@@ -1,0 +1,224 @@
+﻿<?xml version="1.0" encoding="utf-8"?>
+<Project ToolsVersion="4.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup>
+    <Filter Include="Source Files">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;c++;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Resource Files">
+      <UniqueIdentifier>{67DA6AB6-F800-4c08-8B7A-83BB121AAD01}</UniqueIdentifier>
+      <Extensions>rc;ico;cur;bmp;dlg;rc2;rct;bin;rgs;gif;jpg;jpeg;jpe;resx;tiff;tif;png;wav;mfcribbon-ms</Extensions>
+    </Filter>
+    <Filter Include="Source Files\Sandbox">
+      <UniqueIdentifier>{0df18a2c-d69e-4cad-be99-02264f3f2db5}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ClientSource">
+      <UniqueIdentifier>{7780f63a-fbdc-48fd-89db-0af6151f132a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ClientSource\Programs">
+      <UniqueIdentifier>{357a49c3-7eb8-4075-8df9-d11f7fb85e79}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ClientSource\Libraries">
+      <UniqueIdentifier>{387c9d25-acda-4e6c-a9df-551b8aaf5328}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\ClientSource\Connection">
+      <UniqueIdentifier>{b1e2d75e-3719-4f3c-afc7-16b75b40e67a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common">
+      <UniqueIdentifier>{227cd5ac-1fca-4f18-a5c4-e517dd526f05}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common\Clientside">
+      <UniqueIdentifier>{8d23dd57-0446-4723-8b44-05293f49c650}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common\PokemonSwSh">
+      <UniqueIdentifier>{ca670832-1439-443e-a6b2-6bf5b48ad8d3}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common\SwitchRoutines">
+      <UniqueIdentifier>{a5871739-f9dc-498f-b930-705eb7881d98}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common\SwitchFramework">
+      <UniqueIdentifier>{10ade231-7f71-4505-a596-091dfe263106}</UniqueIdentifier>
+    </Filter>
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\ClientSource\Connection\SerialConnection.h">
+      <Filter>Source Files\ClientSource\Connection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ClientSource\Connection\SerialConnectionPOSIX.h">
+      <Filter>Source Files\ClientSource\Connection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ClientSource\Connection\SerialConnectionWinAPI.h">
+      <Filter>Source Files\ClientSource\Connection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ClientSource\Connection\StreamInterface.h">
+      <Filter>Source Files\ClientSource\Connection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ClientSource\Connection\PABotBaseConnection.h">
+      <Filter>Source Files\ClientSource\Connection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ClientSource\Connection\PABotBase.h">
+      <Filter>Source Files\ClientSource\Connection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ClientSource\Libraries\MessageConverter.h">
+      <Filter>Source Files\ClientSource\Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ClientSource\Libraries\Logging.h">
+      <Filter>Source Files\ClientSource\Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ClientSource\Libraries\Compiler.h">
+      <Filter>Source Files\ClientSource\Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ClientSource\Libraries\Utilities.h">
+      <Filter>Source Files\ClientSource\Libraries</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\Clientside\PrettyPrint.h">
+      <Filter>Source Files\Common\Clientside</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\Clientside\Unicode.h">
+      <Filter>Source Files\Common\Clientside</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\ClientSource\Connection\BotBase.h">
+      <Filter>Source Files\ClientSource\Connection</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\Clientside\AsyncDispatcher.h">
+      <Filter>Source Files\Common\Clientside</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\Clientside\SpinLock.h">
+      <Filter>Source Files\Common\Clientside</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonProgramIDs.h">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSettings.h">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\SwitchRoutines\SwitchDigitEntry.h">
+      <Filter>Source Files\Common\SwitchRoutines</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\SwitchFramework\FrameworkSettings.h">
+      <Filter>Source Files\Common\SwitchFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\SwitchFramework\SwitchControllerDefs.h">
+      <Filter>Source Files\Common\SwitchFramework</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSwShAutoHosts.h">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSwShDateSpam.h">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSwShDaySkippers.h">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSwShEggRoutines.h">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSwShGameEntry.h">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSwShMisc.h">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\MessageProtocol.h">
+      <Filter>Source Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\CRC32.h">
+      <Filter>Source Files\Common</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\SwitchFramework\Switch_PushButtons.h">
+      <Filter>Source Files\Common\SwitchFramework</Filter>
+    </ClInclude>
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\ClientSource\Connection\PABotBaseConnection.cpp">
+      <Filter>Source Files\ClientSource\Connection</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ClientSource\Connection\PABotBase.cpp">
+      <Filter>Source Files\ClientSource\Connection</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ClientSource\Libraries\MessageConverter.cpp">
+      <Filter>Source Files\ClientSource\Libraries</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ClientSource\Main.cpp">
+      <Filter>Source Files</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ClientSource\Libraries\Logging.cpp">
+      <Filter>Source Files\ClientSource\Libraries</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ClientSource\Libraries\Utilities.cpp">
+      <Filter>Source Files\ClientSource\Libraries</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ClientSource\Programs\DeviceLogger.cpp">
+      <Filter>Source Files\ClientSource\Programs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ClientSource\Programs\TurboA.cpp">
+      <Filter>Source Files\ClientSource\Programs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ClientSource\Programs\ClothingBuyer.cpp">
+      <Filter>Source Files\ClientSource\Programs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ClientSource\Programs\BallThrower.cpp">
+      <Filter>Source Files\ClientSource\Programs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ClientSource\Programs\BeamReset.cpp">
+      <Filter>Source Files\ClientSource\Programs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ClientSource\Programs\FriendDelete.cpp">
+      <Filter>Source Files\ClientSource\Programs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\ClientSource\Programs\DateSpam-WattFarmer.cpp">
+      <Filter>Source Files\ClientSource\Programs</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\Clientside\PrettyPrint.cpp">
+      <Filter>Source Files\Common\Clientside</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\Clientside\Unicode.cpp">
+      <Filter>Source Files\Common\Clientside</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\Clientside\AsyncDispatcher.cpp">
+      <Filter>Source Files\Common\Clientside</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSettings.c">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSettings.cpp">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShDaySkippers.cpp">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShEggRoutines.cpp">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShAutoHosts.cpp">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShDateSpam.cpp">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\SwitchRoutines\SwitchDigitEntry.cpp">
+      <Filter>Source Files\Common\SwitchRoutines</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\SwitchFramework\FrameworkSettings.c">
+      <Filter>Source Files\Common\SwitchFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\SwitchFramework\FrameworkSettings.cpp">
+      <Filter>Source Files\Common\SwitchFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShGameEntry.cpp">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShMisc.cpp">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\CRC32.c">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\CRC32.cpp">
+      <Filter>Source Files\Common</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\SwitchFramework\Switch_PushButtons.cpp">
+      <Filter>Source Files\Common\SwitchFramework</Filter>
+    </ClCompile>
+  </ItemGroup>
+</Project>

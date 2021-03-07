@@ -1,0 +1,232 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Debug|Win32">
+      <Configuration>Debug</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|Win32">
+      <Configuration>Release</Configuration>
+      <Platform>Win32</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Debug|x64">
+      <Configuration>Debug</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>16.0</VCProjectVersion>
+    <Keyword>Win32Proj</Keyword>
+    <ProjectGuid>{17c9a95d-88bd-49df-8e2e-8f773b17646a}</ProjectGuid>
+    <RootNamespace>PokemonAutomationClient</RootNamespace>
+    <WindowsTargetPlatformVersion>10.0</WindowsTargetPlatformVersion>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>true</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v142</PlatformToolset>
+    <WholeProgramOptimization>true</WholeProgramOptimization>
+    <CharacterSet>Unicode</CharacterSet>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <LinkIncremental>true</LinkIncremental>
+  </PropertyGroup>
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <LinkIncremental>false</LinkIncremental>
+  </PropertyGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>WIN32;NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>_DEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <ClCompile>
+      <WarningLevel>Level4</WarningLevel>
+      <FunctionLevelLinking>true</FunctionLevelLinking>
+      <IntrinsicFunctions>true</IntrinsicFunctions>
+      <SDLCheck>true</SDLCheck>
+      <PreprocessorDefinitions>NDEBUG;_CONSOLE;%(PreprocessorDefinitions)</PreprocessorDefinitions>
+      <ConformanceMode>true</ConformanceMode>
+      <AdditionalIncludeDirectories>$(SolutionDir)\..\</AdditionalIncludeDirectories>
+      <MultiProcessorCompilation>true</MultiProcessorCompilation>
+      <RuntimeLibrary>MultiThreaded</RuntimeLibrary>
+    </ClCompile>
+    <Link>
+      <SubSystem>Console</SubSystem>
+      <EnableCOMDATFolding>true</EnableCOMDATFolding>
+      <OptimizeReferences>true</OptimizeReferences>
+      <GenerateDebugInformation>true</GenerateDebugInformation>
+    </Link>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClInclude Include="..\..\ClientSource\Connection\BotBase.h" />
+    <ClInclude Include="..\..\ClientSource\Connection\PABotBase.h" />
+    <ClInclude Include="..\..\ClientSource\Connection\PABotBaseConnection.h" />
+    <ClInclude Include="..\..\ClientSource\Connection\SerialConnection.h" />
+    <ClInclude Include="..\..\ClientSource\Connection\SerialConnectionPOSIX.h" />
+    <ClInclude Include="..\..\ClientSource\Connection\SerialConnectionWinAPI.h" />
+    <ClInclude Include="..\..\ClientSource\Connection\StreamInterface.h" />
+    <ClInclude Include="..\..\ClientSource\Libraries\Compiler.h" />
+    <ClInclude Include="..\..\ClientSource\Libraries\Logging.h" />
+    <ClInclude Include="..\..\ClientSource\Libraries\MessageConverter.h" />
+    <ClInclude Include="..\..\ClientSource\Libraries\Utilities.h" />
+    <ClInclude Include="..\..\Common\Clientside\PrettyPrint.h" />
+    <ClInclude Include="..\..\Common\Clientside\AsyncDispatcher.h" />
+    <ClInclude Include="..\..\Common\Clientside\SpinLock.h" />
+    <ClInclude Include="..\..\Common\Clientside\Unicode.h" />
+    <ClInclude Include="..\..\Common\CRC32.h" />
+    <ClInclude Include="..\..\Common\MessageProtocol.h" />
+    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonProgramIDs.h" />
+    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSettings.h" />
+    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSwShAutoHosts.h" />
+    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSwShDateSpam.h" />
+    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSwShDaySkippers.h" />
+    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSwShEggRoutines.h" />
+    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSwShGameEntry.h" />
+    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSwShMisc.h" />
+    <ClInclude Include="..\..\Common\SwitchFramework\FrameworkSettings.h" />
+    <ClInclude Include="..\..\Common\SwitchFramework\SwitchControllerDefs.h" />
+    <ClInclude Include="..\..\Common\SwitchFramework\Switch_PushButtons.h" />
+    <ClInclude Include="..\..\Common\SwitchRoutines\SwitchDigitEntry.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClCompile Include="..\..\ClientSource\Connection\PABotBase.cpp" />
+    <ClCompile Include="..\..\ClientSource\Connection\PABotBaseConnection.cpp" />
+    <ClCompile Include="..\..\ClientSource\Libraries\Logging.cpp" />
+    <ClCompile Include="..\..\ClientSource\Libraries\MessageConverter.cpp" />
+    <ClCompile Include="..\..\ClientSource\Libraries\Utilities.cpp" />
+    <ClCompile Include="..\..\ClientSource\Main.cpp" />
+    <ClCompile Include="..\..\ClientSource\Programs\BallThrower.cpp" />
+    <ClCompile Include="..\..\ClientSource\Programs\BeamReset.cpp" />
+    <ClCompile Include="..\..\ClientSource\Programs\ClothingBuyer.cpp" />
+    <ClCompile Include="..\..\ClientSource\Programs\DeviceLogger.cpp" />
+    <ClCompile Include="..\..\ClientSource\Programs\FriendDelete.cpp" />
+    <ClCompile Include="..\..\ClientSource\Programs\TurboA.cpp" />
+    <ClCompile Include="..\..\ClientSource\Programs\DateSpam-WattFarmer.cpp" />
+    <ClCompile Include="..\..\Common\Clientside\PrettyPrint.cpp" />
+    <ClCompile Include="..\..\Common\Clientside\AsyncDispatcher.cpp" />
+    <ClCompile Include="..\..\Common\Clientside\Unicode.cpp" />
+    <ClCompile Include="..\..\Common\CRC32.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\CRC32.cpp" />
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSettings.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSettings.cpp" />
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShAutoHosts.cpp" />
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShDateSpam.cpp" />
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShDaySkippers.cpp" />
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShEggRoutines.cpp" />
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShGameEntry.cpp" />
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShMisc.cpp" />
+    <ClCompile Include="..\..\Common\SwitchFramework\FrameworkSettings.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\SwitchFramework\FrameworkSettings.cpp" />
+    <ClCompile Include="..\..\Common\SwitchFramework\Switch_PushButtons.cpp" />
+    <ClCompile Include="..\..\Common\SwitchRoutines\SwitchDigitEntry.cpp" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
