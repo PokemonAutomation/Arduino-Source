@@ -1,6 +1,6 @@
 /*  Device-side Callbacks for the Pokemon Programs
  * 
- *  From: https://github.com/Mysticial/Pokemon-Automation-SwSh-Arduino-Scripts
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
  * 
  */
 

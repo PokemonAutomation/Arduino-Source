@@ -1,6 +1,6 @@
 /*  Pokemon Sword & Shield: Custom Program
  * 
- *  From: https://github.com/Mysticial/Pokemon-Automation-SwSh-Arduino-Scripts
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
  * 
  *      Make your own program here!
  * 

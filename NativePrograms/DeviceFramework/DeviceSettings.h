@@ -1,6 +1,6 @@
 /*  Device Settings
  * 
- *  From: https://github.com/Mysticial/Pokemon-Automation-SwSh-Arduino-Scripts
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
  * 
  */
 

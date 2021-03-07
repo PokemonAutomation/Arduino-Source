@@ -1,6 +1,6 @@
 /*  Pokemon Sword & Shield: Berry Farmer
  * 
- *  From: https://github.com/Mysticial/Pokemon-Automation-SwSh-Arduino-Scripts
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
  * 
  *      Please refer to the user manual for instructions and documentation.
  * 

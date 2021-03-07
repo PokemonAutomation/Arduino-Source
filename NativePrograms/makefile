@@ -5,7 +5,7 @@
 #  dean [at] fourwalledcubicle [dot] com
 #           www.lufa-lib.org
 # 
-#  Modified by https://github.com/Mysticial/Pokemon-Automation-SwSh-Arduino-Scripts
+#  Modified by https://github.com/PokemonAutomation/Arduino-Source
 #
 # --------------------------------------
 #         LUFA Project Makefile.

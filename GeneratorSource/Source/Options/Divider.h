@@ -1,6 +1,6 @@
 /*  Divider
  *
- *  From: https://github.com/Mysticial/Pokemon-Automation-SwSh-Arduino-Scripts
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  *      This isn't a real option. It's just a line divider between groups of options.
  */
