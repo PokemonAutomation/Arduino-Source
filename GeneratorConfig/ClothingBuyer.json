@@ -1,0 +1,13 @@
+﻿{
+    "0-ProgramName": "ClothingBuyer",
+    "1-Description": "Buy out all the clothing in a store.",
+    "2-Parameters": [
+        {
+            "00-Type": "BooleanCheckBox",
+            "01-Label": "<b>Rotate Categories:</b><br>This slows down the program, but ensures it will cover all categories.",
+            "02-Declaration": "const bool CATEGORY_ROTATION",
+            "98-Default": true,
+            "99-Current": true
+        }
+    ]
+}

@@ -1,0 +1,6 @@
+﻿{
+    "0-ProgramName": "PABotBase",
+    "1-Description": "Control your Arduino/Teensy (and therefore your Switch) from a computer.",
+    "2-Parameters": [
+    ]
+}

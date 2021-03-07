@@ -1,0 +1,24 @@
+﻿{
+    "0-ProgramName": "DateSpam-WattFarmer",
+    "1-Description": "Farm watts. (6.9 seconds/fetch, 1 million watts/hour)",
+    "2-Parameters": [
+        {
+            "00-Type": "SimpleInteger",
+            "01-Label": "<b>Number of Fetch Attempts:</b>",
+            "02-Declaration": "const uint32_t SKIPS",
+            "03-MinValue": 0,
+            "04-MaxValue": 2147483647,
+            "98-Default": 33334,
+            "99-Current": 33334
+        },
+        {
+            "00-Type": "SimpleInteger",
+            "01-Label": "<b>Save Every this Many Fetches:</b><br>(zero disables saving): ",
+            "02-Declaration": "const uint16_t SAVE_ITERATIONS",
+            "03-MinValue": 0,
+            "04-MaxValue": 65535,
+            "98-Default": 0,
+            "99-Current": 0
+        }
+    ]
+}
