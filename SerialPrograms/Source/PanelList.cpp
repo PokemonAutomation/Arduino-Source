@@ -62,8 +62,8 @@
 #include "PokemonSwSh/Programs/EggPrograms/PokemonSwSh_GodEggDuplication.h"
 #include "PokemonSwSh/Programs/EggPrograms/PokemonSwSh_GodEggItemDupe.h"
 
-#include "PokemonSwSh/Programs/SynchronizedSpinning.h"
-#include "PokemonSwSh/Programs/RaidItemFarmerOKHO.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_SynchronizedSpinning.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_RaidItemFarmerOKHO.h"
 
 namespace PokemonAutomation{
 

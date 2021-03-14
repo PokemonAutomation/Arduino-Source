@@ -7,7 +7,7 @@
 #include "Common/Clientside/PrettyPrint.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "PokemonSwSh/Programs/Hosting/PokemonSwSh_DenTools.h"
-#include "RaidItemFarmerOKHO.h"
+#include "PokemonSwSh_RaidItemFarmerOKHO.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

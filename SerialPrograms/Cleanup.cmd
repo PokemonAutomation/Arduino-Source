@@ -5,6 +5,8 @@ del object_script.*
 del users*
 del SerialPrograms.pro.user*
 del Settings.json
+del *.png
+del *.jpg
 
 rd /s /q "debug\"
 rd /s /q "release\"

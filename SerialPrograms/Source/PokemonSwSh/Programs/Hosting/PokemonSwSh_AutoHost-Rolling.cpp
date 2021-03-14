@@ -10,6 +10,7 @@
 #include "Common/SwitchRoutines/SwitchDigitEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShAutoHosts.h"
+#include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "PokemonSwSh_DenTools.h"
 #include "PokemonSwSh_LobbyWait.h"
 #include "PokemonSwSh_AutoHost-Rolling.h"
@@ -162,7 +163,28 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env) const{
         pbf_press_dpad(DPAD_UP, 5, 45);
 
         //  Mash A until it's time to close the game.
+#if 1
+        {
+            env.console.botbase().wait_for_all_requests();
+            uint32_t start = system_clock();
+            pbf_mash_button(BUTTON_A, 3 * TICKS_PER_SECOND);
+            env.console.botbase().wait_for_all_requests();
+
+            BlackScreenDetector black_screen(env.console, env.logger);
+            uint32_t now = start;
+            while (now - start < RAID_START_TO_EXIT_DELAY){
+                if (black_screen.black_is_over()){
+                    env.logger.log("Raid has Started!", "blue");
+                    break;
+                }
+                pbf_mash_button(BUTTON_A, TICKS_PER_SECOND);
+                env.console.botbase().wait_for_all_requests();
+                now = system_clock();
+            }
+        }
+#else
         pbf_mash_button(BUTTON_A, RAID_START_TO_EXIT_DELAY);
+#endif
 
         //  Select a move.
         if (MOVE_SLOT > 0){

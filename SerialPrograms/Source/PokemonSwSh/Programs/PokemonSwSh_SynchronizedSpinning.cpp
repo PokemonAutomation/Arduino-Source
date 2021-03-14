@@ -5,7 +5,7 @@
  */
 
 #include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "SynchronizedSpinning.h"
+#include "PokemonSwSh_SynchronizedSpinning.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

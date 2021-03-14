@@ -64,7 +64,7 @@ RaidLobbyState RaidLobbyReader::read(){
     str += QString::number(stddev2) + ", ";
     str += QString::number(stddev3) + "}";
 
-    m_logger.log("RaidLobbyReader(): " + str, "blue");
+    m_logger.log("RaidLobbyReader(): " + str, "purple");
 
     const double PLAYER_READY = 100;
     const double PLAYER_EXISTS = 20;

@@ -45,15 +45,9 @@ void PABotBase::stop(){
 
     //  Make sure only one thread can get in here.
     State expected = State::RUNNING;
-    if (!m_state.compare_exchange_strong(expected, State::NO_COMMANDS)){
+    if (!m_state.compare_exchange_strong(expected, State::STOPPING)){
         return;
     }
-
-    //  Send a stop request, but don't wait for a response that we may never
-    //  receive.
-    pabb_MsgRequestStop params;
-    try_issue_request<PABB_MSG_REQUEST_STOP>(params);
-    m_state.store(State::STOPPING, std::memory_order_release);
 
     //  Wake everyone up.
     {
@@ -63,6 +57,17 @@ void PABotBase::stop(){
     m_retransmit_thread.join();
 
     SpinLockGuard lg(m_state_lock, "PABotBase::stop()");
+
+    //  Send a stop request, but don't wait for a response that we may never
+    //  receive.
+    pabb_MsgRequestStop params;
+    uint64_t seqnum = m_send_seq;
+    seqnum_t seqnum_s = (seqnum_t)seqnum;
+    memcpy(&params, &seqnum_s, sizeof(seqnum_t));
+//    try_issue_request<PABB_MSG_REQUEST_STOP>(params);
+//    m_state.store(State::STOPPING, std::memory_order_release);
+    BotBaseMessage stop_request(PABB_MSG_REQUEST_STOP, std::string((char*)&params, sizeof(params)));
+    send_message(stop_request, false);
 
     //  Must call this to stop the receiver thread from making any more async
     //  calls into this class which touch its fields.
@@ -375,7 +380,7 @@ bool PABotBase::try_issue_request(
     SpinLockGuard lg(m_state_lock, "PABotBase::try_issue_request()");
 
     State state = m_state.load(std::memory_order_acquire);
-    if (state == State::STOPPING){
+    if (state != State::RUNNING){
         throw CancelledException();
     }
 
@@ -423,11 +428,7 @@ bool PABotBase::try_issue_command(
     SpinLockGuard lg(m_state_lock, "PABotBase::try_issue_command()");
 
     State state = m_state.load(std::memory_order_acquire);
-    if (state == State::STOPPING){
-        throw CancelledException();
-    }
-
-    if (state == State::NO_COMMANDS){
+    if (state != State::RUNNING){
         throw CancelledException();
     }
 
@@ -501,6 +502,9 @@ bool PABotBase::issue_request(
             return true;
         }
         std::unique_lock<std::mutex> lg(m_sleep_lock);
+        if (m_state.load(std::memory_order_acquire) != State::RUNNING){
+            throw CancelledException();
+        }
         m_cv.wait(lg);
     }
 }
@@ -536,6 +540,9 @@ bool PABotBase::issue_command(
             return true;
         }
         std::unique_lock<std::mutex> lg(m_sleep_lock);
+        if (m_state.load(std::memory_order_acquire) != State::RUNNING){
+            throw CancelledException();
+        }
         m_cv.wait(lg);
     }
 }
@@ -581,7 +588,7 @@ void PABotBase::issue_request_and_wait(
         {
             SpinLockGuard slg(m_state_lock, "PABotBase::issue_request_and_wait() - 0");
             State state = m_state.load(std::memory_order_acquire);
-            if (state == State::STOPPING){
+            if (state != State::RUNNING){
                 remove_request(iter);
                 throw CancelledException();
             }

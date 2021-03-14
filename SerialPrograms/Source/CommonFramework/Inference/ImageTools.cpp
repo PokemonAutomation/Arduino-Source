@@ -94,6 +94,36 @@ FloatPixel pixel_stddev(const QImage& image){
     );
 }
 
+ImageStats pixel_stats(const QImage& image){
+    int w = image.width();
+    int h = image.height();
+    if (w * h <= 1){
+        return ImageStats();
+    }
+    FloatPixel sum;
+    FloatPixel sqr_sum;
+    for (int r = 0; r < h; r++){
+        for (int c = 0; c < w; c++){
+            FloatPixel p(image.pixel(c, r));
+            sum += p;
+            sqr_sum += p * p;
+        }
+    }
+    size_t total = w * h;
+    FloatPixel variance = (sqr_sum - sum*sum / total) / (total - 1);
+    return ImageStats{
+        sum / total,
+        FloatPixel(
+            std::sqrt(variance.r),
+            std::sqrt(variance.g),
+            std::sqrt(variance.b)
+        )
+    };
+
+}
+
+
+
 
 
 }

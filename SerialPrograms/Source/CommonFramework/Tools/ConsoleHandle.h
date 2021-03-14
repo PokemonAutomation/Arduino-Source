@@ -16,8 +16,6 @@ namespace PokemonAutomation{
 
 
 class ConsoleHandle{
-    using BotBase = BotBase;
-
 public:
     ConsoleHandle(
         size_t index,

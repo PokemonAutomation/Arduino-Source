@@ -36,7 +36,6 @@ class BotBase{
 public:
     enum class State{
         RUNNING,
-        NO_COMMANDS,
         STOPPING,
         STOPPED,
     };

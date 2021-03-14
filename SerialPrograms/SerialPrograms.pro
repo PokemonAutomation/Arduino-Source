@@ -59,6 +59,9 @@ SOURCES += \
     ../Common/SwitchFramework/Switch_PushButtons.cpp \
     ../Common/SwitchRoutines/SwitchDigitEntry.cpp \
     Source/CommonFramework/Globals.cpp \
+    Source/CommonFramework/Inference/BlackScreenDetector.cpp \
+    Source/CommonFramework/Inference/FillGeometry.cpp \
+    Source/CommonFramework/Inference/FlagMatrix.cpp \
     Source/CommonFramework/Inference/ImageTools.cpp \
     Source/CommonFramework/Main.cpp \
     Source/CommonFramework/Options/FixedCode.cpp \
@@ -129,10 +132,10 @@ SOURCES += \
     Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_AutoHost-MultiGame.cpp \
     Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_AutoHost-Rolling.cpp \
     Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_DenRoller.cpp \
+    Source/PokemonSwSh/Programs/PokemonSwSh_RaidItemFarmerOKHO.cpp \
+    Source/PokemonSwSh/Programs/PokemonSwSh_SynchronizedSpinning.cpp \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FastCodeEntry.cpp \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.cpp \
-    Source/PokemonSwSh/Programs/RaidItemFarmerOKHO.cpp \
-    Source/PokemonSwSh/Programs/SynchronizedSpinning.cpp \
     Source/PokemonSwSh/Programs/TestProgram.cpp
 
 HEADERS += \
@@ -177,6 +180,9 @@ HEADERS += \
     ../Common/SwitchFramework/Switch_PushButtons.h \
     ../Common/SwitchRoutines/SwitchDigitEntry.h \
     Source/CommonFramework/Globals.h \
+    Source/CommonFramework/Inference/BlackScreenDetector.h \
+    Source/CommonFramework/Inference/FillGeometry.h \
+    Source/CommonFramework/Inference/FlagMatrix.h \
     Source/CommonFramework/Inference/ImageTools.h \
     Source/CommonFramework/Options/BooleanCheckBox.h \
     Source/CommonFramework/Options/ConfigOption.h \
@@ -266,11 +272,11 @@ HEADERS += \
     Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_DenRoller.h \
     Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_DenTools.h \
     Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_LobbyWait.h \
+    Source/PokemonSwSh/Programs/PokemonSwSh_RaidItemFarmerOKHO.h \
+    Source/PokemonSwSh/Programs/PokemonSwSh_SynchronizedSpinning.h \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FastCodeEntry.h \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.h \
-    Source/PokemonSwSh/Programs/RaidItemFarmerOKHO.h \
     Source/PokemonSwSh/Programs/ReleaseHelpers.h \
-    Source/PokemonSwSh/Programs/SynchronizedSpinning.h \
     Source/PokemonSwSh/Programs/TestProgram.h
 
 # Default rules for deployment.

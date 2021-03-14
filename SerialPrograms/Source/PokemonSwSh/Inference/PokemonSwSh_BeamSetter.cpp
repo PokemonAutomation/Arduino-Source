@@ -92,7 +92,7 @@ bool BeamSetter::run(
         double max_red_diff = -1.0;
         size_t max_red_diff_index = 0;
         double min_stddev = 255;
-//        size_t min_stddev_index = 0;
+        size_t min_stddev_index = 0;
         for (size_t c = 0; c < m_boxes.size(); c++){
             FloatPixel diff = current_ratio_diffs[c] - average_diff;
 //                cout << "current_values[" << c << "] = " << current_values[c] << ", " << diff << endl;
@@ -103,50 +103,54 @@ bool BeamSetter::run(
             }
             if (min_stddev > stddev){
                 min_stddev = stddev;
-//                min_stddev_index = c;
+                min_stddev_index = c;
             }
             if (stddev < 10 && current_values[c].sum() > 500){
                 size_t& count = purple_detections[c];
                 count++;
-                if (count >= 1){
-                    m_logger.log("BeamReader(): Purple beam found!", "blue");
-                    return true;
-                }
             }
             if (diff.r > detection_threshold){
                 size_t& count = red_detections[c];
                 count++;
-                if (count >= 5){
-                    m_logger.log("BeamReader(): 5 positive red reads. Red beam found.", "blue");
-                    return false;
-                }
             }
         }
 
         QString str =
-            "BeamReader(): Red[" + QString::number(max_red_diff_index) + "] = " +
-            (current_ratio_diffs[max_red_diff_index] - average_diff).to_string() +
-            ", b = " + QString::number(min_stddev) +
+            "BeamReader(): r[" + QString::number(max_red_diff_index) + "] = " +
+            QString::number(current_ratio_diffs[max_red_diff_index].r - average_diff.r) +
+            ", b[" + QString::number(min_stddev_index) + "] = " + QString::number(min_stddev) +
             ", t = " + QString::number(text_stddev);
         m_logger.log(str, "purple");
 
         if (!red_detections.empty()){
             str = "BeamReader(): Red = ";
+            size_t count = 0;
             for (const auto& column : red_detections){
+                count = std::max(count, column.second);
                 str += "[" + QString::number(column.second) + " x " +
                     QString::number(column.first) + "-" +
                     QString::number(current_ratio_diffs[column.first].r - average_diff.r) + "]";
             }
             m_logger.log(str, "purple");
+            if (count >= 5){
+                m_logger.log("BeamReader(): 5 positive red reads. Red beam found.", "blue");
+                return false;
+            }
         }
         if (!purple_detections.empty()){
             str = "BeamReader(): Purple = ";
+            size_t count = 0;
             for (const auto& column : purple_detections){
+                count = std::max(count, column.second);
                 str += "[" + QString::number(column.second) + " x " +
                     QString::number(column.first) + "-" +
                     current_values[column.first].to_string() + "]";
             }
             m_logger.log(str, "purple");
+            if (count >= 1){
+                m_logger.log("BeamReader(): Purple beam found!", "blue");
+                return true;
+            }
         }
         if (low_stddev_flag && text_stddev > 100){
             m_logger.log("BeamReader(): No beam detected with text. Resetting.", "blue");

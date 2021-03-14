@@ -88,14 +88,35 @@ void registeel(void){
     pbf_move_left_joystick(128, 0, 250, 0);
 }
 void regieleki(void){
+    pbf_move_left_joystick(16, 255, 162, 0);
+    pbf_move_left_joystick(64, 255, 52, 0);
+    pbf_move_left_joystick(200, 255, 52, 0);
+    pbf_move_left_joystick(0, 50, 122, 0);
+    pbf_move_left_joystick(0, 206, 93, 0);
+    pbf_move_left_joystick(216, 0, 78, 0);
+    pbf_move_left_joystick(56, 0, 80, 0);
+    pbf_mash_button(BUTTON_A, 5 * TICKS_PER_SECOND);
+    pbf_move_left_joystick(216, 0, 170, 0);
+#if 0
+    pbf_move_left_joystick(16, 255, 162, 0);
+    pbf_move_left_joystick(128, 255, 90, 0);
+    pbf_move_left_joystick(64, 0, 73, 0);
+    pbf_move_left_joystick(0, 128, 119, 0);
+    pbf_move_left_joystick(80, 255, 46, 0);
+    pbf_move_left_joystick(128, 0, 120, 0);
+    pbf_mash_button(BUTTON_A, 5 * TICKS_PER_SECOND);
+    pbf_move_left_joystick(192, 0, 160, 0);
+#endif
+#if 0
     pbf_move_left_joystick(16, 255, 160, 0);
     pbf_move_left_joystick(128, 255, 90, 0);
-    pbf_move_left_joystick(64, 0, 75, 0);
+    pbf_move_left_joystick(64, 0, 77, 0);
     pbf_move_left_joystick(0, 128, 115, 0);
-    pbf_move_left_joystick(72, 255, 50, 0);
+    pbf_move_left_joystick(80, 255, 48, 0);
     pbf_move_left_joystick(128, 0, 110, 0);
     pbf_mash_button(BUTTON_A, 5 * TICKS_PER_SECOND);
     pbf_move_left_joystick(192, 0, 200, 0);
+#endif
 }
 void regidrago(void){
     pbf_move_left_joystick(16, 255, 160, 0);

@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_ImageTools_H
-#define PokemonAutomation_ImageTools_H
+#ifndef PokemonAutomation_CommonFramework_ImageTools_H
+#define PokemonAutomation_CommonFramework_ImageTools_H
 
 #include <ostream>
 #include <QImage>
@@ -97,6 +97,11 @@ FloatPixel pixel_average(const QImage& image);
 FloatPixel pixel_average_normalized(const QImage& image);
 FloatPixel pixel_stddev(const QImage& image);
 
+struct ImageStats{
+    FloatPixel average;
+    FloatPixel stddev;
+};
+ImageStats pixel_stats(const QImage& image);
 
 }
 #endif
