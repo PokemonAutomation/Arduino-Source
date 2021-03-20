@@ -52,7 +52,11 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env) const{
 
     uint64_t count = 0;
     while (true){
-        env.logger.log("Attempts: " + QString::number(count));
+        {
+            QString status = "Red Beams: " + QString::number(count);
+            env.logger.log(status);
+            env.set_status(status);
+        }
 
         //  Talk to den.
         pbf_press_button(BUTTON_A, 10, 450);

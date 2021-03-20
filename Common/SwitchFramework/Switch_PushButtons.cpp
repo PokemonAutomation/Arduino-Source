@@ -138,10 +138,12 @@ void end_program_loop(void){
     end_program_loop(*global_connection);
 }
 void end_program_loop(BotBase& device){
+#if 0
     pbf_wait(device, 15 * TICKS_PER_SECOND);
     while (true){
         pbf_press_button(device, BUTTON_ZL, 10, 15 * TICKS_PER_SECOND - 10);
     }
+#endif
 }
 
 

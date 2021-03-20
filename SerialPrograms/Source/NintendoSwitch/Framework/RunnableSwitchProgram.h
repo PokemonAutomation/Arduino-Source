@@ -8,6 +8,7 @@
 #define PokemonAutomation_RunnableProgram_H
 
 #include <thread>
+#include <QLabel>
 #include <QPushButton>
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/ConfigOption.h"
@@ -67,6 +68,8 @@ public:
     void restore_defaults();
     virtual ProgramState update_ui();
 
+    void set_status(QString status);
+
 private:
     void on_stop();
     void reset_connections();
@@ -89,6 +92,7 @@ protected:
     SwitchSetup* m_setup;
     std::vector<ConfigOptionUI*> m_options;
 
+    QLabel* m_status_bar;
     QPushButton* m_start_button;
     QPushButton* m_default_button;
 

@@ -55,6 +55,12 @@ void SingleSwitchProgramUI::program(){
         },
         Qt::DirectConnection
     );
+    connect(
+        &env, &ProgramEnvironment::set_status,
+        this, [=](QString status){
+            this->set_status(std::move(status));
+        }
+    );
     PokemonAutomation::global_connection = &(BotBase&)env.console;
     SingleSwitchProgram& factory = static_cast<SingleSwitchProgram&>(m_factory);
     factory.program(env);

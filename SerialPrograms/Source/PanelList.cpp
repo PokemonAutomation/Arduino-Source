@@ -36,12 +36,12 @@
 #include "PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-StowOnSideFarmer.h"
 #include "PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-DailyHighlightFarmer.h"
 
-#include "PokemonSwSh/Programs/BasicShinyHunt/PokemonSwSh_MultiGameFossil.h"
-#include "PokemonSwSh/Programs/BasicShinyHunt/PokemonSwSh_ShinyHuntUnattended-Regi.h"
-#include "PokemonSwSh/Programs/BasicShinyHunt/PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.h"
-#include "PokemonSwSh/Programs/BasicShinyHunt/PokemonSwSh_ShinyHuntUnattended-StrongSpawn.h"
-#include "PokemonSwSh/Programs/BasicShinyHunt/PokemonSwSh_ShinyHuntUnattended-Regigigas2.h"
-#include "PokemonSwSh/Programs/BasicShinyHunt/PokemonSwSh_ShinyHuntUnattended-IoATrade.h"
+#include "PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_MultiGameFossil.h"
+#include "PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-Regi.h"
+#include "PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.h"
+#include "PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-StrongSpawn.h"
+#include "PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-Regigigas2.h"
+#include "PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-IoATrade.h"
 
 #include "PokemonSwSh/Programs/DenHunting/PokemonSwSh_BeamReset.h"
 #include "PokemonSwSh/Programs/DenHunting/PokemonSwSh_PurpleBeamFinder.h"

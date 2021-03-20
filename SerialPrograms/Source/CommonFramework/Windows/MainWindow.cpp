@@ -128,6 +128,7 @@ MainWindow::MainWindow(QWidget* parent)
         output, &QPushButton::clicked,
         this, [=](bool){
             m_output_window->show();
+            m_output_window->activateWindow();
         }
     );
 

@@ -8,7 +8,7 @@
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "PokemonSwSh_ShinyHuntTools.h"
+#include "PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntTools.h"
 #include "PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.h"
 
 namespace PokemonAutomation{

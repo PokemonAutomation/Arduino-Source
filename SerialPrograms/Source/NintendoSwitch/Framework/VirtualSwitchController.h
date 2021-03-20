@@ -4,17 +4,18 @@
  *
  */
 
-#ifndef PokemonAutomation_VirtualController_H
-#define PokemonAutomation_VirtualController_H
+#ifndef PokemonAutomation_NintendoSwitch_VirtualController_H
+#define PokemonAutomation_NintendoSwitch_VirtualController_H
 
 #include <set>
+#include <map>
 #include <thread>
 #include <Qt>
-#include "Common/SwitchFramework/SwitchControllerDefs.h"
 #include "Common/Clientside/SpinLock.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/BotBaseHandle.h"
 #include "CommonFramework/Tools/Logger.h"
+#include "VirtualSwitchControllerMapping.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -34,7 +35,6 @@ public:
     void on_state_changed(ProgramState state);
 
 private:
-    void print();
     void thread_loop();
 
 private:
@@ -45,13 +45,7 @@ private:
     std::set<Qt::Key> m_pressed_buttons;
 
     //  Controller State
-    Button m_buttons;
-    int m_dpad_x;
-    int m_dpad_y;
-    int m_left_joystick_x;
-    int m_left_joystick_y;
-    int m_right_joystick_x;
-    int m_right_joystick_y;
+    VirtualControllerState m_controller_state;
     std::chrono::time_point<std::chrono::system_clock> m_last;
 
     std::atomic<ProgramState> m_last_known_state;

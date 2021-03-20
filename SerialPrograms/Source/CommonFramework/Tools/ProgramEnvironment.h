@@ -22,6 +22,8 @@ namespace PokemonAutomation{
 
 
 class ProgramEnvironment : public QObject{
+    Q_OBJECT
+
 public:
     ProgramEnvironment()
         : m_enable_feedback(true)
@@ -59,6 +61,11 @@ public:
         std::lock_guard<std::mutex> lg(m_lock);
         m_cv.notify_all();
     }
+
+
+signals:
+    void set_status(QString status);
+
 
 private:
     std::atomic<bool> m_enable_feedback;

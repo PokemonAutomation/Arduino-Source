@@ -50,8 +50,8 @@
             "02-Declaration": "const uint16_t CORRECTION_INTERVAL",
             "03-MinValue": 0,
             "04-MaxValue": 65535,
-            "98-Default": 10,
-            "99-Current": 10
+            "98-Default": 20,
+            "99-Current": 20
         },
         {
             "00-Type": "TimeExpression",
@@ -59,8 +59,8 @@
             "02-Declaration": "const uint16_t TRANSITION_DELAY",
             "03-MinValue": 0,
             "04-MaxValue": 65535,
-            "98-Default": "3 * TICKS_PER_SECOND",
-            "99-Current": "3 * TICKS_PER_SECOND"
+            "98-Default": "5 * TICKS_PER_SECOND",
+            "99-Current": "5 * TICKS_PER_SECOND"
         },
         {
             "00-Type": "TimeExpression",

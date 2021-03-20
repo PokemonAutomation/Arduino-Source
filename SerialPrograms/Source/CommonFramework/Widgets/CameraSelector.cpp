@@ -125,12 +125,18 @@ CameraSelectorUI::CameraSelectorUI(QWidget& parent, CameraSelector& value, QWidg
             if (settings.resolution() == resolution){
                 return;
             }
+
             settings.setResolution(resolution);
             m_value.m_resolution = resolution;
+
+//            std::lock_guard<std::mutex> lg(m_camera_lock);
             m_camera->setViewfinderSettings(settings);
 //            resizeEvent(nullptr);
 //            on_state_changed();
             m_overlay->update_size(m_holder.size(), resolution);
+
+//            m_capture_done = true;
+//            m_cv.notify_all();
         }
     );
     connect(
@@ -189,54 +195,79 @@ QString CameraSelectorUI::aspect_ratio(const QSize& size){
     return "(" + QString::number(w) + ":" + QString::number(h) + ")";
 }
 void CameraSelectorUI::reset_video(){
-    std::lock_guard<std::mutex> lg(m_camera_lock);
+    QSize resolution;
+    {
+        std::lock_guard<std::mutex> lg(m_camera_lock);
+        if (m_camera != nullptr){
+            delete m_camera_view;
+            m_camera_view = nullptr;
 
-    if (m_camera != nullptr){
-        delete m_camera_view;
-        m_camera_view = nullptr;
+            delete m_capture;
+            m_capture = nullptr;
 
-        delete m_capture;
-        m_capture = nullptr;
+            delete m_camera;
+            m_camera = nullptr;
 
-        delete m_camera;
-        m_camera = nullptr;
-    }
-
-
-    const QCameraInfo& info = m_value.m_camera;
-    if (info.isNull()){
-        m_resolution_box->clear();
-        return;
-    }
-
-
-    m_camera = new QCamera(info, &m_holder);
-
-    m_capture = new QCameraImageCapture(m_camera, &m_holder);
-    m_capture->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
-    m_camera->setCaptureMode(QCamera::CaptureStillImage);
-    connect(
-        m_capture, &QCameraImageCapture::imageCaptured,
-        this, [&](int id, const QImage& preview){
-            std::lock_guard<std::mutex> lg(m_camera_lock);
-            m_capture_image = preview;
-            m_capture_done = true;
-            m_cv.notify_all();
+            for (auto& item : m_pending_captures){
+                item.second.done = true;
+                item.second.cv.notify_all();
+            }
         }
-    );
 
-    m_camera_view = new QCameraViewfinder(&m_holder);
-    m_holder.layout()->addWidget(m_camera_view);
-    m_camera_view->setMinimumSize(80, 45);
-//    m_camera_view->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Maximum);
-    m_camera->setViewfinder(m_camera_view);
-    m_camera->start();
 
-    m_resolutions = m_camera->supportedViewfinderResolutions();
+        const QCameraInfo& info = m_value.m_camera;
+        if (info.isNull()){
+            m_resolution_box->clear();
+            return;
+        }
 
-    QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
-    QSize resolution = settings.resolution();
-    m_overlay->update_size(m_holder.size(), resolution);
+
+        m_camera = new QCamera(info, &m_holder);
+
+        m_capture = new QCameraImageCapture(m_camera, &m_holder);
+        m_capture->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
+        m_camera->setCaptureMode(QCamera::CaptureStillImage);
+        connect(
+            m_capture, &QCameraImageCapture::imageCaptured,
+            this, [&](int id, const QImage& preview){
+                std::lock_guard<std::mutex> lg(m_camera_lock);
+                auto iter = m_pending_captures.find(id);
+                if (iter == m_pending_captures.end()){
+                    cout << "QCameraImageCapture::imageCaptured(): Unable to find capture id: " << id << endl;
+                    return;
+                }
+                iter->second.done = true;
+                iter->second.image = preview;
+                iter->second.cv.notify_all();
+            }
+        );
+        connect(
+            m_capture, static_cast<void(QCameraImageCapture::*)(int, QCameraImageCapture::Error, const QString&)>(&QCameraImageCapture::error),
+            this, [&](int id, QCameraImageCapture::Error error, const QString& errorString){
+                std::lock_guard<std::mutex> lg(m_camera_lock);
+                cout << "QCameraImageCapture::error(): " << errorString.toUtf8().data() << endl;
+                auto iter = m_pending_captures.find(id);
+                if (iter == m_pending_captures.end()){
+                    return;
+                }
+                iter->second.done = true;
+                iter->second.cv.notify_all();
+            }
+        );
+
+        m_camera_view = new QCameraViewfinder(&m_holder);
+        m_holder.layout()->addWidget(m_camera_view);
+        m_camera_view->setMinimumSize(80, 45);
+    //    m_camera_view->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Maximum);
+        m_camera->setViewfinder(m_camera_view);
+        m_camera->start();
+
+        m_resolutions = m_camera->supportedViewfinderResolutions();
+
+        QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
+        resolution = settings.resolution();
+        m_overlay->update_size(m_holder.size(), resolution);
+    }
 
     m_resolution_box->clear();
     int index = 0;
@@ -325,22 +356,33 @@ QImage CameraSelectorUI::snapshot(){
     if (!m_snapshots_allowed.load(std::memory_order_acquire)){
         return QImage();
     }
-    {
-        std::unique_lock<std::mutex> lg(m_camera_lock);
 
-        if (m_camera_view == nullptr){
-            return QImage();
-        }
-
-        m_capture_done = false;
-
-        m_camera->searchAndLock();
-        m_capture->capture();
-        m_camera->unlock();
-
-        m_cv.wait(lg, [=]{ return m_capture_done; } );
+    std::unique_lock<std::mutex> lg(m_camera_lock);
+    if (m_camera_view == nullptr){
+        return QImage();
     }
-    return std::move(m_capture_image);
+
+    m_camera->searchAndLock();
+    int id = m_capture->capture();
+    m_camera->unlock();
+
+    auto iter = m_pending_captures.emplace(
+        std::piecewise_construct,
+        std::forward_as_tuple(id),
+        std::forward_as_tuple()
+    );
+    if (!iter.second){
+        return QImage();
+    }
+    PendingCapture& capture = iter.first->second;
+
+    capture.cv.wait(lg, [&]{
+        return capture.done;
+    });
+
+    QImage ret = std::move(capture.image);
+    m_pending_captures.erase(iter.first);
+    return ret;
 }
 void CameraSelectorUI::operator+=(const InferenceBox& box){
     *m_overlay += box;

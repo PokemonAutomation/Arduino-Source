@@ -56,18 +56,20 @@ void PABotBase::stop(){
     }
     m_retransmit_thread.join();
 
-    SpinLockGuard lg(m_state_lock, "PABotBase::stop()");
+    {
+        SpinLockGuard lg(m_state_lock, "PABotBase::stop()");
 
-    //  Send a stop request, but don't wait for a response that we may never
-    //  receive.
-    pabb_MsgRequestStop params;
-    uint64_t seqnum = m_send_seq;
-    seqnum_t seqnum_s = (seqnum_t)seqnum;
-    memcpy(&params, &seqnum_s, sizeof(seqnum_t));
-//    try_issue_request<PABB_MSG_REQUEST_STOP>(params);
-//    m_state.store(State::STOPPING, std::memory_order_release);
-    BotBaseMessage stop_request(PABB_MSG_REQUEST_STOP, std::string((char*)&params, sizeof(params)));
-    send_message(stop_request, false);
+        //  Send a stop request, but don't wait for a response that we may never
+        //  receive.
+        pabb_MsgRequestStop params;
+        uint64_t seqnum = m_send_seq;
+        seqnum_t seqnum_s = (seqnum_t)seqnum;
+        memcpy(&params, &seqnum_s, sizeof(seqnum_t));
+    //    try_issue_request<PABB_MSG_REQUEST_STOP>(params);
+    //    m_state.store(State::STOPPING, std::memory_order_release);
+        BotBaseMessage stop_request(PABB_MSG_REQUEST_STOP, std::string((char*)&params, sizeof(params)));
+        send_message(stop_request, false);
+    }
 
     //  Must call this to stop the receiver thread from making any more async
     //  calls into this class which touch its fields.
@@ -171,11 +173,13 @@ void PABotBase::process_ack_request(BotBaseMessage message){
     switch (iter->second.state){
     case AckState::NOT_ACKED:
 //        std::cout << "acked: " << full_seqnum << std::endl;
-        iter->second.state = AckState::ACKED;
-        iter->second.ack = std::move(message);
-        if (iter->second.silent_remove){
+        {
             SpinLockGuard lg(m_state_lock, "PABotBase::process_ack_request() - 1");
-            m_pending_requests.erase(iter);
+            iter->second.state = AckState::ACKED;
+            iter->second.ack = std::move(message);
+            if (iter->second.silent_remove){
+                m_pending_requests.erase(iter);
+            }
         }
         {
             std::lock_guard<std::mutex> lg(m_sleep_lock);
@@ -574,16 +578,15 @@ void PABotBase::issue_request_and_wait(
     uint8_t send_type, char* send_params, size_t send_bytes,
     uint8_t recv_type, char* recv_params, size_t recv_bytes
 ){
+    if (!PABB_MSG_IS_REQUEST(send_type)){
+        throw "This function only supports requests.";
+    }
+
     std::map<uint64_t, PendingRequest>::iterator iter;
     issue_request(iter, send_type, send_params, send_bytes, false);
 
-    const bool is_command = PABB_MSG_IS_COMMAND(send_type);
-    AckState end_state = is_command
-        ? AckState::FINISHED
-        : AckState::ACKED;
-
     //  Wait for ack.
-    while (iter->second.state != end_state){
+    while (iter->second.state != AckState::ACKED){
         std::unique_lock<std::mutex> lg(m_sleep_lock);
         {
             SpinLockGuard slg(m_state_lock, "PABotBase::issue_request_and_wait() - 0");
@@ -596,21 +599,24 @@ void PABotBase::issue_request_and_wait(
         m_cv.wait(lg);
     }
 
+    std::unique_lock<std::mutex> lg(m_sleep_lock);
 
     //  Verify return payload.
     uint8_t type = iter->second.ack.type;
     if (type != recv_type){
+        SpinLockGuard slg(m_state_lock, "PABotBase::issue_request_and_wait() - 1");
+        remove_request(iter);
         throw "Received incorrect response type: " + std::to_string(type);
     }
     const std::string& body = iter->second.ack.body;
     if (body.size() != recv_bytes){
+        SpinLockGuard slg(m_state_lock, "PABotBase::issue_request_and_wait() - 2");
+        remove_request(iter);
         throw "Received incorrect response size: " + std::to_string(body.size());
     }
     memcpy(recv_params, body.c_str(), body.size());
-//    remove_request(iter);
 
-    std::unique_lock<std::mutex> lg(m_sleep_lock);
-    SpinLockGuard slg(m_state_lock, "PABotBase::issue_request_and_wait() - 1");
+    SpinLockGuard slg(m_state_lock, "PABotBase::issue_request_and_wait() - 3");
     remove_request(iter);
 }
 

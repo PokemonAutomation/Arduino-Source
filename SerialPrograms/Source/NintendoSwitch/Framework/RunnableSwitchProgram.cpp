@@ -99,6 +99,7 @@ RunnableProgramUI::RunnableProgramUI(RunnableProgram& factory, MainWindow& windo
     , m_window(window)
     , m_logger(window.output_window(), "Program")
     , m_setup(nullptr)
+    , m_status_bar(nullptr)
     , m_start_button(nullptr)
     , m_state(ProgramState::STOPPED)
 {}
@@ -178,6 +179,11 @@ void RunnableProgramUI::make_body(QWidget& parent, QVBoxLayout& layout){
         this, &RunnableProgramUI::update_ui
     );
 
+    m_status_bar = new QLabel(&parent);
+    m_status_bar->setVisible(false);
+    m_status_bar->setAlignment(Qt::AlignCenter);
+    layout.addWidget(m_status_bar);
+    m_status_bar->setText("<b>Encounters: 1,267 - Corrections: 0 - Star Shinies: 1 - Square Shinies: 0</b>");
 
     QGroupBox* actions_widget = new QGroupBox("Actions", &parent);
     layout.addWidget(actions_widget);
@@ -312,6 +318,15 @@ void RunnableProgramUI::on_stop(){
 }
 void RunnableProgramUI::reset_connections(){
     if (m_setup) m_setup->reset_serial();
+}
+void RunnableProgramUI::set_status(QString status){
+    if (status.size() <= 0){
+        m_status_bar->setVisible(false);
+        m_status_bar->setText(status);
+    }else{
+        m_status_bar->setText(status);
+        m_status_bar->setVisible(true);
+    }
 }
 
 void RunnableProgramUI::run_program(){

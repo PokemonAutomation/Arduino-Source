@@ -37,6 +37,22 @@ double euclidean_distance(const FloatPixel& x, const FloatPixel& y){
 }
 
 
+InferenceBox translate_to_parent(
+    const QImage& original_image,
+    const InferenceBox& inference_box,
+    const PixelBox& box
+){
+    double width = original_image.width();
+    double height = original_image.height();
+    int box_x = (int)(width * inference_box.x + 0.5);
+    int box_y = (int)(height * inference_box.y + 0.5);
+    return InferenceBox(
+        (box_x + box.min_x) / width,
+        (box_y + box.min_y) / height,
+        (box.max_x - box.min_x) / width,
+        (box.max_y - box.min_y) / height
+    );
+}
 
 QImage extract_box(const QImage& image, const InferenceBox& box){
     return image.copy(
@@ -46,6 +62,31 @@ QImage extract_box(const QImage& image, const InferenceBox& box){
         (int)(image.height() * box.height + 0.5)
     );
 }
+
+double image_diff(const QImage& x, const QImage& y){
+    if (x.isNull() || y.isNull()){
+        return -1;
+    }
+    if (x.width() != y.width()){
+        return -1;
+    }
+    if (x.height() != y.height()){
+        return -1;
+    }
+
+    double sum = 0;
+
+    int width = x.width();
+    int height = x.height();
+    for (int r = 0; r < height; r++){
+        for (int c = 0; c < width; c++){
+            sum += euclidean_distance(x.pixel(c, r), y.pixel(c, r));
+        }
+    }
+
+    return std::sqrt(sum / ((size_t)width * height));
+}
+
 FloatPixel pixel_average(const QImage& image){
     int w = image.width();
     int h = image.height();
@@ -69,6 +110,7 @@ FloatPixel pixel_average_normalized(const QImage& image){
     }
     return average / sum;
 }
+
 
 FloatPixel pixel_stddev(const QImage& image){
     int w = image.width();

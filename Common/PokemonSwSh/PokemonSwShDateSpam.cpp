@@ -145,6 +145,18 @@ int register_message_converters_pokemon_date_spam(){
             return ss.str();
         }
     );
+    register_message_converter(
+        PABB_MSG_COMMAND_ROLLBACK_HOURS_FROM_HOME,
+        [](const std::string& body){
+            std::stringstream ss;
+            ss << "rollback_hours_from_home() - ";
+            if (body.size() != sizeof(pabb_rollback_hours_from_home)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_rollback_hours_from_home*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            ss << ", rollback_year = " << params->settings_to_home_delay;
+            return ss.str();
+        }
+    );
     return 0;
 }
 

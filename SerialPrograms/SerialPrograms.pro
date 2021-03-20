@@ -60,8 +60,6 @@ SOURCES += \
     ../Common/SwitchRoutines/SwitchDigitEntry.cpp \
     Source/CommonFramework/Globals.cpp \
     Source/CommonFramework/Inference/BlackScreenDetector.cpp \
-    Source/CommonFramework/Inference/FillGeometry.cpp \
-    Source/CommonFramework/Inference/FlagMatrix.cpp \
     Source/CommonFramework/Inference/ImageTools.cpp \
     Source/CommonFramework/Main.cpp \
     Source/CommonFramework/Options/FixedCode.cpp \
@@ -86,6 +84,7 @@ SOURCES += \
     Source/NintendoSwitch/Framework/SwitchCommandRow.cpp \
     Source/NintendoSwitch/Framework/SwitchSystem.cpp \
     Source/NintendoSwitch/Framework/VirtualSwitchController.cpp \
+    Source/NintendoSwitch/Framework/VirtualSwitchControllerMapping.cpp \
     Source/NintendoSwitch/FrameworkSettingsPanel.cpp \
     Source/NintendoSwitch/Options/FriendCodeList.cpp \
     Source/NintendoSwitch/Programs/FriendCodeAdder.cpp \
@@ -105,12 +104,12 @@ SOURCES += \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_SurpriseTrade.cpp \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_TradeBot.cpp \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_TurboA.cpp \
-    Source/PokemonSwSh/Programs/BasicShinyHunt/PokemonSwSh_MultiGameFossil.cpp \
-    Source/PokemonSwSh/Programs/BasicShinyHunt/PokemonSwSh_ShinyHuntUnattended-IoATrade.cpp \
-    Source/PokemonSwSh/Programs/BasicShinyHunt/PokemonSwSh_ShinyHuntUnattended-Regi.cpp \
-    Source/PokemonSwSh/Programs/BasicShinyHunt/PokemonSwSh_ShinyHuntUnattended-Regigigas2.cpp \
-    Source/PokemonSwSh/Programs/BasicShinyHunt/PokemonSwSh_ShinyHuntUnattended-StrongSpawn.cpp \
-    Source/PokemonSwSh/Programs/BasicShinyHunt/PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.cpp \
+    Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_MultiGameFossil.cpp \
+    Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHunt-Regi.cpp \
+    Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-IoATrade.cpp \
+    Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-Regi.cpp \
+    Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-Regigigas2.cpp \
+    Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-StrongSpawn.cpp \
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-BerryFarmer.cpp \
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-DailyHighlightFarmer.cpp \
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-LotoFarmer.cpp \
@@ -136,6 +135,7 @@ SOURCES += \
     Source/PokemonSwSh/Programs/PokemonSwSh_SynchronizedSpinning.cpp \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FastCodeEntry.cpp \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.cpp \
+    Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.cpp \
     Source/PokemonSwSh/Programs/TestProgram.cpp
 
 HEADERS += \
@@ -181,9 +181,9 @@ HEADERS += \
     ../Common/SwitchRoutines/SwitchDigitEntry.h \
     Source/CommonFramework/Globals.h \
     Source/CommonFramework/Inference/BlackScreenDetector.h \
-    Source/CommonFramework/Inference/FillGeometry.h \
-    Source/CommonFramework/Inference/FlagMatrix.h \
+    Source/CommonFramework/Inference/FloatPixel.h \
     Source/CommonFramework/Inference/ImageTools.h \
+    Source/CommonFramework/Inference/InferenceTypes.h \
     Source/CommonFramework/Options/BooleanCheckBox.h \
     Source/CommonFramework/Options/ConfigOption.h \
     Source/CommonFramework/Options/FixedCode.h \
@@ -216,6 +216,7 @@ HEADERS += \
     Source/NintendoSwitch/Framework/SwitchSetup.h \
     Source/NintendoSwitch/Framework/SwitchSystem.h \
     Source/NintendoSwitch/Framework/VirtualSwitchController.h \
+    Source/NintendoSwitch/Framework/VirtualSwitchControllerMapping.h \
     Source/NintendoSwitch/FrameworkSettingsPanel.h \
     Source/NintendoSwitch/Options/FriendCodeList.h \
     Source/NintendoSwitch/Options/SwitchDate.h \
@@ -240,13 +241,13 @@ HEADERS += \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_SurpriseTrade.h \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_TradeBot.h \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_TurboA.h \
-    Source/PokemonSwSh/Programs/BasicShinyHunt/PokemonSwSh_MultiGameFossil.h \
-    Source/PokemonSwSh/Programs/BasicShinyHunt/PokemonSwSh_ShinyHuntTools.h \
-    Source/PokemonSwSh/Programs/BasicShinyHunt/PokemonSwSh_ShinyHuntUnattended-IoATrade.h \
-    Source/PokemonSwSh/Programs/BasicShinyHunt/PokemonSwSh_ShinyHuntUnattended-Regi.h \
-    Source/PokemonSwSh/Programs/BasicShinyHunt/PokemonSwSh_ShinyHuntUnattended-Regigigas2.h \
-    Source/PokemonSwSh/Programs/BasicShinyHunt/PokemonSwSh_ShinyHuntUnattended-StrongSpawn.h \
-    Source/PokemonSwSh/Programs/BasicShinyHunt/PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.h \
+    Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_MultiGameFossil.h \
+    Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHunt-Regi.h \
+    Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntTools.h \
+    Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-IoATrade.h \
+    Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-Regi.h \
+    Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-Regigigas2.h \
+    Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-StrongSpawn.h \
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-BerryFarmer.h \
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-DailyHighlightFarmer.h \
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-LotoFarmer.h \
@@ -277,6 +278,7 @@ HEADERS += \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FastCodeEntry.h \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.h \
     Source/PokemonSwSh/Programs/ReleaseHelpers.h \
+    Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.h \
     Source/PokemonSwSh/Programs/TestProgram.h
 
 # Default rules for deployment.

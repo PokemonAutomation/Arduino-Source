@@ -39,10 +39,10 @@ const RegiGolem REGI_NAME           =   Registeel;
 //  building after this many encounters. Zero disables the corrections.
 //  If you disable corrections, the program will stop working when it
 //  misses a light and will not self-recover.
-const uint16_t CORRECTION_INTERVAL  =   10;
+const uint16_t CORRECTION_INTERVAL  =   20;
 
 //  Delay to enter/exit the building.
-const uint16_t TRANSITION_DELAY     =   3 * TICKS_PER_SECOND;
+const uint16_t TRANSITION_DELAY     =   5 * TICKS_PER_SECOND;
 
 
 //  Rollover Prevention

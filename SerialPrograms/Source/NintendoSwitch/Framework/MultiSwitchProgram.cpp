@@ -85,7 +85,16 @@ void MultiSwitchProgramUI::program(){
     MultiSwitchProgramEnvironment env(m_logger, std::move(switches));
     connect(
         this, &RunnableProgramUI::signal_cancel,
-        &env, [&]{ env.signal_stop(); }
+        &env, [&]{
+            env.signal_stop();
+        },
+        Qt::DirectConnection
+    );
+    connect(
+        &env, &ProgramEnvironment::set_status,
+        this, [=](QString status){
+            this->set_status(std::move(status));
+        }
     );
     PokemonAutomation::global_connection = nullptr;
     factory.program(env);

@@ -8,7 +8,6 @@
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "Common/Qt/QtJsonTools.h"
 #include "PokemonSwSh_ShinyHuntTools.h"
 #include "PokemonSwSh_ShinyHuntUnattended-StrongSpawn.h"
 

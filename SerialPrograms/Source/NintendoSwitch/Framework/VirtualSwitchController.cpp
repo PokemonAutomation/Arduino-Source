@@ -4,6 +4,7 @@
  *
  */
 
+#include <functional>
 #include <deque>
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSwShMisc.h"
@@ -21,13 +22,6 @@ namespace NintendoSwitch{
 VirtualController::VirtualController(BotBaseHandle& botbase, Logger& logger)
     : m_botbase(botbase)
     , m_logger(logger)
-    , m_buttons(0)
-    , m_dpad_x(0)
-    , m_dpad_y(0)
-    , m_left_joystick_x(0)
-    , m_left_joystick_y(0)
-    , m_right_joystick_x(0)
-    , m_right_joystick_y(0)
     , m_last(std::chrono::system_clock::now())
     , m_last_known_state(ProgramState::STOPPED)
     , m_stop(false)
@@ -43,13 +37,7 @@ VirtualController::~VirtualController(){
     m_thread.join();
 }
 void VirtualController::clear_state(){
-    m_buttons = 0;
-    m_dpad_x = 0;
-    m_dpad_y = 0;
-    m_left_joystick_x = 0;
-    m_left_joystick_y = 0;
-    m_right_joystick_x = 0;
-    m_right_joystick_y = 0;
+    m_controller_state = VirtualControllerState();
     m_pressed_buttons.clear();
 }
 
@@ -63,113 +51,11 @@ void VirtualController::on_key_press(Qt::Key key){
             return;
         }
 
-        switch (key){
-        case Qt::Key::Key_8:
-            m_dpad_y--;
-            break;
-        case Qt::Key::Key_9:
-            m_dpad_x++;
-            m_dpad_y--;
-            break;
-        case Qt::Key::Key_6:
-            m_dpad_x++;
-            break;
-        case Qt::Key::Key_3:
-            m_dpad_x++;
-            m_dpad_y++;
-            break;
-        case Qt::Key::Key_2:
-            m_dpad_y++;
-            break;
-        case Qt::Key::Key_1:
-            m_dpad_x--;
-            m_dpad_y++;
-            break;
-        case Qt::Key::Key_4:
-            m_dpad_x--;
-            break;
-        case Qt::Key::Key_7:
-            m_dpad_x--;
-            m_dpad_y--;
-            break;
-
-        case Qt::Key::Key_W:
-            m_left_joystick_y--;
-            break;
-        case Qt::Key::Key_D:
-            m_left_joystick_x++;
-            break;
-        case Qt::Key::Key_S:
-            m_left_joystick_y++;
-            break;
-        case Qt::Key::Key_A:
-            m_left_joystick_x--;
-            break;
-
-        case Qt::Key::Key_Up:
-            m_right_joystick_y--;
-            break;
-        case Qt::Key::Key_Right:
-            m_right_joystick_x++;
-            break;
-        case Qt::Key::Key_Down:
-            m_right_joystick_y++;
-            break;
-        case Qt::Key::Key_Left:
-            m_right_joystick_x--;
-            break;
-
-        case Qt::Key::Key_Slash:
-        case Qt::Key::Key_Question:
-            m_buttons |= BUTTON_Y;
-            break;
-        case Qt::Key::Key_Shift:
-        case Qt::Key::Key_Control:
-            m_buttons |= BUTTON_B;
-            break;
-        case Qt::Key::Key_Enter:
-        case Qt::Key::Key_Return:
-            m_buttons |= BUTTON_A;
-            break;
-        case Qt::Key::Key_Apostrophe:
-        case Qt::Key::Key_QuoteDbl:
-            m_buttons |= BUTTON_X;
-            break;
-        case Qt::Key::Key_Q:
-            m_buttons |= BUTTON_L;
-            break;
-        case Qt::Key::Key_E:
-            m_buttons |= BUTTON_R;
-            break;
-        case Qt::Key::Key_R:
-            m_buttons |= BUTTON_ZL;
-            break;
-        case Qt::Key::Key_Backslash:
-            m_buttons |= BUTTON_ZR;
-            break;
-        case Qt::Key::Key_Equal:
-            m_buttons |= BUTTON_PLUS;
-            break;
-        case Qt::Key::Key_Minus:
-            m_buttons |= BUTTON_MINUS;
-            break;
-        case Qt::Key::Key_C:
-            m_buttons |= BUTTON_LCLICK;
-            break;
-        case Qt::Key::Key_0:
-            m_buttons |= BUTTON_RCLICK;
-            break;
-        case Qt::Key::Key_Home:
-        case Qt::Key::Key_Escape:
-            m_buttons |= BUTTON_HOME;
-            break;
-        case Qt::Key::Key_Insert:
-            m_buttons |= BUTTON_CAPTURE;
-            break;
-
-        default:;
+        const ControllerButton* button = button_lookup(key);
+        if (button == nullptr){
             return;
         }
+        button->press(m_controller_state);
 
         m_pressed_buttons.insert(key);
         m_last = std::chrono::system_clock::now();
@@ -182,119 +68,17 @@ void VirtualController::on_key_release(Qt::Key key){
     {
         SpinLockGuard lg(m_state_lock, "VirtualController::on_key_release()");
 
-        //  Suppress if key is already pressed.
+        //  Suppress if key is not pressed.
         auto iter = m_pressed_buttons.find(key);
         if (iter == m_pressed_buttons.end()){
             return;
         }
 
-        switch (key){
-        case Qt::Key::Key_8:
-            m_dpad_y++;
-            break;
-        case Qt::Key::Key_9:
-            m_dpad_x--;
-            m_dpad_y++;
-            break;
-        case Qt::Key::Key_6:
-            m_dpad_x--;
-            break;
-        case Qt::Key::Key_3:
-            m_dpad_x--;
-            m_dpad_y--;
-            break;
-        case Qt::Key::Key_2:
-            m_dpad_y--;
-            break;
-        case Qt::Key::Key_1:
-            m_dpad_x++;
-            m_dpad_y--;
-            break;
-        case Qt::Key::Key_4:
-            m_dpad_x++;
-            break;
-        case Qt::Key::Key_7:
-            m_dpad_x++;
-            m_dpad_y++;
-            break;
-
-        case Qt::Key::Key_W:
-            m_left_joystick_y++;
-            break;
-        case Qt::Key::Key_D:
-            m_left_joystick_x--;
-            break;
-        case Qt::Key::Key_S:
-            m_left_joystick_y--;
-            break;
-        case Qt::Key::Key_A:
-            m_left_joystick_x++;
-            break;
-
-        case Qt::Key::Key_Up:
-            m_right_joystick_y++;
-            break;
-        case Qt::Key::Key_Right:
-            m_right_joystick_x--;
-            break;
-        case Qt::Key::Key_Down:
-            m_right_joystick_y--;
-            break;
-        case Qt::Key::Key_Left:
-            m_right_joystick_x++;
-            break;
-
-        case Qt::Key::Key_Slash:
-        case Qt::Key::Key_Question:
-            m_buttons &= ~BUTTON_Y;
-            break;
-        case Qt::Key::Key_Shift:
-        case Qt::Key::Key_Control:
-            m_buttons &= ~BUTTON_B;
-            break;
-        case Qt::Key::Key_Enter:
-        case Qt::Key::Key_Return:
-            m_buttons &= ~BUTTON_A;
-            break;
-        case Qt::Key::Key_Apostrophe:
-        case Qt::Key::Key_QuoteDbl:
-            m_buttons &= ~BUTTON_X;
-            break;
-        case Qt::Key::Key_Q:
-            m_buttons &= ~BUTTON_L;
-            break;
-        case Qt::Key::Key_E:
-            m_buttons &= ~BUTTON_R;
-            break;
-        case Qt::Key::Key_R:
-            m_buttons &= ~BUTTON_ZL;
-            break;
-        case Qt::Key::Key_Backslash:
-            m_buttons &= ~BUTTON_ZR;
-            break;
-        case Qt::Key::Key_Equal:
-            m_buttons &= ~BUTTON_PLUS;
-            break;
-        case Qt::Key::Key_Minus:
-            m_buttons &= ~BUTTON_MINUS;
-            break;
-        case Qt::Key::Key_C:
-            m_buttons &= ~BUTTON_LCLICK;
-            break;
-        case Qt::Key::Key_0:
-            m_buttons &= ~BUTTON_RCLICK;
-            break;
-        case Qt::Key::Key_Home:
-        case Qt::Key::Key_Escape:
-            m_buttons &= ~BUTTON_HOME;
-            break;
-        case Qt::Key::Key_Insert:
-            m_buttons &= ~BUTTON_CAPTURE;
-            break;
-
-        default:;
+        const ControllerButton* button = button_lookup(key);
+        if (button == nullptr){
             return;
         }
+        button->release(m_controller_state);
 
         m_pressed_buttons.erase(key);
         m_last = std::chrono::system_clock::now();
@@ -305,28 +89,6 @@ void VirtualController::on_key_release(Qt::Key key){
     m_cv.notify_all();
 }
 
-
-void VirtualController::print(){
-    cout << "dpad = (" << m_dpad_x << "," << m_dpad_y
-         << "), left = (" << m_left_joystick_x << "," << m_left_joystick_y
-         << "), right = (" << m_right_joystick_x << "," << m_right_joystick_y
-         << "), buttons =";
-    if (m_buttons & BUTTON_Y) cout << " Y";
-    if (m_buttons & BUTTON_B) cout << " B";
-    if (m_buttons & BUTTON_A) cout << " A";
-    if (m_buttons & BUTTON_X) cout << " X";
-    if (m_buttons & BUTTON_L) cout << " L";
-    if (m_buttons & BUTTON_R) cout << " R";
-    if (m_buttons & BUTTON_ZL) cout << " ZL";
-    if (m_buttons & BUTTON_ZR) cout << " ZR";
-    if (m_buttons & BUTTON_PLUS) cout << " +";
-    if (m_buttons & BUTTON_MINUS) cout << " -";
-    if (m_buttons & BUTTON_LCLICK) cout << " LC";
-    if (m_buttons & BUTTON_RCLICK) cout << " RC";
-    if (m_buttons & BUTTON_HOME) cout << " Home";
-    if (m_buttons & BUTTON_CAPTURE) cout << " Screen";
-    cout << ")" << endl;
-}
 
 
 void VirtualController::thread_loop(){
@@ -352,34 +114,34 @@ void VirtualController::thread_loop(){
         {
             SpinLockGuard lg(m_state_lock, "VirtualController::thread_loop()");
 
-            buttons = m_buttons;
-            neutral = m_buttons == 0;
+            buttons = m_controller_state.buttons;
+            neutral = m_controller_state.buttons == 0;
 
             dpad = DPAD_NONE;
-            if (m_dpad_x != 0 || m_dpad_y != 0){
+            if (m_controller_state.dpad_x != 0 || m_controller_state.dpad_y != 0){
                 neutral = false;
                 do{
-                    if (m_dpad_x == 0){
-                        dpad = m_dpad_y > 0 ? DPAD_DOWN : DPAD_UP;
+                    if (m_controller_state.dpad_x == 0){
+                        dpad = m_controller_state.dpad_y > 0 ? DPAD_DOWN : DPAD_UP;
                         break;
                     }
-                    if (m_dpad_y == 0){
-                        dpad = m_dpad_x > 0 ? DPAD_RIGHT : DPAD_LEFT;
+                    if (m_controller_state.dpad_y == 0){
+                        dpad = m_controller_state.dpad_x > 0 ? DPAD_RIGHT : DPAD_LEFT;
                         break;
                     }
-                    if (m_dpad_x < 0 && m_dpad_y < 0){
+                    if (m_controller_state.dpad_x < 0 && m_controller_state.dpad_y < 0){
                         dpad = DPAD_UP_LEFT;
                         break;
                     }
-                    if (m_dpad_x < 0 && m_dpad_y > 0){
+                    if (m_controller_state.dpad_x < 0 && m_controller_state.dpad_y > 0){
                         dpad = DPAD_DOWN_LEFT;
                         break;
                     }
-                    if (m_dpad_x > 0 && m_dpad_y > 0){
+                    if (m_controller_state.dpad_x > 0 && m_controller_state.dpad_y > 0){
                         dpad = DPAD_DOWN_RIGHT;
                         break;
                     }
-                    if (m_dpad_x > 0 && m_dpad_y < 0){
+                    if (m_controller_state.dpad_x > 0 && m_controller_state.dpad_y < 0){
                         dpad = DPAD_UP_RIGHT;
                         break;
                     }
@@ -388,24 +150,24 @@ void VirtualController::thread_loop(){
 
             left_x = 128;
             left_y = 128;
-            if (m_left_joystick_x != 0 || m_left_joystick_y != 0){
+            if (m_controller_state.left_joystick_x != 0 || m_controller_state.left_joystick_y != 0){
                 neutral = false;
-                int mag = std::abs(m_left_joystick_x) > std::abs(m_left_joystick_y)
-                    ? std::abs(m_left_joystick_x)
-                    : std::abs(m_left_joystick_y);
-                left_x = std::min(128 * m_left_joystick_x / mag + 128, 255);
-                left_y = std::min(128 * m_left_joystick_y / mag + 128, 255);
+                int mag = std::abs(m_controller_state.left_joystick_x) > std::abs(m_controller_state.left_joystick_y)
+                    ? std::abs(m_controller_state.left_joystick_x)
+                    : std::abs(m_controller_state.left_joystick_y);
+                left_x = std::min(128 * m_controller_state.left_joystick_x / mag + 128, 255);
+                left_y = std::min(128 * m_controller_state.left_joystick_y / mag + 128, 255);
             }
 
             right_x = 128;
             right_y = 128;
-            if (m_right_joystick_x != 0 || m_right_joystick_y != 0){
+            if (m_controller_state.right_joystick_x != 0 || m_controller_state.right_joystick_y != 0){
                 neutral = false;
-                int mag = std::abs(m_right_joystick_x) > std::abs(m_right_joystick_y)
-                    ? std::abs(m_right_joystick_x)
-                    : std::abs(m_right_joystick_y);
-                right_x = std::min(128 * m_right_joystick_x / mag + 128, 255);
-                right_y = std::min(128 * m_right_joystick_y / mag + 128, 255);
+                int mag = std::abs(m_controller_state.right_joystick_x) > std::abs(m_controller_state.right_joystick_y)
+                    ? std::abs(m_controller_state.right_joystick_x)
+                    : std::abs(m_controller_state.right_joystick_y);
+                right_x = std::min(128 * m_controller_state.right_joystick_x / mag + 128, 255);
+                right_y = std::min(128 * m_controller_state.right_joystick_y / mag + 128, 255);
             }
 
         }

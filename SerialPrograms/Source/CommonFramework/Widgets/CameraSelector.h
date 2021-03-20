@@ -71,6 +71,12 @@ private:
     static QString aspect_ratio(const QSize& size);
 
 private:
+    struct PendingCapture{
+        bool done = false;
+        QImage image;
+        std::condition_variable cv;
+    };
+
     CameraSelector& m_value;
     QWidget& m_holder;
 
@@ -90,8 +96,10 @@ private:
     std::atomic<bool> m_snapshots_allowed;
     std::mutex m_camera_lock;
     std::condition_variable m_cv;
-    bool m_capture_done;
-    QImage m_capture_image;
+//    bool m_capture_done;
+//    QImage m_capture_image;
+    std::map<int, PendingCapture> m_pending_captures;
+
 
     std::deque<int> m_height_history;
     std::set<int> m_recent_heights;
