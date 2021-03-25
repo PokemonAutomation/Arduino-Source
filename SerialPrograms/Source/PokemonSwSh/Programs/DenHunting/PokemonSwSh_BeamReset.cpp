@@ -58,7 +58,7 @@ void BeamReset::program(SingleSwitchProgramEnvironment& env) const{
         }
         pbf_wait(DELAY_BEFORE_RESET);
 
-        reset_game_from_home(TOLERATE_SYSTEM_UPDATE_MENU_SLOW, 0, false);
+        reset_game_from_home(TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
     }
 }
 

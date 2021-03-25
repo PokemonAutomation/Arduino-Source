@@ -31,7 +31,7 @@ BeamSetter::BeamSetter(VideoFeed& feed, Logger& logger)
     }
 }
 
-bool BeamSetter::run(
+BeamSetter::Detection BeamSetter::run(
     ProgramEnvironment& env, BotBase& botbase,
     double detection_threshold, uint16_t timeout_ticks
 ){
@@ -39,7 +39,7 @@ bool BeamSetter::run(
     QImage baseline_image = m_feed.snapshot();
     if (baseline_image.isNull()){
         m_logger.log("BeamSetter(): Screenshot failed.", "purple");
-        return false;
+        return Detection::NO_DETECTION;
     }
 //    baseline_image.save("f:/test0.jpg");
 //    cout << "=======================" << endl;
@@ -67,7 +67,7 @@ bool BeamSetter::run(
         QImage current = m_feed.snapshot();
         if (current.isNull()){
             m_logger.log("BeamSetter(): Screenshot failed.", "purple");
-            return false;
+            return Detection::NO_DETECTION;
         }
 //        current.save("f:/test1.jpg");
 
@@ -134,7 +134,7 @@ bool BeamSetter::run(
             m_logger.log(str, "purple");
             if (count >= 5){
                 m_logger.log("BeamReader(): 5 positive red reads. Red beam found.", "blue");
-                return false;
+                return Detection::RED_DETECTED;
             }
         }
         if (!purple_detections.empty()){
@@ -149,18 +149,18 @@ bool BeamSetter::run(
             m_logger.log(str, "purple");
             if (count >= 1){
                 m_logger.log("BeamReader(): Purple beam found!", "blue");
-                return true;
+                return Detection::PURPLE;
             }
         }
         if (low_stddev_flag && text_stddev > 100){
             m_logger.log("BeamReader(): No beam detected with text. Resetting.", "blue");
-            return false;
+            return Detection::RED_ASSUMED;
         }
 
         env.wait(std::chrono::milliseconds(50));
         now = system_clock(botbase);
     }
-    return false;
+    return Detection::NO_DETECTION;
 }
 
 

@@ -9,7 +9,9 @@
 
 #include <atomic>
 #include <emmintrin.h>
+#if _WIN32
 #include <intrin.h>
+#endif
 
 #include <iostream>
 using std::cout;
@@ -32,6 +34,7 @@ public:
         }
     }
     void spin_acquire(const char* label){
+#if _WIN32
         uint64_t start = __rdtsc();
         while (true){
             bool state = false;
@@ -45,6 +48,9 @@ public:
                 start = __rdtsc();
             }
         }
+#else
+        spin_acquire();
+#endif
     }
 
     void unlock(){
@@ -63,7 +69,7 @@ public:
 
     SpinLockGuard(SpinLock& lock, const char* label)
         : m_lock(lock)
-        , m_label(label)
+//        , m_label(label)
     {
         lock.spin_acquire(label);
     }
@@ -73,7 +79,7 @@ public:
 
 private:
     SpinLock& m_lock;
-    const char* m_label;
+//    const char* m_label;
 };
 
 

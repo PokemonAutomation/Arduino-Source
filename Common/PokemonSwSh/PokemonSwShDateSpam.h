@@ -26,7 +26,7 @@
 //  date change button.
 //  If (fast = true), it will run slightly faster, but has a higher chance of
 //  not making all way in. Do this only if the program is able to self-recover.
-void home_to_date_time(bool fast);
+void home_to_date_time(bool to_date_change, bool fast);
 
 //  Call this immediately after calling "home_to_date_time()".
 //  This function will roll the 1st and 3rd slots forward by one.
@@ -79,7 +79,7 @@ void rollback_hours_from_home(uint8_t hours, uint16_t settings_to_home_delay);
 namespace PokemonAutomation{
     class BotBase;
 }
-void home_to_date_time                      (PokemonAutomation::BotBase& device, bool fast);
+void home_to_date_time                      (PokemonAutomation::BotBase& device, bool to_date_change, bool fast);
 void roll_date_forward_1                    (PokemonAutomation::BotBase& device, bool fast);
 void roll_date_backward_N                   (PokemonAutomation::BotBase& device, uint8_t skips, bool fast);
 void home_roll_date_enter_game              (PokemonAutomation::BotBase& device, bool rollback_year);
@@ -103,6 +103,7 @@ void rollback_hours_from_home               (PokemonAutomation::BotBase& device,
 #define PABB_MSG_COMMAND_HOME_TO_DATE_TIME                      0xb4
 typedef struct{
     seqnum_t seqnum;
+    bool to_date_change;
     bool fast;
 } PABB_PACK pabb_home_to_date_time;
 

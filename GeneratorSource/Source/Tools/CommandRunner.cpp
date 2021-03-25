@@ -37,9 +37,10 @@ int build_hexfile(
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
     QString command = module + " " + board.c_str() + " " + program_name + " > \"" + log_file + "\" 2>&1";
+    std::wstring wpath = utf8_to_wstr(command.toUtf8().data());
     bool ret = CreateProcessW(
         nullptr,
-        &utf8_to_wstr(command.toUtf8().data())[0],
+        &wpath[0],
         nullptr,
         nullptr,
         false,
@@ -50,11 +51,12 @@ int build_hexfile(
         &pi
     );
     if (!ret){
-        ret = GetLastError();
-        std::cout << "error = " << ret << std::endl;
+        DWORD code = GetLastError();
+        std::cout << "error = " << code << std::endl;
         run_on_main_thread([=]{
             QMessageBox box;
-            box.critical(nullptr, "Error", "Unable to open: " + module);
+            box.critical(nullptr, "Error", "Unable to open: " + QString::fromWCharArray(wpath.data()) + "\r\nError Code: " + QString::number(code));
+//            box.critical(nullptr, "Error", "Unable to open: " + module + "\r\nError Code: " + QString::number(code));
         });
         return 1;
     }

@@ -60,15 +60,8 @@ void FriendCodeAdder::program(SingleSwitchProgramEnvironment& env) const{
             continue;
         }
 
-        home_to_add_friends(USER_SLOT - 1, first);
+        home_to_add_friends(USER_SLOT - 1, 3, first);
         first = false;
-        pbf_wait(50);
-
-        //  Enter friend search.
-        pbf_press_dpad(DPAD_RIGHT, 5, 0);
-        pbf_move_right_joystick(128, 255, 5, 0);
-        pbf_press_dpad(DPAD_DOWN, 5, 0);
-        pbf_move_right_joystick(128, 255, 5, 0);
 
         ssf_press_button1(BUTTON_A, OPEN_CODE_PAD_DELAY);
         enter_digits(12, &code[0]);

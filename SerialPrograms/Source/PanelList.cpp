@@ -43,6 +43,14 @@
 #include "PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-Regigigas2.h"
 #include "PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-IoATrade.h"
 
+#include "PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-Regi.h"
+#include "PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-SwordsOfJustice.h"
+#include "PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-StrongSpawn.h"
+#include "PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-Regigigas2.h"
+#include "PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-IoATrade.h"
+#include "PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-BerryTree.h"
+#include "PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-Fishing.h"
+
 #include "PokemonSwSh/Programs/DenHunting/PokemonSwSh_BeamReset.h"
 #include "PokemonSwSh/Programs/DenHunting/PokemonSwSh_PurpleBeamFinder.h"
 #include "PokemonSwSh/Programs/DenHunting/PokemonSwSh_EventBeamFinder.h"
@@ -137,6 +145,14 @@ const std::vector<std::unique_ptr<RightPanel>>& PROGRAM_LIST(){
     list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntUnattendedStrongSpawn>(settings.programs));
     list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntUnattendedRegigigas2>(settings.programs));
     list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntUnattendedIoATrade>(settings.programs));
+    
+    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousRegi>(settings.programs));
+    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousSwordsOfJustice>(settings.programs));
+    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousStrongSpawn>(settings.programs));
+    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousRegigigas2>(settings.programs));
+    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousIoATrade>(settings.programs));
+    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousBerryTree>(settings.programs));
+    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousFishing>(settings.programs));
 
     list.emplace_back(new SingleSwitchProgramWrapper<BeamReset>(settings.programs));
     list.emplace_back(new SingleSwitchProgramWrapper<PurpleBeamFinder>(settings.programs));

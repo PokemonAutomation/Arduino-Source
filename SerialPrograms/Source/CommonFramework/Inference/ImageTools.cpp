@@ -161,9 +161,43 @@ ImageStats pixel_stats(const QImage& image){
             std::sqrt(variance.b)
         )
     };
-
+}
+ImageStats object_stats(const QImage& image, const FillMatrix& matrix, const FillGeometry& object){
+    int w = image.width();
+    int h = image.height();
+    if (w * h <= 1){
+        return ImageStats();
+    }
+    FloatPixel sum;
+    FloatPixel sqr_sum;
+    for (int r = 0; r < h; r++){
+        for (int c = 0; c < w; c++){
+            if (matrix[r][c] == object.id){
+                FloatPixel p(image.pixel(c, r));
+                sum += p;
+                sqr_sum += p * p;
+            }
+        }
+    }
+    size_t total = object.area;
+    FloatPixel variance = (sqr_sum - sum*sum / total) / (total - 1);
+    return ImageStats{
+        sum / total,
+        FloatPixel(
+            std::sqrt(variance.r),
+            std::sqrt(variance.g),
+            std::sqrt(variance.b)
+        )
+    };
 }
 
+
+bool is_black(const QImage& image, double max_rgb_sum, double max_stddev_sum){
+    ImageStats stats = pixel_stats(image);
+    double average = stats.average.sum();
+    double stddev = stats.stddev.sum();
+    return average < 100 && stddev < 10;
+}
 
 
 

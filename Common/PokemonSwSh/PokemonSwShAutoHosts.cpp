@@ -25,12 +25,13 @@ void connect_to_internet(
     params.connect_to_internet_delay = connect_to_internet_delay;
     device.issue_request<PABB_MSG_COMMAND_CONNECT_TO_INTERNET>(params);
 }
-void home_to_add_friends(uint8_t user_slot, bool fix_cursor){
-    home_to_add_friends(*global_connection, user_slot, fix_cursor);
+void home_to_add_friends(uint8_t user_slot, uint8_t scroll_down, bool fix_cursor){
+    home_to_add_friends(*global_connection, user_slot, scroll_down, fix_cursor);
 }
-void home_to_add_friends(BotBase& device, uint8_t user_slot, bool fix_cursor){
+void home_to_add_friends(BotBase& device, uint8_t user_slot, uint8_t scroll_down, bool fix_cursor){
     pabb_home_to_add_friends params;
     params.user_slot = user_slot;
+    params.scroll_down = scroll_down;
     params.fix_cursor = fix_cursor;
     device.issue_request<PABB_MSG_COMMAND_HOME_TO_ADD_FRIENDS>(params);
 }

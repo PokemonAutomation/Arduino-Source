@@ -12,11 +12,12 @@
 
 using namespace PokemonAutomation;
 
-void home_to_date_time(bool fast){
-    home_to_date_time(*global_connection, fast);
+void home_to_date_time(bool to_date_change, bool fast){
+    home_to_date_time(*global_connection, to_date_change, fast);
 }
-void home_to_date_time(BotBase& device, bool fast){
+void home_to_date_time(BotBase& device, bool to_date_change, bool fast){
     pabb_home_to_date_time params;
+    params.to_date_change = to_date_change;
     params.fast = fast;
     device.issue_request<PABB_MSG_COMMAND_HOME_TO_DATE_TIME>(params);
 }
@@ -93,6 +94,7 @@ int register_message_converters_pokemon_date_spam(){
             if (body.size() != sizeof(pabb_home_to_date_time)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_home_to_date_time*)body.c_str();
             ss << "seqnum = " << (uint64_t)params->seqnum;
+            ss << ", to_date_change = " << params->to_date_change;
             ss << ", fast = " << params->fast;
             return ss.str();
         }

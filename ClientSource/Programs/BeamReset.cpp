@@ -64,7 +64,7 @@ void program_BeamReset(const std::string& device_name){
         }
         pbf_wait(DELAY_BEFORE_RESET);
 
-        reset_game_from_home(TOLERATE_SYSTEM_UPDATE_MENU_SLOW, 0, false);
+        reset_game_from_home(TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
     }
 
     end_program_callback();

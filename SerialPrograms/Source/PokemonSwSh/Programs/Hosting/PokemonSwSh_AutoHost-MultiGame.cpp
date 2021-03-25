@@ -13,6 +13,7 @@
 #include "Common/PokemonSwSh/PokemonSwShAutoHosts.h"
 #include "Common/Qt/ExpressionEvaluator.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
 #include "PokemonSwSh_DenTools.h"
 #include "PokemonSwSh_LobbyWait.h"
 #include "PokemonSwSh_AutoHost-MultiGame.h"
@@ -221,7 +222,8 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env) const{
                 game_slot = game_slot_flipped ? 0 : 2;
                 break;
             }
-            start_game_from_home(
+            start_game_from_home_with_inference(
+                env, env.logger, env.console,
                 TOLERATE_SYSTEM_UPDATE_MENU_SLOW,
                 game_slot,
                 game.user_slot,

@@ -22,9 +22,17 @@ namespace PokemonSwSh{
 
 class BeamSetter{
 public:
+    enum Detection{
+        NO_DETECTION,
+        RED_DETECTED,
+        RED_ASSUMED,
+        PURPLE,
+    };
+
+public:
     BeamSetter(VideoFeed& feed, Logger& logger);
 
-    bool run(
+    Detection run(
         ProgramEnvironment& env, BotBase& botbase,
         double detection_threshold, uint16_t timeout_ticks
     );

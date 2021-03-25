@@ -102,7 +102,7 @@ static void roll_den(
 
         //  Skip forward.
         ssf_press_button2(BUTTON_HOME, GAME_TO_HOME_DELAY_FAST, 10);
-        home_to_date_time(false);
+        home_to_date_time(true, false);
         roll_date_forward_1(false);
 
         //  Enter game
@@ -120,7 +120,7 @@ static void rollback_date_from_home(uint8_t skips){
     if (skips > 60){
         skips = 60;
     }
-    home_to_date_time(false);
+    home_to_date_time(true, false);
     roll_date_backward_N(skips, false);
 //    pbf_wait(5);
 

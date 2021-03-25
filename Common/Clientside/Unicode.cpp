@@ -94,7 +94,8 @@ std::u16string utf8_to_utf16(const std::string& str){
 
 #ifdef _WIN32
 std::wstring utf8_to_wstr(const std::string& str){
-    return std::wstring(str.begin(), str.end());
+    std::u16string tmp(utf8_to_utf16(str));
+    return std::wstring(tmp.begin(), tmp.end());
 }
 #endif
 

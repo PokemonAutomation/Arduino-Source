@@ -73,24 +73,11 @@ void fast_reset_game(
     device.issue_request<PABB_MSG_COMMAND_FAST_RESET_GAME>(params);
 }
 
-void reset_game_from_home(bool tolerate_update_menu, uint8_t user_slot, bool game_slot2){
-    reset_game_from_home(*global_connection, tolerate_update_menu, user_slot, game_slot2);
+void reset_game_from_home(bool tolerate_update_menu){
+    reset_game_from_home(*global_connection, tolerate_update_menu);
 }
-void reset_game_from_home(BotBase& device, bool tolerate_update_menu, uint8_t user_slot, bool game_slot2){
-#if 0
-    pabb_reset_game_from_home params;
-    params.tolerate_update_menu = tolerate_update_menu;
-    params.user_slot = user_slot;
-    params.game_slot2 = game_slot2;
-    device.issue_request<PABB_MSG_COMMAND_RESET_GAME_FROM_HOME>(params);
-#else
-    //  If "user_slot" is 0, start whatever the current user is.
-    //  If "game_slot2" is true, start the game in the 2nd slot instead of the 1st slot.
-
-    if (!START_GAME_REQUIRES_INTERNET &&
-        !tolerate_update_menu &&
-        user_slot == 0 && !game_slot2
-    ){
+void reset_game_from_home(BotBase& device, bool tolerate_update_menu){
+    if (!START_GAME_REQUIRES_INTERNET && !tolerate_update_menu){
         fast_reset_game(
             device,
             START_GAME_MASH, START_GAME_WAIT,
@@ -100,15 +87,7 @@ void reset_game_from_home(BotBase& device, bool tolerate_update_menu, uint8_t us
     }
 
     close_game(device);
-
-    start_game_from_home(
-        device,
-        tolerate_update_menu,
-        game_slot2 ? 2 : 0,
-        user_slot,
-        false
-    );
-#endif
+    start_game_from_home(device, tolerate_update_menu, 0, 0, false);
 }
 
 void settings_to_enter_game(bool fast){

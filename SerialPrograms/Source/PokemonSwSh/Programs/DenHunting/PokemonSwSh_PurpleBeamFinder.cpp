@@ -4,11 +4,13 @@
  *
  */
 
+#include "Common/Clientside/PrettyPrint.h"
 #include "Common/SwitchFramework/FrameworkSettings.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_BeamSetter.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
 #include "PokemonSwSh_PurpleBeamFinder.h"
 
 namespace PokemonAutomation{
@@ -29,7 +31,7 @@ PurpleBeamFinder::PurpleBeamFinder()
     )
     , DETECTION_THRESHOLD(
         "<b>Red Beam Detection Threshold:</b>",
-        0.01, 0.0, 1.0
+        0.02, 0.0, 1.0
     )
     , TIMEOUT_DELAY(
         "<b>Timeout Delay:</b><br>Reset if no beam is detected after this long.",
@@ -48,16 +50,16 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env) const{
     pbf_mash_button(BUTTON_B, 100);
     env.console.botbase().wait_for_all_requests();
 
-    BeamSetter setter(env.console, env.logger);
 
-    uint64_t count = 0;
+    uint64_t attempts = 0;
+    uint64_t red_detected = 0;
+    uint64_t red_assumed = 0;
+    uint64_t timed_out = 0;
+    uint64_t purple = 0;
+
+
+    bool exit = false;
     while (true){
-        {
-            QString status = "Red Beams: " + QString::number(count);
-            env.logger.log(status);
-            env.set_status(status);
-        }
-
         //  Talk to den.
         pbf_press_button(BUTTON_A, 10, 450);
         if (EXTRA_LINE){
@@ -66,15 +68,49 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env) const{
         pbf_press_button(BUTTON_A, 10, 300);
         env.console.botbase().wait_for_all_requests();
 
-        if (setter.run(env, env.console, DETECTION_THRESHOLD, TIMEOUT_DELAY)){
+        BeamSetter::Detection detection;
+        {
+            BeamSetter setter(env.console, env.logger);
+            detection = setter.run(env, env.console, DETECTION_THRESHOLD, TIMEOUT_DELAY);
+            attempts++;
+        }
+        switch (detection){
+        case BeamSetter::NO_DETECTION:
+            timed_out++;
+            break;
+        case BeamSetter::RED_DETECTED:
+            red_detected++;
+            break;
+        case BeamSetter::RED_ASSUMED:
+            red_assumed++;
+            break;
+        case BeamSetter::PURPLE:
+            purple++;
+            exit = true;
+            break;
+        }
+        {
+            std::string status = "<b>Attempts: " + tostr_u_commas(attempts);
+            status += ", Timeouts: " + tostr_u_commas(timed_out);
+            status += ", Red Detected: " + tostr_u_commas(red_detected);
+            status += ", Red Presumed: " + tostr_u_commas(red_assumed);
+            status += ", Purple: " + tostr_u_commas(purple);
+            status += "</br>";
+            QString str = status.c_str();
+            env.logger.log(str);
+            env.set_status(str);
+        }
+        if (exit){
             break;
         }
 
         pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
-        reset_game_from_home(TOLERATE_SYSTEM_UPDATE_MENU_SLOW, 0, false);
-
-        count++;
+        reset_game_from_home_with_inference(
+            env, env.logger, env.console,
+            TOLERATE_SYSTEM_UPDATE_MENU_SLOW
+        );
     }
+
 
     while (true){
         pbf_press_button(BUTTON_B, 20, 20);

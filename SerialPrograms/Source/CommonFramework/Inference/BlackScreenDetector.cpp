@@ -37,25 +37,24 @@ BlackScreenDetector::BlackScreenDetector(
 
 
 bool BlackScreenDetector::black_is_over(){
-    //  Grab baseline image.
     QImage image = m_feed.snapshot();
     if (image.isNull()){
         m_logger.log("BlackScreenDetector(): Screenshot failed.", "purple");
         return false;
     }
 
-    ImageStats stats = pixel_stats(image);
-    double average = stats.average.sum();
-    double stddev = stats.stddev.sum();
+//    ImageStats stats = pixel_stats(image);
+//    double average = stats.average.sum();
+//    double stddev = stats.stddev.sum();
 //    cout << stats.average << endl;
-    m_logger.log("BlackScreenDetector(): a = " + QString::number(average) + ", s = " + QString::number(stddev), "purple");
-    if (average < 100 && stddev < 10){
+//    m_logger.log("BlackScreenDetector(): a = " + QString::number(average) + ", s = " + QString::number(stddev), "purple");
+//    if (average < 100 && stddev < 10){
+    if (is_black(image)){
         m_has_been_black = true;
         return false;
     }
     return m_has_been_black;
 }
-
 
 
 

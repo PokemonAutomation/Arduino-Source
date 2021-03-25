@@ -73,7 +73,7 @@ void fast_reset_game(
 //  From the Switch home menu, close the game and open another game.
 //      If "user_slot" is 0, start whatever the current user is.
 //      If "game_slot2" is true, start the game in the 2nd slot instead of the 1st slot.
-void reset_game_from_home(bool tolerate_update_menu, uint8_t user_slot, bool game_slot2);
+void reset_game_from_home(bool tolerate_update_menu);
 
 #endif
 ////////////////////////////////////////////////////////////////////////////////
@@ -98,7 +98,7 @@ void fast_reset_game(
     uint16_t start_game_mash, uint16_t start_game_wait,
     uint16_t enter_game_mash, uint16_t enter_game_wait
 );
-void reset_game_from_home               (PokemonAutomation::BotBase& device, bool tolerate_update_menu, uint8_t user_slot, bool game_slot2);
+void reset_game_from_home               (PokemonAutomation::BotBase& device, bool tolerate_update_menu);
 #endif
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

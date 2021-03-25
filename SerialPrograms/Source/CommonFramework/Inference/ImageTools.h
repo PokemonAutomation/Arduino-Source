@@ -11,6 +11,7 @@
 #include <QImage>
 #include "InferenceTypes.h"
 #include "FloatPixel.h"
+#include "FillGeometry.h"
 
 namespace PokemonAutomation{
 
@@ -36,6 +37,10 @@ struct ImageStats{
     FloatPixel stddev;
 };
 ImageStats pixel_stats(const QImage& image);
+ImageStats object_stats(const QImage& image, const FillMatrix& matrix, const FillGeometry& object);
+
+
+bool is_black(const QImage& image, double max_rgb_sum = 100, double max_stddev_sum = 10);
 
 
 

@@ -11,6 +11,7 @@
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShAutoHosts.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
 #include "PokemonSwSh_DenTools.h"
 #include "PokemonSwSh_LobbyWait.h"
 #include "PokemonSwSh_AutoHost-Rolling.h"
@@ -212,7 +213,9 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env) const{
             last_touch += TOUCH_DATE_INTERVAL;
         }
         rollback_date_from_home(SKIPS);
-        start_game_from_home(
+
+        start_game_from_home_with_inference(
+            env, env.logger, env.console,
             TOLERATE_SYSTEM_UPDATE_MENU_SLOW,
             0, 0,
             BACKUP_SAVE

@@ -33,12 +33,9 @@ FriendSearchDisconnect::FriendSearchDisconnect()
 void FriendSearchDisconnect::program(SingleSwitchProgramEnvironment& env) const{
     ssf_press_button2(BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
 
-    home_to_add_friends(USER_SLOT - 1, true);
-    pbf_wait(50);
+    home_to_add_friends(USER_SLOT - 1, 1, true);
 
     //  Enter friend search.
-    pbf_press_dpad(DPAD_RIGHT, 5, 0);
-    pbf_move_right_joystick(128, 255, 5, 0);
     pbf_mash_button(BUTTON_A, 100);
     settings_to_enter_game(true);
 }

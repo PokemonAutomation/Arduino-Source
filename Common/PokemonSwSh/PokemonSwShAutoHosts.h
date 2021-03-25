@@ -19,8 +19,15 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Universal
 #ifdef __cplusplus
-void connect_to_internet(uint16_t open_ycomm_delay, uint16_t connect_to_internet_delay);
-void home_to_add_friends(uint8_t user_slot, bool fix_cursor);
+void connect_to_internet(
+    uint16_t open_ycomm_delay,
+    uint16_t connect_to_internet_delay
+);
+void home_to_add_friends(
+    uint8_t user_slot,
+    uint8_t scroll_down,
+    bool fix_cursor
+);
 uint16_t accept_FRs(
     uint8_t slot, bool fix_cursor,
     uint16_t game_to_home_delay_safe,
@@ -43,8 +50,17 @@ void accept_FRs_while_waiting(
 namespace PokemonAutomation{
     class BotBase;
 }
-void connect_to_internet(PokemonAutomation::BotBase& device, uint16_t open_ycomm_delay, uint16_t connect_to_internet_delay);
-void home_to_add_friends(PokemonAutomation::BotBase& device, uint8_t user_slot, bool fix_cursor);
+void connect_to_internet(
+    PokemonAutomation::BotBase& device,
+    uint16_t open_ycomm_delay,
+    uint16_t connect_to_internet_delay
+);
+void home_to_add_friends(
+    PokemonAutomation::BotBase& device,
+    uint8_t user_slot,
+    uint8_t scroll_down,
+    bool fix_cursor
+);
 uint16_t accept_FRs(
     PokemonAutomation::BotBase& device,
     uint8_t slot, bool fix_cursor,
@@ -84,6 +100,7 @@ typedef struct{
 typedef struct{
     seqnum_t seqnum;
     uint8_t user_slot;
+    uint8_t scroll_down;
     bool fix_cursor;
 } PABB_PACK pabb_home_to_add_friends;
 
