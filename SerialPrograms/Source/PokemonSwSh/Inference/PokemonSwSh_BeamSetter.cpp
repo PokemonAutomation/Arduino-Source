@@ -9,6 +9,7 @@
 
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "CommonFramework/Inference/ImageTools.h"
+#include "CommonFramework/Inference/InferenceThrottler.h"
 #include "PokemonSwSh_BeamSetter.h"
 
 //#include <iostream>
@@ -52,7 +53,6 @@ BeamSetter::Detection BeamSetter::run(
     //  Drop the wishing piece.
     pbf_press_button(botbase, BUTTON_A, 10, 10);
     botbase.wait_for_all_requests();
-    uint32_t start = system_clock(botbase);
 
     //  Set up detection history.
     std::map<size_t, size_t> red_detections;
@@ -61,8 +61,9 @@ BeamSetter::Detection BeamSetter::run(
     bool low_stddev_flag = false;
     std::vector<FloatPixel> current_values(m_boxes.size());
     std::vector<FloatPixel> current_ratio_diffs(m_boxes.size());
-    uint32_t now = start;
-    while (now - start < timeout_ticks){
+
+    InferenceThrottler throttler(std::chrono::milliseconds((uint64_t)timeout_ticks * 1000 / TICKS_PER_SECOND));
+    do{
         //  Take screenshot.
         QImage current = m_feed.snapshot();
         if (current.isNull()){
@@ -157,9 +158,8 @@ BeamSetter::Detection BeamSetter::run(
             return Detection::RED_ASSUMED;
         }
 
-        env.wait(std::chrono::milliseconds(50));
-        now = system_clock(botbase);
-    }
+    }while (!throttler.end_iteration(env));
+
     return Detection::NO_DETECTION;
 }
 

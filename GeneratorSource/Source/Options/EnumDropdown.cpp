@@ -36,7 +36,7 @@ EnumDropdown::EnumDropdown(const QJsonObject& obj)
     : SingleStatementOption(obj)
 {
     QJsonArray options = json_get_array(obj, JSON_OPTIONS);
-    for (const auto& option : options){
+    for (const auto option : options){
         if (!option.isArray()){
             throw StringException("Config Error - Expected Array: " + JSON_OPTIONS);
         }

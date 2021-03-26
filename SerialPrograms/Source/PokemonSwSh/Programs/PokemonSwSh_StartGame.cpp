@@ -9,6 +9,7 @@
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "CommonFramework/Inference/ImageTools.h"
+#include "CommonFramework/Inference/InferenceThrottler.h"
 #include "PokemonSwSh_StartGame.h"
 
 namespace PokemonAutomation{
@@ -30,16 +31,16 @@ void enter_loading_game(
         InferenceBoxScope box0(console, 0.2, 0.2, 0.6, 0.1);
         InferenceBoxScope box1(console, 0.2, 0.7, 0.6, 0.1);
 
-        auto start = std::chrono::system_clock::now();
-        auto last = start;
         bool black_found = false;
+
+        InferenceThrottler throttler(timeout);
         while (true){
             env.check_stopping();
 
             QImage screen = console.video().snapshot();
             if (screen.isNull()){
-                logger.log("start_game_with_inference(): Screenshot failed.", "purple");
-                timeout = std::chrono::milliseconds(1000);
+                logger.log("enter_loading_game(): Screenshot failed.", "purple");
+                throttler.set_period(std::chrono::milliseconds(1000));
             }else{
                 bool black0 = is_black(extract_box(screen, box0));
                 bool black1 = is_black(extract_box(screen, box1));
@@ -53,20 +54,14 @@ void enter_loading_game(
                 }
             }
 
-            auto now = std::chrono::system_clock::now();
-            if (now - start > timeout){
-                logger.log("start_game_with_inference(): Game load timed out. Proceeding with default start delay.", "red");
+            if (throttler.end_iteration(env)){
+                logger.log("enter_loading_game(): Game load timed out. Proceeding with default start delay.", "red");
                 break;
             }
-            auto time_since_last_frame = now - last;
-            if (time_since_last_frame > std::chrono::milliseconds(50)){
-                env.wait(std::chrono::milliseconds(50) - time_since_last_frame);
-            }
-            last = now;
         }
     }
 
-    logger.log("start_game_with_inference(): Game Loaded. Entering game...", "purple");
+    logger.log("enter_loading_game(): Game Loaded. Entering game...", "purple");
     enter_game(backup_save, ENTER_GAME_MASH, 0);
     console.botbase().wait_for_all_requests();
 
@@ -76,21 +71,21 @@ void enter_loading_game(
 
         InferenceBoxScope box(console, 0.2, 0.2, 0.6, 0.6);
 
-        auto start = std::chrono::system_clock::now();
-        auto last = start;
         bool black_found = false;
+
+        InferenceThrottler throttler(timeout);
         while (true){
             env.check_stopping();
 
             QImage screen = console.video().snapshot();
             if (screen.isNull()){
-                logger.log("start_game_with_inference(): Screenshot failed.", "purple");
-                timeout = std::chrono::milliseconds(1000);
+                logger.log("enter_loading_game(): Screenshot failed.", "purple");
+                throttler.set_period(std::chrono::milliseconds(1000));
             }else{
                 bool black = is_black(extract_box(screen, box));
                 if (black){
                     if (!black_found){
-                        logger.log("start_game_with_inference(): Game entry started.", "purple");
+                        logger.log("enter_loading_game(): Game entry started.", "purple");
                     }
                     black_found = true;
                 }else if (black_found){
@@ -98,16 +93,10 @@ void enter_loading_game(
                 }
             }
 
-            auto now = std::chrono::system_clock::now();
-            if (now - start > timeout){
-                logger.log("start_game_with_inference(): Game entry timed out. Proceeding with default start delay.", "red");
+            if (throttler.end_iteration(env)){
+                logger.log("enter_loading_game(): Game entry timed out. Proceeding with default start delay.", "red");
                 break;
             }
-            auto time_since_last_frame = now - last;
-            if (time_since_last_frame > std::chrono::milliseconds(50)){
-                env.wait(std::chrono::milliseconds(50) - time_since_last_frame);
-            }
-            last = now;
         }
     }
     logger.log("start_game_with_inference(): Game started.", "purple");

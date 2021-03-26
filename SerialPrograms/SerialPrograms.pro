@@ -211,6 +211,7 @@ HEADERS += \
     Source/CommonFramework/Inference/FloatPixel.h \
     Source/CommonFramework/Inference/FloatStatAccumulator.h \
     Source/CommonFramework/Inference/ImageTools.h \
+    Source/CommonFramework/Inference/InferenceThrottler.h \
     Source/CommonFramework/Inference/InferenceTypes.h \
     Source/CommonFramework/Inference/TimeWindowStatTracker.h \
     Source/CommonFramework/Options/BooleanCheckBox.h \

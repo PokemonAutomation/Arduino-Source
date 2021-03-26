@@ -31,7 +31,7 @@ const QString MultiHostTableOption::JSON_POST_RAID_DELAY    = "post_raid_delay";
 
 std::vector<MultiHostTableOption::GameSlot> parse_game_slot(const QJsonValue& json){
     std::vector<MultiHostTableOption::GameSlot> list;
-    for (const auto& item : json_cast_array(json)){
+    for (const auto item : json_cast_array(json)){
         QJsonObject line = json_cast_object(item);
         MultiHostTableOption::GameSlot slot;
 

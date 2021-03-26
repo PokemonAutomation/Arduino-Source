@@ -113,10 +113,10 @@ void ShinyImageDetection::accumulate(
 
 double ShinyImageDetection::alpha() const{
     double x = 1.0;
-    x *= std::pow(5.0, lines.size());
-    x *= std::pow(2.0, stars.size());
-    x *= std::pow(2.0, balls.size());
+    x *= std::pow(3.0, balls.size());
+    x *= std::pow(3.0, stars.size());
     x *= std::pow(1.2, squares.size());
+    x *= std::pow(5.0, lines.size());
     return x;
 }
 

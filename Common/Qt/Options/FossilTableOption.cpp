@@ -37,7 +37,7 @@ const std::map<QString, int> FOSSIL_MAP{
 
 std::vector<FossilTableOption::GameSlot> parse_fossil_slot(const QJsonValue& json){
     std::vector<FossilTableOption::GameSlot> list;
-    for (const auto& item : json_cast_array(json)){
+    for (const auto item : json_cast_array(json)){
         QJsonObject line = json_cast_object(item);
         FossilTableOption::GameSlot slot;
 

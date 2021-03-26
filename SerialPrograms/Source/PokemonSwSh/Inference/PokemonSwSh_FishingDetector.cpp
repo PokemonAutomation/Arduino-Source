@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Inference/ImageTools.h"
+#include "CommonFramework/Inference/InferenceThrottler.h"
 #include "CommonFramework/Inference/FillMatrix.h"
 #include "PokemonSwSh_FishingDetector.h"
 
@@ -155,9 +156,7 @@ FishingDetector::Detection FishingDetector::wait_for_detection(
     ProgramEnvironment& env, Logger& logger,
     std::chrono::seconds timeout
 ){
-    auto start = std::chrono::system_clock::now();
-    auto last = start;
-
+    InferenceThrottler throttler(timeout);
     while (true){
         env.check_stopping();
 
@@ -176,16 +175,10 @@ FishingDetector::Detection FishingDetector::wait_for_detection(
             return detection;
         }
 
-        auto now = std::chrono::system_clock::now();
-        if (now - start > timeout){
-            logger.log("FishEncounterDetector: Timed out.", "red");
+        if (throttler.end_iteration(env)){
+        logger.log("FishEncounterDetector: Timed out.", "red");
             return Detection::NO_DETECTION;
         }
-        auto time_since_last_frame = now - last;
-        if (time_since_last_frame > std::chrono::milliseconds(50)){
-            env.wait(std::chrono::milliseconds(50) - time_since_last_frame);
-        }
-        last = now;
     }
 }
 

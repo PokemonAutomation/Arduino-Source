@@ -24,8 +24,8 @@ ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing()
     : SingleSwitchProgram(
         FeedbackType::REQUIRED, PABotBaseLevel::PABOTBASE_12KB,
         "Shiny Hunt Autonomous - Fishing",
-        "SerialPrograms/ShinyHuntAutonomous-BerryTree.md",
-        "Automatically hunt for shiny berry tree " + STRING_POKEMON + " using video feedback."
+        "SerialPrograms/ShinyHuntAutonomous-Fishing.md",
+        "Automatically hunt for shiny fishing " + STRING_POKEMON + " using video feedback."
     )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"

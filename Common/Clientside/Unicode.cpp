@@ -11,7 +11,6 @@ namespace PokemonAutomation{
 
 const uint32_t MAX_CODEPOINT = 0x10ffff;
 const uint32_t REPLACEMENT = 0xfffd;
-const char REPLACEMENT_UTF8[] = "\xef\xbf\xbd";
 
 void utf8_skip_to_next_codepoint(const char*& str){
     while (true){

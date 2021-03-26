@@ -21,7 +21,7 @@ Settings_JsonFile::Settings_JsonFile(const QString& filepath)
 Settings_JsonFile::Settings_JsonFile(const QJsonObject& obj)
     : ConfigSet(obj)
 {
-    for (const auto& item : json_get_array(obj, JSON_OPTIONS)){
+    for (const auto item : json_get_array(obj, JSON_OPTIONS)){
         if (!item.isObject()){
             throw StringException("Config Error - Expected and object.");
         }

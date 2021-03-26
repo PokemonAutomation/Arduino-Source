@@ -8,6 +8,7 @@
  */
 
 #include "CommonFramework/Inference/ImageTools.h"
+#include "CommonFramework/Inference/InferenceThrottler.h"
 #include "CommonFramework/Inference/ColorClustering.h"
 #include "PokemonSwSh_SummaryShinySymbolDetector.h"
 
@@ -72,11 +73,10 @@ SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::wait_for_detec
     ProgramEnvironment& env,
     std::chrono::seconds timeout
 ){
-    auto start = std::chrono::system_clock::now();
-    auto last = start;
-
     Detection last_detection = Detection::NO_DETECTION;
     size_t confirmations = 0;
+
+    InferenceThrottler throttler(timeout);
     while (true){
         env.check_stopping();
 
@@ -91,16 +91,10 @@ SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::wait_for_detec
             break;
         }
 
-        auto now = std::chrono::system_clock::now();
-        if (now - start > timeout){
+        if (throttler.end_iteration(env)){
             last_detection = Detection::NO_DETECTION;
             break;
         }
-        auto time_since_last_frame = now - last;
-        if (time_since_last_frame > std::chrono::milliseconds(50)){
-            env.wait(std::chrono::milliseconds(50) - time_since_last_frame);
-        }
-        last = now;
     }
 
     switch (last_detection){

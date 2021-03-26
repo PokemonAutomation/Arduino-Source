@@ -54,6 +54,7 @@ bool StandardEncounterTracker::process_result(ShinyEncounterDetector::Detection 
         pbf_press_button(m_console, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
         return true;
     }
+    return false;
 }
 
 

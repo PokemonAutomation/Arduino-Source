@@ -34,7 +34,7 @@ public:
         VideoFeed& feed, Logger& logger,
         const InferenceBox& box,
         std::chrono::seconds timeout,
-        double detection_threshold = 4.0
+        double detection_threshold = 3.0
     );
 
     Detection detect(ProgramEnvironment& env);

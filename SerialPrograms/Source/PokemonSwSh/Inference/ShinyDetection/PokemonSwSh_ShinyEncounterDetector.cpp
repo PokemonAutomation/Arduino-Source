@@ -5,11 +5,17 @@
  */
 
 #include <deque>
+#include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/Inference/FloatStatAccumulator.h"
 #include "CommonFramework/Inference/TimeWindowStatTracker.h"
-#include "CommonFramework/Inference/ImageTools.h"
+#include "CommonFramework/Inference/InferenceThrottler.h"
 #include "PokemonSwSh_ShinyTrigger.h"
 #include "PokemonSwSh_ShinyEncounterDetector.h"
+
+#include "ClientSource/Libraries/Logging.h"
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -33,6 +39,8 @@ ShinyEncounterDetector::ShinyEncounterDetector(
     , m_menu(feed)
 {}
 
+
+
 ShinyEncounterDetector::Detection ShinyEncounterDetector::detect(ProgramEnvironment& env){
     TimeWindowStatTracker<FloatStatAccumulator> tracker(std::chrono::milliseconds(4000));
 
@@ -42,12 +50,12 @@ ShinyEncounterDetector::Detection ShinyEncounterDetector::detect(ProgramEnvironm
     double star_alpha = 0;
     double square_alpha = 0;
 
-    auto start = std::chrono::system_clock::now();
-    auto last = start;
+    InferenceThrottler throttler(m_timeout, std::chrono::milliseconds(50));
     for (uint64_t count = 0;; count++){
         env.check_stopping();
 
         QImage image = m_feed.snapshot();
+        auto timestamp = std::chrono::system_clock::now();
         if (m_menu.detect(image)){
             m_logger.log("ShinyDetector: Battle menu found!", "purple");
             break;
@@ -65,7 +73,7 @@ ShinyEncounterDetector::Detection ShinyEncounterDetector::detect(ProgramEnvironm
         square_alpha += 5 * signatures.lines.size();
 
         double signature_alpha = signatures.alpha();
-        tracker.push(signature_alpha, last);
+        tracker.push(signature_alpha, timestamp);
         FloatStatAccumulator previous_2_seconds = tracker.accumulate_start_to_point(std::chrono::milliseconds(2000));
         FloatStatAccumulator last_2_seconds = tracker.accumulate_last(std::chrono::milliseconds(2000));
         double mean0 = previous_2_seconds.mean();
@@ -112,16 +120,10 @@ ShinyEncounterDetector::Detection ShinyEncounterDetector::detect(ProgramEnvironm
             image.save("DetectionLine.png");
         }
 
-        auto now = std::chrono::system_clock::now();
-        if (now - start > m_timeout){
+        if (throttler.end_iteration(env)){
             m_logger.log("ShinyDetector: Battle menu not found after timeout.", "red");
             return Detection::NO_BATTLE_MENU;
         }
-        auto time_since_last_frame = now - last;
-        if (time_since_last_frame > std::chrono::milliseconds(50)){
-            env.wait(std::chrono::milliseconds(50) - time_since_last_frame);
-        }
-        last = now;
     }
     detection_overlays.clear();
 
