@@ -4,6 +4,9 @@
  *
  */
 
+#ifndef PokemonAutomation_StringException_H
+#define PokemonAutomation_StringException_H
+
 #include <memory>
 #include <QString>
 
@@ -41,3 +44,5 @@ private:
 
 
 }
+
+#endif
