@@ -14,17 +14,11 @@ namespace PokemonAutomation{
 
 template class SimpleIntegerOption<uint8_t>;
 template class SimpleIntegerOption<uint16_t>;
+template class SimpleIntegerOption<uint32_t>;
+
 template class SimpleIntegerOptionUI<uint8_t>;
 template class SimpleIntegerOptionUI<uint16_t>;
-
-//  COMPILER-BUG-CLANG: unsigned in vs. uint32_t linking
-#ifdef __clang__
-template class SimpleIntegerOption<unsigned int>;
-template class SimpleIntegerOptionUI<unsigned int>;
-#else
-template class SimpleIntegerOption<uint32_t>;
 template class SimpleIntegerOptionUI<uint32_t>;
-#endif
 
 
 template <typename Type>
