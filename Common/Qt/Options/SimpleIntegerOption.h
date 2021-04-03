@@ -65,12 +65,6 @@ private:
 
 
 
-//  COMPILER-BUG-CLANG: unsigned in vs. uint32_t linking
-#ifdef __clang__
-template class SimpleIntegerOption<unsigned int>;
-template class SimpleIntegerOptionUI<unsigned int>;
-#endif
-
 
 }
 #endif

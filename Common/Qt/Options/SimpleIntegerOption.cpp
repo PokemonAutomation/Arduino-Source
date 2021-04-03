@@ -12,18 +12,6 @@
 namespace PokemonAutomation{
 
 
-template class SimpleIntegerOption<uint8_t>;
-template class SimpleIntegerOption<uint16_t>;
-
-template class SimpleIntegerOptionUI<uint8_t>;
-template class SimpleIntegerOptionUI<uint16_t>;
-
-//  COMPILER-BUG-CLANG: unsigned in vs. uint32_t linking
-#ifndef __clang__
-template class SimpleIntegerOption<uint32_t>;
-template class SimpleIntegerOptionUI<uint32_t>;
-#endif
-
 
 template <typename Type>
 SimpleIntegerOption<Type>::SimpleIntegerOption(
@@ -126,5 +114,17 @@ void SimpleIntegerOptionUI<Type>::restore_defaults(){
     m_box->setText(QString::number(m_value));
 }
 
+
+
+
+
+
+template class SimpleIntegerOption<uint8_t>;
+template class SimpleIntegerOption<uint16_t>;
+template class SimpleIntegerOption<uint32_t>;
+
+template class SimpleIntegerOptionUI<uint8_t>;
+template class SimpleIntegerOptionUI<uint16_t>;
+template class SimpleIntegerOptionUI<uint32_t>;
 
 }
