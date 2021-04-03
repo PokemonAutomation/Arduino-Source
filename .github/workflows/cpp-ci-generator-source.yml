@@ -1,0 +1,51 @@
+name: C++ CI Hex Generator
+
+on: [push, pull_request, workflow_dispatch]
+
+jobs:
+  build:
+
+    runs-on: ${{ matrix.os }}
+
+    strategy:
+      matrix:
+        os: [macOS-latest, windows-latest]
+
+    steps:
+    - uses: actions/checkout@v2
+    - name: Set up MinGW
+      if: contains( matrix.os, 'windows')
+      uses: egor-tensin/setup-mingw@v2
+    - name: Install Qt
+      if: contains( matrix.os, 'windows')
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: '5.12.10'
+        arch: 'win32_mingw73'
+    - name: Install Qt
+      if: contains( matrix.os, 'macOS')
+      uses: jurplel/install-qt-action@v2
+      with:
+        version: '5.12.10'
+    - name: C++ generation
+      run: |
+        cd GeneratorSource
+        qmake
+        make
+    - name: Generate windows package
+      if: contains( matrix.os, 'windows')
+      run: |
+        mkdir package
+        cd package
+        mkdir Binaries
+        cd ..
+        move GeneratorSource/release/HexGenerator.exe package/Binaries/
+        move Common package/Common/
+        move GeneratorConfig package/GeneratorConfig/
+        move NativePrograms package/NativePrograms/
+        windeployqt ./package/Binaries/HexGenerator.exe
+    - uses: actions/upload-artifact@v2
+      if: contains( matrix.os, 'windows')
+      with:
+        name: Hex Generator for windows
+        path: package/
