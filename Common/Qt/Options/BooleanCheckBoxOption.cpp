@@ -31,9 +31,15 @@ BooleanCheckBoxOption::BooleanCheckBoxOption(
 {}
 
 void BooleanCheckBoxOption::load_default(const QJsonValue& json){
+    if (!json.isBool()){
+        return;
+    }
     m_default = json.toBool();
 }
 void BooleanCheckBoxOption::load_current(const QJsonValue& json){
+    if (!json.isBool()){
+        return;
+    }
     m_current = json.toBool();
 }
 QJsonValue BooleanCheckBoxOption::write_default() const{

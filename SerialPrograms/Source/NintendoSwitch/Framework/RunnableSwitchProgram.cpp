@@ -48,19 +48,12 @@ RunnableProgram::RunnableProgram(
     , m_setup(nullptr)
 {}
 void RunnableProgram::from_json(const QJsonValue& json){
-    try{
-        const QJsonObject& obj = json_get_object(json_cast_object(json), m_name);
-        m_setup->load_json(json_get_value(obj, "SwitchSetup"));
-        for (auto& item : m_options){
-            if (!item.second.isEmpty()){
-                QJsonValue value = json_get_value(obj, item.second);
-                item.first->load_json(value);
-            }
+    const QJsonObject& obj = json_get_object_nothrow(json.toObject(), m_name);
+    m_setup->load_json(json_get_value_nothrow(obj, "SwitchSetup"));
+    for (auto& item : m_options){
+        if (!item.second.isEmpty()){
+            item.first->load_json(json_get_value_nothrow(obj, item.second));
         }
-    }catch (const StringException& str){
-        cout << str.message().toUtf8().data() << endl;
-    }catch (...){
-        cout << "Failed to catch." << endl;
     }
 }
 QJsonValue RunnableProgram::to_json() const{
@@ -96,6 +89,7 @@ QWidget* RunnableProgram::make_ui(MainWindow& window){
 
 RunnableProgramUI::RunnableProgramUI(RunnableProgram& factory, MainWindow& window)
     : RightPanelUI(factory)
+    , m_name(factory.name())
     , m_window(window)
     , m_logger(window.output_window(), "Program")
     , m_setup(nullptr)
@@ -183,7 +177,12 @@ void RunnableProgramUI::make_body(QWidget& parent, QVBoxLayout& layout){
     m_status_bar->setVisible(false);
     m_status_bar->setAlignment(Qt::AlignCenter);
     layout.addWidget(m_status_bar);
-    m_status_bar->setText("<b>Encounters: 1,267 - Corrections: 0 - Star Shinies: 1 - Square Shinies: 0</b>");
+//    m_status_bar->setText("<b>Encounters: 1,267 - Corrections: 0 - Star Shinies: 1 - Square Shinies: 0</b>");
+    QFont font = m_status_bar->font();
+//    cout << font.pointSize() << endl;
+    int font_size = font.pointSize();
+    font.setPointSize(font_size + font_size / 2);
+    m_status_bar->setFont(font);
 
     QGroupBox* actions_widget = new QGroupBox("Actions", &parent);
     layout.addWidget(actions_widget);
@@ -335,7 +334,7 @@ void RunnableProgramUI::run_program(){
     }
 
     try{
-        m_logger.log("Starting Program...");
+        m_logger.log("<b>Starting Program: " + m_name + "</b>");
         program();
         m_setup->wait_for_all_requests();
         m_logger.log("Ending Program...");

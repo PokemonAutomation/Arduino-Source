@@ -40,8 +40,8 @@ MultiHostTable::MultiHostTable(const QJsonObject& obj)
     : SingleStatementOption(obj)
     , MultiHostTableOption(SingleStatementOption::m_label)
 {
-    load_default(json_get_array(obj, JSON_DEFAULT));
-    load_current(json_get_array(obj, JSON_CURRENT));
+    load_default(json_get_array_throw(obj, JSON_DEFAULT));
+    load_current(json_get_array_throw(obj, JSON_CURRENT));
 }
 bool MultiHostTable::is_valid() const{
     return MultiHostTableOption::is_valid();

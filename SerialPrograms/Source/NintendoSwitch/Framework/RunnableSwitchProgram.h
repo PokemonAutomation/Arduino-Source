@@ -86,6 +86,7 @@ protected:
     static BotBase& sanitize_botbase(BotBase* botbase);
 
 protected:
+    const QString& m_name;
     MainWindow& m_window;
     TaggedLogger m_logger;
 

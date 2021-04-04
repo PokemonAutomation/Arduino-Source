@@ -8,11 +8,17 @@
 #define PokemonAutomation_PokemonSwSh_StartBattleDetector_H
 
 #include <chrono>
+#include "CommonFramework/Tools/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+
+
+
+bool is_dialog_grey(const QImage& image);
 
 
 class StartBattleDetector{
@@ -23,12 +29,14 @@ public:
     );
 
     bool has_timed_out() const;
-    bool detect();
+    bool detect(const QImage& screen);
+    bool wait(ProgramEnvironment& env, Logger& logger);
 
 private:
     VideoFeed& m_feed;
     std::chrono::milliseconds m_timeout;
-    InferenceBoxScope m_box;
+    InferenceBoxScope m_screen_box;
+    InferenceBoxScope m_dialog_box;
     std::chrono::time_point<std::chrono::system_clock> m_start_time;
 };
 

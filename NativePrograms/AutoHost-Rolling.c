@@ -75,6 +75,7 @@ const uint16_t EXTRA_DELAY_BETWEEN_RAIDS    =   0 * TICKS_PER_SECOND;
 //      MOVE_SLOT   =   #   Select this move for the first turn.
 const uint8_t MOVE_SLOT     =   0;
 const bool DYNAMAX          =   true;   //  Must set to false if you cannot dmax.
+const uint8_t TROLL_HOSTING =   0;      //0 to disable, 1/2/3 to attack one of your allies.
 
 
 //  Alternate Games: (experimental feature)

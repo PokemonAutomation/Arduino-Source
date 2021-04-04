@@ -1,4 +1,4 @@
-/*  ShinyHuntAutonomous-Regi
+/*  Shiny Hunt Autonomous - Regi
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -32,6 +32,7 @@ private:
         uint64_t m_light_resets = 0;
     };
 
+    BooleanCheckBox GO_HOME_WHEN_DONE;
     RegiSelector REGI_NAME;
     BooleanCheckBox REQUIRE_SQUARE;
     SectionDivider m_advanced_options;

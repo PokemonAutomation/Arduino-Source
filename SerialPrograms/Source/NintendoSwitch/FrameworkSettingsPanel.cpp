@@ -9,6 +9,10 @@
 #include "NintendoSwitch/Options/TimeExpression.h"
 #include "FrameworkSettingsPanel.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 

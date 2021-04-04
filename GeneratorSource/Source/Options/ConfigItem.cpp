@@ -16,7 +16,7 @@ const QString ConfigItem::JSON_TYPE     = "00-Type";
 const QString ConfigItem::JSON_LABEL    = "01-Label";
 
 ConfigItem::ConfigItem(const QJsonObject& obj)
-    : m_label(json_get_string(obj, JSON_LABEL))
+    : m_label(json_get_string_throw(obj, JSON_LABEL))
 {}
 
 QJsonObject ConfigItem::to_json() const{
@@ -33,7 +33,7 @@ std::map<QString, OptionMaker>& OPTION_FACTORIES(){
     return map;
 }
 std::unique_ptr<ConfigItem> parse_option(const QJsonObject& obj){
-    QString type = json_get_string(obj, ConfigItem::JSON_TYPE);
+    QString type = json_get_string_throw(obj, ConfigItem::JSON_TYPE);
     std::map<QString, OptionMaker>& map = OPTION_FACTORIES();
     auto iter = map.find(type);
     if (iter == map.end()){

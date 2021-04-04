@@ -35,13 +35,9 @@ SerialSelector::SerialSelector(
     load_json(json);
 }
 void SerialSelector::load_json(const QJsonValue& json){
-    try{
-        QString name = json.toString();
-        if (name.size() > 0){
-            m_port = QSerialPortInfo(name);
-        }
-    }catch (const StringException& str){
-        cout << str.message().toUtf8().data() << endl;
+    QString name = json.toString();
+    if (name.size() > 0){
+        m_port = QSerialPortInfo(name);
     }
 }
 QJsonValue SerialSelector::to_json() const{

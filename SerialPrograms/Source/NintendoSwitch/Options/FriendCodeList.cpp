@@ -39,9 +39,12 @@ FriendCodeList::FriendCodeList()
 
 void FriendCodeList::load_json(const QJsonValue& json){
     m_lines.clear();
-    QJsonArray list = json_cast_array(json);
+    QJsonArray list = json.toArray();
     for (const auto& line : list){
-        m_lines.emplace_back(json_cast_string(line));
+        QString str = line.toString();
+        if (str.size() > 0){
+            m_lines.emplace_back(str);
+        }
     }
 }
 QJsonValue FriendCodeList::to_json() const{

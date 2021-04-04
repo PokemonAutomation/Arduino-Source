@@ -37,12 +37,12 @@ TimeExpression::TimeExpression(const QJsonObject& obj)
     : SingleStatementOption(obj)
     , TimeExpressionOption<uint32_t>(
         SingleStatementOption::m_label,
-        json_get_int(obj, JSON_MIN_VALUE),
-        json_get_int(obj, JSON_MAX_VALUE),
-        json_get_string(obj, JSON_DEFAULT)
+        json_get_int_throw(obj, JSON_MIN_VALUE),
+        json_get_int_throw(obj, JSON_MAX_VALUE),
+        json_get_string_throw(obj, JSON_DEFAULT)
     )
 {
-    load_current(json_get_string(obj, JSON_CURRENT));
+    load_current(json_get_string_throw(obj, JSON_CURRENT));
     update();
 }
 

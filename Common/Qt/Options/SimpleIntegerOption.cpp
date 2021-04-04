@@ -12,7 +12,6 @@
 namespace PokemonAutomation{
 
 
-
 template <typename Type>
 SimpleIntegerOption<Type>::SimpleIntegerOption(
     Type& backing,
@@ -25,8 +24,7 @@ SimpleIntegerOption<Type>::SimpleIntegerOption(
     , m_min_value(min_value)
     , m_max_value(max_value)
     , m_default(default_value)
-    , m_current(default_value)
-    , m_backing(backing)
+    , m_current(backing)
 {}
 template <typename Type>
 SimpleIntegerOption<Type>::SimpleIntegerOption(
@@ -45,12 +43,18 @@ SimpleIntegerOption<Type>::SimpleIntegerOption(
 
 template <typename Type>
 void SimpleIntegerOption<Type>::load_default(const QJsonValue& json){
+    if (!json.isDouble()){
+        return;
+    }
     m_default = json.toInt();
     m_default = std::max(m_default, m_min_value);
     m_default = std::min(m_default, m_max_value);
 }
 template <typename Type>
 void SimpleIntegerOption<Type>::load_current(const QJsonValue& json){
+    if (!json.isDouble()){
+        return;
+    }
     m_current = json.toInt();
     m_current = std::max(m_current, m_min_value);
     m_current = std::min(m_current, m_max_value);
@@ -113,7 +117,6 @@ void SimpleIntegerOptionUI<Type>::restore_defaults(){
     m_value.restore_defaults();
     m_box->setText(QString::number(m_value));
 }
-
 
 
 

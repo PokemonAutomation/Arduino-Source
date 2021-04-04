@@ -35,6 +35,8 @@ public:
 
     FillMatrix extract(PixelBox box, ObjectID id) const;
 
+    std::string dump() const;
+
 public:
     template <typename Image, typename Filter>
     bool apply_filter(Image&& image, Filter& filter);

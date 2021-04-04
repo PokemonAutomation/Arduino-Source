@@ -17,9 +17,9 @@ EncounterStats::EncounterStats(bool shiny_types)
 {}
 
 void EncounterStats::log_stats(ProgramEnvironment& env, Logger& logger) const{
-    QString str = "<b>" + QString(stats().c_str()) + "</b>";
+    QString str = QString(stats().c_str());
     env.set_status(str);
-    logger.log(str);
+    logger.log("<b>" + str + "</b>");
 }
 std::string EncounterStats::stats() const{
     std::string str;
@@ -37,8 +37,11 @@ std::string EncounterStats::str_shinies() const{
     if (m_shiny_types){
         str += " - Star Shinies: " + tostr_u_commas(m_star_shinies);
         str += " - Square Shinies: " + tostr_u_commas(m_square_shinies);
+        if (m_unknown_shinies > 0){
+            str += " - Unknown Shinies: " + tostr_u_commas(m_unknown_shinies);
+        }
     }else{
-        str += " - Shinies: " + tostr_u_commas(m_shinies);
+        str += " - Shinies: " + tostr_u_commas(m_unknown_shinies);
     }
     return str;
 }
@@ -48,18 +51,16 @@ std::string EncounterStats::str_shinies() const{
 void EncounterStats::add_non_shiny(){
     m_encounters++;
 }
-void EncounterStats::add_shiny(){
+void EncounterStats::add_unknown_shiny(){
     m_encounters++;
-    m_shinies++;
+    m_unknown_shinies++;
 }
 void EncounterStats::add_star_shiny(){
     m_encounters++;
-    m_shinies++;
     m_star_shinies++;
 }
 void EncounterStats::add_square_shiny(){
     m_encounters++;
-    m_shinies++;
     m_square_shinies++;
 }
 

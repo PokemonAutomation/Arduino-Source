@@ -29,14 +29,14 @@ public:
     virtual std::string str_shinies() const;
 
     void add_non_shiny();
-    void add_shiny();
+    void add_unknown_shiny();
     void add_star_shiny();
     void add_square_shiny();
 
 protected:
     bool m_shiny_types;
     uint64_t m_encounters = 0;
-    uint64_t m_shinies = 0;
+    uint64_t m_unknown_shinies = 0;
     uint64_t m_star_shinies = 0;
     uint64_t m_square_shinies = 0;
 };

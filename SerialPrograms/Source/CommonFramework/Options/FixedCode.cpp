@@ -24,6 +24,9 @@ FixedCode::FixedCode(
     , m_current(std::move(default_value))
 {}
 void FixedCode::load_json(const QJsonValue& json){
+    if (!json.isString()){
+        return;
+    }
     m_current = json.toString();
 }
 QJsonValue FixedCode::to_json() const{

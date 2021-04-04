@@ -23,6 +23,7 @@ InferenceBox translate_to_parent(
     const PixelBox& box
 );
 
+QImage extract_box(const QImage& image, const PixelBox& box);
 QImage extract_box(const QImage& image, const InferenceBox& box);
 
 double image_diff(const QImage& x, const QImage& y);

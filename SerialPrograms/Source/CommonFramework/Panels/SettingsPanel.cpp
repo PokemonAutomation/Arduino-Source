@@ -19,18 +19,11 @@ namespace PokemonAutomation{
 
 
 void SettingsPanel::from_json(const QJsonValue& json){
-    try{
-        const QJsonObject& obj = json_get_object(json_cast_object(json), m_name);
-        for (auto& item : m_options){
-            if (!item.first.isEmpty()){
-                QJsonValue value = json_get_value(obj, item.first);
-                item.second->load_json(value);
-            }
+    QJsonObject obj = json_get_object_nothrow(json.toObject(), m_name);
+    for (auto& item : m_options){
+        if (!item.first.isEmpty()){
+            item.second->load_json(json_get_value_nothrow(obj, item.first));
         }
-    }catch (const StringException& str){
-        cout << str.message().toUtf8().data() << endl;
-    }catch (...){
-        cout << "Failed to catch." << endl;
     }
 }
 QJsonValue SettingsPanel::to_json() const{

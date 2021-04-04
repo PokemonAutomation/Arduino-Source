@@ -288,10 +288,20 @@ void set_keyboard_mapping(const QJsonArray& json){
     std::vector<std::pair<Qt::Key, const ControllerButton&>> mapping;
 
     for (const auto& item : json){
-        QJsonObject pair = json_cast_object(item);
-        Qt::Key key = (Qt::Key)json_get_int(pair, "Qt::Key");
-        const ControllerButton* button = string_to_controller_button(json_get_string(pair, "Button"));
-        mapping.emplace_back(key, *button);
+        QJsonObject pair = item.toObject();
+        int key;
+        if (!json_get_int(key, pair, "Qt::Key")){
+            continue;
+        }
+        QString button_name;
+        if (!json_get_string(button_name, pair, "Button")){
+            continue;
+        }
+        const ControllerButton* button = string_to_controller_button(button_name);
+        if (button == nullptr){
+            continue;
+        }
+        mapping.emplace_back((Qt::Key)key, *button);
     }
 
     set_keyboard_mapping(std::move(mapping));

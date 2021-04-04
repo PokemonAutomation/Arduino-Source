@@ -33,22 +33,20 @@ CameraSelector::CameraSelector(QString label, const QJsonValue& json)
 }
 
 void CameraSelector::load_json(const QJsonValue& json){
-    try{
-        QJsonObject obj = json_cast_object(json);
-        QString name = json_get_string(obj, JSON_CAMERA);
-        for (const auto& item : QCameraInfo::availableCameras()){
-            if (name == item.deviceName()){
-                m_camera = item;
-                break;
-            }
+    QJsonObject obj = json.toObject();
+    QString name;
+    if (!json_get_string(name, obj, JSON_CAMERA)){
+        return;
+    }
+    for (const auto& item : QCameraInfo::availableCameras()){
+        if (name == item.deviceName()){
+            m_camera = item;
+            break;
         }
-        QJsonArray res = json_get_array(obj, JSON_RESOLUTION);
-        if (res.size() != 2){
-            throw StringException("Config Error - Resolution should be 2 elements: " + JSON_RESOLUTION);
-        }
-        m_resolution = QSize(json_cast_int(res[0]), json_cast_int(res[1]));
-    }catch (const StringException& str){
-        cout << str.message().toUtf8().data() << endl;
+    }
+    QJsonArray res = json_get_array_nothrow(obj, JSON_RESOLUTION);
+    if (res.size() == 2 && res[0].isDouble() && res[1].isDouble()){
+        m_resolution = QSize(res[0].toInt(), res[1].toInt());
     }
 }
 QJsonValue CameraSelector::to_json() const{

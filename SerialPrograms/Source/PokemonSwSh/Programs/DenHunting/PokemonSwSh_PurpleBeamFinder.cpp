@@ -90,15 +90,14 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env) const{
             break;
         }
         {
-            std::string status = "<b>Attempts: " + tostr_u_commas(attempts);
+            std::string status = "Attempts: " + tostr_u_commas(attempts);
             status += " - Timeouts: " + tostr_u_commas(timed_out);
             status += " - Red Detected: " + tostr_u_commas(red_detected);
             status += " - Red Presumed: " + tostr_u_commas(red_assumed);
             status += " - Purple: " + tostr_u_commas(purple);
-            status += "</br>";
             QString str = status.c_str();
-            env.logger.log(str);
             env.set_status(str);
+            env.logger.log("<b>" + str + "</b>");
         }
         if (exit){
             break;

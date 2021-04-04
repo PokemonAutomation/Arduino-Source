@@ -18,6 +18,14 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
+struct ShinyImageAlpha{
+    double shiny = 0;
+    double star = 0;
+    double square = 0;
+
+    void max(const ShinyImageAlpha& x);
+};
+
 struct ShinyImageDetection{
     std::vector<PixelBox> balls;
     std::vector<PixelBox> stars;
@@ -30,7 +38,7 @@ struct ShinyImageDetection{
     );
 
 
-    double alpha() const;
+    ShinyImageAlpha alpha() const;
 };
 
 

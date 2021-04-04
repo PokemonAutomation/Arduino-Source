@@ -16,6 +16,10 @@ namespace PokemonAutomation{
 
 class PersistentSettings{
 public:
+    PersistentSettings()
+        : log_everything(false)
+    {}
+
     void write() const;
     void read();
 
@@ -25,7 +29,7 @@ public:
     QSize window_size = QSize(960, 540);
     bool naughty_mode = false;
     bool developer_mode = false;
-    bool log_everything = false;
+    std::atomic<bool> log_everything;
 
     QJsonObject settings;
     QJsonObject programs;

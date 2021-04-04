@@ -5,25 +5,30 @@
  */
 
 #include <cmath>
+#include "Common/Clientside/PrettyPrint.h"
 #include "Common/SwitchFramework/FrameworkSettings.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "CommonFramework/Inference/ImageTools.h"
+#include "CommonFramework/Inference/InferenceThrottler.h"
 #include "CommonFramework/Inference/FillGeometry.h"
 #include "CommonFramework/Inference/AnomalyDetector.h"
 #include "CommonFramework/Inference/ColorClustering.h"
-#include "CommonFramework/Inference/FloatStatAccumulator.h"
+#include "CommonFramework/Inference/StatAccumulator.h"
 #include "CommonFramework/Inference/TimeWindowStatTracker.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyFilters.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleTrigger.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareTrigger.h"
+#include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyTrigger.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_StartBattleDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_RaidCatchDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_FishingDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h"
 #include "PokemonSwSh_StartGame.h"
 #include "TestProgram.h"
 
@@ -49,11 +54,107 @@ TestProgram::TestProgram()
 
 
 
+
+
+
+
+
+
+
 void TestProgram::program(SingleSwitchProgramEnvironment& env) const{
     BotBase& botbase = env.console;
     VideoFeed& feed = env.console;
 
 //    start_game_from_home_with_inference(env, env.logger, env.console, true, 0, 0, true);
+
+//    std::pair<uint8_t, uint8_t> coord = get_direction(-3, -1.0);
+//    cout << "direction = " << (int)coord.first << ", " << (int)coord.second << endl;
+
+//    Trajectory trajectory = get_trajectory_float(.09, .09);
+//    cout << trajectory.distance_in_ticks << " : " << (int)trajectory.joystick_x << "," << (int)trajectory.joystick_y << endl;
+
+
+#if 0
+    QImage image("square-test.png");
+//    QImage image("test-1617471750423682600-O.png");
+//    QImage image = feed.snapshot();
+//    image.save("square-test0.png");
+    FillMatrix matrix(image);
+
+    BrightYellowLightFilterDebug filter;
+    matrix.apply_filter(image, filter);
+
+    std::vector<FillGeometry> objects;
+    objects = find_all_objects(matrix, 1, true);
+    cout << "objects = " << objects.size() << endl;
+
+    std::deque<InferenceBoxScope> boxes;
+    for (const FillGeometry& object : objects){
+        if (is_square2(image, matrix, object)){
+            InferenceBox box = translate_to_parent(image, InferenceBox(0, 0, 1, 1), object.box);
+            box.color = Qt::green;
+            boxes.emplace_back(feed, box);
+        }
+    }
+
+    env.wait(std::chrono::seconds(600));
+#endif
+
+
+#if 0
+    std::deque<InferenceBoxScope> grid;
+    for (size_t r = 0; r < 10; r++){
+        for (size_t c = 0; c < 10; c++){
+            grid.emplace_back(feed, 0.1 * c, 0.1 * r, 0.1, 0.1);
+        }
+    }
+
+    env.wait(std::chrono::seconds(5));
+
+    pbf_move_left_joystick(208, 16, 500, 0);
+
+    env.wait(std::chrono::seconds(600));
+#endif
+
+
+
+#if 0
+    QImage screen("test-161.png");
+
+    std::vector<PixelBox> marks;
+    find_marks(screen, nullptr, &marks);
+
+    for (const PixelBox& box : marks){
+        cout << box.width() << " x " << box.height() << endl;
+    }
+#endif
+
+
+#if 0
+    FillMatrix blue_matrix(screen);
+    BlueFilter blue_filter;
+    blue_matrix.apply_filter(blue, blue_filter);
+    blue.save("blue.png");
+#endif
+
+
+
+#if 0
+    SummaryShinySymbolDetector detector(feed, env.logger);
+
+    detector.wait_for_detection(env);
+
+    env.wait(std::chrono::seconds(600));
+#endif
+
+#if 1
+    detect_shiny_battle(
+        env, env.console, env.logger,
+        SHINY_BATTLE_REGULAR,
+        std::chrono::seconds(60)
+    );
+#endif
+
 
 #if 0
     StandardBattleMenuDetector detector(feed);
@@ -149,22 +250,6 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env) const{
 #endif
 
 
-#if 0
-    SummaryShinySymbolDetector detector(feed, env.logger);
-
-    detector.wait_for_detection(env);
-
-    env.wait(std::chrono::seconds(600));
-#endif
-
-#if 1
-    ShinyEncounterDetector detector(
-        feed, env.logger,
-        ShinyEncounterDetector::REGULAR_BATTLE,
-        std::chrono::seconds(60)
-    );
-    detector.detect(env);
-#endif
 
 
 #if 0

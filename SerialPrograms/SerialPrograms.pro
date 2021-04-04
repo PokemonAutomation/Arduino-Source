@@ -10,7 +10,7 @@ CONFIG += c++14
 INCLUDEPATH += ../
 INCLUDEPATH += Source/
 
-#CONFIG += force_debug_info
+CONFIG += force_debug_info
 
 QMAKE_CXXFLAGS += -msse4.2
 QMAKE_CXXFLAGS += -Wnarrowing
@@ -99,6 +99,7 @@ SOURCES += \
     Source/PokemonSwSh/Inference/PokemonSwSh_BattleMenuDetector.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_BeamSetter.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_FishingDetector.cpp \
+    Source/PokemonSwSh/Inference/PokemonSwSh_MarkFinder.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_RaidCatchDetector.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_RaidLobbyReader.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_StartBattleDetector.cpp \
@@ -106,6 +107,7 @@ SOURCES += \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyTrigger.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleTrigger.cpp \
+    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareDetector.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareTrigger.cpp \
     Source/PokemonSwSh/Options/Catchability.cpp \
     Source/PokemonSwSh/Options/EggStepCount.cpp \
@@ -125,10 +127,12 @@ SOURCES += \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-BerryTree.cpp \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-Fishing.cpp \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-IoATrade.cpp \
+    Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-Overworld.cpp \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-Regi.cpp \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-Regigigas2.cpp \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-StrongSpawn.cpp \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-SwordsOfJustice.cpp \
+    Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-Whistling.cpp \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-IoATrade.cpp \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-Regi.cpp \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-Regigigas2.cpp \
@@ -209,10 +213,10 @@ HEADERS += \
     Source/CommonFramework/Inference/FillGeometry.h \
     Source/CommonFramework/Inference/FillMatrix.h \
     Source/CommonFramework/Inference/FloatPixel.h \
-    Source/CommonFramework/Inference/FloatStatAccumulator.h \
     Source/CommonFramework/Inference/ImageTools.h \
     Source/CommonFramework/Inference/InferenceThrottler.h \
     Source/CommonFramework/Inference/InferenceTypes.h \
+    Source/CommonFramework/Inference/StatAccumulator.h \
     Source/CommonFramework/Inference/TimeWindowStatTracker.h \
     Source/CommonFramework/Options/BooleanCheckBox.h \
     Source/CommonFramework/Options/ConfigOption.h \
@@ -260,6 +264,7 @@ HEADERS += \
     Source/PokemonSwSh/Inference/PokemonSwSh_BattleMenuDetector.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_BeamSetter.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_FishingDetector.h \
+    Source/PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_RaidCatchDetector.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_RaidLobbyReader.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_StartBattleDetector.h \
@@ -268,6 +273,7 @@ HEADERS += \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyFilters.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyTrigger.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleTrigger.h \
+    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareDetector.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareTrigger.h \
     Source/PokemonSwSh/Options/Catchability.h \
     Source/PokemonSwSh/Options/EggStepCount.h \
@@ -289,10 +295,12 @@ HEADERS += \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-BerryTree.h \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-Fishing.h \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-IoATrade.h \
+    Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-Overworld.h \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-Regi.h \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-Regigigas2.h \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-StrongSpawn.h \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-SwordsOfJustice.h \
+    Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-Whistling.h \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntTools.h \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-IoATrade.h \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-Regi.h \

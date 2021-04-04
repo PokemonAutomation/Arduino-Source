@@ -18,7 +18,7 @@ const QString SingleStatementOption::JSON_CURRENT      = "99-Current";
 
 SingleStatementOption::SingleStatementOption(const QJsonObject& obj)
     : ConfigItem(obj)
-    , m_declaration(json_get_string(obj, JSON_DECLARATION))
+    , m_declaration(json_get_string_throw(obj, JSON_DECLARATION))
 {}
 
 QJsonObject SingleStatementOption::to_json() const{

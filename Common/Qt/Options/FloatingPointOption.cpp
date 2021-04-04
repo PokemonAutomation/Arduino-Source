@@ -26,11 +26,17 @@ FloatingPointOption::FloatingPointOption(
 {}
 
 void FloatingPointOption::load_default(const QJsonValue& json){
+    if (!json.isDouble()){
+        return;
+    }
     m_default = json.toDouble();
     m_default = std::max(m_default, m_min_value);
     m_default = std::min(m_default, m_max_value);
 }
 void FloatingPointOption::load_current(const QJsonValue& json){
+    if (!json.isDouble()){
+        return;
+    }
     m_current = json.toDouble();
     m_current = std::max(m_current, m_min_value);
     m_current = std::min(m_current, m_max_value);

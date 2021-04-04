@@ -69,6 +69,7 @@ extern const uint16_t EXTRA_DELAY_BETWEEN_RAIDS;
 //      MOVE_SLOT   =   #   Select this move for the first turn.
 extern const uint8_t MOVE_SLOT;
 extern const bool DYNAMAX;          //  Must set to false if you cannot dmax.
+extern const uint8_t TROLL_HOSTING; //  0 disables the troll hosting option, 1 attacks the first ally, 2 attacks the second one, 3 attacks the third one. Dynamaxing will disable this option.
 
 
 //  Alternate Games: (experimental feature)

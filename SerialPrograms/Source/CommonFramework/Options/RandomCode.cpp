@@ -60,9 +60,9 @@ RandomCode::RandomCode()
     )
 {}
 void RandomCode::load_json(const QJsonValue& json){
-    QJsonObject root = json_cast_object(json);
-    m_current.m_random_digits = json_get_int(root, "RandomDigits");
-    m_current.m_code = json_get_string(root, "RaidCode");
+    QJsonObject root = json.toObject();
+    json_get_int(m_current.m_random_digits, root, "RandomDigits");
+    json_get_string(m_current.m_code, root, "RaidCode");
 }
 QJsonValue RandomCode::to_json() const{
     QJsonObject root;

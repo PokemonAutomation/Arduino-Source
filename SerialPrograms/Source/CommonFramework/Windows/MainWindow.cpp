@@ -72,7 +72,7 @@ MainWindow::MainWindow(QWidget* parent)
     program_box->setMaximumWidth(width);
     setting_box->setMaximumWidth(width);
 
-    QGroupBox* support_box = new QGroupBox("Support", centralwidget);
+    QGroupBox* support_box = new QGroupBox("Support (" + STRING_POKEMON + " Automation " + VERSION + ")", centralwidget);
     left_layout->addWidget(support_box);
     QVBoxLayout* support_layout = new QVBoxLayout(support_box);
 

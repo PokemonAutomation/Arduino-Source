@@ -1,4 +1,4 @@
-/*  ShinyHuntAutonomous-StrongSpawn
+/*  Shiny Hunt Autonomous - StrongSpawn
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -36,6 +36,7 @@ private:
         virtual bool run_away() override;
     };
 
+    BooleanCheckBox GO_HOME_WHEN_DONE;
     SectionDivider m_advanced_options;
     TimeExpression<uint16_t> EXIT_BATTLE_MASH_TIME;
     SimpleInteger<uint8_t> TIME_ROLLBACK_HOURS;

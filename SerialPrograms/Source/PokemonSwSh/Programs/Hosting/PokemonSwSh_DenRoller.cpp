@@ -29,6 +29,7 @@ DenRoller::DenRoller()
     )
 {
     m_options.emplace_back(&SKIPS, "SKIPS");
+    m_options.emplace_back(&CATCHABILITY, "CATCHABILITY");
     m_options.emplace_back(&VIEW_TIME, "VIEW_TIME");
 }
 

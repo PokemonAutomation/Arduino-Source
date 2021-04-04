@@ -54,6 +54,9 @@ InferenceBox translate_to_parent(
     );
 }
 
+QImage extract_box(const QImage& image, const PixelBox& box){
+    return image.copy(box.min_x, box.min_y, box.width(), box.height());
+}
 QImage extract_box(const QImage& image, const InferenceBox& box){
     return image.copy(
         (int)(image.width() * box.x + 0.5),

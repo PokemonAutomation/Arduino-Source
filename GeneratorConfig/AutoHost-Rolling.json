@@ -86,6 +86,15 @@
         },
         {
             "00-Type": "SimpleInteger",
+            "01-Label": "<b>Troll hosting:</b><br>Zero disables the troll hosting mode, 1 attacks the first ally, 2 attacks the second, 3 attacks the third. Dynamaxing will disable this option.",
+            "02-Declaration": "const uint8_t TROLL_HOSTING",
+            "03-MinValue": 0,
+            "04-MaxValue": 3, 
+            "98-Default": 0,
+            "99-Current": 0
+        },
+        {
+            "00-Type": "SimpleInteger",
             "01-Label": "<b>1st Move Select Slot:</b><br>Zero disables 1st move select.",
             "02-Declaration": "const uint8_t MOVE_SLOT",
             "03-MinValue": 0,

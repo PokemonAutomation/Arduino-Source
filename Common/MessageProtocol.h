@@ -252,6 +252,7 @@ typedef struct{
 ////////////////////////////////////////////////////////////////////////////////
 //  Requests
 #define PABB_MSG_SEQNUM_RESET                   0x40
+//  After you send this message, the next seqnum you should use is (seqnum + 1).
 typedef struct{
     seqnum_t seqnum;
 } PABB_PACK pabb_MsgInfoSeqnumReset;
@@ -277,6 +278,7 @@ typedef struct{
 } PABB_PACK pabb_system_clock;
 
 #define PABB_MSG_REQUEST_COMMAND_FINISHED       0x45
+//  When you receive this message, you must ack it with PABB_MSG_ACK_REQUEST.
 typedef struct{
     seqnum_t seqnum;
     seqnum_t seq_of_original_command;

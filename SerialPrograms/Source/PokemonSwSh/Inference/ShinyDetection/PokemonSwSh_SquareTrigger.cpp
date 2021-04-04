@@ -96,7 +96,10 @@ bool is_square_beam(
 }
 
 
-
+//
+//  The old square detector. Deprecated.
+//
+#if 0
 bool is_square(
     const FillMatrix& matrix,
     const FillGeometry& object
@@ -138,19 +141,19 @@ bool is_square(
         size_t edge_area = 0;
         for (int c = 0; c < width; c++){
             FillGeometry body;
-            if (fill_geometry(body, submatrix, c, 0, false, 2)){
+            if (fill_geometry(body, submatrix, 1, c, 0, false, 2)){
                 edge_area += body.area;
             }
-            if (fill_geometry(body, submatrix, c, height - 1, false, 2)){
+            if (fill_geometry(body, submatrix, 1, c, height - 1, false, 2)){
                 edge_area += body.area;
             }
         }
         for (int r = 0; r < height; r++){
             FillGeometry body;
-            if (fill_geometry(body, submatrix, 0, r, false, 2)){
+            if (fill_geometry(body, submatrix, 1, 0, r, false, 2)){
                 edge_area += body.area;
             }
-            if (fill_geometry(body, submatrix, width - 1, r, false, 2)){
+            if (fill_geometry(body, submatrix, 1, width - 1, r, false, 2)){
                 edge_area += body.area;
             }
         }
@@ -171,103 +174,10 @@ bool is_square(
         }
     }
 
-#if 0
-    std::set<double> angles;
-    {
-        int r = object.box.min_y;
-        for (int c = object.box.min_x; c < object.box.max_x; c++){
-            if (matrix[r][c] != object.id){
-                continue;
-            }
-            int x = c - object.center_x;
-            int y = r - object.center_y;
-            double angle = std::atan2(y, x) * 57.29577951308232;
-            if (angle < 0){
-                angle += 360;
-            }
-            angles.insert(angle);
-        }
-    }
-    {
-        int r = object.box.max_y - 1;
-        for (int c = object.box.min_x; c < object.box.max_x; c++){
-            if (matrix[r][c] != object.id){
-                continue;
-            }
-            int x = c - object.center_x;
-            int y = r - object.center_y;
-            double angle = std::atan2(y, x) * 57.29577951308232;
-            if (angle < 0){
-                angle += 360;
-            }
-            angles.insert(angle);
-        }
-    }
-    {
-        int c = object.box.min_x;
-        for (int r = object.box.min_y; r < object.box.max_y; r++){
-            if (matrix[r][c] != object.id){
-                continue;
-            }
-            int x = c - object.center_x;
-            int y = r - object.center_y;
-            double angle = std::atan2(y, x) * 57.29577951308232;
-            if (angle < 0){
-                angle += 360;
-            }
-            angles.insert(angle);
-        }
-    }
-    {
-        int c = object.box.max_x - 1;
-        for (int r = object.box.min_y; r < object.box.max_y; r++){
-            if (matrix[r][c] != object.id){
-                continue;
-            }
-            int x = c - object.center_x;
-            int y = r - object.center_y;
-            double angle = std::atan2(y, x) * 57.29577951308232;
-            if (angle < 0){
-                angle += 360;
-            }
-            angles.insert(angle);
-        }
-    }
-
-//    cout << "angles = " << angles.size() << endl;
-
-    //  Group angles.
-    std::map<double, int> angle_sets;
-    while (!angles.empty()){
-        double pivot = *angles.begin();
-        int& high = angle_sets[pivot] = false;
-        for (auto angle : angles){
-            double n = angle - pivot;
-            double q = std::round(n / 180.);
-            double r = n - 180*q;
-            if (std::abs(r) < SQUARE_ANGLE_TOLERANCE_DEGREES){
-                angles.erase(angle);
-                if (n > 100){
-                    high = 1;
-                }
-            }
-        }
-    }
-
-    int sum = 0;
-    for (const auto& angle : angle_sets){
-//        cout << "Angle Set: " << angle.first << ":" << angle.second << endl;
-        sum += angle.second;
-    }
-    if (sum < 2){
-        return false;
-    }
-
-    cout << width << " x " << height << endl;
+//    cout << submatrix.dump() << endl;
 
 
-#else
-    //  Check vertix angles.
+    //  Check vertex angles.
     {
         submatrix = matrix.extract(object.box, object.id);
 
@@ -277,29 +187,10 @@ bool is_square(
                 submatrix[r][c] = 0;
             }
         }
+//        cout << submatrix.dump() << endl;
 
-        std::vector<FillGeometry> regions = find_all_objects(submatrix, false, 1);
-//        std::multimap<size_t, FillGeometry> regions;
-//        for (const FillGeometry& region : find_all_objects(submatrix, false, 1)){
-//            regions.emplace(region.area, region);
-//        }
-
-#if 0
-        cout << "{" << endl;
-        for (int r = 0; r < height; r++){
-            cout << "    {";
-            for (int c = 0; c < width; c++){
-                cout << submatrix[r][c] << ",";
-            }
-            cout << "    }" << endl;
-        }
-        cout << "}" << endl;
-#endif
-
+        std::vector<FillGeometry> regions = find_all_objects(submatrix, 1, false, 1);
 //        cout << "regions = " << regions.size() << endl;
-//        if (regions.size() < 4){
-//            return false;
-//        }
 
         //  Get furthest points.
         std::vector<std::pair<int, int>> points;
@@ -357,14 +248,16 @@ bool is_square(
 //            cout << "Angle Set: " << angle.first << ":" << angle.second << endl;
             sum += angle.second;
         }
+//        cout << "sum = " << sum << endl;
         if (sum < 2){
             return false;
         }
     }
-#endif
 
+//    cout << "square" << endl;
     return true;
 }
+#endif
 
 
 

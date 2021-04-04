@@ -1,4 +1,4 @@
-/*  ShinyHuntAutonomous-IoATrade
+/*  Shiny Hunt Autonomous - IoA Trade
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -21,9 +21,13 @@ namespace PokemonSwSh{
 ShinyHuntAutonomousIoATrade::ShinyHuntAutonomousIoATrade()
     : SingleSwitchProgram(
         FeedbackType::REQUIRED, PABotBaseLevel::PABOTBASE_12KB,
-        "Shiny Hunt Autonomous - IoATrade",
+        "Shiny Hunt Autonomous - IoA Trade",
         "SerialPrograms/ShinyHuntAutonomous-IoATrade.md",
         "Hunt for shiny Isle of Armor trade using video feedback."
+    )
+    , GO_HOME_WHEN_DONE(
+        "<b>Go Home when Done:</b><br>After finding a shiny, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
+        true
     )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
@@ -37,6 +41,7 @@ ShinyHuntAutonomousIoATrade::ShinyHuntAutonomousIoATrade()
         "4 * 3600 * TICKS_PER_SECOND"
     )
 {
+    m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
     m_options.emplace_back(&m_advanced_options, "");
     m_options.emplace_back(&MASH_TO_TRADE_DELAY, "MASH_TO_TRADE_DELAY");
     m_options.emplace_back(&TOUCH_DATE_INTERVAL, "TOUCH_DATE_INTERVAL");
@@ -65,7 +70,7 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env) c
         stats.log_stats(env, env.logger);
 
         pbf_press_button(BUTTON_A, 10, 100);
-        pbf_press_button(BUTTON_A, 10, 50);
+        pbf_press_button(BUTTON_A, 10, 60);
         pbf_press_button(BUTTON_A, 10, 100);
         pbf_press_button(BUTTON_A, 10, 50);
         pbf_press_button(BUTTON_A, 10, POKEMON_TO_BOX_DELAY);
@@ -95,7 +100,7 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env) c
             stats.add_non_shiny();
             break;
         case SummaryShinySymbolDetector::SHINY:
-            stats.add_shiny();
+            stats.add_unknown_shiny();
             pbf_wait(1 * TICKS_PER_SECOND);
             pbf_press_button(BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
             goto StopProgram;
@@ -116,7 +121,9 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env) c
 StopProgram:
     stats.log_stats(env, env.logger);
 
-    pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+    if (GO_HOME_WHEN_DONE){
+        pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+    }
 
     end_program_callback();
     end_program_loop();

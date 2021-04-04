@@ -31,9 +31,9 @@ int FixedCode_init = register_option(
 
 FixedCode::FixedCode(const QJsonObject& obj)
     : SingleStatementOption(obj)
-    , m_digits(json_get_int(obj, JSON_DIGITS))
-    , m_default(json_get_string(obj, JSON_DEFAULT))
-    , m_current(json_get_string(obj, JSON_CURRENT))
+    , m_digits(json_get_int_throw(obj, JSON_DIGITS))
+    , m_default(json_get_string_throw(obj, JSON_DEFAULT))
+    , m_current(json_get_string_throw(obj, JSON_CURRENT))
 {
     if (!validate_code(m_digits, m_default)){
         throw StringException("Invalid code.");

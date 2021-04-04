@@ -39,8 +39,8 @@ Program::Program(const QString& name, const QString& description)
     , m_description(description)
 {}
 Program::Program(const QJsonObject& obj)
-    : RightPanel(json_get_string(obj, JSON_PROGRAM_NAME))
-    , m_description(json_get_string(obj, JSON_DESCRIPTION))
+    : RightPanel(json_get_string_throw(obj, JSON_PROGRAM_NAME))
+    , m_description(json_get_string_throw(obj, JSON_DESCRIPTION))
 {}
 Program::~Program(){
     if (m_builder.joinable()){

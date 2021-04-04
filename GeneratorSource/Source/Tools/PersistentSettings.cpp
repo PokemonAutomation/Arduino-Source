@@ -20,7 +20,7 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-const QString VERSION = "v0.4.0";
+const QString VERSION = "v0.4.1";
 const QString DISCORD = "https://discord.gg/cQ4gWxN";
 const QString GITHUB_REPO = "https://github.com/PokemonAutomation/SwSh-Arduino";
 
@@ -68,10 +68,7 @@ void PersistentSettings::load(){
 
         QJsonObject root = doc.object();
 
-        board_index = json_get_int(root, "Board");
-        if (board_index >= 4){
-            board_index = 0;
-        }
+        json_get_int(board_index, root, "Board", 0, 3);
 
     }catch (const StringException& str){
         std::cout << ("Error Parsing " + SETTINGS_NAME + ": " + str.message()).toUtf8().data() << std::endl;

@@ -14,8 +14,6 @@
 namespace PokemonAutomation{
 
 
-
-
 template <typename Type>
 TimeExpressionOption<Type>::TimeExpressionOption(
     Type& backing,
@@ -52,11 +50,17 @@ TimeExpressionOption<Type>::TimeExpressionOption(
 
 template <typename Type>
 void TimeExpressionOption<Type>::load_default(const QJsonValue& json){
+    if (!json.isString()){
+        return;
+    }
     m_default = json.toString();
     update();
 }
 template <typename Type>
 void TimeExpressionOption<Type>::load_current(const QJsonValue& json){
+    if (!json.isString()){
+        return;
+    }
     m_current = json.toString();
     update();
 }
@@ -165,11 +169,11 @@ void TimeExpressionOptionUI<Type>::restore_defaults(){
 
 
 
-
 template class TimeExpressionOption<uint16_t>;
 template class TimeExpressionOption<uint32_t>;
 
 template class TimeExpressionOptionUI<uint16_t>;
 template class TimeExpressionOptionUI<uint32_t>;
+
 
 }

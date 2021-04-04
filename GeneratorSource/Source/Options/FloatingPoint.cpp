@@ -34,12 +34,12 @@ FloatingPoint::FloatingPoint(const QJsonObject& obj)
     : SingleStatementOption(obj)
     , FloatingPointOption(
         SingleStatementOption::m_label,
-        json_get_double(obj, JSON_MIN_VALUE),
-        json_get_double(obj, JSON_MAX_VALUE),
-        json_get_double(obj, JSON_DEFAULT)
+        json_get_double_throw(obj, JSON_MIN_VALUE),
+        json_get_double_throw(obj, JSON_MAX_VALUE),
+        json_get_double_throw(obj, JSON_DEFAULT)
     )
 {
-    m_current = json_get_double(obj, JSON_CURRENT);
+    m_current = json_get_double_throw(obj, JSON_CURRENT);
 }
 bool FloatingPoint::is_valid() const{
     return FloatingPointOption::is_valid();

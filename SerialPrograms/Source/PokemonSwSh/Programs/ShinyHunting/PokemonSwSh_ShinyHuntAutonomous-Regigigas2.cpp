@@ -1,4 +1,4 @@
-/*  ShinyHuntAutonomous-Regigigas2
+/*  Shiny Hunt Autonomous - Regigigas2
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -27,6 +27,10 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
         "SerialPrograms/ShinyHuntAutonomous-Regigigas2.md",
         "Automatically hunt for shiny Regigigas using video feedback."
     )
+    , GO_HOME_WHEN_DONE(
+        "<b>Go Home when Done:</b><br>After finding a shiny, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
+        true
+    )
     , REVERSAL_PP(
         "<b>Reversal PP:</b><br>The amount of Reversal PP you are saved with.",
         24
@@ -47,6 +51,7 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
         "4 * 3600 * TICKS_PER_SECOND"
     )
 {
+    m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
     m_options.emplace_back(&REVERSAL_PP, "REVERSAL_PP");
     m_options.emplace_back(&REQUIRE_SQUARE, "REQUIRE_SQUARE");
     m_options.emplace_back(&m_advanced_options, "");
@@ -123,23 +128,24 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env)
 
             env.logger.log("Starting Regigigas Encounter: " + tostr_u_commas(stats.encounters() + 1));
 
-            pbf_mash_button(BUTTON_A, 10 * TICKS_PER_SECOND);
+            pbf_mash_button(BUTTON_A, 18 * TICKS_PER_SECOND);
             env.console.botbase().wait_for_all_requests();
 
-            ShinyEncounterDetector::Detection detection;
             {
-                ShinyEncounterDetector detector(
-                    env.console, env.logger,
-                    ShinyEncounterDetector::RAID_BATTLE,
-                    std::chrono::seconds(30)
-                );
-                detection = detector.detect(env);
+                StartBattleDetector detector(env.console, std::chrono::seconds(30));
+                detector.wait(env, env.logger);
             }
+
+            ShinyDetection detection = detect_shiny_battle(
+                env, env.console, env.logger,
+                SHINY_BATTLE_RAID,
+                std::chrono::seconds(30)
+            );
 
             if (tracker.process_result(detection)){
                 goto StopProgram;
             }
-            if (detection == ShinyEncounterDetector::NO_BATTLE_MENU || !tracker.run_away()){
+            if (detection == ShinyDetection::NO_BATTLE_MENU || !tracker.run_away()){
                 stats.m_timeouts++;
                 break;
             }
@@ -160,7 +166,9 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env)
 StopProgram:
     stats.log_stats(env, env.logger);
 
-    pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+    if (GO_HOME_WHEN_DONE){
+        pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+    }
 
     end_program_callback();
     end_program_loop();

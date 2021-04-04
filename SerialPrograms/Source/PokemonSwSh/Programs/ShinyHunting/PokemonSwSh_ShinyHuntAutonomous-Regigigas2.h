@@ -1,4 +1,4 @@
-/*  ShinyHuntAutonomous-Regigigas2
+/*  Shiny Hunt Autonomous - Regigigas2
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -49,6 +49,7 @@ private:
         Logger& m_logger;
     };
 
+    BooleanCheckBox GO_HOME_WHEN_DONE;
     SimpleInteger<uint8_t> REVERSAL_PP;
     BooleanCheckBox REQUIRE_SQUARE;
     SectionDivider m_advanced_options;

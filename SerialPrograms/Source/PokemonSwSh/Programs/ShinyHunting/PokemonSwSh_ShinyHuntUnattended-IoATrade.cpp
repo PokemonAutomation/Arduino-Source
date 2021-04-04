@@ -19,7 +19,7 @@ namespace PokemonSwSh{
 ShinyHuntUnattendedIoATrade::ShinyHuntUnattendedIoATrade()
     : SingleSwitchProgram(
         FeedbackType::NONE, PABotBaseLevel::PABOTBASE_31KB,
-        "Shiny Hunt Unattended - IoATrade",
+        "Shiny Hunt Unattended - IoA Trade",
         "NativePrograms/ShinyHuntUnattended-IoATrade.md",
         "Hunt for shiny Isle of Armor trade. Stop when a shiny is found."
     )
@@ -64,7 +64,7 @@ void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env) c
         env.logger.log("Starting Trade: " + tostr_u_commas(c + 1));
 
         pbf_press_button(BUTTON_A, 10, 100);
-        pbf_press_button(BUTTON_A, 10, 50);
+        pbf_press_button(BUTTON_A, 10, 60);
         pbf_press_button(BUTTON_A, 10, 100);
         pbf_press_button(BUTTON_A, 10, 50);
         pbf_press_button(BUTTON_A, 10, POKEMON_TO_BOX_DELAY);

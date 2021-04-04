@@ -10,6 +10,7 @@
 #include "ClientSource/Connection/SerialConnection.h"
 #include "ClientSource/Connection/PABotBase.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/PersistentSettings.h"
 #include "BotBaseHandle.h"
 
 namespace PokemonAutomation{
@@ -198,6 +199,8 @@ void BotBaseHandle::thread_body(){
                     QString("<font color=\"red\">Last Ack: ") +
                     tostr_fixed(seconds.count(), 3).c_str() + " seconds ago</font>"
                 );
+//                m_logger.log("Connection issue detected. Turning on all logging...");
+//                settings.log_everything.store(true, std::memory_order_release);
             }
 
             std::unique_lock<std::mutex> lg(m_cv_lock);

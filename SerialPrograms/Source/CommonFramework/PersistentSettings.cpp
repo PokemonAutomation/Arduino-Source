@@ -35,7 +35,7 @@ void PersistentSettings::write() const{
     }
     root.insert("03-NaughtyMode", QJsonValue(naughty_mode));
     root.insert("04-DeveloperMode", QJsonValue(developer_mode));
-    root.insert("05-LogEverything", QJsonValue(log_everything));
+    root.insert("05-LogEverything", QJsonValue(log_everything.load(std::memory_order_acquire)));
 
     root.insert("10-SwitchKeyboardMapping", NintendoSwitch::read_keyboard_mapping());
 
@@ -59,10 +59,10 @@ void PersistentSettings::read(){
         throw StringException("Invalid settings file.");
     }
     QJsonObject root = doc.object();
-    config_path = json_get_string(root, "00-ConfigPath");
-    source_path = json_get_string(root, "01-SourcePath");
+    json_get_string(config_path, root, "00-ConfigPath");
+    json_get_string(source_path, root, "01-SourcePath");
     {
-        QJsonArray res = json_get_array(root, "02-WindowSize");
+        QJsonArray res = json_get_array_nothrow(root, "02-WindowSize");
         if (res.size() == 2){
             window_size = QSize(
                 res[0].toInt(window_size.width()),
@@ -70,12 +70,12 @@ void PersistentSettings::read(){
             );
         }
     }
-    naughty_mode = json_get_bool(root, "03-NaughtyMode");
-    developer_mode = json_get_bool(root, "04-DeveloperMode");
-    log_everything = json_get_bool(root, "05-LogEverything");
-    NintendoSwitch::set_keyboard_mapping(json_get_array(root, "10-SwitchKeyboardMapping"));
-    settings = json_get_object(root, "98-SharedSettings");
-    programs = json_get_object(root, "99-ProgramSettings");
+    json_get_bool(naughty_mode, root, "03-NaughtyMode");
+    json_get_bool(developer_mode, root, "04-DeveloperMode");
+    json_get_bool(log_everything, root, "05-LogEverything");
+    NintendoSwitch::set_keyboard_mapping(json_get_array_nothrow(root, "10-SwitchKeyboardMapping"));
+    settings = json_get_object_nothrow(root, "98-SharedSettings");
+    programs = json_get_object_nothrow(root, "99-ProgramSettings");
 }
 
 

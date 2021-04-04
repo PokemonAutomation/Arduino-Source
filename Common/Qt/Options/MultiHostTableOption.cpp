@@ -31,41 +31,22 @@ const QString MultiHostTableOption::JSON_POST_RAID_DELAY    = "post_raid_delay";
 
 std::vector<MultiHostTableOption::GameSlot> parse_game_slot(const QJsonValue& json){
     std::vector<MultiHostTableOption::GameSlot> list;
-    for (const auto item : json_cast_array(json)){
-        QJsonObject line = json_cast_object(item);
+    for (const auto item : json.toArray()){
+        QJsonObject line = item.toObject();
         MultiHostTableOption::GameSlot slot;
 
-        slot.game_slot = json_get_int(line, MultiHostTableOption::JSON_GAME_SLOT);
-        if (slot.game_slot < 1 || slot.game_slot > 2){
-            throw StringException("Config Error - Game slot is out of range.");
-        }
+        json_get_int(slot.game_slot, line, MultiHostTableOption::JSON_GAME_SLOT, 1, 2);
+        json_get_int(slot.user_slot, line, MultiHostTableOption::JSON_USER_SLOT, 1, 8);
+        json_get_int(slot.skips, line, MultiHostTableOption::JSON_SKIPS, 1, 7);
 
-        slot.user_slot = json_get_int(line, MultiHostTableOption::JSON_USER_SLOT);
-        if (slot.user_slot < 1 || slot.user_slot > 8){
-            throw StringException("Config Error - User slot is out of range.");
-        }
+        json_get_bool(slot.backup_save, line, MultiHostTableOption::JSON_BACKUP_SAVE);
+        json_get_bool(slot.always_catchable, line, MultiHostTableOption::JSON_ALWAYS_CATCHABLE);
+        json_get_bool(slot.accept_FRs, line, MultiHostTableOption::JSON_ACCEPT_FRS);
 
-        slot.skips = json_get_int(line, MultiHostTableOption::JSON_SKIPS);
-        if (slot.skips < 0 || slot.skips > 7){
-            throw StringException("Config Error - Skips is out of range.");
-        }
+        json_get_int(slot.move_slot, line, MultiHostTableOption::JSON_MOVE_SLOT, 0, 4);
+        json_get_bool(slot.dynamax, line, MultiHostTableOption::JSON_DYNAMAX);
 
-        slot.backup_save = json_get_bool(line, MultiHostTableOption::JSON_BACKUP_SAVE);
-        slot.always_catchable = json_get_bool(line, MultiHostTableOption::JSON_ALWAYS_CATCHABLE);
-        slot.accept_FRs = json_get_bool(line, MultiHostTableOption::JSON_ACCEPT_FRS);
-
-        slot.move_slot = json_get_int(line, MultiHostTableOption::JSON_MOVE_SLOT);
-        if (slot.move_slot < 0 || slot.move_slot > 4){
-            throw StringException("Config Error - Skips is out of range.");
-        }
-
-        slot.dynamax = json_get_bool(line, MultiHostTableOption::JSON_DYNAMAX);
-
-        slot.post_raid_delay = json_get_string(line, MultiHostTableOption::JSON_POST_RAID_DELAY);
-        uint32_t delay = parse_ticks_i32(slot.post_raid_delay);
-        if (delay > 65535){
-            throw StringException("Config Error - Skips is out of range.");
-        }
+        json_get_string(slot.post_raid_delay, line, MultiHostTableOption::JSON_POST_RAID_DELAY);
 
         list.emplace_back(std::move(slot));
     }
@@ -108,9 +89,15 @@ MultiHostTableOption::MultiHostTableOption(QString label)
 {}
 
 void MultiHostTableOption::load_default(const QJsonValue& json){
+    if (json.isNull()){
+        return;
+    }
     m_default = parse_game_slot(json);
 }
 void MultiHostTableOption::load_current(const QJsonValue& json){
+    if (json.isNull()){
+        return;
+    }
     m_current = parse_game_slot(json);
 }
 QJsonValue MultiHostTableOption::write_default() const{

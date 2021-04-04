@@ -6,6 +6,10 @@
 
 #include "FillMatrix.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -56,6 +60,24 @@ FillMatrix FillMatrix::extract(PixelBox box, ObjectID id) const{
 }
 
 
+
+std::string FillMatrix::dump() const{
+    int width = m_width;
+    int height = m_height;
+
+    std::string str;
+    str += "{\n";
+    for (int r = 0; r < height; r++){
+        str += "   ";
+        for (int c = 0; c < width; c++){
+            str += " ";
+            str += std::to_string((int)(*this)[r][c]);
+        }
+        str += "\n";
+    }
+    str += "}\n";
+    return str;
+}
 
 
 

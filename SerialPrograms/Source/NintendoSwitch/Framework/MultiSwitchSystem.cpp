@@ -47,39 +47,23 @@ MultiSwitchSystemFactory::MultiSwitchSystemFactory(
     }
 }
 void MultiSwitchSystemFactory::load_json(const QJsonValue& json){
-    try{
-        QJsonObject obj = json_cast_object(json);
-        QJsonArray array = json_get_array(obj, "DeviceList");
-        if (array.size() == 0 || (size_t)array.size() > MAX_SWITCHES){
-            throw StringException("Invalid switch count.");
-        }
-        m_switches.clear();
-        for (size_t c = 0; c < (size_t)array.size(); c++){
-            m_switches.emplace_back(
-                new SwitchSystemFactory(
-                    QString("Switch ") + QString::number(c),
-                    QString("Switch ") + QString::number(c),
-                    m_min_pabotbase, m_feedback,
-                    array[c]
-                )
-            );
-        }
-        m_active_switches = json_get_int(obj, "ActiveDevices");
-        m_active_switches = std::max(m_active_switches, m_min_switches);
-        m_active_switches = std::min(m_active_switches, m_max_switches);
-    }catch (const StringException&){
-#if 0
+    QJsonObject obj = json.toObject();
+    QJsonArray array = json_get_array_nothrow(obj, "DeviceList");
+    if (array.size() == 0 || (size_t)array.size() > MAX_SWITCHES){
+        return;
+    }
+    m_switches.clear();
+    for (size_t c = 0; c < (size_t)array.size(); c++){
         m_switches.emplace_back(
             new SwitchSystemFactory(
-                "Switch 0",
-                "Switch 0",
-                m_min_pabotbase,
-                m_lock_camera_when_running,
-                m_lock_resolution_when_running
+                QString("Switch ") + QString::number(c),
+                QString("Switch ") + QString::number(c),
+                m_min_pabotbase, m_feedback,
+                array[c]
             )
         );
-#endif
     }
+    json_get_int(m_active_switches, obj, "ActiveDevices", m_min_switches, m_max_switches);
 }
 QJsonValue MultiSwitchSystemFactory::to_json() const{
     QJsonObject obj;

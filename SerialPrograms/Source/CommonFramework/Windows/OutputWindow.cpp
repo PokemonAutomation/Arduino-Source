@@ -81,7 +81,7 @@ OutputWindow::OutputWindow(QWidget* parent)
 
     m_text->setReadOnly(true);
     m_text->setAcceptRichText(true);
-    m_text->document()->setMaximumBlockCount(100000);
+    m_text->document()->setMaximumBlockCount(1000);
     m_default_color = m_text->textColor();
 
     m_log_file.setFileName(QCoreApplication::applicationFilePath() + ".log");
@@ -91,6 +91,14 @@ OutputWindow::OutputWindow(QWidget* parent)
         std::string bom = "\xef\xbb\xbf";
         m_log_file.write(bom.c_str(), bom.size());
     }
+
+    log("================================================================================", "");
+    log(
+        QString(PokemonAutomation::current_time().c_str()) +
+        " - [Application]: " +
+        "<b>Application Startup...</b>",
+        ""
+    );
 }
 OutputWindow::~OutputWindow(){
     m_log_file.close();

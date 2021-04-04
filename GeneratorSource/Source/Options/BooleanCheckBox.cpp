@@ -31,8 +31,8 @@ BooleanCheckBox::BooleanCheckBox(const QJsonObject& obj)
     : SingleStatementOption(obj)
     , BooleanCheckBoxOption(SingleStatementOption::m_label, false)
 {
-    load_default(json_get_bool(obj, JSON_DEFAULT));
-    load_current(json_get_bool(obj, JSON_CURRENT));
+    load_default(json_get_value_throw(obj, JSON_DEFAULT));
+    load_current(json_get_value_throw(obj, JSON_CURRENT));
 }
 void BooleanCheckBox::restore_defaults(){
     BooleanCheckBoxOption::restore_defaults();

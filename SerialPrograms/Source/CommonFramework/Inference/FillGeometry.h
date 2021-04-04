@@ -35,12 +35,12 @@ enum class MapState : uint8_t{
 
 bool fill_geometry(
     FillGeometry& geometry,
-    FillMatrix& matrix,
+    FillMatrix& matrix, FillMatrix::ObjectID required_existing_id,
     int x, int y, bool allow_diagonal,
     FillMatrix::ObjectID id
 );
 std::vector<FillGeometry> find_all_objects(
-    FillMatrix& matrix,
+    FillMatrix& matrix, FillMatrix::ObjectID required_existing_id,
     bool allow_diagonal,
     size_t min_area = 10
 );

@@ -53,13 +53,9 @@ SwitchSystemFactory::SwitchSystemFactory(
     load_json(json);
 }
 void SwitchSystemFactory::load_json(const QJsonValue& json){
-    try{
-        QJsonObject obj = json_cast_object(json);
-        m_serial.load_json(json_get_value(obj, JSON_SERIAL));
-        m_camera.load_json(json_get_value(obj, JSON_CAMERA));
-    }catch (const StringException& str){
-        cout << str.message().toUtf8().data() << endl;
-    }
+    QJsonObject obj = json.toObject();
+    m_serial.load_json(json_get_value_nothrow(obj, JSON_SERIAL));
+    m_camera.load_json(json_get_value_nothrow(obj, JSON_CAMERA));
 }
 QJsonValue SwitchSystemFactory::to_json() const{
     QJsonObject root;

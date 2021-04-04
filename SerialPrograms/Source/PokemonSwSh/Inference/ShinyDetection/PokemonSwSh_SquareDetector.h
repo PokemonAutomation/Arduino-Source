@@ -1,13 +1,13 @@
-/*  Square Trigger
+/*  Square Detector
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_PokemonSwSh_SquareTrigger_H
-#define PokemonAutomation_PokemonSwSh_SquareTrigger_H
+#ifndef PokemonAutomation_PokemonSwSh_SquareDetector_H
+#define PokemonAutomation_PokemonSwSh_SquareDetector_H
 
-#include <vector>
+#include "CommonFramework/Inference/FillMatrix.h"
 #include "CommonFramework/Inference/FillGeometry.h"
 
 namespace PokemonAutomation{
@@ -15,17 +15,14 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-bool is_square_beam(
+
+bool is_square2(
+    const QImage& image,
     const FillMatrix& matrix,
     const FillGeometry& object,
-    double min_length
+    double max_deviation = 0.04
 );
 
-
-bool is_square(
-    const FillMatrix& matrix,
-    const FillGeometry& object
-);
 
 
 }

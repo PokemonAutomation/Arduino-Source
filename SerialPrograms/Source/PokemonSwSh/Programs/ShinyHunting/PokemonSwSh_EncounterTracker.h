@@ -27,7 +27,7 @@ public:
 
     virtual bool run_away();
 
-    bool process_result(ShinyEncounterDetector::Detection detection);
+    bool process_result(ShinyDetection detection);
 
 protected:
     EncounterStats& m_stats;

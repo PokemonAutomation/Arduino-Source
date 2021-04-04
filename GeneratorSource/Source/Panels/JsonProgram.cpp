@@ -21,7 +21,7 @@ Program_JsonFile::Program_JsonFile(const QString& filepath)
 Program_JsonFile::Program_JsonFile(const QJsonObject& obj)
     : Program(obj)
 {
-    for (const auto item : json_get_array(obj, JSON_PARAMETERS)){
+    for (const auto item : json_get_array_throw(obj, JSON_PARAMETERS)){
         if (!item.isObject()){
             throw StringException("Config Error - Expected and object.");
         }

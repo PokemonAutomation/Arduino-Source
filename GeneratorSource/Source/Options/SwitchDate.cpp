@@ -32,8 +32,8 @@ SwitchDate::SwitchDate(const QJsonObject& obj)
     : SingleStatementOption(obj)
     , SwitchDateOption(SingleStatementOption::m_label, QDate(2000, 1, 1))
 {
-    load_default(json_get_value(obj, JSON_DEFAULT));
-    load_current(json_get_value(obj, JSON_CURRENT));
+    load_default(json_get_value_throw(obj, JSON_DEFAULT));
+    load_current(json_get_value_throw(obj, JSON_CURRENT));
 }
 bool SwitchDate::is_valid() const{
     return SwitchDateOption::is_valid();

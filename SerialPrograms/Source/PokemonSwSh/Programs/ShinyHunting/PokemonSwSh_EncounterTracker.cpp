@@ -31,15 +31,15 @@ bool StandardEncounterTracker::run_away(){
     return true;
 }
 
-bool StandardEncounterTracker::process_result(ShinyEncounterDetector::Detection detection){
+bool StandardEncounterTracker::process_result(ShinyDetection detection){
     switch (detection){
-    case ShinyEncounterDetector::NO_BATTLE_MENU:
+    case ShinyDetection::NO_BATTLE_MENU:
         return false;
-    case ShinyEncounterDetector::NOT_SHINY:
+    case ShinyDetection::NOT_SHINY:
         m_stats.add_non_shiny();
         run_away();
         return false;
-    case ShinyEncounterDetector::STAR_SHINY:
+    case ShinyDetection::STAR_SHINY:
         m_stats.add_star_shiny();
         pbf_wait(m_console, 5 * TICKS_PER_SECOND);
         pbf_press_button(m_console, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
@@ -48,8 +48,13 @@ bool StandardEncounterTracker::process_result(ShinyEncounterDetector::Detection 
             return false;
         }
         return true;
-    case ShinyEncounterDetector::SQUARE_SHINY:
+    case ShinyDetection::SQUARE_SHINY:
         m_stats.add_square_shiny();
+        pbf_wait(m_console, 5 * TICKS_PER_SECOND);
+        pbf_press_button(m_console, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+        return true;
+    case ShinyDetection::UNKNOWN_SHINY:
+        m_stats.add_unknown_shiny();
         pbf_wait(m_console, 5 * TICKS_PER_SECOND);
         pbf_press_button(m_console, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
         return true;

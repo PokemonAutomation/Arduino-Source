@@ -35,7 +35,7 @@ int EnumDropdown_init = register_option(
 EnumDropdown::EnumDropdown(const QJsonObject& obj)
     : SingleStatementOption(obj)
 {
-    QJsonArray options = json_get_array(obj, JSON_OPTIONS);
+    QJsonArray options = json_get_array_throw(obj, JSON_OPTIONS);
     for (const auto option : options){
         if (!option.isArray()){
             throw StringException("Config Error - Expected Array: " + JSON_OPTIONS);
@@ -44,9 +44,12 @@ EnumDropdown::EnumDropdown(const QJsonObject& obj)
         if (pair.size() != 2){
             throw StringException("Config Error - Enum pairs should be 2 elements: " + JSON_OPTIONS);
         }
+        if (!pair[0].isString() || !pair[1].isString()){
+            throw StringException("Config Error - Enum pairs should be strings: " + JSON_OPTIONS);
+        }
         m_options.emplace_back(
-            json_cast_string(pair.at(0)),
-            json_cast_string(pair.at(1))
+            pair[0].toString(),
+            pair[1].toString()
         );
     }
     for (size_t c = 0; c < m_options.size(); c++){
@@ -55,14 +58,14 @@ EnumDropdown::EnumDropdown(const QJsonObject& obj)
         }
     }
     {
-        auto iter = m_map.find(json_get_string(obj, JSON_DEFAULT));
+        auto iter = m_map.find(json_get_string_throw(obj, JSON_DEFAULT));
         if (iter == m_map.end()){
             throw StringException("Config Error - Unrecognized token.");
         }
         m_default = iter->second;
     }
     {
-        auto iter = m_map.find(json_get_string(obj, JSON_CURRENT));
+        auto iter = m_map.find(json_get_string_throw(obj, JSON_CURRENT));
         if (iter == m_map.end()){
             throw StringException("Config Error - Unrecognized token.");
         }

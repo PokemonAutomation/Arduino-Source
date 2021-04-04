@@ -1,4 +1,4 @@
-/*  ShinyHuntAutonomous-Fishing
+/*  Shiny Hunt Autonomous - Fishing
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousFishing_H
 
 #include "CommonFramework/Options/SectionDivider.h"
+#include "CommonFramework/Options/BooleanCheckBox.h"
 #include "CommonFramework/Options/SimpleInteger.h"
 #include "NintendoSwitch/Options/TimeExpression.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
@@ -33,6 +34,7 @@ private:
         uint64_t m_unexpected_battles = 0;
     };
 
+    BooleanCheckBox GO_HOME_WHEN_DONE;
     SectionDivider m_advanced_options;
     TimeExpression<uint16_t> EXIT_BATTLE_MASH_TIME;
     TimeExpression<uint16_t> FISH_RESPAWN_TIME;

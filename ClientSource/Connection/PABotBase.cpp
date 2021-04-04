@@ -586,7 +586,7 @@ void PABotBase::issue_request_and_wait(
     issue_request(iter, send_type, send_params, send_bytes, false);
 
     //  Wait for ack.
-    while (iter->second.state != AckState::ACKED){
+    while (true){
         std::unique_lock<std::mutex> lg(m_sleep_lock);
         {
             SpinLockGuard slg(m_state_lock, "PABotBase::issue_request_and_wait() - 0");
@@ -594,6 +594,9 @@ void PABotBase::issue_request_and_wait(
             if (state != State::RUNNING){
                 remove_request(iter);
                 throw CancelledException();
+            }
+            if (iter->second.state == AckState::ACKED){
+                break;
             }
         }
         m_cv.wait(lg);

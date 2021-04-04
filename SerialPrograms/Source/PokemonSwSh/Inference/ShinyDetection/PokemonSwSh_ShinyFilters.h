@@ -27,6 +27,21 @@ struct BrightYellowLightFilter{
     }
 };
 
+struct BrightYellowLightFilterDebug{
+    size_t count = 0;
+
+    void operator()(FillMatrix::ObjectID& cell, QImage& image, size_t x, size_t y){
+        QRgb pixel = image.pixel(x, y);
+//        int set = qRed(pixel) > 160 && qGreen(pixel) > 160 && qBlue(pixel) > 128;
+        int set = (pixel & 0x00c0c080) == 0x00c0c080 ? 1 : 0;
+        cell = set;
+        if (cell == 0){
+            image.setPixel(x, y, 0);
+        }
+        count += set;
+    }
+};
+
 
 
 

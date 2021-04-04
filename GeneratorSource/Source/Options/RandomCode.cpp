@@ -37,13 +37,13 @@ int RandomCode_init = register_option(
 
 RandomCode::RandomCode(const QJsonObject& obj)
     : ConfigItem(obj)
-    , m_declaration_random(json_get_string(obj, JSON_DECLARATION_RANDOM))
-    , m_declaration_code(json_get_string(obj, JSON_DECLARATION_CODE))
-    , m_digits(json_get_int(obj, JSON_DIGITS))
-    , m_default_random(json_get_int(obj, JSON_DEFAULT_RANDOM))
-    , m_default_code(json_get_string(obj, JSON_DEFAULT_CODE))
-    , m_current_random(json_get_int(obj, JSON_CURRENT_RANDOM))
-    , m_current_code(json_get_string(obj, JSON_CURRENT_CODE))
+    , m_declaration_random(json_get_string_throw(obj, JSON_DECLARATION_RANDOM))
+    , m_declaration_code(json_get_string_throw(obj, JSON_DECLARATION_CODE))
+    , m_digits(json_get_int_throw(obj, JSON_DIGITS))
+    , m_default_random(json_get_int_throw(obj, JSON_DEFAULT_RANDOM))
+    , m_default_code(json_get_string_throw(obj, JSON_DEFAULT_CODE))
+    , m_current_random(json_get_int_throw(obj, JSON_CURRENT_RANDOM))
+    , m_current_code(json_get_string_throw(obj, JSON_CURRENT_CODE))
 {
     if (m_default_random > m_digits){
         m_default_random = m_digits;

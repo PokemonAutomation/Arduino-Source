@@ -26,9 +26,9 @@ const QString ConfigSet::JSON_DESCRIPTION   = "2-Description";
 const QString ConfigSet::JSON_OPTIONS       = "3-Options";
 
 ConfigSet::ConfigSet(const QJsonObject& obj)
-    : RightPanel(json_get_string(obj, JSON_CONFIG_NAME))
-    , m_path(json_get_string(obj, JSON_CONFIG_PATH))
-    , m_description(json_get_string(obj, JSON_DESCRIPTION))
+    : RightPanel(json_get_string_throw(obj, JSON_CONFIG_NAME))
+    , m_path(json_get_string_throw(obj, JSON_CONFIG_PATH))
+    , m_description(json_get_string_throw(obj, JSON_DESCRIPTION))
 {}
 
 QJsonDocument ConfigSet::to_json() const{

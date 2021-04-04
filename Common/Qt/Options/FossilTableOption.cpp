@@ -37,31 +37,21 @@ const std::map<QString, int> FOSSIL_MAP{
 
 std::vector<FossilTableOption::GameSlot> parse_fossil_slot(const QJsonValue& json){
     std::vector<FossilTableOption::GameSlot> list;
-    for (const auto item : json_cast_array(json)){
-        QJsonObject line = json_cast_object(item);
+    for (const auto item : json.toArray()){
+        QJsonObject line = item.toObject();
         FossilTableOption::GameSlot slot;
 
-        slot.game_slot = json_get_int(line, FossilTableOption::JSON_GAME_SLOT);
-        if (slot.game_slot < 1 || slot.game_slot > 2){
-            throw StringException("Config Error - Game slot is out of range.");
-        }
+        json_get_int(slot.game_slot, line, FossilTableOption::JSON_GAME_SLOT, 1, 2);
+        json_get_int(slot.user_slot, line, FossilTableOption::JSON_USER_SLOT, 1, 8);
 
-        slot.user_slot = json_get_int(line, FossilTableOption::JSON_USER_SLOT);
-        if (slot.user_slot < 1 || slot.user_slot > 8){
-            throw StringException("Config Error - User slot is out of range.");
-        }
-
-        QString str = json_get_string(line, FossilTableOption::JSON_FOSSIL);
+        QString str;
+        json_get_string(str, line, FossilTableOption::JSON_FOSSIL);
         auto iter = FOSSIL_MAP.find(str);
-        if (iter == FOSSIL_MAP.end()){
-            throw StringException("Config Error - Invalid Fossil Name.");
+        if (iter != FOSSIL_MAP.end()){
+            slot.fossil = (FossilTableOption::Fossil)iter->second;
         }
-        slot.fossil = (FossilTableOption::Fossil)iter->second;
 
-        slot.revives = json_get_int(line, FossilTableOption::JSON_REVIVES);
-        if (slot.revives < 0 || slot.revives > 965){
-            throw StringException("Config Error - Revives is out of range.");
-        }
+        json_get_int(slot.revives, line, FossilTableOption::JSON_REVIVES, 0, 965);
 
         list.emplace_back(slot);
     }
@@ -94,9 +84,15 @@ FossilTableOption::FossilTableOption(QString label)
 {}
 
 void FossilTableOption::load_default(const QJsonValue& json){
+    if (json.isNull()){
+        return;
+    }
     m_default = parse_fossil_slot(json);
 }
 void FossilTableOption::load_current(const QJsonValue& json){
+    if (json.isNull()){
+        return;
+    }
     m_current = parse_fossil_slot(json);
 }
 QJsonValue FossilTableOption::write_default() const{

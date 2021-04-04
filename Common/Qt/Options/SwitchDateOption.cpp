@@ -22,10 +22,10 @@ SwitchDateOption::SwitchDateOption(
     , m_current(default_value)
 {}
 void SwitchDateOption::load_default(const QJsonValue& json){
-    m_default = json_parse_date(json);
+    json_parse_date(m_default, json);
 }
 void SwitchDateOption::load_current(const QJsonValue& json){
-    m_current = json_parse_date(json);
+    json_parse_date(m_current, json);
 }
 QJsonValue SwitchDateOption::write_default() const{
     return json_write_date(m_default);

@@ -34,12 +34,12 @@ SimpleInteger::SimpleInteger(const QJsonObject& obj)
     : SingleStatementOption(obj)
     , SimpleIntegerOption<uint32_t>(
         SingleStatementOption::m_label,
-        json_get_int(obj, JSON_MIN_VALUE),
-        json_get_int(obj, JSON_MAX_VALUE),
-        json_get_int(obj, JSON_DEFAULT)
+        json_get_int_throw(obj, JSON_MIN_VALUE),
+        json_get_int_throw(obj, JSON_MAX_VALUE),
+        json_get_int_throw(obj, JSON_DEFAULT)
     )
 {
-    m_current = json_get_int(obj, JSON_CURRENT);
+    m_current = json_get_int_throw(obj, JSON_CURRENT);
 }
 bool SimpleInteger::is_valid() const{
     return SimpleIntegerOption<uint32_t>::is_valid();

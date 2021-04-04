@@ -31,6 +31,9 @@ SparkleDetector::SparkleDetector(
     if (box.area < 20){
         return;
     }
+    if (box.box.width() * box.box.height() > 10000){
+//        return;
+    }
 
     //  Copy the relevant portion of the matrix and keep only the current object.
     m_matrix = matrix.extract(box.box, box.id);
@@ -78,7 +81,7 @@ SparkleDetector::SparkleDetector(
     for (size_t r = 0; r < m_matrix.height(); r++){
         for (size_t c = 0; c < m_matrix.width(); c++){
             FillGeometry region;
-            if (!fill_geometry(region, m_matrix, c, r, true, id)){
+            if (!fill_geometry(region, m_matrix, 1, c, r, true, id)){
                 continue;
             }
             id++;

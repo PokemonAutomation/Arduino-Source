@@ -1,4 +1,4 @@
-/*  Shiny Hunt Autonomous - Fishing
+/*  Shiny Hunt Autonomous - Whistling
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -10,22 +10,23 @@
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_FishingDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_StartBattleDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
 #include "PokemonSwSh_EncounterTracker.h"
-#include "PokemonSwSh_ShinyHuntAutonomous-Fishing.h"
+#include "PokemonSwSh_ShinyHuntAutonomous-Whistling.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing()
+ShinyHuntAutonomousWhistling::ShinyHuntAutonomousWhistling()
     : SingleSwitchProgram(
         FeedbackType::REQUIRED, PABotBaseLevel::PABOTBASE_12KB,
-        "Shiny Hunt Autonomous - Fishing",
-        "SerialPrograms/ShinyHuntAutonomous-Fishing.md",
-        "Automatically hunt for shiny fishing " + STRING_POKEMON + " using video feedback."
+        "Shiny Hunt Autonomous - Whistling",
+        "SerialPrograms/ShinyHuntAutonomous-Whistling.md",
+        "Stand in one place and whistle. Shiny hunt everything that attacks you using video feedback."
     )
     , GO_HOME_WHEN_DONE(
         "<b>Go Home when Done:</b><br>After finding a shiny, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
@@ -35,12 +36,8 @@ ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing()
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
     , EXIT_BATTLE_MASH_TIME(
-        "<b>Exit Battle Time:</b><br>After running, wait this long to return to overworld and for the fish to reappear.",
+        "<b>Exit Battle Time:</b><br>After running, wait this long to return to overworld.",
         "6 * TICKS_PER_SECOND"
-    )
-    , FISH_RESPAWN_TIME(
-        "<b>Fish Respawn Time:</b><br>Wait this long for fish to respawn.",
-        "4 * TICKS_PER_SECOND"
     )
     , TIME_ROLLBACK_HOURS(
         "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
@@ -50,33 +47,28 @@ ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing()
     m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
     m_options.emplace_back(&m_advanced_options, "");
     m_options.emplace_back(&EXIT_BATTLE_MASH_TIME, "EXIT_BATTLE_MASH_TIME");
-    m_options.emplace_back(&FISH_RESPAWN_TIME, "FISH_RESPAWN_TIME");
     m_options.emplace_back(&TIME_ROLLBACK_HOURS, "TIME_ROLLBACK_HOURS");
 }
 
 
-
-
-std::string ShinyHuntAutonomousFishing::Stats::stats() const{
+std::string ShinyHuntAutonomousWhistling::Stats::stats() const{
     std::string str;
     str += str_encounters();
-    str += " - Misses: " + tostr_u_commas(m_misses);
     str += " - Timeouts: " + tostr_u_commas(m_timeouts);
     str += " - Unexpected Battles: " + tostr_u_commas(m_unexpected_battles);
     str += str_shinies();
     return str;
 }
 
-void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env) const{
+void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env) const{
     grip_menu_connect_go_home();
-    resume_game_no_interact(TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+    resume_game_back_out(TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
 
     const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
     uint32_t last_touch = system_clock();
 
     Stats stats;
     StandardEncounterTracker tracker(stats, env.console, false, EXIT_BATTLE_MASH_TIME);
-
     while (true){
         stats.log_stats(env, env.logger);
 
@@ -88,40 +80,33 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env) co
             last_touch += PERIOD;
         }
 
-        pbf_wait(FISH_RESPAWN_TIME);
         env.console.botbase().wait_for_all_requests();
-
-        //  Trigger encounter.
         {
-            FishingDetector detector(env.console);
-            pbf_press_button(BUTTON_A, 10, 10);
-            pbf_mash_button(BUTTON_B, TICKS_PER_SECOND);
-            env.console.botbase().wait_for_all_requests();
-            FishingDetector::Detection detection = detector.wait_for_detection(env, env.logger);
-            switch (detection){
-            case FishingDetector::NO_DETECTION:
-                stats.m_timeouts++;
-                pbf_mash_button(BUTTON_B, 2 * TICKS_PER_SECOND);
-                continue;
-            case FishingDetector::HOOKED:
-                pbf_press_button(BUTTON_A, 10, 0);
-                break;
-            case FishingDetector::MISSED:
-                stats.m_misses++;
-                pbf_mash_button(BUTTON_B, 2 * TICKS_PER_SECOND);
-                continue;
-            case FishingDetector::BATTLE_MENU:
-                stats.m_unexpected_battles++;
+            StandardBattleMenuDetector menu(env.console);
+            StartBattleDetector detector(env.console, std::chrono::seconds(0));
+
+            //  Detect start of battle.
+            bool unexpected = false;
+            QImage screen;
+            do{
+                screen = env.console.video().snapshot();
+                if (menu.detect(screen)){
+                    env.logger.log("ScreenChangeDetector: Unexpected battle menu.", Qt::red);
+                    stats.m_unexpected_battles++;
+                    unexpected = true;
+                    break;
+                }
+                pbf_mash_button(BUTTON_LCLICK, 10);
+                pbf_move_right_joystick(192, 128, 10, 0);
+                env.console.botbase().wait_for_all_requests();
+            }while (!detector.detect(screen));
+
+            if (unexpected){
+                pbf_mash_button(BUTTON_B, TICKS_PER_SECOND);
                 tracker.run_away();
                 continue;
             }
-            env.wait(std::chrono::seconds(3));
-            detection = detector.detect_now();
-            if (detection == FishingDetector::MISSED){
-                stats.m_misses++;
-                pbf_mash_button(BUTTON_B, 2 * TICKS_PER_SECOND);
-                continue;
-            }
+            pbf_mash_button(BUTTON_B, 5 * TICKS_PER_SECOND);
         }
 
         //  Detect shiny.
