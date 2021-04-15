@@ -51,8 +51,8 @@ double cluster_fit_2(
     QRgb color0, PixelEuclideanStatAccumulator& cluster0,
     QRgb color1, PixelEuclideanStatAccumulator& cluster1
 ){
-    int width = image.width();
-    int height = image.height();
+    pxint_t width = image.width();
+    pxint_t height = image.height();
 
     FloatPixel f0(color0);
     FloatPixel f1(color1);
@@ -63,8 +63,8 @@ double cluster_fit_2(
 //    image.save("points.png");
 //    std::fstream ss("points.txt", std::fstream::out);
 
-    for (int r = 0; r < height; r++){
-        for (int c = 0; c < width; c++){
+    for (pxint_t r = 0; r < height; r++){
+        for (pxint_t c = 0; c < width; c++){
             QRgb pixel = image.pixel(c, r);
 //            ss << "{" << qRed(pixel) << ", " << qGreen(pixel) << ", " << qBlue(pixel) << "}," << endl;
             FloatPixel p0 = f0 - pixel;

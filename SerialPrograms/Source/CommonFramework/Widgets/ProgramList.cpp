@@ -26,11 +26,12 @@ ProgramListUI::ProgramListUI(MainWindow& parent)
     QFontMetrics fm(this->font());
     for (const auto& item : PROGRAM_LIST()){
         addItem(item->name());
-        this->item(this->count() - 1)->setForeground(item->color());
+        QListWidgetItem* list_item = this->item(this->count() - 1);
+        list_item->setForeground(item->color());
         m_text_width = std::max(m_text_width, fm.width(item->name()));
-//        cout << m_text_width << endl;
+//        cout << m_text_width << " / " << list_item->sizeHint().width() << endl;
     }
-//    setMaximumWidth(m_width);
+//    setMaximumWidth(m_text_width);
 
     connect(this, &QListWidget::itemClicked, this, &ProgramListUI::row_selected);
 //    connect(this, &QListWidget::currentRowChanged, this, &ProgramListUI::row_changed);

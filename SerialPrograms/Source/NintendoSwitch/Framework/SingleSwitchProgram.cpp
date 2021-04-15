@@ -41,10 +41,14 @@ SingleSwitchProgramUI::SingleSwitchProgramUI(SingleSwitchProgram& factory, MainW
 
 SingleSwitchProgramUI::~SingleSwitchProgramUI(){ stop(); }
 
-void SingleSwitchProgramUI::program(){
+void SingleSwitchProgramUI::program(
+    StatsTracker* current_stats,
+    const StatsTracker* historical_stats
+){
     SwitchSystem* system = static_cast<SwitchSystem*>(m_setup);
     SingleSwitchProgramEnvironment env(
         m_logger,
+        current_stats, historical_stats,
         sanitize_botbase(system->botbase()),
         system->camera()
     );

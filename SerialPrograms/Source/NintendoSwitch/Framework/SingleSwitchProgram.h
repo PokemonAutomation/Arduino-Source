@@ -18,14 +18,18 @@ namespace NintendoSwitch{
 
 class SingleSwitchProgramEnvironment : public ProgramEnvironment{
 public:
-    Logger& logger;
     ConsoleHandle console;
 
 private:
     friend class SingleSwitchProgramUI;
     template <class... Args>
-    SingleSwitchProgramEnvironment(Logger& p_logger, Args&&... args)
-        : logger(p_logger)
+    SingleSwitchProgramEnvironment(
+        Logger& logger,
+        StatsTracker* current_stats,
+        const StatsTracker* historical_stats,
+        Args&&... args
+    )
+        : ProgramEnvironment(logger, current_stats, historical_stats)
         , console(0, std::forward<Args>(args)...)
     {}
 };
@@ -53,7 +57,10 @@ public:
     SingleSwitchProgramUI(SingleSwitchProgram& factory, MainWindow& window);
     ~SingleSwitchProgramUI();
 
-    virtual void program() override;
+    virtual void program(
+        StatsTracker* current_stats,
+        const StatsTracker* historical_stats
+    ) override;
 };
 
 

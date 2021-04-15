@@ -53,7 +53,7 @@ void MultiSwitchSystemFactory::load_json(const QJsonValue& json){
         return;
     }
     m_switches.clear();
-    for (size_t c = 0; c < (size_t)array.size(); c++){
+    for (int c = 0; c < array.size(); c++){
         m_switches.emplace_back(
             new SwitchSystemFactory(
                 QString("Switch ") + QString::number(c),
@@ -63,7 +63,7 @@ void MultiSwitchSystemFactory::load_json(const QJsonValue& json){
             )
         );
     }
-    json_get_int(m_active_switches, obj, "ActiveDevices", m_min_switches, m_max_switches);
+    json_get_int(m_active_switches, obj, "ActiveDevices", (int)m_min_switches, (int)m_max_switches);
 }
 QJsonValue MultiSwitchSystemFactory::to_json() const{
     QJsonObject obj;
@@ -124,7 +124,7 @@ MultiSwitchSystem::MultiSwitchSystem(
     for (size_t c = factory.m_min_switches; c <= factory.m_max_switches; c++){
         box->addItem(QString::number(c));
     }
-    box->setCurrentIndex(m_factory.m_active_switches - factory.m_min_switches);
+    box->setCurrentIndex((int)(m_factory.m_active_switches - factory.m_min_switches));
 
     connect(
         box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),

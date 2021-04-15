@@ -33,8 +33,7 @@ extern const ShinyDetectionBattle SHINY_BATTLE_RAID;
 
 
 ShinyDetection detect_shiny_battle(
-    ProgramEnvironment& env,
-    VideoFeed& feed, Logger& logger,
+    ProgramEnvironment& env, VideoFeed& feed,
     const ShinyDetectionBattle& battle_settings,
     std::chrono::seconds timeout,
     double detection_threshold = 2.0

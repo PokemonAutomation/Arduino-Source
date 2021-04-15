@@ -19,6 +19,12 @@
 #include "ButtonDiagram.h"
 #include "MainWindow.h"
 
+//#include <Windows.h>
+
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -44,7 +50,7 @@ MainWindow::MainWindow(QWidget* parent)
     QHBoxLayout* hbox = new QHBoxLayout(centralwidget);
 
     QVBoxLayout* left_layout = new QVBoxLayout();
-    hbox->addLayout(left_layout, 2);
+    hbox->addLayout(left_layout, 0);
 
 
     QGroupBox* program_box = new QGroupBox("Program List", centralwidget);
@@ -67,10 +73,10 @@ MainWindow::MainWindow(QWidget* parent)
         m_settings_list->text_width()
     );
 #else
-        int width = 250;
+//        int width = 250;
 #endif
-    program_box->setMaximumWidth(width);
-    setting_box->setMaximumWidth(width);
+//    program_box->setMaximumWidth(width);
+//    setting_box->setMaximumWidth(width);
 
     QGroupBox* support_box = new QGroupBox("Support (" + STRING_POKEMON + " Automation " + VERSION + ")", centralwidget);
     left_layout->addWidget(support_box);
@@ -86,7 +92,7 @@ MainWindow::MainWindow(QWidget* parent)
     {
         QLabel* discord = new QLabel(support_box);
         links->addWidget(discord);
-        discord->setText("<a href=\"" + DISCORD + "\">Discord Server</a>");
+        discord->setText("Discord: <a href=\"" + DISCORD_LINK_FULL + "\">" + DISCORD_LINK + "</a>");
         discord->setTextFormat(Qt::RichText);
         discord->setTextInteractionFlags(Qt::TextBrowserInteraction);
         discord->setOpenExternalLinks(true);
@@ -159,12 +165,14 @@ MainWindow::MainWindow(QWidget* parent)
 
 }
 MainWindow::~MainWindow(){
-//    cout << "~MainWindow()" << endl;
+//    cout << "~MainWindow() - start" << endl;
     if (m_right_panel_widget != nullptr){
         m_right_panel_layout->removeWidget(m_right_panel_widget);
         delete m_right_panel_widget;
         m_right_panel_widget = nullptr;
     }
+//    Sleep(1000);
+//    cout << "~MainWindow() - finish" << endl;
 }
 
 

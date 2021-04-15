@@ -6,27 +6,37 @@ QT += multimediawidgets
 
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
-CONFIG += c++14
 INCLUDEPATH += ../
 INCLUDEPATH += Source/
 
 CONFIG += force_debug_info
-
-QMAKE_CXXFLAGS += -msse4.2
-QMAKE_CXXFLAGS += -Wnarrowing
-QMAKE_CXXFLAGS += -Wno-unused-parameter
-QMAKE_CXXFLAGS += -Wno-unused-function
-QMAKE_CXXFLAGS += -Wno-missing-field-initializers
 
 # You can make your code fail to compile if it uses deprecated APIs.
 # In order to do so, uncomment the following line.
 #DEFINES += QT_DISABLE_DEPRECATED_BEFORE=0x060000    # disables all the APIs deprecated before Qt 6.0.0
 
 
-# Link Tesseract C API for Windows.
-DEFINES += TESS_IMPORTS
-DEFINES += WIN32
-LIBS += ../SerialPrograms/libtesseractc.lib
+win32-g++{
+    CONFIG += c++14
+
+    QMAKE_CXXFLAGS += -msse4.2
+#    QMAKE_CXXFLAGS += -Wnarrowing
+#    QMAKE_CXXFLAGS += -Wno-unused-parameter
+#    QMAKE_CXXFLAGS += -Wno-unused-function
+#    QMAKE_CXXFLAGS += -Wno-missing-field-initializers
+
+    DEFINES += TESS_IMPORTS
+    DEFINES += WIN32
+    LIBS += ../SerialPrograms/libtesseractc.lib
+}
+win32-msvc{
+    QMAKE_CXXFLAGS += /std:c++latest
+
+
+    DEFINES += TESS_IMPORTS
+    DEFINES += WIN32
+    LIBS += ../SerialPrograms/libtesseractc.lib
+}
 
 
 SOURCES += \
@@ -73,6 +83,9 @@ SOURCES += \
     Source/CommonFramework/Panels/SettingsPanel.cpp \
     Source/CommonFramework/PersistentSettings.cpp \
     Source/CommonFramework/Tools/BotBaseHandle.cpp \
+    Source/CommonFramework/Tools/ProgramEnvironment.cpp \
+    Source/CommonFramework/Tools/StatsDatabase.cpp \
+    Source/CommonFramework/Tools/StatsTracking.cpp \
     Source/CommonFramework/Widgets/CameraSelector.cpp \
     Source/CommonFramework/Widgets/ProgramList.cpp \
     Source/CommonFramework/Widgets/SerialSelector.cpp \
@@ -119,8 +132,8 @@ SOURCES += \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_SurpriseTrade.cpp \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_TradeBot.cpp \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_TurboA.cpp \
+    Source/PokemonSwSh/Programs/PokemonSwSh_OverworldTrajectory.cpp \
     Source/PokemonSwSh/Programs/PokemonSwSh_StartGame.cpp \
-    Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_EncounterStats.cpp \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_EncounterTracker.cpp \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_MultiGameFossil.cpp \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHunt-Regi.cpp \
@@ -163,7 +176,8 @@ SOURCES += \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FastCodeEntry.cpp \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.cpp \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.cpp \
-    Source/PokemonSwSh/Programs/TestProgram.cpp
+    Source/PokemonSwSh/Programs/TestProgram.cpp \
+    Source/PokemonSwSh/ShinyHuntTracker.cpp
 
 HEADERS += \
     ../ClientSource/Connection/BotBase.h \
@@ -181,6 +195,7 @@ HEADERS += \
     ../Common/Clientside/PrettyPrint.h \
     ../Common/Clientside/SpinLock.h \
     ../Common/Clientside/Unicode.h \
+    ../Common/Compiler.h \
     ../Common/MessageProtocol.h \
     ../Common/PokemonSwSh/PokemonProgramIDs.h \
     ../Common/PokemonSwSh/PokemonSettings.h \
@@ -228,9 +243,13 @@ HEADERS += \
     Source/CommonFramework/Panels/RightPanel.h \
     Source/CommonFramework/Panels/SettingsPanel.h \
     Source/CommonFramework/PersistentSettings.h \
+    Source/CommonFramework/Tesseract/capi.h \
+    Source/CommonFramework/Tesseract/platform.h \
     Source/CommonFramework/Tools/ConsoleHandle.h \
     Source/CommonFramework/Tools/Logger.h \
     Source/CommonFramework/Tools/ProgramEnvironment.h \
+    Source/CommonFramework/Tools/StatsDatabase.h \
+    Source/CommonFramework/Tools/StatsTracking.h \
     Source/CommonFramework/Tools/VideoFeed.h \
     Source/CommonFramework/Tools/BotBaseHandle.h \
     Source/CommonFramework/Widgets/CameraSelector.h \
@@ -287,8 +306,8 @@ HEADERS += \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_SurpriseTrade.h \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_TradeBot.h \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_TurboA.h \
+    Source/PokemonSwSh/Programs/PokemonSwSh_OverworldTrajectory.h \
     Source/PokemonSwSh/Programs/PokemonSwSh_StartGame.h \
-    Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_EncounterStats.h \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_EncounterTracker.h \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_MultiGameFossil.h \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHunt-Regi.h \
@@ -337,7 +356,8 @@ HEADERS += \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.h \
     Source/PokemonSwSh/Programs/ReleaseHelpers.h \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.h \
-    Source/PokemonSwSh/Programs/TestProgram.h
+    Source/PokemonSwSh/Programs/TestProgram.h \
+    Source/PokemonSwSh/ShinyHuntTracker.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin

@@ -11,15 +11,18 @@
 
 namespace PokemonAutomation{
 
+using pxint_t = int;
+
 
 struct PixelBox{
-    int min_x;
-    int min_y;
-    int max_x;
-    int max_y;
+    pxint_t min_x;
+    pxint_t min_y;
+    pxint_t max_x;
+    pxint_t max_y;
 
-    int width() const{ return max_x - min_x; }
-    int height() const{ return max_y - min_y; }
+    pxint_t width() const{ return max_x - min_x; }
+    pxint_t height() const{ return max_y - min_y; }
+    size_t area() const{ return (size_t)width() * (size_t)height(); }
 };
 
 
@@ -30,6 +33,11 @@ struct InferenceBox{
     double width;
     double height;
 
+    InferenceBox()
+        : color(Qt::red)
+        , x(0), y(0)
+        , width(0), height(0)
+    {}
     InferenceBox(
         double p_x, double p_y,
         double p_width, double p_height

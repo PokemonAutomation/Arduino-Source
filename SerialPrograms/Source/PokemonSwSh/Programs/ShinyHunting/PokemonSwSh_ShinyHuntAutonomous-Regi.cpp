@@ -62,37 +62,44 @@ ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi()
 
 
 
-std::string ShinyHuntAutonomousRegi::Stats::stats() const{
-    std::string str;
-    str += str_encounters();
-    str += " - Light Resets: " + tostr_u_commas(m_light_resets);
-    str += str_shinies();
-    return str;
+struct ShinyHuntAutonomousRegi::Stats : public ShinyHuntTracker{
+    Stats()
+        : ShinyHuntTracker(true)
+        , m_light_resets(m_stats["Light Resets"])
+    {
+        m_display_order.insert(m_display_order.begin() + 1, Stat("Light Resets"));
+    }
+    uint64_t& m_light_resets;
+};
+std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegi::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
 }
+
+
 
 
 void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env) const{
     grip_menu_connect_go_home();
     resume_game_back_out(TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
 
-    Stats stats;
+    Stats& stats = env.stats<Stats>();
     StandardEncounterTracker tracker(stats, env.console, REQUIRE_SQUARE, EXIT_BATTLE_MASH_TIME);
 
     uint32_t last_touch = system_clock() - TOUCH_DATE_INTERVAL;
     bool error = false;
     while (true){
-        stats.log_stats(env, env.logger);
+        env.update_stats();
 
         move_to_corner(env, error, TRANSITION_DELAY);
         if (error){
             stats.m_light_resets++;
-            stats.log_stats(env, env.logger);
+            env.update_stats();
             error = false;
         }
 
         //  Touch the date.
         if (TOUCH_DATE_INTERVAL > 0 && system_clock() - last_touch >= TOUCH_DATE_INTERVAL){
-            env.logger.log("Touching date to prevent rollover.");
+            env.log("Touching date to prevent rollover.");
             pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
             touch_date_from_home(SETTINGS_TO_HOME_DELAY);
             resume_game_no_interact(TOLERATE_SYSTEM_UPDATE_MENU_FAST);
@@ -108,7 +115,7 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env) const
 
         //  Detect shiny.
         ShinyDetection detection = detect_shiny_battle(
-            env, env.console, env.logger,
+            env, env.console,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );
@@ -123,7 +130,7 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env) const
         }
     }
 
-    stats.log_stats(env, env.logger);
+    env.update_stats();
 
     if (GO_HOME_WHEN_DONE){
         pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);

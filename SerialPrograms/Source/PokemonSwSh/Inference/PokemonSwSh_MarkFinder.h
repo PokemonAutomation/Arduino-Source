@@ -18,11 +18,6 @@ namespace PokemonSwSh{
 
 
 
-struct WhiteFilter{
-    size_t count = 0;
-
-    void operator()(FillMatrix::ObjectID& cell, const QImage& image, size_t x, size_t y);
-};
 
 
 

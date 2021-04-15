@@ -30,7 +30,7 @@ public:
 
     bool has_timed_out() const;
     bool detect(const QImage& screen);
-    bool wait(ProgramEnvironment& env, Logger& logger);
+    bool wait(ProgramEnvironment& env);
 
 private:
     VideoFeed& m_feed;

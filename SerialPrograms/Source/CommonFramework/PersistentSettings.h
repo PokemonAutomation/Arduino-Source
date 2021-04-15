@@ -24,8 +24,9 @@ public:
     void read();
 
 public:
-    QString config_path = "GeneratorConfig";
-    QString source_path = "DeviceSource";
+//    QString config_path = "GeneratorConfig";
+//    QString source_path = "DeviceSource";
+    QString stats_file = "PA-Stats.txt";
     QSize window_size = QSize(960, 540);
     bool naughty_mode = false;
     bool developer_mode = false;

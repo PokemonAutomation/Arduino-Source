@@ -95,7 +95,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env) const{
 
 
     for (uint32_t raids = 0;; raids++){
-        env.logger.log("Raids Completed: " + tostr_u_commas(raids));
+        env.log("Raids Completed: " + tostr_u_commas(raids));
 
         host.wait_for_all_requests();
         env.run_in_parallel(

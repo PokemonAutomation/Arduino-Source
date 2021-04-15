@@ -25,14 +25,15 @@ public:
 
 public:
     FillMatrix();
-    FillMatrix(size_t width, size_t height);
+    FillMatrix(pxint_t width, pxint_t height);
     FillMatrix(const QImage& image);
 
-    size_t width () const{ return m_width; }
-    size_t height() const{ return m_height; }
-    const ObjectID* operator[](size_t row) const{ return m_cells.data() + row * m_width; }
-          ObjectID* operator[](size_t row)      { return m_cells.data() + row * m_width; }
+    pxint_t width () const{ return m_width; }
+    pxint_t height() const{ return m_height; }
+    const ObjectID* operator[](pxint_t row) const{ return m_cells.data() + row * m_width; }
+          ObjectID* operator[](pxint_t row)      { return m_cells.data() + row * m_width; }
 
+    FillMatrix extract(PixelBox box) const;
     FillMatrix extract(PixelBox box, ObjectID id) const;
 
     std::string dump() const;
@@ -44,14 +45,14 @@ public:
     template <typename Image, typename Filter>
     bool apply_filter(
         Image&& image, Filter& filter,
-        size_t y_start, size_t y_end,
-        size_t x_start, size_t x_end
+        pxint_t y_start, pxint_t y_end,
+        pxint_t x_start, pxint_t x_end
     );
 
 
 private:
-    size_t m_width;
-    size_t m_height;
+    pxint_t m_width;
+    pxint_t m_height;
     std::vector<ObjectID> m_cells;
 };
 
@@ -69,16 +70,16 @@ bool FillMatrix::apply_filter(Image&& image, Filter& filter){
 template <typename Image, typename Filter>
 bool FillMatrix::apply_filter(
     Image&& image, Filter& filter,
-    size_t y_start, size_t y_end,
-    size_t x_start, size_t x_end
+    pxint_t y_start, pxint_t y_end,
+    pxint_t x_start, pxint_t x_end
 ){
-    if (image.isNull() || (size_t)image.width() != m_width || (size_t)image.height() != m_height){
+    if (image.isNull() || image.width() != m_width || image.height() != m_height){
         return false;
     }
 
     ObjectID* data = m_cells.data();
-    for (size_t r = y_start; r < y_end; r++){
-        for (size_t c = x_start; c < x_end; c++){
+    for (pxint_t r = y_start; r < y_end; r++){
+        for (pxint_t c = x_start; c < x_end; c++){
             filter(data[c], image, c, r);
         }
         data += m_width;

@@ -17,6 +17,7 @@
 #include <memory>
 #include <string>
 #include <deque>
+#include "Common/Compiler.h"
 #include "Common/MessageProtocol.h"
 #include "ClientSource/Libraries/Compiler.h"
 #include "BotBase.h"

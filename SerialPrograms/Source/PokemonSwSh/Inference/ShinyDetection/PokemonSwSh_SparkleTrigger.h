@@ -34,7 +34,7 @@ private:
     FillMatrix m_matrix;
     double m_percentile;
 
-    std::multimap<ssize_t, FillGeometry> m_regions;
+    std::multimap<int64_t, FillGeometry> m_regions;
     uint64_t m_radius_sqr;
 };
 

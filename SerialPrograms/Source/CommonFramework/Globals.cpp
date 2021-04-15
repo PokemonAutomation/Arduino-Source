@@ -9,8 +9,9 @@
 namespace PokemonAutomation{
 
 
-const QString VERSION = "v0.5.3";
-const QString DISCORD = "https://discord.gg/cQ4gWxN";
+const QString VERSION = "v0.5.9";
+const QString DISCORD_LINK = "discord.gg/cQ4gWxN";
+const QString DISCORD_LINK_FULL = "https://" + DISCORD_LINK;
 const QString GITHUB_REPO = "https://github.com/PokemonAutomation/SwSh-Arduino";
 
 const QString STRING_POKEMON = QString("Pok") + QChar(0xe9) + "mon";

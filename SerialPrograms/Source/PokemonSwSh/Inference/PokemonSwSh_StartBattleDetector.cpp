@@ -77,19 +77,19 @@ bool StartBattleDetector::detect(const QImage& screen){
     }
     return dialog;
 }
-bool StartBattleDetector::wait(ProgramEnvironment& env, Logger& logger){
+bool StartBattleDetector::wait(ProgramEnvironment& env){
     InferenceThrottler throttler(m_timeout, std::chrono::milliseconds(50));
     while (true){
         env.check_stopping();
 
         QImage screen = m_feed.snapshot();
         if (detect(screen)){
-            logger.log("StartBattleDetector: Detected start of battle!", "purple");
+            env.log("StartBattleDetector: Detected start of battle!", "purple");
             return true;
         }
 
         if (throttler.end_iteration(env)){
-            logger.log("StartBattleDetector: Timed out.", "red");
+            env.log("StartBattleDetector: Timed out.", "red");
             return false;
         }
     }

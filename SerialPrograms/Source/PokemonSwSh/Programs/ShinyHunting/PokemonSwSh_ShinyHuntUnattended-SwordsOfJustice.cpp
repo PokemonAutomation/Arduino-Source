@@ -76,7 +76,7 @@ void ShinyHuntUnattendedSwordsOfJustice::program(SingleSwitchProgramEnvironment&
         }
         pbf_press_button(BUTTON_X, 10, 50);
         pbf_press_dpad(DPAD_LEFT, 10, 10);
-        env.logger.log("Starting Encounter: " + tostr_u_commas(c + 1));
+        env.log("Starting Encounter: " + tostr_u_commas(c + 1));
         pbf_press_button(BUTTON_A, 10, EXIT_CAMP_TO_RUN_DELAY);
 
         //  Run away if not shiny.

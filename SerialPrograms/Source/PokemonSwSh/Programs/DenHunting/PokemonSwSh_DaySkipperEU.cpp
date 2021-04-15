@@ -68,7 +68,7 @@ void DaySkipperEU::program(SingleSwitchProgramEnvironment& env) const{
         correct_count++;
         year++;
         remaining_skips--;
-        env.logger.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
+        env.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
 
         if (year >= 60){
             if (real_life_year <= 36){

@@ -60,7 +60,7 @@ void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env) const{
             correct_count++;
             day++;
             remaining_skips--;
-            env.logger.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
+            env.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
         }
         if (CORRECTION_SKIPS != 0 && correct_count == CORRECTION_SKIPS){
             correct_count = 0;

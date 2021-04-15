@@ -6,10 +6,13 @@
 
 #include <cmath>
 #include "Common/Clientside/PrettyPrint.h"
+#include "ClientSource/Libraries/Logging.h"
 #include "Common/SwitchFramework/FrameworkSettings.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
+#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/Tools/StatsDatabase.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/Inference/InferenceThrottler.h"
 #include "CommonFramework/Inference/FillGeometry.h"
@@ -17,6 +20,7 @@
 #include "CommonFramework/Inference/ColorClustering.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CommonFramework/Inference/TimeWindowStatTracker.h"
+#include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyFilters.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleTrigger.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareTrigger.h"
@@ -56,15 +60,21 @@ TestProgram::TestProgram()
 
 
 
-
-
-
-
-
 void TestProgram::program(SingleSwitchProgramEnvironment& env) const{
-    BotBase& botbase = env.console;
+//    BotBase& botbase = env.console;
     VideoFeed& feed = env.console;
 
+#if 0
+    StatSet set;
+    set.open_from_file("test.txt");
+
+//    cout << set.to_str() << endl;
+
+    set.save_to_file("test2.txt");
+#endif
+
+
+#if 0
 //    start_game_from_home_with_inference(env, env.logger, env.console, true, 0, 0, true);
 
 //    std::pair<uint8_t, uint8_t> coord = get_direction(-3, -1.0);
@@ -73,9 +83,36 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env) const{
 //    Trajectory trajectory = get_trajectory_float(.09, .09);
 //    cout << trajectory.distance_in_ticks << " : " << (int)trajectory.joystick_x << "," << (int)trajectory.joystick_y << endl;
 
+    ShinyHuntTracker tracker(true);
+    tracker.parse_and_append_line("Encounters: 100 - Star Shinies: 2 - Square Shinies: 1");
+//    cout << tracker.to_str() << endl;
+
+//    StatLine line(tracker);
+//    cout << line.to_str() << endl;
+
+//    StatLine line1("2021-04-08 00:25:12.131850 - Encounters: 100 - Star Shinies: 2 - Square Shinies: 1");
+//    cout << line1.to_str() << endl;
+
+    StatList list;
+    list += tracker;
+    list += "2021-04-08 00:25:12.131850 - Encounters: 200 - Star Shinies: 1 - Square Shinies: 0";
+
+    cout << list.to_str() << endl;
+
+    StatSet set;
+    StatList& program0 = set["program 0"];
+    program0 += "Timestamp - Encounters: 100 - Star Shinies: 2 - Square Shinies: 1";
+    program0 += "Timestamp - Encounters: 200 - Star Shinies: 1 - Square Shinies: 0";
+    StatList& program1 = set["program 1"];
+    program1 += "Timestamp - Encounters: 300 - Star Shinies: 3 - Square Shinies: 2";
+    program1 += "Timestamp - Encounters: 400 - Star Shinies: 4 - Square Shinies: 1";
+
+    set.save_to_file("test.txt");
+#endif
+
 
 #if 0
-    QImage image("square-test.png");
+    QImage image("test-screen.png");
 //    QImage image("test-1617471750423682600-O.png");
 //    QImage image = feed.snapshot();
 //    image.save("square-test0.png");
@@ -83,6 +120,7 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env) const{
 
     BrightYellowLightFilterDebug filter;
     matrix.apply_filter(image, filter);
+    image.save("square-test0.png");
 
     std::vector<FillGeometry> objects;
     objects = find_all_objects(matrix, 1, true);
@@ -118,8 +156,8 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env) const{
 
 
 
-#if 0
-    QImage screen("test-161.png");
+#if 1
+    QImage screen("mark-test0.png");
 
     std::vector<PixelBox> marks;
     find_marks(screen, nullptr, &marks);
@@ -149,7 +187,7 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env) const{
 
 #if 1
     detect_shiny_battle(
-        env, env.console, env.logger,
+        env, env.console,
         SHINY_BATTLE_REGULAR,
         std::chrono::seconds(60)
     );

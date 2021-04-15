@@ -20,9 +20,12 @@ class PurpleBeamFinder : public SingleSwitchProgram{
 public:
     PurpleBeamFinder();
 
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env) const override;
 
 private:
+    struct Stats;
+
     BooleanCheckBox EXTRA_LINE;
     FloatingPoint DETECTION_THRESHOLD;
     TimeExpression<uint16_t> TIMEOUT_DELAY;

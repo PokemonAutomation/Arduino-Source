@@ -50,15 +50,24 @@ ShinyHuntAutonomousStrongSpawn::ShinyHuntAutonomousStrongSpawn()
 }
 
 
-std::string ShinyHuntAutonomousStrongSpawn::Stats::stats() const{
-    std::string str;
-    str += str_encounters();
-    str += " - Timeouts: " + tostr_u_commas(m_timeouts);
-    str += str_shinies();
-    return str;
+
+
+struct ShinyHuntAutonomousStrongSpawn::Stats : public ShinyHuntTracker{
+    Stats()
+        : ShinyHuntTracker(true)
+        , m_timeouts(m_stats["Timeouts"])
+    {
+        m_display_order.insert(m_display_order.begin() + 1, Stat("Timeouts"));
+    }
+    uint64_t& m_timeouts;
+};
+std::unique_ptr<StatsTracker> ShinyHuntAutonomousStrongSpawn::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-ShinyHuntAutonomousStrongSpawn::Tracker::Tracker(EncounterStats& stats, ConsoleHandle& console)
+
+
+ShinyHuntAutonomousStrongSpawn::Tracker::Tracker(ShinyHuntTracker& stats, ConsoleHandle& console)
     : StandardEncounterTracker(stats, console, false, 0)
 {}
 bool ShinyHuntAutonomousStrongSpawn::Tracker::run_away(){
@@ -73,11 +82,11 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
     const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
     uint32_t last_touch = system_clock();
 
-    Stats stats;
+    Stats& stats = env.stats<Stats>();
     Tracker tracker(stats, env.console);
 
     while (true){
-        stats.log_stats(env, env.logger);
+        env.update_stats();
 
         uint32_t now = system_clock();
         if (TIME_ROLLBACK_HOURS > 0 && now - last_touch >= PERIOD){
@@ -85,15 +94,15 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
             last_touch += PERIOD;
         }
         reset_game_from_home_with_inference(
-            env, env.logger, env.console,
+            env, env.console,
             TOLERATE_SYSTEM_UPDATE_MENU_FAST
         );
-        env.logger.log("Starting Encounter: " + tostr_u_commas(stats.encounters() + 1));
+        env.log("Starting Encounter: " + tostr_u_commas(stats.encounters() + 1));
         env.console.botbase().wait_for_all_requests();
 
         //  Detect shiny.
         ShinyDetection detection = detect_shiny_battle(
-            env, env.console, env.logger,
+            env, env.console,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );
@@ -107,7 +116,7 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
         }
     }
 
-    stats.log_stats(env, env.logger);
+    env.update_stats();
 
     if (GO_HOME_WHEN_DONE){
         pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);

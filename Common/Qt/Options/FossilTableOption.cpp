@@ -156,20 +156,20 @@ void FossilTableOptionUI::replace_table(){
     m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
 
     size_t rows = m_value.m_current.size();
-    m_table->setRowCount(m_value.m_current.size() + 1);
+    m_table->setRowCount((int)(m_value.m_current.size() + 1));
     for (size_t c = 0; c < rows; c++){
         const auto& item = m_value.m_current[c];
         m_index_table.emplace_back(new int);
-        add_row(c, item, *m_index_table.back());
+        add_row((int)c, item, *m_index_table.back());
     }
 
     QPushButton* button = new QPushButton(m_table);
     button->setText("Add Row");
-    m_table->setCellWidget(m_value.m_current.size(), 0, button);
+    m_table->setCellWidget((int)m_value.m_current.size(), 0, button);
     connect(
         button, &QPushButton::clicked,
         this, [&](bool){
-            int index = m_index_table.size();
+            int index = (int)m_index_table.size();
 
             //  Update data vector.
             m_value.m_current.emplace_back(

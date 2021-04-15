@@ -37,7 +37,7 @@ SettingListUI::SettingListUI(MainWindow& parent)
     }
 //    setMaximumWidth(m_width);
 
-    setMaximumHeight(4 + list.size() * (sizeHintForRow(0) + 2));
+    setMaximumHeight(4 + (int)list.size() * (sizeHintForRow(0) + 2));
 }
 
 void SettingListUI::row_selected(QListWidgetItem* item){

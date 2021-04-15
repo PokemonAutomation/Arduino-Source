@@ -50,6 +50,7 @@ private:
 class CameraSelectorUI : public QWidget, public VideoFeed{
 public:
     CameraSelectorUI(QWidget& parent, CameraSelector& value, QWidget& holder);
+    ~CameraSelectorUI();
 
     VideoOverlay& overlay(){ return *m_overlay; }
 
@@ -71,8 +72,13 @@ private:
     static QString aspect_ratio(const QSize& size);
 
 private:
+    enum class CaptureStatus{
+        PENDING,
+        COMPLETED,
+        CANCELED,
+    };
     struct PendingCapture{
-        bool done = false;
+        CaptureStatus status = CaptureStatus::PENDING;
         QImage image;
         std::condition_variable cv;
     };

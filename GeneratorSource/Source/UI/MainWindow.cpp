@@ -51,7 +51,7 @@ MainWindow::MainWindow(QWidget* parent)
     QHBoxLayout* hbox = new QHBoxLayout(m_centralwidget);
 
     QVBoxLayout* left = new QVBoxLayout();
-    hbox->addLayout(left, 2);
+    hbox->addLayout(left, 0);
     left->setAlignment(Qt::AlignTop);
     left->addWidget(new QLabel("<b><font size=5>Device and Program:</font></b>", this));
 
@@ -76,11 +76,11 @@ MainWindow::MainWindow(QWidget* parent)
         m_settings_list->text_width()
     );
 #else
-    int width = 300;
+//    int width = 300;
 #endif
 //    cout << "Width = " << width << endl;
-    m_program_list->setMaximumWidth(width);
-    m_settings_list->setMaximumWidth(width);
+//    m_program_list->setMaximumWidth(width);
+//    m_settings_list->setMaximumWidth(width);
 
     QHBoxLayout* support = new QHBoxLayout();
     left->addLayout(support);

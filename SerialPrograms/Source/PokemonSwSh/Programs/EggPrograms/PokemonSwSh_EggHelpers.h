@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_EggHelpers_H
 #define PokemonAutomation_PokemonSwSh_EggHelpers_H
 
+#include "Common/Compiler.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "NintendoSwitch/FixedInterval.h"

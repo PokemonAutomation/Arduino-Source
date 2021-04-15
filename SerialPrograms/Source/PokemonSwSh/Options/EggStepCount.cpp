@@ -9,6 +9,9 @@
 #include "Common/Clientside/PrettyPrint.h"
 #include "EggStepCount.h"
 
+namespace PokemonAutomation{
+
+
 const std::vector<uint16_t> STEP_COUNTS{
     1280,
     2560,
@@ -73,3 +76,8 @@ void EggStepCountUI::restore_defaults(){
     m_value.restore_defaults();
     m_box->setCurrentIndex((int)m_value.m_current);
 }
+
+
+
+}
+

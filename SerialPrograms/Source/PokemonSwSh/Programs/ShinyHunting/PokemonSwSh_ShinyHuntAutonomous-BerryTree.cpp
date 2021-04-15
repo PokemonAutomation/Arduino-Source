@@ -51,26 +51,31 @@ ShinyHuntAutonomousBerryTree::ShinyHuntAutonomousBerryTree()
 
 
 
-
-
-
-std::string ShinyHuntAutonomousBerryTree::Stats::stats() const{
-    std::string str;
-    str += str_encounters();
-    str += " - Timeouts: " + tostr_u_commas(m_timeouts);
-    str += str_shinies();
-    return str;
+struct ShinyHuntAutonomousBerryTree::Stats : public ShinyHuntTracker{
+    Stats()
+        : ShinyHuntTracker(true)
+        , m_timeouts(m_stats["Timeouts"])
+    {
+        m_display_order.insert(m_display_order.begin() + 1, Stat("Timeouts"));
+    }
+    uint64_t& m_timeouts;
+};
+std::unique_ptr<StatsTracker> ShinyHuntAutonomousBerryTree::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
 }
+
+
+
 
 void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env) const{
     grip_menu_connect_go_home();
 
-    Stats stats;
+    Stats& stats = env.stats<Stats>();
     StandardEncounterTracker tracker(stats, env.console, REQUIRE_SQUARE, EXIT_BATTLE_MASH_TIME);
 
     uint8_t year = MAX_YEAR;
     while (true){
-        stats.log_stats(env, env.logger);
+        env.update_stats();
 
         home_roll_date_enter_game_autorollback(&year);
         pbf_mash_button(BUTTON_B, 90);
@@ -83,7 +88,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env) 
             bool timed_out = false;
             do{
                 if (detector.has_timed_out()){
-                    env.logger.log("ScreenChangeDetector: Timed out.", Qt::red);
+                    env.log("ScreenChangeDetector: Timed out.", Qt::red);
                     stats.m_timeouts++;
                     timed_out = true;
                     break;
@@ -101,7 +106,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env) 
 
         //  Detect shiny.
         ShinyDetection detection = detect_shiny_battle(
-            env, env.console, env.logger,
+            env, env.console,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );
@@ -118,7 +123,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env) 
         pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
     }
 
-    stats.log_stats(env, env.logger);
+    env.update_stats();
 
     pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
 

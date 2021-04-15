@@ -122,7 +122,7 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env) const{
 
     char first = true;
     for (uint32_t raids = 0;; raids++){
-        env.logger.log("Raids Completed: " + tostr_u_commas(raids));
+        env.log("Raids Completed: " + tostr_u_commas(raids));
 
         roll_den(ENTER_ONLINE_DEN_DELAY, OPEN_ONLINE_DEN_LOBBY_DELAY, SKIPS, CATCHABILITY);
 
@@ -144,7 +144,7 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env) const{
             for (size_t c = 0; c < 8; c++){
                 str[c] = code[c] + '0';
             }
-            env.logger.log("Next Raid Code: " + std::string(str, sizeof(str)));
+            env.log("Next Raid Code: " + std::string(str, sizeof(str)));
             pbf_press_button(BUTTON_PLUS, 5, 145);
             enter_digits(8, code);
             pbf_wait(180);
@@ -154,7 +154,7 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env) const{
 
         //  Accept friend requests while we wait.
         raid_lobby_wait(
-            env.console, env.logger,
+            env.console, env.logger(),
             HOST_ONLINE,
             FRIEND_ACCEPT_USER_SLOT,
             lobby_wait_delay
@@ -171,11 +171,11 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env) const{
             pbf_mash_button(BUTTON_A, 3 * TICKS_PER_SECOND);
             env.console.botbase().wait_for_all_requests();
 
-            BlackScreenDetector black_screen(env.console, env.logger);
+            BlackScreenDetector black_screen(env.console, env.logger());
             uint32_t now = start;
             while (now - start < RAID_START_TO_EXIT_DELAY){
                 if (black_screen.black_is_over()){
-                    env.logger.log("Raid has Started!", "blue");
+                    env.log("Raid has Started!", "blue");
                     break;
                 }
                 pbf_mash_button(BUTTON_A, TICKS_PER_SECOND);
@@ -215,7 +215,7 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env) const{
         rollback_date_from_home(SKIPS);
 
         start_game_from_home_with_inference(
-            env, env.logger, env.console,
+            env, env.console,
             TOLERATE_SYSTEM_UPDATE_MENU_SLOW,
             0, 0,
             BACKUP_SAVE

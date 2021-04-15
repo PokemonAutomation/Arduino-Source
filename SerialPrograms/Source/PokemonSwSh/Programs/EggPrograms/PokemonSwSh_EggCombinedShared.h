@@ -232,7 +232,7 @@ struct EggCombinedSession{
             for (uint8_t column = 0; column < 6; column++){
                 //  Touch the date.
                 if (TOUCH_DATE_INTERVAL > 0 && system_clock() - last_touch >= TOUCH_DATE_INTERVAL){
-                    env.logger.log("Touching date to prevent rollover.");
+                    env.log("Touching date to prevent rollover.");
                     pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
                     touch_date_from_home(SETTINGS_TO_HOME_DELAY);
                     resume_game_no_interact(TOLERATE_SYSTEM_UPDATE_MENU_FAST);

@@ -10,6 +10,7 @@
 #include <QString>
 #include <QJsonValue>
 #include <QWidget>
+#include "Common/Compiler.h"
 
 class ConfigOptionUI;
 

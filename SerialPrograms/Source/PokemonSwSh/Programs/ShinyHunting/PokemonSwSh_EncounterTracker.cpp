@@ -13,7 +13,7 @@ namespace PokemonSwSh{
 
 
 StandardEncounterTracker::StandardEncounterTracker(
-    EncounterStats& stats,
+    ShinyHuntTracker& stats,
     ConsoleHandle& console,
     bool require_square,
     uint16_t exit_battle_time

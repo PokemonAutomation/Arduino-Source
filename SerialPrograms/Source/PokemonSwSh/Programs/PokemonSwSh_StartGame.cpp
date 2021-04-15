@@ -19,7 +19,6 @@ namespace PokemonSwSh{
 
 void enter_loading_game(
     ProgramEnvironment& env,
-    Logger& logger,
     ConsoleHandle& console,
     bool backup_save,
     uint16_t post_wait_time
@@ -39,14 +38,14 @@ void enter_loading_game(
 
             QImage screen = console.video().snapshot();
             if (screen.isNull()){
-                logger.log("enter_loading_game(): Screenshot failed.", "purple");
+                env.log("enter_loading_game(): Screenshot failed.", "purple");
                 throttler.set_period(std::chrono::milliseconds(1000));
             }else{
                 bool black0 = is_black(extract_box(screen, box0));
                 bool black1 = is_black(extract_box(screen, box1));
                 if (black0 && black1){
                     if (!black_found){
-                        logger.log("start_game_with_inference(): Game load started.", "purple");
+                        env.log("start_game_with_inference(): Game load started.", "purple");
                     }
                     black_found = true;
                 }else if (black_found){
@@ -55,13 +54,13 @@ void enter_loading_game(
             }
 
             if (throttler.end_iteration(env)){
-                logger.log("enter_loading_game(): Game load timed out. Proceeding with default start delay.", "red");
+                env.log("enter_loading_game(): Game load timed out. Proceeding with default start delay.", "red");
                 break;
             }
         }
     }
 
-    logger.log("enter_loading_game(): Game Loaded. Entering game...", "purple");
+    env.log("enter_loading_game(): Game Loaded. Entering game...", "purple");
     enter_game(backup_save, ENTER_GAME_MASH, 0);
     console.botbase().wait_for_all_requests();
 
@@ -79,13 +78,13 @@ void enter_loading_game(
 
             QImage screen = console.video().snapshot();
             if (screen.isNull()){
-                logger.log("enter_loading_game(): Screenshot failed.", "purple");
+                env.log("enter_loading_game(): Screenshot failed.", "purple");
                 throttler.set_period(std::chrono::milliseconds(1000));
             }else{
                 bool black = is_black(extract_box(screen, box));
                 if (black){
                     if (!black_found){
-                        logger.log("enter_loading_game(): Game entry started.", "purple");
+                        env.log("enter_loading_game(): Game entry started.", "purple");
                     }
                     black_found = true;
                 }else if (black_found){
@@ -94,12 +93,12 @@ void enter_loading_game(
             }
 
             if (throttler.end_iteration(env)){
-                logger.log("enter_loading_game(): Game entry timed out. Proceeding with default start delay.", "red");
+                env.log("enter_loading_game(): Game entry timed out. Proceeding with default start delay.", "red");
                 break;
             }
         }
     }
-    logger.log("start_game_with_inference(): Game started.", "purple");
+    env.log("start_game_with_inference(): Game started.", "purple");
 
     if (post_wait_time != 0){
         pbf_wait(post_wait_time);
@@ -108,7 +107,6 @@ void enter_loading_game(
 
 void start_game_from_home_with_inference(
     ProgramEnvironment& env,
-    Logger& logger,
     ConsoleHandle& console,
     bool tolerate_update_menu,
     uint8_t game_slot,
@@ -159,12 +157,11 @@ void start_game_from_home_with_inference(
     console.botbase().wait_for_all_requests();
 
     //  Wait for game to load.
-    enter_loading_game(env, logger, console, backup_save, post_wait_time);
+    enter_loading_game(env, console, backup_save, post_wait_time);
 }
 
 void reset_game_from_home_with_inference(
     ProgramEnvironment& env,
-    Logger& logger,
     ConsoleHandle& console,
     bool tolerate_update_menu,
     uint16_t post_wait_time
@@ -172,7 +169,7 @@ void reset_game_from_home_with_inference(
     if (START_GAME_REQUIRES_INTERNET || tolerate_update_menu){
         close_game();
         start_game_from_home_with_inference(
-            env, logger, console, tolerate_update_menu, 0, 0, false, post_wait_time
+            env, console, tolerate_update_menu, 0, 0, false, post_wait_time
         );
         return;
     }
@@ -181,7 +178,7 @@ void reset_game_from_home_with_inference(
     console.botbase().wait_for_all_requests();
 
     //  Wait for game to load.
-    enter_loading_game(env, logger, console, false, post_wait_time);
+    enter_loading_game(env, console, false, post_wait_time);
 }
 
 

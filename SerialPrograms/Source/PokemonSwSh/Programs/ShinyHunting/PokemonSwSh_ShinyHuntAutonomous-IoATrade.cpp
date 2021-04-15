@@ -10,6 +10,7 @@
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
+#include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
 #include "PokemonSwSh_ShinyHuntAutonomous-IoATrade.h"
@@ -49,13 +50,21 @@ ShinyHuntAutonomousIoATrade::ShinyHuntAutonomousIoATrade()
 
 
 
-std::string ShinyHuntAutonomousIoATrade::Stats::stats() const{
-    std::string str;
-    str += "Trades: " + tostr_u_commas(m_encounters);
-    str += " - Errors: " + tostr_u_commas(m_errors);
-    str += str_shinies();
-    return str;
+
+struct ShinyHuntAutonomousIoATrade::Stats : public ShinyHuntTracker{
+    Stats()
+        : ShinyHuntTracker(false)
+        , m_errors(m_stats["Errors"])
+    {
+        m_display_order.insert(m_display_order.begin() + 1, Stat("Errors"));
+    }
+    uint64_t& m_errors;
+};
+std::unique_ptr<StatsTracker> ShinyHuntAutonomousIoATrade::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
 }
+
+
 
 
 void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env) const{
@@ -64,10 +73,10 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env) c
 
     uint32_t last_touch = system_clock() - TOUCH_DATE_INTERVAL;
 
-    Stats stats;
+    Stats& stats = env.stats<Stats>();
 
     while (true){
-        stats.log_stats(env, env.logger);
+        env.update_stats();
 
         pbf_press_button(BUTTON_A, 10, 100);
         pbf_press_button(BUTTON_A, 10, 60);
@@ -89,7 +98,7 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env) c
 
         SummaryShinySymbolDetector::Detection detection;
         {
-            SummaryShinySymbolDetector detector(env.console, env.logger);
+            SummaryShinySymbolDetector detector(env.console, env.logger());
             detection = detector.wait_for_detection(env);
         }
         switch (detection){
@@ -108,18 +117,18 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env) c
 
         pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
         if (TOUCH_DATE_INTERVAL > 0 && system_clock() - last_touch >= TOUCH_DATE_INTERVAL){
-            env.logger.log("Touching date to prevent rollover.");
+            env.log("Touching date to prevent rollover.");
             touch_date_from_home(SETTINGS_TO_HOME_DELAY);
             last_touch += TOUCH_DATE_INTERVAL;
         }
         reset_game_from_home_with_inference(
-            env, env.logger, env.console,
+            env, env.console,
             TOLERATE_SYSTEM_UPDATE_MENU_FAST
         );
     }
 
 StopProgram:
-    stats.log_stats(env, env.logger);
+    env.update_stats();
 
     if (GO_HOME_WHEN_DONE){
         pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);

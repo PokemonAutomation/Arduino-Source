@@ -11,6 +11,7 @@
 #include <atomic>
 #include <thread>
 #include <windows.h>
+#include "Common/Compiler.h"
 #include "Common/Clientside/Unicode.h"
 #include "Common/Clientside/SpinLock.h"
 #include "ClientSource/Libraries/Logging.h"

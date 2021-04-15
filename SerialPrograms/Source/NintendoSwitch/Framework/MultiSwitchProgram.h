@@ -19,7 +19,6 @@ namespace NintendoSwitch{
 
 class MultiSwitchProgramEnvironment : public ProgramEnvironment{
 public:
-    Logger& logger;
     AsyncDispatcher dispatcher;
     std::vector<ConsoleHandle> consoles;
 
@@ -36,7 +35,12 @@ public:
 
 private:
     friend class MultiSwitchProgramUI;
-    MultiSwitchProgramEnvironment(Logger& p_logger, std::vector<ConsoleHandle> p_switches);
+    MultiSwitchProgramEnvironment(
+        Logger& logger,
+        StatsTracker* current_stats,
+        const StatsTracker* historical_stats,
+        std::vector<ConsoleHandle> p_switches
+    );
 };
 
 
@@ -66,7 +70,10 @@ public:
     MultiSwitchProgramUI(MultiSwitchProgram& factory, MainWindow& window);
     ~MultiSwitchProgramUI();
 
-    virtual void program() override;
+    virtual void program(
+        StatsTracker* current_stats,
+        const StatsTracker* historical_stats
+    ) override;
 };
 
 

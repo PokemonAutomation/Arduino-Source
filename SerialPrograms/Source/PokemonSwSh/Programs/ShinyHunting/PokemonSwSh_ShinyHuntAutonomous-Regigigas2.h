@@ -12,7 +12,6 @@
 #include "CommonFramework/Options/SimpleInteger.h"
 #include "NintendoSwitch/Options/TimeExpression.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
-#include "PokemonSwSh_EncounterStats.h"
 #include "PokemonSwSh_EncounterTracker.h"
 
 namespace PokemonAutomation{
@@ -23,22 +22,18 @@ class ShinyHuntAutonomousRegigigas2 : public SingleSwitchProgram{
 public:
     ShinyHuntAutonomousRegigigas2();
 
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env) const override;
 
 private:
     bool kill_and_return(SingleSwitchProgramEnvironment& env) const;
 
 private:
-    struct Stats : public EncounterStats{
-        Stats() : EncounterStats(true) {}
-        virtual std::string stats() const override;
-        uint64_t m_timeouts = 0;
-    };
+    struct Stats;
     struct Tracker : public StandardEncounterTracker{
         Tracker(
-            EncounterStats& stats,
+            ShinyHuntTracker& stats,
             ProgramEnvironment& env,
-            Logger& logger,
             ConsoleHandle& console,
             bool require_square,
             uint16_t exit_battle_time
@@ -46,7 +41,6 @@ private:
         virtual bool run_away() override;
 
         ProgramEnvironment& m_env;
-        Logger& m_logger;
     };
 
     BooleanCheckBox GO_HOME_WHEN_DONE;

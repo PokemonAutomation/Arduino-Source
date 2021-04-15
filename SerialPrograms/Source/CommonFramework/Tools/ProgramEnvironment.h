@@ -13,6 +13,8 @@
 #include <condition_variable>
 #include <QObject>
 #include "ClientSource/Connection/BotBase.h"
+#include "Logger.h"
+#include "StatsTracking.h"
 
 //#include <iostream>
 //using std::cout;
@@ -25,42 +27,28 @@ class ProgramEnvironment : public QObject{
     Q_OBJECT
 
 public:
-    ProgramEnvironment()
-        : m_enable_feedback(true)
-        , m_stopping(false)
-    {}
+    ProgramEnvironment(
+        Logger& logger,
+        StatsTracker* current_stats,
+        const StatsTracker* historical_stats
+    );
 
-    bool is_stopping() const{
-        return m_stopping.load(std::memory_order_acquire);
-    }
+    template <class... Args>
+    void log(Args&&... args);
+    Logger& logger(){ return m_logger; }
 
-    void check_stopping() const{
-        if (is_stopping()){
-            throw PokemonAutomation::CancelledException();
-        }
-    }
+    void update_stats();
+
+    template <typename StatsType>
+    StatsType& stats();
+
+    bool is_stopping() const;
+    void check_stopping() const;
 
     template <typename Duration>
-    void wait(Duration duration){
-        check_stopping();
+    void wait(Duration duration);
 
-        auto start = std::chrono::system_clock::now();
-        std::unique_lock<std::mutex> lg(m_lock);
-        m_cv.wait_for(
-            lg, duration,
-            [=]{
-                return std::chrono::system_clock::now() - start >= duration || is_stopping();
-            }
-        );
-
-        check_stopping();
-    }
-
-    void signal_stop(){
-        m_stopping.store(true, std::memory_order_release);
-        std::lock_guard<std::mutex> lg(m_lock);
-        m_cv.notify_all();
-    }
+    void signal_stop();
 
 
 signals:
@@ -72,8 +60,44 @@ private:
     std::atomic<bool> m_stopping;
     std::mutex m_lock;
     std::condition_variable m_cv;
+
+    Logger& m_logger;
+    StatsTracker* m_current_stats;
+    const StatsTracker* m_historical_stats;
 };
 
+
+
+
+//  Templates
+
+
+template <class... Args>
+void ProgramEnvironment::log(Args&&... args){
+    m_logger.log(std::forward<Args>(args)...);
+}
+
+
+template <typename StatsType>
+StatsType& ProgramEnvironment::stats(){
+    return *static_cast<StatsType*>(m_current_stats);
+}
+
+template <typename Duration>
+void ProgramEnvironment::wait(Duration duration){
+    check_stopping();
+
+    auto start = std::chrono::system_clock::now();
+    std::unique_lock<std::mutex> lg(m_lock);
+    m_cv.wait_for(
+        lg, duration,
+        [=]{
+            return std::chrono::system_clock::now() - start >= duration || is_stopping();
+        }
+    );
+
+    check_stopping();
+}
 
 
 }

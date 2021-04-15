@@ -157,8 +157,11 @@ void ShinyEncounterDetector::push(
 
     QImage shiny_box = extract_box(screen, m_shiny_box);
 
+//    auto time0 = std::chrono::system_clock::now();
     ShinyImageDetection signatures;
     signatures.accumulate(shiny_box, timestamp.time_since_epoch().count(), &m_logger);
+//    auto time1 = std::chrono::system_clock::now();
+//    cout << std::chrono::duration_cast<std::chrono::milliseconds>(time1 - time0).count() << endl;
 
     ShinyImageAlpha frame_alpha = signatures.alpha();
     m_image_alpha.max(frame_alpha);
@@ -169,7 +172,7 @@ void ShinyEncounterDetector::push(
 
 
     if (frame_alpha.shiny > 0){
-        if (frame_alpha.shiny > m_detection_threshold){
+        if (frame_alpha.shiny >= m_detection_threshold){
             m_logger.log(
                 "ShinyDetector: alpha = " + QString::number(frame_alpha.shiny) + " / "  + QString::number(m_image_alpha.shiny) + " (threshold exceeded)",
                 "blue"
@@ -208,7 +211,7 @@ void ShinyEncounterDetector::push(
 ShinyDetection ShinyEncounterDetector::results() const{
     double alpha = m_image_alpha.shiny;
     if (m_dialog_trigger){
-        alpha += 1.0;
+        alpha += 1.5;
     }
     m_logger.log(
         "ShinyDetector: Overall Alpha = " + QString::number(alpha) +
@@ -238,8 +241,7 @@ ShinyDetection ShinyEncounterDetector::results() const{
 
 
 ShinyDetection detect_shiny_battle(
-    ProgramEnvironment& env,
-    VideoFeed& feed, Logger& logger,
+    ProgramEnvironment& env, VideoFeed& feed,
     const ShinyDetectionBattle& battle_settings,
     std::chrono::seconds timeout,
     double detection_threshold
@@ -255,7 +257,7 @@ ShinyDetection detect_shiny_battle(
     StatAccumulatorI32 throttle_stats;
 
     StandardBattleMenuDetector menu(feed);
-    ShinyEncounterDetector detector(feed, logger, battle_settings, detection_threshold);
+    ShinyEncounterDetector detector(feed, env.logger(), battle_settings, detection_threshold);
 
     bool no_detection = false;
 
@@ -273,7 +275,7 @@ ShinyDetection detect_shiny_battle(
         auto timestamp = time1;
 
         if (menu.detect(screen)){
-            logger.log("ShinyDetector: Battle menu found!", "purple");
+            env.log("ShinyDetector: Battle menu found!", "purple");
             break;
         }
         auto time2 = std::chrono::system_clock::now();
@@ -295,13 +297,13 @@ ShinyDetection detect_shiny_battle(
         throttle_stats += std::chrono::duration_cast<std::chrono::milliseconds>(time4 - time3).count();
     }
 
-    logger.log("Diagnostics: Screenshot:\r\n" + capture_stats.dump(), Qt::magenta);
-    logger.log("Diagnostics: Menu Detection:\r\n" + menu_stats.dump(), Qt::magenta);
-    logger.log("Diagnostics: Inference:\r\n" + inference_stats.dump(), Qt::magenta);
-    logger.log("Diagnostics: Throttle:\r\n" + throttle_stats.dump(), Qt::magenta);
+    env.log("Diagnostics: Screenshot: " + capture_stats.dump(), Qt::magenta);
+    env.log("Diagnostics: Menu Detection: " + menu_stats.dump(), Qt::magenta);
+    env.log("Diagnostics: Inference: " + inference_stats.dump(), Qt::magenta);
+    env.log("Diagnostics: Throttle: " + throttle_stats.dump(), Qt::magenta);
 
     if (no_detection){
-        logger.log("ShinyDetector: Battle menu not found after timeout.", "red");
+        env.log("ShinyDetector: Battle menu not found after timeout.", "red");
         return ShinyDetection::NO_BATTLE_MENU;
     }
 

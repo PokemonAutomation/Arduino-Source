@@ -59,13 +59,22 @@ ShinyHuntAutonomousSwordsOfJustice::ShinyHuntAutonomousSwordsOfJustice()
 }
 
 
-std::string ShinyHuntAutonomousSwordsOfJustice::Stats::stats() const{
-    std::string str;
-    str += str_encounters();
-    str += " - Timeouts: " + tostr_u_commas(m_timeouts);
-    str += str_shinies();
-    return str;
+
+struct ShinyHuntAutonomousSwordsOfJustice::Stats : public ShinyHuntTracker{
+    Stats()
+        : ShinyHuntTracker(true)
+        , m_timeouts(m_stats["Timeouts"])
+    {
+        m_display_order.insert(m_display_order.begin() + 1, Stat("Timeouts"));
+    }
+    uint64_t& m_timeouts;
+};
+std::unique_ptr<StatsTracker> ShinyHuntAutonomousSwordsOfJustice::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
 }
+
+
+
 
 void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment& env) const{
     grip_menu_connect_go_home();
@@ -74,11 +83,11 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
     const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
     uint32_t last_touch = system_clock();
 
-    Stats stats;
+    Stats& stats = env.stats<Stats>();
     StandardEncounterTracker tracker(stats, env.console, false, EXIT_BATTLE_MASH_TIME);
 
     while (true){
-        stats.log_stats(env, env.logger);
+        env.update_stats();
 
         //  Touch the date.
         if (TIME_ROLLBACK_HOURS > 0 && system_clock() - last_touch >= PERIOD){
@@ -97,13 +106,13 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
         }
         pbf_press_button(BUTTON_X, 10, 50);
         pbf_press_dpad(DPAD_LEFT, 10, 10);
-        env.logger.log("Starting Encounter: " + tostr_u_commas(stats.encounters() + 1));
+        env.log("Starting Encounter: " + tostr_u_commas(stats.encounters() + 1));
         pbf_press_button(BUTTON_A, 10, 0);
         env.console.botbase().wait_for_all_requests();
 
         //  Detect shiny.
         ShinyDetection detection = detect_shiny_battle(
-            env, env.console, env.logger,
+            env, env.console,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );
@@ -118,7 +127,7 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
         }
     }
 
-    stats.log_stats(env, env.logger);
+    env.update_stats();
 
     if (GO_HOME_WHEN_DONE){
         pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);

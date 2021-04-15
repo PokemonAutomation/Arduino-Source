@@ -34,7 +34,7 @@ FillMatrix::FillMatrix()
     : m_width(0)
     , m_height(0)
 {}
-FillMatrix::FillMatrix(size_t width, size_t height)
+FillMatrix::FillMatrix(pxint_t width, pxint_t height)
     : m_width(width)
     , m_height(height)
     , m_cells(width * height)
@@ -46,12 +46,23 @@ FillMatrix::FillMatrix(const QImage& image)
     )
 {}
 
-FillMatrix FillMatrix::extract(PixelBox box, ObjectID id) const{
-    int width = box.width();
-    int height = box.height();
+FillMatrix FillMatrix::extract(PixelBox box) const{
+    pxint_t width = box.width();
+    pxint_t height = box.height();
     FillMatrix matrix(width, height);
-    for (int r = 0; r < height; r++){
-        for (int c = 0; c < width; c++){
+    for (pxint_t r = 0; r < height; r++){
+        for (pxint_t c = 0; c < width; c++){
+            matrix[r][c] = (*this)[r + box.min_y][c + box.min_x];
+        }
+    }
+    return matrix;
+}
+FillMatrix FillMatrix::extract(PixelBox box, ObjectID id) const{
+    pxint_t width = box.width();
+    pxint_t height = box.height();
+    FillMatrix matrix(width, height);
+    for (pxint_t r = 0; r < height; r++){
+        for (pxint_t c = 0; c < width; c++){
             ObjectID cell = (*this)[r + box.min_y][c + box.min_x];
             matrix[r][c] = cell == id ? 1 : 0;
         }
@@ -62,14 +73,14 @@ FillMatrix FillMatrix::extract(PixelBox box, ObjectID id) const{
 
 
 std::string FillMatrix::dump() const{
-    int width = m_width;
-    int height = m_height;
+    pxint_t width = m_width;
+    pxint_t height = m_height;
 
     std::string str;
     str += "{\n";
-    for (int r = 0; r < height; r++){
+    for (pxint_t r = 0; r < height; r++){
         str += "   ";
-        for (int c = 0; c < width; c++){
+        for (pxint_t c = 0; c < width; c++){
             str += " ";
             str += std::to_string((int)(*this)[r][c]);
         }

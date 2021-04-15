@@ -12,6 +12,8 @@
 #include <QComboBox>
 #include "CommonFramework/Options/ConfigOption.h"
 
+namespace PokemonAutomation{
+
 extern const std::vector<uint16_t> STEP_COUNTS;
 
 class EggStepCount : public ConfigOption{
@@ -30,8 +32,8 @@ public:
 
 private:
     friend class EggStepCountUI;
-    const uint16_t m_default;
-    uint16_t m_current;
+    const size_t m_default;
+    size_t m_current;
 };
 
 
@@ -47,6 +49,6 @@ private:
 };
 
 
-
+}
 #endif
 

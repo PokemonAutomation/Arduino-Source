@@ -12,9 +12,9 @@
 #include "CommonFramework/Inference/InferenceThrottler.h"
 #include "PokemonSwSh_BeamSetter.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -106,7 +106,8 @@ BeamSetter::Detection BeamSetter::run(
                 min_stddev = stddev;
                 min_stddev_index = c;
             }
-            if (stddev < 10 && current_values[c].sum() > 500){
+//            cout << c << " : stddev = " << stddev << ", sum = " << current_values[c].sum() << endl;
+            if (stddev < 50 && current_values[c].sum() > 500){
                 size_t& count = purple_detections[c];
                 count++;
             }

@@ -25,8 +25,9 @@ PersistentSettings settings;
 
 void PersistentSettings::write() const{
     QJsonObject root;
-    root.insert("00-ConfigPath", QJsonValue(config_path));
-    root.insert("01-SourcePath", QJsonValue(source_path));
+//    root.insert("00-ConfigPath", QJsonValue(config_path));
+//    root.insert("01-SourcePath", QJsonValue(source_path));
+    root.insert("01-StatsFile", QJsonValue(stats_file));
     {
         QJsonArray res;
         res.append(QJsonValue(window_size.width()));
@@ -59,8 +60,9 @@ void PersistentSettings::read(){
         throw StringException("Invalid settings file.");
     }
     QJsonObject root = doc.object();
-    json_get_string(config_path, root, "00-ConfigPath");
-    json_get_string(source_path, root, "01-SourcePath");
+//    json_get_string(config_path, root, "00-ConfigPath");
+//    json_get_string(source_path, root, "01-SourcePath");
+    json_get_string(stats_file, root, "01-StatsFile");
     {
         QJsonArray res = json_get_array_nothrow(root, "02-WindowSize");
         if (res.size() == 2){

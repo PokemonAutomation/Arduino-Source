@@ -5,6 +5,7 @@
  */
 
 #include <cmath>
+#include <algorithm>
 #include "AnomalyDetector.h"
 
 namespace PokemonAutomation{
@@ -85,7 +86,7 @@ double TimeNormalizedDeltaAnomalyDetector::push(
     }
 
     auto time_diff = timestamp - m_window.back().timestamp;
-    uint32_t millis = std::chrono::duration_cast<std::chrono::milliseconds>(time_diff).count();
+    uint32_t millis = (uint32_t)std::chrono::duration_cast<std::chrono::milliseconds>(time_diff).count();
     x /= millis;
     x = std::min(x, m_max_value);
 

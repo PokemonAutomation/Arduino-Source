@@ -51,14 +51,26 @@ ShinyHuntAutonomousWhistling::ShinyHuntAutonomousWhistling()
 }
 
 
-std::string ShinyHuntAutonomousWhistling::Stats::stats() const{
-    std::string str;
-    str += str_encounters();
-    str += " - Timeouts: " + tostr_u_commas(m_timeouts);
-    str += " - Unexpected Battles: " + tostr_u_commas(m_unexpected_battles);
-    str += str_shinies();
-    return str;
+
+struct ShinyHuntAutonomousWhistling::Stats : public ShinyHuntTracker{
+    Stats()
+        : ShinyHuntTracker(true)
+        , m_timeouts(m_stats["Timeouts"])
+        , m_unexpected_battles(m_stats["Unexpected Battles"])
+    {
+        m_display_order.insert(m_display_order.begin() + 1, Stat("Timeouts"));
+        m_display_order.insert(m_display_order.begin() + 2, Stat("Unexpected Battles"));
+    }
+    uint64_t& m_timeouts;
+    uint64_t& m_unexpected_battles;
+};
+std::unique_ptr<StatsTracker> ShinyHuntAutonomousWhistling::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
 }
+
+
+
+
 
 void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env) const{
     grip_menu_connect_go_home();
@@ -67,10 +79,10 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env) 
     const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
     uint32_t last_touch = system_clock();
 
-    Stats stats;
+    Stats& stats = env.stats<Stats>();
     StandardEncounterTracker tracker(stats, env.console, false, EXIT_BATTLE_MASH_TIME);
     while (true){
-        stats.log_stats(env, env.logger);
+        env.update_stats();
 
         //  Touch the date.
         if (TIME_ROLLBACK_HOURS > 0 && system_clock() - last_touch >= PERIOD){
@@ -91,7 +103,7 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env) 
             do{
                 screen = env.console.video().snapshot();
                 if (menu.detect(screen)){
-                    env.logger.log("ScreenChangeDetector: Unexpected battle menu.", Qt::red);
+                    env.log("ScreenChangeDetector: Unexpected battle menu.", Qt::red);
                     stats.m_unexpected_battles++;
                     unexpected = true;
                     break;
@@ -111,7 +123,7 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env) 
 
         //  Detect shiny.
         ShinyDetection detection = detect_shiny_battle(
-            env, env.console, env.logger,
+            env, env.console,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );
@@ -126,7 +138,7 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env) 
         }
     }
 
-    stats.log_stats(env, env.logger);
+    env.update_stats();
 
     if (GO_HOME_WHEN_DONE){
         pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);

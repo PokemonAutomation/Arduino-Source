@@ -10,6 +10,7 @@
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
+#include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_FishingDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
 #include "PokemonSwSh_EncounterTracker.h"
@@ -56,16 +57,26 @@ ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing()
 
 
 
-
-std::string ShinyHuntAutonomousFishing::Stats::stats() const{
-    std::string str;
-    str += str_encounters();
-    str += " - Misses: " + tostr_u_commas(m_misses);
-    str += " - Timeouts: " + tostr_u_commas(m_timeouts);
-    str += " - Unexpected Battles: " + tostr_u_commas(m_unexpected_battles);
-    str += str_shinies();
-    return str;
+struct ShinyHuntAutonomousFishing::Stats : public ShinyHuntTracker{
+    Stats()
+        : ShinyHuntTracker(true)
+        , m_misses(m_stats["Misses"])
+        , m_timeouts(m_stats["Timeouts"])
+        , m_unexpected_battles(m_stats["Unexpected Battles"])
+    {
+        m_display_order.insert(m_display_order.begin() + 1, Stat("Misses"));
+        m_display_order.insert(m_display_order.begin() + 2, Stat("Timeouts"));
+        m_display_order.insert(m_display_order.begin() + 3, Stat("Unexpected Battles"));
+    }
+    uint64_t& m_misses;
+    uint64_t& m_timeouts;
+    uint64_t& m_unexpected_battles;
+};
+std::unique_ptr<StatsTracker> ShinyHuntAutonomousFishing::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
 }
+
+
 
 void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env) const{
     grip_menu_connect_go_home();
@@ -74,11 +85,11 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env) co
     const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
     uint32_t last_touch = system_clock();
 
-    Stats stats;
+    Stats& stats = env.stats<Stats>();
     StandardEncounterTracker tracker(stats, env.console, false, EXIT_BATTLE_MASH_TIME);
 
     while (true){
-        stats.log_stats(env, env.logger);
+        env.update_stats();
 
         //  Touch the date.
         if (TIME_ROLLBACK_HOURS > 0 && system_clock() - last_touch >= PERIOD){
@@ -97,7 +108,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env) co
             pbf_press_button(BUTTON_A, 10, 10);
             pbf_mash_button(BUTTON_B, TICKS_PER_SECOND);
             env.console.botbase().wait_for_all_requests();
-            FishingDetector::Detection detection = detector.wait_for_detection(env, env.logger);
+            FishingDetector::Detection detection = detector.wait_for_detection(env);
             switch (detection){
             case FishingDetector::NO_DETECTION:
                 stats.m_timeouts++;
@@ -126,7 +137,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env) co
 
         //  Detect shiny.
         ShinyDetection detection = detect_shiny_battle(
-            env, env.console, env.logger,
+            env, env.console,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );
@@ -141,7 +152,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env) co
         }
     }
 
-    stats.log_stats(env, env.logger);
+    env.update_stats();
 
     if (GO_HOME_WHEN_DONE){
         pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);

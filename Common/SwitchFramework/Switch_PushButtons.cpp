@@ -4,6 +4,7 @@
  * 
  */
 
+#include "Common/Compiler.h"
 #include "Common/MessageProtocol.h"
 #include "Common/SwitchFramework/FrameworkSettings.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"

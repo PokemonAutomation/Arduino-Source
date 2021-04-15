@@ -40,7 +40,7 @@ void EggFetcher2::run_eggfetcher(SingleSwitchProgramEnvironment& env, bool depos
 
     //  1st Fetch: Get into position.
     {
-        env.logger.log("Fetch Attempts: " + tostr_u_commas(c));
+        env.log("Fetch Attempts: " + tostr_u_commas(c));
         fly_home_collect_egg(true);
         collect_egg_mash_out(deposit_automatically);
 
@@ -52,7 +52,7 @@ void EggFetcher2::run_eggfetcher(SingleSwitchProgramEnvironment& env, bool depos
 
     //  Now we are in steady state.
     for (; c < attempts; c++){
-        env.logger.log("Fetch Attempts: " + tostr_u_commas(c));
+        env.log("Fetch Attempts: " + tostr_u_commas(c));
         eggfetcher_loop();
         collect_egg();
         collect_egg_mash_out(deposit_automatically);

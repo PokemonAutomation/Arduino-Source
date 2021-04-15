@@ -9,6 +9,7 @@
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
+#include "CommonFramework/Tools/StatsTracking.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_BeamSetter.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
 #include "PokemonSwSh_PurpleBeamFinder.h"
@@ -43,6 +44,35 @@ PurpleBeamFinder::PurpleBeamFinder()
     m_options.emplace_back(&TIMEOUT_DELAY, "TIMEOUT_DELAY");
 }
 
+
+
+
+struct PurpleBeamFinder::Stats : public StatsTracker{
+    Stats()
+        : attempts(m_stats["Attempts"])
+        , timeouts(m_stats["Timeouts"])
+        , red_detected(m_stats["Red Detected"])
+        , red_presumed(m_stats["Red Presumed"])
+        , purple(m_stats["Purple"])
+    {
+        m_display_order.emplace_back(Stat("Attempts"));
+        m_display_order.emplace_back(Stat("Timeouts"));
+        m_display_order.emplace_back(Stat("Red Detected"));
+        m_display_order.emplace_back(Stat("Red Presumed"));
+        m_display_order.emplace_back(Stat("Purple"));
+    }
+    uint64_t& attempts;
+    uint64_t& timeouts;
+    uint64_t& red_detected;
+    uint64_t& red_presumed;
+    uint64_t& purple;
+};
+std::unique_ptr<StatsTracker> PurpleBeamFinder::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
+
+
+
 void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env) const{
     grip_menu_connect_go_home();
 
@@ -51,11 +81,7 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env) const{
     env.console.botbase().wait_for_all_requests();
 
 
-    uint64_t attempts = 0;
-    uint64_t red_detected = 0;
-    uint64_t red_assumed = 0;
-    uint64_t timed_out = 0;
-    uint64_t purple = 0;
+    Stats& stats = env.stats<Stats>();
 
 
     bool exit = false;
@@ -70,42 +96,33 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env) const{
 
         BeamSetter::Detection detection;
         {
-            BeamSetter setter(env.console, env.logger);
+            BeamSetter setter(env.console, env.logger());
             detection = setter.run(env, env.console, DETECTION_THRESHOLD, TIMEOUT_DELAY);
-            attempts++;
+            stats.attempts++;
         }
         switch (detection){
         case BeamSetter::NO_DETECTION:
-            timed_out++;
+            stats.timeouts++;
             break;
         case BeamSetter::RED_DETECTED:
-            red_detected++;
+            stats.red_detected++;
             break;
         case BeamSetter::RED_ASSUMED:
-            red_assumed++;
+            stats.red_presumed++;
             break;
         case BeamSetter::PURPLE:
-            purple++;
+            stats.purple++;
             exit = true;
             break;
         }
-        {
-            std::string status = "Attempts: " + tostr_u_commas(attempts);
-            status += " - Timeouts: " + tostr_u_commas(timed_out);
-            status += " - Red Detected: " + tostr_u_commas(red_detected);
-            status += " - Red Presumed: " + tostr_u_commas(red_assumed);
-            status += " - Purple: " + tostr_u_commas(purple);
-            QString str = status.c_str();
-            env.set_status(str);
-            env.logger.log("<b>" + str + "</b>");
-        }
+        env.update_stats();
         if (exit){
             break;
         }
 
         pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
         reset_game_from_home_with_inference(
-            env, env.logger, env.console,
+            env, env.console,
             TOLERATE_SYSTEM_UPDATE_MENU_SLOW
         );
     }

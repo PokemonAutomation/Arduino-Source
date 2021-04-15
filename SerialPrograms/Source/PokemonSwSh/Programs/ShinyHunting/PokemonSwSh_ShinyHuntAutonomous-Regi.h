@@ -13,7 +13,6 @@
 #include "NintendoSwitch/Options/TimeExpression.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/RegiSelector.h"
-#include "PokemonSwSh_EncounterStats.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -23,14 +22,11 @@ class ShinyHuntAutonomousRegi : public SingleSwitchProgram{
 public:
     ShinyHuntAutonomousRegi();
 
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env) const override;
 
 private:
-    struct Stats : public EncounterStats{
-        Stats() : EncounterStats(true) {}
-        virtual std::string stats() const override;
-        uint64_t m_light_resets = 0;
-    };
+    struct Stats;
 
     BooleanCheckBox GO_HOME_WHEN_DONE;
     RegiSelector REGI_NAME;

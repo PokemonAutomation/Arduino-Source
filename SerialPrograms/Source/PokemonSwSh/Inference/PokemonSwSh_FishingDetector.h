@@ -36,7 +36,7 @@ public:
 
     Detection detect_now();
     Detection wait_for_detection(
-        ProgramEnvironment& env, Logger& logger,
+        ProgramEnvironment& env,
         std::chrono::seconds timeout = std::chrono::seconds(12)
     );
 

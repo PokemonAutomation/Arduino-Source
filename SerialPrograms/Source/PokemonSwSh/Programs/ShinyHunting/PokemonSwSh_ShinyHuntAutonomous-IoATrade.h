@@ -11,7 +11,6 @@
 #include "CommonFramework/Options/BooleanCheckBox.h"
 #include "NintendoSwitch/Options/TimeExpression.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
-#include "PokemonSwSh_EncounterStats.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -21,14 +20,11 @@ class ShinyHuntAutonomousIoATrade : public SingleSwitchProgram{
 public:
     ShinyHuntAutonomousIoATrade();
 
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env) const override;
 
 private:
-    struct Stats : public EncounterStats{
-        Stats() : EncounterStats(false) {}
-        virtual std::string stats() const override;
-        uint64_t m_errors = 0;
-    };
+    struct Stats;
 
     BooleanCheckBox GO_HOME_WHEN_DONE;
     SectionDivider m_advanced_options;

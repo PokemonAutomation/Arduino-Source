@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_DenTools_H
 #define PokemonAutomation_PokemonSwSh_DenTools_H
 
+#include "Common/Compiler.h"
 #include "Common/SwitchFramework/FrameworkSettings.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"

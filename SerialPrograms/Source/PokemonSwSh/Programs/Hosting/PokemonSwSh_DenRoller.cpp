@@ -62,7 +62,7 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env) const{
         rollback_date_from_home(SKIPS);
 //        reset_game_from_home(TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
         reset_game_from_home_with_inference(
-            env, env.logger, env.console,
+            env, env.console,
             TOLERATE_SYSTEM_UPDATE_MENU_SLOW
         );
     }

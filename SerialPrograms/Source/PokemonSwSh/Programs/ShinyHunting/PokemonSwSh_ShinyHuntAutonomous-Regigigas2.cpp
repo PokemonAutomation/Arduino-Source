@@ -62,32 +62,38 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
 
 
 
-std::string ShinyHuntAutonomousRegigigas2::Stats::stats() const{
-    std::string str;
-    str += str_encounters();
-    str += " - Timeouts: " + tostr_u_commas(m_timeouts);
-    str += str_shinies();
-    return str;
+struct ShinyHuntAutonomousRegigigas2::Stats : public ShinyHuntTracker{
+    Stats()
+        : ShinyHuntTracker(true)
+        , m_timeouts(m_stats["Timeouts"])
+    {
+        m_display_order.insert(m_display_order.begin() + 1, Stat("Timeouts"));
+    }
+    uint64_t& m_timeouts;
+};
+std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegigigas2::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
 }
 
+
+
+
 ShinyHuntAutonomousRegigigas2::Tracker::Tracker(
-    EncounterStats& stats,
+    ShinyHuntTracker& stats,
     ProgramEnvironment& env,
-    Logger& logger,
     ConsoleHandle& console,
     bool require_square,
     uint16_t exit_battle_time
 )
     : StandardEncounterTracker(stats, console, require_square, exit_battle_time)
     , m_env(env)
-    , m_logger(logger)
 {}
 bool ShinyHuntAutonomousRegigigas2::Tracker::run_away(){
     RaidCatchDetector detector(m_console, std::chrono::seconds(30));
     pbf_mash_button(BUTTON_A, 4 * TICKS_PER_SECOND);
 
     if (!detector.wait(m_env)){
-        m_logger.log("Raid Catch Menu not found.", Qt::red);
+        m_env.log("Raid Catch Menu not found.", Qt::red);
         return false;
     }
 
@@ -101,7 +107,7 @@ bool ShinyHuntAutonomousRegigigas2::kill_and_return(SingleSwitchProgramEnvironme
     pbf_mash_button(BUTTON_A, 4 * TICKS_PER_SECOND);
 
     if (!detector.wait(env)){
-        env.logger.log("Raid Catch Menu not found.", Qt::red);
+        env.log("Raid Catch Menu not found.", Qt::red);
         return false;
     }
 
@@ -119,25 +125,25 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env)
 
     resume_game_back_out(TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);
 
-    Stats stats;
-    Tracker tracker(stats, env, env.logger, env.console, REQUIRE_SQUARE, 0);
+    Stats& stats = env.stats<Stats>();
+    Tracker tracker(stats, env, env.console, REQUIRE_SQUARE, 0);
 
     while (true){
         for (uint8_t pp = REVERSAL_PP; pp > 0; pp--){
-            stats.log_stats(env, env.logger);
+            env.update_stats();
 
-            env.logger.log("Starting Regigigas Encounter: " + tostr_u_commas(stats.encounters() + 1));
+            env.log("Starting Regigigas Encounter: " + tostr_u_commas(stats.encounters() + 1));
 
             pbf_mash_button(BUTTON_A, 18 * TICKS_PER_SECOND);
             env.console.botbase().wait_for_all_requests();
 
             {
                 StartBattleDetector detector(env.console, std::chrono::seconds(30));
-                detector.wait(env, env.logger);
+                detector.wait(env);
             }
 
             ShinyDetection detection = detect_shiny_battle(
-                env, env.console, env.logger,
+                env, env.console,
                 SHINY_BATTLE_RAID,
                 std::chrono::seconds(30)
             );
@@ -157,14 +163,14 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env)
             last_touch += TOUCH_DATE_INTERVAL;
         }
         reset_game_from_home_with_inference(
-            env, env.logger, env.console,
+            env, env.console,
             TOLERATE_SYSTEM_UPDATE_MENU_FAST
         );
     }
 
 
 StopProgram:
-    stats.log_stats(env, env.logger);
+    env.update_stats();
 
     if (GO_HOME_WHEN_DONE){
         pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);

@@ -5,6 +5,7 @@
  */
 
 #include <cmath>
+#include "Common/Compiler.h"
 #include "PokemonSwSh_SquareDetector.h"
 
 #include <iostream>
@@ -18,17 +19,28 @@ namespace PokemonSwSh{
 
 
 struct Point{
-    int x;
-    int y;
+    pxint_t x;
+    pxint_t y;
     double distance;
     double angle;
     bool remove;
 };
 
+void dump_matrix(
+    FillMatrix submatrix,
+    pxint_t center_x, pxint_t center_y,
+    const std::vector<Point>& points
+){
+    submatrix[center_y][center_x] = 9;
+    for (const Point& item : points){
+        submatrix[item.y][item.x] = 9;
+    }
+    cout << submatrix.dump() << endl;
+}
 template <typename MapType>
 void dump_matrix(
     FillMatrix submatrix,
-    int center_x, int center_y,
+    pxint_t center_x, pxint_t center_y,
     const MapType& points_by_distance
 ){
     submatrix[center_y][center_x] = 9;
@@ -47,16 +59,16 @@ bool check_hole(
     size_t& background_area,
     FillMatrix& submatrix,
     size_t object_area,
-    int object_center_x,
-    int object_center_y
+    pxint_t object_center_x,
+    pxint_t object_center_y
 ){
-    int width = submatrix.width();
-    int height = submatrix.height();
+    pxint_t width = submatrix.width();
+    pxint_t height = submatrix.height();
     size_t box_area = (size_t)width * height;
 
     //  Fill in the edges.
     size_t edge_area = 0;
-    for (int c = 0; c < width; c++){
+    for (pxint_t c = 0; c < width; c++){
         FillGeometry body;
         if (fill_geometry(body, submatrix, 1, c, 0, false, 2)){
             edge_area += body.area;
@@ -65,7 +77,7 @@ bool check_hole(
             edge_area += body.area;
         }
     }
-    for (int r = 0; r < height; r++){
+    for (pxint_t r = 0; r < height; r++){
         FillGeometry body;
         if (fill_geometry(body, submatrix, 1, 0, r, false, 2)){
             edge_area += body.area;
@@ -110,60 +122,60 @@ bool check_hole(
 //
 std::vector<Point> get_furthest_points(
     const FillMatrix& submatrix,
-    int center_x, int center_y
+    pxint_t center_x, pxint_t center_y
 ){
-    int width = submatrix.width();
-    int height = submatrix.height();
+    pxint_t width = submatrix.width();
+    pxint_t height = submatrix.height();
 //    cout << "width  = " << width << endl;
 //    cout << "height = " << height << endl;
 
     //  Keep points that are locally furthest away from the center.
     std::vector<Point> points;
-    for (int r = 0; r < height; r++){
-        for (int c = 0; c < width; c++){
+    for (pxint_t r = 0; r < height; r++){
+        for (pxint_t c = 0; c < width; c++){
             FillMatrix::ObjectID cell = submatrix[r][c];
             if (cell != 0){
                 continue;
             }
 
-            int my_dx2 = c - center_x;
-            int my_dy2 = r - center_y;
+            pxint_t my_dx2 = c - center_x;
+            pxint_t my_dy2 = r - center_y;
             my_dx2 *= my_dx2;
             my_dy2 *= my_dy2;
 
             {
-                int dx2 = c + 1 - center_x;
+                pxint_t dx2 = c + 1 - center_x;
                 dx2 *= dx2;
                 if (dx2 > my_dx2 && c + 1 < width && submatrix[r][c + 1] == 0){
                     continue;
                 }
             }
             {
-                int dx2 = c - 1 - center_x;
+                pxint_t dx2 = c - 1 - center_x;
                 dx2 *= dx2;
                 if (dx2 > my_dx2 && c > 0 && submatrix[r][c - 1] == 0){
                     continue;
                 }
             }
             {
-                int dy2 = r + 1 - center_y;
+                pxint_t dy2 = r + 1 - center_y;
                 dy2 *= dy2;
                 if (dy2 > my_dy2 && r + 1 < height && submatrix[r + 1][c] == 0){
                     continue;
                 }
             }
             {
-                int dy2 = r - 1 - center_y;
+                pxint_t dy2 = r - 1 - center_y;
                 dy2 *= dy2;
                 if (dy2 > my_dy2 && r > 0 && submatrix[r - 1][c] == 0){
                     continue;
                 }
             }
 
-            int my_distance = my_dx2 + my_dy2;
+            pxint_t my_distance = my_dx2 + my_dy2;
             {
-                int dx2 = c + 1 - center_x;
-                int dy2 = r + 1 - center_y;
+                pxint_t dx2 = c + 1 - center_x;
+                pxint_t dy2 = r + 1 - center_y;
                 dx2 *= dx2;
                 dy2 *= dy2;
                 if (dx2 + dy2 > my_distance && c + 1 < width && r + 1 < height && submatrix[r + 1][c + 1] == 0){
@@ -171,8 +183,8 @@ std::vector<Point> get_furthest_points(
                 }
             }
             {
-                int dx2 = c - 1 - center_x;
-                int dy2 = r + 1 - center_y;
+                pxint_t dx2 = c - 1 - center_x;
+                pxint_t dy2 = r + 1 - center_y;
                 dx2 *= dx2;
                 dy2 *= dy2;
                 if (dx2 + dy2 > my_distance && c > 0 && r + 1 < height && submatrix[r + 1][c - 1] == 0){
@@ -180,8 +192,8 @@ std::vector<Point> get_furthest_points(
                 }
             }
             {
-                int dx2 = c + 1 - center_x;
-                int dy2 = r - 1 - center_y;
+                pxint_t dx2 = c + 1 - center_x;
+                pxint_t dy2 = r - 1 - center_y;
                 dx2 *= dx2;
                 dy2 *= dy2;
                 if (dx2 + dy2 > my_distance && c + 1 < width && r > 0 && submatrix[r - 1][c + 1] == 0){
@@ -189,8 +201,8 @@ std::vector<Point> get_furthest_points(
                 }
             }
             {
-                int dx2 = c - 1 - center_x;
-                int dy2 = r - 1 - center_y;
+                pxint_t dx2 = c - 1 - center_x;
+                pxint_t dy2 = r - 1 - center_y;
                 dx2 *= dx2;
                 dy2 *= dy2;
                 if (dx2 + dy2 > my_distance && c > 0 && r > 0 && submatrix[r - 1][c - 1] == 0){
@@ -218,6 +230,10 @@ void merge_nearby_points(std::map<double, Point>& points, double min_distance_di
     const int DISTANCE_THRESHOLD = 5 * 5;
     bool changed;
     do{
+        if (points.size() < 4){
+            return;
+        }
+
         //  Iterate adjacent points and merge points that are close together.
         changed = false;
         auto iter = points.begin();
@@ -226,9 +242,9 @@ void merge_nearby_points(std::map<double, Point>& points, double min_distance_di
         for (; iter != points.end(); ++iter){
 
             Point* current = &iter->second;
-            int dx = current->x - last->x;
-            int dy = current->y - last->y;
-            int distance = dx*dx + dy*dy;
+            pxint_t dx = current->x - last->x;
+            pxint_t dy = current->y - last->y;
+            uint64_t distance = (int64_t)dx*dx + (int64_t)dy*dy;
             if (distance < DISTANCE_THRESHOLD){
                 if (current->distance + min_distance_diff < last->distance){
                     current->remove = true;
@@ -243,9 +259,9 @@ void merge_nearby_points(std::map<double, Point>& points, double min_distance_di
         }
         {
             Point* current = &points.begin()->second;
-            int dx = current->x - last->x;
-            int dy = current->y - last->y;
-            int distance = dx*dx + dy*dy;
+            pxint_t dx = current->x - last->x;
+            pxint_t dy = current->y - last->y;
+            uint64_t distance = (int64_t)dx*dx + (int64_t)dy*dy;
             if (distance < DISTANCE_THRESHOLD){
                 if (current->distance + min_distance_diff < last->distance){
                     current->remove = true;
@@ -260,12 +276,12 @@ void merge_nearby_points(std::map<double, Point>& points, double min_distance_di
         }
 
         //  Remove points marked for removal.
-        for (iter = points.begin(); iter != points.end(); ++iter){
+        for (iter = points.begin(); iter != points.end();){
             if (iter->second.remove){
 //                cout << "remove" << endl;
-                points.erase(iter);
+                iter = points.erase(iter);
             }else{
-                iter->second.remove = false;
+                ++iter;
             }
         }
 //        cout << "asdf" << endl;
@@ -288,9 +304,9 @@ double normalize_angle_0_360(double angle){
 
 
 double area_of_triangle(
-    int x0, int y0,
-    int x1, int y1,
-    int x2, int y2
+    pxint_t x0, pxint_t y0,
+    pxint_t x1, pxint_t y1,
+    pxint_t x2, pxint_t y2
 ){
     return ((double)(x0 - x2) * (y1 - y0) - (double)(x0 - x1) * (y2 - y0)) * 0.5;
 }
@@ -302,32 +318,35 @@ double area_of_triangle(
 //  The returned map is keyed by the angle of the point to the center of the
 //  object. This angle is relative to "base_angle" and reduced [0, 360).
 //
-std::multimap<double, std::pair<int, int>> get_edge_points(
+std::multimap<double, std::pair<pxint_t, pxint_t>> get_edge_points(
     const FillMatrix& submatrix,
-    int center_x, int center_y, double base_angle,
+    pxint_t center_x, pxint_t center_y, double base_angle,
     FillMatrix::ObjectID object,
     FillMatrix::ObjectID background
 ){
-    int width = submatrix.width();
-    int height = submatrix.height();
+    pxint_t width = submatrix.width();
+    pxint_t height = submatrix.height();
 
-    std::multimap<double, std::pair<int, int>> ret;
-    for (int r = 0; r < height; r++){
-        for (int c = 0; c < width; c++){
+    std::multimap<double, std::pair<pxint_t, pxint_t>> ret;
+    for (pxint_t r = 0; r < height; r++){
+        for (pxint_t c = 0; c < width; c++){
             if (submatrix[r][c] != object){
                 continue;
             }
             if (
-                (c > 0 && submatrix[r][c - 1] == background) ||
+                (c     > 0     && submatrix[r][c - 1] == background) ||
                 (c + 1 < width && submatrix[r][c + 1] == background) ||
-                (r > 0 && submatrix[r - 1][c] == background) ||
+                (r     > 0     && submatrix[r - 1][c] == background) ||
                 (r + 1 < width && submatrix[r + 1][c] == background)
             ){
-                double angle = std::atan2(r - center_y, c - center_x) * 57.295779513082320877;
+                double angle = std::atan2(
+                    r - center_y,
+                    c - center_x
+                ) * 57.295779513082320877;
                 angle = normalize_angle_0_360(angle - base_angle);
                 ret.emplace(
                     angle,
-                    std::pair<int, int>{c, r}
+                    std::pair<pxint_t, pxint_t>{c, r}
                 );
             }
         }
@@ -345,9 +364,9 @@ std::multimap<double, std::pair<int, int>> get_edge_points(
 //      [point_hi_x, point_hi_y]
 //
 double sum_squares_from_line(
-    const std::multimap<double, std::pair<int, int>>& points_by_angle,
-    double point_lo_angle, int point_lo_x, int point_lo_y,
-    double point_hi_angle, int point_hi_x, int point_hi_y
+    const std::multimap<double, std::pair<pxint_t, pxint_t>>& points_by_angle,
+    double point_lo_angle, pxint_t point_lo_x, pxint_t point_lo_y,
+    double point_hi_angle, pxint_t point_hi_x, pxint_t point_hi_y
 ){
 //    cout << "Point 0: angle = " << point_lo_angle << ", [" << point_lo_x << "," << point_lo_y << "]" << endl;
 //    cout << "Point 1: angle = " << point_hi_angle << ", [" << point_hi_x << "," << point_hi_y << "]" << endl;
@@ -370,8 +389,8 @@ double sum_squares_from_line(
 //        cout << "slope = " << slope << endl;
         double inverse = 1 / (slope*slope + 1);
         for (; iter0 != iter1; ++iter0){
-            int dx = iter0->second.first - point_lo_x;
-            int dy = iter0->second.second - point_lo_y;
+            pxint_t dx = iter0->second.first - point_lo_x;
+            pxint_t dy = iter0->second.second - point_lo_y;
             double top = slope * dx - dy;
             double distance_sqr = top * top * inverse;
 //            cout << "    angle = " << iter0->first
@@ -400,32 +419,35 @@ bool is_square2(
 //    static int c = 0;
 //    image.copy(object.box.min_x, object.box.min_y, object.box.width(), object.box.height()).save("item-" + QString::number(++c) + ".png");
 
-    int width = object.box.width();
-    int height = object.box.height();
+    pxint_t width = object.box.width();
+    pxint_t height = object.box.height();
 //    cout << "width  = " << width << endl;
 //    cout << "height = " << height << endl;
     if (width < 10 || height < 10){
         return false;
     }
-    if (object.area * 10 > matrix.height() * matrix.width()){
+    if (object.area * 10 > (size_t)matrix.height() * matrix.width()){
 //        cout << "Bad area." << endl;
         return false;
     }
 //    size_t box_area = (size_t)width * height;
 
     FillMatrix submatrix = matrix.extract(object.box, object.id);
-    int center_x = object.center_x - object.box.min_x;
-    int center_y = object.center_y - object.box.min_y;
+    pxint_t center_x = object.center_x - object.box.min_x;
+    pxint_t center_y = object.center_y - object.box.min_y;
 
     //  Invert the cells.
-    for (int r = 0; r < height; r++){
-        for (int c = 0; c < width; c++){
+    for (pxint_t r = 0; r < height; r++){
+        for (pxint_t c = 0; c < width; c++){
             FillMatrix::ObjectID cell = submatrix[r][c];
             cell = cell ? 0 : 1;
             submatrix[r][c] = cell;
         }
     }
 //    cout << submatrix.dump() << endl;
+
+//    static int c = 0;
+//    image.copy(object.box.min_x, object.box.min_y, object.box.width(), object.box.height()).save("item-" + QString::number(++c) + ".png");
 
     //  Check the hole
     size_t background_area;
@@ -454,7 +476,6 @@ bool is_square2(
             }
         }
     }
-    const Point& far_corner0 = *best_point;
 
 //    dump_matrix(submatrix, center_x, center_y, corner_candidates);
 
@@ -476,13 +497,21 @@ bool is_square2(
         points_by_angle[angle] = point;
 //        cout << "distance = " << point.first << ": " << point.second.x << ", " << point.second.y << endl;
     }
+    if (points_by_angle.size() < 4){
+        return false;
+    }
+    Point far_corner0 = *best_point;
     corner_candidates.clear();
 
 
     //  Merge points that are close together.
     merge_nearby_points(points_by_angle);
+    if (points_by_angle.size() < 4){
+        return false;
+    }
 
 //    dump_matrix(submatrix, center_x, center_y, points_by_angle);
+//    cout << "points = " << points_by_angle.size() << endl;
 
 
     //  Look for a point opposite to the furthest.
@@ -503,13 +532,14 @@ bool is_square2(
             }
         }
         if (best_opposite < 160){
-//            cout << "bad angle" << endl;
+//            cout << "bad angle = " << best_opposite << endl;
             return false;
         }
     }
+//    cout << "qwer" << endl;
 
 
-    const Point& far_corner1 = *best_point;
+    Point far_corner1 = *best_point;
     double far_corner1_angle = normalize_angle_0_360(far_corner1.angle - far_corner0.angle);
 
 
@@ -533,11 +563,14 @@ bool is_square2(
 
 
     //  Build array of all edge pixels.
-    std::multimap<double, std::pair<int, int>> edge_pixels = get_edge_points(
+    std::multimap<double, std::pair<pxint_t, pxint_t>> edge_pixels = get_edge_points(
         submatrix,
         center_x, center_y, far_corner0.angle,
         0, 2
     );
+    if (edge_pixels.empty()){
+        return false;
+    }
 
 //    dump_matrix(submatrix, center_x, center_y, points_by_angle);
 

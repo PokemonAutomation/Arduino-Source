@@ -177,21 +177,21 @@ void MultiHostTableOptionUI::replace_table(){
 
 
     size_t rows = m_value.m_current.size();
-    m_table->setRowCount(m_value.m_current.size() + 1);
+    m_table->setRowCount((int)(m_value.m_current.size() + 1));
     for (size_t c = 0; c < rows; c++){
         const auto& item = m_value.m_current[c];
-        m_index_table.emplace_back(new int);
-        add_row(c, item, *m_index_table.back());
+        m_index_table.emplace_back(new size_t);
+        add_row((int)c, item, *m_index_table.back());
     }
 
     QPushButton* button = new QPushButton(m_table);
     button->setText("Add Row");
-    m_table->setCellWidget(m_value.m_current.size(), 0, button);
+    m_table->setCellWidget((int)m_value.m_current.size(), 0, button);
     update_table_height();
     connect(
         button, &QPushButton::clicked,
         this, [&](bool){
-            int index = m_index_table.size();
+            size_t index = m_index_table.size();
 
             //  Update data vector.
             m_value.m_current.emplace_back(
@@ -206,34 +206,34 @@ void MultiHostTableOptionUI::replace_table(){
             const auto& item = m_value.m_current.back();
 
             //  Update index vector.
-            m_index_table.emplace_back(new int);
+            m_index_table.emplace_back(new size_t);
 
             //  Update UI.
-            m_table->insertRow(index);
+            m_table->insertRow((int)index);
             add_row(index, item, *m_index_table.back());
             update_table_height();
         }
     );
 }
-void MultiHostTableOptionUI::add_row(int row, const MultiHostTableOption::GameSlot& game, int& index_ref){
+void MultiHostTableOptionUI::add_row(size_t row, const MultiHostTableOption::GameSlot& game, size_t& index_ref){
     index_ref = row;
-    m_table->setCellWidget(row,  0, make_game_slot_box(*m_table, index_ref, game.game_slot - 1));
-    m_table->setCellWidget(row,  1, make_user_slot_box(*m_table, index_ref, game.user_slot - 1));
-    m_table->setCellWidget(row,  2, make_skips_box(*m_table, index_ref, game.skips));
-    m_table->setCellWidget(row,  3, make_backup_save_box(*m_table, index_ref, game.backup_save));
-    m_table->setCellWidget(row,  4, make_catchable_box(*m_table, index_ref, game.always_catchable));
-    m_table->setCellWidget(row,  5, make_accept_FRs_box(*m_table, index_ref, game.accept_FRs));
-    m_table->setCellWidget(row,  6, make_move_slot_box(*m_table, index_ref, game.move_slot));
-    m_table->setCellWidget(row,  7, make_dynamax_box(*m_table, index_ref, game.dynamax));
-    m_table->setCellWidget(row,  8, make_delay_box(*m_table, index_ref, game.post_raid_delay));
-    m_table->setCellWidget(row,  9, make_insert_button(*m_table, index_ref));
-    m_table->setCellWidget(row, 10, make_remove_button(*m_table, index_ref));
+    m_table->setCellWidget((int)row,  0, make_game_slot_box(*m_table, index_ref, game.game_slot - 1));
+    m_table->setCellWidget((int)row,  1, make_user_slot_box(*m_table, index_ref, game.user_slot - 1));
+    m_table->setCellWidget((int)row,  2, make_skips_box(*m_table, index_ref, game.skips));
+    m_table->setCellWidget((int)row,  3, make_backup_save_box(*m_table, index_ref, game.backup_save));
+    m_table->setCellWidget((int)row,  4, make_catchable_box(*m_table, index_ref, game.always_catchable));
+    m_table->setCellWidget((int)row,  5, make_accept_FRs_box(*m_table, index_ref, game.accept_FRs));
+    m_table->setCellWidget((int)row,  6, make_move_slot_box(*m_table, index_ref, game.move_slot));
+    m_table->setCellWidget((int)row,  7, make_dynamax_box(*m_table, index_ref, game.dynamax));
+    m_table->setCellWidget((int)row,  8, make_delay_box(*m_table, index_ref, game.post_raid_delay));
+    m_table->setCellWidget((int)row,  9, make_insert_button(*m_table, index_ref));
+    m_table->setCellWidget((int)row, 10, make_remove_button(*m_table, index_ref));
 }
-QComboBox* MultiHostTableOptionUI::make_game_slot_box(QWidget& parent, int& row, int slot){
+QComboBox* MultiHostTableOptionUI::make_game_slot_box(QWidget& parent, size_t& row, size_t slot){
     QComboBox* box = new QComboBox(&parent);
     box->addItem("Slot 1");
     box->addItem("Slot 2");
-    box->setCurrentIndex(slot);
+    box->setCurrentIndex((int)slot);
     connect(
         box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
         this, [&](int index){
@@ -242,7 +242,7 @@ QComboBox* MultiHostTableOptionUI::make_game_slot_box(QWidget& parent, int& row,
     );
     return box;
 }
-QComboBox* MultiHostTableOptionUI::make_user_slot_box(QWidget& parent, int& row, int slot){
+QComboBox* MultiHostTableOptionUI::make_user_slot_box(QWidget& parent, size_t& row, size_t slot){
     QComboBox* box = new QComboBox(&parent);
     box->addItem("User 1");
     box->addItem("User 2");
@@ -252,7 +252,7 @@ QComboBox* MultiHostTableOptionUI::make_user_slot_box(QWidget& parent, int& row,
     box->addItem("User 6");
     box->addItem("User 7");
     box->addItem("User 8");
-    box->setCurrentIndex(slot);
+    box->setCurrentIndex((int)slot);
     connect(
         box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
         this, [&](int index){
@@ -261,7 +261,7 @@ QComboBox* MultiHostTableOptionUI::make_user_slot_box(QWidget& parent, int& row,
     );
     return box;
 }
-QLineEdit* MultiHostTableOptionUI::make_skips_box(QWidget& parent, int& row, int skips){
+QLineEdit* MultiHostTableOptionUI::make_skips_box(QWidget& parent, size_t& row, size_t skips){
     QLineEdit* box = new QLineEdit(&parent);
     QIntValidator* validator = new QIntValidator(0, 965, box);
     box->setValidator(validator);
@@ -284,7 +284,7 @@ QLineEdit* MultiHostTableOptionUI::make_skips_box(QWidget& parent, int& row, int
     );
     return box;
 }
-QWidget* MultiHostTableOptionUI::make_backup_save_box(QWidget& parent, int& row, bool backup_save){
+QWidget* MultiHostTableOptionUI::make_backup_save_box(QWidget& parent, size_t& row, bool backup_save){
     QWidget* widget = new QWidget(&parent);
     QHBoxLayout* layout = new QHBoxLayout(widget);
     layout->setAlignment(Qt::AlignHCenter);
@@ -300,7 +300,7 @@ QWidget* MultiHostTableOptionUI::make_backup_save_box(QWidget& parent, int& row,
     );
     return widget;
 }
-QWidget* MultiHostTableOptionUI::make_catchable_box(QWidget& parent, int& row, bool always_catchable){
+QWidget* MultiHostTableOptionUI::make_catchable_box(QWidget& parent, size_t& row, bool always_catchable){
     QWidget* widget = new QWidget(&parent);
     QHBoxLayout* layout = new QHBoxLayout(widget);
     layout->setAlignment(Qt::AlignHCenter);
@@ -316,7 +316,7 @@ QWidget* MultiHostTableOptionUI::make_catchable_box(QWidget& parent, int& row, b
     );
     return widget;
 }
-QWidget* MultiHostTableOptionUI::make_accept_FRs_box(QWidget& parent, int& row, bool accept_FRs){
+QWidget* MultiHostTableOptionUI::make_accept_FRs_box(QWidget& parent, size_t& row, bool accept_FRs){
     QWidget* widget = new QWidget(&parent);
     QHBoxLayout* layout = new QHBoxLayout(widget);
     layout->setAlignment(Qt::AlignHCenter);
@@ -332,14 +332,14 @@ QWidget* MultiHostTableOptionUI::make_accept_FRs_box(QWidget& parent, int& row, 
     );
     return widget;
 }
-QComboBox* MultiHostTableOptionUI::make_move_slot_box(QWidget& parent, int& row, int move_slot){
+QComboBox* MultiHostTableOptionUI::make_move_slot_box(QWidget& parent, size_t& row, size_t move_slot){
     QComboBox* box = new QComboBox(&parent);
     box->addItem("None");
     box->addItem("Slot 1");
     box->addItem("Slot 2");
     box->addItem("Slot 3");
     box->addItem("Slot 4");
-    box->setCurrentIndex(move_slot);
+    box->setCurrentIndex((int)move_slot);
     connect(
         box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
         this, [&](int index){
@@ -348,7 +348,7 @@ QComboBox* MultiHostTableOptionUI::make_move_slot_box(QWidget& parent, int& row,
     );
     return box;
 }
-QWidget* MultiHostTableOptionUI::make_dynamax_box(QWidget& parent, int& row, bool dynamax){
+QWidget* MultiHostTableOptionUI::make_dynamax_box(QWidget& parent, size_t& row, bool dynamax){
     QWidget* widget = new QWidget(&parent);
     QHBoxLayout* layout = new QHBoxLayout(widget);
     layout->setAlignment(Qt::AlignHCenter);
@@ -364,7 +364,7 @@ QWidget* MultiHostTableOptionUI::make_dynamax_box(QWidget& parent, int& row, boo
     );
     return widget;
 }
-QLineEdit* MultiHostTableOptionUI::make_delay_box(QWidget& parent, int& row, const QString& post_raid_delay){
+QLineEdit* MultiHostTableOptionUI::make_delay_box(QWidget& parent, size_t& row, const QString& post_raid_delay){
     QLineEdit* box = new QLineEdit(&parent);
     box->setText(post_raid_delay);
 //    box->setMaxLength(3);
@@ -381,7 +381,7 @@ QLineEdit* MultiHostTableOptionUI::make_delay_box(QWidget& parent, int& row, con
     );
     return box;
 }
-QPushButton* MultiHostTableOptionUI::make_insert_button(QWidget& parent, int& row){
+QPushButton* MultiHostTableOptionUI::make_insert_button(QWidget& parent, size_t& row){
     QPushButton* button = new QPushButton(&parent);
     QFont font;
     font.setBold(true);
@@ -395,7 +395,7 @@ QPushButton* MultiHostTableOptionUI::make_insert_button(QWidget& parent, int& ro
     connect(
         button, &QPushButton::clicked,
         this, [&](bool){
-            int index = row;
+            size_t index = row;
             MultiHostTableOption::GameSlot item{
                 1, 1,
                 3, false, true,
@@ -408,21 +408,21 @@ QPushButton* MultiHostTableOptionUI::make_insert_button(QWidget& parent, int& ro
             m_value.m_current.insert(m_value.m_current.begin() + index, item);
 
             //  Update index vector.
-            m_index_table.insert(m_index_table.begin() + index, std::unique_ptr<int>(new int(index)));
-            int& new_row = *m_index_table[index];
+            m_index_table.insert(m_index_table.begin() + index, std::unique_ptr<size_t>(new size_t(index)));
+            size_t& new_row = *m_index_table[index];
             for (size_t c = 0; c < m_index_table.size(); c++){
-                *m_index_table[c] = (int)c;
+                *m_index_table[c] = c;
             }
 
             //  Update UI.
-            m_table->insertRow(index);
+            m_table->insertRow((int)index);
             add_row(index, item, new_row);
             update_table_height();
         }
     );
     return button;
 }
-QPushButton* MultiHostTableOptionUI::make_remove_button(QWidget& parent, int& row){
+QPushButton* MultiHostTableOptionUI::make_remove_button(QWidget& parent, size_t& row){
     QPushButton* button = new QPushButton(&parent);
     QFont font;
     font.setBold(true);
@@ -432,7 +432,7 @@ QPushButton* MultiHostTableOptionUI::make_remove_button(QWidget& parent, int& ro
     connect(
         button, &QPushButton::clicked,
         this, [&](bool){
-            int index = row;
+            size_t index = row;
 
             //  Update data vector.
             m_index_table.erase(m_index_table.begin() + index);
@@ -444,7 +444,7 @@ QPushButton* MultiHostTableOptionUI::make_remove_button(QWidget& parent, int& ro
             m_value.m_current.erase(m_value.m_current.begin() + index);
 
             //  Update UI.
-            m_table->removeRow(index);
+            m_table->removeRow((int)index);
             update_table_height();
         }
     );

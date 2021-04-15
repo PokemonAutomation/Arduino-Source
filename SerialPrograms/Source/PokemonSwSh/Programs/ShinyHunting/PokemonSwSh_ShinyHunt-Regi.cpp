@@ -18,7 +18,7 @@ void move_to_corner(
     bool correction, uint16_t TRANSITION_DELAY
 ){
     if (correction){
-        env.logger.log("Performing auto-correction.");
+        env.log("Performing auto-correction.");
         //  Move down to building exit and exit.
         pbf_move_left_joystick(env.console, 128, 255, 500, TRANSITION_DELAY);
         pbf_move_left_joystick(env.console, 128, 255, 300, TRANSITION_DELAY);
@@ -97,23 +97,23 @@ void run_regi_light_puzzle(
     switch (regi){
     case RegiGolem::Regirock:
         regirock(env.console);
-        env.logger.log("Starting Regirock Encounter: " + tostr_u_commas(encounter + 1));
+        env.log("Starting Regirock Encounter: " + tostr_u_commas(encounter + 1));
         break;
     case RegiGolem::Regice:
         regice(env.console);
-        env.logger.log("Starting Regice Encounter: " + tostr_u_commas(encounter + 1));
+        env.log("Starting Regice Encounter: " + tostr_u_commas(encounter + 1));
         break;
     case RegiGolem::Registeel:
         registeel(env.console);
-        env.logger.log("Starting Registeel Encounter: " + tostr_u_commas(encounter + 1));
+        env.log("Starting Registeel Encounter: " + tostr_u_commas(encounter + 1));
         break;
     case RegiGolem::Regieleki:
         regieleki(env.console);
-        env.logger.log("Starting Regieleki Encounter: " + tostr_u_commas(encounter + 1));
+        env.log("Starting Regieleki Encounter: " + tostr_u_commas(encounter + 1));
         break;
     case RegiGolem::Regidrago:
         regidrago(env.console);
-        env.logger.log("Starting Regidrago Encounter: " + tostr_u_commas(encounter + 1));
+        env.log("Starting Regidrago Encounter: " + tostr_u_commas(encounter + 1));
         break;
     }
 }

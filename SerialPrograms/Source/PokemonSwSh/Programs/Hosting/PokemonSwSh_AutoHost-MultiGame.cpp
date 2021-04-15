@@ -102,7 +102,7 @@ void AutoHostMultiGame::run_autohost(
         for (size_t c = 0; c < 8; c++){
             str[c] = code[c] + '0';
         }
-        env.logger.log("Next Raid Code: " + std::string(str, sizeof(str)));
+        env.log("Next Raid Code: " + std::string(str, sizeof(str)));
         pbf_press_button(BUTTON_PLUS, 5, 145);
         enter_digits(8, code);
         pbf_wait(180);
@@ -112,7 +112,7 @@ void AutoHostMultiGame::run_autohost(
 
     //  Accept friend requests while we wait.
     raid_lobby_wait(
-        env.console, env.logger,
+        env.console, env.logger(),
         HOST_ONLINE,
         accept_FR_slot,
         lobby_wait_delay
@@ -129,11 +129,11 @@ void AutoHostMultiGame::run_autohost(
             pbf_mash_button(BUTTON_A, 3 * TICKS_PER_SECOND);
             env.console.botbase().wait_for_all_requests();
 
-            BlackScreenDetector black_screen(env.console, env.logger);
+            BlackScreenDetector black_screen(env.console, env.logger());
             uint32_t now = start;
             while (now - start < RAID_START_TO_EXIT_DELAY){
                 if (black_screen.black_is_over()){
-                    env.logger.log("Raid has Started!", "blue");
+                    env.log("Raid has Started!", "blue");
                     break;
                 }
                 pbf_mash_button(BUTTON_A, TICKS_PER_SECOND);
@@ -193,14 +193,14 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env) const{
     uint32_t raids = 0;
     bool game_slot_flipped = false;
     while (true){
-        env.logger.log("Beginning from start of game list.");
+        env.log("Beginning from start of game list.");
         for (uint8_t index = 0; index < GAME_LIST.size(); index++){
             const MultiHostTable::GameSlot& game = GAME_LIST[index];
 //            if (game.user_slot == 0){
 //                break;
 //            }
 
-            env.logger.log("Raids Completed: " + tostr_u_commas(raids++));
+            env.log("Raids Completed: " + tostr_u_commas(raids++));
 
             //  Start game.
             rollback_date_from_home(game.skips);
@@ -223,7 +223,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env) const{
                 break;
             }
             start_game_from_home_with_inference(
-                env, env.logger, env.console,
+                env, env.console,
                 TOLERATE_SYSTEM_UPDATE_MENU_SLOW,
                 game_slot,
                 game.user_slot,

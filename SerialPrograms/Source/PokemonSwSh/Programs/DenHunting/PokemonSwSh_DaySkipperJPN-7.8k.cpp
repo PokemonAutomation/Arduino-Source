@@ -141,8 +141,8 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env) const{
         if (date_increment_day(&date, true)){
             remaining_skips--;
             correct_count++;
-            env.logger.log("Expected Date: " + QDate(date.year + 2000, date.month, date.day).toString("yyyy/MM/dd"));
-            env.logger.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
+            env.log("Expected Date: " + QDate(date.year + 2000, date.month, date.day).toString("yyyy/MM/dd"));
+            env.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
         }
         if (CORRECTION_SKIPS != 0 && correct_count == CORRECTION_SKIPS){
             correct_count = 0;

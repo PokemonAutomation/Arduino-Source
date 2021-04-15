@@ -46,7 +46,7 @@ FishingDetector::Detection FishingDetector::detect_now(){
         : Detection::HOOKED;
 }
 FishingDetector::Detection FishingDetector::wait_for_detection(
-    ProgramEnvironment& env, Logger& logger,
+    ProgramEnvironment& env,
     std::chrono::seconds timeout
 ){
     InferenceThrottler throttler(timeout);
@@ -58,18 +58,18 @@ FishingDetector::Detection FishingDetector::wait_for_detection(
         case Detection::NO_DETECTION:
             break;
         case Detection::HOOKED:
-            logger.log("FishEncounterDetector: Detected hook!", "purple");
+            env.log("FishEncounterDetector: Detected hook!", "purple");
             return detection;
         case Detection::MISSED:
-            logger.log("FishEncounterDetector: Missed a hook.", "red");
+            env.log("FishEncounterDetector: Missed a hook.", "red");
             return detection;
         case Detection::BATTLE_MENU:
-            logger.log("FishEncounterDetector: Expected battle menu.", "red");
+            env.log("FishEncounterDetector: Expected battle menu.", "red");
             return detection;
         }
 
         if (throttler.end_iteration(env)){
-        logger.log("FishEncounterDetector: Timed out.", "red");
+            env.log("FishEncounterDetector: Timed out.", "red");
             return Detection::NO_DETECTION;
         }
     }

@@ -61,7 +61,7 @@ void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env) c
 
     uint32_t last_touch = system_clock() - TOUCH_DATE_INTERVAL;
     for (uint32_t c = 0; ; c++){
-        env.logger.log("Starting Trade: " + tostr_u_commas(c + 1));
+        env.log("Starting Trade: " + tostr_u_commas(c + 1));
 
         pbf_press_button(BUTTON_A, 10, 100);
         pbf_press_button(BUTTON_A, 10, 60);

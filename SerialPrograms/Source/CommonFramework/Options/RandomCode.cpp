@@ -40,7 +40,7 @@ bool RaidCode::get_code(uint8_t* code) const{
         }while (x >= 10);
         code[c] = x;
     }
-    for (uint8_t c = m_random_digits; c < m_digits; c++){
+    for (size_t c = m_random_digits; c < m_digits; c++){
         code[c] = code[c - 1];
     }
     return true;
@@ -107,7 +107,7 @@ RandomCodeUI::RandomCodeUI(QWidget& parent, RandomCode& value)
 
         m_box_random = new QLineEdit(QString::number(m_value.m_current.random_digits()), this);
         box_row->addWidget(m_box_random, 1);
-        m_box_random->setValidator(new QIntValidator(0, m_value.m_current.total_digits(), this));
+        m_box_random->setValidator(new QIntValidator(0, (int)m_value.m_current.total_digits(), this));
     }
     {
         QHBoxLayout* box_row = new QHBoxLayout();

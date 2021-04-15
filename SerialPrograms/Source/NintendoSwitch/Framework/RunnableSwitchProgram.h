@@ -11,6 +11,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Options/ConfigOption.h"
 #include "CommonFramework/Panels/RightPanel.h"
 #include "SwitchSetup.h"
@@ -40,6 +41,7 @@ public:
     bool is_valid() const;
     void restore_defaults();
 
+    virtual std::unique_ptr<StatsTracker> make_stats() const{ return nullptr; }
     virtual QWidget* make_ui(MainWindow& window) override;
 
 protected:
@@ -73,7 +75,10 @@ public:
 private:
     void on_stop();
     void reset_connections();
-    virtual void program(){}
+    virtual void program(
+        StatsTracker* current_stats,
+        const StatsTracker* historical_stats
+    ){}
 
     void run_program();
 
@@ -81,6 +86,9 @@ signals:
     void signal_cancel();
     void signal_error(QString message);
     void signal_reset();
+
+public slots:
+    void show_stats_warning() const;
 
 protected:
     static BotBase& sanitize_botbase(BotBase* botbase);

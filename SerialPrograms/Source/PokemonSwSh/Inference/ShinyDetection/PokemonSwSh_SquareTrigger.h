@@ -22,10 +22,10 @@ bool is_square_beam(
 );
 
 
-bool is_square(
-    const FillMatrix& matrix,
-    const FillGeometry& object
-);
+//bool is_square(
+//    const FillMatrix& matrix,
+//    const FillGeometry& object
+//);
 
 
 }

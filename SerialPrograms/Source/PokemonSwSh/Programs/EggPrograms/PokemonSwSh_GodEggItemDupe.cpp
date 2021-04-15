@@ -119,7 +119,7 @@ void GodEggItemDupe::run_program(SingleSwitchProgramEnvironment& env, uint16_t a
 
     //  1st Fetch: Get into position.
     {
-        env.logger.log("Fetch Attempts: " + tostr_u_commas(c));
+        env.log("Fetch Attempts: " + tostr_u_commas(c));
         fly_home_collect_egg(true);
         collect_godegg(party_slot++, true, false);
         if (party_slot >= items){
@@ -134,7 +134,7 @@ void GodEggItemDupe::run_program(SingleSwitchProgramEnvironment& env, uint16_t a
 
     //  Now we are in steady state.
     for (; c < attempts; c++){
-        env.logger.log("Fetch Attempts: " + tostr_u_commas(c));
+        env.log("Fetch Attempts: " + tostr_u_commas(c));
         eggfetcher_loop();
         collect_egg();
         collect_godegg(party_slot++, false, false);

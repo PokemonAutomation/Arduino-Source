@@ -11,8 +11,13 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-MultiSwitchProgramEnvironment::MultiSwitchProgramEnvironment(Logger& p_logger, std::vector<ConsoleHandle> p_switches)
-    : logger(p_logger)
+MultiSwitchProgramEnvironment::MultiSwitchProgramEnvironment(
+    Logger& logger,
+    StatsTracker* current_stats,
+    const StatsTracker* historical_stats,
+    std::vector<ConsoleHandle> p_switches
+)
+    : ProgramEnvironment(logger, current_stats, historical_stats)
     , dispatcher(p_switches.size())
     , consoles(std::move(p_switches))
 {}
@@ -71,7 +76,10 @@ MultiSwitchProgramUI::MultiSwitchProgramUI(MultiSwitchProgram& factory, MainWind
 }
 MultiSwitchProgramUI::~MultiSwitchProgramUI(){ stop(); }
 
-void MultiSwitchProgramUI::program(){
+void MultiSwitchProgramUI::program(
+    StatsTracker* current_stats,
+    const StatsTracker* historical_stats
+){
     MultiSwitchProgram& factory = static_cast<MultiSwitchProgram&>(m_factory);
     std::vector<ConsoleHandle> switches;
     for (size_t c = 0; c < factory.count(); c++){
@@ -82,7 +90,11 @@ void MultiSwitchProgramUI::program(){
             system.camera()
         );
     }
-    MultiSwitchProgramEnvironment env(m_logger, std::move(switches));
+    MultiSwitchProgramEnvironment env(
+        m_logger,
+        current_stats, historical_stats,
+        std::move(switches)
+    );
     connect(
         this, &RunnableProgramUI::signal_cancel,
         &env, [&]{

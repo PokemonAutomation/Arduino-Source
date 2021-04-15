@@ -13,6 +13,8 @@
 #include "Common/Qt/StringException.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "ClientSource/Connection/PABotBase.h"
+#include "CommonFramework/Tools/StatsDatabase.h"
+#include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Windows/MainWindow.h"
 #include "RunnableSwitchProgram.h"
 
@@ -328,14 +330,41 @@ void RunnableProgramUI::set_status(QString status){
     }
 }
 
+void RunnableProgramUI::show_stats_warning() const{
+    QMessageBox box;
+    box.critical(
+        nullptr,
+        "Error",
+        "Unable to update stats file. You will need to do this manually."
+    );
+}
+
 void RunnableProgramUI::run_program(){
     if (m_state.load(std::memory_order_acquire) != ProgramState::RUNNING){
         return;
     }
 
+    RunnableProgram& factory = static_cast<RunnableProgram&>(m_factory);
+    std::unique_ptr<StatsTracker> current_stats = factory.make_stats();
+    std::unique_ptr<StatsTracker> historial_stats;
+
+    std::string program_name = m_name.toUtf8().data();
+
+    //  Aggregate historical stats.
+    if (current_stats){
+        StatSet stat_sets;
+        stat_sets.open_from_file(settings.stats_file);
+        StatList& list = stat_sets[program_name];
+        if (list.size() != 0){
+            historial_stats = factory.make_stats();
+            list.aggregate(*historial_stats);
+        }
+    }
+
+
     try{
         m_logger.log("<b>Starting Program: " + m_name + "</b>");
-        program();
+        program(current_stats.get(), historial_stats.get());
         m_setup->wait_for_all_requests();
         m_logger.log("Ending Program...");
     }catch (PokemonAutomation::CancelledException&){
@@ -344,10 +373,29 @@ void RunnableProgramUI::run_program(){
         signal_error(str);
     }
 
+
+    //  Update historical stats.
+    if (current_stats){
+        bool ok = StatSet::update_file(settings.stats_file, program_name, *current_stats);
+        if (ok){
+            m_logger.log("Stats successfully saved!", "Blue");
+        }else{
+            m_logger.log("Unable to save stats.", "Red");
+            QMetaObject::invokeMethod(
+                this,
+                "show_stats_warning",
+                Qt::AutoConnection
+            );
+//            show_stats_warning();
+        }
+    }
+
+
     m_logger.log("Entering STOPPED state.");
     m_state.store(ProgramState::STOPPED, std::memory_order_release);
     signal_reset();
     m_logger.log("Now in STOPPED state.");
+//    cout << "Now in STOPPED state." << endl;
 }
 
 BotBase& RunnableProgramUI::sanitize_botbase(BotBase* botbase){

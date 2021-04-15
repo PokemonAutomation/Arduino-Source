@@ -13,7 +13,6 @@
 #include "NintendoSwitch/Options/TimeExpression.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "PokemonSwSh_EncounterTracker.h"
-#include "PokemonSwSh_EncounterStats.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -23,19 +22,31 @@ class ShinyHuntAutonomousOverworld : public SingleSwitchProgram{
 public:
     ShinyHuntAutonomousOverworld();
 
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env) const override;
 
 
 private:
-    struct Stats : public EncounterStats{
-        Stats() : EncounterStats(true) {}
-        virtual std::string stats() const override;
-        uint64_t m_timeouts = 0;
-        uint64_t m_unexpected_battles = 0;
-        uint64_t m_resets = 0;
-    };
+    struct Stats;
 
-    void move_in_circle(SingleSwitchProgramEnvironment& env, uint8_t size_ticks) const;
+    void move_in_circle(
+        SingleSwitchProgramEnvironment& env,
+        uint8_t size_ticks,
+        uint8_t current_direction_x,
+        uint8_t current_direction_y
+    ) const;
+
+    enum WatchResult{
+        TIMEOUT,
+        BATTLE_START,
+        BATTLE_MENU,
+    };
+    WatchResult whistle_and_watch(
+        SingleSwitchProgramEnvironment& env,
+        std::vector<InferenceBox>& exclamations,
+        std::vector<InferenceBox>& questions
+    ) const;
+
     bool find_encounter(
         SingleSwitchProgramEnvironment& env,
         Stats& stats,
@@ -46,7 +57,8 @@ private:
 private:
     BooleanCheckBox GO_HOME_WHEN_DONE;
     BooleanCheckBox PRIORITIZE_EXCLAMATION_POINTS;
-    BooleanCheckBox ENABLE_CIRCLING;
+    BooleanCheckBox TARGET_CIRCLING;
+    SimpleInteger<uint8_t> LOCAL_CIRCLING;
     TimeExpression<uint16_t> MAX_MOVE_DURATION;
     TimeExpression<uint16_t> WATCHDOG_TIMER;
     SectionDivider m_advanced_options;
