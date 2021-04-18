@@ -4,12 +4,14 @@
  *
  */
 
-#include <QSize>
-#include <QString>
-#include <QJsonObject>
 
 #ifndef PokemonAutomation_PersistentSettings_H
 #define PokemonAutomation_PersistentSettings_H
+
+#include <QSize>
+#include <QString>
+#include <QJsonObject>
+#include "Tools/StatsDatabase.h"
 
 namespace PokemonAutomation{
 
@@ -31,6 +33,8 @@ public:
     bool naughty_mode = false;
     bool developer_mode = false;
     std::atomic<bool> log_everything;
+
+    StatSet stat_sets;
 
     QJsonObject settings;
     QJsonObject programs;

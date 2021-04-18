@@ -63,6 +63,8 @@ void PersistentSettings::read(){
 //    json_get_string(config_path, root, "00-ConfigPath");
 //    json_get_string(source_path, root, "01-SourcePath");
     json_get_string(stats_file, root, "01-StatsFile");
+    stat_sets.open_from_file(stats_file);
+
     {
         QJsonArray res = json_get_array_nothrow(root, "02-WindowSize");
         if (res.size() == 2){

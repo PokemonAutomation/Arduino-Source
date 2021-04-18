@@ -37,6 +37,10 @@ EggSuperCombined2::EggSuperCombined2()
         "<b>Fetches per Batch:</b><br>For each batch of eggs, attempt this many egg fetches.",
         6.0, 0, 7
     )
+    , TOUCH_DATE_INTERVAL(
+        "<b>Rollover Prevention:</b><br>Prevent a den from rolling over by periodically touching the date. If set to zero, this feature is disabled.",
+        "4 * 3600 * TICKS_PER_SECOND"
+    )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -52,21 +56,17 @@ EggSuperCombined2::EggSuperCombined2()
         "<b>Hatch Delay:</b><br>Total animation time for hatching 5 eggs when there are no shinies.",
         "88 * TICKS_PER_SECOND"
     )
-    , TOUCH_DATE_INTERVAL(
-        "<b>Rollover Prevention:</b><br>Prevent a den from rolling over by periodically touching the date. If set to zero, this feature is disabled.",
-        "4 * 3600 * TICKS_PER_SECOND"
-    )
 {
     m_options.emplace_back(&BOXES_TO_RELEASE, "BOXES_TO_RELEASE");
     m_options.emplace_back(&BOXES_TO_SKIP, "BOXES_TO_SKIP");
     m_options.emplace_back(&BOXES_TO_HATCH, "BOXES_TO_HATCH");
     m_options.emplace_back(&STEPS_TO_HATCH, "STEPS_TO_HATCH");
     m_options.emplace_back(&FETCHES_PER_BATCH, "FETCHES_PER_BATCH");
+    m_options.emplace_back(&TOUCH_DATE_INTERVAL, "TOUCH_DATE_INTERVAL");
     m_options.emplace_back(&m_advanced_options, "");
     m_options.emplace_back(&SAFETY_TIME, "SAFETY_TIME");
     m_options.emplace_back(&EARLY_HATCH_SAFETY, "EARLY_HATCH_SAFETY");
     m_options.emplace_back(&HATCH_DELAY, "HATCH_DELAY");
-    m_options.emplace_back(&TOUCH_DATE_INTERVAL, "TOUCH_DATE_INTERVAL");
 }
 
 void EggSuperCombined2::program(SingleSwitchProgramEnvironment& env) const{

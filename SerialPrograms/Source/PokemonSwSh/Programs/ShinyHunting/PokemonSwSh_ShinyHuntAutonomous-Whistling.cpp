@@ -10,6 +10,7 @@
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
+#include "CommonFramework/PersistentSettings.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_StartBattleDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
@@ -30,7 +31,11 @@ ShinyHuntAutonomousWhistling::ShinyHuntAutonomousWhistling()
     )
     , GO_HOME_WHEN_DONE(
         "<b>Go Home when Done:</b><br>After finding a shiny, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
-        true
+        false
+    )
+    , TIME_ROLLBACK_HOURS(
+        "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
+        1, 0, 11
     )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
@@ -39,15 +44,23 @@ ShinyHuntAutonomousWhistling::ShinyHuntAutonomousWhistling()
         "<b>Exit Battle Time:</b><br>After running, wait this long to return to overworld.",
         "6 * TICKS_PER_SECOND"
     )
-    , TIME_ROLLBACK_HOURS(
-        "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
-        1, 0, 11
+    , VIDEO_ON_SHINY(
+        "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
+        true
+    )
+    , RUN_FROM_EVERYTHING(
+        "<b>Run from Everything:</b><br>Run from everything - even if it is shiny. (For testing only.)",
+        false
     )
 {
     m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
+    m_options.emplace_back(&TIME_ROLLBACK_HOURS, "TIME_ROLLBACK_HOURS");
     m_options.emplace_back(&m_advanced_options, "");
     m_options.emplace_back(&EXIT_BATTLE_MASH_TIME, "EXIT_BATTLE_MASH_TIME");
-    m_options.emplace_back(&TIME_ROLLBACK_HOURS, "TIME_ROLLBACK_HOURS");
+    if (settings.developer_mode){
+        m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
+        m_options.emplace_back(&RUN_FROM_EVERYTHING, "RUN_FROM_EVERYTHING");
+    }
 }
 
 
@@ -80,7 +93,14 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env) 
     uint32_t last_touch = system_clock();
 
     Stats& stats = env.stats<Stats>();
-    StandardEncounterTracker tracker(stats, env.console, false, EXIT_BATTLE_MASH_TIME);
+    StandardEncounterTracker tracker(
+        stats, env.console,
+        false,
+        EXIT_BATTLE_MASH_TIME,
+        VIDEO_ON_SHINY,
+        RUN_FROM_EVERYTHING
+    );
+
     while (true){
         env.update_stats();
 

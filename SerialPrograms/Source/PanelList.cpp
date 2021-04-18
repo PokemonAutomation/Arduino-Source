@@ -168,9 +168,9 @@ const std::vector<std::unique_ptr<RightPanel>>& PROGRAM_LIST(){
     list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousBerryTree>(settings.programs));
     list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousWhistling>(settings.programs));
     list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousFishing>(settings.programs));
-//    if (settings.developer_mode){
+    if (settings.developer_mode){
         list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousOverworld>(settings.programs));
-//    }
+    }
 
     list.emplace_back(new SingleSwitchProgramWrapper<EggFetcher2>(settings.programs));
     list.emplace_back(new SingleSwitchProgramWrapper<EggHatcher>(settings.programs));

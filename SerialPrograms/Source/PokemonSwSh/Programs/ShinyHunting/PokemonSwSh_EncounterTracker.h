@@ -22,18 +22,25 @@ public:
         ShinyHuntTracker& stats,
         ConsoleHandle& console,
         bool require_square,
-        uint16_t exit_battle_time
+        uint16_t exit_battle_time,
+        bool take_video,
+        bool run_from_everything
     );
 
     virtual bool run_away();
 
     bool process_result(ShinyDetection detection);
 
+private:
+    void take_video();
+
 protected:
     ShinyHuntTracker& m_stats;
     ConsoleHandle& m_console;
     bool m_require_square;
     uint16_t m_exit_battle_time;
+    bool m_take_video;
+    bool m_run_from_everything;
 };
 
 

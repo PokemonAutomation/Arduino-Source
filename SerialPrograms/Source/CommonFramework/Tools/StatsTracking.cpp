@@ -75,14 +75,17 @@ void StatsTracker::parse_and_append_line(const std::string& line){
         uint64_t count = 0;
         while (true){
             char ch = *ptr++;
-            if (ch < 32) break;
+            if (ch < 32){
+                m_stats[label] += count;
+                return;
+            }
             if (ch == ',') continue;
             if (!('0' <= ch && ch <= '9')) break;
             count *= 10;
             count += ch - '0';
         }
 
-        cout << label << " = " << count << endl;
+//        cout << label << " = " << count << endl;
         m_stats[label] += count;
 
         //  Skip to next;

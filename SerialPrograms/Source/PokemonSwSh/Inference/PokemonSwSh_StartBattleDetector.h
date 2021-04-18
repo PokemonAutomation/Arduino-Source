@@ -32,13 +32,34 @@ public:
     bool detect(const QImage& screen);
     bool wait(ProgramEnvironment& env);
 
-private:
+protected:
     VideoFeed& m_feed;
     std::chrono::milliseconds m_timeout;
     InferenceBoxScope m_screen_box;
     InferenceBoxScope m_dialog_box;
     std::chrono::time_point<std::chrono::system_clock> m_start_time;
 };
+
+
+class AsyncStartBattleDetector : public StartBattleDetector{
+public:
+    AsyncStartBattleDetector(ProgramEnvironment& env, VideoFeed& feed);
+    ~AsyncStartBattleDetector();
+
+    bool detected() const;
+
+    void start();
+
+
+private:
+    void thread_loop(ProgramEnvironment& env);
+
+private:
+    std::atomic<bool> m_stopping;
+    std::atomic<bool> m_detected;
+    std::thread m_thread;
+};
+
 
 
 }

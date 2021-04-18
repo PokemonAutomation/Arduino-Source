@@ -25,10 +25,10 @@ public:
 private:
     SimpleInteger<uint8_t> REVERSAL_PP;
     TimeExpression<uint16_t> START_TO_ATTACK_DELAY;
+    TimeExpression<uint32_t> TOUCH_DATE_INTERVAL;
     SectionDivider m_advanced_options;
     TimeExpression<uint16_t> ATTACK_TO_CATCH_DELAY;
     TimeExpression<uint16_t> CATCH_TO_OVERWORLD_DELAY;
-    TimeExpression<uint32_t> TOUCH_DATE_INTERVAL;
 };
 
 }

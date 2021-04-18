@@ -10,6 +10,7 @@
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
+#include "CommonFramework/PersistentSettings.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_StartBattleDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
 #include "PokemonSwSh_EncounterTracker.h"
@@ -29,7 +30,7 @@ ShinyHuntAutonomousBerryTree::ShinyHuntAutonomousBerryTree()
     )
     , GO_HOME_WHEN_DONE(
         "<b>Go Home when Done:</b><br>After finding a shiny, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
-        true
+        false
     )
     , REQUIRE_SQUARE(
         "<b>Require Square:</b><br>Stop only for a square shiny. Run from star shinies.",
@@ -42,11 +43,23 @@ ShinyHuntAutonomousBerryTree::ShinyHuntAutonomousBerryTree()
         "<b>Exit Battle Time:</b><br>After running, wait this long to return to overworld.",
         "6 * TICKS_PER_SECOND"
     )
+    , VIDEO_ON_SHINY(
+        "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
+        true
+    )
+    , RUN_FROM_EVERYTHING(
+        "<b>Run from Everything:</b><br>Run from everything - even if it is shiny. (For testing only.)",
+        false
+    )
 {
     m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
     m_options.emplace_back(&REQUIRE_SQUARE, "REQUIRE_SQUARE");
     m_options.emplace_back(&m_advanced_options, "");
     m_options.emplace_back(&EXIT_BATTLE_MASH_TIME, "EXIT_BATTLE_MASH_TIME");
+    if (settings.developer_mode){
+        m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
+        m_options.emplace_back(&RUN_FROM_EVERYTHING, "RUN_FROM_EVERYTHING");
+    }
 }
 
 
@@ -71,7 +84,13 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env) 
     grip_menu_connect_go_home();
 
     Stats& stats = env.stats<Stats>();
-    StandardEncounterTracker tracker(stats, env.console, REQUIRE_SQUARE, EXIT_BATTLE_MASH_TIME);
+    StandardEncounterTracker tracker(
+        stats, env.console,
+        REQUIRE_SQUARE,
+        EXIT_BATTLE_MASH_TIME,
+        VIDEO_ON_SHINY,
+        RUN_FROM_EVERYTHING
+    );
 
     uint8_t year = MAX_YEAR;
     while (true){

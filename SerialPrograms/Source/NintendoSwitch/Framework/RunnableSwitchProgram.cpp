@@ -185,6 +185,7 @@ void RunnableProgramUI::make_body(QWidget& parent, QVBoxLayout& layout){
     int font_size = font.pointSize();
     font.setPointSize(font_size + font_size / 2);
     m_status_bar->setFont(font);
+    update_historical_stats();
 
     QGroupBox* actions_widget = new QGroupBox("Actions", &parent);
     layout.addWidget(actions_widget);
@@ -320,6 +321,19 @@ void RunnableProgramUI::on_stop(){
 void RunnableProgramUI::reset_connections(){
     if (m_setup) m_setup->reset_serial();
 }
+void RunnableProgramUI::update_historical_stats(){
+    RunnableProgram& factory = static_cast<RunnableProgram&>(m_factory);
+    m_stats = factory.make_stats();
+    if (m_stats){
+        settings.stat_sets.open_from_file(settings.stats_file);
+        StatList& list = settings.stat_sets[m_name.toUtf8().data()];
+        if (list.size() != 0){
+            list.aggregate(*m_stats);
+        }
+        m_status_bar->setText(m_stats->to_str().c_str());
+        m_status_bar->setVisible(true);
+    }
+}
 void RunnableProgramUI::set_status(QString status){
     if (status.size() <= 0){
         m_status_bar->setVisible(false);
@@ -346,25 +360,15 @@ void RunnableProgramUI::run_program(){
 
     RunnableProgram& factory = static_cast<RunnableProgram&>(m_factory);
     std::unique_ptr<StatsTracker> current_stats = factory.make_stats();
-    std::unique_ptr<StatsTracker> historial_stats;
 
     std::string program_name = m_name.toUtf8().data();
 
-    //  Aggregate historical stats.
-    if (current_stats){
-        StatSet stat_sets;
-        stat_sets.open_from_file(settings.stats_file);
-        StatList& list = stat_sets[program_name];
-        if (list.size() != 0){
-            historial_stats = factory.make_stats();
-            list.aggregate(*historial_stats);
-        }
-    }
-
+    //  Update historical stats.
+    update_historical_stats();
 
     try{
         m_logger.log("<b>Starting Program: " + m_name + "</b>");
-        program(current_stats.get(), historial_stats.get());
+        program(current_stats.get(), m_stats.get());
         m_setup->wait_for_all_requests();
         m_logger.log("Ending Program...");
     }catch (PokemonAutomation::CancelledException&){
@@ -388,6 +392,7 @@ void RunnableProgramUI::run_program(){
             );
 //            show_stats_warning();
         }
+        settings.stat_sets.open_from_file(settings.stats_file);
     }
 
 

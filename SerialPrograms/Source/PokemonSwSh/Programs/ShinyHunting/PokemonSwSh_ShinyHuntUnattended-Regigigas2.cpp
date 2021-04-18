@@ -31,6 +31,10 @@ ShinyHuntUnattendedRegigigas2::ShinyHuntUnattendedRegigigas2()
         "<b>Start to Attack Delay:</b><br>This needs to be carefully calibrated.",
         "3750"
     )
+    , TOUCH_DATE_INTERVAL(
+        "<b>Rollover Prevention:</b><br>Prevent a den from rolling over by periodically touching the date. If set to zero, this feature is disabled.",
+        "4 * 3600 * TICKS_PER_SECOND"
+    )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -42,17 +46,13 @@ ShinyHuntUnattendedRegigigas2::ShinyHuntUnattendedRegigigas2()
         "<b>Catch to Overworld Delay:</b>",
         "8 * TICKS_PER_SECOND"
     )
-    , TOUCH_DATE_INTERVAL(
-        "<b>Rollover Prevention:</b><br>Prevent a den from rolling over by periodically touching the date. If set to zero, this feature is disabled.",
-        "4 * 3600 * TICKS_PER_SECOND"
-    )
 {
     m_options.emplace_back(&REVERSAL_PP, "REVERSAL_PP");
     m_options.emplace_back(&START_TO_ATTACK_DELAY, "START_TO_ATTACK_DELAY");
+    m_options.emplace_back(&TOUCH_DATE_INTERVAL, "TOUCH_DATE_INTERVAL");
     m_options.emplace_back(&m_advanced_options, "");
     m_options.emplace_back(&ATTACK_TO_CATCH_DELAY, "ATTACK_TO_CATCH_DELAY");
     m_options.emplace_back(&CATCH_TO_OVERWORLD_DELAY, "CATCH_TO_OVERWORLD_DELAY");
-    m_options.emplace_back(&TOUCH_DATE_INTERVAL, "TOUCH_DATE_INTERVAL");
 }
 
 void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env) const{

@@ -28,14 +28,21 @@ public:
 private:
     struct Stats;
     struct Tracker : public StandardEncounterTracker{
-        Tracker(ShinyHuntTracker& stats, ConsoleHandle& console);
+        Tracker(
+            ShinyHuntTracker& stats,
+            ConsoleHandle& console,
+            bool take_video,
+            bool run_from_everything
+        );
         virtual bool run_away() override;
     };
 
     BooleanCheckBox GO_HOME_WHEN_DONE;
+    SimpleInteger<uint8_t> TIME_ROLLBACK_HOURS;
     SectionDivider m_advanced_options;
     TimeExpression<uint16_t> EXIT_BATTLE_MASH_TIME;
-    SimpleInteger<uint8_t> TIME_ROLLBACK_HOURS;
+    BooleanCheckBox VIDEO_ON_SHINY;
+    BooleanCheckBox RUN_FROM_EVERYTHING;
 };
 
 }

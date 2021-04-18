@@ -22,6 +22,16 @@
 const uint16_t START_TO_RUN_DELAY   =   1260;
 
 
+//  Rollover Prevention
+//
+//  Prevent a den from rolling over by periodically touching the date.
+//
+//  If set to zero, this feature is disabled.
+//  Otherwise, the program will touch the date at roughly this interval to
+//  prevent a den from rolling over. This feature requres time-sync be disabled.
+const uint32_t TOUCH_DATE_INTERVAL  =   (uint32_t)4 * 3600 * TICKS_PER_SECOND;  //  4 hours
+
+
 
 
 //
@@ -37,13 +47,3 @@ const uint16_t MOVE_DURATION        =   300;
 
 //  Time to perform the trade.
 const uint16_t MASH_TO_TRADE_DELAY  =   29 * TICKS_PER_SECOND;
-
-
-//  Rollover Prevention
-//
-//  Prevent a den from rolling over by periodically touching the date.
-//
-//  If set to zero, this feature is disabled.
-//  Otherwise, the program will touch the date at roughly this interval to
-//  prevent a den from rolling over. This feature requres time-sync be disabled.
-const uint32_t TOUCH_DATE_INTERVAL  =   (uint32_t)4 * 3600 * TICKS_PER_SECOND;  //  4 hours

@@ -36,7 +36,9 @@ private:
             ProgramEnvironment& env,
             ConsoleHandle& console,
             bool require_square,
-            uint16_t exit_battle_time
+            uint16_t exit_battle_time,
+            bool take_video,
+            bool run_from_everything
         );
         virtual bool run_away() override;
 
@@ -46,9 +48,11 @@ private:
     BooleanCheckBox GO_HOME_WHEN_DONE;
     SimpleInteger<uint8_t> REVERSAL_PP;
     BooleanCheckBox REQUIRE_SQUARE;
+    TimeExpression<uint32_t> TOUCH_DATE_INTERVAL;
     SectionDivider m_advanced_options;
     TimeExpression<uint16_t> CATCH_TO_OVERWORLD_DELAY;
-    TimeExpression<uint32_t> TOUCH_DATE_INTERVAL;
+    BooleanCheckBox VIDEO_ON_SHINY;
+    BooleanCheckBox RUN_FROM_EVERYTHING;
 };
 
 }

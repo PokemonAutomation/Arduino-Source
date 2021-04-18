@@ -11,6 +11,7 @@
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
+#include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/Inference/InferenceThrottler.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
@@ -36,7 +37,7 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
     )
     , GO_HOME_WHEN_DONE(
         "<b>Go Home when Done:</b><br>After finding a shiny, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
-        true
+        false
     )
     , PRIORITIZE_EXCLAMATION_POINTS(
         "<b>Prioritize Exclamation Points:</b><br>Given multiple options, prefer those with exclamation points."
@@ -62,6 +63,10 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
         "<b>Watchdog Timer:</b><br>Reset the game if you go this long without any encounters.",
         "120 * TICKS_PER_SECOND"
     )
+    , TIME_ROLLBACK_HOURS(
+        "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
+        1, 0, 11
+    )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -69,9 +74,13 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
         "<b>Exit Battle Time:</b><br>After running, wait this long to return to overworld.",
         "6 * TICKS_PER_SECOND"
     )
-    , TIME_ROLLBACK_HOURS(
-        "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
-        1, 0, 11
+    , VIDEO_ON_SHINY(
+        "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
+        true
+    )
+    , RUN_FROM_EVERYTHING(
+        "<b>Run from Everything:</b><br>Run from everything - even if it is shiny. (For testing only.)",
+        false
     )
 {
     m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
@@ -80,9 +89,13 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
     m_options.emplace_back(&LOCAL_CIRCLING, "LOCAL_CIRCLING");
     m_options.emplace_back(&MAX_MOVE_DURATION, "MAX_MOVE_DURATION");
     m_options.emplace_back(&WATCHDOG_TIMER, "WATCHDOG_TIMER");
+    m_options.emplace_back(&TIME_ROLLBACK_HOURS, "TIME_ROLLBACK_HOURS");
     m_options.emplace_back(&m_advanced_options, "");
     m_options.emplace_back(&EXIT_BATTLE_MASH_TIME, "EXIT_BATTLE_MASH_TIME");
-    m_options.emplace_back(&TIME_ROLLBACK_HOURS, "TIME_ROLLBACK_HOURS");
+    if (settings.developer_mode){
+        m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
+        m_options.emplace_back(&RUN_FROM_EVERYTHING, "RUN_FROM_EVERYTHING");
+    }
 }
 
 
@@ -145,8 +158,8 @@ ShinyHuntAutonomousOverworld::WatchResult ShinyHuntAutonomousOverworld::whistle_
     std::vector<InferenceBox>& exclamations,
     std::vector<InferenceBox>& questions
 ) const{
-    StandardBattleMenuDetector battle_menu(env.console);
     StartBattleDetector start_battle(env.console, std::chrono::milliseconds(0));
+    StandardBattleMenuDetector battle_menu(env.console);
     InferenceBoxScope search_area(env.console, 0.0, 0.2, 1.0, 0.8);
 
     const double center_x = 0.5;
@@ -253,10 +266,12 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
             tracker.run_away();
             return false;
         case WatchResult::BATTLE_START:
-            env.log("Battle started!");
+            env.log("Battle started! (whistle)");
             return true;
         default:;
         }
+
+        AsyncStartBattleDetector start_battle(env, env.console);
 
         //  Nothing was found. Rotate the view and try again.
         if (exclamation_marks.empty() && question_marks.empty()){
@@ -269,6 +284,10 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
                 pbf_move_right_joystick(192, 255, 50, 70);
             }
             env.console.botbase().wait_for_all_requests();
+            if (start_battle.detected()){
+                env.log("Battle started! (rotate)");
+                return true;
+            }
             continue;
         }
 
@@ -283,7 +302,10 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
                 "purple"
             );
             Trajectory trajectory = get_trajectory_float(delta_x, delta_y);
-            exclamations.emplace(trajectory.distance_in_ticks, std::pair(trajectory, box));
+            exclamations.emplace(
+                trajectory.distance_in_ticks,
+                std::pair<Trajectory, InferenceBox>(trajectory, box)
+            );
             break;
         }
 
@@ -296,7 +318,10 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
                 "purple"
             );
             Trajectory trajectory = get_trajectory_float(delta_x, delta_y);
-            questions.emplace(trajectory.distance_in_ticks, std::pair(trajectory, box));
+            questions.emplace(
+                trajectory.distance_in_ticks,
+                std::pair<Trajectory, InferenceBox>(trajectory, box)
+            );
             break;
         }
 
@@ -351,6 +376,10 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
         }
 
         env.console.botbase().wait_for_all_requests();
+        if (start_battle.detected()){
+            env.log("Battle started! (move)");
+            return true;
+        }
     }
 }
 
@@ -363,7 +392,13 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env) 
     uint32_t last_touch = system_clock();
 
     Stats& stats = env.stats<Stats>();
-    StandardEncounterTracker tracker(stats, env.console, false, EXIT_BATTLE_MASH_TIME);
+    StandardEncounterTracker tracker(
+        stats, env.console,
+        false,
+        EXIT_BATTLE_MASH_TIME,
+        VIDEO_ON_SHINY,
+        RUN_FROM_EVERYTHING
+    );
 
     //  Encounter Loop
     while (true){

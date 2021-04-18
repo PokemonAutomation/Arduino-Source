@@ -31,9 +31,6 @@ ShinyHuntUnattendedStrongSpawn::ShinyHuntUnattendedStrongSpawn()
         "<b>Start Game Wait Delay:</b><br>Decrease this if your game starts quickly.",
         "20 * TICKS_PER_SECOND"
     )
-    , m_advanced_options(
-        "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
-    )
     , TIME_ROLLBACK_HOURS(
         "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
         1, 0, 11
@@ -41,7 +38,6 @@ ShinyHuntUnattendedStrongSpawn::ShinyHuntUnattendedStrongSpawn()
 {
     m_options.emplace_back(&ENTER_GAME_TO_RUN_DELAY, "ENTER_GAME_TO_RUN_DELAY");
     m_options.emplace_back(&START_GAME_WAIT_DELAY, "START_GAME_WAIT_DELAY");
-    m_options.emplace_back(&m_advanced_options, "");
     m_options.emplace_back(&TIME_ROLLBACK_HOURS, "TIME_ROLLBACK_HOURS");
 }
 

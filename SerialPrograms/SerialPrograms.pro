@@ -68,6 +68,7 @@ SOURCES += \
     ../Common/SwitchFramework/FrameworkSettings.cpp \
     ../Common/SwitchFramework/Switch_PushButtons.cpp \
     ../Common/SwitchRoutines/SwitchDigitEntry.cpp \
+    Source/CommonFramework/CrashDump.cpp \
     Source/CommonFramework/Globals.cpp \
     Source/CommonFramework/Inference/AnomalyDetector.cpp \
     Source/CommonFramework/Inference/BlackScreenDetector.cpp \
@@ -221,6 +222,7 @@ HEADERS += \
     ../Common/SwitchFramework/SwitchControllerDefs.h \
     ../Common/SwitchFramework/Switch_PushButtons.h \
     ../Common/SwitchRoutines/SwitchDigitEntry.h \
+    Source/CommonFramework/CrashDump.h \
     Source/CommonFramework/Globals.h \
     Source/CommonFramework/Inference/AnomalyDetector.h \
     Source/CommonFramework/Inference/BlackScreenDetector.h \

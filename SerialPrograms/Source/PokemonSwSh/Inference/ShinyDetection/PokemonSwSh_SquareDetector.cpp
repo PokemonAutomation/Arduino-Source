@@ -334,10 +334,10 @@ std::multimap<double, std::pair<pxint_t, pxint_t>> get_edge_points(
                 continue;
             }
             if (
-                (c     > 0     && submatrix[r][c - 1] == background) ||
-                (c + 1 < width && submatrix[r][c + 1] == background) ||
-                (r     > 0     && submatrix[r - 1][c] == background) ||
-                (r + 1 < width && submatrix[r + 1][c] == background)
+                (c     > 0      && submatrix[r][c - 1] == background) ||
+                (c + 1 < width  && submatrix[r][c + 1] == background) ||
+                (r     > 0      && submatrix[r - 1][c] == background) ||
+                (r + 1 < height && submatrix[r + 1][c] == background)
             ){
                 double angle = std::atan2(
                     r - center_y,

@@ -42,8 +42,8 @@ Trajectory get_trajectory_float(double delta_x, double delta_y){
     delta_x *= 10;
     delta_y *= 10;
 
-    int int_x = std::floor(delta_x);
-    int int_y = std::floor(delta_y);
+    int int_x = (int)std::floor(delta_x);
+    int int_y = (int)std::floor(delta_y);
 
     double frac_x = delta_x - int_x;
     double frac_y = delta_y - int_y;

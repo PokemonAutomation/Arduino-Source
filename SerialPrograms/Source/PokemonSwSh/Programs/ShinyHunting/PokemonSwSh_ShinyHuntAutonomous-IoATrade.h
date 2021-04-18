@@ -27,9 +27,11 @@ private:
     struct Stats;
 
     BooleanCheckBox GO_HOME_WHEN_DONE;
+    TimeExpression<uint32_t> TOUCH_DATE_INTERVAL;
     SectionDivider m_advanced_options;
     TimeExpression<uint16_t> MASH_TO_TRADE_DELAY;
-    TimeExpression<uint32_t> TOUCH_DATE_INTERVAL;
+    BooleanCheckBox VIDEO_ON_SHINY;
+    BooleanCheckBox RUN_FROM_EVERYTHING;
 };
 
 

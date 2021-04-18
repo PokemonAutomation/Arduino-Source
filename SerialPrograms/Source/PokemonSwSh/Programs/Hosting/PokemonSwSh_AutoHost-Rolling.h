@@ -37,6 +37,7 @@ private:
 
     SimpleInteger<uint8_t> MOVE_SLOT;
     BooleanCheckBox DYNAMAX;
+    SimpleInteger<uint8_t> TROLL_HOSTING;
 
     BooleanCheckBox ALTERNATE_GAMES;
     TimeExpression<uint32_t> TOUCH_DATE_INTERVAL;

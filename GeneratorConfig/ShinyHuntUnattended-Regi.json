@@ -41,6 +41,15 @@
             "99-Current": "Registeel"
         },
         {
+            "00-Type": "TimeExpression",
+            "01-Label": "<b>Rollover Prevention:</b><br>Prevent a den from rolling over by periodically touching the date. If set to zero, this feature is disabled.",
+            "02-Declaration": "const uint32_t TOUCH_DATE_INTERVAL",
+            "03-MinValue": 0,
+            "04-MaxValue": 2147483647,
+            "98-Default": "4 * 3600 * TICKS_PER_SECOND",
+            "99-Current": "4 * 3600 * TICKS_PER_SECOND"
+        },
+        {
             "00-Type": "Divider",
             "01-Label": "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
         },
@@ -61,15 +70,6 @@
             "04-MaxValue": 65535,
             "98-Default": "5 * TICKS_PER_SECOND",
             "99-Current": "5 * TICKS_PER_SECOND"
-        },
-        {
-            "00-Type": "TimeExpression",
-            "01-Label": "<b>Rollover Prevention:</b><br>Prevent a den from rolling over by periodically touching the date. If set to zero, this feature is disabled.",
-            "02-Declaration": "const uint32_t TOUCH_DATE_INTERVAL",
-            "03-MinValue": 0,
-            "04-MaxValue": 2147483647,
-            "98-Default": "4 * 3600 * TICKS_PER_SECOND",
-            "99-Current": "4 * 3600 * TICKS_PER_SECOND"
         }
     ]
 }

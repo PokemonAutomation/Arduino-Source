@@ -10,6 +10,7 @@
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
+#include "CommonFramework/PersistentSettings.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_FishingDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
@@ -30,7 +31,11 @@ ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing()
     )
     , GO_HOME_WHEN_DONE(
         "<b>Go Home when Done:</b><br>After finding a shiny, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
-        true
+        false
+    )
+    , TIME_ROLLBACK_HOURS(
+        "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
+        1, 0, 11
     )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
@@ -43,16 +48,24 @@ ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing()
         "<b>Fish Respawn Time:</b><br>Wait this long for fish to respawn.",
         "4 * TICKS_PER_SECOND"
     )
-    , TIME_ROLLBACK_HOURS(
-        "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
-        1, 0, 11
+    , VIDEO_ON_SHINY(
+        "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
+        true
+    )
+    , RUN_FROM_EVERYTHING(
+        "<b>Run from Everything:</b><br>Run from everything - even if it is shiny. (For testing only.)",
+        false
     )
 {
     m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
+    m_options.emplace_back(&TIME_ROLLBACK_HOURS, "TIME_ROLLBACK_HOURS");
     m_options.emplace_back(&m_advanced_options, "");
     m_options.emplace_back(&EXIT_BATTLE_MASH_TIME, "EXIT_BATTLE_MASH_TIME");
     m_options.emplace_back(&FISH_RESPAWN_TIME, "FISH_RESPAWN_TIME");
-    m_options.emplace_back(&TIME_ROLLBACK_HOURS, "TIME_ROLLBACK_HOURS");
+    if (settings.developer_mode){
+        m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
+        m_options.emplace_back(&RUN_FROM_EVERYTHING, "RUN_FROM_EVERYTHING");
+    }
 }
 
 
@@ -61,16 +74,13 @@ struct ShinyHuntAutonomousFishing::Stats : public ShinyHuntTracker{
     Stats()
         : ShinyHuntTracker(true)
         , m_misses(m_stats["Misses"])
-        , m_timeouts(m_stats["Timeouts"])
-        , m_unexpected_battles(m_stats["Unexpected Battles"])
+        , m_errors(m_stats["Errors"])
     {
         m_display_order.insert(m_display_order.begin() + 1, Stat("Misses"));
-        m_display_order.insert(m_display_order.begin() + 2, Stat("Timeouts"));
-        m_display_order.insert(m_display_order.begin() + 3, Stat("Unexpected Battles"));
+        m_display_order.insert(m_display_order.begin() + 2, Stat("Errors"));
     }
     uint64_t& m_misses;
-    uint64_t& m_timeouts;
-    uint64_t& m_unexpected_battles;
+    uint64_t& m_errors;
 };
 std::unique_ptr<StatsTracker> ShinyHuntAutonomousFishing::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -86,7 +96,13 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env) co
     uint32_t last_touch = system_clock();
 
     Stats& stats = env.stats<Stats>();
-    StandardEncounterTracker tracker(stats, env.console, false, EXIT_BATTLE_MASH_TIME);
+    StandardEncounterTracker tracker(
+        stats, env.console,
+        false,
+        EXIT_BATTLE_MASH_TIME,
+        VIDEO_ON_SHINY,
+        RUN_FROM_EVERYTHING
+    );
 
     while (true){
         env.update_stats();
@@ -111,7 +127,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env) co
             FishingDetector::Detection detection = detector.wait_for_detection(env);
             switch (detection){
             case FishingDetector::NO_DETECTION:
-                stats.m_timeouts++;
+                stats.m_errors++;
                 pbf_mash_button(BUTTON_B, 2 * TICKS_PER_SECOND);
                 continue;
             case FishingDetector::HOOKED:
@@ -122,7 +138,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env) co
                 pbf_mash_button(BUTTON_B, 2 * TICKS_PER_SECOND);
                 continue;
             case FishingDetector::BATTLE_MENU:
-                stats.m_unexpected_battles++;
+                stats.m_errors++;
                 tracker.run_away();
                 continue;
             }
@@ -146,7 +162,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env) co
             break;
         }
         if (detection == ShinyDetection::NO_BATTLE_MENU){
-            stats.m_timeouts++;
+            stats.m_errors++;
             pbf_mash_button(BUTTON_B, TICKS_PER_SECOND);
             tracker.run_away();
         }

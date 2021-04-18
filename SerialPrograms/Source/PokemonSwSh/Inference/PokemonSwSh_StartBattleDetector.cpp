@@ -96,6 +96,44 @@ bool StartBattleDetector::wait(ProgramEnvironment& env){
 }
 
 
+
+AsyncStartBattleDetector::AsyncStartBattleDetector(ProgramEnvironment& env, VideoFeed& feed)
+    : StartBattleDetector(feed, std::chrono::milliseconds(0))
+    , m_stopping(false)
+    , m_detected(false)
+    , m_thread(&AsyncStartBattleDetector::thread_loop, this, std::ref(env))
+{}
+AsyncStartBattleDetector::~AsyncStartBattleDetector(){
+    m_stopping.store(true, std::memory_order_release);
+    m_thread.join();
+}
+
+bool AsyncStartBattleDetector::detected() const{
+    return m_detected.load(std::memory_order_acquire);
+}
+
+void AsyncStartBattleDetector::thread_loop(ProgramEnvironment& env){
+    InferenceThrottler throttler(m_timeout, std::chrono::milliseconds(50));
+    while (!m_stopping.load(std::memory_order_acquire) && !detected()){
+        env.check_stopping();
+
+        QImage screen = m_feed.snapshot();
+        if (detect(screen)){
+            m_detected.store(true, std::memory_order_release);
+        }
+
+        if (throttler.end_iteration(env)){
+            env.log("StartBattleDetector: Timed out.", "red");
+            return;
+        }
+    }
+}
+
+
+
+
+
+
 }
 }
 }

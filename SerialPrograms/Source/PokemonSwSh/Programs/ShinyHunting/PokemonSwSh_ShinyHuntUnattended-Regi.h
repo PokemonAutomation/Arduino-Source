@@ -26,10 +26,10 @@ public:
 private:
     TimeExpression<uint16_t> START_TO_RUN_DELAY;
     RegiSelector REGI_NAME;
+    TimeExpression<uint32_t> TOUCH_DATE_INTERVAL;
     SectionDivider m_advanced_options;
     SimpleInteger<uint16_t> CORRECTION_INTERVAL;
     TimeExpression<uint16_t> TRANSITION_DELAY;
-    TimeExpression<uint32_t> TOUCH_DATE_INTERVAL;
 };
 
 }

@@ -10,6 +10,7 @@
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
+#include "CommonFramework/PersistentSettings.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_StartBattleDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_RaidCatchDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
@@ -29,7 +30,7 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
     )
     , GO_HOME_WHEN_DONE(
         "<b>Go Home when Done:</b><br>After finding a shiny, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
-        true
+        false
     )
     , REVERSAL_PP(
         "<b>Reversal PP:</b><br>The amount of Reversal PP you are saved with.",
@@ -39,6 +40,10 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
         "<b>Require Square:</b><br>Stop only for a square shiny. Run from star shinies.",
         false
     )
+    , TOUCH_DATE_INTERVAL(
+        "<b>Rollover Prevention:</b><br>Prevent a den from rolling over by periodically touching the date. If set to zero, this feature is disabled.",
+        "4 * 3600 * TICKS_PER_SECOND"
+    )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -46,17 +51,25 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
         "<b>Catch to Overworld Delay:</b>",
         "8 * TICKS_PER_SECOND"
     )
-    , TOUCH_DATE_INTERVAL(
-        "<b>Rollover Prevention:</b><br>Prevent a den from rolling over by periodically touching the date. If set to zero, this feature is disabled.",
-        "4 * 3600 * TICKS_PER_SECOND"
+    , VIDEO_ON_SHINY(
+        "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
+        true
+    )
+    , RUN_FROM_EVERYTHING(
+        "<b>Run from Everything:</b><br>Run from everything - even if it is shiny. (For testing only.)",
+        false
     )
 {
     m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
     m_options.emplace_back(&REVERSAL_PP, "REVERSAL_PP");
     m_options.emplace_back(&REQUIRE_SQUARE, "REQUIRE_SQUARE");
+    m_options.emplace_back(&TOUCH_DATE_INTERVAL, "TOUCH_DATE_INTERVAL");
     m_options.emplace_back(&m_advanced_options, "");
     m_options.emplace_back(&CATCH_TO_OVERWORLD_DELAY, "CATCH_TO_OVERWORLD_DELAY");
-    m_options.emplace_back(&TOUCH_DATE_INTERVAL, "TOUCH_DATE_INTERVAL");
+    if (settings.developer_mode){
+        m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
+        m_options.emplace_back(&RUN_FROM_EVERYTHING, "RUN_FROM_EVERYTHING");
+    }
 }
 
 
@@ -83,9 +96,11 @@ ShinyHuntAutonomousRegigigas2::Tracker::Tracker(
     ProgramEnvironment& env,
     ConsoleHandle& console,
     bool require_square,
-    uint16_t exit_battle_time
+    uint16_t exit_battle_time,
+    bool take_video,
+    bool run_from_everything
 )
-    : StandardEncounterTracker(stats, console, require_square, exit_battle_time)
+    : StandardEncounterTracker(stats, console, require_square, exit_battle_time, take_video, run_from_everything)
     , m_env(env)
 {}
 bool ShinyHuntAutonomousRegigigas2::Tracker::run_away(){
@@ -126,7 +141,14 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env)
     resume_game_back_out(TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);
 
     Stats& stats = env.stats<Stats>();
-    Tracker tracker(stats, env, env.console, REQUIRE_SQUARE, 0);
+    Tracker tracker(
+        stats,
+        env, env.console,
+        REQUIRE_SQUARE,
+        0,
+        VIDEO_ON_SHINY,
+        RUN_FROM_EVERYTHING
+    );
 
     while (true){
         for (uint8_t pp = REVERSAL_PP; pp > 0; pp--){

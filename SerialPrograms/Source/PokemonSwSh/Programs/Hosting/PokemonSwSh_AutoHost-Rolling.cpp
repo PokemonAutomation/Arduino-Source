@@ -50,6 +50,10 @@ AutoHostRolling::AutoHostRolling()
         "<b>1st Move Dynamax:</b><br>Dynamax on first move. (only applies if above option is non-zero)",
         true
     )
+    , TROLL_HOSTING(
+        "<b>Troll Hosting:</b> (requires 1st move select)<br>0 disables the troll hosting option, 1 attacks the first ally, 2 attacks the second one, 3 attacks the third one. Dynamaxing will disable this option.",
+        0, 0, 3
+    )
     , ALTERNATE_GAMES(
         "<b>Alternate Games:</b><br>Alternate hosting between 1st and 2nd games. Host from both Sword and Shield.",
         false
@@ -92,6 +96,7 @@ AutoHostRolling::AutoHostRolling()
     m_options.emplace_back(&EXTRA_DELAY_BETWEEN_RAIDS, "EXTRA_DELAY_BETWEEN_RAIDS");
     m_options.emplace_back(&MOVE_SLOT, "MOVE_SLOT");
     m_options.emplace_back(&DYNAMAX, "DYNAMAX");
+    m_options.emplace_back(&TROLL_HOSTING, "TROLL_HOSTING");
     m_options.emplace_back(&ALTERNATE_GAMES, "ALTERNATE_GAMES");
     m_options.emplace_back(&TOUCH_DATE_INTERVAL, "TOUCH_DATE_INTERVAL");
     m_options.emplace_back(&m_internet_settings, "");
@@ -199,6 +204,15 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env) const{
                 pbf_press_dpad(DPAD_DOWN, 20, 30);
             }
             pbf_press_button(BUTTON_A, 20, 80);
+
+            // Disable the troll hosting option if the dynamax is set to TRUE.
+            if (!DYNAMAX && TROLL_HOSTING > 0){
+                pbf_press_dpad(DPAD_DOWN, 20, 80);
+                for (uint8_t c = 0; c < TROLL_HOSTING; c++){
+                    pbf_press_dpad(DPAD_RIGHT, 20, 80);
+                }
+            }
+
             pbf_press_button(BUTTON_A, 20, 980);
         }
 

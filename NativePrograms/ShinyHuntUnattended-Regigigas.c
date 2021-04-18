@@ -21,9 +21,6 @@
 //
 const uint16_t START_TO_ATTACK_DELAY    =   3720;
 
-//  Time to return to the overworld after selecting a move.
-const uint16_t END_BATTLE_DELAY         =   22 * TICKS_PER_SECOND;
-
 
 //  Rollover Prevention
 //
@@ -33,3 +30,8 @@ const uint16_t END_BATTLE_DELAY         =   22 * TICKS_PER_SECOND;
 //  Otherwise, the program will touch the date at roughly this interval to
 //  prevent a den from rolling over. This feature requres time-sync be disabled.
 const uint32_t TOUCH_DATE_INTERVAL  =   (uint32_t)4 * 3600 * TICKS_PER_SECOND;  //  4 hours
+
+
+
+//  Time to return to the overworld after selecting a move.
+const uint16_t END_BATTLE_DELAY         =   22 * TICKS_PER_SECOND;

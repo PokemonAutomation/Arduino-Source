@@ -26,9 +26,9 @@ public:
 private:
     TimeExpression<uint16_t> EXIT_CAMP_TO_RUN_DELAY;
     BooleanCheckBox AIRPLANE_MODE;
+    SimpleInteger<uint8_t> TIME_ROLLBACK_HOURS;
     SectionDivider m_advanced_options;
     TimeExpression<uint16_t> ENTER_CAMP_DELAY;
-    SimpleInteger<uint8_t> TIME_ROLLBACK_HOURS;
 };
 
 }

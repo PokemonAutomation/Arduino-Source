@@ -104,7 +104,7 @@
         },
         {
             "00-Type": "BooleanCheckBox",
-            "01-Label": "<b>1st Move Dynamax:</b><br>Dynamax on first move. (only applies if above option is non-zero)",
+            "01-Label": "<b>1st Move Dynamax:</b> (requires 1st move select)<br>Dynamax on first move. (only applies if above option is non-zero)",
             "02-Declaration": "const bool DYNAMAX",
             "98-Default": true,
             "99-Current": true

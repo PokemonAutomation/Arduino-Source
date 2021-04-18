@@ -30,7 +30,7 @@ public:
     //  Returns true if this loop has timed out.
     bool end_iteration(ProgramEnvironment& env){
         auto now = std::chrono::system_clock::now();
-        if (now - m_start >= m_timeout){
+        if (m_timeout != std::chrono::milliseconds(0) && now - m_start >= m_timeout){
             return true;
         }
 

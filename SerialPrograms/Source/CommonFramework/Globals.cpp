@@ -9,7 +9,7 @@
 namespace PokemonAutomation{
 
 
-const QString VERSION = "v0.5.9";
+const QString VERSION = "v0.5.16";
 const QString DISCORD_LINK = "discord.gg/cQ4gWxN";
 const QString DISCORD_LINK_FULL = "https://" + DISCORD_LINK;
 const QString GITHUB_REPO = "https://github.com/PokemonAutomation/SwSh-Arduino";

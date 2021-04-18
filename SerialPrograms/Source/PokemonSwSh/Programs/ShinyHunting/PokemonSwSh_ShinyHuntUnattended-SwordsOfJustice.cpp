@@ -31,6 +31,10 @@ ShinyHuntUnattendedSwordsOfJustice::ShinyHuntUnattendedSwordsOfJustice()
         "<b>Airplane Mode:</b><br>Enable if airplane mode is on.",
         false
     )
+    , TIME_ROLLBACK_HOURS(
+        "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
+        1, 0, 11
+    )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -38,16 +42,12 @@ ShinyHuntUnattendedSwordsOfJustice::ShinyHuntUnattendedSwordsOfJustice()
         "<b>Enter Camp Delay:</b>",
         "8 * TICKS_PER_SECOND"
     )
-    , TIME_ROLLBACK_HOURS(
-        "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
-        1, 0, 11
-    )
 {
     m_options.emplace_back(&EXIT_CAMP_TO_RUN_DELAY, "EXIT_CAMP_TO_RUN_DELAY");
     m_options.emplace_back(&AIRPLANE_MODE, "AIRPLANE_MODE");
+    m_options.emplace_back(&TIME_ROLLBACK_HOURS, "TIME_ROLLBACK_HOURS");
     m_options.emplace_back(&m_advanced_options, "");
     m_options.emplace_back(&ENTER_CAMP_DELAY, "ENTER_CAMP_DELAY");
-    m_options.emplace_back(&TIME_ROLLBACK_HOURS, "TIME_ROLLBACK_HOURS");
 }
 
 

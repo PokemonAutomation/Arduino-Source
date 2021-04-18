@@ -9,6 +9,10 @@
 #include "ClientSource/Libraries/Logging.h"
 #include "StatsDatabase.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -70,6 +74,7 @@ std::string StatList::to_str() const{
 void StatList::aggregate(StatsTracker& tracker) const{
     for (const StatLine& line : m_list){
         tracker.parse_and_append_line(line.stats());
+//        cout << tracker.to_str() << endl;
     }
 }
 
@@ -150,7 +155,7 @@ bool StatSet::get_line(std::string& line, const char*& ptr){
     for (;; ptr++){
         char ch = *ptr;
         if (ch == '\0'){
-//                cout << line << endl;
+//            cout << line << endl;
             ptr++;
             return false;
         }
@@ -166,6 +171,8 @@ bool StatSet::get_line(std::string& line, const char*& ptr){
     }
 }
 void StatSet::load_from_string(const char* ptr){
+    m_data.clear();
+
     //  Find first section.
     while (true){
         std::string line;

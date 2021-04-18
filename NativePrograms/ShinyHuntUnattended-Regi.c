@@ -33,6 +33,16 @@ const uint16_t START_TO_RUN_DELAY   =   1990;
 const RegiGolem REGI_NAME           =   Registeel;
 
 
+//  Rollover Prevention
+//
+//  Prevent a den from rolling over by periodically touching the date.
+//
+//  If set to zero, this feature is disabled.
+//  Otherwise, the program will touch the date at roughly this interval to
+//  prevent a den from rolling over. This feature requres time-sync be disabled.
+const uint32_t TOUCH_DATE_INTERVAL  =   (uint32_t)4 * 3600 * TICKS_PER_SECOND;  //  4 hours
+
+
 
 //  The light puzzle is not 100% reliable. Sometimes it will miss lights.
 //  To counter that, the program will periodically leave and re-enter the
@@ -43,13 +53,3 @@ const uint16_t CORRECTION_INTERVAL  =   20;
 
 //  Delay to enter/exit the building.
 const uint16_t TRANSITION_DELAY     =   5 * TICKS_PER_SECOND;
-
-
-//  Rollover Prevention
-//
-//  Prevent a den from rolling over by periodically touching the date.
-//
-//  If set to zero, this feature is disabled.
-//  Otherwise, the program will touch the date at roughly this interval to
-//  prevent a den from rolling over. This feature requres time-sync be disabled.
-const uint32_t TOUCH_DATE_INTERVAL  =   (uint32_t)4 * 3600 * TICKS_PER_SECOND;  //  4 hours

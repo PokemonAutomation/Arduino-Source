@@ -28,9 +28,11 @@ private:
     struct Stats;
 
     BooleanCheckBox GO_HOME_WHEN_DONE;
+    SimpleInteger<uint8_t> TIME_ROLLBACK_HOURS;
     SectionDivider m_advanced_options;
     TimeExpression<uint16_t> EXIT_BATTLE_MASH_TIME;
-    SimpleInteger<uint8_t> TIME_ROLLBACK_HOURS;
+    BooleanCheckBox VIDEO_ON_SHINY;
+    BooleanCheckBox RUN_FROM_EVERYTHING;
 };
 
 }

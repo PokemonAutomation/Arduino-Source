@@ -75,6 +75,7 @@ public:
 private:
     void on_stop();
     void reset_connections();
+    void update_historical_stats();
     virtual void program(
         StatsTracker* current_stats,
         const StatsTracker* historical_stats
@@ -104,6 +105,8 @@ protected:
     QLabel* m_status_bar;
     QPushButton* m_start_button;
     QPushButton* m_default_button;
+
+    std::unique_ptr<StatsTracker> m_stats;
 
 //    ProgramEnvironment m_environment;
     std::atomic<ProgramState> m_state;

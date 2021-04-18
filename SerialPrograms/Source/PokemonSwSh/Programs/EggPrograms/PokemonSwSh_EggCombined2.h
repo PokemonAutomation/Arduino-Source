@@ -29,11 +29,11 @@ private:
     SimpleInteger<uint8_t> BOXES_TO_HATCH;
     EggStepCount STEPS_TO_HATCH;
     FloatingPoint FETCHES_PER_BATCH;
+    TimeExpression<uint32_t> TOUCH_DATE_INTERVAL;
     SectionDivider m_advanced_options;
     TimeExpression<uint16_t> SAFETY_TIME;
     TimeExpression<uint16_t> EARLY_HATCH_SAFETY;
     TimeExpression<uint16_t> HATCH_DELAY;
-    TimeExpression<uint32_t> TOUCH_DATE_INTERVAL;
 };
 
 

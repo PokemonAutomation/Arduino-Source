@@ -22,13 +22,6 @@
 const uint16_t ENTER_GAME_TO_RUN_DELAY  =   2280;
 
 
-
-//  Wait this long for the game to start before pressing A to enter the game
-//  and start the encounter. You can try to decrease this to make resetting
-//  faster.
-const uint16_t START_GAME_WAIT_DELAY    =   20 * TICKS_PER_SECOND;
-
-
 //  Time Rollback
 //
 //  Periodically roll back the time to keep the weather the same.
@@ -37,3 +30,10 @@ const uint16_t START_GAME_WAIT_DELAY    =   20 * TICKS_PER_SECOND;
 //  Otherwise, it roll the hour back by this amount every this many hours.
 //  This feature requres time-sync be disabled.
 const uint8_t TIME_ROLLBACK_HOURS   =   1;
+
+
+
+//  Wait this long for the game to start before pressing A to enter the game
+//  and start the encounter. You can try to decrease this to make resetting
+//  faster.
+const uint16_t START_GAME_WAIT_DELAY    =   20 * TICKS_PER_SECOND;
