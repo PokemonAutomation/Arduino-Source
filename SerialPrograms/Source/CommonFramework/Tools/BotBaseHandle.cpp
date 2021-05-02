@@ -211,6 +211,7 @@ void BotBaseHandle::thread_body(){
         }
     });
 
+    BotBaseContext context(*m_botbase);
     while (true){
         if (m_state.load(std::memory_order_acquire) != State::READY){
             break;
@@ -220,7 +221,7 @@ void BotBaseHandle::thread_body(){
         std::string error;
         try{
 //            cout << "system_clock()" << endl;
-            uint32_t wallclock = system_clock(*m_botbase);
+            uint32_t wallclock = system_clock(context);
 //            cout << "system_clock() - done" << endl;
             str = ticks_to_time(wallclock);
         }catch (const char* str){

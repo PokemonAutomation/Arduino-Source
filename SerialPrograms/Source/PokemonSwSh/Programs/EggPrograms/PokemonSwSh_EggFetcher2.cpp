@@ -31,7 +31,11 @@ EggFetcher2::EggFetcher2()
 }
 
 
-void EggFetcher2::run_eggfetcher(SingleSwitchProgramEnvironment& env, bool deposit_automatically, uint16_t attempts) const{
+void EggFetcher2::run_eggfetcher(
+    SingleSwitchProgramEnvironment& env,
+    bool deposit_automatically,
+    uint16_t attempts
+) const{
     if (attempts == 0){
         return;
     }
@@ -41,8 +45,8 @@ void EggFetcher2::run_eggfetcher(SingleSwitchProgramEnvironment& env, bool depos
     //  1st Fetch: Get into position.
     {
         env.log("Fetch Attempts: " + tostr_u_commas(c));
-        fly_home_collect_egg(true);
-        collect_egg_mash_out(deposit_automatically);
+        fly_home_collect_egg(env.console, true);
+        collect_egg_mash_out(env.console, deposit_automatically);
 
         c++;
         if (c >= attempts){
@@ -53,21 +57,21 @@ void EggFetcher2::run_eggfetcher(SingleSwitchProgramEnvironment& env, bool depos
     //  Now we are in steady state.
     for (; c < attempts; c++){
         env.log("Fetch Attempts: " + tostr_u_commas(c));
-        eggfetcher_loop();
-        collect_egg();
-        collect_egg_mash_out(deposit_automatically);
+        eggfetcher_loop(env.console);
+        collect_egg(env.console);
+        collect_egg_mash_out(env.console, deposit_automatically);
     }
 }
 
 void EggFetcher2::program(SingleSwitchProgramEnvironment& env) const{
-    grip_menu_connect_go_home();
-    resume_game_back_out(TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+    grip_menu_connect_go_home(env.console);
+    resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
 
     run_eggfetcher(env, AUTO_DEPOSIT, MAX_FETCH_ATTEMPTS);
 
-    pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
-    end_program_callback();
-    end_program_loop();
+    pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+    end_program_callback(env.console);
+    end_program_loop(env.console);
 }
 
 

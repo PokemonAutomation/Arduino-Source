@@ -81,38 +81,39 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousIoATrade::make_stats() const{
 
 
 void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env) const{
-    grip_menu_connect_go_home();
-    resume_game_back_out(TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);
+    grip_menu_connect_go_home(env.console);
+    resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);
 
-    uint32_t last_touch = system_clock() - TOUCH_DATE_INTERVAL;
+    uint32_t last_touch = system_clock(env.console) - TOUCH_DATE_INTERVAL;
 
     Stats& stats = env.stats<Stats>();
 
     while (true){
         env.update_stats();
 
-        pbf_press_button(BUTTON_A, 10, 100);
-        pbf_press_button(BUTTON_A, 10, 60);
-        pbf_press_button(BUTTON_A, 10, 100);
-        pbf_press_button(BUTTON_A, 10, 50);
-        pbf_press_button(BUTTON_A, 10, POKEMON_TO_BOX_DELAY);
-        pbf_press_dpad(DPAD_LEFT, 10, 10);
-        pbf_mash_button(BUTTON_A, MASH_TO_TRADE_DELAY);
+        pbf_press_button(env.console, BUTTON_A, 10, 100);
+        pbf_press_button(env.console, BUTTON_A, 10, 60);
+        pbf_press_button(env.console, BUTTON_A, 10, 100);
+        pbf_press_button(env.console, BUTTON_A, 10, 50);
+        pbf_press_button(env.console, BUTTON_A, 10, POKEMON_TO_BOX_DELAY);
+        pbf_press_dpad(env.console, DPAD_LEFT, 10, 10);
+        pbf_mash_button(env.console, BUTTON_A, MASH_TO_TRADE_DELAY);
 
         //  Enter box system.
-        pbf_press_button(BUTTON_X, 10, OVERWORLD_TO_MENU_DELAY);
-        pbf_press_dpad(DPAD_RIGHT, 10, 10);
-        pbf_press_button(BUTTON_A, 10, MENU_TO_POKEMON_DELAY);
+        pbf_press_button(env.console, BUTTON_X, 10, OVERWORLD_TO_MENU_DELAY);
+        pbf_press_dpad(env.console, DPAD_RIGHT, 10, 10);
+        pbf_press_button(env.console, BUTTON_A, 10, MENU_TO_POKEMON_DELAY);
 
         //  View summary.
-        pbf_press_button(BUTTON_A, 10, 100);
-        pbf_press_button(BUTTON_A, 10, 0);
+        pbf_press_button(env.console, BUTTON_A, 10, 100);
+        pbf_press_button(env.console, BUTTON_A, 10, 0);
         env.console.botbase().wait_for_all_requests();
 
         SummaryShinySymbolDetector::Detection detection;
         {
             SummaryShinySymbolDetector detector(env.console, env.logger());
             detection = detector.wait_for_detection(env);
+//            detection = SummaryShinySymbolDetector::SHINY;
         }
         switch (detection){
         case SummaryShinySymbolDetector::NO_DETECTION:
@@ -124,18 +125,18 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env) c
         case SummaryShinySymbolDetector::SHINY:
             stats.add_unknown_shiny();
             if (VIDEO_ON_SHINY){
-                pbf_wait(1 * TICKS_PER_SECOND);
-                pbf_press_button(BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+                pbf_wait(env.console, 1 * TICKS_PER_SECOND);
+                pbf_press_button(env.console, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
             }
             if (!RUN_FROM_EVERYTHING){
                 goto StopProgram;
             }
         }
 
-        pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
-        if (TOUCH_DATE_INTERVAL > 0 && system_clock() - last_touch >= TOUCH_DATE_INTERVAL){
+        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+        if (TOUCH_DATE_INTERVAL > 0 && system_clock(env.console) - last_touch >= TOUCH_DATE_INTERVAL){
             env.log("Touching date to prevent rollover.");
-            touch_date_from_home(SETTINGS_TO_HOME_DELAY);
+            touch_date_from_home(env.console, SETTINGS_TO_HOME_DELAY);
             last_touch += TOUCH_DATE_INTERVAL;
         }
         reset_game_from_home_with_inference(
@@ -148,11 +149,11 @@ StopProgram:
     env.update_stats();
 
     if (GO_HOME_WHEN_DONE){
-        pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
     }
 
-    end_program_callback();
-    end_program_loop();
+    end_program_callback(env.console);
+    end_program_loop(env.console);
 }
 
 

@@ -10,30 +10,13 @@
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "PokemonSwShAutoHosts.h"
 
-using namespace PokemonAutomation;
 
+#if 0
 void connect_to_internet(uint16_t open_ycomm_delay, uint16_t connect_to_internet_delay){
-    connect_to_internet(*global_connection, open_ycomm_delay, connect_to_internet_delay);
-}
-void connect_to_internet(
-    BotBase& device,
-    uint16_t open_ycomm_delay,
-    uint16_t connect_to_internet_delay
-){
-    pabb_connect_to_internet params;
-    params.open_ycomm_delay = open_ycomm_delay;
-    params.connect_to_internet_delay = connect_to_internet_delay;
-    device.issue_request<PABB_MSG_COMMAND_CONNECT_TO_INTERNET>(params);
+    connect_to_internet(*PokemonAutomation::global_connection, open_ycomm_delay, connect_to_internet_delay);
 }
 void home_to_add_friends(uint8_t user_slot, uint8_t scroll_down, bool fix_cursor){
-    home_to_add_friends(*global_connection, user_slot, scroll_down, fix_cursor);
-}
-void home_to_add_friends(BotBase& device, uint8_t user_slot, uint8_t scroll_down, bool fix_cursor){
-    pabb_home_to_add_friends params;
-    params.user_slot = user_slot;
-    params.scroll_down = scroll_down;
-    params.fix_cursor = fix_cursor;
-    device.issue_request<PABB_MSG_COMMAND_HOME_TO_ADD_FRIENDS>(params);
+    home_to_add_friends(*PokemonAutomation::global_connection, user_slot, scroll_down, fix_cursor);
 }
 uint16_t accept_FRs(
     uint8_t slot, bool fix_cursor,
@@ -42,7 +25,7 @@ uint16_t accept_FRs(
     bool tolerate_system_update_window_slow
 ){
     accept_FRs(
-        *global_connection,
+        *PokemonAutomation::global_connection,
         slot, fix_cursor,
         game_to_home_delay_safe,
         auto_fr_duration,
@@ -50,8 +33,53 @@ uint16_t accept_FRs(
     );
     return 0;
 }
+void accept_FRs_while_waiting(
+    uint8_t slot, uint16_t wait_time,
+    uint16_t game_to_home_delay_safe,
+    uint16_t auto_fr_duration,
+    bool tolerate_system_update_window_slow
+){
+    accept_FRs_while_waiting(
+        *PokemonAutomation::global_connection,
+        slot, wait_time,
+        game_to_home_delay_safe,
+        auto_fr_duration,
+        tolerate_system_update_window_slow
+    );
+}
+#endif
+
+
+
+namespace PokemonAutomation{
+
+
+
+
+void connect_to_internet(
+    const BotBaseContext& context,
+    uint16_t open_ycomm_delay,
+    uint16_t connect_to_internet_delay
+){
+    pabb_connect_to_internet params;
+    params.open_ycomm_delay = open_ycomm_delay;
+    params.connect_to_internet_delay = connect_to_internet_delay;
+    context->issue_request<PABB_MSG_COMMAND_CONNECT_TO_INTERNET>(&context.cancelled_bool(), params);
+}
+void home_to_add_friends(
+    const BotBaseContext& context,
+    uint8_t user_slot,
+    uint8_t scroll_down,
+    bool fix_cursor
+){
+    pabb_home_to_add_friends params;
+    params.user_slot = user_slot;
+    params.scroll_down = scroll_down;
+    params.fix_cursor = fix_cursor;
+    context->issue_request<PABB_MSG_COMMAND_HOME_TO_ADD_FRIENDS>(&context.cancelled_bool(), params);
+}
 uint16_t accept_FRs(
-    BotBase& device,
+    const BotBaseContext& context,
     uint8_t slot, bool fix_cursor,
     uint16_t game_to_home_delay_safe,
     uint16_t auto_fr_duration,
@@ -63,25 +91,11 @@ uint16_t accept_FRs(
     params.game_to_home_delay_safe = game_to_home_delay_safe;
     params.auto_fr_duration = auto_fr_duration;
     params.tolerate_system_update_window_slow = tolerate_system_update_window_slow;
-    device.issue_request<PABB_MSG_COMMAND_ACCEPT_FRS>(params);
+    context->issue_request<PABB_MSG_COMMAND_ACCEPT_FRS>(&context.cancelled_bool(), params);
     return 0;
 }
 void accept_FRs_while_waiting(
-    uint8_t slot, uint16_t wait_time,
-    uint16_t game_to_home_delay_safe,
-    uint16_t auto_fr_duration,
-    bool tolerate_system_update_window_slow
-){
-    accept_FRs_while_waiting(
-        *global_connection,
-        slot, wait_time,
-        game_to_home_delay_safe,
-        auto_fr_duration,
-        tolerate_system_update_window_slow
-    );
-}
-void accept_FRs_while_waiting(
-    BotBase& device,
+    const BotBaseContext& context,
     uint8_t slot, uint16_t wait_time,
     uint16_t game_to_home_delay_safe,
     uint16_t auto_fr_duration,
@@ -93,7 +107,7 @@ void accept_FRs_while_waiting(
     params.game_to_home_delay_safe = game_to_home_delay_safe;
     params.auto_fr_duration = auto_fr_duration;
     params.tolerate_system_update_window_slow = tolerate_system_update_window_slow;
-    device.issue_request<PABB_MSG_COMMAND_ACCEPT_FRS_WHILE_WAITING>(params);
+    context->issue_request<PABB_MSG_COMMAND_ACCEPT_FRS_WHILE_WAITING>(&context.cancelled_bool(), params);
 }
 
 
@@ -160,4 +174,8 @@ int register_message_converters_pokemon_autohosting(){
     return 0;
 }
 int init_PokemonSwShAutoHosts = register_message_converters_pokemon_autohosting();
+
+
+}
+
 

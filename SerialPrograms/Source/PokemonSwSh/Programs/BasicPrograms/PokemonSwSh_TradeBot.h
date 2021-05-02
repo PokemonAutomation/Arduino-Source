@@ -25,7 +25,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) const override;
 
 private:
-    void trade_slot(const uint8_t code[8], uint8_t slot) const;
+    void trade_slot(const BotBaseContext& context, const uint8_t code[8], uint8_t slot) const;
 
 private:
     FixedCode TRADE_CODE;

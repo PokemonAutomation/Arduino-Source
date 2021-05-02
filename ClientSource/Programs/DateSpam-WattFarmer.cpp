@@ -35,7 +35,7 @@ void program_DateSpam_WattFarmer(const std::string& device_name){
     std::cout << "Starting PABotBase - DateSpam-WattFarmer..." << std::endl;
     std::cout << std::endl;
     std::unique_ptr<PABotBase> pabotbase = start_connection(true, device_name);
-    global_connection = pabotbase.get();
+//    global_connection = pabotbase.get();
 
     std::cout << "Begin Message Logging..." << std::endl;
     MessageLogger logger;
@@ -43,39 +43,39 @@ void program_DateSpam_WattFarmer(const std::string& device_name){
 
 
 
-    start_program_flash(CONNECT_CONTROLLER_DELAY);
-    grip_menu_connect_go_home();
+    start_program_flash(*pabotbase, CONNECT_CONTROLLER_DELAY);
+    grip_menu_connect_go_home(*pabotbase);
 
     uint8_t year = MAX_YEAR;
     uint16_t save_count = 0;
     for (uint32_t c = 0; c < SKIPS; c++){
 //        pabb_send_info_i32(c);
         log("Frames Skipped: " + std::to_string(c));
-        home_roll_date_enter_game_autorollback(&year);
-        pbf_mash_button(BUTTON_B, 90);
+        home_roll_date_enter_game_autorollback(*pabotbase, &year);
+        pbf_mash_button(*pabotbase, BUTTON_B, 90);
 
-        pbf_press_button(BUTTON_A, 5, 5);
-        pbf_mash_button(BUTTON_B, 215);
+        pbf_press_button(*pabotbase, BUTTON_A, 5, 5);
+        pbf_mash_button(*pabotbase, BUTTON_B, 215);
 
         if (SAVE_ITERATIONS != 0){
             save_count++;
             if (save_count >= SAVE_ITERATIONS){
                 save_count = 0;
-                pbf_mash_button(BUTTON_B, 2 * TICKS_PER_SECOND);
-                pbf_press_button(BUTTON_X, 20, OVERWORLD_TO_MENU_DELAY);
-                pbf_press_button(BUTTON_R, 20, 2 * TICKS_PER_SECOND);
-                pbf_press_button(BUTTON_ZL, 20, 3 * TICKS_PER_SECOND);
+                pbf_mash_button(*pabotbase, BUTTON_B, 2 * TICKS_PER_SECOND);
+                pbf_press_button(*pabotbase, BUTTON_X, 20, OVERWORLD_TO_MENU_DELAY);
+                pbf_press_button(*pabotbase, BUTTON_R, 20, 2 * TICKS_PER_SECOND);
+                pbf_press_button(*pabotbase, BUTTON_ZL, 20, 3 * TICKS_PER_SECOND);
             }
         }
 
         //  Tap HOME and quickly spam B. The B spamming ensures that we don't
         //  accidentally update the system if the system update window pops up.
-        pbf_press_button(BUTTON_HOME, 10, 5);
-        pbf_mash_button(BUTTON_B, GAME_TO_HOME_DELAY_FAST - 15);
+        pbf_press_button(*pabotbase, BUTTON_HOME, 10, 5);
+        pbf_mash_button(*pabotbase, BUTTON_B, GAME_TO_HOME_DELAY_FAST - 15);
     }
 
-    end_program_callback();
-    end_program_loop();
+    end_program_callback(*pabotbase);
+    end_program_loop(*pabotbase);
 }
 
 

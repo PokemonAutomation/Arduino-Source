@@ -23,20 +23,24 @@ public:
         VideoFeed& video
     )
         : m_index(index)
-        , m_botbase(botbase)
+        , m_context(botbase)
         , m_video(video)
     {}
 
     size_t index() const{ return m_index; }
-    BotBase& botbase(){ return m_botbase; }
+
+    BotBase& botbase(){ return m_context.botbase(); }
+    BotBaseContext& context(){ return m_context; }
     VideoFeed& video(){ return m_video; }
 
-    operator BotBase&(){ return m_botbase; }
+    operator BotBase&(){ return m_context.botbase(); }
     operator VideoFeed&(){ return m_video; }
+    operator BotBaseContext&(){ return m_context; }
 
 private:
     size_t m_index;
-    BotBase& m_botbase;
+//    BotBase& m_botbase;
+    BotBaseContext m_context;
     VideoFeed& m_video;
 };
 

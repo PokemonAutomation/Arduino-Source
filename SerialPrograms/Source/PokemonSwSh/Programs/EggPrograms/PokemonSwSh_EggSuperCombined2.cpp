@@ -80,25 +80,25 @@ void EggSuperCombined2::program(SingleSwitchProgramEnvironment& env) const{
         .TOUCH_DATE_INTERVAL = TOUCH_DATE_INTERVAL,
     };
 
-    grip_menu_connect_go_home();
-    resume_game_back_out(TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+    grip_menu_connect_go_home(env.console);
+    resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
 
     //  Mass Release
-    ssf_press_button2(BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
-    ssf_press_button1(BUTTON_A, 200);
-    ssf_press_button1(BUTTON_R, 250);
-    release_boxes(BOXES_TO_RELEASE, BOX_SCROLL_DELAY, BOX_CHANGE_DELAY);
+    ssf_press_button2(env.console, BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
+    ssf_press_button1(env.console, BUTTON_A, 200);
+    ssf_press_button1(env.console, BUTTON_R, 250);
+    release_boxes(env.console, BOXES_TO_RELEASE, BOX_SCROLL_DELAY, BOX_CHANGE_DELAY);
 
     //  Skip Boxes
     for (uint8_t c = 0; c <= BOXES_TO_SKIP; c++){
-        ssf_press_button1(BUTTON_R, 60);
+        ssf_press_button1(env.console, BUTTON_R, 60);
     }
-    pbf_mash_button(BUTTON_B, 600);
+    pbf_mash_button(env.console, BUTTON_B, 600);
 
     session.eggcombined2_body(env);
 
-    end_program_callback();
-    end_program_loop();
+    end_program_callback(env.console);
+    end_program_loop(env.console);
 }
 
 

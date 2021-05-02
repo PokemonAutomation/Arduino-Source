@@ -65,7 +65,7 @@ void SingleSwitchProgramUI::program(
             this->set_status(std::move(status));
         }
     );
-    PokemonAutomation::global_connection = &(BotBase&)env.console;
+//    PokemonAutomation::global_connection = &env.console.context();
     SingleSwitchProgram& factory = static_cast<SingleSwitchProgram&>(m_factory);
     factory.program(env);
 }

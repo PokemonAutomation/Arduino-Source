@@ -89,16 +89,16 @@ ShinyHuntAutonomousStrongSpawn::Tracker::Tracker(
     : StandardEncounterTracker(stats, console, false, 0, take_video, run_from_everything)
 {}
 bool ShinyHuntAutonomousStrongSpawn::Tracker::run_away(){
-    pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+    pbf_press_button(m_console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
     return true;
 }
 
 void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env) const{
-    grip_menu_connect_go_home();
-//    resume_game_no_interact(TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+    grip_menu_connect_go_home(env.console);
+//    resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 
     const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
-    uint32_t last_touch = system_clock();
+    uint32_t last_touch = system_clock(env.console);
 
     Stats& stats = env.stats<Stats>();
     Tracker tracker(stats, env.console, VIDEO_ON_SHINY, RUN_FROM_EVERYTHING);
@@ -106,9 +106,9 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
     while (true){
         env.update_stats();
 
-        uint32_t now = system_clock();
+        uint32_t now = system_clock(env.console);
         if (TIME_ROLLBACK_HOURS > 0 && now - last_touch >= PERIOD){
-            rollback_hours_from_home(TIME_ROLLBACK_HOURS, SETTINGS_TO_HOME_DELAY);
+            rollback_hours_from_home(env.console, TIME_ROLLBACK_HOURS, SETTINGS_TO_HOME_DELAY);
             last_touch += PERIOD;
         }
         reset_game_from_home_with_inference(
@@ -137,11 +137,11 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
     env.update_stats();
 
     if (GO_HOME_WHEN_DONE){
-        pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
     }
 
-    end_program_callback();
-    end_program_loop();
+    end_program_callback(env.console);
+    end_program_loop(env.console);
 }
 
 

@@ -56,79 +56,79 @@ ShinyHuntUnattendedIoATrade::ShinyHuntUnattendedIoATrade()
 }
 
 void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env) const{
-    grip_menu_connect_go_home();
-    resume_game_back_out(TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);
+    grip_menu_connect_go_home(env.console);
+    resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);
 
-    uint32_t last_touch = system_clock() - TOUCH_DATE_INTERVAL;
+    uint32_t last_touch = system_clock(env.console) - TOUCH_DATE_INTERVAL;
     for (uint32_t c = 0; ; c++){
         env.log("Starting Trade: " + tostr_u_commas(c + 1));
 
-        pbf_press_button(BUTTON_A, 10, 100);
-        pbf_press_button(BUTTON_A, 10, 60);
-        pbf_press_button(BUTTON_A, 10, 100);
-        pbf_press_button(BUTTON_A, 10, 50);
-        pbf_press_button(BUTTON_A, 10, POKEMON_TO_BOX_DELAY);
-        pbf_press_dpad(DPAD_LEFT, 10, 10);
-        pbf_mash_button(BUTTON_A, MASH_TO_TRADE_DELAY);
+        pbf_press_button(env.console, BUTTON_A, 10, 100);
+        pbf_press_button(env.console, BUTTON_A, 10, 60);
+        pbf_press_button(env.console, BUTTON_A, 10, 100);
+        pbf_press_button(env.console, BUTTON_A, 10, 50);
+        pbf_press_button(env.console, BUTTON_A, 10, POKEMON_TO_BOX_DELAY);
+        pbf_press_dpad(env.console, DPAD_LEFT, 10, 10);
+        pbf_mash_button(env.console, BUTTON_A, MASH_TO_TRADE_DELAY);
 
         if (true){
             //  Enter box system.
-            pbf_press_button(BUTTON_X, 10, OVERWORLD_TO_MENU_DELAY);
-            pbf_press_dpad(DPAD_RIGHT, 10, 10);
-            pbf_press_button(BUTTON_A, 10, MENU_TO_POKEMON_DELAY);
+            pbf_press_button(env.console, BUTTON_X, 10, OVERWORLD_TO_MENU_DELAY);
+            pbf_press_dpad(env.console, DPAD_RIGHT, 10, 10);
+            pbf_press_button(env.console, BUTTON_A, 10, MENU_TO_POKEMON_DELAY);
 
             //  Move item from 2nd party member to 1st.
-            pbf_press_button(BUTTON_X, 10, 50);
-            pbf_press_dpad(DPAD_DOWN, 10, 50);
-            pbf_press_button(BUTTON_A, 10, 50);
-            pbf_press_dpad(DPAD_UP, 10, 50);
-            pbf_press_button(BUTTON_A, 10, 50);
+            pbf_press_button(env.console, BUTTON_X, 10, 50);
+            pbf_press_dpad(env.console, DPAD_DOWN, 10, 50);
+            pbf_press_button(env.console, BUTTON_A, 10, 50);
+            pbf_press_dpad(env.console, DPAD_UP, 10, 50);
+            pbf_press_button(env.console, BUTTON_A, 10, 50);
 
             //  Back out to menu.
             //  Prepend each B press by a DOWN press so that the B gets
             //  swallowed while in the summary.
-            IoA_backout(POKEMON_TO_MENU_DELAY);
+            IoA_backout(env.console, POKEMON_TO_MENU_DELAY);
 
             //  Enter map.
-            pbf_press_dpad(DPAD_LEFT, 10, 0);
-            pbf_move_left_joystick(128, 255, 10, 0);
+            pbf_press_dpad(env.console, DPAD_LEFT, 10, 0);
+            pbf_move_left_joystick(env.console, 128, 255, 10, 0);
         }else{
-            pbf_press_dpad(DPAD_DOWN, 10, 50);
+            pbf_press_dpad(env.console, DPAD_DOWN, 10, 50);
         }
-        pbf_press_button(BUTTON_A, 10, 350);
+        pbf_press_button(env.console, BUTTON_A, 10, 350);
 
         //  Fly to Route 10.
-        pbf_press_button(BUTTON_L, 10, 100);
-        pbf_press_button(BUTTON_L, 10, 100);
-        pbf_press_dpad(DPAD_RIGHT, 15, 10);
-        pbf_press_dpad(DPAD_DOWN, 30, 10);
-        pbf_mash_button(BUTTON_A, FLY_DURATION);
+        pbf_press_button(env.console, BUTTON_L, 10, 100);
+        pbf_press_button(env.console, BUTTON_L, 10, 100);
+        pbf_press_dpad(env.console, DPAD_RIGHT, 15, 10);
+        pbf_press_dpad(env.console, DPAD_DOWN, 30, 10);
+        pbf_mash_button(env.console, BUTTON_A, FLY_DURATION);
 
         //  Move to Beartic.
-        pbf_move_left_joystick(240, 0, MOVE_DURATION, 0);
+        pbf_move_left_joystick(env.console, 240, 0, MOVE_DURATION, 0);
 
-        pbf_wait(START_TO_RUN_DELAY);
+        pbf_wait(env.console, START_TO_RUN_DELAY);
 
         //  Run away.
-        run_away_with_lights();
+        run_away_with_lights(env.console);
 
         //  Enter Pokemon menu if shiny.
-        enter_summary(false);
+        enter_summary(env.console, false);
 
         //  Touch the date and conditional close game.
-        if (TOUCH_DATE_INTERVAL > 0 && system_clock() - last_touch >= TOUCH_DATE_INTERVAL){
+        if (TOUCH_DATE_INTERVAL > 0 && system_clock(env.console) - last_touch >= TOUCH_DATE_INTERVAL){
             last_touch += TOUCH_DATE_INTERVAL;
-            close_game_if_overworld(true, 0);
+            close_game_if_overworld(env.console, true, 0);
         }else{
-            close_game_if_overworld(false, 0);
+            close_game_if_overworld(env.console, false, 0);
         }
 
-        start_game_from_home(TOLERATE_SYSTEM_UPDATE_MENU_FAST, 0, 0, false);
+        start_game_from_home(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 0, 0, false);
     }
 
-    pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
-    end_program_callback();
-    end_program_loop();
+    pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+    end_program_callback(env.console);
+    end_program_loop(env.console);
 }
 
 

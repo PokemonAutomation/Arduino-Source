@@ -50,7 +50,7 @@ void RightPanelUI::construct(){
 
     QString name_text = "<b>Name:</b> " + m_factory.m_name;
     if (m_factory.m_doc_link.size() > 0){
-        QString path = GITHUB_REPO + "/blob/master/Documentation/" + m_factory.m_doc_link;
+        QString path = ONLINE_DOC_URL + "/blob/master/Documentation/" + m_factory.m_doc_link;
         name_text += " (<a href=\"" + path + "\">online documentation</a>)</font>";
     }
     QLabel* name = new QLabel(name_text, description_box);

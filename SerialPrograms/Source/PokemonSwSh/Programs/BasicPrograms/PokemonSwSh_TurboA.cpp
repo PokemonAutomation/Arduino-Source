@@ -23,10 +23,10 @@ TurboA::TurboA()
 {}
 
 void TurboA::program(SingleSwitchProgramEnvironment& env) const{
-    grip_menu_connect_go_home();
-    resume_game_back_out(TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
+    grip_menu_connect_go_home(env.console);
+    resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
     while (true){
-        pbf_press_button(BUTTON_A, 5, 5);
+        pbf_press_button(env.console, BUTTON_A, 5, 5);
     }
 }
 

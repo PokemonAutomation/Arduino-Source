@@ -28,6 +28,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
+
 ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
     : SingleSwitchProgram(
         FeedbackType::REQUIRED, PABotBaseLevel::PABOTBASE_12KB,
@@ -38,6 +39,11 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
     , GO_HOME_WHEN_DONE(
         "<b>Go Home when Done:</b><br>After finding a shiny, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
         false
+    )
+    , MARK_OFFSET(
+        "<b>Mark Offset:</b><br>Aim this far below the bottom of the exclamation/question mark. 1.0 is the height of the mark. "
+        "Increase this value when the " + STRING_POKEMON + " are large.",
+        0.5, 0, 20
     )
     , PRIORITIZE_EXCLAMATION_POINTS(
         "<b>Prioritize Exclamation Points:</b><br>Given multiple options, prefer those with exclamation points."
@@ -74,6 +80,10 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
         "<b>Exit Battle Time:</b><br>After running, wait this long to return to overworld.",
         "6 * TICKS_PER_SECOND"
     )
+    , MAX_TARGET_ALPHA(
+        "<b>Max Target Alpha:</b><br>Ignore all targets with alpha larger than this.",
+        50000, 0
+    )
     , VIDEO_ON_SHINY(
         "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
         true
@@ -84,6 +94,7 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
     )
 {
     m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
+    m_options.emplace_back(&MARK_OFFSET, "MARK_OFFSET");
     m_options.emplace_back(&PRIORITIZE_EXCLAMATION_POINTS, "PRIORITIZE_EXCLAMATION_POINTS");
     m_options.emplace_back(&TARGET_CIRCLING, "ENABLE_CIRCLING");
     m_options.emplace_back(&LOCAL_CIRCLING, "LOCAL_CIRCLING");
@@ -93,6 +104,7 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
     m_options.emplace_back(&m_advanced_options, "");
     m_options.emplace_back(&EXIT_BATTLE_MASH_TIME, "EXIT_BATTLE_MASH_TIME");
     if (settings.developer_mode){
+        m_options.emplace_back(&MAX_TARGET_ALPHA, "MAX_TARGET_ALPHA");
         m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
         m_options.emplace_back(&RUN_FROM_EVERYTHING, "RUN_FROM_EVERYTHING");
     }
@@ -119,111 +131,179 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousOverworld::make_stats() const{
 
 
 
-void ShinyHuntAutonomousOverworld::move_in_circle(
+void ShinyHuntAutonomousOverworld::move_in_circle_up(
     SingleSwitchProgramEnvironment& env,
-    uint8_t size_ticks,
-    uint8_t current_direction_x,
-    uint8_t current_direction_y
+    bool counter_clockwise
 ) const{
-//    cout << "size_ticks = " << (int)size_ticks << endl;
-
-    if (current_direction_x <= 128){
-        pbf_move_left_joystick(env.console, 0, 128, size_ticks, 0);     //  Correct for bias.
-        pbf_move_left_joystick(env.console, 128, 0, size_ticks, 0);
-        pbf_move_left_joystick(env.console, 255, 0, size_ticks, 0);
-        pbf_move_left_joystick(env.console, 255, 128, size_ticks, 0);
-        pbf_move_left_joystick(env.console, 255, 255, size_ticks, 0);
-        pbf_move_left_joystick(env.console, 128, 255, size_ticks, 0);
-        pbf_move_left_joystick(env.console, 0, 255, size_ticks, 0);
-        pbf_move_left_joystick(env.console, 0, 128, size_ticks, 0);
-        pbf_move_left_joystick(env.console, 0, 0, size_ticks, 0);
-        pbf_move_left_joystick(env.console, 255, 128, size_ticks, 0);   //  Correct for bias.
+//    cout << "up" << endl;
+    if (counter_clockwise){
+        pbf_move_left_joystick(env.console, 255, 128, 16, 0);
+        pbf_move_left_joystick(env.console, 255, 0, 16, 0);
+        pbf_move_left_joystick(env.console, 128, 0, 16, 0);
+        pbf_move_left_joystick(env.console, 0, 0, 16, 0);
+        pbf_move_left_joystick(env.console, 0, 128, 16, 0);
+        pbf_move_left_joystick(env.console, 0, 255, 16, 0);
+        pbf_move_left_joystick(env.console, 128, 255, 16, 0);
+        pbf_move_left_joystick(env.console, 255, 255, 16, 0);
     }else{
-        pbf_move_left_joystick(env.console, 255, 128, size_ticks, 0);   //  Correct for bias.
-        pbf_move_left_joystick(env.console, 128, 0, size_ticks, 0);
-        pbf_move_left_joystick(env.console, 0, 0, size_ticks, 0);
-        pbf_move_left_joystick(env.console, 0, 128, size_ticks, 0);
-        pbf_move_left_joystick(env.console, 0, 255, size_ticks, 0);
-        pbf_move_left_joystick(env.console, 128, 255, size_ticks, 0);
-        pbf_move_left_joystick(env.console, 255, 255, size_ticks, 0);
-        pbf_move_left_joystick(env.console, 255, 128, size_ticks, 0);
-        pbf_move_left_joystick(env.console, 255, 0, size_ticks, 0);
-        pbf_move_left_joystick(env.console, 0, 128, size_ticks, 0);     //  Correct for bias.
+        pbf_move_left_joystick(env.console, 0, 128, 16, 0);
+        pbf_move_left_joystick(env.console, 0, 0, 16, 0);
+        pbf_move_left_joystick(env.console, 128, 0, 16, 0);
+        pbf_move_left_joystick(env.console, 255, 0, 16, 0);
+        pbf_move_left_joystick(env.console, 255, 128, 16, 0);
+        pbf_move_left_joystick(env.console, 255, 255, 16, 0);
+        pbf_move_left_joystick(env.console, 128, 255, 16, 0);
+        pbf_move_left_joystick(env.console, 0, 255, 16, 0);
+    }
+}
+void ShinyHuntAutonomousOverworld::move_in_circle_down(
+    SingleSwitchProgramEnvironment& env,
+    bool counter_clockwise
+) const{
+    if (counter_clockwise){
+        pbf_move_left_joystick(env.console, 0, 128, 16, 0);
+        pbf_move_left_joystick(env.console, 0, 255, 16, 0);
+        pbf_move_left_joystick(env.console, 128, 255, 16, 0);
+        pbf_move_left_joystick(env.console, 255, 255, 16, 0);
+        pbf_move_left_joystick(env.console, 255, 128, 16, 0);
+        pbf_move_left_joystick(env.console, 255, 0, 32, 0);
+        pbf_move_left_joystick(env.console, 128, 0, 32, 0);
+        pbf_move_left_joystick(env.console, 0, 0, 32, 0);
+    }else{
+        pbf_move_left_joystick(env.console, 255, 128, 16, 0);
+        pbf_move_left_joystick(env.console, 255, 255, 16, 0);
+        pbf_move_left_joystick(env.console, 128, 255, 16, 0);
+        pbf_move_left_joystick(env.console, 0, 255, 16, 0);
+        pbf_move_left_joystick(env.console, 0, 128, 16, 0);
+        pbf_move_left_joystick(env.console, 0, 0, 32, 0);
+        pbf_move_left_joystick(env.console, 128, 0, 32, 0);
+        pbf_move_left_joystick(env.console, 255, 0, 32, 0);
+    }
+}
+void ShinyHuntAutonomousOverworld::circle_in_place(
+    SingleSwitchProgramEnvironment& env,
+    bool counter_clockwise
+) const{
+    if (counter_clockwise){
+        pbf_move_left_joystick(env.console, 0, 128, 64, 0);     //  Correct for bias.
+        pbf_move_left_joystick(env.console, 128, 255, 32, 0);
+        pbf_move_left_joystick(env.console, 255, 255, 32, 0);
+        pbf_move_left_joystick(env.console, 255, 128, 32, 0);
+        pbf_move_left_joystick(env.console, 255, 0, 32, 0);
+        pbf_move_left_joystick(env.console, 128, 0, 32, 0);
+        pbf_move_left_joystick(env.console, 0, 0, 32, 0);
+        pbf_move_left_joystick(env.console, 0, 128, 32, 0);
+        pbf_move_left_joystick(env.console, 0, 255, 32, 0);
+        pbf_move_left_joystick(env.console, 255, 128, 16, 0);   //  Correct for bias.
+    }else{
+        pbf_move_left_joystick(env.console, 255, 128, 64, 0);   //  Correct for bias.
+        pbf_move_left_joystick(env.console, 128, 255, 32, 0);
+        pbf_move_left_joystick(env.console, 0, 255, 32, 0);
+        pbf_move_left_joystick(env.console, 0, 128, 32, 0);
+        pbf_move_left_joystick(env.console, 0, 0, 32, 0);
+        pbf_move_left_joystick(env.console, 128, 0, 32, 0);
+        pbf_move_left_joystick(env.console, 255, 0, 32, 0);
+        pbf_move_left_joystick(env.console, 255, 128, 32, 0);
+        pbf_move_left_joystick(env.console, 255, 255, 32, 0);
+        pbf_move_left_joystick(env.console, 0, 128, 16, 0);     //  Correct for bias.
     }
 }
 
 
-ShinyHuntAutonomousOverworld::WatchResult ShinyHuntAutonomousOverworld::whistle_and_watch(
+MarkWatchResult ShinyHuntAutonomousOverworld::whistle_and_watch(
     SingleSwitchProgramEnvironment& env,
     std::vector<InferenceBox>& exclamations,
     std::vector<InferenceBox>& questions
 ) const{
-    StartBattleDetector start_battle(env.console, std::chrono::milliseconds(0));
-    StandardBattleMenuDetector battle_menu(env.console);
-    InferenceBoxScope search_area(env.console, 0.0, 0.2, 1.0, 0.8);
+    MarkTracker mark_tracker(env, env.console);
 
     const double center_x = 0.5;
     const double center_y = 0.70;
     InferenceBoxScope self(env.console, Qt::cyan, center_x - 0.02, center_y - 0.05, 0.04, 0.1);
 
-
     //  Whistle
     pbf_press_button(env.console, BUTTON_LCLICK, 5, 0);
 
-    std::deque<InferenceBoxScope> detection_boxes;
+    return mark_tracker.watch_for(
+        exclamations, questions,
+        std::chrono::milliseconds(1000)
+    );
+}
 
-    size_t count = 0;
 
-    InferenceThrottler throttler(std::chrono::milliseconds(1000), std::chrono::milliseconds(50));
-    while (true){
-        env.check_stopping();
+enum class OverworldMark{
+    EXCLAMATION_MARK,
+    QUESTION_MARK,
+};
 
-        QImage screen = env.console.video().snapshot();
+struct OverworldTarget{
+    OverworldMark mark;
+    InferenceBox box;
+    Trajectory trajectory;
+    double delta_x;
+    double delta_y;
+};
 
-        //  Check if a battle has started.
-        if (battle_menu.detect(screen)){
-            return WatchResult::BATTLE_MENU;
+
+void populate_targets(
+    std::multimap<double, OverworldTarget>& scored_targets,
+    const std::vector<OverworldTarget>& targets
+){
+#if 0
+    cout << "Targets:" << endl;
+    for (const auto& item : targets){
+        cout << "    " << item.box.x << " - " << item.box.x + item.box.width
+             << " x " << item.box.y << " - " << item.box.y + item.box.height << endl;
+    }
+#endif
+
+//    cout << "Candidates:" << endl;
+    for (size_t c = 0; c < targets.size(); c++){
+        double overlap = 0;
+        const InferenceBox& box0 = targets[c].box;
+        for (size_t i = 0; i < targets.size(); i++){
+            const InferenceBox& box1 = targets[i].box;
+            double min_x = std::max(box0.x, box1.x);
+            double max_x = std::min(box0.x + box0.width, box1.x + box1.width);
+            if (min_x >= max_x){
+                continue;
+            }
+            double min_y = std::max(box0.y, box1.y);
+            double max_y = std::min(box0.y + box0.height, box1.y + box1.height);
+            if (min_y >= max_y){
+                continue;
+            }
+            overlap += (max_x - min_x) * (max_y - min_y);
         }
-        if (start_battle.detect(screen)){
-            return WatchResult::BATTLE_START;
-        }
-
-        //  Look for exclamation points and question marks.
-        QImage search_image = extract_box(screen, search_area);
-
-        std::vector<PixelBox> exclamation_marks;
-        std::vector<PixelBox> question_marks;
-        count += find_marks(
-            search_image,
-            &exclamation_marks,
-            &question_marks
-        );
-
-        detection_boxes.clear();
-        for (const PixelBox& mark : exclamation_marks){
-            InferenceBox box = translate_to_parent(screen, search_area, mark);
-            box.color = Qt::magenta;
-            box.x -= box.width;
-            box.width *= 3;
-            box.height *= 2;
-            detection_boxes.emplace_back(env.console, box);
-            exclamations.emplace_back(box);
-        }
-        for (const PixelBox& mark : question_marks){
-            InferenceBox box = translate_to_parent(screen, search_area, mark);
-            box.color = Qt::magenta;
-            box.x -= box.width / 2;
-            box.width *= 2;
-            box.height *= 2;
-            detection_boxes.emplace_back(env.console, box);
-            questions.emplace_back(box);
-        }
-
-        if (throttler.end_iteration(env)){
-            return WatchResult::TIMEOUT;
-        }
+        double score = targets[c].trajectory.distance_in_ticks / overlap;
+        scored_targets.emplace(score, targets[c]);
+//        cout << "    " << score << " = "
+//             << (int)targets[c].trajectory.joystick_x << ", "
+//             << (int)targets[c].trajectory.joystick_y << endl;
     }
 }
+
+
+const double OVERWORLD_CENTER_X = 0.50;
+const double OVERWORLD_CENTER_Y = 0.70;
+
+void populate_targets(
+    std::multimap<double, OverworldTarget>& scored_targets,
+    ProgramEnvironment& env,
+    const std::vector<InferenceBox>& marks,
+    double offset,
+    OverworldMark mark
+){
+    std::vector<OverworldTarget> targets;
+    for (const InferenceBox& box : marks){
+        double delta_x = box.x + box.width / 2 - OVERWORLD_CENTER_X;
+        double delta_y = box.y + box.height * (1.0 + offset) - OVERWORLD_CENTER_Y;
+        Trajectory trajectory = get_trajectory_float(delta_x, delta_y);
+        targets.emplace_back(OverworldTarget{mark, box, trajectory, delta_x, delta_y});
+    }
+    populate_targets(scored_targets, targets);
+}
+
 
 
 bool ShinyHuntAutonomousOverworld::find_encounter(
@@ -231,20 +311,25 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
     Stats& stats,
     StandardEncounterTracker& tracker
 ) const{
-    const double center_x = 0.5;
-    const double center_y = 0.70;
-    InferenceBoxScope self(env.console, Qt::cyan, center_x - 0.02, center_y - 0.05, 0.04, 0.1);
+    InferenceBoxScope self(
+        env.console, Qt::cyan,
+        OVERWORLD_CENTER_X - 0.02,
+        OVERWORLD_CENTER_Y - 0.05,
+        0.04, 0.1
+    );
 
     const std::chrono::milliseconds TIMEOUT((uint64_t)WATCHDOG_TIMER * 1000 / TICKS_PER_SECOND);
 
     size_t nothing_found_counter = 0;
+    std::vector<InferenceBox> exclamation_marks;
+    std::vector<InferenceBox> question_marks;
 
     auto last = std::chrono::system_clock::now();
     while (true){
         //  No battle for a long time. Reset the game.
         auto now = std::chrono::system_clock::now();
         if (now - last > TIMEOUT){
-            pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+            pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
             reset_game_from_home_with_inference(
                 env, env.console,
                 TOLERATE_SYSTEM_UPDATE_MENU_FAST
@@ -253,37 +338,78 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
             return false;
         }
 
-        std::vector<InferenceBox> exclamation_marks;
-        std::vector<InferenceBox> question_marks;
-        WatchResult result = whistle_and_watch(
-            env,
-            exclamation_marks,
-            question_marks
-        );
-        switch (result){
-        case WatchResult::BATTLE_MENU:
-            stats.m_errors++;
-            tracker.run_away();
-            return false;
-        case WatchResult::BATTLE_START:
-            env.log("Battle started! (whistle)");
-            return true;
-        default:;
+        //  If there's nothing, whistle and watch.
+        if (exclamation_marks.empty() && question_marks.empty()){
+            MarkWatchResult result = whistle_and_watch(
+                env,
+                exclamation_marks,
+                question_marks
+            );
+            switch (result){
+            case MarkWatchResult::BATTLE_MENU:
+                stats.m_errors++;
+                tracker.run_away();
+                return false;
+            case MarkWatchResult::BATTLE_START:
+                env.log("Battle started! (whistle)");
+                return true;
+            default:;
+            }
         }
+
+//        cout << "exclamation_marks = " << exclamation_marks.size() << endl;
+//        cout << "question_marks    = " << question_marks.size() << endl;
 
         AsyncStartBattleDetector start_battle(env, env.console);
 
-        //  Nothing was found. Rotate the view and try again.
-        if (exclamation_marks.empty() && question_marks.empty()){
+        //  Build targets.
+        std::multimap<double, OverworldTarget> targets;
+        {
+            populate_targets(targets, env, exclamation_marks, MARK_OFFSET, OverworldMark::EXCLAMATION_MARK);
+            if (targets.empty() || !PRIORITIZE_EXCLAMATION_POINTS){
+                populate_targets(targets, env, question_marks, MARK_OFFSET, OverworldMark::QUESTION_MARK);
+            }
+            exclamation_marks.clear();
+            question_marks.clear();
+        }
+
+//        std::unique_ptr<AsyncMarkTracker> tracker(new AsyncMarkTracker(
+//            env, env.console, exclamation_marks, question_marks
+//        ));
+
+        //  Pick a target.
+        auto target = targets.end();
+        if (!targets.empty()){
+            target = targets.begin();
+            env.log(
+                QString("Best Target: ") +
+                (target->second.mark == OverworldMark::EXCLAMATION_MARK ? "Exclamation" : "Question") +
+                " at [" +
+                QString::number(target->second.delta_x) + " , " +
+                QString::number(-target->second.delta_y) + "], alpha = " +
+                QString::number(target->first),
+                "purple"
+            );
+        }
+
+        //  No good target found. Rotate the view and try again.
+        if (targets.empty() || target->first > MAX_TARGET_ALPHA){
+            if (targets.empty()){
+                env.log("No targets found.", "orange");
+            }else{
+                env.log("Target is too weak.", "orange");
+            }
+
             env.log("Nothing found. Rotating view.");
             nothing_found_counter++;
             if (LOCAL_CIRCLING != 0 && nothing_found_counter >= LOCAL_CIRCLING){
-                move_in_circle(env, 32, 0, 0);
+                circle_in_place(env, rand() % 2);
                 nothing_found_counter = 0;
             }else{
-                pbf_move_right_joystick(192, 255, 50, 70);
+                pbf_move_right_joystick(env.console, 192, 255, 50, 70);
             }
             env.console.botbase().wait_for_all_requests();
+//            if (tracker->result() == MarkWatchResult::BATTLE_START){
             if (start_battle.detected()){
                 env.log("Battle started! (rotate)");
                 return true;
@@ -293,103 +419,74 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
 
         nothing_found_counter = 0;
 
-        std::multimap<uint16_t, std::pair<Trajectory, InferenceBox>> exclamations;
-        for (const InferenceBox& box : exclamation_marks){
-            double delta_x = box.x + box.width / 2 - center_x;
-            double delta_y = box.y + box.height * 1.5 - center_y;
-            env.log(
-                "Exclamation at: [" + QString::number(delta_x) + " , " + QString::number(-delta_y) + "]",
-                "purple"
-            );
-            Trajectory trajectory = get_trajectory_float(delta_x, delta_y);
-            exclamations.emplace(
-                trajectory.distance_in_ticks,
-                std::pair<Trajectory, InferenceBox>(trajectory, box)
-            );
-            break;
-        }
-
-        std::multimap<uint16_t, std::pair<Trajectory, InferenceBox>> questions;
-        for (const InferenceBox& box : question_marks){
-            double delta_x = box.x + box.width / 2 - center_x;
-            double delta_y = box.y + box.height * 1.5 - center_y;
-            env.log(
-                "Question at: [" + QString::number(delta_x) + " , " + QString::number(-delta_y) + "]",
-                "purple"
-            );
-            Trajectory trajectory = get_trajectory_float(delta_x, delta_y);
-            questions.emplace(
-                trajectory.distance_in_ticks,
-                std::pair<Trajectory, InferenceBox>(trajectory, box)
-            );
-            break;
-        }
-
 
         //  Pick a target.
-        std::pair<Trajectory, InferenceBox> target;
-        target.first.distance_in_ticks = (uint16_t)0 - 1;
-
-        if (PRIORITIZE_EXCLAMATION_POINTS && !exclamations.empty()){
-            questions.clear();
-        }
-        if (!exclamations.empty() && target.first.distance_in_ticks > exclamations.begin()->first){
-            target = exclamations.begin()->second;
-        }
-        if (!questions.empty() && target.first.distance_in_ticks > questions.begin()->first){
-            target = questions.begin()->second;
-        }
-
-        target.second.color = Qt::yellow;
-        InferenceBoxScope target_box(env.console, target.second);
+        target->second.box.color = Qt::yellow;
+        InferenceBoxScope target_box(env.console, target->second.box);
+        const Trajectory& trajectory = target->second.trajectory;
 
         double angle = std::atan2(
-            (double)target.first.joystick_y - 128,
-            (double)target.first.joystick_x - 128
+            (double)trajectory.joystick_y - 128,
+            (double)trajectory.joystick_x - 128
         ) * 57.295779513082320877;
         env.log(
-            "Found something. Distance: " + QString::number(target.first.distance_in_ticks) +
-            ", Direction: " + QString::number(-angle) + " degrees"
+            "Trajectory: Distance = " + QString::number(trajectory.distance_in_ticks) +
+            ", Direction = " + QString::number(-angle) + " degrees"
         );
 
 
 
         //  Move towards target.
 
-        int duration = target.first.distance_in_ticks + 30;
+        int duration = trajectory.distance_in_ticks + 16;
         if (duration > (int)MAX_MOVE_DURATION){
             duration = MAX_MOVE_DURATION;
         }
         pbf_move_left_joystick(
-            target.first.joystick_x,
-            target.first.joystick_y,
+            env.console,
+            trajectory.joystick_x,
+            trajectory.joystick_y,
             (uint16_t)duration, 0
         );
 
         //  Circle Maneuver
         if (TARGET_CIRCLING){
-            move_in_circle(
-                env, 16,
-                target.first.joystick_x,
-                target.first.joystick_y
-            );
+            if (
+                trajectory.joystick_y < 64 &&
+                64 <= trajectory.joystick_x && trajectory.joystick_x <= 192
+            ){
+                move_in_circle_up(
+                    env,
+                    trajectory.joystick_x > 128
+                );
+            }else{
+                move_in_circle_down(
+                    env,
+                    trajectory.joystick_x <= 128
+                );
+            }
         }
 
         env.console.botbase().wait_for_all_requests();
+//        if (tracker->result() == MarkWatchResult::BATTLE_START){
         if (start_battle.detected()){
             env.log("Battle started! (move)");
+            exclamation_marks.clear();
+            question_marks.clear();
             return true;
         }
     }
 }
 
 void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env) const{
-    grip_menu_connect_go_home();
-    resume_game_back_out(TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
-    pbf_move_right_joystick(128, 255, TICKS_PER_SECOND, 0);
+    srand(time(nullptr));
+
+    grip_menu_connect_go_home(env.console);
+    resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
+    pbf_move_right_joystick(env.console, 128, 255, TICKS_PER_SECOND, 0);
 
     const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
-    uint32_t last_touch = system_clock();
+    uint32_t last_touch = system_clock(env.console);
 
     Stats& stats = env.stats<Stats>();
     StandardEncounterTracker tracker(
@@ -405,10 +502,10 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env) 
         env.update_stats();
 
         //  Touch the date.
-        if (TIME_ROLLBACK_HOURS > 0 && system_clock() - last_touch >= PERIOD){
-            pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
-            rollback_hours_from_home(TIME_ROLLBACK_HOURS, SETTINGS_TO_HOME_DELAY);
-            resume_game_no_interact(TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        if (TIME_ROLLBACK_HOURS > 0 && system_clock(env.console) - last_touch >= PERIOD){
+            pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+            rollback_hours_from_home(env.console, TIME_ROLLBACK_HOURS, SETTINGS_TO_HOME_DELAY);
+            resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             last_touch += PERIOD;
         }
         env.console.botbase().wait_for_all_requests();
@@ -430,7 +527,7 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env) 
         }
         if (detection == ShinyDetection::NO_BATTLE_MENU){
             stats.m_errors++;
-            pbf_mash_button(BUTTON_B, TICKS_PER_SECOND);
+            pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
             tracker.run_away();
         }
     }
@@ -438,11 +535,11 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env) 
     env.update_stats();
 
     if (GO_HOME_WHEN_DONE){
-        pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
     }
 
-    end_program_callback();
-    end_program_loop();
+    end_program_callback(env.console);
+    end_program_loop(env.console);
 }
 
 

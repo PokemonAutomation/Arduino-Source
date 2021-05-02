@@ -50,52 +50,52 @@ SurpriseTrade::SurpriseTrade()
 }
 
 
-void SurpriseTrade::trade_slot(uint8_t slot, bool next_box) const{
-    ssf_press_button2(BUTTON_Y, OPEN_YCOMM_DELAY, 50);
-    ssf_press_dpad1(DPAD_DOWN, 10);
-    ssf_press_button2(BUTTON_A, 280, 20);
+void SurpriseTrade::trade_slot(const BotBaseContext& context, uint8_t slot, bool next_box) const{
+    ssf_press_button2(context, BUTTON_Y, OPEN_YCOMM_DELAY, 50);
+    ssf_press_dpad1(context, DPAD_DOWN, 10);
+    ssf_press_button2(context, BUTTON_A, 280, 20);
 
     if (next_box){
-        ssf_press_button1(BUTTON_R, BOX_CHANGE_DELAY);
+        ssf_press_button1(context, BUTTON_R, BOX_CHANGE_DELAY);
     }
 
     //  Move to slot
     while (slot >= 6){
-        ssf_press_dpad1(DPAD_DOWN, BOX_SCROLL_DELAY);
+        ssf_press_dpad1(context, DPAD_DOWN, BOX_SCROLL_DELAY);
         slot -= 6;
     }
     while (slot > 0){
-        ssf_press_dpad1(DPAD_RIGHT, BOX_SCROLL_DELAY);
+        ssf_press_dpad1(context, DPAD_RIGHT, BOX_SCROLL_DELAY);
         slot--;
     }
 
-    ssf_press_button1(BUTTON_A, 50);
-    ssf_press_button1(BUTTON_A, 500);
-    ssf_press_button1(BUTTON_A, 100);
-    ssf_press_button1(BUTTON_A, 100);
+    ssf_press_button1(context, BUTTON_A, 50);
+    ssf_press_button1(context, BUTTON_A, 500);
+    ssf_press_button1(context, BUTTON_A, 100);
+    ssf_press_button1(context, BUTTON_A, 100);
 
-    pbf_mash_button(BUTTON_B, INITIAL_WAIT);
+    pbf_mash_button(context, BUTTON_B, INITIAL_WAIT);
 
     //  This is a state-merging operation.
     //  If we just finished a trade, this will start the animation for it.
     //  If we failed the previous trade and are stuck in the wrong parity, this
     //  is a no-op that will correct the parity and setup the next trade.
-    ssf_press_button1(BUTTON_Y, OPEN_YCOMM_DELAY);
-    pbf_mash_button(BUTTON_B, TRADE_ANIMATION);
+    ssf_press_button1(context, BUTTON_Y, OPEN_YCOMM_DELAY);
+    pbf_mash_button(context, BUTTON_B, TRADE_ANIMATION);
 }
 
 void SurpriseTrade::program(SingleSwitchProgramEnvironment& env) const{
-    grip_menu_connect_go_home();
-    resume_game_no_interact(TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+    grip_menu_connect_go_home(env.console);
+    resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){
         //  At this point, we MUST be in the overworld with no pending trade.
         //  Otherwise the box transition will fail. Therefore we add a cleanup
         //  stage after each box to make sure we are in this state.
-        trade_slot(0, box != 0);
+        trade_slot(env.console, 0, box != 0);
 
         for (uint8_t c = 1; c < 30; c++){
-            trade_slot(c, false);
+            trade_slot(env.console, c, false);
         }
 
         //  If the previous trade isn't done, either wait to finish or cancel it.
@@ -107,23 +107,23 @@ void SurpriseTrade::program(SingleSwitchProgramEnvironment& env) const{
         //          because the trade is in progress. The 2nd iteration finishes it.
         //      4.  No partner was ever found. The 1st iteration will cancel the trade.
         for (uint8_t c = 0; c < 2; c++){
-            ssf_press_button1(BUTTON_Y, 250);
-            ssf_press_dpad1(DPAD_DOWN, 20);
-            ssf_press_button1(BUTTON_A, 280);
-            ssf_press_button1(BUTTON_B, 280);
-            ssf_press_button1(BUTTON_B, 200);
-            ssf_press_button1(BUTTON_A, 100);
-            pbf_mash_button(BUTTON_B, TRADE_ANIMATION);
+            ssf_press_button1(env.console, BUTTON_Y, 250);
+            ssf_press_dpad1(env.console, DPAD_DOWN, 20);
+            ssf_press_button1(env.console, BUTTON_A, 280);
+            ssf_press_button1(env.console, BUTTON_B, 280);
+            ssf_press_button1(env.console, BUTTON_B, 200);
+            ssf_press_button1(env.console, BUTTON_A, 100);
+            pbf_mash_button(env.console, BUTTON_B, TRADE_ANIMATION);
         }
 
         //  Wait out any new pokedex entries or trade evolutions.
-        pbf_mash_button(BUTTON_B, EVOLVE_DELAY);
+        pbf_mash_button(env.console, BUTTON_B, EVOLVE_DELAY);
     }
 
-    ssf_press_button2(BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
+    ssf_press_button2(env.console, BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
 
-    end_program_callback();
-    end_program_loop();
+    end_program_callback(env.console);
+    end_program_loop(env.console);
 }
 
 

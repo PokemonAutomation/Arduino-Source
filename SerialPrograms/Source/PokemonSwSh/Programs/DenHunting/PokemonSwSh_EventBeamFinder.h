@@ -19,9 +19,9 @@ public:
     EventBeamFinder();
 
 
-    void goto_near_den(void) const;
-    void goto_far_den(void) const;
-    void drop_wishing_piece(void) const;
+    void goto_near_den(const BotBaseContext& context) const;
+    void goto_far_den(const BotBaseContext& context) const;
+    void drop_wishing_piece(const BotBaseContext& context) const;
     virtual void program(SingleSwitchProgramEnvironment& env) const override;
 
 private:

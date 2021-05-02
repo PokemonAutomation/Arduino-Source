@@ -23,7 +23,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) const override;
 
 private:
-    void trade_slot(uint8_t slot, bool next_box) const;
+    void trade_slot(const BotBaseContext& context, uint8_t slot, bool next_box) const;
 
 private:
     SimpleInteger<uint8_t> BOXES_TO_TRADE;

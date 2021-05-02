@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 #include <string>
+#include <atomic>
 #include "Common/MessageProtocol.h"
 
 namespace PokemonAutomation{
@@ -44,34 +45,48 @@ public:
     virtual ~BotBase() = default;
     virtual State state() const = 0;
     virtual void wait_for_all_requests() = 0;
+    virtual void stop_all_commands() = 0;
 
 public:
     //  Request Dispatch
 
     //  Return if request cannot be dispatched immediately.
     template <uint8_t SendType, typename SendParams>
-    bool try_issue_request(SendParams& send_params);
+    bool try_issue_request(
+        const std::atomic<bool>* cancelled,
+        SendParams& send_params
+    );
 
     //  Block the thread until the request is sent.
     template <uint8_t SendType, typename SendParams>
-    void issue_request(SendParams& send_params);
+    void issue_request(
+        const std::atomic<bool>* cancelled,
+        SendParams& send_params
+    );
 
-    //  Block the thread until the request is send and the response is received.
+    //  Block the thread until the request is sent and the response is received.
     template <
         uint8_t SendType, uint8_t RecvType,
         typename SendParams, typename RecvParams
     >
-    void issue_request_and_wait(SendParams& send_params, RecvParams& recv_params);
+    void issue_request_and_wait(
+        const std::atomic<bool>* cancelled,
+        SendParams& send_params,
+        RecvParams& recv_params
+    );
 
 
 protected:
     virtual bool try_issue_request(
+        const std::atomic<bool>* cancelled,
         uint8_t send_type, char* send_params, size_t send_bytes
     ) = 0;
     virtual void issue_request(
+        const std::atomic<bool>* cancelled,
         uint8_t send_type, char* send_params, size_t send_bytes
     ) = 0;
     virtual void issue_request_and_wait(
+        const std::atomic<bool>* cancelled,
         uint8_t send_type, char* send_params, size_t send_bytes,
         uint8_t recv_type, char* recv_params, size_t recv_bytes
     ) = 0;
@@ -79,28 +94,78 @@ protected:
 
 
 
+//  A wrapper for BotBase that allows for asynchronous cancelling.
+class BotBaseContext{
+public:
+    BotBaseContext(BotBase& botbase)
+        : m_botbase(&botbase)
+        , m_cancelled(false)
+    {}
+
+    BotBase& botbase() const{ return *m_botbase; }
+//    operator BotBase&() const{
+//        return *m_botbase;
+//    }
+    BotBase* operator->() const{
+        check_cancelled();
+        return m_botbase;
+    }
+    void check_cancelled() const{
+        if (m_cancelled.load(std::memory_order_acquire)){
+            throw CancelledException();
+        }
+    }
+    void cancel(){
+        m_cancelled.store(true, std::memory_order_release);
+        m_botbase->stop_all_commands();
+    }
+
+    const std::atomic<bool>& cancelled_bool() const{
+        return m_cancelled;
+    }
+
+private:
+    BotBase* m_botbase;
+    std::atomic<bool> m_cancelled;
+};
+
+
+
+
+
 
 //  Implementations
 
 template <uint8_t SendType, typename SendParams>
-bool BotBase::try_issue_request(SendParams& send_params){
+bool BotBase::try_issue_request(
+    const std::atomic<bool>* cancelled,
+    SendParams& send_params
+){
     static_assert(sizeof(SendParams) <= PABB_MAX_MESSAGE_SIZE, "Message is too large.");
-    return try_issue_request(SendType, (char*)&send_params, sizeof(SendParams));
+    return try_issue_request(cancelled, SendType, (char*)&send_params, sizeof(SendParams));
 }
 template <uint8_t SendType, typename SendParams>
-void BotBase::issue_request(SendParams& send_params){
+void BotBase::issue_request(
+    const std::atomic<bool>* cancelled,
+    SendParams& send_params
+){
     static_assert(sizeof(SendParams) <= PABB_MAX_MESSAGE_SIZE, "Message is too large.");
-    issue_request(SendType, (char*)&send_params, sizeof(SendParams));
+    issue_request(cancelled, SendType, (char*)&send_params, sizeof(SendParams));
 }
 template <
     uint8_t SendType, uint8_t RecvType,
     typename SendParams, typename RecvParams
 >
-void BotBase::issue_request_and_wait(SendParams& send_params, RecvParams& recv_params){
+void BotBase::issue_request_and_wait(
+    const std::atomic<bool>* cancelled,
+    SendParams& send_params,
+    RecvParams& recv_params
+){
     static_assert(sizeof(SendParams) <= PABB_MAX_MESSAGE_SIZE, "Message is too large.");
     static_assert(sizeof(RecvParams) <= PABB_MAX_MESSAGE_SIZE, "Message is too large.");
     static_assert(PABB_MSG_IS_REQUEST(SendType), "Message must be a request.");
     issue_request_and_wait(
+        cancelled,
         SendType, (char*)&send_params, sizeof(SendParams),
         RecvType, (char*)&recv_params, sizeof(RecvParams)
     );

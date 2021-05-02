@@ -18,7 +18,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 //  Universal
-#ifdef __cplusplus
+#if 0
 
 void mash_A         (uint16_t ticks);
 void IoA_backout    (uint16_t pokemon_to_menu_delay);
@@ -31,10 +31,11 @@ void IoA_backout    (uint16_t pokemon_to_menu_delay);
 //  Client Side
 #ifdef __cplusplus
 namespace PokemonAutomation{
-    class BotBase;
+    class BotBaseContext;
+
+    void mash_A         (const BotBaseContext& context, uint16_t ticks);
+    void IoA_backout    (const BotBaseContext& context, uint16_t pokemon_to_menu_delay);
 }
-void mash_A         (PokemonAutomation::BotBase& device, uint16_t ticks);
-void IoA_backout    (PokemonAutomation::BotBase& device, uint16_t pokemon_to_menu_delay);
 #endif
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

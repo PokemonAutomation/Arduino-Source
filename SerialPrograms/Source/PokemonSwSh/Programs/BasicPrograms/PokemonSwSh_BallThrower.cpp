@@ -23,18 +23,18 @@ BallThrower::BallThrower()
 {}
 
 void BallThrower::program(SingleSwitchProgramEnvironment& env) const{
-    grip_menu_connect_go_home();
-    pbf_press_button(BUTTON_HOME, 10, HOME_TO_GAME_DELAY);
+    grip_menu_connect_go_home(env.console);
+    pbf_press_button(env.console, BUTTON_HOME, 10, HOME_TO_GAME_DELAY);
 
     while (true){
-        pbf_press_button(BUTTON_X, 50, 50);
-        pbf_press_button(BUTTON_A, 50, 50);
-        pbf_mash_button(BUTTON_B, 100);
+        pbf_press_button(env.console, BUTTON_X, 50, 50);
+        pbf_press_button(env.console, BUTTON_A, 50, 50);
+        pbf_mash_button(env.console, BUTTON_B, 100);
     }
 
-    pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
-    end_program_callback();
-    end_program_loop();
+    pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+    end_program_callback(env.console);
+    end_program_loop(env.console);
 }
 
 

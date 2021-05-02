@@ -78,54 +78,54 @@ TradeBot::TradeBot()
 }
 
 
-void TradeBot::trade_slot(const uint8_t code[8], uint8_t slot) const{
-    ssf_press_button2(BUTTON_Y, OPEN_YCOMM_DELAY, 50);
-    ssf_press_button2(BUTTON_A, 150, 20);
-    ssf_press_dpad1(DPAD_DOWN, 10);
-    ssf_press_button2(BUTTON_A, 200, 20);
+void TradeBot::trade_slot(const BotBaseContext& context, const uint8_t code[8], uint8_t slot) const{
+    ssf_press_button2(context, BUTTON_Y, OPEN_YCOMM_DELAY, 50);
+    ssf_press_button2(context, BUTTON_A, 150, 20);
+    ssf_press_dpad1(context, DPAD_DOWN, 10);
+    ssf_press_button2(context, BUTTON_A, 200, 20);
     if (LINK_TRADE_EXTRA_LINE){
-        ssf_press_button2(BUTTON_B, 50, 20);
+        ssf_press_button2(context, BUTTON_B, 50, 20);
     }
-    ssf_press_button2(BUTTON_B, 200, 20);
-    ssf_press_dpad1(DPAD_UP, 10);
-    ssf_press_button1(BUTTON_A, 5);
-    ssf_press_button1(BUTTON_B, 5);
+    ssf_press_button2(context, BUTTON_B, 200, 20);
+    ssf_press_dpad1(context, DPAD_UP, 10);
+    ssf_press_button1(context, BUTTON_A, 5);
+    ssf_press_button1(context, BUTTON_B, 5);
 
-    enter_digits(8, code);
-    ssf_press_button1(BUTTON_PLUS, 200);
-    ssf_press_button2(BUTTON_B, 125, 10);
-    ssf_press_button2(BUTTON_A, 50, 10);
-    pbf_mash_button(BUTTON_B, 400);
+    enter_digits(context, 8, code);
+    ssf_press_button1(context, BUTTON_PLUS, 200);
+    ssf_press_button2(context, BUTTON_B, 125, 10);
+    ssf_press_button2(context, BUTTON_A, 50, 10);
+    pbf_mash_button(context, BUTTON_B, 400);
 
-    pbf_wait(SEARCH_DELAY);
+    pbf_wait(context, SEARCH_DELAY);
 
     //  If we're not in a trade, enter Y-COMM to avoid a connection at this point.
-    ssf_press_button2(BUTTON_Y, OPEN_YCOMM_DELAY, 50);
-    ssf_press_button2(BUTTON_A, 200, 20);
-    ssf_press_button2(BUTTON_B, 80, 10);
+    ssf_press_button2(context, BUTTON_Y, OPEN_YCOMM_DELAY, 50);
+    ssf_press_button2(context, BUTTON_A, 200, 20);
+    ssf_press_button2(context, BUTTON_B, 80, 10);
 
     //  Move to slot
     while (slot >= 6){
-        ssf_press_dpad1(DPAD_DOWN, BOX_SCROLL_DELAY);
+        ssf_press_dpad1(context, DPAD_DOWN, BOX_SCROLL_DELAY);
         slot -= 6;
     }
     while (slot > 0){
-        ssf_press_dpad1(DPAD_RIGHT, BOX_SCROLL_DELAY);
+        ssf_press_dpad1(context, DPAD_RIGHT, BOX_SCROLL_DELAY);
         slot--;
     }
 
     //  Select Pokemon
-    ssf_press_button1(BUTTON_A, 100);
-    ssf_press_button1(BUTTON_A, CONFIRM_DELAY);
+    ssf_press_button1(context, BUTTON_A, 100);
+    ssf_press_button1(context, BUTTON_A, CONFIRM_DELAY);
 
     //  Start Trade
-    ssf_press_button1(BUTTON_A, TRADE_START);
+    ssf_press_button1(context, BUTTON_A, TRADE_START);
 
     //  Cancel out
     for (uint16_t c = 0; c < TRADE_COMMUNICATION + TRADE_ANIMATION; c += 300){
-        ssf_press_button1(BUTTON_B, 100);
-        ssf_press_button1(BUTTON_B, 100);
-        ssf_press_button1(BUTTON_A, 100);
+        ssf_press_button1(context, BUTTON_B, 100);
+        ssf_press_button1(context, BUTTON_B, 100);
+        ssf_press_button1(context, BUTTON_A, 100);
     }
 }
 
@@ -133,12 +133,12 @@ void TradeBot::program(SingleSwitchProgramEnvironment& env) const{
     uint8_t code[8];
     TRADE_CODE.to_str(code);
 
-    grip_menu_connect_go_home();
-    resume_game_no_interact(TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+    grip_menu_connect_go_home(env.console);
+    resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){
         for (uint8_t c = 0; c < 30; c++){
-            trade_slot(code, c);
+            trade_slot(env.console, code, c);
         }
 
         //  If the previous trade isn't done, either wait to finish or cancel it.
@@ -150,29 +150,29 @@ void TradeBot::program(SingleSwitchProgramEnvironment& env) const{
         //          because the trade is in progress. The 2nd iteration finishes it.
         //      4.  No partner was ever found. The 1st iteration will cancel the trade.
         for (uint8_t c = 0; c < 2; c++){
-            ssf_press_button1(BUTTON_Y, 250);
-            ssf_press_button1(BUTTON_A, 280);
-            ssf_press_button1(BUTTON_B, 280);
-            ssf_press_button1(BUTTON_B, 200);
-            ssf_press_button1(BUTTON_A, 100);
-            pbf_mash_button(BUTTON_B, TRADE_ANIMATION);
+            ssf_press_button1(env.console, BUTTON_Y, 250);
+            ssf_press_button1(env.console, BUTTON_A, 280);
+            ssf_press_button1(env.console, BUTTON_B, 280);
+            ssf_press_button1(env.console, BUTTON_B, 200);
+            ssf_press_button1(env.console, BUTTON_A, 100);
+            pbf_mash_button(env.console, BUTTON_B, TRADE_ANIMATION);
         }
 
         //  Wait out any new pokedex entries or trade evolutions.
-        pbf_mash_button(BUTTON_B, EVOLVE_DELAY);
+        pbf_mash_button(env.console, BUTTON_B, EVOLVE_DELAY);
 
         //  Change boxes.
-        ssf_press_button2(BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
-        ssf_press_button2(BUTTON_A, MENU_TO_POKEMON_DELAY, 10);
-        ssf_press_button2(BUTTON_R, POKEMON_TO_BOX_DELAY, 10);
-        ssf_press_button2(BUTTON_R, BOX_CHANGE_DELAY, 10);
-        pbf_mash_button(BUTTON_B, BOX_TO_POKEMON_DELAY + POKEMON_TO_MENU_DELAY + OVERWORLD_TO_MENU_DELAY);
+        ssf_press_button2(env.console, BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
+        ssf_press_button2(env.console, BUTTON_A, MENU_TO_POKEMON_DELAY, 10);
+        ssf_press_button2(env.console, BUTTON_R, POKEMON_TO_BOX_DELAY, 10);
+        ssf_press_button2(env.console, BUTTON_R, BOX_CHANGE_DELAY, 10);
+        pbf_mash_button(env.console, BUTTON_B, BOX_TO_POKEMON_DELAY + POKEMON_TO_MENU_DELAY + OVERWORLD_TO_MENU_DELAY);
     }
 
-    ssf_press_button2(BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
+    ssf_press_button2(env.console, BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
 
-    end_program_callback();
-    end_program_loop();
+    end_program_callback(env.console);
+    end_program_loop(env.console);
 }
 
 

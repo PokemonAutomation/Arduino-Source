@@ -44,22 +44,22 @@ ShinyHuntUnattendedStrongSpawn::ShinyHuntUnattendedStrongSpawn()
 
 
 void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env) const{
-    grip_menu_connect_go_home();
-//    resume_game_no_interact(false);
+    grip_menu_connect_go_home(env.console);
+//    resume_game_no_interact(env.console, false);
 
     const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
-    uint32_t last_touch = system_clock();
+    uint32_t last_touch = system_clock(env.console);
     for (uint32_t c = 0; ; c++){
 
         //  If the update menu isn't there, these will get swallowed by the opening
         //  animation for the select user menu.
         if (TOLERATE_SYSTEM_UPDATE_MENU_FAST){
-            pbf_press_button(BUTTON_A, 5, 35);  //  Choose game
-            pbf_press_dpad(DPAD_UP, 5, 0);      //  Skip the update window.
+            pbf_press_button(env.console, BUTTON_A, 5, 35); //  Choose game
+            pbf_press_dpad(env.console, DPAD_UP, 5, 0);     //  Skip the update window.
         }
 
-        pbf_press_button(BUTTON_A, 10, 180);    //  Enter select user menu.
-        pbf_press_button(BUTTON_A, 10, 10);     //  Enter game
+        pbf_press_button(env.console, BUTTON_A, 10, 180);   //  Enter select user menu.
+        pbf_press_button(env.console, BUTTON_A, 10, 10);    //  Enter game
 
         //  Switch to mashing ZR instead of A to get into the game.
         //  Mash your way into the game.
@@ -68,35 +68,35 @@ void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env
             //  Need to wait a bit longer for the internet check.
             duration += START_GAME_INTERNET_CHECK_DELAY;
         }
-        pbf_mash_button(BUTTON_ZR, duration);
+        pbf_mash_button(env.console, BUTTON_ZR, duration);
 
         //  Wait for game to start.
-        pbf_wait(START_GAME_WAIT_DELAY);
+        pbf_wait(env.console, START_GAME_WAIT_DELAY);
 
         //  Enter game.
         env.log("Starting Encounter: " + tostr_u_commas(c + 1));
-        pbf_press_button(BUTTON_A, 10, ENTER_GAME_TO_RUN_DELAY);
+        pbf_press_button(env.console, BUTTON_A, 10, ENTER_GAME_TO_RUN_DELAY);
 
         //  Run away.
-        run_away_with_lights();
+        run_away_with_lights(env.console);
 
         //  Enter Pokemon menu if shiny.
-        enter_summary(false);
+        enter_summary(env.console, false);
 
         //  Touch the date and conditional close game.
 //        if (true){
-        if (TIME_ROLLBACK_HOURS > 0 && system_clock() - last_touch >= PERIOD){
+        if (TIME_ROLLBACK_HOURS > 0 && system_clock(env.console) - last_touch >= PERIOD){
             last_touch += PERIOD;
-            close_game_if_overworld(false, TIME_ROLLBACK_HOURS);
+            close_game_if_overworld(env.console, false, TIME_ROLLBACK_HOURS);
         }else{
-            close_game_if_overworld(false, 0);
+            close_game_if_overworld(env.console, false, 0);
         }
 
     }
 
-    pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
-    end_program_callback();
-    end_program_loop();
+    pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+    end_program_callback(env.console);
+    end_program_loop(env.console);
 }
 
 

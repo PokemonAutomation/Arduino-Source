@@ -23,7 +23,7 @@ PreventSleep::PreventSleep()
 
 void PreventSleep::program(SingleSwitchProgramEnvironment& env) const{
     while (true){
-        ssf_press_button2(BUTTON_B, 15 * TICKS_PER_SECOND, 10);
+        ssf_press_button2(env.console, BUTTON_B, 15 * TICKS_PER_SECOND, 10);
     }
 }
 

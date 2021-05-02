@@ -13,7 +13,7 @@ namespace PokemonAutomation{
 
 ShinyHuntTracker::ShinyHuntTracker(bool shiny_types)
     : m_encounters(m_stats["Encounters"])
-    , m_unknown_shinies(m_stats["Unknown Shinies"])
+    , m_unknown_shinies(m_stats[shiny_types ? "Unknown Shinies" : "Shinies"])
     , m_star_shinies(m_stats["Star Shinies"])
     , m_square_shinies(m_stats["Square Shinies"])
 {

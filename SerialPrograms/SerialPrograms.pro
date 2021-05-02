@@ -62,6 +62,7 @@ SOURCES += \
     ../Common/Qt/Options/FossilTableOption.cpp \
     ../Common/Qt/Options/MultiHostTableOption.cpp \
     ../Common/Qt/Options/SimpleIntegerOption.cpp \
+	../Common/Qt/Options/StringOption.cpp \
     ../Common/Qt/Options/SwitchDateOption.cpp \
     ../Common/Qt/Options/TimeExpressionOption.cpp \
     ../Common/Qt/QtJsonTools.cpp \
@@ -83,6 +84,7 @@ SOURCES += \
     Source/CommonFramework/Panels/RightPanel.cpp \
     Source/CommonFramework/Panels/SettingsPanel.cpp \
     Source/CommonFramework/PersistentSettings.cpp \
+    Source/CommonFramework/Tools/AsyncCommandSet.cpp \
     Source/CommonFramework/Tools/BotBaseHandle.cpp \
     Source/CommonFramework/Tools/ProgramEnvironment.cpp \
     Source/CommonFramework/Tools/StatsDatabase.cpp \
@@ -114,6 +116,8 @@ SOURCES += \
     Source/PokemonSwSh/Inference/PokemonSwSh_BeamSetter.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_FishingDetector.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_MarkFinder.cpp \
+    Source/PokemonSwSh/Inference/PokemonSwSh_MarkTracker.cpp \
+    Source/PokemonSwSh/Inference/PokemonSwSh_OverworldMarkTracker.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_RaidCatchDetector.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_RaidLobbyReader.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_StartBattleDetector.cpp \
@@ -193,6 +197,7 @@ HEADERS += \
     ../ClientSource/Libraries/MessageConverter.h \
     ../Common/CRC32.h \
     ../Common/Clientside/AsyncDispatcher.h \
+    ../Common/Clientside/FixedLimitVector.h \
     ../Common/Clientside/PrettyPrint.h \
     ../Common/Clientside/SpinLock.h \
     ../Common/Clientside/Unicode.h \
@@ -213,6 +218,7 @@ HEADERS += \
     ../Common/Qt/Options/FossilTableOption.h \
     ../Common/Qt/Options/MultiHostTableOption.h \
     ../Common/Qt/Options/SimpleIntegerOption.h \
+	../Common/Qt/Options/StringOption.h \
     ../Common/Qt/Options/SwitchDateOption.h \
     ../Common/Qt/Options/TimeExpressionOption.h \
     ../Common/Qt/QtJsonTools.h \
@@ -247,6 +253,7 @@ HEADERS += \
     Source/CommonFramework/PersistentSettings.h \
     Source/CommonFramework/Tesseract/capi.h \
     Source/CommonFramework/Tesseract/platform.h \
+    Source/CommonFramework/Tools/AsyncCommandSet.h \
     Source/CommonFramework/Tools/ConsoleHandle.h \
     Source/CommonFramework/Tools/Logger.h \
     Source/CommonFramework/Tools/ProgramEnvironment.h \
@@ -286,6 +293,8 @@ HEADERS += \
     Source/PokemonSwSh/Inference/PokemonSwSh_BeamSetter.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_FishingDetector.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h \
+    Source/PokemonSwSh/Inference/PokemonSwSh_MarkTracker.h \
+    Source/PokemonSwSh/Inference/PokemonSwSh_OverworldMarkTracker.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_RaidCatchDetector.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_RaidLobbyReader.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_StartBattleDetector.h \

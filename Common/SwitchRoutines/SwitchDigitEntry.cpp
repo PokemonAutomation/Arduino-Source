@@ -14,16 +14,23 @@
 #include "ClientSource/Connection/BotBase.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 
-using namespace PokemonAutomation;
 
+#if 0
 void enter_digits_str(uint8_t count, const char* digits){
     enter_digits(count, (const uint8_t*)digits);
 }
-void enter_digits_str(BotBase& device, uint8_t count, const char* digits){
-    enter_digits(device, count, (const uint8_t*)digits);
-}
 void enter_digits(uint8_t count, const uint8_t* digits){
-    enter_digits(*global_connection, count, digits);
+    enter_digits(*PokemonAutomation::global_connection, count, digits);
+}
+#endif
+
+
+namespace PokemonAutomation{
+
+
+
+void enter_digits_str(const BotBaseContext& context, uint8_t count, const char* digits){
+    enter_digits(context, count, (const uint8_t*)digits);
 }
 uint8_t convert_digit(uint8_t digit){
     if (digit >= '0'){
@@ -34,14 +41,14 @@ uint8_t convert_digit(uint8_t digit){
     }
     return digit;
 }
-void enter_digits(BotBase& device, uint8_t count, const uint8_t* digits){
+void enter_digits(const BotBaseContext& context, uint8_t count, const uint8_t* digits){
     pabb_enter_digits params;
     params.count = count;
     memset(params.digit_pairs, 0, sizeof(params.digit_pairs));
     for (uint8_t c = 0; c < count; c++){
         params.digit_pairs[c/2] |= convert_digit(digits[c]) << 4 * (c & 1);
     }
-    device.issue_request<PABB_MSG_COMMAND_ENTER_DIGITS>(params);
+    context->issue_request<PABB_MSG_COMMAND_ENTER_DIGITS>(&context.cancelled_bool(), params);
 }
 
 
@@ -66,3 +73,6 @@ int register_message_converters_switch_digit_entry(){
     return 0;
 }
 int init_SwitchDigitEntry = register_message_converters_switch_digit_entry();
+
+
+}

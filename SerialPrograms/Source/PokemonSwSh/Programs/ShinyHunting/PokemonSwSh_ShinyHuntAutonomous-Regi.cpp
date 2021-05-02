@@ -44,7 +44,7 @@ ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi()
     )
     , EXIT_BATTLE_MASH_TIME(
         "<b>Exit Battle Time:</b><br>After running, wait this long to return to overworld.",
-        "6 * TICKS_PER_SECOND"
+        "6 * TICKS_PER_SECOND + 10"
     )
     , TRANSITION_DELAY(
         "<b>Transition Delay:</b><br>Time to enter/exit the building.",
@@ -92,8 +92,8 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegi::make_stats() const{
 
 
 void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env) const{
-    grip_menu_connect_go_home();
-    resume_game_back_out(TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
+    grip_menu_connect_go_home(env.console);
+    resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
 
     Stats& stats = env.stats<Stats>();
     StandardEncounterTracker tracker(
@@ -104,7 +104,7 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env) const
         RUN_FROM_EVERYTHING
     );
 
-    uint32_t last_touch = system_clock() - TOUCH_DATE_INTERVAL;
+    uint32_t last_touch = system_clock(env.console) - TOUCH_DATE_INTERVAL;
     bool error = false;
     while (true){
         env.update_stats();
@@ -117,11 +117,11 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env) const
         }
 
         //  Touch the date.
-        if (TOUCH_DATE_INTERVAL > 0 && system_clock() - last_touch >= TOUCH_DATE_INTERVAL){
+        if (TOUCH_DATE_INTERVAL > 0 && system_clock(env.console) - last_touch >= TOUCH_DATE_INTERVAL){
             env.log("Touching date to prevent rollover.");
-            pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
-            touch_date_from_home(SETTINGS_TO_HOME_DELAY);
-            resume_game_no_interact(TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+            touch_date_from_home(env.console, SETTINGS_TO_HOME_DELAY);
+            resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             last_touch += TOUCH_DATE_INTERVAL;
         }
 
@@ -129,7 +129,7 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env) const
         run_regi_light_puzzle(env, REGI_NAME, stats.encounters());
 
         //  Start the encounter.
-        pbf_mash_button(BUTTON_A, 5 * TICKS_PER_SECOND);
+        pbf_mash_button(env.console, BUTTON_A, 5 * TICKS_PER_SECOND);
         env.console.botbase().wait_for_all_requests();
 
         //  Detect shiny.
@@ -143,7 +143,7 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env) const
             break;
         }
         if (detection == ShinyDetection::NO_BATTLE_MENU){
-            pbf_mash_button(BUTTON_B, TICKS_PER_SECOND);
+            pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
             tracker.run_away();
             error = true;
         }
@@ -152,11 +152,11 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env) const
     env.update_stats();
 
     if (GO_HOME_WHEN_DONE){
-        pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
     }
 
-    end_program_callback();
-    end_program_loop();
+    end_program_callback(env.console);
+    end_program_loop(env.console);
 }
 
 

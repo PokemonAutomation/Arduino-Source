@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_StartBattleDetector_H
 
 #include <chrono>
+#include <thread>
 #include "CommonFramework/Tools/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"

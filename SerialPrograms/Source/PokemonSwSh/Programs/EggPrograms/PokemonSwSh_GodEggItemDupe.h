@@ -20,7 +20,7 @@ class GodEggItemDupe : public SingleSwitchProgram{
 public:
     GodEggItemDupe();
 
-    void collect_godegg(uint8_t party_slot, bool map_to_pokemon, bool pokemon_to_map) const;
+    void collect_godegg(const BotBaseContext& context, uint8_t party_slot, bool map_to_pokemon, bool pokemon_to_map) const;
     void run_program(SingleSwitchProgramEnvironment& env, uint16_t attempts) const;
     virtual void program(SingleSwitchProgramEnvironment& env) const override;
 

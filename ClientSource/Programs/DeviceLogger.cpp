@@ -18,7 +18,7 @@ void device_logger(const std::string& device_name){
     std::cout << "Starting Device Logger..." << std::endl;
     std::cout << std::endl;
     std::unique_ptr<PABotBase> pabotbase = start_connection(false, device_name);
-    global_connection = pabotbase.get();
+//    global_connection = pabotbase.get();
 
     std::cout << "Begin Message Logging..." << std::endl;
     MessageLogger logger;

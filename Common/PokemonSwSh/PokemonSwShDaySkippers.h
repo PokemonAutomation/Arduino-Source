@@ -20,7 +20,7 @@
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////
 //  Universal
-#ifdef __cplusplus
+#if 0
 void skipper_init_view              (void);
 void skipper_auto_recovery          (void);
 void skipper_rollback_year_full     (bool date_us);
@@ -37,16 +37,17 @@ void skipper_increment_all_rollback (void);
 //  Client Side
 #ifdef __cplusplus
 namespace PokemonAutomation{
-    class BotBase;
+    class BotBaseContext;
+
+    void skipper_init_view              (const BotBaseContext& context);
+    void skipper_auto_recovery          (const BotBaseContext& context);
+    void skipper_rollback_year_full     (const BotBaseContext& context, bool date_us);
+    void skipper_rollback_year_sync     (const BotBaseContext& context);
+    void skipper_increment_day          (const BotBaseContext& context, bool date_us);
+    void skipper_increment_month        (const BotBaseContext& context, uint8_t days);
+    void skipper_increment_all          (const BotBaseContext& context);
+    void skipper_increment_all_rollback (const BotBaseContext& context);
 }
-void skipper_init_view              (PokemonAutomation::BotBase& device);
-void skipper_auto_recovery          (PokemonAutomation::BotBase& device);
-void skipper_rollback_year_full     (PokemonAutomation::BotBase& device, bool date_us);
-void skipper_rollback_year_sync     (PokemonAutomation::BotBase& device);
-void skipper_increment_day          (PokemonAutomation::BotBase& device, bool date_us);
-void skipper_increment_month        (PokemonAutomation::BotBase& device, uint8_t days);
-void skipper_increment_all          (PokemonAutomation::BotBase& device);
-void skipper_increment_all_rollback (PokemonAutomation::BotBase& device);
 #endif
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

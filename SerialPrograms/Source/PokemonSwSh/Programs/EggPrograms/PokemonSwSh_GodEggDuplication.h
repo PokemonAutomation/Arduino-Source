@@ -20,7 +20,7 @@ class GodEggDuplication : public SingleSwitchProgram{
 public:
     GodEggDuplication();
 
-    void collect_godegg(uint8_t party_slot) const;
+    void collect_godegg(const BotBaseContext& context, uint8_t party_slot) const;
     void run_program(SingleSwitchProgramEnvironment& env, uint16_t attempts) const;
     virtual void program(SingleSwitchProgramEnvironment& env) const override;
 

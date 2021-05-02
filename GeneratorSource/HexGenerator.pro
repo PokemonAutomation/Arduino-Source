@@ -30,6 +30,7 @@ SOURCES += \
     ../Common/Qt/Options/FossilTableOption.cpp \
     ../Common/Qt/Options/MultiHostTableOption.cpp \
     ../Common/Qt/Options/SimpleIntegerOption.cpp \
+	../Common/Qt/Options/StringOption.cpp \
     ../Common/Qt/Options/SwitchDateOption.cpp \
     ../Common/Qt/Options/TimeExpressionOption.cpp \
     ../Common/Qt/QtJsonTools.cpp \
@@ -70,6 +71,7 @@ HEADERS += \
     ../Common/Qt/Options/FossilTableOption.h \
     ../Common/Qt/Options/MultiHostTableOption.h \
     ../Common/Qt/Options/SimpleIntegerOption.h \
+	../Common/Qt/Options/StringOption.h \
     ../Common/Qt/Options/SwitchDateOption.h \
     ../Common/Qt/Options/TimeExpressionOption.h \
     ../Common/Qt/QtJsonTools.h \

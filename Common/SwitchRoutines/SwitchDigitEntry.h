@@ -32,10 +32,11 @@ void enter_digits       (uint8_t count, const uint8_t* digits);
 //  Client Side
 #ifdef __cplusplus
 namespace PokemonAutomation{
-    class BotBase;
+    class BotBaseContext;
+
+    void enter_digits_str   (const BotBaseContext& context, uint8_t count, const char* digits);
+    void enter_digits       (const BotBaseContext& context, uint8_t count, const uint8_t* digits);
 }
-void enter_digits_str   (PokemonAutomation::BotBase& device, uint8_t count, const char* digits);
-void enter_digits       (PokemonAutomation::BotBase& device, uint8_t count, const uint8_t* digits);
 #endif
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

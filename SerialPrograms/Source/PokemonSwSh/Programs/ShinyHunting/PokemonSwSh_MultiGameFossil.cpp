@@ -28,7 +28,12 @@ MultiGameFossil::MultiGameFossil()
     m_options.emplace_back(&GAME_LIST, "GAME_LIST");
 }
 
-void run_fossil_batch(const FossilTable::GameSlot* batch, bool* game_slot_flipped, bool save_and_exit){
+void run_fossil_batch(
+    const BotBaseContext& context,
+    const FossilTable::GameSlot* batch,
+    bool* game_slot_flipped,
+    bool save_and_exit
+){
     //  Sanitize Slots
     uint8_t game_slot = batch->game_slot;
     uint8_t user_slot = batch->user_slot;
@@ -48,7 +53,13 @@ void run_fossil_batch(const FossilTable::GameSlot* batch, bool* game_slot_flippe
         break;
     }
 
-    start_game_from_home(TOLERATE_SYSTEM_UPDATE_MENU_FAST, game_slot, user_slot, false);
+    start_game_from_home(
+        context,
+        TOLERATE_SYSTEM_UPDATE_MENU_FAST,
+        game_slot,
+        user_slot,
+        false
+    );
     if (game_slot == 2){
         *game_slot_flipped = !*game_slot_flipped;
     }
@@ -57,27 +68,28 @@ void run_fossil_batch(const FossilTable::GameSlot* batch, bool* game_slot_flippe
 #if 1
     for (uint16_t c = 0; c < batch->revives; c++){
 #if 1
-        mash_A(170);
-        pbf_wait(65);
+        mash_A(context, 170);
+        pbf_wait(context, 65);
 #else
-        mash_A(50);
-        pbf_wait(140);
-        ssf_press_button1(BUTTON_A, 160);
+        mash_A(context, 50);
+        pbf_wait(context, 140);
+        ssf_press_button1(context, BUTTON_A, 160);
 #endif
         if (batch->fossil & 2){
-            ssf_press_dpad1(DPAD_DOWN, 5);
+            ssf_press_dpad1(context, DPAD_DOWN, 5);
         }
-        ssf_press_button1(BUTTON_A, 160);
+        ssf_press_button1(context, BUTTON_A, 160);
         if (batch->fossil & 1){
-            ssf_press_dpad1(DPAD_DOWN, 5);
+            ssf_press_dpad1(context, DPAD_DOWN, 5);
         }
-        mash_A(400);
+        mash_A(context, 400);
         pbf_mash_button(
+            context,
             BUTTON_B,
             AUTO_DEPOSIT ? 1400 : 1520
         );
     }
-    pbf_wait(100);
+    pbf_wait(context, 100);
 #endif
 
     if (!save_and_exit){
@@ -86,18 +98,18 @@ void run_fossil_batch(const FossilTable::GameSlot* batch, bool* game_slot_flippe
     }
 
     //  Save game.
-    ssf_press_button2(BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
-    ssf_press_button2(BUTTON_R, 150, 20);
-    ssf_press_button2(BUTTON_A, 500, 10);
+    ssf_press_button2(context, BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
+    ssf_press_button2(context, BUTTON_R, 150, 20);
+    ssf_press_button2(context, BUTTON_A, 500, 10);
 
     //  Exit game.
-    ssf_press_button2(BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
-    close_game();
+    ssf_press_button2(context, BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
+    close_game(context);
 }
 
 
 void MultiGameFossil::program(SingleSwitchProgramEnvironment& env) const{
-    grip_menu_connect_go_home();
+    grip_menu_connect_go_home(env.console);
 
     FossilTable::GameSlot batch;
 
@@ -106,13 +118,13 @@ void MultiGameFossil::program(SingleSwitchProgramEnvironment& env) const{
     bool game_slot_flipped = false;
     for (size_t c = 0; c < games; c++){
         batch = GAME_LIST[c];
-        run_fossil_batch(&batch, &game_slot_flipped, c + 1 < games);
+        run_fossil_batch(env.console, &batch, &game_slot_flipped, c + 1 < games);
     }
 
-    ssf_press_button2(BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
+    ssf_press_button2(env.console, BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
 
-    end_program_callback();
-    end_program_loop();
+    end_program_callback(env.console);
+    end_program_loop(env.console);
 
 
 }

@@ -10,78 +10,82 @@
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "PokemonSwShDateSpam.h"
 
-using namespace PokemonAutomation;
 
+#if 0
 void home_to_date_time(bool to_date_change, bool fast){
-    home_to_date_time(*global_connection, to_date_change, fast);
+    home_to_date_time(*PokemonAutomation::global_connection, to_date_change, fast);
 }
-void home_to_date_time(BotBase& device, bool to_date_change, bool fast){
+void roll_date_forward_1(bool fast){
+    roll_date_forward_1(*PokemonAutomation::global_connection, fast);
+}
+void roll_date_backward_N(uint8_t skips, bool fast){
+    roll_date_backward_N(*PokemonAutomation::global_connection, skips, fast);
+}
+void home_roll_date_enter_game_autorollback(uint8_t* year){
+    home_roll_date_enter_game_autorollback(*PokemonAutomation::global_connection, year);
+}
+void home_roll_date_enter_game(bool rollback_year){
+    home_roll_date_enter_game(*PokemonAutomation::global_connection, rollback_year);
+}
+void touch_date_from_home(uint16_t settings_to_home_delay){
+    touch_date_from_home(*PokemonAutomation::global_connection, settings_to_home_delay);
+}
+void rollback_hours_from_home(uint8_t hours, uint16_t settings_to_home_delay){
+    rollback_hours_from_home(*PokemonAutomation::global_connection, hours, settings_to_home_delay);
+}
+#endif
+
+
+
+namespace PokemonAutomation{
+
+
+
+void home_to_date_time(const BotBaseContext& context, bool to_date_change, bool fast){
     pabb_home_to_date_time params;
     params.to_date_change = to_date_change;
     params.fast = fast;
-    device.issue_request<PABB_MSG_COMMAND_HOME_TO_DATE_TIME>(params);
+    context->issue_request<PABB_MSG_COMMAND_HOME_TO_DATE_TIME>(&context.cancelled_bool(), params);
 }
-
-void roll_date_forward_1(bool fast){
-    roll_date_forward_1(*global_connection, fast);
-}
-void roll_date_forward_1(BotBase& device, bool fast){
+void roll_date_forward_1(const BotBaseContext& context, bool fast){
     pabb_roll_date_forward_1 params;
     params.fast = fast;
-    device.issue_request<PABB_MSG_COMMAND_ROLL_DATE_FORWARD_1>(params);
+    context->issue_request<PABB_MSG_COMMAND_ROLL_DATE_FORWARD_1>(&context.cancelled_bool(), params);
 }
-
-void roll_date_backward_N(uint8_t skips, bool fast){
-    roll_date_backward_N(*global_connection, skips, fast);
-}
-void roll_date_backward_N(BotBase& device, uint8_t skips, bool fast){
+void roll_date_backward_N(const BotBaseContext& context, uint8_t skips, bool fast){
     pabb_roll_date_backward_N params;
     params.skips = skips;
     params.fast = fast;
-    device.issue_request<PABB_MSG_COMMAND_ROLL_DATE_BACKWARD_N>(params);
+    context->issue_request<PABB_MSG_COMMAND_ROLL_DATE_BACKWARD_N>(&context.cancelled_bool(), params);
 }
-
-void home_roll_date_enter_game_autorollback(uint8_t* year){
-    home_roll_date_enter_game_autorollback(*global_connection, year);
-}
-void home_roll_date_enter_game_autorollback(BotBase& device, uint8_t* year){
+void home_roll_date_enter_game_autorollback(const BotBaseContext& context, uint8_t* year){
     //  This version automatically handles the 2060 roll-back.
     if (*year >= MAX_YEAR){
-        home_roll_date_enter_game(device, true);
+        home_roll_date_enter_game(context, true);
         *year = 0;
     }else{
-        home_roll_date_enter_game(device, false);
+        home_roll_date_enter_game(context, false);
     }
     (*year)++;
 }
-
-void home_roll_date_enter_game(bool rollback_year){
-    home_roll_date_enter_game(*global_connection, rollback_year);
-}
-void home_roll_date_enter_game(BotBase& device, bool rollback_year){
+void home_roll_date_enter_game(const BotBaseContext& context, bool rollback_year){
     pabb_home_roll_date_enter_game params;
     params.rollback_year = rollback_year;
-    device.issue_request<PABB_MSG_COMMAND_HOME_ROLL_DATE_ENTER_GAME>(params);
+    context->issue_request<PABB_MSG_COMMAND_HOME_ROLL_DATE_ENTER_GAME>(&context.cancelled_bool(), params);
 }
-
-void touch_date_from_home(uint16_t settings_to_home_delay){
-    touch_date_from_home(*global_connection, settings_to_home_delay);
-}
-void touch_date_from_home(BotBase& device, uint16_t settings_to_home_delay){
+void touch_date_from_home(const BotBaseContext& context, uint16_t settings_to_home_delay){
     pabb_touch_date_from_home params;
     params.settings_to_home_delay = settings_to_home_delay;
-    device.issue_request<PABB_MSG_COMMAND_TOUCH_DATE_FROM_HOME>(params);
+    context->issue_request<PABB_MSG_COMMAND_TOUCH_DATE_FROM_HOME>(&context.cancelled_bool(), params);
 }
-
-void rollback_hours_from_home(uint8_t hours, uint16_t settings_to_home_delay){
-    rollback_hours_from_home(*global_connection, hours, settings_to_home_delay);
-}
-void rollback_hours_from_home(BotBase& device, uint8_t hours, uint16_t settings_to_home_delay){
+void rollback_hours_from_home(const BotBaseContext& context, uint8_t hours, uint16_t settings_to_home_delay){
     pabb_rollback_hours_from_home params;
     params.hours = hours;
     params.settings_to_home_delay = settings_to_home_delay;
-    device.issue_request<PABB_MSG_COMMAND_ROLLBACK_HOURS_FROM_HOME>(params);
+    context->issue_request<PABB_MSG_COMMAND_ROLLBACK_HOURS_FROM_HOME>(&context.cancelled_bool(), params);
 }
+
+
 
 
 
@@ -164,4 +168,7 @@ int register_message_converters_pokemon_date_spam(){
 }
 
 int init_PokemonSwShDateSpam = register_message_converters_pokemon_date_spam();
+
+
+}
 

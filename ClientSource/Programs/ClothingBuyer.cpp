@@ -29,7 +29,7 @@ void program_ClothingBuyer(const std::string& device_name){
     std::cout << "Starting PABotBase - ClothingBuyer..." << std::endl;
     std::cout << std::endl;
     std::unique_ptr<PABotBase> pabotbase = start_connection(true, device_name);
-    global_connection = pabotbase.get();
+//    global_connection = pabotbase.get();
 
     std::cout << "Begin Message Logging..." << std::endl;
     MessageLogger logger;
@@ -37,18 +37,18 @@ void program_ClothingBuyer(const std::string& device_name){
 
 
     //  Start Program
-    start_program_flash(CONNECT_CONTROLLER_DELAY);
-    grip_menu_connect_go_home();
-    resume_game_no_interact(TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+    start_program_flash(*pabotbase, CONNECT_CONTROLLER_DELAY);
+    grip_menu_connect_go_home(*pabotbase);
+    resume_game_no_interact(*pabotbase, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 
     while (true){
-        pbf_press_button(BUTTON_A, 10, 90);
+        pbf_press_button(*pabotbase, BUTTON_A, 10, 90);
         if (CATEGORY_ROTATION){
-            pbf_press_dpad(DPAD_RIGHT, 10, 40);
+            pbf_press_dpad(*pabotbase, DPAD_RIGHT, 10, 40);
         }
-        pbf_press_button(BUTTON_A, 10, 90);
-        pbf_press_button(BUTTON_A, 10, 90);
-        pbf_press_dpad(DPAD_DOWN, 10, 40);
+        pbf_press_button(*pabotbase, BUTTON_A, 10, 90);
+        pbf_press_button(*pabotbase, BUTTON_A, 10, 90);
+        pbf_press_dpad(*pabotbase, DPAD_DOWN, 10, 40);
     }
 }
 

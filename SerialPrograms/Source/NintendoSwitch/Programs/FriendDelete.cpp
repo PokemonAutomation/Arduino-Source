@@ -49,25 +49,25 @@ FriendDelete::FriendDelete()
 }
 
 void FriendDelete::program(SingleSwitchProgramEnvironment& env) const{
-    pbf_press_button(BUTTON_A, 5, 5);
+    pbf_press_button(env.console, BUTTON_A, 5, 5);
 
     for (uint16_t c = 0; c < FRIENDS_TO_DELETE; c++){
-        pbf_press_button(BUTTON_A, 5, VIEW_FRIEND_DELAY);       //  View friend
-        pbf_press_dpad(DPAD_DOWN, 5, 5);
-        pbf_press_button(BUTTON_A, 10, 90);                     //  Click on Options
+        pbf_press_button(env.console, BUTTON_A, 5, VIEW_FRIEND_DELAY);      //  View friend
+        pbf_press_dpad(env.console, DPAD_DOWN, 5, 5);
+        pbf_press_button(env.console, BUTTON_A, 10, 90);                    //  Click on Options
         if (BLOCK_FRIENDS){
-            pbf_press_dpad(DPAD_DOWN, 5, 5);
+            pbf_press_dpad(env.console, DPAD_DOWN, 5, 5);
         }
-        pbf_press_button(BUTTON_A, 10, 90);                     //  Click on Remove/Block Friend
+        pbf_press_button(env.console, BUTTON_A, 10, 90);                    //  Click on Remove/Block Friend
         if (BLOCK_FRIENDS){
-            pbf_press_button(BUTTON_A, 5, VIEW_FRIEND_DELAY);   //  Confirm
+            pbf_press_button(env.console, BUTTON_A, 5, VIEW_FRIEND_DELAY);  //  Confirm
         }
-        pbf_press_button(BUTTON_A, 5, DELETE_FRIEND_DELAY);     //  Confirm
-        pbf_press_button(BUTTON_A, 5, FINISH_DELETE_DELAY);     //  Finish delete friend.
+        pbf_press_button(env.console, BUTTON_A, 5, DELETE_FRIEND_DELAY);    //  Confirm
+        pbf_press_button(env.console, BUTTON_A, 5, FINISH_DELETE_DELAY);    //  Finish delete friend.
     }
 
-    end_program_callback();
-    end_program_loop();
+    end_program_callback(env.console);
+    end_program_loop(env.console);
 }
 
 

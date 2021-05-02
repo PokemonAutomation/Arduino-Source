@@ -21,7 +21,7 @@ class DenRoller : public SingleSwitchProgram{
 public:
     DenRoller();
 
-    void ring_bell(int count) const;
+    void ring_bell(const BotBaseContext& context, int count) const;
     virtual void program(SingleSwitchProgramEnvironment& env) const override;
 
 private:

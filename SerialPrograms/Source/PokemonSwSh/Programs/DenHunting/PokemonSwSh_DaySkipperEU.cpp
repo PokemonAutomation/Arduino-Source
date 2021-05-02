@@ -54,16 +54,16 @@ void DaySkipperEU::program(SingleSwitchProgramEnvironment& env) const{
     uint32_t remaining_skips = SKIPS;
 
     //  Connect
-    pbf_press_button(BUTTON_ZR, 5, 5);
+    pbf_press_button(env.console, BUTTON_ZR, 5, 5);
 
     //  Setup starting state.
-    skipper_init_view();
-    skipper_rollback_year_full(false);
+    skipper_init_view(env.console);
+    skipper_rollback_year_full(env.console, false);
     year = 0;
 
     uint16_t correct_count = 0;
     while (remaining_skips > 0){
-        skipper_increment_day(false);
+        skipper_increment_day(env.console, false);
 
         correct_count++;
         year++;
@@ -72,24 +72,24 @@ void DaySkipperEU::program(SingleSwitchProgramEnvironment& env) const{
 
         if (year >= 60){
             if (real_life_year <= 36){
-                skipper_rollback_year_sync();
+                skipper_rollback_year_sync(env.console);
                 year = real_life_year;
             }else{
-                skipper_rollback_year_full(false);
+                skipper_rollback_year_full(env.console, false);
                 year = 0;
             }
         }
         if (CORRECTION_SKIPS != 0 && correct_count == CORRECTION_SKIPS){
             correct_count = 0;
-            skipper_auto_recovery();
+            skipper_auto_recovery(env.console);
         }
     }
 
     //  Prevent the Switch from sleeping and the time from advancing.
-    end_program_callback();
-    pbf_wait(15 * TICKS_PER_SECOND);
+    end_program_callback(env.console);
+    pbf_wait(env.console, 15 * TICKS_PER_SECOND);
     while (true){
-        ssf_press_button1(BUTTON_A, 15 * TICKS_PER_SECOND);
+        ssf_press_button1(env.console, BUTTON_A, 15 * TICKS_PER_SECOND);
     }
 }
 

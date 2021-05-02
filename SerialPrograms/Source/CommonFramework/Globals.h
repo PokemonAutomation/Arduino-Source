@@ -14,8 +14,10 @@ namespace PokemonAutomation{
 
 extern const QString VERSION;
 extern const QString DISCORD_LINK;
-extern const QString DISCORD_LINK_FULL;
-extern const QString GITHUB_REPO;
+extern const QString DISCORD_LINK_URL;
+extern const QString ONLINE_DOC_URL;
+extern const QString PROJECT_GITHUB;
+extern const QString PROJECT_GITHUB_URL;
 
 const auto SERIAL_REFRESH_RATE = std::chrono::milliseconds(1000);
 extern const QString STRING_POKEMON;

@@ -182,8 +182,9 @@ void RunnableProgramUI::make_body(QWidget& parent, QVBoxLayout& layout){
 //    m_status_bar->setText("<b>Encounters: 1,267 - Corrections: 0 - Star Shinies: 1 - Square Shinies: 0</b>");
     QFont font = m_status_bar->font();
 //    cout << font.pointSize() << endl;
-    int font_size = font.pointSize();
-    font.setPointSize(font_size + font_size / 2);
+//    int font_size = font.pointSize();
+//    font.setPointSize(font_size + font_size / 2);
+    font.setPointSize(10);
     m_status_bar->setFont(font);
     update_historical_stats();
 

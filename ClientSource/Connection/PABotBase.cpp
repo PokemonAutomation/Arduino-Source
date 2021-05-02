@@ -38,7 +38,7 @@ void PABotBase::connect(){
     //  Send seqnum reset.
     pabb_MsgInfoSeqnumReset params;
     pabb_MsgAckRequest response;
-    issue_request_and_wait<PABB_MSG_SEQNUM_RESET, PABB_MSG_ACK_REQUEST>(params, response);
+    issue_request_and_wait<PABB_MSG_SEQNUM_RESET, PABB_MSG_ACK_REQUEST>(nullptr, params, response);
 }
 void PABotBase::stop(){
 //    cout << "stop" << endl;
@@ -93,6 +93,26 @@ void PABotBase::wait_for_all_requests(){
     });
     if (canceled){
         throw CancelledException();
+    }
+}
+void PABotBase::stop_all_commands(){
+    pabb_MsgRequestProtocolVersion params;
+    pabb_MsgAckRequest response;
+    issue_request_and_wait<PABB_MSG_REQUEST_STOP, PABB_MSG_ACK_REQUEST>(nullptr, params, response);
+    {
+        std::lock_guard<std::mutex> lg0(m_sleep_lock);
+        SpinLockGuard lg1(m_state_lock, "PABotBase::stop_all_commands()");
+
+        //  Remove all commands that are before the stop seqnum.
+        uint64_t seqnum = infer_full_seqnum(m_pending_commands, response.seqnum);
+        while (true){
+            auto iter = m_pending_commands.begin();
+            if (iter == m_pending_commands.end() || iter->first > seqnum){
+                break;
+            }
+            m_pending_commands.erase(iter);
+        }
+        m_cv.notify_all();
     }
 }
 void PABotBase::remove_request(std::map<uint64_t, PendingRequest>::iterator iter){
@@ -374,6 +394,7 @@ void PABotBase::retransmit_thread(){
 
 bool PABotBase::try_issue_request(
     std::map<uint64_t, PendingRequest>::iterator& iter,
+    const std::atomic<bool>* cancelled,
     uint8_t send_type, char* send_params, size_t send_bytes,
     bool silent_remove, size_t queue_limit
 ){
@@ -382,6 +403,9 @@ bool PABotBase::try_issue_request(
     }
 
     SpinLockGuard lg(m_state_lock, "PABotBase::try_issue_request()");
+    if (cancelled != nullptr && cancelled->load(std::memory_order_acquire)){
+        throw CancelledException();
+    }
 
     State state = m_state.load(std::memory_order_acquire);
     if (state != State::RUNNING){
@@ -422,6 +446,7 @@ bool PABotBase::try_issue_request(
 }
 bool PABotBase::try_issue_command(
     std::map<uint64_t, PendingCommand>::iterator& iter,
+    const std::atomic<bool>* cancelled,
     uint8_t send_type, char* send_params, size_t send_bytes,
     bool silent_remove, size_t queue_limit
 ){
@@ -430,6 +455,9 @@ bool PABotBase::try_issue_command(
     }
 
     SpinLockGuard lg(m_state_lock, "PABotBase::try_issue_command()");
+    if (cancelled != nullptr && cancelled->load(std::memory_order_acquire)){
+        throw CancelledException();
+    }
 
     State state = m_state.load(std::memory_order_acquire);
     if (state != State::RUNNING){
@@ -476,6 +504,7 @@ bool PABotBase::try_issue_command(
 }
 bool PABotBase::issue_request(
     std::map<uint64_t, PendingRequest>::iterator& iter,
+    const std::atomic<bool>* cancelled,
     uint8_t send_type, char* send_params, size_t send_bytes,
     bool silent_remove
 ){
@@ -500,12 +529,16 @@ bool PABotBase::issue_request(
     while (true){
         if (try_issue_request(
             iter,
+            cancelled,
             send_type, send_params, send_bytes,
             silent_remove, MAX_PENDING_REQUESTS
         )){
             return true;
         }
         std::unique_lock<std::mutex> lg(m_sleep_lock);
+        if (cancelled != nullptr && cancelled->load(std::memory_order_acquire)){
+            throw CancelledException();
+        }
         if (m_state.load(std::memory_order_acquire) != State::RUNNING){
             throw CancelledException();
         }
@@ -514,6 +547,7 @@ bool PABotBase::issue_request(
 }
 bool PABotBase::issue_command(
     std::map<uint64_t, PendingCommand>::iterator& iter,
+    const std::atomic<bool>* cancelled,
     uint8_t send_type, char* send_params, size_t send_bytes,
     bool silent_remove
 ){
@@ -538,12 +572,16 @@ bool PABotBase::issue_command(
     while (true){
         if (try_issue_command(
             iter,
+            cancelled,
             send_type, send_params, send_bytes,
             silent_remove, MAX_PENDING_REQUESTS
         )){
             return true;
         }
         std::unique_lock<std::mutex> lg(m_sleep_lock);
+        if (cancelled != nullptr && cancelled->load(std::memory_order_acquire)){
+            throw CancelledException();
+        }
         if (m_state.load(std::memory_order_acquire) != State::RUNNING){
             throw CancelledException();
         }
@@ -553,28 +591,31 @@ bool PABotBase::issue_command(
 
 
 bool PABotBase::try_issue_request(
+    const std::atomic<bool>* cancelled,
     uint8_t send_type, char* send_params, size_t send_bytes
 ){
     if (!PABB_MSG_IS_COMMAND(send_type)){
         std::map<uint64_t, PendingRequest>::iterator iter;
-        return try_issue_request(iter, send_type, send_params, send_bytes, true, MAX_PENDING_REQUESTS);
+        return try_issue_request(iter, cancelled, send_type, send_params, send_bytes, true, MAX_PENDING_REQUESTS);
     }else{
         std::map<uint64_t, PendingCommand>::iterator iter;
-        return try_issue_command(iter, send_type, send_params, send_bytes, true, MAX_PENDING_REQUESTS);
+        return try_issue_command(iter, cancelled, send_type, send_params, send_bytes, true, MAX_PENDING_REQUESTS);
     }
 }
 void PABotBase::issue_request(
+    const std::atomic<bool>* cancelled,
     uint8_t send_type, char* send_params, size_t send_bytes
 ){
     if (!PABB_MSG_IS_COMMAND(send_type)){
         std::map<uint64_t, PendingRequest>::iterator iter;
-        issue_request(iter, send_type, send_params, send_bytes, true);
+        issue_request(iter, cancelled, send_type, send_params, send_bytes, true);
     }else{
         std::map<uint64_t, PendingCommand>::iterator iter;
-        issue_command(iter, send_type, send_params, send_bytes, true);
+        issue_command(iter, cancelled, send_type, send_params, send_bytes, true);
     }
 }
 void PABotBase::issue_request_and_wait(
+    const std::atomic<bool>* cancelled,
     uint8_t send_type, char* send_params, size_t send_bytes,
     uint8_t recv_type, char* recv_params, size_t recv_bytes
 ){
@@ -583,7 +624,7 @@ void PABotBase::issue_request_and_wait(
     }
 
     std::map<uint64_t, PendingRequest>::iterator iter;
-    issue_request(iter, send_type, send_params, send_bytes, false);
+    issue_request(iter, cancelled, send_type, send_params, send_bytes, false);
 
     //  Wait for ack.
     while (true){
@@ -629,19 +670,19 @@ void PABotBase::issue_request_and_wait(
 uint32_t PABotBase::protocol_version(){
     pabb_MsgRequestProtocolVersion params;
     pabb_MsgAckRequestI32 response;
-    issue_request_and_wait<PABB_MSG_REQUEST_PROTOCOL_VERSION, PABB_MSG_ACK_REQUEST_I32>(params, response);
+    issue_request_and_wait<PABB_MSG_REQUEST_PROTOCOL_VERSION, PABB_MSG_ACK_REQUEST_I32>(nullptr, params, response);
     return response.data;
 }
 uint32_t PABotBase::program_version(){
     pabb_MsgRequestProgramVersion params;
     pabb_MsgAckRequestI32 response;
-    issue_request_and_wait<PABB_MSG_REQUEST_PROGRAM_VERSION, PABB_MSG_ACK_REQUEST_I32>(params, response);
+    issue_request_and_wait<PABB_MSG_REQUEST_PROGRAM_VERSION, PABB_MSG_ACK_REQUEST_I32>(nullptr, params, response);
     return response.data;
 }
 uint8_t PABotBase::program_id(){
     pabb_MsgRequestProgramID params;
     pabb_MsgAckRequestI8 response;
-    issue_request_and_wait<PABB_MSG_REQUEST_PROGRAM_ID, PABB_MSG_ACK_REQUEST_I8>(params, response);
+    issue_request_and_wait<PABB_MSG_REQUEST_PROGRAM_ID, PABB_MSG_ACK_REQUEST_I8>(nullptr, params, response);
     return response.data;
 }
 

@@ -32,7 +32,7 @@ void program_BeamReset(const std::string& device_name){
     std::cout << "Starting PABotBase - BeamReset..." << std::endl;
     std::cout << std::endl;
     std::unique_ptr<PABotBase> pabotbase = start_connection(true, device_name);
-    global_connection = pabotbase.get();
+//    global_connection = pabotbase.get();
 
     std::cout << "Begin Message Logging..." << std::endl;
     MessageLogger logger;
@@ -40,35 +40,35 @@ void program_BeamReset(const std::string& device_name){
 
 
     //  Start Program
-    start_program_flash(CONNECT_CONTROLLER_DELAY);
-    grip_menu_connect_go_home();
+    start_program_flash(*pabotbase, CONNECT_CONTROLLER_DELAY);
+    grip_menu_connect_go_home(*pabotbase);
 
-    resume_game_front_of_den_nowatts(TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
-    pbf_mash_button(BUTTON_B, 100);
+    resume_game_front_of_den_nowatts(*pabotbase, TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+    pbf_mash_button(*pabotbase, BUTTON_B, 100);
 
     while (true){
         //  Talk to den.
-        pbf_press_button(BUTTON_A, 10, 450);
+        pbf_press_button(*pabotbase, BUTTON_A, 10, 450);
         if (EXTRA_LINE){
-            pbf_press_button(BUTTON_A, 10, 300);
+            pbf_press_button(*pabotbase, BUTTON_A, 10, 300);
         }
-        pbf_press_button(BUTTON_A, 10, 300);
+        pbf_press_button(*pabotbase, BUTTON_A, 10, 300);
 
         //  Drop wishing piece.
-        pbf_press_button(BUTTON_A, 10, 70);
-        pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(*pabotbase, BUTTON_A, 10, 70);
+        pbf_press_button(*pabotbase, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
 
         for (uint16_t c = 0; c < 4; c++){
-            pbf_press_button(BUTTON_HOME, 10, 10);
-            pbf_press_button(BUTTON_HOME, 10, 220);
+            pbf_press_button(*pabotbase, BUTTON_HOME, 10, 10);
+            pbf_press_button(*pabotbase, BUTTON_HOME, 10, 220);
         }
-        pbf_wait(DELAY_BEFORE_RESET);
+        pbf_wait(*pabotbase, DELAY_BEFORE_RESET);
 
-        reset_game_from_home(TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+        reset_game_from_home(*pabotbase, TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
     }
 
-    end_program_callback();
-    end_program_loop();
+    end_program_callback(*pabotbase);
+    end_program_loop(*pabotbase);
 }
 
 

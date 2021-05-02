@@ -15,7 +15,7 @@ MultiSwitchProgramEnvironment::MultiSwitchProgramEnvironment(
     Logger& logger,
     StatsTracker* current_stats,
     const StatsTracker* historical_stats,
-    std::vector<ConsoleHandle> p_switches
+    FixedLimitVector<ConsoleHandle> p_switches
 )
     : ProgramEnvironment(logger, current_stats, historical_stats)
     , dispatcher(p_switches.size())
@@ -81,7 +81,7 @@ void MultiSwitchProgramUI::program(
     const StatsTracker* historical_stats
 ){
     MultiSwitchProgram& factory = static_cast<MultiSwitchProgram&>(m_factory);
-    std::vector<ConsoleHandle> switches;
+    FixedLimitVector<ConsoleHandle> switches(factory.count());
     for (size_t c = 0; c < factory.count(); c++){
         SwitchSystem& system = static_cast<MultiSwitchSystem&>(*m_setup)[c];
         switches.emplace_back(
@@ -108,7 +108,7 @@ void MultiSwitchProgramUI::program(
             this->set_status(std::move(status));
         }
     );
-    PokemonAutomation::global_connection = nullptr;
+//    PokemonAutomation::global_connection = nullptr;
     factory.program(env);
 }
 

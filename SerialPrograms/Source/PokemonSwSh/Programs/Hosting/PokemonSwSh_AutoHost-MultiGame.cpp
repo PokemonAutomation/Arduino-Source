@@ -89,12 +89,12 @@ void AutoHostMultiGame::run_autohost(
     uint16_t lobby_wait_delay,
     Catchability catchability
 ) const{
-    roll_den(ENTER_ONLINE_DEN_DELAY, OPEN_ONLINE_DEN_LOBBY_DELAY, game.skips, catchability);
+    roll_den(env.console, ENTER_ONLINE_DEN_DELAY, OPEN_ONLINE_DEN_LOBBY_DELAY, game.skips, catchability);
 
     if (HOST_ONLINE){
-        connect_to_internet(OPEN_YCOMM_DELAY, CONNECT_TO_INTERNET_DELAY);
+        connect_to_internet(env.console, OPEN_YCOMM_DELAY, CONNECT_TO_INTERNET_DELAY);
     }
-    enter_den(ENTER_ONLINE_DEN_DELAY, game.skips != 0, HOST_ONLINE);
+    enter_den(env.console, ENTER_ONLINE_DEN_DELAY, game.skips != 0, HOST_ONLINE);
 
     uint8_t code[8];
     if (RAID_CODE.get_code(code)){
@@ -103,12 +103,12 @@ void AutoHostMultiGame::run_autohost(
             str[c] = code[c] + '0';
         }
         env.log("Next Raid Code: " + std::string(str, sizeof(str)));
-        pbf_press_button(BUTTON_PLUS, 5, 145);
-        enter_digits(8, code);
-        pbf_wait(180);
-        pbf_press_button(BUTTON_A, 5, 95);
+        pbf_press_button(env.console, BUTTON_PLUS, 5, 145);
+        enter_digits(env.console, 8, code);
+        pbf_wait(env.console, 180);
+        pbf_press_button(env.console, BUTTON_A, 5, 95);
     }
-    enter_lobby(OPEN_ONLINE_DEN_LOBBY_DELAY, HOST_ONLINE, catchability);
+    enter_lobby(env.console, OPEN_ONLINE_DEN_LOBBY_DELAY, HOST_ONLINE, catchability);
 
     //  Accept friend requests while we wait.
     raid_lobby_wait(
@@ -119,14 +119,14 @@ void AutoHostMultiGame::run_autohost(
     );
 
     //  Start Raid
-    pbf_press_dpad(DPAD_UP, 5, 45);
+    pbf_press_dpad(env.console, DPAD_UP, 5, 45);
 
     //  Mash A until it's time to close the game.
 #if 1
         {
             env.console.botbase().wait_for_all_requests();
-            uint32_t start = system_clock();
-            pbf_mash_button(BUTTON_A, 3 * TICKS_PER_SECOND);
+            uint32_t start = system_clock(env.console);
+            pbf_mash_button(env.console, BUTTON_A, 3 * TICKS_PER_SECOND);
             env.console.botbase().wait_for_all_requests();
 
             BlackScreenDetector black_screen(env.console, env.logger());
@@ -136,28 +136,28 @@ void AutoHostMultiGame::run_autohost(
                     env.log("Raid has Started!", "blue");
                     break;
                 }
-                pbf_mash_button(BUTTON_A, TICKS_PER_SECOND);
+                pbf_mash_button(env.console, BUTTON_A, TICKS_PER_SECOND);
                 env.console.botbase().wait_for_all_requests();
-                now = system_clock();
+                now = system_clock(env.console);
             }
         }
 #else
-        pbf_mash_button(BUTTON_A, RAID_START_TO_EXIT_DELAY);
+        pbf_mash_button(env.console, BUTTON_A, RAID_START_TO_EXIT_DELAY);
 #endif
 
     //  Select a move.
     if (game.move_slot > 0){
-        pbf_wait(DELAY_TO_SELECT_MOVE);
-        pbf_press_button(BUTTON_A, 20, 80);
+        pbf_wait(env.console, DELAY_TO_SELECT_MOVE);
+        pbf_press_button(env.console, BUTTON_A, 20, 80);
         if (game.dynamax){
-            pbf_press_dpad(DPAD_LEFT, 20, 30);
-            pbf_press_button(BUTTON_A, 20, 60);
+            pbf_press_dpad(env.console, DPAD_LEFT, 20, 30);
+            pbf_press_button(env.console, BUTTON_A, 20, 60);
         }
         for (uint8_t c = 1; c < game.move_slot; c++){
-            pbf_press_dpad(DPAD_DOWN, 20, 30);
+            pbf_press_dpad(env.console, DPAD_DOWN, 20, 30);
         }
-        pbf_press_button(BUTTON_A, 20, 80);
-        pbf_press_button(BUTTON_A, 20, 980);
+        pbf_press_button(env.console, BUTTON_A, 20, 80);
+        pbf_press_button(env.console, BUTTON_A, 20, 980);
     }
 }
 
@@ -182,12 +182,12 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env) const{
         }
     }
 
-    grip_menu_connect_go_home();
+    grip_menu_connect_go_home(env.console);
 
     uint32_t last_touch = 0;
     if (enable_touch && TOUCH_DATE_INTERVAL > 0){
-        touch_date_from_home(SETTINGS_TO_HOME_DELAY);
-        last_touch = system_clock();
+        touch_date_from_home(env.console, SETTINGS_TO_HOME_DELAY);
+        last_touch = system_clock(env.console);
     }
 
     uint32_t raids = 0;
@@ -203,7 +203,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env) const{
             env.log("Raids Completed: " + tostr_u_commas(raids++));
 
             //  Start game.
-            rollback_date_from_home(game.skips);
+            rollback_date_from_home(env.console, game.skips);
 
             //  Sanitize game slot.
             uint8_t game_slot = game.game_slot;
@@ -237,7 +237,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env) const{
             size_t FR_index = index;
             for (uint8_t c = 0; c < FR_FORWARD_ACCEPT; c++){
                 FR_index++;
-                if (GAME_LIST[FR_index].user_slot == 0){
+                if (FR_index >= GAME_LIST.size()){
                     FR_index = 0;
                 }
             }
@@ -253,22 +253,22 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env) const{
             );
 
             //  Exit game.
-            pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
-            close_game();
+            pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+            close_game(env.console);
 
             //  Post-raid delay.
-            pbf_wait(parse_ticks_i32(game.post_raid_delay));
+            pbf_wait(env.console, parse_ticks_i32(game.post_raid_delay));
 
             //  Touch the date.
-            if (enable_touch && TOUCH_DATE_INTERVAL > 0 && system_clock() - last_touch >= TOUCH_DATE_INTERVAL){
-                touch_date_from_home(SETTINGS_TO_HOME_DELAY);
+            if (enable_touch && TOUCH_DATE_INTERVAL > 0 && system_clock(env.console) - last_touch >= TOUCH_DATE_INTERVAL){
+                touch_date_from_home(env.console, SETTINGS_TO_HOME_DELAY);
                 last_touch += TOUCH_DATE_INTERVAL;
             }
         }
     }
 
-    end_program_callback();
-    end_program_loop();
+    end_program_callback(env.console);
+    end_program_loop(env.console);
 }
 
 

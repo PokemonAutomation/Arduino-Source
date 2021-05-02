@@ -98,7 +98,7 @@ bool BotBaseHandle::try_send_request(Parameters& params){
     if (!accepting_commands()){
         return false;
     }
-    return botbase()->try_issue_request<SendType>(params);
+    return botbase()->try_issue_request<SendType>(nullptr, params);
 }
 
 

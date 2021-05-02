@@ -12,24 +12,29 @@
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "Common/PokemonSwSh/PokemonSwShMisc.h"
 
-using namespace PokemonAutomation;
 
+#if 0
 void mash_A(uint16_t ticks){
-    mash_A(*global_connection, ticks);
+    mash_A(*PokemonAutomation::global_connection, ticks);
 }
-void mash_A(BotBase& device, uint16_t ticks){
+void IoA_backout(uint16_t pokemon_to_menu_delay){
+    IoA_backout(*PokemonAutomation::global_connection, pokemon_to_menu_delay);
+}
+#endif
+
+
+namespace PokemonAutomation{
+
+
+void mash_A(const BotBaseContext& context, uint16_t ticks){
     pabb_mashA params;
     params.ticks = ticks;
-    device.issue_request<PABB_MSG_COMMAND_MASH_A>(params);
+    context->issue_request<PABB_MSG_COMMAND_MASH_A>(&context.cancelled_bool(), params);
 }
-
-void IoA_backout(uint16_t pokemon_to_menu_delay){
-    IoA_backout(*global_connection, pokemon_to_menu_delay);
-}
-void IoA_backout(BotBase& device, uint16_t pokemon_to_menu_delay){
+void IoA_backout(const BotBaseContext& context, uint16_t pokemon_to_menu_delay){
     pabb_IoA_backout params;
     params.pokemon_to_menu_delay = pokemon_to_menu_delay;
-    device.issue_request<PABB_MSG_COMMAND_IOA_BACKOUT>(params);
+    context->issue_request<PABB_MSG_COMMAND_IOA_BACKOUT>(&context.cancelled_bool(), params);
 }
 
 int register_message_converters_pokemon_misc(){
@@ -76,3 +81,10 @@ int register_message_converters_pokemon_misc(){
     return 0;
 }
 int init_PokemonSwShMisc = register_message_converters_pokemon_misc();
+
+
+
+
+}
+
+

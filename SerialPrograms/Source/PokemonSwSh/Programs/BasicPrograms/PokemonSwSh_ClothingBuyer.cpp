@@ -30,17 +30,17 @@ ClothingBuyer::ClothingBuyer()
 }
 
 void ClothingBuyer::program(SingleSwitchProgramEnvironment& env) const{
-    grip_menu_connect_go_home();
-    resume_game_no_interact(TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+    grip_menu_connect_go_home(env.console);
+    resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 
     while (true){
-        pbf_press_button(BUTTON_A, 10, 90);
+        pbf_press_button(env.console, BUTTON_A, 10, 90);
         if (CATEGORY_ROTATION){
-            pbf_press_dpad(DPAD_RIGHT, 10, 40);
+            pbf_press_dpad(env.console, DPAD_RIGHT, 10, 40);
         }
-        pbf_press_button(BUTTON_A, 10, 90);
-        pbf_press_button(BUTTON_A, 10, 90);
-        pbf_press_dpad(DPAD_DOWN, 10, 40);
+        pbf_press_button(env.console, BUTTON_A, 10, 90);
+        pbf_press_button(env.console, BUTTON_A, 10, 90);
+        pbf_press_dpad(env.console, DPAD_DOWN, 10, 40);
     }
 }
 

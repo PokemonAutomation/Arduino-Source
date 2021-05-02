@@ -22,15 +22,16 @@ namespace PokemonSwSh{
 
 
 //  Collect egg.
-static void collect_egg(void){
-    ssf_press_button1(BUTTON_A, 120);
+static void collect_egg(const BotBaseContext& context){
+    ssf_press_button1(context, BUTTON_A, 120);
     if (EGG_FETCH_EXTRA_LINE){
-        ssf_press_button1(BUTTON_A, 120);
+        ssf_press_button1(context, BUTTON_A, 120);
     }
-    ssf_press_button1(BUTTON_A, 10);
+    ssf_press_button1(context, BUTTON_A, 10);
 }
-static void collect_egg_mash_out(bool deposit_automatically){
+static void collect_egg_mash_out(const BotBaseContext& context, bool deposit_automatically){
     pbf_mash_button(
+        context,
         BUTTON_B,
         deposit_automatically
             ? FETCH_EGG_MASH_DELAY
@@ -40,25 +41,25 @@ static void collect_egg_mash_out(bool deposit_automatically){
 
 
 //  Fly Home: Used by everything.
-static void fly_home(char from_overworld){
+static void fly_home(const BotBaseContext& context, char from_overworld){
     if (from_overworld){
-        ssf_press_button2(BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
+        ssf_press_button2(context, BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
     }
-    ssf_press_button2(BUTTON_A, 350, 10);
-    ssf_press_dpad2(DPAD_UP_RIGHT, 25, 5);
-    pbf_mash_button(BUTTON_A, 480);
+    ssf_press_button2(context, BUTTON_A, 350, 10);
+    ssf_press_dpad2(context, DPAD_UP_RIGHT, 25, 5);
+    pbf_mash_button(context, BUTTON_A, 480);
 }
-static void fly_home_goto_lady(char from_overworld){
-    fly_home(from_overworld);
+static void fly_home_goto_lady(const BotBaseContext& context, char from_overworld){
+    fly_home(context, from_overworld);
 
     //  Go to lady.
     //  If you change this, you MUST update "GO_TO_LADY_DURATION".
-    ssf_press_joystick2(true, STICK_MIN, STICK_CENTER, 16, 6);
-    ssf_press_joystick2(true, STICK_CENTER, STICK_MIN, 90, 45);
+    ssf_press_joystick2(context, true, STICK_MIN, STICK_CENTER, 16, 6);
+    ssf_press_joystick2(context, true, STICK_CENTER, STICK_MIN, 90, 45);
 }
-static void fly_home_collect_egg(char from_overworld){
-    fly_home_goto_lady(from_overworld);
-    collect_egg();
+static void fly_home_collect_egg(const BotBaseContext& context, char from_overworld){
+    fly_home_goto_lady(context, from_overworld);
+    collect_egg(context);
 }
 
 
@@ -67,19 +68,19 @@ static void fly_home_collect_egg(char from_overworld){
 
 #define EGG_BUTTON_HOLD_DELAY   10
 
-static void menu_to_box(bool from_map){
+static void menu_to_box(const BotBaseContext& context, bool from_map){
     if (from_map){
-        ssf_press_dpad2(DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
-        ssf_press_dpad2(DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+        ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+        ssf_press_dpad2(context, DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
     }
-    ssf_press_button2(BUTTON_A, MENU_TO_POKEMON_DELAY, EGG_BUTTON_HOLD_DELAY);
-    ssf_press_button2(BUTTON_R, POKEMON_TO_BOX_DELAY, EGG_BUTTON_HOLD_DELAY);
-    ssf_press_dpad2(DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
-    ssf_press_dpad2(DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
-    ssf_press_button2(BUTTON_Y, 30, EGG_BUTTON_HOLD_DELAY);
-    ssf_press_button2(BUTTON_Y, 30, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_button2(context, BUTTON_A, MENU_TO_POKEMON_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_button2(context, BUTTON_R, POKEMON_TO_BOX_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_dpad2(context, DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_dpad2(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_button2(context, BUTTON_Y, 30, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_button2(context, BUTTON_Y, 30, EGG_BUTTON_HOLD_DELAY);
 }
-static void box_to_menu(void){
+static void box_to_menu(const BotBaseContext& context){
     //  There are two states here which need to be merged:
     //      1.  The depositing column was empty. The party has been swapped and
     //          it's sitting in the box with no held pokemon.
@@ -91,50 +92,50 @@ static void box_to_menu(void){
     //                  be swallowed by the animation.
     //  In state (2):   The 1st B will drop the party pokemon. The 2nd B will
     //                  back out of the box.
-    ssf_press_button2(BUTTON_B, 20, EGG_BUTTON_HOLD_DELAY);
-    ssf_press_button2(BUTTON_B, BOX_TO_POKEMON_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_button2(context, BUTTON_B, 20, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_button2(context, BUTTON_B, BOX_TO_POKEMON_DELAY, EGG_BUTTON_HOLD_DELAY);
 
     //  Back out to menu.
-    ssf_press_button2(BUTTON_B, POKEMON_TO_MENU_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_button2(context, BUTTON_B, POKEMON_TO_MENU_DELAY, EGG_BUTTON_HOLD_DELAY);
 
-    ssf_press_dpad2(DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
-    ssf_press_dpad2(DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_dpad2(context, DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_dpad2(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
 }
 
-static void party_to_column(uint8_t column){
-    ssf_press_dpad2(DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+static void party_to_column(const BotBaseContext& context, uint8_t column){
+    ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
     column++;
     if (column <= 3){
         for (uint8_t c = 0; c != column; c++){
-            ssf_press_dpad2(DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+            ssf_press_dpad2(context, DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
         }
     }else{
         for (uint8_t c = 7; c != column; c--){
-            ssf_press_dpad2(DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+            ssf_press_dpad2(context, DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
         }
     }
 }
-static void column_to_party(uint8_t column){
+static void column_to_party(const BotBaseContext& context, uint8_t column){
     column++;
     if (column <= 3){
         for (uint8_t c = column; c != 0; c--){
-            ssf_press_dpad2(DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+            ssf_press_dpad2(context, DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
         }
     }else{
         for (uint8_t c = column; c != 7; c++){
-            ssf_press_dpad2(DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+            ssf_press_dpad2(context, DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
         }
     }
-    ssf_press_dpad2(DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_dpad2(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
 }
 
-static void pickup_column(char party){
-    ssf_press_button2(BUTTON_A, 20, EGG_BUTTON_HOLD_DELAY);
+static void pickup_column(const BotBaseContext& context, char party){
+    ssf_press_button2(context, BUTTON_A, 20, EGG_BUTTON_HOLD_DELAY);
     if (party){
-        ssf_press_dpad2(DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+        ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
     }
-    ssf_press_dpad2(DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
-    ssf_press_button2(BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_button2(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
 }
 
 

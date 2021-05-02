@@ -74,10 +74,10 @@ std::unique_ptr<StatsTracker> PurpleBeamFinder::make_stats() const{
 
 
 void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env) const{
-    grip_menu_connect_go_home();
+    grip_menu_connect_go_home(env.console);
 
-    resume_game_front_of_den_nowatts(TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
-    pbf_mash_button(BUTTON_B, 100);
+    resume_game_front_of_den_nowatts(env.console, TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+    pbf_mash_button(env.console, BUTTON_B, 100);
     env.console.botbase().wait_for_all_requests();
 
 
@@ -87,11 +87,11 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env) const{
     bool exit = false;
     while (true){
         //  Talk to den.
-        pbf_press_button(BUTTON_A, 10, 450);
+        pbf_press_button(env.console, BUTTON_A, 10, 450);
         if (EXTRA_LINE){
-            pbf_press_button(BUTTON_A, 10, 300);
+            pbf_press_button(env.console, BUTTON_A, 10, 300);
         }
-        pbf_press_button(BUTTON_A, 10, 300);
+        pbf_press_button(env.console, BUTTON_A, 10, 300);
         env.console.botbase().wait_for_all_requests();
 
         BeamSetter::Detection detection;
@@ -120,7 +120,7 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env) const{
             break;
         }
 
-        pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
         reset_game_from_home_with_inference(
             env, env.console,
             TOLERATE_SYSTEM_UPDATE_MENU_SLOW
@@ -129,8 +129,8 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env) const{
 
 
     while (true){
-        pbf_press_button(BUTTON_B, 20, 20);
-        pbf_press_button(BUTTON_LCLICK, 20, 20);
+        pbf_press_button(env.console, BUTTON_B, 20, 20);
+        pbf_press_button(env.console, BUTTON_LCLICK, 20, 20);
     }
 }
 

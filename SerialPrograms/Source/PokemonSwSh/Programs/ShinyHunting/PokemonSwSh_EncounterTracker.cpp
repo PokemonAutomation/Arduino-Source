@@ -29,9 +29,11 @@ StandardEncounterTracker::StandardEncounterTracker(
 {}
 
 bool StandardEncounterTracker::run_away(){
-    pbf_press_dpad(DPAD_UP, 10, 10);
-    pbf_press_button(BUTTON_A, 10, 10);
-    pbf_mash_button(BUTTON_B, m_exit_battle_time);
+    pbf_press_dpad(m_console, DPAD_UP, 10, 10);
+    pbf_mash_button(m_console, BUTTON_A, TICKS_PER_SECOND);
+    if (m_exit_battle_time > TICKS_PER_SECOND){
+        pbf_mash_button(m_console, BUTTON_B, m_exit_battle_time - TICKS_PER_SECOND);
+    }
     return true;
 }
 

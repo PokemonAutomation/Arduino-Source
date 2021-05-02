@@ -36,30 +36,30 @@ GodEggDuplication::GodEggDuplication()
 }
 
 
-void GodEggDuplication::collect_godegg(uint8_t party_slot) const{
-    pbf_wait(50);
-    ssf_press_button1(BUTTON_B, 100);
-    ssf_press_button1(BUTTON_B, 100);
-    pbf_wait(225);
+void GodEggDuplication::collect_godegg(const BotBaseContext& context, uint8_t party_slot) const{
+    pbf_wait(context, 50);
+    ssf_press_button1(context, BUTTON_B, 100);
+    ssf_press_button1(context, BUTTON_B, 100);
+    pbf_wait(context, 225);
 
     //  "You received an Egg from the Nursery worker!"
-    ssf_press_button1(BUTTON_B, 300);
+    ssf_press_button1(context, BUTTON_B, 300);
 
     //  "Where do you want to send the Egg to?"
-    ssf_press_button1(BUTTON_A, 100);
+    ssf_press_button1(context, BUTTON_A, 100);
 
     //  (extra line of text for French)
-    ssf_press_button1(BUTTON_B, 100);
+    ssf_press_button1(context, BUTTON_B, 100);
 
     //  "Please select a Pokemon to swap from your party."
-    ssf_press_button1(BUTTON_B, MENU_TO_POKEMON_DELAY);
+    ssf_press_button1(context, BUTTON_B, MENU_TO_POKEMON_DELAY);
 
     //  Select the party member.
     for (uint8_t c = 0; c < party_slot; c++){
-        ssf_press_dpad1(DPAD_DOWN, 10);
+        ssf_press_dpad1(context, DPAD_DOWN, 10);
     }
-    ssf_press_button1(BUTTON_A, 300);
-    pbf_mash_button(BUTTON_B, 500);
+    ssf_press_button1(context, BUTTON_A, 300);
+    pbf_mash_button(context, BUTTON_B, 500);
 }
 void GodEggDuplication::run_program(SingleSwitchProgramEnvironment& env, uint16_t attempts) const{
     if (attempts == 0){
@@ -74,8 +74,8 @@ void GodEggDuplication::run_program(SingleSwitchProgramEnvironment& env, uint16_
     //  1st Fetch: Get into position.
     {
         env.log("Fetch Attempts: " + tostr_u_commas(c));
-        fly_home_collect_egg(true);
-        collect_godegg(party_slot++);
+        fly_home_collect_egg(env.console, true);
+        collect_godegg(env.console, party_slot++);
         if (party_slot >= items){
             party_slot = 0;
         }
@@ -89,9 +89,9 @@ void GodEggDuplication::run_program(SingleSwitchProgramEnvironment& env, uint16_
     //  Now we are in steady state.
     for (; c < attempts; c++){
         env.log("Fetch Attempts: " + tostr_u_commas(c));
-        eggfetcher_loop();
-        collect_egg();
-        collect_godegg(party_slot++);
+        eggfetcher_loop(env.console);
+        collect_egg(env.console);
+        collect_godegg(env.console, party_slot++);
         if (party_slot >= items){
             party_slot = 0;
         }
@@ -99,14 +99,14 @@ void GodEggDuplication::run_program(SingleSwitchProgramEnvironment& env, uint16_
 }
 
 void GodEggDuplication::program(SingleSwitchProgramEnvironment& env) const{
-    grip_menu_connect_go_home();
-    resume_game_back_out(TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+    grip_menu_connect_go_home(env.console);
+    resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
 
     run_program(env, MAX_FETCH_ATTEMPTS);
-    ssf_press_button2(BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
+    ssf_press_button2(env.console, BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
 
-    end_program_callback();
-    end_program_loop();
+    end_program_callback(env.console);
+    end_program_loop(env.console);
 }
 
 

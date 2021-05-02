@@ -81,7 +81,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousBerryTree::make_stats() const{
 
 
 void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env) const{
-    grip_menu_connect_go_home();
+    grip_menu_connect_go_home(env.console);
 
     Stats& stats = env.stats<Stats>();
     StandardEncounterTracker tracker(
@@ -96,8 +96,8 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env) 
     while (true){
         env.update_stats();
 
-        home_roll_date_enter_game_autorollback(&year);
-        pbf_mash_button(BUTTON_B, 90);
+        home_roll_date_enter_game_autorollback(env.console, &year);
+        pbf_mash_button(env.console, BUTTON_B, 90);
         env.console.botbase().wait_for_all_requests();
 
         {
@@ -112,13 +112,13 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env) 
                     timed_out = true;
                     break;
                 }
-                pbf_mash_button(BUTTON_A, 10);
+                pbf_mash_button(env.console, BUTTON_A, 10);
                 env.console.botbase().wait_for_all_requests();
             }while (!detector.detect(env.console.video().snapshot()));
 
-            pbf_mash_button(BUTTON_B, 5 * TICKS_PER_SECOND);
+            pbf_mash_button(env.console, BUTTON_B, 5 * TICKS_PER_SECOND);
             if (timed_out){
-                pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
+                pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
                 continue;
             }
         }
@@ -135,28 +135,28 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env) 
         }
         if (detection == ShinyDetection::NO_BATTLE_MENU){
             stats.m_timeouts++;
-            pbf_mash_button(BUTTON_B, TICKS_PER_SECOND);
+            pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
             tracker.run_away();
         }
 
-        pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
     }
 
     env.update_stats();
 
-    pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+    pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
 
-    home_to_date_time(false, false);
-    pbf_press_button(BUTTON_A, 5, 5);
-    pbf_press_button(BUTTON_A, 5, 10);
-    pbf_press_button(BUTTON_HOME, 10, SETTINGS_TO_HOME_DELAY);
+    home_to_date_time(env.console, false, false);
+    pbf_press_button(env.console, BUTTON_A, 5, 5);
+    pbf_press_button(env.console, BUTTON_A, 5, 10);
+    pbf_press_button(env.console, BUTTON_HOME, 10, SETTINGS_TO_HOME_DELAY);
 
     if (!GO_HOME_WHEN_DONE){
-        pbf_press_button(BUTTON_HOME, 10, HOME_TO_GAME_DELAY);
+        pbf_press_button(env.console, BUTTON_HOME, 10, HOME_TO_GAME_DELAY);
     }
 
-    end_program_callback();
-    end_program_loop();
+    end_program_callback(env.console);
+    end_program_loop(env.console);
 }
 
 

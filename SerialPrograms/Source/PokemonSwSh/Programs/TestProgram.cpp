@@ -13,6 +13,7 @@
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/StatsDatabase.h"
+#include "CommonFramework/Tools/AsyncCommandSet.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/Inference/InferenceThrottler.h"
 #include "CommonFramework/Inference/FillGeometry.h"
@@ -38,6 +39,7 @@
 
 #include <fstream>
 
+#include <Windows.h>
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -58,11 +60,38 @@ TestProgram::TestProgram()
 
 
 
+class AsyncCircle : public AsyncCommandSet{
+public:
+    using AsyncCommandSet::AsyncCommandSet;
+    virtual void task() override{
+        while (true){
+            pbf_move_left_joystick(m_context, 128, 255, 32, 0);
+            pbf_move_left_joystick(m_context, 255, 255, 32, 0);
+            pbf_move_left_joystick(m_context, 255, 128, 32, 0);
+            pbf_move_left_joystick(m_context, 255, 0, 32, 0);
+            pbf_move_left_joystick(m_context, 128, 0, 32, 0);
+            pbf_move_left_joystick(m_context, 0, 0, 32, 0);
+            pbf_move_left_joystick(m_context, 0, 128, 32, 0);
+            pbf_move_left_joystick(m_context, 0, 255, 32, 0);
+        }
+    }
+};
+
 
 
 void TestProgram::program(SingleSwitchProgramEnvironment& env) const{
 //    BotBase& botbase = env.console;
     VideoFeed& feed = env.console;
+
+    AsyncDispatcher dispatcher;
+
+    AsyncCircle circle(env.console.botbase(), dispatcher);
+
+    env.wait(std::chrono::seconds(5));
+//    Sleep(10000);
+    circle.cancel();
+
+
 
 #if 0
     StatSet set;
@@ -156,7 +185,7 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env) const{
 
 
 
-#if 1
+#if 0
     QImage screen("mark-test0.png");
 
     std::vector<PixelBox> marks;
@@ -177,15 +206,15 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env) const{
 
 
 
-#if 0
-    SummaryShinySymbolDetector detector(feed, env.logger);
+#if 1
+    SummaryShinySymbolDetector detector(feed, env.logger());
 
     detector.wait_for_detection(env);
 
     env.wait(std::chrono::seconds(600));
 #endif
 
-#if 1
+#if 0
     detect_shiny_battle(
         env, env.console,
         SHINY_BATTLE_REGULAR,

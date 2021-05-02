@@ -21,7 +21,7 @@ void program_TurboA(const std::string& device_name){
     std::cout << "Starting PABotBase - TurboA..." << std::endl;
     std::cout << std::endl;
     std::unique_ptr<PABotBase> pabotbase = start_connection(true, device_name);
-    global_connection = pabotbase.get();
+//    global_connection = pabotbase.get();
 
     std::cout << "Begin Message Logging..." << std::endl;
     MessageLogger logger;
@@ -29,12 +29,12 @@ void program_TurboA(const std::string& device_name){
 
 
     //  Start Program
-    start_program_flash(CONNECT_CONTROLLER_DELAY);
-    grip_menu_connect_go_home();
-    resume_game_no_interact(TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+    start_program_flash(*pabotbase, CONNECT_CONTROLLER_DELAY);
+    grip_menu_connect_go_home(*pabotbase);
+    resume_game_no_interact(*pabotbase, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 
     while (true){
-        pbf_press_button(BUTTON_A, 5, 5);
+        pbf_press_button(*pabotbase, BUTTON_A, 5, 5);
     }
 }
 

@@ -90,9 +90,17 @@ MainWindow::MainWindow(QWidget* parent)
     support->addLayout(links);
 
     {
+        QLabel* github = new QLabel(support_box);
+        links->addWidget(github);
+        github->setText("<a href=\"" + ONLINE_DOC_URL + "/blob/master/README.md\">Online Documentation</a>");
+        github->setTextFormat(Qt::RichText);
+        github->setTextInteractionFlags(Qt::TextBrowserInteraction);
+        github->setOpenExternalLinks(true);
+    }
+    {
         QLabel* discord = new QLabel(support_box);
         links->addWidget(discord);
-        discord->setText("Discord: <a href=\"" + DISCORD_LINK_FULL + "\">" + DISCORD_LINK + "</a>");
+        discord->setText("<a href=\"" + DISCORD_LINK_URL + "\">" + DISCORD_LINK + "</a>");
         discord->setTextFormat(Qt::RichText);
         discord->setTextInteractionFlags(Qt::TextBrowserInteraction);
         discord->setOpenExternalLinks(true);
@@ -100,15 +108,8 @@ MainWindow::MainWindow(QWidget* parent)
     {
         QLabel* github = new QLabel(support_box);
         links->addWidget(github);
-        github->setText("<a href=\"" + GITHUB_REPO + "/blob/master/Documentation/README.md\">Online Documentation</a>");
-        github->setTextFormat(Qt::RichText);
-        github->setTextInteractionFlags(Qt::TextBrowserInteraction);
-        github->setOpenExternalLinks(true);
-    }
-    {
-        QLabel* github = new QLabel(support_box);
-        links->addWidget(github);
-        github->setText("<a href=\"" + GITHUB_REPO + "\">GitHub Repository</a>");
+        github->setText("<a href=\"" + PROJECT_GITHUB_URL + "\">" + PROJECT_GITHUB + "</a>");
+//        github->setText("<a href=\"" + GITHUB_REPO + "\">GitHub Repository</a>");
         github->setTextFormat(Qt::RichText);
         github->setTextInteractionFlags(Qt::TextBrowserInteraction);
         github->setOpenExternalLinks(true);

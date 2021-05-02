@@ -89,11 +89,11 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousFishing::make_stats() const{
 
 
 void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env) const{
-    grip_menu_connect_go_home();
-    resume_game_no_interact(TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+    grip_menu_connect_go_home(env.console);
+    resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 
     const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
-    uint32_t last_touch = system_clock();
+    uint32_t last_touch = system_clock(env.console);
 
     Stats& stats = env.stats<Stats>();
     StandardEncounterTracker tracker(
@@ -108,34 +108,34 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env) co
         env.update_stats();
 
         //  Touch the date.
-        if (TIME_ROLLBACK_HOURS > 0 && system_clock() - last_touch >= PERIOD){
-            pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
-            rollback_hours_from_home(TIME_ROLLBACK_HOURS, SETTINGS_TO_HOME_DELAY);
-            resume_game_no_interact(TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        if (TIME_ROLLBACK_HOURS > 0 && system_clock(env.console) - last_touch >= PERIOD){
+            pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+            rollback_hours_from_home(env.console, TIME_ROLLBACK_HOURS, SETTINGS_TO_HOME_DELAY);
+            resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             last_touch += PERIOD;
         }
 
-        pbf_wait(FISH_RESPAWN_TIME);
+        pbf_wait(env.console, FISH_RESPAWN_TIME);
         env.console.botbase().wait_for_all_requests();
 
         //  Trigger encounter.
         {
             FishingDetector detector(env.console);
-            pbf_press_button(BUTTON_A, 10, 10);
-            pbf_mash_button(BUTTON_B, TICKS_PER_SECOND);
+            pbf_press_button(env.console, BUTTON_A, 10, 10);
+            pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
             env.console.botbase().wait_for_all_requests();
             FishingDetector::Detection detection = detector.wait_for_detection(env);
             switch (detection){
             case FishingDetector::NO_DETECTION:
                 stats.m_errors++;
-                pbf_mash_button(BUTTON_B, 2 * TICKS_PER_SECOND);
+                pbf_mash_button(env.console, BUTTON_B, 2 * TICKS_PER_SECOND);
                 continue;
             case FishingDetector::HOOKED:
-                pbf_press_button(BUTTON_A, 10, 0);
+                pbf_press_button(env.console, BUTTON_A, 10, 0);
                 break;
             case FishingDetector::MISSED:
                 stats.m_misses++;
-                pbf_mash_button(BUTTON_B, 2 * TICKS_PER_SECOND);
+                pbf_mash_button(env.console, BUTTON_B, 2 * TICKS_PER_SECOND);
                 continue;
             case FishingDetector::BATTLE_MENU:
                 stats.m_errors++;
@@ -146,7 +146,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env) co
             detection = detector.detect_now();
             if (detection == FishingDetector::MISSED){
                 stats.m_misses++;
-                pbf_mash_button(BUTTON_B, 2 * TICKS_PER_SECOND);
+                pbf_mash_button(env.console, BUTTON_B, 2 * TICKS_PER_SECOND);
                 continue;
             }
         }
@@ -163,7 +163,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env) co
         }
         if (detection == ShinyDetection::NO_BATTLE_MENU){
             stats.m_errors++;
-            pbf_mash_button(BUTTON_B, TICKS_PER_SECOND);
+            pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
             tracker.run_away();
         }
     }
@@ -171,11 +171,11 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env) co
     env.update_stats();
 
     if (GO_HOME_WHEN_DONE){
-        pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
     }
 
-    end_program_callback();
-    end_program_loop();
+    end_program_callback(env.console);
+    end_program_loop(env.console);
 }
 
 

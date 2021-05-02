@@ -90,11 +90,11 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousSwordsOfJustice::make_stats() c
 
 
 void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment& env) const{
-    grip_menu_connect_go_home();
-    resume_game_no_interact(TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+    grip_menu_connect_go_home(env.console);
+    resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 
     const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
-    uint32_t last_touch = system_clock();
+    uint32_t last_touch = system_clock(env.console);
 
     Stats& stats = env.stats<Stats>();
     StandardEncounterTracker tracker(
@@ -109,24 +109,24 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
         env.update_stats();
 
         //  Touch the date.
-        if (TIME_ROLLBACK_HOURS > 0 && system_clock() - last_touch >= PERIOD){
-            pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
-            rollback_hours_from_home(TIME_ROLLBACK_HOURS, SETTINGS_TO_HOME_DELAY);
-            resume_game_no_interact(TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        if (TIME_ROLLBACK_HOURS > 0 && system_clock(env.console) - last_touch >= PERIOD){
+            pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+            rollback_hours_from_home(env.console, TIME_ROLLBACK_HOURS, SETTINGS_TO_HOME_DELAY);
+            resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             last_touch += PERIOD;
         }
 
         //  Trigger encounter.
-        pbf_press_button(BUTTON_X, 10, OVERWORLD_TO_MENU_DELAY);
-        pbf_press_button(BUTTON_A, 10, ENTER_CAMP_DELAY);
+        pbf_press_button(env.console, BUTTON_X, 10, OVERWORLD_TO_MENU_DELAY);
+        pbf_press_button(env.console, BUTTON_A, 10, ENTER_CAMP_DELAY);
         if (AIRPLANE_MODE){
-            pbf_press_button(BUTTON_A, 10, 100);
-            pbf_press_button(BUTTON_A, 10, 100);
+            pbf_press_button(env.console, BUTTON_A, 10, 100);
+            pbf_press_button(env.console, BUTTON_A, 10, 100);
         }
-        pbf_press_button(BUTTON_X, 10, 50);
-        pbf_press_dpad(DPAD_LEFT, 10, 10);
+        pbf_press_button(env.console, BUTTON_X, 10, 50);
+        pbf_press_dpad(env.console, DPAD_LEFT, 10, 10);
         env.log("Starting Encounter: " + tostr_u_commas(stats.encounters() + 1));
-        pbf_press_button(BUTTON_A, 10, 0);
+        pbf_press_button(env.console, BUTTON_A, 10, 0);
         env.console.botbase().wait_for_all_requests();
 
         //  Detect shiny.
@@ -141,7 +141,7 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
         }
         if (detection == ShinyDetection::NO_BATTLE_MENU){
             stats.m_timeouts++;
-            pbf_mash_button(BUTTON_B, TICKS_PER_SECOND);
+            pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
             tracker.run_away();
         }
     }
@@ -149,11 +149,11 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
     env.update_stats();
 
     if (GO_HOME_WHEN_DONE){
-        pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
     }
 
-    end_program_callback();
-    end_program_loop();
+    end_program_callback(env.console);
+    end_program_loop(env.console);
 }
 
 

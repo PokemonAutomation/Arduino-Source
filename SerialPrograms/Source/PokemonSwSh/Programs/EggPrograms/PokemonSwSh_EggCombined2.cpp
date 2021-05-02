@@ -69,13 +69,13 @@ void EggCombined2::program(SingleSwitchProgramEnvironment& env) const{
         .TOUCH_DATE_INTERVAL = TOUCH_DATE_INTERVAL,
     };
 
-    grip_menu_connect_go_home();
-    resume_game_back_out(TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+    grip_menu_connect_go_home(env.console);
+    resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
 
     session.eggcombined2_body(env);
 
-    end_program_callback();
-    end_program_loop();
+    end_program_callback(env.console);
+    end_program_loop(env.console);
 }
 
 

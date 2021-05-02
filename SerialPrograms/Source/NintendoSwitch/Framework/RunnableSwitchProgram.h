@@ -20,8 +20,8 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-using PABotBase = PokemonAutomation::PABotBase;
-using BotBase = BotBase;
+//using PABotBase = PokemonAutomation::PABotBase;
+//using BotBase = BotBase;
 
 
 

@@ -65,52 +65,52 @@ struct EggCombinedSession{
 
         return block;
     }
-    void withdraw_column_shiftR(uint8_t column){
-        menu_to_box(false);
-        party_to_column(column);
-        pickup_column(false);
-        ssf_press_button2(BUTTON_R, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
-        column_to_party(column);
-        ssf_press_button2(BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
-        box_to_menu();
+    void withdraw_column_shiftR(const BotBaseContext& context, uint8_t column){
+        menu_to_box(context, false);
+        party_to_column(context, column);
+        pickup_column(context, false);
+        ssf_press_button2(context, BUTTON_R, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
+        column_to_party(context, column);
+        ssf_press_button2(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
+        box_to_menu(context);
     }
-    void deposit_column_shiftL(uint8_t column){
-        menu_to_box(true);
-        pickup_column(true);
-        party_to_column(column);
-        ssf_press_button2(BUTTON_L, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
-        ssf_press_button2(BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
-        box_to_menu();
+    void deposit_column_shiftL(const BotBaseContext& context, uint8_t column){
+        menu_to_box(context, true);
+        pickup_column(context, true);
+        party_to_column(context, column);
+        ssf_press_button2(context, BUTTON_L, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
+        ssf_press_button2(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
+        box_to_menu(context);
     }
-    uint8_t swap_party_shift(uint8_t column){
-        menu_to_box(true);
-        pickup_column(true);
+    uint8_t swap_party_shift(const BotBaseContext& context, uint8_t column){
+        menu_to_box(context, true);
+        pickup_column(context, true);
 
         //  Move to column.
-        party_to_column(column);
-        ssf_press_button2(BUTTON_L, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
-        ssf_press_button2(BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
+        party_to_column(context, column);
+        ssf_press_button2(context, BUTTON_L, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
+        ssf_press_button2(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
 
         //  Move to next column.
         column++;
         if (column < 6){
-            ssf_press_dpad2(DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+            ssf_press_dpad2(context, DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
         }else{
             column = 0;
-            ssf_press_button2(BUTTON_R, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
-            ssf_press_dpad2(DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
-            ssf_press_dpad2(DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+            ssf_press_button2(context, BUTTON_R, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
+            ssf_press_dpad2(context, DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
+            ssf_press_dpad2(context, DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
         }
 
-        pickup_column(false);
+        pickup_column(context, false);
 
         //  Move to party.
-        ssf_press_button2(BUTTON_R, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
-        column_to_party(column);
-        ssf_press_button2(BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
+        ssf_press_button2(context, BUTTON_R, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
+        column_to_party(context, column);
+        ssf_press_button2(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
 
         //  Return to menu.
-        box_to_menu();
+        box_to_menu(context);
 
         return column;
     }
@@ -120,6 +120,7 @@ struct EggCombinedSession{
 #define TRAVEL_BACK_TO_LADY_DURATION    (30 + 260 + (620) + 120 + 120 * 0)
 
     void eggcombined2_run_batch(
+        const BotBaseContext& context,
         uint16_t INCUBATION_DELAY_LOWER,
         uint16_t remaining_travel_duration,
         uint8_t column,
@@ -142,12 +143,12 @@ struct EggCombinedSession{
                 spin *= 128;
             }
 
-            collect_egg();
-            collect_egg_mash_out(AUTO_DEPOSIT);
+            collect_egg(context);
+            collect_egg_mash_out(context, AUTO_DEPOSIT);
 
-            travel_to_spin_location();
-            spin_and_mash_A(spin);
-            travel_back_to_lady();
+            travel_to_spin_location(context);
+            spin_and_mash_A(context, spin);
+            travel_back_to_lady(context);
 
             fetches--;
             loop_incubation -= MIN_TRAVEL_TIME + spin;
@@ -156,54 +157,54 @@ struct EggCombinedSession{
 
         //  Last fetch.
         if (fetches > 0){
-            collect_egg();
-            collect_egg_mash_out(AUTO_DEPOSIT);
+            collect_egg(context);
+            collect_egg_mash_out(context, AUTO_DEPOSIT);
             fetches--;
         }
-        travel_to_spin_location();
+        travel_to_spin_location(context);
 
         //  Hatch eggs.
         if (remaining_travel_duration >= END_BATCH_MASH_B_DURATION){
-            spin_and_mash_A(remaining_travel_duration - END_BATCH_MASH_B_DURATION);
-            pbf_mash_button(BUTTON_B, END_BATCH_MASH_B_DURATION);
+            spin_and_mash_A(context, remaining_travel_duration - END_BATCH_MASH_B_DURATION);
+            pbf_mash_button(context, BUTTON_B, END_BATCH_MASH_B_DURATION);
         }else{
-            spin_and_mash_A(remaining_travel_duration);
+            spin_and_mash_A(context, remaining_travel_duration);
         }
 
         if (fetches == 0){
             //  Swap party.
-            ssf_press_button2(BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
+            ssf_press_button2(context, BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
             if (last_batch){
-                deposit_column_shiftL(column);
-                ssf_press_button2(BUTTON_B, MENU_TO_OVERWORLD_DELAY, 20);
+                deposit_column_shiftL(context, column);
+                ssf_press_button2(context, BUTTON_B, MENU_TO_OVERWORLD_DELAY, 20);
             }else{
-                swap_party_shift(column);
-                fly_home_goto_lady(false);
+                swap_party_shift(context, column);
+                fly_home_goto_lady(context, false);
             }
             return;
         }
 
         //  Additional fetches.
-        fly_home_goto_lady(true);
+        fly_home_goto_lady(context, true);
         while (fetches-- > 0){
-            collect_egg();
-            collect_egg_mash_out(AUTO_DEPOSIT);
-            eggfetcher_loop();
+            collect_egg(context);
+            collect_egg_mash_out(context, AUTO_DEPOSIT);
+            eggfetcher_loop(context);
         }
 
         //  Swap party.
-        ssf_press_button2(BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
+        ssf_press_button2(context, BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
         if (last_batch){
-            deposit_column_shiftL(column);
+            deposit_column_shiftL(context, column);
         }else{
-            swap_party_shift(column);
+            swap_party_shift(context, column);
         }
-        ssf_press_button2(BUTTON_B, MENU_TO_OVERWORLD_DELAY, 20);
+        ssf_press_button2(context, BUTTON_B, MENU_TO_OVERWORLD_DELAY, 20);
     }
 
     void eggcombined2_body(SingleSwitchProgramEnvironment& env){
         if (BOXES_TO_HATCH == 0){
-            ssf_press_button2(BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
+            ssf_press_button2(env.console, BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
             return;
         }
 
@@ -223,25 +224,26 @@ struct EggCombinedSession{
         float fetch_residual = 0;
 
         //  Withdraw party.
-        ssf_press_button2(BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
-        withdraw_column_shiftR(0);
-        fly_home_goto_lady(false);
+        ssf_press_button2(env.console, BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
+        withdraw_column_shiftR(env.console, 0);
+        fly_home_goto_lady(env.console, false);
 
-        uint32_t last_touch = system_clock() - TOUCH_DATE_INTERVAL;
+        uint32_t last_touch = system_clock(env.console) - TOUCH_DATE_INTERVAL;
         for (uint8_t box = 0; box < BOXES_TO_HATCH; box++){
             for (uint8_t column = 0; column < 6; column++){
                 //  Touch the date.
-                if (TOUCH_DATE_INTERVAL > 0 && system_clock() - last_touch >= TOUCH_DATE_INTERVAL){
+                if (TOUCH_DATE_INTERVAL > 0 && system_clock(env.console) - last_touch >= TOUCH_DATE_INTERVAL){
                     env.log("Touching date to prevent rollover.");
-                    pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
-                    touch_date_from_home(SETTINGS_TO_HOME_DELAY);
-                    resume_game_no_interact(TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+                    pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+                    touch_date_from_home(env.console, SETTINGS_TO_HOME_DELAY);
+                    resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
                     last_touch += TOUCH_DATE_INTERVAL;
                 }
 
                 fetch_residual += fetches_per_batch;
                 uint8_t fetches = (uint8_t)fetch_residual;
                 eggcombined2_run_batch(
+                    env.console,
                     INCUBATION_DELAY_LOWER,
                     INCUBATION_DELAY_UPPER + FINISH_DELAY,
                     column,
@@ -253,7 +255,7 @@ struct EggCombinedSession{
         }
 
         //  Finish
-        ssf_press_button2(BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
+        ssf_press_button2(env.console, BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
     }
 
 };

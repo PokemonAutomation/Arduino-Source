@@ -114,19 +114,18 @@ bool AsyncStartBattleDetector::detected() const{
 
 void AsyncStartBattleDetector::thread_loop(ProgramEnvironment& env){
     InferenceThrottler throttler(m_timeout, std::chrono::milliseconds(50));
-    while (!m_stopping.load(std::memory_order_acquire) && !detected()){
-        env.check_stopping();
+    try{
+        while (!m_stopping.load(std::memory_order_acquire) && !detected()){
+            env.check_stopping();
 
-        QImage screen = m_feed.snapshot();
-        if (detect(screen)){
-            m_detected.store(true, std::memory_order_release);
-        }
+            QImage screen = m_feed.snapshot();
+            if (detect(screen)){
+                m_detected.store(true, std::memory_order_release);
+            }
 
-        if (throttler.end_iteration(env)){
-            env.log("StartBattleDetector: Timed out.", "red");
-            return;
+            throttler.end_iteration(env);
         }
-    }
+    }catch (CancelledException&){}
 }
 
 

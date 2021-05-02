@@ -51,7 +51,7 @@ FriendCodeAdder::FriendCodeAdder()
 }
 
 void FriendCodeAdder::program(SingleSwitchProgramEnvironment& env) const{
-    grip_menu_connect_go_home();
+    grip_menu_connect_go_home(env.console);
 
     bool first = true;
     for (const QString& line : FRIEND_CODES.lines()){
@@ -60,20 +60,20 @@ void FriendCodeAdder::program(SingleSwitchProgramEnvironment& env) const{
             continue;
         }
 
-        home_to_add_friends(USER_SLOT - 1, 3, first);
+        home_to_add_friends(env.console, USER_SLOT - 1, 3, first);
         first = false;
 
-        ssf_press_button1(BUTTON_A, OPEN_CODE_PAD_DELAY);
-        enter_digits(12, &code[0]);
+        ssf_press_button1(env.console, BUTTON_A, OPEN_CODE_PAD_DELAY);
+        enter_digits(env.console, 12, &code[0]);
 
-        pbf_wait(SEARCH_TIME);
-        ssf_press_button1(BUTTON_A, TOGGLE_BEST_STATUS_DELAY);
-        ssf_press_button1(BUTTON_A, TOGGLE_BEST_STATUS_DELAY);
-        pbf_press_button(BUTTON_HOME, 10, SETTINGS_TO_HOME_DELAY);
+        pbf_wait(env.console, SEARCH_TIME);
+        ssf_press_button1(env.console, BUTTON_A, TOGGLE_BEST_STATUS_DELAY);
+        ssf_press_button1(env.console, BUTTON_A, TOGGLE_BEST_STATUS_DELAY);
+        pbf_press_button(env.console, BUTTON_HOME, 10, SETTINGS_TO_HOME_DELAY);
     }
 
-    end_program_callback();
-    end_program_loop();
+    end_program_callback(env.console);
+    end_program_loop(env.console);
 }
 
 

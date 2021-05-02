@@ -13,10 +13,10 @@
 
 //  The initial wait period before the program does anything. This gives you
 //  time to switch the Arduino from computer to Switch if connected over a KVM.
-uint16_t CONNECT_CONTROLLER_DELAY         =   5 * TICKS_PER_SECOND;
+uint16_t CONNECT_CONTROLLER_DELAY       =   5 * TICKS_PER_SECOND;
 
 //  Delay from pressing home anywhere in the settings to return to the home menu.
-uint16_t SETTINGS_TO_HOME_DELAY           =   120;
+uint16_t SETTINGS_TO_HOME_DELAY         =   120;
 
 //  Set this to true if starting the game requires checking the internet.
 //  Otherwise, programs that require soft-resetting may not work properly.
@@ -36,3 +36,23 @@ bool TOLERATE_SYSTEM_UPDATE_MENU_FAST   =   true;
 //  performance hit. Setting this to true enables this.
 bool TOLERATE_SYSTEM_UPDATE_MENU_SLOW   =   false;
 
+
+#ifdef __cplusplus
+
+//  Some programs can send discord messages in your own private server. Set this
+//  to your discord webhook ID.
+std::string DISCORD_WEBHOOK_ID          =   "";
+
+//  Some programs can send discord messages in your own private server. Set this
+//  to your discord webhook token.
+std::string DISCORD_WEBHOOK_TOKEN       =   "";
+
+//  Some programs can send discord messages in your own private server. Set this
+//  to your discord user ID.
+std::string DISCORD_USER_ID             =   "";
+
+//  Some programs can send discord messages in your own private server. Set this
+//  to your discord user short name.
+std::string DISCORD_USER_SHORT_NAME     =   "";
+
+#endif

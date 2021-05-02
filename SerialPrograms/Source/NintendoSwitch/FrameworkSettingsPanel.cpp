@@ -5,7 +5,9 @@
  */
 
 #include "Common/SwitchFramework/FrameworkSettings.h"
+#include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Options/BooleanCheckBox.h"
+#include "CommonFramework/Options/String.h"
 #include "NintendoSwitch/Options/TimeExpression.h"
 #include "FrameworkSettingsPanel.h"
 
@@ -65,6 +67,36 @@ FrameworkSettings::FrameworkSettings()
             false
         )
     );
+    if (settings.developer_mode){
+        m_options.emplace_back(
+            "DISCORD_WEBHOOK_ID",
+            new String(
+                "<b>Discord webhook ID:</b><br>Some programs can send discord messages in your own private server. Set this to your discord webhook ID.",
+                ""
+            )
+        );
+        m_options.emplace_back(
+            "DISCORD_WEBHOOK_TOKEN",
+            new String(
+                "<b>Discord webhook token:</b><br>Some programs can send discord messages in your own private server. Set this to your discord webhook token.",
+                ""
+            )
+        );
+        m_options.emplace_back(
+            "DISCORD_USER_ID",
+            new String(
+                "<b>Discord user ID:</b><br>Some programs can send discord messages in your own private server. Set this to your discord user ID.",
+                ""
+            )
+        );
+        m_options.emplace_back(
+            "DISCORD_USER_SHORT_NAME",
+            new String(
+                "<b>Discord user short name:</b><br>Some programs can send discord messages in your own private server. Set this to your discord user short name.",
+                ""
+            )
+        );
+    }
 }
 FrameworkSettings::FrameworkSettings(const QJsonValue& json)
     : FrameworkSettings()

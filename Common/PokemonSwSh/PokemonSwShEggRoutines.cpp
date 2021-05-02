@@ -10,44 +10,52 @@
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "PokemonSwShEggRoutines.h"
 
-using namespace PokemonAutomation;
 
+#if 0
 void eggfetcher_loop(void){
-    eggfetcher_loop(*global_connection);
-}
-void eggfetcher_loop(BotBase& device){
-    pabb_eggfetcher_loop params;
-    device.issue_request<PABB_MSG_COMMAND_EGG_FETCHER_LOOP>(params);
+    eggfetcher_loop(*PokemonAutomation::global_connection);
 }
 void move_while_mashing_B(uint16_t duration){
-    move_while_mashing_B(*global_connection, duration);
-}
-void move_while_mashing_B(BotBase& device, uint16_t duration){
-    pabb_move_while_mashing_B params;
-    params.duration = duration;
-    device.issue_request<PABB_MSG_COMMAND_MOVE_WHILE_MASHING_B>(params);
+    move_while_mashing_B(*PokemonAutomation::global_connection, duration);
 }
 void spin_and_mash_A(uint16_t duration){
-    spin_and_mash_A(*global_connection, duration);
-}
-void spin_and_mash_A(BotBase& device, uint16_t duration){
-    pabb_spin_and_mash_A params;
-    params.duration = duration;
-    device.issue_request<PABB_MSG_COMMAND_SPIN_AND_MASH_A>(params);
+    spin_and_mash_A(*PokemonAutomation::global_connection, duration);
 }
 void travel_to_spin_location(void){
-    travel_to_spin_location(*global_connection);
-}
-void travel_to_spin_location(BotBase& device){
-    pabb_travel_to_spin_location params;
-    device.issue_request<PABB_MSG_COMMAND_TRAVEL_TO_SPIN_LOCATION>(params);
+    travel_to_spin_location(*PokemonAutomation::global_connection);
 }
 void travel_back_to_lady(void){
-    travel_back_to_lady(*global_connection);
+    travel_back_to_lady(*PokemonAutomation::global_connection);
 }
-void travel_back_to_lady(BotBase& device){
+#endif
+
+
+
+namespace PokemonAutomation{
+
+
+
+void eggfetcher_loop(const BotBaseContext& context){
+    pabb_eggfetcher_loop params;
+    context->issue_request<PABB_MSG_COMMAND_EGG_FETCHER_LOOP>(&context.cancelled_bool(), params);
+}
+void move_while_mashing_B(const BotBaseContext& context, uint16_t duration){
+    pabb_move_while_mashing_B params;
+    params.duration = duration;
+    context->issue_request<PABB_MSG_COMMAND_MOVE_WHILE_MASHING_B>(&context.cancelled_bool(), params);
+}
+void spin_and_mash_A(const BotBaseContext& context, uint16_t duration){
+    pabb_spin_and_mash_A params;
+    params.duration = duration;
+    context->issue_request<PABB_MSG_COMMAND_SPIN_AND_MASH_A>(&context.cancelled_bool(), params);
+}
+void travel_to_spin_location(const BotBaseContext& context){
+    pabb_travel_to_spin_location params;
+    context->issue_request<PABB_MSG_COMMAND_TRAVEL_TO_SPIN_LOCATION>(&context.cancelled_bool(), params);
+}
+void travel_back_to_lady(const BotBaseContext& context){
     pabb_travel_back_to_lady params;
-    device.issue_request<PABB_MSG_COMMAND_TRAVEL_BACK_TO_LADY>(params);
+    context->issue_request<PABB_MSG_COMMAND_TRAVEL_BACK_TO_LADY>(&context.cancelled_bool(), params);
 }
 
 
@@ -113,3 +121,7 @@ int register_message_converters_eggs(){
     return 0;
 }
 int init_PokemonSwShEggRoutines = register_message_converters_eggs();
+
+
+}
+

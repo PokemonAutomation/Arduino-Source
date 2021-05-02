@@ -20,7 +20,7 @@
 //  Universal
 #define MAX_YEAR    60
 
-#ifdef __cplusplus
+#if 0
 
 //  From the Switch Home (cursor over 1st game), navigate all the way to the
 //  date change button.
@@ -77,15 +77,16 @@ void rollback_hours_from_home(uint8_t hours, uint16_t settings_to_home_delay);
 //  Client Side
 #ifdef __cplusplus
 namespace PokemonAutomation{
-    class BotBase;
+    class BotBaseContext;
+
+    void home_to_date_time                      (const BotBaseContext& context, bool to_date_change, bool fast);
+    void roll_date_forward_1                    (const BotBaseContext& context, bool fast);
+    void roll_date_backward_N                   (const BotBaseContext& context, uint8_t skips, bool fast);
+    void home_roll_date_enter_game              (const BotBaseContext& context, bool rollback_year);
+    void home_roll_date_enter_game_autorollback (const BotBaseContext& context, uint8_t* year);
+    void touch_date_from_home                   (const BotBaseContext& context, uint16_t settings_to_home_delay);
+    void rollback_hours_from_home               (const BotBaseContext& context, uint8_t hours, uint16_t settings_to_home_delay);
 }
-void home_to_date_time                      (PokemonAutomation::BotBase& device, bool to_date_change, bool fast);
-void roll_date_forward_1                    (PokemonAutomation::BotBase& device, bool fast);
-void roll_date_backward_N                   (PokemonAutomation::BotBase& device, uint8_t skips, bool fast);
-void home_roll_date_enter_game              (PokemonAutomation::BotBase& device, bool rollback_year);
-void home_roll_date_enter_game_autorollback (PokemonAutomation::BotBase& device, uint8_t* year);
-void touch_date_from_home                   (PokemonAutomation::BotBase& device, uint16_t settings_to_home_delay);
-void rollback_hours_from_home               (PokemonAutomation::BotBase& device, uint8_t hours, uint16_t settings_to_home_delay);
 #endif
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

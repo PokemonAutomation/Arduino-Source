@@ -10,66 +10,74 @@
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "PokemonSwShDaySkippers.h"
 
-using namespace PokemonAutomation;
 
+#if 0
 void skipper_init_view(void){
-    skipper_init_view(*global_connection);
-}
-void skipper_init_view(BotBase& device){
-    pabb_skipper_init_view params;
-    device.issue_request<PABB_MSG_COMMAND_SKIPPER_INIT_VIEW>(params);
+    skipper_init_view(*PokemonAutomation::global_connection);
 }
 void skipper_auto_recovery(void){
-    skipper_auto_recovery(*global_connection);
-}
-void skipper_auto_recovery(BotBase& device){
-    pabb_skipper_auto_recovery params;
-    device.issue_request<PABB_MSG_COMMAND_SKIPPER_AUTO_RECOVERY>(params);
+    skipper_auto_recovery(*PokemonAutomation::global_connection);
 }
 void skipper_rollback_year_full(bool date_us){
-    skipper_rollback_year_full(*global_connection, date_us);
-}
-void skipper_rollback_year_full(BotBase& device, bool date_us){
-    pabb_skipper_rollback_year_full params;
-    params.date_us = date_us;
-    device.issue_request<PABB_MSG_COMMAND_SKIPPER_ROLLBACK_YEAR_FULL>(params);
+    skipper_rollback_year_full(*PokemonAutomation::global_connection, date_us);
 }
 void skipper_rollback_year_sync(void){
-    skipper_rollback_year_sync(*global_connection);
-}
-void skipper_rollback_year_sync(BotBase& device){
-    pabb_skipper_rollback_year_sync params;
-    device.issue_request<PABB_MSG_COMMAND_SKIPPER_ROLLBACK_YEAR_SYNC>(params);
+    skipper_rollback_year_sync(*PokemonAutomation::global_connection);
 }
 void skipper_increment_day(bool date_us){
-    skipper_increment_day(*global_connection, date_us);
-}
-void skipper_increment_day(BotBase& device, bool date_us){
-    pabb_skipper_increment_day params;
-    params.date_us = date_us;
-    device.issue_request<PABB_MSG_COMMAND_SKIPPER_INCREMENT_DAY>(params);
+    skipper_increment_day(*PokemonAutomation::global_connection, date_us);
 }
 void skipper_increment_month(uint8_t days){
-    skipper_increment_month(*global_connection, days);
-}
-void skipper_increment_month(BotBase& device, uint8_t days){
-    pabb_skipper_increment_month params;
-    params.days = days;
-    device.issue_request<PABB_MSG_COMMAND_SKIPPER_INCREMENT_MONTH>(params);
+    skipper_increment_month(*PokemonAutomation::global_connection, days);
 }
 void skipper_increment_all(void){
-    skipper_increment_all(*global_connection);
-}
-void skipper_increment_all(BotBase& device){
-    pabb_skipper_increment_all params;
-    device.issue_request<PABB_MSG_COMMAND_SKIPPER_INCREMENT_ALL>(params);
+    skipper_increment_all(*PokemonAutomation::global_connection);
 }
 void skipper_increment_all_rollback(void){
-    skipper_increment_all_rollback(*global_connection);
+    skipper_increment_all_rollback(*PokemonAutomation::global_connection);
 }
-void skipper_increment_all_rollback(BotBase& device){
+#endif
+
+
+
+namespace PokemonAutomation{
+
+
+
+void skipper_init_view(const BotBaseContext& context){
+    pabb_skipper_init_view params;
+    context->issue_request<PABB_MSG_COMMAND_SKIPPER_INIT_VIEW>(&context.cancelled_bool(), params);
+}
+void skipper_auto_recovery(const BotBaseContext& context){
+    pabb_skipper_auto_recovery params;
+    context->issue_request<PABB_MSG_COMMAND_SKIPPER_AUTO_RECOVERY>(&context.cancelled_bool(), params);
+}
+void skipper_rollback_year_full(const BotBaseContext& context, bool date_us){
+    pabb_skipper_rollback_year_full params;
+    params.date_us = date_us;
+    context->issue_request<PABB_MSG_COMMAND_SKIPPER_ROLLBACK_YEAR_FULL>(&context.cancelled_bool(), params);
+}
+void skipper_rollback_year_sync(const BotBaseContext& context){
+    pabb_skipper_rollback_year_sync params;
+    context->issue_request<PABB_MSG_COMMAND_SKIPPER_ROLLBACK_YEAR_SYNC>(&context.cancelled_bool(), params);
+}
+void skipper_increment_day(const BotBaseContext& context, bool date_us){
+    pabb_skipper_increment_day params;
+    params.date_us = date_us;
+    context->issue_request<PABB_MSG_COMMAND_SKIPPER_INCREMENT_DAY>(&context.cancelled_bool(), params);
+}
+void skipper_increment_month(const BotBaseContext& context, uint8_t days){
+    pabb_skipper_increment_month params;
+    params.days = days;
+    context->issue_request<PABB_MSG_COMMAND_SKIPPER_INCREMENT_MONTH>(&context.cancelled_bool(), params);
+}
+void skipper_increment_all(const BotBaseContext& context){
+    pabb_skipper_increment_all params;
+    context->issue_request<PABB_MSG_COMMAND_SKIPPER_INCREMENT_ALL>(&context.cancelled_bool(), params);
+}
+void skipper_increment_all_rollback(const BotBaseContext& context){
     pabb_skipper_increment_all_rollback params;
-    device.issue_request<PABB_MSG_COMMAND_SKIPPER_INCREMENT_ALL_ROLLBACK>(params);
+    context->issue_request<PABB_MSG_COMMAND_SKIPPER_INCREMENT_ALL_ROLLBACK>(&context.cancelled_bool(), params);
 }
 
 
@@ -169,3 +177,9 @@ int register_message_converters_pokemon_skippers(){
     return 0;
 }
 int init_PokemonSwShDaySkippers = register_message_converters_pokemon_skippers();
+
+
+
+
+}
+

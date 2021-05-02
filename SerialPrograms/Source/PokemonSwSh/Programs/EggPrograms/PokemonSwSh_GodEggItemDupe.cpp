@@ -42,69 +42,74 @@ GodEggItemDupe::GodEggItemDupe()
 }
 
 
-void GodEggItemDupe::collect_godegg(uint8_t party_slot, bool map_to_pokemon, bool pokemon_to_map) const{
-    pbf_wait(50);
-    ssf_press_button1(BUTTON_B, 100);
-    ssf_press_button1(BUTTON_B, 100);
-    pbf_wait(225);
+void GodEggItemDupe::collect_godegg(
+    const BotBaseContext& context,
+    uint8_t party_slot,
+    bool map_to_pokemon,
+    bool pokemon_to_map
+) const{
+    pbf_wait(context, 50);
+    ssf_press_button1(context, BUTTON_B, 100);
+    ssf_press_button1(context, BUTTON_B, 100);
+    pbf_wait(context, 225);
 
     //  "You received an Egg from the Nursery worker!"
-    ssf_press_button1(BUTTON_B, 300);
+    ssf_press_button1(context, BUTTON_B, 300);
 
     //  "Where do you want to send the Egg to?"
-    ssf_press_button1(BUTTON_A, 100);
+    ssf_press_button1(context, BUTTON_A, 100);
 
     //  (extra line of text for French)
-    ssf_press_button1(BUTTON_B, 100);
+    ssf_press_button1(context, BUTTON_B, 100);
 
     //  "Please select a Pokemon to swap from your party."
-    ssf_press_button1(BUTTON_B, MENU_TO_POKEMON_DELAY);
+    ssf_press_button1(context, BUTTON_B, MENU_TO_POKEMON_DELAY);
 
     //  Select the party member.
     for (uint8_t c = 0; c < party_slot; c++){
-        ssf_press_dpad1(DPAD_DOWN, 10);
+        ssf_press_dpad1(context, DPAD_DOWN, 10);
     }
-    ssf_press_button1(BUTTON_A, 300);
-    pbf_mash_button(BUTTON_B, 500);
+    ssf_press_button1(context, BUTTON_A, 300);
+    pbf_mash_button(context, BUTTON_B, 500);
 
     //  Enter box
-    ssf_press_button2(BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
+    ssf_press_button2(context, BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
     if (map_to_pokemon){
-        ssf_press_dpad2(DPAD_UP, 20, 10);
-        ssf_press_dpad2(DPAD_RIGHT, 20, 10);
+        ssf_press_dpad2(context, DPAD_UP, 20, 10);
+        ssf_press_dpad2(context, DPAD_RIGHT, 20, 10);
     }
-    ssf_press_button2(BUTTON_A, MENU_TO_POKEMON_DELAY, 10);
-    ssf_press_button2(BUTTON_R, POKEMON_TO_BOX_DELAY, 10);
+    ssf_press_button2(context, BUTTON_A, MENU_TO_POKEMON_DELAY, 10);
+    ssf_press_button2(context, BUTTON_R, POKEMON_TO_BOX_DELAY, 10);
 
     if (DETACH_BEFORE_RELEASE){
         //  Detach item
-        ssf_press_button2(BUTTON_A, 50, 10);
-        ssf_press_dpad1(DPAD_DOWN, 10);
-        ssf_press_dpad1(DPAD_DOWN, 10);
-        ssf_press_button2(BUTTON_A, 150, 10);
-        ssf_press_button2(BUTTON_A, 150, 10);
-        ssf_press_button2(BUTTON_A, 100, 10);
+        ssf_press_button2(context, BUTTON_A, 50, 10);
+        ssf_press_dpad1(context, DPAD_DOWN, 10);
+        ssf_press_dpad1(context, DPAD_DOWN, 10);
+        ssf_press_button2(context, BUTTON_A, 150, 10);
+        ssf_press_button2(context, BUTTON_A, 150, 10);
+        ssf_press_button2(context, BUTTON_A, 100, 10);
 
         //  Release
-        release();
+        release(context);
     }else{
         //  Release (item detaches automatically)
-        ssf_press_button2(BUTTON_A, 60, 10);
-        ssf_press_dpad1(DPAD_DOWN, 15);
-        ssf_press_dpad1(DPAD_DOWN, 15);
-        ssf_press_dpad1(DPAD_DOWN, 15);
-        ssf_press_dpad1(DPAD_DOWN, 15);
-        ssf_press_button2(BUTTON_A, 125, 10);
-        ssf_press_dpad1(DPAD_UP, 10);
-        mash_A(180);
+        ssf_press_button2(context, BUTTON_A, 60, 10);
+        ssf_press_dpad1(context, DPAD_DOWN, 15);
+        ssf_press_dpad1(context, DPAD_DOWN, 15);
+        ssf_press_dpad1(context, DPAD_DOWN, 15);
+        ssf_press_dpad1(context, DPAD_DOWN, 15);
+        ssf_press_button2(context, BUTTON_A, 125, 10);
+        ssf_press_dpad1(context, DPAD_UP, 10);
+        mash_A(context, 180);
     }
 
     //  Back out to menu.
     if (pokemon_to_map){
-        box_to_menu();
-        ssf_press_button1(BUTTON_B, 250);
+        box_to_menu(context);
+        ssf_press_button1(context, BUTTON_B, 250);
     }else{
-        pbf_mash_button(BUTTON_B, 700);
+        pbf_mash_button(context, BUTTON_B, 700);
     }
 }
 void GodEggItemDupe::run_program(SingleSwitchProgramEnvironment& env, uint16_t attempts) const{
@@ -120,8 +125,8 @@ void GodEggItemDupe::run_program(SingleSwitchProgramEnvironment& env, uint16_t a
     //  1st Fetch: Get into position.
     {
         env.log("Fetch Attempts: " + tostr_u_commas(c));
-        fly_home_collect_egg(true);
-        collect_godegg(party_slot++, true, false);
+        fly_home_collect_egg(env.console, true);
+        collect_godegg(env.console, party_slot++, true, false);
         if (party_slot >= items){
             party_slot = 0;
         }
@@ -135,9 +140,9 @@ void GodEggItemDupe::run_program(SingleSwitchProgramEnvironment& env, uint16_t a
     //  Now we are in steady state.
     for (; c < attempts; c++){
         env.log("Fetch Attempts: " + tostr_u_commas(c));
-        eggfetcher_loop();
-        collect_egg();
-        collect_godegg(party_slot++, false, false);
+        eggfetcher_loop(env.console);
+        collect_egg(env.console);
+        collect_godegg(env.console, party_slot++, false, false);
         if (party_slot >= items){
             party_slot = 0;
         }
@@ -145,14 +150,14 @@ void GodEggItemDupe::run_program(SingleSwitchProgramEnvironment& env, uint16_t a
 }
 
 void GodEggItemDupe::program(SingleSwitchProgramEnvironment& env) const{
-    grip_menu_connect_go_home();
-    resume_game_back_out(TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+    grip_menu_connect_go_home(env.console);
+    resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
 
     run_program(env, MAX_FETCH_ATTEMPTS);
-    ssf_press_button2(BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
+    ssf_press_button2(env.console, BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
 
-    end_program_callback();
-    end_program_loop();
+    end_program_callback(env.console);
+    end_program_loop(env.console);
 }
 
 
