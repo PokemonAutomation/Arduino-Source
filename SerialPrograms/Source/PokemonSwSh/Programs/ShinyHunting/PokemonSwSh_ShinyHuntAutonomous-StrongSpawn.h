@@ -30,6 +30,7 @@ private:
     struct Tracker : public StandardEncounterTracker{
         Tracker(
             ShinyHuntTracker& stats,
+            ProgramEnvironment& env,
             ConsoleHandle& console,
             bool take_video,
             bool run_from_everything
@@ -40,7 +41,6 @@ private:
     BooleanCheckBox GO_HOME_WHEN_DONE;
     SimpleInteger<uint8_t> TIME_ROLLBACK_HOURS;
     SectionDivider m_advanced_options;
-    TimeExpression<uint16_t> EXIT_BATTLE_MASH_TIME;
     BooleanCheckBox VIDEO_ON_SHINY;
     BooleanCheckBox RUN_FROM_EVERYTHING;
 };

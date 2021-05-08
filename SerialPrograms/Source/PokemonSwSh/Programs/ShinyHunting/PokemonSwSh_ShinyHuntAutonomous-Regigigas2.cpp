@@ -100,7 +100,12 @@ ShinyHuntAutonomousRegigigas2::Tracker::Tracker(
     bool take_video,
     bool run_from_everything
 )
-    : StandardEncounterTracker(stats, console, require_square, exit_battle_time, take_video, run_from_everything)
+    : StandardEncounterTracker(
+        stats, env, console,
+        require_square,
+        exit_battle_time,
+        take_video, run_from_everything
+    )
     , m_env(env)
 {}
 bool ShinyHuntAutonomousRegigigas2::Tracker::run_away(){
@@ -159,9 +164,9 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env)
             pbf_mash_button(env.console, BUTTON_A, 18 * TICKS_PER_SECOND);
             env.console.botbase().wait_for_all_requests();
 
-            {
-                StartBattleDetector detector(env.console, std::chrono::seconds(30));
-                detector.wait(env);
+            if (!wait_for_start_battle(env, env.console, std::chrono::seconds(30))){
+                stats.m_timeouts++;
+                break;
             }
 
             ShinyDetection detection = detect_shiny_battle(

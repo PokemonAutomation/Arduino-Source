@@ -31,7 +31,8 @@ private:
     BooleanCheckBox AIRPLANE_MODE;
     SimpleInteger<uint8_t> TIME_ROLLBACK_HOURS;
     SectionDivider m_advanced_options;
-    TimeExpression<uint16_t> EXIT_BATTLE_MASH_TIME;
+    TimeExpression<uint16_t> EXIT_BATTLE_TIMEOUT;
+    TimeExpression<uint16_t> POST_BATTLE_MASH_TIME;
     TimeExpression<uint16_t> ENTER_CAMP_DELAY;
     BooleanCheckBox VIDEO_ON_SHINY;
     BooleanCheckBox RUN_FROM_EVERYTHING;

@@ -40,13 +40,13 @@ ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , EXIT_BATTLE_MASH_TIME(
-        "<b>Exit Battle Time:</b><br>After running, wait this long to return to overworld and for the fish to reappear.",
-        "6 * TICKS_PER_SECOND"
+    , EXIT_BATTLE_TIMEOUT(
+        "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld and for the fish to reappear.",
+        "10 * TICKS_PER_SECOND"
     )
     , FISH_RESPAWN_TIME(
         "<b>Fish Respawn Time:</b><br>Wait this long for fish to respawn.",
-        "4 * TICKS_PER_SECOND"
+        "5 * TICKS_PER_SECOND"
     )
     , VIDEO_ON_SHINY(
         "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
@@ -60,7 +60,7 @@ ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing()
     m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
     m_options.emplace_back(&TIME_ROLLBACK_HOURS, "TIME_ROLLBACK_HOURS");
     m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&EXIT_BATTLE_MASH_TIME, "EXIT_BATTLE_MASH_TIME");
+    m_options.emplace_back(&EXIT_BATTLE_TIMEOUT, "EXIT_BATTLE_TIMEOUT");
     m_options.emplace_back(&FISH_RESPAWN_TIME, "FISH_RESPAWN_TIME");
     if (settings.developer_mode){
         m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
@@ -97,9 +97,9 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env) co
 
     Stats& stats = env.stats<Stats>();
     StandardEncounterTracker tracker(
-        stats, env.console,
+        stats, env, env.console,
         false,
-        EXIT_BATTLE_MASH_TIME,
+        EXIT_BATTLE_TIMEOUT,
         VIDEO_ON_SHINY,
         RUN_FROM_EVERYTHING
     );

@@ -125,9 +125,11 @@ void SimpleIntegerOptionUI<Type>::restore_defaults(){
 template class SimpleIntegerOption<uint8_t>;
 template class SimpleIntegerOption<uint16_t>;
 template class SimpleIntegerOption<uint32_t>;
+template class SimpleIntegerOption<int8_t>;
 
 template class SimpleIntegerOptionUI<uint8_t>;
 template class SimpleIntegerOptionUI<uint16_t>;
 template class SimpleIntegerOptionUI<uint32_t>;
+template class SimpleIntegerOptionUI<int8_t>;
 
 }

@@ -39,10 +39,6 @@ ShinyHuntAutonomousStrongSpawn::ShinyHuntAutonomousStrongSpawn()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , EXIT_BATTLE_MASH_TIME(
-        "<b>Exit Battle Time:</b><br>After running, wait this long to return to overworld.",
-        "6 * TICKS_PER_SECOND"
-    )
     , VIDEO_ON_SHINY(
         "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
         true
@@ -54,9 +50,8 @@ ShinyHuntAutonomousStrongSpawn::ShinyHuntAutonomousStrongSpawn()
 {
     m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
     m_options.emplace_back(&TIME_ROLLBACK_HOURS, "TIME_ROLLBACK_HOURS");
-    m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&EXIT_BATTLE_MASH_TIME, "EXIT_BATTLE_MASH_TIME");
     if (settings.developer_mode){
+        m_options.emplace_back(&m_advanced_options, "");
         m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
         m_options.emplace_back(&RUN_FROM_EVERYTHING, "RUN_FROM_EVERYTHING");
     }
@@ -82,11 +77,12 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousStrongSpawn::make_stats() const
 
 ShinyHuntAutonomousStrongSpawn::Tracker::Tracker(
     ShinyHuntTracker& stats,
+    ProgramEnvironment& env,
     ConsoleHandle& console,
     bool take_video,
     bool run_from_everything
 )
-    : StandardEncounterTracker(stats, console, false, 0, take_video, run_from_everything)
+    : StandardEncounterTracker(stats, env, console, false, 0, take_video, run_from_everything)
 {}
 bool ShinyHuntAutonomousStrongSpawn::Tracker::run_away(){
     pbf_press_button(m_console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
@@ -101,7 +97,7 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
     uint32_t last_touch = system_clock(env.console);
 
     Stats& stats = env.stats<Stats>();
-    Tracker tracker(stats, env.console, VIDEO_ON_SHINY, RUN_FROM_EVERYTHING);
+    Tracker tracker(stats, env, env.console, VIDEO_ON_SHINY, RUN_FROM_EVERYTHING);
 
     while (true){
         env.update_stats();

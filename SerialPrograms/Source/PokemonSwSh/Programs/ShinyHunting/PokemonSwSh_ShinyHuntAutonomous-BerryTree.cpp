@@ -11,7 +11,10 @@
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
 #include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/Tools/InterruptableCommands.h"
+#include "CommonFramework/Inference/VisualInferenceSession.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_StartBattleDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
 #include "PokemonSwSh_EncounterTracker.h"
 #include "PokemonSwSh_ShinyHuntAutonomous-BerryTree.h"
@@ -39,9 +42,9 @@ ShinyHuntAutonomousBerryTree::ShinyHuntAutonomousBerryTree()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , EXIT_BATTLE_MASH_TIME(
-        "<b>Exit Battle Time:</b><br>After running, wait this long to return to overworld.",
-        "6 * TICKS_PER_SECOND"
+    , EXIT_BATTLE_TIMEOUT(
+        "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
+        "10 * TICKS_PER_SECOND"
     )
     , VIDEO_ON_SHINY(
         "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
@@ -55,7 +58,7 @@ ShinyHuntAutonomousBerryTree::ShinyHuntAutonomousBerryTree()
     m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
     m_options.emplace_back(&REQUIRE_SQUARE, "REQUIRE_SQUARE");
     m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&EXIT_BATTLE_MASH_TIME, "EXIT_BATTLE_MASH_TIME");
+    m_options.emplace_back(&EXIT_BATTLE_TIMEOUT, "EXIT_BATTLE_TIMEOUT");
     if (settings.developer_mode){
         m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
         m_options.emplace_back(&RUN_FROM_EVERYTHING, "RUN_FROM_EVERYTHING");
@@ -67,11 +70,11 @@ ShinyHuntAutonomousBerryTree::ShinyHuntAutonomousBerryTree()
 struct ShinyHuntAutonomousBerryTree::Stats : public ShinyHuntTracker{
     Stats()
         : ShinyHuntTracker(true)
-        , m_timeouts(m_stats["Timeouts"])
+        , m_errors(m_stats["Errors"])
     {
-        m_display_order.insert(m_display_order.begin() + 1, Stat("Timeouts"));
+        m_display_order.insert(m_display_order.begin() + 1, Stat("Errors"));
     }
-    uint64_t& m_timeouts;
+    uint64_t& m_errors;
 };
 std::unique_ptr<StatsTracker> ShinyHuntAutonomousBerryTree::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -82,12 +85,13 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousBerryTree::make_stats() const{
 
 void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env) const{
     grip_menu_connect_go_home(env.console);
+    resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 
     Stats& stats = env.stats<Stats>();
     StandardEncounterTracker tracker(
-        stats, env.console,
+        stats, env, env.console,
         REQUIRE_SQUARE,
-        EXIT_BATTLE_MASH_TIME,
+        EXIT_BATTLE_TIMEOUT,
         VIDEO_ON_SHINY,
         RUN_FROM_EVERYTHING
     );
@@ -96,12 +100,47 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env) 
     while (true){
         env.update_stats();
 
+        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
         home_roll_date_enter_game_autorollback(env.console, &year);
         pbf_mash_button(env.console, BUTTON_B, 90);
         env.console.botbase().wait_for_all_requests();
 
         {
-            StartBattleDetector detector(env.console, std::chrono::seconds(60));
+            InterruptableCommandSession commands(env.console);
+
+            StandardBattleMenuDetector battle_menu_detector(env.console);
+            battle_menu_detector.register_command_stop(commands);
+
+            StartBattleDetector start_battle_detector(env.console);
+            start_battle_detector.register_command_stop(commands);
+
+            AsyncVisualInferenceSession inference(env, env.console);
+            inference += battle_menu_detector;
+            inference += start_battle_detector;
+
+            commands.run([](const BotBaseContext& context){
+                pbf_mash_button(context, BUTTON_A, 60 * TICKS_PER_SECOND);
+                context.botbase().wait_for_all_requests();
+            });
+
+            if (battle_menu_detector.triggered()){
+                env.log("Unexpected battle menu.", Qt::red);
+                stats.m_errors++;
+                pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
+                tracker.run_away();
+                continue;
+            }
+            if (start_battle_detector.triggered()){
+                env.log("Battle started!");
+            }else{
+                stats.m_errors++;
+                env.log("Timed out.");
+                continue;
+            }
+        }
+#if 0
+        if (false){
+            TimedStartBattleDetector detector(env.console, std::chrono::seconds(60));
 
             //  Detect start of battle.
             bool timed_out = false;
@@ -122,6 +161,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env) 
                 continue;
             }
         }
+#endif
 
         //  Detect shiny.
         ShinyDetection detection = detect_shiny_battle(
@@ -134,12 +174,12 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env) 
             break;
         }
         if (detection == ShinyDetection::NO_BATTLE_MENU){
-            stats.m_timeouts++;
+            stats.m_errors++;
             pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
             tracker.run_away();
         }
 
-        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
+//        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
     }
 
     env.update_stats();

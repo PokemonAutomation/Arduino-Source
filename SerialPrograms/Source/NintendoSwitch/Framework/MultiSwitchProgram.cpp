@@ -18,7 +18,6 @@ MultiSwitchProgramEnvironment::MultiSwitchProgramEnvironment(
     FixedLimitVector<ConsoleHandle> p_switches
 )
     : ProgramEnvironment(logger, current_stats, historical_stats)
-    , dispatcher(p_switches.size())
     , consoles(std::move(p_switches))
 {}
 
@@ -31,7 +30,7 @@ void MultiSwitchProgramEnvironment::run_in_parallel(
     size_t s, size_t e,
     const std::function<void(ConsoleHandle& console)>& func
 ){
-    dispatcher.run_in_parallel(
+    dispatcher().run_in_parallel(
         s, e,
         [&](size_t index){
             func(consoles[index]);

@@ -33,7 +33,8 @@ private:
     BooleanCheckBox REQUIRE_SQUARE;
     TimeExpression<uint32_t> TOUCH_DATE_INTERVAL;
     SectionDivider m_advanced_options;
-    TimeExpression<uint16_t> EXIT_BATTLE_MASH_TIME;
+    TimeExpression<uint16_t> EXIT_BATTLE_TIMEOUT;
+    TimeExpression<uint16_t> POST_BATTLE_MASH_TIME;
     TimeExpression<uint16_t> TRANSITION_DELAY;
     BooleanCheckBox VIDEO_ON_SHINY;
     BooleanCheckBox RUN_FROM_EVERYTHING;

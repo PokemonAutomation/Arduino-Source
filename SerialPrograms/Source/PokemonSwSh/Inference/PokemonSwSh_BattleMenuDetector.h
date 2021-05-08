@@ -11,16 +11,22 @@
 #define PokemonAutomation_PokemonSwSh_BattleMenuDetector_H
 
 #include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/Inference/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class StandardBattleMenuDetector{
+class StandardBattleMenuDetector : public VisualInferenceCallbackWithCommandStop{
 public:
     StandardBattleMenuDetector(VideoFeed& feed);
 
     bool detect(const QImage& image) const;
+
+    virtual bool on_frame(
+        const QImage& frame,
+        std::chrono::system_clock::time_point timestamp
+    ) override final;
 
 
 private:

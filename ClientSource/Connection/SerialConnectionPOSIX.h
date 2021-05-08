@@ -123,6 +123,7 @@ public:
             m_listener = std::thread(&SerialConnection::recv_loop, this);
         }catch (...){
             close(m_fd);
+            throw;
         }
     }
 

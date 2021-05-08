@@ -11,6 +11,8 @@
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
 #include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/Tools/InterruptableCommands.h"
+#include "CommonFramework/Inference/VisualInferenceSession.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_StartBattleDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
@@ -40,9 +42,9 @@ ShinyHuntAutonomousWhistling::ShinyHuntAutonomousWhistling()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , EXIT_BATTLE_MASH_TIME(
-        "<b>Exit Battle Time:</b><br>After running, wait this long to return to overworld.",
-        "6 * TICKS_PER_SECOND"
+    , EXIT_BATTLE_TIMEOUT(
+        "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
+        "10 * TICKS_PER_SECOND"
     )
     , VIDEO_ON_SHINY(
         "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
@@ -56,7 +58,7 @@ ShinyHuntAutonomousWhistling::ShinyHuntAutonomousWhistling()
     m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
     m_options.emplace_back(&TIME_ROLLBACK_HOURS, "TIME_ROLLBACK_HOURS");
     m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&EXIT_BATTLE_MASH_TIME, "EXIT_BATTLE_MASH_TIME");
+    m_options.emplace_back(&EXIT_BATTLE_TIMEOUT, "EXIT_BATTLE_TIMEOUT");
     if (settings.developer_mode){
         m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
         m_options.emplace_back(&RUN_FROM_EVERYTHING, "RUN_FROM_EVERYTHING");
@@ -94,9 +96,9 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env) 
 
     Stats& stats = env.stats<Stats>();
     StandardEncounterTracker tracker(
-        stats, env.console,
+        stats, env, env.console,
         false,
-        EXIT_BATTLE_MASH_TIME,
+        EXIT_BATTLE_TIMEOUT,
         VIDEO_ON_SHINY,
         RUN_FROM_EVERYTHING
     );
@@ -114,31 +116,35 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env) 
 
         env.console.botbase().wait_for_all_requests();
         {
-            StandardBattleMenuDetector menu(env.console);
-            StartBattleDetector detector(env.console, std::chrono::seconds(0));
+            InterruptableCommandSession commands(env.console);
 
-            //  Detect start of battle.
-            bool unexpected = false;
-            QImage screen;
-            do{
-                screen = env.console.video().snapshot();
-                if (menu.detect(screen)){
-                    env.log("ScreenChangeDetector: Unexpected battle menu.", Qt::red);
-                    stats.m_unexpected_battles++;
-                    unexpected = true;
-                    break;
+            StandardBattleMenuDetector battle_menu_detector(env.console);
+            battle_menu_detector.register_command_stop(commands);
+
+            StartBattleDetector start_battle_detector(env.console);
+            start_battle_detector.register_command_stop(commands);
+
+            AsyncVisualInferenceSession inference(env, env.console);
+            inference += battle_menu_detector;
+            inference += start_battle_detector;
+
+            commands.run([](const BotBaseContext& context){
+                while (true){
+                    pbf_mash_button(context, BUTTON_LCLICK, TICKS_PER_SECOND);
+                    pbf_move_right_joystick(context, 192, 128, TICKS_PER_SECOND, 0);
                 }
-                pbf_mash_button(env.console, BUTTON_LCLICK, 10);
-                pbf_move_right_joystick(env.console, 192, 128, 10, 0);
-                env.console.botbase().wait_for_all_requests();
-            }while (!detector.detect(screen));
+            });
 
-            if (unexpected){
+            if (battle_menu_detector.triggered()){
+                env.log("Unexpected battle menu.", Qt::red);
+                stats.m_unexpected_battles++;
                 pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
                 tracker.run_away();
                 continue;
             }
-            pbf_mash_button(env.console, BUTTON_B, 5 * TICKS_PER_SECOND);
+            if (start_battle_detector.triggered()){
+                env.log("Battle started!");
+            }
         }
 
         //  Detect shiny.

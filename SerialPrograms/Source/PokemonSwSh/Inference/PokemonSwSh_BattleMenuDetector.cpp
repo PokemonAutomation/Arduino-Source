@@ -7,6 +7,7 @@
  *
  */
 
+#include "Common/Compiler.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/Inference/ColorClustering.h"
 #include "PokemonSwSh_BattleMenuDetector.h"
@@ -32,6 +33,12 @@ StandardBattleMenuDetector::StandardBattleMenuDetector(VideoFeed& feed)
     , m_text_bag     (feed, 0.830, 0.576 + 2 * 0.1075, 0.08, 0.080)
     , m_text_run     (feed, 0.830, 0.576 + 3 * 0.1075, 0.08, 0.080)
 {}
+bool StandardBattleMenuDetector::on_frame(
+    const QImage& frame,
+    std::chrono::system_clock::time_point timestamp
+){
+    return detect(frame);
+}
 bool StandardBattleMenuDetector::detect(const QImage& image) const{
     bool fight;
 

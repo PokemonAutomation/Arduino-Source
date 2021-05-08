@@ -27,15 +27,21 @@ win32-g++{
 
     DEFINES += TESS_IMPORTS
     DEFINES += WIN32
+    DEFINES += PA_TESSERACT
     LIBS += ../SerialPrograms/libtesseractc.lib
 }
 win32-msvc{
     QMAKE_CXXFLAGS += /std:c++latest
 
-
     DEFINES += TESS_IMPORTS
     DEFINES += WIN32
+    DEFINES += PA_TESSERACT
     LIBS += ../SerialPrograms/libtesseractc.lib
+}
+macx{
+    QMAKE_CXXFLAGS += -std=c++14
+
+    QMAKE_INFO_PLIST = macos/Info.plist
 }
 
 
@@ -77,6 +83,9 @@ SOURCES += \
     Source/CommonFramework/Inference/FillGeometry.cpp \
     Source/CommonFramework/Inference/FillMatrix.cpp \
     Source/CommonFramework/Inference/ImageTools.cpp \
+    Source/CommonFramework/Inference/VisualInferenceCallback.cpp \
+    Source/CommonFramework/Inference/VisualInferenceSession.cpp \
+    Source/CommonFramework/Inference/VisualInferenceWait.cpp \
     Source/CommonFramework/Main.cpp \
     Source/CommonFramework/Options/FixedCode.cpp \
     Source/CommonFramework/Options/RandomCode.cpp \
@@ -84,8 +93,8 @@ SOURCES += \
     Source/CommonFramework/Panels/RightPanel.cpp \
     Source/CommonFramework/Panels/SettingsPanel.cpp \
     Source/CommonFramework/PersistentSettings.cpp \
-    Source/CommonFramework/Tools/AsyncCommandSet.cpp \
     Source/CommonFramework/Tools/BotBaseHandle.cpp \
+    Source/CommonFramework/Tools/InterruptableCommands.cpp \
     Source/CommonFramework/Tools/ProgramEnvironment.cpp \
     Source/CommonFramework/Tools/StatsDatabase.cpp \
     Source/CommonFramework/Tools/StatsTracking.cpp \
@@ -116,8 +125,7 @@ SOURCES += \
     Source/PokemonSwSh/Inference/PokemonSwSh_BeamSetter.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_FishingDetector.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_MarkFinder.cpp \
-    Source/PokemonSwSh/Inference/PokemonSwSh_MarkTracker.cpp \
-    Source/PokemonSwSh/Inference/PokemonSwSh_OverworldMarkTracker.cpp \
+    Source/PokemonSwSh/Inference/PokemonSwSh_OverworldTargetTracker.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_RaidCatchDetector.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_RaidLobbyReader.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_StartBattleDetector.cpp \
@@ -241,6 +249,9 @@ HEADERS += \
     Source/CommonFramework/Inference/InferenceTypes.h \
     Source/CommonFramework/Inference/StatAccumulator.h \
     Source/CommonFramework/Inference/TimeWindowStatTracker.h \
+    Source/CommonFramework/Inference/VisualInferenceCallback.h \
+    Source/CommonFramework/Inference/VisualInferenceSession.h \
+    Source/CommonFramework/Inference/VisualInferenceWait.h \
     Source/CommonFramework/Options/BooleanCheckBox.h \
     Source/CommonFramework/Options/ConfigOption.h \
     Source/CommonFramework/Options/FixedCode.h \
@@ -253,8 +264,8 @@ HEADERS += \
     Source/CommonFramework/PersistentSettings.h \
     Source/CommonFramework/Tesseract/capi.h \
     Source/CommonFramework/Tesseract/platform.h \
-    Source/CommonFramework/Tools/AsyncCommandSet.h \
     Source/CommonFramework/Tools/ConsoleHandle.h \
+    Source/CommonFramework/Tools/InterruptableCommands.h \
     Source/CommonFramework/Tools/Logger.h \
     Source/CommonFramework/Tools/ProgramEnvironment.h \
     Source/CommonFramework/Tools/StatsDatabase.h \
@@ -293,8 +304,7 @@ HEADERS += \
     Source/PokemonSwSh/Inference/PokemonSwSh_BeamSetter.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_FishingDetector.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h \
-    Source/PokemonSwSh/Inference/PokemonSwSh_MarkTracker.h \
-    Source/PokemonSwSh/Inference/PokemonSwSh_OverworldMarkTracker.h \
+    Source/PokemonSwSh/Inference/PokemonSwSh_OverworldTargetTracker.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_RaidCatchDetector.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_RaidLobbyReader.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_StartBattleDetector.h \

@@ -18,30 +18,33 @@ using std::endl;
 namespace PokemonAutomation{
 
 BlackScreenDetector::BlackScreenDetector(
-    VideoFeed& feed, Logger& logger
+    VideoFeed& feed
 )
-    : m_feed(feed)
-    , m_logger(logger)
-    , m_box(feed, 0.0, 0.0, 1.0, 1.0)
+    : m_box(feed, 0.1, 0.1, 0.8, 0.8)
     , m_has_been_black(false)
 {}
 BlackScreenDetector::BlackScreenDetector(
-    VideoFeed& feed, Logger& logger,
+    VideoFeed& feed,
     const InferenceBox& box
 )
-    : m_feed(feed)
-    , m_logger(logger)
-    , m_box(feed, box)
+    : m_box(feed, box)
     , m_has_been_black(false)
 {}
 
 
-bool BlackScreenDetector::black_is_over(){
-    QImage image = m_feed.snapshot();
-    if (image.isNull()){
-        m_logger.log("BlackScreenDetector(): Screenshot failed.", "purple");
-        return false;
-    }
+bool BlackScreenDetector::on_frame(
+    const QImage& frame,
+    std::chrono::system_clock::time_point timestamp
+){
+    return black_is_over(frame);
+}
+bool BlackScreenDetector::black_is_over(const QImage& frame){
+    QImage image = extract_box(frame, m_box);
+//    QImage image = m_feed.snapshot();
+//    if (image.isNull()){
+//        m_logger.log("BlackScreenDetector(): Screenshot failed.", "purple");
+//        return false;
+//    }
 
 //    ImageStats stats = pixel_stats(image);
 //    double average = stats.average.sum();

@@ -1,7 +1,9 @@
 
 #include <QApplication>
 #include "Common/Qt/StringException.h"
+#ifdef PA_TESSERACT
 #include "Tesseract/capi.h"
+#endif
 #include "PersistentSettings.h"
 #include "CrashDump.h"
 #include "Windows/MainWindow.h"
@@ -14,14 +16,15 @@ using std::endl;
 using namespace PokemonAutomation;
 
 
-int main(int argc, char *argv[])
-{
+int main(int argc, char *argv[]){
     setup_crash_handler();
 
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication application(argc, argv);
 
+#ifdef PA_TESSERACT
     cout << "Tesseract Version: " << TessVersion() << endl;
+#endif
 
     try{
         settings.read();

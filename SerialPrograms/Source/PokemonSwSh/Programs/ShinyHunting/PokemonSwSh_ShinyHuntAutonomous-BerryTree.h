@@ -29,7 +29,7 @@ private:
     BooleanCheckBox GO_HOME_WHEN_DONE;
     BooleanCheckBox REQUIRE_SQUARE;
     SectionDivider m_advanced_options;
-    TimeExpression<uint16_t> EXIT_BATTLE_MASH_TIME;
+    TimeExpression<uint16_t> EXIT_BATTLE_TIMEOUT;
     BooleanCheckBox VIDEO_ON_SHINY;
     BooleanCheckBox RUN_FROM_EVERYTHING;
 };

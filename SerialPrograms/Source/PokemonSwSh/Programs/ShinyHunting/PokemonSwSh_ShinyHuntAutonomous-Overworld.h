@@ -13,7 +13,6 @@
 #include "CommonFramework/Options/FloatingPoint.h"
 #include "NintendoSwitch/Options/TimeExpression.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_MarkTracker.h"
 #include "PokemonSwSh_EncounterTracker.h"
 
 namespace PokemonAutomation{
@@ -32,24 +31,17 @@ private:
     struct Stats;
 
     void move_in_circle_up(
-        SingleSwitchProgramEnvironment& env,
+        const BotBaseContext& context,
         bool counter_clockwise
     ) const;
     void move_in_circle_down(
-        SingleSwitchProgramEnvironment& env,
+        const BotBaseContext& context,
         bool counter_clockwise
     ) const;
     void circle_in_place(
-        SingleSwitchProgramEnvironment& env,
+        const BotBaseContext& context,
         bool counter_clockwise
     ) const;
-
-    MarkWatchResult whistle_and_watch(
-        SingleSwitchProgramEnvironment& env,
-        std::vector<InferenceBox>& exclamations,
-        std::vector<InferenceBox>& questions
-    ) const;
-
 
     bool find_encounter(
         SingleSwitchProgramEnvironment& env,
@@ -63,12 +55,12 @@ private:
     FloatingPoint MARK_OFFSET;
     BooleanCheckBox PRIORITIZE_EXCLAMATION_POINTS;
     BooleanCheckBox TARGET_CIRCLING;
-    SimpleInteger<uint8_t> LOCAL_CIRCLING;
+    SimpleInteger<int8_t> LOCAL_CIRCLING;
     TimeExpression<uint16_t> MAX_MOVE_DURATION;
     TimeExpression<uint16_t> WATCHDOG_TIMER;
     SimpleInteger<uint8_t> TIME_ROLLBACK_HOURS;
     SectionDivider m_advanced_options;
-    TimeExpression<uint16_t> EXIT_BATTLE_MASH_TIME;
+    TimeExpression<uint16_t> EXIT_BATTLE_TIMEOUT;
     FloatingPoint MAX_TARGET_ALPHA;
     BooleanCheckBox VIDEO_ON_SHINY;
     BooleanCheckBox RUN_FROM_EVERYTHING;

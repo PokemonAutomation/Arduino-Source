@@ -103,6 +103,7 @@ public:
             m_listener = std::thread(&SerialConnection::recv_loop, this);
         }catch (...){
             CloseHandle(m_handle);
+            throw;
         }
     }
     virtual ~SerialConnection(){

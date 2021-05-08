@@ -1,4 +1,4 @@
-/*  Differential Anomaly Detector_H
+/*  Differential Anomaly Detector
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

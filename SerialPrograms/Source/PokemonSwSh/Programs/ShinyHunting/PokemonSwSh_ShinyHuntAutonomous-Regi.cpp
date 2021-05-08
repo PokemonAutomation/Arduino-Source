@@ -42,9 +42,13 @@ ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , EXIT_BATTLE_MASH_TIME(
-        "<b>Exit Battle Time:</b><br>After running, wait this long to return to overworld.",
-        "6 * TICKS_PER_SECOND + 10"
+    , EXIT_BATTLE_TIMEOUT(
+        "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
+        "10 * TICKS_PER_SECOND"
+    )
+    , POST_BATTLE_MASH_TIME(
+        "<b>Post-Battle Mash:</b><br>After each battle, mash B for this long to clear the dialogs.",
+        "1 * TICKS_PER_SECOND"
     )
     , TRANSITION_DELAY(
         "<b>Transition Delay:</b><br>Time to enter/exit the building.",
@@ -64,7 +68,8 @@ ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi()
     m_options.emplace_back(&REGI_NAME, "REGI_NAME");
     m_options.emplace_back(&TOUCH_DATE_INTERVAL, "TOUCH_DATE_INTERVAL");
     m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&EXIT_BATTLE_MASH_TIME, "EXIT_BATTLE_MASH_TIME");
+    m_options.emplace_back(&EXIT_BATTLE_TIMEOUT, "EXIT_BATTLE_TIMEOUT");
+    m_options.emplace_back(&POST_BATTLE_MASH_TIME, "POST_BATTLE_MASH_TIME");
     m_options.emplace_back(&TRANSITION_DELAY, "TRANSITION_DELAY");
     if (settings.developer_mode){
         m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
@@ -97,9 +102,9 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env) const
 
     Stats& stats = env.stats<Stats>();
     StandardEncounterTracker tracker(
-        stats, env.console,
+        stats, env, env.console,
         REQUIRE_SQUARE,
-        EXIT_BATTLE_MASH_TIME,
+        EXIT_BATTLE_TIMEOUT,
         VIDEO_ON_SHINY,
         RUN_FROM_EVERYTHING
     );
@@ -109,6 +114,7 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env) const
     while (true){
         env.update_stats();
 
+        pbf_mash_button(env.console, BUTTON_B, POST_BATTLE_MASH_TIME);
         move_to_corner(env, error, TRANSITION_DELAY);
         if (error){
             stats.m_light_resets++;

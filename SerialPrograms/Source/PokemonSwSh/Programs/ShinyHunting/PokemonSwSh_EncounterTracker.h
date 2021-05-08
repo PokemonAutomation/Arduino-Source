@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_EncounterTracker_H
 
 #include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
 
@@ -20,6 +21,7 @@ class StandardEncounterTracker{
 public:
     StandardEncounterTracker(
         ShinyHuntTracker& stats,
+        ProgramEnvironment& env,
         ConsoleHandle& console,
         bool require_square,
         uint16_t exit_battle_time,
@@ -36,6 +38,7 @@ private:
 
 protected:
     ShinyHuntTracker& m_stats;
+    ProgramEnvironment& m_env;
     ConsoleHandle& m_console;
     bool m_require_square;
     uint16_t m_exit_battle_time;

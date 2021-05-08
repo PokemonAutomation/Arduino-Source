@@ -13,7 +13,7 @@
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/StatsDatabase.h"
-#include "CommonFramework/Tools/AsyncCommandSet.h"
+#include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/Inference/InferenceThrottler.h"
 #include "CommonFramework/Inference/FillGeometry.h"
@@ -21,6 +21,7 @@
 #include "CommonFramework/Inference/ColorClustering.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CommonFramework/Inference/TimeWindowStatTracker.h"
+#include "CommonFramework/Inference/VisualInferenceSession.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyFilters.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleTrigger.h"
@@ -39,7 +40,7 @@
 
 #include <fstream>
 
-#include <Windows.h>
+//#include <Windows.h>
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -59,7 +60,7 @@ TestProgram::TestProgram()
 
 
 
-
+#if 0
 class AsyncCircle : public AsyncCommandSet{
 public:
     using AsyncCommandSet::AsyncCommandSet;
@@ -76,13 +77,52 @@ public:
         }
     }
 };
+#endif
+
+
+
+
+
+
+
+
 
 
 
 void TestProgram::program(SingleSwitchProgramEnvironment& env) const{
 //    BotBase& botbase = env.console;
-    VideoFeed& feed = env.console;
+//    VideoFeed& feed = env.console;
 
+    pbf_mash_button(env.console, BUTTON_B, 600);
+    env.wait(std::chrono::milliseconds(2000));
+    env.console.botbase().stop_all_commands();
+    cout << "asdf" << endl;
+
+//    env.wait(std::chrono::milliseconds(1000));
+
+    pbf_mash_button(env.console, BUTTON_A, 600);
+//    pbf_wait(env.console, 600);
+    pbf_press_button(env.console, BUTTON_X, 10, 10);
+
+
+
+#if 0
+    {
+        VisualInferenceSession session(
+            env, feed
+        );
+        session += [](const QImage& screen){
+            cout << "asdf" << endl;
+            return false;
+        };
+        session.run();
+    }
+    cout << "stop" << endl;
+#endif
+
+
+
+#if 0
     AsyncDispatcher dispatcher;
 
     AsyncCircle circle(env.console.botbase(), dispatcher);
@@ -90,6 +130,7 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env) const{
     env.wait(std::chrono::seconds(5));
 //    Sleep(10000);
     circle.cancel();
+#endif
 
 
 
@@ -206,7 +247,7 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env) const{
 
 
 
-#if 1
+#if 0
     SummaryShinySymbolDetector detector(feed, env.logger());
 
     detector.wait_for_detection(env);

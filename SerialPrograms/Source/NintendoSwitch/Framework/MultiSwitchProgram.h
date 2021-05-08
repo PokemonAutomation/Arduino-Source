@@ -8,7 +8,6 @@
 #define PokemonAutomation_MultiSwitchProgram_H
 
 #include "Common/Clientside/FixedLimitVector.h"
-#include "Common/Clientside/AsyncDispatcher.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "MultiSwitchSystem.h"
@@ -20,7 +19,6 @@ namespace NintendoSwitch{
 
 class MultiSwitchProgramEnvironment : public ProgramEnvironment{
 public:
-    AsyncDispatcher dispatcher;
     FixedLimitVector<ConsoleHandle> consoles;
 
     //  Run the specified lambda for all switches in parallel.

@@ -129,10 +129,10 @@ void AutoHostMultiGame::run_autohost(
             pbf_mash_button(env.console, BUTTON_A, 3 * TICKS_PER_SECOND);
             env.console.botbase().wait_for_all_requests();
 
-            BlackScreenDetector black_screen(env.console, env.logger());
+            BlackScreenDetector black_screen(env.console);
             uint32_t now = start;
             while (now - start < RAID_START_TO_EXIT_DELAY){
-                if (black_screen.black_is_over()){
+                if (black_screen.black_is_over(env.console.video().snapshot())){
                     env.log("Raid has Started!", "blue");
                     break;
                 }

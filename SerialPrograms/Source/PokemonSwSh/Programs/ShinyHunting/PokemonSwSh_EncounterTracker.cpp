@@ -5,6 +5,10 @@
  */
 
 #include "Common/SwitchFramework/Switch_PushButtons.h"
+#include "CommonFramework/Tools/InterruptableCommands.h"
+#include "CommonFramework/Inference/VisualInferenceSession.h"
+#include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "CommonFramework/Inference/VisualInferenceSession.h"
 #include "PokemonSwSh_EncounterTracker.h"
 
 namespace PokemonAutomation{
@@ -14,6 +18,7 @@ namespace PokemonSwSh{
 
 StandardEncounterTracker::StandardEncounterTracker(
     ShinyHuntTracker& stats,
+    ProgramEnvironment& env,
     ConsoleHandle& console,
     bool require_square,
     uint16_t exit_battle_time,
@@ -21,6 +26,7 @@ StandardEncounterTracker::StandardEncounterTracker(
     bool run_from_everything
 )
     : m_stats(stats)
+    , m_env(env)
     , m_console(console)
     , m_require_square(require_square)
     , m_exit_battle_time(exit_battle_time)
@@ -29,11 +35,30 @@ StandardEncounterTracker::StandardEncounterTracker(
 {}
 
 bool StandardEncounterTracker::run_away(){
+#if 1
+    InterruptableCommandSession commands(m_console);
+
+    BlackScreenDetector black_screen_detector(m_console);
+    black_screen_detector.register_command_stop(commands);
+
+    AsyncVisualInferenceSession inference(m_env, m_console);
+    inference += black_screen_detector;
+
+    commands.run([=](const BotBaseContext& context){
+        pbf_press_dpad(context, DPAD_UP, 10, 10);
+        pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
+        if (m_exit_battle_time > TICKS_PER_SECOND){
+            pbf_mash_button(context, BUTTON_B, m_exit_battle_time - TICKS_PER_SECOND);
+        }
+        context.botbase().wait_for_all_requests();
+    });
+#else
     pbf_press_dpad(m_console, DPAD_UP, 10, 10);
     pbf_mash_button(m_console, BUTTON_A, TICKS_PER_SECOND);
     if (m_exit_battle_time > TICKS_PER_SECOND){
         pbf_mash_button(m_console, BUTTON_B, m_exit_battle_time - TICKS_PER_SECOND);
     }
+#endif
     return true;
 }
 

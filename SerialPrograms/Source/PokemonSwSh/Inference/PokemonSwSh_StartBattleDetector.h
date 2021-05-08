@@ -7,11 +7,13 @@
 #ifndef PokemonAutomation_PokemonSwSh_StartBattleDetector_H
 #define PokemonAutomation_PokemonSwSh_StartBattleDetector_H
 
+#include <functional>
 #include <chrono>
 #include <thread>
 #include "CommonFramework/Tools/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonFramework/Inference/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -22,9 +24,41 @@ namespace PokemonSwSh{
 bool is_dialog_grey(const QImage& image);
 
 
-class StartBattleDetector{
+//  Return false if timed out.
+bool wait_for_start_battle(
+    ProgramEnvironment& env,
+    VideoFeed& feed,
+    std::chrono::milliseconds timeout
+);
+
+
+
+class StartBattleDetector : public VisualInferenceCallbackWithCommandStop{
 public:
-    StartBattleDetector(
+    StartBattleDetector(VideoFeed& feed);
+
+    bool detect(const QImage& frame);
+
+    virtual bool on_frame(
+        const QImage& frame,
+        std::chrono::system_clock::time_point timestamp
+    ) override final;
+
+private:
+    InferenceBoxScope m_screen_box;
+    InferenceBoxScope m_dialog_box;
+};
+
+
+
+
+
+#if 1
+//  Deprecated
+
+class TimedStartBattleDetector{
+public:
+    TimedStartBattleDetector(
         VideoFeed& feed,
         std::chrono::milliseconds timeout
     );
@@ -42,7 +76,10 @@ protected:
 };
 
 
-class AsyncStartBattleDetector : public StartBattleDetector{
+
+
+
+class AsyncStartBattleDetector : public TimedStartBattleDetector{
 public:
     AsyncStartBattleDetector(ProgramEnvironment& env, VideoFeed& feed);
     ~AsyncStartBattleDetector();
@@ -60,7 +97,7 @@ private:
     std::atomic<bool> m_detected;
     std::thread m_thread;
 };
-
+#endif
 
 
 }
