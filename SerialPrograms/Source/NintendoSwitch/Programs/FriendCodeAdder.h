@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_FriendCodeAdder_H
-#define PokemonAutomation_FriendCodeAdder_H
+#ifndef PokemonAutomation_NintendoSwitch_FriendCodeAdder_H
+#define PokemonAutomation_NintendoSwitch_FriendCodeAdder_H
 
 #include "CommonFramework/Options/SectionDivider.h"
 #include "CommonFramework/Options/SimpleInteger.h"

@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_SwitchViewer_H
-#define PokemonAutomation_SwitchViewer_H
+#ifndef PokemonAutomation_NintendoSwitch_SwitchViewer_H
+#define PokemonAutomation_NintendoSwitch_SwitchViewer_H
 
 #include <QJsonObject>
 #include "CommonFramework/Panels/RightPanel.h"

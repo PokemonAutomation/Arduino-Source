@@ -87,9 +87,11 @@ SOURCES += \
     Source/CommonFramework/Inference/VisualInferenceSession.cpp \
     Source/CommonFramework/Inference/VisualInferenceWait.cpp \
     Source/CommonFramework/Main.cpp \
+    Source/CommonFramework/Options/EnumDropdown.cpp \
     Source/CommonFramework/Options/FixedCode.cpp \
     Source/CommonFramework/Options/RandomCode.cpp \
     Source/CommonFramework/Options/SectionDivider.cpp \
+    Source/CommonFramework/Options/StringSelect.cpp \
     Source/CommonFramework/Panels/RightPanel.cpp \
     Source/CommonFramework/Panels/SettingsPanel.cpp \
     Source/CommonFramework/PersistentSettings.cpp \
@@ -118,6 +120,7 @@ SOURCES += \
     Source/NintendoSwitch/Options/FriendCodeList.cpp \
     Source/NintendoSwitch/Programs/FriendCodeAdder.cpp \
     Source/NintendoSwitch/Programs/FriendDelete.cpp \
+    Source/NintendoSwitch/Programs/PokemonHome_PageSwap.cpp \
     Source/NintendoSwitch/Programs/PreventSleep.cpp \
     Source/NintendoSwitch/Programs/SwitchViewer.cpp \
     Source/PanelList.cpp \
@@ -141,10 +144,12 @@ SOURCES += \
     Source/PokemonSwSh/PokemonSwSh_SettingsPanel.cpp \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_BallThrower.cpp \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_ClothingBuyer.cpp \
+    Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_DexRecFinder.cpp \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_MassRelease.cpp \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_SurpriseTrade.cpp \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_TradeBot.cpp \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_TurboA.cpp \
+    Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_AutoHostStats.cpp \
     Source/PokemonSwSh/Programs/PokemonSwSh_OverworldTrajectory.cpp \
     Source/PokemonSwSh/Programs/PokemonSwSh_StartGame.cpp \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_EncounterTracker.cpp \
@@ -254,11 +259,13 @@ HEADERS += \
     Source/CommonFramework/Inference/VisualInferenceWait.h \
     Source/CommonFramework/Options/BooleanCheckBox.h \
     Source/CommonFramework/Options/ConfigOption.h \
+    Source/CommonFramework/Options/EnumDropdown.h \
     Source/CommonFramework/Options/FixedCode.h \
     Source/CommonFramework/Options/FloatingPoint.h \
     Source/CommonFramework/Options/RandomCode.h \
     Source/CommonFramework/Options/SectionDivider.h \
     Source/CommonFramework/Options/SimpleInteger.h \
+    Source/CommonFramework/Options/StringSelect.h \
     Source/CommonFramework/Panels/RightPanel.h \
     Source/CommonFramework/Panels/SettingsPanel.h \
     Source/CommonFramework/PersistentSettings.h \
@@ -296,6 +303,7 @@ HEADERS += \
     Source/NintendoSwitch/Options/TimeExpression.h \
     Source/NintendoSwitch/Programs/FriendCodeAdder.h \
     Source/NintendoSwitch/Programs/FriendDelete.h \
+    Source/NintendoSwitch/Programs/PokemonHome_PageSwap.h \
     Source/NintendoSwitch/Programs/PreventSleep.h \
     Source/NintendoSwitch/Programs/SwitchViewer.h \
     Source/NintendoSwitch/Programs/VirtualConsole.h \
@@ -323,10 +331,12 @@ HEADERS += \
     Source/PokemonSwSh/PokemonSwSh_SettingsPanel.h \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_BallThrower.h \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_ClothingBuyer.h \
+    Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_DexRecFinder.h \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_MassRelease.h \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_SurpriseTrade.h \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_TradeBot.h \
     Source/PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_TurboA.h \
+    Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_AutoHostStats.h \
     Source/PokemonSwSh/Programs/PokemonSwSh_OverworldTrajectory.h \
     Source/PokemonSwSh/Programs/PokemonSwSh_StartGame.h \
     Source/PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_EncounterTracker.h \

@@ -55,7 +55,7 @@ ShinyHuntAutonomousIoATrade::ShinyHuntAutonomousIoATrade()
     m_options.emplace_back(&TOUCH_DATE_INTERVAL, "TOUCH_DATE_INTERVAL");
     m_options.emplace_back(&m_advanced_options, "");
     m_options.emplace_back(&MASH_TO_TRADE_DELAY, "MASH_TO_TRADE_DELAY");
-    if (settings.developer_mode){
+    if (PERSISTENT_SETTINGS().developer_mode){
         m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
         m_options.emplace_back(&RUN_FROM_EVERYTHING, "RUN_FROM_EVERYTHING");
     }

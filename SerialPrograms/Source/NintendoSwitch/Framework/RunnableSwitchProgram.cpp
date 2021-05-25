@@ -326,8 +326,9 @@ void RunnableProgramUI::update_historical_stats(){
     RunnableProgram& factory = static_cast<RunnableProgram&>(m_factory);
     m_stats = factory.make_stats();
     if (m_stats){
-        settings.stat_sets.open_from_file(settings.stats_file);
-        StatList& list = settings.stat_sets[m_name.toUtf8().data()];
+        StatSet stats;
+        stats.open_from_file(PERSISTENT_SETTINGS().stats_file);
+        StatList& list = stats[m_name.toUtf8().data()];
         if (list.size() != 0){
             list.aggregate(*m_stats);
         }
@@ -381,7 +382,11 @@ void RunnableProgramUI::run_program(){
 
     //  Update historical stats.
     if (current_stats){
-        bool ok = StatSet::update_file(settings.stats_file, program_name, *current_stats);
+        bool ok = StatSet::update_file(
+            PERSISTENT_SETTINGS().stats_file,
+            program_name,
+            *current_stats
+        );
         if (ok){
             m_logger.log("Stats successfully saved!", "Blue");
         }else{
@@ -393,7 +398,7 @@ void RunnableProgramUI::run_program(){
             );
 //            show_stats_warning();
         }
-        settings.stat_sets.open_from_file(settings.stats_file);
+//        settings.stat_sets.open_from_file(settings.stats_file);
     }
 
 

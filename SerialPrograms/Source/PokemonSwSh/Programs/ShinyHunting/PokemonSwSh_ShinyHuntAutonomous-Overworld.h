@@ -11,6 +11,7 @@
 #include "CommonFramework/Options/BooleanCheckBox.h"
 #include "CommonFramework/Options/SimpleInteger.h"
 #include "CommonFramework/Options/FloatingPoint.h"
+#include "CommonFramework/Options/EnumDropdown.h"
 #include "NintendoSwitch/Options/TimeExpression.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "PokemonSwSh_EncounterTracker.h"
@@ -53,14 +54,14 @@ private:
 private:
     BooleanCheckBox GO_HOME_WHEN_DONE;
     FloatingPoint MARK_OFFSET;
-    BooleanCheckBox PRIORITIZE_EXCLAMATION_POINTS;
-    BooleanCheckBox TARGET_CIRCLING;
-    SimpleInteger<int8_t> LOCAL_CIRCLING;
+    EnumDropdown MARK_PRIORITY;
+    EnumDropdown TRIGGER_METHOD;
     TimeExpression<uint16_t> MAX_MOVE_DURATION;
     TimeExpression<uint16_t> WATCHDOG_TIMER;
     SimpleInteger<uint8_t> TIME_ROLLBACK_HOURS;
     SectionDivider m_advanced_options;
     TimeExpression<uint16_t> EXIT_BATTLE_TIMEOUT;
+    BooleanCheckBox TARGET_CIRCLING;
     FloatingPoint MAX_TARGET_ALPHA;
     BooleanCheckBox VIDEO_ON_SHINY;
     BooleanCheckBox RUN_FROM_EVERYTHING;

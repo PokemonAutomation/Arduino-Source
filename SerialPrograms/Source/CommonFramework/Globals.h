@@ -21,6 +21,7 @@ extern const QString PROJECT_GITHUB_URL;
 
 const auto SERIAL_REFRESH_RATE = std::chrono::milliseconds(1000);
 extern const QString STRING_POKEMON;
+extern const QString STRING_POKEDEX;
 
 
 

@@ -18,7 +18,7 @@ FishingDetector::FishingDetector(
     VideoFeed& feed
 )
     : m_feed(feed)
-    , m_hook_box(feed, 0.4, 0.15, 0.2, 0.4)
+    , m_hook_box(feed, 0.1, 0.15, 0.8, 0.4)
     , m_miss_box(feed, 0.3, 0.9, 0.4, 0.05)
     , m_battle_menu(feed)
 {}
@@ -40,6 +40,14 @@ FishingDetector::Detection FishingDetector::detect_now(){
 
     std::vector<PixelBox> exclamation_marks;
     find_marks(hook_image, &exclamation_marks, nullptr);
+    for (const PixelBox& mark : exclamation_marks){
+        InferenceBox box = translate_to_parent(screen, m_hook_box, mark);
+        box.color = Qt::yellow;
+        box.x -= box.width * 1.5;
+        box.width *= 4;
+        box.height *= 1.5;
+        m_marks.emplace_back(m_feed, box);
+    }
 
     return exclamation_marks.empty()
         ? Detection::NO_DETECTION

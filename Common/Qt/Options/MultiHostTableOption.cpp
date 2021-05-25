@@ -37,7 +37,7 @@ std::vector<MultiHostTableOption::GameSlot> parse_game_slot(const QJsonValue& js
 
         json_get_int(slot.game_slot, line, MultiHostTableOption::JSON_GAME_SLOT, 1, 2);
         json_get_int(slot.user_slot, line, MultiHostTableOption::JSON_USER_SLOT, 1, 8);
-        json_get_int(slot.skips, line, MultiHostTableOption::JSON_SKIPS, 1, 7);
+        json_get_int(slot.skips, line, MultiHostTableOption::JSON_SKIPS, 0, 7);
 
         json_get_bool(slot.backup_save, line, MultiHostTableOption::JSON_BACKUP_SAVE);
         json_get_bool(slot.always_catchable, line, MultiHostTableOption::JSON_ALWAYS_CATCHABLE);

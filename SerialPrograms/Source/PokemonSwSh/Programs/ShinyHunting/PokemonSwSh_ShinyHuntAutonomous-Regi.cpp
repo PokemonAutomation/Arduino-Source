@@ -71,7 +71,7 @@ ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi()
     m_options.emplace_back(&EXIT_BATTLE_TIMEOUT, "EXIT_BATTLE_TIMEOUT");
     m_options.emplace_back(&POST_BATTLE_MASH_TIME, "POST_BATTLE_MASH_TIME");
     m_options.emplace_back(&TRANSITION_DELAY, "TRANSITION_DELAY");
-    if (settings.developer_mode){
+    if (PERSISTENT_SETTINGS().developer_mode){
         m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
         m_options.emplace_back(&RUN_FROM_EVERYTHING, "RUN_FROM_EVERYTHING");
     }

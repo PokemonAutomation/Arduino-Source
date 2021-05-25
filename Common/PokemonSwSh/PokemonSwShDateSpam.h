@@ -28,6 +28,14 @@
 //  not making all way in. Do this only if the program is able to self-recover.
 void home_to_date_time(bool to_date_change, bool fast);
 
+//  Perform date skip and leave the current date unchanged. You are expected to
+//  press HOME immediately after this function returns.
+//
+//  This function is slower than the other methods of date-spam.
+//
+//  Requires: PABB_PABOTBASE_LEVEL >= 31
+void neutral_date_skip(void);
+
 //  Call this immediately after calling "home_to_date_time()".
 //  This function will roll the 1st and 3rd slots forward by one.
 void roll_date_forward_1(bool fast);
@@ -80,6 +88,7 @@ namespace PokemonAutomation{
     class BotBaseContext;
 
     void home_to_date_time                      (const BotBaseContext& context, bool to_date_change, bool fast);
+    void neutral_date_skip                      (const BotBaseContext& context);
     void roll_date_forward_1                    (const BotBaseContext& context, bool fast);
     void roll_date_backward_N                   (const BotBaseContext& context, uint8_t skips, bool fast);
     void home_roll_date_enter_game              (const BotBaseContext& context, bool rollback_year);
@@ -107,6 +116,11 @@ typedef struct{
     bool to_date_change;
     bool fast;
 } PABB_PACK pabb_home_to_date_time;
+
+#define PABB_MSG_COMMAND_NEUTRAL_DATE_SKIP                      0xcb
+typedef struct{
+    seqnum_t seqnum;
+} PABB_PACK pabb_neutral_date_skip;
 
 #define PABB_MSG_COMMAND_ROLL_DATE_FORWARD_1                    0xb5
 typedef struct{

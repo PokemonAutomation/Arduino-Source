@@ -62,6 +62,8 @@ BeamSetter::Detection BeamSetter::run(
     std::vector<FloatPixel> current_values(m_boxes.size());
     std::vector<FloatPixel> current_ratio_diffs(m_boxes.size());
 
+//    static size_t c = 0;
+
     InferenceThrottler throttler(std::chrono::milliseconds((uint64_t)timeout_ticks * 1000 / TICKS_PER_SECOND));
     do{
         //  Take screenshot.
@@ -71,6 +73,10 @@ BeamSetter::Detection BeamSetter::run(
             return Detection::NO_DETECTION;
         }
 //        current.save("f:/test1.jpg");
+
+        QImage image_diff = image_diff_greyscale(baseline_image, current);
+//        image_diff.save("diff-" + QString::number(c++) + ".png");
+
 
         //  Text detection.
         double text_stddev = pixel_stddev(extract_box(current, m_text_box)).sum();
@@ -107,7 +113,10 @@ BeamSetter::Detection BeamSetter::run(
                 min_stddev_index = c;
             }
 //            cout << c << " : stddev = " << stddev << ", sum = " << current_values[c].sum() << endl;
-            if (stddev < 50 && current_values[c].sum() > 500){
+            double average_euclidean_diff = pixel_average(extract_box(image_diff, m_boxes[c])).r;
+//            cout << "average_euclidean_diff = " << average_euclidean_diff << endl;
+
+            if (stddev < 50 && current_values[c].sum() > 500 && average_euclidean_diff > 20){
                 size_t& count = purple_detections[c];
                 count++;
             }
@@ -151,6 +160,8 @@ BeamSetter::Detection BeamSetter::run(
             m_logger.log(str, "purple");
             if (count >= 1){
                 m_logger.log("BeamReader(): Purple beam found!", "blue");
+//                env.wait(std::chrono::seconds(3));
+//                image_diff_greyscale(baseline_image, current).save("diff-" + QString::number(c++) + ".png");
                 return Detection::PURPLE;
             }
         }

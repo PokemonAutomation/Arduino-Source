@@ -59,7 +59,7 @@ ShinyHuntAutonomousWhistling::ShinyHuntAutonomousWhistling()
     m_options.emplace_back(&TIME_ROLLBACK_HOURS, "TIME_ROLLBACK_HOURS");
     m_options.emplace_back(&m_advanced_options, "");
     m_options.emplace_back(&EXIT_BATTLE_TIMEOUT, "EXIT_BATTLE_TIMEOUT");
-    if (settings.developer_mode){
+    if (PERSISTENT_SETTINGS().developer_mode){
         m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
         m_options.emplace_back(&RUN_FROM_EVERYTHING, "RUN_FROM_EVERYTHING");
     }

@@ -23,7 +23,7 @@ namespace PokemonSwSh{
 //using std::cout;
 //using std::endl;
 
-static void raid_lobby_wait(
+static RaidLobbyState raid_lobby_wait(
     ConsoleHandle& console, Logger& logger,
     bool HOST_ONLINE,
     uint8_t accept_FR_slot,
@@ -66,7 +66,7 @@ static void raid_lobby_wait(
         while (true){
             state = inference.read();
             if (state.valid && state.raid_is_full() && state.raiders_are_ready()){
-                return;
+                return state;
             }
             time_elapsed = system_clock(console) - start;
             if (time_elapsed + delay >= lobby_wait_delay){
@@ -86,7 +86,7 @@ static void raid_lobby_wait(
     while (true){
         state = inference.read();
         if (state.valid && state.raid_is_full() && state.raiders_are_ready()){
-            return;
+            return state;
         }
         uint32_t time_elapsed = system_clock(console) - start;
         if (time_elapsed >= lobby_wait_delay){
@@ -106,11 +106,11 @@ static void raid_lobby_wait(
 
     while (true){
         if (!state.valid || state.raiders_are_ready()){
-            return;
+            return state;
         }
         uint32_t time_elapsed = system_clock(console) - start;
         if (time_elapsed > FULL_LOBBY_TIMER){
-            return;
+            return state;
         }
         pbf_wait(
             console,

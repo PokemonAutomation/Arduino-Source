@@ -23,6 +23,7 @@ class AutoHostRolling : public SingleSwitchProgram{
 public:
     AutoHostRolling();
 
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env) const override;
 
 private:

@@ -26,7 +26,8 @@ InferenceBox translate_to_parent(
 QImage extract_box(const QImage& image, const PixelBox& box);
 QImage extract_box(const QImage& image, const InferenceBox& box);
 
-double image_diff(const QImage& x, const QImage& y);
+double image_diff_total(const QImage& x, const QImage& y);
+QImage image_diff_greyscale(const QImage& x, const QImage& y);
 
 FloatPixel pixel_average(const QImage& image);
 FloatPixel pixel_average_normalized(const QImage& image);

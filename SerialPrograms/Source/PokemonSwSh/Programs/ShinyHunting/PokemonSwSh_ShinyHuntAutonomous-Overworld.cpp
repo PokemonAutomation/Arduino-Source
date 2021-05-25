@@ -48,20 +48,18 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
         "Increase this value when the " + STRING_POKEMON + " are large.",
         0.5, 0, 20
     )
-    , PRIORITIZE_EXCLAMATION_POINTS(
-        "<b>Prioritize Exclamation Points:</b><br>Given multiple options, prefer those with exclamation points."
-        " This prioritizes random grass encounters and " + STRING_POKEMON + " that flee.",
-        true
+    , MARK_PRIORITY(
+        "<b>Mark Priority:</b><br>Favor exclamation marks or question marks?",
+        MARK_PRIORITY_STRINGS, 1
     )
-    , TARGET_CIRCLING(
-        "<b>Target Circling:</b><br>After moving towards a " + STRING_POKEMON + ", make a circle."
-        " This increases the chance of encountering the " + STRING_POKEMON + " if it has moved or if the trajectory missed.",
-        true
-    )
-    , LOCAL_CIRCLING(
-        "<b>Local Circling:</b><br>If nothing is found after this many whistles, run in a circle."
-        " Set this to -1 to disable this feature.",
-        3, -1, 10
+    , TRIGGER_METHOD(
+        "<b>Trigger Method:</b><br>How to trigger an overworld reaction mark?",
+        {
+            "Whistle Only",
+            "Whistle 3 times, then circle once.",
+            "Circle 3 times, then whistle 3 times.",
+            "Circle Only",
+        }, 1
     )
     , MAX_MOVE_DURATION(
         "<b>Maximum Move Duration:</b><br>Do not move in the same direction for more than this long."
@@ -70,7 +68,7 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
     )
     , WATCHDOG_TIMER(
         "<b>Watchdog Timer:</b><br>Reset the game if you go this long without any encounters.",
-        "120 * TICKS_PER_SECOND"
+        "60 * TICKS_PER_SECOND"
     )
     , TIME_ROLLBACK_HOURS(
         "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
@@ -82,6 +80,11 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
     , EXIT_BATTLE_TIMEOUT(
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
         "10 * TICKS_PER_SECOND"
+    )
+    , TARGET_CIRCLING(
+        "<b>Target Circling:</b><br>After moving towards a " + STRING_POKEMON + ", make a circle."
+        " This increases the chance of encountering the " + STRING_POKEMON + " if it has moved or if the trajectory missed.",
+        true
     )
     , MAX_TARGET_ALPHA(
         "<b>Max Target Alpha:</b><br>Ignore all targets with alpha larger than this.",
@@ -98,16 +101,16 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld()
 {
     m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
     m_options.emplace_back(&MARK_OFFSET, "MARK_OFFSET");
-    m_options.emplace_back(&PRIORITIZE_EXCLAMATION_POINTS, "PRIORITIZE_EXCLAMATION_POINTS");
-    m_options.emplace_back(&TARGET_CIRCLING, "ENABLE_CIRCLING");
-    m_options.emplace_back(&LOCAL_CIRCLING, "LOCAL_CIRCLING");
+    m_options.emplace_back(&MARK_PRIORITY, "MARK_PRIORITY");
+    m_options.emplace_back(&TRIGGER_METHOD, "TRIGGER_METHOD");
     m_options.emplace_back(&MAX_MOVE_DURATION, "MAX_MOVE_DURATION");
     m_options.emplace_back(&WATCHDOG_TIMER, "WATCHDOG_TIMER");
     m_options.emplace_back(&TIME_ROLLBACK_HOURS, "TIME_ROLLBACK_HOURS");
     m_options.emplace_back(&m_advanced_options, "");
     m_options.emplace_back(&EXIT_BATTLE_TIMEOUT, "EXIT_BATTLE_TIMEOUT");
-    if (settings.developer_mode){
-        m_options.emplace_back(&MAX_TARGET_ALPHA, "MAX_TARGET_ALPHA");
+    m_options.emplace_back(&TARGET_CIRCLING, "ENABLE_CIRCLING");
+    m_options.emplace_back(&MAX_TARGET_ALPHA, "MAX_TARGET_ALPHA");
+    if (PERSISTENT_SETTINGS().developer_mode){
         m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
         m_options.emplace_back(&RUN_FROM_EVERYTHING, "RUN_FROM_EVERYTHING");
     }
@@ -131,6 +134,54 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousOverworld::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
+
+class OverworldTriggerDecider{
+public:
+    OverworldTriggerDecider(
+        bool whistle_first,
+        size_t whistles, size_t circles
+    )
+        : m_whistle_first(whistle_first)
+        , m_whistles(whistles)
+        , m_circles(circles)
+        , m_whistle_counter(0)
+        , m_circle_counter(0)
+    {}
+
+    //  Return true to whistle.
+    bool decide(){
+        while (true){
+            if (m_whistle_first){
+                if (m_whistle_counter < m_whistles){
+                    m_whistle_counter++;
+                    return true;
+                }
+                if (m_circle_counter < m_circles){
+                    m_circle_counter++;
+                    return false;
+                }
+            }else{
+                if (m_circle_counter < m_circles){
+                    m_circle_counter++;
+                    return false;
+                }
+                if (m_whistle_counter < m_whistles){
+                    m_whistle_counter++;
+                    return true;
+                }
+            }
+            m_whistle_counter = 0;
+            m_circle_counter = 0;
+        }
+    }
+
+private:
+    bool m_whistle_first;
+    size_t m_whistles;
+    size_t m_circles;
+    size_t m_whistle_counter;
+    size_t m_circle_counter;
+};
 
 
 
@@ -169,18 +220,18 @@ void ShinyHuntAutonomousOverworld::move_in_circle_down(
         pbf_move_left_joystick(context, 128, 255, 16, 0);
         pbf_move_left_joystick(context, 255, 255, 16, 0);
         pbf_move_left_joystick(context, 255, 128, 16, 0);
-        pbf_move_left_joystick(context, 255, 0, 32, 0);
-        pbf_move_left_joystick(context, 128, 0, 32, 0);
-        pbf_move_left_joystick(context, 0, 0, 32, 0);
+        pbf_move_left_joystick(context, 255, 0, 24, 0);
+        pbf_move_left_joystick(context, 128, 0, 24, 0);
+        pbf_move_left_joystick(context, 0, 0, 24, 0);
     }else{
         pbf_move_left_joystick(context, 255, 128, 16, 0);
         pbf_move_left_joystick(context, 255, 255, 16, 0);
         pbf_move_left_joystick(context, 128, 255, 16, 0);
         pbf_move_left_joystick(context, 0, 255, 16, 0);
         pbf_move_left_joystick(context, 0, 128, 16, 0);
-        pbf_move_left_joystick(context, 0, 0, 32, 0);
-        pbf_move_left_joystick(context, 128, 0, 32, 0);
-        pbf_move_left_joystick(context, 255, 0, 32, 0);
+        pbf_move_left_joystick(context, 0, 0, 24, 0);
+        pbf_move_left_joystick(context, 128, 0, 24, 0);
+        pbf_move_left_joystick(context, 255, 0, 24, 0);
     }
 }
 void ShinyHuntAutonomousOverworld::circle_in_place(
@@ -229,6 +280,21 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
 
     const std::chrono::milliseconds TIMEOUT((uint64_t)WATCHDOG_TIMER * 1000 / TICKS_PER_SECOND);
 
+    std::unique_ptr<OverworldTriggerDecider> decider;
+    switch ((size_t)TRIGGER_METHOD){
+    case 0:
+        decider.reset(new OverworldTriggerDecider(true, 1, 0));
+        break;
+    case 1:
+        decider.reset(new OverworldTriggerDecider(true, 3, 1));
+        break;
+    case 2:
+        decider.reset(new OverworldTriggerDecider(false, 3, 3));
+        break;
+    case 3:
+        decider.reset(new OverworldTriggerDecider(false, 0, 1));
+        break;
+    }
 
     InterruptableCommandSession commands(env.console);
 
@@ -242,16 +308,17 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
         env.logger(), env.console,
         std::chrono::milliseconds(1000),
         MARK_OFFSET,
-        PRIORITIZE_EXCLAMATION_POINTS,
+        (MarkPriority)(size_t)MARK_PRIORITY,
         MAX_TARGET_ALPHA
     );
     target_tracker.register_command_stop(commands);
 
-
-    int8_t nothing_found_counter = 0;
+    size_t loops = 0;
 
     auto last = std::chrono::system_clock::now();
     while (true){
+        loops++;
+
         //  No battle for a long time. Reset the game.
         auto now = std::chrono::system_clock::now();
         if (now - last > TIMEOUT){
@@ -286,7 +353,9 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
         //  No target found.
         if (target.first < 0 || target.first > MAX_TARGET_ALPHA){
             if (target.first < 0){
-                env.log("No targets found.", "orange");
+                if (loops > 1){
+                    env.log("No targets found.", "orange");
+                }
             }else{
                 env.log(
                     QString("Target too Weak: ") +
@@ -298,7 +367,17 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
                     "orange"
                 );
             }
-            if (LOCAL_CIRCLING >= 0 && nothing_found_counter >= LOCAL_CIRCLING){
+            if (decider->decide()){
+                //  Whistle and wait.
+                env.log("Whistle and wait.");
+                commands.run([=](const BotBaseContext& context){
+                    if (loops > 1){
+                        pbf_move_right_joystick(context, 192, 255, 50, 70);
+                    }
+                    pbf_press_button(context, BUTTON_LCLICK, 5, TICKS_PER_SECOND);
+                    context.botbase().wait_for_all_requests();
+                });
+            }else{
                 //  Circle in place.
                 env.log("Circling in place.");
                 target_tracker.set_stop_on_target(true);
@@ -307,22 +386,9 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
                     context.botbase().wait_for_all_requests();
                 });
                 target_tracker.set_stop_on_target(false);
-                nothing_found_counter = 0;
-            }else{
-                //  Whistle and wait.
-                env.log("Whistle and wait.");
-                commands.run([=](const BotBaseContext& context){
-                    if (nothing_found_counter > 0){
-                        pbf_move_right_joystick(context, 192, 255, 50, 70);
-                    }
-                    pbf_press_button(context, BUTTON_LCLICK, 5, TICKS_PER_SECOND);
-                    context.botbase().wait_for_all_requests();
-                });
-                nothing_found_counter++;
             }
             continue;
         }
-        nothing_found_counter = 0;
 
 
         //  Target Found

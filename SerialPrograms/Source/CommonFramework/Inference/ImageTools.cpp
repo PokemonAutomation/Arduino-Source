@@ -66,7 +66,7 @@ QImage extract_box(const QImage& image, const InferenceBox& box){
     );
 }
 
-double image_diff(const QImage& x, const QImage& y){
+double image_diff_total(const QImage& x, const QImage& y){
     if (x.isNull() || y.isNull()){
         return -1;
     }
@@ -89,6 +89,32 @@ double image_diff(const QImage& x, const QImage& y){
 
     return std::sqrt(sum / ((size_t)width * height));
 }
+QImage image_diff_greyscale(const QImage& x, const QImage& y){
+    if (x.isNull() || y.isNull()){
+        return QImage();
+    }
+    if (x.width() != y.width()){
+        return QImage();
+    }
+    if (x.height() != y.height()){
+        return QImage();
+    }
+
+    QImage image(x.width(), x.height(), x.format());
+    pxint_t width = x.width();
+    pxint_t height = x.height();
+    for (int r = 0; r < height; r++){
+        for (int c = 0; c < width; c++){
+            double distance = euclidean_distance(x.pixel(c, r), y.pixel(c, r));
+            distance *= 0.57735026918962576451;  //  1 / sqrt(3)
+            int dist_int = std::min((int)distance, 255);
+            image.setPixel(c, r, qRgb(dist_int, dist_int, dist_int));
+        }
+    }
+    return image;
+}
+
+
 
 FloatPixel pixel_average(const QImage& image){
     pxint_t w = image.width();

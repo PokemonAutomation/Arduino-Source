@@ -25,6 +25,15 @@ enum class OverworldMark{
     QUESTION_MARK,
 };
 
+enum class MarkPriority{
+    EXCLAMATION_ONLY,
+    PRIORITIZE_EXCLAMATION,
+    NO_PREFERENCE,
+    PRIORITIZE_QUESTION,
+    QUESTION_ONLY,
+};
+extern const std::vector<QString> MARK_PRIORITY_STRINGS;
+
 struct OverworldTarget{
     OverworldMark mark;
     InferenceBox box;
@@ -44,7 +53,7 @@ public:
         Logger& logger, VideoFeed& feed,
         std::chrono::milliseconds window,
         double mark_offset,
-        bool prioritize_exclamations,
+        MarkPriority mark_priority,
         double max_alpha
     );
 
@@ -88,7 +97,7 @@ private:
     VideoFeed& m_feed;
     std::chrono::milliseconds m_window;
     double m_mark_offset;
-    bool m_prioritize_exclamations;
+    MarkPriority m_mark_priority;
     double m_max_alpha;
 
     InferenceBoxScope m_search_area;

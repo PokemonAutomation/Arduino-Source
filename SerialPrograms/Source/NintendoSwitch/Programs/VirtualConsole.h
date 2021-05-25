@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_VirtualConsole_H
-#define PokemonAutomation_VirtualConsole_H
+#ifndef PokemonAutomation_NintendoSwitch_VirtualConsole_H
+#define PokemonAutomation_NintendoSwitch_VirtualConsole_H
 
 #include <QJsonObject>
 #include "Common/Qt/QtJsonTools.h"

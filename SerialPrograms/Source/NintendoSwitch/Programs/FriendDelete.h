@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonSwSh_FriendDelete_H
-#define PokemonAutomation_PokemonSwSh_FriendDelete_H
+#ifndef PokemonAutomation_NintendoSwitch_FriendDelete_H
+#define PokemonAutomation_NintendoSwitch_FriendDelete_H
 
 #include "CommonFramework/Options/BooleanCheckBox.h"
 #include "CommonFramework/Options/SimpleInteger.h"

@@ -10,33 +10,23 @@
 //#include <QGraphicsScene>
 //#include <QGraphicsView>
 //#include <QGraphicsPixmapItem>
+#include "CommonFramework/PersistentSettings.h"
 #include "ButtonDiagram.h"
 
 #include <iostream>
 using std::cout;
 using std::endl;
 
+
+namespace PokemonAutomation{
+
+
 ButtonDiagram::ButtonDiagram(QWidget& parent)
     : QMainWindow(&parent)
 {
     setWindowTitle("Controller Keyboard Mapping");
 
-    //  Find the image.
-    QString path = QCoreApplication::applicationDirPath() + "/";
-    for (int c = 0; c < 5; c++){
-//        cout << (path + "Button Layout.jpg").toUtf8().data() << endl;
-        QString filepath = path + "Button Layout.jpg";
-//        QFile file(filepath);
-//        QMessageBox box0;
-//        box0.critical(nullptr, "Error", "Exists = " + QString::number(file.exists()));
-        m_image = QPixmap(filepath);
-        if (!m_image.isNull()){
-            break;
-        }
-//        QMessageBox box;
-//        box.critical(nullptr, "Error", path + "Button Layout.jpg");
-        path += "../";
-    }
+    m_image = QPixmap(PERSISTENT_SETTINGS().resource_path + "/NintendoSwitch/ButtonLayout.jpg");
 
     m_image_label = new QLabel(this);
     setCentralWidget(m_image_label);
@@ -67,5 +57,9 @@ void ButtonDiagram::resizeEvent(QResizeEvent*){
     ih = (int)(ih * scale);
 
     m_image_label->setPixmap(m_image.scaled(iw, ih, Qt::KeepAspectRatio, Qt::SmoothTransformation));
+}
+
+
+
 }
 

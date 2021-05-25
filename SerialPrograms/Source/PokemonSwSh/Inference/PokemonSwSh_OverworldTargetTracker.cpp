@@ -13,6 +13,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
+const std::vector<QString> MARK_PRIORITY_STRINGS{
+    "Exclamation Marks Only (Ignore Question Marks)",
+    "Prioritize Exclamation Marks",
+    "No Preference",
+    "Prioritize Question Marks",
+    "Question Marks Only (Ignore Exclamation Marks)",
+};
+
+
+
 const double OverworldTargetTracker::OVERWORLD_CENTER_X = 0.50;
 const double OverworldTargetTracker::OVERWORLD_CENTER_Y = 0.70;
 
@@ -21,14 +31,14 @@ OverworldTargetTracker::OverworldTargetTracker(
     Logger& logger, VideoFeed& feed,
     std::chrono::milliseconds window,
     double mark_offset,
-    bool prioritize_exclamations,
+    MarkPriority mark_priority,
     double max_alpha
 )
     : m_logger(logger)
     , m_feed(feed)
     , m_window(window)
     , m_mark_offset(mark_offset)
-    , m_prioritize_exclamations(prioritize_exclamations)
+    , m_mark_priority(mark_priority)
     , m_max_alpha(max_alpha)
     , m_search_area(feed, 0.0, 0.2, 1.0, 0.8)
     , m_stop_on_target(false)
@@ -153,8 +163,8 @@ bool OverworldTargetTracker::on_frame(
     for (const PixelBox& mark : exclamation_marks){
         InferenceBox box = translate_to_parent(frame, m_search_area, mark);
         box.color = Qt::magenta;
-        box.x -= box.width;
-        box.width *= 3;
+        box.x -= box.width * 1.5;
+        box.width *= 4;
         box.height *= 1.5;
         m_exclamations.emplace_back(Mark{timestamp, box});
         m_detection_boxes.emplace_back(m_feed, box);
@@ -163,7 +173,7 @@ bool OverworldTargetTracker::on_frame(
     for (const PixelBox& mark : question_marks){
         InferenceBox box = translate_to_parent(frame, m_search_area, mark);
         box.color = Qt::magenta;
-        box.x -= box.width / 2;
+        box.x -= box.width * 0.5;
         box.width *= 2;
         box.height *= 1.5;
         m_questions.emplace_back(Mark{timestamp, box});
@@ -174,14 +184,16 @@ bool OverworldTargetTracker::on_frame(
 
     //  Build targets.
 
-    if (!m_prioritize_exclamations){
+    switch (m_mark_priority){
+    case MarkPriority::EXCLAMATION_ONLY:{
         std::multimap<double, OverworldTarget> targets;
         populate_targets(targets, m_exclamations, OverworldMark::EXCLAMATION_MARK);
-        populate_targets(targets, m_questions, OverworldMark::QUESTION_MARK);
         if (!targets.empty()){
             return save_target(targets.begin());
         }
-    }else{
+        break;
+    }
+    case MarkPriority::PRIORITIZE_EXCLAMATION:{
         std::multimap<double, OverworldTarget> exclamation_targets;
         std::multimap<double, OverworldTarget> question_targets;
         populate_targets(exclamation_targets, m_exclamations, OverworldMark::EXCLAMATION_MARK);
@@ -209,6 +221,55 @@ bool OverworldTargetTracker::on_frame(
         if (!targets.empty()){
             return save_target(targets.begin());
         }
+        break;
+    }
+    case MarkPriority::NO_PREFERENCE:{
+        std::multimap<double, OverworldTarget> targets;
+        populate_targets(targets, m_exclamations, OverworldMark::EXCLAMATION_MARK);
+        populate_targets(targets, m_questions, OverworldMark::QUESTION_MARK);
+        if (!targets.empty()){
+            return save_target(targets.begin());
+        }
+        break;
+    }
+    case MarkPriority::PRIORITIZE_QUESTION:{
+        std::multimap<double, OverworldTarget> exclamation_targets;
+        std::multimap<double, OverworldTarget> question_targets;
+        populate_targets(exclamation_targets, m_exclamations, OverworldMark::EXCLAMATION_MARK);
+        populate_targets(question_targets, m_questions, OverworldMark::QUESTION_MARK);
+
+        auto target0 = exclamation_targets.begin();
+        auto target1 = question_targets.begin();
+
+        //  See if we have any good target.
+        if (!question_targets.empty() && target1->first <= m_max_alpha){
+            return save_target(target1);
+        }
+        if (!exclamation_targets.empty() && target0->first <= m_max_alpha){
+            return save_target(target0);
+        }
+
+        //  No good targets. Pick the next best one for logging purposes.
+        std::multimap<double, OverworldTarget> targets;
+        if (!question_targets.empty()){
+            targets.emplace(target1->first, target1->second);
+        }
+        if (!exclamation_targets.empty()){
+            targets.emplace(target0->first, target0->second);
+        }
+        if (!targets.empty()){
+            return save_target(targets.begin());
+        }
+        break;
+    }
+    case MarkPriority::QUESTION_ONLY:{
+        std::multimap<double, OverworldTarget> targets;
+        populate_targets(targets, m_questions, OverworldMark::QUESTION_MARK);
+        if (!targets.empty()){
+            return save_target(targets.begin());
+        }
+        break;
+    }
     }
 
     m_best_target.first = -1;

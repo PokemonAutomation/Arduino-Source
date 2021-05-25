@@ -27,7 +27,7 @@ int main(int argc, char *argv[]){
 #endif
 
     try{
-        settings.read();
+        PERSISTENT_SETTINGS().read();
     }catch (const StringException& error){
         cout << error.message().toUtf8().data() << endl;
     }
@@ -37,6 +37,6 @@ int main(int argc, char *argv[]){
     MainWindow w;
     w.show();
     int ret = application.exec();
-    settings.write();
+    PERSISTENT_SETTINGS().write();
     return ret;
 }

@@ -16,6 +16,7 @@
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
 #include "PokemonSwSh_DenTools.h"
 #include "PokemonSwSh_LobbyWait.h"
+#include "PokemonSwSh_AutoHostStats.h"
 #include "PokemonSwSh_AutoHost-MultiGame.h"
 
 namespace PokemonAutomation{
@@ -81,6 +82,10 @@ AutoHostMultiGame::AutoHostMultiGame()
 }
 
 
+std::unique_ptr<StatsTracker> AutoHostMultiGame::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new AutoHostStats());
+}
+
 
 void AutoHostMultiGame::run_autohost(
     SingleSwitchProgramEnvironment& env,
@@ -89,6 +94,8 @@ void AutoHostMultiGame::run_autohost(
     uint16_t lobby_wait_delay,
     Catchability catchability
 ) const{
+    AutoHostStats& stats = env.stats<AutoHostStats>();
+
     roll_den(env.console, ENTER_ONLINE_DEN_DELAY, OPEN_ONLINE_DEN_LOBBY_DELAY, game.skips, catchability);
 
     if (HOST_ONLINE){
@@ -111,7 +118,7 @@ void AutoHostMultiGame::run_autohost(
     enter_lobby(env.console, OPEN_ONLINE_DEN_LOBBY_DELAY, HOST_ONLINE, catchability);
 
     //  Accept friend requests while we wait.
-    raid_lobby_wait(
+    RaidLobbyState raid_state = raid_lobby_wait(
         env.console, env.logger(),
         HOST_ONLINE,
         accept_FR_slot,
@@ -131,9 +138,14 @@ void AutoHostMultiGame::run_autohost(
 
             BlackScreenDetector black_screen(env.console);
             uint32_t now = start;
-            while (now - start < RAID_START_TO_EXIT_DELAY){
+            while (true){
                 if (black_screen.black_is_over(env.console.video().snapshot())){
                     env.log("Raid has Started!", "blue");
+                    stats.add_raid(raid_state.raiders());
+                    break;
+                }
+                if (now - start >= RAID_START_TO_EXIT_DELAY){
+                    stats.add_timeout();
                     break;
                 }
                 pbf_mash_button(env.console, BUTTON_A, TICKS_PER_SECOND);
@@ -195,6 +207,8 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env) const{
     while (true){
         env.log("Beginning from start of game list.");
         for (uint8_t index = 0; index < GAME_LIST.size(); index++){
+            env.update_stats();
+
             const MultiHostTable::GameSlot& game = GAME_LIST[index];
 //            if (game.user_slot == 0){
 //                break;

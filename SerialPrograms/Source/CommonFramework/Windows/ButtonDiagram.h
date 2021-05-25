@@ -7,6 +7,8 @@
 #include <QLabel>
 #include <QMainWindow>
 
+namespace PokemonAutomation{
+
 class ButtonDiagram : public QMainWindow{
 public:
     ButtonDiagram(QWidget& parent);
@@ -18,3 +20,6 @@ private:
     QPixmap m_image;
     QLabel* m_image_label;
 };
+
+
+}

@@ -14,6 +14,7 @@
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
 #include "PokemonSwSh_DenTools.h"
 #include "PokemonSwSh_LobbyWait.h"
+#include "PokemonSwSh_AutoHostStats.h"
 #include "PokemonSwSh_AutoHost-Rolling.h"
 
 namespace PokemonAutomation{
@@ -107,7 +108,16 @@ AutoHostRolling::AutoHostRolling()
     m_options.emplace_back(&DELAY_TO_SELECT_MOVE, "DELAY_TO_SELECT_MOVE");
 }
 
+
+
+std::unique_ptr<StatsTracker> AutoHostRolling::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new AutoHostStats());
+}
+
+
 void AutoHostRolling::program(SingleSwitchProgramEnvironment& env) const{
+    AutoHostStats& stats = env.stats<AutoHostStats>();
+
     uint16_t start_raid_delay = HOST_ONLINE
         ? OPEN_ONLINE_DEN_LOBBY_DELAY
         : OPEN_LOCAL_DEN_LOBBY_DELAY;
@@ -128,6 +138,7 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env) const{
     char first = true;
     for (uint32_t raids = 0;; raids++){
         env.log("Raids Completed: " + tostr_u_commas(raids));
+        env.update_stats();
 
         roll_den(
             env.console,
@@ -164,7 +175,7 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env) const{
         enter_lobby(env.console, OPEN_ONLINE_DEN_LOBBY_DELAY, HOST_ONLINE, CATCHABILITY);
 
         //  Accept friend requests while we wait.
-        raid_lobby_wait(
+        RaidLobbyState raid_state = raid_lobby_wait(
             env.console, env.logger(),
             HOST_ONLINE,
             FRIEND_ACCEPT_USER_SLOT,
@@ -184,9 +195,14 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env) const{
 
             BlackScreenDetector black_screen(env.console);
             uint32_t now = start;
-            while (now - start < RAID_START_TO_EXIT_DELAY){
+            while (true){
                 if (black_screen.black_is_over(env.console.video().snapshot())){
                     env.log("Raid has Started!", "blue");
+                    stats.add_raid(raid_state.raiders());
+                    break;
+                }
+                if (now - start >= RAID_START_TO_EXIT_DELAY){
+                    stats.add_timeout();
                     break;
                 }
                 pbf_mash_button(env.console, BUTTON_A, TICKS_PER_SECOND);

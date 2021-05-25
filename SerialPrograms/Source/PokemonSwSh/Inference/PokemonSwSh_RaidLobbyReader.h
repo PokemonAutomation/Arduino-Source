@@ -44,6 +44,14 @@ struct RaidLobbyState{
             player2 != RaidLobbySlot::NOT_READY &&
             player3 != RaidLobbySlot::NOT_READY;
     }
+
+    size_t raiders() const{
+        size_t count = 0;
+        if (player1 != RaidLobbySlot::EMPTY) count++;
+        if (player2 != RaidLobbySlot::EMPTY) count++;
+        if (player3 != RaidLobbySlot::EMPTY) count++;
+        return count;
+    }
 };
 
 

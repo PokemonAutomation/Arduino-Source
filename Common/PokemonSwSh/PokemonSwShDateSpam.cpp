@@ -47,6 +47,10 @@ void home_to_date_time(const BotBaseContext& context, bool to_date_change, bool 
     params.fast = fast;
     context->issue_request<PABB_MSG_COMMAND_HOME_TO_DATE_TIME>(&context.cancelled_bool(), params);
 }
+void neutral_date_skip(const BotBaseContext& context){
+    pabb_neutral_date_skip params;
+    context->issue_request<PABB_MSG_COMMAND_NEUTRAL_DATE_SKIP>(&context.cancelled_bool(), params);
+}
 void roll_date_forward_1(const BotBaseContext& context, bool fast){
     pabb_roll_date_forward_1 params;
     params.fast = fast;

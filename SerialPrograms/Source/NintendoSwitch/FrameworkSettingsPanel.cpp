@@ -67,7 +67,7 @@ FrameworkSettings::FrameworkSettings()
             false
         )
     );
-    if (settings.developer_mode){
+    if (PERSISTENT_SETTINGS().developer_mode){
         m_options.emplace_back(
             "DISCORD_WEBHOOK_ID",
             new String(

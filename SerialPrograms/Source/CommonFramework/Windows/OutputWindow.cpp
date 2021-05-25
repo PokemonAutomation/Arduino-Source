@@ -54,7 +54,7 @@ void TaggedLogger::log(const QString& msg, QColor color){
 
 SerialLogger::SerialLogger(OutputWindow& window, QString tag)
     : TaggedLogger(window, std::move(tag))
-    , PokemonAutomation::MessageLogger(settings.log_everything)
+    , PokemonAutomation::MessageLogger(PERSISTENT_SETTINGS().log_everything)
 {}
 void SerialLogger::log(std::string msg){
     TaggedLogger::log(msg, "green");

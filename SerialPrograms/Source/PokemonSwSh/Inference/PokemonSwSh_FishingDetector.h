@@ -45,6 +45,7 @@ private:
     InferenceBoxScope m_hook_box;
     InferenceBoxScope m_miss_box;
     StandardBattleMenuDetector m_battle_menu;
+    std::deque<InferenceBoxScope> m_marks;
 };
 
 

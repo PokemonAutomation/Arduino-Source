@@ -11,6 +11,7 @@
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
+#include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/StatsDatabase.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
@@ -56,7 +57,30 @@ TestProgram::TestProgram()
         "",
         "Test Program"
     )
-{}
+    , DROPDOWN(
+        "<b>Test Dropdown:</b>",
+        {
+            "case 0",
+            "case 1",
+            "case 2",
+            "case 3",
+        }, 0
+    )
+    , STRING_SELECT(
+        "<b>Test Select:</b>",
+        {
+            "Bulbasaur",
+            "Charmander",
+            "Charmeleon",
+            "Charizard",
+            "Squirtle",
+            "Chikorita",
+        }, 0
+    )
+{
+    m_options.emplace_back(&DROPDOWN, "DROPDOWN");
+    m_options.emplace_back(&STRING_SELECT, "STRING_SELECT");
+}
 
 
 
@@ -90,9 +114,16 @@ public:
 
 
 void TestProgram::program(SingleSwitchProgramEnvironment& env) const{
-//    BotBase& botbase = env.console;
+    BotBase& botbase = env.console;
 //    VideoFeed& feed = env.console;
 
+    home_to_date_time(botbase, true, true);
+    neutral_date_skip(botbase);
+    settings_to_enter_game(botbase, true);
+
+
+
+#if 0
     pbf_mash_button(env.console, BUTTON_B, 600);
     env.wait(std::chrono::milliseconds(2000));
     env.console.botbase().stop_all_commands();
@@ -103,7 +134,7 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env) const{
     pbf_mash_button(env.console, BUTTON_A, 600);
 //    pbf_wait(env.console, 600);
     pbf_press_button(env.console, BUTTON_X, 10, 10);
-
+#endif
 
 
 #if 0

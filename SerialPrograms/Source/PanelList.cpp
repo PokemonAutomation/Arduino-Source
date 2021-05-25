@@ -20,6 +20,8 @@
 #include "NintendoSwitch/Programs/PreventSleep.h"
 #include "NintendoSwitch/Programs/FriendCodeAdder.h"
 #include "NintendoSwitch/Programs/FriendDelete.h"
+#include "NintendoSwitch/Programs/PokemonHome_PageSwap.h"
+
 #include "PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FastCodeEntry.h"
 #include "PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.h"
 
@@ -29,6 +31,7 @@
 #include "PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_TradeBot.h"
 #include "PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_ClothingBuyer.h"
 #include "PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_BallThrower.h"
+#include "PokemonSwSh/Programs/BasicPrograms/PokemonSwSh_DexRecFinder.h"
 
 #include "PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-WattFarmer.h"
 #include "PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-BerryFarmer.h"
@@ -78,6 +81,7 @@
 namespace PokemonAutomation{
 
 using namespace NintendoSwitch;
+using namespace PokemonHome;
 using namespace PokemonSwSh;
 
 using std::cout;
@@ -89,8 +93,11 @@ const std::vector<std::unique_ptr<RightPanel>>& SETTINGS_LIST(){
         return list;
     }
 
-    list.emplace_back(new FrameworkSettings(settings.settings));
-    list.emplace_back(new PokemonSettings(settings.settings));
+    const QJsonObject& json = PERSISTENT_SETTINGS().settings;
+
+
+    list.emplace_back(new FrameworkSettings(json));
+    list.emplace_back(new PokemonSettings(json));
 
     return list;
 }
@@ -115,74 +122,80 @@ const std::vector<std::unique_ptr<RightPanel>>& PROGRAM_LIST(){
         return list;
     }
 
-    list.emplace_back(new VirtualConsole(settings.programs));
-    list.emplace_back(new SwitchViewer(settings.programs));
+    PersistentSettings& settings = PERSISTENT_SETTINGS();
+    const QJsonObject& json = settings.programs;
+
+    list.emplace_back(new VirtualConsole(json));
+    list.emplace_back(new SwitchViewer(json));
 
     if (settings.developer_mode){
-        list.emplace_back(new SingleSwitchProgramWrapper<TestProgram>(settings.programs));
+        list.emplace_back(new SingleSwitchProgramWrapper<TestProgram>(json));
     }
 
-    list.emplace_back(new SingleSwitchProgramWrapper<PreventSleep>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<FriendCodeAdder>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<FriendDelete>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<FastCodeEntry>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<FriendSearchDisconnect>(settings.programs));
+    list.emplace_back(new SingleSwitchProgramWrapper<PreventSleep>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<FriendCodeAdder>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<FriendDelete>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<PageSwap>(json));
 
-    list.emplace_back(new SingleSwitchProgramWrapper<TurboA>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<MassRelease>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<SurpriseTrade>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<TradeBot>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<ClothingBuyer>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<BallThrower>(settings.programs));
+    list.emplace_back(new SingleSwitchProgramWrapper<FastCodeEntry>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<FriendSearchDisconnect>(json));
 
-    list.emplace_back(new SingleSwitchProgramWrapper<WattFarmer>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<BerryFarmer>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<LotoFarmer>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<StowOnSideFarmer>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<DailyHighlightFarmer>(settings.programs));
+    list.emplace_back(new SingleSwitchProgramWrapper<TurboA>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<MassRelease>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<SurpriseTrade>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<TradeBot>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<ClothingBuyer>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<BallThrower>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<DexRecFinder>(json));
 
-    list.emplace_back(new SingleSwitchProgramWrapper<BeamReset>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<PurpleBeamFinder>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<EventBeamFinder>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<DaySkipperJPN>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<DaySkipperEU>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<DaySkipperUS>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<DaySkipperJPN7p8k>(settings.programs));
+    list.emplace_back(new SingleSwitchProgramWrapper<WattFarmer>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<BerryFarmer>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<LotoFarmer>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<StowOnSideFarmer>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<DailyHighlightFarmer>(json));
 
-    list.emplace_back(new SingleSwitchProgramWrapper<DenRoller>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<AutoHostRolling>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<AutoHostMultiGame>(settings.programs));
+    list.emplace_back(new SingleSwitchProgramWrapper<BeamReset>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<PurpleBeamFinder>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<EventBeamFinder>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<DaySkipperJPN>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<DaySkipperEU>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<DaySkipperUS>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<DaySkipperJPN7p8k>(json));
 
-    list.emplace_back(new SingleSwitchProgramWrapper<MultiGameFossil>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntUnattendedRegi>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntUnattendedSwordsOfJustice>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntUnattendedStrongSpawn>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntUnattendedRegigigas2>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntUnattendedIoATrade>(settings.programs));
+    list.emplace_back(new SingleSwitchProgramWrapper<DenRoller>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<AutoHostRolling>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<AutoHostMultiGame>(json));
+
+    list.emplace_back(new SingleSwitchProgramWrapper<MultiGameFossil>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntUnattendedRegi>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntUnattendedSwordsOfJustice>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntUnattendedStrongSpawn>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntUnattendedRegigigas2>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntUnattendedIoATrade>(json));
     
-    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousRegi>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousSwordsOfJustice>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousStrongSpawn>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousRegigigas2>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousIoATrade>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousBerryTree>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousWhistling>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousFishing>(settings.programs));
-    if (settings.developer_mode){
-        list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousOverworld>(settings.programs));
-    }
+    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousRegi>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousSwordsOfJustice>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousStrongSpawn>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousRegigigas2>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousIoATrade>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousBerryTree>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousWhistling>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousFishing>(json));
+//    if (settings.developer_mode){
+        list.emplace_back(new SingleSwitchProgramWrapper<ShinyHuntAutonomousOverworld>(json));
+//    }
 
-    list.emplace_back(new SingleSwitchProgramWrapper<EggFetcher2>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<EggHatcher>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<EggCombined2>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<EggSuperCombined2>(settings.programs));
-    list.emplace_back(new SingleSwitchProgramWrapper<GodEggItemDupe>(settings.programs));
+    list.emplace_back(new SingleSwitchProgramWrapper<EggFetcher2>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<EggHatcher>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<EggCombined2>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<EggSuperCombined2>(json));
+    list.emplace_back(new SingleSwitchProgramWrapper<GodEggItemDupe>(json));
     if (settings.naughty_mode){
-        list.emplace_back(new SingleSwitchProgramWrapper<GodEggDuplication>(settings.programs));
+        list.emplace_back(new SingleSwitchProgramWrapper<GodEggDuplication>(json));
     }
 
-    list.emplace_back(new MultiSwitchProgramWrapper<SynchronizedSpinning>(settings.programs));
-    list.emplace_back(new MultiSwitchProgramWrapper<RaidItemFarmerOHKO>(settings.programs));
+    list.emplace_back(new MultiSwitchProgramWrapper<SynchronizedSpinning>(json));
+    list.emplace_back(new MultiSwitchProgramWrapper<RaidItemFarmerOHKO>(json));
 
     return list;
 }

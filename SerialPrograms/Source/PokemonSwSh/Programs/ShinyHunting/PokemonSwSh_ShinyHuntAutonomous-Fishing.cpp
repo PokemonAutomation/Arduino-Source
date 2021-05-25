@@ -62,7 +62,7 @@ ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing()
     m_options.emplace_back(&m_advanced_options, "");
     m_options.emplace_back(&EXIT_BATTLE_TIMEOUT, "EXIT_BATTLE_TIMEOUT");
     m_options.emplace_back(&FISH_RESPAWN_TIME, "FISH_RESPAWN_TIME");
-    if (settings.developer_mode){
+    if (PERSISTENT_SETTINGS().developer_mode){
         m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
         m_options.emplace_back(&RUN_FROM_EVERYTHING, "RUN_FROM_EVERYTHING");
     }
