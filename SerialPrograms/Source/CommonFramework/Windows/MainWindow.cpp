@@ -13,14 +13,15 @@
 #include <QMessageBox>
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/PersistentSettings.h"
-#include "CommonFramework/Panels/RightPanel.h"
-#include "CommonFramework/Widgets/ProgramList.h"
-#include "CommonFramework/Widgets/SettingList.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
+#include "PanelLists.h"
 #include "ButtonDiagram.h"
 #include "MainWindow.h"
 
+
 //#include <Windows.h>
 
+//#include <QJsonDocument>
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -30,13 +31,13 @@ namespace PokemonAutomation{
 
 MainWindow::MainWindow(QWidget* parent)
     : QMainWindow(parent)
-    , m_right_panel_widget(nullptr)
+    , m_current_panel_widget(nullptr)
 {
     if (objectName().isEmpty()){
         setObjectName(QString::fromUtf8("MainWindow"));
     }
-    QSize window_size = PERSISTENT_SETTINGS().window_size;
-    resize(window_size.width(), window_size.height());
+//    QSize window_size = PERSISTENT_SETTINGS().window_size;
+    resize(PERSISTENT_SETTINGS().window_width, PERSISTENT_SETTINGS().window_height);
     centralwidget = new QWidget(this);
     centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
     setCentralWidget(centralwidget);
@@ -54,30 +55,14 @@ MainWindow::MainWindow(QWidget* parent)
     hbox->addLayout(left_layout, 0);
 
 
-    QGroupBox* program_box = new QGroupBox("Program List", centralwidget);
+    QGroupBox* program_box = new QGroupBox("Program Select", centralwidget);
     left_layout->addWidget(program_box, 1);
     QVBoxLayout* program_layout = new QVBoxLayout(program_box);
     program_layout->setAlignment(Qt::AlignTop);
-    m_program_list = new ProgramListUI(*this);
+
+    m_program_list = new ProgramTabs(*this, *this);
     program_layout->addWidget(m_program_list);
 
-    QGroupBox* setting_box = new QGroupBox("Global Settings", centralwidget);
-    left_layout->addWidget(setting_box, 0);
-    QVBoxLayout* setting_layout = new QVBoxLayout(setting_box);
-    setting_layout->setAlignment(Qt::AlignTop);
-    m_setting_list = new SettingListUI(*this);
-    setting_layout->addWidget(m_setting_list);
-
-#if 0
-    int width = std::max(
-        m_program_list->text_width(),
-        m_settings_list->text_width()
-    );
-#else
-//        int width = 250;
-#endif
-//    program_box->setMaximumWidth(width);
-//    setting_box->setMaximumWidth(width);
 
     QGroupBox* support_box = new QGroupBox("Support (" + STRING_POKEMON + " Automation " + VERSION + ")", centralwidget);
     left_layout->addWidget(support_box);
@@ -115,6 +100,28 @@ MainWindow::MainWindow(QWidget* parent)
         github->setTextInteractionFlags(Qt::TextBrowserInteraction);
         github->setOpenExternalLinks(true);
     }
+    {
+        QLabel* about = new QLabel(support_box);
+        links->addWidget(about);
+        about->setText("<a href=\"" + PROJECT_GITHUB_URL + "\">" + "About this Program" + "</a>");
+        about->setTextFormat(Qt::RichText);
+        connect(
+            about, &QLabel::linkActivated,
+            this, [](const QString&){
+                QMessageBox box;
+                box.information(
+                    nullptr,
+                    "About",
+                    STRING_POKEMON + " Automation Feedback Programs (" + VERSION + ")<br>" +
+                    "Copyright: 2020 - 2021<br>" +
+                    "<br>"
+                    "Made by the " + STRING_POKEMON + " Automation Discord Server.<br>"
+                    "<br>"
+                    "This program uses Qt and dynamically links to unmodified Qt libraries under LGPL.<br>"
+                );
+            }
+        );
+    }
 
     QVBoxLayout* buttons = new QVBoxLayout();
     support->addLayout(buttons);
@@ -140,6 +147,7 @@ MainWindow::MainWindow(QWidget* parent)
         }
     );
 
+#if 0
     QPushButton* about = new QPushButton("About", support_box);
     buttons->addWidget(about);
     connect(
@@ -158,6 +166,17 @@ MainWindow::MainWindow(QWidget* parent)
             );
         }
     );
+#endif
+
+    QPushButton* settings = new QPushButton("Settings", support_box);
+    m_settings = settings;
+    buttons->addWidget(settings);
+    connect(
+        settings, &QPushButton::clicked,
+        this, [=](bool){
+            on_panel_construct(GlobalSettings_Descriptor::INSTANCE.make_panel());
+        }
+    );
 
     QVBoxLayout* right = new QVBoxLayout();
     m_right_panel_layout = right;
@@ -167,41 +186,67 @@ MainWindow::MainWindow(QWidget* parent)
 
 }
 MainWindow::~MainWindow(){
-//    cout << "~MainWindow() - start" << endl;
-    if (m_right_panel_widget != nullptr){
-        m_right_panel_layout->removeWidget(m_right_panel_widget);
-        delete m_right_panel_widget;
-        m_right_panel_widget = nullptr;
-    }
-//    Sleep(1000);
-//    cout << "~MainWindow() - finish" << endl;
+    close_panel();
 }
 
 
-void MainWindow::left_panel_enabled(bool enabled){
-    m_program_list->setEnabled(enabled);
-    m_setting_list->setEnabled(enabled);
-}
-void MainWindow::change_panel(RightPanel& factory){
-    if (m_right_panel_widget != nullptr){
-        m_right_panel_layout->removeWidget(m_right_panel_widget);
-        delete m_right_panel_widget;
-        m_right_panel_widget = nullptr;
-    }
-    m_right_panel_widget = factory.make_ui(*this);
-    m_right_panel_layout->addWidget(m_right_panel_widget);
-}
+
 void MainWindow::open_output_window(){
     m_output_window->show();
 }
 
-void MainWindow::closeEvent(QCloseEvent *event){
+void MainWindow::closeEvent(QCloseEvent* event){
     m_output_window->close();
     QMainWindow::closeEvent(event);
 }
 void MainWindow::resizeEvent(QResizeEvent* event){
-    PERSISTENT_SETTINGS().window_size = size();
+//    PERSISTENT_SETTINGS().window_size = size();
+    PERSISTENT_SETTINGS().window_width = width();
+    PERSISTENT_SETTINGS().window_height = height();
 }
+
+void MainWindow::close_panel(){
+    //  Must destroy the widget first since it references the instance.
+    if (m_current_panel_widget != nullptr){
+        m_right_panel_layout->removeWidget(m_current_panel_widget);
+        delete m_current_panel_widget;
+        m_current_panel_widget = nullptr;
+    }
+
+    //  Now it's safe to destroy the instance.
+    if (m_current_panel == nullptr){
+        return;
+    }
+
+    const std::string& identifier = m_current_panel->descriptor().identifier();
+    PERSISTENT_SETTINGS().panels[identifier.c_str()] = m_current_panel->to_json();
+
+    m_current_panel.reset();
+}
+
+void MainWindow::on_panel_construct(std::unique_ptr<PanelInstance> panel){
+    close_panel();
+
+    //  Make new widget.
+    m_current_panel_widget = panel->make_widget(*this, *this);
+    m_current_panel = std::move(panel);
+    m_right_panel_layout->addWidget(m_current_panel_widget);
+}
+void MainWindow::on_busy(PanelInstance& panel){
+    if (m_program_list){
+        m_program_list->setEnabled(false);
+        m_settings->setEnabled(false);
+    }
+}
+void MainWindow::on_idle(PanelInstance& panel){
+    if (m_program_list){
+        m_program_list->setEnabled(true);
+        m_settings->setEnabled(true);
+    }
+}
+
+
+
 
 
 }

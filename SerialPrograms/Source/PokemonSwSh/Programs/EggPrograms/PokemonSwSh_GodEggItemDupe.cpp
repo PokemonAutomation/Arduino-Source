@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/FrameworkSettings.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
@@ -16,13 +16,22 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-GodEggItemDupe::GodEggItemDupe()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_31KB,
+
+GodEggItemDupe_Descriptor::GodEggItemDupe_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:GodEggItemDupe",
         "God Egg Item Duplication",
         "NativePrograms/GodEggItemDupe.md",
-        "Mass duplicate items with the God Egg."
+        "Mass duplicate items with the God Egg.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_31KB
     )
+{}
+
+
+
+GodEggItemDupe::GodEggItemDupe(const GodEggItemDupe_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , MAX_FETCH_ATTEMPTS(
         "<b>Fetch this many times:</b><br>This puts a limit on how many eggs you can get so you don't make a mess of your boxes for fetching too many.",
         2000
@@ -149,7 +158,7 @@ void GodEggItemDupe::run_program(SingleSwitchProgramEnvironment& env, uint16_t a
     }
 }
 
-void GodEggItemDupe::program(SingleSwitchProgramEnvironment& env) const{
+void GodEggItemDupe::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
     resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
 

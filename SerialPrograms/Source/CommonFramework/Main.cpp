@@ -1,11 +1,9 @@
 
 #include <QApplication>
-#include "Common/Qt/StringException.h"
-#ifdef PA_TESSERACT
-#include "Tesseract/capi.h"
-#endif
+#include "Common/Cpp/Exception.h"
 #include "PersistentSettings.h"
 #include "CrashDump.h"
+#include "Tools/StatsDatabase.h"
 #include "Windows/MainWindow.h"
 
 #include <iostream>
@@ -22,21 +20,26 @@ int main(int argc, char *argv[]){
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication application(argc, argv);
 
-#ifdef PA_TESSERACT
-    cout << "Tesseract Version: " << TessVersion() << endl;
-#endif
-
     try{
         PERSISTENT_SETTINGS().read();
     }catch (const StringException& error){
-        cout << error.message().toUtf8().data() << endl;
+        cout << error.what() << endl;
     }
-//    int* ptr = nullptr;
-//    cout << *ptr << endl;
 
-    MainWindow w;
-    w.show();
-    int ret = application.exec();
+#if 0
+    {
+        StatSet stats;
+        stats.open_from_file(PERSISTENT_SETTINGS().stats_file);
+        stats.save_to_file(PERSISTENT_SETTINGS().stats_file);
+    }
+#endif
+
+    int ret;
+    {
+        MainWindow w;
+        w.show();
+        ret = application.exec();
+    }
     PERSISTENT_SETTINGS().write();
     return ret;
 }

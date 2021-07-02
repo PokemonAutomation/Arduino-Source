@@ -15,13 +15,22 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-SurpriseTrade::SurpriseTrade()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+
+SurpriseTrade_Descriptor::SurpriseTrade_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:SurpriseTrade",
         "Surprise Trade",
         "NativePrograms/SurpriseTrade.md",
-        "Surprise trade away boxes of " + STRING_POKEMON
+        "Surprise trade away boxes of " + STRING_POKEMON,
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+SurpriseTrade::SurpriseTrade(const SurpriseTrade_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , BOXES_TO_TRADE(
         "<b>Number of Boxes to Trade:</b>",
         2
@@ -84,7 +93,7 @@ void SurpriseTrade::trade_slot(const BotBaseContext& context, uint8_t slot, bool
     pbf_mash_button(context, BUTTON_B, TRADE_ANIMATION);
 }
 
-void SurpriseTrade::program(SingleSwitchProgramEnvironment& env) const{
+void SurpriseTrade::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
     resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 

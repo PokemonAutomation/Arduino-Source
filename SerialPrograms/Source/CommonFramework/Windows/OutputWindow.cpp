@@ -105,11 +105,38 @@ OutputWindow::~OutputWindow(){
 }
 
 void OutputWindow::log(QString msg, QColor color){
-    if (color.isValid()){
-        m_text->append("<font color=\"" + color.name() + "\">" + msg + "</font>");
-    }else{
-        m_text->append("<font color=\"" + m_default_color.name() + "\">" + msg + "</font>");
+    //  Replace all newlines with:
+    //      <br>    for the output window.
+    //      \r\n    for the log file.
+
+    QString window_str = "<font color=\"" + (color.isValid() ? color.name() : m_default_color.name()) + "\">";
+    QString file_str;
+    bool pending_carrage_return = false;
+    for (QChar ch : msg){
+        if (pending_carrage_return && ch == '\n'){
+            window_str += "<br>";
+            file_str += "\r\n";
+            pending_carrage_return = false;
+            continue;
+        }
+        pending_carrage_return = false;
+        if (ch == '\n'){
+            window_str += "<br>";
+            file_str += "\r\n";
+            continue;
+        }
+        window_str += ch;
+        file_str += ch;
     }
+
+    if (file_str.back() == "\n"){
+        window_str.resize(window_str.size() - 4);
+        file_str.resize(file_str.size() - 2);
+    }
+
+    window_str += "</font>";
+    m_text->append(window_str);
+
     msg += "\r\n";
     m_log_file.write(msg.toUtf8().data());
     m_log_file.flush();

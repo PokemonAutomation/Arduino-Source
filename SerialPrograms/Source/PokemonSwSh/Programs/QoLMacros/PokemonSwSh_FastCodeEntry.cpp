@@ -13,13 +13,22 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-FastCodeEntry::FastCodeEntry()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+
+FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:FastCodeEntry",
         "Fast Code Entry (FCE)",
         "NativePrograms/FastCodeEntry.md",
-        "Force your way into raids by entering 8-digit codes in under 1 second."
+        "Force your way into raids by entering 8-digit codes in under 1 second.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+FastCodeEntry::FastCodeEntry(const FastCodeEntry_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , RAID_CODE(
         "<b>Raid Code:</b>",
         8,
@@ -34,7 +43,7 @@ FastCodeEntry::FastCodeEntry()
     m_options.emplace_back(&INITIAL_DELAY, "INITIAL_DELAY");
 }
 
-void FastCodeEntry::program(SingleSwitchProgramEnvironment& env) const{
+void FastCodeEntry::program(SingleSwitchProgramEnvironment& env){
     uint8_t code[8];
     RAID_CODE.to_str(code);
 
@@ -48,6 +57,7 @@ void FastCodeEntry::program(SingleSwitchProgramEnvironment& env) const{
 
     end_program_callback(env.console);
 }
+
 
 
 }

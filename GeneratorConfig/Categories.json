@@ -1,0 +1,14 @@
+[
+    {
+        "Name": "NintendoSwitch",
+        "Display": "General",
+        "Settings": [ "FrameworkSettings" ]
+    },
+    {
+        "Name": "PokemonSwSh",
+        "Display": "Sword/Shield",
+        "Settings": [ "PokemonSettings" ]
+    }
+]
+
+

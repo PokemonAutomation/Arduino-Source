@@ -8,7 +8,7 @@
 #include <QJsonObject>
 #include <QIntValidator>
 #include <QHBoxLayout>
-#include "Common/Qt/StringException.h"
+#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Common/Qt/CodeValidator.h"
 #include "RandomCode.h"
@@ -154,8 +154,8 @@ QString RandomCodeUI::sanitized_code(const QString& text) const{
     QString message;
     try{
         message = "Fixed Raid Code: " + sanitize_code(m_value.m_current.total_digits(), text);
-    }catch (const StringException& str){
-        message = "<font color=\"red\">" + str.message() + "</font>";
+    }catch (const ParseException& e){
+        message = "<font color=\"red\">" + e.message_qt() + "</font>";
     }
     return message;
 }

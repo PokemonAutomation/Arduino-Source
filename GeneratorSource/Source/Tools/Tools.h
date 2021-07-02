@@ -30,6 +30,7 @@ bool valid_switch_date(const QDate& date);
 //  Build the .hex
 int build_hexfile(
     const std::string& board,
+    const QString& category,
     const QString& program_name,
     const QString& hex_file,
     const QString& log_file

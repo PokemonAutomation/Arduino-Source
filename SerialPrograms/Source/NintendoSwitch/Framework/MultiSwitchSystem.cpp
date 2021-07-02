@@ -7,7 +7,6 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QVBoxLayout>
-#include "Common/Qt/StringException.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "MultiSwitchSystem.h"
 

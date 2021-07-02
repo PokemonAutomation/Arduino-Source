@@ -14,11 +14,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class StowOnSideFarmer : public SingleSwitchProgram{
-public:
-    StowOnSideFarmer();
 
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+class StowOnSideFarmer_Descriptor : public RunnableSwitchProgramDescriptor{
+public:
+    StowOnSideFarmer_Descriptor();
+};
+
+
+
+class StowOnSideFarmer : public SingleSwitchProgramInstance{
+public:
+    StowOnSideFarmer(const StowOnSideFarmer_Descriptor& descriptor);
+
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
     SimpleInteger<uint32_t> SKIPS;

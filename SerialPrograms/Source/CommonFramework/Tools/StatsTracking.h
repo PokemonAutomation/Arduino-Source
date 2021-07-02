@@ -34,6 +34,7 @@ protected:
 
     std::vector<Stat> m_display_order;
     std::map<std::string, uint64_t> m_stats;
+    std::map<std::string, std::string> m_aliases;
 };
 
 

@@ -8,7 +8,7 @@
 #include <QHBoxLayout>
 #include <QLineEdit>
 #include <QIntValidator>
-#include "Common/Qt/StringException.h"
+#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Common/Qt/CodeValidator.h"
 #include "RandomCode.h"
@@ -52,10 +52,10 @@ RandomCode::RandomCode(const QJsonObject& obj)
         m_current_random = m_digits;
     }
     if (!validate_code(m_digits, m_default_code)){
-        throw StringException("Invalid code.");
+        PA_THROW_ParseException("Invalid code.");
     }
     if (!validate_code(m_digits, m_current_code)){
-        throw StringException("Invalid code.");
+        PA_THROW_ParseException("Invalid code.");
     }
 }
 void RandomCode::restore_defaults(){
@@ -106,8 +106,8 @@ QString RandomCodeUI::sanitized_code(const QString& text) const{
     QString message;
     try{
         message = "Fixed Raid Code: " + sanitize_code(m_value.m_digits, text);
-    }catch (const StringException& str){
-        message = "<font color=\"red\">" + str.message() + "</font>";
+    }catch (const ParseException& e){
+        message = "<font color=\"red\">" + e.message_qt() + "</font>";
     }
     return message;
 }

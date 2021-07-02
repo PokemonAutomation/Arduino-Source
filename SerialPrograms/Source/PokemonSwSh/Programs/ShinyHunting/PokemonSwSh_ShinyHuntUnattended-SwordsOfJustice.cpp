@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
@@ -16,13 +16,20 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-ShinyHuntUnattendedSwordsOfJustice::ShinyHuntUnattendedSwordsOfJustice()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+ShinyHuntUnattendedSwordsOfJustice_Descriptor::ShinyHuntUnattendedSwordsOfJustice_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:ShinyHuntUnattendedSwordsOfJustice",
         "Shiny Hunt Unattended - Swords Of Justice",
         "NativePrograms/ShinyHuntUnattended-SwordsOfJustice.md",
-        "Hunt for shiny SOJs. Stop when a shiny is found."
+        "Hunt for shiny SOJs. Stop when a shiny is found.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+ShinyHuntUnattendedSwordsOfJustice::ShinyHuntUnattendedSwordsOfJustice(const ShinyHuntUnattendedSwordsOfJustice_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , EXIT_CAMP_TO_RUN_DELAY(
         "<b>Exit Camp to Run Delay:</b><br>This needs to be carefully calibrated.",
         "1890"
@@ -52,7 +59,7 @@ ShinyHuntUnattendedSwordsOfJustice::ShinyHuntUnattendedSwordsOfJustice()
 
 
 
-void ShinyHuntUnattendedSwordsOfJustice::program(SingleSwitchProgramEnvironment& env) const{
+void ShinyHuntUnattendedSwordsOfJustice::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
     resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 

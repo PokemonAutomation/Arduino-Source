@@ -25,16 +25,25 @@ public:
 
 public:
     QString stats_file;
-    QSize window_size;
+//    QSize window_size;
+    uint32_t window_width;
+    uint32_t window_height;
     bool naughty_mode;
     bool developer_mode;
-    std::atomic<bool> log_everything;
+    bool log_everything;
 
     QString resource_path;
-//    StatSet stat_sets;
+    QString training_data;
 
-    QJsonObject settings;
-    QJsonObject programs;
+public:
+    //  Settings Panel
+    QString DISCORD_WEBHOOK_ID;
+    QString DISCORD_WEBHOOK_TOKEN;
+    QString DISCORD_USER_ID;
+    QString DISCORD_USER_SHORT_NAME;
+
+public:
+    QJsonObject panels;
 };
 
 PersistentSettings& PERSISTENT_SETTINGS();

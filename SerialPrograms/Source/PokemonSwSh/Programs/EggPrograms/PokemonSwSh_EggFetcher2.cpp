@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/FrameworkSettings.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
@@ -15,13 +15,22 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-EggFetcher2::EggFetcher2()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_31KB,
+
+EggFetcher2_Descriptor::EggFetcher2_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:EggFetcher2",
         "Egg Fetcher 2",
         "NativePrograms/EggFetcher2.md",
-        "Fetch eggs without hatching them."
+        "Fetch eggs without hatching them.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_31KB
     )
+{}
+
+
+
+EggFetcher2::EggFetcher2(const EggFetcher2_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , MAX_FETCH_ATTEMPTS(
         "<b>Fetch this many times:</b><br>This puts a limit on how many eggs you can get so you don't make a mess of your boxes for fetching too many.",
         2000
@@ -63,7 +72,7 @@ void EggFetcher2::run_eggfetcher(
     }
 }
 
-void EggFetcher2::program(SingleSwitchProgramEnvironment& env) const{
+void EggFetcher2::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
     resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
 

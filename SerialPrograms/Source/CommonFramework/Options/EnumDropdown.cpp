@@ -6,6 +6,7 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include "Common/Qt/NoWheelComboBox.h"
 #include "EnumDropdown.h"
 
 namespace PokemonAutomation{
@@ -62,6 +63,7 @@ ConfigOptionUI* EnumDropdown::make_ui(QWidget& parent){
 }
 
 
+
 EnumDropdownUI::EnumDropdownUI(QWidget& parent, EnumDropdown& value)
     : QWidget(&parent)
     , m_value(value)
@@ -70,7 +72,7 @@ EnumDropdownUI::EnumDropdownUI(QWidget& parent, EnumDropdown& value)
     QLabel* text = new QLabel(m_value.m_label, this);
     layout->addWidget(text, 1);
     text->setWordWrap(true);
-    m_box = new QComboBox(&parent);
+    m_box = new NoWheelComboBox(&parent);
     layout->addWidget(m_box);
 
     for (const QString& item : m_value.m_case_list){

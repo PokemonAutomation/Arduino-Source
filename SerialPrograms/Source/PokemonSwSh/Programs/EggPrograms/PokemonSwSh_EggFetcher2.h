@@ -15,12 +15,20 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class EggFetcher2 : public SingleSwitchProgram{
+
+class EggFetcher2_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
-    EggFetcher2();
+    EggFetcher2_Descriptor();
+};
+
+
+
+class EggFetcher2 : public SingleSwitchProgramInstance{
+public:
+    EggFetcher2(const EggFetcher2_Descriptor& descriptor);
 
     void run_eggfetcher(SingleSwitchProgramEnvironment& env, bool deposit_automatically, uint16_t attempts) const;
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
     SimpleInteger<uint16_t> MAX_FETCH_ATTEMPTS;

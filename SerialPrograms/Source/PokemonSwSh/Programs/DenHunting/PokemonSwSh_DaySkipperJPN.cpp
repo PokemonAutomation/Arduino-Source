@@ -4,24 +4,34 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShDaySkippers.h"
 #include "NintendoSwitch/FixedInterval.h"
+#include "PokemonSwSh_DaySkipperStats.h"
 #include "PokemonSwSh_DaySkipperJPN.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-DaySkipperJPN::DaySkipperJPN()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_31KB,
+
+DaySkipperJPN_Descriptor::DaySkipperJPN_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:DaySkipperJPN",
         "Day Skipper (JPN)",
         "NativePrograms/DaySkipperJPN.md",
-        "A day skipper for Japanese date format. (7600 skips/hour)"
+        "A day skipper for Japanese date format. (7600 skips/hour)",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_31KB
     )
+{}
+
+
+
+DaySkipperJPN::DaySkipperJPN(const DaySkipperJPN_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , SKIPS(
         "<b>Number of Frame Skips:</b>",
         10
@@ -39,7 +49,14 @@ DaySkipperJPN::DaySkipperJPN()
     m_options.emplace_back(&CORRECTION_SKIPS, "CORRECTION_SKIPS");
 }
 
-void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env) const{
+std::unique_ptr<StatsTracker> DaySkipperJPN::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new SkipperStats());
+}
+
+void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env){
+    SkipperStats& stats = env.stats<SkipperStats>();
+    stats.runs++;
+
     //  Setup globals.
     uint32_t remaining_skips = SKIPS;
 
@@ -60,12 +77,15 @@ void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env) const{
             correct_count++;
             day++;
             remaining_skips--;
-            env.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
+            stats.issued++;
+//            env.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
+            env.update_stats(stats.to_str_current(remaining_skips));
         }
         if (CORRECTION_SKIPS != 0 && correct_count == CORRECTION_SKIPS){
             correct_count = 0;
             skipper_auto_recovery(env.console);
         }
+
     }
 
     //  Prevent the Switch from sleeping and the time from advancing.

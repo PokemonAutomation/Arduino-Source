@@ -4,24 +4,34 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShDaySkippers.h"
 #include "NintendoSwitch/FixedInterval.h"
+#include "PokemonSwSh_DaySkipperStats.h"
 #include "PokemonSwSh_DaySkipperUS.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-DaySkipperUS::DaySkipperUS()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_31KB,
+
+DaySkipperUS_Descriptor::DaySkipperUS_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:DaySkipperUS",
         "Day Skipper (US)",
         "NativePrograms/DaySkipperUS.md",
-        "A day skipper for US date format that.  (~7500 skips/hour)"
+        "A day skipper for US date format that.  (~7500 skips/hour)",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_31KB
     )
+{}
+
+
+
+DaySkipperUS::DaySkipperUS(const DaySkipperUS_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , SKIPS(
         "<b>Number of Frame Skips:</b>",
         10
@@ -44,7 +54,14 @@ DaySkipperUS::DaySkipperUS()
     m_options.emplace_back(&CORRECTION_SKIPS, "CORRECTION_SKIPS");
 }
 
-void DaySkipperUS::program(SingleSwitchProgramEnvironment& env) const{
+std::unique_ptr<StatsTracker> DaySkipperUS::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new SkipperStats());
+}
+
+void DaySkipperUS::program(SingleSwitchProgramEnvironment& env){
+    SkipperStats& stats = env.stats<SkipperStats>();
+    stats.runs++;
+
     //  Setup globals.
     uint8_t real_life_year = (uint8_t)(
         REAL_LIFE_YEAR < 2000 ?  0 :
@@ -68,7 +85,9 @@ void DaySkipperUS::program(SingleSwitchProgramEnvironment& env) const{
         correct_count++;
         year++;
         remaining_skips--;
-        env.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
+        stats.issued++;
+//        env.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
+        env.update_stats(stats.to_str_current(remaining_skips));
 
         if (year >= 60){
             if (real_life_year <= 36){

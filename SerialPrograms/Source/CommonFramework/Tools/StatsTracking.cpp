@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "ProgramEnvironment.h"
 #include "StatsTracking.h"
 
@@ -21,12 +21,29 @@ StatsTracker::Stat::Stat(std::string&& p_label, bool p_omit_if_zero)
     , omit_if_zero(p_omit_if_zero)
 {}
 std::string StatsTracker::to_str() const{
+    std::map<std::string, uint64_t> stats;
+    for (const auto& item : m_stats){
+        auto alias = m_aliases.find(item.first);
+
+        //  Not an alias.
+        if (alias == m_aliases.end()){
+            stats[item.first] += item.second;
+            continue;
+        }
+
+        //  Find alias target.
+        auto iter = m_stats.find(alias->second);
+        if (iter != m_stats.end()){
+            stats[alias->second] += item.second;
+        }
+    }
+
     std::string str;
     for (const Stat& stat : m_display_order){
-        auto iter = m_stats.find(stat.label);
+        auto iter = stats.find(stat.label);
         uint64_t count = 0;
-        if (iter != m_stats.end()){
-            count = iter->second;
+        if (iter != stats.end()){
+            count += iter->second;
         }
         if (stat.omit_if_zero && count == 0){
             continue;

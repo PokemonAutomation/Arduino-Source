@@ -14,8 +14,8 @@ namespace PokemonAutomation{
 
 class Settings_JsonFile : public ConfigSet{
 public:
-    Settings_JsonFile(const QString& filepath);
-    Settings_JsonFile(const QJsonObject& obj);
+    Settings_JsonFile(QString category, const QString& filepath);
+    Settings_JsonFile(QString category, const QJsonObject& obj);
 
     virtual bool is_valid() const override;
     virtual void restore_defaults() override;

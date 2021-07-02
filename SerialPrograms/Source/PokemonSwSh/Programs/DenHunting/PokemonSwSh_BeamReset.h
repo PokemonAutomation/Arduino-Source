@@ -15,11 +15,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class BeamReset : public SingleSwitchProgram{
-public:
-    BeamReset();
 
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+class BeamReset_Descriptor : public RunnableSwitchProgramDescriptor{
+public:
+    BeamReset_Descriptor();
+};
+
+
+
+class BeamReset : public SingleSwitchProgramInstance{
+public:
+    BeamReset(const BeamReset_Descriptor& descriptor);
+
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
     TimeExpression<uint16_t> DELAY_BEFORE_RESET;

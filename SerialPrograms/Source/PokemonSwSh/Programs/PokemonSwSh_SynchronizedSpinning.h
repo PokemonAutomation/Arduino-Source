@@ -13,11 +13,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class SynchronizedSpinning : public MultiSwitchProgram{
-public:
-    SynchronizedSpinning();
 
-    virtual void program(MultiSwitchProgramEnvironment& env) const override;
+class SynchronizedSpinning_Descriptor : public MultiSwitchProgramDescriptor{
+public:
+    SynchronizedSpinning_Descriptor();
+};
+
+
+
+class SynchronizedSpinning : public MultiSwitchProgramInstance{
+public:
+    SynchronizedSpinning(const SynchronizedSpinning_Descriptor& description);
+
+    virtual void program(MultiSwitchProgramEnvironment& env) override;
 };
 
 

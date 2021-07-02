@@ -14,10 +14,15 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class PokemonSettings : public SettingsPanel{
+class PokemonSettings_Descriptor : public PanelDescriptor{
 public:
-    PokemonSettings();
-    PokemonSettings(const QJsonValue& json);
+    PokemonSettings_Descriptor();
+};
+
+
+class PokemonSettings : public SettingsPanelInstance{
+public:
+    PokemonSettings(const PokemonSettings_Descriptor& descriptor);
 };
 
 

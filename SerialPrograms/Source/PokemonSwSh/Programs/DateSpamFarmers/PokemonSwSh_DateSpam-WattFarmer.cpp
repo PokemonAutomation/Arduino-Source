@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
@@ -15,13 +15,22 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-WattFarmer::WattFarmer()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+
+WattFarmer_Descriptor::WattFarmer_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:WattFarmer",
         "Date Spam: Watt Farmer",
         "NativePrograms/DateSpam-WattFarmer.md",
-        "Farm watts. (6.9 seconds/fetch, 1 million watts/hour)"
+        "Farm watts. (6.9 seconds/fetch, 1 million watts/hour)",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+WattFarmer::WattFarmer(const WattFarmer_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , SKIPS(
         "<b>Number of Fetch Attempts:</b>",
         33334
@@ -35,7 +44,7 @@ WattFarmer::WattFarmer()
     m_options.emplace_back(&SAVE_ITERATIONS, "SAVE_ITERATIONS");
 }
 
-void WattFarmer::program(SingleSwitchProgramEnvironment& env) const{
+void WattFarmer::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
 
     uint8_t year = MAX_YEAR;

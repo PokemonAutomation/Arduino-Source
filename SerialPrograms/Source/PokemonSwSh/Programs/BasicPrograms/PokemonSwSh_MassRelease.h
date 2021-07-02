@@ -15,11 +15,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class MassRelease : public SingleSwitchProgram{
-public:
-    MassRelease();
 
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+class MassRelease_Descriptor : public RunnableSwitchProgramDescriptor{
+public:
+    MassRelease_Descriptor();
+};
+
+
+
+class MassRelease : public SingleSwitchProgramInstance{
+public:
+    MassRelease(const MassRelease_Descriptor& descriptor);
+
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
     SimpleInteger<uint8_t> BOXES_TO_RELEASE;

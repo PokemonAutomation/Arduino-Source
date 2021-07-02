@@ -10,10 +10,9 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
-#include "Common/Qt/StringException.h"
+#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "NintendoSwitch/Framework/VirtualSwitchControllerMapping.h"
-#include "PanelList.h"
 #include "PersistentSettings.h"
 
 #include <iostream>
@@ -33,7 +32,9 @@ PersistentSettings& PERSISTENT_SETTINGS(){
 
 PersistentSettings::PersistentSettings()
     : stats_file("PA-Stats.txt")
-    , window_size(960, 540)
+//    , window_size(1280, 720)
+    , window_width(1280)
+    , window_height(720)
     , naughty_mode(false)
     , developer_mode(false)
     , log_everything(false)
@@ -45,12 +46,14 @@ PersistentSettings::PersistentSettings()
 //        cout << path.toUtf8().data() << endl;
         if (file.exists()){
             resource_path = path + "/Resources/";
+            training_data = path + "/TrainingData/";
             break;
         }
         path += "/..";
     }
     if (resource_path.isEmpty()){
         resource_path = QCoreApplication::applicationDirPath() + "/../Resources/";
+        training_data = QCoreApplication::applicationDirPath() + "/../TrainingData/";
     }
 //    cout << "resources = " << resource_path.toUtf8().data() << endl;
 }
@@ -59,63 +62,62 @@ PersistentSettings::PersistentSettings()
 
 void PersistentSettings::write() const{
     QJsonObject root;
-//    root.insert("00-ConfigPath", QJsonValue(config_path));
-//    root.insert("01-SourcePath", QJsonValue(source_path));
     root.insert("01-StatsFile", QJsonValue(stats_file));
     {
         QJsonArray res;
-        res.append(QJsonValue(window_size.width()));
-        res.append(QJsonValue(window_size.height()));
+        res.append(QJsonValue((int)window_width));
+        res.append(QJsonValue((int)window_height));
         root.insert("02-WindowSize", res);
     }
     root.insert("03-NaughtyMode", QJsonValue(naughty_mode));
     root.insert("04-DeveloperMode", QJsonValue(developer_mode));
-    root.insert("05-LogEverything", QJsonValue(log_everything.load(std::memory_order_acquire)));
+    root.insert("05-LogEverything", QJsonValue(log_everything));
 //    root.insert("06-ResourcePath", QJsonValue(resource_path));
 
-    root.insert("10-SwitchKeyboardMapping", NintendoSwitch::read_keyboard_mapping());
+    root.insert("20-DISCORD_WEBHOOK_ID", DISCORD_WEBHOOK_ID);
+    root.insert("21-DISCORD_WEBHOOK_TOKEN", DISCORD_WEBHOOK_TOKEN);
+    root.insert("22-DISCORD_USER_ID", DISCORD_USER_ID);
+    root.insert("23-DISCORD_USER_SHORT_NAME", DISCORD_USER_SHORT_NAME);
 
-    QJsonObject settings;
-    for (const auto& panel : SETTINGS_MAP()){
-        settings.insert(panel.first, panel.second->to_json());
-    }
-    root.insert("98-SharedSettings", settings);
+    root.insert("50-SwitchKeyboardMapping", NintendoSwitch::read_keyboard_mapping());
 
-    QJsonObject programs;
-    for (const auto& panel : PROGRAM_MAP()){
-        programs.insert(panel.first, panel.second->to_json());
-    }
-    root.insert("99-ProgramSettings", programs);
+    root.insert("99-Panels", panels);
+//    cout << QJsonDocument(panels).toJson().data() << endl;
 
     write_json_file(QCoreApplication::applicationFilePath() + "-Settings.json", QJsonDocument(root));
 }
 void PersistentSettings::read(){
     QJsonDocument doc = read_json_file(QCoreApplication::applicationFilePath() + "-Settings.json");
     if (!doc.isObject()){
-        throw StringException("Invalid settings file.");
+        PA_THROW_ParseException("Invalid settings file.");
     }
     QJsonObject root = doc.object();
-//    json_get_string(config_path, root, "00-ConfigPath");
-//    json_get_string(source_path, root, "01-SourcePath");
     json_get_string(stats_file, root, "01-StatsFile");
-//    stat_sets.open_from_file(stats_file);
 
     {
         QJsonArray res = json_get_array_nothrow(root, "02-WindowSize");
         if (res.size() == 2){
-            window_size = QSize(
-                res[0].toInt(window_size.width()),
-                res[1].toInt(window_size.height())
-            );
+            window_width = res[0].toInt(window_width);
+            window_height = res[1].toInt(window_height);
+//            window_size = QSize(
+//                res[0].toInt(window_size.width()),
+//                res[1].toInt(window_size.height())
+//            );
         }
     }
     json_get_bool(naughty_mode, root, "03-NaughtyMode");
     json_get_bool(developer_mode, root, "04-DeveloperMode");
     json_get_bool(log_everything, root, "05-LogEverything");
 //    json_get_string(resource_path, root, "06-ResourcePath");
-    NintendoSwitch::set_keyboard_mapping(json_get_array_nothrow(root, "10-SwitchKeyboardMapping"));
-    settings = json_get_object_nothrow(root, "98-SharedSettings");
-    programs = json_get_object_nothrow(root, "99-ProgramSettings");
+
+    json_get_string(DISCORD_WEBHOOK_ID, root, "20-DISCORD_WEBHOOK_ID");
+    json_get_string(DISCORD_WEBHOOK_TOKEN, root, "21-DISCORD_WEBHOOK_TOKEN");
+    json_get_string(DISCORD_USER_ID, root, "22-DISCORD_USER_ID");
+    json_get_string(DISCORD_USER_SHORT_NAME, root, "23-DISCORD_USER_SHORT_NAME");
+
+    NintendoSwitch::set_keyboard_mapping(json_get_array_nothrow(root, "50-SwitchKeyboardMapping"));
+
+    panels = json_get_object_nothrow(root, "99-Panels");
 }
 
 

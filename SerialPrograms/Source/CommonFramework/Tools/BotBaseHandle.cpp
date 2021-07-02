@@ -4,7 +4,9 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include <QtGlobal>
+#include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/PanicDump.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "ClientSource/Connection/SerialConnection.h"
@@ -93,10 +95,8 @@ void BotBaseHandle::reset(const QSerialPortInfo& port){
         std::unique_ptr<SerialConnection> connection(new SerialConnection(name, PABB_BAUD_RATE));
         m_botbase.reset(new PABotBase(std::move(connection), nullptr));
         m_current_pabotbase.store(PABotBaseLevel::NOT_PABOTBASE, std::memory_order_release);
-    }catch (const char* str){
-        error = str;
-    }catch (const std::string& str){
-        error = str;
+    }catch (const StringException& e){
+        error = e.message();
     }
     if (error.empty()){
         m_state.store(State::CONNECTING, std::memory_order_release);
@@ -107,7 +107,7 @@ void BotBaseHandle::reset(const QSerialPortInfo& port){
         return;
     }
 
-    m_status_thread = std::thread(&BotBaseHandle::thread_body, this);
+    m_status_thread = std::thread(run_with_catch, "BotBaseHandle::thread_body()", [=]{ thread_body(); });
 }
 
 void BotBaseHandle::verify_protocol(){
@@ -115,7 +115,9 @@ void BotBaseHandle::verify_protocol(){
     uint32_t version_hi = protocol / 100;
     uint32_t version_lo = protocol % 100;
     if (version_hi != PABB_PROTOCOL_VERSION / 100 || version_lo < PABB_PROTOCOL_VERSION % 100){
-        throw "Incompatible version. Client: " + std::to_string(PABB_PROTOCOL_VERSION) + ", Device: " + std::to_string(protocol);
+        PA_THROW_StringException(
+            "Incompatible version. Client: " + std::to_string(PABB_PROTOCOL_VERSION) + ", Device: " + std::to_string(protocol)
+        );
     }
 }
 uint8_t BotBaseHandle::verify_pabotbase(){
@@ -125,7 +127,9 @@ uint8_t BotBaseHandle::verify_pabotbase(){
     PABotBaseLevel type = program_id_to_botbase_level(program_id);
     m_current_pabotbase.store(type, std::memory_order_release);
     if (type < m_minimum_pabotbase){
-        throw "PABotBase level not met. (" + program_name(program_id) + ")";
+        PA_THROW_StringException(
+            "PABotBase level not met. (" + program_name(program_id) + ")"
+        );
     }
     return program_id;
 }
@@ -136,21 +140,19 @@ void BotBaseHandle::thread_body(){
 
     //  Connect
     {
-        std::string error;
+        QString error;
         try{
             m_botbase->connect();
-        }catch (const char* str){
-            error = str;
-        }catch (const std::string& str){
-            error = str;
         }catch (CancelledException&){
             m_botbase->stop();
             on_stopped("");
             return;
+        }catch (const StringException& e){
+            error = e.message_qt();
         }
-        if (!error.empty()){
+        if (!error.isEmpty()){
             m_botbase->stop();
-            on_stopped(("<font color=\"red\">" + error + "</font>").c_str());
+            on_stopped("<font color=\"red\">" + error + "</font>");
             return;
         }
     }
@@ -159,19 +161,17 @@ void BotBaseHandle::thread_body(){
     {
         uint8_t program_id = 0;
         uint32_t version = 0;
-        std::string error;
+        QString error;
         try{
             verify_protocol();
             program_id = verify_pabotbase();
             version = m_botbase->program_version();
-        }catch (const char* str){
-            error = str;
-        }catch (const std::string& str){
-            error = str;
         }catch (CancelledException&){
             return;
+        }catch (const StringException& e){
+            error = e.message_qt();
         }
-        if (error.empty()){
+        if (error.isEmpty()){
             m_state.store(State::READY, std::memory_order_release);
             on_ready((
                 "<font color=\"blue\">Program: " +
@@ -180,7 +180,7 @@ void BotBaseHandle::thread_body(){
             ).c_str());
         }else{
             m_state.store(State::STOPPED, std::memory_order_release);
-            on_stopped(("<font color=\"red\">" + error + "</font>").c_str());
+            on_stopped("<font color=\"red\">" + error + "</font>");
             m_botbase->stop();
             return;
         }
@@ -218,23 +218,21 @@ void BotBaseHandle::thread_body(){
         }
 
         std::string str;
-        std::string error;
+        QString error;
         try{
 //            cout << "system_clock()" << endl;
             uint32_t wallclock = system_clock(context);
 //            cout << "system_clock() - done" << endl;
             str = ticks_to_time(wallclock);
-        }catch (const char* str){
-            error = str;
-        }catch (const std::string& str){
-            error = str;
         }catch (CancelledException&){
             break;
+        }catch (const StringException& e){
+            error = e.message_qt();
         }
-        if (error.empty()){
+        if (error.isEmpty()){
             uptime_status(("<font color=\"blue\">Up Time: " + str + "</font>").c_str());
         }else{
-            uptime_status(QString("<font color=\"red\">Up Time: ") + error.c_str() + "</font>");
+            uptime_status("<font color=\"red\">Up Time: " + error + "</font>");
             error.clear();
         }
 

@@ -13,11 +13,17 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class PreventSleep : public SingleSwitchProgram{
+class PreventSleep_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
-    PreventSleep();
+    PreventSleep_Descriptor();
+};
 
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+
+class PreventSleep : public SingleSwitchProgramInstance{
+public:
+    PreventSleep(const PreventSleep_Descriptor& descriptor);
+
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 
 };

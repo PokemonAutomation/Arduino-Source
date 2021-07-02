@@ -17,12 +17,20 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class ShinyHuntAutonomousSwordsOfJustice : public SingleSwitchProgram{
+
+class ShinyHuntAutonomousSwordsOfJustice_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
-    ShinyHuntAutonomousSwordsOfJustice();
+    ShinyHuntAutonomousSwordsOfJustice_Descriptor();
+};
+
+
+
+class ShinyHuntAutonomousSwordsOfJustice : public SingleSwitchProgramInstance{
+public:
+    ShinyHuntAutonomousSwordsOfJustice(const ShinyHuntAutonomousSwordsOfJustice_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
     struct Stats;

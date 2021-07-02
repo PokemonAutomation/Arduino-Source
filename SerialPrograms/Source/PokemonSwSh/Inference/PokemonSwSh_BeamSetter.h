@@ -34,7 +34,12 @@ public:
 
     Detection run(
         ProgramEnvironment& env, BotBase& botbase,
-        double detection_threshold, uint16_t timeout_ticks
+        bool save_screenshot,
+        uint16_t timeout_ticks,
+        double min_brightness,
+        double min_euclidean,
+        double min_delta_ratio,
+        double min_sigma_ratio
     );
 
 

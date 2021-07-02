@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/FrameworkSettings.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/SwitchRoutines/SwitchDigitEntry.h"
@@ -23,13 +23,22 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-AutoHostMultiGame::AutoHostMultiGame()
-    : SingleSwitchProgram(
-        FeedbackType::OPTIONAL_, PABotBaseLevel::PABOTBASE_12KB,
+
+AutoHostMultiGame_Descriptor::AutoHostMultiGame_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:AutoHostMultiGame",
         "Auto-Host Multi-Game",
         "NativePrograms/AutoHost-MultiGame.md",
-        "Run AutoHost-Rolling across multiple game saves. (Up to 16 dens!)"
+        "Run AutoHost-Rolling across multiple game saves. (Up to 16 dens!)",
+        FeedbackType::OPTIONAL_,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+AutoHostMultiGame::AutoHostMultiGame(const AutoHostMultiGame_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , HOST_ONLINE("<b>Host Online:</b>", true)
     , LOBBY_WAIT_DELAY(
         "<b>Lobby Wait Delay:</b><br>Wait this long before starting raid. Start time is 3 minutes minus this number.",
@@ -173,7 +182,7 @@ void AutoHostMultiGame::run_autohost(
     }
 }
 
-void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env) const{
+void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env){
     uint16_t start_raid_delay = HOST_ONLINE
         ? OPEN_ONLINE_DEN_LOBBY_DELAY
         : OPEN_LOCAL_DEN_LOBBY_DELAY;

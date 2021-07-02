@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/FrameworkSettings.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
@@ -24,16 +24,28 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-ShinyHuntAutonomousBerryTree::ShinyHuntAutonomousBerryTree()
-    : SingleSwitchProgram(
-        FeedbackType::REQUIRED, PABotBaseLevel::PABOTBASE_12KB,
+ShinyHuntAutonomousBerryTree_Descriptor::ShinyHuntAutonomousBerryTree_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:ShinyHuntAutonomousBerryTree",
         "Shiny Hunt Autonomous - Berry Tree",
         "SerialPrograms/ShinyHuntAutonomous-BerryTree.md",
-        "Automatically hunt for shiny berry tree " + STRING_POKEMON + " using video feedback."
+        "Automatically hunt for shiny berry tree " + STRING_POKEMON + " using video feedback.",
+        FeedbackType::REQUIRED,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+ShinyHuntAutonomousBerryTree::ShinyHuntAutonomousBerryTree(const ShinyHuntAutonomousBerryTree_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(
         "<b>Go Home when Done:</b><br>After finding a shiny, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
         false
+    )
+    , LANGUAGE(
+        "<b>Game Language:</b><br>Attempt to read and log the encountered " + STRING_POKEMON + " in this language.<br>Set to \"None\" to disable this feature.",
+        m_name_reader.languages(), false
     )
     , REQUIRE_SQUARE(
         "<b>Require Square:</b><br>Stop only for a square shiny. Run from star shinies.",
@@ -56,6 +68,7 @@ ShinyHuntAutonomousBerryTree::ShinyHuntAutonomousBerryTree()
     )
 {
     m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
+    m_options.emplace_back(&LANGUAGE, "LANGUAGE");
     m_options.emplace_back(&REQUIRE_SQUARE, "REQUIRE_SQUARE");
     m_options.emplace_back(&m_advanced_options, "");
     m_options.emplace_back(&EXIT_BATTLE_TIMEOUT, "EXIT_BATTLE_TIMEOUT");
@@ -83,13 +96,14 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousBerryTree::make_stats() const{
 
 
 
-void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env) const{
+void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
     resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 
     Stats& stats = env.stats<Stats>();
     StandardEncounterTracker tracker(
         stats, env, env.console,
+        &m_name_reader, LANGUAGE,
         REQUIRE_SQUARE,
         EXIT_BATTLE_TIMEOUT,
         VIDEO_ON_SHINY,
@@ -127,7 +141,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env) 
                 env.log("Unexpected battle menu.", Qt::red);
                 stats.m_errors++;
                 pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
-                tracker.run_away();
+                tracker.run_away(false);
                 continue;
             }
             if (start_battle_detector.triggered()){
@@ -176,7 +190,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env) 
         if (detection == ShinyDetection::NO_BATTLE_MENU){
             stats.m_errors++;
             pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
-            tracker.run_away();
+            tracker.run_away(false);
         }
 
 //        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);

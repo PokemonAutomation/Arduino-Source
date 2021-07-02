@@ -4,13 +4,13 @@
  *
  */
 
-#include <iostream>
 #include <QJsonObject>
 #include <QLabel>
 #include <QGroupBox>
 #include <QScrollArea>
 #include <QMessageBox>
-#include "Common/Qt/StringException.h"
+#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/PanicDump.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "ClientSource/Connection/PABotBase.h"
 #include "CommonFramework/Tools/StatsDatabase.h"
@@ -18,12 +18,14 @@
 #include "CommonFramework/Windows/MainWindow.h"
 #include "RunnableSwitchProgram.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-using std::cout;
-using std::endl;
 
 QColor pick_color(FeedbackType feedback, PABotBaseLevel size){
     switch (size){
@@ -36,299 +38,154 @@ QColor pick_color(FeedbackType feedback, PABotBaseLevel size){
     }
     return QColor();
 }
-
-RunnableProgram::RunnableProgram(
-    FeedbackType feedback,
-    PABotBaseLevel min_pabotbase_level,
-    QString name,
+RunnableSwitchProgramDescriptor::RunnableSwitchProgramDescriptor(
+    std::string identifier,
+    QString display_name,
     QString doc_link,
-    QString description
+    QString description,
+    FeedbackType feedback,
+    PABotBaseLevel min_pabotbase_level
 )
-    : RightPanel(pick_color(feedback, min_pabotbase_level), name, std::move(doc_link), description)
+    : RunnablePanelDescriptor(
+        pick_color(feedback, min_pabotbase_level),
+        std::move(identifier),
+        std::move(display_name),
+        std::move(doc_link),
+        std::move(description)
+    )
     , m_feedback(feedback)
     , m_min_pabotbase_level(min_pabotbase_level)
-    , m_setup(nullptr)
 {}
-void RunnableProgram::from_json(const QJsonValue& json){
-    const QJsonObject& obj = json_get_object_nothrow(json.toObject(), m_name);
+
+
+
+
+void RunnableSwitchProgramInstance::from_json(const QJsonValue& json){
+    const QJsonObject& obj = json.toObject();
     m_setup->load_json(json_get_value_nothrow(obj, "SwitchSetup"));
-    for (auto& item : m_options){
-        if (!item.second.isEmpty()){
-            item.first->load_json(json_get_value_nothrow(obj, item.second));
-        }
-    }
+    RunnablePanelInstance::from_json(json);
 }
-QJsonValue RunnableProgram::to_json() const{
-    QJsonObject obj;
+QJsonValue RunnableSwitchProgramInstance::to_json() const{
+    QJsonObject obj = RunnablePanelInstance::to_json().toObject();
     obj.insert("SwitchSetup", m_setup->to_json());
-    for (auto& item : m_options){
-        if (!item.second.isEmpty()){
-            obj.insert(item.second, item.first->to_json());
-        }
-    }
     return obj;
 }
 
-bool RunnableProgram::is_valid() const{
-    for (const auto& item : m_options){
-        if (!item.first->is_valid()){
-            return false;
-        }
-    }
-    return true;
-}
-void RunnableProgram::restore_defaults(){
-    for (const auto& item : m_options){
-        item.first->restore_defaults();
+
+
+RunnableSwitchProgramWidget::~RunnableSwitchProgramWidget(){
+    if (!m_destructing){
+        stop();
+        m_destructing = true;
     }
 }
 
-QWidget* RunnableProgram::make_ui(MainWindow& window){
-    RunnableProgramUI* widget = new RunnableProgramUI(*this, window);
-    widget->construct();
-    return widget;
-}
-
-RunnableProgramUI::RunnableProgramUI(RunnableProgram& factory, MainWindow& window)
-    : RightPanelUI(factory)
-    , m_name(factory.name())
-    , m_window(window)
-    , m_logger(window.output_window(), "Program")
+RunnableSwitchProgramWidget::RunnableSwitchProgramWidget(
+    QWidget& parent,
+    RunnableSwitchProgramInstance& instance,
+    PanelListener& listener
+)
+    : RunnablePanelWidget(parent, instance, listener)
     , m_setup(nullptr)
-    , m_status_bar(nullptr)
-    , m_start_button(nullptr)
-    , m_state(ProgramState::STOPPED)
 {}
-void RunnableProgramUI::append_description(QWidget& parent, QVBoxLayout& layout){
-    RunnableProgram& factory = static_cast<RunnableProgram&>(m_factory);
+void RunnableSwitchProgramWidget::construct(){
+    RunnablePanelWidget::construct();
+    update_historical_stats();
+}
+QWidget* RunnableSwitchProgramWidget::make_header(QWidget& parent){
+    RunnableSwitchProgramInstance& instance = static_cast<RunnableSwitchProgramInstance&>(m_instance);
+    QWidget* header = PanelWidget::make_header(parent);
+    QLayout* layout = header->layout();
 
     QLabel* text = nullptr;
-    switch (factory.m_feedback){
+    switch (instance.descriptor().feedback()){
     case FeedbackType::NONE:
         text = new QLabel(
             "<font color=\"purple\">(This program does not use feedback. It can run without video input.</font>)",
-            &parent
+            header
         );
         break;
     case FeedbackType::OPTIONAL_:
         text = new QLabel(
             "<font color=\"purple\">(This program will use video feedback if it is available. Video input is not required.</font>)",
-            &parent
+            header
         );
         break;
     case FeedbackType::REQUIRED:
         text = new QLabel(
             "<font color=\"green\">(This program requires video feedback. Please make sure you choose the correct capture device.</font>)",
-            &parent
+            header
         );
         break;
     }
-    layout.addWidget(text);
     text->setWordWrap(true);
+    layout->addWidget(text);
 
-    switch (factory.m_min_pabotbase_level){
+    switch (instance.descriptor().min_pabotbase_level()){
     case PABotBaseLevel::NOT_PABOTBASE:
         break;
     case PABotBaseLevel::PABOTBASE_12KB:{
 #if 0
         QLabel* text = new QLabel(
             "<font color=\"blue\">(This program will run on both Arduino Uno R3 and Teensy 2.0.</font>)",
-            &parent
+            header
         );
-        layout.addWidget(text);
         text->setWordWrap(true);
+        layout->addWidget(text);
 #endif
         break;
     }case PABotBaseLevel::PABOTBASE_31KB:{
         QLabel* text = new QLabel(
             "<font color=\"red\">(This program requires a Teensy or higher. PABotBase for Arduino Uno R3 does not have all the features required by this program.)</font>",
-            &parent
+            header
         );
-        layout.addWidget(text);
         text->setWordWrap(true);
+        layout->addWidget(text);
         break;
     }
     }
+
+    return header;
 }
-void RunnableProgramUI::make_body(QWidget& parent, QVBoxLayout& layout){
-    QScrollArea* scroll = new QScrollArea(&parent);
-    layout.addWidget(scroll);
-    scroll->setWidgetResizable(true);
+QWidget* RunnableSwitchProgramWidget::make_options(QWidget& parent){
+    QWidget* options_widget = RunnablePanelWidget::make_options(parent);
 
-    QWidget* options_widget = new QWidget(scroll);
-    (new QVBoxLayout(scroll))->addWidget(options_widget);
-    scroll->setWidget(options_widget);
+    RunnableSwitchProgramInstance& instance = static_cast<RunnableSwitchProgramInstance&>(m_instance);
+    m_setup = instance.m_setup->make_ui(*options_widget, m_listener.output_window());
+    static_cast<QVBoxLayout*>(options_widget->layout())->insertWidget(0, m_setup);
 
-    QVBoxLayout* options_layout = new QVBoxLayout(options_widget);
-    options_layout->setAlignment(Qt::AlignTop);
-
-
-    RunnableProgram& factory = static_cast<RunnableProgram&>(m_factory);
-    m_setup = factory.m_setup->make_ui(*options_widget, m_window.output_window());
-    options_layout->addWidget(m_setup);
-    for (auto& item : factory.m_options){
-        m_options.emplace_back(item.first->make_ui(parent));
-        options_layout->addWidget(m_options.back()->widget());
-    }
-    RightPanelUI::connect(
-        m_setup, &SwitchSetup::on_state_changed,
-        this, &RunnableProgramUI::update_ui
-    );
-
-    m_status_bar = new QLabel(&parent);
-    m_status_bar->setVisible(false);
-    m_status_bar->setAlignment(Qt::AlignCenter);
-    layout.addWidget(m_status_bar);
-//    m_status_bar->setText("<b>Encounters: 1,267 - Corrections: 0 - Star Shinies: 1 - Square Shinies: 0</b>");
-    QFont font = m_status_bar->font();
-//    cout << font.pointSize() << endl;
-//    int font_size = font.pointSize();
-//    font.setPointSize(font_size + font_size / 2);
-    font.setPointSize(10);
-    m_status_bar->setFont(font);
-    update_historical_stats();
-
-    QGroupBox* actions_widget = new QGroupBox("Actions", &parent);
-    layout.addWidget(actions_widget);
-
-    QHBoxLayout* action_layout = new QHBoxLayout(actions_widget);
-    action_layout->setMargin(0);
-
-    {
-        m_start_button = new QPushButton("Start Program!", &parent);
-        action_layout->addWidget(m_start_button, 2);
-        QFont font = m_start_button->font();
-        font.setPointSize(16);
-        m_start_button->setFont(font);
-    }
-    {
-        m_default_button = new QPushButton("Restore Defaults", &parent);
-        action_layout->addWidget(m_default_button, 1);
-        QFont font = m_default_button->font();
-        font.setPointSize(16);
-        m_default_button->setFont(font);
-    }
-
-    update_ui();
+    return options_widget;
+}
+QWidget* RunnableSwitchProgramWidget::make_actions(QWidget& parent){
+    QWidget* actions_widget = RunnablePanelWidget::make_actions(parent);
     connect(
-        this, &RunnableProgramUI::signal_reset,
+        this, &RunnableSwitchProgramWidget::signal_reset,
         this, [=]{
-            reset_connections();
-            update_ui();
-        }
-    );
-    connect(
-        this, &RunnableProgramUI::signal_error,
-        this, [](QString message){
-            QMessageBox box;
-            box.critical(nullptr, "Error", message);
-        }
-    );
-    connect(
-        m_start_button, &QPushButton::clicked,
-        this, [=](bool){
-            switch (m_state.load(std::memory_order_acquire)){
-            case ProgramState::STOPPED:
-                if (!settings_valid()){
-                    QMessageBox box;
-                    box.critical(nullptr, "Error", "Settings are not valid.");
-                    return;
-                }
-                if (m_thread.joinable()){
-                    m_thread.join();
-                }
-//                m_window.open_output_window();
-                m_state.store(ProgramState::RUNNING, std::memory_order_release);
-                m_thread = std::thread(&RunnableProgramUI::run_program, this);
-                break;
-            case ProgramState::RUNNING:
-            case ProgramState::FINISHED:
-                m_state.store(ProgramState::STOPPING, std::memory_order_release);
-                on_stop();
-                break;
-            case ProgramState::STOPPING:
-                break;
+            if (m_setup){
+                m_setup->reset_serial();
             }
-            update_ui();
         }
     );
-    connect(
-        m_default_button, &QPushButton::clicked,
-        this, [=](bool){
-            restore_defaults();
-        }
-    );
-}
-RunnableProgramUI::~RunnableProgramUI(){
-    stop();
-}
-void RunnableProgramUI::stop(){
-    m_state.store(ProgramState::STOPPING, std::memory_order_release);
-    on_stop();
-    if (m_thread.joinable()){
-        m_thread.join();
-    }
+    return actions_widget;
 }
 
-bool RunnableProgramUI::settings_valid() const{
-    RunnableProgram& factory = static_cast<RunnableProgram&>(m_factory);
-    return factory.is_valid() && m_setup && m_setup->serial_ok();
+
+bool RunnableSwitchProgramWidget::settings_valid() const{
+    return RunnablePanelWidget::settings_valid() && m_setup && m_setup->serial_ok();
 }
-void RunnableProgramUI::restore_defaults(){
-    for (ConfigOptionUI* item : m_options){
-        item->restore_defaults();
-    }
-}
-ProgramState RunnableProgramUI::update_ui(){
+void RunnableSwitchProgramWidget::update_ui(){
+    RunnablePanelWidget::update_ui();
     ProgramState state = m_state.load(std::memory_order_acquire);
-    if (m_start_button == nullptr){
-        return state;
-    }
-    m_start_button->setEnabled(state != ProgramState::STOPPING);
-    switch (state){
-    case ProgramState::STOPPED:
-        m_start_button->setText("Start Program...");
-//        m_start_button->setEnabled(settings_valid());
-        m_window.left_panel_enabled(true);
-        break;
-    case ProgramState::RUNNING:
-        m_start_button->setText("Stop Program...");
-        m_window.left_panel_enabled(false);
-        break;
-    case ProgramState::FINISHED:
-        m_start_button->setText("Program Finished! Click to stop.");
-        m_window.left_panel_enabled(false);
-        break;
-    case ProgramState::STOPPING:
-        m_start_button->setText("Stopping Program...");
-        m_window.left_panel_enabled(false);
-        break;
-    }
-
     if (m_setup) m_setup->update_ui(state);
-
-    bool enabled = state == ProgramState::STOPPED;
-    m_default_button->setEnabled(enabled);
-    for (ConfigOptionUI* option : m_options){
-        option->widget()->setEnabled(enabled);
-    }
-
-    return state;
 }
-void RunnableProgramUI::on_stop(){
-    signal_cancel();
-    if (m_setup) m_setup->stop_serial();
-}
-void RunnableProgramUI::reset_connections(){
-    if (m_setup) m_setup->reset_serial();
-}
-void RunnableProgramUI::update_historical_stats(){
-    RunnableProgram& factory = static_cast<RunnableProgram&>(m_factory);
-    m_stats = factory.make_stats();
+void RunnableSwitchProgramWidget::update_historical_stats(){
+    RunnableSwitchProgramInstance& instance = static_cast<RunnableSwitchProgramInstance&>(m_instance);
+    m_stats = instance.make_stats();
     if (m_stats){
         StatSet stats;
         stats.open_from_file(PERSISTENT_SETTINGS().stats_file);
-        StatList& list = stats[m_name.toUtf8().data()];
+        const std::string& identifier = instance.descriptor().identifier();
+        StatList& list = stats[identifier];
         if (list.size() != 0){
             list.aggregate(*m_stats);
         }
@@ -336,47 +193,34 @@ void RunnableProgramUI::update_historical_stats(){
         m_status_bar->setVisible(true);
     }
 }
-void RunnableProgramUI::set_status(QString status){
-    if (status.size() <= 0){
-        m_status_bar->setVisible(false);
-        m_status_bar->setText(status);
-    }else{
-        m_status_bar->setText(status);
-        m_status_bar->setVisible(true);
+
+void RunnableSwitchProgramWidget::on_stop(){
+    RunnablePanelWidget::on_stop();
+    if (m_setup){
+        m_setup->stop_serial();
     }
 }
 
-void RunnableProgramUI::show_stats_warning() const{
-    QMessageBox box;
-    box.critical(
-        nullptr,
-        "Error",
-        "Unable to update stats file. You will need to do this manually."
-    );
-}
-
-void RunnableProgramUI::run_program(){
+void RunnableSwitchProgramWidget::run_program(){
     if (m_state.load(std::memory_order_acquire) != ProgramState::RUNNING){
         return;
     }
 
-    RunnableProgram& factory = static_cast<RunnableProgram&>(m_factory);
-    std::unique_ptr<StatsTracker> current_stats = factory.make_stats();
+    RunnableSwitchProgramInstance& instance = static_cast<RunnableSwitchProgramInstance&>(m_instance);
+    std::unique_ptr<StatsTracker> current_stats = instance.make_stats();
 
-    std::string program_name = m_name.toUtf8().data();
-
-    //  Update historical stats.
+//    std::string program_name = instance.descriptor().display_name().toUtf8().data();
     update_historical_stats();
 
     try{
-        m_logger.log("<b>Starting Program: " + m_name + "</b>");
-        program(current_stats.get(), m_stats.get());
+        m_logger.log("<b>Starting Program: " + instance.descriptor().identifier() + "</b>");
+        run_program(current_stats.get(), m_stats.get());
         m_setup->wait_for_all_requests();
         m_logger.log("Ending Program...");
-    }catch (PokemonAutomation::CancelledException&){
+    }catch (CancelledException&){
         m_logger.log("Stopping Program...");
-    }catch (const char* str){
-        signal_error(str);
+    }catch (StringException& e){
+        signal_error(e.message_qt());
     }
 
 
@@ -384,7 +228,7 @@ void RunnableProgramUI::run_program(){
     if (current_stats){
         bool ok = StatSet::update_file(
             PERSISTENT_SETTINGS().stats_file,
-            program_name,
+            instance.descriptor().identifier(),
             *current_stats
         );
         if (ok){
@@ -409,21 +253,14 @@ void RunnableProgramUI::run_program(){
 //    cout << "Now in STOPPED state." << endl;
 }
 
-BotBase& RunnableProgramUI::sanitize_botbase(BotBase* botbase){
+
+
+BotBase& RunnableSwitchProgramWidget::sanitize_botbase(BotBase* botbase){
     if (botbase != nullptr){
         return *botbase;
     }
-    throw StringException("Cannot Start: Serial connection not ready.");
+    PA_THROW_StringException("Cannot Start: Serial connection not ready.");
 }
-
-
-
-
-
-
-
-
-
 
 
 

@@ -91,9 +91,6 @@ extern uint16_t ENTER_PROFILE_DELAY;
 ////////////////////////////////////////////////////////////////////////////////
 //  Start Game Timings
 
-//  If starting the game requires checking the internet, wait this long for it.
-extern uint16_t START_GAME_INTERNET_CHECK_DELAY;
-
 //  Delays to start and enter the game when it isn't running.
 extern uint16_t START_GAME_MASH;  //  1. Mash A for this long to start the game.
 extern uint16_t START_GAME_WAIT;  //  2. Wait this long for the game to load.

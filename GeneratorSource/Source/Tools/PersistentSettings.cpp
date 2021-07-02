@@ -8,8 +8,8 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QDir>
+#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
-#include "Common/Qt/StringException.h"
 #include "Tools.h"
 #include "PersistentSettings.h"
 
@@ -20,7 +20,7 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-const QString VERSION = "v0.4.3";
+const QString VERSION = "v0.5.2";
 const QString DISCORD = "https://discord.gg/cQ4gWxN";
 const QString GITHUB_REPO = "https://github.com/PokemonAutomation/SwSh-Arduino";
 
@@ -54,7 +54,7 @@ void PersistentSettings::determine_paths(){
     }
 
     path = "";
-//    throw StringException("Unable to find working directory.");
+//    throw StringExceptionQt("Unable to find working directory.");
 }
 void PersistentSettings::load(){
     determine_paths();
@@ -63,15 +63,15 @@ void PersistentSettings::load(){
     try{
         QJsonDocument doc = read_json_file(path + SETTINGS_NAME);
         if (!doc.isObject()){
-            throw StringException("Invalid settings file.");
+            PA_THROW_ParseException("Invalid settings file.");
         }
 
         QJsonObject root = doc.object();
 
         json_get_int(board_index, root, "Board", 0, 3);
 
-    }catch (const StringException& str){
-        std::cout << ("Error Parsing " + SETTINGS_NAME + ": " + str.message()).toUtf8().data() << std::endl;
+    }catch (const StringException& e){
+        std::cout << std::string("Error Parsing ") + SETTINGS_NAME.toUtf8().data() + ": " + e.message() << std::endl;
     }
 }
 

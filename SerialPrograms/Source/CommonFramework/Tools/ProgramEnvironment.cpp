@@ -24,11 +24,14 @@ ProgramEnvironment::ProgramEnvironment(
 
 
 
-void ProgramEnvironment::update_stats(){
+void ProgramEnvironment::update_stats(const std::string& override_current){
     std::string current;
-    if (m_current_stats){
+    if (!override_current.empty()){
+        current = override_current;
+    }else if (m_current_stats){
         current = m_current_stats->to_str();
     }
+
     std::string historical;
     if (m_historical_stats){
         historical = m_historical_stats->to_str();

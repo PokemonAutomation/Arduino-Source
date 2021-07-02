@@ -17,11 +17,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class ShinyHuntUnattendedSwordsOfJustice : public SingleSwitchProgram{
-public:
-    ShinyHuntUnattendedSwordsOfJustice();
 
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+class ShinyHuntUnattendedSwordsOfJustice_Descriptor : public RunnableSwitchProgramDescriptor{
+public:
+    ShinyHuntUnattendedSwordsOfJustice_Descriptor();
+};
+
+
+
+class ShinyHuntUnattendedSwordsOfJustice : public SingleSwitchProgramInstance{
+public:
+    ShinyHuntUnattendedSwordsOfJustice(const ShinyHuntUnattendedSwordsOfJustice_Descriptor& descriptor);
+
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
     TimeExpression<uint16_t> EXIT_CAMP_TO_RUN_DELAY;

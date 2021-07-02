@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_MultiSwitchProgram_H
 #define PokemonAutomation_MultiSwitchProgram_H
 
-#include "Common/Clientside/FixedLimitVector.h"
+#include "Common/Cpp/FixedLimitVector.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "MultiSwitchSystem.h"
@@ -33,6 +33,7 @@ public:
     );
 
 private:
+    friend class MultiSwitchProgramWidget;
     friend class MultiSwitchProgramUI;
     MultiSwitchProgramEnvironment(
         Logger& logger,
@@ -43,52 +44,73 @@ private:
 };
 
 
-class MultiSwitchProgram : public RunnableProgram{
+
+class MultiSwitchProgramDescriptor : public RunnableSwitchProgramDescriptor{
 public:
-    MultiSwitchProgram(
-        FeedbackType feedback,
-        PABotBaseLevel min_pabotbase,
-        QString name,
+    MultiSwitchProgramDescriptor(
+        std::string identifier,
+        QString display_name,
         QString doc_link,
         QString description,
+        FeedbackType feedback,
+        PABotBaseLevel min_pabotbase_level,
         size_t min_switches,
         size_t max_switches,
-        size_t switches
+        size_t default_switches
     );
 
-    size_t count() const{ return m_switches.count(); }
-    virtual void program(MultiSwitchProgramEnvironment& env) const = 0;
+    size_t min_switches() const{ return m_min_switches; }
+    size_t max_switches() const{ return m_max_switches; }
+    size_t default_switches() const{ return m_default_switches; }
 
 private:
+    const size_t m_min_switches;
+    const size_t m_max_switches;
+    const size_t m_default_switches;
+};
+
+
+
+class MultiSwitchProgramInstance : public RunnableSwitchProgramInstance{
+public:
+    MultiSwitchProgramInstance(const MultiSwitchProgramDescriptor& descriptor);
+
+    size_t count() const{ return m_switches.count(); }
+
+    virtual QWidget* make_widget(QWidget& parent, PanelListener& listener) override;
+    virtual void program(MultiSwitchProgramEnvironment& env) = 0;
+
+private:
+    friend class MultiSwitchProgramWidget;
+
     MultiSwitchSystemFactory m_switches;
 };
 
 
-class MultiSwitchProgramUI final : public RunnableProgramUI{
-public:
-    MultiSwitchProgramUI(MultiSwitchProgram& factory, MainWindow& window);
-    ~MultiSwitchProgramUI();
 
-    virtual void program(
+class MultiSwitchProgramWidget : public RunnableSwitchProgramWidget{
+public:
+    static MultiSwitchProgramWidget* make(
+        QWidget& parent,
+        MultiSwitchProgramInstance& instance,
+        PanelListener& listener
+    );
+
+private:
+    using RunnableSwitchProgramWidget::RunnableSwitchProgramWidget;
+    virtual ~MultiSwitchProgramWidget();
+
+private:
+    virtual void run_program(
         StatsTracker* current_stats,
         const StatsTracker* historical_stats
     ) override;
+
+private:
+    friend class MultiSwitchProgramInstance;
 };
 
 
-template <typename Program>
-class MultiSwitchProgramWrapper final : public Program{
-public:
-    MultiSwitchProgramWrapper() = default;
-    MultiSwitchProgramWrapper(const QJsonValue& json)
-        : Program()
-    {
-        this->from_json(json);
-    }
-    virtual QWidget* make_ui(MainWindow& window) override{
-        return new MultiSwitchProgramUI(*this, window);
-    }
-};
 
 
 

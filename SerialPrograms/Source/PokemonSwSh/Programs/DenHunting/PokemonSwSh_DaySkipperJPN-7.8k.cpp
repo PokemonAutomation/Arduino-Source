@@ -4,23 +4,33 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShDaySkippers.h"
 #include "NintendoSwitch/FixedInterval.h"
+#include "PokemonSwSh_DaySkipperStats.h"
 #include "PokemonSwSh_DaySkipperJPN-7.8k.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-DaySkipperJPN7p8k::DaySkipperJPN7p8k()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_31KB,
+
+DaySkipperJPN7p8k_Descriptor::DaySkipperJPN7p8k_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:DaySkipperJPN7p8k",
         "Day Skipper (JPN) - 7.8k",
         "NativePrograms/DaySkipperJPN-7.8k.md",
-        "A faster, but less reliable Japanese date skipper. (7800 skips/hour)"
+        "A faster, but less reliable Japanese date skipper. (7800 skips/hour)",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_31KB
     )
+{}
+
+
+
+DaySkipperJPN7p8k::DaySkipperJPN7p8k(const DaySkipperJPN7p8k_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , SKIPS(
         "<b>Number of Frame Skips:</b>",
         10
@@ -41,6 +51,10 @@ DaySkipperJPN7p8k::DaySkipperJPN7p8k()
     m_options.emplace_back(&START_DATE, "START_DATE");
     m_options.emplace_back(&m_advanced_options, "");
     m_options.emplace_back(&CORRECTION_SKIPS, "CORRECTION_SKIPS");
+}
+
+std::unique_ptr<StatsTracker> DaySkipperJPN7p8k::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new SkipperStats());
 }
 
 const uint8_t DAYS_PER_MONTH[] = {
@@ -109,7 +123,10 @@ bool date_increment_day(const BotBaseContext& context, DateSmall* date, bool pre
     return false;
 }
 
-void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env) const{
+void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env){
+    SkipperStats& stats = env.stats<SkipperStats>();
+    stats.runs++;
+
     //  Setup globals.
     uint32_t remaining_skips = SKIPS;
 
@@ -139,15 +156,18 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env) const{
     uint16_t correct_count = 0;
     while (remaining_skips > 0){
         if (date_increment_day(env.console, &date, true)){
-            remaining_skips--;
             correct_count++;
+            remaining_skips--;
+            stats.issued++;
             env.log("Expected Date: " + QDate(date.year + 2000, date.month, date.day).toString("yyyy/MM/dd"));
-            env.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
+//            env.log("Skips Remaining: " + tostr_u_commas(remaining_skips));
+            env.update_stats(stats.to_str_current(remaining_skips));
         }
         if (CORRECTION_SKIPS != 0 && correct_count == CORRECTION_SKIPS){
             correct_count = 0;
             skipper_auto_recovery(env.console);
         }
+
     }
 
     //  Prevent the Switch from sleeping and the time from advancing.

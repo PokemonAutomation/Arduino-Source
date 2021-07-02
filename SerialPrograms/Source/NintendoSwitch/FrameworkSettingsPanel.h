@@ -13,11 +13,18 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class FrameworkSettings : public SettingsPanel{
+class FrameworkSettings_Descriptor : public PanelDescriptor{
 public:
-    FrameworkSettings();
-    FrameworkSettings(const QJsonValue& json);
+    FrameworkSettings_Descriptor();
 };
+
+
+
+class FrameworkSettings : public SettingsPanelInstance{
+public:
+    FrameworkSettings(const FrameworkSettings_Descriptor& descriptor);
+};
+
 
 
 }

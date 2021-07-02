@@ -11,7 +11,7 @@
 #include <cmath>
 #include <algorithm>
 #include <string>
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 
 namespace PokemonAutomation{
 

@@ -44,7 +44,11 @@ void settings_to_enter_game(bool fast);
 //  From anywhere in the Switch settings except the home menu, return to the game.
 //  Return to the game where you are inside an open den lobby with the cursor over
 //  "Switch Pokemon".
-void settings_to_enter_game_den_lobby(bool tolerate_update_menu, bool fast);
+void settings_to_enter_game_den_lobby(
+    bool tolerate_update_menu, bool fast,
+    uint16_t enter_switch_pokemon_delay,
+    uint16_t exit_switch_pokemon_delay
+);
 
 //  Enter the game when you're sitting in the game intro.
 void enter_game(bool backup_save, uint16_t enter_game_mash, uint16_t enter_game_wait);
@@ -89,7 +93,12 @@ namespace PokemonAutomation{
     void resume_game_back_out               (const BotBaseContext& device, bool tolerate_update_menu, uint16_t mash_B_time);
     void resume_game_front_of_den_nowatts   (const BotBaseContext& device, bool tolerate_update_menu);
     void settings_to_enter_game             (const BotBaseContext& device, bool fast);
-    void settings_to_enter_game_den_lobby   (const BotBaseContext& device, bool tolerate_update_menu, bool fast);
+    void settings_to_enter_game_den_lobby   (
+        const BotBaseContext& device,
+        bool tolerate_update_menu, bool fast,
+        uint16_t enter_switch_pokemon_delay,
+        uint16_t exit_switch_pokemon_delay
+    );
     void enter_game                         (const BotBaseContext& device, bool backup_save, uint16_t enter_game_mash, uint16_t enter_game_wait);
     void close_game                         (const BotBaseContext& device);
     void start_game_from_home               (const BotBaseContext& device, bool tolerate_update_menu, uint8_t game_slot, uint8_t user_slot, bool backup_save);
@@ -119,6 +128,8 @@ typedef struct{
     seqnum_t seqnum;
     bool tolerate_update_menu;
     bool fast;
+    uint16_t enter_switch_pokemon_delay;
+    uint16_t exit_switch_pokemon_delay;
 } PABB_PACK pabb_settings_to_enter_game_den_lobby;
 
 #define PABB_MSG_COMMAND_ENTER_GAME                             0xb1

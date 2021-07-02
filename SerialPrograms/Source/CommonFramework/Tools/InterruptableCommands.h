@@ -8,8 +8,8 @@
 #define PokemonAutomation_InterruptableCommands_H
 
 #include <thread>
-#include "Common/Clientside/SpinLock.h"
-#include "Common/Clientside/AsyncDispatcher.h"
+#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/AsyncDispatcher.h"
 #include "ClientSource/Connection/BotBase.h"
 
 

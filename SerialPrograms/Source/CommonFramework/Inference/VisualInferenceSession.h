@@ -8,7 +8,7 @@
 #define PokemonAutomation_CommonFramework_VisualInferenceSession_H
 
 #include <set>
-#include "Common/Clientside/AsyncDispatcher.h"
+#include "Common/Cpp/AsyncDispatcher.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "VisualInferenceCallback.h"

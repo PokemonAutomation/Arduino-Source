@@ -1,4 +1,4 @@
-/*  MCU List
+/*  Board List
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

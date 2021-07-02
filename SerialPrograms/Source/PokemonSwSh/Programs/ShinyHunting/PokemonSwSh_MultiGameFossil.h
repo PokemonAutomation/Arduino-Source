@@ -15,11 +15,18 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class MultiGameFossil : public SingleSwitchProgram{
+class MultiGameFossil_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
-    MultiGameFossil();
+    MultiGameFossil_Descriptor();
+};
 
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+
+
+class MultiGameFossil : public SingleSwitchProgramInstance{
+public:
+    MultiGameFossil(const MultiGameFossil_Descriptor& descriptor);
+
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
     FossilTable GAME_LIST;

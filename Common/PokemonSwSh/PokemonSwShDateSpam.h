@@ -32,8 +32,6 @@ void home_to_date_time(bool to_date_change, bool fast);
 //  press HOME immediately after this function returns.
 //
 //  This function is slower than the other methods of date-spam.
-//
-//  Requires: PABB_PABOTBASE_LEVEL >= 31
 void neutral_date_skip(void);
 
 //  Call this immediately after calling "home_to_date_time()".
@@ -117,37 +115,37 @@ typedef struct{
     bool fast;
 } PABB_PACK pabb_home_to_date_time;
 
-#define PABB_MSG_COMMAND_NEUTRAL_DATE_SKIP                      0xcb
+#define PABB_MSG_COMMAND_NEUTRAL_DATE_SKIP                      0xb5
 typedef struct{
     seqnum_t seqnum;
 } PABB_PACK pabb_neutral_date_skip;
 
-#define PABB_MSG_COMMAND_ROLL_DATE_FORWARD_1                    0xb5
+#define PABB_MSG_COMMAND_ROLL_DATE_FORWARD_1                    0xb6
 typedef struct{
     seqnum_t seqnum;
     bool fast;
 } PABB_PACK pabb_roll_date_forward_1;
 
-#define PABB_MSG_COMMAND_ROLL_DATE_BACKWARD_N                   0xb6
+#define PABB_MSG_COMMAND_ROLL_DATE_BACKWARD_N                   0xb7
 typedef struct{
     seqnum_t seqnum;
     uint8_t skips;
     bool fast;
 } PABB_PACK pabb_roll_date_backward_N;
 
-#define PABB_MSG_COMMAND_HOME_ROLL_DATE_ENTER_GAME              0xb7
+#define PABB_MSG_COMMAND_HOME_ROLL_DATE_ENTER_GAME              0xb8
 typedef struct{
     seqnum_t seqnum;
     bool rollback_year;
 } PABB_PACK pabb_home_roll_date_enter_game;
 
-#define PABB_MSG_COMMAND_TOUCH_DATE_FROM_HOME                   0xb8
+#define PABB_MSG_COMMAND_TOUCH_DATE_FROM_HOME                   0xb9
 typedef struct{
     seqnum_t seqnum;
     uint16_t settings_to_home_delay;
 } PABB_PACK pabb_touch_date_from_home;
 
-#define PABB_MSG_COMMAND_ROLLBACK_HOURS_FROM_HOME               0xb9
+#define PABB_MSG_COMMAND_ROLLBACK_HOURS_FROM_HOME               0xba
 typedef struct{
     seqnum_t seqnum;
     uint8_t hours;

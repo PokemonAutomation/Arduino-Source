@@ -7,6 +7,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QCompleter>
+#include "Common/Qt/NoWheelComboBox.h"
 #include "StringSelect.h"
 
 #include <iostream>
@@ -75,8 +76,7 @@ StringSelectUI::StringSelectUI(QWidget& parent, StringSelect& value)
     QLabel* text = new QLabel(m_value.m_label, this);
     layout->addWidget(text, 1);
     text->setWordWrap(true);
-    m_box = new QComboBox(&parent);
-    layout->addWidget(m_box);
+    m_box = new NoWheelComboBox(&parent);
 
     m_box->setEditable(true);
     m_box->setInsertPolicy(QComboBox::NoInsert);

@@ -14,11 +14,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class ClothingBuyer : public SingleSwitchProgram{
-public:
-    ClothingBuyer();
 
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+class ClothingBuyer_Descriptor : public RunnableSwitchProgramDescriptor{
+public:
+    ClothingBuyer_Descriptor();
+};
+
+
+
+class ClothingBuyer : public SingleSwitchProgramInstance{
+public:
+    ClothingBuyer(const ClothingBuyer_Descriptor& descriptor);
+
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
     BooleanCheckBox CATEGORY_ROTATION;

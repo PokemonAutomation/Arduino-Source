@@ -14,11 +14,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class DailyHighlightFarmer : public SingleSwitchProgram{
-public:
-    DailyHighlightFarmer();
 
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+class DailyHighlightFarmer_Descriptor : public RunnableSwitchProgramDescriptor{
+public:
+    DailyHighlightFarmer_Descriptor();
+};
+
+
+
+class DailyHighlightFarmer : public SingleSwitchProgramInstance{
+public:
+    DailyHighlightFarmer(const DailyHighlightFarmer_Descriptor& descriptor);
+
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
     SimpleInteger<uint32_t> SKIPS;

@@ -6,6 +6,8 @@
 
 #include <sstream>
 #include "Common/SwitchFramework/Switch_PushButtons.h"
+#include "Common/PokemonSwSh/PokemonSettings.h"
+#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "PokemonSwShAutoHosts.h"
@@ -78,36 +80,32 @@ void home_to_add_friends(
     params.fix_cursor = fix_cursor;
     context->issue_request<PABB_MSG_COMMAND_HOME_TO_ADD_FRIENDS>(&context.cancelled_bool(), params);
 }
-uint16_t accept_FRs(
+void accept_FRs(
     const BotBaseContext& context,
     uint8_t slot, bool fix_cursor,
     uint16_t game_to_home_delay_safe,
     uint16_t auto_fr_duration,
     bool tolerate_system_update_window_slow
 ){
-    pabb_accept_FRs params;
-    params.slot = slot;
-    params.fix_cursor = fix_cursor;
-    params.game_to_home_delay_safe = game_to_home_delay_safe;
-    params.auto_fr_duration = auto_fr_duration;
-    params.tolerate_system_update_window_slow = tolerate_system_update_window_slow;
-    context->issue_request<PABB_MSG_COMMAND_ACCEPT_FRS>(&context.cancelled_bool(), params);
-    return 0;
-}
-void accept_FRs_while_waiting(
-    const BotBaseContext& context,
-    uint8_t slot, uint16_t wait_time,
-    uint16_t game_to_home_delay_safe,
-    uint16_t auto_fr_duration,
-    bool tolerate_system_update_window_slow
-){
-    pabb_accept_FRs_while_waiting params;
-    params.slot = slot;
-    params.wait_time = wait_time;
-    params.game_to_home_delay_safe = game_to_home_delay_safe;
-    params.auto_fr_duration = auto_fr_duration;
-    params.tolerate_system_update_window_slow = tolerate_system_update_window_slow;
-    context->issue_request<PABB_MSG_COMMAND_ACCEPT_FRS_WHILE_WAITING>(&context.cancelled_bool(), params);
+    if (slot > 7){
+        slot = 7;
+    }
+
+    //  Go to Switch Home menu.
+    pbf_press_button(context, BUTTON_HOME, 10, game_to_home_delay_safe);
+
+    home_to_add_friends(context, slot, 0, fix_cursor);
+
+    //  Mash A.
+    pbf_mash_button(context, BUTTON_A, auto_fr_duration);
+
+    //  Return to Switch Home menu. (or game)
+    settings_to_enter_game_den_lobby(
+        context,
+        tolerate_system_update_window_slow, false,
+        ENTER_SWITCH_POKEMON, EXIT_SWITCH_POKEMON
+    );
+    pbf_wait(context, 300);
 }
 
 
@@ -136,38 +134,6 @@ int register_message_converters_pokemon_autohosting(){
             ss << "seqnum = " << (uint64_t)params->seqnum;
             ss << ", user_slot = " << (unsigned)params->user_slot;
             ss << ", fix_cursor = " << params->fix_cursor;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_ACCEPT_FRS,
-        [](const std::string& body){
-            std::stringstream ss;
-            ss << "accept_FRs() - ";
-            if (body.size() != sizeof(pabb_accept_FRs)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_accept_FRs*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", slot = " << (unsigned)params->slot;
-            ss << ", fix_cursor = " << params->fix_cursor;
-            ss << ", game_to_home_delay_safe = " << params->game_to_home_delay_safe;
-            ss << ", auto_fr_duration = " << params->auto_fr_duration;
-            ss << ", tolerate_system_update_window_slow = " << params->tolerate_system_update_window_slow;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_ACCEPT_FRS_WHILE_WAITING,
-        [](const std::string& body){
-            std::stringstream ss;
-            ss << "accept_FRs_while_waiting() - ";
-            if (body.size() != sizeof(pabb_accept_FRs_while_waiting)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_accept_FRs_while_waiting*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", slot = " << (unsigned)params->slot;
-            ss << ", wait_time = " << params->wait_time;
-            ss << ", game_to_home_delay_safe = " << params->game_to_home_delay_safe;
-            ss << ", auto_fr_duration = " << params->auto_fr_duration;
-            ss << ", tolerate_system_update_window_slow = " << params->tolerate_system_update_window_slow;
             return ss.str();
         }
     );

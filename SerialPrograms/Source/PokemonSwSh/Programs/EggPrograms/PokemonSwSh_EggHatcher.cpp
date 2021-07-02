@@ -15,6 +15,20 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
+
+EggHatcher_Descriptor::EggHatcher_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:EggHatcher",
+        "Egg Hatcher",
+        "NativePrograms/EggHatcher.md",
+        "Fetch eggs without hatching them.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_31KB
+    )
+{}
+
+
+
 void withdraw_column(const BotBaseContext& context, uint8_t column){
     menu_to_box(context, false);
     party_to_column(context, column);
@@ -62,13 +76,8 @@ uint8_t swap_party(const BotBaseContext& context, uint8_t column){
 }
 
 
-EggHatcher::EggHatcher()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_31KB,
-        "Egg Hatcher",
-        "NativePrograms/EggHatcher.md",
-        "Fetch eggs without hatching them."
-    )
+EggHatcher::EggHatcher(const EggHatcher_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , BOXES_TO_HATCH(
         "<b>Boxes to Hatch:</b>",
         3
@@ -91,7 +100,7 @@ EggHatcher::EggHatcher()
     m_options.emplace_back(&SAFETY_TIME, "SAFETY_TIME");
     m_options.emplace_back(&HATCH_DELAY, "HATCH_DELAY");
 }
-void EggHatcher::program(SingleSwitchProgramEnvironment& env) const{
+void EggHatcher::program(SingleSwitchProgramEnvironment& env){
     //  Calculate upper bounds for incubation time.
     uint16_t INCUBATION_DELAY_UPPER = (uint16_t)((uint32_t)STEPS_TO_HATCH * (uint32_t)103180 >> 16);
 

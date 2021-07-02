@@ -12,7 +12,7 @@
 #include <mutex>
 #include <condition_variable>
 #include <QObject>
-#include "Common/Clientside/AsyncDispatcher.h"
+#include "Common/Cpp/AsyncDispatcher.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "Logger.h"
 #include "StatsTracking.h"
@@ -40,7 +40,7 @@ public:
 
     AsyncDispatcher& dispatcher(){ return m_dispatcher; }
 
-    void update_stats();
+    void update_stats(const std::string& override_current = "");
 
     template <typename StatsType>
     StatsType& stats();

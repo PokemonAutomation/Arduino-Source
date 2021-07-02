@@ -114,6 +114,10 @@ void start_game_from_home_with_inference(
     bool backup_save,
     uint16_t post_wait_time
 ){
+//    cout << "tolerate_update_menu = " << tolerate_update_menu << endl;
+//    cout << "TOLERATE_SYSTEM_UPDATE_MENU_FAST = " << TOLERATE_SYSTEM_UPDATE_MENU_FAST << endl;
+//    cout << "TOLERATE_SYSTEM_UPDATE_MENU_FAST = " << &TOLERATE_SYSTEM_UPDATE_MENU_FAST << endl;
+
     if (game_slot != 0){
         pbf_press_button(console, BUTTON_HOME, 10, SETTINGS_TO_HOME_DELAY - 10);
         for (uint8_t c = 1; c < game_slot; c++){
@@ -128,6 +132,7 @@ void start_game_from_home_with_inference(
         pbf_press_dpad(console, DPAD_UP, 5, 0);          //  Skip the update window.
     }
 
+//    cout << "START_GAME_REQUIRES_INTERNET = " << START_GAME_REQUIRES_INTERNET << endl;
     if (!START_GAME_REQUIRES_INTERNET && user_slot == 0){
         //  Mash your way into the game.
         pbf_mash_button(console, BUTTON_A, START_GAME_MASH);

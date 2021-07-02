@@ -9,24 +9,19 @@
 
 #include <QMainWindow>
 #include <QVBoxLayout>
+#include "CommonFramework/Panels/Panel.h"
+#include "PanelLists.h"
 #include "OutputWindow.h"
 
 namespace PokemonAutomation{
 
 
-class RightPanel;
-class ProgramListUI;
-class SettingListUI;
-
-class MainWindow : public QMainWindow{
+class MainWindow : public QMainWindow, public PanelListener{
 public:
     MainWindow(QWidget* parent = nullptr);
     ~MainWindow();
 
-    OutputWindow& output_window() const{ return *m_output_window; }
-
-    void left_panel_enabled(bool enabled);
-    void change_panel(RightPanel& factory);
+//    OutputWindow& output_window() const{ return *m_output_window; }
 
     void open_output_window();
 
@@ -34,16 +29,27 @@ private:
     virtual void closeEvent(QCloseEvent* event) override;
     virtual void resizeEvent(QResizeEvent* event) override;
 
+    void close_panel();
+
+    virtual void on_panel_construct(std::unique_ptr<PanelInstance> panel) override;
+public: //  Make private.
+    virtual OutputWindow& output_window() override{ return *m_output_window; }
+private:
+    virtual void on_busy(PanelInstance& panel) override;
+    virtual void on_idle(PanelInstance& panel) override;
+
 private:
     QWidget* centralwidget;
     QMenuBar* menubar;
 //    QStatusBar* statusbar;
 
-    ProgramListUI* m_program_list;
-    SettingListUI* m_setting_list;
-
+    ProgramTabs* m_program_list = nullptr;
     QVBoxLayout* m_right_panel_layout;
-    QWidget* m_right_panel_widget;
+
+    QWidget* m_settings;
+
+    std::unique_ptr<PanelInstance> m_current_panel;
+    QWidget* m_current_panel_widget;
 
     std::unique_ptr<OutputWindow> m_output_window;
 };

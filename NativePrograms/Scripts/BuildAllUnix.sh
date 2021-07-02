@@ -7,61 +7,14 @@ board=$1
 
 declare -a PROGRAMS=()
 
-# standard program list
-PROGRAMS+=("TurboA")
-PROGRAMS+=("MultiGameFossil")
-PROGRAMS+=("MassRelease")
-PROGRAMS+=("SurpriseTrade")
-PROGRAMS+=("TradeBot")
-PROGRAMS+=("ClothingBuyer")
-PROGRAMS+=("BallThrower")
+#PROGRAMS+=("FriendDelete")
+#mapfile -t PROGRAMS < ProgramList.txt
+while IFS="$IFS"$'\r' read -r line; do
+    if [ -n "$line" ]; then
+        PROGRAMS+=("$line")
+    fi
+done < ProgramList.txt
 
-# farming programs
-PROGRAMS+=("DateSpam-WattFarmer")
-PROGRAMS+=("DateSpam-BerryFarmer")
-PROGRAMS+=("DateSpam-LotoFarmer")
-PROGRAMS+=("DateSpam-StowOnSideFarmer")
-PROGRAMS+=("DateSpam-DailyHighlightFarmer")
-
-# soft reset programs
-PROGRAMS+=("ShinyHunt-Regi")
-PROGRAMS+=("ShinyHunt-SwordsOfJustice")
-PROGRAMS+=("ShinyHuntUnattended-Regi")
-PROGRAMS+=("ShinyHuntUnattended-SwordsOfJustice")
-PROGRAMS+=("ShinyHuntUnattended-StrongSpawn")
-PROGRAMS+=("ShinyHuntUnattended-Regigigas")
-PROGRAMS+=("ShinyHuntUnattended-Regigigas2")
-PROGRAMS+=("ShinyHuntUnattended-IoATrade")
-
-# beam reset and day skipper programs
-PROGRAMS+=("BeamReset")
-PROGRAMS+=("EventBeamFinder")
-PROGRAMS+=("DaySkipperJPN")
-PROGRAMS+=("DaySkipperEU")
-PROGRAMS+=("DaySkipperUS")
-PROGRAMS+=("DaySkipperJPN-7.8k")
-
-# rolling and autohost programs
-PROGRAMS+=("DenRoller")
-PROGRAMS+=("AutoHost-Rolling")
-PROGRAMS+=("AutoHost-MultiGame")
-PROGRAMS+=("FriendDelete")
-
-# egg programs
-PROGRAMS+=("EggFetcher2")
-PROGRAMS+=("EggHatcher")
-PROGRAMS+=("EggCombined2")
-PROGRAMS+=("EggSuperCombined2")
-
-# forbidden programs
-PROGRAMS+=("FastCodeEntry")
-PROGRAMS+=("GodEggItemDupe")
-PROGRAMS+=("GodEggDuplication")
-
-# other
-PROGRAMS+=("PABotBase")
-PROGRAMS+=("Sandbox")
-PROGRAMS+=("CustomProgram")
 
 echo "Now Checking the make command..."
 echo ""
@@ -77,11 +30,11 @@ echo ""
 
 # check the obj directory and make it if it doesn't exist
 if [ ! -d obj/ ]; then
-  mkdir obj/
+    mkdir obj/
 fi
 
 if [ ! -d log/ ]; then
-  mkdir log/
+    mkdir log/
 fi
 
 # build one of them first to establish the library
@@ -89,8 +42,8 @@ for p in "${PROGRAMS[@]}"; do
     first="$p"
     echo "$first"
 
-    echo "sh Scripts/BuildOneUnix.sh $board $p"
-    sh Scripts/BuildOneUnix.sh $board $p
+    echo "sh ../Scripts/BuildOneUnix.sh $board $p"
+    sh ../Scripts/BuildOneUnix.sh $board $p
 
     retVal=$?
     if [ $retVal -ne 0 ]; then
@@ -100,7 +53,7 @@ for p in "${PROGRAMS[@]}"; do
         rm obj/*.d obj/*.o
         echo "WARNING: Attempting build again..." 1>&2
 
-        sh Scripts/BuildOneUnix.sh $board $p
+        sh ../Scripts/BuildOneUnix.sh $board $p
         retVal=$?
 
         # one last check, if it errors again, we'll exit
@@ -120,7 +73,7 @@ done
 for p in "${PROGRAMS[@]}"; do
     if [ "$p" != "$first" ]; then
         # send it off and pipe it to a log file
-        sh Scripts/BuildOneUnix.sh $board $p 2>&1 | tee "log/$p.log" &
+        sh ../Scripts/BuildOneUnix.sh $board $p 2>&1 | tee "log/$p.log" &
     fi
 done
 

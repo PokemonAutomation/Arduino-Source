@@ -8,7 +8,7 @@
 #include <map>
 #include <sstream>
 #include "Common/MessageProtocol.h"
-#include "ClientSource/Libraries/Compiler.h"
+#include "Common/Cpp/Exception.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonProgramIDs.h"
 #include "MessageConverter.h"
@@ -24,7 +24,7 @@ void register_message_converter(uint8_t type, MessageConverter converter){
     std::map<uint8_t, MessageConverter>& converters = converter_map();
     auto iter = converters.find(type);
     if (iter != converters.end()){
-        throw "Duplicate message type.";
+        PA_THROW_StringException("Duplicate message type.");
     }
     converters[type] = converter;
 }

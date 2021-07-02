@@ -7,6 +7,7 @@
 #include <iostream>
 #include "Common/CRC32.h"
 #include "Common/MessageProtocol.h"
+#include "Common/Cpp/Exception.h"
 #include "ClientSource/Libraries/Logging.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "PABotBaseConnection.h"
@@ -53,7 +54,7 @@ void PABotBaseConnection::send_message(const BotBaseMessage& message, bool is_re
 
     size_t total_bytes = PABB_PROTOCOL_OVERHEAD + message.body.size();
     if (total_bytes > PABB_MAX_PACKET_SIZE){
-        throw "Message is too long.";
+        PA_THROW_StringException("Message is too long.");
     }
 
     std::string buffer;

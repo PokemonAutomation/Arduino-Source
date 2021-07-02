@@ -11,7 +11,7 @@
 #include <map>
 #include <thread>
 #include <Qt>
-#include "Common/Clientside/SpinLock.h"
+#include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/BotBaseHandle.h"
 #include "CommonFramework/Tools/Logger.h"

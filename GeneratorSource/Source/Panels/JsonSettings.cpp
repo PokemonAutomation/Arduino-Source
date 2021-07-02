@@ -7,7 +7,7 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QLabel>
-#include "Common/Qt/StringException.h"
+#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Tools/Tools.h"
 #include "JsonSettings.h"
@@ -15,15 +15,15 @@
 namespace PokemonAutomation{
 
 
-Settings_JsonFile::Settings_JsonFile(const QString& filepath)
-    : Settings_JsonFile(read_json_file(filepath).object())
+Settings_JsonFile::Settings_JsonFile(QString category, const QString& filepath)
+    : Settings_JsonFile(std::move(category), read_json_file(filepath).object())
 {}
-Settings_JsonFile::Settings_JsonFile(const QJsonObject& obj)
-    : ConfigSet(obj)
+Settings_JsonFile::Settings_JsonFile(QString category, const QJsonObject& obj)
+    : ConfigSet(std::move(category), obj)
 {
     for (const auto item : json_get_array_throw(obj, JSON_OPTIONS)){
         if (!item.isObject()){
-            throw StringException("Config Error - Expected and object.");
+            PA_THROW_ParseException("Config Error - Expected and object.");
         }
         m_options.emplace_back(parse_option(item.toObject()));
     }

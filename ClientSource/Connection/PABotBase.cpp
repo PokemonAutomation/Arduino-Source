@@ -8,6 +8,8 @@
 #include <iostream>
 #include <emmintrin.h>
 #include "Common/MessageProtocol.h"
+#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/PanicDump.h"
 #include "PABotBase.h"
 
 namespace PokemonAutomation{
@@ -24,7 +26,7 @@ PABotBase::PABotBase(
     , m_retransmit_delay(retransmit_delay)
     , m_last_ack(std::chrono::system_clock::now())
     , m_state(State::RUNNING)
-    , m_retransmit_thread(&PABotBase::retransmit_thread, this)
+    , m_retransmit_thread(run_with_catch, "PABotBase::retransmit_thread()", [=]{ retransmit_thread(); })
 {
     set_sniffer(logger);
 }
@@ -399,7 +401,7 @@ bool PABotBase::try_issue_request(
     bool silent_remove, size_t queue_limit
 ){
     if (send_bytes > PABB_MAX_MESSAGE_SIZE){
-        throw "Message is too long.";
+        PA_THROW_StringException("Message is too long.");
     }
 
     SpinLockGuard lg(m_state_lock, "PABotBase::try_issue_request()");
@@ -427,7 +429,7 @@ bool PABotBase::try_issue_request(
         std::forward_as_tuple()
     );
     if (!ret.second){
-        throw "Duplicate sequence number: " + std::to_string(seqnum);
+        PA_THROW_StringException("Duplicate sequence number: " + std::to_string(seqnum));
     }
 
     m_send_seq = seqnum + 1;
@@ -451,7 +453,7 @@ bool PABotBase::try_issue_command(
     bool silent_remove, size_t queue_limit
 ){
     if (send_bytes > PABB_MAX_MESSAGE_SIZE){
-        throw "Message is too long.";
+        PA_THROW_StringException("Message is too long.");
     }
 
     SpinLockGuard lg(m_state_lock, "PABotBase::try_issue_command()");
@@ -485,7 +487,7 @@ bool PABotBase::try_issue_command(
         std::forward_as_tuple()
     );
     if (!ret.second){
-        throw "Duplicate sequence number: " + std::to_string(seqnum);
+        PA_THROW_StringException("Duplicate sequence number: " + std::to_string(seqnum));
     }
 
     m_send_seq = seqnum + 1;
@@ -620,7 +622,7 @@ void PABotBase::issue_request_and_wait(
     uint8_t recv_type, char* recv_params, size_t recv_bytes
 ){
     if (!PABB_MSG_IS_REQUEST(send_type)){
-        throw "This function only supports requests.";
+        PA_THROW_StringException("This function only supports requests.");
     }
 
     std::map<uint64_t, PendingRequest>::iterator iter;
@@ -650,13 +652,13 @@ void PABotBase::issue_request_and_wait(
     if (type != recv_type){
         SpinLockGuard slg(m_state_lock, "PABotBase::issue_request_and_wait() - 1");
         remove_request(iter);
-        throw "Received incorrect response type: " + std::to_string(type);
+        PA_THROW_StringException("Received incorrect response type: " + std::to_string(type));
     }
     const std::string& body = iter->second.ack.body;
     if (body.size() != recv_bytes){
         SpinLockGuard slg(m_state_lock, "PABotBase::issue_request_and_wait() - 2");
         remove_request(iter);
-        throw "Received incorrect response size: " + std::to_string(body.size());
+        PA_THROW_StringException("Received incorrect response size: " + std::to_string(body.size()));
     }
     memcpy(recv_params, body.c_str(), body.size());
 

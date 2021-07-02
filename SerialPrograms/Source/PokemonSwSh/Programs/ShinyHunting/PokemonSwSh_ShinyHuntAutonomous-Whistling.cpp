@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/FrameworkSettings.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
@@ -24,16 +24,28 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-ShinyHuntAutonomousWhistling::ShinyHuntAutonomousWhistling()
-    : SingleSwitchProgram(
-        FeedbackType::REQUIRED, PABotBaseLevel::PABOTBASE_12KB,
+ShinyHuntAutonomousWhistling_Descriptor::ShinyHuntAutonomousWhistling_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:ShinyHuntAutonomousWhistling",
         "Shiny Hunt Autonomous - Whistling",
         "SerialPrograms/ShinyHuntAutonomous-Whistling.md",
-        "Stand in one place and whistle. Shiny hunt everything that attacks you using video feedback."
+        "Stand in one place and whistle. Shiny hunt everything that attacks you using video feedback.",
+        FeedbackType::REQUIRED,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+ShinyHuntAutonomousWhistling::ShinyHuntAutonomousWhistling(const ShinyHuntAutonomousWhistling_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(
         "<b>Go Home when Done:</b><br>After finding a shiny, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
         false
+    )
+    , LANGUAGE(
+        "<b>Game Language:</b><br>Attempt to read and log the encountered " + STRING_POKEMON + " in this language.<br>Set to \"None\" to disable this feature.",
+        m_name_reader.languages(), false
     )
     , TIME_ROLLBACK_HOURS(
         "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
@@ -56,6 +68,7 @@ ShinyHuntAutonomousWhistling::ShinyHuntAutonomousWhistling()
     )
 {
     m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
+    m_options.emplace_back(&LANGUAGE, "LANGUAGE");
     m_options.emplace_back(&TIME_ROLLBACK_HOURS, "TIME_ROLLBACK_HOURS");
     m_options.emplace_back(&m_advanced_options, "");
     m_options.emplace_back(&EXIT_BATTLE_TIMEOUT, "EXIT_BATTLE_TIMEOUT");
@@ -87,7 +100,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousWhistling::make_stats() const{
 
 
 
-void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env) const{
+void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
     resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
 
@@ -97,6 +110,7 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env) 
     Stats& stats = env.stats<Stats>();
     StandardEncounterTracker tracker(
         stats, env, env.console,
+        &m_name_reader, LANGUAGE,
         false,
         EXIT_BATTLE_TIMEOUT,
         VIDEO_ON_SHINY,
@@ -139,7 +153,7 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env) 
                 env.log("Unexpected battle menu.", Qt::red);
                 stats.m_unexpected_battles++;
                 pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
-                tracker.run_away();
+                tracker.run_away(false);
                 continue;
             }
             if (start_battle_detector.triggered()){
@@ -160,7 +174,7 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env) 
         if (detection == ShinyDetection::NO_BATTLE_MENU){
             stats.m_timeouts++;
             pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
-            tracker.run_away();
+            tracker.run_away(false);
         }
     }
 

@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
@@ -16,13 +16,21 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-ShinyHuntUnattendedStrongSpawn::ShinyHuntUnattendedStrongSpawn()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+ShinyHuntUnattendedStrongSpawn_Descriptor::ShinyHuntUnattendedStrongSpawn_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:ShinyHuntUnattendedStrongSpawn",
         "Shiny Hunt Unattended - Strong Spawn",
         "NativePrograms/ShinyHuntUnattended-StrongSpawn.md",
-        "Hunt for shiny strong spawns. Stop when a shiny is found."
+        "Hunt for shiny strong spawns. Stop when a shiny is found.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+ShinyHuntUnattendedStrongSpawn::ShinyHuntUnattendedStrongSpawn(const ShinyHuntUnattendedStrongSpawn_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , ENTER_GAME_TO_RUN_DELAY(
         "<b>Enter Game to Run Delay:</b><br>This needs to be carefully calibrated.",
         "2280"
@@ -43,7 +51,7 @@ ShinyHuntUnattendedStrongSpawn::ShinyHuntUnattendedStrongSpawn()
 
 
 
-void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env) const{
+void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
 //    resume_game_no_interact(env.console, false);
 

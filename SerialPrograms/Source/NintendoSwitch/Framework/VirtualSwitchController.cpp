@@ -6,6 +6,7 @@
 
 #include <functional>
 #include <deque>
+#include "Common/Cpp/Exception.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSwShMisc.h"
 #include "ClientSource/Connection/BotBase.h"
@@ -197,9 +198,9 @@ void VirtualController::thread_loop(){
                 params.right_joystick_y = right_y;
                 params.ticks = m_granularity;
                 while (m_botbase.try_send_request<PABB_MSG_CONTROLLER_STATE>(params));
-            }catch (const char*){
-            }catch (std::string&){
-            }catch (PokemonAutomation::CancelledException&){}
+            }catch (PokemonAutomation::CancelledException&){
+            }catch (const StringException&){
+            }
         }while (false);
 
 

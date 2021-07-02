@@ -14,13 +14,22 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-EggSuperCombined2::EggSuperCombined2()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_31KB,
+
+EggSuperCombined2_Descriptor::EggSuperCombined2_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:EggSuperCombined2",
         "Egg Super-Combined 2",
         "NativePrograms/EggSuperCombined2.md",
-        "Fetch and hatch eggs at the same time. (Fastest - 1700 eggs/day for 5120-step)"
+        "Fetch and hatch eggs at the same time. (Fastest - 1700 eggs/day for 5120-step)",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_31KB
     )
+{}
+
+
+
+EggSuperCombined2::EggSuperCombined2(const EggSuperCombined2_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , BOXES_TO_RELEASE(
         "<b>Boxes to Release:</b><br>Start by releasing this many boxes.",
         2, 0, 32
@@ -69,7 +78,7 @@ EggSuperCombined2::EggSuperCombined2()
     m_options.emplace_back(&HATCH_DELAY, "HATCH_DELAY");
 }
 
-void EggSuperCombined2::program(SingleSwitchProgramEnvironment& env) const{
+void EggSuperCombined2::program(SingleSwitchProgramEnvironment& env){
     EggCombinedSession session{
         .BOXES_TO_HATCH = BOXES_TO_HATCH,
         .STEPS_TO_HATCH = STEPS_TO_HATCH,

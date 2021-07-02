@@ -102,7 +102,11 @@ static void roll_den(
         roll_date_forward_1(context, false);
 
         //  Enter game
-        settings_to_enter_game_den_lobby(context, TOLERATE_SYSTEM_UPDATE_MENU_SLOW, true);
+        settings_to_enter_game_den_lobby(
+            context,
+            TOLERATE_SYSTEM_UPDATE_MENU_SLOW, true,
+            ENTER_SWITCH_POKEMON, EXIT_SWITCH_POKEMON
+        );
 
         //  Exit Raid
         ssf_press_button2(context, BUTTON_B, 120, 50);

@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/FrameworkSettings.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
@@ -21,13 +21,21 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-ShinyHuntAutonomousStrongSpawn::ShinyHuntAutonomousStrongSpawn()
-    : SingleSwitchProgram(
-        FeedbackType::REQUIRED, PABotBaseLevel::PABOTBASE_12KB,
+ShinyHuntAutonomousStrongSpawn_Descriptor::ShinyHuntAutonomousStrongSpawn_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:ShinyHuntAutonomousStrongSpawn",
         "Shiny Hunt Autonomous - Strong Spawn",
         "SerialPrograms/ShinyHuntAutonomous-StrongSpawn.md",
-        "Automatically hunt for shiny strong spawns using video feedback."
+        "Automatically hunt for shiny strong spawns using video feedback.",
+        FeedbackType::REQUIRED,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+ShinyHuntAutonomousStrongSpawn::ShinyHuntAutonomousStrongSpawn(const ShinyHuntAutonomousStrongSpawn_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(
         "<b>Go Home when Done:</b><br>After finding a shiny, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
         false
@@ -82,14 +90,21 @@ ShinyHuntAutonomousStrongSpawn::Tracker::Tracker(
     bool take_video,
     bool run_from_everything
 )
-    : StandardEncounterTracker(stats, env, console, false, 0, take_video, run_from_everything)
+    : StandardEncounterTracker(
+        stats, env, console,
+        nullptr, Language::None,
+        false,
+        0,
+        take_video,
+        run_from_everything
+    )
 {}
-bool ShinyHuntAutonomousStrongSpawn::Tracker::run_away(){
+bool ShinyHuntAutonomousStrongSpawn::Tracker::run_away(bool confirmed_encounter){
     pbf_press_button(m_console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
     return true;
 }
 
-void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env) const{
+void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
 //    resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 
@@ -126,7 +141,7 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
         }
         if (detection == ShinyDetection::NO_BATTLE_MENU){
             stats.m_timeouts++;
-            tracker.run_away();
+            tracker.run_away(false);
         }
     }
 

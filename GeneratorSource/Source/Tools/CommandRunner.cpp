@@ -7,7 +7,7 @@
 #include <iostream>
 #include <QFile>
 #include <QMessageBox>
-#include "Common/Clientside/Unicode.h"
+#include "Common/Cpp/Unicode.h"
 #include "Tools/PersistentSettings.h"
 #include "Tools.h"
 
@@ -17,6 +17,7 @@ namespace PokemonAutomation{
 
 int build_hexfile(
     const std::string& board,
+    const QString& category,
     const QString& program_name,
     const QString& hex_file,
     const QString& log_file
@@ -36,7 +37,11 @@ int build_hexfile(
     ZeroMemory(&si, sizeof(si));
     si.cb = sizeof(si);
     ZeroMemory(&pi, sizeof(pi));
-    QString command = "\"" + module + "\" " + board.c_str() + " " + program_name + " > \"" + log_file + "\" 2>&1";
+    QString command = "\"" + module + "\"";
+    command += QString(" ") + board.c_str();
+    command += QString(" ") + category;
+    command += QString(" ") + program_name;
+    command += " > \"" + log_file + "\" 2>&1";
     std::wstring wpath = utf8_to_wstr(command.toUtf8().data());
     bool ret = CreateProcessW(
         nullptr,
@@ -79,12 +84,13 @@ namespace PokemonAutomation{
 
 int build_hexfile(
     const std::string& board,
+    const QString& category,
     const QString& program_name,
     const QString& hex_file,
     const QString& log_file
 ){
-    QString module_dir = settings.path + SOURCE_FOLDER_NAME;
-    QString module = "./Scripts/BuildOneUnix.sh ";
+    QString module_dir = settings.path + SOURCE_FOLDER_NAME + "/" + category;
+    QString module = "../Scripts/BuildOneUnix.sh ";
     QString command =  module + board.c_str() + " " + program_name + " gui > " + log_file + " 2>&1";
 
     // Since most macs will have the avr tools installed in /usr/local/bin, add it to the path now

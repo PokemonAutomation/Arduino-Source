@@ -5,7 +5,8 @@
  */
 
 #include <iostream>
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonProgramIDs.h"
 #include "ClientSource/Connection/SerialConnection.h"
@@ -58,7 +59,9 @@ std::unique_ptr<PABotBase> start_connection(
     uint32_t version_hi = version / 100;
     uint32_t version_lo = version % 100;
     if (version_hi != PABB_PROTOCOL_VERSION / 100 || version_lo < PABB_PROTOCOL_VERSION % 100){
-        throw "Incompatible version. Client: " + std::to_string(PABB_PROTOCOL_VERSION) + ", Device: " + std::to_string(version);
+        PA_THROW_StringException(
+            "Incompatible version. Client: " + std::to_string(PABB_PROTOCOL_VERSION) + ", Device: " + std::to_string(version)
+        );
     }
     std::cout << std::endl;
 
@@ -77,7 +80,7 @@ std::unique_ptr<PABotBase> start_connection(
 
     //  If we're running an actual program, the device needs to be running PABotBase to work.
     if (require_pabotbase && (int)program_id_to_botbase_level(program_id) >= (int)PABB_PID_PABOTBASE_12KB){
-        throw "The device must be running PABotBase for this program to work.";
+        PA_THROW_StringException("The device must be running PABotBase for this program to work.");
     }
 
 //    std::cout << "Begin Message Logging..." << std::endl;

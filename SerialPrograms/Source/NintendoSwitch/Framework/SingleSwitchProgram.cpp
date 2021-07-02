@@ -11,37 +11,39 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-SingleSwitchProgram::SingleSwitchProgram(
-    FeedbackType feedback,
-    PABotBaseLevel min_pabotbase,
-    QString name,
-    QString doc_link,
-    QString description
-)
-    : RunnableProgram(
-        feedback, min_pabotbase,
-        std::move(name),
-        std::move(doc_link),
-        std::move(description)
-    )
+
+SingleSwitchProgramInstance::SingleSwitchProgramInstance(const RunnableSwitchProgramDescriptor& descriptor)
+    : RunnableSwitchProgramInstance(descriptor)
     , m_switch(
         "Switch Settings", "Switch 0",
-        min_pabotbase, feedback
+        descriptor.min_pabotbase_level(),
+        descriptor.feedback()
     )
 {
     m_setup = &m_switch;
 }
-
-SingleSwitchProgramUI::SingleSwitchProgramUI(SingleSwitchProgram& factory, MainWindow& window)
-    : RunnableProgramUI(factory, window)
-{
-    this->construct();
+QWidget* SingleSwitchProgramInstance::make_widget(QWidget& parent, PanelListener& listener){
+    return SingleSwitchProgramWidget::make(parent, *this, listener);
 }
 
 
-SingleSwitchProgramUI::~SingleSwitchProgramUI(){ stop(); }
 
-void SingleSwitchProgramUI::program(
+SingleSwitchProgramWidget::~SingleSwitchProgramWidget(){
+    if (!m_destructing){
+        stop();
+        m_destructing = true;
+    }
+}
+SingleSwitchProgramWidget* SingleSwitchProgramWidget::make(
+    QWidget& parent,
+    SingleSwitchProgramInstance& instance,
+    PanelListener& listener
+){
+    SingleSwitchProgramWidget* widget = new SingleSwitchProgramWidget(parent, instance, listener);
+    widget->construct();
+    return widget;
+}
+void SingleSwitchProgramWidget::run_program(
     StatsTracker* current_stats,
     const StatsTracker* historical_stats
 ){
@@ -53,7 +55,7 @@ void SingleSwitchProgramUI::program(
         system->camera()
     );
     connect(
-        this, &RunnableProgramUI::signal_cancel,
+        this, &RunnableSwitchProgramWidget::signal_cancel,
         &env, [&]{
             env.signal_stop();
         },
@@ -61,14 +63,13 @@ void SingleSwitchProgramUI::program(
     );
     connect(
         &env, &ProgramEnvironment::set_status,
-        this, [=](QString status){
-            this->set_status(std::move(status));
-        }
+        this, &SingleSwitchProgramWidget::set_status
     );
-//    PokemonAutomation::global_connection = &env.console.context();
-    SingleSwitchProgram& factory = static_cast<SingleSwitchProgram&>(m_factory);
-    factory.program(env);
+    SingleSwitchProgramInstance& instance = static_cast<SingleSwitchProgramInstance&>(m_instance);
+    instance.program(env);
 }
+
+
 
 
 

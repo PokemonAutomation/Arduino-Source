@@ -8,7 +8,6 @@
 #include <QJsonObject>
 #include <QHBoxLayout>
 #include "Common/Compiler.h"
-#include "Common/Qt/StringException.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CameraSelector.h"
 

@@ -12,13 +12,22 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-DenRoller::DenRoller()
-    : SingleSwitchProgram(
-        FeedbackType::OPTIONAL_, PABotBaseLevel::PABOTBASE_12KB,
+
+DenRoller_Descriptor::DenRoller_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:DenRoller",
         "Den Roller",
         "NativePrograms/DenRoller.md",
-        "Roll den to the N'th day, SR and repeat."
+        "Roll den to the N'th day, SR and repeat.",
+        FeedbackType::OPTIONAL_,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+DenRoller::DenRoller(const DenRoller_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , SKIPS(
         "<b>Number of Skips:</b>",
         3, 0, 60
@@ -41,7 +50,7 @@ void DenRoller::ring_bell(const BotBaseContext& context, int count) const{
     pbf_wait(context, 200);
 }
 
-void DenRoller::program(SingleSwitchProgramEnvironment& env) const{
+void DenRoller::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
 
     rollback_date_from_home(env.console, SKIPS);

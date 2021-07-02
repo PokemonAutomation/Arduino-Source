@@ -1,10 +1,11 @@
 ::@echo off
 
 set board=%1
-set program=%2
+set category=%2
+set program=%3
 
 cd /D "%~dp0"
-cd "../NativePrograms"
+cd "../NativePrograms/%category%"
 
 
 if [%board%] == [ArduinoUnoR3] (
@@ -65,6 +66,6 @@ del "%program%.lss"
 del "%program%.sym"
 del "%program%.tmp"
 
-move "%program%.hex" "../%program%-%board%.hex"
+move "%program%.hex" "../../%program%-%board%.hex"
 
 ::pause

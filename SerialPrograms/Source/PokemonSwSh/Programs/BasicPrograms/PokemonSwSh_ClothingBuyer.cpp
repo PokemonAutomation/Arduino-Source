@@ -14,13 +14,22 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-ClothingBuyer::ClothingBuyer()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+
+ClothingBuyer_Descriptor::ClothingBuyer_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:ClothingBuyer",
         "Clothing Buyer",
         "NativePrograms/ClothingBuyer.md",
-        "Buy out all the clothing in a store."
+        "Buy out all the clothing in a store.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+ClothingBuyer::ClothingBuyer(const ClothingBuyer_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , CATEGORY_ROTATION(
         "<b>Rotate Categories:</b><br>This slows down the program, but ensures it will cover all categories.",
         true
@@ -29,7 +38,7 @@ ClothingBuyer::ClothingBuyer()
     m_options.emplace_back(&CATEGORY_ROTATION, "CATEGORY_ROTATION");
 }
 
-void ClothingBuyer::program(SingleSwitchProgramEnvironment& env) const{
+void ClothingBuyer::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
     resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 

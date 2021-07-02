@@ -18,11 +18,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class TradeBot : public SingleSwitchProgram{
-public:
-    TradeBot();
 
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+class TradeBot_Descriptor : public RunnableSwitchProgramDescriptor{
+public:
+    TradeBot_Descriptor();
+};
+
+
+
+class TradeBot : public SingleSwitchProgramInstance{
+public:
+    TradeBot(const TradeBot_Descriptor& descriptor);
+
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
     void trade_slot(const BotBaseContext& context, const uint8_t code[8], uint8_t slot) const;

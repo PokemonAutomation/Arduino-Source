@@ -19,11 +19,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class EggCombined2 : public SingleSwitchProgram{
-public:
-    EggCombined2();
 
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+class EggCombined2_Descriptor : public RunnableSwitchProgramDescriptor{
+public:
+    EggCombined2_Descriptor();
+};
+
+
+
+class EggCombined2 : public SingleSwitchProgramInstance{
+public:
+    EggCombined2(const EggCombined2_Descriptor& descriptor);
+
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
     SimpleInteger<uint8_t> BOXES_TO_HATCH;

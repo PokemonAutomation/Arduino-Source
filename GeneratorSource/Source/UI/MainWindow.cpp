@@ -9,6 +9,7 @@
 #include <QMenuBar>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
+#include <QGroupBox>
 #include <QLabel>
 #include <QPushButton>
 #include <QMessageBox>
@@ -16,8 +17,7 @@
 #include <QUrl>
 #include "Tools/Tools.h"
 #include "Tools/PersistentSettings.h"
-#include "SettingListUI.h"
-#include "ProgramListUI.h"
+#include "Panels/ProgramTabs.h"
 #include "MainWindow.h"
 
 //#include <iostream>
@@ -56,10 +56,19 @@ MainWindow::MainWindow(QWidget* parent)
     left->addWidget(new QLabel("<b><font size=5>Device and Program:</font></b>", this));
 
 
-    left->addSpacerItem(new QSpacerItem(10, 10));
-    left->addWidget(new QLabel("<b>Board Type:", this));
-    left->addWidget(m_mcu_list = new BoardList(*this));
+    QGroupBox* board_box = new QGroupBox("Board Type", m_centralwidget);
+    left->addWidget(board_box, 0);
+    QVBoxLayout* board_layout = new QVBoxLayout(board_box);
+    board_layout->setAlignment(Qt::AlignTop);
+    board_layout->addWidget(m_mcu_list = new BoardList(*this));
 
+    QGroupBox* program_box = new QGroupBox("Program Select", m_centralwidget);
+    left->addWidget(program_box, 1);
+    QVBoxLayout* program_layout = new QVBoxLayout(program_box);
+    program_layout->setAlignment(Qt::AlignTop);
+    program_layout->addWidget(new ProgramTabs(*program_box, *this));
+
+#if 0
     left->addSpacerItem(new QSpacerItem(10, 10));
     left->addWidget(new QLabel("<b>Select a Program:", this));
     m_program_list = new ProgramListUI(*this);
@@ -69,6 +78,8 @@ MainWindow::MainWindow(QWidget* parent)
     left->addWidget(new QLabel("<b>Global Settings:", this));
     m_settings_list = new SettingsListUI(*this);
     left->addWidget(m_settings_list);
+#endif
+
 
 #if 0
     int width = std::max(
@@ -81,6 +92,9 @@ MainWindow::MainWindow(QWidget* parent)
 //    cout << "Width = " << width << endl;
 //    m_program_list->setMaximumWidth(width);
 //    m_settings_list->setMaximumWidth(width);
+
+    QGroupBox* support_box = new QGroupBox("Support (" + STRING_POKEMON + " Automation " + VERSION + ")", m_centralwidget);
+    left->addWidget(support_box);
 
     QHBoxLayout* support = new QHBoxLayout();
     left->addLayout(support);

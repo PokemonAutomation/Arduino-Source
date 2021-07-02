@@ -14,11 +14,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class FriendSearchDisconnect : public SingleSwitchProgram{
-public:
-    FriendSearchDisconnect();
 
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+class FriendSearchDisconnect_Descriptor : public RunnableSwitchProgramDescriptor{
+public:
+    FriendSearchDisconnect_Descriptor();
+};
+
+
+
+class FriendSearchDisconnect : public SingleSwitchProgramInstance{
+public:
+    FriendSearchDisconnect(const FriendSearchDisconnect_Descriptor& descriptor);
+
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
     SimpleInteger<uint8_t> USER_SLOT;

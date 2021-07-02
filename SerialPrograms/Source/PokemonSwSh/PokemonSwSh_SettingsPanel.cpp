@@ -15,13 +15,21 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-PokemonSettings::PokemonSettings()
-    : SettingsPanel(
+
+PokemonSettings_Descriptor::PokemonSettings_Descriptor()
+    : PanelDescriptor(
         QColor(),
+        "PokemonSwSh:GlobalSettings",
         STRING_POKEMON + " Settings",
         "",
         "Global " + STRING_POKEMON + " Settings"
     )
+{}
+
+
+
+PokemonSettings::PokemonSettings(const PokemonSettings_Descriptor& descriptor)
+    : SettingsPanelInstance(descriptor)
 {
     m_options.emplace_back(
         "",
@@ -142,14 +150,6 @@ PokemonSettings::PokemonSettings()
     m_options.emplace_back(
         "",
         new SectionDivider("<font size=4><b>Start Game Timings:</b></font>")
-    );
-    m_options.emplace_back(
-        "START_GAME_INTERNET_CHECK_DELAY",
-        new TimeExpression<uint16_t>(
-            START_GAME_INTERNET_CHECK_DELAY,
-            "<b>Start Game Internet Check Delay:</b><br>If starting the game requires checking the internet, wait this long for it.",
-            "3 * TICKS_PER_SECOND"
-        )
     );
     m_options.emplace_back(
         "START_GAME_MASH",
@@ -319,12 +319,6 @@ PokemonSettings::PokemonSettings()
             "250"
         )
     );
-}
-
-PokemonSettings::PokemonSettings(const QJsonValue& json)
-    : PokemonSettings()
-{
-    from_json(json);
 }
 
 

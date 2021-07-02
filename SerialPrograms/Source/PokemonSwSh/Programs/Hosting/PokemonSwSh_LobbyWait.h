@@ -29,23 +29,6 @@ static RaidLobbyState raid_lobby_wait(
     uint8_t accept_FR_slot,
     uint16_t lobby_wait_delay
 ){
-#if 0
-    if (!settings.developer_mode){
-        if (HOST_ONLINE && accept_FR_slot > 0){
-            accept_FRs_while_waiting(
-                accept_FR_slot - 1,
-                lobby_wait_delay,
-                GAME_TO_HOME_DELAY_SAFE,
-                AUTO_FR_DURATION,
-                TOLERATE_SYSTEM_UPDATE_MENU_SLOW
-            );
-        }else{
-            pbf_wait(lobby_wait_delay);
-        }
-        return;
-    }
-#endif
-
     console.botbase().wait_for_all_requests();
     uint32_t start = system_clock(console);
     RaidLobbyReader inference(console, logger);

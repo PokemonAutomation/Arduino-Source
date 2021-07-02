@@ -50,7 +50,7 @@ private:
 class StatSet{
 public:
 //    StatList* find(const std::string& label);
-    StatList& operator[](const std::string& label);
+    StatList& operator[](const std::string& identifier);
 
     std::string to_str() const;
 
@@ -59,7 +59,7 @@ public:
 
     static bool update_file(
         const QString& filepath,
-        const std::string& label,
+        const std::string& identifier,
         const StatsTracker& tracker
     );
 

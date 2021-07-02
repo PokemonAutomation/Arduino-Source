@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
@@ -16,13 +16,21 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-ShinyHuntUnattendedRegigigas2::ShinyHuntUnattendedRegigigas2()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+ShinyHuntUnattendedRegigigas2_Descriptor::ShinyHuntUnattendedRegigigas2_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:ShinyHuntUnattendedRegigigas2",
         "Shiny Hunt Unattended - Regigigas2",
         "NativePrograms/ShinyHuntUnattended-Regigigas2.md",
-        "A new version of the Regigigas program that is faster."
+        "A new version of the Regigigas program that is faster.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+ShinyHuntUnattendedRegigigas2::ShinyHuntUnattendedRegigigas2(const ShinyHuntUnattendedRegigigas2_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , REVERSAL_PP(
         "<b>Reversal PP:</b><br>The amount of Reversal PP you are saved with.",
         24
@@ -55,7 +63,7 @@ ShinyHuntUnattendedRegigigas2::ShinyHuntUnattendedRegigigas2()
     m_options.emplace_back(&CATCH_TO_OVERWORLD_DELAY, "CATCH_TO_OVERWORLD_DELAY");
 }
 
-void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env) const{
+void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
 
     uint32_t last_touch = system_clock(env.console);

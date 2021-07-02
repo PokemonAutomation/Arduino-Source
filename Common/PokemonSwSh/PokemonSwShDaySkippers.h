@@ -62,45 +62,45 @@ namespace PokemonAutomation{
 #endif
 ////////////////////////////////////////////////////////////////////////////////
 
-#define PABB_MSG_COMMAND_SKIPPER_INIT_VIEW                      0xbe
+#define PABB_MSG_COMMAND_SKIPPER_INIT_VIEW                      0xbd
 typedef struct{
     seqnum_t seqnum;
 } PABB_PACK pabb_skipper_init_view;
 
-#define PABB_MSG_COMMAND_SKIPPER_AUTO_RECOVERY                  0xbf
+#define PABB_MSG_COMMAND_SKIPPER_AUTO_RECOVERY                  0xbe
 typedef struct{
     seqnum_t seqnum;
 } PABB_PACK pabb_skipper_auto_recovery;
 
-#define PABB_MSG_COMMAND_SKIPPER_ROLLBACK_YEAR_FULL             0xc0
+#define PABB_MSG_COMMAND_SKIPPER_ROLLBACK_YEAR_FULL             0xbf
 typedef struct{
     seqnum_t seqnum;
     bool date_us;
 } PABB_PACK pabb_skipper_rollback_year_full;
 
-#define PABB_MSG_COMMAND_SKIPPER_ROLLBACK_YEAR_SYNC             0xc1
+#define PABB_MSG_COMMAND_SKIPPER_ROLLBACK_YEAR_SYNC             0xc0
 typedef struct{
     seqnum_t seqnum;
 } PABB_PACK pabb_skipper_rollback_year_sync;
 
-#define PABB_MSG_COMMAND_SKIPPER_INCREMENT_DAY                  0xc2
+#define PABB_MSG_COMMAND_SKIPPER_INCREMENT_DAY                  0xc1
 typedef struct{
     seqnum_t seqnum;
     bool date_us;
 } PABB_PACK pabb_skipper_increment_day;
 
-#define PABB_MSG_COMMAND_SKIPPER_INCREMENT_MONTH                0xc3
+#define PABB_MSG_COMMAND_SKIPPER_INCREMENT_MONTH                0xc2
 typedef struct{
     seqnum_t seqnum;
     uint8_t days;
 } PABB_PACK pabb_skipper_increment_month;
 
-#define PABB_MSG_COMMAND_SKIPPER_INCREMENT_ALL                  0xc4
+#define PABB_MSG_COMMAND_SKIPPER_INCREMENT_ALL                  0xc3
 typedef struct{
     seqnum_t seqnum;
 } PABB_PACK pabb_skipper_increment_all;
 
-#define PABB_MSG_COMMAND_SKIPPER_INCREMENT_ALL_ROLLBACK         0xc5
+#define PABB_MSG_COMMAND_SKIPPER_INCREMENT_ALL_ROLLBACK         0xc4
 typedef struct{
     seqnum_t seqnum;
 } PABB_PACK pabb_skipper_increment_all_rollback;

@@ -15,13 +15,22 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-EventBeamFinder::EventBeamFinder()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+
+EventBeamFinder_Descriptor::EventBeamFinder_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:EventBeamFinder",
         "Event Beam Finder",
         "NativePrograms/EventBeamFinder.md",
-        "Drop wishing pieces until you find an event den."
+        "Drop wishing pieces until you find an event den.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+EventBeamFinder::EventBeamFinder(const EventBeamFinder_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , WAIT_TIME_IN_DEN(
         "<b>Wait time in Den:</b>",
         "5 * TICKS_PER_SECOND"
@@ -57,7 +66,7 @@ void EventBeamFinder::drop_wishing_piece(const BotBaseContext& context) const{
     ssf_press_button2(context, BUTTON_A, WAIT_TIME_IN_DEN + 100, 10);
     pbf_mash_button(context, BUTTON_B, 600);
 }
-void EventBeamFinder::program(SingleSwitchProgramEnvironment& env) const{
+void EventBeamFinder::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
 
     resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);

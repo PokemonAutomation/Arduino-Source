@@ -15,11 +15,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class ShinyHuntUnattendedIoATrade : public SingleSwitchProgram{
-public:
-    ShinyHuntUnattendedIoATrade();
 
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+class ShinyHuntUnattendedIoATrade_Descriptor : public RunnableSwitchProgramDescriptor{
+public:
+    ShinyHuntUnattendedIoATrade_Descriptor();
+};
+
+
+
+class ShinyHuntUnattendedIoATrade : public SingleSwitchProgramInstance{
+public:
+    ShinyHuntUnattendedIoATrade(const ShinyHuntUnattendedIoATrade_Descriptor& descriptor);
+
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
     TimeExpression<uint16_t> START_TO_RUN_DELAY;

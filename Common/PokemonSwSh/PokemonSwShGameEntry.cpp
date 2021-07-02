@@ -120,10 +120,17 @@ void settings_to_enter_game(const BotBaseContext& context, bool fast){
         pbf_press_button(context, BUTTON_HOME, 10, 0);
     }
 }
-void settings_to_enter_game_den_lobby(const BotBaseContext& context, bool tolerate_update_menu, bool fast){
+void settings_to_enter_game_den_lobby(
+    const BotBaseContext& context,
+    bool tolerate_update_menu, bool fast,
+    uint16_t enter_switch_pokemon_delay,
+    uint16_t exit_switch_pokemon_delay
+){
     pabb_settings_to_enter_game_den_lobby params;
     params.tolerate_update_menu = tolerate_update_menu;
     params.fast = fast;
+    params.enter_switch_pokemon_delay = enter_switch_pokemon_delay;
+    params.exit_switch_pokemon_delay = exit_switch_pokemon_delay;
     context->issue_request<PABB_MSG_COMMAND_SETTINGS_TO_ENTER_GAME_DEN_LOBBY>(&context.cancelled_bool(), params);
 }
 void start_game_from_home(const BotBaseContext& context, bool tolerate_update_menu, uint8_t game_slot, uint8_t user_slot, bool backup_save){
@@ -215,6 +222,8 @@ int register_message_converters_pokemon_game_entry(){
             ss << "seqnum = " << (uint64_t)params->seqnum;
             ss << ", tolerate_update_menu = " << params->tolerate_update_menu;
             ss << ", fast = " << params->fast;
+            ss << ", enter_switch_pokemon_delay = " << params->enter_switch_pokemon_delay;
+            ss << ", exit_switch_pokemon_delay = " << params->exit_switch_pokemon_delay;
             return ss.str();
         }
     );

@@ -17,11 +17,17 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class FriendCodeAdder : public SingleSwitchProgram{
+class FriendCodeAdder_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
-    FriendCodeAdder();
+    FriendCodeAdder_Descriptor();
+};
 
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+
+class FriendCodeAdder : public SingleSwitchProgramInstance{
+public:
+    FriendCodeAdder(const FriendCodeAdder_Descriptor& descriptor);
+
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
     SimpleInteger<uint8_t> USER_SLOT;

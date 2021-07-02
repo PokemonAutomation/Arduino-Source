@@ -7,7 +7,7 @@
 #include <string>
 #include <map>
 #include <vector>
-#include "StringException.h"
+#include "Common/Cpp/Exception.h"
 #include "ExpressionEvaluator.h"
 
 namespace PokemonAutomation{
@@ -51,6 +51,8 @@ bool skip_whitespace(const char*& str){
     }
 }
 uint32_t parse_integer(const char*& str){
+    const char* ptr = str;
+
     uint64_t x = 0;
     while (true){
         char ch = *str;
@@ -61,7 +63,7 @@ uint32_t parse_integer(const char*& str){
             x *= 10;
             x += ch - '0';
             if ((uint32_t)x != x){
-                throw StringException("Number is too large.");
+                PA_THROW_ParseException(std::string("Number is too large: ") + ptr);
             }
             str++;
             continue;
@@ -73,10 +75,12 @@ uint32_t parse_integer(const char*& str){
         case ')':
             return (uint32_t)x;
         }
-        throw StringException("Invalid integer.");
+        PA_THROW_ParseException(std::string("Invalid integer: ") + ptr);
     }
 }
 std::string parse_symbol(const char*& str){
+    const char* ptr = str;
+
     std::string ret;
     ret += *str++;
     while (true){
@@ -101,7 +105,7 @@ std::string parse_symbol(const char*& str){
         case ')':
             return ret;
         }
-        throw StringException("Invalid symbol.");
+        PA_THROW_ParseException(std::string("Invalid symbol: ") + ptr);
     }
 }
 
@@ -113,7 +117,7 @@ uint8_t precedence(char ch){
     case '*':
         return 1;
     }
-    throw StringException("Invalid operator.");
+    PA_THROW_ParseException(std::string("Invalid operator: ") + ch);
 }
 
 int32_t parse_expression(
@@ -139,7 +143,7 @@ int32_t parse_expression(
             std::string symbol = parse_symbol(str);
             auto iter = variables.find(symbol);
             if (iter == variables.end()){
-                throw StringException("Undefined symbol.");
+                PA_THROW_ParseException("Undefined symbol: " + symbol);
             }
             num.emplace_back(0, iter->second);
             continue;
@@ -171,7 +175,7 @@ int32_t parse_expression(
     //    if (ch == ')'){
     //
     //    }
-        throw StringException("Invalid expression.");
+        PA_THROW_ParseException("Invalid expression: " + expression);
     }
 
     while (!op.empty()){
@@ -206,7 +210,7 @@ int32_t parse_expression(
         switch (item.first){
         case '+':{
             if (stack.size() < 2){
-                throw StringException("Invalid expression: unexpected +");
+                PA_THROW_ParseException("Invalid expression: unexpected +");
             }
             int64_t x = stack[stack.size() - 2];
             int64_t y = stack[stack.size() - 1];
@@ -214,14 +218,14 @@ int32_t parse_expression(
             stack.pop_back();
             x += y;
             if ((int32_t)x != x){
-                throw StringException("Overflow");
+                PA_THROW_ParseException("Overflow");
             }
             stack.push_back(x);
             continue;
         }
         case '-':{
             if (stack.size() < 2){
-                throw StringException("Invalid expression: unexpected -");
+                PA_THROW_ParseException("Invalid expression: unexpected -");
             }
             int64_t x = stack[stack.size() - 2];
             int64_t y = stack[stack.size() - 1];
@@ -229,14 +233,14 @@ int32_t parse_expression(
             stack.pop_back();
             x -= y;
             if ((int32_t)x != x){
-                throw StringException("Overflow");
+                PA_THROW_ParseException("Overflow");
             }
             stack.push_back(x);
             continue;
         }
         case '*':{
             if (stack.size() < 2){
-                throw StringException("Invalid expression: unexpected *");
+                PA_THROW_ParseException("Invalid expression: unexpected *");
             }
             int64_t x = stack[stack.size() - 2];
             int64_t y = stack[stack.size() - 1];
@@ -244,16 +248,16 @@ int32_t parse_expression(
             stack.pop_back();
             x *= y;
             if ((int32_t)x != x){
-                throw StringException("Overflow");
+                PA_THROW_ParseException("Overflow");
             }
             stack.push_back(x);
             continue;
         }
         }
-        throw StringException("Invalid operator.");
+        PA_THROW_ParseException("Invalid operator.");
     }
     if (stack.size() != 1){
-        throw StringException("Invalid expression.");
+        PA_THROW_ParseException("Invalid expression.");
     }
 
     return (int32_t)stack[0];
@@ -270,7 +274,7 @@ const std::map<std::string, int64_t>& SYMBOLS(){
 uint32_t parse_ticks_i32(const QString& expression){
     int32_t x = parse_expression(SYMBOLS(), expression.toUtf8().toStdString());
     if (x < 0){
-        throw StringException("Value cannot be negative.");
+        PA_THROW_ParseException("Value cannot be negative.");
     }
     return x;
 }

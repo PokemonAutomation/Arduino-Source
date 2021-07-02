@@ -92,9 +92,6 @@ uint16_t ENTER_PROFILE_DELAY                =   2 * TICKS_PER_SECOND;
 ////////////////////////////////////////////////////////////////////////////////
 //  Start Game Timings
 
-//  If starting the game requires checking the internet, wait this long for it.
-uint16_t START_GAME_INTERNET_CHECK_DELAY    =   3 * TICKS_PER_SECOND;
-
 //  Delays to start and enter the game when it isn't running.
 uint16_t START_GAME_MASH                    =   2 * TICKS_PER_SECOND;   //  1. Mash A for this long to start the game.
 uint16_t START_GAME_WAIT                    =   20 * TICKS_PER_SECOND;  //  2. Wait this long for the game to load.

@@ -6,10 +6,14 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
-#include "Common/Clientside/PrettyPrint.h"
-#include "Common/Qt/StringException.h"
+#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/ExpressionEvaluator.h"
 #include "TimeExpressionOption.h"
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -105,8 +109,8 @@ bool TimeExpressionOption<Type>::update(){
     uint32_t value;
     try{
         value = parse_ticks_i32(m_current);
-    }catch (const StringException& str){
-        m_error = str.message();
+    }catch (const ParseException& str){
+        m_error = str.message_qt();
         return false;
     }catch (...){
         m_error = "Unknown Error";

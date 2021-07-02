@@ -10,7 +10,6 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QHeaderView>
-#include "Common/Qt/StringException.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "FossilTableOption.h"
 

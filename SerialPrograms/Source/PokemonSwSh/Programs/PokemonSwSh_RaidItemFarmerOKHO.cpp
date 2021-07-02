@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "PokemonSwSh/Programs/Hosting/PokemonSwSh_DenTools.h"
 #include "PokemonSwSh_RaidItemFarmerOKHO.h"
@@ -14,14 +14,22 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-RaidItemFarmerOHKO::RaidItemFarmerOHKO()
-    : MultiSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+RaidItemFarmerOHKO_Descriptor::RaidItemFarmerOHKO_Descriptor()
+    : MultiSwitchProgramDescriptor(
+        "PokemonSwSh:RaidItemFarmerOHKO",
         "Raid Item Farmer (OHKO)",
         "SerialPrograms/RaidItemFarmerOHKO.md",
         "Farm items from raids that can be OHKO'ed. (requires multiple Switches)",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB,
         2, 4, 2
     )
+{}
+
+
+
+RaidItemFarmerOHKO::RaidItemFarmerOHKO(const RaidItemFarmerOHKO_Descriptor& descriptor)
+    : MultiSwitchProgramInstance(descriptor)
     , BACKUP_SAVE("<b>Load Backup Save:</b><br>For backup save soft-locking method.", false)
 //    , m_advanced_options(
 //        "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
@@ -68,7 +76,7 @@ RaidItemFarmerOHKO::RaidItemFarmerOHKO()
     m_options.emplace_back(&TOUCH_DATE_INTERVAL, "TOUCH_DATE_INTERVAL");
 }
 
-void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env) const{
+void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env){
     BotBase& host = env.consoles[0];
     size_t switches = env.consoles.size();
 

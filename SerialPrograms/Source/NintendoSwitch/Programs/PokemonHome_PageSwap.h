@@ -14,12 +14,17 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonHome{
 
-
-class PageSwap : public SingleSwitchProgram{
+class PageSwap_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
-    PageSwap();
+    PageSwap_Descriptor();
+};
 
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+
+class PageSwap : public SingleSwitchProgramInstance{
+public:
+    PageSwap(const PageSwap_Descriptor& descriptor);
+
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
     BooleanCheckBox DODGE_SYSTEM_UPDATE_WINDOW;

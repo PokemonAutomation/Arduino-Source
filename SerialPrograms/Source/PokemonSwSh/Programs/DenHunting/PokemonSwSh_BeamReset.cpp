@@ -14,13 +14,22 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-BeamReset::BeamReset()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+
+BeamReset_Descriptor::BeamReset_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:BeamReset",
         "Beam Reset",
         "NativePrograms/BeamReset.md",
-        "Reset a beam until you see a purple beam."
+        "Reset a beam until you see a purple beam.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+BeamReset::BeamReset(const BeamReset_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , DELAY_BEFORE_RESET(
         "<b>Delay before Reset:</b>",
         "5 * TICKS_PER_SECOND"
@@ -34,7 +43,7 @@ BeamReset::BeamReset()
     m_options.emplace_back(&EXTRA_LINE, "EXTRA_LINE");
 }
 
-void BeamReset::program(SingleSwitchProgramEnvironment& env) const{
+void BeamReset::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
 
     resume_game_front_of_den_nowatts(env.console, TOLERATE_SYSTEM_UPDATE_MENU_SLOW);

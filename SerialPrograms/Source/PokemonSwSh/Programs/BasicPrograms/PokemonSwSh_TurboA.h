@@ -13,11 +13,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class TurboA : public SingleSwitchProgram{
-public:
-    TurboA();
 
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+class TurboA_Descriptor : public RunnableSwitchProgramDescriptor{
+public:
+    TurboA_Descriptor();
+};
+
+
+
+class TurboA : public SingleSwitchProgramInstance{
+public:
+    TurboA(const TurboA_Descriptor& descriptor);
+
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 };
 
 

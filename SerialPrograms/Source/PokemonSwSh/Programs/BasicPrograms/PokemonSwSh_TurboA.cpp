@@ -13,16 +13,25 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-TurboA::TurboA()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+
+TurboA_Descriptor::TurboA_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:TurboA",
         "Turbo A",
         "NativePrograms/TurboA.md",
-        "Endlessly mash A."
+        "Endlessly mash A.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB
     )
 {}
 
-void TurboA::program(SingleSwitchProgramEnvironment& env) const{
+
+
+TurboA::TurboA(const TurboA_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
+{}
+
+void TurboA::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
     resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
     while (true){

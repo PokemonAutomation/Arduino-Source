@@ -10,41 +10,59 @@
 #include <memory>
 #include <QPushButton>
 #include "CommonFramework/Options/ConfigOption.h"
-#include "RightPanel.h"
+#include "Panel.h"
 
 namespace PokemonAutomation{
 
 
-class SettingsPanel : public RightPanel{
-public:
-    using RightPanel::RightPanel;
 
-    void from_json(const QJsonValue& json);
+class SettingsPanelInstance : public PanelInstance{
+public:
+    using PanelInstance::PanelInstance;
+
+    virtual QWidget* make_widget(QWidget& parent, PanelListener& listener) override;
+
+public:
+    //  Serialization
+    virtual void from_json(const QJsonValue& json) override;
     virtual QJsonValue to_json() const override;
 
-    virtual QWidget* make_ui(MainWindow& window) override;
-
 protected:
-    friend class SettingsPanelUI;
+    friend class SettingsPanelWidget;
+
     std::vector<std::pair<QString, std::unique_ptr<ConfigOption>>> m_options;
 };
 
 
 
-class SettingsPanelUI : public RightPanelUI{
-    friend class SettingsPanel;
-
+class SettingsPanelWidget : public PanelWidget{
 public:
-    SettingsPanelUI(SettingsPanel& factory);
-    virtual void make_body(QWidget& parent, QVBoxLayout& layout) override;
+    static SettingsPanelWidget* make(
+        QWidget& parent,
+        SettingsPanelInstance& instance,
+        PanelListener& listener
+    );
 
     void restore_defaults();
 
 private:
-    SettingsPanel& m_factory;
+    SettingsPanelWidget(
+        QWidget& parent,
+        SettingsPanelInstance& instance,
+        PanelListener& listener
+    );
+    void construct();
+    QWidget* make_options(QWidget& parent);
+    QWidget* make_actions(QWidget& parent);
+
+private:
+    friend class SettingsPanelInstance;
+
     std::vector<ConfigOptionUI*> m_options;
     QPushButton* m_default_button;
 };
+
+
 
 
 }

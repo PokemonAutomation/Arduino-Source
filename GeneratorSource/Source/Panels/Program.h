@@ -28,8 +28,8 @@ public:
     static const QString BUILD_BUTTON_BUSY;
 
 public:
-    Program(const QString& name, const QString& description);
-    Program(const QJsonObject& obj);
+    Program(QString category, QString name, QString description);
+    Program(QString category, const QJsonObject& obj);
     ~Program();
 
     const QString& description() const{ return m_description; }

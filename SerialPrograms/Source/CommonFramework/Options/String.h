@@ -13,8 +13,16 @@
 namespace PokemonAutomation{
 
 
-class String : public ConfigOption, public StringOption {
+class String : public ConfigOption, public StringOption{
 public:
+    String(
+        QString& backing,
+        QString label,
+        QString default_value
+    )
+        : ConfigOption(label)
+        , StringOption(backing, std::move(label), default_value)
+    {}
     String(
         QString label,
         QString default_value

@@ -27,9 +27,6 @@
     <Filter Include="Source Files\Common">
       <UniqueIdentifier>{227cd5ac-1fca-4f18-a5c4-e517dd526f05}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Common\Clientside">
-      <UniqueIdentifier>{8d23dd57-0446-4723-8b44-05293f49c650}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Common\PokemonSwSh">
       <UniqueIdentifier>{ca670832-1439-443e-a6b2-6bf5b48ad8d3}</UniqueIdentifier>
     </Filter>
@@ -38,6 +35,9 @@
     </Filter>
     <Filter Include="Source Files\Common\SwitchFramework">
       <UniqueIdentifier>{10ade231-7f71-4505-a596-091dfe263106}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common\Cpp">
+      <UniqueIdentifier>{8d23dd57-0446-4723-8b44-05293f49c650}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -65,26 +65,11 @@
     <ClInclude Include="..\..\ClientSource\Libraries\Logging.h">
       <Filter>Source Files\ClientSource\Libraries</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\ClientSource\Libraries\Compiler.h">
-      <Filter>Source Files\ClientSource\Libraries</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\ClientSource\Libraries\Utilities.h">
       <Filter>Source Files\ClientSource\Libraries</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\Clientside\PrettyPrint.h">
-      <Filter>Source Files\Common\Clientside</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\Clientside\Unicode.h">
-      <Filter>Source Files\Common\Clientside</Filter>
-    </ClInclude>
     <ClInclude Include="..\..\ClientSource\Connection\BotBase.h">
       <Filter>Source Files\ClientSource\Connection</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\Clientside\AsyncDispatcher.h">
-      <Filter>Source Files\Common\Clientside</Filter>
-    </ClInclude>
-    <ClInclude Include="..\..\Common\Clientside\SpinLock.h">
-      <Filter>Source Files\Common\Clientside</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Common\PokemonSwSh\PokemonProgramIDs.h">
       <Filter>Source Files\Common\PokemonSwSh</Filter>
@@ -128,6 +113,30 @@
     <ClInclude Include="..\..\Common\SwitchFramework\Switch_PushButtons.h">
       <Filter>Source Files\Common\SwitchFramework</Filter>
     </ClInclude>
+    <ClInclude Include="..\..\Common\Cpp\AsyncDispatcher.h">
+      <Filter>Source Files\Common\Cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\Cpp\Exception.h">
+      <Filter>Source Files\Common\Cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\Cpp\FixedLimitVector.h">
+      <Filter>Source Files\Common\Cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\Cpp\PanicDump.h">
+      <Filter>Source Files\Common\Cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\Cpp\PrettyPrint.h">
+      <Filter>Source Files\Common\Cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\Cpp\SpinLock.h">
+      <Filter>Source Files\Common\Cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\Cpp\Unicode.h">
+      <Filter>Source Files\Common\Cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\Compiler.h">
+      <Filter>Source Files\Common</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\ClientSource\Connection\PABotBaseConnection.cpp">
@@ -168,15 +177,6 @@
     </ClCompile>
     <ClCompile Include="..\..\ClientSource\Programs\DateSpam-WattFarmer.cpp">
       <Filter>Source Files\ClientSource\Programs</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\Clientside\PrettyPrint.cpp">
-      <Filter>Source Files\Common\Clientside</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\Clientside\Unicode.cpp">
-      <Filter>Source Files\Common\Clientside</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\Clientside\AsyncDispatcher.cpp">
-      <Filter>Source Files\Common\Clientside</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSettings.c">
       <Filter>Source Files\Common\PokemonSwSh</Filter>
@@ -219,6 +219,21 @@
     </ClCompile>
     <ClCompile Include="..\..\Common\SwitchFramework\Switch_PushButtons.cpp">
       <Filter>Source Files\Common\SwitchFramework</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\Cpp\PanicDump.cpp">
+      <Filter>Source Files\Common\Cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\Cpp\PrettyPrint.cpp">
+      <Filter>Source Files\Common\Cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\Cpp\Unicode.cpp">
+      <Filter>Source Files\Common\Cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\Cpp\AsyncDispatcher.cpp">
+      <Filter>Source Files\Common\Cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\Cpp\Exception.cpp">
+      <Filter>Source Files\Common\Cpp</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

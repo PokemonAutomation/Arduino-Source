@@ -15,6 +15,27 @@ using std::endl;
 
 namespace PokemonAutomation{
 
+const std::map<std::string, std::string> STATS_DATABASE_ALIASES{
+    {"Dex Rec Finder", "PokemonSwSh:DexRecFinder"},
+    {"Day Skipper (JPN)", "PokemonSwSh:DaySkipperJPN"},
+    {"Day Skipper (EU)", "PokemonSwSh:DaySkipperEU"},
+    {"Day Skipper (US)", "PokemonSwSh:DaySkipperUS"},
+    {"Day Skipper (JPN) - 7.8k", "PokemonSwSh:DaySkipperJPN7p8k"},
+    {"Purple Beam Finder", "PokemonSwSh:PurpleBeamFinder"},
+    {"Auto-Host Multi-Game", "PokemonSwSh:AutoHostMultiGame"},
+    {"Auto-Host Rolling", "PokemonSwSh:AutoHostRolling"},
+    {"Stats Reset", "PokemonSwSh:StatsReset"},
+    {"Shiny Hunt Autonomous - Regi", "PokemonSwSh:ShinyHuntAutonomousRegi"},
+    {"Shiny Hunt Autonomous - Swords Of Justice", "PokemonSwSh:ShinyHuntAutonomousSwordsOfJustice"},
+    {"Shiny Hunt Autonomous - Strong Spawn", "PokemonSwSh:ShinyHuntAutonomousStrongSpawn"},
+    {"Shiny Hunt Autonomous - Regigigas2", "PokemonSwSh:ShinyHuntAutonomousRegigigas2"},
+    {"Shiny Hunt Autonomous - IoA Trade", "PokemonSwSh:ShinyHuntAutonomousIoATrade"},
+    {"Shiny Hunt Autonomous - Berry Tree", "PokemonSwSh:ShinyHuntAutonomousBerryTree"},
+    {"Shiny Hunt Autonomous - Whistling", "PokemonSwSh:ShinyHuntAutonomousWhistling"},
+    {"Shiny Hunt Autonomous - Fishing", "PokemonSwSh:ShinyHuntAutonomousFishing"},
+    {"Shiny Hunt Autonomous - Overworld", "PokemonSwSh:ShinyHuntAutonomousOverworld"},
+};
+
 
 
 StatLine::StatLine(const StatsTracker& tracker)
@@ -89,8 +110,8 @@ StatList* StatSet::find(const std::string& label){
         : &iter->second;
 }
 #endif
-StatList& StatSet::operator[](const std::string& label){
-    return m_data[label];
+StatList& StatSet::operator[](const std::string& identifier){
+    return m_data[identifier];
 }
 
 std::string StatSet::to_str() const{
@@ -127,7 +148,7 @@ void StatSet::open_from_file(const QString& filepath){
 
 bool StatSet::update_file(
     const QString& filepath,
-    const std::string& label,
+    const std::string& identifier,
     const StatsTracker& tracker
 ){
     QFile file(filepath);
@@ -139,7 +160,7 @@ bool StatSet::update_file(
     StatSet set;
     set.load_from_string(data.c_str());
 
-    set[label] += tracker;
+    set[identifier] += tracker;
 
     data = set.to_str();
     file.seek(0);
@@ -191,6 +212,11 @@ void StatSet::load_from_string(const char* ptr){
         }
         if (line.empty()){
             continue;
+        }
+
+        auto iter = STATS_DATABASE_ALIASES.find(line);
+        if (iter != STATS_DATABASE_ALIASES.end()){
+            line = iter->second;
         }
 
         StatList& program = m_data[line];

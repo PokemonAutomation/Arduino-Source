@@ -24,7 +24,7 @@ std::string current_time();
 class MessageLogger : public MessageSniffer{
 public:
     MessageLogger(bool log_everything = false)
-        : m_low_everything_owner(false)
+        : m_low_everything_owner(log_everything)
         , m_log_everything(m_low_everything_owner)
     {}
     MessageLogger(std::atomic<bool>& log_everything)

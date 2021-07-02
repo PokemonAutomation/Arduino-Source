@@ -6,7 +6,8 @@
 
 #include <time.h>
 #include <fstream>
-#include "Common/Clientside/Unicode.h"
+#include "Common/Cpp/Unicode.h"
+#include "Common/Cpp/PrettyPrint.h"
 //#include "ClientSource/Libraries/Logging.h"
 #include "CrashDump.h"
 
@@ -14,28 +15,6 @@
 using std::cout;
 using std::endl;
 
-namespace PokemonAutomation{
-
-std::string now_to_filestring(){
-#if _WIN32 && _MSC_VER
-#pragma warning(disable:4996)
-#endif
-
-    time_t t = time(0);
-    struct tm* now = localtime(&t);
-
-    std::string str;
-    str += std::to_string(now->tm_year + 1900);
-    str += std::string(now->tm_mon + 1 < 10 ? "0" : "") + std::to_string(now->tm_mon + 1);
-    str += std::string(now->tm_mday    < 10 ? "0" : "") + std::to_string(now->tm_mday);
-    str += "-";
-    str += std::string(now->tm_hour    < 10 ? "0" : "") + std::to_string(now->tm_hour);
-    str += std::string(now->tm_min     < 10 ? "0" : "") + std::to_string(now->tm_min);
-    str += std::string(now->tm_sec     < 10 ? "0" : "") + std::to_string(now->tm_sec);
-    return str;
-}
-
-}
 
 
 #if _WIN32 && _MSC_VER

@@ -18,12 +18,20 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class ShinyHuntAutonomousRegigigas2 : public SingleSwitchProgram{
+
+class ShinyHuntAutonomousRegigigas2_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
-    ShinyHuntAutonomousRegigigas2();
+    ShinyHuntAutonomousRegigigas2_Descriptor();
+};
+
+
+
+class ShinyHuntAutonomousRegigigas2 : public SingleSwitchProgramInstance{
+public:
+    ShinyHuntAutonomousRegigigas2(const ShinyHuntAutonomousRegigigas2_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
     bool kill_and_return(SingleSwitchProgramEnvironment& env) const;
@@ -40,7 +48,7 @@ private:
             bool take_video,
             bool run_from_everything
         );
-        virtual bool run_away() override;
+        virtual bool run_away(bool confirmed_encounter) override;
 
         ProgramEnvironment& m_env;
     };

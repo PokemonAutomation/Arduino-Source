@@ -14,13 +14,21 @@ namespace PokemonHome{
 
 
 
-PageSwap::PageSwap()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
-        STRING_POKEMON + " Home - Page Swap",
+PageSwap_Descriptor::PageSwap_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonHome:PageSwap",
+        STRING_POKEMON + " Home: Page Swap",
         "SerialPrograms/PokemonHome-PageSwap.md",
-        "Swap 30 boxes (1 page) in " + STRING_POKEMON + " Home."
+        "Swap 30 boxes (1 page) in " + STRING_POKEMON + " Home.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+PageSwap::PageSwap(const PageSwap_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , DODGE_SYSTEM_UPDATE_WINDOW(
         "<b>Dodge System Update Window:</b>",
         false
@@ -29,7 +37,7 @@ PageSwap::PageSwap()
     m_options.emplace_back(&DODGE_SYSTEM_UPDATE_WINDOW, "DODGE_SYSTEM_UPDATE_WINDOW");
 }
 
-void PageSwap::program(SingleSwitchProgramEnvironment& env) const{
+void PageSwap::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
     resume_game_no_interact(env.console, DODGE_SYSTEM_UPDATE_WINDOW);
 

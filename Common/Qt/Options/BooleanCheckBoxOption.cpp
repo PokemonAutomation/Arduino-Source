@@ -8,6 +8,10 @@
 #include <QLabel>
 #include "BooleanCheckBoxOption.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -19,7 +23,10 @@ BooleanCheckBoxOption::BooleanCheckBoxOption(
     : m_label(std::move(label))
     , m_default(default_value)
     , m_current(backing)
-{}
+{
+//    cout << "Backing: " << m_label.toUtf8().data() << endl;
+//    cout << "&m_current = " << &m_current << endl;
+}
 BooleanCheckBoxOption::BooleanCheckBoxOption(
     QString label,
     bool default_value
@@ -67,7 +74,11 @@ BooleanCheckBoxOptionUI::BooleanCheckBoxOptionUI(QWidget& parent, BooleanCheckBo
     layout->addWidget(m_box, 1);
     connect(
         m_box, &QCheckBox::stateChanged,
-        this, [=](int){ m_value.m_current = m_box->isChecked(); }
+        this, [=](int){
+            m_value.m_current = m_box->isChecked();
+//            cout << "m_value.m_current = " << m_value.m_current << endl;
+//            cout << "&m_value.m_current = " << &m_value.m_current << endl;
+        }
     );
 }
 void BooleanCheckBoxOptionUI::restore_defaults(){

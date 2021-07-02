@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/FrameworkSettings.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
@@ -23,13 +23,21 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-ShinyHuntAutonomousSwordsOfJustice::ShinyHuntAutonomousSwordsOfJustice()
-    : SingleSwitchProgram(
-        FeedbackType::REQUIRED, PABotBaseLevel::PABOTBASE_12KB,
+ShinyHuntAutonomousSwordsOfJustice_Descriptor::ShinyHuntAutonomousSwordsOfJustice_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:ShinyHuntAutonomousSwordsOfJustice",
         "Shiny Hunt Autonomous - Swords Of Justice",
         "SerialPrograms/ShinyHuntAutonomous-SwordsOfJustice.md",
-        "Automatically hunt for shiny Sword of Justice using video feedback."
+        "Automatically hunt for shiny Sword of Justice using video feedback.",
+        FeedbackType::REQUIRED,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+ShinyHuntAutonomousSwordsOfJustice::ShinyHuntAutonomousSwordsOfJustice(const ShinyHuntAutonomousSwordsOfJustice_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(
         "<b>Go Home when Done:</b><br>After finding a shiny, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
         false
@@ -97,7 +105,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousSwordsOfJustice::make_stats() c
 
 
 
-void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment& env) const{
+void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
     resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 
@@ -107,6 +115,7 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
     Stats& stats = env.stats<Stats>();
     StandardEncounterTracker tracker(
         stats, env, env.console,
+        nullptr, Language::None,
         false,
         EXIT_BATTLE_TIMEOUT,
         VIDEO_ON_SHINY,
@@ -161,7 +170,7 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
         if (detection == ShinyDetection::NO_BATTLE_MENU){
             stats.m_timeouts++;
             pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
-            tracker.run_away();
+            tracker.run_away(false);
         }
     }
 

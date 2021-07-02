@@ -14,13 +14,22 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-MassRelease::MassRelease()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+
+MassRelease_Descriptor::MassRelease_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:MassRelease",
         "Mass Release",
         "NativePrograms/MassRelease.md",
-        "Mass release boxes of " + STRING_POKEMON + "."
+        "Mass release boxes of " + STRING_POKEMON + ".",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+MassRelease::MassRelease(const MassRelease_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , BOXES_TO_RELEASE(
         "<b>Number of Boxes to Release:</b>",
         2, 0, 32
@@ -34,7 +43,7 @@ MassRelease::MassRelease()
     m_options.emplace_back(&DODGE_SYSTEM_UPDATE_WINDOW, "DODGE_SYSTEM_UPDATE_WINDOW");
 }
 
-void MassRelease::program(SingleSwitchProgramEnvironment& env) const{
+void MassRelease::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
     resume_game_no_interact(env.console, DODGE_SYSTEM_UPDATE_WINDOW);
 

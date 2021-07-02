@@ -16,11 +16,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class RaidItemFarmerOHKO : public MultiSwitchProgram{
-public:
-    RaidItemFarmerOHKO();
 
-    virtual void program(MultiSwitchProgramEnvironment& env) const override;
+class RaidItemFarmerOHKO_Descriptor : public MultiSwitchProgramDescriptor{
+public:
+    RaidItemFarmerOHKO_Descriptor();
+};
+
+
+
+class RaidItemFarmerOHKO : public MultiSwitchProgramInstance{
+public:
+    RaidItemFarmerOHKO(const RaidItemFarmerOHKO_Descriptor& descriptor);
+
+    virtual void program(MultiSwitchProgramEnvironment& env) override;
 
 private:
     BooleanCheckBox BACKUP_SAVE;

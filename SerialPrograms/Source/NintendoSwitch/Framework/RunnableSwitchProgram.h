@@ -13,105 +13,99 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Options/ConfigOption.h"
-#include "CommonFramework/Panels/RightPanel.h"
+#include "CommonFramework/Panels/Panel.h"
+#include "CommonFramework/Panels/RunnablePanel.h"
 #include "SwitchSetup.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-//using PABotBase = PokemonAutomation::PABotBase;
-//using BotBase = BotBase;
-
-
-
-
-class RunnableProgram : public RightPanel{
+class RunnableSwitchProgramDescriptor : public RunnablePanelDescriptor{
 public:
-    RunnableProgram(
-        FeedbackType feedback,
-        PABotBaseLevel min_pabotbase_level,
-        QString name,
+    RunnableSwitchProgramDescriptor(
+        std::string identifier,
+        QString display_name,
         QString doc_link,
-        QString description
+        QString description,
+        FeedbackType feedback,
+        PABotBaseLevel min_pabotbase_level
     );
-    void from_json(const QJsonValue& json);
-    virtual QJsonValue to_json() const override;
 
-    bool is_valid() const;
-    void restore_defaults();
-
-    virtual std::unique_ptr<StatsTracker> make_stats() const{ return nullptr; }
-    virtual QWidget* make_ui(MainWindow& window) override;
+    FeedbackType feedback() const{ return m_feedback; }
+    PABotBaseLevel min_pabotbase_level() const{ return m_min_pabotbase_level; }
 
 protected:
-    friend class RunnableProgramUI;
     const FeedbackType m_feedback;
     const PABotBaseLevel m_min_pabotbase_level;
-    SwitchSetupFactory* m_setup;
-    std::vector<std::pair<ConfigOption*, QString>> m_options;
 };
 
 
-class RunnableProgramUI : public RightPanelUI{
-    Q_OBJECT
-    friend class RunnableProgram;
 
-protected:
-    RunnableProgramUI(RunnableProgram& factory, MainWindow& parent);
-    virtual void append_description(QWidget& parent, QVBoxLayout& layout) override;
-    virtual void make_body(QWidget& parent, QVBoxLayout& layout) override;
+class RunnableSwitchProgramInstance : public RunnablePanelInstance{
+public:
+    using RunnablePanelInstance::RunnablePanelInstance;
+
+    const RunnableSwitchProgramDescriptor& descriptor() const{
+        return static_cast<const RunnableSwitchProgramDescriptor&>(m_descriptor);
+    }
+
+    virtual std::unique_ptr<StatsTracker> make_stats() const{ return nullptr; }
 
 public:
-    virtual ~RunnableProgramUI();
-    void stop();
+    //  Serialization
+    virtual void from_json(const QJsonValue& json) override;
+    virtual QJsonValue to_json() const override;
 
-    virtual bool settings_valid() const;
-    void restore_defaults();
-    virtual ProgramState update_ui();
+protected:
+    friend class RunnableSwitchProgramWidget;
 
-    void set_status(QString status);
+    SwitchSetupFactory* m_setup = nullptr;
+};
 
-private:
-    void on_stop();
-    void reset_connections();
+
+
+class RunnableSwitchProgramWidget : public RunnablePanelWidget{
+public:
+    virtual ~RunnableSwitchProgramWidget();
+
+protected:
+    RunnableSwitchProgramWidget(
+        QWidget& parent,
+        RunnableSwitchProgramInstance& instance,
+        PanelListener& listener
+    );
+    void construct();
+    virtual QWidget* make_header(QWidget& parent) override;
+    virtual QWidget* make_options(QWidget& parent) override;
+    virtual QWidget* make_actions(QWidget& parent) override;
+
+protected:
+    virtual bool settings_valid() const override;
+
+    virtual void update_ui() override;
     void update_historical_stats();
-    virtual void program(
+
+    virtual void on_stop() override;
+
+    virtual void run_program() override;
+    virtual void run_program(
         StatsTracker* current_stats,
         const StatsTracker* historical_stats
-    ){}
-
-    void run_program();
-
-signals:
-    void signal_cancel();
-    void signal_error(QString message);
-    void signal_reset();
-
-public slots:
-    void show_stats_warning() const;
+    ) = 0;
 
 protected:
     static BotBase& sanitize_botbase(BotBase* botbase);
 
 protected:
-    const QString& m_name;
-    MainWindow& m_window;
-    TaggedLogger m_logger;
+    friend class RunnableSwitchProgramInstance;
 
     SwitchSetup* m_setup;
-    std::vector<ConfigOptionUI*> m_options;
-
-    QLabel* m_status_bar;
-    QPushButton* m_start_button;
-    QPushButton* m_default_button;
 
     std::unique_ptr<StatsTracker> m_stats;
-
-//    ProgramEnvironment m_environment;
-    std::atomic<ProgramState> m_state;
-    std::thread m_thread;
 };
+
+
 
 
 

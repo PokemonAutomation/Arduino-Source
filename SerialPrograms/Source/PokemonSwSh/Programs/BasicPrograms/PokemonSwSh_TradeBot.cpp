@@ -17,13 +17,22 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-TradeBot::TradeBot()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+
+TradeBot_Descriptor::TradeBot_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:TradeBot",
         "Trade Bot",
         "NativePrograms/TradeBot.md",
-        "Surprise trade with a code for hosting giveaways."
+        "Surprise trade with a code for hosting giveaways.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+TradeBot::TradeBot(const TradeBot_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , TRADE_CODE(
         "<b>Trade Code:</b>",
         8,
@@ -129,7 +138,7 @@ void TradeBot::trade_slot(const BotBaseContext& context, const uint8_t code[8], 
     }
 }
 
-void TradeBot::program(SingleSwitchProgramEnvironment& env) const{
+void TradeBot::program(SingleSwitchProgramEnvironment& env){
     uint8_t code[8];
     TRADE_CODE.to_str(code);
 

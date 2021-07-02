@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/FrameworkSettings.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
@@ -20,13 +20,22 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi()
-    : SingleSwitchProgram(
-        FeedbackType::REQUIRED, PABotBaseLevel::PABOTBASE_12KB,
+
+ShinyHuntAutonomousRegi_Descriptor::ShinyHuntAutonomousRegi_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:ShinyHuntAutonomousRegi",
         "Shiny Hunt Autonomous - Regi",
         "SerialPrograms/ShinyHuntAutonomous-Regi.md",
-        "Automatically hunt for shiny Regi using video feedback."
+        "Automatically hunt for shiny Regi using video feedback.",
+        FeedbackType::REQUIRED,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi(const ShinyHuntAutonomousRegi_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(
         "<b>Go Home when Done:</b><br>After finding a shiny, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
         false
@@ -96,13 +105,14 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegi::make_stats() const{
 
 
 
-void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env) const{
+void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
     resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
 
     Stats& stats = env.stats<Stats>();
     StandardEncounterTracker tracker(
         stats, env, env.console,
+        nullptr, Language::None,
         REQUIRE_SQUARE,
         EXIT_BATTLE_TIMEOUT,
         VIDEO_ON_SHINY,
@@ -150,7 +160,7 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env) const
         }
         if (detection == ShinyDetection::NO_BATTLE_MENU){
             pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
-            tracker.run_away();
+            tracker.run_away(false);
             error = true;
         }
     }

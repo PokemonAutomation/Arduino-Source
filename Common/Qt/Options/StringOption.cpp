@@ -13,12 +13,22 @@ namespace PokemonAutomation{
 
 
 StringOption::StringOption(
+    QString& backing,
     QString label,
     QString default_value
 )
     : m_label(std::move(label))
     , m_default(default_value)
-    , m_current(default_value)
+    , m_current(backing)
+{}
+StringOption::StringOption(
+    QString label,
+    QString default_value
+)
+    : m_label(std::move(label))
+    , m_default(default_value)
+    , m_current(m_backing)
+    , m_backing(default_value)
 {}
 void StringOption::load_default(const QJsonValue& json){
     if (!json.isString()) {

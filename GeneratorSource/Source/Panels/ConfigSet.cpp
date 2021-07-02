@@ -10,7 +10,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QMessageBox>
-#include "Common/Qt/StringException.h"
+#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Tools/Tools.h"
 #include "Tools/PersistentSettings.h"
@@ -25,8 +25,8 @@ const QString ConfigSet::JSON_CONFIG_PATH   = "1-ConfigPath";
 const QString ConfigSet::JSON_DESCRIPTION   = "2-Description";
 const QString ConfigSet::JSON_OPTIONS       = "3-Options";
 
-ConfigSet::ConfigSet(const QJsonObject& obj)
-    : RightPanel(json_get_string_throw(obj, JSON_CONFIG_NAME))
+ConfigSet::ConfigSet(QString category, const QJsonObject& obj)
+    : RightPanel(std::move(category), json_get_string_throw(obj, JSON_CONFIG_NAME))
     , m_path(json_get_string_throw(obj, JSON_CONFIG_PATH))
     , m_description(json_get_string_throw(obj, JSON_DESCRIPTION))
 {}
@@ -49,7 +49,7 @@ std::string ConfigSet::to_cfile() const{
     return body;
 }
 QString ConfigSet::save_json() const{
-    QString name = settings.path + CONFIG_FOLDER_NAME + "/" + m_name + ".json";
+    QString name = settings.path + CONFIG_FOLDER_NAME + "/" + m_category + "/" + m_name + ".json";
     write_json_file(name, to_json());
     return name;
 }
@@ -58,10 +58,10 @@ QString ConfigSet::save_cfile() const{
     std::string cpp = to_cfile();
     QFile file(name);
     if (!file.open(QFile::WriteOnly)){
-        throw StringException("Unable to create source file: " + name);
+        PA_THROW_FileException("Unable to create source file.", name);
     }
     if (file.write(cpp.c_str(), cpp.size()) != cpp.size()){
-        throw StringException("Unable to write source file: " + name);
+        PA_THROW_FileException("Unable to write source file.", name);
     }
     file.close();
     return name;
@@ -91,9 +91,9 @@ QWidget* ConfigSet::make_ui(MainWindow& parent){
                     QString cfile = save_cfile();
                     QMessageBox box;
                     box.information(nullptr, "Success!", "Settings saved to:\n" + json + "\n" + cfile);
-                }catch (const StringException& str){
+                }catch (const StringException& e){
                     QMessageBox box;
-                    box.critical(nullptr, "Error", str.message());
+                    box.critical(nullptr, "Error", e.message_qt());
                     return;
                 }
             }

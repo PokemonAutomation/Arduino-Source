@@ -11,7 +11,7 @@
 #include <QHeaderView>
 #include <QCheckBox>
 #include <QScrollBar>
-#include "Common/Qt/StringException.h"
+#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Common/Qt/ExpressionEvaluator.h"
 #include "MultiHostTableOption.h"
@@ -128,7 +128,7 @@ bool MultiHostTableOption::is_valid() const{
         int ticks;
         try{
             ticks = parse_ticks_i32(item.post_raid_delay);
-        }catch (...){
+        }catch (const ParseException&){
             return false;
         }
         if (ticks < 0 || ticks > 65535){

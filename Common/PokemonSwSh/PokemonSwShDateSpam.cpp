@@ -108,6 +108,17 @@ int register_message_converters_pokemon_date_spam(){
         }
     );
     register_message_converter(
+        PABB_MSG_COMMAND_NEUTRAL_DATE_SKIP,
+        [](const std::string& body){
+            std::stringstream ss;
+            ss << "neutral_date_skip() - ";
+            if (body.size() != sizeof(pabb_neutral_date_skip)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_neutral_date_skip*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            return ss.str();
+        }
+    );
+    register_message_converter(
         PABB_MSG_COMMAND_ROLL_DATE_FORWARD_1,
         [](const std::string& body){
             std::stringstream ss;

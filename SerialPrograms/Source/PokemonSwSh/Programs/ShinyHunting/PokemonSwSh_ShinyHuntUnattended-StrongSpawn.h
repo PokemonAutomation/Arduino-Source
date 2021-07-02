@@ -17,11 +17,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class ShinyHuntUnattendedStrongSpawn : public SingleSwitchProgram{
-public:
-    ShinyHuntUnattendedStrongSpawn();
 
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+class ShinyHuntUnattendedStrongSpawn_Descriptor : public RunnableSwitchProgramDescriptor{
+public:
+    ShinyHuntUnattendedStrongSpawn_Descriptor();
+};
+
+
+
+class ShinyHuntUnattendedStrongSpawn : public SingleSwitchProgramInstance{
+public:
+    ShinyHuntUnattendedStrongSpawn(const ShinyHuntUnattendedStrongSpawn_Descriptor& descriptor);
+
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
     TimeExpression<uint16_t> ENTER_GAME_TO_RUN_DELAY;

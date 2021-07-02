@@ -16,11 +16,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class ShinyHuntUnattendedRegigigas2 : public SingleSwitchProgram{
-public:
-    ShinyHuntUnattendedRegigigas2();
 
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+class ShinyHuntUnattendedRegigigas2_Descriptor : public RunnableSwitchProgramDescriptor{
+public:
+    ShinyHuntUnattendedRegigigas2_Descriptor();
+};
+
+
+
+class ShinyHuntUnattendedRegigigas2 : public SingleSwitchProgramInstance{
+public:
+    ShinyHuntUnattendedRegigigas2(const ShinyHuntUnattendedRegigigas2_Descriptor& descriptor);
+
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
     SimpleInteger<uint8_t> REVERSAL_PP;

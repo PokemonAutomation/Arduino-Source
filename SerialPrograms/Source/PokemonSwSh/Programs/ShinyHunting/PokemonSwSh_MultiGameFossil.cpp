@@ -17,13 +17,21 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-MultiGameFossil::MultiGameFossil()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+MultiGameFossil_Descriptor::MultiGameFossil_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:MultiGameFossil",
         "Multi-Game Fossil Revive",
         "NativePrograms/MultiGameFossil.md",
-        "Revive fossils. Supports multiple saves so you can go afk for longer than 5 hours."
+        "Revive fossils. Supports multiple saves so you can go afk for longer than 5 hours.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+MultiGameFossil::MultiGameFossil(const MultiGameFossil_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
 {
     m_options.emplace_back(&GAME_LIST, "GAME_LIST");
 }
@@ -108,7 +116,7 @@ void run_fossil_batch(
 }
 
 
-void MultiGameFossil::program(SingleSwitchProgramEnvironment& env) const{
+void MultiGameFossil::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
 
     FossilTable::GameSlot batch;

@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/FrameworkSettings.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
@@ -20,13 +20,22 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-ShinyHuntAutonomousIoATrade::ShinyHuntAutonomousIoATrade()
-    : SingleSwitchProgram(
-        FeedbackType::REQUIRED, PABotBaseLevel::PABOTBASE_12KB,
+
+ShinyHuntAutonomousIoATrade_Descriptor::ShinyHuntAutonomousIoATrade_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:ShinyHuntAutonomousIoATrade",
         "Shiny Hunt Autonomous - IoA Trade",
         "SerialPrograms/ShinyHuntAutonomous-IoATrade.md",
-        "Hunt for shiny Isle of Armor trade using video feedback."
+        "Hunt for shiny Isle of Armor trade using video feedback.",
+        FeedbackType::REQUIRED,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+ShinyHuntAutonomousIoATrade::ShinyHuntAutonomousIoATrade(const ShinyHuntAutonomousIoATrade_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(
         "<b>Go Home when Done:</b><br>After finding a shiny, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
         false
@@ -80,7 +89,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousIoATrade::make_stats() const{
 
 
 
-void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env) const{
+void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
     resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);
 

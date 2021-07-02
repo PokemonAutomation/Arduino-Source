@@ -22,7 +22,7 @@ public:
     static const QString JSON_OPTIONS;
 
 public:
-    ConfigSet(const QJsonObject& obj);
+    ConfigSet(QString category, const QJsonObject& obj);
 
     const QString& description() const{ return m_description; }
 

@@ -14,8 +14,8 @@ namespace PokemonAutomation{
 
 class Program_JsonFile : public Program{
 public:
-    Program_JsonFile(const QString& filepath);
-    Program_JsonFile(const QJsonObject& obj);
+    Program_JsonFile(QString category, const QString& filepath);
+    Program_JsonFile(QString category, const QJsonObject& obj);
 
     virtual bool is_valid() const override;
     virtual void restore_defaults() override;

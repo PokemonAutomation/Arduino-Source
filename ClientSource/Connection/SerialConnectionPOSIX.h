@@ -13,7 +13,9 @@
 #include <fcntl.h>
 #include <termios.h>
 #include <unistd.h>
-#include "Common/Clientside/SpinLock.h"
+#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/PanicDump.h"
 #include "StreamInterface.h"
 
 //#include <iostream>
@@ -34,7 +36,7 @@ public:
         case 57600: baud = B57600;  break;
         case 115200: baud = B115200;break;
         default:
-            throw "Unsupported Baud Rate: " + std::to_string(baud_rate);
+            PA_THROW_StringException("Unsupported Baud Rate: " + std::to_string(baud_rate));
         }
 //        std::cout << "desired baud = " << baud << std::endl;
 
@@ -45,13 +47,13 @@ public:
             if (error == EACCES){
                 str += " (permission denied)\nPlease run as sudo.";
             }
-            throw str;
+            PA_THROW_StringException(std::move(str));
         }
 
         struct termios options;
         if (tcgetattr(m_fd, &options) == -1){
             int error = errno;
-            throw "tcgetattr() failed. Error = " + std::to_string(error);
+            PA_THROW_StringException("tcgetattr() failed. Error = " + std::to_string(error));
         }
 //        std::cout << "read baud = " << cfgetispeed(&options) << std::endl;
 //        std::cout << "write baud = " << cfgetospeed(&options) << std::endl;
@@ -59,11 +61,11 @@ public:
         //  Baud Rate
         if (cfsetispeed(&options, baud) == -1){
             int error = errno;
-            throw "cfsetispeed() failed. Error = " + std::to_string(error);
+            PA_THROW_StringException("cfsetispeed() failed. Error = " + std::to_string(error));
         }
         if (cfsetospeed(&options, baud) == -1){
             int error = errno;
-            throw "cfsetospeed() failed. Error = " + std::to_string(error);
+            PA_THROW_StringException("cfsetospeed() failed. Error = " + std::to_string(error));
         }
 //        std::cout << "write baud = " << cfgetispeed(&options) << std::endl;
 //        std::cout << "write baud = " << cfgetospeed(&options) << std::endl;
@@ -102,25 +104,25 @@ public:
 
         if (tcsetattr(m_fd, TCSANOW, &options) == -1){
             int error = errno;
-            throw "tcsetattr() failed. Error = " + std::to_string(error);
+            PA_THROW_StringException("tcsetattr() failed. Error = " + std::to_string(error));
         }
 
         if (tcgetattr(m_fd, &options) == -1){
             int error = errno;
-            throw "tcgetattr() failed. Error = " + std::to_string(error);
+            PA_THROW_StringException("tcgetattr() failed. Error = " + std::to_string(error));
         }
         if (cfgetispeed(&options) != baud){
 //            std::cout << "actual baud = " << cfgetispeed(&options) << std::endl;
-            throw "Unable to set input baud rate.";
+            PA_THROW_StringException("Unable to set input baud rate.");
         }
         if (cfgetospeed(&options) != baud){
 //            std::cout << "actual baud = " << cfgetospeed(&options) << std::endl;
-            throw "Unable to set output baud rate.";
+            PA_THROW_StringException("Unable to set output baud rate.");
         }
 
         //  Start receiver thread.
         try{
-            m_listener = std::thread(&SerialConnection::recv_loop, this);
+            m_listener = std::thread(run_with_catch, "SerialConnection::SerialConnection()", [=]{ recv_loop(); });
         }catch (...){
             close(m_fd);
             throw;

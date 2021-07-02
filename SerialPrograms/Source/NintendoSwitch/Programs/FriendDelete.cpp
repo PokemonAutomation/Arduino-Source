@@ -13,13 +13,20 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-FriendDelete::FriendDelete()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+FriendDelete_Descriptor::FriendDelete_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "NintendoSwitch:FriendDelete",
         "Friend Delete",
         "NativePrograms/FriendDelete.md",
-        "Mass delete/block all those unwanted friends."
+        "Mass delete/block all those unwanted friends.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+FriendDelete::FriendDelete(const FriendDelete_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , FRIENDS_TO_DELETE(
         "<b>Number of Friends to Delete:</b>",
         3, 0, 300
@@ -47,8 +54,7 @@ FriendDelete::FriendDelete()
     m_options.emplace_back(&DELETE_FRIEND_DELAY, "DELETE_FRIEND_DELAY");
     m_options.emplace_back(&FINISH_DELETE_DELAY, "FINISH_DELETE_DELAY");
 }
-
-void FriendDelete::program(SingleSwitchProgramEnvironment& env) const{
+void FriendDelete::program(SingleSwitchProgramEnvironment& env){
     pbf_press_button(env.console, BUTTON_A, 5, 5);
 
     for (uint16_t c = 0; c < FRIENDS_TO_DELETE; c++){
@@ -69,6 +75,9 @@ void FriendDelete::program(SingleSwitchProgramEnvironment& env) const{
     end_program_callback(env.console);
     end_program_loop(env.console);
 }
+
+
+
 
 
 

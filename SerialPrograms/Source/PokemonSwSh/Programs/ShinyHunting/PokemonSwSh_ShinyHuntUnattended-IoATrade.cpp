@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShMisc.h"
@@ -16,13 +16,21 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-ShinyHuntUnattendedIoATrade::ShinyHuntUnattendedIoATrade()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_31KB,
+ShinyHuntUnattendedIoATrade_Descriptor::ShinyHuntUnattendedIoATrade_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:ShinyHuntUnattendedIoATrade",
         "Shiny Hunt Unattended - IoA Trade",
         "NativePrograms/ShinyHuntUnattended-IoATrade.md",
-        "Hunt for shiny Isle of Armor trade. Stop when a shiny is found."
+        "Hunt for shiny Isle of Armor trade. Stop when a shiny is found.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_31KB
     )
+{}
+
+
+
+ShinyHuntUnattendedIoATrade::ShinyHuntUnattendedIoATrade(const ShinyHuntUnattendedIoATrade_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , START_TO_RUN_DELAY(
         "<b>Start to Run Delay:</b><br>This needs to be carefully calibrated.",
         "1260"
@@ -55,7 +63,7 @@ ShinyHuntUnattendedIoATrade::ShinyHuntUnattendedIoATrade()
     m_options.emplace_back(&MASH_TO_TRADE_DELAY, "MASH_TO_TRADE_DELAY");
 }
 
-void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env) const{
+void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
     resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);
 

@@ -8,8 +8,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
-#include "Common/Clientside/PrettyPrint.h"
-#include "Common/Qt/StringException.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Common/Qt/ExpressionEvaluator.h"
 #include "Tools/Tools.h"

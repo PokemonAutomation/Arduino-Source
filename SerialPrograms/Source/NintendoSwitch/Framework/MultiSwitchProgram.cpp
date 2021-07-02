@@ -11,6 +11,8 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+
+
 MultiSwitchProgramEnvironment::MultiSwitchProgramEnvironment(
     Logger& logger,
     StatsTracker* current_stats,
@@ -41,47 +43,73 @@ void MultiSwitchProgramEnvironment::run_in_parallel(
 
 
 
-MultiSwitchProgram::MultiSwitchProgram(
-    FeedbackType feedback,
-    PABotBaseLevel min_pabotbase,
-    QString name,
+MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
+    std::string identifier,
+    QString display_name,
     QString doc_link,
     QString description,
+    FeedbackType feedback,
+    PABotBaseLevel min_pabotbase_level,
     size_t min_switches,
     size_t max_switches,
-    size_t switches
+    size_t default_switches
 )
-    : RunnableProgram(
-        feedback, min_pabotbase,
-        std::move(name),
+    : RunnableSwitchProgramDescriptor(
+        std::move(identifier),
+        std::move(display_name),
         std::move(doc_link),
-        std::move(description)
+        std::move(description),
+        feedback,
+        min_pabotbase_level
     )
+    , m_min_switches(min_switches)
+    , m_max_switches(max_switches)
+    , m_default_switches(default_switches)
+{}
+
+
+
+MultiSwitchProgramInstance::MultiSwitchProgramInstance(const MultiSwitchProgramDescriptor& descriptor)
+    : RunnableSwitchProgramInstance(descriptor)
     , m_switches(
-        min_pabotbase, feedback,
-        min_switches,
-        max_switches,
-        switches
+        descriptor.min_pabotbase_level(),
+        descriptor.feedback(),
+        descriptor.min_switches(),
+        descriptor.max_switches(),
+        descriptor.default_switches()
     )
 {
     m_setup = &m_switches;
 }
-
-
-MultiSwitchProgramUI::MultiSwitchProgramUI(MultiSwitchProgram& factory, MainWindow& window)
-    : RunnableProgramUI(factory, window)
-{
-    this->construct();
+QWidget* MultiSwitchProgramInstance::make_widget(QWidget& parent, PanelListener& listener){
+    return MultiSwitchProgramWidget::make(parent, *this, listener);
 }
-MultiSwitchProgramUI::~MultiSwitchProgramUI(){ stop(); }
 
-void MultiSwitchProgramUI::program(
+
+
+
+MultiSwitchProgramWidget::~MultiSwitchProgramWidget(){
+    if (!m_destructing){
+        stop();
+        m_destructing = true;
+    }
+}
+MultiSwitchProgramWidget* MultiSwitchProgramWidget::make(
+    QWidget& parent,
+    MultiSwitchProgramInstance& instance,
+    PanelListener& listener
+){
+    MultiSwitchProgramWidget* widget = new MultiSwitchProgramWidget(parent, instance, listener);
+    widget->construct();
+    return widget;
+}
+void MultiSwitchProgramWidget::run_program(
     StatsTracker* current_stats,
     const StatsTracker* historical_stats
 ){
-    MultiSwitchProgram& factory = static_cast<MultiSwitchProgram&>(m_factory);
-    FixedLimitVector<ConsoleHandle> switches(factory.count());
-    for (size_t c = 0; c < factory.count(); c++){
+    MultiSwitchProgramInstance& instance = static_cast<MultiSwitchProgramInstance&>(m_instance);
+    FixedLimitVector<ConsoleHandle> switches(instance.count());
+    for (size_t c = 0; c < instance.count(); c++){
         SwitchSystem& system = static_cast<MultiSwitchSystem&>(*m_setup)[c];
         switches.emplace_back(
             c,
@@ -95,7 +123,7 @@ void MultiSwitchProgramUI::program(
         std::move(switches)
     );
     connect(
-        this, &RunnableProgramUI::signal_cancel,
+        this, &RunnableSwitchProgramWidget::signal_cancel,
         &env, [&]{
             env.signal_stop();
         },
@@ -107,9 +135,10 @@ void MultiSwitchProgramUI::program(
             this->set_status(std::move(status));
         }
     );
-//    PokemonAutomation::global_connection = nullptr;
-    factory.program(env);
+    instance.program(env);
 }
+
+
 
 
 

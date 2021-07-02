@@ -15,11 +15,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class FastCodeEntry : public SingleSwitchProgram{
-public:
-    FastCodeEntry();
 
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+class FastCodeEntry_Descriptor : public RunnableSwitchProgramDescriptor{
+public:
+    FastCodeEntry_Descriptor();
+};
+
+
+
+class FastCodeEntry : public SingleSwitchProgramInstance{
+public:
+    FastCodeEntry(const FastCodeEntry_Descriptor& descriptor);
+
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
     FixedCode RAID_CODE;

@@ -156,14 +156,17 @@
     <ClInclude Include="..\..\ClientSource\Connection\SerialConnectionPOSIX.h" />
     <ClInclude Include="..\..\ClientSource\Connection\SerialConnectionWinAPI.h" />
     <ClInclude Include="..\..\ClientSource\Connection\StreamInterface.h" />
-    <ClInclude Include="..\..\ClientSource\Libraries\Compiler.h" />
     <ClInclude Include="..\..\ClientSource\Libraries\Logging.h" />
     <ClInclude Include="..\..\ClientSource\Libraries\MessageConverter.h" />
     <ClInclude Include="..\..\ClientSource\Libraries\Utilities.h" />
-    <ClInclude Include="..\..\Common\Clientside\PrettyPrint.h" />
-    <ClInclude Include="..\..\Common\Clientside\AsyncDispatcher.h" />
-    <ClInclude Include="..\..\Common\Clientside\SpinLock.h" />
-    <ClInclude Include="..\..\Common\Clientside\Unicode.h" />
+    <ClInclude Include="..\..\Common\Compiler.h" />
+    <ClInclude Include="..\..\Common\Cpp\AsyncDispatcher.h" />
+    <ClInclude Include="..\..\Common\Cpp\Exception.h" />
+    <ClInclude Include="..\..\Common\Cpp\FixedLimitVector.h" />
+    <ClInclude Include="..\..\Common\Cpp\PanicDump.h" />
+    <ClInclude Include="..\..\Common\Cpp\PrettyPrint.h" />
+    <ClInclude Include="..\..\Common\Cpp\SpinLock.h" />
+    <ClInclude Include="..\..\Common\Cpp\Unicode.h" />
     <ClInclude Include="..\..\Common\CRC32.h" />
     <ClInclude Include="..\..\Common\MessageProtocol.h" />
     <ClInclude Include="..\..\Common\PokemonSwSh\PokemonProgramIDs.h" />
@@ -193,9 +196,11 @@
     <ClCompile Include="..\..\ClientSource\Programs\FriendDelete.cpp" />
     <ClCompile Include="..\..\ClientSource\Programs\TurboA.cpp" />
     <ClCompile Include="..\..\ClientSource\Programs\DateSpam-WattFarmer.cpp" />
-    <ClCompile Include="..\..\Common\Clientside\PrettyPrint.cpp" />
-    <ClCompile Include="..\..\Common\Clientside\AsyncDispatcher.cpp" />
-    <ClCompile Include="..\..\Common\Clientside\Unicode.cpp" />
+    <ClCompile Include="..\..\Common\Cpp\AsyncDispatcher.cpp" />
+    <ClCompile Include="..\..\Common\Cpp\Exception.cpp" />
+    <ClCompile Include="..\..\Common\Cpp\PanicDump.cpp" />
+    <ClCompile Include="..\..\Common\Cpp\PrettyPrint.cpp" />
+    <ClCompile Include="..\..\Common\Cpp\Unicode.cpp" />
     <ClCompile Include="..\..\Common\CRC32.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>

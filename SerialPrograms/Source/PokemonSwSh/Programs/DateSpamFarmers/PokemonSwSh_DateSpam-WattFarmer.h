@@ -14,11 +14,19 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class WattFarmer : public SingleSwitchProgram{
-public:
-    WattFarmer();
 
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+class WattFarmer_Descriptor : public RunnableSwitchProgramDescriptor{
+public:
+    WattFarmer_Descriptor();
+};
+
+
+
+class WattFarmer : public SingleSwitchProgramInstance{
+public:
+    WattFarmer(const WattFarmer_Descriptor& descriptor);
+
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
     SimpleInteger<uint32_t> SKIPS;

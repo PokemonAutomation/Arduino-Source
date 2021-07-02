@@ -23,56 +23,6 @@ set PATH=%PATH%C:\WinAVR-20100110\bin;
 set PATH=%PATH%C:\WinAVR-20100110\utils\bin;
 
 
-set programs=
-
-set programs=%programs%;TurboA
-set programs=%programs%;MultiGameFossil
-set programs=%programs%;MassRelease
-set programs=%programs%;SurpriseTrade
-set programs=%programs%;TradeBot
-set programs=%programs%;ClothingBuyer
-set programs=%programs%;BallThrower
-
-set programs=%programs%;DateSpam-WattFarmer
-set programs=%programs%;DateSpam-BerryFarmer
-set programs=%programs%;DateSpam-LotoFarmer
-set programs=%programs%;DateSpam-StowOnSideFarmer
-set programs=%programs%;DateSpam-DailyHighlightFarmer
-
-set programs=%programs%;ShinyHunt-Regi
-set programs=%programs%;ShinyHunt-SwordsOfJustice
-set programs=%programs%;ShinyHuntUnattended-Regi
-set programs=%programs%;ShinyHuntUnattended-SwordsOfJustice
-set programs=%programs%;ShinyHuntUnattended-StrongSpawn
-set programs=%programs%;ShinyHuntUnattended-Regigigas
-set programs=%programs%;ShinyHuntUnattended-Regigigas2
-set programs=%programs%;ShinyHuntUnattended-IoATrade
-
-set programs=%programs%;BeamReset
-set programs=%programs%;EventBeamFinder
-set programs=%programs%;DaySkipperJPN
-set programs=%programs%;DaySkipperEU
-set programs=%programs%;DaySkipperUS
-set programs=%programs%;DaySkipperJPN-7.8k
-
-set programs=%programs%;DenRoller
-set programs=%programs%;AutoHost-Rolling
-set programs=%programs%;AutoHost-MultiGame
-set programs=%programs%;FriendDelete
-
-set programs=%programs%;EggFetcher2
-set programs=%programs%;EggHatcher
-set programs=%programs%;EggCombined2
-set programs=%programs%;EggSuperCombined2
-
-set programs=%programs%;FastCodeEntry
-set programs=%programs%;GodEggItemDupe
-set programs=%programs%;GodEggDuplication
-
-set programs=%programs%;PABotBase
-set programs=%programs%;Sandbox
-set programs=%programs%;CustomProgram
-
 
 
 echo Checking make command...
@@ -106,7 +56,7 @@ copy NUL obj\build-%MCU% > NUL
 
 
 echo.
-echo Starting build... This make take a while if your computer is slow.
+echo Starting build... This may take a while if your computer is slow.
 echo.
 
 if not exist obj\ (
@@ -117,18 +67,18 @@ if not exist obj\ (
 ::  Build one first to build all the shared libraries.
 ::  Only then can we run the rest in parallel.
 
-for %%p in (%programs%) do (
+for /F "tokens=*" %%p in (ProgramList.txt) do (
     set first=%%p
-    @call Scripts\BuildOne.cmd %board% %%p > %%p.log  2>&1
+    @call %~dp0BuildOne.cmd %board% %%p > %%p.log  2>&1
     goto :done
 )
 :done
 
-for %%p in (%programs%) do (
+for /F "tokens=*" %%p in (ProgramList.txt) do (
     if exist %%p.c (
         if [%%p] NEQ [%first%] (
             echo > %%p.tmp
-            START /B Scripts\BuildOne.cmd %board% %%p > %%p.log 2>&1
+            START /B %~dp0BuildOne.cmd %board% %%p > %%p.log 2>&1
         )
     )
 )
@@ -136,11 +86,11 @@ for %%p in (%programs%) do (
 ::@echo on
 
 :loop
-for %%p in (%programs%) do (
+for /F "tokens=*" %%p in (ProgramList.txt) do (
     if exist %%p.tmp goto :loop
 )
 
-for %%p in (%programs%) do (
+for /F "tokens=*" %%p in (ProgramList.txt) do (
     if exist %%p.c (
         if not exist %%p.hex (
             echo.

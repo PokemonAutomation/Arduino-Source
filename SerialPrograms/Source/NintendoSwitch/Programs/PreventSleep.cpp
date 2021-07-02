@@ -12,16 +12,24 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-PreventSleep::PreventSleep()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+PreventSleep_Descriptor::PreventSleep_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "NintendoSwitch:PreventSleep",
         "Prevent Sleep",
         "SerialPrograms/PreventSleep.md",
-        "Press B every 15 seconds to keep the Switch from sleeping."
+        "Press B every 15 seconds to keep the Switch from sleeping.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB
     )
 {}
 
-void PreventSleep::program(SingleSwitchProgramEnvironment& env) const{
+
+
+PreventSleep::PreventSleep(const PreventSleep_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
+{}
+
+void PreventSleep::program(SingleSwitchProgramEnvironment& env){
     while (true){
         ssf_press_button2(env.console, BUTTON_B, 15 * TICKS_PER_SECOND, 10);
     }

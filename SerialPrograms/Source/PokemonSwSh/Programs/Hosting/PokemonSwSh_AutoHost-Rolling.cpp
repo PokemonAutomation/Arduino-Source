@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/FrameworkSettings.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/SwitchRoutines/SwitchDigitEntry.h"
@@ -21,13 +21,22 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-AutoHostRolling::AutoHostRolling()
-    : SingleSwitchProgram(
-        FeedbackType::OPTIONAL_, PABotBaseLevel::PABOTBASE_12KB,
+
+AutoHostRolling_Descriptor::AutoHostRolling_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:AutoHostRolling",
         "Auto-Host Rolling",
         "NativePrograms/AutoHost-Rolling.md",
-        "Roll N days, host, SR and repeat. Also supports hard-locks and soft-locks."
+        "Roll N days, host, SR and repeat. Also supports hard-locks and soft-locks.",
+        FeedbackType::OPTIONAL_,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+AutoHostRolling::AutoHostRolling(const AutoHostRolling_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , SKIPS("<b>Day Skips:</b>", 3)
     , BACKUP_SAVE("<b>Load Backup Save:</b><br>For backup save soft-locking method.", false)
     , HOST_ONLINE("<b>Host Online:</b>", true)
@@ -115,7 +124,7 @@ std::unique_ptr<StatsTracker> AutoHostRolling::make_stats() const{
 }
 
 
-void AutoHostRolling::program(SingleSwitchProgramEnvironment& env) const{
+void AutoHostRolling::program(SingleSwitchProgramEnvironment& env){
     AutoHostStats& stats = env.stats<AutoHostStats>();
 
     uint16_t start_raid_delay = HOST_ONLINE

@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
@@ -15,13 +15,22 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-StowOnSideFarmer::StowOnSideFarmer()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+
+StowOnSideFarmer_Descriptor::StowOnSideFarmer_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:StowOnSideFarmer",
         "Date Spam: Stow-On-Side Farmer",
         "NativePrograms/DateSpam-StowOnSideFarmer.md",
-        "Farm the Stow-on-Side items dealer."
+        "Farm the Stow-on-Side items dealer.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+StowOnSideFarmer::StowOnSideFarmer(const StowOnSideFarmer_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , SKIPS(
         "<b>Number of Purchase Attempts:</b>",
         100000
@@ -35,7 +44,7 @@ StowOnSideFarmer::StowOnSideFarmer()
     m_options.emplace_back(&SAVE_ITERATIONS, "SAVE_ITERATIONS");
 }
 
-void StowOnSideFarmer::program(SingleSwitchProgramEnvironment& env) const{
+void StowOnSideFarmer::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
 
     uint8_t year = MAX_YEAR;

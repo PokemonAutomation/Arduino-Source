@@ -17,11 +17,20 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class DaySkipperJPN7p8k : public SingleSwitchProgram{
-public:
-    DaySkipperJPN7p8k();
 
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+class DaySkipperJPN7p8k_Descriptor : public RunnableSwitchProgramDescriptor{
+public:
+    DaySkipperJPN7p8k_Descriptor();
+};
+
+
+
+class DaySkipperJPN7p8k : public SingleSwitchProgramInstance{
+public:
+    DaySkipperJPN7p8k(const DaySkipperJPN7p8k_Descriptor& descriptor);
+
+    virtual std::unique_ptr<StatsTracker> make_stats() const override;
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
     SimpleInteger<uint32_t> SKIPS;

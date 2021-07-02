@@ -83,10 +83,14 @@ double image_diff_total(const QImage& x, const QImage& y){
     pxint_t height = x.height();
     for (int r = 0; r < height; r++){
         for (int c = 0; c < width; c++){
-            sum += euclidean_distance(x.pixel(c, r), y.pixel(c, r));
+//            sum += euclidean_distance(x.pixel(c, r), y.pixel(c, r));
+            FloatPixel p = FloatPixel(x.pixel(c, r)) - FloatPixel(y.pixel(c, r));
+            p *= p;
+            sum += p.sum();
         }
     }
 
+//    return std::sqrt(sum / ((size_t)width * height));
     return std::sqrt(sum / ((size_t)width * height));
 }
 QImage image_diff_greyscale(const QImage& x, const QImage& y){

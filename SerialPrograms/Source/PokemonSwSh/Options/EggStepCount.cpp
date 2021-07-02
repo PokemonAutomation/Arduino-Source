@@ -6,7 +6,7 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "EggStepCount.h"
 
 namespace PokemonAutomation{

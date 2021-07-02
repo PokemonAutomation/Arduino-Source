@@ -7,7 +7,7 @@
 #include <vector>
 #include <map>
 #include <QJsonObject>
-#include "Common/Qt/StringException.h"
+#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "VirtualSwitchControllerMapping.h"
 
@@ -124,6 +124,7 @@ const ControllerButton_Button CONTROLLER_BUTTON_LCLICK  (BUTTON_LCLICK);
 const ControllerButton_Button CONTROLLER_BUTTON_RCLICK  (BUTTON_RCLICK);
 const ControllerButton_Button CONTROLLER_BUTTON_HOME    (BUTTON_HOME);
 const ControllerButton_Button CONTROLLER_BUTTON_CAPTURE (BUTTON_CAPTURE);
+const ControllerButton_Button CONTROLLER_BUTTON_AR      (BUTTON_A | BUTTON_R);
 
 const std::map<QString, const ControllerButton&>& STRING_TO_BUTTON_MAP(){
     static const std::map<QString, const ControllerButton&> map{
@@ -163,6 +164,8 @@ const std::map<QString, const ControllerButton&>& STRING_TO_BUTTON_MAP(){
 
         {"CONTROLLER_BUTTON_HOME",          CONTROLLER_BUTTON_HOME},
         {"CONTROLLER_BUTTON_CAPTURE",       CONTROLLER_BUTTON_CAPTURE},
+
+        {"CONTROLLER_BUTTON_AR",            CONTROLLER_BUTTON_AR},
     };
     return map;
 }
@@ -236,6 +239,8 @@ std::vector<std::pair<Qt::Key, const ControllerButton&>> keyboard_mapping{
     {Qt::Key::Key_Escape,       CONTROLLER_BUTTON_HOME},
 
     {Qt::Key::Key_Insert,       CONTROLLER_BUTTON_CAPTURE},
+
+    {Qt::Key::Key_Y,            CONTROLLER_BUTTON_AR},
 };
 
 std::map<Qt::Key, const ControllerButton&> make_keyboard_map(
@@ -245,7 +250,7 @@ std::map<Qt::Key, const ControllerButton&> make_keyboard_map(
     for (const auto& item : mapping){
         auto iter = map.find(item.first);
         if (iter != map.end()){
-            throw StringException("Duplicate Key: " + QString::number((uint32_t)item.first));
+            PA_THROW_StringException("Duplicate Key: " + QString::number((uint32_t)item.first));
         }
         map.emplace(
             std::piecewise_construct,
@@ -285,6 +290,10 @@ QJsonArray read_keyboard_mapping(){
     return array;
 }
 void set_keyboard_mapping(const QJsonArray& json){
+    if (json.isEmpty()){
+        return;
+    }
+
     std::vector<std::pair<Qt::Key, const ControllerButton&>> mapping;
 
     for (const auto& item : json){

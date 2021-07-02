@@ -15,13 +15,20 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-FriendCodeAdder::FriendCodeAdder()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+FriendCodeAdder_Descriptor::FriendCodeAdder_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "NintendoSwitch:FriendCodeAdder",
         "Friend Code Adder",
         "SerialPrograms/FriendCodeAdder.md",
-        "Add a list of friend codes."
+        "Add a list of friend codes.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+FriendCodeAdder::FriendCodeAdder(const FriendCodeAdder_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , USER_SLOT(
         "<b>User Slot:</b><br>Send friend requests for this profile.",
         1, 1, 8
@@ -50,7 +57,7 @@ FriendCodeAdder::FriendCodeAdder()
     m_options.emplace_back(&TOGGLE_BEST_STATUS_DELAY, "TOGGLE_BEST_STATUS_DELAY");
 }
 
-void FriendCodeAdder::program(SingleSwitchProgramEnvironment& env) const{
+void FriendCodeAdder::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
 
     bool first = true;

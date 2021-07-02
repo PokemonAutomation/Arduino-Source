@@ -18,9 +18,15 @@ namespace PokemonAutomation{
 class StringOption{
 public:
     StringOption(
+        QString& backing,
         QString label,
         QString default_value
     );
+    StringOption(
+        QString label,
+        QString default_value
+    );
+
     void load_default(const QJsonValue& json);
     void load_current(const QJsonValue& json);
     QJsonValue write_default() const;
@@ -35,7 +41,8 @@ private:
     friend class StringOptionUI;
     const QString m_label;
     QString m_default;
-    QString m_current;
+    QString& m_current;
+    QString m_backing;
 };
 
 

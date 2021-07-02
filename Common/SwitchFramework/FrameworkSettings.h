@@ -35,6 +35,9 @@ extern uint16_t SETTINGS_TO_HOME_DELAY;
 //  Setting this option to true will slow down soft-resetting by about 3 seconds.
 extern bool START_GAME_REQUIRES_INTERNET;
 
+//  If starting the game requires checking the internet, wait this long for it.
+extern uint16_t START_GAME_INTERNET_CHECK_DELAY;
+
 //  Some programs can bypass the system update menu at little performance cost.
 //  Setting this to true enables this.
 extern bool TOLERATE_SYSTEM_UPDATE_MENU_FAST;

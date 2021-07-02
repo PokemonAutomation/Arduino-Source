@@ -7,7 +7,7 @@
 #include <QFile>
 #include <QJsonArray>
 #include <QJsonObject>
-#include "StringException.h"
+#include "Common/Cpp/Exception.h"
 #include "QtJsonTools.h"
 
 namespace PokemonAutomation{
@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 QJsonDocument read_json_file(const QString& path){
     QFile file(path);
     if (!file.open(QFile::ReadOnly)){
-        throw StringException("Unable to open file: " + path);
+        PA_THROW_FileException("Unable to open file.", path);
     }
 //    auto data = file.readAll();
 //    return QJsonDocument::fromJson(data);
@@ -37,10 +37,10 @@ void write_json_file(const QString& path, const QJsonDocument& json){
 
     QFile file(path);
     if (!file.open(QFile::WriteOnly)){
-        throw StringException("Unable to create settings file.\r\n" + path);
+        PA_THROW_FileException("Unable to create file.", path);
     }
     if (file.write(json_out.c_str(), json_out.size()) != (int)json_out.size()){
-        throw StringException("Unable to write settings file.\r\n" + path);
+        PA_THROW_FileException("Unable to write file.", path);
     }
     file.close();
 }
@@ -50,67 +50,67 @@ void write_json_file(const QString& path, const QJsonDocument& json){
 QJsonValue json_get_value_throw(const QJsonObject& obj, const QString& key){
     auto iter = obj.find(key);
     if (iter == obj.end()){
-        throw StringException("Config Error - Key not found: " + key);
+        PA_THROW_ParseException("Config Error - Key not found: " + key);
     }
     return *iter;
 }
 bool json_get_bool_throw(const QJsonObject& obj, const QString& key){
     auto iter = obj.find(key);
     if (iter == obj.end()){
-        throw StringException("Config Error - Key not found: " + key);
+        PA_THROW_ParseException("Config Error - Key not found: " + key);
     }
     if (!iter->isBool()){
-        throw StringException("Config Error - Expected a boolean: " + key);
+        PA_THROW_ParseException("Config Error - Expected a boolean: " + key);
     }
     return iter->toBool();
 }
 int json_get_int_throw(const QJsonObject& obj, const QString& key){
     auto iter = obj.find(key);
     if (iter == obj.end()){
-        throw StringException("Config Error - Key not found: " + key);
+        PA_THROW_ParseException("Config Error - Key not found: " + key);
     }
     if (!iter->isDouble()){
-        throw StringException("Config Error - Expected a number: " + key);
+        PA_THROW_ParseException("Config Error - Expected a number: " + key);
     }
     return iter->toInt();
 }
 double json_get_double_throw(const QJsonObject& obj, const QString& key){
     auto iter = obj.find(key);
     if (iter == obj.end()){
-        throw StringException("Config Error - Key not found: " + key);
+        PA_THROW_ParseException("Config Error - Key not found: " + key);
     }
     if (!iter->isDouble()){
-        throw StringException("Config Error - Expected a number: " + key);
+        PA_THROW_ParseException("Config Error - Expected a number: " + key);
     }
     return iter->toDouble();
 }
 QString json_get_string_throw(const QJsonObject& obj, const QString& key){
     auto iter = obj.find(key);
     if (iter == obj.end()){
-        throw StringException("Config Error - Key not found: " + key);
+        PA_THROW_ParseException("Config Error - Key not found: " + key);
     }
     if (!iter->isString()){
-        throw StringException("Config Error - Expected a string: " + key);
+        PA_THROW_ParseException("Config Error - Expected a string: " + key);
     }
     return iter->toString();
 }
 QJsonArray json_get_array_throw(const QJsonObject& obj, const QString& key){
     auto iter = obj.find(key);
     if (iter == obj.end()){
-        throw StringException("Config Error - Key not found: " + key);
+        PA_THROW_ParseException("Config Error - Key not found: " + key);
     }
     if (!iter->isArray()){
-        throw StringException("Config Error - Expected an array: " + key);
+        PA_THROW_ParseException("Config Error - Expected an array: " + key);
     }
     return iter->toArray();
 }
 QJsonObject json_get_object_throw(const QJsonObject& obj, const QString& key){
     auto iter = obj.find(key);
     if (iter == obj.end()){
-        throw StringException("Config Error - Key not found: " + key);
+        PA_THROW_ParseException("Config Error - Key not found: " + key);
     }
     if (!iter->isObject()){
-        throw StringException("Config Error - Expected an array: " + key);
+        PA_THROW_ParseException("Config Error - Expected an array: " + key);
     }
     return iter->toObject();
 }

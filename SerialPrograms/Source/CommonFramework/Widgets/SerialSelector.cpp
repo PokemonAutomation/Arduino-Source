@@ -7,7 +7,6 @@
 #include <QJsonObject>
 #include <QMessageBox>
 #include <QHBoxLayout>
-#include "Common/Qt/StringException.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "SerialSelector.h"
 

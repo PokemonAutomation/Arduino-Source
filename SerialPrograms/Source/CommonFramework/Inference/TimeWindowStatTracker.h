@@ -28,6 +28,13 @@ public:
         return m_window;
     }
 
+    const StatObject& oldest() const{
+        return m_history.begin()->second;
+    }
+    const StatObject& newest() const{
+        return m_history.rbegin()->second;
+    }
+
     system_clock::time_point push(
         const StatObject& stats,
         system_clock::time_point timestamp = system_clock::now()

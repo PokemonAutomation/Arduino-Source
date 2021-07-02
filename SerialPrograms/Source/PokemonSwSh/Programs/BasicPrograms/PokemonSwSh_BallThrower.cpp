@@ -13,16 +13,25 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-BallThrower::BallThrower()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+
+BallThrower_Descriptor::BallThrower_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:BallThrower",
         "Ball Thrower",
         "NativePrograms/BallThrower.md",
-        "Blindly throw balls at the opposing " + STRING_POKEMON + " until it catches."
+        "Blindly throw balls at the opposing " + STRING_POKEMON + " until it catches.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB
     )
 {}
 
-void BallThrower::program(SingleSwitchProgramEnvironment& env) const{
+
+
+BallThrower::BallThrower(const BallThrower_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
+{}
+
+void BallThrower::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
     pbf_press_button(env.console, BUTTON_HOME, 10, HOME_TO_GAME_DELAY);
 

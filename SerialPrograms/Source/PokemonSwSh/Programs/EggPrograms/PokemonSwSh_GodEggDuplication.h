@@ -16,13 +16,21 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-class GodEggDuplication : public SingleSwitchProgram{
+
+class GodEggDuplication_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
-    GodEggDuplication();
+    GodEggDuplication_Descriptor();
+};
+
+
+
+class GodEggDuplication : public SingleSwitchProgramInstance{
+public:
+    GodEggDuplication(const GodEggDuplication_Descriptor& descriptor);
 
     void collect_godegg(const BotBaseContext& context, uint8_t party_slot) const;
     void run_program(SingleSwitchProgramEnvironment& env, uint16_t attempts) const;
-    virtual void program(SingleSwitchProgramEnvironment& env) const override;
+    virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
     SimpleInteger<uint16_t> MAX_FETCH_ATTEMPTS;

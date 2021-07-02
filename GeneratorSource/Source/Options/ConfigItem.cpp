@@ -4,7 +4,8 @@
  *
  */
 
-#include "Common/Qt/StringException.h"
+#include <QtGlobal>
+#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Tools/Tools.h"
 #include "ConfigItem.h"
@@ -37,14 +38,14 @@ std::unique_ptr<ConfigItem> parse_option(const QJsonObject& obj){
     std::map<QString, OptionMaker>& map = OPTION_FACTORIES();
     auto iter = map.find(type);
     if (iter == map.end()){
-        throw StringException("Unknown option type: " + type);
+        PA_THROW_ParseException("Unknown option type: " + type);
     }
     return iter->second(obj);
 }
 int register_option(const QString& name, OptionMaker fp){
     std::map<QString, OptionMaker>& map = OPTION_FACTORIES();
     if (!map.emplace(name, fp).second){
-        throw StringException("Duplicate option name.");
+        PA_THROW_ParseException("Duplicate option name.");
     }
     return 0;
 }

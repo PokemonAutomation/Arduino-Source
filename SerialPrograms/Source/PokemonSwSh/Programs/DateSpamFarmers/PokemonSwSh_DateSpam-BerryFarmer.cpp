@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
@@ -15,13 +15,22 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-BerryFarmer::BerryFarmer()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+
+BerryFarmer_Descriptor::BerryFarmer_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:BerryFarmer",
         "Date Spam: Berry Farmer",
         "NativePrograms/DateSpam-BerryFarmer.md",
-        "Farm berries."
+        "Farm berries.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+BerryFarmer::BerryFarmer(const BerryFarmer_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , SKIPS(
         "<b>Number of Fetch Attempts:</b>",
         100000
@@ -35,7 +44,7 @@ BerryFarmer::BerryFarmer()
     m_options.emplace_back(&SAVE_ITERATIONS, "SAVE_ITERATIONS");
 }
 
-void BerryFarmer::program(SingleSwitchProgramEnvironment& env) const{
+void BerryFarmer::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
 
     uint8_t year = MAX_YEAR;

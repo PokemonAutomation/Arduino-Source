@@ -8,7 +8,6 @@
 #include <QJsonObject>
 #include <QKeyEvent>
 #include <QVBoxLayout>
-#include "Common/Qt/StringException.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "SwitchCommandRow.h"

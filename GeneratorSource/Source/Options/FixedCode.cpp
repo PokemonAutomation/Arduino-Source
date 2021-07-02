@@ -8,7 +8,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
-#include "Common/Qt/StringException.h"
+#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Common/Qt/CodeValidator.h"
 #include "FixedCode.h"
@@ -36,10 +36,10 @@ FixedCode::FixedCode(const QJsonObject& obj)
     , m_current(json_get_string_throw(obj, JSON_CURRENT))
 {
     if (!validate_code(m_digits, m_default)){
-        throw StringException("Invalid code.");
+        PA_THROW_ParseException("Invalid code.");
     }
     if (!validate_code(m_digits, m_current)){
-        throw StringException("Invalid code.");
+        PA_THROW_ParseException("Invalid code.");
     }
 }
 void FixedCode::restore_defaults(){
@@ -73,8 +73,8 @@ QString FixedCodeUI::sanitized_code(const QString& text){
     QString message;
     try{
         message = "Code: " + sanitize_code(m_value.m_digits, text);
-    }catch (const StringException& str){
-        message = "<font color=\"red\">" + str.message() + "</font>";
+    }catch (const ParseException& e){
+        message = "<font color=\"red\">" + e.message_qt() + "</font>";
     }
     return message;
 }

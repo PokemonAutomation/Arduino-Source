@@ -21,7 +21,7 @@ public:
     ConsoleHandle console;
 
 private:
-    friend class SingleSwitchProgramUI;
+    friend class SingleSwitchProgramWidget;
     template <class... Args>
     SingleSwitchProgramEnvironment(
         Logger& logger,
@@ -35,48 +35,43 @@ private:
 };
 
 
-class SingleSwitchProgram : public RunnableProgram{
-public:
-    SingleSwitchProgram(
-        FeedbackType feedback,
-        PABotBaseLevel min_pabotbase,
-        QString name,
-        QString doc_link,
-        QString description
-    );
 
-    virtual void program(SingleSwitchProgramEnvironment& env) const = 0;
+class SingleSwitchProgramInstance : public RunnableSwitchProgramInstance{
+public:
+    SingleSwitchProgramInstance(const RunnableSwitchProgramDescriptor& descriptor);
+    virtual QWidget* make_widget(QWidget& parent, PanelListener& listener) override;
+    virtual void program(SingleSwitchProgramEnvironment& env) = 0;
 
 private:
+    friend class SingleSwitchProgramWidget;
+
     SwitchSystemFactory m_switch;
 };
 
 
-class SingleSwitchProgramUI final : public RunnableProgramUI{
-public:
-    SingleSwitchProgramUI(SingleSwitchProgram& factory, MainWindow& window);
-    ~SingleSwitchProgramUI();
 
-    virtual void program(
+class SingleSwitchProgramWidget : public RunnableSwitchProgramWidget{
+public:
+    static SingleSwitchProgramWidget* make(
+        QWidget& parent,
+        SingleSwitchProgramInstance& instance,
+        PanelListener& listener
+    );
+
+private:
+    using RunnableSwitchProgramWidget::RunnableSwitchProgramWidget;
+    virtual ~SingleSwitchProgramWidget();
+
+private:
+    virtual void run_program(
         StatsTracker* current_stats,
         const StatsTracker* historical_stats
     ) override;
+
+private:
+    friend class SingleSwitchProgramInstance;
 };
 
-
-template <typename Program>
-class SingleSwitchProgramWrapper final : public Program{
-public:
-    SingleSwitchProgramWrapper() = default;
-    SingleSwitchProgramWrapper(const QJsonValue& json)
-        : Program()
-    {
-        this->from_json(json);
-    }
-    virtual QWidget* make_ui(MainWindow& window) override{
-        return new SingleSwitchProgramUI(*this, window);
-    }
-};
 
 
 

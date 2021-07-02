@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/FrameworkSettings.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
@@ -18,13 +18,21 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-ShinyHuntUnattendedRegi::ShinyHuntUnattendedRegi()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+ShinyHuntUnattendedRegi_Descriptor::ShinyHuntUnattendedRegi_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:ShinyHuntUnattendedRegi",
         "Shiny Hunt Unattended - Regi",
         "NativePrograms/ShinyHuntUnattended-Regi.md",
-        "Hunt for shiny Regis. Stop when a shiny is found."
+        "Hunt for shiny Regis. Stop when a shiny is found.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+ShinyHuntUnattendedRegi::ShinyHuntUnattendedRegi(const ShinyHuntUnattendedRegi_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , START_TO_RUN_DELAY(
         "<b>Start to Run Delay:</b><br>This needs to be carefully calibrated.",
         "1990"
@@ -55,7 +63,7 @@ ShinyHuntUnattendedRegi::ShinyHuntUnattendedRegi()
 
 
 
-void ShinyHuntUnattendedRegi::program(SingleSwitchProgramEnvironment& env) const{
+void ShinyHuntUnattendedRegi::program(SingleSwitchProgramEnvironment& env){
 //    BotBase& botbase = env.console;
 
 //    start_program_flash(CONNECT_CONTROLLER_DELAY);

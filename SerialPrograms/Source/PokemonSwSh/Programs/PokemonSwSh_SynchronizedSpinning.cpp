@@ -12,16 +12,24 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-SynchronizedSpinning::SynchronizedSpinning()
-    : MultiSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+SynchronizedSpinning_Descriptor::SynchronizedSpinning_Descriptor()
+    : MultiSwitchProgramDescriptor(
+        "PokemonSwSh:SynchronizedSpinning",
         "Synchronized Spinning", "",
         "Don't ask... seriously, don't ask...",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB,
         1, 4, 1
     )
 {}
 
-void SynchronizedSpinning::program(MultiSwitchProgramEnvironment& env) const{
+
+
+SynchronizedSpinning::SynchronizedSpinning(const SynchronizedSpinning_Descriptor& description)
+    : MultiSwitchProgramInstance(description)
+{}
+
+void SynchronizedSpinning::program(MultiSwitchProgramEnvironment& env){
     env.run_in_parallel(
         [&](ConsoleHandle& console){
             pbf_move_left_joystick(console, 128, 255, 5, 20);

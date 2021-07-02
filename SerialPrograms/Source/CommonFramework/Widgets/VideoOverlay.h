@@ -9,7 +9,7 @@
 
 #include <set>
 #include <QWidget>
-#include "Common/Clientside/SpinLock.h"
+#include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 
 namespace PokemonAutomation{
@@ -30,6 +30,7 @@ private:
 
 private:
     QSize m_video_size;
+    QSize m_display_size;
     int m_offset_x;
     double m_scale;
 

@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/FrameworkSettings.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
@@ -21,13 +21,22 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2()
-    : SingleSwitchProgram(
-        FeedbackType::REQUIRED, PABotBaseLevel::PABOTBASE_12KB,
+
+ShinyHuntAutonomousRegigigas2_Descriptor::ShinyHuntAutonomousRegigigas2_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:ShinyHuntAutonomousRegigigas2",
         "Shiny Hunt Autonomous - Regigigas2",
         "SerialPrograms/ShinyHuntAutonomous-Regigigas2.md",
-        "Automatically hunt for shiny Regigigas using video feedback."
+        "Automatically hunt for shiny Regigigas using video feedback.",
+        FeedbackType::REQUIRED,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2(const ShinyHuntAutonomousRegigigas2_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(
         "<b>Go Home when Done:</b><br>After finding a shiny, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
         false
@@ -102,13 +111,14 @@ ShinyHuntAutonomousRegigigas2::Tracker::Tracker(
 )
     : StandardEncounterTracker(
         stats, env, console,
+        nullptr, Language::None,
         require_square,
         exit_battle_time,
         take_video, run_from_everything
     )
     , m_env(env)
 {}
-bool ShinyHuntAutonomousRegigigas2::Tracker::run_away(){
+bool ShinyHuntAutonomousRegigigas2::Tracker::run_away(bool confirmed_encounter){
     RaidCatchDetector detector(m_console, std::chrono::seconds(30));
     pbf_mash_button(m_console, BUTTON_A, 4 * TICKS_PER_SECOND);
 
@@ -135,7 +145,7 @@ bool ShinyHuntAutonomousRegigigas2::kill_and_return(SingleSwitchProgramEnvironme
     pbf_press_button(env.console, BUTTON_A, 10, CATCH_TO_OVERWORLD_DELAY);
     return true;
 }
-void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env) const{
+void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
 
     uint32_t last_touch = system_clock(env.console);
@@ -178,7 +188,7 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env)
             if (tracker.process_result(detection)){
                 goto StopProgram;
             }
-            if (detection == ShinyDetection::NO_BATTLE_MENU || !tracker.run_away()){
+            if (detection == ShinyDetection::NO_BATTLE_MENU || !tracker.run_away(false)){
                 stats.m_timeouts++;
                 break;
             }

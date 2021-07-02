@@ -10,6 +10,7 @@
 #include <sstream>
 #include <iostream>
 #include "Common/MessageProtocol.h"
+#include "Common/Cpp/Exception.h"
 #include "Common/PokemonSwSh/PokemonSwShMisc.h"
 #include "MessageConverter.h"
 #include "Logging.h"
@@ -19,7 +20,7 @@ namespace PokemonAutomation{
 std::string to_string_padded(size_t digits, uint64_t x){
     std::string str = std::to_string(x);
     if (digits < str.size()){
-        throw "Number is too big to convert to fixed length string.";
+        PA_THROW_StringException("Number is too big to convert to fixed length string.");
     }
     return std::string(digits - str.size(), '0') + str;
 }

@@ -12,6 +12,7 @@ if [%program%] == [] (
 
 del "%program%.hex"
 make BOARD_TYPE="%board%" TARGET="%program%"
+avr-size --mcu=%MCU% -C %program%.elf
 
 ::if %errorlevel% NEQ 0 (
 ::   echo Build Failed. Error %errorlevel%

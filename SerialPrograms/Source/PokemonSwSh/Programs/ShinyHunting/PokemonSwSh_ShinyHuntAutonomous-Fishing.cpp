@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/FrameworkSettings.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
@@ -22,16 +22,28 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing()
-    : SingleSwitchProgram(
-        FeedbackType::REQUIRED, PABotBaseLevel::PABOTBASE_12KB,
+ShinyHuntAutonomousFishing_Descriptor::ShinyHuntAutonomousFishing_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:ShinyHuntAutonomousFishing",
         "Shiny Hunt Autonomous - Fishing",
         "SerialPrograms/ShinyHuntAutonomous-Fishing.md",
-        "Automatically hunt for shiny fishing " + STRING_POKEMON + " using video feedback."
+        "Automatically hunt for shiny fishing " + STRING_POKEMON + " using video feedback.",
+        FeedbackType::REQUIRED,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing(const ShinyHuntAutonomousFishing_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(
         "<b>Go Home when Done:</b><br>After finding a shiny, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
         false
+    )
+    , LANGUAGE(
+        "<b>Game Language:</b><br>Attempt to read and log the encountered " + STRING_POKEMON + " in this language.<br>Set to \"None\" to disable this feature.",
+        m_name_reader.languages(), false
     )
     , TIME_ROLLBACK_HOURS(
         "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
@@ -58,6 +70,7 @@ ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing()
     )
 {
     m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
+    m_options.emplace_back(&LANGUAGE, "LANGUAGE");
     m_options.emplace_back(&TIME_ROLLBACK_HOURS, "TIME_ROLLBACK_HOURS");
     m_options.emplace_back(&m_advanced_options, "");
     m_options.emplace_back(&EXIT_BATTLE_TIMEOUT, "EXIT_BATTLE_TIMEOUT");
@@ -78,6 +91,8 @@ struct ShinyHuntAutonomousFishing::Stats : public ShinyHuntTracker{
     {
         m_display_order.insert(m_display_order.begin() + 1, Stat("Misses"));
         m_display_order.insert(m_display_order.begin() + 2, Stat("Errors"));
+        m_aliases["Timeouts"] = "Errors";
+        m_aliases["Unexpected Battles"] = "Errors";
     }
     uint64_t& m_misses;
     uint64_t& m_errors;
@@ -88,7 +103,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousFishing::make_stats() const{
 
 
 
-void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env) const{
+void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
     resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 
@@ -98,6 +113,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env) co
     Stats& stats = env.stats<Stats>();
     StandardEncounterTracker tracker(
         stats, env, env.console,
+        &m_name_reader, LANGUAGE,
         false,
         EXIT_BATTLE_TIMEOUT,
         VIDEO_ON_SHINY,
@@ -139,7 +155,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env) co
                 continue;
             case FishingDetector::BATTLE_MENU:
                 stats.m_errors++;
-                tracker.run_away();
+                tracker.run_away(false);
                 continue;
             }
             env.wait(std::chrono::seconds(3));
@@ -164,7 +180,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env) co
         if (detection == ShinyDetection::NO_BATTLE_MENU){
             stats.m_errors++;
             pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
-            tracker.run_away();
+            tracker.run_away(false);
         }
     }
 

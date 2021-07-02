@@ -29,7 +29,7 @@
 #include <atomic>
 #include <condition_variable>
 #include <thread>
-#include "Common/Clientside/SpinLock.h"
+#include "Common/Cpp/SpinLock.h"
 #include "ClientSource/Connection/PABotBaseConnection.h"
 #include "ClientSource/Libraries/Logging.h"
 #include "BotBase.h"

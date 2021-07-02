@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Clientside/PrettyPrint.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
@@ -15,27 +15,36 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-LotoFarmer::LotoFarmer()
-    : SingleSwitchProgram(
-        FeedbackType::NONE, PABotBaseLevel::PABOTBASE_12KB,
+
+LotoFarmer_Descriptor::LotoFarmer_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:LotoFarmer",
         "Date Spam: Loto Farmer",
         "NativePrograms/DateSpam-LotoFarmer.md",
-        "Farm the Loto ID."
+        "Farm the Loto ID.",
+        FeedbackType::NONE,
+        PABotBaseLevel::PABOTBASE_12KB
     )
+{}
+
+
+
+LotoFarmer::LotoFarmer(const LotoFarmer_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
     , SKIPS(
         "<b>Number of Loto Attempts:</b>",
         100000
     )
     , MASH_B_DURATION(
         "<b>Mash B for this long to exit the dialog:</b><br>(Some languages like German need to increase this.)",
-        "8 * TICKS_PER_SECOND"
+        "9 * TICKS_PER_SECOND"
     )
 {
     m_options.emplace_back(&SKIPS, "SKIPS");
     m_options.emplace_back(&MASH_B_DURATION, "MASH_B_DURATION");
 }
 
-void LotoFarmer::program(SingleSwitchProgramEnvironment& env) const{
+void LotoFarmer::program(SingleSwitchProgramEnvironment& env){
     grip_menu_connect_go_home(env.console);
 
     uint8_t year = MAX_YEAR;

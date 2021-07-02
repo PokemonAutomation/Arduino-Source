@@ -4,29 +4,32 @@
  *
  */
 
-#include <iostream>
 #include <QJsonObject>
+#include <QVBoxLayout>
 #include <QScrollArea>
 #include <QGroupBox>
-#include "Common/Qt/StringException.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "SettingsPanel.h"
 
+#include <iostream>
 using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
 
 
-void SettingsPanel::from_json(const QJsonValue& json){
-    QJsonObject obj = json_get_object_nothrow(json.toObject(), m_name);
+
+void SettingsPanelInstance::from_json(const QJsonValue& json){
+//    cout << QJsonDocument(json.toObject()).toJson().data() << endl;
+//    QJsonObject obj = json_get_object_nothrow(json.toObject(), m_descriptor.name());
+    QJsonObject obj = json.toObject();
     for (auto& item : m_options){
         if (!item.first.isEmpty()){
             item.second->load_json(json_get_value_nothrow(obj, item.first));
         }
     }
 }
-QJsonValue SettingsPanel::to_json() const{
+QJsonValue SettingsPanelInstance::to_json() const{
     QJsonObject obj;
     for (auto& item : m_options){
         if (!item.first.isEmpty()){
@@ -35,47 +38,63 @@ QJsonValue SettingsPanel::to_json() const{
     }
     return obj;
 }
+QWidget* SettingsPanelInstance::make_widget(QWidget& parent, PanelListener& listener){
+    return SettingsPanelWidget::make(parent, *this, listener);
+}
 
 
-QWidget* SettingsPanel::make_ui(MainWindow& window){
-    SettingsPanelUI* widget = new SettingsPanelUI(*this);
+
+SettingsPanelWidget* SettingsPanelWidget::make(
+    QWidget& parent,
+    SettingsPanelInstance& instance,
+    PanelListener& listener
+){
+    SettingsPanelWidget* widget = new SettingsPanelWidget(parent, instance, listener);
     widget->construct();
     return widget;
 }
-
-SettingsPanelUI::SettingsPanelUI(SettingsPanel& factory)
-    : RightPanelUI(factory)
-    , m_factory(factory)
+SettingsPanelWidget::SettingsPanelWidget(
+    QWidget& parent,
+    SettingsPanelInstance& instance,
+    PanelListener& listener
+)
+    : PanelWidget(parent, instance, listener)
 {}
+void SettingsPanelWidget::construct(){
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->setMargin(0);
+    layout->addWidget(make_header(*this));
 
-
-
-void SettingsPanelUI::make_body(QWidget& parent, QVBoxLayout& layout){
-    QScrollArea* scroll = new QScrollArea(&parent);
-    layout.addWidget(scroll);
+    QScrollArea* scroll = new QScrollArea(this);
+    layout->addWidget(scroll);
     scroll->setWidgetResizable(true);
 
-    QWidget* options_widget = new QWidget(scroll);
-    (new QVBoxLayout(scroll))->addWidget(options_widget);
-    scroll->setWidget(options_widget);
+    scroll->setWidget(make_options(*scroll));
+    layout->addWidget(make_actions(*this));
+}
+QWidget* SettingsPanelWidget::make_options(QWidget& parent){
+    QWidget* options_widget = new QWidget(&parent);
+    (new QVBoxLayout(&parent))->addWidget(options_widget);
 
     QVBoxLayout* options_layout = new QVBoxLayout(options_widget);
     options_layout->setAlignment(Qt::AlignTop);
 
 
-    for (auto& item : m_factory.m_options){
-        m_options.emplace_back(item.second->make_ui(parent));
+    SettingsPanelInstance& instance = static_cast<SettingsPanelInstance&>(m_instance);
+    for (auto& item : instance.m_options){
+        m_options.emplace_back(item.second->make_ui(*options_widget));
         options_layout->addWidget(m_options.back()->widget());
     }
 
-
+    return options_widget;
+}
+QWidget* SettingsPanelWidget::make_actions(QWidget& parent){
     QGroupBox* actions_widget = new QGroupBox("Actions", &parent);
-    layout.addWidget(actions_widget);
 
     QHBoxLayout* action_layout = new QHBoxLayout(actions_widget);
     action_layout->setMargin(0);
     {
-        m_default_button = new QPushButton("Restore Defaults", &parent);
+        m_default_button = new QPushButton("Restore Defaults", actions_widget);
         action_layout->addWidget(m_default_button, 1);
         QFont font = m_default_button->font();
         font.setPointSize(16);
@@ -88,13 +107,17 @@ void SettingsPanelUI::make_body(QWidget& parent, QVBoxLayout& layout){
             restore_defaults();
         }
     );
+
+    return actions_widget;
 }
 
-void SettingsPanelUI::restore_defaults(){
+void SettingsPanelWidget::restore_defaults(){
     for (ConfigOptionUI* item : m_options){
         item->restore_defaults();
     }
 }
+
+
 
 
 }
