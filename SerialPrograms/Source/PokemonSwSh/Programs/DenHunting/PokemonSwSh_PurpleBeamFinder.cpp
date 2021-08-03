@@ -24,7 +24,7 @@ PurpleBeamFinder_Descriptor::PurpleBeamFinder_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:PurpleBeamFinder",
         "Purple Beam Finder",
-        "SerialPrograms/PurpleBeamFinder.md",
+        "SwSh-Arduino/wiki/Advanced:-PurpleBeamFinder",
         "Automatically reset for a purple beam.",
         FeedbackType::REQUIRED,
         PABotBaseLevel::PABOTBASE_12KB
@@ -71,6 +71,7 @@ PurpleBeamFinder::PurpleBeamFinder(const PurpleBeamFinder_Descriptor& descriptor
         5.0, 0
     )
 {
+    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
     m_options.emplace_back(&EXTRA_LINE, "EXTRA_LINE");
     if (PERSISTENT_SETTINGS().developer_mode){
         m_options.emplace_back(&m_advanced_options, "");
@@ -119,10 +120,13 @@ std::unique_ptr<StatsTracker> PurpleBeamFinder::make_stats() const{
 
 
 void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env){
-    grip_menu_connect_go_home(env.console);
-
-    resume_game_front_of_den_nowatts(env.console, TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
-    pbf_mash_button(env.console, BUTTON_B, 100);
+    if (START_IN_GRIP_MENU){
+        grip_menu_connect_go_home(env.console);
+        resume_game_front_of_den_nowatts(env.console, TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+        pbf_mash_button(env.console, BUTTON_B, 100);
+    }else{
+        pbf_press_button(env.console, BUTTON_B, 5, 5);
+    }
     env.console.botbase().wait_for_all_requests();
 
 

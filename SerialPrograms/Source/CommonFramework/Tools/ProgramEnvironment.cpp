@@ -11,12 +11,14 @@ namespace PokemonAutomation{
 
 
 ProgramEnvironment::ProgramEnvironment(
+//    std::string program_identifier,
     Logger& logger,
     StatsTracker* current_stats,
     const StatsTracker* historical_stats
 )
     : m_enable_feedback(true)
     , m_stopping(false)
+//    , m_program_identifier(program_identifier)
     , m_logger(logger)
     , m_current_stats(current_stats)
     , m_historical_stats(historical_stats)
@@ -43,25 +45,25 @@ void ProgramEnvironment::update_stats(const std::string& override_current){
     }
 
     if (!current.empty() && historical.empty()){
-        QString str = QString(current.c_str());
+        QString str = QString::fromStdString(current);
         set_status(str);
         log(str);
         return;
     }
     if (current.empty() && !historical.empty()){
-        QString str = QString(historical.c_str());
+        QString str = QString::fromStdString(historical);
         set_status("<b>Past Runs</b> - " + str);
         return;
     }
 
-    log(QString(current.c_str()));
+    log(QString::fromStdString(current));
 
     std::string str;
     str += "<b>Current Run</b> - " + current;
     str += "<br>";
     str += "<b>Past Totals</b> - " + historical;
 
-    set_status(str.c_str());
+    set_status(QString::fromStdString(str));
 }
 
 bool ProgramEnvironment::is_stopping() const{

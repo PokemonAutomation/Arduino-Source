@@ -1,0 +1,181 @@
+/*  Shiny Hunt Autonomous - Regi
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#include <QJsonArray>
+#include "Common/Cpp/PrettyPrint.h"
+#include "Common/SwitchFramework/FrameworkSettings.h"
+#include "Common/SwitchFramework/Switch_PushButtons.h"
+#include "Common/PokemonSwSh/PokemonSettings.h"
+#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
+#include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
+#include "CommonFramework/PersistentSettings.h"
+#include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_EncounterHandler.h"
+#include "PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHunt-Regi.h"
+#include "PokemonSwSh_ShinyHuntAutonomous-Regi.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSwSh{
+
+
+ShinyHuntAutonomousRegi_Descriptor::ShinyHuntAutonomousRegi_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonSwSh:ShinyHuntAutonomousRegi",
+        "Shiny Hunt Autonomous - Regi",
+        "SwSh-Arduino/wiki/Advanced:-ShinyHuntAutonomous-Regi",
+        "Automatically hunt for shiny Regi using video feedback.",
+        FeedbackType::REQUIRED,
+        PABotBaseLevel::PABOTBASE_12KB
+    )
+{}
+
+
+
+ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi(const ShinyHuntAutonomousRegi_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
+    , GO_HOME_WHEN_DONE(false)
+    , LANGUAGE(m_name_reader)
+    , FILTER(false, false)
+    , TOUCH_DATE_INTERVAL(
+        "<b>Rollover Prevention:</b><br>Prevent a den from rolling over by periodically touching the date. If set to zero, this feature is disabled.",
+        "4 * 3600 * TICKS_PER_SECOND"
+    )
+    , m_advanced_options(
+        "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
+    )
+    , EXIT_BATTLE_TIMEOUT(
+        "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
+        "10 * TICKS_PER_SECOND"
+    )
+    , POST_BATTLE_MASH_TIME(
+        "<b>Post-Battle Mash:</b><br>After each battle, mash B for this long to clear the dialogs.",
+        "1 * TICKS_PER_SECOND"
+    )
+    , TRANSITION_DELAY(
+        "<b>Transition Delay:</b><br>Time to enter/exit the building.",
+        "5 * TICKS_PER_SECOND"
+    )
+    , VIDEO_ON_SHINY(
+        "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
+        true
+    )
+{
+    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
+    m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
+
+    m_options.emplace_back(&LANGUAGE, "LANGUAGE");
+    m_options.emplace_back(&REGI_NAME, "REGI_NAME");
+    m_options.emplace_back(&FILTER, "FILTER");
+
+    m_options.emplace_back(&TOUCH_DATE_INTERVAL, "TOUCH_DATE_INTERVAL");
+    m_options.emplace_back(&NOTIFICATION_LEVEL, "NOTIFICATION_LEVEL");
+
+    m_options.emplace_back(&m_advanced_options, "");
+    m_options.emplace_back(&EXIT_BATTLE_TIMEOUT, "EXIT_BATTLE_TIMEOUT");
+    m_options.emplace_back(&POST_BATTLE_MASH_TIME, "POST_BATTLE_MASH_TIME");
+    m_options.emplace_back(&TRANSITION_DELAY, "TRANSITION_DELAY");
+    if (PERSISTENT_SETTINGS().developer_mode){
+        m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
+    }
+}
+
+
+
+
+std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegi::make_stats() const{
+    return std::unique_ptr<StatsTracker>(
+        new ShinyHuntTracker(
+            true,
+            {{"Light Resets", "Errors"}}
+        )
+    );
+}
+
+
+
+
+void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env){
+    if (START_IN_GRIP_MENU){
+        grip_menu_connect_go_home(env.console);
+        resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
+    }else{
+        pbf_press_button(env.console, BUTTON_B, 5, 5);
+    }
+
+    ShinyHuntTracker& stats = env.stats<ShinyHuntTracker>();
+    env.update_stats();
+//    DiscordWebHook::send_message_old(true, "Starting a new run for regi", stats.make_discord_stats());
+
+    StandardEncounterHandler handler(
+        m_descriptor.display_name(),
+        env, env.console,
+        &m_name_reader, LANGUAGE,
+        stats,
+        FILTER,
+        VIDEO_ON_SHINY,
+        NOTIFICATION_LEVEL
+    );
+
+    uint32_t last_touch = system_clock(env.console) - TOUCH_DATE_INTERVAL;
+    bool error = false;
+    while (true){
+        pbf_mash_button(env.console, BUTTON_B, POST_BATTLE_MASH_TIME);
+        move_to_corner(env, error, TRANSITION_DELAY);
+        if (error){
+            env.update_stats();
+            error = false;
+        }
+//        DiscordWebHook::send_message_old(false, "Regi wasn't shiny this time", stats.make_discord_stats());
+
+        //  Touch the date.
+        if (TOUCH_DATE_INTERVAL > 0 && system_clock(env.console) - last_touch >= TOUCH_DATE_INTERVAL){
+            env.log("Touching date to prevent rollover.");
+            pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+            touch_date_from_home(env.console, SETTINGS_TO_HOME_DELAY);
+            resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            last_touch += TOUCH_DATE_INTERVAL;
+        }
+
+        //  Do the light puzzle.
+        run_regi_light_puzzle(env, REGI_NAME, stats.encounters());
+
+        //  Start the encounter.
+        pbf_mash_button(env.console, BUTTON_A, 5 * TICKS_PER_SECOND);
+        env.console.botbase().wait_for_all_requests();
+
+        //  Detect shiny.
+        ShinyType shininess = detect_shiny_battle(
+            env, env.console,
+            SHINY_BATTLE_REGULAR,
+            std::chrono::seconds(30)
+        );
+//        shininess = ShinyDetection::SQUARE_SHINY;
+
+        bool stop = handler.handle_standard_encounter_runaway(shininess, EXIT_BATTLE_TIMEOUT);
+        if (stop){
+            break;
+        }
+    }
+
+//    DiscordWebHook::send_message_old(true, "Regi was shiny this time", stats.make_discord_stats());
+
+    if (GO_HOME_WHEN_DONE){
+        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+    }
+
+    end_program_callback(env.console);
+    end_program_loop(env.console);
+}
+
+
+
+
+}
+}
+}
+
+

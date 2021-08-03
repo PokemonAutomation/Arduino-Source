@@ -18,18 +18,21 @@ namespace PokemonSwSh{
 
 class OverworldTrigger{
 public:
-    OverworldTrigger(ProgramEnvironment& env);
-
-    virtual void run(
+    OverworldTrigger(
+        ProgramEnvironment& env,
         InterruptableCommandSession& session,
         OverworldTargetTracker& target_tracker
-    ) = 0;
+    );
+
+    virtual void run() = 0;
 
 protected:
-    static void whistle(const BotBaseContext& context, bool rotate);
+    void whistle(const BotBaseContext& context, bool rotate);
 
 protected:
     ProgramEnvironment& m_env;
+    InterruptableCommandSession& m_session;
+    OverworldTargetTracker& m_target_tracker;
 };
 
 
@@ -37,10 +40,7 @@ protected:
 class OverworldTrigger_Whistle : public OverworldTrigger{
 public:
     using OverworldTrigger::OverworldTrigger;
-    virtual void run(
-        InterruptableCommandSession& session,
-        OverworldTargetTracker& target_tracker
-    ) override;
+    virtual void run() override;
 
 private:
     bool m_first_after_battle = true;
@@ -51,17 +51,20 @@ class OverworldTrigger_WhistleStaticAction : public OverworldTrigger{
 public:
     OverworldTrigger_WhistleStaticAction(
         ProgramEnvironment& env,
+        InterruptableCommandSession& session,
+        OverworldTargetTracker& target_tracker,
         bool whistle_first,
         size_t whistle_count,
         size_t action_count
     );
-    virtual void run(
-        InterruptableCommandSession& session,
-        OverworldTargetTracker& target_tracker
-    ) override;
+    virtual void run() override;
 
 protected:
     virtual void action(const BotBaseContext& context) = 0;
+
+private:
+    void whistle_loop(const BotBaseContext& context);
+    void action_loop(const BotBaseContext& context);
 
 private:
     bool m_whistle_first;

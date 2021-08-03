@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_BerryFarmer_H
 
 #include "CommonFramework/Options/SimpleInteger.h"
+#include "NintendoSwitch/Options/StartInGripMenu.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -29,6 +30,8 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
+    StartInGripOrGame START_IN_GRIP_MENU;
+
     SimpleInteger<uint32_t> SKIPS;
     SimpleInteger<uint16_t> SAVE_ITERATIONS;
 };

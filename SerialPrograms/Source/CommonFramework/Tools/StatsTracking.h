@@ -11,8 +11,9 @@
 #include <string>
 #include <map>
 
-namespace PokemonAutomation{
+class QJsonArray;
 
+namespace PokemonAutomation{
 
 class StatsTracker{
     StatsTracker(const StatsTracker&) = delete;
@@ -24,6 +25,8 @@ public:
 //    void log_stats(ProgramEnvironment& env) const;
 
     void parse_and_append_line(const std::string& line);
+
+    QJsonArray make_discord_stats() const;
 
 protected:
     struct Stat{

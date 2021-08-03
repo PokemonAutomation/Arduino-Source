@@ -8,6 +8,7 @@
 #include <QMessageBox>
 #include <QHBoxLayout>
 #include "Common/Qt/QtJsonTools.h"
+#include "Common/Qt/NoWheelComboBox.h"
 #include "SerialSelector.h"
 
 #include <iostream>
@@ -74,7 +75,7 @@ SerialSelectorUI::SerialSelectorUI(
     serial_row->addWidget(new QLabel("<b>Serial Port:</b>", this), 1);
     serial_row->addSpacing(5);
 
-    m_serial_box = new QComboBox(this);
+    m_serial_box = new NoWheelComboBox(this);
     serial_row->addWidget(m_serial_box, 5);
     refresh();
     serial_row->addSpacing(5);

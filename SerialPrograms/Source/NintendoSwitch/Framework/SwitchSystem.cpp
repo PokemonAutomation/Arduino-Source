@@ -132,6 +132,9 @@ SwitchSystem::SwitchSystem(
 SwitchSystem::~SwitchSystem(){
     m_serial->stop();
 }
+ProgramState SwitchSystem::last_known_state() const{
+    return m_command->last_known_state();
+}
 bool SwitchSystem::serial_ok() const{
     return m_serial->is_ready();
 }

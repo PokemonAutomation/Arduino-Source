@@ -20,7 +20,7 @@ EggFetcher2_Descriptor::EggFetcher2_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:EggFetcher2",
         "Egg Fetcher 2",
-        "NativePrograms/EggFetcher2.md",
+        "SwSh-Arduino/wiki/Basic:-EggFetcher2",
         "Fetch eggs without hatching them.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_31KB
@@ -36,6 +36,7 @@ EggFetcher2::EggFetcher2(const EggFetcher2_Descriptor& descriptor)
         2000
     )
 {
+    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
     m_options.emplace_back(&MAX_FETCH_ATTEMPTS, "MAX_FETCH_ATTEMPTS");
 }
 
@@ -73,8 +74,12 @@ void EggFetcher2::run_eggfetcher(
 }
 
 void EggFetcher2::program(SingleSwitchProgramEnvironment& env){
-    grip_menu_connect_go_home(env.console);
-    resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+    if (START_IN_GRIP_MENU){
+        grip_menu_connect_go_home(env.console);
+        resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+    }else{
+        pbf_press_button(env.console, BUTTON_B, 5, 5);
+    }
 
     run_eggfetcher(env, AUTO_DEPOSIT, MAX_FETCH_ATTEMPTS);
 

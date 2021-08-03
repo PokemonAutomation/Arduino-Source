@@ -5,6 +5,7 @@
  */
 
 #include "Common/SwitchFramework/Switch_PushButtons.h"
+#include "SwitchProgramTracker.h"
 #include "SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -29,10 +30,8 @@ QWidget* SingleSwitchProgramInstance::make_widget(QWidget& parent, PanelListener
 
 
 SingleSwitchProgramWidget::~SingleSwitchProgramWidget(){
-    if (!m_destructing){
-        stop();
-        m_destructing = true;
-    }
+    SwitchProgramTracker::instance().remove_program(*this);
+    on_destruct_stop();
 }
 SingleSwitchProgramWidget* SingleSwitchProgramWidget::make(
     QWidget& parent,
@@ -41,22 +40,24 @@ SingleSwitchProgramWidget* SingleSwitchProgramWidget::make(
 ){
     SingleSwitchProgramWidget* widget = new SingleSwitchProgramWidget(parent, instance, listener);
     widget->construct();
+    SwitchProgramTracker::instance().add_program(*widget);
     return widget;
 }
 void SingleSwitchProgramWidget::run_program(
     StatsTracker* current_stats,
     const StatsTracker* historical_stats
 ){
-    SwitchSystem* system = static_cast<SwitchSystem*>(m_setup);
+    SingleSwitchProgramInstance& instance = static_cast<SingleSwitchProgramInstance&>(m_instance);
     SingleSwitchProgramEnvironment env(
         m_logger,
         current_stats, historical_stats,
-        sanitize_botbase(system->botbase()),
-        system->camera()
+        sanitize_botbase(system().botbase()),
+        system().camera()
     );
     connect(
         this, &RunnableSwitchProgramWidget::signal_cancel,
         &env, [&]{
+            m_state.store(ProgramState::STOPPING, std::memory_order_release);
             env.signal_stop();
         },
         Qt::DirectConnection
@@ -65,7 +66,7 @@ void SingleSwitchProgramWidget::run_program(
         &env, &ProgramEnvironment::set_status,
         this, &SingleSwitchProgramWidget::set_status
     );
-    SingleSwitchProgramInstance& instance = static_cast<SingleSwitchProgramInstance&>(m_instance);
+
     instance.program(env);
 }
 

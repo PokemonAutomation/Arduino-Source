@@ -20,7 +20,7 @@ LotoFarmer_Descriptor::LotoFarmer_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:LotoFarmer",
         "Date Spam: Loto Farmer",
-        "NativePrograms/DateSpam-LotoFarmer.md",
+        "SwSh-Arduino/wiki/Basic:-DateSpam-LotoFarmer",
         "Farm the Loto ID.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB
@@ -40,12 +40,18 @@ LotoFarmer::LotoFarmer(const LotoFarmer_Descriptor& descriptor)
         "9 * TICKS_PER_SECOND"
     )
 {
+    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
     m_options.emplace_back(&SKIPS, "SKIPS");
     m_options.emplace_back(&MASH_B_DURATION, "MASH_B_DURATION");
 }
 
 void LotoFarmer::program(SingleSwitchProgramEnvironment& env){
-    grip_menu_connect_go_home(env.console);
+    if (START_IN_GRIP_MENU){
+        grip_menu_connect_go_home(env.console);
+    }else{
+        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
+    }
 
     uint8_t year = MAX_YEAR;
     for (uint32_t c = 0; c < SKIPS; c++){

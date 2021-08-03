@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Compiler.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "PokemonSwSh_OverworldMovement.h"
 #include "PokemonSwSh_OverworldTrigger.h"
@@ -13,71 +14,84 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-OverworldTrigger::OverworldTrigger(ProgramEnvironment& env)
+OverworldTrigger::OverworldTrigger(
+    ProgramEnvironment& env,
+    InterruptableCommandSession& session,
+    OverworldTargetTracker& target_tracker
+)
     : m_env(env)
+    , m_session(session)
+    , m_target_tracker(target_tracker)
 {}
 void OverworldTrigger::whistle(const BotBaseContext& context, bool rotate){
+    context.botbase().wait_for_all_requests();
+    m_target_tracker.set_stop_on_target(false);
+
     if (rotate){
         pbf_move_right_joystick(context, 192, 255, 50, 70);
     }
     pbf_press_button(context, BUTTON_LCLICK, 5, 0);
     pbf_mash_button(context, BUTTON_B, 120);
+
+    context.botbase().wait_for_all_requests();
+    m_target_tracker.set_stop_on_target(true);
+    if (m_target_tracker.has_good_target()){
+        throw CancelledException();
+    }
+
+    pbf_mash_button(context, BUTTON_B, 40);
+
+    context.botbase().wait_for_all_requests();
+    m_target_tracker.set_stop_on_target(false);
 }
 
 
-void OverworldTrigger_Whistle::run(
-    InterruptableCommandSession& session,
-    OverworldTargetTracker& target_tracker
-){
+void OverworldTrigger_Whistle::run(){
 //    m_env.log("Whistle and wait.");
-    session.run([=](const BotBaseContext& context){
+    m_session.run([=](const BotBaseContext& context){
         whistle(context, !m_first_after_battle);
-        context.botbase().wait_for_all_requests();
+        m_first_after_battle = false;
     });
-    m_first_after_battle = false;
 }
 
 
 OverworldTrigger_WhistleStaticAction::OverworldTrigger_WhistleStaticAction(
     ProgramEnvironment& env,
+    InterruptableCommandSession& session,
+    OverworldTargetTracker& target_tracker,
     bool whistle_first,
     size_t whistle_count,
     size_t action_count
 )
-    : OverworldTrigger(env)
+    : OverworldTrigger(env, session, target_tracker)
     , m_whistle_first(whistle_first)
     , m_whistle_count(whistle_count)
     , m_action_count(action_count)
 {}
-void OverworldTrigger_WhistleStaticAction::run(
-    InterruptableCommandSession& session,
-    OverworldTargetTracker& target_tracker
-){
-    target_tracker.set_stop_on_target(true);
-    if (m_whistle_first){
-        session.run([=](const BotBaseContext& context){
-            for (size_t c = 0; c < m_whistle_count; c++){
-                whistle(context, !m_first_after_battle);
-                m_first_after_battle = false;
-            }
-            for (size_t c = 0; c < m_action_count; c++){
-                action(context);
-            }
-            context.botbase().wait_for_all_requests();
-        });
-    }else{
-        session.run([=](const BotBaseContext& context){
-            for (size_t c = 0; c < m_action_count; c++){
-                action(context);
-            }
-            for (size_t c = 0; c < m_whistle_count; c++){
-                whistle(context, true);
-            }
-            context.botbase().wait_for_all_requests();
-        });
-
+void OverworldTrigger_WhistleStaticAction::run(){
+    m_session.run([=](const BotBaseContext& context){
+        if (m_whistle_first){
+            whistle_loop(context);
+            action_loop(context);
+        }else{
+            action_loop(context);
+            whistle_loop(context);
+        }
+    });
+}
+void OverworldTrigger_WhistleStaticAction::whistle_loop(const BotBaseContext& context){
+    for (size_t c = 0; c < m_whistle_count; c++){
+        whistle(context, !m_first_after_battle);
+        m_first_after_battle = false;
     }
-    target_tracker.set_stop_on_target(false);
+}
+void OverworldTrigger_WhistleStaticAction::action_loop(const BotBaseContext& context){
+    m_target_tracker.set_stop_on_target(true);
+    for (size_t c = 0; c < m_action_count; c++){
+        action(context);
+        m_first_after_battle = false;
+    }
+    m_target_tracker.set_stop_on_target(false);
 }
 
 

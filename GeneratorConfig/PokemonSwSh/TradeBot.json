@@ -1,7 +1,8 @@
 ﻿{
     "0-ProgramName": "TradeBot",
-    "1-Description": "Surprise trade with a code for hosting giveaways.",
-    "2-Parameters": [
+    "1-Documentation": "SwSh-Arduino/wiki/Basic:-TradeBot",
+    "2-Description": "Surprise trade with a code for hosting giveaways.",
+    "3-Parameters": [
         {
             "00-Type": "FixedCode",
             "01-Label": "<b>Trade Code:</b>",

@@ -11,6 +11,7 @@
 #include "CommonFramework/Options/SimpleInteger.h"
 #include "CommonFramework/Options/FloatingPoint.h"
 #include "NintendoSwitch/Options/TimeExpression.h"
+#include "NintendoSwitch/Options/StartInGripMenu.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/EggStepCount.h"
 #include "PokemonSwSh_EggHelpers.h"
@@ -34,6 +35,8 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
+    StartInGripOrGame START_IN_GRIP_MENU;
+
     SimpleInteger<uint8_t> BOXES_TO_RELEASE;
     SimpleInteger<uint8_t> BOXES_TO_SKIP;
     SimpleInteger<uint8_t> BOXES_TO_HATCH;

@@ -15,14 +15,14 @@ PokemonNameReader::PokemonNameReader()
     : LargeDictionaryMatcher("Pokemon/PokemonNameOCR/PokemonOCR-")
 {}
 
-OCR::MatchResult PokemonNameReader::read_exact(
+OCR::MatchResult PokemonNameReader::read_substring(
     Language language,
     const QImage& image
 ) const{
     QString text = OCR::ocr_read(language, image);
     return match_substring(language, text);
 }
-OCR::MatchResult PokemonNameReader::read_exact(
+OCR::MatchResult PokemonNameReader::read_substring(
     Language language,
     const std::string& expected,
     const QImage& image

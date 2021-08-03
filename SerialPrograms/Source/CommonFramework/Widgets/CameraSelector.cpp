@@ -9,6 +9,7 @@
 #include <QHBoxLayout>
 #include "Common/Compiler.h"
 #include "Common/Qt/QtJsonTools.h"
+#include "Common/Qt/NoWheelComboBox.h"
 #include "CameraSelector.h"
 
 #include <iostream>
@@ -84,12 +85,12 @@ CameraSelectorUI::CameraSelectorUI(QWidget& parent, CameraSelector& value, QWidg
     camera_row->addWidget(new QLabel("<b>Camera:</b>", this), 1);
     camera_row->addSpacing(5);
 
-    m_camera_box = new QComboBox(this);
+    m_camera_box = new NoWheelComboBox(this);
     camera_row->addWidget(m_camera_box, 5);
     refresh();
     camera_row->addSpacing(5);
 
-    m_resolution_box = new QComboBox(this);
+    m_resolution_box = new NoWheelComboBox(this);
     camera_row->addWidget(m_resolution_box, 3);
     camera_row->addSpacing(5);
 

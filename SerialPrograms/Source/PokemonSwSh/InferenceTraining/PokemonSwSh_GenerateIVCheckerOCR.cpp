@@ -65,7 +65,7 @@ void GenerateIVCheckerOCR::program(SingleSwitchProgramEnvironment& env){
     IVCheckerReaderScope reader(m_reader, env.console, LANGUAGE);
 
     QString path = "IVCheckerOCR/";
-    path += language_data(LANGUAGE).code.c_str();
+    path += QString::fromStdString(language_data(LANGUAGE).code);
 
     QDir dir(path);
     if (!dir.exists()){
@@ -75,13 +75,13 @@ void GenerateIVCheckerOCR::program(SingleSwitchProgramEnvironment& env){
 
     std::vector<QImage> images = reader.dump_images(env.console.video().snapshot());
 
-    QString now = now_to_filestring().c_str();
-    images[0].save(path + IVCheckerOptionOCR::TOKENS[HP].c_str() + "-" + now + "a.png");
-    images[1].save(path + IVCheckerOptionOCR::TOKENS[ATTACK].c_str() + "-" + now + "b.png");
-    images[2].save(path + IVCheckerOptionOCR::TOKENS[DEFENSE].c_str() + "-" + now + "c.png");
-    images[3].save(path + IVCheckerOptionOCR::TOKENS[SPATK].c_str() + "-" + now + "d.png");
-    images[4].save(path + IVCheckerOptionOCR::TOKENS[SPDEF].c_str() + "-" + now + "e.png");
-    images[5].save(path + IVCheckerOptionOCR::TOKENS[SPEED].c_str() + "-" + now + "f.png");
+    QString now = QString::fromStdString(now_to_filestring());
+    images[0].save(path + QString::fromStdString(IVCheckerOptionOCR::TOKENS[HP]) + "-" + now + "a.png");
+    images[1].save(path + QString::fromStdString(IVCheckerOptionOCR::TOKENS[ATTACK]) + "-" + now + "b.png");
+    images[2].save(path + QString::fromStdString(IVCheckerOptionOCR::TOKENS[DEFENSE]) + "-" + now + "c.png");
+    images[3].save(path + QString::fromStdString(IVCheckerOptionOCR::TOKENS[SPATK]) + "-" + now + "d.png");
+    images[4].save(path + QString::fromStdString(IVCheckerOptionOCR::TOKENS[SPDEF]) + "-" + now + "e.png");
+    images[5].save(path + QString::fromStdString(IVCheckerOptionOCR::TOKENS[SPEED]) + "-" + now + "f.png");
 
 }
 

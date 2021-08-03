@@ -29,6 +29,15 @@ BotBaseHandle::BotBaseHandle(
     , m_logger(logger)
 {
     reset(port);
+    connect(
+        this, static_cast<void(BotBaseHandle::*)(uint8_t, std::string)>(&BotBaseHandle::async_try_send_request),
+        this, [=](uint8_t msg_type, std::string body){
+            if (try_send_request(msg_type, &body[0], body.size())){
+                return;
+            }
+            m_logger.log("BotBaseHandle::async_try_send_request() - Request dropped.");
+        }
+    );
 }
 BotBaseHandle::~BotBaseHandle(){
     stop();
@@ -37,7 +46,9 @@ BotBaseHandle::~BotBaseHandle(){
     on_not_connected("");
 }
 
-BotBase* BotBaseHandle::botbase(){ return m_botbase.get(); }
+BotBase* BotBaseHandle::botbase(){
+    return m_botbase.get();
+}
 
 BotBaseHandle::State BotBaseHandle::state() const{
     return m_state.load(std::memory_order_acquire);
@@ -46,6 +57,22 @@ bool BotBaseHandle::accepting_commands() const{
     return state() == State::READY &&
         m_current_pabotbase.load(std::memory_order_acquire) > PABotBaseLevel::NOT_PABOTBASE;
 }
+
+
+bool BotBaseHandle::try_send_request(uint8_t msg_type, void* params, size_t bytes){
+    std::unique_lock<std::mutex> lg(m_lock, std::defer_lock);
+    if (!lg.try_lock()){
+        return false;
+    }
+    if (!accepting_commands()){
+        return false;
+    }
+    return botbase()->try_issue_request(nullptr, msg_type, params, bytes);
+}
+void BotBaseHandle::async_try_send_request(uint8_t msg_type, void* params, size_t bytes){
+    async_try_send_request(msg_type, std::string((char*)params, bytes));
+}
+
 void BotBaseHandle::stop_unprotected(){
     {
         State state = m_state.load(std::memory_order_acquire);
@@ -173,11 +200,11 @@ void BotBaseHandle::thread_body(){
         }
         if (error.isEmpty()){
             m_state.store(State::READY, std::memory_order_release);
-            on_ready((
+            on_ready(QString::fromStdString(
                 "<font color=\"blue\">Program: " +
                 program_name(program_id) +
                 " (" + std::to_string(version) + ")</font>"
-            ).c_str());
+            ));
         }else{
             m_state.store(State::STOPPED, std::memory_order_release);
             on_stopped("<font color=\"red\">" + error + "</font>");
@@ -197,7 +224,7 @@ void BotBaseHandle::thread_body(){
             if (last > 2 * SERIAL_REFRESH_RATE){
                 uptime_status(
                     QString("<font color=\"red\">Last Ack: ") +
-                    tostr_fixed(seconds.count(), 3).c_str() + " seconds ago</font>"
+                    QString::fromStdString(tostr_fixed(seconds.count(), 3)) + " seconds ago</font>"
                 );
 //                m_logger.log("Connection issue detected. Turning on all logging...");
 //                settings.log_everything.store(true, std::memory_order_release);
@@ -230,7 +257,7 @@ void BotBaseHandle::thread_body(){
             error = e.message_qt();
         }
         if (error.isEmpty()){
-            uptime_status(("<font color=\"blue\">Up Time: " + str + "</font>").c_str());
+            uptime_status("<font color=\"blue\">Up Time: " + QString::fromStdString(str) + "</font>");
         }else{
             uptime_status("<font color=\"red\">Up Time: " + error + "</font>");
             error.clear();

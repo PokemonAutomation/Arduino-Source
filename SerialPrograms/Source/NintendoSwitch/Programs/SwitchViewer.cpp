@@ -16,7 +16,7 @@ SwitchViewer_Descriptor::SwitchViewer_Descriptor()
         QColor(),
         "NintendoSwitch:SwitchViewer",
         "Switch Viewer",
-        "SerialPrograms/SwitchViewer.md",
+        "SwSh-Arduino/wiki/Switch-Viewer",
         "View status information from one or more running programs."
     )
 {}

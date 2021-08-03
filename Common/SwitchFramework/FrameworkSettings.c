@@ -38,24 +38,3 @@ bool TOLERATE_SYSTEM_UPDATE_MENU_FAST       =   true;
 //  Some programs can bypass the system update menu, but will take a noticeable
 //  performance hit. Setting this to true enables this.
 bool TOLERATE_SYSTEM_UPDATE_MENU_SLOW       =   false;
-
-
-#ifdef __cplusplus
-
-//  Some programs can send discord messages in your own private server. Set this
-//  to your discord webhook ID.
-std::string DISCORD_WEBHOOK_ID          =   "";
-
-//  Some programs can send discord messages in your own private server. Set this
-//  to your discord webhook token.
-std::string DISCORD_WEBHOOK_TOKEN       =   "";
-
-//  Some programs can send discord messages in your own private server. Set this
-//  to your discord user ID.
-std::string DISCORD_USER_ID             =   "";
-
-//  Some programs can send discord messages in your own private server. Set this
-//  to your discord user short name.
-std::string DISCORD_USER_SHORT_NAME     =   "";
-
-#endif

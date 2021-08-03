@@ -78,7 +78,7 @@ MainWindow::MainWindow(QWidget* parent)
     {
         QLabel* github = new QLabel(support_box);
         links->addWidget(github);
-        github->setText("<a href=\"" + ONLINE_DOC_URL + "/blob/master/README.md\">Online Documentation</a>");
+        github->setText("<a href=\"" + ONLINE_DOC_URL + "SwSh-Arduino/wiki\">Online Documentation</a>");
         github->setTextFormat(Qt::RichText);
         github->setTextInteractionFlags(Qt::TextBrowserInteraction);
         github->setOpenExternalLinks(true);
@@ -219,7 +219,7 @@ void MainWindow::close_panel(){
     }
 
     const std::string& identifier = m_current_panel->descriptor().identifier();
-    PERSISTENT_SETTINGS().panels[identifier.c_str()] = m_current_panel->to_json();
+    PERSISTENT_SETTINGS().panels[QString::fromStdString(identifier)] = m_current_panel->to_json();
 
     m_current_panel.reset();
 }

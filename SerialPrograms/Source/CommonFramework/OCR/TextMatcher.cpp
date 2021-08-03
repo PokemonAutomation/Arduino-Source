@@ -186,7 +186,7 @@ void MatchResult::log(Logger* logger, const QString& extra) const{
 
     if (!expected_token.empty()){
         str += "Expected (";
-        str += expected_token.c_str();
+        str += QString::fromStdString(expected_token);
         str += "): ";
     }
 
@@ -224,7 +224,7 @@ void MatchResult::log(Logger* logger, const QString& extra) const{
                 token_str += ", ";
             }
             first = false;
-            token_str += "\"" + QString(token.c_str()) + "\"";
+            token_str += "\"" + QString::fromStdString(token) + "\"";
         }
         token_str += ")";
     }

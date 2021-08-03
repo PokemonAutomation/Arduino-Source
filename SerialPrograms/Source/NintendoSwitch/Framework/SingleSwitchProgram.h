@@ -24,11 +24,13 @@ private:
     friend class SingleSwitchProgramWidget;
     template <class... Args>
     SingleSwitchProgramEnvironment(
+//        std::string program_identifier,
         Logger& logger,
         StatsTracker* current_stats,
         const StatsTracker* historical_stats,
         Args&&... args
     )
+//        : ProgramEnvironment(std::move(program_identifier), logger, current_stats, historical_stats)
         : ProgramEnvironment(logger, current_stats, historical_stats)
         , console(0, std::forward<Args>(args)...)
     {}
@@ -57,6 +59,10 @@ public:
         SingleSwitchProgramInstance& instance,
         PanelListener& listener
     );
+
+    SwitchSystem& system(){
+        return *static_cast<SwitchSystem*>(m_setup);
+    }
 
 private:
     using RunnableSwitchProgramWidget::RunnableSwitchProgramWidget;

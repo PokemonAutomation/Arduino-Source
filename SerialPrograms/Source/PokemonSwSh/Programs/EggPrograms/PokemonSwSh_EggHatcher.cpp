@@ -20,7 +20,7 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:EggHatcher",
         "Egg Hatcher",
-        "NativePrograms/EggHatcher.md",
+        "SwSh-Arduino/wiki/Basic:-EggHatcher",
         "Fetch eggs without hatching them.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_31KB
@@ -94,6 +94,8 @@ EggHatcher::EggHatcher(const EggHatcher_Descriptor& descriptor)
         "88 * TICKS_PER_SECOND"
     )
 {
+    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
+
     m_options.emplace_back(&BOXES_TO_HATCH, "BOXES_TO_HATCH");
     m_options.emplace_back(&STEPS_TO_HATCH, "STEPS_TO_HATCH");
     m_options.emplace_back(&m_advanced_options, "");
@@ -103,11 +105,14 @@ EggHatcher::EggHatcher(const EggHatcher_Descriptor& descriptor)
 void EggHatcher::program(SingleSwitchProgramEnvironment& env){
     //  Calculate upper bounds for incubation time.
     uint16_t INCUBATION_DELAY_UPPER = (uint16_t)((uint32_t)STEPS_TO_HATCH * (uint32_t)103180 >> 16);
-
     uint16_t TOTAL_DELAY = INCUBATION_DELAY_UPPER + HATCH_DELAY + SAFETY_TIME - TRAVEL_RIGHT_DURATION;
 
-    grip_menu_connect_go_home(env.console);
-    resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+    if (START_IN_GRIP_MENU){
+        grip_menu_connect_go_home(env.console);
+        resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+    }else{
+        pbf_press_button(env.console, BUTTON_B, 5, 5);
+    }
 
     bool party_is_empty = true;
     for (uint8_t box = 0; box < BOXES_TO_HATCH; box++){

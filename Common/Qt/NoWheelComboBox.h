@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 class NoWheelComboBox : public QComboBox{
 public:
     using QComboBox::QComboBox;
-    virtual void wheelEvent(QWheelEvent* e) override{}
+    virtual void wheelEvent(QWheelEvent*) override{}
 };
 
 

@@ -11,6 +11,7 @@
 #include "CommonFramework/Options/StringSelect.h"
 #include "CommonFramework/Options/LanguageOCR.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
+#include "PokemonSwSh/Options/EncounterFilter.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
 
 namespace PokemonAutomation{
@@ -35,6 +36,7 @@ private:
     LanguageOCR LANGUAGE;
     EnumDropdown DROPDOWN;
     StringSelect STRING_SELECT;
+    EncounterFilter FILTER;
 };
 
 

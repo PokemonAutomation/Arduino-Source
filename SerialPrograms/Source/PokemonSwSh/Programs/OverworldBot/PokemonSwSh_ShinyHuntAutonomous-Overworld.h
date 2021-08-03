@@ -12,11 +12,12 @@
 #include "CommonFramework/Options/SimpleInteger.h"
 #include "CommonFramework/Options/FloatingPoint.h"
 #include "CommonFramework/Options/EnumDropdown.h"
-#include "CommonFramework/Options/LanguageOCR.h"
-#include "Pokemon/Pokemon_NameReader.h"
+#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "NintendoSwitch/Options/GoHomeWhenDone.h"
 #include "NintendoSwitch/Options/TimeExpression.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
-#include "PokemonSwSh/Programs/ShinyHunting/PokemonSwSh_EncounterTracker.h"
+#include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
+#include "PokemonSwSh/Options/EncounterFilter.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -44,29 +45,32 @@ private:
     bool find_encounter(
         SingleSwitchProgramEnvironment& env,
         Stats& stats,
-        StandardEncounterTracker& tracker,
         std::chrono::system_clock::time_point expiration
     ) const;
 
 
 private:
-    BooleanCheckBox GO_HOME_WHEN_DONE;
+    StartInGripOrGame START_IN_GRIP_MENU;
+    GoHomeWhenDone GO_HOME_WHEN_DONE;
 
     Pokemon::PokemonNameReader m_name_reader;
-    LanguageOCR LANGUAGE;
+    Pokemon::EncounterBotLanguage LANGUAGE;
 
     FloatingPoint MARK_OFFSET;
     EnumDropdown MARK_PRIORITY;
     EnumDropdown TRIGGER_METHOD;
     TimeExpression<uint16_t> MAX_MOVE_DURATION;
-    TimeExpression<uint16_t> WATCHDOG_TIMER;
+    FloatingPoint MAX_TARGET_ALPHA;
+    EncounterFilter FILTER;
+
     SimpleInteger<uint8_t> TIME_ROLLBACK_HOURS;
+    Pokemon::EncounterBotNotifications NOTIFICATION_LEVEL;
+
     SectionDivider m_advanced_options;
+    TimeExpression<uint16_t> WATCHDOG_TIMER;
     TimeExpression<uint16_t> EXIT_BATTLE_TIMEOUT;
     BooleanCheckBox TARGET_CIRCLING;
-    FloatingPoint MAX_TARGET_ALPHA;
     BooleanCheckBox VIDEO_ON_SHINY;
-    BooleanCheckBox RUN_FROM_EVERYTHING;
 };
 
 

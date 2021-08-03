@@ -130,11 +130,11 @@ TextImageFilter make_OCR_filter(const QImage& image){
     TextImageFilter filter;
     if (largest_index < BUCKETS / 3){
         filter.black_text = false;
-        filter.threshold = hi * BUCKET_SIZE;
+        filter.threshold = (uint16_t)hi * BUCKET_SIZE;
         filter.threshold = 768 - (768 - filter.threshold) / 2;
     }else{
         filter.black_text = true;
-        filter.threshold = lo * BUCKET_SIZE;
+        filter.threshold = (uint16_t)lo * BUCKET_SIZE;
         filter.threshold /= 2;
     }
 

@@ -19,6 +19,9 @@ public:
     ConfigOption(QString label)
         : m_label(std::move(label))
     {}
+
+    const QString& label() const{ return m_label; }
+
     virtual void load_json(const QJsonValue& json) = 0;
     virtual QJsonValue to_json() const = 0;
 

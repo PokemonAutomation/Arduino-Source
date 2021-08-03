@@ -18,7 +18,7 @@ EggCombined2_Descriptor::EggCombined2_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:EggCombined2",
         "Egg Combined 2",
-        "NativePrograms/EggCombined2.md",
+        "SwSh-Arduino/wiki/Basic:-EggCombined2",
         "Fetch and hatch eggs at the same time. (Fastest - 1700 eggs/day for 5120-step)",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_31KB
@@ -57,6 +57,8 @@ EggCombined2::EggCombined2(const EggCombined2_Descriptor& descriptor)
         "88 * TICKS_PER_SECOND"
     )
 {
+    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
+
     m_options.emplace_back(&BOXES_TO_HATCH, "BOXES_TO_HATCH");
     m_options.emplace_back(&STEPS_TO_HATCH, "STEPS_TO_HATCH");
     m_options.emplace_back(&FETCHES_PER_BATCH, "FETCHES_PER_BATCH");
@@ -78,8 +80,12 @@ void EggCombined2::program(SingleSwitchProgramEnvironment& env){
         .TOUCH_DATE_INTERVAL = TOUCH_DATE_INTERVAL,
     };
 
-    grip_menu_connect_go_home(env.console);
-    resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+    if (START_IN_GRIP_MENU){
+        grip_menu_connect_go_home(env.console);
+        resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+    }else{
+        pbf_press_button(env.console, BUTTON_B, 5, 5);
+    }
 
     session.eggcombined2_body(env);
 

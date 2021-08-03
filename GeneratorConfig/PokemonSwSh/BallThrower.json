@@ -1,6 +1,7 @@
 ﻿{
     "0-ProgramName": "BallThrower",
-    "1-Description": "Blindly throw balls at the opposing Pokémon until it catches.",
-    "2-Parameters": [
+    "1-Documentation": "SwSh-Arduino/wiki/Basic:-BallThrower",
+    "2-Description": "Blindly throw balls at the opposing Pokémon until it catches.",
+    "3-Parameters": [
     ]
 }

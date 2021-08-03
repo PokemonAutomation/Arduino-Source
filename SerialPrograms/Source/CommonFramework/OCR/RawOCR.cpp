@@ -22,7 +22,7 @@ namespace OCR{
 bool language_available(Language language){
     QString path = PERSISTENT_SETTINGS().resource_path;
     path += "Tesseract/";
-    path += language_data(language).code.c_str();
+    path += QString::fromStdString(language_data(language).code);
     path += ".traineddata";
     QFile file(path);
     return file.exists();
@@ -53,7 +53,7 @@ public:
 
             //  Make sure training data exists.
             std::string path = m_training_data_path + m_language_code + ".traineddata";
-            QFile file(QString::fromUtf8(path.c_str()));
+            QFile file(QString::fromStdString(path));
             if (!file.exists()){
                 return QString();
             }

@@ -40,7 +40,7 @@ PanelInstance::PanelInstance(const PanelDescriptor& descriptor)
 {}
 
 void PanelInstance::from_json(){
-    from_json(PERSISTENT_SETTINGS().panels[m_descriptor.identifier().c_str()]);
+    from_json(PERSISTENT_SETTINGS().panels[QString::fromStdString(m_descriptor.identifier())]);
 }
 QJsonValue PanelInstance::to_json() const{
     return QJsonValue();
@@ -69,7 +69,7 @@ QWidget* PanelWidget::make_header(QWidget& parent){
 
     QString name_text = "<b>Name:</b> " + m_instance.descriptor().display_name();
     if (m_instance.descriptor().doc_link().size() > 0){
-        QString path = ONLINE_DOC_URL + "/blob/master/Documentation/" + m_instance.descriptor().doc_link();
+        QString path = ONLINE_DOC_URL + m_instance.descriptor().doc_link();
         name_text += " (<a href=\"" + path + "\">online documentation</a>)</font>";
     }
     QLabel* name = new QLabel(name_text, description_box);

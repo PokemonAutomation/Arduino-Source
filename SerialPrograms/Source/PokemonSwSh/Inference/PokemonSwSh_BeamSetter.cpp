@@ -276,7 +276,7 @@ BeamSetter::Detection BeamSetter::run(
             m_logger.log(str, "blue");
             m_logger.log("BeamReader(): Purple beam found!", "blue");
             if (save_screenshot){
-                current_screenshot.save(QString("PurpleBeam-") + now_to_filestring().c_str() + ".png");
+                current_screenshot.save("PurpleBeam-" + QString::fromStdString(now_to_filestring()) + ".png");
             }
             return Detection::PURPLE;
         }else{

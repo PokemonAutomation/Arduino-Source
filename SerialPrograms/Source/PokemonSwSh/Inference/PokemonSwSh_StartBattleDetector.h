@@ -14,6 +14,7 @@
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_BattleDialogDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -21,7 +22,7 @@ namespace PokemonSwSh{
 
 
 
-bool is_dialog_grey(const QImage& image);
+//bool is_dialog_grey(const QImage& image);
 
 
 //  Return false if timed out.
@@ -46,14 +47,14 @@ public:
 
 private:
     InferenceBoxScope m_screen_box;
-    InferenceBoxScope m_dialog_box;
+    BattleDialogDetector m_dialog;
 };
 
 
 
 
 
-#if 1
+#if 0
 //  Deprecated
 
 class TimedStartBattleDetector{

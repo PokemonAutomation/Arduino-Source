@@ -67,14 +67,16 @@ TrainingSession::TrainingSession(
         for (size_t c = 1; c < (size_t)Language::EndOfList; c++){
             Language language = (Language)c;
             const std::string& code = language_data(language).code;
-            QString folder = sample_directory + code.c_str() + "/";
+            QString folder = sample_directory + QString::fromStdString(code) + "/";
             QDirIterator iter(m_directory + folder, QStringList() << "*.png", QDir::Files);
             while (iter.hasNext()){
                 iter.next();
 //                QString file = iter.next();
                 m_samples[language].emplace_back(
-                    OCR::extract_name(iter.fileName()),
-                    folder + iter.fileName()
+                    TrainingSample{
+                        OCR::extract_name(iter.fileName()),
+                        folder + iter.fileName()
+                    }
                 );
                 m_total_samples++;
 
@@ -105,8 +107,8 @@ void TrainingSession::generate_small_dictionary(
 
     ParallelTaskRunner task_runner(0, threads);
 
-    std::atomic<size_t> matched = 0;
-    std::atomic<size_t> failed = 0;
+    std::atomic<size_t> matched(0);
+    std::atomic<size_t> failed(0);
     for (const auto& language : m_samples){
         const LanguageData& language_info = language_data(language.first);
         env.log("Starting Language: " + language_info.name);
@@ -168,8 +170,8 @@ void TrainingSession::generate_large_dictionary(
 
     ParallelTaskRunner task_runner(0, threads);
 
-    std::atomic<size_t> matched = 0;
-    std::atomic<size_t> failed = 0;
+    std::atomic<size_t> matched(0);
+    std::atomic<size_t> failed(0);
     for (const auto& language : m_samples){
         const LanguageData& language_info = language_data(language.first);
         env.log("Starting Language: " + language_info.name);
@@ -204,7 +206,7 @@ void TrainingSession::generate_large_dictionary(
 
         task_runner.wait_for_everything();
 
-        QString json = output_prefix + language_info.code.c_str() + ".json";
+        QString json = output_prefix + QString::fromStdString(language_info.code) + ".json";
         trained.save(language.first, json);
 
         env.check_stopping();

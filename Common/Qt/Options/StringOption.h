@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_StringOption_H
 #define PokemonAutomation_StringOption_H
 
-#include <QJSonValue>
+#include <QJsonValue>
 #include <QLineEdit>
 #include <QString>
 #include <QWidget>

@@ -6,7 +6,12 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include "Common/Qt/NoWheelComboBox.h"
 #include "RegiSelector.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSwSh{
 
 
 RegiSelector::RegiSelector()
@@ -42,7 +47,7 @@ RegiSelectorUI::RegiSelectorUI(QWidget& parent, RegiSelector& value)
     QLabel* text = new QLabel(m_value.m_label, this);
     layout->addWidget(text, 1);
     text->setWordWrap(true);
-    m_box = new QComboBox(&parent);
+    m_box = new NoWheelComboBox(&parent);
     layout->addWidget(m_box);
     m_box->addItem("Regirock");
     m_box->addItem("Regice");
@@ -64,4 +69,9 @@ void RegiSelectorUI::restore_defaults(){
     m_box->setCurrentIndex((int)(RegiGolem)m_value);
 }
 
+
+
+}
+}
+}
 

@@ -18,9 +18,10 @@ class RightPanel : public QObject{
     Q_OBJECT
 
 public:
-    RightPanel(QString category, QString name)
+    RightPanel(QString category, QString name, QString doc_link)
         : m_category(std::move(category))
         , m_name(std::move(name))
+        , m_doc_link(std::move(doc_link))
     {}
     virtual ~RightPanel() = default;
 
@@ -32,6 +33,7 @@ public:
 protected:
     QString m_category;
     QString m_name;
+    QString m_doc_link;
 };
 
 

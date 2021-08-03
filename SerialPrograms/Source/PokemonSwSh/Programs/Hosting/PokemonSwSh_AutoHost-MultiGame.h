@@ -13,6 +13,7 @@
 #include "CommonFramework/Options/SimpleInteger.h"
 #include "CommonFramework/Options/RandomCode.h"
 #include "NintendoSwitch/Options/TimeExpression.h"
+#include "NintendoSwitch/Options/StartInGripMenu.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/MultiHostTable.h"
 
@@ -45,6 +46,8 @@ private:
     ) const;
 
 private:
+    StartInGripOrClosed START_IN_GRIP_MENU;
+
     RandomCode RAID_CODE;
     BooleanCheckBox HOST_ONLINE;
     TimeExpression<uint16_t> LOBBY_WAIT_DELAY;

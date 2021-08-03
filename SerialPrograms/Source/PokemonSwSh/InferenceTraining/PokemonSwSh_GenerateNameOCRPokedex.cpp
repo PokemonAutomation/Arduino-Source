@@ -76,7 +76,7 @@ void GenerateNameOCRDataPokedex::read(
     OCR::make_OCR_filter(image).apply(image);
     image.save("test.png");
 
-    OCR::MatchResult result = m_reader.read_exact(LANGUAGE, image);
+    OCR::MatchResult result = m_reader.read_substring(LANGUAGE, image);
     result.log(logger);
     if (result.tokens.empty()){
         output.append("");
@@ -95,7 +95,7 @@ void GenerateNameOCRDataPokedex::dump_images(
     }
 
     QString path = "PokemonNameOCR/";
-    path += language_data(LANGUAGE).code.c_str();
+    path += QString::fromStdString(language_data(LANGUAGE).code);
 
     QDir dir(path);
     if (!dir.exists()){
@@ -103,9 +103,9 @@ void GenerateNameOCRDataPokedex::dump_images(
     }
 
     path += "/";
-    path += expected[index].c_str();
+    path += QString::fromStdString(expected[index]);
     path += "-";
-    path += now_to_filestring().c_str();
+    path += QString::fromStdString(now_to_filestring());
     path += ".png";
     image.save(path);
 

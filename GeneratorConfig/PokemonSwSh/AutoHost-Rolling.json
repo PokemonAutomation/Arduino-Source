@@ -1,7 +1,8 @@
 ﻿{
     "0-ProgramName": "AutoHost-Rolling",
-    "1-Description": "Roll N days, host, SR and repeat. Also supports hard-locks and soft-locks.",
-    "2-Parameters": [
+    "1-Documentation": "SwSh-Arduino/wiki/Basic:-AutoHost-Rolling",
+    "2-Description": "Roll N days, host, SR and repeat. Also supports hard-locks and soft-locks.",
+    "3-Parameters": [
         {
             "00-Type": "RandomCode",
             "01-Label": "<b>Raid Code:</b><br>Blank for no raid code. Set random digits to zero for a fixed code. Otherwise, it is the # of leading random digits.",
@@ -89,7 +90,7 @@
             "01-Label": "<b>Troll hosting:</b><br>Zero disables the troll hosting mode, 1 attacks the first ally, 2 attacks the second, 3 attacks the third. Dynamaxing will disable this option.",
             "02-Declaration": "const uint8_t TROLL_HOSTING",
             "03-MinValue": 0,
-            "04-MaxValue": 3, 
+            "04-MaxValue": 3,
             "98-Default": 0,
             "99-Current": 0
         },

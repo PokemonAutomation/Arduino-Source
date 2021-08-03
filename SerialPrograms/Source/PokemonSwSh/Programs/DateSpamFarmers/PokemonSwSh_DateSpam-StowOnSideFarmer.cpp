@@ -20,7 +20,7 @@ StowOnSideFarmer_Descriptor::StowOnSideFarmer_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:StowOnSideFarmer",
         "Date Spam: Stow-On-Side Farmer",
-        "NativePrograms/DateSpam-StowOnSideFarmer.md",
+        "SwSh-Arduino/wiki/Basic:-DateSpam-StowOnSideFarmer",
         "Farm the Stow-on-Side items dealer.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB
@@ -40,12 +40,18 @@ StowOnSideFarmer::StowOnSideFarmer(const StowOnSideFarmer_Descriptor& descriptor
         0, 0
     )
 {
+    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
     m_options.emplace_back(&SKIPS, "SKIPS");
     m_options.emplace_back(&SAVE_ITERATIONS, "SAVE_ITERATIONS");
 }
 
 void StowOnSideFarmer::program(SingleSwitchProgramEnvironment& env){
-    grip_menu_connect_go_home(env.console);
+    if (START_IN_GRIP_MENU){
+        grip_menu_connect_go_home(env.console);
+    }else{
+        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
+    }
 
     uint8_t year = MAX_YEAR;
     uint16_t save_count = 0;

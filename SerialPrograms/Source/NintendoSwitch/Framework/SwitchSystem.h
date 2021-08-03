@@ -66,10 +66,21 @@ public:
     );
     virtual ~SwitchSystem();
 
+    ProgramState last_known_state() const;
+
     virtual bool serial_ok() const override;
     virtual void wait_for_all_requests() override;
     virtual void stop_serial() override;
     virtual void reset_serial() override;
+
+    template <uint8_t SendType, typename Parameters>
+    void send_request(Parameters& params){
+        if (last_known_state() == ProgramState::STOPPED){
+            m_serial->botbase().async_try_send_request<SendType>(params);
+        }else{
+            m_logger.log("SwitchSystem::send_request() - Request dropped due to incorrect program state.", Qt::red);
+        }
+    }
 
 public:
     BotBase* botbase();

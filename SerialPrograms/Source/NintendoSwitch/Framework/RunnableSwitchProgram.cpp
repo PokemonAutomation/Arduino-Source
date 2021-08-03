@@ -74,10 +74,7 @@ QJsonValue RunnableSwitchProgramInstance::to_json() const{
 
 
 RunnableSwitchProgramWidget::~RunnableSwitchProgramWidget(){
-    if (!m_destructing){
-        stop();
-        m_destructing = true;
-    }
+    on_destruct_stop();
 }
 
 RunnableSwitchProgramWidget::RunnableSwitchProgramWidget(
@@ -86,6 +83,7 @@ RunnableSwitchProgramWidget::RunnableSwitchProgramWidget(
     PanelListener& listener
 )
     : RunnablePanelWidget(parent, instance, listener)
+    , m_program_name(instance.descriptor().identifier())
     , m_setup(nullptr)
 {}
 void RunnableSwitchProgramWidget::construct(){
@@ -189,7 +187,7 @@ void RunnableSwitchProgramWidget::update_historical_stats(){
         if (list.size() != 0){
             list.aggregate(*m_stats);
         }
-        m_status_bar->setText(m_stats->to_str().c_str());
+        m_status_bar->setText(QString::fromStdString(m_stats->to_str()));
         m_status_bar->setVisible(true);
     }
 }
@@ -209,26 +207,29 @@ void RunnableSwitchProgramWidget::run_program(){
     RunnableSwitchProgramInstance& instance = static_cast<RunnableSwitchProgramInstance&>(m_instance);
     std::unique_ptr<StatsTracker> current_stats = instance.make_stats();
 
-//    std::string program_name = instance.descriptor().display_name().toUtf8().data();
+    const std::string& program_identifier = instance.descriptor().identifier();
+
     update_historical_stats();
 
     try{
-        m_logger.log("<b>Starting Program: " + instance.descriptor().identifier() + "</b>");
+        m_logger.log("<b>Starting Program: " + program_identifier + "</b>");
         run_program(current_stats.get(), m_stats.get());
         m_setup->wait_for_all_requests();
         m_logger.log("Ending Program...");
     }catch (CancelledException&){
-        m_logger.log("Stopping Program...");
     }catch (StringException& e){
         signal_error(e.message_qt());
     }
+
+    m_state.store(ProgramState::STOPPING, std::memory_order_release);
+    m_logger.log("Stopping Program...");
 
 
     //  Update historical stats.
     if (current_stats){
         bool ok = StatSet::update_file(
             PERSISTENT_SETTINGS().stats_file,
-            instance.descriptor().identifier(),
+            program_identifier,
             *current_stats
         );
         if (ok){
@@ -246,9 +247,8 @@ void RunnableSwitchProgramWidget::run_program(){
     }
 
 
-    m_logger.log("Entering STOPPED state.");
-    m_state.store(ProgramState::STOPPED, std::memory_order_release);
     signal_reset();
+    m_state.store(ProgramState::STOPPED, std::memory_order_release);
     m_logger.log("Now in STOPPED state.");
 //    cout << "Now in STOPPED state." << endl;
 }

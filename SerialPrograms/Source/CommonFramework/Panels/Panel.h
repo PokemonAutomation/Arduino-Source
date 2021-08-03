@@ -94,6 +94,8 @@ public:
     );
     virtual ~PanelWidget() = default;
 
+    PanelInstance& instance(){ return m_instance; }
+
 protected:
     virtual QWidget* make_header(QWidget& parent);
 

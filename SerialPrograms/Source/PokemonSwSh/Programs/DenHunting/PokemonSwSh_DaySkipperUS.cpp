@@ -21,7 +21,7 @@ DaySkipperUS_Descriptor::DaySkipperUS_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:DaySkipperUS",
         "Day Skipper (US)",
-        "NativePrograms/DaySkipperUS.md",
+        "SwSh-Arduino/wiki/Basic:-DaySkipperUS",
         "A day skipper for US date format that.  (~7500 skips/hour)",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_31KB

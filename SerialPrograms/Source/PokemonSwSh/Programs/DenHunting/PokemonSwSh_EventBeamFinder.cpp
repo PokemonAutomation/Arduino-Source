@@ -20,7 +20,7 @@ EventBeamFinder_Descriptor::EventBeamFinder_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:EventBeamFinder",
         "Event Beam Finder",
-        "NativePrograms/EventBeamFinder.md",
+        "SwSh-Arduino/wiki/Basic:-EventBeamFinder",
         "Drop wishing pieces until you find an event den.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB
@@ -36,6 +36,7 @@ EventBeamFinder::EventBeamFinder(const EventBeamFinder_Descriptor& descriptor)
         "5 * TICKS_PER_SECOND"
     )
 {
+    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
     m_options.emplace_back(&WAIT_TIME_IN_DEN, "WAIT_TIME_IN_DEN");
 }
 
@@ -67,10 +68,13 @@ void EventBeamFinder::drop_wishing_piece(const BotBaseContext& context) const{
     pbf_mash_button(context, BUTTON_B, 600);
 }
 void EventBeamFinder::program(SingleSwitchProgramEnvironment& env){
-    grip_menu_connect_go_home(env.console);
-
-    resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
-    pbf_mash_button(env.console, BUTTON_B, 700);
+    if (START_IN_GRIP_MENU){
+        grip_menu_connect_go_home(env.console);
+        resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        pbf_mash_button(env.console, BUTTON_B, 700);
+    }else{
+        pbf_press_button(env.console, BUTTON_B, 5, 5);
+    }
 
     bool parity = false;
     while (true){

@@ -114,7 +114,7 @@ MainWindow::MainWindow(QWidget* parent)
     {
         QLabel* github = new QLabel(this);
         links->addWidget(github);
-        github->setText("<a href=\"" + GITHUB_REPO + "/blob/master/Documentation/README.md\">Online Documentation</a>");
+        github->setText("<a href=\"" + GITHUB_REPO + "SwSh-Arduino/wiki\">Online Documentation</a>");
         github->setTextFormat(Qt::RichText);
         github->setTextInteractionFlags(Qt::TextBrowserInteraction);
         github->setOpenExternalLinks(true);

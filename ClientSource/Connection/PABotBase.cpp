@@ -397,7 +397,7 @@ void PABotBase::retransmit_thread(){
 bool PABotBase::try_issue_request(
     std::map<uint64_t, PendingRequest>::iterator& iter,
     const std::atomic<bool>* cancelled,
-    uint8_t send_type, char* send_params, size_t send_bytes,
+    uint8_t send_type, void* send_params, size_t send_bytes,
     bool silent_remove, size_t queue_limit
 ){
     if (send_bytes > PABB_MAX_MESSAGE_SIZE){
@@ -437,7 +437,7 @@ bool PABotBase::try_issue_request(
     PendingRequest* handle = &ret.first->second;
 
     handle->silent_remove = silent_remove;
-    handle->request = BotBaseMessage(send_type, std::string(send_params, send_bytes));
+    handle->request = BotBaseMessage(send_type, std::string((char*)send_params, send_bytes));
     handle->first_sent = std::chrono::system_clock::now();
 
     send_message(handle->request, false);
@@ -449,7 +449,7 @@ bool PABotBase::try_issue_request(
 bool PABotBase::try_issue_command(
     std::map<uint64_t, PendingCommand>::iterator& iter,
     const std::atomic<bool>* cancelled,
-    uint8_t send_type, char* send_params, size_t send_bytes,
+    uint8_t send_type, void* send_params, size_t send_bytes,
     bool silent_remove, size_t queue_limit
 ){
     if (send_bytes > PABB_MAX_MESSAGE_SIZE){
@@ -495,7 +495,7 @@ bool PABotBase::try_issue_command(
     PendingCommand* handle = &ret.first->second;
 
     handle->silent_remove = silent_remove;
-    handle->request = BotBaseMessage(send_type, std::string(send_params, send_bytes));
+    handle->request = BotBaseMessage(send_type, std::string((char*)send_params, send_bytes));
     handle->first_sent = std::chrono::system_clock::now();
 
     send_message(handle->request, false);
@@ -507,7 +507,7 @@ bool PABotBase::try_issue_command(
 bool PABotBase::issue_request(
     std::map<uint64_t, PendingRequest>::iterator& iter,
     const std::atomic<bool>* cancelled,
-    uint8_t send_type, char* send_params, size_t send_bytes,
+    uint8_t send_type, void* send_params, size_t send_bytes,
     bool silent_remove
 ){
     //  Issue a request or a command and return.
@@ -550,7 +550,7 @@ bool PABotBase::issue_request(
 bool PABotBase::issue_command(
     std::map<uint64_t, PendingCommand>::iterator& iter,
     const std::atomic<bool>* cancelled,
-    uint8_t send_type, char* send_params, size_t send_bytes,
+    uint8_t send_type, void* send_params, size_t send_bytes,
     bool silent_remove
 ){
     //  Issue a request or a command and return.
@@ -594,7 +594,7 @@ bool PABotBase::issue_command(
 
 bool PABotBase::try_issue_request(
     const std::atomic<bool>* cancelled,
-    uint8_t send_type, char* send_params, size_t send_bytes
+    uint8_t send_type, void* send_params, size_t send_bytes
 ){
     if (!PABB_MSG_IS_COMMAND(send_type)){
         std::map<uint64_t, PendingRequest>::iterator iter;
@@ -606,7 +606,7 @@ bool PABotBase::try_issue_request(
 }
 void PABotBase::issue_request(
     const std::atomic<bool>* cancelled,
-    uint8_t send_type, char* send_params, size_t send_bytes
+    uint8_t send_type, void* send_params, size_t send_bytes
 ){
     if (!PABB_MSG_IS_COMMAND(send_type)){
         std::map<uint64_t, PendingRequest>::iterator iter;
@@ -618,8 +618,8 @@ void PABotBase::issue_request(
 }
 void PABotBase::issue_request_and_wait(
     const std::atomic<bool>* cancelled,
-    uint8_t send_type, char* send_params, size_t send_bytes,
-    uint8_t recv_type, char* recv_params, size_t recv_bytes
+    uint8_t send_type, void* send_params, size_t send_bytes,
+    uint8_t recv_type, void* recv_params, size_t recv_bytes
 ){
     if (!PABB_MSG_IS_REQUEST(send_type)){
         PA_THROW_StringException("This function only supports requests.");

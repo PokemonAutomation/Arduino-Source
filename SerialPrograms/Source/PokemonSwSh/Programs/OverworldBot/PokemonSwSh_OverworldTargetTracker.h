@@ -63,6 +63,8 @@ public:
 
     void clear_detections();
 
+    bool has_good_target();
+
     //  Get the best target as of right now.
     //  The return value is only valid if the first element is non-negative.
     std::pair<double, OverworldTarget> best_target();

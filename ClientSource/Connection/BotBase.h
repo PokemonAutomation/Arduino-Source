@@ -76,19 +76,19 @@ public:
     );
 
 
-protected:
+public:
     virtual bool try_issue_request(
         const std::atomic<bool>* cancelled,
-        uint8_t send_type, char* send_params, size_t send_bytes
+        uint8_t send_type, void* send_params, size_t send_bytes
     ) = 0;
     virtual void issue_request(
         const std::atomic<bool>* cancelled,
-        uint8_t send_type, char* send_params, size_t send_bytes
+        uint8_t send_type, void* send_params, size_t send_bytes
     ) = 0;
     virtual void issue_request_and_wait(
         const std::atomic<bool>* cancelled,
-        uint8_t send_type, char* send_params, size_t send_bytes,
-        uint8_t recv_type, char* recv_params, size_t recv_bytes
+        uint8_t send_type, void* send_params, size_t send_bytes,
+        uint8_t recv_type, void* recv_params, size_t recv_bytes
     ) = 0;
 };
 
@@ -142,7 +142,7 @@ bool BotBase::try_issue_request(
     SendParams& send_params
 ){
     static_assert(sizeof(SendParams) <= PABB_MAX_MESSAGE_SIZE, "Message is too large.");
-    return try_issue_request(cancelled, SendType, (char*)&send_params, sizeof(SendParams));
+    return try_issue_request(cancelled, SendType, &send_params, sizeof(SendParams));
 }
 template <uint8_t SendType, typename SendParams>
 void BotBase::issue_request(
@@ -150,7 +150,7 @@ void BotBase::issue_request(
     SendParams& send_params
 ){
     static_assert(sizeof(SendParams) <= PABB_MAX_MESSAGE_SIZE, "Message is too large.");
-    issue_request(cancelled, SendType, (char*)&send_params, sizeof(SendParams));
+    issue_request(cancelled, SendType, &send_params, sizeof(SendParams));
 }
 template <
     uint8_t SendType, uint8_t RecvType,
@@ -166,8 +166,8 @@ void BotBase::issue_request_and_wait(
     static_assert(PABB_MSG_IS_REQUEST(SendType), "Message must be a request.");
     issue_request_and_wait(
         cancelled,
-        SendType, (char*)&send_params, sizeof(SendParams),
-        RecvType, (char*)&recv_params, sizeof(RecvParams)
+        SendType, &send_params, sizeof(SendParams),
+        RecvType, &recv_params, sizeof(RecvParams)
     );
 }
 

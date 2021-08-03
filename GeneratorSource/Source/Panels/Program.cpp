@@ -27,19 +27,28 @@ namespace PokemonAutomation{
 
 
 const QString Program::JSON_PROGRAM_NAME    = "0-ProgramName";
-const QString Program::JSON_DESCRIPTION     = "1-Description";
-const QString Program::JSON_PARAMETERS      = "2-Parameters";
+const QString Program::JSON_DOCUMENTATION   = "1-Documentation";
+const QString Program::JSON_DESCRIPTION     = "2-Description";
+const QString Program::JSON_PARAMETERS      = "3-Parameters";
 
 
 const QString Program::BUILD_BUTTON_NORMAL  = "Save and generate .hex file!";
 const QString Program::BUILD_BUTTON_BUSY    = "Build in progress... Please Wait.";
 
-Program::Program(QString category, QString name, QString description)
-    : RightPanel(std::move(category), std::move(name))
+Program::Program(QString category, QString name, QString description, QString doc_link)
+    : RightPanel(
+        std::move(category),
+        std::move(name),
+        std::move(doc_link)
+    )
     , m_description(std::move(description))
 {}
 Program::Program(QString category, const QJsonObject& obj)
-    : RightPanel(std::move(category), json_get_string_throw(obj, JSON_PROGRAM_NAME))
+    : RightPanel(
+        std::move(category),
+        json_get_string_throw(obj, JSON_PROGRAM_NAME),
+        json_get_string_throw(obj, JSON_DOCUMENTATION)
+    )
     , m_description(json_get_string_throw(obj, JSON_DESCRIPTION))
 {}
 Program::~Program(){
@@ -60,6 +69,7 @@ QWidget* Program::make_options_body(QWidget& parent){
 QJsonDocument Program::to_json() const{
     QJsonObject root;
     root.insert(JSON_PROGRAM_NAME, m_name);
+    root.insert(JSON_DOCUMENTATION, m_doc_link);
     root.insert(JSON_DESCRIPTION, m_description);
     root.insert(JSON_PARAMETERS, parameters_json());
     return QJsonDocument(root);
@@ -175,7 +185,7 @@ QWidget* Program::make_ui(MainWindow& parent){
         text->setWordWrap(true);
     }
     {
-        QString path = GITHUB_REPO + "/blob/master/Documentation/NativePrograms/" + m_name + ".md";
+        QString path = GITHUB_REPO + m_doc_link;
         QLabel* text = new QLabel("<font size=4><a href=\"" + path + "\">Online Documentation for " + m_name + "</a></font>");
         layout->addWidget(text);
         text->setTextFormat(Qt::RichText);

@@ -1,8 +1,9 @@
 ﻿{
     "0-ConfigName": "FrameworkSettings",
     "1-ConfigPath": "../Common/SwitchFramework",
-    "2-Description": "Global Framework Settings",
-    "3-Options": [
+    "2-Documentation": "SwSh-Arduino/wiki/Appendix:-GlobalSettings",
+    "3-Description": "Global Framework Settings",
+    "4-Options": [
         {
             "00-Type": "TimeExpression",
             "01-Label": "<b>Connection Controller Delay:</b><br>Wait this long before starting the program. The LEDs normally flash during this time.",

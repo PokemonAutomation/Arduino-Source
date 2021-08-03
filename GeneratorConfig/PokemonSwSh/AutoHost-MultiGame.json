@@ -1,7 +1,8 @@
 ﻿{
     "0-ProgramName": "AutoHost-MultiGame",
-    "1-Description": "Run AutoHost-Rolling across multiple game saves. (Up to 16 dens!)",
-    "2-Parameters": [
+    "1-Documentation": "SwSh-Arduino/wiki/Basic:-AutoHost-MultiGame",
+    "2-Description": "Run AutoHost-Rolling across multiple game saves. (Up to 16 dens!)",
+    "3-Parameters": [
         {
             "00-Type": "RandomCode",
             "01-Label": "<b>Raid Code:</b><br>Blank for no raid code. Set random digits to zero for a fixed code. Otherwise, it is the # of leading random digits.",

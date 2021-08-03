@@ -8,6 +8,7 @@
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/PersistentSettings.h"
+#include "Pokemon/Pokemon_SpeciesDatabase.h"
 #include "Pokemon_NameSelect.h"
 
 #include <iostream>
@@ -18,36 +19,18 @@ namespace PokemonAutomation{
 namespace Pokemon{
 
 
-PokemonNameSelectData::PokemonNameSelectData(const QString& json_file){
+PokemonNameSelectData::PokemonNameSelectData(const QString& json_file_slugs){
     QJsonArray array = read_json_file(
-        PERSISTENT_SETTINGS().resource_path + json_file
+        PERSISTENT_SETTINGS().resource_path + json_file_slugs
     ).array();
-    QJsonObject obj = read_json_file(
-        PERSISTENT_SETTINGS().resource_path + "Pokemon/PokemonNameOCR/PokemonOCR-eng.json"
-    ).object();
     for (const auto& item : array){
-        QString token = item.toString();
-//        cout << token.toUtf8().data() << endl;
-        if (token.size() <= 0){
-            PA_THROW_StringException("Expected non-empty string for Pokemon token.");
+        QString slug = item.toString();
+        std::string slug_str = slug.toUtf8().data();
+        if (slug.size() <= 0){
+            PA_THROW_StringException("Expected non-empty string for Pokemon slug.");
         }
-        auto iter = obj.find(token);
-        if (iter == obj.end()){
-            PA_THROW_StringException("Pokemon token not found in database: " + token);
-        }
-        QJsonArray array = iter.value().toArray();
-        if (array.empty()){
-            PA_THROW_StringException("No display names or candidates found for: " + token);
-        }
-        QString display = array[0].toString();
-        if (display.size() <= 0){
-            PA_THROW_StringException("Expected non-empty string for display name. Token: " + token);
-        }
-        m_list.emplace_back(display);
-        m_display_to_token.emplace(
-            std::move(display),
-            token.toUtf8().data()
-        );
+        const SpeciesData& data = species_slug_to_data(slug_str);
+        m_list.emplace_back(data.display_name());
     }
 }
 
@@ -55,19 +38,15 @@ PokemonNameSelectData::PokemonNameSelectData(const QString& json_file){
 
 PokemonNameSelect::PokemonNameSelect(
     QString label,
-    const QString& json_file
+    const QString& json_file_slugs
 )
-    : PokemonNameSelectData(json_file)
+    : PokemonNameSelectData(json_file_slugs)
     , StringSelect(std::move(label), cases(), 0)
 {}
 
-const std::string& PokemonNameSelect::token() const{
+const std::string& PokemonNameSelect::slug() const{
     const QString& display = (const QString&)*this;
-    auto iter = m_display_to_token.find(display);
-    if (iter == m_display_to_token.end()){
-        PA_THROW_StringException("Display name not found in database: " + display);
-    }
-    return iter->second;
+    return species_display_name_to_slug(display);
 }
 
 

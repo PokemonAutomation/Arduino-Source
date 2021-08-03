@@ -69,6 +69,8 @@ class RunnableSwitchProgramWidget : public RunnablePanelWidget{
 public:
     virtual ~RunnableSwitchProgramWidget();
 
+    SwitchSetup& setup(){ return *m_setup; }
+
 protected:
     RunnableSwitchProgramWidget(
         QWidget& parent,
@@ -100,8 +102,8 @@ protected:
 protected:
     friend class RunnableSwitchProgramInstance;
 
+    const std::string& m_program_name;
     SwitchSetup* m_setup;
-
     std::unique_ptr<StatsTracker> m_stats;
 };
 

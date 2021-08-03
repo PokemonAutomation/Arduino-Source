@@ -37,8 +37,9 @@ public:
 
 public:
     //  Settings Panel
-    QString DISCORD_WEBHOOK_ID;
-    QString DISCORD_WEBHOOK_TOKEN;
+    QString INSTANCE_NAME;
+
+    QString DISCORD_WEBHOOK_URL;
     QString DISCORD_USER_ID;
     QString DISCORD_USER_SHORT_NAME;
 

@@ -7,6 +7,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Qt/NoWheelComboBox.h"
 #include "EggStepCount.h"
 
 namespace PokemonAutomation{
@@ -57,10 +58,10 @@ EggStepCountUI::EggStepCountUI(QWidget& parent, EggStepCount& value)
     QLabel* text = new QLabel(m_value.m_label, this);
     layout->addWidget(text, 1);
     text->setWordWrap(true);
-    m_box = new QComboBox(&parent);
+    m_box = new NoWheelComboBox(&parent);
     layout->addWidget(m_box);
     for (uint16_t count : STEP_COUNTS){
-        m_box->addItem(PokemonAutomation::tostr_u_commas(count).c_str());
+        m_box->addItem(QString::fromStdString(PokemonAutomation::tostr_u_commas(count)));
     }
     m_box->setCurrentIndex((int)m_value.m_current);
     layout->addWidget(m_box, 1);

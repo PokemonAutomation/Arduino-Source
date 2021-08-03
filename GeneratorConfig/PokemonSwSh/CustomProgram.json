@@ -1,6 +1,7 @@
 ﻿{
     "0-ProgramName": "CustomProgram",
-    "1-Description": "Write your own program by editing \"NativePrograms/PokemonSwShPrograms/CustomProgram_Core.c\".<br>(This example is just a copy of TurboA.)",
-    "2-Parameters": [
+    "1-Documentation": "SwSh-Arduino/wiki/Basic:-CustomProgram",
+    "2-Description": "Write your own program by editing \"NativePrograms/PokemonSwShPrograms/CustomProgram_Core.c\".<br>(This example is just a copy of TurboA.)",
+    "3-Parameters": [
     ]
 }

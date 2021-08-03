@@ -130,40 +130,40 @@ private:
     bool try_issue_request(
         std::map<uint64_t, PendingRequest>::iterator& iter,
         const std::atomic<bool>* cancelled,
-        uint8_t send_type, char* send_params, size_t send_bytes,
+        uint8_t send_type, void* send_params, size_t send_bytes,
         bool silent_remove, size_t queue_limit
     );
     bool try_issue_command(
         std::map<uint64_t, PendingCommand>::iterator& iter,
         const std::atomic<bool>* cancelled,
-        uint8_t send_type, char* send_params, size_t send_bytes,
+        uint8_t send_type, void* send_params, size_t send_bytes,
         bool silent_remove, size_t queue_limit
     );
     bool issue_request(
         std::map<uint64_t, PendingRequest>::iterator& iter,
         const std::atomic<bool>* cancelled,
-        uint8_t send_type, char* send_params, size_t send_bytes,
+        uint8_t send_type, void* send_params, size_t send_bytes,
         bool silent_remove
     );
     bool issue_command(
         std::map<uint64_t, PendingCommand>::iterator& iter,
         const std::atomic<bool>* cancelled,
-        uint8_t send_type, char* send_params, size_t send_bytes,
+        uint8_t send_type, void* send_params, size_t send_bytes,
         bool silent_remove
     );
 
     virtual bool try_issue_request(
         const std::atomic<bool>* cancelled,
-        uint8_t send_type, char* send_params, size_t send_bytes
+        uint8_t send_type, void* send_params, size_t send_bytes
     ) override;
     virtual void issue_request(
         const std::atomic<bool>* cancelled,
-        uint8_t send_type, char* send_params, size_t send_bytes
+        uint8_t send_type, void* send_params, size_t send_bytes
     ) override;
     virtual void issue_request_and_wait(
         const std::atomic<bool>* cancelled,
-        uint8_t send_type, char* send_params, size_t send_bytes,
-        uint8_t recv_type, char* recv_params, size_t recv_bytes
+        uint8_t send_type, void* send_params, size_t send_bytes,
+        uint8_t recv_type, void* recv_params, size_t recv_bytes
     ) override;
 
 

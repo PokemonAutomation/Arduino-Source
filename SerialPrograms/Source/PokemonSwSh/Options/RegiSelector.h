@@ -10,6 +10,10 @@
 #include <QComboBox>
 #include "CommonFramework/Options/ConfigOption.h"
 
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSwSh{
+
 
 enum class RegiGolem{
     Regirock,
@@ -52,4 +56,8 @@ private:
 };
 
 
+
+}
+}
+}
 #endif

@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_EventBeamFinder_H
 
 #include "NintendoSwitch/Options/TimeExpression.h"
+#include "NintendoSwitch/Options/StartInGripMenu.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -33,6 +34,8 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
+    StartInGripOrGame START_IN_GRIP_MENU;
+
     TimeExpression<uint16_t> WAIT_TIME_IN_DEN;
 };
 

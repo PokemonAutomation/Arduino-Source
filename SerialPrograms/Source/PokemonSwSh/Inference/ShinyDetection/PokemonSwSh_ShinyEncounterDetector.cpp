@@ -11,6 +11,7 @@
 #include "CommonFramework/Inference/InferenceThrottler.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_StartBattleDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_BattleMenuDetector.h"
+#include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyDialogTracker.h"
 #include "PokemonSwSh_ShinyTrigger.h"
 #include "PokemonSwSh_ShinyEncounterDetector.h"
 
@@ -30,20 +31,13 @@ const ShinyDetectionBattle SHINY_BATTLE_RAID    {{0.3, 0.01, 0.7, 0.75}, std::ch
 
 class ShinyEncounterDetector{
 public:
-    enum class DialogTimerState{
-        NOT_STARTED,
-        LISTENING,
-        FINISHED,
-    };
-
-public:
     ShinyEncounterDetector(
         VideoFeed& feed, Logger& logger,
         const ShinyDetectionBattle& battle_settings,
         double detection_threshold
     );
 
-    ShinyDetection results() const;
+    ShinyType results() const;
 
     void push(
         const QImage& screen,
@@ -55,7 +49,7 @@ private:
     VideoFeed& m_feed;
     Logger& m_logger;
 
-    InferenceBoxScope m_dialog_box;
+//    InferenceBoxScope m_dialog_box;
     InferenceBoxScope m_shiny_box;
 
     std::chrono::milliseconds m_min_delay;
@@ -64,11 +58,7 @@ private:
     double m_detection_threshold;
     StandardBattleMenuDetector m_menu;
 
-    bool m_dialog_on = false;
-    DialogTimerState m_dialog_state = DialogTimerState::NOT_STARTED;
-
-    std::chrono::system_clock::time_point m_last_dialog_off;
-    ShinyImageAlpha m_dialog_alpha;
+    ShinyDialogTracker m_dialog_tracker;
 
     std::deque<InferenceBoxScope> m_detection_overlays;
 
@@ -87,13 +77,13 @@ ShinyEncounterDetector::ShinyEncounterDetector(
 )
     : m_feed(feed)
     , m_logger(logger)
-    , m_dialog_box(feed, 0.50, 0.89, 0.40, 0.07)
+//    , m_dialog_box(feed, 0.50, 0.89, 0.40, 0.07)
     , m_shiny_box(feed, battle_settings.detection_box)
     , m_min_delay(battle_settings.dialog_delay_when_shiny - std::chrono::milliseconds(500))
     , m_max_delay(battle_settings.dialog_delay_when_shiny + std::chrono::milliseconds(500))
     , m_detection_threshold(detection_threshold)
     , m_menu(feed)
-    , m_last_dialog_off(std::chrono::system_clock::now())
+    , m_dialog_tracker(feed, logger)
 {}
 
 
@@ -101,56 +91,9 @@ void ShinyEncounterDetector::push(
     const QImage& screen,
     std::chrono::system_clock::time_point timestamp
 ){
-    //  Dialog timing detector.
-    bool dialog_on = is_dialog_grey(extract_box(screen, m_dialog_box));
-    do{
-        if (m_dialog_on){
-            if (dialog_on){
-                //  on -> on    :   Zero the alpha.
-                m_dialog_alpha = ShinyImageAlpha();
-            }else{
-                //  on -> off   :   Reset the timer.
-                if (m_dialog_state != DialogTimerState::FINISHED){
-                    m_dialog_state = DialogTimerState::LISTENING;
-                }
-                m_last_dialog_off = timestamp;
-                m_dialog_on = false;
-                m_logger.log("ShinyDetector: Dialog on -> off.", "purple");
-            }
-            break;
-        }
-
-        if (!dialog_on){
-            break;
-        }
-        if (m_dialog_state == DialogTimerState::NOT_STARTED){
-                m_logger.log("ShinyDetector: Dialog off -> on. Starting timer.", "purple");
-            break;
-        }
-
-        //  off -> on   :   Check if we sandwiched a shiny sparkle with the appropriate time delay.
-        auto time_off = timestamp - m_last_dialog_off;
-        bool shiny_delay = m_min_delay < time_off && time_off < m_max_delay;
-        bool sandwiched_shiny = m_dialog_alpha.shiny >= 0.5;
-        bool dialog_trigger = shiny_delay && sandwiched_shiny;
-
-        m_logger.log(
-            "ShinyDetector: Dialog Delay = " +
-            QString::number(std::chrono::duration_cast<std::chrono::milliseconds>(time_off).count() / 1000.) + " seconds",
-            "purple"
-        );
-        if (dialog_trigger){
-            if (m_dialog_state == DialogTimerState::LISTENING){
-                m_logger.log("ShinyDetector: Dialog delay is consistent with a shiny!", "blue");
-                m_dialog_trigger = true;
-            }else{
-                m_logger.log("ShinyDetector: Dialog delay is consistent with a shiny, but it's the wrong dialog.", "blue");
-            }
-        }
-
-        m_dialog_state = DialogTimerState::FINISHED;
-    }while (false);
-    m_dialog_on = dialog_on;
+    m_dialog_tracker.push_frame(screen, timestamp);
+    auto wild_animation_duration = m_dialog_tracker.wild_animation_duration();
+    m_dialog_trigger |= m_min_delay < wild_animation_duration && wild_animation_duration < m_max_delay;
 
 
 
@@ -164,12 +107,10 @@ void ShinyEncounterDetector::push(
 //    cout << std::chrono::duration_cast<std::chrono::milliseconds>(time1 - time0).count() << endl;
 
     ShinyImageAlpha frame_alpha = signatures.alpha();
-    m_image_alpha.max(frame_alpha);
 
-    if (!m_dialog_on){
-        m_dialog_alpha.max(frame_alpha);
+    if (m_dialog_tracker.encounter_state() == EncounterState::WILD_ANIMATION){
+        m_image_alpha.max(frame_alpha);
     }
-
 
     if (frame_alpha.shiny > 0){
         if (frame_alpha.shiny >= m_detection_threshold){
@@ -208,10 +149,10 @@ void ShinyEncounterDetector::push(
     }
 }
 
-ShinyDetection ShinyEncounterDetector::results() const{
+ShinyType ShinyEncounterDetector::results() const{
     double alpha = m_image_alpha.shiny;
     if (m_dialog_trigger){
-        alpha += 1.5;
+        alpha += 1.4;
     }
     m_logger.log(
         "ShinyDetector: Overall Alpha = " + QString::number(alpha) +
@@ -222,35 +163,30 @@ ShinyDetection ShinyEncounterDetector::results() const{
 
     if (alpha < m_detection_threshold){
         m_logger.log("ShinyDetector: Not Shiny.", "purple");
-        return ShinyDetection::NOT_SHINY;
+        return ShinyType::NOT_SHINY;
     }
     if (m_image_alpha.star > 0 && m_image_alpha.star > m_image_alpha.square * 2){
         m_logger.log("ShinyDetector: Detected Star Shiny!", "blue");
-        return ShinyDetection::STAR_SHINY;
+        return ShinyType::STAR_SHINY;
     }
     if (m_image_alpha.square > 0 && m_image_alpha.square > m_image_alpha.star * 2){
         m_logger.log("ShinyDetector: Detected Square Shiny!", "blue");
-        return ShinyDetection::SQUARE_SHINY;
+        return ShinyType::SQUARE_SHINY;
     }
 
     m_logger.log("ShinyDetector: Detected Shiny! But ambiguous shiny type.", "blue");
-    return ShinyDetection::UNKNOWN_SHINY;
+    return ShinyType::UNKNOWN_SHINY;
 }
 
 
 
 
-ShinyDetection detect_shiny_battle(
+ShinyType detect_shiny_battle(
     ProgramEnvironment& env, VideoFeed& feed,
     const ShinyDetectionBattle& battle_settings,
     std::chrono::seconds timeout,
     double detection_threshold
 ){
-#if 0
-    ShinyEncounterDetector detector(env, feed, logger, shiny_box, timeout, detection_threshold);
-    return detector.detect();
-#else
-
     StatAccumulatorI32 capture_stats;
     StatAccumulatorI32 menu_stats;
     StatAccumulatorI32 inference_stats;
@@ -304,12 +240,10 @@ ShinyDetection detect_shiny_battle(
 
     if (no_detection){
         env.log("ShinyDetector: Battle menu not found after timeout.", "red");
-        return ShinyDetection::NO_BATTLE_MENU;
+        return ShinyType::UNKNOWN;
     }
 
     return detector.results();
-
-#endif
 }
 
 

@@ -18,7 +18,7 @@ RaidItemFarmerOHKO_Descriptor::RaidItemFarmerOHKO_Descriptor()
     : MultiSwitchProgramDescriptor(
         "PokemonSwSh:RaidItemFarmerOHKO",
         "Raid Item Farmer (OHKO)",
-        "SerialPrograms/RaidItemFarmerOHKO.md",
+        "SwSh-Arduino/wiki/Advanced:-RaidItemFarmerOHKO",
         "Farm items from raids that can be OHKO'ed. (requires multiple Switches)",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB,

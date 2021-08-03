@@ -8,6 +8,7 @@
 #include <QJsonObject>
 #include <QVBoxLayout>
 #include "Common/Qt/QtJsonTools.h"
+#include "Common/Qt/NoWheelComboBox.h"
 #include "MultiSwitchSystem.h"
 
 namespace PokemonAutomation{
@@ -117,7 +118,7 @@ MultiSwitchSystem::MultiSwitchSystem(
     row->setMargin(0);
     row->addStretch(2);
     row->addWidget(new QLabel("<b>Switch Count:</b>", this), 0);
-    QComboBox* box = new QComboBox(this);
+    QComboBox* box = new NoWheelComboBox(this);
     row->addWidget(box, 1);
     row->addStretch(2);
     for (size_t c = factory.m_min_switches; c <= factory.m_max_switches; c++){

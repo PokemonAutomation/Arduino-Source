@@ -14,14 +14,14 @@
 #include "Programs/QoLMacros/PokemonSwSh_FastCodeEntry.h"
 #include "Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.h"
 
-#include "Programs/BasicPrograms/PokemonSwSh_TurboA.h"
-#include "Programs/BasicPrograms/PokemonSwSh_MassRelease.h"
-#include "Programs/BasicPrograms/PokemonSwSh_SurpriseTrade.h"
-#include "Programs/BasicPrograms/PokemonSwSh_TradeBot.h"
-#include "Programs/BasicPrograms/PokemonSwSh_ClothingBuyer.h"
-#include "Programs/BasicPrograms/PokemonSwSh_BallThrower.h"
-#include "Programs/BasicPrograms/PokemonSwSh_DexRecFinder.h"
-#include "Programs/PokemonSwSh_StatsReset.h"
+#include "Programs/General/PokemonSwSh_TurboA.h"
+#include "Programs/General/PokemonSwSh_MassRelease.h"
+#include "Programs/General/PokemonSwSh_SurpriseTrade.h"
+#include "Programs/General/PokemonSwSh_TradeBot.h"
+#include "Programs/General/PokemonSwSh_ClothingBuyer.h"
+#include "Programs/General/PokemonSwSh_BallThrower.h"
+#include "Programs/General/PokemonSwSh_DexRecFinder.h"
+#include "Programs/General/PokemonSwSh_StatsReset.h"
 
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-WattFarmer.h"
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-BerryFarmer.h"
@@ -41,21 +41,22 @@
 #include "Programs/Hosting/PokemonSwSh_AutoHost-Rolling.h"
 #include "Programs/Hosting/PokemonSwSh_AutoHost-MultiGame.h"
 
-#include "Programs/ShinyHunting/PokemonSwSh_MultiGameFossil.h"
-#include "Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-Regi.h"
-#include "Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.h"
-#include "Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-StrongSpawn.h"
-#include "Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-Regigigas2.h"
-#include "Programs/ShinyHunting/PokemonSwSh_ShinyHuntUnattended-IoATrade.h"
+#include "Programs/ShinyHuntUnattended/PokemonSwSh_MultiGameFossil.h"
+#include "Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-Regi.h"
+#include "Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.h"
+#include "Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-StrongSpawn.h"
+#include "Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-Regigigas2.h"
+#include "Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-IoATrade.h"
+#include "Programs/ShinyHuntUnattended/PokemonSwSh_CurryHunter.h"
 
-#include "Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-Regi.h"
-#include "Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-SwordsOfJustice.h"
-#include "Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-StrongSpawn.h"
-#include "Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-Regigigas2.h"
-#include "Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-IoATrade.h"
-#include "Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-BerryTree.h"
-#include "Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-Whistling.h"
-#include "Programs/ShinyHunting/PokemonSwSh_ShinyHuntAutonomous-Fishing.h"
+#include "Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Regi.h"
+#include "Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-SwordsOfJustice.h"
+#include "Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-StrongSpawn.h"
+#include "Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Regigigas2.h"
+#include "Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-IoATrade.h"
+#include "Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-BerryTree.h"
+#include "Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Whistling.h"
+#include "Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Fishing.h"
 #include "Programs/OverworldBot/PokemonSwSh_ShinyHuntAutonomous-Overworld.h"
 
 #include "Programs/EggPrograms/PokemonSwSh_EggFetcher2.h"
@@ -127,6 +128,7 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<ShinyHuntUnattendedStrongSpawn_Descriptor, ShinyHuntUnattendedStrongSpawn>();
     add_program<ShinyHuntUnattendedRegigigas2_Descriptor, ShinyHuntUnattendedRegigigas2>();
     add_program<ShinyHuntUnattendedIoATrade_Descriptor, ShinyHuntUnattendedIoATrade>();
+    add_program<CurryHunter_Descriptor, CurryHunter>();
 
     add_divider("---- Autonomous Shiny Hunting ----");
     add_program<ShinyHuntAutonomousRegi_Descriptor, ShinyHuntAutonomousRegi>();

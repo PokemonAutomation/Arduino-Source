@@ -18,11 +18,11 @@ class PokemonNameReader : public OCR::LargeDictionaryMatcher{
 public:
     PokemonNameReader();
 
-    OCR::MatchResult read_exact(
+    OCR::MatchResult read_substring(
         Language language,
         const QImage& image
     ) const;
-    OCR::MatchResult read_exact(
+    OCR::MatchResult read_substring(
         Language language,
         const std::string& expected,
         const QImage& image

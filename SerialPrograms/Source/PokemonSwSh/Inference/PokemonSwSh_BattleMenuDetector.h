@@ -2,9 +2,6 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *
- *      Drop a wishing piece and determine if it is red or purple.
- *
  */
 
 #ifndef PokemonAutomation_PokemonSwSh_BattleMenuDetector_H

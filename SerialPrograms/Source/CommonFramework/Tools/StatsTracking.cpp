@@ -9,6 +9,8 @@
 #include "StatsTracking.h"
 
 #include <iostream>
+#include <QJsonArray>
+#include <QJsonObject>
 using std::cout;
 using std::endl;
 
@@ -60,7 +62,7 @@ std::string StatsTracker::to_str() const{
 
 #if 0
 void StatsTracker::log_stats(ProgramEnvironment& env) const{
-    QString str = QString(to_str().c_str());
+    QString str = QString::fromStdString(to_str());
     env.set_status(str);
     env.log(str);
 }
@@ -113,6 +115,29 @@ void StatsTracker::parse_and_append_line(const std::string& line){
             ptr++;
         }
     }
+}
+
+QJsonArray StatsTracker::make_discord_stats() const{
+    QJsonArray fields;
+    for (const Stat& stat : m_display_order) {
+
+        uint64_t count = 0;
+        auto iter = m_stats.find(stat.label);
+        if (iter != m_stats.end()){
+            count = iter->second;
+        }
+
+        if (stat.omit_if_zero && count == 0){
+            continue;
+        }
+
+        QJsonObject field;
+        field["name"] = QString::fromStdString(stat.label);
+        field["value"] = QString::fromStdString(tostr_u_commas(count));
+
+        fields.append(field);
+    }
+    return fields;
 }
 
 

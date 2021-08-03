@@ -20,9 +20,9 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-const QString VERSION = "v0.5.2";
+const QString VERSION = "v0.5.5";
 const QString DISCORD = "https://discord.gg/cQ4gWxN";
-const QString GITHUB_REPO = "https://github.com/PokemonAutomation/SwSh-Arduino";
+const QString GITHUB_REPO = "https://github.com/PokemonAutomation/";
 
 const QString SETTINGS_NAME = "Settings.json";
 const QString CONFIG_FOLDER_NAME = "GeneratorConfig";

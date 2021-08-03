@@ -26,7 +26,7 @@ AutoHostRolling_Descriptor::AutoHostRolling_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:AutoHostRolling",
         "Auto-Host Rolling",
-        "NativePrograms/AutoHost-Rolling.md",
+        "SwSh-Arduino/wiki/Basic:-AutoHost-Rolling",
         "Roll N days, host, SR and repeat. Also supports hard-locks and soft-locks.",
         FeedbackType::OPTIONAL_,
         PABotBaseLevel::PABOTBASE_12KB
@@ -96,6 +96,8 @@ AutoHostRolling::AutoHostRolling(const AutoHostRolling_Descriptor& descriptor)
         "32 * TICKS_PER_SECOND"
     )
 {
+    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
+
     m_options.emplace_back(&RAID_CODE, "RAID_CODE");
     m_options.emplace_back(&SKIPS, "SKIPS");
     m_options.emplace_back(&BACKUP_SAVE, "BACKUP_SAVE");
@@ -134,7 +136,12 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env){
         ? 0
         : LOBBY_WAIT_DELAY - start_raid_delay;
 
-    grip_menu_connect_go_home(env.console);
+    if (START_IN_GRIP_MENU){
+        grip_menu_connect_go_home(env.console);
+    }else{
+        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
+    }
 
     uint32_t last_touch = 0;
     if (SKIPS == 0 && TOUCH_DATE_INTERVAL > 0){

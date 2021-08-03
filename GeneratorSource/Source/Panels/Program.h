@@ -21,6 +21,7 @@ namespace PokemonAutomation{
 class Program : public RightPanel{
 public:
     static const QString JSON_PROGRAM_NAME;
+    static const QString JSON_DOCUMENTATION;
     static const QString JSON_DESCRIPTION;
     static const QString JSON_PARAMETERS;
 
@@ -28,7 +29,7 @@ public:
     static const QString BUILD_BUTTON_BUSY;
 
 public:
-    Program(QString category, QString name, QString description);
+    Program(QString category, QString name, QString description, QString doc_link);
     Program(QString category, const QJsonObject& obj);
     ~Program();
 

@@ -28,7 +28,7 @@ AutoHostMultiGame_Descriptor::AutoHostMultiGame_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:AutoHostMultiGame",
         "Auto-Host Multi-Game",
-        "NativePrograms/AutoHost-MultiGame.md",
+        "SwSh-Arduino/wiki/Basic:-AutoHost-MultiGame",
         "Run AutoHost-Rolling across multiple game saves. (Up to 16 dens!)",
         FeedbackType::OPTIONAL_,
         PABotBaseLevel::PABOTBASE_12KB
@@ -76,6 +76,8 @@ AutoHostMultiGame::AutoHostMultiGame(const AutoHostMultiGame_Descriptor& descrip
         "32 * TICKS_PER_SECOND"
     )
 {
+    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
+
     m_options.emplace_back(&RAID_CODE, "RAID_CODE");
     m_options.emplace_back(&HOST_ONLINE, "HOST_ONLINE");
     m_options.emplace_back(&LOBBY_WAIT_DELAY, "LOBBY_WAIT_DELAY");
@@ -203,7 +205,12 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env){
         }
     }
 
-    grip_menu_connect_go_home(env.console);
+    if (START_IN_GRIP_MENU){
+        grip_menu_connect_go_home(env.console);
+    }else{
+        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
+    }
 
     uint32_t last_touch = 0;
     if (enable_touch && TOUCH_DATE_INTERVAL > 0){

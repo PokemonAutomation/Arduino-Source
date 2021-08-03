@@ -52,7 +52,7 @@ QJsonObject DictionaryOCR::to_json() const{
         for (const QString& candidate : item.second){
             list.append(candidate);
         }
-        obj.insert(QString::fromUtf8(item.first.c_str()), list);
+        obj.insert(QString::fromStdString(item.first), list);
     }
     return obj;
 }

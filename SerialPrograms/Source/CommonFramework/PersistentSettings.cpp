@@ -74,10 +74,11 @@ void PersistentSettings::write() const{
     root.insert("05-LogEverything", QJsonValue(log_everything));
 //    root.insert("06-ResourcePath", QJsonValue(resource_path));
 
-    root.insert("20-DISCORD_WEBHOOK_ID", DISCORD_WEBHOOK_ID);
-    root.insert("21-DISCORD_WEBHOOK_TOKEN", DISCORD_WEBHOOK_TOKEN);
-    root.insert("22-DISCORD_USER_ID", DISCORD_USER_ID);
-    root.insert("23-DISCORD_USER_SHORT_NAME", DISCORD_USER_SHORT_NAME);
+    root.insert("10-INSTANCE_NAME", INSTANCE_NAME);
+
+    root.insert("20-DISCORD_WEBHOOK_URL", DISCORD_WEBHOOK_URL);
+    root.insert("21-DISCORD_USER_ID", DISCORD_USER_ID);
+    root.insert("22-DISCORD_USER_SHORT_NAME", DISCORD_USER_SHORT_NAME);
 
     root.insert("50-SwitchKeyboardMapping", NintendoSwitch::read_keyboard_mapping());
 
@@ -110,10 +111,11 @@ void PersistentSettings::read(){
     json_get_bool(log_everything, root, "05-LogEverything");
 //    json_get_string(resource_path, root, "06-ResourcePath");
 
-    json_get_string(DISCORD_WEBHOOK_ID, root, "20-DISCORD_WEBHOOK_ID");
-    json_get_string(DISCORD_WEBHOOK_TOKEN, root, "21-DISCORD_WEBHOOK_TOKEN");
-    json_get_string(DISCORD_USER_ID, root, "22-DISCORD_USER_ID");
-    json_get_string(DISCORD_USER_SHORT_NAME, root, "23-DISCORD_USER_SHORT_NAME");
+    json_get_string(INSTANCE_NAME, root, "10-INSTANCE_NAME");
+
+    json_get_string(DISCORD_WEBHOOK_URL, root, "20-DISCORD_WEBHOOK_URL");
+    json_get_string(DISCORD_USER_ID, root, "21-DISCORD_USER_ID");
+    json_get_string(DISCORD_USER_SHORT_NAME, root, "22-DISCORD_USER_SHORT_NAME");
 
     NintendoSwitch::set_keyboard_mapping(json_get_array_nothrow(root, "50-SwitchKeyboardMapping"));
 

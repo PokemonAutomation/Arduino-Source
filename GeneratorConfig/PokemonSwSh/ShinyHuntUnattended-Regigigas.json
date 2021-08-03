@@ -1,7 +1,8 @@
 ﻿{
     "0-ProgramName": "ShinyHuntUnattended-Regigigas",
-    "1-Description": "Hunt for shiny Regigigas. Stop when a shiny is found.",
-    "2-Parameters": [
+    "1-Documentation": "SwSh-Arduino/wiki/Basic:-ShinyHuntUnattended-Regigigas",
+    "2-Description": "Hunt for shiny Regigigas. Stop when a shiny is found.",
+    "3-Parameters": [
         {
             "00-Type": "TimeExpression",
             "01-Label": "<b>Start to Attack Delay:</b><br>This needs to be carefully calibrated.",

@@ -18,7 +18,7 @@ PageSwap_Descriptor::PageSwap_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonHome:PageSwap",
         STRING_POKEMON + " Home: Page Swap",
-        "SerialPrograms/PokemonHome-PageSwap.md",
+        "SwSh-Arduino/wiki/Advanced:-PkmnHomePageSwap",
         "Swap 30 boxes (1 page) in " + STRING_POKEMON + " Home.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB
@@ -34,12 +34,17 @@ PageSwap::PageSwap(const PageSwap_Descriptor& descriptor)
         false
     )
 {
+    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
     m_options.emplace_back(&DODGE_SYSTEM_UPDATE_WINDOW, "DODGE_SYSTEM_UPDATE_WINDOW");
 }
 
 void PageSwap::program(SingleSwitchProgramEnvironment& env){
-    grip_menu_connect_go_home(env.console);
-    resume_game_no_interact(env.console, DODGE_SYSTEM_UPDATE_WINDOW);
+    if (START_IN_GRIP_MENU){
+        grip_menu_connect_go_home(env.console);
+        resume_game_no_interact(env.console, DODGE_SYSTEM_UPDATE_WINDOW);
+    }else{
+        pbf_press_button(env.console, BUTTON_RCLICK, 5, 5);
+    }
 
     const uint16_t PICKUP_DELAY = 50;
     const uint16_t SCROLL_DELAY = 20;

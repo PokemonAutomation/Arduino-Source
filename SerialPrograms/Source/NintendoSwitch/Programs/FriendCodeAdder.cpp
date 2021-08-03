@@ -19,7 +19,7 @@ FriendCodeAdder_Descriptor::FriendCodeAdder_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "NintendoSwitch:FriendCodeAdder",
         "Friend Code Adder",
-        "SerialPrograms/FriendCodeAdder.md",
+        "SwSh-Arduino/wiki/Advanced:-FriendCodeAdder",
         "Add a list of friend codes.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB

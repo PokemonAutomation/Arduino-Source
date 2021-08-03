@@ -18,7 +18,7 @@ FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:FastCodeEntry",
         "Fast Code Entry (FCE)",
-        "NativePrograms/FastCodeEntry.md",
+        "SwSh-Arduino/wiki/Basic:-FastCodeEntry",
         "Force your way into raids by entering 8-digit codes in under 1 second.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB

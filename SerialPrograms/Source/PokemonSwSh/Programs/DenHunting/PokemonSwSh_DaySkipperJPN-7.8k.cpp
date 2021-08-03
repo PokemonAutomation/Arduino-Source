@@ -20,7 +20,7 @@ DaySkipperJPN7p8k_Descriptor::DaySkipperJPN7p8k_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:DaySkipperJPN7p8k",
         "Day Skipper (JPN) - 7.8k",
-        "NativePrograms/DaySkipperJPN-7.8k.md",
+        "SwSh-Arduino/wiki/Basic:-DaySkipperJPN-7.8k",
         "A faster, but less reliable Japanese date skipper. (7800 skips/hour)",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_31KB

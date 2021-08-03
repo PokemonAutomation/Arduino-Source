@@ -19,7 +19,10 @@ namespace PokemonAutomation{
 class InterruptableCommandSession{
 
 public:
-    InterruptableCommandSession(BotBase& botbase);
+    InterruptableCommandSession(BotBase& botbase, bool enable_interrupt = true);
+//    void set_interruptable(bool interruptable){
+//        m_enable_interrupt.store(interruptable, std::memory_order_release);
+//    }
 
 public:
     //  Execution Thread
@@ -31,8 +34,8 @@ public:
 public:
     //  External Threads
 
-    //  If there is a command running right now, interrupt it with a different one.
-    void interrupt_with(std::function<void(const BotBaseContext&)>&& lambda);
+//    //  If there is a command running right now, interrupt it with a different one.
+//    void interrupt_with(std::function<void(const BotBaseContext&)>&& lambda);
 
     //  Stop the currently running command.
     void stop();
@@ -45,6 +48,7 @@ private:
     };
 
     SpinLock m_lock;
+    std::atomic<bool> m_enable_interrupt;
     BotBase& m_botbase;
     std::unique_ptr<CommandSet> m_current;
     std::unique_ptr<CommandSet> m_pending;

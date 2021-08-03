@@ -438,6 +438,7 @@ std::string program_name(uint8_t id){
     case PABB_PID_SHINYHUNT_UNATTENDED_REGIGIGAS:           return "ShinyHuntUnattended-Regigigas";
     case PABB_PID_SHINYHUNT_UNATTENDED_REGIGIGAS2:          return "ShinyHuntUnattended-Regigigas2";
     case PABB_PID_SHINYHUNT_UNATTENDED_IOA_TRADE:           return "ShinyHuntUnattended-IoATrade";
+    case PABB_PID_CURRYHUNTER:                              return "CurryHunter";
 
     case PABB_PID_BEAM_RESET:               return "BeamReset";
     case PABB_PID_EVENT_BEAM_FINDER:        return "EventBeamFinder";

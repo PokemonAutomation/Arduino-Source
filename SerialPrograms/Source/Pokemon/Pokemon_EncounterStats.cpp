@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
+#include "Pokemon/Pokemon_SpeciesDatabase.h"
 #include "Pokemon_EncounterStats.h"
 
 namespace PokemonAutomation{
@@ -38,48 +39,48 @@ bool operator<(const PokemonEncounterSet& x, const PokemonEncounterSet& y){
         ++iter1;
     }
 }
-std::string PokemonEncounterSet::dump() const{
+QString PokemonEncounterSet::dump() const{
     if (m_set.empty()){
         return "None - Unable to detect";
     }
     if (m_set.size() == 1){
-        return *m_set.begin();
+        return species_slug_to_data(*m_set.begin()).display_name();
     }
     if (m_set.size() <= 5){
-        std::string str = "Ambiguous (";
+        QString str = "Ambiguous (";
         bool first = true;
-        for (const std::string& token : m_set){
+        for (const std::string& slug : m_set){
             if (!first){
                 str += ", ";
             }
             first = false;
-            str += token;
+            str += species_slug_to_data(slug).display_name();
         }
         str += ")";
         return str;
     }
-    return "Ambiguous (" + std::to_string(m_set.size()) + " candidates)";
+    return "Ambiguous (" + QString::number(m_set.size()) + " candidates)";
 }
 
 
 
-void PokemonEncounterStats::operator+=(const PokemonEncounterSet& set){
+void EncounterFrequencies::operator+=(const PokemonEncounterSet& set){
     m_encounter_map[set]++;
 }
 
 std::multimap<uint64_t, const PokemonEncounterSet*, std::greater<uint64_t>>
-PokemonEncounterStats::to_sorted_map() const{
+EncounterFrequencies::to_sorted_map() const{
     MapType ret;
     for (const auto& item : m_encounter_map){
         ret.emplace(item.second, &item.first);
     }
     return ret;
 }
-std::string PokemonEncounterStats::dump_sorted_map() const{
+QString EncounterFrequencies::dump_sorted_map(const std::string& header) const{
     MapType map = to_sorted_map();
-    std::string str = "Encounter Stats:\n";
+    QString str = QString::fromStdString(header);
     for (const auto& item : map){
-        str += tostr_u_commas(item.first);
+        str += QString::fromStdString(tostr_u_commas(item.first));
         str += " : ";
         str += item.second->dump();
         str += "\n";

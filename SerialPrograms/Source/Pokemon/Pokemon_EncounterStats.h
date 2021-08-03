@@ -10,6 +10,7 @@
 #include <string>
 #include <set>
 #include <map>
+#include <QString>
 
 namespace PokemonAutomation{
 namespace Pokemon{
@@ -27,7 +28,7 @@ public:
 
     friend bool operator<(const PokemonEncounterSet& x, const PokemonEncounterSet& y);
 
-    std::string dump() const;
+    QString dump() const;
 
 
 private:
@@ -35,12 +36,13 @@ private:
 };
 
 
-class PokemonEncounterStats{
+class EncounterFrequencies{
 
 public:
     void operator+=(const PokemonEncounterSet& set);
 
-    std::string dump_sorted_map() const;
+    bool empty() const{ return m_encounter_map.empty(); }
+    QString dump_sorted_map(const std::string& header) const;
 
 public:
     using MapType = std::multimap<uint64_t, const PokemonEncounterSet*, std::greater<uint64_t>>;

@@ -17,7 +17,7 @@ FriendDelete_Descriptor::FriendDelete_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "NintendoSwitch:FriendDelete",
         "Friend Delete",
-        "NativePrograms/FriendDelete.md",
+        "SwSh-Arduino/wiki/Basic:-FriendDelete",
         "Mass delete/block all those unwanted friends.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB

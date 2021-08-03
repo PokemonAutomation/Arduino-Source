@@ -20,7 +20,7 @@ WattFarmer_Descriptor::WattFarmer_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:WattFarmer",
         "Date Spam: Watt Farmer",
-        "NativePrograms/DateSpam-WattFarmer.md",
+        "SwSh-Arduino/wiki/Basic:-DateSpam-WattFarmer",
         "Farm watts. (6.9 seconds/fetch, 1 million watts/hour)",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB
@@ -40,12 +40,18 @@ WattFarmer::WattFarmer(const WattFarmer_Descriptor& descriptor)
         0, 0
     )
 {
+    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
     m_options.emplace_back(&SKIPS, "SKIPS");
     m_options.emplace_back(&SAVE_ITERATIONS, "SAVE_ITERATIONS");
 }
 
 void WattFarmer::program(SingleSwitchProgramEnvironment& env){
-    grip_menu_connect_go_home(env.console);
+    if (START_IN_GRIP_MENU){
+        grip_menu_connect_go_home(env.console);
+    }else{
+        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
+    }
 
     uint8_t year = MAX_YEAR;
     uint16_t save_count = 0;

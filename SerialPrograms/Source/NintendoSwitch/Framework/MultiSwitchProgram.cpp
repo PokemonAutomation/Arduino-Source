@@ -5,6 +5,7 @@
  */
 
 #include "Common/SwitchFramework/Switch_PushButtons.h"
+#include "SwitchProgramTracker.h"
 #include "MultiSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -14,11 +15,13 @@ namespace NintendoSwitch{
 
 
 MultiSwitchProgramEnvironment::MultiSwitchProgramEnvironment(
+//    std::string program_identifier,
     Logger& logger,
     StatsTracker* current_stats,
     const StatsTracker* historical_stats,
     FixedLimitVector<ConsoleHandle> p_switches
 )
+//    : ProgramEnvironment(std::move(program_identifier), logger, current_stats, historical_stats)
     : ProgramEnvironment(logger, current_stats, historical_stats)
     , consoles(std::move(p_switches))
 {}
@@ -89,10 +92,8 @@ QWidget* MultiSwitchProgramInstance::make_widget(QWidget& parent, PanelListener&
 
 
 MultiSwitchProgramWidget::~MultiSwitchProgramWidget(){
-    if (!m_destructing){
-        stop();
-        m_destructing = true;
-    }
+    SwitchProgramTracker::instance().remove_program(*this);
+    on_destruct_stop();
 }
 MultiSwitchProgramWidget* MultiSwitchProgramWidget::make(
     QWidget& parent,
@@ -101,6 +102,7 @@ MultiSwitchProgramWidget* MultiSwitchProgramWidget::make(
 ){
     MultiSwitchProgramWidget* widget = new MultiSwitchProgramWidget(parent, instance, listener);
     widget->construct();
+    SwitchProgramTracker::instance().add_program(*widget);
     return widget;
 }
 void MultiSwitchProgramWidget::run_program(
@@ -110,7 +112,7 @@ void MultiSwitchProgramWidget::run_program(
     MultiSwitchProgramInstance& instance = static_cast<MultiSwitchProgramInstance&>(m_instance);
     FixedLimitVector<ConsoleHandle> switches(instance.count());
     for (size_t c = 0; c < instance.count(); c++){
-        SwitchSystem& system = static_cast<MultiSwitchSystem&>(*m_setup)[c];
+        SwitchSystem& system = this->system(c);
         switches.emplace_back(
             c,
             sanitize_botbase(system.botbase()),
@@ -125,6 +127,7 @@ void MultiSwitchProgramWidget::run_program(
     connect(
         this, &RunnableSwitchProgramWidget::signal_cancel,
         &env, [&]{
+            m_state.store(ProgramState::STOPPING, std::memory_order_release);
             env.signal_stop();
         },
         Qt::DirectConnection
@@ -135,6 +138,7 @@ void MultiSwitchProgramWidget::run_program(
             this->set_status(std::move(status));
         }
     );
+
     instance.program(env);
 }
 

@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Options/BooleanCheckBox.h"
 #include "CommonFramework/Options/SimpleInteger.h"
+#include "NintendoSwitch/Options/StartInGripMenu.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "PokemonSwSh_EggHelpers.h"
 
@@ -33,6 +34,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
+    StartInGripOrGame START_IN_GRIP_MENU;
     SimpleInteger<uint16_t> MAX_FETCH_ATTEMPTS;
     SimpleInteger<uint8_t> PARTY_ROUND_ROBIN;
 };

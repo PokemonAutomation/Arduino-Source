@@ -1,7 +1,8 @@
 ﻿{
     "0-ProgramName": "EggSuperCombined2",
-    "1-Description": "Mass release breedjects, then run EggCombined2.",
-    "2-Parameters": [
+    "1-Documentation": "SwSh-Arduino/wiki/Basic:-EggSuperCombined2",
+    "2-Description": "Mass release breedjects, then run EggCombined2.",
+    "3-Parameters": [
         {
             "00-Type": "SimpleInteger",
             "01-Label": "<b>Boxes to Release:</b><br>Start by releasing this many boxes.",

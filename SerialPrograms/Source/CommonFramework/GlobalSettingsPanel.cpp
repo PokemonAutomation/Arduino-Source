@@ -76,40 +76,38 @@ GlobalSettings::GlobalSettings(const GlobalSettings_Descriptor& descriptor)
         )
     );
 
-    if (PERSISTENT_SETTINGS().developer_mode){
-        m_options.emplace_back(
-            "DISCORD_WEBHOOK_ID",
-            new String(
-                PERSISTENT_SETTINGS().DISCORD_WEBHOOK_ID,
-                "<b>Discord webhook ID:</b><br>Some programs can send discord messages in your own private server. Set this to your discord webhook ID.",
-                ""
-            )
+    m_options.emplace_back(
+        "INSTANCE_NAME",
+        new String(
+            PERSISTENT_SETTINGS().INSTANCE_NAME,
+            "<b>Instance Name:</b><br>If you are running multiple instances of this program, give it a name to distinguish them in notifications.",
+            ""
+        )
+    );
+    m_options.emplace_back(
+        "DISCORD_WEBHOOK_URL",
+        new String(
+            PERSISTENT_SETTINGS().DISCORD_WEBHOOK_URL,
+            "<b>Discord webhook URL:</b><br>Set this to your discord webhook URL. This is used to send notifications to your private server.",
+            ""
+        )
+    );
+    m_options.emplace_back(
+        "DISCORD_USER_ID",
+        new String(
+            PERSISTENT_SETTINGS().DISCORD_USER_ID,
+            "<b>Discord user ID:</b><br>Set this to your discord user ID to receive pings. Your ID is a number.",
+            ""
+        )
+    );
+    m_options.emplace_back(
+        "DISCORD_USER_SHORT_NAME",
+        new String(
+            PERSISTENT_SETTINGS().DISCORD_USER_SHORT_NAME,
+            "<b>Discord user short name:</b><br>Your short name is your visible ID. (\"Username#1234\") This is only for display purposes.",
+            ""
+        )
         );
-        m_options.emplace_back(
-            "DISCORD_WEBHOOK_TOKEN",
-            new String(
-                PERSISTENT_SETTINGS().DISCORD_WEBHOOK_TOKEN,
-                "<b>Discord webhook token:</b><br>Some programs can send discord messages in your own private server. Set this to your discord webhook token.",
-                ""
-            )
-        );
-        m_options.emplace_back(
-            "DISCORD_USER_ID",
-            new String(
-                PERSISTENT_SETTINGS().DISCORD_USER_ID,
-                "<b>Discord user ID:</b><br>Some programs can send discord messages in your own private server. Set this to your discord user ID.",
-                ""
-            )
-        );
-        m_options.emplace_back(
-            "DISCORD_USER_SHORT_NAME",
-            new String(
-                PERSISTENT_SETTINGS().DISCORD_USER_SHORT_NAME,
-                "<b>Discord user short name:</b><br>Some programs can send discord messages in your own private server. Set this to your discord user short name.",
-                ""
-            )
-        );
-    }
 }
 
 

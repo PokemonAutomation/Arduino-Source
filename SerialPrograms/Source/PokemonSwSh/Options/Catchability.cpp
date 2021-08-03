@@ -6,6 +6,7 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include "Common/Qt/NoWheelComboBox.h"
 #include "CommonFramework/Globals.h"
 #include "Catchability.h"
 
@@ -46,7 +47,7 @@ CatchabilitySelectorUI::CatchabilitySelectorUI(QWidget& parent, CatchabilitySele
     QLabel* text = new QLabel(m_value.m_label, this);
     layout->addWidget(text, 1);
     text->setWordWrap(true);
-    m_box = new QComboBox(&parent);
+    m_box = new NoWheelComboBox(&parent);
     layout->addWidget(m_box);
     m_box->addItem("Always Catchable");
     m_box->addItem("Maybe Uncatchable");

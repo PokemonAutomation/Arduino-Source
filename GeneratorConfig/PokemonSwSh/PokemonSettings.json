@@ -1,8 +1,9 @@
 ﻿{
     "0-ConfigName": "PokemonSettings",
     "1-ConfigPath": "../Common/PokemonSwSh",
-    "2-Description": "Global Pokémon Settings",
-    "3-Options": [
+    "2-Documentation": "SwSh-Arduino/wiki/Appendix:-GlobalSettings",
+    "3-Description": "Global Pokémon Settings",
+    "4-Options": [
         {
             "00-Type": "Divider",
             "01-Label": "<font size=4><b>Egg Options:</b></font>"

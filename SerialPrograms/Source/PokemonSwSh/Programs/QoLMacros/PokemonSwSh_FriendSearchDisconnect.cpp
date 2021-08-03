@@ -20,7 +20,7 @@ FriendSearchDisconnect_Descriptor::FriendSearchDisconnect_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:FriendSearchDisconnect",
         "Friend Search Disconnect",
-        "SerialPrograms/FriendSearchDisconnect.md",
+        "SwSh-Arduino/wiki/Advanced:-FriendSearchDisconnect",
         "Disconnect from the internet using the friend search method.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB

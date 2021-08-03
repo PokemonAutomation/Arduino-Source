@@ -36,10 +36,7 @@ QWidget* RunnableComputerProgramInstance::make_widget(QWidget& parent, PanelList
 
 
 RunnableComputerProgramWidget::~RunnableComputerProgramWidget(){
-    if (!m_destructing){
-        stop();
-        m_destructing = true;
-    }
+    on_destruct_stop();
 }
 
 RunnableComputerProgramWidget* RunnableComputerProgramWidget::make(
@@ -58,10 +55,13 @@ void RunnableComputerProgramWidget::run_program(){
 
     RunnableComputerProgramInstance& instance = static_cast<RunnableComputerProgramInstance&>(m_instance);
 
+    const std::string& program_identifier = instance.descriptor().identifier();
+
     ProgramEnvironment env(m_logger, nullptr, nullptr);
     connect(
         this, &RunnableComputerProgramWidget::signal_cancel,
         &env, [&]{
+            m_state.store(ProgramState::STOPPING, std::memory_order_release);
             env.signal_stop();
         },
         Qt::DirectConnection
@@ -72,19 +72,21 @@ void RunnableComputerProgramWidget::run_program(){
     );
 
     try{
-        m_logger.log("<b>Starting Program: " + instance.descriptor().identifier() + "</b>");
+        m_logger.log("<b>Starting Program: " + program_identifier + "</b>");
         instance.program(env);
         m_logger.log("Ending Program...");
     }catch (CancelledException&){
-        m_logger.log("Stopping Program...");
     }catch (StringException& e){
         signal_error(e.message_qt());
     }
 
-    m_logger.log("Entering STOPPED state.");
-    m_state.store(ProgramState::STOPPED, std::memory_order_release);
+    m_state.store(ProgramState::STOPPING, std::memory_order_release);
+    m_logger.log("Stopping Program...");
+
     signal_reset();
+    m_state.store(ProgramState::STOPPED, std::memory_order_release);
     m_logger.log("Now in STOPPED state.");
+//    cout << "Now in STOPPED state." << endl;
 }
 
 

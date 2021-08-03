@@ -11,6 +11,7 @@
 #include "CommonFramework/Options/BooleanCheckBox.h"
 #include "CommonFramework/Options/FloatingPoint.h"
 #include "NintendoSwitch/Options/TimeExpression.h"
+#include "NintendoSwitch/Options/StartInGripMenu.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -35,6 +36,7 @@ public:
 private:
     struct Stats;
 
+    StartInGripOrGame START_IN_GRIP_MENU;
     BooleanCheckBox EXTRA_LINE;
 
     SectionDivider m_advanced_options;

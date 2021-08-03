@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Options/SimpleInteger.h"
 #include "NintendoSwitch/Options/TimeExpression.h"
+#include "NintendoSwitch/Options/StartInGripMenu.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/Catchability.h"
 
@@ -32,6 +33,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
+    StartInGripOrGame START_IN_GRIP_MENU;
     SimpleInteger<uint8_t> SKIPS;
     CatchabilitySelector CATCHABILITY;
     TimeExpression<uint16_t> VIEW_TIME;

@@ -50,18 +50,96 @@ void RunnablePanelInstance::restore_defaults(){
 
 
 
-void RunnablePanelWidget::stop(){
-    m_state.store(ProgramState::STOPPING, std::memory_order_release);
-    on_stop();
+void RunnablePanelWidget::on_destruct_stop(){
+    if (m_destructing){
+        return;
+    }
+    m_destructing = true;
+    stop();
     if (m_thread.joinable()){
         m_thread.join();
     }
 }
 RunnablePanelWidget::~RunnablePanelWidget(){
-    if (!m_destructing){
-        stop();
-        m_destructing = true;
+    on_destruct_stop();
+}
+
+
+#if 0
+bool RunnablePanelWidget::reset_serial(){
+    switch (state()){
+    case ProgramState::STOPPED:
+        m_logger.log("Received Reset Request");
+        return true;
+    case ProgramState::RUNNING:
+    case ProgramState::FINISHED:
+        m_logger.log("Received Reset Request: Program is running.");
+        return false;
+    case ProgramState::STOPPING:
+        m_logger.log("Received Reset Request: Program is stopping.");
+        return false;
     }
+    return false;
+}
+#endif
+bool RunnablePanelWidget::start(){
+    bool ret = false;
+    switch (state()){
+    case ProgramState::STOPPED:
+        m_logger.log("Received Start Request");
+        if (!settings_valid()){
+            QMessageBox box;
+            box.critical(nullptr, "Error", "Settings are not valid.");
+            ret = false;
+            break;
+        }
+        if (m_thread.joinable()){
+            m_thread.join();
+        }
+        m_state.store(ProgramState::RUNNING, std::memory_order_release);
+        m_thread = std::thread(
+            run_with_catch,
+            "RunnablePanelWidget::run_program()",
+            [=]{ run_program(); }
+        );
+        ret = true;
+        break;
+    case ProgramState::RUNNING:
+    case ProgramState::FINISHED:
+        m_logger.log("Received Start Request: Program is already running.");
+        m_state.store(ProgramState::STOPPING, std::memory_order_release);
+        on_stop();
+        ret = false;
+        break;
+    case ProgramState::STOPPING:
+        m_logger.log("Received Start Request: Program is already stopping.");
+        ret = false;
+        break;
+    }
+    update_ui();
+    return ret;
+}
+bool RunnablePanelWidget::stop(){
+    bool ret = false;
+    switch (state()){
+    case ProgramState::STOPPED:
+        m_logger.log("Received Stop Request: Program is not running.");
+        ret = false;
+        break;
+    case ProgramState::RUNNING:
+    case ProgramState::FINISHED:
+        m_logger.log("Received Stop Request");
+        m_state.store(ProgramState::STOPPING, std::memory_order_release);
+        on_stop();
+        ret = true;
+        break;
+    case ProgramState::STOPPING:
+        m_logger.log("Received Stop Request: Program is already stopping.");
+        ret = false;
+        break;
+    }
+    update_ui();
+    return ret;
 }
 
 
@@ -76,7 +154,16 @@ RunnablePanelWidget::RunnablePanelWidget(
     , m_status_bar(nullptr)
     , m_start_button(nullptr)
     , m_state(ProgramState::STOPPED)
-{}
+{
+    connect(
+        this, &RunnablePanelWidget::async_start,
+        this, &RunnablePanelWidget::start
+    );
+    connect(
+        this, &RunnablePanelWidget::async_stop,
+        this, &RunnablePanelWidget::stop
+    );
+}
 void RunnablePanelWidget::construct(){
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setMargin(0);
@@ -152,33 +239,18 @@ QWidget* RunnablePanelWidget::make_actions(QWidget& parent){
     connect(
         m_start_button, &QPushButton::clicked,
         this, [=](bool){
-            switch (m_state.load(std::memory_order_acquire)){
+            switch (state()){
             case ProgramState::STOPPED:
-                if (!settings_valid()){
-                    QMessageBox box;
-                    box.critical(nullptr, "Error", "Settings are not valid.");
-                    return;
-                }
-                if (m_thread.joinable()){
-                    m_thread.join();
-                }
-//                m_window.open_output_window();
-                m_state.store(ProgramState::RUNNING, std::memory_order_release);
-                m_thread = std::thread(
-                    run_with_catch,
-                    "RunnablePanelWidget::run_program()",
-                    [=]{ run_program(); }
-                );
+                start();
                 break;
             case ProgramState::RUNNING:
             case ProgramState::FINISHED:
-                m_state.store(ProgramState::STOPPING, std::memory_order_release);
-                on_stop();
+                stop();
                 break;
             case ProgramState::STOPPING:
                 break;
             }
-            update_ui();
+//            update_ui();
         }
     );
     connect(

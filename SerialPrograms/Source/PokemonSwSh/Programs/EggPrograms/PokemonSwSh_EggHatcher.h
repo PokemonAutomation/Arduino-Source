@@ -10,6 +10,7 @@
 #include "CommonFramework/Options/SectionDivider.h"
 #include "CommonFramework/Options/SimpleInteger.h"
 #include "NintendoSwitch/Options/TimeExpression.h"
+#include "NintendoSwitch/Options/StartInGripMenu.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/EggStepCount.h"
 #include "PokemonSwSh_EggHelpers.h"
@@ -34,6 +35,8 @@ public:
 
 
 private:
+    StartInGripOrGame START_IN_GRIP_MENU;
+
     SimpleInteger<uint8_t> BOXES_TO_HATCH;
     EggStepCount STEPS_TO_HATCH;
     SectionDivider m_advanced_options;

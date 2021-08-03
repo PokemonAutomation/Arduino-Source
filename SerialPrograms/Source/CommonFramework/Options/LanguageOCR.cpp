@@ -74,7 +74,7 @@ void LanguageOCR::load_json(const QJsonValue& json){
     }
 }
 QJsonValue LanguageOCR::to_json() const{
-    return QJsonValue(language_data(m_case_list[m_current].first).code.c_str());
+    return QJsonValue(QString::fromStdString(language_data(m_case_list[m_current].first).code));
 }
 
 bool LanguageOCR::is_valid() const{

@@ -62,10 +62,27 @@ class RunnablePanelWidget : public PanelWidget{
 
 public:
     virtual ~RunnablePanelWidget();
-protected:
-    void stop();
+
+    ProgramState state() const{ return m_state.load(std::memory_order_acquire); }
+
+//    //  Reset serial if possible.
+//    bool reset_serial();    //  Must call on main thread.
+
+    //  Start program if possible.
+    bool start();           //  Must call on main thread.
+
+    //  Stops the program if it is running.
+    bool stop();            //  Must call on main thread.
+
+signals:    //  Public Signals
+    void async_start();
+    void async_stop();
+
 
 protected:
+    //  Call this in the destructor of all child classes.
+    void on_destruct_stop();
+
     RunnablePanelWidget(
         QWidget& parent,
         RunnablePanelInstance& instance,
@@ -88,12 +105,11 @@ protected:
     virtual void run_program() = 0;
 
 
-
-
-signals:
+signals:    //  Protected Signals
     void signal_cancel();
     void signal_error(QString message);
     void signal_reset();
+
 
 protected:
     friend class RunnablePanelInstance;

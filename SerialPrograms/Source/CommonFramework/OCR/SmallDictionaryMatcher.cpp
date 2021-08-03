@@ -41,7 +41,7 @@ void SmallDictionaryMatcher::save(const QString& json_path) const{
     QJsonObject root;
     for (const auto& item : m_database){
         root.insert(
-            language_data(item.first).code.c_str(),
+            QString::fromStdString(language_data(item.first).code),
             item.second.to_json()
         );
     }

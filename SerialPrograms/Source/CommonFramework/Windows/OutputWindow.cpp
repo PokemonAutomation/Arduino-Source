@@ -28,7 +28,7 @@ TaggedLogger::TaggedLogger(OutputWindow& window, QString tag)
 }
 void TaggedLogger::log(const char* msg, QColor color){
     QString body =
-        QString(PokemonAutomation::current_time().c_str()) +
+        QString::fromStdString(PokemonAutomation::current_time()) +
         " - [" + m_tag + "]: " +
         msg;
 //    cout << color.toUtf8().data() << " - " << body.toUtf8().data() << endl;
@@ -36,15 +36,15 @@ void TaggedLogger::log(const char* msg, QColor color){
 }
 void TaggedLogger::log(const std::string& msg, QColor color){
     QString body =
-        QString(PokemonAutomation::current_time().c_str()) +
+        QString::fromStdString(PokemonAutomation::current_time()) +
         " - [" + m_tag + "]: " +
-        QString::fromUtf8(msg.c_str());
+        QString::fromStdString(msg);
 //    cout << color.toUtf8().data() << " - " << body.toUtf8().data() << endl;
     signal_log(std::move(body), color);
 }
 void TaggedLogger::log(const QString& msg, QColor color){
     QString body =
-        QString(PokemonAutomation::current_time().c_str()) +
+        QString::fromStdString(PokemonAutomation::current_time()) +
         " - [" + m_tag + "]: " +
         msg;
 //    cout << color.toUtf8().data() << " - " << body.toUtf8().data() << endl;
@@ -94,7 +94,7 @@ OutputWindow::OutputWindow(QWidget* parent)
 
     log("================================================================================", "");
     log(
-        QString(PokemonAutomation::current_time().c_str()) +
+        QString::fromStdString(PokemonAutomation::current_time()) +
         " - [Application]: " +
         "<b>Application Startup...</b>",
         ""

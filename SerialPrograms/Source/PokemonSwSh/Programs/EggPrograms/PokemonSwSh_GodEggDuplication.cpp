@@ -20,7 +20,7 @@ GodEggDuplication_Descriptor::GodEggDuplication_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:GodEggDuplication",
         "God Egg Duplication",
-        "NativePrograms/GodEggDuplication.md",
+        "SwSh-Arduino/wiki/Basic:-GodEggDuplication",
         "Mass duplicate " + STRING_POKEMON + " with the God Egg.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_31KB
@@ -40,6 +40,7 @@ GodEggDuplication::GodEggDuplication(const GodEggDuplication_Descriptor& descrip
         6, 1, 6
     )
 {
+    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
     m_options.emplace_back(&MAX_FETCH_ATTEMPTS, "MAX_FETCH_ATTEMPTS");
     m_options.emplace_back(&PARTY_ROUND_ROBIN, "PARTY_ROUND_ROBIN");
 }
@@ -108,8 +109,12 @@ void GodEggDuplication::run_program(SingleSwitchProgramEnvironment& env, uint16_
 }
 
 void GodEggDuplication::program(SingleSwitchProgramEnvironment& env){
-    grip_menu_connect_go_home(env.console);
-    resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+    if (START_IN_GRIP_MENU){
+        grip_menu_connect_go_home(env.console);
+        resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+    }else{
+        pbf_press_button(env.console, BUTTON_B, 5, 5);
+    }
 
     run_program(env, MAX_FETCH_ATTEMPTS);
     ssf_press_button2(env.console, BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);

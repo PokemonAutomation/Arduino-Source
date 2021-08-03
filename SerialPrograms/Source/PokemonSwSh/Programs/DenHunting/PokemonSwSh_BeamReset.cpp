@@ -19,7 +19,7 @@ BeamReset_Descriptor::BeamReset_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:BeamReset",
         "Beam Reset",
-        "NativePrograms/BeamReset.md",
+        "SwSh-Arduino/wiki/Basic:-BeamReset",
         "Reset a beam until you see a purple beam.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB
@@ -39,15 +39,18 @@ BeamReset::BeamReset(const BeamReset_Descriptor& descriptor)
         false
     )
 {
+    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
     m_options.emplace_back(&DELAY_BEFORE_RESET, "DELAY_BEFORE_RESET");
     m_options.emplace_back(&EXTRA_LINE, "EXTRA_LINE");
 }
 
 void BeamReset::program(SingleSwitchProgramEnvironment& env){
-    grip_menu_connect_go_home(env.console);
-
-    resume_game_front_of_den_nowatts(env.console, TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
-    pbf_mash_button(env.console, BUTTON_B, 100);
+    if (START_IN_GRIP_MENU){
+        grip_menu_connect_go_home(env.console);
+        resume_game_front_of_den_nowatts(env.console, TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+    }else{
+        pbf_press_button(env.console, BUTTON_B, 5, 5);
+    }
 
     while (true){
         //  Talk to den.

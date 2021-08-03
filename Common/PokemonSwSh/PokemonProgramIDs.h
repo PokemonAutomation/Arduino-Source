@@ -63,6 +63,7 @@ inline PABotBaseLevel program_id_to_botbase_level(uint8_t id){
 #define PABB_PID_SHINYHUNT_UNATTENDED_REGIGIGAS             0x36
 #define PABB_PID_SHINYHUNT_UNATTENDED_REGIGIGAS2            0x37
 #define PABB_PID_SHINYHUNT_UNATTENDED_IOA_TRADE             0x38
+#define PABB_PID_CURRYHUNTER                                0x39
 
 #define PABB_PID_BEAM_RESET                                 0x40
 #define PABB_PID_EVENT_BEAM_FINDER                          0x41

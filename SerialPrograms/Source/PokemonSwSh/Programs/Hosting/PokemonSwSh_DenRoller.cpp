@@ -17,7 +17,7 @@ DenRoller_Descriptor::DenRoller_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:DenRoller",
         "Den Roller",
-        "NativePrograms/DenRoller.md",
+        "SwSh-Arduino/wiki/Basic:-DenRoller",
         "Roll den to the N'th day, SR and repeat.",
         FeedbackType::OPTIONAL_,
         PABotBaseLevel::PABOTBASE_12KB
@@ -37,6 +37,7 @@ DenRoller::DenRoller(const DenRoller_Descriptor& descriptor)
         "5 * TICKS_PER_SECOND"
     )
 {
+    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
     m_options.emplace_back(&SKIPS, "SKIPS");
     m_options.emplace_back(&CATCHABILITY, "CATCHABILITY");
     m_options.emplace_back(&VIEW_TIME, "VIEW_TIME");
@@ -51,10 +52,16 @@ void DenRoller::ring_bell(const BotBaseContext& context, int count) const{
 }
 
 void DenRoller::program(SingleSwitchProgramEnvironment& env){
-    grip_menu_connect_go_home(env.console);
+    if (START_IN_GRIP_MENU){
+        grip_menu_connect_go_home(env.console);
+    }else{
+        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
+    }
 
     rollback_date_from_home(env.console, SKIPS);
     resume_game_front_of_den_nowatts(env.console, TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+
 
     while (true){
         roll_den(env.console, 0, 0, SKIPS, CATCHABILITY);

@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Options/SimpleInteger.h"
 #include "NintendoSwitch/Options/TimeExpression.h"
+#include "NintendoSwitch/Options/StartInGripMenu.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -30,6 +31,8 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
+    StartInGripOrGame START_IN_GRIP_MENU;
+
     SimpleInteger<uint32_t> SKIPS;
     TimeExpression<uint16_t> MASH_B_DURATION;
 };

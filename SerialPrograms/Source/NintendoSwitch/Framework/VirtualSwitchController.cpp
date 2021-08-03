@@ -197,7 +197,7 @@ void VirtualController::thread_loop(){
                 params.right_joystick_x = right_x;
                 params.right_joystick_y = right_y;
                 params.ticks = m_granularity;
-                while (m_botbase.try_send_request<PABB_MSG_CONTROLLER_STATE>(params));
+                m_botbase.try_send_request<PABB_MSG_CONTROLLER_STATE>(params);
             }catch (PokemonAutomation::CancelledException&){
             }catch (const StringException&){
             }

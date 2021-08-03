@@ -22,6 +22,7 @@ ShinyHuntUnattended-StrongSpawn
 ShinyHuntUnattended-Regigigas
 ShinyHuntUnattended-Regigigas2
 ShinyHuntUnattended-IoATrade
+CurryHunter
 
 BeamReset
 EventBeamFinder

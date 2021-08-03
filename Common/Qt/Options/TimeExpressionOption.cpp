@@ -98,7 +98,7 @@ QString TimeExpressionOption<Type>::time_string() const{
     if (!m_error.isEmpty()){
         return "<font color=\"red\">" + m_error + "</font>";
     }
-    return PokemonAutomation::ticks_to_time(m_value).c_str();
+    return QString::fromStdString(PokemonAutomation::ticks_to_time(m_value));
 }
 template <typename Type>
 bool TimeExpressionOption<Type>::update(){

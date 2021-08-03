@@ -18,8 +18,9 @@ InterruptableCommandSession::CommandSet::CommandSet(
     , commands(std::move(lambda))
 {}
 
-InterruptableCommandSession::InterruptableCommandSession(BotBase& botbase)
-    : m_botbase(botbase)
+InterruptableCommandSession::InterruptableCommandSession(BotBase& botbase, bool enable_interrupt)
+    : m_enable_interrupt(enable_interrupt)
+    , m_botbase(botbase)
 {}
 
 bool InterruptableCommandSession::run(std::function<void(const BotBaseContext&)>&& lambda){
@@ -60,6 +61,7 @@ bool InterruptableCommandSession::run(std::function<void(const BotBaseContext&)>
 }
 
 
+#if 0
 void InterruptableCommandSession::interrupt_with(std::function<void(const BotBaseContext&)>&& lambda){
     SpinLockGuard lg(m_lock, "InterruptableCommandSession::interrupt_with()");
     if (m_current){
@@ -67,8 +69,12 @@ void InterruptableCommandSession::interrupt_with(std::function<void(const BotBas
         m_pending.reset(new CommandSet(m_botbase, std::move(lambda)));
     }
 }
+#endif
 
 void InterruptableCommandSession::stop(){
+    if (!m_enable_interrupt.load(std::memory_order_acquire)){
+        return;
+    }
     SpinLockGuard lg(m_lock, "InterruptableCommandSession::stop()");
     if (m_current){
         m_current->context.cancel();

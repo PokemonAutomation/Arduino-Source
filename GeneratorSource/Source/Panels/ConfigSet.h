@@ -18,6 +18,7 @@ class ConfigSet : public RightPanel{
 public:
     static const QString JSON_CONFIG_NAME;
     static const QString JSON_CONFIG_PATH;
+    static const QString JSON_DOCUMENTATION;
     static const QString JSON_DESCRIPTION;
     static const QString JSON_OPTIONS;
 

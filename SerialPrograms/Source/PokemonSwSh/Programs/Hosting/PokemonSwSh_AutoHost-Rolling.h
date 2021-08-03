@@ -12,6 +12,7 @@
 #include "CommonFramework/Options/SimpleInteger.h"
 #include "CommonFramework/Options/RandomCode.h"
 #include "NintendoSwitch/Options/TimeExpression.h"
+#include "NintendoSwitch/Options/StartInGripMenu.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/Catchability.h"
 
@@ -35,6 +36,8 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
+    StartInGripOrGame START_IN_GRIP_MENU;
+
     RandomCode RAID_CODE;
     SimpleInteger<uint8_t> SKIPS;
     BooleanCheckBox BACKUP_SAVE;

@@ -13,12 +13,16 @@ using std::endl;
 
 using namespace PokemonAutomation;
 
+Q_DECLARE_METATYPE(std::string)
 
 int main(int argc, char *argv[]){
     setup_crash_handler();
 
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
     QApplication application(argc, argv);
+
+    qRegisterMetaType<uint8_t>("uint8_t");
+    qRegisterMetaType<std::string>();
 
     try{
         PERSISTENT_SETTINGS().read();

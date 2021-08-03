@@ -10,6 +10,7 @@
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QHeaderView>
+#include "Common/Qt/NoWheelComboBox.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "FossilTableOption.h"
 
@@ -193,9 +194,10 @@ void FossilTableOptionUI::add_row(int row, const FossilTableOption::GameSlot& ga
     m_table->setCellWidget(row, 3, make_revives_slot_box(*m_table, index_ref, game.revives));
     m_table->setCellWidget(row, 4, make_insert_button(*m_table, index_ref));
     m_table->setCellWidget(row, 5, make_remove_button(*m_table, index_ref));
+    m_table->resizeColumnsToContents();
 }
 QComboBox* FossilTableOptionUI::make_game_slot_box(QWidget& parent, int& row, int slot){
-    QComboBox* box = new QComboBox(&parent);
+    QComboBox* box = new NoWheelComboBox(&parent);
     box->addItem("Slot 1");
     box->addItem("Slot 2");
     box->setCurrentIndex(slot);
@@ -208,7 +210,7 @@ QComboBox* FossilTableOptionUI::make_game_slot_box(QWidget& parent, int& row, in
     return box;
 }
 QComboBox* FossilTableOptionUI::make_user_slot_box(QWidget& parent, int& row, int slot){
-    QComboBox* box = new QComboBox(&parent);
+    QComboBox* box = new NoWheelComboBox(&parent);
     box->addItem("User 1");
     box->addItem("User 2");
     box->addItem("User 3");
@@ -227,7 +229,7 @@ QComboBox* FossilTableOptionUI::make_user_slot_box(QWidget& parent, int& row, in
     return box;
 }
 QComboBox* FossilTableOptionUI::make_fossil_slot_box(QWidget& parent, int& row, FossilTableOption::Fossil fossil){
-    QComboBox* box = new QComboBox(&parent);
+    QComboBox* box = new NoWheelComboBox(&parent);
     box->addItem(FossilTableOption::FOSSIL_LIST[0]);
     box->addItem(FossilTableOption::FOSSIL_LIST[1]);
     box->addItem(FossilTableOption::FOSSIL_LIST[2]);

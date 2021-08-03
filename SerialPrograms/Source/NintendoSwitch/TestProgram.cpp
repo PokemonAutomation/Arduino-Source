@@ -32,6 +32,7 @@
 #include "CommonFramework/OCR/StringNormalization.h"
 #include "CommonFramework/OCR/TextMatcher.h"
 #include "CommonFramework/OCR/LargeDictionaryMatcher.h"
+#include "Pokemon/Pokemon_SpeciesDatabase.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyFilters.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleTrigger.h"
@@ -39,6 +40,7 @@
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyTrigger.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
+#include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_StartBattleDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_RaidCatchDetector.h"
@@ -46,6 +48,9 @@
 #include "PokemonSwSh/Inference/PokemonSwSh_FishingDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_ReceivePokemonDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_BattleDialogDetector.h"
+#include "CommonFramework/Tools/DiscordWebHook.h"
+#include "Pokemon/Pokemon_Notification.h"
 #include "TestProgram.h"
 
 #include <fstream>
@@ -113,30 +118,130 @@ TestProgram::TestProgram(const TestProgram_Descriptor& descriptor)
             "Chikorita",
         }, 0
     )
-
+    , FILTER(true, false)
 {
     m_options.emplace_back(&LANGUAGE, "LANGUAGE");
     m_options.emplace_back(&DROPDOWN, "DROPDOWN");
     m_options.emplace_back(&STRING_SELECT, "STRING_SELECT");
+    m_options.emplace_back(&FILTER, "FILTER");
 }
 
 
 
-
+void read(std::map<std::string, std::map<Language, QString>>& database, Language language){
+    std::string code = language_data(language).code;
+    QString path = PERSISTENT_SETTINGS().resource_path +
+        "Pokemon/PokemonNameOCR-baseline/PokemonOCR-" +
+        code.c_str() + ".json";
+    QJsonObject obj = read_json_file(path).object();
+    for (auto iter = obj.begin(); iter != obj.end(); ++iter){
+        database[iter.key().toUtf8().data()][language] = iter.value().toArray()[0].toString();
+    }
+}
 
 
 
 void TestProgram::program(SingleSwitchProgramEnvironment& env){
     using namespace OCR;
+    using namespace Pokemon;
 
-    BotBase& botbase = env.console;
-    VideoFeed& feed = env.console;
+//    BotBase& botbase = env.console;
+//    VideoFeed& feed = env.console;
+
+    BattleDialogDetector detector(env.console);
+
+#if 0
+    {
+        ReceivePokemonDetector receive_detector(env.console);
+        ShinySparkleDetector shiny_detector(
+            env.console, env.logger(),
+            InferenceBox(0.1, 0.01, 0.8, 0.77),
+            0.7
+        );
+        AsyncVisualInferenceSession inference(env, env.console);
+        inference += receive_detector;
+        inference += shiny_detector;
+
+        env.wait(std::chrono::seconds(30));
+
+        shiny_detector.results();
+    }
+#endif
+
+
+
+
+#if 0
+    send_encounter_notification(
+        nullptr,
+        "Test Program",
+        nullptr,
+        ShinyType::SQUARE_SHINY
+    );
+#endif
+
+#if 0
+    std::map<std::string, std::map<Language, QString>> database;
+    for (size_t c = 1; c < (size_t)Language::EndOfList; c++){
+        Language language = (Language)c;
+        cout << language_data(language).code << endl;
+        read(database, language);
+    }
+
+    QString str;
+    str += "{\r\n";
+    for (const auto& item : NATIONAL_DEX_SLUGS()){
+        auto iter = database.find(item);
+        if (iter == database.end()){
+            PA_THROW_StringException("Missing slug.");
+        }
+        const std::map<Language, QString>& species = iter->second;
+
+        str += "    \"";
+        str += item.c_str();
+        str += "\": {\r\n";
+
+        for (size_t c = 1; c < (size_t)Language::EndOfList; c++){
+            Language language = (Language)c;
+            auto iter1 = species.find(language);
+            if (iter1 == species.end()){
+                continue;
+            }
+            str += "        \"";
+            str += language_data(language).code.c_str();
+            str += "\": \"";
+            str += iter1->second;
+            if (c + 1 < (size_t)Language::EndOfList){
+                str += "\",\r\n";
+            }else{
+                str += "\"\r\n";
+            }
+        }
+
+        str += "    },\r\n";
+    }
+    str += "}";
+
+    QFile file("PokemonNameTranslations.json");
+    file.open(QIODevice::WriteOnly);
+    std::string data = "\xef\xbb\xbf";
+    data += str.toUtf8().data();
+    file.write(data.c_str(), data.size());
+#endif
+
+
+
+//    DiscordWebHook::send_message(true, "test message", QJsonArray(), &env.logger());
+
+//    DiscordWebHook::send_message(true, "hello world", QJsonArray());
+//    send_encounter_notification(m_descriptor.display_name(), {}, ShinyType::SHINY);
+
 
 //    cout << levenshtein_distance_substring("asdf", "a") << endl;
 //    cout << random_match_probability(10, 10, 1. / 3) << endl;
 
 
-    env.log("asdf\nqwer");
+//    env.log("asdf\nqwer");
 
 //    QSystemTrayIcon icon;
 //    icon.show();

@@ -1,6 +1,7 @@
 ﻿{
     "0-ProgramName": "PABotBase",
-    "1-Description": "Control your Arduino/Teensy (and therefore your Switch) from a computer.",
-    "2-Parameters": [
+    "1-Documentation": "SwSh-Arduino/wiki/PABotBase",
+    "2-Description": "Control your Arduino/Teensy (and therefore your Switch) from a computer.",
+    "3-Parameters": [
     ]
 }

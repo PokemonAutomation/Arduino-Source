@@ -16,7 +16,7 @@ PreventSleep_Descriptor::PreventSleep_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "NintendoSwitch:PreventSleep",
         "Prevent Sleep",
-        "SerialPrograms/PreventSleep.md",
+        "SwSh-Arduino/wiki/Advanced:-PreventSleep",
         "Press B every 15 seconds to keep the Switch from sleeping.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB

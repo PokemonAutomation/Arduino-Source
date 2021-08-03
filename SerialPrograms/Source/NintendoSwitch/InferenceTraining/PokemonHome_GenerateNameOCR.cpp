@@ -54,20 +54,20 @@ void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env){
         PERSISTENT_SETTINGS().resource_path + "Pokemon/Pokedex/Pokedex-National.json"
     ).array();
 
-    std::vector<std::string> tokens;
+    std::vector<std::string> slugs;
     for (const auto& item : array){
-        QString token = item.toString();
-        if (token.size() <= 0){
-            PA_THROW_StringException("Expected non-empty string for Pokemon token.");
+        QString slug = item.toString();
+        if (slug.size() <= 0){
+            PA_THROW_StringException("Expected non-empty string for Pokemon slug.");
         }
-        tokens.emplace_back(token.toUtf8().data());
+        slugs.emplace_back(slug.toUtf8().data());
     }
 
 
     InferenceBoxScope box(env.console, 0.705, 0.815, 0.219, 0.055);
-    QString language_code = language_data(LANGUAGE).code.c_str();
+    QString language_code = QString::fromStdString(language_data(LANGUAGE).code);
 
-    for (const std::string& token : tokens){
+    for (const std::string& slug : slugs){
         env.console.botbase().wait_for_all_requests();
 
         QImage screen = env.console.video().snapshot();
@@ -82,9 +82,9 @@ void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env){
             dir.mkpath(".");
         }
 
-        path += token.c_str();
+        path += QString::fromStdString(slug);
         path += "-";
-        path += now_to_filestring().c_str();
+        path += QString::fromStdString(now_to_filestring());
         path += ".png";
         image.save(path);
 
@@ -92,7 +92,7 @@ void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env){
 
         OCR::make_OCR_filter(image).apply(image);
 
-        OCR::MatchResult result = m_reader.read_exact(LANGUAGE, token, image);
+        OCR::MatchResult result = m_reader.read_substring(LANGUAGE, slug, image);
         result.log(&env.logger());
     }
 

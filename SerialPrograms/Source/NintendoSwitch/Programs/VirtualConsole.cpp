@@ -14,7 +14,7 @@ VirtualConsole_Descriptor::VirtualConsole_Descriptor()
         QColor(),
         "NintendoSwitch:VirtualConsole",
         "Virtual Console",
-        "SerialPrograms/VirtualConsole.md",
+        "SwSh-Arduino/wiki/Virtual-Console",
         "Play your Switch from your computer. Device logging is logged to the output window."
     )
 {}

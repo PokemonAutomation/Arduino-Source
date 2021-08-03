@@ -55,6 +55,16 @@ void OverworldTargetTracker::clear_detections(){
     m_exclamations.clear();
     m_questions.clear();
 }
+bool OverworldTargetTracker::has_good_target(){
+//    m_logger.log("has_good_target()");
+    SpinLockGuard lg(m_lock, "OverworldTargetTracker::has_good_target()");
+    if (m_best_target.first < 0){
+//        m_logger.log("has_good_target(): < 0");
+        return false;
+    }
+//    m_logger.log("has_good_target(): " + QString::number(m_best_target.first));
+    return m_best_target.first <= m_max_alpha;
+}
 std::pair<double, OverworldTarget> OverworldTargetTracker::best_target(){
     SpinLockGuard lg(m_lock, "OverworldTargetTracker::best_target()");
     return m_best_target;
@@ -116,7 +126,7 @@ void OverworldTargetTracker::populate_targets(
 }
 
 bool OverworldTargetTracker::save_target(std::multimap<double, OverworldTarget>::iterator target){
-#if 0
+#if 1
     m_logger.log(
         QString("Best Target: ") +
         (target->second.mark == OverworldMark::EXCLAMATION_MARK ? "Exclamation" : "Question") +
@@ -124,12 +134,13 @@ bool OverworldTargetTracker::save_target(std::multimap<double, OverworldTarget>:
         QString::number(target->second.delta_x) + " , " +
         QString::number(-target->second.delta_y) + "], alpha = " +
         QString::number(target->first),
-        "purple"
+        "orange"
     );
 #endif
 //    SpinLockGuard lg(m_lock, "OverworldTargetTracker::save_target()");
     m_best_target = *target;
     return target->first <= m_max_alpha && m_stop_on_target.load(std::memory_order_acquire);
+//    return target->first <= m_max_alpha;
 }
 
 bool OverworldTargetTracker::on_frame(
@@ -203,10 +214,18 @@ bool OverworldTargetTracker::on_frame(
         auto target1 = question_targets.begin();
 
         //  See if we have any good target.
+        if (!exclamation_targets.empty()){
+//            cout << "Exclamation = " << target0->first << endl;
+        }
+        if (!question_targets.empty()){
+//            cout << "Question    = " << target1->first << endl;
+        }
         if (!exclamation_targets.empty() && target0->first <= m_max_alpha){
+//            cout << "Pick Exclamation" << endl;
             return save_target(target0);
         }
         if (!question_targets.empty() && target1->first <= m_max_alpha){
+//            cout << "Pick Question" << endl;
             return save_target(target1);
         }
 

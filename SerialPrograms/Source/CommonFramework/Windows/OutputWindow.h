@@ -37,6 +37,7 @@ private:
 class SerialLogger : public TaggedLogger, public PokemonAutomation::MessageLogger{
 public:
     SerialLogger(OutputWindow& window, QString tag);
+    using TaggedLogger::log;
     virtual void log(std::string msg) override;
 };
 

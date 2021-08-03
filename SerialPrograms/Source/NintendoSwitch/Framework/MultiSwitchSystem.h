@@ -65,6 +65,7 @@ public:
     );
     void redraw_videos(size_t count);
 
+    size_t switch_count() const{ return m_switches.size(); }
     SwitchSystem& operator[](size_t index){ return *m_switches[index]; }
 
     virtual bool serial_ok() const override;

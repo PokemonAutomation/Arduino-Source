@@ -16,7 +16,7 @@ TurboButton_Descriptor::TurboButton_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "NintendoSwitch:TurboButton",
         "Turbo Button",
-        "",
+        "SwSh-Arduino/wiki/Advanced:-TurboButton",
         "Mash a controller button. (similar to turbo controller)",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB

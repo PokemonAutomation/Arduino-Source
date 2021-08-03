@@ -22,11 +22,16 @@ namespace PokemonAutomation{
 
 const QString ConfigSet::JSON_CONFIG_NAME   = "0-ConfigName";
 const QString ConfigSet::JSON_CONFIG_PATH   = "1-ConfigPath";
-const QString ConfigSet::JSON_DESCRIPTION   = "2-Description";
-const QString ConfigSet::JSON_OPTIONS       = "3-Options";
+const QString ConfigSet::JSON_DOCUMENTATION      = "2-Documentation";
+const QString ConfigSet::JSON_DESCRIPTION   = "3-Description";
+const QString ConfigSet::JSON_OPTIONS       = "4-Options";
 
 ConfigSet::ConfigSet(QString category, const QJsonObject& obj)
-    : RightPanel(std::move(category), json_get_string_throw(obj, JSON_CONFIG_NAME))
+    : RightPanel(
+        std::move(category),
+        json_get_string_throw(obj, JSON_CONFIG_NAME),
+        json_get_string_throw(obj, JSON_DOCUMENTATION)
+    )
     , m_path(json_get_string_throw(obj, JSON_CONFIG_PATH))
     , m_description(json_get_string_throw(obj, JSON_DESCRIPTION))
 {}

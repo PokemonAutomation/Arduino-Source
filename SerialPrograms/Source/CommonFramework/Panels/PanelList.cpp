@@ -57,7 +57,7 @@ void PanelList::finish_panel_setup(){
             }
             const PanelDescriptor* descriptor = iter->second;
             std::unique_ptr<PanelInstance> panel = descriptor->make_panel();
-            panel->from_json(PERSISTENT_SETTINGS().panels[descriptor->identifier().c_str()]);
+            panel->from_json(PERSISTENT_SETTINGS().panels[QString::fromStdString(descriptor->identifier())]);
             m_listener.on_panel_construct(std::move(panel));
         }
     );

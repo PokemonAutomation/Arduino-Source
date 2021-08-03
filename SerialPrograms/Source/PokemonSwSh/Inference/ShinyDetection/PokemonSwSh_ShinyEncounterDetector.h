@@ -10,18 +10,13 @@
 #include "CommonFramework/Tools/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "Pokemon/Pokemon_Types.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+using namespace Pokemon;
 
-enum class ShinyDetection{
-    NO_BATTLE_MENU,
-    NOT_SHINY,
-    STAR_SHINY,
-    SQUARE_SHINY,
-    UNKNOWN_SHINY,
-};
 
 struct ShinyDetectionBattle{
     InferenceBox detection_box;
@@ -32,7 +27,7 @@ extern const ShinyDetectionBattle SHINY_BATTLE_RAID;
 
 
 
-ShinyDetection detect_shiny_battle(
+ShinyType detect_shiny_battle(
     ProgramEnvironment& env, VideoFeed& feed,
     const ShinyDetectionBattle& battle_settings,
     std::chrono::seconds timeout,

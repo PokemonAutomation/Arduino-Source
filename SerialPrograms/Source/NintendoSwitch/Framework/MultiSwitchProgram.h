@@ -36,6 +36,7 @@ private:
     friend class MultiSwitchProgramWidget;
     friend class MultiSwitchProgramUI;
     MultiSwitchProgramEnvironment(
+//        std::string program_identifier,
         Logger& logger,
         StatsTracker* current_stats,
         const StatsTracker* historical_stats,
@@ -95,6 +96,13 @@ public:
         MultiSwitchProgramInstance& instance,
         PanelListener& listener
     );
+
+    size_t system_count() const{
+        return static_cast<MultiSwitchSystem&>(*m_setup).switch_count();
+    }
+    SwitchSystem& system(size_t index){
+        return static_cast<MultiSwitchSystem&>(*m_setup)[index];
+    }
 
 private:
     using RunnableSwitchProgramWidget::RunnableSwitchProgramWidget;

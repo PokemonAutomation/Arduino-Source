@@ -55,8 +55,16 @@ public:
     State state() const;
     bool accepting_commands() const;
 
+    //  Must call this on the same thread that controls the lifetime
+    //  of this class. Not thread-safe with stop()/reset().
     template <uint8_t SendType, typename Parameters>
     bool try_send_request(Parameters& params);
+    bool try_send_request(uint8_t msg_type, void* params, size_t bytes);
+
+    //  This one can be called from anywhere.
+    template <uint8_t SendType, typename Parameters>
+    void async_try_send_request(Parameters& params);
+    void async_try_send_request(uint8_t msg_type, void* params, size_t bytes);
 
 signals:
     void on_not_connected(QString error);
@@ -66,12 +74,15 @@ signals:
 
     void uptime_status(QString status);
 
+    void async_try_send_request(uint8_t msg_type, std::string body);
+
 private:
     void stop_unprotected();
 
     void verify_protocol();
     uint8_t verify_pabotbase();
     void thread_body();
+
 
 private:
     PABotBaseLevel m_minimum_pabotbase;
@@ -91,16 +102,12 @@ private:
 
 template <uint8_t SendType, typename Parameters>
 bool BotBaseHandle::try_send_request(Parameters& params){
-    std::unique_lock<std::mutex> lg(m_lock, std::defer_lock);
-    if (!lg.try_lock()){
-        return false;
-    }
-    if (!accepting_commands()){
-        return false;
-    }
-    return botbase()->try_issue_request<SendType>(nullptr, params);
+    return try_send_request(SendType, &params, sizeof(Parameters));
 }
-
+template <uint8_t SendType, typename Parameters>
+void BotBaseHandle::async_try_send_request(Parameters& params){
+    async_try_send_request(SendType, &params, sizeof(Parameters));
+}
 
 
 }
