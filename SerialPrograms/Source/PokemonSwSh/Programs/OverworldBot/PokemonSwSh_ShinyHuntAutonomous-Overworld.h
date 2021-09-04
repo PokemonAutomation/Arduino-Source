@@ -17,7 +17,7 @@
 #include "NintendoSwitch/Options/TimeExpression.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
-#include "PokemonSwSh/Options/EncounterFilter.h"
+#include "PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -52,8 +52,8 @@ private:
 private:
     StartInGripOrGame START_IN_GRIP_MENU;
     GoHomeWhenDone GO_HOME_WHEN_DONE;
+    SimpleInteger<uint8_t> TIME_ROLLBACK_HOURS;
 
-    Pokemon::PokemonNameReader m_name_reader;
     Pokemon::EncounterBotLanguage LANGUAGE;
 
     FloatingPoint MARK_OFFSET;
@@ -61,16 +61,13 @@ private:
     EnumDropdown TRIGGER_METHOD;
     TimeExpression<uint16_t> MAX_MOVE_DURATION;
     FloatingPoint MAX_TARGET_ALPHA;
-    EncounterFilter FILTER;
 
-    SimpleInteger<uint8_t> TIME_ROLLBACK_HOURS;
-    Pokemon::EncounterBotNotifications NOTIFICATION_LEVEL;
+    EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
 
     SectionDivider m_advanced_options;
     TimeExpression<uint16_t> WATCHDOG_TIMER;
     TimeExpression<uint16_t> EXIT_BATTLE_TIMEOUT;
     BooleanCheckBox TARGET_CIRCLING;
-    BooleanCheckBox VIDEO_ON_SHINY;
 };
 
 

@@ -38,12 +38,7 @@ ShinyHuntAutonomousRegi_Descriptor::ShinyHuntAutonomousRegi_Descriptor()
 ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi(const ShinyHuntAutonomousRegi_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
-    , LANGUAGE(m_name_reader)
-    , FILTER(false, false)
-    , TOUCH_DATE_INTERVAL(
-        "<b>Rollover Prevention:</b><br>Prevent a den from rolling over by periodically touching the date. If set to zero, this feature is disabled.",
-        "4 * 3600 * TICKS_PER_SECOND"
-    )
+    , ENCOUNTER_BOT_OPTIONS(false, false)
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -59,28 +54,20 @@ ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi(const ShinyHuntAutonomousRegi_D
         "<b>Transition Delay:</b><br>Time to enter/exit the building.",
         "5 * TICKS_PER_SECOND"
     )
-    , VIDEO_ON_SHINY(
-        "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
-        true
-    )
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
-    m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(TOUCH_DATE_INTERVAL);
 
-    m_options.emplace_back(&LANGUAGE, "LANGUAGE");
-    m_options.emplace_back(&REGI_NAME, "REGI_NAME");
-    m_options.emplace_back(&FILTER, "FILTER");
+    PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(REGI_NAME);
 
-    m_options.emplace_back(&TOUCH_DATE_INTERVAL, "TOUCH_DATE_INTERVAL");
-    m_options.emplace_back(&NOTIFICATION_LEVEL, "NOTIFICATION_LEVEL");
+    PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
 
-    m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&EXIT_BATTLE_TIMEOUT, "EXIT_BATTLE_TIMEOUT");
-    m_options.emplace_back(&POST_BATTLE_MASH_TIME, "POST_BATTLE_MASH_TIME");
-    m_options.emplace_back(&TRANSITION_DELAY, "TRANSITION_DELAY");
-    if (PERSISTENT_SETTINGS().developer_mode){
-        m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
-    }
+    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
+    PA_ADD_OPTION(POST_BATTLE_MASH_TIME);
+    PA_ADD_OPTION(TRANSITION_DELAY);
 }
 
 
@@ -113,11 +100,9 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env){
     StandardEncounterHandler handler(
         m_descriptor.display_name(),
         env, env.console,
-        &m_name_reader, LANGUAGE,
-        stats,
-        FILTER,
-        VIDEO_ON_SHINY,
-        NOTIFICATION_LEVEL
+        LANGUAGE,
+        ENCOUNTER_BOT_OPTIONS,
+        stats
     );
 
     uint32_t last_touch = system_clock(env.console) - TOUCH_DATE_INTERVAL;
@@ -148,14 +133,15 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env){
         env.console.botbase().wait_for_all_requests();
 
         //  Detect shiny.
-        ShinyType shininess = detect_shiny_battle(
-            env, env.console,
+        ShinyDetectionResult result = detect_shiny_battle(
+            env.console,
+            env, env.console, env.console,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );
 //        shininess = ShinyDetection::SQUARE_SHINY;
 
-        bool stop = handler.handle_standard_encounter_runaway(shininess, EXIT_BATTLE_TIMEOUT);
+        bool stop = handler.handle_standard_encounter_end_battle(result, EXIT_BATTLE_TIMEOUT);
         if (stop){
             break;
         }

@@ -20,15 +20,13 @@ public:
         QString label,
         QString default_value
     )
-        : ConfigOption(label)
-        , StringOption(backing, std::move(label), default_value)
+        : StringOption(backing, std::move(label), default_value)
     {}
     String(
         QString label,
         QString default_value
     )
-        : ConfigOption(label)
-        , StringOption(std::move(label), default_value)
+        : StringOption(std::move(label), default_value)
     {}
 
     virtual void load_json(const QJsonValue& json) override{

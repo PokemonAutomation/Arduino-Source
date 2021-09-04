@@ -26,12 +26,14 @@ public:
 
     MatchResult match_substring(
         Language language,
-        const QString& text
+        const QString& text,
+        double min_alpha = 25
     ) const;
     MatchResult match_substring(
         Language language,
         const std::string& expected,
-        const QString& text
+        const QString& text,
+        double min_alpha = 100
     ) const;
 
 

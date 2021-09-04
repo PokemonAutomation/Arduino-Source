@@ -28,19 +28,19 @@ const double OverworldTargetTracker::OVERWORLD_CENTER_Y = 0.70;
 
 
 OverworldTargetTracker::OverworldTargetTracker(
-    Logger& logger, VideoFeed& feed,
+    Logger& logger, VideoOverlay& overlay,
     std::chrono::milliseconds window,
     double mark_offset,
     MarkPriority mark_priority,
     double max_alpha
 )
     : m_logger(logger)
-    , m_feed(feed)
+    , m_overlay(overlay)
     , m_window(window)
     , m_mark_offset(mark_offset)
     , m_mark_priority(mark_priority)
     , m_max_alpha(max_alpha)
-    , m_search_area(feed, 0.0, 0.2, 1.0, 0.8)
+    , m_search_area(overlay, 0.0, 0.2, 1.0, 0.8)
     , m_stop_on_target(false)
 {
     m_best_target.first = -1;
@@ -86,9 +86,9 @@ void OverworldTargetTracker::populate_targets(
 //    cout << "Candidates:" << endl;
     for (size_t c = 0; c < targets.size(); c++){
         double overlap = 0;
-        const InferenceBox& box0 = targets[c].box;
+        const ImageFloatBox& box0 = targets[c].box;
         for (size_t i = 0; i < targets.size(); i++){
-            const InferenceBox& box1 = targets[i].box;
+            const ImageFloatBox& box1 = targets[i].box;
             double min_x = std::max(box0.x, box1.x);
             double max_x = std::min(box0.x + box0.width, box1.x + box1.width);
             if (min_x >= max_x){
@@ -116,7 +116,7 @@ void OverworldTargetTracker::populate_targets(
 ){
     std::vector<OverworldTarget> targets;
     for (const Mark& item : marks){
-        const InferenceBox& box = item.box;
+        const ImageFloatBox& box = item.box;
         double delta_x = box.x + box.width / 2 - OVERWORLD_CENTER_X;
         double delta_y = box.y + box.height * (1.0 + m_mark_offset) - OVERWORLD_CENTER_Y;
         Trajectory trajectory = get_trajectory_float(delta_x, delta_y);
@@ -149,8 +149,8 @@ bool OverworldTargetTracker::on_frame(
 ){
     QImage image = extract_box(frame, m_search_area);
 
-    std::vector<PixelBox> exclamation_marks;
-    std::vector<PixelBox> question_marks;
+    std::vector<ImagePixelBox> exclamation_marks;
+    std::vector<ImagePixelBox> question_marks;
     find_marks(
         image,
         &exclamation_marks,
@@ -171,24 +171,22 @@ bool OverworldTargetTracker::on_frame(
 
 
     m_detection_boxes.clear();
-    for (const PixelBox& mark : exclamation_marks){
-        InferenceBox box = translate_to_parent(frame, m_search_area, mark);
-        box.color = Qt::magenta;
+    for (const ImagePixelBox& mark : exclamation_marks){
+        ImageFloatBox box = translate_to_parent(frame, m_search_area, mark);
         box.x -= box.width * 1.5;
         box.width *= 4;
         box.height *= 1.5;
         m_exclamations.emplace_back(Mark{timestamp, box});
-        m_detection_boxes.emplace_back(m_feed, box);
+        m_detection_boxes.emplace_back(m_overlay, box, Qt::magenta);
 //        cout << "asdf = " << exclamations.size() << endl;
     }
-    for (const PixelBox& mark : question_marks){
-        InferenceBox box = translate_to_parent(frame, m_search_area, mark);
-        box.color = Qt::magenta;
+    for (const ImagePixelBox& mark : question_marks){
+        ImageFloatBox box = translate_to_parent(frame, m_search_area, mark);
         box.x -= box.width * 0.5;
         box.width *= 2;
         box.height *= 1.5;
         m_questions.emplace_back(Mark{timestamp, box});
-        m_detection_boxes.emplace_back(m_feed, box);
+        m_detection_boxes.emplace_back(m_overlay, box, Qt::magenta);
 //        cout << "qwer = " << questions.size() << endl;
     }
 

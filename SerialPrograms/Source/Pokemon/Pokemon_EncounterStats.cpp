@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "Pokemon/Pokemon_SpeciesDatabase.h"
+#include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "Pokemon_EncounterStats.h"
 
 namespace PokemonAutomation{
@@ -44,7 +44,7 @@ QString PokemonEncounterSet::dump() const{
         return "None - Unable to detect";
     }
     if (m_set.size() == 1){
-        return species_slug_to_data(*m_set.begin()).display_name();
+        return get_pokemon_name(*m_set.begin()).display_name();
     }
     if (m_set.size() <= 5){
         QString str = "Ambiguous (";
@@ -54,7 +54,7 @@ QString PokemonEncounterSet::dump() const{
                 str += ", ";
             }
             first = false;
-            str += species_slug_to_data(slug).display_name();
+            str += get_pokemon_name(slug).display_name();
         }
         str += ")";
         return str;

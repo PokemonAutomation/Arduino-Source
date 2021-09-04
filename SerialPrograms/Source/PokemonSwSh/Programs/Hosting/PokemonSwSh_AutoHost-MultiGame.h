@@ -15,7 +15,8 @@
 #include "NintendoSwitch/Options/TimeExpression.h"
 #include "NintendoSwitch/Options/StartInGripMenu.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
-#include "PokemonSwSh/Options/MultiHostTable.h"
+#include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
+#include "PokemonSwSh/Options/PokemonSwSh_MultiHostTable.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -47,13 +48,13 @@ private:
 
 private:
     StartInGripOrClosed START_IN_GRIP_MENU;
+    TouchDateInterval TOUCH_DATE_INTERVAL;
 
     RandomCode RAID_CODE;
     BooleanCheckBox HOST_ONLINE;
     TimeExpression<uint16_t> LOBBY_WAIT_DELAY;
     MultiHostTable GAME_LIST;
     SimpleInteger<uint8_t> FR_FORWARD_ACCEPT;
-    TimeExpression<uint32_t> TOUCH_DATE_INTERVAL;
 
     SectionDivider m_internet_settings;
     TimeExpression<uint16_t> CONNECT_TO_INTERNET_DELAY;

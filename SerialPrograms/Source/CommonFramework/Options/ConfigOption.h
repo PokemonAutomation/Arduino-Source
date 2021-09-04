@@ -16,11 +16,7 @@ class ConfigOptionUI;
 
 class ConfigOption{
 public:
-    ConfigOption(QString label)
-        : m_label(std::move(label))
-    {}
-
-    const QString& label() const{ return m_label; }
+    virtual ~ConfigOption() = default;
 
     virtual void load_json(const QJsonValue& json) = 0;
     virtual QJsonValue to_json() const = 0;
@@ -29,9 +25,6 @@ public:
     virtual void restore_defaults(){};
 
     virtual ConfigOptionUI* make_ui(QWidget& parent) = 0;
-
-protected:
-    QString m_label;
 };
 
 

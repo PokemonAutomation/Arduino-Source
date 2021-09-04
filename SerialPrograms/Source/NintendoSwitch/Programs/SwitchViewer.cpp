@@ -64,7 +64,7 @@ void SwitchViewer_Widget::construct(){
     layout->addWidget(make_header(*this));
 
     SwitchViewer& instance = static_cast<SwitchViewer&>(m_instance);
-    m_switches = (MultiSwitchSystem*)instance.m_switches.make_ui(*this, m_listener.output_window());
+    m_switches = (MultiSwitchSystem*)instance.m_switches.make_ui(*this, m_listener.logger());
     layout->addWidget(m_switches);
 }
 

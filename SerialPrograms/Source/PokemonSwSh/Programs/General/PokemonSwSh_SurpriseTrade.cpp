@@ -51,13 +51,13 @@ SurpriseTrade::SurpriseTrade(const SurpriseTrade_Descriptor& descriptor)
         "30 * TICKS_PER_SECOND"
     )
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
 
-    m_options.emplace_back(&BOXES_TO_TRADE, "BOXES_TO_TRADE");
-    m_options.emplace_back(&INITIAL_WAIT, "INITIAL_WAIT");
-    m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&TRADE_ANIMATION, "TRADE_ANIMATION");
-    m_options.emplace_back(&EVOLVE_DELAY, "EVOLVE_DELAY");
+    PA_ADD_OPTION(BOXES_TO_TRADE);
+    PA_ADD_OPTION(INITIAL_WAIT);
+    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_OPTION(TRADE_ANIMATION);
+    PA_ADD_OPTION(EVOLVE_DELAY);
 }
 
 

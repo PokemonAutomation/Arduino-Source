@@ -23,6 +23,7 @@ public:
         InterruptableCommandSession& session,
         OverworldTargetTracker& target_tracker
     );
+    virtual ~OverworldTrigger() = default;
 
     virtual void run() = 0;
 

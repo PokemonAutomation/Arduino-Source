@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 
 
 SerialSelector::SerialSelector(
-    QString label, QString logger_tag,
+    QString label, std::string logger_tag,
     PABotBaseLevel minimum_pabotbase
 )
     : m_label(std::move(label))
@@ -27,7 +27,7 @@ SerialSelector::SerialSelector(
     , m_logger_tag(std::move(logger_tag))
 {}
 SerialSelector::SerialSelector(
-    QString label, QString logger_tag,
+    QString label, std::string logger_tag,
     PABotBaseLevel minimum_pabotbase,
     const QJsonValue& json
 )
@@ -52,8 +52,8 @@ const QSerialPortInfo* SerialSelector::port() const{
     return &m_port;
 }
 
-SerialSelectorUI* SerialSelector::make_ui(QWidget& parent, OutputWindow& log_window){
-    return new SerialSelectorUI(parent, *this, log_window);
+SerialSelectorUI* SerialSelector::make_ui(QWidget& parent, Logger& logger){
+    return new SerialSelectorUI(parent, *this, logger);
 }
 
 
@@ -62,11 +62,11 @@ SerialSelectorUI* SerialSelector::make_ui(QWidget& parent, OutputWindow& log_win
 SerialSelectorUI::SerialSelectorUI(
     QWidget& parent,
     SerialSelector& value,
-    OutputWindow& log_window
+    Logger& logger
 )
     : QWidget(&parent)
     , m_value(value)
-    , m_logger(log_window, value.m_logger_tag)
+    , m_logger(logger, value.m_logger_tag)
     , m_connection(value.m_port, value.m_minimum_pabotbase, m_logger)
 {
     QHBoxLayout* serial_row = new QHBoxLayout(this);

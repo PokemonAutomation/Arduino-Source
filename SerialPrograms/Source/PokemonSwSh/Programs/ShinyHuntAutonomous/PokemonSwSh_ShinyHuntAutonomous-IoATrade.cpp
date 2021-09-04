@@ -38,16 +38,12 @@ ShinyHuntAutonomousIoATrade_Descriptor::ShinyHuntAutonomousIoATrade_Descriptor()
 ShinyHuntAutonomousIoATrade::ShinyHuntAutonomousIoATrade(const ShinyHuntAutonomousIoATrade_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
-    , TOUCH_DATE_INTERVAL(
-        "<b>Rollover Prevention:</b><br>Prevent a den from rolling over by periodically touching the date. If set to zero, this feature is disabled.",
-        "4 * 3600 * TICKS_PER_SECOND"
-    )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
     , MASH_TO_TRADE_DELAY(
         "<b>Mash to Trade Delay:</b><br>Time to perform the trade.",
-        "29 * TICKS_PER_SECOND"
+        "30 * TICKS_PER_SECOND"
     )
     , VIDEO_ON_SHINY(
         "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
@@ -58,17 +54,18 @@ ShinyHuntAutonomousIoATrade::ShinyHuntAutonomousIoATrade(const ShinyHuntAutonomo
         false
     )
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
-    m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(TOUCH_DATE_INTERVAL);
 
-    m_options.emplace_back(&TOUCH_DATE_INTERVAL, "TOUCH_DATE_INTERVAL");
-    m_options.emplace_back(&NOTIFICATION_LEVEL, "NOTIFICATION_LEVEL");
+    PA_ADD_OPTION(NOTIFICATION_LEVEL);
+    PA_ADD_OPTION(NOTIFICATION_SCREENSHOT);
 
-    m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&MASH_TO_TRADE_DELAY, "MASH_TO_TRADE_DELAY");
+    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_OPTION(MASH_TO_TRADE_DELAY);
     if (PERSISTENT_SETTINGS().developer_mode){
-        m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
-        m_options.emplace_back(&RUN_FROM_EVERYTHING, "RUN_FROM_EVERYTHING");
+        PA_ADD_OPTION(VIDEO_ON_SHINY);
+        PA_ADD_OPTION(RUN_FROM_EVERYTHING);
     }
 }
 
@@ -118,8 +115,8 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env){
 
         SummaryShinySymbolDetector::Detection detection;
         {
-            SummaryShinySymbolDetector detector(env.console, env.logger());
-            detection = detector.wait_for_detection(env);
+            SummaryShinySymbolDetector detector(env.console, env.console);
+            detection = detector.wait_for_detection(env, env.console);
 //            detection = SummaryShinySymbolDetector::SHINY;
         }
         switch (detection){
@@ -129,20 +126,22 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env){
         case SummaryShinySymbolDetector::NOT_SHINY:
             stats.add_non_shiny();
             notification_sender.send_notification(
-                &env.logger(),
+                env.console,
                 m_descriptor.display_name(),
                 nullptr,
-                ShinyType::NOT_SHINY,
+                ShinyDetectionResult{ShinyType::NOT_SHINY, QImage()},
+                EncounterBotScreenshot::NO_SCREENSHOT,
                 &stats
             );
             break;
         case SummaryShinySymbolDetector::SHINY:
             stats.add_unknown_shiny();
             notification_sender.send_notification(
-                &env.logger(),
+                env.console,
                 m_descriptor.display_name(),
                 nullptr,
-                ShinyType::UNKNOWN_SHINY,
+                ShinyDetectionResult{ShinyType::UNKNOWN_SHINY, QImage()},
+                EncounterBotScreenshot::NO_SCREENSHOT,
                 &stats
             );
             if (VIDEO_ON_SHINY){

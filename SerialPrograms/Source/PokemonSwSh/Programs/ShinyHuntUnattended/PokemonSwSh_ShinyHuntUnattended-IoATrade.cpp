@@ -38,10 +38,6 @@ ShinyHuntUnattendedIoATrade::ShinyHuntUnattendedIoATrade(const ShinyHuntUnattend
         "<b>Start to Run Delay:</b><br>This needs to be carefully calibrated.",
         "1260"
     )
-    , TOUCH_DATE_INTERVAL(
-        "<b>Rollover Prevention:</b><br>Prevent a den from rolling over by periodically touching the date. If set to zero, this feature is disabled.",
-        "4 * 3600 * TICKS_PER_SECOND"
-    )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -55,17 +51,17 @@ ShinyHuntUnattendedIoATrade::ShinyHuntUnattendedIoATrade(const ShinyHuntUnattend
     )
     , MASH_TO_TRADE_DELAY(
         "<b>Mash to Trade Delay:</b><br>Time to perform the trade.",
-        "29 * TICKS_PER_SECOND"
+        "30 * TICKS_PER_SECOND"
     )
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(TOUCH_DATE_INTERVAL);
 
-    m_options.emplace_back(&START_TO_RUN_DELAY, "START_TO_RUN_DELAY");
-    m_options.emplace_back(&TOUCH_DATE_INTERVAL, "TOUCH_DATE_INTERVAL");
-    m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&FLY_DURATION, "FLY_DURATION");
-    m_options.emplace_back(&MOVE_DURATION, "MOVE_DURATION");
-    m_options.emplace_back(&MASH_TO_TRADE_DELAY, "MASH_TO_TRADE_DELAY");
+    PA_ADD_OPTION(START_TO_RUN_DELAY);
+    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_OPTION(FLY_DURATION);
+    PA_ADD_OPTION(MOVE_DURATION);
+    PA_ADD_OPTION(MASH_TO_TRADE_DELAY);
 }
 
 void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env){

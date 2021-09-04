@@ -48,11 +48,11 @@ FriendDelete::FriendDelete(const FriendDelete_Descriptor& descriptor)
         "2 * TICKS_PER_SECOND"
     )
 {
-    m_options.emplace_back(&FRIENDS_TO_DELETE, "FRIENDS_TO_DELETE");
-    m_options.emplace_back(&BLOCK_FRIENDS, "BLOCK_FRIENDS");
-    m_options.emplace_back(&VIEW_FRIEND_DELAY, "VIEW_FRIEND_DELAY");
-    m_options.emplace_back(&DELETE_FRIEND_DELAY, "DELETE_FRIEND_DELAY");
-    m_options.emplace_back(&FINISH_DELETE_DELAY, "FINISH_DELETE_DELAY");
+    PA_ADD_OPTION(FRIENDS_TO_DELETE);
+    PA_ADD_OPTION(BLOCK_FRIENDS);
+    PA_ADD_OPTION(VIEW_FRIEND_DELAY);
+    PA_ADD_OPTION(DELETE_FRIEND_DELAY);
+    PA_ADD_OPTION(FINISH_DELETE_DELAY);
 }
 void FriendDelete::program(SingleSwitchProgramEnvironment& env){
     pbf_press_button(env.console, BUTTON_A, 5, 5);

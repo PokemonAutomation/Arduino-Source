@@ -14,6 +14,7 @@
 #include "NintendoSwitch/Options/GoHomeWhenDone.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
+#include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -37,9 +38,10 @@ public:
 private:
     StartInGripOrGame START_IN_GRIP_MENU;
     GoHomeWhenDone GO_HOME_WHEN_DONE;
+    TouchDateInterval TOUCH_DATE_INTERVAL;
 
-    TimeExpression<uint32_t> TOUCH_DATE_INTERVAL;
     Pokemon::EncounterBotNotifications NOTIFICATION_LEVEL;
+    Pokemon::EncounterBotScreenshotOption NOTIFICATION_SCREENSHOT;
 
     SectionDivider m_advanced_options;
     TimeExpression<uint16_t> MASH_TO_TRADE_DELAY;

@@ -65,19 +65,19 @@ const std::string& IVCheckerReader::enum_to_token(Result result){
 
 
 
-IVCheckerReaderScope::IVCheckerReaderScope(const IVCheckerReader& reader, VideoFeed& feed, Language language)
+IVCheckerReaderScope::IVCheckerReaderScope(const IVCheckerReader& reader, VideoOverlay& overlay, Language language)
     : m_reader(reader)
     , m_language(language)
-    , m_box0(feed, InferenceBox(0.777, 0.198 + 0 * 0.0515, 0.2, 0.0515))
-    , m_box1(feed, InferenceBox(0.777, 0.198 + 1 * 0.0515, 0.2, 0.0515))
-    , m_box2(feed, InferenceBox(0.777, 0.198 + 2 * 0.0515, 0.2, 0.0515))
-    , m_box3(feed, InferenceBox(0.777, 0.198 + 3 * 0.0515, 0.2, 0.0515))
-    , m_box4(feed, InferenceBox(0.777, 0.198 + 4 * 0.0515, 0.2, 0.0515))
-    , m_box5(feed, InferenceBox(0.777, 0.198 + 5 * 0.0515, 0.2, 0.0515))
+    , m_box0(overlay, 0.777, 0.198 + 0 * 0.0515, 0.2, 0.0515)
+    , m_box1(overlay, 0.777, 0.198 + 1 * 0.0515, 0.2, 0.0515)
+    , m_box2(overlay, 0.777, 0.198 + 2 * 0.0515, 0.2, 0.0515)
+    , m_box3(overlay, 0.777, 0.198 + 3 * 0.0515, 0.2, 0.0515)
+    , m_box4(overlay, 0.777, 0.198 + 4 * 0.0515, 0.2, 0.0515)
+    , m_box5(overlay, 0.777, 0.198 + 5 * 0.0515, 0.2, 0.0515)
 {}
 
 
-IVCheckerReader::Result IVCheckerReaderScope::read(Logger* logger, const QImage& frame, const InferenceBoxScope& box){
+IVCheckerReader::Result IVCheckerReaderScope::read(Logger& logger, const QImage& frame, const InferenceBoxScope& box){
     QImage image = extract_box(frame, box);
     OCR::make_OCR_filter(image).apply(image);
 //    image.save("test.png");
@@ -86,12 +86,12 @@ IVCheckerReader::Result IVCheckerReaderScope::read(Logger* logger, const QImage&
 
     OCR::MatchResult result = m_reader.match_substring(m_language, text);
     result.log(logger);
-    if (!result.matched || result.tokens.size() != 1){
+    if (!result.matched || result.slugs.size() != 1){
         return IVCheckerReader::Result::UnableToDetect;
     }
-    return IVCheckerReader::token_to_enum(*result.tokens.begin());
+    return IVCheckerReader::token_to_enum(*result.slugs.begin());
 }
-IVCheckerReader::Results IVCheckerReaderScope::read(Logger* logger, const QImage& frame){
+IVCheckerReader::Results IVCheckerReaderScope::read(Logger& logger, const QImage& frame){
     IVCheckerReader::Results results;
     results.hp      = read(logger, frame, m_box0);
     results.attack  = read(logger, frame, m_box1);

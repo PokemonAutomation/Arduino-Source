@@ -104,7 +104,7 @@ protected:
 
     const std::string& m_program_name;
     SwitchSetup* m_setup;
-    std::unique_ptr<StatsTracker> m_stats;
+    std::unique_ptr<StatsTracker> m_historical_stats;
 };
 
 

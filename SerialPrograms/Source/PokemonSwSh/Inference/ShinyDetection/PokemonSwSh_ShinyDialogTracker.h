@@ -10,7 +10,7 @@
 #include <chrono>
 #include "CommonFramework/Tools/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_BattleDialogDetector.h"
+#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -26,7 +26,7 @@ enum class EncounterState{
 
 class ShinyDialogTracker{
 public:
-    ShinyDialogTracker(VideoFeed& feed, Logger& logger);
+    ShinyDialogTracker(VideoOverlay& overlay, Logger& logger);
 
     EncounterState encounter_state() const{ return m_state; }
     std::chrono::milliseconds wild_animation_duration() const{ return m_wild_animation_duration; }

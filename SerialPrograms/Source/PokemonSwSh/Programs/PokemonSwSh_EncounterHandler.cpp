@@ -4,10 +4,15 @@
  *
  */
 
+#include <QtGlobal>
+#include "Common/Cpp/Exception.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
+#include "Common/PokemonSwSh/PokemonSettings.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Inference/VisualInferenceSession.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "Pokemon/Pokemon_Notification.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_BasicCatcher.h"
 #include "PokemonSwSh_EncounterHandler.h"
 
 namespace PokemonAutomation{
@@ -49,20 +54,17 @@ StandardEncounterHandler::StandardEncounterHandler(
     const QString& program_name,
     ProgramEnvironment& env,
     ConsoleHandle& console,
-    const Pokemon::PokemonNameReader* name_reader, Language language,
-    ShinyHuntTracker& session_stats,
-    EncounterFilter& filter,
-    bool video_on_shiny,
-    EncounterBotNotificationLevel notification_level
+    Language language,
+    const EncounterBotCommonSettings& settings,
+    ShinyHuntTracker& session_stats
 )
     : m_program_name(program_name)
     , m_env(env)
     , m_console(console)
-    , m_name_reader(name_reader), m_language(language)
+    , m_language(language)
+    , m_settings(settings)
     , m_session_stats(session_stats)
-    , m_filter(filter)
-    , m_video_on_shiny(video_on_shiny)
-    , m_notification_sender(notification_level)
+    , m_notification_sender(settings.notification_level)
 {}
 
 
@@ -76,7 +78,7 @@ void StandardEncounterHandler::update_frequencies(StandardEncounterDetection& en
 void StandardEncounterHandler::run_away_and_update_stats(
     StandardEncounterDetection& encounter,
     uint16_t exit_battle_time,
-    ShinyType shininess
+    const ShinyDetectionResult& result
 ){
     //  Initiate the run-away.
     pbf_press_dpad(m_console, DPAD_UP, 10, 0);
@@ -86,10 +88,10 @@ void StandardEncounterHandler::run_away_and_update_stats(
     update_frequencies(encounter);
 
     m_notification_sender.send_notification(
-        &m_env.logger(),
+        m_console,
         m_program_name,
         encounter.candidates(),
-        shininess,
+        result, m_settings.shiny_screenshot,
         &m_session_stats,
         &m_frequencies
     );
@@ -113,47 +115,47 @@ void StandardEncounterHandler::run_away_and_update_stats(
 }
 
 
-bool StandardEncounterHandler::handle_standard_encounter(ShinyType shininess){
-    m_session_stats += shininess;
+bool StandardEncounterHandler::handle_standard_encounter(const ShinyDetectionResult& result){
+    m_session_stats += result.shiny_type;
     m_env.update_stats();
 
-    if (shininess == ShinyType::UNKNOWN){
+    if (result.shiny_type == ShinyType::UNKNOWN){
         pbf_mash_button(m_console, BUTTON_B, TICKS_PER_SECOND);
         return false;
     }
 
     StandardEncounterDetection encounter(
         m_env, m_console,
-        m_name_reader, m_language,
-        m_filter,
-        shininess
+        m_language,
+        m_settings.filter,
+        result.shiny_type
     );
 
     update_frequencies(encounter);
 
     m_notification_sender.send_notification(
-        &m_env.logger(),
+        m_console,
         m_program_name,
         encounter.candidates(),
-        shininess,
+        result, m_settings.shiny_screenshot,
         &m_session_stats,
         &m_frequencies
     );
 
-    if (m_video_on_shiny && encounter.is_shiny()){
+    if (m_settings.video_on_shiny && encounter.is_shiny()){
         take_video(m_console);
     }
 
-    return encounter.should_stop();
+    return encounter.get_action().first == EncounterAction::StopProgram;
 }
-bool StandardEncounterHandler::handle_standard_encounter_runaway(
-    ShinyType shininess,
+bool StandardEncounterHandler::handle_standard_encounter_end_battle(
+    const ShinyDetectionResult& result,
     uint16_t exit_battle_time
 ){
-    m_session_stats += shininess;
+    m_session_stats += result.shiny_type;
     m_env.update_stats();
 
-    if (shininess == ShinyType::UNKNOWN){
+    if (result.shiny_type == ShinyType::UNKNOWN){
         pbf_mash_button(m_console, BUTTON_B, TICKS_PER_SECOND);
         run_away(m_env, m_console, exit_battle_time);
         return false;
@@ -161,29 +163,92 @@ bool StandardEncounterHandler::handle_standard_encounter_runaway(
 
     StandardEncounterDetection encounter(
         m_env, m_console,
-        m_name_reader, m_language,
-        m_filter,
-        shininess
+        m_language,
+        m_settings.filter,
+        result.shiny_type
     );
 
-    if (m_video_on_shiny && encounter.is_shiny()){
+    if (m_settings.video_on_shiny && encounter.is_shiny()){
         take_video(m_console);
     }
 
-    if (encounter.should_stop()){
-        update_frequencies(encounter);
-        m_notification_sender.send_notification(
-            &m_env.logger(),
-            m_program_name,
-            encounter.candidates(),
-            shininess,
-            &m_session_stats,
-            &m_frequencies
-        );
-        return true;
+    std::pair<EncounterAction, std::string> action  = encounter.get_action();
+
+    //  Fast run-away sequence to save time.
+    if (action.first == EncounterAction::RunAway){
+        run_away_and_update_stats(encounter, exit_battle_time, result);
+        return false;
     }
 
-    run_away_and_update_stats(encounter, exit_battle_time, shininess);
+    update_frequencies(encounter);
+    m_notification_sender.send_notification(
+        m_console,
+        m_program_name,
+        encounter.candidates(),
+        result, m_settings.shiny_screenshot,
+        &m_session_stats,
+        &m_frequencies
+    );
+
+    switch (action.first){
+    case EncounterAction::StopProgram:
+        return true;
+    case EncounterAction::RunAway:
+        return false;
+    case EncounterAction::ThrowBalls:{
+        CatchResults results = basic_catcher(m_env, m_console, m_language, action.second);
+        switch (results.result){
+        case CatchResult::POKEMON_CAUGHT:
+        case CatchResult::POKEMON_FAINTED:
+            break;
+        case CatchResult::OWN_FAINTED:
+            PA_THROW_StringException("Your " + STRING_POKEMON + " fainted after " + QString::number(results.balls_used) + " balls.");
+        case CatchResult::OUT_OF_BALLS:
+            PA_THROW_StringException("Unable to find the desired ball after throwing " + QString::number(results.balls_used) + " of them. Did you run out?");
+        case CatchResult::TIMEOUT:
+            PA_THROW_StringException("Program has timed out. Did your lead " + STRING_POKEMON + " faint?");
+        }
+        send_catch_notification(
+            m_console,
+            m_program_name,
+            encounter.candidates(),
+            action.second,
+            results.balls_used,
+            results.result == CatchResult::POKEMON_CAUGHT,
+            result.shiny_type != ShinyType::NOT_SHINY
+        );
+        return false;
+    }
+    case EncounterAction::ThrowBallsAndSave:{
+        CatchResults results = basic_catcher(m_env, m_console, m_language, action.second);
+        switch (results.result){
+        case CatchResult::POKEMON_CAUGHT:
+            pbf_wait(m_console, 2 * TICKS_PER_SECOND);
+            pbf_press_button(m_console, BUTTON_X, 20, OVERWORLD_TO_MENU_DELAY); //  Save game.
+            pbf_press_button(m_console, BUTTON_R, 20, 150);
+            pbf_press_button(m_console, BUTTON_A, 10, 500);
+            break;
+        case CatchResult::POKEMON_FAINTED:
+            break;
+        case CatchResult::OWN_FAINTED:
+            PA_THROW_StringException("Your " + STRING_POKEMON + " fainted after " + QString::number(results.balls_used) + " balls.");
+        case CatchResult::OUT_OF_BALLS:
+            PA_THROW_StringException("Unable to find the desired ball after throwing " + QString::number(results.balls_used) + " of them. Did you run out?");
+        case CatchResult::TIMEOUT:
+            PA_THROW_StringException("Program has timed out. Did your lead " + STRING_POKEMON + " faint?");
+        }
+        send_catch_notification(
+            m_console,
+            m_program_name,
+            encounter.candidates(),
+            action.second,
+            results.balls_used,
+            results.result == CatchResult::POKEMON_CAUGHT,
+            result.shiny_type != ShinyType::NOT_SHINY
+        );
+        return false;
+    }
+    }
 
     return false;
 }

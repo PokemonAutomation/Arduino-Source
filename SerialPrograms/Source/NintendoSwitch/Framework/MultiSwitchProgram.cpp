@@ -115,8 +115,10 @@ void MultiSwitchProgramWidget::run_program(
         SwitchSystem& system = this->system(c);
         switches.emplace_back(
             c,
+            m_logger.base_logger(),
             sanitize_botbase(system.botbase()),
-            system.camera()
+            system.camera(),
+            system.overlay()
         );
     }
     MultiSwitchProgramEnvironment env(

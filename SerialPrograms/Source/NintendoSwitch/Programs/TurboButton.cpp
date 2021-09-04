@@ -52,8 +52,8 @@ TurboButton::TurboButton(const TurboButton_Descriptor& descriptor)
         "8", 8
     )
 {
-    m_options.emplace_back(&BUTTON, "BUTTON");
-    m_options.emplace_back(&PERIOD, "PERIOD");
+    PA_ADD_OPTION(BUTTON);
+    PA_ADD_OPTION(PERIOD);
 }
 void TurboButton::program(SingleSwitchProgramEnvironment& env){
     while (true){

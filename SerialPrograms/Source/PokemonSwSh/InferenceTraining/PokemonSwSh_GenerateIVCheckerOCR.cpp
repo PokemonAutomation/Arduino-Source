@@ -51,13 +51,13 @@ GenerateIVCheckerOCR::GenerateIVCheckerOCR(const GenerateIVCheckerOCR_Descriptor
     , SPDEF("<b>Sp. Def:</b>")
     , SPEED("<b>Speed:</b>")
 {
-    m_options.emplace_back(&LANGUAGE, "LANGUAGE");
-    m_options.emplace_back(&HP, "HP");
-    m_options.emplace_back(&ATTACK, "ATTACK");
-    m_options.emplace_back(&DEFENSE, "DEFENSE");
-    m_options.emplace_back(&SPATK, "SPATK");
-    m_options.emplace_back(&SPDEF, "SPDEF");
-    m_options.emplace_back(&SPEED, "SPEED");
+    PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(HP);
+    PA_ADD_OPTION(ATTACK);
+    PA_ADD_OPTION(DEFENSE);
+    PA_ADD_OPTION(SPATK);
+    PA_ADD_OPTION(SPDEF);
+    PA_ADD_OPTION(SPEED);
 }
 
 

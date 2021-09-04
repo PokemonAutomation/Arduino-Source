@@ -55,7 +55,7 @@ bool RaidCode::is_valid() const{
 
 
 RandomCode::RandomCode()
-    : ConfigOption(
+    : m_label(
         "<b>Raid Code:</b><br>Blank for no raid code. Set random digits to zero for a fixed code. Otherwise, it is the # of leading random digits."
     )
 {}

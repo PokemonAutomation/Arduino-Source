@@ -57,7 +57,7 @@ void MultiSwitchSystemFactory::load_json(const QJsonValue& json){
         m_switches.emplace_back(
             new SwitchSystemFactory(
                 QString("Switch ") + QString::number(c),
-                QString("Switch ") + QString::number(c),
+                "Switch " + std::to_string(c),
                 m_min_pabotbase, m_feedback,
                 array[c]
             )
@@ -80,7 +80,7 @@ void MultiSwitchSystemFactory::resize(size_t count){
         m_switches.emplace_back(
             new SwitchSystemFactory(
                 QString("Switch ") + QString::number(m_switches.size()),
-                QString("Switch ") + QString::number(m_switches.size()),
+                "Switch " + std::to_string(m_switches.size()),
                 m_min_pabotbase, m_feedback
             )
         );
@@ -95,19 +95,19 @@ const QSerialPortInfo* MultiSwitchSystemFactory::port(size_t index) const{
 //    return m_switches[index]->camera();
 //}
 
-SwitchSetup* MultiSwitchSystemFactory::make_ui(QWidget& parent, OutputWindow& log_window){
-    return new MultiSwitchSystem(parent, *this, log_window);
+SwitchSetup* MultiSwitchSystemFactory::make_ui(QWidget& parent, Logger& logger){
+    return new MultiSwitchSystem(parent, *this, logger);
 }
 
 
 MultiSwitchSystem::MultiSwitchSystem(
     QWidget& parent,
     MultiSwitchSystemFactory& factory,
-    OutputWindow& log_window
+    Logger& logger
 )
     : SwitchSetup(parent, factory)
     , m_factory(factory)
-    , m_log_window(log_window)
+    , m_logger(logger)
     , m_videos(nullptr)
 {
     QVBoxLayout* vbox = new QVBoxLayout(this);
@@ -154,7 +154,7 @@ void MultiSwitchSystem::redraw_videos(size_t count){
     m_factory.resize(count);
     for (size_t c = 0; c < m_factory.m_active_switches; c++){
         const auto& item = m_factory.m_switches[c];
-        m_switches.emplace_back((SwitchSystem*)item->make_ui(*this, m_log_window));
+        m_switches.emplace_back((SwitchSystem*)item->make_ui(*this, m_logger));
     }
 
     m_videos = new QWidget(this);

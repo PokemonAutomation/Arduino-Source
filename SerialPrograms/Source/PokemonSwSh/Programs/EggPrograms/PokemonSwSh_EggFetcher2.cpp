@@ -36,8 +36,8 @@ EggFetcher2::EggFetcher2(const EggFetcher2_Descriptor& descriptor)
         2000
     )
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
-    m_options.emplace_back(&MAX_FETCH_ATTEMPTS, "MAX_FETCH_ATTEMPTS");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(MAX_FETCH_ATTEMPTS);
 }
 
 

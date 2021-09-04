@@ -6,7 +6,7 @@
 
 #include "SwitchDigitEntry.h"
 
-#include <string.h>
+#include <cstring>
 #include <sstream>
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/SwitchRoutines/SwitchDigitEntry.h"

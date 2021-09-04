@@ -39,9 +39,9 @@ BeamReset::BeamReset(const BeamReset_Descriptor& descriptor)
         false
     )
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
-    m_options.emplace_back(&DELAY_BEFORE_RESET, "DELAY_BEFORE_RESET");
-    m_options.emplace_back(&EXTRA_LINE, "EXTRA_LINE");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(DELAY_BEFORE_RESET);
+    PA_ADD_OPTION(EXTRA_LINE);
 }
 
 void BeamReset::program(SingleSwitchProgramEnvironment& env){

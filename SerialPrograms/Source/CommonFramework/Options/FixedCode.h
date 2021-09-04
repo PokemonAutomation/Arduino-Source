@@ -35,6 +35,7 @@ public:
 
 private:
     friend class FixedCodeUI;
+    QString m_label;
     const size_t m_digits;
     const QString m_default;
     QString m_current;

@@ -40,9 +40,9 @@ LotoFarmer::LotoFarmer(const LotoFarmer_Descriptor& descriptor)
         "9 * TICKS_PER_SECOND"
     )
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
-    m_options.emplace_back(&SKIPS, "SKIPS");
-    m_options.emplace_back(&MASH_B_DURATION, "MASH_B_DURATION");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(SKIPS);
+    PA_ADD_OPTION(MASH_B_DURATION);
 }
 
 void LotoFarmer::program(SingleSwitchProgramEnvironment& env){

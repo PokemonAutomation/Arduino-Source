@@ -8,10 +8,10 @@
 #define PokemonAutomation_PokemonSwSh_DexRecFinder_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/BooleanCheckBox.h"
-#include "CommonFramework/Options/LanguageOCR.h"
+#include "CommonFramework/OCR/LanguageOptionOCR.h"
 #include "Pokemon/Options/Pokemon_NameSelect.h"
-#include "Pokemon/Pokemon_NameReader.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
+#include "NintendoSwitch/Options/GoHomeWhenDone.h"
 #include "NintendoSwitch/Options/TimeExpression.h"
 #include "NintendoSwitch/Options/StartInGripMenu.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
@@ -19,6 +19,7 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+using namespace Pokemon;
 
 
 class DexRecFinder_Descriptor : public RunnableSwitchProgramDescriptor{
@@ -41,7 +42,7 @@ private:
         bool& bad_read,
         Logger& logger,
         const QImage& frame,
-        const InferenceBox& box,
+        const ImageFloatBox& box,
         const std::set<std::string>& desired
     );
 
@@ -50,12 +51,9 @@ private:
 
 private:
     StartInGripOrGame START_IN_GRIP_MENU;
+    GoHomeWhenDone GO_HOME_WHEN_DONE;
 
-    Pokemon::PokemonNameReader m_name_reader;
-
-    BooleanCheckBox GO_HOME_WHEN_DONE;
-
-    LanguageOCR LANGUAGE;
+    OCR::LanguageOCR LANGUAGE;
     Pokemon::PokemonNameSelect DESIRED;
     TimeExpression<uint16_t> VIEW_TIME;
 

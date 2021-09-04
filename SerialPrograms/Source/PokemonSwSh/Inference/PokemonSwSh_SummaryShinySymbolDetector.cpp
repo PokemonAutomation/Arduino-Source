@@ -7,9 +7,9 @@
  *
  */
 
+#include "CommonFramework/ImageTools/ColorClustering.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/Inference/InferenceThrottler.h"
-#include "CommonFramework/Inference/ColorClustering.h"
 #include "PokemonSwSh_SummaryShinySymbolDetector.h"
 
 namespace PokemonAutomation{
@@ -17,17 +17,14 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-SummaryShinySymbolDetector::SummaryShinySymbolDetector(VideoFeed& feed, Logger& logger)
-    : m_feed(feed)
-    , m_logger(logger)
-    , m_state0_box(feed, 0.02, 0.84, 0.1, 0.1)
-    , m_state1_box(feed, 0.02, 0.97, 0.5, 0.02)
-    , m_symbol_box(feed, 0.08, 0.53, 0.02, 0.05)
+SummaryShinySymbolDetector::SummaryShinySymbolDetector(Logger& logger, VideoOverlay& overlay)
+    : m_logger(logger)
+    , m_state0_box(overlay, 0.02, 0.84, 0.1, 0.1)
+    , m_state1_box(overlay, 0.02, 0.97, 0.5, 0.02)
+    , m_symbol_box(overlay, 0.08, 0.53, 0.02, 0.05)
 {}
 
-SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::detect_now(){
-    QImage screen = m_feed.snapshot();
-
+SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::detect(const QImage& screen){
     {
         QImage state = extract_box(screen, m_state1_box);
         if (pixel_stddev(state).sum() > 10){
@@ -71,6 +68,7 @@ SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::detect_now(){
 }
 SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::wait_for_detection(
     ProgramEnvironment& env,
+    VideoFeed& feed,
     std::chrono::seconds timeout
 ){
     Detection last_detection = Detection::NO_DETECTION;
@@ -80,7 +78,7 @@ SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::wait_for_detec
     while (true){
         env.check_stopping();
 
-        Detection detection = detect_now();
+        Detection detection = detect(feed.snapshot());
         if (detection == last_detection){
             confirmations++;
         }else{

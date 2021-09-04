@@ -11,6 +11,7 @@
 #include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/OCR/RawOCR.h"
 #include "CommonFramework/OCR/Filtering.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh_DexRecFinder.h"
 
 namespace PokemonAutomation{
@@ -33,13 +34,10 @@ DexRecFinder_Descriptor::DexRecFinder_Descriptor()
 
 DexRecFinder::DexRecFinder(const DexRecFinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(
-        "<b>Go Home when Done:</b><br>After finding a match, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
-        false
-    )
+    , GO_HOME_WHEN_DONE(false)
     , LANGUAGE(
         "<b>Game Language:</b>",
-        m_name_reader.languages(), false
+        PokemonNameReader::instance().languages(), false
     )
     , DESIRED(
         "<b>Desired " + STRING_POKEMON + ":</b><br>Stop when it finds this " + STRING_POKEMON + ". Requires the language be set.",
@@ -61,15 +59,15 @@ DexRecFinder::DexRecFinder(const DexRecFinder_Descriptor& descriptor)
         "3 * TICKS_PER_SECOND"
     )
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
-    m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
 
-    m_options.emplace_back(&LANGUAGE, "LANGUAGE");
-    m_options.emplace_back(&DESIRED, "DESIRED");
-    m_options.emplace_back(&VIEW_TIME, "VIEW_TIME");
-    m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&ENTER_POKEDEX_TIME, "ENTER_POKEDEX_TIME");
-    m_options.emplace_back(&BACK_OUT_TIME, "BACK_OUT_TIME");
+    PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(DESIRED);
+    PA_ADD_OPTION(VIEW_TIME);
+    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_OPTION(ENTER_POKEDEX_TIME);
+    PA_ADD_OPTION(BACK_OUT_TIME);
 }
 
 
@@ -98,20 +96,20 @@ void DexRecFinder::read_line(
     bool& bad_read,
     Logger& logger,
     const QImage& frame,
-    const InferenceBox& box,
+    const ImageFloatBox& box,
     const std::set<std::string>& desired
 ){
     QImage image = extract_box(frame, box);
     OCR::make_OCR_filter(image).apply(image);
 
-    OCR::MatchResult result = m_name_reader.read_substring(LANGUAGE, image);
-    result.log(&logger);
+    OCR::MatchResult result = PokemonNameReader::instance().read_substring(LANGUAGE, image);
+    result.log(logger);
 
-    if (!result.matched || result.tokens.empty()){
+    if (!result.matched || result.slugs.empty()){
         bad_read = true;
         return;
     }
-    for (const std::string& hit : result.tokens){
+    for (const std::string& hit : result.slugs){
         if (desired.find(hit) != desired.end()){
             found = true;
         }
@@ -140,10 +138,10 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env){
 
         if (LANGUAGE){
             env.console.botbase().wait_for_all_requests();
-            InferenceBoxScope box0(env.console, InferenceBox(0.75, 0.531 + 0 * 0.1115, 0.18, 0.059));
-            InferenceBoxScope box1(env.console, InferenceBox(0.75, 0.531 + 1 * 0.1115, 0.18, 0.059));
-            InferenceBoxScope box2(env.console, InferenceBox(0.75, 0.531 + 2 * 0.1115, 0.18, 0.059));
-            InferenceBoxScope box3(env.console, InferenceBox(0.75, 0.531 + 3 * 0.1115, 0.18, 0.059));
+            InferenceBoxScope box0(env.console, ImageFloatBox(0.75, 0.531 + 0 * 0.1115, 0.18, 0.059));
+            InferenceBoxScope box1(env.console, ImageFloatBox(0.75, 0.531 + 1 * 0.1115, 0.18, 0.059));
+            InferenceBoxScope box2(env.console, ImageFloatBox(0.75, 0.531 + 2 * 0.1115, 0.18, 0.059));
+            InferenceBoxScope box3(env.console, ImageFloatBox(0.75, 0.531 + 3 * 0.1115, 0.18, 0.059));
             pbf_press_button(env.console, BUTTON_A, 10, ENTER_POKEDEX_TIME);
             env.console.botbase().wait_for_all_requests();
 
@@ -151,10 +149,10 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env){
             bool found = false;
             bool bad_read = false;
             if (!frame.isNull()){
-                read_line(found, bad_read, env.logger(), frame, box0, desired);
-                read_line(found, bad_read, env.logger(), frame, box1, desired);
-                read_line(found, bad_read, env.logger(), frame, box2, desired);
-                read_line(found, bad_read, env.logger(), frame, box3, desired);
+                read_line(found, bad_read, env.console, frame, box0, desired);
+                read_line(found, bad_read, env.console, frame, box1, desired);
+                read_line(found, bad_read, env.console, frame, box2, desired);
+                read_line(found, bad_read, env.console, frame, box3, desired);
             }else{
                 bad_read = true;
             }

@@ -48,6 +48,7 @@ public:
 
 private:
     friend class RandomCodeUI;
+    QString m_label;
     const RaidCode m_default;
     RaidCode m_current;
 };

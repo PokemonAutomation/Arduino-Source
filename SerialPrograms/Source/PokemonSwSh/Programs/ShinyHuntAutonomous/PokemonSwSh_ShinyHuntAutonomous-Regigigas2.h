@@ -8,14 +8,14 @@
 #define PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousRegigigas2_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/BooleanCheckBox.h"
 #include "CommonFramework/Options/SimpleInteger.h"
 #include "NintendoSwitch/Options/TimeExpression.h"
 #include "NintendoSwitch/Options/StartInGripMenu.h"
 #include "NintendoSwitch/Options/GoHomeWhenDone.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
-#include "PokemonSwSh/Options/EncounterFilter.h"
+#include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
+#include "PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -42,16 +42,13 @@ private:
 private:
     StartInGripOrGame START_IN_GRIP_MENU;
     GoHomeWhenDone GO_HOME_WHEN_DONE;
+    TouchDateInterval TOUCH_DATE_INTERVAL;
 
     SimpleInteger<uint8_t> REVERSAL_PP;
-    EncounterFilter FILTER;
-
-    TimeExpression<uint32_t> TOUCH_DATE_INTERVAL;
-    Pokemon::EncounterBotNotifications NOTIFICATION_LEVEL;
+    EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
 
     SectionDivider m_advanced_options;
     TimeExpression<uint16_t> CATCH_TO_OVERWORLD_DELAY;
-    BooleanCheckBox VIDEO_ON_SHINY;
 };
 
 }

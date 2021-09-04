@@ -10,8 +10,8 @@
 #include <QMainWindow>
 #include <QVBoxLayout>
 #include "CommonFramework/Panels/Panel.h"
+#include "CommonFramework/Tools/FileWindowLogger.h"
 #include "PanelLists.h"
-#include "OutputWindow.h"
 
 namespace PokemonAutomation{
 
@@ -33,7 +33,7 @@ private:
 
     virtual void on_panel_construct(std::unique_ptr<PanelInstance> panel) override;
 public: //  Make private.
-    virtual OutputWindow& output_window() override{ return *m_output_window; }
+    virtual Logger& logger() override{ return global_logger(); }
 private:
     virtual void on_busy(PanelInstance& panel) override;
     virtual void on_idle(PanelInstance& panel) override;
@@ -51,7 +51,7 @@ private:
     std::unique_ptr<PanelInstance> m_current_panel;
     QWidget* m_current_panel_widget;
 
-    std::unique_ptr<OutputWindow> m_output_window;
+    std::unique_ptr<FileWindowLoggerWindow> m_output_window;
 };
 
 

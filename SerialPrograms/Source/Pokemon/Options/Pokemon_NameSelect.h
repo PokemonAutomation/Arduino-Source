@@ -15,18 +15,19 @@ namespace Pokemon{
 
 struct PokemonNameSelectData{
     PokemonNameSelectData(const QString& json_file_slugs);
-    const std::vector<QString>& cases() const{ return m_list; }
+    const std::vector<std::pair<QString, QIcon>>& cases() const{ return m_list; }
 
 protected:
-    std::vector<QString> m_list;
+    std::vector<std::pair<QString, QIcon>> m_list;
 };
 
 
-class PokemonNameSelect : public PokemonNameSelectData, public StringSelect{
+class PokemonNameSelect : private PokemonNameSelectData, public StringSelect{
 public:
     PokemonNameSelect(
         QString label,
-        const QString& json_file_slugs
+        const QString& json_file_slugs,
+        const std::string& default_slug = ""
     );
 
     const std::string& slug() const;

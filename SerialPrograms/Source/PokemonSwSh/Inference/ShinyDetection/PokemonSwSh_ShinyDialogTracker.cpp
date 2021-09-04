@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/Inference/ImageTools.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_StartBattleDetector.h"
+#include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
 #include "PokemonSwSh_ShinyDialogTracker.h"
 
 #include <iostream>
@@ -17,9 +17,9 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-ShinyDialogTracker::ShinyDialogTracker(VideoFeed& feed, Logger& logger)
+ShinyDialogTracker::ShinyDialogTracker(VideoOverlay& overlay, Logger& logger)
     : m_logger(logger)
-    , m_dialog(feed)
+    , m_dialog(overlay)
     , m_end_dialog(std::chrono::system_clock::now())
     , m_dialog_on(false)
     , m_state(EncounterState::BEFORE_ANYTHING)

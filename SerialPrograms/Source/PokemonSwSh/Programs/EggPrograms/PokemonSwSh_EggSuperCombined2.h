@@ -13,7 +13,8 @@
 #include "NintendoSwitch/Options/TimeExpression.h"
 #include "NintendoSwitch/Options/StartInGripMenu.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
-#include "PokemonSwSh/Options/EggStepCount.h"
+#include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
+#include "PokemonSwSh/Options/PokemonSwSh_EggStepCount.h"
 #include "PokemonSwSh_EggHelpers.h"
 
 namespace PokemonAutomation{
@@ -36,13 +37,13 @@ public:
 
 private:
     StartInGripOrGame START_IN_GRIP_MENU;
+    TouchDateInterval TOUCH_DATE_INTERVAL;
 
     SimpleInteger<uint8_t> BOXES_TO_RELEASE;
     SimpleInteger<uint8_t> BOXES_TO_SKIP;
     SimpleInteger<uint8_t> BOXES_TO_HATCH;
     EggStepCount STEPS_TO_HATCH;
     FloatingPoint FETCHES_PER_BATCH;
-    TimeExpression<uint32_t> TOUCH_DATE_INTERVAL;
     SectionDivider m_advanced_options;
     TimeExpression<uint16_t> SAFETY_TIME;
     TimeExpression<uint16_t> EARLY_HATCH_SAFETY;

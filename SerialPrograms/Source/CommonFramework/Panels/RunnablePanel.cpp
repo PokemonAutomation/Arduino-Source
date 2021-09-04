@@ -17,35 +17,17 @@ namespace PokemonAutomation{
 
 
 void RunnablePanelInstance::from_json(const QJsonValue& json){
-    const QJsonObject& obj = json.toObject();
-    for (auto& item : m_options){
-        if (!item.second.isEmpty()){
-            item.first->load_json(json_get_value_nothrow(obj, item.second));
-        }
-    }
+    m_options.load_json(json);
 }
 QJsonValue RunnablePanelInstance::to_json() const{
-    QJsonObject obj;
-    for (auto& item : m_options){
-        if (!item.second.isEmpty()){
-            obj.insert(item.second, item.first->to_json());
-        }
-    }
-    return obj;
+    return m_options.to_json();
 }
 
 bool RunnablePanelInstance::is_valid() const{
-    for (const auto& item : m_options){
-        if (!item.first->is_valid()){
-            return false;
-        }
-    }
-    return true;
+    return m_options.is_valid();
 }
 void RunnablePanelInstance::restore_defaults(){
-    for (const auto& item : m_options){
-        item.first->restore_defaults();
-    }
+    m_options.restore_defaults();
 }
 
 
@@ -65,23 +47,6 @@ RunnablePanelWidget::~RunnablePanelWidget(){
 }
 
 
-#if 0
-bool RunnablePanelWidget::reset_serial(){
-    switch (state()){
-    case ProgramState::STOPPED:
-        m_logger.log("Received Reset Request");
-        return true;
-    case ProgramState::RUNNING:
-    case ProgramState::FINISHED:
-        m_logger.log("Received Reset Request: Program is running.");
-        return false;
-    case ProgramState::STOPPING:
-        m_logger.log("Received Reset Request: Program is stopping.");
-        return false;
-    }
-    return false;
-}
-#endif
 bool RunnablePanelWidget::start(){
     bool ret = false;
     switch (state()){
@@ -150,7 +115,7 @@ RunnablePanelWidget::RunnablePanelWidget(
     PanelListener& listener
 )
     : PanelWidget(parent, instance, listener)
-    , m_logger(listener.output_window(), "Program")
+    , m_logger(listener.logger(), "Program")
     , m_status_bar(nullptr)
     , m_start_button(nullptr)
     , m_state(ProgramState::STOPPED)
@@ -162,6 +127,10 @@ RunnablePanelWidget::RunnablePanelWidget(
     connect(
         this, &RunnablePanelWidget::async_stop,
         this, &RunnablePanelWidget::stop
+    );
+    connect(
+        this, &RunnablePanelWidget::async_set_status,
+        this, &RunnablePanelWidget::set_status
     );
 }
 void RunnablePanelWidget::construct(){
@@ -185,16 +154,13 @@ QWidget* RunnablePanelWidget::make_options(QWidget& parent){
     options_layout->setAlignment(Qt::AlignTop);
 
     RunnablePanelInstance& instance = static_cast<RunnablePanelInstance&>(m_instance);
-    for (auto& item : instance.m_options){
-        m_options.emplace_back(item.first->make_ui(parent));
-        options_layout->addWidget(m_options.back()->widget());
-    }
+    m_options = static_cast<BatchOptionUI*>(instance.m_options.make_ui(parent));
+    options_layout->addWidget(m_options);
 
     return options_widget;
 }
 QLabel* RunnablePanelWidget::make_status_bar(QWidget& parent){
     QLabel* status_bar = new QLabel(&parent);
-    status_bar = new QLabel(&parent);
     status_bar->setVisible(false);
     status_bar->setAlignment(Qt::AlignCenter);
 //    status_bar->setText("<b>Encounters: 1,267 - Corrections: 0 - Star Shinies: 1 - Square Shinies: 0</b>");
@@ -270,9 +236,7 @@ bool RunnablePanelWidget::settings_valid() const{
     return instance.is_valid();
 }
 void RunnablePanelWidget::restore_defaults(){
-    for (ConfigOptionUI* item : m_options){
-        item->restore_defaults();
-    }
+    m_options->restore_defaults();
 }
 void RunnablePanelWidget::update_ui(){
     ProgramState state = m_state.load(std::memory_order_acquire);
@@ -302,9 +266,7 @@ void RunnablePanelWidget::update_ui(){
 
     bool enabled = state == ProgramState::STOPPED;
     m_default_button->setEnabled(enabled);
-    for (ConfigOptionUI* option : m_options){
-        option->widget()->setEnabled(enabled);
-    }
+    m_options->setEnabled(enabled);
 }
 
 

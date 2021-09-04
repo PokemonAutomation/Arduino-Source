@@ -19,8 +19,7 @@ public:
         QString label,
         QDate default_value
     )
-        : ConfigOption(label)
-        , SwitchDateOption(std::move(label), default_value)
+        : SwitchDateOption(std::move(label), default_value)
     {}
     virtual void load_json(const QJsonValue& json) override{
         return this->load_current(json);

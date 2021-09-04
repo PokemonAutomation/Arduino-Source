@@ -40,9 +40,9 @@ BerryFarmer::BerryFarmer(const BerryFarmer_Descriptor& descriptor)
         0
     )
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
-    m_options.emplace_back(&SKIPS, "SKIPS");
-    m_options.emplace_back(&SAVE_ITERATIONS, "SAVE_ITERATIONS");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(SKIPS);
+    PA_ADD_OPTION(SAVE_ITERATIONS);
 }
 
 void BerryFarmer::program(SingleSwitchProgramEnvironment& env){

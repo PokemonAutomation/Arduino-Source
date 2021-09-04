@@ -4,14 +4,16 @@
  *
  */
 
+#include <QJsonArray>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/FrameworkSettings.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
+#include "CommonFramework/Tools/DiscordWebHook.h"
 #include "CommonFramework/Tools/StatsTracking.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_BeamSetter.h"
+#include "PokemonSwSh/Inference/Dens/PokemonSwSh_BeamSetter.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
 #include "PokemonSwSh_PurpleBeamFinder.h"
 
@@ -71,16 +73,16 @@ PurpleBeamFinder::PurpleBeamFinder(const PurpleBeamFinder_Descriptor& descriptor
         5.0, 0
     )
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
-    m_options.emplace_back(&EXTRA_LINE, "EXTRA_LINE");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(EXTRA_LINE);
     if (PERSISTENT_SETTINGS().developer_mode){
-        m_options.emplace_back(&m_advanced_options, "");
-        m_options.emplace_back(&SAVE_SCREENSHOT, "SAVE_SCREENSHOT");
-        m_options.emplace_back(&TIMEOUT_DELAY, "TIMEOUT_DELAY");
-        m_options.emplace_back(&MIN_BRIGHTNESS, "MIN_BRIGHTNESS");
-        m_options.emplace_back(&MIN_EUCLIDEAN, "MIN_EUCLIDEAN");
-        m_options.emplace_back(&MIN_DELTA_STDDEV_RATIO, "MIN_DELTA_STDDEV_RATIO");
-        m_options.emplace_back(&MIN_SIGMA_STDDEV_RATIO, "MIN_SIGMA_STDDEV_RATIO");
+        PA_ADD_OPTION(m_advanced_options);
+        PA_ADD_OPTION(SAVE_SCREENSHOT);
+        PA_ADD_OPTION(TIMEOUT_DELAY);
+        PA_ADD_OPTION(MIN_BRIGHTNESS);
+        PA_ADD_OPTION(MIN_EUCLIDEAN);
+        PA_ADD_OPTION(MIN_DELTA_STDDEV_RATIO);
+        PA_ADD_OPTION(MIN_SIGMA_STDDEV_RATIO);
     }
 }
 
@@ -145,9 +147,8 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env){
 
         BeamSetter::Detection detection;
         {
-            BeamSetter setter(env.console, env.logger());
+            BeamSetter setter(env, env.console);
             detection = setter.run(
-                env, env.console,
                 SAVE_SCREENSHOT,
                 TIMEOUT_DELAY,
                 MIN_BRIGHTNESS,
@@ -184,11 +185,10 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env){
         );
     }
 
+    DiscordWebHook::send_message_old(true, "Found a purple beam", stats.make_discord_stats());
 
-    while (true){
-        pbf_press_button(env.console, BUTTON_B, 20, 20);
-        pbf_press_button(env.console, BUTTON_LCLICK, 20, 20);
-    }
+    end_program_callback(env.console);
+    end_program_loop(env.console);
 }
 
 

@@ -13,8 +13,8 @@
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Inference/VisualInferenceSession.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_StartBattleDetector.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_BattleMenuDetector.h"
+#include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
+#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_EncounterHandler.h"
 #include "PokemonSwSh_ShinyHuntAutonomous-Whistling.h"
@@ -40,12 +40,7 @@ ShinyHuntAutonomousWhistling_Descriptor::ShinyHuntAutonomousWhistling_Descriptor
 ShinyHuntAutonomousWhistling::ShinyHuntAutonomousWhistling(const ShinyHuntAutonomousWhistling_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
-    , LANGUAGE(m_name_reader)
-    , FILTER(true, true)
-    , TIME_ROLLBACK_HOURS(
-        "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
-        1, 0, 11
-    )
+    , ENCOUNTER_BOT_OPTIONS(true, true)
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -53,25 +48,16 @@ ShinyHuntAutonomousWhistling::ShinyHuntAutonomousWhistling(const ShinyHuntAutono
         "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
         "10 * TICKS_PER_SECOND"
     )
-    , VIDEO_ON_SHINY(
-        "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
-        true
-    )
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
-    m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(TIME_ROLLBACK_HOURS);
 
-    m_options.emplace_back(&LANGUAGE, "LANGUAGE");
-    m_options.emplace_back(&FILTER, "FILTER");
+    PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
 
-    m_options.emplace_back(&TIME_ROLLBACK_HOURS, "TIME_ROLLBACK_HOURS");
-    m_options.emplace_back(&NOTIFICATION_LEVEL, "NOTIFICATION_LEVEL");
-
-    m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&EXIT_BATTLE_TIMEOUT, "EXIT_BATTLE_TIMEOUT");
-    if (PERSISTENT_SETTINGS().developer_mode){
-        m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
-    }
+    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
 }
 
 
@@ -111,11 +97,9 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env){
     StandardEncounterHandler handler(
         m_descriptor.display_name(),
         env, env.console,
-        &m_name_reader, LANGUAGE,
-        stats,
-        FILTER,
-        VIDEO_ON_SHINY,
-        NOTIFICATION_LEVEL
+        LANGUAGE,
+        ENCOUNTER_BOT_OPTIONS,
+        stats
     );
 
     while (true){
@@ -131,7 +115,7 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env){
         {
             InterruptableCommandSession commands(env.console);
 
-            StandardBattleMenuDetector battle_menu_detector(env.console);
+            StandardBattleMenuDetector battle_menu_detector(env.console, false);
             battle_menu_detector.register_command_stop(commands);
 
             StartBattleDetector start_battle_detector(env.console);
@@ -162,13 +146,14 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env){
         }
 
         //  Detect shiny.
-        ShinyType shininess = detect_shiny_battle(
-            env, env.console,
+        ShinyDetectionResult result = detect_shiny_battle(
+            env.console,
+            env, env.console, env.console,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );
 
-        bool stop = handler.handle_standard_encounter_runaway(shininess, EXIT_BATTLE_TIMEOUT);
+        bool stop = handler.handle_standard_encounter_end_battle(result, EXIT_BATTLE_TIMEOUT);
         if (stop){
             break;
         }

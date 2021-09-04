@@ -20,8 +20,8 @@ namespace PokemonAutomation{
 
 class BlackScreenDetector : public VisualInferenceCallbackWithCommandStop{
 public:
-    BlackScreenDetector(VideoFeed& feed);
-    BlackScreenDetector(VideoFeed& feed, const InferenceBox& box);
+    BlackScreenDetector(VideoOverlay& overlay);
+    BlackScreenDetector(VideoOverlay& overlay, const ImageFloatBox& box);
 
     bool black_is_over(const QImage& frame);
     virtual bool on_frame(

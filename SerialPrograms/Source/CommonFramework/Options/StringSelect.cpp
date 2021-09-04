@@ -7,6 +7,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QCompleter>
+#include "Common/Cpp/Exception.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "StringSelect.h"
 
@@ -19,29 +20,56 @@ namespace PokemonAutomation{
 
 StringSelect::StringSelect(
     QString label,
-    std::vector<QString> cases,
-    size_t default_index
+    const std::vector<QString>& cases,
+    const QString& default_case
 )
-    : ConfigOption(std::move(label))
-    , m_case_list(std::move(cases))
-    , m_default(default_index)
-    , m_current(default_index)
+    : m_label(std::move(label))
+//    , m_case_list(std::move(cases))
+    , m_default(0)
+    , m_current(0)
 {
-    if (default_index >= m_case_list.size()){
-        throw "Index is too large.";
-    }
-
-    for (size_t index = 0; index < m_case_list.size(); index++){
-        const QString& item = m_case_list[index];
+    for (size_t index = 0; index < cases.size(); index++){
+        const QString& item = cases[index];
+        if (item == default_case){
+            m_default = index;
+        }
+        m_case_list.emplace_back(item, QIcon());
         auto ret = m_case_map.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(item),
             std::forward_as_tuple(index)
         );
         if (!ret.second){
-            throw "Duplicate enum label.";
+            PA_THROW_StringException("Duplicate enum label.");
         }
     }
+    m_current = m_default;
+}
+StringSelect::StringSelect(
+    QString label,
+    std::vector<std::pair<QString, QIcon>> cases,
+    const QString& default_case
+)
+    : m_label(std::move(label))
+    , m_case_list(std::move(cases))
+    , m_default(0)
+    , m_current(0)
+{
+    for (size_t index = 0; index < m_case_list.size(); index++){
+        const QString& item = m_case_list[index].first;
+        if (item == default_case){
+            m_default = index;
+        }
+        auto ret = m_case_map.emplace(
+            std::piecewise_construct,
+            std::forward_as_tuple(item),
+            std::forward_as_tuple(index)
+        );
+        if (!ret.second){
+            PA_THROW_StringException("Duplicate enum label.");
+        }
+    }
+    m_current = m_default;
 }
 
 void StringSelect::load_json(const QJsonValue& json){
@@ -55,7 +83,7 @@ void StringSelect::load_json(const QJsonValue& json){
     }
 }
 QJsonValue StringSelect::to_json() const{
-    return QJsonValue(m_case_list[m_current]);
+    return QJsonValue(m_case_list[m_current].first);
 }
 
 void StringSelect::restore_defaults(){
@@ -83,8 +111,8 @@ StringSelectUI::StringSelectUI(QWidget& parent, StringSelect& value)
     m_box->completer()->setCompletionMode(QCompleter::PopupCompletion);
     m_box->completer()->setFilterMode(Qt::MatchContains);
 
-    for (const QString& item : m_value.m_case_list){
-        m_box->addItem(item);
+    for (const auto& item : m_value.m_case_list){
+        m_box->addItem(item.second, item.first);
     }
     m_box->setCurrentIndex((int)m_value.m_current);
     layout->addWidget(m_box, 1);
@@ -97,7 +125,7 @@ StringSelectUI::StringSelectUI(QWidget& parent, StringSelect& value)
                 return;
             }
             m_value.m_current = index;
-            cout << "index = " << index << endl;
+//            cout << "index = " << index << endl;
         }
     );
 }

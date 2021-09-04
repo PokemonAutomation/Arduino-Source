@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_GenerateIVCheckerOCR_H
 
 #include "CommonFramework/Options/EnumDropdown.h"
-#include "CommonFramework/Options/LanguageOCR.h"
+#include "CommonFramework/OCR/LanguageOptionOCR.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
@@ -75,7 +75,7 @@ private:
 private:
     IVCheckerReader m_reader;
 
-    LanguageOCR LANGUAGE;
+    OCR::LanguageOCR LANGUAGE;
     IVCheckerOptionOCR HP;
     IVCheckerOptionOCR ATTACK;
     IVCheckerOptionOCR DEFENSE;

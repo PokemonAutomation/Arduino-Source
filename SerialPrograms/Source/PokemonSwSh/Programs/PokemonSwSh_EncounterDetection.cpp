@@ -6,6 +6,7 @@
 
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/Inference/VisualInferenceSession.h"
@@ -20,14 +21,14 @@ namespace PokemonSwSh{
 StandardEncounterDetection::StandardEncounterDetection(
     ProgramEnvironment& env,
     ConsoleHandle& console,
-    const Pokemon::PokemonNameReader* name_reader, Language language,
-    EncounterFilter& filter,
+    Language language,
+    const EncounterFilter& filter,
     ShinyType shininess,
     std::chrono::milliseconds read_name_delay
 )
     : m_env(env)
     , m_console(console)
-    , m_name_reader(name_reader), m_language(language)
+    , m_language(language)
     , m_filter(filter)
     , m_shininess(shininess)
     , m_read_name_delay(read_name_delay)
@@ -48,7 +49,7 @@ bool StandardEncounterDetection::is_shiny() const{
     return false;
 }
 const std::set<std::string>* StandardEncounterDetection::candidates(){
-    if (m_name_reader == nullptr || m_language == Language::None){
+    if (m_language == Language::None){
         m_name_read = true;
         return nullptr;
     }
@@ -57,17 +58,23 @@ const std::set<std::string>* StandardEncounterDetection::candidates(){
         return &m_candidates;
     }
 
-    InferenceBoxScope box(m_console, InferenceBox(0.76, 0.04, 0.15, 0.044));
+    InferenceBoxScope box(m_console, ImageFloatBox(0.76, 0.04, 0.15, 0.044));
     m_env.wait(m_read_name_delay);
 
-    QImage frame = m_console.video().snapshot();
+    QImage screen = m_console.video().snapshot();
+    QImage frame = screen;
     frame = extract_box(frame, box);
 
-    OCR::MatchResult result = m_name_reader->read_substring(m_language, frame);
-    result.log(&m_env.logger());
+    OCR::MatchResult result = PokemonNameReader::instance().read_substring(m_language, frame);
+    result.log(m_console);
 
     if (result.matched){
-        m_candidates = std::move(result.tokens);
+        m_candidates = std::move(result.slugs);
+    }else{
+        dump_image(
+            m_console, screen,
+            QString::fromStdString("StandardEncounterDetection-NameOCR-" + language_data(m_language).code)
+        );
     }
     m_name_read = true;
     return &m_candidates;
@@ -96,12 +103,15 @@ bool filter_match(ShinyType detection, ShinyFilter filter){
     return false;
 }
 
-bool StandardEncounterDetection::should_stop(){
+std::pair<EncounterAction, std::string> StandardEncounterDetection::get_action(){
     if (m_shininess == ShinyType::UNKNOWN){
-        return false;
+        return {EncounterAction::RunAway, ""};
     }
 
-    bool stop = filter_match(m_shininess, m_filter.shiny_filter());
+    std::pair<EncounterAction, std::string> action;
+    action.first = filter_match(m_shininess, m_filter.shiny_filter())
+        ? EncounterAction::StopProgram
+        : EncounterAction::RunAway;
 
     const std::vector<EncounterFilterOverrides>& overrides = m_filter.overrides();
     if (!overrides.empty()){
@@ -109,7 +119,7 @@ bool StandardEncounterDetection::should_stop(){
         if (candidates != nullptr){
             for (const EncounterFilterOverrides& override : overrides){
                 //  Not a token match.
-                if (candidates->find(override.slug) == candidates->end()){
+                if (candidates->find(override.pokemon_slug) == candidates->end()){
                     continue;
                 }
 
@@ -118,12 +128,13 @@ bool StandardEncounterDetection::should_stop(){
                     continue;
                 }
 
-                stop = override.stop;
+                action.first = override.action;
+                action.second = override.pokeball_slug;
             }
         }
     }
 
-    return stop;
+    return action;
 }
 
 

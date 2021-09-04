@@ -9,6 +9,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "BlackScreenDetector.h"
 
@@ -19,16 +20,16 @@ using std::endl;
 namespace PokemonAutomation{
 
 BlackScreenDetector::BlackScreenDetector(
-    VideoFeed& feed
+    VideoOverlay& overlay
 )
-    : m_box(feed, 0.1, 0.1, 0.8, 0.8)
+    : m_box(overlay, 0.1, 0.1, 0.8, 0.8)
     , m_has_been_black(false)
 {}
 BlackScreenDetector::BlackScreenDetector(
-    VideoFeed& feed,
-    const InferenceBox& box
+    VideoOverlay& overlay,
+    const ImageFloatBox& box
 )
-    : m_box(feed, box)
+    : m_box(overlay, box)
     , m_has_been_black(false)
 {}
 

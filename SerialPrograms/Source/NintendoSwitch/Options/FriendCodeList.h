@@ -30,6 +30,7 @@ public:
 
 private:
     friend class FriendCodeListUI;
+    QString m_label;
     std::vector<QString> m_lines;
 };
 

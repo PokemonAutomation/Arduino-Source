@@ -8,8 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_GenerateNameOCRData_H
 
 #include "CommonFramework/Options/EnumDropdown.h"
-#include "CommonFramework/Options/LanguageOCR.h"
-#include "Pokemon/Pokemon_NameReader.h"
+#include "CommonFramework/OCR/LanguageOptionOCR.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
 
@@ -40,7 +39,7 @@ public:
 private:
     void read(
         QJsonArray& output,
-        Logger* logger,
+        Logger& logger,
         QImage image
     ) const;
     void dump_images(
@@ -50,9 +49,7 @@ private:
     ) const;
 
 private:
-    Pokemon::PokemonNameReader m_reader;
-
-    LanguageOCR LANGUAGE;
+    OCR::LanguageOCR LANGUAGE;
     EnumDropdown POKEDEX;
     EnumDropdown MODE;
 };

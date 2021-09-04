@@ -36,7 +36,7 @@ FriendSearchDisconnect::FriendSearchDisconnect(const FriendSearchDisconnect_Desc
         1, 1, 8
     )
 {
-    m_options.emplace_back(&USER_SLOT, "USER_SLOT");
+    PA_ADD_OPTION(USER_SLOT);
 }
 
 void FriendSearchDisconnect::program(SingleSwitchProgramEnvironment& env) {

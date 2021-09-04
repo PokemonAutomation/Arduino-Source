@@ -33,7 +33,7 @@ public:
 
 private:
     friend class EnumDropdownUI;
-
+    QString m_label;
     std::vector<QString> m_case_list;
     std::map<QString, size_t> m_case_map;
     size_t m_default;

@@ -32,8 +32,8 @@ MultiGameFossil_Descriptor::MultiGameFossil_Descriptor()
 MultiGameFossil::MultiGameFossil(const MultiGameFossil_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
-    m_options.emplace_back(&GAME_LIST, "GAME_LIST");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(GAME_LIST);
 }
 
 void run_fossil_batch(

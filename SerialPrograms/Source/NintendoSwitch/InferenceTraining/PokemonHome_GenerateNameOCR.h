@@ -7,10 +7,9 @@
 #ifndef PokemonAutomation_PokemonHome_GenerateNameOCR_H
 #define PokemonAutomation_PokemonHome_GenerateNameOCR_H
 
-#include "CommonFramework/Options/LanguageOCR.h"
+#include "CommonFramework/OCR/LanguageOptionOCR.h"
 #include "NintendoSwitch/Options/TimeExpression.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
-#include "Pokemon/Pokemon_NameReader.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -32,9 +31,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    Pokemon::PokemonNameReader m_reader;
-
-    LanguageOCR LANGUAGE;
+    OCR::LanguageOCR LANGUAGE;
     TimeExpression<uint16_t> DELAY;
 };
 

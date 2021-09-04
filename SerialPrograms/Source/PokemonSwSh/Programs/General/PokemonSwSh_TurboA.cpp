@@ -30,7 +30,7 @@ TurboA_Descriptor::TurboA_Descriptor()
 TurboA::TurboA(const TurboA_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
 }
 
 void TurboA::program(SingleSwitchProgramEnvironment& env){

@@ -13,6 +13,7 @@
 #include "NintendoSwitch/Options/TimeExpression.h"
 #include "NintendoSwitch/Options/StartInGripMenu.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
+#include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -34,10 +35,10 @@ public:
 
 private:
     StartInGripOrGame START_IN_GRIP_MENU;
+    TimeRollbackHours TIME_ROLLBACK_HOURS;
 
     TimeExpression<uint16_t> EXIT_CAMP_TO_RUN_DELAY;
     BooleanCheckBox AIRPLANE_MODE;
-    SimpleInteger<uint8_t> TIME_ROLLBACK_HOURS;
     SectionDivider m_advanced_options;
     TimeExpression<uint16_t> ENTER_CAMP_DELAY;
 };

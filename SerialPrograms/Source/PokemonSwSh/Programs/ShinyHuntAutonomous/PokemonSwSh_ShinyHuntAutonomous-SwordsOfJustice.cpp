@@ -12,8 +12,8 @@
 #include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Inference/VisualInferenceWait.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_StartBattleDetector.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_BattleMenuDetector.h"
+#include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
+#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_EncounterHandler.h"
 #include "PokemonSwSh_ShinyHuntAutonomous-SwordsOfJustice.h"
@@ -39,16 +39,11 @@ ShinyHuntAutonomousSwordsOfJustice_Descriptor::ShinyHuntAutonomousSwordsOfJustic
 ShinyHuntAutonomousSwordsOfJustice::ShinyHuntAutonomousSwordsOfJustice(const ShinyHuntAutonomousSwordsOfJustice_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
-    , LANGUAGE(m_name_reader)
     , AIRPLANE_MODE(
         "<b>Airplane Mode:</b><br>Enable if airplane mode is on.",
         false
     )
-    , FILTER(true, false)
-    , TIME_ROLLBACK_HOURS(
-        "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
-        1, 0, 11
-    )
+    , ENCOUNTER_BOT_OPTIONS(true, false)
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -64,28 +59,19 @@ ShinyHuntAutonomousSwordsOfJustice::ShinyHuntAutonomousSwordsOfJustice(const Shi
         "<b>Enter Camp Delay:</b>",
         "8 * TICKS_PER_SECOND"
     )
-    , VIDEO_ON_SHINY(
-        "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
-        true
-    )
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
-    m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(TIME_ROLLBACK_HOURS);
 
-    m_options.emplace_back(&LANGUAGE, "LANGUAGE");
-    m_options.emplace_back(&AIRPLANE_MODE, "AIRPLANE_MODE");
-    m_options.emplace_back(&FILTER, "FILTER");
+    PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(AIRPLANE_MODE);
+    PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
 
-    m_options.emplace_back(&TIME_ROLLBACK_HOURS, "TIME_ROLLBACK_HOURS");
-    m_options.emplace_back(&NOTIFICATION_LEVEL, "NOTIFICATION_LEVEL");
-
-    m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&EXIT_BATTLE_TIMEOUT, "EXIT_BATTLE_TIMEOUT");
-    m_options.emplace_back(&POST_BATTLE_MASH_TIME, "POST_BATTLE_MASH_TIME");
-    m_options.emplace_back(&ENTER_CAMP_DELAY, "ENTER_CAMP_DELAY");
-    if (PERSISTENT_SETTINGS().developer_mode){
-        m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
-    }
+    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
+    PA_ADD_OPTION(POST_BATTLE_MASH_TIME);
+    PA_ADD_OPTION(ENTER_CAMP_DELAY);
 }
 
 
@@ -119,11 +105,9 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
     StandardEncounterHandler handler(
         m_descriptor.display_name(),
         env, env.console,
-        &m_name_reader, LANGUAGE,
-        stats,
-        FILTER,
-        VIDEO_ON_SHINY,
-        NOTIFICATION_LEVEL
+        LANGUAGE,
+        ENCOUNTER_BOT_OPTIONS,
+        stats
     );
 
     while (true){
@@ -151,7 +135,7 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
 
         {
             //  Wait for start of battle.
-            StandardBattleMenuDetector battle_menu_detector(env.console);
+            StandardBattleMenuDetector battle_menu_detector(env.console, false);
             StartBattleDetector start_back_detector(env.console);
             VisualInferenceWait inference(env, env.console, std::chrono::seconds(30));
             inference += battle_menu_detector;
@@ -160,14 +144,15 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
         }
 
         //  Detect shiny.
-        ShinyType shininess = detect_shiny_battle(
-            env, env.console,
+        ShinyDetectionResult result = detect_shiny_battle(
+            env.console,
+            env, env.console, env.console,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );
 //        shininess = ShinyDetection::SQUARE_SHINY;
 
-        bool stop = handler.handle_standard_encounter_runaway(shininess, EXIT_BATTLE_TIMEOUT);
+        bool stop = handler.handle_standard_encounter_end_battle(result, EXIT_BATTLE_TIMEOUT);
         if (stop){
             break;
         }

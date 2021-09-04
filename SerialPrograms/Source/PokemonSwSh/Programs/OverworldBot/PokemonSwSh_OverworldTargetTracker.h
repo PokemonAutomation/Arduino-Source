@@ -36,7 +36,7 @@ extern const std::vector<QString> MARK_PRIORITY_STRINGS;
 
 struct OverworldTarget{
     OverworldMark mark;
-    InferenceBox box;
+    ImageFloatBox box;
     Trajectory trajectory;
     double delta_x;
     double delta_y;
@@ -50,7 +50,7 @@ public:
 
 public:
     OverworldTargetTracker(
-        Logger& logger, VideoFeed& feed,
+        Logger& logger, VideoOverlay& overlay,
         std::chrono::milliseconds window,
         double mark_offset,
         MarkPriority mark_priority,
@@ -78,7 +78,7 @@ public:
 private:
     struct Mark{
         std::chrono::system_clock::time_point timestamp;
-        InferenceBox box;
+        ImageFloatBox box;
     };
 
     static void populate_targets(
@@ -96,7 +96,7 @@ private:
 
 private:
     Logger& m_logger;
-    VideoFeed& m_feed;
+    VideoOverlay& m_overlay;
     std::chrono::milliseconds m_window;
     double m_mark_offset;
     MarkPriority m_mark_priority;

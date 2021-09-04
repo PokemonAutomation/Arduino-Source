@@ -6,8 +6,14 @@
 
 #include <QCompleter>
 #include "Common/Cpp/Exception.h"
-#include "Pokemon/Pokemon_SpeciesDatabase.h"
+#include "CommonFramework/Tools/Logger.h"
+#include "Pokemon/Resources/Pokemon_PokemonNames.h"
+#include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
 #include "Pokemon_NameSelectWidget.h"
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace Pokemon{
@@ -24,21 +30,29 @@ NameSelectWidget::NameSelectWidget(
     this->completer()->setCompletionMode(QCompleter::PopupCompletion);
     this->completer()->setFilterMode(Qt::MatchContains);
 
-    const std::map<std::string, SpeciesData>& database = ALL_POKEMON();
     for (size_t index = 0; index < slugs.size(); index++){
+        using namespace NintendoSwitch::PokemonSwSh;
+
         const std::string& slug = slugs[index];
-        auto iter = database.find(slug);
-        if (iter == database.end()){
-            PA_THROW_StringException("Invalid slug: " + slug);
+        const PokemonSprite* sprites = get_pokemon_sprite_nothrow(slug);
+        if (sprites == nullptr){
+            this->addItem(
+                get_pokemon_name(slug).display_name()
+            );
+            global_logger().log("Missing sprite for: " + slug, "red");
+        }else{
+            this->addItem(
+                sprites->icon(),
+                get_pokemon_name(slug).display_name()
+            );
         }
-        this->addItem(iter->second.display_name());
         if (slug == current_slug){
             this->setCurrentIndex((int)index);
         }
     }
 }
 std::string NameSelectWidget::slug() const{
-    return species_display_name_to_slug_nothrow(currentText());
+    return parse_pokemon_name_nothrow(currentText());
 }
 
 

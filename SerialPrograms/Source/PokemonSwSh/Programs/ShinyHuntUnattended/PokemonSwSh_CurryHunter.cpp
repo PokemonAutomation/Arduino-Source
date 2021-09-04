@@ -65,10 +65,10 @@ CurryHunter::CurryHunter(const CurryHunter_Descriptor& descriptor)
         999
     )
 {
-    m_options.emplace_back(&WALK_UP_DELAY, "WALK_UP_DELAY");
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
-    m_options.emplace_back(&TAKE_VIDEO, "TAKE_VIDEO");
-    m_options.emplace_back(&ITERATIONS, "ITERATIONS");
+    PA_ADD_OPTION(WALK_UP_DELAY);
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(TAKE_VIDEO);
+    PA_ADD_OPTION(ITERATIONS);
 }
 
 
@@ -149,8 +149,8 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env){
 
             ReceivePokemonDetector receive_detector(env.console);
             ShinySparkleDetector shiny_detector(
-                env.console, env.logger(),
-                InferenceBox(0.1, 0.01, 0.8, 0.77)
+                env.console, env.console,
+                ImageFloatBox(0.1, 0.01, 0.8, 0.77)
             );
             AsyncVisualInferenceSession inference(env, env.console);
             inference += receive_detector;
@@ -219,10 +219,10 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env){
             env.console.botbase().wait_for_all_requests();
             ShinyType shininess = ShinyType::NOT_SHINY;
             if (receive_detector.triggered()){
+                shininess = shiny_detector.results();
 #if 1
                 stats.add_non_shiny();
 #else
-                shininess = shiny_detector.results();
                 switch (shininess){
                 case ShinyType::UNKNOWN:
                 case ShinyType::NOT_SHINY:

@@ -31,6 +31,7 @@ public:
     bool naughty_mode;
     bool developer_mode;
     bool log_everything;
+    bool save_debug_images;
 
     QString resource_path;
     QString training_data;

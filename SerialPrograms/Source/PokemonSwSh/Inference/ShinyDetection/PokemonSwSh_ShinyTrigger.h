@@ -27,10 +27,10 @@ struct ShinyImageAlpha{
 };
 
 struct ShinyImageDetection{
-    std::vector<PixelBox> balls;
-    std::vector<PixelBox> stars;
-    std::vector<PixelBox> squares;
-    std::vector<PixelBox> lines;
+    std::vector<ImagePixelBox> balls;
+    std::vector<ImagePixelBox> stars;
+    std::vector<ImagePixelBox> squares;
+    std::vector<ImagePixelBox> lines;
 
     void accumulate(
         const QImage& image, uint64_t frame_counter,

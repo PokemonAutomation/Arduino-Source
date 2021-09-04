@@ -24,8 +24,7 @@ public:
         Type min_value = std::numeric_limits<Type>::min(),
         Type max_value = std::numeric_limits<Type>::max()
     )
-        : ConfigOption(label)
-        , TimeExpressionOption<Type>(backing, std::move(label), min_value, max_value, default_value)
+        : TimeExpressionOption<Type>(backing, std::move(label), min_value, max_value, default_value)
     {}
     TimeExpression(
         QString label,
@@ -33,8 +32,7 @@ public:
         Type min_value = std::numeric_limits<Type>::min(),
         Type max_value = std::numeric_limits<Type>::max()
     )
-        : ConfigOption(label)
-        , TimeExpressionOption<Type>(std::move(label), min_value, max_value, default_value)
+        : TimeExpressionOption<Type>(std::move(label), min_value, max_value, default_value)
     {}
 
     virtual void load_json(const QJsonValue& json) override{

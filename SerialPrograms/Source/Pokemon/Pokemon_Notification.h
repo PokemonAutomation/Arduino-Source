@@ -22,16 +22,14 @@ namespace Pokemon{
 
 
 void send_encounter_notification(
-    Logger* logger,
+    Logger& logger,
     const QString& program,
     const std::set<std::string>* slugs,
-    ShinyType shiny,
+    const ShinyDetectionResult& result, EncounterBotScreenshot screenshot,
     const StatsTracker* session_stats = nullptr,
     const EncounterFrequencies* frequencies = nullptr,
     const StatsTracker* alltime_stats = nullptr
 );
-
-
 class EncounterNotificationSender{
 public:
     EncounterNotificationSender(
@@ -40,10 +38,10 @@ public:
     );
 
     void send_notification(
-        Logger* logger,
+        Logger& logger,
         const QString& program,
         const std::set<std::string>* slugs,
-        ShinyType shiny,
+        const ShinyDetectionResult& result, EncounterBotScreenshot screenshot,
         const StatsTracker* session_stats = nullptr,
         const EncounterFrequencies* frequencies = nullptr,
         const StatsTracker* alltime_stats = nullptr
@@ -54,6 +52,16 @@ private:
     std::chrono::seconds m_notification_period;
     std::chrono::system_clock::time_point m_last_notification;
 };
+
+
+
+void send_catch_notification(
+    Logger& logger,
+    const QString& program,
+    const std::set<std::string>* pokemon_slugs,
+    const std::string& ball_slug, int balls_used,
+    bool success, bool ping
+);
 
 
 

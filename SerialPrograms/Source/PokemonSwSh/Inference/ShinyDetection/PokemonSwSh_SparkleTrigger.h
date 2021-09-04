@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_SparkleTrigger_H
 #define PokemonAutomation_PokemonSwSh_SparkleTrigger_H
 
-#include "CommonFramework/Inference/FillMatrix.h"
-#include "CommonFramework/Inference/FillGeometry.h"
+#include "CommonFramework/ImageTools/CellMatrix.h"
+#include "CommonFramework/ImageTools/FillGeometry.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -20,7 +20,7 @@ class SparkleDetector{
 
 public:
     SparkleDetector(
-        const FillMatrix& matrix,
+        const CellMatrix& matrix,
         const FillGeometry& box,
         double percentile = 0.85
     );
@@ -31,7 +31,7 @@ public:
 
 private:
     FillGeometry m_box;
-    FillMatrix m_matrix;
+    CellMatrix m_matrix;
     double m_percentile;
 
     std::multimap<int64_t, FillGeometry> m_regions;

@@ -6,8 +6,7 @@
 
 #include <cmath>
 #include "Common/Compiler.h"
-#include "CommonFramework/Inference/FillMatrix.h"
-#include "CommonFramework/Inference/FillGeometry.h"
+#include "CommonFramework/ImageTools/FillGeometry.h"
 #include "PokemonSwSh_ShinyFilters.h"
 #include "PokemonSwSh_SparkleTrigger.h"
 #include "PokemonSwSh_SquareDetector.h"
@@ -42,7 +41,7 @@ void ShinyImageDetection::accumulate(
 //    cout << "Image Check: " << std::chrono::duration_cast<std::chrono::milliseconds>(time1 - time0).count() << endl;
 
 //    auto time0 = std::chrono::system_clock::now();
-    FillMatrix matrix(image);
+    CellMatrix matrix(image);
 //    auto time1 = std::chrono::system_clock::now();
 //    cout << "Matrix: " << std::chrono::duration_cast<std::chrono::milliseconds>(time1 - time0).count() << endl;
 

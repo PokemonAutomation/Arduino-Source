@@ -8,14 +8,14 @@
 #define PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousStrongSpawn_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/BooleanCheckBox.h"
 #include "CommonFramework/Options/SimpleInteger.h"
 #include "NintendoSwitch/Options/TimeExpression.h"
 #include "NintendoSwitch/Options/StartInGripMenu.h"
 #include "NintendoSwitch/Options/GoHomeWhenDone.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
-#include "PokemonSwSh/Options/EncounterFilter.h"
+#include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
+#include "PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -39,17 +39,12 @@ public:
 private:
     StartInGripOrClosed START_IN_GRIP_MENU;
     GoHomeWhenDone GO_HOME_WHEN_DONE;
+    TimeRollbackHours TIME_ROLLBACK_HOURS;
 
-    Pokemon::PokemonNameReader m_name_reader;
     Pokemon::EncounterBotLanguage LANGUAGE;
+    EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
 
-    EncounterFilter FILTER;
-
-    SimpleInteger<uint8_t> TIME_ROLLBACK_HOURS;
-    Pokemon::EncounterBotNotifications NOTIFICATION_LEVEL;
-
-    SectionDivider m_advanced_options;
-    BooleanCheckBox VIDEO_ON_SHINY;
+//    SectionDivider m_advanced_options;
 };
 
 }

@@ -28,16 +28,16 @@ public:
     };
 
 public:
-    SummaryShinySymbolDetector(VideoFeed& feed, Logger& logger);
+    SummaryShinySymbolDetector(Logger& logger, VideoOverlay& overlay);
 
-    Detection detect_now();
+    Detection detect(const QImage& screen);
     Detection wait_for_detection(
         ProgramEnvironment& env,
+        VideoFeed& feed,
         std::chrono::seconds timeout = std::chrono::seconds(10)
     );
 
 private:
-    VideoFeed& m_feed;
     Logger& m_logger;
     InferenceBoxScope m_state0_box;
     InferenceBoxScope m_state1_box;

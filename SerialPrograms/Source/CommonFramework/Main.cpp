@@ -4,6 +4,7 @@
 #include "PersistentSettings.h"
 #include "CrashDump.h"
 #include "Tools/StatsDatabase.h"
+#include "Tools/Logger.h"
 #include "Windows/MainWindow.h"
 
 #include <iostream>
@@ -27,7 +28,7 @@ int main(int argc, char *argv[]){
     try{
         PERSISTENT_SETTINGS().read();
     }catch (const StringException& error){
-        cout << error.what() << endl;
+        global_logger().log(error.what(), "red");
     }
 
 #if 0

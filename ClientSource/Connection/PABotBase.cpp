@@ -174,35 +174,37 @@ void PABotBase::process_ack_request(BotBaseMessage message){
     const Params* params = (const Params*)message.body.c_str();
     seqnum_t seqnum = params->seqnum;
 
-    std::map<uint64_t, PendingRequest>::iterator iter;
+    AckState state;
     {
-        SpinLockGuard lg(m_state_lock, "PABotBase::process_ack_request() - 0");
+        SpinLockGuard lg(m_state_lock, "PABotBase::process_ack_request()");
+
         if (m_pending_requests.empty()){
             m_sniffer->log("Unexpected request ack message: seqnum = " + std::to_string(seqnum));
             return;
         }
 
         uint64_t full_seqnum = infer_full_seqnum(m_pending_requests, seqnum);
-        iter = m_pending_requests.find(full_seqnum);
+        std::map<uint64_t, PendingRequest>::iterator iter = m_pending_requests.find(full_seqnum);
         if (iter == m_pending_requests.end()){
             m_sniffer->log("Unexpected request ack message: seqnum = " + std::to_string(seqnum));
             return;
+        }
+
+        state = iter->second.state;
+        if (state == AckState::NOT_ACKED){
+            if (iter->second.silent_remove){
+                m_pending_requests.erase(iter);
+            }else{
+                iter->second.state = AckState::ACKED;
+                iter->second.ack = std::move(message);
+            }
         }
     }
 
     m_last_ack.store(std::chrono::system_clock::now(), std::memory_order_release);
 
-    switch (iter->second.state){
+    switch (state){
     case AckState::NOT_ACKED:
-//        std::cout << "acked: " << full_seqnum << std::endl;
-        {
-            SpinLockGuard lg(m_state_lock, "PABotBase::process_ack_request() - 1");
-            iter->second.state = AckState::ACKED;
-            iter->second.ack = std::move(message);
-            if (iter->second.silent_remove){
-                m_pending_requests.erase(iter);
-            }
-        }
         {
             std::lock_guard<std::mutex> lg(m_sleep_lock);
             m_cv.notify_all();

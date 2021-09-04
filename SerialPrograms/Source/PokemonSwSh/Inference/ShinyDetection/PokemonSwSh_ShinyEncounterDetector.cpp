@@ -9,8 +9,8 @@
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CommonFramework/Inference/TimeWindowStatTracker.h"
 #include "CommonFramework/Inference/InferenceThrottler.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_StartBattleDetector.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_BattleMenuDetector.h"
+#include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
+#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyDialogTracker.h"
 #include "PokemonSwSh_ShinyTrigger.h"
 #include "PokemonSwSh_ShinyEncounterDetector.h"
@@ -24,20 +24,28 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-const ShinyDetectionBattle SHINY_BATTLE_REGULAR {{0.5, 0.05, 0.5, 0.70}, std::chrono::milliseconds(2300)};
-const ShinyDetectionBattle SHINY_BATTLE_RAID    {{0.3, 0.01, 0.7, 0.75}, std::chrono::milliseconds(3900)};
+const ShinyDetectionBattle SHINY_BATTLE_REGULAR {false, {0.5, 0.05, 0.5, 0.70}, std::chrono::milliseconds(2300)};
+const ShinyDetectionBattle SHINY_BATTLE_RAID    {true,  {0.3, 0.01, 0.7, 0.75}, std::chrono::milliseconds(3900)};
 
 
 
 class ShinyEncounterDetector{
 public:
     ShinyEncounterDetector(
-        VideoFeed& feed, Logger& logger,
+        Logger& logger, VideoOverlay& overlay,
         const ShinyDetectionBattle& battle_settings,
         double detection_threshold
     );
 
-    ShinyType results() const;
+    ShinyType shiny_type() const;
+    const QImage& best() const{ return m_best; }
+
+    ShinyDetectionResult results(){
+        ShinyDetectionResult result;
+        result.shiny_type = shiny_type();
+        result.best_screenshot = std::move(m_best);
+        return result;
+    }
 
     void push(
         const QImage& screen,
@@ -46,8 +54,8 @@ public:
 
 
 private:
-    VideoFeed& m_feed;
     Logger& m_logger;
+    VideoOverlay& m_overlay;
 
 //    InferenceBoxScope m_dialog_box;
     InferenceBoxScope m_shiny_box;
@@ -65,25 +73,28 @@ private:
     bool m_dialog_trigger = false;
     ShinyImageAlpha m_image_alpha;
 
+    QImage m_best;
+    double m_best_type_alpha;
 };
 
 
 
 
 ShinyEncounterDetector::ShinyEncounterDetector(
-    VideoFeed& feed, Logger& logger,
+    Logger& logger, VideoOverlay& overlay,
     const ShinyDetectionBattle& battle_settings,
     double detection_threshold
 )
-    : m_feed(feed)
-    , m_logger(logger)
+    : m_logger(logger)
+    , m_overlay(overlay)
 //    , m_dialog_box(feed, 0.50, 0.89, 0.40, 0.07)
-    , m_shiny_box(feed, battle_settings.detection_box)
+    , m_shiny_box(overlay, battle_settings.detection_box)
     , m_min_delay(battle_settings.dialog_delay_when_shiny - std::chrono::milliseconds(500))
     , m_max_delay(battle_settings.dialog_delay_when_shiny + std::chrono::milliseconds(500))
     , m_detection_threshold(detection_threshold)
-    , m_menu(feed)
-    , m_dialog_tracker(feed, logger)
+    , m_menu(overlay, battle_settings.den)
+    , m_dialog_tracker(overlay, logger)
+    , m_best_type_alpha(0)
 {}
 
 
@@ -94,8 +105,6 @@ void ShinyEncounterDetector::push(
     m_dialog_tracker.push_frame(screen, timestamp);
     auto wild_animation_duration = m_dialog_tracker.wild_animation_duration();
     m_dialog_trigger |= m_min_delay < wild_animation_duration && wild_animation_duration < m_max_delay;
-
-
 
 
     QImage shiny_box = extract_box(screen, m_shiny_box);
@@ -113,43 +122,43 @@ void ShinyEncounterDetector::push(
     }
 
     if (frame_alpha.shiny > 0){
+        QString str = "ShinyDetector: alpha = " +
+            QString::number(frame_alpha.shiny) + " / "  +
+            QString::number(m_image_alpha.shiny);
+
         if (frame_alpha.shiny >= m_detection_threshold){
-            m_logger.log(
-                "ShinyDetector: alpha = " + QString::number(frame_alpha.shiny) + " / "  + QString::number(m_image_alpha.shiny) + " (threshold exceeded)",
-                "blue"
-            );
-        }else{
-            m_logger.log(
-                "ShinyDetector: alpha = " + QString::number(frame_alpha.shiny) + " / "  + QString::number(m_image_alpha.shiny),
-                "blue"
-            );
+            str += " (threshold exceeded)";
+        }
+        m_logger.log(str, "blue");
+
+        double type_alpha = frame_alpha.star + frame_alpha.square;
+        if (m_best_type_alpha < type_alpha){
+            m_best = screen;
+            m_best_type_alpha = type_alpha;
+            m_logger.log("ShinyDetector: New best screenshot: alpha = " + QString::number(type_alpha));
         }
     }
 
     m_detection_overlays.clear();
     for (const auto& item : signatures.balls){
-        InferenceBox box = translate_to_parent(screen, m_shiny_box, item);
-        box.color = Qt::green;
-        m_detection_overlays.emplace_back(m_feed, box);
+        ImageFloatBox box = translate_to_parent(screen, m_shiny_box, item);
+        m_detection_overlays.emplace_back(m_overlay, box, Qt::green);
     }
     for (const auto& item : signatures.stars){
-        InferenceBox box = translate_to_parent(screen, m_shiny_box, item);
-        box.color = Qt::green;
-        m_detection_overlays.emplace_back(m_feed, box);
+        ImageFloatBox box = translate_to_parent(screen, m_shiny_box, item);
+        m_detection_overlays.emplace_back(m_overlay, box, Qt::green);
     }
     for (const auto& item : signatures.squares){
-        InferenceBox box = translate_to_parent(screen, m_shiny_box, item);
-        box.color = Qt::green;
-        m_detection_overlays.emplace_back(m_feed, box);
+        ImageFloatBox box = translate_to_parent(screen, m_shiny_box, item);
+        m_detection_overlays.emplace_back(m_overlay, box, Qt::green);
     }
     for (const auto& item : signatures.lines){
-        InferenceBox box = translate_to_parent(screen, m_shiny_box, item);
-        box.color = Qt::green;
-        m_detection_overlays.emplace_back(m_feed, box);
+        ImageFloatBox box = translate_to_parent(screen, m_shiny_box, item);
+        m_detection_overlays.emplace_back(m_overlay, box, Qt::green);
     }
 }
 
-ShinyType ShinyEncounterDetector::results() const{
+ShinyType ShinyEncounterDetector::shiny_type() const{
     double alpha = m_image_alpha.shiny;
     if (m_dialog_trigger){
         alpha += 1.4;
@@ -181,8 +190,10 @@ ShinyType ShinyEncounterDetector::results() const{
 
 
 
-ShinyType detect_shiny_battle(
-    ProgramEnvironment& env, VideoFeed& feed,
+ShinyDetectionResult detect_shiny_battle(
+    Logger& logger,
+    ProgramEnvironment& env,
+    VideoFeed& feed, VideoOverlay& overlay,
     const ShinyDetectionBattle& battle_settings,
     std::chrono::seconds timeout,
     double detection_threshold
@@ -192,8 +203,13 @@ ShinyType detect_shiny_battle(
     StatAccumulatorI32 inference_stats;
     StatAccumulatorI32 throttle_stats;
 
-    StandardBattleMenuDetector menu(feed);
-    ShinyEncounterDetector detector(feed, env.logger(), battle_settings, detection_threshold);
+    StandardBattleMenuDetector menu(overlay, battle_settings.den);
+    ShinyEncounterDetector detector(
+        logger,
+        overlay,
+        battle_settings,
+        detection_threshold
+    );
 
     bool no_detection = false;
 
@@ -203,9 +219,9 @@ ShinyType detect_shiny_battle(
 
         auto time0 = std::chrono::system_clock::now();
         QImage screen = feed.snapshot();
-        if (screen.isNull()){
-
-        }
+//        if (screen.isNull()){
+//
+//        }
         auto time1 = std::chrono::system_clock::now();
         capture_stats += std::chrono::duration_cast<std::chrono::milliseconds>(time1 - time0).count();
         auto timestamp = time1;
@@ -240,7 +256,7 @@ ShinyType detect_shiny_battle(
 
     if (no_detection){
         env.log("ShinyDetector: Battle menu not found after timeout.", "red");
-        return ShinyType::UNKNOWN;
+        return ShinyDetectionResult{ShinyType::UNKNOWN, QImage()};
     }
 
     return detector.results();

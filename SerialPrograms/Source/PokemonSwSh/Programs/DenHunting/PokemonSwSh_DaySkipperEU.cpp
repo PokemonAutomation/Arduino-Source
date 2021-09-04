@@ -48,10 +48,10 @@ DaySkipperEU::DaySkipperEU(const DaySkipperEU_Descriptor& descriptor)
         1000
     )
 {
-    m_options.emplace_back(&SKIPS, "SKIPS");
-    m_options.emplace_back(&REAL_LIFE_YEAR, "REAL_LIFE_YEAR");
-    m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&CORRECTION_SKIPS, "CORRECTION_SKIPS");
+    PA_ADD_OPTION(SKIPS);
+    PA_ADD_OPTION(REAL_LIFE_YEAR);
+    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_OPTION(CORRECTION_SKIPS);
 }
 
 std::unique_ptr<StatsTracker> DaySkipperEU::make_stats() const{

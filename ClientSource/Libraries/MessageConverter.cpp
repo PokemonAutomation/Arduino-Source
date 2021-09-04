@@ -114,6 +114,11 @@ int register_message_converters_framework_errors(){
             if (body.size() != sizeof(pabb_MsgInfoWARNING)){ ss << "(invalid size)" << std::endl; return ss.str(); }
             const auto* params = (const pabb_MsgInfoWARNING*)body.c_str();
             ss << "error code = " << (unsigned)params->error_code;
+            switch (params->error_code){
+            case 1:
+                ss << " (Device was slow to respond to USB request.)";
+                break;
+            }
             return ss.str();
         }
     );

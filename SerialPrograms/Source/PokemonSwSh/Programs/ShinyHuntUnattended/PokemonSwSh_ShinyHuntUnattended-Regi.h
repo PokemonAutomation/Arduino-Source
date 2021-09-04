@@ -12,7 +12,8 @@
 #include "NintendoSwitch/Options/TimeExpression.h"
 #include "NintendoSwitch/Options/StartInGripMenu.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
-#include "PokemonSwSh/Options/RegiSelector.h"
+#include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
+#include "PokemonSwSh/Options/PokemonSwSh_RegiSelector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -34,10 +35,10 @@ public:
 
 private:
     StartInGripOrGame START_IN_GRIP_MENU;
+    TouchDateInterval TOUCH_DATE_INTERVAL;
 
     TimeExpression<uint16_t> START_TO_RUN_DELAY;
     RegiSelector REGI_NAME;
-    TimeExpression<uint32_t> TOUCH_DATE_INTERVAL;
     SectionDivider m_advanced_options;
     SimpleInteger<uint16_t> CORRECTION_INTERVAL;
     TimeExpression<uint16_t> TRANSITION_DELAY;

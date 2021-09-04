@@ -147,7 +147,7 @@ void AsyncDispatcher::thread_loop(){
             task->m_task();
         }catch (...){
             task->m_exception = std::current_exception();
-            cout << "Task threw an exception." << endl;
+//            cout << "Task threw an exception." << endl;
 //            std::lock_guard<std::mutex> lg(m_lock);
 //            for (AsyncTask* t : m_queue){
 //                t->signal();

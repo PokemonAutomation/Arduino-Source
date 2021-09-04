@@ -48,10 +48,6 @@ AutoHostMultiGame::AutoHostMultiGame(const AutoHostMultiGame_Descriptor& descrip
         "<b>Forward Friend Accept:</b><br>Accept FRs this many raids in the future.",
         1
     )
-    , TOUCH_DATE_INTERVAL(
-        "<b>Rollover Prevention:</b><br>Prevent the den from rolling over by periodically touching the date. If set to zero, this feature is disabled. If skips is non-zero, this feature is also disabled.",
-        "4 * 3600 * TICKS_PER_SECOND"
-    )
     , m_internet_settings(
         "<font size=4><b>Internet Settings:</b> Increase these if your internet is slow.</font>"
     )
@@ -76,20 +72,20 @@ AutoHostMultiGame::AutoHostMultiGame(const AutoHostMultiGame_Descriptor& descrip
         "32 * TICKS_PER_SECOND"
     )
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(TOUCH_DATE_INTERVAL);
 
-    m_options.emplace_back(&RAID_CODE, "RAID_CODE");
-    m_options.emplace_back(&HOST_ONLINE, "HOST_ONLINE");
-    m_options.emplace_back(&LOBBY_WAIT_DELAY, "LOBBY_WAIT_DELAY");
-    m_options.emplace_back(&GAME_LIST, "GAME_LIST");
-    m_options.emplace_back(&FR_FORWARD_ACCEPT, "FR_FORWARD_ACCEPT");
-    m_options.emplace_back(&TOUCH_DATE_INTERVAL, "TOUCH_DATE_INTERVAL");
-    m_options.emplace_back(&m_internet_settings, "");
-    m_options.emplace_back(&CONNECT_TO_INTERNET_DELAY, "CONNECT_TO_INTERNET_DELAY");
-    m_options.emplace_back(&ENTER_ONLINE_DEN_DELAY, "ENTER_ONLINE_DEN_DELAY");
-    m_options.emplace_back(&OPEN_ONLINE_DEN_LOBBY_DELAY, "OPEN_ONLINE_DEN_LOBBY_DELAY");
-    m_options.emplace_back(&RAID_START_TO_EXIT_DELAY, "RAID_START_TO_EXIT_DELAY");
-    m_options.emplace_back(&DELAY_TO_SELECT_MOVE, "DELAY_TO_SELECT_MOVE");
+    PA_ADD_OPTION(RAID_CODE);
+    PA_ADD_OPTION(HOST_ONLINE);
+    PA_ADD_OPTION(LOBBY_WAIT_DELAY);
+    PA_ADD_OPTION(GAME_LIST);
+    PA_ADD_OPTION(FR_FORWARD_ACCEPT);
+    PA_ADD_OPTION(m_internet_settings);
+    PA_ADD_OPTION(CONNECT_TO_INTERNET_DELAY);
+    PA_ADD_OPTION(ENTER_ONLINE_DEN_DELAY);
+    PA_ADD_OPTION(OPEN_ONLINE_DEN_LOBBY_DELAY);
+    PA_ADD_OPTION(RAID_START_TO_EXIT_DELAY);
+    PA_ADD_OPTION(DELAY_TO_SELECT_MOVE);
 }
 
 
@@ -130,7 +126,7 @@ void AutoHostMultiGame::run_autohost(
 
     //  Accept friend requests while we wait.
     RaidLobbyState raid_state = raid_lobby_wait(
-        env.console, env.logger(),
+        env.console,
         HOST_ONLINE,
         accept_FR_slot,
         lobby_wait_delay

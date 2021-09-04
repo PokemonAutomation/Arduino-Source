@@ -86,7 +86,10 @@ QImage SwitchProgramTracker::grab_screenshot(uint64_t console_id){
     std::lock_guard<std::mutex> lg(m_lock);
     auto iter = m_consoles.find(console_id);
     if (iter == m_consoles.end()){
-        cout << "SwitchProgramTracker::grab_screenshot(" << console_id << ") - ID not found." << endl;
+        global_logger().log(
+            "SwitchProgramTracker::grab_screenshot(" + std::to_string(console_id) + ") - ID not found.",
+            "red"
+        );
         return QImage();
     }
     return iter->second.first->camera().snapshot();
@@ -106,7 +109,10 @@ void SwitchProgramTracker::start_program(uint64_t program_id){
     std::lock_guard<std::mutex> lg(m_lock);
     auto iter = m_all_programs.find(program_id);
     if (iter == m_all_programs.end()){
-        cout << "SwitchProgramTracker::start_program(" << program_id << ") - ID not found." << endl;
+        global_logger().log(
+            "SwitchProgramTracker::start_program(" + std::to_string(program_id) + ") - ID not found.",
+            "red"
+        );
         return;
     }
     iter->second->program.async_start();
@@ -115,7 +121,10 @@ void SwitchProgramTracker::stop_program(uint64_t program_id){
     std::lock_guard<std::mutex> lg(m_lock);
     auto iter = m_all_programs.find(program_id);
     if (iter == m_all_programs.end()){
-        cout << "SwitchProgramTracker::stop_program(" << program_id << ") - ID not found." << endl;
+        global_logger().log(
+            "SwitchProgramTracker::stop_program(" + std::to_string(program_id) + ") - ID not found.",
+            "red"
+        );
         return;
     }
     iter->second->program.async_stop();
@@ -124,7 +133,10 @@ void SwitchProgramTracker::press_button(uint64_t console_id, Button button, uint
     std::lock_guard<std::mutex> lg(m_lock);
     auto iter = m_consoles.find(console_id);
     if (iter == m_consoles.end()){
-        cout << "SwitchProgramTracker::press_button(" << console_id << ", ...) - ID not found." << endl;
+        global_logger().log(
+            "SwitchProgramTracker::press_button(" + std::to_string(console_id) + ", ...) - ID not found.",
+            "red"
+        );
         return;
     }
     pabb_pbf_press_button params;
@@ -137,7 +149,10 @@ void SwitchProgramTracker::press_dpad(uint64_t console_id, DpadPosition position
     std::lock_guard<std::mutex> lg(m_lock);
     auto iter = m_consoles.find(console_id);
     if (iter == m_consoles.end()){
-        cout << "SwitchProgramTracker::press_dpad(" << console_id << ", ...) - ID not found." << endl;
+        global_logger().log(
+            "SwitchProgramTracker::press_dpad(" + std::to_string(console_id) + ", ...) - ID not found.",
+            "red"
+        );
         return;
     }
     pabb_pbf_press_dpad params;
@@ -150,7 +165,10 @@ void SwitchProgramTracker::press_left_joystick(uint64_t console_id, uint8_t x, u
     std::lock_guard<std::mutex> lg(m_lock);
     auto iter = m_consoles.find(console_id);
     if (iter == m_consoles.end()){
-        cout << "SwitchProgramTracker::press_left_joystick(" << console_id << ", ...) - ID not found." << endl;
+        global_logger().log(
+            "SwitchProgramTracker::press_left_joystick(" + std::to_string(console_id) + ", ...) - ID not found.",
+            "red"
+        );
         return;
     }
     pabb_pbf_move_joystick params;
@@ -164,7 +182,10 @@ void SwitchProgramTracker::press_right_joystick(uint64_t console_id, uint8_t x, 
     std::lock_guard<std::mutex> lg(m_lock);
     auto iter = m_consoles.find(console_id);
     if (iter == m_consoles.end()){
-        cout << "SwitchProgramTracker::press_right_joystick(" << console_id << ", ...) - ID not found." << endl;
+        global_logger().log(
+            "SwitchProgramTracker::press_right_joystick(" + std::to_string(console_id) + ", ...) - ID not found.",
+            "red"
+        );
         return;
     }
     pabb_pbf_move_joystick params;

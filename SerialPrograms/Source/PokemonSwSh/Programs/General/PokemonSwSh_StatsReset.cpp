@@ -37,10 +37,7 @@ StatsReset_Descriptor::StatsReset_Descriptor()
 
 StatsReset::StatsReset(const StatsReset_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
-    , GO_HOME_WHEN_DONE(
-        "<b>Go Home when Done:</b><br>After finding a match, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
-        false
-    )
+    , GO_HOME_WHEN_DONE(false)
     , LANGUAGE(
         "<b>Game Language:</b>",
         m_iv_checker_reader.languages()
@@ -61,17 +58,17 @@ StatsReset::StatsReset(const StatsReset_Descriptor& descriptor)
     , SPDEF("<b>Sp. Def:</b>")
     , SPEED("<b>Speed:</b>")
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
-    m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
 
-    m_options.emplace_back(&LANGUAGE, "LANGUAGE");
-    m_options.emplace_back(&POKEMON, "POKEMON");
-    m_options.emplace_back(&HP, "HP");
-    m_options.emplace_back(&ATTACK, "ATTACK");
-    m_options.emplace_back(&DEFENSE, "DEFENSE");
-    m_options.emplace_back(&SPATK, "SPATK");
-    m_options.emplace_back(&SPDEF, "SPDEF");
-    m_options.emplace_back(&SPEED, "SPEED");
+    PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(POKEMON);
+    PA_ADD_OPTION(HP);
+    PA_ADD_OPTION(ATTACK);
+    PA_ADD_OPTION(DEFENSE);
+    PA_ADD_OPTION(SPATK);
+    PA_ADD_OPTION(SPDEF);
+    PA_ADD_OPTION(SPEED);
 }
 
 
@@ -153,7 +150,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env){
 
         {
             IVCheckerReaderScope reader(m_iv_checker_reader, env.console, LANGUAGE);
-            IVCheckerReader::Results results = reader.read(&env.logger(), env.console.video().snapshot());
+            IVCheckerReader::Results results = reader.read(env.console, env.console.video().snapshot());
             bool ok = true;
             ok &= HP.matches(stats.errors, results.hp);
             ok &= ATTACK.matches(stats.errors, results.attack);

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_MultiGameFossil_H
 #define PokemonAutomation_PokemonSwSh_MultiGameFossil_H
 
-#include "PokemonSwSh/Options/FossilTable.h"
+#include "PokemonSwSh/Options/PokemonSwSh_FossilTable.h"
 #include "NintendoSwitch/Options/StartInGripMenu.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 

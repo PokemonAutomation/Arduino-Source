@@ -13,13 +13,13 @@ namespace PokemonSwSh{
 
 
 ShinySparkleDetector::ShinySparkleDetector(
-    VideoFeed& feed, Logger& logger,
-    const InferenceBox& detection_box,
+    Logger& logger, VideoOverlay& overlay,
+    const ImageFloatBox& detection_box,
     double detection_threshold
 )
-    : m_feed(feed)
-    , m_logger(logger)
-    , m_detection_box(feed, detection_box)
+    : m_logger(logger)
+    , m_overlay(overlay)
+    , m_detection_box(overlay, detection_box)
     , m_detection_threshold(detection_threshold)
 {}
 
@@ -81,24 +81,20 @@ bool ShinySparkleDetector::on_frame(
 
     m_detection_overlays.clear();
     for (const auto& item : signatures.balls){
-        InferenceBox box = translate_to_parent(frame, m_detection_box, item);
-        box.color = Qt::green;
-        m_detection_overlays.emplace_back(m_feed, box);
+        ImageFloatBox box = translate_to_parent(frame, m_detection_box, item);
+        m_detection_overlays.emplace_back(m_overlay, box, Qt::green);
     }
     for (const auto& item : signatures.stars){
-        InferenceBox box = translate_to_parent(frame, m_detection_box, item);
-        box.color = Qt::green;
-        m_detection_overlays.emplace_back(m_feed, box);
+        ImageFloatBox box = translate_to_parent(frame, m_detection_box, item);
+        m_detection_overlays.emplace_back(m_overlay, box, Qt::green);
     }
     for (const auto& item : signatures.squares){
-        InferenceBox box = translate_to_parent(frame, m_detection_box, item);
-        box.color = Qt::green;
-        m_detection_overlays.emplace_back(m_feed, box);
+        ImageFloatBox box = translate_to_parent(frame, m_detection_box, item);
+        m_detection_overlays.emplace_back(m_overlay, box, Qt::green);
     }
     for (const auto& item : signatures.lines){
-        InferenceBox box = translate_to_parent(frame, m_detection_box, item);
-        box.color = Qt::green;
-        m_detection_overlays.emplace_back(m_feed, box);
+        ImageFloatBox box = translate_to_parent(frame, m_detection_box, item);
+        m_detection_overlays.emplace_back(m_overlay, box, Qt::green);
     }
 
     return false;

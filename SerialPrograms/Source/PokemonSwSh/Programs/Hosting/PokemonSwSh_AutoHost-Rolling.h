@@ -14,7 +14,8 @@
 #include "NintendoSwitch/Options/TimeExpression.h"
 #include "NintendoSwitch/Options/StartInGripMenu.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
-#include "PokemonSwSh/Options/Catchability.h"
+#include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
+#include "PokemonSwSh/Options/PokemonSwSh_Catchability.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -37,6 +38,7 @@ public:
 
 private:
     StartInGripOrGame START_IN_GRIP_MENU;
+    TouchDateInterval TOUCH_DATE_INTERVAL;
 
     RandomCode RAID_CODE;
     SimpleInteger<uint8_t> SKIPS;
@@ -52,7 +54,6 @@ private:
     SimpleInteger<uint8_t> TROLL_HOSTING;
 
     BooleanCheckBox ALTERNATE_GAMES;
-    TimeExpression<uint32_t> TOUCH_DATE_INTERVAL;
 
     SectionDivider m_internet_settings;
     TimeExpression<uint16_t> CONNECT_TO_INTERNET_DELAY;

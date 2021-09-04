@@ -10,6 +10,7 @@
 #include <memory>
 #include <QWidget>
 #include "Common/Compiler.h"
+#include "CommonFramework/Tools/Logger.h"
 
 namespace PokemonAutomation{
 
@@ -19,7 +20,7 @@ class PanelInstance;
 
 struct PanelListener{
     virtual void on_panel_construct(std::unique_ptr<PanelInstance> panel) = 0;
-    virtual OutputWindow& output_window() = 0;
+    virtual Logger& logger() = 0;
     virtual void on_busy(PanelInstance& panel) = 0;
     virtual void on_idle(PanelInstance& panel) = 0;
 };

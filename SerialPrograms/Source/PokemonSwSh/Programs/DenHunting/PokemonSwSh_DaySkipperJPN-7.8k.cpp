@@ -47,10 +47,10 @@ DaySkipperJPN7p8k::DaySkipperJPN7p8k(const DaySkipperJPN7p8k_Descriptor& descrip
         1000
     )
 {
-    m_options.emplace_back(&SKIPS, "SKIPS");
-    m_options.emplace_back(&START_DATE, "START_DATE");
-    m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&CORRECTION_SKIPS, "CORRECTION_SKIPS");
+    PA_ADD_OPTION(SKIPS);
+    PA_ADD_OPTION(START_DATE);
+    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_OPTION(CORRECTION_SKIPS);
 }
 
 std::unique_ptr<StatsTracker> DaySkipperJPN7p8k::make_stats() const{

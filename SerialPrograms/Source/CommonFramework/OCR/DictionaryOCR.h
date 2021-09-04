@@ -29,7 +29,7 @@ public:
 
     MatchResult match_substring(
         const QString& text,
-        double min_alpha = 25
+        double min_alpha = 90
     ) const;
 
     MatchResult match_substring(

@@ -94,13 +94,13 @@ EggHatcher::EggHatcher(const EggHatcher_Descriptor& descriptor)
         "88 * TICKS_PER_SECOND"
     )
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
 
-    m_options.emplace_back(&BOXES_TO_HATCH, "BOXES_TO_HATCH");
-    m_options.emplace_back(&STEPS_TO_HATCH, "STEPS_TO_HATCH");
-    m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&SAFETY_TIME, "SAFETY_TIME");
-    m_options.emplace_back(&HATCH_DELAY, "HATCH_DELAY");
+    PA_ADD_OPTION(BOXES_TO_HATCH);
+    PA_ADD_OPTION(STEPS_TO_HATCH);
+    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_OPTION(SAFETY_TIME);
+    PA_ADD_OPTION(HATCH_DELAY);
 }
 void EggHatcher::program(SingleSwitchProgramEnvironment& env){
     //  Calculate upper bounds for incubation time.

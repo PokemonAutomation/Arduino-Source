@@ -11,6 +11,7 @@
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
+#include "PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_EncounterDetection.h"
 
 namespace PokemonAutomation{
@@ -24,17 +25,15 @@ public:
         const QString& program_name,
         ProgramEnvironment& env,
         ConsoleHandle& console,
-        const Pokemon::PokemonNameReader* name_reader, Language language,
-        ShinyHuntTracker& session_stats,
-        EncounterFilter& filter,
-        bool video_on_shiny,
-        EncounterBotNotificationLevel notification_level
+        Language language,
+        const EncounterBotCommonSettings& settings,
+        ShinyHuntTracker& session_stats
     );
 
 
     //  Return true if program should stop.
-    bool handle_standard_encounter(ShinyType shininess);
-    bool handle_standard_encounter_runaway(ShinyType shininess, uint16_t exit_battle_time);
+    bool handle_standard_encounter(const ShinyDetectionResult& result);
+    bool handle_standard_encounter_end_battle(const ShinyDetectionResult& result, uint16_t exit_battle_time);
 
 
 private:
@@ -42,20 +41,18 @@ private:
     void run_away_and_update_stats(
         StandardEncounterDetection& encounter,
         uint16_t exit_battle_time,
-        ShinyType shininess
+        const ShinyDetectionResult& result
     );
 
 private:
     const QString& m_program_name;
     ProgramEnvironment& m_env;
     ConsoleHandle& m_console;
-    const Pokemon::PokemonNameReader* m_name_reader;
     const Language m_language;
+    const EncounterBotCommonSettings& m_settings;
 
     Pokemon::EncounterFrequencies m_frequencies;
     ShinyHuntTracker& m_session_stats;
-    EncounterFilter& m_filter;
-    const bool m_video_on_shiny;
 
     EncounterNotificationSender m_notification_sender;
 };

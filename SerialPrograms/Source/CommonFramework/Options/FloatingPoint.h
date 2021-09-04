@@ -21,8 +21,7 @@ public:
         double min_value = -std::numeric_limits<double>::max(),
         double max_value = std::numeric_limits<double>::max()
     )
-        : ConfigOption(label)
-        , FloatingPointOption(std::move(label), min_value, max_value, default_value)
+        : FloatingPointOption(std::move(label), min_value, max_value, default_value)
     {}
     virtual void load_json(const QJsonValue& json) override{
         return this->load_current(json);

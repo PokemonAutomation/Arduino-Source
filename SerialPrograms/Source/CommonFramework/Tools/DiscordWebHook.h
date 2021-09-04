@@ -21,6 +21,8 @@ void send_message(bool should_ping, const QString& message, const QJsonArray& em
 
 void send_message_old(bool should_ping, const QString& message, const QJsonArray& fields);
 
+void send_file(QString file, Logger* logger);
+
 }
 }
 

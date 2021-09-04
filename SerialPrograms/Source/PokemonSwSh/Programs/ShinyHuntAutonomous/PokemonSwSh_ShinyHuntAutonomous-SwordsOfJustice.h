@@ -15,7 +15,8 @@
 #include "NintendoSwitch/Options/GoHomeWhenDone.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
-#include "PokemonSwSh/Options/EncounterFilter.h"
+#include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
+#include "PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -39,21 +40,17 @@ public:
 private:
     StartInGripOrGame START_IN_GRIP_MENU;
     GoHomeWhenDone GO_HOME_WHEN_DONE;
+    TimeRollbackHours TIME_ROLLBACK_HOURS;
 
-    Pokemon::PokemonNameReader m_name_reader;
     Pokemon::EncounterBotLanguage LANGUAGE;
 
     BooleanCheckBox AIRPLANE_MODE;
-    EncounterFilter FILTER;
-
-    SimpleInteger<uint8_t> TIME_ROLLBACK_HOURS;
-    Pokemon::EncounterBotNotifications NOTIFICATION_LEVEL;
+    EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
 
     SectionDivider m_advanced_options;
     TimeExpression<uint16_t> EXIT_BATTLE_TIMEOUT;
     TimeExpression<uint16_t> POST_BATTLE_MASH_TIME;
     TimeExpression<uint16_t> ENTER_CAMP_DELAY;
-    BooleanCheckBox VIDEO_ON_SHINY;
 };
 
 }

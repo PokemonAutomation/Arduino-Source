@@ -133,7 +133,7 @@ void TrainingSession::generate_small_dictionary(
 //                    result.log(&env.logger(), sample.filepath);
                 }else{
                     failed++;
-                    result.log(&env.logger(), sample.filepath);
+                    result.log(env.logger(), sample.filepath);
                     trained.add_candidate(language.first, sample.token, result.normalized_text);
                 }
 
@@ -195,7 +195,7 @@ void TrainingSession::generate_large_dictionary(
                     matched++;
                 }else{
                     failed++;
-                    result.log(&env.logger(), sample.filepath);
+                    result.log(env.logger(), sample.filepath);
                     trained.add_candidate(language.first, sample.token, result.normalized_text);
                 }
 

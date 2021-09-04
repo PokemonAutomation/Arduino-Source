@@ -22,7 +22,7 @@ ShinyHuntUnattendedSwordsOfJustice_Descriptor::ShinyHuntUnattendedSwordsOfJustic
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntUnattendedSwordsOfJustice",
         "Shiny Hunt Unattended - Swords Of Justice",
-        "SwSh-Arduino/wiki/Basic:-ShinyHunt-SwordsOfJustice",
+        "SwSh-Arduino/wiki/Basic:-ShinyHuntUnattended-SwordsOfJustice",
         "Hunt for shiny SOJs. Stop when a shiny is found.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB
@@ -40,10 +40,6 @@ ShinyHuntUnattendedSwordsOfJustice::ShinyHuntUnattendedSwordsOfJustice(const Shi
         "<b>Airplane Mode:</b><br>Enable if airplane mode is on.",
         false
     )
-    , TIME_ROLLBACK_HOURS(
-        "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
-        1, 0, 11
-    )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -52,13 +48,13 @@ ShinyHuntUnattendedSwordsOfJustice::ShinyHuntUnattendedSwordsOfJustice(const Shi
         "8 * TICKS_PER_SECOND"
     )
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(TIME_ROLLBACK_HOURS);
 
-    m_options.emplace_back(&EXIT_CAMP_TO_RUN_DELAY, "EXIT_CAMP_TO_RUN_DELAY");
-    m_options.emplace_back(&AIRPLANE_MODE, "AIRPLANE_MODE");
-    m_options.emplace_back(&TIME_ROLLBACK_HOURS, "TIME_ROLLBACK_HOURS");
-    m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&ENTER_CAMP_DELAY, "ENTER_CAMP_DELAY");
+    PA_ADD_OPTION(EXIT_CAMP_TO_RUN_DELAY);
+    PA_ADD_OPTION(AIRPLANE_MODE);
+    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_OPTION(ENTER_CAMP_DELAY);
 }
 
 

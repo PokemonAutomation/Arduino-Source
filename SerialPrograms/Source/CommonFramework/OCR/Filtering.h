@@ -55,6 +55,7 @@ TextImageFilter make_OCR_filter(const QImage& image);
 
 void binary_filter_black_text(QImage& image, int max_rgb_sum = 250);
 
+void binary_filter_solid_background(QImage& image, double euclidean_distance = 128);
 
 
 

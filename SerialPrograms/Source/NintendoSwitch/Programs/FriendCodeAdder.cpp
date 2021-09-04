@@ -49,12 +49,12 @@ FriendCodeAdder::FriendCodeAdder(const FriendCodeAdder_Descriptor& descriptor)
         "1 * TICKS_PER_SECOND"
     )
 {
-    m_options.emplace_back(&USER_SLOT, "USER_SLOT");
-    m_options.emplace_back(&FRIEND_CODES, "FRIEND_CODES");
-    m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&OPEN_CODE_PAD_DELAY, "OPEN_CODE_PAD_DELAY");
-    m_options.emplace_back(&SEARCH_TIME, "SEARCH_TIME");
-    m_options.emplace_back(&TOGGLE_BEST_STATUS_DELAY, "TOGGLE_BEST_STATUS_DELAY");
+    PA_ADD_OPTION(USER_SLOT);
+    PA_ADD_OPTION(FRIEND_CODES);
+    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_OPTION(OPEN_CODE_PAD_DELAY);
+    PA_ADD_OPTION(SEARCH_TIME);
+    PA_ADD_OPTION(TOGGLE_BEST_STATUS_DELAY);
 }
 
 void FriendCodeAdder::program(SingleSwitchProgramEnvironment& env){

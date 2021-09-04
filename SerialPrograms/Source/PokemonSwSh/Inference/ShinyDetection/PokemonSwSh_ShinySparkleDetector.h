@@ -24,8 +24,8 @@ using namespace Pokemon;
 class ShinySparkleDetector : public VisualInferenceCallbackWithCommandStop{
 public:
     ShinySparkleDetector(
-        VideoFeed& feed, Logger& logger,
-        const InferenceBox& detection_box,
+        Logger& logger, VideoOverlay& overlay,
+        const ImageFloatBox& detection_box,
         double detection_threshold = 1.0
     );
 
@@ -38,8 +38,8 @@ public:
 
 
 private:
-    VideoFeed& m_feed;
     Logger& m_logger;
+    VideoOverlay& m_overlay;
     InferenceBoxScope m_detection_box;
     double m_detection_threshold;
 

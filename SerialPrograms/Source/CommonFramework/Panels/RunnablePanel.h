@@ -12,7 +12,7 @@
 #include <QPushButton>
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/ConfigOption.h"
-#include "CommonFramework/Windows/OutputWindow.h"
+#include "CommonFramework/Options/BatchOption.h"
 #include "CommonFramework/Panels/Panel.h"
 
 namespace PokemonAutomation{
@@ -37,22 +37,25 @@ class RunnablePanelInstance : public PanelInstance{
 public:
     using PanelInstance::PanelInstance;
 
+    void add_option(ConfigOption& option, QString serialization_string){
+        m_options.add_option(option, std::move(serialization_string));
+    }
+
     const RunnablePanelDescriptor& descriptor() const{
         return static_cast<const RunnablePanelDescriptor&>(m_descriptor);
     }
 
-    bool is_valid() const;
-    void restore_defaults();
+    virtual bool is_valid() const;
+    virtual void restore_defaults();
 
 public:
     //  Serialization
     virtual void from_json(const QJsonValue& json) override;
     virtual QJsonValue to_json() const override;
 
-protected:
+private:
     friend class RunnablePanelWidget;
-
-    std::vector<std::pair<ConfigOption*, QString>> m_options;
+    BatchOption m_options;
 };
 
 
@@ -110,13 +113,15 @@ signals:    //  Protected Signals
     void signal_error(QString message);
     void signal_reset();
 
+    void async_set_status(QString status);
+
 
 protected:
     friend class RunnablePanelInstance;
 
     TaggedLogger m_logger;
 
-    std::vector<ConfigOptionUI*> m_options;
+    BatchOptionUI* m_options;
     QLabel* m_status_bar;
 
     QPushButton* m_start_button;

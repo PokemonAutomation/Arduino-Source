@@ -4,8 +4,9 @@
  *
  */
 
-#include "CommonFramework/Inference/InferenceTypes.h"
-#include "CommonFramework/Inference/FloatPixel.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTools/FloatPixel.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
 #include "Filtering.h"
 
 #include <iostream>
@@ -183,6 +184,25 @@ void binary_filter_black_text(QImage& image, int max_rgb_sum){
 //    static size_t c = 0;
 //    image.save("test-" + QString::number(c++) + ".png");
 }
+
+void binary_filter_solid_background(QImage& image, double euclidean_distance){
+    euclidean_distance *= euclidean_distance;
+    ImageStats stats = image_border_stats(image);
+    pxint_t w = image.width();
+    pxint_t h = image.height();
+    for (pxint_t r = 0; r < h; r++){
+        for (pxint_t c = 0; c < w; c++){
+            QRgb pixel = image.pixel(c, r);
+            double R = (double)qRed(pixel) - stats.average.r;
+            double g = (double)qGreen(pixel) - stats.average.g;
+            double b = (double)qBlue(pixel) - stats.average.b;
+            bool text = R*R + g*g + b*b >= euclidean_distance;
+            image.setPixel(c, r, text ? 0 : 0x00ffffff);
+        }
+    }
+}
+
+
 
 
 

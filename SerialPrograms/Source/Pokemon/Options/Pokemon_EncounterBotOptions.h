@@ -8,20 +8,21 @@
 #define PokemonAutomation_Pokemon_EncounterBotOptions_H
 
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Options/BooleanCheckBox.h"
 #include "CommonFramework/Options/EnumDropdown.h"
-#include "CommonFramework/Options/LanguageOCR.h"
-#include "Pokemon/Pokemon_NameReader.h"
+#include "CommonFramework/OCR/LanguageOptionOCR.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{
 
 
-class EncounterBotLanguage : public LanguageOCR{
+class EncounterBotLanguage : public OCR::LanguageOCR{
 public:
-    EncounterBotLanguage(const PokemonNameReader& name_reader, bool required = false)
+    EncounterBotLanguage(bool required = false)
         : LanguageOCR(
             "<b>Game Language:</b><br>Attempt to read and log the encountered " + STRING_POKEMON + " in this language.<br>Set to \"None\" to disable this feature.",
-            name_reader.languages(), required
+            PokemonNameReader::instance().languages(), required
         )
     {}
 };
@@ -33,7 +34,6 @@ enum class EncounterBotNotificationLevel{
     PERIODIC_AND_SHINY,
     EVERYTHING,
 };
-
 class EncounterBotNotifications : public EnumDropdown{
 public:
     EncounterBotNotifications()
@@ -51,6 +51,31 @@ public:
 
     operator EncounterBotNotificationLevel() const{
         return (EncounterBotNotificationLevel)(size_t)*this;
+    }
+};
+
+
+enum class EncounterBotScreenshot{
+    NO_SCREENSHOT,
+    JPG,
+    PNG,
+};
+class EncounterBotScreenshotOption : public EnumDropdown{
+public:
+    EncounterBotScreenshotOption()
+        : EnumDropdown(
+            "<b>Attach Shiny Screenshot:</b><br>Attach screenshot of shiny encounters to notification.",
+            {
+                "Do not attach screenshot.",
+                "Attach as .jpg.",
+                "Attach as .png.",
+            },
+            1
+        )
+    {}
+
+    operator EncounterBotScreenshot() const{
+        return (EncounterBotScreenshot)(size_t)*this;
     }
 };
 

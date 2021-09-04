@@ -30,7 +30,7 @@ BallThrower_Descriptor::BallThrower_Descriptor()
 BallThrower::BallThrower(const BallThrower_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
 }
 
 void BallThrower::program(SingleSwitchProgramEnvironment& env){

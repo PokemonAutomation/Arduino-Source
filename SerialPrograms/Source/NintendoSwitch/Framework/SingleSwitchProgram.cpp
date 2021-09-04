@@ -51,8 +51,10 @@ void SingleSwitchProgramWidget::run_program(
     SingleSwitchProgramEnvironment env(
         m_logger,
         current_stats, historical_stats,
+        m_logger.base_logger(),
         sanitize_botbase(system().botbase()),
-        system().camera()
+        system().camera(),
+        system().overlay()
     );
     connect(
         this, &RunnableSwitchProgramWidget::signal_cancel,

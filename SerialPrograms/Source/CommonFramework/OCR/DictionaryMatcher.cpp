@@ -30,16 +30,18 @@ DictionaryOCR& DictionaryMatcher::dictionary(Language language){
 
 MatchResult DictionaryMatcher::match_substring(
     Language language,
-    const QString& text
+    const QString& text,
+    double min_alpha
 ) const{
-    return dictionary(language).match_substring(text);
+    return dictionary(language).match_substring(text, min_alpha);
 }
 MatchResult DictionaryMatcher::match_substring(
     Language language,
     const std::string& expected,
-    const QString& text
+    const QString& text,
+    double min_alpha
 ) const{
-    return dictionary(language).match_substring(expected, text);
+    return dictionary(language).match_substring(expected, text, min_alpha);
 }
 void DictionaryMatcher::add_candidate(Language language, std::string token, const QString& candidate){
     dictionary(language).add_candidate(std::move(token), candidate);

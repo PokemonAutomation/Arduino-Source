@@ -9,22 +9,17 @@
 
 #include <vector>
 #include <QImage>
-#include "CommonFramework/Inference/InferenceTypes.h"
-#include "CommonFramework/Inference/FillMatrix.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-
-
-
-
 size_t find_marks(
     const QImage& image,
-    std::vector<PixelBox>* exclamation_marks,
-    std::vector<PixelBox>* question_marks
+    std::vector<ImagePixelBox>* exclamation_marks,
+    std::vector<ImagePixelBox>* question_marks
 );
 
 

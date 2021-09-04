@@ -18,7 +18,7 @@ FixedCode::FixedCode(
     size_t digits,
     QString default_value
 )
-    : ConfigOption(std::move(label))
+    : m_label(std::move(label))
     , m_digits(digits)
     , m_default(default_value)
     , m_current(std::move(default_value))

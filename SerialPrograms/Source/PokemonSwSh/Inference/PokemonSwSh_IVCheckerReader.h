@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_IVCheckerReader_H
 
 #include "CommonFramework/Language.h"
+#include "CommonFramework/Options/EnumDropdown.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/OCR/SmallDictionaryMatcher.h"
@@ -54,14 +55,14 @@ private:
 
 class IVCheckerReaderScope{
 public:
-    IVCheckerReaderScope(const IVCheckerReader& reader, VideoFeed& feed, Language language);
+    IVCheckerReaderScope(const IVCheckerReader& reader, VideoOverlay& overlay, Language language);
 
-    IVCheckerReader::Results read(Logger* logger, const QImage& frame);
+    IVCheckerReader::Results read(Logger& logger, const QImage& frame);
 
     std::vector<QImage> dump_images(const QImage& frame);
 
 private:
-    IVCheckerReader::Result read(Logger* logger, const QImage& frame, const InferenceBoxScope& box);
+    IVCheckerReader::Result read(Logger& logger, const QImage& frame, const InferenceBoxScope& box);
 
 private:
     const IVCheckerReader& m_reader;
@@ -75,6 +76,38 @@ private:
 };
 
 
+class IVCheckerOption : public EnumDropdown{
+public:
+    IVCheckerOption(QString label, size_t default_index = 0)
+        : EnumDropdown(
+            std::move(label),
+            {
+                "Don't Care (0-31)",
+                "No Good (0)",
+                "Decent (0-15)",
+                "Pretty Good (16-25)",
+                "Very Good (26-29)",
+                "Fantastic (30)",
+                "Best (31)",
+            },
+            default_index
+        )
+    {}
+
+    bool matches(uint64_t& errors, IVCheckerReader::Result result) const{
+        if (result == IVCheckerReader::Result::UnableToDetect){
+            errors++;
+        }
+        size_t desired = (size_t)*this;
+        if (desired == 0){
+            return true;
+        }
+        if (desired == (size_t)result){
+            return true;
+        }
+        return false;
+    }
+};
 
 
 }

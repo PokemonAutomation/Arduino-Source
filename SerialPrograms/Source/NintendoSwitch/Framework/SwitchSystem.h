@@ -29,11 +29,11 @@ class SwitchSystemFactory : public SwitchSetupFactory{
 
 public:
     SwitchSystemFactory(
-        QString label, QString logger_tag,
+        QString label, std::string logger_tag,
         PABotBaseLevel min_pabotbase, FeedbackType feedback
     );
     SwitchSystemFactory(
-        QString label, QString logger_tag,
+        QString label, std::string logger_tag,
         PABotBaseLevel min_pabotbase, FeedbackType feedback,
         const QJsonValue& json
     );
@@ -42,13 +42,13 @@ public:
 
     const QSerialPortInfo* port() const;
 
-    SwitchSetup* make_ui(QWidget& parent, OutputWindow& log_window) override;
+    SwitchSetup* make_ui(QWidget& parent, Logger& logger) override;
 
 private:
     friend class SwitchSystem;
 
     QString m_label;
-    QString m_logger_tag;
+    std::string m_logger_tag;
 
     SerialSelector m_serial;
     CameraSelector m_camera;
@@ -62,7 +62,7 @@ public:
     SwitchSystem(
         QWidget& parent,
         SwitchSystemFactory& factory,
-        OutputWindow& log_window
+        Logger& logger
     );
     virtual ~SwitchSystem();
 
@@ -85,6 +85,7 @@ public:
 public:
     BotBase* botbase();
     VideoFeed& camera();
+    VideoOverlay& overlay();
     virtual void update_ui(ProgramState state) override;
 
 private:

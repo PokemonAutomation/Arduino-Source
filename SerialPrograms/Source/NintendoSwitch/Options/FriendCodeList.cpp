@@ -30,7 +30,7 @@ std::vector<uint8_t> FriendCodeList::parse(const QString& line){
 }
 
 FriendCodeList::FriendCodeList()
-    : ConfigOption("<b>Friend Codes:</b> One per line only. Invalid characters are ignored.")
+    : m_label("<b>Friend Codes:</b> One per line only. Invalid characters are ignored.")
     , m_lines{
         "SW-1234-5678-9012",
         "123456789012",

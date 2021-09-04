@@ -12,8 +12,8 @@
 #include <QComboBox>
 #include <QPushButton>
 #include "Common/PokemonSwSh/PokemonProgramIDs.h"
+#include "CommonFramework/Tools/Logger.h"
 #include "CommonFramework/Tools/BotBaseHandle.h"
-#include "CommonFramework/Windows/OutputWindow.h"
 
 namespace PokemonAutomation{
 
@@ -24,11 +24,11 @@ class SerialSelectorUI;
 class SerialSelector{
 public:
     SerialSelector(
-        QString label, QString logger_tag,
+        QString label, std::string logger_tag,
         PABotBaseLevel minimum_pabotbase
     );
     SerialSelector(
-        QString label, QString logger_tag,
+        QString label, std::string logger_tag,
         PABotBaseLevel minimum_pabotbase,
         const QJsonValue& json
     );
@@ -38,14 +38,14 @@ public:
 
     const QSerialPortInfo* port() const;
 
-    SerialSelectorUI* make_ui(QWidget& parent, OutputWindow& log_window);
+    SerialSelectorUI* make_ui(QWidget& parent, Logger& logger);
 
 private:
     friend class SerialSelectorUI;
 
     const QString m_label;
     const PABotBaseLevel m_minimum_pabotbase;
-    const QString m_logger_tag;
+    const std::string m_logger_tag;
 
     QSerialPortInfo m_port;
 };
@@ -58,7 +58,7 @@ public:
     SerialSelectorUI(
         QWidget& parent,
         SerialSelector& value,
-        OutputWindow& log_window
+        Logger& logger
     );
     ~SerialSelectorUI();
 

@@ -18,7 +18,7 @@ PanelDescriptorWrapper<GlobalSettings_Descriptor, GlobalSettings> GlobalSettings
 GlobalSettings_Descriptor::GlobalSettings_Descriptor()
     : PanelDescriptor(
         QColor(),
-        "GlobalSettings",
+        "",
         "Global Settings",
         "",
         "Global Settings"
@@ -65,6 +65,15 @@ GlobalSettings::GlobalSettings(const GlobalSettings_Descriptor& descriptor)
             PERSISTENT_SETTINGS().log_everything,
             "<b>Log Everything:</b><br>Log everything to the output window and output log. Will be very spammy.",
             false
+        )
+    );
+    m_options.emplace_back(
+        "SaveDebugImages",
+        new BooleanCheckBox(
+            PERSISTENT_SETTINGS().save_debug_images,
+            "<b>Save Debug Images:</b><br>"
+            "If the program fails to read something when it should succeed, save the image for debugging purposes.",
+            true
         )
     );
     m_options.emplace_back(

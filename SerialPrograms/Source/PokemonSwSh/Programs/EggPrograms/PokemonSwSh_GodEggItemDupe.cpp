@@ -45,10 +45,10 @@ GodEggItemDupe::GodEggItemDupe(const GodEggItemDupe_Descriptor& descriptor)
         false
     )
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
-    m_options.emplace_back(&MAX_FETCH_ATTEMPTS, "MAX_FETCH_ATTEMPTS");
-    m_options.emplace_back(&PARTY_ROUND_ROBIN, "PARTY_ROUND_ROBIN");
-    m_options.emplace_back(&DETACH_BEFORE_RELEASE, "DETACH_BEFORE_RELEASE");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(MAX_FETCH_ATTEMPTS);
+    PA_ADD_OPTION(PARTY_ROUND_ROBIN);
+    PA_ADD_OPTION(DETACH_BEFORE_RELEASE);
 }
 
 

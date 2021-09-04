@@ -34,8 +34,8 @@ PageSwap::PageSwap(const PageSwap_Descriptor& descriptor)
         false
     )
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
-    m_options.emplace_back(&DODGE_SYSTEM_UPDATE_WINDOW, "DODGE_SYSTEM_UPDATE_WINDOW");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(DODGE_SYSTEM_UPDATE_WINDOW);
 }
 
 void PageSwap::program(SingleSwitchProgramEnvironment& env){

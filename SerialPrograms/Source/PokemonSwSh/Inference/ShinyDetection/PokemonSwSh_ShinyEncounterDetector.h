@@ -11,6 +11,7 @@
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "Pokemon/Pokemon_Types.h"
+#include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -19,7 +20,8 @@ using namespace Pokemon;
 
 
 struct ShinyDetectionBattle{
-    InferenceBox detection_box;
+    bool den;
+    ImageFloatBox detection_box;
     std::chrono::milliseconds dialog_delay_when_shiny;
 };
 extern const ShinyDetectionBattle SHINY_BATTLE_REGULAR;
@@ -27,8 +29,10 @@ extern const ShinyDetectionBattle SHINY_BATTLE_RAID;
 
 
 
-ShinyType detect_shiny_battle(
-    ProgramEnvironment& env, VideoFeed& feed,
+ShinyDetectionResult detect_shiny_battle(
+    Logger& logger,
+    ProgramEnvironment& env,
+    VideoFeed& feed, VideoOverlay& overlay,
     const ShinyDetectionBattle& battle_settings,
     std::chrono::seconds timeout,
     double detection_threshold = 2.0

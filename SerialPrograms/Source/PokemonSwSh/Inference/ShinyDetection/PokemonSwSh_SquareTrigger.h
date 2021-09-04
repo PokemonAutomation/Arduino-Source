@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_SquareTrigger_H
 
 #include <vector>
-#include "CommonFramework/Inference/FillGeometry.h"
+#include "CommonFramework/ImageTools/FillGeometry.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -16,7 +16,7 @@ namespace PokemonSwSh{
 
 
 bool is_square_beam(
-    const FillMatrix& matrix,
+    const CellMatrix& matrix,
     const FillGeometry& object,
     double min_length
 );

@@ -12,7 +12,7 @@
 #include "NintendoSwitch/Options/TimeExpression.h"
 #include "NintendoSwitch/Options/StartInGripMenu.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
-#include "PokemonSwSh/Options/EggStepCount.h"
+#include "PokemonSwSh/Options/PokemonSwSh_EggStepCount.h"
 #include "PokemonSwSh_EggHelpers.h"
 
 namespace PokemonAutomation{

@@ -74,18 +74,18 @@ TradeBot::TradeBot(const TradeBot_Descriptor& descriptor)
         "30 * TICKS_PER_SECOND"
     )
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
 
-    m_options.emplace_back(&TRADE_CODE, "TRADE_CODE");
-    m_options.emplace_back(&BOXES_TO_TRADE, "BOXES_TO_TRADE");
-    m_options.emplace_back(&LINK_TRADE_EXTRA_LINE, "EXTRA_LINE");
-    m_options.emplace_back(&SEARCH_DELAY, "SEARCH_DELAY");
-    m_options.emplace_back(&CONFIRM_DELAY, "CONFIRM_DELAY");
-    m_options.emplace_back(&TRADE_START, "TRADE_START");
-    m_options.emplace_back(&TRADE_COMMUNICATION, "TRADE_COMMUNICATION");
-    m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&TRADE_ANIMATION, "TRADE_ANIMATION");
-    m_options.emplace_back(&EVOLVE_DELAY, "EVOLVE_DELAY");
+    PA_ADD_OPTION(TRADE_CODE);
+    PA_ADD_OPTION(BOXES_TO_TRADE);
+    PA_ADD_OPTION(LINK_TRADE_EXTRA_LINE);
+    PA_ADD_OPTION(SEARCH_DELAY);
+    PA_ADD_OPTION(CONFIRM_DELAY);
+    PA_ADD_OPTION(TRADE_START);
+    PA_ADD_OPTION(TRADE_COMMUNICATION);
+    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_OPTION(TRADE_ANIMATION);
+    PA_ADD_OPTION(EVOLVE_DELAY);
 }
 
 

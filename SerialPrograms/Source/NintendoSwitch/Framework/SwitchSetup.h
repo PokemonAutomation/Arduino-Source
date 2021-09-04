@@ -10,8 +10,8 @@
 #include <QJsonValue>
 #include <QWidget>
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Tools/Logger.h"
 #include "CommonFramework/Tools/BotBaseHandle.h"
-#include "CommonFramework/Windows/OutputWindow.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -32,7 +32,7 @@ public:
     virtual void load_json(const QJsonValue& json) = 0;
     virtual QJsonValue to_json() const = 0;
 
-    virtual SwitchSetup* make_ui(QWidget& parent, OutputWindow& log_window) = 0;
+    virtual SwitchSetup* make_ui(QWidget& parent, Logger& logger) = 0;
 
 protected:
     const PABotBaseLevel m_min_pabotbase;

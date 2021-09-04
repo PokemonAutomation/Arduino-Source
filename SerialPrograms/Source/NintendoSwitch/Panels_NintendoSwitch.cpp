@@ -23,8 +23,8 @@
 
 #include "TestProgram.h"
 #include "NintendoSwitch/InferenceTraining/PokemonHome_GenerateNameOCR.h"
-#include "Pokemon/Pokemon_TrainIVCheckerOCR.h"
-#include "Pokemon/Pokemon_TrainPokemonOCR.h"
+#include "Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h"
+#include "Pokemon/Inference/Pokemon_TrainPokemonOCR.h"
 
 
 namespace PokemonAutomation{

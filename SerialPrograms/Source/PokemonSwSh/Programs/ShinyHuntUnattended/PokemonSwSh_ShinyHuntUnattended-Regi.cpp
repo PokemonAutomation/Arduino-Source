@@ -38,10 +38,6 @@ ShinyHuntUnattendedRegi::ShinyHuntUnattendedRegi(const ShinyHuntUnattendedRegi_D
         "<b>Start to Run Delay:</b><br>This needs to be carefully calibrated.",
         "1990"
     )
-    , TOUCH_DATE_INTERVAL(
-        "<b>Rollover Prevention:</b><br>Prevent a den from rolling over by periodically touching the date. If set to zero, this feature is disabled.",
-        "4 * 3600 * TICKS_PER_SECOND"
-    )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -54,14 +50,14 @@ ShinyHuntUnattendedRegi::ShinyHuntUnattendedRegi(const ShinyHuntUnattendedRegi_D
         "5 * TICKS_PER_SECOND"
     )
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(TOUCH_DATE_INTERVAL);
 
-    m_options.emplace_back(&START_TO_RUN_DELAY, "START_TO_RUN_DELAY");
-    m_options.emplace_back(&REGI_NAME, "REGI_NAME");
-    m_options.emplace_back(&TOUCH_DATE_INTERVAL, "TOUCH_DATE_INTERVAL");
-    m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&CORRECTION_INTERVAL, "CORRECTION_INTERVAL");
-    m_options.emplace_back(&TRANSITION_DELAY, "TRANSITION_DELAY");
+    PA_ADD_OPTION(START_TO_RUN_DELAY);
+    PA_ADD_OPTION(REGI_NAME);
+    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_OPTION(CORRECTION_INTERVAL);
+    PA_ADD_OPTION(TRANSITION_DELAY);
 }
 
 

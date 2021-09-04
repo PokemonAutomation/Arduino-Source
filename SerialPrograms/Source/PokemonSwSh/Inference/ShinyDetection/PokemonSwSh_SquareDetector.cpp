@@ -27,7 +27,7 @@ struct Point{
 };
 
 void dump_matrix(
-    FillMatrix submatrix,
+    CellMatrix submatrix,
     pxint_t center_x, pxint_t center_y,
     const std::vector<Point>& points
 ){
@@ -39,7 +39,7 @@ void dump_matrix(
 }
 template <typename MapType>
 void dump_matrix(
-    FillMatrix submatrix,
+    CellMatrix submatrix,
     pxint_t center_x, pxint_t center_y,
     const MapType& points_by_distance
 ){
@@ -57,7 +57,7 @@ void dump_matrix(
 //
 bool check_hole(
     size_t& background_area,
-    FillMatrix& submatrix,
+    CellMatrix& submatrix,
     size_t object_area,
     pxint_t object_center_x,
     pxint_t object_center_y
@@ -121,7 +121,7 @@ bool check_hole(
 //  the object.
 //
 std::vector<Point> get_furthest_points(
-    const FillMatrix& submatrix,
+    const CellMatrix& submatrix,
     pxint_t center_x, pxint_t center_y
 ){
     pxint_t width = submatrix.width();
@@ -133,7 +133,7 @@ std::vector<Point> get_furthest_points(
     std::vector<Point> points;
     for (pxint_t r = 0; r < height; r++){
         for (pxint_t c = 0; c < width; c++){
-            FillMatrix::ObjectID cell = submatrix[r][c];
+            CellMatrix::ObjectID cell = submatrix[r][c];
             if (cell != 0){
                 continue;
             }
@@ -319,10 +319,10 @@ double area_of_triangle(
 //  object. This angle is relative to "base_angle" and reduced [0, 360).
 //
 std::multimap<double, std::pair<pxint_t, pxint_t>> get_edge_points(
-    const FillMatrix& submatrix,
+    const CellMatrix& submatrix,
     pxint_t center_x, pxint_t center_y, double base_angle,
-    FillMatrix::ObjectID object,
-    FillMatrix::ObjectID background
+    CellMatrix::ObjectID object,
+    CellMatrix::ObjectID background
 ){
     pxint_t width = submatrix.width();
     pxint_t height = submatrix.height();
@@ -412,7 +412,7 @@ double sum_squares_from_line(
 //
 bool is_square2(
     const QImage& image,
-    const FillMatrix& matrix,
+    const CellMatrix& matrix,
     const FillGeometry& object,
     double max_deviation
 ){
@@ -432,14 +432,14 @@ bool is_square2(
     }
 //    size_t box_area = (size_t)width * height;
 
-    FillMatrix submatrix = matrix.extract(object.box, object.id);
+    CellMatrix submatrix = matrix.extract(object.box, object.id);
     pxint_t center_x = object.center_x - object.box.min_x;
     pxint_t center_y = object.center_y - object.box.min_y;
 
     //  Invert the cells.
     for (pxint_t r = 0; r < height; r++){
         for (pxint_t c = 0; c < width; c++){
-            FillMatrix::ObjectID cell = submatrix[r][c];
+            CellMatrix::ObjectID cell = submatrix[r][c];
             cell = cell ? 0 : 1;
             submatrix[r][c] = cell;
         }

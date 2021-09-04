@@ -153,10 +153,10 @@
 //      (version / 100) must be the same on both server and client.
 //      (version % 100) can be higher on server than client.
 //
-#define PABB_PROTOCOL_VERSION           2021052601
+#define PABB_PROTOCOL_VERSION           2021052603
 
 //  Program versioning doesn't matter. It's just for informational purposes.
-#define PABB_PROGRAM_VERSION            2021071400
+#define PABB_PROGRAM_VERSION            2021082200
 
 #define PABB_BAUD_RATE                  115200
 #define PABB_RETRANSMIT_DELAY_MILLIS    80

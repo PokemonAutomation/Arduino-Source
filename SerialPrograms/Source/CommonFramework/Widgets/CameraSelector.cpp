@@ -60,17 +60,34 @@ QJsonValue CameraSelector::to_json() const{
     return root;
 }
 
-CameraSelectorUI* CameraSelector::make_ui(QWidget& parent, QWidget& holder){
-    return new CameraSelectorUI(parent, *this, holder);
+CameraSelectorUI* CameraSelector::make_ui(QWidget& parent, Logger& logger, QWidget& holder){
+    return new CameraSelectorUI(parent, logger, *this, holder);
 }
 
+
+
+
+#if 0
+void ExpandingCameraViewFinder::resizeEvent(QResizeEvent* event){
+    QCameraViewfinder::resizeEvent(event);
+//    cout << width() << " x " << height() << endl;
+//    setMinimumSize(80, 1080);
+//    resize(width(), 1080);
+}
+#endif
 
 
 CameraSelectorUI::~CameraSelectorUI(){
 //    cout << "~CameraSelectorUI()" << endl;
 }
-CameraSelectorUI::CameraSelectorUI(QWidget& parent, CameraSelector& value, QWidget& holder)
+CameraSelectorUI::CameraSelectorUI(
+    QWidget& parent,
+    Logger& logger,
+    CameraSelector& value,
+    QWidget& holder
+)
     : QWidget(&parent)
+    , m_logger(logger)
     , m_value(value)
     , m_holder(holder)
     , m_camera_box(nullptr)
@@ -97,7 +114,7 @@ CameraSelectorUI::CameraSelectorUI(QWidget& parent, CameraSelector& value, QWidg
     m_reset_button = new QPushButton("Reset Camera", this);
     camera_row->addWidget(m_reset_button, 1);
 
-    m_overlay = new VideoOverlay(m_holder);
+    m_overlay = new VideoOverlayWidget(m_holder);
 
     connect(
         m_camera_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -236,7 +253,11 @@ void CameraSelectorUI::reset_video(){
 //                cout << "finish = " << id << endl;
                 auto iter = m_pending_captures.find(id);
                 if (iter == m_pending_captures.end()){
-                    cout << "QCameraImageCapture::imageCaptured(): Unable to find capture id: " << id << endl;
+                    m_logger.log(
+                        "QCameraImageCapture::imageCaptured(): Unable to find capture id: " + std::to_string(id),
+                        "red"
+                    );
+//                    cout << "QCameraImageCapture::imageCaptured(): Unable to find capture id: " << id << endl;
                     return;
                 }
                 iter->second.status = CaptureStatus::COMPLETED;
@@ -249,7 +270,11 @@ void CameraSelectorUI::reset_video(){
             this, [&](int id, QCameraImageCapture::Error error, const QString& errorString){
                 std::lock_guard<std::mutex> lg(m_camera_lock);
 //                cout << "error = " << id << endl;
-                cout << "QCameraImageCapture::error(): " << errorString.toUtf8().data() << endl;
+                m_logger.log(
+                    "QCameraImageCapture::error(): Unable to find capture id: " + errorString,
+                    "red"
+                );
+//                cout << "QCameraImageCapture::error(): " << errorString.toUtf8().data() << endl;
                 auto iter = m_pending_captures.find(id);
                 if (iter == m_pending_captures.end()){
                     return;
@@ -262,7 +287,6 @@ void CameraSelectorUI::reset_video(){
         m_camera_view = new QCameraViewfinder(&m_holder);
         m_holder.layout()->addWidget(m_camera_view);
         m_camera_view->setMinimumSize(80, 45);
-    //    m_camera_view->setSizePolicy(QSizePolicy::Ignored, QSizePolicy::Maximum);
         m_camera->setViewfinder(m_camera_view);
         m_camera->start();
 
@@ -325,10 +349,12 @@ void CameraSelectorUI::update_size(){
     if (m_camera_view == nullptr){
         return;
     }
-//    cout << this->width() << " x " << this->height() << " | "
-//         << m_video->width() << " x " << m_video->height() << endl;
     QSize resolution = m_camera->viewfinderSettings().resolution();
+//    cout << m_holder.width() << " x " << m_holder.height() << " | "
+//         << resolution.width() << " x " << resolution.height() << endl;
+
     int height = (int)((double)m_holder.width() / resolution.width() * resolution.height());
+//    cout << "desired height = " << height << endl;
 
 
     //  Safeguard against a resizing loop where the UI bounces between larger
@@ -347,7 +373,8 @@ void CameraSelectorUI::update_size(){
         m_height_history.pop_front();
     }
 //    cout << "before = " << m_video->height() << ", " << height << endl;
-    m_holder.setMaximumHeight(height);
+//    m_holder.setMaximumHeight(height);
+    m_holder.setFixedHeight(height);
 //    cout << "after  = " << m_video->height() << endl;
     m_overlay->update_size(m_holder.size(), resolution);
 
@@ -395,18 +422,18 @@ QImage CameraSelectorUI::snapshot(){
     );
 
     if (capture.status != CaptureStatus::COMPLETED){
-        cout << "Capture timed out." << endl;
+        m_logger.log("Capture timed out.");
     }
 
     QImage ret = std::move(capture.image);
     m_pending_captures.erase(iter.first);
     return ret;
 }
-void CameraSelectorUI::operator+=(const InferenceBox& box){
-    *m_overlay += box;
+void CameraSelectorUI::add_box(const ImageFloatBox& box, QColor color){
+    m_overlay->add_box(box, color);
 }
-void CameraSelectorUI::operator-=(const InferenceBox& box){
-    *m_overlay -= box;
+void CameraSelectorUI::remove_box(const ImageFloatBox& box){
+    m_overlay->remove_box(box);
 }
 
 #if 0

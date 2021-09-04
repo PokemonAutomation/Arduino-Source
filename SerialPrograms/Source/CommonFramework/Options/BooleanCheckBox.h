@@ -20,15 +20,13 @@ public:
         QString label,
         bool default_value
     )
-        : ConfigOption(label)
-        , BooleanCheckBoxOption(backing, std::move(label), default_value)
+        : BooleanCheckBoxOption(backing, std::move(label), default_value)
     {}
     BooleanCheckBox(
         QString label,
         bool default_value
     )
-        : ConfigOption(label)
-        , BooleanCheckBoxOption(std::move(label), default_value)
+        : BooleanCheckBoxOption(std::move(label), default_value)
     {}
 
     virtual void load_json(const QJsonValue& json) override{

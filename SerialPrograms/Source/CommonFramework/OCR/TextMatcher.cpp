@@ -177,11 +177,7 @@ double random_match_probability(size_t total, size_t matched, double random_matc
 
 
 
-void MatchResult::log(Logger* logger, const QString& extra) const{
-    if (logger == nullptr){
-        return;
-    }
-
+void MatchResult::log(Logger& logger, const QString& extra) const{
     QString str = "OCR Result: ";
 
     if (!expected_token.empty()){
@@ -214,12 +210,12 @@ void MatchResult::log(Logger* logger, const QString& extra) const{
     }
 
     QString token_str;
-    if (tokens.size() > 5){
+    if (slugs.size() > 5){
         token_str += "(" + QString::number(candidates.size()) + " matches)";
     }else{
         token_str += "(";
         bool first = true;
-        for (const std::string& token : tokens){
+        for (const std::string& token : slugs){
             if (!first){
                 token_str += ", ";
             }
@@ -240,7 +236,7 @@ void MatchResult::log(Logger* logger, const QString& extra) const{
         str += extra;
     }
 
-    logger->log(str, matched ? Qt::blue : Qt::red);
+    logger.log(str, matched ? Qt::blue : Qt::red);
 }
 
 
@@ -265,7 +261,7 @@ MatchResult match_substring(
 //        result.exact_match_error = 0;
         result.alpha = 1. / random_match_probability(normalized.size(), normalized.size(), random_match_chance);
         result.candidates = {normalized};
-        result.tokens = iter->second;
+        result.slugs = iter->second;
         return result;
     }
 
@@ -319,7 +315,7 @@ MatchResult match_substring(
 //    result.exact_match_error = best_error;
     result.alpha = best_alpha;
     result.candidates = candidates;
-    result.tokens = tokens;
+    result.slugs = tokens;
     return result;
 }
 

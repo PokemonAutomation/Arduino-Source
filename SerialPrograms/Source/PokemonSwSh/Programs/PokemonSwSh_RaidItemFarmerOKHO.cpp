@@ -65,15 +65,15 @@ RaidItemFarmerOHKO::RaidItemFarmerOHKO(const RaidItemFarmerOHKO_Descriptor& desc
         "4 * 3600 * TICKS_PER_SECOND"
     )
 {
-    m_options.emplace_back(&BACKUP_SAVE, "BACKUP_SAVE");
-//    m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&WAIT_FOR_STAMP_DELAY, "WAIT_FOR_STAMP_DELAY");
-    m_options.emplace_back(&ENTER_STAMP_MASH_DURATION, "ENTER_STAMP_MASH_DELAY");
-    m_options.emplace_back(&RAID_START_MASH_DURATION, "RAID_START_MASH_DURATION");
-    m_options.emplace_back(&RAID_START_TO_ATTACK_DELAY, "RAID_START_TO_ATTACK_DELAY");
-    m_options.emplace_back(&ATTACK_TO_CATCH_DELAY, "ATTACK_TO_CATCH_DELAY");
-    m_options.emplace_back(&RETURN_TO_OVERWORLD_DELAY, "RETURN_TO_OVERWORLD_DELAY");
-    m_options.emplace_back(&TOUCH_DATE_INTERVAL, "TOUCH_DATE_INTERVAL");
+    PA_ADD_OPTION(BACKUP_SAVE);
+//    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_OPTION(WAIT_FOR_STAMP_DELAY);
+    PA_ADD_OPTION(ENTER_STAMP_MASH_DURATION);
+    PA_ADD_OPTION(RAID_START_MASH_DURATION);
+    PA_ADD_OPTION(RAID_START_TO_ATTACK_DELAY);
+    PA_ADD_OPTION(ATTACK_TO_CATCH_DELAY);
+    PA_ADD_OPTION(RETURN_TO_OVERWORLD_DELAY);
+    PA_ADD_OPTION(TOUCH_DATE_INTERVAL);
 }
 
 void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env){

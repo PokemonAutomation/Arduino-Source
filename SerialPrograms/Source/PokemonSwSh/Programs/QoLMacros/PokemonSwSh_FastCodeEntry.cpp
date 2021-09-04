@@ -39,8 +39,8 @@ FastCodeEntry::FastCodeEntry(const FastCodeEntry_Descriptor& descriptor)
         "0 * TICKS_PER_SECOND"
     )
 {
-    m_options.emplace_back(&RAID_CODE, "RAID_CODE");
-    m_options.emplace_back(&INITIAL_DELAY, "INITIAL_DELAY");
+    PA_ADD_OPTION(RAID_CODE);
+    PA_ADD_OPTION(INITIAL_DELAY);
 }
 
 void FastCodeEntry::program(SingleSwitchProgramEnvironment& env){

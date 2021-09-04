@@ -18,9 +18,8 @@
 #include "CommonFramework/OCR/Filtering.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_StartBattleDetector.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_BattleMenuDetector.h"
-#include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
+#include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
+#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_EncounterHandler.h"
 #include "PokemonSwSh_OverworldMovement.h"
@@ -50,7 +49,10 @@ ShinyHuntAutonomousOverworld_Descriptor::ShinyHuntAutonomousOverworld_Descriptor
 ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld(const ShinyHuntAutonomousOverworld_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
-    , LANGUAGE(m_name_reader)
+    , TIME_ROLLBACK_HOURS(
+        "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
+        1, 0, 11
+    )
     , MARK_OFFSET(
         "<b>Mark Offset:</b><br>Aim this far below the bottom of the exclamation/question mark. 1.0 is the height of the mark. "
         "Increase this value when the " + STRING_POKEMON + " are large.",
@@ -84,11 +86,7 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld(const ShinyHuntAutono
         "<b>Max Target Alpha:</b><br>Ignore all targets with alpha larger than this. Set to zero to ignore all marks.",
         70000, 0
     )
-    , FILTER(true, true)
-    , TIME_ROLLBACK_HOURS(
-        "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
-        1, 0, 11
-    )
+    , ENCOUNTER_BOT_OPTIONS(true, true)
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -105,32 +103,24 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld(const ShinyHuntAutono
         " This increases the chance of encountering the " + STRING_POKEMON + " if it has moved or if the trajectory missed.",
         true
     )
-    , VIDEO_ON_SHINY(
-        "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
-        true
-    )
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
-    m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(TIME_ROLLBACK_HOURS);
 
-    m_options.emplace_back(&LANGUAGE, "LANGUAGE");
-    m_options.emplace_back(&MARK_OFFSET, "MARK_OFFSET");
-    m_options.emplace_back(&MARK_PRIORITY, "MARK_PRIORITY");
-    m_options.emplace_back(&TRIGGER_METHOD, "TRIGGER_METHOD");
-    m_options.emplace_back(&MAX_MOVE_DURATION, "MAX_MOVE_DURATION");
-    m_options.emplace_back(&MAX_TARGET_ALPHA, "MAX_TARGET_ALPHA");
-    m_options.emplace_back(&FILTER, "FILTER");
+    PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(MARK_OFFSET);
+    PA_ADD_OPTION(MARK_PRIORITY);
+    PA_ADD_OPTION(TRIGGER_METHOD);
+    PA_ADD_OPTION(MAX_MOVE_DURATION);
+    PA_ADD_OPTION(MAX_TARGET_ALPHA);
 
-    m_options.emplace_back(&TIME_ROLLBACK_HOURS, "TIME_ROLLBACK_HOURS");
-    m_options.emplace_back(&NOTIFICATION_LEVEL, "NOTIFICATION_LEVEL");
+    PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
 
-    m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&WATCHDOG_TIMER, "WATCHDOG_TIMER");
-    m_options.emplace_back(&EXIT_BATTLE_TIMEOUT, "EXIT_BATTLE_TIMEOUT");
-    m_options.emplace_back(&TARGET_CIRCLING, "ENABLE_CIRCLING");
-    if (PERSISTENT_SETTINGS().developer_mode){
-        m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
-    }
+    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_OPTION(WATCHDOG_TIMER);
+    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
+    PA_ADD_OPTION(TARGET_CIRCLING);
 }
 
 
@@ -157,22 +147,22 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
     std::chrono::system_clock::time_point expiration
 ) const{
     InferenceBoxScope self(
-        env.console, Qt::cyan,
+        env.console,
         OverworldTargetTracker::OVERWORLD_CENTER_X - 0.02,
         OverworldTargetTracker::OVERWORLD_CENTER_Y - 0.05,
-        0.04, 0.1
+        0.04, 0.1, Qt::cyan
     );
 
     InterruptableCommandSession commands(env.console);
 
-    StandardBattleMenuDetector battle_menu_detector(env.console);
+    StandardBattleMenuDetector battle_menu_detector(env.console, false);
     battle_menu_detector.register_command_stop(commands);
 
     StartBattleDetector start_battle_detector(env.console);
     start_battle_detector.register_command_stop(commands);
 
     OverworldTargetTracker target_tracker(
-        env.logger(), env.console,
+        env.console, env.console,
         std::chrono::milliseconds(1000),
         MARK_OFFSET,
         (MarkPriority)(size_t)MARK_PRIORITY,
@@ -266,8 +256,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
 
 
         //  Target Found
-        target.second.box.color = Qt::yellow;
-        InferenceBoxScope target_box(env.console, target.second.box);
+        InferenceBoxScope target_box(env.console, target.second.box, Qt::yellow);
         env.log(
             QString("Best Target: ") +
             (target.second.mark == OverworldMark::EXCLAMATION_MARK ? "Exclamation" : "Question") +
@@ -338,11 +327,9 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env){
     StandardEncounterHandler handler(
         m_descriptor.display_name(),
         env, env.console,
-        &m_name_reader, LANGUAGE,
-        stats,
-        FILTER,
-        VIDEO_ON_SHINY,
-        NOTIFICATION_LEVEL
+        LANGUAGE,
+        ENCOUNTER_BOT_OPTIONS,
+        stats
     );
 
     //  Encounter Loop
@@ -378,14 +365,15 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env){
         }
 
         //  Detect shiny.
-        ShinyType shininess = detect_shiny_battle(
-            env, env.console,
+        ShinyDetectionResult result = detect_shiny_battle(
+            env.console,
+            env, env.console, env.console,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );
 //        shininess = ShinyDetection::SQUARE_SHINY;
 
-        bool stop = handler.handle_standard_encounter_runaway(shininess, EXIT_BATTLE_TIMEOUT);
+        bool stop = handler.handle_standard_encounter_end_battle(result, EXIT_BATTLE_TIMEOUT);
         if (stop){
             break;
         }

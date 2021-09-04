@@ -20,8 +20,8 @@
 #include "Programs/General/PokemonSwSh_TradeBot.h"
 #include "Programs/General/PokemonSwSh_ClothingBuyer.h"
 #include "Programs/General/PokemonSwSh_BallThrower.h"
+#include "Programs/General/PokemonSwSh_AutonomousBallThrower.h"
 #include "Programs/General/PokemonSwSh_DexRecFinder.h"
-#include "Programs/General/PokemonSwSh_StatsReset.h"
 
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-WattFarmer.h"
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-BerryFarmer.h"
@@ -41,6 +41,10 @@
 #include "Programs/Hosting/PokemonSwSh_AutoHost-Rolling.h"
 #include "Programs/Hosting/PokemonSwSh_AutoHost-MultiGame.h"
 
+#include "Programs/General/PokemonSwSh_StatsReset.h"
+#include "Programs/General/PokemonSwSh_StatsReset-Moltres.h"
+#include "Programs/General/PokemonSwSh_StatsReset-Regi.h"
+
 #include "Programs/ShinyHuntUnattended/PokemonSwSh_MultiGameFossil.h"
 #include "Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-Regi.h"
 #include "Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.h"
@@ -58,6 +62,7 @@
 #include "Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Whistling.h"
 #include "Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Fishing.h"
 #include "Programs/OverworldBot/PokemonSwSh_ShinyHuntAutonomous-Overworld.h"
+#include "Programs/MaxLair/PokemonSwSh_MaxLair_SingleRun.h"
 
 #include "Programs/EggPrograms/PokemonSwSh_EggFetcher2.h"
 #include "Programs/EggPrograms/PokemonSwSh_EggHatcher.h"
@@ -97,8 +102,8 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<TradeBot_Descriptor, TradeBot>();
     add_program<ClothingBuyer_Descriptor, ClothingBuyer>();
     add_program<BallThrower_Descriptor, BallThrower>();
+    add_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>();
     add_program<DexRecFinder_Descriptor, DexRecFinder>();
-    add_program<StatsReset_Descriptor, StatsReset>();
 
     add_divider("---- Date-Spam Farmers ----");
     add_program<WattFarmer_Descriptor, WattFarmer>();
@@ -120,6 +125,11 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<DenRoller_Descriptor, DenRoller>();
     add_program<AutoHostRolling_Descriptor, AutoHostRolling>();
     add_program<AutoHostMultiGame_Descriptor, AutoHostMultiGame>();
+
+    add_divider("---- Non-Shiny Hunting ----");
+    add_program<StatsReset_Descriptor, StatsReset>();
+    add_program<StatsResetMoltres_Descriptor, StatsResetMoltres>();
+    add_program<StatsResetRegi_Descriptor, StatsResetRegi>();
 
     add_divider("---- Unattended Shiny Hunting ----");
     add_program<MultiGameFossil_Descriptor, MultiGameFossil>();
@@ -157,6 +167,9 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
 
     if (settings.developer_mode){
         add_divider("---- Developer Tools ----");
+        if (settings.naughty_mode){
+            add_program<MaxLairSingleRun_Descriptor, MaxLairSingleRun>();
+        }
         add_program<GenerateIVCheckerOCR_Descriptor, GenerateIVCheckerOCR>();
         add_program<GenerateNameOCRDataPokedex_Descriptor, GenerateNameOCRDataPokedex>();
     }

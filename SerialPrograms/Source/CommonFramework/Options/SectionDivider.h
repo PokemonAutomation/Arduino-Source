@@ -21,6 +21,7 @@ public:
 
 private:
     friend class SectionDividerUI;
+    QString m_label;
 };
 
 

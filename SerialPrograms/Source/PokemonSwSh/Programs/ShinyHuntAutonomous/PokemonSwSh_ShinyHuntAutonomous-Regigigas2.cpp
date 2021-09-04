@@ -11,8 +11,8 @@
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
 #include "CommonFramework/PersistentSettings.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_StartBattleDetector.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_RaidCatchDetector.h"
+#include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
+#include "PokemonSwSh/Inference/Dens/PokemonSwSh_RaidCatchDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_EncounterHandler.h"
@@ -43,11 +43,7 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2(const ShinyHuntAuto
         "<b>Reversal PP:</b><br>The amount of Reversal PP you are saved with.",
         24
     )
-    , FILTER(false, false)
-    , TOUCH_DATE_INTERVAL(
-        "<b>Rollover Prevention:</b><br>Prevent a den from rolling over by periodically touching the date. If set to zero, this feature is disabled.",
-        "4 * 3600 * TICKS_PER_SECOND"
-    )
+    , ENCOUNTER_BOT_OPTIONS(false, false)
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -55,25 +51,16 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2(const ShinyHuntAuto
         "<b>Catch to Overworld Delay:</b>",
         "8 * TICKS_PER_SECOND"
     )
-    , VIDEO_ON_SHINY(
-        "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
-        true
-    )
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
-    m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(TOUCH_DATE_INTERVAL);
 
-    m_options.emplace_back(&REVERSAL_PP, "REVERSAL_PP");
-    m_options.emplace_back(&FILTER, "FILTER");
+    PA_ADD_OPTION(REVERSAL_PP);
+    PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
 
-    m_options.emplace_back(&TOUCH_DATE_INTERVAL, "TOUCH_DATE_INTERVAL");
-    m_options.emplace_back(&NOTIFICATION_LEVEL, "NOTIFICATION_LEVEL");
-
-    m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&CATCH_TO_OVERWORLD_DELAY, "CATCH_TO_OVERWORLD_DELAY");
-    if (PERSISTENT_SETTINGS().developer_mode){
-        m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
-    }
+    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_OPTION(CATCH_TO_OVERWORLD_DELAY);
 }
 
 
@@ -91,10 +78,10 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegigigas2::make_stats() const{
 
 
 bool ShinyHuntAutonomousRegigigas2::kill_and_return(SingleSwitchProgramEnvironment& env) const{
-    RaidCatchDetector detector(env.console, std::chrono::seconds(30));
+    RaidCatchDetector detector(env.console);
     pbf_mash_button(env.console, BUTTON_A, 4 * TICKS_PER_SECOND);
 
-    if (!detector.wait(env)){
+    if (!detector.wait(env, env.console, std::chrono::seconds(30))){
         env.log("Raid Catch Menu not found.", Qt::red);
         return false;
     }
@@ -119,11 +106,9 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env)
     StandardEncounterHandler handler(
         m_descriptor.display_name(),
         env, env.console,
-        nullptr, Language::None,
-        stats,
-        FILTER,
-        VIDEO_ON_SHINY,
-        NOTIFICATION_LEVEL
+        Language::None,
+        ENCOUNTER_BOT_OPTIONS,
+        stats
     );
 
     while (true){
@@ -133,25 +118,31 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env)
             pbf_mash_button(env.console, BUTTON_A, 18 * TICKS_PER_SECOND);
             env.console.botbase().wait_for_all_requests();
 
-            if (!wait_for_start_battle(env, env.console, std::chrono::seconds(30))){
+            if (!wait_for_start_battle(
+                    env,
+                    env.console,
+                    env.console,
+                    std::chrono::seconds(30)
+            )){
                 stats.add_error();
                 env.update_stats();
                 break;
             }
 
-            ShinyType shininess = detect_shiny_battle(
-                env, env.console,
+            ShinyDetectionResult result = detect_shiny_battle(
+                env.console,
+                env, env.console, env.console,
                 SHINY_BATTLE_RAID,
                 std::chrono::seconds(30)
             );
 //            shininess = ShinyDetection::STAR_SHINY;
 
-            bool stop = handler.handle_standard_encounter(shininess);
+            bool stop = handler.handle_standard_encounter(result);
             if (stop){
                 goto StopProgram;
             }
 
-            if (shininess == ShinyType::UNKNOWN){
+            if (result.shiny_type == ShinyType::UNKNOWN){
                 stats.add_error();
                 env.update_stats();
                 break;

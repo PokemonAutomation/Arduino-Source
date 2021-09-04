@@ -15,6 +15,7 @@
 #include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/OCR/RawOCR.h"
 #include "CommonFramework/OCR/Filtering.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh_GenerateNameOCRPokedex.h"
 
 #include <iostream>
@@ -43,7 +44,7 @@ GenerateNameOCRDataPokedex::GenerateNameOCRDataPokedex(const GenerateNameOCRData
     : SingleSwitchProgramInstance(descriptor)
     , LANGUAGE(
         "<b>Game Language:</b>",
-        m_reader.languages()
+        Pokemon::PokemonNameReader::instance().languages()
     )
     , POKEDEX(
         "<b>" + STRING_POKEDEX + ":</b>",
@@ -63,25 +64,25 @@ GenerateNameOCRDataPokedex::GenerateNameOCRDataPokedex(const GenerateNameOCRData
         1
     )
 {
-    m_options.emplace_back(&LANGUAGE, "LANGUAGE");
-    m_options.emplace_back(&POKEDEX, "POKEDEX");
-    m_options.emplace_back(&MODE, "MODE");
+    PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(POKEDEX);
+    PA_ADD_OPTION(MODE);
 }
 
 void GenerateNameOCRDataPokedex::read(
     QJsonArray& output,
-    Logger* logger,
+    Logger& logger,
     QImage image
 ) const{
     OCR::make_OCR_filter(image).apply(image);
     image.save("test.png");
 
-    OCR::MatchResult result = m_reader.read_substring(LANGUAGE, image);
+    OCR::MatchResult result = Pokemon::PokemonNameReader::instance().read_substring(LANGUAGE, image);
     result.log(logger);
-    if (result.tokens.empty()){
+    if (result.slugs.empty()){
         output.append("");
     }else{
-        output.append(result.tokens.begin()->c_str());
+        output.append(result.slugs.begin()->c_str());
     }
 }
 
@@ -131,13 +132,13 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env){
         break;
     }
 
-    InferenceBoxScope box0(env.console, Qt::blue, 0.75, 0.146 + 0 * 0.1115, 0.18, 0.059);
-    InferenceBoxScope box1(env.console, Qt::blue, 0.75, 0.146 + 1 * 0.1115, 0.18, 0.059);
-    InferenceBoxScope box2(env.console, Qt::blue, 0.75, 0.146 + 2 * 0.1115, 0.18, 0.059);
-    InferenceBoxScope box3(env.console, Qt::blue, 0.75, 0.146 + 3 * 0.1115, 0.18, 0.059);
-    InferenceBoxScope box4(env.console, Qt::blue, 0.75, 0.146 + 4 * 0.1115, 0.18, 0.059);
-    InferenceBoxScope box5(env.console, Qt::blue, 0.75, 0.146 + 5 * 0.1115, 0.18, 0.059);
-    InferenceBoxScope box6(env.console, Qt::blue, 0.75, 0.146 + 6 * 0.1115, 0.18, 0.059);
+    InferenceBoxScope box0(env.console, 0.75, 0.146 + 0 * 0.1115, 0.18, 0.059, Qt::blue);
+    InferenceBoxScope box1(env.console, 0.75, 0.146 + 1 * 0.1115, 0.18, 0.059, Qt::blue);
+    InferenceBoxScope box2(env.console, 0.75, 0.146 + 2 * 0.1115, 0.18, 0.059, Qt::blue);
+    InferenceBoxScope box3(env.console, 0.75, 0.146 + 3 * 0.1115, 0.18, 0.059, Qt::blue);
+    InferenceBoxScope box4(env.console, 0.75, 0.146 + 4 * 0.1115, 0.18, 0.059, Qt::blue);
+    InferenceBoxScope box5(env.console, 0.75, 0.146 + 5 * 0.1115, 0.18, 0.059, Qt::blue);
+    InferenceBoxScope box6(env.console, 0.75, 0.146 + 6 * 0.1115, 0.18, 0.059, Qt::blue);
 
     std::vector<std::string> expected;
     QJsonArray actual;
@@ -173,13 +174,13 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env){
 
         switch (MODE){
         case Mode::READ_AND_SAVE:
-            read(actual, &env.logger(), std::move(image0));
-            read(actual, &env.logger(), std::move(image1));
-            read(actual, &env.logger(), std::move(image2));
-            read(actual, &env.logger(), std::move(image3));
-            read(actual, &env.logger(), std::move(image4));
-            read(actual, &env.logger(), std::move(image5));
-            read(actual, &env.logger(), std::move(image6));
+            read(actual, env.console, std::move(image0));
+            read(actual, env.console, std::move(image1));
+            read(actual, env.console, std::move(image2));
+            read(actual, env.console, std::move(image3));
+            read(actual, env.console, std::move(image4));
+            read(actual, env.console, std::move(image5));
+            read(actual, env.console, std::move(image6));
             break;
         case Mode::GENERATE_TRAINING_DATA:
             dump_images(expected, c - 1 + 0, std::move(image0));

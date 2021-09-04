@@ -38,6 +38,7 @@ PersistentSettings::PersistentSettings()
     , naughty_mode(false)
     , developer_mode(false)
     , log_everything(false)
+    , save_debug_images(true)
 {
     //  Find the resource directory.
     QString path = QCoreApplication::applicationDirPath();
@@ -72,7 +73,7 @@ void PersistentSettings::write() const{
     root.insert("03-NaughtyMode", QJsonValue(naughty_mode));
     root.insert("04-DeveloperMode", QJsonValue(developer_mode));
     root.insert("05-LogEverything", QJsonValue(log_everything));
-//    root.insert("06-ResourcePath", QJsonValue(resource_path));
+    root.insert("06-SaveDebugImages", QJsonValue(save_debug_images));
 
     root.insert("10-INSTANCE_NAME", INSTANCE_NAME);
 
@@ -109,7 +110,7 @@ void PersistentSettings::read(){
     json_get_bool(naughty_mode, root, "03-NaughtyMode");
     json_get_bool(developer_mode, root, "04-DeveloperMode");
     json_get_bool(log_everything, root, "05-LogEverything");
-//    json_get_string(resource_path, root, "06-ResourcePath");
+    json_get_bool(save_debug_images, root, "06-SaveDebugImages");
 
     json_get_string(INSTANCE_NAME, root, "10-INSTANCE_NAME");
 

@@ -30,7 +30,8 @@ DictionaryOCR::DictionaryOCR(const QJsonObject& json, double random_match_chance
             QString normalized = normalize(candidate);
             std::set<std::string>& set = m_candidate_to_token[normalized];
             if (!set.empty()){
-                cout << "Duplicate Candidate: " << it.key().toUtf8().data() << endl;
+                global_logger().log("[DictionaryOCR] Duplicate Candidate: " + it.key().toStdString());
+//                cout << "Duplicate Candidate: " << it.key().toUtf8().data() << endl;
             }
             set.insert(token);
             candidates.emplace_back(std::move(candidate));
@@ -39,7 +40,11 @@ DictionaryOCR::DictionaryOCR(const QJsonObject& json, double random_match_chance
             }
         }
     }
-    cout << "Tokens: " << m_database.size() << ", Match Candidates: " << m_candidate_to_token.size() << endl;
+    global_logger().log(
+        "[DictionaryOCR] Tokens: " + std::to_string(m_database.size()) +
+        ", Match Candidates: " + std::to_string(m_candidate_to_token.size())
+    );
+//    cout << "Tokens: " << m_database.size() << ", Match Candidates: " << m_candidate_to_token.size() << endl;
 }
 DictionaryOCR::DictionaryOCR(const QString& json_path, double random_match_chance, bool first_only)
     : DictionaryOCR(read_json_file(json_path).object(), random_match_chance, first_only)
@@ -85,7 +90,7 @@ MatchResult DictionaryOCR::match_substring(
         min_alpha
     );
     result.expected_token = expected;
-    result.matched = result.matched && result.tokens.find(expected) != result.tokens.end();
+    result.matched = result.matched && result.slugs.find(expected) != result.slugs.end();
     return result;
 }
 void DictionaryOCR::add_candidate(std::string token, const QString& candidate){

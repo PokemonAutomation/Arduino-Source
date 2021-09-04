@@ -8,8 +8,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_ReceivePokemonDetector_H
-#define PokemonAutomation_CommonFramework_ReceivePokemonDetector_H
+#ifndef PokemonAutomation_PokemonSwSh_ReceivePokemonDetector_H
+#define PokemonAutomation_PokemonSwSh_ReceivePokemonDetector_H
 
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/Logger.h"
@@ -22,8 +22,7 @@ namespace PokemonSwSh{
 
 class ReceivePokemonDetector : public VisualInferenceCallbackWithCommandStop{
 public:
-    ReceivePokemonDetector(VideoFeed& feed);
-    ReceivePokemonDetector(VideoFeed& feed, const InferenceBox& box);
+    ReceivePokemonDetector(VideoOverlay& overlay);
 
     bool receive_is_over(const QImage& frame);
     virtual bool on_frame(
@@ -32,7 +31,9 @@ public:
    ) override;
 
 private:
-    InferenceBoxScope m_box;
+    InferenceBoxScope m_box_top;
+    InferenceBoxScope m_box_top_right;
+    InferenceBoxScope m_box_bot_left;
     bool m_has_been_orange;
 };
 

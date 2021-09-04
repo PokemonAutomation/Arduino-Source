@@ -32,10 +32,10 @@ struct MatchResult{
     QString ocr_text;
     QString normalized_text;
     std::vector<QString> candidates;
-    std::set<std::string> tokens;
+    std::set<std::string> slugs;
     std::string expected_token;
 
-    void log(Logger* logger, const QString& extra = QString()) const;
+    void log(Logger& logger, const QString& extra = QString()) const;
 };
 
 

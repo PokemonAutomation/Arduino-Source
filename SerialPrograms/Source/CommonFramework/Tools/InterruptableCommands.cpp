@@ -43,6 +43,9 @@ bool InterruptableCommandSession::run(std::function<void(const BotBaseContext&)>
             m_current->commands(m_current->context);
             break;
         }catch (CancelledException&){
+            if (m_current->context.botbase().state() != BotBase::State::RUNNING){
+                throw CancelledException();
+            }
             SpinLockGuard lg(m_lock, "InterruptableCommandSession::run() - cancelled");
             m_current = std::move(m_pending);
             if (m_current){

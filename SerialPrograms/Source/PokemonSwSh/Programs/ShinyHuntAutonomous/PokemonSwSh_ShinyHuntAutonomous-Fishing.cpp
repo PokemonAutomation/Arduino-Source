@@ -38,12 +38,7 @@ ShinyHuntAutonomousFishing_Descriptor::ShinyHuntAutonomousFishing_Descriptor()
 ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing(const ShinyHuntAutonomousFishing_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
-    , LANGUAGE(m_name_reader)
-    , FILTER(true, true)
-    , TIME_ROLLBACK_HOURS(
-        "<b>Time Rollback (in hours):</b><br>Periodically roll back the time to keep the weather the same. If set to zero, this feature is disabled.",
-        1, 0, 11
-    )
+    , ENCOUNTER_BOT_OPTIONS(true, true)
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -55,26 +50,17 @@ ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing(const ShinyHuntAutonomous
         "<b>Fish Respawn Time:</b><br>Wait this long for fish to respawn.",
         "5 * TICKS_PER_SECOND"
     )
-    , VIDEO_ON_SHINY(
-        "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
-        true
-    )
 {
-    m_options.emplace_back(&START_IN_GRIP_MENU, "START_IN_GRIP_MENU");
-    m_options.emplace_back(&GO_HOME_WHEN_DONE, "GO_HOME_WHEN_DONE");
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(TIME_ROLLBACK_HOURS);
 
-    m_options.emplace_back(&LANGUAGE, "LANGUAGE");
-    m_options.emplace_back(&FILTER, "FILTER");
+    PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
 
-    m_options.emplace_back(&TIME_ROLLBACK_HOURS, "TIME_ROLLBACK_HOURS");
-    m_options.emplace_back(&NOTIFICATION_LEVEL, "NOTIFICATION_LEVEL");
-
-    m_options.emplace_back(&m_advanced_options, "");
-    m_options.emplace_back(&EXIT_BATTLE_TIMEOUT, "EXIT_BATTLE_TIMEOUT");
-    m_options.emplace_back(&FISH_RESPAWN_TIME, "FISH_RESPAWN_TIME");
-    if (PERSISTENT_SETTINGS().developer_mode){
-        m_options.emplace_back(&VIDEO_ON_SHINY, "VIDEO_ON_SHINY");
-    }
+    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
+    PA_ADD_OPTION(FISH_RESPAWN_TIME);
 }
 
 
@@ -113,11 +99,9 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env){
     StandardEncounterHandler handler(
         m_descriptor.display_name(),
         env, env.console,
-        &m_name_reader, LANGUAGE,
-        stats,
-        FILTER,
-        VIDEO_ON_SHINY,
-        NOTIFICATION_LEVEL
+        LANGUAGE,
+        ENCOUNTER_BOT_OPTIONS,
+        stats
     );
 
     while (true){
@@ -138,7 +122,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env){
             pbf_press_button(env.console, BUTTON_A, 10, 10);
             pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
             env.console.botbase().wait_for_all_requests();
-            FishingDetector::Detection detection = detector.wait_for_detection(env);
+            FishingDetector::Detection detection = detector.wait_for_detection(env, env.console);
             switch (detection){
             case FishingDetector::NO_DETECTION:
                 stats.add_error();
@@ -159,7 +143,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env){
                 continue;
             }
             env.wait(std::chrono::seconds(3));
-            detection = detector.detect_now();
+            detection = detector.detect_now(env.console.video().snapshot());
             if (detection == FishingDetector::MISSED){
                 stats.m_misses++;
                 pbf_mash_button(env.console, BUTTON_B, 2 * TICKS_PER_SECOND);
@@ -168,13 +152,14 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env){
         }
 
         //  Detect shiny.
-        ShinyType shininess = detect_shiny_battle(
-            env, env.console,
+        ShinyDetectionResult result = detect_shiny_battle(
+            env.console,
+            env, env.console, env.console,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );
 
-        bool stop = handler.handle_standard_encounter_runaway(shininess, EXIT_BATTLE_TIMEOUT);
+        bool stop = handler.handle_standard_encounter_end_battle(result, EXIT_BATTLE_TIMEOUT);
         if (stop){
             break;
         }

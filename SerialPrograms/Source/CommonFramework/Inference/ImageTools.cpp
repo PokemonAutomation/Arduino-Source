@@ -11,42 +11,16 @@
 namespace PokemonAutomation{
 
 
-
-QString FloatPixel::to_string() const{
-    return "{" + QString::number(r) + ", " + QString::number(g) + ", " + QString::number(b) + "}";
-}
-double FloatPixel::stddev() const{
-    double mean = (r + g + b) / 3;
-    double rd = (r - mean);
-    double gd = (g - mean);
-    double bd = (b - mean);
-    return std::sqrt((rd*rd + gd*gd + bd*bd) / 2);
-}
-
-FloatPixel abs(const FloatPixel& x){
-    return FloatPixel{
-        x.r < 0 ? -x.r : x.r,
-        x.g < 0 ? -x.g : x.g,
-        x.b < 0 ? -x.b : x.b,
-    };
-}
-double euclidean_distance(const FloatPixel& x, const FloatPixel& y){
-    FloatPixel p = x - y;
-    p *= p;
-    return std::sqrt(p.r + p.g + p.b);
-}
-
-
-InferenceBox translate_to_parent(
+ImageFloatBox translate_to_parent(
     const QImage& original_image,
-    const InferenceBox& inference_box,
-    const PixelBox& box
+    const ImageFloatBox& inference_box,
+    const ImagePixelBox& box
 ){
     double width = original_image.width();
     double height = original_image.height();
     pxint_t box_x = (pxint_t)(width * inference_box.x + 0.5);
     pxint_t box_y = (pxint_t)(height * inference_box.y + 0.5);
-    return InferenceBox(
+    return ImageFloatBox(
         (box_x + box.min_x) / width,
         (box_y + box.min_y) / height,
         (box.max_x - box.min_x) / width,
@@ -54,17 +28,6 @@ InferenceBox translate_to_parent(
     );
 }
 
-QImage extract_box(const QImage& image, const PixelBox& box){
-    return image.copy(box.min_x, box.min_y, box.width(), box.height());
-}
-QImage extract_box(const QImage& image, const InferenceBox& box){
-    return image.copy(
-        (pxint_t)(image.width() * box.x + 0.5),
-        (pxint_t)(image.height() * box.y + 0.5),
-        (pxint_t)(image.width() * box.width + 0.5),
-        (pxint_t)(image.height() * box.height + 0.5)
-    );
-}
 
 double image_diff_total(const QImage& x, const QImage& y){
     if (x.isNull() || y.isNull()){
@@ -169,33 +132,7 @@ FloatPixel pixel_stddev(const QImage& image){
     );
 }
 
-ImageStats pixel_stats(const QImage& image){
-    pxint_t w = image.width();
-    pxint_t h = image.height();
-    if (w * h <= 1){
-        return ImageStats();
-    }
-    FloatPixel sum;
-    FloatPixel sqr_sum;
-    for (pxint_t r = 0; r < h; r++){
-        for (pxint_t c = 0; c < w; c++){
-            FloatPixel p(image.pixel(c, r));
-            sum += p;
-            sqr_sum += p * p;
-        }
-    }
-    size_t total = (size_t)w * (size_t)h;
-    FloatPixel variance = (sqr_sum - sum*sum / total) / (total - 1);
-    return ImageStats{
-        sum / total,
-        FloatPixel(
-            std::sqrt(variance.r),
-            std::sqrt(variance.g),
-            std::sqrt(variance.b)
-        )
-    };
-}
-ImageStats object_stats(const QImage& image, const FillMatrix& matrix, const FillGeometry& object){
+ImageStats object_stats(const QImage& image, const CellMatrix& matrix, const FillGeometry& object){
     pxint_t w = image.width();
     pxint_t h = image.height();
     if (w * h <= 1){
@@ -225,12 +162,11 @@ ImageStats object_stats(const QImage& image, const FillMatrix& matrix, const Fil
 }
 
 
-bool is_black(const QImage& image, double max_rgb_sum, double max_stddev_sum){
-    ImageStats stats = pixel_stats(image);
-    double average = stats.average.sum();
-    double stddev = stats.stddev.sum();
-    return average <= max_rgb_sum && stddev <= max_stddev_sum;
-}
+
+
+
+
+
 
 
 

@@ -17,12 +17,17 @@ class StringSelect : public ConfigOption{
 public:
     StringSelect(
         QString label,
-        std::vector<QString> cases,
-        size_t default_index
+        const std::vector<QString>& cases,
+        const QString& default_case
+    );
+    StringSelect(
+        QString label,
+        std::vector<std::pair<QString, QIcon>> cases,
+        const QString& default_case
     );
 
     operator size_t() const{ return m_current; }
-    operator const QString&() const{ return m_case_list[m_current]; }
+    operator const QString&() const{ return m_case_list[m_current].first; }
 
     virtual void load_json(const QJsonValue& json) override;
     virtual QJsonValue to_json() const override;
@@ -33,8 +38,8 @@ public:
 
 private:
     friend class StringSelectUI;
-
-    std::vector<QString> m_case_list;
+    QString m_label;
+    std::vector<std::pair<QString, QIcon>> m_case_list;
     std::map<QString, size_t> m_case_map;
     size_t m_default;
     size_t m_current;

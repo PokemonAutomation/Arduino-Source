@@ -67,7 +67,7 @@ public:
     SpinLockGuard(const SpinLockGuard&) = delete;
     void operator=(const SpinLockGuard&) = delete;
 
-    SpinLockGuard(SpinLock& lock, const char* label)
+    SpinLockGuard(SpinLock& lock, const char* label = "(unnamed lock)")
         : m_lock(lock)
 //        , m_label(label)
     {

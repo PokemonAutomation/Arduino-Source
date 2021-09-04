@@ -4,8 +4,8 @@
  *
  */
 
+#include "CommonFramework/ImageTools/FillGeometry.h"
 #include "CommonFramework/Inference/ImageTools.h"
-#include "CommonFramework/Inference/FillGeometry.h"
 #include "PokemonSwSh_MarkFinder.h"
 
 #include <iostream>
@@ -86,7 +86,7 @@ void WhiteFilter2::operator()(FillMatrix::ObjectID& cell, QImage& image, pxint_t
 struct BrightFilter{
     size_t count = 0;
 
-    void operator()(FillMatrix::ObjectID& cell, const QImage& image, pxint_t x, pxint_t y){
+    void operator()(CellMatrix::ObjectID& cell, const QImage& image, pxint_t x, pxint_t y){
         QRgb pixel = image.pixel(x, y);
         if ((pixel & 0x00808080) != 0x00808080){
             cell = 0;
@@ -99,7 +99,7 @@ struct BrightFilter{
 struct BrightFilterDebug{
     size_t count = 0;
 
-    void operator()(FillMatrix::ObjectID& cell, QImage& image, pxint_t x, pxint_t y){
+    void operator()(CellMatrix::ObjectID& cell, QImage& image, pxint_t x, pxint_t y){
         QRgb pixel = image.pixel(x, y);
         if ((pixel & 0x00808080) != 0x00808080){
             cell = 0;
@@ -243,11 +243,11 @@ bool is_question_mark(
 }
 
 size_t find_exclamation_marks(
-    QImage image, const FillMatrix& matrix,
+    QImage image, const CellMatrix& matrix,
     const FillGeometry& object,
-    std::vector<PixelBox>& marks
+    std::vector<ImagePixelBox>& marks
 ){
-    FillMatrix search_matrix(image);
+    CellMatrix search_matrix(image);
     for (pxint_t r = 0; r < image.height(); r++){
         for (pxint_t c = 0; c < image.width(); c++){
             if (matrix[r][c] != 1){
@@ -258,7 +258,7 @@ size_t find_exclamation_marks(
             int red = qRed(pixel);
             int green = qGreen(pixel);
 //            cout << red << ", " << green << endl;
-            FillMatrix::ObjectID cell = red >= 96 && green <= 160 ? 1 : 0;
+            CellMatrix::ObjectID cell = red >= 96 && green <= 160 ? 1 : 0;
             if (cell == 0){
                 image.setPixel(c, r, 0);
             }
@@ -305,7 +305,7 @@ size_t find_exclamation_marks(
             if (!is_exclamation_mark(top, bot)){
                 continue;
             }
-            PixelBox box{
+            ImagePixelBox box{
                 top.box.min_x + object.box.min_x,
                 top.box.min_y + object.box.min_y,
                 top.box.max_x + object.box.min_x,
@@ -336,11 +336,11 @@ size_t find_exclamation_marks(
     return count;
 }
 size_t find_question_marks(
-    const QImage& image, const FillMatrix& matrix,
+    const QImage& image, const CellMatrix& matrix,
     const FillGeometry& object,
-    std::vector<PixelBox>& marks
+    std::vector<ImagePixelBox>& marks
 ){
-    FillMatrix search_matrix(image);
+    CellMatrix search_matrix(image);
     for (int r = 0; r < image.height(); r++){
         for (int c = 0; c < image.width(); c++){
             if (matrix[r][c] != 1){
@@ -386,7 +386,7 @@ size_t find_question_marks(
             if (!is_question_mark(top, bot)){
                 continue;
             }
-            PixelBox box{
+            ImagePixelBox box{
                 top.box.min_x + object.box.min_x,
                 top.box.min_y + object.box.min_y,
                 top.box.max_x + object.box.min_x,
@@ -401,10 +401,10 @@ size_t find_question_marks(
 }
 
 size_t find_marks(
-    const QImage& image, const FillMatrix& matrix,
+    const QImage& image, const CellMatrix& matrix,
     const FillGeometry& object,
-    std::vector<PixelBox>* exclamation_marks,
-    std::vector<PixelBox>* question_marks
+    std::vector<ImagePixelBox>* exclamation_marks,
+    std::vector<ImagePixelBox>* question_marks
 ){
     pxint_t width = object.box.width();
     pxint_t height = object.box.height();
@@ -415,11 +415,11 @@ size_t find_marks(
 
 //    cout << "area = " << object.area << endl;
 
-    FillMatrix edge_matrix = matrix.extract(object.box, object.id);
+    CellMatrix edge_matrix = matrix.extract(object.box, object.id);
     //  Invert the cells.
     for (pxint_t r = 0; r < height; r++){
         for (pxint_t c = 0; c < width; c++){
-            FillMatrix::ObjectID cell = edge_matrix[r][c];
+            CellMatrix::ObjectID cell = edge_matrix[r][c];
             cell = cell ? 0 : 1;
             edge_matrix[r][c] = cell;
         }
@@ -468,8 +468,8 @@ size_t find_marks(
 
 size_t find_marks(
     const QImage& image,
-    std::vector<PixelBox>* exclamation_marks,
-    std::vector<PixelBox>* question_marks
+    std::vector<ImagePixelBox>* exclamation_marks,
+    std::vector<ImagePixelBox>* question_marks
 ){
 #if 0
     FillMatrix matrix(image);
@@ -478,7 +478,7 @@ size_t find_marks(
 #else
     QImage copy = image;
 
-    FillMatrix matrix(image);
+    CellMatrix matrix(image);
     BrightFilterDebug filter;
     matrix.apply_filter(copy, filter);
 //    copy.save("white_filter.png");

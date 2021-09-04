@@ -17,7 +17,7 @@ EnumDropdown::EnumDropdown(
     std::vector<QString> cases,
     size_t default_index
 )
-    : ConfigOption(std::move(label))
+    : m_label(std::move(label))
     , m_case_list(std::move(cases))
     , m_default(default_index)
     , m_current(default_index)

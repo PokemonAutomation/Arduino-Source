@@ -16,6 +16,9 @@ namespace PokemonAutomation{
 #if 0
 #elif _MSC_VER
 
+#define PA_NO_INLINE        __declspec(noinline)
+#define PA_FORCE_INLINE     inline __forceinline
+
 using ssize_t = ptrdiff_t;
 
 #pragma warning(disable:4100)   //  Unreferenced Formal Parameter
@@ -27,6 +30,9 @@ using ssize_t = ptrdiff_t;
 
 
 #elif __GNUC__
+
+#define PA_NO_INLINE        __attribute__ ((noinline))
+#define PA_FORCE_INLINE     inline __attribute__ ((always_inline))
 
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wunused-function"

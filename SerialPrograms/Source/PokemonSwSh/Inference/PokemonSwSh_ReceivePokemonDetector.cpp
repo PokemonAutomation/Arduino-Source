@@ -18,16 +18,11 @@ namespace PokemonSwSh{
 
 
 ReceivePokemonDetector::ReceivePokemonDetector(
-    VideoFeed& feed
+    VideoOverlay& overlay
 )
-    : m_box(feed, 0.2, 0.1, 0.6, 0.1)
-    , m_has_been_orange(false)
-{}
-ReceivePokemonDetector::ReceivePokemonDetector(
-    VideoFeed& feed,
-    const InferenceBox& box
-)
-    : m_box(feed, box)
+    : m_box_top(overlay, 0.2, 0.02, 0.78, 0.02)
+    , m_box_top_right(overlay, 0.93, 0.02, 0.05, 0.1)
+    , m_box_bot_left(overlay, 0.02, 0.85, 0.1, 0.1)
     , m_has_been_orange(false)
 {}
 
@@ -39,43 +34,49 @@ bool ReceivePokemonDetector::on_frame(
     return receive_is_over(frame);
 }
 bool ReceivePokemonDetector::receive_is_over(const QImage& frame){
-    QImage image = extract_box(frame, m_box);
-//    QImage image = m_feed.snapshot();
-//    if (image.isNull()){
-//        m_logger.log("BlackScreenDetector(): Screenshot failed.", "purple");
-//        return false;
-//    }
+    QImage image0 = extract_box(frame, m_box_top);
+    QImage image1 = extract_box(frame, m_box_top_right);
+    QImage image2 = extract_box(frame, m_box_bot_left);
 
-//    ImageStats stats = pixel_stats(image);
-//    double average = stats.average.sum();
-//    double stddev = stats.stddev.sum();
-//    cout << stats.average << endl;
-//    m_logger.log("BlackScreenDetector(): a = " + QString::number(average) + ", s = " + QString::number(stddev), "purple");
-//    if (average < 100 && stddev < 10){
+    ImageStats stats0 = image_stats(image0);
+    ImageStats stats1 = image_stats(image1);
+    ImageStats stats2 = image_stats(image2);
 
-
-    ImageStats stats = pixel_stats(image);
     FloatPixel expected(193, 78, 56);
-    FloatPixel actual = stats.average;
+    FloatPixel actual0 = stats0.average;
+    FloatPixel actual1 = stats1.average;
+    FloatPixel actual2 = stats2.average;
 
     expected /= expected.sum();
-    actual /= actual.sum();
+    actual0 /= actual0.sum();
+    actual1 /= actual1.sum();
+    actual2 /= actual2.sum();
 
-    double distance = euclidean_distance(expected, actual);
+    double distance0 = euclidean_distance(expected, actual0);
+    double distance1 = euclidean_distance(expected, actual1);
+    double distance2 = euclidean_distance(expected, actual2);
 
-//    cout << "average = " << stats.average << ", stddev = " << stats.stddev << ", distance = " << distance << endl;
-//    cout << "m_has_been_orange = " << m_has_been_orange << endl;
-
-//    double average = stats.average.sum();
-//    double stddev = stats.stddev.sum();
-//    return average <= max_rgb_sum && stddev <= max_stddev_sum;
-
-
-    if (stats.stddev.sum() < 10 && distance < 0.2){
-        m_has_been_orange = true;
-        return false;
+    if (euclidean_distance(actual0, actual1) > 10){
+        return m_has_been_orange;
     }
-    return m_has_been_orange;
+    if (euclidean_distance(actual0, actual2) > 10){
+        return m_has_been_orange;
+    }
+    if (euclidean_distance(actual1, actual2) > 10){
+        return m_has_been_orange;
+    }
+    if (stats0.stddev.sum() > 10 || distance0 > 0.2){
+        return m_has_been_orange;
+    }
+    if (stats1.stddev.sum() > 10 || distance1 > 0.2){
+        return m_has_been_orange;
+    }
+    if (stats2.stddev.sum() > 10 || distance2 > 0.2){
+        return m_has_been_orange;
+    }
+
+    m_has_been_orange = true;
+    return false;
 }
 
 

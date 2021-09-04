@@ -8,7 +8,9 @@
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/PersistentSettings.h"
-#include "Pokemon/Pokemon_SpeciesDatabase.h"
+#include "CommonFramework/Tools/Logger.h"
+#include "Pokemon/Resources/Pokemon_PokemonNames.h"
+#include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
 #include "Pokemon_NameSelect.h"
 
 #include <iostream>
@@ -29,8 +31,19 @@ PokemonNameSelectData::PokemonNameSelectData(const QString& json_file_slugs){
         if (slug.size() <= 0){
             PA_THROW_StringException("Expected non-empty string for Pokemon slug.");
         }
-        const SpeciesData& data = species_slug_to_data(slug_str);
-        m_list.emplace_back(data.display_name());
+
+        using namespace NintendoSwitch::PokemonSwSh;
+        const PokemonNames& data = get_pokemon_name(slug_str);
+        const PokemonSprite* sprites = get_pokemon_sprite_nothrow(slug_str);
+        if (sprites == nullptr){
+            m_list.emplace_back(data.display_name(), QIcon());
+            global_logger().log("Missing sprite for: " + slug, "red");
+        }else{
+            m_list.emplace_back(
+                data.display_name(),
+                sprites->icon()
+           );
+        }
     }
 }
 
@@ -38,15 +51,20 @@ PokemonNameSelectData::PokemonNameSelectData(const QString& json_file_slugs){
 
 PokemonNameSelect::PokemonNameSelect(
     QString label,
-    const QString& json_file_slugs
+    const QString& json_file_slugs,
+    const std::string& default_slug
 )
     : PokemonNameSelectData(json_file_slugs)
-    , StringSelect(std::move(label), cases(), 0)
+    , StringSelect(
+        std::move(label),
+        cases(),
+        default_slug.empty() ? "" :get_pokemon_name(default_slug).display_name()
+    )
 {}
 
 const std::string& PokemonNameSelect::slug() const{
     const QString& display = (const QString&)*this;
-    return species_display_name_to_slug(display);
+    return parse_pokemon_name(display);
 }
 
 

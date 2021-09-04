@@ -13,6 +13,7 @@
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "ClientSource/Connection/PABotBase.h"
+#include "CommonFramework/Tools/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsDatabase.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Windows/MainWindow.h"
@@ -149,7 +150,7 @@ QWidget* RunnableSwitchProgramWidget::make_options(QWidget& parent){
     QWidget* options_widget = RunnablePanelWidget::make_options(parent);
 
     RunnableSwitchProgramInstance& instance = static_cast<RunnableSwitchProgramInstance&>(m_instance);
-    m_setup = instance.m_setup->make_ui(*options_widget, m_listener.output_window());
+    m_setup = instance.m_setup->make_ui(*options_widget, m_listener.logger());
     static_cast<QVBoxLayout*>(options_widget->layout())->insertWidget(0, m_setup);
 
     return options_widget;
@@ -178,17 +179,18 @@ void RunnableSwitchProgramWidget::update_ui(){
 }
 void RunnableSwitchProgramWidget::update_historical_stats(){
     RunnableSwitchProgramInstance& instance = static_cast<RunnableSwitchProgramInstance&>(m_instance);
-    m_stats = instance.make_stats();
-    if (m_stats){
+    m_historical_stats = instance.make_stats();
+    if (m_historical_stats){
         StatSet stats;
         stats.open_from_file(PERSISTENT_SETTINGS().stats_file);
         const std::string& identifier = instance.descriptor().identifier();
         StatList& list = stats[identifier];
         if (list.size() != 0){
-            list.aggregate(*m_stats);
+            list.aggregate(*m_historical_stats);
         }
-        m_status_bar->setText(QString::fromStdString(m_stats->to_str()));
-        m_status_bar->setVisible(true);
+        async_set_status(QString::fromStdString(m_historical_stats->to_str()));
+//        m_status_bar->setText(QString::fromStdString(m_historical_stats->to_str()));
+//        m_status_bar->setVisible(true);
     }
 }
 
@@ -213,12 +215,17 @@ void RunnableSwitchProgramWidget::run_program(){
 
     try{
         m_logger.log("<b>Starting Program: " + program_identifier + "</b>");
-        run_program(current_stats.get(), m_stats.get());
+        run_program(current_stats.get(), m_historical_stats.get());
         m_setup->wait_for_all_requests();
         m_logger.log("Ending Program...");
     }catch (CancelledException&){
     }catch (StringException& e){
         signal_error(e.message_qt());
+        send_program_error_notification(
+            &m_logger,
+            instance.descriptor().display_name(),
+            e.message_qt()
+        );
     }
 
     m_state.store(ProgramState::STOPPING, std::memory_order_release);

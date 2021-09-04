@@ -17,8 +17,9 @@
 #include <QLabel>
 #include <QComboBox>
 #include <QPushButton>
+#include "CommonFramework/Tools/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
-#include "VideoOverlay.h"
+#include "VideoOverlayWidget.h"
 
 namespace PokemonAutomation{
 
@@ -37,7 +38,7 @@ public:
     void load_json(const QJsonValue& json);
     QJsonValue to_json() const;
 
-    CameraSelectorUI* make_ui(QWidget& parent, QWidget& holder);
+    CameraSelectorUI* make_ui(QWidget& parent, Logger& logger, QWidget& holder);
 
 private:
     friend class CameraSelectorUI;
@@ -47,12 +48,29 @@ private:
 };
 
 
-class CameraSelectorUI : public QWidget, public VideoFeed{
+
+#if 0
+class ExpandingCameraViewFinder : public QCameraViewfinder{
 public:
-    CameraSelectorUI(QWidget& parent, CameraSelector& value, QWidget& holder);
+    using QCameraViewfinder::QCameraViewfinder;
+
+    virtual void resizeEvent(QResizeEvent* event) override;
+};
+#endif
+
+
+
+class CameraSelectorUI : public QWidget, public VideoFeed, public VideoOverlay{
+public:
+    CameraSelectorUI(
+        QWidget& parent,
+        Logger& logger,
+        CameraSelector& value,
+        QWidget& holder
+    );
     ~CameraSelectorUI();
 
-    VideoOverlay& overlay(){ return *m_overlay; }
+    VideoOverlayWidget& overlay(){ return *m_overlay; }
 
     void set_camera_enabled(bool enabled);
     void set_resolution_enabled(bool enabled);
@@ -63,8 +81,8 @@ public:
     void reset_video();
 
     virtual QImage snapshot() override;
-    virtual void operator+=(const InferenceBox& box) override;
-    virtual void operator-=(const InferenceBox& box) override;
+    virtual void add_box(const ImageFloatBox& box, QColor color) override;
+    virtual void remove_box(const ImageFloatBox& box) override;
 //    virtual void test_draw() override;
 
 private:
@@ -83,6 +101,7 @@ private:
         std::condition_variable cv;
     };
 
+    Logger& m_logger;
     CameraSelector& m_value;
     QWidget& m_holder;
 
@@ -97,7 +116,7 @@ private:
     QCamera* m_camera;
     QCameraViewfinder* m_camera_view;
     QCameraImageCapture* m_capture;
-    VideoOverlay* m_overlay;
+    VideoOverlayWidget* m_overlay;
 
     std::atomic<bool> m_snapshots_allowed;
     std::mutex m_camera_lock;

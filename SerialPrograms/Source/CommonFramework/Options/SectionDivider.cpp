@@ -11,7 +11,7 @@
 
 
 SectionDivider::SectionDivider(QString label)
-    : ConfigOption(std::move(label))
+    : m_label(std::move(label))
 {}
 
 ConfigOptionUI* SectionDivider::make_ui(QWidget& parent){

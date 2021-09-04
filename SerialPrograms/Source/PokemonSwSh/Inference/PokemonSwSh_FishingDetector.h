@@ -11,7 +11,7 @@
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/Logger.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "PokemonSwSh_BattleMenuDetector.h"
+#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 
 #include <iostream>
 using std::cout;
@@ -32,16 +32,17 @@ public:
     };
 
 public:
-    FishingDetector(VideoFeed& feed);
+    FishingDetector(VideoOverlay& overlay);
 
-    Detection detect_now();
+    Detection detect_now(const QImage& screen);
     Detection wait_for_detection(
         ProgramEnvironment& env,
+        VideoFeed& feed,
         std::chrono::seconds timeout = std::chrono::seconds(12)
     );
 
 private:
-    VideoFeed& m_feed;
+    VideoOverlay& m_overlay;
     InferenceBoxScope m_hook_box;
     InferenceBoxScope m_miss_box;
     StandardBattleMenuDetector m_battle_menu;

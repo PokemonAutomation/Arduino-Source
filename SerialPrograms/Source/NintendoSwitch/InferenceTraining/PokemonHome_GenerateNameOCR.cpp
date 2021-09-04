@@ -12,6 +12,7 @@
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/OCR/Filtering.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonHome_GenerateNameOCR.h"
 
 namespace PokemonAutomation{
@@ -36,15 +37,16 @@ GenerateNameOCRData::GenerateNameOCRData(const GenerateNameOCRData_Descriptor& d
     : SingleSwitchProgramInstance(descriptor)
     , LANGUAGE(
         "<b>Game Language:</b>",
-        m_reader.languages()
+        Pokemon::PokemonNameReader::instance().languages()
     )
     , DELAY(
         "<b>Delay Between Each Iteration:</b>",
         "30"
     )
 {
-    m_options.emplace_back(&LANGUAGE, "LANGUAGE");
-    m_options.emplace_back(&DELAY, "DELAY");
+    PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(DELAY);
+
 }
 
 
@@ -92,8 +94,8 @@ void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env){
 
         OCR::make_OCR_filter(image).apply(image);
 
-        OCR::MatchResult result = m_reader.read_substring(LANGUAGE, slug, image);
-        result.log(&env.logger());
+        OCR::MatchResult result = Pokemon::PokemonNameReader::instance().read_substring(LANGUAGE, slug, image);
+        result.log(env.console);
     }
 
 

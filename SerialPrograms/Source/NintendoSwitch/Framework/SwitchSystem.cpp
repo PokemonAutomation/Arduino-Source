@@ -29,7 +29,7 @@ const QString SwitchSystemFactory::JSON_CAMERA_RESOLUTION   = "CameraResolution"
 
 
 SwitchSystemFactory::SwitchSystemFactory(
-    QString label, QString logger_tag,
+    QString label, std::string logger_tag,
     PABotBaseLevel min_pabotbase, FeedbackType feedback
 )
     : SwitchSetupFactory(min_pabotbase, feedback)
@@ -39,7 +39,7 @@ SwitchSystemFactory::SwitchSystemFactory(
     , m_camera(std::move(label))
 {}
 SwitchSystemFactory::SwitchSystemFactory(
-    QString label, QString logger_tag,
+    QString label, std::string logger_tag,
     PABotBaseLevel min_pabotbase, FeedbackType feedback,
     const QJsonValue& json
 )
@@ -67,8 +67,8 @@ const QSerialPortInfo* SwitchSystemFactory::port() const{
     return m_serial.port();
 }
 
-SwitchSetup* SwitchSystemFactory::make_ui(QWidget& parent, OutputWindow& log_window){
-    return new SwitchSystem(parent, *this, log_window);
+SwitchSetup* SwitchSystemFactory::make_ui(QWidget& parent, Logger& logger){
+    return new SwitchSystem(parent, *this, logger);
 }
 
 
@@ -76,23 +76,23 @@ SwitchSetup* SwitchSystemFactory::make_ui(QWidget& parent, OutputWindow& log_win
 SwitchSystem::SwitchSystem(
     QWidget& parent,
     SwitchSystemFactory& factory,
-    OutputWindow& log_window
+    Logger& logger
 )
     : SwitchSetup(parent, factory)
     , m_factory(factory)
-    , m_logger(log_window, factory.m_logger_tag)
+    , m_logger(logger, factory.m_logger_tag)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignTop);
 
-    m_serial = factory.m_serial.make_ui(*this, log_window);
+    m_serial = factory.m_serial.make_ui(*this, logger);
     layout->addWidget(m_serial);
 
     QWidget* video = new QWidget(this);
     QHBoxLayout* video_layout = new QHBoxLayout(video);
     video_layout->setMargin(0);
 
-    m_camera = factory.m_camera.make_ui(*this, *video);
+    m_camera = factory.m_camera.make_ui(*this, logger, *video);
     layout->addWidget(m_camera);
 
     m_command = new CommandRow(
@@ -149,6 +149,9 @@ BotBase* SwitchSystem::botbase(){
     return m_serial->botbase().botbase();
 }
 VideoFeed& SwitchSystem::camera(){
+    return *m_camera;
+}
+VideoOverlay& SwitchSystem::overlay(){
     return *m_camera;
 }
 void SwitchSystem::stop_serial(){

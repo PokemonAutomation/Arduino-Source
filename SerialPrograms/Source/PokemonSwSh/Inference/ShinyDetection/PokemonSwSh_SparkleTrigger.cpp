@@ -22,7 +22,7 @@ const double SparkleDetector::ANGLE_TOLERANCE_DEGREES = 10.;
 
 
 SparkleDetector::SparkleDetector(
-    const FillMatrix& matrix,
+    const CellMatrix& matrix,
     const FillGeometry& object,
     double percentile
 )
@@ -83,7 +83,7 @@ SparkleDetector::SparkleDetector(
     }
 
     //  Find new regions.
-    FillMatrix::ObjectID id = 2;
+    CellMatrix::ObjectID id = 2;
     for (pxint_t r = 0; r < m_matrix.height(); r++){
         for (pxint_t c = 0; c < m_matrix.width(); c++){
             FillGeometry region;

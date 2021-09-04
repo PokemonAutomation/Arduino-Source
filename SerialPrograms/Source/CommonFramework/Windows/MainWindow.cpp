@@ -47,7 +47,7 @@ MainWindow::MainWindow(QWidget* parent)
 //    statusbar = new QStatusBar(this);
 //    statusbar->setObjectName(QString::fromUtf8("statusbar"));
 //    setStatusBar(statusbar);
-    setWindowTitle(STRING_POKEMON + " Automation Serial Programs (" + VERSION + ")");
+    setWindowTitle(STRING_POKEMON + " Automation Serial Programs (" + PROGRAM_VERSION + ")");
 
     QHBoxLayout* hbox = new QHBoxLayout(centralwidget);
 
@@ -64,7 +64,7 @@ MainWindow::MainWindow(QWidget* parent)
     program_layout->addWidget(m_program_list);
 
 
-    QGroupBox* support_box = new QGroupBox("Support (" + STRING_POKEMON + " Automation " + VERSION + ")", centralwidget);
+    QGroupBox* support_box = new QGroupBox("Support (" + STRING_POKEMON + " Automation " + PROGRAM_VERSION + ")", centralwidget);
     left_layout->addWidget(support_box);
     QVBoxLayout* support_layout = new QVBoxLayout(support_box);
 
@@ -112,7 +112,7 @@ MainWindow::MainWindow(QWidget* parent)
                 box.information(
                     nullptr,
                     "About",
-                    STRING_POKEMON + " Automation Feedback Programs (" + VERSION + ")<br>" +
+                    STRING_POKEMON + " Automation Feedback Programs (" + PROGRAM_VERSION + ")<br>" +
                     "Copyright: 2020 - 2021<br>" +
                     "<br>"
                     "Made by the " + STRING_POKEMON + " Automation Discord Server.<br>"
@@ -136,7 +136,7 @@ MainWindow::MainWindow(QWidget* parent)
         }
     );
 
-    m_output_window.reset(new OutputWindow());
+    m_output_window.reset(new FileWindowLoggerWindow((FileWindowLogger&)global_logger()));
     QPushButton* output = new QPushButton("Output Window", support_box);
     buttons->addWidget(output);
     connect(
@@ -219,7 +219,9 @@ void MainWindow::close_panel(){
     }
 
     const std::string& identifier = m_current_panel->descriptor().identifier();
-    PERSISTENT_SETTINGS().panels[QString::fromStdString(identifier)] = m_current_panel->to_json();
+    if (!identifier.empty()){
+        PERSISTENT_SETTINGS().panels[QString::fromStdString(identifier)] = m_current_panel->to_json();
+    }
 
     m_current_panel.reset();
 }

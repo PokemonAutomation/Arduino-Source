@@ -21,7 +21,7 @@ namespace PokemonSwSh{
 
 
 bool is_square_beam(
-    const FillMatrix& matrix,
+    const CellMatrix& matrix,
     const FillGeometry& object,
     double min_length
 ){

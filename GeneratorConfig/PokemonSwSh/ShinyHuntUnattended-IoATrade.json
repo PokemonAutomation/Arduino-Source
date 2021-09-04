@@ -49,8 +49,8 @@
             "02-Declaration": "const uint16_t MASH_TO_TRADE_DELAY",
             "03-MinValue": 0,
             "04-MaxValue": 65535,
-            "98-Default": "29 * TICKS_PER_SECOND",
-            "99-Current": "29 * TICKS_PER_SECOND"
+            "98-Default": "30 * TICKS_PER_SECOND",
+            "99-Current": "30 * TICKS_PER_SECOND"
         }
     ]
 }

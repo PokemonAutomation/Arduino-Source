@@ -6,6 +6,10 @@
 
 #include "Exception.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -19,6 +23,8 @@ StringException::StringException(const char* type, const char* location, std::st
     m_full_body += "\r\n\r\n";
     m_full_body += m_message;
     m_full_body += "\r\n\r\n";
+
+    cout << m_full_body << endl;
 }
 
 
