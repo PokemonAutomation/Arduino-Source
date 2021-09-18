@@ -30,15 +30,35 @@ namespace PokemonAutomation{
 namespace DiscordWebHook{
 
 
+class PendingFileSend{
+public:
+    PendingFileSend(const QString& file, bool keep_file)
+        : m_keep_file(keep_file)
+        , m_file(file)
+    {}
+    ~PendingFileSend(){
+        if (!m_keep_file){
+            QFile file(m_file);
+            file.remove();
+        }
+    }
+    const QString& file() const{ return m_file; }
+
+private:
+    bool m_keep_file;
+    QString m_file;
+};
+
+
 struct DiscordWebHookRequest{
     DiscordWebHookRequest() = default;
-    DiscordWebHookRequest(Logger* p_logger, QUrl p_url, QByteArray p_data)
-        : logger(p_logger)
+    DiscordWebHookRequest(Logger& p_logger, QUrl p_url, QByteArray p_data)
+        : logger(&p_logger)
         , url(std::move(p_url))
         , data(std::move(p_data))
     {}
-    DiscordWebHookRequest(Logger* p_logger, QUrl p_url, QString p_file)
-        : logger(p_logger)
+    DiscordWebHookRequest(Logger& p_logger, QUrl p_url, std::shared_ptr<PendingFileSend> p_file)
+        : logger(&p_logger)
         , url(std::move(p_url))
         , file(std::move(p_file))
     {}
@@ -46,11 +66,14 @@ struct DiscordWebHookRequest{
     QUrl url;
 
     QByteArray data;
-    QString file;
+    std::shared_ptr<PendingFileSend> file;
 };
 
 
 class DiscordWebHookSender : public QObject{
+    static constexpr auto THROTTLE_DURATION = std::chrono::seconds(1);
+    static constexpr size_t MAX_IN_WINDOW = 2;
+
 private:
     DiscordWebHookSender()
         : m_stopping(false)
@@ -67,28 +90,20 @@ private:
 
 
 public:
-    void send_json(Logger* logger, const QUrl& url, const QJsonObject& obj){
+    void send_json(Logger& logger, const QUrl& url, const QJsonObject& obj){
         std::lock_guard<std::mutex> lg(m_lock);
         m_queue.emplace_back(
             logger,
             url,
             QJsonDocument(obj).toJson()
         );
-        if (logger){
-            logger->log("Sending JSON to Discord... (queue = " + tostr_u_commas(m_queue.size()) + ")", "purple");
-        }
+        logger.log("Sending JSON to Discord... (queue = " + tostr_u_commas(m_queue.size()) + ")", "purple");
         m_cv.notify_all();
     }
-    void send_file(Logger* logger, const QUrl& url, QString file){
+    void send_file(Logger& logger, const QUrl& url, std::shared_ptr<PendingFileSend> file){
         std::lock_guard<std::mutex> lg(m_lock);
-        m_queue.emplace_back(
-            logger,
-            url,
-            std::move(file)
-        );
-        if (logger){
-            logger->log("Sending File to Discord... (queue = " + tostr_u_commas(m_queue.size()) + ")", "purple");
-        }
+        m_queue.emplace_back(logger, url, file);
+        logger.log("Sending File to Discord... (queue = " + tostr_u_commas(m_queue.size()) + ")", "purple");
         m_cv.notify_all();
     }
 
@@ -114,33 +129,45 @@ private:
 
                 item = std::move(m_queue.front());
                 m_queue.pop_front();
+
+                //  Throttle the messages.
+                auto now = std::chrono::system_clock::now();
+                while (!m_sent.empty() && m_sent[0] + THROTTLE_DURATION < now){
+                    m_sent.pop_front();
+                }
+                if (m_sent.size() >= MAX_IN_WINDOW){
+                    m_cv.wait_for(
+                        lg, THROTTLE_DURATION,
+                        [&]{
+                            return m_sent[0] + THROTTLE_DURATION < now;
+                        }
+                    );
+                    m_sent.clear();
+                }
+                m_sent.push_back(now);
             }
 
-            if (item.file.isNull()){
-                internal_send_json(item.logger, item.url, item.data);
+            if (!item.file){
+                internal_send_json(*item.logger, item.url, item.data);
             }else{
-                internal_send_file(item.logger, item.url, item.file);
+                internal_send_file(*item.logger, item.url, item.file->file());
             }
         }
     }
 
-    void process_reply(Logger* logger, QNetworkReply* reply){
+    void process_reply(Logger& logger, QNetworkReply* reply){
         if (!reply){
-            if (logger){
-                logger->log("QNetworkReply is null.", "red");
-            }
+            logger.log("QNetworkReply is null.", "red");
         }else if (reply->error() == QNetworkReply::NoError){
 //            QString contents = QString::fromUtf8(reply->readAll());
 //            qDebug() << contents;
         }else{
-            if (logger){
-                logger->log("Discord Request Response: " + reply->errorString(), "red");
-            }
+            logger.log("Discord Request Response: " + reply->errorString(), "red");
 //            QString err = reply->errorString();
 //            qDebug() << err;
         }
     }
-    void internal_send_json(Logger* logger, const QUrl& url, const QByteArray& data){
+    void internal_send_json(Logger& logger, const QUrl& url, const QByteArray& data){
         QNetworkRequest request(url);
         request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
 
@@ -151,12 +178,10 @@ private:
         loop.exec();
         process_reply(logger, reply.get());
     }
-    void internal_send_file(Logger* logger, const QUrl& url, const QString& filename){
+    void internal_send_file(Logger& logger, const QUrl& url, const QString& filename){
         QFile file(filename);
         if (!file.open(QIODevice::ReadOnly)){
-            if (logger){
-                logger->log("File doesn't exist: " + filename, "red");
-            }
+            logger.log("File doesn't exist: " + filename, "red");
             return;
         }
 
@@ -186,74 +211,144 @@ private:
     std::mutex m_lock;
     std::condition_variable m_cv;
     std::deque<DiscordWebHookRequest> m_queue;
+    std::deque<std::chrono::system_clock::time_point> m_sent;
     std::thread m_thread;
 };
 
 
+std::vector<QString> split_lines(const QString& str){
+    std::vector<QString> lines;
+    lines.emplace_back();
+    for (QChar ch : str){
+        if (ch == '\n'){
+            lines.emplace_back();
+            continue;
+        }
+        if (ch < 32){
+            continue;
+        }
+        lines.back() += ch;
+    }
+    return lines;
+}
 
-void send_message(bool should_ping, const QString& message, const QJsonObject& embed, Logger* logger){
+
+
+void send_message(Logger& logger, bool should_ping, const QString& message, const QJsonObject& embed){
     QJsonArray embeds;
     embeds.append(embed);
-    send_message(should_ping, message, embeds, logger);
+    send_message(logger, should_ping, message, embeds);
 }
-void send_message(bool should_ping, const QString& message, const QJsonArray& embeds, Logger* logger){
-    QString webhook_url = PERSISTENT_SETTINGS().DISCORD_WEBHOOK_URL;
-    if (webhook_url.isEmpty()){
+void send_message(Logger& logger, bool should_ping, const QString& message, const QJsonArray& embeds){
+    const DiscordSettingsOption& settings = PERSISTENT_SETTINGS().discord_settings;
+    for (const QString& url : split_lines(settings.webhook_urls)){
+//        cout << url.toStdString() << endl;
+        if (url.isEmpty()){
+            return;
+        }
+
+        //  customize the message
+        QString str;
+        if (should_ping){
+            str += "<@" + settings.user_id + ">";
+        }
+        if (settings.ping_once){
+            should_ping = false;
+        }
+
+        const QString& discord_message = settings.message;
+        if (!discord_message.isEmpty()){
+            if (!str.isEmpty()){
+                str += " ";
+            }
+            for (QChar ch : discord_message){
+                if (ch != '@'){
+                    str += ch;
+                }
+            }
+//            str += discord_message;
+        }
+        if (!message.isEmpty()){
+            if (!str.isEmpty()){
+                str += " ";
+            }
+            str += message;
+        }
+
+        QJsonObject jsonContent;
+        jsonContent["content"] = str;
+        jsonContent["embeds"] = embeds;
+
+//        cout << QJsonDocument(jsonContent).toJson().data() << endl;
+
+        DiscordWebHookSender::instance().send_json(
+            logger,
+            url,
+            jsonContent
+        );
+    }
+}
+void send_file(Logger& logger, QString file, bool keep_file){
+    std::shared_ptr<PendingFileSend> pending(new PendingFileSend(file, keep_file));
+    for (const QString& url : split_lines(PERSISTENT_SETTINGS().discord_settings.webhook_urls)){
+        if (url.isEmpty()){
+            return;
+        }
+        DiscordWebHookSender::instance().send_file(logger, url, pending);
+    }
+}
+void send_image(Logger& logger, const QImage& image, const QString& format, bool keep_file){
+    if (image.isNull()){
+        logger.log("Shiny screenshot is null.", "red");
         return;
     }
 
-    //  customize the message
-    QString name = should_ping
-        ? "<@" + PERSISTENT_SETTINGS().DISCORD_USER_ID + "> "
-        : PERSISTENT_SETTINGS().DISCORD_USER_SHORT_NAME + " ";
+    QString name = QString::fromStdString(now_to_filestring()) + format;
 
-    QJsonObject jsonContent;
-    jsonContent["content"] = name + message;
-    jsonContent["embeds"] = embeds;
-
-    DiscordWebHookSender::instance().send_json(
-        logger,
-        webhook_url,
-        jsonContent
-    );
-}
-void send_message_old(bool should_ping, const QString& message, const QJsonArray& fields) {
-    if (PERSISTENT_SETTINGS().DISCORD_WEBHOOK_URL.isEmpty()){
+    if (!image.save(name)){
+        logger.log("Unable to save shiny screenshot to: " + name, "red");
         return;
     }
 
-    //customize the message
-    QString name = should_ping ? "<@" + PERSISTENT_SETTINGS().DISCORD_USER_ID + "> " : PERSISTENT_SETTINGS().DISCORD_USER_SHORT_NAME + " ";
-
-    //create the embeds holding the data to send
-    QJsonObject embeds;
-    embeds["title"] = "Serial Programs Update";
-    embeds["color"] = 0;
-    embeds["author"] = QJsonObject();
-    embeds["image"] = QJsonObject();
-    embeds["thumbnail"] = QJsonObject();
-    embeds["footer"] = QJsonObject();
-    embeds["fields"] = fields;
-
-    QJsonArray embedsArray;
-    embedsArray.append(embeds);
-
-    send_message(should_ping, message, embedsArray, nullptr);
+    logger.log("Saved shiny screenshot to: " + name, "blue");
+    DiscordWebHook::send_file(logger, name, keep_file);
 }
-void send_file(QString file, Logger* logger){
-    QString webhook_url = PERSISTENT_SETTINGS().DISCORD_WEBHOOK_URL;
-    if (webhook_url.isEmpty()){
+void send_screenshot(Logger& logger, const QImage& image, ScreenshotMode mode, bool keep_file){
+    if (mode == ScreenshotMode::NO_SCREENSHOT){
         return;
     }
 
-    DiscordWebHookSender::instance().send_file(
-        logger,
-        webhook_url,
-//        QString("https://discord.requestcatcher.com/test"),
-        std::move(file)
-    );
+    if (image.isNull()){
+        logger.log("Shiny screenshot is null.", "red");
+        return;
+    }
+
+    QString format;
+    switch (mode){
+    case ScreenshotMode::NO_SCREENSHOT:
+        return;
+    case ScreenshotMode::JPG:
+        format = ".jpg";
+        break;
+    case ScreenshotMode::PNG:
+        format = ".png";
+        break;
+    }
+
+    DiscordWebHook::send_image(logger, image, format, keep_file);
 }
 
 
+
+
+
 }
 }
+
+
+
+
+
+
+
+

@@ -8,10 +8,10 @@
 #define PokemonAutomation_PokemonSwSh_EggSuperCombined2_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/SimpleInteger.h"
-#include "CommonFramework/Options/FloatingPoint.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Options/FloatingPointOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 #include "PokemonSwSh/Options/PokemonSwSh_EggStepCount.h"
@@ -36,18 +36,18 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
-    TouchDateInterval TOUCH_DATE_INTERVAL;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+    TouchDateIntervalOption TOUCH_DATE_INTERVAL;
 
-    SimpleInteger<uint8_t> BOXES_TO_RELEASE;
-    SimpleInteger<uint8_t> BOXES_TO_SKIP;
-    SimpleInteger<uint8_t> BOXES_TO_HATCH;
-    EggStepCount STEPS_TO_HATCH;
-    FloatingPoint FETCHES_PER_BATCH;
-    SectionDivider m_advanced_options;
-    TimeExpression<uint16_t> SAFETY_TIME;
-    TimeExpression<uint16_t> EARLY_HATCH_SAFETY;
-    TimeExpression<uint16_t> HATCH_DELAY;
+    SimpleIntegerOption<uint8_t> BOXES_TO_RELEASE;
+    SimpleIntegerOption<uint8_t> BOXES_TO_SKIP;
+    SimpleIntegerOption<uint8_t> BOXES_TO_HATCH;
+    EggStepCountOption STEPS_TO_HATCH;
+    FloatingPointOption FETCHES_PER_BATCH;
+    SectionDividerOption m_advanced_options;
+    TimeExpressionOption<uint16_t> SAFETY_TIME;
+    TimeExpressionOption<uint16_t> EARLY_HATCH_SAFETY;
+    TimeExpressionOption<uint16_t> HATCH_DELAY;
 };
 
 

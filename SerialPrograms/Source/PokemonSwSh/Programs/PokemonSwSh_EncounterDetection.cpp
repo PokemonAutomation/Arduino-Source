@@ -22,7 +22,7 @@ StandardEncounterDetection::StandardEncounterDetection(
     ProgramEnvironment& env,
     ConsoleHandle& console,
     Language language,
-    const EncounterFilter& filter,
+    const EncounterFilterOption& filter,
     ShinyType shininess,
     std::chrono::milliseconds read_name_delay
 )
@@ -59,7 +59,7 @@ const std::set<std::string>* StandardEncounterDetection::candidates(){
     }
 
     InferenceBoxScope box(m_console, ImageFloatBox(0.76, 0.04, 0.15, 0.044));
-    m_env.wait(m_read_name_delay);
+    m_env.wait_for(m_read_name_delay);
 
     QImage screen = m_console.video().snapshot();
     QImage frame = screen;

@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_StowOnSideFarmer_H
 #define PokemonAutomation_PokemonSwSh_StowOnSideFarmer_H
 
-#include "CommonFramework/Options/SimpleInteger.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -30,10 +30,10 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
 
-    SimpleInteger<uint32_t> SKIPS;
-    SimpleInteger<uint16_t> SAVE_ITERATIONS;
+    SimpleIntegerOption<uint32_t> SKIPS;
+    SimpleIntegerOption<uint16_t> SAVE_ITERATIONS;
 };
 
 

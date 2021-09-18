@@ -18,6 +18,7 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonHome{
+using namespace Pokemon;
 
 
 GenerateNameOCRData_Descriptor::GenerateNameOCRData_Descriptor()
@@ -37,7 +38,7 @@ GenerateNameOCRData::GenerateNameOCRData(const GenerateNameOCRData_Descriptor& d
     : SingleSwitchProgramInstance(descriptor)
     , LANGUAGE(
         "<b>Game Language:</b>",
-        Pokemon::PokemonNameReader::instance().languages()
+        PokemonNameReader::instance().languages()
     )
     , DELAY(
         "<b>Delay Between Each Iteration:</b>",
@@ -94,7 +95,7 @@ void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env){
 
         OCR::make_OCR_filter(image).apply(image);
 
-        OCR::MatchResult result = Pokemon::PokemonNameReader::instance().read_substring(LANGUAGE, slug, image);
+        OCR::MatchResult result = PokemonNameReader::instance().read_substring(LANGUAGE, slug, image);
         result.log(env.console);
     }
 

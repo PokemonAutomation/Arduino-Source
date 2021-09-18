@@ -21,8 +21,18 @@ namespace OCR{
 
 class DictionaryOCR{
 public:
-    DictionaryOCR(const QJsonObject& json, double random_match_chance, bool first_only);
-    DictionaryOCR(const QString& json_path, double random_match_chance, bool first_only);
+    DictionaryOCR(
+        const QJsonObject& json,
+        const std::set<std::string>* subset,
+        double random_match_chance,
+        bool first_only
+    );
+    DictionaryOCR(
+        const QString& json_path,
+        const std::set<std::string>* subset,
+        double random_match_chance,
+        bool first_only
+    );
 
     QJsonObject to_json() const;
     void save_json(const QString& json_path) const;

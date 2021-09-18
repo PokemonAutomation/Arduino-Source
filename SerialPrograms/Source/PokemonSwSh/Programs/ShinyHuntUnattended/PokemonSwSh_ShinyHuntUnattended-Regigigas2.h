@@ -8,9 +8,9 @@
 #define PokemonAutomation_PokemonSwSh_ShinyHuntUnattendedRegigigas2_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/SimpleInteger.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 
@@ -33,14 +33,14 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
-    TouchDateInterval TOUCH_DATE_INTERVAL;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+    TouchDateIntervalOption TOUCH_DATE_INTERVAL;
 
-    SimpleInteger<uint8_t> REVERSAL_PP;
-    TimeExpression<uint16_t> START_TO_ATTACK_DELAY;
-    SectionDivider m_advanced_options;
-    TimeExpression<uint16_t> ATTACK_TO_CATCH_DELAY;
-    TimeExpression<uint16_t> CATCH_TO_OVERWORLD_DELAY;
+    SimpleIntegerOption<uint8_t> REVERSAL_PP;
+    TimeExpressionOption<uint16_t> START_TO_ATTACK_DELAY;
+    SectionDividerOption m_advanced_options;
+    TimeExpressionOption<uint16_t> ATTACK_TO_CATCH_DELAY;
+    TimeExpressionOption<uint16_t> CATCH_TO_OVERWORLD_DELAY;
 };
 
 }

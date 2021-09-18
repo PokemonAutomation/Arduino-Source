@@ -61,7 +61,7 @@ DenMonReader::DenMonReader(Logger& logger, VideoOverlay& overlay)
 {}
 
 
-DenMonReadResults DenMonReader::read(const QImage& image, double max_RMSD){
+DenMonReadResults DenMonReader::read(const QImage& image, double max_RMSD_ratio) const{
     DenMonReadResults results;
     if (image.isNull()){
         return results;
@@ -71,7 +71,7 @@ DenMonReadResults DenMonReader::read(const QImage& image, double max_RMSD){
 //    processed.save("processed.png");
 //    processed = ImageMatch::black_filter_to_alpha(processed);
     results.slugs = m_matcher.match(std::move(processed));
-    results.slugs.log(m_logger, max_RMSD);
+    results.slugs.log(m_logger, max_RMSD_ratio);
 
     return results;
 }
@@ -88,7 +88,7 @@ DenMonSelectData::DenMonSelectData(){
     }
 }
 DenMonSelectOption::DenMonSelectOption(QString label)
-    : StringSelect(std::move(label), cases(), "")
+    : StringSelectOption(std::move(label), cases(), "")
 {}
 std::string DenMonSelectOption::slug() const{
     size_t index = *this;

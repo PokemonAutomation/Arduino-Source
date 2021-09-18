@@ -20,23 +20,10 @@ namespace PokemonAutomation{
 
 
 void SettingsPanelInstance::from_json(const QJsonValue& json){
-//    cout << QJsonDocument(json.toObject()).toJson().data() << endl;
-//    QJsonObject obj = json_get_object_nothrow(json.toObject(), m_descriptor.name());
-    QJsonObject obj = json.toObject();
-    for (auto& item : m_options){
-        if (!item.first.isEmpty()){
-            item.second->load_json(json_get_value_nothrow(obj, item.first));
-        }
-    }
+    m_options.load_json(json);
 }
 QJsonValue SettingsPanelInstance::to_json() const{
-    QJsonObject obj;
-    for (auto& item : m_options){
-        if (!item.first.isEmpty()){
-            obj.insert(item.first, item.second->to_json());
-        }
-    }
-    return obj;
+    return m_options.to_json();
 }
 QWidget* SettingsPanelInstance::make_widget(QWidget& parent, PanelListener& listener){
     return SettingsPanelWidget::make(parent, *this, listener);
@@ -81,10 +68,8 @@ QWidget* SettingsPanelWidget::make_options(QWidget& parent){
 
 
     SettingsPanelInstance& instance = static_cast<SettingsPanelInstance&>(m_instance);
-    for (auto& item : instance.m_options){
-        m_options.emplace_back(item.second->make_ui(*options_widget));
-        options_layout->addWidget(m_options.back()->widget());
-    }
+    m_options = static_cast<BatchOptionUI*>(instance.m_options.make_ui(parent));
+    options_layout->addWidget(m_options);
 
     return options_widget;
 }
@@ -112,9 +97,7 @@ QWidget* SettingsPanelWidget::make_actions(QWidget& parent){
 }
 
 void SettingsPanelWidget::restore_defaults(){
-    for (ConfigOptionUI* item : m_options){
-        item->restore_defaults();
-    }
+    m_options->restore_defaults();
 }
 
 

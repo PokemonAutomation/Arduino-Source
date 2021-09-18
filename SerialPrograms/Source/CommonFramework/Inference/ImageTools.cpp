@@ -72,10 +72,16 @@ QImage image_diff_greyscale(const QImage& x, const QImage& y){
     pxint_t height = x.height();
     for (int r = 0; r < height; r++){
         for (int c = 0; c < width; c++){
-            double distance = euclidean_distance(x.pixel(c, r), y.pixel(c, r));
-            distance *= 0.57735026918962576451;  //  1 / sqrt(3)
-            int dist_int = std::min((int)distance, 255);
-            image.setPixel(c, r, qRgb(dist_int, dist_int, dist_int));
+            QRgb px = x.pixel(c, r);
+            QRgb py = y.pixel(c, r);
+            if (qAlpha(px) == 0 || qAlpha(py) == 0){
+                image.setPixel(c, r, qRgb(0, 0, 0));
+            }else{
+                double distance = euclidean_distance(px, py);
+                distance *= 0.57735026918962576451;  //  1 / sqrt(3)
+                int dist_int = std::min((int)distance, 255);
+                image.setPixel(c, r, qRgb(dist_int, dist_int, dist_int));
+            }
         }
     }
     return image;

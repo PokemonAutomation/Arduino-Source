@@ -8,14 +8,17 @@
 #define PokemonAutomation_PokemonSwSh_AutoHostRolling_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/BooleanCheckBox.h"
-#include "CommonFramework/Options/SimpleInteger.h"
-#include "CommonFramework/Options/RandomCode.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Options/ScreenshotFormatOption.h"
+#include "CommonFramework/Options/RandomCodeOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
+#include "NintendoSwitch/Options/FriendCodeListOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 #include "PokemonSwSh/Options/PokemonSwSh_Catchability.h"
+#include "PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -37,30 +40,32 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
-    TouchDateInterval TOUCH_DATE_INTERVAL;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+    TouchDateIntervalOption TOUCH_DATE_INTERVAL;
 
-    RandomCode RAID_CODE;
-    SimpleInteger<uint8_t> SKIPS;
-    BooleanCheckBox BACKUP_SAVE;
-    BooleanCheckBox HOST_ONLINE;
-    TimeExpression<uint16_t> LOBBY_WAIT_DELAY;
-    CatchabilitySelector CATCHABILITY;
-    SimpleInteger<uint8_t> FRIEND_ACCEPT_USER_SLOT;
-    TimeExpression<uint16_t> EXTRA_DELAY_BETWEEN_RAIDS;
+    RandomCodeOption RAID_CODE;
+    SimpleIntegerOption<uint8_t> SKIPS;
+    BooleanCheckBoxOption BACKUP_SAVE;
+    BooleanCheckBoxOption HOST_ONLINE;
+    TimeExpressionOption<uint16_t> LOBBY_WAIT_DELAY;
+    CatchabilitySelectorOption CATCHABILITY;
+    SimpleIntegerOption<uint8_t> FRIEND_ACCEPT_USER_SLOT;
+    TimeExpressionOption<uint16_t> EXTRA_DELAY_BETWEEN_RAIDS;
 
-    SimpleInteger<uint8_t> MOVE_SLOT;
-    BooleanCheckBox DYNAMAX;
-    SimpleInteger<uint8_t> TROLL_HOSTING;
+    SimpleIntegerOption<uint8_t> MOVE_SLOT;
+    BooleanCheckBoxOption DYNAMAX;
+    SimpleIntegerOption<uint8_t> TROLL_HOSTING;
 
-    BooleanCheckBox ALTERNATE_GAMES;
+    BooleanCheckBoxOption ALTERNATE_GAMES;
 
-    SectionDivider m_internet_settings;
-    TimeExpression<uint16_t> CONNECT_TO_INTERNET_DELAY;
-    TimeExpression<uint16_t> ENTER_ONLINE_DEN_DELAY;
-    TimeExpression<uint16_t> OPEN_ONLINE_DEN_LOBBY_DELAY;
-    TimeExpression<uint16_t> RAID_START_TO_EXIT_DELAY;
-    TimeExpression<uint16_t> DELAY_TO_SELECT_MOVE;
+    AutoHostNotificationOption NOTIFICATIONS;
+
+    SectionDividerOption m_internet_settings;
+    TimeExpressionOption<uint16_t> CONNECT_TO_INTERNET_DELAY;
+    TimeExpressionOption<uint16_t> ENTER_ONLINE_DEN_DELAY;
+    TimeExpressionOption<uint16_t> OPEN_ONLINE_DEN_LOBBY_DELAY;
+    TimeExpressionOption<uint16_t> RAID_START_TO_EXIT_DELAY;
+    TimeExpressionOption<uint16_t> DELAY_TO_SELECT_MOVE;
 };
 
 

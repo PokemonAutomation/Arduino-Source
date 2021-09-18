@@ -16,29 +16,29 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class StandardBattleMenuDetector : public VisualInferenceCallbackWithCommandStop{
+class StandardBattleMenuDetector : public VisualInferenceCallback{
 public:
-    StandardBattleMenuDetector(VideoOverlay& overlay, bool den);
+    StandardBattleMenuDetector(bool den);
 
     bool detect(const QImage& screen) const;
 
-    virtual bool on_frame(
+    virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
     ) override final;
 
 
 private:
-    std::unique_ptr<InferenceBoxScope> m_ball_left;
-    std::unique_ptr<InferenceBoxScope> m_ball_right;
-    InferenceBoxScope m_icon_fight;
-    InferenceBoxScope m_icon_pokemon;
-    InferenceBoxScope m_icon_bag;
-    InferenceBoxScope m_icon_run;
-    InferenceBoxScope m_text_fight;
-    InferenceBoxScope m_text_pokemon;
-    InferenceBoxScope m_text_bag;
-    InferenceBoxScope m_text_run;
+    std::unique_ptr<ImageFloatBox> m_ball_left;
+    std::unique_ptr<ImageFloatBox> m_ball_right;
+    ImageFloatBox m_icon_fight;
+    ImageFloatBox m_icon_pokemon;
+    ImageFloatBox m_icon_bag;
+    ImageFloatBox m_icon_run;
+    ImageFloatBox m_text_fight;
+    ImageFloatBox m_text_pokemon;
+    ImageFloatBox m_text_bag;
+    ImageFloatBox m_text_run;
 };
 
 

@@ -34,6 +34,7 @@ enum class CatchResult{
     POKEMON_FAINTED,
     OWN_FAINTED,    //  Not implemented yet. Will show up as TIMEOUT for now.
     OUT_OF_BALLS,
+    CANNOT_THROW_BALL,
     TIMEOUT,
 };
 struct CatchResults{

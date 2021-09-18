@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_Pokemon_TrainPokemonOCR_H
 #define PokemonAutomation_Pokemon_TrainPokemonOCR_H
 
-#include "CommonFramework/Options/SimpleInteger.h"
-#include "CommonFramework/Options/String.h"
-#include "CommonFramework/Options/EnumDropdown.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Options/StringOption.h"
+#include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Panels/RunnableComputerProgram.h"
 
 namespace PokemonAutomation{
@@ -30,9 +30,9 @@ public:
     virtual void program(ProgramEnvironment& env) override;
 
 private:
-    String DIRECTORY;
-    EnumDropdown MODE;
-    SimpleInteger<uint16_t> THREADS;
+    StringOption DIRECTORY;
+    EnumDropdownOption MODE;
+    SimpleIntegerOption<uint16_t> THREADS;
 
 };
 

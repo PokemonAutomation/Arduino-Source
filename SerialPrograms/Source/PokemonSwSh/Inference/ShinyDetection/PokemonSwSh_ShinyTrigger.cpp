@@ -93,7 +93,7 @@ void ShinyImageDetection::accumulate(
 //            detection = true;
             this->balls.emplace_back(object.box);
             QString str;
-            str += "ShinyDetector: Ball [{" + QString::number(object.center_x) + ", " + QString::number(object.center_y);
+            str += "ShinyDetector: Ball [{" + QString::number(object.center_x()) + ", " + QString::number(object.center_y());
             str += "}, " + QString::number(object.area) + "]";
             if (logger){
                 logger->log(str, "purple");
@@ -103,7 +103,7 @@ void ShinyImageDetection::accumulate(
 //            detection = true;
             this->stars.emplace_back(object.box);
             QString str;
-            str += "ShinyDetector: Star [{" + QString::number(object.center_x) + ", " + QString::number(object.center_y);
+            str += "ShinyDetector: Star [{" + QString::number(object.center_x()) + ", " + QString::number(object.center_y());
             str += "}, " + QString::number(object.area) + "]";
             if (logger){
                 logger->log(str, "purple");
@@ -118,7 +118,7 @@ void ShinyImageDetection::accumulate(
 //            detection = true;
             this->squares.emplace_back(object.box);
             QString str;
-            str += "ShinyDetector: Square [{" + QString::number(object.center_x) + ", " + QString::number(object.center_y);
+            str += "ShinyDetector: Square [{" + QString::number(object.center_x()) + ", " + QString::number(object.center_y());
             str += "}, " + QString::number(object.area) + "]";
             if (logger){
                 logger->log(str, "purple");
@@ -137,7 +137,7 @@ void ShinyImageDetection::accumulate(
             this->lines.emplace_back(object.box);
             QString str;
             str += "ShinyDetector: Line [{" + QString::number(object.box.width());
-            str += " : {" + QString::number(object.center_x) + ", " + QString::number(object.center_y);
+            str += " : {" + QString::number(object.center_x()) + ", " + QString::number(object.center_y());
             str += "}, " + QString::number(object.area) + "]";
             if (logger){
                 logger->log(str, "purple");

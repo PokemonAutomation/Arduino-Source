@@ -30,7 +30,7 @@ SmallDictionaryMatcher::SmallDictionaryMatcher(const QJsonObject& json, bool fir
         m_database.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(language),
-            std::forward_as_tuple(iter->toObject(), data.random_match_chance, first_only)
+            std::forward_as_tuple(iter->toObject(), nullptr, data.random_match_chance, first_only)
         );
         m_languages += language;
     }

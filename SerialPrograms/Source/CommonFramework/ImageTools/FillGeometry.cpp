@@ -15,6 +15,51 @@ using std::endl;
 
 namespace PokemonAutomation{
 
+
+
+
+double FillGeometry::aspect_ratio() const{
+    return (double)box.width() / box.height();
+}
+double FillGeometry::area_ratio() const{
+    return (double)area / box.area();
+}
+pxint_t FillGeometry::center_x() const{
+    return (pxint_t)(sum_x / area);
+}
+pxint_t FillGeometry::center_y() const{
+    return (pxint_t)(sum_y / area);
+}
+
+bool FillGeometry::assert_aspect_ratio(double lower_bound, double upper_bound) const{
+    double ratio = aspect_ratio();
+    return lower_bound <= ratio && ratio <= upper_bound;
+}
+bool FillGeometry::assert_area_ratio(double lower_bound, double upper_bound) const{
+    double ratio = area_ratio();
+    return lower_bound <= ratio && ratio <= upper_bound;
+}
+
+void FillGeometry::merge_assume_no_overlap(const FillGeometry& obj){
+    if (obj.area == 0){
+        return;
+    }
+    if (area == 0){
+        *this = obj;
+    }
+    box.min_x = std::min(box.min_x, obj.box.min_x);
+    box.min_y = std::min(box.min_y, obj.box.min_y);
+    box.max_x = std::max(box.max_x, obj.box.max_x);
+    box.max_y = std::max(box.max_y, obj.box.max_y);
+    area += obj.area;
+    sum_x += obj.sum_x;
+    sum_y += obj.sum_y;
+}
+
+
+
+
+
 bool fill_geometry(
     FillGeometry& geometry,
     CellMatrix& matrix, CellMatrix::ObjectID required_existing_id,
@@ -138,8 +183,10 @@ bool fill_geometry(
     geometry.box.max_y = max_y + 1;
     geometry.id = object_id;
     geometry.area = area;
-    geometry.center_x = (pxint_t)(sum_x / area);
-    geometry.center_y = (pxint_t)(sum_y / area);
+    geometry.sum_x = sum_x;
+    geometry.sum_y = sum_y;
+//    geometry.center_x = (pxint_t)(sum_x / area);
+//    geometry.center_y = (pxint_t)(sum_y / area);
     return true;
 }
 

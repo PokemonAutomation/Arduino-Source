@@ -254,10 +254,10 @@ void CameraSelectorUI::reset_video(){
                 auto iter = m_pending_captures.find(id);
                 if (iter == m_pending_captures.end()){
                     m_logger.log(
-                        "QCameraImageCapture::imageCaptured(): Unable to find capture id: " + std::to_string(id),
+                        "QCameraImageCapture::imageCaptured(): Unable to find capture ID: " + std::to_string(id),
                         "red"
                     );
-//                    cout << "QCameraImageCapture::imageCaptured(): Unable to find capture id: " << id << endl;
+//                    cout << "QCameraImageCapture::imageCaptured(): Unable to find capture ID: " << id << endl;
                     return;
                 }
                 iter->second.status = CaptureStatus::COMPLETED;
@@ -271,7 +271,7 @@ void CameraSelectorUI::reset_video(){
                 std::lock_guard<std::mutex> lg(m_camera_lock);
 //                cout << "error = " << id << endl;
                 m_logger.log(
-                    "QCameraImageCapture::error(): Unable to find capture id: " + errorString,
+                    "QCameraImageCapture::error(): Capture ID: " + errorString,
                     "red"
                 );
 //                cout << "QCameraImageCapture::error(): " << errorString.toUtf8().data() << endl;
@@ -391,6 +391,8 @@ QImage CameraSelectorUI::snapshot(){
     if (!m_snapshots_allowed.load(std::memory_order_acquire)){
         return QImage();
     }
+
+    std::unique_lock<std::mutex> snap_lock(m_snapshot_lock);
 
     std::unique_lock<std::mutex> lg(m_camera_lock);
     if (m_camera_view == nullptr){

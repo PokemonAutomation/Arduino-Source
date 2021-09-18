@@ -165,8 +165,8 @@ void TrainingSession::generate_large_dictionary(
 ) const{
     env.log("Generating OCR Data...");
 
-    OCR::LargeDictionaryMatcher baseline(ocr_json_directory + output_prefix, !incremental);
-    OCR::LargeDictionaryMatcher trained(ocr_json_directory + output_prefix, !incremental);
+    OCR::LargeDictionaryMatcher baseline(ocr_json_directory + output_prefix, nullptr, !incremental);
+    OCR::LargeDictionaryMatcher trained(ocr_json_directory + output_prefix, nullptr, !incremental);
 
     ParallelTaskRunner task_runner(0, threads);
 

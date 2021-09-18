@@ -11,7 +11,7 @@
 #include "CommonFramework/PersistentSettings.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "CommonFramework/Tools/DiscordWebHook.h"
+#include "CommonFramework/Tools/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_BeamSetter.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
@@ -185,7 +185,16 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env){
         );
     }
 
-    DiscordWebHook::send_message_old(true, "Found a purple beam", stats.make_discord_stats());
+    send_program_finished_notification(
+        env.logger(), true,
+        descriptor().display_name(),
+        "Found a purple beam!",
+        stats.to_str()
+    );
+    while (true){
+        pbf_press_button(env.console, BUTTON_B, 20, 20);
+        pbf_press_button(env.console, BUTTON_LCLICK, 20, 20);
+    }
 
     end_program_callback(env.console);
     end_program_loop(env.console);

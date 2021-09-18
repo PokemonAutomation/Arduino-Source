@@ -114,9 +114,11 @@ QRgb pixel_average(const QImage& image, const QImage& alpha_mask){
     uint64_t R = _mm_cvtsi128_si64(sumRA);
 //    uint64_t A = _mm_extract_epi64(sumRA, 1);
 
-    B /= area;
-    G /= area;
-    R /= area;
+    if (area != 0){
+        B /= area;
+        G /= area;
+        R /= area;
+    }
 
     return qRgb(R, G, B);
 }
@@ -195,6 +197,7 @@ struct RootMeanSquaredDeviation2{
 
         //  Zero if both alphas are zero.
         i = _mm_and_si128(i, rA);
+//        print8(i); cout << endl;
 
         //  Square
         i = _mm_maddubs_epi16(i, i);
@@ -331,7 +334,8 @@ struct RootMeanSquaredDeviationMasked2{
         i = _mm_and_si128(i, _mm_or_si128(rA, iA));
 
         //  Max out if alphas mismatch.
-        i = _mm_or_si128(i, _mm_andnot_si128(rA, iA));
+        i = _mm_or_si128(i, _mm_xor_si128(rA, iA));
+//        print8(i); cout << endl;
 
         //  Square
         i = _mm_maddubs_epi16(i, i);
@@ -414,6 +418,29 @@ double pixel_RMSD_masked(const QImage& reference, const QImage& image){
     return pixeldiff<RootMeanSquaredDeviationMasked2>(reference, image);
 }
 
+double pixel_max_possible_RMSD(const QImage& reference){
+    int width = reference.width();
+    int height = reference.height();
+    double variance = 0;
+    size_t pixels = 0;
+    for (int r = 0; r < height; r++){
+        for (int c = 0; c < width; c++){
+            QRgb pixel = reference.pixel(c, r);
+            if (qAlpha(pixel) == 0){
+                continue;
+            }
+            pixels++;
+            int red = qRed(pixel);
+            int green = qGreen(pixel);
+            int blue = qBlue(pixel);
+            double rdiff = std::max(red, 255 - red);
+            double gdiff = std::max(green, 255 - green);
+            double bdiff = std::max(blue, 255 - blue);
+            variance += rdiff*rdiff + gdiff*gdiff + bdiff*bdiff;
+        }
+    }
+    return std::sqrt((double)variance / (double)pixels);
+}
 
 
 }

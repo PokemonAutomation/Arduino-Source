@@ -10,6 +10,7 @@
 #include <memory>
 #include <QPushButton>
 #include "CommonFramework/Options/ConfigOption.h"
+#include "CommonFramework/Options/BatchOption.h"
 #include "Panel.h"
 
 namespace PokemonAutomation{
@@ -20,6 +21,10 @@ class SettingsPanelInstance : public PanelInstance{
 public:
     using PanelInstance::PanelInstance;
 
+    void add_option(ConfigOption& option, QString serialization_string){
+        m_options.add_option(option, std::move(serialization_string));
+    }
+
     virtual QWidget* make_widget(QWidget& parent, PanelListener& listener) override;
 
 public:
@@ -29,8 +34,7 @@ public:
 
 protected:
     friend class SettingsPanelWidget;
-
-    std::vector<std::pair<QString, std::unique_ptr<ConfigOption>>> m_options;
+    BatchOption m_options;
 };
 
 
@@ -58,7 +62,7 @@ private:
 private:
     friend class SettingsPanelInstance;
 
-    std::vector<ConfigOptionUI*> m_options;
+    BatchOptionUI* m_options;
     QPushButton* m_default_button;
 };
 

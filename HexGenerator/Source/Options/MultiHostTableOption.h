@@ -1,0 +1,49 @@
+/*  Multi-Host Table
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#ifndef PokemonAutomation_MultiHostTable_H
+#define PokemonAutomation_MultiHostTable_H
+
+#include <vector>
+#include <QTableWidget>
+#include <QComboBox>
+#include <QCheckBox>
+#include <QPushButton>
+#include "Common/Qt/Options/MultiHostTableOptionBase.h"
+#include "SingleStatementOption.h"
+
+namespace PokemonAutomation{
+
+
+class MultiHostTable : public SingleStatementOption, public MultiHostTableOptionBase{
+public:
+    static const QString OPTION_TYPE;
+
+public:
+    MultiHostTable(const QJsonObject& obj);
+
+    virtual const QString& type() const override{ return OPTION_TYPE; }
+    virtual bool is_valid() const override;
+    virtual void restore_defaults() override;
+
+    virtual QJsonObject to_json() const override;
+    virtual std::string to_cpp() const override;
+
+    virtual QWidget* make_ui(QWidget& parent) override;
+
+private:
+    friend class MultiHostTableUI;
+};
+
+
+class MultiHostTableUI : public MultiHostTableOptionBaseUI{
+public:
+    MultiHostTableUI(QWidget& parent, MultiHostTable& value);
+};
+
+
+}
+#endif

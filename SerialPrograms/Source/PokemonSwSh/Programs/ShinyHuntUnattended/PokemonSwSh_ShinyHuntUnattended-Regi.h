@@ -8,9 +8,9 @@
 #define PokemonAutomation_PokemonSwSh_ShinyHuntUnattendedRegi_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/SimpleInteger.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 #include "PokemonSwSh/Options/PokemonSwSh_RegiSelector.h"
@@ -34,14 +34,14 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
-    TouchDateInterval TOUCH_DATE_INTERVAL;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+    TouchDateIntervalOption TOUCH_DATE_INTERVAL;
 
-    TimeExpression<uint16_t> START_TO_RUN_DELAY;
-    RegiSelector REGI_NAME;
-    SectionDivider m_advanced_options;
-    SimpleInteger<uint16_t> CORRECTION_INTERVAL;
-    TimeExpression<uint16_t> TRANSITION_DELAY;
+    TimeExpressionOption<uint16_t> START_TO_RUN_DELAY;
+    RegiSelectorOption REGI_NAME;
+    SectionDividerOption m_advanced_options;
+    SimpleIntegerOption<uint16_t> CORRECTION_INTERVAL;
+    TimeExpressionOption<uint16_t> TRANSITION_DELAY;
 };
 
 }

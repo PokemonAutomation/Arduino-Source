@@ -23,9 +23,9 @@ enum class RegiGolem{
     Regidrago,
 };
 
-class RegiSelector : public ConfigOption{
+class RegiSelectorOption : public ConfigOption{
 public:
-    RegiSelector();
+    RegiSelectorOption();
     virtual void load_json(const QJsonValue& json) override;
     virtual QJsonValue to_json() const override;
 
@@ -38,21 +38,21 @@ public:
 
 
 private:
-    friend class RegiSelectorUI;
+    friend class RegiSelectorOptionUI;
     QString m_label;
     const RegiGolem m_default;
     RegiGolem m_current;
 };
 
 
-class RegiSelectorUI : public ConfigOptionUI, public QWidget{
+class RegiSelectorOptionUI : public ConfigOptionUI, public QWidget{
 public:
-    RegiSelectorUI(QWidget& parent, RegiSelector& value);
+    RegiSelectorOptionUI(QWidget& parent, RegiSelectorOption& value);
     virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override;
 
 private:
-    RegiSelector& m_value;
+    RegiSelectorOption& m_value;
     QComboBox* m_box;
 };
 

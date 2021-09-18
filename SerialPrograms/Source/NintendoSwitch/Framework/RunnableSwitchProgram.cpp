@@ -222,9 +222,10 @@ void RunnableSwitchProgramWidget::run_program(){
     }catch (StringException& e){
         signal_error(e.message_qt());
         send_program_error_notification(
-            &m_logger,
+            m_logger,
             instance.descriptor().display_name(),
-            e.message_qt()
+            e.message_qt(),
+            current_stats ? current_stats->to_str() : ""
         );
     }
 

@@ -5,10 +5,10 @@ cd %~dp0\ClientProject
 cd %~dp0\NativePrograms
 @call Cleanup.cmd
 
-cd %~dp0\GeneratorSource
+cd %~dp0\HexGenerator
 @call Cleanup.cmd
 
-cd %~dp0\GeneratorLauncher
+cd %~dp0\HexGeneratorLauncher
 @call Cleanup.cmd
 
 cd %~dp0\SerialPrograms

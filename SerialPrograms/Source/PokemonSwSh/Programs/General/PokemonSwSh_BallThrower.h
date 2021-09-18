@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_BallThrower_H
 #define PokemonAutomation_PokemonSwSh_BallThrower_H
 
-#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -29,7 +29,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
 };
 
 }

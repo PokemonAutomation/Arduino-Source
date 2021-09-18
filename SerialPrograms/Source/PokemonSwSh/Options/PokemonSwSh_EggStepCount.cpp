@@ -26,31 +26,31 @@ const std::vector<uint16_t> STEP_COUNTS{
     30720,
 };
 
-EggStepCount::EggStepCount()
+EggStepCountOption::EggStepCountOption()
     : m_label("<b>Step Count:</b><br>Lookup the # of steps on Serebii.")
     , m_default(3)
     , m_current(3)
 {}
-void EggStepCount::load_json(const QJsonValue& json){
+void EggStepCountOption::load_json(const QJsonValue& json){
     size_t index = json.toInt((int)m_default);
     index = std::min(index, STEP_COUNTS.size());
     m_current = index;
 }
-QJsonValue EggStepCount::to_json() const{
+QJsonValue EggStepCountOption::to_json() const{
     return QJsonValue((int)m_current);
 }
 
 
-void EggStepCount::restore_defaults(){
+void EggStepCountOption::restore_defaults(){
     m_current = m_default;
 }
 
-ConfigOptionUI* EggStepCount::make_ui(QWidget& parent){
+ConfigOptionUI* EggStepCountOption::make_ui(QWidget& parent){
     return new EggStepCountUI(parent, *this);
 }
 
 
-EggStepCountUI::EggStepCountUI(QWidget& parent, EggStepCount& value)
+EggStepCountUI::EggStepCountUI(QWidget& parent, EggStepCountOption& value)
     : QWidget(&parent)
     , m_value(value)
 {

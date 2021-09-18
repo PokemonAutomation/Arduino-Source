@@ -11,7 +11,7 @@
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
 #include "CommonFramework/PersistentSettings.h"
-#include "CommonFramework/Inference/VisualInferenceWait.h"
+#include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
@@ -135,12 +135,16 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
 
         {
             //  Wait for start of battle.
-            StandardBattleMenuDetector battle_menu_detector(env.console, false);
+            StandardBattleMenuDetector battle_menu_detector(false);
             StartBattleDetector start_back_detector(env.console);
-            VisualInferenceWait inference(env, env.console, std::chrono::seconds(30));
-            inference += battle_menu_detector;
-            inference += start_back_detector;
-            inference.run();
+            wait_until(
+                env, env.console,
+                std::chrono::seconds(30),
+                {
+                    &battle_menu_detector,
+                    &start_back_detector,
+                }
+            );
         }
 
         //  Detect shiny.

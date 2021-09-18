@@ -9,7 +9,7 @@
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
-#include "CommonFramework/Inference/VisualInferenceSession.h"
+#include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_BasicCatcher.h"
@@ -29,22 +29,19 @@ void run_away(
     ConsoleHandle& console,
     uint16_t exit_battle_time
 ){
-    InterruptableCommandSession commands(console);
-
-    BlackScreenDetector black_screen_detector(console);
-    black_screen_detector.register_command_stop(commands);
-
-    AsyncVisualInferenceSession inference(env, console);
-    inference += black_screen_detector;
-
-    commands.run([=](const BotBaseContext& context){
-        pbf_press_dpad(context, DPAD_UP, 10, 0);
-        pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
-        if (exit_battle_time > TICKS_PER_SECOND){
-            pbf_mash_button(context, BUTTON_B, exit_battle_time - TICKS_PER_SECOND);
-        }
-        context.botbase().wait_for_all_requests();
-    });
+    BlackScreenDetector black_screen_detector;
+    run_until(
+        env, console,
+        [=](const BotBaseContext& context){
+            pbf_press_dpad(context, DPAD_UP, 10, 0);
+            pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
+            if (exit_battle_time > TICKS_PER_SECOND){
+                pbf_mash_button(context, BUTTON_B, exit_battle_time - TICKS_PER_SECOND);
+            }
+            context.botbase().wait_for_all_requests();
+        },
+        { &black_screen_detector }
+    );
 }
 
 
@@ -96,22 +93,18 @@ void StandardEncounterHandler::run_away_and_update_stats(
         &m_frequencies
     );
 
-    InterruptableCommandSession commands(m_console);
-
-    BlackScreenDetector black_screen_detector(m_console);
-    black_screen_detector.register_command_stop(commands);
-
-    AsyncVisualInferenceSession inference(m_env, m_console);
-    inference += black_screen_detector;
-
-    commands.run([=](const BotBaseContext& context){
-        pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
-        if (exit_battle_time > TICKS_PER_SECOND){
-            pbf_mash_button(context, BUTTON_B, exit_battle_time - TICKS_PER_SECOND);
-        }
-        context.botbase().wait_for_all_requests();
-    });
-
+    BlackScreenDetector black_screen_detector;
+    run_until(
+        m_env, m_console,
+        [=](const BotBaseContext& context){
+            pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
+            if (exit_battle_time > TICKS_PER_SECOND){
+                pbf_mash_button(context, BUTTON_B, exit_battle_time - TICKS_PER_SECOND);
+            }
+            context.botbase().wait_for_all_requests();
+        },
+        { &black_screen_detector }
+    );
 }
 
 
@@ -155,11 +148,13 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     m_session_stats += result.shiny_type;
     m_env.update_stats();
 
+#if 0
     if (result.shiny_type == ShinyType::UNKNOWN){
         pbf_mash_button(m_console, BUTTON_B, TICKS_PER_SECOND);
         run_away(m_env, m_console, exit_battle_time);
         return false;
     }
+#endif
 
     StandardEncounterDetection encounter(
         m_env, m_console,
@@ -205,6 +200,8 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
             PA_THROW_StringException("Your " + STRING_POKEMON + " fainted after " + QString::number(results.balls_used) + " balls.");
         case CatchResult::OUT_OF_BALLS:
             PA_THROW_StringException("Unable to find the desired ball after throwing " + QString::number(results.balls_used) + " of them. Did you run out?");
+        case CatchResult::CANNOT_THROW_BALL:
+            PA_THROW_StringException("Unable to throw ball. Is the " + STRING_POKEMON + " semi-invulnerable?");
         case CatchResult::TIMEOUT:
             PA_THROW_StringException("Program has timed out. Did your lead " + STRING_POKEMON + " faint?");
         }
@@ -223,17 +220,20 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         CatchResults results = basic_catcher(m_env, m_console, m_language, action.second);
         switch (results.result){
         case CatchResult::POKEMON_CAUGHT:
-            pbf_wait(m_console, 2 * TICKS_PER_SECOND);
+            pbf_mash_button(m_console, BUTTON_B, 2 * TICKS_PER_SECOND);
             pbf_press_button(m_console, BUTTON_X, 20, OVERWORLD_TO_MENU_DELAY); //  Save game.
             pbf_press_button(m_console, BUTTON_R, 20, 150);
             pbf_press_button(m_console, BUTTON_A, 10, 500);
             break;
         case CatchResult::POKEMON_FAINTED:
+            pbf_mash_button(m_console, BUTTON_B, 2 * TICKS_PER_SECOND);
             break;
         case CatchResult::OWN_FAINTED:
             PA_THROW_StringException("Your " + STRING_POKEMON + " fainted after " + QString::number(results.balls_used) + " balls.");
         case CatchResult::OUT_OF_BALLS:
             PA_THROW_StringException("Unable to find the desired ball after throwing " + QString::number(results.balls_used) + " of them. Did you run out?");
+        case CatchResult::CANNOT_THROW_BALL:
+            PA_THROW_StringException("Unable to throw ball. Is the " + STRING_POKEMON + " semi-invulnerable?");
         case CatchResult::TIMEOUT:
             PA_THROW_StringException("Program has timed out. Did your lead " + STRING_POKEMON + " faint?");
         }

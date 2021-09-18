@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_PokemonSwSh_LotoFarmer_H
 #define PokemonAutomation_PokemonSwSh_LotoFarmer_H
 
-#include "CommonFramework/Options/SimpleInteger.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -31,10 +31,10 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
 
-    SimpleInteger<uint32_t> SKIPS;
-    TimeExpression<uint16_t> MASH_B_DURATION;
+    SimpleIntegerOption<uint32_t> SKIPS;
+    TimeExpressionOption<uint16_t> MASH_B_DURATION;
 };
 
 

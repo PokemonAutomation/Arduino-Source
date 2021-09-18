@@ -4,7 +4,9 @@
  *
  */
 
+#include <set>
 #include <QCoreApplication>
+#include <QCryptographicHash>
 #include <QFile>
 #include <QJsonValue>
 #include <QJsonArray>
@@ -20,6 +22,17 @@ using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
+
+
+const std::set<std::string> TOKENS{
+    "f6538243092d8a3b9959bca988f054e1670f57c7246df2cbba25c4df3fe7a4e7",
+    "2d04af67f6520e3550842d7eeb292868c6d0d4809b607f5a454712023d8815e1",
+    "475d0a0a305a02cbf8b602bd47c3b275dccd5ac19fbe480729804a8e4e360b71",
+    "6643d9fe87b3e54dc75dfac8ac22f0cc8bd17f6a8a786debf5fc4c517ee65469",
+    "8e48e38e49bffc8462ada9d2d9d850d5b3b5c9529d20978c09bc548bc9a614a4",
+    "7694adee4419d62c6a923c4efc9e7b41def7b96bb84ea882701b0bf2e8c13bee",
+};
+
 
 
 
@@ -71,15 +84,11 @@ void PersistentSettings::write() const{
         root.insert("02-WindowSize", res);
     }
     root.insert("03-NaughtyMode", QJsonValue(naughty_mode));
-    root.insert("04-DeveloperMode", QJsonValue(developer_mode));
     root.insert("05-LogEverything", QJsonValue(log_everything));
     root.insert("06-SaveDebugImages", QJsonValue(save_debug_images));
+    root.insert("07-DeveloperToken", QJsonValue(developer_token));
 
-    root.insert("10-INSTANCE_NAME", INSTANCE_NAME);
-
-    root.insert("20-DISCORD_WEBHOOK_URL", DISCORD_WEBHOOK_URL);
-    root.insert("21-DISCORD_USER_ID", DISCORD_USER_ID);
-    root.insert("22-DISCORD_USER_SHORT_NAME", DISCORD_USER_SHORT_NAME);
+    root.insert("10-DiscordSettings", discord_settings.to_json());
 
     root.insert("50-SwitchKeyboardMapping", NintendoSwitch::read_keyboard_mapping());
 
@@ -108,15 +117,18 @@ void PersistentSettings::read(){
         }
     }
     json_get_bool(naughty_mode, root, "03-NaughtyMode");
-    json_get_bool(developer_mode, root, "04-DeveloperMode");
     json_get_bool(log_everything, root, "05-LogEverything");
     json_get_bool(save_debug_images, root, "06-SaveDebugImages");
+    json_get_string(developer_token, root, "07-DeveloperToken");
 
-    json_get_string(INSTANCE_NAME, root, "10-INSTANCE_NAME");
+    {
+        std::string token = developer_token.toStdString();
+        QCryptographicHash hash(QCryptographicHash::Algorithm::Sha256);
+        hash.addData(token.c_str(), token.size());
+        developer_mode = TOKENS.find(hash.result().toHex().toStdString()) != TOKENS.end();
+    }
 
-    json_get_string(DISCORD_WEBHOOK_URL, root, "20-DISCORD_WEBHOOK_URL");
-    json_get_string(DISCORD_USER_ID, root, "21-DISCORD_USER_ID");
-    json_get_string(DISCORD_USER_SHORT_NAME, root, "22-DISCORD_USER_SHORT_NAME");
+    discord_settings.load_json(json_get_object_throw(root, "10-DiscordSettings"));
 
     NintendoSwitch::set_keyboard_mapping(json_get_array_nothrow(root, "50-SwitchKeyboardMapping"));
 

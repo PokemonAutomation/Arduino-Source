@@ -54,9 +54,9 @@ struct EncounterFilterOverrides{
 };
 
 
-class EncounterFilter : public ConfigOption{
+class EncounterFilterOption : public ConfigOption{
 public:
-    EncounterFilter(bool rare_stars, bool enable_overrides);
+    EncounterFilterOption(bool rare_stars, bool enable_overrides);
 
     ShinyFilter shiny_filter() const{ return m_shiny_filter_current; }
     const std::vector<EncounterFilterOverrides>& overrides() const{ return m_overrides; }
@@ -69,7 +69,7 @@ public:
     virtual ConfigOptionUI* make_ui(QWidget& parent) override;
 
 private:
-    friend class EncounterFilterUI;
+    friend class EncounterFilterOptionUI;
 
     QString m_label;
 
@@ -83,9 +83,9 @@ private:
 };
 
 
-class EncounterFilterUI : public ConfigOptionUI, public QWidget{
+class EncounterFilterOptionUI : public ConfigOptionUI, public QWidget{
 public:
-    EncounterFilterUI(QWidget& parent, EncounterFilter& value);
+    EncounterFilterOptionUI(QWidget& parent, EncounterFilterOption& value);
     virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override;
 
@@ -100,7 +100,7 @@ private:
     QPushButton* make_remove_button(QWidget& parent, int& row);
 
 private:
-    EncounterFilter& m_value;
+    EncounterFilterOption& m_value;
 
     QComboBox* m_shininess;
     QTableWidget* m_table;

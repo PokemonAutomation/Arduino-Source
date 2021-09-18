@@ -153,6 +153,12 @@ TextImageFilter make_OCR_filter(const QImage& image){
 
 
 
+void filter_smart(QImage& image){
+    OCR::TextImageFilter filter = OCR::make_OCR_filter(image);
+    filter.apply(image);
+}
+
+
 
 void binary_filter_black_text(QImage& image, int max_rgb_sum){
     pxint_t w = image.width();

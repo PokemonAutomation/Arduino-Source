@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_EncounterBotCommon_H
 
 #include "CommonFramework/Options/BatchOption.h"
-#include "CommonFramework/Options/BooleanCheckBox.h"
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonSwSh/Options/PokemonSwSh_EncounterFilter.h"
 
@@ -19,10 +19,10 @@ namespace PokemonSwSh{
 
 
 struct EncounterBotCommonSettings{
-    const EncounterFilter& filter;
+    const EncounterFilterOption& filter;
     bool video_on_shiny;
     EncounterBotNotificationLevel notification_level;
-    EncounterBotScreenshot shiny_screenshot;
+    ScreenshotMode shiny_screenshot;
 };
 
 
@@ -45,8 +45,8 @@ public:
         return {FILTER, VIDEO_ON_SHINY, NOTIFICATION_LEVEL, SHINY_SCREENSHOT};
     }
 
-    EncounterFilter FILTER;
-    BooleanCheckBox VIDEO_ON_SHINY;
+    EncounterFilterOption FILTER;
+    BooleanCheckBoxOption VIDEO_ON_SHINY;
     EncounterBotNotifications NOTIFICATION_LEVEL;
     EncounterBotScreenshotOption SHINY_SCREENSHOT;
 };

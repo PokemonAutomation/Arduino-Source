@@ -9,14 +9,17 @@
 
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/BooleanCheckBox.h"
-#include "CommonFramework/Options/SimpleInteger.h"
-#include "CommonFramework/Options/RandomCode.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Options/ScreenshotFormatOption.h"
+#include "CommonFramework/Options/RandomCodeOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
+#include "NintendoSwitch/Options/FriendCodeListOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 #include "PokemonSwSh/Options/PokemonSwSh_MultiHostTable.h"
+#include "PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -40,28 +43,30 @@ public:
 private:
     void run_autohost(
         SingleSwitchProgramEnvironment& env,
-        const MultiHostTable::GameSlot& game,
+        const MultiHostTableOption::GameSlot& game,
         uint8_t accept_FR_slot,
         uint16_t lobby_wait_delay,
         Catchability catchability
     ) const;
 
 private:
-    StartInGripOrClosed START_IN_GRIP_MENU;
-    TouchDateInterval TOUCH_DATE_INTERVAL;
+    StartInGripOrClosedOption START_IN_GRIP_MENU;
+    TouchDateIntervalOption TOUCH_DATE_INTERVAL;
 
-    RandomCode RAID_CODE;
-    BooleanCheckBox HOST_ONLINE;
-    TimeExpression<uint16_t> LOBBY_WAIT_DELAY;
-    MultiHostTable GAME_LIST;
-    SimpleInteger<uint8_t> FR_FORWARD_ACCEPT;
+    RandomCodeOption RAID_CODE;
+    BooleanCheckBoxOption HOST_ONLINE;
+    TimeExpressionOption<uint16_t> LOBBY_WAIT_DELAY;
+    MultiHostTableOption GAME_LIST;
+    SimpleIntegerOption<uint8_t> FR_FORWARD_ACCEPT;
 
-    SectionDivider m_internet_settings;
-    TimeExpression<uint16_t> CONNECT_TO_INTERNET_DELAY;
-    TimeExpression<uint16_t> ENTER_ONLINE_DEN_DELAY;
-    TimeExpression<uint16_t> OPEN_ONLINE_DEN_LOBBY_DELAY;
-    TimeExpression<uint16_t> RAID_START_TO_EXIT_DELAY;
-    TimeExpression<uint16_t> DELAY_TO_SELECT_MOVE;
+    AutoHostNotificationOption NOTIFICATIONS;
+
+    SectionDividerOption m_internet_settings;
+    TimeExpressionOption<uint16_t> CONNECT_TO_INTERNET_DELAY;
+    TimeExpressionOption<uint16_t> ENTER_ONLINE_DEN_DELAY;
+    TimeExpressionOption<uint16_t> OPEN_ONLINE_DEN_LOBBY_DELAY;
+    TimeExpressionOption<uint16_t> RAID_START_TO_EXIT_DELAY;
+    TimeExpressionOption<uint16_t> DELAY_TO_SELECT_MOVE;
 };
 
 

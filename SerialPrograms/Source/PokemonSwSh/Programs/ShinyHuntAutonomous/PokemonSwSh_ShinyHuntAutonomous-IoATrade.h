@@ -8,10 +8,10 @@
 #define PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousIoATrade_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/BooleanCheckBox.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
-#include "NintendoSwitch/Options/GoHomeWhenDone.h"
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
+#include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
@@ -36,17 +36,17 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
-    GoHomeWhenDone GO_HOME_WHEN_DONE;
-    TouchDateInterval TOUCH_DATE_INTERVAL;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+    TouchDateIntervalOption TOUCH_DATE_INTERVAL;
 
-    Pokemon::EncounterBotNotifications NOTIFICATION_LEVEL;
-    Pokemon::EncounterBotScreenshotOption NOTIFICATION_SCREENSHOT;
+    EncounterBotNotifications NOTIFICATION_LEVEL;
+    EncounterBotScreenshotOption NOTIFICATION_SCREENSHOT;
 
-    SectionDivider m_advanced_options;
-    TimeExpression<uint16_t> MASH_TO_TRADE_DELAY;
-    BooleanCheckBox VIDEO_ON_SHINY;
-    BooleanCheckBox RUN_FROM_EVERYTHING;
+    SectionDividerOption m_advanced_options;
+    TimeExpressionOption<uint16_t> MASH_TO_TRADE_DELAY;
+    BooleanCheckBoxOption VIDEO_ON_SHINY;
+    BooleanCheckBoxOption RUN_FROM_EVERYTHING;
 };
 
 

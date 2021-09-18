@@ -30,6 +30,7 @@ private:
 
 
 const PokemonNames& get_pokemon_name(const std::string& slug);
+const PokemonNames* get_pokemon_name_nothrow(const std::string& slug);
 const std::string& parse_pokemon_name(const QString& display_name);
 const std::string& parse_pokemon_name_nothrow(const QString& display_name);
 

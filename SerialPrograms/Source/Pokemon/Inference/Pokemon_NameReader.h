@@ -17,6 +17,8 @@ namespace Pokemon{
 class PokemonNameReader : public OCR::LargeDictionaryMatcher{
 private:
     PokemonNameReader();
+public:
+    PokemonNameReader(const std::set<std::string>& subset);
 
 public:
     static const PokemonNameReader& instance();
@@ -30,6 +32,7 @@ public:
         const std::string& expected,
         const QImage& image
     ) const;
+
 };
 
 

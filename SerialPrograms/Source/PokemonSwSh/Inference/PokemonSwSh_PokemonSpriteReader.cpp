@@ -6,7 +6,6 @@
 
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageMatch/ImageCropper.h"
-#include "CommonFramework/ImageMatch/CroppedImageMatcher.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
 #include "PokemonSwSh_PokemonSpriteReader.h"
 
@@ -19,84 +18,97 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-
-class PokemonSpriteMatcher : public ImageMatch::CroppedImageMatcher{
-public:
-    PokemonSpriteMatcher(double min_euclidean_distance)
-        : CroppedImageMatcher(true)
-        , m_min_euclidean_distance_squared(min_euclidean_distance * min_euclidean_distance)
-    {}
-
-    virtual QRgb crop_image(QImage& image) const override{
-        ImageStats border = image_border_stats(image);
-        QRect rect = ImageMatch::enclosing_rectangle_with_pixel_filter(
-            image,
-            [&](QRgb pixel){
-//                if (qAlpha(pixel) == 0){
-//                    return false;
-//                }
-                double r = (double)qRed(pixel) - border.average.r;
-                double g = (double)qGreen(pixel) - border.average.g;
-                double b = (double)qBlue(pixel) - border.average.b;
-                bool stop = r*r + g*g + b*b >= m_min_euclidean_distance_squared;
-//                if (stop){
-//                    cout << r << " " << g << " " << b << endl;
-//                }
-                return stop;
-            }
-        );
-        image = image.copy(rect);
-        return border.average.round();
-    }
-    virtual void crop_sprite(QImage& image, QRgb background) const override{
-        QRect rect = ImageMatch::enclosing_rectangle_with_pixel_filter(
-            image,
-            [&](QRgb pixel){
-                if (qAlpha(pixel) == 0){
-                    return false;
-                }
-                double r = (double)qRed(pixel) - (double)qRed(background);
-                double g = (double)qGreen(pixel) - (double)qGreen(background);
-                double b = (double)qBlue(pixel) - (double)qBlue(background);
-                bool stop = r*r + g*g + b*b >= m_min_euclidean_distance_squared;
-//                if (stop){
-//                    cout << r << " " << g << " " << b << endl;
-//                }
-                return stop;
-            }
-        );
-        image = image.copy(rect);
-    }
-
-private:
-    double m_min_euclidean_distance_squared;
-};
-
-
-
-PokemonSpriteMatcher make_POKEMON_SPRITE_MATCHER(){
-    PokemonSpriteMatcher matcher(100);
+PokemonSpriteMatcherExact::PokemonSpriteMatcherExact(const std::set<std::string>* subset){
     for (const auto& item : all_pokemon_sprites()){
-        matcher.add(item.first, item.second.sprite());
+        if (subset == nullptr || subset->find(item.first) != subset->end()){
+//            cout << item.first << endl;
+            add(item.first, item.second.sprite());
+        }
     }
-    return matcher;
 }
-const PokemonSpriteMatcher& POKEMON_SPRITE_MATCHER(){
-    static PokemonSpriteMatcher matcher = make_POKEMON_SPRITE_MATCHER();
-    return matcher;
+PokemonLeftSpriteMatcherExact::PokemonLeftSpriteMatcherExact(const std::set<std::string>* subset){
+    for (const auto& item : all_pokemon_sprites()){
+        if (subset == nullptr || subset->find(item.first) != subset->end()){
+//            cout << item.first << endl;
+            const QImage& sprite = item.second.sprite();
+            int width = sprite.width();
+            int height = sprite.height();
+            add(item.first, sprite.copy(0, 0, width/2, height));
+        }
+    }
 }
 
 
 
-ImageMatch::MatchResult read_pokemon_sprite_on_solid(
-    Logger& logger,
-    const QImage& image,
-    double max_RMSD
-){
-    ImageMatch::MatchResult results = POKEMON_SPRITE_MATCHER().match(image);
-    results.log(logger, max_RMSD);
-    return results;
+
+
+
+PokemonSpriteMatcherCropped::PokemonSpriteMatcherCropped(const std::set<std::string>* subset, double min_euclidean_distance)
+    : CroppedImageMatcher(true)
+    , m_min_euclidean_distance_squared(min_euclidean_distance * min_euclidean_distance)
+{
+    for (const auto& item : all_pokemon_sprites()){
+        if (subset == nullptr || subset->find(item.first) != subset->end()){
+//            cout << item.first << endl;
+            add(item.first, item.second.sprite());
+        }
+    }
 }
+
+QRgb PokemonSpriteMatcherCropped::crop_image(QImage& image) const{
+    ImageStats border = image_border_stats(image);
+//    cout << border.average << border.stddev << endl;
+//    image.save("image1.png");
+    QRect rect = ImageMatch::enclosing_rectangle_with_pixel_filter(
+        image,
+        [&](QRgb pixel){
+//            if (qAlpha(pixel) == 0){
+//                return false;
+//            }
+//            FloatPixel p(pixel);
+//            cout << p << endl;
+            double r = (double)qRed(pixel) - border.average.r;
+            double g = (double)qGreen(pixel) - border.average.g;
+            double b = (double)qBlue(pixel) - border.average.b;
+            bool stop = r*r + g*g + b*b >= m_min_euclidean_distance_squared;
+            if (stop){
+//                FloatPixel p(pixel);
+//                cout << p << " : " << r << " " << g << " " << b << endl;
+            }
+            return stop;
+        }
+    );
+    image = image.copy(rect);
+//    image.save("image2.png");
+    return border.average.round();
+}
+void PokemonSpriteMatcherCropped::crop_sprite(QImage& image, QRgb background) const{
+//    FloatPixel p(background);
+//    cout << p << endl;
+//    image.save("test0.png");
+    QRect rect = ImageMatch::enclosing_rectangle_with_pixel_filter(
+        image,
+        [&](QRgb pixel){
+            if (qAlpha(pixel) == 0){
+                return false;
+            }
+            double r = (double)qRed(pixel) - (double)qRed(background);
+            double g = (double)qGreen(pixel) - (double)qGreen(background);
+            double b = (double)qBlue(pixel) - (double)qBlue(background);
+            bool stop = r*r + g*g + b*b >= m_min_euclidean_distance_squared;
+//            if (stop){
+//                cout << r << " " << g << " " << b << endl;
+//            }
+            return stop;
+        }
+    );
+    image = image.copy(rect);
+}
+
+
+
+
+
 
 
 

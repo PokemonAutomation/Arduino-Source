@@ -11,7 +11,7 @@
 #include "CommonFramework/Tools/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
-#include "Pokemon/Pokemon_Types.h"
+#include "Pokemon/Pokemon_DataTypes.h"
 #include "PokemonSwSh_ShinyTrigger.h"
 
 namespace PokemonAutomation{
@@ -21,7 +21,7 @@ namespace PokemonSwSh{
 using namespace Pokemon;
 
 
-class ShinySparkleDetector : public VisualInferenceCallbackWithCommandStop{
+class ShinySparkleDetector : public VisualInferenceCallback{
 public:
     ShinySparkleDetector(
         Logger& logger, VideoOverlay& overlay,
@@ -31,7 +31,7 @@ public:
 
     ShinyType results() const;
 
-    virtual bool on_frame(
+    virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
     ) override final;
@@ -40,7 +40,7 @@ public:
 private:
     Logger& m_logger;
     VideoOverlay& m_overlay;
-    InferenceBoxScope m_detection_box;
+    ImageFloatBox m_detection_box;
     double m_detection_threshold;
 
     ShinyImageAlpha m_image_alpha;

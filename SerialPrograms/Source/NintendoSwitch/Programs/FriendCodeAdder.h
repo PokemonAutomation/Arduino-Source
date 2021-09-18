@@ -8,9 +8,9 @@
 #define PokemonAutomation_NintendoSwitch_FriendCodeAdder_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/SimpleInteger.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
-#include "NintendoSwitch/Options/FriendCodeList.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Options/FriendCodeListOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -30,12 +30,12 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    SimpleInteger<uint8_t> USER_SLOT;
-    FriendCodeList FRIEND_CODES;
-    SectionDivider m_advanced_options;
-    TimeExpression<uint16_t> OPEN_CODE_PAD_DELAY;
-    TimeExpression<uint16_t> SEARCH_TIME;
-    TimeExpression<uint16_t> TOGGLE_BEST_STATUS_DELAY;
+    SimpleIntegerOption<uint8_t> USER_SLOT;
+    FriendCodeListOption FRIEND_CODES;
+    SectionDividerOption m_advanced_options;
+    TimeExpressionOption<uint16_t> OPEN_CODE_PAD_DELAY;
+    TimeExpressionOption<uint16_t> SEARCH_TIME;
+    TimeExpressionOption<uint16_t> TOGGLE_BEST_STATUS_DELAY;
 };
 
 

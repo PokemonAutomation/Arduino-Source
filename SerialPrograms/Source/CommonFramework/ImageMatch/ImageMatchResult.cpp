@@ -10,7 +10,7 @@ namespace PokemonAutomation{
 namespace ImageMatch{
 
 
-void MatchResult::log(Logger& logger, double max_RMSD) const{
+void MatchResult::log(Logger& logger, double max_RMSD_ratio) const{
     std::string str = "Image Match Result: ";
 
     if (slugs.empty()){
@@ -20,14 +20,14 @@ void MatchResult::log(Logger& logger, double max_RMSD) const{
     }
 
     double best = slugs.begin()->first;
-    QColor color = best <= max_RMSD
+    QColor color = best <= max_RMSD_ratio
         ? Qt::blue
         : Qt::red;
 
     if (slugs.size() == 1){
         auto iter = slugs.begin();
         str += iter->second;
-        str += " (RMSD = ";
+        str += " (RMSD Ratio = ";
         str += std::to_string(iter->first);
         str += ")";
         logger.log(str, color);

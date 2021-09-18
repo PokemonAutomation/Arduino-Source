@@ -83,16 +83,29 @@ GroupOptionUI::GroupOptionUI(QWidget& parent, GroupOption& value)
     , m_value(value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
-    QGroupBox* box = new QGroupBox(value.m_label, this);
-    layout->addWidget(box);
+//    layout->setMargin(0);
+    QGroupBox* group_box = new QGroupBox(value.m_label, this);
+    layout->addWidget(group_box);
 
-    QVBoxLayout* options_layout = new QVBoxLayout(box);
-    options_layout->setAlignment(Qt::AlignTop);
-    options_layout->setMargin(0);
+#if 0
+    QVBoxLayout* mid_layout = new QVBoxLayout(group_box);
+    QWidget* mid_widget = new QWidget(group_box);
+    mid_layout->addWidget(mid_widget);
+    mid_layout->setMargin(0);
+
+    QFont font = group_box->font();
+    mid_widget->setFont(font);
+    font.setBold(true);
+    group_box->setFont(font);
+#endif
+
+    m_options_layout = new QVBoxLayout(group_box);
+    m_options_layout->setAlignment(Qt::AlignTop);
+    m_options_layout->setMargin(0);
 
     for (auto& item : m_value.m_options){
         m_options.emplace_back(item.first->make_ui(parent));
-        options_layout->addWidget(m_options.back()->widget());
+        m_options_layout->addWidget(m_options.back()->widget());
     }
 }
 bool GroupOptionUI::settings_valid() const{

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_GenerateIVCheckerOCR_H
 #define PokemonAutomation_PokemonSwSh_GenerateIVCheckerOCR_H
 
-#include "CommonFramework/Options/EnumDropdown.h"
+#include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/OCR/LanguageOptionOCR.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
@@ -17,13 +17,13 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class IVCheckerOptionOCR : public EnumDropdown{
+class IVCheckerOptionOCR : public EnumDropdownOption{
 public:
     static const std::string TOKENS[];
 
 public:
     IVCheckerOptionOCR(QString label, size_t default_index = 0)
-        : EnumDropdown(
+        : EnumDropdownOption(
             std::move(label),
             {
                 "No Good (0)",

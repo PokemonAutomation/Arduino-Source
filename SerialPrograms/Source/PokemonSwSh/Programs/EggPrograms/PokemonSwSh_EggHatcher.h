@@ -8,9 +8,9 @@
 #define PokemonAutomation_PokemonSwSh_EggHatcher_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/SimpleInteger.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_EggStepCount.h"
 #include "PokemonSwSh_EggHelpers.h"
@@ -35,13 +35,13 @@ public:
 
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
 
-    SimpleInteger<uint8_t> BOXES_TO_HATCH;
-    EggStepCount STEPS_TO_HATCH;
-    SectionDivider m_advanced_options;
-    TimeExpression<uint16_t> SAFETY_TIME;
-    TimeExpression<uint16_t> HATCH_DELAY;
+    SimpleIntegerOption<uint8_t> BOXES_TO_HATCH;
+    EggStepCountOption STEPS_TO_HATCH;
+    SectionDividerOption m_advanced_options;
+    TimeExpressionOption<uint16_t> SAFETY_TIME;
+    TimeExpressionOption<uint16_t> HATCH_DELAY;
 };
 
 

@@ -1,0 +1,106 @@
+/*  Max Lair State Tracker
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#ifndef PokemonAutomation_PokemonSwSh_MaxLair_StateTracker_H
+#define PokemonAutomation_PokemonSwSh_MaxLair_StateTracker_H
+
+#include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "PokemonSwSh_MaxLair_State.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSwSh{
+namespace MaxLairInternal{
+
+
+class GlobalStateTracker{
+    using time_point = std::chrono::system_clock::time_point;
+public:
+    GlobalStateTracker(ProgramEnvironment& env, size_t consoles);
+
+    //  Access the local copy for this console.
+    //  This one is safe to directly access.
+    GlobalState& operator[](size_t index){
+        return m_consoles[index];
+    }
+
+    //  Push the local copy into the master shared copy.
+    void push_update(size_t index);
+
+    //  Get the inferred state from all the known states.
+    GlobalState infer_actual_state(size_t index);
+
+    //  Attempt to synchronize with other consoles.
+    GlobalState synchronize(
+        ProgramEnvironment& env, Logger& logger,
+        size_t index,
+        std::chrono::milliseconds window = std::chrono::seconds(5)
+    );
+
+    void mark_as_dead(size_t index);
+
+    std::string dump();
+
+
+private:
+    //  Recompute the group assignments.
+    void update_groups_unprotected();
+    bool group_is_up_to_date(uint8_t group, time_point time_min);
+    bool group_sync_completed(uint8_t group);
+    void group_clear_status(uint8_t group);
+    GlobalState infer_actual_state_unprotected(size_t index);
+
+
+private:
+    void merge_timestamp(size_t group, GlobalState& state);
+    void merge_boss(size_t group, GlobalState& state);
+    void merge_wins(size_t group, GlobalState& state);
+    void merge_opponent_species(size_t group, GlobalState& state);
+    void merge_opponent_hp(size_t group, GlobalState& state);
+
+    void merge_player_console_id(size_t group, PlayerState& player, size_t player_index);
+    void merge_player_species(size_t group, PlayerState& player, size_t player_index);
+    void merge_player_item(size_t group, PlayerState& player, size_t player_index);
+//    void merge_player_dead(size_t group, PlayerState& player, size_t player_index, time_point now);
+//    void merge_player_hp(size_t group, PlayerState& player, size_t player_index);
+    void merge_player_health(size_t group, PlayerState& player, size_t player_index);
+    void merge_player_dmax_turns_left(size_t group, PlayerState& player, size_t player_index);
+    void merge_player_can_dmax(size_t group, PlayerState& player, size_t player_index);
+    void merge_player_pp(size_t group, PlayerState& player, size_t player_index, size_t move_index);
+    void merge_player_move_blocked(size_t group, PlayerState& player, size_t player_index, size_t move_index);
+
+
+private:
+    ProgramEnvironment& m_env;
+    size_t m_count;
+    GlobalState m_consoles[4];
+
+//    SpinLock m_lock;
+
+    enum class SyncState{
+        NOT_CALLED,
+        WAITING,
+        DONE
+    };
+
+    SyncState m_pending_sync[4] = {
+        SyncState::NOT_CALLED,
+        SyncState::NOT_CALLED,
+        SyncState::NOT_CALLED,
+        SyncState::NOT_CALLED
+    };
+    GlobalState m_master_consoles[4];
+
+    uint8_t m_groups[4];
+};
+
+
+
+}
+}
+}
+}
+#endif

@@ -26,7 +26,7 @@ public:
         ProgramEnvironment& env,
         ConsoleHandle& console,
         Language language,
-        const EncounterFilter& filter,
+        const EncounterFilterOption& filter,
         ShinyType shininess,
         std::chrono::milliseconds read_name_delay = std::chrono::milliseconds(500)
     );
@@ -46,7 +46,7 @@ private:
 
     const Language m_language;
 
-    const EncounterFilter m_filter;
+    const EncounterFilterOption m_filter;
     const ShinyType m_shininess;
     const std::chrono::milliseconds m_read_name_delay;
 

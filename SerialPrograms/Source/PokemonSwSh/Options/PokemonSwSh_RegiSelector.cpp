@@ -14,32 +14,32 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-RegiSelector::RegiSelector()
+RegiSelectorOption::RegiSelectorOption()
     : m_label("<b>Name of Regi:</b>")
     , m_default(RegiGolem::Registeel)
     , m_current(RegiGolem::Registeel)
 {}
-void RegiSelector::load_json(const QJsonValue& json){
+void RegiSelectorOption::load_json(const QJsonValue& json){
     size_t index = json.toInt((int)m_default);
     index = std::min(index, (size_t)4);
     m_current = (RegiGolem)index;
 }
-QJsonValue RegiSelector::to_json() const{
+QJsonValue RegiSelectorOption::to_json() const{
     return QJsonValue((int)m_current);
 }
 
-void RegiSelector::restore_defaults(){
+void RegiSelectorOption::restore_defaults(){
     m_current = m_default;
 };
 
-ConfigOptionUI* RegiSelector::make_ui(QWidget& parent){
-    return new RegiSelectorUI(parent, *this);
+ConfigOptionUI* RegiSelectorOption::make_ui(QWidget& parent){
+    return new RegiSelectorOptionUI(parent, *this);
 }
 
 
 
 
-RegiSelectorUI::RegiSelectorUI(QWidget& parent, RegiSelector& value)
+RegiSelectorOptionUI::RegiSelectorOptionUI(QWidget& parent, RegiSelectorOption& value)
     : QWidget(&parent)
     , m_value(value)
 {
@@ -64,7 +64,7 @@ RegiSelectorUI::RegiSelectorUI(QWidget& parent, RegiSelector& value)
         }
     );
 }
-void RegiSelectorUI::restore_defaults(){
+void RegiSelectorOptionUI::restore_defaults(){
     m_value.restore_defaults();
     m_box->setCurrentIndex((int)(RegiGolem)m_value);
 }

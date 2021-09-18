@@ -10,8 +10,8 @@
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 #include "CommonFramework/OCR/LanguageOptionOCR.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
-#include "NintendoSwitch/Options/GoHomeWhenDone.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
+#include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h"
 
@@ -37,8 +37,8 @@ public:
 private:
     struct Stats;
 
-    StartInGripOrGame START_IN_GRIP_MENU;
-    GoHomeWhenDone GO_HOME_WHEN_DONE;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     IVCheckerReader m_iv_checker_reader;
 

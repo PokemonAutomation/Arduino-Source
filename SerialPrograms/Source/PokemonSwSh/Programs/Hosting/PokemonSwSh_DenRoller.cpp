@@ -4,6 +4,9 @@
  *
  */
 
+#include "Common/SwitchFramework/FrameworkSettings.h"
+#include "Common/SwitchFramework/Switch_PushButtons.h"
+#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_DenMonReader.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"

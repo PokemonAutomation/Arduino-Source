@@ -43,7 +43,7 @@ struct OverworldTarget{
 };
 
 
-class OverworldTargetTracker : public VisualInferenceCallbackWithCommandStop{
+class OverworldTargetTracker : public VisualInferenceCallback{
 public:
     static const double OVERWORLD_CENTER_X;
     static const double OVERWORLD_CENTER_Y;
@@ -69,7 +69,7 @@ public:
     //  The return value is only valid if the first element is non-negative.
     std::pair<double, OverworldTarget> best_target();
 
-    virtual bool on_frame(
+    virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
     ) override final;
@@ -102,7 +102,7 @@ private:
     MarkPriority m_mark_priority;
     double m_max_alpha;
 
-    InferenceBoxScope m_search_area;
+    ImageFloatBox m_search_area;
     std::deque<InferenceBoxScope> m_detection_boxes;
 
     //  Sliding window of detections.

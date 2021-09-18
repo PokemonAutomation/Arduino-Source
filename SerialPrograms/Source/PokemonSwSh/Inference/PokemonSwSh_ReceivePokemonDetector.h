@@ -20,20 +20,20 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class ReceivePokemonDetector : public VisualInferenceCallbackWithCommandStop{
+class ReceivePokemonDetector : public VisualInferenceCallback{
 public:
-    ReceivePokemonDetector(VideoOverlay& overlay);
+    ReceivePokemonDetector();
 
     bool receive_is_over(const QImage& frame);
-    virtual bool on_frame(
+    virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
    ) override;
 
 private:
-    InferenceBoxScope m_box_top;
-    InferenceBoxScope m_box_top_right;
-    InferenceBoxScope m_box_bot_left;
+    ImageFloatBox m_box_top;
+    ImageFloatBox m_box_top_right;
+    ImageFloatBox m_box_bot_left;
     bool m_has_been_orange;
 };
 

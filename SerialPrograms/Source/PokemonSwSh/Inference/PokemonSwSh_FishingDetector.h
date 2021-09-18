@@ -11,6 +11,7 @@
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/Logger.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonFramework/Inference/VisualInferenceCallback.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 
 #include <iostream>
@@ -22,32 +23,37 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class FishingDetector{
+class FishingMissDetector : public VisualInferenceCallback{
 public:
-    enum Detection{
-        NO_DETECTION,
-        HOOKED,
-        MISSED,
-        BATTLE_MENU,
-    };
+    FishingMissDetector();
 
+    bool detect(const QImage& frame);
+
+    virtual bool process_frame(
+        const QImage& frame,
+        std::chrono::system_clock::time_point timestamp
+    ) override;
+
+private:
+    ImageFloatBox m_hook_box;
+    ImageFloatBox m_miss_box;
+};
+
+class FishingHookDetector : public VisualInferenceCallback{
 public:
-    FishingDetector(VideoOverlay& overlay);
+    FishingHookDetector(VideoOverlay& overlay);
 
-    Detection detect_now(const QImage& screen);
-    Detection wait_for_detection(
-        ProgramEnvironment& env,
-        VideoFeed& feed,
-        std::chrono::seconds timeout = std::chrono::seconds(12)
-    );
+    virtual bool process_frame(
+        const QImage& frame,
+        std::chrono::system_clock::time_point timestamp
+    ) override;
 
 private:
     VideoOverlay& m_overlay;
-    InferenceBoxScope m_hook_box;
-    InferenceBoxScope m_miss_box;
-    StandardBattleMenuDetector m_battle_menu;
+    ImageFloatBox m_hook_box;
     std::deque<InferenceBoxScope> m_marks;
 };
+
 
 
 }

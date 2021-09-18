@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_FriendSearchDisconnect_H
 #define PokemonAutomation_PokemonSwSh_FriendSearchDisconnect_H
 
-#include "CommonFramework/Options/SimpleInteger.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -29,7 +29,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    SimpleInteger<uint8_t> USER_SLOT;
+    SimpleIntegerOption<uint8_t> USER_SLOT;
 };
 
 

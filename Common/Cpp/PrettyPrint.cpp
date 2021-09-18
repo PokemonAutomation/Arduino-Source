@@ -96,6 +96,23 @@ std::string now_to_filestring(){
     return str;
 }
 
+std::string set_to_str(const std::set<std::string>& set){
+    std::string str = "{";
+    bool first = true;
+    for (const std::string& item : set){
+        if (!first){
+            str += ", ";
+        }
+        first = false;
+        str += "\"";
+        str += item;
+        str += "\"";
+    }
+    str += "}";
+    return str;
+}
+
+
 
 
 

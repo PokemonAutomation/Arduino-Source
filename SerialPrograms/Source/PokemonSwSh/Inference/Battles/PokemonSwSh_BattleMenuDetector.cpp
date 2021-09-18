@@ -26,19 +26,32 @@ namespace PokemonSwSh{
 
 
 
-StandardBattleMenuDetector::StandardBattleMenuDetector(VideoOverlay& overlay, bool den)
-    : m_ball_left   (den ? nullptr : new InferenceBoxScope(overlay, 0.912, 0.452, 0.02, 0.03))
-    , m_ball_right  (den ? nullptr : new InferenceBoxScope(overlay, 0.970, 0.452, 0.02, 0.03))
-    , m_icon_fight  (overlay, 0.923, 0.576 + 0 * 0.1075, 0.05, 0.080)
-    , m_icon_pokemon(overlay, 0.923, 0.576 + 1 * 0.1075, 0.05, 0.080)
-    , m_icon_bag    (overlay, 0.923, 0.576 + 2 * 0.1075, 0.05, 0.080)
-    , m_icon_run    (overlay, 0.923, 0.576 + 3 * 0.1075, 0.05, 0.080)
-    , m_text_fight  (overlay, 0.830, 0.576 + 0 * 0.1075, 0.08, 0.080)
-    , m_text_pokemon(overlay, 0.830, 0.576 + 1 * 0.1075, 0.08, 0.080)
-    , m_text_bag    (overlay, 0.830, 0.576 + 2 * 0.1075, 0.08, 0.080)
-    , m_text_run    (overlay, 0.830, 0.576 + 3 * 0.1075, 0.08, 0.080)
-{}
-bool StandardBattleMenuDetector::on_frame(
+StandardBattleMenuDetector::StandardBattleMenuDetector(bool den)
+    : m_ball_left   (den ? nullptr : new ImageFloatBox(0.912, 0.452, 0.02, 0.03))
+    , m_ball_right  (den ? nullptr : new ImageFloatBox(0.970, 0.452, 0.02, 0.03))
+    , m_icon_fight  (0.923, 0.576 + 0 * 0.1075, 0.05, 0.080)
+    , m_icon_pokemon(0.923, 0.576 + 1 * 0.1075, 0.05, 0.080)
+    , m_icon_bag    (0.923, 0.576 + 2 * 0.1075, 0.05, 0.080)
+    , m_icon_run    (0.923, 0.576 + 3 * 0.1075, 0.05, 0.080)
+    , m_text_fight  (0.830, 0.576 + 0 * 0.1075, 0.08, 0.080)
+    , m_text_pokemon(0.830, 0.576 + 1 * 0.1075, 0.08, 0.080)
+    , m_text_bag    (0.830, 0.576 + 2 * 0.1075, 0.08, 0.080)
+    , m_text_run    (0.830, 0.576 + 3 * 0.1075, 0.08, 0.080)
+{
+    if (!den){
+        add_box(*m_ball_left);
+        add_box(*m_ball_right);
+    }
+    add_box(m_icon_fight);
+    add_box(m_icon_pokemon);
+    add_box(m_icon_bag);
+    add_box(m_icon_run);
+    add_box(m_text_fight);
+    add_box(m_text_pokemon);
+    add_box(m_text_bag);
+    add_box(m_text_run);
+}
+bool StandardBattleMenuDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){

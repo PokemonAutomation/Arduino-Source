@@ -8,10 +8,10 @@
 #define PokemonAutomation_PokemonSwSh_ShinyHuntUnattendedSwordsOfJustice_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/BooleanCheckBox.h"
-#include "CommonFramework/Options/SimpleInteger.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 
@@ -34,13 +34,13 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
-    TimeRollbackHours TIME_ROLLBACK_HOURS;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+    TimeRollbackHoursOption TIME_ROLLBACK_HOURS;
 
-    TimeExpression<uint16_t> EXIT_CAMP_TO_RUN_DELAY;
-    BooleanCheckBox AIRPLANE_MODE;
-    SectionDivider m_advanced_options;
-    TimeExpression<uint16_t> ENTER_CAMP_DELAY;
+    TimeExpressionOption<uint16_t> EXIT_CAMP_TO_RUN_DELAY;
+    BooleanCheckBoxOption AIRPLANE_MODE;
+    SectionDividerOption m_advanced_options;
+    TimeExpressionOption<uint16_t> ENTER_CAMP_DELAY;
 };
 
 }

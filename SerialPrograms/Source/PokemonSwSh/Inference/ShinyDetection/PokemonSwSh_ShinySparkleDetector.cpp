@@ -19,9 +19,11 @@ ShinySparkleDetector::ShinySparkleDetector(
 )
     : m_logger(logger)
     , m_overlay(overlay)
-    , m_detection_box(overlay, detection_box)
+    , m_detection_box(detection_box)
     , m_detection_threshold(detection_threshold)
-{}
+{
+    add_box(m_detection_box);
+}
 
 
 ShinyType ShinySparkleDetector::results() const{
@@ -52,7 +54,7 @@ ShinyType ShinySparkleDetector::results() const{
 }
 
 
-bool ShinySparkleDetector::on_frame(
+bool ShinySparkleDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){

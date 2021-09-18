@@ -12,7 +12,7 @@
 #include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
-#include "CommonFramework/Inference/VisualInferenceSession.h"
+#include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
@@ -113,35 +113,34 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env){
 
         env.console.botbase().wait_for_all_requests();
         {
-            InterruptableCommandSession commands(env.console);
-
-            StandardBattleMenuDetector battle_menu_detector(env.console, false);
-            battle_menu_detector.register_command_stop(commands);
-
+            StandardBattleMenuDetector battle_menu_detector(false);
             StartBattleDetector start_battle_detector(env.console);
-            start_battle_detector.register_command_stop(commands);
 
-            AsyncVisualInferenceSession inference(env, env.console);
-            inference += battle_menu_detector;
-            inference += start_battle_detector;
-
-            commands.run([](const BotBaseContext& context){
-                while (true){
-                    pbf_mash_button(context, BUTTON_LCLICK, TICKS_PER_SECOND);
-                    pbf_move_right_joystick(context, 192, 128, TICKS_PER_SECOND, 0);
+            int result = run_until(
+                env, env.console,
+                [](const BotBaseContext& context){
+                    while (true){
+                        pbf_mash_button(context, BUTTON_LCLICK, TICKS_PER_SECOND);
+                        pbf_move_right_joystick(context, 192, 128, TICKS_PER_SECOND, 0);
+                    }
+                },
+                {
+                    &battle_menu_detector,
+                    &start_battle_detector,
                 }
-            });
+            );
 
-            if (battle_menu_detector.triggered()){
+            switch (result){
+            case 0:
                 env.log("Unexpected battle menu.", Qt::red);
                 stats.m_unexpected_battles++;
                 env.update_stats();
                 pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
                 run_away(env, env.console, EXIT_BATTLE_TIMEOUT);
                 continue;
-            }
-            if (start_battle_detector.triggered()){
+            case 1:
                 env.log("Battle started!");
+                break;
             }
         }
 

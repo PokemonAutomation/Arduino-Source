@@ -9,8 +9,12 @@
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/SwitchRoutines/SwitchDigitEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
+#include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
 #include "Common/PokemonSwSh/PokemonSwShAutoHosts.h"
+#include "CommonFramework/Tools/ProgramNotifications.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "NintendoSwitch/FixedInterval.h"
+#include "PokemonSwSh/Inference/Dens/PokemonSwSh_DenMonReader.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
 #include "PokemonSwSh_DenTools.h"
 #include "PokemonSwSh_LobbyWait.h"
@@ -68,6 +72,7 @@ AutoHostRolling::AutoHostRolling(const AutoHostRolling_Descriptor& descriptor)
         "<b>Alternate Games:</b><br>Alternate hosting between 1st and 2nd games. Host from both Sword and Shield.",
         false
     )
+    , NOTIFICATIONS("Discord Notifications")
     , m_internet_settings(
         "<font size=4><b>Internet Settings:</b> Increase these if your internet is slow.</font>"
     )
@@ -107,6 +112,10 @@ AutoHostRolling::AutoHostRolling(const AutoHostRolling_Descriptor& descriptor)
     PA_ADD_OPTION(DYNAMAX);
     PA_ADD_OPTION(TROLL_HOSTING);
     PA_ADD_OPTION(ALTERNATE_GAMES);
+    if (PERSISTENT_SETTINGS().developer_mode){
+        PA_ADD_OPTION(NOTIFICATIONS);
+    }
+
     PA_ADD_OPTION(m_internet_settings);
     PA_ADD_OPTION(CONNECT_TO_INTERNET_DELAY);
     PA_ADD_OPTION(ENTER_ONLINE_DEN_DELAY);
@@ -163,27 +172,43 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env){
         if (HOST_ONLINE){
             connect_to_internet(env.console, OPEN_YCOMM_DELAY, CONNECT_TO_INTERNET_DELAY);
         }
-        enter_den(env.console, ENTER_ONLINE_DEN_DELAY, SKIPS != 0, HOST_ONLINE);
 
-        //  Don't delay if it's the first iteration.
-        if (first){
-            first = false;
-        }else{
-            pbf_wait(env.console, EXTRA_DELAY_BETWEEN_RAIDS);
-        }
+        env.console.botbase().wait_for_all_requests();
+        {
+            DenMonReader reader(env.console, env.console);
+            enter_den(env.console, ENTER_ONLINE_DEN_DELAY, SKIPS != 0, HOST_ONLINE);
 
-        uint8_t code[8];
-        if (RAID_CODE.get_code(code)){
-            char str[8];
-            for (size_t c = 0; c < 8; c++){
-                str[c] = code[c] + '0';
+            //  Don't delay if it's the first iteration.
+            if (first){
+                first = false;
+            }else{
+                pbf_wait(env.console, EXTRA_DELAY_BETWEEN_RAIDS);
             }
-            env.log("Next Raid Code: " + std::string(str, sizeof(str)));
-            pbf_press_button(env.console, BUTTON_PLUS, 5, 145);
-            enter_digits(env.console, 8, code);
-            pbf_wait(env.console, 180);
-            pbf_press_button(env.console, BUTTON_A, 5, 95);
+
+            uint8_t code[8];
+            bool has_code = RAID_CODE.get_code(code);
+            if (has_code){
+                char str[8];
+                for (size_t c = 0; c < 8; c++){
+                    str[c] = code[c] + '0';
+                }
+                env.log("Next Raid Code: " + std::string(str, sizeof(str)));
+                pbf_press_button(env.console, BUTTON_PLUS, 5, 145);
+                enter_digits(env.console, 8, code);
+                pbf_wait(env.console, 180);
+                pbf_press_button(env.console, BUTTON_A, 5, 95);
+            }
+            env.console.botbase().wait_for_all_requests();
+
+            send_raid_notification(
+                descriptor().display_name(),
+                env.console,
+                NOTIFICATIONS,
+                has_code, code,
+                reader, stats
+            );
         }
+
         enter_lobby(env.console, OPEN_ONLINE_DEN_LOBBY_DELAY, HOST_ONLINE, CATCHABILITY);
 
         //  Accept friend requests while we wait.
@@ -205,7 +230,7 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env){
             pbf_mash_button(env.console, BUTTON_A, 3 * TICKS_PER_SECOND);
             env.console.botbase().wait_for_all_requests();
 
-            BlackScreenDetector black_screen(env.console);
+            BlackScreenDetector black_screen;
             uint32_t now = start;
             while (true){
                 if (black_screen.black_is_over(env.console.video().snapshot())){

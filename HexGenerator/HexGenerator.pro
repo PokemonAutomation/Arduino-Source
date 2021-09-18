@@ -26,29 +26,29 @@ SOURCES += \
     ../Common/Cpp/Unicode.cpp \
     ../Common/Qt/CodeValidator.cpp \
     ../Common/Qt/ExpressionEvaluator.cpp \
-    ../Common/Qt/Options/BooleanCheckBoxOption.cpp \
-    ../Common/Qt/Options/FloatingPointOption.cpp \
-    ../Common/Qt/Options/FossilTableOption.cpp \
-    ../Common/Qt/Options/MultiHostTableOption.cpp \
-    ../Common/Qt/Options/SimpleIntegerOption.cpp \
-	../Common/Qt/Options/StringOption.cpp \
-    ../Common/Qt/Options/SwitchDateOption.cpp \
-    ../Common/Qt/Options/TimeExpressionOption.cpp \
+    ../Common/Qt/Options/BooleanCheckBoxOptionBase.cpp \
+    ../Common/Qt/Options/FloatingPointOptionBase.cpp \
+    ../Common/Qt/Options/FossilTableOptionBase.cpp \
+    ../Common/Qt/Options/MultiHostTableOptionBase.cpp \
+    ../Common/Qt/Options/SimpleIntegerOptionBase.cpp \
+    ../Common/Qt/Options/StringOptionBase.cpp \
+    ../Common/Qt/Options/SwitchDateOptionBase.cpp \
+    ../Common/Qt/Options/TimeExpressionOptionBase.cpp \
     ../Common/Qt/QtJsonTools.cpp \
     Source/Main.cpp \
-    Source/Options/BooleanCheckBox.cpp \
+    Source/Options/BooleanCheckBoxOption.cpp \
     Source/Options/ConfigItem.cpp \
     Source/Options/Divider.cpp \
-    Source/Options/EnumDropdown.cpp \
-    Source/Options/FixedCode.cpp \
-    Source/Options/FloatingPoint.cpp \
-    Source/Options/FossilTable.cpp \
-    Source/Options/MultiHostTable.cpp \
-    Source/Options/RandomCode.cpp \
-    Source/Options/SimpleInteger.cpp \
+    Source/Options/EnumDropdownOption.cpp \
+    Source/Options/FixedCodeOption.cpp \
+    Source/Options/FloatingPointOption.cpp \
+    Source/Options/FossilTableOption.cpp \
+    Source/Options/MultiHostTableOption.cpp \
+    Source/Options/RandomCodeOption.cpp \
+    Source/Options/SimpleIntegerOption.cpp \
     Source/Options/SingleStatementOption.cpp \
-    Source/Options/SwitchDate.cpp \
-    Source/Options/TimeExpression.cpp \
+    Source/Options/SwitchDateOption.cpp \
+    Source/Options/TimeExpressionOption.cpp \
     Source/Panels/ConfigSet.cpp \
     Source/Panels/JsonProgram.cpp \
     Source/Panels/JsonSettings.cpp \
@@ -67,28 +67,28 @@ HEADERS += \
     ../Common/Cpp/Unicode.h \
     ../Common/Qt/CodeValidator.h \
     ../Common/Qt/ExpressionEvaluator.h \
-    ../Common/Qt/Options/BooleanCheckBoxOption.h \
-    ../Common/Qt/Options/FloatingPointOption.h \
-    ../Common/Qt/Options/FossilTableOption.h \
-    ../Common/Qt/Options/MultiHostTableOption.h \
-    ../Common/Qt/Options/SimpleIntegerOption.h \
-	../Common/Qt/Options/StringOption.h \
-    ../Common/Qt/Options/SwitchDateOption.h \
-    ../Common/Qt/Options/TimeExpressionOption.h \
+    ../Common/Qt/Options/BooleanCheckBoxOptionBase.h \
+    ../Common/Qt/Options/FloatingPointOptionBase.h \
+    ../Common/Qt/Options/FossilTableOptionBase.h \
+    ../Common/Qt/Options/MultiHostTableOptionBase.h \
+    ../Common/Qt/Options/SimpleIntegerOptionBase.h \
+    ../Common/Qt/Options/StringOptionBase.h \
+    ../Common/Qt/Options/SwitchDateOptionBase.h \
+    ../Common/Qt/Options/TimeExpressionOptionBase.h \
     ../Common/Qt/QtJsonTools.h \
-    Source/Options/BooleanCheckBox.h \
+    Source/Options/BooleanCheckBoxOption.h \
     Source/Options/ConfigItem.h \
     Source/Options/Divider.h \
-    Source/Options/EnumDropdown.h \
-    Source/Options/FixedCode.h \
-    Source/Options/FloatingPoint.h \
-    Source/Options/FossilTable.h \
-    Source/Options/MultiHostTable.h \
-    Source/Options/RandomCode.h \
-    Source/Options/SimpleInteger.h \
+    Source/Options/EnumDropdownOption.h \
+    Source/Options/FixedCodeOption.h \
+    Source/Options/FloatingPointOption.h \
+    Source/Options/FossilTableOption.h \
+    Source/Options/MultiHostTableOption.h \
+    Source/Options/RandomCodeOption.h \
+    Source/Options/SimpleIntegerOption.h \
     Source/Options/SingleStatementOption.h \
-    Source/Options/SwitchDate.h \
-    Source/Options/TimeExpression.h \
+    Source/Options/SwitchDateOption.h \
+    Source/Options/TimeExpressionOption.h \
     Source/Panels/ConfigSet.h \
     Source/Panels/JsonProgram.h \
     Source/Panels/JsonSettings.h \

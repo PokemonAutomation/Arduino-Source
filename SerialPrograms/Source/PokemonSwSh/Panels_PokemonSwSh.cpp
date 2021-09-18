@@ -42,6 +42,7 @@
 #include "Programs/Hosting/PokemonSwSh_AutoHost-MultiGame.h"
 
 #include "Programs/General/PokemonSwSh_StatsReset.h"
+#include "Programs/General/PokemonSwSh_StatsReset-Calyrex.h"
 #include "Programs/General/PokemonSwSh_StatsReset-Moltres.h"
 #include "Programs/General/PokemonSwSh_StatsReset-Regi.h"
 
@@ -62,7 +63,6 @@
 #include "Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Whistling.h"
 #include "Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Fishing.h"
 #include "Programs/OverworldBot/PokemonSwSh_ShinyHuntAutonomous-Overworld.h"
-#include "Programs/MaxLair/PokemonSwSh_MaxLair_SingleRun.h"
 
 #include "Programs/EggPrograms/PokemonSwSh_EggFetcher2.h"
 #include "Programs/EggPrograms/PokemonSwSh_EggHatcher.h"
@@ -73,6 +73,9 @@
 
 #include "Programs/PokemonSwSh_SynchronizedSpinning.h"
 #include "Programs/PokemonSwSh_RaidItemFarmerOKHO.h"
+
+#include "MaxLair/PokemonSwSh_MaxLair_SingleRun.h"
+#include "MaxLair/PokemonSwSh_MaxLair_Standard.h"
 
 #include "InferenceTraining/PokemonSwSh_GenerateIVCheckerOCR.h"
 #include "InferenceTraining/PokemonSwSh_GenerateNameOCRPokedex.h"
@@ -128,6 +131,7 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
 
     add_divider("---- Non-Shiny Hunting ----");
     add_program<StatsReset_Descriptor, StatsReset>();
+    add_program<StatsResetCalyrex_Descriptor, StatsResetCalyrex>();
     add_program<StatsResetMoltres_Descriptor, StatsResetMoltres>();
     add_program<StatsResetRegi_Descriptor, StatsResetRegi>();
 
@@ -166,10 +170,13 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<RaidItemFarmerOHKO_Descriptor, RaidItemFarmerOHKO>();
 
     if (settings.developer_mode){
+        add_divider("---- Auto Max Lair 2.0 ----");
+        add_program<MaxLairSingleRun_Descriptor, MaxLairSingleRun>();
+        add_program<MaxLairStandard_Descriptor, MaxLairStandard>();
+    }
+
+    if (settings.developer_mode){
         add_divider("---- Developer Tools ----");
-        if (settings.naughty_mode){
-            add_program<MaxLairSingleRun_Descriptor, MaxLairSingleRun>();
-        }
         add_program<GenerateIVCheckerOCR_Descriptor, GenerateIVCheckerOCR>();
         add_program<GenerateNameOCRDataPokedex_Descriptor, GenerateNameOCRDataPokedex>();
     }

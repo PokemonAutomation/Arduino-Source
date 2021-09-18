@@ -8,6 +8,10 @@
 #include "ImageBoxes.h"
 #include "ImageStats.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -17,15 +21,25 @@ ImageStats image_stats(const QImage& image){
     if (w * h <= 1){
         return ImageStats();
     }
+//    size_t total = 0;
     FloatPixel sum;
     FloatPixel sqr_sum;
     for (pxint_t r = 0; r < h; r++){
         for (pxint_t c = 0; c < w; c++){
-            FloatPixel p(image.pixel(c, r));
+            QRgb pixel = image.pixel(c, r);
+//            if (qAlpha(pixel) == 0){
+//                continue;
+//            }
+            FloatPixel p(pixel);
+//            total++;
             sum += p;
             sqr_sum += p * p;
         }
     }
+//    if (total < 2){
+//        return ImageStats();
+//    }
+//    cout << "total = " << total << endl;
     size_t total = (size_t)w * (size_t)h;
     FloatPixel variance = (sqr_sum - sum*sum / total) / (total - 1);
     return ImageStats{

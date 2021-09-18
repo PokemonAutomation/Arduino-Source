@@ -8,10 +8,10 @@
 #define PokemonAutomation_PokemonSwSh_PurpleBeamFinder_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/BooleanCheckBox.h"
-#include "CommonFramework/Options/FloatingPoint.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Options/FloatingPointOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -36,17 +36,17 @@ public:
 private:
     struct Stats;
 
-    StartInGripOrGame START_IN_GRIP_MENU;
-    BooleanCheckBox EXTRA_LINE;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+    BooleanCheckBoxOption EXTRA_LINE;
 
-    SectionDivider m_advanced_options;
-    BooleanCheckBox SAVE_SCREENSHOT;
-    TimeExpression<uint16_t> TIMEOUT_DELAY;
+    SectionDividerOption m_advanced_options;
+    BooleanCheckBoxOption SAVE_SCREENSHOT;
+    TimeExpressionOption<uint16_t> TIMEOUT_DELAY;
 //    FloatingPoint MAX_STDDEV;
-    FloatingPoint MIN_BRIGHTNESS;
-    FloatingPoint MIN_EUCLIDEAN;
-    FloatingPoint MIN_DELTA_STDDEV_RATIO;
-    FloatingPoint MIN_SIGMA_STDDEV_RATIO;
+    FloatingPointOption MIN_BRIGHTNESS;
+    FloatingPointOption MIN_EUCLIDEAN;
+    FloatingPointOption MIN_DELTA_STDDEV_RATIO;
+    FloatingPointOption MIN_SIGMA_STDDEV_RATIO;
 };
 
 

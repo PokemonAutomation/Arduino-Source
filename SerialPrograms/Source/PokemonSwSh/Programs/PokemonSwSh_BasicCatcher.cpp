@@ -9,7 +9,7 @@
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
-#include "CommonFramework/Inference/VisualInferenceSession.h"
+#include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_ReceivePokemonDetector.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_ExperienceGainDetector.h"
@@ -32,7 +32,8 @@ bool move_to_ball(
     if (first_ball == ball_slug){
         return true;
     }
-    for (size_t c = 0; c < 30; c++){
+    size_t repeat_counter = 0;
+    for (size_t c = 0; c < 50; c++){
         pbf_press_dpad(console, DPAD_RIGHT, 10, 50);
         console.botbase().wait_for_all_requests();
         frame = console.video().snapshot();
@@ -41,22 +42,22 @@ bool move_to_ball(
             return true;
         }
         if (current_ball == first_ball){
-            return false;
+            repeat_counter++;
+            if (repeat_counter == 3){
+                return false;
+            }
         }
     }
     return false;
 }
 
 
-CatchResults basic_catcher(
+CatchResults throw_balls(
     ProgramEnvironment& env,
     ConsoleHandle& console,
     Language language,
     const std::string& ball_slug
 ){
-    console.botbase().wait_for_all_requests();
-    env.log("Attempting to catch with: " + ball_slug);
-
     uint16_t balls_used = 0;
     while (true){
         {
@@ -76,98 +77,113 @@ CatchResults basic_catcher(
         }
         balls_used++;
 
-        InterruptableCommandSession commands(console);
+        auto start = std::chrono::system_clock::now();
 
-        StandardBattleMenuDetector menu_detector(console, false);
-        menu_detector.register_command_stop(commands);
-
+        StandardBattleMenuDetector menu_detector(false);
         ExperienceGainDetector experience_detector(console);
-        experience_detector.register_command_stop(commands);
-
-        AsyncVisualInferenceSession inference(env, console);
-        inference += menu_detector;
-        inference += experience_detector;
-
-        commands.run([](const BotBaseContext& context){
-            pbf_wait(context, 60 * TICKS_PER_SECOND);
-            context->wait_for_all_requests();
-        });
-
-        if (menu_detector.triggered()){
-            env.log("Failed to catch.", "orange");
+        int result = wait_until(
+            env, console,
+            std::chrono::seconds(60),
+            {
+                &menu_detector,
+                &experience_detector,
+            }
+        );
+        switch (result){
+        case 0:
+            if (std::chrono::system_clock::now() < start + std::chrono::seconds(5)){
+                env.log("BasicCatcher: Unable to throw ball.", Qt::red);
+                return {CatchResult::CANNOT_THROW_BALL, balls_used};
+            }
+            env.log("BasicCatcher: Failed to catch.", "orange");
             continue;
+        case 1:
+            env.log("BasicCatcher: End of battle detected.", "purple");
+            return {CatchResult::POKEMON_FAINTED, balls_used};
+         default:
+            env.log("BasicCatcher: Timed out.", Qt::red);
+            return {CatchResult::TIMEOUT, balls_used};
         }
-
-        //  Experience screen.
-        if (experience_detector.triggered()){
-            env.log("End of battle detected.", "purple");
-            break;
-        }
-
-//        PA_THROW_StringException("Program is stuck. Did your " + STRING_POKEMON + " faint?");
-        return {CatchResult::TIMEOUT, balls_used};
     }
+}
+
+
+CatchResults basic_catcher(
+    ProgramEnvironment& env,
+    ConsoleHandle& console,
+    Language language,
+    const std::string& ball_slug
+){
+    console.botbase().wait_for_all_requests();
+    env.log("Attempting to catch with: " + ball_slug);
+
+    CatchResults results = throw_balls(env, console, language, ball_slug);
+    if (results.result == CatchResult::OUT_OF_BALLS){
+        return results;
+    }
+    if (results.result == CatchResult::CANNOT_THROW_BALL){
+        return results;
+    }
+    if (results.result == CatchResult::TIMEOUT){
+        return results;
+    }
+
+
+    //  Need to distinguish between caught or faint.
+
 
     //  Wait for end of battle.
     {
-        InterruptableCommandSession commands(console);
-
-        BlackScreenDetector black_screen_detector(console);
-        black_screen_detector.register_command_stop(commands);
-
-        AsyncVisualInferenceSession inference(env, console);
-        inference += black_screen_detector;
-
-        commands.run([=](const BotBaseContext& context){
-            pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
-            context.botbase().wait_for_all_requests();
-        });
+        BlackScreenDetector black_screen_detector;
+        run_until(
+            env, console,
+            [=](const BotBaseContext& context){
+                pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
+                context.botbase().wait_for_all_requests();
+            },
+            { &black_screen_detector }
+        );
     }
 
     //  Look for the orange caught screen.
     {
-        InterruptableCommandSession commands(console);
+        ReceivePokemonDetector caught_detector;
 
-        ReceivePokemonDetector caught_detector(console);
-        caught_detector.register_command_stop(commands);
+        int result = run_until(
+            env, console,
+            [=](const BotBaseContext& context){
+                pbf_mash_button(context, BUTTON_B, 4 * TICKS_PER_SECOND);
+                context->wait_for_all_requests();
+            },
+            { &caught_detector }
+        );
 
-        AsyncVisualInferenceSession inference(env, console);
-        inference += caught_detector;
-
-        commands.run([](const BotBaseContext& context){
-            pbf_mash_button(context, BUTTON_B, 4 * TICKS_PER_SECOND);
-            context->wait_for_all_requests();
-        });
-
-        if (caught_detector.triggered()){
-            env.log("The wild " + STRING_POKEMON + " was caught!", "blue");
-        }else{
-            env.log("The wild " + STRING_POKEMON + " fainted.", "red");
-            return {CatchResult::POKEMON_FAINTED, balls_used};
+        switch (result){
+        case 0:
+            env.log("BasicCatcher: The wild " + STRING_POKEMON + " was caught!", "blue");
+            break;
+        default:
+            env.log("BasicCatcher: The wild " + STRING_POKEMON + " fainted.", "red");
+            results.result = CatchResult::POKEMON_FAINTED;
+            return results;
         }
     }
 
 //    pbf_wait(console, 5 * TICKS_PER_SECOND);
-
-#if 1
-    //  Wait to return to overworld.
     {
-        InterruptableCommandSession commands(console);
-
-        BlackScreenDetector black_screen_detector(console);
-        black_screen_detector.register_command_stop(commands);
-
-        AsyncVisualInferenceSession inference(env, console);
-        inference += black_screen_detector;
-
-        commands.run([=](const BotBaseContext& context){
-            pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
-            context.botbase().wait_for_all_requests();
-        });
+        BlackScreenDetector black_screen_detector;
+        run_until(
+            env, console,
+            [=](const BotBaseContext& context){
+                pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
+                context.botbase().wait_for_all_requests();
+            },
+            { &black_screen_detector }
+        );
     }
-#endif
 
-    return {CatchResult::POKEMON_CAUGHT, balls_used};
+    results.result = CatchResult::POKEMON_CAUGHT;
+    return results;
 }
 
 

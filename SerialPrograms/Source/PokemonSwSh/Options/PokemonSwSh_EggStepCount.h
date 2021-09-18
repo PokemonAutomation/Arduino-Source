@@ -16,9 +16,9 @@ namespace PokemonAutomation{
 
 extern const std::vector<uint16_t> STEP_COUNTS;
 
-class EggStepCount : public ConfigOption{
+class EggStepCountOption : public ConfigOption{
 public:
-    EggStepCount();
+    EggStepCountOption();
     virtual void load_json(const QJsonValue& json) override;
     virtual QJsonValue to_json() const override;
 
@@ -40,12 +40,12 @@ private:
 
 class EggStepCountUI : public ConfigOptionUI, public QWidget{
 public:
-    EggStepCountUI(QWidget& parent, EggStepCount& value);
+    EggStepCountUI(QWidget& parent, EggStepCountOption& value);
     virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override;
 
 private:
-    EggStepCount& m_value;
+    EggStepCountOption& m_value;
     QComboBox* m_box;
 };
 

@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_BatchOption_H
 #define PokemonAutomation_BatchOption_H
 
+#include <QVBoxLayout>
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -43,6 +44,7 @@ public:
 
 protected:
     BatchOption& m_value;
+private:
     std::vector<ConfigOptionUI*> m_options;
 };
 inline ConfigOptionUI* BatchOption::make_ui(QWidget& parent){
@@ -69,7 +71,10 @@ public:
 
 protected:
     BatchOption& m_value;
+private:
     std::vector<ConfigOptionUI*> m_options;
+protected:
+    QVBoxLayout* m_options_layout;
 };
 inline ConfigOptionUI* GroupOption::make_ui(QWidget& parent){
     return new GroupOptionUI(parent, *this);

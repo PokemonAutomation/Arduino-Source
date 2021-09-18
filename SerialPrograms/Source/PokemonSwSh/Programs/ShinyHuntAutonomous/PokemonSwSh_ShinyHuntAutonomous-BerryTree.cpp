@@ -12,7 +12,7 @@
 #include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
-#include "CommonFramework/Inference/VisualInferenceSession.h"
+#include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
@@ -91,38 +91,40 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env){
     while (true){
         pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
         home_roll_date_enter_game_autorollback(env.console, &year);
+//        home_to_date_time(env.console, true, true);
+//        neutral_date_skip(env.console);
+//        settings_to_enter_game(env.console, true);
         pbf_mash_button(env.console, BUTTON_B, 90);
         env.console.botbase().wait_for_all_requests();
 
         {
-            InterruptableCommandSession commands(env.console);
-
-            StandardBattleMenuDetector battle_menu_detector(env.console, false);
-            battle_menu_detector.register_command_stop(commands);
-
+            StandardBattleMenuDetector battle_menu_detector(false);
             StartBattleDetector start_battle_detector(env.console);
-            start_battle_detector.register_command_stop(commands);
 
-            AsyncVisualInferenceSession inference(env, env.console);
-            inference += battle_menu_detector;
-            inference += start_battle_detector;
+            int result = run_until(
+                env, env.console,
+                [](const BotBaseContext& context){
+                    pbf_mash_button(context, BUTTON_A, 60 * TICKS_PER_SECOND);
+                    context.botbase().wait_for_all_requests();
+                },
+                {
+                    &battle_menu_detector,
+                    &start_battle_detector,
+                }
+            );
 
-            commands.run([](const BotBaseContext& context){
-                pbf_mash_button(context, BUTTON_A, 60 * TICKS_PER_SECOND);
-                context.botbase().wait_for_all_requests();
-            });
-
-            if (battle_menu_detector.triggered()){
+            switch (result){
+            case 0:
                 env.log("Unexpected battle menu.", Qt::red);
                 stats.add_error();
                 env.update_stats();
                 pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
                 run_away(env, env.console, EXIT_BATTLE_TIMEOUT);
                 continue;
-            }
-            if (start_battle_detector.triggered()){
+            case 1:
                 env.log("Battle started!");
-            }else{
+                break;
+            default:
                 stats.add_error();
                 env.update_stats();
                 env.log("Timed out.");
@@ -142,6 +144,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env){
         if (stop){
             break;
         }
+//        pbf_mash_button(env.console, BUTTON_B, 10 * TICKS_PER_SECOND);
     }
 
     pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);

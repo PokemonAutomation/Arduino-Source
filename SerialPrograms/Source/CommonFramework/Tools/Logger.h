@@ -50,6 +50,37 @@ public:
 };
 
 
+
+
+
+
+#if 1
+inline std::string combine_string(const char* a, const char* b){
+    std::string str(a);
+    str += ": ";
+    str += b;
+    return str;
+}
+inline std::string combine_string(const char* a, const std::string& b){
+    std::string str(a);
+    str += ": ";
+    str += b;
+    return str;
+}
+inline QString combine_string(const char* a, const QString& b){
+    QString str(a);
+    str += ": ";
+    str += b;
+    return str;
+}
+#define PA_THROW_AND_LOG_StringException(message){  \
+    global_logger().log(combine_string(__PRETTY_FUNCTION__, message), Qt::red); \
+    throw StringException(__PRETTY_FUNCTION__, message);    \
+}
+#endif
+
+
+
 }
 #endif
 

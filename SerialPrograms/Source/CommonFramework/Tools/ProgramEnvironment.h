@@ -51,9 +51,19 @@ public:
     bool is_stopping() const;
     void check_stopping() const;
 
-    template <typename Duration>
-    void wait(Duration duration);
 
+public:
+    //  Use these since they will wake up on program stop.
+    std::mutex& lock(){ return m_lock; }
+    std::condition_variable& cv(){ return m_cv; }
+
+    template <typename Duration>
+    void wait_for(Duration duration);
+    void notify_all();
+
+
+public:
+    //  Don't call this from a program.
     void signal_stop();
 
 
@@ -94,7 +104,7 @@ StatsType& ProgramEnvironment::stats(){
 }
 
 template <typename Duration>
-void ProgramEnvironment::wait(Duration duration){
+void ProgramEnvironment::wait_for(Duration duration){
     check_stopping();
 
     auto start = std::chrono::system_clock::now();

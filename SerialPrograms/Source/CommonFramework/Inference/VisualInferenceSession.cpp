@@ -13,11 +13,12 @@ namespace PokemonAutomation{
 
 VisualInferenceSession::VisualInferenceSession(
     ProgramEnvironment& env,
-    VideoFeed& feed,
+    VideoFeed& feed, VideoOverlay& overlay,
     std::chrono::milliseconds period
 )
     : m_env(env)
     , m_feed(feed)
+    , m_overlay(overlay)
     , m_period(period)
     , m_stop(false)
 {}
@@ -36,20 +37,25 @@ void VisualInferenceSession::operator+=(std::function<bool(const QImage&)>&& cal
 }
 void VisualInferenceSession::operator+=(VisualInferenceCallback& callback){
     std::unique_lock<std::mutex> lg(m_lock);
-    m_callbacks1.insert(&callback);
+    std::deque<InferenceBoxScope>& boxes = m_callbacks1[&callback];
+    boxes.clear();
+    callback.make_overlays(boxes, m_overlay);
 }
 void VisualInferenceSession::operator-=(VisualInferenceCallback& callback){
     std::unique_lock<std::mutex> lg(m_lock);
     m_callbacks1.erase(&callback);
 }
 
-void VisualInferenceSession::run(){
-    auto wait_until = std::chrono::system_clock::now();
-    wait_until += m_period;
+VisualInferenceCallback* VisualInferenceSession::run(std::chrono::milliseconds timeout){
+    auto now = std::chrono::system_clock::now();
+    auto wait_until = now + m_period;
+    auto stop_time = timeout == std::chrono::milliseconds(0)
+        ? std::chrono::system_clock::time_point::max()
+        : wait_until + timeout;
     while (true){
         m_env.check_stopping();
         if (m_stop.load(std::memory_order_acquire)){
-            return;
+            return nullptr;
         }
 
         QImage screen = m_feed.snapshot();
@@ -58,16 +64,19 @@ void VisualInferenceSession::run(){
         std::unique_lock<std::mutex> lg(m_lock);
         for (auto& callback : m_callbacks0){
             if (callback(screen)){
-                return;
+                return nullptr;
             }
         }
-        for (VisualInferenceCallback* callback : m_callbacks1){
-            if (callback->process_frame(screen, timestamp)){
-                return;
+        for (auto& callback : m_callbacks1){
+            if (callback.first->process_frame(screen, timestamp)){
+                return callback.first;
             }
         }
 
-        auto now = std::chrono::system_clock::now();
+        now = std::chrono::system_clock::now();
+        if (now >= stop_time){
+            return nullptr;
+        }
         auto wait = wait_until - now;
         if (wait <= std::chrono::milliseconds(0)){
             wait_until = now + m_period;
@@ -75,8 +84,10 @@ void VisualInferenceSession::run(){
             m_cv.wait_for(
                 lg, wait,
                 [=]{
+                    auto now = std::chrono::system_clock::now();
                     return
-                        std::chrono::system_clock::now() >= wait_until ||
+                        now >= stop_time ||
+                        now >= wait_until ||
                         m_env.is_stopping() ||
                         m_stop.load(std::memory_order_acquire);
                 }
@@ -88,7 +99,7 @@ void VisualInferenceSession::run(){
 
 
 
-
+#if 0
 VisualInferenceScope::VisualInferenceScope(
     VisualInferenceSession& session,
     VisualInferenceCallback& callback
@@ -101,31 +112,33 @@ VisualInferenceScope::VisualInferenceScope(
 VisualInferenceScope::~VisualInferenceScope(){
     m_session -= m_callback;
 }
-
+#endif
 
 
 
 
 AsyncVisualInferenceSession::AsyncVisualInferenceSession(
     ProgramEnvironment& env,
-    VideoFeed& feed,
+    VideoFeed& feed, VideoOverlay& overlay,
     std::chrono::milliseconds period
 )
-    : VisualInferenceSession(env, feed, period)
+    : VisualInferenceSession(env, feed, overlay, period)
+    , m_callback(nullptr)
     , m_task(env.dispatcher().dispatch([this]{ thread_body(); }))
 {}
 AsyncVisualInferenceSession::~AsyncVisualInferenceSession(){
-    stop();
+    VisualInferenceSession::stop();
 }
-void AsyncVisualInferenceSession::stop(){
+VisualInferenceCallback* AsyncVisualInferenceSession::stop(){
     VisualInferenceSession::stop();
     if (m_task){
         m_task->wait();
     }
+    return m_callback;
 }
 void AsyncVisualInferenceSession::thread_body(){
     try{
-        run();
+        m_callback = run();
     }catch (CancelledException&){}
 }
 

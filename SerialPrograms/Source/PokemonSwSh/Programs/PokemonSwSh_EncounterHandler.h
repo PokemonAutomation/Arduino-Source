@@ -51,7 +51,7 @@ private:
     const Language m_language;
     const EncounterBotCommonSettings& m_settings;
 
-    Pokemon::EncounterFrequencies m_frequencies;
+    EncounterFrequencies m_frequencies;
     ShinyHuntTracker& m_session_stats;
 
     EncounterNotificationSender m_notification_sender;

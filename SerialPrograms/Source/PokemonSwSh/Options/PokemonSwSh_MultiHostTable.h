@@ -7,17 +7,17 @@
 #ifndef PokemonAutomation_PokemonSwSh_MultiHostTable_H
 #define PokemonAutomation_PokemonSwSh_MultiHostTable_H
 
-#include "Common/Qt/Options/MultiHostTableOption.h"
+#include "Common/Qt/Options/MultiHostTableOptionBase.h"
 #include "CommonFramework/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
 
 
 
-class MultiHostTable : public ConfigOption, public MultiHostTableOption{
+class MultiHostTableOption : public ConfigOption, public MultiHostTableOptionBase{
 public:
-    MultiHostTable()
-        : MultiHostTableOption("<b>Game List:</b>")
+    MultiHostTableOption()
+        : MultiHostTableOptionBase("<b>Game List:</b>")
     {}
     virtual void load_json(const QJsonValue& json) override{
         load_current(json);
@@ -27,29 +27,29 @@ public:
     }
 
     virtual bool is_valid() const override{
-        return MultiHostTableOption::is_valid();
+        return MultiHostTableOptionBase::is_valid();
     }
     virtual void restore_defaults() override{
-        MultiHostTableOption::restore_defaults();
+        MultiHostTableOptionBase::restore_defaults();
     }
 
     virtual ConfigOptionUI* make_ui(QWidget& parent) override;
 };
 
 
-class MultiHostTableUI : public ConfigOptionUI, public MultiHostTableOptionUI{
+class MultiHostTableOptionUI : public ConfigOptionUI, public MultiHostTableOptionBaseUI{
 public:
-    MultiHostTableUI(QWidget& parent, MultiHostTable& value)
-        : MultiHostTableOptionUI(parent, value)
+    MultiHostTableOptionUI(QWidget& parent, MultiHostTableOption& value)
+        : MultiHostTableOptionBaseUI(parent, value)
     {}
     virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override{
-        MultiHostTableOptionUI::restore_defaults();
+        MultiHostTableOptionBaseUI::restore_defaults();
     }
 };
 
-inline ConfigOptionUI* MultiHostTable::make_ui(QWidget& parent){
-    return new MultiHostTableUI(parent, *this);
+inline ConfigOptionUI* MultiHostTableOption::make_ui(QWidget& parent){
+    return new MultiHostTableOptionUI(parent, *this);
 }
 
 

@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_ClothingBuyer_H
 #define PokemonAutomation_PokemonSwSh_ClothingBuyer_H
 
-#include "CommonFramework/Options/BooleanCheckBox.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -30,8 +30,8 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
-    BooleanCheckBox CATEGORY_ROTATION;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+    BooleanCheckBoxOption CATEGORY_ROTATION;
 };
 
 

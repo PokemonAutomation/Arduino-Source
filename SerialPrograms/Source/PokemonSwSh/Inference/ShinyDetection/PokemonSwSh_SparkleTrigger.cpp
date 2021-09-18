@@ -45,8 +45,8 @@ SparkleDetector::SparkleDetector(
     m_matrix = matrix.extract(object.box, object.id);
 
     //  Sort all pixels by distance from center.
-    pxint_t center_x = object.center_x - object.box.min_x;
-    pxint_t center_y = object.center_y - object.box.min_y;
+    pxint_t center_x = object.center_x() - object.box.min_x;
+    pxint_t center_y = object.center_y() - object.box.min_y;
     std::map<uint64_t, size_t> distances;
     for (pxint_t r = 0; r < m_matrix.height(); r++){
         for (pxint_t c = 0; c < m_matrix.width(); c++){
@@ -127,13 +127,13 @@ bool SparkleDetector::is_ball(){
     }
 
     //  Compute angles for the 4 largest regions.
-    pxint_t center_x = m_box.center_x - m_box.box.min_x;
-    pxint_t center_y = m_box.center_y - m_box.box.min_y;
+    pxint_t center_x = m_box.center_x() - m_box.box.min_x;
+    pxint_t center_y = m_box.center_y() - m_box.box.min_y;
     std::set<double> angles;
     size_t c = 0;
     for (const auto& region : m_regions){
-        pxint_t x = region.second.center_x - center_x;
-        pxint_t y = region.second.center_y - center_y;
+        pxint_t x = region.second.center_x() - center_x;
+        pxint_t y = region.second.center_y() - center_y;
         double angle = std::atan2(y, x) * 57.29577951308232;
         if (angle < 0){
             angle += 360;
@@ -200,13 +200,13 @@ bool SparkleDetector::is_star(){
     }
 
     //  Compute angles for the 5 largest regions.
-    pxint_t center_x = m_box.center_x - m_box.box.min_x;
-    pxint_t center_y = m_box.center_y - m_box.box.min_y;
+    pxint_t center_x = m_box.center_x() - m_box.box.min_x;
+    pxint_t center_y = m_box.center_y() - m_box.box.min_y;
     std::set<double> angles;
     size_t c = 0;
     for (const auto& region : m_regions){
-        pxint_t x = region.second.center_x - center_x;
-        pxint_t y = region.second.center_y - center_y;
+        pxint_t x = region.second.center_x() - center_x;
+        pxint_t y = region.second.center_y() - center_y;
         double angle = std::atan2(y, x) * 57.29577951308232;
         if (angle < 0){
             angle += 360;

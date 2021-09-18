@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_PokemonSwSh_MassRelease_H
 #define PokemonAutomation_PokemonSwSh_MassRelease_H
 
-#include "CommonFramework/Options/BooleanCheckBox.h"
-#include "CommonFramework/Options/SimpleInteger.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -31,9 +31,9 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
-    SimpleInteger<uint8_t> BOXES_TO_RELEASE;
-    BooleanCheckBox DODGE_SYSTEM_UPDATE_WINDOW;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+    SimpleIntegerOption<uint8_t> BOXES_TO_RELEASE;
+    BooleanCheckBoxOption DODGE_SYSTEM_UPDATE_WINDOW;
 };
 
 

@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_NintendoSwitch_TurboButton_H
 #define PokemonAutomation_NintendoSwitch_TurboButton_H
 
-#include "CommonFramework/Options/EnumDropdown.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
+#include "CommonFramework/Options/EnumDropdownOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -28,8 +28,8 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    EnumDropdown BUTTON;
-    TimeExpression<uint16_t> PERIOD;
+    EnumDropdownOption BUTTON;
+    TimeExpressionOption<uint16_t> PERIOD;
 };
 
 

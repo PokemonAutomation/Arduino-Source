@@ -9,16 +9,18 @@
 #include <QLabel>
 #include "SectionDivider.h"
 
+namespace PokemonAutomation{
 
-SectionDivider::SectionDivider(QString label)
+
+SectionDividerOption::SectionDividerOption(QString label)
     : m_label(std::move(label))
 {}
 
-ConfigOptionUI* SectionDivider::make_ui(QWidget& parent){
-    return new SectionDividerUI(parent, *this);
+ConfigOptionUI* SectionDividerOption::make_ui(QWidget& parent){
+    return new SectionDividerOptionUI(parent, *this);
 }
 
-SectionDividerUI::SectionDividerUI(QWidget& parent, SectionDivider& value)
+SectionDividerOptionUI::SectionDividerOptionUI(QWidget& parent, SectionDividerOption& value)
     : QWidget(&parent)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -32,3 +34,6 @@ SectionDividerUI::SectionDividerUI(QWidget& parent, SectionDivider& value)
     text->setWordWrap(true);
 }
 
+
+
+}

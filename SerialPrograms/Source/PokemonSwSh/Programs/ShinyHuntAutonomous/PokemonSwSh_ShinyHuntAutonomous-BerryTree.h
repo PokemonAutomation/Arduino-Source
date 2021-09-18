@@ -8,9 +8,9 @@
 #define PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousBerryTree_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
-#include "NintendoSwitch/Options/GoHomeWhenDone.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
+#include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h"
@@ -35,14 +35,14 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
-    GoHomeWhenDone GO_HOME_WHEN_DONE;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    Pokemon::EncounterBotLanguage LANGUAGE;
+    EncounterBotLanguage LANGUAGE;
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
 
-    SectionDivider m_advanced_options;
-    TimeExpression<uint16_t> EXIT_BATTLE_TIMEOUT;
+    SectionDividerOption m_advanced_options;
+    TimeExpressionOption<uint16_t> EXIT_BATTLE_TIMEOUT;
 };
 
 }

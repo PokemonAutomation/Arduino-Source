@@ -16,9 +16,9 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class CatchabilitySelector : public ConfigOption{
+class CatchabilitySelectorOption : public ConfigOption{
 public:
-    CatchabilitySelector();
+    CatchabilitySelectorOption();
     virtual void load_json(const QJsonValue& json) override;
     virtual QJsonValue to_json() const override;
 
@@ -40,12 +40,12 @@ private:
 
 class CatchabilitySelectorUI : public ConfigOptionUI, public QWidget{
 public:
-    CatchabilitySelectorUI(QWidget& parent, CatchabilitySelector& value);
+    CatchabilitySelectorUI(QWidget& parent, CatchabilitySelectorOption& value);
     virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override;
 
 private:
-    CatchabilitySelector& m_value;
+    CatchabilitySelectorOption& m_value;
     QComboBox* m_box;
 };
 

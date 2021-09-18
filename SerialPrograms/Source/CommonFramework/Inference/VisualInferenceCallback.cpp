@@ -10,6 +10,7 @@
 namespace PokemonAutomation{
 
 
+#if 0
 VisualInferenceCallbackWithCommandStop::VisualInferenceCallbackWithCommandStop()
     : m_triggered(false)
 {}
@@ -32,6 +33,7 @@ bool VisualInferenceCallbackWithCommandStop::process_frame(
     }
     return true;
 }
+#endif
 
 
 

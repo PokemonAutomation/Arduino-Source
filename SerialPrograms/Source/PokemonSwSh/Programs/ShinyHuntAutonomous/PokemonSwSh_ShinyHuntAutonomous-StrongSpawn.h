@@ -8,10 +8,10 @@
 #define PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousStrongSpawn_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/SimpleInteger.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
-#include "NintendoSwitch/Options/GoHomeWhenDone.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
+#include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
@@ -37,11 +37,11 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    StartInGripOrClosed START_IN_GRIP_MENU;
-    GoHomeWhenDone GO_HOME_WHEN_DONE;
-    TimeRollbackHours TIME_ROLLBACK_HOURS;
+    StartInGripOrClosedOption START_IN_GRIP_MENU;
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+    TimeRollbackHoursOption TIME_ROLLBACK_HOURS;
 
-    Pokemon::EncounterBotLanguage LANGUAGE;
+    EncounterBotLanguage LANGUAGE;
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
 
 //    SectionDivider m_advanced_options;

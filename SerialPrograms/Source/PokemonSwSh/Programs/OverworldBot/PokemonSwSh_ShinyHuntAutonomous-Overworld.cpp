@@ -5,17 +5,13 @@
  */
 
 #include <cmath>
-#include "Common/Cpp/PrettyPrint.h"
 #include "Common/SwitchFramework/FrameworkSettings.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
 #include "CommonFramework/PersistentSettings.h"
-#include "CommonFramework/Tools/InterruptableCommands.h"
-#include "CommonFramework/Inference/ImageTools.h"
-#include "CommonFramework/Inference/VisualInferenceSession.h"
-#include "CommonFramework/OCR/Filtering.h"
+#include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
@@ -23,7 +19,6 @@
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_EncounterHandler.h"
 #include "PokemonSwSh_OverworldMovement.h"
-#include "PokemonSwSh_OverworldTargetTracker.h"
 #include "PokemonSwSh_OverworldTrajectory.h"
 #include "PokemonSwSh_OverworldTrigger.h"
 #include "PokemonSwSh_ShinyHuntAutonomous-Overworld.h"
@@ -141,6 +136,9 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousOverworld::make_stats() const{
 
 
 
+
+
+
 bool ShinyHuntAutonomousOverworld::find_encounter(
     SingleSwitchProgramEnvironment& env,
     Stats& stats,
@@ -153,14 +151,6 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
         0.04, 0.1, Qt::cyan
     );
 
-    InterruptableCommandSession commands(env.console);
-
-    StandardBattleMenuDetector battle_menu_detector(env.console, false);
-    battle_menu_detector.register_command_stop(commands);
-
-    StartBattleDetector start_battle_detector(env.console);
-    start_battle_detector.register_command_stop(commands);
-
     OverworldTargetTracker target_tracker(
         env.console, env.console,
         std::chrono::milliseconds(1000),
@@ -168,143 +158,192 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
         (MarkPriority)(size_t)MARK_PRIORITY,
         MAX_TARGET_ALPHA
     );
-    target_tracker.register_command_stop(commands);
 
     std::unique_ptr<OverworldTrigger> trigger;
     switch ((size_t)TRIGGER_METHOD){
     case 0:
-        trigger.reset(new OverworldTrigger_Whistle(env, commands, target_tracker));
+        trigger.reset(new OverworldTrigger_Whistle(target_tracker));
         break;
     case 1:
-        trigger.reset(new OverworldTrigger_WhistleCircle(env, commands, target_tracker, true, 3, 1));
+        trigger.reset(new OverworldTrigger_WhistleCircle(target_tracker, true, 3, 1));
         break;
     case 2:
-        trigger.reset(new OverworldTrigger_WhistleCircle(env, commands, target_tracker, false, 3, 3));
+        trigger.reset(new OverworldTrigger_WhistleCircle(target_tracker, false, 3, 3));
         break;
     case 3:
-        trigger.reset(new OverworldTrigger_WhistleCircle(env, commands, target_tracker, false, 0, 1));
+        trigger.reset(new OverworldTrigger_WhistleCircle(target_tracker, false, 0, 1));
         break;
     case 4:
-        trigger.reset(new OverworldTrigger_WhistleHorizontal(env, commands, target_tracker, false, 0, 1));
+        trigger.reset(new OverworldTrigger_WhistleHorizontal(target_tracker, false, 0, 1));
         break;
     case 5:
-        trigger.reset(new OverworldTrigger_WhistleHorizontal(env, commands, target_tracker, true, 3, 1));
+        trigger.reset(new OverworldTrigger_WhistleHorizontal(target_tracker, true, 3, 1));
         break;
     case 6:
-        trigger.reset(new OverworldTrigger_WhistleHorizontal(env, commands, target_tracker, false, 3, 3));
+        trigger.reset(new OverworldTrigger_WhistleHorizontal(target_tracker, false, 3, 3));
         break;
     case 7:
-        trigger.reset(new OverworldTrigger_WhistleVertical(env, commands, target_tracker, false, 0, 1));
+        trigger.reset(new OverworldTrigger_WhistleVertical(target_tracker, false, 0, 1));
         break;
     case 8:
-        trigger.reset(new OverworldTrigger_WhistleVertical(env, commands, target_tracker, true, 3, 1));
+        trigger.reset(new OverworldTrigger_WhistleVertical(target_tracker, true, 3, 1));
         break;
     case 9:
-        trigger.reset(new OverworldTrigger_WhistleVertical(env, commands, target_tracker, false, 3, 3));
+        trigger.reset(new OverworldTrigger_WhistleVertical(target_tracker, false, 3, 3));
         break;
     }
 
-    size_t loops = 0;
     while (true){
-        loops++;
-
         //  Time expired.
         if (std::chrono::system_clock::now() > expiration){
             return false;
         }
 
-        if (battle_menu_detector.triggered()){
-            env.log("Unexpected Battle.", "red");
-            stats.add_error();
-            run_away(env, env.console, EXIT_BATTLE_TIMEOUT);
-            return false;
-        }
-        if (start_battle_detector.triggered()){
-            env.log("Battle started!");
-            return true;
+        target_tracker.clear_detections();
+
+        //  Run trigger.
+        {
+            StandardBattleMenuDetector battle_menu_detector(false);
+            StartBattleDetector start_battle_detector(env.console);
+
+            int result = run_until(
+                env, env.console,
+                [&](const BotBaseContext& context){
+                    trigger->run(context);
+                },
+                {
+                    &battle_menu_detector,
+                    &start_battle_detector,
+                    &target_tracker,
+                }
+            );
+
+            switch (result){
+            case 0:
+                env.console.log("Unexpected Battle.", "red");
+                return false;
+            case 1:
+                env.console.log("Battle started!");
+                return true;
+            }
         }
 
         std::pair<double, OverworldTarget> target = target_tracker.best_target();
-
         target_tracker.clear_detections();
-        AsyncVisualInferenceSession inference(env, env.console);
-        inference += battle_menu_detector;
-        inference += start_battle_detector;
-        inference += target_tracker;
 
-        //  No target found.
-        if (target.first < 0 || target.first > MAX_TARGET_ALPHA){
-            if (target.first < 0){
-                if (loops > 1){
-                    env.log("No targets found.", "orange");
-//                    pbf_press_button(env.console, BUTTON_B, 5, 0);
-                }
-            }else{
-                env.log(
-                    QString("Target too Weak: ") +
-                    (target.second.mark == OverworldMark::EXCLAMATION_MARK ? "Exclamation" : "Question") +
-                    " at [" +
-                    QString::number(target.second.delta_x) + " , " +
-                    QString::number(-target.second.delta_y) + "], alpha = " +
-                    QString::number(target.first),
-                    "orange"
-                );
-            }
-            trigger->run();
+//        env.log("target: " + std::to_string(target.first));
+
+        if (target.first < 0){
+            env.log("No targets found.", "orange");
+            continue;
+        }
+        if (target.first > MAX_TARGET_ALPHA){
+            env.log(
+                QString("Target too Weak: ") +
+                (target.second.mark == OverworldMark::EXCLAMATION_MARK ? "Exclamation" : "Question") +
+                " at [" +
+                QString::number(target.second.delta_x) + " , " +
+                QString::number(-target.second.delta_y) + "], alpha = " +
+                QString::number(target.first),
+                "orange"
+            );
             continue;
         }
 
-
-        //  Target Found
-        InferenceBoxScope target_box(env.console, target.second.box, Qt::yellow);
-        env.log(
-            QString("Best Target: ") +
-            (target.second.mark == OverworldMark::EXCLAMATION_MARK ? "Exclamation" : "Question") +
-            " at [" +
-            QString::number(target.second.delta_x) + " , " +
-            QString::number(-target.second.delta_y) + "], alpha = " +
-            QString::number(target.first),
-            "purple"
-        );
-
-        const Trajectory& trajectory = target.second.trajectory;
-        double angle = std::atan2(
-            (double)trajectory.joystick_y - 128,
-            (double)trajectory.joystick_x - 128
-        ) * 57.295779513082320877;
-        env.log(
-            "Trajectory: Distance = " + QString::number(trajectory.distance_in_ticks) +
-            ", Direction = " + QString::number(-angle) + " degrees"
-        );
-
-        int duration = trajectory.distance_in_ticks + 16;
-        if (duration > (int)MAX_MOVE_DURATION){
-            duration = MAX_MOVE_DURATION;
+        if (charge_at_target(env, env.console, target)){
+            return true;
         }
-
-        //  Move to target.
-        pbf_move_left_joystick(
-            env.console,
-            trajectory.joystick_x,
-            trajectory.joystick_y,
-            (uint16_t)duration, 0
-        );
-
-        //  Circle Maneuver
-        if (TARGET_CIRCLING){
-            if (
-                trajectory.joystick_y < 64 &&
-                64 <= trajectory.joystick_x && trajectory.joystick_x <= 192
-            ){
-                move_in_circle_up(env.console, trajectory.joystick_x > 128);
-            }else{
-                move_in_circle_down(env.console, trajectory.joystick_x <= 128);
-            }
-        }
-        env.console.botbase().wait_for_all_requests();
-        target_tracker.clear_detections();
     }
 }
+
+
+bool ShinyHuntAutonomousOverworld::charge_at_target(
+    ProgramEnvironment& env, ConsoleHandle& console,
+    const std::pair<double, OverworldTarget>& target
+) const{
+    InferenceBoxScope target_box(console, target.second.box, Qt::yellow);
+    env.log(
+        QString("Best Target: ") +
+        (target.second.mark == OverworldMark::EXCLAMATION_MARK ? "Exclamation" : "Question") +
+        " at [" +
+        QString::number(target.second.delta_x) + " , " +
+        QString::number(-target.second.delta_y) + "], alpha = " +
+        QString::number(target.first),
+        "purple"
+    );
+
+    const Trajectory& trajectory = target.second.trajectory;
+    double angle = std::atan2(
+        (double)trajectory.joystick_y - 128,
+        (double)trajectory.joystick_x - 128
+    ) * 57.295779513082320877;
+    env.log(
+        "Trajectory: Distance = " + QString::number(trajectory.distance_in_ticks) +
+        ", Direction = " + QString::number(-angle) + " degrees"
+    );
+
+    int duration = trajectory.distance_in_ticks + 16;
+    if (duration > (int)MAX_MOVE_DURATION){
+        duration = MAX_MOVE_DURATION;
+    }
+
+
+    StandardBattleMenuDetector battle_menu_detector(false);
+    StartBattleDetector start_battle_detector(console);
+    OverworldTargetTracker target_tracker(
+        console, console,
+        std::chrono::milliseconds(1000),
+        MARK_OFFSET,
+        (MarkPriority)(size_t)MARK_PRIORITY,
+        MAX_TARGET_ALPHA
+    );
+
+    int result = run_until(
+        env, console,
+        [&](const BotBaseContext& context){
+            //  Move to target.
+            pbf_move_left_joystick(
+                context,
+                trajectory.joystick_x,
+                trajectory.joystick_y,
+                (uint16_t)duration, 0
+            );
+
+            //  Circle Maneuver
+            if (TARGET_CIRCLING){
+                if (trajectory.joystick_y < 64 &&
+                    64 <= trajectory.joystick_x && trajectory.joystick_x <= 192
+                ){
+                    move_in_circle_up(context, trajectory.joystick_x > 128);
+                }else{
+                    move_in_circle_down(context, trajectory.joystick_x <= 128);
+                }
+            }
+            context->wait_for_all_requests();
+        },
+        {
+            &battle_menu_detector,
+            &start_battle_detector,
+            &target_tracker,
+        }
+    );
+
+    switch (result){
+    case 0:
+        console.log("Unexpected Battle.", "red");
+        return true;
+    case 1:
+        console.log("Battle started!");
+        return true;
+    default:
+        return false;
+    }
+}
+
+
+
+
+
 
 void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env){
     srand(time(nullptr));

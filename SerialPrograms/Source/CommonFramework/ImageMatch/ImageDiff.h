@@ -53,11 +53,15 @@ double pixel_RMSD(const QImage& reference, const QImage& image, QRgb background)
 //    - The alpha channels of both images must be 0 or 255. No other values are valid.
 //
 //      If (reference.alpha == 255 && image.alpha == 255)  Count the pixel.
-//      If (reference.alpha == 255 && image.alpha ==   0)  Count the pixel.
+//      If (reference.alpha == 255 && image.alpha ==   0)  Count the pixel as maximum possible distance. (255 for all RGB)
 //      If (reference.alpha == 0   && image.alpha == 255)  Count the pixel as maximum possible distance. (255 for all RGB)
 //      If (reference.alpha == 0   && image.alpha ==   0)  Ignore the pixel and exclude from pixel count.
 //
 double pixel_RMSD_masked(const QImage& reference, const QImage& image);
+
+
+double pixel_max_possible_RMSD(const QImage& reference);
+
 
 }
 }

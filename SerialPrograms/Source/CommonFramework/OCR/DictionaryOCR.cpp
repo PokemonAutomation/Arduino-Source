@@ -19,11 +19,20 @@ namespace PokemonAutomation{
 namespace OCR{
 
 
-DictionaryOCR::DictionaryOCR(const QJsonObject& json, double random_match_chance, bool first_only)
+
+DictionaryOCR::DictionaryOCR(
+    const QJsonObject& json,
+    const std::set<std::string>* subset,
+    double random_match_chance,
+    bool first_only
+)
     : m_random_match_chance(random_match_chance)
 {
     for (auto it = json.begin(); it != json.end(); ++it){
         std::string token = it.key().toUtf8().data();
+        if (subset != nullptr && subset->find(token) == subset->end()){
+            continue;
+        }
         std::vector<QString>& candidates = m_database[token];
         for (const auto& item : it.value().toArray()){
             QString candidate = item.toString();
@@ -46,8 +55,13 @@ DictionaryOCR::DictionaryOCR(const QJsonObject& json, double random_match_chance
     );
 //    cout << "Tokens: " << m_database.size() << ", Match Candidates: " << m_candidate_to_token.size() << endl;
 }
-DictionaryOCR::DictionaryOCR(const QString& json_path, double random_match_chance, bool first_only)
-    : DictionaryOCR(read_json_file(json_path).object(), random_match_chance, first_only)
+DictionaryOCR::DictionaryOCR(
+    const QString& json_path,
+    const std::set<std::string>* subset,
+    double random_match_chance,
+    bool first_only
+)
+    : DictionaryOCR(read_json_file(json_path).object(), subset, random_match_chance, first_only)
 {}
 
 QJsonObject DictionaryOCR::to_json() const{

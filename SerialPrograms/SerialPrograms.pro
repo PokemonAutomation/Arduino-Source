@@ -26,7 +26,6 @@ win32-g++{
 #    QMAKE_CXXFLAGS += -Wno-missing-field-initializers
 
     DEFINES += WIN32
-    DEFINES += TESS_IMPORTS
     DEFINES += PA_TESSERACT
     LIBS += ../SerialPrograms/tesseractPA.lib
 }
@@ -35,7 +34,6 @@ win32-msvc{
     QMAKE_CXXFLAGS += -MP
 
     DEFINES += WIN32
-    DEFINES += TESS_IMPORTS
     DEFINES += PA_TESSERACT
     LIBS += ../SerialPrograms/tesseractPA.lib
 }
@@ -67,14 +65,14 @@ SOURCES += \
     ../Common/PokemonSwSh/PokemonSwShMisc.cpp \
     ../Common/Qt/CodeValidator.cpp \
     ../Common/Qt/ExpressionEvaluator.cpp \
-    ../Common/Qt/Options/BooleanCheckBoxOption.cpp \
-    ../Common/Qt/Options/FloatingPointOption.cpp \
-    ../Common/Qt/Options/FossilTableOption.cpp \
-    ../Common/Qt/Options/MultiHostTableOption.cpp \
-    ../Common/Qt/Options/SimpleIntegerOption.cpp \
-	../Common/Qt/Options/StringOption.cpp \
-    ../Common/Qt/Options/SwitchDateOption.cpp \
-    ../Common/Qt/Options/TimeExpressionOption.cpp \
+    ../Common/Qt/Options/BooleanCheckBoxOptionBase.cpp \
+    ../Common/Qt/Options/FloatingPointOptionBase.cpp \
+    ../Common/Qt/Options/FossilTableOptionBase.cpp \
+    ../Common/Qt/Options/MultiHostTableOptionBase.cpp \
+    ../Common/Qt/Options/SimpleIntegerOptionBase.cpp \
+    ../Common/Qt/Options/StringOptionBase.cpp \
+    ../Common/Qt/Options/SwitchDateOptionBase.cpp \
+    ../Common/Qt/Options/TimeExpressionOptionBase.cpp \
     ../Common/Qt/QtJsonTools.cpp \
     ../Common/SwitchFramework/FrameworkSettings.cpp \
     ../Common/SwitchFramework/Switch_PushButtons.cpp \
@@ -87,6 +85,7 @@ SOURCES += \
     Source/CommonFramework/ImageMatch/FilterToAlpha.cpp \
     Source/CommonFramework/ImageMatch/ImageCropper.cpp \
     Source/CommonFramework/ImageMatch/ImageDiff.cpp \
+    Source/CommonFramework/ImageMatch/ImageMatchMetadata.cpp \
     Source/CommonFramework/ImageMatch/ImageMatchOption.cpp \
     Source/CommonFramework/ImageMatch/ImageMatchResult.cpp \
     Source/CommonFramework/ImageTools/CellMatrix.cpp \
@@ -100,8 +99,8 @@ SOURCES += \
     Source/CommonFramework/Inference/BlackScreenDetector.cpp \
     Source/CommonFramework/Inference/ImageTools.cpp \
     Source/CommonFramework/Inference/VisualInferenceCallback.cpp \
+    Source/CommonFramework/Inference/VisualInferenceRoutines.cpp \
     Source/CommonFramework/Inference/VisualInferenceSession.cpp \
-    Source/CommonFramework/Inference/VisualInferenceWait.cpp \
     Source/CommonFramework/Language.cpp \
     Source/CommonFramework/Main.cpp \
     Source/CommonFramework/OCR/DictionaryMatcher.cpp \
@@ -115,11 +114,15 @@ SOURCES += \
     Source/CommonFramework/OCR/TextMatcher.cpp \
     Source/CommonFramework/OCR/TrainingTools.cpp \
     Source/CommonFramework/Options/BatchOption.cpp \
-    Source/CommonFramework/Options/EnumDropdown.cpp \
-    Source/CommonFramework/Options/FixedCode.cpp \
-    Source/CommonFramework/Options/RandomCode.cpp \
+    Source/CommonFramework/Options/DiscordSettingsOption.cpp \
+    Source/CommonFramework/Options/EnumDropdownOption.cpp \
+    Source/CommonFramework/Options/FixedCodeOption.cpp \
+    Source/CommonFramework/Options/RandomCodeOption.cpp \
+    Source/CommonFramework/Options/ScreenshotFormatOption.cpp \
     Source/CommonFramework/Options/SectionDivider.cpp \
-    Source/CommonFramework/Options/StringSelect.cpp \
+    Source/CommonFramework/Options/StringBoxOption.cpp \
+    Source/CommonFramework/Options/StringSelectOption.cpp \
+    Source/CommonFramework/Options/TextEditOption.cpp \
     Source/CommonFramework/Panels/Panel.cpp \
     Source/CommonFramework/Panels/PanelList.cpp \
     Source/CommonFramework/Panels/RunnableComputerProgram.cpp \
@@ -153,7 +156,7 @@ SOURCES += \
     Source/NintendoSwitch/Framework/VirtualSwitchControllerMapping.cpp \
     Source/NintendoSwitch/FrameworkSettingsPanel.cpp \
     Source/NintendoSwitch/InferenceTraining/PokemonHome_GenerateNameOCR.cpp \
-    Source/NintendoSwitch/Options/FriendCodeList.cpp \
+    Source/NintendoSwitch/Options/FriendCodeListOption.cpp \
     Source/NintendoSwitch/Panels_NintendoSwitch.cpp \
     Source/NintendoSwitch/Programs/FriendCodeAdder.cpp \
     Source/NintendoSwitch/Programs/FriendDelete.cpp \
@@ -168,12 +171,13 @@ SOURCES += \
     Source/Pokemon/Inference/Pokemon_PokeballNameReader.cpp \
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.cpp \
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.cpp \
-    Source/Pokemon/Options/Pokemon_BallSelect.cpp \
+    Source/Pokemon/Options/Pokemon_BallSelectOption.cpp \
     Source/Pokemon/Options/Pokemon_BallSelectWidget.cpp \
-    Source/Pokemon/Options/Pokemon_NameSelect.cpp \
+    Source/Pokemon/Options/Pokemon_NameSelectOption.cpp \
     Source/Pokemon/Options/Pokemon_NameSelectWidget.cpp \
     Source/Pokemon/Pokemon_EncounterStats.cpp \
     Source/Pokemon/Pokemon_Notification.cpp \
+    Source/Pokemon/Pokemon_Types.cpp \
     Source/Pokemon/Resources/Pokemon_PokeballNames.cpp \
     Source/Pokemon/Resources/Pokemon_PokemonNames.cpp \
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.cpp \
@@ -193,7 +197,9 @@ SOURCES += \
     Source/PokemonSwSh/Inference/PokemonSwSh_PokemonSpriteReader.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_PromptDetector.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_ReceivePokemonDetector.cpp \
+    Source/PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.cpp \
+    Source/PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyDialogTracker.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleDetector.cpp \
@@ -203,6 +209,10 @@ SOURCES += \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareTrigger.cpp \
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateIVCheckerOCR.cpp \
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateNameOCRPokedex.cpp \
+    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_ProfessorSwap.cpp \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_ProfessorSwap.cpp \
+    Source/PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.cpp \
     Source/PokemonSwSh/Options/PokemonSwSh_Catchability.cpp \
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.cpp \
     Source/PokemonSwSh/Options/PokemonSwSh_EncounterFilter.cpp \
@@ -215,32 +225,45 @@ SOURCES += \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_DexRecFinder.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_MassRelease.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_StatsReset.cpp \
+    Source/PokemonSwSh/Programs/General/PokemonSwSh_StatsReset-Calyrex.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_StatsReset-Moltres.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_StatsReset-Regi.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_SurpriseTrade.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_TradeBot.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_TurboA.cpp \
     Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_AutoHostStats.cpp \
-    Source/PokemonSwSh/Programs/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.cpp \
-    Source/PokemonSwSh/Programs/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_EndBattle.cpp \
-    Source/PokemonSwSh/Programs/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_ItemSelectMenu.cpp \
-    Source/PokemonSwSh/Programs/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Lobby.cpp \
-    Source/PokemonSwSh/Programs/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PP.cpp \
-    Source/PokemonSwSh/Programs/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.cpp \
-    Source/PokemonSwSh/Programs/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.cpp \
-    Source/PokemonSwSh/Programs/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.cpp \
-    Source/PokemonSwSh/Programs/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.cpp \
-    Source/PokemonSwSh/Programs/MaxLair/PokemonSwSh_MaxLair_AI.cpp \
-    Source/PokemonSwSh/Programs/MaxLair/PokemonSwSh_MaxLair_Options.cpp \
-    Source/PokemonSwSh/Programs/MaxLair/PokemonSwSh_MaxLair_SingleRun.cpp \
-    Source/PokemonSwSh/Programs/MaxLair/PokemonSwSh_MaxLair_State.cpp \
-    Source/PokemonSwSh/Programs/MaxLair/PokemonSwSh_MaxLair_StateMachine.cpp \
-    Source/PokemonSwSh/Programs/MaxLair/Program/PokemonSwSh_MaxLair_Run_Battle.cpp \
-    Source/PokemonSwSh/Programs/MaxLair/Program/PokemonSwSh_MaxLair_Run_ItemSelect.cpp \
-    Source/PokemonSwSh/Programs/MaxLair/Program/PokemonSwSh_MaxLair_Run_PathSelect.cpp \
-    Source/PokemonSwSh/Programs/MaxLair/Program/PokemonSwSh_MaxLair_Run_PokemonSelect.cpp \
-    Source/PokemonSwSh/Programs/MaxLair/Program/PokemonSwSh_MaxLair_Run_PokemonSwap.cpp \
-    Source/PokemonSwSh/Programs/MaxLair/Program/PokemonSwSh_MaxLair_Run_Start.cpp \
+    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SelectItem.cpp \
+    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SelectMove.cpp \
+    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SelectPath.cpp \
+    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SelectStarter.cpp \
+    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SwapCatch.cpp \
+    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SwapProfessor.cpp \
+    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Notifications.cpp \
+    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Options.cpp \
+    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.cpp \
+    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.cpp \
+    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateTracker.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_EndBattle.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Entrance.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_HPPP.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_ItemSelectMenu.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Lobby.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.cpp \
+    Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_SingleRun.cpp \
+    Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_Standard.cpp \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Battle.cpp \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_CaughtScreen.cpp \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Entrance.cpp \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_ItemSelect.cpp \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_PathSelect.cpp \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_PokemonSelect.cpp \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_PokemonSwap.cpp \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Start.cpp \
+    Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_DenTools.cpp \
     Source/PokemonSwSh/Programs/OverworldBot/PokemonSwSh_OverworldMovement.cpp \
     Source/PokemonSwSh/Programs/OverworldBot/PokemonSwSh_OverworldTargetTracker.cpp \
     Source/PokemonSwSh/Programs/OverworldBot/PokemonSwSh_OverworldTrajectory.cpp \
@@ -292,8 +315,11 @@ SOURCES += \
     Source/PokemonSwSh/Programs/PokemonSwSh_SynchronizedSpinning.cpp \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FastCodeEntry.cpp \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.cpp \
+    Source/PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.cpp \
+    Source/PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.cpp \
+    Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.cpp \
     Source/PokemonSwSh/ShinyHuntTracker.cpp
 
 HEADERS += \
@@ -329,14 +355,14 @@ HEADERS += \
     ../Common/Qt/CodeValidator.h \
     ../Common/Qt/ExpressionEvaluator.h \
     ../Common/Qt/NoWheelComboBox.h \
-    ../Common/Qt/Options/BooleanCheckBoxOption.h \
-    ../Common/Qt/Options/FloatingPointOption.h \
-    ../Common/Qt/Options/FossilTableOption.h \
-    ../Common/Qt/Options/MultiHostTableOption.h \
-    ../Common/Qt/Options/SimpleIntegerOption.h \
-	../Common/Qt/Options/StringOption.h \
-    ../Common/Qt/Options/SwitchDateOption.h \
-    ../Common/Qt/Options/TimeExpressionOption.h \
+    ../Common/Qt/Options/BooleanCheckBoxOptionBase.h \
+    ../Common/Qt/Options/FloatingPointOptionBase.h \
+    ../Common/Qt/Options/FossilTableOptionBase.h \
+    ../Common/Qt/Options/MultiHostTableOptionBase.h \
+    ../Common/Qt/Options/SimpleIntegerOptionBase.h \
+    ../Common/Qt/Options/StringOptionBase.h \
+    ../Common/Qt/Options/SwitchDateOptionBase.h \
+    ../Common/Qt/Options/TimeExpressionOptionBase.h \
     ../Common/Qt/QtJsonTools.h \
     ../Common/SwitchFramework/FrameworkSettings.h \
     ../Common/SwitchFramework/Switch_PushButtons.h \
@@ -351,6 +377,7 @@ HEADERS += \
     Source/CommonFramework/ImageMatch/FilterToAlpha.h \
     Source/CommonFramework/ImageMatch/ImageCropper.h \
     Source/CommonFramework/ImageMatch/ImageDiff.h \
+    Source/CommonFramework/ImageMatch/ImageMatchMetadata.h \
     Source/CommonFramework/ImageMatch/ImageMatchOption.h \
     Source/CommonFramework/ImageMatch/ImageMatchResult.h \
     Source/CommonFramework/ImageTools/CellMatrix.h \
@@ -367,8 +394,8 @@ HEADERS += \
     Source/CommonFramework/Inference/StatAccumulator.h \
     Source/CommonFramework/Inference/TimeWindowStatTracker.h \
     Source/CommonFramework/Inference/VisualInferenceCallback.h \
+    Source/CommonFramework/Inference/VisualInferenceRoutines.h \
     Source/CommonFramework/Inference/VisualInferenceSession.h \
-    Source/CommonFramework/Inference/VisualInferenceWait.h \
     Source/CommonFramework/Language.h \
     Source/CommonFramework/OCR/DictionaryMatcher.h \
     Source/CommonFramework/OCR/DictionaryOCR.h \
@@ -382,15 +409,20 @@ HEADERS += \
     Source/CommonFramework/OCR/TextMatcher.h \
     Source/CommonFramework/OCR/TrainingTools.h \
     Source/CommonFramework/Options/BatchOption.h \
-    Source/CommonFramework/Options/BooleanCheckBox.h \
+    Source/CommonFramework/Options/BooleanCheckBoxOption.h \
     Source/CommonFramework/Options/ConfigOption.h \
-    Source/CommonFramework/Options/EnumDropdown.h \
-    Source/CommonFramework/Options/FixedCode.h \
-    Source/CommonFramework/Options/FloatingPoint.h \
-    Source/CommonFramework/Options/RandomCode.h \
+    Source/CommonFramework/Options/DiscordSettingsOption.h \
+    Source/CommonFramework/Options/EnumDropdownOption.h \
+    Source/CommonFramework/Options/FixedCodeOption.h \
+    Source/CommonFramework/Options/FloatingPointOption.h \
+    Source/CommonFramework/Options/RandomCodeOption.h \
+    Source/CommonFramework/Options/ScreenshotFormatOption.h \
     Source/CommonFramework/Options/SectionDivider.h \
-    Source/CommonFramework/Options/SimpleInteger.h \
-    Source/CommonFramework/Options/StringSelect.h \
+    Source/CommonFramework/Options/SimpleIntegerOption.h \
+    Source/CommonFramework/Options/StringBoxOption.h \
+    Source/CommonFramework/Options/StringOption.h \
+    Source/CommonFramework/Options/StringSelectOption.h \
+    Source/CommonFramework/Options/TextEditOption.h \
     Source/CommonFramework/Panels/Panel.h \
     Source/CommonFramework/Panels/PanelList.h \
     Source/CommonFramework/Panels/RunnableComputerProgram.h \
@@ -428,11 +460,11 @@ HEADERS += \
     Source/NintendoSwitch/Framework/VirtualSwitchControllerMapping.h \
     Source/NintendoSwitch/FrameworkSettingsPanel.h \
     Source/NintendoSwitch/InferenceTraining/PokemonHome_GenerateNameOCR.h \
-    Source/NintendoSwitch/Options/FriendCodeList.h \
-    Source/NintendoSwitch/Options/GoHomeWhenDone.h \
-    Source/NintendoSwitch/Options/StartInGripMenu.h \
-    Source/NintendoSwitch/Options/SwitchDate.h \
-    Source/NintendoSwitch/Options/TimeExpression.h \
+    Source/NintendoSwitch/Options/FriendCodeListOption.h \
+    Source/NintendoSwitch/Options/GoHomeWhenDoneOption.h \
+    Source/NintendoSwitch/Options/StartInGripMenuOption.h \
+    Source/NintendoSwitch/Options/SwitchDateOption.h \
+    Source/NintendoSwitch/Options/TimeExpressionOption.h \
     Source/NintendoSwitch/Panels_NintendoSwitch.h \
     Source/NintendoSwitch/Programs/FriendCodeAdder.h \
     Source/NintendoSwitch/Programs/FriendDelete.h \
@@ -447,11 +479,12 @@ HEADERS += \
     Source/Pokemon/Inference/Pokemon_PokeballNameReader.h \
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h \
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.h \
-    Source/Pokemon/Options/Pokemon_BallSelect.h \
+    Source/Pokemon/Options/Pokemon_BallSelectOption.h \
     Source/Pokemon/Options/Pokemon_BallSelectWidget.h \
     Source/Pokemon/Options/Pokemon_EncounterBotOptions.h \
-    Source/Pokemon/Options/Pokemon_NameSelect.h \
+    Source/Pokemon/Options/Pokemon_NameSelectOption.h \
     Source/Pokemon/Options/Pokemon_NameSelectWidget.h \
+    Source/Pokemon/Pokemon_DataTypes.h \
     Source/Pokemon/Pokemon_EncounterStats.h \
     Source/Pokemon/Pokemon_Notification.h \
     Source/Pokemon/Pokemon_Types.h \
@@ -474,7 +507,9 @@ HEADERS += \
     Source/PokemonSwSh/Inference/PokemonSwSh_PokemonSpriteReader.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_PromptDetector.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_ReceivePokemonDetector.h \
+    Source/PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h \
+    Source/PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyDialogTracker.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyFilters.h \
@@ -485,6 +520,10 @@ HEADERS += \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareTrigger.h \
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateIVCheckerOCR.h \
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateNameOCRPokedex.h \
+    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_ProfessorSwap.h \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_ProfessorSwap.h \
+    Source/PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h \
     Source/PokemonSwSh/Options/PokemonSwSh_Catchability.h \
     Source/PokemonSwSh/Options/PokemonSwSh_DateToucher.h \
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.h \
@@ -502,32 +541,39 @@ HEADERS += \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_DexRecFinder.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_MassRelease.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_StatsReset.h \
+    Source/PokemonSwSh/Programs/General/PokemonSwSh_StatsReset-Calyrex.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_StatsReset-Moltres.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_StatsReset-Regi.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_SurpriseTrade.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_TradeBot.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_TurboA.h \
     Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_AutoHostStats.h \
-    Source/PokemonSwSh/Programs/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h \
-    Source/PokemonSwSh/Programs/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_EndBattle.h \
-    Source/PokemonSwSh/Programs/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_ItemSelectMenu.h \
-    Source/PokemonSwSh/Programs/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Lobby.h \
-    Source/PokemonSwSh/Programs/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PP.h \
-    Source/PokemonSwSh/Programs/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h \
-    Source/PokemonSwSh/Programs/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.h \
-    Source/PokemonSwSh/Programs/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.h \
-    Source/PokemonSwSh/Programs/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h \
-    Source/PokemonSwSh/Programs/MaxLair/PokemonSwSh_MaxLair_AI.h \
-    Source/PokemonSwSh/Programs/MaxLair/PokemonSwSh_MaxLair_Options.h \
-    Source/PokemonSwSh/Programs/MaxLair/PokemonSwSh_MaxLair_SingleRun.h \
-    Source/PokemonSwSh/Programs/MaxLair/PokemonSwSh_MaxLair_State.h \
-    Source/PokemonSwSh/Programs/MaxLair/PokemonSwSh_MaxLair_StateMachine.h \
-    Source/PokemonSwSh/Programs/MaxLair/Program/PokemonSwSh_MaxLair_Run_Battle.h \
-    Source/PokemonSwSh/Programs/MaxLair/Program/PokemonSwSh_MaxLair_Run_ItemSelect.h \
-    Source/PokemonSwSh/Programs/MaxLair/Program/PokemonSwSh_MaxLair_Run_PathSelect.h \
-    Source/PokemonSwSh/Programs/MaxLair/Program/PokemonSwSh_MaxLair_Run_PokemonSelect.h \
-    Source/PokemonSwSh/Programs/MaxLair/Program/PokemonSwSh_MaxLair_Run_PokemonSwap.h \
-    Source/PokemonSwSh/Programs/MaxLair/Program/PokemonSwSh_MaxLair_Run_Start.h \
+    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Notifications.h \
+    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Options.h \
+    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h \
+    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.h \
+    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateTracker.h \
+    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Stats.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_EndBattle.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Entrance.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_HPPP.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_ItemSelectMenu.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Lobby.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h \
+    Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_SingleRun.h \
+    Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_Standard.h \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Battle.h \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_CaughtScreen.h \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Entrance.h \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_ItemSelect.h \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_PathSelect.h \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_PokemonSelect.h \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_PokemonSwap.h \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Start.h \
     Source/PokemonSwSh/Programs/OverworldBot/PokemonSwSh_OverworldMovement.h \
     Source/PokemonSwSh/Programs/OverworldBot/PokemonSwSh_OverworldTargetTracker.h \
     Source/PokemonSwSh/Programs/OverworldBot/PokemonSwSh_OverworldTrajectory.h \
@@ -584,8 +630,11 @@ HEADERS += \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FastCodeEntry.h \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.h \
     Source/PokemonSwSh/Programs/ReleaseHelpers.h \
+    Source/PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h \
+    Source/PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.h \
+    Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.h \
     Source/PokemonSwSh/ShinyHuntTracker.h
 
 # Default rules for deployment.

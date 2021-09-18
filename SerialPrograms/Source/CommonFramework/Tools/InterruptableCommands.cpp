@@ -10,6 +10,8 @@ namespace PokemonAutomation{
 
 
 
+#if 0
+
 InterruptableCommandSession::CommandSet::CommandSet(
     BotBase& botbase,
     std::function<void(const BotBaseContext&)>&& lambda
@@ -83,6 +85,8 @@ void InterruptableCommandSession::stop(){
         m_current->context.cancel();
     }
 }
+
+#endif
 
 
 

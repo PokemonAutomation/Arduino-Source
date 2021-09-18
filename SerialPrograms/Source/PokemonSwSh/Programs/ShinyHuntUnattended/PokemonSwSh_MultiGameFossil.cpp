@@ -38,7 +38,7 @@ MultiGameFossil::MultiGameFossil(const MultiGameFossil_Descriptor& descriptor)
 
 void run_fossil_batch(
     const BotBaseContext& context,
-    const FossilTable::GameSlot* batch,
+    const FossilTableOption::GameSlot* batch,
     bool* game_slot_flipped,
     bool save_and_exit
 ){
@@ -124,7 +124,7 @@ void MultiGameFossil::program(SingleSwitchProgramEnvironment& env){
         pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
     }
 
-    FossilTable::GameSlot batch;
+    FossilTableOption::GameSlot batch;
 
     size_t games = GAME_LIST.size();
 

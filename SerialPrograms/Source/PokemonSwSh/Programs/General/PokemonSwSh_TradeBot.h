@@ -8,11 +8,11 @@
 #define PokemonAutomation_PokemonSwSh_TradeBot_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/BooleanCheckBox.h"
-#include "CommonFramework/Options/SimpleInteger.h"
-#include "CommonFramework/Options/FixedCode.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Options/FixedCodeOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -37,18 +37,18 @@ private:
     void trade_slot(const BotBaseContext& context, const uint8_t code[8], uint8_t slot) const;
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
 
-    FixedCode TRADE_CODE;
-    SimpleInteger<uint8_t> BOXES_TO_TRADE;
-    BooleanCheckBox LINK_TRADE_EXTRA_LINE;
-    TimeExpression<uint16_t> SEARCH_DELAY;
-    TimeExpression<uint16_t> CONFIRM_DELAY;
-    TimeExpression<uint16_t> TRADE_START;
-    TimeExpression<uint16_t> TRADE_COMMUNICATION;
-    SectionDivider m_advanced_options;
-    TimeExpression<uint16_t> TRADE_ANIMATION;
-    TimeExpression<uint16_t> EVOLVE_DELAY;
+    FixedCodeOption TRADE_CODE;
+    SimpleIntegerOption<uint8_t> BOXES_TO_TRADE;
+    BooleanCheckBoxOption LINK_TRADE_EXTRA_LINE;
+    TimeExpressionOption<uint16_t> SEARCH_DELAY;
+    TimeExpressionOption<uint16_t> CONFIRM_DELAY;
+    TimeExpressionOption<uint16_t> TRADE_START;
+    TimeExpressionOption<uint16_t> TRADE_COMMUNICATION;
+    SectionDividerOption m_advanced_options;
+    TimeExpressionOption<uint16_t> TRADE_ANIMATION;
+    TimeExpressionOption<uint16_t> EVOLVE_DELAY;
 };
 
 

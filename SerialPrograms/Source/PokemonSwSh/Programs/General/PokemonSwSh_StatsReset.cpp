@@ -11,7 +11,7 @@
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
-#include "CommonFramework/Inference/VisualInferenceSession.h"
+#include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "NintendoSwitch/FixedInterval.h"
 //#include "PokemonSwSh/Inference/PokemonSwSh_ReceivePokemonDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
@@ -109,30 +109,21 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env){
 
         env.console.botbase().wait_for_all_requests();
         {
-            InterruptableCommandSession commands(env.console);
-
-            BlackScreenDetector detector(env.console);
-            detector.register_command_stop(commands);
-
-//            ReceivePokemonDetector detector(env.console);
-//            detector.register_command_stop(commands);
-
-            AsyncVisualInferenceSession inference(env, env.console);
-            inference += detector;
-
-            commands.run([=](const BotBaseContext& context){
-
-                if (POKEMON == 2){
-                    pbf_mash_button(context, BUTTON_A, 10 * TICKS_PER_SECOND);
-                }else{
-                    pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
-                }
-
-                pbf_mash_button(context, BUTTON_B, 20 * TICKS_PER_SECOND);
-                context->wait_for_all_requests();
-            });
-
-            if (detector.triggered()){
+            BlackScreenDetector detector;
+            int result = run_until(
+                env, env.console,
+                [=](const BotBaseContext& context){
+                    if (POKEMON == 2){
+                        pbf_mash_button(context, BUTTON_A, 10 * TICKS_PER_SECOND);
+                    }else{
+                        pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
+                    }
+                    pbf_mash_button(context, BUTTON_B, 20 * TICKS_PER_SECOND);
+                    context->wait_for_all_requests();
+                },
+                { &detector }
+            );
+            if (result == 0){
                 env.log(STRING_POKEMON + " receive menu detected.", "purple");
             }else{
                 env.log(STRING_POKEMON + " receive menu timed out.", Qt::red);

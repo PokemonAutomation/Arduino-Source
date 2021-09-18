@@ -120,6 +120,7 @@ private:
 
     std::atomic<bool> m_snapshots_allowed;
     std::mutex m_camera_lock;
+    std::mutex m_snapshot_lock;
     std::condition_variable m_cv;
 //    bool m_capture_done;
 //    QImage m_capture_image;

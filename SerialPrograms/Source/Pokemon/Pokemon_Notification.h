@@ -11,11 +11,12 @@
 #include <set>
 #include <chrono>
 #include <QString>
+#include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Tools/Logger.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "Pokemon_EncounterStats.h"
-#include "Pokemon_Types.h"
+#include "Pokemon_DataTypes.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{
@@ -25,7 +26,7 @@ void send_encounter_notification(
     Logger& logger,
     const QString& program,
     const std::set<std::string>* slugs,
-    const ShinyDetectionResult& result, EncounterBotScreenshot screenshot,
+    const ShinyDetectionResult& result, ScreenshotMode screenshot,
     const StatsTracker* session_stats = nullptr,
     const EncounterFrequencies* frequencies = nullptr,
     const StatsTracker* alltime_stats = nullptr
@@ -41,7 +42,7 @@ public:
         Logger& logger,
         const QString& program,
         const std::set<std::string>* slugs,
-        const ShinyDetectionResult& result, EncounterBotScreenshot screenshot,
+        const ShinyDetectionResult& result, ScreenshotMode screenshot,
         const StatsTracker* session_stats = nullptr,
         const EncounterFrequencies* frequencies = nullptr,
         const StatsTracker* alltime_stats = nullptr

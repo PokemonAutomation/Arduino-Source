@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_IVCheckerReader_H
 
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Options/EnumDropdown.h"
+#include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/OCR/SmallDictionaryMatcher.h"
@@ -76,10 +76,10 @@ private:
 };
 
 
-class IVCheckerOption : public EnumDropdown{
+class IVCheckerOption : public EnumDropdownOption{
 public:
     IVCheckerOption(QString label, size_t default_index = 0)
-        : EnumDropdown(
+        : EnumDropdownOption(
             std::move(label),
             {
                 "Don't Care (0-31)",

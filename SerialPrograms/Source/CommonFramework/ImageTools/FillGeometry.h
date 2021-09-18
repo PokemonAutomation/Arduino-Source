@@ -21,20 +21,19 @@ struct FillGeometry{
     ImagePixelBox box;
     CellMatrix::ObjectID id = 0;
     size_t area = 0;
-    pxint_t center_x = 0;
-    pxint_t center_y = 0;
+    uint64_t sum_x = 0;
+    uint64_t sum_y = 0;
 
-    double aspect_ratio() const{ return (double)box.width() / box.height(); }
-    double area_ratio() const{ return (double)area / box.area();}
+    double aspect_ratio() const;
+    double area_ratio() const;
 
-    bool assert_aspect_ratio(double lower_bound, double upper_bound) const{
-        double ratio = aspect_ratio();
-        return lower_bound <= ratio && ratio <= upper_bound;
-    }
-    bool assert_area_ratio(double lower_bound, double upper_bound) const{
-        double ratio = area_ratio();
-        return lower_bound <= ratio && ratio <= upper_bound;
-    }
+    pxint_t center_x() const;
+    pxint_t center_y() const;
+
+    bool assert_aspect_ratio(double lower_bound, double upper_bound) const;
+    bool assert_area_ratio(double lower_bound, double upper_bound) const;
+
+    void merge_assume_no_overlap(const FillGeometry& obj);
 };
 
 enum class MapState : uint8_t{

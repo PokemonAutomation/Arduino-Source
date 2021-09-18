@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_MultiGameFossil_H
 
 #include "PokemonSwSh/Options/PokemonSwSh_FossilTable.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -30,8 +30,8 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    StartInGripOrClosed START_IN_GRIP_MENU;
-    FossilTable GAME_LIST;
+    StartInGripOrClosedOption START_IN_GRIP_MENU;
+    FossilTableOption GAME_LIST;
 };
 
 

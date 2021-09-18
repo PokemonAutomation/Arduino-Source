@@ -5,6 +5,7 @@
  */
 
 #include <deque>
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CommonFramework/Inference/TimeWindowStatTracker.h"
@@ -92,7 +93,7 @@ ShinyEncounterDetector::ShinyEncounterDetector(
     , m_min_delay(battle_settings.dialog_delay_when_shiny - std::chrono::milliseconds(500))
     , m_max_delay(battle_settings.dialog_delay_when_shiny + std::chrono::milliseconds(500))
     , m_detection_threshold(detection_threshold)
-    , m_menu(overlay, battle_settings.den)
+    , m_menu(battle_settings.den)
     , m_dialog_tracker(overlay, logger)
     , m_best_type_alpha(0)
 {}
@@ -203,7 +204,7 @@ ShinyDetectionResult detect_shiny_battle(
     StatAccumulatorI32 inference_stats;
     StatAccumulatorI32 throttle_stats;
 
-    StandardBattleMenuDetector menu(overlay, battle_settings.den);
+    StandardBattleMenuDetector menu(battle_settings.den);
     ShinyEncounterDetector detector(
         logger,
         overlay,
@@ -243,6 +244,7 @@ ShinyDetectionResult detect_shiny_battle(
 
         if (throttler.end_iteration(env)){
             no_detection = true;
+            dump_image(logger, screen, "BattleMenu");
             break;
         }
         auto time4 = std::chrono::system_clock::now();

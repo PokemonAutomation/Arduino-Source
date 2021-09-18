@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_DaySkipperJPN_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/SimpleInteger.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -31,9 +31,9 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    SimpleInteger<uint32_t> SKIPS;
-    SectionDivider m_advanced_options;
-    SimpleInteger<uint16_t> CORRECTION_SKIPS;
+    SimpleIntegerOption<uint32_t> SKIPS;
+    SectionDividerOption m_advanced_options;
+    SimpleIntegerOption<uint16_t> CORRECTION_SKIPS;
 };
 
 

@@ -16,6 +16,7 @@
 namespace PokemonAutomation{
 
 
+#if 0
 class InterruptableCommandSession{
 
 public:
@@ -53,6 +54,7 @@ private:
     std::unique_ptr<CommandSet> m_current;
     std::unique_ptr<CommandSet> m_pending;
 };
+#endif
 
 
 

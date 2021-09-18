@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_GenerateNameOCRData_H
 #define PokemonAutomation_PokemonSwSh_GenerateNameOCRData_H
 
-#include "CommonFramework/Options/EnumDropdown.h"
+#include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/OCR/LanguageOptionOCR.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
@@ -50,8 +50,8 @@ private:
 
 private:
     OCR::LanguageOCR LANGUAGE;
-    EnumDropdown POKEDEX;
-    EnumDropdown MODE;
+    EnumDropdownOption POKEDEX;
+    EnumDropdownOption MODE;
 };
 
 

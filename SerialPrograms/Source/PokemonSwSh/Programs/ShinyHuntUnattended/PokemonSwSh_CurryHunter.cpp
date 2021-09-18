@@ -147,12 +147,12 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env){
         {
             env.console.botbase().wait_for_all_requests();
 
-            ReceivePokemonDetector receive_detector(env.console);
+            ReceivePokemonDetector receive_detector;
             ShinySparkleDetector shiny_detector(
                 env.console, env.console,
                 ImageFloatBox(0.1, 0.01, 0.8, 0.77)
             );
-            AsyncVisualInferenceSession inference(env, env.console);
+            AsyncVisualInferenceSession inference(env, env.console, env.console);
             inference += receive_detector;
             inference += shiny_detector;
 
@@ -218,7 +218,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env){
 
             env.console.botbase().wait_for_all_requests();
             ShinyType shininess = ShinyType::NOT_SHINY;
-            if (receive_detector.triggered()){
+            if (inference.stop() != nullptr){
                 shininess = shiny_detector.results();
 #if 1
                 stats.add_non_shiny();

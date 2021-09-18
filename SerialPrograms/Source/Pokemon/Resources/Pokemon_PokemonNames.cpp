@@ -85,6 +85,14 @@ const PokemonNames& get_pokemon_name(const std::string& slug){
     }
     return iter->second;
 }
+const PokemonNames* get_pokemon_name_nothrow(const std::string& slug){
+    const std::map<std::string, PokemonNames>& database = PokemonNameDatabase::instance().m_slug_to_data;
+    auto iter = database.find(slug);
+    if (iter == database.end()){
+        return nullptr;
+    }
+    return &iter->second;
+}
 const std::string& parse_pokemon_name(const QString& display_name){
     const std::map<QString, std::string>& database = PokemonNameDatabase::instance().m_display_name_to_slug;
     auto iter = database.find(display_name);

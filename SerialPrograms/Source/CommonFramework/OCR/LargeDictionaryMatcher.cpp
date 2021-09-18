@@ -19,9 +19,12 @@ namespace OCR{
 
 
 
-LargeDictionaryMatcher::LargeDictionaryMatcher(const QString& json_file_prefix, bool first_only)
-    : m_prefix(PERSISTENT_SETTINGS().resource_path + json_file_prefix)
-{
+LargeDictionaryMatcher::LargeDictionaryMatcher(
+    const QString& json_file_prefix,
+    const std::set<std::string>* subset,
+    bool first_only
+){
+    QString prefix = PERSISTENT_SETTINGS().resource_path + json_file_prefix;
     for (size_t c = 1; c < (size_t)Language::EndOfList; c++){
         Language language = (Language)c;
         const LanguageData& data = language_data(language);
@@ -30,7 +33,7 @@ LargeDictionaryMatcher::LargeDictionaryMatcher(const QString& json_file_prefix, 
             m_database.emplace(
                 std::piecewise_construct,
                 std::forward_as_tuple(language),
-                std::forward_as_tuple(m_prefix + QString::fromStdString(code) + ".json", data.random_match_chance, first_only)
+                std::forward_as_tuple(prefix + QString::fromStdString(code) + ".json", subset, data.random_match_chance, first_only)
             );
             m_languages += language;
         }catch (FileException&){}

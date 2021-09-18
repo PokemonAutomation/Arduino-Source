@@ -14,17 +14,22 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-RaidCatchDetector::RaidCatchDetector(
-    VideoOverlay& overlay
-)
-    : m_left0 (overlay, 0.82, 0.85 + 0 * 0.078, 0.01, 0.04)
-    , m_right0(overlay, 0.96, 0.85 + 0 * 0.078, 0.01, 0.04)
-    , m_left1 (overlay, 0.82, 0.85 + 1 * 0.078, 0.01, 0.04)
-    , m_right1(overlay, 0.96, 0.85 + 1 * 0.078, 0.01, 0.04)
-    , m_text0 (overlay, 0.82, 0.84 + 0 * 0.078, 0.15, 0.06)
-    , m_text1 (overlay, 0.82, 0.84 + 1 * 0.078, 0.15, 0.06)
+RaidCatchDetector::RaidCatchDetector()
+    : m_left0 (0.82, 0.85 + 0 * 0.078, 0.01, 0.04)
+    , m_right0(0.96, 0.85 + 0 * 0.078, 0.01, 0.04)
+    , m_left1 (0.82, 0.85 + 1 * 0.078, 0.01, 0.04)
+    , m_right1(0.96, 0.85 + 1 * 0.078, 0.01, 0.04)
+    , m_text0 (0.82, 0.84 + 0 * 0.078, 0.15, 0.06)
+    , m_text1 (0.82, 0.84 + 1 * 0.078, 0.15, 0.06)
     , m_start_time(std::chrono::system_clock::now())
-{}
+{
+    add_box(m_left0);
+    add_box(m_right0);
+    add_box(m_left1);
+    add_box(m_right1);
+    add_box(m_text0);
+    add_box(m_text1);
+}
 bool RaidCatchDetector::has_timed_out(std::chrono::milliseconds timeout) const{
     return std::chrono::system_clock::now() - m_start_time > timeout;
 }
@@ -68,7 +73,7 @@ bool RaidCatchDetector::detect(const QImage& screen){
     }
     return true;
 }
-bool RaidCatchDetector::on_frame(
+bool RaidCatchDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
@@ -93,7 +98,7 @@ bool RaidCatchDetector::wait(
         auto end = std::chrono::system_clock::now();
         auto duration = end - start;
         if (duration < std::chrono::milliseconds(50)){
-            env.wait(std::chrono::milliseconds(50) - duration);
+            env.wait_for(std::chrono::milliseconds(50) - duration);
         }
     }
 }

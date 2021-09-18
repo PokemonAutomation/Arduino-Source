@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonSwSh_ShinyHuntUnattendedIoATrade_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 
@@ -32,14 +32,14 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
-    TouchDateInterval TOUCH_DATE_INTERVAL;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+    TouchDateIntervalOption TOUCH_DATE_INTERVAL;
 
-    TimeExpression<uint16_t> START_TO_RUN_DELAY;
-    SectionDivider m_advanced_options;
-    TimeExpression<uint16_t> FLY_DURATION;
-    TimeExpression<uint16_t> MOVE_DURATION;
-    TimeExpression<uint16_t> MASH_TO_TRADE_DELAY;
+    TimeExpressionOption<uint16_t> START_TO_RUN_DELAY;
+    SectionDividerOption m_advanced_options;
+    TimeExpressionOption<uint16_t> FLY_DURATION;
+    TimeExpressionOption<uint16_t> MOVE_DURATION;
+    TimeExpressionOption<uint16_t> MASH_TO_TRADE_DELAY;
 };
 
 

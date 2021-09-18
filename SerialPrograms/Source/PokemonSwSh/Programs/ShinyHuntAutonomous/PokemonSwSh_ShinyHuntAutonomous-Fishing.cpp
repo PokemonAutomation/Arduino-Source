@@ -11,6 +11,7 @@
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
 #include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_FishingDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
@@ -118,33 +119,48 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env){
 
         //  Trigger encounter.
         {
-            FishingDetector detector(env.console);
             pbf_press_button(env.console, BUTTON_A, 10, 10);
             pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
             env.console.botbase().wait_for_all_requests();
-            FishingDetector::Detection detection = detector.wait_for_detection(env, env.console);
-            switch (detection){
-            case FishingDetector::NO_DETECTION:
-                stats.add_error();
-                env.update_stats();
-                pbf_mash_button(env.console, BUTTON_B, 2 * TICKS_PER_SECOND);
-                continue;
-            case FishingDetector::HOOKED:
-                pbf_press_button(env.console, BUTTON_A, 10, 0);
-                break;
-            case FishingDetector::MISSED:
+
+            FishingMissDetector miss_detector;
+            FishingHookDetector hook_detector(env.console);
+            StandardBattleMenuDetector menu_detector(false);
+            int result = wait_until(
+                env, env.console,
+                std::chrono::seconds(12),
+                {
+                    &miss_detector,
+                    &hook_detector,
+                    &menu_detector,
+                }
+            );
+            switch (result){
+            case 0:
+                env.log("Missed a hook.", "red");
                 stats.m_misses++;
                 pbf_mash_button(env.console, BUTTON_B, 2 * TICKS_PER_SECOND);
                 continue;
-            case FishingDetector::BATTLE_MENU:
+            case 1:
+                env.log("Detected hook!", "purple");
+                pbf_press_button(env.console, BUTTON_A, 10, 0);
+                break;
+            case 2:
+                env.log("Unexpected battle menu.", "red");
                 stats.add_error();
                 env.update_stats();
                 run_away(env, env.console, EXIT_BATTLE_TIMEOUT);
                 continue;
+            default:
+                env.log("Timed out.", "red");
+                stats.add_error();
+                env.update_stats();
+                pbf_mash_button(env.console, BUTTON_B, 2 * TICKS_PER_SECOND);
+                continue;
             }
-            env.wait(std::chrono::seconds(3));
-            detection = detector.detect_now(env.console.video().snapshot());
-            if (detection == FishingDetector::MISSED){
+            env.wait_for(std::chrono::seconds(3));
+            if (miss_detector.detect(env.console.video().snapshot())){
+                env.log("False alarm! We actually missed.", "red");
                 stats.m_misses++;
                 pbf_mash_button(env.console, BUTTON_B, 2 * TICKS_PER_SECOND);
                 continue;

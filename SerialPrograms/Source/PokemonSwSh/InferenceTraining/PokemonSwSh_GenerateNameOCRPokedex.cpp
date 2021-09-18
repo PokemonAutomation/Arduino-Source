@@ -25,6 +25,7 @@ using std::endl;
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+using namespace Pokemon;
 
 
 GenerateNameOCRDataPokedex_Descriptor::GenerateNameOCRDataPokedex_Descriptor()
@@ -44,7 +45,7 @@ GenerateNameOCRDataPokedex::GenerateNameOCRDataPokedex(const GenerateNameOCRData
     : SingleSwitchProgramInstance(descriptor)
     , LANGUAGE(
         "<b>Game Language:</b>",
-        Pokemon::PokemonNameReader::instance().languages()
+        PokemonNameReader::instance().languages()
     )
     , POKEDEX(
         "<b>" + STRING_POKEDEX + ":</b>",
@@ -75,9 +76,9 @@ void GenerateNameOCRDataPokedex::read(
     QImage image
 ) const{
     OCR::make_OCR_filter(image).apply(image);
-    image.save("test.png");
+//    image.save("test.png");
 
-    OCR::MatchResult result = Pokemon::PokemonNameReader::instance().read_substring(LANGUAGE, image);
+    OCR::MatchResult result = PokemonNameReader::instance().read_substring(LANGUAGE, image);
     result.log(logger);
     if (result.slugs.empty()){
         output.append("");

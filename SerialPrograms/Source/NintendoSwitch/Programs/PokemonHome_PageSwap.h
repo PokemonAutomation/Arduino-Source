@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_PokemonHome_PageSwap_H
 #define PokemonAutomation_PokemonHome_PageSwap_H
 
-#include "CommonFramework/Options/BooleanCheckBox.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -28,8 +28,8 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
-    BooleanCheckBox DODGE_SYSTEM_UPDATE_WINDOW;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+    BooleanCheckBoxOption DODGE_SYSTEM_UPDATE_WINDOW;
 };
 
 

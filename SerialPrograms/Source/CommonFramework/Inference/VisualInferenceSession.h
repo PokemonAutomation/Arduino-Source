@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_CommonFramework_VisualInferenceSession_H
 #define PokemonAutomation_CommonFramework_VisualInferenceSession_H
 
-#include <set>
+#include <map>
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/VideoFeed.h"
@@ -21,7 +21,7 @@ class VisualInferenceSession{
 public:
     VisualInferenceSession(
         ProgramEnvironment& env,
-        VideoFeed& feed,
+        VideoFeed& feed, VideoOverlay& overlay,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)
     );
     ~VisualInferenceSession();
@@ -31,7 +31,7 @@ public:
     void operator-=(VisualInferenceCallback& callback);
 
     //  Run the session. This will not return until the session is stopped.
-    void run();
+    VisualInferenceCallback* run(std::chrono::milliseconds timeout = std::chrono::milliseconds(0));
 
     //  Call this from a different thread to asynchronously stop the session.
     void stop();
@@ -39,16 +39,20 @@ public:
 private:
     ProgramEnvironment& m_env;
     VideoFeed& m_feed;
+    VideoOverlay& m_overlay;
     std::chrono::milliseconds m_period;
     std::atomic<bool> m_stop;
+
     std::vector<std::function<bool(const QImage&)>> m_callbacks0;
-    std::set<VisualInferenceCallback*> m_callbacks1;
+    std::map<VisualInferenceCallback*, std::deque<InferenceBoxScope>> m_callbacks1;
+
     std::mutex m_lock;
     std::condition_variable m_cv;
 };
 
 
 
+#if 0
 //  RAII wrapper for adding/removing infererence callbacks.
 class VisualInferenceScope{
 public:
@@ -61,6 +65,7 @@ private:
     VisualInferenceSession& m_session;
     VisualInferenceCallback& m_callback;
 };
+#endif
 
 
 
@@ -69,17 +74,22 @@ class AsyncVisualInferenceSession : public VisualInferenceSession{
 public:
     AsyncVisualInferenceSession(
         ProgramEnvironment& env,
-        VideoFeed& feed,
+        VideoFeed& feed, VideoOverlay& overlay,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)
     );
+
+    //  This will not rethrow exceptions in the inference thread.
     ~AsyncVisualInferenceSession();
 
-    void stop();
+    //  This will rethrow any exceptions in the inference thread.
+    //  You should call this at all natural destruction points.
+    VisualInferenceCallback* stop();
 
 private:
     void thread_body();
 
 private:
+    VisualInferenceCallback* m_callback;
     std::unique_ptr<AsyncTask> m_task;
 };
 

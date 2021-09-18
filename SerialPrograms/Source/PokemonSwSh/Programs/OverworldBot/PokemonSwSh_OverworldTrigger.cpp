@@ -14,14 +14,8 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-OverworldTrigger::OverworldTrigger(
-    ProgramEnvironment& env,
-    InterruptableCommandSession& session,
-    OverworldTargetTracker& target_tracker
-)
-    : m_env(env)
-    , m_session(session)
-    , m_target_tracker(target_tracker)
+OverworldTrigger::OverworldTrigger(OverworldTargetTracker& target_tracker)
+    : m_target_tracker(target_tracker)
 {}
 void OverworldTrigger::whistle(const BotBaseContext& context, bool rotate){
     context.botbase().wait_for_all_requests();
@@ -46,38 +40,31 @@ void OverworldTrigger::whistle(const BotBaseContext& context, bool rotate){
 }
 
 
-void OverworldTrigger_Whistle::run(){
-//    m_env.log("Whistle and wait.");
-    m_session.run([=](const BotBaseContext& context){
-        whistle(context, !m_first_after_battle);
-        m_first_after_battle = false;
-    });
+void OverworldTrigger_Whistle::run(const BotBaseContext& context){
+    whistle(context, !m_first_after_battle);
+    m_first_after_battle = false;
 }
 
 
 OverworldTrigger_WhistleStaticAction::OverworldTrigger_WhistleStaticAction(
-    ProgramEnvironment& env,
-    InterruptableCommandSession& session,
     OverworldTargetTracker& target_tracker,
     bool whistle_first,
     size_t whistle_count,
     size_t action_count
 )
-    : OverworldTrigger(env, session, target_tracker)
+    : OverworldTrigger(target_tracker)
     , m_whistle_first(whistle_first)
     , m_whistle_count(whistle_count)
     , m_action_count(action_count)
 {}
-void OverworldTrigger_WhistleStaticAction::run(){
-    m_session.run([=](const BotBaseContext& context){
-        if (m_whistle_first){
-            whistle_loop(context);
-            action_loop(context);
-        }else{
-            action_loop(context);
-            whistle_loop(context);
-        }
-    });
+void OverworldTrigger_WhistleStaticAction::run(const BotBaseContext& context){
+    if (m_whistle_first){
+        whistle_loop(context);
+        action_loop(context);
+    }else{
+        action_loop(context);
+        whistle_loop(context);
+    }
 }
 void OverworldTrigger_WhistleStaticAction::whistle_loop(const BotBaseContext& context){
     for (size_t c = 0; c < m_whistle_count; c++){
@@ -87,10 +74,12 @@ void OverworldTrigger_WhistleStaticAction::whistle_loop(const BotBaseContext& co
 }
 void OverworldTrigger_WhistleStaticAction::action_loop(const BotBaseContext& context){
     m_target_tracker.set_stop_on_target(true);
+    context->wait_for_all_requests();
     for (size_t c = 0; c < m_action_count; c++){
         action(context);
         m_first_after_battle = false;
     }
+    context->wait_for_all_requests();
     m_target_tracker.set_stop_on_target(false);
 }
 

@@ -11,28 +11,32 @@
 #include <QCheckBox>
 #include "ConfigOption.h"
 
-class SectionDivider : public ConfigOption{
+namespace PokemonAutomation{
+
+
+class SectionDividerOption : public ConfigOption{
 public:
-    SectionDivider(QString label);
+    SectionDividerOption(QString label);
     virtual void load_json(const QJsonValue& json) override{}
     virtual QJsonValue to_json() const override{ return QJsonValue(); }
 
     virtual ConfigOptionUI* make_ui(QWidget& parent) override;
 
 private:
-    friend class SectionDividerUI;
+    friend class SectionDividerOptionUI;
     QString m_label;
 };
 
 
-class SectionDividerUI : public ConfigOptionUI, public QWidget{
+class SectionDividerOptionUI : public ConfigOptionUI, public QWidget{
 public:
-    SectionDividerUI(QWidget& parent, SectionDivider& value);
+    SectionDividerOptionUI(QWidget& parent, SectionDividerOption& value);
     virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override{}
 };
 
 
+}
 #endif
 
 

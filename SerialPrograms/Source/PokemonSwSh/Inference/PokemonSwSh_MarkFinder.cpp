@@ -83,7 +83,7 @@ void WhiteFilter2::operator()(FillMatrix::ObjectID& cell, QImage& image, pxint_t
 
 
 
-struct BrightFilter{
+struct MarkFilter{
     size_t count = 0;
 
     void operator()(CellMatrix::ObjectID& cell, const QImage& image, pxint_t x, pxint_t y){
@@ -96,7 +96,7 @@ struct BrightFilter{
         }
     }
 };
-struct BrightFilterDebug{
+struct MarkFilterDebug{
     size_t count = 0;
 
     void operator()(CellMatrix::ObjectID& cell, QImage& image, pxint_t x, pxint_t y){
@@ -156,7 +156,7 @@ bool is_exclamation_mark(
 //    cout << "check 1" << endl;
 
     //  Verify bottom is left of the top.
-    if (top.center_x < bot.center_x){
+    if (top.center_x() < bot.center_x()){
         return false;
     }
 
@@ -479,7 +479,7 @@ size_t find_marks(
     QImage copy = image;
 
     CellMatrix matrix(image);
-    BrightFilterDebug filter;
+    MarkFilterDebug filter;
     matrix.apply_filter(copy, filter);
 //    copy.save("white_filter.png");
 #endif

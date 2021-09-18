@@ -39,7 +39,7 @@ public:
             m_wait_until = now + m_period;
         }else{
             m_wait_until += m_period;
-            env.wait(wait);
+            env.wait_for(wait);
         }
         return false;
     }

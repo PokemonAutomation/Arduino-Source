@@ -18,7 +18,10 @@ const PokemonNameReader& PokemonNameReader::instance(){
 
 
 PokemonNameReader::PokemonNameReader()
-    : LargeDictionaryMatcher("Pokemon/PokemonNameOCR/PokemonOCR-")
+    : LargeDictionaryMatcher("Pokemon/PokemonNameOCR/PokemonOCR-", nullptr, false)
+{}
+PokemonNameReader::PokemonNameReader(const std::set<std::string>& subset)
+    : LargeDictionaryMatcher("Pokemon/PokemonNameOCR/PokemonOCR-", &subset, false)
 {}
 
 OCR::MatchResult PokemonNameReader::read_substring(

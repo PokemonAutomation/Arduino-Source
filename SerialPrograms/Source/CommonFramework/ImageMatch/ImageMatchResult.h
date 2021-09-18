@@ -18,7 +18,7 @@ namespace ImageMatch{
 struct MatchResult{
     std::multimap<double, std::string> slugs;
 
-    void log(Logger& logger, double max_RMSD) const;
+    void log(Logger& logger, double max_RMSD_ratio) const;
 };
 
 

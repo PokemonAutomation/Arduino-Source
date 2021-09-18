@@ -100,7 +100,7 @@ QJsonValue EncounterFilterOverrides::to_json() const{
 
 
 
-EncounterFilter::EncounterFilter(bool rare_stars, bool enable_overrides)
+EncounterFilterOption::EncounterFilterOption(bool rare_stars, bool enable_overrides)
     : m_label("<b>Encounter Filter:</b>")
     , m_rare_stars(rare_stars)
     , m_enable_overrides(enable_overrides)
@@ -110,7 +110,7 @@ EncounterFilter::EncounterFilter(bool rare_stars, bool enable_overrides)
 //    , m_blacklist_current(m_blacklist_default)
 {}
 
-void EncounterFilter::load_json(const QJsonValue& json){
+void EncounterFilterOption::load_json(const QJsonValue& json){
     using namespace Pokemon;
 
     QJsonObject obj = json.toObject();
@@ -133,7 +133,7 @@ void EncounterFilter::load_json(const QJsonValue& json){
     }
 
 }
-QJsonValue EncounterFilter::to_json() const{
+QJsonValue EncounterFilterOption::to_json() const{
     QJsonObject obj;
     obj.insert("ShinyFilter", ShinyFilter_NAMES[(size_t)m_shiny_filter_current]);
 
@@ -148,18 +148,18 @@ QJsonValue EncounterFilter::to_json() const{
     return obj;
 }
 
-void EncounterFilter::restore_defaults(){
+void EncounterFilterOption::restore_defaults(){
     m_shiny_filter_current = m_shiny_filter_default;
     m_overrides.clear();
 }
-ConfigOptionUI* EncounterFilter::make_ui(QWidget& parent){
-    return new EncounterFilterUI(parent, *this);
+ConfigOptionUI* EncounterFilterOption::make_ui(QWidget& parent){
+    return new EncounterFilterOptionUI(parent, *this);
 }
 
 
 
 
-EncounterFilterUI::EncounterFilterUI(QWidget& parent, EncounterFilter& value)
+EncounterFilterOptionUI::EncounterFilterOptionUI(QWidget& parent, EncounterFilterOption& value)
     : QWidget(&parent)
     , m_value(value)
     , m_table(nullptr)
@@ -238,7 +238,7 @@ EncounterFilterUI::EncounterFilterUI(QWidget& parent, EncounterFilter& value)
 
 
 }
-void EncounterFilterUI::replace_table(){
+void EncounterFilterOptionUI::replace_table(){
     if (!m_value.m_enable_overrides){
         return;
     }
@@ -292,7 +292,7 @@ void EncounterFilterUI::replace_table(){
     );
 
 }
-void EncounterFilterUI::add_row(int row, const EncounterFilterOverrides& game, int& index_ref){
+void EncounterFilterOptionUI::add_row(int row, const EncounterFilterOverrides& game, int& index_ref){
     index_ref = row;
     BallSelectWidget* ball_select = make_ball_select(*m_table, index_ref, m_value.m_overrides[row].pokeball_slug);
     m_table->setCellWidget(row, 0, make_action_box(*m_table, index_ref, *ball_select, m_value.m_overrides[row].action));
@@ -303,7 +303,7 @@ void EncounterFilterUI::add_row(int row, const EncounterFilterOverrides& game, i
     m_table->setCellWidget(row, 5, make_remove_button(*m_table, index_ref));
     m_table->resizeColumnsToContents();
 }
-QComboBox* EncounterFilterUI::make_action_box(QWidget& parent, int& row, BallSelectWidget& ball_select, EncounterAction action){
+QComboBox* EncounterFilterOptionUI::make_action_box(QWidget& parent, int& row, BallSelectWidget& ball_select, EncounterAction action){
     QComboBox* box = new NoWheelComboBox(&parent);
     for (const QString& action : EncounterAction_NAMES){
         box->addItem(action);
@@ -342,7 +342,7 @@ QComboBox* EncounterFilterUI::make_action_box(QWidget& parent, int& row, BallSel
     );
     return box;
 }
-BallSelectWidget* EncounterFilterUI::make_ball_select(QWidget& parent, int& row, const std::string& slug){
+BallSelectWidget* EncounterFilterOptionUI::make_ball_select(QWidget& parent, int& row, const std::string& slug){
     using namespace Pokemon;
     BallSelectWidget* box = new BallSelectWidget(parent, POKEBALL_SLUGS(), slug);
     connect(
@@ -354,7 +354,7 @@ BallSelectWidget* EncounterFilterUI::make_ball_select(QWidget& parent, int& row,
     );
     return box;
 }
-NameSelectWidget* EncounterFilterUI::make_species_select(QWidget& parent, int& row, const std::string& slug){
+NameSelectWidget* EncounterFilterOptionUI::make_species_select(QWidget& parent, int& row, const std::string& slug){
     using namespace Pokemon;
     NameSelectWidget* box = new NameSelectWidget(parent, NATIONAL_DEX_SLUGS(), slug);
     connect(
@@ -366,7 +366,7 @@ NameSelectWidget* EncounterFilterUI::make_species_select(QWidget& parent, int& r
     );
     return box;
 }
-QComboBox* EncounterFilterUI::make_shiny_box(QWidget& parent, int& row, ShinyFilter shiniess){
+QComboBox* EncounterFilterOptionUI::make_shiny_box(QWidget& parent, int& row, ShinyFilter shiniess){
     QComboBox* box = new NoWheelComboBox(&parent);
     if (m_value.m_rare_stars){
         box->addItem(ShinyFilter_NAMES[(int)ShinyFilter::NOT_SHINY]);
@@ -402,7 +402,7 @@ QComboBox* EncounterFilterUI::make_shiny_box(QWidget& parent, int& row, ShinyFil
     );
     return box;
 }
-QPushButton* EncounterFilterUI::make_insert_button(QWidget& parent, int& row){
+QPushButton* EncounterFilterOptionUI::make_insert_button(QWidget& parent, int& row){
     QPushButton* button = new QPushButton(&parent);
     QFont font;
     font.setBold(true);
@@ -432,7 +432,7 @@ QPushButton* EncounterFilterUI::make_insert_button(QWidget& parent, int& row){
     );
     return button;
 }
-QPushButton* EncounterFilterUI::make_remove_button(QWidget& parent, int& row){
+QPushButton* EncounterFilterOptionUI::make_remove_button(QWidget& parent, int& row){
     QPushButton* button = new QPushButton(&parent);
     QFont font;
     font.setBold(true);
@@ -463,7 +463,7 @@ QPushButton* EncounterFilterUI::make_remove_button(QWidget& parent, int& row){
 
 
 
-void EncounterFilterUI::restore_defaults(){
+void EncounterFilterOptionUI::restore_defaults(){
     m_value.restore_defaults();
     ShinyFilter current = m_value.m_shiny_filter_current;
     for (int c = 0; c < m_shininess->count(); c++){

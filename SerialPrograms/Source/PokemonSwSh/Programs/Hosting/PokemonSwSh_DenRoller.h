@@ -8,9 +8,9 @@
 #define PokemonAutomation_PokemonSwSh_DenRoller_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/SimpleInteger.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_Catchability.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_DenMonReader.h"
@@ -39,15 +39,15 @@ public:
 private:
     struct Stats;
 
-    StartInGripOrGame START_IN_GRIP_MENU;
-    SimpleInteger<uint8_t> SKIPS;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+    SimpleIntegerOption<uint8_t> SKIPS;
     DenMonSelectOption FILTER;
 
-    CatchabilitySelector CATCHABILITY;
-    TimeExpression<uint16_t> VIEW_TIME;
+    CatchabilitySelectorOption CATCHABILITY;
+    TimeExpressionOption<uint16_t> VIEW_TIME;
 
-    SectionDivider m_advanced_options;
-    TimeExpression<uint16_t> READ_DELAY;
+    SectionDividerOption m_advanced_options;
+    TimeExpressionOption<uint16_t> READ_DELAY;
 };
 
 

@@ -8,8 +8,9 @@
 #define PokemonAutomation_Pokemon_EncounterBotOptions_H
 
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Options/BooleanCheckBox.h"
-#include "CommonFramework/Options/EnumDropdown.h"
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Options/EnumDropdownOption.h"
+#include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/OCR/LanguageOptionOCR.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 
@@ -34,10 +35,10 @@ enum class EncounterBotNotificationLevel{
     PERIODIC_AND_SHINY,
     EVERYTHING,
 };
-class EncounterBotNotifications : public EnumDropdown{
+class EncounterBotNotifications : public EnumDropdownOption{
 public:
     EncounterBotNotifications()
-        : EnumDropdown(
+        : EnumDropdownOption(
             "<b>Discord Notification Level:</b><br>Requires Discord notification settings be set.",
             {
                 "No notifications.",
@@ -55,28 +56,13 @@ public:
 };
 
 
-enum class EncounterBotScreenshot{
-    NO_SCREENSHOT,
-    JPG,
-    PNG,
-};
-class EncounterBotScreenshotOption : public EnumDropdown{
+class EncounterBotScreenshotOption : public ScreenshotOption{
 public:
     EncounterBotScreenshotOption()
-        : EnumDropdown(
-            "<b>Attach Shiny Screenshot:</b><br>Attach screenshot of shiny encounters to notification.",
-            {
-                "Do not attach screenshot.",
-                "Attach as .jpg.",
-                "Attach as .png.",
-            },
-            1
+        : ScreenshotOption(
+            "<b>Attach Shiny Screenshot:</b><br>Attach screenshot of shiny encounters to notification."
         )
     {}
-
-    operator EncounterBotScreenshot() const{
-        return (EncounterBotScreenshot)(size_t)*this;
-    }
 };
 
 

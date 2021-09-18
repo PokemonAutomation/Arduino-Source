@@ -433,8 +433,8 @@ bool is_square2(
 //    size_t box_area = (size_t)width * height;
 
     CellMatrix submatrix = matrix.extract(object.box, object.id);
-    pxint_t center_x = object.center_x - object.box.min_x;
-    pxint_t center_y = object.center_y - object.box.min_y;
+    pxint_t center_x = object.center_x() - object.box.min_x;
+    pxint_t center_y = object.center_y() - object.box.min_y;
 
     //  Invert the cells.
     for (pxint_t r = 0; r < height; r++){

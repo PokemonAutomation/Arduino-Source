@@ -6,6 +6,10 @@
 
 #include "ImageCropper.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace ImageMatch{
 
@@ -15,6 +19,7 @@ bool scan_row(const QImage& image, int row, const std::function<bool(QRgb)>& fil
     for (int c = 0; c < image.width(); c++){
         QRgb pixel = image.pixel(c, row);
         if (filter(pixel)){
+//            cout << "{" << c << "," << row << "}" << endl;
             return false;
         }
     }
@@ -24,6 +29,7 @@ bool scan_col(const QImage& image, int col, const std::function<bool(QRgb)>& fil
     for (int r = 0; r < image.height(); r++){
         QRgb pixel = image.pixel(col, r);
         if (filter(pixel)){
+//            cout << "{" << col << "," << r << "}" << endl;
             return false;
         }
     }

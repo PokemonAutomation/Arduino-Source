@@ -9,13 +9,14 @@
 
 #include "CommonFramework/OCR/LanguageOptionOCR.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
-#include "NintendoSwitch/Options/GoHomeWhenDone.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
-#include "Pokemon/Options/Pokemon_BallSelect.h"
+#include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
+#include "Pokemon/Options/Pokemon_BallSelectOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+using namespace Pokemon;
 
 
 class AutonomousBallThrower_Descriptor : public RunnableSwitchProgramDescriptor{
@@ -35,9 +36,9 @@ public:
 private:
     struct Stats;
 
-    StartInGripOrGame START_IN_GRIP_MENU;
-    GoHomeWhenDone GO_HOME_WHEN_DONE;
-    Pokemon::PokemonBallSelect BALL_SELECT;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+    PokemonBallSelect BALL_SELECT;
     OCR::LanguageOCR LANGUAGE;
 };
 

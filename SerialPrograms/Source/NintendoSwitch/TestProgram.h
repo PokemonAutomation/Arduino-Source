@@ -8,12 +8,12 @@
 #define PokemonAutomation_PokemonSwSh_TestProgram_H
 
 #include "CommonFramework/Options/BatchOption.h"
-#include "CommonFramework/Options/BooleanCheckBox.h"
-#include "CommonFramework/Options/EnumDropdown.h"
-#include "CommonFramework/Options/StringSelect.h"
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Options/EnumDropdownOption.h"
+#include "CommonFramework/Options/StringSelectOption.h"
 #include "CommonFramework/OCR/LanguageOptionOCR.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
-#include "Pokemon/Options/Pokemon_BallSelect.h"
+#include "Pokemon/Options/Pokemon_BallSelectOption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_EncounterFilter.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -36,8 +36,8 @@ public:
         PA_ADD_OPTION(BOX1);
     }
 
-    BooleanCheckBox BOX0;
-    BooleanCheckBox BOX1;
+    BooleanCheckBoxOption BOX0;
+    BooleanCheckBoxOption BOX1;
 };
 
 
@@ -69,10 +69,10 @@ private:
 private:
     IVCheckerReader m_iv_checker_reader;
     OCR::LanguageOCR LANGUAGE;
-    EnumDropdown DROPDOWN;
-    StringSelect STRING_SELECT;
+    EnumDropdownOption DROPDOWN;
+    StringSelectOption STRING_SELECT;
     Pokemon::PokemonBallSelect BALL_SELECT;
-    EncounterFilter FILTER;
+    EncounterFilterOption FILTER;
     DoubleBoolOption BATCH;
 };
 

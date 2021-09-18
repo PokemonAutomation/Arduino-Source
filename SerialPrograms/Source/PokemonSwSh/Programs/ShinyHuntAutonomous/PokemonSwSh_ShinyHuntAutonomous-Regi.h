@@ -8,10 +8,10 @@
 #define PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousRegi_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/SimpleInteger.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
-#include "NintendoSwitch/Options/GoHomeWhenDone.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
+#include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
@@ -38,19 +38,19 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
-    GoHomeWhenDone GO_HOME_WHEN_DONE;
-    TouchDateInterval TOUCH_DATE_INTERVAL;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+    TouchDateIntervalOption TOUCH_DATE_INTERVAL;
 
-    Pokemon::EncounterBotLanguage LANGUAGE;
+    EncounterBotLanguage LANGUAGE;
 
-    RegiSelector REGI_NAME;
+    RegiSelectorOption REGI_NAME;
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
 
-    SectionDivider m_advanced_options;
-    TimeExpression<uint16_t> EXIT_BATTLE_TIMEOUT;
-    TimeExpression<uint16_t> POST_BATTLE_MASH_TIME;
-    TimeExpression<uint16_t> TRANSITION_DELAY;
+    SectionDividerOption m_advanced_options;
+    TimeExpressionOption<uint16_t> EXIT_BATTLE_TIMEOUT;
+    TimeExpressionOption<uint16_t> POST_BATTLE_MASH_TIME;
+    TimeExpressionOption<uint16_t> TRANSITION_DELAY;
 };
 
 }

@@ -76,6 +76,12 @@ void ProgramEnvironment::check_stopping() const{
 }
 void ProgramEnvironment::signal_stop(){
     m_stopping.store(true, std::memory_order_release);
+//    std::lock_guard<std::mutex> lg(m_lock);
+//    m_cv.notify_all();
+    notify_all();
+}
+
+void ProgramEnvironment::notify_all(){
     std::lock_guard<std::mutex> lg(m_lock);
     m_cv.notify_all();
 }

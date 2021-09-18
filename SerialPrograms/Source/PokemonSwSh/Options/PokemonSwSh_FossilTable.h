@@ -7,17 +7,17 @@
 #ifndef PokemonAutomation_PokemonSwSh_FossilTable_H
 #define PokemonAutomation_PokemonSwSh_FossilTable_H
 
-#include "Common/Qt/Options/FossilTableOption.h"
+#include "Common/Qt/Options/FossilTableOptionBase.h"
 #include "CommonFramework/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
 
 
 
-class FossilTable : public ConfigOption, public FossilTableOption{
+class FossilTableOption : public ConfigOption, public FossilTableOptionBase{
 public:
-    FossilTable()
-        : FossilTableOption("<b>Game List:</b>")
+    FossilTableOption()
+        : FossilTableOptionBase("<b>Game List:</b>")
     {}
     virtual void load_json(const QJsonValue& json) override{
         load_current(json);
@@ -27,29 +27,29 @@ public:
     }
 
     virtual bool is_valid() const override{
-        return FossilTableOption::is_valid();
+        return FossilTableOptionBase::is_valid();
     }
     virtual void restore_defaults() override{
-        FossilTableOption::restore_defaults();
+        FossilTableOptionBase::restore_defaults();
     }
 
     virtual ConfigOptionUI* make_ui(QWidget& parent) override;
 };
 
 
-class FossilTableUI : public ConfigOptionUI, public FossilTableOptionUI{
+class FossilTableOptionUI : public ConfigOptionUI, public FossilTableOptionBaseUI{
 public:
-    FossilTableUI(QWidget& parent, FossilTable& value)
-        : FossilTableOptionUI(parent, value)
+    FossilTableOptionUI(QWidget& parent, FossilTableOption& value)
+        : FossilTableOptionBaseUI(parent, value)
     {}
     virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override{
-        FossilTableOptionUI::restore_defaults();
+        FossilTableOptionBaseUI::restore_defaults();
     }
 };
 
-inline ConfigOptionUI* FossilTable::make_ui(QWidget& parent){
-    return new FossilTableUI(parent, *this);
+inline ConfigOptionUI* FossilTableOption::make_ui(QWidget& parent){
+    return new FossilTableOptionUI(parent, *this);
 }
 
 

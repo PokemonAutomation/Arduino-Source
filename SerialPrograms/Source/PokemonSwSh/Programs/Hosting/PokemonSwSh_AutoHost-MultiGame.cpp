@@ -5,13 +5,14 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Qt/ExpressionEvaluator.h"
 #include "Common/SwitchFramework/FrameworkSettings.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/SwitchRoutines/SwitchDigitEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
 #include "Common/PokemonSwSh/PokemonSwShAutoHosts.h"
-#include "Common/Qt/ExpressionEvaluator.h"
+#include "CommonFramework/Tools/ProgramNotifications.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
 #include "PokemonSwSh_DenTools.h"
@@ -48,6 +49,7 @@ AutoHostMultiGame::AutoHostMultiGame(const AutoHostMultiGame_Descriptor& descrip
         "<b>Forward Friend Accept:</b><br>Accept FRs this many raids in the future.",
         1
     )
+    , NOTIFICATIONS("Discord Notifications")
     , m_internet_settings(
         "<font size=4><b>Internet Settings:</b> Increase these if your internet is slow.</font>"
     )
@@ -80,6 +82,10 @@ AutoHostMultiGame::AutoHostMultiGame(const AutoHostMultiGame_Descriptor& descrip
     PA_ADD_OPTION(LOBBY_WAIT_DELAY);
     PA_ADD_OPTION(GAME_LIST);
     PA_ADD_OPTION(FR_FORWARD_ACCEPT);
+    if (PERSISTENT_SETTINGS().developer_mode){
+        PA_ADD_OPTION(NOTIFICATIONS);
+    }
+
     PA_ADD_OPTION(m_internet_settings);
     PA_ADD_OPTION(CONNECT_TO_INTERNET_DELAY);
     PA_ADD_OPTION(ENTER_ONLINE_DEN_DELAY);
@@ -96,7 +102,7 @@ std::unique_ptr<StatsTracker> AutoHostMultiGame::make_stats() const{
 
 void AutoHostMultiGame::run_autohost(
     SingleSwitchProgramEnvironment& env,
-    const MultiHostTable::GameSlot& game,
+    const MultiHostTableOption::GameSlot& game,
     uint8_t accept_FR_slot,
     uint16_t lobby_wait_delay,
     Catchability catchability
@@ -108,20 +114,36 @@ void AutoHostMultiGame::run_autohost(
     if (HOST_ONLINE){
         connect_to_internet(env.console, OPEN_YCOMM_DELAY, CONNECT_TO_INTERNET_DELAY);
     }
-    enter_den(env.console, ENTER_ONLINE_DEN_DELAY, game.skips != 0, HOST_ONLINE);
 
-    uint8_t code[8];
-    if (RAID_CODE.get_code(code)){
-        char str[8];
-        for (size_t c = 0; c < 8; c++){
-            str[c] = code[c] + '0';
+    env.console.botbase().wait_for_all_requests();
+    {
+        DenMonReader reader(env.console, env.console);
+        enter_den(env.console, ENTER_ONLINE_DEN_DELAY, game.skips != 0, HOST_ONLINE);
+
+        uint8_t code[8];
+        bool has_code = RAID_CODE.get_code(code);
+        if (has_code){
+            char str[8];
+            for (size_t c = 0; c < 8; c++){
+                str[c] = code[c] + '0';
+            }
+            env.log("Next Raid Code: " + std::string(str, sizeof(str)));
+            pbf_press_button(env.console, BUTTON_PLUS, 5, 145);
+            enter_digits(env.console, 8, code);
+            pbf_wait(env.console, 180);
+            pbf_press_button(env.console, BUTTON_A, 5, 95);
         }
-        env.log("Next Raid Code: " + std::string(str, sizeof(str)));
-        pbf_press_button(env.console, BUTTON_PLUS, 5, 145);
-        enter_digits(env.console, 8, code);
-        pbf_wait(env.console, 180);
-        pbf_press_button(env.console, BUTTON_A, 5, 95);
+        env.console.botbase().wait_for_all_requests();
+
+        send_raid_notification(
+            descriptor().display_name(),
+            env.console,
+            NOTIFICATIONS,
+            has_code, code,
+            reader, stats
+        );
     }
+
     enter_lobby(env.console, OPEN_ONLINE_DEN_LOBBY_DELAY, HOST_ONLINE, catchability);
 
     //  Accept friend requests while we wait.
@@ -143,7 +165,7 @@ void AutoHostMultiGame::run_autohost(
             pbf_mash_button(env.console, BUTTON_A, 3 * TICKS_PER_SECOND);
             env.console.botbase().wait_for_all_requests();
 
-            BlackScreenDetector black_screen(env.console);
+            BlackScreenDetector black_screen;
             uint32_t now = start;
             while (true){
                 if (black_screen.black_is_over(env.console.video().snapshot())){
@@ -191,7 +213,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env){
     //  Scan den list for any rolling dens.
     bool enable_touch = true;
     for (uint8_t index = 0; index < GAME_LIST.size(); index++){
-        const MultiHostTable::GameSlot& game = GAME_LIST[index];
+        const MultiHostTableOption::GameSlot& game = GAME_LIST[index];
 //        if (game.user_slot == 0){
 //            break;
 //        }
@@ -221,7 +243,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env){
         for (uint8_t index = 0; index < GAME_LIST.size(); index++){
             env.update_stats();
 
-            const MultiHostTable::GameSlot& game = GAME_LIST[index];
+            const MultiHostTableOption::GameSlot& game = GAME_LIST[index];
 //            if (game.user_slot == 0){
 //                break;
 //            }
@@ -269,7 +291,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env){
             }
 
             //  Run auto-host.
-            const MultiHostTable::GameSlot& fr_game = GAME_LIST[FR_index];
+            const MultiHostTableOption::GameSlot& fr_game = GAME_LIST[FR_index];
             run_autohost(
                 env,
                 game,

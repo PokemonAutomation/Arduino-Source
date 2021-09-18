@@ -8,9 +8,9 @@
 #define PokemonAutomation_PokemonSwSh_SurpriseTrade_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/SimpleInteger.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -35,13 +35,13 @@ private:
     void trade_slot(const BotBaseContext& context, uint8_t slot, bool next_box) const;
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
 
-    SimpleInteger<uint8_t> BOXES_TO_TRADE;
-    TimeExpression<uint16_t> INITIAL_WAIT;
-    SectionDivider m_advanced_options;
-    TimeExpression<uint16_t> TRADE_ANIMATION;
-    TimeExpression<uint16_t> EVOLVE_DELAY;
+    SimpleIntegerOption<uint8_t> BOXES_TO_TRADE;
+    TimeExpressionOption<uint16_t> INITIAL_WAIT;
+    SectionDividerOption m_advanced_options;
+    TimeExpressionOption<uint16_t> TRADE_ANIMATION;
+    TimeExpressionOption<uint16_t> EVOLVE_DELAY;
 };
 
 

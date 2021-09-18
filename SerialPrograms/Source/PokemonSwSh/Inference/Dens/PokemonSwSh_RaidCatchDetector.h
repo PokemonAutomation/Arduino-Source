@@ -16,9 +16,9 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class RaidCatchDetector : public VisualInferenceCallbackWithCommandStop{
+class RaidCatchDetector : public VisualInferenceCallback{
 public:
-    RaidCatchDetector(VideoOverlay& overlay);
+    RaidCatchDetector();
 
     bool detect(const QImage& screen);
     bool wait(
@@ -27,7 +27,7 @@ public:
         std::chrono::milliseconds timeout
     );
 
-    virtual bool on_frame(
+    virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
     ) override final;
@@ -38,12 +38,12 @@ private:
 
 
 private:
-    InferenceBoxScope m_left0;
-    InferenceBoxScope m_right0;
-    InferenceBoxScope m_left1;
-    InferenceBoxScope m_right1;
-    InferenceBoxScope m_text0;
-    InferenceBoxScope m_text1;
+    ImageFloatBox m_left0;
+    ImageFloatBox m_right0;
+    ImageFloatBox m_left1;
+    ImageFloatBox m_right1;
+    ImageFloatBox m_text0;
+    ImageFloatBox m_text1;
     std::chrono::time_point<std::chrono::system_clock> m_start_time;
 };
 

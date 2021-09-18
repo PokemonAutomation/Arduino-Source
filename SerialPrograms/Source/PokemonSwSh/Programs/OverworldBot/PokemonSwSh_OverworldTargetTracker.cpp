@@ -40,9 +40,10 @@ OverworldTargetTracker::OverworldTargetTracker(
     , m_mark_offset(mark_offset)
     , m_mark_priority(mark_priority)
     , m_max_alpha(max_alpha)
-    , m_search_area(overlay, 0.0, 0.2, 1.0, 0.8)
+    , m_search_area(0.0, 0.2, 1.0, 0.8)
     , m_stop_on_target(false)
 {
+    add_box(m_search_area);
     m_best_target.first = -1;
 }
 
@@ -52,6 +53,7 @@ void OverworldTargetTracker::set_stop_on_target(bool stop){
 void OverworldTargetTracker::clear_detections(){
     SpinLockGuard lg(m_lock, "OverworldTargetTracker::clear_detections()");
     m_best_target.first = -1;
+    m_detection_boxes.clear();
     m_exclamations.clear();
     m_questions.clear();
 }
@@ -143,7 +145,7 @@ bool OverworldTargetTracker::save_target(std::multimap<double, OverworldTarget>:
 //    return target->first <= m_max_alpha;
 }
 
-bool OverworldTargetTracker::on_frame(
+bool OverworldTargetTracker::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){

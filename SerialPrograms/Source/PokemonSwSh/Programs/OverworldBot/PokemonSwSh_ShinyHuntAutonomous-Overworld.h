@@ -8,16 +8,17 @@
 #define PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousOverworld_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/BooleanCheckBox.h"
-#include "CommonFramework/Options/SimpleInteger.h"
-#include "CommonFramework/Options/FloatingPoint.h"
-#include "CommonFramework/Options/EnumDropdown.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
-#include "NintendoSwitch/Options/GoHomeWhenDone.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Options/FloatingPointOption.h"
+#include "CommonFramework/Options/EnumDropdownOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
+#include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h"
+#include "PokemonSwSh_OverworldTargetTracker.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -48,26 +49,30 @@ private:
         std::chrono::system_clock::time_point expiration
     ) const;
 
+    bool charge_at_target(
+        ProgramEnvironment& env, ConsoleHandle& console,
+        const std::pair<double, OverworldTarget>& target
+    ) const;
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
-    GoHomeWhenDone GO_HOME_WHEN_DONE;
-    SimpleInteger<uint8_t> TIME_ROLLBACK_HOURS;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+    SimpleIntegerOption<uint8_t> TIME_ROLLBACK_HOURS;
 
-    Pokemon::EncounterBotLanguage LANGUAGE;
+    EncounterBotLanguage LANGUAGE;
 
-    FloatingPoint MARK_OFFSET;
-    EnumDropdown MARK_PRIORITY;
-    EnumDropdown TRIGGER_METHOD;
-    TimeExpression<uint16_t> MAX_MOVE_DURATION;
-    FloatingPoint MAX_TARGET_ALPHA;
+    FloatingPointOption MARK_OFFSET;
+    EnumDropdownOption MARK_PRIORITY;
+    EnumDropdownOption TRIGGER_METHOD;
+    TimeExpressionOption<uint16_t> MAX_MOVE_DURATION;
+    FloatingPointOption MAX_TARGET_ALPHA;
 
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
 
-    SectionDivider m_advanced_options;
-    TimeExpression<uint16_t> WATCHDOG_TIMER;
-    TimeExpression<uint16_t> EXIT_BATTLE_TIMEOUT;
-    BooleanCheckBox TARGET_CIRCLING;
+    SectionDividerOption m_advanced_options;
+    TimeExpressionOption<uint16_t> WATCHDOG_TIMER;
+    TimeExpressionOption<uint16_t> EXIT_BATTLE_TIMEOUT;
+    BooleanCheckBoxOption TARGET_CIRCLING;
 };
 
 

@@ -11,6 +11,7 @@
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
 #include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_RaidCatchDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
@@ -78,17 +79,23 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegigigas2::make_stats() const{
 
 
 bool ShinyHuntAutonomousRegigigas2::kill_and_return(SingleSwitchProgramEnvironment& env) const{
-    RaidCatchDetector detector(env.console);
     pbf_mash_button(env.console, BUTTON_A, 4 * TICKS_PER_SECOND);
 
-    if (!detector.wait(env, env.console, std::chrono::seconds(30))){
+    RaidCatchDetector detector;
+    int result = wait_until(
+        env, env.console,
+        std::chrono::seconds(30),
+        { &detector }
+    );
+    switch (result){
+    case 0:
+        pbf_press_dpad(env.console, DPAD_DOWN, 10, 0);
+        pbf_press_button(env.console, BUTTON_A, 10, CATCH_TO_OVERWORLD_DELAY);
+        return true;
+    default:
         env.log("Raid Catch Menu not found.", Qt::red);
         return false;
     }
-
-    pbf_press_dpad(env.console, DPAD_DOWN, 10, 0);
-    pbf_press_button(env.console, BUTTON_A, 10, CATCH_TO_OVERWORLD_DELAY);
-    return true;
 }
 void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env){
     if (START_IN_GRIP_MENU){
@@ -118,15 +125,18 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env)
             pbf_mash_button(env.console, BUTTON_A, 18 * TICKS_PER_SECOND);
             env.console.botbase().wait_for_all_requests();
 
-            if (!wait_for_start_battle(
-                    env,
-                    env.console,
-                    env.console,
-                    std::chrono::seconds(30)
-            )){
-                stats.add_error();
-                env.update_stats();
-                break;
+            {
+                StartBattleDetector detector(env.console);
+                int result = wait_until(
+                    env, env.console,
+                    std::chrono::seconds(30),
+                    { &detector }
+                );
+                if (result < 0){
+                    stats.add_error();
+                    env.update_stats();
+                    break;
+                }
             }
 
             ShinyDetectionResult result = detect_shiny_battle(

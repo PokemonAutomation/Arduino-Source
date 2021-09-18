@@ -19,22 +19,21 @@ using std::endl;
 
 namespace PokemonAutomation{
 
-BlackScreenDetector::BlackScreenDetector(
-    VideoOverlay& overlay
-)
-    : m_box(overlay, 0.1, 0.1, 0.8, 0.8)
+BlackScreenDetector::BlackScreenDetector()
+    : m_box(0.1, 0.1, 0.8, 0.8)
     , m_has_been_black(false)
-{}
-BlackScreenDetector::BlackScreenDetector(
-    VideoOverlay& overlay,
-    const ImageFloatBox& box
-)
-    : m_box(overlay, box)
+{
+    add_box(m_box);
+}
+BlackScreenDetector::BlackScreenDetector(const ImageFloatBox& box)
+    : m_box(box)
     , m_has_been_black(false)
-{}
+{
+    add_box(m_box);
+}
 
 
-bool BlackScreenDetector::on_frame(
+bool BlackScreenDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){

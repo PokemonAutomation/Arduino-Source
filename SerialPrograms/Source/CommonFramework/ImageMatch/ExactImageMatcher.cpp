@@ -9,14 +9,35 @@
 #include "ImageDiff.h"
 #include "ExactImageMatcher.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace ImageMatch{
 
 
 
-//ExactImageMatcher::ExactImageMatcher(size_t width, size_t height)
-//    : m_dimensions(width, height)
-//{}
+
+std::vector<QImage> make_image_set(
+    const QImage& screen,
+    const ImageFloatBox& box,
+    const QSize& dimensions,
+    size_t tolerance
+){
+    std::vector<QImage> ret;
+    int limit = (int)tolerance;
+    for (int y = -limit; y <= limit; y++){
+        for (int x = -limit; x <= limit; x++){
+            ret.emplace_back(extract_box(screen, box, x, y).scaled(dimensions));
+//            if (x == 0 && y == 0){
+//                ret.back().save("image.png");
+//            }
+        }
+    }
+    return ret;
+}
+
 
 void ExactImageMatcher::add(const std::string& slug, QImage image){
     if (image.isNull()){
@@ -36,13 +57,7 @@ void ExactImageMatcher::add(const std::string& slug, QImage image){
         PA_THROW_StringException("Duplicate slug: " + slug);
     }
 
-    Sprite sprite;
-    sprite.average_pixel = pixel_average(image, image);
-    sprite.sprite = std::move(image);
-    m_database.emplace(
-        slug,
-        std::move(sprite)
-    );
+    m_database.emplace(slug, std::move(image));
 }
 
 
@@ -55,72 +70,84 @@ void ExactImageMatcher::scale_to_dimensions(QImage& image) const{
 
 
 double ExactImageMatcher::compare(
-    const QImage& sprite, const FloatPixel& sprite_brightness,
-    const QImage& image, const ImageFloatBox& box,
-    bool use_alpha_mask,
-    int offset_x, int offset_y
-) const{
-    QImage processed = extract_box(image, box, offset_x, offset_y);
-    scale_to_dimensions(processed);
-    FloatPixel image_brightness = pixel_average(processed, sprite);
-    FloatPixel scale = sprite_brightness / image_brightness;
-//        cout << "image  = " << image_brightness << endl;
-//        cout << "sprite = " << item.second.average_pixel << endl;
+    const ExactMatchMetadata& sprite,
+    QImage image, bool use_alpha_mask
+){
+    if (use_alpha_mask){
+        return sprite.rmsd_ratio_masked_with(image);
+    }else{
+        return sprite.rmsd_ratio_with(image);
+    }
+
+#if 0
+    FloatPixel image_brightness = pixel_average(image, sprite.m_image);
+    FloatPixel scale = sprite.m_average_pixel / image_brightness;
     if (std::isnan(scale.r)) scale.r = 1.0;
     if (std::isnan(scale.g)) scale.g = 1.0;
     if (std::isnan(scale.b)) scale.b = 1.0;
-    scale.bound(0.5, 2.0);
+//    scale.bound(0.5, 2.0);
+    scale.bound(0.8, 1.2);
 
-    scale_brightness(processed, scale);
-    return use_alpha_mask
-        ? pixel_RMSD_masked(sprite, processed)
-        : pixel_RMSD(sprite, processed);
+    scale_brightness(image, scale);
+    double ret = use_alpha_mask
+        ? pixel_RMSD_masked(sprite.m_image, image)
+        : pixel_RMSD(sprite.m_image, image);
+//    cout << ret << endl;
+
+#if 0
+    if (ret < 103){
+        cout << pixel_max_possible_RMSD(sprite) << endl;
+//        cout << sprite_brightness << endl;
+        image_diff_greyscale(sprite, image).save("diff.png");
+        image.save("test.png");
+    }
+#endif
+
+//    return ret;
+    return ret / sprite.m_max_possible_RMSD;
+#endif
 }
 double ExactImageMatcher::compare(
-    const QImage& sprite, const FloatPixel& sprite_brightness,
-    const QImage& image, const ImageFloatBox& box,
-    bool use_alpha_mask,
-    int tolerance
-) const{
+    const ExactMatchMetadata& sprite,
+    const std::vector<QImage>& images, bool use_alpha_mask
+){
     double best = 1000;
-    for (int x = -tolerance; x <= tolerance; x++){
-        for (int y = -tolerance; y <= tolerance; y++){
-            best = std::min(best, compare(sprite, sprite_brightness, image, box, use_alpha_mask, x, y));
-        }
+    for (const QImage& image : images){
+        best = std::min(best, compare(sprite, image, use_alpha_mask));
     }
+//    cout << best << endl;
     return best;
 }
+
 MatchResult ExactImageMatcher::match(
     const QImage& screen, const ImageFloatBox& box,
     bool use_alpha_mask,
-    int tolerance,
-    double RMSD_spread
+    size_t tolerance,
+    double RMSD_ratio_spread
 ) const{
     if (screen.isNull()){
         return MatchResult();
     }
 
-    const QImage& formatted = screen.format() == QImage::Format_RGB32 || screen.format() == QImage::Format_ARGB32
-        ? screen
-        : screen.convertToFormat(QImage::Format_RGB32);
+    std::vector<QImage> image_set = make_image_set(screen, box, m_dimensions, tolerance);
 
     std::multimap<double, std::string> slugs;
 
     for (const auto& item : m_database){
+//        if (item.first != "butterfree"){
+//            continue;
+//        }
         slugs.emplace(
             compare(
-                item.second.sprite,
-                item.second.average_pixel,
-                formatted, box,
-                use_alpha_mask,
-                tolerance
+                item.second,
+                image_set, use_alpha_mask
             ),
             item.first
         );
         while (slugs.size() > 1){
             auto best = slugs.begin();
             auto back = slugs.rbegin();
-            if (back->first <= best->first + RMSD_spread){
+            if (back->first <= best->first + RMSD_ratio_spread){
                 break;
             }
             slugs.erase(back->first);

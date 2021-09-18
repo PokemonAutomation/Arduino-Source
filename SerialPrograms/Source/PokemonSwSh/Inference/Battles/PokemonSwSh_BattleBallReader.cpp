@@ -36,7 +36,7 @@ BattleBallReader::BattleBallReader(
     Language language
 )
     : m_matcher(BALL_SPRITE_MATCHER())
-    , m_name_reader(Pokemon::PokeballNameReader::instance())
+    , m_name_reader(PokeballNameReader::instance())
     , m_language(language)
     , m_console(console)
     , m_box_sprite(console, 0.649, 0.624, 0.0335, 0.060)
@@ -58,10 +58,10 @@ std::string BattleBallReader::read_ball(const QImage& screen) const{
 //        cropped.save("scaled.png");
         sprite_result = m_matcher.match(cropped, false, 15);
 #else
-        sprite_result = m_matcher.match(screen, m_box_sprite, false, 2, 15);
+        sprite_result = m_matcher.match(screen, m_box_sprite, false, 2, 0.02);
 #endif
-        sprite_result.log(m_console, 100);
-        if (!sprite_result.slugs.empty() && sprite_result.slugs.begin()->first > 100){
+        sprite_result.log(m_console, 0.30);
+        if (!sprite_result.slugs.empty() && sprite_result.slugs.begin()->first > 0.30){
             sprite_result.slugs.clear();
         }
     }

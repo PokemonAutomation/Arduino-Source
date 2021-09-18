@@ -7,7 +7,9 @@
 #ifndef PokemonAutomation_CommonFramework_VisualInferenceCallback_H
 #define PokemonAutomation_CommonFramework_VisualInferenceCallback_H
 
+#include <deque>
 #include <QImage>
+#include "CommonFramework/Tools/VideoFeed.h"
 
 namespace PokemonAutomation{
 
@@ -21,10 +23,26 @@ public:
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
     ) = 0;
+
+public:
+    void make_overlays(std::deque<InferenceBoxScope>& boxes, VideoOverlay& overlay){
+        for (const auto& item : m_boxes){
+            boxes.emplace_back(overlay, *item.first, item.second);
+        }
+    }
+
+protected:
+    void add_box(const ImageFloatBox& box, QColor color = Qt::red){
+        m_boxes.emplace_back(&box, color);
+    }
+
+private:
+    std::vector<std::pair<const ImageFloatBox*, QColor>> m_boxes;
 };
 
 
 
+#if 0
 class VisualInferenceCallbackWithCommandStop : public VisualInferenceCallback{
 public:
     VisualInferenceCallbackWithCommandStop();
@@ -50,6 +68,9 @@ private:
     std::atomic<bool> m_triggered;
     std::vector<InterruptableCommandSession*> m_command_stops;
 };
+#endif
+
+
 
 
 

@@ -5,7 +5,11 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/SwitchFramework/FrameworkSettings.h"
 #include "Common/SwitchFramework/Switch_PushButtons.h"
+#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
+#include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
+#include "NintendoSwitch/FixedInterval.h"
 #include "PokemonSwSh/Programs/Hosting/PokemonSwSh_DenTools.h"
 #include "PokemonSwSh_RaidItemFarmerOKHO.h"
 

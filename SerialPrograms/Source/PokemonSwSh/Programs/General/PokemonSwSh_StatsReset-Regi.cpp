@@ -10,8 +10,8 @@
 #include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "CommonFramework/Inference/VisualInferenceSession.h"
-#include "CommonFramework/Tools/DiscordWebHook.h"
+#include "CommonFramework/Inference/VisualInferenceRoutines.h"
+#include "CommonFramework/Tools/ProgramNotifications.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_BasicCatcher.h"
@@ -119,22 +119,18 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env){
             env.log("Talk to regi.", "purple");
             env.console.botbase().wait_for_all_requests();
             {
-                InterruptableCommandSession commands(env.console);
-
-                StandardBattleMenuDetector fight_detector(env.console, false);
-                fight_detector.register_command_stop(commands);
-
-                AsyncVisualInferenceSession inference(env, env.console);
-                inference += fight_detector;
-
-                commands.run([=](const BotBaseContext& context){
-                    while (true){
-                        pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
-                    }
-                    context->wait_for_all_requests();
-                });
-
-                if (fight_detector.triggered()){
+                StandardBattleMenuDetector fight_detector(false);
+                int result = run_until(
+                    env, env.console,
+                    [=](const BotBaseContext& context){
+                        while (true){
+                            pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
+                        }
+                        context->wait_for_all_requests();
+                    },
+                    { &fight_detector }
+                );
+                if (result == 0){
                     env.log("New fight detected, let's begin to throw balls.", "purple");
                     pbf_mash_button(env.console, BUTTON_B, 1 * TICKS_PER_SECOND);
                 }
@@ -156,6 +152,7 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env){
             case CatchResult::OUT_OF_BALLS:
                 stats.out_of_balls++;
                 break;
+            case CatchResult::CANNOT_THROW_BALL:
             case CatchResult::TIMEOUT:
                 stats.errors++;
                 break;
@@ -163,7 +160,13 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env){
             stats.total_balls_thrown += result.balls_used;
             env.update_stats();
             QString message = "Threw " + QString::number(result.balls_used) + " balls " + (regi_caught ? "and caught it" : "and did not caught it");
-            DiscordWebHook::send_message_old(false, message, stats.make_discord_stats());
+//            DiscordWebHook::send_message_old(false, message, stats.make_discord_stats());
+            send_program_status_notification(
+                env.logger(), false,
+                descriptor().display_name(),
+                message,
+                stats.to_str()
+            );
 
             if (!regi_caught){
                 pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
@@ -208,10 +211,16 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env){
         }
     }
 
-    DiscordWebHook::send_message_old(true, "Found a perfect match", stats.make_discord_stats());
+//    DiscordWebHook::send_message_old(true, "Found a perfect match", stats.make_discord_stats());
     stats.matches++;
     env.update_stats();
     env.log("Result Found!", Qt::blue);
+    send_program_finished_notification(
+        env.logger(), true,
+        descriptor().display_name(),
+        "Found a perfect match!",
+        stats.to_str()
+    );
 
     pbf_wait(env.console, 5 * TICKS_PER_SECOND);
 

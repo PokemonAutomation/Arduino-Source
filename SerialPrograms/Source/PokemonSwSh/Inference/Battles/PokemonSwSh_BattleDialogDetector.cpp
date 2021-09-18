@@ -22,15 +22,15 @@ BattleDialogDetector::BattleDialogDetector(VideoOverlay& overlay)
 
 bool BattleDialogDetector::detect(const QImage& screen) const{
     ImageStats bottom = image_stats(extract_box(screen, m_bottom));
-    if (!is_grey(bottom, 0, 200)){
+    if (!is_grey(bottom, 0, 200, 5)){
         return false;
     }
     ImageStats left = image_stats(extract_box(screen, m_left));
-    if (!is_grey(left, 0, 200)){
+    if (!is_grey(left, 0, 200, 5)){
         return false;
     }
     ImageStats right = image_stats(extract_box(screen, m_right));
-    if (!is_grey(right, 0, 200)){
+    if (!is_grey(right, 0, 200, 5)){
         return false;
     }
 

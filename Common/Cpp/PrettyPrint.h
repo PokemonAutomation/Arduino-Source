@@ -8,6 +8,7 @@
 #define PokemonAutomation_PrettyPrint_H
 
 #include <string>
+#include <set>
 
 namespace PokemonAutomation{
 
@@ -16,6 +17,8 @@ std::string tostr_fixed(double x, int precision);
 std::string ticks_to_time(uint64_t ticks);
 
 std::string now_to_filestring();
+
+std::string set_to_str(const std::set<std::string>& set);
 
 }
 #endif

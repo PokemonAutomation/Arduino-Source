@@ -10,6 +10,7 @@
 #include <QImage>
 #include "CommonFramework/ImageTools/FloatPixel.h"
 #include "ImageMatchResult.h"
+#include "ImageMatchMetadata.h"
 
 namespace PokemonAutomation{
 namespace ImageMatch{
@@ -22,7 +23,7 @@ public:
 
     void add(const std::string& slug, QImage image);
 
-    MatchResult match(QImage image, double RMSD_spread = 20) const;
+    MatchResult match(QImage image, double RMSD_ratio_spread = 0.03) const;
 
 
 protected:
@@ -32,13 +33,8 @@ protected:
 
 
 private:
-    struct Sprite{
-        QImage sprite;
-        FloatPixel average_pixel;
-    };
-
     bool m_use_background;
-    std::map<std::string, Sprite> m_database;
+    std::map<std::string, ExactMatchMetadata> m_database;
 };
 
 

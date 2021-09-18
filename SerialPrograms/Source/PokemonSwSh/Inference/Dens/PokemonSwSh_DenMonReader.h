@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_DenMonReader_H
 
 #include <string>
-#include "CommonFramework/Options/StringSelect.h"
+#include "CommonFramework/Options/StringSelectOption.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/ImageMatch/CroppedImageMatcher.h"
 
@@ -28,7 +28,7 @@ class DenMonReader{
 public:
     DenMonReader(Logger& logger, VideoOverlay& overlay);
 
-    DenMonReadResults read(const QImage& image, double max_RMSD = 50);
+    DenMonReadResults read(const QImage& image, double max_RMSD_ratio = 0.20) const;
 
 private:
     const ImageMatch::CroppedImageMatcher& m_matcher;
@@ -47,7 +47,7 @@ protected:
     std::vector<std::pair<QString, QIcon>> m_list;
 };
 
-class DenMonSelectOption : private DenMonSelectData, public StringSelect{
+class DenMonSelectOption : private DenMonSelectData, public StringSelectOption{
 public:
     DenMonSelectOption(QString label);
 

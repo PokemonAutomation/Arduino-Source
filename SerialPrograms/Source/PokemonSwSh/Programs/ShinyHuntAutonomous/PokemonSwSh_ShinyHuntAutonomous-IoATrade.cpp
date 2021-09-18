@@ -130,7 +130,7 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env){
                 m_descriptor.display_name(),
                 nullptr,
                 ShinyDetectionResult{ShinyType::NOT_SHINY, QImage()},
-                EncounterBotScreenshot::NO_SCREENSHOT,
+                ScreenshotMode::NO_SCREENSHOT,
                 &stats
             );
             break;
@@ -141,7 +141,7 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env){
                 m_descriptor.display_name(),
                 nullptr,
                 ShinyDetectionResult{ShinyType::UNKNOWN_SHINY, QImage()},
-                EncounterBotScreenshot::NO_SCREENSHOT,
+                ScreenshotMode::NO_SCREENSHOT,
                 &stats
             );
             if (VIDEO_ON_SHINY){

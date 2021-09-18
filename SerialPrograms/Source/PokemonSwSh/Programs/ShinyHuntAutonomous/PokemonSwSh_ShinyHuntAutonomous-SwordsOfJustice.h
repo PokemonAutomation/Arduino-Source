@@ -8,11 +8,11 @@
 #define PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousSwordsOfJustice_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/BooleanCheckBox.h"
-#include "CommonFramework/Options/SimpleInteger.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
-#include "NintendoSwitch/Options/GoHomeWhenDone.h"
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
+#include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
@@ -38,19 +38,19 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
-    GoHomeWhenDone GO_HOME_WHEN_DONE;
-    TimeRollbackHours TIME_ROLLBACK_HOURS;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+    TimeRollbackHoursOption TIME_ROLLBACK_HOURS;
 
-    Pokemon::EncounterBotLanguage LANGUAGE;
+    EncounterBotLanguage LANGUAGE;
 
-    BooleanCheckBox AIRPLANE_MODE;
+    BooleanCheckBoxOption AIRPLANE_MODE;
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
 
-    SectionDivider m_advanced_options;
-    TimeExpression<uint16_t> EXIT_BATTLE_TIMEOUT;
-    TimeExpression<uint16_t> POST_BATTLE_MASH_TIME;
-    TimeExpression<uint16_t> ENTER_CAMP_DELAY;
+    SectionDividerOption m_advanced_options;
+    TimeExpressionOption<uint16_t> EXIT_BATTLE_TIMEOUT;
+    TimeExpressionOption<uint16_t> POST_BATTLE_MASH_TIME;
+    TimeExpressionOption<uint16_t> ENTER_CAMP_DELAY;
 };
 
 }

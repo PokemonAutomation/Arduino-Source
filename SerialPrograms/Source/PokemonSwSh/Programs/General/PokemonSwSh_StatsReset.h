@@ -7,10 +7,10 @@
 #ifndef PokemonAutomation_PokemonSwSh_StatsReset_H
 #define PokemonAutomation_PokemonSwSh_StatsReset_H
 
-#include "CommonFramework/Options/EnumDropdown.h"
+#include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/OCR/LanguageOptionOCR.h"
-#include "NintendoSwitch/Options/GoHomeWhenDone.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
 
@@ -37,13 +37,13 @@ private:
     struct Stats;
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
-    GoHomeWhenDone GO_HOME_WHEN_DONE;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     IVCheckerReader m_iv_checker_reader;
 
     OCR::LanguageOCR LANGUAGE;
-    EnumDropdown POKEMON;
+    EnumDropdownOption POKEMON;
     IVCheckerOption HP;
     IVCheckerOption ATTACK;
     IVCheckerOption DEFENSE;

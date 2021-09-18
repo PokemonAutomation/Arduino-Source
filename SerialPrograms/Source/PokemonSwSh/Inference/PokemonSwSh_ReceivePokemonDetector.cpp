@@ -17,17 +17,19 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-ReceivePokemonDetector::ReceivePokemonDetector(
-    VideoOverlay& overlay
-)
-    : m_box_top(overlay, 0.2, 0.02, 0.78, 0.02)
-    , m_box_top_right(overlay, 0.93, 0.02, 0.05, 0.1)
-    , m_box_bot_left(overlay, 0.02, 0.85, 0.1, 0.1)
+ReceivePokemonDetector::ReceivePokemonDetector()
+    : m_box_top(0.2, 0.02, 0.78, 0.02)
+    , m_box_top_right(0.93, 0.02, 0.05, 0.1)
+    , m_box_bot_left(0.02, 0.85, 0.1, 0.1)
     , m_has_been_orange(false)
-{}
+{
+    add_box(m_box_top);
+    add_box(m_box_top_right);
+    add_box(m_box_bot_left);
+}
 
 
-bool ReceivePokemonDetector::on_frame(
+bool ReceivePokemonDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){

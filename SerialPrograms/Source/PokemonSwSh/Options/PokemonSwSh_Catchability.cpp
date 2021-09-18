@@ -16,32 +16,32 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-CatchabilitySelector::CatchabilitySelector()
+CatchabilitySelectorOption::CatchabilitySelectorOption()
     : m_label("<b>" + STRING_POKEMON + " Catchability</b>")
     , m_default(Catchability::ALWAYS_CATCHABLE)
     , m_current(Catchability::ALWAYS_CATCHABLE)
 {}
-void CatchabilitySelector::load_json(const QJsonValue& json){
+void CatchabilitySelectorOption::load_json(const QJsonValue& json){
     size_t index = json.toInt((int)m_default);
     index = std::min(index, (size_t)2);
     m_current = (Catchability)index;
 }
-QJsonValue CatchabilitySelector::to_json() const{
+QJsonValue CatchabilitySelectorOption::to_json() const{
     return QJsonValue((int)m_current);
 }
 
-void CatchabilitySelector::restore_defaults(){
+void CatchabilitySelectorOption::restore_defaults(){
     m_current = m_default;
 };
 
-ConfigOptionUI* CatchabilitySelector::make_ui(QWidget& parent){
+ConfigOptionUI* CatchabilitySelectorOption::make_ui(QWidget& parent){
     return new CatchabilitySelectorUI(parent, *this);
 }
 
 
 
 
-CatchabilitySelectorUI::CatchabilitySelectorUI(QWidget& parent, CatchabilitySelector& value)
+CatchabilitySelectorUI::CatchabilitySelectorUI(QWidget& parent, CatchabilitySelectorOption& value)
     : QWidget(&parent)
     , m_value(value)
 {

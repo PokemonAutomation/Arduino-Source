@@ -4,9 +4,6 @@
  *
  */
 
-#include "CommonFramework/Options/BooleanCheckBox.h"
-#include "CommonFramework/Options/SimpleInteger.h"
-#include "CommonFramework/Options/String.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "GlobalSettingsPanel.h"
 
@@ -28,95 +25,51 @@ GlobalSettings_Descriptor::GlobalSettings_Descriptor()
 
 GlobalSettings::GlobalSettings(const GlobalSettings_Descriptor& descriptor)
     : SettingsPanelInstance(descriptor)
+    , STATS_FILE(
+        PERSISTENT_SETTINGS().stats_file,
+        "<b>Stats File:</b><br>Use the stats file here. Multiple instances of the program can use the same file.",
+        "PA-Stats.txt"
+    )
+    , WINDOW_WIDTH(
+        PERSISTENT_SETTINGS().window_width,
+        "<b>Window Size (Width):</b><br>"
+        "Set the width of the window. Restart application to take effect.<br>"
+        "Use this to easily set the window to a specific resolution for streaming alignment.<br>"
+        "Note that the actual resolution will be subject to your monitor's DPI scaling.",
+        1280
+    )
+    , WINDOW_HEIGHT(
+        PERSISTENT_SETTINGS().window_height,
+        "<b>Window Size (Height):</b><br>"
+        "Set the height of the window. Restart application to take effect.<br>"
+        "Use this to easily set the window to a specific resolution for streaming alignment.<br>"
+        "Note that the actual resolution will be subject to your monitor's DPI scaling.",
+        720
+    )
+    , LOG_EVERYTHING(
+        PERSISTENT_SETTINGS().log_everything,
+        "<b>Log Everything:</b><br>Log everything to the output window and output log. Will be very spammy.",
+        false
+    )
+    , SAVE_DEBUG_IMAGES(
+        PERSISTENT_SETTINGS().save_debug_images,
+        "<b>Save Debug Images:</b><br>"
+        "If the program fails to read something when it should succeed, save the image for debugging purposes.",
+        true
+    )
+    , DEVELOPER_TOKEN(
+        PERSISTENT_SETTINGS().developer_token,
+        "<b>Developer Token:</b><br>Restart application to take full effect after changing this.",
+        ""
+    )
 {
-    m_options.emplace_back(
-        "StatsFile",
-        new String(
-            PERSISTENT_SETTINGS().stats_file,
-            "<b>Stats File:</b><br>Use the stats file here. Multiple instances of the program can use the same file.",
-            "PA-Stats.txt"
-        )
-    );
-    m_options.emplace_back(
-        "Window Size (Width)",
-        new SimpleInteger<uint32_t>(
-            PERSISTENT_SETTINGS().window_width,
-            "<b>Window Size (Width):</b><br>"
-            "Set the width of the window. Restart application to take effect.<br>"
-            "Use this to easily set the window to a specific resolution for streaming alignment.<br>"
-            "Note that the actual resolution will be subject to your monitor's DPI scaling.",
-            1280
-        )
-    );
-    m_options.emplace_back(
-        "Window Size (height)",
-        new SimpleInteger<uint32_t>(
-            PERSISTENT_SETTINGS().window_height,
-            "<b>Window Size (Height):</b><br>"
-            "Set the height of the window. Restart application to take effect.<br>"
-            "Use this to easily set the window to a specific resolution for streaming alignment.<br>"
-            "Note that the actual resolution will be subject to your monitor's DPI scaling.",
-            720
-        )
-    );
-    m_options.emplace_back(
-        "LogEverything",
-        new BooleanCheckBox(
-            PERSISTENT_SETTINGS().log_everything,
-            "<b>Log Everything:</b><br>Log everything to the output window and output log. Will be very spammy.",
-            false
-        )
-    );
-    m_options.emplace_back(
-        "SaveDebugImages",
-        new BooleanCheckBox(
-            PERSISTENT_SETTINGS().save_debug_images,
-            "<b>Save Debug Images:</b><br>"
-            "If the program fails to read something when it should succeed, save the image for debugging purposes.",
-            true
-        )
-    );
-    m_options.emplace_back(
-        "DeveloperMode",
-        new BooleanCheckBox(
-            PERSISTENT_SETTINGS().developer_mode,
-            "<b>Developer Mode:</b><br>Enable developer options. Restart application to take full effect.",
-            false
-        )
-    );
-
-    m_options.emplace_back(
-        "INSTANCE_NAME",
-        new String(
-            PERSISTENT_SETTINGS().INSTANCE_NAME,
-            "<b>Instance Name:</b><br>If you are running multiple instances of this program, give it a name to distinguish them in notifications.",
-            ""
-        )
-    );
-    m_options.emplace_back(
-        "DISCORD_WEBHOOK_URL",
-        new String(
-            PERSISTENT_SETTINGS().DISCORD_WEBHOOK_URL,
-            "<b>Discord webhook URL:</b><br>Set this to your discord webhook URL. This is used to send notifications to your private server.",
-            ""
-        )
-    );
-    m_options.emplace_back(
-        "DISCORD_USER_ID",
-        new String(
-            PERSISTENT_SETTINGS().DISCORD_USER_ID,
-            "<b>Discord user ID:</b><br>Set this to your discord user ID to receive pings. Your ID is a number.",
-            ""
-        )
-    );
-    m_options.emplace_back(
-        "DISCORD_USER_SHORT_NAME",
-        new String(
-            PERSISTENT_SETTINGS().DISCORD_USER_SHORT_NAME,
-            "<b>Discord user short name:</b><br>Your short name is your visible ID. (\"Username#1234\") This is only for display purposes.",
-            ""
-        )
-        );
+    PA_ADD_OPTION(STATS_FILE);
+    PA_ADD_OPTION(WINDOW_WIDTH);
+    PA_ADD_OPTION(WINDOW_HEIGHT);
+    PA_ADD_OPTION(LOG_EVERYTHING);
+    PA_ADD_OPTION(SAVE_DEBUG_IMAGES);
+    add_option(PERSISTENT_SETTINGS().discord_settings, "DISCORD_SETTINGS");
+    PA_ADD_OPTION(DEVELOPER_TOKEN);
 }
 
 

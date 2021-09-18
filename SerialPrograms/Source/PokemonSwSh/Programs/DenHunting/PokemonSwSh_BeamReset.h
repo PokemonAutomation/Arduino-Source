@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_PokemonSwSh_BeamReset_H
 #define PokemonAutomation_PokemonSwSh_BeamReset_H
 
-#include "CommonFramework/Options/BooleanCheckBox.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -31,10 +31,10 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
 
-    TimeExpression<uint16_t> DELAY_BEFORE_RESET;
-    BooleanCheckBox EXTRA_LINE;
+    TimeExpressionOption<uint16_t> DELAY_BEFORE_RESET;
+    BooleanCheckBoxOption EXTRA_LINE;
 };
 
 

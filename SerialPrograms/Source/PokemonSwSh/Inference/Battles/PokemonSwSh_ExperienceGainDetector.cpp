@@ -26,9 +26,11 @@ ExperienceGainDetector::ExperienceGainDetector(VideoOverlay& overlay)
     for (size_t c = 0; c < 6; c++){
         m_rows.emplace_back(
             std::piecewise_construct,
-            std::forward_as_tuple(overlay, 0.255            , 0.04 + c*SHIFT_Y, 0.18 - c*SHIFT_X, 0.08),
-            std::forward_as_tuple(overlay, 0.475 - c*SHIFT_X, 0.04 + c*SHIFT_Y, 0.05            , 0.08)
+            std::forward_as_tuple(0.255            , 0.04 + c*SHIFT_Y, 0.18 - c*SHIFT_X, 0.08),
+            std::forward_as_tuple(0.475 - c*SHIFT_X, 0.04 + c*SHIFT_Y, 0.05            , 0.08)
         );
+        add_box(m_rows.back().first);
+        add_box(m_rows.back().second);
     }
 }
 
@@ -57,7 +59,7 @@ bool ExperienceGainDetector::detect(const QImage& screen) const{
     return true;
 }
 
-bool ExperienceGainDetector::on_frame(
+bool ExperienceGainDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){

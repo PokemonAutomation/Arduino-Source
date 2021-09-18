@@ -8,10 +8,10 @@
 #define PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousRegigigas2_H
 
 #include "CommonFramework/Options/SectionDivider.h"
-#include "CommonFramework/Options/SimpleInteger.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
-#include "NintendoSwitch/Options/GoHomeWhenDone.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
+#include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
@@ -40,15 +40,15 @@ private:
     bool kill_and_return(SingleSwitchProgramEnvironment& env) const;
 
 private:
-    StartInGripOrGame START_IN_GRIP_MENU;
-    GoHomeWhenDone GO_HOME_WHEN_DONE;
-    TouchDateInterval TOUCH_DATE_INTERVAL;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+    TouchDateIntervalOption TOUCH_DATE_INTERVAL;
 
-    SimpleInteger<uint8_t> REVERSAL_PP;
+    SimpleIntegerOption<uint8_t> REVERSAL_PP;
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
 
-    SectionDivider m_advanced_options;
-    TimeExpression<uint16_t> CATCH_TO_OVERWORLD_DELAY;
+    SectionDividerOption m_advanced_options;
+    TimeExpressionOption<uint16_t> CATCH_TO_OVERWORLD_DELAY;
 };
 
 }

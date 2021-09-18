@@ -7,10 +7,10 @@
 #ifndef PokemonAutomation_PokemonSwSh_CurryHunter_H
 #define PokemonAutomation_PokemonSwSh_CurryHunter_H
 
-#include "CommonFramework/Options/BooleanCheckBox.h"
-#include "CommonFramework/Options/SimpleInteger.h"
-#include "NintendoSwitch/Options/TimeExpression.h"
-#include "NintendoSwitch/Options/StartInGripMenu.h"
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -35,10 +35,10 @@ public:
 private:
     struct Stats;
 
-    StartInGripOrGame START_IN_GRIP_MENU;
-    TimeExpression<uint16_t> WALK_UP_DELAY;
-    BooleanCheckBox TAKE_VIDEO;
-    SimpleInteger<uint32_t> ITERATIONS;
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+    TimeExpressionOption<uint16_t> WALK_UP_DELAY;
+    BooleanCheckBoxOption TAKE_VIDEO;
+    SimpleIntegerOption<uint32_t> ITERATIONS;
 };
 
 

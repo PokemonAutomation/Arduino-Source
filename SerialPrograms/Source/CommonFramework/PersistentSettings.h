@@ -12,6 +12,7 @@
 #include <QString>
 #include <QJsonObject>
 //#include "Tools/StatsDatabase.h"
+#include "CommonFramework/Options/DiscordSettingsOption.h"
 
 namespace PokemonAutomation{
 
@@ -32,17 +33,19 @@ public:
     bool developer_mode;
     bool log_everything;
     bool save_debug_images;
+    QString developer_token;
 
     QString resource_path;
     QString training_data;
 
 public:
     //  Settings Panel
-    QString INSTANCE_NAME;
-
-    QString DISCORD_WEBHOOK_URL;
-    QString DISCORD_USER_ID;
-    QString DISCORD_USER_SHORT_NAME;
+    DiscordSettingsOption discord_settings;
+//    QString INSTANCE_NAME;
+//    bool PING_ONLY_FIRST_URL;
+//    QString DISCORD_WEBHOOK_URLS;
+//    QString DISCORD_USER_ID;
+//    QString DISCORD_MESSAGE;
 
 public:
     QJsonObject panels;

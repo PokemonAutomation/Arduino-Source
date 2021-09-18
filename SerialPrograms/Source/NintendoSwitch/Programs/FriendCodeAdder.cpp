@@ -33,6 +33,13 @@ FriendCodeAdder::FriendCodeAdder(const FriendCodeAdder_Descriptor& descriptor)
         "<b>User Slot:</b><br>Send friend requests for this profile.",
         1, 1, 8
     )
+    , FRIEND_CODES(
+        "<b>Friend Codes:</b> One per line only. Invalid characters are ignored.",
+        {
+            "SW-1234-5678-9012",
+            "123456789012",
+        }
+    )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -62,7 +69,7 @@ void FriendCodeAdder::program(SingleSwitchProgramEnvironment& env){
 
     bool first = true;
     for (const QString& line : FRIEND_CODES.lines()){
-        std::vector<uint8_t> code = FriendCodeList::parse(line);
+        std::vector<uint8_t> code = FriendCodeListOption::parse(line);
         if (code.size() != 12){
             continue;
         }

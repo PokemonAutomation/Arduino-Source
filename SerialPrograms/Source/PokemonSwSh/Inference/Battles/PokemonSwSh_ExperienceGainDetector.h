@@ -18,13 +18,13 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class ExperienceGainDetector : public VisualInferenceCallbackWithCommandStop{
+class ExperienceGainDetector : public VisualInferenceCallback{
 public:
     ExperienceGainDetector(VideoOverlay& overlay);
 
     bool detect(const QImage& screen) const;
 
-    virtual bool on_frame(
+    virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
     ) override final;
@@ -32,7 +32,7 @@ public:
 
 private:
     BattleDialogDetector m_dialog;
-    FixedLimitVector<std::pair<InferenceBoxScope, InferenceBoxScope>> m_rows;
+    FixedLimitVector<std::pair<ImageFloatBox, ImageFloatBox>> m_rows;
 };
 
 
