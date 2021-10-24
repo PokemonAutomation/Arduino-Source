@@ -40,19 +40,19 @@ public:
     size_t size() const{ return m_size; }
     size_t capacity() const{ return m_capacity; }
 
-          Object& operator[](size_t index)      { return m_data[index]; }
     const Object& operator[](size_t index) const{ return m_data[index]; }
-          Object& back()      { return m_data[m_size - 1]; }
+          Object& operator[](size_t index)      { return m_data[index]; }
     const Object& back() const{ return m_data[m_size - 1]; }
+          Object& back()      { return m_data[m_size - 1]; }
 
     template <class... Args>
     bool emplace_back(Args&&... args);
     void pop_back();
 
-    Object* begin();
     const Object* begin() const;
-    Object* end();
+          Object* begin();
     const Object* end() const;
+          Object* end();
 
 private:
     Object* m_data;
@@ -145,19 +145,19 @@ void FixedLimitVector<Object>::pop_back(){
 }
 
 template <typename Object>
-Object* FixedLimitVector<Object>::begin(){
-    return m_data;
-}
-template <typename Object>
 const Object* FixedLimitVector<Object>::begin() const{
     return m_data;
 }
 template <typename Object>
-Object* FixedLimitVector<Object>::end(){
-    return m_data + m_size;
+Object* FixedLimitVector<Object>::begin(){
+    return m_data;
 }
 template <typename Object>
 const Object* FixedLimitVector<Object>::end() const{
+    return m_data + m_size;
+}
+template <typename Object>
+Object* FixedLimitVector<Object>::end(){
     return m_data + m_size;
 }
 

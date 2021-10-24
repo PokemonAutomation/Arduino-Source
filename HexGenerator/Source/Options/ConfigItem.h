@@ -24,7 +24,9 @@ public:
     virtual ~ConfigItem() = default;
 
     virtual const QString& type() const = 0;
-    virtual bool is_valid() const{ return true; }
+
+    //  Returns error message if invalid. Otherwise returns empty string.
+    virtual QString check_validity() const{ return QString(); }
 
     virtual void restore_defaults(){}
 

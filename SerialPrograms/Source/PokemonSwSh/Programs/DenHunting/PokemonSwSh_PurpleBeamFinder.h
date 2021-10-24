@@ -10,6 +10,8 @@
 #include "CommonFramework/Options/SectionDivider.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/FloatingPointOption.h"
+#include "CommonFramework/Options/ScreenshotFormatOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
@@ -38,6 +40,10 @@ private:
 
     StartInGripOrGameOption START_IN_GRIP_MENU;
     BooleanCheckBoxOption EXTRA_LINE;
+
+    EventNotificationOption NOTIFICATION_RED_BEAM;
+    EventNotificationOption NOTIFICATION_PURPLE_BEAM;
+    EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;
     BooleanCheckBoxOption SAVE_SCREENSHOT;

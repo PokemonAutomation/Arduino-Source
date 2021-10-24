@@ -25,11 +25,16 @@ bool should_swap_with_professor(
     );
 
 
+#if 0
     double pc_least_hp = 1.0;
     int pc_player = -1;
 
     double npc_least_hp = 1.0;
     int npc_player = -1;
+#endif
+
+    double least_hp = 1.0;
+    int player = -1;
 
     for (int c = 0; c < 4; c++){
         double hp = state.players[c].health.value.hp;
@@ -37,6 +42,11 @@ bool should_swap_with_professor(
             continue;
         }
 
+        if (least_hp > hp){
+            least_hp = hp;
+            player = c;
+        }
+#if 0
         if (state.players[c].console_id < 0){
             //  NPC
             if (npc_least_hp > hp){
@@ -50,20 +60,28 @@ bool should_swap_with_professor(
                 pc_player = c;
             }
         }
+#endif
     }
+
+    return (int)player_index == player;
+
+#if 0
+    logger.log("Player with least HP: " + std::to_string(pc_player) + " (" + std::to_string(pc_least_hp * 100) + "%");
+    logger.log("NPC with least HP: " + std::to_string(npc_player) + " (" + std::to_string(npc_least_hp * 100) + "%");
 
     //  Player character should take it. Take it if you have the least HP.
     if (pc_player >= 0 && pc_least_hp < 0.5){
         return player_index == (size_t)pc_player;
     }
 
-    //  And NPC needs it. Don't take it and hope they do.
+    //  An NPC needs it. Don't take it and hope they do.
     if (npc_player >= 0 && npc_least_hp < 0.5){
         return false;
     }
 
     //  Nobody has less than 50%. Take it if you have the least HP.
     return player_index == (size_t)pc_player;
+#endif
 }
 
 

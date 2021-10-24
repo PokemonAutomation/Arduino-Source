@@ -6,12 +6,11 @@
 
 #include <QtGlobal>
 #include "Common/Cpp/Exception.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "Pokemon/Pokemon_Notification.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_BasicCatcher.h"
 #include "PokemonSwSh_EncounterHandler.h"
 
@@ -29,7 +28,7 @@ void run_away(
     ConsoleHandle& console,
     uint16_t exit_battle_time
 ){
-    BlackScreenDetector black_screen_detector;
+    BlackScreenOverDetector black_screen_detector;
     run_until(
         env, console,
         [=](const BotBaseContext& context){
@@ -38,7 +37,6 @@ void run_away(
             if (exit_battle_time > TICKS_PER_SECOND){
                 pbf_mash_button(context, BUTTON_B, exit_battle_time - TICKS_PER_SECOND);
             }
-            context.botbase().wait_for_all_requests();
         },
         { &black_screen_detector }
     );
@@ -52,7 +50,7 @@ StandardEncounterHandler::StandardEncounterHandler(
     ProgramEnvironment& env,
     ConsoleHandle& console,
     Language language,
-    const EncounterBotCommonSettings& settings,
+    EncounterBotCommonOptions& settings,
     ShinyHuntTracker& session_stats
 )
     : m_program_name(program_name)
@@ -61,7 +59,7 @@ StandardEncounterHandler::StandardEncounterHandler(
     , m_language(language)
     , m_settings(settings)
     , m_session_stats(session_stats)
-    , m_notification_sender(settings.notification_level)
+//    , m_notification_sender(settings.notification_level)
 {}
 
 
@@ -84,16 +82,18 @@ void StandardEncounterHandler::run_away_and_update_stats(
 
     update_frequencies(encounter);
 
-    m_notification_sender.send_notification(
+    send_encounter_notification(
         m_console,
+        m_settings.NOTIFICATION_NONSHINY,
+        m_settings.NOTIFICATION_SHINY,
         m_program_name,
         encounter.candidates(),
-        result, m_settings.shiny_screenshot,
+        result,
         &m_session_stats,
         &m_frequencies
     );
 
-    BlackScreenDetector black_screen_detector;
+    BlackScreenOverDetector black_screen_detector;
     run_until(
         m_env, m_console,
         [=](const BotBaseContext& context){
@@ -101,7 +101,6 @@ void StandardEncounterHandler::run_away_and_update_stats(
             if (exit_battle_time > TICKS_PER_SECOND){
                 pbf_mash_button(context, BUTTON_B, exit_battle_time - TICKS_PER_SECOND);
             }
-            context.botbase().wait_for_all_requests();
         },
         { &black_screen_detector }
     );
@@ -120,22 +119,24 @@ bool StandardEncounterHandler::handle_standard_encounter(const ShinyDetectionRes
     StandardEncounterDetection encounter(
         m_env, m_console,
         m_language,
-        m_settings.filter,
+        m_settings.FILTER,
         result.shiny_type
     );
 
     update_frequencies(encounter);
 
-    m_notification_sender.send_notification(
+    send_encounter_notification(
         m_console,
+        m_settings.NOTIFICATION_NONSHINY,
+        m_settings.NOTIFICATION_SHINY,
         m_program_name,
         encounter.candidates(),
-        result, m_settings.shiny_screenshot,
+        result,
         &m_session_stats,
         &m_frequencies
     );
 
-    if (m_settings.video_on_shiny && encounter.is_shiny()){
+    if (m_settings.VIDEO_ON_SHINY && encounter.is_shiny()){
         take_video(m_console);
     }
 
@@ -148,26 +149,18 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     m_session_stats += result.shiny_type;
     m_env.update_stats();
 
-#if 0
-    if (result.shiny_type == ShinyType::UNKNOWN){
-        pbf_mash_button(m_console, BUTTON_B, TICKS_PER_SECOND);
-        run_away(m_env, m_console, exit_battle_time);
-        return false;
-    }
-#endif
-
     StandardEncounterDetection encounter(
         m_env, m_console,
         m_language,
-        m_settings.filter,
+        m_settings.FILTER,
         result.shiny_type
     );
 
-    if (m_settings.video_on_shiny && encounter.is_shiny()){
+    if (m_settings.VIDEO_ON_SHINY && encounter.is_shiny()){
         take_video(m_console);
     }
 
-    std::pair<EncounterAction, std::string> action  = encounter.get_action();
+    std::pair<EncounterAction, std::string> action = encounter.get_action();
 
     //  Fast run-away sequence to save time.
     if (action.first == EncounterAction::RunAway){
@@ -176,11 +169,13 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     }
 
     update_frequencies(encounter);
-    m_notification_sender.send_notification(
+    send_encounter_notification(
         m_console,
+        m_settings.NOTIFICATION_NONSHINY,
+        m_settings.NOTIFICATION_SHINY,
         m_program_name,
         encounter.candidates(),
-        result, m_settings.shiny_screenshot,
+        result,
         &m_session_stats,
         &m_frequencies
     );
@@ -207,12 +202,13 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         }
         send_catch_notification(
             m_console,
+            m_settings.NOTIFICATION_CATCH_SUCCESS,
+            m_settings.NOTIFICATION_CATCH_FAILED,
             m_program_name,
             encounter.candidates(),
             action.second,
             results.balls_used,
-            results.result == CatchResult::POKEMON_CAUGHT,
-            result.shiny_type != ShinyType::NOT_SHINY
+            results.result == CatchResult::POKEMON_CAUGHT
         );
         return false;
     }
@@ -221,7 +217,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         switch (results.result){
         case CatchResult::POKEMON_CAUGHT:
             pbf_mash_button(m_console, BUTTON_B, 2 * TICKS_PER_SECOND);
-            pbf_press_button(m_console, BUTTON_X, 20, OVERWORLD_TO_MENU_DELAY); //  Save game.
+            pbf_press_button(m_console, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY); //  Save game.
             pbf_press_button(m_console, BUTTON_R, 20, 150);
             pbf_press_button(m_console, BUTTON_A, 10, 500);
             break;
@@ -239,12 +235,13 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         }
         send_catch_notification(
             m_console,
+            m_settings.NOTIFICATION_CATCH_SUCCESS,
+            m_settings.NOTIFICATION_CATCH_FAILED,
             m_program_name,
             encounter.candidates(),
             action.second,
             results.balls_used,
-            results.result == CatchResult::POKEMON_CAUGHT,
-            result.shiny_type != ShinyType::NOT_SHINY
+            results.result == CatchResult::POKEMON_CAUGHT
         );
         return false;
     }

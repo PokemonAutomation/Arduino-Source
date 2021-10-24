@@ -34,7 +34,8 @@ private:
     ImageFloatBox m_pink0;
     ImageFloatBox m_pink1;
     ImageFloatBox m_pink2;
-    ImageFloatBox m_white;
+    ImageFloatBox m_white0;
+    ImageFloatBox m_white1;
 //    ImageFloatBox m_bottom;
 //    ImageFloatBox m_box0;
 //    ImageFloatBox m_box1;

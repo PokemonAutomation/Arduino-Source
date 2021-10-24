@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "ClothingBuyer",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-ClothingBuyer",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/ClothingBuyer.md",
     "2-Description": "Buy out all the clothing in a store.",
     "3-Parameters": [
         {

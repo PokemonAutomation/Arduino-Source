@@ -17,7 +17,7 @@ public:
     Program_JsonFile(QString category, const QString& filepath);
     Program_JsonFile(QString category, const QJsonObject& obj);
 
-    virtual bool is_valid() const override;
+    virtual QString check_validity() const override;
     virtual void restore_defaults() override;
 
     virtual QJsonArray parameters_json() const override;

@@ -10,7 +10,7 @@
 #include <string>
 #include "CommonFramework/Options/StringSelectOption.h"
 #include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/ImageMatch/CroppedImageMatcher.h"
+#include "CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -18,22 +18,36 @@ namespace PokemonSwSh{
 
 
 struct DenMonReadResults{
-    //  TODO: Red vs. Purple
+    enum DenType{
+        NOT_DETECTED,
+        RED_BEAM,
+        PURPLE_BEAM,
+        MAX_LAIR,
+    };
+
     //  TODO: Star count.
     //  TODO: Types
-    ImageMatch::MatchResult slugs;
+    DenType type = NOT_DETECTED;
+    ImageMatch::ImageMatchResult slugs;
+
 };
 
 class DenMonReader{
+    static constexpr double MAX_ALPHA = 100;
+    static constexpr double ALPHA_SPREAD = 20;
+
 public:
     DenMonReader(Logger& logger, VideoOverlay& overlay);
 
-    DenMonReadResults read(const QImage& image, double max_RMSD_ratio = 0.20) const;
+    DenMonReadResults read(const QImage& screen) const;
 
 private:
-    const ImageMatch::CroppedImageMatcher& m_matcher;
+    const ImageMatch::SilhouetteDictionaryMatcher& m_matcher;
     Logger& m_logger;
-    InferenceBoxScope m_box;
+    InferenceBoxScope m_white;
+    InferenceBoxScope m_den_color;
+    InferenceBoxScope m_lair_pink;
+    InferenceBoxScope m_sprite;
 };
 
 

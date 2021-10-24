@@ -8,7 +8,7 @@
 #include <QtGlobal>
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
-#include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/Globals.h"
 #include "StringNormalization.h"
 
 namespace PokemonAutomation{
@@ -80,7 +80,7 @@ bool strip_leading_trailing_non_alphanumeric(QString& text){
 
 std::map<QChar, QString> make_substitution_map(){
     QJsonObject obj = read_json_file(
-        PERSISTENT_SETTINGS().resource_path + "Tesseract/CharacterReductions.json"
+        RESOURCE_PATH() + "Tesseract/CharacterReductions.json"
     ).object();
 
     std::map<QChar, QString> map;

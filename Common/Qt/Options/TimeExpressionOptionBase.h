@@ -2,6 +2,8 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *      This option is thread-safe.
+ *
  */
 
 #ifndef PokemonAutomation_TimeExpressionOptionBase_H
@@ -9,57 +11,54 @@
 
 #include <QJsonValue>
 #include <QLineEdit>
+#include "Common/Cpp/SpinLock.h"
 
 namespace PokemonAutomation{
+namespace NintendoSwitch{
 
 
 template <typename Type>
 class TimeExpressionOptionBase{
 public:
     TimeExpressionOptionBase(
-        Type& backing,
         QString label,
         Type min_value,
         Type max_value,
         QString default_value
     );
-    TimeExpressionOptionBase(
-        QString label,
-        Type min_value,
-        Type max_value,
-        QString default_value
-    );
+
+    const QString& label() const{ return m_label; }
+
+    operator Type() const;
+    Type get() const;
+    QString set(QString text);
+
+    QString text() const;
+    QString time_string() const;
 
     void load_default(const QJsonValue& json);
     void load_current(const QJsonValue& json);
     QJsonValue write_default() const;
     QJsonValue write_current() const;
 
-    operator Type() const{ return m_value; }
-    Type value() const{ return m_value; }
-
     Type min() const{ return m_min_value; }
     Type max() const{ return m_max_value; }
 
-    bool is_valid() const;
+    QString check_validity() const;
     void restore_defaults();
-    bool update();
 
 private:
-    bool set_value(const QString& str);
-    QString time_string() const;
+    QString process(const QString& text, Type& value) const;
 
 private:
-    template <typename> friend class TimeExpressionOptionBaseUI;
     const QString m_label;
     const Type m_min_value;
     const Type m_max_value;
     QString m_default;
+
+    mutable SpinLock m_lock;
     QString m_current;
-
-    Type& m_value;
-    Type m_backing;
-
+    Type m_value;
     QString m_error;
 };
 
@@ -76,6 +75,7 @@ private:
 };
 
 
+}
 }
 #endif
 

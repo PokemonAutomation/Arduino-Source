@@ -5,7 +5,6 @@
  */
 
 #include "Common/Qt/QtJsonTools.h"
-#include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Windows/MainWindow.h"
 #include "Panels_PokemonBDSP.h"
 
@@ -19,7 +18,6 @@ namespace PokemonBDSP{
 Panels::Panels(QTabWidget& parent, PanelListener& listener)
     : PanelList(parent, "BD/SP", listener)
 {
-    PersistentSettings& settings = PERSISTENT_SETTINGS();
 
 
     finish_panel_setup();

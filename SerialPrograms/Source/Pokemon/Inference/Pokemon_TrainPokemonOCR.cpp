@@ -7,7 +7,6 @@
 #include <QDirIterator>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/ParallelTaskRunner.h"
-#include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/OCR/RawOCR.h"
 #include "CommonFramework/OCR/Filtering.h"
@@ -37,7 +36,9 @@ TrainPokemonOCR_Descriptor::TrainPokemonOCR_Descriptor()
 TrainPokemonOCR::TrainPokemonOCR(const TrainPokemonOCR_Descriptor& descriptor)
     : RunnableComputerProgramInstance(descriptor)
     , DIRECTORY(
+        false,
         "<b>Training Data Directory:</b> (Relative to \"TrainingData/\")",
+        "PokemonNameOCR/",
         "PokemonNameOCR/"
     )
     , MODE(

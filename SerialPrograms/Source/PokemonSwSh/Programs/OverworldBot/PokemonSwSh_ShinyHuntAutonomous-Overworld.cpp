@@ -5,13 +5,14 @@
  */
 
 #include <cmath>
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
-#include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
@@ -32,7 +33,7 @@ ShinyHuntAutonomousOverworld_Descriptor::ShinyHuntAutonomousOverworld_Descriptor
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousOverworld",
         "Shiny Hunt Autonomous - Overworld",
-        "SwSh-Arduino/wiki/Advanced:-ShinyHuntAutonomous-Overworld",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-Overworld.md",
         "Automatically shiny hunt overworld " + STRING_POKEMON + " with video feedback.",
         FeedbackType::REQUIRED,
         PABotBaseLevel::PABOTBASE_12KB
@@ -82,6 +83,15 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld(const ShinyHuntAutono
         70000, 0
     )
     , ENCOUNTER_BOT_OPTIONS(true, true)
+    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
+    , NOTIFICATIONS({
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_CATCH_SUCCESS,
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_CATCH_FAILED,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_PROGRAM_ERROR,
+    })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -111,8 +121,9 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld(const ShinyHuntAutono
     PA_ADD_OPTION(MAX_TARGET_ALPHA);
 
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
+    PA_ADD_OPTION(NOTIFICATIONS);
 
-    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_DIVIDER(m_advanced_options);
     PA_ADD_OPTION(WATCHDOG_TIMER);
     PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
     PA_ADD_OPTION(TARGET_CIRCLING);
@@ -128,7 +139,7 @@ struct ShinyHuntAutonomousOverworld::Stats : public ShinyHuntTracker{
         m_display_order.insert(m_display_order.begin() + 2, Stat("Resets"));
         m_aliases["Unexpected Battles"] = "Errors";
     }
-    uint64_t& m_resets;
+    std::atomic<uint64_t>& m_resets;
 };
 std::unique_ptr<StatsTracker> ShinyHuntAutonomousOverworld::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -319,7 +330,6 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
                     move_in_circle_down(context, trajectory.joystick_x <= 128);
                 }
             }
-            context->wait_for_all_requests();
         },
         {
             &battle_menu_detector,
@@ -350,7 +360,7 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env){
 
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
+        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
     }
@@ -376,9 +386,9 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env){
     while (true){
         //  Touch the date.
         if (TIME_ROLLBACK_HOURS > 0 && system_clock(env.console) - last_touch >= PERIOD){
-            pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
-            rollback_hours_from_home(env.console, TIME_ROLLBACK_HOURS, SETTINGS_TO_HOME_DELAY);
-            resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+            rollback_hours_from_home(env.console, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+            resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             last_touch += PERIOD;
         }
 
@@ -386,10 +396,10 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env){
 
         auto now = std::chrono::system_clock::now();
         if (now - last > TIMEOUT){
-            pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+            pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
             reset_game_from_home_with_inference(
                 env, env.console,
-                TOLERATE_SYSTEM_UPDATE_MENU_FAST
+                ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
             );
             stats.m_resets++;
             last = std::chrono::system_clock::now();
@@ -421,8 +431,15 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env){
     }
 
     if (GO_HOME_WHEN_DONE){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
     }
+
+    send_program_finished_notification(
+        env.logger(), NOTIFICATION_PROGRAM_FINISH,
+        descriptor().display_name(),
+        "",
+        stats.to_str()
+    );
 
     end_program_callback(env.console);
     end_program_loop(env.console);

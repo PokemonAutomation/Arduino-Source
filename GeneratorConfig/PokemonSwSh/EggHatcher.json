@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "EggHatcher",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-EggHatcher",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/EggHatcher.md",
     "2-Description": "Hatch eggs from boxes.",
     "3-Parameters": [
         {

@@ -5,11 +5,12 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh_ShinyHuntTools.h"
 #include "PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.h"
 
@@ -22,7 +23,7 @@ ShinyHuntUnattendedSwordsOfJustice_Descriptor::ShinyHuntUnattendedSwordsOfJustic
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntUnattendedSwordsOfJustice",
         "Shiny Hunt Unattended - Swords Of Justice",
-        "SwSh-Arduino/wiki/Basic:-ShinyHuntUnattended-SwordsOfJustice",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-SwordsOfJustice.md",
         "Hunt for shiny SOJs. Stop when a shiny is found.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB
@@ -53,7 +54,7 @@ ShinyHuntUnattendedSwordsOfJustice::ShinyHuntUnattendedSwordsOfJustice(const Shi
 
     PA_ADD_OPTION(EXIT_CAMP_TO_RUN_DELAY);
     PA_ADD_OPTION(AIRPLANE_MODE);
-    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_DIVIDER(m_advanced_options);
     PA_ADD_OPTION(ENTER_CAMP_DELAY);
 }
 
@@ -62,7 +63,7 @@ ShinyHuntUnattendedSwordsOfJustice::ShinyHuntUnattendedSwordsOfJustice(const Shi
 void ShinyHuntUnattendedSwordsOfJustice::program(SingleSwitchProgramEnvironment& env){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
-        resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
     }
@@ -72,14 +73,14 @@ void ShinyHuntUnattendedSwordsOfJustice::program(SingleSwitchProgramEnvironment&
     for (uint32_t c = 0; ; c++){
         //  Touch the date.
         if (TIME_ROLLBACK_HOURS > 0 && system_clock(env.console) - last_touch >= PERIOD){
-            pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
-            rollback_hours_from_home(env.console, TIME_ROLLBACK_HOURS, SETTINGS_TO_HOME_DELAY);
-            resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+            rollback_hours_from_home(env.console, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+            resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             last_touch += PERIOD;
         }
 
         //  Trigger encounter.
-        pbf_press_button(env.console, BUTTON_X, 10, OVERWORLD_TO_MENU_DELAY);
+        pbf_press_button(env.console, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
         pbf_press_button(env.console, BUTTON_A, 10, ENTER_CAMP_DELAY);
         if (AIRPLANE_MODE){
             pbf_press_button(env.console, BUTTON_A, 10, 100);
@@ -97,7 +98,7 @@ void ShinyHuntUnattendedSwordsOfJustice::program(SingleSwitchProgramEnvironment&
         enter_summary(env.console, false);
     }
 
-    pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+    pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
     end_program_callback(env.console);
     end_program_loop(env.console);
 }

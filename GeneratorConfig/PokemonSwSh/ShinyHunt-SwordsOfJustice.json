@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "ShinyHunt-SwordsOfJustice",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-ShinyHunt-SwordsOfJustice",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/ShinyHunt-SwordsOfJustice.md",
     "2-Description": "Hunt for shiny Swords of Justice legendaries.",
     "3-Parameters": [
         {

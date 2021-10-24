@@ -4,7 +4,7 @@
  * 
  */
 
-#include "Common/SwitchFramework/SwitchControllerDefs.h"
+#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 
 
 //  The amount of Reversal PP that you are saved with.

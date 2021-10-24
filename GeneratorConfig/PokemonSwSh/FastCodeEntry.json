@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "FastCodeEntry",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-FastCodeEntry",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/FastCodeEntry.md",
     "2-Description": "Force your way into raids by entering 8-digit codes in under 1 second.",
     "3-Parameters": [
         {

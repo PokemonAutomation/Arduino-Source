@@ -4,17 +4,18 @@
  *
  */
 
-#include "PokemonSwSh_AutonomousBallThrower.h"
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
-#include "CommonFramework/Tools/ProgramNotifications.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_BasicCatcher.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
+#include "PokemonSwSh_AutonomousBallThrower.h"
 
 #include <QJsonArray>
 
@@ -27,7 +28,7 @@ AutonomousBallThrower_Descriptor::AutonomousBallThrower_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:AutonomousBallThrower",
         "Autonomous Ball Thrower",
-        "SwSh-Arduino/wiki/Advanced:-AutonomousBallThrower",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/AutonomousBallThrower.md",
         "Repeatedly throw a ball and reset until you catch the pokemon.",
         FeedbackType::REQUIRED,
         PABotBaseLevel::PABOTBASE_12KB
@@ -55,11 +56,21 @@ AutonomousBallThrower::AutonomousBallThrower(const AutonomousBallThrower_Descrip
         },
         true
     )
+    , NOTIFICATION_CATCH_SUCCESS("Catch Success", true, false, std::chrono::seconds(3600))
+    , NOTIFICATION_CATCH_FAILED("Catch Failed", true, false, std::chrono::seconds(3600))
+    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
+    , NOTIFICATIONS({
+        &NOTIFICATION_CATCH_SUCCESS,
+        &NOTIFICATION_CATCH_FAILED,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_PROGRAM_ERROR,
+    })
 {
     PA_ADD_OPTION(START_IN_GRIP_MENU);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(BALL_SELECT);
     PA_ADD_OPTION(LANGUAGE);
+    PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 
@@ -81,12 +92,12 @@ struct AutonomousBallThrower::Stats : public StatsTracker{
         m_display_order.emplace_back(Stat("Total balls thrown"));
     }
 
-    uint64_t& pokemon_caught;
-    uint64_t& pokemon_fainted;
-    uint64_t& own_fainted;
-    uint64_t& out_of_balls;
-    uint64_t& errors;
-    uint64_t& total_balls_thrown;
+    std::atomic<uint64_t>& pokemon_caught;
+    std::atomic<uint64_t>& pokemon_fainted;
+    std::atomic<uint64_t>& own_fainted;
+    std::atomic<uint64_t>& out_of_balls;
+    std::atomic<uint64_t>& errors;
+    std::atomic<uint64_t>& total_balls_thrown;
 };
 std::unique_ptr<StatsTracker> AutonomousBallThrower::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -97,7 +108,7 @@ std::unique_ptr<StatsTracker> AutonomousBallThrower::make_stats() const{
 void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
+        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
     }
@@ -117,7 +128,6 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env){
                         //TODO edit here for what to do
                         pbf_wait(context, 1 * TICKS_PER_SECOND);
                     }
-                    context->wait_for_all_requests();
                 },
                 { &fight_detector }
             );
@@ -149,27 +159,34 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env){
         }
         stats.total_balls_thrown += result.balls_used;
         env.update_stats();
-        QString message = "Threw " + QString::number(result.balls_used) + " balls " + (pokemon_caught ? "and caught it" : "and did not caught it");
-//        DiscordWebHook::send_message_old(false, message, stats.make_discord_stats());
-        send_program_status_notification(
-            env.logger(), false,
-            descriptor().display_name(),
-            message,
-            stats.to_str()
-        );
+
+        if (pokemon_caught){
+            send_program_status_notification(
+                env.logger(), NOTIFICATION_CATCH_SUCCESS,
+                descriptor().display_name(),
+                "Threw " + QString::number(result.balls_used) + " ball(s) and caught it.",
+                stats.to_str()
+            );
+        }else{
+            send_program_status_notification(
+                env.logger(), NOTIFICATION_CATCH_FAILED,
+                descriptor().display_name(),
+                "Threw " + QString::number(result.balls_used) + " ball(s) and did not catch it.",
+                stats.to_str()
+            );
+        }
 
         if (!pokemon_caught){
-            pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+            pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
             reset_game_from_home_with_inference(
                 env, env.console,
-                TOLERATE_SYSTEM_UPDATE_MENU_SLOW
+                ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
             );
         }
     }
 
-//    DiscordWebHook::send_message_old(true, "Caught the pokemon", stats.make_discord_stats());
     send_program_finished_notification(
-        env.logger(), true,
+        env.logger(), NOTIFICATION_PROGRAM_FINISH,
         descriptor().display_name(),
         "Caught the " + STRING_POKEMON,
         stats.to_str()
@@ -179,7 +196,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env){
     pbf_wait(env.console, 5 * TICKS_PER_SECOND);
 
     if (GO_HOME_WHEN_DONE){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
     }
 
     end_program_callback(env.console);

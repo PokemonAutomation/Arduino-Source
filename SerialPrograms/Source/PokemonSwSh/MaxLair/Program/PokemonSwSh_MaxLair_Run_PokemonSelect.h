@@ -22,7 +22,7 @@ void run_select_pokemon(
     ProgramEnvironment& env,
     ConsoleHandle& console,
     GlobalStateTracker& state_tracker,
-    const MaxLairPlayerOptions& settings
+    const MaxLairConsoleOptions& settings
 );
 
 

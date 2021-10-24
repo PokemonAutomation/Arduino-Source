@@ -11,7 +11,6 @@
 #include <QLabel>
 #include <QPushButton>
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Options/ConfigOption.h"
 #include "CommonFramework/Panels/Panel.h"
 #include "CommonFramework/Panels/RunnablePanel.h"
@@ -50,8 +49,6 @@ public:
         return static_cast<const RunnableSwitchProgramDescriptor&>(m_descriptor);
     }
 
-    virtual std::unique_ptr<StatsTracker> make_stats() const{ return nullptr; }
-
 public:
     //  Serialization
     virtual void from_json(const QJsonValue& json) override;
@@ -83,14 +80,13 @@ protected:
     virtual QWidget* make_actions(QWidget& parent) override;
 
 protected:
-    virtual bool settings_valid() const override;
+    virtual QString check_validity() const override;
 
     virtual void update_ui() override;
-    void update_historical_stats();
 
     virtual void on_stop() override;
 
-    virtual void run_program() override;
+    virtual void run_program() override final;
     virtual void run_program(
         StatsTracker* current_stats,
         const StatsTracker* historical_stats
@@ -103,8 +99,8 @@ protected:
     friend class RunnableSwitchProgramInstance;
 
     const std::string& m_program_name;
+
     SwitchSetup* m_setup;
-    std::unique_ptr<StatsTracker> m_historical_stats;
 };
 
 

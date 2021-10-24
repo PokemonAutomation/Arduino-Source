@@ -7,9 +7,9 @@
 #include <set>
 #include <map>
 #include <sstream>
-#include "Common/MessageProtocol.h"
+#include "Common/Microcontroller/MessageProtocol.h"
 #include "Common/Cpp/Exception.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
+#include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonProgramIDs.h"
 #include "MessageConverter.h"
 

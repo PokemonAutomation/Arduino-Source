@@ -11,17 +11,21 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-AutoHostNotificationOption::AutoHostNotificationOption(QString label)
-    : GroupOption(std::move(label))
-    , ENABLE("<b>Enable Discord Notifications:</b>", false)
-    , DESCRIPTION("<b>Description:</b> What you're hosting, your IGN, friend code(s), etc...", "")
+AutoHostNotificationOption::AutoHostNotificationOption(QString label, bool max_lair)
+    : GroupOption(std::move(label), true, false)
+    , DESCRIPTION(
+        "<b>Description:</b>", "",
+        max_lair
+            ? "Auto-Hosting Lugia\nCode: Random"
+            : "Den 123: Square Shiny\nIGN: Kimberly\nCode: 1234-5678\nFC: SW-1234-5678-9012"
+    )
     , SHOW_STATS("<b>Show Stats:</b> Show program stats for this session.", true)
-    , SCREENSHOT("<b>Notification Screenshot:</b><br>Attach screenshot of the den to notifications.")
+//    , SCREENSHOT("<b>Notification Screenshot:</b><br>Attach screenshot of the den to notifications.")
+    , NOTIFICATION("Hosting Announcements", true, false, ImageAttachmentMode::JPG, {"LiveHost"})
 {
-    PA_ADD_OPTION(ENABLE);
     PA_ADD_OPTION(DESCRIPTION);
     PA_ADD_OPTION(SHOW_STATS);
-    PA_ADD_OPTION(SCREENSHOT);
+//    PA_ADD_OPTION(SCREENSHOT);
 }
 
 

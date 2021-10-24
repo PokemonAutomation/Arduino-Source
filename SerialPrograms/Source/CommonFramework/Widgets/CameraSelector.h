@@ -32,8 +32,8 @@ class CameraSelector{
     static const QString JSON_RESOLUTION;
 
 public:
-    CameraSelector(QString label);
-    CameraSelector(QString label, const QJsonValue& json);
+    CameraSelector();
+    CameraSelector(const QJsonValue& json);
 
     void load_json(const QJsonValue& json);
     QJsonValue to_json() const;
@@ -42,7 +42,6 @@ public:
 
 private:
     friend class CameraSelectorUI;
-    QString m_label;
     QCameraInfo m_camera;
     QSize m_resolution;
 };

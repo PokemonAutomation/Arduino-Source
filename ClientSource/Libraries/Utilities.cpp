@@ -7,7 +7,10 @@
 #include <iostream>
 #include "Common/Cpp/Exception.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
+#include "Common/Microcontroller/DeviceRoutines.h"
+#include "Common/NintendoSwitch/NintendoSwitch_Tools.h"
+#include "Common/NintendoSwitch/NintendoSwitch_Device.h"
+#include "Common/NintendoSwitch/NintendoSwitch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonProgramIDs.h"
 #include "ClientSource/Connection/SerialConnection.h"
 #include "ClientSource/Libraries/MessageConverter.h"
@@ -55,7 +58,7 @@ std::unique_ptr<PABotBase> start_connection(
 
     //  Make sure the device is using the same protocol version as us.
     std::cout << "Verifying protocol compatibility..." << std::endl;
-    uint32_t version = pabotbase->protocol_version();
+    uint32_t version = Microcontroller::protocol_version(*pabotbase);
     uint32_t version_hi = version / 100;
     uint32_t version_lo = version % 100;
     if (version_hi != PABB_PROTOCOL_VERSION / 100 || version_lo < PABB_PROTOCOL_VERSION % 100){
@@ -67,14 +70,14 @@ std::unique_ptr<PABotBase> start_connection(
 
 
     //  Fetch some random information about what's running on the device.
-    uint8_t program_id = pabotbase->program_id();
+    uint8_t program_id = Microcontroller::program_id(*pabotbase);
     std::cout << "Program ID:       " << (unsigned)program_id << " (" << program_name(program_id) << ")" << std::endl;
 
-    uint32_t program_version = pabotbase->program_version();
+    uint32_t program_version = Microcontroller::program_version(*pabotbase);
     std::cout << "Program Version:  " << program_version << std::endl;
 
-    uint32_t wallclock = system_clock(*pabotbase);
-    std::cout << "Device Up Time:   " << ticks_to_time(wallclock) << std::endl;
+    uint32_t wallclock = NintendoSwitch::system_clock(*pabotbase);
+    std::cout << "Device Up Time:   " << NintendoSwitch::ticks_to_time(wallclock) << std::endl;
     std::cout << std::endl;
 
 

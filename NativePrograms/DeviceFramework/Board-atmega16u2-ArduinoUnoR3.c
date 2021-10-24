@@ -23,3 +23,11 @@ void onboard_led(bool on){
         PORTD |= leds;
     }
 }
+void flicker_led(void){
+    uint8_t port = PORTD;
+    
+    port ^= (port ^ (port << 1)) & (1 << 5);
+    port ^= (1 << 4);
+
+    PORTD = port;
+}

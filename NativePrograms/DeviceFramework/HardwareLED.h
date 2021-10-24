@@ -11,6 +11,7 @@
 
 void setup_leds(void);
 void onboard_led(bool on);
+void flicker_led(void);
 
 
 #endif

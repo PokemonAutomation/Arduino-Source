@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "MultiGameFossil",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-MultiGameFossil",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/MultiGameFossil.md",
     "2-Description": "Revive fossils. Supports multiple saves so you can go afk for longer than 5 hours.",
     "3-Parameters": [
         {

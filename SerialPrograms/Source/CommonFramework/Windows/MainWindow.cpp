@@ -11,6 +11,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QMessageBox>
+#include "Kernels/Kernels_Arch.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -37,7 +38,7 @@ MainWindow::MainWindow(QWidget* parent)
         setObjectName(QString::fromUtf8("MainWindow"));
     }
 //    QSize window_size = PERSISTENT_SETTINGS().window_size;
-    resize(PERSISTENT_SETTINGS().window_width, PERSISTENT_SETTINGS().window_height);
+    resize(GlobalSettings::instance().WINDOW_WIDTH, GlobalSettings::instance().WINDOW_HEIGHT);
     centralwidget = new QWidget(this);
     centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
     setCentralWidget(centralwidget);
@@ -64,7 +65,10 @@ MainWindow::MainWindow(QWidget* parent)
     program_layout->addWidget(m_program_list);
 
 
-    QGroupBox* support_box = new QGroupBox("Support (" + STRING_POKEMON + " Automation " + PROGRAM_VERSION + ")", centralwidget);
+    QGroupBox* support_box = new QGroupBox(
+        STRING_POKEMON + " Automation " + PROGRAM_VERSION + " (" + PA_ARCH_STRING + ")",
+        centralwidget
+    );
     left_layout->addWidget(support_box);
     QVBoxLayout* support_layout = new QVBoxLayout(support_box);
 
@@ -78,7 +82,7 @@ MainWindow::MainWindow(QWidget* parent)
     {
         QLabel* github = new QLabel(support_box);
         links->addWidget(github);
-        github->setText("<a href=\"" + ONLINE_DOC_URL + "SwSh-Arduino/wiki\">Online Documentation</a>");
+        github->setText("<a href=\"" + ONLINE_DOC_URL + "ComputerControl\">Online Documentation</a>");
         github->setTextFormat(Qt::RichText);
         github->setTextInteractionFlags(Qt::TextBrowserInteraction);
         github->setOpenExternalLinks(true);
@@ -136,7 +140,7 @@ MainWindow::MainWindow(QWidget* parent)
         }
     );
 
-    m_output_window.reset(new FileWindowLoggerWindow((FileWindowLogger&)global_logger()));
+    m_output_window.reset(new FileWindowLoggerWindow((FileWindowLogger&)global_logger_raw()));
     QPushButton* output = new QPushButton("Output Window", support_box);
     buttons->addWidget(output);
     connect(
@@ -146,27 +150,6 @@ MainWindow::MainWindow(QWidget* parent)
             m_output_window->activateWindow();
         }
     );
-
-#if 0
-    QPushButton* about = new QPushButton("About", support_box);
-    buttons->addWidget(about);
-    connect(
-        about, &QPushButton::clicked,
-        this, [=](bool){
-            QMessageBox box;
-            box.information(
-                nullptr,
-                "About",
-                STRING_POKEMON + " Automation Feedback Programs (" + VERSION + ")<br>" +
-                "Copyright: 2020 - 2021<br>" +
-                "<br>"
-                "Made by the " + STRING_POKEMON + " Automation Discord Server.<br>"
-                "<br>"
-                "This program uses Qt and dynamically links to unmodified Qt libraries under LGPL.<br>"
-            );
-        }
-    );
-#endif
 
     QPushButton* settings = new QPushButton("Settings", support_box);
     m_settings = settings;
@@ -200,9 +183,8 @@ void MainWindow::closeEvent(QCloseEvent* event){
     QMainWindow::closeEvent(event);
 }
 void MainWindow::resizeEvent(QResizeEvent* event){
-//    PERSISTENT_SETTINGS().window_size = size();
-    PERSISTENT_SETTINGS().window_width = width();
-    PERSISTENT_SETTINGS().window_height = height();
+    GlobalSettings::instance().WINDOW_WIDTH.set(width());
+    GlobalSettings::instance().WINDOW_HEIGHT.set(height());
 }
 
 void MainWindow::close_panel(){
@@ -218,10 +200,13 @@ void MainWindow::close_panel(){
         return;
     }
 
+    m_current_panel->save_settings();
+#if 0
     const std::string& identifier = m_current_panel->descriptor().identifier();
     if (!identifier.empty()){
         PERSISTENT_SETTINGS().panels[QString::fromStdString(identifier)] = m_current_panel->to_json();
     }
+#endif
 
     m_current_panel.reset();
 }

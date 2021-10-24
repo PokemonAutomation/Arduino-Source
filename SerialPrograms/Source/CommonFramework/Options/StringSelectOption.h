@@ -2,6 +2,8 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *      This option is thread-safe.
+ *
  */
 
 #ifndef PokemonAutomation_StringSelect_H
@@ -26,8 +28,8 @@ public:
         const QString& default_case
     );
 
-    operator size_t() const{ return m_current; }
-    operator const QString&() const{ return m_case_list[m_current].first; }
+    operator size_t() const{ return m_current.load(std::memory_order_relaxed); }
+    operator const QString&() const{ return m_case_list[(size_t)*this].first; }
 
     virtual void load_json(const QJsonValue& json) override;
     virtual QJsonValue to_json() const override;
@@ -38,11 +40,12 @@ public:
 
 private:
     friend class StringSelectOptionUI;
-    QString m_label;
+    const QString m_label;
     std::vector<std::pair<QString, QIcon>> m_case_list;
     std::map<QString, size_t> m_case_map;
     size_t m_default;
-    size_t m_current;
+
+    std::atomic<size_t> m_current;
 };
 
 

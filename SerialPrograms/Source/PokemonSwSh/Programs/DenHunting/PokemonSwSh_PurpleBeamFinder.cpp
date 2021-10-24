@@ -6,13 +6,14 @@
 
 #include <QJsonArray>
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "CommonFramework/PersistentSettings.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "CommonFramework/Tools/ProgramNotifications.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_BeamSetter.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
 #include "PokemonSwSh_PurpleBeamFinder.h"
@@ -26,7 +27,7 @@ PurpleBeamFinder_Descriptor::PurpleBeamFinder_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:PurpleBeamFinder",
         "Purple Beam Finder",
-        "SwSh-Arduino/wiki/Advanced:-PurpleBeamFinder",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/PurpleBeamFinder.md",
         "Automatically reset for a purple beam.",
         FeedbackType::REQUIRED,
         PABotBaseLevel::PABOTBASE_12KB
@@ -41,6 +42,13 @@ PurpleBeamFinder::PurpleBeamFinder(const PurpleBeamFinder_Descriptor& descriptor
         "<b>Extra Line:</b><br>(German has an extra line of text.)",
         false
     )
+    , NOTIFICATION_RED_BEAM("Red Beam", false, false)
+    , NOTIFICATION_PURPLE_BEAM("Purple Beam", true, true, ImageAttachmentMode::JPG)
+    , NOTIFICATIONS({
+        &NOTIFICATION_RED_BEAM,
+        &NOTIFICATION_PURPLE_BEAM,
+        &NOTIFICATION_PROGRAM_ERROR,
+    })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> Don't adjust these unless you're having problems.</font>"
     )
@@ -75,9 +83,9 @@ PurpleBeamFinder::PurpleBeamFinder(const PurpleBeamFinder_Descriptor& descriptor
 {
     PA_ADD_OPTION(START_IN_GRIP_MENU);
     PA_ADD_OPTION(EXTRA_LINE);
-    if (PERSISTENT_SETTINGS().developer_mode){
-        PA_ADD_OPTION(m_advanced_options);
-        PA_ADD_OPTION(SAVE_SCREENSHOT);
+    PA_ADD_OPTION(NOTIFICATIONS);
+    if (GlobalSettings::instance().DEVELOPER_MODE){
+        PA_ADD_DIVIDER(m_advanced_options);
         PA_ADD_OPTION(TIMEOUT_DELAY);
         PA_ADD_OPTION(MIN_BRIGHTNESS);
         PA_ADD_OPTION(MIN_EUCLIDEAN);
@@ -107,12 +115,12 @@ struct PurpleBeamFinder::Stats : public StatsTracker{
         m_aliases["Red Detected"] = "Red";
         m_aliases["Red Presumed"] = "Red";
     }
-    uint64_t& attempts;
-    uint64_t& timeouts;
-    uint64_t& red_detected;
-    uint64_t& red_presumed;
-    uint64_t& red;
-    uint64_t& purple;
+    std::atomic<uint64_t>& attempts;
+    std::atomic<uint64_t>& timeouts;
+    std::atomic<uint64_t>& red_detected;
+    std::atomic<uint64_t>& red_presumed;
+    std::atomic<uint64_t>& red;
+    std::atomic<uint64_t>& purple;
 };
 std::unique_ptr<StatsTracker> PurpleBeamFinder::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -124,7 +132,7 @@ std::unique_ptr<StatsTracker> PurpleBeamFinder::make_stats() const{
 void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
-        resume_game_front_of_den_nowatts(env.console, TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+        resume_game_front_of_den_nowatts(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
         pbf_mash_button(env.console, BUTTON_B, 100);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
@@ -178,18 +186,27 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env){
             break;
         }
 
-        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+        send_program_status_notification(
+            env.logger(), NOTIFICATION_RED_BEAM,
+            descriptor().display_name(),
+            "Red Beam...",
+            stats.to_str()
+        );
+
+        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
         reset_game_from_home_with_inference(
             env, env.console,
-            TOLERATE_SYSTEM_UPDATE_MENU_SLOW
+            ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
         );
     }
 
+    env.wait_for(std::chrono::seconds(2));
     send_program_finished_notification(
-        env.logger(), true,
+        env.logger(), NOTIFICATION_PURPLE_BEAM,
         descriptor().display_name(),
         "Found a purple beam!",
-        stats.to_str()
+        stats.to_str(),
+        env.console.video().snapshot()
     );
     while (true){
         pbf_press_button(env.console, BUTTON_B, 20, 20);

@@ -4,7 +4,12 @@
  * 
  */
 
-#include "Common/SwitchFramework/SwitchControllerDefs.h"
+#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
+
+
+//  Wait this long after leaving the grip menu to allow for the Switch to
+//  reestablish local connection.
+extern const uint16_t GRIP_MENU_WAIT;
 
 
 //  Grab watts this many times. You can set this number if you're also date

@@ -16,9 +16,12 @@
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSwSh{
 
 
-class FossilTable : public SingleStatementOption, public FossilTableOptionBase{
+#if 1
+class FossilTable : public SingleStatementOption{
 public:
     static const QString OPTION_TYPE;
 
@@ -26,7 +29,7 @@ public:
     FossilTable(const QJsonObject& obj);
 
     virtual const QString& type() const override{ return OPTION_TYPE; }
-    virtual bool is_valid() const override;
+    virtual QString check_validity() const override;
     virtual void restore_defaults() override;
 
     virtual QJsonObject to_json() const override;
@@ -36,14 +39,15 @@ public:
 
 private:
     friend class FossilTableUI;
+    FossilGameOptionFactory m_factory;
+    EditableTableBase m_table;
 };
+#endif
 
 
-class FossilTableUI : public FossilTableOptionBaseUI{
-public:
-    FossilTableUI(QWidget& parent, FossilTable& value);
-};
 
 
+}
+}
 }
 #endif

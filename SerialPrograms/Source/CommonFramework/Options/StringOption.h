@@ -2,6 +2,8 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *      This option is thread-safe.
+ *
  */
 
 #ifndef PokemonAutomation_StringOption_H
@@ -13,21 +15,26 @@
 namespace PokemonAutomation{
 
 
-class StringOption : public ConfigOption, public StringOptionBase{
+class StringOption : public ConfigOption, private StringOptionBase{
 public:
     StringOption(
-        QString& backing,
+        bool is_password,
         QString label,
-        QString default_value
+        QString default_value,
+        QString placeholder_text
     )
-        : StringOptionBase(backing, std::move(label), default_value)
+        : StringOptionBase(
+            is_password,
+            std::move(label),
+            default_value,
+            std::move(placeholder_text)
+        )
     {}
-    StringOption(
-        QString label,
-        QString default_value
-    )
-        : StringOptionBase(std::move(label), default_value)
-    {}
+
+    using StringOptionBase::label;
+    using StringOptionBase::operator QString;
+    using StringOptionBase::get;
+    using StringOptionBase::set;
 
     virtual void load_json(const QJsonValue& json) override{
         load_current(json);
@@ -41,10 +48,13 @@ public:
     }
 
     virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+
+private:
+    friend class StringOptionUI;
 };
 
 
-class StringOptionUI : public ConfigOptionUI, public StringOptionBaseUI{
+class StringOptionUI : public ConfigOptionUI, private StringOptionBaseUI{
 public:
     StringOptionUI(QWidget& parent, StringOptionBase& value)
         : StringOptionBaseUI(parent, value)

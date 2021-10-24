@@ -7,6 +7,7 @@
 #include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "PokemonSwSh_MaxLair_Detect_Lobby.h"
 
 #include <iostream>
@@ -38,20 +39,23 @@ bool LobbyReadyButtonDetector::detect(const QImage& screen){
 #endif
 
 
-#if 0
-NonLobbyDetector::NonLobbyDetector(VideoOverlay& overlay)
-    : m_pink (overlay, 0.575, 0.035, 0.050, 0.100)
-    , m_white(overlay, 0.800, 0.200, 0.150, 0.100)
-{}
-bool NonLobbyDetector::on_frame(
+#if 1
+NonLobbyDetector::NonLobbyDetector()
+    : m_pink (0.575, 0.035, 0.050, 0.100)
+    , m_white(0.800, 0.200, 0.150, 0.100)
+{
+    add_box(m_pink);
+    add_box(m_white);
+}
+bool NonLobbyDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
     return detect(frame);
 }
 bool NonLobbyDetector::detect(const QImage& screen){
-    ImageStats stats0 = pixel_stats(extract_box(screen, m_pink));
-    ImageStats stats1 = pixel_stats(extract_box(screen, m_white));
+    ImageStats stats0 = image_stats(extract_box(screen, m_pink));
+    ImageStats stats1 = image_stats(extract_box(screen, m_white));
 //    cout << stats0.average << ", " << stats0.stddev << endl;
 //    cout << stats1.average << ", " << stats1.stddev << endl;
     if (!is_solid(stats0, {0.444944, 0.150562, 0.404494})){
@@ -67,8 +71,10 @@ bool NonLobbyDetector::detect(const QImage& screen){
 
 LobbyDoneConnecting::LobbyDoneConnecting()
     : m_box(0.600, 0.820, 0.080, 0.100)
+    , m_player0(0.669, 0.337 + 0.0775*1, 0.100, 0.06)
 {
     add_box(m_box);
+    add_box(m_player0);
 }
 bool LobbyDoneConnecting::process_frame(
     const QImage& frame,
@@ -79,15 +85,60 @@ bool LobbyDoneConnecting::process_frame(
 bool LobbyDoneConnecting::detect(const QImage& screen){
     ImageStats stats0 = image_stats(extract_box(screen, m_box));
 //    cout << stats0.average << ", " << stats0.stddev << endl;
-    if (!is_grey(stats0, 0, 200)){
-        return true;
+    if (is_grey(stats0, 0, 200)){
+        return false;
     }
-    return false;
+    ImageStats player0 = image_stats(extract_box(screen, m_player0));
+//    cout << player0.average << player0.stddev << endl;
+    if (is_white(player0, 300, 20)){
+        return false;
+    }
+//    screen.save("test.png");
+    return true;
 }
 
 
-LobbyAllReadyDetector::LobbyAllReadyDetector(size_t consoles)
+
+LobbyJoinedDetector::LobbyJoinedDetector(size_t consoles)
     : m_consoles(consoles)
+    , m_box0(0.705, 0.337 + 0.0775*0, 0.034, 0.06)
+    , m_box1(0.705, 0.337 + 0.0775*1, 0.034, 0.06)
+    , m_box2(0.705, 0.337 + 0.0775*2, 0.034, 0.06)
+    , m_box3(0.705, 0.337 + 0.0775*3, 0.034, 0.06)
+    , m_player0(std::chrono::seconds(1), 10)
+    , m_player1(std::chrono::seconds(1), 10)
+    , m_player2(std::chrono::seconds(1), 10)
+    , m_player3(std::chrono::seconds(1), 10)
+{}
+
+size_t LobbyJoinedDetector::joined(
+    const QImage& screen,
+    std::chrono::system_clock::time_point timestamp
+){
+    size_t count = 0;
+    if (m_player0.process_frame(extract_box(screen, m_box0), timestamp)) count++;
+    if (m_player1.process_frame(extract_box(screen, m_box1), timestamp)) count++;
+    if (m_player2.process_frame(extract_box(screen, m_box2), timestamp)) count++;
+    if (m_player3.process_frame(extract_box(screen, m_box3), timestamp)) count++;
+    return count;
+}
+
+bool LobbyJoinedDetector::process_frame(
+    const QImage& frame,
+    std::chrono::system_clock::time_point timestamp
+){
+    return joined(frame, timestamp) >= m_consoles;
+}
+
+
+
+
+LobbyAllReadyDetector::LobbyAllReadyDetector(
+    size_t consoles,
+    std::chrono::system_clock::time_point time_limit
+)
+    : m_consoles(consoles)
+    , m_time_limit(time_limit)
     , m_checkbox0(0.669, 0.337 + 0.0775*0, 0.034, 0.06)
     , m_checkbox1(0.669, 0.337 + 0.0775*1, 0.034, 0.06)
     , m_checkbox2(0.669, 0.337 + 0.0775*2, 0.034, 0.06)
@@ -102,7 +153,7 @@ bool LobbyAllReadyDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
-    return detect(frame);
+    return timestamp >= m_time_limit || detect(frame);
 }
 bool LobbyAllReadyDetector::detect(const QImage& screen){
     size_t ready = 0;
@@ -115,7 +166,7 @@ bool LobbyAllReadyDetector::detect(const QImage& screen){
     if (stats2.stddev.sum() > 50) ready++;
     if (stats3.stddev.sum() > 50) ready++;
 
-    return ready >= m_consoles - 1;
+    return ready >= m_consoles;
 }
 
 

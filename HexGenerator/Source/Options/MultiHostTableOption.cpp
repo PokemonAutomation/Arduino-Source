@@ -21,6 +21,8 @@
 //using namespace std;
 
 namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSwSh{
 
 
 const QString MultiHostTable::OPTION_TYPE = "MultiHostTable";
@@ -37,28 +39,30 @@ int MultiHostTable_init = register_option(
 
 MultiHostTable::MultiHostTable(const QJsonObject& obj)
     : SingleStatementOption(obj)
-    , MultiHostTableOptionBase(SingleStatementOption::m_label)
+    , m_factory(false)
+    , m_table(SingleStatementOption::m_label, m_factory, true)
 {
-    load_default(json_get_array_throw(obj, JSON_DEFAULT));
-    load_current(json_get_array_throw(obj, JSON_CURRENT));
+    m_table.load_default(json_get_array_throw(obj, JSON_DEFAULT));
+    m_table.load_current(json_get_array_throw(obj, JSON_CURRENT));
 }
-bool MultiHostTable::is_valid() const{
-    return MultiHostTableOptionBase::is_valid();
+QString MultiHostTable::check_validity() const{
+    return m_table.check_validity();
 }
 void MultiHostTable::restore_defaults(){
-    MultiHostTableOptionBase::restore_defaults();
+    m_table.restore_defaults();
 }
 QJsonObject MultiHostTable::to_json() const{
     QJsonObject root = SingleStatementOption::to_json();
-    root.insert(JSON_DEFAULT, write_default());
-    root.insert(JSON_CURRENT, write_current());
+    root.insert(JSON_DEFAULT, m_table.write_default());
+    root.insert(JSON_CURRENT, m_table.write_current());
     return root;
 }
 std::string MultiHostTable::to_cpp() const{
     std::string str;
     str += m_declaration.toUtf8().data();
     str += " = {\r\n";
-    for (const auto& item : value()){
+    for (size_t c = 0; c < m_table.size(); c++){
+        const MultiHostSlot& item = static_cast<const MultiHostSlot&>(m_table[c]);
         str += "    {\r\n";
         str += std::string("        .game_slot        = ") + std::to_string(item.game_slot) + ",\r\n";
         str += std::string("        .user_slot        = ") + std::to_string(item.user_slot) + ",\r\n";
@@ -76,16 +80,12 @@ std::string MultiHostTable::to_cpp() const{
     return str;
 }
 QWidget* MultiHostTable::make_ui(QWidget& parent){
-    return new MultiHostTableUI(parent, *this);
+    return new EditableTableBaseUI(parent, m_table);
 }
 
 
-MultiHostTableUI::MultiHostTableUI(QWidget& parent, MultiHostTable& value)
-    : MultiHostTableOptionBaseUI(parent, value)
-{}
-
-
-
+}
+}
 }
 
 

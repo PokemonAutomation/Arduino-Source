@@ -6,18 +6,21 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exception.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Inference/VisualInferenceSession.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_RaidCatchDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_BasicCatcher.h"
-#include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_EndBattle.h"
+#include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
+//#include "PokemonSwSh_MaxLair_Run_CaughtScreen.h"
 #include "PokemonSwSh_MaxLair_Run_Battle.h"
 
 namespace PokemonAutomation{
@@ -26,11 +29,11 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-void read_battle_menu(
+bool read_battle_menu(
     ProgramEnvironment& env,
     ConsoleHandle& console, size_t player_index,
     GlobalState& state,
-    const MaxLairPlayerOptions& settings,
+    const MaxLairConsoleOptions& settings,
     bool currently_dmaxed, bool cheer_only
 ){
     PlayerState& player = state.players[player_index];
@@ -39,29 +42,53 @@ void read_battle_menu(
     BattleMoveArrowFinder arrow_finder(console);
 
 
-    QImage screen = console.video().snapshot();
-
     //  Read raid mon.
-    std::set<std::string> mon = reader.read_opponent(console, screen);
-    if (!mon.empty()){
+    std::set<std::string> mon = reader.read_opponent(console, env, console);
+    do{
+        if (mon.size() == 1){
+            state.opponent = std::move(mon);
+            break;
+        }
         if (mon.size() > 1){
-//            console.log("Ambiguous Read Result: " + set_to_str(mon) + " - Disambiguation not yet supported.", Qt::red);
             console.log("Ambiguous Read Result: " + set_to_str(mon), "purple");
             if (state.opponent.size() == 1 && mon.find(*state.opponent.begin()) != mon.end()){
                 console.log("Using previous known value to disambiguate: " + set_to_str(mon), "purple");
-            }else{
-                pbf_press_button(console, BUTTON_Y, 10, TICKS_PER_SECOND);
-                pbf_press_dpad(console, DPAD_UP, 10, 50);
-                pbf_press_button(console, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
-                console.botbase().wait_for_all_requests();
-                reader.disambiguate_opponent(console, mon, console.video().snapshot());
-                pbf_mash_button(console, BUTTON_B, 3 * TICKS_PER_SECOND);
+                break;
             }
         }
+        console.log("Attempting to read from summary.", "purple");
+        pbf_press_button(console, BUTTON_Y, 10, TICKS_PER_SECOND);
+        pbf_press_dpad(console, DPAD_UP, 10, 50);
+        pbf_press_button(console, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
+        console.botbase().wait_for_all_requests();
+        mon = reader.read_opponent_in_summary(console, console.video().snapshot());
+        pbf_mash_button(console, BUTTON_B, 3 * TICKS_PER_SECOND);
         state.opponent = std::move(mon);
+    }while (false);
+    console.botbase().wait_for_all_requests();
+
+    const std::string& opponent = state.opponent.empty()
+        ? ""
+        : *state.opponent.begin();
+
+    if (state.wins != 3 && is_boss(opponent)){
+        console.log("Boss found before 3 wins. Something is seriously out-of-sync.", Qt::red);
+        send_program_telemetry(
+            env.logger(), true, Qt::red, MODULE_NAME,
+            "Error",
+            {{"Message", "Boss found before 3 wins."}},
+            ""
+        );
+        return false;
+    }
+
+    //  Infer the boss if we don't know it.
+    if (state.boss.empty() && state.wins == 3){
+        state.boss = opponent;
     }
 
     //  Read misc.
+    QImage screen = console.video().snapshot();
     state.opponent_hp = reader.read_opponent_hp(console, screen);
     if (cheer_only){
         player.dmax_turns_left = 0;
@@ -69,7 +96,7 @@ void read_battle_menu(
         player.can_dmax = false;
         pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
         console.botbase().wait_for_all_requests();
-        return;
+        return true;
     }
 
     if (currently_dmaxed){
@@ -102,7 +129,6 @@ void read_battle_menu(
     if (health[3].hp >= 0) state.players[3].health = health[3];
 
 
-
     //  Enter move selection to read PP.
     AsyncVisualInferenceSession inference(env, console, console);
     inference += arrow_finder;
@@ -126,7 +152,7 @@ void read_battle_menu(
     int8_t move_slot = arrow_finder.get_slot();
     if (move_slot < 0){
         console.log("Unable to detect move slot.", Qt::red);
-//            dump_image(console, screen, "MoveSlot");
+        dump_image(console, MODULE_NAME, "MoveSlot", screen);
         pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
         pbf_press_dpad(console, DPAD_RIGHT, 2 * TICKS_PER_SECOND, 0);
         pbf_press_dpad(console, DPAD_UP, 2 * TICKS_PER_SECOND, 0);
@@ -143,14 +169,15 @@ void read_battle_menu(
     state.move_slot = move_slot;
 
     inference.stop();
+    return true;
 }
 
 
-void run_move_select(
+StateMachineAction run_move_select(
     ProgramEnvironment& env,
     ConsoleHandle& console,
     GlobalStateTracker& state_tracker,
-    const MaxLairPlayerOptions& settings,
+    const MaxLairConsoleOptions& settings,
     bool currently_dmaxed, bool cheer_only
 ){
     size_t console_index = console.index();
@@ -159,11 +186,13 @@ void run_move_select(
     PlayerState& player = state.players[player_index];
 
 
-    read_battle_menu(
+    if (!read_battle_menu(
         env, console, player_index,
         state, settings,
         currently_dmaxed, cheer_only
-    );
+    )){
+        return StateMachineAction::RESET_RECOVER;
+    }
 
 
     GlobalState inferred = state_tracker.synchronize(env, console, console_index);
@@ -209,9 +238,9 @@ void run_move_select(
             env, console,
             [](const BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
-                context->wait_for_all_requests();
             },
-            { &detector }
+            { &detector },
+            INFERENCE_RATE
         );
 //        pbf_mash_button(console, BUTTON_B, 2 * TICKS_PER_SECOND);
 //        console.botbase().wait_for_all_requests();
@@ -238,6 +267,7 @@ void run_move_select(
     }
 
 //    inference.stop();
+    return StateMachineAction::KEEP_GOING;
 }
 
 
@@ -245,9 +275,9 @@ void run_move_select(
 StateMachineAction throw_balls(
     MaxLairRuntime& runtime,
     ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ConsoleHandle& console, Language language,
     GlobalStateTracker& state_tracker,
-    const MaxLairPlayerOptions& settings
+    const EndBattleDecider& decider
 ){
     size_t console_index = console.index();
     GlobalState& state = state_tracker[console_index];
@@ -263,25 +293,37 @@ StateMachineAction throw_balls(
     GlobalState inferred = state_tracker.synchronize(env, console, console_index);
 
 
+    std::string ball;
+
     bool boss = inferred.wins == 4;
-    if (boss && runtime.action == CaughtScreenAction::ALWAYS_STOP){
-        return StateMachineAction::STOP_PROGRAM;
+    if (boss){
+        ball = decider.boss_ball(console_index, inferred.boss);
+
+        EndBattleDecider::CatchAction action = decider.catch_boss_action();
+        switch (action){
+        case EndBattleDecider::CatchAction::STOP_PROGRAM:
+            runtime.stats.add_run(inferred.wins);
+            return StateMachineAction::STOP_PROGRAM;
+        case EndBattleDecider::CatchAction::CATCH:
+            break;
+        case EndBattleDecider::CatchAction::DONT_CATCH:
+            pbf_press_dpad(console, DPAD_DOWN, 10, 50);
+            pbf_press_button(console, BUTTON_A, 10, 125);
+            console.botbase().wait_for_all_requests();
+            return StateMachineAction::KEEP_GOING;
+        }
+    }else{
+        ball = decider.normal_ball(console_index);
     }
 
-    BattleBallReader reader(console, settings.language);
+    BattleBallReader reader(console, language);
     pbf_press_button(console, BUTTON_A, 10, 125);
     console.botbase().wait_for_all_requests();
-
-    std::string ball = boss
-        ? settings.boss_ball.slug()
-        : settings.normal_ball.slug();
 
     if (move_to_ball(reader, console, ball)){
         pbf_press_button(console, BUTTON_A, 10, 125);
     }else{
         console.log("Unable to find appropriate ball. Did you run out?", Qt::red);
-//        pbf_press_dpad(console, DPAD_DOWN, 10, 50);
-//        pbf_press_button(console, BUTTON_A, 10, 125);
         PA_THROW_StringException("Unable to find appropriate ball. Did you run out?");
     }
 

@@ -4,12 +4,12 @@
  *
  */
 
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/FixedInterval.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh_ShinyHuntTools.h"
 
 namespace PokemonAutomation{
@@ -35,7 +35,7 @@ void enter_summary(const BotBaseContext& context, bool regi_move_right){
 }
 void close_game_if_overworld(const BotBaseContext& context, bool touch_date, uint8_t rollback_hours){
     //  Enter Y-COMM.
-    ssf_press_button2(context, BUTTON_Y, OPEN_YCOMM_DELAY, 10);
+    ssf_press_button2(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY, 10);
 
     //  Move the cursor as far away from Link Trade and Surprise Trade as possible.
     //  This is added safety in case connect to internet takes too long.
@@ -47,18 +47,18 @@ void close_game_if_overworld(const BotBaseContext& context, bool touch_date, uin
     pbf_press_button(context, BUTTON_PLUS, 10, TICKS_PER_SECOND);
 
     //  Enter Switch Home.
-    pbf_press_button(context, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
 
     if (touch_date){
-        touch_date_from_home(context, SETTINGS_TO_HOME_DELAY);
+        touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
     }
     if (rollback_hours > 0){
-        rollback_hours_from_home(context, rollback_hours, SETTINGS_TO_HOME_DELAY);
+        rollback_hours_from_home(context, rollback_hours, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
     }
 
     //  Enter profile.
     pbf_press_dpad(context, DPAD_UP, 10, 10);
-    pbf_press_button(context, BUTTON_A, 10, ENTER_PROFILE_DELAY);
+    pbf_press_button(context, BUTTON_A, 10, GameSettings::instance().ENTER_PROFILE_DELAY);
 
     //  Back out.
     pbf_press_dpad(context, DPAD_LEFT, 10, 10);

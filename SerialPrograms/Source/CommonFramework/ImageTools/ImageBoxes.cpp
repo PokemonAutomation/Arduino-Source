@@ -30,4 +30,23 @@ QImage extract_box(const QImage& image, const ImageFloatBox& box, int offset_x, 
 }
 
 
+ImageFloatBox translate_to_parent(
+    const QImage& original_image,
+    const ImageFloatBox& inference_box,
+    const ImagePixelBox& box
+){
+    double width = original_image.width();
+    double height = original_image.height();
+    pxint_t box_x = (pxint_t)(width * inference_box.x + 0.5);
+    pxint_t box_y = (pxint_t)(height * inference_box.y + 0.5);
+    return ImageFloatBox(
+        (box_x + box.min_x) / width,
+        (box_y + box.min_y) / height,
+        (box.max_x - box.min_x) / width,
+        (box.max_y - box.min_y) / height
+    );
+}
+
+
+
 }

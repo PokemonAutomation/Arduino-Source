@@ -6,9 +6,9 @@
 
 #include <QLabel>
 #include "Common/Qt/QtJsonTools.h"
-#include "CommonFramework/PersistentSettings.h"
-#include "NintendoSwitch/Panels_NintendoSwitch.h"
-#include "PokemonSwSh/Panels_PokemonSwSh.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
+#include "NintendoSwitch/NintendoSwitch_Panels.h"
+#include "PokemonSwSh/PokemonSwSh_Panels.h"
 #include "PokemonBDSP/Panels_PokemonBDSP.h"
 #include "PanelLists.h"
 
@@ -24,7 +24,7 @@ ProgramTabs::ProgramTabs(QWidget& parent, PanelListener& listener)
 {
     add(new NintendoSwitch::Panels(*this, listener));
     add(new NintendoSwitch::PokemonSwSh::Panels(*this, listener));
-    if (PERSISTENT_SETTINGS().developer_mode){
+    if (GlobalSettings::instance().DEVELOPER_MODE){
         add(new NintendoSwitch::PokemonBDSP::Panels(*this, listener));
     }
 }

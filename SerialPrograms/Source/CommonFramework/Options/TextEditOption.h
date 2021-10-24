@@ -2,12 +2,15 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *      This option is thread-safe.
+ *
  */
 
 #ifndef PokemonAutomation_TextEdit_H
 #define PokemonAutomation_TextEdit_H
 
 #include <QTextEdit>
+#include "Common/Cpp/SpinLock.h"
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -15,10 +18,17 @@ namespace PokemonAutomation{
 
 class TextEditOption : public ConfigOption{
 public:
-    TextEditOption(QString label, QString default_value);
-    TextEditOption(QString& backing, QString label, QString default_value);
+    TextEditOption(
+        QString label,
+        QString default_value,
+        QString placeholder_text
+    );
 
-    operator const QString&() const{ return m_current; }
+    const QString& label() const{ return m_label; }
+    const QString& placeholder_text() const{ return m_placeholder_text; }
+
+    operator const QString&() const;
+    void set(QString x);
 
     virtual void load_json(const QJsonValue& json) override;
     virtual QJsonValue to_json() const override;
@@ -28,11 +38,12 @@ public:
     virtual ConfigOptionUI* make_ui(QWidget& parent) override;
 
 private:
-    friend class TextEditOptionUI;
-    QString m_label;
-    QString m_default;
-    QString& m_current;
-    QString m_backing;
+    const QString m_label;
+    const QString m_default;
+    const QString m_placeholder_text;
+
+    mutable SpinLock m_lock;
+    QString m_current;
 };
 
 

@@ -17,7 +17,7 @@
 #include <QUrl>
 #include "Tools/Tools.h"
 #include "Tools/PersistentSettings.h"
-#include "Panels/ProgramTabs.h"
+#include "Panels/PanelLists.h"
 #include "MainWindow.h"
 
 //#include <iostream>
@@ -33,7 +33,7 @@ MainWindow::MainWindow(QWidget* parent)
 {
     if (objectName().isEmpty())
         setObjectName(QString::fromUtf8("MainWindow"));
-    resize(800, 600);
+    resize(800, 500);
     m_centralwidget = new QWidget(this);
     m_centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
     setCentralWidget(m_centralwidget);
@@ -66,7 +66,7 @@ MainWindow::MainWindow(QWidget* parent)
     left->addWidget(program_box, 1);
     QVBoxLayout* program_layout = new QVBoxLayout(program_box);
     program_layout->setAlignment(Qt::AlignTop);
-    program_layout->addWidget(new ProgramTabs(*program_box, *this));
+    program_layout->addWidget(new PanelLists(*program_box, *this));
 
 #if 0
     left->addSpacerItem(new QSpacerItem(10, 10));
@@ -114,7 +114,7 @@ MainWindow::MainWindow(QWidget* parent)
     {
         QLabel* github = new QLabel(this);
         links->addWidget(github);
-        github->setText("<a href=\"" + GITHUB_REPO + "SwSh-Arduino/wiki\">Online Documentation</a>");
+        github->setText("<a href=\"" + GITHUB_REPO + "Microcontroller\">Online Documentation</a>");
         github->setTextFormat(Qt::RichText);
         github->setTextInteractionFlags(Qt::TextBrowserInteraction);
         github->setOpenExternalLinks(true);

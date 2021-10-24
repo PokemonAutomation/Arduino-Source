@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "CurryHunter",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-CurryHunter",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/CurryHunter.md",
     "2-Description": "Cooks curry to attract Pokémon to your camp. This is a beta version.",
     "3-Parameters": [
         {

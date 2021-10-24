@@ -9,21 +9,14 @@
 #include <chrono>
 #include <sstream>
 #include <iostream>
-#include "Common/MessageProtocol.h"
+#include "Common/Microcontroller/MessageProtocol.h"
 #include "Common/Cpp/Exception.h"
-#include "Common/PokemonSwSh/PokemonSwShMisc.h"
+#include "Common/Cpp/PrettyPrint.h"
+#include "Common/PokemonSwSh/PokemonSwSh_Protocol_Misc.h"
 #include "MessageConverter.h"
 #include "Logging.h"
 
 namespace PokemonAutomation{
-
-std::string to_string_padded(size_t digits, uint64_t x){
-    std::string str = std::to_string(x);
-    if (digits < str.size()){
-        PA_THROW_StringException("Number is too big to convert to fixed length string.");
-    }
-    return std::string(digits - str.size(), '0') + str;
-}
 
 std::string current_time(){
     //  Based off of: https://stackoverflow.com/questions/15957805/extract-year-month-day-etc-from-stdchronotime-point-in-c

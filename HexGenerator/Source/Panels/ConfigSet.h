@@ -20,6 +20,7 @@ public:
     static const QString JSON_CONFIG_PATH;
     static const QString JSON_DOCUMENTATION;
     static const QString JSON_DESCRIPTION;
+    static const QString JSON_HEADER;
     static const QString JSON_OPTIONS;
 
 public:
@@ -27,7 +28,9 @@ public:
 
     const QString& description() const{ return m_description; }
 
-    virtual bool is_valid() const{ return true; }
+    //  Returns error message if invalid. Otherwise returns empty string.
+    virtual QString check_validity() const{ return QString(); }
+
     virtual void restore_defaults(){}
 
     QJsonDocument to_json() const;
@@ -47,6 +50,7 @@ protected:
 private:
     QString m_path;
     QString m_description;
+    QString m_header;
 };
 
 

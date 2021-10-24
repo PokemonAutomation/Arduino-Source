@@ -32,7 +32,7 @@ public:
     virtual void load_json(const QJsonValue& json) = 0;
     virtual QJsonValue to_json() const = 0;
 
-    virtual SwitchSetup* make_ui(QWidget& parent, Logger& logger) = 0;
+    virtual SwitchSetup* make_ui(QWidget& parent, Logger& logger, uint64_t program_id) = 0;
 
 protected:
     const PABotBaseLevel m_min_pabotbase;
@@ -44,6 +44,11 @@ class SwitchSetup : public QWidget{
     Q_OBJECT
 
 public:
+    virtual ~SwitchSetup() = default;
+    SwitchSetup(const SwitchSetup&) = delete;
+    void operator=(const SwitchSetup&) = delete;
+
+public:
     SwitchSetup(
         QWidget& parent,
         SwitchSetupFactory& factory
@@ -51,7 +56,6 @@ public:
         : QWidget(&parent)
         , m_factory(factory)
     {}
-    virtual ~SwitchSetup() = default;
 
     virtual bool serial_ok() const = 0;
     virtual void wait_for_all_requests() = 0;

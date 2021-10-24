@@ -7,6 +7,10 @@
 #include <immintrin.h>
 #include "PokemonSwSh_MaxLair_AI.h"
 
+#if _WIN32
+#include <intrin.h>
+#endif
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{

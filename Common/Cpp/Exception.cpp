@@ -24,7 +24,7 @@ StringException::StringException(const char* type, const char* location, std::st
     m_full_body += m_message;
     m_full_body += "\r\n\r\n";
 
-    cout << m_full_body << endl;
+//    cout << m_full_body << endl;
 }
 
 

@@ -7,7 +7,7 @@
 #include <QtGlobal>
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
-#include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageMatch/ImageCropper.h"
 #include "PokemonSwSh_PokemonSprites.h"
 
@@ -32,11 +32,11 @@ struct PokemonSpriteDatabase{
         return data;
     }
     PokemonSpriteDatabase()
-        : m_sprites(PERSISTENT_SETTINGS().resource_path + "PokemonSwSh/PokemonSprites.png")
-        , m_silhouettes(PERSISTENT_SETTINGS().resource_path + "PokemonSwSh/PokemonSilhouettes.png")
+        : m_sprites(RESOURCE_PATH() + "PokemonSwSh/PokemonSprites.png")
+        , m_silhouettes(RESOURCE_PATH() + "PokemonSwSh/PokemonSilhouettes.png")
     {
         QJsonObject json = read_json_file(
-            PERSISTENT_SETTINGS().resource_path + "PokemonSwSh/PokemonSprites.json"
+            RESOURCE_PATH() + "PokemonSwSh/PokemonSprites.json"
         ).object();
 
         int width = json.find("spriteWidth")->toInt();

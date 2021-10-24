@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "MassRelease",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-MassRelease",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/MassRelease.md",
     "2-Description": "Mass release boxes of Pokémon.",
     "3-Parameters": [
         {

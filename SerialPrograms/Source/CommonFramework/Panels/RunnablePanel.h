@@ -13,7 +13,9 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/ConfigOption.h"
 #include "CommonFramework/Options/BatchOption.h"
+#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Panels/Panel.h"
+#include "CommonFramework/Notifications/EventNotificationOption.h"
 
 namespace PokemonAutomation{
 
@@ -35,7 +37,7 @@ using RunnablePanelDescriptor = PanelDescriptor;
 
 class RunnablePanelInstance : public PanelInstance{
 public:
-    using PanelInstance::PanelInstance;
+    RunnablePanelInstance(const PanelDescriptor& descriptor);
 
     void add_option(ConfigOption& option, QString serialization_string){
         m_options.add_option(option, std::move(serialization_string));
@@ -45,7 +47,9 @@ public:
         return static_cast<const RunnablePanelDescriptor&>(m_descriptor);
     }
 
-    virtual bool is_valid() const;
+    virtual std::unique_ptr<StatsTracker> make_stats() const{ return nullptr; }
+
+    virtual QString check_validity() const;
     virtual void restore_defaults();
 
 public:
@@ -56,6 +60,8 @@ public:
 private:
     friend class RunnablePanelWidget;
     BatchOption m_options;
+protected:
+    EventNotificationOption NOTIFICATION_PROGRAM_ERROR;
 };
 
 
@@ -67,6 +73,8 @@ public:
     virtual ~RunnablePanelWidget();
 
     ProgramState state() const{ return m_state.load(std::memory_order_acquire); }
+    std::string stats();
+    std::chrono::system_clock::time_point timestamp() const;
 
 //    //  Reset serial if possible.
 //    bool reset_serial();    //  Must call on main thread.
@@ -97,8 +105,11 @@ protected:
     virtual QWidget* make_actions(QWidget& parent);
 
 protected:
-    virtual bool settings_valid() const;
+    virtual QString check_validity() const;
     virtual void restore_defaults();
+
+    void load_historical_stats();
+    void update_historical_stats();
 
     virtual void update_ui();
     void set_status(QString status);
@@ -119,6 +130,7 @@ signals:    //  Protected Signals
 protected:
     friend class RunnablePanelInstance;
 
+    uint64_t m_instance_id = 0;
     TaggedLogger m_logger;
 
     BatchOptionUI* m_options;
@@ -127,10 +139,15 @@ protected:
     QPushButton* m_start_button;
     QPushButton* m_default_button;
 
+    std::atomic<std::chrono::system_clock::time_point> m_timestamp;
     std::atomic<ProgramState> m_state;
     std::thread m_thread;
 
     bool m_destructing = false;
+
+    std::mutex m_lock;
+    std::unique_ptr<StatsTracker> m_historical_stats;
+    std::unique_ptr<StatsTracker> m_current_stats;
 };
 
 

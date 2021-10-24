@@ -5,10 +5,10 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh_DateSpam-StowOnSideFarmer.h"
 
 namespace PokemonAutomation{
@@ -20,7 +20,7 @@ StowOnSideFarmer_Descriptor::StowOnSideFarmer_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:StowOnSideFarmer",
         "Date Spam: Stow-On-Side Farmer",
-        "SwSh-Arduino/wiki/Basic:-DateSpam-StowOnSideFarmer",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-StowOnSideFarmer.md",
         "Farm the Stow-on-Side items dealer.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB
@@ -50,7 +50,7 @@ void StowOnSideFarmer::program(SingleSwitchProgramEnvironment& env){
         grip_menu_connect_go_home(env.console);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
-        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
     }
 
     uint8_t year = MAX_YEAR;
@@ -69,7 +69,7 @@ void StowOnSideFarmer::program(SingleSwitchProgramEnvironment& env){
             if (save_count >= SAVE_ITERATIONS){
                 save_count = 0;
                 pbf_mash_button(env.console, BUTTON_B, 2 * TICKS_PER_SECOND);
-                pbf_press_button(env.console, BUTTON_X, 20, OVERWORLD_TO_MENU_DELAY);
+                pbf_press_button(env.console, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
                 pbf_press_button(env.console, BUTTON_R, 20, 2 * TICKS_PER_SECOND);
                 pbf_press_button(env.console, BUTTON_ZL, 20, 3 * TICKS_PER_SECOND);
             }
@@ -78,7 +78,7 @@ void StowOnSideFarmer::program(SingleSwitchProgramEnvironment& env){
         //  Tap HOME and quickly spam B. The B spamming ensures that we don't
         //  accidentally update the system if the system update window pops up.
         pbf_press_button(env.console, BUTTON_HOME, 10, 5);
-        pbf_mash_button(env.console, BUTTON_B, GAME_TO_HOME_DELAY_FAST - 15);
+        pbf_mash_button(env.console, BUTTON_B, GameSettings::instance().GAME_TO_HOME_DELAY_FAST - 15);
     }
 
     end_program_callback(env.console);

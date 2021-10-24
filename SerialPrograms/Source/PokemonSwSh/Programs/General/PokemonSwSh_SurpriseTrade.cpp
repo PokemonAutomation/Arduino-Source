@@ -4,11 +4,11 @@
  *
  */
 
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/FixedInterval.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh_SurpriseTrade.h"
 
 namespace PokemonAutomation{
@@ -20,7 +20,7 @@ SurpriseTrade_Descriptor::SurpriseTrade_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:SurpriseTrade",
         "Surprise Trade",
-        "SwSh-Arduino/wiki/Basic:-SurpriseTrade",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/SurpriseTrade.md",
         "Surprise trade away boxes of " + STRING_POKEMON,
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB
@@ -55,28 +55,28 @@ SurpriseTrade::SurpriseTrade(const SurpriseTrade_Descriptor& descriptor)
 
     PA_ADD_OPTION(BOXES_TO_TRADE);
     PA_ADD_OPTION(INITIAL_WAIT);
-    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_DIVIDER(m_advanced_options);
     PA_ADD_OPTION(TRADE_ANIMATION);
     PA_ADD_OPTION(EVOLVE_DELAY);
 }
 
 
 void SurpriseTrade::trade_slot(const BotBaseContext& context, uint8_t slot, bool next_box) const{
-    ssf_press_button2(context, BUTTON_Y, OPEN_YCOMM_DELAY, 50);
+    ssf_press_button2(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY, 50);
     ssf_press_dpad1(context, DPAD_DOWN, 10);
     ssf_press_button2(context, BUTTON_A, 280, 20);
 
     if (next_box){
-        ssf_press_button1(context, BUTTON_R, BOX_CHANGE_DELAY);
+        ssf_press_button1(context, BUTTON_R, GameSettings::instance().BOX_CHANGE_DELAY);
     }
 
     //  Move to slot
     while (slot >= 6){
-        ssf_press_dpad1(context, DPAD_DOWN, BOX_SCROLL_DELAY);
+        ssf_press_dpad1(context, DPAD_DOWN, GameSettings::instance().BOX_SCROLL_DELAY);
         slot -= 6;
     }
     while (slot > 0){
-        ssf_press_dpad1(context, DPAD_RIGHT, BOX_SCROLL_DELAY);
+        ssf_press_dpad1(context, DPAD_RIGHT, GameSettings::instance().BOX_SCROLL_DELAY);
         slot--;
     }
 
@@ -91,14 +91,14 @@ void SurpriseTrade::trade_slot(const BotBaseContext& context, uint8_t slot, bool
     //  If we just finished a trade, this will start the animation for it.
     //  If we failed the previous trade and are stuck in the wrong parity, this
     //  is a no-op that will correct the parity and setup the next trade.
-    ssf_press_button1(context, BUTTON_Y, OPEN_YCOMM_DELAY);
+    ssf_press_button1(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY);
     pbf_mash_button(context, BUTTON_B, TRADE_ANIMATION);
 }
 
 void SurpriseTrade::program(SingleSwitchProgramEnvironment& env){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
-        resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
     }
@@ -135,7 +135,7 @@ void SurpriseTrade::program(SingleSwitchProgramEnvironment& env){
         pbf_mash_button(env.console, BUTTON_B, EVOLVE_DELAY);
     }
 
-    ssf_press_button2(env.console, BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
+    ssf_press_button2(env.console, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
 
     end_program_callback(env.console);
     end_program_loop(env.console);

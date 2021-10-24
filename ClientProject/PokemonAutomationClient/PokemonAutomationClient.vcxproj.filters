@@ -30,14 +30,14 @@
     <Filter Include="Source Files\Common\PokemonSwSh">
       <UniqueIdentifier>{ca670832-1439-443e-a6b2-6bf5b48ad8d3}</UniqueIdentifier>
     </Filter>
-    <Filter Include="Source Files\Common\SwitchRoutines">
-      <UniqueIdentifier>{a5871739-f9dc-498f-b930-705eb7881d98}</UniqueIdentifier>
-    </Filter>
-    <Filter Include="Source Files\Common\SwitchFramework">
-      <UniqueIdentifier>{10ade231-7f71-4505-a596-091dfe263106}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Source Files\Common\Cpp">
       <UniqueIdentifier>{8d23dd57-0446-4723-8b44-05293f49c650}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common\NintendoSwitch">
+      <UniqueIdentifier>{10ade231-7f71-4505-a596-091dfe263106}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source Files\Common\Microcontroller">
+      <UniqueIdentifier>{e21343a4-522a-4455-83c6-a73a2c33e324}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
@@ -71,26 +71,44 @@
     <ClInclude Include="..\..\ClientSource\Connection\BotBase.h">
       <Filter>Source Files\ClientSource\Connection</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonProgramIDs.h">
-      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    <ClInclude Include="..\..\Common\CRC32.h">
+      <Filter>Source Files\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSettings.h">
-      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    <ClInclude Include="..\..\Common\Compiler.h">
+      <Filter>Source Files\Common</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\SwitchRoutines\SwitchDigitEntry.h">
-      <Filter>Source Files\Common\SwitchRoutines</Filter>
+    <ClInclude Include="..\..\Common\Cpp\FixedLimitVector.h">
+      <Filter>Source Files\Common\Cpp</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\SwitchFramework\FrameworkSettings.h">
-      <Filter>Source Files\Common\SwitchFramework</Filter>
+    <ClInclude Include="..\..\Common\Cpp\PanicDump.h">
+      <Filter>Source Files\Common\Cpp</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\SwitchFramework\SwitchControllerDefs.h">
-      <Filter>Source Files\Common\SwitchFramework</Filter>
+    <ClInclude Include="..\..\Common\Cpp\ParallelTaskRunner.h">
+      <Filter>Source Files\Common\Cpp</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSwShAutoHosts.h">
-      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    <ClInclude Include="..\..\Common\Cpp\PrettyPrint.h">
+      <Filter>Source Files\Common\Cpp</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSwShDateSpam.h">
-      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    <ClInclude Include="..\..\Common\Cpp\SIMDDebuggers.h">
+      <Filter>Source Files\Common\Cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\Cpp\SpinLock.h">
+      <Filter>Source Files\Common\Cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\Cpp\Unicode.h">
+      <Filter>Source Files\Common\Cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\Cpp\AlignedVector.h">
+      <Filter>Source Files\Common\Cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\Cpp\AsyncDispatcher.h">
+      <Filter>Source Files\Common\Cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\Cpp\DllSafeString.h">
+      <Filter>Source Files\Common\Cpp</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\Cpp\Exception.h">
+      <Filter>Source Files\Common\Cpp</Filter>
     </ClInclude>
     <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSwShDaySkippers.h">
       <Filter>Source Files\Common\PokemonSwSh</Filter>
@@ -104,38 +122,41 @@
     <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSwShMisc.h">
       <Filter>Source Files\Common\PokemonSwSh</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\MessageProtocol.h">
-      <Filter>Source Files\Common</Filter>
+    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonProgramIDs.h">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\CRC32.h">
-      <Filter>Source Files\Common</Filter>
+    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSettings.h">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\SwitchFramework\Switch_PushButtons.h">
-      <Filter>Source Files\Common\SwitchFramework</Filter>
+    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSwShAutoHosts.h">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\Cpp\AsyncDispatcher.h">
-      <Filter>Source Files\Common\Cpp</Filter>
+    <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSwShDateSpam.h">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\Cpp\Exception.h">
-      <Filter>Source Files\Common\Cpp</Filter>
+    <ClInclude Include="..\..\Common\NintendoSwitch\NintendoSwitch_DigitEntry.h">
+      <Filter>Source Files\Common\NintendoSwitch</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\Cpp\FixedLimitVector.h">
-      <Filter>Source Files\Common\Cpp</Filter>
+    <ClInclude Include="..\..\Common\NintendoSwitch\NintendoSwitch_PushButtons.h">
+      <Filter>Source Files\Common\NintendoSwitch</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\Cpp\PanicDump.h">
-      <Filter>Source Files\Common\Cpp</Filter>
+    <ClInclude Include="..\..\Common\NintendoSwitch\NintendoSwitch_Tools.h">
+      <Filter>Source Files\Common\NintendoSwitch</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\Cpp\PrettyPrint.h">
-      <Filter>Source Files\Common\Cpp</Filter>
+    <ClInclude Include="..\..\Common\NintendoSwitch\FrameworkSettings.h">
+      <Filter>Source Files\Common\NintendoSwitch</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\Cpp\SpinLock.h">
-      <Filter>Source Files\Common\Cpp</Filter>
+    <ClInclude Include="..\..\Common\NintendoSwitch\NintendoSwitch_ControllerDefs.h">
+      <Filter>Source Files\Common\NintendoSwitch</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\Cpp\Unicode.h">
-      <Filter>Source Files\Common\Cpp</Filter>
+    <ClInclude Include="..\..\Common\NintendoSwitch\NintendoSwitch_Device.h">
+      <Filter>Source Files\Common\NintendoSwitch</Filter>
     </ClInclude>
-    <ClInclude Include="..\..\Common\Compiler.h">
-      <Filter>Source Files\Common</Filter>
+    <ClInclude Include="..\..\Common\Microcontroller\DeviceRoutines.h">
+      <Filter>Source Files\Common\Microcontroller</Filter>
+    </ClInclude>
+    <ClInclude Include="..\..\Common\Microcontroller\MessageProtocol.h">
+      <Filter>Source Files\Common\Microcontroller</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>
@@ -181,46 +202,16 @@
     <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSettings.c">
       <Filter>Source Files\Common\PokemonSwSh</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSettings.cpp">
-      <Filter>Source Files\Common\PokemonSwSh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShDaySkippers.cpp">
-      <Filter>Source Files\Common\PokemonSwSh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShEggRoutines.cpp">
-      <Filter>Source Files\Common\PokemonSwSh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShAutoHosts.cpp">
-      <Filter>Source Files\Common\PokemonSwSh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShDateSpam.cpp">
-      <Filter>Source Files\Common\PokemonSwSh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\SwitchRoutines\SwitchDigitEntry.cpp">
-      <Filter>Source Files\Common\SwitchRoutines</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\SwitchFramework\FrameworkSettings.c">
-      <Filter>Source Files\Common\SwitchFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\SwitchFramework\FrameworkSettings.cpp">
-      <Filter>Source Files\Common\SwitchFramework</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShGameEntry.cpp">
-      <Filter>Source Files\Common\PokemonSwSh</Filter>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShMisc.cpp">
-      <Filter>Source Files\Common\PokemonSwSh</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Common\CRC32.c">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Common\CRC32.cpp">
       <Filter>Source Files\Common</Filter>
     </ClCompile>
-    <ClCompile Include="..\..\Common\SwitchFramework\Switch_PushButtons.cpp">
-      <Filter>Source Files\Common\SwitchFramework</Filter>
-    </ClCompile>
     <ClCompile Include="..\..\Common\Cpp\PanicDump.cpp">
+      <Filter>Source Files\Common\Cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\Cpp\ParallelTaskRunner.cpp">
       <Filter>Source Files\Common\Cpp</Filter>
     </ClCompile>
     <ClCompile Include="..\..\Common\Cpp\PrettyPrint.cpp">
@@ -234,6 +225,48 @@
     </ClCompile>
     <ClCompile Include="..\..\Common\Cpp\Exception.cpp">
       <Filter>Source Files\Common\Cpp</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShEggRoutines.cpp">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShGameEntry.cpp">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShMisc.cpp">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSettings.cpp">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShAutoHosts.cpp">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShDateSpam.cpp">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShDaySkippers.cpp">
+      <Filter>Source Files\Common\PokemonSwSh</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\NintendoSwitch\NintendoSwitch_DigitEntry.cpp">
+      <Filter>Source Files\Common\NintendoSwitch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\NintendoSwitch\NintendoSwitch_PushButtons.cpp">
+      <Filter>Source Files\Common\NintendoSwitch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\NintendoSwitch\NintendoSwitch_Tools.cpp">
+      <Filter>Source Files\Common\NintendoSwitch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\NintendoSwitch\FrameworkSettings.c">
+      <Filter>Source Files\Common\NintendoSwitch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\NintendoSwitch\FrameworkSettings.cpp">
+      <Filter>Source Files\Common\NintendoSwitch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\NintendoSwitch\NintendoSwitch_Device.cpp">
+      <Filter>Source Files\Common\NintendoSwitch</Filter>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\Microcontroller\DeviceRoutines.cpp">
+      <Filter>Source Files\Common\Microcontroller</Filter>
     </ClCompile>
   </ItemGroup>
 </Project>

@@ -5,20 +5,16 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/SwitchRoutines/SwitchDigitEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
-#include "Common/PokemonSwSh/PokemonSwShAutoHosts.h"
-#include "CommonFramework/Tools/ProgramNotifications.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/FixedInterval.h"
-#include "PokemonSwSh/Inference/Dens/PokemonSwSh_DenMonReader.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
 #include "PokemonSwSh_DenTools.h"
-#include "PokemonSwSh_LobbyWait.h"
 #include "PokemonSwSh_AutoHostStats.h"
+#include "PokemonSwSh_AutoHost.h"
 #include "PokemonSwSh_AutoHost-Rolling.h"
 
 namespace PokemonAutomation{
@@ -30,7 +26,7 @@ AutoHostRolling_Descriptor::AutoHostRolling_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:AutoHostRolling",
         "Auto-Host Rolling",
-        "SwSh-Arduino/wiki/Basic:-AutoHost-Rolling",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/AutoHost-Rolling.md",
         "Roll N days, host, SR and repeat. Also supports hard-locks and soft-locks.",
         FeedbackType::OPTIONAL_,
         PABotBaseLevel::PABOTBASE_12KB
@@ -72,7 +68,11 @@ AutoHostRolling::AutoHostRolling(const AutoHostRolling_Descriptor& descriptor)
         "<b>Alternate Games:</b><br>Alternate hosting between 1st and 2nd games. Host from both Sword and Shield.",
         false
     )
-    , NOTIFICATIONS("Discord Notifications")
+    , HOSTING_NOTIFICATIONS("Live-Hosting Announcements", false)
+    , NOTIFICATIONS({
+        &HOSTING_NOTIFICATIONS.NOTIFICATION,
+        &NOTIFICATION_PROGRAM_ERROR,
+    })
     , m_internet_settings(
         "<font size=4><b>Internet Settings:</b> Increase these if your internet is slow.</font>"
     )
@@ -112,9 +112,8 @@ AutoHostRolling::AutoHostRolling(const AutoHostRolling_Descriptor& descriptor)
     PA_ADD_OPTION(DYNAMAX);
     PA_ADD_OPTION(TROLL_HOSTING);
     PA_ADD_OPTION(ALTERNATE_GAMES);
-    if (PERSISTENT_SETTINGS().developer_mode){
-        PA_ADD_OPTION(NOTIFICATIONS);
-    }
+    PA_ADD_OPTION(HOSTING_NOTIFICATIONS);
+    PA_ADD_OPTION(NOTIFICATIONS);
 
     PA_ADD_OPTION(m_internet_settings);
     PA_ADD_OPTION(CONNECT_TO_INTERNET_DELAY);
@@ -131,12 +130,11 @@ std::unique_ptr<StatsTracker> AutoHostRolling::make_stats() const{
 }
 
 
-void AutoHostRolling::program(SingleSwitchProgramEnvironment& env){
-    AutoHostStats& stats = env.stats<AutoHostStats>();
 
+void AutoHostRolling::program(SingleSwitchProgramEnvironment& env){
     uint16_t start_raid_delay = HOST_ONLINE
         ? OPEN_ONLINE_DEN_LOBBY_DELAY
-        : OPEN_LOCAL_DEN_LOBBY_DELAY;
+        : GameSettings::instance().OPEN_LOCAL_DEN_LOBBY_DELAY;
     const uint16_t lobby_wait_delay = LOBBY_WAIT_DELAY < start_raid_delay
         ? 0
         : LOBBY_WAIT_DELAY - start_raid_delay;
@@ -145,151 +143,53 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env){
         grip_menu_connect_go_home(env.console);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
-        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
     }
 
     uint32_t last_touch = 0;
     if (SKIPS == 0 && TOUCH_DATE_INTERVAL > 0){
-        touch_date_from_home(env.console, SETTINGS_TO_HOME_DELAY);
+        touch_date_from_home(env.console, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
         last_touch = system_clock(env.console);
     }
     rollback_date_from_home(env.console, SKIPS);
-    resume_game_front_of_den_nowatts(env.console, TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+    resume_game_front_of_den_nowatts(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
 
-    char first = true;
     for (uint32_t raids = 0;; raids++){
-        env.log("Raids Completed: " + tostr_u_commas(raids));
+        env.log("Raids Attempted: " + tostr_u_commas(raids));
         env.update_stats();
 
-        roll_den(
-            env.console,
+        run_autohost(
+            env, env.console,
+            descriptor().display_name(),
+            CATCHABILITY, SKIPS,
+            &RAID_CODE, lobby_wait_delay,
+            HOST_ONLINE, FRIEND_ACCEPT_USER_SLOT,
+            MOVE_SLOT, DYNAMAX, TROLL_HOSTING,
+            HOSTING_NOTIFICATIONS,
+            CONNECT_TO_INTERNET_DELAY,
             ENTER_ONLINE_DEN_DELAY,
             OPEN_ONLINE_DEN_LOBBY_DELAY,
-            SKIPS,
-            CATCHABILITY
+            RAID_START_TO_EXIT_DELAY,
+            DELAY_TO_SELECT_MOVE
         );
 
-        if (HOST_ONLINE){
-            connect_to_internet(env.console, OPEN_YCOMM_DELAY, CONNECT_TO_INTERNET_DELAY);
-        }
-
-        env.console.botbase().wait_for_all_requests();
-        {
-            DenMonReader reader(env.console, env.console);
-            enter_den(env.console, ENTER_ONLINE_DEN_DELAY, SKIPS != 0, HOST_ONLINE);
-
-            //  Don't delay if it's the first iteration.
-            if (first){
-                first = false;
-            }else{
-                pbf_wait(env.console, EXTRA_DELAY_BETWEEN_RAIDS);
-            }
-
-            uint8_t code[8];
-            bool has_code = RAID_CODE.get_code(code);
-            if (has_code){
-                char str[8];
-                for (size_t c = 0; c < 8; c++){
-                    str[c] = code[c] + '0';
-                }
-                env.log("Next Raid Code: " + std::string(str, sizeof(str)));
-                pbf_press_button(env.console, BUTTON_PLUS, 5, 145);
-                enter_digits(env.console, 8, code);
-                pbf_wait(env.console, 180);
-                pbf_press_button(env.console, BUTTON_A, 5, 95);
-            }
-            env.console.botbase().wait_for_all_requests();
-
-            send_raid_notification(
-                descriptor().display_name(),
-                env.console,
-                NOTIFICATIONS,
-                has_code, code,
-                reader, stats
-            );
-        }
-
-        enter_lobby(env.console, OPEN_ONLINE_DEN_LOBBY_DELAY, HOST_ONLINE, CATCHABILITY);
-
-        //  Accept friend requests while we wait.
-        RaidLobbyState raid_state = raid_lobby_wait(
-            env.console,
-            HOST_ONLINE,
-            FRIEND_ACCEPT_USER_SLOT,
-            lobby_wait_delay
-        );
-
-        //  Start Raid
-        pbf_press_dpad(env.console, DPAD_UP, 5, 45);
-
-        //  Mash A until it's time to close the game.
-#if 1
-        {
-            env.console.botbase().wait_for_all_requests();
-            uint32_t start = system_clock(env.console);
-            pbf_mash_button(env.console, BUTTON_A, 3 * TICKS_PER_SECOND);
-            env.console.botbase().wait_for_all_requests();
-
-            BlackScreenDetector black_screen;
-            uint32_t now = start;
-            while (true){
-                if (black_screen.black_is_over(env.console.video().snapshot())){
-                    env.log("Raid has Started!", "blue");
-                    stats.add_raid(raid_state.raiders());
-                    break;
-                }
-                if (now - start >= RAID_START_TO_EXIT_DELAY){
-                    stats.add_timeout();
-                    break;
-                }
-                pbf_mash_button(env.console, BUTTON_A, TICKS_PER_SECOND);
-                env.console.botbase().wait_for_all_requests();
-                now = system_clock(env.console);
-            }
-        }
-#else
-        pbf_mash_button(BUTTON_A, RAID_START_TO_EXIT_DELAY);
-#endif
-
-        //  Select a move.
-        if (MOVE_SLOT > 0){
-            pbf_wait(env.console, DELAY_TO_SELECT_MOVE);
-            pbf_press_button(env.console, BUTTON_A, 20, 80);
-            if (DYNAMAX){
-                pbf_press_dpad(env.console, DPAD_LEFT, 20, 30);
-                pbf_press_button(env.console, BUTTON_A, 20, 60);
-            }
-            for (uint8_t c = 1; c < MOVE_SLOT; c++){
-                pbf_press_dpad(env.console, DPAD_DOWN, 20, 30);
-            }
-            pbf_press_button(env.console, BUTTON_A, 20, 80);
-
-            // Disable the troll hosting option if the dynamax is set to TRUE.
-            if (!DYNAMAX && TROLL_HOSTING > 0){
-                pbf_press_dpad(env.console, DPAD_DOWN, 20, 80);
-                for (uint8_t c = 0; c < TROLL_HOSTING; c++){
-                    pbf_press_dpad(env.console, DPAD_RIGHT, 20, 80);
-                }
-            }
-
-            pbf_press_button(env.console, BUTTON_A, 20, 980);
-        }
-
-        //  Add a little extra wait time since correctness matters here.
-        ssf_press_button2(env.console, BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
-
+        //  Exit game.
+        ssf_press_button2(env.console, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
         close_game(env.console);
+
+        //  Post-raid delay.
+        pbf_wait(env.console, EXTRA_DELAY_BETWEEN_RAIDS);
 
         //  Touch the date.
         if (SKIPS == 0 && TOUCH_DATE_INTERVAL > 0 && system_clock(env.console) - last_touch >= TOUCH_DATE_INTERVAL){
-            touch_date_from_home(env.console, SETTINGS_TO_HOME_DELAY);
+            touch_date_from_home(env.console, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
             last_touch += TOUCH_DATE_INTERVAL;
         }
         rollback_date_from_home(env.console, SKIPS);
 
         start_game_from_home_with_inference(
             env, env.console,
-            TOLERATE_SYSTEM_UPDATE_MENU_SLOW,
+            ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW,
             0, 0,
             BACKUP_SAVE
         );

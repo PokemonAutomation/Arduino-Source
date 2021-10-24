@@ -1,9 +1,10 @@
 ﻿{
     "0-ConfigName": "PokemonSettings",
-    "1-ConfigPath": "../Common/PokemonSwSh",
-    "2-Documentation": "SwSh-Arduino/wiki/Appendix:-GlobalSettings",
+    "1-ConfigPath": "PokemonSwSh",
+    "2-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/PokemonSettings.md",
     "3-Description": "Global Pokémon Settings",
-    "4-Options": [
+    "4-Header": "Libraries/PokemonSettings.h",
+    "5-Options": [
         {
             "00-Type": "Divider",
             "01-Label": "<font size=4><b>Egg Options:</b></font>"
@@ -52,7 +53,7 @@
         },
         {
             "00-Type": "TimeExpression",
-            "01-Label": "<b>Auto-FR Duration:</b><br>Time to accept FRs before returning to den lobby.",
+            "01-Label": "<b>Auto-FR Duration:</b><br>Time to accept friend requests before returning to den lobby.",
             "02-Declaration": "uint16_t AUTO_FR_DURATION",
             "03-MinValue": 0,
             "04-MaxValue": 65535,
@@ -83,7 +84,7 @@
         },
         {
             "00-Type": "TimeExpression",
-            "01-Label": "<b>Game to Home Delay (fast):</b><br>Delay from pressing home to entering the the Switch home menu. This affects the speed of date-spamming programs",
+            "01-Label": "<b>Game to Home Delay (fast):</b><br>Delay from pressing home to entering the the Switch home menu. This affects the speed of date-spamming programs.",
             "02-Declaration": "uint16_t GAME_TO_HOME_DELAY_FAST",
             "03-MinValue": 0,
             "04-MaxValue": 65535,
@@ -92,7 +93,7 @@
         },
         {
             "00-Type": "TimeExpression",
-            "01-Label": "<b>Game to Home Delay (safe):</b><br>Delay from pressing home to entering the the Switch home menu. This affects the speed of date-spamming programs",
+            "01-Label": "<b>Game to Home Delay (safe):</b><br>Delay from pressing home to entering the the Switch home menu. This affects the speed of date-spamming programs.",
             "02-Declaration": "uint16_t GAME_TO_HOME_DELAY_SAFE",
             "03-MinValue": 0,
             "04-MaxValue": 65535,
@@ -129,15 +130,6 @@
         {
             "00-Type": "Divider",
             "01-Label": "<font size=4><b>Start Game Timings:</b></font>"
-        },
-        {
-            "00-Type": "TimeExpression",
-            "01-Label": "<b>Start Game Internet Check Delay:</b><br>If starting the game requires checking the internet, wait this long for it.",
-            "02-Declaration": "uint16_t START_GAME_INTERNET_CHECK_DELAY",
-            "03-MinValue": 0,
-            "04-MaxValue": 65535,
-            "98-Default": "3 * TICKS_PER_SECOND",
-            "99-Current": "3 * TICKS_PER_SECOND"
         },
         {
             "00-Type": "TimeExpression",
@@ -217,7 +209,7 @@
         },
         {
             "00-Type": "TimeExpression",
-            "01-Label": "<b>Uncatchable Prompt Delay:</b><br>Time needed to bypass uncatchable pokemon prompt.",
+            "01-Label": "<b>Uncatchable Prompt Delay:</b><br>Time needed to bypass uncatchable Pokémon prompt.",
             "02-Declaration": "uint16_t UNCATCHABLE_PROMPT_DELAY",
             "03-MinValue": 0,
             "04-MaxValue": 65535,

@@ -1,0 +1,34 @@
+/*  QLineEdit with auto-width sizing.
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+
+#include "Common/Compiler.h"
+#include "AutoWidthLineEdit.h"
+
+namespace PokemonAutomation{
+
+
+AutoWidthLineEdit::AutoWidthLineEdit(QWidget* parent)
+    : QLineEdit(parent)
+{
+    connect(
+        this, &QLineEdit::textChanged,
+        this, [=](const QString& line){
+            resize_to_content();
+        }
+    );
+}
+
+void AutoWidthLineEdit::resize_to_content(){
+    QString text = this->text();
+    QFontMetrics fm(this->font());
+    int pixelsWide = fm.width(text);
+    this->setFixedWidth(pixelsWide);
+    adjustSize();
+}
+
+
+}

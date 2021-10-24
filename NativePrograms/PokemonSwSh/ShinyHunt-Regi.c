@@ -6,7 +6,7 @@
  * 
  */
 
-#include "Common/SwitchFramework/SwitchControllerDefs.h"
+#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "Programs/ShinyHunt-Regi.h"
 
 const uint16_t WAIT_TIME    =   15 * TICKS_PER_SECOND;

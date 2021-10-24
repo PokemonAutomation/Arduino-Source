@@ -5,12 +5,12 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
-#include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
@@ -26,7 +26,7 @@ ShinyHuntAutonomousStrongSpawn_Descriptor::ShinyHuntAutonomousStrongSpawn_Descri
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousStrongSpawn",
         "Shiny Hunt Autonomous - Strong Spawn",
-        "SwSh-Arduino/wiki/Advanced:-ShinyHuntAutonomous-StrongSpawn",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-StrongSpawn.md",
         "Automatically hunt for shiny strong spawns using video feedback.",
         FeedbackType::REQUIRED,
         PABotBaseLevel::PABOTBASE_12KB
@@ -39,6 +39,13 @@ ShinyHuntAutonomousStrongSpawn::ShinyHuntAutonomousStrongSpawn(const ShinyHuntAu
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
     , ENCOUNTER_BOT_OPTIONS(true, false)
+    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
+    , NOTIFICATIONS({
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_PROGRAM_ERROR,
+    })
 //    , m_advanced_options(
 //        "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
 //    )
@@ -50,9 +57,10 @@ ShinyHuntAutonomousStrongSpawn::ShinyHuntAutonomousStrongSpawn(const ShinyHuntAu
     PA_ADD_OPTION(LANGUAGE);
 
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
+    PA_ADD_OPTION(NOTIFICATIONS);
 
 //    if (PERSISTENT_SETTINGS().developer_mode){
-//        PA_ADD_OPTION(m_advanced_options);
+//        PA_ADD_DIVIDER(m_advanced_options);
 //    }
 }
 
@@ -75,7 +83,7 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
         grip_menu_connect_go_home(env.console);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
-        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
     }
 
     const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
@@ -95,12 +103,12 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
     while (true){
         uint32_t now = system_clock(env.console);
         if (TIME_ROLLBACK_HOURS > 0 && now - last_touch >= PERIOD){
-            rollback_hours_from_home(env.console, TIME_ROLLBACK_HOURS, SETTINGS_TO_HOME_DELAY);
+            rollback_hours_from_home(env.console, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
             last_touch += PERIOD;
         }
         reset_game_from_home_with_inference(
             env, env.console,
-            TOLERATE_SYSTEM_UPDATE_MENU_FAST
+            ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
         );
         env.log("Starting Encounter: " + tostr_u_commas(stats.encounters() + 1));
         env.console.botbase().wait_for_all_requests();
@@ -118,14 +126,21 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
             break;
         }
 
-        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
     }
 
     env.update_stats();
 
     if (GO_HOME_WHEN_DONE){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
     }
+
+    send_program_finished_notification(
+        env.logger(), NOTIFICATION_PROGRAM_FINISH,
+        descriptor().display_name(),
+        "",
+        stats.to_str()
+    );
 
     end_program_callback(env.console);
     end_program_loop(env.console);

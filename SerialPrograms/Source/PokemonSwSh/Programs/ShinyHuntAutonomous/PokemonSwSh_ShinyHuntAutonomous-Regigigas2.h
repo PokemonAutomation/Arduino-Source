@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Options/SectionDivider.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
@@ -46,6 +47,9 @@ private:
 
     SimpleIntegerOption<uint8_t> REVERSAL_PP;
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
+
+    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
+    EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;
     TimeExpressionOption<uint16_t> CATCH_TO_OVERWORLD_DELAY;

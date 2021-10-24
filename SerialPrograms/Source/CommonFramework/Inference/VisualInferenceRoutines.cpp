@@ -18,6 +18,19 @@ int wait_until(
     std::vector<VisualInferenceCallback*>&& callbacks,
     std::chrono::milliseconds period
 ){
+    return wait_until(
+        env, console,
+        std::chrono::system_clock::now() + timeout,
+        std::move(callbacks),
+        period
+    );
+}
+int wait_until(
+    ProgramEnvironment& env, ConsoleHandle& console,
+    std::chrono::system_clock::time_point time_limit,
+    std::vector<VisualInferenceCallback*>&& callbacks,
+    std::chrono::milliseconds period
+){
     std::map<VisualInferenceCallback*, size_t> map;
     VisualInferenceCallback* trigger = nullptr;
     {
@@ -31,7 +44,7 @@ int wait_until(
             }
         }
 
-        trigger = session.run(timeout);
+        trigger = session.run(time_limit);
         session.stop();
     }
 
@@ -76,6 +89,7 @@ int run_until(
 
         try{
             command(context);
+            context->wait_for_all_requests();
         }catch (CancelledException&){};
 
         session.stop();

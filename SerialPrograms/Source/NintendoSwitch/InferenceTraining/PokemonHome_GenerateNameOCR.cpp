@@ -8,10 +8,10 @@
 #include "Common/Cpp/Exception.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/QtJsonTools.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/OCR/Filtering.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonHome_GenerateNameOCR.h"
 
@@ -54,7 +54,7 @@ GenerateNameOCRData::GenerateNameOCRData(const GenerateNameOCRData_Descriptor& d
 void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env){
 
     QJsonArray array = read_json_file(
-        PERSISTENT_SETTINGS().resource_path + "Pokemon/Pokedex/Pokedex-National.json"
+        RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-National.json"
     ).array();
 
     std::vector<std::string> slugs;
@@ -95,8 +95,7 @@ void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env){
 
         OCR::make_OCR_filter(image).apply(image);
 
-        OCR::MatchResult result = PokemonNameReader::instance().read_substring(LANGUAGE, slug, image);
-        result.log(env.console);
+        OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(env.console, LANGUAGE, image);
     }
 
 

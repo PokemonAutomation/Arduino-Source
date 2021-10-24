@@ -6,6 +6,7 @@
 
 #include <cmath>
 #include "Common/Compiler.h"
+#include "CommonFramework/ImageTools/DistanceToLine.h"
 #include "PokemonSwSh_SquareDetector.h"
 
 #include <iostream>
@@ -272,7 +273,7 @@ void merge_nearby_points(std::map<double, Point>& points, double min_distance_di
                     changed = true;
                 }
             }
-            last = current;
+//            last = current;
         }
 
         //  Remove points marked for removal.
@@ -333,8 +334,7 @@ std::multimap<double, std::pair<pxint_t, pxint_t>> get_edge_points(
             if (submatrix[r][c] != object){
                 continue;
             }
-            if (
-                (c     > 0      && submatrix[r][c - 1] == background) ||
+            if ((c     > 0      && submatrix[r][c - 1] == background) ||
                 (c + 1 < width  && submatrix[r][c + 1] == background) ||
                 (r     > 0      && submatrix[r - 1][c] == background) ||
                 (r + 1 < height && submatrix[r + 1][c] == background)
@@ -377,30 +377,12 @@ double sum_squares_from_line(
 
     auto iter0 = points_by_angle.lower_bound(point_lo_angle);
     auto iter1 = points_by_angle.lower_bound(point_hi_angle);
-    if (point_lo_x == point_hi_x){
-        for (; iter0 != iter1; ++iter0){
-            double distance_sqr = iter0->second.first - point_lo_x;
-//            sum += std::abs(distance_sqr);
-            sum_sqr += distance_sqr * distance_sqr;
-//            count++;
-        }
-    }else{
-        double slope = (double)(point_hi_y - point_lo_y) / (point_hi_x - point_lo_x);
-//        cout << "slope = " << slope << endl;
-        double inverse = 1 / (slope*slope + 1);
-        for (; iter0 != iter1; ++iter0){
-            pxint_t dx = iter0->second.first - point_lo_x;
-            pxint_t dy = iter0->second.second - point_lo_y;
-            double top = slope * dx - dy;
-            double distance_sqr = top * top * inverse;
-//            cout << "    angle = " << iter0->first
-//                 << ", [" << iter0->second.first
-//                 << "," << iter0->second.second
-//                 << "] d = " << std::sqrt(distance_sqr) << endl;
-//            sum += std::sqrt(distance_sqr);
-            sum_sqr += distance_sqr;
-//            count++;
-        }
+    DistanceToLine calc(
+        point_lo_x, point_lo_y,
+        point_hi_x, point_hi_y
+    );
+    for (; iter0 != iter1; ++iter0){
+        sum_sqr += calc.distance_squared(iter0->second.first, iter0->second.second);
     }
 //    cout << "average distance = " << sum / count << endl;
     return sum_sqr;
@@ -590,12 +572,12 @@ bool is_square2(
         }
 
         //  Calculate things on 2 of the edges.
-        double edge0 = sum_squares_from_line(
+        double sum_edge0 = sum_squares_from_line(
             edge_pixels,
             0, far_corner0.x, far_corner0.y,
             near_corner0.first, near_corner0.second.x, near_corner0.second.y
         );
-        double edge1 = sum_squares_from_line(
+        double sum_edge1 = sum_squares_from_line(
             edge_pixels,
             near_corner0.first, near_corner0.second.x, near_corner0.second.y,
             far_corner1_angle, far_corner1.x, far_corner1.y
@@ -613,12 +595,12 @@ bool is_square2(
 
         //  Iterate through the candidate corners on the other side.
         for (; near_corner1_iter0 != near_corner1_iter1; ++near_corner1_iter0){
-            double edge2 = sum_squares_from_line(
+            double sum_edge2 = sum_squares_from_line(
                 edge_pixels,
                 far_corner1_angle, far_corner1.x, far_corner1.y,
                 near_corner1_iter0->first, near_corner1_iter0->second.x, near_corner1_iter0->second.y
             );
-            double edge3 = sum_squares_from_line(
+            double sum_edge3 = sum_squares_from_line(
                 edge_pixels,
                 near_corner1_iter0->first, near_corner1_iter0->second.x, near_corner1_iter0->second.y,
                 360, far_corner0.x, far_corner0.y
@@ -634,7 +616,7 @@ bool is_square2(
                 far_corner0.x, far_corner0.y
             );
 
-            double sum_squares = edge0 + edge1 + edge2 + edge3;
+            double sum_squares = sum_edge0 + sum_edge1 + sum_edge2 + sum_edge3;
             double normalized_distance = std::sqrt(sum_squares / edge_pixels.size());
 
             normalized_distance *= size_scaling;

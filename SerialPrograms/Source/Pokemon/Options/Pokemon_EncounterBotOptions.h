@@ -29,43 +29,6 @@ public:
 };
 
 
-enum class EncounterBotNotificationLevel{
-    NO_NOTIFICATIONS,
-    SHINY_ONLY,
-    PERIODIC_AND_SHINY,
-    EVERYTHING,
-};
-class EncounterBotNotifications : public EnumDropdownOption{
-public:
-    EncounterBotNotifications()
-        : EnumDropdownOption(
-            "<b>Discord Notification Level:</b><br>Requires Discord notification settings be set.",
-            {
-                "No notifications.",
-                "Notify on shinies only.",
-                "Notify once an hour and on shinies.",
-                "Notify on all encounters."
-            },
-            2
-        )
-    {}
-
-    operator EncounterBotNotificationLevel() const{
-        return (EncounterBotNotificationLevel)(size_t)*this;
-    }
-};
-
-
-class EncounterBotScreenshotOption : public ScreenshotOption{
-public:
-    EncounterBotScreenshotOption()
-        : ScreenshotOption(
-            "<b>Attach Shiny Screenshot:</b><br>Attach screenshot of shiny encounters to notification."
-        )
-    {}
-};
-
-
 
 }
 }

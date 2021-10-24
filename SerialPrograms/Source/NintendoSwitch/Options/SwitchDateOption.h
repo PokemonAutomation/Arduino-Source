@@ -2,6 +2,8 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *      This option is thread-safe.
+ *
  */
 
 #ifndef PokemonAutomation_SwitchDate_H
@@ -11,9 +13,10 @@
 #include "CommonFramework/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
+namespace NintendoSwitch{
 
 
-class SwitchDateOption : public ConfigOption, public SwitchDateOptionBase{
+class SwitchDateOption : public ConfigOption, private SwitchDateOptionBase{
 public:
     SwitchDateOption(
         QString label,
@@ -21,6 +24,12 @@ public:
     )
         : SwitchDateOptionBase(std::move(label), default_value)
     {}
+
+    using SwitchDateOptionBase::label;
+    using SwitchDateOptionBase::operator QDate;
+    using SwitchDateOptionBase::get;
+    using SwitchDateOptionBase::set;
+
     virtual void load_json(const QJsonValue& json) override{
         return this->load_current(json);
     }
@@ -28,18 +37,21 @@ public:
         return this->write_current();
     }
 
-    virtual bool is_valid() const override{
-        return SwitchDateOptionBase::is_valid();
+    virtual QString check_validity() const override{
+        return SwitchDateOptionBase::check_validity();
     }
     virtual void restore_defaults() override{
         SwitchDateOptionBase::restore_defaults();
     }
 
     virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+
+private:
+    friend class SwitchDateOptionUI;
 };
 
 
-class SwitchDateOptionUI : public ConfigOptionUI, public SwitchDateOptionBaseUI{
+class SwitchDateOptionUI : public ConfigOptionUI, private SwitchDateOptionBaseUI{
 public:
     SwitchDateOptionUI(QWidget& parent, SwitchDateOption& value)
         : SwitchDateOptionBaseUI(parent, value)
@@ -57,6 +69,7 @@ inline ConfigOptionUI* SwitchDateOption::make_ui(QWidget& parent){
 
 
 
+}
 }
 #endif
 

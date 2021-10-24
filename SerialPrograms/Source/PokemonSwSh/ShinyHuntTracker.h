@@ -20,7 +20,7 @@ public:
     ShinyHuntTracker(bool shiny_types);
     ShinyHuntTracker(bool shiny_types, std::map<std::string, std::string> aliases);
 
-    uint64_t encounters() const{ return m_encounters; }
+    uint64_t encounters() const{ return m_encounters.load(std::memory_order_relaxed); }
 
     void operator+=(ShinyType detection);
     void add_non_shiny();
@@ -30,12 +30,12 @@ public:
     void add_square_shiny();
 
 private:
-    uint64_t& m_encounters;
-    uint64_t& m_errors;
+    std::atomic<uint64_t>& m_encounters;
+    std::atomic<uint64_t>& m_errors;
 
-    uint64_t& m_unknown_shinies;
-    uint64_t& m_star_shinies;
-    uint64_t& m_square_shinies;
+    std::atomic<uint64_t>& m_unknown_shinies;
+    std::atomic<uint64_t>& m_star_shinies;
+    std::atomic<uint64_t>& m_square_shinies;
 };
 
 

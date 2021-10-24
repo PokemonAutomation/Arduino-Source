@@ -39,10 +39,10 @@ RaidLobbyState RaidLobbyReader::read(const QImage& screen){
 
     QString str;
 
-    FloatPixel average0 = pixel_average(extract_box(screen, m_checkbox0));
-    FloatPixel average1 = pixel_average(extract_box(screen, m_checkbox1));
-    FloatPixel average2 = pixel_average(extract_box(screen, m_checkbox2));
-    FloatPixel average3 = pixel_average(extract_box(screen, m_checkbox3));
+    FloatPixel average0 = image_average(extract_box(screen, m_checkbox0));
+    FloatPixel average1 = image_average(extract_box(screen, m_checkbox1));
+    FloatPixel average2 = image_average(extract_box(screen, m_checkbox2));
+    FloatPixel average3 = image_average(extract_box(screen, m_checkbox3));
     double distance1 = euclidean_distance(average0, average1);
     double distance2 = euclidean_distance(average0, average2);
     double distance3 = euclidean_distance(average0, average3);
@@ -52,10 +52,10 @@ RaidLobbyState RaidLobbyReader::read(const QImage& screen){
     str += QString::number(distance2) + ", ";
     str += QString::number(distance3) + "}";
 
-    double stddev0 = pixel_stddev(extract_box(screen, m_spritebox0)).sum();
-    double stddev1 = pixel_stddev(extract_box(screen, m_spritebox1)).sum();
-    double stddev2 = pixel_stddev(extract_box(screen, m_spritebox2)).sum();
-    double stddev3 = pixel_stddev(extract_box(screen, m_spritebox3)).sum();
+    double stddev0 = image_stddev(extract_box(screen, m_spritebox0)).sum();
+    double stddev1 = image_stddev(extract_box(screen, m_spritebox1)).sum();
+    double stddev2 = image_stddev(extract_box(screen, m_spritebox2)).sum();
+    double stddev3 = image_stddev(extract_box(screen, m_spritebox3)).sum();
     str += ", Sprites = {";
     str += QString::number(stddev0) + ", ";
     str += QString::number(stddev1) + ", ";

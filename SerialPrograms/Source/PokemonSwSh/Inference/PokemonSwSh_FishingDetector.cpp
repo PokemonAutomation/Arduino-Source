@@ -32,7 +32,7 @@ bool FishingMissDetector::detect(const QImage& frame){
     }
 
     QImage hook_image = extract_box(frame, m_hook_box);
-    if (pixel_stddev(hook_image).sum() < 50){
+    if (image_stddev(hook_image).sum() < 50){
         return false;
     }
 

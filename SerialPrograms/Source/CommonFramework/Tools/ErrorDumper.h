@@ -13,7 +13,11 @@
 namespace PokemonAutomation{
 
 
-QString dump_image(Logger& logger, const QImage& image, const QString& label);
+QString dump_image(
+    Logger& logger,
+    const QString& module, const QString& label,
+    const QImage& image
+);
 
 
 }

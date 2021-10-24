@@ -13,7 +13,7 @@
 namespace PokemonAutomation{
 
 
-class BooleanCheckBox : public SingleStatementOption, public BooleanCheckBoxOptionBase{
+class BooleanCheckBox : public SingleStatementOption, private BooleanCheckBoxOptionBase{
 public:
     static const QString OPTION_TYPE;
 

@@ -12,6 +12,7 @@
 #include "CommonFramework/Tools/BotBaseHandle.h"
 #include "CommonFramework/Widgets/SerialSelector.h"
 #include "CommonFramework/Widgets/CameraSelector.h"
+#include "Integrations/ProgramTracker.h"
 #include "SwitchSetup.h"
 
 namespace PokemonAutomation{
@@ -42,7 +43,7 @@ public:
 
     const QSerialPortInfo* port() const;
 
-    SwitchSetup* make_ui(QWidget& parent, Logger& logger) override;
+    SwitchSetup* make_ui(QWidget& parent, Logger& logger, uint64_t program_id) override;
 
 private:
     friend class SwitchSystem;
@@ -55,14 +56,15 @@ private:
 };
 
 
-class SwitchSystem : public SwitchSetup{
+class SwitchSystem : public SwitchSetup, public ConsoleSystem{
     Q_OBJECT
 
 public:
     SwitchSystem(
         QWidget& parent,
         SwitchSystemFactory& factory,
-        Logger& logger
+        Logger& logger,
+        uint64_t program_id
     );
     virtual ~SwitchSystem();
 
@@ -73,20 +75,14 @@ public:
     virtual void stop_serial() override;
     virtual void reset_serial() override;
 
-    template <uint8_t SendType, typename Parameters>
-    void send_request(Parameters& params){
-        if (last_known_state() == ProgramState::STOPPED){
-            m_serial->botbase().async_try_send_request<SendType>(params);
-        }else{
-            m_logger.log("SwitchSystem::send_request() - Request dropped due to incorrect program state.", Qt::red);
-        }
-    }
-
 public:
     BotBase* botbase();
     VideoFeed& camera();
     VideoOverlay& overlay();
     virtual void update_ui(ProgramState state) override;
+
+    virtual VideoFeed& video() override;
+    virtual BotBaseHandle& sender() override;
 
 private:
     virtual void resizeEvent(QResizeEvent* event) override;
@@ -96,6 +92,7 @@ private:
     virtual void focusOutEvent(QFocusEvent* event) override;
 
 private:
+    uint64_t m_instance_id = 0;
     SwitchSystemFactory& m_factory;
     SerialLogger m_logger;
 

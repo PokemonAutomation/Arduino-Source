@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Options/BatchOption.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonSwSh/Options/PokemonSwSh_EncounterFilter.h"
 
@@ -16,14 +17,6 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-
-
-struct EncounterBotCommonSettings{
-    const EncounterFilterOption& filter;
-    bool video_on_shiny;
-    EncounterBotNotificationLevel notification_level;
-    ScreenshotMode shiny_screenshot;
-};
 
 
 class EncounterBotCommonOptions : public BatchOption{
@@ -34,21 +27,39 @@ public:
             "<b>Video Capture:</b><br>Take a video of the encounter if it is shiny.",
             true
         )
+        , NOTIFICATION_NONSHINY(
+            "Non-Shiny Encounter",
+            true, false,
+            {"Notifs"},
+            std::chrono::seconds(3600)
+        )
+        , NOTIFICATION_SHINY(
+            "Shiny Encounter",
+            true, true, ImageAttachmentMode::JPG,
+            {"Notifs", "Showcase"}
+        )
+        , NOTIFICATION_CATCH_SUCCESS(
+            "Catch Success",
+            true, false,
+            {"Notifs"}
+        )
+        , NOTIFICATION_CATCH_FAILED(
+            "Catch Failed",
+            true, true,
+            {"Notifs"}
+        )
     {
         PA_ADD_OPTION(FILTER);
         PA_ADD_OPTION(VIDEO_ON_SHINY);
-        PA_ADD_OPTION(NOTIFICATION_LEVEL);
-        PA_ADD_OPTION(SHINY_SCREENSHOT);
-    }
-
-    operator EncounterBotCommonSettings() const{
-        return {FILTER, VIDEO_ON_SHINY, NOTIFICATION_LEVEL, SHINY_SCREENSHOT};
     }
 
     EncounterFilterOption FILTER;
     BooleanCheckBoxOption VIDEO_ON_SHINY;
-    EncounterBotNotifications NOTIFICATION_LEVEL;
-    EncounterBotScreenshotOption SHINY_SCREENSHOT;
+
+    EventNotificationOption NOTIFICATION_NONSHINY;
+    EventNotificationOption NOTIFICATION_SHINY;
+    EventNotificationOption NOTIFICATION_CATCH_SUCCESS;
+    EventNotificationOption NOTIFICATION_CATCH_FAILED;
 };
 
 

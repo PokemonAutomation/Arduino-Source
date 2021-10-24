@@ -46,7 +46,7 @@ private:
 
     const Language m_language;
 
-    const EncounterFilterOption m_filter;
+    const EncounterFilterOption& m_filter;
     const ShinyType m_shininess;
     const std::chrono::milliseconds m_read_name_delay;
 

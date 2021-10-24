@@ -4,11 +4,12 @@
  *
  */
 
-#include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.h"
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
 #include "PokemonSwSh_MaxLair_Run_PokemonSelect.h"
 
 namespace PokemonAutomation{
@@ -21,13 +22,14 @@ void run_select_pokemon(
     ProgramEnvironment& env,
     ConsoleHandle& console,
     GlobalStateTracker& state_tracker,
-    const MaxLairPlayerOptions& settings
+    const MaxLairConsoleOptions& settings
 ){
     size_t console_index = console.index();
     GlobalState& state = state_tracker[console_index];
 
     state.adventure_started = true;
 
+    console.log("Switch " + std::to_string(console.index()) + "'s turn to select.");
 
     //  Wait for the screen to finish loading.
     env.wait_for(std::chrono::milliseconds(500));
@@ -39,26 +41,12 @@ void run_select_pokemon(
         settings.language
     );
 
-    //  Wait until it's your turn.
-    auto start = std::chrono::system_clock::now();
-    do{
-        if (reader.my_turn(console.video().snapshot())){
-            break;
-        }
-        if (std::chrono::system_clock::now() - start > std::chrono::seconds(120)){
-            console.log("Still not your turn after 120 seconds.", Qt::red);
-//            switch_ok = false;
-            return;
-        }
-        env.wait_for(std::chrono::milliseconds(500));
-    }while (true);
-    console.log("Switch " + std::to_string(console.index()) + "'s turn to select.");
 
     std::string options[3];
 
-    //  Wait for bottom row to reload.
-    pbf_wait(console, 50);
-    console.botbase().wait_for_all_requests();
+//    //  Wait for bottom row to reload.
+//    pbf_wait(console, 50);
+//    console.botbase().wait_for_all_requests();
 
     //  Read the bottom two options first.
     QImage screen = console.video().snapshot();
@@ -106,15 +94,7 @@ void run_select_pokemon(
         state.players[console_index].pokemon = std::move(options[selection]);
     }
 
-    //  Wait until we exit the window.
-    PokemonSelectMenuDetector detector(true);
-    wait_until(
-        env, console,
-        std::chrono::seconds(480),
-        { &detector }
-    );
 
-    pbf_wait(console, 5 * TICKS_PER_SECOND);
 }
 
 

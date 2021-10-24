@@ -4,10 +4,9 @@
  *
  */
 
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh_ClothingBuyer.h"
 
 namespace PokemonAutomation{
@@ -19,7 +18,7 @@ ClothingBuyer_Descriptor::ClothingBuyer_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:ClothingBuyer",
         "Clothing Buyer",
-        "SwSh-Arduino/wiki/Basic:-ClothingBuyer",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ClothingBuyer.md",
         "Buy out all the clothing in a store.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB
@@ -42,7 +41,7 @@ ClothingBuyer::ClothingBuyer(const ClothingBuyer_Descriptor& descriptor)
 void ClothingBuyer::program(SingleSwitchProgramEnvironment& env){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
-        resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     }else{
         pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
     }

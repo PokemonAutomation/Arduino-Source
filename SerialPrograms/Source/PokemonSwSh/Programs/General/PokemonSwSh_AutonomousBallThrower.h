@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_AutonomousStatsReset_H
 #define PokemonAutomation_PokemonSwSh_AutonomousStatsReset_H
 
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/OCR/LanguageOptionOCR.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
@@ -40,6 +41,11 @@ private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     PokemonBallSelect BALL_SELECT;
     OCR::LanguageOCR LANGUAGE;
+
+    EventNotificationOption NOTIFICATION_CATCH_SUCCESS;
+    EventNotificationOption NOTIFICATION_CATCH_FAILED;
+    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
+    EventNotificationsOption NOTIFICATIONS;
 };
 
 

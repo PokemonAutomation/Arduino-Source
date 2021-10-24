@@ -2,6 +2,8 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *      This option is thread-safe.
+ *
  */
 
 #ifndef PokemonAutomation_StringOptionBase_H
@@ -11,6 +13,7 @@
 #include <QLineEdit>
 #include <QString>
 #include <QWidget>
+#include <Common/Cpp/SpinLock.h>
 
 namespace PokemonAutomation{
 
@@ -18,31 +21,35 @@ namespace PokemonAutomation{
 class StringOptionBase{
 public:
     StringOptionBase(
-        QString& backing,
+        bool is_password,
         QString label,
-        QString default_value
+        QString default_value,
+        QString placeholder_text
     );
-    StringOptionBase(
-        QString label,
-        QString default_value
-    );
+
+    const QString& label() const{ return m_label; }
+    const QString& placeholder_text() const{ return m_placeholder_text; }
+    bool is_password() const{ return m_is_password; }
+
+    operator QString() const;
+    QString get() const;
+    void set(QString x);
+
+    void restore_defaults();
 
     void load_default(const QJsonValue& json);
     void load_current(const QJsonValue& json);
     QJsonValue write_default() const;
     QJsonValue write_current() const;
 
-    operator QString() const{ return m_current; }
-    QString value() const{ return m_current; }
-
-    void restore_defaults();
-
 private:
-    friend class StringOptionBaseUI;
     const QString m_label;
     QString m_default;
-    QString& m_current;
-    QString m_backing;
+    QString m_placeholder_text;
+    bool m_is_password;
+
+    mutable SpinLock m_lock;
+    QString m_current;
 };
 
 

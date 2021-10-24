@@ -23,11 +23,9 @@ const double SparkleDetector::ANGLE_TOLERANCE_DEGREES = 10.;
 
 SparkleDetector::SparkleDetector(
     const CellMatrix& matrix,
-    const FillGeometry& object,
-    double percentile
+    const FillGeometry& object
 )
     : m_box(object)
-    , m_percentile(percentile)
 {
     if (object.area < 20){
         return;
@@ -130,18 +128,20 @@ bool SparkleDetector::is_ball(){
     pxint_t center_x = m_box.center_x() - m_box.box.min_x;
     pxint_t center_y = m_box.center_y() - m_box.box.min_y;
     std::set<double> angles;
-    size_t c = 0;
-    for (const auto& region : m_regions){
-        pxint_t x = region.second.center_x() - center_x;
-        pxint_t y = region.second.center_y() - center_y;
-        double angle = std::atan2(y, x) * 57.29577951308232;
-        if (angle < 0){
-            angle += 360;
-        }
-        angles.insert(angle);
-        c++;
-        if (c >= 4){
-            break;
+    {
+        size_t c = 0;
+        for (const auto& region : m_regions){
+            pxint_t x = region.second.center_x() - center_x;
+            pxint_t y = region.second.center_y() - center_y;
+            double angle = std::atan2(y, x) * 57.29577951308232;
+            if (angle < 0){
+                angle += 360;
+            }
+            angles.insert(angle);
+            c++;
+            if (c >= 4){
+                break;
+            }
         }
     }
 

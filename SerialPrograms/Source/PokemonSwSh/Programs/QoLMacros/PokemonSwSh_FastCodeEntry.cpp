@@ -4,9 +4,9 @@
  *
  */
 
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/SwitchRoutines/SwitchDigitEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_DigitEntry.h"
 #include "PokemonSwSh_FastCodeEntry.h"
 
 namespace PokemonAutomation{
@@ -18,7 +18,7 @@ FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:FastCodeEntry",
         "Fast Code Entry (FCE)",
-        "SwSh-Arduino/wiki/Basic:-FastCodeEntry",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/FastCodeEntry.md",
         "Force your way into raids by entering 8-digit codes in under 1 second.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB

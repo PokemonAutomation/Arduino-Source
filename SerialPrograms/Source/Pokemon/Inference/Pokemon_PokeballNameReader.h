@@ -8,6 +8,7 @@
 #define PokemonAutomation_Pokemon_PokeballNameReader_H
 
 #include <QImage>
+#include "CommonFramework/Tools/Logger.h"
 #include "CommonFramework/OCR/SmallDictionaryMatcher.h"
 
 namespace PokemonAutomation{
@@ -15,18 +16,16 @@ namespace Pokemon{
 
 
 class PokeballNameReader : public OCR::SmallDictionaryMatcher{
+    static constexpr double MAX_LOG10P = -1.40;
+
 public:
     PokeballNameReader();
 
     static PokeballNameReader& instance();
 
-    OCR::MatchResult read_substring(
+    OCR::StringMatchResult read_substring(
+        Logger& logger,
         Language language,
-        const QImage& image
-    ) const;
-    OCR::MatchResult read_substring(
-        Language language,
-        const std::string& expected,
         const QImage& image
     ) const;
 };

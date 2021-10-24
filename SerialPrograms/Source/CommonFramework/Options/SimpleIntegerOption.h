@@ -2,11 +2,14 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *      This option is thread-safe.
+ *
  */
 
 #ifndef PokemonAutomation_SimpleInteger_H
 #define PokemonAutomation_SimpleInteger_H
 
+#include <limits>
 #include "Common/Qt/Options/SimpleIntegerOptionBase.h"
 #include "ConfigOption.h"
 
@@ -14,17 +17,12 @@ namespace PokemonAutomation{
 
 
 template <typename Type>
-class SimpleIntegerOption : public ConfigOption, public SimpleIntegerOptionBase<Type>{
+class SimpleIntegerOptionUI;
+
+
+template <typename Type>
+class SimpleIntegerOption : public ConfigOption, private SimpleIntegerOptionBase<Type>{
 public:
-    SimpleIntegerOption(
-        Type& backing,
-        QString label,
-        Type default_value,
-        Type min_value = std::numeric_limits<Type>::min(),
-        Type max_value = std::numeric_limits<Type>::max()
-    )
-        : SimpleIntegerOptionBase<Type>(backing, std::move(label), min_value, max_value, default_value)
-    {}
     SimpleIntegerOption(
         QString label,
         Type default_value,
@@ -34,6 +32,11 @@ public:
         : SimpleIntegerOptionBase<Type>(std::move(label), min_value, max_value, default_value)
     {}
 
+    using SimpleIntegerOptionBase<Type>::label;
+    using SimpleIntegerOptionBase<Type>::operator Type;
+    using SimpleIntegerOptionBase<Type>::get;
+    using SimpleIntegerOptionBase<Type>::set;
+
     virtual void load_json(const QJsonValue& json) override{
         return this->load_current(json);
     }
@@ -41,19 +44,22 @@ public:
         return this->write_current();
     }
 
-    virtual bool is_valid() const override{
-        return SimpleIntegerOptionBase<Type>::is_valid();
+    virtual QString check_validity() const override{
+        return SimpleIntegerOptionBase<Type>::check_validity();
     }
     virtual void restore_defaults() override{
         SimpleIntegerOptionBase<Type>::restore_defaults();
     }
 
     virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+
+private:
+    friend class SimpleIntegerOptionUI<Type>;
 };
 
 
 template <typename Type>
-class SimpleIntegerOptionUI : public ConfigOptionUI, public SimpleIntegerOptionBaseUI<Type>{
+class SimpleIntegerOptionUI : public ConfigOptionUI, private SimpleIntegerOptionBaseUI<Type>{
 public:
     SimpleIntegerOptionUI(QWidget& parent, SimpleIntegerOption<Type>& value)
         : SimpleIntegerOptionBaseUI<Type>(parent, value)

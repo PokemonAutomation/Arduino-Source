@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Options/SectionDivider.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
@@ -45,6 +46,9 @@ private:
 
     CatchabilitySelectorOption CATCHABILITY;
     TimeExpressionOption<uint16_t> VIEW_TIME;
+
+    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
+    EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;
     TimeExpressionOption<uint16_t> READ_DELAY;

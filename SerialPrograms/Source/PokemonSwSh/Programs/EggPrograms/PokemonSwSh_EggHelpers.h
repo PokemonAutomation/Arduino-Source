@@ -8,8 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_EggHelpers_H
 
 #include "Common/Compiler.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "NintendoSwitch/FixedInterval.h"
 
 namespace PokemonAutomation{
@@ -24,12 +23,13 @@ namespace PokemonSwSh{
 //  Collect egg.
 static void collect_egg(const BotBaseContext& context){
     ssf_press_button1(context, BUTTON_A, 120);
-    if (EGG_FETCH_EXTRA_LINE){
+    if (GameSettings::instance().EGG_FETCH_EXTRA_LINE){
         ssf_press_button1(context, BUTTON_A, 120);
     }
     ssf_press_button1(context, BUTTON_A, 10);
 }
 static void collect_egg_mash_out(const BotBaseContext& context, bool deposit_automatically){
+    uint16_t FETCH_EGG_MASH_DELAY = GameSettings::instance().FETCH_EGG_MASH_DELAY;
     pbf_mash_button(
         context,
         BUTTON_B,
@@ -43,7 +43,7 @@ static void collect_egg_mash_out(const BotBaseContext& context, bool deposit_aut
 //  Fly Home: Used by everything.
 static void fly_home(const BotBaseContext& context, char from_overworld){
     if (from_overworld){
-        ssf_press_button2(context, BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
+        ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
     }
     ssf_press_button2(context, BUTTON_A, 350, 10);
     ssf_press_dpad2(context, DPAD_UP_RIGHT, 25, 5);
@@ -69,12 +69,13 @@ static void fly_home_collect_egg(const BotBaseContext& context, char from_overwo
 #define EGG_BUTTON_HOLD_DELAY   10
 
 static void menu_to_box(const BotBaseContext& context, bool from_map){
+    uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY;
     if (from_map){
         ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
         ssf_press_dpad2(context, DPAD_RIGHT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
     }
-    ssf_press_button2(context, BUTTON_A, MENU_TO_POKEMON_DELAY, EGG_BUTTON_HOLD_DELAY);
-    ssf_press_button2(context, BUTTON_R, POKEMON_TO_BOX_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_button2(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_button2(context, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY, EGG_BUTTON_HOLD_DELAY);
     ssf_press_dpad2(context, DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
     ssf_press_dpad2(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
     ssf_press_button2(context, BUTTON_Y, 30, EGG_BUTTON_HOLD_DELAY);
@@ -92,17 +93,22 @@ static void box_to_menu(const BotBaseContext& context){
     //                  be swallowed by the animation.
     //  In state (2):   The 1st B will drop the party pokemon. The 2nd B will
     //                  back out of the box.
+
+    uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY;
+
     ssf_press_button2(context, BUTTON_B, 20, EGG_BUTTON_HOLD_DELAY);
-    ssf_press_button2(context, BUTTON_B, BOX_TO_POKEMON_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_button2(context, BUTTON_B, GameSettings::instance().BOX_TO_POKEMON_DELAY, EGG_BUTTON_HOLD_DELAY);
 
     //  Back out to menu.
-    ssf_press_button2(context, BUTTON_B, POKEMON_TO_MENU_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_button2(context, BUTTON_B, GameSettings::instance().POKEMON_TO_MENU_DELAY, EGG_BUTTON_HOLD_DELAY);
 
     ssf_press_dpad2(context, DPAD_LEFT, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
     ssf_press_dpad2(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
 }
 
 static void party_to_column(const BotBaseContext& context, uint8_t column){
+    uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY;
+
     ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
     column++;
     if (column <= 3){
@@ -116,6 +122,8 @@ static void party_to_column(const BotBaseContext& context, uint8_t column){
     }
 }
 static void column_to_party(const BotBaseContext& context, uint8_t column){
+    uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY;
+
     column++;
     if (column <= 3){
         for (uint8_t c = column; c != 0; c--){
@@ -130,12 +138,14 @@ static void column_to_party(const BotBaseContext& context, uint8_t column){
 }
 
 static void pickup_column(const BotBaseContext& context, char party){
+    uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY;
+
     ssf_press_button2(context, BUTTON_A, 20, EGG_BUTTON_HOLD_DELAY);
     if (party){
         ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
     }
     ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
-    ssf_press_button2(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
+    ssf_press_button2(context, BUTTON_A, GameSettings::instance().BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
 }
 
 

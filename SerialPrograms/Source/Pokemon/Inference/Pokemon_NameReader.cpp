@@ -24,20 +24,17 @@ PokemonNameReader::PokemonNameReader(const std::set<std::string>& subset)
     : LargeDictionaryMatcher("Pokemon/PokemonNameOCR/PokemonOCR-", &subset, false)
 {}
 
-OCR::MatchResult PokemonNameReader::read_substring(
+OCR::StringMatchResult PokemonNameReader::read_substring(
+    Logger& logger,
     Language language,
     const QImage& image
 ) const{
     QString text = OCR::ocr_read(language, image);
-    return match_substring(language, text);
-}
-OCR::MatchResult PokemonNameReader::read_substring(
-    Language language,
-    const std::string& expected,
-    const QImage& image
-) const{
-    QString text = OCR::ocr_read(language, image);
-    return match_substring(language, expected, text);
+    OCR::StringMatchResult ret;
+    match_substring(ret, language, text);
+    ret.log(logger, MAX_LOG10P);
+    ret.clear_beyond_log10p(MAX_LOG10P);
+    return ret;
 }
 
 

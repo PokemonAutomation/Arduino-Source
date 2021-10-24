@@ -31,8 +31,8 @@ public:
             " - Skips Remaining: " + tostr_u_commas(skips_remaining);
     }
 
-    uint64_t& runs;
-    uint64_t& issued;
+    std::atomic<uint64_t>& runs;
+    std::atomic<uint64_t>& issued;
 };
 
 

@@ -44,6 +44,9 @@ private:
 //    ImageFloatBox m_box4;
 //    ImageFloatBox m_box5;
 //    ImageFloatBox m_box6;
+    ImageFloatBox m_select0;
+    ImageFloatBox m_select1;
+    ImageFloatBox m_select2;
 };
 
 
@@ -65,7 +68,6 @@ public:
         Language language
     );
 
-    bool my_turn(const QImage& screen) const;
     int8_t who_is_selecting(const QImage& screen) const;
 
     std::string read_option(const QImage& screen, size_t index);
@@ -81,9 +83,6 @@ private:
     InferenceBoxScope m_name0;
     InferenceBoxScope m_name1;
     InferenceBoxScope m_name2;
-    InferenceBoxScope m_select0;
-    InferenceBoxScope m_select1;
-    InferenceBoxScope m_select2;
     InferenceBoxScope m_player0;
     InferenceBoxScope m_player1;
     InferenceBoxScope m_player2;

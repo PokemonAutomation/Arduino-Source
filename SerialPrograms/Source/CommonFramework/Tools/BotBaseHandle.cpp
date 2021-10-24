@@ -5,14 +5,16 @@
  */
 
 #include <QtGlobal>
+#include <QMessageBox>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/PanicDump.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
+#include "Common/Microcontroller/DeviceRoutines.h"
+#include "Common/NintendoSwitch/NintendoSwitch_Tools.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "ClientSource/Connection/SerialConnection.h"
 #include "ClientSource/Connection/PABotBase.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/PersistentSettings.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
 #include "BotBaseHandle.h"
 
 namespace PokemonAutomation{
@@ -26,18 +28,10 @@ BotBaseHandle::BotBaseHandle(
     : m_minimum_pabotbase(minimum_pabotbase)
     , m_current_pabotbase(PABotBaseLevel::NOT_PABOTBASE)
     , m_state(State::NOT_CONNECTED)
+    , m_allow_user_commands(true)
     , m_logger(logger)
 {
     reset(port);
-    connect(
-        this, static_cast<void(BotBaseHandle::*)(uint8_t, std::string)>(&BotBaseHandle::async_try_send_request),
-        this, [=](uint8_t msg_type, std::string body){
-            if (try_send_request(msg_type, &body[0], body.size())){
-                return;
-            }
-            m_logger.log("BotBaseHandle::async_try_send_request() - Request dropped.");
-        }
-    );
 }
 BotBaseHandle::~BotBaseHandle(){
     stop();
@@ -58,19 +52,28 @@ bool BotBaseHandle::accepting_commands() const{
         m_current_pabotbase.load(std::memory_order_acquire) > PABotBaseLevel::NOT_PABOTBASE;
 }
 
+void BotBaseHandle::set_allow_user_commands(bool allow){
+    m_allow_user_commands.store(allow, std::memory_order_release);
+}
 
-bool BotBaseHandle::try_send_request(uint8_t msg_type, void* params, size_t bytes){
+const char* BotBaseHandle::try_send_request(const BotBaseRequest& request){
     std::unique_lock<std::mutex> lg(m_lock, std::defer_lock);
     if (!lg.try_lock()){
-        return false;
+        return "Console is busy.";
     }
-    if (!accepting_commands()){
-        return false;
+    if (state() != State::READY){
+        return "Console is not accepting commands right now.";
     }
-    return botbase()->try_issue_request(nullptr, msg_type, params, bytes);
-}
-void BotBaseHandle::async_try_send_request(uint8_t msg_type, void* params, size_t bytes){
-    async_try_send_request(msg_type, std::string((char*)params, bytes));
+    if (m_current_pabotbase.load(std::memory_order_acquire) <= PABotBaseLevel::NOT_PABOTBASE){
+        return "Device is not running PABotBase.";
+    }
+    if (!m_allow_user_commands.load(std::memory_order_acquire)){
+        return "Cannot accept commands while a program is running.";
+    }
+    if (!botbase()->try_issue_request(nullptr, request)){
+        return "Command dropped.";
+    }
+    return nullptr;
 }
 
 void BotBaseHandle::stop_unprotected(){
@@ -118,6 +121,21 @@ void BotBaseHandle::reset(const QSerialPortInfo& port){
     std::string name = port.systemLocation().toUtf8().data();
     std::string error;
 
+
+    if (port.description().indexOf("Prolific") != -1){
+        QMessageBox box;
+        box.critical(
+            nullptr,
+            "Error",
+            "Cannot select Prolific controller.<br><br>"
+            "Prolific controllers do not work for Arduino and similar microntrollers.<br>"
+            "You were warned of this in the setup instructions. Please buy a CP210x controller instead."
+        );
+        on_not_connected("<font color=\"red\">Cannot connect to Prolific controller.</font>");
+        m_logger.log("Unable to connect due to Prolific controller.");
+        return;
+    }
+
     try{
         std::unique_ptr<SerialConnection> connection(new SerialConnection(name, PABB_BAUD_RATE));
         m_botbase.reset(new PABotBase(std::move(connection), nullptr));
@@ -137,8 +155,9 @@ void BotBaseHandle::reset(const QSerialPortInfo& port){
     m_status_thread = std::thread(run_with_catch, "BotBaseHandle::thread_body()", [=]{ thread_body(); });
 }
 
+
 void BotBaseHandle::verify_protocol(){
-    uint32_t protocol = m_botbase->protocol_version();
+    uint32_t protocol = Microcontroller::protocol_version(*m_botbase);
     uint32_t version_hi = protocol / 100;
     uint32_t version_lo = protocol % 100;
     if (version_hi != PABB_PROTOCOL_VERSION / 100 || version_lo < PABB_PROTOCOL_VERSION % 100){
@@ -150,7 +169,7 @@ void BotBaseHandle::verify_protocol(){
 uint8_t BotBaseHandle::verify_pabotbase(){
     using namespace PokemonAutomation;
 
-    uint8_t program_id = m_botbase->program_id();
+    uint8_t program_id = Microcontroller::program_id(*m_botbase);
     PABotBaseLevel type = program_id_to_botbase_level(program_id);
     m_current_pabotbase.store(type, std::memory_order_release);
     if (type < m_minimum_pabotbase){
@@ -192,7 +211,7 @@ void BotBaseHandle::thread_body(){
         try{
             verify_protocol();
             program_id = verify_pabotbase();
-            version = m_botbase->program_version();
+            version = Microcontroller::program_version(*m_botbase);
         }catch (CancelledException&){
             return;
         }catch (const StringException& e){
@@ -248,9 +267,9 @@ void BotBaseHandle::thread_body(){
         QString error;
         try{
 //            cout << "system_clock()" << endl;
-            uint32_t wallclock = system_clock(context);
+            uint32_t wallclock = NintendoSwitch::system_clock(context);
 //            cout << "system_clock() - done" << endl;
-            str = ticks_to_time(wallclock);
+            str = NintendoSwitch::ticks_to_time(wallclock);
         }catch (CancelledException&){
             break;
         }catch (const StringException& e){

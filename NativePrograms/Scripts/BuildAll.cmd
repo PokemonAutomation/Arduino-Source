@@ -69,8 +69,10 @@ if not exist obj\ (
 
 for /F "tokens=*" %%p in (ProgramList.txt) do (
     set first=%%p
-    @call %~dp0BuildOne.cmd %board% %%p > %%p.log  2>&1
-    goto :done
+    if exist %%p.c (
+        @call %~dp0BuildOne.cmd %board% %%p > %%p.log  2>&1
+        goto :done
+    )
 )
 :done
 

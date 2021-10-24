@@ -10,7 +10,7 @@
 #include <memory>
 #include "CommonFramework/ImageTools/FloatPixel.h"
 #include "CommonFramework/ImageTools/FillGeometry.h"
-#include "CommonFramework/ImageMatch/ImageMatchMetadata.h"
+#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "PokemonSwSh_TypeMatchup.h"
 
 namespace PokemonAutomation{
@@ -23,7 +23,7 @@ public:
     const std::string& slug() const{ return m_slug; }
     const QImage& sprite() const{ return m_sprite; }
 
-    const ImageMatch::ExactMatchMetadata& matcher() const{ return *m_matcher; }
+    const ImageMatch::WeightedExactImageMatcher& matcher() const{ return *m_matcher; }
     const FillGeometry& matching_object() const{ return m_matching_object; }
 
 public:
@@ -34,7 +34,7 @@ private:
     std::string m_slug;
     QImage m_sprite;
 
-    std::unique_ptr<ImageMatch::ExactMatchMetadata> m_matcher;
+    std::unique_ptr<ImageMatch::WeightedExactImageMatcher> m_matcher;
     FillGeometry m_matching_object;
 };
 

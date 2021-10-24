@@ -2,6 +2,8 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *      This option is thread-safe.
+ *
  */
 
 #ifndef PokemonAutomation_BooleanCheckBox_H
@@ -13,21 +15,19 @@
 namespace PokemonAutomation{
 
 
-class BooleanCheckBoxOption : public ConfigOption, public BooleanCheckBoxOptionBase{
+class BooleanCheckBoxOption : public ConfigOption, private BooleanCheckBoxOptionBase{
 public:
-    BooleanCheckBoxOption(
-        bool& backing,
-        QString label,
-        bool default_value
-    )
-        : BooleanCheckBoxOptionBase(backing, std::move(label), default_value)
-    {}
     BooleanCheckBoxOption(
         QString label,
         bool default_value
     )
         : BooleanCheckBoxOptionBase(std::move(label), default_value)
     {}
+
+    using BooleanCheckBoxOptionBase::label;
+    using BooleanCheckBoxOptionBase::operator bool;
+    using BooleanCheckBoxOptionBase::get;
+    using BooleanCheckBoxOptionBase::set;
 
     virtual void load_json(const QJsonValue& json) override{
         load_current(json);
@@ -41,10 +41,13 @@ public:
     }
 
     virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+
+private:
+    friend class BooleanCheckBoxOptionUI;
 };
 
 
-class BooleanCheckBoxOptionUI : public ConfigOptionUI, public BooleanCheckBoxOptionBaseUI{
+class BooleanCheckBoxOptionUI : public ConfigOptionUI, private BooleanCheckBoxOptionBaseUI{
 public:
     BooleanCheckBoxOptionUI(QWidget& parent, BooleanCheckBoxOption& value)
         : BooleanCheckBoxOptionBaseUI(parent, value)

@@ -11,6 +11,7 @@
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
+namespace NintendoSwitch{
 
 
 class TimeExpression : public SingleStatementOption, public TimeExpressionOptionBase<uint32_t>{
@@ -23,7 +24,7 @@ public:
     TimeExpression(const QJsonObject& obj);
 
     virtual const QString& type() const override{ return OPTION_TYPE; }
-    bool is_valid() const override;
+    QString check_validity() const override;
     virtual void restore_defaults() override;
 
     virtual QJsonObject to_json() const override;
@@ -39,6 +40,7 @@ public:
 };
 
 
+}
 }
 #endif
 

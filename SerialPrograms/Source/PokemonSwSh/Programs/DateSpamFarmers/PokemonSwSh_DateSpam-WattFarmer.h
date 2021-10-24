@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_WattFarmer_H
 
 #include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
@@ -31,6 +32,7 @@ public:
 
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;
+    TimeExpressionOption<uint16_t> GRIP_MENU_WAIT;
 
     SimpleIntegerOption<uint32_t> SKIPS;
     SimpleIntegerOption<uint16_t> SAVE_ITERATIONS;

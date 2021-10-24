@@ -7,7 +7,7 @@
 #include <QtGlobal>
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
-#include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/Logger.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
@@ -22,9 +22,7 @@ namespace Pokemon{
 
 
 PokemonNameSelectData::PokemonNameSelectData(const QString& json_file_slugs){
-    QJsonArray array = read_json_file(
-        PERSISTENT_SETTINGS().resource_path + json_file_slugs
-    ).array();
+    QJsonArray array = read_json_file(RESOURCE_PATH() + json_file_slugs).array();
     for (const auto& item : array){
         QString slug = item.toString();
         std::string slug_str = slug.toUtf8().data();
@@ -37,7 +35,7 @@ PokemonNameSelectData::PokemonNameSelectData(const QString& json_file_slugs){
         const PokemonSprite* sprites = get_pokemon_sprite_nothrow(slug_str);
         if (sprites == nullptr){
             m_list.emplace_back(data.display_name(), QIcon());
-            global_logger().log("Missing sprite for: " + slug, "red");
+            global_logger_tagged().log("Missing sprite for: " + slug, "red");
         }else{
             m_list.emplace_back(
                 data.display_name(),

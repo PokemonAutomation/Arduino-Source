@@ -20,7 +20,9 @@ namespace MaxLairInternal{
 StateMachineAction run_caught_screen(
     MaxLairRuntime& runtime,
     ProgramEnvironment& env,
-    ConsoleHandle& console, bool is_host,
+    ConsoleHandle& console,
+    GlobalStateTracker& state_tracker,
+    const EndBattleDecider& decider,
     const QImage& entrance
 );
 

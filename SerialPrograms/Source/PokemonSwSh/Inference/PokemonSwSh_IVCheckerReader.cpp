@@ -47,14 +47,14 @@ IVCheckerReader::IVCheckerReader()
     : SmallDictionaryMatcher("PokemonSwSh/IVCheckerOCR.json")
 {}
 
-IVCheckerReader::Result IVCheckerReader::token_to_enum(const std::string& token){
+IVCheckerReader::Result IVCheckerReader::string_to_enum(const std::string& token){
     auto iter = m_token_to_enum.find(token);
     if (iter == m_token_to_enum.end()){
         return Result::UnableToDetect;
     }
     return iter->second;
 }
-const std::string& IVCheckerReader::enum_to_token(Result result){
+const std::string& IVCheckerReader::enum_to_string(Result result){
     auto iter = m_enum_to_token.find(result);
     if (iter == m_enum_to_token.end()){
         PA_THROW_StringException("Invalid IV result enum.");
@@ -84,12 +84,16 @@ IVCheckerReader::Result IVCheckerReaderScope::read(Logger& logger, const QImage&
 
     QString text = OCR::ocr_read(m_language, image);
 
-    OCR::MatchResult result = m_reader.match_substring(m_language, text);
-    result.log(logger);
-    if (!result.matched || result.slugs.size() != 1){
+    static constexpr double MAX_LOG10P = -1.40;
+
+    OCR::StringMatchResult result;
+    m_reader.match_substring(result, m_language, text);
+    result.log(logger, MAX_LOG10P);
+    result.clear_beyond_log10p(MAX_LOG10P);
+    if (result.results.size() != 1){
         return IVCheckerReader::Result::UnableToDetect;
     }
-    return IVCheckerReader::token_to_enum(*result.slugs.begin());
+    return IVCheckerReader::string_to_enum(result.results.begin()->second.token);
 }
 IVCheckerReader::Results IVCheckerReaderScope::read(Logger& logger, const QImage& frame){
     IVCheckerReader::Results results;

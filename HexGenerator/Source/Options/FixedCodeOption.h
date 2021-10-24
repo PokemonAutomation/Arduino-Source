@@ -21,7 +21,7 @@ public:
     FixedCode(const QJsonObject& obj);
 
     virtual const QString& type() const override{ return OPTION_TYPE; }
-    virtual bool is_valid() const override;
+    virtual QString check_validity() const override;
     virtual void restore_defaults() override;
 
     virtual QJsonObject to_json() const override;

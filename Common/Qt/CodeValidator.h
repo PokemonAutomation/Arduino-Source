@@ -11,6 +11,7 @@
 
 namespace PokemonAutomation{
 
+
 bool validate_code(size_t digits, const QString& code);
 QString sanitize_code(size_t digits, const QString& code);
 

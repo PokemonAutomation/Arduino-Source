@@ -30,11 +30,10 @@ struct Stats : public StatsTracker{
         m_display_order.emplace_back("Wins");
         m_display_order.emplace_back("Catches");
         m_display_order.emplace_back("Shinies");
-        m_display_order.emplace_back("Shiny Legendary");
+        m_display_order.emplace_back("Shiny Legendary", true);
     }
 
     void add_run(size_t catches){
-        SpinLockGuard lg(m_lock);
         m_runs++;
         m_catches += catches;
         if (catches >= 4){
@@ -42,27 +41,23 @@ struct Stats : public StatsTracker{
         }
     }
     void add_error(){
-        SpinLockGuard lg(m_lock);
         m_errors++;
     }
     void add_shiny(){
-        SpinLockGuard lg(m_lock);
         m_shinies++;
     }
     void add_shiny_legendary(){
-        SpinLockGuard lg(m_lock);
         m_shiny_legendary++;
     }
 
 
 private:
-    SpinLock m_lock;
-    uint64_t& m_runs;
-    uint64_t& m_errors;
-    uint64_t& m_wins;
-    uint64_t& m_catches;
-    uint64_t& m_shinies;
-    uint64_t& m_shiny_legendary;
+    std::atomic<uint64_t>& m_runs;
+    std::atomic<uint64_t>& m_errors;
+    std::atomic<uint64_t>& m_wins;
+    std::atomic<uint64_t>& m_catches;
+    std::atomic<uint64_t>& m_shinies;
+    std::atomic<uint64_t>& m_shiny_legendary;
 };
 
 

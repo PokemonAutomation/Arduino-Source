@@ -4,8 +4,8 @@
  * 
  */
 
-#include "Common/SwitchFramework/SwitchControllerDefs.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
+#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
+#include "NativePrograms/PokemonSwSh/Libraries/PokemonSettings.h"
 
 
 //  # of frames to roll.

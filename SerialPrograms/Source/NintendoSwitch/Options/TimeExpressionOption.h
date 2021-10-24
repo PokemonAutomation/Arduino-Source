@@ -2,6 +2,8 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *      This option is thread-safe.
+ *
  */
 
 #ifndef PokemonAutomation_TimeExpression_H
@@ -12,20 +14,16 @@
 #include "CommonFramework/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
+namespace NintendoSwitch{
 
 
 template <typename Type>
-class TimeExpressionOption : public ConfigOption, public TimeExpressionOptionBase<Type>{
+class TimeExpressionOptionUI;
+
+
+template <typename Type>
+class TimeExpressionOption : public ConfigOption, private TimeExpressionOptionBase<Type>{
 public:
-    TimeExpressionOption(
-        Type& backing,
-        QString label,
-        QString default_value,
-        Type min_value = std::numeric_limits<Type>::min(),
-        Type max_value = std::numeric_limits<Type>::max()
-    )
-        : TimeExpressionOptionBase<Type>(backing, std::move(label), min_value, max_value, default_value)
-    {}
     TimeExpressionOption(
         QString label,
         QString default_value,
@@ -35,6 +33,11 @@ public:
         : TimeExpressionOptionBase<Type>(std::move(label), min_value, max_value, default_value)
     {}
 
+    using TimeExpressionOptionBase<Type>::label;
+    using TimeExpressionOptionBase<Type>::operator Type;
+    using TimeExpressionOptionBase<Type>::get;
+    using TimeExpressionOptionBase<Type>::set;
+
     virtual void load_json(const QJsonValue& json) override{
         this->load_current(json);
     }
@@ -42,19 +45,22 @@ public:
         return this->write_current();
     }
 
-    virtual bool is_valid() const override{
-        return TimeExpressionOptionBase<Type>::is_valid();
+    virtual QString check_validity() const override{
+        return TimeExpressionOptionBase<Type>::check_validity();
     }
     virtual void restore_defaults() override{
         TimeExpressionOptionBase<Type>::restore_defaults();
     }
 
     virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+
+private:
+    friend class TimeExpressionOptionUI<Type>;
 };
 
 
 template <typename Type>
-class TimeExpressionOptionUI : public ConfigOptionUI, public TimeExpressionOptionBaseUI<Type>{
+class TimeExpressionOptionUI : public ConfigOptionUI, private TimeExpressionOptionBaseUI<Type>{
 public:
     TimeExpressionOptionUI(QWidget& parent, TimeExpressionOption<Type>& value)
         : TimeExpressionOptionBaseUI<Type>(parent, value)
@@ -73,6 +79,7 @@ ConfigOptionUI* TimeExpressionOption<Type>::make_ui(QWidget& parent){
 
 
 
+}
 }
 #endif
 

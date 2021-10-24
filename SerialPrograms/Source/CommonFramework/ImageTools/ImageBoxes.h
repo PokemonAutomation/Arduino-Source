@@ -53,6 +53,15 @@ QImage extract_box(const QImage& image, const ImageFloatBox& box);
 QImage extract_box(const QImage& image, const ImageFloatBox& box, int offset_x, int offset_y);
 
 
+ImageFloatBox translate_to_parent(
+    const QImage& original_image,
+    const ImageFloatBox& inference_box,
+    const ImagePixelBox& box
+);
+
+
+
+
 
 }
 #endif

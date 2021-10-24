@@ -8,6 +8,9 @@
 #define PokemonAutomation_PokemonSwSh_DexRecFinder_H
 
 #include "CommonFramework/Options/SectionDivider.h"
+#include "CommonFramework/Options/ScreenshotFormatOption.h"
+#include "CommonFramework/Options/EditableTableOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/OCR/LanguageOptionOCR.h"
 #include "Pokemon/Options/Pokemon_NameSelectOption.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
@@ -29,6 +32,16 @@ public:
 
 
 
+class DexRecFilters : public GroupOption{
+public:
+    DexRecFilters();
+
+    OCR::LanguageOCR LANGUAGE;
+    PokemonNameSelect DESIRED;
+    EditableTableOption EXCLUSIONS;
+};
+
+
 class DexRecFinder : public SingleSwitchProgramInstance{
 public:
     DexRecFinder(const DexRecFinder_Descriptor& descriptor);
@@ -39,11 +52,14 @@ public:
 private:
     void read_line(
         bool& found,
+        bool& excluded,
         bool& bad_read,
         Logger& logger,
+        Language language,
         const QImage& frame,
         const ImageFloatBox& box,
-        const std::set<std::string>& desired
+        const std::set<std::string>& desired,
+        const std::set<std::string>& exclusions
     );
 
 private:
@@ -53,9 +69,11 @@ private:
     StartInGripOrGameOption START_IN_GRIP_MENU;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    OCR::LanguageOCR LANGUAGE;
-    PokemonNameSelect DESIRED;
+    DexRecFilters FILTERS;
     TimeExpressionOption<uint16_t> VIEW_TIME;
+
+    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
+    EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;
     TimeExpressionOption<uint16_t> ENTER_POKEDEX_TIME;

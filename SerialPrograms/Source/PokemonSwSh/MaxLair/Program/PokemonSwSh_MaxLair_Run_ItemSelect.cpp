@@ -4,12 +4,13 @@
  *
  */
 
-#include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
-#include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_ItemSelectMenu.h"
+#include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
 #include "PokemonSwSh_MaxLair_Run_ItemSelect.h"
 
 namespace PokemonAutomation{
@@ -27,9 +28,9 @@ void run_item_select(
     GlobalState& state = state_tracker[console_index];
     size_t player_index = state.find_player_index(console_index);
 
-    PathPartyReader reader(console, player_index);
-    reader.read_sprites(console, console, state, console.video().snapshot());
-    reader.read_hp(console, console, state, console.video().snapshot());
+    PathReader reader(console, player_index);
+    reader.read_sprites(console, state, console.video().snapshot());
+    reader.read_hp(console, state, console.video().snapshot());
 
 
     GlobalState inferred = state_tracker.synchronize(env, console, console_index);
@@ -53,7 +54,8 @@ void run_item_select(
     wait_until(
         env, console,
         std::chrono::seconds(480),
-        { &item_menu }
+        { &item_menu },
+        INFERENCE_RATE
     );
 
     pbf_wait(console, 1 * TICKS_PER_SECOND);

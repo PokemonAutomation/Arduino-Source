@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "ShinyHuntUnattended-SwordsOfJustice",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-ShinyHuntUnattended-SwordOfJustice",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-SwordsOfJustice.md",
     "2-Description": "Hunt for shiny SOJs. Stop when a shiny is found.",
     "3-Parameters": [
         {

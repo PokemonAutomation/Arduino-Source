@@ -4,9 +4,9 @@
  *
  */
 
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Programs/ReleaseHelpers.h"
 #include "PokemonSwSh_MassRelease.h"
 
@@ -19,7 +19,7 @@ MassRelease_Descriptor::MassRelease_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:MassRelease",
         "Mass Release",
-        "SwSh-Arduino/wiki/Basic:-MassRelease",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/MassRelease.md",
         "Mass release boxes of " + STRING_POKEMON + ".",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB
@@ -52,8 +52,8 @@ void MassRelease::program(SingleSwitchProgramEnvironment& env){
         pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
     }
 
-    release_boxes(env.console, BOXES_TO_RELEASE, BOX_SCROLL_DELAY, BOX_CHANGE_DELAY);
-    pbf_press_button(env.console, BUTTON_HOME, 10, HOME_TO_GAME_DELAY);
+    release_boxes(env.console, BOXES_TO_RELEASE, GameSettings::instance().BOX_SCROLL_DELAY, GameSettings::instance().BOX_CHANGE_DELAY);
+    pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().HOME_TO_GAME_DELAY);
 
     end_program_callback(env.console);
     end_program_loop(env.console);

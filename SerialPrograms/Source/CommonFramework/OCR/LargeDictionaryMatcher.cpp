@@ -9,7 +9,7 @@
 #include <QJsonArray>
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
-#include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/Globals.h"
 #include "StringNormalization.h"
 #include "TextMatcher.h"
 #include "LargeDictionaryMatcher.h"
@@ -24,7 +24,7 @@ LargeDictionaryMatcher::LargeDictionaryMatcher(
     const std::set<std::string>* subset,
     bool first_only
 ){
-    QString prefix = PERSISTENT_SETTINGS().resource_path + json_file_prefix;
+    QString prefix = RESOURCE_PATH() + json_file_prefix;
     for (size_t c = 1; c < (size_t)Language::EndOfList; c++){
         Language language = (Language)c;
         const LanguageData& data = language_data(language);

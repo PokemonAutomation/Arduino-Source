@@ -4,14 +4,15 @@
  *
  */
 
-#include "Common/SwitchFramework/Switch_PushButtons.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Inference/VisualInferenceSession.h"
-#include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_ItemSelectMenu.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_EndBattle.h"
+#include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
 #include "PokemonSwSh_MaxLair_Run_ItemSelect.h"
 #include "PokemonSwSh_MaxLair_Run_PathSelect.h"
 
@@ -34,20 +35,17 @@ void run_path_select(
     GlobalState& state = state_tracker[console_index];
     size_t player_index = state.find_player_index(console_index);
 
-    PathPartyReader reader(console, player_index);
+    PathReader reader(console, player_index);
     env.wait_for(std::chrono::milliseconds(500));
 
-    reader.read_sprites(console, console, state, console.video().snapshot());
-    reader.read_hp(console, console, state, console.video().snapshot());
+    QImage screen = console.video().snapshot();
+    reader.read_sprites(console, state, screen);
+    reader.read_hp(console, state, screen);
 
     if (state.wins == 0){
-        Path path;
-        if (read_path(path, console)){
-            console.log("Path Detection:\n" + path.dump());
-            state.path = path;
-        }else{
-            console.log("Path Detection: Failed", Qt::red);
-        }
+        reader.read_path(env, console, state);
+    }else{
+        reader.read_side(console, state, screen);
     }
 
 

@@ -5,10 +5,11 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShDaySkippers.h"
+#include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
 #include "NintendoSwitch/FixedInterval.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h"
 #include "PokemonSwSh_DaySkipperStats.h"
 #include "PokemonSwSh_DaySkipperJPN.h"
 
@@ -21,7 +22,7 @@ DaySkipperJPN_Descriptor::DaySkipperJPN_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:DaySkipperJPN",
         "Day Skipper (JPN)",
-        "SwSh-Arduino/wiki/Basic:-DaySkipperJPN",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DaySkipperJPN.md",
         "A day skipper for Japanese date format. (7600 skips/hour)",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_31KB
@@ -36,6 +37,13 @@ DaySkipperJPN::DaySkipperJPN(const DaySkipperJPN_Descriptor& descriptor)
         "<b>Number of Frame Skips:</b>",
         10
     )
+    , NOTIFICATION_PROGRESS_UPDATE("Progress Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
+    , NOTIFICATIONS({
+        &NOTIFICATION_PROGRESS_UPDATE,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_PROGRAM_ERROR,
+    })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -45,7 +53,8 @@ DaySkipperJPN::DaySkipperJPN(const DaySkipperJPN_Descriptor& descriptor)
     )
 {
     PA_ADD_OPTION(SKIPS);
-    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_OPTION(NOTIFICATIONS);
+    PA_ADD_DIVIDER(m_advanced_options);
     PA_ADD_OPTION(CORRECTION_SKIPS);
 }
 
@@ -69,6 +78,13 @@ void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env){
     uint8_t day = 1;
     uint16_t correct_count = 0;
     while (remaining_skips > 0){
+        send_program_status_notification(
+            env.logger(), NOTIFICATION_PROGRESS_UPDATE,
+            descriptor().display_name(),
+            "",
+            stats.to_str_current(remaining_skips)
+        );
+
         skipper_increment_day(env.console, false);
 
         if (day == 31){
@@ -90,6 +106,15 @@ void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env){
 
     //  Prevent the Switch from sleeping and the time from advancing.
     end_program_callback(env.console);
+
+    env.console.botbase().wait_for_all_requests();
+    send_program_finished_notification(
+        env.logger(), NOTIFICATION_PROGRAM_FINISH,
+        descriptor().display_name(),
+        "",
+        stats.to_str_current(remaining_skips)
+    );
+
     pbf_wait(env.console, 15 * TICKS_PER_SECOND);
     while (true){
         ssf_press_button1(env.console, BUTTON_A, 15 * TICKS_PER_SECOND);

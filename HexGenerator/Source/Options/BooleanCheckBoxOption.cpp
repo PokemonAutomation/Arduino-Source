@@ -47,7 +47,7 @@ std::string BooleanCheckBox::to_cpp() const{
     std::string str;
     str += m_declaration.toUtf8().data();
     str += " = ";
-    str += value() ? "true" : "false";
+    str += *this ? "true" : "false";
     str += ";\r\n";
     return str;
 }

@@ -1,57 +1,57 @@
-/*  Exact Image Matcher
+/*  Exact Image Match Preprocessed Data
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_ExactImageMatcher_H
-#define PokemonAutomation_CommonFramework_ExactImageMatcher_H
+#ifndef PokemonAutomation_ExactImageMatcher_H
+#define PokemonAutomation_ExactImageMatcher_H
 
-#include <string>
-#include <map>
 #include <QImage>
-#include "CommonFramework/Tools/Logger.h"
-#include "CommonFramework/Inference/ImageTools.h"
-#include "ImageMatchResult.h"
-#include "ImageMatchMetadata.h"
+#include "CommonFramework/ImageTools/FloatPixel.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
 
 namespace PokemonAutomation{
 namespace ImageMatch{
 
 
+//  Matching with brightness scaling only.
 class ExactImageMatcher{
 public:
-    ExactImageMatcher() = default;
-    void add(const std::string& slug, QImage image);
+    ExactImageMatcher(QImage image, void*);
 
-    QSize dimensions() const{ return m_dimensions; }
+    const ImageStats& stats() const{ return m_stats; }
 
-    void scale_to_dimensions(QImage& image) const;
-
-    MatchResult match(
-        const QImage& screen, const ImageFloatBox& box,
-        bool use_alpha_mask,
-        size_t tolerance = 2,
-        double RMSD_ratio_spread = 0.03
-    ) const;
-
+    double rmsd(QImage image) const;
+    double rmsd(QImage image, QRgb background) const;
+    double rmsd_masked(QImage image) const;
 
 private:
-    static double compare(
-        const ExactMatchMetadata& sprite,
-        QImage image, bool use_alpha_mask
-    );
-    static double compare(
-        const ExactMatchMetadata& sprite,
-        const std::vector<QImage>& images, bool use_alpha_mask
-    );
+    void process_images(QImage& reference, QImage& image) const;
 
-
-private:
-    QSize m_dimensions;
-    std::map<std::string, ExactMatchMetadata> m_database;
+public:
+    QImage m_image;
+    ImageStats m_stats;
 };
 
+
+//  Matching with custom weight.
+class WeightedExactImageMatcher : public ExactImageMatcher{
+public:
+    struct InverseStddevWeight{
+        double stddev_coefficient;
+        double offset;
+    };
+
+    WeightedExactImageMatcher(QImage image, const InverseStddevWeight& weight);
+
+    double diff(QImage image) const;
+    double diff(QImage image, QRgb background) const;
+    double diff_masked(QImage image) const;
+
+public:
+    double m_multiplier;
+};
 
 
 }

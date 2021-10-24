@@ -41,8 +41,8 @@ SimpleInteger::SimpleInteger(const QJsonObject& obj)
 {
     m_current = json_get_int_throw(obj, JSON_CURRENT);
 }
-bool SimpleInteger::is_valid() const{
-    return SimpleIntegerOptionBase<uint32_t>::is_valid();
+QString SimpleInteger::check_validity() const{
+    return SimpleIntegerOptionBase<uint32_t>::check_validity();
 }
 void SimpleInteger::restore_defaults(){
     SimpleIntegerOptionBase<uint32_t>::restore_defaults();

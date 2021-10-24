@@ -2,6 +2,8 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *      This option is thread-safe.
+ *
  */
 
 #ifndef PokemonAutomation_SimpleIntegerOptionBase_H
@@ -17,38 +19,34 @@ template <typename Type>
 class SimpleIntegerOptionBase{
 public:
     SimpleIntegerOptionBase(
-        Type& backing,
         QString label,
         Type min_value,
         Type max_value,
         Type default_value
     );
-    SimpleIntegerOptionBase(
-        QString label,
-        Type min_value,
-        Type max_value,
-        Type default_value
-    );
+
+    const QString& label() const{ return m_label; }
+
+    operator Type() const{ return m_current.load(std::memory_order_relaxed); }
+    Type get() const{ return m_current.load(std::memory_order_relaxed); }
+    QString set(Type x);
+
+    QString check_validity() const;
+    QString check_validity(Type x) const;
+    void restore_defaults();
 
     void load_default(const QJsonValue& json);
     void load_current(const QJsonValue& json);
     QJsonValue write_default() const;
     QJsonValue write_current() const;
 
-    operator Type() const{ return m_current; }
-    Type value() const{ return m_current; }
-
-    bool is_valid() const;
-    void restore_defaults();
 
 protected:
-    template <typename> friend class SimpleIntegerOptionBaseUI;
     const QString m_label;
     const Type m_min_value;
     const Type m_max_value;
     Type m_default;
-    Type& m_current;
-    Type m_backing;
+    std::atomic<Type> m_current;
 };
 
 

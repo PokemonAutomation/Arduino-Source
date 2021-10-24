@@ -5,7 +5,6 @@
  */
 
 #include <QJsonObject>
-#include <QMessageBox>
 #include <QHBoxLayout>
 #include "Common/Qt/QtJsonTools.h"
 #include "Common/Qt/NoWheelComboBox.h"
@@ -205,18 +204,6 @@ void SerialSelectorUI::reset(){
     stop();
     on_ready(false);
     refresh();
-
-//    if (m_value.m_port.description().indexOf("Labs") != -1){
-    if (m_value.m_port.description().indexOf("Prolific") != -1){
-        QMessageBox box;
-        box.warning(
-            nullptr,
-            "Warning",
-            "Prolific controller detected!<br><br>These controllers are known to have reliability issues. Proceed at your own risk!"
-        );
-    }
-
-
     m_connection.reset(m_value.m_port);
 }
 

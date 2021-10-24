@@ -35,7 +35,7 @@ public:
 
     const QString& description() const{ return m_description; }
 
-    virtual bool is_valid() const{ return true; }
+    virtual QString check_validity() const{ return QString(); }
     virtual void restore_defaults(){}
 
     QJsonDocument to_json() const;

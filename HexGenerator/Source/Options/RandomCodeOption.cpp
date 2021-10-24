@@ -62,11 +62,15 @@ void RandomCode::restore_defaults(){
     m_current_random = m_default_random;
     m_current_code = m_default_code;
 }
-bool RandomCode::is_valid() const{
+QString RandomCode::check_validity() const{
     if (m_current_random == 0){
-        return validate_code(m_digits, m_current_code);
+        return validate_code(m_digits, m_current_code)
+            ? QString()
+            : "Code is invalid.";
     }else{
-        return m_current_random <= m_digits;
+        return m_current_random <= m_digits
+            ? QString()
+            : "Random digits cannot be greater than " + QString::number(m_digits) + ".";
     }
 }
 QJsonObject RandomCode::to_json() const{

@@ -24,13 +24,15 @@ extern const QString STRING_POKEBALL;
 extern const QString STRING_POKEMON;
 extern const QString STRING_POKEDEX;
 
-
+const QString& RESOURCE_PATH();
+const QString& TRAINING_PATH();
 
 
 enum class ProgramState{
+    NOT_READY,
     STOPPED,
     RUNNING,
-    FINISHED,
+//    FINISHED,
     STOPPING,
 };
 

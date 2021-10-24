@@ -123,9 +123,10 @@ private:
 
 void Program::save_and_build(const std::string& board){
 //        cout << "asdf" << endl;
-    if (!is_valid()){
+    QString error = check_validity();
+    if (!error.isEmpty()){
         QMessageBox box;
-        box.critical(nullptr, "Error", "The current settings are invalid.");
+        box.critical(nullptr, "Error", error);
         return;
     }
 //    if (!QDir(settings.config_path).exists()){

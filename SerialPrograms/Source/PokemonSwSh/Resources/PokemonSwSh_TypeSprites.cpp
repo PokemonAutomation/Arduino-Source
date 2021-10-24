@@ -6,7 +6,7 @@
 
 #include <QtGlobal>
 #include "Common/Cpp/Exception.h"
-#include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/CommonFilters.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "PokemonSwSh_TypeSprites.h"
@@ -49,7 +49,7 @@ struct TypeSpriteDatabase{
 TypeSprite::TypeSprite(const std::string& slug)
     : m_slug(slug)
 {
-    QString path = PERSISTENT_SETTINGS().resource_path + "PokemonSwSh/Types/" + QString::fromStdString(slug) + ".png";
+    QString path = RESOURCE_PATH() + "PokemonSwSh/Types/" + QString::fromStdString(slug) + ".png";
     m_sprite = QImage(path);
     if (m_sprite.isNull()){
         PA_THROW_FileException("Unable to open file.", path);
@@ -88,15 +88,17 @@ TypeSprite::TypeSprite(const std::string& slug)
 //    cout << "[" << object.box.min_x << "," << object.box.min_y << "][" << object.box.max_x << "," << object.box.max_y << "]" << endl;
 
     m_matcher.reset(
-        new ImageMatch::ExactMatchMetadata(
+        new ImageMatch::WeightedExactImageMatcher(
             m_sprite.copy(
                 object.box.min_x,
                 object.box.min_y,
                 object.box.width(),
                 object.box.height()
-            )
+            ),
+            ImageMatch::WeightedExactImageMatcher::InverseStddevWeight{1, 64}
         )
     );
+//    cout << slug << ": " << 1 / m_matcher->m_multiplier << endl;
     m_matching_object = object;
 }
 

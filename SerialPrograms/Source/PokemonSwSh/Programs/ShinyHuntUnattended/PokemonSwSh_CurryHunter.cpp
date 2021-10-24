@@ -4,12 +4,13 @@
  *
  */
 
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Inference/VisualInferenceSession.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_ReceivePokemonDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleDetector.h"
@@ -24,7 +25,7 @@ CurryHunter_Descriptor::CurryHunter_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:CurryHunter",
         "Curry Hunter",
-        "SwSh-Arduino/wiki/Basic:-CurryHunter",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/CurryHunter.md",
         "Cooks curry to attract " + STRING_POKEMON + " to your camp. This is a beta version. "
         "<font color=\"red\">(This program cannot detect shinies. You must check manually or with " + STRING_POKEMON + " HOME.)</font>",
         FeedbackType::OPTIONAL_,
@@ -43,7 +44,7 @@ struct CurryHunter::Stats : public ShinyHuntTracker{
         }
         m_display_order.insert(m_display_order.begin(), Stat("Attempts"));
     }
-    uint64_t& m_attempts;
+    std::atomic<uint64_t>& m_attempts;
 };
 std::unique_ptr<StatsTracker> CurryHunter::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -76,7 +77,7 @@ CurryHunter::CurryHunter(const CurryHunter_Descriptor& descriptor)
 void CurryHunter::program(SingleSwitchProgramEnvironment& env){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
-        resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     }else{
         pbf_press_button(env.console, BUTTON_R, 5, 50);
     }
@@ -267,7 +268,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env){
 
     //  Not really relevant here, but for programs that finish, go to
     //  Switch home to idle.
-    pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+    pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
     end_program_callback(env.console);
     end_program_loop(env.console);
 }

@@ -24,16 +24,10 @@ public:
 public:
     const DictionaryOCR& dictionary(Language language) const;
 
-    MatchResult match_substring(
+    void match_substring(
+        StringMatchResult& results,
         Language language,
-        const QString& text,
-        double min_alpha = 25
-    ) const;
-    MatchResult match_substring(
-        Language language,
-        const std::string& expected,
-        const QString& text,
-        double min_alpha = 100
+        const QString& text, double log10p_spread = 0.50
     ) const;
 
 

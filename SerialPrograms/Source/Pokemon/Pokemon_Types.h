@@ -18,6 +18,7 @@ enum class MoveCategory{
     STATUS,
     PHYSICAL,
     SPECIAL,
+    UNKNOWN,
 };
 
 enum class PokemonType{

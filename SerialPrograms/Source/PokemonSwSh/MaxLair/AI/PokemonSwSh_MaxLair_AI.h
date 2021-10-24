@@ -19,6 +19,7 @@ namespace MaxLairInternal{
 int random(int min, int max);
 
 
+
 //  0 for top Pokemon
 //  1 for middle Pokemon
 //  2 for bottom Pokemon

@@ -4,7 +4,7 @@
  * 
  */
 
-#include "Common/SwitchFramework/SwitchControllerDefs.h"
+#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 
 
 //  Rotate categories. This will allow the program to eventually buy out the

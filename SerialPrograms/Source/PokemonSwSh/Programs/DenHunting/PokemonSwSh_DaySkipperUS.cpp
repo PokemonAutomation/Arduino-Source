@@ -5,10 +5,11 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShDaySkippers.h"
+#include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
 #include "NintendoSwitch/FixedInterval.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h"
 #include "PokemonSwSh_DaySkipperStats.h"
 #include "PokemonSwSh_DaySkipperUS.h"
 
@@ -21,8 +22,8 @@ DaySkipperUS_Descriptor::DaySkipperUS_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:DaySkipperUS",
         "Day Skipper (US)",
-        "SwSh-Arduino/wiki/Basic:-DaySkipperUS",
-        "A day skipper for US date format that.  (~7500 skips/hour)",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DaySkipperUS.md",
+        "A day skipper for US date format that.  (~7100 skips/hour)",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_31KB
     )
@@ -40,6 +41,13 @@ DaySkipperUS::DaySkipperUS(const DaySkipperUS_Descriptor& descriptor)
         "<b>Real Life Year:</b>",
         2021, 2000, 2060
     )
+    , NOTIFICATION_PROGRESS_UPDATE("Progress Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
+    , NOTIFICATIONS({
+        &NOTIFICATION_PROGRESS_UPDATE,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_PROGRAM_ERROR,
+    })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -50,7 +58,8 @@ DaySkipperUS::DaySkipperUS(const DaySkipperUS_Descriptor& descriptor)
 {
     PA_ADD_OPTION(SKIPS);
     PA_ADD_OPTION(REAL_LIFE_YEAR);
-    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_OPTION(NOTIFICATIONS);
+    PA_ADD_DIVIDER(m_advanced_options);
     PA_ADD_OPTION(CORRECTION_SKIPS);
 }
 
@@ -80,6 +89,13 @@ void DaySkipperUS::program(SingleSwitchProgramEnvironment& env){
 
     uint16_t correct_count = 0;
     while (remaining_skips > 0){
+        send_program_status_notification(
+            env.logger(), NOTIFICATION_PROGRESS_UPDATE,
+            descriptor().display_name(),
+            "",
+            stats.to_str_current(remaining_skips)
+        );
+
         skipper_increment_day(env.console, true);
 
         correct_count++;
@@ -106,6 +122,15 @@ void DaySkipperUS::program(SingleSwitchProgramEnvironment& env){
 
     //  Prevent the Switch from sleeping and the time from advancing.
     end_program_callback(env.console);
+
+    env.console.botbase().wait_for_all_requests();
+    send_program_finished_notification(
+        env.logger(), NOTIFICATION_PROGRAM_FINISH,
+        descriptor().display_name(),
+        "",
+        stats.to_str_current(remaining_skips)
+    );
+
     pbf_wait(env.console, 15 * TICKS_PER_SECOND);
     while (true){
         ssf_press_button1(env.console, BUTTON_A, 15 * TICKS_PER_SECOND);

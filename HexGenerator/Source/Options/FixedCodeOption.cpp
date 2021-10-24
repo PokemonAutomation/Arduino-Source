@@ -45,8 +45,8 @@ FixedCode::FixedCode(const QJsonObject& obj)
 void FixedCode::restore_defaults(){
     m_current = m_default;
 }
-bool FixedCode::is_valid() const{
-    return validate_code(m_digits, m_current);
+QString FixedCode::check_validity() const{
+    return validate_code(m_digits, m_current) ? QString() : "Code is invalid.";
 }
 QJsonObject FixedCode::to_json() const{
     QJsonObject root = SingleStatementOption::to_json();

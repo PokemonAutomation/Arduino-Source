@@ -18,7 +18,7 @@
 #include <string>
 #include <deque>
 #include "Common/Compiler.h"
-#include "Common/MessageProtocol.h"
+#include "Common/Microcontroller/MessageProtocol.h"
 #include "BotBase.h"
 #include "StreamInterface.h"
 

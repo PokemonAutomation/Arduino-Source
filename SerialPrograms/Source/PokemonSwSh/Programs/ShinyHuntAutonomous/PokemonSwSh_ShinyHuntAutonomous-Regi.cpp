@@ -6,12 +6,13 @@
 
 #include <QJsonArray>
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
-#include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_EncounterHandler.h"
 #include "PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHunt-Regi.h"
@@ -26,7 +27,7 @@ ShinyHuntAutonomousRegi_Descriptor::ShinyHuntAutonomousRegi_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousRegi",
         "Shiny Hunt Autonomous - Regi",
-        "SwSh-Arduino/wiki/Advanced:-ShinyHuntAutonomous-Regi",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-Regi.md",
         "Automatically hunt for shiny Regi using video feedback.",
         FeedbackType::REQUIRED,
         PABotBaseLevel::PABOTBASE_12KB
@@ -39,6 +40,13 @@ ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi(const ShinyHuntAutonomousRegi_D
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
     , ENCOUNTER_BOT_OPTIONS(false, false)
+    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
+    , NOTIFICATIONS({
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_PROGRAM_ERROR,
+    })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -63,8 +71,9 @@ ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi(const ShinyHuntAutonomousRegi_D
     PA_ADD_OPTION(REGI_NAME);
 
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
+    PA_ADD_OPTION(NOTIFICATIONS);
 
-    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_DIVIDER(m_advanced_options);
     PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
     PA_ADD_OPTION(POST_BATTLE_MASH_TIME);
     PA_ADD_OPTION(TRANSITION_DELAY);
@@ -88,14 +97,13 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegi::make_stats() const{
 void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
+        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
     }
 
     ShinyHuntTracker& stats = env.stats<ShinyHuntTracker>();
     env.update_stats();
-//    DiscordWebHook::send_message_old(true, "Starting a new run for regi", stats.make_discord_stats());
 
     StandardEncounterHandler handler(
         m_descriptor.display_name(),
@@ -114,14 +122,13 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env){
             env.update_stats();
             error = false;
         }
-//        DiscordWebHook::send_message_old(false, "Regi wasn't shiny this time", stats.make_discord_stats());
 
         //  Touch the date.
         if (TOUCH_DATE_INTERVAL > 0 && system_clock(env.console) - last_touch >= TOUCH_DATE_INTERVAL){
             env.log("Touching date to prevent rollover.");
-            pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
-            touch_date_from_home(env.console, SETTINGS_TO_HOME_DELAY);
-            resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+            touch_date_from_home(env.console, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+            resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             last_touch += TOUCH_DATE_INTERVAL;
         }
 
@@ -147,11 +154,16 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env){
         }
     }
 
-//    DiscordWebHook::send_message_old(true, "Regi was shiny this time", stats.make_discord_stats());
-
     if (GO_HOME_WHEN_DONE){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
     }
+
+    send_program_finished_notification(
+        env.logger(), NOTIFICATION_PROGRAM_FINISH,
+        descriptor().display_name(),
+        "",
+        stats.to_str()
+    );
 
     end_program_callback(env.console);
     end_program_loop(env.console);

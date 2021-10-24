@@ -6,12 +6,21 @@
 
 #include <QDir>
 #include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "ErrorDumper.h"
 
 namespace PokemonAutomation{
 
 
-QString dump_image(Logger& logger, const QImage& image, const QString& label){
+
+QString dump_image(
+    Logger& logger,
+    const QString& module, const QString& label,
+    const QImage& image
+){
+    static std::mutex lock;
+    std::lock_guard<std::mutex> lg(lock);
+
     QDir().mkdir("ErrorDumps");
     QString name = "ErrorDumps/";
     name += QString::fromStdString(now_to_filestring());
@@ -20,7 +29,14 @@ QString dump_image(Logger& logger, const QImage& image, const QString& label){
     name += ".png";
     logger.log("Saving failed inference image to: " + name, Qt::red);
     image.save(name);
-    return std::move(name);
+    send_program_telemetry(
+        logger, true, Qt::red,
+        module,
+        label,
+        {},
+        name
+    );
+    return name;
 }
 
 

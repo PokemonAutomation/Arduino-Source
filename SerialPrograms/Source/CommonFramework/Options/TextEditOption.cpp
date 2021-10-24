@@ -15,26 +15,37 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-TextEditOption::TextEditOption(QString label, QString default_value)
+TextEditOption::TextEditOption(
+    QString label,
+    QString default_value,
+    QString placeholder_text
+)
     : m_label(std::move(label))
     , m_default(std::move(default_value))
-    , m_current(m_backing)
-    , m_backing(m_default)
+    , m_placeholder_text(std::move(placeholder_text))
+    , m_current(m_default)
 {}
-TextEditOption::TextEditOption(QString& backing, QString label, QString default_value)
-    : m_label(std::move(label))
-    , m_default(std::move(default_value))
-    , m_current(backing)
-{}
+
+TextEditOption::operator const QString&() const{
+    SpinLockGuard lg(m_lock);
+    return m_current;
+}
+void TextEditOption::set(QString x){
+    SpinLockGuard lg(m_lock);
+    m_current = std::move(x);
+}
 
 
 void TextEditOption::load_json(const QJsonValue& json){
+    SpinLockGuard lg(m_lock);
     m_current = json.toString();
 }
 QJsonValue TextEditOption::to_json() const{
+    SpinLockGuard lg(m_lock);
     return m_current;
 }
 void TextEditOption::restore_defaults(){
+    SpinLockGuard lg(m_lock);
     m_current = m_default;
 }
 ConfigOptionUI* TextEditOption::make_ui(QWidget& parent){
@@ -54,10 +65,12 @@ public:
     {
         this->setAcceptRichText(false);
         this->setFocusPolicy(Qt::StrongFocus);
+        this->setPlaceholderText(parent.m_value.placeholder_text());
+//        this->hide();
     }
 
     void update_backing(){
-        m_parent.m_value.m_current = this->toPlainText();
+        m_parent.m_value.set(this->toPlainText());
     }
 
     virtual void focusOutEvent(QFocusEvent* event) override{
@@ -80,9 +93,9 @@ TextEditOptionUI::TextEditOptionUI(QWidget& parent, TextEditOption& value)
     , m_value(value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->addWidget(new QLabel(value.m_label, this));
+    layout->addWidget(new QLabel(value.label(), this));
     m_box = new Box(*this);
-    m_box->setText(value.m_current);
+    m_box->setText(value);
     layout->addWidget(m_box);
 }
 void TextEditOptionUI::restore_defaults(){

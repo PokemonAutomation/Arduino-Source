@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "EggSuperCombined2",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-EggSuperCombined2",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/EggSuperCombined2.md",
     "2-Description": "Mass release breedjects, then run EggCombined2.",
     "3-Parameters": [
         {

@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "ShinyHunt-Regi",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-ShinyHunt-Regi",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/ShinyHunt-Regi.md",
     "2-Description": "Hunt for shiny Regi golem legendaries.",
     "3-Parameters": [
         {

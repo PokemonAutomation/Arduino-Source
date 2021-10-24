@@ -5,10 +5,10 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShEggRoutines.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
 #include "PokemonSwSh_EggFetcher2.h"
 
 namespace PokemonAutomation{
@@ -20,7 +20,7 @@ EggFetcher2_Descriptor::EggFetcher2_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:EggFetcher2",
         "Egg Fetcher 2",
-        "SwSh-Arduino/wiki/Basic:-EggFetcher2",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggFetcher2.md",
         "Fetch eggs without hatching them.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_31KB
@@ -76,14 +76,14 @@ void EggFetcher2::run_eggfetcher(
 void EggFetcher2::program(SingleSwitchProgramEnvironment& env){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
     }
 
-    run_eggfetcher(env, AUTO_DEPOSIT, MAX_FETCH_ATTEMPTS);
+    run_eggfetcher(env, GameSettings::instance().AUTO_DEPOSIT, MAX_FETCH_ATTEMPTS);
 
-    pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+    pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
     end_program_callback(env.console);
     end_program_loop(env.console);
 }

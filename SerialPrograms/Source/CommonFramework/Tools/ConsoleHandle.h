@@ -54,7 +54,6 @@ public:
 private:
     size_t m_index;
     TaggedLogger m_logger;
-//    BotBase& m_botbase;
     BotBaseContext m_context;
     VideoFeed& m_video;
     VideoOverlay& m_overlay;

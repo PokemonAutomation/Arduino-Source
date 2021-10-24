@@ -29,8 +29,10 @@ public:
 
 
 private:
-    std::unique_ptr<ImageFloatBox> m_ball_left;
-    std::unique_ptr<ImageFloatBox> m_ball_right;
+    bool m_den;
+
+    ImageFloatBox m_ball_left;
+    ImageFloatBox m_ball_right;
     ImageFloatBox m_icon_fight;
     ImageFloatBox m_icon_pokemon;
     ImageFloatBox m_icon_bag;
@@ -39,6 +41,11 @@ private:
     ImageFloatBox m_text_pokemon;
     ImageFloatBox m_text_bag;
     ImageFloatBox m_text_run;
+
+//    ImageFloatBox m_status0;
+    ImageFloatBox m_status1;
+
+    size_t m_trigger_count = 0;
 };
 
 

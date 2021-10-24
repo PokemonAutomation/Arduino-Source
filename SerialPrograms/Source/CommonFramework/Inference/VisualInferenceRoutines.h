@@ -33,6 +33,12 @@ int wait_until(
     std::vector<VisualInferenceCallback*>&& callbacks,
     std::chrono::milliseconds period = std::chrono::milliseconds(50)
 );
+int wait_until(
+    ProgramEnvironment& env, ConsoleHandle& console,
+    std::chrono::system_clock::time_point time_limit,
+    std::vector<VisualInferenceCallback*>&& callbacks,
+    std::chrono::milliseconds period = std::chrono::milliseconds(50)
+);
 
 
 //  Run the specified "command" until either it finishes or one of the

@@ -19,20 +19,20 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-void run_move_select(
+StateMachineAction run_move_select(
     ProgramEnvironment& env,
     ConsoleHandle& console,
     GlobalStateTracker& state_tracker,
-    const MaxLairPlayerOptions& settings,
+    const MaxLairConsoleOptions& settings,
     bool currently_dmaxed, bool cheer_only
 );
 
 StateMachineAction throw_balls(
     MaxLairRuntime& runtime,
     ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ConsoleHandle& console, Language language,
     GlobalStateTracker& state_tracker,
-    const MaxLairPlayerOptions& settings
+    const EndBattleDecider& decider
 );
 
 

@@ -10,11 +10,19 @@
 #include <QMessageBox>
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Qt/QtJsonTools.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Tools/StatsDatabase.h"
+#include "Integrations/ProgramTracker.h"
 #include "RunnablePanel.h"
 
 namespace PokemonAutomation{
 
 
+
+RunnablePanelInstance::RunnablePanelInstance(const PanelDescriptor& descriptor)
+    : PanelInstance(descriptor)
+    , NOTIFICATION_PROGRAM_ERROR("Program Error", true, true, {"Notifs", "LiveHost"})
+{}
 
 void RunnablePanelInstance::from_json(const QJsonValue& json){
     m_options.load_json(json);
@@ -23,13 +31,12 @@ QJsonValue RunnablePanelInstance::to_json() const{
     return m_options.to_json();
 }
 
-bool RunnablePanelInstance::is_valid() const{
-    return m_options.is_valid();
+QString RunnablePanelInstance::check_validity() const{
+    return m_options.check_validity();
 }
 void RunnablePanelInstance::restore_defaults(){
     m_options.restore_defaults();
 }
-
 
 
 void RunnablePanelWidget::on_destruct_stop(){
@@ -43,24 +50,42 @@ void RunnablePanelWidget::on_destruct_stop(){
     }
 }
 RunnablePanelWidget::~RunnablePanelWidget(){
+    ProgramTracker::instance().remove_program(m_instance_id);
     on_destruct_stop();
+}
+
+std::string RunnablePanelWidget::stats(){
+    std::lock_guard<std::mutex> lg(m_lock);
+    if (m_current_stats){
+        return m_current_stats->to_str();
+    }
+    return "";
+}
+std::chrono::system_clock::time_point RunnablePanelWidget::timestamp() const{
+    return m_timestamp.load(std::memory_order_acquire);
 }
 
 
 bool RunnablePanelWidget::start(){
     bool ret = false;
     switch (state()){
-    case ProgramState::STOPPED:
+    case ProgramState::NOT_READY:
+        m_logger.log("Recevied Start Request: Program is not ready.", Qt::red);
+        break;
+    case ProgramState::STOPPED:{
         m_logger.log("Received Start Request");
-        if (!settings_valid()){
+        QString error = check_validity();
+        if (!error.isEmpty()){
             QMessageBox box;
-            box.critical(nullptr, "Error", "Settings are not valid.");
+            box.critical(nullptr, "Error", error);
             ret = false;
             break;
         }
         if (m_thread.joinable()){
             m_thread.join();
         }
+
+        m_timestamp.store(std::chrono::system_clock::now(), std::memory_order_release);
         m_state.store(ProgramState::RUNNING, std::memory_order_release);
         m_thread = std::thread(
             run_with_catch,
@@ -69,8 +94,9 @@ bool RunnablePanelWidget::start(){
         );
         ret = true;
         break;
+    }
     case ProgramState::RUNNING:
-    case ProgramState::FINISHED:
+//    case ProgramState::FINISHED:
         m_logger.log("Received Start Request: Program is already running.");
         m_state.store(ProgramState::STOPPING, std::memory_order_release);
         on_stop();
@@ -87,12 +113,15 @@ bool RunnablePanelWidget::start(){
 bool RunnablePanelWidget::stop(){
     bool ret = false;
     switch (state()){
+    case ProgramState::NOT_READY:
+        m_logger.log("Recevied Stop Request: Program is not ready.", Qt::red);
+        break;
     case ProgramState::STOPPED:
         m_logger.log("Received Stop Request: Program is not running.");
         ret = false;
         break;
     case ProgramState::RUNNING:
-    case ProgramState::FINISHED:
+//    case ProgramState::FINISHED:
         m_logger.log("Received Stop Request");
         m_state.store(ProgramState::STOPPING, std::memory_order_release);
         on_stop();
@@ -115,11 +144,13 @@ RunnablePanelWidget::RunnablePanelWidget(
     PanelListener& listener
 )
     : PanelWidget(parent, instance, listener)
-    , m_logger(listener.logger(), "Program")
+    , m_logger(listener.raw_logger(), "Program")
     , m_status_bar(nullptr)
     , m_start_button(nullptr)
-    , m_state(ProgramState::STOPPED)
+    , m_timestamp(std::chrono::system_clock::now())
+    , m_state(ProgramState::NOT_READY)
 {
+    m_instance_id = ProgramTracker::instance().add_program(*this);
     connect(
         this, &RunnablePanelWidget::async_start,
         this, &RunnablePanelWidget::start
@@ -156,6 +187,7 @@ QWidget* RunnablePanelWidget::make_options(QWidget& parent){
     RunnablePanelInstance& instance = static_cast<RunnablePanelInstance&>(m_instance);
     m_options = static_cast<BatchOptionUI*>(instance.m_options.make_ui(parent));
     options_layout->addWidget(m_options);
+    options_layout->addStretch();
 
     return options_widget;
 }
@@ -206,11 +238,13 @@ QWidget* RunnablePanelWidget::make_actions(QWidget& parent){
         m_start_button, &QPushButton::clicked,
         this, [=](bool){
             switch (state()){
+            case ProgramState::NOT_READY:
+                break;
             case ProgramState::STOPPED:
                 start();
                 break;
             case ProgramState::RUNNING:
-            case ProgramState::FINISHED:
+//            case ProgramState::FINISHED:
                 stop();
                 break;
             case ProgramState::STOPPING:
@@ -231,13 +265,59 @@ QWidget* RunnablePanelWidget::make_actions(QWidget& parent){
 
 
 
-bool RunnablePanelWidget::settings_valid() const{
+QString RunnablePanelWidget::check_validity() const{
     RunnablePanelInstance& instance = static_cast<RunnablePanelInstance&>(m_instance);
-    return instance.is_valid();
+    return instance.check_validity();
 }
 void RunnablePanelWidget::restore_defaults(){
     m_options->restore_defaults();
 }
+void RunnablePanelWidget::load_historical_stats(){
+    RunnablePanelInstance& instance = static_cast<RunnablePanelInstance&>(m_instance);
+    std::unique_ptr<StatsTracker> stats = instance.make_stats();
+    if (stats){
+        StatSet set;
+        set.open_from_file(GlobalSettings::instance().STATS_FILE);
+        const std::string& identifier = instance.descriptor().identifier();
+        StatList& list = set[identifier];
+        if (list.size() != 0){
+            list.aggregate(*stats);
+        }
+        async_set_status(QString::fromStdString(stats->to_str()));
+//        m_status_bar->setText(QString::fromStdString(stats->to_str()));
+//        m_status_bar->setVisible(true);
+    }
+
+    std::lock_guard<std::mutex> lg(m_lock);
+    m_historical_stats = std::move(stats);
+}
+void RunnablePanelWidget::update_historical_stats(){
+    bool ok;
+    {
+//        std::lock_guard<std::mutex> lg(m_lock);
+        if (!m_current_stats){
+            return;
+        }
+        ok = StatSet::update_file(
+            GlobalSettings::instance().STATS_FILE,
+            m_instance.descriptor().identifier(),
+            *m_current_stats
+        );
+    }
+    if (ok){
+        m_logger.log("Stats successfully saved!", "Blue");
+    }else{
+        m_logger.log("Unable to save stats.", "Red");
+        QMetaObject::invokeMethod(
+            this,
+            "show_stats_warning",
+            Qt::AutoConnection
+        );
+//        show_stats_warning();
+    }
+//    settings.stat_sets.open_from_file(settings.stats_file);
+}
+
 void RunnablePanelWidget::update_ui(){
     ProgramState state = m_state.load(std::memory_order_acquire);
     if (m_start_button == nullptr){
@@ -245,6 +325,10 @@ void RunnablePanelWidget::update_ui(){
     }
     m_start_button->setEnabled(state != ProgramState::STOPPING);
     switch (state){
+    case ProgramState::NOT_READY:
+        m_start_button->setText("Loading...");
+        m_listener.on_busy(m_instance);
+        break;
     case ProgramState::STOPPED:
         m_start_button->setText("Start Program...");
 //        m_start_button->setEnabled(settings_valid());
@@ -254,10 +338,10 @@ void RunnablePanelWidget::update_ui(){
         m_start_button->setText("Stop Program...");
         m_listener.on_busy(m_instance);
         break;
-    case ProgramState::FINISHED:
-        m_start_button->setText("Program Finished! Click to stop.");
-        m_listener.on_busy(m_instance);
-        break;
+//    case ProgramState::FINISHED:
+//        m_start_button->setText("Program Finished! Click to stop.");
+//        m_listener.on_busy(m_instance);
+//        break;
     case ProgramState::STOPPING:
         m_start_button->setText("Stopping Program...");
         m_listener.on_busy(m_instance);

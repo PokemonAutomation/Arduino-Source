@@ -6,7 +6,7 @@
 
 #include <iostream>
 #include "Common/CRC32.h"
-#include "Common/MessageProtocol.h"
+#include "Common/Microcontroller/MessageProtocol.h"
 #include "Common/Cpp/Exception.h"
 #include "ClientSource/Libraries/Logging.h"
 #include "ClientSource/Libraries/MessageConverter.h"

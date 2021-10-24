@@ -9,7 +9,7 @@
 #include <QFile>
 #include "Common/Cpp/Exception.h"
 #include "Common/Cpp/SpinLock.h"
-#include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/Globals.h"
 #include "TesseractPA.h"
 #include "RawOCR.h"
 
@@ -20,7 +20,7 @@ namespace OCR{
 
 
 bool language_available(Language language){
-    QString path = PERSISTENT_SETTINGS().resource_path;
+    QString path = RESOURCE_PATH();
     path += "Tesseract/";
     path += QString::fromStdString(language_data(language).code);
     path += ".traineddata";
@@ -35,7 +35,7 @@ public:
     TesseractPool(Language language)
         : m_language_code(language_data(language).code)
         , m_training_data_path(
-            std::string(PERSISTENT_SETTINGS().resource_path.toUtf8().data()) + "Tesseract/"
+            RESOURCE_PATH().toStdString() + "Tesseract/"
         )
     {}
 

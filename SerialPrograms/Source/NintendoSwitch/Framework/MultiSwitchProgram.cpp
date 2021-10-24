@@ -4,8 +4,7 @@
  *
  */
 
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "SwitchProgramTracker.h"
+#include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "MultiSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -92,7 +91,6 @@ QWidget* MultiSwitchProgramInstance::make_widget(QWidget& parent, PanelListener&
 
 
 MultiSwitchProgramWidget::~MultiSwitchProgramWidget(){
-    SwitchProgramTracker::instance().remove_program(*this);
     on_destruct_stop();
 }
 MultiSwitchProgramWidget* MultiSwitchProgramWidget::make(
@@ -102,7 +100,6 @@ MultiSwitchProgramWidget* MultiSwitchProgramWidget::make(
 ){
     MultiSwitchProgramWidget* widget = new MultiSwitchProgramWidget(parent, instance, listener);
     widget->construct();
-    SwitchProgramTracker::instance().add_program(*widget);
     return widget;
 }
 void MultiSwitchProgramWidget::run_program(

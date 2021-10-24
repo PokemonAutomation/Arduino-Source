@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_StartGame_H
 #define PokemonAutomation_PokemonSwSh_StartGame_H
 
-#include "Common/SwitchFramework/SwitchControllerDefs.h"
+#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/Logger.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
@@ -33,6 +33,7 @@ void reset_game_from_home_with_inference(
     ProgramEnvironment& env,
     ConsoleHandle& console,
     bool tolerate_update_menu,
+    bool backup_save = false,
     uint16_t post_wait_time = 1 * TICKS_PER_SECOND
 );
 

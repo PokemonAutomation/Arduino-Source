@@ -32,7 +32,7 @@ Trajectory get_trajectory_int(int delta_x, int delta_y){
 
     if (delta_x < 0){
         Trajectory entry = get_trajectory_int(-delta_x, delta_y);
-        entry.joystick_x = 256 - entry.joystick_x;
+        entry.joystick_x = (uint8_t)(256 - entry.joystick_x);
         return entry;
     }
 

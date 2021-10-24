@@ -2,6 +2,8 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *      This option is thread-safe.
+ *
  */
 
 #ifndef PokemonAutomation_FixedCode_H
@@ -9,6 +11,7 @@
 
 #include <QJsonValue>
 #include <QLineEdit>
+#include "Common/Cpp/SpinLock.h"
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -21,15 +24,18 @@ public:
         size_t digits,
         QString default_value
     );
-    virtual void load_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
 
-    operator const QString&() const{ return m_current; }
-    const QString& value() const{ return m_current; }
+    operator const QString&() const;
+    const QString& get() const;
+    QString set(QString x);
     void to_str(uint8_t* code) const;
 
-    virtual bool is_valid() const override;
+    virtual QString check_validity() const override;
+    QString check_validity(const QString& x) const;
     virtual void restore_defaults() override;
+
+    virtual void load_json(const QJsonValue& json) override;
+    virtual QJsonValue to_json() const override;
 
     virtual ConfigOptionUI* make_ui(QWidget& parent) override;
 
@@ -38,6 +44,8 @@ private:
     QString m_label;
     const size_t m_digits;
     const QString m_default;
+
+    mutable SpinLock m_lock;
     QString m_current;
 };
 

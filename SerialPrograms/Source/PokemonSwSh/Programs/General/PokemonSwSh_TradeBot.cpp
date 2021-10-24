@@ -4,13 +4,13 @@
  *
  */
 
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/SwitchRoutines/SwitchDigitEntry.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "Common/Qt/CodeValidator.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_DigitEntry.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/FixedInterval.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh_TradeBot.h"
 
 namespace PokemonAutomation{
@@ -22,7 +22,7 @@ TradeBot_Descriptor::TradeBot_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:TradeBot",
         "Trade Bot",
-        "SwSh-Arduino/wiki/Basic:-TradeBot",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/TradeBot.md",
         "Surprise trade with a code for hosting giveaways.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB
@@ -83,14 +83,14 @@ TradeBot::TradeBot(const TradeBot_Descriptor& descriptor)
     PA_ADD_OPTION(CONFIRM_DELAY);
     PA_ADD_OPTION(TRADE_START);
     PA_ADD_OPTION(TRADE_COMMUNICATION);
-    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_DIVIDER(m_advanced_options);
     PA_ADD_OPTION(TRADE_ANIMATION);
     PA_ADD_OPTION(EVOLVE_DELAY);
 }
 
 
 void TradeBot::trade_slot(const BotBaseContext& context, const uint8_t code[8], uint8_t slot) const{
-    ssf_press_button2(context, BUTTON_Y, OPEN_YCOMM_DELAY, 50);
+    ssf_press_button2(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY, 50);
     ssf_press_button2(context, BUTTON_A, 150, 20);
     ssf_press_dpad1(context, DPAD_DOWN, 10);
     ssf_press_button2(context, BUTTON_A, 200, 20);
@@ -111,17 +111,17 @@ void TradeBot::trade_slot(const BotBaseContext& context, const uint8_t code[8], 
     pbf_wait(context, SEARCH_DELAY);
 
     //  If we're not in a trade, enter Y-COMM to avoid a connection at this point.
-    ssf_press_button2(context, BUTTON_Y, OPEN_YCOMM_DELAY, 50);
+    ssf_press_button2(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY, 50);
     ssf_press_button2(context, BUTTON_A, 200, 20);
     ssf_press_button2(context, BUTTON_B, 80, 10);
 
     //  Move to slot
     while (slot >= 6){
-        ssf_press_dpad1(context, DPAD_DOWN, BOX_SCROLL_DELAY);
+        ssf_press_dpad1(context, DPAD_DOWN, GameSettings::instance().BOX_SCROLL_DELAY);
         slot -= 6;
     }
     while (slot > 0){
-        ssf_press_dpad1(context, DPAD_RIGHT, BOX_SCROLL_DELAY);
+        ssf_press_dpad1(context, DPAD_RIGHT, GameSettings::instance().BOX_SCROLL_DELAY);
         slot--;
     }
 
@@ -146,7 +146,7 @@ void TradeBot::program(SingleSwitchProgramEnvironment& env){
 
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
-        resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
     }
@@ -177,14 +177,19 @@ void TradeBot::program(SingleSwitchProgramEnvironment& env){
         pbf_mash_button(env.console, BUTTON_B, EVOLVE_DELAY);
 
         //  Change boxes.
-        ssf_press_button2(env.console, BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
-        ssf_press_button2(env.console, BUTTON_A, MENU_TO_POKEMON_DELAY, 10);
-        ssf_press_button2(env.console, BUTTON_R, POKEMON_TO_BOX_DELAY, 10);
-        ssf_press_button2(env.console, BUTTON_R, BOX_CHANGE_DELAY, 10);
-        pbf_mash_button(env.console, BUTTON_B, BOX_TO_POKEMON_DELAY + POKEMON_TO_MENU_DELAY + OVERWORLD_TO_MENU_DELAY);
+        ssf_press_button2(env.console, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
+        ssf_press_button2(env.console, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY, 10);
+        ssf_press_button2(env.console, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY, 10);
+        ssf_press_button2(env.console, BUTTON_R, GameSettings::instance().BOX_CHANGE_DELAY, 10);
+        pbf_mash_button(
+            env.console, BUTTON_B,
+            GameSettings::instance().BOX_TO_POKEMON_DELAY +
+            GameSettings::instance().POKEMON_TO_MENU_DELAY +
+            GameSettings::instance().OVERWORLD_TO_MENU_DELAY
+        );
     }
 
-    ssf_press_button2(env.console, BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
+    ssf_press_button2(env.console, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
 
     end_program_callback(env.console);
     end_program_loop(env.console);

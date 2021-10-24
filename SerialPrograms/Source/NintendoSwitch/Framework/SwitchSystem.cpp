@@ -9,7 +9,8 @@
 #include <QKeyEvent>
 #include <QVBoxLayout>
 #include "Common/Qt/QtJsonTools.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
+#include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
+#include "Integrations/ProgramTracker.h"
 #include "SwitchCommandRow.h"
 #include "SwitchSystem.h"
 
@@ -67,8 +68,8 @@ const QSerialPortInfo* SwitchSystemFactory::port() const{
     return m_serial.port();
 }
 
-SwitchSetup* SwitchSystemFactory::make_ui(QWidget& parent, Logger& logger){
-    return new SwitchSystem(parent, *this, logger);
+SwitchSetup* SwitchSystemFactory::make_ui(QWidget& parent, Logger& logger, uint64_t program_id){
+    return new SwitchSystem(parent, *this, logger, program_id);
 }
 
 
@@ -76,7 +77,8 @@ SwitchSetup* SwitchSystemFactory::make_ui(QWidget& parent, Logger& logger){
 SwitchSystem::SwitchSystem(
     QWidget& parent,
     SwitchSystemFactory& factory,
-    Logger& logger
+    Logger& logger,
+    uint64_t program_id
 )
     : SwitchSetup(parent, factory)
     , m_factory(factory)
@@ -128,8 +130,11 @@ SwitchSystem::SwitchSystem(
             m_camera->set_overlay_enabled(enabled);
         }
     );
+
+    m_instance_id = ProgramTracker::instance().add_console(program_id, *this);
 }
 SwitchSystem::~SwitchSystem(){
+    ProgramTracker::instance().remove_console(m_instance_id);
     m_serial->stop();
 }
 ProgramState SwitchSystem::last_known_state() const{
@@ -161,15 +166,28 @@ void SwitchSystem::reset_serial(){
     m_serial->reset();
 }
 
+VideoFeed& SwitchSystem::video(){
+    return *m_camera;
+}
+BotBaseHandle& SwitchSystem::sender(){
+    return m_serial->botbase();
+}
+
 void SwitchSystem::update_ui(ProgramState state){
+    m_serial->botbase().set_allow_user_commands(state == ProgramState::STOPPED);
     switch (state){
+    case ProgramState::NOT_READY:
+        m_serial->set_options_enabled(false);
+        m_camera->set_camera_enabled(false);
+        m_camera->set_resolution_enabled(false);
+        break;
     case ProgramState::STOPPED:
         m_serial->set_options_enabled(true);
         m_camera->set_camera_enabled(true);
         m_camera->set_resolution_enabled(true);
         break;
     case ProgramState::RUNNING:
-    case ProgramState::FINISHED:
+//    case ProgramState::FINISHED:
     case ProgramState::STOPPING:
         m_serial->set_options_enabled(false);
 #if 0

@@ -7,7 +7,7 @@
 #include <QtGlobal>
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
-#include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/Globals.h"
 #include "Pokemon_PokemonNames.h"
 
 namespace PokemonAutomation{
@@ -29,7 +29,7 @@ const std::string PokemonNameDatabase::NULL_SLUG;
 
 PokemonNameDatabase::PokemonNameDatabase(){
     QJsonObject displays = read_json_file(
-        PERSISTENT_SETTINGS().resource_path + "Pokemon/PokemonNameDisplay.json"
+        RESOURCE_PATH() + "Pokemon/PokemonNameDisplay.json"
     ).object();
 
     for (auto iter = displays.begin(); iter != displays.end(); ++iter){

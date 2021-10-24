@@ -4,8 +4,9 @@
  *
  */
 
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonHome_PageSwap.h"
 
 namespace PokemonAutomation{
@@ -18,7 +19,7 @@ PageSwap_Descriptor::PageSwap_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonHome:PageSwap",
         STRING_POKEMON + " Home: Page Swap",
-        "SwSh-Arduino/wiki/Advanced:-PkmnHomePageSwap",
+        "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/PokemonHome-PageSwap.md",
         "Swap 30 boxes (1 page) in " + STRING_POKEMON + " Home.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB
@@ -41,7 +42,7 @@ PageSwap::PageSwap(const PageSwap_Descriptor& descriptor)
 void PageSwap::program(SingleSwitchProgramEnvironment& env){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
-        resume_game_no_interact(env.console, DODGE_SYSTEM_UPDATE_WINDOW);
+        PokemonSwSh::resume_game_no_interact(env.console, DODGE_SYSTEM_UPDATE_WINDOW);
     }else{
         pbf_press_button(env.console, BUTTON_RCLICK, 5, 5);
     }

@@ -12,6 +12,7 @@
 
 #include <stdint.h>
 #include <vector>
+#include "CommonFramework/ImageTools/ImageStats.h"
 #include "ImageBoxes.h"
 #include "CellMatrix.h"
 
@@ -57,6 +58,11 @@ std::vector<FillGeometry> find_all_objects(
 );
 
 
+ImageStats object_stats(
+    const QImage& image,
+    const CellMatrix& matrix,
+    const FillGeometry& object
+);
 
 
 }

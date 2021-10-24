@@ -5,10 +5,10 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShEggRoutines.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
 #include "PokemonSwSh_GodEggDuplication.h"
 
 namespace PokemonAutomation{
@@ -20,7 +20,7 @@ GodEggDuplication_Descriptor::GodEggDuplication_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:GodEggDuplication",
         "God Egg Duplication",
-        "SwSh-Arduino/wiki/Basic:-GodEggDuplication",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/GodEggDuplication.md",
         "Mass duplicate " + STRING_POKEMON + " with the God Egg.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_31KB
@@ -62,7 +62,7 @@ void GodEggDuplication::collect_godegg(const BotBaseContext& context, uint8_t pa
     ssf_press_button1(context, BUTTON_B, 100);
 
     //  "Please select a Pokemon to swap from your party."
-    ssf_press_button1(context, BUTTON_B, MENU_TO_POKEMON_DELAY);
+    ssf_press_button1(context, BUTTON_B, GameSettings::instance().MENU_TO_POKEMON_DELAY);
 
     //  Select the party member.
     for (uint8_t c = 0; c < party_slot; c++){
@@ -111,13 +111,13 @@ void GodEggDuplication::run_program(SingleSwitchProgramEnvironment& env, uint16_
 void GodEggDuplication::program(SingleSwitchProgramEnvironment& env){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
     }
 
     run_program(env, MAX_FETCH_ATTEMPTS);
-    ssf_press_button2(env.console, BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
+    ssf_press_button2(env.console, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
 
     end_program_callback(env.console);
     end_program_loop(env.console);

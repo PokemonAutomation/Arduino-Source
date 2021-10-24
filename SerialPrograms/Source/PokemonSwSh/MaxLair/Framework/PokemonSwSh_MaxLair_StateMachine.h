@@ -39,28 +39,32 @@ enum class CaughtScreenAction{
 };
 
 
+
 enum class StateMachineAction{
     KEEP_GOING,
     DONE_WITH_ADVENTURE,
     STOP_PROGRAM,
+    RESET_RECOVER,
 };
 
 
 struct MaxLairRuntime{
     QString program_name;
-    const MaxLairPlayerOptions* player_settings[4];
-    CaughtScreenAction action;
-    ScreenshotMode screenshot;
+    const MaxLairConsoleOptions* player_settings[4];
+    const EndBattleDecider& actions;
+    EventNotificationOption& notification_noshiny;
+    EventNotificationOption& notification_shiny;
     Stats& stats;
 };
 
 
 //  Return true if done.
 StateMachineAction run_state_iteration(
-    MaxLairRuntime& runtime, size_t index,
+    MaxLairRuntime& runtime, size_t console_index,
     ProgramEnvironment& env,
-    ConsoleHandle& console, bool is_host,
+    ConsoleHandle& console, bool save_path,
     GlobalStateTracker& state_tracker,
+    const EndBattleDecider& boss_action,
     const QImage& entrance
 );
 

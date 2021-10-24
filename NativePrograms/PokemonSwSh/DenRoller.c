@@ -6,8 +6,7 @@
  * 
  */
 
-#include "Common/SwitchFramework/SwitchControllerDefs.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
+#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "Programs/DenRoller.h"
 
 

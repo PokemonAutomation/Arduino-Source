@@ -4,7 +4,7 @@
  * 
  */
 
-#include "Common/SwitchFramework/SwitchControllerDefs.h"
+#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 
 
 //  Start by releasing this many boxes. All boxes must be completely filled with

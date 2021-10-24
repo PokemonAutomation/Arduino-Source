@@ -44,8 +44,8 @@ public:
     IVCheckerReader();
 
 public:
-    static Result token_to_enum(const std::string& token);
-    static const std::string& enum_to_token(Result result);
+    static Result string_to_enum(const std::string& token);
+    static const std::string& enum_to_string(Result result);
 
 private:
     static const std::map<std::string, Result> m_token_to_enum;
@@ -94,7 +94,7 @@ public:
         )
     {}
 
-    bool matches(uint64_t& errors, IVCheckerReader::Result result) const{
+    bool matches(std::atomic<uint64_t>& errors, IVCheckerReader::Result result) const{
         if (result == IVCheckerReader::Result::UnableToDetect){
             errors++;
         }

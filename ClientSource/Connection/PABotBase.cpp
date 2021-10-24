@@ -7,7 +7,8 @@
 #include <algorithm>
 #include <iostream>
 #include <emmintrin.h>
-#include "Common/MessageProtocol.h"
+#include "Common/Microcontroller/MessageProtocol.h"
+#include "Common/Microcontroller/DeviceRoutines.h"
 #include "Common/Cpp/Exception.h"
 #include "Common/Cpp/PanicDump.h"
 #include "PABotBase.h"
@@ -36,11 +37,9 @@ PABotBase::~PABotBase(){
         _mm_pause();
     }
 }
+
 void PABotBase::connect(){
-    //  Send seqnum reset.
-    pabb_MsgInfoSeqnumReset params;
-    pabb_MsgAckRequest response;
-    issue_request_and_wait<PABB_MSG_SEQNUM_RESET, PABB_MSG_ACK_REQUEST>(nullptr, params, response);
+    Microcontroller::seqnum_reset(*this);
 }
 void PABotBase::stop(){
 //    cout << "stop" << endl;
@@ -97,16 +96,15 @@ void PABotBase::wait_for_all_requests(){
         throw CancelledException();
     }
 }
+
 void PABotBase::stop_all_commands(){
-    pabb_MsgRequestProtocolVersion params;
-    pabb_MsgAckRequest response;
-    issue_request_and_wait<PABB_MSG_REQUEST_STOP, PABB_MSG_ACK_REQUEST>(nullptr, params, response);
+    uint32_t msg_seqnum = Microcontroller::request_stop(*this);
     {
         std::lock_guard<std::mutex> lg0(m_sleep_lock);
         SpinLockGuard lg1(m_state_lock, "PABotBase::stop_all_commands()");
 
         //  Remove all commands that are before the stop seqnum.
-        uint64_t seqnum = infer_full_seqnum(m_pending_commands, response.seqnum);
+        uint64_t seqnum = infer_full_seqnum(m_pending_commands, msg_seqnum);
         while (true){
             auto iter = m_pending_commands.begin();
             if (iter == m_pending_commands.end() || iter->first > seqnum){
@@ -399,10 +397,14 @@ void PABotBase::retransmit_thread(){
 bool PABotBase::try_issue_request(
     std::map<uint64_t, PendingRequest>::iterator& iter,
     const std::atomic<bool>* cancelled,
-    uint8_t send_type, void* send_params, size_t send_bytes,
+    const BotBaseRequest& request,
     bool silent_remove, size_t queue_limit
 ){
-    if (send_bytes > PABB_MAX_MESSAGE_SIZE){
+    BotBaseMessage message = request.message();
+    if (message.body.size() < sizeof(uint32_t)){
+        PA_THROW_StringException("Message is too short.");
+    }
+    if (message.body.size() > PABB_MAX_MESSAGE_SIZE){
         PA_THROW_StringException("Message is too long.");
     }
 
@@ -423,7 +425,7 @@ bool PABotBase::try_issue_request(
     }
 
     seqnum_t seqnum_s = (seqnum_t)seqnum;
-    memcpy(send_params, &seqnum_s, sizeof(seqnum_t));
+    memcpy(&message.body[0], &seqnum_s, sizeof(seqnum_t));
 
     std::pair<std::map<uint64_t, PendingRequest>::iterator, bool> ret = m_pending_requests.emplace(
         std::piecewise_construct,
@@ -439,7 +441,7 @@ bool PABotBase::try_issue_request(
     PendingRequest* handle = &ret.first->second;
 
     handle->silent_remove = silent_remove;
-    handle->request = BotBaseMessage(send_type, std::string((char*)send_params, send_bytes));
+    handle->request = std::move(message);
     handle->first_sent = std::chrono::system_clock::now();
 
     send_message(handle->request, false);
@@ -451,10 +453,14 @@ bool PABotBase::try_issue_request(
 bool PABotBase::try_issue_command(
     std::map<uint64_t, PendingCommand>::iterator& iter,
     const std::atomic<bool>* cancelled,
-    uint8_t send_type, void* send_params, size_t send_bytes,
+    const BotBaseRequest& request,
     bool silent_remove, size_t queue_limit
 ){
-    if (send_bytes > PABB_MAX_MESSAGE_SIZE){
+    BotBaseMessage message = request.message();
+    if (message.body.size() < sizeof(uint32_t)){
+        PA_THROW_StringException("Message is too short.");
+    }
+    if (message.body.size() > PABB_MAX_MESSAGE_SIZE){
         PA_THROW_StringException("Message is too long.");
     }
 
@@ -481,7 +487,7 @@ bool PABotBase::try_issue_command(
     }
 
     seqnum_t seqnum_s = (seqnum_t)seqnum;
-    memcpy(send_params, &seqnum_s, sizeof(seqnum_t));
+    memcpy(&message.body[0], &seqnum_s, sizeof(seqnum_t));
 
     std::pair<std::map<uint64_t, PendingCommand>::iterator, bool> ret = m_pending_commands.emplace(
         std::piecewise_construct,
@@ -497,7 +503,7 @@ bool PABotBase::try_issue_command(
     PendingCommand* handle = &ret.first->second;
 
     handle->silent_remove = silent_remove;
-    handle->request = BotBaseMessage(send_type, std::string((char*)send_params, send_bytes));
+    handle->request = std::move(message);
     handle->first_sent = std::chrono::system_clock::now();
 
     send_message(handle->request, false);
@@ -509,7 +515,7 @@ bool PABotBase::try_issue_command(
 bool PABotBase::issue_request(
     std::map<uint64_t, PendingRequest>::iterator& iter,
     const std::atomic<bool>* cancelled,
-    uint8_t send_type, void* send_params, size_t send_bytes,
+    const BotBaseRequest& request,
     bool silent_remove
 ){
     //  Issue a request or a command and return.
@@ -532,9 +538,7 @@ bool PABotBase::issue_request(
 
     while (true){
         if (try_issue_request(
-            iter,
-            cancelled,
-            send_type, send_params, send_bytes,
+            iter, cancelled, request,
             silent_remove, MAX_PENDING_REQUESTS
         )){
             return true;
@@ -552,7 +556,7 @@ bool PABotBase::issue_request(
 bool PABotBase::issue_command(
     std::map<uint64_t, PendingCommand>::iterator& iter,
     const std::atomic<bool>* cancelled,
-    uint8_t send_type, void* send_params, size_t send_bytes,
+    const BotBaseRequest& request,
     bool silent_remove
 ){
     //  Issue a request or a command and return.
@@ -575,9 +579,7 @@ bool PABotBase::issue_command(
 
     while (true){
         if (try_issue_command(
-            iter,
-            cancelled,
-            send_type, send_params, send_bytes,
+            iter, cancelled, request,
             silent_remove, MAX_PENDING_REQUESTS
         )){
             return true;
@@ -593,42 +595,33 @@ bool PABotBase::issue_command(
     }
 }
 
-
-bool PABotBase::try_issue_request(
-    const std::atomic<bool>* cancelled,
-    uint8_t send_type, void* send_params, size_t send_bytes
-){
-    if (!PABB_MSG_IS_COMMAND(send_type)){
+bool PABotBase::try_issue_request(const std::atomic<bool>* cancelled, const BotBaseRequest& request){
+    if (!request.is_command()){
         std::map<uint64_t, PendingRequest>::iterator iter;
-        return try_issue_request(iter, cancelled, send_type, send_params, send_bytes, true, MAX_PENDING_REQUESTS);
+        return try_issue_request(iter, cancelled, request, true, MAX_PENDING_REQUESTS);
     }else{
         std::map<uint64_t, PendingCommand>::iterator iter;
-        return try_issue_command(iter, cancelled, send_type, send_params, send_bytes, true, MAX_PENDING_REQUESTS);
+        return try_issue_command(iter, cancelled, request, true, MAX_PENDING_REQUESTS);
     }
 }
-void PABotBase::issue_request(
-    const std::atomic<bool>* cancelled,
-    uint8_t send_type, void* send_params, size_t send_bytes
-){
-    if (!PABB_MSG_IS_COMMAND(send_type)){
+void PABotBase::issue_request(const std::atomic<bool>* cancelled, const BotBaseRequest& request){
+    if (!request.is_command()){
         std::map<uint64_t, PendingRequest>::iterator iter;
-        issue_request(iter, cancelled, send_type, send_params, send_bytes, true);
+        issue_request(iter, cancelled, request, true);
     }else{
         std::map<uint64_t, PendingCommand>::iterator iter;
-        issue_command(iter, cancelled, send_type, send_params, send_bytes, true);
+        issue_command(iter, cancelled, request, true);
     }
 }
-void PABotBase::issue_request_and_wait(
-    const std::atomic<bool>* cancelled,
-    uint8_t send_type, void* send_params, size_t send_bytes,
-    uint8_t recv_type, void* recv_params, size_t recv_bytes
-){
-    if (!PABB_MSG_IS_REQUEST(send_type)){
+BotBaseMessage PABotBase::issue_request_and_wait(const std::atomic<bool>* cancelled, const BotBaseRequest& request){
+    if (request.is_command()){
         PA_THROW_StringException("This function only supports requests.");
     }
 
+    BotBaseMessage message = request.message();
+
     std::map<uint64_t, PendingRequest>::iterator iter;
-    issue_request(iter, cancelled, send_type, send_params, send_bytes, false);
+    issue_request(iter, cancelled, request, false);
 
     //  Wait for ack.
     while (true){
@@ -648,47 +641,14 @@ void PABotBase::issue_request_and_wait(
     }
 
     std::unique_lock<std::mutex> lg(m_sleep_lock);
+    SpinLockGuard slg(m_state_lock, "PABotBase::issue_request_and_wait() - 1");
 
-    //  Verify return payload.
-    uint8_t type = iter->second.ack.type;
-    if (type != recv_type){
-        SpinLockGuard slg(m_state_lock, "PABotBase::issue_request_and_wait() - 1");
-        remove_request(iter);
-        PA_THROW_StringException("Received incorrect response type: " + std::to_string(type));
-    }
-    const std::string& body = iter->second.ack.body;
-    if (body.size() != recv_bytes){
-        SpinLockGuard slg(m_state_lock, "PABotBase::issue_request_and_wait() - 2");
-        remove_request(iter);
-        PA_THROW_StringException("Received incorrect response size: " + std::to_string(body.size()));
-    }
-    memcpy(recv_params, body.c_str(), body.size());
-
-    SpinLockGuard slg(m_state_lock, "PABotBase::issue_request_and_wait() - 3");
+    BotBaseMessage ret = std::move(iter->second.ack);
     remove_request(iter);
+
+    return ret;
 }
 
-
-
-
-uint32_t PABotBase::protocol_version(){
-    pabb_MsgRequestProtocolVersion params;
-    pabb_MsgAckRequestI32 response;
-    issue_request_and_wait<PABB_MSG_REQUEST_PROTOCOL_VERSION, PABB_MSG_ACK_REQUEST_I32>(nullptr, params, response);
-    return response.data;
-}
-uint32_t PABotBase::program_version(){
-    pabb_MsgRequestProgramVersion params;
-    pabb_MsgAckRequestI32 response;
-    issue_request_and_wait<PABB_MSG_REQUEST_PROGRAM_VERSION, PABB_MSG_ACK_REQUEST_I32>(nullptr, params, response);
-    return response.data;
-}
-uint8_t PABotBase::program_id(){
-    pabb_MsgRequestProgramID params;
-    pabb_MsgAckRequestI8 response;
-    issue_request_and_wait<PABB_MSG_REQUEST_PROGRAM_ID, PABB_MSG_ACK_REQUEST_I8>(nullptr, params, response);
-    return response.data;
-}
 
 
 

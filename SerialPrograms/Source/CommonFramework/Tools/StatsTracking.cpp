@@ -29,14 +29,14 @@ std::string StatsTracker::to_str() const{
 
         //  Not an alias.
         if (alias == m_aliases.end()){
-            stats[item.first] += item.second;
+            stats[item.first] += item.second.load(std::memory_order_relaxed);
             continue;
         }
 
         //  Find alias target.
         auto iter = m_stats.find(alias->second);
         if (iter != m_stats.end()){
-            stats[alias->second] += item.second;
+            stats[alias->second] += item.second.load(std::memory_order_relaxed);
         }
     }
 
@@ -59,14 +59,6 @@ std::string StatsTracker::to_str() const{
     }
     return str;
 }
-
-#if 0
-void StatsTracker::log_stats(ProgramEnvironment& env) const{
-    QString str = QString::fromStdString(to_str());
-    env.set_status(str);
-    env.log(str);
-}
-#endif
 
 
 
@@ -115,29 +107,6 @@ void StatsTracker::parse_and_append_line(const std::string& line){
             ptr++;
         }
     }
-}
-
-QJsonArray StatsTracker::make_discord_stats() const{
-    QJsonArray fields;
-    for (const Stat& stat : m_display_order) {
-
-        uint64_t count = 0;
-        auto iter = m_stats.find(stat.label);
-        if (iter != m_stats.end()){
-            count = iter->second;
-        }
-
-        if (stat.omit_if_zero && count == 0){
-            continue;
-        }
-
-        QJsonObject field;
-        field["name"] = QString::fromStdString(stat.label);
-        field["value"] = QString::fromStdString(tostr_u_commas(count));
-
-        fields.append(field);
-    }
-    return fields;
 }
 
 

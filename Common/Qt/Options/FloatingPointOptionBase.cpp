@@ -4,10 +4,15 @@
  *
  */
 
+#include <cmath>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QDoubleValidator>
 #include "FloatingPointOptionBase.h"
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -25,6 +30,17 @@ FloatingPointOptionBase::FloatingPointOptionBase(
     , m_current(default_value)
 {}
 
+QString FloatingPointOptionBase::set(double x){
+    QString err = check_validity(x);
+    if (err.isEmpty()){
+        m_current.store(x, std::memory_order_relaxed);
+    }
+    return err;
+}
+void FloatingPointOptionBase::restore_defaults(){
+    m_current = m_default;
+}
+
 void FloatingPointOptionBase::load_default(const QJsonValue& json){
     if (!json.isDouble()){
         return;
@@ -37,22 +53,32 @@ void FloatingPointOptionBase::load_current(const QJsonValue& json){
     if (!json.isDouble()){
         return;
     }
-    m_current = json.toDouble();
-    m_current = std::max(m_current, m_min_value);
-    m_current = std::min(m_current, m_max_value);
+    double current = json.toDouble();
+    current = std::max(current, m_min_value);
+    current = std::min(current, m_max_value);
+    m_current.store(current, std::memory_order_relaxed);
 }
 QJsonValue FloatingPointOptionBase::write_default() const{
     return QJsonValue(m_default);
 }
 QJsonValue FloatingPointOptionBase::write_current() const{
-    return QJsonValue(m_current);
+    return QJsonValue(m_current.load(std::memory_order_relaxed));
 }
 
-bool FloatingPointOptionBase::is_valid() const{
-    return m_current >= m_min_value && m_current <= m_max_value;
+QString FloatingPointOptionBase::check_validity() const{
+    return check_validity(m_current.load(std::memory_order_relaxed));
 }
-void FloatingPointOptionBase::restore_defaults(){
-    m_current = m_default;
+QString FloatingPointOptionBase::check_validity(double x) const{
+    if (x < m_min_value){
+        return "Value too small: min = " + QString::number(m_min_value) + ", value = " + QString::number(x);
+    }
+    if (x > m_max_value){
+        return "Value too large: max = " + QString::number(m_max_value) + ", value = " + QString::number(x);
+    }
+    if (std::isnan(x)){
+        return "Value is NaN";
+    }
+    return QString();
 }
 
 
@@ -61,28 +87,32 @@ FloatingPointOptionBaseUI::FloatingPointOptionBaseUI(QWidget& parent, FloatingPo
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
-    QLabel* text = new QLabel(value.m_label, this);
+    QLabel* text = new QLabel(value.label(), this);
     layout->addWidget(text, 1);
     text->setWordWrap(true);
     m_box = new QLineEdit(QString::number(m_value, 'f', 2), this);
 //    box->setInputMask("999999999");
-    QDoubleValidator* validator = new QDoubleValidator(value.m_min_value, value.m_max_value, 2, this);
-    m_box->setValidator(validator);
+//    QDoubleValidator* validator = new QDoubleValidator(value.min_value(), value.max_value(), 2, this);
+//    m_box->setValidator(validator);
     layout->addWidget(m_box, 1);
     connect(
         m_box, &QLineEdit::textChanged,
         this, [=](const QString& text){
-            double read = text.toDouble();
-            double fixed = read;
-//            fixed = std::max(fixed, m_value.m_min_value);
-            fixed = std::min(fixed, m_value.m_max_value);
-            if (read != fixed){
-                m_box->setText(QString::number(fixed, 'f', 2));
+            bool ok;
+            double current = text.toDouble(&ok);
+            QPalette palette;
+            if (ok && m_value.set(current).isEmpty()){
+                palette.setColor(QPalette::Text, Qt::black);
+            }else{
+                palette.setColor(QPalette::Text, Qt::red);
             }
-            m_value.m_current = fixed;
-            QPalette *palette = new QPalette();
-            palette->setColor(QPalette::Text, m_value.is_valid() ? Qt::black : Qt::red);
-            m_box->setPalette(*palette);
+            m_box->setPalette(palette);
+        }
+    );
+    connect(
+        m_box, &QLineEdit::editingFinished,
+        this, [=](){
+            m_box->setText(QString::number(m_value, 'f', 2));
         }
     );
 }

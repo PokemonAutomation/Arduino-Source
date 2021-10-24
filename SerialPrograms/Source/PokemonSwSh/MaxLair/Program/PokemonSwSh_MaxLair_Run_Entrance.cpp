@@ -4,8 +4,8 @@
  *
  */
 
-#include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "PokemonSwSh_MaxLair_Run_Entrance.h"
 
 namespace PokemonAutomation{
@@ -17,7 +17,7 @@ namespace MaxLairInternal{
 void run_entrance(
     MaxLairRuntime& runtime,
     ProgramEnvironment& env,
-    ConsoleHandle& console, bool is_host,
+    ConsoleHandle& console, bool save_path,
     GlobalStateTracker& state_tracker
 ){
     size_t console_index = console.index();
@@ -36,7 +36,7 @@ void run_entrance(
 
     pbf_wait(console, 2 * TICKS_PER_SECOND);
     while (true){
-        if (is_host){
+        if (save_path){
             pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
         }else{
             pbf_press_button(console, BUTTON_B, 10, TICKS_PER_SECOND);

@@ -45,6 +45,13 @@ void PanelInstance::from_json(){
 QJsonValue PanelInstance::to_json() const{
     return QJsonValue();
 }
+void PanelInstance::save_settings() const{
+    const std::string& identifier = m_descriptor.identifier();
+    if (!identifier.empty()){
+        PERSISTENT_SETTINGS().panels[QString::fromStdString(identifier)] = to_json();
+    }
+    PERSISTENT_SETTINGS().write();
+}
 QWidget* PanelInstance::make_widget(QWidget& parent, PanelListener& listener){
     return new PanelWidget(parent, *this, listener);
 }

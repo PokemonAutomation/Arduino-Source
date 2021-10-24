@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "EggCombined2",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-EggCombined2",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/EggCombined2.md",
     "2-Description": "Fetch and hatch eggs at the same time. (Fastest - 1700 eggs/day for 5120-step)",
     "3-Parameters": [
         {

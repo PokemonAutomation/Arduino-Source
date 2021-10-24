@@ -10,11 +10,15 @@
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/Tools/ConsoleHandle.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{
+
+
+std::string read_boss_sprite(ConsoleHandle& console);
 
 
 //  OCR the Pokemon name and return all possible candidates.

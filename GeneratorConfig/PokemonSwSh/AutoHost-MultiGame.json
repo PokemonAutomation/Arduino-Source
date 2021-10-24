@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "AutoHost-MultiGame",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-AutoHost-MultiGame",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/AutoHost-MultiGame.md",
     "2-Description": "Run AutoHost-Rolling across multiple game saves. (Up to 16 dens!)",
     "3-Parameters": [
         {

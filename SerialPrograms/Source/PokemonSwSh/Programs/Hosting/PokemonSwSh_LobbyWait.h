@@ -7,12 +7,12 @@
 #ifndef PokemonAutomation_PokemonSwSh_LobbyWait_H
 #define PokemonAutomation_PokemonSwSh_LobbyWait_H
 
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShAutoHosts.h"
-#include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_RaidLobbyReader.h"
 
 namespace PokemonAutomation{
@@ -29,6 +29,11 @@ static RaidLobbyState raid_lobby_wait(
     uint8_t accept_FR_slot,
     uint16_t lobby_wait_delay
 ){
+    uint16_t GAME_TO_HOME_DELAY_SAFE = GameSettings::instance().GAME_TO_HOME_DELAY_SAFE;
+    uint16_t AUTO_FR_DURATION = GameSettings::instance().AUTO_FR_DURATION;
+    bool TOLERATE_SYSTEM_UPDATE_MENU_SLOW = ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW;
+    uint16_t FULL_LOBBY_TIMER = GameSettings::instance().FULL_LOBBY_TIMER;
+
     console.botbase().wait_for_all_requests();
     uint32_t start = system_clock(console);
     RaidLobbyReader inference(console, console);

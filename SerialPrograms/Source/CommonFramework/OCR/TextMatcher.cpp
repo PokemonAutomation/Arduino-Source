@@ -4,6 +4,7 @@
  *
  */
 
+#include <cmath>
 #include <vector>
 #include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/Exception.h"
@@ -122,7 +123,6 @@ std::vector<uint64_t> binomial_row_u64(size_t degree){
     return row;
 }
 uint64_t binomial_coefficient_u64(size_t degree, size_t index){
-
     if (degree > 62){
         PA_THROW_StringException("Cannot go beyond degree 62.");
     }
@@ -143,6 +143,10 @@ uint64_t binomial_coefficient_u64(size_t degree, size_t index){
 
 
 double random_match_probability(size_t total, size_t matched, double random_match_chance){
+    if (total > 62){
+        PA_THROW_StringException("Cannot go beyond degree 62.");
+    }
+
     double c_match = 1 - random_match_chance;
 
     double misses[62];
@@ -174,149 +178,53 @@ double random_match_probability(size_t total, size_t matched, double random_matc
 
 
 
-
-
-
-void MatchResult::log(Logger& logger, const QString& extra) const{
-    QString str = "OCR Result: ";
-
-    if (!expected_token.empty()){
-        str += "Expected (";
-        str += QString::fromStdString(expected_token);
-        str += "): ";
-    }
-
-    str += "\"";
-    for (QChar ch : ocr_text){
-        if (ch != '\r' && ch != '\n'){
-            str += ch;
-        }
-    }
-    str += "\" -> ";
-    str += "\"" + normalized_text + "\" -> ";
-
-    QString candidate_str;
-    if (candidates.size() > 5){
-        candidate_str += "(" + QString::number(candidates.size()) + " candidates)";
-    }else{
-        candidate_str += "(";
-        for (size_t c = 0; c < candidates.size(); c++){
-            candidate_str += "\"" + candidates[c] + "\"";
-            if (c + 1 < candidates.size()){
-                candidate_str += ", ";
-            }
-        }
-        candidate_str += ")";
-    }
-
-    QString token_str;
-    if (slugs.size() > 5){
-        token_str += "(" + QString::number(candidates.size()) + " matches)";
-    }else{
-        token_str += "(";
-        bool first = true;
-        for (const std::string& token : slugs){
-            if (!first){
-                token_str += ", ";
-            }
-            first = false;
-            token_str += "\"" + QString::fromStdString(token) + "\"";
-        }
-        token_str += ")";
-    }
-
-    str += candidate_str;
-    str += ": ";
-    str += token_str;
-//    str += " (error = " + QString::number(exact_match_error) + ")";
-    str += " (alpha = " + QString::number(alpha) + ")";
-
-    if (!extra.isEmpty()){
-        str += " ===> ";
-        str += extra;
-    }
-
-    logger.log(str, matched ? Qt::blue : Qt::red);
-}
-
-
-
-
-MatchResult match_substring(
-    const std::map<QString, std::set<std::string>>& database,
-    const QString& text,
-    double random_match_chance,
-    double min_alpha
+void match_substring(
+    StringMatchResult& results,
+    const std::map<QString, std::set<std::string>>& database, double random_match_chance,
+    const QString& text, double log10p_spread
 ){
-    MatchResult result;
-    result.ocr_text = text;
-    result.normalized_text = normalize(text);
+//    result.original_text = text;
+//    result.normalized_text = normalize(text);
 
-    const QString& normalized = result.normalized_text;
+    QString normalized = normalize(text);
 
     //  Search for exact match of candidate.
     auto iter = database.find(normalized);
     if (iter != database.end()){
-        result.matched = true;
-//        result.exact_match_error = 0;
-        result.alpha = 1. / random_match_probability(normalized.size(), normalized.size(), random_match_chance);
-        result.candidates = {normalized};
-        result.slugs = iter->second;
-        return result;
+        results.exact_match = true;
+        double probability = random_match_probability(normalized.size(), normalized.size(), random_match_chance);
+        double log10p = std::log10(probability);
+        for (const auto& target : iter->second){
+            results.add(
+                log10p,
+                StringMatchData{text, normalized, normalized, target}
+            );
+        }
+        return;
     }
 
-
-    bool exact_substring_match = false;
-//    double best_error = 1.0;
-    double best_alpha = 0;
-    std::vector<QString> candidates;
-    std::set<std::string> tokens;
 
     for (auto item : database){
         double token_length = item.first.size();
 
-//        double error = (double)levenshtein_distance(item.first, normalized);
-//        error /= token_length;
-
         size_t distance = levenshtein_distance_substring(item.first, normalized);
         size_t matched = token_length - distance;
-        double alpha = 1. / random_match_probability(token_length, matched, random_match_chance);
+        if (matched == 0){
+            continue;
+        }
 
-//        double alpha = (token_length - (double)distance) / std::sqrt(token_length);
+        double probability = random_match_probability(token_length, matched, random_match_chance);
+        double log10p = std::log10(probability);
 
         if (distance == 0){
-            exact_substring_match = true;
+            results.exact_match = true;
         }
 
-#if 0
-        if (error < 1.0 && best_error > error){
-            best_error = error;
-            candidates.clear();
-            candidates.emplace_back(item.first);
-            tokens = item.second;
-        }else if (best_error < 1.0 && best_error == error){
-            candidates.emplace_back(item.first);
-            tokens.insert(item.second.begin(), item.second.end());
+        for (const auto& slug : item.second){
+            results.add(log10p, StringMatchData{text, normalized, item.first, slug});
+            results.clear_beyond_spread(log10p_spread);
         }
-#else
-        if (alpha > 2.0 && best_alpha < alpha){
-//            best_error = error;
-            best_alpha = alpha;
-            candidates.clear();
-            candidates.emplace_back(item.first);
-            tokens = item.second;
-        }else if (alpha > 2.0 && best_alpha == alpha){
-            candidates.emplace_back(item.first);
-            tokens.insert(item.second.begin(), item.second.end());
-        }
-#endif
     }
-    result.matched = exact_substring_match || best_alpha >= min_alpha;
-//    result.exact_match_error = best_error;
-    result.alpha = best_alpha;
-    result.candidates = candidates;
-    result.slugs = tokens;
-    return result;
 }
 
 

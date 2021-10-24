@@ -23,10 +23,14 @@ win32-msvc{
 SOURCES += \
     ../Common/Cpp/Exception.cpp \
     ../Common/Cpp/PrettyPrint.cpp \
+    ../Common/Cpp/SpinLock.cpp \
     ../Common/Cpp/Unicode.cpp \
+    ../Common/NintendoSwitch/NintendoSwitch_Tools.cpp \
+    ../Common/Qt/AutoHeightTable.cpp \
     ../Common/Qt/CodeValidator.cpp \
     ../Common/Qt/ExpressionEvaluator.cpp \
     ../Common/Qt/Options/BooleanCheckBoxOptionBase.cpp \
+    ../Common/Qt/Options/EditableTableOptionBase.cpp \
     ../Common/Qt/Options/FloatingPointOptionBase.cpp \
     ../Common/Qt/Options/FossilTableOptionBase.cpp \
     ../Common/Qt/Options/MultiHostTableOptionBase.cpp \
@@ -52,9 +56,9 @@ SOURCES += \
     Source/Panels/ConfigSet.cpp \
     Source/Panels/JsonProgram.cpp \
     Source/Panels/JsonSettings.cpp \
+    Source/Panels/PanelList.cpp \
+    Source/Panels/PanelLists.cpp \
     Source/Panels/Program.cpp \
-    Source/Panels/ProgramTab.cpp \
-    Source/Panels/ProgramTabs.cpp \
     Source/Tools/CommandRunner.cpp \
     Source/Tools/MiscTools.cpp \
     Source/Tools/PersistentSettings.cpp \
@@ -64,10 +68,14 @@ SOURCES += \
 HEADERS += \
     ../Common/Cpp/Exception.h \
     ../Common/Cpp/PrettyPrint.h \
+    ../Common/Cpp/SpinLock.h \
     ../Common/Cpp/Unicode.h \
+    ../Common/NintendoSwitch/NintendoSwitch_Tools.h \
+    ../Common/Qt/AutoHeightTable.h \
     ../Common/Qt/CodeValidator.h \
     ../Common/Qt/ExpressionEvaluator.h \
     ../Common/Qt/Options/BooleanCheckBoxOptionBase.h \
+    ../Common/Qt/Options/EditableTableOptionBase.h \
     ../Common/Qt/Options/FloatingPointOptionBase.h \
     ../Common/Qt/Options/FossilTableOptionBase.h \
     ../Common/Qt/Options/MultiHostTableOptionBase.h \
@@ -92,9 +100,9 @@ HEADERS += \
     Source/Panels/ConfigSet.h \
     Source/Panels/JsonProgram.h \
     Source/Panels/JsonSettings.h \
+    Source/Panels/PanelList.h \
+    Source/Panels/PanelLists.h \
     Source/Panels/Program.h \
-    Source/Panels/ProgramTab.h \
-    Source/Panels/ProgramTabs.h \
     Source/Panels/RightPanel.h \
     Source/Tools/PersistentSettings.h \
     Source/Tools/Tools.h \

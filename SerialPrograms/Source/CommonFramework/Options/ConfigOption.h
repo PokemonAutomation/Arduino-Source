@@ -21,7 +21,9 @@ public:
     virtual void load_json(const QJsonValue& json) = 0;
     virtual QJsonValue to_json() const = 0;
 
-    virtual bool is_valid() const{ return true; };
+    //  Returns error message if invalid. Otherwise returns empty string.
+    virtual QString check_validity() const{ return QString(); };
+
     virtual void restore_defaults(){};
 
     virtual ConfigOptionUI* make_ui(QWidget& parent) = 0;

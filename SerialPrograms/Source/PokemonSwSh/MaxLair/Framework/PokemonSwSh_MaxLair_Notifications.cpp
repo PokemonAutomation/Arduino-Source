@@ -7,9 +7,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/PersistentSettings.h"
-#include "CommonFramework/Tools/DiscordWebHook.h"
-#include "CommonFramework/Tools/ProgramNotifications.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "PokemonSwSh_MaxLair_Notifications.h"
 
@@ -21,12 +19,27 @@ namespace MaxLairInternal{
 using namespace Pokemon;
 
 
+void send_nonshiny_notification(
+    Logger& logger, EventNotificationOption& settings,
+    const QString& program,
+    const Stats& stats
+){
+    std::vector<std::pair<QString, QString>> embeds;
+    embeds.emplace_back("Adventure Result", "No shinies found.");
+    embeds.emplace_back("Session Stats", QString::fromStdString(stats.to_str()));
+    send_program_notification(
+        logger, settings,
+        QColor(), program,
+        "Max Lair Status Update",
+        embeds
+    );
+}
 void send_shiny_notification(
-    Logger& logger,
+    Logger& logger, EventNotificationOption& settings,
     const QString& program,
     const std::set<std::string>* slugs,
-    const QImage& screenshot,
-    const Stats& stats
+    const Stats& stats,
+    const QImage& image
 ){
     std::vector<std::pair<QString, QString>> embeds;
     if (slugs){
@@ -63,13 +76,12 @@ void send_shiny_notification(
     embeds.emplace_back("Session Stats", QString::fromStdString(stats.to_str()));
 
     send_program_notification(
-        logger,
-        true, 0xffff00,
-        program,
+        logger, settings,
+        0xffff00, program,
         "Max Lair Shiny Notification",
-        embeds
+        embeds,
+        image, true
     );
-    DiscordWebHook::send_screenshot(logger, screenshot, ScreenshotMode::JPG, true);
 }
 
 

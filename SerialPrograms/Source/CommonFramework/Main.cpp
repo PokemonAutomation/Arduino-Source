@@ -5,6 +5,7 @@
 #include "CrashDump.h"
 #include "Tools/StatsDatabase.h"
 #include "Tools/Logger.h"
+#include "Integrations/SleepyDiscordRunner.h"
 #include "Windows/MainWindow.h"
 
 #include <iostream>
@@ -28,16 +29,9 @@ int main(int argc, char *argv[]){
     try{
         PERSISTENT_SETTINGS().read();
     }catch (const StringException& error){
-        global_logger().log(error.what(), "red");
+        global_logger_tagged().log(error.what(), "red");
     }
 
-#if 0
-    {
-        StatSet stats;
-        stats.open_from_file(PERSISTENT_SETTINGS().stats_file);
-        stats.save_to_file(PERSISTENT_SETTINGS().stats_file);
-    }
-#endif
 
     int ret;
     {
@@ -46,5 +40,6 @@ int main(int argc, char *argv[]){
         ret = application.exec();
     }
     PERSISTENT_SETTINGS().write();
+    Integration::SleepyDiscordRunner::sleepy_terminate();
     return ret;
 }

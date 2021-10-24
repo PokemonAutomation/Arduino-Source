@@ -4,15 +4,18 @@
  *
  */
 
+#include <QtGlobal>
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
-#include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/OCR/Filtering.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_PokemonSpriteReader.h"
-#include "PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
+#include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_PokemonSpriteReader.h"
+#include "PokemonSwSh/Inference/Dens/PokemonSwSh_DenMonReader.h"
+#include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Options.h"
+#include "PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -22,7 +25,15 @@ using namespace Pokemon;
 
 
 struct SpeciesReadDatabase{
-    static constexpr double MAX_SPRITE_RMSD = 0.40;
+
+    static constexpr double CROPPED_MAX_ALPHA = 0.30;
+    static constexpr double CROPPED_ALPHA_SPREAD = 0.03;
+
+    static constexpr double RETRY_ALPHA = 0.25;
+
+    static constexpr double EXACT_MAX_ALPHA = 0.30;
+    static constexpr double EXACT_ALPHA_SPREAD = 0.02;
+
 
     std::map<std::string, std::set<std::string>> ocr_map;
     std::map<std::string, std::set<std::string>> sprite_map;
@@ -38,23 +49,17 @@ struct SpeciesReadDatabase{
     }
 
     SpeciesReadDatabase(){
-        QJsonObject json = read_json_file(
-            PERSISTENT_SETTINGS().resource_path + QString::fromStdString("PokemonSwSh/MaxLairSlugMap.json")
-        ).object();
-
         std::set<std::string> ocr_set;
         std::set<std::string> sprite_set;
 
-        for (auto iter = json.begin(); iter != json.end(); ++iter){
-            std::string maxlair_slug = iter.key().toStdString();
-            QJsonObject obj = iter.value().toObject();
-            for (const auto& item : obj["OCR"].toArray()){
-                std::string slug = item.toString().toStdString();
+        for (const auto& item0 : maxlair_slugs()){
+            const std::string& maxlair_slug = item0.first;
+            {
+                const std::string& slug = item0.second.name_slug;
                 ocr_map[slug].insert(maxlair_slug);
                 ocr_set.insert(slug);
             }
-            for (const auto& item : obj["Sprite"].toArray()){
-                std::string slug = item.toString().toStdString();
+            for (const auto& slug : item0.second.sprite_slugs){
                 sprite_map[slug].insert(maxlair_slug);
                 sprite_set.insert(slug);
             }
@@ -68,6 +73,33 @@ struct SpeciesReadDatabase{
 };
 
 
+
+std::string read_boss_sprite(ConsoleHandle& console){
+    DenMonReader reader(console, console);
+    QImage screen = console.video().snapshot();
+    DenMonReadResults results = reader.read(screen);
+
+    std::string sprite_slug;
+    {
+        auto iter = results.slugs.results.begin();
+        if (iter == results.slugs.results.end()){
+            return "";
+        }
+        sprite_slug = std::move(iter->second);
+    }
+
+    const SpeciesReadDatabase& database = SpeciesReadDatabase::instance();
+    auto iter = database.sprite_map.find(sprite_slug);
+    if (iter == database.sprite_map.end()){
+        PA_THROW_StringException("Slug doesn't exist in sprite map: " + sprite_slug);
+    }
+    if (iter->second.empty()){
+        PA_THROW_StringException("Sprite map is empty for slug: " + sprite_slug);
+    }
+    return *iter->second.begin();
+}
+
+
 std::set<std::string> read_pokemon_name(
     Logger& logger,
     const QImage& screen, const QImage& image,
@@ -76,19 +108,19 @@ std::set<std::string> read_pokemon_name(
     const SpeciesReadDatabase& database = SpeciesReadDatabase::instance();
 
 //    OCR::MatchResult result = PokemonNameReader::instance().read_substring(language, image);
-    OCR::MatchResult result = database.name_reader->read_substring(language, image);
-    result.log(logger);
-    if (!result.matched){
-        dump_image(logger, screen, "MaxLair-NameOCR");
+//    image.save("test.png");
+    OCR::StringMatchResult result = database.name_reader->read_substring(logger, language, image);
+//    result.log(logger);
+    if (result.results.empty()){
         return {};
     }
 
     //  Convert OCR slugs to MaxLair name slugs.
     std::set<std::string> ret;
-    for (const std::string& name_slug : result.slugs){
-        auto iter = database.ocr_map.find(name_slug);
+    for (const auto& hit : result.results){
+        auto iter = database.ocr_map.find(hit.second.token);
         if (iter == database.ocr_map.end()){
-            PA_THROW_StringException("Slug doesn't exist in OCR map: " + name_slug);
+            PA_THROW_StringException("Slug doesn't exist in OCR map: " + hit.second.token);
         }
         for (const std::string& item : iter->second){
             ret.insert(item);
@@ -99,7 +131,7 @@ std::set<std::string> read_pokemon_name(
 }
 
 
-ImageMatch::MatchResult read_pokemon_sprite_set(
+ImageMatch::ImageMatchResult read_pokemon_sprite_set(
     Logger& logger,
     const QImage& screen,
     const ImageFloatBox& box,
@@ -121,21 +153,28 @@ ImageMatch::MatchResult read_pokemon_sprite_set(
 
 //    image.save("test.png");
 
-    ImageMatch::MatchResult result = database.sprite_reader->match(image);
-//    result.log(logger, SpeciesReadDatabase::MAX_SPRITE_RMSD);
+    double max_alpha = SpeciesReadDatabase::CROPPED_MAX_ALPHA;
+
+    ImageMatch::ImageMatchResult result = database.sprite_reader->match(image, SpeciesReadDatabase::CROPPED_ALPHA_SPREAD);
+//    result.log(logger, SpeciesReadDatabase::CROPPED_MAX_ALPHA);
 
     //  Try with exact matcher.
     if (allow_exact_match_fallback){
-        if (result.slugs.size() != 1 || result.slugs.begin()->first > 0.30){
+        if (result.results.size() != 1 || result.results.begin()->first > SpeciesReadDatabase::RETRY_ALPHA){
             logger.log("Retrying with exact sprite matcher...");
-            result = database.exact_sprite_reader->match(screen, box, false, 5);
+            max_alpha = SpeciesReadDatabase::EXACT_MAX_ALPHA;
+            result = database.exact_sprite_reader->match(
+                screen, box,
+                5,
+                SpeciesReadDatabase::EXACT_ALPHA_SPREAD
+            );
         }
     }
 
     //  Convert slugs to MaxLair slugs.
-    for (auto& item : result.slugs){
+    for (auto& item : result.results){
         auto iter = database.sprite_map.find(item.second);
-        if (iter == database.ocr_map.end()){
+        if (iter == database.sprite_map.end()){
             PA_THROW_StringException("Slug doesn't exist in sprite map: " + item.second);
         }
         if (iter->second.empty()){
@@ -144,36 +183,16 @@ ImageMatch::MatchResult read_pokemon_sprite_set(
         item.second = *iter->second.begin();
     }
 
-    result.log(logger, SpeciesReadDatabase::MAX_SPRITE_RMSD);
+    result.log(logger, max_alpha);
+    result.clear_beyond_alpha(max_alpha);
 
     return result;
 }
-#if 0
-std::string read_pokemon_sprite(
-    Logger& logger,
-    const QImage& screen, const ImageFloatBox& box
-){
-    ImageMatch::MatchResult result = read_pokemon_sprite_set(logger, screen, box);
-    auto iter = result.slugs.begin();
-    if (iter == result.slugs.end()){
-        return "";
-    }
-    if (iter->first > SpeciesReadDatabase::MAX_SPRITE_RMSD){
-        logger.log("No good sprite match found.", Qt::red);
-        return "";
-    }
-//    if (iter->first > 0.35 && result.slugs.size() > 5){
-//        logger.log("Multiple \"ok\" sprite matches with no clear winner.", Qt::red);
-//        return "";
-//    }
-    return std::move(iter->second);
-}
-#endif
 
 
 
 
-ImageMatch::MatchResult read_pokemon_sprite_set_with_item(Logger& logger, const QImage& screen, const ImageFloatBox& box){
+ImageMatch::ImageMatchResult read_pokemon_sprite_set_with_item(Logger& logger, const QImage& screen, const ImageFloatBox& box){
     const SpeciesReadDatabase& database = SpeciesReadDatabase::instance();
 
     //  Try with cropped matcher.
@@ -183,20 +202,24 @@ ImageMatch::MatchResult read_pokemon_sprite_set_with_item(Logger& logger, const 
     large_box.x += 0.005;
     QImage image = extract_box(screen, large_box);
 
-    ImageMatch::MatchResult result = database.sprite_reader->match(image);
+    double max_alpha = SpeciesReadDatabase::CROPPED_MAX_ALPHA;
+
+    ImageMatch::ImageMatchResult result = database.sprite_reader->match(image, SpeciesReadDatabase::CROPPED_ALPHA_SPREAD);
+//    result.log(logger, SpeciesReadDatabase::CROPPED_MAX_ALPHA);
 
     //  Try with exact matcher.
-    if (result.slugs.empty() || result.slugs.begin()->first > SpeciesReadDatabase::MAX_SPRITE_RMSD){
+    if (result.results.empty() || result.results.begin()->first > SpeciesReadDatabase::RETRY_ALPHA){
         logger.log("Retrying with left-side exact sprite matcher...");
+        max_alpha = SpeciesReadDatabase::EXACT_MAX_ALPHA;
         ImageFloatBox half_box = box;
         half_box.width /= 2;
-        result = database.exact_leftsprite_reader->match(screen, half_box, false, 5);
+        result = database.exact_leftsprite_reader->match(screen, half_box, 5, SpeciesReadDatabase::EXACT_ALPHA_SPREAD);
     }
 
     //  Convert slugs to MaxLair slugs.
-    for (auto& item : result.slugs){
+    for (auto& item : result.results){
         auto iter = database.sprite_map.find(item.second);
-        if (iter == database.ocr_map.end()){
+        if (iter == database.sprite_map.end()){
             PA_THROW_StringException("Slug doesn't exist in sprite map: " + item.second);
         }
         if (iter->second.empty()){
@@ -205,7 +228,8 @@ ImageMatch::MatchResult read_pokemon_sprite_set_with_item(Logger& logger, const 
         item.second = *iter->second.begin();
     }
 
-    result.log(logger, SpeciesReadDatabase::MAX_SPRITE_RMSD);
+    result.log(logger, max_alpha);
+    result.clear_beyond_alpha(max_alpha);
 
     return result;
 }
@@ -213,16 +237,16 @@ std::string read_pokemon_sprite_with_item(
     Logger& logger,
     const QImage& screen, const ImageFloatBox& box
 ){
-    ImageMatch::MatchResult result = read_pokemon_sprite_set_with_item(logger, screen, box);
-    auto iter = result.slugs.begin();
-    if (iter == result.slugs.end()){
+    ImageMatch::ImageMatchResult result = read_pokemon_sprite_set_with_item(logger, screen, box);
+    auto iter = result.results.begin();
+    if (iter == result.results.end()){
         return "";
     }
-    if (iter->first > SpeciesReadDatabase::MAX_SPRITE_RMSD){
+    if (iter->first > SpeciesReadDatabase::CROPPED_MAX_ALPHA){
         logger.log("No good sprite match found.", Qt::red);
         return "";
     }
-    if (iter->first > 100 && result.slugs.size() > 5){
+    if (result.results.size() > 2){
         logger.log("Multiple \"ok\" sprite matches with no clear winner.", Qt::red);
         return "";
     }
@@ -238,7 +262,7 @@ std::string read_pokemon_name_sprite(
     bool allow_exact_match_fallback
 ){
 //    QImage sprite = extract_box(screen, sprite_box);
-    QImage name = extract_box(screen, name_box);
+//    QImage name = extract_box(screen, name_box);
 
     QImage image = extract_box(screen, name_box);
     OCR::filter_smart(image);
@@ -246,24 +270,27 @@ std::string read_pokemon_name_sprite(
     std::set<std::string> ocr_slugs = read_pokemon_name(logger, screen, image, language);
     bool ocr_hit = !ocr_slugs.empty();
     bool ocr_unique = ocr_hit && ocr_slugs.size() == 1;
+    if (!ocr_hit){
+        dump_image(logger, MODULE_NAME, "MaxLair-read_name_sprite", screen);
+    }
 
-    ImageMatch::MatchResult result = read_pokemon_sprite_set(
+    ImageMatch::ImageMatchResult result = read_pokemon_sprite_set(
         logger,
         screen,
         sprite_box,
         allow_exact_match_fallback
     );
-    auto iter = result.slugs.begin();
-    bool sprite_hit = iter != result.slugs.end() && iter->first <= SpeciesReadDatabase::MAX_SPRITE_RMSD;
-    if (!sprite_hit || result.slugs.size() > 1){
-        dump_image(logger, screen, "MaxLair-read_name_sprite");
+    auto iter = result.results.begin();
+    bool sprite_hit = iter != result.results.end() && iter->first <= SpeciesReadDatabase::CROPPED_MAX_ALPHA;
+    if (!sprite_hit || result.results.size() > 1){
+        dump_image(logger, MODULE_NAME, "MaxLair-read_name_sprite", screen);
     }
 
     //  No hit on sprite. Use OCR.
     if (!sprite_hit){
         std::string ret = ocr_unique ? *ocr_slugs.begin() : "";
         logger.log("Failed to read sprite. Using OCR result: " + ret, Qt::red);
-        dump_image(logger, screen, "MaxLair-read_name_sprite");
+//        dump_image(logger, screen, "MaxLair-read_name_sprite");
         return ret;
     }
 
@@ -271,13 +298,13 @@ std::string read_pokemon_name_sprite(
     if (!ocr_hit){
         std::string ret = sprite_hit ? std::move(iter->second) : "";
         logger.log("Failed to read name. Using sprite result: " + ret, Qt::red);
-        dump_image(logger, screen, "MaxLair-read_name_sprite");
+//        dump_image(logger, screen, "MaxLair-read_name_sprite");
         return ret;
     }
 
     //  If any are in common to both, pick the best one.
     std::multimap<double, std::string> common;
-    for (const auto& item : result.slugs){
+    for (const auto& item : result.results){
         if (ocr_slugs.find(item.second) != ocr_slugs.end()){
             common.emplace(item.first, item.second);
         }
@@ -288,12 +315,12 @@ std::string read_pokemon_name_sprite(
     }
 
     //  This is where things get bad since OCR and sprites disagree.
-    dump_image(logger, screen, "MaxLair-read_name_sprite");
+    dump_image(logger, MODULE_NAME, "MaxLair-read_name_sprite", screen);
 
     //  If there is only one sprite match, use it.
-    if (result.slugs.size() == 1){
-        logger.log("Sprite and OCR disagree. Attempt to arbitrate... Picking: " + result.slugs.begin()->second, Qt::red);
-        return std::move(result.slugs.begin()->second);
+    if (result.results.size() == 1){
+        logger.log("Sprite and OCR disagree. Attempt to arbitrate... Picking: " + result.results.begin()->second, Qt::red);
+        return std::move(result.results.begin()->second);
     }
 
     //  If there is only one OCR match, use it.

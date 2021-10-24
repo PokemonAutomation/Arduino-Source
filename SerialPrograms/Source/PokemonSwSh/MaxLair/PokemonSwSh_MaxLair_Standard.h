@@ -8,9 +8,10 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_Standard_H
 
 #include "CommonFramework/Options/EnumDropdownOption.h"
-#include "CommonFramework/Options/ScreenshotFormatOption.h"
-#include "CommonFramework/Options/FixedCodeOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/OCR/LanguageOptionOCR.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
+#include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Framework/MultiSwitchProgram.h"
 #include "Framework/PokemonSwSh_MaxLair_Options.h"
 
@@ -28,28 +29,41 @@ public:
 
 class MaxLairStandard : public MultiSwitchProgramInstance{
 public:
+    enum class StopCondition{
+        STOP_ON_SHINY_LEGENDARY,
+        STOP_ON_NOTHING,
+    };
+
+public:
     MaxLairStandard(const MaxLairStandard_Descriptor& descriptor);
 
-    virtual bool is_valid() const override;
+    virtual QString check_validity() const override;
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(MultiSwitchProgramEnvironment& env) override;
 
 
 private:
+    StartInGripOrGameOption START_IN_GRIP_MENU;
+    GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+
     EnumDropdownOption HOST_SWITCH;
     EnumDropdownOption BOSS_SLOT;
-    EnumDropdownOption STOP_CONDITION;
-    FixedCodeOption RAID_CODE;
 
-    ScreenshotOption SCREENSHOT;
+    EnumDropdownOption STOP_CONDITION;
 
     LanguageSet m_languages;
+    MaxLairInternal::MaxLairConsoleOptions PLAYER0;
+    MaxLairInternal::MaxLairConsoleOptions PLAYER1;
+    MaxLairInternal::MaxLairConsoleOptions PLAYER2;
+    MaxLairInternal::MaxLairConsoleOptions PLAYER3;
 
-    MaxLairPlayerOptions PLAYER0;
-    MaxLairPlayerOptions PLAYER1;
-    MaxLairPlayerOptions PLAYER2;
-    MaxLairPlayerOptions PLAYER3;
+    MaxLairInternal::HostingSettings HOSTING;
+
+    EventNotificationOption NOTIFICATION_NO_SHINY;
+    EventNotificationOption NOTIFICATION_SHINY;
+    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
+    EventNotificationsOption NOTIFICATIONS;
 };
 
 

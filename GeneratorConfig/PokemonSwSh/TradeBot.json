@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "TradeBot",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-TradeBot",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/TradeBot.md",
     "2-Description": "Surprise trade with a code for hosting giveaways.",
     "3-Parameters": [
         {

@@ -23,6 +23,8 @@ using ssize_t = ptrdiff_t;
 
 #pragma warning(disable:4100)   //  Unreferenced Formal Parameter
 #pragma warning(disable:4127)   //  Conditional expresstion is constant
+#pragma warning(disable:4324)   //  structure was padded due to alignment specifier
+#pragma warning(disable:4458)   //  Hiding of class members
 #pragma warning(disable:4996)   //  Unsafe function
 
 

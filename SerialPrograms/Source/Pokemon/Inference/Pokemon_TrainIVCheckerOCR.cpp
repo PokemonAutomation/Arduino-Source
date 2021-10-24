@@ -7,7 +7,6 @@
 #include <QDirIterator>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/ParallelTaskRunner.h"
-#include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/OCR/RawOCR.h"
 #include "CommonFramework/OCR/Filtering.h"
@@ -37,7 +36,9 @@ TrainIVCheckerOCR_Descriptor::TrainIVCheckerOCR_Descriptor()
 TrainIVCheckerOCR::TrainIVCheckerOCR(const TrainIVCheckerOCR_Descriptor& descriptor)
     : RunnableComputerProgramInstance(descriptor)
     , DIRECTORY(
+        false,
         "<b>Training Data Directory:</b> (Relative to \"TrainingData/\")",
+        "IVCheckerOCR/",
         "IVCheckerOCR/"
     )
     , MODE(

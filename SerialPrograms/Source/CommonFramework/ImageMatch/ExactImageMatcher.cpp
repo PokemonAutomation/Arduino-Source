@@ -1,11 +1,10 @@
-/*  Exact Image Matcher
+/*  Image Match Preprocessed Data
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
 #include <cmath>
-#include "Common/Cpp/Exception.h"
 #include "ImageDiff.h"
 #include "ExactImageMatcher.h"
 
@@ -17,147 +16,82 @@ namespace PokemonAutomation{
 namespace ImageMatch{
 
 
-
-
-std::vector<QImage> make_image_set(
-    const QImage& screen,
-    const ImageFloatBox& box,
-    const QSize& dimensions,
-    size_t tolerance
-){
-    std::vector<QImage> ret;
-    int limit = (int)tolerance;
-    for (int y = -limit; y <= limit; y++){
-        for (int x = -limit; x <= limit; x++){
-            ret.emplace_back(extract_box(screen, box, x, y).scaled(dimensions));
-//            if (x == 0 && y == 0){
-//                ret.back().save("image.png");
-//            }
-        }
-    }
-    return ret;
+ExactImageMatcher::ExactImageMatcher(QImage image, void*)
+    : m_image(std::move(image))
+    , m_stats(image_stats(m_image))
+{
+//    cout << m_stats.stddev.sum() << endl;
 }
 
-
-void ExactImageMatcher::add(const std::string& slug, QImage image){
-    if (image.isNull()){
-        PA_THROW_StringException("Null image.");
-    }
-//    image = image.scaled(image.width() * 8, image.height() * 8);
-//    image = image.scaled(image.width() * 8, image.height() * 8, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-    if (m_dimensions.isValid()){
-        if (image.size() != m_dimensions){
-            PA_THROW_StringException("Mismatching dimensions.");
-        }
-    }else{
-        m_dimensions = image.size();
-    }
-    auto iter = m_database.find(slug);
-    if (iter != m_database.end()){
-        PA_THROW_StringException("Duplicate slug: " + slug);
+void ExactImageMatcher::process_images(QImage& reference, QImage& image) const{
+    if (image.size() != m_image.size()){
+        image = image.scaled(m_image.size());
     }
 
-    m_database.emplace(slug, std::move(image));
-}
+    FloatPixel image_brightness = pixel_average(image, m_image);
+    FloatPixel scale = image_brightness / m_stats.average;
 
+//    cout << image_brightness << m_stats.average << scale << endl;
 
-void ExactImageMatcher::scale_to_dimensions(QImage& image) const{
-    if (image.size() != m_dimensions){
-        image = image.scaled(m_dimensions);
-//        image = image.scaled(m_dimensions, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-    }
-}
-
-
-double ExactImageMatcher::compare(
-    const ExactMatchMetadata& sprite,
-    QImage image, bool use_alpha_mask
-){
-    if (use_alpha_mask){
-        return sprite.rmsd_ratio_masked_with(image);
-    }else{
-        return sprite.rmsd_ratio_with(image);
-    }
-
-#if 0
-    FloatPixel image_brightness = pixel_average(image, sprite.m_image);
-    FloatPixel scale = sprite.m_average_pixel / image_brightness;
     if (std::isnan(scale.r)) scale.r = 1.0;
     if (std::isnan(scale.g)) scale.g = 1.0;
     if (std::isnan(scale.b)) scale.b = 1.0;
-//    scale.bound(0.5, 2.0);
     scale.bound(0.8, 1.2);
 
-    scale_brightness(image, scale);
-    double ret = use_alpha_mask
-        ? pixel_RMSD_masked(sprite.m_image, image)
-        : pixel_RMSD(sprite.m_image, image);
-//    cout << ret << endl;
-
-#if 0
-    if (ret < 103){
-        cout << pixel_max_possible_RMSD(sprite) << endl;
-//        cout << sprite_brightness << endl;
-        image_diff_greyscale(sprite, image).save("diff.png");
-        image.save("test.png");
-    }
-#endif
-
-//    return ret;
-    return ret / sprite.m_max_possible_RMSD;
-#endif
-}
-double ExactImageMatcher::compare(
-    const ExactMatchMetadata& sprite,
-    const std::vector<QImage>& images, bool use_alpha_mask
-){
-    double best = 1000;
-    for (const QImage& image : images){
-        best = std::min(best, compare(sprite, image, use_alpha_mask));
-    }
-//    cout << best << endl;
-    return best;
+    reference = m_image;
+    scale_brightness(reference, scale);
 }
 
-MatchResult ExactImageMatcher::match(
-    const QImage& screen, const ImageFloatBox& box,
-    bool use_alpha_mask,
-    size_t tolerance,
-    double RMSD_ratio_spread
-) const{
-    if (screen.isNull()){
-        return MatchResult();
-    }
 
-    std::vector<QImage> image_set = make_image_set(screen, box, m_dimensions, tolerance);
-
-    std::multimap<double, std::string> slugs;
-
-    for (const auto& item : m_database){
-//        if (item.first != "butterfree"){
-//            continue;
-//        }
-        slugs.emplace(
-            compare(
-                item.second,
-                image_set, use_alpha_mask
-            ),
-            item.first
-        );
-        while (slugs.size() > 1){
-            auto best = slugs.begin();
-            auto back = slugs.rbegin();
-            if (back->first <= best->first + RMSD_ratio_spread){
-                break;
-            }
-            slugs.erase(back->first);
-        }
-    }
-
-    MatchResult result;
-    result.slugs = std::move(slugs);
-    return result;
+double ExactImageMatcher::rmsd(QImage image) const{
+    QImage reference;
+    process_images(reference, image);
+//    image.save("image.png");
+//    reference.save("sprite.png");
+    return pixel_RMSD(reference, image);
 }
+double ExactImageMatcher::rmsd(QImage image, QRgb background) const{
+    QImage reference;
+    process_images(reference, image);
+    return pixel_RMSD(reference, image, background);
+}
+double ExactImageMatcher::rmsd_masked(QImage image) const{
+    QImage reference;
+    process_images(reference, image);
+    return pixel_RMSD_masked(reference, image);
+}
+
+
+
+
+WeightedExactImageMatcher::WeightedExactImageMatcher(QImage image, const InverseStddevWeight& weight)
+    : ExactImageMatcher(std::move(image), nullptr)
+    , m_multiplier(1. / (m_stats.stddev.sum() * weight.stddev_coefficient + weight.offset))
+{}
+
+
+double WeightedExactImageMatcher::diff(QImage image) const{
+    return rmsd(std::move(image)) * m_multiplier;
+}
+double WeightedExactImageMatcher::diff(QImage image, QRgb background) const{
+    return rmsd(std::move(image), background) * m_multiplier;
+}
+double WeightedExactImageMatcher::diff_masked(QImage image) const{
+    return rmsd_masked(std::move(image)) * m_multiplier;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

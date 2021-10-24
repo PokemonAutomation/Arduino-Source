@@ -50,7 +50,7 @@ private:
     using RunnablePanelWidget::RunnablePanelWidget;
     virtual ~RunnableComputerProgramWidget();
 
-    virtual void run_program() override;
+    virtual void run_program() override final;
 };
 
 

@@ -4,11 +4,11 @@
  *
  */
 
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/FixedInterval.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh_EventBeamFinder.h"
 
 namespace PokemonAutomation{
@@ -20,7 +20,7 @@ EventBeamFinder_Descriptor::EventBeamFinder_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:EventBeamFinder",
         "Event Beam Finder",
-        "SwSh-Arduino/wiki/Basic:-EventBeamFinder",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EventBeamFinder.md",
         "Drop wishing pieces until you find an event den.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB
@@ -70,7 +70,7 @@ void EventBeamFinder::drop_wishing_piece(const BotBaseContext& context) const{
 void EventBeamFinder::program(SingleSwitchProgramEnvironment& env){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
-        resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         pbf_mash_button(env.console, BUTTON_B, 700);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
@@ -79,7 +79,7 @@ void EventBeamFinder::program(SingleSwitchProgramEnvironment& env){
     bool parity = false;
     while (true){
         //  Fly back to daycare.
-        ssf_press_button2(env.console, BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
+        ssf_press_button2(env.console, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
         pbf_mash_button(env.console, BUTTON_A, 700);
 
         //  Goto den.

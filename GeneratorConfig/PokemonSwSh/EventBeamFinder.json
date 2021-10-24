@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "EventBeamFinder",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-EventBeamFinder",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/EventBeamFinder.md",
     "2-Description": "Drop wishing pieces until you find an event den.",
     "3-Parameters": [
         {

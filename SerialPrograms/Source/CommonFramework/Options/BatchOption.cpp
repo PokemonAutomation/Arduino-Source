@@ -5,9 +5,14 @@
  */
 
 #include <QVBoxLayout>
+#include <QLabel>
 #include <QGroupBox>
 #include "Common/Qt/QtJsonTools.h"
 #include "BatchOption.h"
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -34,13 +39,14 @@ QJsonValue BatchOption::to_json() const{
     return obj;
 }
 
-bool BatchOption::is_valid() const{
+QString BatchOption::check_validity() const{
     for (const auto& item : m_options){
-        if (!item.first->is_valid()){
-            return false;
+        QString error = item.first->check_validity();
+        if (!error.isEmpty()){
+            return error;
         }
     }
-    return true;
+    return QString();
 }
 void BatchOption::restore_defaults(){
     for (const auto& item : m_options){
@@ -59,11 +65,8 @@ BatchOptionUI::BatchOptionUI(QWidget& parent, BatchOption& value)
 
     for (auto& item : m_value.m_options){
         m_options.emplace_back(item.first->make_ui(parent));
-        options_layout->addWidget(m_options.back()->widget());
+        options_layout->addWidget(m_options.back()->widget(), 0);
     }
-}
-bool BatchOptionUI::settings_valid() const{
-    return m_value.is_valid();
 }
 void BatchOptionUI::restore_defaults(){
     for (ConfigOptionUI* item : m_options){
@@ -75,16 +78,49 @@ void BatchOptionUI::restore_defaults(){
 
 
 
-GroupOption::GroupOption(QString label)
+GroupOption::GroupOption(
+    QString label,
+    bool toggleable,
+    bool enabled
+)
     : m_label(std::move(label))
+    , m_toggleable(toggleable)
+    , m_enabled(enabled)
 {}
+inline ConfigOptionUI* GroupOption::make_ui(QWidget& parent){
+    return new GroupOptionUI(parent, *this);
+}
+bool GroupOption::enabled() const{
+    return m_enabled.load(std::memory_order_relaxed);
+}
+void GroupOption::load_json(const QJsonValue& json){
+    BatchOption::load_json(json);
+    if (m_toggleable){
+        bool enabled;
+        json_get_bool(enabled, json.toObject(), "Enabled");
+        m_enabled.store(enabled, std::memory_order_relaxed);
+        on_set_enabled(enabled);
+    }
+}
+QJsonValue GroupOption::to_json() const{
+    QJsonObject obj = BatchOption::to_json().toObject();
+    if (m_toggleable){
+        obj.insert("Enabled", m_enabled.load(std::memory_order_relaxed));
+    }
+    return obj;
+}
+
+
 GroupOptionUI::GroupOptionUI(QWidget& parent, GroupOption& value)
     : QWidget(&parent)
     , m_value(value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
+//    layout->setAlignment(Qt::AlignTop);
 //    layout->setMargin(0);
     QGroupBox* group_box = new QGroupBox(value.m_label, this);
+    group_box->setCheckable(value.m_toggleable);
+    group_box->setChecked(value.enabled());
     layout->addWidget(group_box);
 
 #if 0
@@ -103,17 +139,41 @@ GroupOptionUI::GroupOptionUI(QWidget& parent, GroupOption& value)
     m_options_layout->setAlignment(Qt::AlignTop);
     m_options_layout->setMargin(0);
 
+    m_placeholder = new QWidget(group_box);
+    m_placeholder->setLayout(new QVBoxLayout());
+    m_placeholder->layout()->addWidget(new QLabel("(double click to expand)", this));
+    m_placeholder->setVisible(false);
+    m_options_layout->addWidget(m_placeholder);
+
     for (auto& item : m_value.m_options){
         m_options.emplace_back(item.first->make_ui(parent));
         m_options_layout->addWidget(m_options.back()->widget());
     }
+
+    connect(
+        group_box, &QGroupBox::toggled,
+        this, [=](bool on){
+            m_value.m_enabled.store(on, std::memory_order_relaxed);
+            m_value.on_set_enabled(on);
+            on_set_enabled(on);
+        }
+    );
 }
-bool GroupOptionUI::settings_valid() const{
-    return m_value.is_valid();
+void GroupOptionUI::set_options_enabled(bool enabled){
+    for (ConfigOptionUI* item : m_options){
+        item->widget()->setEnabled(enabled);
+    }
 }
 void GroupOptionUI::restore_defaults(){
     for (ConfigOptionUI* item : m_options){
         item->restore_defaults();
+    }
+}
+void GroupOptionUI::mouseDoubleClickEvent(QMouseEvent* event){
+    m_placeholder->setVisible(m_expanded);
+    m_expanded = !m_expanded;
+    for (ConfigOptionUI* item : m_options){
+        item->widget()->setVisible(m_expanded);
     }
 }
 

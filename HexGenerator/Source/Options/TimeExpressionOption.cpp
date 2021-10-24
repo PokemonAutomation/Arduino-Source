@@ -15,6 +15,7 @@
 #include "TimeExpressionOption.h"
 
 namespace PokemonAutomation{
+namespace NintendoSwitch{
 
 
 const QString TimeExpression::OPTION_TYPE = "TimeExpression";
@@ -42,11 +43,10 @@ TimeExpression::TimeExpression(const QJsonObject& obj)
     )
 {
     load_current(json_get_string_throw(obj, JSON_CURRENT));
-    update();
 }
 
-bool TimeExpression::is_valid() const{
-    return TimeExpressionOptionBase<uint32_t>::is_valid();
+QString TimeExpression::check_validity() const{
+    return TimeExpressionOptionBase<uint32_t>::check_validity();
 }
 void TimeExpression::restore_defaults(){
     TimeExpressionOptionBase<uint32_t>::restore_defaults();
@@ -63,7 +63,7 @@ std::string TimeExpression::to_cpp() const{
     std::string str;
     str += m_declaration.toUtf8().data();
     str += " = ";
-    str += std::to_string(value());
+    str += std::to_string(get());
     str += ";\r\n";
     return str;
 }
@@ -77,4 +77,5 @@ TimeExpressionUI::TimeExpressionUI(QWidget& parent, TimeExpression& value)
 
 
 
+}
 }

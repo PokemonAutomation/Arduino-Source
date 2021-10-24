@@ -4,8 +4,7 @@
  *
  */
 
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "SwitchProgramTracker.h"
+#include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -30,7 +29,6 @@ QWidget* SingleSwitchProgramInstance::make_widget(QWidget& parent, PanelListener
 
 
 SingleSwitchProgramWidget::~SingleSwitchProgramWidget(){
-    SwitchProgramTracker::instance().remove_program(*this);
     on_destruct_stop();
 }
 SingleSwitchProgramWidget* SingleSwitchProgramWidget::make(
@@ -40,7 +38,6 @@ SingleSwitchProgramWidget* SingleSwitchProgramWidget::make(
 ){
     SingleSwitchProgramWidget* widget = new SingleSwitchProgramWidget(parent, instance, listener);
     widget->construct();
-    SwitchProgramTracker::instance().add_program(*widget);
     return widget;
 }
 void SingleSwitchProgramWidget::run_program(

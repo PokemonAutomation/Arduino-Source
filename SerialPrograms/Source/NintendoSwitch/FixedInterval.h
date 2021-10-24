@@ -9,7 +9,7 @@
 #ifndef PokemonAutomation_FixedIntervalWrappers_H
 #define PokemonAutomation_FixedIntervalWrappers_H
 
-#include "Common/SwitchFramework/Switch_PushButtons.h"
+#include "Commands/NintendoSwitch_PushButtons.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -2,11 +2,14 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *      This option is thread-safe.
+ *
  */
 
 #ifndef PokemonAutomation_FloatingPointOptionBase_H
 #define PokemonAutomation_FloatingPointOptionBase_H
 
+#include <atomic>
 #include <QJsonValue>
 #include <QLineEdit>
 
@@ -21,24 +24,31 @@ public:
         double max_value,
         double default_value
     );
+
+    const QString& label() const{ return m_label; }
+    double min_value() const{ return m_min_value; }
+    double max_value() const{ return m_max_value; }
+
+    operator double() const{ return m_current.load(std::memory_order_relaxed); }
+    double get() const{ return m_current.load(std::memory_order_relaxed); }
+    QString set(double x);
+
+    QString check_validity() const;
+    QString check_validity(double x) const;
+    void restore_defaults();
+
     void load_default(const QJsonValue& json);
     void load_current(const QJsonValue& json);
     QJsonValue write_default() const;
     QJsonValue write_current() const;
 
-    operator double() const{ return m_current; }
-    double value() const{ return m_current; }
-
-    bool is_valid() const;
-    void restore_defaults();
-
 protected:
-    friend class FloatingPointOptionBaseUI;
     const QString m_label;
     const double m_min_value;
     const double m_max_value;
     double m_default;
-    double m_current;
+
+    std::atomic<double> m_current;
 };
 
 

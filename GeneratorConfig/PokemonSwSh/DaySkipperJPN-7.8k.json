@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "DaySkipperJPN-7.8k",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-DaySkipperJPN-7.8k",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/DaySkipperJPN-7.8k.md",
     "2-Description": "A faster, but less reliable Japanese date skipper. (7800 skips/hour)",
     "3-Parameters": [
         {

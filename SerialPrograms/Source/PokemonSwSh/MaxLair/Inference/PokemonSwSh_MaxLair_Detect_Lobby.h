@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
+#include "CommonFramework/Inference/FrozenImageDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -35,22 +36,22 @@ private:
 #endif
 
 
-#if 0
-class NonLobbyDetector  : public VisualInferenceCallbackWithCommandStop{
+#if 1
+class NonLobbyDetector  : public VisualInferenceCallback{
 public:
-    NonLobbyDetector(VideoOverlay& overlay);
+    NonLobbyDetector();
 
     bool detect(const QImage& screen);
 
-    virtual bool on_frame(
+    virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
     ) override final;
 
 
 private:
-    InferenceBoxScope m_pink;
-    InferenceBoxScope m_white;
+    ImageFloatBox m_pink;
+    ImageFloatBox m_white;
 };
 #endif
 
@@ -69,13 +70,45 @@ public:
 
 private:
     ImageFloatBox m_box;
+    ImageFloatBox m_player0;
+};
+
+
+class LobbyJoinedDetector : public VisualInferenceCallback{
+public:
+    LobbyJoinedDetector(size_t consoles);
+
+    size_t joined(
+        const QImage& screen,
+        std::chrono::system_clock::time_point timestamp
+    );
+
+    virtual bool process_frame(
+        const QImage& frame,
+        std::chrono::system_clock::time_point timestamp
+    ) override final;
+
+private:
+    size_t m_consoles;
+    ImageFloatBox m_box0;
+    ImageFloatBox m_box1;
+    ImageFloatBox m_box2;
+    ImageFloatBox m_box3;
+
+    FrozenImageDetector m_player0;
+    FrozenImageDetector m_player1;
+    FrozenImageDetector m_player2;
+    FrozenImageDetector m_player3;
 };
 
 
 //  Detects when all joiners are readied up.
 class LobbyAllReadyDetector : public VisualInferenceCallback{
 public:
-    LobbyAllReadyDetector(size_t consoles);
+    LobbyAllReadyDetector(
+        size_t consoles,
+        std::chrono::system_clock::time_point time_limit
+    );
 
     bool detect(const QImage& screen);
 
@@ -87,6 +120,7 @@ public:
 
 private:
     size_t m_consoles;
+    std::chrono::system_clock::time_point m_time_limit;
     ImageFloatBox m_checkbox0;
     ImageFloatBox m_checkbox1;
     ImageFloatBox m_checkbox2;

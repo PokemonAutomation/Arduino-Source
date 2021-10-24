@@ -22,7 +22,7 @@ GlobalStateTracker::GlobalStateTracker(ProgramEnvironment& env, size_t consoles)
     }
     update_groups_unprotected();
 }
-std::string GlobalStateTracker::dump(){
+std::pair<uint64_t, std::string> GlobalStateTracker::dump(){
     std::lock_guard<std::mutex> lg(m_env.lock());
 //    SpinLockGuard lg(m_lock);
     std::string str;
@@ -36,10 +36,11 @@ std::string GlobalStateTracker::dump(){
         str += compute_inferred_unprotected(c).dump();
     }
 #endif
-    return str;
+    return {m_state_epoch, str};
 }
 void GlobalStateTracker::push_update(size_t index){
     std::lock_guard<std::mutex> lg(m_env.lock());
+    m_state_epoch++;
     m_master_consoles[index] = m_consoles[index];
     m_master_consoles[index].timestamp = std::chrono::system_clock::now();
     m_env.cv().notify_all();
@@ -86,6 +87,7 @@ void GlobalStateTracker::group_clear_status(uint8_t group){
 }
 void GlobalStateTracker::mark_as_dead(size_t index){
     std::lock_guard<std::mutex> lg(m_env.lock());
+    m_state_epoch++;
     m_groups[index] = 4;
 }
 
@@ -96,6 +98,7 @@ GlobalState GlobalStateTracker::synchronize(
 ){
 //    std::unique_lock<std::mutex> lg(m_env.lock());
     std::unique_lock<std::mutex> lg(m_env.lock());
+    m_state_epoch++;
 
     time_point timestamp = std::chrono::system_clock::now();
     logger.log("Synchronizing...", Qt::magenta);
@@ -120,6 +123,7 @@ GlobalState GlobalStateTracker::synchronize(
 
         time_point now = std::chrono::system_clock::now();
         if (now > time_limit){
+            m_state_epoch++;
             logger.log("GlobalStateTracker::synchronize() timed out.", Qt::red);
             group_clear_status(m_groups[index]);
             update_groups_unprotected();
@@ -131,6 +135,7 @@ GlobalState GlobalStateTracker::synchronize(
         }
     }
 
+    m_state_epoch++;
     m_pending_sync[index] = SyncState::DONE;
 
     if (!group_sync_completed(m_groups[index])){
@@ -295,7 +300,7 @@ std::set<std::string> merge_sets(const std::vector<const std::set<std::string>*>
     return ret;
 }
 
-void GlobalStateTracker::merge_timestamp(size_t group, GlobalState& state){
+void GlobalStateTracker::merge_timestamp(uint8_t group, GlobalState& state){
     for (size_t c = 0; c < m_count; c++){
         if (group != m_groups[c]){
             continue;
@@ -303,19 +308,37 @@ void GlobalStateTracker::merge_timestamp(size_t group, GlobalState& state){
         state.timestamp = std::max(state.timestamp, m_master_consoles[c].timestamp);
     }
 }
-void GlobalStateTracker::merge_boss(size_t group, GlobalState& state){
+void GlobalStateTracker::merge_boss(uint8_t group, GlobalState& state){
     state.boss = merge_majority_vote<std::string>(
         m_groups, m_count, group, "",
         [&](size_t index){ return m_master_consoles[index].boss; }
     );
 }
-void GlobalStateTracker::merge_wins(size_t group, GlobalState& state){
+void GlobalStateTracker::merge_path(uint8_t group, GlobalState& state){
+//    std::chrono::system_clock::time_point latest =  std::chrono::system_clock::time_point::min();
+    for (size_t c = 0; c < m_count; c++){
+        if (group != m_groups[c]){
+            continue;
+        }
+        if (m_master_consoles[c].path.path_type >= 0){
+            state.path = m_master_consoles[c].path;
+            return;
+        }
+    }
+}
+void GlobalStateTracker::merge_path_side(uint8_t group, GlobalState& state){
+    state.path_side = merge_majority_vote<int8_t>(
+        m_groups, m_count, group, -1,
+        [&](size_t index){ return m_master_consoles[index].path_side; }
+    );
+}
+void GlobalStateTracker::merge_wins(uint8_t group, GlobalState& state){
     state.wins = merge_majority_vote<uint8_t>(
         m_groups, m_count, group,
         [&](size_t index){ return m_master_consoles[index].wins; }
     );
 }
-void GlobalStateTracker::merge_opponent_species(size_t group, GlobalState& state){
+void GlobalStateTracker::merge_opponent_species(uint8_t group, GlobalState& state){
     state.opponent = merge_sets({
         0 < m_count && m_groups[0] == group ? &m_master_consoles[0].opponent : nullptr,
         1 < m_count && m_groups[1] == group ? &m_master_consoles[1].opponent : nullptr,
@@ -323,13 +346,13 @@ void GlobalStateTracker::merge_opponent_species(size_t group, GlobalState& state
         3 < m_count && m_groups[3] == group ? &m_master_consoles[3].opponent : nullptr,
     });
 }
-void GlobalStateTracker::merge_opponent_hp(size_t group, GlobalState& state){
+void GlobalStateTracker::merge_opponent_hp(uint8_t group, GlobalState& state){
     state.opponent_hp = merge_hp(
         m_groups, m_count, group,
         [&](size_t index){ return m_master_consoles[index].opponent_hp; }
     );
 }
-void GlobalStateTracker::merge_player_species(size_t group, PlayerState& player, size_t player_index){
+void GlobalStateTracker::merge_player_species(uint8_t group, PlayerState& player, size_t player_index){
     //  Check if it's self-reported.
     do{
         if (player.console_id < 0){
@@ -351,7 +374,7 @@ void GlobalStateTracker::merge_player_species(size_t group, PlayerState& player,
         [&](size_t index){ return m_master_consoles[index].players[player_index].pokemon; }
     );
 }
-void GlobalStateTracker::merge_player_console_id(size_t group, PlayerState& player, size_t player_index){
+void GlobalStateTracker::merge_player_console_id(uint8_t group, PlayerState& player, size_t player_index){
     for (size_t c = 0; c < m_count; c++){
         if (group != m_groups[c]){
             player.console_id = -1;
@@ -364,28 +387,28 @@ void GlobalStateTracker::merge_player_console_id(size_t group, PlayerState& play
         }
     }
 }
-void GlobalStateTracker::merge_player_item(size_t group, PlayerState& player, size_t player_index){
+void GlobalStateTracker::merge_player_item(uint8_t group, PlayerState& player, size_t player_index){
     player.item = merge_majority_vote<std::string>(
         m_groups, m_count, group, "",
         [&](size_t index){ return m_master_consoles[index].players[player_index].item; }
     );
 }
 #if 0
-void GlobalStateTracker::merge_player_dead(size_t group, PlayerState& player, size_t player_index, time_point now){
+void GlobalStateTracker::merge_player_dead(uint8_t group, PlayerState& player, size_t player_index, time_point now){
     player.is_dead = merge_majority_vote<int8_t>(
         m_groups, m_count, group, -1,
         m_master_consoles, now - std::chrono::seconds(12),
         [&](size_t index){ return m_master_consoles[index].players[player_index].is_dead; }
     );
 }
-void GlobalStateTracker::merge_player_hp(size_t group, PlayerState& player, size_t player_index){
+void GlobalStateTracker::merge_player_hp(uint8_t group, PlayerState& player, size_t player_index){
     player.hp = merge_hp(
         m_groups, m_count, group,
         [&](size_t index){ return m_master_consoles[index].players[player_index].hp; }
     );
 }
 #endif
-void GlobalStateTracker::merge_player_health(size_t group, PlayerState& player, size_t player_index){
+void GlobalStateTracker::merge_player_health(uint8_t group, PlayerState& player, size_t player_index){
     TimestampedValue<Health> latest(Health(), std::chrono::system_clock::time_point::min());
     for (size_t c = 0; c < m_count; c++){
         if (group != m_groups[c]){
@@ -398,13 +421,13 @@ void GlobalStateTracker::merge_player_health(size_t group, PlayerState& player, 
     }
     player.health = latest;
 }
-void GlobalStateTracker::merge_player_dmax_turns_left(size_t group, PlayerState& player, size_t player_index){
+void GlobalStateTracker::merge_player_dmax_turns_left(uint8_t group, PlayerState& player, size_t player_index){
     player.dmax_turns_left = merge_majority_vote<int8_t>(
         m_groups, m_count, group, -1,
         [&](size_t index){ return m_master_consoles[index].players[player_index].dmax_turns_left; }
     );
 }
-void GlobalStateTracker::merge_player_can_dmax(size_t group, PlayerState& player, size_t player_index){
+void GlobalStateTracker::merge_player_can_dmax(uint8_t group, PlayerState& player, size_t player_index){
     //  Ability to dmax is self-reporting.
     for (size_t c = 0; c < m_count; c++){
         if (group != m_groups[c]){
@@ -413,13 +436,13 @@ void GlobalStateTracker::merge_player_can_dmax(size_t group, PlayerState& player
         player.can_dmax |= m_master_consoles[c].players[player_index].can_dmax;
     }
 }
-void GlobalStateTracker::merge_player_pp(size_t group, PlayerState& player, size_t player_index, size_t move_index){
+void GlobalStateTracker::merge_player_pp(uint8_t group, PlayerState& player, size_t player_index, size_t move_index){
     player.pp[move_index] = merge_majority_vote<int8_t>(
         m_groups, m_count, group, -1,
         [&](size_t index){ return m_master_consoles[index].players[player_index].pp[move_index]; }
     );
 }
-void GlobalStateTracker::merge_player_move_blocked(size_t group, PlayerState& player, size_t player_index, size_t move_index){
+void GlobalStateTracker::merge_player_move_blocked(uint8_t group, PlayerState& player, size_t player_index, size_t move_index){
     player.move_blocked[move_index] = merge_majority_vote<bool>(
         m_groups, m_count, group, false,
         [&](size_t index){ return m_master_consoles[index].players[player_index].move_blocked[move_index]; }
@@ -433,6 +456,9 @@ GlobalState GlobalStateTracker::infer_actual_state_unprotected(size_t index){
     GlobalState state;
     merge_timestamp(group, state);
     merge_boss(group, state);
+    merge_path(group, state);
+    merge_path_side(group, state);
+
     merge_wins(group, state);
     merge_opponent_species(group, state);
     merge_opponent_hp(group, state);

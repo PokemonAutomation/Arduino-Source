@@ -5,11 +5,11 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/FixedInterval.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh/Programs/Hosting/PokemonSwSh_DenTools.h"
 #include "PokemonSwSh_RaidItemFarmerOKHO.h"
 
@@ -22,7 +22,7 @@ RaidItemFarmerOHKO_Descriptor::RaidItemFarmerOHKO_Descriptor()
     : MultiSwitchProgramDescriptor(
         "PokemonSwSh:RaidItemFarmerOHKO",
         "Raid Item Farmer (OHKO)",
-        "SwSh-Arduino/wiki/Advanced:-RaidItemFarmerOHKO",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/RaidItemFarmerOHKO.md",
         "Farm items from raids that can be OHKO'ed. (requires multiple Switches)",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB,
@@ -70,7 +70,7 @@ RaidItemFarmerOHKO::RaidItemFarmerOHKO(const RaidItemFarmerOHKO_Descriptor& desc
     )
 {
     PA_ADD_OPTION(BACKUP_SAVE);
-//    PA_ADD_OPTION(m_advanced_options);
+//    PA_ADD_DIVIDER(m_advanced_options);
     PA_ADD_OPTION(WAIT_FOR_STAMP_DELAY);
     PA_ADD_OPTION(ENTER_STAMP_MASH_DURATION);
     PA_ADD_OPTION(RAID_START_MASH_DURATION);
@@ -92,15 +92,15 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env){
 
     uint32_t last_touch = 0;
     if (TOUCH_DATE_INTERVAL > 0){
-        touch_date_from_home(host, SETTINGS_TO_HOME_DELAY);
+        touch_date_from_home(host, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
         last_touch = system_clock(host);
     }
     env.run_in_parallel(
         [](ConsoleHandle& console){
             if (console.index() == 0){
-                resume_game_front_of_den_nowatts(console, TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+                resume_game_front_of_den_nowatts(console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
             }else{
-                resume_game_no_interact(console, TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+                resume_game_no_interact(console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
             }
         }
     );
@@ -115,7 +115,7 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env){
                 if (console.index() == 0){
                     enter_den(console, 0, false, false);
                 }else{
-                    pbf_press_button(console, BUTTON_Y, 10, OPEN_YCOMM_DELAY);
+                    pbf_press_button(console, BUTTON_Y, 10, GameSettings::instance().OPEN_YCOMM_DELAY);
                     pbf_press_dpad(console, DPAD_UP, 5, 0);
                     pbf_move_right_joystick(console, 128, 0, 5, 0);
                     pbf_press_button(console, BUTTON_X, 10, 10);
@@ -149,18 +149,18 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env){
 
                 if (console.index() == 0){
                     //  Add a little extra wait time since correctness matters here.
-                    ssf_press_button2(host, BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
+                    ssf_press_button2(host, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
 
                     close_game(console);
 
                     //  Touch the date.
                     if (TOUCH_DATE_INTERVAL > 0 && system_clock(console) - last_touch >= TOUCH_DATE_INTERVAL){
-                        touch_date_from_home(console, SETTINGS_TO_HOME_DELAY);
+                        touch_date_from_home(console, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
                         last_touch += TOUCH_DATE_INTERVAL;
                     }
                     start_game_from_home(
                         console,
-                        TOLERATE_SYSTEM_UPDATE_MENU_SLOW,
+                        ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW,
                         0, 0,
                         BACKUP_SAVE
                     );

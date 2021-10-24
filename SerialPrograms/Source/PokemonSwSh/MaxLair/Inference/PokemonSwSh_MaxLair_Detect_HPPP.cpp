@@ -101,7 +101,7 @@ double read_hp_bar_internal(const QImage& image){
 }
 double read_hp_bar(const QImage& image){
     //  Try reading just the upper half first.
-    double hp = read_hp_bar_internal(extract_box(image, ImageFloatBox(0.0, 0.0, 0.5, 1.0)));
+    double hp = read_hp_bar_internal(extract_box(image, ImageFloatBox(0.5, 0.0, 0.5, 1.0)));
     if (hp > 0){
         return (1.0 + hp) * 0.5;
     }

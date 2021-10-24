@@ -8,7 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_VirtualControllerMapping_H
 
 #include <QJsonArray>
-#include "Common/SwitchFramework/SwitchControllerDefs.h"
+#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

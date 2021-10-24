@@ -4,11 +4,10 @@
  *
  */
 
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShAutoHosts.h"
 #include "NintendoSwitch/FixedInterval.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h"
 #include "PokemonSwSh_FriendSearchDisconnect.h"
 
 namespace PokemonAutomation{
@@ -20,7 +19,7 @@ FriendSearchDisconnect_Descriptor::FriendSearchDisconnect_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:FriendSearchDisconnect",
         "Friend Search Disconnect",
-        "SwSh-Arduino/wiki/Advanced:-FriendSearchDisconnect",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/FriendSearchDisconnect.md",
         "Disconnect from the internet using the friend search method.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB
@@ -40,7 +39,7 @@ FriendSearchDisconnect::FriendSearchDisconnect(const FriendSearchDisconnect_Desc
 }
 
 void FriendSearchDisconnect::program(SingleSwitchProgramEnvironment& env) {
-    ssf_press_button2(env.console, BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
+    ssf_press_button2(env.console, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
 
     home_to_add_friends(env.console, USER_SLOT - 1, 1, true);
 

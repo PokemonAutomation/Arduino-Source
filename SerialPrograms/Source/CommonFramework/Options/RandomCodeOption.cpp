@@ -21,8 +21,27 @@ RaidCodeOption::RaidCodeOption()
     , m_random_digits(0)
     , m_code("1280 0000")
 {}
+RaidCodeOption::RaidCodeOption(size_t random_digits, QString code_string)
+    : m_digits(8)
+    , m_random_digits(random_digits)
+    , m_code(std::move(code_string))
+{}
+QString RaidCodeOption::check_validity() const{
+    if (m_random_digits == 0){
+        return validate_code(m_digits, m_code)
+            ? QString()
+            : "Code is invalid.";
+    }else{
+        return m_random_digits <= m_digits
+            ? QString()
+            : "Random digits cannot be greater than " + QString::number(m_digits) + ".";
+    }
+}
+bool RaidCodeOption::code_enabled() const{
+    return m_random_digits != 0 || m_code.size() > 0;
+}
 bool RaidCodeOption::get_code(uint8_t* code) const{
-    if (m_random_digits == 0 && m_code.size() <= 0){
+    if (!code_enabled()){
         return false;
     }
     if (m_random_digits == 0){
@@ -45,19 +64,17 @@ bool RaidCodeOption::get_code(uint8_t* code) const{
     }
     return true;
 }
-bool RaidCodeOption::is_valid() const{
-    if (m_random_digits == 0){
-        return validate_code(m_digits, m_code);
-    }else{
-        return m_random_digits <= m_digits;
-    }
-}
 
 
 RandomCodeOption::RandomCodeOption()
     : m_label(
         "<b>Raid Code:</b><br>Blank for no raid code. Set random digits to zero for a fixed code. Otherwise, it is the # of leading random digits."
     )
+{}
+RandomCodeOption::RandomCodeOption(QString label, size_t random_digits, QString code_string)
+    : m_label(std::move(label))
+    , m_default(random_digits, std::move(code_string))
+    , m_current(m_default)
 {}
 void RandomCodeOption::load_json(const QJsonValue& json){
     QJsonObject root = json.toObject();
@@ -71,12 +88,16 @@ QJsonValue RandomCodeOption::to_json() const{
     return root;
 }
 
+bool RandomCodeOption::code_enabled() const{
+    return m_current.code_enabled();
+}
+
 bool RandomCodeOption::get_code(uint8_t* code) const{
     return m_current.get_code(code);
 }
 
-bool RandomCodeOption::is_valid() const{
-    return m_current.is_valid();
+QString RandomCodeOption::check_validity() const{
+    return m_current.check_validity();
 }
 void RandomCodeOption::restore_defaults(){
     m_current = m_default;

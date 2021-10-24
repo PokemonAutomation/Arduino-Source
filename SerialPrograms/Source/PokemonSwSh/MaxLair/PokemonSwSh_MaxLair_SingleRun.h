@@ -8,9 +8,9 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_SingleRun_H
 
 #include "CommonFramework/Options/EnumDropdownOption.h"
-#include "CommonFramework/Options/ScreenshotFormatOption.h"
-#include "CommonFramework/Options/FixedCodeOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/OCR/LanguageOptionOCR.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/MultiSwitchProgram.h"
 #include "Framework/PokemonSwSh_MaxLair_Options.h"
 
@@ -30,28 +30,29 @@ class MaxLairSingleRun : public MultiSwitchProgramInstance{
 public:
     MaxLairSingleRun(const MaxLairSingleRun_Descriptor& descriptor);
 
-    virtual bool is_valid() const override;
+    virtual QString check_validity() const override;
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(MultiSwitchProgramEnvironment& env) override;
 
 
 private:
+    StartInGripOrGameOption START_IN_GRIP_MENU;
 
-
-private:
     EnumDropdownOption HOST_SWITCH;
     EnumDropdownOption BOSS_SLOT;
-    FixedCodeOption RAID_CODE;
-
-    ScreenshotOption SCREENSHOT;
 
     LanguageSet m_languages;
+    MaxLairInternal::MaxLairConsoleOptions PLAYER0;
+    MaxLairInternal::MaxLairConsoleOptions PLAYER1;
+    MaxLairInternal::MaxLairConsoleOptions PLAYER2;
+    MaxLairInternal::MaxLairConsoleOptions PLAYER3;
 
-    MaxLairPlayerOptions PLAYER0;
-    MaxLairPlayerOptions PLAYER1;
-    MaxLairPlayerOptions PLAYER2;
-    MaxLairPlayerOptions PLAYER3;
+    MaxLairInternal::HostingSettings HOSTING;
+
+    EventNotificationOption NOTIFICATION_NO_SHINY;
+    EventNotificationOption NOTIFICATION_SHINY;
+    EventNotificationsOption NOTIFICATIONS;
 };
 
 

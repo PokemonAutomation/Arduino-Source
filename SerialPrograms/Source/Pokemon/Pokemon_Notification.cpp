@@ -7,9 +7,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/PersistentSettings.h"
-#include "CommonFramework/Tools/DiscordWebHook.h"
-#include "CommonFramework/Tools/ProgramNotifications.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "Pokemon/Resources/Pokemon_PokeballNames.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "Pokemon_Notification.h"
@@ -20,20 +18,25 @@ namespace Pokemon{
 
 void send_encounter_notification(
     Logger& logger,
+    EventNotificationOption& settings_nonshiny,
+    EventNotificationOption& settings_shiny,
     const QString& program,
     const std::set<std::string>* slugs,
-    const ShinyDetectionResult& result, ScreenshotMode screenshot,
+    const ShinyDetectionResult& result,
     const StatsTracker* session_stats,
     const EncounterFrequencies* frequencies,
     const StatsTracker* alltime_stats
 ){
+    bool is_shiny = false;
     QColor color;
     switch (result.shiny_type){
     case ShinyType::UNKNOWN_SHINY:
     case ShinyType::STAR_SHINY:
+        is_shiny = true;
         color = 0xffff99;
         break;
     case ShinyType::SQUARE_SHINY:
+        is_shiny = true;
         color = 0xb266ff;
         break;
     default:;
@@ -102,90 +105,34 @@ void send_encounter_notification(
         embeds.emplace_back("All Time Stats", QString::fromStdString(alltime_stats->to_str()));
     }
 
-    bool is_shiny = result.shiny_type != ShinyType::NOT_SHINY;
-    send_program_notification(
-        logger,
-        is_shiny, color,
-        program,
-        "Encounter Notification",
-        embeds
-    );
     if (is_shiny){
-        DiscordWebHook::send_screenshot(logger, result.best_screenshot, screenshot, true);
+        send_program_notification(
+            logger, settings_shiny,
+            color, program,
+            "Encounter Notification",
+            embeds,
+            result.best_screenshot, true
+        );
+    }else{
+        send_program_notification(
+            logger, settings_nonshiny,
+            color, program,
+            "Encounter Notification",
+            embeds
+        );
     }
-}
-
-EncounterNotificationSender::EncounterNotificationSender(
-    EncounterBotNotificationLevel notification_level,
-    std::chrono::seconds period
-)
-    : m_notification_level(notification_level)
-    , m_notification_period(period)
-    , m_last_notification(std::chrono::system_clock::now() - period)
-{}
-void EncounterNotificationSender::send_notification(
-    Logger& logger,
-    const QString& program,
-    const std::set<std::string>* slugs,
-    const ShinyDetectionResult& result, ScreenshotMode screenshot,
-    const StatsTracker* session_stats,
-    const EncounterFrequencies* frequencies,
-    const StatsTracker* alltime_stats
-){
-    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
-
-    if (m_notification_level == EncounterBotNotificationLevel::NO_NOTIFICATIONS){
-//        cout << "no notifications" << endl;
-        return;
-    }
-
-    do{
-        if (m_notification_level == EncounterBotNotificationLevel::EVERYTHING){
-//            cout << "everything" << endl;
-            break;
-        }
-
-        //  Always notify on shiny.
-        if (result.shiny_type != ShinyType::NOT_SHINY){
-//            cout << "shiny" << endl;
-            break;
-        }
-
-        if (m_notification_level == EncounterBotNotificationLevel::SHINY_ONLY){
-//            cout << "notify on shiny only" << endl;
-            return;
-        }
-
-        //  Not enough time elapsed.
-        if (now < m_last_notification + m_notification_period){
-//            cout << "not enough time" << endl;
-            return;
-        }
-
-    }while (false);
-
-    m_last_notification = now;
-
-    send_encounter_notification(
-        logger,
-        program,
-        slugs,
-        result, screenshot,
-        session_stats,
-        frequencies,
-        alltime_stats
-    );
-
 }
 
 
 
 void send_catch_notification(
     Logger& logger,
+    EventNotificationOption& settings_catch_success,
+    EventNotificationOption& settings_catch_failed,
     const QString& program,
     const std::set<std::string>* pokemon_slugs,
     const std::string& ball_slug, int balls_used,
-    bool success, bool ping
+    bool success
 ){
     QColor color = success ? 0x00ff00 : 0xffa500;
 
@@ -226,15 +173,24 @@ void send_catch_notification(
         }
     }
 
-    send_program_notification(
-        logger,
-        ping, color,
-        program,
-        success ? STRING_POKEMON + " Caught" : "Catch Failed",
-        embeds
-    );
+    if (success){
+        send_program_notification(
+            logger, settings_catch_success,
+            color,
+            program,
+            STRING_POKEMON + " Caught",
+            embeds
+        );
+    }else{
+        send_program_notification(
+            logger, settings_catch_failed,
+            color,
+            program,
+            "Catch Failed",
+            embeds
+        );
+    }
 }
-
 
 
 

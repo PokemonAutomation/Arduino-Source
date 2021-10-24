@@ -42,7 +42,7 @@ public:
 
     void mark_as_dead(size_t index);
 
-    std::string dump();
+    std::pair<uint64_t, std::string> dump();
 
 
 private:
@@ -55,26 +55,32 @@ private:
 
 
 private:
-    void merge_timestamp(size_t group, GlobalState& state);
-    void merge_boss(size_t group, GlobalState& state);
-    void merge_wins(size_t group, GlobalState& state);
-    void merge_opponent_species(size_t group, GlobalState& state);
-    void merge_opponent_hp(size_t group, GlobalState& state);
+    void merge_timestamp                (uint8_t group, GlobalState& state);
+    void merge_boss                     (uint8_t group, GlobalState& state);
+    void merge_path                     (uint8_t group, GlobalState& state);
+    void merge_path_side                (uint8_t group, GlobalState& state);
 
-    void merge_player_console_id(size_t group, PlayerState& player, size_t player_index);
-    void merge_player_species(size_t group, PlayerState& player, size_t player_index);
-    void merge_player_item(size_t group, PlayerState& player, size_t player_index);
-//    void merge_player_dead(size_t group, PlayerState& player, size_t player_index, time_point now);
-//    void merge_player_hp(size_t group, PlayerState& player, size_t player_index);
-    void merge_player_health(size_t group, PlayerState& player, size_t player_index);
-    void merge_player_dmax_turns_left(size_t group, PlayerState& player, size_t player_index);
-    void merge_player_can_dmax(size_t group, PlayerState& player, size_t player_index);
-    void merge_player_pp(size_t group, PlayerState& player, size_t player_index, size_t move_index);
-    void merge_player_move_blocked(size_t group, PlayerState& player, size_t player_index, size_t move_index);
+    void merge_wins                     (uint8_t group, GlobalState& state);
+    void merge_opponent_species         (uint8_t group, GlobalState& state);
+    void merge_opponent_hp              (uint8_t group, GlobalState& state);
+
+    void merge_player_console_id        (uint8_t group, PlayerState& player, size_t player_index);
+    void merge_player_species           (uint8_t group, PlayerState& player, size_t player_index);
+    void merge_player_item              (uint8_t group, PlayerState& player, size_t player_index);
+//    void merge_player_dead              (uint8_t group, PlayerState& player, size_t player_index, time_point now);
+//    void merge_player_hp                (uint8_t group, PlayerState& player, size_t player_index);
+    void merge_player_health            (uint8_t group, PlayerState& player, size_t player_index);
+    void merge_player_dmax_turns_left   (uint8_t group, PlayerState& player, size_t player_index);
+    void merge_player_can_dmax          (uint8_t group, PlayerState& player, size_t player_index);
+    void merge_player_pp                (uint8_t group, PlayerState& player, size_t player_index, size_t move_index);
+    void merge_player_move_blocked      (uint8_t group, PlayerState& player, size_t player_index, size_t move_index);
 
 
 private:
     ProgramEnvironment& m_env;
+
+    uint64_t m_state_epoch = 0;
+
     size_t m_count;
     GlobalState m_consoles[4];
 

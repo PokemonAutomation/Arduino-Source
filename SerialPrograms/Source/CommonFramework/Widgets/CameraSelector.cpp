@@ -23,12 +23,11 @@ const QString CameraSelector::JSON_CAMERA       = "Device";
 const QString CameraSelector::JSON_RESOLUTION   = "Resolution";
 
 
-CameraSelector::CameraSelector(QString label)
-    : m_label(std::move(label))
-    , m_resolution(1280, 720)
+CameraSelector::CameraSelector()
+    : m_resolution(1920, 1080)
 {}
-CameraSelector::CameraSelector(QString label, const QJsonValue& json)
-    : CameraSelector(std::move(label))
+CameraSelector::CameraSelector(const QJsonValue& json)
+    : CameraSelector()
 {
     load_json(json);
 }

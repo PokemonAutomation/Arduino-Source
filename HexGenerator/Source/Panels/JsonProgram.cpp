@@ -29,13 +29,14 @@ Program_JsonFile::Program_JsonFile(QString category, const QJsonObject& obj)
     }
 }
 
-bool Program_JsonFile::is_valid() const{
+QString Program_JsonFile::check_validity() const{
     for (const auto& item : m_options){
-        if (!item->is_valid()){
-            return false;
+        QString error = item->check_validity();
+        if (!error.isEmpty()){
+            return error;
         }
     }
-    return true;
+    return QString();
 }
 void Program_JsonFile::restore_defaults(){
     for (const auto& item : m_options){

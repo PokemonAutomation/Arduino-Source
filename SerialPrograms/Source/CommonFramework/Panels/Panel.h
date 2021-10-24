@@ -20,7 +20,7 @@ class PanelInstance;
 
 struct PanelListener{
     virtual void on_panel_construct(std::unique_ptr<PanelInstance> panel) = 0;
-    virtual Logger& logger() = 0;
+    virtual Logger& raw_logger() = 0;
     virtual void on_busy(PanelInstance& panel) = 0;
     virtual void on_idle(PanelInstance& panel) = 0;
 };
@@ -72,6 +72,7 @@ public:
 
     const PanelDescriptor& descriptor() const{ return m_descriptor; }
 
+    void save_settings() const;
     virtual QWidget* make_widget(QWidget& parent, PanelListener& listener);
 
 public:

@@ -7,9 +7,10 @@
 #include <QDirIterator>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/ParallelTaskRunner.h"
-#include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/OCR/RawOCR.h"
 #include "CommonFramework/OCR/Filtering.h"
+#include "CommonFramework/OCR/StringNormalization.h"
 #include "SmallDictionaryMatcher.h"
 #include "LargeDictionaryMatcher.h"
 #include "TrainingTools.h"
@@ -51,7 +52,7 @@ TrainingSession::TrainingSession(
     ProgramEnvironment& env,
     const QString& training_data_directory
 )
-    : m_directory(PERSISTENT_SETTINGS().training_data + training_data_directory)
+    : m_directory(TRAINING_PATH() + training_data_directory)
     , m_total_samples(0)
 {
     if (!m_directory.isEmpty() && m_directory.back() != '/' && m_directory.back() != '\\'){
@@ -68,14 +69,14 @@ TrainingSession::TrainingSession(
             Language language = (Language)c;
             const std::string& code = language_data(language).code;
             QString folder = sample_directory + QString::fromStdString(code) + "/";
-            QDirIterator iter(m_directory + folder, QStringList() << "*.png", QDir::Files);
-            while (iter.hasNext()){
-                iter.next();
+            QDirIterator iter1(m_directory + folder, QStringList() << "*.png", QDir::Files);
+            while (iter1.hasNext()){
+                iter1.next();
 //                QString file = iter.next();
                 m_samples[language].emplace_back(
                     TrainingSample{
-                        OCR::extract_name(iter.fileName()),
-                        folder + iter.fileName()
+                        OCR::extract_name(iter1.fileName()),
+                        folder + iter1.fileName()
                     }
                 );
                 m_total_samples++;
@@ -122,29 +123,31 @@ void TrainingSession::generate_small_dictionary(
                 }
                 OCR::make_OCR_filter(image).apply(image);
                 QString text = OCR::ocr_read(language.first, image);
+                QString normalized = OCR::normalize(text);
 
-                OCR::MatchResult result = baseline.match_substring(
-                    language.first,
-                    sample.token,
-                    text
-                );
-                if (result.matched){
-                    matched++;
-//                    result.log(&env.logger(), sample.filepath);
-                }else{
+                OCR::StringMatchResult result;
+                baseline.match_substring(result, language.first, text, LOG10P_SPREAD);
+
+                OCR::StringMatchResult result0 = result;
+                result.clear_beyond_log10p(MAX_LOG10P);
+
+                if (result.results.empty()){
                     failed++;
-                    result.log(env.logger(), sample.filepath);
-                    trained.add_candidate(language.first, sample.token, result.normalized_text);
+                    result0.log(env.logger(), MAX_LOG10P, sample.filepath);
+                    trained.add_candidate(language.first, sample.token, normalized);
+                    return;
                 }
 
-//                cout << "matched = " << matched << ", failed = " << failed << endl;
+                for (const auto& item : result.results){
+                    if (item.second.token == sample.token){
+                        matched++;
+                        return;
+                    }
+                }
             });
-
             env.check_stopping();
         }
-
         task_runner.wait_for_everything();
-
         env.check_stopping();
     }
 
@@ -185,30 +188,34 @@ void TrainingSession::generate_large_dictionary(
                 }
                 OCR::make_OCR_filter(image).apply(image);
                 QString text = OCR::ocr_read(language.first, image);
+                QString normalized = OCR::normalize(text);
 
-                OCR::MatchResult result = baseline.match_substring(
-                    language.first,
-                    sample.token,
-                    text
-                );
-                if (result.matched){
-                    matched++;
-                }else{
+                OCR::StringMatchResult result;
+                baseline.match_substring(result, language.first, text, LOG10P_SPREAD);
+
+                OCR::StringMatchResult result0 = result;
+                result.clear_beyond_log10p(MAX_LOG10P);
+
+                if (result.results.empty()){
                     failed++;
-                    result.log(env.logger(), sample.filepath);
-                    trained.add_candidate(language.first, sample.token, result.normalized_text);
+                    result0.log(env.logger(), MAX_LOG10P, sample.filepath);
+                    trained.add_candidate(language.first, sample.token, normalized);
+                    return;
                 }
 
+                for (const auto& item : result.results){
+                    if (item.second.token == sample.token){
+                        matched++;
+                        return;
+                    }
+                }
             });
-
             env.check_stopping();
         }
-
         task_runner.wait_for_everything();
 
         QString json = output_prefix + QString::fromStdString(language_info.code) + ".json";
         trained.save(language.first, json);
-
         env.check_stopping();
     }
 

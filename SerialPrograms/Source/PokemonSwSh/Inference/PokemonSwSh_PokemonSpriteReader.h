@@ -10,28 +10,28 @@
 #include <QImage>
 #include "CommonFramework/Tools/Logger.h"
 #include "CommonFramework/ImageMatch/ImageMatchResult.h"
-#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
-#include "CommonFramework/ImageMatch/CroppedImageMatcher.h"
+#include "CommonFramework/ImageMatch/ExactImageDictionaryMatcher.h"
+#include "CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class PokemonSpriteMatcherExact : public ImageMatch::ExactImageMatcher{
+class PokemonSpriteMatcherExact : public ImageMatch::ExactImageDictionaryMatcher{
 public:
     PokemonSpriteMatcherExact(const std::set<std::string>* subset);
 };
 
 //  Used by Max Lair when there's an item blocking the right side.
-class PokemonLeftSpriteMatcherExact : public ImageMatch::ExactImageMatcher{
+class PokemonLeftSpriteMatcherExact : public ImageMatch::ExactImageDictionaryMatcher{
 public:
     PokemonLeftSpriteMatcherExact(const std::set<std::string>* subset);
 };
 
 
 
-class PokemonSpriteMatcherCropped : public ImageMatch::CroppedImageMatcher{
+class PokemonSpriteMatcherCropped : public ImageMatch::CroppedImageDictionaryMatcher{
 public:
     PokemonSpriteMatcherCropped(const std::set<std::string>* subset, double min_euclidean_distance = 100);
 

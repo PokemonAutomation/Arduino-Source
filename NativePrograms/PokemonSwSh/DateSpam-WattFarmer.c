@@ -9,6 +9,10 @@
 #include "Programs/DateSpam-WattFarmer.h"
 
 
+//  Wait this long after leaving the grip menu to allow for the Switch to
+//  reestablish local connection.
+const uint16_t GRIP_MENU_WAIT   =   5 * TICKS_PER_SECOND;
+
 
 //  Grab watts this many times. You can set this number if you're also date
 //  skipping to a particular den frame and you don't want to overshoot it.

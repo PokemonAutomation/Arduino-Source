@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "DateSpam-DailyHighlightFarmer",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-DateSpam-DailyHighlightFarmer",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-DailyHighlightFarmer.md",
     "2-Description": "Farm the daily highlight watt trader in Crown Tundra.",
     "3-Parameters": [
         {

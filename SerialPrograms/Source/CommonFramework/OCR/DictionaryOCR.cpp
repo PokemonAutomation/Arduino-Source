@@ -39,7 +39,7 @@ DictionaryOCR::DictionaryOCR(
             QString normalized = normalize(candidate);
             std::set<std::string>& set = m_candidate_to_token[normalized];
             if (!set.empty()){
-                global_logger().log("[DictionaryOCR] Duplicate Candidate: " + it.key().toStdString());
+                global_logger_tagged().log("DictionaryOCR - Duplicate Candidate: " + it.key().toStdString());
 //                cout << "Duplicate Candidate: " << it.key().toUtf8().data() << endl;
             }
             set.insert(token);
@@ -49,8 +49,8 @@ DictionaryOCR::DictionaryOCR(
             }
         }
     }
-    global_logger().log(
-        "[DictionaryOCR] Tokens: " + std::to_string(m_database.size()) +
+    global_logger_tagged().log(
+        "DictionaryOCR - Tokens: " + std::to_string(m_database.size()) +
         ", Match Candidates: " + std::to_string(m_candidate_to_token.size())
     );
 //    cout << "Tokens: " << m_database.size() << ", Match Candidates: " << m_candidate_to_token.size() << endl;
@@ -81,31 +81,16 @@ void DictionaryOCR::save_json(const QString& json_path) const{
 
 
 
-MatchResult DictionaryOCR::match_substring(
+void DictionaryOCR::match_substring(
+    StringMatchResult& results,
     const QString& text,
-    double min_alpha
+    double log10p_spread
 ) const{
-    return OCR::match_substring(
-        m_candidate_to_token,
-        text,
-        m_random_match_chance,
-        min_alpha
+    OCR::match_substring(
+        results,
+        m_candidate_to_token, m_random_match_chance,
+        text, log10p_spread
     );
-}
-MatchResult DictionaryOCR::match_substring(
-    const std::string& expected,
-    const QString& text,
-    double min_alpha
-) const{
-    MatchResult result = OCR::match_substring(
-        m_candidate_to_token,
-        text,
-        m_random_match_chance,
-        min_alpha
-    );
-    result.expected_token = expected;
-    result.matched = result.matched && result.slugs.find(expected) != result.slugs.end();
-    return result;
 }
 void DictionaryOCR::add_candidate(std::string token, const QString& candidate){
     if (candidate.isEmpty() || (candidate.size() == 1 && candidate[0] < 128)){

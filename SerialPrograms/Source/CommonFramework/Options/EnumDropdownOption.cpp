@@ -47,7 +47,7 @@ void EnumDropdownOption::load_json(const QJsonValue& json){
     QString str = json.toString();
     auto iter = m_case_map.find(str);
     if (iter != m_case_map.end()){
-        m_current = iter->second;
+        m_current.store(iter->second, std::memory_order_relaxed);
     }
 }
 QJsonValue EnumDropdownOption::to_json() const{
@@ -55,7 +55,7 @@ QJsonValue EnumDropdownOption::to_json() const{
 }
 
 void EnumDropdownOption::restore_defaults(){
-    m_current = m_default;
+    m_current.store(m_default, std::memory_order_relaxed);
 }
 
 ConfigOptionUI* EnumDropdownOption::make_ui(QWidget& parent){
@@ -69,16 +69,16 @@ EnumDropdownOptionUI::EnumDropdownOptionUI(QWidget& parent, EnumDropdownOption& 
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
-    QLabel* text = new QLabel(m_value.m_label, this);
+    QLabel* text = new QLabel(m_value.label(), this);
     layout->addWidget(text, 1);
     text->setWordWrap(true);
     m_box = new NoWheelComboBox(&parent);
     layout->addWidget(m_box);
 
-    for (const QString& item : m_value.m_case_list){
+    for (const QString& item : m_value.case_list()){
         m_box->addItem(item);
     }
-    m_box->setCurrentIndex((int)m_value.m_current);
+    m_box->setCurrentIndex((int)m_value);
     layout->addWidget(m_box, 1);
 
     connect(
@@ -88,7 +88,7 @@ EnumDropdownOptionUI::EnumDropdownOptionUI(QWidget& parent, EnumDropdownOption& 
                 m_value.restore_defaults();
                 return;
             }
-            m_value.m_current = index;
+            m_value.set(index);
         }
     );
 }

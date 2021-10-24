@@ -7,12 +7,17 @@
 #ifndef PokemonAutomation_PokemonSwSh_EggCombinedShared_H
 #define PokemonAutomation_PokemonSwSh_EggCombinedShared_H
 
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShEggRoutines.h"
-#include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
 #include "PokemonSwSh_EggHelpers.h"
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -69,22 +74,26 @@ struct EggCombinedSession{
         menu_to_box(context, false);
         party_to_column(context, column);
         pickup_column(context, false);
-        ssf_press_button2(context, BUTTON_R, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
+        ssf_press_button2(context, BUTTON_R, GameSettings::instance().BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
         column_to_party(context, column);
-        ssf_press_button2(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
+        ssf_press_button2(context, BUTTON_A, GameSettings::instance().BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
         box_to_menu(context);
     }
     void deposit_column_shiftL(const BotBaseContext& context, uint8_t column){
         menu_to_box(context, true);
         pickup_column(context, true);
         party_to_column(context, column);
-        ssf_press_button2(context, BUTTON_L, BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
-        ssf_press_button2(context, BUTTON_A, BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
+        ssf_press_button2(context, BUTTON_L, GameSettings::instance().BOX_CHANGE_DELAY, EGG_BUTTON_HOLD_DELAY);
+        ssf_press_button2(context, BUTTON_A, GameSettings::instance().BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
         box_to_menu(context);
     }
     uint8_t swap_party_shift(const BotBaseContext& context, uint8_t column){
         menu_to_box(context, true);
         pickup_column(context, true);
+
+        uint16_t BOX_CHANGE_DELAY = GameSettings::instance().BOX_CHANGE_DELAY;
+        uint16_t BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY;
+        uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY;
 
         //  Move to column.
         party_to_column(context, column);
@@ -144,7 +153,7 @@ struct EggCombinedSession{
             }
 
             collect_egg(context);
-            collect_egg_mash_out(context, AUTO_DEPOSIT);
+            collect_egg_mash_out(context, GameSettings::instance().AUTO_DEPOSIT);
 
             travel_to_spin_location(context);
             spin_and_mash_A(context, spin);
@@ -158,7 +167,7 @@ struct EggCombinedSession{
         //  Last fetch.
         if (fetches > 0){
             collect_egg(context);
-            collect_egg_mash_out(context, AUTO_DEPOSIT);
+            collect_egg_mash_out(context, GameSettings::instance().AUTO_DEPOSIT);
             fetches--;
         }
         travel_to_spin_location(context);
@@ -173,10 +182,10 @@ struct EggCombinedSession{
 
         if (fetches == 0){
             //  Swap party.
-            ssf_press_button2(context, BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
+            ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
             if (last_batch){
                 deposit_column_shiftL(context, column);
-                ssf_press_button2(context, BUTTON_B, MENU_TO_OVERWORLD_DELAY, 20);
+                ssf_press_button2(context, BUTTON_B, GameSettings::instance().MENU_TO_OVERWORLD_DELAY, 20);
             }else{
                 swap_party_shift(context, column);
                 fly_home_goto_lady(context, false);
@@ -188,23 +197,23 @@ struct EggCombinedSession{
         fly_home_goto_lady(context, true);
         while (fetches-- > 0){
             collect_egg(context);
-            collect_egg_mash_out(context, AUTO_DEPOSIT);
+            collect_egg_mash_out(context, GameSettings::instance().AUTO_DEPOSIT);
             eggfetcher_loop(context);
         }
 
         //  Swap party.
-        ssf_press_button2(context, BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
+        ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
         if (last_batch){
             deposit_column_shiftL(context, column);
         }else{
             swap_party_shift(context, column);
         }
-        ssf_press_button2(context, BUTTON_B, MENU_TO_OVERWORLD_DELAY, 20);
+        ssf_press_button2(context, BUTTON_B, GameSettings::instance().MENU_TO_OVERWORLD_DELAY, 20);
     }
 
     void eggcombined2_body(SingleSwitchProgramEnvironment& env){
         if (BOXES_TO_HATCH == 0){
-            ssf_press_button2(env.console, BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
+            ssf_press_button2(env.console, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
             return;
         }
 
@@ -224,7 +233,7 @@ struct EggCombinedSession{
         float fetch_residual = 0;
 
         //  Withdraw party.
-        ssf_press_button2(env.console, BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
+        ssf_press_button2(env.console, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
         withdraw_column_shiftR(env.console, 0);
         fly_home_goto_lady(env.console, false);
 
@@ -234,9 +243,9 @@ struct EggCombinedSession{
                 //  Touch the date.
                 if (TOUCH_DATE_INTERVAL > 0 && system_clock(env.console) - last_touch >= TOUCH_DATE_INTERVAL){
                     env.log("Touching date to prevent rollover.");
-                    pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
-                    touch_date_from_home(env.console, SETTINGS_TO_HOME_DELAY);
-                    resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+                    pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+                    touch_date_from_home(env.console, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+                    resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
                     last_touch += TOUCH_DATE_INTERVAL;
                 }
 
@@ -255,7 +264,7 @@ struct EggCombinedSession{
         }
 
         //  Finish
-        ssf_press_button2(env.console, BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
+        ssf_press_button2(env.console, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
     }
 
 };

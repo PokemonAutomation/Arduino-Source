@@ -6,7 +6,7 @@
  * 
  */
 
-#include "Common/SwitchFramework/SwitchControllerDefs.h"
+#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "Programs/ShinyHunt-SwordsOfJustice.h"
 
 //  Increase this number if you want to give yourself more time before running.

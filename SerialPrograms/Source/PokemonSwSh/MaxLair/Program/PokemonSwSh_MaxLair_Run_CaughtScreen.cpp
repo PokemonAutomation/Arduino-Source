@@ -5,15 +5,17 @@
  */
 
 #include "Common/Cpp/Exception.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
-#include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Notifications.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_EndBattle.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Entrance.h"
+#include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Notifications.h"
+#include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_CatchScreenTracker.h"
 #include "PokemonSwSh_MaxLair_Run_CaughtScreen.h"
 
 namespace PokemonAutomation{
@@ -22,193 +24,147 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-void summary_to_caught_screen(ProgramEnvironment& env, ConsoleHandle& console){
-    pbf_press_button(console, BUTTON_B, 10, TICKS_PER_SECOND);
-
-    PokemonCaughtMenuDetector caught_menu;
-
-    int result = wait_until(
-        env, console,
-        std::chrono::seconds(10),
-        { &caught_menu }
-    );
-
-    switch (result){
-    case 0:
-        pbf_wait(console, 125);
-        console.botbase().wait_for_all_requests();
-        return;
-    default:
-        console.log("Failed to detect caught menu.", Qt::red);
-        PA_THROW_StringException("Failed to detect caught menu.");
-    }
-}
-void mash_A_to_entrance(ProgramEnvironment& env, ConsoleHandle& console, const QImage& entrance){
+StateMachineAction mash_A_to_entrance(
+    MaxLairRuntime& runtime,
+    ProgramEnvironment& env,
+    ConsoleHandle& console,
+    const QImage& entrance
+){
     EntranceDetector entrance_detector(entrance);
 
     int result = run_until(
         env, console,
         [&](const BotBaseContext& context){
-            pbf_mash_button(context, BUTTON_A, 30 * TICKS_PER_SECOND);
-            context->wait_for_all_requests();
+            pbf_mash_button(context, BUTTON_A, 60 * TICKS_PER_SECOND);
         },
-        { &entrance_detector }
+        { &entrance_detector },
+        INFERENCE_RATE
     );
 
     if (result < 0){
         console.log("Failed to detect entrance.", Qt::red);
-        PA_THROW_StringException("Failed to detect entrance.");
+//        PA_THROW_StringException("Failed to detect entrance.");
+        runtime.stats.add_error();
+        dump_image(console, MODULE_NAME, "ResetRecovery", console.video().snapshot());
+        return StateMachineAction::RESET_RECOVER;
     }
+    return StateMachineAction::KEEP_GOING;
 }
 
 
+void synchronize_caught_screen(
+    ProgramEnvironment& env,
+    ConsoleHandle& console,
+    GlobalStateTracker& state_tracker
+){
+    console.botbase().wait_for_all_requests();
+    state_tracker.synchronize(env, console, console.index(), std::chrono::seconds(60));
+}
 
 
 StateMachineAction run_caught_screen(
     MaxLairRuntime& runtime,
     ProgramEnvironment& env,
-    ConsoleHandle& console, bool is_host,
+    ConsoleHandle& console,
+    GlobalStateTracker& state_tracker,
+    const EndBattleDecider& decider,
     const QImage& entrance
 ){
+    size_t console_index = console.index();
+
     pbf_wait(console, TICKS_PER_SECOND);
     console.botbase().wait_for_all_requests();
 
-    SummaryShinySymbolDetector detector(console, console);
-    size_t count = count_catches(console, console.video().snapshot());
-    console.log(STRING_POKEMON + " Caught: " + QString::number(count), "purple");
-    runtime.stats.add_run(count);
+    CaughtPokemonScreen tracker(env, console);
+    runtime.stats.add_run(tracker.total());
 
-    pbf_press_button(console, BUTTON_A, 10, 100);
-    pbf_press_dpad(console, DPAD_DOWN, 10, 50);
-    pbf_press_button(console, BUTTON_A, 10, 0);
-    console.botbase().wait_for_all_requests();
+    //  Scroll over everything. This checks them for shinies.
+    tracker.enter_summary();
+    for (size_t c = 0; c < tracker.total(); c++){
+        tracker.scroll_to(c);
+    }
 
-    bool shiny_found = false;
-    bool shiny[4] = {false, false, false, false};
-    for (size_t c = 0; c < count; c++){
-        if (c != 0){
-            pbf_press_dpad(console, DPAD_DOWN, 10, TICKS_PER_SECOND);
-            console.botbase().wait_for_all_requests();
+    //  Get all the shinies.
+    bool boss_is_shiny = false;
+    std::vector<size_t> shinies;
+    for (size_t c = 0; c < tracker.total(); c++){
+        if (!tracker[c].shiny){
+            continue;
         }
-
-        SummaryShinySymbolDetector::Detection detection = detector.wait_for_detection(env, console);
-        switch (detection){
-        case SummaryShinySymbolDetector::Detection::NO_DETECTION:
-            console.log("Failed to detect summary screen.", Qt::red);
-            PA_THROW_StringException("Failed to detect summary screen.");
-        case SummaryShinySymbolDetector::Detection::NOT_SHINY:
-            shiny[c] = false;
-            shiny_found |= false;
-            break;
-        case SummaryShinySymbolDetector::Detection::SHINY:
-            console.log("Found shiny!", Qt::blue);
-            shiny[c] = true;
-            shiny_found |= true;
-            runtime.stats.add_shiny();
-            break;
+        shinies.emplace_back(c);
+        runtime.stats.add_shiny();
+        if (c == 3){
+            boss_is_shiny = true;
+            runtime.stats.add_shiny_legendary();
         }
     }
 
-    //  No shinies
-    if (!shiny_found){
-        switch (runtime.action){
-        case CaughtScreenAction::ALWAYS_STOP:
-            console.log("No shinies found.", "purple");
-            return StateMachineAction::STOP_PROGRAM;
-        case CaughtScreenAction::RESET_HOST_IF_NON_SHINY_BOSS:
-            if (is_host){
-                console.log("No shinies found. Resetting host.", "purple");
-                reset_game_from_home_with_inference(env, console, true);
-                return StateMachineAction::KEEP_GOING;
-            }
-            //  Intentional fall-through.
-        case CaughtScreenAction::TAKE_NON_BOSS_STOP_ON_NOTHING:
-        case CaughtScreenAction::TAKE_NON_BOSS_STOP_ON_SHINY_BOSS:
-            console.log("Quitting back to entrance.", "purple");
-            summary_to_caught_screen(env, console);
-            pbf_press_dpad(console, DPAD_DOWN, 10, 50);
-            pbf_press_button(console, BUTTON_B, 10, TICKS_PER_SECOND);
-            mash_A_to_entrance(env, console, entrance);
-            return StateMachineAction::KEEP_GOING;
-        }
-    }
-
-    //  Boss is shiny
-    if (shiny[3]){
-        runtime.stats.add_shiny_legendary();
-        summary_to_caught_screen(env, console);
-
-        QImage screen = console.video().snapshot();
-        {
-            std::lock_guard<std::mutex> lg(env.lock());
-            send_shiny_notification(console, runtime.program_name, nullptr, screen, runtime.stats);
-        }
+    //  If anything is shiny, take a video.
+    if (!shinies.empty()){
+        tracker.scroll_to(shinies.back());
+        tracker.leave_summary();
+        env.wait_for(std::chrono::seconds(1));
         pbf_press_button(console, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+        console.botbase().wait_for_all_requests();
+    }else{
+        std::lock_guard<std::mutex> lg(env.lock());
+        send_nonshiny_notification(
+            console, runtime.notification_noshiny,
+            runtime.program_name, runtime.stats
+        );
+    }
 
-        switch (runtime.action){
-        case CaughtScreenAction::ALWAYS_STOP:
-        case CaughtScreenAction::RESET_HOST_IF_NON_SHINY_BOSS:
-        case CaughtScreenAction::TAKE_NON_BOSS_STOP_ON_SHINY_BOSS:
-            console.log("Boss is shiny! Stopping program...", Qt::blue);
-            return StateMachineAction::STOP_PROGRAM;
-        case CaughtScreenAction::TAKE_NON_BOSS_STOP_ON_NOTHING:
-            console.log("Boss is shiny! But you're not stopping...", Qt::blue);
+    //  Screencap all the shinies and send notifications.
+    for (size_t index : shinies){
+        tracker.scroll_to(index);
+        tracker.leave_summary();
+        QImage screen = console.video().snapshot();
+
+        std::lock_guard<std::mutex> lg(env.lock());
+        send_shiny_notification(
+            console, runtime.notification_shiny,
+            runtime.program_name,
+            nullptr,
+            runtime.stats,
+            screen
+        );
+    }
+
+
+    const std::string& boss = state_tracker[console_index].boss;
+    EndBattleDecider::EndAdventureAction action = boss.empty()
+        ? decider.end_adventure_action(console_index)
+        : decider.end_adventure_action(console_index, boss, boss_is_shiny);
+
+    switch (action){
+    case EndBattleDecider::EndAdventureAction::STOP_PROGRAM:
+        console.log("Stopping program...", "purple");
+        synchronize_caught_screen(env, console, state_tracker);
+        return StateMachineAction::STOP_PROGRAM;
+    case EndBattleDecider::EndAdventureAction::TAKE_NON_BOSS_SHINY_AND_CONTINUE:
+        if (shinies.empty() || shinies[0] == 3){
+            console.log("Quitting back to entrance.", "purple");
+            tracker.leave_summary();
+            synchronize_caught_screen(env, console, state_tracker);
             pbf_press_dpad(console, DPAD_DOWN, 10, 50);
             pbf_press_button(console, BUTTON_B, 10, TICKS_PER_SECOND);
-            mash_A_to_entrance(env, console, entrance);
-            return StateMachineAction::KEEP_GOING;
+            return mash_A_to_entrance(runtime, env, console, entrance);
+        }else{
+            console.log("Taking non-shiny boss and returning to entrance...", Qt::blue);
+            tracker.scroll_to(shinies.back());
+            tracker.enter_summary();    //  Enter summary to verify you're on the right mon.
+            tracker.leave_summary();
+            synchronize_caught_screen(env, console, state_tracker);
+            return mash_A_to_entrance(runtime, env, console, entrance);
         }
-    }
-
-    //  Move to the shiny.
-    size_t c = count;
-    while (c > 0){
-        c--;
-        if (shiny[c]){
-            break;
-        }
-        pbf_press_dpad(console, DPAD_UP, 10, TICKS_PER_SECOND);
-    }
-
-    console.botbase().wait_for_all_requests();
-    QImage screen = console.video().snapshot();
-    SummaryShinySymbolDetector::Detection detection = detector.detect(screen);
-    switch (detection){
-    case SummaryShinySymbolDetector::Detection::NO_DETECTION:
-        dump_image(console, screen, "CaughtScreen-Shiny");
-        PA_THROW_StringException("Unrecoverable Error: Unable to detect shiny status.");
-    case SummaryShinySymbolDetector::Detection::NOT_SHINY:
-        dump_image(console, screen, "CaughtScreen-Shiny");
-        PA_THROW_StringException("Fatal Inconsistency: Expected to see a shiny.");
-    case SummaryShinySymbolDetector::Detection::SHINY:
-        break;
-    }
-
-    summary_to_caught_screen(env, console);
-
-    screen = console.video().snapshot();
-    send_shiny_notification(console, runtime.program_name, nullptr, screen, runtime.stats);
-
-    //  Non-boss is shiny.
-    if (is_host && runtime.action == CaughtScreenAction::RESET_HOST_IF_NON_SHINY_BOSS){
-        console.log("Shiny found! But you're resetting to keep the path...", Qt::blue);
-        reset_game_from_home_with_inference(env, console, true);
+    case EndBattleDecider::EndAdventureAction::RESET:
+        console.log("Resetting game...", Qt::blue);
+        synchronize_caught_screen(env, console, state_tracker);
+        reset_game_from_home_with_inference(env, console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         return StateMachineAction::KEEP_GOING;
     }
 
-    switch (runtime.action){
-    case CaughtScreenAction::ALWAYS_STOP:
-        console.log("Shiny found. Stopping program...", Qt::blue);
-        return StateMachineAction::STOP_PROGRAM;
-    case CaughtScreenAction::TAKE_NON_BOSS_STOP_ON_SHINY_BOSS:
-    case CaughtScreenAction::TAKE_NON_BOSS_STOP_ON_NOTHING:
-    case CaughtScreenAction::RESET_HOST_IF_NON_SHINY_BOSS:
-        console.log("Shiny found. Taking it and continuing...", Qt::blue);
-        mash_A_to_entrance(env, console, entrance);
-        return StateMachineAction::KEEP_GOING;
-    }
-
-    return StateMachineAction::STOP_PROGRAM;
+    PA_THROW_StringException("Invalid enum.");
 }
 
 

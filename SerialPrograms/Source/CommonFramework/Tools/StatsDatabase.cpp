@@ -38,7 +38,7 @@ const std::map<std::string, std::string> STATS_DATABASE_ALIASES{
 
 
 
-StatLine::StatLine(const StatsTracker& tracker)
+StatLine::StatLine(StatsTracker& tracker)
     : m_time(current_time())
     , m_stats(tracker.to_str())
 {}
@@ -77,7 +77,7 @@ std::string StatLine::to_str() const{
 
 
 
-void StatList::operator+=(const StatsTracker& tracker){
+void StatList::operator+=(StatsTracker& tracker){
     m_list.emplace_back(tracker);
 }
 void StatList::operator+=(const std::string& line){
@@ -149,7 +149,7 @@ void StatSet::open_from_file(const QString& filepath){
 bool StatSet::update_file(
     const QString& filepath,
     const std::string& identifier,
-    const StatsTracker& tracker
+    StatsTracker& tracker
 ){
     QFile file(filepath);
     while (!file.open(QIODevice::ReadWrite)){

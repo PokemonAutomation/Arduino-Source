@@ -10,24 +10,24 @@ namespace PokemonAutomation{
 namespace ImageMatch{
 
 
-void MatchResult::log(Logger& logger, double max_RMSD_ratio) const{
+void ImageMatchResult::log(Logger& logger, double max_alpha) const{
     std::string str = "Image Match Result: ";
 
-    if (slugs.empty()){
+    if (results.empty()){
         str += "no matches";
         logger.log(str, Qt::red);
         return;
     }
 
-    double best = slugs.begin()->first;
-    QColor color = best <= max_RMSD_ratio
+    double best = results.begin()->first;
+    QColor color = best <= max_alpha
         ? Qt::blue
         : Qt::red;
 
-    if (slugs.size() == 1){
-        auto iter = slugs.begin();
+    if (results.size() == 1){
+        auto iter = results.begin();
         str += iter->second;
-        str += " (RMSD Ratio = ";
+        str += " (alpha = ";
         str += std::to_string(iter->first);
         str += ")";
         logger.log(str, color);
@@ -36,9 +36,9 @@ void MatchResult::log(Logger& logger, double max_RMSD_ratio) const{
 
     str += "Multiple Candidates =>\n";
     size_t printed = 0;
-    for (const auto& item : slugs){
+    for (const auto& item : results){
         if (printed == 10){
-            str += "    (" + std::to_string(slugs.size() - 10) + " more...)\n";
+            str += "    (" + std::to_string(results.size() - 10) + " more...)\n";
             break;
         }
         str += "    ";
@@ -51,6 +51,34 @@ void MatchResult::log(Logger& logger, double max_RMSD_ratio) const{
 
     logger.log(str, color);
 }
+
+void ImageMatchResult::add(double alpha, std::string slug){
+    results.emplace(alpha, std::move(slug));
+}
+void ImageMatchResult::clear_beyond_spread(double max_alpha_spread){
+    auto best = results.begin();
+    while (results.size() > 1){
+        auto back = results.rbegin();
+        if (back->first <= best->first + max_alpha_spread){
+            break;
+        }
+        results.erase(back->first);
+    }
+}
+void ImageMatchResult::clear_beyond_alpha(double max_alpha){
+    while (true){
+        if (results.empty()){
+            return;
+        }
+        auto iter = results.end();
+        --iter;
+        if (iter->first <= max_alpha){
+            break;;
+        }
+        results.erase(iter);
+    }
+}
+
 
 
 

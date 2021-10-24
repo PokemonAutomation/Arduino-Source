@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
@@ -57,8 +58,12 @@ class BattleMenuReader{
 public:
     BattleMenuReader(VideoOverlay& overlay, Language language);
 
-    std::set<std::string> read_opponent(Logger& logger, const QImage& screen) const;
-    void disambiguate_opponent(Logger& logger, std::set<std::string>& slugs, const QImage& screen) const;
+    std::set<std::string> read_opponent(
+        Logger& logger,
+        ProgramEnvironment& env,
+        VideoFeed& feed
+    ) const;
+    std::set<std::string> read_opponent_in_summary(Logger& logger, const QImage& screen) const;
 
     std::string read_own_mon(Logger& logger, const QImage& screen) const;
 
@@ -70,8 +75,9 @@ public:
 
 private:
     Language m_language;
-    InferenceBoxScope m_opponent;
-    InferenceBoxScope m_opponent_types;
+    InferenceBoxScope m_opponent_name;
+    InferenceBoxScope m_summary_opponent_name;
+    InferenceBoxScope m_summary_opponent_types;
 
     InferenceBoxScope m_own_name;
     InferenceBoxScope m_own_sprite;

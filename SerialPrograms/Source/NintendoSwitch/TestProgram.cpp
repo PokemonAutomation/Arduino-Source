@@ -8,12 +8,9 @@
 //#include <QSystemTrayIcon>
 #include "Common/Cpp/Exception.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/AlignedVector.h"
+#include "Common/Cpp/SIMDDebuggers.h"
 #include "Common/Qt/QtJsonTools.h"
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
 #include "ClientSource/Libraries/Logging.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -25,6 +22,7 @@
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CommonFramework/Inference/TimeWindowStatTracker.h"
 #include "CommonFramework/Inference/VisualInferenceSession.h"
+#include "CommonFramework/Inference/FrozenImageDetector.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageMatch/FilterToAlpha.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
@@ -36,10 +34,12 @@
 #include "CommonFramework/OCR/StringNormalization.h"
 #include "CommonFramework/OCR/TextMatcher.h"
 #include "CommonFramework/OCR/LargeDictionaryMatcher.h"
-#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
-#include "CommonFramework/ImageMatch/CroppedImageMatcher.h"
-#include "CommonFramework/Tools/ProgramNotifications.h"
+#include "CommonFramework/ImageMatch/ExactImageDictionaryMatcher.h"
+#include "CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
@@ -66,6 +66,7 @@
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_DenMonReader.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_ExperienceGainDetector.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Entrance.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
@@ -79,13 +80,31 @@
 #include "PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_CaughtScreen.h"
 #include "PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Entrance.h"
 #include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
+#include "PokemonSwSh/PkmnLib/PokemonSwSh_MaxLair_Moves.h"
+#include "PokemonSwSh/PkmnLib/PokemonSwSh_MaxLair_Pokemon.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_BasicCatcher.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_Internet.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_TypeSprites.h"
-#include "CommonFramework/Tools/DiscordWebHook.h"
+#include "Kernels/Kernels_x64_SSE41.h"
+#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
+//#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
+#include "Kernels/ImageStats/Kernels_ImagePixelSumSqr.h"
+#include "Kernels/ImageStats/Kernels_ImagePixelSumSqrDev.h"
+#include "Kernels/Kernels_Alignment.h"
+#include "Kernels/WaterFill/Kernels_WaterFill_Intrinsics_SSE4.h"
+#include "Kernels/WaterFill/Kernels_WaterFill_FillQueue.h"
+#include "Kernels/BinaryImage/Kernels_BinaryImage_Default.h"
+#include "Kernels/BinaryImage/Kernels_BinaryImage_x64_SSE42.h"
+#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.h"
+#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h"
+//#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h"
+//#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h"
+#include "Integrations/DiscordWebHook.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "TestProgram.h"
 
+#include <immintrin.h>
 #include <fstream>
 #include <QHttpMultiPart>
 #include <QFile>
@@ -133,76 +152,23 @@ TestProgram_Descriptor::TestProgram_Descriptor()
 {}
 
 
-
 TestProgram::TestProgram(const TestProgram_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , LANGUAGE(
         "<b>OCR Language:</b>",
-//        m_iv_checker_reader.languages()
-#if 1
-        {
-//            Language::None,
-            Language::English,
-            Language::Spanish,
-            Language::French,
-            Language::German,
-            Language::Italian,
-            Language::Japanese,
-            Language::Korean,
-            Language::ChineseSimplified,
-            Language::ChineseTraditional,
-        },
-        false
-#endif
+        m_iv_checker_reader.languages()
     )
-    , DROPDOWN(
-        "<b>Test Dropdown:</b>",
-        {
-            "case 0",
-            "case 1",
-            "case 2",
-            "case 3",
-        }, 0
-    )
-    , STRING_SELECT(
-        "<b>Test Select:</b>",
-        {
-            "Bulbasaur",
-            "Charmander",
-            "Charmeleon",
-            "Charizard",
-            "Squirtle",
-            "Chikorita",
-        }, "Charmander"
-    )
-    , BALL_SELECT("<b>Ball Select:</b>", "master-ball")
-    , FILTER(true, false)
-    , BATCH()
+//    , TABLE({
+//        {"Description", {true, true, false, ImageAttachmentMode::JPG, {"Notifs", "Showcase"}, std::chrono::seconds(60)}},
+//    })
 {
     PA_ADD_OPTION(LANGUAGE);
-    PA_ADD_OPTION(DROPDOWN);
-    PA_ADD_OPTION(STRING_SELECT);
-    PA_ADD_OPTION(BALL_SELECT);
-    PA_ADD_OPTION(FILTER);
-    PA_ADD_OPTION(BATCH);
+//    PA_ADD_OPTION(TABLE);
 }
 
 
-
-
-
-class VertexMap{
-
-
-
-private:
-    std::map<pxint_t, const FillGeometry*> m_hor;
-    std::map<pxint_t, const FillGeometry*> m_ver;
-};
-
-
-
-
+using namespace Kernels;
+using namespace Kernels::WaterFill;
 
 
 
@@ -218,14 +184,550 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.console;
 
 
-//    DenMonReader reader(env.logger(), overlay);
-//    reader.read(feed.snapshot());
+
+    for (const auto& item : papkmnlib::all_boss_pokemon()){
+        cout << item.first << ": " << item.second.ability() << endl;
+    }
+    for (const auto& item : papkmnlib::all_rental_pokemon()){
+        cout << item.first << ": " << item.second.ability() << endl;
+    }
 
 
-    pbf_move_right_joystick(env.console, 128, 0, 80, 2 * 125);
-    pbf_move_right_joystick(env.console, 128, 0, 100, 2 * 125);
+
+//    for (const auto& item : papkmnlib::get_all_moves()){
+//        cout << item.first << ": " << item.second.name() << endl;
+//    }
+
+
+
+#if 0
+    bool on = false;
+    while (true){
+        on = !on;
+        set_leds(env.console, on);
+        pbf_wait(env.console, 20);
+    }
+#endif
+
+
+#if 0
+    EventNotificationOption event("", true, true, ImageAttachmentMode::JPG);
+
+    send_program_notification(
+        env.console, event,
+        QColor(), descriptor().display_name(),
+        "test",
+        {},
+        feed.snapshot(), false
+    );
+#endif
+
+
+
+#if 0
+    DiscordWebHook::send_message(
+        env.console, TABLE[0].ping,
+        TABLE[0].tags,
+        ":middle_finger:", QJsonArray(),
+        ImageAttachment()
+    );
+#endif
+
+
+//    connect_to_internet_with_inference(env, env.console);
+
+
+#if 0
+    std::vector<std::string> tokens;
+    std::istringstream stream(" asdf qwer   xcvb  ");
+    std::string str;
+    while (std::getline(stream, str, ' ')){
+        if (!str.empty()){
+            cout << "asdf = " << str << endl;
+            tokens.emplace_back(std::move(str));
+        }
+    }
+#endif
+
+
+
+
+//    all_bosses();
+
+
+
+
+//    InferenceBoxScope box(overlay, 0.200, 0.100, 0.300, 0.065, Qt::blue);
+
+
+//    dump_image(env.logger(), "test", "label", feed.snapshot());
+
+#if 0
+    std::string ERROR_REPORTING_URL = "https://discord.com/api/webhooks/892647720223924254/xcOc0SOPmiM7FVsRLZ4zKxqYEW5LGnfMwpfFdbaPH2ZhJnTnoOhDU8s_LiDGwj3SRm4p";
+    std::string TELEMETRY_URL = "https://discord.com/api/webhooks/892648029352525914/o4Zqdsl2BN8bRUg1FXy63GmMjGZWvAFGxZPaxtl90yy67B-haEp2GL91XIpy1-5UykXz";
+
+    flip(ERROR_REPORTING_URL);
+    flip(TELEMETRY_URL);
+//    cout << ERROR_REPORTING_URL << endl;
+//    cout << TELEMETRY_URL << endl;
+
+    for (size_t c = 0; c < TELEMETRY_URL.size(); c++){
+        cout << (unsigned)(uint8_t)TELEMETRY_URL[c] << ",";
+    }
+    cout << endl;
+#endif
+
+#if 0
+    QImage image0("ErrorDumps (old)/20210831-014455-PathPartyReader-ReadSprites.png");
+    const uint32_t* pixels = (const uint32_t*)image0.bits();
+    size_t bytes_per_row = image0.bytesPerLine();
+
+    BinaryImage bin0(127, 20);
+    filter_min_rgb32(bin0, pixels + 30*bytes_per_row/4, bytes_per_row, 255, 96, 128, 128);
+    cout << "---------" << endl;
+    cout << bin0.dump() << endl;
+
+
+#if 1
+    MinRgbFilter_Default filter(255, 96, 128, 128);
+    BinaryImage_x64_SSE42 bin1(127, 20);
+    rgb32_to_binary_image(bin1, pixels + 30*bytes_per_row/4, bytes_per_row, filter);
+    cout << "---------" << endl;
+    cout << bin1.dump() << endl;
+#endif
+#endif
+
+
+
+//    YCommMenuDetector detector(false);
+//    AsyncVisualInferenceSession session(env, feed, overlay);
+//    session += detector;
+
+#if 0
+    QImage image0("ErrorDumps (old)/20210831-014455-PathPartyReader-ReadSprites.png");
+    const uint32_t* pixels = (const uint32_t*)image0.bits();
+    size_t bytes_per_row = image0.bytesPerLine();
+
+    BinaryImage_Default bin0   = filter_min_rgb_Default  (127, 20, pixels + 30*bytes_per_row/4, bytes_per_row, 255, 96, 128, 128);
+    BinaryImage_x64_SSE42 bin1 = filter_min_rgb_x64_SSE42(127, 20, pixels + 30*bytes_per_row/4, bytes_per_row, 255, 96, 128, 128);
+
+    cout << bin0.dump() << endl;
+    cout << "---------" << endl;
+    cout << bin1.dump() << endl;
+
+    MinRgbFilter_x64_SSE41 filter(255, 96, 128, 128);
+    BinaryImage_x64_SSE42 bin2(127, 20);
+    rgb32_to_binary_image(bin2, pixels + 30*bytes_per_row/4, bytes_per_row, filter);
+    cout << "---------" << endl;
+    cout << bin2.dump() << endl;
+#endif
+
+
+#if 0
+    SelectionArrowFinder arrow_detector(env.console, ImageFloatBox(0.550, 0.600, 0.200, 0.200));
+//    AsyncVisualInferenceSession session(env, feed, overlay);
+//    session += arrow_detector;
+
+    arrow_detector.detect(feed.snapshot());
+#endif
+
+
+#if 0
+    __m128i pixel = _mm_set1_epi32(0xffffffff);
+    __m128i scale0 = _mm_set1_epi16(256);
+    __m128i scale1 = _mm_set1_epi16(256);
+
+    __m128i pixel0 = _mm_and_si128(pixel, _mm_set1_epi16(0x00ff));
+//    __m128i pixel1 = _mm_and_si128(_mm_srli_epi16(pixel, 8), _mm_set1_epi16(0x00ff));
+    __m128i pixel1 = _mm_shuffle_epi8(pixel, _mm_setr_epi8(1, -1, 3, -1, 5, -1, 7, -1, 9, -1, 11, -1, 13, -1, 15, -1));
+
+    pixel0 = _mm_mullo_epi16(pixel0, scale0);
+    pixel1 = _mm_mullo_epi16(pixel1, scale1);
+
+    pixel0 = _mm_shuffle_epi8(pixel0, _mm_setr_epi8(1, -1, 3, -1, 5, -1, 7, -1, 9, -1, 11, -1, 13, -1, 15, -1));
+    pixel1 = _mm_and_si128(pixel1, _mm_set1_epi16(0xff00));
+
+    pixel = _mm_or_si128(pixel0, pixel1);
+
+    print8(pixel0); cout << endl;
+    print8(pixel1); cout << endl;
+#endif
+
+
+#if 0
+    QImage image0("ErrorDumps (old)/20210831-014455-PathPartyReader-ReadSprites.png");
+    QImage image1("ErrorDumps (old)/20210831-020939-PathPartyReader-ReadSprites.png");
+    image0 = image0.copy(0, 0, image0.width() - 1, image0.height());
+    image1 = image1.copy(0, 0, image1.width() - 1, image1.height());
+
+    auto time0 = std::chrono::system_clock::now();
+    ImageStats stats = image_stats(image0);
+//    double diff = ImageMatch::pixel_RMSD(image0, image1);
+
+    auto time1 = std::chrono::system_clock::now();
+    cout << std::chrono::duration_cast<std::chrono::nanoseconds>(time1 - time0).count() << endl;
+    cout << stats.average << stats.stddev << endl;
+//    cout << diff << endl;
+#endif
+
+
+#if 0
+    uint64_t bits0 = filter_min_rgb_u64((const uint32_t*)image.bits()     , 63, 96, 0, 0);
+    uint64_t bits1 = filter_min_rgb_u64((const uint32_t*)image.bits() + 64, 63, 96, 0, 0);
+    cout << bits0 << endl;
+    cout << bits1 << endl;
+
+    __m128i mask = _mm_set1_epi32(0xff600000);
+    mask = _mm_xor_si128(mask, _mm_set1_epi8(0x80));
+    __m128i vbits = filter_min_rgb_SSE4((const uint32_t*)image.bits(), 63, mask);
+    cout << vbits.m128i_u64[0] << endl;
+    cout << vbits.m128i_u64[1] << endl;
+#endif
+
+
+//    uint8_t x[] = {0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15};
+
+//    PartialWordLoader_SSE4 loader(16);
+//    print8(loader.load(x)); cout << endl;
+
+#if 0
+    BinaryImage_SSE4 image(10, 4);
+    image.set_zero();
+    cout << image.pixel(1, 1) << endl;
+    image.set_pixel(1, 1, true);
+    cout << image.pixel(1, 1) << endl;
+//    image.set_pixel(1, 1, false);
+//    cout << image.pixel(1, 1) << endl;
+
+    cout << image.dump() << endl;
+#endif
+
+
+//    __m128i x = _mm_setr_epi32(4, 0, 0, 0);
+//    cout << least_significant_bit(x) << endl;
+//    cout << most_significant_bit(x) << endl;
+
+//    cout << Intrinsics_SSE4::low_bit(x) << endl;
+//    cout << Intrinsics_SSE4::high_bit(x) << endl;
+
+//    cout << most_significant_bit(7) << endl;
+//    cout << most_significant_bit(15) << endl;
+
+
+//    __m128i x = _mm_set1_epi64x(0xffffffffffffffff);
+
+
+#if 0
+    uint64_t x = 0xffffffffffffffff;
+
+    uint64_t p, s;
+//    popcount_sumindex(p, s, x);
+    Intrinsics_u64::popcount_sumindex(p, s, x);
+
+    cout << p << endl;
+    cout << s << endl;
+#endif
+
+//    popcount;
+//    sumcoord;
+
+#if 0
+    {
+        AlignedVector<std::string> vector;
+
+        for (const auto& item : vector){
+            cout << item << endl;
+        }
+
+        vector.emplace_back("asdf");
+        vector.emplace_back("qwer");
+        for (const auto& item : vector){
+            cout << item << endl;
+        }
+
+        vector.pop_back();
+        for (const auto& item : vector){
+            cout << item << endl;
+        }
+        vector.emplace_back("zxcv");
+        vector.emplace_back("qwer");
+        for (const auto& item : vector){
+            cout << item << endl;
+        }
+    }
+    cout << TrackingObject::live() << endl;
+#endif
+
+
+#if 0
+    __m128i m = _mm_setr_epi32(-1, -1, -1, 1);
+    __m128i x = _mm_setr_epi32(1, 0, 0, 0);
+
+    cout << Intrinsics_SSE4::to_str(Intrinsics_SSE4::add(m, x)) << endl;
+
+//    cout << Intrinsics_SSE4::expand(x, m) << endl;
+//    cout << Intrinsics_SSE4::to_str(x) << endl;
+//    cout << Intrinsics_SSE4::to_str(m) << endl;
+#endif
+
+
+#if 0
+    __m128i x = _mm_set1_epi32(0x12345678);
+    cout << Intrinsics_SSE4::to_str(x) << endl;
+    x = bit_reverse(x);
+    cout << Intrinsics_SSE4::to_str(x) << endl;
+    x = bit_reverse(x);
+    cout << Intrinsics_SSE4::to_str(x) << endl;
+#endif
+
+#if 0
+    uint64_t matrix[2][2] = {
+        {0x7777777777777777, 0x7777777777777777},
+        {0xdddddddddddddddd, 0xdddddddddddddddd},
+    };
+    cout << Mask64(matrix[0][0]) << " " << Mask64(matrix[0][1]) << endl;
+    cout << Mask64(matrix[1][0]) << " " << Mask64(matrix[1][1]) << endl;
+
+    FillQueue<Intrinsics_u64> queue(2, 2);
+    queue.push_point(1, 0, 1);
+
+
+
+    while (true){
+        FillQueue<Intrinsics_u64>::Point point;
+        if (!queue.pop(point)){
+            break;
+        }
+
+//        cout << "------------------> [" << point.x << "," << point.y << "]" << endl;
+
+#if 0
+        uint64_t mask = matrix[point.y][point.x];
+//        cout << "mask = " << Mask64(mask) << endl;
+        uint64_t x = point.mask & mask;
+//        cout << "olap = " << Mask64(x) << endl;
+        if (x == 0){
+            continue;
+        }
+        x = fill_full(x, mask);
+//        cout << "fill = " << Mask64(x) << endl;
+        mask &= ~x;
+//        cout << "mask = " << Mask64(mask) << endl;
+        matrix[point.y][point.x] = mask;
+#endif
+        uint64_t x = point.mask;
+        if (Intrinsics_u64::expand(x, matrix[point.y][point.x])){
+            queue.push_neighbors(point.x, point.y, x);
+        }
+
+//        cout << Mask64(matrix[0][0]) << " " << Mask64(matrix[0][1]) << endl;
+//        cout << Mask64(matrix[1][0]) << " " << Mask64(matrix[1][1]) << endl;
+    }
+
+    cout << Mask64(matrix[0][0]) << " " << Mask64(matrix[0][1]) << endl;
+    cout << Mask64(matrix[1][0]) << " " << Mask64(matrix[1][1]) << endl;
+#endif
+
+
+#if 0
+    uint64_t row0 = 0x7777777777777777;
+    uint64_t row1 = 0xdddddddddddddddd;
+    cout << Mask64(row0) << endl;
+    cout << Mask64(row1) << endl;
+    cout << "------------------" << endl;
+
+    uint64_t x0 = 1;
+
+    x0 = fill_full(x0, row0);
+    cout << Mask64(x0) << endl;
+    row0 &= ~x0;
+
+    cout << "------------------" << endl;
+    cout << Mask64(row0) << endl;
+    cout << Mask64(row1) << endl;
+
+    uint64_t x1 = x0 & row1;
+    if (x1){}
+
+    x1 = fill_full(x1, row1);
+    cout << Mask64(x1) << endl;
+    row1 &= ~x1;
+
+    cout << "------------------" << endl;
+    cout << Mask64(row0) << endl;
+    cout << Mask64(row1) << endl;
+#endif
+
+
+#if 0
+    Mask64 mask = 8480658636838181070;
+    cout << mask << endl;
+
+    Mask64 x = 0b100;
+
+    x = fill_full(x, mask);
+    cout << x << endl;
+#endif
+
+
+#if 0
+    PokemonSelectMenuDetector detector(false);
+//    AsyncVisualInferenceSession session(env, feed, overlay);
+//    session += detector;
+
+    QImage image("ErrorDumps (old)/20210831-172559-MaxLair-read_name_sprite.png");
+    cout << detector.process_frame(image, std::chrono::system_clock::now()) << endl;
+#endif
+
+
+//    InferenceBoxScope box(overlay, 0.550, 0.600, 0.200, 0.200);
+
+//    LobbyAllReadyDetector detector(4, std::chrono::system_clock::now());
+//    AsyncVisualInferenceSession session(env, feed, overlay);
+//    session += detector;
+
+#if 0
+    FrozenScreenDetector detector(std::chrono::milliseconds(1000), 10);
+    AsyncVisualInferenceSession session(env, feed, overlay);
+    session += detector;
+#endif
+
+
+#if 0
+    QImage screen0("20210918-153851.jpg");
+    QImage screen1("20210919-054635.jpg");
+
+    cout << image_diff_total(screen0, screen1) << endl;
+    cout << ImageMatch::pixel_RMSD(screen0, screen1) << endl;
+#endif
+
+
+#if 0
+    PathReader reader(overlay, 0);
+    std::string slugs[4];
+//    double hp[4];
+//    reader.read_hp(env.logger(), QImage("ErrorDumps/20210909-183539-PathPartyReader-ReadHP.png"), hp);
+    QImage image("ErrorDumps (old)/20210831-025335-PathPartyReader-ReadSprites.png");
+//    QImage image = feed.snapshot();
+    reader.read_sprites(env.logger(), image, slugs);
+#endif
+
+
+#if 0
+    QImage screen0("20210918-153851.jpg");
+    QImage screen1("20210919-054635.jpg");
+
+    auto time0 = std::chrono::system_clock::now();
+    uint64_t count = 0;
+    uint64_t sumsqrs = 0;
+    sum_sqr_deviation(
+        count, sumsqrs,
+        screen0.width(), screen0.height(),
+        (const uint32_t*)screen0.bits(), screen0.bytesPerLine(),
+        (const uint32_t*)screen1.bits(), screen1.bytesPerLine(),
+        0
+    );
+    auto time1 = std::chrono::system_clock::now();
+    cout << std::chrono::duration_cast<std::chrono::nanoseconds>(time1 - time0).count() << endl;
+
+    cout << std::sqrt((double)sumsqrs / (double)count) << endl;
+
+    cout << ImageMatch::pixel_RMSD(screen0, screen1) << endl;
+#endif
+
+
+#if 0
+    QImage screen("20210918-153851.jpg");
+
+    auto time0 = std::chrono::system_clock::now();
+    ImageStats stats0 = image_stats(screen);
+    auto time1 = std::chrono::system_clock::now();
+    cout << stats0.average << stats0.stddev << endl;
+    cout << std::chrono::duration_cast<std::chrono::nanoseconds>(time1 - time0).count() << endl;
+
+
+    QRgb average = ImageMatch::pixel_average(screen);
+    cout << qRed(average) << "," << qGreen(average) << "," << qBlue(average) << endl;
+#endif
+
+
+#if 0
+    auto time2 = std::chrono::system_clock::now();
+    Kernels::PixelSums sums;
+    Kernels::pixel_mean(
+        sums, screen.width(), screen.height(),
+        (const uint32_t*)screen.bits(), screen.bytesPerLine(),
+        (const uint32_t*)screen.bits(), screen.bytesPerLine()
+    );
+
+    ImageStats stats1;
+    FloatPixel sum(sums.sumR, sums.sumG, sums.sumB);
+    FloatPixel sqr(sums.sqrR, sums.sqrG, sums.sqrB);
+
+    stats1.average = sum / sums.count;
+    FloatPixel variance = (sqr - sum*sum / sums.count) / (sums.count - 1);
+    stats1.stddev = FloatPixel(
+        std::sqrt(variance.r),
+        std::sqrt(variance.g),
+        std::sqrt(variance.b)
+    );
+
+    auto time3 = std::chrono::system_clock::now();
+    cout << stats1.average << stats1.stddev << endl;
+    cout << std::chrono::duration_cast<std::chrono::nanoseconds>(time3 - time2).count() << endl;
+#endif
+
+
+#if 0
+//    Kernels::PixelSums sums;
+
+    uint32_t pixel0[4] = {
+        0x81123456,
+        0x81123456,
+        0x81123456,
+        0x81123456,
+    };
+    uint32_t pixel1[4] = {
+        0x81123456,
+        0,
+        0x81123456,
+        0,
+    };
+
+    uint64_t count = 0;
+    uint64_t sumsqr = 0;
+    Kernels::sum_sqr_deviation(
+        count, sumsqr, 4, 1, pixel, pixel
+    );
+#endif
+
+
+//    qRed();
+
+
+#if 0
+    QImage screen("ErrorDumps/20210921-015058-ReadPath.png");
+    test_find_symbols(env, overlay, {0.150, 0.020, 0.800, 0.780}, screen, 0.20);
+#endif
+
+
+#if 0
+    ShinySparkleDetector detector(env.logger(), overlay, ImageFloatBox(0.5, 0.05, 0.5, 0.70));
+
+    AsyncVisualInferenceSession session(env, feed, overlay);
+    session += detector;
+#endif
+
+
+#if 0
+    DenMonReader reader(env.logger(), overlay);
+    reader.read(feed.snapshot());
+#endif
+
+//    pbf_move_right_joystick(env.console, 128, 0, 80, 2 * 125);
+//    pbf_move_right_joystick(env.console, 128, 0, 100, 2 * 125);
 //    pbf_move_right_joystick(env.console, 128, 255, 200, 2 * 125);
-    botbase.wait_for_all_requests();
+//    botbase.wait_for_all_requests();
 
 
 
@@ -233,10 +735,73 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env){
 //        item.second.matching_image().save(QString::fromStdString(item.second.slug() + ".png"));
 //    }
 
+#if 0
+    PathMap map;
+    map.path_type = 2;
+    map.mon3[0] = PokemonType::BUG;
+    map.mon3[1] = PokemonType::DARK;
+    map.mon3[2] = PokemonType::DRAGON;
+    map.mon3[3] = PokemonType::ELECTRIC;
+    map.mon2[0] = PokemonType::FAIRY;
+    map.mon2[1] = PokemonType::FIGHTING;
+    map.mon2[2] = PokemonType::FIRE;
+    map.mon2[3] = PokemonType::FLYING;
+    map.mon1[0] = PokemonType::GHOST;
+    map.mon1[1] = PokemonType::GRASS;
+
+    auto paths = generate_paths(map, 0, -1);
+    cout << "Paths = " << paths.size() << endl;
+    for (const auto& path : paths){
+        for (const auto& item : path){
+            cout << "[" << (int)item.path_slot << ":" << get_type_slug(item.type) << "] ";
+        }
+        cout << endl;
+    }
+#endif
+
+
+
+#if 0
+//    QImage screen = feed.snapshot();
+//    QImage screen("ErrorDumps (old)/20210831-025634-PathPartyReader-ReadSprites.png");
+    QImage screen("ErrorDumps (old)/20210924-132645-ReadPathSide.png");
+//    QImage screen("ErrorDumps (old)/20210919-203328-ReadPathSide.png");
+
+//    InferenceBoxScope box(overlay, 0.150, 0.100, 0.800, 0.700);
+
+//    QImage image = extract_box(screen, box);
+
+//    cout << (int)find_side(image) << endl;
+
+    PathReader reader(overlay, 0);
+    GlobalState state;
+
+    reader.read_side(env.logger(), state, screen);
+
+#endif
+
+#if 0
+    CellMatrix matrix(image);
+    BrightFilter filter(500);
+    matrix.apply_filter(image, filter);
+
+    std::vector<FillGeometry> objects = find_all_objects(matrix, 1, false, 300);
+
+    std::deque<InferenceBoxScope> hits;
+    for (const FillGeometry& item : objects){
+        if (!is_arrow(image, matrix, item)){
+            continue;
+        }
+        cout << item.area << " / " << item.box.area() << endl;
+        hits.emplace_back(overlay, translate_to_parent(screen, box, item.box), Qt::green);
+    }
+#endif
+
+
 
 #if 0
 //    QImage screen("ErrorDumps (old)/20210831-014455-PathPartyReader-ReadSprites.png");
-    QImage screen("ErrorDumps (old)/20210831-020939-PathPartyReader-ReadSprites.png");
+//    QImage screen("ErrorDumps (old)/20210831-020939-PathPartyReader-ReadSprites.png");
 //    QImage screen("ErrorDumps (old)/20210831-025335-PathPartyReader-ReadSprites.png");
 //    QImage screen("ErrorDumps (old)/20210831-025634-PathPartyReader-ReadSprites.png");
 //    QImage screen("ErrorDumps (old)/20210831-040810-PathPartyReader-ReadSprites.png");
@@ -250,13 +815,14 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env){
 //    QImage screen("ErrorDumps (old)/20210831-163931-PathPartyReader-ReadSprites.png");
 //    QImage screen("ErrorDumps (old)/20210831-185522-PathPartyReader-ReadSprites.png");
 //    QImage screen("ErrorDumps (old)/20210831-185523-PathPartyReader-ReadSprites.png");
+    QImage screen("ErrorDumps/20210917-125152-ReadPath.png");
 //    QImage screen = feed.snapshot();
 
-    InferenceBoxScope box(overlay, 0.150, 0.200, 0.800, 0.600);
+    InferenceBoxScope box(overlay, 0.150, 0.100, 0.800, 0.700);
 
     QImage image = extract_box(screen, box);
 
-    std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_symbols(image);
+    std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_symbols(image, 0.2);
 
     std::deque<InferenceBoxScope> hits;
     size_t c = 0;
@@ -426,15 +992,6 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env){
 
 
 
-#if 0
-    PathPartyReader reader(overlay, 0);
-    std::string slugs[4];
-//    double hp[4];
-//    reader.read_hp(env.logger(), QImage("ErrorDumps/20210909-183539-PathPartyReader-ReadHP.png"), hp);
-    QImage image("ErrorDumps (old)/20210831-014455-PathPartyReader-ReadSprites.png");
-//    QImage image = feed.snapshot();
-    reader.read_sprites(env.logger(), image, slugs);
-#endif
 
 
 
@@ -452,7 +1009,10 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env){
     std::deque<InferenceBoxScope> boxes;
     detector.make_overlays(boxes, overlay);
 
-    cout << detector.detect(feed.snapshot()) << endl;
+//    QImage screen("ErrorDumps (old)/20210831-023522-MaxLair-read_name_sprite.png");
+    QImage screen(feed.snapshot());
+
+    cout << detector.detect(screen) << endl;
 #endif
 
 
@@ -467,7 +1027,8 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env){
 
 //    reader.read_own_mon(env.logger(), QImage("ErrorDumps/20210913-101915-MaxLair-read_name_sprite.png"));
 
-    reader.disambiguate_opponent(env.logger(), feed.snapshot());
+//    std::set<std::string> slugs{"stunfisk", "stunfisk-galar"};
+//    reader.disambiguate_opponent(env.logger(), slugs, QImage("ErrorDumps/20210917-172444-DisambiguateBoss.png"));
 
 
 #endif
@@ -483,13 +1044,15 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env){
 
 #if 0
     PokemonSelectMenuReader reader(env.logger(), overlay, Language::English);
-    QImage image("ErrorDumps/20210910-073238-MaxLair-read_name_sprite.png");
+    QImage image("ErrorDumps (old)/20210901-193318-MaxLair-read_name_sprite.png");
+    reader.read_option(image, 0);
+    reader.read_option(image, 1);
     reader.read_option(image, 2);
 #endif
 #if 0
     PokemonSwapMenuReader reader(env.logger(), overlay, Language::English);
 
-    QImage image("ErrorDumps/20210910-181920-MaxLair-read_name_sprite.png");
+    QImage image("ErrorDumps (old)/20210920-212120-MaxLair-read_name_sprite.png");
 //    QImage image = feed.snapshot();
 
     std::string slugs[2];
@@ -501,10 +1064,10 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env){
 #if 0
     BattleMenuReader reader(overlay, Language::English);
 
-//    QImage image("ErrorDumps/20210910-232803-MaxLair-read_name_sprite.png");
-    QImage image = feed.snapshot();
+    QImage image("ErrorDumps/20210921-160110-MaxLair-read_name_sprite.png");
+//    QImage image = feed.snapshot();
 
-    image.copy(QRect(-100, 100, 200, 100)).save("edge.png");
+//    image.copy(QRect(-100, 100, 200, 100)).save("edge.png");
 
 //    double hp[4];
 //    reader.read_hp(env.logger(), image, hp, 0);
@@ -631,181 +1194,30 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env){
     );
 #endif
 
-//    BattleMenuReader reader(overlay);
-
-//    cout << reader.can_dmax(feed.snapshot()) << endl;
-
-
-//    GlobalStateTracker tracker(env, 2);
-
-//    run_entrance(env, env.console, true, tracker);
-
-//    return;
-
-
-//    InferenceBoxScope box(overlay, 0.600, 0.900, 0.140, 0.050);
-//    InferenceBoxScope box(overlay, 0.782, 0.850, 0.030, 0.050);
-
-//    ImageStats stats = image_stats(extract_box(feed.snapshot(), box));
-//    cout << stats.average << stats.stddev << endl;
-
-
-//    back_out_to_caught_screen(env, env.console);
-
-//    run_caught_screen(env, env.console, false, QImage());
-
-
-
-//    cout << count_catches(overlay, feed.snapshot()) << endl;
-
-
-//    InferenceBoxScope box(overlay, 0.541, 0.779, 0.105, 0.186);
-//    QImage image = extract_box(feed.snapshot(), box);
-
-//    cout << dmax_circle_ready(image) << endl;
-
-#if 0
-    image = image.scaled(200, 200);
-
-    image.save("box.png");
-
-    int center_x = image.width() / 2;
-    int center_y = image.height() / 2;
-    cout << image.width() << " x " << image.height() << endl;
-
-    FloatPixel sum;
-    size_t total = 0;
-
-    for (int r = 0; r < image.height(); r++){
-        for (int c = 0; c < image.width(); c++){
-            int dy = r - center_y;
-            int dx = c - center_x;
-            if (dx*dx + dy*dy < 72*72){
-                image.setPixel(c, r, 0x0000ff);
-                continue;
-            }
-            if (dx*dx + dy*dy > 80*80){
-                image.setPixel(c, r, 0x0000ff);
-                continue;
-            }
-            if (dy < -60){
-                image.setPixel(c, r, 0x0000ff);
-                continue;
-            }
-            if (-18 < dy && dy < 40){
-                image.setPixel(c, r, 0x0000ff);
-                continue;
-            }
-            sum += FloatPixel(image.pixel(c, r));
-            total++;
-        }
-    }
-    image.save("circle.png");
-
-    sum /= total;
-    cout << sum << endl;
-#endif
 
 
 
 
 
-
-
-#if 0
-//    EntranceDetector detector(overlay, feed.snapshot());
-//    PathSelectDetector detector(overlay);
-//    ItemSelectDetector detector(overlay, false);
-//    BattleMenuDetector detector(overlay);
-//    PokemonCaughtMenuDetector detector(overlay);
-//    RaidCatchDetector detector(overlay);
-//    PokemonSwapMenuDetector detector(overlay, false);
-    PokemonCaughtMenuDetector detector(overlay);
-
-
-//    QImage image("ErrorDumps/20210827-224729-MaxLair-NameOCR.png");
-    QImage image = feed.snapshot();
-    cout << detector.detect(image) << endl;
-
-//    read_raid_mon(env.logger(), overlay, image, LANGUAGE);
-
-//    AsyncVisualInferenceSession session(env, feed);
-//    session += detector;
-
-
-
-
-
-#endif
-
-
-//    InferenceBoxScope box0(overlay, 0.760, 0.400 + 0*0.133, 0.050, 0.030, Qt::blue);
-//    InferenceBoxScope box1(overlay, 0.760, 0.400 + 1*0.133, 0.050, 0.030, Qt::blue);
-//    InferenceBoxScope box2(overlay, 0.760, 0.400 + 2*0.133, 0.050, 0.030, Qt::blue);
-//    InferenceBoxScope box3(overlay, 0.760, 0.400 + 3*0.133, 0.050, 0.030, Qt::blue);
-
-
-
-
-
-
-
-//    PokemonSelectMenuReader reader(env.logger(), overlay, LANGUAGE);
-//    cout << (int)reader.who_is_selecting(feed.snapshot()) << endl;
-
-#if 0
-    InferenceBoxScope box(overlay, 0.3, 0.010, 0.4, 0.10, Qt::green);
-    QImage image = extract_box(feed.snapshot(), box);
-
-    TextImageFilter filter = make_OCR_filter(image);
-    filter.apply(image);
-
-    image.save("test.png");
-
-    env.log(OCR::ocr_read(Language::English, image));
-#endif
-
-#if 0
-    QImage sprite = get_pokemon_sprite("garbodor").sprite();
-    sprite.save("sprite.png");
-
-
-    QImage screen = feed.snapshot();
-
-    InferenceBoxScope box0(overlay, 0.002, 0.347 + 0*0.163, 0.071 - 0.005, 0.102);
-    InferenceBoxScope box1(overlay, 0.002, 0.347 + 1*0.163, 0.071 - 0.005, 0.102);
-    InferenceBoxScope box2(overlay, 0.002, 0.347 + 2*0.163, 0.071 - 0.005, 0.102);
-    InferenceBoxScope box3(overlay, 0.002, 0.347 + 3*0.163, 0.071 - 0.005, 0.102);
-//    InferenceBoxScope box3(overlay, 0.002, 0.510 + 3*0.166, 0.071 - 0.005, 0.102);
-    QImage image = extract_box(screen, box2);
-//    image.scaled(sprite.size()).save("image.png");
-//    image.save("image.png");
-
-
-//    ImageStats stats = image_border_stats(image);
-//    cout << stats.average << stats.stddev << endl;
-
-//    read_pokemon_sprite_on_white(env.logger(), image);
-    PathPartyReader reader(overlay);
-    std::string slugs[4];
-    reader.read_sprites(env.logger(), screen, slugs);
-#endif
 
 
 
 #if 0
 //    PokemonSelectMenuReader reader(env.logger(), overlay, LANGUAGE);
 //    PokemonSwapMenuReader reader(env.logger(), overlay, LANGUAGE);
-    BattleMenuReader reader(overlay);
+    BattleMenuReader reader(overlay, Language::English);
 
-//    QImage image("ErrorDumps/20210826-040952-BattleMenuReader-read_opponent_hp.png");
-    QImage image = feed.snapshot();
+    QImage image("ErrorDumps/20210929-074054726330-MaxLair-read_name_sprite.png");
+
+    reader.read_own_mon(env.logger(), image);
+
+//    QImage image = feed.snapshot();
 //    cout << reader.read_opponent_hp(env.logger(), image) << endl;
 //    cout << reader.read_own_hp(env.logger(), image) << endl;
 //    double hp[4];
 //    reader.read_hp(image, hp);
-     int8_t pp[4];
-     reader.read_own_pp(env.logger(), image, pp);
+//     int8_t pp[4];
+//     reader.read_own_pp(env.logger(), image, pp);
 
 
 //    std::string mon[3];
@@ -823,256 +1235,6 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env){
 //    reader.read_pp(QImage("ErrorDumps/20210823-195515-MaxLair-NameOCR.png"), pp);
     reader.read_options(image, mon);
     reader.read_pp(image, pp);
-#endif
-
-
-#if 0
-    pbf_press_button(env.console, BUTTON_B, 5, 5);
-
-    env.update_stats();
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
-#endif
-
-
-//    StandardBattleMenuDetector detector(overlay);
-
-
-
-//    PokemonSelectMenu detector(feed);
-//    cout << detector.detect(feed.snapshot()) << endl;
-
-#if 0
-    BattleBallReader reader(env.logger(), env.console, Language::English);
-    cout << reader.read_ball(QImage()) << endl;
-#endif
-
-//    dump_image(QImage("test.jpg"), "test");
-
-//    get_pokeball_sprite("luxury-ball").sprite().save("sprite.png");
-
-
-#if 0
-    PokemonSelectMenuReader reader(env.logger(), overlay, Language::English);
-    reader.load(feed.snapshot());
-
-    cout << reader.index() << endl;
-#endif
-#if 0
-    InferenceBoxScope box0(feed, 0.02, 0.02, 0.40, 0.04);
-    InferenceBoxScope box1(feed, 0.09, 0.18, 0.30, 0.10);
-    InferenceBoxScope box2(feed, 0.15, 0.72, 0.10, 0.10);
-    InferenceBoxScope box3(feed, 0.35, 0.80, 0.10, 0.10);
-    InferenceBoxScope box4(feed, 0.87, 0.17, 0.03, 0.20);
-    InferenceBoxScope box5(feed, 0.87, 0.43, 0.03, 0.20);
-    InferenceBoxScope box6(feed, 0.87, 0.69, 0.03, 0.20);
-
-    QImage screen = feed.snapshot();
-
-    ImageStats stats0 = pixel_stats(extract_box(screen, box0));
-    cout << "box0.average = " << stats0.average << endl;
-    cout << "box0.stddev  = " << stats0.stddev << endl;
-
-    ImageStats stats1 = pixel_stats(extract_box(screen, box1));
-    cout << "box1.average = " << stats1.average << endl;
-    cout << "box1.stddev  = " << stats1.stddev << endl;
-
-    ImageStats stats2 = pixel_stats(extract_box(screen, box2));
-    cout << "box2.average = " << stats2.average << endl;
-    cout << "box2.stddev  = " << stats2.stddev << endl;
-
-    ImageStats stats3 = pixel_stats(extract_box(screen, box3));
-    cout << "box3.average = " << stats3.average << endl;
-    cout << "box3.stddev  = " << stats3.stddev << endl;
-
-    ImageStats stats4 = pixel_stats(extract_box(screen, box4));
-    cout << "box4.average = " << stats4.average << endl;
-    cout << "box4.stddev  = " << stats4.stddev << endl;
-
-    ImageStats stats5 = pixel_stats(extract_box(screen, box5));
-    cout << "box5.average = " << stats5.average << endl;
-    cout << "box5.stddev  = " << stats5.stddev << endl;
-
-    ImageStats stats6 = pixel_stats(extract_box(screen, box6));
-    cout << "box6.average = " << stats6.average << endl;
-    cout << "box6.stddev  = " << stats6.stddev << endl;
-#endif
-
-
-
-
-//    test_send_message2(env.logger());
-
-
-
-//    DiscordWebHook::send_message(env.logger(), true, "asdf", QJsonArray());
-//    DiscordWebHook::send_file("20210813-153702.png", &env.logger());
-
-
-
-//    ExperienceGainDetector detector(feed);
-//    cout << detector.detect(feed.snapshot()) << endl;
-
-
-//    basic_catcher(env, env.console, LANGUAGE, "beast-ball");
-
-
-//    ReceivePokemonDetector detector(feed);
-
-
-#if 0
-    send_program_error_notification(
-        &env.logger(),
-        m_descriptor.display_name(),
-        "test error"
-    );
-#endif
-
-
-#if 0
-    BattleBallReader reader(env.logger(), env.console, LANGUAGE);
-
-
-    pbf_press_button(botbase, BUTTON_X, 10, 125);
-    botbase.wait_for_all_requests();
-    move_to_ball(reader, botbase, feed, "park-ball");
-#endif
-
-
-
-#if 0
-    BattleBallReader reader(env.logger(), env.console, LANGUAGE);
-
-    QImage frame = feed.snapshot();
-    std::string slug = reader.read_ball(frame);
-    reader.read_quantity(frame);
-    env.log(slug);
-#endif
-
-
-#if 0
-    InferenceBoxScope box(feed, 0.710, 0.624, 0.18, 0.060);
-
-    QImage frame = feed.snapshot();
-    frame = extract_box(frame, box);
-
-    auto filter = make_OCR_filter(frame);
-    filter.apply(frame);
-
-//    binary_filter_black_text(frame);
-    frame.save("test.png");
-    QString str = OCR::ocr_read(LANGUAGE, frame);
-    env.log(str);
-
-//    BattleBallInventoryReader reader(env.logger(), env.console);
-
-//    QImage frame = feed.snapshot();
-//    reader.read_quantity(frame);
-#endif
-
-
-
-//    cout << normalize_newlines("asdf\r\nasdf\n") << endl;
-
-
-//    const QImage& ralts = get_pokemon_sprites("ralts").sprite();
-//    const QImage& zard = get_pokemon_sprites("charizard").sprite();
-//    cout << pixel_euclidean_distance_stddev(ralts, zard) << endl;
-//    cout << pixel_euclidean_distance_stddev(ralts, ralts) << endl;
-
-#if 0
-    InferenceBoxScope box0(feed, 0.649, 0.624, 0.0335, 0.060);
-//    InferenceBoxScope box1(feed, 0.914, 0.63, 0.04, 0.05);
-
-    QImage sprite = get_pokeball_sprite("poke").sprite();
-//    sprite = sprite.scaled(sprite.size());
-//    sprite = sprite.scaled(sprite.width() * 8, sprite.height() * 8);
-    sprite.save("sprite.png");
-
-    float sprite_average = ImageMatch::average_brightness(sprite);
-    cout << "Sprite: " << sprite_average << endl;
-#if 0
-    QRgb sprite_average = ImageMatch::pixel_average(sprite);
-    cout << "Sprite: " << endl;
-    cout << "    A = " << qAlpha(sprite_average) << endl;
-    cout << "    R = " << qRed(sprite_average) << endl;
-    cout << "    G = " << qGreen(sprite_average) << endl;
-    cout << "    B = " << qBlue(sprite_average) << endl;
-#endif
-
-    QImage image = extract_box(feed.snapshot(), box0);
-    image = image.scaled(sprite.size());
-//    ball = ball.scaled(sprite.size(), Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
-    image.save("image.png");
-
-    float image_average = ImageMatch::average_brightness(image, sprite);
-    cout << "Image: " << image_average << endl;
-#if 0
-    QRgb image_average = ImageMatch::pixel_average(ball);
-    cout << "Sprite:" << endl;
-    cout << "    A = " << qAlpha(image_average) << endl;
-    cout << "    R = " << qRed(image_average) << endl;
-    cout << "    G = " << qGreen(image_average) << endl;
-    cout << "    B = " << qBlue(image_average) << endl;
-#endif
-
-    image = ImageMatch::scale_brightness(image, sprite_average / image_average);
-    image.save("image2.png");
-//    image_average = ImageMatch::average_brightness(image, sprite);
-//    cout << "Image: " << image_average << endl;
-#endif
-
-//    BattleBallInventoryReader reader(env.logger(), env.console);
-//    reader.read_ball(feed.snapshot());
-
-
-
-//    feed.snapshot().save("clefable.png");
-
-
-//    reader.read_ball(feed.snapshot());
-
-#if 0
-    ImageMatch::ExactImageMatcher matcher;
-    for (const auto& item : all_pokemon_sprites()){
-        matcher.add(item.first, item.second.silhouette());
-    }
-
-    InferenceBoxScope box(feed, 0.098, 0.23, 0.285, 0.41);
-    QImage cropped = extract_box(feed.snapshot(), box);
-    matcher.scale_to_dimensions(cropped);
-    QImage filtered = ImageMatch::black_filter_to_alpha(cropped);
-    filtered.save("image.png");
-#endif
-
-#if 0
-    ImageMatch::MatchResult result = matcher.match(filtered, false);
-    for (const auto& item : result.slugs){
-        cout << item.first << " : " << item.second << endl;
-    }
-#endif
-
-#if 0
-    const QImage& sprite = get_pokemon_sprite("snorlax-gmax").silhouette();
-    sprite.save("sprite.png");
-
-    cout << ImageMatch::pixel_RMSD_masked(sprite, filtered) << endl;
-#endif
-
-//    image_diff_greyscale(sprite, scaled).save("diff.png");
-
-#if 0
-//    QImage image("Bad-Gyarados.png");
-    QImage image;
-
-    DenMonReader reader(&env.logger(), overlay);
-    auto results = reader.read(image);
-
-//    if (results.slugs.slugs.empty() || results.slugs.slugs.begin()->first > 50){
-//        //  No detection. Keep going.
-//        dump_image(image, "ReadDenMon");
-//    }
 #endif
 
 
@@ -1213,6 +1375,45 @@ void maxlair_make_mapping_json(){
 
 
 
+#if 0
+class TrackingObject{
+public:
+    TrackingObject(std::string x){
+        auto iter = m_live.find(this);
+        if (iter != m_live.end()){
+            PA_THROW_StringException("Double allocation.");
+        }
+        m_live.insert(this);
+        m_data = x;
+    }
+    TrackingObject(TrackingObject&& x){
+        auto iter = m_live.find(this);
+        if (iter != m_live.end()){
+            PA_THROW_StringException("Double allocation.");
+        }
+        m_live.insert(this);
+        m_data = std::move(x.m_data);
+    }
+    TrackingObject(const TrackingObject&) = delete;
+    void operator=(const TrackingObject&) = delete;
+    ~TrackingObject(){
+        auto iter = m_live.find(this);
+        if (iter == m_live.end()){
+            PA_THROW_StringException("Dangling free.");
+        }
+        m_live.erase(this);
+    }
+
+    static size_t live(){
+        return m_live.size();
+    }
+
+private:
+    std::string m_data;
+    static std::set<TrackingObject*> m_live;
+};
+std::set<TrackingObject*> TrackingObject::m_live;
+#endif
 
 
 

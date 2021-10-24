@@ -13,9 +13,8 @@
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "ClientSource/Connection/PABotBase.h"
-#include "CommonFramework/Tools/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsDatabase.h"
-#include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Windows/MainWindow.h"
 #include "RunnableSwitchProgram.h"
 
@@ -89,7 +88,9 @@ RunnableSwitchProgramWidget::RunnableSwitchProgramWidget(
 {}
 void RunnableSwitchProgramWidget::construct(){
     RunnablePanelWidget::construct();
-    update_historical_stats();
+    load_historical_stats();
+    m_state.store(ProgramState::STOPPED, std::memory_order_release);
+    update_ui();
 }
 QWidget* RunnableSwitchProgramWidget::make_header(QWidget& parent){
     RunnableSwitchProgramInstance& instance = static_cast<RunnableSwitchProgramInstance&>(m_instance);
@@ -134,12 +135,12 @@ QWidget* RunnableSwitchProgramWidget::make_header(QWidget& parent){
 #endif
         break;
     }case PABotBaseLevel::PABOTBASE_31KB:{
-        QLabel* text = new QLabel(
+        QLabel* label = new QLabel(
             "<font color=\"red\">(This program requires a Teensy or higher. PABotBase for Arduino Uno R3 does not have all the features required by this program.)</font>",
             header
         );
-        text->setWordWrap(true);
-        layout->addWidget(text);
+        label->setWordWrap(true);
+        layout->addWidget(label);
         break;
     }
     }
@@ -150,7 +151,7 @@ QWidget* RunnableSwitchProgramWidget::make_options(QWidget& parent){
     QWidget* options_widget = RunnablePanelWidget::make_options(parent);
 
     RunnableSwitchProgramInstance& instance = static_cast<RunnableSwitchProgramInstance&>(m_instance);
-    m_setup = instance.m_setup->make_ui(*options_widget, m_listener.logger());
+    m_setup = instance.m_setup->make_ui(*options_widget, m_listener.raw_logger(), m_instance_id);
     static_cast<QVBoxLayout*>(options_widget->layout())->insertWidget(0, m_setup);
 
     return options_widget;
@@ -169,29 +170,19 @@ QWidget* RunnableSwitchProgramWidget::make_actions(QWidget& parent){
 }
 
 
-bool RunnableSwitchProgramWidget::settings_valid() const{
-    return RunnablePanelWidget::settings_valid() && m_setup && m_setup->serial_ok();
+QString RunnableSwitchProgramWidget::check_validity() const{
+    QString error = RunnablePanelWidget::check_validity();
+    if (!error.isEmpty()){
+        return error;
+    }
+    return m_setup && m_setup->serial_ok()
+        ? QString()
+        : "Switch setup is not ready.";
 }
 void RunnableSwitchProgramWidget::update_ui(){
     RunnablePanelWidget::update_ui();
     ProgramState state = m_state.load(std::memory_order_acquire);
     if (m_setup) m_setup->update_ui(state);
-}
-void RunnableSwitchProgramWidget::update_historical_stats(){
-    RunnableSwitchProgramInstance& instance = static_cast<RunnableSwitchProgramInstance&>(m_instance);
-    m_historical_stats = instance.make_stats();
-    if (m_historical_stats){
-        StatSet stats;
-        stats.open_from_file(PERSISTENT_SETTINGS().stats_file);
-        const std::string& identifier = instance.descriptor().identifier();
-        StatList& list = stats[identifier];
-        if (list.size() != 0){
-            list.aggregate(*m_historical_stats);
-        }
-        async_set_status(QString::fromStdString(m_historical_stats->to_str()));
-//        m_status_bar->setText(QString::fromStdString(m_historical_stats->to_str()));
-//        m_status_bar->setVisible(true);
-    }
 }
 
 void RunnableSwitchProgramWidget::on_stop(){
@@ -207,53 +198,35 @@ void RunnableSwitchProgramWidget::run_program(){
     }
 
     RunnableSwitchProgramInstance& instance = static_cast<RunnableSwitchProgramInstance&>(m_instance);
-    std::unique_ptr<StatsTracker> current_stats = instance.make_stats();
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_current_stats = instance.make_stats();
+    }
 
     const std::string& program_identifier = instance.descriptor().identifier();
 
-    update_historical_stats();
+    load_historical_stats();
 
     try{
         m_logger.log("<b>Starting Program: " + program_identifier + "</b>");
-        run_program(current_stats.get(), m_historical_stats.get());
+        run_program(m_current_stats.get(), m_historical_stats.get());
         m_setup->wait_for_all_requests();
         m_logger.log("Ending Program...");
     }catch (CancelledException&){
     }catch (StringException& e){
         signal_error(e.message_qt());
         send_program_error_notification(
-            m_logger,
+            m_logger, instance.NOTIFICATION_PROGRAM_ERROR,
             instance.descriptor().display_name(),
             e.message_qt(),
-            current_stats ? current_stats->to_str() : ""
+            m_current_stats ? m_current_stats->to_str() : ""
         );
     }
 
     m_state.store(ProgramState::STOPPING, std::memory_order_release);
     m_logger.log("Stopping Program...");
 
-
-    //  Update historical stats.
-    if (current_stats){
-        bool ok = StatSet::update_file(
-            PERSISTENT_SETTINGS().stats_file,
-            program_identifier,
-            *current_stats
-        );
-        if (ok){
-            m_logger.log("Stats successfully saved!", "Blue");
-        }else{
-            m_logger.log("Unable to save stats.", "Red");
-            QMetaObject::invokeMethod(
-                this,
-                "show_stats_warning",
-                Qt::AutoConnection
-            );
-//            show_stats_warning();
-        }
-//        settings.stat_sets.open_from_file(settings.stats_file);
-    }
-
+    update_historical_stats();
 
     signal_reset();
     m_state.store(ProgramState::STOPPED, std::memory_order_release);

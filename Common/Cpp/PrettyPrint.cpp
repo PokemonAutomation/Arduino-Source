@@ -5,14 +5,22 @@
  */
 
 #include <stdio.h>
+#include <chrono>
 #include <sstream>
 #include <iomanip>
-#include "Common/SwitchFramework/SwitchControllerDefs.h"
+#include "Exception.h"
 #include "PrettyPrint.h"
 
 namespace PokemonAutomation{
 
 
+std::string to_string_padded(size_t digits, uint64_t x){
+    std::string str = std::to_string(x);
+    if (digits < str.size()){
+        PA_THROW_StringException("Number is too big to convert to fixed length string.");
+    }
+    return std::string(digits - str.size(), '0') + str;
+}
 std::string tostr_u_commas(uint64_t x){
     //  Prints out x with comma separators.
 
@@ -46,35 +54,6 @@ std::string tostr_fixed(double x, int precision){
     out << x;
     return out.str();
 }
-std::string ticks_to_time(uint64_t ticks){
-    const uint64_t SECOND = TICKS_PER_SECOND;
-    const uint64_t MINUTE = SECOND * 60;
-    const uint64_t HOUR = MINUTE * 60;
-    const uint64_t DAY = HOUR * 24;
-
-    std::string str;
-    str += tostr_u_commas(ticks);
-    str += " tick";
-    if (ticks != 1){
-        str += "s";
-    }
-    str += " (";
-    if (ticks < MINUTE * 2){
-        str += tostr_fixed((double)ticks / SECOND, 3);
-        str += " seconds";
-    }else if (ticks < HOUR * 2){
-        str += tostr_fixed((double)ticks / MINUTE, 3);
-        str += " minutes";
-    }else if (ticks < DAY * 2){
-        str += tostr_fixed((double)ticks / HOUR, 3);
-        str += " hours";
-    }else{
-        str += tostr_fixed((double)ticks / DAY, 3);
-        str += " days";
-    }
-    str += ")";
-    return str;
-}
 
 
 std::string now_to_filestring(){
@@ -82,18 +61,36 @@ std::string now_to_filestring(){
 #pragma warning(disable:4996)
 #endif
 
-    time_t t = time(0);
-    struct tm* now = localtime(&t);
+    //  Based off of: https://stackoverflow.com/questions/15957805/extract-year-month-day-etc-from-stdchronotime-point-in-c
 
-    std::string str;
-    str += std::to_string(now->tm_year + 1900);
-    str += std::string(now->tm_mon + 1 < 10 ? "0" : "") + std::to_string(now->tm_mon + 1);
-    str += std::string(now->tm_mday    < 10 ? "0" : "") + std::to_string(now->tm_mday);
-    str += "-";
-    str += std::string(now->tm_hour    < 10 ? "0" : "") + std::to_string(now->tm_hour);
-    str += std::string(now->tm_min     < 10 ? "0" : "") + std::to_string(now->tm_min);
-    str += std::string(now->tm_sec     < 10 ? "0" : "") + std::to_string(now->tm_sec);
-    return str;
+    using namespace std;
+    using namespace std::chrono;
+    typedef duration<int, ratio_multiply<hours::period, ratio<24> >::type> days;
+    system_clock::time_point now = system_clock::now();
+    system_clock::duration tp = now.time_since_epoch();
+    days d = duration_cast<days>(tp);
+    tp -= d;
+    hours h = duration_cast<hours>(tp);
+    tp -= h;
+    minutes m = duration_cast<minutes>(tp);
+    tp -= m;
+    seconds s = duration_cast<seconds>(tp);
+    tp -= s;
+    auto micros = 1000000 * tp.count() * system_clock::duration::period::num / system_clock::duration::period::den;
+    time_t tt = system_clock::to_time_t(now);
+//    tm utc_tm = *gmtime(&tt);
+    tm local_tm = *localtime(&tt);
+
+    std::stringstream ss;
+    ss << local_tm.tm_year + 1900;
+    ss << to_string_padded(2, local_tm.tm_mon + 1);
+    ss << to_string_padded(2, local_tm.tm_mday) << '-';
+    ss << to_string_padded(2, local_tm.tm_hour);
+    ss << to_string_padded(2, local_tm.tm_min);
+    ss << to_string_padded(2, local_tm.tm_sec);
+    ss << to_string_padded(6, micros);
+
+    return ss.str();
 }
 
 std::string set_to_str(const std::set<std::string>& set){
@@ -111,6 +108,33 @@ std::string set_to_str(const std::set<std::string>& set){
     str += "}";
     return str;
 }
+
+std::string duration_to_string(std::chrono::milliseconds milliseconds){
+    const uint64_t SECOND = 1000;
+    const uint64_t MINUTE = SECOND * 60;
+    const uint64_t HOUR = MINUTE * 60;
+    const uint64_t DAY = HOUR * 24;
+
+    uint64_t ticks = milliseconds.count();
+
+    std::string str;
+    if (ticks < MINUTE * 2){
+        str += tostr_fixed((double)ticks / SECOND, 3);
+        str += " seconds";
+    }else if (ticks < HOUR * 2){
+        str += tostr_fixed((double)ticks / MINUTE, 3);
+        str += " minutes";
+    }else if (ticks < DAY * 2){
+        str += tostr_fixed((double)ticks / HOUR, 3);
+        str += " hours";
+    }else{
+        str += tostr_fixed((double)ticks / DAY, 3);
+        str += " days";
+    }
+    return str;
+}
+
+
 
 
 

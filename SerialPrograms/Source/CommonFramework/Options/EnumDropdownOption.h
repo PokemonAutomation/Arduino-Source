@@ -2,6 +2,8 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *      This option is thread-safe.
+ *
  */
 
 #ifndef PokemonAutomation_EnumDropdown_H
@@ -22,7 +24,12 @@ public:
         size_t default_index
     );
 
-    operator size_t() const{ return m_current; }
+    const QString& label() const{ return m_label; }
+    const QString& case_name(size_t index) const{ return m_case_list[index]; }
+    const std::vector<QString>& case_list() const{ return m_case_list; }
+
+    operator size_t() const{ return m_current.load(std::memory_order_relaxed); }
+    void set(size_t index){ m_current.store(index, std::memory_order_relaxed); }
 
     virtual void load_json(const QJsonValue& json) override;
     virtual QJsonValue to_json() const override;
@@ -32,12 +39,11 @@ public:
     virtual ConfigOptionUI* make_ui(QWidget& parent) override;
 
 private:
-    friend class EnumDropdownOptionUI;
     QString m_label;
     std::vector<QString> m_case_list;
     std::map<QString, size_t> m_case_map;
-    size_t m_default;
-    size_t m_current;
+    const size_t m_default;
+    std::atomic<size_t> m_current;
 };
 
 

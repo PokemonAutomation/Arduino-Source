@@ -5,9 +5,11 @@
  */
 
 #include "Common/Cpp/Exception.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
+#include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
+#include "CommonFramework/Inference/FrozenImageDetector.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_RaidCatchDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.h"
@@ -35,14 +37,22 @@ namespace MaxLairInternal{
 
 
 StateMachineAction run_state_iteration(
-    MaxLairRuntime& runtime, size_t index,
+    MaxLairRuntime& runtime, size_t console_index,
     ProgramEnvironment& env,
-    ConsoleHandle& console, bool is_host,
+    ConsoleHandle& console, bool save_path,
     GlobalStateTracker& global_state,
+    const EndBattleDecider& decider,
     const QImage& entrance
 ){
     GlobalState state = global_state.infer_actual_state(console.index());
-    uint8_t wins = state.wins;
+//    uint8_t wins = state.wins;
+    bool starting = true;
+    for (size_t c = 0; c < 4; c++){
+        if (state.players[c].console_id == (int8_t)console_index){
+            starting = false;
+            break;
+        }
+    }
 
     PokemonSelectMenuDetector pokemon_select(false);
     PokemonSwapMenuDetector pokemon_swap(false);
@@ -53,33 +63,36 @@ StateMachineAction run_state_iteration(
     RaidCatchDetector catch_select;
     PokemonCaughtMenuDetector caught_menu;
     EntranceDetector entrance_detector(entrance);
+    FrozenImageDetector frozen_screen(std::chrono::seconds(30), 10);
 
     int result = wait_until(
         env, console,
-        std::chrono::seconds(480),
+        std::chrono::seconds(300),
         {
-            wins == 0
+            starting
                 ? (VisualInferenceCallback*)&pokemon_select
                 : (VisualInferenceCallback*)&pokemon_swap,
             &path_select,
             &item_menu,
-            wins == 0 ? nullptr : &professor_swap,
+            starting ? nullptr : &professor_swap,
             &battle_menu,
             &catch_select,
             &caught_menu,
             &entrance_detector,
-        }
+            &frozen_screen,
+        },
+        std::chrono::milliseconds(200)
     );
 
     switch (result){
     case 0:
-        if (wins == 0){
+        if (starting){
             console.log("Current State: " + STRING_POKEMON + " Select");
-            run_select_pokemon(env, console, global_state, *runtime.player_settings[index]);
+            run_select_pokemon(env, console, global_state, *runtime.player_settings[console_index]);
             return StateMachineAction::KEEP_GOING;
         }else{
             console.log("Current State: " + STRING_POKEMON + " Swap");
-            run_swap_pokemon(env, console, global_state, *runtime.player_settings[index]);
+            run_swap_pokemon(env, console, global_state, *runtime.player_settings[console_index]);
             return StateMachineAction::KEEP_GOING;
         }
     case 1:
@@ -96,29 +109,43 @@ StateMachineAction run_state_iteration(
         return StateMachineAction::KEEP_GOING;
     case 4:
         console.log("Current State: Move Select");
-        run_move_select(
+        return run_move_select(
             env, console, global_state,
-            *runtime.player_settings[index],
+            *runtime.player_settings[console_index],
             battle_menu.dmaxed(),
             battle_menu.cheer()
         );
-        return StateMachineAction::KEEP_GOING;
     case 5:
         console.log("Current State: Catch Select");
-        return throw_balls(runtime, env, console, global_state, *runtime.player_settings[index]);
+        return throw_balls(
+            runtime,
+            env, console, runtime.player_settings[console_index]->language,
+            global_state,
+            decider
+        );
     case 6:
         console.log("Current State: Caught Menu");
-        return run_caught_screen(runtime, env, console, is_host, entrance);
+        return run_caught_screen(
+            runtime,
+            env, console,
+            global_state, decider,
+            entrance
+        );
     case 7:
         console.log("Current State: Entrance");
-        run_entrance(runtime, env, console, is_host, global_state);
+        run_entrance(runtime, env, console, save_path, global_state);
         return StateMachineAction::DONE_WITH_ADVENTURE;
+    case 8:
+        console.log("Current State: Frozen Screen", Qt::red);
+//        pbf_mash_button(console, BUTTON_B, TICKS_PER_SECOND);
+//        console.botbase().wait_for_all_requests();
+//        return StateMachineAction::KEEP_GOING;
+        return StateMachineAction::RESET_RECOVER;
     default:
-        global_state.mark_as_dead(index);
-        console.log("Program hang. No state detected after 8 minutes. Resetting game...", Qt::red);
-        runtime.stats.add_error();
-        reset_game_from_home_with_inference(env, console, true);
-        return StateMachineAction::DONE_WITH_ADVENTURE;
+        console.log("Program hang. No state detected after 5 minutes.", Qt::red);
+        dump_image(console, MODULE_NAME, "ProgramHang", console.video().snapshot());
+        global_state.mark_as_dead(console_index);
+        return StateMachineAction::RESET_RECOVER;
     }
 
 

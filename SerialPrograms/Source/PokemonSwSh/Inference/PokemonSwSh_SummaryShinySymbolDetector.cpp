@@ -7,6 +7,7 @@
  *
  */
 
+#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/ColorClustering.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/Inference/InferenceThrottler.h"
@@ -27,20 +28,15 @@ SummaryShinySymbolDetector::SummaryShinySymbolDetector(Logger& logger, VideoOver
 SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::detect(const QImage& screen){
     {
         QImage state = extract_box(screen, m_state1_box);
-        if (pixel_stddev(state).sum() > 10){
-            return Detection::NO_DETECTION;
-        }
-        if (pixel_average(state).sum() > 100){
+        ImageStats stats = image_stats(state);
+        if (!is_black(stats)){
             return Detection::NO_DETECTION;
         }
     }
     {
         QImage state = extract_box(screen, m_state0_box);
-        if (pixel_stddev(state).sum() > 10){
-            return Detection::NO_DETECTION;
-        }
-        FloatPixel color = pixel_average_normalized(state);
-        if (euclidean_distance(color, FloatPixel(0.70, 0.07, 0.23)) > 0.2){
+        ImageStats stats = image_stats(state);
+        if (!is_solid(stats, {0.70, 0.07, 0.23}, 0.2, 10)){
             return Detection::NO_DETECTION;
         }
     }

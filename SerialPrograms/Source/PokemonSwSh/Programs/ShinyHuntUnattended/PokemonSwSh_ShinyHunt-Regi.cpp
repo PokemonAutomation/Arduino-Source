@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "PokemonSwSh_ShinyHunt-Regi.h"
 
 namespace PokemonAutomation{

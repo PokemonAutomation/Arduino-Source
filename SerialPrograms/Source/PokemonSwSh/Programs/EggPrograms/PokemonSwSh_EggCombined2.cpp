@@ -4,7 +4,8 @@
  *
  */
 
-#include "Common/SwitchFramework/FrameworkSettings.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh_EggHelpers.h"
 #include "PokemonSwSh_EggCombinedShared.h"
 #include "PokemonSwSh_EggCombined2.h"
@@ -18,7 +19,7 @@ EggCombined2_Descriptor::EggCombined2_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:EggCombined2",
         "Egg Combined 2",
-        "SwSh-Arduino/wiki/Basic:-EggCombined2",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggCombined2.md",
         "Fetch and hatch eggs at the same time. (Fastest - 1700 eggs/day for 5120-step)",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_31KB
@@ -45,7 +46,7 @@ EggCombined2::EggCombined2(const EggCombined2_Descriptor& descriptor)
         "8 * TICKS_PER_SECOND"
     )
     , EARLY_HATCH_SAFETY(
-        "<b>Safety Time:</b><br>Additional time added to the spinning.",
+        "<b>Early Hatch Safety:</b><br>Eggs will not hatch early by more than this period.",
         "5 * TICKS_PER_SECOND"
     )
     , HATCH_DELAY(
@@ -59,7 +60,7 @@ EggCombined2::EggCombined2(const EggCombined2_Descriptor& descriptor)
     PA_ADD_OPTION(BOXES_TO_HATCH);
     PA_ADD_OPTION(STEPS_TO_HATCH);
     PA_ADD_OPTION(FETCHES_PER_BATCH);
-    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_DIVIDER(m_advanced_options);
     PA_ADD_OPTION(SAFETY_TIME);
     PA_ADD_OPTION(EARLY_HATCH_SAFETY);
     PA_ADD_OPTION(HATCH_DELAY);
@@ -78,7 +79,7 @@ void EggCombined2::program(SingleSwitchProgramEnvironment& env){
 
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
     }

@@ -69,9 +69,6 @@ public:
 
 public:
     //  Basic Requests
-    uint32_t    protocol_version    ();
-    uint32_t    program_version     ();
-    uint8_t     program_id          ();
 
     //  Waits for all pending requests to finish.
     virtual void wait_for_all_requests() override;
@@ -84,7 +81,7 @@ public:
 public:
     //  For Command Implementations
 
-    using BotBase::try_issue_request;
+//    using BotBase::try_issue_request;
     using BotBase::issue_request;
     using BotBase::issue_request_and_wait;
 
@@ -130,40 +127,36 @@ private:
     bool try_issue_request(
         std::map<uint64_t, PendingRequest>::iterator& iter,
         const std::atomic<bool>* cancelled,
-        uint8_t send_type, void* send_params, size_t send_bytes,
+        const BotBaseRequest& request,
         bool silent_remove, size_t queue_limit
     );
     bool try_issue_command(
         std::map<uint64_t, PendingCommand>::iterator& iter,
         const std::atomic<bool>* cancelled,
-        uint8_t send_type, void* send_params, size_t send_bytes,
+        const BotBaseRequest& request,
         bool silent_remove, size_t queue_limit
     );
     bool issue_request(
         std::map<uint64_t, PendingRequest>::iterator& iter,
         const std::atomic<bool>* cancelled,
-        uint8_t send_type, void* send_params, size_t send_bytes,
+        const BotBaseRequest& request,
         bool silent_remove
     );
     bool issue_command(
         std::map<uint64_t, PendingCommand>::iterator& iter,
         const std::atomic<bool>* cancelled,
-        uint8_t send_type, void* send_params, size_t send_bytes,
+        const BotBaseRequest& request,
         bool silent_remove
     );
 
     virtual bool try_issue_request(
-        const std::atomic<bool>* cancelled,
-        uint8_t send_type, void* send_params, size_t send_bytes
+        const std::atomic<bool>* cancelled, const BotBaseRequest& request
     ) override;
     virtual void issue_request(
-        const std::atomic<bool>* cancelled,
-        uint8_t send_type, void* send_params, size_t send_bytes
+        const std::atomic<bool>* cancelled, const BotBaseRequest& request
     ) override;
-    virtual void issue_request_and_wait(
-        const std::atomic<bool>* cancelled,
-        uint8_t send_type, void* send_params, size_t send_bytes,
-        uint8_t recv_type, void* recv_params, size_t recv_bytes
+    virtual BotBaseMessage issue_request_and_wait(
+        const std::atomic<bool>* cancelled, const BotBaseRequest& request
     ) override;
 
 

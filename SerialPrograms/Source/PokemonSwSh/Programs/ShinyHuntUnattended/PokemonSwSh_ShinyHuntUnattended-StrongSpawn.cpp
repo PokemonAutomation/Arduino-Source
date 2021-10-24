@@ -5,10 +5,10 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh_ShinyHuntTools.h"
 #include "PokemonSwSh_ShinyHuntUnattended-StrongSpawn.h"
 
@@ -21,7 +21,7 @@ ShinyHuntUnattendedStrongSpawn_Descriptor::ShinyHuntUnattendedStrongSpawn_Descri
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntUnattendedStrongSpawn",
         "Shiny Hunt Unattended - Strong Spawn",
-        "SwSh-Arduino/wiki/Basic:-ShinyHuntUnattended-StrongSpawn",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-StrongSpawn.md",
         "Hunt for shiny strong spawns. Stop when a shiny is found.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB
@@ -55,7 +55,7 @@ void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env
         grip_menu_connect_go_home(env.console);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
-        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
     }
 
     const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
@@ -64,7 +64,7 @@ void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env
 
         //  If the update menu isn't there, these will get swallowed by the opening
         //  animation for the select user menu.
-        if (TOLERATE_SYSTEM_UPDATE_MENU_FAST){
+        if (ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST){
             pbf_press_button(env.console, BUTTON_A, 5, 35); //  Choose game
             pbf_press_dpad(env.console, DPAD_UP, 5, 0);     //  Skip the update window.
         }
@@ -74,10 +74,10 @@ void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env
 
         //  Switch to mashing ZR instead of A to get into the game.
         //  Mash your way into the game.
-        uint16_t duration = START_GAME_MASH;
-        if (START_GAME_REQUIRES_INTERNET){
+        uint16_t duration = GameSettings::instance().START_GAME_MASH;
+        if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET){
             //  Need to wait a bit longer for the internet check.
-            duration += START_GAME_INTERNET_CHECK_DELAY;
+            duration += ConsoleSettings::instance().START_GAME_INTERNET_CHECK_DELAY;
         }
         pbf_mash_button(env.console, BUTTON_ZR, duration);
 
@@ -105,7 +105,7 @@ void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env
 
     }
 
-    pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+    pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
     end_program_callback(env.console);
     end_program_loop(env.console);
 }

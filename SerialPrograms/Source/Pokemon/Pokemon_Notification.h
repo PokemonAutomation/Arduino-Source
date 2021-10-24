@@ -11,9 +11,9 @@
 #include <set>
 #include <chrono>
 #include <QString>
-#include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Tools/Logger.h"
 #include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "Pokemon_EncounterStats.h"
 #include "Pokemon_DataTypes.h"
@@ -24,44 +24,24 @@ namespace Pokemon{
 
 void send_encounter_notification(
     Logger& logger,
+    EventNotificationOption& settings_nonshiny,
+    EventNotificationOption& settings_shiny,
     const QString& program,
     const std::set<std::string>* slugs,
-    const ShinyDetectionResult& result, ScreenshotMode screenshot,
+    const ShinyDetectionResult& result,
     const StatsTracker* session_stats = nullptr,
     const EncounterFrequencies* frequencies = nullptr,
     const StatsTracker* alltime_stats = nullptr
 );
-class EncounterNotificationSender{
-public:
-    EncounterNotificationSender(
-        EncounterBotNotificationLevel notification_level,
-        std::chrono::seconds period = std::chrono::seconds(3600)
-    );
-
-    void send_notification(
-        Logger& logger,
-        const QString& program,
-        const std::set<std::string>* slugs,
-        const ShinyDetectionResult& result, ScreenshotMode screenshot,
-        const StatsTracker* session_stats = nullptr,
-        const EncounterFrequencies* frequencies = nullptr,
-        const StatsTracker* alltime_stats = nullptr
-    );
-
-private:
-    EncounterBotNotificationLevel m_notification_level;
-    std::chrono::seconds m_notification_period;
-    std::chrono::system_clock::time_point m_last_notification;
-};
-
-
 
 void send_catch_notification(
     Logger& logger,
+    EventNotificationOption& settings_catch_success,
+    EventNotificationOption& settings_catch_failed,
     const QString& program,
     const std::set<std::string>* pokemon_slugs,
     const std::string& ball_slug, int balls_used,
-    bool success, bool ping
+    bool success
 );
 
 

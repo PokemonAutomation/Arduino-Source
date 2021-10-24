@@ -8,7 +8,7 @@
  */
 
 #include <iostream>
-#include "Common/SwitchFramework/Switch_PushButtons.h"
+#include "Common/NintendoSwitch/NintendoSwitch_PushButtons.h"
 #include "ClientSource/Libraries/Utilities.h"
 
 namespace PokemonAutomation{

@@ -21,8 +21,7 @@ class SparkleDetector{
 public:
     SparkleDetector(
         const CellMatrix& matrix,
-        const FillGeometry& box,
-        double percentile = 0.85
+        const FillGeometry& box
     );
 
     bool is_ball();
@@ -32,7 +31,6 @@ public:
 private:
     FillGeometry m_box;
     CellMatrix m_matrix;
-    double m_percentile;
 
     std::multimap<int64_t, FillGeometry> m_regions;
     uint64_t m_radius_sqr;

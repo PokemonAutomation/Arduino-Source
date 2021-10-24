@@ -5,11 +5,11 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh_ShinyHuntTools.h"
 #include "PokemonSwSh_ShinyHuntUnattended-Regigigas2.h"
 
@@ -22,7 +22,7 @@ ShinyHuntUnattendedRegigigas2_Descriptor::ShinyHuntUnattendedRegigigas2_Descript
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntUnattendedRegigigas2",
         "Shiny Hunt Unattended - Regigigas2",
-        "SwSh-Arduino/wiki/Basic:-ShinyHuntUnattended-Regigigas2",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-Regigigas2.md",
         "A new version of the Regigigas program that is faster.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB
@@ -58,7 +58,7 @@ ShinyHuntUnattendedRegigigas2::ShinyHuntUnattendedRegigigas2(const ShinyHuntUnat
 
     PA_ADD_OPTION(REVERSAL_PP);
     PA_ADD_OPTION(START_TO_ATTACK_DELAY);
-    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_DIVIDER(m_advanced_options);
     PA_ADD_OPTION(ATTACK_TO_CATCH_DELAY);
     PA_ADD_OPTION(CATCH_TO_OVERWORLD_DELAY);
 }
@@ -66,7 +66,7 @@ ShinyHuntUnattendedRegigigas2::ShinyHuntUnattendedRegigigas2(const ShinyHuntUnat
 void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);
+        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
     }
@@ -108,10 +108,10 @@ void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env)
             close_game_if_overworld(env.console, false, 0);
         }
 
-        start_game_from_home(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 0, 0, false);
+        start_game_from_home(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 0, 0, false);
     }
 
-    pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+    pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
     end_program_callback(env.console);
     end_program_loop(env.console);
 }

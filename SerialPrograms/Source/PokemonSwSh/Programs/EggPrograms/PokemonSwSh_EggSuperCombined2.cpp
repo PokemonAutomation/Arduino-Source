@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/SwitchFramework/FrameworkSettings.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
 #include "PokemonSwSh/Programs/ReleaseHelpers.h"
 #include "PokemonSwSh_EggHelpers.h"
 #include "PokemonSwSh_EggCombinedShared.h"
@@ -19,7 +19,7 @@ EggSuperCombined2_Descriptor::EggSuperCombined2_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:EggSuperCombined2",
         "Egg Super-Combined 2",
-        "SwSh-Arduino/wiki/Basic:-EggSuperCombined2",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggSuperCombined2.md",
         "Fetch and hatch eggs at the same time. (Fastest - 1700 eggs/day for 5120-step)",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_31KB
@@ -70,7 +70,7 @@ EggSuperCombined2::EggSuperCombined2(const EggSuperCombined2_Descriptor& descrip
     PA_ADD_OPTION(BOXES_TO_HATCH);
     PA_ADD_OPTION(STEPS_TO_HATCH);
     PA_ADD_OPTION(FETCHES_PER_BATCH);
-    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_DIVIDER(m_advanced_options);
     PA_ADD_OPTION(SAFETY_TIME);
     PA_ADD_OPTION(EARLY_HATCH_SAFETY);
     PA_ADD_OPTION(HATCH_DELAY);
@@ -89,16 +89,16 @@ void EggSuperCombined2::program(SingleSwitchProgramEnvironment& env){
 
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
     }
 
     //  Mass Release
-    ssf_press_button2(env.console, BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
+    ssf_press_button2(env.console, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
     ssf_press_button1(env.console, BUTTON_A, 200);
     ssf_press_button1(env.console, BUTTON_R, 250);
-    release_boxes(env.console, BOXES_TO_RELEASE, BOX_SCROLL_DELAY, BOX_CHANGE_DELAY);
+    release_boxes(env.console, BOXES_TO_RELEASE, GameSettings::instance().BOX_SCROLL_DELAY, GameSettings::instance().BOX_CHANGE_DELAY);
 
     //  Skip Boxes
     for (uint8_t c = 0; c <= BOXES_TO_SKIP; c++){

@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "ShinyHuntUnattended-Regigigas2",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-ShinyHuntUnattended-Regigigas2",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-Regigigas2.md",
     "2-Description": "A new version of the Regigigas program that is faster.",
     "3-Parameters": [
         {

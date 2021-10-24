@@ -5,10 +5,17 @@
  */
 
 #include "ClientSource/Libraries/Logging.h"
-#include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "Logger.h"
 
 namespace PokemonAutomation{
+
+
+Logger& global_logger_tagged(){
+    static TaggedLogger logger(global_logger_raw(), "Global");
+    return logger;
+}
+
 
 TaggedLogger::TaggedLogger(Logger& logger, std::string tag)
     : m_logger(logger)
@@ -33,7 +40,7 @@ void TaggedLogger::log(const QString& msg, QColor color){
 
 SerialLogger::SerialLogger(Logger& logger, std::string tag)
     : TaggedLogger(logger, std::move(tag))
-    , PokemonAutomation::MessageLogger(PERSISTENT_SETTINGS().log_everything)
+    , PokemonAutomation::MessageLogger(GlobalSettings::instance().LOG_EVERYTHING)
 {}
 void SerialLogger::log(std::string msg){
     TaggedLogger::log(msg, "green");

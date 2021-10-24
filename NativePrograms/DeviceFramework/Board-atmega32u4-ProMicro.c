@@ -24,3 +24,12 @@ void onboard_led(bool on){
         PORTD |= (1 << 5);
     }
 }
+void flicker_led(void){
+    if (PORTB & 1){
+        PORTB &= ~(1 << 0);
+        PORTD |= (1 << 5);
+    }else{
+        PORTB |= (1 << 0);
+        PORTD &= ~(1 << 5);
+    }
+}

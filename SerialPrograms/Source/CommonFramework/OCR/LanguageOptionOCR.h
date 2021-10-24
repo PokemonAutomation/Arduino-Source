@@ -28,7 +28,7 @@ public:
     virtual void load_json(const QJsonValue& json) override;
     virtual QJsonValue to_json() const override;
 
-    virtual bool is_valid() const override;
+    virtual QString check_validity() const override;
     virtual void restore_defaults() override;
 
     virtual ConfigOptionUI* make_ui(QWidget& parent) override;

@@ -120,8 +120,8 @@ struct PlayerState{
 //     \/
 //     X
 
-struct Path{
-    uint8_t path_type = 0;
+struct PathMap{
+    int8_t path_type = -1;
 //    PokemonType boss;
     PokemonType mon3[4] = {PokemonType::NONE, PokemonType::NONE, PokemonType::NONE, PokemonType::NONE};
     PokemonType mon2[4] = {PokemonType::NONE, PokemonType::NONE, PokemonType::NONE, PokemonType::NONE};
@@ -140,11 +140,13 @@ struct GlobalState{
     bool adventure_started = false;
 
     std::string boss;
+    PathMap path;
+    int8_t path_side = -1;  //  -1 = unknown, 0 = left, 1 = right
+
     uint8_t wins = 0;
     int8_t lives_left = -1; //  -1 means unknown
-    PlayerState players[4];
 
-    Path path;
+    PlayerState players[4];
 
     //  Battle State
     std::set<std::string> opponent;

@@ -4,10 +4,12 @@
  *
  */
 
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_DenMonReader.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
 #include "PokemonSwSh_DenTools.h"
@@ -22,7 +24,7 @@ DenRoller_Descriptor::DenRoller_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:DenRoller",
         "Den Roller",
-        "SwSh-Arduino/wiki/Basic:-DenRoller",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DenRoller.md",
         "Roll den to the N'th day, SR and repeat.",
         FeedbackType::OPTIONAL_,
         PABotBaseLevel::PABOTBASE_12KB
@@ -46,6 +48,11 @@ DenRoller::DenRoller(const DenRoller_Descriptor& descriptor)
         STRING_POKEMON + " is set since the program will be watching it for you.",
         "5 * TICKS_PER_SECOND"
     )
+    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true, ImageAttachmentMode::JPG)
+    , NOTIFICATIONS({
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_PROGRAM_ERROR,
+    })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -60,8 +67,9 @@ DenRoller::DenRoller(const DenRoller_Descriptor& descriptor)
     PA_ADD_OPTION(FILTER);
     PA_ADD_OPTION(CATCHABILITY);
     PA_ADD_OPTION(VIEW_TIME);
+    PA_ADD_OPTION(NOTIFICATIONS);
 
-    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_DIVIDER(m_advanced_options);
     PA_ADD_OPTION(READ_DELAY);
 }
 
@@ -79,10 +87,10 @@ struct DenRoller::Stats : public StatsTracker{
         m_display_order.emplace_back(Stat("Errors"));
         m_display_order.emplace_back(Stat("Matches"));
     }
-    uint64_t& rolls;
-    uint64_t& skips;
-    uint64_t& errors;
-    uint64_t& matches;
+    std::atomic<uint64_t>& rolls;
+    std::atomic<uint64_t>& skips;
+    std::atomic<uint64_t>& errors;
+    std::atomic<uint64_t>& matches;
 };
 std::unique_ptr<StatsTracker> DenRoller::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -107,13 +115,14 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env){
         grip_menu_connect_go_home(env.console);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
-        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
     }
 
     rollback_date_from_home(env.console, SKIPS);
-    resume_game_front_of_den_nowatts(env.console, TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+    resume_game_front_of_den_nowatts(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
 
 
+    QImage screen;
     while (true){
         roll_den(env.console, 0, 0, SKIPS, CATCHABILITY);
 
@@ -135,21 +144,21 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env){
             }
             env.console.botbase().wait_for_all_requests();
 
-            QImage screen = env.console.video().snapshot();
+            screen = env.console.video().snapshot();
             DenMonReadResults results = reader.read(screen);
 
             //  Give user time to look at the mon.
             if (FILTER == 0){
                 //  No filter enabled. Keep going.
                 pbf_wait(env.console, VIEW_TIME);
-            }else if (results.slugs.slugs.empty() || results.slugs.slugs.begin()->first > 50){
+            }else if (results.slugs.results.empty()){
                 //  No detection. Keep going.
                 stats.errors++;
-                dump_image(env.console, screen, "ReadDenMon");
+                dump_image(env.console, "", "ReadDenMon", screen);
                 pbf_wait(env.console, VIEW_TIME);
             }else{
                 //  Check if we got what we wanted.
-                for (const auto& item : results.slugs.slugs){
+                for (const auto& item : results.slugs.results){
                     if (item.second == desired_slug){
                         stats.matches++;
                         goto StopProgram;
@@ -160,18 +169,25 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env){
         env.update_stats();
 
         //  Add a little extra wait time since correctness matters here.
-        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE - 10);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE - 10);
 
         rollback_date_from_home(env.console, SKIPS);
 //        reset_game_from_home(TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
         reset_game_from_home_with_inference(
             env, env.console,
-            TOLERATE_SYSTEM_UPDATE_MENU_SLOW
+            ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
         );
     }
 
 StopProgram:
     env.update_stats();
+    send_program_finished_notification(
+        env.logger(), NOTIFICATION_PROGRAM_FINISH,
+        descriptor().display_name(),
+        "Found a match!",
+        stats.to_str(),
+        screen, false
+    );
     end_program_callback(env.console);
     end_program_loop(env.console);
 }

@@ -8,8 +8,8 @@
 #define PokemonAutomation_PokemonSwSh_Catchability_H
 
 #include <QComboBox>
-#include "Common/PokemonSwSh/PokemonSettings.h"
 #include "CommonFramework/Options/ConfigOption.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

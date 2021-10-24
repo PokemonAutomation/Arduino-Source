@@ -10,7 +10,7 @@
 #include <string>
 #include "CommonFramework/Options/StringSelectOption.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
+#include "CommonFramework/ImageMatch/ExactImageDictionaryMatcher.h"
 #include "Pokemon/Inference/Pokemon_PokeballNameReader.h"
 
 namespace PokemonAutomation{
@@ -20,6 +20,9 @@ using namespace Pokemon;
 
 
 class BattleBallReader{
+    static const double MAX_ALPHA;
+    static const double ALPHA_SPREAD;
+
 public:
     BattleBallReader(
         ConsoleHandle& console,
@@ -31,7 +34,7 @@ public:
     int read_quantity(const QImage& screen) const;
 
 private:
-    const ImageMatch::ExactImageMatcher& m_matcher;
+    const ImageMatch::ExactImageDictionaryMatcher& m_matcher;
     const PokeballNameReader& m_name_reader;
     Language m_language;
     ConsoleHandle& m_console;

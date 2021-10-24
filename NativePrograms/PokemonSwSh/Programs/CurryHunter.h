@@ -5,7 +5,7 @@
  */
 
 
-#include "Common/SwitchFramework/SwitchControllerDefs.h"
+#include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 
 //  Wait this long for the Pokemon to walk up to you.
 extern const uint16_t WALK_UP_DELAY;

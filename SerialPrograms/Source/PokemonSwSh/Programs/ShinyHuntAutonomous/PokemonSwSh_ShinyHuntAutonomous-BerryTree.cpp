@@ -5,14 +5,15 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
-#include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
@@ -28,7 +29,7 @@ ShinyHuntAutonomousBerryTree_Descriptor::ShinyHuntAutonomousBerryTree_Descriptor
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousBerryTree",
         "Shiny Hunt Autonomous - Berry Tree",
-        "SwSh-Arduino/wiki/Advanced:-ShinyHuntAutonomous-BerryTree",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-BerryTree.md",
         "Automatically hunt for shiny berry tree " + STRING_POKEMON + " using video feedback.",
         FeedbackType::REQUIRED,
         PABotBaseLevel::PABOTBASE_12KB
@@ -41,6 +42,15 @@ ShinyHuntAutonomousBerryTree::ShinyHuntAutonomousBerryTree(const ShinyHuntAutono
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
     , ENCOUNTER_BOT_OPTIONS(false, true)
+    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
+    , NOTIFICATIONS({
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_CATCH_SUCCESS,
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_CATCH_FAILED,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_PROGRAM_ERROR,
+    })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -54,8 +64,9 @@ ShinyHuntAutonomousBerryTree::ShinyHuntAutonomousBerryTree(const ShinyHuntAutono
 
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
+    PA_ADD_OPTION(NOTIFICATIONS);
 
-    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_DIVIDER(m_advanced_options);
     PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
 }
 
@@ -71,7 +82,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousBerryTree::make_stats() const{
 void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
-        resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
     }
@@ -89,7 +100,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env){
 
     uint8_t year = MAX_YEAR;
     while (true){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
         home_roll_date_enter_game_autorollback(env.console, &year);
 //        home_to_date_time(env.console, true, true);
 //        neutral_date_skip(env.console);
@@ -105,7 +116,6 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env){
                 env, env.console,
                 [](const BotBaseContext& context){
                     pbf_mash_button(context, BUTTON_A, 60 * TICKS_PER_SECOND);
-                    context.botbase().wait_for_all_requests();
                 },
                 {
                     &battle_menu_detector,
@@ -147,16 +157,23 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env){
 //        pbf_mash_button(env.console, BUTTON_B, 10 * TICKS_PER_SECOND);
     }
 
-    pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+    pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
 
     home_to_date_time(env.console, false, false);
     pbf_press_button(env.console, BUTTON_A, 5, 5);
     pbf_press_button(env.console, BUTTON_A, 5, 10);
-    pbf_press_button(env.console, BUTTON_HOME, 10, SETTINGS_TO_HOME_DELAY);
+    pbf_press_button(env.console, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
 
     if (!GO_HOME_WHEN_DONE){
-        pbf_press_button(env.console, BUTTON_HOME, 10, HOME_TO_GAME_DELAY);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().HOME_TO_GAME_DELAY);
     }
+
+    send_program_finished_notification(
+        env.logger(), NOTIFICATION_PROGRAM_FINISH,
+        descriptor().display_name(),
+        "",
+        stats.to_str()
+    );
 
     end_program_callback(env.console);
     end_program_loop(env.console);

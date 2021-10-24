@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "BeamReset",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-BeamReset",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/BeamReset.md",
     "2-Description": "Reset a beam until you see a purple beam.",
     "3-Parameters": [
         {

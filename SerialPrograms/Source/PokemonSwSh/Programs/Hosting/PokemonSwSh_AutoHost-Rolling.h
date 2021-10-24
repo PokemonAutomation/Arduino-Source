@@ -12,9 +12,10 @@
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Options/RandomCodeOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
-#include "NintendoSwitch/Options/FriendCodeListOption.h"
+#include "NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 #include "PokemonSwSh/Options/PokemonSwSh_Catchability.h"
@@ -58,7 +59,8 @@ private:
 
     BooleanCheckBoxOption ALTERNATE_GAMES;
 
-    AutoHostNotificationOption NOTIFICATIONS;
+    AutoHostNotificationOption HOSTING_NOTIFICATIONS;
+    EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_internet_settings;
     TimeExpressionOption<uint16_t> CONNECT_TO_INTERNET_DELAY;

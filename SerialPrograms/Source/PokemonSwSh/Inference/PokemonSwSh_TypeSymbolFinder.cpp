@@ -5,7 +5,9 @@
  */
 
 #include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/CommonFilters.h"
+#include "CommonFramework/Inference/ImageTools.h"
 #include "PokemonSwSh_TypeSymbolFinder.h"
 
 #include <iostream>
@@ -43,7 +45,7 @@ size_t distance_sqr(const ImagePixelBox& a, const ImagePixelBox& b){
 }
 
 
-std::pair<double, PokemonType> match_type_symbol(const QImage& image){
+std::pair<double, PokemonType> match_type_symbol(const QImage& image, int threshold, CellMatrix::ObjectID id){
     int width = image.width();
     int height = image.height();
     if (width * height < 100){
@@ -60,25 +62,35 @@ std::pair<double, PokemonType> match_type_symbol(const QImage& image){
         return {1.0, PokemonType::NONE};
     }
 
-//    image.save("test-" + QString::number(id) + ".png");
+//    image.save("test-" + QString::number(threshold) + "-" + QString::number(id) + ".png");
 
 //    std::map<double, PokemonType> rank;
-    double best_score = 0.20;
+    double best_score = 0.4;
     PokemonType best_type = PokemonType::NONE;
     for (const auto& item : all_type_sprites()){
-        double rmsd_ratio = item.second.matcher().rmsd_ratio_with(image);
-//        cout << item.second.slug() << ": " << rmsd_ratio << endl;
+//        if (threshold != 700 || id != 55){
+//            continue;
+//        }
+        double rmsd_alpha = item.second.matcher().diff(image);
 
-#if 1
+//        item.second.matcher().m_image.save("sprite.png");
+//        cout << item.second.slug() << ": " << rmsd_alpha << endl;
+
+#if 0
         //  Handicap fairy due to white and pink being too similar in color and
         //  false positiving on the background.
         if (item.first == PokemonType::FAIRY){
             rmsd_ratio *= 1.5;
         }
+
+        //  Bonus for dark because or large contrast.
+        if (item.first == PokemonType::DARK){
+            rmsd_ratio *= 0.8;
+        }
 #endif
 
-        if (best_score > rmsd_ratio){
-            best_score = rmsd_ratio;
+        if (best_score > rmsd_alpha){
+            best_score = rmsd_alpha;
             best_type = item.first;
 //            cout << item.second.slug() << ": " << stats.stddev << endl;
         }
@@ -137,7 +149,7 @@ void find_symbol_candidates(
             item.second.box.min_x, item.second.box.min_y,
             item.second.box.width(), item.second.box.height()
         );
-        std::pair<double, PokemonType> result = match_type_symbol(img);
+        std::pair<double, PokemonType> result = match_type_symbol(img, min_rgb_brightness, item.first);
         if (result.second != PokemonType::NONE){
             candidates.emplace(
                 result.first,
@@ -194,6 +206,30 @@ std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_symbols(
 }
 
 
+
+
+
+void test_find_symbols(
+    ProgramEnvironment& env,
+    VideoOverlay& overlay,
+    const ImageFloatBox& box,
+    const QImage& screen, double max_area_ratio
+){
+    QImage image = extract_box(screen, box);
+
+    std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_symbols(image, 0.20);
+
+
+    std::deque<InferenceBoxScope> hits;
+//    hits.clear();
+    cout << "---------------" << endl;
+    for (const auto& item : candidates){
+        cout << get_type_slug(item.second.first) << ": " << item.first << endl;
+        hits.emplace_back(overlay, translate_to_parent(screen, box, item.second.second), Qt::green);
+    }
+
+    env.wait_for(std::chrono::seconds(10));
+}
 
 
 

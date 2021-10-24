@@ -205,6 +205,8 @@ ShinyDetectionResult detect_shiny_battle(
     StatAccumulatorI32 throttle_stats;
 
     StandardBattleMenuDetector menu(battle_settings.den);
+    std::deque<InferenceBoxScope> overlay_boxes;
+    menu.make_overlays(overlay_boxes, overlay);
     ShinyEncounterDetector detector(
         logger,
         overlay,
@@ -244,7 +246,7 @@ ShinyDetectionResult detect_shiny_battle(
 
         if (throttler.end_iteration(env)){
             no_detection = true;
-            dump_image(logger, screen, "BattleMenu");
+            dump_image(logger, "", "BattleMenu", screen);
             break;
         }
         auto time4 = std::chrono::system_clock::now();

@@ -7,7 +7,7 @@
 #include <QtGlobal>
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
-#include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/Globals.h"
 #include "StringNormalization.h"
 #include "TextMatcher.h"
 #include "SmallDictionaryMatcher.h"
@@ -19,7 +19,7 @@ namespace OCR{
 
 SmallDictionaryMatcher::SmallDictionaryMatcher(const QString& json_offset, bool first_only)
     : SmallDictionaryMatcher(
-        read_json_file(PERSISTENT_SETTINGS().resource_path + json_offset).object(),
+        read_json_file(RESOURCE_PATH() + json_offset).object(),
         first_only
     )
 {}

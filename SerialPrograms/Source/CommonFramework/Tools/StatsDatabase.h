@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 
 class StatLine{
 public:
-    StatLine(const StatsTracker& tracker);
+    StatLine(StatsTracker& tracker);
     StatLine(const std::string& line);
 
     const std::string& stats() const{ return m_stats; }
@@ -30,7 +30,7 @@ private:
 
 class StatList{
 public:
-    void operator+=(const StatsTracker& tracker);
+    void operator+=(StatsTracker& tracker);
     void operator+=(const std::string& line);
 
     size_t size() const{ return m_list.size(); }
@@ -60,7 +60,7 @@ public:
     static bool update_file(
         const QString& filepath,
         const std::string& identifier,
-        const StatsTracker& tracker
+        StatsTracker& tracker
     );
 
 private:

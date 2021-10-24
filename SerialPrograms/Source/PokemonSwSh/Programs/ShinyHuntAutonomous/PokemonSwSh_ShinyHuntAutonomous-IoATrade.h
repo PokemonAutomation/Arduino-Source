@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Options/SectionDivider.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
@@ -40,12 +41,14 @@ private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     TouchDateIntervalOption TOUCH_DATE_INTERVAL;
 
-    EncounterBotNotifications NOTIFICATION_LEVEL;
-    EncounterBotScreenshotOption NOTIFICATION_SCREENSHOT;
+    BooleanCheckBoxOption VIDEO_ON_SHINY;
+    EventNotificationOption NOTIFICATION_NONSHINY;
+    EventNotificationOption NOTIFICATION_SHINY;
+//    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
+    EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;
     TimeExpressionOption<uint16_t> MASH_TO_TRADE_DELAY;
-    BooleanCheckBoxOption VIDEO_ON_SHINY;
     BooleanCheckBoxOption RUN_FROM_EVERYTHING;
 };
 

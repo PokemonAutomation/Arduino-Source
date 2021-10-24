@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "GodEggDuplication",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-GodEggDuplication",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/GodEggDuplication.md",
     "2-Description": "Mass duplicate Pokémon with the God Egg.",
     "3-Parameters": [
         {

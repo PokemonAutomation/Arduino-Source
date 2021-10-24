@@ -7,9 +7,9 @@
 #include <functional>
 #include <deque>
 #include "Common/Cpp/Exception.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSwShMisc.h"
+#include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "ClientSource/Connection/BotBase.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_Misc.h"
 #include "VirtualSwitchController.h"
 
 #include <iostream>
@@ -188,16 +188,13 @@ void VirtualController::thread_loop(){
                 break;
             }
             try{
-                pabb_controller_state params;
-                params.button = buttons;
-                params.dpad = dpad;
-                params.dpad = dpad;
-                params.left_joystick_x = left_x;
-                params.left_joystick_y = left_y;
-                params.right_joystick_x = right_x;
-                params.right_joystick_y = right_y;
-                params.ticks = m_granularity;
-                m_botbase.try_send_request<PABB_MSG_CONTROLLER_STATE>(params);
+                DeviceRequest_controller_state request(
+                    buttons, dpad,
+                    left_x, left_y,
+                    right_x, right_y,
+                    m_granularity
+                );
+                m_botbase.try_send_request(request);
             }catch (PokemonAutomation::CancelledException&){
             }catch (const StringException&){
             }

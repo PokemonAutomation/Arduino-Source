@@ -78,8 +78,8 @@ QJsonValue LanguageOCR::to_json() const{
     return QJsonValue(QString::fromStdString(language_data(m_case_list[m_current].first).code));
 }
 
-bool LanguageOCR::is_valid() const{
-    return m_case_list[m_current].second;
+QString LanguageOCR::check_validity() const{
+    return m_case_list[m_current].second ? QString() : "Language data is not available.";
 }
 void LanguageOCR::restore_defaults(){
     m_current = m_default;

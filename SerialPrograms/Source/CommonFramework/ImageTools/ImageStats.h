@@ -18,7 +18,13 @@ struct ImageStats{
     FloatPixel stddev;
 };
 
+
+//  Pixels with alpha < 128 are ignored.
+FloatPixel image_average(const QImage& image);
+FloatPixel image_stddev(const QImage& image);
 ImageStats image_stats(const QImage& image);
+
+
 ImageStats image_border_stats(const QImage& image);
 
 

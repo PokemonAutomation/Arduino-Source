@@ -61,18 +61,6 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    void read(
-        QJsonArray& output,
-        Logger* logger,
-        QImage image
-    ) const;
-    void dump_images(
-        const std::vector<std::string>& expected,
-        size_t index,
-        QImage image
-    ) const;
-
-private:
     IVCheckerReader m_reader;
 
     OCR::LanguageOCR LANGUAGE;

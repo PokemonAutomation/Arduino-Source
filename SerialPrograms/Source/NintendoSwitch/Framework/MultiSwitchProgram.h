@@ -89,7 +89,7 @@ private:
 
 
 
-class MultiSwitchProgramWidget : public RunnableSwitchProgramWidget{
+class MultiSwitchProgramWidget final : public RunnableSwitchProgramWidget{
 public:
     static MultiSwitchProgramWidget* make(
         QWidget& parent,

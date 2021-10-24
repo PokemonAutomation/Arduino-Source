@@ -7,15 +7,15 @@
 #ifndef PokemonAutomation_PokemonSwSh_AutoHostMultiGame_H
 #define PokemonAutomation_PokemonSwSh_AutoHostMultiGame_H
 
-#include "Common/PokemonSwSh/PokemonSettings.h"
 #include "CommonFramework/Options/SectionDivider.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Options/RandomCodeOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
-#include "NintendoSwitch/Options/FriendCodeListOption.h"
+#include "NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 #include "PokemonSwSh/Options/PokemonSwSh_MultiHostTable.h"
@@ -41,15 +41,6 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    void run_autohost(
-        SingleSwitchProgramEnvironment& env,
-        const MultiHostTableOption::GameSlot& game,
-        uint8_t accept_FR_slot,
-        uint16_t lobby_wait_delay,
-        Catchability catchability
-    ) const;
-
-private:
     StartInGripOrClosedOption START_IN_GRIP_MENU;
     TouchDateIntervalOption TOUCH_DATE_INTERVAL;
 
@@ -59,7 +50,8 @@ private:
     MultiHostTableOption GAME_LIST;
     SimpleIntegerOption<uint8_t> FR_FORWARD_ACCEPT;
 
-    AutoHostNotificationOption NOTIFICATIONS;
+    AutoHostNotificationOption HOSTING_NOTIFICATIONS;
+    EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_internet_settings;
     TimeExpressionOption<uint16_t> CONNECT_TO_INTERNET_DELAY;

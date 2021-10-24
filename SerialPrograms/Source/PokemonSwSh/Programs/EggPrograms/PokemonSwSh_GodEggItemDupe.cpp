@@ -5,10 +5,11 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShEggRoutines.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_Misc.h"
 #include "PokemonSwSh/Programs/ReleaseHelpers.h"
 #include "PokemonSwSh_GodEggItemDupe.h"
 
@@ -21,7 +22,7 @@ GodEggItemDupe_Descriptor::GodEggItemDupe_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:GodEggItemDupe",
         "God Egg Item Duplication",
-        "SwSh-Arduino/wiki/Basic:-GodEggDupe",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/GodEggItemDuplication.md",
         "Mass duplicate items with the God Egg.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_31KB
@@ -73,7 +74,7 @@ void GodEggItemDupe::collect_godegg(
     ssf_press_button1(context, BUTTON_B, 100);
 
     //  "Please select a Pokemon to swap from your party."
-    ssf_press_button1(context, BUTTON_B, MENU_TO_POKEMON_DELAY);
+    ssf_press_button1(context, BUTTON_B, GameSettings::instance().MENU_TO_POKEMON_DELAY);
 
     //  Select the party member.
     for (uint8_t c = 0; c < party_slot; c++){
@@ -83,13 +84,13 @@ void GodEggItemDupe::collect_godegg(
     pbf_mash_button(context, BUTTON_B, 500);
 
     //  Enter box
-    ssf_press_button2(context, BUTTON_X, OVERWORLD_TO_MENU_DELAY, 20);
+    ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
     if (map_to_pokemon){
         ssf_press_dpad2(context, DPAD_UP, 20, 10);
         ssf_press_dpad2(context, DPAD_RIGHT, 20, 10);
     }
-    ssf_press_button2(context, BUTTON_A, MENU_TO_POKEMON_DELAY, 10);
-    ssf_press_button2(context, BUTTON_R, POKEMON_TO_BOX_DELAY, 10);
+    ssf_press_button2(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY, 10);
+    ssf_press_button2(context, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY, 10);
 
     if (DETACH_BEFORE_RELEASE){
         //  Detach item
@@ -162,13 +163,13 @@ void GodEggItemDupe::run_program(SingleSwitchProgramEnvironment& env, uint16_t a
 void GodEggItemDupe::program(SingleSwitchProgramEnvironment& env){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
     }
 
     run_program(env, MAX_FETCH_ATTEMPTS);
-    ssf_press_button2(env.console, BUTTON_HOME, GAME_TO_HOME_DELAY_SAFE, 10);
+    ssf_press_button2(env.console, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
 
     end_program_callback(env.console);
     end_program_loop(env.console);

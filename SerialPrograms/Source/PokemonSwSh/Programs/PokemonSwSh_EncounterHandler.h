@@ -26,7 +26,7 @@ public:
         ProgramEnvironment& env,
         ConsoleHandle& console,
         Language language,
-        const EncounterBotCommonSettings& settings,
+        EncounterBotCommonOptions& settings,
         ShinyHuntTracker& session_stats
     );
 
@@ -48,13 +48,14 @@ private:
     const QString& m_program_name;
     ProgramEnvironment& m_env;
     ConsoleHandle& m_console;
+    bool m_enable_notifications;
     const Language m_language;
-    const EncounterBotCommonSettings& m_settings;
+    EncounterBotCommonOptions& m_settings;
 
     EncounterFrequencies m_frequencies;
     ShinyHuntTracker& m_session_stats;
 
-    EncounterNotificationSender m_notification_sender;
+//    EncounterNotificationSender m_notification_sender;
 };
 
 

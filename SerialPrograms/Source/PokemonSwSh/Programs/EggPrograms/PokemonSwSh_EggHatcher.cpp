@@ -4,10 +4,10 @@
  *
  */
 
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShEggRoutines.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
 #include "PokemonSwSh_EggHelpers.h"
 #include "PokemonSwSh_EggHatcher.h"
 
@@ -20,8 +20,8 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:EggHatcher",
         "Egg Hatcher",
-        "SwSh-Arduino/wiki/Basic:-EggHatcher",
-        "Fetch eggs without hatching them.",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggHatcher.md",
+        "Hatch eggs from boxes.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_31KB
     )
@@ -34,19 +34,22 @@ void withdraw_column(const BotBaseContext& context, uint8_t column){
     party_to_column(context, column);
     pickup_column(context, false);
     column_to_party(context, column);
-    ssf_press_button1(context, BUTTON_A, BOX_PICKUP_DROP_DELAY);
+    ssf_press_button1(context, BUTTON_A, GameSettings::instance().BOX_PICKUP_DROP_DELAY);
     box_to_menu(context);
 }
 void deposit_column(const BotBaseContext& context, uint8_t column){
     menu_to_box(context, true);
     pickup_column(context, true);
     party_to_column(context, column);
-    ssf_press_button1(context, BUTTON_A, BOX_PICKUP_DROP_DELAY);
+    ssf_press_button1(context, BUTTON_A, GameSettings::instance().BOX_PICKUP_DROP_DELAY);
     box_to_menu(context);
 }
 uint8_t swap_party(const BotBaseContext& context, uint8_t column){
     menu_to_box(context, true);
     pickup_column(context, true);
+
+    uint16_t BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY;
+    uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY;
 
     //  Move to column.
     party_to_column(context, column);
@@ -58,7 +61,7 @@ uint8_t swap_party(const BotBaseContext& context, uint8_t column){
         ssf_press_dpad1(context, DPAD_RIGHT, BOX_SCROLL_DELAY);
     }else{
         column = 0;
-        ssf_press_button1(context, BUTTON_R, BOX_CHANGE_DELAY);
+        ssf_press_button1(context, BUTTON_R, GameSettings::instance().BOX_CHANGE_DELAY);
         ssf_press_dpad1(context, DPAD_RIGHT, BOX_SCROLL_DELAY);
         ssf_press_dpad1(context, DPAD_RIGHT, BOX_SCROLL_DELAY);
     }
@@ -98,7 +101,7 @@ EggHatcher::EggHatcher(const EggHatcher_Descriptor& descriptor)
 
     PA_ADD_OPTION(BOXES_TO_HATCH);
     PA_ADD_OPTION(STEPS_TO_HATCH);
-    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_DIVIDER(m_advanced_options);
     PA_ADD_OPTION(SAFETY_TIME);
     PA_ADD_OPTION(HATCH_DELAY);
 }
@@ -109,7 +112,7 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env){
 
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
     }
@@ -118,7 +121,7 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env){
     for (uint8_t box = 0; box < BOXES_TO_HATCH; box++){
         for (uint8_t column = 0; column < 6; column++){
             //  Get eggs from box.
-            pbf_press_button(env.console, BUTTON_X, 20, OVERWORLD_TO_MENU_DELAY - 20);
+            pbf_press_button(env.console, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY - 20);
             if (party_is_empty){
                 withdraw_column(env.console, column);
                 party_is_empty = false;
@@ -147,12 +150,14 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env){
         }
     }
 
+    uint16_t OVERWORLD_TO_MENU_DELAY = GameSettings::instance().OVERWORLD_TO_MENU_DELAY;
+
     if (!party_is_empty){
         pbf_press_button(env.console, BUTTON_X, 20, OVERWORLD_TO_MENU_DELAY - 20);
         deposit_column(env.console, 5);
         pbf_press_button(env.console, BUTTON_X, 20, OVERWORLD_TO_MENU_DELAY - 20);
     }
-    pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE - 10);
+    pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE - 10);
 
     end_program_callback(env.console);
     end_program_loop(env.console);

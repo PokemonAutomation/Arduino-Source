@@ -41,7 +41,7 @@ MultiSwitchSystemFactory::MultiSwitchSystemFactory(
     , m_max_switches(std::min(max_switches, (size_t)MAX_SWITCHES))
     , m_active_switches(0)
 {
-    load_json(json);
+    MultiSwitchSystemFactory::load_json(json);
     if (m_switches.size() < m_min_switches){
         resize(m_min_switches);
     }
@@ -95,17 +95,19 @@ const QSerialPortInfo* MultiSwitchSystemFactory::port(size_t index) const{
 //    return m_switches[index]->camera();
 //}
 
-SwitchSetup* MultiSwitchSystemFactory::make_ui(QWidget& parent, Logger& logger){
-    return new MultiSwitchSystem(parent, *this, logger);
+SwitchSetup* MultiSwitchSystemFactory::make_ui(QWidget& parent, Logger& logger, uint64_t program_id){
+    return new MultiSwitchSystem(parent, *this, logger, program_id);
 }
 
 
 MultiSwitchSystem::MultiSwitchSystem(
     QWidget& parent,
     MultiSwitchSystemFactory& factory,
-    Logger& logger
+    Logger& logger,
+    uint64_t program_id
 )
     : SwitchSetup(parent, factory)
+    , m_program_id(program_id)
     , m_factory(factory)
     , m_logger(logger)
     , m_videos(nullptr)
@@ -154,7 +156,7 @@ void MultiSwitchSystem::redraw_videos(size_t count){
     m_factory.resize(count);
     for (size_t c = 0; c < m_factory.m_active_switches; c++){
         const auto& item = m_factory.m_switches[c];
-        m_switches.emplace_back((SwitchSystem*)item->make_ui(*this, m_logger));
+        m_switches.emplace_back((SwitchSystem*)item->make_ui(*this, m_logger, m_program_id));
     }
 
     m_videos = new QWidget(this);

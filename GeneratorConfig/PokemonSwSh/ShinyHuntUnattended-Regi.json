@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "ShinyHuntUnattended-Regi",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-ShinyHuntUnattended-Regi",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-Regi.md",
     "2-Description": "Hunt for shiny Regis. Stop when a shiny is found.",
     "3-Parameters": [
         {

@@ -14,14 +14,11 @@ namespace PokemonAutomation{
 namespace ImageMatch{
 
 
-//  Compute average of all 4 components (ARGB).
-QRgb pixel_average(const QImage& image);
-
 //  Compute average of all 4 components.
 //    - The two images must be the same dimensions.
 //    - The alpha channels of "reference" is used to indicate which parts to ignore.
 //      0 means background. 255 means object. No other values are valid.
-QRgb pixel_average(const QImage& image, const QImage& alpha_mask);
+FloatPixel pixel_average(const QImage& image, const QImage& alpha_mask);
 
 
 //  Multiply every pixel by "multiplier". Alpha channels are ignored.
@@ -59,8 +56,6 @@ double pixel_RMSD(const QImage& reference, const QImage& image, QRgb background)
 //
 double pixel_RMSD_masked(const QImage& reference, const QImage& image);
 
-
-double pixel_max_possible_RMSD(const QImage& reference);
 
 
 }

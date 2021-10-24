@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "ShinyHuntUnattended-IoATrade",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-ShinyHuntUnattended-IoATrade",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-IoATrade.md",
     "2-Description": "Hunt for shiny Isle of Armor trade. Stop when a shiny is found.",
     "3-Parameters": [
         {

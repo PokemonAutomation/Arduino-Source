@@ -39,7 +39,7 @@ NameSelectWidget::NameSelectWidget(
             this->addItem(
                 get_pokemon_name(slug).display_name()
             );
-            global_logger().log("Missing sprite for: " + slug, "red");
+            global_logger_tagged().log("Missing sprite for: " + slug, "red");
         }else{
             this->addItem(
                 sprites->icon(),

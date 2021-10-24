@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "SurpriseTrade",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-SurpriseTrade",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/SurpriseTrade.md",
     "2-Description": "Surprise trade away boxes of Pokémon.",
     "3-Parameters": [
         {

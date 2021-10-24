@@ -4,13 +4,13 @@
  *
  */
 
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/Inference/InferenceThrottler.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh_StartGame.h"
 
 namespace PokemonAutomation{
@@ -26,7 +26,7 @@ void enter_loading_game(
 ){
     //  Wait for game to load.
     {
-        std::chrono::milliseconds timeout(START_GAME_WAIT * (1000 / TICKS_PER_SECOND));
+        std::chrono::milliseconds timeout(GameSettings::instance().START_GAME_WAIT * (1000 / TICKS_PER_SECOND));
 
         InferenceBoxScope box0(console, 0.2, 0.2, 0.6, 0.1);
         InferenceBoxScope box1(console, 0.2, 0.7, 0.6, 0.1);
@@ -62,12 +62,12 @@ void enter_loading_game(
     }
 
     env.log("enter_loading_game(): Game Loaded. Entering game...", "purple");
-    enter_game(console, backup_save, ENTER_GAME_MASH, 0);
+    enter_game(console, backup_save, GameSettings::instance().ENTER_GAME_MASH, 0);
     console.botbase().wait_for_all_requests();
 
     //  Wait to enter game.
     {
-        std::chrono::milliseconds timeout(ENTER_GAME_WAIT * (1000 / TICKS_PER_SECOND));
+        std::chrono::milliseconds timeout(GameSettings::instance().ENTER_GAME_WAIT * (1000 / TICKS_PER_SECOND));
 
         InferenceBoxScope box(console, 0.2, 0.2, 0.6, 0.6);
 
@@ -120,7 +120,7 @@ void start_game_from_home_with_inference(
 //    cout << "TOLERATE_SYSTEM_UPDATE_MENU_FAST = " << &TOLERATE_SYSTEM_UPDATE_MENU_FAST << endl;
 
     if (game_slot != 0){
-        pbf_press_button(console, BUTTON_HOME, 10, SETTINGS_TO_HOME_DELAY - 10);
+        pbf_press_button(console, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY - 10);
         for (uint8_t c = 1; c < game_slot; c++){
             pbf_press_dpad(console, DPAD_RIGHT, 5, 5);
         }
@@ -134,9 +134,9 @@ void start_game_from_home_with_inference(
     }
 
 //    cout << "START_GAME_REQUIRES_INTERNET = " << START_GAME_REQUIRES_INTERNET << endl;
-    if (!START_GAME_REQUIRES_INTERNET && user_slot == 0){
+    if (!ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET && user_slot == 0){
         //  Mash your way into the game.
-        pbf_mash_button(console, BUTTON_A, START_GAME_MASH);
+        pbf_mash_button(console, BUTTON_A, GameSettings::instance().START_GAME_MASH);
     }else{
         pbf_press_button(console, BUTTON_A, 5, 175);     //  Enter select user menu.
         if (user_slot != 0){
@@ -153,10 +153,10 @@ void start_game_from_home_with_inference(
 
         //  Switch to mashing ZR instead of A to get into the game.
         //  Mash your way into the game.
-        uint16_t duration = START_GAME_MASH;
-        if (START_GAME_REQUIRES_INTERNET){
+        uint16_t duration = GameSettings::instance().START_GAME_MASH;
+        if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET){
             //  Need to wait a bit longer for the internet check.
-            duration += START_GAME_INTERNET_CHECK_DELAY;
+            duration += ConsoleSettings::instance().START_GAME_INTERNET_CHECK_DELAY;
         }
         pbf_mash_button(console, BUTTON_ZR, duration);
     }
@@ -170,21 +170,22 @@ void reset_game_from_home_with_inference(
     ProgramEnvironment& env,
     ConsoleHandle& console,
     bool tolerate_update_menu,
+    bool backup_save,
     uint16_t post_wait_time
 ){
-    if (START_GAME_REQUIRES_INTERNET || tolerate_update_menu){
+    if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET || tolerate_update_menu){
         close_game(console);
         start_game_from_home_with_inference(
-            env, console, tolerate_update_menu, 0, 0, false, post_wait_time
+            env, console, tolerate_update_menu, 0, 0, backup_save, post_wait_time
         );
         return;
     }
 
-    fast_reset_game(console, START_GAME_MASH, 0, 0, 0);
+    fast_reset_game(console, GameSettings::instance().START_GAME_MASH, 0, 0, 0);
     console.botbase().wait_for_all_requests();
 
     //  Wait for game to load.
-    enter_loading_game(env, console, false, post_wait_time);
+    enter_loading_game(env, console, backup_save, post_wait_time);
 }
 
 

@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Options/SectionDivider.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -32,6 +33,11 @@ public:
 
 private:
     SimpleIntegerOption<uint32_t> SKIPS;
+
+    EventNotificationOption NOTIFICATION_PROGRESS_UPDATE;
+    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
+    EventNotificationsOption NOTIFICATIONS;
+
     SectionDividerOption m_advanced_options;
     SimpleIntegerOption<uint16_t> CORRECTION_SKIPS;
 };

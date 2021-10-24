@@ -2,6 +2,8 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *      This option is thread-safe.
+ *
  */
 
 #ifndef PokemonAutomation_FloatingPoint_H
@@ -13,7 +15,7 @@
 namespace PokemonAutomation{
 
 
-class FloatingPointOption : public ConfigOption, public FloatingPointOptionBase{
+class FloatingPointOption : public ConfigOption, private FloatingPointOptionBase{
 public:
     FloatingPointOption(
         QString label,
@@ -23,6 +25,12 @@ public:
     )
         : FloatingPointOptionBase(std::move(label), min_value, max_value, default_value)
     {}
+
+    using FloatingPointOptionBase::label;
+    using FloatingPointOptionBase::operator double;
+    using FloatingPointOptionBase::get;
+    using FloatingPointOptionBase::set;
+
     virtual void load_json(const QJsonValue& json) override{
         return this->load_current(json);
     }
@@ -30,18 +38,21 @@ public:
         return this->write_current();
     }
 
-    virtual bool is_valid() const override{
-        return FloatingPointOptionBase::is_valid();
+    virtual QString check_validity() const override{
+        return FloatingPointOptionBase::check_validity();
     }
     virtual void restore_defaults() override{
         FloatingPointOptionBase::restore_defaults();
     }
 
     virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+
+private:
+    friend class FloatingPointOptionUI;
 };
 
 
-class FloatingPointOptionUI : public ConfigOptionUI, public FloatingPointOptionBaseUI{
+class FloatingPointOptionUI : public ConfigOptionUI, private FloatingPointOptionBaseUI{
 public:
     FloatingPointOptionUI(QWidget& parent, FloatingPointOption& value)
         : FloatingPointOptionBaseUI(parent, value)

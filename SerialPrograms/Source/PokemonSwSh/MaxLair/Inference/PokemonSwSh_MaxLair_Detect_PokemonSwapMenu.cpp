@@ -13,6 +13,7 @@
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_PokemonSpriteReader.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_HPPP.h"
+#include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 #include "PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
 
@@ -31,7 +32,8 @@ PokemonSwapMenuDetector::PokemonSwapMenuDetector(bool stop_no_detect)
     , m_pink0(0.150, 0.015, 0.270, 0.050)
     , m_pink1(0.100, 0.180, 0.270, 0.120)
     , m_pink2(0.150, 0.700, 0.090, 0.150)
-    , m_white(0.520, 0.130, 0.450, 0.050)
+    , m_white0(0.600, 0.015, 0.370, 0.040)
+    , m_white1(0.520, 0.130, 0.450, 0.050)
 //    , m_bottom(overlay, 0.35, 0.80, 0.10, 0.10)
 //    , m_box0(overlay, 0.87, 0.22, 0.03, 0.20)
 //    , m_box1(overlay, 0.87, 0.48, 0.03, 0.20)
@@ -41,7 +43,8 @@ PokemonSwapMenuDetector::PokemonSwapMenuDetector(bool stop_no_detect)
     add_box(m_pink0);
     add_box(m_pink1);
     add_box(m_pink2);
-    add_box(m_white);
+    add_box(m_white0);
+    add_box(m_white1);
     add_box(m_bottom_main);
     add_box(m_bottom_right);
 }
@@ -60,9 +63,12 @@ bool PokemonSwapMenuDetector::detect(const QImage& screen) const{
     if (!is_solid(pink1, {0.448591, 0.176516, 0.374892}, 0.1, 20)) return false;
     ImageStats pink2 = image_stats(extract_box(screen, m_pink2));
     if (!is_solid(pink2, {0.464402, 0.156018, 0.379581}, 0.1, 20)) return false;
-    ImageStats white = image_stats(extract_box(screen, m_white));
+    ImageStats white0 = image_stats(extract_box(screen, m_white0));
+//    cout << white0.average << ", " << white0.stddev << endl;
+    if (!is_solid(white0, {0.318115, 0.33587, 0.346015})) return false;
+    ImageStats white1 = image_stats(extract_box(screen, m_white1));
 //    cout << white.average << ", " << white.stddev << endl;
-    if (!is_solid(white, {0.310994, 0.344503, 0.344503})) return false;
+    if (!is_solid(white1, {0.310994, 0.344503, 0.344503})) return false;
 //    ImageStats bottom = pixel_stats(extract_box(screen, m_bottom));
 //    if (!is_white(bottom)) return false;
 //    ImageStats box0 = pixel_stats(extract_box(screen, m_box0));
@@ -80,7 +86,6 @@ bool PokemonSwapMenuDetector::detect(const QImage& screen) const{
     if (bottom_right.stddev.sum() < 30){
         return false;
     }
-    return true;
 
 //    cout << pink0.average << ", " << pink0.stddev << endl;
 //    cout << pink1.average << ", " << pink1.stddev << endl;
@@ -112,9 +117,9 @@ PokemonSwapMenuReader::PokemonSwapMenuReader(
     , m_hp3(overlay, 0.226, 0.3435 + 3*0.089, 0.112, 0.005)
 {}
 bool PokemonSwapMenuReader::my_turn(const QImage& screen){
-    double box0 = pixel_average(extract_box(screen, m_select0)).sum();
+    double box0 = image_average(extract_box(screen, m_select0)).sum();
     if (box0 < 200) return true;
-    double box1 = pixel_average(extract_box(screen, m_select1)).sum();
+    double box1 = image_average(extract_box(screen, m_select1)).sum();
     if (box1 < 200) return true;
     return false;
 }
@@ -129,7 +134,7 @@ void PokemonSwapMenuReader::read_hp(const QImage& screen, double hp[4]){
     hp[2] = read_hp_bar(m_logger, extract_box(screen, m_hp2));
     hp[3] = read_hp_bar(m_logger, extract_box(screen, m_hp3));
     if (hp[0] < 0 || hp[1] < 0 || hp[2] < 0 || hp[3] < 0){
-        dump_image(m_logger, screen, "PokemonSwapMenuReader-read_hp");
+        dump_image(m_logger, MODULE_NAME, "PokemonSwapMenuReader-read_hp", screen);
     }
 }
 void PokemonSwapMenuReader::read_pp(const QImage& screen, int8_t pp[4]){
@@ -138,7 +143,7 @@ void PokemonSwapMenuReader::read_pp(const QImage& screen, int8_t pp[4]){
     pp[2] = read_pp_text(m_logger, extract_box(screen, m_pp2));
     pp[3] = read_pp_text(m_logger, extract_box(screen, m_pp3));
     if (pp[0] < 0 && pp[1] < 0 && pp[2] < 0 && pp[3] < 0){
-        dump_image(m_logger, screen, "PokemonSwapMenuReader-read_pp");
+        dump_image(m_logger, MODULE_NAME, "PokemonSwapMenuReader-read_pp", screen);
         return;
     }
 }

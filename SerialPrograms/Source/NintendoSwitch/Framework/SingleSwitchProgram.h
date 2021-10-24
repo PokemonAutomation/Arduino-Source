@@ -52,7 +52,7 @@ private:
 
 
 
-class SingleSwitchProgramWidget : public RunnableSwitchProgramWidget{
+class SingleSwitchProgramWidget final : public RunnableSwitchProgramWidget{
 public:
     static SingleSwitchProgramWidget* make(
         QWidget& parent,

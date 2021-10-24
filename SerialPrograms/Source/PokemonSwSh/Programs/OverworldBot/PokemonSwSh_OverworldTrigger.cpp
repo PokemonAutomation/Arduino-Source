@@ -5,7 +5,7 @@
  */
 
 #include "Common/Compiler.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "PokemonSwSh_OverworldMovement.h"
 #include "PokemonSwSh_OverworldTrigger.h"
 

@@ -29,13 +29,14 @@ Settings_JsonFile::Settings_JsonFile(QString category, const QJsonObject& obj)
     }
 }
 
-bool Settings_JsonFile::is_valid() const{
+QString Settings_JsonFile::check_validity() const{
     for (const auto& item : m_options){
-        if (!item->is_valid()){
-            return false;
+        QString error = item->check_validity();
+        if (!error.isEmpty()){
+            return error;
         }
     }
-    return true;
+    return QString();
 }
 void Settings_JsonFile::restore_defaults(){
     for (const auto& item : m_options){

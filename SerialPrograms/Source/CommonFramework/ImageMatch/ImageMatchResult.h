@@ -15,10 +15,14 @@ namespace PokemonAutomation{
 namespace ImageMatch{
 
 
-struct MatchResult{
-    std::multimap<double, std::string> slugs;
+struct ImageMatchResult{
+    std::multimap<double, std::string> results;
 
-    void log(Logger& logger, double max_RMSD_ratio) const;
+    void log(Logger& logger, double max_alpha) const;
+
+    void add(double alpha, std::string slug);
+    void clear_beyond_spread(double max_alpha_spread);
+    void clear_beyond_alpha(double max_alpha);
 };
 
 

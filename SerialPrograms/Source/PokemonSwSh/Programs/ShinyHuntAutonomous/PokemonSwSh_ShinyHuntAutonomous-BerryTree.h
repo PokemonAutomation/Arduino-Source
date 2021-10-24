@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousBerryTree_H
 
 #include "CommonFramework/Options/SectionDivider.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
@@ -40,6 +41,9 @@ private:
 
     EncounterBotLanguage LANGUAGE;
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
+
+    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
+    EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;
     TimeExpressionOption<uint16_t> EXIT_BATTLE_TIMEOUT;

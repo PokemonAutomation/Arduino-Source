@@ -22,11 +22,11 @@ public:
     void add_timeout();
 
 private:
-    uint64_t& m_raids;
-    uint64_t& m_timeouts;
-    uint64_t& m_empty;
-    uint64_t& m_full;
-    uint64_t& m_total;
+    std::atomic<uint64_t>& m_raids;
+    std::atomic<uint64_t>& m_timeouts;
+    std::atomic<uint64_t>& m_empty;
+    std::atomic<uint64_t>& m_full;
+    std::atomic<uint64_t>& m_total;
 };
 
 

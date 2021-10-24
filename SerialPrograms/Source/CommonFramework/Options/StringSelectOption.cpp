@@ -43,7 +43,7 @@ StringSelectOption::StringSelectOption(
             PA_THROW_StringException("Duplicate enum label.");
         }
     }
-    m_current = m_default;
+    m_current.store(m_default, std::memory_order_relaxed);
 }
 StringSelectOption::StringSelectOption(
     QString label,
@@ -69,7 +69,7 @@ StringSelectOption::StringSelectOption(
             PA_THROW_StringException("Duplicate enum label.");
         }
     }
-    m_current = m_default;
+    m_current.store(m_default, std::memory_order_relaxed);
 }
 
 void StringSelectOption::load_json(const QJsonValue& json){
@@ -79,15 +79,15 @@ void StringSelectOption::load_json(const QJsonValue& json){
     QString str = json.toString();
     auto iter = m_case_map.find(str);
     if (iter != m_case_map.end()){
-        m_current = iter->second;
+        m_current.store(iter->second, std::memory_order_relaxed);
     }
 }
 QJsonValue StringSelectOption::to_json() const{
-    return QJsonValue(m_case_list[m_current].first);
+    return QJsonValue(m_case_list[(size_t)*this].first);
 }
 
 void StringSelectOption::restore_defaults(){
-    m_current = m_default;
+    m_current.store(m_default, std::memory_order_relaxed);
 }
 
 ConfigOptionUI* StringSelectOption::make_ui(QWidget& parent){
@@ -114,7 +114,7 @@ StringSelectOptionUI::StringSelectOptionUI(QWidget& parent, StringSelectOption& 
     for (const auto& item : m_value.m_case_list){
         m_box->addItem(item.second, item.first);
     }
-    m_box->setCurrentIndex((int)m_value.m_current);
+    m_box->setCurrentIndex((int)m_value);
     layout->addWidget(m_box, 1);
 
     connect(
@@ -124,7 +124,7 @@ StringSelectOptionUI::StringSelectOptionUI(QWidget& parent, StringSelectOption& 
                 m_value.restore_defaults();
                 return;
             }
-            m_value.m_current = index;
+            m_value.m_current.store(index, std::memory_order_relaxed);
 //            cout << "index = " << index << endl;
         }
     );

@@ -52,6 +52,11 @@ VisualInferenceCallback* VisualInferenceSession::run(std::chrono::milliseconds t
     auto stop_time = timeout == std::chrono::milliseconds(0)
         ? std::chrono::system_clock::time_point::max()
         : wait_until + timeout;
+    return run(stop_time);
+}
+VisualInferenceCallback* VisualInferenceSession::run(std::chrono::system_clock::time_point stop){
+    auto now = std::chrono::system_clock::now();
+    auto wait_until = now + m_period;
     while (true){
         m_env.check_stopping();
         if (m_stop.load(std::memory_order_acquire)){
@@ -74,7 +79,7 @@ VisualInferenceCallback* VisualInferenceSession::run(std::chrono::milliseconds t
         }
 
         now = std::chrono::system_clock::now();
-        if (now >= stop_time){
+        if (now >= stop){
             return nullptr;
         }
         auto wait = wait_until - now;
@@ -86,7 +91,7 @@ VisualInferenceCallback* VisualInferenceSession::run(std::chrono::milliseconds t
                 [=]{
                     auto now = std::chrono::system_clock::now();
                     return
-                        now >= stop_time ||
+                        now >= stop ||
                         now >= wait_until ||
                         m_env.is_stopping() ||
                         m_stop.load(std::memory_order_acquire);

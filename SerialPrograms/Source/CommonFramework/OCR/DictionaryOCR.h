@@ -37,16 +37,7 @@ public:
     QJsonObject to_json() const;
     void save_json(const QString& json_path) const;
 
-    MatchResult match_substring(
-        const QString& text,
-        double min_alpha = 90
-    ) const;
-
-    MatchResult match_substring(
-        const std::string& expected,
-        const QString& text,
-        double min_alpha = 100
-    ) const;
+    void match_substring(StringMatchResult& results, const QString& text, double log10p_spread = 0.50) const;
 
 
 public:

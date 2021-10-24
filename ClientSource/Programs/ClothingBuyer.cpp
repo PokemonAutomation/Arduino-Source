@@ -8,13 +8,15 @@
  */
 
 #include <iostream>
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
+#include "Common/NintendoSwitch/FrameworkSettings.h"
+#include "Common/NintendoSwitch/NintendoSwitch_Device.h"
+#include "Common/NintendoSwitch/NintendoSwitch_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonSettings.h"
 #include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
 #include "ClientSource/Libraries/Utilities.h"
 
 namespace PokemonAutomation{
+namespace NintendoSwitch{
 
 
 
@@ -53,4 +55,6 @@ void program_ClothingBuyer(const std::string& device_name){
 }
 
 
+
+}
 }

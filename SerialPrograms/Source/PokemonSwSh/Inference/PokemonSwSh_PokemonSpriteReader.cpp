@@ -18,7 +18,9 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-PokemonSpriteMatcherExact::PokemonSpriteMatcherExact(const std::set<std::string>* subset){
+PokemonSpriteMatcherExact::PokemonSpriteMatcherExact(const std::set<std::string>* subset)
+    : ExactImageDictionaryMatcher({1, 256})
+{
     for (const auto& item : all_pokemon_sprites()){
         if (subset == nullptr || subset->find(item.first) != subset->end()){
 //            cout << item.first << endl;
@@ -26,7 +28,9 @@ PokemonSpriteMatcherExact::PokemonSpriteMatcherExact(const std::set<std::string>
         }
     }
 }
-PokemonLeftSpriteMatcherExact::PokemonLeftSpriteMatcherExact(const std::set<std::string>* subset){
+PokemonLeftSpriteMatcherExact::PokemonLeftSpriteMatcherExact(const std::set<std::string>* subset)
+    : ExactImageDictionaryMatcher({1, 256})
+{
     for (const auto& item : all_pokemon_sprites()){
         if (subset == nullptr || subset->find(item.first) != subset->end()){
 //            cout << item.first << endl;
@@ -44,7 +48,7 @@ PokemonLeftSpriteMatcherExact::PokemonLeftSpriteMatcherExact(const std::set<std:
 
 
 PokemonSpriteMatcherCropped::PokemonSpriteMatcherCropped(const std::set<std::string>* subset, double min_euclidean_distance)
-    : CroppedImageMatcher(true)
+    : CroppedImageDictionaryMatcher({1, 256})
     , m_min_euclidean_distance_squared(min_euclidean_distance * min_euclidean_distance)
 {
     for (const auto& item : all_pokemon_sprites()){

@@ -5,10 +5,10 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh_DateSpam-LotoFarmer.h"
 
 namespace PokemonAutomation{
@@ -20,7 +20,7 @@ LotoFarmer_Descriptor::LotoFarmer_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:LotoFarmer",
         "Date Spam: Loto Farmer",
-        "SwSh-Arduino/wiki/Basic:-DateSpam-LotoFarmer",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-LotoFarmer.md",
         "Farm the Loto ID.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB
@@ -50,7 +50,7 @@ void LotoFarmer::program(SingleSwitchProgramEnvironment& env){
         grip_menu_connect_go_home(env.console);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
-        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
     }
 
     uint8_t year = MAX_YEAR;
@@ -68,7 +68,7 @@ void LotoFarmer::program(SingleSwitchProgramEnvironment& env){
         //  Tap HOME and quickly spam B. The B spamming ensures that we don't
         //  accidentally update the system if the system update window pops up.
         pbf_press_button(env.console, BUTTON_HOME, 10, 5);
-        pbf_mash_button(env.console, BUTTON_B, GAME_TO_HOME_DELAY_FAST - 15);
+        pbf_mash_button(env.console, BUTTON_B, GameSettings::instance().GAME_TO_HOME_DELAY_FAST - 15);
     }
 
     end_program_callback(env.console);

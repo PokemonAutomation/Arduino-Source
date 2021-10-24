@@ -32,6 +32,8 @@ SectionDividerOptionUI::SectionDividerOptionUI(QWidget& parent, SectionDividerOp
     QLabel* text = new QLabel(value.m_label, this);
     layout->addWidget(text);
     text->setWordWrap(true);
+    text->setTextInteractionFlags(Qt::TextBrowserInteraction);
+    text->setOpenExternalLinks(true);
 }
 
 

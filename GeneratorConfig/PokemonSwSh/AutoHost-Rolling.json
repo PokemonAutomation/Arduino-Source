@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "AutoHost-Rolling",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-AutoHost-Rolling",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/AutoHost-Rolling.md",
     "2-Description": "Roll N days, host, SR and repeat. Also supports hard-locks and soft-locks.",
     "3-Parameters": [
         {

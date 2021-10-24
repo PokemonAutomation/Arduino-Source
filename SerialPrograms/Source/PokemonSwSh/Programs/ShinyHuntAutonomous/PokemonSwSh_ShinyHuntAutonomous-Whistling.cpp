@@ -5,14 +5,15 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "Common/PokemonSwSh/PokemonSwShDateSpam.h"
-#include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
@@ -28,7 +29,7 @@ ShinyHuntAutonomousWhistling_Descriptor::ShinyHuntAutonomousWhistling_Descriptor
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousWhistling",
         "Shiny Hunt Autonomous - Whistling",
-        "SwSh-Arduino/wiki/Advanced:-ShinyHuntAutonomous-Whistling",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-Whistling.md",
         "Stand in one place and whistle. Shiny hunt everything that attacks you using video feedback.",
         FeedbackType::REQUIRED,
         PABotBaseLevel::PABOTBASE_12KB
@@ -41,6 +42,15 @@ ShinyHuntAutonomousWhistling::ShinyHuntAutonomousWhistling(const ShinyHuntAutono
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
     , ENCOUNTER_BOT_OPTIONS(true, true)
+    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
+    , NOTIFICATIONS({
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_CATCH_SUCCESS,
+        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_CATCH_FAILED,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_PROGRAM_ERROR,
+    })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
@@ -55,8 +65,9 @@ ShinyHuntAutonomousWhistling::ShinyHuntAutonomousWhistling(const ShinyHuntAutono
 
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
+    PA_ADD_OPTION(NOTIFICATIONS);
 
-    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_DIVIDER(m_advanced_options);
     PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
 }
 
@@ -70,7 +81,7 @@ struct ShinyHuntAutonomousWhistling::Stats : public ShinyHuntTracker{
         m_display_order.insert(m_display_order.begin() + 2, Stat("Unexpected Battles"));
         m_aliases["Timeouts"] = "Errors";
     }
-    uint64_t& m_unexpected_battles;
+    std::atomic<uint64_t>& m_unexpected_battles;
 };
 std::unique_ptr<StatsTracker> ShinyHuntAutonomousWhistling::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
@@ -83,7 +94,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousWhistling::make_stats() const{
 void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
+        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
     }
@@ -105,9 +116,9 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env){
     while (true){
         //  Touch the date.
         if (TIME_ROLLBACK_HOURS > 0 && system_clock(env.console) - last_touch >= PERIOD){
-            pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
-            rollback_hours_from_home(env.console, TIME_ROLLBACK_HOURS, SETTINGS_TO_HOME_DELAY);
-            resume_game_no_interact(env.console, TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+            rollback_hours_from_home(env.console, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+            resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             last_touch += PERIOD;
         }
 
@@ -161,8 +172,15 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env){
     env.update_stats();
 
     if (GO_HOME_WHEN_DONE){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
     }
+
+    send_program_finished_notification(
+        env.logger(), NOTIFICATION_PROGRAM_FINISH,
+        descriptor().display_name(),
+        "",
+        stats.to_str()
+    );
 
     end_program_callback(env.console);
     end_program_loop(env.console);

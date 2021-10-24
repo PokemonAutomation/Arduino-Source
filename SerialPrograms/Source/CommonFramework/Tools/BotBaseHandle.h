@@ -29,7 +29,7 @@ public:
         NOT_CONNECTED,  //  Connection doesn't exist.
         CONNECTING,     //  Connection exists, but not ready.
         READY,          //  Connection exists and ready to use.
-        STOPPED,        //  Connection exists, but has beeb stopped.
+        STOPPED,        //  Connection exists, but has been stopped.
         SHUTDOWN,       //  Connection is in the process of being destroyed.
     };
 
@@ -45,6 +45,8 @@ public:
     void stop();
     void reset(const QSerialPortInfo& port);
 
+    void set_allow_user_commands(bool allow);
+
 public:
     //  Not thread-safe with stop() or reset(). The returned pointer
     //  will only be valid until the next call to stop()/reset().
@@ -55,16 +57,9 @@ public:
     State state() const;
     bool accepting_commands() const;
 
-    //  Must call this on the same thread that controls the lifetime
-    //  of this class. Not thread-safe with stop()/reset().
-    template <uint8_t SendType, typename Parameters>
-    bool try_send_request(Parameters& params);
-    bool try_send_request(uint8_t msg_type, void* params, size_t bytes);
-
-    //  This one can be called from anywhere.
-    template <uint8_t SendType, typename Parameters>
-    void async_try_send_request(Parameters& params);
-    void async_try_send_request(uint8_t msg_type, void* params, size_t bytes);
+    //  Thread-safe with stop()/reset().
+    //  This is meant for user commands. It will drop if a program is running.
+    const char* try_send_request(const BotBaseRequest& request);
 
 signals:
     void on_not_connected(QString error);
@@ -73,8 +68,6 @@ signals:
     void on_stopped(QString error);
 
     void uptime_status(QString status);
-
-    void async_try_send_request(uint8_t msg_type, std::string body);
 
 private:
     void stop_unprotected();
@@ -88,6 +81,7 @@ private:
     PABotBaseLevel m_minimum_pabotbase;
     std::atomic<PABotBaseLevel> m_current_pabotbase;
     std::atomic<State> m_state;
+    std::atomic<bool> m_allow_user_commands;
 
     MessageSniffer& m_logger;
 
@@ -98,16 +92,6 @@ private:
     std::condition_variable m_cv;
 };
 
-
-
-template <uint8_t SendType, typename Parameters>
-bool BotBaseHandle::try_send_request(Parameters& params){
-    return try_send_request(SendType, &params, sizeof(Parameters));
-}
-template <uint8_t SendType, typename Parameters>
-void BotBaseHandle::async_try_send_request(Parameters& params){
-    async_try_send_request(SendType, &params, sizeof(Parameters));
-}
 
 
 }

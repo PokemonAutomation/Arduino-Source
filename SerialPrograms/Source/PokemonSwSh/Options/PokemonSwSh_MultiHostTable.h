@@ -11,47 +11,63 @@
 #include "CommonFramework/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSwSh{
 
 
-
-class MultiHostTableOption : public ConfigOption, public MultiHostTableOptionBase{
+class MultiHostTableOption : public ConfigOption{
 public:
     MultiHostTableOption()
-        : MultiHostTableOptionBase("<b>Game List:</b>")
+        : m_factory(true)
+        , m_table("<b>Game List:</b>", m_factory, true)
     {}
     virtual void load_json(const QJsonValue& json) override{
-        load_current(json);
+        m_table.load_current(json);
     }
     virtual QJsonValue to_json() const override{
-        return write_current();
+        return m_table.write_current();
     }
 
-    virtual bool is_valid() const override{
-        return MultiHostTableOptionBase::is_valid();
+    size_t size() const{
+        return m_table.size();
+    }
+    const MultiHostSlot& operator[](size_t index) const{
+        return static_cast<const MultiHostSlot&>(m_table[index]);
+    }
+
+    virtual QString check_validity() const override{
+        return m_table.check_validity();
     }
     virtual void restore_defaults() override{
-        MultiHostTableOptionBase::restore_defaults();
+        m_table.restore_defaults();
     }
 
     virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+
+private:
+    friend class MultiHostTableOptionUI;
+    MultiHostSlotOptionFactory m_factory;
+    EditableTableBase m_table;
 };
-
-
-class MultiHostTableOptionUI : public ConfigOptionUI, public MultiHostTableOptionBaseUI{
+class MultiHostTableOptionUI : public ConfigOptionUI, public EditableTableBaseUI{
 public:
     MultiHostTableOptionUI(QWidget& parent, MultiHostTableOption& value)
-        : MultiHostTableOptionBaseUI(parent, value)
+        : EditableTableBaseUI(parent, value.m_table)
     {}
     virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override{
-        MultiHostTableOptionBaseUI::restore_defaults();
+        EditableTableBaseUI::restore_defaults();
     }
-};
 
+};
 inline ConfigOptionUI* MultiHostTableOption::make_ui(QWidget& parent){
     return new MultiHostTableOptionUI(parent, *this);
 }
 
 
+
+
+}
+}
 }
 #endif

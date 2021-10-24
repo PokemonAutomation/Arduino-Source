@@ -23,7 +23,12 @@ public:
 };
 
 
-Logger& global_logger();
+//  Print as is. Use this to build other loggers.
+Logger& global_logger_raw();
+
+//  Print with timestamp and a default tag. use this directly.
+Logger& global_logger_tagged();
+
 
 
 class TaggedLogger : public Logger{

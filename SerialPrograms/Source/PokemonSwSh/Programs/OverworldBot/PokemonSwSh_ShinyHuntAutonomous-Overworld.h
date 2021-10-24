@@ -12,6 +12,7 @@
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/FloatingPointOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
+#include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
@@ -68,6 +69,9 @@ private:
     FloatingPointOption MAX_TARGET_ALPHA;
 
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
+
+    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
+    EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;
     TimeExpressionOption<uint16_t> WATCHDOG_TIMER;

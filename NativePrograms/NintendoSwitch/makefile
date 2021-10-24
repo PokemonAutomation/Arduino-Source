@@ -68,22 +68,22 @@ endif
 
 #   Framework
 SRC += $(LUFA_SRC_USB)
-SRC += $(PATH_PUBLIC)/Common/SwitchFramework/FrameworkSettings.c
-SRC += $(PATH_PUBLIC)/NativePrograms/DeviceFramework/DeviceSettings.c
-ifneq ("$(wildcard $(PATH_INTERNAL)/NativePrograms/SwitchFramework/Switch_PushButtons.c)","")
+SRC += $(PATH_PUBLIC)/NativePrograms/NintendoSwitch/FrameworkSettings.c
+SRC += $(PATH_PUBLIC)/NativePrograms/DeviceFramework/Framework/DeviceSettings.c
+ifneq ("$(wildcard $(PATH_INTERNAL)/NativePrograms/NintendoSwitch/Framework/NintendoSwitch_PushButtons.c)","")
 CC_FLAGS += -I$(PATH_INTERNAL)
 SRC += $(PATH_PUBLIC)/Common/CRC32.c
-SRC += $(PATH_INTERNAL)/NativePrograms/SwitchFramework/uart.c
-SRC += $(PATH_INTERNAL)/NativePrograms/SwitchFramework/HardwareUSB.c
+SRC += $(PATH_INTERNAL)/NativePrograms/NintendoSwitch/Framework/uart.c
+SRC += $(PATH_INTERNAL)/NativePrograms/NintendoSwitch/Framework/HardwareUSB.c
 ifeq ($(TARGET), PABotBase)
-SRC += $(PATH_INTERNAL)/NativePrograms/SwitchFramework/CommandQueue.c
+SRC += $(PATH_INTERNAL)/NativePrograms/NintendoSwitch/Framework/CommandQueue.c
 else
-SRC += $(PATH_INTERNAL)/NativePrograms/SwitchFramework/CommandQueueNull.c
+SRC += $(PATH_INTERNAL)/NativePrograms/NintendoSwitch/Framework/CommandQueueNull.c
 endif
-SRC += $(PATH_INTERNAL)/NativePrograms/SwitchFramework/HardwareSerial.c
-SRC += $(PATH_INTERNAL)/NativePrograms/SwitchFramework/Controller.c
-SRC += $(PATH_INTERNAL)/NativePrograms/SwitchFramework/Switch_PushButtons.c
-SRC += $(PATH_INTERNAL)/NativePrograms/SwitchFramework/Switch_ScalarButtons.c
+SRC += $(PATH_INTERNAL)/NativePrograms/NintendoSwitch/Framework/HardwareSerial.c
+SRC += $(PATH_INTERNAL)/NativePrograms/NintendoSwitch/Framework/Controller.c
+SRC += $(PATH_INTERNAL)/NativePrograms/NintendoSwitch/Framework/NintendoSwitch_PushButtons.c
+SRC += $(PATH_INTERNAL)/NativePrograms/NintendoSwitch/Framework/NintendoSwitch_ScalarButtons.c
 else
 LD_FLAGS += obj/obj-$(MCU)/CRC32.o
 LD_FLAGS += obj/obj-$(MCU)/uart.o
@@ -95,12 +95,12 @@ LD_FLAGS += obj/obj-$(MCU)/CommandQueueNull.o
 endif
 LD_FLAGS += obj/obj-$(MCU)/HardwareSerial.o
 LD_FLAGS += obj/obj-$(MCU)/Controller.o
-LD_FLAGS += obj/obj-$(MCU)/Switch_PushButtons.o
-LD_FLAGS += obj/obj-$(MCU)/Switch_ScalarButtons.o
+LD_FLAGS += obj/obj-$(MCU)/NintendoSwitch_PushButtons.o
+LD_FLAGS += obj/obj-$(MCU)/NintendoSwitch_ScalarButtons.o
 endif
 
 #   Program
-SRC += $(PATH_PUBLIC)/Common/PokemonSwSh/PokemonSettings.c
+SRC += $(PATH_PUBLIC)/NativePrograms/PokemonSwSh/PokemonSettings.c
 ifneq ("$(wildcard $(PATH_INTERNAL)/NativePrograms/$(CATEGORY)/$(TARGET)_Core.c)","")
 SRC += $(PATH_INTERNAL)/NativePrograms/$(CATEGORY)/$(TARGET)_Core.c
 else ifneq ("$(wildcard Programs/$(TARGET)_Core.c)","")

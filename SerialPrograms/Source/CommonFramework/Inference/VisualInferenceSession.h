@@ -32,6 +32,7 @@ public:
 
     //  Run the session. This will not return until the session is stopped.
     VisualInferenceCallback* run(std::chrono::milliseconds timeout = std::chrono::milliseconds(0));
+    VisualInferenceCallback* run(std::chrono::system_clock::time_point stop);
 
     //  Call this from a different thread to asynchronously stop the session.
     void stop();

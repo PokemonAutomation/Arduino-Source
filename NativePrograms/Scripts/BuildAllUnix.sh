@@ -11,7 +11,9 @@ declare -a PROGRAMS=()
 #mapfile -t PROGRAMS < ProgramList.txt
 while IFS="$IFS"$'\r' read -r line; do
     if [ -n "$line" ]; then
-        PROGRAMS+=("$line")
+        if [ -f "$line.c" ]; then
+            PROGRAMS+=("$line")
+        fi
     fi
 done < ProgramList.txt
 

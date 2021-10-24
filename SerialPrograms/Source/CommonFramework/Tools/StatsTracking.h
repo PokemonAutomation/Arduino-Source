@@ -10,6 +10,7 @@
 #include <vector>
 #include <string>
 #include <map>
+#include <atomic>
 
 class QJsonArray;
 
@@ -22,11 +23,9 @@ public:
     StatsTracker() = default;
 
     std::string to_str() const;
-//    void log_stats(ProgramEnvironment& env) const;
 
     void parse_and_append_line(const std::string& line);
 
-    QJsonArray make_discord_stats() const;
 
 protected:
     struct Stat{
@@ -36,7 +35,7 @@ protected:
     };
 
     std::vector<Stat> m_display_order;
-    std::map<std::string, uint64_t> m_stats;
+    std::map<std::string, std::atomic<uint64_t>> m_stats;
     std::map<std::string, std::string> m_aliases;
 };
 

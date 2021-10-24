@@ -7,13 +7,9 @@
 #ifndef PokemonAutomation_PokemonSwSh_DenTools_H
 #define PokemonAutomation_PokemonSwSh_DenTools_H
 
-#include "Common/PokemonSwSh/PokemonSettings.h"
-//#include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/Options/ScreenshotFormatOption.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "PokemonSwSh/Inference/Dens/PokemonSwSh_DenMonReader.h"
-#include "PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -31,14 +27,6 @@ void roll_den(
 );
 void rollback_date_from_home(const BotBaseContext& context, uint8_t skips);
 
-void send_raid_notification(
-    const QString& program_name,
-    ConsoleHandle& console,
-    const AutoHostNotificationOption& settings,
-    bool has_code, uint8_t code[8],
-    const DenMonReader& reader,
-    const StatsTracker& stats_tracker
-);
 
 
 

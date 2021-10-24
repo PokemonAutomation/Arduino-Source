@@ -21,11 +21,27 @@ namespace PokemonAutomation{
 
 BlackScreenDetector::BlackScreenDetector()
     : m_box(0.1, 0.1, 0.8, 0.8)
+{
+    add_box(m_box);
+}
+bool BlackScreenDetector::process_frame(
+    const QImage& frame,
+    std::chrono::system_clock::time_point timestamp
+){
+    QImage image = extract_box(frame, m_box);
+    return is_black(image);
+}
+
+
+
+
+BlackScreenOverDetector::BlackScreenOverDetector()
+    : m_box(0.1, 0.1, 0.8, 0.8)
     , m_has_been_black(false)
 {
     add_box(m_box);
 }
-BlackScreenDetector::BlackScreenDetector(const ImageFloatBox& box)
+BlackScreenOverDetector::BlackScreenOverDetector(const ImageFloatBox& box)
     : m_box(box)
     , m_has_been_black(false)
 {
@@ -33,13 +49,13 @@ BlackScreenDetector::BlackScreenDetector(const ImageFloatBox& box)
 }
 
 
-bool BlackScreenDetector::process_frame(
+bool BlackScreenOverDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
     return black_is_over(frame);
 }
-bool BlackScreenDetector::black_is_over(const QImage& frame){
+bool BlackScreenOverDetector::black_is_over(const QImage& frame){
     QImage image = extract_box(frame, m_box);
     if (is_black(image)){
         m_has_been_black = true;

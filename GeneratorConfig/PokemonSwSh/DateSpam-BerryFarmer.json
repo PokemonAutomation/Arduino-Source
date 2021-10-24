@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "DateSpam-BerryFarmer",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-DateSpam-BerryFarmer",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-BerryFarmer.md",
     "2-Description": "Farm berries.",
     "3-Parameters": [
         {

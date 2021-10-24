@@ -6,7 +6,7 @@
 
 #include "Common/Compiler.h"
 #include "Common/Cpp/SpinLock.h"
-#include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/CellMatrix.h"
 #include "CommonFramework/ImageTools/FillGeometry.h"
@@ -54,7 +54,7 @@ struct BlackFilter{
 
 
 const QImage& SelectionArrowDetector_reference_image(){
-    static QImage image(PERSISTENT_SETTINGS().resource_path + "PokemonSwSh/BattleArrow.png");
+    static QImage image(RESOURCE_PATH() + "PokemonSwSh/BattleArrow.png");
     return image;
 }
 bool SelectionArrowDetector_is_arrow(
@@ -71,6 +71,8 @@ bool SelectionArrowDetector_is_arrow(
         object.box.width(), object.box.height()
     );
 //    oimage.convertToFormat(QImage::Format::Format_ARGB32);
+//    cout << "asdf" << endl;
+//    oimage.save("test-" + QString::number(object.id) + ".png");
 
     int width = oimage.width();
     int height = oimage.height();
@@ -119,6 +121,7 @@ bool SelectionArrowFinder::detect(const QImage& screen){
 
 //    double arrow_y_center = -1;
     m_arrow_boxes.clear();
+//    cout << objects.size() << endl;
 
     for (const FillGeometry& object : objects){
         if (!SelectionArrowDetector_is_arrow(image, matrix, object)){
@@ -135,6 +138,7 @@ bool SelectionArrowFinder::process_frame(
     std::chrono::system_clock::time_point timestamp
 ){
     detect(frame);
+//    cout << m_arrow_boxes.size() << endl;
     return !m_arrow_boxes.empty();
 }
 

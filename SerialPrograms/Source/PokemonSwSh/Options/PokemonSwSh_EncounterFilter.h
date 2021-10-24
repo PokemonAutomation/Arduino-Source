@@ -10,7 +10,9 @@
 #include <QComboBox>
 #include <QPushButton>
 #include <QTableWidget>
+#include "Common/Qt/AutoHeightTable.h"
 #include "CommonFramework/Options/ConfigOption.h"
+#include "CommonFramework/Options/EditableTableOption.h"
 #include "Pokemon/Options/Pokemon_BallSelectWidget.h"
 #include "Pokemon/Options/Pokemon_NameSelectWidget.h"
 
@@ -38,20 +40,41 @@ enum class EncounterAction{
 };
 
 
-struct EncounterFilterOverrides{
-    EncounterFilterOverrides(bool rare_stars)
-        : shininess(rare_stars ? ShinyFilter::SQUARE_ONLY : ShinyFilter::STAR_ONLY)
-    {}
+class EncounterFilterOverride : public EditableTableRow{
+public:
+    EncounterFilterOverride(bool rare_stars);
 
+    virtual void load_json(const QJsonValue& json) override;
+    virtual QJsonValue to_json() const override;
+    virtual std::unique_ptr<EditableTableRow> clone() const override;
+    virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
+
+private:
+    QComboBox* make_action_box(QWidget& parent, BallSelectWidget& ball_select);
+    BallSelectWidget* make_ball_select(QWidget& parent);
+    NameSelectWidget* make_species_select(QWidget& parent);
+    QComboBox* make_shiny_box(QWidget& parent);
+
+private:
+    bool m_rare_stars;
+public:
     EncounterAction action = EncounterAction::RunAway;
     std::string pokeball_slug = "poke-ball";
 
     std::string pokemon_slug;
     ShinyFilter shininess = ShinyFilter::SQUARE_ONLY;
-
-    void load_json(const QJsonValue& json);
-    QJsonValue to_json() const;
 };
+
+class EncounterFilterOptionFactory : public EditableTableFactory{
+public:
+    EncounterFilterOptionFactory(bool rare_stars);
+    virtual QStringList make_header() const override;
+    virtual std::unique_ptr<EditableTableRow> make_row() const override;
+private:
+    bool m_rare_stars;
+};
+
+
 
 
 class EncounterFilterOption : public ConfigOption{
@@ -59,7 +82,7 @@ public:
     EncounterFilterOption(bool rare_stars, bool enable_overrides);
 
     ShinyFilter shiny_filter() const{ return m_shiny_filter_current; }
-    const std::vector<EncounterFilterOverrides>& overrides() const{ return m_overrides; }
+    std::vector<EncounterFilterOverride> overrides() const;
 
     virtual void load_json(const QJsonValue& json) override;
     virtual QJsonValue to_json() const override;
@@ -79,33 +102,25 @@ private:
     const ShinyFilter m_shiny_filter_default;
     ShinyFilter m_shiny_filter_current;
 
-    std::vector<EncounterFilterOverrides> m_overrides;
+    EncounterFilterOptionFactory m_factory;
+    EditableTableOption m_table;
 };
-
 
 class EncounterFilterOptionUI : public ConfigOptionUI, public QWidget{
 public:
     EncounterFilterOptionUI(QWidget& parent, EncounterFilterOption& value);
+
     virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override;
 
 private:
-    void replace_table();
-    void add_row(int row, const EncounterFilterOverrides& game, int& index_ref);
-    QComboBox* make_action_box(QWidget& parent, int& row, BallSelectWidget& ball_select, EncounterAction action);
-    BallSelectWidget* make_ball_select(QWidget& parent, int& row, const std::string& slug);
-    NameSelectWidget* make_species_select(QWidget& parent, int& row, const std::string& slug);
-    QComboBox* make_shiny_box(QWidget& parent, int& row, ShinyFilter shiniess);
-    QPushButton* make_insert_button(QWidget& parent, int& row);
-    QPushButton* make_remove_button(QWidget& parent, int& row);
-
-private:
     EncounterFilterOption& m_value;
 
-    QComboBox* m_shininess;
-    QTableWidget* m_table;
-    std::vector<std::unique_ptr<int>> m_index_table;
+    QComboBox* m_shininess = nullptr;
+    ConfigOptionUI* m_table = nullptr;
 };
+
+
 
 
 }

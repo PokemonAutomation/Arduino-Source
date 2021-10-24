@@ -13,6 +13,7 @@
 #include "CommonFramework/OCR/Filtering.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h"
+#include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 #include "PokemonSwSh_MaxLair_Detect_HPPP.h"
 #include "PokemonSwSh_MaxLair_Detect_BattleMenu.h"
@@ -36,8 +37,8 @@ BattleMenuDetector::BattleMenuDetector()
     , m_text_run    (0.830, 0.576 + 3 * 0.1075, 0.08, 0.080)
 //    , m_info_left   (0.907, 0.500, 0.02, 0.03)
 //    , m_info_right  (0.970, 0.500, 0.02, 0.03)
-    , m_status0      (0.280, 0.870, 0.015, 0.030)
-    , m_status1      (0.165, 0.945, 0.100, 0.020)
+    , m_status0     (0.280, 0.870, 0.015, 0.030)
+    , m_status1     (0.165, 0.945, 0.100, 0.020)
 {
     add_box(m_icon_fight,   Qt::yellow);
     add_box(m_icon_pokemon, Qt::yellow);
@@ -52,7 +53,9 @@ bool BattleMenuDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
+    //  Need 5 consecutive successful detections.
     if (!detect(frame)){
+        m_trigger_count = 0;
         return false;
     }
     m_trigger_count++;
@@ -200,8 +203,9 @@ bool BattleMenuDetector::detect(const QImage& screen){
 
 BattleMenuReader::BattleMenuReader(VideoOverlay& overlay, Language language)
     : m_language(language)
-    , m_opponent(overlay, 0.3, 0.010, 0.4, 0.10, Qt::blue)
-    , m_opponent_types(overlay, 0.200, 0.170, 0.300, 0.050, Qt::blue)
+    , m_opponent_name(overlay, 0.3, 0.010, 0.4, 0.10, Qt::blue)
+    , m_summary_opponent_name(overlay, 0.200, 0.100, 0.300, 0.065, Qt::blue)
+    , m_summary_opponent_types(overlay, 0.200, 0.170, 0.300, 0.050, Qt::blue)
     , m_own_name(overlay, 0.060, 0.860, 0.160, 0.045, Qt::blue)
     , m_own_sprite(overlay, 0.002, 0.860, 0.060, 0.100, Qt::blue)
     , m_opponent_hp(overlay, 0.360, 0.120, 0.280, 0.005, Qt::blue)
@@ -219,28 +223,49 @@ BattleMenuReader::BattleMenuReader(VideoOverlay& overlay, Language language)
     , m_dmax(overlay, 0.541, 0.779, 0.105, 0.186, Qt::blue)
 {}
 
-std::set<std::string> BattleMenuReader::read_opponent(Logger& logger, const QImage& screen) const{
-    QImage image = extract_box(screen, m_opponent);
-    OCR::TextImageFilter{false, 600}.apply(image);
-    return read_pokemon_name(logger, screen, image, m_language);
+std::set<std::string> BattleMenuReader::read_opponent(
+    Logger& logger,
+    ProgramEnvironment& env,
+    VideoFeed& feed
+) const{
+    std::set<std::string> result;
+    QImage screen;
+    for (size_t c = 0; c < 3; c++){
+        screen = feed.snapshot();
+        QImage image = extract_box(screen, m_opponent_name);
+        OCR::TextImageFilter{false, 600}.apply(image);
+        result = read_pokemon_name(logger, screen, image, m_language);
+        if (!result.empty()){
+            return result;
+        }
+        logger.log("Failed to read opponent name. Retrying in 1 second...", "orange");
+        env.wait_for(std::chrono::seconds(1));
+    }
+    dump_image(logger, MODULE_NAME, "MaxLair-read_opponent", screen);
+    return result;
 }
-void BattleMenuReader::disambiguate_opponent(Logger& logger, std::set<std::string>& slugs, const QImage& screen) const{
-    QImage image = extract_box(screen, m_opponent_types);
-    std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_symbols(image, 0.2);
+std::set<std::string> BattleMenuReader::read_opponent_in_summary(Logger& logger, const QImage& screen) const{
+    QImage name = extract_box(screen, m_summary_opponent_name);
+    std::set<std::string> slugs = read_pokemon_name(logger, screen, name, m_language);
+
+    QImage types = extract_box(screen, m_summary_opponent_types);
+    std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_symbols(types, 0.2);
 //    for (const auto& item : candidates){
 //        cout << get_type_slug(item.second.first) << ": " << item.first << endl;
 //    }
 
     PokemonType type0 = PokemonType::NONE;
     PokemonType type1 = PokemonType::NONE;
-    auto iter = candidates.begin();
-    if (iter != candidates.end()){
-        type0 = iter->second.first;
-        iter++;
-    }
-    if (iter != candidates.end()){
-        type1 = iter->second.first;
-        iter++;
+    {
+        auto iter = candidates.begin();
+        if (iter != candidates.end()){
+            type0 = iter->second.first;
+            iter++;
+        }
+        if (iter != candidates.end()){
+            type1 = iter->second.first;
+            iter++;
+        }
     }
 
     for (auto iter = slugs.begin(); iter != slugs.end();){
@@ -252,13 +277,37 @@ void BattleMenuReader::disambiguate_opponent(Logger& logger, std::set<std::strin
         }
     }
 
+    if (slugs.size() == 1){
+        logger.log("Disambiguation succeeded: " + *slugs.begin(), Qt::blue);
+        return slugs;
+    }
+
     if (slugs.empty()){
         logger.log("Disambiguation failed. No results.", Qt::red);
-    }else if (slugs.size() > 1){
-        logger.log("Disambiguation failed. Still have multiple results: " + set_to_str(slugs), Qt::red);
     }else{
-        logger.log("Disambiguation succeeded: " + *slugs.begin(), Qt::blue);
+        logger.log("Disambiguation failed. Still have multiple results: " + set_to_str(slugs), Qt::red);
     }
+
+    static std::set<std::string> KNOWN_BAD_SLUGS{
+        "basculin-blue-striped",
+        "basculin-red-striped",
+        "lycanroc-midday",
+        "lycanroc-midnight",
+    };
+    bool error = true;
+    for (const std::string& slug : slugs){
+        auto iter = KNOWN_BAD_SLUGS.find(slug);
+        if (iter != KNOWN_BAD_SLUGS.end()){
+            error = false;
+            logger.log("Known case that cannot be disambiguated. Skipping error report.", Qt::red);
+            break;
+        }
+    }
+    if (error){
+        dump_image(logger, MODULE_NAME, "DisambiguateBoss", screen);
+    }
+
+    return slugs;
 }
 std::string BattleMenuReader::read_own_mon(Logger& logger, const QImage& screen) const{
     return read_pokemon_name_sprite(
@@ -315,7 +364,7 @@ void BattleMenuReader::read_hp(Logger& logger, const QImage& screen, Health heal
     }
 
     if (bad){
-        dump_image(logger, screen, "BattlePartyReader-ReadHP");
+        dump_image(logger, MODULE_NAME, "BattlePartyReader-ReadHP", screen);
     }
 }
 void BattleMenuReader::read_own_pp(Logger& logger, const QImage& screen, int8_t pp[4]) const{
@@ -324,7 +373,7 @@ void BattleMenuReader::read_own_pp(Logger& logger, const QImage& screen, int8_t 
     pp[2] = read_pp_text(logger, extract_box(screen, m_pp2));
     pp[3] = read_pp_text(logger, extract_box(screen, m_pp3));
     if (pp[0] < 0 && pp[1] < 0 && pp[2] < 0 && pp[3] < 0){
-        dump_image(logger, screen, "BattleMenuReader-read_own_pp");
+        dump_image(logger, MODULE_NAME, "BattleMenuReader-read_own_pp", screen);
         return;
     }
 #if 0

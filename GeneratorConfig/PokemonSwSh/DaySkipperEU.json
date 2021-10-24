@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "DaySkipperEU",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-DaySkipperEU",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/DaySkipperEU.md",
     "2-Description": "A day skipper for EU date format that.  (~7500 skips/hour)",
     "3-Parameters": [
         {

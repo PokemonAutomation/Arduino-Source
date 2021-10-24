@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "FriendDelete",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-FriendDelete",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/NintendoSwitch/FriendDelete.md",
     "2-Description": "Mass delete/block all those unwanted friends.",
     "3-Parameters": [
         {

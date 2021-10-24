@@ -160,15 +160,26 @@
     <ClInclude Include="..\..\ClientSource\Libraries\MessageConverter.h" />
     <ClInclude Include="..\..\ClientSource\Libraries\Utilities.h" />
     <ClInclude Include="..\..\Common\Compiler.h" />
+    <ClInclude Include="..\..\Common\Cpp\AlignedVector.h" />
     <ClInclude Include="..\..\Common\Cpp\AsyncDispatcher.h" />
+    <ClInclude Include="..\..\Common\Cpp\DllSafeString.h" />
     <ClInclude Include="..\..\Common\Cpp\Exception.h" />
     <ClInclude Include="..\..\Common\Cpp\FixedLimitVector.h" />
     <ClInclude Include="..\..\Common\Cpp\PanicDump.h" />
+    <ClInclude Include="..\..\Common\Cpp\ParallelTaskRunner.h" />
     <ClInclude Include="..\..\Common\Cpp\PrettyPrint.h" />
+    <ClInclude Include="..\..\Common\Cpp\SIMDDebuggers.h" />
     <ClInclude Include="..\..\Common\Cpp\SpinLock.h" />
     <ClInclude Include="..\..\Common\Cpp\Unicode.h" />
     <ClInclude Include="..\..\Common\CRC32.h" />
-    <ClInclude Include="..\..\Common\MessageProtocol.h" />
+    <ClInclude Include="..\..\Common\Microcontroller\DeviceRoutines.h" />
+    <ClInclude Include="..\..\Common\Microcontroller\MessageProtocol.h" />
+    <ClInclude Include="..\..\Common\NintendoSwitch\FrameworkSettings.h" />
+    <ClInclude Include="..\..\Common\NintendoSwitch\NintendoSwitch_ControllerDefs.h" />
+    <ClInclude Include="..\..\Common\NintendoSwitch\NintendoSwitch_Device.h" />
+    <ClInclude Include="..\..\Common\NintendoSwitch\NintendoSwitch_DigitEntry.h" />
+    <ClInclude Include="..\..\Common\NintendoSwitch\NintendoSwitch_PushButtons.h" />
+    <ClInclude Include="..\..\Common\NintendoSwitch\NintendoSwitch_Tools.h" />
     <ClInclude Include="..\..\Common\PokemonSwSh\PokemonProgramIDs.h" />
     <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSettings.h" />
     <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSwShAutoHosts.h" />
@@ -177,10 +188,6 @@
     <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSwShEggRoutines.h" />
     <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSwShGameEntry.h" />
     <ClInclude Include="..\..\Common\PokemonSwSh\PokemonSwShMisc.h" />
-    <ClInclude Include="..\..\Common\SwitchFramework\FrameworkSettings.h" />
-    <ClInclude Include="..\..\Common\SwitchFramework\SwitchControllerDefs.h" />
-    <ClInclude Include="..\..\Common\SwitchFramework\Switch_PushButtons.h" />
-    <ClInclude Include="..\..\Common\SwitchRoutines\SwitchDigitEntry.h" />
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="..\..\ClientSource\Connection\PABotBase.cpp" />
@@ -199,6 +206,7 @@
     <ClCompile Include="..\..\Common\Cpp\AsyncDispatcher.cpp" />
     <ClCompile Include="..\..\Common\Cpp\Exception.cpp" />
     <ClCompile Include="..\..\Common\Cpp\PanicDump.cpp" />
+    <ClCompile Include="..\..\Common\Cpp\ParallelTaskRunner.cpp" />
     <ClCompile Include="..\..\Common\Cpp\PrettyPrint.cpp" />
     <ClCompile Include="..\..\Common\Cpp\Unicode.cpp" />
     <ClCompile Include="..\..\Common\CRC32.c">
@@ -208,6 +216,18 @@
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
     </ClCompile>
     <ClCompile Include="..\..\Common\CRC32.cpp" />
+    <ClCompile Include="..\..\Common\Microcontroller\DeviceRoutines.cpp" />
+    <ClCompile Include="..\..\Common\NintendoSwitch\FrameworkSettings.c">
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
+      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
+    </ClCompile>
+    <ClCompile Include="..\..\Common\NintendoSwitch\FrameworkSettings.cpp" />
+    <ClCompile Include="..\..\Common\NintendoSwitch\NintendoSwitch_Device.cpp" />
+    <ClCompile Include="..\..\Common\NintendoSwitch\NintendoSwitch_DigitEntry.cpp" />
+    <ClCompile Include="..\..\Common\NintendoSwitch\NintendoSwitch_PushButtons.cpp" />
+    <ClCompile Include="..\..\Common\NintendoSwitch\NintendoSwitch_Tools.cpp" />
     <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSettings.c">
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
       <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
@@ -221,15 +241,6 @@
     <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShEggRoutines.cpp" />
     <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShGameEntry.cpp" />
     <ClCompile Include="..\..\Common\PokemonSwSh\PokemonSwShMisc.cpp" />
-    <ClCompile Include="..\..\Common\SwitchFramework\FrameworkSettings.c">
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|Win32'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Debug|x64'">true</ExcludedFromBuild>
-      <ExcludedFromBuild Condition="'$(Configuration)|$(Platform)'=='Release|x64'">true</ExcludedFromBuild>
-    </ClCompile>
-    <ClCompile Include="..\..\Common\SwitchFramework\FrameworkSettings.cpp" />
-    <ClCompile Include="..\..\Common\SwitchFramework\Switch_PushButtons.cpp" />
-    <ClCompile Include="..\..\Common\SwitchRoutines\SwitchDigitEntry.cpp" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">

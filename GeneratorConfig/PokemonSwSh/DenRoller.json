@@ -1,6 +1,6 @@
 ﻿{
     "0-ProgramName": "DenRoller",
-    "1-Documentation": "SwSh-Arduino/wiki/Basic:-DenRoller",
+    "1-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonSwSh/DenRoller.md",
     "2-Description": "Roll den to the N'th day, SR and repeat.",
     "3-Parameters": [
         {

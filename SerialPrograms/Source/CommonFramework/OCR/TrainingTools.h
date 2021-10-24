@@ -25,6 +25,9 @@ struct TrainingSample{
 
 
 class TrainingSession{
+    static constexpr double MAX_LOG10P = -1.90;
+    static constexpr double LOG10P_SPREAD = 0.10;
+
 public:
     TrainingSession(
         ProgramEnvironment& env,

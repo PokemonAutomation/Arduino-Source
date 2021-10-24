@@ -4,10 +4,10 @@
  *
  */
 
-#include "Common/SwitchFramework/FrameworkSettings.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh_BeamReset.h"
 
 namespace PokemonAutomation{
@@ -19,7 +19,7 @@ BeamReset_Descriptor::BeamReset_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:BeamReset",
         "Beam Reset",
-        "SwSh-Arduino/wiki/Basic:-BeamReset",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/BeamReset.md",
         "Reset a beam until you see a purple beam.",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB
@@ -47,7 +47,7 @@ BeamReset::BeamReset(const BeamReset_Descriptor& descriptor)
 void BeamReset::program(SingleSwitchProgramEnvironment& env){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
-        resume_game_front_of_den_nowatts(env.console, TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+        resume_game_front_of_den_nowatts(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
     }
@@ -62,7 +62,7 @@ void BeamReset::program(SingleSwitchProgramEnvironment& env){
 
         //  Drop wishing piece.
         pbf_press_button(env.console, BUTTON_A, 10, 70);
-        pbf_press_button(env.console, BUTTON_HOME, 10, GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
 
         for (uint16_t c = 0; c < 4; c++){
             pbf_press_button(env.console, BUTTON_HOME, 10, 10);
@@ -70,7 +70,7 @@ void BeamReset::program(SingleSwitchProgramEnvironment& env){
         }
         pbf_wait(env.console, DELAY_BEFORE_RESET);
 
-        reset_game_from_home(env.console, TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+        reset_game_from_home(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
     }
 }
 

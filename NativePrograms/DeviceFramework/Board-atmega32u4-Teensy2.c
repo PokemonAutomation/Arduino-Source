@@ -21,3 +21,6 @@ void onboard_led(bool on){
         PORTD &= ~(1 << 6);
     }
 }
+void flicker_led(void){
+    PORTD ^= (1 << 6);
+}

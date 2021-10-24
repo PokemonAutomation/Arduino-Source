@@ -7,6 +7,7 @@
  *
  */
 
+#include <cmath>
 #include "FillGeometry.h"
 
 #include <iostream>
@@ -213,6 +214,38 @@ std::vector<FillGeometry> find_all_objects(
 //    cout << "objects = " << objects.size() << endl;
     return objects;
 }
+
+
+
+ImageStats object_stats(const QImage& image, const CellMatrix& matrix, const FillGeometry& object){
+    pxint_t w = image.width();
+    pxint_t h = image.height();
+    if (w * h <= 1){
+        return ImageStats();
+    }
+    FloatPixel sum;
+    FloatPixel sqr_sum;
+    for (pxint_t r = 0; r < h; r++){
+        for (pxint_t c = 0; c < w; c++){
+            if (matrix[r][c] == object.id){
+                FloatPixel p(image.pixel(c, r));
+                sum += p;
+                sqr_sum += p * p;
+            }
+        }
+    }
+    size_t total = object.area;
+    FloatPixel variance = (sqr_sum - sum*sum / total) / (total - 1);
+    return ImageStats{
+        sum / total,
+        FloatPixel(
+            std::sqrt(variance.r),
+            std::sqrt(variance.g),
+            std::sqrt(variance.b)
+        )
+    };
+}
+
 
 
 

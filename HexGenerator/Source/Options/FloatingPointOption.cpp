@@ -41,8 +41,8 @@ FloatingPoint::FloatingPoint(const QJsonObject& obj)
 {
     m_current = json_get_double_throw(obj, JSON_CURRENT);
 }
-bool FloatingPoint::is_valid() const{
-    return FloatingPointOptionBase::is_valid();
+QString FloatingPoint::check_validity() const{
+    return FloatingPointOptionBase::check_validity();
 }
 void FloatingPoint::restore_defaults(){
     FloatingPointOptionBase::restore_defaults();

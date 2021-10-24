@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/SwitchFramework/Switch_PushButtons.h"
+#include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
@@ -65,17 +65,20 @@ const std::set<std::string>* StandardEncounterDetection::candidates(){
     QImage frame = screen;
     frame = extract_box(frame, box);
 
-    OCR::MatchResult result = PokemonNameReader::instance().read_substring(m_language, frame);
-    result.log(m_console);
-
-    if (result.matched){
-        m_candidates = std::move(result.slugs);
-    }else{
+    OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(m_console, m_language, frame);
+    if (result.results.empty()){
         dump_image(
-            m_console, screen,
-            QString::fromStdString("StandardEncounterDetection-NameOCR-" + language_data(m_language).code)
+            m_console, "",
+            QString::fromStdString("StandardEncounterDetection-NameOCR-" + language_data(m_language).code),
+            screen
         );
+    }else{
+        m_candidates.clear();
+        for (const auto& item : result.results){
+            m_candidates.insert(item.second.token);
+        }
     }
+
     m_name_read = true;
     return &m_candidates;
 }
@@ -113,11 +116,11 @@ std::pair<EncounterAction, std::string> StandardEncounterDetection::get_action()
         ? EncounterAction::StopProgram
         : EncounterAction::RunAway;
 
-    const std::vector<EncounterFilterOverrides>& overrides = m_filter.overrides();
+    const std::vector<EncounterFilterOverride>& overrides = m_filter.overrides();
     if (!overrides.empty()){
         const std::set<std::string>* candidates = this->candidates();
         if (candidates != nullptr){
-            for (const EncounterFilterOverrides& override : overrides){
+            for (const EncounterFilterOverride& override : overrides){
                 //  Not a token match.
                 if (candidates->find(override.pokemon_slug) == candidates->end()){
                     continue;

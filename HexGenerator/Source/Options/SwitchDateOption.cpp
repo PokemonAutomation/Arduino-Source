@@ -14,6 +14,7 @@
 #include "SwitchDateOption.h"
 
 namespace PokemonAutomation{
+namespace NintendoSwitch{
 
 
 const QString SwitchDate::OPTION_TYPE = "SwitchDate";
@@ -35,8 +36,8 @@ SwitchDate::SwitchDate(const QJsonObject& obj)
     load_default(json_get_value_throw(obj, JSON_DEFAULT));
     load_current(json_get_value_throw(obj, JSON_CURRENT));
 }
-bool SwitchDate::is_valid() const{
-    return SwitchDateOptionBase::is_valid();
+QString SwitchDate::check_validity() const{
+    return SwitchDateOptionBase::check_validity();
 }
 void SwitchDate::restore_defaults(){
     SwitchDateOptionBase::restore_defaults();
@@ -69,6 +70,7 @@ SwitchDateUI::SwitchDateUI(QWidget& parent, SwitchDate& value)
 
 
 
+}
 }
 
 

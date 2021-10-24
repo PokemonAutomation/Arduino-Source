@@ -43,7 +43,7 @@ public:
     const QSerialPortInfo* port(size_t index) const;
 //    const QCameraInfo* camera(size_t index) const;
 
-    SwitchSetup* make_ui(QWidget& parent, Logger& logger) override;
+    SwitchSetup* make_ui(QWidget& parent, Logger& logger, uint64_t program_id) override;
 
 private:
     friend class MultiSwitchSystem;
@@ -61,7 +61,8 @@ public:
     MultiSwitchSystem(
         QWidget& parent,
         MultiSwitchSystemFactory& factory,
-        Logger& logger
+        Logger& logger,
+        uint64_t program_id
     );
     void redraw_videos(size_t count);
 
@@ -80,6 +81,7 @@ private:
 //    void change_serial(size_t old_index, size_t new_index, SwitchSystem& system);
 
 private:
+    uint64_t m_program_id;
     MultiSwitchSystemFactory& m_factory;
     Logger& m_logger;
     std::vector<SwitchSystem*> m_switches;

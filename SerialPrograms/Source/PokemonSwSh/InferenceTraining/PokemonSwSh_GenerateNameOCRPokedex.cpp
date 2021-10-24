@@ -8,13 +8,11 @@
 #include <QJsonArray>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/QtJsonTools.h"
-#include "Common/SwitchFramework/Switch_PushButtons.h"
-#include "Common/PokemonSwSh/PokemonSettings.h"
-#include "Common/PokemonSwSh/PokemonSwShGameEntry.h"
-#include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/OCR/RawOCR.h"
 #include "CommonFramework/OCR/Filtering.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh_GenerateNameOCRPokedex.h"
 
@@ -78,12 +76,11 @@ void GenerateNameOCRDataPokedex::read(
     OCR::make_OCR_filter(image).apply(image);
 //    image.save("test.png");
 
-    OCR::MatchResult result = PokemonNameReader::instance().read_substring(LANGUAGE, image);
-    result.log(logger);
-    if (result.slugs.empty()){
+    OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(logger, LANGUAGE, image);
+    if (result.results.empty()){
         output.append("");
     }else{
-        output.append(result.slugs.begin()->c_str());
+        output.append(QString::fromStdString(result.results.begin()->second.token));
     }
 }
 
@@ -147,7 +144,7 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env){
 
     if (MODE == Mode::GENERATE_TRAINING_DATA){
         QJsonArray array = read_json_file(
-            PERSISTENT_SETTINGS().resource_path + "Pokemon/Pokedex/Pokedex-" + dex_name + ".json"
+            RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-" + dex_name + ".json"
         ).array();
         for (const auto& item : array){
             expected.emplace_back(item.toString().toUtf8().data());

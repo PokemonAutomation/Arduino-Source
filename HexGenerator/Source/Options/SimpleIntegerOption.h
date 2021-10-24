@@ -13,7 +13,7 @@
 namespace PokemonAutomation{
 
 
-class SimpleInteger : public SingleStatementOption, public SimpleIntegerOptionBase<uint32_t>{
+class SimpleInteger : public SingleStatementOption, private SimpleIntegerOptionBase<uint32_t>{
 public:
     static const QString OPTION_TYPE;
     static const QString JSON_MIN_VALUE;
@@ -23,13 +23,16 @@ public:
     SimpleInteger(const QJsonObject& obj);
 
     virtual const QString& type() const override{ return OPTION_TYPE; }
-    virtual bool is_valid() const override;
+    virtual QString check_validity() const override;
     virtual void restore_defaults() override;
 
     virtual QJsonObject to_json() const override;
     virtual std::string to_cpp() const override;
 
     virtual QWidget* make_ui(QWidget& parent) override;
+
+private:
+    friend class SimpleIntegerUI;
 };
 
 class SimpleIntegerUI : public SimpleIntegerOptionBaseUI<uint32_t>{

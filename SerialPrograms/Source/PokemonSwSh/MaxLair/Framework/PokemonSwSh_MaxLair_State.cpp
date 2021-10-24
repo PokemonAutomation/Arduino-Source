@@ -54,12 +54,12 @@ void PlayerState::clear_battle_state(){
     }
 }
 
-std::string Path::dump() const{
+std::string PathMap::dump() const{
     std::string str;
-    str += "Path Type: " + std::to_string((int)path_type);
+    str += "    Path Type: " + std::to_string((int)path_type);
     str += "\n";
     {
-        str += "Row 3: ";
+        str += "        Row 3: ";
         bool first = true;
         for (size_t c = 0; c < 4; c++){
             if (!first){
@@ -71,7 +71,7 @@ std::string Path::dump() const{
         str += "\n";
     }
     {
-        str += "Row 2: ";
+        str += "        Row 2: ";
         bool first = true;
         for (size_t c = 0; c < 4; c++){
             if (!first){
@@ -83,7 +83,7 @@ std::string Path::dump() const{
         str += "\n";
     }
     {
-        str += "Row 1: ";
+        str += "        Row 1: ";
         bool first = true;
         for (size_t c = 0; c < 2; c++){
             if (!first){
@@ -124,6 +124,13 @@ std::string GlobalState::dump() const{
     str += "    Player 1: " + players[1].dump() + "\n";
     str += "    Player 2: " + players[2].dump() + "\n";
     str += "    Player 3: " + players[3].dump() + "\n";
+    str += path.dump();
+    switch (path_side){
+    case 0: str += "        current-side: left"; break;
+    case 1: str += "        current-side: right"; break;
+    default: str += "        current-side: ?"; break;
+    }
+    str += "\n";
     return str;
 }
 void GlobalState::clear_battle_state(){

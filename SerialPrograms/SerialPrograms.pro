@@ -20,6 +20,8 @@ win32-g++{
     CONFIG += c++14
 
     QMAKE_CXXFLAGS += -march=nehalem
+    QMAKE_CXXFLAGS += -Wno-comment
+    QMAKE_CXXFLAGS += -Wno-ignored-attributes
 #    QMAKE_CXXFLAGS += -Wnarrowing
 #    QMAKE_CXXFLAGS += -Wno-unused-parameter
 #    QMAKE_CXXFLAGS += -Wno-unused-function
@@ -28,6 +30,10 @@ win32-g++{
     DEFINES += WIN32
     DEFINES += PA_TESSERACT
     LIBS += ../SerialPrograms/tesseractPA.lib
+
+    DEFINES += WIN32
+    DEFINES += PA_SLEEPY
+    LIBS += ../SerialPrograms/Sleepy.lib
 }
 win32-msvc{
     QMAKE_CXXFLAGS += /std:c++latest
@@ -36,6 +42,10 @@ win32-msvc{
     DEFINES += WIN32
     DEFINES += PA_TESSERACT
     LIBS += ../SerialPrograms/tesseractPA.lib
+
+    DEFINES += WIN32
+    DEFINES += PA_SLEEPY
+    LIBS += ../SerialPrograms/Sleepy.lib
 }
 macx{
     QMAKE_CXXFLAGS += -std=c++14
@@ -55,17 +65,16 @@ SOURCES += \
     ../Common/Cpp/PanicDump.cpp \
     ../Common/Cpp/ParallelTaskRunner.cpp \
     ../Common/Cpp/PrettyPrint.cpp \
+    ../Common/Cpp/SpinLock.cpp \
     ../Common/Cpp/Unicode.cpp \
-    ../Common/PokemonSwSh/PokemonSettings.cpp \
-    ../Common/PokemonSwSh/PokemonSwShAutoHosts.cpp \
-    ../Common/PokemonSwSh/PokemonSwShDateSpam.cpp \
-    ../Common/PokemonSwSh/PokemonSwShDaySkippers.cpp \
-    ../Common/PokemonSwSh/PokemonSwShEggRoutines.cpp \
-    ../Common/PokemonSwSh/PokemonSwShGameEntry.cpp \
-    ../Common/PokemonSwSh/PokemonSwShMisc.cpp \
+    ../Common/Microcontroller/DeviceRoutines.cpp \
+    ../Common/NintendoSwitch/NintendoSwitch_Tools.cpp \
+    ../Common/Qt/AutoHeightTable.cpp \
+    ../Common/Qt/AutoWidthLineEdit.cpp \
     ../Common/Qt/CodeValidator.cpp \
     ../Common/Qt/ExpressionEvaluator.cpp \
     ../Common/Qt/Options/BooleanCheckBoxOptionBase.cpp \
+    ../Common/Qt/Options/EditableTableOptionBase.cpp \
     ../Common/Qt/Options/FloatingPointOptionBase.cpp \
     ../Common/Qt/Options/FossilTableOptionBase.cpp \
     ../Common/Qt/Options/MultiHostTableOptionBase.cpp \
@@ -74,20 +83,18 @@ SOURCES += \
     ../Common/Qt/Options/SwitchDateOptionBase.cpp \
     ../Common/Qt/Options/TimeExpressionOptionBase.cpp \
     ../Common/Qt/QtJsonTools.cpp \
-    ../Common/SwitchFramework/FrameworkSettings.cpp \
-    ../Common/SwitchFramework/Switch_PushButtons.cpp \
-    ../Common/SwitchRoutines/SwitchDigitEntry.cpp \
     Source/CommonFramework/CrashDump.cpp \
     Source/CommonFramework/GlobalSettingsPanel.cpp \
     Source/CommonFramework/Globals.cpp \
-    Source/CommonFramework/ImageMatch/CroppedImageMatcher.cpp \
+    Source/CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.cpp \
+    Source/CommonFramework/ImageMatch/ExactImageDictionaryMatcher.cpp \
     Source/CommonFramework/ImageMatch/ExactImageMatcher.cpp \
     Source/CommonFramework/ImageMatch/FilterToAlpha.cpp \
     Source/CommonFramework/ImageMatch/ImageCropper.cpp \
     Source/CommonFramework/ImageMatch/ImageDiff.cpp \
-    Source/CommonFramework/ImageMatch/ImageMatchMetadata.cpp \
     Source/CommonFramework/ImageMatch/ImageMatchOption.cpp \
     Source/CommonFramework/ImageMatch/ImageMatchResult.cpp \
+    Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.cpp \
     Source/CommonFramework/ImageTools/CellMatrix.cpp \
     Source/CommonFramework/ImageTools/ColorClustering.cpp \
     Source/CommonFramework/ImageTools/FillGeometry.cpp \
@@ -97,12 +104,18 @@ SOURCES += \
     Source/CommonFramework/ImageTools/SolidColorTest.cpp \
     Source/CommonFramework/Inference/AnomalyDetector.cpp \
     Source/CommonFramework/Inference/BlackScreenDetector.cpp \
+    Source/CommonFramework/Inference/FrozenImageDetector.cpp \
     Source/CommonFramework/Inference/ImageTools.cpp \
     Source/CommonFramework/Inference/VisualInferenceCallback.cpp \
     Source/CommonFramework/Inference/VisualInferenceRoutines.cpp \
     Source/CommonFramework/Inference/VisualInferenceSession.cpp \
     Source/CommonFramework/Language.cpp \
     Source/CommonFramework/Main.cpp \
+    Source/CommonFramework/Notifications/EventNotificationOption.cpp \
+    Source/CommonFramework/Notifications/EventNotificationsTable.cpp \
+    Source/CommonFramework/Notifications/MessageAttachment.cpp \
+    Source/CommonFramework/Notifications/ProgramNotifications.cpp \
+    Source/CommonFramework/Notifications/SenderNotificationTable.cpp \
     Source/CommonFramework/OCR/DictionaryMatcher.cpp \
     Source/CommonFramework/OCR/DictionaryOCR.cpp \
     Source/CommonFramework/OCR/Filtering.cpp \
@@ -110,17 +123,17 @@ SOURCES += \
     Source/CommonFramework/OCR/LargeDictionaryMatcher.cpp \
     Source/CommonFramework/OCR/RawOCR.cpp \
     Source/CommonFramework/OCR/SmallDictionaryMatcher.cpp \
+    Source/CommonFramework/OCR/StringMatchResult.cpp \
     Source/CommonFramework/OCR/StringNormalization.cpp \
     Source/CommonFramework/OCR/TextMatcher.cpp \
     Source/CommonFramework/OCR/TrainingTools.cpp \
     Source/CommonFramework/Options/BatchOption.cpp \
-    Source/CommonFramework/Options/DiscordSettingsOption.cpp \
     Source/CommonFramework/Options/EnumDropdownOption.cpp \
     Source/CommonFramework/Options/FixedCodeOption.cpp \
+    Source/CommonFramework/Options/HiddenTextEditOption.cpp \
     Source/CommonFramework/Options/RandomCodeOption.cpp \
     Source/CommonFramework/Options/ScreenshotFormatOption.cpp \
     Source/CommonFramework/Options/SectionDivider.cpp \
-    Source/CommonFramework/Options/StringBoxOption.cpp \
     Source/CommonFramework/Options/StringSelectOption.cpp \
     Source/CommonFramework/Options/TextEditOption.cpp \
     Source/CommonFramework/Panels/Panel.cpp \
@@ -130,13 +143,11 @@ SOURCES += \
     Source/CommonFramework/Panels/SettingsPanel.cpp \
     Source/CommonFramework/PersistentSettings.cpp \
     Source/CommonFramework/Tools/BotBaseHandle.cpp \
-    Source/CommonFramework/Tools/DiscordWebHook.cpp \
     Source/CommonFramework/Tools/ErrorDumper.cpp \
     Source/CommonFramework/Tools/FileWindowLogger.cpp \
     Source/CommonFramework/Tools/InterruptableCommands.cpp \
     Source/CommonFramework/Tools/Logger.cpp \
     Source/CommonFramework/Tools/ProgramEnvironment.cpp \
-    Source/CommonFramework/Tools/ProgramNotifications.cpp \
     Source/CommonFramework/Tools/QueuedLogger.cpp \
     Source/CommonFramework/Tools/StatsDatabase.cpp \
     Source/CommonFramework/Tools/StatsTracking.cpp \
@@ -145,26 +156,55 @@ SOURCES += \
     Source/CommonFramework/Widgets/VideoOverlayWidget.cpp \
     Source/CommonFramework/Windows/ButtonDiagram.cpp \
     Source/CommonFramework/Windows/MainWindow.cpp \
+    Source/Integrations/DiscordIntegrationSettings.cpp \
+    Source/Integrations/DiscordIntegrationTable.cpp \
+    Source/Integrations/DiscordSettingsOption.cpp \
+    Source/Integrations/DiscordWebHook.cpp \
+    Source/Integrations/DiscordWebhookSettings.cpp \
+    Source/Integrations/IntegrationsAPI.cpp \
+    Source/Integrations/ProgramTracker.cpp \
+    Source/Integrations/SleepyDiscordRunner.cpp \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.cpp \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.cpp \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.cpp \
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.cpp \
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Default.cpp \
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.cpp \
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX512.cpp \
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_SSE41.cpp \
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr.cpp \
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev.cpp \
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_Default.cpp \
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX2.cpp \
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.cpp \
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_SSE41.cpp \
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_Default.cpp \
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX2.cpp \
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.cpp \
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Device.cpp \
+    Source/NintendoSwitch/Commands/NintendoSwitch_DigitEntry.cpp \
+    Source/NintendoSwitch/Commands/NintendoSwitch_PushButtons.cpp \
     Source/NintendoSwitch/Framework/MultiSwitchProgram.cpp \
     Source/NintendoSwitch/Framework/MultiSwitchSystem.cpp \
     Source/NintendoSwitch/Framework/RunnableSwitchProgram.cpp \
     Source/NintendoSwitch/Framework/SingleSwitchProgram.cpp \
     Source/NintendoSwitch/Framework/SwitchCommandRow.cpp \
-    Source/NintendoSwitch/Framework/SwitchProgramTracker.cpp \
     Source/NintendoSwitch/Framework/SwitchSystem.cpp \
     Source/NintendoSwitch/Framework/VirtualSwitchController.cpp \
     Source/NintendoSwitch/Framework/VirtualSwitchControllerMapping.cpp \
-    Source/NintendoSwitch/FrameworkSettingsPanel.cpp \
     Source/NintendoSwitch/InferenceTraining/PokemonHome_GenerateNameOCR.cpp \
-    Source/NintendoSwitch/Options/FriendCodeListOption.cpp \
-    Source/NintendoSwitch/Panels_NintendoSwitch.cpp \
-    Source/NintendoSwitch/Programs/FriendCodeAdder.cpp \
-    Source/NintendoSwitch/Programs/FriendDelete.cpp \
+    Source/NintendoSwitch/NintendoSwitch_Panels.cpp \
+    Source/NintendoSwitch/NintendoSwitch_Settings.cpp \
+    Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.cpp \
+    Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.cpp \
+    Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.cpp \
+    Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.cpp \
+    Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.cpp \
+    Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.cpp \
+    Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.cpp \
+    Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.cpp \
     Source/NintendoSwitch/Programs/PokemonHome_PageSwap.cpp \
-    Source/NintendoSwitch/Programs/PreventSleep.cpp \
-    Source/NintendoSwitch/Programs/SwitchViewer.cpp \
-    Source/NintendoSwitch/Programs/TurboButton.cpp \
-    Source/NintendoSwitch/Programs/VirtualConsole.cpp \
     Source/NintendoSwitch/TestProgram.cpp \
     Source/PanelLists.cpp \
     Source/Pokemon/Inference/Pokemon_NameReader.cpp \
@@ -182,6 +222,12 @@ SOURCES += \
     Source/Pokemon/Resources/Pokemon_PokemonNames.cpp \
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.cpp \
     Source/PokemonBDSP/Panels_PokemonBDSP.cpp \
+    Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp \
+    Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp \
+    Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.cpp \
+    Source/PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.cpp \
+    Source/PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.cpp \
+    Source/PokemonSwSh/Commands/PokemonSwSh_Commands_Misc.cpp \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.cpp \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogDetector.cpp \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.cpp \
@@ -200,6 +246,7 @@ SOURCES += \
     Source/PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.cpp \
+    Source/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyDialogTracker.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleDetector.cpp \
@@ -210,27 +257,32 @@ SOURCES += \
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateIVCheckerOCR.cpp \
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateNameOCRPokedex.cpp \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.cpp \
+    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_CatchScreenTracker.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathMap.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSide.cpp \
     Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_ProfessorSwap.cpp \
+    Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_BossFinder.cpp \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Adventure.cpp \
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_ProfessorSwap.cpp \
     Source/PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.cpp \
     Source/PokemonSwSh/Options/PokemonSwSh_Catchability.cpp \
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.cpp \
     Source/PokemonSwSh/Options/PokemonSwSh_EncounterFilter.cpp \
     Source/PokemonSwSh/Options/PokemonSwSh_RegiSelector.cpp \
-    Source/PokemonSwSh/Panels_PokemonSwSh.cpp \
-    Source/PokemonSwSh/PokemonSwSh_SettingsPanel.cpp \
+    Source/PokemonSwSh/PkmnLib/PokemonSwSh_MaxLair_Moves.cpp \
+    Source/PokemonSwSh/PkmnLib/PokemonSwSh_MaxLair_Pokemon.cpp \
+    Source/PokemonSwSh/PkmnLib/PokemonSwSh_MaxLair_Stats.cpp \
+    Source/PokemonSwSh/PkmnLib/PokemonSwSh_MaxLair_Types.cpp \
+    Source/PokemonSwSh/PokemonSwSh_Panels.cpp \
+    Source/PokemonSwSh/PokemonSwSh_Settings.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_AutonomousBallThrower.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_BallThrower.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_ClothingBuyer.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_DexRecFinder.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_MassRelease.cpp \
-    Source/PokemonSwSh/Programs/General/PokemonSwSh_StatsReset.cpp \
-    Source/PokemonSwSh/Programs/General/PokemonSwSh_StatsReset-Calyrex.cpp \
-    Source/PokemonSwSh/Programs/General/PokemonSwSh_StatsReset-Moltres.cpp \
-    Source/PokemonSwSh/Programs/General/PokemonSwSh_StatsReset-Regi.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_SurpriseTrade.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_TradeBot.cpp \
-    Source/PokemonSwSh/Programs/General/PokemonSwSh_TurboA.cpp \
+    Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_AutoHost.cpp \
     Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_AutoHostStats.cpp \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SelectItem.cpp \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SelectMove.cpp \
@@ -264,6 +316,10 @@ SOURCES += \
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_PokemonSwap.cpp \
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Start.cpp \
     Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_DenTools.cpp \
+    Source/PokemonSwSh/Programs/NonShinyHunting/PokemonSwSh_StatsReset-Calyrex.cpp \
+    Source/PokemonSwSh/Programs/NonShinyHunting/PokemonSwSh_StatsReset-Moltres.cpp \
+    Source/PokemonSwSh/Programs/NonShinyHunting/PokemonSwSh_StatsReset-Regi.cpp \
+    Source/PokemonSwSh/Programs/NonShinyHunting/PokemonSwSh_StatsReset.cpp \
     Source/PokemonSwSh/Programs/OverworldBot/PokemonSwSh_OverworldMovement.cpp \
     Source/PokemonSwSh/Programs/OverworldBot/PokemonSwSh_OverworldTargetTracker.cpp \
     Source/PokemonSwSh/Programs/OverworldBot/PokemonSwSh_OverworldTrajectory.cpp \
@@ -272,6 +328,7 @@ SOURCES += \
     Source/PokemonSwSh/Programs/PokemonSwSh_BasicCatcher.cpp \
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterDetection.cpp \
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterHandler.cpp \
+    Source/PokemonSwSh/Programs/PokemonSwSh_Internet.cpp \
     Source/PokemonSwSh/Programs/PokemonSwSh_StartGame.cpp \
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-BerryTree.cpp \
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Fishing.cpp \
@@ -343,19 +400,26 @@ HEADERS += \
     ../Common/Cpp/SIMDDebuggers.h \
     ../Common/Cpp/SpinLock.h \
     ../Common/Cpp/Unicode.h \
-    ../Common/MessageProtocol.h \
+    ../Common/Microcontroller/DeviceRoutines.h \
+    ../Common/Microcontroller/MessageProtocol.h \
+    ../Common/NintendoSwitch/NintendoSwitch_Protocol_DigitEntry.h \
+    ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h \
+    ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h \
+    ../Common/NintendoSwitch/NintendoSwitch_Tools.h \
     ../Common/PokemonSwSh/PokemonProgramIDs.h \
-    ../Common/PokemonSwSh/PokemonSettings.h \
-    ../Common/PokemonSwSh/PokemonSwShAutoHosts.h \
-    ../Common/PokemonSwSh/PokemonSwShDateSpam.h \
-    ../Common/PokemonSwSh/PokemonSwShDaySkippers.h \
-    ../Common/PokemonSwSh/PokemonSwShEggRoutines.h \
-    ../Common/PokemonSwSh/PokemonSwShGameEntry.h \
-    ../Common/PokemonSwSh/PokemonSwShMisc.h \
+    ../Common/PokemonSwSh/PokemonSwSh_Protocol_AutoHosts.h \
+    ../Common/PokemonSwSh/PokemonSwSh_Protocol_DateSpam.h \
+    ../Common/PokemonSwSh/PokemonSwSh_Protocol_DaySkippers.h \
+    ../Common/PokemonSwSh/PokemonSwSh_Protocol_EggRoutines.h \
+    ../Common/PokemonSwSh/PokemonSwSh_Protocol_GameEntry.h \
+    ../Common/PokemonSwSh/PokemonSwSh_Protocol_Misc.h \
+    ../Common/Qt/AutoHeightTable.h \
+    ../Common/Qt/AutoWidthLineEdit.h \
     ../Common/Qt/CodeValidator.h \
     ../Common/Qt/ExpressionEvaluator.h \
     ../Common/Qt/NoWheelComboBox.h \
     ../Common/Qt/Options/BooleanCheckBoxOptionBase.h \
+    ../Common/Qt/Options/EditableTableOptionBase.h \
     ../Common/Qt/Options/FloatingPointOptionBase.h \
     ../Common/Qt/Options/FossilTableOptionBase.h \
     ../Common/Qt/Options/MultiHostTableOptionBase.h \
@@ -364,24 +428,22 @@ HEADERS += \
     ../Common/Qt/Options/SwitchDateOptionBase.h \
     ../Common/Qt/Options/TimeExpressionOptionBase.h \
     ../Common/Qt/QtJsonTools.h \
-    ../Common/SwitchFramework/FrameworkSettings.h \
-    ../Common/SwitchFramework/Switch_PushButtons.h \
-    ../Common/SwitchFramework/SwitchControllerDefs.h \
-    ../Common/SwitchFramework/Switch_PushButtons.h \
-    ../Common/SwitchRoutines/SwitchDigitEntry.h \
+    ../Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h \
     Source/CommonFramework/CrashDump.h \
     Source/CommonFramework/GlobalSettingsPanel.h \
     Source/CommonFramework/Globals.h \
-    Source/CommonFramework/ImageMatch/CroppedImageMatcher.h \
+    Source/CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h \
+    Source/CommonFramework/ImageMatch/ExactImageDictionaryMatcher.h \
     Source/CommonFramework/ImageMatch/ExactImageMatcher.h \
     Source/CommonFramework/ImageMatch/FilterToAlpha.h \
     Source/CommonFramework/ImageMatch/ImageCropper.h \
     Source/CommonFramework/ImageMatch/ImageDiff.h \
-    Source/CommonFramework/ImageMatch/ImageMatchMetadata.h \
     Source/CommonFramework/ImageMatch/ImageMatchOption.h \
     Source/CommonFramework/ImageMatch/ImageMatchResult.h \
+    Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h \
     Source/CommonFramework/ImageTools/CellMatrix.h \
     Source/CommonFramework/ImageTools/ColorClustering.h \
+    Source/CommonFramework/ImageTools/DistanceToLine.h \
     Source/CommonFramework/ImageTools/FillGeometry.h \
     Source/CommonFramework/ImageTools/FloatPixel.h \
     Source/CommonFramework/ImageTools/ImageBoxes.h \
@@ -389,6 +451,7 @@ HEADERS += \
     Source/CommonFramework/ImageTools/SolidColorTest.h \
     Source/CommonFramework/Inference/AnomalyDetector.h \
     Source/CommonFramework/Inference/BlackScreenDetector.h \
+    Source/CommonFramework/Inference/FrozenImageDetector.h \
     Source/CommonFramework/Inference/ImageTools.h \
     Source/CommonFramework/Inference/InferenceThrottler.h \
     Source/CommonFramework/Inference/StatAccumulator.h \
@@ -397,6 +460,11 @@ HEADERS += \
     Source/CommonFramework/Inference/VisualInferenceRoutines.h \
     Source/CommonFramework/Inference/VisualInferenceSession.h \
     Source/CommonFramework/Language.h \
+    Source/CommonFramework/Notifications/EventNotificationOption.h \
+    Source/CommonFramework/Notifications/EventNotificationsTable.h \
+    Source/CommonFramework/Notifications/MessageAttachment.h \
+    Source/CommonFramework/Notifications/ProgramNotifications.h \
+    Source/CommonFramework/Notifications/SenderNotificationTable.h \
     Source/CommonFramework/OCR/DictionaryMatcher.h \
     Source/CommonFramework/OCR/DictionaryOCR.h \
     Source/CommonFramework/OCR/Filtering.h \
@@ -404,6 +472,7 @@ HEADERS += \
     Source/CommonFramework/OCR/LargeDictionaryMatcher.h \
     Source/CommonFramework/OCR/RawOCR.h \
     Source/CommonFramework/OCR/SmallDictionaryMatcher.h \
+    Source/CommonFramework/OCR/StringMatchResult.h \
     Source/CommonFramework/OCR/StringNormalization.h \
     Source/CommonFramework/OCR/TesseractPA.h \
     Source/CommonFramework/OCR/TextMatcher.h \
@@ -411,15 +480,15 @@ HEADERS += \
     Source/CommonFramework/Options/BatchOption.h \
     Source/CommonFramework/Options/BooleanCheckBoxOption.h \
     Source/CommonFramework/Options/ConfigOption.h \
-    Source/CommonFramework/Options/DiscordSettingsOption.h \
+    Source/CommonFramework/Options/EditableTableOption.h \
     Source/CommonFramework/Options/EnumDropdownOption.h \
     Source/CommonFramework/Options/FixedCodeOption.h \
     Source/CommonFramework/Options/FloatingPointOption.h \
+    Source/CommonFramework/Options/HiddenTextEditOption.h \
     Source/CommonFramework/Options/RandomCodeOption.h \
     Source/CommonFramework/Options/ScreenshotFormatOption.h \
     Source/CommonFramework/Options/SectionDivider.h \
     Source/CommonFramework/Options/SimpleIntegerOption.h \
-    Source/CommonFramework/Options/StringBoxOption.h \
     Source/CommonFramework/Options/StringOption.h \
     Source/CommonFramework/Options/StringSelectOption.h \
     Source/CommonFramework/Options/TextEditOption.h \
@@ -430,13 +499,11 @@ HEADERS += \
     Source/CommonFramework/Panels/SettingsPanel.h \
     Source/CommonFramework/PersistentSettings.h \
     Source/CommonFramework/Tools/ConsoleHandle.h \
-    Source/CommonFramework/Tools/DiscordWebHook.h \
     Source/CommonFramework/Tools/ErrorDumper.h \
     Source/CommonFramework/Tools/FileWindowLogger.h \
     Source/CommonFramework/Tools/InterruptableCommands.h \
     Source/CommonFramework/Tools/Logger.h \
     Source/CommonFramework/Tools/ProgramEnvironment.h \
-    Source/CommonFramework/Tools/ProgramNotifications.h \
     Source/CommonFramework/Tools/QueuedLogger.h \
     Source/CommonFramework/Tools/StatsDatabase.h \
     Source/CommonFramework/Tools/StatsTracking.h \
@@ -447,32 +514,75 @@ HEADERS += \
     Source/CommonFramework/Widgets/VideoOverlayWidget.h \
     Source/CommonFramework/Windows/ButtonDiagram.h \
     Source/CommonFramework/Windows/MainWindow.h \
+    Source/Integrations/DiscordIntegrationSettings.h \
+    Source/Integrations/DiscordIntegrationTable.h \
+    Source/Integrations/DiscordSettingsOption.h \
+    Source/Integrations/DiscordWebHook.h \
+    Source/Integrations/DiscordWebhookSettings.h \
+    Source/Integrations/IntegrationsAPI.h \
+    Source/Integrations/ProgramTracker.h \
+    Source/Integrations/SleepyDiscordRunner.h \
+    Source/Kernels/BinaryImage/Kernels_BinaryImage.h \
+    Source/Kernels/BinaryImage/Kernels_BinaryImageBase.h \
+    Source/Kernels/BinaryImage/Kernels_BinaryImage_Default.h \
+    Source/Kernels/BinaryImage/Kernels_BinaryImage_x64_SSE42.h \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.h \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h \
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h \
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Default.h \
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.h \
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX512.h \
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_SSE41.h \
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr.h \
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev.h \
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_Default.h \
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX2.h \
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.h \
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_SSE41.h \
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_Default.h \
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX2.h \
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.h \
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.h \
+    Source/Kernels/Kernels_Alignment.h \
+    Source/Kernels/Kernels_Arch.h \
+    Source/Kernels/Kernels_x64_AVX2.h \
+    Source/Kernels/Kernels_x64_AVX512.h \
+    Source/Kernels/Kernels_x64_SSE41.h \
+    Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h \
+    Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h \
+    Source/Kernels/WaterFill/Kernels_WaterFill_FillQueue.h \
+    Source/Kernels/WaterFill/Kernels_WaterFill_Intrinsics_SSE4.h \
+    Source/Kernels/WaterFill/Kernels_WaterFill_Intrinsics_u64.h \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Device.h \
+    Source/NintendoSwitch/Commands/NintendoSwitch_DigitEntry.h \
+    Source/NintendoSwitch/Commands/NintendoSwitch_PushButtons.h \
     Source/NintendoSwitch/FixedInterval.h \
     Source/NintendoSwitch/Framework/MultiSwitchProgram.h \
     Source/NintendoSwitch/Framework/MultiSwitchSystem.h \
     Source/NintendoSwitch/Framework/RunnableSwitchProgram.h \
     Source/NintendoSwitch/Framework/SingleSwitchProgram.h \
     Source/NintendoSwitch/Framework/SwitchCommandRow.h \
-    Source/NintendoSwitch/Framework/SwitchProgramTracker.h \
     Source/NintendoSwitch/Framework/SwitchSetup.h \
     Source/NintendoSwitch/Framework/SwitchSystem.h \
     Source/NintendoSwitch/Framework/VirtualSwitchController.h \
     Source/NintendoSwitch/Framework/VirtualSwitchControllerMapping.h \
-    Source/NintendoSwitch/FrameworkSettingsPanel.h \
     Source/NintendoSwitch/InferenceTraining/PokemonHome_GenerateNameOCR.h \
-    Source/NintendoSwitch/Options/FriendCodeListOption.h \
+    Source/NintendoSwitch/NintendoSwitch_Panels.h \
+    Source/NintendoSwitch/NintendoSwitch_Settings.h \
     Source/NintendoSwitch/Options/GoHomeWhenDoneOption.h \
+    Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.h \
     Source/NintendoSwitch/Options/StartInGripMenuOption.h \
     Source/NintendoSwitch/Options/SwitchDateOption.h \
     Source/NintendoSwitch/Options/TimeExpressionOption.h \
-    Source/NintendoSwitch/Panels_NintendoSwitch.h \
-    Source/NintendoSwitch/Programs/FriendCodeAdder.h \
-    Source/NintendoSwitch/Programs/FriendDelete.h \
+    Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.h \
+    Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.h \
+    Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.h \
+    Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.h \
+    Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.h \
+    Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.h \
+    Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.h \
     Source/NintendoSwitch/Programs/PokemonHome_PageSwap.h \
-    Source/NintendoSwitch/Programs/PreventSleep.h \
-    Source/NintendoSwitch/Programs/SwitchViewer.h \
-    Source/NintendoSwitch/Programs/TurboButton.h \
-    Source/NintendoSwitch/Programs/VirtualConsole.h \
     Source/NintendoSwitch/TestProgram.h \
     Source/PanelLists.h \
     Source/Pokemon/Inference/Pokemon_NameReader.h \
@@ -492,6 +602,12 @@ HEADERS += \
     Source/Pokemon/Resources/Pokemon_PokemonNames.h \
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.h \
     Source/PokemonBDSP/Panels_PokemonBDSP.h \
+    Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h \
+    Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h \
+    Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h \
+    Source/PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h \
+    Source/PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h \
+    Source/PokemonSwSh/Commands/PokemonSwSh_Commands_Misc.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogDetector.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h \
@@ -510,6 +626,7 @@ HEADERS += \
     Source/PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h \
+    Source/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyDialogTracker.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyFilters.h \
@@ -521,7 +638,12 @@ HEADERS += \
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateIVCheckerOCR.h \
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateNameOCRPokedex.h \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h \
+    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_CatchScreenTracker.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathMap.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSide.h \
     Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_ProfessorSwap.h \
+    Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_BossFinder.h \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Adventure.h \
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_ProfessorSwap.h \
     Source/PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h \
     Source/PokemonSwSh/Options/PokemonSwSh_Catchability.h \
@@ -532,21 +654,21 @@ HEADERS += \
     Source/PokemonSwSh/Options/PokemonSwSh_FossilTable.h \
     Source/PokemonSwSh/Options/PokemonSwSh_MultiHostTable.h \
     Source/PokemonSwSh/Options/PokemonSwSh_RegiSelector.h \
-    Source/PokemonSwSh/Panels_PokemonSwSh.h \
-    Source/PokemonSwSh/PokemonSwSh_SettingsPanel.h \
+    Source/PokemonSwSh/PkmnLib/PokemonSwSh_MaxLair_Moves.h \
+    Source/PokemonSwSh/PkmnLib/PokemonSwSh_MaxLair_Pokemon.h \
+    Source/PokemonSwSh/PkmnLib/PokemonSwSh_MaxLair_Stats.h \
+    Source/PokemonSwSh/PkmnLib/PokemonSwSh_MaxLair_Types.h \
+    Source/PokemonSwSh/PokemonSwSh_Panels.h \
+    Source/PokemonSwSh/PokemonSwSh_Settings.h \
     Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperStats.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_AutonomousBallThrower.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_BallThrower.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_ClothingBuyer.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_DexRecFinder.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_MassRelease.h \
-    Source/PokemonSwSh/Programs/General/PokemonSwSh_StatsReset.h \
-    Source/PokemonSwSh/Programs/General/PokemonSwSh_StatsReset-Calyrex.h \
-    Source/PokemonSwSh/Programs/General/PokemonSwSh_StatsReset-Moltres.h \
-    Source/PokemonSwSh/Programs/General/PokemonSwSh_StatsReset-Regi.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_SurpriseTrade.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_TradeBot.h \
-    Source/PokemonSwSh/Programs/General/PokemonSwSh_TurboA.h \
+    Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_AutoHost.h \
     Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_AutoHostStats.h \
     Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Notifications.h \
     Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Options.h \
@@ -574,6 +696,10 @@ HEADERS += \
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_PokemonSelect.h \
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_PokemonSwap.h \
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Start.h \
+    Source/PokemonSwSh/Programs/NonShinyHunting/PokemonSwSh_StatsReset-Calyrex.h \
+    Source/PokemonSwSh/Programs/NonShinyHunting/PokemonSwSh_StatsReset-Moltres.h \
+    Source/PokemonSwSh/Programs/NonShinyHunting/PokemonSwSh_StatsReset-Regi.h \
+    Source/PokemonSwSh/Programs/NonShinyHunting/PokemonSwSh_StatsReset.h \
     Source/PokemonSwSh/Programs/OverworldBot/PokemonSwSh_OverworldMovement.h \
     Source/PokemonSwSh/Programs/OverworldBot/PokemonSwSh_OverworldTargetTracker.h \
     Source/PokemonSwSh/Programs/OverworldBot/PokemonSwSh_OverworldTrajectory.h \
@@ -582,6 +708,7 @@ HEADERS += \
     Source/PokemonSwSh/Programs/PokemonSwSh_BasicCatcher.h \
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterDetection.h \
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterHandler.h \
+    Source/PokemonSwSh/Programs/PokemonSwSh_Internet.h \
     Source/PokemonSwSh/Programs/PokemonSwSh_StartGame.h \
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-BerryTree.h \
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Fishing.h \

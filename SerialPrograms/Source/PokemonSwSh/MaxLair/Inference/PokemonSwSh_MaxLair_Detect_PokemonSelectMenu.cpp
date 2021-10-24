@@ -27,11 +27,17 @@ PokemonSelectMenuDetector::PokemonSelectMenuDetector(bool stop_no_detect)
 //    , m_box4(overlay, 0.87, 0.17, 0.03, 0.20)
 //    , m_box5(overlay, 0.87, 0.43, 0.03, 0.20)
 //    , m_box6(overlay, 0.87, 0.69, 0.03, 0.20)
+    , m_select0(0.630, 0.270 + 0*0.258, 0.030, 0.100)
+    , m_select1(0.630, 0.270 + 1*0.258, 0.030, 0.100)
+    , m_select2(0.630, 0.270 + 2*0.258, 0.030, 0.100)
 {
     add_box(m_box0);
     add_box(m_box1);
     add_box(m_box2);
     add_box(m_box3);
+    add_box(m_select0);
+    add_box(m_select1);
+    add_box(m_select2);
 }
 bool PokemonSelectMenuDetector::is_pink(const ImageStats& stats){
     if (stats.average.sum() < 400){
@@ -62,7 +68,13 @@ bool PokemonSelectMenuDetector::detect(const QImage& screen) const{
 //    if (euclidean_distance(box3.average, box5.average) > 10) return false;
 ///    if (euclidean_distance(box3.average, box6.average) > 10) return false;
 
-    return true;
+    double select0 = image_average(extract_box(screen, m_select0)).sum();
+    if (select0 < 200) return true;
+//    double select1 = image_average(extract_box(screen, m_select1)).sum();
+//    if (select1 < 200) return true;
+//    double select2 = image_average(extract_box(screen, m_select2)).sum();
+//    if (select2 < 200) return true;
+    return false;
 }
 bool PokemonSelectMenuDetector::process_frame(
     const QImage& frame,
@@ -87,23 +99,11 @@ PokemonSelectMenuReader::PokemonSelectMenuReader(
     , m_name0(overlay, 0.485, 0.285 + 0*0.258, 0.180, 0.045)
     , m_name1(overlay, 0.485, 0.285 + 1*0.258, 0.180, 0.045)
     , m_name2(overlay, 0.485, 0.285 + 2*0.258, 0.180, 0.045)
-    , m_select0(overlay, 0.630, 0.270 + 0*0.258, 0.030, 0.100)
-    , m_select1(overlay, 0.630, 0.270 + 1*0.258, 0.030, 0.100)
-    , m_select2(overlay, 0.630, 0.270 + 2*0.258, 0.030, 0.100)
     , m_player0(overlay, 0.200, 0.335 + 0*0.090, 0.200, 0.060)
     , m_player1(overlay, 0.200, 0.335 + 1*0.090, 0.200, 0.060)
     , m_player2(overlay, 0.200, 0.335 + 2*0.090, 0.200, 0.060)
     , m_player3(overlay, 0.200, 0.335 + 3*0.090, 0.200, 0.060)
 {}
-bool PokemonSelectMenuReader::my_turn(const QImage& screen) const{
-    double box0 = pixel_average(extract_box(screen, m_select0)).sum();
-    if (box0 < 200) return true;
-    double box1 = pixel_average(extract_box(screen, m_select1)).sum();
-    if (box1 < 200) return true;
-    double box2 = pixel_average(extract_box(screen, m_select2)).sum();
-    if (box2 < 200) return true;
-    return false;
-}
 int8_t PokemonSelectMenuReader::who_is_selecting(const QImage& screen) const{
 //    cout << slot0.average << ", " << slot0.stddev << endl;
     ImageStats slot3 = image_stats(extract_box(screen, m_player3));
@@ -124,13 +124,6 @@ std::string PokemonSelectMenuReader::read_option(const QImage& screen, size_t in
     }
     return "";
 }
-#if 0
-void PokemonSelectMenuReader::read_options(const QImage& screen, std::string option[3]){
-    option[0] = read_name_sprite(m_logger, screen, m_sprite0, m_name0, m_language);
-//    option[1] = read_name_sprite(m_logger, screen, m_sprite1, m_name1, m_language);
-//    option[2] = read_name_sprite(m_logger, screen, m_sprite2, m_name2, m_language);
-}
-#endif
 
 
 

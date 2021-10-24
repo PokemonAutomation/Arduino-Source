@@ -16,9 +16,11 @@
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSwSh{
 
 
-class MultiHostTable : public SingleStatementOption, public MultiHostTableOptionBase{
+class MultiHostTable : public SingleStatementOption{
 public:
     static const QString OPTION_TYPE;
 
@@ -26,7 +28,7 @@ public:
     MultiHostTable(const QJsonObject& obj);
 
     virtual const QString& type() const override{ return OPTION_TYPE; }
-    virtual bool is_valid() const override;
+    virtual QString check_validity() const override;
     virtual void restore_defaults() override;
 
     virtual QJsonObject to_json() const override;
@@ -36,14 +38,13 @@ public:
 
 private:
     friend class MultiHostTableUI;
+    MultiHostSlotOptionFactory m_factory;
+    EditableTableBase m_table;
 };
 
 
-class MultiHostTableUI : public MultiHostTableOptionBaseUI{
-public:
-    MultiHostTableUI(QWidget& parent, MultiHostTable& value);
-};
 
-
+}
+}
 }
 #endif
