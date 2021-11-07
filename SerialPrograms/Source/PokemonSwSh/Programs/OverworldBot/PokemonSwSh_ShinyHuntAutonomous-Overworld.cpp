@@ -123,7 +123,7 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld(const ShinyHuntAutono
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
 
-    PA_ADD_DIVIDER(m_advanced_options);
+    PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(WATCHDOG_TIMER);
     PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
     PA_ADD_OPTION(TARGET_CIRCLING);

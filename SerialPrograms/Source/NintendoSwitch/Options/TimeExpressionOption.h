@@ -60,12 +60,12 @@ private:
 
 
 template <typename Type>
-class TimeExpressionOptionUI : public ConfigOptionUI, private TimeExpressionOptionBaseUI<Type>{
+class TimeExpressionOptionUI : private TimeExpressionOptionBaseUI<Type>, public ConfigOptionUI{
 public:
     TimeExpressionOptionUI(QWidget& parent, TimeExpressionOption<Type>& value)
         : TimeExpressionOptionBaseUI<Type>(parent, value)
+        , ConfigOptionUI(value, *this)
     {}
-    virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override{
         return TimeExpressionOptionBaseUI<Type>::restore_defaults();
     }

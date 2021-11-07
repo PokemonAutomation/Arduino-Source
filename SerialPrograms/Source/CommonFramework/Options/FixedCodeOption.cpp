@@ -88,6 +88,7 @@ QString FixedCodeOptionUI::sanitized_code(const QString& text) const{
 }
 FixedCodeOptionUI::FixedCodeOptionUI(QWidget& parent, FixedCodeOption& value)
     : QWidget(&parent)
+    , ConfigOptionUI(value, *this)
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);

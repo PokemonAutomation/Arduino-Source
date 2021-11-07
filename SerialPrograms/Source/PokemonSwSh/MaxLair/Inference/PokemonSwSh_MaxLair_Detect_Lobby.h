@@ -37,9 +37,9 @@ private:
 
 
 #if 1
-class NonLobbyDetector  : public VisualInferenceCallback{
+class LobbyDetector  : public VisualInferenceCallback{
 public:
-    NonLobbyDetector();
+    LobbyDetector(bool invert);
 
     bool detect(const QImage& screen);
 
@@ -50,6 +50,7 @@ public:
 
 
 private:
+    bool m_invert;
     ImageFloatBox m_pink;
     ImageFloatBox m_white;
 };
@@ -76,7 +77,7 @@ private:
 
 class LobbyJoinedDetector : public VisualInferenceCallback{
 public:
-    LobbyJoinedDetector(size_t consoles);
+    LobbyJoinedDetector(size_t consoles, bool invert);
 
     size_t joined(
         const QImage& screen,
@@ -90,6 +91,8 @@ public:
 
 private:
     size_t m_consoles;
+    bool m_invert;
+
     ImageFloatBox m_box0;
     ImageFloatBox m_box1;
     ImageFloatBox m_box2;
@@ -103,28 +106,40 @@ private:
 
 
 //  Detects when all joiners are readied up.
-class LobbyAllReadyDetector : public VisualInferenceCallback{
+class LobbyReadyDetector : public VisualInferenceCallback{
 public:
-    LobbyAllReadyDetector(
-        size_t consoles,
-        std::chrono::system_clock::time_point time_limit
-    );
+    LobbyReadyDetector();
 
-    bool detect(const QImage& screen);
+    size_t ready_players(const QImage& screen);
 
     virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
     ) override final;
+    virtual bool detect(const QImage& screen) = 0;
 
 
 private:
-    size_t m_consoles;
-    std::chrono::system_clock::time_point m_time_limit;
     ImageFloatBox m_checkbox0;
     ImageFloatBox m_checkbox1;
     ImageFloatBox m_checkbox2;
     ImageFloatBox m_checkbox3;
+};
+
+class LobbyMinReadyDetector : public LobbyReadyDetector{
+public:
+    LobbyMinReadyDetector(size_t consoles, bool invert);
+    virtual bool detect(const QImage& screen) override;
+private:
+    size_t m_consoles;
+    bool m_invert;
+};
+class LobbyAllReadyDetector : public LobbyReadyDetector{
+public:
+    LobbyAllReadyDetector(size_t consoles);
+    virtual bool detect(const QImage& screen) override;
+private:
+    size_t m_consoles;
 };
 
 

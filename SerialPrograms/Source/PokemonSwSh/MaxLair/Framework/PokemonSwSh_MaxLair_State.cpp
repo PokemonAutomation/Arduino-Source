@@ -7,6 +7,7 @@
 #include <map>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exception.h"
+#include "Pokemon/Pokemon_Types.h"
 #include "PokemonSwSh_MaxLair_State.h"
 
 namespace PokemonAutomation{
@@ -97,13 +98,28 @@ std::string PathMap::dump() const{
     return str;
 }
 
+std::string dump_path(const std::vector<PathNode>& path){
+    std::string str;
+    for (const auto& item : path){
+        str += "[";
+        str += std::to_string(item.path_slot);
+        str += ":";
+        str += get_type_slug(item.type);
+        str += "] ";
+    }
+    return str;
+}
 
 
 
 std::string GlobalState::dump() const{
     std::string str;
     str += "    boss:";
-    str += boss.empty() ? "?" : boss;
+    if (boss.empty()){
+        str += "? (" + get_type_slug(path.boss) + ")";
+    }else{
+        str += boss;
+    }
     str += " - wins:" + std::to_string(wins);
     str += " - lives:";
     str += lives_left < 0 ? "?" : std::to_string(lives_left);
@@ -131,6 +147,8 @@ std::string GlobalState::dump() const{
     default: str += "        current-side: ?"; break;
     }
     str += "\n";
+    str += "    Best Remaining Path: " + dump_path(last_best_path) + "\n";
+    str += "    Seen: " + set_to_str(seen) + "\n";
     return str;
 }
 void GlobalState::clear_battle_state(){
@@ -141,6 +159,11 @@ void GlobalState::clear_battle_state(){
     players[1].clear_battle_state();
     players[2].clear_battle_state();
     players[3].clear_battle_state();
+}
+void GlobalState::add_seen(const std::string& mon){
+    if (!mon.empty()){
+        seen.insert(mon);
+    }
 }
 size_t GlobalState::find_player_index(size_t console_id) const{
     for (size_t c = 0; c < 4; c++){

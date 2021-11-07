@@ -108,8 +108,9 @@ EventNotificationOption::EventNotificationOption(
     , screenshot_supported(false)
     , m_default({enabled, ping, ImageAttachmentMode::NO_SCREENSHOT, {"Notifs"}, rate_limit})
     , m_current(m_default)
-    , m_last_sent(std::chrono::system_clock::time_point::min())
-{}
+{
+    reset_rate_limit();
+}
 EventNotificationOption::EventNotificationOption(
     QString label,
     bool enabled, bool ping,
@@ -120,8 +121,9 @@ EventNotificationOption::EventNotificationOption(
     , screenshot_supported(false)
     , m_default({enabled, ping, ImageAttachmentMode::NO_SCREENSHOT, std::move(tags), rate_limit})
     , m_current(m_default)
-    , m_last_sent(std::chrono::system_clock::time_point::min())
-{}
+{
+    reset_rate_limit();
+}
 EventNotificationOption::EventNotificationOption(
     QString label,
     bool enabled, bool ping,
@@ -133,8 +135,9 @@ EventNotificationOption::EventNotificationOption(
     , screenshot_supported(true)
     , m_default({enabled, ping, screenshot, std::move(tags), rate_limit})
     , m_current(m_default)
-    , m_last_sent(std::chrono::system_clock::time_point::min())
-{}
+{
+    reset_rate_limit();
+}
 
 
 void EventNotificationOption::load_json(const QJsonValue& json){

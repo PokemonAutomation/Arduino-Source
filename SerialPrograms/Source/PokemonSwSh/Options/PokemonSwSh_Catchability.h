@@ -38,10 +38,9 @@ private:
 };
 
 
-class CatchabilitySelectorUI : public ConfigOptionUI, public QWidget{
+class CatchabilitySelectorUI : public QWidget, public ConfigOptionUI{
 public:
     CatchabilitySelectorUI(QWidget& parent, CatchabilitySelectorOption& value);
-    virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override;
 
 private:

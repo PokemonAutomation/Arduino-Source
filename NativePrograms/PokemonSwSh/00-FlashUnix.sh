@@ -186,6 +186,9 @@ function board_prompt() {
         "ArduinoUnoR3")
             MCU=atmega16u2
             ;;
+        "ArduinoLeonardo")
+            MCU=atmega32u4
+            ;;
         "ProMicro") 
             MCU=atmega32u4
             ;;

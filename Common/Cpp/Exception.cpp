@@ -34,6 +34,9 @@ FileException::FileException(const char* location, std::string message, const st
 {
     m_full_body += file;
     m_full_body += "\r\n\r\n";
+
+    m_message += file;
+    m_message += "\r\n\r\n";
 }
 
 

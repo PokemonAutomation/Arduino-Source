@@ -8,10 +8,10 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/ParallelTaskRunner.h"
 #include "CommonFramework/Language.h"
-#include "CommonFramework/OCR/RawOCR.h"
-#include "CommonFramework/OCR/Filtering.h"
-#include "CommonFramework/OCR/TextMatcher.h"
-#include "CommonFramework/OCR/TrainingTools.h"
+#include "CommonFramework/OCR/OCR_RawOCR.h"
+#include "CommonFramework/OCR/OCR_Filtering.h"
+#include "CommonFramework/OCR/OCR_TextMatcher.h"
+#include "CommonFramework/OCR/OCR_TrainingTools.h"
 #include "Pokemon_TrainIVCheckerOCR.h"
 
 #include <iostream>

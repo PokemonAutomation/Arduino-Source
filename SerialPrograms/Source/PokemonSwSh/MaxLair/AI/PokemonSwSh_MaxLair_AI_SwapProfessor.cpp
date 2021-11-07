@@ -4,7 +4,14 @@
  *
  */
 
-#include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
+#include "PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Pokemon.h"
+#include "PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Matchup.h"
+#include "PokemonSwSh_MaxLair_AI.h"
+#include "PokemonSwSh_MaxLair_AI_Tools.h"
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -24,64 +31,132 @@ bool should_swap_with_professor(
         "purple"
     );
 
+    using namespace papkmnlib;
 
-#if 0
-    double pc_least_hp = 1.0;
-    int pc_player = -1;
+    uint8_t lives = 4;
 
-    double npc_least_hp = 1.0;
-    int npc_player = -1;
-#endif
 
-    double least_hp = 1.0;
-    int player = -1;
+    std::vector<const Pokemon*> rental_candidates_on_path =
+        get_rental_candidates_on_path_pkmnlib(state);
 
-    for (int c = 0; c < 4; c++){
-        double hp = state.players[c].health.value.hp;
-        if (hp < 0){
-            continue;
-        }
+    std::vector<const Pokemon*> boss_candidates_on_path =
+        get_boss_candidates(state);
 
-        if (least_hp > hp){
-            least_hp = hp;
-            player = c;
-        }
-#if 0
-        if (state.players[c].console_id < 0){
-            //  NPC
-            if (npc_least_hp > hp){
-                npc_least_hp = hp;
-                npc_player = c;
+    std::unique_ptr<Pokemon> current_team[4];
+    current_team[0] = convert_player_to_pkmnlib(state.players[0]);
+    current_team[1] = convert_player_to_pkmnlib(state.players[1]);
+    current_team[2] = convert_player_to_pkmnlib(state.players[2]);
+    current_team[3] = convert_player_to_pkmnlib(state.players[3]);
+
+
+    //  Find the "average" rental against this boss.
+    std::multimap<double, const Pokemon*> list;
+    for (const Pokemon* boss : boss_candidates_on_path){
+        for (const auto& rental : all_rental_pokemon()){
+            if (state.seen.find(rental.first) != state.seen.end()){
+                continue;
             }
+            list.emplace(evaluate_matchup(rental.second, *boss, {}, lives), &rental.second);
+        }
+    }
+    if (list.empty()){
+        PA_THROW_StringException("Opponent candidate list is empty.");
+    }
+    size_t midpoint = list.size() / 2;
+    for (size_t c = 0; c < midpoint; c++){
+        list.erase(list.begin());
+    }
+    const Pokemon* average_rental = list.begin()->second;
+    list.clear();
+
+
+
+    std::multimap<double, int8_t, std::greater<double>> rank;
+#if 0
+    {
+        const Pokemon* hypothetical_team[4];
+        hypothetical_team[0] = current_team[0].get();
+        hypothetical_team[1] = current_team[1].get();
+        hypothetical_team[2] = current_team[2].get();
+        hypothetical_team[3] = current_team[3].get();
+        double score = evaluate_hypothetical_team(
+            state,
+            hypothetical_team,
+            rental_candidates_on_path,
+            boss_candidates_on_path
+        );
+        rank.emplace(score, -1);
+    }
+    for (int8_t c = 0; c < 4; c++){
+        const Pokemon* hypothetical_team[4];
+        hypothetical_team[0] = current_team[0].get();
+        hypothetical_team[1] = current_team[1].get();
+        hypothetical_team[2] = current_team[2].get();
+        hypothetical_team[3] = current_team[3].get();
+
+        double score = 0;
+        size_t count = 0;
+        for (const auto& mon : all_rental_pokemon()){
+            if (state.seen.find(mon.first) != state.seen.end()){
+                continue;
+            }
+            logger.log(std::to_string(count));
+            hypothetical_team[c] = &mon.second;
+            score += evaluate_hypothetical_team(
+                state,
+                hypothetical_team,
+                rental_candidates_on_path,
+                boss_candidates_on_path
+            );
+            count++;
+        }
+//        cout << "total score = " << score << endl;
+//        cout << "candidates  = " << rental_candidates_on_path.size() << endl;
+        score /= count;
+
+        rank.emplace(score, c);
+    }
+#endif
+    for (int8_t c = -1; c < 4; c++){
+        const Pokemon* hypothetical_team[4];
+        hypothetical_team[0] = current_team[0].get();
+        hypothetical_team[1] = current_team[1].get();
+        hypothetical_team[2] = current_team[2].get();
+        hypothetical_team[3] = current_team[3].get();
+        if (c >= 0){
+            hypothetical_team[c] = average_rental;
+        }
+        double score = evaluate_hypothetical_team(
+            state,
+            hypothetical_team,
+            rental_candidates_on_path,
+            boss_candidates_on_path
+        );
+        rank.emplace(score, c);
+    }
+
+
+    if (rank.empty()){
+        logger.log("Unable to compute decisions. Taking if you have the least HP.", Qt::red);
+        return swap_if_least_hp(state, player_index);
+    }
+
+    std::string dump = "Selection Score:\n";
+    for (const auto& item : rank){
+        dump += std::to_string(item.first) + " : ";
+        if (item.second < 0){
+            dump += "Nobody";
         }else{
-            //  Player Character
-            if (pc_least_hp > hp){
-                pc_least_hp = hp;
-                pc_player = c;
-            }
+            dump += "Player " + std::to_string(item.second);
         }
-#endif
+        dump += "\n";
     }
+    logger.log(dump);
 
-    return (int)player_index == player;
+    return rank.begin()->second == (int8_t)player_index;
 
-#if 0
-    logger.log("Player with least HP: " + std::to_string(pc_player) + " (" + std::to_string(pc_least_hp * 100) + "%");
-    logger.log("NPC with least HP: " + std::to_string(npc_player) + " (" + std::to_string(npc_least_hp * 100) + "%");
 
-    //  Player character should take it. Take it if you have the least HP.
-    if (pc_player >= 0 && pc_least_hp < 0.5){
-        return player_index == (size_t)pc_player;
-    }
-
-    //  An NPC needs it. Don't take it and hope they do.
-    if (npc_player >= 0 && npc_least_hp < 0.5){
-        return false;
-    }
-
-    //  Nobody has less than 50%. Take it if you have the least HP.
-    return player_index == (size_t)pc_player;
-#endif
+//    return swap_if_least_hp(state, player_index);
 }
 
 

@@ -50,10 +50,9 @@ private:
 };
 
 
-class FixedCodeOptionUI : public ConfigOptionUI, public QWidget{
+class FixedCodeOptionUI : public QWidget, public ConfigOptionUI{
 public:
     FixedCodeOptionUI(QWidget& parent, FixedCodeOption& value);
-    virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override;
 
 private:

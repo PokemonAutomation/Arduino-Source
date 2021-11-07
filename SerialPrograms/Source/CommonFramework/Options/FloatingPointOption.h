@@ -52,12 +52,12 @@ private:
 };
 
 
-class FloatingPointOptionUI : public ConfigOptionUI, private FloatingPointOptionBaseUI{
+class FloatingPointOptionUI : private FloatingPointOptionBaseUI, public ConfigOptionUI{
 public:
     FloatingPointOptionUI(QWidget& parent, FloatingPointOption& value)
         : FloatingPointOptionBaseUI(parent, value)
+        , ConfigOptionUI(value, *this)
     {}
-    virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override{
         FloatingPointOptionBaseUI::restore_defaults();
     }

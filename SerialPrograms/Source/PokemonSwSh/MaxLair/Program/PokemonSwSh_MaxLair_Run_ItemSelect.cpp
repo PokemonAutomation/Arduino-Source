@@ -7,7 +7,7 @@
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
-#include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Options.h"
+#include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_ItemSelectMenu.h"
 #include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
@@ -29,8 +29,11 @@ void run_item_select(
     size_t player_index = state.find_player_index(console_index);
 
     PathReader reader(console, player_index);
-    reader.read_sprites(console, state, console.video().snapshot());
-    reader.read_hp(console, state, console.video().snapshot());
+    {
+        QImage screen = console.video().snapshot();
+        reader.read_sprites(console, state, screen);
+        reader.read_hp(console, state, screen);
+    }
 
 
     GlobalState inferred = state_tracker.synchronize(env, console, console_index);

@@ -59,10 +59,9 @@ private:
 };
 
 
-class RandomCodeOptionUI : public ConfigOptionUI, public QWidget{
+class RandomCodeOptionUI : public QWidget, public ConfigOptionUI{
 public:
     RandomCodeOptionUI(QWidget& parent, RandomCodeOption& value);
-    virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override;
 
 private:

@@ -22,7 +22,7 @@ void run_select_pokemon(
     ProgramEnvironment& env,
     ConsoleHandle& console,
     GlobalStateTracker& state_tracker,
-    const MaxLairConsoleOptions& settings
+    const ConsoleSpecificOptions& settings
 ){
     size_t console_index = console.index();
     GlobalState& state = state_tracker[console_index];
@@ -62,10 +62,14 @@ void run_select_pokemon(
     }
 
     //  Scroll down one to move the arrow off the top row. Then we can read it.
-    pbf_press_dpad(console, DPAD_DOWN, 10, 50);
+    pbf_press_dpad(console, DPAD_DOWN, 10, 80);
     console.botbase().wait_for_all_requests();
     screen = console.video().snapshot();
     options[0] = reader.read_option(screen, 0);
+
+    state.add_seen(options[0]);
+    state.add_seen(options[1]);
+    state.add_seen(options[2]);
 
 
 //    GlobalState inferred = state_tracker.synchronize(env, console, console_index);

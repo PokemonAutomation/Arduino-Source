@@ -53,19 +53,21 @@ int move_to_ball(
     return -1;
 }
 
-//  Returns true if the ball is found.
-bool move_to_ball(
+//  Returns the quantity of the ball.
+//  Returns -1 if unable to read.
+int16_t move_to_ball(
     const BattleBallReader& reader,
     ConsoleHandle& console,
     const std::string& ball_slug
 ){
     //  Search forward at high speed.
     int ret = move_to_ball(reader, console, ball_slug, true, 50, 30);
-    if (ret == 0){
-        return true;
-    }
     if (ret < 0){
-        return false;
+        return 0;
+    }
+    if (ret == 0){
+        uint16_t quantity = reader.read_quantity(console.video().snapshot());
+        return quantity == 0 ? -1 : quantity;
     }
 
     //  Wait a second to let the video catch up.
@@ -75,10 +77,14 @@ bool move_to_ball(
     //  Now try again in reverse at a lower speed in case we overshot.
     //  This will return immediately if we got it right the first time.
     ret = move_to_ball(reader, console, ball_slug, false, 5, TICKS_PER_SECOND);
+    if (ret < 0){
+        return 0;
+    }
     if (ret > 0){
         console.log("Fast ball scrolling overshot by " + std::to_string(ret) + " slot(s).", Qt::red);
     }
-    return ret >= 0;
+    uint16_t quantity = reader.read_quantity(console.video().snapshot());
+    return quantity == 0 ? -1 : quantity;
 }
 
 

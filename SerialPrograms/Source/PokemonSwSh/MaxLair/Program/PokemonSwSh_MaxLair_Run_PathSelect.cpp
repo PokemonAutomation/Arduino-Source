@@ -53,10 +53,19 @@ void run_path_select(
 
 
     //  Select the path.
-    uint8_t path = select_path(console, inferred, player_index);
-    console.log("Choosing path " + std::to_string((int)path) + ".", "purple");
+    std::vector<PathNode> path = select_path(console, inferred, player_index);
+    uint8_t slot;
+    if (path.empty()){
+        console.log("No available paths due to read errors. Picking left-most path.", Qt::red);
+        slot = 0;
+    }else{
+        slot = path[0].path_slot;
+    }
+    state.last_best_path = std::move(path);
 
-    for (uint8_t c = 0; c < path; c++){
+    console.log("Choosing path " + std::to_string((int)slot) + ".", "purple");
+
+    for (uint8_t c = 0; c < slot; c++){
         pbf_press_dpad(console, DPAD_RIGHT, 10, 50);
     }
     pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);

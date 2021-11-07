@@ -13,6 +13,7 @@
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h"
+#include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 #include "PokemonSwSh_EggHelpers.h"
 
 #include <iostream>
@@ -36,7 +37,7 @@ struct EggCombinedSession{
     uint16_t    SAFETY_TIME;
     uint16_t    EARLY_HATCH_SAFETY;
     uint16_t    HATCH_DELAY;
-    uint32_t    TOUCH_DATE_INTERVAL;
+    TouchDateIntervalOption& TOUCH_DATE_INTERVAL;
 
     EggCombinedBlock sanitize_fetch_count(uint8_t desired_fetches, uint16_t duration){
         //  The amount of time during egg-fetches that counts towards incubation.
@@ -237,16 +238,14 @@ struct EggCombinedSession{
         withdraw_column_shiftR(env.console, 0);
         fly_home_goto_lady(env.console, false);
 
-        uint32_t last_touch = system_clock(env.console) - TOUCH_DATE_INTERVAL;
         for (uint8_t box = 0; box < BOXES_TO_HATCH; box++){
             for (uint8_t column = 0; column < 6; column++){
                 //  Touch the date.
-                if (TOUCH_DATE_INTERVAL > 0 && system_clock(env.console) - last_touch >= TOUCH_DATE_INTERVAL){
+                if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
                     env.log("Touching date to prevent rollover.");
                     pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
                     touch_date_from_home(env.console, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
                     resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
-                    last_touch += TOUCH_DATE_INTERVAL;
                 }
 
                 fetch_residual += fetches_per_batch;

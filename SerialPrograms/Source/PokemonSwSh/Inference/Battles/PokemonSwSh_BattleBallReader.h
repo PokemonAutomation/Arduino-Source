@@ -31,7 +31,7 @@ public:
 
 public:
     std::string read_ball(const QImage& screen) const;
-    int read_quantity(const QImage& screen) const;
+    uint16_t read_quantity(const QImage& screen) const;
 
 private:
     const ImageMatch::ExactImageDictionaryMatcher& m_matcher;

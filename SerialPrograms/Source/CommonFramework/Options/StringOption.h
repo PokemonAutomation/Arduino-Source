@@ -54,12 +54,12 @@ private:
 };
 
 
-class StringOptionUI : public ConfigOptionUI, private StringOptionBaseUI{
+class StringOptionUI : private StringOptionBaseUI, public ConfigOptionUI{
 public:
-    StringOptionUI(QWidget& parent, StringOptionBase& value)
+    StringOptionUI(QWidget& parent, StringOption& value)
         : StringOptionBaseUI(parent, value)
+        , ConfigOptionUI(value, *this)
     {}
-    virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override{
         StringOptionBaseUI::restore_defaults();
     }

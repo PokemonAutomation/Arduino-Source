@@ -106,11 +106,10 @@ private:
     EditableTableOption m_table;
 };
 
-class EncounterFilterOptionUI : public ConfigOptionUI, public QWidget{
+class EncounterFilterOptionUI : public QWidget, public ConfigOptionUI{
 public:
     EncounterFilterOptionUI(QWidget& parent, EncounterFilterOption& value);
 
-    virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override;
 
 private:

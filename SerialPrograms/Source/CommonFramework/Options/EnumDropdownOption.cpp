@@ -9,6 +9,10 @@
 #include "Common/Qt/NoWheelComboBox.h"
 #include "EnumDropdownOption.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -66,6 +70,7 @@ ConfigOptionUI* EnumDropdownOption::make_ui(QWidget& parent){
 
 EnumDropdownOptionUI::EnumDropdownOptionUI(QWidget& parent, EnumDropdownOption& value)
     : QWidget(&parent)
+    , ConfigOptionUI(value, *this)
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
@@ -89,6 +94,7 @@ EnumDropdownOptionUI::EnumDropdownOptionUI(QWidget& parent, EnumDropdownOption& 
                 return;
             }
             m_value.set(index);
+            on_changed();
         }
     );
 }

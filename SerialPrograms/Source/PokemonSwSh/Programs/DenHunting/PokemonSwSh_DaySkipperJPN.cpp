@@ -54,7 +54,7 @@ DaySkipperJPN::DaySkipperJPN(const DaySkipperJPN_Descriptor& descriptor)
 {
     PA_ADD_OPTION(SKIPS);
     PA_ADD_OPTION(NOTIFICATIONS);
-    PA_ADD_DIVIDER(m_advanced_options);
+    PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(CORRECTION_SKIPS);
 }
 

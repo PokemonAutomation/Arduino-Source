@@ -414,56 +414,9 @@ std::string message_to_string(const BotBaseMessage& message){
 
 std::string program_name(uint8_t id){
     switch (id){
-    case PABB_PID_UNSPECIFIED:              return "Unspecified/Unknown";
+    case PABB_PID_UNSPECIFIED:              return "Unknown";
     case PABB_PID_PABOTBASE_12KB:           return "PABotBase-12KB";
     case PABB_PID_PABOTBASE_31KB:           return "PABotBase-31KB";
-    case PABB_PID_CUSTOM_PROGRAM:           return "Custom Program";
-    case PABB_PID_SANDBOX:                  return "Sandbox";
-
-    case PABB_PID_TURBOA:                   return "TurboA";
-    case PABB_PID_MASS_RELEASE:             return "MassRelease";
-    case PABB_PID_FAST_CODE_ENTRY:          return "FastCodeEntry";
-    case PABB_PID_SURPRISE_TRADE:           return "SurpriseTrade";
-    case PABB_PID_TRADE_BOT:                return "TradeBot";
-    case PABB_PID_CLOTHING_BUYER:           return "ClothingBuyer";
-    case PABB_PID_BALL_THROWER:             return "BallThrower";
-
-    case PABB_PID_DATESPAM_WATT_FARMER:             return "DateSpam-WattFarmer";
-    case PABB_PID_DATESPAM_BERRY_FARMER:            return "DateSpam-BerryFarmer";
-    case PABB_PID_DATESPAM_LOTO_FARMER:             return "DateSpam-LotoFarmer";
-    case PABB_PID_DATESPAM_STOW_ON_SIDE_FARMER:     return "DateSpam-StowOnSideFarmer";
-    case PABB_PID_DATESPAM_DAILY_HIGHLIGHT_FARMER:  return "DateSpam-DailyHighlightFarmer";
-
-    case PABB_PID_MULTIGAME_FOSSIL:                         return "MultiGameFossil";
-    case PABB_PID_SHINYHUNT_REGI:                           return "ShinyHunt-Regi";
-    case PABB_PID_SHINYHUNT_SWORDS_OF_JUSTICE:              return "ShinyHunt-SwordsOfJustice";
-    case PABB_PID_SHINYHUNT_UNATTENDED_REGI:                return "ShinyHuntUnattended-Regi";
-    case PABB_PID_SHINYHUNT_UNATTENDED_SWORDS_OF_JUSTICE:   return "ShinyHuntUnattended-SwordsOfJustice";
-    case PABB_PID_SHINYHUNT_UNATTENDED_STRONG_SPAWN:        return "ShinyHuntUnattended-StrongSpawn";
-    case PABB_PID_SHINYHUNT_UNATTENDED_REGIGIGAS:           return "ShinyHuntUnattended-Regigigas";
-    case PABB_PID_SHINYHUNT_UNATTENDED_REGIGIGAS2:          return "ShinyHuntUnattended-Regigigas2";
-    case PABB_PID_SHINYHUNT_UNATTENDED_IOA_TRADE:           return "ShinyHuntUnattended-IoATrade";
-    case PABB_PID_CURRYHUNTER:                              return "CurryHunter";
-
-    case PABB_PID_BEAM_RESET:               return "BeamReset";
-    case PABB_PID_EVENT_BEAM_FINDER:        return "EventBeamFinder";
-    case PABB_PID_DAYSKIPPER_JPN:           return "DaySkipperJPN";
-    case PABB_PID_DAYSKIPPER_EU:            return "DaySkipperEU";
-    case PABB_PID_DAYSKIPPER_US:            return "DaySkipperUS";
-    case PABB_PID_DAYSKIPPER_JPN_7P8K:      return "DaySkipperJPN-7.8k";
-
-    case PABB_PID_FRIEND_DELETE:            return "FriendDelete";
-    case PABB_PID_DEN_ROLLER:               return "DenRoller";
-    case PABB_PID_AUTOHOST_ROLLING:         return "AutoHost-Rolling";
-    case PABB_PID_AUTOHOST_MULTIGAME:       return "AutoHost-MultiGame";
-
-    case PABB_PID_EGG_FETCHER2:             return "EggFetcher2";
-    case PABB_PID_EGG_HATCHER:              return "EggHatcher";
-    case PABB_PID_EGG_COMBINED2:            return "EggCombined2";
-    case PABB_PID_EGG_SUPER_COMBINED2:      return "EggSuperCombined2";
-    case PABB_PID_GOD_EGG_ITEM_DUPE:        return "GodEggItemDupe";
-    case PABB_PID_GOD_EGG_DUPLICATION:      return "GodEggDuplication";
-
     default: return "Unknown ID";
     }
 }

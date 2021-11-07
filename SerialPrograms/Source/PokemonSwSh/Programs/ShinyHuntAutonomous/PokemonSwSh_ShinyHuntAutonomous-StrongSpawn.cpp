@@ -60,7 +60,7 @@ ShinyHuntAutonomousStrongSpawn::ShinyHuntAutonomousStrongSpawn(const ShinyHuntAu
     PA_ADD_OPTION(NOTIFICATIONS);
 
 //    if (PERSISTENT_SETTINGS().developer_mode){
-//        PA_ADD_DIVIDER(m_advanced_options);
+//        PA_ADD_STATIC(m_advanced_options);
 //    }
 }
 

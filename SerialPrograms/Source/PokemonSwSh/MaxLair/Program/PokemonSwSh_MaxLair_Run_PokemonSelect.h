@@ -9,7 +9,8 @@
 
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Options.h"
+#include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
+#include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Consoles.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateTracker.h"
 
 namespace PokemonAutomation{
@@ -22,7 +23,7 @@ void run_select_pokemon(
     ProgramEnvironment& env,
     ConsoleHandle& console,
     GlobalStateTracker& state_tracker,
-    const MaxLairConsoleOptions& settings
+    const ConsoleSpecificOptions& settings
 );
 
 

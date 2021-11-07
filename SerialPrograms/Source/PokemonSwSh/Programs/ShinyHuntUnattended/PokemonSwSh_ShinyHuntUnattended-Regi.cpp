@@ -56,7 +56,7 @@ ShinyHuntUnattendedRegi::ShinyHuntUnattendedRegi(const ShinyHuntUnattendedRegi_D
 
     PA_ADD_OPTION(START_TO_RUN_DELAY);
     PA_ADD_OPTION(REGI_NAME);
-    PA_ADD_DIVIDER(m_advanced_options);
+    PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(CORRECTION_INTERVAL);
     PA_ADD_OPTION(TRANSITION_DELAY);
 }
@@ -71,7 +71,6 @@ void ShinyHuntUnattendedRegi::program(SingleSwitchProgramEnvironment& env){
         pbf_press_button(env.console, BUTTON_B, 5, 5);
     }
 
-    uint32_t last_touch = system_clock(env.console) - TOUCH_DATE_INTERVAL;
     uint16_t correct_count = 0;
     for (uint32_t c = 0; ; c++){
         //  Auto-correction.
@@ -82,12 +81,11 @@ void ShinyHuntUnattendedRegi::program(SingleSwitchProgramEnvironment& env){
         }
 
         //  Touch the date.
-        if (TOUCH_DATE_INTERVAL > 0 && system_clock(env.console) - last_touch >= TOUCH_DATE_INTERVAL){
+        if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
             env.log("Touching date to prevent rollover.");
             pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
             touch_date_from_home(env.console, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
             resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
-            last_touch += TOUCH_DATE_INTERVAL;
         }
 
 

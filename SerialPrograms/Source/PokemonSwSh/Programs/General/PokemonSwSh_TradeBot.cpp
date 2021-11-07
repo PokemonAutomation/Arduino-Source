@@ -83,7 +83,7 @@ TradeBot::TradeBot(const TradeBot_Descriptor& descriptor)
     PA_ADD_OPTION(CONFIRM_DELAY);
     PA_ADD_OPTION(TRADE_START);
     PA_ADD_OPTION(TRADE_COMMUNICATION);
-    PA_ADD_DIVIDER(m_advanced_options);
+    PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(TRADE_ANIMATION);
     PA_ADD_OPTION(EVOLVE_DELAY);
 }

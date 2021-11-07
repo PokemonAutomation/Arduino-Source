@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_PurpleBeamFinder_H
 #define PokemonAutomation_PokemonSwSh_PurpleBeamFinder_H
 
-#include "CommonFramework/Options/SectionDivider.h"
+#include "CommonFramework/Options/StaticTextOption.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/FloatingPointOption.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"

@@ -21,7 +21,6 @@ RaidCatchDetector::RaidCatchDetector()
     , m_right1(0.96, 0.85 + 1 * 0.078, 0.01, 0.04)
     , m_text0 (0.82, 0.84 + 0 * 0.078, 0.15, 0.06)
     , m_text1 (0.82, 0.84 + 1 * 0.078, 0.15, 0.06)
-    , m_start_time(std::chrono::system_clock::now())
 {
     add_box(m_left0);
     add_box(m_right0);
@@ -29,9 +28,6 @@ RaidCatchDetector::RaidCatchDetector()
     add_box(m_right1);
     add_box(m_text0);
     add_box(m_text1);
-}
-bool RaidCatchDetector::has_timed_out(std::chrono::milliseconds timeout) const{
-    return std::chrono::system_clock::now() - m_start_time > timeout;
 }
 bool RaidCatchDetector::detect(const QImage& screen){
     ImageStats left0 = image_stats(extract_box(screen, m_left0));
@@ -77,31 +73,15 @@ bool RaidCatchDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
-    return detect(frame);
-}
-bool RaidCatchDetector::wait(
-    ProgramEnvironment& env,
-    VideoFeed& feed,
-    std::chrono::milliseconds timeout
-){
-    while (true){
-        auto start = std::chrono::system_clock::now();
-        env.check_stopping();
-
-        if (has_timed_out(timeout)){
-            return false;
-        }
-        if (detect(feed.snapshot())){
-            return true;
-        }
-
-        auto end = std::chrono::system_clock::now();
-        auto duration = end - start;
-        if (duration < std::chrono::milliseconds(50)){
-            env.wait_for(std::chrono::milliseconds(50) - duration);
-        }
+    //  Need 5 consecutive successful detections.
+    if (!detect(frame)){
+        m_trigger_count = 0;
+        return false;
     }
+    m_trigger_count++;
+    return m_trigger_count >= 5;
 }
+
 
 
 

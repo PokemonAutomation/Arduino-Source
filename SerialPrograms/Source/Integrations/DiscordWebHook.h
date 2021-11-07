@@ -26,7 +26,7 @@ namespace DiscordWebHook{
 
 struct DiscordWebHookRequest{
     DiscordWebHookRequest() = default;
-    DiscordWebHookRequest(Logger& p_logger, QUrl p_url, QByteArray p_data);
+    DiscordWebHookRequest(Logger& p_logger, QUrl p_url, QByteArray p_data, std::shared_ptr<PendingFileSend> file);
     DiscordWebHookRequest(Logger& p_logger, QUrl p_url, std::shared_ptr<PendingFileSend> p_file);
 
     Logger* logger;
@@ -46,7 +46,7 @@ private:
 
 
 public:
-    void send_json(Logger& logger, const QUrl& url, const QJsonObject& obj);
+    void send_json(Logger& logger, const QUrl& url, const QJsonObject& obj, std::shared_ptr<PendingFileSend> file);
     void send_file(Logger& logger, const QUrl& url, std::shared_ptr<PendingFileSend> file);
 
     static DiscordWebHookSender& instance();
@@ -58,6 +58,7 @@ private:
     void process_reply(Logger& logger, QNetworkReply* reply);
     void internal_send_json(Logger& logger, const QUrl& url, const QByteArray& data);
     void internal_send_file(Logger& logger, const QUrl& url, const QString& filename);
+    void internal_send_image_embed(Logger& logger, const QUrl& url, const QByteArray& data, const QString& filepath, const QString& filename);
 
 
 private:

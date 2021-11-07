@@ -9,7 +9,7 @@
 
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Options.h"
+#include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateTracker.h"
 
@@ -23,12 +23,12 @@ StateMachineAction run_move_select(
     ProgramEnvironment& env,
     ConsoleHandle& console,
     GlobalStateTracker& state_tracker,
-    const MaxLairConsoleOptions& settings,
+    const ConsoleSpecificOptions& settings,
     bool currently_dmaxed, bool cheer_only
 );
 
 StateMachineAction throw_balls(
-    MaxLairRuntime& runtime,
+    AdventureRuntime& runtime,
     ProgramEnvironment& env,
     ConsoleHandle& console, Language language,
     GlobalStateTracker& state_tracker,

@@ -7,10 +7,12 @@
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "MultiSwitchProgram.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-
-
 
 
 MultiSwitchProgramEnvironment::MultiSwitchProgramEnvironment(
@@ -98,8 +100,17 @@ MultiSwitchProgramWidget* MultiSwitchProgramWidget::make(
     MultiSwitchProgramInstance& instance,
     PanelListener& listener
 ){
+    instance.update_active_consoles();
     MultiSwitchProgramWidget* widget = new MultiSwitchProgramWidget(parent, instance, listener);
     widget->construct();
+    connect(
+        widget->m_setup, &SwitchSetup::on_setup_changed,
+        widget, [=, &instance]{
+            instance.update_active_consoles();
+            widget->m_options->update_visibility();
+//            widget->redraw_options();
+        }
+    );
     return widget;
 }
 void MultiSwitchProgramWidget::run_program(
@@ -107,8 +118,8 @@ void MultiSwitchProgramWidget::run_program(
     const StatsTracker* historical_stats
 ){
     MultiSwitchProgramInstance& instance = static_cast<MultiSwitchProgramInstance&>(m_instance);
-    FixedLimitVector<ConsoleHandle> switches(instance.count());
-    for (size_t c = 0; c < instance.count(); c++){
+    FixedLimitVector<ConsoleHandle> switches(instance.system_count());
+    for (size_t c = 0; c < instance.system_count(); c++){
         SwitchSystem& system = this->system(c);
         switches.emplace_back(
             c,
@@ -139,6 +150,7 @@ void MultiSwitchProgramWidget::run_program(
     );
 
     instance.program(env);
+    env.update_stats();
 }
 
 

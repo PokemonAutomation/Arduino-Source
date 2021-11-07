@@ -15,6 +15,7 @@ const std::vector<std::pair<std::string, QString>> BOARD_LIST{
     {"Teensy2", "Teensy 2.0"},
     {"TeensyPP2", "Teensy++ 2.0"},
     {"ProMicro", "Pro Micro"},
+    {"ArduinoLeonardo", "Arduino Leonardo"},
     {"ArduinoUnoR3", "Arduino Uno R3"},
 };
 

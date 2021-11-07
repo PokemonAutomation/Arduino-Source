@@ -23,7 +23,7 @@ void run_swap_pokemon(
     ProgramEnvironment& env,
     ConsoleHandle& console,
     GlobalStateTracker& state_tracker,
-    const MaxLairConsoleOptions& settings
+    const ConsoleSpecificOptions& settings
 ){
     size_t console_index = console.index();
     GlobalState& state = state_tracker[console_index];
@@ -55,6 +55,9 @@ void run_swap_pokemon(
     if (hp[1] >= 0) state.players[1].health = Health{hp[1], 0};
     if (hp[2] >= 0) state.players[2].health = Health{hp[2], 0};
     if (hp[3] >= 0) state.players[3].health = Health{hp[3], 0};
+
+    state.add_seen(options[0]);
+    state.add_seen(options[1]);
 
 
     GlobalState inferred = state_tracker.synchronize(env, console, console_index);

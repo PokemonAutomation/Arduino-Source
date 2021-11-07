@@ -58,7 +58,7 @@ ShinyHuntUnattendedIoATrade::ShinyHuntUnattendedIoATrade(const ShinyHuntUnattend
     PA_ADD_OPTION(TOUCH_DATE_INTERVAL);
 
     PA_ADD_OPTION(START_TO_RUN_DELAY);
-    PA_ADD_DIVIDER(m_advanced_options);
+    PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(FLY_DURATION);
     PA_ADD_OPTION(MOVE_DURATION);
     PA_ADD_OPTION(MASH_TO_TRADE_DELAY);
@@ -72,7 +72,6 @@ void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env){
         pbf_press_button(env.console, BUTTON_B, 5, 5);
     }
 
-    uint32_t last_touch = system_clock(env.console) - TOUCH_DATE_INTERVAL;
     for (uint32_t c = 0; ; c++){
         env.log("Starting Trade: " + tostr_u_commas(c + 1));
 
@@ -128,13 +127,12 @@ void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env){
         //  Enter Pokemon menu if shiny.
         enter_summary(env.console, false);
 
-        //  Touch the date and conditional close game.
-        if (TOUCH_DATE_INTERVAL > 0 && system_clock(env.console) - last_touch >= TOUCH_DATE_INTERVAL){
-            last_touch += TOUCH_DATE_INTERVAL;
-            close_game_if_overworld(env.console, true, 0);
-        }else{
-            close_game_if_overworld(env.console, false, 0);
-        }
+        //  Conditional close game.
+        close_game_if_overworld(
+            env.console,
+            TOUCH_DATE_INTERVAL.ok_to_touch_now(),
+            0
+        );
 
         start_game_from_home(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 0, 0, false);
     }

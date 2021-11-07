@@ -17,7 +17,9 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-bool move_to_ball(
+//  Returns the quantity of the ball.
+//  Returns -1 if unable to read.
+int16_t move_to_ball(
     const BattleBallReader& reader,
     ConsoleHandle& console,
     const std::string& ball_slug

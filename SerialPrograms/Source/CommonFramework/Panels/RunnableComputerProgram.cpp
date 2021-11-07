@@ -47,7 +47,7 @@ RunnableComputerProgramWidget* RunnableComputerProgramWidget::make(
     RunnableComputerProgramWidget* widget = new RunnableComputerProgramWidget(parent, instance, listener);
     widget->construct();
     widget->m_state.store(ProgramState::STOPPED, std::memory_order_release);
-    widget->update_ui();
+    widget->update_ui_after_program_state_change();
     return widget;
 }
 void RunnableComputerProgramWidget::run_program(){

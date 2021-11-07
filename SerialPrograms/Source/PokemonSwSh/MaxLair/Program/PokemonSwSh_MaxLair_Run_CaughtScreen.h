@@ -18,7 +18,7 @@ namespace MaxLairInternal{
 
 
 StateMachineAction run_caught_screen(
-    MaxLairRuntime& runtime,
+    AdventureRuntime& runtime,
     ProgramEnvironment& env,
     ConsoleHandle& console,
     GlobalStateTracker& state_tracker,

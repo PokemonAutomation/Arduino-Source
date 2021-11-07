@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousSwordsOfJustice_H
 #define PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousSwordsOfJustice_H
 
-#include "CommonFramework/Options/SectionDivider.h"
+#include "CommonFramework/Options/StaticTextOption.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"

@@ -33,7 +33,7 @@ int8_t select_starter(
 //  0 for left-most path.
 //  1 for 2nd from left.
 //  2 ...
-uint8_t select_path(
+std::vector<PathNode> select_path(
     Logger& logger,
     const GlobalState& state,
     size_t player_index

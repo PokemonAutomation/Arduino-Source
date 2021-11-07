@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousWhistling_H
 #define PokemonAutomation_PokemonSwSh_ShinyHuntAutonomousWhistling_H
 
-#include "CommonFramework/Options/SectionDivider.h"
+#include "CommonFramework/Options/StaticTextOption.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"

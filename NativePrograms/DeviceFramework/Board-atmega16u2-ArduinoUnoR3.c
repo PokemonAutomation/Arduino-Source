@@ -8,8 +8,6 @@
 #include "DeviceSettings.h"
 #include "HardwareLED.h"
 
-const int BOARD_TYPE = BOARD_TYPE_UNO;
-
 void setup_leds(void){
     const int leds = (1 << 4) | (1 << 5);
     DDRD  |= leds;

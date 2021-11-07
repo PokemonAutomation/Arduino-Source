@@ -65,7 +65,8 @@ public:
     virtual void update_ui(ProgramState state) = 0;
 
 signals:
-    void on_state_changed();
+    void on_setup_changed();
+    void on_program_state_changed();
 
 protected:
     SwitchSetupFactory& m_factory;

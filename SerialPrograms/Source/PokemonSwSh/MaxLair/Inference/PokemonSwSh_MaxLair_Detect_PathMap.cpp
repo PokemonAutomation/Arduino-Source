@@ -8,7 +8,7 @@
 #include "CommonFramework/Inference/ImageTools.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h"
-#include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Options.h"
+#include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh_MaxLair_Detect_PathMap.h"
 
 namespace PokemonAutomation{
@@ -126,6 +126,16 @@ bool read_path(
         dump_image(console, MODULE_NAME, "ReadPath", error_image);
         return false;
     }
+
+    pbf_move_right_joystick(console, 128, 0, 125, 50);
+    console.botbase().wait_for_all_requests();
+
+    error_image = read_type_array_retry(env, console, box, hits, 1, &path.boss, nullptr);
+    if (!error_image.isNull()){
+        dump_image(console, MODULE_NAME, "ReadPath", error_image);
+        return false;
+    }
+
 
 
     if (boxes[0].min_y < boxes[2].min_y &&

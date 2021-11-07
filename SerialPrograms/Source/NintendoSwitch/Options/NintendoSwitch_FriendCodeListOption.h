@@ -38,10 +38,9 @@ private:
 };
 
 
-class FriendCodeListOptionUI : public ConfigOptionUI, public QWidget{
+class FriendCodeListOptionUI : public QWidget, public ConfigOptionUI{
 public:
     FriendCodeListOptionUI(QWidget& parent, FriendCodeListOption& value);
-    virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override;
 
 private:

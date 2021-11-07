@@ -6,9 +6,9 @@
 
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/OCR/Filtering.h"
-#include "CommonFramework/OCR/StringNormalization.h"
-#include "CommonFramework/OCR/RawOCR.h"
+#include "CommonFramework/OCR/OCR_Filtering.h"
+#include "CommonFramework/OCR/OCR_StringNormalization.h"
+#include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "PokemonSwSh_MaxLair_Detect_HPPP.h"
 
 #include <iostream>

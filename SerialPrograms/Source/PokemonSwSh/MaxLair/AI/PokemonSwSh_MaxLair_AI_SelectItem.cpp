@@ -25,7 +25,8 @@ int8_t select_item(
     );
 
     //  Can't do anything since there's no item detection yet.
-    return random(0, 4);
+//    return random(0, 4);
+    return 0;
 }
 
 

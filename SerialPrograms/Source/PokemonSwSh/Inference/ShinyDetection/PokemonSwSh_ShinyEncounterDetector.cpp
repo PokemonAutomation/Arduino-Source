@@ -90,7 +90,7 @@ ShinyEncounterDetector::ShinyEncounterDetector(
     , m_overlay(overlay)
 //    , m_dialog_box(feed, 0.50, 0.89, 0.40, 0.07)
     , m_shiny_box(overlay, battle_settings.detection_box)
-    , m_min_delay(battle_settings.dialog_delay_when_shiny - std::chrono::milliseconds(500))
+    , m_min_delay(battle_settings.dialog_delay_when_shiny - std::chrono::milliseconds(300))
     , m_max_delay(battle_settings.dialog_delay_when_shiny + std::chrono::milliseconds(500))
     , m_detection_threshold(detection_threshold)
     , m_menu(battle_settings.den)
@@ -118,7 +118,9 @@ void ShinyEncounterDetector::push(
 
     ShinyImageAlpha frame_alpha = signatures.alpha();
 
-    if (m_dialog_tracker.encounter_state() == EncounterState::WILD_ANIMATION){
+    if (m_dialog_tracker.encounter_state() == EncounterState::WILD_ANIMATION &&
+        !m_dialog_tracker.dialog_on()
+    ){
         m_image_alpha.max(frame_alpha);
     }
 

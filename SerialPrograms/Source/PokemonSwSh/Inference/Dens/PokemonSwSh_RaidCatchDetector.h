@@ -21,20 +21,11 @@ public:
     RaidCatchDetector();
 
     bool detect(const QImage& screen);
-    bool wait(
-        ProgramEnvironment& env,
-        VideoFeed& feed,
-        std::chrono::milliseconds timeout
-    );
 
     virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
     ) override final;
-
-
-private:
-    bool has_timed_out(std::chrono::milliseconds timeout) const;
 
 
 private:
@@ -44,7 +35,8 @@ private:
     ImageFloatBox m_right1;
     ImageFloatBox m_text0;
     ImageFloatBox m_text1;
-    std::chrono::time_point<std::chrono::system_clock> m_start_time;
+
+    size_t m_trigger_count = 0;
 };
 
 

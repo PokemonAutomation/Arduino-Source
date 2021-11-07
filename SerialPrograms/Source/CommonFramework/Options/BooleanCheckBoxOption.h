@@ -47,12 +47,12 @@ private:
 };
 
 
-class BooleanCheckBoxOptionUI : public ConfigOptionUI, private BooleanCheckBoxOptionBaseUI{
+class BooleanCheckBoxOptionUI : private BooleanCheckBoxOptionBaseUI, public ConfigOptionUI{
 public:
     BooleanCheckBoxOptionUI(QWidget& parent, BooleanCheckBoxOption& value)
         : BooleanCheckBoxOptionBaseUI(parent, value)
+        , ConfigOptionUI(value, *this)
     {}
-    virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override{
         BooleanCheckBoxOptionBaseUI::restore_defaults();
     }

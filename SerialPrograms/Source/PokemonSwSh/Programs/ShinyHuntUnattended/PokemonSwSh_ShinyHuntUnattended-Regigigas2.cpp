@@ -58,7 +58,7 @@ ShinyHuntUnattendedRegigigas2::ShinyHuntUnattendedRegigigas2(const ShinyHuntUnat
 
     PA_ADD_OPTION(REVERSAL_PP);
     PA_ADD_OPTION(START_TO_ATTACK_DELAY);
-    PA_ADD_DIVIDER(m_advanced_options);
+    PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(ATTACK_TO_CATCH_DELAY);
     PA_ADD_OPTION(CATCH_TO_OVERWORLD_DELAY);
 }
@@ -70,8 +70,6 @@ void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env)
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
     }
-
-    uint32_t last_touch = system_clock(env.console);
 
     uint32_t encounter = 0;
     while (true){
@@ -100,13 +98,12 @@ void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env)
             pbf_press_button(env.console, BUTTON_A, 10, CATCH_TO_OVERWORLD_DELAY);
         }
 
-        //  Touch the date and conditional close game.
-        if (TOUCH_DATE_INTERVAL > 0 && system_clock(env.console) - last_touch >= TOUCH_DATE_INTERVAL){
-            last_touch += TOUCH_DATE_INTERVAL;
-            close_game_if_overworld(env.console, true, 0);
-        }else{
-            close_game_if_overworld(env.console, false, 0);
-        }
+        //  Conditional close game.
+        close_game_if_overworld(
+            env.console,
+            TOUCH_DATE_INTERVAL.ok_to_touch_now(),
+            0
+        );
 
         start_game_from_home(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 0, 0, false);
     }

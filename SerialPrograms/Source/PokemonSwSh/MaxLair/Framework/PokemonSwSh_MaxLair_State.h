@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_State_H
 
 #include <string>
+#include <vector>
 #include <chrono>
 #include <set>
 #include "Pokemon/Pokemon_Types.h"
@@ -122,13 +123,19 @@ struct PlayerState{
 
 struct PathMap{
     int8_t path_type = -1;
-//    PokemonType boss;
+    PokemonType boss = PokemonType::NONE;
     PokemonType mon3[4] = {PokemonType::NONE, PokemonType::NONE, PokemonType::NONE, PokemonType::NONE};
     PokemonType mon2[4] = {PokemonType::NONE, PokemonType::NONE, PokemonType::NONE, PokemonType::NONE};
     PokemonType mon1[2] = {PokemonType::NONE, PokemonType::NONE};
 
     std::string dump() const;
 };
+
+struct PathNode{
+    uint8_t path_slot;
+    PokemonType type;
+};
+std::string dump_path(const std::vector<PathNode>& path);
 
 
 struct GlobalState{
@@ -140,13 +147,18 @@ struct GlobalState{
     bool adventure_started = false;
 
     std::string boss;
+
     PathMap path;
     int8_t path_side = -1;  //  -1 = unknown, 0 = left, 1 = right
+    std::vector<PathNode> last_best_path;
 
     uint8_t wins = 0;
     int8_t lives_left = -1; //  -1 means unknown
 
     PlayerState players[4];
+
+    std::set<std::string> seen;
+    void add_seen(const std::string& mon);
 
     //  Battle State
     std::set<std::string> opponent;

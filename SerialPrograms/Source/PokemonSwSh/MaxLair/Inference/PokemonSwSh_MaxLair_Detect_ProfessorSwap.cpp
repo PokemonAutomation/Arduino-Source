@@ -18,7 +18,7 @@ ProfessorSwapDetector::ProfessorSwapDetector(VideoOverlay& overlay)
     : SelectionArrowFinder(overlay, ImageFloatBox(0.600, 0.600, 0.200, 0.200))
 //    , m_dialog0(0.257, 0.807, 0.015, 0.030)
 //    , m_dialog1(0.710, 0.880, 0.030, 0.050)
-    , m_bottom_main(0.100, 0.970, 0.800, 0.020)
+    , m_bottom_main(0.100, 0.970, 0.600, 0.020)
 {
 //    add_box(m_dialog0, Qt::yellow);
 //    add_box(m_dialog1, Qt::yellow);

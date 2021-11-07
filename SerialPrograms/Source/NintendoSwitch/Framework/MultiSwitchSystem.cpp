@@ -11,6 +11,10 @@
 #include "Common/Qt/NoWheelComboBox.h"
 #include "MultiSwitchSystem.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
@@ -187,10 +191,11 @@ void MultiSwitchSystem::redraw_videos(size_t count){
 
     for (const auto& item : m_switches){
         connect(
-            item, &SwitchSystem::on_state_changed,
-            this, [=]{ on_state_changed(); }
+            item, &SwitchSystem::on_program_state_changed,
+            this, [=]{ on_program_state_changed(); }
         );
     }
+    on_setup_changed();
 }
 
 bool MultiSwitchSystem::serial_ok() const{

@@ -48,11 +48,15 @@ private:
 
 
 
-class EnumDropdownOptionUI : public ConfigOptionUI, public QWidget{
+class EnumDropdownOptionUI : public QWidget, public ConfigOptionUI{
+    Q_OBJECT
+
 public:
     EnumDropdownOptionUI(QWidget& parent, EnumDropdownOption& value);
-    virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override;
+
+signals:
+    void on_changed();
 
 private:
     EnumDropdownOption& m_value;

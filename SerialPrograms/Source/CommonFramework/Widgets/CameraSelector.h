@@ -10,16 +10,13 @@
 #include <deque>
 #include <set>
 #include <mutex>
-#include <condition_variable>
 #include <QCameraInfo>
-#include <QCameraViewfinder>
-#include <QCameraImageCapture>
-#include <QLabel>
 #include <QComboBox>
 #include <QPushButton>
 #include "CommonFramework/Tools/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "VideoOverlayWidget.h"
+#include "VideoWidget.h"
 
 namespace PokemonAutomation{
 
@@ -47,15 +44,6 @@ private:
 };
 
 
-
-#if 0
-class ExpandingCameraViewFinder : public QCameraViewfinder{
-public:
-    using QCameraViewfinder::QCameraViewfinder;
-
-    virtual void resizeEvent(QResizeEvent* event) override;
-};
-#endif
 
 
 
@@ -89,17 +77,6 @@ private:
     static QString aspect_ratio(const QSize& size);
 
 private:
-    enum class CaptureStatus{
-        PENDING,
-        COMPLETED,
-        CANCELED,
-    };
-    struct PendingCapture{
-        CaptureStatus status = CaptureStatus::PENDING;
-        QImage image;
-        std::condition_variable cv;
-    };
-
     Logger& m_logger;
     CameraSelector& m_value;
     QWidget& m_holder;
@@ -109,21 +86,12 @@ private:
     QPushButton* m_reset_button;
 
     QList<QCameraInfo> m_cameras;
-    QList<QSize> m_resolutions;
 
-//    QWidget* m_video;
-    QCamera* m_camera;
-    QCameraViewfinder* m_camera_view;
-    QCameraImageCapture* m_capture;
+    VideoWidget* m_video = nullptr;
     VideoOverlayWidget* m_overlay;
 
     std::atomic<bool> m_snapshots_allowed;
     std::mutex m_camera_lock;
-    std::mutex m_snapshot_lock;
-    std::condition_variable m_cv;
-//    bool m_capture_done;
-//    QImage m_capture_image;
-    std::map<int, PendingCapture> m_pending_captures;
 
 
     std::deque<int> m_height_history;

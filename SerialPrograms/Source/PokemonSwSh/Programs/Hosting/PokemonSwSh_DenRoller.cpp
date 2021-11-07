@@ -69,7 +69,7 @@ DenRoller::DenRoller(const DenRoller_Descriptor& descriptor)
     PA_ADD_OPTION(VIEW_TIME);
     PA_ADD_OPTION(NOTIFICATIONS);
 
-    PA_ADD_DIVIDER(m_advanced_options);
+    PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(READ_DELAY);
 }
 

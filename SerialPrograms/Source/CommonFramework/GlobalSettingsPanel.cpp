@@ -82,9 +82,9 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(STATS_FILE);
     PA_ADD_OPTION(WINDOW_WIDTH);
     PA_ADD_OPTION(WINDOW_HEIGHT);
-    PA_ADD_DIVIDER(m_discord_settings);
+    PA_ADD_STATIC(m_discord_settings);
     PA_ADD_OPTION(DISCORD);
-    PA_ADD_DIVIDER(m_advanced_options);
+    PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(LOG_EVERYTHING);
     PA_ADD_OPTION(SAVE_DEBUG_IMAGES);
 //    PA_ADD_OPTION(NAUGHTY_MODE);

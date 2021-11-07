@@ -15,7 +15,7 @@ namespace MaxLairInternal{
 
 
 void run_entrance(
-    MaxLairRuntime& runtime,
+    AdventureRuntime& runtime,
     ProgramEnvironment& env,
     ConsoleHandle& console, bool save_path,
     GlobalStateTracker& state_tracker
@@ -25,10 +25,13 @@ void run_entrance(
 
     if (!state.adventure_started){
         console.log("Failed to start raid.", Qt::red);
-        runtime.stats.add_error();
+        runtime.session_stats.add_error();
     }else if (state.wins == 0){
         console.log("Lost on first raid.", "purple");
-        runtime.stats.add_run(0);
+        runtime.session_stats.add_run(0);
+        if (console_index == runtime.host_index){
+            runtime.path_stats.clear();
+        }
     }
 
 

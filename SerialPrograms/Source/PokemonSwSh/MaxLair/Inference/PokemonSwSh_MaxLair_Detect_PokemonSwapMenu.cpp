@@ -6,14 +6,14 @@
 
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/OCR/Filtering.h"
-#include "CommonFramework/OCR/StringNormalization.h"
-#include "CommonFramework/OCR/RawOCR.h"
+#include "CommonFramework/OCR/OCR_Filtering.h"
+#include "CommonFramework/OCR/OCR_StringNormalization.h"
+#include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_PokemonSpriteReader.h"
+#include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_HPPP.h"
-#include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 #include "PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
 
@@ -30,14 +30,14 @@ namespace MaxLairInternal{
 PokemonSwapMenuDetector::PokemonSwapMenuDetector(bool stop_no_detect)
     : m_stop_on_no_detect(stop_no_detect)
     , m_pink0(0.150, 0.015, 0.270, 0.050)
-    , m_pink1(0.100, 0.180, 0.270, 0.120)
+    , m_pink1(0.100, 0.220, 0.270, 0.080)
     , m_pink2(0.150, 0.700, 0.090, 0.150)
     , m_white0(0.600, 0.015, 0.370, 0.040)
     , m_white1(0.520, 0.130, 0.450, 0.050)
 //    , m_bottom(overlay, 0.35, 0.80, 0.10, 0.10)
 //    , m_box0(overlay, 0.87, 0.22, 0.03, 0.20)
 //    , m_box1(overlay, 0.87, 0.48, 0.03, 0.20)
-    , m_bottom_main(0.100, 0.970, 0.700, 0.020)
+    , m_bottom_main(0.100, 0.970, 0.600, 0.020)
     , m_bottom_right(0.920, 0.970, 0.070, 0.020)
 {
     add_box(m_pink0);
@@ -57,7 +57,7 @@ bool PokemonSwapMenuDetector::process_frame(
         : detect(frame);
 }
 bool PokemonSwapMenuDetector::detect(const QImage& screen) const{
-    ImageStats pink0 = image_stats(extract_box(screen, m_pink1));
+    ImageStats pink0 = image_stats(extract_box(screen, m_pink0));
     if (!is_solid(pink0, {0.448591, 0.176516, 0.374892}, 0.1, 20)) return false;
     ImageStats pink1 = image_stats(extract_box(screen, m_pink1));
     if (!is_solid(pink1, {0.448591, 0.176516, 0.374892}, 0.1, 20)) return false;

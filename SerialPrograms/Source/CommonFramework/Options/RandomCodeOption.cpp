@@ -110,6 +110,7 @@ ConfigOptionUI* RandomCodeOption::make_ui(QWidget& parent){
 
 RandomCodeOptionUI::RandomCodeOptionUI(QWidget& parent, RandomCodeOption& value)
     : QWidget(&parent)
+    , ConfigOptionUI(value, *this)
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);

@@ -9,9 +9,9 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Inference/ImageTools.h"
+#include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_HPPP.h"
-#include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh_MaxLair_Detect_PathSide.h"
 #include "PokemonSwSh_MaxLair_Detect_PathMap.h"
 #include "PokemonSwSh_MaxLair_Detect_PathSelect.h"
@@ -27,7 +27,7 @@ namespace MaxLairInternal{
 
 
 PathScreenDetector::PathScreenDetector()
-    : m_bottom_main(0.100, 0.970, 0.700, 0.020)
+    : m_bottom_main(0.100, 0.970, 0.600, 0.020)
     , m_main(0.100, 0.100, 0.800, 0.600)
     , m_box0(0.074, 0.420 + 0*0.16315, 0.020, 0.007)
     , m_box1(0.074, 0.420 + 1*0.16315, 0.020, 0.007)
@@ -201,6 +201,10 @@ void PathReader::read_sprites(
 ) const{
     std::string mons[4];
     read_sprites(logger, screen, mons);
+    state.add_seen(mons[0]);
+    state.add_seen(mons[1]);
+    state.add_seen(mons[2]);
+    state.add_seen(mons[3]);
     if (!mons[0].empty()) state.players[0].pokemon = mons[0];
     if (!mons[1].empty()) state.players[1].pokemon = mons[1];
     if (!mons[2].empty()) state.players[2].pokemon = mons[2];

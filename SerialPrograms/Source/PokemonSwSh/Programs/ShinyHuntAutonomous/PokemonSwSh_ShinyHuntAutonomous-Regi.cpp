@@ -73,7 +73,7 @@ ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi(const ShinyHuntAutonomousRegi_D
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
 
-    PA_ADD_DIVIDER(m_advanced_options);
+    PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
     PA_ADD_OPTION(POST_BATTLE_MASH_TIME);
     PA_ADD_OPTION(TRANSITION_DELAY);
@@ -113,7 +113,6 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env){
         stats
     );
 
-    uint32_t last_touch = system_clock(env.console) - TOUCH_DATE_INTERVAL;
     bool error = false;
     while (true){
         pbf_mash_button(env.console, BUTTON_B, POST_BATTLE_MASH_TIME);
@@ -124,12 +123,11 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env){
         }
 
         //  Touch the date.
-        if (TOUCH_DATE_INTERVAL > 0 && system_clock(env.console) - last_touch >= TOUCH_DATE_INTERVAL){
+        if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
             env.log("Touching date to prevent rollover.");
             pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
             touch_date_from_home(env.console, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
             resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
-            last_touch += TOUCH_DATE_INTERVAL;
         }
 
         //  Do the light puzzle.

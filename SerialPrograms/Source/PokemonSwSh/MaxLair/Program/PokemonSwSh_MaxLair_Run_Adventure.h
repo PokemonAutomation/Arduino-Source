@@ -8,7 +8,8 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_Run_Adventure_H
 
 #include "NintendoSwitch/Framework/MultiSwitchProgram.h"
-#include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Options.h"
+#include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
+#include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateTracker.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.h"
 
@@ -24,20 +25,18 @@ enum class AdventureResult{
     ERROR,
 };
 
-AdventureResult run_adventure(
-    MultiSwitchProgramEnvironment& env,
+
+void loop_adventures(
     const QString& program_name,
+    MultiSwitchProgramEnvironment& env,
+    const Consoles& consoles,
     size_t host_index, size_t boss_slot,
-    const MaxLairConsoleOptions& player0,
-    const MaxLairConsoleOptions& player1,
-    const MaxLairConsoleOptions& player2,
-    const MaxLairConsoleOptions& player3,
-    HostingSettings& HOSTING,
     const EndBattleDecider& decider,
-    EventNotificationOption& notification_noshiny,
-    EventNotificationOption& notification_shiny,
-    bool save_path_if_host,
-    bool return_to_entrance, bool go_home_when_done
+    bool go_home_when_done,
+    HostingSettings& HOSTING,
+    TouchDateIntervalOption& TOUCH_DATE_INTERVAL,
+    EventNotificationOption& notification_status,
+    EventNotificationOption& notification_shiny
 );
 
 

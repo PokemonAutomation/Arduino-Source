@@ -7,7 +7,7 @@
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
-#include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Options.h"
+#include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
 #include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
 #include "PokemonSwSh_MaxLair_Run_ProfessorSwap.h"
@@ -28,8 +28,11 @@ void run_professor_swap(
     size_t player_index = state.find_player_index(console_index);
 
     PathReader reader(console, player_index);
-    reader.read_sprites(console, state, console.video().snapshot());
-    reader.read_hp(console, state, console.video().snapshot());
+    {
+        QImage screen = console.video().snapshot();
+        reader.read_sprites(console, state, screen);
+        reader.read_hp(console, state, screen);
+    }
 
 
     GlobalState inferred = state_tracker.synchronize(env, console, console_index);
@@ -38,7 +41,9 @@ void run_professor_swap(
     bool swap = should_swap_with_professor(console, inferred, player_index);
     if (swap){
         console.log("Choosing to swap.", "purple");
+        std::lock_guard<std::mutex> lg(env.lock());
         pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
+        console.botbase().wait_for_all_requests();
     }else{
         console.log("Choosing not to swap.", "purple");
         pbf_press_button(console, BUTTON_B, 10, TICKS_PER_SECOND);
@@ -80,8 +85,11 @@ void run_professor_swap(
 
     env.wait_for(std::chrono::milliseconds(100));
 
-    reader.read_sprites(console, state, console.video().snapshot());
-    reader.read_hp(console, state, console.video().snapshot());
+    {
+        QImage screen = console.video().snapshot();
+        reader.read_sprites(console, state, screen);
+        reader.read_hp(console, state, screen);
+    }
 }
 
 

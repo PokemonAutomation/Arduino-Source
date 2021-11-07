@@ -69,7 +69,7 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2(const ShinyHuntAuto
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
 
-    PA_ADD_DIVIDER(m_advanced_options);
+    PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(CATCH_TO_OVERWORLD_DELAY);
 }
 
@@ -113,8 +113,6 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env)
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);
     }
-
-    uint32_t last_touch = system_clock(env.console);
 
     ShinyHuntTracker& stats = env.stats<ShinyHuntTracker>();
     env.update_stats();
@@ -172,10 +170,7 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env)
         }
 
         pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-        if (TOUCH_DATE_INTERVAL > 0 && system_clock(env.console) - last_touch >= TOUCH_DATE_INTERVAL){
-            touch_date_from_home(env.console, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-            last_touch += TOUCH_DATE_INTERVAL;
-        }
+        TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.console);
         reset_game_from_home_with_inference(
             env, env.console,
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST

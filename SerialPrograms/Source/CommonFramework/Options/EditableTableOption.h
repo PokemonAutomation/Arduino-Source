@@ -37,12 +37,12 @@ public:
 };
 
 
-class EditableTableOptionUI : public ConfigOptionUI, public EditableTableBaseUI{
+class EditableTableOptionUI : public EditableTableBaseUI, public ConfigOptionUI{
 public:
     EditableTableOptionUI(QWidget& parent, EditableTableOption& value)
         : EditableTableBaseUI(parent, value)
+        , ConfigOptionUI(value, *this)
     {}
-    virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override{
         EditableTableBaseUI::restore_defaults();
     }

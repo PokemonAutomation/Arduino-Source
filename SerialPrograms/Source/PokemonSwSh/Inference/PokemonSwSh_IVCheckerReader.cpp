@@ -7,8 +7,8 @@
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Inference/ImageTools.h"
-#include "CommonFramework/OCR/RawOCR.h"
-#include "CommonFramework/OCR/Filtering.h"
+#include "CommonFramework/OCR/OCR_RawOCR.h"
+#include "CommonFramework/OCR/OCR_Filtering.h"
 #include "PokemonSwSh_IVCheckerReader.h"
 
 #include <iostream>

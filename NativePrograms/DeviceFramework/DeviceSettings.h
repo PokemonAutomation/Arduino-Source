@@ -14,12 +14,12 @@
 ////////////////////////////////////////////////////////////////////////////////
 //  Board Type (for LEDs)
 
-#define BOARD_TYPE_UNKNOWN      0
-#define BOARD_TYPE_UNO          1
-#define BOARD_TYPE_PRO_MICRO    2
-#define BOARD_TYPE_TEENSY2      3
+//#define BOARD_TYPE_UNKNOWN      0
+//#define BOARD_TYPE_UNO          1
+//#define BOARD_TYPE_PRO_MICRO    2
+//#define BOARD_TYPE_TEENSY2      3
 
-extern const int BOARD_TYPE;
+//extern const int BOARD_TYPE;
 
 ////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////

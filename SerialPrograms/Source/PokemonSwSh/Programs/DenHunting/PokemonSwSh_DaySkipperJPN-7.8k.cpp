@@ -58,7 +58,7 @@ DaySkipperJPN7p8k::DaySkipperJPN7p8k(const DaySkipperJPN7p8k_Descriptor& descrip
     PA_ADD_OPTION(SKIPS);
     PA_ADD_OPTION(START_DATE);
     PA_ADD_OPTION(NOTIFICATIONS);
-    PA_ADD_DIVIDER(m_advanced_options);
+    PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(CORRECTION_SKIPS);
 }
 

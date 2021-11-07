@@ -43,6 +43,7 @@ ConfigOptionUI* CatchabilitySelectorOption::make_ui(QWidget& parent){
 
 CatchabilitySelectorUI::CatchabilitySelectorUI(QWidget& parent, CatchabilitySelectorOption& value)
     : QWidget(&parent)
+    , ConfigOptionUI(value, *this)
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);

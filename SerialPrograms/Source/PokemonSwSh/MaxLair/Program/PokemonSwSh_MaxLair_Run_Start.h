@@ -8,23 +8,28 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_Run_Start_H
 
 #include "NintendoSwitch/Framework/MultiSwitchProgram.h"
-#include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Options.h"
+#include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
+#include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Hosting.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateTracker.h"
+#include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{
 
-//  Returns true if raid started. False if you errored and are back at the entrance.
 
-bool start_raid(
+//  Returns true if adventure started. False if you errored and are back at the entrance.
+bool start_adventure(
     MultiSwitchProgramEnvironment& env,
     GlobalStateTracker& state_tracker,
     QImage entrance[4],
     ConsoleHandle& host, size_t boss_slot,
     HostingSettings& settings,
-    const QString& program_name, const StatsTracker& stats_tracker
+    const QString& program_name,
+    const PathStats& path_stats,
+    const StatsTracker& session_stats,
+    ConsoleRuntime console_stats[4]
 );
 
 

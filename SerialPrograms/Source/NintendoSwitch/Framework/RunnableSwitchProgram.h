@@ -76,13 +76,13 @@ protected:
     );
     void construct();
     virtual QWidget* make_header(QWidget& parent) override;
-    virtual QWidget* make_options(QWidget& parent) override;
+    virtual QWidget* make_body(QWidget& parent) override;
     virtual QWidget* make_actions(QWidget& parent) override;
 
 protected:
     virtual QString check_validity() const override;
 
-    virtual void update_ui() override;
+    virtual void update_ui_after_program_state_change() override;
 
     virtual void on_stop() override;
 

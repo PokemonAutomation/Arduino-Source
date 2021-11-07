@@ -48,10 +48,9 @@ private:
 };
 
 
-class HiddenTextEditOptionUI : public ConfigOptionUI, public QWidget{
+class HiddenTextEditOptionUI : public QWidget, public ConfigOptionUI{
 public:
     HiddenTextEditOptionUI(QWidget& parent, HiddenTextEditOption& value);
-    virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override;
 
 private:

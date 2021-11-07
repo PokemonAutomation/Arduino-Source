@@ -73,8 +73,8 @@
 #include "Programs/PokemonSwSh_SynchronizedSpinning.h"
 #include "Programs/PokemonSwSh_RaidItemFarmerOKHO.h"
 
-#include "MaxLair/PokemonSwSh_MaxLair_SingleRun.h"
 #include "MaxLair/PokemonSwSh_MaxLair_Standard.h"
+#include "MaxLair/PokemonSwSh_MaxLair_StrongBoss.h"
 #include "MaxLair/PokemonSwSh_MaxLair_BossFinder.h"
 
 #include "InferenceTraining/PokemonSwSh_GenerateIVCheckerOCR.h"
@@ -166,12 +166,10 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<SynchronizedSpinning_Descriptor, SynchronizedSpinning>();
     add_program<RaidItemFarmerOHKO_Descriptor, RaidItemFarmerOHKO>();
 
-    if (GlobalSettings::instance().DEVELOPER_MODE){
-        add_divider("---- Auto Max Lair 2.0 ----");
-        add_program<MaxLairSingleRun_Descriptor, MaxLairSingleRun>();
-        add_program<MaxLairStandard_Descriptor, MaxLairStandard>();
-        add_program<MaxLairBossFinder_Descriptor, MaxLairBossFinder>();
-    }
+    add_divider("---- Auto Max Lair 2.0 ----");
+    add_program<MaxLairStandard_Descriptor, MaxLairStandard>();
+    add_program<MaxLairStrongBoss_Descriptor, MaxLairStrongBoss>();
+    add_program<MaxLairBossFinder_Descriptor, MaxLairBossFinder>();
 
     if (GlobalSettings::instance().DEVELOPER_MODE){
         add_divider("---- Developer Tools ----");

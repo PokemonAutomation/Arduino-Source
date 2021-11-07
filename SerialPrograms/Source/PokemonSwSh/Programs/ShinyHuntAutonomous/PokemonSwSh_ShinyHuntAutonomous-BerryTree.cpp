@@ -66,7 +66,7 @@ ShinyHuntAutonomousBerryTree::ShinyHuntAutonomousBerryTree(const ShinyHuntAutono
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
 
-    PA_ADD_DIVIDER(m_advanced_options);
+    PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
 }
 

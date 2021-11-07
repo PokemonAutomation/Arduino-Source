@@ -63,8 +63,8 @@ public:
     QJsonValue to_json() const;
 
     void restore_defaults();
-
     void reset_rate_limit();
+
     bool ok_to_send_now(Logger& logger);
 
 private:

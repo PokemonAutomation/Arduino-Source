@@ -3,6 +3,7 @@
 #include "Common/Cpp/Exception.h"
 #include "PersistentSettings.h"
 #include "CrashDump.h"
+#include "Environment/HardwareValidation.h"
 #include "Tools/StatsDatabase.h"
 #include "Tools/Logger.h"
 #include "Integrations/SleepyDiscordRunner.h"
@@ -26,6 +27,11 @@ int main(int argc, char *argv[]){
     qRegisterMetaType<uint8_t>("uint8_t");
     qRegisterMetaType<std::string>();
 
+
+    if (!check_hardware()){
+        return 1;
+    }
+
     try{
         PERSISTENT_SETTINGS().read();
     }catch (const StringException& error){
@@ -40,6 +46,10 @@ int main(int argc, char *argv[]){
         ret = application.exec();
     }
     PERSISTENT_SETTINGS().write();
+
+#ifdef PA_SLEEPY
     Integration::SleepyDiscordRunner::sleepy_terminate();
+#endif
+
     return ret;
 }

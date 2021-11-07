@@ -162,6 +162,12 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Inference/VisualInferenceRoutines.h
     Source/CommonFramework/Inference/VisualInferenceSession.cpp
     Source/CommonFramework/Inference/VisualInferenceSession.h
+    Source/CommonFramework/Environment/Environment_Linux.cpp
+    Source/CommonFramework/Environment/Environment_Windows.cpp
+    Source/CommonFramework/Environment/Environment.cpp
+    Source/CommonFramework/Environment/Environment.h
+    Source/CommonFramework/Environment/HardwareValidation.cpp
+    Source/CommonFramework/Environment/HardwareValidation.h
     Source/CommonFramework/Language.cpp
     Source/CommonFramework/Language.h
     Source/CommonFramework/Main.cpp
@@ -175,29 +181,31 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Notifications/ProgramNotifications.h
     Source/CommonFramework/Notifications/SenderNotificationTable.cpp
     Source/CommonFramework/Notifications/SenderNotificationTable.h
-    Source/CommonFramework/OCR/DictionaryMatcher.cpp
-    Source/CommonFramework/OCR/DictionaryMatcher.h
-    Source/CommonFramework/OCR/DictionaryOCR.cpp
-    Source/CommonFramework/OCR/DictionaryOCR.h
-    Source/CommonFramework/OCR/Filtering.cpp
-    Source/CommonFramework/OCR/Filtering.h
-    Source/CommonFramework/OCR/LanguageOptionOCR.cpp
-    Source/CommonFramework/OCR/LanguageOptionOCR.h
-    Source/CommonFramework/OCR/LargeDictionaryMatcher.cpp
-    Source/CommonFramework/OCR/LargeDictionaryMatcher.h
-    Source/CommonFramework/OCR/RawOCR.cpp
-    Source/CommonFramework/OCR/RawOCR.h
-    Source/CommonFramework/OCR/SmallDictionaryMatcher.cpp
-    Source/CommonFramework/OCR/SmallDictionaryMatcher.h
-    Source/CommonFramework/OCR/StringNormalization.cpp
-    Source/CommonFramework/OCR/StringNormalization.h
-    Source/CommonFramework/OCR/StringMatchResult.cpp
-    Source/CommonFramework/OCR/StringMatchResult.h
+    Source/CommonFramework/OCR/OCR_DictionaryMatcher.cpp
+    Source/CommonFramework/OCR/OCR_DictionaryMatcher.h
+    Source/CommonFramework/OCR/OCR_DictionaryOCR.cpp
+    Source/CommonFramework/OCR/OCR_DictionaryOCR.h
+    Source/CommonFramework/OCR/OCR_Filtering.cpp
+    Source/CommonFramework/OCR/OCR_Filtering.h
+    Source/CommonFramework/OCR/OCR_LanguageOptionOCR.cpp
+    Source/CommonFramework/OCR/OCR_LanguageOptionOCR.h
+    Source/CommonFramework/OCR/OCR_LargeDictionaryMatcher.cpp
+    Source/CommonFramework/OCR/OCR_LargeDictionaryMatcher.h
+    Source/CommonFramework/OCR/OCR_NumberReader.cpp
+    Source/CommonFramework/OCR/OCR_NumberReader.h
+    Source/CommonFramework/OCR/OCR_RawOCR.cpp
+    Source/CommonFramework/OCR/OCR_RawOCR.h
+    Source/CommonFramework/OCR/OCR_SmallDictionaryMatcher.cpp
+    Source/CommonFramework/OCR/OCR_SmallDictionaryMatcher.h
+    Source/CommonFramework/OCR/OCR_StringNormalization.cpp
+    Source/CommonFramework/OCR/OCR_StringNormalization.h
+    Source/CommonFramework/OCR/OCR_StringMatchResult.cpp
+    Source/CommonFramework/OCR/OCR_StringMatchResult.h
+    Source/CommonFramework/OCR/OCR_TextMatcher.cpp
+    Source/CommonFramework/OCR/OCR_TextMatcher.h
+    Source/CommonFramework/OCR/OCR_TrainingTools.cpp
+    Source/CommonFramework/OCR/OCR_TrainingTools.h
     Source/CommonFramework/OCR/TesseractPA.h
-    Source/CommonFramework/OCR/TextMatcher.cpp
-    Source/CommonFramework/OCR/TextMatcher.h
-    Source/CommonFramework/OCR/TrainingTools.cpp
-    Source/CommonFramework/OCR/TrainingTools.h
     Source/CommonFramework/Options/BatchOption.cpp
     Source/CommonFramework/Options/BatchOption.h
     Source/CommonFramework/Options/BooleanCheckBoxOption.h
@@ -214,9 +222,9 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/RandomCodeOption.h
     Source/CommonFramework/Options/ScreenshotFormatOption.cpp
     Source/CommonFramework/Options/ScreenshotFormatOption.h
-    Source/CommonFramework/Options/SectionDivider.cpp
-    Source/CommonFramework/Options/SectionDivider.h
     Source/CommonFramework/Options/SimpleIntegerOption.h
+    Source/CommonFramework/Options/StaticTextOption.cpp
+    Source/CommonFramework/Options/StaticTextOption.h
     Source/CommonFramework/Options/StringOption.h
     Source/CommonFramework/Options/StringSelectOption.cpp
     Source/CommonFramework/Options/StringSelectOption.h
@@ -256,8 +264,11 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Tools/VideoFeed.h
     Source/CommonFramework/Widgets/CameraSelector.cpp
     Source/CommonFramework/Widgets/CameraSelector.h
+    Source/CommonFramework/Widgets/QtVideoWidget.cpp
+    Source/CommonFramework/Widgets/QtVideoWidget.h
     Source/CommonFramework/Widgets/SerialSelector.cpp
     Source/CommonFramework/Widgets/SerialSelector.h
+    Source/CommonFramework/Widgets/VideoWidget.h
     Source/CommonFramework/Widgets/VideoOverlayWidget.cpp
     Source/CommonFramework/Widgets/VideoOverlayWidget.h
     Source/CommonFramework/Windows/ButtonDiagram.cpp
@@ -460,6 +471,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Inference/PokemonSwSh_PokemonSpriteReader.h
     Source/PokemonSwSh/Inference/PokemonSwSh_PromptDetector.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_PromptDetector.h
+    Source/PokemonSwSh/Inference/PokemonSwSh_QuantityReader.cpp
+    Source/PokemonSwSh/Inference/PokemonSwSh_QuantityReader.h
     Source/PokemonSwSh/Inference/PokemonSwSh_ReceivePokemonDetector.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_ReceivePokemonDetector.h
     Source/PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.cpp
@@ -491,18 +504,22 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateNameOCRPokedex.h
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.cpp
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h
+    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_PathMatchup.cpp
+    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_PathMatchup.h
+    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_RentalBossMatchup.cpp
+    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_RentalBossMatchup.h
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SelectItem.cpp
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SelectMove.cpp
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SelectPath.cpp
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SelectStarter.cpp
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SwapCatch.cpp
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SwapProfessor.cpp
+    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_Tools.cpp
+    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_Tools.h
     Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_CatchScreenTracker.cpp
     Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_CatchScreenTracker.h
     Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Notifications.cpp
     Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Notifications.h
-    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Options.cpp
-    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Options.h
     Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.cpp
     Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h
     Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.cpp
@@ -536,18 +553,28 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h
     Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_ProfessorSwap.cpp
     Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_ProfessorSwap.h
+    Source/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_BossAction.cpp
+    Source/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_BossAction.h
+    Source/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Consoles.cpp
+    Source/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Consoles.h
+    Source/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Hosting.cpp
+    Source/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Hosting.h
+    Source/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.cpp
+    Source/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h
     Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_BossFinder.cpp
     Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_BossFinder.h
-    Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_SingleRun.cpp
-    Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_SingleRun.h
     Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_Standard.cpp
     Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_Standard.h
+    Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_StrongBoss.cpp
+    Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_StrongBoss.h
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Adventure.cpp
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Adventure.h
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Battle.cpp
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Battle.h
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_CaughtScreen.cpp
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_CaughtScreen.h
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_EnterLobby.cpp
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_EnterLobby.h
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Entrance.cpp
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Entrance.h
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_ItemSelect.cpp
@@ -562,10 +589,13 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_ProfessorSwap.h
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Start.cpp
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Start.h
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_StartSolo.cpp
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_StartSolo.h
     Source/PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h
     Source/PokemonSwSh/Options/PokemonSwSh_Catchability.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_Catchability.h
+    Source/PokemonSwSh/Options/PokemonSwSh_DateToucher.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_DateToucher.h
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.h
@@ -576,14 +606,20 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Options/PokemonSwSh_MultiHostTable.h
     Source/PokemonSwSh/Options/PokemonSwSh_RegiSelector.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_RegiSelector.h
-    Source/PokemonSwSh/PkmnLib/PokemonSwSh_MaxLair_Moves.cpp
-    Source/PokemonSwSh/PkmnLib/PokemonSwSh_MaxLair_Moves.h
-    Source/PokemonSwSh/PkmnLib/PokemonSwSh_MaxLair_Pokemon.cpp
-    Source/PokemonSwSh/PkmnLib/PokemonSwSh_MaxLair_Pokemon.h
-    Source/PokemonSwSh/PkmnLib/PokemonSwSh_MaxLair_Stats.cpp
-    Source/PokemonSwSh/PkmnLib/PokemonSwSh_MaxLair_Stats.h
-    Source/PokemonSwSh/PkmnLib/PokemonSwSh_MaxLair_Types.cpp
-    Source/PokemonSwSh/PkmnLib/PokemonSwSh_MaxLair_Types.h
+    Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Battle.cpp
+    Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Battle.h
+    Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Field.cpp
+    Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Field.h
+    Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Matchup.cpp
+    Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Matchup.h
+    Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Moves.cpp
+    Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Moves.h
+    Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Pokemon.cpp
+    Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Pokemon.h
+    Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Stats.cpp
+    Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Stats.h
+    Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Types.cpp
+    Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Types.h
     Source/PokemonSwSh/PokemonSwSh_Panels.cpp
     Source/PokemonSwSh/PokemonSwSh_Panels.h
     Source/PokemonSwSh/PokemonSwSh_Settings.cpp
@@ -744,6 +780,10 @@ target_link_libraries(SerialPrograms Qt5::Widgets Qt5::SerialPort Qt5::Multimedi
 
 #add defines
 target_compile_definitions(SerialPrograms PRIVATE NOMINMAX PA_TESSERACT PA_SLEEPY)
+
+if (EXISTS "../../Internal/SerialPrograms/TelemetryURLs.h")
+target_compile_definitions(SerialPrograms PRIVATE PA_OFFICIAL)
+endif()
 
 #add include directory
 target_include_directories(SerialPrograms PRIVATE Source/ ../)

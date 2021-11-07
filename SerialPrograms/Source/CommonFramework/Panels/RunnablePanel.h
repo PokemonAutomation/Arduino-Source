@@ -10,6 +10,7 @@
 #include <thread>
 #include <QLabel>
 #include <QPushButton>
+#include <QScrollArea>
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/ConfigOption.h"
 #include "CommonFramework/Options/BatchOption.h"
@@ -51,6 +52,7 @@ public:
 
     virtual QString check_validity() const;
     virtual void restore_defaults();
+    virtual void reset_state();
 
 public:
     //  Serialization
@@ -99,10 +101,17 @@ protected:
         RunnablePanelInstance& instance,
         PanelListener& listener
     );
+
+    //  Call immediately after construction.
     void construct();
-    virtual QWidget* make_options(QWidget& parent);
+
+    //  Child classes can override these with their own customizations.
+    virtual QWidget* make_body(QWidget& parent);
+    virtual BatchOptionUI* make_options(QWidget& parent);
     virtual QLabel* make_status_bar(QWidget& parent);
     virtual QWidget* make_actions(QWidget& parent);
+
+//    void redraw_options();
 
 protected:
     virtual QString check_validity() const;
@@ -111,13 +120,14 @@ protected:
     void load_historical_stats();
     void update_historical_stats();
 
-    virtual void update_ui();
+    virtual void update_ui_after_program_state_change();
     void set_status(QString status);
 
     virtual void on_stop();
 
     virtual void run_program() = 0;
 
+protected:
 
 signals:    //  Protected Signals
     void signal_cancel();
@@ -133,8 +143,19 @@ protected:
     uint64_t m_instance_id = 0;
     TaggedLogger m_logger;
 
-    BatchOptionUI* m_options;
-    QLabel* m_status_bar;
+    QBoxLayout* m_header_holder;
+    QBoxLayout* m_body_holder;
+    QBoxLayout* m_options_holder;
+    QBoxLayout* m_status_bar_holder;
+    QBoxLayout* m_actions_holder;
+
+    QWidget* m_scroll_inner;
+
+    QWidget* m_header = nullptr;
+    QWidget* m_body = nullptr;
+    BatchOptionUI* m_options = nullptr;
+    QLabel* m_status_bar = nullptr;
+    QWidget* m_actions = nullptr;
 
     QPushButton* m_start_button;
     QPushButton* m_default_button;

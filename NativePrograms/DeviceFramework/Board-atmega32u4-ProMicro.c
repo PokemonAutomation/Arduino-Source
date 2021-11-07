@@ -8,8 +8,6 @@
 #include "DeviceSettings.h"
 #include "HardwareLED.h"
 
-const int BOARD_TYPE = BOARD_TYPE_PRO_MICRO;
-
 void setup_leds(void){
     DDRB |= (1 << 0);
     DDRD |= (1 << 5);

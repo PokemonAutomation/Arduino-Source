@@ -146,10 +146,8 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env){
         pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
     }
 
-    uint32_t last_touch = 0;
-    if (SKIPS == 0 && TOUCH_DATE_INTERVAL > 0){
-        touch_date_from_home(env.console, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-        last_touch = system_clock(env.console);
+    if (SKIPS == 0){
+        TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.console);
     }
     rollback_date_from_home(env.console, SKIPS);
     resume_game_front_of_den_nowatts(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
@@ -181,16 +179,16 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env){
         pbf_wait(env.console, EXTRA_DELAY_BETWEEN_RAIDS);
 
         //  Touch the date.
-        if (SKIPS == 0 && TOUCH_DATE_INTERVAL > 0 && system_clock(env.console) - last_touch >= TOUCH_DATE_INTERVAL){
-            touch_date_from_home(env.console, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-            last_touch += TOUCH_DATE_INTERVAL;
+        if (SKIPS == 0){
+            TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.console);
+        }else{
+            rollback_date_from_home(env.console, SKIPS);
         }
-        rollback_date_from_home(env.console, SKIPS);
 
         start_game_from_home_with_inference(
             env, env.console,
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW,
-            0, 0,
+            ALTERNATE_GAMES ? 2 : 0, 0,
             BACKUP_SAVE
         );
     }

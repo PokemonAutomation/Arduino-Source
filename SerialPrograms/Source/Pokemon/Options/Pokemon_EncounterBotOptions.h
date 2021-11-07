@@ -11,7 +11,7 @@
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
-#include "CommonFramework/OCR/LanguageOptionOCR.h"
+#include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 
 namespace PokemonAutomation{

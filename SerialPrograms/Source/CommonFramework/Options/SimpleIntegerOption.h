@@ -59,12 +59,12 @@ private:
 
 
 template <typename Type>
-class SimpleIntegerOptionUI : public ConfigOptionUI, private SimpleIntegerOptionBaseUI<Type>{
+class SimpleIntegerOptionUI : private SimpleIntegerOptionBaseUI<Type>, public ConfigOptionUI{
 public:
     SimpleIntegerOptionUI(QWidget& parent, SimpleIntegerOption<Type>& value)
         : SimpleIntegerOptionBaseUI<Type>(parent, value)
+        , ConfigOptionUI(value, *this)
     {}
-    virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override{
         SimpleIntegerOptionBaseUI<Type>::restore_defaults();
     }

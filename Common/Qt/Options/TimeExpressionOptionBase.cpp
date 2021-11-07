@@ -183,7 +183,7 @@ TimeExpressionOptionBaseUI<Type>::TimeExpressionOptionBaseUI(QWidget& parent, Ti
 template <typename Type>
 void TimeExpressionOptionBaseUI<Type>::restore_defaults(){
     m_value.restore_defaults();
-    m_box->setText(m_value.time_string());
+    m_box->setText(m_value.text());
 }
 
 

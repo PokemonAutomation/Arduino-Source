@@ -9,7 +9,7 @@
 
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/OCR/LanguageOptionOCR.h"
+#include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"

@@ -106,6 +106,7 @@ private:
 
 HiddenTextEditOptionUI::HiddenTextEditOptionUI(QWidget& parent, HiddenTextEditOption& value)
     : QWidget(&parent)
+    , ConfigOptionUI(value, *this)
     , m_value(value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);

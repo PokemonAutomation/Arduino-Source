@@ -52,6 +52,7 @@ ConfigOptionUI* EggStepCountOption::make_ui(QWidget& parent){
 
 EggStepCountUI::EggStepCountUI(QWidget& parent, EggStepCountOption& value)
     : QWidget(&parent)
+    , ConfigOptionUI(value, *this)
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);

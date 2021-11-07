@@ -57,8 +57,10 @@ private:
 private:
     void merge_timestamp                (uint8_t group, GlobalState& state);
     void merge_boss                     (uint8_t group, GlobalState& state);
+//    void merge_boss_type                (uint8_t group, GlobalState& state);
     void merge_path                     (uint8_t group, GlobalState& state);
     void merge_path_side                (uint8_t group, GlobalState& state);
+    void merge_seen                     (uint8_t group, GlobalState& state);
 
     void merge_wins                     (uint8_t group, GlobalState& state);
     void merge_opponent_species         (uint8_t group, GlobalState& state);

@@ -55,7 +55,7 @@ SurpriseTrade::SurpriseTrade(const SurpriseTrade_Descriptor& descriptor)
 
     PA_ADD_OPTION(BOXES_TO_TRADE);
     PA_ADD_OPTION(INITIAL_WAIT);
-    PA_ADD_DIVIDER(m_advanced_options);
+    PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(TRADE_ANIMATION);
     PA_ADD_OPTION(EVOLVE_DELAY);
 }

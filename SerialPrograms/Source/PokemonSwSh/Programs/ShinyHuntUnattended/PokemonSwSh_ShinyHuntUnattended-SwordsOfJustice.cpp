@@ -54,7 +54,7 @@ ShinyHuntUnattendedSwordsOfJustice::ShinyHuntUnattendedSwordsOfJustice(const Shi
 
     PA_ADD_OPTION(EXIT_CAMP_TO_RUN_DELAY);
     PA_ADD_OPTION(AIRPLANE_MODE);
-    PA_ADD_DIVIDER(m_advanced_options);
+    PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(ENTER_CAMP_DELAY);
 }
 

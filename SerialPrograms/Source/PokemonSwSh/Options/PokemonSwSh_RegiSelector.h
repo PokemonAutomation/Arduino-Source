@@ -45,10 +45,9 @@ private:
 };
 
 
-class RegiSelectorOptionUI : public ConfigOptionUI, public QWidget{
+class RegiSelectorOptionUI : public QWidget, public ConfigOptionUI{
 public:
     RegiSelectorOptionUI(QWidget& parent, RegiSelectorOption& value);
-    virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override;
 
 private:

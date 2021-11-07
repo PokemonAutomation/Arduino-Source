@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_Settings_H
 #define PokemonAutomation_PokemonSwSh_Settings_H
 
-#include "CommonFramework/Options/SectionDivider.h"
+#include "CommonFramework/Options/StaticTextOption.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"

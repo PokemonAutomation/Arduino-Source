@@ -7,11 +7,11 @@
 #ifndef PokemonAutomation_PokemonSwSh_DexRecFinder_H
 #define PokemonAutomation_PokemonSwSh_DexRecFinder_H
 
-#include "CommonFramework/Options/SectionDivider.h"
+#include "CommonFramework/Options/StaticTextOption.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/OCR/LanguageOptionOCR.h"
+#include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "Pokemon/Options/Pokemon_NameSelectOption.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"

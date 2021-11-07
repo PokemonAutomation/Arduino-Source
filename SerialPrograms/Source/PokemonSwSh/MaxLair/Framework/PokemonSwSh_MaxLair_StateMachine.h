@@ -9,8 +9,11 @@
 
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "NintendoSwitch/Framework/MultiSwitchProgram.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_QuantityReader.h"
+#include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
+#include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Consoles.h"
+#include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Hosting.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Stats.h"
-#include "PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh_MaxLair_StateTracker.h"
 
 namespace PokemonAutomation{
@@ -31,14 +34,6 @@ enum class ConsoleState{
 };
 
 
-enum class CaughtScreenAction{
-    ALWAYS_STOP,
-    TAKE_NON_BOSS_STOP_ON_NOTHING,
-    TAKE_NON_BOSS_STOP_ON_SHINY_BOSS,
-    RESET_HOST_IF_NON_SHINY_BOSS,
-};
-
-
 
 enum class StateMachineAction{
     KEEP_GOING,
@@ -48,19 +43,54 @@ enum class StateMachineAction{
 };
 
 
-struct MaxLairRuntime{
-    QString program_name;
-    const MaxLairConsoleOptions* player_settings[4];
+struct ConsoleRuntime{
+    ReadableQuantity999 ore;
+    ReadableQuantity999 normal_balls;
+    ReadableQuantity999 boss_balls;
+};
+
+struct AdventureRuntime{
+    AdventureRuntime(
+        const QString& p_program_name,
+        const size_t p_host_index,
+        const Consoles& p_console_settings,
+        const EndBattleDecider& p_actions,
+        const bool p_go_home_when_done,
+        HostingSettings& p_hosting_settings,
+        EventNotificationOption& p_notification_status,
+        EventNotificationOption& p_notification_shiny,
+        Stats& p_session_stats
+    )
+        : program_name(p_program_name)
+        , host_index(p_host_index)
+        , console_settings(p_console_settings)
+        , actions(p_actions)
+        , go_home_when_done(p_go_home_when_done)
+        , hosting_settings(p_hosting_settings)
+        , notification_status(p_notification_status)
+        , notification_shiny(p_notification_shiny)
+        , session_stats(p_session_stats)
+    {}
+
+    const QString& program_name;
+    const size_t host_index;
+    const Consoles& console_settings;
     const EndBattleDecider& actions;
-    EventNotificationOption& notification_noshiny;
+    const bool go_home_when_done;
+    HostingSettings& hosting_settings;
+    EventNotificationOption& notification_status;
     EventNotificationOption& notification_shiny;
-    Stats& stats;
+    Stats& session_stats;
+
+    PathStats path_stats;
+    std::string last_boss;
+    ConsoleRuntime consoles[4];
 };
 
 
 //  Return true if done.
 StateMachineAction run_state_iteration(
-    MaxLairRuntime& runtime, size_t console_index,
+    AdventureRuntime& runtime, size_t console_index,
     ProgramEnvironment& env,
     ConsoleHandle& console, bool save_path,
     GlobalStateTracker& state_tracker,

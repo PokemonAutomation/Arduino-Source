@@ -10,7 +10,7 @@
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Inference/ImageTools.h"
-#include "CommonFramework/OCR/Filtering.h"
+#include "CommonFramework/OCR/OCR_Filtering.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonHome_GenerateNameOCR.h"

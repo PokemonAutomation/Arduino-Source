@@ -28,6 +28,7 @@ class ShinyDialogTracker{
 public:
     ShinyDialogTracker(VideoOverlay& overlay, Logger& logger);
 
+    bool dialog_on() const{ return m_dialog_on; }
     EncounterState encounter_state() const{ return m_state; }
     std::chrono::milliseconds wild_animation_duration() const{ return m_wild_animation_duration; }
     std::chrono::milliseconds your_animation_duration() const{ return m_your_animation_duration; }

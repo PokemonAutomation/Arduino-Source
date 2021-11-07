@@ -314,6 +314,14 @@ void GlobalStateTracker::merge_boss(uint8_t group, GlobalState& state){
         [&](size_t index){ return m_master_consoles[index].boss; }
     );
 }
+#if 0
+void GlobalStateTracker::merge_boss_type(uint8_t group, GlobalState& state){
+    state.boss_type = merge_majority_vote<PokemonType>(
+        m_groups, m_count, group, PokemonType::NONE,
+        [&](size_t index){ return m_master_consoles[index].boss_type; }
+    );
+}
+#endif
 void GlobalStateTracker::merge_path(uint8_t group, GlobalState& state){
 //    std::chrono::system_clock::time_point latest =  std::chrono::system_clock::time_point::min();
     for (size_t c = 0; c < m_count; c++){
@@ -322,6 +330,7 @@ void GlobalStateTracker::merge_path(uint8_t group, GlobalState& state){
         }
         if (m_master_consoles[c].path.path_type >= 0){
             state.path = m_master_consoles[c].path;
+            state.last_best_path = m_master_consoles[c].last_best_path;
             return;
         }
     }
@@ -331,6 +340,18 @@ void GlobalStateTracker::merge_path_side(uint8_t group, GlobalState& state){
         m_groups, m_count, group, -1,
         [&](size_t index){ return m_master_consoles[index].path_side; }
     );
+}
+void GlobalStateTracker::merge_seen(uint8_t group, GlobalState& state){
+    std::set<std::string> merged;
+    for (size_t c = 0; c < m_count; c++){
+        if (group != m_groups[c]){
+            continue;
+        }
+        for (const std::string& mon : m_master_consoles[c].seen){
+            merged.insert(mon);
+        }
+    }
+    state.seen = std::move(merged);
 }
 void GlobalStateTracker::merge_wins(uint8_t group, GlobalState& state){
     state.wins = merge_majority_vote<uint8_t>(
@@ -458,6 +479,7 @@ GlobalState GlobalStateTracker::infer_actual_state_unprotected(size_t index){
     merge_boss(group, state);
     merge_path(group, state);
     merge_path_side(group, state);
+    merge_seen(group, state);
 
     merge_wins(group, state);
     merge_opponent_species(group, state);

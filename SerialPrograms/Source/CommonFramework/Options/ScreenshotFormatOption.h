@@ -19,7 +19,7 @@ public:
         : EnumDropdownOption(
             std::move(label),
             {
-                "Do not attach screenshot.",
+                "No Screenshot.",
                 "Attach as .jpg.",
                 "Attach as .png.",
             },

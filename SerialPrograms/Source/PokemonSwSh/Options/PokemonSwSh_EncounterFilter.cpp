@@ -299,6 +299,7 @@ ConfigOptionUI* EncounterFilterOption::make_ui(QWidget& parent){
 
 EncounterFilterOptionUI::EncounterFilterOptionUI(QWidget& parent, EncounterFilterOption& value)
     : QWidget(&parent)
+    , ConfigOptionUI(value, *this)
     , m_value(value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -353,7 +354,7 @@ EncounterFilterOptionUI::EncounterFilterOptionUI(QWidget& parent, EncounterFilte
     if (m_value.m_enable_overrides){
         layout->addSpacing(5);
         m_table = value.m_table.make_ui(*this);
-        layout->addWidget(m_table->widget());
+        layout->addWidget(&m_table->widget());
     }
 }
 void EncounterFilterOptionUI::restore_defaults(){

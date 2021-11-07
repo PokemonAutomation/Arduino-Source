@@ -51,12 +51,12 @@ private:
 };
 
 
-class SwitchDateOptionUI : public ConfigOptionUI, private SwitchDateOptionBaseUI{
+class SwitchDateOptionUI : private SwitchDateOptionBaseUI, public ConfigOptionUI{
 public:
     SwitchDateOptionUI(QWidget& parent, SwitchDateOption& value)
         : SwitchDateOptionBaseUI(parent, value)
+        , ConfigOptionUI(value, *this)
     {}
-    virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override{
         SwitchDateOptionBaseUI::restore_defaults();
     }

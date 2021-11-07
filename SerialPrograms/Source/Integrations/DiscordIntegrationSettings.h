@@ -27,9 +27,6 @@ public:
     BooleanCheckBoxOption use_suffix;
     StringOption game_status;
     StringOption hello_message;
-//    StringOption channels_whitelist;
-//    StringOption channels_echo;
-//    StringOption channels_log;
     StringOption sudo;
     StringOption owner;
     DiscordIntegrationTable channels;

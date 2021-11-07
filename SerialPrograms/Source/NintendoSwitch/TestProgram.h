@@ -13,12 +13,11 @@
 #include "CommonFramework/Options/StringSelectOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/OCR/LanguageOptionOCR.h"
+#include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_BallSelectOption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_EncounterFilter.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
-#include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Options.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 
 namespace PokemonAutomation{

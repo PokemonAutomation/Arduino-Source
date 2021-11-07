@@ -7,18 +7,18 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Standard_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Standard_H
 
-#include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/OCR/LanguageOptionOCR.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Framework/MultiSwitchProgram.h"
-#include "Framework/PokemonSwSh_MaxLair_Options.h"
+#include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
+#include "Options/PokemonSwSh_MaxLair_Options.h"
+#include "Options/PokemonSwSh_MaxLair_Options_Consoles.h"
+#include "Options/PokemonSwSh_MaxLair_Options_Hosting.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
-using namespace Pokemon;
 
 
 class MaxLairStandard_Descriptor : public MultiSwitchProgramDescriptor{
@@ -38,6 +38,7 @@ public:
     MaxLairStandard(const MaxLairStandard_Descriptor& descriptor);
 
     virtual QString check_validity() const override;
+    virtual void update_active_consoles() override;
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(MultiSwitchProgramEnvironment& env) override;
@@ -47,20 +48,14 @@ private:
     StartInGripOrGameOption START_IN_GRIP_MENU;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    EnumDropdownOption HOST_SWITCH;
-    EnumDropdownOption BOSS_SLOT;
+    MaxLairInternal::BossSlot BOSS_SLOT;
 
-    EnumDropdownOption STOP_CONDITION;
-
-    LanguageSet m_languages;
-    MaxLairInternal::MaxLairConsoleOptions PLAYER0;
-    MaxLairInternal::MaxLairConsoleOptions PLAYER1;
-    MaxLairInternal::MaxLairConsoleOptions PLAYER2;
-    MaxLairInternal::MaxLairConsoleOptions PLAYER3;
-
+    MaxLairInternal::Consoles CONSOLES;
     MaxLairInternal::HostingSettings HOSTING;
 
-    EventNotificationOption NOTIFICATION_NO_SHINY;
+    TouchDateIntervalOption TOUCH_DATE_INTERVAL;
+
+    EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationOption NOTIFICATION_SHINY;
     EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;

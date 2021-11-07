@@ -162,7 +162,8 @@ void BotBaseHandle::verify_protocol(){
     uint32_t version_lo = protocol % 100;
     if (version_hi != PABB_PROTOCOL_VERSION / 100 || version_lo < PABB_PROTOCOL_VERSION % 100){
         PA_THROW_StringException(
-            "Incompatible version. Client: " + std::to_string(PABB_PROTOCOL_VERSION) + ", Device: " + std::to_string(protocol)
+            "Incompatible version. Client: " + std::to_string(PABB_PROTOCOL_VERSION) + ", Device: " + std::to_string(protocol) + "<br>"
+            "Please install the .hex that came with this version of the program."
         );
     }
 }

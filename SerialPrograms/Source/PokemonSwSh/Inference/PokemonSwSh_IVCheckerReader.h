@@ -11,7 +11,7 @@
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/OCR/SmallDictionaryMatcher.h"
+#include "CommonFramework/OCR/OCR_SmallDictionaryMatcher.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

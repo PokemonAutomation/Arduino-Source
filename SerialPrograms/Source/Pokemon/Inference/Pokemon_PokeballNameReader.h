@@ -9,7 +9,7 @@
 
 #include <QImage>
 #include "CommonFramework/Tools/Logger.h"
-#include "CommonFramework/OCR/SmallDictionaryMatcher.h"
+#include "CommonFramework/OCR/OCR_SmallDictionaryMatcher.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{

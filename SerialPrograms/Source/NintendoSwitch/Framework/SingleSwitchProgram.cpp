@@ -67,6 +67,7 @@ void SingleSwitchProgramWidget::run_program(
     );
 
     instance.program(env);
+    env.update_stats();
 }
 
 

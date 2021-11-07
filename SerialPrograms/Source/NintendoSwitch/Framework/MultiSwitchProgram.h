@@ -76,7 +76,10 @@ class MultiSwitchProgramInstance : public RunnableSwitchProgramInstance{
 public:
     MultiSwitchProgramInstance(const MultiSwitchProgramDescriptor& descriptor);
 
-    size_t count() const{ return m_switches.count(); }
+    //  Called when the user changes the # of Switches.
+    virtual void update_active_consoles(){}
+
+    size_t system_count() const{ return m_switches.count(); }
 
     virtual QWidget* make_widget(QWidget& parent, PanelListener& listener) override;
     virtual void program(MultiSwitchProgramEnvironment& env) = 0;

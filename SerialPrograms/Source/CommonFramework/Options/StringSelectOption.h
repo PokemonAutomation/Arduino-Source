@@ -50,10 +50,9 @@ private:
 
 
 
-class StringSelectOptionUI : public ConfigOptionUI, public QWidget{
+class StringSelectOptionUI : public QWidget, public ConfigOptionUI{
 public:
     StringSelectOptionUI(QWidget& parent, StringSelectOption& value);
-    virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override;
 
 private:

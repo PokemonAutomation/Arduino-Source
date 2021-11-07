@@ -8,13 +8,13 @@
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/OCR/Filtering.h"
+#include "CommonFramework/OCR/OCR_Filtering.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_PokemonSpriteReader.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_DenMonReader.h"
-#include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Options.h"
+#include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 
 namespace PokemonAutomation{

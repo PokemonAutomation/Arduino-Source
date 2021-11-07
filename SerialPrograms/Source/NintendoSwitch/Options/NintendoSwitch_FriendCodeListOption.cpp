@@ -131,6 +131,7 @@ private:
 
 FriendCodeListOptionUI::FriendCodeListOptionUI(QWidget& parent, FriendCodeListOption& value)
     : QWidget(&parent)
+    , ConfigOptionUI(value, *this)
     , m_value(value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);

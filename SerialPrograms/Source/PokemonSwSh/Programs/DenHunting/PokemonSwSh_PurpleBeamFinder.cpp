@@ -85,7 +85,7 @@ PurpleBeamFinder::PurpleBeamFinder(const PurpleBeamFinder_Descriptor& descriptor
     PA_ADD_OPTION(EXTRA_LINE);
     PA_ADD_OPTION(NOTIFICATIONS);
     if (GlobalSettings::instance().DEVELOPER_MODE){
-        PA_ADD_DIVIDER(m_advanced_options);
+        PA_ADD_STATIC(m_advanced_options);
         PA_ADD_OPTION(TIMEOUT_DELAY);
         PA_ADD_OPTION(MIN_BRIGHTNESS);
         PA_ADD_OPTION(MIN_EUCLIDEAN);
@@ -132,7 +132,7 @@ std::unique_ptr<StatsTracker> PurpleBeamFinder::make_stats() const{
 void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
-        resume_game_front_of_den_nowatts(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+        resume_game_front_of_den_nowatts(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         pbf_mash_button(env.console, BUTTON_B, 100);
     }else{
         pbf_press_button(env.console, BUTTON_B, 5, 5);

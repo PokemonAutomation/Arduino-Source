@@ -90,7 +90,7 @@ void RunnableSwitchProgramWidget::construct(){
     RunnablePanelWidget::construct();
     load_historical_stats();
     m_state.store(ProgramState::STOPPED, std::memory_order_release);
-    update_ui();
+    update_ui_after_program_state_change();
 }
 QWidget* RunnableSwitchProgramWidget::make_header(QWidget& parent){
     RunnableSwitchProgramInstance& instance = static_cast<RunnableSwitchProgramInstance&>(m_instance);
@@ -147,14 +147,10 @@ QWidget* RunnableSwitchProgramWidget::make_header(QWidget& parent){
 
     return header;
 }
-QWidget* RunnableSwitchProgramWidget::make_options(QWidget& parent){
-    QWidget* options_widget = RunnablePanelWidget::make_options(parent);
-
+QWidget* RunnableSwitchProgramWidget::make_body(QWidget& parent){
     RunnableSwitchProgramInstance& instance = static_cast<RunnableSwitchProgramInstance&>(m_instance);
-    m_setup = instance.m_setup->make_ui(*options_widget, m_listener.raw_logger(), m_instance_id);
-    static_cast<QVBoxLayout*>(options_widget->layout())->insertWidget(0, m_setup);
-
-    return options_widget;
+    m_setup = instance.m_setup->make_ui(parent, m_listener.raw_logger(), m_instance_id);
+    return m_setup;
 }
 QWidget* RunnableSwitchProgramWidget::make_actions(QWidget& parent){
     QWidget* actions_widget = RunnablePanelWidget::make_actions(parent);
@@ -179,8 +175,8 @@ QString RunnableSwitchProgramWidget::check_validity() const{
         ? QString()
         : "Switch setup is not ready.";
 }
-void RunnableSwitchProgramWidget::update_ui(){
-    RunnablePanelWidget::update_ui();
+void RunnableSwitchProgramWidget::update_ui_after_program_state_change(){
+    RunnablePanelWidget::update_ui_after_program_state_change();
     ProgramState state = m_state.load(std::memory_order_acquire);
     if (m_setup) m_setup->update_ui(state);
 }

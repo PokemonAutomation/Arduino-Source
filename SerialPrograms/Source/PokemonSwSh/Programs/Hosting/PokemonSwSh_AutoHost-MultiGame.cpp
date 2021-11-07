@@ -129,10 +129,8 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env){
         pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
     }
 
-    uint32_t last_touch = 0;
-    if (enable_touch && TOUCH_DATE_INTERVAL > 0){
-        touch_date_from_home(env.console, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-        last_touch = system_clock(env.console);
+    if (enable_touch){
+        TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.console);
     }
 
     uint32_t raids = 0;
@@ -217,9 +215,8 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env){
             pbf_wait(env.console, parse_ticks_i32(game.post_raid_delay));
 
             //  Touch the date.
-            if (enable_touch && TOUCH_DATE_INTERVAL > 0 && system_clock(env.console) - last_touch >= TOUCH_DATE_INTERVAL){
-                touch_date_from_home(env.console, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-                last_touch += TOUCH_DATE_INTERVAL;
+            if (enable_touch){
+                TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.console);
             }
         }
     }

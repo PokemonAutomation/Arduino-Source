@@ -155,20 +155,20 @@ GameSettings::GameSettings()
         "250"
     )
 {
-    PA_ADD_DIVIDER(m_egg_options);
+    PA_ADD_STATIC(m_egg_options);
     PA_ADD_OPTION(AUTO_DEPOSIT);
     PA_ADD_OPTION(EGG_FETCH_EXTRA_LINE);
     PA_ADD_OPTION(FETCH_EGG_MASH_DELAY);
 
-    PA_ADD_DIVIDER(m_den_options);
+    PA_ADD_STATIC(m_den_options);
     PA_ADD_OPTION(DODGE_UNCATCHABLE_PROMPT_FAST);
 
-    PA_ADD_DIVIDER(m_advanced_options);
+    PA_ADD_STATIC(m_advanced_options);
 
-    PA_ADD_DIVIDER(m_general_options);
+    PA_ADD_STATIC(m_general_options);
     PA_ADD_OPTION(AUTO_FR_DURATION);
 
-    PA_ADD_DIVIDER(m_menu_navigation);
+    PA_ADD_STATIC(m_menu_navigation);
     PA_ADD_OPTION(OVERWORLD_TO_MENU_DELAY);
     PA_ADD_OPTION(MENU_TO_OVERWORLD_DELAY);
     PA_ADD_OPTION(GAME_TO_HOME_DELAY_FAST);
@@ -177,13 +177,13 @@ GameSettings::GameSettings()
     PA_ADD_OPTION(OPEN_YCOMM_DELAY);
     PA_ADD_OPTION(ENTER_PROFILE_DELAY);
 
-    PA_ADD_DIVIDER(m_start_game_timings);
+    PA_ADD_STATIC(m_start_game_timings);
     PA_ADD_OPTION(START_GAME_MASH);
     PA_ADD_OPTION(START_GAME_WAIT);
     PA_ADD_OPTION(ENTER_GAME_MASH);
     PA_ADD_OPTION(ENTER_GAME_WAIT);
 
-    PA_ADD_DIVIDER(m_den_timings);
+    PA_ADD_STATIC(m_den_timings);
     PA_ADD_OPTION(ENTER_OFFLINE_DEN_DELAY);
     PA_ADD_OPTION(REENTER_DEN_DELAY);
     PA_ADD_OPTION(COLLECT_WATTS_OFFLINE_DELAY);
@@ -194,7 +194,7 @@ GameSettings::GameSettings()
     PA_ADD_OPTION(EXIT_SWITCH_POKEMON);
     PA_ADD_OPTION(FULL_LOBBY_TIMER);
 
-    PA_ADD_DIVIDER(m_box_timings);
+    PA_ADD_STATIC(m_box_timings);
     PA_ADD_OPTION(BOX_SCROLL_DELAY);
     PA_ADD_OPTION(BOX_CHANGE_DELAY);
     PA_ADD_OPTION(BOX_PICKUP_DROP_DELAY);

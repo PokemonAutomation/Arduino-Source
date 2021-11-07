@@ -90,6 +90,7 @@ private:
 
 TextEditOptionUI::TextEditOptionUI(QWidget& parent, TextEditOption& value)
     : QWidget(&parent)
+    , ConfigOptionUI(value, *this)
     , m_value(value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonHome_GenerateNameOCR_H
 #define PokemonAutomation_PokemonHome_GenerateNameOCR_H
 
-#include "CommonFramework/OCR/LanguageOptionOCR.h"
+#include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 

@@ -12,6 +12,16 @@
 #include <QWidget>
 #include "Common/Compiler.h"
 
+namespace PokemonAutomation{
+
+
+enum class ConfigOptionState{
+    ENABLED,
+    DISABLED,
+    HIDDEN,
+};
+
+
 class ConfigOptionUI;
 
 class ConfigOption{
@@ -26,17 +36,55 @@ public:
 
     virtual void restore_defaults(){};
 
+    //  This is called by the framework at the start of a program to reset any
+    //  transient state that the option object may have.
+    virtual void reset_state(){};
+
     virtual ConfigOptionUI* make_ui(QWidget& parent) = 0;
+
+public:
+    ConfigOptionState visibility = ConfigOptionState::ENABLED;
 };
 
 
 class ConfigOptionUI{
 public:
     virtual ~ConfigOptionUI() = default;
-    virtual QWidget* widget() = 0;
+    ConfigOptionUI(ConfigOption& m_value, QWidget& widget)
+        : m_value(m_value)
+        , m_widget(widget)
+    {
+        ConfigOptionUI::update_visibility();
+    }
+
+    const ConfigOption& option() const{ return m_value; }
+    ConfigOption& option(){ return m_value; }
+
+    QWidget& widget(){ return m_widget; }
     virtual void restore_defaults() = 0;
+
+    virtual void update_visibility(){
+        switch (m_value.visibility){
+        case ConfigOptionState::ENABLED:
+            m_widget.setEnabled(true);
+            m_widget.setVisible(true);
+            break;
+        case ConfigOptionState::DISABLED:
+            m_widget.setEnabled(false);
+            m_widget.setVisible(true);
+            break;
+        case ConfigOptionState::HIDDEN:
+            m_widget.setEnabled(false);
+            m_widget.setVisible(false);
+            break;
+        }
+    }
+
+private:
+    ConfigOption& m_value;
+    QWidget& m_widget;
 };
 
 
-
+}
 #endif

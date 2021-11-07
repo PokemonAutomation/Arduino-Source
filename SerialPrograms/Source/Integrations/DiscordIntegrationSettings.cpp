@@ -40,21 +40,6 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption(bool integrat
         "<b>Discord hello message:</b><br>Enter a message you'd like the bot to respond with to the \"$hi\" command.",
         "", "Automation at your service!"
     )
-//    , channels_whitelist(
-//        false,
-//        "<b>Discord channel ID(s) to whitelist:</b><br>Enter comma-separated channel ID(s) where your bot would be allowed to send messages to and respond.",
-//        "", "123456789012345678"
-//    )
-//    , channels_echo(
-//        false,
-//        "<b>Discord echo channel ID(s):</b><br>Enter comma-separated channel ID(s) where your bot would be allowed to echo.",
-//        "", "123456789012345678"
-//    )
-//    , channels_log(
-//        false,
-//        "<b>Discord log channel ID(s):</b><br>Enter comma-separated channel ID(s) where your bot would be allowed to log.",
-//        "", "123456789012345678"
-//    )
     , sudo(
         false,
         "<b>Discord sudo:</b><br>Enter user ID(s) to grant sudo access to.",
@@ -71,9 +56,6 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption(bool integrat
     PA_ADD_OPTION(use_suffix);
     PA_ADD_OPTION(game_status);
     PA_ADD_OPTION(hello_message);
-//    PA_ADD_OPTION(channels_whitelist);
-//    PA_ADD_OPTION(channels_echo);
-//    PA_ADD_OPTION(channels_log);
     PA_ADD_OPTION(sudo);
     PA_ADD_OPTION(owner);
     PA_ADD_OPTION(channels);
@@ -101,6 +83,7 @@ DiscordIntegrationSettingsOptionUI::DiscordIntegrationSettingsOptionUI(QWidget& 
     button_start->setFont(font);
     button_stop->setFont(font);
 
+#ifdef PA_SLEEPY
     this->setVisible(value.m_integration_enabled);
     set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
 
@@ -119,9 +102,12 @@ DiscordIntegrationSettingsOptionUI::DiscordIntegrationSettingsOptionUI(QWidget& 
             set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
         }
     );
+#endif
 }
 void DiscordIntegrationSettingsOptionUI::on_set_enabled(bool enabled){
+#ifdef PA_SLEEPY
     set_options_enabled(m_value.enabled() && !SleepyDiscordRunner::is_running());
+#endif
 }
 
 

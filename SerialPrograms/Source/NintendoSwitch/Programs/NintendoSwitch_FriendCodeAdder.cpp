@@ -58,7 +58,7 @@ FriendCodeAdder::FriendCodeAdder(const FriendCodeAdder_Descriptor& descriptor)
 {
     PA_ADD_OPTION(USER_SLOT);
     PA_ADD_OPTION(FRIEND_CODES);
-    PA_ADD_DIVIDER(m_advanced_options);
+    PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(OPEN_CODE_PAD_DELAY);
     PA_ADD_OPTION(SEARCH_TIME);
     PA_ADD_OPTION(TOGGLE_BEST_STATUS_DELAY);

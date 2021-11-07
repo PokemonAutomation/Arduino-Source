@@ -27,11 +27,13 @@ namespace Integration{
 namespace DiscordWebHook{
 
 
-DiscordWebHookRequest::DiscordWebHookRequest(Logger& p_logger, QUrl p_url, QByteArray p_data)
+DiscordWebHookRequest::DiscordWebHookRequest(Logger& p_logger, QUrl p_url, QByteArray p_data, std::shared_ptr<PendingFileSend> p_file)
     : logger(&p_logger)
     , url(std::move(p_url))
     , data(std::move(p_data))
+    , file(std::move(p_file))
 {}
+
 DiscordWebHookRequest::DiscordWebHookRequest(Logger& p_logger, QUrl p_url, std::shared_ptr<PendingFileSend> p_file)
     : logger(&p_logger)
     , url(std::move(p_url))
@@ -43,6 +45,7 @@ DiscordWebHookSender::DiscordWebHookSender()
     : m_stopping(false)
     , m_thread(&DiscordWebHookSender::thread_loop, this)
 {}
+
 DiscordWebHookSender::~DiscordWebHookSender(){
     {
         std::lock_guard<std::mutex> lg(m_lock);
@@ -51,21 +54,24 @@ DiscordWebHookSender::~DiscordWebHookSender(){
     }
     m_thread.join();
 }
+
 DiscordWebHookSender& DiscordWebHookSender::instance(){
     static DiscordWebHookSender sender;
     return sender;
 }
 
-void DiscordWebHookSender::send_json(Logger& logger, const QUrl& url, const QJsonObject& obj){
+void DiscordWebHookSender::send_json(Logger& logger, const QUrl& url, const QJsonObject& obj, std::shared_ptr<PendingFileSend> file){
     std::lock_guard<std::mutex> lg(m_lock);
     m_queue.emplace_back(
         logger,
         url,
-        QJsonDocument(obj).toJson()
+        QJsonDocument(obj).toJson(),
+        file
     );
     logger.log("Sending JSON to Discord... (queue = " + tostr_u_commas(m_queue.size()) + ")", "purple");
     m_cv.notify_all();
 }
+
 void DiscordWebHookSender::send_file(Logger& logger, const QUrl& url, std::shared_ptr<PendingFileSend> file){
     std::lock_guard<std::mutex> lg(m_lock);
     m_queue.emplace_back(logger, url, file);
@@ -95,8 +101,9 @@ void DiscordWebHookSender::thread_loop(){
                 m_sent.pop_front();
             }
             if (m_sent.size() >= MAX_IN_WINDOW){
+                auto duration = THROTTLE_DURATION;
                 m_cv.wait_for(
-                    lg, THROTTLE_DURATION,
+                    lg, duration,
                     [&]{
                         return m_sent[0] + THROTTLE_DURATION < now;
                     }
@@ -106,13 +113,16 @@ void DiscordWebHookSender::thread_loop(){
             m_sent.push_back(now);
         }
 
-        if (!item.file){
+        if (!item.file && !item.data.isEmpty()){
             internal_send_json(*item.logger, item.url, item.data);
+        }else if (item.file && !item.data.isEmpty()){
+            internal_send_image_embed(*item.logger, item.url, item.data, item.file->filepath(), item.file->filename());
         }else{
             internal_send_file(*item.logger, item.url, item.file->filepath());
         }
     }
 }
+
 void DiscordWebHookSender::process_reply(Logger& logger, QNetworkReply* reply){
     if (!reply){
         logger.log("QNetworkReply is null.", "red");
@@ -120,11 +130,18 @@ void DiscordWebHookSender::process_reply(Logger& logger, QNetworkReply* reply){
 //        QString contents = QString::fromUtf8(reply->readAll());
 //        qDebug() << contents;
     }else{
-        logger.log("Discord Request Response: " + reply->errorString(), "red");
+        QString error_string = reply->errorString();
+        QString url = reply->url().toString();
+        int index = error_string.indexOf(url);
+        if (index >= 0){
+            error_string.replace(index, url.size(), "****************");
+        }
+        logger.log("Discord Request Response: " + error_string, "red");
 //        QString err = reply->errorString();
 //        qDebug() << err;
     }
 }
+
 void DiscordWebHookSender::internal_send_json(Logger& logger, const QUrl& url, const QByteArray& data){
     QNetworkRequest request(url);
     request.setHeader(QNetworkRequest::ContentTypeHeader, "application/json");
@@ -136,6 +153,7 @@ void DiscordWebHookSender::internal_send_json(Logger& logger, const QUrl& url, c
     loop.exec();
     process_reply(logger, reply.get());
 }
+
 void DiscordWebHookSender::internal_send_file(Logger& logger, const QUrl& url, const QString& filename){
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly)){
@@ -163,8 +181,40 @@ void DiscordWebHookSender::internal_send_file(Logger& logger, const QUrl& url, c
     process_reply(logger, reply.get());
 }
 
+void DiscordWebHookSender::internal_send_image_embed(Logger& logger, const QUrl& url, const QByteArray& data, const QString& filepath, const QString& filename){
+    QFile file(filepath);
+    if (!file.open(QIODevice::ReadOnly)){
+        logger.log("File doesn't exist: " + filepath, "red");
+        return;
+    }
 
+    QNetworkRequest request(url);
 
+    QHttpPart imagePart;
+    imagePart.setHeader(
+        QNetworkRequest::ContentDispositionHeader,
+        QVariant("application/octet-stream; name=file0; filename=" + filename)
+    );
+    imagePart.setBodyDevice(&file);
+
+    QHttpPart jsonPart;
+    jsonPart.setHeader(
+        QNetworkRequest::ContentDispositionHeader,
+        QVariant("form-data; name=payload_json")
+    );
+    jsonPart.setBody(data);
+
+    QHttpMultiPart multiPart(QHttpMultiPart::FormDataType);
+    multiPart.append(imagePart);
+    multiPart.append(jsonPart);
+
+    QNetworkAccessManager manager;
+    QEventLoop loop;
+    loop.connect(&manager, SIGNAL(finished(QNetworkReply*)), SLOT(quit()));
+    std::unique_ptr<QNetworkReply> reply(manager.post(request, &multiPart));
+    loop.exec();
+    process_reply(logger, reply.get());
+}
 
 void send_message(
     Logger& logger,
@@ -248,10 +298,7 @@ void send_message(
 
 //        cout << QJsonDocument(jsonContent).toJson().data() << endl;
 
-        DiscordWebHookSender::instance().send_json(logger, url.url, jsonContent);
-        if (file){
-            DiscordWebHookSender::instance().send_file(logger, url.url, file);
-        }
+        DiscordWebHookSender::instance().send_json(logger, url.url, jsonContent, file);
     }
 }
 

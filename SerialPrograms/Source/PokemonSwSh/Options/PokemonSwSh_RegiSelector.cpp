@@ -41,6 +41,7 @@ ConfigOptionUI* RegiSelectorOption::make_ui(QWidget& parent){
 
 RegiSelectorOptionUI::RegiSelectorOptionUI(QWidget& parent, RegiSelectorOption& value)
     : QWidget(&parent)
+    , ConfigOptionUI(value, *this)
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);

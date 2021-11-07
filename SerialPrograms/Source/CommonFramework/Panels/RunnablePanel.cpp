@@ -6,7 +6,6 @@
 
 #include <QVBoxLayout>
 #include <QGroupBox>
-#include <QScrollArea>
 #include <QMessageBox>
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Qt/QtJsonTools.h"
@@ -36,6 +35,9 @@ QString RunnablePanelInstance::check_validity() const{
 }
 void RunnablePanelInstance::restore_defaults(){
     m_options.restore_defaults();
+}
+void RunnablePanelInstance::reset_state(){
+    m_options.reset_state();
 }
 
 
@@ -90,7 +92,10 @@ bool RunnablePanelWidget::start(){
         m_thread = std::thread(
             run_with_catch,
             "RunnablePanelWidget::run_program()",
-            [=]{ run_program(); }
+            [=]{
+                static_cast<RunnablePanelInstance&>(m_instance).reset_state();
+                run_program();
+            }
         );
         ret = true;
         break;
@@ -107,7 +112,7 @@ bool RunnablePanelWidget::start(){
         ret = false;
         break;
     }
-    update_ui();
+    update_ui_after_program_state_change();
     return ret;
 }
 bool RunnablePanelWidget::stop(){
@@ -132,7 +137,7 @@ bool RunnablePanelWidget::stop(){
         ret = false;
         break;
     }
-    update_ui();
+    update_ui_after_program_state_change();
     return ret;
 }
 
@@ -150,6 +155,37 @@ RunnablePanelWidget::RunnablePanelWidget(
     , m_timestamp(std::chrono::system_clock::now())
     , m_state(ProgramState::NOT_READY)
 {
+    QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->setMargin(0);
+
+    m_header_holder = new QVBoxLayout();
+    layout->addLayout(m_header_holder);
+
+    {
+        QScrollArea* scroll_outer = new QScrollArea(this);
+        layout->addWidget(scroll_outer);
+        scroll_outer->setWidgetResizable(true);
+
+        m_scroll_inner = new QWidget(scroll_outer);
+        scroll_outer->setWidget(m_scroll_inner);
+        QVBoxLayout* scroll_layout = new QVBoxLayout(m_scroll_inner);
+        scroll_layout->setAlignment(Qt::AlignTop);
+
+        m_body_holder = new QVBoxLayout();
+        scroll_layout->addLayout(m_body_holder);
+
+        m_options_holder = new QVBoxLayout();
+        scroll_layout->addLayout(m_options_holder);
+        scroll_layout->addStretch();
+    }
+
+    m_status_bar_holder = new QVBoxLayout();
+    layout->addLayout(m_status_bar_holder);
+
+    m_actions_holder = new QVBoxLayout();
+    layout->addLayout(m_actions_holder);
+
+
     m_instance_id = ProgramTracker::instance().add_program(*this);
     connect(
         this, &RunnablePanelWidget::async_start,
@@ -165,31 +201,23 @@ RunnablePanelWidget::RunnablePanelWidget(
     );
 }
 void RunnablePanelWidget::construct(){
-    QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->setMargin(0);
-    layout->addWidget(make_header(*this));
-
-    QScrollArea* scroll = new QScrollArea(this);
-    layout->addWidget(scroll);
-    scroll->setWidgetResizable(true);
-
-    scroll->setWidget(make_options(*scroll));
-    m_status_bar = make_status_bar(*this);
-    layout->addWidget(m_status_bar);
-    layout->addWidget(make_actions(*this));
+    m_header_holder->addWidget(m_header = make_header(*this));
+    m_body = make_body(*m_scroll_inner);
+    if (m_body){
+        m_body_holder->addWidget(m_body);
+    }
+    m_options_holder->addWidget(m_options = make_options(*m_scroll_inner));
+    m_status_bar_holder->addWidget(m_status_bar = make_status_bar(*this));
+    m_actions_holder->addWidget(m_actions = make_actions(*this));
 }
-QWidget* RunnablePanelWidget::make_options(QWidget& parent){
-    QWidget* options_widget = new QWidget(&parent);
-
-    QVBoxLayout* options_layout = new QVBoxLayout(options_widget);
-    options_layout->setAlignment(Qt::AlignTop);
-
+QWidget* RunnablePanelWidget::make_body(QWidget& parent){
+    return nullptr;
+}
+BatchOptionUI* RunnablePanelWidget::make_options(QWidget& parent){
     RunnablePanelInstance& instance = static_cast<RunnablePanelInstance&>(m_instance);
-    m_options = static_cast<BatchOptionUI*>(instance.m_options.make_ui(parent));
-    options_layout->addWidget(m_options);
-    options_layout->addStretch();
-
-    return options_widget;
+    BatchOptionUI* options = static_cast<BatchOptionUI*>(instance.m_options.make_ui(parent));
+    options->update_visibility();
+    return options;
 }
 QLabel* RunnablePanelWidget::make_status_bar(QWidget& parent){
     QLabel* status_bar = new QLabel(&parent);
@@ -222,10 +250,10 @@ QWidget* RunnablePanelWidget::make_actions(QWidget& parent){
         m_default_button->setFont(font);
     }
 
-    update_ui();
+    update_ui_after_program_state_change();
     connect(
         this, &RunnablePanelWidget::signal_reset,
-        this, [=]{ update_ui(); }
+        this, [=]{ update_ui_after_program_state_change(); }
     );
     connect(
         this, &RunnablePanelWidget::signal_error,
@@ -263,6 +291,17 @@ QWidget* RunnablePanelWidget::make_actions(QWidget& parent){
     return actions_widget;
 }
 
+
+#if 0
+void RunnablePanelWidget::redraw_options(){
+    if (m_options != nullptr){
+        m_options_holder->removeWidget(m_options);
+        delete m_options;
+        m_options = nullptr;
+    }
+    m_options_holder->addWidget(m_options = make_options(*m_scroll_inner));
+}
+#endif
 
 
 QString RunnablePanelWidget::check_validity() const{
@@ -318,7 +357,7 @@ void RunnablePanelWidget::update_historical_stats(){
 //    settings.stat_sets.open_from_file(settings.stats_file);
 }
 
-void RunnablePanelWidget::update_ui(){
+void RunnablePanelWidget::update_ui_after_program_state_change(){
     ProgramState state = m_state.load(std::memory_order_acquire);
     if (m_start_button == nullptr){
         return;

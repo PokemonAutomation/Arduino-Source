@@ -11,6 +11,7 @@
 
 #include <atomic>
 #include <QVBoxLayout>
+#include <QGroupBox>
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -22,7 +23,7 @@ public:
     void add_option(ConfigOption& option, QString serialization_string);
 
 #define PA_ADD_OPTION(x)    add_option(x, #x)
-#define PA_ADD_DIVIDER(x)   add_option(x, "")
+#define PA_ADD_STATIC(x)    add_option(x, "")
 
 
 public:
@@ -31,6 +32,7 @@ public:
 
     QString check_validity() const override;
     virtual void restore_defaults() override;
+    virtual void reset_state() override;
 
     virtual ConfigOptionUI* make_ui(QWidget& parent) override;
 
@@ -45,17 +47,13 @@ class BatchOptionUI : public QWidget, public ConfigOptionUI{
 public:
     BatchOptionUI(QWidget& parent, BatchOption& value);
 
-    virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override;
+    virtual void update_visibility() override;
 
 protected:
     BatchOption& m_value;
-private:
     std::vector<ConfigOptionUI*> m_options;
 };
-inline ConfigOptionUI* BatchOption::make_ui(QWidget& parent){
-    return new BatchOptionUI(parent, *this);
-}
 
 
 
@@ -72,6 +70,8 @@ public:
     virtual void load_json(const QJsonValue& json) override;
     virtual QJsonValue to_json() const override;
 
+    virtual void restore_defaults() override;
+
     virtual ConfigOptionUI* make_ui(QWidget& parent) override;
 
 public:
@@ -82,7 +82,7 @@ private:
     friend class GroupOptionUI;
     const QString m_label;
     const bool m_toggleable;
-
+    const bool m_default_enabled;
     std::atomic<bool> m_enabled;
 };
 
@@ -92,8 +92,8 @@ public:
 
     void set_options_enabled(bool enabled);
 
-    virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override;
+    virtual void update_visibility() override;
 
 
 public:
@@ -105,11 +105,11 @@ private:
 
 protected:
     GroupOption& m_value;
-private:
-    QWidget* m_placeholder;
+    QGroupBox* m_group_box;
+    QWidget* m_expand_text;
+    QWidget* m_options_holder;
     std::vector<ConfigOptionUI*> m_options;
     bool m_expanded = true;
-protected:
     QVBoxLayout* m_options_layout;
 };
 

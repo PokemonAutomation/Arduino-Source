@@ -6,8 +6,8 @@
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Inference/ImageTools.h"
-#include "CommonFramework/OCR/RawOCR.h"
-#include "CommonFramework/OCR/Filtering.h"
+#include "CommonFramework/OCR/OCR_RawOCR.h"
+#include "CommonFramework/OCR/OCR_Filtering.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
@@ -139,7 +139,7 @@ DexRecFinder::DexRecFinder(const DexRecFinder_Descriptor& descriptor)
     PA_ADD_OPTION(VIEW_TIME);
     PA_ADD_OPTION(NOTIFICATIONS);
 
-    PA_ADD_DIVIDER(m_advanced_options);
+    PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(ENTER_POKEDEX_TIME);
     PA_ADD_OPTION(BACK_OUT_TIME);
 }

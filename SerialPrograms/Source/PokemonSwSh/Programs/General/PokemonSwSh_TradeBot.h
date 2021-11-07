@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_TradeBot_H
 #define PokemonAutomation_PokemonSwSh_TradeBot_H
 
-#include "CommonFramework/Options/SectionDivider.h"
+#include "CommonFramework/Options/StaticTextOption.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/FixedCodeOption.h"

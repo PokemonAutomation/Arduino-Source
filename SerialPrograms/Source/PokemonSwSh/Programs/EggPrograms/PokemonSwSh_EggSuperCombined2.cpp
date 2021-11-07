@@ -70,7 +70,7 @@ EggSuperCombined2::EggSuperCombined2(const EggSuperCombined2_Descriptor& descrip
     PA_ADD_OPTION(BOXES_TO_HATCH);
     PA_ADD_OPTION(STEPS_TO_HATCH);
     PA_ADD_OPTION(FETCHES_PER_BATCH);
-    PA_ADD_DIVIDER(m_advanced_options);
+    PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(SAFETY_TIME);
     PA_ADD_OPTION(EARLY_HATCH_SAFETY);
     PA_ADD_OPTION(HATCH_DELAY);

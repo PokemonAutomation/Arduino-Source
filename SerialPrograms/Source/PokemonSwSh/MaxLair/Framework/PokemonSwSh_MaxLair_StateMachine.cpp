@@ -37,7 +37,7 @@ namespace MaxLairInternal{
 
 
 StateMachineAction run_state_iteration(
-    MaxLairRuntime& runtime, size_t console_index,
+    AdventureRuntime& runtime, size_t console_index,
     ProgramEnvironment& env,
     ConsoleHandle& console, bool save_path,
     GlobalStateTracker& global_state,
@@ -88,11 +88,11 @@ StateMachineAction run_state_iteration(
     case 0:
         if (starting){
             console.log("Current State: " + STRING_POKEMON + " Select");
-            run_select_pokemon(env, console, global_state, *runtime.player_settings[console_index]);
+            run_select_pokemon(env, console, global_state, runtime.console_settings[console_index]);
             return StateMachineAction::KEEP_GOING;
         }else{
             console.log("Current State: " + STRING_POKEMON + " Swap");
-            run_swap_pokemon(env, console, global_state, *runtime.player_settings[console_index]);
+            run_swap_pokemon(env, console, global_state, runtime.console_settings[console_index]);
             return StateMachineAction::KEEP_GOING;
         }
     case 1:
@@ -111,7 +111,7 @@ StateMachineAction run_state_iteration(
         console.log("Current State: Move Select");
         return run_move_select(
             env, console, global_state,
-            *runtime.player_settings[console_index],
+            runtime.console_settings[console_index],
             battle_menu.dmaxed(),
             battle_menu.cheer()
         );
@@ -119,7 +119,7 @@ StateMachineAction run_state_iteration(
         console.log("Current State: Catch Select");
         return throw_balls(
             runtime,
-            env, console, runtime.player_settings[console_index]->language,
+            env, console, runtime.console_settings[console_index].language,
             global_state,
             decider
         );

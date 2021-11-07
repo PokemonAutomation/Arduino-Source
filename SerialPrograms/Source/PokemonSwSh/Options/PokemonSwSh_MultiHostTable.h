@@ -49,12 +49,12 @@ private:
     MultiHostSlotOptionFactory m_factory;
     EditableTableBase m_table;
 };
-class MultiHostTableOptionUI : public ConfigOptionUI, public EditableTableBaseUI{
+class MultiHostTableOptionUI : public EditableTableBaseUI, public ConfigOptionUI{
 public:
     MultiHostTableOptionUI(QWidget& parent, MultiHostTableOption& value)
         : EditableTableBaseUI(parent, value.m_table)
+        , ConfigOptionUI(value, *this)
     {}
-    virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override{
         EditableTableBaseUI::restore_defaults();
     }

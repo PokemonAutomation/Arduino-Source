@@ -8,6 +8,9 @@ if [%board%] == [] (
 if [%board%] == [ArduinoUnoR3] (
     set MCU=atmega16u2
 )
+if [%board%] == [ArduinoLeonardo] (
+    set MCU=atmega32u4
+)
 if [%board%] == [ProMicro] (
     set MCU=atmega32u4
 )

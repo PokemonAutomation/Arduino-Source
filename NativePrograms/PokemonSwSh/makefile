@@ -53,6 +53,10 @@ ifeq ($(BOARD_TYPE), ArduinoUnoR3)
 MCU := atmega16u2
 SRC += $(PATH_PUBLIC)/NativePrograms/DeviceFramework/Board-atmega16u2-ArduinoUnoR3.c
 endif
+ifeq ($(BOARD_TYPE), ArduinoLeonardo)
+MCU := atmega32u4
+SRC += $(PATH_PUBLIC)/NativePrograms/DeviceFramework/Board-atmega32u4-ArduinoLeonardo.c
+endif
 ifeq ($(BOARD_TYPE), ProMicro)
 MCU := atmega32u4
 SRC += $(PATH_PUBLIC)/NativePrograms/DeviceFramework/Board-atmega32u4-ProMicro.c

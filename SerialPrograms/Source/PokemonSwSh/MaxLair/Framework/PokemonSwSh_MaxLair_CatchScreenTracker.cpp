@@ -8,8 +8,8 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_EndBattle.h"
-#include "PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh_MaxLair_CatchScreenTracker.h"
 
 namespace PokemonAutomation{
@@ -22,7 +22,11 @@ CaughtPokemonScreen::CaughtPokemonScreen(ProgramEnvironment& env, ConsoleHandle&
     : m_env(env)
     , m_console(console)
     , m_total(count_catches(console, console.video().snapshot()))
-{}
+{
+    if (m_total == 0 || m_total > 4){
+        console.log("Detected " + std::to_string(m_total) + " catches. Something is wrong.", Qt::red);
+    }
+}
 
 size_t CaughtPokemonScreen::total() const{
     return m_total;
@@ -90,7 +94,7 @@ void CaughtPokemonScreen::scroll_down(){
     pbf_press_dpad(m_console, DPAD_DOWN, 10, TICKS_PER_SECOND);
     m_console.botbase().wait_for_all_requests();
     m_current_position++;
-    if (m_current_position == m_total){
+    if (m_current_position >= m_total){
         m_current_position = 0;
     }
     if (m_in_summary){

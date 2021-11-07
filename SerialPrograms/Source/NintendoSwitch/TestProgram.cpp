@@ -29,11 +29,11 @@
 #include "CommonFramework/ImageMatch/ImageCropper.h"
 #include "CommonFramework/ImageTools/CommonFilters.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
-#include "CommonFramework/OCR/RawOCR.h"
-#include "CommonFramework/OCR/Filtering.h"
-#include "CommonFramework/OCR/StringNormalization.h"
-#include "CommonFramework/OCR/TextMatcher.h"
-#include "CommonFramework/OCR/LargeDictionaryMatcher.h"
+#include "CommonFramework/OCR/OCR_RawOCR.h"
+#include "CommonFramework/OCR/OCR_Filtering.h"
+#include "CommonFramework/OCR/OCR_StringNormalization.h"
+#include "CommonFramework/OCR/OCR_TextMatcher.h"
+#include "CommonFramework/OCR/OCR_LargeDictionaryMatcher.h"
 #include "CommonFramework/ImageMatch/ExactImageDictionaryMatcher.h"
 #include "CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -80,8 +80,11 @@
 #include "PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_CaughtScreen.h"
 #include "PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Entrance.h"
 #include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
-#include "PokemonSwSh/PkmnLib/PokemonSwSh_MaxLair_Moves.h"
-#include "PokemonSwSh/PkmnLib/PokemonSwSh_MaxLair_Pokemon.h"
+#include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_PathMatchup.h"
+#include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_RentalBossMatchup.h"
+#include "PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Moves.h"
+#include "PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Pokemon.h"
+#include "PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Matchup.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_BasicCatcher.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_Internet.h"
@@ -136,6 +139,8 @@ double relative_damage(const MaxLairMon& you, const MaxLairMon& opponent, uint8_
 }
 
 
+
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
@@ -178,19 +183,125 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env){
     using namespace OCR;
     using namespace Pokemon;
     using namespace PokemonSwSh::MaxLairInternal;
+    using namespace papkmnlib;
 
     BotBase& botbase = env.console;
     VideoFeed& feed = env.console;
     VideoOverlay& overlay = env.console;
 
 
+#if 0
+    PokemonCaughtMenuDetector detector;
 
+    QImage image("20211106-143106513770-ProgramHang.png");
+    cout << detector.detect(image) << endl;
+#endif
+
+#if 0
+    InferenceBoxScope box(env.console, 0.945, 0.010, 0.0525, 0.050);
+
+    QImage image = extract_box(feed.snapshot(), box);
+    OCR::TextImageFilter{false, 600}.apply(image);
+    image.save("test.png");
+#endif
+
+
+
+//    InferenceBoxScope box0(overlay, 0.760, 0.400 + 0*0.133, 0.050, 0.030, Qt::blue);
+//    InferenceBoxScope box1(overlay, 0.760, 0.400 + 1*0.133, 0.050, 0.030, Qt::blue);
+//    InferenceBoxScope box2(overlay, 0.760, 0.400 + 2*0.133, 0.050, 0.030, Qt::blue);
+//    InferenceBoxScope box3(overlay, 0.760, 0.400 + 3*0.133, 0.050, 0.030, Qt::blue);
+
+
+//    cout << MaxLairInternal::count_catches(overlay, QImage("test.png")) << endl;
+
+
+//    SelectionArrowFinder arrow_detector(env.console, ImageFloatBox(0.450, 0.450, 0.400, 0.400));
+//    AsyncVisualInferenceSession session(env, env.console, env.console);
+//    session += arrow_detector;
+
+#if 0
+    QImage screen = env.console.video().snapshot();
+
+    InferenceBoxScope box0(env.console, 0.180, 0.815, 0.015, 0.030);
+    InferenceBoxScope box1(env.console, 0.785, 0.840, 0.030, 0.050);
+
+    ImageStats stats0 = image_stats(extract_box(screen, box0));
+    ImageStats stats1 = image_stats(extract_box(screen, box1));
+    cout << stats0.average << stats0.stddev << endl;
+    cout << stats1.average << stats1.stddev << endl;
+#endif
+
+#if 0
+    InferenceBoxScope box(env.console, 0.900, 0.015, 0.020, 0.040);
+
+    ImageStats stats = image_stats(extract_box(feed.snapshot(), box));
+    cout << stats.average << endl;
+    cout << stats.stddev << endl;
+#endif
+
+
+#if 0
+    GlobalState state;
+    state.boss = "palkia";
+    state.opponent = {"azumarill"};
+    state.opponent_hp = 0.79;
+//    state.players[1].dmax_turns_left = 0;
+    state.players[0].console_id = 0;
+    state.players[1].console_id = 1;
+    state.players[2].console_id = -1;
+    state.players[3].console_id = -1;
+    state.players[0].pokemon = "lilligant";
+    state.players[1].pokemon = "linoone-galar";
+    state.players[2].pokemon = "charmeleon";
+    state.players[3].pokemon = "shiinotic";
+
+    select_move(env.logger(), state, 0);
+#endif
+
+
+#if 0
+    const Pokemon& boss = get_pokemon("zygarde-50");
+
+    std::multimap<double, std::string, std::greater<double>> rank;
+    for (const auto& rental : all_rental_pokemon()){
+//        rank.emplace(evaluate_matchup(rental.second, boss, {}, 4), rental.first);
+        rank.emplace(rental_vs_boss_matchup(rental.first, boss.name()), rental.first);
+    }
+
+    for (const auto& item : rank){
+        cout << item.first << " : " << item.second <<endl;
+    }
+#endif
+
+
+#if 0
+    GlobalState state;
+    state.players[0].console_id = 0;
+    state.players[1].console_id = 1;
+    state.players[2].console_id = 2;
+    state.players[3].console_id = 3;
+    state.players[0].pokemon = "hatterene";
+    state.players[1].pokemon = "drifblim";
+    state.players[2].pokemon = "ivysaur";
+    state.players[3].pokemon = "alcremie";
+
+    should_swap_with_professor(env.logger(), state, 0);
+#endif
+
+
+//    cout << type_vs_boss(PokemonType::NORMAL, "lugia") << endl;
+
+
+#if 0
     for (const auto& item : papkmnlib::all_boss_pokemon()){
-        cout << item.first << ": " << item.second.ability() << endl;
+//        cout << item.first << ": " << item.second.ability() << endl;
+        item.second.mo
     }
     for (const auto& item : papkmnlib::all_rental_pokemon()){
-        cout << item.first << ": " << item.second.ability() << endl;
+//        cout << item.first << ": " << item.second.ability() << endl;
     }
+#endif
 
 
 
@@ -1009,8 +1120,8 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env){
     std::deque<InferenceBoxScope> boxes;
     detector.make_overlays(boxes, overlay);
 
-//    QImage screen("ErrorDumps (old)/20210831-023522-MaxLair-read_name_sprite.png");
-    QImage screen(feed.snapshot());
+    QImage screen("swap-jpn.jpg");
+//    QImage screen(feed.snapshot());
 
     cout << detector.detect(screen) << endl;
 #endif
@@ -1131,7 +1242,7 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env){
 //    AsyncVisualInferenceSession inference(env, env.console);
 //    inference += detector;
 
-    QImage image("ErrorDumps/20210901-005327-MoveSlot.png");
+    QImage image("fail-arrow.png");
 
     cout << (int)detector.detect(image) << endl;
 #endif

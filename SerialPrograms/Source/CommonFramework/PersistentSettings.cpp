@@ -13,8 +13,9 @@
 #include <QJsonDocument>
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
-#include "NintendoSwitch/Framework/VirtualSwitchControllerMapping.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
+#include "CommonFramework/Tools/Logger.h"
+#include "NintendoSwitch/Framework/VirtualSwitchControllerMapping.h"
 #include "PersistentSettings.h"
 
 #include <iostream>
@@ -44,7 +45,11 @@ void PersistentSettings::write() const{
     root.insert("99-Panels", panels);
 //    cout << QJsonDocument(panels).toJson().data() << endl;
 
-    write_json_file(QCoreApplication::applicationFilePath() + "-Settings.json", QJsonDocument(root));
+    try{
+        write_json_file(QCoreApplication::applicationFilePath() + "-Settings.json", QJsonDocument(root));
+    }catch (FileException& e){
+        global_logger_tagged().log(e.message(), Qt::red);
+    }
 }
 void PersistentSettings::read(){
     QJsonDocument doc = read_json_file(QCoreApplication::applicationFilePath() + "-Settings.json");

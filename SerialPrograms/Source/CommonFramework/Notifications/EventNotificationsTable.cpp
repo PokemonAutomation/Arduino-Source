@@ -61,6 +61,11 @@ void EventNotificationsTable::restore_defaults(){
         option->restore_defaults();
     }
 }
+void EventNotificationsTable::reset_state(){
+    for (EventNotificationOption* option : m_options){
+        option->reset_rate_limit();
+    }
+}
 ConfigOptionUI* EventNotificationsTable::make_ui(QWidget& parent){
     return new EventNotificationsTableUI(parent, *this);
 }
@@ -75,6 +80,7 @@ void EventNotificationsTable::set_enabled(bool enabled){
 
 EventNotificationsTableUI::EventNotificationsTableUI(QWidget& parent, EventNotificationsTable& value)
     : QWidget(&parent)
+    , ConfigOptionUI(value, *this)
     , m_value(value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);

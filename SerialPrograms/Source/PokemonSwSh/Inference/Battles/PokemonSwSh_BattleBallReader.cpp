@@ -6,9 +6,9 @@
 
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Inference/ImageTools.h"
-#include "CommonFramework/OCR/RawOCR.h"
-#include "CommonFramework/OCR/StringNormalization.h"
-#include "CommonFramework/OCR/Filtering.h"
+#include "CommonFramework/OCR/OCR_NumberReader.h"
+#include "CommonFramework/OCR/OCR_StringNormalization.h"
+#include "CommonFramework/OCR/OCR_Filtering.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h"
 #include "PokemonSwSh_BattleBallReader.h"
 
@@ -98,27 +98,11 @@ std::string BattleBallReader::read_ball(const QImage& screen) const{
     }
     return overlap[0];
 }
-int BattleBallReader::read_quantity(const QImage& screen) const{
+uint16_t BattleBallReader::read_quantity(const QImage& screen) const{
     QImage image = extract_box(screen, m_box_quantity);
     auto filter = OCR::make_OCR_filter(image);
     filter.apply(image);
-    QString ocr_text = OCR::ocr_read(Language::English, image);
-    QString normalized;
-    for (QChar ch : ocr_text){
-        if (ch.isDigit()){
-            normalized += ch;
-        }
-    }
-    int quantity = normalized.toInt();
-
-    QString str;
-    for (QChar ch : ocr_text){
-        if (ch != '\r' && ch != '\n'){
-            str += ch;
-        }
-    }
-    m_console.log("OCR Text: \"" + str + "\" -> \"" + normalized + "\" -> " + QString::number(quantity));
-    return quantity;
+    return OCR::read_number(m_console, image);
 }
 
 

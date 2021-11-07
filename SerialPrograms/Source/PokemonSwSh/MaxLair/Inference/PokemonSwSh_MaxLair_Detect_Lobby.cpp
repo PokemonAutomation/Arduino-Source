@@ -40,31 +40,32 @@ bool LobbyReadyButtonDetector::detect(const QImage& screen){
 
 
 #if 1
-NonLobbyDetector::NonLobbyDetector()
-    : m_pink (0.575, 0.035, 0.050, 0.100)
+LobbyDetector::LobbyDetector(bool invert)
+    : m_invert(invert)
+    , m_pink (0.575, 0.035, 0.050, 0.100)
     , m_white(0.800, 0.200, 0.150, 0.100)
 {
     add_box(m_pink);
     add_box(m_white);
 }
-bool NonLobbyDetector::process_frame(
+bool LobbyDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
     return detect(frame);
 }
-bool NonLobbyDetector::detect(const QImage& screen){
+bool LobbyDetector::detect(const QImage& screen){
     ImageStats stats0 = image_stats(extract_box(screen, m_pink));
     ImageStats stats1 = image_stats(extract_box(screen, m_white));
 //    cout << stats0.average << ", " << stats0.stddev << endl;
 //    cout << stats1.average << ", " << stats1.stddev << endl;
     if (!is_solid(stats0, {0.444944, 0.150562, 0.404494})){
-        return true;
+        return m_invert;
     }
     if (!is_solid(stats1, {0.303079, 0.356564, 0.340357})){
-        return true;
+        return m_invert;
     }
-    return false;
+    return !m_invert;
 }
 #endif
 
@@ -99,8 +100,9 @@ bool LobbyDoneConnecting::detect(const QImage& screen){
 
 
 
-LobbyJoinedDetector::LobbyJoinedDetector(size_t consoles)
+LobbyJoinedDetector::LobbyJoinedDetector(size_t consoles, bool invert)
     : m_consoles(consoles)
+    , m_invert(invert)
     , m_box0(0.705, 0.337 + 0.0775*0, 0.034, 0.06)
     , m_box1(0.705, 0.337 + 0.0775*1, 0.034, 0.06)
     , m_box2(0.705, 0.337 + 0.0775*2, 0.034, 0.06)
@@ -127,19 +129,16 @@ bool LobbyJoinedDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
-    return joined(frame, timestamp) >= m_consoles;
+    return m_invert
+        ? joined(frame, timestamp) < m_consoles
+        : joined(frame, timestamp) >= m_consoles;
 }
 
 
 
 
-LobbyAllReadyDetector::LobbyAllReadyDetector(
-    size_t consoles,
-    std::chrono::system_clock::time_point time_limit
-)
-    : m_consoles(consoles)
-    , m_time_limit(time_limit)
-    , m_checkbox0(0.669, 0.337 + 0.0775*0, 0.034, 0.06)
+LobbyReadyDetector::LobbyReadyDetector()
+    : m_checkbox0(0.669, 0.337 + 0.0775*0, 0.034, 0.06)
     , m_checkbox1(0.669, 0.337 + 0.0775*1, 0.034, 0.06)
     , m_checkbox2(0.669, 0.337 + 0.0775*2, 0.034, 0.06)
     , m_checkbox3(0.669, 0.337 + 0.0775*3, 0.034, 0.06)
@@ -149,13 +148,7 @@ LobbyAllReadyDetector::LobbyAllReadyDetector(
     add_box(m_checkbox2);
     add_box(m_checkbox3);
 }
-bool LobbyAllReadyDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
-    return timestamp >= m_time_limit || detect(frame);
-}
-bool LobbyAllReadyDetector::detect(const QImage& screen){
+size_t LobbyReadyDetector::ready_players(const QImage& screen){
     size_t ready = 0;
     ImageStats stats0 = image_stats(extract_box(screen, m_checkbox0));
     ImageStats stats1 = image_stats(extract_box(screen, m_checkbox1));
@@ -165,8 +158,30 @@ bool LobbyAllReadyDetector::detect(const QImage& screen){
     if (stats1.stddev.sum() > 50) ready++;
     if (stats2.stddev.sum() > 50) ready++;
     if (stats3.stddev.sum() > 50) ready++;
+    return ready;
+}
+bool LobbyReadyDetector::process_frame(
+    const QImage& frame,
+    std::chrono::system_clock::time_point timestamp
+){
+    return detect(frame);
+}
 
-    return ready >= m_consoles;
+LobbyMinReadyDetector::LobbyMinReadyDetector(size_t consoles, bool invert)
+    : m_consoles(consoles)
+    , m_invert(invert)
+{}
+bool LobbyMinReadyDetector::detect(const QImage& screen){
+    return m_invert
+        ? ready_players(screen) < m_consoles
+        : ready_players(screen) >= m_consoles;
+}
+
+LobbyAllReadyDetector::LobbyAllReadyDetector(size_t consoles)
+    : m_consoles(consoles)
+{}
+bool LobbyAllReadyDetector::detect(const QImage& screen){
+    return ready_players(screen) >= m_consoles;
 }
 
 

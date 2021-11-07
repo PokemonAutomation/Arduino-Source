@@ -70,7 +70,7 @@ RaidItemFarmerOHKO::RaidItemFarmerOHKO(const RaidItemFarmerOHKO_Descriptor& desc
     )
 {
     PA_ADD_OPTION(BACKUP_SAVE);
-//    PA_ADD_DIVIDER(m_advanced_options);
+//    PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(WAIT_FOR_STAMP_DELAY);
     PA_ADD_OPTION(ENTER_STAMP_MASH_DURATION);
     PA_ADD_OPTION(RAID_START_MASH_DURATION);

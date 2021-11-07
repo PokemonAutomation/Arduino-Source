@@ -47,10 +47,9 @@ private:
 };
 
 
-class TextEditOptionUI : public ConfigOptionUI, public QWidget{
+class TextEditOptionUI : public QWidget, public ConfigOptionUI{
 public:
     TextEditOptionUI(QWidget& parent, TextEditOption& value);
-    virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override;
 
 private:

@@ -24,7 +24,7 @@ PokemonCaughtMenuDetector::PokemonCaughtMenuDetector()
     , m_caught_right(0.930, 0.080, 0.050, 0.070)
     , m_middle_pink(0.930, 0.300, 0.050, 0.200)
     , m_bottom_white(0.550, 0.900, 0.400, 0.020)
-    , m_bottom_black(0.100, 0.970, 0.700, 0.020)
+    , m_bottom_black(0.100, 0.970, 0.600, 0.020)
     , m_bottom_options(0.920, 0.970, 0.070, 0.020)
 {
     add_box(m_top_white, Qt::magenta);
@@ -84,10 +84,10 @@ bool PokemonCaughtMenuDetector::detect(const QImage& screen){
 
 
 size_t count_catches(VideoOverlay& overlay, const QImage& screen){
-    InferenceBoxScope box0(overlay, 0.760, 0.400 + 0*0.133, 0.050, 0.030, Qt::blue);
-    InferenceBoxScope box1(overlay, 0.760, 0.400 + 1*0.133, 0.050, 0.030, Qt::blue);
-    InferenceBoxScope box2(overlay, 0.760, 0.400 + 2*0.133, 0.050, 0.030, Qt::blue);
-    InferenceBoxScope box3(overlay, 0.760, 0.400 + 3*0.133, 0.050, 0.030, Qt::blue);
+    InferenceBoxScope box0(overlay, 0.780, 0.400 + 0*0.133, 0.030, 0.030, Qt::blue);
+    InferenceBoxScope box1(overlay, 0.780, 0.400 + 1*0.133, 0.030, 0.030, Qt::blue);
+    InferenceBoxScope box2(overlay, 0.780, 0.400 + 2*0.133, 0.030, 0.030, Qt::blue);
+    InferenceBoxScope box3(overlay, 0.780, 0.400 + 3*0.133, 0.030, 0.030, Qt::blue);
 
     size_t count = 0;
     if (is_black(image_stats(extract_box(screen, box0)))){

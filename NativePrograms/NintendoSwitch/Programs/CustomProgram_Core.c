@@ -34,7 +34,7 @@
 int main(void){
     //  Do not delete these two lines!
     start_program_callback();
-    initialize_framework(PABB_PID_CUSTOM_PROGRAM);
+    initialize_framework(0);
 
     //  Start the program in the grip menu. Then go home.
     start_program_flash(CONNECT_CONTROLLER_DELAY);

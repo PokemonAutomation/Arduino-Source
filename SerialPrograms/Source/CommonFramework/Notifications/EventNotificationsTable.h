@@ -20,12 +20,13 @@ class EventNotificationsTable : public ConfigOption{
 public:
     EventNotificationsTable(std::vector<EventNotificationOption*> options);
 
-    virtual void load_json(const QJsonValue& json);
-    virtual QJsonValue to_json() const;
+    virtual void load_json(const QJsonValue& json) override;
+    virtual QJsonValue to_json() const override;
 
-    virtual void restore_defaults();
+    virtual void restore_defaults() override;
+    virtual void reset_state() override;
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent);
+    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
 
     void set_enabled(bool enabled);
 
@@ -35,11 +36,10 @@ private:
     std::map<QString, EventNotificationOption*> m_name_map;
 };
 
-class EventNotificationsTableUI : public ConfigOptionUI, public QWidget{
+class EventNotificationsTableUI : public QWidget, public ConfigOptionUI{
 public:
     EventNotificationsTableUI(QWidget& parent, EventNotificationsTable& value);
 
-    virtual QWidget* widget(){ return this; }
     virtual void restore_defaults();
 
 private:

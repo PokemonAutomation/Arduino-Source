@@ -56,7 +56,9 @@ DiscordSettingsOption::DiscordSettingsOption()
 {
     PA_ADD_OPTION(message);
     PA_ADD_OPTION(webhooks);
+#ifdef PA_SLEEPY
     PA_ADD_OPTION(integration);
+#endif
 }
 void DiscordSettingsOption::load_json(const QJsonValue& json){
     BatchOption::load_json(json);

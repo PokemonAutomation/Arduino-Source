@@ -1,3 +1,6 @@
+
+#ifdef PA_SLEEPY
+
 #include <deque>
 #include <condition_variable>
 #include <unordered_map>
@@ -364,7 +367,7 @@ private:
             send_response(SleepyRequest::Start, channel, message);
             return;
         }else{
-            message = "Program ID " + std::to_string(id) + " started the program.";
+            message = "Console ID " + std::to_string(id) + " started the program.";
         }
         send_response(SleepyRequest::Start, channel, message);
     }
@@ -375,7 +378,7 @@ private:
             send_response(SleepyRequest::Stop, channel, message);
             return;
         }else{
-            message = "Program ID " + std::to_string(id) + " stopped the program.";
+            message = "Console ID " + std::to_string(id) + " stopped the program.";
         }
         send_response(SleepyRequest::Stop, channel, message);
     }
@@ -472,14 +475,6 @@ void send_screenshot_sleepy(bool should_ping, const QString& message, QJsonObjec
     if (m_sleepy_client == nullptr) {
         return;
     }
-
-    const QString& filename = file->filename();
-
-    QJsonObject qimage;
-    {
-        qimage["url"] = "attachment://" + filename;
-    }
-    embed["image"] = qimage;
 
     std::string content = ((should_ping ? "<@" + GlobalSettings::instance().DISCORD.message.user_id + "> " : "") + message).toStdString();
     std::string json = QJsonDocument(embed).toJson().toStdString();
@@ -587,3 +582,4 @@ bool check_if_empty(const DiscordSettingsOption& settings) {
 }
 }
 }
+#endif

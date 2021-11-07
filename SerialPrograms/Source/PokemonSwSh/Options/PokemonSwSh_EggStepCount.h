@@ -38,10 +38,9 @@ private:
 };
 
 
-class EggStepCountUI : public ConfigOptionUI, public QWidget{
+class EggStepCountUI : public QWidget, public ConfigOptionUI{
 public:
     EggStepCountUI(QWidget& parent, EggStepCountOption& value);
-    virtual QWidget* widget() override{ return this; }
     virtual void restore_defaults() override;
 
 private:

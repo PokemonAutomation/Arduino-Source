@@ -98,6 +98,7 @@ ConfigOptionUI* StringSelectOption::make_ui(QWidget& parent){
 
 StringSelectOptionUI::StringSelectOptionUI(QWidget& parent, StringSelectOption& value)
     : QWidget(&parent)
+    , ConfigOptionUI(value, *this)
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);

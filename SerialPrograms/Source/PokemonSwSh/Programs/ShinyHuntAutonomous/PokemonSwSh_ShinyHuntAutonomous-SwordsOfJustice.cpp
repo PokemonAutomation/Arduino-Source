@@ -77,7 +77,7 @@ ShinyHuntAutonomousSwordsOfJustice::ShinyHuntAutonomousSwordsOfJustice(const Shi
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
 
-    PA_ADD_DIVIDER(m_advanced_options);
+    PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
     PA_ADD_OPTION(POST_BATTLE_MASH_TIME);
     PA_ADD_OPTION(ENTER_CAMP_DELAY);
