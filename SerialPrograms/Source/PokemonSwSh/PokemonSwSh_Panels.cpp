@@ -25,6 +25,7 @@
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-LotoFarmer.h"
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-StowOnSideFarmer.h"
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-DailyHighlightFarmer.h"
+#include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-PokeJobsFarmer.h"
 
 #include "Programs/DenHunting/PokemonSwSh_BeamReset.h"
 #include "Programs/DenHunting/PokemonSwSh_PurpleBeamFinder.h"
@@ -109,6 +110,7 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<LotoFarmer_Descriptor, LotoFarmer>();
     add_program<StowOnSideFarmer_Descriptor, StowOnSideFarmer>();
     add_program<DailyHighlightFarmer_Descriptor, DailyHighlightFarmer>();
+    add_program<PokeJobsFarmer_Descriptor, PokeJobsFarmer>();
 
     add_divider("---- Den Hunting ----");
     add_program<BeamReset_Descriptor, BeamReset>();
