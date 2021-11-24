@@ -27,7 +27,7 @@ namespace MaxLairInternal{
 
 
 
-const QString MODULE_NAME = "Max Lair";
+const std::string MODULE_NAME = "Max Lair";
 const std::chrono::milliseconds INFERENCE_RATE = std::chrono::milliseconds(200);
 
 
@@ -57,6 +57,7 @@ BossSlot::BossSlot()
     : EnumDropdownOption(
         "<b>Boss Slot:</b>",
         {
+            "Anything is fine",
             "Slot 1",
             "Slot 2",
             "Slot 3",

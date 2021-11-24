@@ -24,6 +24,7 @@ namespace PokemonAutomation{
 namespace Integration{
 namespace SleepyDiscordRunner{
 
+using namespace SleepyDiscord;
 const char* enum_str_callback[] = {
     "Fault",
     "API",
@@ -35,6 +36,7 @@ const char* enum_str_callback[] = {
     "Callbacks Set",
     "Invalid Command",
     "Terminating",
+    "Remove File",
 };
 
 const char* enum_str_command[] = {
@@ -51,6 +53,8 @@ const char* enum_str_command[] = {
     "Shutdown",
     "Get Connected Bots",
     "Reload Settings",
+    "Reset Camera",
+    "Reset Serial",
     "Terminate",
 
     "Hi",
@@ -99,15 +103,15 @@ Logger& sleepy_logger(){
 
 struct SleepyDiscordRequest {
     SleepyDiscordRequest() = default;
-    SleepyDiscordRequest(std::string json, std::string channel, std::string message, std::shared_ptr<PendingFileSend> file) :
-        json(std::move(json)),
-        channel(std::move(channel)),
-        message(std::move(message)),
+    SleepyDiscordRequest(std::string embed, std::string channels, std::string messages, std::shared_ptr<PendingFileSend> file) :
+        embed(std::move(embed)),
+        channels(std::move(channels)),
+        messages(std::move(messages)),
         file(std::move(file)) {}
 
-    std::string json;
-    std::string channel;
-    std::string message;
+    std::string embed;
+    std::string channels;
+    std::string messages;
     std::shared_ptr<PendingFileSend> file;
 };
 
@@ -129,10 +133,10 @@ public:
         return sender;
     }
 
-    void send(std::string json, std::string channel, std::string message, std::shared_ptr<PendingFileSend> file) {
+    void send(std::string embed, std::string channels, std::string messages, std::shared_ptr<PendingFileSend> file) {
         std::lock_guard<std::mutex> lg(m_lock);
         sleepy_logger().log("Sending notification... (queue = " + tostr_u_commas(m_queue.size()) + ")", "purple");
-        m_queue.emplace_back(json, channel, message, std::move(file));
+        m_queue.emplace_back(embed, channels, messages, std::move(file));
         m_cv.notify_all();
     }
 
@@ -156,12 +160,9 @@ private:
 
             if (item.file != nullptr && !item.file->filepath().isEmpty()) {
                 std::string filepath = item.file->filepath().toStdString();
-                sendFile(&filepath[0], &item.channel[0], &item.message[0], &item.json[0]);
+                sendMessage(&item.channels[0], &item.messages[0], &item.embed[0], &filepath[0]);
             }
-            else if (item.json != "") {
-                sendEmbed(&item.message[0], &item.json[0]);
-            }
-            else sendLog(&item.message[0]);
+            else sendMessage(&item.channels[0], &item.messages[0], &item.embed[0], nullptr);
         }
     }
 
@@ -194,15 +195,12 @@ struct CommandArgs{
 
 class SleepyDiscordClient {
 public:
-    void send(std::string json, std::string channel, std::string message, std::shared_ptr<PendingFileSend> file) {
-        //  TODO: Once file cleanup works, remove this.
-        if (file){
-            file->extend_lifetime();
-        }
+    bool m_connected = false;
 
-        if (m_connected) {
-            SleepyDiscordSender::instance().send(json, channel, message, std::move(file));
-//            sleepy_logger().log("SleepyDiscordClient::send(): Destroying file.", Qt::red);
+public:
+    void send(std::string embed, std::string channels, std::string messages, std::shared_ptr<PendingFileSend> file) {
+        if (m_sleepy_client != nullptr) {
+            SleepyDiscordSender::instance().send(embed, channels, messages, std::move(file));
         }else{
             sleepy_logger().log("SleepyDiscordClient::send(): Not connected.", Qt::red);
         }
@@ -219,11 +217,18 @@ public:
         switch (response) {
         case SleepyResponse::Connected: m_connected = true; break;
         case SleepyResponse::Disconnected: m_connected = false; break;
+        case SleepyResponse::RemoveFile:
+        {
+            bool success = QFile(message).remove();
+            if (success){
+                msg = "Removed sent file. (Callback: " + (std::string)enum_str_callback[response] + ")";
+            }else{
+                msg = "Failed to remove sent file. (Callback: " + (std::string)enum_str_callback[response] + ")";
+                color = "red";
+            }
+        }; break;
         }
 
-        if (response != (int)SleepyResponse::API){
-            send_log_sleepy(msg);
-        }
         sleepy_logger().log(msg, color);
     }
 
@@ -235,7 +240,6 @@ public:
         cout << "cmd_callback(): " << request << endl;
 
         std::string cmd = "Received command: " + (std::string)enum_str_command[request] + ".";
-        send_log_sleepy(cmd);
         sleepy_logger().log(cmd, "purple");
 
         switch (request) {
@@ -272,6 +276,12 @@ public:
         case SleepyRequest::ReloadSettings:
             run_ReloadSettings(channel);
             return;
+        case SleepyRequest::ResetCamera:
+            run_ResetCamera(channel, id);
+            return;
+        case SleepyRequest::ResetSerial:
+            run_ResetSerial(channel, id);
+            return;
         }
     }
 
@@ -279,11 +289,6 @@ public:
 
 private:
     void send_response(SleepyRequest request, char* channel, std::string message, std::shared_ptr<PendingFileSend> file = nullptr){
-        //  TODO: Once file cleanup works, remove this.
-        if (file){
-            file->extend_lifetime();
-        }
-
         std::string filename = file == nullptr ? "" : file->filepath().toStdString();
         if ((int)request <= 11) {
             program_response(request, channel, &message[0], &filename[0]);
@@ -336,7 +341,6 @@ private:
         std::string filepath = "capture.png";
         std::string message = Integration::screenshot(id, filepath.c_str());
         if (!message.empty()){
-            send_log_sleepy(message);
             send_response(SleepyRequest::ScreenshotPng, channel, message);
             return;
         }else{
@@ -350,7 +354,6 @@ private:
         std::string filepath = "capture.jpg";
         std::string message = Integration::screenshot(id, filepath.c_str());
         if (!message.empty()){
-            send_log_sleepy(message);
             send_response(SleepyRequest::ScreenshotJpg, channel, message);
             return;
         }else{
@@ -363,7 +366,6 @@ private:
     void run_start(char* channel, uint64_t id){
         std::string message = Integration::start_program(id);
         if (!message.empty()){
-            send_log_sleepy(message);
             send_response(SleepyRequest::Start, channel, message);
             return;
         }else{
@@ -374,7 +376,6 @@ private:
     void run_stop(char* channel, uint64_t id){
         std::string message = Integration::stop_program(id);
         if (!message.empty()){
-            send_log_sleepy(message);
             send_response(SleepyRequest::Stop, channel, message);
             return;
         }else{
@@ -399,11 +400,14 @@ private:
             : "Failed to reload Discord settings.";
         send_response(SleepyRequest::ReloadSettings, channel, message);
     }
-
-
-
-private:
-    bool m_connected = false;
+    void run_ResetCamera(char* channel, uint64_t id){
+        std::string message = Integration::reset_camera(id);
+        send_response(SleepyRequest::ResetCamera, channel, message.empty() ? "Camera was reset." : message);
+    }
+    void run_ResetSerial(char* channel, uint64_t id){
+        std::string message = Integration::reset_serial(id);
+        send_response(SleepyRequest::ResetSerial, channel, message);
+    }
 };
 
 
@@ -416,6 +420,12 @@ bool is_running(){
     std::lock_guard<std::mutex> lg(m_connect_lock);
     return m_sleepy_client != nullptr;
 }
+
+bool is_connected(){
+    std::lock_guard<std::mutex> lg(m_connect_lock);
+    return m_sleepy_client != nullptr && m_sleepy_client->m_connected;
+}
+
 void sleepy_connect(){
     std::lock_guard<std::mutex> lg(m_connect_lock);
     {
@@ -438,7 +448,7 @@ void sleepy_connect(){
 }
 
 void sleepy_terminate() {
-//    std::lock_guard<std::mutex> lg(m_client_lock);
+    std::lock_guard<std::mutex> lg(m_client_lock);
     program_response(SleepyRequest::Terminate);
     if (m_sleepy_client != nullptr) {
         m_sleepy_client.reset();
@@ -446,7 +456,7 @@ void sleepy_terminate() {
 }
 
 void sleepy_response(int response, char* message) {
-    std::lock_guard<std::mutex> lg(m_client_lock);
+    //std::lock_guard<std::mutex> lg(m_client_lock);
     if (m_sleepy_client != nullptr) {
         return m_sleepy_client->callback(response, message);
     }
@@ -459,40 +469,91 @@ void sleepy_cmd_response(int request, char* channel, uint64_t console_id, uint16
     }
 }
 
-void send_message_sleepy(bool should_ping, const QString& message, const QJsonObject& embed) {
+void send_message_sleepy(bool should_ping, const std::vector<QString>& tags, const QString& message, QJsonObject& embed, std::shared_ptr<PendingFileSend> file) {
     std::lock_guard<std::mutex> lg(m_client_lock);
-    sleepy_logger().log("send_message_sleepy()", "purple");
     if (m_sleepy_client != nullptr) {
-        sleepy_logger().log("send_message_sleepy(): Sending...", "purple");
-        std::string content = ((should_ping ? "<@" + GlobalSettings::instance().DISCORD.message.user_id + "> " : "") + message).toStdString();
-        std::string json = QJsonDocument(embed).toJson().toStdString();
-        m_sleepy_client->send(json, "", content, nullptr);
-    }
-}
-
-void send_screenshot_sleepy(bool should_ping, const QString& message, QJsonObject& embed, std::shared_ptr<PendingFileSend> file){
-    std::lock_guard<std::mutex> lg(m_client_lock);
-    if (m_sleepy_client == nullptr) {
-        return;
-    }
-
-    std::string content = ((should_ping ? "<@" + GlobalSettings::instance().DISCORD.message.user_id + "> " : "") + message).toStdString();
-    std::string json = QJsonDocument(embed).toJson().toStdString();
-    m_sleepy_client->send(json, "", content, std::move(file));
-}
-
-void send_log_sleepy(std::string logText) {
-    //  Must be called inside lock.
-//    std::lock_guard<std::mutex> lg(m_client_lock);
-    if (m_sleepy_client != nullptr) {
-        std::string instance = GlobalSettings::instance().DISCORD.message.instance_name.get().toStdString();
-        if (!instance.empty()) {
-            instance = " - [" + instance + "]";
+        //  TODO: Once file cleanup works, remove this.
+        if (file){
+            file->extend_lifetime();
         }
-        else instance = " - [SleepyDiscord]";
 
-        std::string msg = "> [" + current_time() + "]" + instance + ": " + logText;
-        m_sleepy_client->send("", "", msg, nullptr);
+        std::set<QString> tag_set;
+        for (const QString& tag : tags){
+            tag_set.insert(tag.toLower());
+        }
+
+        DiscordSettingsOption& settings = GlobalSettings::instance().DISCORD;
+        DiscordIntegrationTable& channels = settings.integration.channels;
+        std::vector<QString> channel_vector;
+        std::vector<QString> message_vector;
+
+        for (size_t i = 0; i < channels.size(); i++){
+            Integration::DiscordIntegrationChannel channel = channels.operator[](i);
+            if (channel.tags.empty() || !channel.enabled){
+                continue;
+            }
+
+            bool send = false;
+            for (const QString& tag : channel.tags){
+                auto iter = tag_set.find(tag.toLower());
+                if (iter != tag_set.end()){
+                    channel_vector.emplace_back(channels.operator[](i).channel_id);
+                    send = true;
+                    break;
+                }
+            }
+
+            if (!send) {
+                continue;
+            }
+
+            if (settings.message.user_id.get().toULongLong() == 0){
+                should_ping = false;
+            }
+
+            QString str = "";
+            if (should_ping && channel.ping){
+                str += "<@" + settings.message.user_id + ">";
+            }
+
+            const QString& discord_message = settings.message.message;
+            if (!discord_message.isEmpty()){
+                if (!str.isEmpty()){
+                    str += " ";
+                }
+
+                for (QChar ch : discord_message){
+                    if (ch != '@'){
+                        str += ch;
+                    }
+                }
+            }
+
+            if (!message.isEmpty()){
+                if (!str.isEmpty()){
+                    str += " ";
+                }
+                str += message;
+            }
+            message_vector.emplace_back(str);
+        }
+
+        if (channel_vector.empty()){
+            return;
+        }
+
+        std::string chanStr;
+        std::string messages;
+        for (size_t i = 0; i < channel_vector.size(); i++){
+            chanStr += channel_vector[i].toStdString();
+            chanStr += (i + 1 == channel_vector.size() ? "" : ",");
+            messages += message_vector[i].toStdString();
+            messages += (i + 1 == channel_vector.size() ? "" : "|");
+        }
+
+        std::string json = QJsonDocument(embed).toJson().toStdString();
+        sleepy_logger().log("send_message_sleepy(): Sending...", "purple");
+        m_sleepy_client->send(json, chanStr, messages, file == nullptr ? nullptr : std::move(file));
     }
 }
 
@@ -511,7 +572,7 @@ bool initialize_sleepy_settings() {
     param_string += settings.integration.command_prefix.get().toStdString() + "|";
     param_string += settings.integration.owner.get().replace(" ", "").toStdString() + "|";
     param_string += settings.integration.game_status.get().toStdString() + "|";
-    param_string += settings.integration.hello_message.get().replace("@&", "").toStdString() + "|";
+    param_string += settings.integration.hello_message.get().replace("@", "").toStdString() + "|";
     param_string += PROGRAM_VERSION.toStdString() + "|";
     param_string += PROJECT_GITHUB_URL.toStdString();
 
@@ -526,26 +587,8 @@ bool initialize_sleepy_settings() {
         w_channels += channel_id.toStdString();
     }
 
-//    std::string l_channels = settings.integration.channels_log.get().replace(" ", "").toStdString();
-    std::string l_channels;
-    for (const QString& channel_id : settings.integration.channels.logging_channels()){
-        if (!l_channels.empty()){
-            l_channels += ",";
-        }
-        l_channels += channel_id.toStdString();
-    }
-
-//    std::string e_channels = settings.integration.channels_echo.get().replace(" ", "").toStdString();
-    std::string e_channels;
-    for (const QString& channel_id : settings.integration.channels.echo_channels()){
-        if (!e_channels.empty()){
-            e_channels += ",";
-        }
-        e_channels += channel_id.toStdString();
-    }
-
     m_sleepy_client = std::unique_ptr<SleepyDiscordClient>(new SleepyDiscordClient());
-    apply_settings(sleepy_response, sleepy_cmd_response, &w_channels[0], &e_channels[0], &l_channels[0], &sudo[0], &param_string[0], suffix);
+    apply_settings(sleepy_response, sleepy_cmd_response, &w_channels[0], &sudo[0], &param_string[0], suffix);
     return true;
 }
 
@@ -568,10 +611,6 @@ bool check_if_empty(const DiscordSettingsOption& settings) {
         sleepy_logger().log("Please enter a Discord command prefix. Stopping...", "red");
         return false;
     }
-//    else if (settings.integration.channels_echo.get().isEmpty()) {
-//        sleepy_logger().log(" Please enter at least one Discord channel for your bot to post notifications to. Stopping...", "red");
-//        return false;
-//    }
     return true;
 }
 

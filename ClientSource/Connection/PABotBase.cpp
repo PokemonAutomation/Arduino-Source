@@ -103,15 +103,18 @@ void PABotBase::stop_all_commands(){
         std::lock_guard<std::mutex> lg0(m_sleep_lock);
         SpinLockGuard lg1(m_state_lock, "PABotBase::stop_all_commands()");
 
-        //  Remove all commands that are before the stop seqnum.
-        uint64_t seqnum = infer_full_seqnum(m_pending_commands, msg_seqnum);
-        while (true){
-            auto iter = m_pending_commands.begin();
-            if (iter == m_pending_commands.end() || iter->first > seqnum){
-                break;
+        if (!m_pending_commands.empty()){
+            //  Remove all commands that are before the stop seqnum.
+            uint64_t seqnum = infer_full_seqnum(m_pending_commands, msg_seqnum);
+            while (true){
+                auto iter = m_pending_commands.begin();
+                if (iter == m_pending_commands.end() || iter->first > seqnum){
+                    break;
+                }
+                m_pending_commands.erase(iter);
             }
-            m_pending_commands.erase(iter);
         }
+
         m_cv.notify_all();
     }
 }

@@ -7,6 +7,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QFile>
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "Integrations/DiscordWebHook.h"
@@ -27,7 +28,7 @@ namespace PokemonAutomation{
 void send_program_notification(
     Logger& logger,
     QColor color, bool should_ping, const std::vector<QString>& tags,
-    const QString& program_name,
+    const ProgramInfo& info,
     const QString& title,
     const std::vector<std::pair<QString, QString>>& messages,
     const ImageAttachment& image
@@ -59,7 +60,18 @@ void send_program_notification(
             field["name"] = GlobalSettings::instance().DEVELOPER_MODE
                 ? STRING_POKEMON + " Automation (" + PROGRAM_VERSION + "-dev)"
                 : STRING_POKEMON + " Automation (" + PROGRAM_VERSION + ")";
-            field["value"] = program_name;
+            QString text = info.program_name;
+            if (info.start_time != std::chrono::system_clock::time_point::min()){
+                text += "\nUp Time: ";
+                text += QString::fromStdString(
+                    duration_to_string(
+                        std::chrono::duration_cast<std::chrono::milliseconds>(
+                            std::chrono::system_clock::now() - info.start_time
+                        )
+                    )
+                );
+            }
+            field["value"] = std::move(text);
             fields.append(field);
         }
 
@@ -74,32 +86,25 @@ void send_program_notification(
         embed["fields"] = fields;
 
         if (hasFile){
-            QJsonObject image;
+            QJsonObject field;
             {
-                image["url"] = "attachment://" + file->filename();
+                field["url"] = "attachment://" + file->filename();
             }
-            embed["image"] = image;
+            embed["image"] = field;
         }
         embeds.append(embed);
         embed_sleepy = embed;
     }
 
-    if (!hasFile){
-        Integration::DiscordWebHook::send_message(logger, should_ping, tags, "", embeds, nullptr);
+    Integration::DiscordWebHook::send_message(logger, should_ping, tags, "", embeds, hasFile ? file : nullptr);
 #ifdef PA_SLEEPY
-        Integration::SleepyDiscordRunner::send_message_sleepy(should_ping, "", embed_sleepy);
+    Integration::SleepyDiscordRunner::send_message_sleepy(should_ping, tags, "", embed_sleepy, hasFile ? file : nullptr);
 #endif
-    }else{
-        Integration::DiscordWebHook::send_message(logger, should_ping, tags, "", embeds, file);
-#ifdef PA_SLEEPY
-        Integration::SleepyDiscordRunner::send_screenshot_sleepy(should_ping, "", embed_sleepy, file);
-#endif
-    }
 }
 void send_program_notification(
     Logger& logger, EventNotificationOption& settings,
     QColor color,
-    const QString& program_name,
+    const ProgramInfo& info,
     const QString& title,
     const std::vector<std::pair<QString, QString>>& messages,
     const QImage& image, bool keep_file
@@ -111,7 +116,7 @@ void send_program_notification(
         logger,
         color,
         settings.ping(), settings.tags(),
-        program_name, title,
+        info, title,
         messages,
         ImageAttachment(image, settings.screenshot(), keep_file)
     );
@@ -119,7 +124,7 @@ void send_program_notification(
 
 void send_program_telemetry(
     Logger& logger, bool is_error, QColor color,
-    const QString& program_name,
+    const ProgramInfo& info,
     const QString& title,
     const std::vector<std::pair<QString, QString>>& messages,
     const QString& file
@@ -148,7 +153,7 @@ void send_program_telemetry(
             field["name"] = GlobalSettings::instance().DEVELOPER_MODE
                 ? STRING_POKEMON + " Automation (" + PROGRAM_VERSION + "-dev)"
                 : STRING_POKEMON + " Automation (" + PROGRAM_VERSION + ")";
-            field["value"] = program_name.isEmpty() ? "(unknown)" : program_name;
+            field["value"] = info.program_name.isEmpty() ? "(unknown)" : info.program_name;
             fields.append(field);
         }
         for (const auto& item : messages){
@@ -197,15 +202,14 @@ void send_program_telemetry(
 
 void send_program_status_notification(
     Logger& logger, EventNotificationOption& settings,
-    const QString& program_name,
+    const ProgramInfo& info,
     const QString& message,
     const std::string& stats,
     const QImage& image, bool keep_file
 ){
     send_program_notification(
         logger, settings,
-        QColor(),
-        program_name,
+        QColor(), info,
         "Program Status",
         {
             {"Message", message},
@@ -216,14 +220,14 @@ void send_program_status_notification(
 }
 void send_program_finished_notification(
     Logger& logger, EventNotificationOption& settings,
-    const QString& program_name,
+    const ProgramInfo& info,
     const QString& message,
     const std::string& stats,
     const QImage& image, bool keep_file
 ){
     send_program_notification(
         logger, settings,
-        Qt::green, program_name,
+        Qt::green, info,
         "Program Finished",
         {
             {"Message", message},
@@ -234,14 +238,14 @@ void send_program_finished_notification(
 }
 void send_program_error_notification(
     Logger& logger, EventNotificationOption& settings,
-    const QString& program_name,
+    const ProgramInfo& info,
     const QString& message,
     const std::string& stats,
     const QImage& image, bool keep_file
 ){
     send_program_notification(
         logger, settings,
-        Qt::red, program_name,
+        Qt::red, info,
         "Program Stopped (Error)",
         {
             {"Message", message},

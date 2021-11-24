@@ -14,6 +14,7 @@ namespace Pokemon{
 
 
 struct PokemonNameSelectData{
+    PokemonNameSelectData(const std::vector<std::string>& slugs);
     PokemonNameSelectData(const QString& json_file_slugs);
     const std::vector<std::pair<QString, QIcon>>& cases() const{ return m_list; }
 
@@ -24,6 +25,11 @@ protected:
 
 class PokemonNameSelect : private PokemonNameSelectData, public StringSelectOption{
 public:
+    PokemonNameSelect(
+        QString label,
+        const std::vector<std::string>& slugs,
+        const std::string& default_slug = ""
+    );
     PokemonNameSelect(
         QString label,
         const QString& json_file_slugs,

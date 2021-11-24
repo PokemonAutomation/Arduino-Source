@@ -1,0 +1,40 @@
+/*  Selection Arrow
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#ifndef PokemonAutomation_PokemonBDSP_SelectionArrow_H
+#define PokemonAutomation_PokemonBDSP_SelectionArrow_H
+
+#include <deque>
+#include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/Inference/VisualInferenceCallback.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonBDSP{
+
+
+class SelectionArrowFinder : public VisualInferenceCallback{
+public:
+    SelectionArrowFinder(VideoOverlay& overlay, const ImageFloatBox& box);
+
+    void detect(const QImage& screen);
+    virtual bool process_frame(
+        const QImage& frame,
+        std::chrono::system_clock::time_point timestamp
+    ) override;
+
+protected:
+    VideoOverlay& m_overlay;
+    ImageFloatBox m_box;
+    std::deque<InferenceBoxScope> m_arrow_boxes;
+};
+
+
+
+}
+}
+}
+#endif

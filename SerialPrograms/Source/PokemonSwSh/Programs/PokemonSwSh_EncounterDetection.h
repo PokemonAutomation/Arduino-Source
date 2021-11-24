@@ -1,4 +1,4 @@
-/*  Encounter Tracker
+/*  Encounter Detection
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

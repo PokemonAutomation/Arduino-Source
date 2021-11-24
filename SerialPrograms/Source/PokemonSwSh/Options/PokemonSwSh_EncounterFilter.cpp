@@ -4,7 +4,6 @@
  *
  */
 
-#include <map>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QHeaderView>

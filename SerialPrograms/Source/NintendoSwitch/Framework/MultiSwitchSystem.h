@@ -84,6 +84,7 @@ private:
     uint64_t m_program_id;
     MultiSwitchSystemFactory& m_factory;
     Logger& m_logger;
+    QComboBox* m_console_count_box;
     std::vector<SwitchSystem*> m_switches;
     QWidget* m_videos;
 //    std::map<size_t, SwitchSystem*> m_active_ports;

@@ -42,11 +42,11 @@ public:
 
     std::string dump() const{
         std::string str;
-        str += "Count  = " + tostr_u_commas(m_count);
-        str += ", Mean   = " + std::to_string(mean());
+        str += "Count = " + tostr_u_commas(m_count);
+        str += ", Mean = " + std::to_string(mean());
         str += ", Stddev = " + std::to_string(stddev());
-        str += ", Min    = " + std::to_string(min());
-        str += ", Max    = " + std::to_string(max());
+        str += ", Min = " + std::to_string(min());
+        str += ", Max = " + std::to_string(max());
         return str;
     }
 

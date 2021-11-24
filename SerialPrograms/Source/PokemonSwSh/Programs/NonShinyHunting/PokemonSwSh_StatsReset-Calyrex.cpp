@@ -198,14 +198,14 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env){
             if (calyrex_caught){
                 send_program_status_notification(
                     env.logger(), NOTIFICATION_CATCH_SUCCESS,
-                    descriptor().display_name(),
+                    env.program_info(),
                     "Threw " + QString::number(result.balls_used) + " ball(s) and caught it.",
                     stats.to_str()
                 );
             }else{
                 send_program_status_notification(
                     env.logger(), NOTIFICATION_CATCH_FAILED,
-                    descriptor().display_name(),
+                    env.program_info(),
                     "Threw " + QString::number(result.balls_used) + " ball(s) and did not catch it.",
                     stats.to_str()
                 );
@@ -292,7 +292,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env){
 
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        descriptor().display_name(),
+        env.program_info(),
         "Found a perfect match!",
         stats.to_str()
     );

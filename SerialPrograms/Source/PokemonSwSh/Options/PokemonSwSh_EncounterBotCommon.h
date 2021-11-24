@@ -11,7 +11,7 @@
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
-#include "PokemonSwSh/Options/PokemonSwSh_EncounterFilter.h"
+#include "PokemonSwSh_EncounterFilter.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -14,7 +14,7 @@
 #include "CommonFramework/Options/EditableTableOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
-#include "NintendoSwitch/Framework/SingleSwitchProgram.h"
+#include "NintendoSwitch/Framework/MultiSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_BallSelectOption.h"
 #include "PokemonSwSh/Options/PokemonSwSh_EncounterFilter.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
@@ -23,26 +23,26 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
-using namespace PokemonSwSh;
+//using namespace PokemonSwSh;
 
 
 
 
 
-class TestProgram_Descriptor : public RunnableSwitchProgramDescriptor{
+class TestProgram_Descriptor : public MultiSwitchProgramDescriptor{
 public:
     TestProgram_Descriptor();
 };
 
 
-class TestProgram : public SingleSwitchProgramInstance{
+class TestProgram : public MultiSwitchProgramInstance{
 public:
     TestProgram(const TestProgram_Descriptor& descriptor);
 
 //    std::unique_ptr<StatsTracker> make_stats() const override{
 //        return std::unique_ptr<StatsTracker>(new StatsTracker());
 //    }
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(MultiSwitchProgramEnvironment& env) override;
 
 private:
     struct Stats : public StatsTracker{
@@ -55,7 +55,6 @@ private:
     };
 
 private:
-    IVCheckerReader m_iv_checker_reader;
     OCR::LanguageOCR LANGUAGE;
 //    ProgramNotificationTable TABLE;
 };

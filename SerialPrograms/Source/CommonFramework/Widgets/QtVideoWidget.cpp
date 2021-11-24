@@ -7,21 +7,25 @@
 #include <QVBoxLayout>
 #include "QtVideoWidget.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 
 
 QtVideoWidget::QtVideoWidget(
-    QWidget& parent, Logger& logger,
+    Logger& logger,
     const QCameraInfo& info, const QSize& suggested_resolution
 )
-    : VideoWidget(parent)
-    , m_logger(logger)
+    : m_logger(logger)
 {
     if (info.isNull()){
         return;
     }
 
     QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->setAlignment(Qt::AlignTop);
     layout->setMargin(0);
 
     m_camera = new QCamera(info, this);
@@ -101,7 +105,7 @@ QtVideoWidget::~QtVideoWidget(){
         item.second.cv.notify_all();
     }
 }
-QSize QtVideoWidget::resolution(){
+QSize QtVideoWidget::resolution() const{
     std::lock_guard<std::mutex> lg(m_lock);
     if (m_camera == nullptr){
         return QSize();
@@ -109,7 +113,7 @@ QSize QtVideoWidget::resolution(){
     QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
     return settings.resolution();
 }
-std::vector<QSize> QtVideoWidget::resolutions(){
+std::vector<QSize> QtVideoWidget::resolutions() const{
     return m_resolutions;
 }
 void QtVideoWidget::set_resolution(const QSize& size){
@@ -118,14 +122,13 @@ void QtVideoWidget::set_resolution(const QSize& size){
     if (settings.resolution() == size){
         return;
     }
-
     settings.setResolution(size);
     m_camera->setViewfinderSettings(settings);
     m_resolution = size;
 }
 QImage QtVideoWidget::snapshot(){
     std::unique_lock<std::mutex> lg(m_lock);
-    if (m_camera_view == nullptr){
+    if (m_camera == nullptr){
         return QImage();
     }
 
@@ -158,6 +161,25 @@ QImage QtVideoWidget::snapshot(){
     QImage ret = std::move(capture.image);
     m_pending_captures.erase(iter.first);
     return ret;
+}
+
+void QtVideoWidget::resizeEvent(QResizeEvent* event){
+    QWidget::resizeEvent(event);
+    if (m_camera == nullptr){
+        return;
+    }
+
+#if 0
+    cout << "Widget = " << this->width() << " x " << this->height() << endl;
+
+    QSize size = m_camera_view->size();
+    cout << "Camera = " << size.width() << " x " << size.height() << endl;
+
+    QSize hint = m_camera_view->sizeHint();
+    cout << "Hint = " << hint.width() << " x " << hint.height() << endl;
+#endif
+
+    m_camera_view->setFixedSize(this->size());
 }
 
 

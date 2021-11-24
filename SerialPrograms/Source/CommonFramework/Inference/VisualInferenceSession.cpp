@@ -137,7 +137,7 @@ AsyncVisualInferenceSession::~AsyncVisualInferenceSession(){
 VisualInferenceCallback* AsyncVisualInferenceSession::stop(){
     VisualInferenceSession::stop();
     if (m_task){
-        m_task->wait();
+        m_task->wait_and_rethrow_exceptions();
     }
     return m_callback;
 }

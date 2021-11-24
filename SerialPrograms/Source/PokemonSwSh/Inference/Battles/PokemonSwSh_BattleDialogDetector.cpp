@@ -6,7 +6,7 @@
 
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Inference/ImageTools.h"
-#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogDetector.h"
+#include "PokemonSwSh_BattleDialogDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

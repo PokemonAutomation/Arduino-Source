@@ -46,6 +46,11 @@ void SingleSwitchProgramWidget::run_program(
 ){
     SingleSwitchProgramInstance& instance = static_cast<SingleSwitchProgramInstance&>(m_instance);
     SingleSwitchProgramEnvironment env(
+        ProgramInfo(
+            instance.descriptor().identifier(),
+            instance.descriptor().display_name(),
+            timestamp()
+        ),
         m_logger,
         current_stats, historical_stats,
         m_logger.base_logger(),
@@ -66,8 +71,12 @@ void SingleSwitchProgramWidget::run_program(
         this, &SingleSwitchProgramWidget::set_status
     );
 
-    instance.program(env);
-    env.update_stats();
+    try{
+        instance.program(env);
+    }catch (...){
+        env.update_stats();
+        throw;
+    }
 }
 
 

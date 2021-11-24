@@ -40,7 +40,7 @@ void VideoOverlayWidget::remove_box(const ImageFloatBox& box){
 }
 
 void VideoOverlayWidget::update_size(const QSize& widget_size, const QSize& video_size){
-//    cout << "update_size(): " << video_size.width() << " x " << video_size.height() << endl;
+//    cout << "video_size(): " << video_size.width() << " x " << video_size.height() << endl;
     m_video_size = video_size;
 
     m_scale = (double)widget_size.height() / video_size.height();

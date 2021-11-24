@@ -22,6 +22,7 @@ namespace PokemonSwSh{
 void take_video(const BotBaseContext& context){
     pbf_wait(context, 5 * TICKS_PER_SECOND);
     pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+//    context->wait_for_all_requests();
 }
 void run_away(
     ProgramEnvironment& env,
@@ -46,15 +47,13 @@ void run_away(
 
 
 StandardEncounterHandler::StandardEncounterHandler(
-    const QString& program_name,
     ProgramEnvironment& env,
     ConsoleHandle& console,
     Language language,
     EncounterBotCommonOptions& settings,
     ShinyHuntTracker& session_stats
 )
-    : m_program_name(program_name)
-    , m_env(env)
+    : m_env(env)
     , m_console(console)
     , m_language(language)
     , m_settings(settings)
@@ -82,19 +81,24 @@ void StandardEncounterHandler::run_away_and_update_stats(
 
     update_frequencies(encounter);
 
+    const std::set<std::string>* candidates_ptr = encounter.candidates();
+    const std::set<std::string>& candidates = candidates_ptr
+        ? *candidates_ptr
+        : std::set<std::string>();
     send_encounter_notification(
         m_console,
         m_settings.NOTIFICATION_NONSHINY,
         m_settings.NOTIFICATION_SHINY,
-        m_program_name,
-        encounter.candidates(),
-        result,
+        m_env.program_info(),
+        candidates_ptr, is_shiny(result.shiny_type),
+        {{candidates, result.shiny_type}},
+        result.best_screenshot,
         &m_session_stats,
         &m_frequencies
     );
 
     BlackScreenOverDetector black_screen_detector;
-    run_until(
+    int ret = run_until(
         m_env, m_console,
         [=](const BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
@@ -104,10 +108,19 @@ void StandardEncounterHandler::run_away_and_update_stats(
         },
         { &black_screen_detector }
     );
+    if (ret < 0){
+        m_console.log("Timed out waiting for end of battle. Are you stuck in the battle?", Qt::red);
+    }
 }
 
 
 bool StandardEncounterHandler::handle_standard_encounter(const ShinyDetectionResult& result){
+    if (result.shiny_type == ShinyType::UNKNOWN){
+        m_console.log("Unable to determine result of battle.", Qt::red);
+        m_session_stats.add_error();
+        return false;
+    }
+
     m_session_stats += result.shiny_type;
     m_env.update_stats();
 
@@ -125,13 +138,18 @@ bool StandardEncounterHandler::handle_standard_encounter(const ShinyDetectionRes
 
     update_frequencies(encounter);
 
+    const std::set<std::string>* candidates_ptr = encounter.candidates();
+    const std::set<std::string>& candidates = candidates_ptr
+        ? *candidates_ptr
+        : std::set<std::string>();
     send_encounter_notification(
         m_console,
         m_settings.NOTIFICATION_NONSHINY,
         m_settings.NOTIFICATION_SHINY,
-        m_program_name,
-        encounter.candidates(),
-        result,
+        m_env.program_info(),
+        candidates_ptr, is_shiny(result.shiny_type),
+        {{candidates, result.shiny_type}},
+        result.best_screenshot,
         &m_session_stats,
         &m_frequencies
     );
@@ -146,6 +164,12 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     const ShinyDetectionResult& result,
     uint16_t exit_battle_time
 ){
+    if (result.shiny_type == ShinyType::UNKNOWN){
+        m_console.log("Unable to determine result of battle.", Qt::red);
+        m_session_stats.add_error();
+        return false;
+    }
+
     m_session_stats += result.shiny_type;
     m_env.update_stats();
 
@@ -169,13 +193,18 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     }
 
     update_frequencies(encounter);
+    const std::set<std::string>* candidates_ptr = encounter.candidates();
+    const std::set<std::string>& candidates = candidates_ptr
+        ? *candidates_ptr
+        : std::set<std::string>();
     send_encounter_notification(
         m_console,
         m_settings.NOTIFICATION_NONSHINY,
         m_settings.NOTIFICATION_SHINY,
-        m_program_name,
-        encounter.candidates(),
-        result,
+        m_env.program_info(),
+        candidates_ptr, is_shiny(result.shiny_type),
+        {{candidates, result.shiny_type}},
+        result.best_screenshot,
         &m_session_stats,
         &m_frequencies
     );
@@ -204,7 +233,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
             m_console,
             m_settings.NOTIFICATION_CATCH_SUCCESS,
             m_settings.NOTIFICATION_CATCH_FAILED,
-            m_program_name,
+            m_env.program_info(),
             encounter.candidates(),
             action.second,
             results.balls_used,
@@ -237,7 +266,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
             m_console,
             m_settings.NOTIFICATION_CATCH_SUCCESS,
             m_settings.NOTIFICATION_CATCH_FAILED,
-            m_program_name,
+            m_env.program_info(),
             encounter.candidates(),
             action.second,
             results.balls_used,

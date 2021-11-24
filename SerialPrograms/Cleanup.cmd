@@ -9,9 +9,9 @@ del *.png
 del *.jpg
 del CMakeLists.txt.user
 
-cp CMakeLists.txt CMakeLists.txt.tmp
+copy CMakeLists.txt CMakeLists.txt.tmp
 del *.txt
-mv CMakeLists.txt.tmp CMakeLists.txt
+move CMakeLists.txt.tmp CMakeLists.txt
 
 rd /s /q "debug\"
 rd /s /q "release\"

@@ -215,7 +215,9 @@ QWidget* EventNotificationsTableUI::make_test_box(EventNotificationOption& entry
         this, [&](bool){
             send_program_notification(
                 global_logger_tagged(), entry,
-                Qt::green, "Notification Test", "Notification Test",
+                Qt::green,
+                ProgramInfo("Notification Test", "Notification Test"),
+                "Notification Test",
                 {
                     {"Event Type", entry.label()},
                 }

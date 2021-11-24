@@ -16,6 +16,12 @@ namespace PokemonAutomation{
 class InterruptableCommandSession;
 
 
+class ScreenDetector{
+public:
+    virtual bool detect(const QImage& screen) const = 0;
+};
+
+
 class VisualInferenceCallback{
 public:
     //  Return true if the inference session should stop.
@@ -34,6 +40,11 @@ public:
 protected:
     void add_box(const ImageFloatBox& box, QColor color = Qt::red){
         m_boxes.emplace_back(&box, color);
+    }
+    void add_boxes(const VisualInferenceCallback& callback){
+        for (const auto& item : callback.m_boxes){
+            m_boxes.emplace_back(item);
+        }
     }
 
 private:

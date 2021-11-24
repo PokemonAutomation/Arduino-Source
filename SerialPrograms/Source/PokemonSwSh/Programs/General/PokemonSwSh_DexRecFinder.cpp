@@ -275,7 +275,7 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env){
     env.update_stats();
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        descriptor().display_name(),
+        env.program_info(),
         "Found a match!",
         stats.to_str(),
         env.console.video().snapshot(), false

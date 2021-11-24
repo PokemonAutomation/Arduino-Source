@@ -90,11 +90,9 @@ SwitchSystem::SwitchSystem(
     m_serial = factory.m_serial.make_ui(*this, logger);
     layout->addWidget(m_serial);
 
-    QWidget* video = new QWidget(this);
-    QHBoxLayout* video_layout = new QHBoxLayout(video);
-    video_layout->setMargin(0);
+    m_video_display = new VideoDisplayWidget(*this);
 
-    m_camera = factory.m_camera.make_ui(*this, logger, *video);
+    m_camera = factory.m_camera.make_ui(*this, logger, *m_video_display);
     layout->addWidget(m_camera);
 
     m_command = new CommandRow(
@@ -105,7 +103,7 @@ SwitchSystem::SwitchSystem(
     );
     layout->addWidget(m_command);
 
-    layout->addWidget(video);
+    layout->addWidget(m_video_display);
     m_camera->reset_video();
 
 //    m_controller.reset(new VirtualController(m_serial->botbase()));
@@ -157,7 +155,7 @@ VideoFeed& SwitchSystem::camera(){
     return *m_camera;
 }
 VideoOverlay& SwitchSystem::overlay(){
-    return *m_camera;
+    return *m_video_display;
 }
 void SwitchSystem::stop_serial(){
     m_serial->stop();
@@ -203,9 +201,6 @@ void SwitchSystem::update_ui(ProgramState state){
     m_command->on_state_changed(state);
 }
 
-void SwitchSystem::resizeEvent(QResizeEvent* event){
-    m_camera->update_size();
-}
 void SwitchSystem::keyPressEvent(QKeyEvent* event){
     m_command->on_key_press((Qt::Key)event->key());
 }
@@ -215,7 +210,6 @@ void SwitchSystem::keyReleaseEvent(QKeyEvent* event){
 void SwitchSystem::focusInEvent(QFocusEvent* event){
     m_command->set_focus(true);
 }
-
 void SwitchSystem::focusOutEvent(QFocusEvent* event){
     m_command->set_focus(false);
 }

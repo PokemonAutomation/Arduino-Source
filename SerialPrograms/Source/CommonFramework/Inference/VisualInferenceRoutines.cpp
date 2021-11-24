@@ -93,7 +93,7 @@ int run_until(
         }catch (CancelledException&){};
 
         session.stop();
-        task->wait();
+        task->wait_and_rethrow_exceptions();
     }
 
     //  Lookup which callback triggered.

@@ -158,7 +158,6 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env){
 
         run_autohost(
             env, env.console,
-            descriptor().display_name(),
             CATCHABILITY, SKIPS,
             &RAID_CODE, lobby_wait_delay,
             HOST_ONLINE, FRIEND_ACCEPT_USER_SLOT,

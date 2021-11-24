@@ -15,6 +15,9 @@ namespace PokemonAutomation{
 
 class VideoFeed{
 public:
+    //  Can call from anywhere.
+    virtual void async_reset_video() = 0;
+
     //  Do not call this on the main thread or it will deadlock.
     virtual QImage snapshot() = 0;
 };

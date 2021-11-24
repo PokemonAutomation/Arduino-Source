@@ -33,7 +33,7 @@ public:
     ~AsyncTask();
 
     //  Wait for the task to finish. Will rethrow any exceptions.
-    void wait();
+    void wait_and_rethrow_exceptions();
 
 
 private:

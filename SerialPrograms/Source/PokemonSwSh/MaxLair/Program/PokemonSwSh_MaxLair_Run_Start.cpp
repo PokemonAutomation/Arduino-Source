@@ -49,7 +49,7 @@ bool wait_for_all_join(
     EntranceDetector entrance_detector(entrance);
     int result = wait_until(
         env, console,
-        std::chrono::seconds(5),
+        std::chrono::seconds(10),
         {
             &joined_detector,
             &entrance_detector,
@@ -58,7 +58,7 @@ bool wait_for_all_join(
     );
     switch (result){
     case 0:
-        console.log("All consoles joined!");
+        console.log("Detected " + std::to_string(start_players) + " players in lobby!");
         return true;
     case 1:
         console.log("Detected entrance... Did you get disconnected?", Qt::red);
@@ -266,7 +266,6 @@ bool start_raid_host(
     QImage entrance[4],
     ConsoleHandle& host, size_t boss_slot,
     HostingSettings& settings,
-    const QString& program_name,
     const PathStats& path_stats,
     const StatsTracker& session_stats,
     ConsoleRuntime console_stats[4]
@@ -277,7 +276,6 @@ bool start_raid_host(
             state_tracker,
             entrance[0], boss_slot,
             settings,
-            program_name,
             path_stats, session_stats,
             console_stats[0].ore
         );
@@ -384,7 +382,7 @@ bool start_raid_host(
     }
 
     send_raid_notification(
-        program_name,
+        env.program_info(),
         host,
         settings.NOTIFICATIONS,
         has_code, code,
@@ -435,7 +433,6 @@ bool start_adventure(
     QImage entrance[4],
     ConsoleHandle& host, size_t boss_slot,
     HostingSettings& settings,
-    const QString& program_name,
     const PathStats& path_stats,
     const StatsTracker& session_stats,
     ConsoleRuntime console_stats[4]
@@ -451,7 +448,6 @@ bool start_adventure(
             entrance,
             host, boss_slot,
             settings,
-            program_name,
             path_stats, session_stats,
             console_stats
         );

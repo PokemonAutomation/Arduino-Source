@@ -471,18 +471,9 @@ size_t find_marks(
     std::vector<ImagePixelBox>* exclamation_marks,
     std::vector<ImagePixelBox>* question_marks
 ){
-#if 0
-    FillMatrix matrix(image);
-    BrightFilter filter;
-    matrix.apply_filter(image, filter);
-#else
-    QImage copy = image;
-
     CellMatrix matrix(image);
-    MarkFilterDebug filter;
-    matrix.apply_filter(copy, filter);
-//    copy.save("white_filter.png");
-#endif
+    MarkFilter filter;
+    matrix.apply_filter(image, filter);
 
     size_t count = 0;
     std::vector<FillGeometry> white_boxes = find_all_objects(matrix, 1, true, 100);

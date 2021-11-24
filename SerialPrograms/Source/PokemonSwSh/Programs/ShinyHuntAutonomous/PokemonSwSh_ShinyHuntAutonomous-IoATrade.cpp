@@ -143,9 +143,9 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env){
                 env.console,
                 NOTIFICATION_NONSHINY,
                 NOTIFICATION_SHINY,
-                m_descriptor.display_name(),
-                nullptr,
-                ShinyDetectionResult{ShinyType::NOT_SHINY, QImage()},
+                env.program_info(),
+                false, false, {{{}, ShinyType::NOT_SHINY}},
+                QImage(),
                 &stats
             );
             break;
@@ -155,9 +155,9 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env){
                 env.console,
                 NOTIFICATION_NONSHINY,
                 NOTIFICATION_SHINY,
-                m_descriptor.display_name(),
-                nullptr,
-                ShinyDetectionResult{ShinyType::UNKNOWN_SHINY, env.console.video().snapshot()},
+                env.program_info(),
+                false, true, {{{}, ShinyType::UNKNOWN_SHINY}},
+                env.console.video().snapshot(),
                 &stats
             );
             if (VIDEO_ON_SHINY){

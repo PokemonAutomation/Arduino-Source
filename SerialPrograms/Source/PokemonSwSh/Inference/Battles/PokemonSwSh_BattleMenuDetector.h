@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonSwSh_BattleMenuDetector_H
 #define PokemonAutomation_PokemonSwSh_BattleMenuDetector_H
 
-#include <memory>
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 

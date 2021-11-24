@@ -127,7 +127,7 @@ StateMachineAction run_caught_screen(
         std::lock_guard<std::mutex> lg(env.lock());
         send_shiny_notification(
             console, runtime.notification_shiny,
-            runtime.program_name,
+            env.program_info(),
             console_index, shinies.size(),
             nullptr,
             runtime.path_stats,

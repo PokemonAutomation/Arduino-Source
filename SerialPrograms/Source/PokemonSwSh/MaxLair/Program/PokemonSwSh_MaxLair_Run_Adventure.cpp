@@ -42,13 +42,12 @@ AdventureResult run_adventure(
         entrance,
         env.consoles[runtime.host_index], boss_slot,
         runtime.hosting_settings,
-        runtime.program_name,
         runtime.path_stats,
         runtime.session_stats,
         runtime.consoles
     )){
         runtime.session_stats.add_error();
-        return AdventureResult::ERROR;
+        return AdventureResult::START_ERROR;
     }
 
     uint64_t epoch = 0;
@@ -109,9 +108,9 @@ AdventureResult run_adventure(
     if (stop.load(std::memory_order_acquire)){
         return AdventureResult::STOP_PROGRAM;
     }
-    if (error.load(std::memory_order_acquire)){
-        return AdventureResult::ERROR;
-    }
+//    if (error.load(std::memory_order_acquire)){
+//        return AdventureResult::START_ERROR;
+//    }
     return AdventureResult::FINISHED;
 }
 
@@ -120,7 +119,6 @@ AdventureResult run_adventure(
 
 
 void loop_adventures(
-    const QString& program_name,
     MultiSwitchProgramEnvironment& env,
     const Consoles& consoles,
     size_t host_index, size_t boss_slot,
@@ -134,7 +132,6 @@ void loop_adventures(
     Stats& stats = env.stats<Stats>();
 
     AdventureRuntime runtime(
-        program_name,
         host_index,
         consoles,
         decider,
@@ -164,11 +161,11 @@ void loop_adventures(
             continue;
         case AdventureResult::STOP_PROGRAM:
             return;
-        case AdventureResult::ERROR:
+        case AdventureResult::START_ERROR:
             restart_count++;
             if (restart_count == 3){
                 send_program_telemetry(
-                    env.logger(), true, Qt::red, MODULE_NAME,
+                    env.logger(), true, Qt::red, env.program_info(),
                     "Error",
                     {{"Message", "Failed to start adventure 3 times in the row."}},
                     ""

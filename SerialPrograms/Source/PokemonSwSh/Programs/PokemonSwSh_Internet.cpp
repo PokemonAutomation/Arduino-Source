@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
@@ -43,6 +44,7 @@ bool connect_to_internet_with_inference(
             console.log("Y-COMM detected.");
         }else{
             console.log("Failed to detect Y-COMM after timeout.", Qt::red);
+            dump_image(console, ProgramInfo(), "connect_to_internet_with_inference", console.video().snapshot());
             ok = false;
         }
     }

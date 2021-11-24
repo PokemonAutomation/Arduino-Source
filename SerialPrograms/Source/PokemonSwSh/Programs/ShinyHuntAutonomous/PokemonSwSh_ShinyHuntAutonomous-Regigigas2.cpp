@@ -90,7 +90,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegigigas2::make_stats() const{
 bool ShinyHuntAutonomousRegigigas2::kill_and_return(SingleSwitchProgramEnvironment& env) const{
     pbf_mash_button(env.console, BUTTON_A, 4 * TICKS_PER_SECOND);
 
-    RaidCatchDetector detector;
+    RaidCatchDetector detector(env.console);
     int result = wait_until(
         env, env.console,
         std::chrono::seconds(30),
@@ -118,7 +118,6 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env)
     env.update_stats();
 
     StandardEncounterHandler handler(
-        m_descriptor.display_name(),
         env, env.console,
         Language::None,
         ENCOUNTER_BOT_OPTIONS,
@@ -187,7 +186,7 @@ StopProgram:
 
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        descriptor().display_name(),
+        env.program_info(),
         "",
         stats.to_str()
     );

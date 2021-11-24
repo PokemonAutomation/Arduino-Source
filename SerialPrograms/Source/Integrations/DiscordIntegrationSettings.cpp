@@ -75,7 +75,7 @@ DiscordIntegrationSettingsOptionUI::DiscordIntegrationSettingsOptionUI(QWidget& 
     QPushButton* button_start = new QPushButton("Start Bot", this);
     layout->addWidget(button_start, 1);
 
-    QPushButton* button_stop = new QPushButton("Stop Bot (doesn't work - currently crashes)", this);
+    QPushButton* button_stop = new QPushButton("Stop Bot", this);
     layout->addWidget(button_stop, 1);
 
     QFont font = button_start->font();

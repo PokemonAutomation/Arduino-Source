@@ -89,7 +89,7 @@ QImage enter_lobby(
     }
 
     std::deque<InferenceBoxScope> boxes;
-    SelectionArrowFinder arrow_detector(console, ImageFloatBox(0.450, 0.450, 0.400, 0.400));
+    SelectionArrowFinder arrow_detector(console, ImageFloatBox(0.350, 0.450, 0.500, 0.400));
     GreyDialogDetector dialog_detector;
     arrow_detector.make_overlays(boxes, console);
     dialog_detector.make_overlays(boxes, console);
@@ -97,9 +97,11 @@ QImage enter_lobby(
     InferenceBoxScope ore_box(console, 0.900, 0.015, 0.020, 0.040);
     InferenceBoxScope ore_quantity(console, 0.945, 0.010, 0.0525, 0.050);
 
+    size_t presses = 0;
     size_t arrow_count = 0;
     size_t ore_dialog_count = 0;
-    while (arrow_count < 10){
+    while (presses < 50){
+        presses++;
         pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
         console.botbase().wait_for_all_requests();
 
@@ -122,6 +124,10 @@ QImage enter_lobby(
             QImage image = extract_box(screen, ore_quantity);
             OCR::TextImageFilter{false, 600}.apply(image);
             ore.update_with_ocr(console.logger(), image);
+
+            if (ore.quantity < 20){
+                PA_THROW_StringException("You have less than 20 ore. Program stopped. (Quantity: " + ore.to_str() + ")");
+            }
 
             ore_dialog_count++;
             if (ore_dialog_count >= 2){

@@ -30,7 +30,7 @@ public:
 
 
 
-struct ProgramInfo{
+struct ProgramTrackingState{
     std::string program_name;
     std::vector<uint64_t> console_ids;
     std::chrono::system_clock::time_point start_time;
@@ -44,10 +44,11 @@ class ProgramTracker{
 public:
     static ProgramTracker& instance();
 
-    std::map<uint64_t, ProgramInfo> all_programs();
+    std::map<uint64_t, ProgramTrackingState> all_programs();
 
     std::string grab_screenshot     (uint64_t console_id, QImage& image);
-//    void reset_serial       (uint64_t console_id);
+    std::string reset_camera        (uint64_t console_id);
+    std::string reset_serial        (uint64_t console_id);
 //    void change_program (uint64_t program_id, std::string program_identifier);
     std::string start_program       (uint64_t program_id);
     std::string stop_program        (uint64_t program_id);

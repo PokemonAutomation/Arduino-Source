@@ -91,7 +91,7 @@ void DaySkipperEU::program(SingleSwitchProgramEnvironment& env){
     while (remaining_skips > 0){
         send_program_status_notification(
             env.logger(), NOTIFICATION_PROGRESS_UPDATE,
-            descriptor().display_name(),
+            env.program_info(),
             "",
             stats.to_str_current(remaining_skips)
         );
@@ -126,7 +126,7 @@ void DaySkipperEU::program(SingleSwitchProgramEnvironment& env){
     env.console.botbase().wait_for_all_requests();
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        descriptor().display_name(),
+        env.program_info(),
         "",
         stats.to_str_current(remaining_skips)
     );

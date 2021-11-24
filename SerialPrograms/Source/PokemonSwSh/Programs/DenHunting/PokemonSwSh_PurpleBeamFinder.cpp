@@ -188,7 +188,7 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env){
 
         send_program_status_notification(
             env.logger(), NOTIFICATION_RED_BEAM,
-            descriptor().display_name(),
+            env.program_info(),
             "Red Beam...",
             stats.to_str()
         );
@@ -203,7 +203,7 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env){
     env.wait_for(std::chrono::seconds(2));
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PURPLE_BEAM,
-        descriptor().display_name(),
+        env.program_info(),
         "Found a purple beam!",
         stats.to_str(),
         env.console.video().snapshot()

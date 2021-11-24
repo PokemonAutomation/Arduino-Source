@@ -72,7 +72,7 @@ std::string BattleBallReader::read_ball(const QImage& screen) const{
         if (name_result.results.size() == 1){
             return name_result.results.begin()->second.token;
         }
-        dump_image(m_console, "", "BattleBallReader", screen);
+        dump_image(m_console, ProgramInfo(), "BattleBallReader", screen);
         return "";
     }
 
@@ -93,7 +93,7 @@ std::string BattleBallReader::read_ball(const QImage& screen) const{
         }
     }
     if (overlap.size() != 1){
-        dump_image(m_console, "", "BattleBallReader", screen);
+        dump_image(m_console, ProgramInfo(), "BattleBallReader", screen);
         return "";
     }
     return overlap[0];

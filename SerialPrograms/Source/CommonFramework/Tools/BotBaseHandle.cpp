@@ -4,6 +4,7 @@
  *
  */
 
+#include <emmintrin.h>
 #include <QtGlobal>
 #include <QMessageBox>
 #include "Common/Cpp/PrettyPrint.h"
@@ -25,7 +26,8 @@ BotBaseHandle::BotBaseHandle(
     PABotBaseLevel minimum_pabotbase,
     MessageSniffer& logger
 )
-    : m_minimum_pabotbase(minimum_pabotbase)
+    : m_port(port)
+    , m_minimum_pabotbase(minimum_pabotbase)
     , m_current_pabotbase(PABotBaseLevel::NOT_PABOTBASE)
     , m_state(State::NOT_CONNECTED)
     , m_allow_user_commands(true)
@@ -56,6 +58,20 @@ void BotBaseHandle::set_allow_user_commands(bool allow){
     m_allow_user_commands.store(allow, std::memory_order_release);
 }
 
+const char* BotBaseHandle::try_reset(){
+    std::unique_lock<std::mutex> lg(m_lock, std::defer_lock);
+    if (!lg.try_lock()){
+        return "Console is busy.";
+    }
+    if (state() != State::READY){
+        return "Console is not accepting commands right now.";
+    }
+    if (!m_allow_user_commands.load(std::memory_order_acquire)){
+        return "Cannot reset while a program is running.";
+    }
+    reset_unprotected(m_port);
+    return nullptr;
+}
 const char* BotBaseHandle::try_send_request(const BotBaseRequest& request){
     std::unique_lock<std::mutex> lg(m_lock, std::defer_lock);
     if (!lg.try_lock()){
@@ -104,14 +120,8 @@ void BotBaseHandle::stop_unprotected(){
     m_state.store(State::NOT_CONNECTED, std::memory_order_release);
     on_not_connected("");
 }
-void BotBaseHandle::stop(){
-    std::lock_guard<std::mutex> lg(m_lock);
-    stop_unprotected();
-}
-void BotBaseHandle::reset(const QSerialPortInfo& port){
+void BotBaseHandle::reset_unprotected(const QSerialPortInfo& port){
     using namespace PokemonAutomation;
-
-    std::lock_guard<std::mutex> lg(m_lock);
 
     stop_unprotected();
     if (port.isNull()){
@@ -153,6 +163,15 @@ void BotBaseHandle::reset(const QSerialPortInfo& port){
     }
 
     m_status_thread = std::thread(run_with_catch, "BotBaseHandle::thread_body()", [=]{ thread_body(); });
+}
+
+void BotBaseHandle::stop(){
+    std::lock_guard<std::mutex> lg(m_lock);
+    stop_unprotected();
+}
+void BotBaseHandle::reset(const QSerialPortInfo& port){
+    std::lock_guard<std::mutex> lg(m_lock);
+    reset_unprotected(port);
 }
 
 

@@ -213,7 +213,11 @@ void RunnableSwitchProgramWidget::run_program(){
         signal_error(e.message_qt());
         send_program_error_notification(
             m_logger, instance.NOTIFICATION_PROGRAM_ERROR,
-            instance.descriptor().display_name(),
+            ProgramInfo(
+                instance.descriptor().identifier(),
+                instance.descriptor().display_name(),
+                timestamp()
+            ),
             e.message_qt(),
             m_current_stats ? m_current_stats->to_str() : ""
         );

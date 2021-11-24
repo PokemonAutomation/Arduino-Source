@@ -153,6 +153,7 @@ bool cluster_fit_2(
             double distance = euclidean_distance(ratio_desired, ratio_actual);
 //            cout << ratio_desired << " / " << ratio_actual << " = " << distance << endl;
             if (distance > distance_threshold){
+//                cout << distance << " > " << distance_threshold << endl;
                 return false;
             }
         }

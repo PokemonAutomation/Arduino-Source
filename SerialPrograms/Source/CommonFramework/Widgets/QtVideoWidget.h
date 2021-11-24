@@ -20,17 +20,18 @@ namespace PokemonAutomation{
 class QtVideoWidget : public VideoWidget{
 public:
     QtVideoWidget(
-        QWidget& parent, Logger& logger,
+        Logger& logger,
         const QCameraInfo& info, const QSize& suggested_resolution
     );
     virtual ~QtVideoWidget();
-    virtual QSize resolution() override;
-    virtual std::vector<QSize> resolutions() override;
+    virtual QSize resolution() const override;
+    virtual std::vector<QSize> resolutions() const override;
     virtual void set_resolution(const QSize& size) override;
 
     //  Cannot call from UI thread or it will deadlock.
     virtual QImage snapshot() override;
 
+    virtual void resizeEvent(QResizeEvent* event) override;
 
 private:
     enum class CaptureStatus{
@@ -50,7 +51,7 @@ private:
     QCameraImageCapture* m_capture = nullptr;
     std::vector<QSize> m_resolutions;
 
-    std::mutex m_lock;
+    mutable std::mutex m_lock;
     QSize m_resolution;
     std::map<int, PendingCapture> m_pending_captures;
 };

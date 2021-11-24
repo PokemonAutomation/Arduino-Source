@@ -151,6 +151,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Inference/BlackScreenDetector.h
     Source/CommonFramework/Inference/FrozenImageDetector.cpp
     Source/CommonFramework/Inference/FrozenImageDetector.h
+    Source/CommonFramework/Inference/ImageMatchDetector.cpp
+    Source/CommonFramework/Inference/ImageMatchDetector.h
     Source/CommonFramework/Inference/ImageTools.cpp
     Source/CommonFramework/Inference/ImageTools.h
     Source/CommonFramework/Inference/InferenceThrottler.h
@@ -269,6 +271,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Widgets/SerialSelector.cpp
     Source/CommonFramework/Widgets/SerialSelector.h
     Source/CommonFramework/Widgets/VideoWidget.h
+    Source/CommonFramework/Widgets/VideoDisplayWidget.cpp
+    Source/CommonFramework/Widgets/VideoDisplayWidget.h
     Source/CommonFramework/Widgets/VideoOverlayWidget.cpp
     Source/CommonFramework/Widgets/VideoOverlayWidget.h
     Source/CommonFramework/Windows/ButtonDiagram.cpp
@@ -429,8 +433,57 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Resources/Pokemon_PokemonNames.h
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.cpp
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.h
+    Source/PokemonBDSP/Inference/PokemonBDSP_BattleBallReader.cpp
+    Source/PokemonBDSP/Inference/PokemonBDSP_BattleBallReader.h
+    Source/PokemonBDSP/Inference/PokemonBDSP_BattleMenuDetector.cpp
+    Source/PokemonBDSP/Inference/PokemonBDSP_BattleMenuDetector.h
+    Source/PokemonBDSP/Inference/PokemonBDSP_DialogDetector.cpp
+    Source/PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h
+    Source/PokemonBDSP/Inference/PokemonBDSP_EndBattleDetector.cpp
+    Source/PokemonBDSP/Inference/PokemonBDSP_EndBattleDetector.h
+    Source/PokemonBDSP/Inference/PokemonBDSP_MarkFinder.cpp
+    Source/PokemonBDSP/Inference/PokemonBDSP_MarkFinder.h
+    Source/PokemonBDSP/Inference/PokemonBDSP_PokeballSpriteMatcher.cpp
+    Source/PokemonBDSP/Inference/PokemonBDSP_PokeballSpriteMatcher.h
+    Source/PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.cpp
+    Source/PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h
+    Source/PokemonBDSP/Inference/PokemonBDSP_ShinyEncounterDetector.cpp
+    Source/PokemonBDSP/Inference/PokemonBDSP_ShinyEncounterDetector.h
+    Source/PokemonBDSP/Inference/PokemonBDSP_ShinyTrigger.cpp
+    Source/PokemonBDSP/Inference/PokemonBDSP_ShinyTrigger.h
+    Source/PokemonBDSP/Inference/PokemonBDSP_StartBattleDetector.cpp
+    Source/PokemonBDSP/Inference/PokemonBDSP_StartBattleDetector.h
+    Source/PokemonBDSP/Inference/PokemonBDSP_VSSeekerReaction.cpp
+    Source/PokemonBDSP/Inference/PokemonBDSP_VSSeekerReaction.h
+    Source/PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h
+    Source/PokemonBDSP/Options/PokemonBDSP_EncounterFilter.cpp
+    Source/PokemonBDSP/Options/PokemonBDSP_EncounterFilter.h
+    Source/PokemonBDSP/Programs/Farming/PokemonBDSP_DoublesLeveling.cpp
+    Source/PokemonBDSP/Programs/Farming/PokemonBDSP_DoublesLeveling.h
+    Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute210.cpp
+    Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute210.h
+    Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.cpp
+    Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.h
+    Source/PokemonBDSP/Programs/PokemonBDSP_EncounterDetection.cpp
+    Source/PokemonBDSP/Programs/PokemonBDSP_EncounterDetection.h
+    Source/PokemonBDSP/Programs/PokemonBDSP_EncounterHandler.cpp
+    Source/PokemonBDSP/Programs/PokemonBDSP_EncounterHandler.h
+    Source/PokemonBDSP/Programs/PokemonBDSP_GameEntry.cpp
+    Source/PokemonBDSP/Programs/PokemonBDSP_GameEntry.h
+    Source/PokemonBDSP/Programs/PokemonBDSP_OverworldTrigger.cpp
+    Source/PokemonBDSP/Programs/PokemonBDSP_OverworldTrigger.h
+    Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_LegendaryReset.cpp
+    Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_LegendaryReset.h
+    Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Fishing.cpp
+    Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Fishing.h
+    Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Overworld.cpp
+    Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Overworld.h
+    Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_StarterReset.cpp
+    Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_StarterReset.h
     Source/PokemonBDSP/Panels_PokemonBDSP.cpp
     Source/PokemonBDSP/Panels_PokemonBDSP.h
+    Source/PokemonBDSP/PokemonBDSP_Settings.cpp
+    Source/PokemonBDSP/PokemonBDSP_Settings.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp
@@ -776,10 +829,10 @@ file(GLOB MAIN_SOURCES
 )
 add_executable(SerialPrograms WIN32 ${MAIN_SOURCES})
 set_target_properties(SerialPrograms PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(SerialPrograms Qt5::Widgets Qt5::SerialPort Qt5::Multimedia Qt5::MultimediaWidgets tesseractPA.lib Sleepy.lib)
+target_link_libraries(SerialPrograms Qt5::Widgets Qt5::SerialPort Qt5::Multimedia Qt5::MultimediaWidgets)
 
 #add defines
-target_compile_definitions(SerialPrograms PRIVATE NOMINMAX PA_TESSERACT PA_SLEEPY)
+target_compile_definitions(SerialPrograms PRIVATE NOMINMAX)
 
 if (EXISTS "../../Internal/SerialPrograms/TelemetryURLs.h")
 target_compile_definitions(SerialPrograms PRIVATE PA_OFFICIAL)
@@ -790,6 +843,9 @@ target_include_directories(SerialPrograms PRIVATE Source/ ../)
 
 #enable MP with MSVC (Build with Multiple Processes)
 if (MSVC)
+    target_link_libraries(SerialPrograms tesseractPA.lib Sleepy.lib)
+    target_compile_definitions(SerialPrograms PRIVATE PA_TESSERACT PA_SLEEPY)
+
     target_compile_options(SerialPrograms PRIVATE /MP)
     target_compile_options(SerialPrograms PRIVATE /W4)
     target_compile_options(SerialPrograms PRIVATE /wd5054)  # Deprecated enum arithemtic

@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 
 QString dump_image(
     Logger& logger,
-    const QString& module, const QString& label,
+    const ProgramInfo& program_info, const QString& label,
     const QImage& image
 ){
     static std::mutex lock;
@@ -31,7 +31,7 @@ QString dump_image(
     image.save(name);
     send_program_telemetry(
         logger, true, Qt::red,
-        module,
+        program_info,
         label,
         {},
         name

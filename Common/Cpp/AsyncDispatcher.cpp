@@ -18,10 +18,10 @@ AsyncTask::~AsyncTask(){
     std::unique_lock<std::mutex> lg(m_lock);
     m_cv.wait(lg, [=]{ return m_finished; });
 }
-void AsyncTask::wait(){
+void AsyncTask::wait_and_rethrow_exceptions(){
     std::unique_lock<std::mutex> lg(m_lock);
     m_cv.wait(lg, [=]{ return m_finished; });
-    if (!std::current_exception() && m_exception){
+    if (m_exception && std::uncaught_exceptions() == 0){
         std::rethrow_exception(m_exception);
     }
 }
@@ -110,7 +110,7 @@ void AsyncDispatcher::run_in_parallel(
     //  Wait
 //    cout << "begin wait()" << endl;
     for (std::unique_ptr<AsyncTask>& task : tasks){
-        task->wait();
+        task->wait_and_rethrow_exceptions();
     }
 //    cout << "end wait()" << endl;
 }

@@ -52,11 +52,11 @@ GameSettings::GameSettings()
         "250"
     )
     , GAME_TO_HOME_DELAY_FAST(
-        "<b>Game to Home Delay (fast):</b><br>Delay from pressing home to entering the the Switch home menu. This affects the speed of date-spamming programs",
+        "<b>Game to Home Delay (fast):</b><br>Delay from pressing home to entering the the Switch home menu. This affects the speed of date-spamming programs.",
         "100"
     )
     , GAME_TO_HOME_DELAY_SAFE(
-        "<b>Game to Home Delay (safe):</b><br>Delay from pressing home to entering the the Switch home menu. This affects the speed of date-spamming programs",
+        "<b>Game to Home Delay (safe):</b><br>Delay from pressing home to entering the the Switch home menu. This affects the speed of date-spamming programs.",
         "125"
     )
     , HOME_TO_GAME_DELAY(

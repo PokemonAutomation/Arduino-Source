@@ -124,16 +124,16 @@ MultiSwitchSystem::MultiSwitchSystem(
     row->setMargin(0);
     row->addStretch(2);
     row->addWidget(new QLabel("<b>Switch Count:</b>", this), 0);
-    QComboBox* box = new NoWheelComboBox(this);
-    row->addWidget(box, 1);
+    m_console_count_box = new NoWheelComboBox(this);
+    row->addWidget(m_console_count_box, 1);
     row->addStretch(2);
     for (size_t c = factory.m_min_switches; c <= factory.m_max_switches; c++){
-        box->addItem(QString::number(c));
+        m_console_count_box->addItem(QString::number(c));
     }
-    box->setCurrentIndex((int)(m_factory.m_active_switches - factory.m_min_switches));
+    m_console_count_box->setCurrentIndex((int)(m_factory.m_active_switches - factory.m_min_switches));
 
     connect(
-        box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+        m_console_count_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
         this, [=](int index){
             if (index < 0 || index > (int)(m_factory.m_max_switches - m_factory.m_min_switches)){
                 return;
@@ -222,6 +222,7 @@ void MultiSwitchSystem::reset_serial(){
     }
 }
 void MultiSwitchSystem::update_ui(ProgramState state){
+    m_console_count_box->setEnabled(state == ProgramState::STOPPED);
     for (const auto& item : m_switches){
         item->update_ui(state);
     }

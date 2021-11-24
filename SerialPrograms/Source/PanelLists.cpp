@@ -24,9 +24,7 @@ ProgramTabs::ProgramTabs(QWidget& parent, PanelListener& listener)
 {
     add(new NintendoSwitch::Panels(*this, listener));
     add(new NintendoSwitch::PokemonSwSh::Panels(*this, listener));
-    if (GlobalSettings::instance().DEVELOPER_MODE){
-        add(new NintendoSwitch::PokemonBDSP::Panels(*this, listener));
-    }
+    add(new NintendoSwitch::PokemonBDSP::Panels(*this, listener));
 }
 
 void ProgramTabs::add(PanelList* list){

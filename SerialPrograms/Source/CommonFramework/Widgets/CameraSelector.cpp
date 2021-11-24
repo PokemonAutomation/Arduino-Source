@@ -61,7 +61,7 @@ QJsonValue CameraSelector::to_json() const{
     return root;
 }
 
-CameraSelectorUI* CameraSelector::make_ui(QWidget& parent, Logger& logger, QWidget& holder){
+CameraSelectorUI* CameraSelector::make_ui(QWidget& parent, Logger& logger, VideoDisplayWidget& holder){
     return new CameraSelectorUI(parent, logger, *this, holder);
 }
 
@@ -76,12 +76,12 @@ CameraSelectorUI::CameraSelectorUI(
     QWidget& parent,
     Logger& logger,
     CameraSelector& value,
-    QWidget& holder
+    VideoDisplayWidget& holder
 )
     : QWidget(&parent)
     , m_logger(logger)
     , m_value(value)
-    , m_holder(holder)
+    , m_display(holder)
     , m_camera_box(nullptr)
     , m_resolution_box(nullptr)
     , m_snapshots_allowed(true)
@@ -104,8 +104,6 @@ CameraSelectorUI::CameraSelectorUI(
     m_reset_button = new QPushButton("Reset Camera", this);
     camera_row->addWidget(m_reset_button, 1);
 
-    m_overlay = new VideoOverlayWidget(m_holder);
-
     connect(
         m_camera_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
         this, [=](int index){
@@ -125,22 +123,26 @@ CameraSelectorUI::CameraSelectorUI(
     connect(
         m_resolution_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
         this, [=](int index){
-            if (m_video == nullptr){
+            if (!m_display){
                 return;
             }
-            std::vector<QSize> resolutions = m_video->resolutions();
-            if (index < 0 || index >= (int)resolutions.size()){
+            if (index < 0 || index >= (int)m_resolutions.size()){
                 return;
             }
-
-            QSize resolution = resolutions[index];
-            m_video->set_resolution(resolution);
-            m_overlay->update_size(m_holder.size(), resolution);
+            QSize resolution = m_resolutions[index];
+            m_value.m_resolution = resolution;
+            m_display.set_resolution(resolution);
         }
     );
     connect(
         m_reset_button, &QPushButton::clicked,
         this, [=](bool){
+            reset_video();
+        }
+    );
+    connect(
+        this, &CameraSelectorUI::internal_async_reset_video,
+        this, [=]{
             reset_video();
         }
     );
@@ -195,29 +197,25 @@ QString CameraSelectorUI::aspect_ratio(const QSize& size){
 }
 void CameraSelectorUI::reset_video(){
     std::lock_guard<std::mutex> lg(m_camera_lock);
-    if (m_video != nullptr){
-        delete m_video;
-        m_video = nullptr;
-    }
+    m_display.close_video();
 
     const QCameraInfo& info = m_value.m_camera;
 
     //  If we change video implementations, here's what we change.
-    m_video = new QtVideoWidget(m_holder, m_logger, info, m_value.m_resolution);
+    if (!info.isNull()){
+        m_display.set_video(new QtVideoWidget(m_logger, info, m_value.m_resolution));
+    }
 
-    m_holder.layout()->addWidget(m_video);
-
-    QSize resolution = m_video->resolution();
-    m_overlay->update_size(m_holder.size(), resolution);
+    QSize resolution = m_display.resolution();
 
     //  Update resolutions dropdown.
     m_resolution_box->clear();
-    std::vector<QSize> resolutions = m_video->resolutions();
+    m_resolutions = m_display.resolutions();
 
     int index = -1;
     bool resolution_match = false;
-    for (int c = 0; c < (int)resolutions.size(); c++){
-        const QSize& size = resolutions[c];
+    for (int c = 0; c < (int)m_resolutions.size(); c++){
+        const QSize& size = m_resolutions[c];
         m_resolution_box->addItem(
             QString::number(size.width()) + " x " + QString::number(size.height()) + " " + aspect_ratio(size)
         );
@@ -231,15 +229,15 @@ void CameraSelectorUI::reset_video(){
         }
     }
     if (index >= 0){
-        m_value.m_resolution = resolutions[index];
+        m_value.m_resolution = m_resolutions[index];
         m_resolution_box->setCurrentIndex(index);
         m_resolution_box->activated(index);
     }else{
         m_value.m_resolution = QSize();
     }
-
-    m_overlay->raise();
-//    update_size();
+}
+void CameraSelectorUI::async_reset_video(){
+    internal_async_reset_video();
 }
 
 
@@ -254,53 +252,7 @@ void CameraSelectorUI::set_snapshots_allowed(bool enabled){
     m_snapshots_allowed.store(enabled, std::memory_order_release);
 }
 void CameraSelectorUI::set_overlay_enabled(bool enabled){
-    if (m_overlay == nullptr){
-        return;
-    }
-    m_overlay->setHidden(!enabled);
-}
-void CameraSelectorUI::update_size(){
-    std::lock_guard<std::mutex> lg(m_camera_lock);
-    if (m_video == nullptr){
-        return;
-    }
-
-    QSize resolution = m_video->resolution();
-//    cout << m_holder.width() << " x " << m_holder.height() << " | "
-//         << resolution.width() << " x " << resolution.height() << endl;
-
-    int height = (int)((double)m_holder.width() / resolution.width() * resolution.height());
-//    cout << "desired height = " << height << endl;
-
-
-    //  Safeguard against a resizing loop where the UI bounces between larger
-    //  height with scroll bar and lower height with no scroll bar.
-    auto iter = m_recent_heights.find(height);
-    if (iter != m_recent_heights.end() && std::abs(height - m_holder.maximumHeight()) < 50){
-//        cout << "Supressing potential infinite resizing loop." << endl;
-        m_overlay->update_size(m_holder.size(), resolution);
-        return;
-    }
-
-    m_height_history.push_back(height);
-    m_recent_heights.insert(height);
-    if (m_height_history.size() > 10){
-        m_recent_heights.erase(m_height_history[0]);
-        m_height_history.pop_front();
-    }
-//    cout << "before = " << m_video->height() << ", " << height << endl;
-//    m_holder.setMaximumHeight(height);
-    m_holder.setFixedHeight(height);
-//    cout << "after  = " << m_video->height() << endl;
-    m_overlay->update_size(m_holder.size(), resolution);
-
-//    m_camera_view->frameGeometry()
-//    QRect rect = m_camera_view->frameGeometry();
-//    cout << rect.x() << ", " << rect.y() << " - " << rect.width() << " x " << rect.height() << endl;
-//    QSize size = m_video->baseSize();
-//    cout << size.width() << " x " << size.height() << endl;
-
-//    m_overlay->update_size(m_video->size(), );
+    m_display.overlay().setHidden(!enabled);
 }
 
 QImage CameraSelectorUI::snapshot(){
@@ -309,17 +261,11 @@ QImage CameraSelectorUI::snapshot(){
     }
 
     std::unique_lock<std::mutex> lg(m_camera_lock);
-    if (m_video == nullptr){
+    if (!m_display){
         return QImage();
     }
 
-    return m_video->snapshot();
-}
-void CameraSelectorUI::add_box(const ImageFloatBox& box, QColor color){
-    m_overlay->add_box(box, color);
-}
-void CameraSelectorUI::remove_box(const ImageFloatBox& box){
-    m_overlay->remove_box(box);
+    return m_display.snapshot();
 }
 
 

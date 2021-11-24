@@ -30,7 +30,7 @@ namespace MaxLairInternal{
 PokemonSwapMenuDetector::PokemonSwapMenuDetector(bool stop_no_detect)
     : m_stop_on_no_detect(stop_no_detect)
     , m_pink0(0.150, 0.015, 0.270, 0.050)
-    , m_pink1(0.100, 0.220, 0.270, 0.080)
+    , m_pink1(0.100, 0.260, 0.270, 0.040)
     , m_pink2(0.150, 0.700, 0.090, 0.150)
     , m_white0(0.600, 0.015, 0.370, 0.040)
     , m_white1(0.520, 0.130, 0.450, 0.050)

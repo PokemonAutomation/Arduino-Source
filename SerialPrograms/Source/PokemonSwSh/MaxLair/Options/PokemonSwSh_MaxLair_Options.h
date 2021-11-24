@@ -16,7 +16,7 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-extern const QString MODULE_NAME;
+extern const std::string MODULE_NAME;
 extern const std::chrono::milliseconds INFERENCE_RATE;
 
 

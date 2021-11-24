@@ -57,8 +57,11 @@ public:
     State state() const;
     bool accepting_commands() const;
 
-    //  Thread-safe with stop()/reset().
-    //  This is meant for user commands. It will drop if a program is running.
+
+public:
+    //  Aync external requests. (typically from integration commands)
+    //  Thread-safe with stop()/reset(). These may drop.
+    const char* try_reset();
     const char* try_send_request(const BotBaseRequest& request);
 
 signals:
@@ -71,6 +74,7 @@ signals:
 
 private:
     void stop_unprotected();
+    void reset_unprotected(const QSerialPortInfo& port);
 
     void verify_protocol();
     uint8_t verify_pabotbase();
@@ -78,6 +82,7 @@ private:
 
 
 private:
+    const QSerialPortInfo m_port;
     PABotBaseLevel m_minimum_pabotbase;
     std::atomic<PABotBaseLevel> m_current_pabotbase;
     std::atomic<State> m_state;

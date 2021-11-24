@@ -60,7 +60,7 @@ StateMachineAction run_state_iteration(
     ItemSelectDetector item_menu(false);
     ProfessorSwapDetector professor_swap(console);
     BattleMenuDetector battle_menu;
-    RaidCatchDetector catch_select;
+    RaidCatchDetector catch_select(console);
     PokemonCaughtMenuDetector caught_menu;
     EntranceDetector entrance_detector(entrance);
     FrozenImageDetector frozen_screen(std::chrono::seconds(30), 10);

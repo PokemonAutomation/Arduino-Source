@@ -61,14 +61,14 @@ void send_status_notification(
     env.log(status_str);
     send_program_notification(
         env.logger(), runtime.notification_status,
-        QColor(), runtime.program_name,
+        QColor(), env.program_info(),
         "Max Lair Status Update",
         embeds
     );
 }
 
 void send_raid_notification(
-    const QString& program_name,
+    const ProgramInfo& program_info,
     ConsoleHandle& console,
     AutoHostNotificationOption& settings,
     bool has_code, uint8_t code[8],
@@ -119,7 +119,7 @@ void send_raid_notification(
     send_program_notification(
         console, settings.NOTIFICATION,
         QColor(),
-        program_name,
+        program_info,
         "Max Lair Notification",
         embeds,
         screen, false
@@ -130,7 +130,7 @@ void send_raid_notification(
 
 void send_shiny_notification(
     Logger& logger, EventNotificationOption& settings,
-    const QString& program,
+    const ProgramInfo& program_info,
     size_t console_index, size_t shinies,
     const std::set<std::string>* slugs,
     const PathStats& path_stats,
@@ -182,7 +182,7 @@ void send_shiny_notification(
 
     send_program_notification(
         logger, settings,
-        0xffff00, program,
+        0xffff00, program_info,
         "Max Lair Shiny Notification",
         embeds,
         image, true

@@ -36,7 +36,7 @@ private:
     friend class MultiSwitchProgramWidget;
     friend class MultiSwitchProgramUI;
     MultiSwitchProgramEnvironment(
-//        std::string program_identifier,
+        ProgramInfo program_info,
         Logger& logger,
         StatsTracker* current_stats,
         const StatsTracker* historical_stats,

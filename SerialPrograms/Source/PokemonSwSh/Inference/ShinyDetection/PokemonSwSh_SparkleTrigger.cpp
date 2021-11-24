@@ -116,11 +116,13 @@ bool SparkleDetector::is_ball(){
         return false;
     }
 
-    //  Make sure area is less than 1/2 of the box.
     pxint_t width = m_box.box.width();
     pxint_t height = m_box.box.height();
+
+    //  Make sure area is less than 2/3 of the box.
 //    cout << "area = " << m_box.area * 2 << ", box = " << (uint64_t)width * height << endl;
-    if (m_box.area * 2 > (uint64_t)width * height){
+    if (m_box.area * 3 > (uint64_t)width * height * 2){
+//        cout << "bad area" << endl;
         return false;
     }
 

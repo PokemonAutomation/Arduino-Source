@@ -181,7 +181,6 @@ void MaxLairBossFinder::program(MultiSwitchProgramEnvironment& env){
     EndBattleDecider_BossFinder decider(CONSOLES, BOSS_LIST);
 
     loop_adventures(
-        descriptor().display_name(),
         env, CONSOLES,
         CONSOLES.HOST, 0,
         decider,
@@ -196,7 +195,7 @@ void MaxLairBossFinder::program(MultiSwitchProgramEnvironment& env){
     env.update_stats();
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        descriptor().display_name(),
+        env.program_info(),
         "",
         stats.to_str()
     );

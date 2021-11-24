@@ -19,7 +19,7 @@ using std::endl;
 
 namespace PokemonAutomation{
 
-BlackScreenDetector::BlackScreenDetector()
+BlackScreenDetector::BlackScreenDetector(const ImageFloatBox& box)
     : m_box(0.1, 0.1, 0.8, 0.8)
 {
     add_box(m_box);
@@ -35,12 +35,6 @@ bool BlackScreenDetector::process_frame(
 
 
 
-BlackScreenOverDetector::BlackScreenOverDetector()
-    : m_box(0.1, 0.1, 0.8, 0.8)
-    , m_has_been_black(false)
-{
-    add_box(m_box);
-}
 BlackScreenOverDetector::BlackScreenOverDetector(const ImageFloatBox& box)
     : m_box(box)
     , m_has_been_black(false)

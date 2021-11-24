@@ -51,7 +51,6 @@ struct ConsoleRuntime{
 
 struct AdventureRuntime{
     AdventureRuntime(
-        const QString& p_program_name,
         const size_t p_host_index,
         const Consoles& p_console_settings,
         const EndBattleDecider& p_actions,
@@ -61,8 +60,7 @@ struct AdventureRuntime{
         EventNotificationOption& p_notification_shiny,
         Stats& p_session_stats
     )
-        : program_name(p_program_name)
-        , host_index(p_host_index)
+        : host_index(p_host_index)
         , console_settings(p_console_settings)
         , actions(p_actions)
         , go_home_when_done(p_go_home_when_done)
@@ -72,7 +70,6 @@ struct AdventureRuntime{
         , session_stats(p_session_stats)
     {}
 
-    const QString& program_name;
     const size_t host_index;
     const Consoles& console_settings;
     const EndBattleDecider& actions;

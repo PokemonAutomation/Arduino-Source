@@ -154,7 +154,7 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env){
             }else if (results.slugs.results.empty()){
                 //  No detection. Keep going.
                 stats.errors++;
-                dump_image(env.console, "", "ReadDenMon", screen);
+                dump_image(env.console, env.program_info(), "ReadDenMon", screen);
                 pbf_wait(env.console, VIEW_TIME);
             }else{
                 //  Check if we got what we wanted.
@@ -183,7 +183,7 @@ StopProgram:
     env.update_stats();
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        descriptor().display_name(),
+        env.program_info(),
         "Found a match!",
         stats.to_str(),
         screen, false

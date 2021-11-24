@@ -33,11 +33,11 @@ struct ProgramTracker::ProgramData{
 };
 
 
-std::map<uint64_t, ProgramInfo> ProgramTracker::all_programs(){
+std::map<uint64_t, ProgramTrackingState> ProgramTracker::all_programs(){
     std::lock_guard<std::mutex> lg(m_lock);
-    std::map<uint64_t, ProgramInfo> info;
+    std::map<uint64_t, ProgramTrackingState> info;
     for (const auto& item : m_programs){
-        info[item.first] = ProgramInfo{
+        info[item.first] = ProgramTrackingState{
             item.second->program.instance().descriptor().identifier(),
             item.second->console_ids,
             item.second->program.timestamp(),
@@ -59,17 +59,28 @@ std::string ProgramTracker::grab_screenshot(uint64_t console_id, QImage& image){
     image = iter->second.first->video().snapshot();
     return "";
 }
-#if 0
-void SwitchProgramTracker::reset_serial(uint64_t console_id){
+std::string ProgramTracker::reset_camera(uint64_t console_id){
     std::lock_guard<std::mutex> lg(m_lock);
     auto iter = m_consoles.find(console_id);
     if (iter == m_consoles.end()){
-        return;
+        std::string error = "reset_camera(" + std::to_string(console_id) + ") - ID not found.";
+        global_logger_tagged().log("SwitchProgramTracker::" + error, "red");
+        return error;
     }
-
-
+    iter->second.first->video().async_reset_video();
+    return "";
 }
-#endif
+std::string ProgramTracker::reset_serial(uint64_t console_id){
+    std::lock_guard<std::mutex> lg(m_lock);
+    auto iter = m_consoles.find(console_id);
+    if (iter == m_consoles.end()){
+        std::string error = "reset_serial(" + std::to_string(console_id) + ") - ID not found.";
+        global_logger_tagged().log("SwitchProgramTracker::" + error, "red");
+        return error;
+    }
+    const char* msg = iter->second.first->sender().try_reset();
+    return msg == nullptr ? "Serial connection was reset." : msg;
+}
 std::string ProgramTracker::start_program(uint64_t program_id){
     std::lock_guard<std::mutex> lg(m_lock);
     auto iter = m_programs.find(program_id);

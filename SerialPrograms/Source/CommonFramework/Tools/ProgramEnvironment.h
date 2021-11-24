@@ -14,6 +14,7 @@
 #include <QObject>
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "ClientSource/Connection/BotBase.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "Logger.h"
 #include "StatsTracking.h"
 
@@ -29,13 +30,13 @@ class ProgramEnvironment : public QObject{
 
 public:
     ProgramEnvironment(
-//        std::string program_identifier,
+        ProgramInfo program_info,
         Logger& logger,
         StatsTracker* current_stats,
         const StatsTracker* historical_stats
     );
 
-//    const std::string& program_identifier(){ return m_program_identifier; }
+    const ProgramInfo& program_info() const{ return m_program_info; }
 
     template <class... Args>
     void log(Args&&... args);
@@ -77,7 +78,7 @@ private:
     std::mutex m_lock;
     std::condition_variable m_cv;
 
-//    std::string m_program_identifier;
+    const ProgramInfo m_program_info;
     Logger& m_logger;
 
     AsyncDispatcher m_dispatcher;

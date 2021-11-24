@@ -10,7 +10,7 @@
 #include <chrono>
 #include "CommonFramework/Tools/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
-#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogDetector.h"
+#include "CommonFramework/Inference/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -26,7 +26,10 @@ enum class EncounterState{
 
 class ShinyDialogTracker{
 public:
-    ShinyDialogTracker(VideoOverlay& overlay, Logger& logger);
+    ShinyDialogTracker(
+        VideoOverlay& overlay, Logger& logger,
+        ScreenDetector& detector
+    );
 
     bool dialog_on() const{ return m_dialog_on; }
     EncounterState encounter_state() const{ return m_state; }
@@ -37,10 +40,11 @@ public:
         const QImage& screen,
         std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now()
     );
+    void push_end(std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now());
 
 private:
     Logger& m_logger;
-    BattleDialogDetector m_dialog;
+    ScreenDetector& m_detector;
     std::chrono::system_clock::time_point m_end_dialog;
     bool m_dialog_on;
 

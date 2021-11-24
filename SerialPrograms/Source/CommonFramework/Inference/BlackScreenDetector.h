@@ -20,13 +20,12 @@ namespace PokemonAutomation{
 
 class BlackScreenDetector : public VisualInferenceCallback{
 public:
-    BlackScreenDetector();
-    BlackScreenDetector(const ImageFloatBox& box);
+    BlackScreenDetector(const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8});
 
     virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
-   ) override;
+    ) override;
 
 private:
     ImageFloatBox m_box;
@@ -35,8 +34,7 @@ private:
 
 class BlackScreenOverDetector : public VisualInferenceCallback{
 public:
-    BlackScreenOverDetector();
-    BlackScreenOverDetector(const ImageFloatBox& box);
+    BlackScreenOverDetector(const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8});
 
     bool black_is_over(const QImage& frame);
     virtual bool process_frame(

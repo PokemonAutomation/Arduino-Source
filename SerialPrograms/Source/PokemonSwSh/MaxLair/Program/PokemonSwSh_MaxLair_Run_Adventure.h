@@ -22,12 +22,11 @@ namespace MaxLairInternal{
 enum class AdventureResult{
     FINISHED,
     STOP_PROGRAM,
-    ERROR,
+    START_ERROR,
 };
 
 
 void loop_adventures(
-    const QString& program_name,
     MultiSwitchProgramEnvironment& env,
     const Consoles& consoles,
     size_t host_index, size_t boss_slot,

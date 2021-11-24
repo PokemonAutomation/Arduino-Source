@@ -59,7 +59,14 @@ void RunnableComputerProgramWidget::run_program(){
 
     const std::string& program_identifier = instance.descriptor().identifier();
 
-    ProgramEnvironment env(m_logger, nullptr, nullptr);
+    ProgramEnvironment env(
+        ProgramInfo(
+            program_identifier,
+            instance.descriptor().display_name(),
+            timestamp()
+        ),
+        m_logger, nullptr, nullptr
+    );
     connect(
         this, &RunnableComputerProgramWidget::signal_cancel,
         &env, [&]{

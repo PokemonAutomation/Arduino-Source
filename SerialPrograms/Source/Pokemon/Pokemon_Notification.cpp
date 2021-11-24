@@ -16,73 +16,129 @@ namespace PokemonAutomation{
 namespace Pokemon{
 
 
+QColor shiny_color(ShinyType shiny_type){
+    switch (shiny_type){
+    case ShinyType::UNKNOWN_SHINY:
+    case ShinyType::STAR_SHINY:
+        return 0xffff99;
+    case ShinyType::SQUARE_SHINY:
+        return 0xb266ff;
+    default:
+        return QColor();
+    }
+}
+QString shiny_symbol(ShinyType shiny_type){
+    switch (shiny_type){
+    case ShinyType::UNKNOWN_SHINY:
+    case ShinyType::STAR_SHINY:
+        return QChar(0x2728);
+    case ShinyType::SQUARE_SHINY:
+        return QChar(0x2733);   //  Green square asterisk
+    default:
+        return "";
+    }
+}
+QString slug_set_to_string(const std::set<std::string>& slug_candidates){
+    QString str;
+    if (slug_candidates.empty()){
+        str = "None - Unable to detect.";
+    }else if (slug_candidates.size() == 1){
+        str += get_pokemon_name(*slug_candidates.begin()).display_name();
+    }else{
+        str += "Ambiguous: ";
+        bool first1 = true;
+        for (const std::string& slug : slug_candidates){
+            if (!first1){
+                str += ", ";
+            }
+            first1 = false;
+            str += get_pokemon_name(slug).display_name();
+        }
+    }
+    return str;
+}
+
+
+
 void send_encounter_notification(
     Logger& logger,
     EventNotificationOption& settings_nonshiny,
     EventNotificationOption& settings_shiny,
-    const QString& program,
-    const std::set<std::string>* slugs,
-    const ShinyDetectionResult& result,
+    const ProgramInfo& info,
+    bool enable_names, bool shiny_detected,
+    const std::vector<EncounterResult> results,
+    const QImage& screenshot,
     const StatsTracker* session_stats,
     const EncounterFrequencies* frequencies,
     const StatsTracker* alltime_stats
 ){
-    bool is_shiny = false;
-    QColor color;
-    switch (result.shiny_type){
-    case ShinyType::UNKNOWN_SHINY:
-    case ShinyType::STAR_SHINY:
-        is_shiny = true;
-        color = 0xffff99;
-        break;
-    case ShinyType::SQUARE_SHINY:
-        is_shiny = true;
-        color = 0xb266ff;
-        break;
-    default:;
+    ShinyType max_shiny_type = ShinyType::UNKNOWN;
+    size_t shiny_count = 0;
+
+    QString names;
+
+    bool first = true;
+    for (const EncounterResult& result : results){
+        if (!first){
+            names += "\n";
+        }
+        first = false;
+        QString symbol = shiny_symbol(result.shininess);
+        if (!symbol.isEmpty()){
+            names += symbol + " ";
+        }
+        names += slug_set_to_string(result.slug_candidates);
+        max_shiny_type = max_shiny_type < result.shininess ? result.shininess : max_shiny_type;
+        shiny_count += is_shiny(result.shininess) ? 1 : 0;
+    }
+    QColor color = shiny_color(max_shiny_type);
+    bool has_shiny = is_shiny(max_shiny_type) || shiny_detected;
+
+    QString shinies;
+    if (results.size() == 1){
+        QString symbol = shiny_symbol(results[0].shininess);
+        switch (results[0].shininess){
+        case ShinyType::UNKNOWN:
+            shinies = "Unknown";
+            break;
+        case ShinyType::NOT_SHINY:
+            shinies = "Not Shiny";
+            break;
+        case ShinyType::UNKNOWN_SHINY:
+            shinies = symbol + QString(" Shiny ") + symbol;
+            break;
+        case ShinyType::STAR_SHINY:
+            shinies = symbol + QString(" Star Shiny ") + symbol;
+            break;
+        case ShinyType::SQUARE_SHINY:
+            shinies = symbol + QString(" Square Shiny ") + symbol;
+            break;
+        }
+    }else if (!results.empty()){
+        QString symbol = shiny_symbol(max_shiny_type);
+        switch (shiny_count){
+        case 0:
+            if (shiny_detected){
+                shinies = symbol + " Found Shiny! " + symbol + "(Unable to determine which.)";
+            }else{
+                shinies = "No Shinies";
+            }
+            break;
+        case 1:
+            shinies = symbol + " Found Shiny! " + symbol;
+            break;
+        default:
+            shinies += symbol + QString(" Multiple Shinies! ") + symbol;
+            break;
+        }
     }
 
     std::vector<std::pair<QString, QString>> embeds;
-
-    if (slugs){
-        QString str;
-        if (slugs->empty()){
-            str = "None - Unable to detect.";
-        }else if (slugs->size() == 1){
-            str += get_pokemon_name(*slugs->begin()).display_name();
-        }else{
-            str += "Ambiguous: ";
-            bool first = true;
-            for (const std::string& slug : *slugs){
-                if (!first){
-                    str += ", ";
-                }
-                first = false;
-                str += get_pokemon_name(slug).display_name();
-            }
-        }
-        embeds.emplace_back("Species", std::move(str));
+    if (enable_names && !names.isEmpty()){
+        embeds.emplace_back("Species", std::move(names));
     }
-    {
-        QString str;
-        switch (result.shiny_type){
-        case ShinyType::UNKNOWN:
-            str = "Unknown";
-            break;
-        case ShinyType::NOT_SHINY:
-            str = "Not Shiny";
-            break;
-        case ShinyType::UNKNOWN_SHINY:
-            str = QChar(0x2728) + QString(" Shiny ") + QChar(0x2728);
-            break;
-        case ShinyType::STAR_SHINY:
-            str = QChar(0x2728) + QString(" Star Shiny ") + QChar(0x2728);
-            break;
-        case ShinyType::SQUARE_SHINY:
-            str = QChar(0x2728) + QString(" Square Shiny ") + QChar(0x2728);
-            break;
-        }
-        embeds.emplace_back("Shininess", std::move(str));
+    if (!shinies.isEmpty()){
+        embeds.emplace_back("Shininess", std::move(shinies));
     }
     {
         QString session_stats_str;
@@ -105,18 +161,18 @@ void send_encounter_notification(
         embeds.emplace_back("All Time Stats", QString::fromStdString(alltime_stats->to_str()));
     }
 
-    if (is_shiny){
+    if (has_shiny){
         send_program_notification(
             logger, settings_shiny,
-            color, program,
+            color, info,
             "Encounter Notification",
             embeds,
-            result.best_screenshot, true
+            screenshot, true
         );
     }else{
         send_program_notification(
             logger, settings_nonshiny,
-            color, program,
+            color, info,
             "Encounter Notification",
             embeds
         );
@@ -129,7 +185,7 @@ void send_catch_notification(
     Logger& logger,
     EventNotificationOption& settings_catch_success,
     EventNotificationOption& settings_catch_failed,
-    const QString& program,
+    const ProgramInfo& info,
     const std::set<std::string>* pokemon_slugs,
     const std::string& ball_slug, int balls_used,
     bool success
@@ -176,16 +232,14 @@ void send_catch_notification(
     if (success){
         send_program_notification(
             logger, settings_catch_success,
-            color,
-            program,
+            color, info,
             STRING_POKEMON + " Caught",
             embeds
         );
     }else{
         send_program_notification(
             logger, settings_catch_failed,
-            color,
-            program,
+            color, info,
             "Catch Failed",
             embeds
         );

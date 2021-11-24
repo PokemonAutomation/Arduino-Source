@@ -29,7 +29,6 @@ private:
     QWidget* make_ping_box(QWidget& parent);
     QWidget* make_tags_box(QWidget& parent);
     QWidget* make_commands_box(QWidget& parent);
-    QWidget* make_logs_box(QWidget& parent);
     QWidget* make_channel_box(QWidget& parent);
 
 public:
@@ -38,7 +37,6 @@ public:
     bool ping;
     std::vector<QString> tags;
     bool allow_commands;
-    bool allow_logging;
     QString channel_id;
 };
 
@@ -59,10 +57,6 @@ public:
     const DiscordIntegrationChannel& operator[](size_t index) const;
 
     std::vector<QString> command_channels() const;
-    std::vector<QString> logging_channels() const;
-
-    //  Temporary until tags are implemented.
-    std::vector<QString> echo_channels() const;
 };
 
 

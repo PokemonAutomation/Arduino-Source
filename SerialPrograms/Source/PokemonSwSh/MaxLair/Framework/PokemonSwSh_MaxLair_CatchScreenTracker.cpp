@@ -84,7 +84,7 @@ void CaughtPokemonScreen::leave_summary(){
         break;
     default:
         m_console.log("Failed to detect caught menu.", Qt::red);
-        dump_image(m_console, MODULE_NAME, "CaughtMenu", m_console.video().snapshot());
+        dump_image(m_console, m_env.program_info(), "CaughtMenu", m_console.video().snapshot());
         PA_THROW_StringException("Failed to detect caught menu.");
     }
 
@@ -112,7 +112,7 @@ void CaughtPokemonScreen::process_detection(Detection detection){
     CaughtPokemon& mon = m_mons[m_current_position];
     switch (detection){
     case SummaryShinySymbolDetector::Detection::NO_DETECTION:
-        dump_image(m_console, MODULE_NAME, "SummaryScreen", m_console.video().snapshot());
+        dump_image(m_console, m_env.program_info(), "SummaryScreen", m_console.video().snapshot());
         PA_THROW_StringException("Failed to detect summary screen.");
     case SummaryShinySymbolDetector::Detection::NOT_SHINY:
         if (!mon.read){
@@ -120,7 +120,7 @@ void CaughtPokemonScreen::process_detection(Detection detection){
             mon.shiny = false;
             mon.read = true;
         }else if (mon.shiny){
-            dump_image(m_console, MODULE_NAME, "InconsistentShiny", m_console.video().snapshot());
+            dump_image(m_console, m_env.program_info(), "InconsistentShiny", m_console.video().snapshot());
             PA_THROW_StringException("Fatal Inconsistency: Expected to see a non-shiny.");
         }
         break;
@@ -130,7 +130,7 @@ void CaughtPokemonScreen::process_detection(Detection detection){
             mon.shiny = true;
             mon.read = true;
         }else if (!mon.shiny){
-            dump_image(m_console, MODULE_NAME, "InconsistentShiny", m_console.video().snapshot());
+            dump_image(m_console, m_env.program_info(), "InconsistentShiny", m_console.video().snapshot());
             PA_THROW_StringException("Fatal Inconsistency: Expected to see a shiny.");
         }
         break;

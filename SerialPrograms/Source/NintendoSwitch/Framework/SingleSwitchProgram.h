@@ -24,14 +24,13 @@ private:
     friend class SingleSwitchProgramWidget;
     template <class... Args>
     SingleSwitchProgramEnvironment(
-//        std::string program_identifier,
+        ProgramInfo program_info,
         Logger& logger,
         StatsTracker* current_stats,
         const StatsTracker* historical_stats,
         Args&&... args
     )
-//        : ProgramEnvironment(std::move(program_identifier), logger, current_stats, historical_stats)
-        : ProgramEnvironment(logger, current_stats, historical_stats)
+        : ProgramEnvironment(std::move(program_info), logger, current_stats, historical_stats)
         , console(0, std::forward<Args>(args)...)
     {}
 };

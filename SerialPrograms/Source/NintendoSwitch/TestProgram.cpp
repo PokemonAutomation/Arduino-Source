@@ -22,13 +22,16 @@
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CommonFramework/Inference/TimeWindowStatTracker.h"
 #include "CommonFramework/Inference/VisualInferenceSession.h"
+#include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "CommonFramework/Inference/FrozenImageDetector.h"
+#include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageMatch/FilterToAlpha.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/ImageMatch/ImageCropper.h"
 #include "CommonFramework/ImageTools/CommonFilters.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
+#include "CommonFramework/ImageTools/FillGeometry.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "CommonFramework/OCR/OCR_Filtering.h"
 #include "CommonFramework/OCR/OCR_StringNormalization.h"
@@ -38,6 +41,7 @@
 #include "CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
@@ -62,7 +66,6 @@
 #include "PokemonSwSh/Inference/PokemonSwSh_ReceivePokemonDetector.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_PokemonSpriteReader.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h"
-#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogDetector.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_DenMonReader.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_ExperienceGainDetector.h"
@@ -105,6 +108,19 @@
 //#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h"
 #include "Integrations/DiscordWebHook.h"
 #include "Pokemon/Pokemon_Notification.h"
+#include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
+#include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyDialogTracker.h"
+#include "PokemonBDSP/PokemonBDSP_Settings.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
+#include "CommonFramework/ImageTools/ColorClustering.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_ShinyEncounterDetector.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_ShinyTrigger.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_MarkFinder.h"
+#include "PokemonBDSP/Programs/PokemonBDSP_GameEntry.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_BattleBallReader.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_BattleMenuDetector.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_VSSeekerReaction.h"
 #include "TestProgram.h"
 
 #include <immintrin.h>
@@ -124,20 +140,6 @@ using std::cout;
 using std::endl;
 
 
-namespace PokemonAutomation{
-namespace NintendoSwitch{
-namespace PokemonSwSh{
-namespace MaxLairInternal{
-
-
-double relative_damage(const MaxLairMon& you, const MaxLairMon& opponent, uint8_t move_slot, bool dmax);
-
-
-}
-}
-}
-}
-
 
 
 
@@ -146,22 +148,23 @@ namespace NintendoSwitch{
 
 
 TestProgram_Descriptor::TestProgram_Descriptor()
-    : RunnableSwitchProgramDescriptor(
+    : MultiSwitchProgramDescriptor(
         "NintendoSwitch:TestProgram",
         "Test Program",
         "",
         "Test Program",
         FeedbackType::REQUIRED,
-        PABotBaseLevel::PABOTBASE_12KB
+        PABotBaseLevel::PABOTBASE_12KB,
+        1, 4, 1
     )
 {}
 
 
 TestProgram::TestProgram(const TestProgram_Descriptor& descriptor)
-    : SingleSwitchProgramInstance(descriptor)
+    : MultiSwitchProgramInstance(descriptor)
     , LANGUAGE(
         "<b>OCR Language:</b>",
-        m_iv_checker_reader.languages()
+        { Language::English }
     )
 //    , TABLE({
 //        {"Description", {true, true, false, ImageAttachmentMode::JPG, {"Notifs", "Showcase"}, std::chrono::seconds(60)}},
@@ -179,15 +182,443 @@ using namespace Kernels::WaterFill;
 
 
 
-void TestProgram::program(SingleSwitchProgramEnvironment& env){
+
+
+
+void TestProgram::program(MultiSwitchProgramEnvironment& env){
     using namespace OCR;
     using namespace Pokemon;
-    using namespace PokemonSwSh::MaxLairInternal;
-    using namespace papkmnlib;
+    using namespace PokemonBDSP;
 
-    BotBase& botbase = env.console;
-    VideoFeed& feed = env.console;
-    VideoOverlay& overlay = env.console;
+    Logger& logger = env.logger();
+    ConsoleHandle& console = env.consoles[0];
+    BotBase& botbase = env.consoles[0];
+    VideoFeed& feed = env.consoles[0];
+    VideoOverlay& overlay = env.consoles[0];
+
+
+
+
+//    pbf_move_left_joystick(console, 0, 128, 55, 0);
+//    pbf_move_left_joystick(console, 128, 255, 10, 0);
+
+//    pbf_move_left_joystick(console, 0, 128, 55, 0);
+//    pbf_move_left_joystick(console, 128, 255, 10, 0);
+
+
+    pbf_press_dpad(console, DPAD_UP, 85, 0);
+    for (size_t c = 0; c < 8; c++){
+        pbf_move_left_joystick(console, 255, 128, 140, 0);
+        pbf_move_left_joystick(console, 0, 128, 140, 0);
+    }
+    pbf_press_dpad(console, DPAD_DOWN, 85, 0);
+    pbf_press_dpad(console, DPAD_RIGHT, 10, 0);
+
+
+#if 0
+    pbf_move_left_joystick(console, 128, 255, 6 * TICKS_PER_SECOND, 0);
+    pbf_move_left_joystick(console, 255, 128, 60, 0);
+    pbf_move_left_joystick(console, 128, 0, 200, 0);
+    pbf_move_left_joystick(console, 255, 128, 750, 0);
+    pbf_move_left_joystick(console, 128, 255, 30, 0);
+    pbf_move_left_joystick(console,   0, 128, 30, 0);
+    pbf_move_left_joystick(console, 128, 255, 80, 0);
+    pbf_move_left_joystick(console, 255, 128, 110, 0);
+    pbf_move_left_joystick(console, 128, 255, 125, 0);
+    pbf_move_left_joystick(console, 255, 128, 105, 0);
+    pbf_move_left_joystick(console, 128,   0, 375, 0);
+    pbf_move_left_joystick(console, 255, 128, 300, 0);
+    pbf_move_left_joystick(console, 128, 255, 375, 0);
+    pbf_move_left_joystick(console,   0, 128, 250, 0);
+#endif
+
+
+#if 0
+    pbf_press_button(console, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+    pbf_press_button(console, BUTTON_A, 10, 240);
+    pbf_press_dpad(console, DPAD_UP, 10, 40);
+    pbf_press_dpad(console, DPAD_UP, 10, 40);
+    pbf_mash_button(console, BUTTON_A, 12 * TICKS_PER_SECOND);
+    pbf_move_left_joystick(console, 125, 0, 6 * TICKS_PER_SECOND, 0);
+    pbf_mash_button(console, BUTTON_A, 3 * TICKS_PER_SECOND);
+    pbf_mash_button(console, BUTTON_B, 10 * TICKS_PER_SECOND);
+    pbf_move_left_joystick(console, 125, 255, 8 * TICKS_PER_SECOND, 0);
+    pbf_move_left_joystick(console, 255, 128, 380, 0);
+    pbf_move_left_joystick(console, 128, 255, 300, 0);
+    pbf_move_left_joystick(console,   0, 128, 600, 0);
+    pbf_move_left_joystick(console, 255, 128,  70, 0);
+    pbf_move_left_joystick(console, 128, 255, 1375, 0);
+    pbf_move_left_joystick(console, 255, 128, 125, 0);
+    pbf_move_left_joystick(console, 128, 255, 200, 0);
+    pbf_move_left_joystick(console,   0, 128, 200, 0);
+    pbf_move_left_joystick(console, 128, 255,  50, 0);
+    pbf_move_left_joystick(console,   0, 128, 125, 0);
+    pbf_move_left_joystick(console, 128, 255, 125, 0);
+    pbf_move_left_joystick(console, 255, 128, 250, 0);
+    pbf_move_left_joystick(console, 128, 255, 200, 0);
+    pbf_move_left_joystick(console,   0, 128,  90, 0);
+    pbf_move_left_joystick(console, 128, 255, 200, 0);
+    pbf_move_left_joystick(console, 255, 128, 125, 0);
+    pbf_move_left_joystick(console, 128, 255, 200, 0);
+#endif
+
+
+#if 0
+    VSSeekerReactionTracker tracker(overlay, {0.05, 0.30, 0.35, 0.30});
+    AsyncVisualInferenceSession session(env, feed, overlay);
+    session += tracker;
+#endif
+
+#if 0
+    pbf_move_left_joystick(console, 255, 128, 180, 0);
+    for (size_t c = 0; c < 5; c++){
+        pbf_move_left_joystick(console, 0, 128, 180, 0);
+        pbf_move_left_joystick(console, 255, 128, 180, 0);
+    }
+    pbf_press_button(console, BUTTON_PLUS, 10, 125);
+    pbf_press_dpad(console, DPAD_DOWN, 10, 10);
+    console.botbase().wait_for_all_requests();
+
+    VSSeekerReactionTracker tracker(overlay, {0.05, 0.30, 0.35, 0.30});
+//    AsyncVisualInferenceSession session(env, feed, overlay);
+//    session += tracker;
+
+    wait_until(
+        env, console, std::chrono::milliseconds(1000),
+        { &tracker }
+    );
+    std::vector<ImagePixelBox> bubbles = tracker.reactions();
+    if (bubbles.empty()){
+        console.log("No reactions.", "orange");
+    }else{
+        for (const ImagePixelBox& box : bubbles){
+            console.log("Reaction at: " + std::to_string(box.min_x), Qt::blue);
+        }
+    }
+
+
+#endif
+
+
+
+#if 0
+    PokemonSwSh::YCommMenuDetector detector(true);
+//    cout << detector.detect(QImage("20211122-085751796741-connect_to_internet_with_inference.png")) << endl;
+    cout << detector.detect(feed.snapshot()) << endl;
+#endif
+
+
+#if 0
+    BattleMenuDetector detector(false);
+
+    QImage image("20211121-175528380946-BattleMenu.png");
+//    QImage image("20211122-030047793244-BattleMenu.png");
+//    QImage image = feed.snapshot();
+
+    cout << detector.detect(image) << endl;
+#endif
+
+#if 0
+    InferenceBoxScope box(console, 0.50, 0.60, 0.35, 0.20);
+    SelectionArrowFinder finder(overlay, box);
+    finder.detect(feed.snapshot());
+//    AsyncVisualInferenceSession session(env, feed, overlay);
+//    session += finder;
+#endif
+
+
+#if 0
+    QImage image("test-0.png");
+
+    CellMatrix matrix(image);
+    image = image.convertToFormat(QImage::Format::Format_ARGB32);
+
+    BlackFilter filter(100);
+    matrix.apply_filter(image, filter);
+
+    FillGeometry obj;
+    fill_geometry(obj, matrix, 0, 0, 0, false, 2);
+    fill_geometry(obj, matrix, 0, matrix.width() - 1, 0, false, 2);
+    fill_geometry(obj, matrix, 0, 0, matrix.height() - 1, false, 2);
+    fill_geometry(obj, matrix, 0, matrix.width() - 1, matrix.height() - 1, false, 2);
+
+    cout << matrix.dump() << endl;
+
+    for (int r = 0; r < image.height(); r++){
+        for (int c = 0; c < image.width(); c++){
+            if (matrix[r][c] == 2){
+                image.setPixel(c, r, 0);
+            }
+        }
+    }
+    image.save("test.png");
+#endif
+
+
+#if 0
+//    QImage screen = feed.snapshot();
+
+    QImage screen("VSSeekerReactionImage.png");
+
+    InferenceBoxScope box(console, 0.10, 0.40, 0.4, 0.20);
+    QImage image = extract_box(screen, box);
+
+    CellMatrix matrix(image);
+    BlackFilter filter(100);
+    matrix.apply_filter(image, filter);
+
+    std::vector<FillGeometry> objects;
+    objects = find_all_objects(matrix, 1, false);
+
+    size_t c = 0;
+    for (const FillGeometry& object : objects){
+        cout << "asdf" << endl;
+        image.copy(
+            object.box.min_x, object.box.min_y, object.box.width(), object.box.height()
+        ).save("test-" + QString::number(c++) + ".png");
+    }
+#endif
+
+
+#if 0
+    BattleBallReader reader(console, Language::English);
+    cout << reader.read_ball(screen) << endl;
+    cout << reader.read_quantity(screen) << endl;
+#endif
+
+#if 0
+    PokemonBallMatcher matcher;
+
+    InferenceBoxScope m_box_sprite(console, 0.617, 0.650, 0.0335, 0.060);
+    InferenceBoxScope m_box_name(console, 0.650, 0.650, 0.22, 0.060);
+    InferenceBoxScope m_box_quantity(console, 0.880, 0.650, 0.070, 0.060);
+
+
+    QImage image = extract_box(feed.snapshot(), m_box_sprite);
+    matcher.match(image, 0.03).log(logger, 0.30);
+#endif
+
+
+#if 0
+    const QImage& sprite = PokemonSwSh::get_pokeball_sprite("luxury-ball").sprite();
+    sprite.save("sprite.png");
+    image = image.scaled(sprite.size());
+    image.save("temp.png");
+#endif
+
+
+
+
+#if 0
+    InferenceBoxScope left_mon_white(console, {0.685, 0.065, 0.025, 0.040});
+    InferenceBoxScope left_mon_hp(console, {0.500, 0.120, 0.18, 0.005});
+
+
+    QImage screen = console.video().snapshot();
+
+    //  Check if it's a double battle.
+    do{
+//        if (!is_white(extract_box(screen, left_mon_white))){
+//            break;
+//        }
+        ImageStats stats_hp = image_stats(extract_box(screen, left_mon_hp));
+        cout << stats_hp.average << stats_hp.stddev << endl;
+        if (!is_solid(stats_hp, {0.27731, 0.461346, 0.261344}, 0.1, 50)){
+            cout << "failed" << endl;
+            break;
+        }
+    }while (false);
+#endif
+
+//    ShortDialogDetector detector(overlay);
+
+
+
+
+#if 0
+    DoublesShinyDetection result = detect_shiny_battle(
+        console,
+        env, console, console,
+        YOUR_POKEMON,
+        std::chrono::seconds(30)
+    );
+#endif
+
+#if 0
+    PokemonSwSh::reset_game_from_home_with_inference(
+        env, console,
+        ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
+    );
+    console.botbase().wait_for_all_requests();
+#endif
+
+#if 0
+    openedgame_to_ingame(
+        env, console,
+        GameSettings::instance().START_GAME_WAIT,
+        GameSettings::instance().ENTER_GAME_MASH,
+        GameSettings::instance().ENTER_GAME_WAIT,
+        TICKS_PER_SECOND
+    );
+#endif
+
+//    InferenceBoxScope box0(overlay, 0.2, 0.2, 0.6, 0.1);
+//    InferenceBoxScope box1(overlay, 0.2, 0.7, 0.6, 0.1);
+
+
+#if 0
+    detect_shiny_battle(
+        env.consoles[0],
+        env, feed, overlay,
+        std::chrono::seconds(30)
+    );
+#endif
+
+#if 0
+    InferenceBoxScope box0(overlay, {0.467, 0.06, 0.16, 0.050});
+    InferenceBoxScope box1(overlay, {0.740, 0.06, 0.16, 0.050});
+    InferenceBoxScope box2(overlay, {0.685, 0.065, 0.025, 0.040});
+
+//    extract_box(feed.snapshot(), box).save("test.png");
+#endif
+
+
+
+
+
+#if 0
+    MarkTracker tracker(overlay, {0, 0, 1, 1});
+    AsyncVisualInferenceSession session(env, feed, overlay);
+    session += tracker;
+#endif
+
+
+//    std::vector<ImagePixelBox> exclamation_marks;
+//    find_exclamation_marks(feed.snapshot(), exclamation_marks);
+
+
+#if 0
+    QImage image("mark1.png");
+    image = image.convertToFormat(QImage::Format::Format_ARGB32);
+
+
+    CellMatrix matrix(image);
+    BlackFilter filter(100);
+    matrix.apply_filter(image, filter);
+
+    FillGeometry obj;
+    fill_geometry(obj, matrix, 0, 0, 0, false, 2);
+    fill_geometry(obj, matrix, 0, matrix.width() - 1, 0, false, 2);
+    fill_geometry(obj, matrix, 0, 0, matrix.height() - 1, false, 2);
+    fill_geometry(obj, matrix, 0, matrix.width() - 1, matrix.height() - 1, false, 2);
+
+    cout << matrix.dump() << endl;
+
+    for (int r = 0; r < image.height(); r++){
+        for (int c = 0; c < image.width(); c++){
+            if (matrix[r][c] == 2){
+                image.setPixel(c, r, 0);
+            }
+        }
+    }
+    image.save("test.png");
+#endif
+
+
+#if 0
+//    QImage screen = feed.snapshot();
+//    QImage image = extract_box(screen, ImageFloatBox(0.5, 0.4, 0.2, 0.2));
+//    image.save("box.png");
+    QImage image("image0.png");
+
+    CellMatrix matrix(image);
+
+    WhiteFilter filter(200);
+    matrix.apply_filter(image, filter);
+
+    std::vector<FillGeometry> objects;
+    objects = find_all_objects(matrix, 1, false);
+
+    size_t c = 0;
+    for (const FillGeometry& object : objects){
+        cout << "asdf" << endl;
+        image.copy(
+            object.box.min_x, object.box.min_y, object.box.width(), object.box.height()
+        ).save("test-" + QString::number(c++) + ".png");
+    }
+#endif
+
+
+#if 0
+    std::deque<InferenceBoxScope> overlays;
+
+    QImage screen = feed.snapshot();
+
+    ShinyImageDetection detector;
+    detector.accumulate(screen, 0, &logger);
+    detector.add_overlays(overlays, overlay, screen, {0, 0, 1, 1});
+#endif
+
+#if 0
+#if 1
+    auto result = detect_shiny_battle(logger, env, feed, overlay, std::chrono::seconds(30));
+    result.best_screenshot.save("image.png");
+#else
+    PokemonSwSh::detect_shiny_battle(
+        logger, env, feed, overlay,
+        PokemonSwSh::SHINY_BATTLE_REGULAR, std::chrono::seconds(30)
+    );
+#endif
+#endif
+
+#if 0
+    std::deque<InferenceBoxScope> boxes;
+    StandardBattleMenuDetector detector;
+    detector.make_overlays(boxes, overlay);
+
+    cout << detector.detect(feed.snapshot()) << endl;
+#endif
+
+
+#if 0
+    BattleDialogDetector dialog(overlay);
+    PokemonSwSh::ShinyDialogTracker dialog_tracker(overlay, logger, dialog);
+    PokemonSwSh::ShinySparkleDetector sparkle_detector(logger, overlay, {0.5, 0.05, 0.5, 0.70});
+
+    AsyncVisualInferenceSession session(env, feed, overlay);
+    session += [&](const QImage& screen){
+        dialog_tracker.push_frame(screen);
+        return false;
+    };
+    session += sparkle_detector;
+#endif
+
+
+
+
+#if 0
+    BattleDialogDetector detector(overlay);
+    cout << detector.detect(feed.snapshot()) << endl;
+#endif
+
+
+
+
+#if 0
+    RaidCatchDetector detector(overlay);
+    std::deque<InferenceBoxScope> boxes;
+    detector.make_overlays(boxes, overlay);
+#endif
+
+
+
+
+
+
+
+
+//    InferenceBoxScope box0(env.consoles[0], 0, 0, 1, 1);
+//    InferenceBoxScope box1(env.consoles[1], 0, 0, 1, 1);
 
 
 #if 0
@@ -1116,7 +1547,7 @@ void TestProgram::program(SingleSwitchProgramEnvironment& env){
 
 
 #if 0
-    PokemonSwapMenuDetector detector(false);
+    PokemonSwSh::MaxLairInternal::PokemonSwapMenuDetector detector(false);
     std::deque<InferenceBoxScope> boxes;
     detector.make_overlays(boxes, overlay);
 
@@ -1423,7 +1854,7 @@ void maxlair_make_mapping_json(){
 
             QJsonArray ocr;
             {
-                auto* data = get_pokemon_name_nothrow(slug);
+                auto* data = PokemonSwSh::get_pokemon_name_nothrow(slug);
                 if (data != nullptr){
                     ocr.append(iter.key());
                 }else{
@@ -1433,7 +1864,7 @@ void maxlair_make_mapping_json(){
 
             QJsonArray sprite;
             {
-                auto* data = get_pokemon_sprite_nothrow(slug);
+                auto* data = PokemonSwSh::get_pokemon_sprite_nothrow(slug);
                 if (data != nullptr){
                     sprite.append(iter.key());
                 }else{
@@ -1457,7 +1888,7 @@ void maxlair_make_mapping_json(){
 
             QJsonArray ocr;
             {
-                auto* data = get_pokemon_name_nothrow(slug);
+                auto* data = PokemonSwSh::get_pokemon_name_nothrow(slug);
                 if (data != nullptr){
                     ocr.append(iter.key());
                 }else{
@@ -1467,7 +1898,7 @@ void maxlair_make_mapping_json(){
 
             QJsonArray sprite;
             {
-                auto* data = get_pokemon_sprite_nothrow(slug);
+                auto* data = PokemonSwSh::get_pokemon_sprite_nothrow(slug);
                 if (data != nullptr){
                     sprite.append(iter.key());
                 }else{

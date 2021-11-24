@@ -191,7 +191,6 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env){
             const MultiHostSlot& fr_game = GAME_LIST[FR_index];
             run_autohost(
                 env, env.console,
-                descriptor().display_name(),
                 game.always_catchable
                     ? Catchability::ALWAYS_CATCHABLE
                     : Catchability::MAYBE_UNCATCHABLE,

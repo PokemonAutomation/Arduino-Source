@@ -91,7 +91,6 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env){
     env.update_stats();
 
     StandardEncounterHandler handler(
-        m_descriptor.display_name(),
         env, env.console,
         LANGUAGE,
         ENCOUNTER_BOT_OPTIONS,
@@ -170,7 +169,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env){
 
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        descriptor().display_name(),
+        env.program_info(),
         "",
         stats.to_str()
     );

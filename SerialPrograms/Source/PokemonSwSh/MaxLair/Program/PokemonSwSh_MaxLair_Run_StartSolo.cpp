@@ -162,7 +162,6 @@ bool start_raid_host_solo(
     GlobalStateTracker& state_tracker,
     QImage& entrance, size_t boss_slot,
     HostingSettings& settings,
-    const QString& program_name,
     const PathStats& path_stats,
     const StatsTracker& session_stats,
     ReadableQuantity999& ore
@@ -195,7 +194,7 @@ bool start_raid_host_solo(
     }
 
     send_raid_notification(
-        program_name,
+        env.program_info(),
         console,
         settings.NOTIFICATIONS,
         has_code, code,

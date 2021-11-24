@@ -1,4 +1,4 @@
-/*  Encounter Tracker
+/*  Encounter Detection
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -68,7 +68,7 @@ const std::set<std::string>* StandardEncounterDetection::candidates(){
     OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(m_console, m_language, frame);
     if (result.results.empty()){
         dump_image(
-            m_console, "",
+            m_console, m_env.program_info(),
             QString::fromStdString("StandardEncounterDetection-NameOCR-" + language_data(m_language).code),
             screen
         );

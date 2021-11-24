@@ -16,14 +16,13 @@ namespace NintendoSwitch{
 
 
 MultiSwitchProgramEnvironment::MultiSwitchProgramEnvironment(
-//    std::string program_identifier,
+    ProgramInfo program_info,
     Logger& logger,
     StatsTracker* current_stats,
     const StatsTracker* historical_stats,
     FixedLimitVector<ConsoleHandle> p_switches
 )
-//    : ProgramEnvironment(std::move(program_identifier), logger, current_stats, historical_stats)
-    : ProgramEnvironment(logger, current_stats, historical_stats)
+    : ProgramEnvironment(std::move(program_info), logger, current_stats, historical_stats)
     , consoles(std::move(p_switches))
 {}
 
@@ -130,6 +129,11 @@ void MultiSwitchProgramWidget::run_program(
         );
     }
     MultiSwitchProgramEnvironment env(
+        ProgramInfo(
+            instance.descriptor().identifier(),
+            instance.descriptor().display_name(),
+            timestamp()
+        ),
         m_logger,
         current_stats, historical_stats,
         std::move(switches)
@@ -149,8 +153,12 @@ void MultiSwitchProgramWidget::run_program(
         }
     );
 
-    instance.program(env);
-    env.update_stats();
+    try{
+        instance.program(env);
+    }catch (...){
+        env.update_stats();
+        throw;
+    }
 }
 
 

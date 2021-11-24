@@ -22,6 +22,9 @@ void pai_run_command                (DllSafeString& error, const char* commands)
 void pai_status                     (DllSafeString& description);
 void pai_screenshot                 (DllSafeString& error, uint64_t console_id, const char* path);
 
+void pai_reset_camera               (DllSafeString& error, uint64_t console_id);
+void pai_reset_serial               (DllSafeString& error, uint64_t console_id);
+
 void pai_start_program              (DllSafeString& error, uint64_t program_id);
 void pai_stop_program               (DllSafeString& error, uint64_t program_id);
 
@@ -43,6 +46,16 @@ inline std::string status(){
 inline std::string screenshot(uint64_t console_id, const char* path){
     DllSafeString error;
     pai_screenshot(error, console_id, path);
+    return error;
+}
+inline std::string reset_camera(uint64_t console_id){
+    DllSafeString error;
+    pai_reset_camera(error, console_id);
+    return error;
+}
+inline std::string reset_serial(uint64_t console_id){
+    DllSafeString error;
+    pai_reset_serial(error, console_id);
     return error;
 }
 inline std::string start_program(uint64_t program_id){

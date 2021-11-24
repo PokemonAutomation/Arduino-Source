@@ -5,7 +5,6 @@
  */
 
 #include "Common/Compiler.h"
-#include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/CellMatrix.h"

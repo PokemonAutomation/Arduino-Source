@@ -20,10 +20,22 @@ enum class ShinyType{
     STAR_SHINY,
     SQUARE_SHINY,
 };
+inline bool is_shiny(ShinyType type){
+    switch (type){
+    case ShinyType::UNKNOWN:
+    case ShinyType::NOT_SHINY:
+        return false;
+    case ShinyType::UNKNOWN_SHINY:
+    case ShinyType::STAR_SHINY:
+    case ShinyType::SQUARE_SHINY:
+        return true;
+    }
+    return false;
+}
 
 
 struct ShinyDetectionResult{
-    ShinyType shiny_type;
+    ShinyType shiny_type = ShinyType::UNKNOWN;
     QImage best_screenshot;
 };
 

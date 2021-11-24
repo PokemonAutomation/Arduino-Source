@@ -39,7 +39,9 @@ public:
     );
 
     ShinyType shiny_type() const;
-    const QImage& best() const{ return m_best; }
+    EncounterState encounter_state() const{ return m_dialog_tracker.encounter_state(); }
+
+    const QImage& best_screenshot() const{ return m_best; }
 
     ShinyDetectionResult results(){
         ShinyDetectionResult result;
@@ -65,8 +67,8 @@ private:
     std::chrono::milliseconds m_max_delay;
 
     double m_detection_threshold;
-    StandardBattleMenuDetector m_menu;
 
+    BattleDialogDetector m_dialog_detector;
     ShinyDialogTracker m_dialog_tracker;
 
     std::deque<InferenceBoxScope> m_detection_overlays;
@@ -93,8 +95,8 @@ ShinyEncounterDetector::ShinyEncounterDetector(
     , m_min_delay(battle_settings.dialog_delay_when_shiny - std::chrono::milliseconds(300))
     , m_max_delay(battle_settings.dialog_delay_when_shiny + std::chrono::milliseconds(500))
     , m_detection_threshold(detection_threshold)
-    , m_menu(battle_settings.den)
-    , m_dialog_tracker(overlay, logger)
+    , m_dialog_detector(overlay)
+    , m_dialog_tracker(overlay, logger, m_dialog_detector)
     , m_best_type_alpha(0)
 {}
 
@@ -248,7 +250,7 @@ ShinyDetectionResult detect_shiny_battle(
 
         if (throttler.end_iteration(env)){
             no_detection = true;
-            dump_image(logger, "", "BattleMenu", screen);
+            dump_image(logger, env.program_info(), "BattleMenu", screen);
             break;
         }
         auto time4 = std::chrono::system_clock::now();

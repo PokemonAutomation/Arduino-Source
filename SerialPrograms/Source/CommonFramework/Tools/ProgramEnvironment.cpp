@@ -11,14 +11,14 @@ namespace PokemonAutomation{
 
 
 ProgramEnvironment::ProgramEnvironment(
-//    std::string program_identifier,
+    ProgramInfo program_info,
     Logger& logger,
     StatsTracker* current_stats,
     const StatsTracker* historical_stats
 )
     : m_enable_feedback(true)
     , m_stopping(false)
-//    , m_program_identifier(program_identifier)
+    , m_program_info(std::move(program_info))
     , m_logger(logger)
     , m_current_stats(current_stats)
     , m_historical_stats(historical_stats)

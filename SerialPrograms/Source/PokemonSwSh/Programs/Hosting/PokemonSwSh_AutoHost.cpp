@@ -47,7 +47,7 @@ bool connect_to_internet(
 }
 
 void send_raid_notification(
-    const QString& program_name,
+    const ProgramInfo& info,
     ConsoleHandle& console,
     AutoHostNotificationOption& settings,
     bool has_code, uint8_t code[8],
@@ -121,7 +121,7 @@ void send_raid_notification(
     send_program_notification(
         console, settings.NOTIFICATION,
         QColor(),
-        program_name,
+        info,
         "Raid Notification",
         embeds,
         screenshot, false
@@ -132,7 +132,6 @@ void send_raid_notification(
 
 void run_autohost(
     ProgramEnvironment& env, ConsoleHandle& console,
-    const QString& program_name,
     Catchability catchability, uint8_t skips,
     const RandomCodeOption* raid_code, uint16_t lobby_wait_delay,
     bool host_online, uint8_t accept_FR_slot,
@@ -202,7 +201,7 @@ void run_autohost(
 
         screen = console.video().snapshot();
         send_raid_notification(
-            program_name,
+            env.program_info(),
             console,
             notifications,
             has_code, code,

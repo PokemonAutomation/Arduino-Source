@@ -85,7 +85,6 @@ public:
     virtual BotBaseHandle& sender() override;
 
 private:
-    virtual void resizeEvent(QResizeEvent* event) override;
     virtual void keyPressEvent(QKeyEvent* event) override;
     virtual void keyReleaseEvent(QKeyEvent* event) override;
     virtual void focusInEvent(QFocusEvent* event) override;
@@ -99,6 +98,7 @@ private:
     SerialSelectorUI* m_serial;
     CommandRow* m_command;
     CameraSelectorUI* m_camera;
+    VideoDisplayWidget* m_video_display;
 };
 
 

@@ -10,6 +10,7 @@
 #include "CommonFramework/Options/RandomCodeOption.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
+#include "PokemonSwSh/Options/PokemonSwSh_Catchability.h"
 #include "PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_DenMonReader.h"
 
@@ -27,7 +28,7 @@ bool connect_to_internet(
 
 void send_raid_notification(
     const QString& program_name,
-    ConsoleHandle& console,
+    const ProgramInfo& info,
     AutoHostNotificationOption& settings,
     bool has_code, uint8_t code[8],
     const DenMonReader& reader,
@@ -37,7 +38,6 @@ void send_raid_notification(
 
 void run_autohost(
     ProgramEnvironment& env, ConsoleHandle& console,
-    const QString& program_name,
     Catchability catchability, uint8_t skips,
     const RandomCodeOption* raid_code, uint16_t lobby_wait_delay,
     bool host_online, uint8_t accept_FR_slot,

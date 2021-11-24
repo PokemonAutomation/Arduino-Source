@@ -16,14 +16,12 @@ namespace PokemonAutomation{
 
 class VideoWidget : public QWidget{
 public:
-    VideoWidget(QWidget& parent)
-        : QWidget(&parent)
-    {}
+    using QWidget::QWidget;
     virtual ~VideoWidget() = default;
 
     //  These will be called from the UI thread.
-    virtual QSize resolution() = 0;
-    virtual std::vector<QSize> resolutions() = 0;
+    virtual QSize resolution() const = 0;
+    virtual std::vector<QSize> resolutions() const = 0;
     virtual void set_resolution(const QSize& size) = 0;
 
     //  This snapshot function will be called asynchronously from any thread

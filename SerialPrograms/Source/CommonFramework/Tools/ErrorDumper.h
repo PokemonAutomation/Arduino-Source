@@ -9,13 +9,14 @@
 
 #include <QImage>
 #include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 
 namespace PokemonAutomation{
 
 
 QString dump_image(
     Logger& logger,
-    const QString& module, const QString& label,
+    const ProgramInfo& program_info, const QString& label,
     const QImage& image
 );
 

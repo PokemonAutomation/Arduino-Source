@@ -17,9 +17,12 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-ShinyDialogTracker::ShinyDialogTracker(VideoOverlay& overlay, Logger& logger)
+ShinyDialogTracker::ShinyDialogTracker(
+    VideoOverlay& overlay, Logger& logger,
+    ScreenDetector& detector
+)
     : m_logger(logger)
-    , m_dialog(overlay)
+    , m_detector(detector)
     , m_end_dialog(std::chrono::system_clock::now())
     , m_dialog_on(false)
     , m_state(EncounterState::BEFORE_ANYTHING)
@@ -29,7 +32,8 @@ ShinyDialogTracker::ShinyDialogTracker(VideoOverlay& overlay, Logger& logger)
 
 
 void ShinyDialogTracker::push_frame(const QImage& screen, std::chrono::system_clock::time_point timestamp){
-    bool dialog_on = m_dialog.detect(screen);
+    bool dialog_on = m_detector.detect(screen);
+//    cout << dialog_on << endl;
     if (dialog_on == m_dialog_on){
         return;
     }
@@ -65,6 +69,26 @@ void ShinyDialogTracker::push_frame(const QImage& screen, std::chrono::system_cl
         break;
     case EncounterState::POST_ENTRY:
         m_logger.log("DialogTracker: Starting post-entry.", "purple");
+        break;
+    }
+}
+void ShinyDialogTracker::push_end(std::chrono::system_clock::time_point timestamp){
+    std::chrono::milliseconds gap_duration = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - m_end_dialog);
+    m_logger.log(
+        "DialogTracker: End " +
+        QString::number(gap_duration.count() / 1000.) + " seconds",
+        "purple"
+    );
+    switch (m_state){
+    case EncounterState::BEFORE_ANYTHING:
+        break;
+    case EncounterState::WILD_ANIMATION:
+        m_wild_animation_duration = gap_duration;
+        break;
+    case EncounterState::YOUR_ANIMATION:
+        m_your_animation_duration = gap_duration;
+        break;
+    case EncounterState::POST_ENTRY:
         break;
     }
 }

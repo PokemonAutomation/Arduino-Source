@@ -4,9 +4,7 @@
  *
  */
 
-#include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Windows/MainWindow.h"
 #include "PokemonSwSh_Panels.h"
 
 #include "PokemonSwSh_Settings.h"

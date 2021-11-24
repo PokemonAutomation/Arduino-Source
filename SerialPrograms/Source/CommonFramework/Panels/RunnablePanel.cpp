@@ -176,7 +176,7 @@ RunnablePanelWidget::RunnablePanelWidget(
 
         m_options_holder = new QVBoxLayout();
         scroll_layout->addLayout(m_options_holder);
-        scroll_layout->addStretch();
+        scroll_layout->addStretch(1);
     }
 
     m_status_bar_holder = new QVBoxLayout();
@@ -337,6 +337,7 @@ void RunnablePanelWidget::update_historical_stats(){
         if (!m_current_stats){
             return;
         }
+        m_logger.log("Saving historical stats...");
         ok = StatSet::update_file(
             GlobalSettings::instance().STATS_FILE,
             m_instance.descriptor().identifier(),

@@ -177,9 +177,8 @@ void MaxLairStandard::program(MultiSwitchProgramEnvironment& env){
     EndBattleDecider_Standard decider(CONSOLES);
 
     loop_adventures(
-        descriptor().display_name(),
         env, CONSOLES,
-        CONSOLES.HOST, BOSS_SLOT + 1,
+        CONSOLES.HOST, BOSS_SLOT,
         decider,
         GO_HOME_WHEN_DONE,
         HOSTING,
@@ -192,7 +191,7 @@ void MaxLairStandard::program(MultiSwitchProgramEnvironment& env){
     env.update_stats();
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        descriptor().display_name(),
+        env.program_info(),
         "",
         stats.to_str()
     );

@@ -125,7 +125,7 @@ QWidget* DiscordWebhookUrl::make_tags_box(QWidget& parent){
 }
 QWidget* DiscordWebhookUrl::make_url_box(QWidget& parent){
     QLineEdit* box = new QLineEdit(&parent);
-    box->setText(label);
+    box->setText(url);
     box->setPlaceholderText("https://discord.com/api/webhooks/123456789012345678/xxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxxx");
     box->setEchoMode(QLineEdit::PasswordEchoOnEdit);
     box->connect(

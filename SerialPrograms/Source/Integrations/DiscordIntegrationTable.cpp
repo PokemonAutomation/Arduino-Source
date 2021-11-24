@@ -19,7 +19,6 @@ DiscordIntegrationChannel::DiscordIntegrationChannel()
     , ping(true)
     , tags({"Notifs", "Showcase", "LiveHost"})
     , allow_commands(true)
-    , allow_logging(false)
 {}
 
 void DiscordIntegrationChannel::load_json(const QJsonValue& json){
@@ -29,7 +28,6 @@ void DiscordIntegrationChannel::load_json(const QJsonValue& json){
     json_get_bool(ping, obj, "Ping");
     QJsonArray array = json_get_array_nothrow(obj, "Tags");
     json_get_bool(allow_commands, obj, "Commands");
-    json_get_bool(allow_logging, obj, "Logs");
     tags.clear();
     for (const auto& tag : array){
         QString token = EventNotificationSettings::sanitize_tag(tag.toString());
@@ -50,7 +48,6 @@ QJsonValue DiscordIntegrationChannel::to_json() const{
     }
     obj.insert("Tags", array);
     obj["Commands"] = allow_commands;
-    obj["Logs"] = allow_logging;
     obj["Channel"] = channel_id;
     return obj;
 }
@@ -65,7 +62,6 @@ std::vector<QWidget*> DiscordIntegrationChannel::make_widgets(QWidget& parent){
     widgets.emplace_back(make_ping_box(parent));
     widgets.emplace_back(make_tags_box(parent));
     widgets.emplace_back(make_commands_box(parent));
-    widgets.emplace_back(make_logs_box(parent));
     widgets.emplace_back(make_channel_box(parent));
     return widgets;
 }
@@ -141,22 +137,7 @@ QWidget* DiscordIntegrationChannel::make_commands_box(QWidget& parent){
     );
     return wrapper;
 }
-QWidget* DiscordIntegrationChannel::make_logs_box(QWidget& parent){
-    QWidget* wrapper = new QWidget(&parent);
-    QHBoxLayout* layout = new QHBoxLayout(wrapper);
-    layout->setAlignment(Qt::AlignCenter);
-    layout->setMargin(0);
-    QCheckBox* box = new QCheckBox(&parent);
-    box->setChecked(allow_logging);
-    layout->addWidget(box);
-    box->connect(
-        box, &QCheckBox::stateChanged,
-        box, [=](int){
-            allow_logging = box->isChecked();
-        }
-    );
-    return wrapper;
-}
+
 QWidget* DiscordIntegrationChannel::make_channel_box(QWidget& parent){
     QLineEdit* box = new QLineEdit(&parent);
     box->setText(channel_id);
@@ -174,7 +155,7 @@ QWidget* DiscordIntegrationChannel::make_channel_box(QWidget& parent){
 
 QStringList DiscordIntegrationTableFactory::make_header() const{
     QStringList list;
-    list << "Enabled" << "Description" << "Allow Pings" << "Event Tags" << "Allow Commands" << "Logging" << "Channel ID";
+    list << "Enabled" << "Description" << "Allow Pings" << "Event Tags" << "Allow Commands" << "Channel ID";
     return list;
 }
 std::unique_ptr<EditableTableRow> DiscordIntegrationTableFactory::make_row() const{
@@ -185,8 +166,7 @@ std::unique_ptr<EditableTableRow> DiscordIntegrationTableFactory::make_row() con
 
 DiscordIntegrationTable::DiscordIntegrationTable()
     : EditableTableOption(
-        "<b>Discord Channels:</b> Configure which channels to send notifications, accept commands, and receive logging."
-        "<br><font color=\"red\">Tags and pings are not implemented yet. All notifications will be sent to all channels with at least one tag. Pings will still go to all enabled channels.</font>",
+        "<b>Discord Channels:</b> Configure which channels to send notifications and accept commands in.",
         *this, true
     )
 {}
@@ -198,12 +178,6 @@ void DiscordIntegrationTable::load_json(const QJsonValue& json){
         row.reset(new DiscordIntegrationChannel());
         row->label = "Main Channel";
         add_row(0, std::move(row));
-
-        row.reset(new DiscordIntegrationChannel());
-        row->label = "Log Channel";
-        row->tags.clear();
-        row->allow_logging = true;
-        add_row(1, std::move(row));
     }
 }
 
@@ -219,27 +193,6 @@ std::vector<QString> DiscordIntegrationTable::command_channels() const{
     for (size_t c = 0; c < size(); c++){
         const DiscordIntegrationChannel& channel = (*this)[c];
         if (channel.enabled && channel.allow_commands){
-            ret.emplace_back(channel.channel_id);
-        }
-    }
-    return ret;
-}
-std::vector<QString> DiscordIntegrationTable::logging_channels() const{
-    std::vector<QString> ret;
-    for (size_t c = 0; c < size(); c++){
-        const DiscordIntegrationChannel& channel = (*this)[c];
-        if (channel.enabled && channel.allow_logging){
-            ret.emplace_back(channel.channel_id);
-        }
-    }
-    return ret;
-}
-
-std::vector<QString> DiscordIntegrationTable::echo_channels() const{
-    std::vector<QString> ret;
-    for (size_t c = 0; c < size(); c++){
-        const DiscordIntegrationChannel& channel = (*this)[c];
-        if (channel.enabled && !channel.tags.empty()){
             ret.emplace_back(channel.channel_id);
         }
     }

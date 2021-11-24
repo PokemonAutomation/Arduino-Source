@@ -89,6 +89,13 @@ void pai_screenshot(DllSafeString& error, uint64_t console_id, const char* path)
     }
 }
 
+void pai_reset_camera(DllSafeString& error, uint64_t console_id){
+    error = ProgramTracker::instance().reset_camera(console_id);
+}
+void pai_reset_serial(DllSafeString& error, uint64_t console_id){
+    error = ProgramTracker::instance().reset_serial(console_id);
+}
+
 void pai_start_program(DllSafeString& error, uint64_t program_id){
     error = ProgramTracker::instance().start_program(program_id);
 }

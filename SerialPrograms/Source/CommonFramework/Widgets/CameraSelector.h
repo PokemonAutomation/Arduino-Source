@@ -11,14 +11,17 @@
 #include <set>
 #include <mutex>
 #include <QCameraInfo>
+#include <QVBoxLayout>
 #include <QComboBox>
 #include <QPushButton>
 #include "CommonFramework/Tools/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "VideoOverlayWidget.h"
 #include "VideoWidget.h"
+#include "VideoDisplayWidget.h"
 
 namespace PokemonAutomation{
+
 
 
 class CameraSelectorUI;
@@ -35,7 +38,7 @@ public:
     void load_json(const QJsonValue& json);
     QJsonValue to_json() const;
 
-    CameraSelectorUI* make_ui(QWidget& parent, Logger& logger, QWidget& holder);
+    CameraSelectorUI* make_ui(QWidget& parent, Logger& logger, VideoDisplayWidget& holder);
 
 private:
     friend class CameraSelectorUI;
@@ -47,30 +50,30 @@ private:
 
 
 
-class CameraSelectorUI : public QWidget, public VideoFeed, public VideoOverlay{
+class CameraSelectorUI : public QWidget, public VideoFeed{
+    Q_OBJECT
 public:
     CameraSelectorUI(
         QWidget& parent,
         Logger& logger,
         CameraSelector& value,
-        QWidget& holder
+        VideoDisplayWidget& holder
     );
     ~CameraSelectorUI();
-
-    VideoOverlayWidget& overlay(){ return *m_overlay; }
 
     void set_camera_enabled(bool enabled);
     void set_resolution_enabled(bool enabled);
     void set_snapshots_allowed(bool enabled);
     void set_overlay_enabled(bool enabled);
 
-    void update_size();
     void reset_video();
+    virtual void async_reset_video() override;
 
+    //  Cannot be called from UI thread.
     virtual QImage snapshot() override;
-    virtual void add_box(const ImageFloatBox& box, QColor color) override;
-    virtual void remove_box(const ImageFloatBox& box) override;
-//    virtual void test_draw() override;
+
+signals:
+    void internal_async_reset_video();
 
 private:
     void refresh();
@@ -79,7 +82,9 @@ private:
 private:
     Logger& m_logger;
     CameraSelector& m_value;
-    QWidget& m_holder;
+
+    VideoDisplayWidget& m_display;
+    std::vector<QSize> m_resolutions;
 
     QComboBox* m_camera_box;
     QComboBox* m_resolution_box;
@@ -87,15 +92,8 @@ private:
 
     QList<QCameraInfo> m_cameras;
 
-    VideoWidget* m_video = nullptr;
-    VideoOverlayWidget* m_overlay;
-
     std::atomic<bool> m_snapshots_allowed;
     std::mutex m_camera_lock;
-
-
-    std::deque<int> m_height_history;
-    std::set<int> m_recent_heights;
 };
 
 

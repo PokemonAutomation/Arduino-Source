@@ -95,7 +95,7 @@ bool read_path(
     QImage error_image;
     error_image = read_type_array_retry(env, console, box, hits, 2, path.mon1, nullptr);
     if (!error_image.isNull()){
-        dump_image(console, MODULE_NAME, "ReadPath", error_image);
+        dump_image(console, env.program_info(), "ReadPath", error_image);
         return false;
     }
 
@@ -104,7 +104,7 @@ bool read_path(
     ImagePixelBox boxes[4];
     error_image = read_type_array_retry(env, console, box, hits, 4, path.mon2, boxes);
     if (!error_image.isNull()){
-        dump_image(console, MODULE_NAME, "ReadPath", error_image);
+        dump_image(console, env.program_info(), "ReadPath", error_image);
         return false;
     }
 
@@ -123,7 +123,7 @@ bool read_path(
             break;
         }
 
-        dump_image(console, MODULE_NAME, "ReadPath", error_image);
+        dump_image(console, env.program_info(), "ReadPath", error_image);
         return false;
     }
 
@@ -132,7 +132,7 @@ bool read_path(
 
     error_image = read_type_array_retry(env, console, box, hits, 1, &path.boss, nullptr);
     if (!error_image.isNull()){
-        dump_image(console, MODULE_NAME, "ReadPath", error_image);
+        dump_image(console, env.program_info(), "ReadPath", error_image);
         return false;
     }
 

@@ -22,7 +22,6 @@ namespace PokemonSwSh{
 class StandardEncounterHandler{
 public:
     StandardEncounterHandler(
-        const QString& program_name,
         ProgramEnvironment& env,
         ConsoleHandle& console,
         Language language,
@@ -45,7 +44,6 @@ private:
     );
 
 private:
-    const QString& m_program_name;
     ProgramEnvironment& m_env;
     ConsoleHandle& m_console;
     bool m_enable_notifications;

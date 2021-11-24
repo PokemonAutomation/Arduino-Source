@@ -7,18 +7,18 @@
 #ifndef PokemonAutomation_PokemonSwSh_BattleDialogDetector_H
 #define PokemonAutomation_PokemonSwSh_BattleDialogDetector_H
 
-#include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/Inference/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class BattleDialogDetector{
+class BattleDialogDetector : public ScreenDetector{
 public:
     BattleDialogDetector(VideoOverlay& overlay);
 
-    bool detect(const QImage& screen) const;
+    virtual bool detect(const QImage& screen) const override;
 
 
 private:
@@ -26,6 +26,7 @@ private:
     InferenceBoxScope m_left;
     InferenceBoxScope m_right;
 };
+
 
 
 }

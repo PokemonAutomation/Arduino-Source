@@ -26,7 +26,6 @@ bool start_adventure(
     QImage entrance[4],
     ConsoleHandle& host, size_t boss_slot,
     HostingSettings& settings,
-    const QString& program_name,
     const PathStats& path_stats,
     const StatsTracker& session_stats,
     ConsoleRuntime console_stats[4]

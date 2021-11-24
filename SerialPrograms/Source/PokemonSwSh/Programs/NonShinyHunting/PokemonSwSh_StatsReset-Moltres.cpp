@@ -217,7 +217,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env){
     env.log("Result Found!", Qt::blue);
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
-        descriptor().display_name(),
+        env.program_info(),
         "Found a perfect match!",
         stats.to_str()
     );
