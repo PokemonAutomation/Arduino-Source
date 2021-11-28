@@ -127,7 +127,7 @@ QWidget* EventNotificationsTableUI::make_enabled_box(EventNotificationOption& en
     QWidget* widget = new QWidget(this);
     QHBoxLayout* layout = new QHBoxLayout(widget);
     layout->setAlignment(Qt::AlignHCenter);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     QCheckBox* box = new QCheckBox(this);
     layout->addWidget(box);
     box->setChecked(entry.m_current.enabled);
@@ -143,7 +143,7 @@ QWidget* EventNotificationsTableUI::make_ping_box(EventNotificationOption& entry
     QWidget* widget = new QWidget(this);
     QHBoxLayout* layout = new QHBoxLayout(widget);
     layout->setAlignment(Qt::AlignHCenter);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     QCheckBox* box = new QCheckBox(this);
     layout->addWidget(box);
     box->setChecked(entry.m_current.ping);

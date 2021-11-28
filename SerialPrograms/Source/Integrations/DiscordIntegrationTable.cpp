@@ -69,7 +69,7 @@ QWidget* DiscordIntegrationChannel::make_enabled_box(QWidget& parent){
     QWidget* wrapper = new QWidget(&parent);
     QHBoxLayout* layout = new QHBoxLayout(wrapper);
     layout->setAlignment(Qt::AlignCenter);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     QCheckBox* box = new QCheckBox(&parent);
     box->setChecked(enabled);
     layout->addWidget(box);
@@ -97,7 +97,7 @@ QWidget* DiscordIntegrationChannel::make_ping_box(QWidget& parent){
     QWidget* wrapper = new QWidget(&parent);
     QHBoxLayout* layout = new QHBoxLayout(wrapper);
     layout->setAlignment(Qt::AlignCenter);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     QCheckBox* box = new QCheckBox(&parent);
     box->setChecked(ping);
     layout->addWidget(box);
@@ -125,7 +125,7 @@ QWidget* DiscordIntegrationChannel::make_commands_box(QWidget& parent){
     QWidget* wrapper = new QWidget(&parent);
     QHBoxLayout* layout = new QHBoxLayout(wrapper);
     layout->setAlignment(Qt::AlignCenter);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     QCheckBox* box = new QCheckBox(&parent);
     box->setChecked(allow_commands);
     layout->addWidget(box);

@@ -146,7 +146,7 @@ QWidget* MultiHostSlot::make_backup_save_box(QWidget& parent){
     QWidget* widget = new QWidget(&parent);
     QHBoxLayout* layout = new QHBoxLayout(widget);
     layout->setAlignment(Qt::AlignHCenter);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     QCheckBox* box = new QCheckBox(&parent);
     layout->addWidget(box);
     box->setChecked(backup_save);
@@ -162,7 +162,7 @@ QWidget* MultiHostSlot::make_catchable_box(QWidget& parent){
     QWidget* widget = new QWidget(&parent);
     QHBoxLayout* layout = new QHBoxLayout(widget);
     layout->setAlignment(Qt::AlignHCenter);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     QCheckBox* box = new QCheckBox(&parent);
     layout->addWidget(box);
     box->setChecked(always_catchable);
@@ -178,7 +178,7 @@ QWidget* MultiHostSlot::make_raid_code_box(QWidget& parent){
     QWidget* widget = new QWidget(&parent);
     QHBoxLayout* layout = new QHBoxLayout(widget);
     layout->setAlignment(Qt::AlignHCenter);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     QCheckBox* box = new QCheckBox(&parent);
     layout->addWidget(box);
     box->setChecked(use_raid_code);
@@ -194,7 +194,7 @@ QWidget* MultiHostSlot::make_accept_FRs_box(QWidget& parent){
     QWidget* widget = new QWidget(&parent);
     QHBoxLayout* layout = new QHBoxLayout(widget);
     layout->setAlignment(Qt::AlignHCenter);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     QCheckBox* box = new QCheckBox(&parent);
     layout->addWidget(box);
     box->setChecked(accept_FRs);
@@ -226,7 +226,7 @@ QWidget* MultiHostSlot::make_dynamax_box(QWidget& parent){
     QWidget* widget = new QWidget(&parent);
     QHBoxLayout* layout = new QHBoxLayout(widget);
     layout->setAlignment(Qt::AlignHCenter);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     QCheckBox* box = new QCheckBox(&parent);
     layout->addWidget(box);
     box->setChecked(dynamax);

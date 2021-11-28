@@ -23,7 +23,7 @@ CommandRow::CommandRow(
     , m_last_known_focus(false)
 {
     QHBoxLayout* command_row = new QHBoxLayout(this);
-    command_row->setMargin(0);
+    command_row->setContentsMargins(0, 0, 0, 0);
 
     command_row->addWidget(new QLabel("<b>Keyboard Input:</b>", this), 1);
     command_row->addSpacing(5);

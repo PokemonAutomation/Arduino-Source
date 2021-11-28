@@ -60,7 +60,7 @@ SwitchViewer_Widget::SwitchViewer_Widget(
 {}
 void SwitchViewer_Widget::construct(){
     QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(make_header(*this));
 
     SwitchViewer& instance = static_cast<SwitchViewer&>(m_instance);
