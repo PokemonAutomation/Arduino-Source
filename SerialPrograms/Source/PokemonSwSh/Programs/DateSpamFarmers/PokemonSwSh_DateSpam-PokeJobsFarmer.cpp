@@ -21,9 +21,10 @@ namespace PokemonAutomation
 			PokeJobsFarmer_Descriptor::PokeJobsFarmer_Descriptor()
 				: RunnableSwitchProgramDescriptor(
 					  "PokemonSwSh:PokeJobsFarmer",
-					  "Date Spam: Poke Jobs Farmer",
+                      STRING_POKEMON + " SwSh",
+                      "Date Spam - Poke Jobs Farmer",
 					  "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-PokeJobsFarmer.md",
-					  "Farm PokéJobs.",
+					  "Farm Poke Jobs.",
 					  FeedbackType::NONE,
 					  PABotBaseLevel::PABOTBASE_12KB)
 			{
@@ -33,7 +34,7 @@ namespace PokemonAutomation
 				: SingleSwitchProgramInstance(descriptor),
 				  SKIPS(
 					  "<b>Maximum number of Poke Jobs completed:</b>",
-					  1000),
+					  200),
 				  MASH_B_DURATION(
 					  "<b>Mash B for this long to exit the dialog:</b>",
 					  "9 * TICKS_PER_SECOND"),
@@ -50,11 +51,27 @@ namespace PokemonAutomation
 				PA_ADD_OPTION(CONCURRENCY);
 			}
 
+            static void enter_jobs(SingleSwitchProgramEnvironment &env, uint16_t index)
+			{
+                // Enter menu
+                pbf_press_button(env.console, BUTTON_A, 10, 90);
+                pbf_press_button(env.console, BUTTON_B, 10, 90);
+                // Select entry
+                for (uint16_t i = 1; i < index; i++)
+                {
+                    pbf_press_dpad(env.console, DPAD_DOWN, 10, 10);
+                }
+                pbf_press_button(env.console, BUTTON_A, 10, 5 * TICKS_PER_SECOND); // Wait for animation to complete
+            }
+
 			void PokeJobsFarmer::program(SingleSwitchProgramEnvironment &env)
 			{
 				uint8_t year = MAX_YEAR;
 
-				for (uint32_t c = 0; c < SKIPS; c++)
+                // Play it safe in case some menu is open
+                pbf_mash_button(env.console, BUTTON_B, MASH_B_DURATION);
+
+                for (uint32_t c = 0; c < SKIPS; c++)
 				{
 					if (MAX_YEAR <= year)
 					{
@@ -63,42 +80,37 @@ namespace PokemonAutomation
 						pbf_press_button(env.console, BUTTON_B, 5, 5);
 						pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
 						home_roll_date_enter_game_autorollback(env.console, &year);
-						pbf_mash_button(env.console, BUTTON_B, MASH_B_DURATION);
-					}
+                        pbf_mash_button(env.console, BUTTON_B, MASH_B_DURATION);
 
+                        // Get rid of new jobs notification by entering Poke Jobs and leaving immediately
+                        enter_jobs(env, MENU_INDEX);
+                        pbf_mash_button(env.console, BUTTON_B, MASH_B_DURATION);
+                    }
+
+                    // Start new jobs
 					for (uint16_t j = 1; j <= CONCURRENCY; j++)
 					{
 						env.log("Starting job #" + tostr_u_commas(j) + " in year " + tostr_u_commas(2000 + year));
 
-						// Enter menu
-						env.log("#### Entering menu");
-						pbf_press_button(env.console, BUTTON_A, 10, 90);
-						pbf_press_button(env.console, BUTTON_B, 10, 90);
+                        // Enter Poke Jobs
+                        enter_jobs(env, MENU_INDEX);
 
-						// Select PokéJobs entry
-						env.log("#### Select PokéJobs entry");
-						for (uint16_t i = 1; i < MENU_INDEX; i++)
-						{
-							pbf_press_dpad(env.console, DPAD_DOWN, 10, 10);
-						}
-						pbf_press_button(env.console, BUTTON_A, 10, 4 * TICKS_PER_SECOND); // Wait for animation to complete
-
-						// Select first PokéJob
+						// Select first Poke Job
 						env.log("#### Select first Poke Job");
-						pbf_mash_button(env.console, BUTTON_A, 1 * TICKS_PER_SECOND); // Skip new job notification if any
+                        pbf_press_button(env.console, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
 						pbf_press_button(env.console, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
 						pbf_press_button(env.console, BUTTON_A, 10, 3 * TICKS_PER_SECOND);
 
-						// Select all Pokémons
+						// Select all Pokemons
 						env.log("#### Select all");
 						pbf_press_button(env.console, BUTTON_X, 10, 90);
 
-						// Send to PokéJob
+						// Send to Poke Job
 						env.log("#### Send to Poke Job");
 						pbf_press_button(env.console, BUTTON_B, 10, 2 * TICKS_PER_SECOND);
 						pbf_mash_button(env.console, BUTTON_A, 6 * TICKS_PER_SECOND); // Mash until animation starts
 
-						// Wait for animation to end and exit PokéJobs
+						// Wait for animation to end and exit Poke Jobs
 						env.log("#### Exit Poke Jobs");
 						pbf_mash_button(env.console, BUTTON_B, MASH_B_DURATION);
 					}
@@ -114,26 +126,21 @@ namespace PokemonAutomation
 					home_roll_date_enter_game_autorollback(env.console, &year);
 					pbf_mash_button(env.console, BUTTON_B, 1 * TICKS_PER_SECOND);
 
-					for (uint16_t j = 1; j <= CONCURRENCY; j++)
+                    // Get rid of new jobs notification by entering Poke Jobs and leaving immediately
+                    enter_jobs(env, MENU_INDEX);
+                    pbf_mash_button(env.console, BUTTON_B, MASH_B_DURATION);
+
+                    // Complete jobs
+                    for (uint16_t j = 1; j <= CONCURRENCY; j++)
 					{
 						env.log("Completing job #" + tostr_u_commas(j) + " in year " + tostr_u_commas(2000 + year));
 
-						// Enter menu
-						env.log("#### Entering menu");
-						pbf_press_button(env.console, BUTTON_A, 10, 90);
-						pbf_press_button(env.console, BUTTON_B, 10, 90);
+                        // Enter Poke Jobs
+                        enter_jobs(env, MENU_INDEX);
 
-						// Select Poké Jobs entry
-						env.log("#### Select Poke Jobs entry");
-						for (uint16_t i = 1; i < MENU_INDEX; i++)
-						{
-							pbf_press_dpad(env.console, DPAD_DOWN, 10, 10);
-						}
-						pbf_press_button(env.console, BUTTON_A, 10, 4 * TICKS_PER_SECOND); // Wait for animation to complete
-
-						// Select first PokéJob
+						// Select first Poke Job
 						env.log("#### Select first Poke Job");
-						pbf_mash_button(env.console, BUTTON_A, 1 * TICKS_PER_SECOND);
+                        pbf_press_button(env.console, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
 						pbf_press_button(env.console, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
 						pbf_press_button(env.console, BUTTON_A, 10, 10 * TICKS_PER_SECOND); // Wait for animation to complete
 
@@ -142,11 +149,7 @@ namespace PokemonAutomation
 						pbf_mash_button(env.console, BUTTON_B, MASH_B_DURATION);
 					}
 				}
-
-				end_program_callback(env.console);
-				end_program_loop(env.console);
 			}
-
 		}
 	}
 }
