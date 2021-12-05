@@ -47,21 +47,27 @@ bool PokemonCaughtMenuDetector::detect(const QImage& screen){
     ImageStats top_white = image_stats(extract_box(screen, m_top_white));
 //    cout << top_white.average << ", " << top_white.stddev << endl;
     if (!is_solid(top_white, {0.316068, 0.341966, 0.341966})){
+//        cout << "Failed: m_top_white" << endl;
         return false;
     }
     ImageStats caught_left = image_stats(extract_box(screen, m_caught_left));
     if (!is_black(caught_left)){
+//        cout << "Failed: m_caught_left" << endl;
         return false;
     }
     ImageStats caught_right = image_stats(extract_box(screen, m_caught_right));
     if (!is_black(caught_right)){
+//        cout << "Failed: m_caught_right" << endl;
         return false;
     }
     if (euclidean_distance(caught_left.average, caught_right.average) > 10){
+//        cout << "Bad left/right distance." << endl;
         return false;
     }
     ImageStats middle_pink = image_stats(extract_box(screen, m_middle_pink));
     if (!is_solid(middle_pink, {0.485975, 0.0980567, 0.415969})){
+//        cout << middle_pink.average << ", " << middle_pink.stddev << endl;
+//        cout << "Failed: m_middle_pink" << endl;
         return false;
     }
     ImageStats bottom_white = image_stats(extract_box(screen, m_bottom_white));

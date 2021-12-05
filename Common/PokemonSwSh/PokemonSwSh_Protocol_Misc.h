@@ -26,18 +26,6 @@
 #endif
 ////////////////////////////////////////////////////////////////////////////////
 
-#define PABB_MSG_CONTROLLER_STATE                               0x9f
-typedef struct{
-    seqnum_t seqnum;
-    Button button;
-    DpadPosition dpad;
-    uint8_t left_joystick_x;
-    uint8_t left_joystick_y;
-    uint8_t right_joystick_x;
-    uint8_t right_joystick_y;
-    uint8_t ticks;
-} PABB_PACK pabb_controller_state;
-
 #define PABB_MSG_COMMAND_MASH_A                                 0xa0
 typedef struct{
     seqnum_t seqnum;

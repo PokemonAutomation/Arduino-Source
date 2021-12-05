@@ -24,7 +24,7 @@ class RunnableSwitchProgramDescriptor : public RunnablePanelDescriptor{
 public:
     RunnableSwitchProgramDescriptor(
         std::string identifier,
-        QString display_name,
+        QString category, QString display_name,
         QString doc_link,
         QString description,
         FeedbackType feedback,

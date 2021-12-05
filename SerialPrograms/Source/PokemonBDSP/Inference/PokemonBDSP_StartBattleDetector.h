@@ -40,6 +40,25 @@ private:
 };
 
 
+class StartBattleMenuOverlapDetector : public VisualInferenceCallback{
+public:
+    StartBattleMenuOverlapDetector(VideoOverlay& overlay);
+
+    bool detected() const{ return m_battle_detected.load(std::memory_order_acquire); }
+    bool detect(const QImage& frame);
+
+    virtual bool process_frame(
+        const QImage& frame,
+        std::chrono::system_clock::time_point timestamp
+    ) override final;
+
+private:
+    ImageFloatBox m_left;
+    ImageFloatBox m_right;
+    std::atomic<bool> m_battle_detected;
+};
+
+
 
 
 

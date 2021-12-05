@@ -26,7 +26,7 @@ namespace PokemonBDSP{
 StarterReset_Descriptor::StarterReset_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonBDSP:StarterReset",
-        "Starter Reset",
+        STRING_POKEMON + " BDSP", "Starter Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/StarterReset.md",
         "Shiny hunt your starter " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
@@ -64,6 +64,7 @@ StarterReset::StarterReset(const StarterReset_Descriptor& descriptor)
         &NOTIFICATION_PROGRAM_ERROR,
     })
 {
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(STARTER);
     PA_ADD_OPTION(VIDEO_ON_SHINY);
@@ -84,14 +85,24 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
 
     QImage briefcase(RESOURCE_PATH() + "PokemonBDSP/StarterBriefcase.png");
 
+    //  Connect the controller.
+    pbf_press_button(env.console, BUTTON_B, 5, 5);
+
+    size_t consecutive_failures = 0;
+
     bool reset = false;
     while (true){
         env.update_stats();
+
+        if (consecutive_failures >= 3){
+            PA_THROW_StringException("Failed 3 times in the row.");
+        }
 
         if (reset){
             pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
             if (!reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
                 stats.add_error();
+                consecutive_failures++;
                 continue;
             }
         }
@@ -114,12 +125,14 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
         }else{
             env.log("Timed out waiting for briefcase.", Qt::red);
             stats.add_error();
+            consecutive_failures++;
+            dump_image(env.logger(), env.program_info(), "Briefcase", env.console.video().snapshot());
             continue;
         }
 
         //  Wait for briefcase to fully open.
         env.log("Mashing B for briefcase to fully open.");
-        pbf_mash_button(env.console, BUTTON_B, 3 * TICKS_PER_SECOND);
+        pbf_mash_button(env.console, BUTTON_B, 2 * TICKS_PER_SECOND);
 
         //  Scroll to your starter.
         size_t scroll = 0;
@@ -133,11 +146,11 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
             scroll = 2;
         }
         for (size_t c = 0; c < scroll; c++){
-            pbf_press_dpad(env.console, DPAD_RIGHT, 10, 50);
+            pbf_press_dpad(env.console, DPAD_RIGHT, 20, 105);
         }
 
         //  Select starter.
-        pbf_press_button(env.console, BUTTON_A, 10, 0);
+        pbf_press_button(env.console, BUTTON_A, 20, 30);
         env.console.botbase().wait_for_all_requests();
 
         {
@@ -150,8 +163,9 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
                 env.log("Detected selection prompt!");
             }else{
                 env.log("Timed out waiting for selection prompt.", Qt::red);
+                consecutive_failures++;
             }
-            pbf_wait(env.console, 10);
+            pbf_wait(env.console, 50);
             pbf_press_dpad(env.console, DPAD_UP, 10, 50);
             pbf_press_button(env.console, BUTTON_A, 10, 5 * TICKS_PER_SECOND);
             env.console.botbase().wait_for_all_requests();
@@ -167,6 +181,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
 
         if (result.shiny_type == ShinyType::UNKNOWN){
             stats.add_error();
+            consecutive_failures++;
             dump_image(env.logger(), env.program_info(), "UnknownShinyDetection", env.console.video().snapshot());
         }else if (is_shiny(result.shiny_type)){
             stats.add_unknown_shiny();
@@ -196,13 +211,12 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
                 &stats
             );
         }
+
+        consecutive_failures = 0;
     }
 
     env.update_stats();
-
-    if (GO_HOME_WHEN_DONE){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-    }
+    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
 }
 
 

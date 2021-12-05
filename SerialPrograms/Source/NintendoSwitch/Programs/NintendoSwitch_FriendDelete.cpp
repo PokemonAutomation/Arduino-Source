@@ -15,7 +15,7 @@ namespace NintendoSwitch{
 FriendDelete_Descriptor::FriendDelete_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "NintendoSwitch:FriendDelete",
-        "Friend Delete",
+        "Nintendo Switch", "Friend Delete",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/FriendDelete.md",
         "Mass delete/block all those unwanted friends.",
         FeedbackType::NONE,
@@ -70,9 +70,6 @@ void FriendDelete::program(SingleSwitchProgramEnvironment& env){
         pbf_press_button(env.console, BUTTON_A, 5, DELETE_FRIEND_DELAY);    //  Confirm
         pbf_press_button(env.console, BUTTON_A, 5, FINISH_DELETE_DELAY);    //  Finish delete friend.
     }
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

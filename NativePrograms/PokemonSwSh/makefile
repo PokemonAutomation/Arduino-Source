@@ -72,8 +72,8 @@ endif
 
 #   Framework
 SRC += $(LUFA_SRC_USB)
-SRC += $(PATH_PUBLIC)/NativePrograms/NintendoSwitch/FrameworkSettings.c
 SRC += $(PATH_PUBLIC)/NativePrograms/DeviceFramework/Framework/DeviceSettings.c
+SRC += $(PATH_PUBLIC)/NativePrograms/NintendoSwitch/FrameworkSettings.c
 ifneq ("$(wildcard $(PATH_INTERNAL)/NativePrograms/NintendoSwitch/Framework/NintendoSwitch_PushButtons.c)","")
 CC_FLAGS += -I$(PATH_INTERNAL)
 SRC += $(PATH_PUBLIC)/Common/CRC32.c
@@ -104,7 +104,7 @@ LD_FLAGS += obj/obj-$(MCU)/NintendoSwitch_ScalarButtons.o
 endif
 
 #   Program
-SRC += $(PATH_PUBLIC)/NativePrograms/PokemonSwSh/PokemonSettings.c
+SRC += $(PATH_PUBLIC)/NativePrograms/PokemonSwSh/PokemonSwSh_Settings.c
 SRC += $(PATH_PUBLIC)/NativePrograms/$(CATEGORY)/Programs/PokemonCallbacks.c
 ifneq ("$(wildcard $(PATH_INTERNAL)/NativePrograms/$(CATEGORY)/$(TARGET)_Core.c)","")
 SRC += $(PATH_INTERNAL)/NativePrograms/$(CATEGORY)/$(TARGET)_Core.c

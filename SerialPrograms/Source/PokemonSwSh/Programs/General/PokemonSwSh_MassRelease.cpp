@@ -18,7 +18,7 @@ namespace PokemonSwSh{
 MassRelease_Descriptor::MassRelease_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:MassRelease",
-        "Mass Release",
+        STRING_POKEMON + " SwSh", "Mass Release",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/MassRelease.md",
         "Mass release boxes of " + STRING_POKEMON + ".",
         FeedbackType::NONE,
@@ -52,11 +52,13 @@ void MassRelease::program(SingleSwitchProgramEnvironment& env){
         pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
     }
 
-    release_boxes(env.console, BOXES_TO_RELEASE, GameSettings::instance().BOX_SCROLL_DELAY, GameSettings::instance().BOX_CHANGE_DELAY);
+    release_boxes(
+        env.console,
+        BOXES_TO_RELEASE,
+        GameSettings::instance().BOX_SCROLL_DELAY,
+        GameSettings::instance().BOX_CHANGE_DELAY
+    );
     pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().HOME_TO_GAME_DELAY);
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

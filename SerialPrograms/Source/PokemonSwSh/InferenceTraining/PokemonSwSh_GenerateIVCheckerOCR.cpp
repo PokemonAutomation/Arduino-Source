@@ -28,7 +28,7 @@ const std::string IVCheckerOptionOCR::TOKENS[]{
 GenerateIVCheckerOCR_Descriptor::GenerateIVCheckerOCR_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:GenerateIVCheckerOCR",
-        "Generate IV Checker OCR Data",
+        STRING_POKEMON + " SwSh", "Generate IV Checker OCR Data",
         "",
         "Generate IV Checker OCR Data",
         FeedbackType::REQUIRED,

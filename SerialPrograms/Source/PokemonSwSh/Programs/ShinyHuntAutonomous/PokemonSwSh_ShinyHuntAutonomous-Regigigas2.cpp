@@ -28,7 +28,7 @@ namespace PokemonSwSh{
 ShinyHuntAutonomousRegigigas2_Descriptor::ShinyHuntAutonomousRegigigas2_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousRegigigas2",
-        "Shiny Hunt Autonomous - Regigigas2",
+        STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Regigigas2",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-Regigigas2.md",
         "Automatically hunt for shiny Regigigas using video feedback.",
         FeedbackType::REQUIRED,
@@ -179,20 +179,13 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env)
 
 StopProgram:
     env.update_stats();
-
-    if (GO_HOME_WHEN_DONE){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-    }
-
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
         env.program_info(),
         "",
         stats.to_str()
     );
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
 }
 
 

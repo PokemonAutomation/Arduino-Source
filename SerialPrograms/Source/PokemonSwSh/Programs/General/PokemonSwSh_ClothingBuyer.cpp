@@ -17,7 +17,7 @@ namespace PokemonSwSh{
 ClothingBuyer_Descriptor::ClothingBuyer_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:ClothingBuyer",
-        "Clothing Buyer",
+        STRING_POKEMON + " SwSh", "Clothing Buyer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ClothingBuyer.md",
         "Buy out all the clothing in a store.",
         FeedbackType::NONE,

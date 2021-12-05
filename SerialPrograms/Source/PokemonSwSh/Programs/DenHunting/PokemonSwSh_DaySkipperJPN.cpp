@@ -21,7 +21,7 @@ namespace PokemonSwSh{
 DaySkipperJPN_Descriptor::DaySkipperJPN_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:DaySkipperJPN",
-        "Day Skipper (JPN)",
+        STRING_POKEMON + " SwSh", "Day Skipper (JPN)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DaySkipperJPN.md",
         "A day skipper for Japanese date format. (7600 skips/hour)",
         FeedbackType::NONE,
@@ -105,8 +105,6 @@ void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env){
     }
 
     //  Prevent the Switch from sleeping and the time from advancing.
-    end_program_callback(env.console);
-
     env.console.botbase().wait_for_all_requests();
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,

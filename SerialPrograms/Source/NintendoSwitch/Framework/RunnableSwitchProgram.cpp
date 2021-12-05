@@ -40,7 +40,7 @@ QColor pick_color(FeedbackType feedback, PABotBaseLevel size){
 }
 RunnableSwitchProgramDescriptor::RunnableSwitchProgramDescriptor(
     std::string identifier,
-    QString display_name,
+    QString category, QString display_name,
     QString doc_link,
     QString description,
     FeedbackType feedback,
@@ -49,7 +49,7 @@ RunnableSwitchProgramDescriptor::RunnableSwitchProgramDescriptor(
     : RunnablePanelDescriptor(
         pick_color(feedback, min_pabotbase_level),
         std::move(identifier),
-        std::move(display_name),
+        std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description)
     )
@@ -215,6 +215,7 @@ void RunnableSwitchProgramWidget::run_program(){
             m_logger, instance.NOTIFICATION_PROGRAM_ERROR,
             ProgramInfo(
                 instance.descriptor().identifier(),
+                instance.descriptor().category(),
                 instance.descriptor().display_name(),
                 timestamp()
             ),

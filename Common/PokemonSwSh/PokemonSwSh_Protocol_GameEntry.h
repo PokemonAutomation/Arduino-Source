@@ -43,11 +43,6 @@ typedef struct{
     uint16_t enter_game_wait;
 } PABB_PACK pabb_enter_game;
 
-#define PABB_MSG_COMMAND_CLOSE_GAME                             0xb2
-typedef struct{
-    seqnum_t seqnum;
-} PABB_PACK pabb_close_game;
-
 #define PABB_MSG_COMMAND_FAST_RESET_GAME                        0xb3
 typedef struct{
     seqnum_t seqnum;

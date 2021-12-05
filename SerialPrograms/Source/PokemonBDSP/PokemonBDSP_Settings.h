@@ -32,6 +32,15 @@ public:
     TimeExpressionOption<uint16_t> START_GAME_WAIT;
     TimeExpressionOption<uint16_t> ENTER_GAME_MASH;
     TimeExpressionOption<uint16_t> ENTER_GAME_WAIT;
+
+    SectionDividerOption m_box_timings;
+    TimeExpressionOption<uint16_t> BOX_SCROLL_DELAY_0;      //  Renamed to force defaults on version upgrade.
+    TimeExpressionOption<uint16_t> BOX_CHANGE_DELAY_0;      //  Renamed to force defaults on version upgrade.
+    TimeExpressionOption<uint16_t> BOX_PICKUP_DROP_DELAY;
+    TimeExpressionOption<uint16_t> MENU_TO_POKEMON_DELAY;
+    TimeExpressionOption<uint16_t> POKEMON_TO_BOX_DELAY0;
+    TimeExpressionOption<uint16_t> BOX_TO_POKEMON_DELAY;
+    TimeExpressionOption<uint16_t> POKEMON_TO_MENU_DELAY;
 };
 
 

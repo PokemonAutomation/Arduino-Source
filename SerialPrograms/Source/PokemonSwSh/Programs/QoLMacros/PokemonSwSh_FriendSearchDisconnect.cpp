@@ -18,7 +18,7 @@ namespace PokemonSwSh{
 FriendSearchDisconnect_Descriptor::FriendSearchDisconnect_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:FriendSearchDisconnect",
-        "Friend Search Disconnect",
+        STRING_POKEMON + " SwSh", "Friend Search Disconnect",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/FriendSearchDisconnect.md",
         "Disconnect from the internet using the friend search method.",
         FeedbackType::NONE,

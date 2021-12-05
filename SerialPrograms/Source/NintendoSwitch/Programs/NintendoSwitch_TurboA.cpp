@@ -16,7 +16,7 @@ namespace NintendoSwitch{
 TurboA_Descriptor::TurboA_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:TurboA",
-        "Turbo A",
+        "Nintendo Switch", "Turbo A",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/TurboA.md",
         "Endlessly mash A.",
         FeedbackType::NONE,

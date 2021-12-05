@@ -23,7 +23,7 @@ namespace PokemonSwSh{
 DenRoller_Descriptor::DenRoller_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:DenRoller",
-        "Den Roller",
+        STRING_POKEMON + " SwSh", "Den Roller",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DenRoller.md",
         "Roll den to the N'th day, SR and repeat.",
         FeedbackType::OPTIONAL_,
@@ -188,8 +188,6 @@ StopProgram:
         stats.to_str(),
         screen, false
     );
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

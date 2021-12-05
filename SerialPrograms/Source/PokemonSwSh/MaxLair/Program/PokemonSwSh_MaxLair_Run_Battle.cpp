@@ -83,12 +83,13 @@ bool read_battle_menu(
 
     if (state.wins != 3 && is_boss(opponent)){
         console.log("Boss found before 3 wins. Something is seriously out-of-sync.", Qt::red);
-        send_program_telemetry(
-            env.logger(), true, Qt::red, MODULE_NAME,
-            "Error",
-            {{"Message", "Boss found before 3 wins."}},
-            ""
-        );
+        dump_image(console, MODULE_NAME, "BossBeforeEnd", console.video().snapshot());
+//        send_program_telemetry(
+//            env.logger(), true, Qt::red, MODULE_NAME,
+//            "Error",
+//            {{"Message", "Boss found before 3 wins."}},
+//            ""
+//        );
         return false;
     }
 

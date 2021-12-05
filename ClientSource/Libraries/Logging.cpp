@@ -12,7 +12,7 @@
 #include "Common/Microcontroller/MessageProtocol.h"
 #include "Common/Cpp/Exception.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/PokemonSwSh/PokemonSwSh_Protocol_Misc.h"
+#include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "MessageConverter.h"
 #include "Logging.h"
 
@@ -66,9 +66,9 @@ void log(const std::string& msg){
 
 
 
-void MessageLogger::log(std::string msg){
-    log(msg);
-}
+//void MessageLogger::log(std::string msg){
+//    log(msg);
+//}
 void MessageLogger::on_send(const BotBaseMessage& message, bool is_retransmit){
     bool print = false;
     do{

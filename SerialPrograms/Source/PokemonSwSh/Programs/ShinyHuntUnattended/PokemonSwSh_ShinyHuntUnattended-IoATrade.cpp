@@ -22,7 +22,7 @@ namespace PokemonSwSh{
 ShinyHuntUnattendedIoATrade_Descriptor::ShinyHuntUnattendedIoATrade_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntUnattendedIoATrade",
-        "Shiny Hunt Unattended - IoA Trade",
+        STRING_POKEMON + " SwSh", "Shiny Hunt Unattended - IoA Trade",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-IoATrade.md",
         "Hunt for shiny Isle of Armor trade. Stop when a shiny is found.",
         FeedbackType::NONE,
@@ -138,8 +138,6 @@ void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env){
     }
 
     pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

@@ -13,7 +13,7 @@ VirtualConsole_Descriptor::VirtualConsole_Descriptor()
     : PanelDescriptor(
         QColor(),
         "NintendoSwitch:VirtualConsole",
-        "Virtual Console",
+        "Nintendo Switch", "Virtual Console",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/VirtualConsole.md",
         "Play your Switch from your computer. Device logging is logged to the output window."
     )

@@ -18,7 +18,7 @@ namespace PokemonSwSh{
 EggSuperCombined2_Descriptor::EggSuperCombined2_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:EggSuperCombined2",
-        "Egg Super-Combined 2",
+        STRING_POKEMON + " SwSh", "Egg Super-Combined 2",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggSuperCombined2.md",
         "Fetch and hatch eggs at the same time. (Fastest - 1700 eggs/day for 5120-step)",
         FeedbackType::NONE,
@@ -107,9 +107,6 @@ void EggSuperCombined2::program(SingleSwitchProgramEnvironment& env){
     pbf_mash_button(env.console, BUTTON_B, 600);
 
     session.eggcombined2_body(env);
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

@@ -24,6 +24,16 @@ ImageMatchDetector::ImageMatchDetector(QImage reference_image, const ImageFloatB
     m_reference_image = extract_box(m_reference_image, m_box);
 }
 
+double ImageMatchDetector::rmsd(const QImage& frame){
+    if (frame.isNull()){
+        return 1000;
+    }
+    QImage scaled = extract_box(frame, m_box);
+    if (scaled.size() != m_reference_image.size()){
+        scaled = scaled.scaled(m_reference_image.size());
+    }
+    return ImageMatch::pixel_RMSD(m_reference_image, scaled);
+}
 bool ImageMatchDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point

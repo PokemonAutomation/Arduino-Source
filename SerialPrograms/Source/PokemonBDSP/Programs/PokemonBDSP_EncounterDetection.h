@@ -20,6 +20,13 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
+struct PokemonDetection{
+    bool exists = false;
+    bool detection_enabled = false;
+    std::set<std::string> slugs;
+};
+
+
 class StandardEncounterDetection{
 public:
     StandardEncounterDetection(
@@ -32,8 +39,8 @@ public:
     );
 
     bool is_double_battle() const{ return m_double_battle; }
-    const std::set<std::string>* pokemon_left() const;
-    const std::set<std::string>* pokemon_right() const;
+    const PokemonDetection& pokemon_left() const;
+    const PokemonDetection& pokemon_right() const;
 
     bool has_shiny() const;
     ShinyType overall_shininess() const{ return m_shininess.shiny_type; }
@@ -47,7 +54,7 @@ private:
     void run_overrides(
         std::vector<std::pair<EncounterAction, std::string>>& actions,
         const std::vector<EncounterFilterOverride>& overrides,
-        const std::set<std::string>& pokemon, bool side_shiny
+        const PokemonDetection& pokemon, bool side_shiny
     ) const;
 
 private:
@@ -65,8 +72,8 @@ private:
     ShinyType m_shininess_right;
 
     bool m_name_read = false;
-    std::set<std::string> m_pokemon_left;
-    std::set<std::string> m_pokemon_right;
+    PokemonDetection m_pokemon_left;
+    PokemonDetection m_pokemon_right;
 };
 
 

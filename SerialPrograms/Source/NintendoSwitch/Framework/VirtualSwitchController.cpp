@@ -9,7 +9,7 @@
 #include "Common/Cpp/Exception.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "ClientSource/Connection/BotBase.h"
-#include "PokemonSwSh/Commands/PokemonSwSh_Commands_Misc.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "VirtualSwitchController.h"
 
 #include <iostream>

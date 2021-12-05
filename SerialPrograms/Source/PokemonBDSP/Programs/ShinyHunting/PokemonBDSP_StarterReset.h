@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonBDSP_StarterReset_H
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_NameSelectOption.h"
@@ -37,6 +38,7 @@ private:
     bool find_encounter(SingleSwitchProgramEnvironment& env) const;
 
 private:
+    StartInGripOrGameOption START_IN_GRIP_MENU;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     Pokemon::PokemonNameSelect STARTER;

@@ -4,11 +4,13 @@
  *
  */
 
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Routines.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP_GameEntry.h"
@@ -114,16 +116,16 @@ bool openedgame_to_ingame(
     uint16_t mash_duration, uint16_t enter_game_timeout,
     uint16_t post_wait_time
 ){
-    if (!openedgame_to_gamemenu(env, console, load_game_timeout)){
-        return false;
-    }
-    if (!gamemenu_to_ingame(env, console, mash_duration, enter_game_timeout)){
-        return false;
+    bool ok = true;
+    ok &= openedgame_to_gamemenu(env, console, load_game_timeout);
+    ok &= gamemenu_to_ingame(env, console, mash_duration, enter_game_timeout);
+    if (!ok){
+        dump_image(env.logger(), env.program_info(), "StartGame", console.video().snapshot());
     }
     console.log("Entered game! Waiting out grace period.");
     pbf_wait(console, post_wait_time);
     console.botbase().wait_for_all_requests();
-    return true;
+    return ok;
 }
 
 void start_game_from_home(
@@ -186,7 +188,7 @@ bool reset_game_from_home(
     uint16_t post_wait_time
 ){
     if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET || tolerate_update_menu){
-        PokemonSwSh::close_game(console);
+        close_game(console);
         start_game_from_home(
             env, console,
             tolerate_update_menu,
@@ -207,6 +209,16 @@ bool reset_game_from_home(
     console.botbase().wait_for_all_requests();
     return ret;
 }
+
+
+
+void save_game(const BotBaseContext& context){
+    pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+    pbf_press_button(context, BUTTON_R, 10, 2 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_A, 10, 5 * TICKS_PER_SECOND);
+}
+
+
 
 
 

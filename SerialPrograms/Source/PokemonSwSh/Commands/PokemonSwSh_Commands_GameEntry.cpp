@@ -7,6 +7,7 @@
 #include <sstream>
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Routines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh_Commands_GameEntry.h"
@@ -156,12 +157,6 @@ void enter_game(const BotBaseContext& context, bool backup_save, uint16_t enter_
         DeviceRequest_enter_game(backup_save, enter_game_mash, enter_game_wait)
     );
 }
-void close_game(const BotBaseContext& context){
-    context->issue_request(
-        &context.cancelled_bool(),
-        DeviceRequest_close_game()
-    );
-}
 
 
 
@@ -207,17 +202,6 @@ int register_message_converters_pokemon_game_entry(){
             ss << ", backup_save = " << params->backup_save;
             ss << ", enter_game_mash = " << params->enter_game_mash;
             ss << ", enter_game_wait = " << params->enter_game_wait;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_CLOSE_GAME,
-        [](const std::string& body){
-            std::stringstream ss;
-            ss << "close_game() - ";
-            if (body.size() != sizeof(pabb_close_game)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_close_game*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
             return ss.str();
         }
     );

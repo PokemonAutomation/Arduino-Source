@@ -155,7 +155,7 @@ void Program::save_and_build(const std::string& board){
         }
 
         //  Build
-        QString hex_file = settings.path + m_name + ("-" + board + ".hex").c_str();
+        QString hex_file = settings.path + m_category + "-" + m_name + ("-" + board + ".hex").c_str();
         QString log_file = settings.path + LOG_FOLDER_NAME + "/" + m_name + ("-" + board).c_str() + ".log";
         if (build_hexfile(board, m_category, m_name, hex_file, log_file) != 0){
             return;

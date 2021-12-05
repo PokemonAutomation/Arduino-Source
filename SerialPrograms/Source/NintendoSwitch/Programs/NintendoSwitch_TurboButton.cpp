@@ -15,7 +15,7 @@ namespace NintendoSwitch{
 TurboButton_Descriptor::TurboButton_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "NintendoSwitch:TurboButton",
-        "Turbo Button",
+        "Nintendo Switch", "Turbo Button",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/TurboButton.md",
         "Mash a controller button. (similar to turbo controller)",
         FeedbackType::NONE,

@@ -5,7 +5,7 @@
  */
 
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
-#include "NativePrograms/PokemonSwSh/Libraries/PokemonSettings.h"
+#include "NativePrograms/PokemonSwSh/Libraries/PokemonSwSh_Settings.h"
 
 
 //  Raid Code

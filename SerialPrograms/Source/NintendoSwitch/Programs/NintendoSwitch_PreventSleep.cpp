@@ -15,7 +15,7 @@ namespace NintendoSwitch{
 PreventSleep_Descriptor::PreventSleep_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "NintendoSwitch:PreventSleep",
-        "Prevent Sleep",
+        "Nintendo Switch", "Prevent Sleep",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/PreventSleep.md",
         "Press B every 15 seconds to keep the Switch from sleeping.",
         FeedbackType::NONE,

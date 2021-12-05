@@ -50,22 +50,6 @@ int register_message_converters_pokemon_misc(){
             return ss.str();
         }
     );
-    register_message_converter(
-        PABB_MSG_CONTROLLER_STATE,
-        [](const std::string& body){
-            std::stringstream ss;
-            ss << "controller_state() - ";
-            if (body.size() != sizeof(pabb_controller_state)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_controller_state*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", button = " << params->button;
-            ss << ", dpad = " << (int)params->dpad;
-            ss << ", LJ = (" << (int)params->left_joystick_x << "," << (int)params->left_joystick_y << ")";
-            ss << ", RJ = (" << (int)params->right_joystick_x << "," << (int)params->right_joystick_y << ")";
-            ss << ", ticks = " << (int)params->ticks;
-            return ss.str();
-        }
-    );
     return 0;
 }
 int init_PokemonSwShMisc = register_message_converters_pokemon_misc();

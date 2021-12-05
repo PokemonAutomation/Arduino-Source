@@ -26,7 +26,7 @@ namespace PokemonSwSh{
 ShinyHuntAutonomousIoATrade_Descriptor::ShinyHuntAutonomousIoATrade_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousIoATrade",
-        "Shiny Hunt Autonomous - IoA Trade",
+        STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - IoA Trade",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-IoATrade.md",
         "Hunt for shiny Isle of Armor trade using video feedback.",
         FeedbackType::REQUIRED,
@@ -179,13 +179,7 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env){
 
 StopProgram:
     env.update_stats();
-
-    if (GO_HOME_WHEN_DONE){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-    }
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
 }
 
 

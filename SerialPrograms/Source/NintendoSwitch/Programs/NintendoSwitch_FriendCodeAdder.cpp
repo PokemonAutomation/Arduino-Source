@@ -18,7 +18,7 @@ namespace NintendoSwitch{
 FriendCodeAdder_Descriptor::FriendCodeAdder_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "NintendoSwitch:FriendCodeAdder",
-        "Friend Code Adder",
+        "Nintendo Switch", "Friend Code Adder",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/FriendCodeAdder.md",
         "Add a list of friend codes.",
         FeedbackType::NONE,
@@ -85,9 +85,6 @@ void FriendCodeAdder::program(SingleSwitchProgramEnvironment& env){
         ssf_press_button1(env.console, BUTTON_A, TOGGLE_BEST_STATUS_DELAY);
         pbf_press_button(env.console, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
     }
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

@@ -49,6 +49,41 @@ bool StartBattleDetector::detect(const QImage& frame){
 }
 
 
+StartBattleMenuOverlapDetector::StartBattleMenuOverlapDetector(VideoOverlay& overlay)
+    : m_left(0.02, 0.2, 0.08, 0.5)
+    , m_right(0.90, 0.2, 0.08, 0.5)
+    , m_battle_detected(false)
+{
+    add_box(m_left);
+    add_box(m_right);
+}
+bool StartBattleMenuOverlapDetector::process_frame(
+    const QImage& frame,
+    std::chrono::system_clock::time_point timestamp
+){
+    if (detect(frame)){
+        m_battle_detected.store(true, std::memory_order_release);
+        return true;
+    }
+    return false;
+}
+bool StartBattleMenuOverlapDetector::detect(const QImage& frame){
+    QImage image0 = extract_box(frame, m_left);
+    ImageStats stats0 = image_stats(image0);
+    //  Solid screen that's not black.
+    if (stats0.average.sum() < 50 || stats0.stddev.sum() > 10){
+        return false;
+    }
+
+    QImage image1 = extract_box(frame, m_right);
+    ImageStats stats1 = image_stats(image1);
+    //  Solid screen that's not black.
+    if (stats1.average.sum() < 50 && stats1.stddev.sum() > 10){
+        return false;
+    }
+
+    return true;
+}
 
 
 

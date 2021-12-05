@@ -32,14 +32,17 @@ long WINAPI crash_handler(EXCEPTION_POINTERS* e){
     }
     handled = true;
 
-    std::string filename = "SerialPrograms-";
+//    cout << "Oops... Program has crashed." << endl;
+//    cout << "Creating mini-dump file..." << endl;
+
+    _wmkdir(L"ErrorDumps");
+
+    std::string filename = "ErrorDumps/SerialPrograms-";
     filename += now_to_filestring();
 
     std::ofstream log;
     log.open(filename + ".log");
 
-    cout << "Oops... Program has crashed." << endl;
-    cout << "Creating mini-dump file..." << endl;
     log << "Oops... Program has crashed." << endl;
     log << "Creating mini-dump file..." << endl;
 
@@ -54,7 +57,7 @@ long WINAPI crash_handler(EXCEPTION_POINTERS* e){
     );
     if (handle == INVALID_HANDLE_VALUE){
         DWORD error = GetLastError();
-        cout << "Unable to create dump file: " << error << endl;
+//        cout << "Unable to create dump file: " << error << endl;
         log << "Unable to create dump file: " << error << endl;
         return EXCEPTION_EXECUTE_HANDLER;
     }
@@ -77,10 +80,10 @@ long WINAPI crash_handler(EXCEPTION_POINTERS* e){
 
     if (!ret){
         DWORD error = GetLastError();
-        cout << "Unable to create minidump: " << error << endl;
+//        cout << "Unable to create minidump: " << error << endl;
         log << "Unable to create minidump: " << error << endl;
     }else{
-        cout << "Minidump created!" << endl;
+//        cout << "Minidump created!" << endl;
         log << "Minidump created!" << endl;
     }
 

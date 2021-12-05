@@ -16,7 +16,6 @@ namespace NintendoSwitch{
 
 uint32_t system_clock           (const BotBaseContext& context);
 void set_leds                   (const BotBaseContext& context, bool on);
-void end_program_callback       (const BotBaseContext& context);
 
 
 

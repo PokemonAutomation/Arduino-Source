@@ -158,6 +158,7 @@ SOURCES += \
     Source/CommonFramework/Tools/FileWindowLogger.cpp \
     Source/CommonFramework/Tools/InterruptableCommands.cpp \
     Source/CommonFramework/Tools/Logger.cpp \
+    Source/CommonFramework/Tools/OutputRedirector.cpp \
     Source/CommonFramework/Tools/ProgramEnvironment.cpp \
     Source/CommonFramework/Tools/QueuedLogger.cpp \
     Source/CommonFramework/Tools/StatsDatabase.cpp \
@@ -198,6 +199,7 @@ SOURCES += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Device.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_DigitEntry.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_PushButtons.cpp \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Routines.cpp \
     Source/NintendoSwitch/Framework/MultiSwitchProgram.cpp \
     Source/NintendoSwitch/Framework/MultiSwitchSystem.cpp \
     Source/NintendoSwitch/Framework/RunnableSwitchProgram.cpp \
@@ -209,6 +211,7 @@ SOURCES += \
     Source/NintendoSwitch/InferenceTraining/PokemonHome_GenerateNameOCR.cpp \
     Source/NintendoSwitch/NintendoSwitch_Panels.cpp \
     Source/NintendoSwitch/NintendoSwitch_Settings.cpp \
+    Source/NintendoSwitch/Options/GoHomeWhenDoneOption.cpp \
     Source/NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.cpp \
@@ -246,15 +249,25 @@ SOURCES += \
     Source/PokemonBDSP/Inference/PokemonBDSP_StartBattleDetector.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_VSSeekerReaction.cpp \
     Source/PokemonBDSP/Options/PokemonBDSP_EncounterFilter.cpp \
+    Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.cpp \
     Source/PokemonBDSP/Panels_PokemonBDSP.cpp \
     Source/PokemonBDSP/PokemonBDSP_Settings.cpp \
+    Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggFetcher.cpp \
+    Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggHatcher.cpp \
+    Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggRoutines.cpp \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_DoublesLeveling.cpp \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute210.cpp \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.cpp \
+    Source/PokemonBDSP/Programs/General/PokemonBDSP_MassRelease.cpp \
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy.cpp \
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.cpp \
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_MenuOverlap.cpp \
+    Source/PokemonBDSP/Programs/PokemonBDSP_BoxRelease.cpp \
     Source/PokemonBDSP/Programs/PokemonBDSP_EncounterDetection.cpp \
     Source/PokemonBDSP/Programs/PokemonBDSP_EncounterHandler.cpp \
     Source/PokemonBDSP/Programs/PokemonBDSP_GameEntry.cpp \
     Source/PokemonBDSP/Programs/PokemonBDSP_OverworldTrigger.cpp \
+    Source/PokemonBDSP/Programs/PokemonBDSP_RunFromBattle.cpp \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_LegendaryReset.cpp \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Fishing.cpp \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Overworld.cpp \
@@ -455,6 +468,7 @@ HEADERS += \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_DigitEntry.h \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h \
+    ../Common/NintendoSwitch/NintendoSwitch_Protocol_Routines.h \
     ../Common/NintendoSwitch/NintendoSwitch_Tools.h \
     ../Common/PokemonSwSh/PokemonProgramIDs.h \
     ../Common/PokemonSwSh/PokemonSwSh_Protocol_AutoHosts.h \
@@ -557,6 +571,7 @@ HEADERS += \
     Source/CommonFramework/Tools/FileWindowLogger.h \
     Source/CommonFramework/Tools/InterruptableCommands.h \
     Source/CommonFramework/Tools/Logger.h \
+    Source/CommonFramework/Tools/OutputRedirector.h \
     Source/CommonFramework/Tools/ProgramEnvironment.h \
     Source/CommonFramework/Tools/QueuedLogger.h \
     Source/CommonFramework/Tools/StatsDatabase.h \
@@ -614,6 +629,7 @@ HEADERS += \
     Source/NintendoSwitch/Commands/NintendoSwitch_Device.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_DigitEntry.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_PushButtons.h \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Routines.h \
     Source/NintendoSwitch/FixedInterval.h \
     Source/NintendoSwitch/Framework/MultiSwitchProgram.h \
     Source/NintendoSwitch/Framework/MultiSwitchSystem.h \
@@ -671,15 +687,25 @@ HEADERS += \
     Source/PokemonBDSP/Inference/PokemonBDSP_VSSeekerReaction.h \
     Source/PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h \
     Source/PokemonBDSP/Options/PokemonBDSP_EncounterFilter.h \
+    Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h \
     Source/PokemonBDSP/Panels_PokemonBDSP.h \
     Source/PokemonBDSP/PokemonBDSP_Settings.h \
+    Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggFetcher.h \
+    Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggHatcher.h \
+    Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggRoutines.h \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_DoublesLeveling.h \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute210.h \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.h \
+    Source/PokemonBDSP/Programs/General/PokemonBDSP_MassRelease.h \
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy.h \
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.h \
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_MenuOverlap.h \
+    Source/PokemonBDSP/Programs/PokemonBDSP_BoxRelease.h \
     Source/PokemonBDSP/Programs/PokemonBDSP_EncounterDetection.h \
     Source/PokemonBDSP/Programs/PokemonBDSP_EncounterHandler.h \
     Source/PokemonBDSP/Programs/PokemonBDSP_GameEntry.h \
     Source/PokemonBDSP/Programs/PokemonBDSP_OverworldTrigger.h \
+    Source/PokemonBDSP/Programs/PokemonBDSP_RunFromBattle.h \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_LegendaryReset.h \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Fishing.h \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Overworld.h \

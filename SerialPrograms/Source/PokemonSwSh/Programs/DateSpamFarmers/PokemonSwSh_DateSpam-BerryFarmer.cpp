@@ -19,7 +19,7 @@ namespace PokemonSwSh{
 BerryFarmer_Descriptor::BerryFarmer_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:BerryFarmer",
-        "Date Spam: Berry Farmer",
+        STRING_POKEMON + " SwSh", "Date Spam - Berry Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-BerryFarmer.md",
         "Farm berries.",
         FeedbackType::NONE,
@@ -81,9 +81,6 @@ void BerryFarmer::program(SingleSwitchProgramEnvironment& env){
         pbf_press_button(env.console, BUTTON_HOME, 10, 5);
         pbf_mash_button(env.console, BUTTON_B, GameSettings::instance().GAME_TO_HOME_DELAY_FAST - 15);
     }
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

@@ -30,7 +30,7 @@ bool is_grey(
 bool is_solid(
     const ImageStats& stats,
     const FloatPixel& expected_color_ratio,
-    double max_euclidean_distance = 0.1,
+    double max_euclidean_distance = 0.15,
     double max_stddev_sum = 10
 );
 
@@ -59,7 +59,7 @@ inline bool is_grey(
 inline bool is_solid(
     const QImage& image,
     const FloatPixel& expected_color_ratio,
-    double max_euclidean_distance = 0.1,
+    double max_euclidean_distance = 0.15,
     double max_stddev_sum = 10
 ){
     return is_solid(image_stats(image), expected_color_ratio, max_euclidean_distance, max_stddev_sum);

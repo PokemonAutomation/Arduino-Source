@@ -1,0 +1,259 @@
+/*  Clone Items (Box Swap Method)
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "PokemonBDSP/PokemonBDSP_Settings.h"
+#include "PokemonBDSP/Programs/PokemonBDSP_BoxRelease.h"
+#include "PokemonBDSP/Programs/Eggs/PokemonBDSP_EggRoutines.h"
+#include "PokemonBDSP_MenuOverlap.h"
+#include "PokemonBDSP_CloneItemsBoxCopy.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonBDSP{
+
+
+CloneItemsBoxCopy_Descriptor::CloneItemsBoxCopy_Descriptor()
+    : RunnableSwitchProgramDescriptor(
+        "PokemonBDSP:CloneItemsBoxCopy",
+        STRING_POKEMON + " BDSP", "Clone Items (Box Copy)",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/CloneItemsBoxCopy.md",
+        "Clone 30 items at a time using the menu overlap glitch via the entire box cloning method.<br>"
+        "<font color=\"red\">This program relies the menu overlap glitch which was patched out in v1.1.2. "
+        "Thus this program only works on v1.1.1 and earlier.</font>",
+        FeedbackType::REQUIRED,
+        PABotBaseLevel::PABOTBASE_12KB
+    )
+{}
+
+CloneItemsBoxCopy::CloneItemsBoxCopy(const CloneItemsBoxCopy_Descriptor& descriptor)
+    : SingleSwitchProgramInstance(descriptor)
+    , GO_HOME_WHEN_DONE(false)
+    , BOXES(
+        "<b>Boxes to Clone:</b>",
+        999, 0, 999
+    )
+    , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
+    , NOTIFICATIONS({
+        &NOTIFICATION_STATUS_UPDATE,
+        &NOTIFICATION_PROGRAM_FINISH,
+        &NOTIFICATION_PROGRAM_ERROR,
+    })
+    , m_advanced_options(
+        "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
+    )
+    , EXIT_BATTLE_TIMEOUT(
+        "<b>Exit Battle Timeout:</b><br>After running, wait this long to return to overworld.",
+        "10 * TICKS_PER_SECOND"
+    )
+{
+    PA_ADD_OPTION(GO_HOME_WHEN_DONE);
+    PA_ADD_OPTION(BOXES);
+    PA_ADD_OPTION(NOTIFICATIONS);
+    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_OPTION(EXIT_BATTLE_TIMEOUT);
+}
+
+
+struct CloneItemsBoxCopy::Stats : public StatsTracker{
+    Stats()
+        : m_boxes(m_stats["Boxes Cloned"])
+        , m_errors(m_stats["Errors"])
+//        , m_resets(m_stats["Resets"])
+    {
+        m_display_order.emplace_back("Boxes Cloned");
+        m_display_order.emplace_back("Errors", true);
+//        m_display_order.emplace_back("Resets");
+    }
+    std::atomic<uint64_t>& m_boxes;
+    std::atomic<uint64_t>& m_errors;
+//    std::atomic<uint64_t>& m_resets;
+};
+std::unique_ptr<StatsTracker> CloneItemsBoxCopy::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new Stats());
+}
+
+void CloneItemsBoxCopy::program(SingleSwitchProgramEnvironment& env){
+    Stats& stats = env.stats<Stats>();
+    env.update_stats();
+
+    uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
+    uint16_t POKEMON_TO_BOX_DELAY = GameSettings::instance().POKEMON_TO_BOX_DELAY0;
+//    uint16_t OVERWORLD_TO_MENU_DELAY = GameSettings::instance().OVERWORLD_TO_MENU_DELAY;
+    uint16_t MENU_TO_OVERWORLD_DELAY = GameSettings::instance().MENU_TO_OVERWORLD_DELAY;
+    uint16_t BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY;
+    uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
+    uint16_t BOX_CHANGE_DELAY = GameSettings::instance().BOX_CHANGE_DELAY_0;
+//    uint16_t BOX_TO_POKEMON_DELAY = GameSettings::instance().BOX_TO_POKEMON_DELAY;
+//    uint16_t POKEMON_TO_MENU_DELAY = GameSettings::instance().POKEMON_TO_MENU_DELAY;
+
+    //  Connect the controller.
+    pbf_mash_button(env.console, BUTTON_B, 50);
+
+#if 1
+    for (uint16_t box = 0; box < BOXES; box++){
+        QImage start = activate_menu_overlap_from_overworld(env.console);
+
+        if (start.isNull()){
+            stats.m_errors++;
+            pbf_mash_button(env.console, BUTTON_B, 10 * TICKS_PER_SECOND);
+            continue;
+        }
+
+        //  Enter box system.
+        pbf_mash_button(env.console, BUTTON_A, 30);
+        if (MENU_TO_POKEMON_DELAY > 30){
+            pbf_wait(env.console, MENU_TO_POKEMON_DELAY - 30);
+        }
+        pbf_press_button(env.console, BUTTON_R, 10, POKEMON_TO_BOX_DELAY);
+
+        //  Move to Battle.
+        pbf_press_button(env.console, BUTTON_A, 10, 50);
+
+        //  Enter box system again.
+        overworld_to_box(env.console);
+
+        //  Move entire box to next box.
+        pbf_press_button(env.console, BUTTON_Y, 10, 50);
+        pbf_press_button(env.console, BUTTON_Y, 10, 50);
+        pbf_press_button(env.console, BUTTON_A, 10, BOX_PICKUP_DROP_DELAY);
+        for (size_t c = 0; c < 5; c++){
+            pbf_move_right_joystick(env.console, 255, 128, 10, BOX_SCROLL_DELAY);
+        }
+        for (size_t c = 0; c < 4; c++){
+            pbf_move_right_joystick(env.console, 128, 255, 10, BOX_SCROLL_DELAY);
+        }
+        pbf_press_button(env.console, BUTTON_A, 10, BOX_PICKUP_DROP_DELAY);
+        pbf_press_button(env.console, BUTTON_R, 10, BOX_CHANGE_DELAY);
+        pbf_press_button(env.console, BUTTON_A, 10, BOX_PICKUP_DROP_DELAY);
+
+        //  Back to previous menu.
+        box_to_overworld(env.console);
+
+        //  View Summary
+        pbf_move_right_joystick(env.console, 128, 255, 10, 10);
+        pbf_press_button(env.console, BUTTON_A, 10, 250);
+
+        //  Back all the way out to the overworld and clear glitch.
+        back_out_to_overworld(env.console, start, 3 * TICKS_PER_SECOND);
+        pbf_press_button(env.console, BUTTON_B, 10, MENU_TO_OVERWORLD_DELAY);
+
+        //  Release the cloned box.
+        overworld_to_box(env.console);
+        pbf_press_button(env.console, BUTTON_R, 10, BOX_CHANGE_DELAY);
+        release_box(env.console, BOX_SCROLL_DELAY);
+        pbf_press_button(env.console, BUTTON_L, 10, BOX_CHANGE_DELAY);
+
+        //  Back all the way out to the overworld and clear glitch.
+        back_out_to_overworld(env.console, start, 4 * TICKS_PER_SECOND);
+        pbf_press_button(env.console, BUTTON_B, 10, MENU_TO_OVERWORLD_DELAY);
+
+        stats.m_boxes++;
+        env.update_stats();
+        send_program_status_notification(
+            env.logger(), NOTIFICATION_STATUS_UPDATE,
+            env.program_info(),
+            "",
+            stats.to_str()
+        );
+    }
+#else
+    QImage start = activate_menu_overlap_from_overworld(env.console);
+    if (start.isNull()){
+        stats.m_errors++;
+        pbf_mash_button(env.console, BUTTON_B, 10 * TICKS_PER_SECOND);
+//        continue;
+        PA_THROW_StringException("Error while activating menu overlap glitch.");
+    }
+
+    for (uint16_t box = 0; box < BOXES; box++){
+
+        //  Enter box system.
+        pbf_mash_button(env.console, BUTTON_A, 30);
+        if (MENU_TO_POKEMON_DELAY > 30){
+            pbf_wait(env.console, MENU_TO_POKEMON_DELAY - 30);
+        }
+        pbf_press_button(env.console, BUTTON_R, 10, POKEMON_TO_BOX_DELAY);
+
+        //  Move to Battle.
+        pbf_press_button(env.console, BUTTON_A, 10, 50);
+
+        //  Enter box system again.
+        overworld_to_box(env.console);
+
+        //  Move entire box to next box.
+        pbf_press_button(env.console, BUTTON_Y, 10, 50);
+        pbf_press_button(env.console, BUTTON_Y, 10, 50);
+        pbf_press_button(env.console, BUTTON_A, 10, BOX_PICKUP_DROP_DELAY);
+        for (size_t c = 0; c < 5; c++){
+            pbf_move_right_joystick(env.console, 255, 128, 10, BOX_SCROLL_DELAY);
+        }
+        for (size_t c = 0; c < 4; c++){
+            pbf_move_right_joystick(env.console, 128, 255, 10, BOX_SCROLL_DELAY);
+        }
+        pbf_press_button(env.console, BUTTON_A, 10, BOX_PICKUP_DROP_DELAY);
+        pbf_press_button(env.console, BUTTON_R, 10, BOX_CHANGE_DELAY);
+        pbf_press_button(env.console, BUTTON_A, 10, BOX_PICKUP_DROP_DELAY);
+
+        //  Back to previous menu.
+        box_to_overworld(env.console);
+
+        //  View Summary
+        pbf_move_right_joystick(env.console, 128, 255, 10, 10);
+        pbf_press_button(env.console, BUTTON_A, 10, 250);
+
+        //  Release the cloned box.
+        pbf_press_button(env.console, BUTTON_B, 10, 250);
+        pbf_press_button(env.console, BUTTON_R, 10, BOX_CHANGE_DELAY);
+        release_box(env.console, BOX_SCROLL_DELAY);
+        pbf_press_button(env.console, BUTTON_L, 10, BOX_CHANGE_DELAY);
+
+        //  Back out.
+        back_out_to_overworld(env.console, start, 1 * TICKS_PER_SECOND);
+//        overworld_to_box(env.console);
+        uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
+        pbf_mash_button(env.console, BUTTON_A, 30);
+        if (MENU_TO_POKEMON_DELAY > 30){
+            pbf_wait(env.console, MENU_TO_POKEMON_DELAY - 30);
+        }
+        pbf_press_button(env.console, BUTTON_R, 10, GameSettings::instance().POKEMON_TO_BOX_DELAY);
+//        pbf_press_button(env.console, BUTTON_B, 10, 250);
+
+//        //  Reset cursor
+//        pbf_press_button(env.console, BUTTON_B, 10, BOX_TO_POKEMON_DELAY);
+//        pbf_press_button(env.console, BUTTON_R, 10, POKEMON_TO_BOX_DELAY);
+
+        stats.m_boxes++;
+        env.update_stats();
+        send_program_status_notification(
+            env.logger(), NOTIFICATION_STATUS_UPDATE,
+            env.program_info(),
+            "",
+            stats.to_str()
+        );
+    }
+#endif
+
+    env.update_stats();
+    send_program_finished_notification(
+        env.logger(), NOTIFICATION_PROGRAM_FINISH,
+        env.program_info(),
+        "",
+        stats.to_str()
+    );
+    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+}
+
+
+
+
+
+
+
+}
+}
+}

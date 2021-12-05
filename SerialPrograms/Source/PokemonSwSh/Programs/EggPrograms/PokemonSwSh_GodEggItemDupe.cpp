@@ -21,7 +21,7 @@ namespace PokemonSwSh{
 GodEggItemDupe_Descriptor::GodEggItemDupe_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:GodEggItemDupe",
-        "God Egg Item Duplication",
+        STRING_POKEMON + " SwSh", "God Egg Item Duplication",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/GodEggItemDuplication.md",
         "Mass duplicate items with the God Egg.",
         FeedbackType::NONE,
@@ -170,9 +170,6 @@ void GodEggItemDupe::program(SingleSwitchProgramEnvironment& env){
 
     run_program(env, MAX_FETCH_ATTEMPTS);
     ssf_press_button2(env.console, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

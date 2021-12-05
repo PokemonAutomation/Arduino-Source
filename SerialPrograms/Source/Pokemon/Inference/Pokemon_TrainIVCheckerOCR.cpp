@@ -25,7 +25,7 @@ namespace Pokemon{
 TrainIVCheckerOCR_Descriptor::TrainIVCheckerOCR_Descriptor()
     : RunnableComputerProgramDescriptor(
         "PokemonSwSh:TrainIVCheckerOCR",
-        "Train IV Checker OCR",
+        STRING_POKEMON, "Train IV Checker OCR",
         "",
         "Train IV Checker OCR"
     )

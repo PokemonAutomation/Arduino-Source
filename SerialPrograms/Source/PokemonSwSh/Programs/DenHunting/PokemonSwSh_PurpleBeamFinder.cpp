@@ -26,7 +26,7 @@ namespace PokemonSwSh{
 PurpleBeamFinder_Descriptor::PurpleBeamFinder_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:PurpleBeamFinder",
-        "Purple Beam Finder",
+        STRING_POKEMON + " SwSh", "Purple Beam Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/PurpleBeamFinder.md",
         "Automatically reset for a purple beam.",
         FeedbackType::REQUIRED,
@@ -212,9 +212,6 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env){
         pbf_press_button(env.console, BUTTON_B, 20, 20);
         pbf_press_button(env.console, BUTTON_LCLICK, 20, 20);
     }
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

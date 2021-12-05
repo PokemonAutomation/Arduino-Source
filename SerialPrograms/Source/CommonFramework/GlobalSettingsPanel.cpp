@@ -129,7 +129,7 @@ GlobalSettings_Descriptor::GlobalSettings_Descriptor()
     : PanelDescriptor(
         QColor(),
         "",
-        "Global Settings",
+        "Global Settings", "Global Settings",
         "",
         "Global Settings"
     )

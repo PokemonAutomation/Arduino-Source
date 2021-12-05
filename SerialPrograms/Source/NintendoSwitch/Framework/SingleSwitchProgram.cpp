@@ -48,6 +48,7 @@ void SingleSwitchProgramWidget::run_program(
     SingleSwitchProgramEnvironment env(
         ProgramInfo(
             instance.descriptor().identifier(),
+            instance.descriptor().category(),
             instance.descriptor().display_name(),
             timestamp()
         ),

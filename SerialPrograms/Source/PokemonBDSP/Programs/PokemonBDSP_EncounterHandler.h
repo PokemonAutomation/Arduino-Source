@@ -32,7 +32,7 @@ public:
     );
 
     //  Run away sequence for unexpected battle.
-    void run_away(uint16_t exit_battle_time);
+    void run_away_due_to_error(uint16_t exit_battle_time);
 
     //  Return true if program should stop.
     bool handle_standard_encounter(const DoublesShinyDetection& result);
@@ -57,6 +57,7 @@ private:
 
     EncounterFrequencies m_frequencies;
     PokemonSwSh::ShinyHuntTracker& m_session_stats;
+    size_t m_consecutive_failures = 0;
 };
 
 

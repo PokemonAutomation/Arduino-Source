@@ -32,7 +32,7 @@ public:
     PanelDescriptor(
         QColor color,
         std::string identifier,
-        QString display_name,
+        QString category, QString display_name,
         QString doc_link,
         QString description
     );
@@ -40,6 +40,7 @@ public:
 
     QColor color() const{ return m_color; }
     const std::string& identifier() const{ return m_identifier; }
+    const QString& category() const{ return m_category; }
     const QString& display_name() const{ return m_display_name; }
     const QString& doc_link() const{ return m_doc_link; }
     const QString& description() const{ return m_description; }
@@ -49,6 +50,7 @@ public:
 private:
     const QColor m_color;
     const std::string m_identifier;
+    const QString m_category;
     const QString m_display_name;
     const QString m_doc_link;
     const QString m_description;

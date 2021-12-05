@@ -26,7 +26,6 @@ void settings_to_enter_game_den_lobby   (
     uint16_t exit_switch_pokemon_delay
 );
 void enter_game                         (const BotBaseContext& device, bool backup_save, uint16_t enter_game_mash, uint16_t enter_game_wait);
-void close_game                         (const BotBaseContext& device);
 void start_game_from_home               (const BotBaseContext& device, bool tolerate_update_menu, uint8_t game_slot, uint8_t user_slot, bool backup_save);
 void fast_reset_game(
     const BotBaseContext& device,
@@ -91,18 +90,6 @@ public:
     }
     virtual BotBaseMessage message() const override{
         return BotBaseMessage(PABB_MSG_COMMAND_ENTER_GAME, params);
-    }
-};
-class DeviceRequest_close_game : public BotBaseRequest{
-public:
-    pabb_close_game params;
-    DeviceRequest_close_game()
-        : BotBaseRequest(true)
-    {
-        params.seqnum = 0;
-    }
-    virtual BotBaseMessage message() const override{
-        return BotBaseMessage(PABB_MSG_COMMAND_CLOSE_GAME, params);
     }
 };
 

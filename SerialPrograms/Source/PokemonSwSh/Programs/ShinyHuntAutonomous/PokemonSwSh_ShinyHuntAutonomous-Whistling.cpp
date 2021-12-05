@@ -28,7 +28,7 @@ namespace PokemonSwSh{
 ShinyHuntAutonomousWhistling_Descriptor::ShinyHuntAutonomousWhistling_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousWhistling",
-        "Shiny Hunt Autonomous - Whistling",
+        STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Whistling",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-Whistling.md",
         "Stand in one place and whistle. Shiny hunt everything that attacks you using video feedback.",
         FeedbackType::REQUIRED,
@@ -169,20 +169,13 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env){
     }
 
     env.update_stats();
-
-    if (GO_HOME_WHEN_DONE){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-    }
-
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
         env.program_info(),
         "",
         stats.to_str()
     );
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
 }
 
 

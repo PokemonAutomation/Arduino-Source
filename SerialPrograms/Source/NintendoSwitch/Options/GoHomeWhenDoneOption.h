@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_GoHomeWhenDone_H
 #define PokemonAutomation_GoHomeWhenDone_H
 
+#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
 
 namespace PokemonAutomation{
@@ -15,13 +16,9 @@ namespace NintendoSwitch{
 
 class GoHomeWhenDoneOption : public BooleanCheckBoxOption{
 public:
-    GoHomeWhenDoneOption(bool default_value)
-        : BooleanCheckBoxOption(
-            "<b>Go Home when Done:</b><br>"
-            "After finding a shiny, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
-            default_value
-        )
-    {}
+    GoHomeWhenDoneOption(bool default_value);
+
+    void run_end_of_program(const BotBaseContext& context);
 };
 
 

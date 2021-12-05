@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Routines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/FixedInterval.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
@@ -21,7 +22,7 @@ namespace PokemonSwSh{
 RaidItemFarmerOHKO_Descriptor::RaidItemFarmerOHKO_Descriptor()
     : MultiSwitchProgramDescriptor(
         "PokemonSwSh:RaidItemFarmerOHKO",
-        "Raid Item Farmer (OHKO)",
+        STRING_POKEMON + " SwSh", "Raid Item Farmer (OHKO)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/RaidItemFarmerOHKO.md",
         "Farm items from raids that can be OHKO'ed. (requires multiple Switches)",
         FeedbackType::NONE,

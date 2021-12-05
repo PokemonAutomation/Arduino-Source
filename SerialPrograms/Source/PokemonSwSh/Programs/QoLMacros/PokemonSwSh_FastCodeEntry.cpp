@@ -17,7 +17,7 @@ namespace PokemonSwSh{
 FastCodeEntry_Descriptor::FastCodeEntry_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:FastCodeEntry",
-        "Fast Code Entry (FCE)",
+        STRING_POKEMON + " SwSh", "Fast Code Entry (FCE)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/FastCodeEntry.md",
         "Force your way into raids by entering 8-digit codes in under 1 second.",
         FeedbackType::NONE,
@@ -54,8 +54,6 @@ void FastCodeEntry::program(SingleSwitchProgramEnvironment& env){
     pbf_press_button(env.console, BUTTON_PLUS, 5, 5);
     pbf_press_button(env.console, BUTTON_PLUS, 5, 5);
     enter_digits(env.console, 8, code);
-
-    end_program_callback(env.console);
 }
 
 

@@ -27,7 +27,7 @@ namespace PokemonSwSh{
 ShinyHuntAutonomousSwordsOfJustice_Descriptor::ShinyHuntAutonomousSwordsOfJustice_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousSwordsOfJustice",
-        "Shiny Hunt Autonomous - Swords Of Justice",
+        STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Swords Of Justice",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-SwordsOfJustice.md",
         "Automatically hunt for shiny Sword of Justice using video feedback.",
         FeedbackType::REQUIRED,
@@ -171,20 +171,13 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
     }
 
     env.update_stats();
-
-    if (GO_HOME_WHEN_DONE){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-    }
-
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
         env.program_info(),
         "",
         stats.to_str()
     );
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
 }
 
 

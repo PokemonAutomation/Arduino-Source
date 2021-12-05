@@ -20,7 +20,7 @@ namespace PokemonSwSh{
 ShinyHuntUnattendedStrongSpawn_Descriptor::ShinyHuntUnattendedStrongSpawn_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntUnattendedStrongSpawn",
-        "Shiny Hunt Unattended - Strong Spawn",
+        STRING_POKEMON + " SwSh", "Shiny Hunt Unattended - Strong Spawn",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-StrongSpawn.md",
         "Hunt for shiny strong spawns. Stop when a shiny is found.",
         FeedbackType::NONE,
@@ -106,8 +106,6 @@ void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env
     }
 
     pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

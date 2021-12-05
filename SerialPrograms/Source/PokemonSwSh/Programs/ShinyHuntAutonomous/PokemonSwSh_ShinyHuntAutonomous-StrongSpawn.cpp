@@ -25,7 +25,7 @@ namespace PokemonSwSh{
 ShinyHuntAutonomousStrongSpawn_Descriptor::ShinyHuntAutonomousStrongSpawn_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousStrongSpawn",
-        "Shiny Hunt Autonomous - Strong Spawn",
+        STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Strong Spawn",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-StrongSpawn.md",
         "Automatically hunt for shiny strong spawns using video feedback.",
         FeedbackType::REQUIRED,
@@ -129,20 +129,13 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
     }
 
     env.update_stats();
-
-    if (GO_HOME_WHEN_DONE){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-    }
-
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
         env.program_info(),
         "",
         stats.to_str()
     );
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
 }
 
 

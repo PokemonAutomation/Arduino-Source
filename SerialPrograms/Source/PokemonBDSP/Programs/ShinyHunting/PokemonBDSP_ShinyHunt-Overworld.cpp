@@ -23,7 +23,7 @@ namespace PokemonBDSP{
 ShinyHuntOverworld_Descriptor::ShinyHuntOverworld_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonBDSP:ShinyHuntOverworld",
-        "Shiny Hunt - Overworld",
+        STRING_POKEMON + " BDSP", "Shiny Hunt - Overworld",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ShinyHunt-Overworld.md",
         "Shiny hunt overworld " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
@@ -54,6 +54,7 @@ ShinyHuntOverworld::ShinyHuntOverworld(const ShinyHuntOverworld_Descriptor& desc
         "10 * TICKS_PER_SECOND"
     )
 {
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
 
     PA_ADD_OPTION(LANGUAGE);
@@ -126,13 +127,16 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env){
         stats
     );
 
+    //  Connect the controller.
+    pbf_press_button(env.console, BUTTON_B, 5, 5);
+
     //  Encounter Loop
     while (true){
         //  Find encounter.
         bool battle = find_encounter(env);
         if (!battle){
             stats.add_error();
-            handler.run_away(EXIT_BATTLE_TIMEOUT);
+            handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
             continue;
         }
 
@@ -150,16 +154,13 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env){
         }
     }
 
-    if (GO_HOME_WHEN_DONE){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-    }
-
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
         env.program_info(),
         "",
         stats.to_str()
     );
+    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
 }
 
 

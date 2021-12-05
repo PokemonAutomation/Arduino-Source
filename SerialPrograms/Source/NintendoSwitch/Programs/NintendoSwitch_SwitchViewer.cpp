@@ -15,7 +15,7 @@ SwitchViewer_Descriptor::SwitchViewer_Descriptor()
     : PanelDescriptor(
         QColor(),
         "NintendoSwitch:SwitchViewer",
-        "Switch Viewer",
+        "Nintendo Switch", "Switch Viewer",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/SwitchViewer.md",
         "View status information from one or more running programs."
     )

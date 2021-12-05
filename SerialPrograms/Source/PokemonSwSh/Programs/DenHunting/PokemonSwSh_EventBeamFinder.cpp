@@ -19,7 +19,7 @@ namespace PokemonSwSh{
 EventBeamFinder_Descriptor::EventBeamFinder_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:EventBeamFinder",
-        "Event Beam Finder",
+        STRING_POKEMON + " SwSh", "Event Beam Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EventBeamFinder.md",
         "Drop wishing pieces until you find an event den.",
         FeedbackType::NONE,
@@ -93,9 +93,6 @@ void EventBeamFinder::program(SingleSwitchProgramEnvironment& env){
         //  Drop wishing piece and see what you get.
         drop_wishing_piece(env.console);
     }
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

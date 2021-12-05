@@ -26,7 +26,7 @@ namespace PokemonSwSh{
 DexRecFinder_Descriptor::DexRecFinder_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:DexRecFinder",
-        "Dex Rec Finder",
+        STRING_POKEMON + " SwSh", "Dex Rec Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DexRecFinder.md",
         "Search for a " + STRING_POKEDEX + " recommendation by date-spamming.",
         FeedbackType::OPTIONAL_,
@@ -280,13 +280,7 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env){
         stats.to_str(),
         env.console.video().snapshot(), false
     );
-
-    if (GO_HOME_WHEN_DONE){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-    }
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
 }
 
 

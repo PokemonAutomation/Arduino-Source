@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/PrettyPrint.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Routines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/FixedInterval.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -25,7 +26,7 @@ namespace PokemonSwSh{
 AutoHostRolling_Descriptor::AutoHostRolling_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:AutoHostRolling",
-        "Auto-Host Rolling",
+        STRING_POKEMON + " SwSh", "Auto-Host Rolling",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/AutoHost-Rolling.md",
         "Roll N days, host, SR and repeat. Also supports hard-locks and soft-locks.",
         FeedbackType::OPTIONAL_,
@@ -191,9 +192,6 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env){
             BACKUP_SAVE
         );
     }
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

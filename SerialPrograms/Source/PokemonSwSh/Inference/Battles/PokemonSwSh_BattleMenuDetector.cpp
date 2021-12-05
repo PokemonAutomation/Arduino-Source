@@ -78,6 +78,7 @@ bool StandardBattleMenuDetector::detect(const QImage& screen) const{
     }else{
         ImageStats health = image_stats(extract_box(screen, m_status1));
         if (!is_white(health)){
+//            cout << "Failed: m_status1" << endl;
             return false;
         }
     }
@@ -101,6 +102,7 @@ bool StandardBattleMenuDetector::detect(const QImage& screen) const{
         0.2, 50, 0.1
     );
     if (!fight){
+//        cout << "Failed: m_text_fight" << endl;
         return false;
     }
 
@@ -121,6 +123,7 @@ bool StandardBattleMenuDetector::detect(const QImage& screen) const{
         0.2, 50, 0.1
     );
     if (!fight){
+//        cout << "Failed: m_text_pokemon" << endl;
         return false;
     }
 
@@ -141,6 +144,7 @@ bool StandardBattleMenuDetector::detect(const QImage& screen) const{
         0.2, 50, 0.1
     );
     if (!fight){
+//        cout << "Failed: m_text_bag" << endl;
         return false;
     }
 
@@ -161,6 +165,7 @@ bool StandardBattleMenuDetector::detect(const QImage& screen) const{
         0.2, 50, 0.1
     );
     if (!fight){
+//        cout << "Failed: m_text_run" << endl;
         return false;
     }
 
@@ -189,6 +194,7 @@ bool StandardBattleMenuDetector::detect(const QImage& screen) const{
         qRgb(182, 33, 82), 1.0
     );
     if (!fight){
+//        cout << "Failed: m_icon_fight" << endl;
         return false;
     }
 
@@ -207,6 +213,7 @@ bool StandardBattleMenuDetector::detect(const QImage& screen) const{
         qRgb(8, 158, 18), 1.0
     );
     if (!pokemon){
+//        cout << "Failed: m_icon_pokemon" << endl;
         return false;
     }
 
@@ -225,6 +232,7 @@ bool StandardBattleMenuDetector::detect(const QImage& screen) const{
         qRgb(215, 120, 11), 1.0
     );
     if (!bag){
+//        cout << "Failed: m_icon_bag" << endl;
         return false;
     }
 
@@ -243,6 +251,7 @@ bool StandardBattleMenuDetector::detect(const QImage& screen) const{
         qRgb(179, 15, 195), 1.0
     );
     if (!run){
+//        cout << "Failed: m_icon_run" << endl;
         return false;
     }
 #endif

@@ -24,7 +24,7 @@ namespace PokemonBDSP{
 DoublesLeveling_Descriptor::DoublesLeveling_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonBDSP:DoublesLeveling",
-        "Double Battle Leveling",
+        STRING_POKEMON + " BDSP", "Double Battle Leveling",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/DoublesLeveling.md",
         "Level up your party by spamming spread moves in a double battle with a partner that heals you forever.",
         FeedbackType::REQUIRED,
@@ -165,13 +165,16 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env){
         stats
     );
 
+    //  Connect the controller.
+    pbf_press_button(env.console, BUTTON_B, 5, 5);
+
     //  Encounter Loop
     while (true){
         //  Find encounter.
         bool battle = find_encounter(env);
         if (!battle){
             stats.add_error();
-            handler.run_away(EXIT_BATTLE_TIMEOUT);
+            handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
             continue;
         }
 
@@ -191,16 +194,13 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env){
         this->battle(env);
     }
 
-    if (GO_HOME_WHEN_DONE){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-    }
-
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
         env.program_info(),
         "",
         stats.to_str()
     );
+    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
 }
 
 

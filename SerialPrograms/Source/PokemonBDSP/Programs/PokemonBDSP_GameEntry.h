@@ -36,6 +36,11 @@ bool reset_game_from_home(
 );
 
 
+void save_game(const BotBaseContext& context);
+
+
+
+
 }
 }
 }

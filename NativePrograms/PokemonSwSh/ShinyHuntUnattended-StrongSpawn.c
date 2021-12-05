@@ -36,4 +36,4 @@ const uint8_t TIME_ROLLBACK_HOURS   =   1;
 //  Wait this long for the game to start before pressing A to enter the game
 //  and start the encounter. You can try to decrease this to make resetting
 //  faster.
-const uint16_t START_GAME_WAIT_DELAY    =   20 * TICKS_PER_SECOND;
+const uint16_t PokemonSwSh_START_GAME_WAIT_DELAY    =   20 * TICKS_PER_SECOND;

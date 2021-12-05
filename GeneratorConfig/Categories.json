@@ -7,7 +7,12 @@
     {
         "Name": "PokemonSwSh",
         "Display": "Sword/Shield",
-        "Settings": [ "PokemonSettings" ]
+        "Settings": [ "PokemonSwSh_Settings" ]
+    },
+    {
+        "Name": "PokemonBDSP",
+        "Display": "BDSP",
+        "Settings": [ "PokemonBDSP_Settings" ]
     }
 ]
 

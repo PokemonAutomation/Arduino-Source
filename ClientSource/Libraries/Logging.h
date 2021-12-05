@@ -33,7 +33,7 @@ public:
     {}
 
 
-    virtual void log(std::string msg) override;
+//    virtual void log(std::string msg) override;
     virtual void on_send(const BotBaseMessage& message, bool is_retransmit) override;
     virtual void on_recv(const BotBaseMessage& message) override;
 

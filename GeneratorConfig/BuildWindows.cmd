@@ -66,6 +66,6 @@ del "%program%.lss"
 del "%program%.sym"
 del "%program%.tmp"
 
-move "%program%.hex" "../../%program%-%board%.hex"
+move "%program%.hex" "../../%category%-%program%-%board%.hex"
 
 ::pause

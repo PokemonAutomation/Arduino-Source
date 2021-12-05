@@ -8,6 +8,7 @@
 #include "Common/Qt/ExpressionEvaluator.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Routines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
@@ -25,7 +26,7 @@ namespace PokemonSwSh{
 AutoHostMultiGame_Descriptor::AutoHostMultiGame_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:AutoHostMultiGame",
-        "Auto-Host Multi-Game",
+        STRING_POKEMON + " SwSh", "Auto-Host Multi-Game",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/AutoHost-MultiGame.md",
         "Run AutoHost-Rolling across multiple game saves. (Up to 16 dens!)",
         FeedbackType::OPTIONAL_,
@@ -219,9 +220,6 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env){
             }
         }
     }
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

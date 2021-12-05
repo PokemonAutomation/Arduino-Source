@@ -188,7 +188,9 @@ bool BattleMenuDetector::detect(const QImage& screen){
     }
 
     //  Check the semi-transparent red status bar if you're dmaxed.
-    if (is_solid(status, {0.618001, 0.145809, 0.23619}, 0.1, 40) && is_solid(health, {0.615249, 0.102789, 0.281963}, 0.1, 40)){
+    if (is_solid(status, {0.618001, 0.145809, 0.23619}, 0.15, 40) &&
+        is_solid(health, {0.615249, 0.102789, 0.281963}, 0.15, 40)
+    ){
         m_dmaxed = true;
         return true;
     }

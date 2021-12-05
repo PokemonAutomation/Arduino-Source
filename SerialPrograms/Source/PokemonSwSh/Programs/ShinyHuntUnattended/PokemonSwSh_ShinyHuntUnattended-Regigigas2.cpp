@@ -21,7 +21,7 @@ namespace PokemonSwSh{
 ShinyHuntUnattendedRegigigas2_Descriptor::ShinyHuntUnattendedRegigigas2_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntUnattendedRegigigas2",
-        "Shiny Hunt Unattended - Regigigas2",
+        STRING_POKEMON + " SwSh", "Shiny Hunt Unattended - Regigigas2",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-Regigigas2.md",
         "A new version of the Regigigas program that is faster.",
         FeedbackType::NONE,
@@ -109,8 +109,6 @@ void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env)
     }
 
     pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

@@ -48,7 +48,7 @@ void MultiSwitchProgramEnvironment::run_in_parallel(
 
 MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     std::string identifier,
-    QString display_name,
+    QString category, QString display_name,
     QString doc_link,
     QString description,
     FeedbackType feedback,
@@ -59,7 +59,7 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
 )
     : RunnableSwitchProgramDescriptor(
         std::move(identifier),
-        std::move(display_name),
+        std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
         feedback,
@@ -131,6 +131,7 @@ void MultiSwitchProgramWidget::run_program(
     MultiSwitchProgramEnvironment env(
         ProgramInfo(
             instance.descriptor().identifier(),
+            instance.descriptor().category(),
             instance.descriptor().display_name(),
             timestamp()
         ),

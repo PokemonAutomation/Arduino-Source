@@ -15,7 +15,7 @@
         {
             "00-Type": "TimeExpression",
             "01-Label": "<b>Start Game Wait Delay:</b><br>Decrease this if your game starts quickly.",
-            "02-Declaration": "const uint16_t START_GAME_WAIT_DELAY",
+            "02-Declaration": "const uint16_t PokemonSwSh_START_GAME_WAIT_DELAY",
             "03-MinValue": 0,
             "04-MaxValue": 65535,
             "98-Default": "20 * TICKS_PER_SECOND",

@@ -118,8 +118,13 @@ bool StandardEncounterHandler::handle_standard_encounter(const ShinyDetectionRes
     if (result.shiny_type == ShinyType::UNKNOWN){
         m_console.log("Unable to determine result of battle.", Qt::red);
         m_session_stats.add_error();
+        m_consecutive_failures++;
+        if (m_consecutive_failures >= 3){
+            PA_THROW_StringException("3 consecutive failed encounter detections.");
+        }
         return false;
     }
+    m_consecutive_failures = 0;
 
     m_session_stats += result.shiny_type;
     m_env.update_stats();
@@ -167,8 +172,13 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     if (result.shiny_type == ShinyType::UNKNOWN){
         m_console.log("Unable to determine result of battle.", Qt::red);
         m_session_stats.add_error();
+        m_consecutive_failures++;
+        if (m_consecutive_failures >= 3){
+            PA_THROW_StringException("3 consecutive failed encounter detections.");
+        }
         return false;
     }
+    m_consecutive_failures = 0;
 
     m_session_stats += result.shiny_type;
     m_env.update_stats();

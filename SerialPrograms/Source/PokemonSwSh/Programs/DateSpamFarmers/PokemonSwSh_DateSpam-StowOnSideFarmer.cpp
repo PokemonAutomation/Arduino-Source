@@ -19,7 +19,7 @@ namespace PokemonSwSh{
 StowOnSideFarmer_Descriptor::StowOnSideFarmer_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:StowOnSideFarmer",
-        "Date Spam: Stow-On-Side Farmer",
+        STRING_POKEMON + " SwSh", "Date Spam - Stow-On-Side Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-StowOnSideFarmer.md",
         "Farm the Stow-on-Side items dealer.",
         FeedbackType::NONE,
@@ -80,9 +80,6 @@ void StowOnSideFarmer::program(SingleSwitchProgramEnvironment& env){
         pbf_press_button(env.console, BUTTON_HOME, 10, 5);
         pbf_mash_button(env.console, BUTTON_B, GameSettings::instance().GAME_TO_HOME_DELAY_FAST - 15);
     }
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

@@ -23,7 +23,7 @@ extern const uint16_t ENTER_GAME_TO_RUN_DELAY;
 //  Wait this long for the game to start before pressing A to enter the game
 //  and start the encounter. You can try to decrease this to make resetting
 //  faster.
-extern const uint16_t START_GAME_WAIT_DELAY;
+extern const uint16_t PokemonSwSh_START_GAME_WAIT_DELAY;
 
 
 //  Time Rollback

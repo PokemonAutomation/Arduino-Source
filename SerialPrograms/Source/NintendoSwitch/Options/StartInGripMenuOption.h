@@ -15,7 +15,7 @@ namespace NintendoSwitch{
 
 class StartInGripOrGameOption : public EnumDropdownOption{
 public:
-    StartInGripOrGameOption(bool grip_menu = true)
+    StartInGripOrGameOption(bool grip_menu = false)
         : EnumDropdownOption(
             "<b>Start Location:</b><br>"
             "If set to start in game, you must disconnect all other controllers.",

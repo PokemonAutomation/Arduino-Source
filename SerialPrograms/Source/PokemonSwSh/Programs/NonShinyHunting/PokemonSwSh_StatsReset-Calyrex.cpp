@@ -27,7 +27,7 @@ namespace PokemonSwSh{
 StatsResetCalyrex_Descriptor::StatsResetCalyrex_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:StatsResetCalyrex",
-        "Stats Reset - Calyrex",
+        STRING_POKEMON + " SwSh", "Stats Reset - Calyrex",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/StatsReset-Calyrex.md",
         "Repeatedly catch calyrex (and its horse) until you get the stats you want.",
         FeedbackType::REQUIRED,
@@ -289,25 +289,16 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env){
             );
         }
     }
-
+    stats.matches++;
+    env.log("Result Found!", Qt::blue);
+    env.update_stats();
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
         env.program_info(),
         "Found a perfect match!",
         stats.to_str()
     );
-    stats.matches++;
-    env.update_stats();
-    env.log("Result Found!", Qt::blue);
-
-    pbf_wait(env.console, 5 * TICKS_PER_SECOND);
-
-    if (GO_HOME_WHEN_DONE){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-    }
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
 }
 
 

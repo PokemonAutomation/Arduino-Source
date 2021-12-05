@@ -27,7 +27,7 @@ namespace PokemonSwSh{
 AutonomousBallThrower_Descriptor::AutonomousBallThrower_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:AutonomousBallThrower",
-        "Autonomous Ball Thrower",
+        STRING_POKEMON + " SwSh", "Autonomous Ball Thrower",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/AutonomousBallThrower.md",
         "Repeatedly throw a ball and reset until you catch the pokemon.",
         FeedbackType::REQUIRED,
@@ -185,22 +185,15 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env){
         }
     }
 
+    env.log("Result Found!", Qt::blue);
+
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
         env.program_info(),
         "Caught the " + STRING_POKEMON,
         stats.to_str()
     );
-    env.log("Result Found!", Qt::blue);
-
-    pbf_wait(env.console, 5 * TICKS_PER_SECOND);
-
-    if (GO_HOME_WHEN_DONE){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-    }
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
 }
 
 

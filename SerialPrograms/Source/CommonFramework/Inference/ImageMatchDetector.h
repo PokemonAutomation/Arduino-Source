@@ -16,6 +16,7 @@ class ImageMatchDetector : public VisualInferenceCallback{
 public:
     ImageMatchDetector(QImage reference_image, const ImageFloatBox& box, double max_rmsd);
 
+    double rmsd(const QImage& frame);
     virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp

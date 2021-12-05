@@ -22,7 +22,7 @@ namespace PokemonBDSP{
 MoneyFarmerRoute212_Descriptor::MoneyFarmerRoute212_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonBDSP:MoneyFarmerRoute212",
-        "Money Farmer (Route 212)",
+        STRING_POKEMON + " BDSP", "Money Farmer (Route 212)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/MoneyFarmerRoute212.md",
         "Farm money by using VS Seeker to rebattle the rich couple on Route 212.",
         FeedbackType::REQUIRED,
@@ -33,15 +33,7 @@ MoneyFarmerRoute212_Descriptor::MoneyFarmerRoute212_Descriptor()
 
 MoneyFarmerRoute212::MoneyFarmerRoute212(const MoneyFarmerRoute212_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
-    , VSSEEKER_SHORTCUT(
-        "<b>VS Seeker Shortcut:</b>",
-        {
-            "Dpad Up",
-            "Dpad Right",
-            "Dpad Down",
-            "Dpad Left",
-        }, 0
-    )
+    , SHORTCUT("<b>VS Seeker Shortcut:</b>")
     , START_LOCATION(
         "<b>Start Location:</b>",
         {
@@ -60,7 +52,7 @@ MoneyFarmerRoute212::MoneyFarmerRoute212(const MoneyFarmerRoute212_Descriptor& d
         &NOTIFICATION_PROGRAM_ERROR,
     })
 {
-    PA_ADD_OPTION(VSSEEKER_SHORTCUT);
+    PA_ADD_OPTION(SHORTCUT);
     PA_ADD_OPTION(START_LOCATION);
     PA_ADD_OPTION(MOVE1_PP);
     PA_ADD_OPTION(MOVE2_PP);
@@ -111,6 +103,7 @@ void MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
     pbf_mash_button(env.console, BUTTON_A, 5 * TICKS_PER_SECOND);
 
     uint8_t move_slot = 0;
+    bool battle_menu_seen = false;
 
     //  State Machine
     for (size_t c = 0; c < 5; c++){
@@ -126,13 +119,15 @@ void MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
             },
             {
                 &battle_menu,
-                &end_battle,
+                battle_menu_seen ? &end_battle : nullptr,
 //                &dialog_detector,
             }
         );
         switch (ret){
         case 0:{
             env.log("Battle menu detected!", Qt::blue);
+            battle_menu_seen = true;
+
             pbf_press_button(env.console, BUTTON_A, 10, 125);
 
             uint8_t slot = 0;
@@ -227,21 +222,15 @@ size_t MoneyFarmerRoute212::total_pp(uint8_t pp[4]){
 void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env){
     Stats& stats = env.stats<Stats>();
 
-    Button dpad;
-    switch (VSSEEKER_SHORTCUT){
-    case 0: dpad = DPAD_UP; break;
-    case 1: dpad = DPAD_RIGHT; break;
-    case 2: dpad = DPAD_DOWN; break;
-    case 3: dpad = DPAD_LEFT; break;
-    default: PA_THROW_StringException("Invalid shortcut value: " + std::to_string(VSSEEKER_SHORTCUT));
-    }
-
     uint8_t pp[4] = {
         MOVE1_PP,
         MOVE2_PP,
         MOVE3_PP,
         MOVE4_PP,
     };
+
+    //  Connect the controller.
+    pbf_press_button(env.console, BUTTON_B, 5, 5);
 
     bool need_to_charge = true;
     if (START_LOCATION == 0){
@@ -267,20 +256,21 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env){
                 pbf_move_left_joystick(env.console, 255, 128, 180, 0);
             }
         }
-        pbf_press_button(env.console, BUTTON_PLUS, 10, 125);
-        pbf_press_dpad(env.console, dpad, 10, 10);
-        need_to_charge = true;
         env.console.botbase().wait_for_all_requests();
         stats.m_searches++;
 
         std::vector<ImagePixelBox> bubbles;
         {
             VSSeekerReactionTracker tracker(env.console, {0.05, 0.30, 0.35, 0.30});
+            run_until(
+                env, env.console,
+                [=](const BotBaseContext& context){
+                    SHORTCUT.run(context, TICKS_PER_SECOND);
 
-            wait_until(
-                env, env.console, std::chrono::milliseconds(1000),
+                },
                 { &tracker }
             );
+            need_to_charge = true;
             pbf_mash_button(env.console, BUTTON_B, 250);
 
             bubbles = tracker.reactions();

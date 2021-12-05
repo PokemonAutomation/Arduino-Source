@@ -31,11 +31,11 @@ struct ProgramInfo{
     {}
     ProgramInfo(
         std::string p_program_id,
-        QString p_program_name,
+        QString category, QString display_name,
         std::chrono::system_clock::time_point p_start_time = std::chrono::system_clock::time_point::min()
     )
         : program_id(std::move(p_program_id))
-        , program_name(std::move(p_program_name))
+        , program_name((category.isEmpty() ? "" : category + ": ") + display_name)
         , start_time(p_start_time)
     {}
 };

@@ -17,7 +17,7 @@ namespace PokemonSwSh{
 BallThrower_Descriptor::BallThrower_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:BallThrower",
-        "Ball Thrower",
+        STRING_POKEMON + " SwSh", "Ball Thrower",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/BallThrower.md",
         "Blindly throw balls at the opposing " + STRING_POKEMON + " until it catches.",
         FeedbackType::NONE,
@@ -48,8 +48,6 @@ void BallThrower::program(SingleSwitchProgramEnvironment& env){
     }
 
     pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

@@ -4,10 +4,9 @@
  *
  */
 
-#include "CommonFramework/Inference/VisualInferenceRoutines.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "Pokemon/Pokemon_Types.h"
+#include "PokemonBDSP_RunFromBattle.h"
 #include "PokemonBDSP_EncounterHandler.h"
 
 namespace PokemonAutomation{
@@ -20,24 +19,6 @@ void take_video(const BotBaseContext& context){
     pbf_wait(context, 5 * TICKS_PER_SECOND);
     pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
 //    context->wait_for_all_requests();
-}
-void run_away(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
-    uint16_t exit_battle_time
-){
-    BlackScreenOverDetector black_screen_detector;
-    run_until(
-        env, console,
-        [=](const BotBaseContext& context){
-            pbf_press_dpad(context, DPAD_UP, 10, 0);
-            pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
-            if (exit_battle_time > TICKS_PER_SECOND){
-                pbf_mash_button(context, BUTTON_B, exit_battle_time - TICKS_PER_SECOND);
-            }
-        },
-        { &black_screen_detector }
-    );
 }
 
 
@@ -57,65 +38,52 @@ StandardEncounterHandler::StandardEncounterHandler(
 
 
 
-std::vector<std::set<std::string>> get_mon_list(StandardEncounterDetection& encounter){
-    std::vector<std::set<std::string>> mon_list;
-    const std::set<std::string>* left = encounter.pokemon_left();
-    const std::set<std::string>* right = encounter.pokemon_right();
-    if (left){
-        mon_list.emplace_back(*left);
+std::vector<PokemonDetection> get_mon_list(StandardEncounterDetection& encounter){
+    std::vector<PokemonDetection> mon_list;
+    const PokemonDetection& left = encounter.pokemon_left();
+    const PokemonDetection& right = encounter.pokemon_right();
+    if (left.exists){
+        mon_list.emplace_back(left);
     }
-    if (right){
-        mon_list.emplace_back(*right);
+    if (right.exists){
+        mon_list.emplace_back(right);
     }
     return mon_list;
 }
 
-void StandardEncounterHandler::run_away(uint16_t exit_battle_time){
+void StandardEncounterHandler::run_away_due_to_error(uint16_t exit_battle_time){
     pbf_mash_button(m_console, BUTTON_B, 3 * TICKS_PER_SECOND);
     pbf_press_dpad(m_console, DPAD_DOWN, 3 * TICKS_PER_SECOND, 0);
     m_console.botbase().wait_for_all_requests();
 
-    BlackScreenOverDetector black_screen_detector;
-    int ret = run_until(
-        m_env, m_console,
-        [=](const BotBaseContext& context){
-            pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
-            if (exit_battle_time > TICKS_PER_SECOND){
-                pbf_mash_button(context, BUTTON_B, exit_battle_time - TICKS_PER_SECOND);
-            }
-        },
-        { &black_screen_detector }
-    );
-    if (ret < 0){
-        m_console.log("Timed out waiting for end of battle. Are you stuck in the battle?", Qt::red);
-        m_session_stats.add_error();
-    }
-    pbf_wait(m_console, TICKS_PER_SECOND);
-    m_console.botbase().wait_for_all_requests();
+    run_from_battle(m_env, m_console, exit_battle_time);
 }
 
 std::vector<EncounterResult> StandardEncounterHandler::results(StandardEncounterDetection& encounter){
     std::vector<EncounterResult> ret;
-    const std::set<std::string>* slugs0 = encounter.pokemon_left();
-    const std::set<std::string>* slugs1 = encounter.pokemon_right();
-    if (slugs0){
-        ret.emplace_back(EncounterResult{*slugs0, encounter.left_shininess()});
+    const PokemonDetection& left = encounter.pokemon_left();
+    const PokemonDetection& right = encounter.pokemon_right();
+    if (left.exists){
+        ret.emplace_back(EncounterResult{left.slugs, encounter.left_shininess()});
     }
-    if (slugs1){
-        ret.emplace_back(EncounterResult{*slugs1, encounter.right_shininess()});
+    if (right.exists){
+        ret.emplace_back(EncounterResult{right.slugs, encounter.right_shininess()});
     }
     return ret;
 }
 void StandardEncounterHandler::update_frequencies(StandardEncounterDetection& encounter){
-    const std::set<std::string>* slugs0 = encounter.pokemon_left();
-    const std::set<std::string>* slugs1 = encounter.pokemon_right();
-    if (slugs0){
-        m_frequencies += *slugs0;
+    const PokemonDetection& left = encounter.pokemon_left();
+    const PokemonDetection& right = encounter.pokemon_right();
+    if (!left.detection_enabled && !right.detection_enabled){
+        return;
     }
-    if (slugs1){
-        m_frequencies += *slugs1;
+    if (left.exists){
+        m_frequencies += left.slugs;
     }
-    if (slugs0 || slugs1){
+    if (right.exists){
+        m_frequencies += right.slugs;
+    }
+    if (left.exists || right.exists){
         m_env.log(m_frequencies.dump_sorted_map("Encounter Stats:\n"));
     }
 }
@@ -126,38 +94,23 @@ void StandardEncounterHandler::run_away_and_update_stats(
 ){
     pbf_press_dpad(m_console, DPAD_UP, 10, 0);
 
+    bool enable_names = m_language != Language::None;
     update_frequencies(encounter);
     send_encounter_notification(
         m_console,
         m_settings.NOTIFICATION_NONSHINY,
         m_settings.NOTIFICATION_SHINY,
         m_env.program_info(),
-        m_language != Language::None, is_shiny(result.shiny_type),
+        enable_names, is_shiny(result.shiny_type),
         results(encounter),
         result.best_screenshot,
         &m_session_stats,
-        &m_frequencies
+        enable_names ? &m_frequencies : nullptr
     );
 
     m_console.botbase().wait_for_all_requests();
 
-    BlackScreenOverDetector black_screen_detector;
-    int ret = run_until(
-        m_env, m_console,
-        [=](const BotBaseContext& context){
-            pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
-            if (exit_battle_time > TICKS_PER_SECOND){
-                pbf_mash_button(context, BUTTON_B, exit_battle_time - TICKS_PER_SECOND);
-            }
-        },
-        { &black_screen_detector }
-    );
-    if (ret < 0){
-        m_console.log("Timed out waiting for end of battle. Are you stuck in the battle?", Qt::red);
-        m_session_stats.add_error();
-    }
-    pbf_wait(m_console, TICKS_PER_SECOND);
-    m_console.botbase().wait_for_all_requests();
+    run_from_battle(m_env, m_console, exit_battle_time);
 }
 
 
@@ -165,8 +118,13 @@ bool StandardEncounterHandler::handle_standard_encounter(const DoublesShinyDetec
     if (result.shiny_type == ShinyType::UNKNOWN){
         m_console.log("Unable to determine result of battle.", Qt::red);
         m_session_stats.add_error();
+        m_consecutive_failures++;
+        if (m_consecutive_failures >= 3){
+            PA_THROW_StringException("3 consecutive failed encounter detections.");
+        }
         return false;
     }
+    m_consecutive_failures = 0;
 
     StandardEncounterDetection encounter(
         m_env, m_console,
@@ -192,6 +150,7 @@ bool StandardEncounterHandler::handle_standard_encounter(const DoublesShinyDetec
         return false;
     }
 
+    bool enable_names = m_language != Language::None;
     update_frequencies(encounter);
     send_encounter_notification(
         m_console,
@@ -202,7 +161,7 @@ bool StandardEncounterHandler::handle_standard_encounter(const DoublesShinyDetec
         results(encounter),
         result.best_screenshot,
         &m_session_stats,
-        &m_frequencies
+        enable_names ? &m_frequencies : nullptr
     );
 
     if (m_settings.VIDEO_ON_SHINY && encounter.has_shiny()){
@@ -218,8 +177,13 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     if (result.shiny_type == ShinyType::UNKNOWN){
         m_console.log("Unable to determine result of battle.", Qt::red);
         m_session_stats.add_error();
+        m_consecutive_failures++;
+        if (m_consecutive_failures >= 3){
+            PA_THROW_StringException("3 consecutive failed encounter detections.");
+        }
         return false;
     }
+    m_consecutive_failures = 0;
 
     StandardEncounterDetection encounter(
         m_env, m_console,
@@ -252,6 +216,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         return false;
     }
 
+    bool enable_names = m_language != Language::None;
     update_frequencies(encounter);
     send_encounter_notification(
         m_console,
@@ -262,7 +227,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         results(encounter),
         result.best_screenshot,
         &m_session_stats,
-        &m_frequencies
+        enable_names ? &m_frequencies : nullptr
     );
 
     switch (action.first){

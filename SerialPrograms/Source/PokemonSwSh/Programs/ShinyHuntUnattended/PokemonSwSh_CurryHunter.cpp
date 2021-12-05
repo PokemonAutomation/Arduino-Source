@@ -24,7 +24,7 @@ namespace PokemonSwSh{
 CurryHunter_Descriptor::CurryHunter_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:CurryHunter",
-        "Curry Hunter",
+        STRING_POKEMON + " SwSh", "Curry Hunter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/CurryHunter.md",
         "Cooks curry to attract " + STRING_POKEMON + " to your camp. This is a beta version. "
         "<font color=\"red\">(This program cannot detect shinies. You must check manually or with " + STRING_POKEMON + " HOME.)</font>",
@@ -269,8 +269,6 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env){
     //  Not really relevant here, but for programs that finish, go to
     //  Switch home to idle.
     pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

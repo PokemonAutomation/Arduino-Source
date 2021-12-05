@@ -19,7 +19,7 @@ namespace PokemonSwSh{
 EggFetcher2_Descriptor::EggFetcher2_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:EggFetcher2",
-        "Egg Fetcher 2",
+        STRING_POKEMON + " SwSh", "Egg Fetcher 2",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggFetcher2.md",
         "Fetch eggs without hatching them.",
         FeedbackType::NONE,
@@ -84,8 +84,6 @@ void EggFetcher2::program(SingleSwitchProgramEnvironment& env){
     run_eggfetcher(env, GameSettings::instance().AUTO_DEPOSIT, MAX_FETCH_ATTEMPTS);
 
     pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

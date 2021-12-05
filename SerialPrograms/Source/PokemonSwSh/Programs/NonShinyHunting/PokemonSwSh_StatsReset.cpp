@@ -25,7 +25,7 @@ namespace PokemonSwSh{
 StatsReset_Descriptor::StatsReset_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:StatsReset",
-        "Stats Reset",
+        STRING_POKEMON + " SwSh", "Stats Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/StatsReset.md",
         "Repeatedly receive gift " + STRING_POKEMON + " until you get the stats you want.",
         FeedbackType::REQUIRED,
@@ -175,6 +175,9 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env){
     env.update_stats();
     env.log("Result Found!", Qt::blue);
 
+    pbf_wait(env.console, 5 * TICKS_PER_SECOND);
+    pbf_press_button(env.console, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
         env.program_info(),
@@ -182,16 +185,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env){
         stats.to_str(),
         screen, false
     );
-
-    pbf_wait(env.console, 5 * TICKS_PER_SECOND);
-    pbf_press_button(env.console, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
-
-    if (GO_HOME_WHEN_DONE){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-    }
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
 }
 
 

@@ -13,14 +13,14 @@ namespace PokemonAutomation{
 
 RunnableComputerProgramDescriptor::RunnableComputerProgramDescriptor(
     std::string identifier,
-    QString display_name,
+    QString category, QString display_name,
     QString doc_link,
     QString description
 )
     : RunnablePanelDescriptor(
         Qt::darkCyan,
         std::move(identifier),
-        std::move(display_name),
+        std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description)
     )
@@ -62,6 +62,7 @@ void RunnableComputerProgramWidget::run_program(){
     ProgramEnvironment env(
         ProgramInfo(
             program_identifier,
+            instance.descriptor().category(),
             instance.descriptor().display_name(),
             timestamp()
         ),

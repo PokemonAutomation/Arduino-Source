@@ -28,7 +28,7 @@
 #include "NativePrograms/NintendoSwitch/Libraries/NintendoSwitch_Device.h"
 #include "NativePrograms/NintendoSwitch/Libraries/NintendoSwitch_PushButtons.h"
 #include "NativePrograms/NintendoSwitch/Programs/CustomProgram.h"
-#include "NativePrograms/PokemonSwSh/Libraries/PokemonSettings.h"
+#include "NativePrograms/PokemonSwSh/Libraries/PokemonSwSh_Settings.h"
 
 
 int main(void){
@@ -41,7 +41,7 @@ int main(void){
     grip_menu_connect_go_home();
 
     //  Enter the game.
-    pbf_press_button(BUTTON_HOME, 10, HOME_TO_GAME_DELAY);
+    pbf_press_button(BUTTON_HOME, 10, PokemonSwSh_HOME_TO_GAME_DELAY);
 
     //  Turbo A forever...
     while (true){
@@ -50,7 +50,7 @@ int main(void){
 
     //  Not really relevant here, but for programs that finish, go to
     //  Switch home to idle.
-    pbf_press_button(BUTTON_HOME, 10, GAME_TO_HOME_DELAY_SAFE);
+    pbf_press_button(BUTTON_HOME, 10, PokemonSwSh_GAME_TO_HOME_DELAY_SAFE);
     end_program_callback();
     end_program_loop();
 };

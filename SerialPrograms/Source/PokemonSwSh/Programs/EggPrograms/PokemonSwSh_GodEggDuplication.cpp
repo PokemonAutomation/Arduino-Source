@@ -19,7 +19,7 @@ namespace PokemonSwSh{
 GodEggDuplication_Descriptor::GodEggDuplication_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:GodEggDuplication",
-        "God Egg Duplication",
+        STRING_POKEMON + " SwSh", "God Egg Duplication",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/GodEggDuplication.md",
         "Mass duplicate " + STRING_POKEMON + " with the God Egg.",
         FeedbackType::NONE,
@@ -118,9 +118,6 @@ void GodEggDuplication::program(SingleSwitchProgramEnvironment& env){
 
     run_program(env, MAX_FETCH_ATTEMPTS);
     ssf_press_button2(env.console, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

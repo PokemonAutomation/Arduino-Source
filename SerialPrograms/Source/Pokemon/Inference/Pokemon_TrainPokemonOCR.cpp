@@ -25,7 +25,7 @@ namespace Pokemon{
 TrainPokemonOCR_Descriptor::TrainPokemonOCR_Descriptor()
     : RunnableComputerProgramDescriptor(
         "PokemonSwSh:TrainPokemonNameOCR",
-        "Train " + STRING_POKEMON + " Name OCR",
+        STRING_POKEMON, "Train " + STRING_POKEMON + " Name OCR",
         "",
         "Train " + STRING_POKEMON + " Name OCR"
     )

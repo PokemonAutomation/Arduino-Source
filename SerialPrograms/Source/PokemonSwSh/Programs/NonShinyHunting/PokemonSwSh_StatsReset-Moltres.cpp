@@ -28,7 +28,7 @@ namespace PokemonSwSh{
 StatsResetMoltres_Descriptor::StatsResetMoltres_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:StatsResetMoltres",
-        "Stats Reset - Moltres",
+        STRING_POKEMON + " SwSh", "Stats Reset - Moltres",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/StatsReset-Moltres.md",
         "Repeatedly catch moltres until you get the stats you want.",
         FeedbackType::REQUIRED,
@@ -212,24 +212,17 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env){
         }
     }
 
-    stats.matches++;
-    env.update_stats();
     env.log("Result Found!", Qt::blue);
+    stats.matches++;
+
+    env.update_stats();
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
         env.program_info(),
         "Found a perfect match!",
         stats.to_str()
     );
-
-    pbf_wait(env.console, 5 * TICKS_PER_SECOND);
-
-    if (GO_HOME_WHEN_DONE){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-    }
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
 }
 
 

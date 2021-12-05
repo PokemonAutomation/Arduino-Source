@@ -96,16 +96,16 @@ void DiscordWebHookSender::thread_loop(){
             m_queue.pop_front();
 
             //  Throttle the messages.
+            auto duration = THROTTLE_DURATION;
             auto now = std::chrono::system_clock::now();
-            while (!m_sent.empty() && m_sent[0] + THROTTLE_DURATION < now){
+            while (!m_sent.empty() && m_sent[0] + duration < now){
                 m_sent.pop_front();
             }
             if (m_sent.size() >= MAX_IN_WINDOW){
-                auto duration = THROTTLE_DURATION;
                 m_cv.wait_for(
                     lg, duration,
                     [&]{
-                        return m_sent[0] + THROTTLE_DURATION < now;
+                        return m_sent[0] + duration < now;
                     }
                 );
                 m_sent.clear();

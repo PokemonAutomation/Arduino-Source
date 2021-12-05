@@ -18,7 +18,7 @@ namespace PokemonHome{
 PageSwap_Descriptor::PageSwap_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonHome:PageSwap",
-        STRING_POKEMON + " Home: Page Swap",
+        STRING_POKEMON + " Home", STRING_POKEMON + " Home: Page Swap",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/PokemonHome-PageSwap.md",
         "Swap 30 boxes (1 page) in " + STRING_POKEMON + " Home.",
         FeedbackType::NONE,
@@ -96,9 +96,6 @@ void PageSwap::program(SingleSwitchProgramEnvironment& env){
         pbf_press_button(env.console, BUTTON_Y, 10, PICKUP_DELAY);
         pbf_press_dpad(env.console, DPAD_RIGHT, 10, SCROLL_DELAY);
     }
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

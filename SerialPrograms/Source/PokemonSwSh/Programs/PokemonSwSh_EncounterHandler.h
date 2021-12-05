@@ -52,6 +52,7 @@ private:
 
     EncounterFrequencies m_frequencies;
     ShinyHuntTracker& m_session_stats;
+    size_t m_consecutive_failures = 0;
 
 //    EncounterNotificationSender m_notification_sender;
 };

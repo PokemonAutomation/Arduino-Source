@@ -28,7 +28,7 @@ namespace PokemonSwSh{
 ShinyHuntAutonomousBerryTree_Descriptor::ShinyHuntAutonomousBerryTree_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntAutonomousBerryTree",
-        "Shiny Hunt Autonomous - Berry Tree",
+        STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Berry Tree",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-BerryTree.md",
         "Automatically hunt for shiny berry tree " + STRING_POKEMON + " using video feedback.",
         FeedbackType::REQUIRED,
@@ -173,9 +173,6 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env){
         "",
         stats.to_str()
     );
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

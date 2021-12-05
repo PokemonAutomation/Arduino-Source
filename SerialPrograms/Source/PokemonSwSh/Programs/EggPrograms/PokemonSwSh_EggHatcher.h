@@ -39,6 +39,7 @@ private:
 
     SimpleIntegerOption<uint8_t> BOXES_TO_HATCH;
     EggStepCountOption STEPS_TO_HATCH;
+
     SectionDividerOption m_advanced_options;
     TimeExpressionOption<uint16_t> SAFETY_TIME;
     TimeExpressionOption<uint16_t> HATCH_DELAY;

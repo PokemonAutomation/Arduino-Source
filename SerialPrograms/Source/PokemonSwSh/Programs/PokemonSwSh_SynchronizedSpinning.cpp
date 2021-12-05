@@ -15,7 +15,7 @@ namespace PokemonSwSh{
 SynchronizedSpinning_Descriptor::SynchronizedSpinning_Descriptor()
     : MultiSwitchProgramDescriptor(
         "PokemonSwSh:SynchronizedSpinning",
-        "Synchronized Spinning", "",
+        STRING_POKEMON + " SwSh", "Synchronized Spinning", "",
         "Don't ask... seriously, don't ask...",
         FeedbackType::NONE,
         PABotBaseLevel::PABOTBASE_12KB,

@@ -6,6 +6,7 @@
 #include "Environment/HardwareValidation.h"
 #include "Tools/StatsDatabase.h"
 #include "Tools/Logger.h"
+#include "Tools/OutputRedirector.h"
 #include "Integrations/SleepyDiscordRunner.h"
 #include "Windows/MainWindow.h"
 
@@ -18,6 +19,10 @@ using namespace PokemonAutomation;
 
 Q_DECLARE_METATYPE(std::string)
 
+
+
+
+
 int main(int argc, char *argv[]){
     setup_crash_handler();
 
@@ -27,6 +32,8 @@ int main(int argc, char *argv[]){
     qRegisterMetaType<uint8_t>("uint8_t");
     qRegisterMetaType<std::string>();
 
+    OutputRedirector redirect_stdout(std::cout, "stdout");
+    OutputRedirector redirect_stderr(std::cerr, "stderr");
 
     if (!check_hardware()){
         return 1;

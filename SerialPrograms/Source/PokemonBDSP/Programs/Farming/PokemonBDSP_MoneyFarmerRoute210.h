@@ -12,6 +12,7 @@
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
+#include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -39,9 +40,7 @@ private:
     static bool has_pp(uint8_t pp0[4], uint8_t pp1[4]);
 
 private:
-    EnumDropdownOption VSSEEKER_SHORTCUT;
-
-//    EnumDropdownOption START_LOCATION;
+    ShortcutDirection SHORTCUT;
 
     SimpleIntegerOption<uint8_t> MON0_MOVE1_PP;
     SimpleIntegerOption<uint8_t> MON0_MOVE2_PP;

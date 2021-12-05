@@ -25,7 +25,7 @@ using namespace MaxLairInternal;
 MaxLairStandard_Descriptor::MaxLairStandard_Descriptor()
     : MultiSwitchProgramDescriptor(
         "PokemonSwSh:MaxLair-Standard",
-        "Max Lair: Standard",
+        STRING_POKEMON + " SwSh", "Max Lair - Standard",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/MaxLair-Standard.md",
         "Auto Max Lair 2.0 - Run Dynamax Adventures until a shiny legendary is found.",
         FeedbackType::REQUIRED,

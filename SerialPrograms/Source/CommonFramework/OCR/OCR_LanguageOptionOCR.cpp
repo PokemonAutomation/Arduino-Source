@@ -160,7 +160,7 @@ void LanguageOCRUI::update_status(){
         m_status->setVisible(false);
     }else{
         m_status->setText(
-            "<font color=\"red\">No text recognition data found for " + data.name + ".</font>\r" +
+            "<font color=\"red\">No text recognition data found for " + data.name + ".</font>\n" +
             "<a href=\"" + PROJECT_GITHUB_URL + "Packages/blob/master/SerialPrograms/Resources/Tesseract/\">Download from here.</a>"
         );
         m_status->setVisible(true);

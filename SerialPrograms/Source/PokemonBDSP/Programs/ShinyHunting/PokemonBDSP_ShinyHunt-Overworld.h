@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Options/StaticTextOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
@@ -40,6 +41,7 @@ private:
     bool find_encounter(SingleSwitchProgramEnvironment& env) const;
 
 private:
+    StartInGripOrGameOption START_IN_GRIP_MENU;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     Pokemon::EncounterBotLanguage LANGUAGE;

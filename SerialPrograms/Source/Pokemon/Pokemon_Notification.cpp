@@ -12,6 +12,10 @@
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "Pokemon_Notification.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace Pokemon{
 
@@ -38,16 +42,22 @@ QString shiny_symbol(ShinyType shiny_type){
         return "";
     }
 }
-QString slug_set_to_string(const std::set<std::string>& slug_candidates){
+QString pokemon_to_string(const EncounterResult& pokemon){
     QString str;
-    if (slug_candidates.empty()){
-        str = "None - Unable to detect.";
-    }else if (slug_candidates.size() == 1){
-        str += get_pokemon_name(*slug_candidates.begin()).display_name();
+
+    QString symbol = shiny_symbol(pokemon.shininess);
+    if (!symbol.isEmpty()){
+        str += symbol + " ";
+    }
+
+    if (pokemon.slug_candidates.empty()){
+        str = "Unable to detect.";
+    }else if (pokemon.slug_candidates.size() == 1){
+        str += get_pokemon_name(*pokemon.slug_candidates.begin()).display_name();
     }else{
         str += "Ambiguous: ";
         bool first1 = true;
-        for (const std::string& slug : slug_candidates){
+        for (const std::string& slug : pokemon.slug_candidates){
             if (!first1){
                 str += ", ";
             }
@@ -66,7 +76,7 @@ void send_encounter_notification(
     EventNotificationOption& settings_shiny,
     const ProgramInfo& info,
     bool enable_names, bool shiny_detected,
-    const std::vector<EncounterResult> results,
+    const std::vector<EncounterResult>& results,
     const QImage& screenshot,
     const StatsTracker* session_stats,
     const EncounterFrequencies* frequencies,
@@ -83,11 +93,7 @@ void send_encounter_notification(
             names += "\n";
         }
         first = false;
-        QString symbol = shiny_symbol(result.shininess);
-        if (!symbol.isEmpty()){
-            names += symbol + " ";
-        }
-        names += slug_set_to_string(result.slug_candidates);
+        names += pokemon_to_string(result);
         max_shiny_type = max_shiny_type < result.shininess ? result.shininess : max_shiny_type;
         shiny_count += is_shiny(result.shininess) ? 1 : 0;
     }
@@ -119,7 +125,8 @@ void send_encounter_notification(
         switch (shiny_count){
         case 0:
             if (shiny_detected){
-                shinies = symbol + " Found Shiny! " + symbol + "(Unable to determine which.)";
+                symbol = shiny_symbol(ShinyType::UNKNOWN_SHINY);
+                shinies = symbol + " Found Shiny! " + symbol + " (Unable to determine which.)";
             }else{
                 shinies = "No Shinies";
             }

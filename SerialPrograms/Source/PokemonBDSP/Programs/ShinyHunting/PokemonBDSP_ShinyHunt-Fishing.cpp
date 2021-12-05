@@ -25,7 +25,7 @@ namespace PokemonBDSP{
 ShinyHuntFishing_Descriptor::ShinyHuntFishing_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonBDSP:ShinyHuntFishing",
-        "Shiny Hunt - Fishing",
+        STRING_POKEMON + " BDSP", "Shiny Hunt - Fishing",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ShinyHunt-Fishing.md",
         "Shiny hunt fishing " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
@@ -37,15 +37,7 @@ ShinyHuntFishing_Descriptor::ShinyHuntFishing_Descriptor()
 ShinyHuntFishing::ShinyHuntFishing(const ShinyHuntFishing_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
-    , FISHING_SHORTCUT(
-        "<b>Fishing Shortcut:</b>",
-        {
-            "Dpad Up",
-            "Dpad Right",
-            "Dpad Down",
-            "Dpad Left",
-        }, 0
-    )
+    , SHORTCUT("<b>Fishing Shortcut:</b>")
     , ENCOUNTER_BOT_OPTIONS(false, false)
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
@@ -62,11 +54,12 @@ ShinyHuntFishing::ShinyHuntFishing(const ShinyHuntFishing_Descriptor& descriptor
         "10 * TICKS_PER_SECOND"
     )
 {
+    PA_ADD_OPTION(START_IN_GRIP_MENU);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
 
     PA_ADD_OPTION(LANGUAGE);
 
-    PA_ADD_OPTION(FISHING_SHORTCUT);
+    PA_ADD_OPTION(SHORTCUT);
 
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -99,15 +92,6 @@ std::unique_ptr<StatsTracker> ShinyHuntFishing::make_stats() const{
 void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
     Stats& stats = env.stats<Stats>();
 
-    Button dpad;
-    switch (FISHING_SHORTCUT){
-    case 0: dpad = DPAD_UP; break;
-    case 1: dpad = DPAD_RIGHT; break;
-    case 2: dpad = DPAD_DOWN; break;
-    case 3: dpad = DPAD_LEFT; break;
-    default: PA_THROW_StringException("Invalid shortcut value: " + std::to_string(FISHING_SHORTCUT));
-    }
-
     StandardEncounterHandler handler(
         env, env.console,
         LANGUAGE,
@@ -115,12 +99,13 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
         stats
     );
 
+    //  Connect the controller.
+    pbf_press_button(env.console, BUTTON_B, 5, 5);
+
     //  Encounter Loop
     while (true){
         env.update_stats();
         pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
-        pbf_press_button(env.console, BUTTON_PLUS, 10, 125);
-        pbf_press_dpad(env.console, dpad, 10, 10);
         env.console.botbase().wait_for_all_requests();
 
         {
@@ -128,9 +113,11 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
             MarkDetector mark_detector(env.console, {0.4, 0.2, 0.2, 0.5});
             StartBattleDetector battle(env.console);
             BattleMenuDetector battle_menu(BattleType::WILD);
-            int ret = wait_until(
+            int ret = run_until(
                 env, env.console,
-                std::chrono::milliseconds(30000),
+                [=](const BotBaseContext& context){
+                    SHORTCUT.run(context, 30 * TICKS_PER_SECOND);
+                },
                 {
                     &dialog_detector,
                     &mark_detector,
@@ -149,7 +136,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
             case 2:
                 env.log("Unexpected battle menu.", Qt::red);
                 stats.add_error();
-                handler.run_away(EXIT_BATTLE_TIMEOUT);
+                handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
                 continue;
             default:
                 env.log("Timed out.", Qt::red);
@@ -173,7 +160,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
             case 1:
                 env.log("Unexpected battle menu.", Qt::red);
                 stats.add_error();
-                handler.run_away(EXIT_BATTLE_TIMEOUT);
+                handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
                 continue;
             default:
                 env.log("Timed out.", Qt::red);
@@ -197,7 +184,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
             case 1:
                 env.log("Unexpected battle menu.", Qt::red);
                 stats.add_error();
-                handler.run_away(EXIT_BATTLE_TIMEOUT);
+                handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
                 continue;
             default:
                 env.log("Missed the hook.", "orange");
@@ -220,16 +207,13 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
         }
     }
 
-    if (GO_HOME_WHEN_DONE){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-    }
-
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
         env.program_info(),
         "",
         stats.to_str()
     );
+    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
 }
 
 

@@ -50,7 +50,7 @@ class MultiSwitchProgramDescriptor : public RunnableSwitchProgramDescriptor{
 public:
     MultiSwitchProgramDescriptor(
         std::string identifier,
-        QString display_name,
+        QString category, QString display_name,
         QString doc_link,
         QString description,
         FeedbackType feedback,

@@ -12,6 +12,7 @@
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
+#include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -39,7 +40,7 @@ private:
     static size_t total_pp(uint8_t pp[4]);
 
 private:
-    EnumDropdownOption VSSEEKER_SHORTCUT;
+    ShortcutDirection SHORTCUT;
 
     EnumDropdownOption START_LOCATION;
 

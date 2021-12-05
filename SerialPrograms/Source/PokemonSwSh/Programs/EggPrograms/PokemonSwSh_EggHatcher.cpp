@@ -19,7 +19,7 @@ namespace PokemonSwSh{
 EggHatcher_Descriptor::EggHatcher_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:EggHatcher",
-        "Egg Hatcher",
+        STRING_POKEMON + " SwSh", "Egg Hatcher",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggHatcher.md",
         "Hatch eggs from boxes.",
         FeedbackType::NONE,
@@ -158,9 +158,6 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env){
         pbf_press_button(env.console, BUTTON_X, 20, OVERWORLD_TO_MENU_DELAY - 20);
     }
     pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE - 10);
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

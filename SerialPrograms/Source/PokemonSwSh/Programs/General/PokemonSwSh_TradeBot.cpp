@@ -21,7 +21,7 @@ namespace PokemonSwSh{
 TradeBot_Descriptor::TradeBot_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:TradeBot",
-        "Trade Bot",
+        STRING_POKEMON + " SwSh", "Trade Bot",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/TradeBot.md",
         "Surprise trade with a code for hosting giveaways.",
         FeedbackType::NONE,
@@ -190,9 +190,6 @@ void TradeBot::program(SingleSwitchProgramEnvironment& env){
     }
 
     ssf_press_button2(env.console, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

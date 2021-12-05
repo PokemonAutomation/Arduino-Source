@@ -24,7 +24,15 @@ void pbf_mash_button            (const BotBaseContext& context, Button button, u
 
 void start_program_flash        (const BotBaseContext& context, uint16_t ticks);
 void grip_menu_connect_go_home  (const BotBaseContext& context);
-void end_program_loop           (const BotBaseContext& context);
+
+void pbf_controller_state(
+    const BotBaseContext& context,
+    Button button,
+    DpadPosition position,
+    uint8_t left_x, uint8_t left_y,
+    uint8_t right_x, uint8_t right_y,
+    uint8_t ticks
+);
 
 
 class DeviceRequest_pbf_wait : public BotBaseRequest{
@@ -114,6 +122,35 @@ public:
     }
     virtual BotBaseMessage message() const override{
         return BotBaseMessage(PABB_MSG_COMMAND_MASH_BUTTON, params);
+    }
+};
+
+
+class DeviceRequest_controller_state : public BotBaseRequest{
+public:
+    pabb_controller_state params;
+    DeviceRequest_controller_state(
+        Button button,
+        DpadPosition dpad,
+        uint8_t left_joystick_x,
+        uint8_t left_joystick_y,
+        uint8_t right_joystick_x,
+        uint8_t right_joystick_y,
+        uint8_t ticks
+    )
+        : BotBaseRequest(true)
+    {
+        params.seqnum = 0;
+        params.button = button;
+        params.dpad = dpad;
+        params.left_joystick_x = left_joystick_x;
+        params.left_joystick_y = left_joystick_y;
+        params.right_joystick_x = right_joystick_x;
+        params.right_joystick_y = right_joystick_y;
+        params.ticks = ticks;
+    }
+    virtual BotBaseMessage message() const override{
+        return BotBaseMessage(PABB_MSG_CONTROLLER_STATE, params);
     }
 };
 

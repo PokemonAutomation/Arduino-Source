@@ -19,7 +19,7 @@ namespace PokemonSwSh{
 WattFarmer_Descriptor::WattFarmer_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:WattFarmer",
-        "Date Spam: Watt Farmer",
+        STRING_POKEMON + " SwSh", "Date Spam - Watt Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-WattFarmer.md",
         "Farm watts. (7.2 seconds/fetch, 1 million watts/hour)",
         FeedbackType::NONE,
@@ -85,9 +85,6 @@ void WattFarmer::program(SingleSwitchProgramEnvironment& env){
         pbf_press_button(env.console, BUTTON_HOME, 10, 5);
         pbf_mash_button(env.console, BUTTON_B, GameSettings::instance().GAME_TO_HOME_DELAY_FAST - 15);
     }
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

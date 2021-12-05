@@ -25,12 +25,6 @@ void set_leds(const BotBaseContext& context, bool on){
         DeviceRequest_set_leds(on)
     );
 }
-void end_program_callback(const BotBaseContext& context){
-    context->issue_request(
-        &context.cancelled_bool(),
-        DeviceRequest_end_program_callback()
-    );
-}
 
 
 

@@ -22,7 +22,7 @@ namespace PokemonSwSh{
 ShinyHuntUnattendedSwordsOfJustice_Descriptor::ShinyHuntUnattendedSwordsOfJustice_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntUnattendedSwordsOfJustice",
-        "Shiny Hunt Unattended - Swords Of Justice",
+        STRING_POKEMON + " SwSh", "Shiny Hunt Unattended - Swords Of Justice",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-SwordsOfJustice.md",
         "Hunt for shiny SOJs. Stop when a shiny is found.",
         FeedbackType::NONE,
@@ -99,8 +99,6 @@ void ShinyHuntUnattendedSwordsOfJustice::program(SingleSwitchProgramEnvironment&
     }
 
     pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

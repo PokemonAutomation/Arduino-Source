@@ -24,7 +24,7 @@ using namespace Pokemon;
 GenerateNameOCRData_Descriptor::GenerateNameOCRData_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonHome:GenerateNameOCR",
-        STRING_POKEMON + " Home: Generate Name OCR",
+        STRING_POKEMON + " Home", STRING_POKEMON + " Home: Generate Name OCR",
         "",
         "Generate " + STRING_POKEMON + " Name OCR data by iterating the National " + STRING_POKEDEX + ".",
         FeedbackType::REQUIRED,

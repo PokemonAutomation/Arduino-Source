@@ -23,7 +23,7 @@ namespace PokemonSwSh{
 ShinyHuntUnattendedRegi_Descriptor::ShinyHuntUnattendedRegi_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:ShinyHuntUnattendedRegi",
-        "Shiny Hunt Unattended - Regi",
+        STRING_POKEMON + " SwSh", "Shiny Hunt Unattended - Regi",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntUnattended-Regi.md",
         "Hunt for shiny Regis. Stop when a shiny is found.",
         FeedbackType::NONE,

@@ -62,14 +62,21 @@ void grip_menu_connect_go_home(const BotBaseContext& context){
     pbf_press_button(context, BUTTON_A, 10, 140);
     pbf_press_button(context, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
 }
-void end_program_loop(const BotBaseContext& context){
-#if 0
-    pbf_wait(device, 15 * TICKS_PER_SECOND);
-    while (true){
-        pbf_press_button(device, BUTTON_ZL, 10, 15 * TICKS_PER_SECOND - 10);
-    }
-#endif
+
+void pbf_controller_state(
+    const BotBaseContext& context,
+    Button button,
+    DpadPosition position,
+    uint8_t left_x, uint8_t left_y,
+    uint8_t right_x, uint8_t right_y,
+    uint8_t ticks
+){
+    context->issue_request(
+        &context.cancelled_bool(),
+        DeviceRequest_controller_state(button, position, left_x, left_y, right_x, right_y, ticks)
+    );
 }
+
 
 
 

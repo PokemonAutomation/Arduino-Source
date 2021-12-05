@@ -29,7 +29,7 @@ using namespace Pokemon;
 GenerateNameOCRDataPokedex_Descriptor::GenerateNameOCRDataPokedex_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:GenerateNameOCRPokedex",
-        "Generate " + STRING_POKEMON + " Name OCR Data",
+        STRING_POKEMON + " SwSh", "Generate " + STRING_POKEMON + " Name OCR Data",
         "",
         "Generate " + STRING_POKEMON + " Name OCR data by iterating the " + STRING_POKEDEX + ".",
         FeedbackType::REQUIRED,

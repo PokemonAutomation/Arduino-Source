@@ -6,6 +6,7 @@
 
 #include <cmath>
 //#include <QSystemTrayIcon>
+#include <QProcess>
 #include "Common/Cpp/Exception.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/AlignedVector.h"
@@ -39,6 +40,7 @@
 #include "CommonFramework/OCR/OCR_LargeDictionaryMatcher.h"
 #include "CommonFramework/ImageMatch/ExactImageDictionaryMatcher.h"
 #include "CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h"
+#include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -121,6 +123,9 @@
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_VSSeekerReaction.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_StartBattleDetector.h"
+#include "PokemonBDSP/Programs/Eggs/PokemonBDSP_EggRoutines.h"
+#include "PokemonBDSP/Programs/PokemonBDSP_RunFromBattle.h"
 #include "TestProgram.h"
 
 #include <immintrin.h>
@@ -150,7 +155,7 @@ namespace NintendoSwitch{
 TestProgram_Descriptor::TestProgram_Descriptor()
     : MultiSwitchProgramDescriptor(
         "NintendoSwitch:TestProgram",
-        "Test Program",
+        "Nintendo Switch", "Test Program",
         "",
         "Test Program",
         FeedbackType::REQUIRED,
@@ -180,6 +185,16 @@ using namespace Kernels::WaterFill;
 
 
 
+namespace PokemonBDSP{
+
+
+
+
+}
+
+
+
+
 
 
 
@@ -196,6 +211,210 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoFeed& feed = env.consoles[0];
     VideoOverlay& overlay = env.consoles[0];
 
+    cout << "asdf" << endl;
+    cout << "qwer" << endl;
+    cout << "zxcv" << endl;
+    cout << "sdfg" << endl;
+//    cout << *(int*)nullptr << endl;
+
+#if 0
+    QProcess proc;
+    logger.log(proc.program());
+    cout << proc.state() << endl;
+    cout << proc.error() << endl;
+    cout << proc.processId() << endl;
+#endif
+
+//    pbf_press_button(console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+//    reset_game_from_home(env, console, true);
+
+
+
+#if 0
+    const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY;
+    const uint16_t BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY;
+
+
+    for (size_t c = 0; c < 5; c++){
+        if (c == 0){
+            pbf_press_button(console, BUTTON_X, 10, 50);
+        }else{
+            pbf_move_right_joystick(console, 128, 255, 10, BOX_SCROLL_DELAY);
+        }
+        pbf_press_button(console, BUTTON_A, 10, 50);
+        pbf_move_right_joystick(console, 128, 255, 10, 50);
+        pbf_press_button(console, BUTTON_A, 10, 125);
+        pbf_press_button(console, BUTTON_A, 10, 125);
+        pbf_press_button(console, BUTTON_B, 10, 125);
+    }
+#endif
+
+
+
+
+#if 0
+
+#if 1
+    console.botbase().wait_for_all_requests();
+    QImage start = console.video().snapshot();
+
+    pbf_press_button(console, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+    pbf_press_button(console, BUTTON_A, 10, GameSettings::instance().MENU_TO_POKEMON_DELAY);
+    pbf_press_button(console, BUTTON_A, 10, 50);
+    pbf_press_button(console, BUTTON_A, 10, 250);
+
+    //  Activate overlap.
+    pbf_press_button(console, BUTTON_ZL, 5, 3);
+    pbf_press_button(console, BUTTON_A, 5, 250);
+
+    //  Back all the way out to overworld with menu on top.
+    {
+        console.log("Backing out to overworld...");
+        std::deque<InferenceBoxScope> boxes;
+        ImageMatchDetector background_left(start, {0.02, 0.2, 0.08, 0.5}, 80);
+        ImageMatchDetector background_right(start, {0.90, 0.2, 0.08, 0.5}, 80);
+        background_left.make_overlays(boxes, console);
+        background_right.make_overlays(boxes, console);
+        size_t backouts = 0;
+        while (true){
+            pbf_press_button(console, BUTTON_B, 10, 215);
+            console.botbase().wait_for_all_requests();
+            backouts++;
+            if (backouts > 15){
+                PA_THROW_StringException("Overworld not detected after backing out 16 times.");
+            }
+
+            QImage current = console.video().snapshot();
+            auto now = std::chrono::system_clock::now();
+            if (!background_left.process_frame(current, now)){
+                continue;
+            }
+            if (!background_right.process_frame(current, now)){
+                continue;
+            }
+            break;
+        }
+    }
+#endif
+
+
+#if 1
+    //  Trigger an encounter.
+    {
+        console.log("Detected overworld. Triggering battle with menu overlap...");
+
+        StartBattleMenuOverlapDetector detector(overlay);
+        AsyncVisualInferenceSession session(env, console, console);
+        session += detector;
+
+        for (size_t c = 0; c < 60; c++){
+            if (detector.detected()){
+                break;
+            }
+            pbf_move_left_joystick(console, 0, 128, 45, 0);
+            pbf_move_right_joystick(console, 255, 128, 75, 0);
+            console.botbase().wait_for_all_requests();
+            pbf_move_left_joystick(console, 255, 128, 55, 0);
+            pbf_move_right_joystick(console, 0, 128, 75, 0);
+            console.botbase().wait_for_all_requests();
+        }
+
+        if (session.stop()){
+            console.log("Battle started!");
+        }else{
+            console.log("No battle detected after 2 minutes.", Qt::red);
+            PA_THROW_StringException("No battle detected after 2 minutes.");
+        }
+    }
+#endif
+
+    const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY;
+    const uint16_t BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY;
+
+    //  Enter Box
+    pbf_press_button(console, BUTTON_A, 10, 200);
+    pbf_press_button(console, BUTTON_R, 10, 250);
+
+    //  Change to multi-select.
+    pbf_press_button(console, BUTTON_Y, 10, 50);
+    pbf_press_button(console, BUTTON_Y, 10, 50);
+
+    pbf_move_right_joystick(console, 0, 128, 10, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(console, 128, 255, 10, BOX_SCROLL_DELAY);
+
+    //  Deposit current column.
+    pickup_column(console);
+    party_to_column(console, 0);
+    pbf_press_button(console, BUTTON_A, 10, BOX_PICKUP_DROP_DELAY);
+
+    pbf_move_right_joystick(console, 255, 128, 10, BOX_SCROLL_DELAY);
+    pickup_column(console);
+    column_to_party(console, 1);
+    pbf_press_button(console, BUTTON_A, 10, BOX_PICKUP_DROP_DELAY);
+
+    //  Mash B until battle menu is visible.
+    {
+        BattleMenuDetector detector(BattleType::WILD);
+        int ret = run_until(
+            env, console,
+            [=](const BotBaseContext& context){
+                pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
+            },
+            { &detector }
+        );
+        if (ret < 0){
+            console.log("Battle menu not detected after 10 seconds.", Qt::red);
+            PA_THROW_StringException("Battle menu not detected after 10 seconds.");
+        }else{
+            console.log("Battle menu found!");
+        }
+        pbf_mash_button(console, BUTTON_B, 2 * TICKS_PER_SECOND);
+    }
+
+    //  Run away.
+    pbf_press_dpad(console, DPAD_UP, 10, 0);
+    run_from_battle(env, console, 10 * TICKS_PER_SECOND);
+#endif
+
+#if 0
+    withdraw_1st_column_from_overworld(console);
+    swap_party(console, 0);
+    swap_party(console, 1);
+    swap_party(console, 2);
+    swap_party(console, 3);
+    swap_party(console, 4);
+    swap_party(console, 5);
+#endif
+
+
+//    party_to_column(console, 2);
+//    column_to_party(console, 2);
+
+
+//    egg_spin(console, 60000);
+
+
+//    pbf_move_left_joystick(console, 128, 0, 35, 0);
+//    pbf_move_left_joystick(console, 255, 128, 60, 0);
+
+
+#if 0
+    uint16_t spin_time = 300 * TICKS_PER_SECOND;
+    for (uint16_t c = 0; c < spin_time; c += 41){
+//        pbf_move_left_joystick(console, 128, 0, 5, 0);
+        pbf_controller_state(console, BUTTON_A, DPAD_NONE, 128, 0, 128, 128, 5);
+        pbf_move_left_joystick(console, 255, 0, 5, 0);
+//        pbf_move_left_joystick(console, 255, 128, 5, 0);
+        pbf_controller_state(console, BUTTON_A, DPAD_NONE, 255, 128, 128, 128, 5);
+        pbf_move_left_joystick(console, 255, 255, 5, 0);
+//        pbf_move_left_joystick(console, 128, 255, 5, 0);
+        pbf_controller_state(console, BUTTON_A, DPAD_NONE, 128, 255, 128, 128, 5);
+        pbf_move_left_joystick(console, 0, 255, 5, 0);
+//        pbf_move_left_joystick(console, 0, 128, 5, 0);
+        pbf_controller_state(console, BUTTON_A, DPAD_NONE, 0, 128, 128, 128, 6);
+        pbf_move_left_joystick(console, 0, 0, 5, 0);
+    }
+#endif
 
 
 
@@ -206,6 +425,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 //    pbf_move_left_joystick(console, 128, 255, 10, 0);
 
 
+#if 0
     pbf_press_dpad(console, DPAD_UP, 85, 0);
     for (size_t c = 0; c < 8; c++){
         pbf_move_left_joystick(console, 255, 128, 140, 0);
@@ -213,7 +433,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     }
     pbf_press_dpad(console, DPAD_DOWN, 85, 0);
     pbf_press_dpad(console, DPAD_RIGHT, 10, 0);
-
+#endif
 
 #if 0
     pbf_move_left_joystick(console, 128, 255, 6 * TICKS_PER_SECOND, 0);
@@ -622,9 +842,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 #if 0
-    PokemonCaughtMenuDetector detector;
+    PokemonSwSh::MaxLairInternal::PokemonCaughtMenuDetector detector;
+    std::deque<InferenceBoxScope> boxes;
+    detector.make_overlays(boxes, overlay);
 
-    QImage image("20211106-143106513770-ProgramHang.png");
+    QImage image("20211124-104344538159-ProgramHang.png");
     cout << detector.detect(image) << endl;
 #endif
 
@@ -1518,11 +1740,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 #if 0
-    BattleMenuDetector detector;
+    PokemonSwSh::MaxLairInternal::BattleMenuDetector detector;
     std::deque<InferenceBoxScope> boxes;
     detector.make_overlays(boxes, overlay);
 
-    cout << detector.detect(feed.snapshot()) << endl;
+    QImage screen("20211124-111153502664-ProgramHang.png");
+    cout << detector.detect(screen) << endl;
 #endif
 
 

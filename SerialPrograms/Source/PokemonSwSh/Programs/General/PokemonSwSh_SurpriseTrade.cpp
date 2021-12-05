@@ -19,7 +19,7 @@ namespace PokemonSwSh{
 SurpriseTrade_Descriptor::SurpriseTrade_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:SurpriseTrade",
-        "Surprise Trade",
+        STRING_POKEMON + " SwSh", "Surprise Trade",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/SurpriseTrade.md",
         "Surprise trade away boxes of " + STRING_POKEMON,
         FeedbackType::NONE,
@@ -136,9 +136,6 @@ void SurpriseTrade::program(SingleSwitchProgramEnvironment& env){
     }
 
     ssf_press_button2(env.console, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
 }
 
 

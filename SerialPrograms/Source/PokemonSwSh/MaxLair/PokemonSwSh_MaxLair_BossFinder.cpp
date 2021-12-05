@@ -21,7 +21,7 @@ using namespace MaxLairInternal;
 MaxLairBossFinder_Descriptor::MaxLairBossFinder_Descriptor()
     : MultiSwitchProgramDescriptor(
         "PokemonSwSh:MaxLair-BossFinder",
-        "Max Lair: Boss Finder",
+        STRING_POKEMON + " SwSh", "Max Lair - Boss Finder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/MaxLair-BossFinder.md",
         "Auto Max Lair 2.0 - Run adventures until you find the boss you want. Once you find your boss, switch to the other programs to shiny hunt it.",
         FeedbackType::REQUIRED,

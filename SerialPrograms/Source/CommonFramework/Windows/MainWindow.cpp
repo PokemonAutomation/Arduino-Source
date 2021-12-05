@@ -48,7 +48,7 @@ MainWindow::MainWindow(QWidget* parent)
 //    statusbar = new QStatusBar(this);
 //    statusbar->setObjectName(QString::fromUtf8("statusbar"));
 //    setStatusBar(statusbar);
-    setWindowTitle(STRING_POKEMON + " Automation Serial Programs (" + PROGRAM_VERSION + ")");
+    setWindowTitle(STRING_POKEMON + " Automation Computer-Control Programs (" + PROGRAM_VERSION + ")");
 
     QHBoxLayout* hbox = new QHBoxLayout(centralwidget);
 

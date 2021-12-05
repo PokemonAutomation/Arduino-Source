@@ -35,7 +35,7 @@ void send_encounter_notification(
     EventNotificationOption& settings_shiny,
     const ProgramInfo& info,
     bool enable_names, bool shiny_detected,
-    const std::vector<EncounterResult> results,
+    const std::vector<EncounterResult>& results,
     const QImage& screenshot = QImage(),
     const StatsTracker* session_stats = nullptr,
     const EncounterFrequencies* frequencies = nullptr,

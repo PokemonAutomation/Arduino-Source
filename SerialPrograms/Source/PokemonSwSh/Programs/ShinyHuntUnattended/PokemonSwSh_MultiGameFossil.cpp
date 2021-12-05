@@ -5,6 +5,7 @@
  */
 
 #include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Routines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/FixedInterval.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -20,7 +21,7 @@ namespace PokemonSwSh{
 MultiGameFossil_Descriptor::MultiGameFossil_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonSwSh:MultiGameFossil",
-        "Multi-Game Fossil Revive",
+        STRING_POKEMON + " SwSh", "Multi-Game Fossil Revive",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/MultiGameFossil.md",
         "Revive fossils. Supports multiple saves so you can go afk for longer than 5 hours.",
         FeedbackType::NONE,
@@ -136,11 +137,6 @@ void MultiGameFossil::program(SingleSwitchProgramEnvironment& env){
     }
 
     ssf_press_button2(env.console, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
-
-    end_program_callback(env.console);
-    end_program_loop(env.console);
-
-
 }
 
 

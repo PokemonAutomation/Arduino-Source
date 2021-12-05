@@ -25,7 +25,7 @@ namespace PokemonBDSP{
 LegendaryReset_Descriptor::LegendaryReset_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonBDSP:LegendaryReset",
-        "Legendary Reset",
+        STRING_POKEMON + " BDSP", "Legendary Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/LegendaryReset.md",
         "Shiny hunt a standing legendary " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
@@ -73,6 +73,8 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env){
         stats
     );
 
+    //  Connect the controller.
+    pbf_press_button(env.console, BUTTON_B, 5, 5);
 
     bool reset = false;
     while (true){
@@ -132,16 +134,13 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env){
         }
     }
 
-    if (GO_HOME_WHEN_DONE){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-    }
-
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
         env.program_info(),
         "",
         stats.to_str()
     );
+    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
 }
 
 

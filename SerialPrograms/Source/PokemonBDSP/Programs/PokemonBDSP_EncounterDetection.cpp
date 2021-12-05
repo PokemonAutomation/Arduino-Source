@@ -39,6 +39,8 @@ StandardEncounterDetection::StandardEncounterDetection(
     InferenceBoxScope left_name(console, {0.467, 0.06, 0.16, 0.050});
     InferenceBoxScope right_name(console, {0.740, 0.06, 0.16, 0.050});
 
+    console.botbase().wait_for_all_requests();
+    env.wait_for(std::chrono::milliseconds(100));
     QImage screen = console.video().snapshot();
 
     //  Check if it's a double battle.
@@ -54,12 +56,17 @@ StandardEncounterDetection::StandardEncounterDetection(
         m_double_battle = true;
     }while (false);
 
+    m_pokemon_left.exists = m_double_battle;
+    m_pokemon_right.exists = true;
+
     //  Read the names.
     if (m_language != Language::None){
         if (m_double_battle){
-            m_pokemon_left = read_name(screen, left_name);
+            m_pokemon_left.detection_enabled = true;
+            m_pokemon_left.slugs = read_name(screen, left_name);
         }
-        m_pokemon_right = read_name(screen, right_name);
+        m_pokemon_right.detection_enabled = true;
+        m_pokemon_right.slugs = read_name(screen, right_name);
     }
 
     do{
@@ -85,17 +92,11 @@ StandardEncounterDetection::StandardEncounterDetection(
         m_shininess_right = m_shininess.right_is_shiny ? ShinyType::UNKNOWN_SHINY : ShinyType::NOT_SHINY;
     }while (false);
 }
-const std::set<std::string>* StandardEncounterDetection::pokemon_left() const{
-    if (m_language == Language::None || !m_double_battle){
-        return nullptr;
-    }
-    return &m_pokemon_left;
+const PokemonDetection& StandardEncounterDetection::pokemon_left() const{
+    return m_pokemon_left;
 }
-const std::set<std::string>* StandardEncounterDetection::pokemon_right() const{
-    if (m_language == Language::None){
-        return nullptr;
-    }
-    return &m_pokemon_right;
+const PokemonDetection& StandardEncounterDetection::pokemon_right() const{
+    return m_pokemon_right;
 }
 bool StandardEncounterDetection::has_shiny() const{
     switch (m_shininess.shiny_type){
@@ -157,11 +158,14 @@ bool filter_match(ShinyType detection, ShinyFilter filter){
 void StandardEncounterDetection::run_overrides(
     std::vector<std::pair<EncounterAction, std::string>>& actions,
     const std::vector<EncounterFilterOverride>& overrides,
-    const std::set<std::string>& pokemon, bool side_shiny
+    const PokemonDetection& pokemon, bool side_shiny
 ) const{
+    if (!pokemon.exists || !pokemon.detection_enabled){
+        return;
+    }
     for (const EncounterFilterOverride& override : overrides){
         //  Not a token match.
-        if (pokemon.find(override.pokemon_slug) == pokemon.end()){
+        if (pokemon.slugs.find(override.pokemon_slug) == pokemon.slugs.end()){
             continue;
         }
 
