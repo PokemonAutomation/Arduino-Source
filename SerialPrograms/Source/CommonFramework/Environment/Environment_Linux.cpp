@@ -4,7 +4,7 @@
  *
  */
 
-#ifdef __linux
+#if defined(__linux) || defined(__APPLE__)
 
 #include "Common/Cpp/Exception.h"
 #include "CommonFramework/Tools/Logger.h"

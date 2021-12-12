@@ -7,7 +7,8 @@
 #ifndef PokemonAutomation_Kernels_ImageScaleBrightness_H
 #define PokemonAutomation_Kernels_ImageScaleBrightness_H
 
-#include <stdint.h>
+#include <cstdint>
+#include <cstddef>
 
 namespace PokemonAutomation{
 namespace Kernels{
