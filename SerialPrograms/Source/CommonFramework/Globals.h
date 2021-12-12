@@ -18,6 +18,7 @@ extern const QString DISCORD_LINK_URL;
 extern const QString ONLINE_DOC_URL;
 extern const QString PROJECT_GITHUB;
 extern const QString PROJECT_GITHUB_URL;
+extern const QString PROJECT_SOURCE_URL;
 
 const auto SERIAL_REFRESH_RATE = std::chrono::milliseconds(1000);
 extern const QString STRING_POKEBALL;

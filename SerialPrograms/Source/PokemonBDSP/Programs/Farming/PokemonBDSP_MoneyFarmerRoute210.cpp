@@ -94,12 +94,12 @@ void MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
         int ret = run_until(
             env, env.console,
             [=](const BotBaseContext& context){
-                pbf_press_button(context, BUTTON_A, 10, 10);
+                pbf_press_button(context, BUTTON_ZL, 10, 10);
                 for (size_t c = 0; c < 17; c++){
                     pbf_press_dpad(context, DPAD_UP, 5, 10);
-                    pbf_press_button(context, BUTTON_A, 10, 10);
+                    pbf_press_button(context, BUTTON_ZL, 10, 10);
                     pbf_press_dpad(context, DPAD_RIGHT, 20, 10);
-                    pbf_press_button(context, BUTTON_A, 10, 10);
+                    pbf_press_button(context, BUTTON_ZL, 10, 10);
                 }
             },
             { &detector, }
@@ -152,7 +152,7 @@ void MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
         battle_menu_seen = true;
 
         {
-            pbf_press_button(env.console, BUTTON_A, 10, 125);
+            pbf_press_button(env.console, BUTTON_ZL, 10, 125);
             uint8_t slot = 0;
             for (; slot < 4; slot++){
                 if (pp0[slot] != 0){
@@ -168,12 +168,12 @@ void MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
                 move_slot0++;
                 pbf_press_dpad(env.console, DPAD_DOWN, 10, 50);
             }
-            pbf_press_button(env.console, BUTTON_A, 10, 125);
-            pbf_press_button(env.console, BUTTON_A, 10, 375);
+            pbf_press_button(env.console, BUTTON_ZL, 10, 125);
+            pbf_press_button(env.console, BUTTON_ZL, 10, 375);
             pp0[slot]--;
         }
         {
-            pbf_press_button(env.console, BUTTON_A, 10, 125);
+            pbf_press_button(env.console, BUTTON_ZL, 10, 125);
             uint8_t slot = 0;
             for (; slot < 4; slot++){
                 if (pp1[slot] != 0){
@@ -189,8 +189,8 @@ void MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
                 move_slot1++;
                 pbf_press_dpad(env.console, DPAD_DOWN, 10, 50);
             }
-            pbf_press_button(env.console, BUTTON_A, 10, 125);
-            pbf_press_button(env.console, BUTTON_A, 10, 375);
+            pbf_press_button(env.console, BUTTON_ZL, 10, 125);
+            pbf_press_button(env.console, BUTTON_ZL, 10, 375);
             pp1[slot]--;
         }
     }
@@ -202,7 +202,7 @@ void MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
 void MoneyFarmerRoute210::heal_and_return(ConsoleHandle& console, uint8_t pp0[4], uint8_t pp1[4]){
     console.log("Healing " + STRING_POKEMON + " Celestic Town " + STRING_POKEMON + " Center.");
     pbf_move_left_joystick(console, 125, 0, 6 * TICKS_PER_SECOND, 0);
-    pbf_mash_button(console, BUTTON_A, 3 * TICKS_PER_SECOND);
+    pbf_mash_button(console, BUTTON_ZL, 3 * TICKS_PER_SECOND);
     pbf_mash_button(console, BUTTON_B, 10 * TICKS_PER_SECOND);
 
     console.log("Returning to trainers...");
@@ -212,7 +212,7 @@ void MoneyFarmerRoute210::heal_and_return(ConsoleHandle& console, uint8_t pp0[4]
     pbf_move_left_joystick(console, 255, 128, 750, 0);
 
     pbf_press_button(console, BUTTON_R, 10, 150);
-    pbf_mash_button(console, BUTTON_A, 6 * TICKS_PER_SECOND);
+    pbf_mash_button(console, BUTTON_ZL, 6 * TICKS_PER_SECOND);
 
     pbf_move_left_joystick(console, 128, 255, 30, 0);
     pbf_move_left_joystick(console,   0, 128, 30, 0);
@@ -243,7 +243,7 @@ void MoneyFarmerRoute210::flyback_heal_and_return(ConsoleHandle& console, uint8_
     pbf_press_button(console, BUTTON_PLUS, 10, 240);
     pbf_press_dpad(console, DPAD_LEFT, 10, 60);
     pbf_press_dpad(console, DPAD_LEFT, 10, 60);
-    pbf_mash_button(console, BUTTON_A, 12 * TICKS_PER_SECOND);
+    pbf_mash_button(console, BUTTON_ZL, 12 * TICKS_PER_SECOND);
     heal_and_return(console, pp0, pp1);
 }
 bool MoneyFarmerRoute210::has_pp(uint8_t pp0[4], uint8_t pp1[4]){

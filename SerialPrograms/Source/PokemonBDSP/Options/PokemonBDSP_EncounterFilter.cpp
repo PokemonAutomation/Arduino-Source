@@ -15,6 +15,10 @@
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
 #include "PokemonBDSP_EncounterFilter.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
@@ -49,6 +53,7 @@ const std::map<QString, EncounterAction> EncounterAction_MAP{
 
 EncounterFilterOverride::EncounterFilterOverride(bool allow_autocatch)
     : m_allow_autocatch(allow_autocatch)
+    , m_ball_select(nullptr)
 {}
 
 void EncounterFilterOverride::load_json(const QJsonValue& json){
@@ -65,7 +70,7 @@ void EncounterFilterOverride::load_json(const QJsonValue& json){
             action = EncounterAction::StopProgram;
         }
     }
-    {
+    if (m_allow_autocatch){
         QString value;
         json_get_string(value, obj, "Ball");
         pokeball_slug = value.toUtf8().data();
@@ -88,7 +93,9 @@ void EncounterFilterOverride::load_json(const QJsonValue& json){
 QJsonValue EncounterFilterOverride::to_json() const{
     QJsonObject obj;
     obj.insert("Action", EncounterAction_NAMES[(size_t)action]);
-    obj.insert("Ball", QString::fromStdString(pokeball_slug));
+    if (m_allow_autocatch){
+        obj.insert("Ball", QString::fromStdString(pokeball_slug));
+    }
     obj.insert("Species", QString::fromStdString(pokemon_slug));
     obj.insert("ShinyFilter", ShinyFilter_NAMES[(size_t)shininess]);
     return obj;
@@ -98,14 +105,33 @@ std::unique_ptr<EditableTableRow> EncounterFilterOverride::clone() const{
 }
 std::vector<QWidget*> EncounterFilterOverride::make_widgets(QWidget& parent){
     std::vector<QWidget*> widgets;
-    BallSelectWidget* ball_select = make_ball_select(parent);
-    widgets.emplace_back(make_action_box(parent, *ball_select));
-    widgets.emplace_back(ball_select);
+    if (m_allow_autocatch){
+        m_ball_select = make_ball_select(parent);
+        widgets.emplace_back(make_action_box(parent));
+        widgets.emplace_back(m_ball_select);
+    }else{
+        widgets.emplace_back(make_action_box(parent));
+    }
     widgets.emplace_back(make_species_select(parent));
     widgets.emplace_back(make_shiny_box(parent));
     return widgets;
 }
-QComboBox* EncounterFilterOverride::make_action_box(QWidget& parent, BallSelectWidget& ball_select){
+void EncounterFilterOverride::update_ball_select(){
+    if (!m_allow_autocatch){
+        return;
+    }
+    switch (action){
+    case EncounterAction::StopProgram:
+    case EncounterAction::RunAway:
+        m_ball_select->setEnabled(false);
+        break;
+    case EncounterAction::ThrowBalls:
+    case EncounterAction::ThrowBallsAndSave:
+        m_ball_select->setEnabled(true);
+        break;
+    }
+}
+QComboBox* EncounterFilterOverride::make_action_box(QWidget& parent){
     QComboBox* box = new NoWheelComboBox(&parent);
     box->addItem(EncounterAction_NAMES[0]);
     box->addItem(EncounterAction_NAMES[1]);
@@ -115,15 +141,17 @@ QComboBox* EncounterFilterOverride::make_action_box(QWidget& parent, BallSelectW
     }
     box->setCurrentIndex((int)action);
 
-    switch (action){
-    case EncounterAction::StopProgram:
-    case EncounterAction::RunAway:
-        ball_select.setEnabled(false);
-        break;
-    case EncounterAction::ThrowBalls:
-    case EncounterAction::ThrowBallsAndSave:
-        ball_select.setEnabled(true);
-        break;
+    if (m_allow_autocatch){
+        switch (action){
+        case EncounterAction::StopProgram:
+        case EncounterAction::RunAway:
+            m_ball_select->setEnabled(false);
+            break;
+        case EncounterAction::ThrowBalls:
+        case EncounterAction::ThrowBallsAndSave:
+            m_ball_select->setEnabled(true);
+            break;
+        }
     }
 
     box->connect(
@@ -133,15 +161,17 @@ QComboBox* EncounterFilterOverride::make_action_box(QWidget& parent, BallSelectW
                 index = 0;
             }
             action = (EncounterAction)index;
-            switch ((EncounterAction)index){
-            case EncounterAction::StopProgram:
-            case EncounterAction::RunAway:
-                ball_select.setEnabled(false);
-                break;
-            case EncounterAction::ThrowBalls:
-            case EncounterAction::ThrowBallsAndSave:
-                ball_select.setEnabled(true);
-                break;
+            if (m_allow_autocatch){
+                switch ((EncounterAction)index){
+                case EncounterAction::StopProgram:
+                case EncounterAction::RunAway:
+                    m_ball_select->setEnabled(false);
+                    break;
+                case EncounterAction::ThrowBalls:
+                case EncounterAction::ThrowBallsAndSave:
+                    m_ball_select->setEnabled(true);
+                    break;
+                }
             }
         }
     );
@@ -225,8 +255,8 @@ EncounterFilterOption::EncounterFilterOption(bool enable_overrides, bool allow_a
     , m_factory(allow_autocatch)
     , m_table(
         "<b>Overrides:</b><br>"
-        "The game language must be properly set to read " + STRING_POKEMON + " names.<br>"
-        "If more than one overrides apply and are conflicting, the program will stop.",
+        "The game language must be properly set to read " + STRING_POKEMON + " names. "
+        "If multiple overrides apply and are conflicting, the program will stop.",
         m_factory, false
     )
 {}

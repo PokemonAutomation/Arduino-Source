@@ -130,7 +130,7 @@ void CloneItemsMenuOverlap::swap_party(ConsoleHandle& console){
     const uint16_t BOX_PICKUP_DROP_DELAY = 40;
 
     //  Enter Box
-    pbf_mash_button(console, BUTTON_A, 30);
+    pbf_mash_button(console, BUTTON_ZL, 30);
     pbf_wait(console, 130);
     pbf_press_button(console, BUTTON_R, 20, 190);
 
@@ -144,12 +144,12 @@ void CloneItemsMenuOverlap::swap_party(ConsoleHandle& console){
     //  Deposit current column.
     pickup_column(console);
     party_to_column(console, 0);
-    pbf_press_button(console, BUTTON_A, 10, BOX_PICKUP_DROP_DELAY);
+    pbf_press_button(console, BUTTON_ZL, 10, BOX_PICKUP_DROP_DELAY);
 
     pbf_move_right_joystick(console, 255, 128, 10, BOX_SCROLL_DELAY);
     pickup_column(console);
     column_to_party(console, 1);
-    pbf_press_button(console, BUTTON_A, 10, BOX_PICKUP_DROP_DELAY);
+    pbf_press_button(console, BUTTON_ZL, 10, BOX_PICKUP_DROP_DELAY);
 }
 void CloneItemsMenuOverlap::mash_B_to_battle(ProgramEnvironment& env, ConsoleHandle& console){
     BattleMenuDetector detector(BattleType::WILD);
@@ -177,30 +177,42 @@ void CloneItemsMenuOverlap::detach_items(ConsoleHandle& console){
         }else{
             pbf_move_right_joystick(console, 128, 255, 10, BOX_SCROLL_DELAY);
         }
-        pbf_press_button(console, BUTTON_A, 10, 50);
+        pbf_press_button(console, BUTTON_ZL, 10, 50);
         pbf_move_right_joystick(console, 128, 255, 10, 50);
-        pbf_press_button(console, BUTTON_A, 10, 100);
-        pbf_press_button(console, BUTTON_A, 10, 100);
+        pbf_press_button(console, BUTTON_ZL, 10, 100);
+        pbf_press_button(console, BUTTON_ZL, 10, 100);
         pbf_press_button(console, BUTTON_B, 10, 100);
     }
 }
 
 void CloneItemsMenuOverlap::program(SingleSwitchProgramEnvironment& env){
     Stats& stats = env.stats<Stats>();
-    env.update_stats();
 
     //  Connect the controller.
     pbf_mash_button(env.console, BUTTON_B, 50);
 
+    size_t consecutive_failures = 0;
     uint16_t save_counter = 0;
     for (uint16_t batch = 0; batch < BATCHES; batch++){
-        QImage start = activate_menu_overlap_from_overworld(env.console);
+        env.update_stats();
+        send_program_status_notification(
+            env.logger(), NOTIFICATION_STATUS_UPDATE,
+            env.program_info(),
+            "",
+            stats.to_str()
+        );
 
+        QImage start = activate_menu_overlap_from_overworld(env.console);
         if (start.isNull()){
             stats.m_errors++;
+            consecutive_failures++;
+            if (consecutive_failures >= 3){
+                PA_THROW_StringException("Failed to activate menu overlap glitch 3 times in the row.");
+            }
             pbf_mash_button(env.console, BUTTON_B, 10 * TICKS_PER_SECOND);
             continue;
         }
+        consecutive_failures = 0;
 
         //  Trigger an encounter.
         if (!trigger_encounter(env, env.console)){
@@ -235,12 +247,12 @@ void CloneItemsMenuOverlap::program(SingleSwitchProgramEnvironment& env){
         pbf_press_button(env.console, BUTTON_Y, 20, 40);
         pickup_column(env.console);
         pbf_move_right_joystick(env.console, 255, 128, 10, GameSettings::instance().BOX_SCROLL_DELAY_0);
-        pbf_press_button(env.console, BUTTON_A, 10, GameSettings::instance().BOX_PICKUP_DROP_DELAY);
+        pbf_press_button(env.console, BUTTON_ZL, 10, GameSettings::instance().BOX_PICKUP_DROP_DELAY);
 
         //  Detach items.
         detach_items(env.console);
         pbf_mash_button(env.console, BUTTON_B, 2 * TICKS_PER_SECOND);
-        back_out_to_overworld(env.console, start, 0);
+        back_out_to_overworld_with_overlap(env.console, start, 0);
 
         save_counter++;
         if (SAVE_INTERVAL != 0 && save_counter >= SAVE_INTERVAL){
@@ -248,13 +260,6 @@ void CloneItemsMenuOverlap::program(SingleSwitchProgramEnvironment& env){
         }
 
         stats.m_batches++;
-        env.update_stats();
-        send_program_status_notification(
-            env.logger(), NOTIFICATION_STATUS_UPDATE,
-            env.program_info(),
-            "",
-            stats.to_str()
-        );
     }
 
     env.update_stats();

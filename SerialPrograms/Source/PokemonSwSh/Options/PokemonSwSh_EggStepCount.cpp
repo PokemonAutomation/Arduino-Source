@@ -22,8 +22,8 @@ const std::vector<uint16_t> STEP_COUNTS{
     7680,
     8960,
     10240,
-    20480,
-    30720,
+//    20480,
+//    30720,
 };
 
 EggStepCountOption::EggStepCountOption()

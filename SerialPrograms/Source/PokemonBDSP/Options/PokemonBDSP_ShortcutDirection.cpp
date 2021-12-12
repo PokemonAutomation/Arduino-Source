@@ -35,7 +35,7 @@ void ShortcutDirection::run(const BotBaseContext& context, uint16_t delay){
     default: PA_THROW_StringException("Invalid shortcut value: " + std::to_string(*this));
     }
     pbf_mash_button(context, BUTTON_PLUS, 125);
-    pbf_move_right_joystick(context, shortcut_x, shortcut_y, 10, delay);
+    pbf_move_right_joystick(context, shortcut_x, shortcut_y, 20, delay);
 }
 
 

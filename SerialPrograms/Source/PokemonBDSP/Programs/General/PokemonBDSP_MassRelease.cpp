@@ -76,13 +76,13 @@ void MassRelease::program(SingleSwitchProgramEnvironment& env){
         stats.m_boxes_released++;
         for (uint8_t box = 1; box < BOXES_TO_RELEASE; box++){
             env.update_stats();
-            pbf_press_dpad(env.console, DPAD_DOWN, 5, box_scroll_delay);
-            pbf_press_dpad(env.console, DPAD_DOWN, 5, box_scroll_delay);
-            pbf_press_dpad(env.console, DPAD_DOWN, 5, box_scroll_delay);
-            pbf_press_dpad(env.console, DPAD_RIGHT, 5, box_scroll_delay);
-            pbf_press_dpad(env.console, DPAD_RIGHT, 5, box_scroll_delay);
+            pbf_press_dpad(env.console, DPAD_DOWN, 20, box_scroll_delay);
+            pbf_press_dpad(env.console, DPAD_DOWN, 20, box_scroll_delay);
+            pbf_press_dpad(env.console, DPAD_DOWN, 20, box_scroll_delay);
+            pbf_press_dpad(env.console, DPAD_RIGHT, 20, box_scroll_delay);
+            pbf_press_dpad(env.console, DPAD_RIGHT, 20, box_scroll_delay);
             pbf_wait(env.console, 50);
-            pbf_press_button(env.console, BUTTON_R, 5, box_change_delay);
+            pbf_press_button(env.console, BUTTON_R, 20, box_change_delay);
             release_box(env.console, box_scroll_delay);
             stats.m_boxes_released++;
         }

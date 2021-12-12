@@ -94,7 +94,7 @@ bool gamemenu_to_ingame(
 ){
     console.log("Mashing A to enter game...");
     BlackScreenOverDetector detector({0.2, 0.2, 0.6, 0.6});
-    pbf_mash_button(console, BUTTON_A, mash_duration);
+    pbf_mash_button(console, BUTTON_ZL, mash_duration);
     console.botbase().wait_for_all_requests();
     console.log("Waiting to enter game...");
     int ret = wait_until(
@@ -128,6 +128,18 @@ bool openedgame_to_ingame(
     return ok;
 }
 
+void move_to_user(const BotBaseContext& context, uint8_t user_slot){
+    if (user_slot != 0){
+        //  Move to correct user.
+        for (uint8_t c = 0; c < 8; c++){
+            pbf_press_dpad(context, DPAD_LEFT, 7, 7);
+        }
+        for (uint8_t c = 1; c < user_slot; c++){
+            pbf_press_dpad(context, DPAD_RIGHT, 7, 7);
+        }
+    }
+}
+
 void start_game_from_home(
     ProgramEnvironment& env,
     ConsoleHandle& console,
@@ -146,8 +158,9 @@ void start_game_from_home(
     if (tolerate_update_menu){
         //  If the update menu isn't there, these will get swallowed by the opening
         //  animation for the select user menu.
-        pbf_press_button(console, BUTTON_A, 5, 35);      //  Choose game
+        pbf_press_button(console, BUTTON_A, 5, 175);      //  Choose game
         pbf_press_dpad(console, DPAD_UP, 5, 0);          //  Skip the update window.
+        move_to_user(console, user_slot);
     }
 
 //    cout << "START_GAME_REQUIRES_INTERNET = " << START_GAME_REQUIRES_INTERNET << endl;
@@ -156,26 +169,17 @@ void start_game_from_home(
         pbf_mash_button(console, BUTTON_A, start_game_mash);
     }else{
         pbf_press_button(console, BUTTON_A, 5, 175);     //  Enter select user menu.
-        if (user_slot != 0){
-            //  Move to correct user.
-            for (uint8_t c = 0; c < 8; c++){
-                pbf_press_dpad(console, DPAD_LEFT, 7, 7);
-            }
-//            pbf_wait(50);
-            for (uint8_t c = 1; c < user_slot; c++){
-                pbf_press_dpad(console, DPAD_RIGHT, 7, 7);
-            }
-        }
+        move_to_user(console, user_slot);
         pbf_press_button(console, BUTTON_A, 5, 5);       //  Enter game
 
-        //  Switch to mashing ZR instead of A to get into the game.
+        //  Switch to mashing ZL instead of A to get into the game.
         //  Mash your way into the game.
         uint16_t duration = start_game_mash;
         if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET){
             //  Need to wait a bit longer for the internet check.
             duration += ConsoleSettings::instance().START_GAME_INTERNET_CHECK_DELAY;
         }
-        pbf_mash_button(console, BUTTON_ZR, duration);
+        pbf_mash_button(console, BUTTON_ZL, duration);
     }
     console.botbase().wait_for_all_requests();
 }
@@ -215,7 +219,7 @@ bool reset_game_from_home(
 void save_game(const BotBaseContext& context){
     pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
     pbf_press_button(context, BUTTON_R, 10, 2 * TICKS_PER_SECOND);
-    pbf_press_button(context, BUTTON_A, 10, 5 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_ZL, 10, 5 * TICKS_PER_SECOND);
 }
 
 

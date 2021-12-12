@@ -24,7 +24,7 @@ bool run_from_battle(
     int ret = run_until(
         env, console,
         [=](const BotBaseContext& context){
-            pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_ZL, TICKS_PER_SECOND);
             if (exit_battle_time > TICKS_PER_SECOND){
                 pbf_mash_button(context, BUTTON_B, exit_battle_time - TICKS_PER_SECOND);
             }

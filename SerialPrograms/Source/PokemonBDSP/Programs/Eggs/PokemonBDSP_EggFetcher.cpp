@@ -95,7 +95,7 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env){
         pbf_move_left_joystick(env.console, 255, 128, 60, 0);
 
         //  Fetch egg.
-        pbf_mash_button(env.console, BUTTON_A, 500);
+        pbf_mash_button(env.console, BUTTON_ZL, 500);
         pbf_mash_button(env.console, BUTTON_B, 500);
         pbf_move_left_joystick(env.console, 0, 255, 125, 0);
         SHORTCUT.run(env.console, 100);

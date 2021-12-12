@@ -100,7 +100,7 @@ void MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
         env.log("Starting battle with woman (right).");
     }
 
-    pbf_mash_button(env.console, BUTTON_A, 5 * TICKS_PER_SECOND);
+    pbf_mash_button(env.console, BUTTON_ZL, 5 * TICKS_PER_SECOND);
 
     uint8_t move_slot = 0;
     bool battle_menu_seen = false;
@@ -128,7 +128,7 @@ void MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
             env.log("Battle menu detected!", Qt::blue);
             battle_menu_seen = true;
 
-            pbf_press_button(env.console, BUTTON_A, 10, 125);
+            pbf_press_button(env.console, BUTTON_ZL, 10, 125);
 
             uint8_t slot = 0;
             for (; slot < 4; slot++){
@@ -145,7 +145,7 @@ void MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
                 move_slot++;
                 pbf_press_dpad(env.console, DPAD_DOWN, 10, 50);
             }
-            pbf_mash_button(env.console, BUTTON_A, 250);
+            pbf_mash_button(env.console, BUTTON_ZL, 250);
             pp[slot]--;
 
             break;
@@ -171,7 +171,7 @@ void MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
 void MoneyFarmerRoute212::heal_and_return(ConsoleHandle& console, uint8_t pp[4]){
     console.log("Healing " + STRING_POKEMON + " at Hearthome City " + STRING_POKEMON + " Center.");
     pbf_move_left_joystick(console, 125, 0, 6 * TICKS_PER_SECOND, 0);
-    pbf_mash_button(console, BUTTON_A, 3 * TICKS_PER_SECOND);
+    pbf_mash_button(console, BUTTON_ZL, 3 * TICKS_PER_SECOND);
     pbf_mash_button(console, BUTTON_B, 10 * TICKS_PER_SECOND);
 
     console.log("Returning to rich couple location...");
@@ -205,7 +205,7 @@ void MoneyFarmerRoute212::flyback_heal_and_return(ConsoleHandle& console, uint8_
     pbf_press_button(console, BUTTON_PLUS, 10, 240);
     pbf_press_dpad(console, DPAD_UP, 10, 60);
     pbf_press_dpad(console, DPAD_UP, 10, 60);
-    pbf_mash_button(console, BUTTON_A, 12 * TICKS_PER_SECOND);
+    pbf_mash_button(console, BUTTON_ZL, 12 * TICKS_PER_SECOND);
     heal_and_return(console, pp);
 }
 

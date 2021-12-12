@@ -211,11 +211,46 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoFeed& feed = env.consoles[0];
     VideoOverlay& overlay = env.consoles[0];
 
+#if 1
+    cout << "asdf" << endl;
+    cout << "qwer\nzxcv" << endl;
+    cout << 123.456 << endl << 489.156 << endl;
+    std::cerr << "sdfg" << endl;
+#endif
+
+#if 0
+    ImageMatchDetector background_all(QImage(), {0, 0, 1, 1}, 50);
+
+    int ret = run_until(
+        env, console,
+        [](const BotBaseContext& context){
+            pbf_mash_button(context, BUTTON_B, 20 * TICKS_PER_SECOND);
+        },
+        { &background_all }
+    );
+#endif
+
+
+
+#if 0
+    cout << "[";
+    cout << "]";
+//    cout << endl;
+
+    cout << "asdf" << endl;
+    cout << "qwer\nzxcv" << endl;
+    std::cerr << "sdfg" << endl;
+#endif
+
+
+#if 0
     cout << "asdf" << endl;
     cout << "qwer" << endl;
     cout << "zxcv" << endl;
     cout << "sdfg" << endl;
 //    cout << *(int*)nullptr << endl;
+#endif
+
 
 #if 0
     QProcess proc;

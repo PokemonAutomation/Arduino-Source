@@ -56,7 +56,7 @@ private:
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;
-    TimeExpressionOption<uint16_t> SAFETY_TIME;
+    TimeExpressionOption<uint16_t> SAFETY_TIME0;
     TimeExpressionOption<uint16_t> HATCH_DELAY;
 };
 

@@ -50,9 +50,9 @@ EggHatcher::EggHatcher(const EggHatcher_Descriptor& descriptor)
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , SAFETY_TIME(
+    , SAFETY_TIME0(
         "<b>Safety Time:</b><br>Additional time added to the spinning.",
-        "8 * TICKS_PER_SECOND"
+        "10 * TICKS_PER_SECOND"
     )
     , HATCH_DELAY(
         "<b>Hatch Delay:</b><br>Total animation time for hatching 5 eggs when there are no shinies.",
@@ -65,7 +65,7 @@ EggHatcher::EggHatcher(const EggHatcher_Descriptor& descriptor)
     PA_ADD_OPTION(STEPS_TO_HATCH);
     PA_ADD_OPTION(SAVE_AND_RESET);
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(SAFETY_TIME);
+    PA_ADD_OPTION(SAFETY_TIME0);
     PA_ADD_OPTION(HATCH_DELAY);
 }
 
@@ -88,8 +88,8 @@ std::unique_ptr<StatsTracker> EggHatcher::make_stats() const{
 void EggHatcher::program(SingleSwitchProgramEnvironment& env){
     Stats& stats = env.stats<Stats>();
 
-    uint16_t INCUBATION_TIME = (uint16_t)(864.863 + 4.0875 * STEPS_TO_HATCH);
-    uint16_t TOTAL_DELAY = INCUBATION_TIME + SAFETY_TIME + HATCH_DELAY;
+    uint16_t INCUBATION_TIME = (uint16_t)((1258.5 + 4.05 * STEPS_TO_HATCH) * 1.05);
+    uint16_t TOTAL_DELAY = INCUBATION_TIME + SAFETY_TIME0 + HATCH_DELAY;
 
     //  Connect the controller.
     pbf_move_right_joystick(env.console, 0, 255, 10, 0);
@@ -115,10 +115,10 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env){
             }
         }else{
             deposit_party_to_column(env.console, 5);
-            pbf_press_button(env.console, BUTTON_R, 10, GameSettings::instance().BOX_CHANGE_DELAY_0);
+            pbf_press_button(env.console, BUTTON_R, 20, GameSettings::instance().BOX_CHANGE_DELAY_0);
             box_to_overworld(env.console);
             save_game(env.console);
-            pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             withdraw_1st_column_from_overworld(env.console);
             column = 0;

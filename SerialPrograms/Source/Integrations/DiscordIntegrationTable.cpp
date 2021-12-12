@@ -155,7 +155,7 @@ QWidget* DiscordIntegrationChannel::make_channel_box(QWidget& parent){
 
 QStringList DiscordIntegrationTableFactory::make_header() const{
     QStringList list;
-    list << "Enabled" << "Description" << "Allow Pings" << "Event Tags" << "Allow Commands" << "Channel ID";
+    list << "Enabled" << "Description" << "Allow Pings" << "Tags" << "Allow Commands" << "Channel ID";
     return list;
 }
 std::unique_ptr<EditableTableRow> DiscordIntegrationTableFactory::make_row() const{

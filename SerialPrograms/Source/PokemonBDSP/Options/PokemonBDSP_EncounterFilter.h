@@ -48,13 +48,16 @@ public:
     virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
 
 private:
-    QComboBox* make_action_box(QWidget& parent, BallSelectWidget& ball_select);
+    QComboBox* make_action_box(QWidget& parent);
     BallSelectWidget* make_ball_select(QWidget& parent);
     NameSelectWidget* make_species_select(QWidget& parent);
     QComboBox* make_shiny_box(QWidget& parent);
 
+    void update_ball_select();
+
 private:
     bool m_allow_autocatch;
+    BallSelectWidget* m_ball_select;
 public:
     EncounterAction action = EncounterAction::RunAway;
     std::string pokeball_slug = "poke-ball";

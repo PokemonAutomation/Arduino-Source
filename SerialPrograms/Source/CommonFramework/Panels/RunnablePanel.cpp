@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 
 RunnablePanelInstance::RunnablePanelInstance(const PanelDescriptor& descriptor)
     : PanelInstance(descriptor)
-    , NOTIFICATION_PROGRAM_ERROR("Program Error", true, true, {"Notifs", "LiveHost"})
+    , NOTIFICATION_PROGRAM_ERROR("Fatal Program Error", true, true, {"Notifs", "LiveHost"})
 {}
 
 void RunnablePanelInstance::from_json(const QJsonValue& json){

@@ -105,9 +105,9 @@ void GlobalSettings::load_json(const QJsonValue& json){
         hash.addData(token.c_str(), (int)token.size());
         DEVELOPER_MODE = TOKENS.find(hash.result().toHex().toStdString()) != TOKENS.end();
     }
-    if (DEVELOPER_MODE){
+//    if (DEVELOPER_MODE){
         DISCORD.enable_integration();
-    }
+//    }
 
     BatchOption::load_json(json);
 }

@@ -32,8 +32,8 @@ int main(int argc, char *argv[]){
     qRegisterMetaType<uint8_t>("uint8_t");
     qRegisterMetaType<std::string>();
 
-    OutputRedirector redirect_stdout(std::cout, "stdout");
-    OutputRedirector redirect_stderr(std::cerr, "stderr");
+    OutputRedirector redirect_stdout(std::cout, "stdout", QColor());
+    OutputRedirector redirect_stderr(std::cerr, "stderr", Qt::red);
 
     if (!check_hardware()){
         return 1;

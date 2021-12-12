@@ -10,7 +10,7 @@
 
 namespace PokemonAutomation{
 
-const QString PROGRAM_VERSION_BASE = "v0.9.30";
+const QString PROGRAM_VERSION_BASE = "v0.9.36";
 
 #ifdef PA_OFFICIAL
 const QString PROGRAM_VERSION = PROGRAM_VERSION_BASE;
@@ -23,6 +23,7 @@ const QString DISCORD_LINK_URL = "https://discord.gg/cQ4gWxN";
 const QString ONLINE_DOC_URL = "https://github.com/PokemonAutomation/";
 const QString PROJECT_GITHUB = "github.com/PokemonAutomation";
 const QString PROJECT_GITHUB_URL = "https://github.com/PokemonAutomation/";
+const QString PROJECT_SOURCE_URL = "https://github.com/PokemonAutomation/Arduino-Source/";
 
 const QString STRING_POKEBALL = QString("Pok") + QChar(0xe9) + " Ball";
 const QString STRING_POKEMON = QString("Pok") + QChar(0xe9) + "mon";

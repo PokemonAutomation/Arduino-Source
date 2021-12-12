@@ -135,7 +135,7 @@ void DoublesLeveling::battle(SingleSwitchProgramEnvironment& env){
         switch (ret){
         case 0:
             env.log("Battle menu detected!", Qt::blue);
-            pbf_mash_button(env.console, BUTTON_A, 5 * TICKS_PER_SECOND);
+            pbf_mash_button(env.console, BUTTON_ZL, 5 * TICKS_PER_SECOND);
             break;
         case 1:
             env.log("Battle finished!", Qt::blue);

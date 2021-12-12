@@ -430,9 +430,9 @@ void sleepy_connect(){
     std::lock_guard<std::mutex> lg(m_connect_lock);
     {
 //        std::lock_guard<std::mutex> lg(m_client_lock);
-        if (!GlobalSettings::instance().DEVELOPER_MODE){
-            return;
-        }
+//        if (!GlobalSettings::instance().DEVELOPER_MODE){
+//            return;
+//        }
         if (m_sleepy_client != nullptr){
             sleepy_logger().log("sleepy_connect(): Already initialized!", "purple");
             return;
@@ -574,7 +574,7 @@ bool initialize_sleepy_settings() {
     param_string += settings.integration.game_status.get().toStdString() + "|";
     param_string += settings.integration.hello_message.get().replace("@", "").toStdString() + "|";
     param_string += PROGRAM_VERSION.toStdString() + "|";
-    param_string += PROJECT_GITHUB_URL.toStdString();
+    param_string += PROJECT_SOURCE_URL.toStdString();
 
     std::string sudo = settings.integration.sudo.get().replace(" ", "").toStdString();
 

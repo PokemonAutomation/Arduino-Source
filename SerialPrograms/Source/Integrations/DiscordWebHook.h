@@ -26,10 +26,9 @@ namespace DiscordWebHook{
 
 struct DiscordWebHookRequest{
     DiscordWebHookRequest() = default;
-    DiscordWebHookRequest(Logger& p_logger, QUrl p_url, QByteArray p_data, std::shared_ptr<PendingFileSend> file);
-    DiscordWebHookRequest(Logger& p_logger, QUrl p_url, std::shared_ptr<PendingFileSend> p_file);
+    DiscordWebHookRequest(QUrl p_url, QByteArray p_data, std::shared_ptr<PendingFileSend> file);
+    DiscordWebHookRequest(QUrl p_url, std::shared_ptr<PendingFileSend> p_file);
 
-    Logger* logger;
     QUrl url;
 
     QByteArray data;
@@ -55,13 +54,14 @@ public:
 private:
     void thread_loop();
 
-    void process_reply(Logger& logger, QNetworkReply* reply);
-    void internal_send_json(Logger& logger, const QUrl& url, const QByteArray& data);
-    void internal_send_file(Logger& logger, const QUrl& url, const QString& filename);
-    void internal_send_image_embed(Logger& logger, const QUrl& url, const QByteArray& data, const QString& filepath, const QString& filename);
+    void process_reply(QNetworkReply* reply);
+    void internal_send_json(const QUrl& url, const QByteArray& data);
+    void internal_send_file(const QUrl& url, const QString& filename);
+    void internal_send_image_embed(const QUrl& url, const QByteArray& data, const QString& filepath, const QString& filename);
 
 
 private:
+    TaggedLogger m_logger;
     bool m_stopping;
     std::mutex m_lock;
     std::condition_variable m_cv;

@@ -25,7 +25,7 @@ const bool SAVE_AND_RESET       =   true;
 //  If you see that the program is going into Y-COMM or there is less than 5
 //  seconds of extra spinning after the last egg in the batch, please report
 //  this as a bug. As a temporary work-around, you can increase this number.
-const uint16_t SAFETY_TIME  =   8 * TICKS_PER_SECOND;
+const uint16_t SAFETY_TIME  =   10 * TICKS_PER_SECOND;
 
 //  Total animation time for hatching 5 eggs when there are no shinies.
 const uint16_t HATCH_DELAY  =   105 * TICKS_PER_SECOND;

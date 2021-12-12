@@ -38,7 +38,7 @@ ShinyHuntFishing::ShinyHuntFishing(const ShinyHuntFishing_Descriptor& descriptor
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
     , SHORTCUT("<b>Fishing Shortcut:</b>")
-    , ENCOUNTER_BOT_OPTIONS(false, false)
+    , ENCOUNTER_BOT_OPTIONS(true, false)
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
@@ -131,7 +131,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
                 continue;
             case 1:
                 env.log("Hooked something!", Qt::blue);
-                pbf_press_button(env.console, BUTTON_A, 10, TICKS_PER_SECOND);
+                pbf_press_button(env.console, BUTTON_ZL, 10, TICKS_PER_SECOND);
                 break;
             case 2:
                 env.log("Unexpected battle menu.", Qt::red);

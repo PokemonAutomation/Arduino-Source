@@ -8,6 +8,7 @@
 #define PokemonAutomation_OutputRedirector_H
 
 #include <streambuf>
+#include "Common/Cpp/SpinLock.h"
 #include "Logger.h"
 
 namespace PokemonAutomation{
@@ -15,7 +16,7 @@ namespace PokemonAutomation{
 
 class OutputRedirector : public std::basic_streambuf<char>{
 public:
-    OutputRedirector(std::ostream& stream, std::string tag);
+    OutputRedirector(std::ostream& stream, std::string tag, QColor color);
     ~OutputRedirector();
 
 private:
@@ -23,9 +24,12 @@ private:
     virtual std::streamsize xsputn(const char_type* s, std::streamsize count) override;
 
 private:
+    SpinLock m_lock;
     std::ostream& m_stream;
     std::streambuf* m_old_buf;
     TaggedLogger m_logger;
+    QColor m_color;
+    std::string m_buffer;
 };
 
 

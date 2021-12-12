@@ -64,7 +64,7 @@ StarterReset::StarterReset(const StarterReset_Descriptor& descriptor)
         &NOTIFICATION_PROGRAM_ERROR,
     })
 {
-    PA_ADD_OPTION(START_IN_GRIP_MENU);
+//    PA_ADD_OPTION(START_IN_GRIP_MENU);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(STARTER);
     PA_ADD_OPTION(VIDEO_ON_SHINY);
@@ -150,7 +150,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
         }
 
         //  Select starter.
-        pbf_press_button(env.console, BUTTON_A, 20, 30);
+        pbf_press_button(env.console, BUTTON_ZL, 20, 30);
         env.console.botbase().wait_for_all_requests();
 
         {
@@ -167,7 +167,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
             }
             pbf_wait(env.console, 50);
             pbf_press_dpad(env.console, DPAD_UP, 10, 50);
-            pbf_press_button(env.console, BUTTON_A, 10, 5 * TICKS_PER_SECOND);
+            pbf_press_button(env.console, BUTTON_ZL, 10, 5 * TICKS_PER_SECOND);
             env.console.botbase().wait_for_all_requests();
         }
 

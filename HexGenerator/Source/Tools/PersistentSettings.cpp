@@ -20,7 +20,7 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-const QString VERSION = "v0.5.13";
+const QString VERSION = "v0.5.14";
 const QString DISCORD = "https://discord.gg/cQ4gWxN";
 const QString GITHUB_REPO = "https://github.com/PokemonAutomation/";
 

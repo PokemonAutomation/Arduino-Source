@@ -100,7 +100,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env){
                     if (WALK_UP){
                         pbf_move_left_joystick(context, 128, 0, 125, 0);
                     }
-                    pbf_mash_button(context, BUTTON_A, 125);
+                    pbf_mash_button(context, BUTTON_ZL, 125);
                 }
             },
             {

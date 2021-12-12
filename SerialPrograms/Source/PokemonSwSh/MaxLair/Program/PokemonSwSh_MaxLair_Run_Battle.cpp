@@ -272,6 +272,18 @@ StateMachineAction run_move_select(
 
         console.log("Move not selectable.", Qt::magenta);
         player.move_blocked[state.move_slot] = true;
+
+        bool no_moves = true;
+        for (size_t c = 0; c < 4; c++){
+            no_moves &= player.move_blocked[c];
+        }
+        if (no_moves){
+            console.log("All moves reported as blocked. This is impossible. Clearing state.", Qt::red);
+            for (size_t c = 0; c < 4; c++){
+                player.move_blocked[c] = false;
+            }
+        }
+
         state_tracker.push_update(console_index);
 
         //  Reset position.

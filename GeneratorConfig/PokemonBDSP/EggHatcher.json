@@ -48,14 +48,6 @@
                 [
                     "10240",
                     "10240"
-                ],
-                [
-                    "20480",
-                    "20480"
-                ],
-                [
-                    "30720",
-                    "30720"
                 ]
             ],
             "98-Default": "5120",
@@ -78,8 +70,8 @@
             "02-Declaration": "const uint16_t SAFETY_TIME",
             "03-MinValue": 0,
             "04-MaxValue": 65535,
-            "98-Default": "8 * TICKS_PER_SECOND",
-            "99-Current": "8 * TICKS_PER_SECOND"
+            "98-Default": "10 * TICKS_PER_SECOND",
+            "99-Current": "10 * TICKS_PER_SECOND"
         },
         {
             "00-Type": "TimeExpression",
