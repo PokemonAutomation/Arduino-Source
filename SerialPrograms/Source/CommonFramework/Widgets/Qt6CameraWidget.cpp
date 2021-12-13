@@ -78,8 +78,10 @@ Qt6VideoWidget::Qt6VideoWidget(
     m_captureSession.setVideoOutput(m_videoSink);
 
     connect(m_videoSink, &QVideoSink::videoFrameChanged, this, [&](const QVideoFrame& frame) {
-        std::unique_lock<std::mutex> lg(m_lock);
-        m_videoFrame = frame;
+        {
+            std::unique_lock<std::mutex> lg(m_lock);
+            m_videoFrame = frame;
+        }
         // std::cout << "Video frame changed, " << frame.width() << "x" << frame.height() << std::endl;
         this->repaint();
         // std::cout << "QtVideoWidget repaint() end in slot" << std::endl;
@@ -187,6 +189,7 @@ void Qt6VideoWidget::resizeEvent(QResizeEvent* event){
 void Qt6VideoWidget::paintEvent(QPaintEvent* event){
     // std::cout << "paintEvent start" << std::endl;
     QWidget::paintEvent(event);
+    std::lock_guard<std::mutex> lg(m_lock);
     if (m_videoFrame.isValid()) {
         QRect rect(0,0, m_videoFrame.width(), m_videoFrame.height());
         QVideoFrame::PaintOptions options;
