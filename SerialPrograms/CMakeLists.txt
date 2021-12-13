@@ -4,11 +4,11 @@ cmake_minimum_required(VERSION 3.16.0)
 #set the name of the project
 project(SerialPrograms)
 
-#enable c++14 or c++ 20 depending on compiler
+#enable c++17 or c++ 20 depending on compiler
 if (MSVC)
     set(CMAKE_CXX_STANDARD 20)
 else()
-    set(CMAKE_CXX_STANDARD 14)
+    set(CMAKE_CXX_STANDARD 17)
 endif()
 set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
@@ -26,6 +26,12 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
 
 #add current directory to find tesseractPA.lib
 link_directories(${CMAKE_CURRENT_LIST_DIR})
+
+if(MSVC)
+    add_compile_options(/arch:SSE4.2)
+else()
+    add_compile_options(-msse4.2)
+endif()
 
 file(GLOB MAIN_SOURCES
     ../ClientSource/Connection/BotBase.h

@@ -10,6 +10,7 @@
 #include "PokemonSwSh_SquareDetector.h"
 
 #include <iostream>
+#include <map>
 using std::cout;
 using std::endl;
 

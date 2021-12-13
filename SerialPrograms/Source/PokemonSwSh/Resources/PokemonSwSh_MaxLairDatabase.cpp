@@ -4,7 +4,6 @@
  *
  */
 
-#include <map>
 #include <QtGlobal>
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
@@ -13,6 +12,8 @@
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "PokemonSwSh_MaxLairDatabase.h"
 
+#include <map>
+#include <algorithm>
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -169,14 +170,14 @@ std::map<std::string, MaxLairMon> build_maxlair_mon_database(const std::string& 
         }
         {
             QJsonArray array = obj["moves"].toArray();
-            int stop = std::min(5, array.size());
+            int stop = std::min(5, (int)array.size());
             for (int c = 0; c < stop; c++){
                 mon.moves[c] = parse_move(array[c].toObject());
             }
         }
         {
             QJsonArray array = obj["max_moves"].toArray();
-            int stop = std::min(5, array.size());
+            int stop = std::min(5, (int)array.size());
             for (int c = 0; c < stop; c++){
                 mon.max_moves[c] = parse_move(array[c].toObject());
             }

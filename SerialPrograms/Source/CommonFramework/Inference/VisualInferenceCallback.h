@@ -9,6 +9,7 @@
 
 #include <deque>
 #include <QImage>
+#include <vector>
 #include "CommonFramework/Tools/VideoFeed.h"
 
 namespace PokemonAutomation{

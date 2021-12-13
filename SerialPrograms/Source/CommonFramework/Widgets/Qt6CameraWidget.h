@@ -10,6 +10,15 @@
 #include "CommonFramework/Tools/Logger.h"
 #include "VideoWidget.h"
 
+#include <QMediaDevices>
+#include <QImageCapture>
+#include <QMediaCaptureSession>
+#include <QCameraDevice>
+#include <QVideoWidget>
+#include <QVideoSink>
+#include <QVideoFrame>
+#include <QCamera>
+
 namespace PokemonAutomation{
 
 
@@ -32,13 +41,22 @@ public:
     //  Cannot call from UI thread or it will deadlock.
     virtual QImage snapshot() override;
 
-
+    virtual void resizeEvent(QResizeEvent* event) override;
 private:
+    void paintEvent(QPaintEvent*) override;
+
     Logger& m_logger;
     std::vector<QSize> m_resolutions;
 
-    //  TODO
+    QCameraDevice m_info;
+    QCamera* m_camera = nullptr;
+    QImageCapture * m_capture = nullptr;
+    QMediaCaptureSession m_captureSession;
+    QVideoSink* m_videoSink = nullptr;
+    QVideoFrame m_videoFrame;
 
+    mutable std::mutex m_lock;
+    QSize m_resolution;
 };
 
 
