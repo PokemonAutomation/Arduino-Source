@@ -9,6 +9,7 @@
 
 #include "CommonFramework/ImageTools/CellMatrix.h"
 #include "CommonFramework/ImageTools/FillGeometry.h"
+#include <map>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -18,7 +18,7 @@ namespace PokemonAutomation{
 QString EventNotificationSettings::sanitize_tag(const QString& token){
     QString str;
     for (QChar ch : token){
-        if (ch < 32) continue;
+        if (ch.unicode() < 32) continue;
         if (ch == ' ') continue;
         str += ch;
     }

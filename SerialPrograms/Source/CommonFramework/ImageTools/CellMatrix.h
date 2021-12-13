@@ -8,6 +8,7 @@
 #define PokemonAutomation_CommonFramework_CellMatrix_H
 
 #include <stdint.h>
+#include <vector>
 #include <QImage>
 #include "ImageBoxes.h"
 

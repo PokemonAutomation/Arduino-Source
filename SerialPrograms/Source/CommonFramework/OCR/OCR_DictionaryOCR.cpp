@@ -93,7 +93,7 @@ void DictionaryOCR::match_substring(
     );
 }
 void DictionaryOCR::add_candidate(std::string token, const QString& candidate){
-    if (candidate.isEmpty() || (candidate.size() == 1 && candidate[0] < 128)){
+    if (candidate.isEmpty() || (candidate.size() == 1 && candidate[0].unicode() < 128)){
         return;
     }
 

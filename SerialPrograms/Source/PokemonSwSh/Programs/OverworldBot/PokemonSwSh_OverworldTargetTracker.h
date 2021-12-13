@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_OverworldTargetTracker_H
 
 #include <deque>
+#include <map>
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Tools/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
