@@ -1,4 +1,4 @@
-﻿/*  Video Widget (Qt6)
+/*  Video Widget (Qt6)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_PokemonSwSh_SparkleTrigger_H
 #define PokemonAutomation_PokemonSwSh_SparkleTrigger_H
 
+#include <map>
 #include "CommonFramework/ImageTools/CellMatrix.h"
 #include "CommonFramework/ImageTools/FillGeometry.h"
-#include <map>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

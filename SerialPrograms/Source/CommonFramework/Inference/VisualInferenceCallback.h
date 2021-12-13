@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_CommonFramework_VisualInferenceCallback_H
 #define PokemonAutomation_CommonFramework_VisualInferenceCallback_H
 
+#include <vector>
 #include <deque>
 #include <QImage>
-#include <vector>
 #include "CommonFramework/Tools/VideoFeed.h"
 
 namespace PokemonAutomation{

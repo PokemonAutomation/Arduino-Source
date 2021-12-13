@@ -27,12 +27,6 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
 #add current directory to find tesseractPA.lib
 link_directories(${CMAKE_CURRENT_LIST_DIR})
 
-if(MSVC)
-    add_compile_options(/arch:SSE4.2)
-else()
-    add_compile_options(-msse4.2)
-endif()
-
 file(GLOB MAIN_SOURCES
     ../ClientSource/Connection/BotBase.h
     ../ClientSource/Connection/PABotBase.cpp
@@ -891,7 +885,8 @@ if (MSVC)
 
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX2 /DPA_Arch_x64_AVX2)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512)
-
+else()
+    target_compile_options(SerialPrograms PRIVATE -msse4.2)
 endif()
 
 #copy needed dlls

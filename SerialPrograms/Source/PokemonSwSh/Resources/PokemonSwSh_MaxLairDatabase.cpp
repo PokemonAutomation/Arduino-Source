@@ -4,6 +4,8 @@
  *
  */
 
+#include <algorithm>
+#include <map>
 #include <QtGlobal>
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
@@ -12,8 +14,6 @@
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "PokemonSwSh_MaxLairDatabase.h"
 
-#include <map>
-#include <algorithm>
 #include <iostream>
 using std::cout;
 using std::endl;

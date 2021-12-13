@@ -5,12 +5,12 @@
  */
 
 #include <cmath>
+#include <map>
 #include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/DistanceToLine.h"
 #include "PokemonSwSh_SquareDetector.h"
 
 #include <iostream>
-#include <map>
 using std::cout;
 using std::endl;
 
