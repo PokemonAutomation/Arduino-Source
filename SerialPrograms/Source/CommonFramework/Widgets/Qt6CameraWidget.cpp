@@ -1,4 +1,4 @@
-/*  Video Widget (Qt6)
+﻿/*  Video Widget (Qt6)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -21,13 +21,20 @@ std::vector<CameraInfo> qt6_get_all_cameras(){
     std::vector<CameraInfo> ret;
     const auto cameras = QMediaDevices::videoInputs();
     for (const auto& info : cameras){
-        ret.emplace_back(info.description().toStdString());
+        ret.emplace_back(info.id().toStdString());
     }
     return ret;
 }
 
 QString qt6_get_camera_name(const CameraInfo& info){
-    return info.device_name().c_str();
+    const auto cameras = QMediaDevices::videoInputs();
+    for (const auto& camera : cameras){
+        if (camera.id().toStdString() == info.device_name()) {
+            return camera.description();
+        }
+    }
+    std::cout << "Error: no such camera for CameraInfo: " << info.device_name() << std::endl;
+    return "";
 }
 
 Qt6VideoWidget::Qt6VideoWidget(
@@ -45,7 +52,7 @@ Qt6VideoWidget::Qt6VideoWidget(
     const auto cameras = QMediaDevices::videoInputs();
     bool foundInfo = false;
     for (const auto& camera : cameras){
-        if (camera.description().toStdString() == info.device_name()) {
+        if (camera.id().toStdString() == info.device_name()) {
             m_info = camera;
             foundInfo = true;
             break;
