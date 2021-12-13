@@ -10,7 +10,6 @@
 #include <deque>
 #include <set>
 #include <mutex>
-#include <QCameraInfo>
 #include <QVBoxLayout>
 #include <QComboBox>
 #include <QPushButton>
@@ -42,7 +41,7 @@ public:
 
 private:
     friend class CameraSelectorUI;
-    QCameraInfo m_camera;
+    CameraInfo m_camera;
     QSize m_resolution;
 };
 
@@ -90,7 +89,7 @@ private:
     QComboBox* m_resolution_box;
     QPushButton* m_reset_button;
 
-    QList<QCameraInfo> m_cameras;
+    std::vector<CameraInfo> m_cameras;
 
     std::atomic<bool> m_snapshots_allowed;
     std::mutex m_camera_lock;

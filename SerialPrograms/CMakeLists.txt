@@ -269,10 +269,14 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Tools/StatsTracking.cpp
     Source/CommonFramework/Tools/StatsTracking.h
     Source/CommonFramework/Tools/VideoFeed.h
+    Source/CommonFramework/Widgets/CameraImplementations.cpp
+    Source/CommonFramework/Widgets/CameraImplementations.h
     Source/CommonFramework/Widgets/CameraSelector.cpp
     Source/CommonFramework/Widgets/CameraSelector.h
-    Source/CommonFramework/Widgets/QtVideoWidget.cpp
-    Source/CommonFramework/Widgets/QtVideoWidget.h
+    Source/CommonFramework/Widgets/Qt5CameraWidget.cpp
+    Source/CommonFramework/Widgets/Qt5CameraWidget.h
+    Source/CommonFramework/Widgets/Qt6CameraWidget.cpp
+    Source/CommonFramework/Widgets/Qt6CameraWidget.h
     Source/CommonFramework/Widgets/SerialSelector.cpp
     Source/CommonFramework/Widgets/SerialSelector.h
     Source/CommonFramework/Widgets/VideoWidget.h

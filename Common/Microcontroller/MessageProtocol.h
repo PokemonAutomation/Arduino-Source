@@ -22,7 +22,7 @@
  * 
  *  There are currently 4 categories of message types:
  * 
- *      1.  Info: These are simple one-way messages. They do not need need to be
+ *      1.  Info: These are simple one-way messages. They do not need to be
  *          acked and may be dropped without adversely affecting anything.
  * 
  *      2.  Ack/Response: These are messages sent in response to an earlier
@@ -109,10 +109,10 @@
  * 
  *  PABotBase Specifics:
  * 
- *      -   PABotBase does not allow concurrent commands. If it receives a
- *          command while one is already running, it drops it and responds
- *          with "PABB_MSG_ERROR_COMMAND_DROPPED". (Any command that results
- *          in a button press or a wait is a long command.)
+ *      -   PABotBase can queue up to 4 commands. If it receives any commands
+ *          while the queue is full, it drops it and responds with
+ *          "PABB_MSG_ERROR_COMMAND_DROPPED". (Any command that results in a
+ *          button press or a wait is a long command.)
  * 
  *      -   PABotBase can still handle other messages while it is running a long
  *          command.

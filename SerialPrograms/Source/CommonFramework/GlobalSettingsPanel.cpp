@@ -54,7 +54,7 @@ GlobalSettings::GlobalSettings()
         720
     )
     , m_discord_settings(
-        "<font size=4><b>Discord Settings:</b> Send notifications to Discord. "
+        "<font size=4><b>Discord Settings:</b> Integrate with Discord. "
 //        "You can also control the program from Discord. "
         "(<a href=\"" + ONLINE_DOC_URL + "ComputerControl/blob/master/Wiki/Software/DiscordIntegration.md" +
         "\">online documentation</a>)</font></font>"

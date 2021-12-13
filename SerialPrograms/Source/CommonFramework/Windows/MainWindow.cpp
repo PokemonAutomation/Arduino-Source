@@ -74,7 +74,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     QHBoxLayout* support = new QHBoxLayout();
     support_layout->addLayout(support);
-//    support->setMargin(0);
+//    support->setContentsMargins(0, 0, 0, 0);
 
     QVBoxLayout* links = new QVBoxLayout();
     support->addLayout(links);

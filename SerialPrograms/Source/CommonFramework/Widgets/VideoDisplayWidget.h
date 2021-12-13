@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_VideoDisplayWidget_H
 #define PokemonAutomation_VideoDisplayWidget_H
 
+#include <functional>
 #include <deque>
 #include <set>
 #include "VideoWidget.h"
@@ -23,7 +24,12 @@ public:
     VideoOverlayWidget& overlay(){ return *m_overlay; }
 
     void close_video();
-    void set_video(VideoWidget* video); //  Takes ownership of video.
+
+    //  Set video using an already constructed video. This takes ownership of the video.
+    void set_video(VideoWidget* video);
+
+    //  Set video using a factory lambda. The video is constructed using this class as the parent.
+    void set_video(std::function<VideoWidget*(QWidget& parent)> video_factory);
 
     QSize resolution() const;
     std::vector<QSize> resolutions() const;

@@ -163,8 +163,10 @@ SOURCES += \
     Source/CommonFramework/Tools/QueuedLogger.cpp \
     Source/CommonFramework/Tools/StatsDatabase.cpp \
     Source/CommonFramework/Tools/StatsTracking.cpp \
+    Source/CommonFramework/Widgets/CameraImplementations.cpp \
     Source/CommonFramework/Widgets/CameraSelector.cpp \
-    Source/CommonFramework/Widgets/QtVideoWidget.cpp \
+    Source/CommonFramework/Widgets/Qt5CameraWidget.cpp \
+    Source/CommonFramework/Widgets/Qt6CameraWidget.cpp \
     Source/CommonFramework/Widgets/SerialSelector.cpp \
     Source/CommonFramework/Widgets/VideoDisplayWidget.cpp \
     Source/CommonFramework/Widgets/VideoOverlayWidget.cpp \
@@ -578,8 +580,10 @@ HEADERS += \
     Source/CommonFramework/Tools/StatsTracking.h \
     Source/CommonFramework/Tools/VideoFeed.h \
     Source/CommonFramework/Tools/BotBaseHandle.h \
+    Source/CommonFramework/Widgets/CameraImplementations.h \
     Source/CommonFramework/Widgets/CameraSelector.h \
-    Source/CommonFramework/Widgets/QtVideoWidget.h \
+    Source/CommonFramework/Widgets/Qt5CameraWidget.h \
+    Source/CommonFramework/Widgets/Qt6CameraWidget.h \
     Source/CommonFramework/Widgets/SerialSelector.h \
     Source/CommonFramework/Widgets/VideoDisplayWidget.h \
     Source/CommonFramework/Widgets/VideoOverlayWidget.h \

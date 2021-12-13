@@ -11,7 +11,7 @@
 #include "Common/Compiler.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Common/Qt/NoWheelComboBox.h"
-#include "QtVideoWidget.h"
+#include "CameraImplementations.h"
 #include "CameraSelector.h"
 
 #include <iostream>
@@ -40,12 +40,7 @@ void CameraSelector::load_json(const QJsonValue& json){
     if (!json_get_string(name, obj, JSON_CAMERA)){
         return;
     }
-    for (const auto& item : QCameraInfo::availableCameras()){
-        if (name == item.deviceName()){
-            m_camera = item;
-            break;
-        }
-    }
+    m_camera = CameraInfo(name.toStdString());
     QJsonArray res = json_get_array_nothrow(obj, JSON_RESOLUTION);
     if (res.size() == 2 && res[0].isDouble() && res[1].isDouble()){
         m_resolution = QSize(res[0].toInt(), res[1].toInt());
@@ -53,7 +48,7 @@ void CameraSelector::load_json(const QJsonValue& json){
 }
 QJsonValue CameraSelector::to_json() const{
     QJsonObject root;
-    root.insert(JSON_CAMERA, m_camera.deviceName());
+    root.insert(JSON_CAMERA, QString::fromStdString(m_camera.device_name()));
     QJsonArray res;
     res += m_resolution.width();
     res += m_resolution.height();
@@ -107,15 +102,15 @@ CameraSelectorUI::CameraSelectorUI(
     connect(
         m_camera_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
         this, [=](int index){
-            QCameraInfo& current_port = m_value.m_camera;
-            if (index <= 0 || index > m_cameras.size()){
-                current_port = QCameraInfo();
+            CameraInfo& current = m_value.m_camera;
+            if (index <= 0 || index > (int)m_cameras.size()){
+                current = CameraInfo();
             }else{
-                const QCameraInfo& camera = m_cameras[index - 1];
-                if (!current_port.isNull() && current_port.deviceName() == camera.deviceName()){
+                const CameraInfo& camera = m_cameras[index - 1];
+                if (current == camera){
                     return;
                 }
-                current_port = camera;
+                current = camera;
             }
             reset_video();
         }
@@ -151,22 +146,22 @@ void CameraSelectorUI::refresh(){
     m_camera_box->clear();
     m_camera_box->addItem("(none)");
 
-    m_cameras = QCameraInfo::availableCameras();
-    QCameraInfo& current_camera = m_value.m_camera;
+    m_cameras = get_all_cameras();
+    CameraInfo& current_camera = m_value.m_camera;
 
-    int index = 0;
-    for (int c = 0; c < m_cameras.size(); c++){
-        const QCameraInfo& camera = m_cameras[c];
-        m_camera_box->addItem(camera.description());
+    size_t index = 0;
+    for (size_t c = 0; c < m_cameras.size(); c++){
+        const CameraInfo& camera = m_cameras[c];
+        m_camera_box->addItem(get_camera_name(camera));
 
-        if (!current_camera.isNull() && current_camera.deviceName() == camera.deviceName()){
+        if (current_camera == camera){
             index = c + 1;
         }
     }
     if (index != 0){
-        m_camera_box->setCurrentIndex(index);
+        m_camera_box->setCurrentIndex((int)index);
     }else{
-        current_camera = QCameraInfo();
+        current_camera = CameraInfo();
         m_camera_box->setCurrentIndex(0);
     }
 }
@@ -199,11 +194,9 @@ void CameraSelectorUI::reset_video(){
     std::lock_guard<std::mutex> lg(m_camera_lock);
     m_display.close_video();
 
-    const QCameraInfo& info = m_value.m_camera;
-
-    //  If we change video implementations, here's what we change.
-    if (!info.isNull()){
-        m_display.set_video(new QtVideoWidget(m_logger, info, m_value.m_resolution));
+    const CameraInfo& info = m_value.m_camera;
+    if (info){
+        m_display.set_video(make_video_factory(m_logger, info, m_value.m_resolution));
     }
 
     QSize resolution = m_display.resolution();

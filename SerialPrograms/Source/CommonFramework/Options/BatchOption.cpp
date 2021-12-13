@@ -137,7 +137,7 @@ GroupOptionUI::GroupOptionUI(QWidget& parent, GroupOption& value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
 //    layout->setAlignment(Qt::AlignTop);
-//    layout->setMargin(0);
+//    layout->setContentsMargins(0, 0, 0, 0);
     m_group_box = new QGroupBox(value.m_label, this);
     m_group_box->setCheckable(value.m_toggleable);
     m_group_box->setChecked(value.enabled());
@@ -147,7 +147,7 @@ GroupOptionUI::GroupOptionUI(QWidget& parent, GroupOption& value)
     QVBoxLayout* mid_layout = new QVBoxLayout(group_box);
     QWidget* mid_widget = new QWidget(group_box);
     mid_layout->addWidget(mid_widget);
-    mid_layout->setMargin(0);
+    mid_layout-setContentsMargins(0, 0, 0, 0);
 
     QFont font = group_box->font();
     mid_widget->setFont(font);
