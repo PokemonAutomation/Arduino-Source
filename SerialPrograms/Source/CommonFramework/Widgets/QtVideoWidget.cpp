@@ -26,7 +26,7 @@ QtVideoWidget::QtVideoWidget(
 
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setAlignment(Qt::AlignTop);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
 
     m_camera = new QCamera(info, this);
 

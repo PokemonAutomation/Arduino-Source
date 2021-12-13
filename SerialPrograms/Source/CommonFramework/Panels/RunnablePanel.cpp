@@ -156,7 +156,7 @@ RunnablePanelWidget::RunnablePanelWidget(
     , m_state(ProgramState::NOT_READY)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
 
     m_header_holder = new QVBoxLayout();
     layout->addLayout(m_header_holder);
@@ -233,7 +233,7 @@ QWidget* RunnablePanelWidget::make_actions(QWidget& parent){
     QGroupBox* actions_widget = new QGroupBox("Actions", &parent);
 
     QHBoxLayout* action_layout = new QHBoxLayout(actions_widget);
-    action_layout->setMargin(0);
+    action_layout->setContentsMargins(0, 0, 0, 0);
 
     {
         m_start_button = new QPushButton("Start Program!", &parent);

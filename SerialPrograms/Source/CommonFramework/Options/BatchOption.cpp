@@ -69,7 +69,7 @@ BatchOptionUI::BatchOptionUI(QWidget& parent, BatchOption& value)
 {
     QVBoxLayout* options_layout = new QVBoxLayout(this);
     options_layout->setAlignment(Qt::AlignTop);
-    options_layout->setMargin(0);
+    options_layout->setContentsMargins(0, 0, 0, 0);
 
     for (auto& item : m_value.m_options){
         m_options.emplace_back(item.first->make_ui(parent));
@@ -157,7 +157,7 @@ GroupOptionUI::GroupOptionUI(QWidget& parent, GroupOption& value)
 
     QVBoxLayout* group_layout = new QVBoxLayout(m_group_box);
     group_layout->setAlignment(Qt::AlignTop);
-    group_layout->setMargin(0);
+    group_layout->setContentsMargins(0, 0, 0, 0);
 
     m_expand_text = new QWidget(m_group_box);
     m_expand_text->setLayout(new QVBoxLayout());
@@ -169,7 +169,7 @@ GroupOptionUI::GroupOptionUI(QWidget& parent, GroupOption& value)
     m_options_holder = new QWidget(m_group_box);
     group_layout->addWidget(m_options_holder);
     m_options_layout = new QVBoxLayout(m_options_holder);
-    m_options_layout->setMargin(0);
+    m_options_layout->setContentsMargins(0, 0, 0, 0);
 
     for (auto& item : m_value.m_options){
         m_options.emplace_back(item.first->make_ui(parent));

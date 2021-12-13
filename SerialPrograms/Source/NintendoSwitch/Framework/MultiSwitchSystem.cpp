@@ -117,11 +117,11 @@ MultiSwitchSystem::MultiSwitchSystem(
     , m_videos(nullptr)
 {
     QVBoxLayout* vbox = new QVBoxLayout(this);
-    vbox->setMargin(0);
+    vbox->setContentsMargins(0, 0, 0, 0);
 
     QHBoxLayout* row = new QHBoxLayout();
     vbox->addLayout(row, 0);
-    row->setMargin(0);
+    row->setContentsMargins(0, 0, 0, 0);
     row->addStretch(2);
     row->addWidget(new QLabel("<b>Switch Count:</b>", this), 0);
     m_console_count_box = new NoWheelComboBox(this);
@@ -166,11 +166,11 @@ void MultiSwitchSystem::redraw_videos(size_t count){
     m_videos = new QWidget(this);
     this->layout()->addWidget(m_videos);
     QVBoxLayout* vbox = new QVBoxLayout(m_videos);
-    vbox->setMargin(0);
+    vbox->setContentsMargins(0, 0, 0, 0);
 
     QHBoxLayout* vrow0 = new QHBoxLayout();
     vbox->addLayout(vrow0, 1);
-    vrow0->setMargin(0);
+    vrow0->setContentsMargins(0, 0, 0, 0);
 
     vrow0->addWidget(m_switches[0], 1);
     if (m_switches.size() >= 2){
@@ -179,7 +179,7 @@ void MultiSwitchSystem::redraw_videos(size_t count){
     if (m_switches.size() >= 3){
         QHBoxLayout* vrow1 = new QHBoxLayout();
         vbox->addLayout(vrow1, 1);
-        vrow1->setMargin(0);
+        vrow1->setContentsMargins(0, 0, 0, 0);
         vrow1->addWidget(m_switches[2], 1);
         if (m_switches.size() >= MultiSwitchSystemFactory::MAX_SWITCHES){
             vrow1->addWidget(m_switches[3], 1);

@@ -21,6 +21,8 @@ set(CMAKE_AUTOUIC ON)
 
 #find Qt
 find_package(Qt5 COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets REQUIRED)
+#disable deprecated Qt APIs
+add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
 
 #add current directory to find tesseractPA.lib
 link_directories(${CMAKE_CURRENT_LIST_DIR})

@@ -69,7 +69,7 @@ SerialSelectorUI::SerialSelectorUI(
     , m_connection(value.m_port, value.m_minimum_pabotbase, m_logger)
 {
     QHBoxLayout* serial_row = new QHBoxLayout(this);
-    serial_row->setMargin(0);
+    serial_row->setContentsMargins(0, 0, 0, 0);
 
     serial_row->addWidget(new QLabel("<b>Serial Port:</b>", this), 1);
     serial_row->addSpacing(5);
@@ -82,7 +82,7 @@ SerialSelectorUI::SerialSelectorUI(
     QWidget* status = new QWidget(this);
     serial_row->addWidget(status, 3);
     QVBoxLayout* sbox = new QVBoxLayout(status);
-    sbox->setMargin(0);
+    sbox->setContentsMargins(0, 0, 0, 0);
     sbox->setSpacing(0);
     m_serial_program = new QLabel(this);
     sbox->addWidget(m_serial_program);

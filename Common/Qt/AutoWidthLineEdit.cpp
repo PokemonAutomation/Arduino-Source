@@ -25,7 +25,7 @@ AutoWidthLineEdit::AutoWidthLineEdit(QWidget* parent)
 void AutoWidthLineEdit::resize_to_content(){
     QString text = this->text();
     QFontMetrics fm(this->font());
-    int pixelsWide = fm.width(text);
+    int pixelsWide = fm.boundingRect(text).width();
     this->setFixedWidth(pixelsWide);
     adjustSize();
 }

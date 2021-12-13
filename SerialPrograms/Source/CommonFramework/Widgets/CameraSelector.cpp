@@ -87,7 +87,7 @@ CameraSelectorUI::CameraSelectorUI(
     , m_snapshots_allowed(true)
 {
     QHBoxLayout* camera_row = new QHBoxLayout(this);
-    camera_row->setMargin(0);
+    camera_row->setContentsMargins(0, 0, 0, 0);
 
     camera_row->addWidget(new QLabel("<b>Camera:</b>", this), 1);
     camera_row->addSpacing(5);

@@ -90,7 +90,7 @@ EditableTableBaseUI::EditableTableBaseUI(QWidget& parent, EditableTableBase& val
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     if (!value.m_margin){
-        layout->setMargin(0);
+        layout->setContentsMargins(0, 0, 0, 0);
     }
 
     layout->addWidget(new QLabel(value.m_label, this));

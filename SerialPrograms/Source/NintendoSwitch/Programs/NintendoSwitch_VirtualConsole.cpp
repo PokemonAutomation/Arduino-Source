@@ -58,7 +58,7 @@ VirtualConsole_Widget::VirtualConsole_Widget(
 {}
 void VirtualConsole_Widget::construct(){
     QVBoxLayout* layout = new QVBoxLayout(this);
-    layout->setMargin(0);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(make_header(*this));
 
     VirtualConsole& instance = static_cast<VirtualConsole&>(m_instance);
