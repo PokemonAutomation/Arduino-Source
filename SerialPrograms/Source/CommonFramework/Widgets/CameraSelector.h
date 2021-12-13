@@ -40,6 +40,7 @@ public:
     CameraSelectorUI* make_ui(QWidget& parent, Logger& logger, VideoDisplayWidget& holder);
 
 private:
+
     friend class CameraSelectorUI;
     CameraInfo m_camera;
     QSize m_resolution;

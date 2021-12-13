@@ -41,6 +41,7 @@ void CameraSelector::load_json(const QJsonValue& json){
         return;
     }
     m_camera = CameraInfo(name.toStdString());
+
     QJsonArray res = json_get_array_nothrow(obj, JSON_RESOLUTION);
     if (res.size() == 2 && res[0].isDouble() && res[1].isDouble()){
         m_resolution = QSize(res[0].toInt(), res[1].toInt());
