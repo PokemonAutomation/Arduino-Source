@@ -26,7 +26,7 @@ ShinyHuntShayminRunaway_Descriptor::ShinyHuntShayminRunaway_Descriptor()
         "PokemonBDSP:ShinyHuntRunaway",
         STRING_POKEMON + " BDSP", "Shiny Hunt - Shaymin Runaway",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ShinyHunt-ShayminRunaway.md",
-        "Shiny hunt Shaymin runaway " + STRING_POKEMON + ".",
+        "Shiny hunt Shaymin runaway.",
         FeedbackType::REQUIRED,
         PABotBaseLevel::PABOTBASE_12KB
     )
@@ -110,8 +110,6 @@ bool ShinyHuntShayminRunaway::start_encounter(SingleSwitchProgramEnvironment& en
         return false;
     case 1:
         env.console.log("Battle started!");
-        pbf_mash_button(env.console, BUTTON_A, 250);
-        //mash for another second to clear cutscene, to handle false detection during day hours
         return true;
     }
     return false;
@@ -142,7 +140,8 @@ void ShinyHuntShayminRunaway::program(SingleSwitchProgramEnvironment& env){
             handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
             continue;
         }
-
+        pbf_mash_button(env.console, BUTTON_A, 250);
+        //mash to clear cutscene, to handle false detection during day hours
         //  Detect shiny.
         DoublesShinyDetection result = detect_shiny_battle(
             env.console,
