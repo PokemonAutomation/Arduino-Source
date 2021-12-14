@@ -1,4 +1,4 @@
-/*  Video Widget (Qt6)
+﻿/*  Video Widget (Qt6)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -191,7 +191,7 @@ void Qt6VideoWidget::paintEvent(QPaintEvent* event){
     QWidget::paintEvent(event);
     std::lock_guard<std::mutex> lg(m_lock);
     if (m_videoFrame.isValid()) {
-        QRect rect(0,0, m_videoFrame.width(), m_videoFrame.height());
+        QRect rect(0,0, this->width(), this->height());
         QVideoFrame::PaintOptions options;
         QPainter painter(this);
         m_videoFrame.paint(&painter, rect, options);
