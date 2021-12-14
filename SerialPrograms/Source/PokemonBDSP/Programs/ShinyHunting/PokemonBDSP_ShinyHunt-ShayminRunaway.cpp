@@ -25,7 +25,7 @@ ShinyHuntShayminRunaway_Descriptor::ShinyHuntShayminRunaway_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonBDSP:ShinyHuntRunaway",
         STRING_POKEMON + " BDSP", "Shiny Hunt - Shaymin Runaway",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ShinyHuntShayminRunaway-Overworld.md",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ShinyHunt-ShayminRunaway.md",
         "Shiny hunt Shaymin runaway " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         PABotBaseLevel::PABOTBASE_12KB

@@ -510,7 +510,7 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Fishing.h
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Overworld.cpp
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Overworld.h
-	Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-ShayminRunaway.cpp
+    Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-ShayminRunaway.cpp
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-ShayminRunaway.h
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_StarterReset.cpp
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_StarterReset.h
