@@ -169,7 +169,7 @@ void ShinyHuntShayminRunaway::program(SingleSwitchProgramEnvironment& env){
             for (; count_down > 0; count_down--){
                 pbf_move_left_joystick(env.console, 128, 255, 105, 0);
             }
-            //run up to flower meadows, mashing A to start encounter
+            //run up to flower paradise, mashing A to start encounter
             for (; count_up > 0; count_up--){
                 pbf_move_left_joystick(env.console, 128, 0, 105, 0);
             }
