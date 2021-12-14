@@ -110,6 +110,8 @@ bool ShinyHuntShayminRunaway::start_encounter(SingleSwitchProgramEnvironment& en
         return false;
     case 1:
         env.console.log("Battle started!");
+        pbf_mash_button(env.console, BUTTON_A, 180);
+        //mash for another second to clear cutscene, to handle false detection during day hours
         return true;
     }
     return false;
