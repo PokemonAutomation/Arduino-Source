@@ -19,6 +19,7 @@
 #include "Programs/ShinyHunting/PokemonBDSP_LegendaryReset.h"
 #include "Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Overworld.h"
 #include "Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Fishing.h"
+#include "Programs/ShinyHunting/PokemonBDSP_ShinyHunt-ShayminRunaway.h"
 
 #include "Programs/Eggs/PokemonBDSP_EggFetcher.h"
 #include "Programs/Eggs/PokemonBDSP_EggHatcher.h"
@@ -50,6 +51,7 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<LegendaryReset_Descriptor, LegendaryReset>();
     add_program<ShinyHuntOverworld_Descriptor, ShinyHuntOverworld>();
     add_program<ShinyHuntFishing_Descriptor, ShinyHuntFishing>();
+    add_program<ShinyHuntShayminRunaway_Descriptor, ShinyHuntShayminRunaway>();
 
     add_divider("---- Eggs ----");
     add_program<EggFetcher_Descriptor, EggFetcher>();
