@@ -373,20 +373,20 @@ void PABotBase::retransmit_thread(){
         //  Retransmit
         //      Iterate through all pending requests and retransmit them in
         //  chronological order. Skip the ones that are new.
-        for (auto iter : pending_requests){
+        for (auto& item : pending_requests){
             if (
-                iter.second.state == AckState::NOT_ACKED &&
-                std::chrono::system_clock::now() - iter.second.first_sent >= m_retransmit_delay
+                item.second.state == AckState::NOT_ACKED &&
+                std::chrono::system_clock::now() - item.second.first_sent >= m_retransmit_delay
             ){
-                send_message(iter.second.request, true);
+                send_message(item.second.request, true);
             }
         }
-        for (auto iter : pending_commands){
+        for (auto& item : pending_commands){
             if (
-                iter.second.state == AckState::NOT_ACKED &&
-                std::chrono::system_clock::now() - iter.second.first_sent >= m_retransmit_delay
+                item.second.state == AckState::NOT_ACKED &&
+                std::chrono::system_clock::now() - item.second.first_sent >= m_retransmit_delay
             ){
-                send_message(iter.second.request, true);
+                send_message(item.second.request, true);
             }
         }
         last_sent = std::chrono::system_clock::now();

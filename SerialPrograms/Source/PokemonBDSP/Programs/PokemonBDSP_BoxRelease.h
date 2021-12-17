@@ -13,7 +13,11 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
+//  Detach items.
+void detach(const BotBaseContext& context);
+void detach_box(const BotBaseContext& context, uint16_t box_scroll_delay);
 
+//  Release Pokemon.
 void release(const BotBaseContext& context);
 void release_box(const BotBaseContext& context, uint16_t box_scroll_delay);
 void release_boxes(

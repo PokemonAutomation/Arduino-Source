@@ -54,7 +54,6 @@ ShinyHuntFishing::ShinyHuntFishing(const ShinyHuntFishing_Descriptor& descriptor
         "10 * TICKS_PER_SECOND"
     )
 {
-    PA_ADD_OPTION(START_IN_GRIP_MENU);
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
 
     PA_ADD_OPTION(LANGUAGE);

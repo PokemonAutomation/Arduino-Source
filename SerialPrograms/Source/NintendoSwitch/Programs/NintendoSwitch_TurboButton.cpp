@@ -47,18 +47,26 @@ TurboButton::TurboButton(const TurboButton_Descriptor& descriptor)
         },
         2
     )
-    , PERIOD(
-        "<b>Period (time between presses):</b>",
-        "8", 8
-    )
+    , PRESS_DURATION("<b>Press Duration:</b><br>Hold the button down for this long.", "5", 5)
+    , RELEASE_DURATION("<b>Release Duration:</b><br>After releasing the button, wait this long before pressing it again.", "3", 3)
+    , TOTAL_PRESSES("<b>Total Presses:</b><br>Stop the program after this many presses. If zero, run forever.", 0, 0)
 {
     PA_ADD_OPTION(BUTTON);
-    PA_ADD_OPTION(PERIOD);
+    PA_ADD_OPTION(PRESS_DURATION);
+    PA_ADD_OPTION(RELEASE_DURATION);
+    PA_ADD_OPTION(TOTAL_PRESSES);
 }
 void TurboButton::program(SingleSwitchProgramEnvironment& env){
-    while (true){
-        pbf_press_button(env.console, (Button)1 << BUTTON, 5, PERIOD - 5);
+    if (TOTAL_PRESSES == 0){
+        while (true){
+            pbf_press_button(env.console, (Button)1 << BUTTON, PRESS_DURATION, RELEASE_DURATION);
+        }
+    }else{
+        for (uint64_t c = 0; c < TOTAL_PRESSES; c++){
+            pbf_press_button(env.console, (Button)1 << BUTTON, PRESS_DURATION, RELEASE_DURATION);
+        }
     }
+    env.console.botbase().wait_for_all_requests();
 }
 
 

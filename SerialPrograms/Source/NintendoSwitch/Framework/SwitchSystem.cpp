@@ -8,6 +8,8 @@
 #include <QJsonObject>
 #include <QKeyEvent>
 #include <QVBoxLayout>
+#include "Common/Cpp/FireForgetDispatcher.h"
+#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "Integrations/ProgramTracker.h"
@@ -26,7 +28,6 @@ const QString SwitchSystemFactory::JSON_SERIAL  = "Serial";
 const QString SwitchSystemFactory::JSON_CAMERA  = "Camera";
 const QString SwitchSystemFactory::JSON_CAMERA_INDEX        = "CameraIndex";
 const QString SwitchSystemFactory::JSON_CAMERA_RESOLUTION   = "CameraResolution";
-
 
 
 SwitchSystemFactory::SwitchSystemFactory(
@@ -126,6 +127,20 @@ SwitchSystem::SwitchSystem(
         m_command, &CommandRow::set_inference_boxes,
         m_camera, [=](bool enabled){
             m_camera->set_overlay_enabled(enabled);
+        }
+    );
+    connect(
+        m_command, &CommandRow::screenshot_requested,
+        m_video_display, [=](){
+            global_dispatcher.dispatch([=]{
+                QImage image = m_video_display->snapshot();
+                if (image.isNull()){
+                    return;
+                }
+                QString filename = QString::fromStdString("screenshot-" + now_to_filestring() + ".png");
+                m_logger.log("Saving screenshot to: " + filename);
+                image.save(filename);
+            });
         }
     );
 

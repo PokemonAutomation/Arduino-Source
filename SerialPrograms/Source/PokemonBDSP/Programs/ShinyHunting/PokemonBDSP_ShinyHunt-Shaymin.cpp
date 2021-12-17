@@ -1,4 +1,4 @@
-/*  Shiny Hunt Autonomous - Overworld
+/*  Shiny Hunt - Shaymin Runaway
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -6,6 +6,7 @@
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
@@ -13,30 +14,30 @@
 #include "PokemonBDSP/Inference/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_ShinyEncounterDetector.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_EncounterHandler.h"
-#include "PokemonBDSP_ShinyHunt-Overworld.h"
+#include "PokemonBDSP_ShinyHunt-Shaymin.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-ShinyHuntOverworld_Descriptor::ShinyHuntOverworld_Descriptor()
+ShinyHuntShaymin_Descriptor::ShinyHuntShaymin_Descriptor()
     : RunnableSwitchProgramDescriptor(
-        "PokemonBDSP:ShinyHuntOverworld",
-        STRING_POKEMON + " BDSP", "Shiny Hunt - Overworld",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ShinyHunt-Overworld.md",
-        "Shiny hunt overworld " + STRING_POKEMON + ".",
+        "PokemonBDSP:ShinyHuntShaymin",
+        STRING_POKEMON + " BDSP", "Shiny Hunt - Shaymin",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ShinyHuntShaymin-Overworld.md",
+        "Shiny hunt Shaymin using the runaway method.",
         FeedbackType::REQUIRED,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
 
 
-
-ShinyHuntOverworld::ShinyHuntOverworld(const ShinyHuntOverworld_Descriptor& descriptor)
+ShinyHuntShaymin::ShinyHuntShaymin(const ShinyHuntShaymin_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
-    , ENCOUNTER_BOT_OPTIONS(true, false)
+    , SHORTCUT("<b>Bike Shortcut:</b>")
+    , ENCOUNTER_BOT_OPTIONS(false, false)
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
@@ -55,10 +56,7 @@ ShinyHuntOverworld::ShinyHuntOverworld(const ShinyHuntOverworld_Descriptor& desc
     )
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
-
-    PA_ADD_OPTION(LANGUAGE);
-
-    PA_ADD_OPTION(TRIGGER_METHOD);
+    PA_ADD_OPTION(SHORTCUT);
 
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -70,24 +68,13 @@ ShinyHuntOverworld::ShinyHuntOverworld(const ShinyHuntOverworld_Descriptor& desc
 
 
 
-
-struct ShinyHuntOverworld::Stats : public PokemonSwSh::ShinyHuntTracker{
-    Stats()
-        : ShinyHuntTracker(false)
-//        , m_resets(m_stats["Resets"])
-    {
-//        m_display_order.insert(m_display_order.begin() + 2, Stat("Resets"));
-//        m_aliases["Unexpected Battles"] = "Errors";
-    }
-//    std::atomic<uint64_t>& m_resets;
-};
-std::unique_ptr<StatsTracker> ShinyHuntOverworld::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
+std::unique_ptr<StatsTracker> ShinyHuntShaymin::make_stats() const{
+    return std::unique_ptr<StatsTracker>(new PokemonSwSh::ShinyHuntTracker(false));
 }
 
 
 
-bool ShinyHuntOverworld::find_encounter(SingleSwitchProgramEnvironment& env) const{
+bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env) const{
     BattleMenuDetector battle_menu_detector(BattleType::WILD);
     StartBattleDetector start_battle_detector(env.console);
 
@@ -95,7 +82,7 @@ bool ShinyHuntOverworld::find_encounter(SingleSwitchProgramEnvironment& env) con
         env, env.console,
         [&](const BotBaseContext& context){
             while (true){
-                TRIGGER_METHOD.run_trigger(context);
+                pbf_mash_button(context, BUTTON_ZL, 125);
             }
         },
         {
@@ -115,13 +102,13 @@ bool ShinyHuntOverworld::find_encounter(SingleSwitchProgramEnvironment& env) con
     return false;
 }
 
-void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env){
-    Stats& stats = env.stats<Stats>();
+void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env){
+    PokemonSwSh::ShinyHuntTracker& stats = env.stats<PokemonSwSh::ShinyHuntTracker>();
     env.update_stats();
 
     StandardEncounterHandler handler(
         env, env.console,
-        LANGUAGE,
+        Language::None,
         ENCOUNTER_BOT_OPTIONS,
         stats
     );
@@ -132,7 +119,7 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env){
     //  Encounter Loop
     while (true){
         //  Find encounter.
-        bool battle = find_encounter(env);
+        bool battle = start_encounter(env);
         if (!battle){
             stats.add_error();
             handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
@@ -151,6 +138,14 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env){
         if (stop){
             break;
         }
+
+        //  Clear dialogs.
+        pbf_mash_button(env.console, BUTTON_B, 75);
+
+        //  Hop on bike, ride down to seabreak path
+        SHORTCUT.run(env.console, 0);
+        pbf_move_left_joystick(env.console, 128, 255, 315, 0);
+        pbf_move_left_joystick(env.console, 128, 0, 315, 0);
     }
 
     send_program_finished_notification(
@@ -161,21 +156,6 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env){
     );
     GO_HOME_WHEN_DONE.run_end_of_program(env.console);
 }
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 }
 }

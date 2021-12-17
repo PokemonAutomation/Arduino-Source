@@ -21,6 +21,8 @@ public:
     );
 
     double rmsd(const QImage& frame);
+    bool matches(const QImage& frame);
+
     virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp

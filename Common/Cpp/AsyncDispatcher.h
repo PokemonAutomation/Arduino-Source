@@ -25,8 +25,6 @@
 
 namespace PokemonAutomation{
 
-class AsyncDispatcher;
-
 class AsyncTask{
 public:
     //  Wait for the task to finish before destructing. Doesn't rethrow exceptions.
@@ -45,6 +43,7 @@ private:
     void signal();
 
 private:
+    friend class FireForgetDispatcher;
     friend class AsyncDispatcher;
     friend class ParallelTaskRunner;
 
@@ -93,6 +92,7 @@ private:
     std::mutex m_lock;
     std::condition_variable m_cv;
 };
+
 
 
 

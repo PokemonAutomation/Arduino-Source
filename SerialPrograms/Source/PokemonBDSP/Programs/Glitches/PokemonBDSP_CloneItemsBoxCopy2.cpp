@@ -1,35 +1,35 @@
-/*  Clone Items (Box Swap Method)
+/*  Clone Items (Box Swap Method 2)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
+#include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_BoxRelease.h"
 #include "PokemonBDSP/Programs/Eggs/PokemonBDSP_EggRoutines.h"
 #include "PokemonBDSP_MenuOverlap.h"
-#include "PokemonBDSP_CloneItemsBoxCopy.h"
+#include "PokemonBDSP_CloneItemsBoxCopy2.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-CloneItemsBoxCopy_Descriptor::CloneItemsBoxCopy_Descriptor()
+CloneItemsBoxCopy2_Descriptor::CloneItemsBoxCopy2_Descriptor()
     : RunnableSwitchProgramDescriptor(
-        "PokemonBDSP:CloneItemsBoxCopy",
-        STRING_POKEMON + " BDSP", "Clone Items (Box Copy)",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/CloneItemsBoxCopy.md",
-        "Clone 30 items at a time using the menu overlap glitch via the entire box cloning method.<br>"
-        "<font color=\"red\">This program relies the menu overlap glitch which was patched out in v1.1.2. "
-        "Thus this program only works on v1.1.1 and earlier.</font>",
+        "PokemonBDSP:CloneItemsBoxCopy2",
+        STRING_POKEMON + " BDSP", "Clone Items (Box Copy 2)",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/CloneItemsBoxCopy2.md",
+        "With the menu glitch active, clone entire boxes of items at a time.<br>"
+        "<font color=\"red\">The menu glitch is still possible to activate as of version 1.1.2.</font>",
         FeedbackType::REQUIRED,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
 
-CloneItemsBoxCopy::CloneItemsBoxCopy(const CloneItemsBoxCopy_Descriptor& descriptor)
+CloneItemsBoxCopy2::CloneItemsBoxCopy2(const CloneItemsBoxCopy2_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
     , BOXES(
@@ -50,7 +50,7 @@ CloneItemsBoxCopy::CloneItemsBoxCopy(const CloneItemsBoxCopy_Descriptor& descrip
 }
 
 
-struct CloneItemsBoxCopy::Stats : public StatsTracker{
+struct CloneItemsBoxCopy2::Stats : public StatsTracker{
     Stats()
         : m_boxes(m_stats["Boxes Cloned"])
         , m_errors(m_stats["Errors"])
@@ -64,15 +64,15 @@ struct CloneItemsBoxCopy::Stats : public StatsTracker{
     std::atomic<uint64_t>& m_errors;
 //    std::atomic<uint64_t>& m_resets;
 };
-std::unique_ptr<StatsTracker> CloneItemsBoxCopy::make_stats() const{
+std::unique_ptr<StatsTracker> CloneItemsBoxCopy2::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-void CloneItemsBoxCopy::program(SingleSwitchProgramEnvironment& env){
+void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env){
     Stats& stats = env.stats<Stats>();
 
-    uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
-    uint16_t POKEMON_TO_BOX_DELAY = GameSettings::instance().POKEMON_TO_BOX_DELAY0;
+//    uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
+//    uint16_t POKEMON_TO_BOX_DELAY = GameSettings::instance().POKEMON_TO_BOX_DELAY0;
 //    uint16_t OVERWORLD_TO_MENU_DELAY = GameSettings::instance().OVERWORLD_TO_MENU_DELAY;
 //    uint16_t MENU_TO_OVERWORLD_DELAY = GameSettings::instance().MENU_TO_OVERWORLD_DELAY;
     uint16_t BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY;
@@ -82,9 +82,15 @@ void CloneItemsBoxCopy::program(SingleSwitchProgramEnvironment& env){
 //    uint16_t POKEMON_TO_MENU_DELAY = GameSettings::instance().POKEMON_TO_MENU_DELAY;
 
     //  Connect the controller.
-    pbf_mash_button(env.console, BUTTON_B, 50);
+    pbf_mash_button(env.console, BUTTON_RCLICK, 50);
 
-    size_t consecutive_failures = 0;
+    //  Enter box system.
+    menu_to_box(env.console);
+
+    env.console.botbase().wait_for_all_requests();
+    QImage expected = env.console.video().snapshot();
+    ImageMatchDetector matcher(expected, {0.02, 0.25, 0.96, 0.73}, 20);
+
     for (uint16_t box = 0; box < BOXES; box++){
         env.update_stats();
         send_program_status_notification(
@@ -94,31 +100,28 @@ void CloneItemsBoxCopy::program(SingleSwitchProgramEnvironment& env){
             stats.to_str()
         );
 
-        QImage start = activate_menu_overlap_from_overworld(env.console);
-        if (start.isNull()){
-            stats.m_errors++;
-            consecutive_failures++;
-            if (consecutive_failures >= 3){
-                PA_THROW_StringException("Failed to activate menu overlap glitch 3 times in the row.");
-            }
-            pbf_mash_button(env.console, BUTTON_B, 10 * TICKS_PER_SECOND);
-            continue;
-        }
-        consecutive_failures = 0;
-
-        //  Enter box system.
-        pbf_mash_button(env.console, BUTTON_ZL, 30);
-        if (MENU_TO_POKEMON_DELAY > 30){
-            pbf_wait(env.console, MENU_TO_POKEMON_DELAY - 30);
-        }
-        pbf_press_button(env.console, BUTTON_R, 20, POKEMON_TO_BOX_DELAY);
-
-        //  Move to Battle.
+        //  Select 1st mon.
         pbf_press_button(env.console, BUTTON_ZL, 20, 50);
 
         //  Enter box system again.
         overworld_to_box(env.console);
 
+#if 0
+        //  Detach all items.
+        pbf_press_button(env.console, BUTTON_X, 20, 50);
+        detach_box(env.console, BOX_SCROLL_DELAY);
+
+        //  Back to previous menu.
+        box_to_overworld(env.console);
+
+        //  View Summary
+        pbf_move_right_joystick(env.console, 128, 255, 20, 10);
+        pbf_press_button(env.console, BUTTON_ZL, 20, 250);
+
+        //  Back out.
+        pbf_press_button(env.console, BUTTON_B, 20, 230);
+
+#else
         //  Move entire box to next box.
         pbf_press_button(env.console, BUTTON_Y, 20, 50);
         pbf_press_button(env.console, BUTTON_Y, 20, 50);
@@ -138,17 +141,29 @@ void CloneItemsBoxCopy::program(SingleSwitchProgramEnvironment& env){
         pbf_move_right_joystick(env.console, 128, 255, 20, 10);
         pbf_press_button(env.console, BUTTON_ZL, 20, 250);
 
-        //  Back all the way out to the overworld and clear glitch.
-        back_out_to_overworld(env, env.console, start);
+        //  Back out.
+        pbf_press_button(env.console, BUTTON_B, 20, 230);
 
         //  Release the cloned box.
-        overworld_to_box(env.console);
         pbf_press_button(env.console, BUTTON_R, 20, BOX_CHANGE_DELAY);
         release_box(env.console, BOX_SCROLL_DELAY);
         pbf_press_button(env.console, BUTTON_L, 20, BOX_CHANGE_DELAY);
 
-        //  Back all the way out to the overworld and clear glitch.
-        back_out_to_overworld(env, env.console, start);
+        //  Move cursor back to starting position.
+        pbf_move_right_joystick(env.console, 128, 255, 20, BOX_SCROLL_DELAY);
+        pbf_move_right_joystick(env.console, 128, 255, 20, BOX_SCROLL_DELAY);
+        pbf_move_right_joystick(env.console, 128, 255, 20, BOX_SCROLL_DELAY);
+        pbf_move_right_joystick(env.console, 255, 128, 20, BOX_SCROLL_DELAY);
+        pbf_move_right_joystick(env.console, 255, 128, 20, BOX_SCROLL_DELAY);
+#endif
+
+        env.console.botbase().wait_for_all_requests();
+        env.wait_for(std::chrono::milliseconds(500));
+        QImage current = env.console.video().snapshot();
+        if (!matcher.matches(current)){
+            stats.m_errors++;
+            PA_THROW_StringException("Failed to return to starting position. Something is wrong.");
+        }
 
         stats.m_boxes++;
     }

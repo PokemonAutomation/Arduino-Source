@@ -119,6 +119,7 @@
 #include "PokemonBDSP/Inference/PokemonBDSP_ShinyTrigger.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MarkFinder.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameEntry.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_MapDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_BattleBallReader.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_BattleMenuDetector.h"
@@ -126,6 +127,7 @@
 #include "PokemonBDSP/Inference/PokemonBDSP_StartBattleDetector.h"
 #include "PokemonBDSP/Programs/Eggs/PokemonBDSP_EggRoutines.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_RunFromBattle.h"
+#include "PokemonBDSP/Programs/PokemonBDSP_BoxRelease.h"
 #include "TestProgram.h"
 
 #include <immintrin.h>
@@ -190,9 +192,8 @@ namespace PokemonBDSP{
 
 
 
+
 }
-
-
 
 
 
@@ -211,7 +212,50 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoFeed& feed = env.consoles[0];
     VideoOverlay& overlay = env.consoles[0];
 
-#if 1
+
+    detach(console);
+
+
+
+#if 0
+    //  Move to escalator.
+    pbf_press_dpad(console, DPAD_UP, 20, 105);
+    pbf_press_dpad(console, DPAD_UP, 20, 105);
+    pbf_move_left_joystick(console, 255, 128, 250, 5 * TICKS_PER_SECOND);
+
+    //  Re-enter escalator.
+    pbf_press_dpad(console, DPAD_RIGHT, 125, 5 * TICKS_PER_SECOND);
+
+    //  Leave Pokemon center.
+    pbf_press_dpad(console, DPAD_LEFT, 20, 105);
+    pbf_press_dpad(console, DPAD_LEFT, 20, 105);
+    pbf_press_dpad(console, DPAD_LEFT, 20, 105);
+    pbf_press_dpad(console, DPAD_LEFT, 20, 105);
+    pbf_press_dpad(console, DPAD_LEFT, 20, 105);
+    pbf_move_left_joystick(console, 128, 255, 125, 5 * TICKS_PER_SECOND);
+#endif
+
+
+//    pbf_mash_button(console, BUTTON_ZL | BUTTON_R, 500);
+
+#if 0
+    for (size_t c = 0; c < 15; c++){
+//        pbf_press_button(console, BUTTON_ZL, 5, 0);
+//        pbf_press_button(console, BUTTON_R, 5, 3);
+        pbf_controller_state(console, BUTTON_ZL, DPAD_NONE, 128, 128, 128, 128, 1);
+        pbf_controller_state(console, BUTTON_R | BUTTON_ZL, DPAD_NONE, 128, 128, 128, 128, 5);
+        pbf_wait(console, 3);
+    }
+#endif
+
+//    pbf_press_button(console, BUTTON_R | BUTTON_ZL, 5, 3);
+
+
+
+//    InferenceBoxScope box(console, 0.02, 0.25, 0.96, 0.73);
+
+
+#if 0
     cout << "asdf" << endl;
     cout << "qwer\nzxcv" << endl;
     cout << 123.456 << endl << 489.156 << endl;

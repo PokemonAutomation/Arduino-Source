@@ -39,7 +39,7 @@ void PanelList::finish_panel_setup(){
 
         const QString& display_name = item.second->display_name();
         if (!m_panel_map.emplace(display_name, item.second.get()).second){
-//            cout << ("Duplicate program name: " + display_name).toUtf8().data() << endl;
+            cout << ("Duplicate program name: " + display_name).toUtf8().data() << endl;
             PA_THROW_StringException("Duplicate program name: " + display_name);
         }
 

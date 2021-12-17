@@ -71,10 +71,7 @@ void column_to_party(const BotBaseContext& context, uint8_t column){
     pbf_move_right_joystick(context, 128, 255, 20, BOX_SCROLL_DELAY);
 }
 
-void overworld_to_box(const BotBaseContext& context){
-    pbf_press_button(context, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
-//    pbf_press_button(context, BUTTON_ZL, 20, GameSettings::instance().MENU_TO_POKEMON_DELAY);
-
+void menu_to_box(const BotBaseContext& context){
     uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
     pbf_mash_button(context, BUTTON_ZL, 30);
     if (MENU_TO_POKEMON_DELAY > 30){
@@ -82,6 +79,12 @@ void overworld_to_box(const BotBaseContext& context){
     }
 
     pbf_press_button(context, BUTTON_R, 20, GameSettings::instance().POKEMON_TO_BOX_DELAY0);
+}
+void overworld_to_box(const BotBaseContext& context){
+    pbf_press_button(context, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+//    pbf_press_button(context, BUTTON_ZL, 20, GameSettings::instance().MENU_TO_POKEMON_DELAY);
+
+    menu_to_box(context);
 }
 void box_to_overworld(const BotBaseContext& context){
     pbf_press_button(context, BUTTON_B, 20, GameSettings::instance().BOX_TO_POKEMON_DELAY);

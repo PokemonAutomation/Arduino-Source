@@ -50,6 +50,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/DllSafeString.h
     ../Common/Cpp/Exception.cpp
     ../Common/Cpp/Exception.h
+    ../Common/Cpp/FireForgetDispatcher.cpp
+    ../Common/Cpp/FireForgetDispatcher.h
     ../Common/Cpp/FixedLimitVector.h
     ../Common/Cpp/PanicDump.cpp
     ../Common/Cpp/PanicDump.h
@@ -453,6 +455,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h
     Source/PokemonBDSP/Inference/PokemonBDSP_EndBattleDetector.cpp
     Source/PokemonBDSP/Inference/PokemonBDSP_EndBattleDetector.h
+    Source/PokemonBDSP/Inference/PokemonBDSP_MapDetector.cpp
+    Source/PokemonBDSP/Inference/PokemonBDSP_MapDetector.h
     Source/PokemonBDSP/Inference/PokemonBDSP_MarkFinder.cpp
     Source/PokemonBDSP/Inference/PokemonBDSP_MarkFinder.h
     Source/PokemonBDSP/Inference/PokemonBDSP_PokeballSpriteMatcher.cpp
@@ -488,8 +492,12 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.h
     Source/PokemonBDSP/Programs/General/PokemonBDSP_MassRelease.cpp
     Source/PokemonBDSP/Programs/General/PokemonBDSP_MassRelease.h
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-Poketch.cpp
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-Poketch.h
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy.cpp
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy.h
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy2.cpp
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy2.h
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.cpp
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.h
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_MenuOverlap.cpp
@@ -510,6 +518,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Fishing.h
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Overworld.cpp
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Overworld.h
+    Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Shaymin.cpp
+    Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Shaymin.h
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_StarterReset.cpp
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_StarterReset.h
     Source/PokemonBDSP/Panels_PokemonBDSP.cpp

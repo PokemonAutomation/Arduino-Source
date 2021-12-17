@@ -1,11 +1,11 @@
-/*  Clone Items (Box Swap Method)
+/*  Clone Items (Box Copy Method)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_PokemonBDSP_CloneItemsBoxSwap_H
-#define PokemonAutomation_PokemonBDSP_CloneItemsBoxSwap_H
+#ifndef PokemonAutomation_PokemonBDSP_CloneItemsBoxCopy2_H
+#define PokemonAutomation_PokemonBDSP_CloneItemsBoxCopy2_H
 
 #include "CommonFramework/Options/StaticTextOption.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
@@ -19,16 +19,16 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-class CloneItemsBoxCopy_Descriptor : public RunnableSwitchProgramDescriptor{
+class CloneItemsBoxCopy2_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
-    CloneItemsBoxCopy_Descriptor();
+    CloneItemsBoxCopy2_Descriptor();
 };
 
 
 
-class CloneItemsBoxCopy : public SingleSwitchProgramInstance{
+class CloneItemsBoxCopy2 : public SingleSwitchProgramInstance{
 public:
-    CloneItemsBoxCopy(const CloneItemsBoxCopy_Descriptor& descriptor);
+    CloneItemsBoxCopy2(const CloneItemsBoxCopy2_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env) override;

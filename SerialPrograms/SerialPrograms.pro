@@ -243,6 +243,7 @@ SOURCES += \
     Source/PokemonBDSP/Inference/PokemonBDSP_BattleMenuDetector.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_DialogDetector.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_EndBattleDetector.cpp \
+    Source/PokemonBDSP/Inference/PokemonBDSP_MapDetector.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_MarkFinder.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_PokeballSpriteMatcher.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.cpp \
@@ -261,7 +262,9 @@ SOURCES += \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute210.cpp \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.cpp \
     Source/PokemonBDSP/Programs/General/PokemonBDSP_MassRelease.cpp \
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-Poketch.cpp \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy.cpp \
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy2.cpp \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.cpp \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_MenuOverlap.cpp \
     Source/PokemonBDSP/Programs/PokemonBDSP_BoxRelease.cpp \
@@ -682,6 +685,7 @@ HEADERS += \
     Source/PokemonBDSP/Inference/PokemonBDSP_BattleMenuDetector.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_EndBattleDetector.h \
+    Source/PokemonBDSP/Inference/PokemonBDSP_MapDetector.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_MarkFinder.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_PokeballSpriteMatcher.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h \
@@ -701,7 +705,9 @@ HEADERS += \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute210.h \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.h \
     Source/PokemonBDSP/Programs/General/PokemonBDSP_MassRelease.h \
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-Poketch.h \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy.h \
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy2.h \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.h \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_MenuOverlap.h \
     Source/PokemonBDSP/Programs/PokemonBDSP_BoxRelease.h \

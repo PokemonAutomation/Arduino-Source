@@ -19,6 +19,7 @@ void pickup_column(const BotBaseContext& context);
 void party_to_column(const BotBaseContext& context, uint8_t column);
 void column_to_party(const BotBaseContext& context, uint8_t column);
 
+void menu_to_box(const BotBaseContext& context);
 void overworld_to_box(const BotBaseContext& context);
 void box_to_overworld(const BotBaseContext& context);
 void withdraw_1st_column_from_overworld(const BotBaseContext& context);

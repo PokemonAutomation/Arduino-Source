@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_TurboButton_H
 #define PokemonAutomation_NintendoSwitch_TurboButton_H
 
+#include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
@@ -29,7 +30,9 @@ public:
 
 private:
     EnumDropdownOption BUTTON;
-    TimeExpressionOption<uint16_t> PERIOD;
+    TimeExpressionOption<uint16_t> PRESS_DURATION;
+    TimeExpressionOption<uint16_t> RELEASE_DURATION;
+    SimpleIntegerOption<uint64_t> TOTAL_PRESSES;
 };
 
 

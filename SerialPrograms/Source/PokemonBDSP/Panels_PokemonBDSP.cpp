@@ -19,12 +19,15 @@
 #include "Programs/ShinyHunting/PokemonBDSP_LegendaryReset.h"
 #include "Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Overworld.h"
 #include "Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Fishing.h"
+#include "Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Shaymin.h"
 
 #include "Programs/Eggs/PokemonBDSP_EggFetcher.h"
 #include "Programs/Eggs/PokemonBDSP_EggHatcher.h"
 
-#include "Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.h"
+#include "Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-Poketch.h"
+#include "Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy2.h"
 #include "Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy.h"
+#include "Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -50,15 +53,23 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<LegendaryReset_Descriptor, LegendaryReset>();
     add_program<ShinyHuntOverworld_Descriptor, ShinyHuntOverworld>();
     add_program<ShinyHuntFishing_Descriptor, ShinyHuntFishing>();
+    if (GlobalSettings::instance().DEVELOPER_MODE){
+        add_program<ShinyHuntShaymin_Descriptor, ShinyHuntShaymin>();
+    }
 
     add_divider("---- Eggs ----");
     add_program<EggFetcher_Descriptor, EggFetcher>();
     add_program<EggHatcher_Descriptor, EggHatcher>();
 
+    add_divider("---- Glitches (v1.1.2) ----");
+    add_program<ActivateMenuGlitchPoketch_Descriptor, ActivateMenuGlitchPoketch>();
+    add_program<CloneItemsBoxCopy2_Descriptor, CloneItemsBoxCopy2>();
+
+    add_divider("---- Glitches (v1.1.1) ----");
+    add_program<CloneItemsBoxCopy_Descriptor, CloneItemsBoxCopy>();
+    add_program<CloneItemsMenuOverlap_Descriptor, CloneItemsMenuOverlap>();
+
 //    if (GlobalSettings::instance().DEVELOPER_MODE){
-        add_divider("---- Glitches (v1.1.1) ----");
-        add_program<CloneItemsMenuOverlap_Descriptor, CloneItemsMenuOverlap>();
-        add_program<CloneItemsBoxCopy_Descriptor, CloneItemsBoxCopy>();
 //    }
 
 

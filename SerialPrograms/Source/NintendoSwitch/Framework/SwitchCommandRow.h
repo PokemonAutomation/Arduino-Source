@@ -9,7 +9,7 @@
 
 #include <QComboBox>
 #include <QLabel>
-//#include <QPushButton>
+#include <QPushButton>
 #include <QCheckBox>
 #include "CommonFramework/Globals.h"
 #include "VirtualSwitchController.h"
@@ -35,6 +35,7 @@ public:
 signals:
     void set_feedback_enabled(bool enabled);
     void set_inference_boxes(bool enabled);
+    void screenshot_requested();
 
 public slots:
     void set_focus(bool focused);
@@ -45,9 +46,9 @@ private:
     BotBaseHandle& m_botbase;
     QComboBox* m_command_box;
     QLabel* m_status;
-//    QPushButton* m_test_button;
     QCheckBox* m_inference_box;
     QCheckBox* m_overlay_box;
+    QPushButton* m_screenshot_button;
     bool m_last_known_focus;
 };
 

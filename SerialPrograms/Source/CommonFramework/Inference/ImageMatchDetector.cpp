@@ -40,7 +40,12 @@ double ImageMatchDetector::rmsd(const QImage& frame){
         scaled = scaled.scaled(m_reference_image.size());
     }
 //    cout << "asdf" << endl;
-    return ImageMatch::pixel_RMSD(m_reference_image, scaled);
+    double ret = ImageMatch::pixel_RMSD(m_reference_image, scaled);
+//    cout << "rmsd = " << ret << endl;
+    return ret;
+}
+bool ImageMatchDetector::matches(const QImage& frame){
+    return rmsd(frame) <= m_max_rmsd;
 }
 bool ImageMatchDetector::process_frame(
     const QImage& frame,

@@ -25,21 +25,24 @@ CommandRow::CommandRow(
     QHBoxLayout* command_row = new QHBoxLayout(this);
     command_row->setContentsMargins(0, 0, 0, 0);
 
-    command_row->addWidget(new QLabel("<b>Keyboard Input:</b>", this), 1);
+    command_row->addWidget(new QLabel("<b>Keyboard Input:</b>", this), 2);
     command_row->addSpacing(5);
 
     m_status = new QLabel(this);
-    command_row->addWidget(m_status, 5);
+    command_row->addWidget(m_status, 10);
     command_row->addSpacing(5);
 
     m_inference_box = new QCheckBox("Enable Feedback", this);
     m_inference_box->setChecked(true);
-    command_row->addWidget(m_inference_box, 2);
+    command_row->addWidget(m_inference_box, 3);
     command_row->addSpacing(5);
 
     m_overlay_box = new QCheckBox("Show Inference Boxes", this);
     m_overlay_box->setChecked(true);
-    command_row->addWidget(m_overlay_box, 2);
+    command_row->addWidget(m_overlay_box, 3);
+
+    m_screenshot_button = new QPushButton("Screenshot", this);
+    command_row->addWidget(m_screenshot_button, 2);
 
     switch (feedback){
     case FeedbackType::NONE:
@@ -79,14 +82,10 @@ CommandRow::CommandRow(
         m_overlay_box, &QCheckBox::stateChanged,
         this, [=](int){ set_inference_boxes(m_overlay_box->isChecked()); }
     );
-#if 0
     connect(
-        m_test_button, &QPushButton::clicked,
-        this, [=](bool){
-            test_button();
-        }
+        m_screenshot_button, &QPushButton::clicked,
+        this, [=](bool){ screenshot_requested(); }
     );
-#endif
 }
 
 void CommandRow::on_key_press(Qt::Key key){
