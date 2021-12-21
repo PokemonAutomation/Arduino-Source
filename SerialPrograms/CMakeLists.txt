@@ -484,6 +484,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggHatcher.h
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggRoutines.cpp
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggRoutines.h
+    Source/PokemonBDSP/Programs/Farming/PokemonBDSP_AmitySquarePickUpFarmer.cpp
+    Source/PokemonBDSP/Programs/Farming/PokemonBDSP_AmitySquarePickUpFarmer.h
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_DoublesLeveling.cpp
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_DoublesLeveling.h
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute210.cpp
