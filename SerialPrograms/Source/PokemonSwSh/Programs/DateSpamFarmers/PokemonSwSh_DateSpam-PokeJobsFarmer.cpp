@@ -37,7 +37,7 @@ namespace PokemonAutomation
 					  200),
 				  MASH_B_DURATION(
 					  "<b>Mash B for this long to exit the dialog:</b>",
-					  "9 * TICKS_PER_SECOND"),
+					  "8 * TICKS_PER_SECOND"),
 				  MENU_INDEX(
 					  "<b>Index of Poke Jobs in Rotom menu:</b>",
 					  3),
@@ -84,7 +84,7 @@ namespace PokemonAutomation
 
                         // Get rid of new jobs notification by entering Poke Jobs and leaving immediately
                         enter_jobs(env, MENU_INDEX);
-                        pbf_mash_button(env.console, BUTTON_B, MASH_B_DURATION);
+                        pbf_mash_button(env.console, BUTTON_B, 5 * TICKS_PER_SECOND);
                     }
 
                     // Start new jobs
@@ -112,7 +112,7 @@ namespace PokemonAutomation
 
 						// Wait for animation to end and exit Poke Jobs
 						env.log("#### Exit Poke Jobs");
-						pbf_mash_button(env.console, BUTTON_B, MASH_B_DURATION);
+						pbf_mash_button(env.console, BUTTON_B, 5 * TICKS_PER_SECOND);
 					}
 
 					env.log("Skipping one year...");
@@ -128,7 +128,7 @@ namespace PokemonAutomation
 
                     // Get rid of new jobs notification by entering Poke Jobs and leaving immediately
                     enter_jobs(env, MENU_INDEX);
-                    pbf_mash_button(env.console, BUTTON_B, MASH_B_DURATION);
+                    pbf_mash_button(env.console, BUTTON_B, 5 * TICKS_PER_SECOND);
 
                     // Complete jobs
                     for (uint16_t j = 1; j <= CONCURRENCY; j++)
