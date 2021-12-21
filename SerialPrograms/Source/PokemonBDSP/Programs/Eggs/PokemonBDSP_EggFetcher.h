@@ -38,8 +38,6 @@ public:
 
 private:
     struct Stats;
-    bool find_encounter(SingleSwitchProgramEnvironment& env) const;
-    void battle(SingleSwitchProgramEnvironment& env);
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
