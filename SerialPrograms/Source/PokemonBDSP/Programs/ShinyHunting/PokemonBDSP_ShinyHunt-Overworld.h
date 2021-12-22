@@ -37,9 +37,7 @@ public:
 
 private:
     struct Stats;
-    bool find_encounter(SingleSwitchProgramEnvironment& env) const;
 
-private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
     Pokemon::EncounterBotLanguage LANGUAGE;

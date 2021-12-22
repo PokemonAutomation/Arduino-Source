@@ -87,19 +87,7 @@ void save_game(ProgramEnvironment& env, ConsoleHandle& console){
 
 void overworld_to_box(ProgramEnvironment& env, ConsoleHandle& console){
     //  Open menu.
-    pbf_press_button(console, BUTTON_X, 20, 105);
-    console.botbase().wait_for_all_requests();
-    {
-        MenuWatcher detector;
-        int ret = wait_until(
-            env, console, std::chrono::seconds(10),
-            { &detector }
-        );
-        if (ret < 0){
-            PA_THROW_InferenceException(console, "Menu not detected after 10 seconds.");
-        }
-        console.log("Detected menu.");
-    }
+    overworld_to_menu(env, console);
 
     //  Enter Pokemon
     uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;

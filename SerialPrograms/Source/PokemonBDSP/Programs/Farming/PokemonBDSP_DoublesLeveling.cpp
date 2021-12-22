@@ -94,33 +94,7 @@ std::unique_ptr<StatsTracker> DoublesLeveling::make_stats() const{
 
 
 
-bool DoublesLeveling::find_encounter(SingleSwitchProgramEnvironment& env) const{
-    BattleMenuWatcher battle_menu_detector(BattleType::WILD);
-    StartBattleDetector start_battle_detector(env.console);
 
-    int result = run_until(
-        env, env.console,
-        [&](const BotBaseContext& context){
-            while (true){
-                TRIGGER_METHOD.run_trigger(context);
-            }
-        },
-        {
-            &battle_menu_detector,
-            &start_battle_detector,
-        }
-    );
-
-    switch (result){
-    case 0:
-        env.console.log("Unexpected Battle.", "red");
-        return false;
-    case 1:
-        env.console.log("Battle started!");
-        return true;
-    }
-    return false;
-}
 bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env){
     Stats& stats = env.stats<Stats>();
 
@@ -194,7 +168,7 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env){
     //  Encounter Loop
     while (true){
         //  Find encounter.
-        bool battle = find_encounter(env);
+        bool battle = TRIGGER_METHOD.find_encounter(env);
         if (!battle){
             stats.add_error();
             handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
