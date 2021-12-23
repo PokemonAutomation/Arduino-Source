@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_CommonFramework_ImageMatchDetector_H
 #define PokemonAutomation_CommonFramework_ImageMatchDetector_H
 
+#include <chrono>
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
