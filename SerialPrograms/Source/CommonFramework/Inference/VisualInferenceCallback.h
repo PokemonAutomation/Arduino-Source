@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <deque>
+#include <chrono>
 #include <QImage>
 #include "CommonFramework/Tools/VideoFeed.h"
 
