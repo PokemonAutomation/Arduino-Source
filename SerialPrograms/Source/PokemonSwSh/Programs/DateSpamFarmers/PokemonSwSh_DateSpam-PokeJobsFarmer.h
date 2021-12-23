@@ -14,37 +14,37 @@
 
 namespace PokemonAutomation
 {
-    namespace NintendoSwitch
-    {
-        namespace PokemonSwSh
-        {
+namespace NintendoSwitch
+{
+namespace PokemonSwSh
+{
 
-            class PokeJobsFarmer_Descriptor : public RunnableSwitchProgramDescriptor
-            {
-            public:
-                PokeJobsFarmer_Descriptor();
-            };
+class PokeJobsFarmer_Descriptor : public RunnableSwitchProgramDescriptor
+{
+public:
+    PokeJobsFarmer_Descriptor();
+};
 
-            class PokeJobsFarmer : public SingleSwitchProgramInstance
-            {
-            public:
-                PokeJobsFarmer(const PokeJobsFarmer_Descriptor &descriptor);
+class PokeJobsFarmer : public SingleSwitchProgramInstance
+{
+public:
+    PokeJobsFarmer(const PokeJobsFarmer_Descriptor &descriptor);
 
-                virtual void program(SingleSwitchProgramEnvironment &env) override;
+    virtual void program(SingleSwitchProgramEnvironment &env) override;
 
-            private:
-                StartInGripOrGameOption START_IN_GRIP_MENU;
+private:
+    StartInGripOrGameOption START_IN_GRIP_MENU;
 
-                SimpleIntegerOption<uint32_t> SKIPS;
-                SimpleIntegerOption<uint32_t> CONCURRENCY;
-                SimpleIntegerOption<uint32_t> MENU_INDEX;
+    SimpleIntegerOption<uint32_t> SKIPS;
+    SimpleIntegerOption<uint32_t> CONCURRENCY;
+    SimpleIntegerOption<uint32_t> MENU_INDEX;
 
-                SectionDividerOption m_advanced_options;
-                
-                TimeExpressionOption<uint16_t> MASH_B_DURATION;
-            };
+    SectionDividerOption m_advanced_options;
 
-        }
-    }
+    TimeExpressionOption<uint16_t> MASH_B_DURATION;
+};
+
+}
+}
 }
 #endif
