@@ -22,9 +22,9 @@ PokeJobsFarmer_Descriptor::PokeJobsFarmer_Descriptor()
     : RunnableSwitchProgramDescriptor(
           "PokemonSwSh:PokeJobsFarmer",
           STRING_POKEMON + " SwSh",
-          "Date Spam - Poke Jobs Farmer",
+          "Date Spam - " + STRING_POKEJOB + "s Farmer",
           "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-PokeJobsFarmer.md",
-          "Farm Poke Jobs.",
+          "Farm " + STRING_POKEJOB + "s.",
           FeedbackType::NONE,
           PABotBaseLevel::PABOTBASE_12KB)
 {
@@ -36,15 +36,15 @@ PokeJobsFarmer::PokeJobsFarmer(const PokeJobsFarmer_Descriptor &descriptor)
           "<b>Number of days:</b>",
           200),
       CONCURRENCY(
-          "<b>Number of concurrent Poke Jobs per day:</b>",
+          "<b>Number of concurrent " + STRING_POKEJOB + "s per day:</b>",
           2),
       MENU_INDEX(
-          "<b>Index of Poke Jobs in Rotom menu:</b>",
+          "<b>Index of " + STRING_POKEJOB + "s in Rotom menu:</b>",
           3),
       m_advanced_options(
           "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"),
       MASH_B_DURATION(
-          "<b>Mash B for this long upon completion of Poké Job:</b>",
+          "<b>Mash B for this long upon completion of " + STRING_POKEJOB + ":</b>",
           "8 * TICKS_PER_SECOND")
 {
     PA_ADD_OPTION(SKIPS);
@@ -99,7 +99,7 @@ void PokeJobsFarmer::program(SingleSwitchProgramEnvironment &env)
             enter_jobs(env, MENU_INDEX);
 
             // Select first Poke Job
-            env.log("#### Select first Poke Job");
+            env.log("#### Select first " + STRING_POKEJOB);
             pbf_press_button(env.console, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
             pbf_press_button(env.console, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
             pbf_press_button(env.console, BUTTON_A, 10, 3 * TICKS_PER_SECOND);
@@ -109,12 +109,12 @@ void PokeJobsFarmer::program(SingleSwitchProgramEnvironment &env)
             pbf_press_button(env.console, BUTTON_X, 10, 90);
 
             // Send to Poke Job
-            env.log("#### Send to Poke Job");
+            env.log("#### Send to " + STRING_POKEJOB);
             pbf_press_button(env.console, BUTTON_B, 10, 2 * TICKS_PER_SECOND);
             pbf_mash_button(env.console, BUTTON_A, 6 * TICKS_PER_SECOND); // Mash until animation starts
 
             // Wait for animation to end and exit Poke Jobs
-            env.log("#### Exit Poke Jobs");
+            env.log("#### Exit " + STRING_POKEJOB + "s");
             pbf_mash_button(env.console, BUTTON_B, 5 * TICKS_PER_SECOND);
         }
 
@@ -142,13 +142,13 @@ void PokeJobsFarmer::program(SingleSwitchProgramEnvironment &env)
             enter_jobs(env, MENU_INDEX);
 
             // Select first Poke Job
-            env.log("#### Select first Poke Job");
+            env.log("#### Select first " + STRING_POKEJOB);
             pbf_press_button(env.console, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
             pbf_press_button(env.console, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
             pbf_press_button(env.console, BUTTON_A, 10, 10 * TICKS_PER_SECOND); // Wait for animation to complete
 
             // Skip through wall of text and exit
-            env.log("#### Exit Poke Jobs");
+            env.log("#### Exit " + STRING_POKEJOB + "s");
             pbf_mash_button(env.console, BUTTON_B, MASH_B_DURATION);
         }
     }

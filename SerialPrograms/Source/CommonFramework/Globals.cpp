@@ -28,7 +28,7 @@ const QString PROJECT_SOURCE_URL = "https://github.com/PokemonAutomation/Arduino
 const QString STRING_POKEBALL = QString("Pok") + QChar(0xe9) + " Ball";
 const QString STRING_POKEMON = QString("Pok") + QChar(0xe9) + "mon";
 const QString STRING_POKEDEX = QString("Pok") + QChar(0xe9) + "dex";
-
+const QString STRING_POKEJOB = QString("Pok") + QChar(0xe9) + " Job";
 
 
 QString get_resource_path(){
