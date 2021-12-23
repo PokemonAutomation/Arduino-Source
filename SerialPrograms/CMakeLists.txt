@@ -20,7 +20,10 @@ set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
 #find Qt
-find_package(Qt5 COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets REQUIRED)
+if(NOT QT_MAJOR)
+    set(QT_MAJOR 5)
+endif()
+find_package(Qt${QT_MAJOR} COMPONENTS Widgets SerialPort Multimedia MultimediaWidgets REQUIRED)
 #disable deprecated Qt APIs
 add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
 
@@ -873,7 +876,7 @@ file(GLOB MAIN_SOURCES
 )
 add_executable(SerialPrograms WIN32 ${MAIN_SOURCES})
 set_target_properties(SerialPrograms PROPERTIES LINKER_LANGUAGE CXX)
-target_link_libraries(SerialPrograms Qt5::Widgets Qt5::SerialPort Qt5::Multimedia Qt5::MultimediaWidgets)
+target_link_libraries(SerialPrograms Qt${QT_MAJOR}::Widgets Qt${QT_MAJOR}::SerialPort Qt${QT_MAJOR}::Multimedia Qt${QT_MAJOR}::MultimediaWidgets)
 
 #add defines
 target_compile_definitions(SerialPrograms PRIVATE NOMINMAX)
