@@ -20,9 +20,12 @@ ProfessorSwapDetector::ProfessorSwapDetector(VideoOverlay& overlay)
 //    , m_dialog1(0.710, 0.880, 0.030, 0.050)
     , m_bottom_main(0.100, 0.970, 0.600, 0.020)
 {
-//    add_box(m_dialog0, Qt::yellow);
-//    add_box(m_dialog1, Qt::yellow);
-    add_box(m_bottom_main, Qt::yellow);
+}
+void ProfessorSwapDetector::make_overlays(OverlaySet& items) const{
+    SelectionArrowFinder::make_overlays(items);
+//    items.add(Qt::yellow, m_dialog0);
+//    items.add(Qt::yellow, m_dialog1);
+    items.add(Qt::yellow, m_bottom_main);
 }
 bool ProfessorSwapDetector::detect(const QImage& screen){
 //    ImageStats dialog_left = image_stats(extract_box(screen, m_dialog0));

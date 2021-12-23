@@ -9,9 +9,9 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_VSSeekerReaction.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_StartBattleDetector.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_BattleMenuDetector.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_EndBattleDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_EndBattleDetector.h"
 #include "PokemonBDSP_MoneyFarmerRoute212.h"
 
 namespace PokemonAutomation{
@@ -49,7 +49,7 @@ MoneyFarmerRoute212::MoneyFarmerRoute212(const MoneyFarmerRoute212_Descriptor& d
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
 {
     PA_ADD_OPTION(SHORTCUT);
@@ -109,8 +109,8 @@ void MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
     for (size_t c = 0; c < 5; c++){
         env.console.botbase().wait_for_all_requests();
 
-        BattleMenuDetector battle_menu(BattleType::TRAINER);
-        EndBattleDetector end_battle;
+        BattleMenuWatcher battle_menu(BattleType::TRAINER);
+        EndBattleWatcher end_battle;
 //        ShortDialogDetectorCallback dialog_detector(env.console);
         int ret = run_until(
             env, env.console,

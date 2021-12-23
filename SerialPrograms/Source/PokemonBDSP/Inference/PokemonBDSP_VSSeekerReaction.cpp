@@ -70,10 +70,10 @@ size_t find_seeker_bubbles(
 VSSeekerReactionTracker::VSSeekerReactionTracker(VideoOverlay& overlay, const ImageFloatBox& box)
     : m_overlay(overlay)
     , m_box(box)
-{
-    add_box(m_box);
+{}
+void VSSeekerReactionTracker::make_overlays(OverlaySet& items) const{
+    items.add(Qt::red, m_box);
 }
-
 bool VSSeekerReactionTracker::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point

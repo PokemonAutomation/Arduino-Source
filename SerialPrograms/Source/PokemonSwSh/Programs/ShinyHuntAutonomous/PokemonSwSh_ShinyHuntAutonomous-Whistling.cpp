@@ -49,7 +49,7 @@ ShinyHuntAutonomousWhistling::ShinyHuntAutonomousWhistling(const ShinyHuntAutono
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_CATCH_SUCCESS,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_CATCH_FAILED,
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
@@ -123,8 +123,8 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env){
 
         env.console.botbase().wait_for_all_requests();
         {
-            StandardBattleMenuDetector battle_menu_detector(false);
-            StartBattleDetector start_battle_detector(env.console);
+            StandardBattleMenuWatcher battle_menu_detector(false);
+            StartBattleWatcher start_battle_detector;
 
             int result = run_until(
                 env, env.console,

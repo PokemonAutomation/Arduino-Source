@@ -33,13 +33,14 @@ PathScreenDetector::PathScreenDetector()
     , m_box1(0.074, 0.420 + 1*0.16315, 0.020, 0.007)
     , m_box2(0.074, 0.420 + 2*0.16315, 0.020, 0.007)
     , m_box3(0.074, 0.420 + 3*0.16315, 0.020, 0.007)
-{
-    add_box(m_bottom_main, Qt::cyan);
-    add_box(m_main, Qt::cyan);
-    add_box(m_box0, Qt::cyan);
-    add_box(m_box1, Qt::cyan);
-    add_box(m_box2, Qt::cyan);
-    add_box(m_box3, Qt::cyan);
+{}
+void PathScreenDetector::make_overlays(OverlaySet& items) const{
+    items.add(Qt::cyan, m_bottom_main);
+    items.add(Qt::cyan, m_main);
+    items.add(Qt::cyan, m_box0);
+    items.add(Qt::cyan, m_box1);
+    items.add(Qt::cyan, m_box2);
+    items.add(Qt::cyan, m_box3);
 }
 
 bool PathScreenDetector::detect(const QImage& screen) const{
@@ -99,14 +100,14 @@ PathSelectDetector::PathSelectDetector()
     , m_dialog_middle(0.500, 0.880, 0.180, 0.050)
 //    , m_dialog_right(0.710, 0.880, 0.030, 0.050)
     , m_left(0.050, 0.100, 0.200, 0.700)
-{
-    add_box(m_bottom_right, Qt::cyan);
-    add_box(m_dialog_left, Qt::cyan);
-    add_box(m_dialog_middle, Qt::cyan);
-//    add_box(m_dialog_right, Qt::cyan);
-    add_box(m_left, Qt::cyan);
+{}
+void PathSelectDetector::make_overlays(OverlaySet& items) const{
+    items.add(Qt::cyan, m_bottom_right);
+    items.add(Qt::cyan, m_dialog_left);
+    items.add(Qt::cyan, m_dialog_middle);
+//    items.add(Qt::cyan, m_dialog_right);
+    items.add(Qt::cyan, m_left);
 }
-
 bool PathSelectDetector::detect(const QImage& screen) const{
     if (!PathScreenDetector::detect(screen)){
         return false;

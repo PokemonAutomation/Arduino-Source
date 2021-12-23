@@ -35,6 +35,7 @@ struct EventNotificationSettings{
 
 class EventNotificationOption{
 public:
+    EventNotificationOption();
     EventNotificationOption(
         QString label,
         bool enabled, bool ping,

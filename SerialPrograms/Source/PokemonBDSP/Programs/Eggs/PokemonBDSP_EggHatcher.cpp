@@ -8,6 +8,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameEntry.h"
+#include "PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h"
 #include "PokemonBDSP_EggRoutines.h"
 #include "PokemonBDSP_EggHatcher.h"
 
@@ -45,7 +46,7 @@ EggHatcher::EggHatcher(const EggHatcher_Descriptor& descriptor)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
@@ -125,7 +126,7 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env){
         }
 
         pbf_move_left_joystick(env.console, 0, 255, 125, 0);
-        egg_spin(env.console, TOTAL_DELAY);
+        egg_spin_with_A(env.console, TOTAL_DELAY);
 
         stats.m_batches++;
     }

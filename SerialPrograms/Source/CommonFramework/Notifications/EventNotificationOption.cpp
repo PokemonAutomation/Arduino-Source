@@ -99,6 +99,13 @@ QJsonValue EventNotificationSettings::to_json(bool enable_screenshot) const{
 
 
 
+EventNotificationOption::EventNotificationOption()
+    : screenshot_supported(false)
+    , m_default({false, false, ImageAttachmentMode::NO_SCREENSHOT, {}, std::chrono::seconds(0)})
+    , m_current(m_default)
+{
+    reset_rate_limit();
+}
 EventNotificationOption::EventNotificationOption(
     QString label,
     bool enabled, bool ping,

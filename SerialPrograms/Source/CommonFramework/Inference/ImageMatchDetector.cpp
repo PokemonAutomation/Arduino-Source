@@ -18,20 +18,17 @@ namespace PokemonAutomation{
 ImageMatchDetector::ImageMatchDetector(
     QImage reference_image, const ImageFloatBox& box,
     double max_rmsd,
-    std::chrono::milliseconds hold_duration
+    QColor color
 )
     : m_reference_image(std::move(reference_image))
-    , m_box(box)
     , m_max_rmsd(max_rmsd)
-    , m_hold_duration(hold_duration)
-    , m_last_match(false)
-    , m_start_of_match(std::chrono::system_clock::time_point::min())
+    , m_color(color)
+    , m_box(box)
 {
-    add_box(m_box);
     m_reference_image = extract_box(m_reference_image, m_box);
 }
 
-double ImageMatchDetector::rmsd(const QImage& frame){
+double ImageMatchDetector::rmsd(const QImage& frame) const{
     if (frame.isNull()){
         return 1000;
     }
@@ -44,23 +41,37 @@ double ImageMatchDetector::rmsd(const QImage& frame){
 //    cout << "rmsd = " << ret << endl;
     return ret;
 }
-bool ImageMatchDetector::matches(const QImage& frame){
-    return rmsd(frame) <= m_max_rmsd;
+
+void ImageMatchDetector::make_overlays(OverlaySet& items) const{
+    items.add(m_color, m_box);
 }
-bool ImageMatchDetector::process_frame(
+bool ImageMatchDetector::detect(const QImage& screen) const{
+    return rmsd(screen) <= m_max_rmsd;
+}
+
+
+
+ImageMatchWatcher::ImageMatchWatcher(
+    QImage reference_image, const ImageFloatBox& box,
+    double max_rmsd,
+    std::chrono::milliseconds hold_duration,
+    QColor color
+)
+    : ImageMatchDetector(std::move(reference_image), box, max_rmsd, color)
+    , m_hold_duration(hold_duration)
+    , m_last_match(false)
+    , m_start_of_match(std::chrono::system_clock::time_point::min())
+{}
+
+void ImageMatchWatcher::make_overlays(OverlaySet& items) const{
+    ImageMatchDetector::make_overlays(items);
+}
+bool ImageMatchWatcher::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point
 ){
-    if (frame.isNull()){
-        return false;
-    }
-    QImage scaled = extract_box(frame, m_box);
-    if (scaled.size() != m_reference_image.size()){
-        scaled = scaled.scaled(m_reference_image.size());
-    }
-    double rmsd = ImageMatch::pixel_RMSD(m_reference_image, scaled);
-//    cout << rmsd << endl;
-    if (rmsd > m_max_rmsd){
+    if (!detect(frame)){
+        m_last_match = false;
         return false;
     }
     auto now = std::chrono::system_clock::now();

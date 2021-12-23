@@ -21,6 +21,8 @@ public:
     SelectionArrowFinder(VideoOverlay& overlay, const ImageFloatBox& box);
 
     bool detect(const QImage& screen);
+
+    virtual void make_overlays(OverlaySet& items) const override;
     virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp

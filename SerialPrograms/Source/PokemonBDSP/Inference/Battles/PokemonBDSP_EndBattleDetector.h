@@ -7,8 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_EndBattleDetector_H
 #define PokemonAutomation_PokemonBDSP_EndBattleDetector_H
 
-#include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
@@ -16,10 +15,15 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-class EndBattleDetector : public VisualInferenceCallback{
-public:
-    EndBattleDetector(const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8});
 
+class EndBattleWatcher : public VisualInferenceCallback{
+public:
+    EndBattleWatcher(
+        const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8},
+        QColor color = Qt::red
+    );
+
+    virtual void make_overlays(OverlaySet& items) const override;
     virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
@@ -29,8 +33,9 @@ private:
     bool battle_is_over(const QImage& frame);
 
 private:
+    QColor m_color;
     ImageFloatBox m_box;
-    bool m_has_been_black;
+    bool m_has_been_black = false;
 };
 
 

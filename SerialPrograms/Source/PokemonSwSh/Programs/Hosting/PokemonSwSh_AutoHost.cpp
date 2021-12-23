@@ -229,7 +229,7 @@ void run_autohost(
         pbf_mash_button(console, BUTTON_A, 3 * TICKS_PER_SECOND);
         console.botbase().wait_for_all_requests();
 
-        BlackScreenOverDetector black_screen;
+        BlackScreenOverWatcher black_screen;
         uint32_t now = start;
         while (true){
             if (black_screen.black_is_over(console.video().snapshot())){

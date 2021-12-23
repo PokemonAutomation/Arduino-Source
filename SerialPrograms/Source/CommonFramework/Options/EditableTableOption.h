@@ -15,8 +15,11 @@ namespace PokemonAutomation{
 
 class EditableTableOption : public ConfigOption, public EditableTableBase{
 public:
-    EditableTableOption(QString label, const EditableTableFactory& factory, bool margin)
-        : EditableTableBase(std::move(label), factory, margin)
+    EditableTableOption(
+        QString label, const EditableTableFactory& factory, bool margin,
+        std::vector<std::unique_ptr<EditableTableRow>> default_value = {}
+    )
+        : EditableTableBase(std::move(label), factory, margin, std::move(default_value))
     {}
 
     virtual void load_json(const QJsonValue& json) override{

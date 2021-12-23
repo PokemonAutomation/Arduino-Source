@@ -51,7 +51,7 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2(const ShinyHuntAuto
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
@@ -132,7 +132,7 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env)
             env.console.botbase().wait_for_all_requests();
 
             {
-                StartBattleDetector detector(env.console);
+                StartBattleWatcher detector;
                 int result = wait_until(
                     env, env.console,
                     std::chrono::seconds(30),

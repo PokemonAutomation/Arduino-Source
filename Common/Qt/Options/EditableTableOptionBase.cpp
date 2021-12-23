@@ -20,10 +20,14 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-EditableTableBase::EditableTableBase(QString label, const EditableTableFactory& factory, bool margin)
+EditableTableBase::EditableTableBase(
+    QString label, const EditableTableFactory& factory, bool margin,
+    std::vector<std::unique_ptr<EditableTableRow>> default_value
+)
     : m_label(std::move(label))
     , m_factory(factory)
     , m_margin(margin)
+    , m_default(std::move(default_value))
 {}
 
 std::vector<std::unique_ptr<EditableTableRow>> EditableTableBase::load_json(const QJsonValue& json){

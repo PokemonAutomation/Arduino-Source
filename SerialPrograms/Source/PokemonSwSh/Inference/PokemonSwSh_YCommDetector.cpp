@@ -21,9 +21,10 @@ YCommMenuDetector::YCommMenuDetector(bool is_on)
     : m_is_on(is_on)
     , m_top(0.600, 0.020, 0.100, 0.040)
     , m_bottom(0.100, 0.970, 0.400, 0.020)
-{
-    add_box(m_top);
-    add_box(m_bottom);
+{}
+void YCommMenuDetector::make_overlays(OverlaySet& items) const{
+    items.add(Qt::red, m_top);
+    items.add(Qt::red, m_bottom);
 }
 
 bool YCommMenuDetector::detect(const QImage& screen){

@@ -10,26 +10,32 @@
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "PokemonBDSP_EndBattleDetector.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-EndBattleDetector::EndBattleDetector(const ImageFloatBox& box)
-    : m_box(box)
+
+
+EndBattleWatcher::EndBattleWatcher(const ImageFloatBox& box, QColor color)
+    : m_color(color)
+    , m_box(box)
     , m_has_been_black(false)
-{
-    add_box(m_box);
+{}
+void EndBattleWatcher::make_overlays(OverlaySet& items) const{
+    items.add(m_color, m_box);
 }
-
-
-bool EndBattleDetector::process_frame(
+bool EndBattleWatcher::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
     return battle_is_over(frame);
 }
-bool EndBattleDetector::battle_is_over(const QImage& frame){
+bool EndBattleWatcher::battle_is_over(const QImage& frame){
     QImage image = extract_box(frame, m_box);
     ImageStats stats = image_stats(image);
     if (is_black(stats)){
@@ -39,7 +45,8 @@ bool EndBattleDetector::battle_is_over(const QImage& frame){
     if (!m_has_been_black){
         return false;
     }
-    if (stats.stddev.sum() < 60){
+//    cout << stats.stddev.sum() << endl;
+    if (stats.stddev.sum() < 20){
         return false;
     }
     return true;

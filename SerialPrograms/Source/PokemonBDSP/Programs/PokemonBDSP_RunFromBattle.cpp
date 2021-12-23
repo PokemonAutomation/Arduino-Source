@@ -20,7 +20,7 @@ bool run_from_battle(
     ConsoleHandle& console,
     uint16_t exit_battle_time
 ){
-    BlackScreenOverDetector black_screen_detector;
+    BlackScreenOverWatcher black_screen_detector;
     int ret = run_until(
         env, console,
         [=](const BotBaseContext& context){

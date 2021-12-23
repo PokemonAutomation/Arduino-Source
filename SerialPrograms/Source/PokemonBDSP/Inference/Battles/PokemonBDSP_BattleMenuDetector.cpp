@@ -19,10 +19,10 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-
-BattleMenuDetector::BattleMenuDetector(BattleType battle_type)
-    : m_battle_type(battle_type)
-    , m_left_status(0.685, 0.065, 0.025, 0.040)
+BattleMenuDetector::BattleMenuDetector(BattleType battle_type, QColor color)
+    : m_color(color)
+    , m_battle_type(battle_type)
+    , m_left_status (0.685, 0.065, 0.025, 0.040)
     , m_right_status(0.958, 0.065, 0.025, 0.040)
     , m_ball_left   (0.890, 0.475, 0.02, 0.03)
     , m_ball_right  (0.960, 0.475, 0.03, 0.03)
@@ -30,29 +30,17 @@ BattleMenuDetector::BattleMenuDetector(BattleType battle_type)
     , m_menu_pokemon(0.817, 0.585 + 1 * 0.1075, 0.150, 0.070)
     , m_menu_bag    (0.817, 0.585 + 2 * 0.1075, 0.150, 0.070)
     , m_menu_run    (0.817, 0.585 + 3 * 0.1075, 0.150, 0.070)
-{
-    add_box(m_left_status);
-    add_box(m_right_status);
-    add_box(m_ball_left);
-    add_box(m_ball_right);
-    add_box(m_menu_battle);
-    add_box(m_menu_pokemon);
-    add_box(m_menu_bag);
-    add_box(m_menu_run);
+{}
+void BattleMenuDetector::make_overlays(OverlaySet& items) const{
+    items.add(m_color, m_left_status);
+    items.add(m_color, m_right_status);
+    items.add(m_color, m_ball_left);
+    items.add(m_color, m_ball_right);
+    items.add(m_color, m_menu_battle);
+    items.add(m_color, m_menu_pokemon);
+    items.add(m_color, m_menu_bag);
+    items.add(m_color, m_menu_run);
 }
-bool BattleMenuDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
-    //  Need 5 consecutive successful detections.
-    if (!detect(frame)){
-        m_trigger_count = 0;
-        return false;
-    }
-    m_trigger_count++;
-    return m_trigger_count >= 5;
-}
-
 bool BattleMenuDetector::detect(const QImage& screen) const{
     {
         bool left = is_white(extract_box(screen, m_left_status));
@@ -190,6 +178,24 @@ bool BattleMenuDetector::detect(const QImage& screen) const{
 #endif
 
     return true;
+}
+
+
+
+void BattleMenuWatcher::make_overlays(OverlaySet& items) const{
+    BattleMenuDetector::make_overlays(items);
+}
+bool BattleMenuWatcher::process_frame(
+    const QImage& frame,
+    std::chrono::system_clock::time_point timestamp
+){
+    //  Need 5 consecutive successful detections.
+    if (!detect(frame)){
+        m_trigger_count = 0;
+        return false;
+    }
+    m_trigger_count++;
+    return m_trigger_count >= 5;
 }
 
 

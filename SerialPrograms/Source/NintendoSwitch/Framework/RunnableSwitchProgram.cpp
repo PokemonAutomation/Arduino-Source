@@ -212,7 +212,7 @@ void RunnableSwitchProgramWidget::run_program(){
     }catch (StringException& e){
         signal_error(e.message_qt());
         send_program_error_notification(
-            m_logger, instance.NOTIFICATION_PROGRAM_ERROR,
+            m_logger, instance.NOTIFICATION_ERROR_FATAL,
             ProgramInfo(
                 instance.descriptor().identifier(),
                 instance.descriptor().category(),

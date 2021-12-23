@@ -39,14 +39,15 @@ PokemonSwapMenuDetector::PokemonSwapMenuDetector(bool stop_no_detect)
 //    , m_box1(overlay, 0.87, 0.48, 0.03, 0.20)
     , m_bottom_main(0.100, 0.970, 0.600, 0.020)
     , m_bottom_right(0.920, 0.970, 0.070, 0.020)
-{
-    add_box(m_pink0);
-    add_box(m_pink1);
-    add_box(m_pink2);
-    add_box(m_white0);
-    add_box(m_white1);
-    add_box(m_bottom_main);
-    add_box(m_bottom_right);
+{}
+void PokemonSwapMenuDetector::make_overlays(OverlaySet& items) const{
+    items.add(Qt::red, m_pink0);
+    items.add(Qt::red, m_pink1);
+    items.add(Qt::red, m_pink2);
+    items.add(Qt::red, m_white0);
+    items.add(Qt::red, m_white1);
+    items.add(Qt::red, m_bottom_main);
+    items.add(Qt::red, m_bottom_right);
 }
 bool PokemonSwapMenuDetector::process_frame(
     const QImage& frame,

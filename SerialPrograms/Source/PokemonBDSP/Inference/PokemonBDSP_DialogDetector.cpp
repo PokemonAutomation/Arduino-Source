@@ -13,13 +13,19 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-ShortDialogDetector::ShortDialogDetector(VideoOverlay& overlay)
-    : m_bottom(overlay, 0.50, 0.91, 0.29, 0.05)
-    , m_left_white(overlay, 0.21, 0.835, 0.008, 0.12)
-    , m_left(overlay, 0.18, 0.835, 0.02, 0.12)
-    , m_right(overlay, 0.822, 0.835, 0.02, 0.12)
+ShortDialogDetector::ShortDialogDetector(QColor color)
+    : m_color(color)
+    , m_bottom(0.50, 0.91, 0.29, 0.05)
+    , m_left_white(0.21, 0.835, 0.008, 0.12)
+    , m_left(0.18, 0.835, 0.02, 0.12)
+    , m_right(0.822, 0.835, 0.02, 0.12)
 {}
-
+void ShortDialogDetector::make_overlays(OverlaySet& items) const{
+    items.add(m_color, m_bottom);
+    items.add(m_color, m_left_white);
+    items.add(m_color, m_left);
+    items.add(m_color, m_right);
+}
 bool ShortDialogDetector::detect(const QImage& screen) const{
     ImageStats left_white = image_stats(extract_box(screen, m_left_white));
     if (!is_white(left_white)){
@@ -39,14 +45,14 @@ bool ShortDialogDetector::detect(const QImage& screen) const{
     if (right.stddev.sum() < 50){
         return false;
     }
-
     return true;
 }
 
-ShortDialogDetectorCallback::ShortDialogDetectorCallback(VideoOverlay& overlay)
-    : ShortDialogDetector(overlay)
-{}
-bool ShortDialogDetectorCallback::process_frame(
+
+void ShortDialogWatcher::make_overlays(OverlaySet& items) const{
+    ShortDialogDetector::make_overlays(items);
+}
+bool ShortDialogWatcher::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point
 ){
@@ -56,13 +62,19 @@ bool ShortDialogDetectorCallback::process_frame(
 
 
 
-BattleDialogDetector::BattleDialogDetector(VideoOverlay& overlay)
-    : m_bottom(overlay, 0.50, 0.91, 0.40, 0.05)
-    , m_left_white(overlay, 0.07, 0.835, 0.008, 0.12)
-    , m_left(overlay, 0.04, 0.835, 0.02, 0.12)
-    , m_right(overlay, 0.965, 0.835, 0.02, 0.12)
+BattleDialogDetector::BattleDialogDetector(QColor color)
+    : m_color(color)
+    , m_bottom(0.50, 0.91, 0.40, 0.05)
+    , m_left_white(0.07, 0.835, 0.008, 0.12)
+    , m_left(0.04, 0.835, 0.02, 0.12)
+    , m_right(0.965, 0.835, 0.02, 0.12)
 {}
-
+void BattleDialogDetector::make_overlays(OverlaySet& items) const{
+    items.add(m_color, m_bottom);
+    items.add(m_color, m_left_white);
+    items.add(m_color, m_left);
+    items.add(m_color, m_right);
+}
 bool BattleDialogDetector::detect(const QImage& screen) const{
     ImageStats left_white = image_stats(extract_box(screen, m_left_white));
     if (!is_white(left_white)){
@@ -82,7 +94,6 @@ bool BattleDialogDetector::detect(const QImage& screen) const{
     if (right.stddev.sum() < 50){
         return false;
     }
-
     return true;
 }
 

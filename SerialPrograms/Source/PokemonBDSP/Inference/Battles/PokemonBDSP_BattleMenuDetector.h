@@ -9,6 +9,7 @@
 
 #include <memory>
 #include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
@@ -23,19 +24,15 @@ enum class BattleType{
 };
 
 
-class BattleMenuDetector : public VisualInferenceCallback{
+class BattleMenuDetector : public StaticScreenDetector{
 public:
-    BattleMenuDetector(BattleType battle_type);
+    BattleMenuDetector(BattleType battle_type, QColor color = Qt::red);
 
-    bool detect(const QImage& screen) const;
-
-    virtual bool process_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-    ) override final;
-
+    virtual void make_overlays(OverlaySet& items) const override;
+    virtual bool detect(const QImage& screen) const override;
 
 private:
+    QColor m_color;
     BattleType m_battle_type;
     ImageFloatBox m_left_status;
     ImageFloatBox m_right_status;
@@ -45,7 +42,21 @@ private:
     ImageFloatBox m_menu_pokemon;
     ImageFloatBox m_menu_bag;
     ImageFloatBox m_menu_run;
+};
 
+
+class BattleMenuWatcher : public BattleMenuDetector, public VisualInferenceCallback{
+public:
+    using BattleMenuDetector::BattleMenuDetector;
+
+    virtual void make_overlays(OverlaySet& items) const override;
+    virtual bool process_frame(
+        const QImage& frame,
+        std::chrono::system_clock::time_point timestamp
+    ) override final;
+
+
+private:
     size_t m_trigger_count = 0;
 };
 

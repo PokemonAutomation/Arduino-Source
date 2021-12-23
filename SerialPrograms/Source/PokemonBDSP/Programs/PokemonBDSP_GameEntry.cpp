@@ -30,15 +30,17 @@ public:
         : m_box0(0.2, 0.2, 0.6, 0.1)
         , m_box1(0.2, 0.7, 0.6, 0.1)
         , m_invert(invert)
-    {
-        add_box(m_box0);
-        add_box(m_box1);
+    {}
+
+    virtual void make_overlays(OverlaySet& items) const override{
+        items.add(Qt::red, m_box0);
+        items.add(Qt::red, m_box1);
     }
 
     virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
-   ) override{
+    ) override{
         if (!is_black(extract_box(frame, m_box0))){
             return m_invert;
         }
@@ -93,7 +95,7 @@ bool gamemenu_to_ingame(
     uint16_t mash_duration, uint16_t enter_game_timeout
 ){
     console.log("Mashing A to enter game...");
-    BlackScreenOverDetector detector({0.2, 0.2, 0.6, 0.6});
+    BlackScreenOverWatcher detector({0.2, 0.2, 0.6, 0.6});
     pbf_mash_button(console, BUTTON_ZL, mash_duration);
     console.botbase().wait_for_all_requests();
     console.log("Waiting to enter game...");
@@ -213,16 +215,6 @@ bool reset_game_from_home(
     console.botbase().wait_for_all_requests();
     return ret;
 }
-
-
-
-void save_game(const BotBaseContext& context){
-    pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
-    pbf_press_button(context, BUTTON_R, 10, 2 * TICKS_PER_SECOND);
-    pbf_press_button(context, BUTTON_ZL, 10, 5 * TICKS_PER_SECOND);
-}
-
-
 
 
 

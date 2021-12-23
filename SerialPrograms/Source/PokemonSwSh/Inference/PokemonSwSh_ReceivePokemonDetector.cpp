@@ -22,12 +22,12 @@ ReceivePokemonDetector::ReceivePokemonDetector()
     , m_box_top_right(0.93, 0.02, 0.05, 0.1)
     , m_box_bot_left(0.02, 0.85, 0.1, 0.1)
     , m_has_been_orange(false)
-{
-    add_box(m_box_top);
-    add_box(m_box_top_right);
-    add_box(m_box_bot_left);
+{}
+void ReceivePokemonDetector::make_overlays(OverlaySet& items) const{
+    items.add(Qt::red, m_box_top);
+    items.add(Qt::red, m_box_top_right);
+    items.add(Qt::red, m_box_bot_left);
 }
-
 
 bool ReceivePokemonDetector::process_frame(
     const QImage& frame,

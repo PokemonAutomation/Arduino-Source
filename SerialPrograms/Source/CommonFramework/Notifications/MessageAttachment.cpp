@@ -56,7 +56,7 @@ PendingFileSend::PendingFileSend(Logger& logger, const ImageAttachment& image)
         return;
     }
     if (image.image.isNull()){
-        logger.log("Screenshot is null.", "red");
+        logger.log("Screenshot is null.", "orange");
         return;
     }
 

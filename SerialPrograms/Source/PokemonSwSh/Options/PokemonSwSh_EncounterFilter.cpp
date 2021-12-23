@@ -59,7 +59,7 @@ const std::map<QString, EncounterAction> EncounterAction_MAP{
 
 EncounterFilterOverride::EncounterFilterOverride(bool rare_stars)
     : m_rare_stars(rare_stars)
-    , shininess(rare_stars ? ShinyFilter::SQUARE_ONLY : ShinyFilter::STAR_ONLY)
+//    , shininess(rare_stars ? ShinyFilter::SQUARE_ONLY : ShinyFilter::STAR_ONLY)
 {}
 
 void EncounterFilterOverride::load_json(const QJsonValue& json){

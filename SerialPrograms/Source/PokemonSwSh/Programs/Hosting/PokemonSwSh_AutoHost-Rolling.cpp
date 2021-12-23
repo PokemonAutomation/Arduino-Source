@@ -72,7 +72,7 @@ AutoHostRolling::AutoHostRolling(const AutoHostRolling_Descriptor& descriptor)
     , HOSTING_NOTIFICATIONS("Live-Hosting Announcements", false)
     , NOTIFICATIONS({
         &HOSTING_NOTIFICATIONS.NOTIFICATION,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
     , m_internet_settings(
         "<font size=4><b>Internet Settings:</b> Increase these if your internet is slow.</font>"

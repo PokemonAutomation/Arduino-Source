@@ -26,14 +26,15 @@ PokemonCaughtMenuDetector::PokemonCaughtMenuDetector()
     , m_bottom_white(0.550, 0.900, 0.400, 0.020)
     , m_bottom_black(0.100, 0.970, 0.600, 0.020)
     , m_bottom_options(0.920, 0.970, 0.070, 0.020)
-{
-    add_box(m_top_white, Qt::magenta);
-    add_box(m_caught_left, Qt::magenta);
-    add_box(m_caught_right, Qt::magenta);
-    add_box(m_middle_pink, Qt::magenta);
-    add_box(m_bottom_white, Qt::magenta);
-    add_box(m_bottom_black, Qt::magenta);
-    add_box(m_bottom_options, Qt::magenta);
+{}
+void PokemonCaughtMenuDetector::make_overlays(OverlaySet& items) const{
+    items.add(Qt::magenta, m_top_white);
+    items.add(Qt::magenta, m_caught_left);
+    items.add(Qt::magenta, m_caught_right);
+    items.add(Qt::magenta, m_middle_pink);
+    items.add(Qt::magenta, m_bottom_white);
+    items.add(Qt::magenta, m_bottom_black);
+    items.add(Qt::magenta, m_bottom_options);
 }
 bool PokemonCaughtMenuDetector::process_frame(
     const QImage& frame,

@@ -70,6 +70,7 @@ public:
     //  The return value is only valid if the first element is non-negative.
     std::pair<double, OverworldTarget> best_target();
 
+    virtual void make_overlays(OverlaySet& items) const override;
     virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp

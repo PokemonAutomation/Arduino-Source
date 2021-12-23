@@ -61,8 +61,6 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    IVCheckerReader m_reader;
-
     OCR::LanguageOCR LANGUAGE;
     IVCheckerOptionOCR HP;
     IVCheckerOptionOCR ATTACK;

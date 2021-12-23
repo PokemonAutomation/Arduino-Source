@@ -37,7 +37,7 @@ AmitySquarePickUpFarmer::AmitySquarePickUpFarmer(const AmitySquarePickUpFarmer_D
         "5 * TICKS_PER_SECOND"
     )
     , ROUNDS_PER_FETCH(
-        "<b>Rounds per fetch:</b><br>How many rounds of walking before doing a berry fetch attemp.",
+        "<b>Rounds per fetch:</b><br>How many rounds of walking before doing a berry fetch attempt.",
         3
     )
     , WAIT_TIME_FOR_POKEMON(
@@ -49,7 +49,7 @@ AmitySquarePickUpFarmer::AmitySquarePickUpFarmer(const AmitySquarePickUpFarmer_D
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);

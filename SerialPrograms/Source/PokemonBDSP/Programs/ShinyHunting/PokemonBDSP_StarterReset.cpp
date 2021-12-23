@@ -15,7 +15,7 @@
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameEntry.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_ShinyEncounterDetector.h"
+#include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"
 #include "PokemonBDSP_StarterReset.h"
 
 namespace PokemonAutomation{
@@ -61,7 +61,7 @@ StarterReset::StarterReset(const StarterReset_Descriptor& descriptor)
     , NOTIFICATIONS({
         &NOTIFICATION_NONSHINY,
         &NOTIFICATION_SHINY,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
 {
 //    PA_ADD_OPTION(START_IN_GRIP_MENU);
@@ -112,7 +112,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
         pbf_move_left_joystick(env.console, 128, 0, TICKS_PER_SECOND, 0);
 
         //  Mash B until we see the briefcase.
-        ImageMatchDetector detector(briefcase, {0.5, 0.1, 0.5, 0.7}, 100);
+        ImageMatchWatcher detector(briefcase, {0.5, 0.1, 0.5, 0.7}, 100);
         int ret = run_until(
             env, env.console,
             [](const BotBaseContext& context){
@@ -154,7 +154,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
         env.console.botbase().wait_for_all_requests();
 
         {
-            SelectionArrowFinder selection_arrow(env.console, {0.50, 0.60, 0.35, 0.20});
+            SelectionArrowFinder selection_arrow(env.console, {0.50, 0.60, 0.35, 0.20}, Qt::red);
             ret = wait_until(
                 env, env.console, std::chrono::seconds(5),
                 { &selection_arrow }

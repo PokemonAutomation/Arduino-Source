@@ -115,8 +115,8 @@ CatchResults throw_balls(
 
         auto start = std::chrono::system_clock::now();
 
-        StandardBattleMenuDetector menu_detector(false);
-        ExperienceGainDetector experience_detector(console);
+        StandardBattleMenuWatcher menu_detector(false);
+        ExperienceGainWatcher experience_detector;
         int result = wait_until(
             env, console,
             std::chrono::seconds(60),
@@ -170,7 +170,7 @@ CatchResults basic_catcher(
 
     //  Wait for end of battle.
     {
-        BlackScreenOverDetector black_screen_detector;
+        BlackScreenOverWatcher black_screen_detector;
         run_until(
             env, console,
             [=](const BotBaseContext& context){
@@ -205,7 +205,7 @@ CatchResults basic_catcher(
 
 //    pbf_wait(console, 5 * TICKS_PER_SECOND);
     {
-        BlackScreenOverDetector black_screen_detector;
+        BlackScreenOverWatcher black_screen_detector;
         run_until(
             env, console,
             [=](const BotBaseContext& context){

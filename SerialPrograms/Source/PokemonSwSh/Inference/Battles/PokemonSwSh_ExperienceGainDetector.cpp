@@ -17,8 +17,10 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-ExperienceGainDetector::ExperienceGainDetector(VideoOverlay& overlay)
-    : m_dialog(overlay)
+
+ExperienceGainDetector::ExperienceGainDetector(QColor color)
+    : m_color(color)
+    , m_dialog(color)
     , m_rows(6)
 {
     const double SHIFT_X = 0.0325;
@@ -29,12 +31,16 @@ ExperienceGainDetector::ExperienceGainDetector(VideoOverlay& overlay)
             std::forward_as_tuple(0.255            , 0.04 + c*SHIFT_Y, 0.18 - c*SHIFT_X, 0.08),
             std::forward_as_tuple(0.475 - c*SHIFT_X, 0.04 + c*SHIFT_Y, 0.05            , 0.08)
         );
-        add_box(m_rows.back().first);
-        add_box(m_rows.back().second);
     }
 }
 
-
+void ExperienceGainDetector::make_overlays(OverlaySet& items) const{
+    m_dialog.make_overlays(items);
+    for (const auto& item : m_rows){
+        items.add(m_color, item.first);
+        items.add(m_color, item.second);
+    }
+}
 bool ExperienceGainDetector::detect(const QImage& screen) const{
     if (!m_dialog.detect(screen)){
         return false;
@@ -59,7 +65,11 @@ bool ExperienceGainDetector::detect(const QImage& screen) const{
     return true;
 }
 
-bool ExperienceGainDetector::process_frame(
+
+void ExperienceGainWatcher::make_overlays(OverlaySet& items) const{
+    ExperienceGainDetector::make_overlays(items);
+}
+bool ExperienceGainWatcher::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){

@@ -10,6 +10,7 @@
 #include <chrono>
 #include "CommonFramework/Tools/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
@@ -28,7 +29,7 @@ class ShinyDialogTracker{
 public:
     ShinyDialogTracker(
         VideoOverlay& overlay, Logger& logger,
-        ScreenDetector& detector
+        StaticScreenDetector& detector
     );
 
     bool dialog_on() const{ return m_dialog_on; }
@@ -44,7 +45,8 @@ public:
 
 private:
     Logger& m_logger;
-    ScreenDetector& m_detector;
+    StaticScreenDetector& m_detector;
+    OverlaySet m_overlays;
     std::chrono::system_clock::time_point m_end_dialog;
     bool m_dialog_on;
 

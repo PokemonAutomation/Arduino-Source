@@ -22,9 +22,12 @@ namespace PokemonSwSh{
 
 
 
-
-StandardBattleMenuDetector::StandardBattleMenuDetector(bool den)
+StandardBattleMenuDetector::StandardBattleMenuDetector(
+    bool den,
+    QColor color
+)
     : m_den(den)
+    , m_color(color)
     , m_ball_left   (0.912, 0.452, 0.02, 0.03)
     , m_ball_right  (0.970, 0.452, 0.02, 0.03)
     , m_icon_fight  (0.923, 0.576 + 0 * 0.1075, 0.05, 0.080)
@@ -37,36 +40,23 @@ StandardBattleMenuDetector::StandardBattleMenuDetector(bool den)
     , m_text_run    (0.830, 0.576 + 3 * 0.1075, 0.08, 0.080)
 //    , m_status0     (0.280, 0.870, 0.015, 0.030)
     , m_status1     (0.165, 0.945, 0.100, 0.020)
-{
-    if (!den){
-        add_box(m_ball_left);
-        add_box(m_ball_right);
+{}
+void StandardBattleMenuDetector::make_overlays(OverlaySet& items) const{
+    if (!m_den){
+        items.add(m_color, m_ball_left);
+        items.add(m_color, m_ball_right);
     }else{
-        add_box(m_status1);
+        items.add(m_color, m_status1);
     }
-    add_box(m_icon_fight);
-    add_box(m_icon_pokemon);
-    add_box(m_icon_bag);
-    add_box(m_icon_run);
-    add_box(m_text_fight);
-    add_box(m_text_pokemon);
-    add_box(m_text_bag);
-    add_box(m_text_run);
+    items.add(m_color, m_icon_fight);
+    items.add(m_color, m_icon_pokemon);
+    items.add(m_color, m_icon_bag);
+    items.add(m_color, m_icon_run);
+    items.add(m_color, m_text_fight);
+    items.add(m_color, m_text_pokemon);
+    items.add(m_color, m_text_bag);
+    items.add(m_color, m_text_run);
 }
-bool StandardBattleMenuDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
-    //  Need 5 consecutive successful detections.
-    if (!detect(frame)){
-        m_trigger_count = 0;
-        return false;
-    }
-    m_trigger_count++;
-    return m_trigger_count >= 5;
-}
-
-
 bool StandardBattleMenuDetector::detect(const QImage& screen) const{
     if (!m_den){
         if (!is_white(extract_box(screen, m_ball_left))){
@@ -258,6 +248,23 @@ bool StandardBattleMenuDetector::detect(const QImage& screen) const{
 
 //    image.save("battle-menu.png");
     return true;
+}
+
+
+void StandardBattleMenuWatcher::make_overlays(OverlaySet& items) const{
+    return StandardBattleMenuDetector::make_overlays(items);
+}
+bool StandardBattleMenuWatcher::process_frame(
+    const QImage& frame,
+    std::chrono::system_clock::time_point timestamp
+){
+    //  Need 5 consecutive successful detections.
+    if (!detect(frame)){
+        m_trigger_count = 0;
+        return false;
+    }
+    m_trigger_count++;
+    return m_trigger_count >= 5;
 }
 
 

@@ -11,9 +11,9 @@
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MarkFinder.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_StartBattleDetector.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_BattleMenuDetector.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_ShinyEncounterDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
+#include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_EncounterHandler.h"
 #include "PokemonBDSP_ShinyHunt-Fishing.h"
 
@@ -44,7 +44,7 @@ ShinyHuntFishing::ShinyHuntFishing(const ShinyHuntFishing_Descriptor& descriptor
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
@@ -108,10 +108,10 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
         env.console.botbase().wait_for_all_requests();
 
         {
-            ShortDialogDetectorCallback dialog_detector(env.console);
+            ShortDialogWatcher dialog_detector;
             MarkDetector mark_detector(env.console, {0.4, 0.2, 0.2, 0.5});
             StartBattleDetector battle(env.console);
-            BattleMenuDetector battle_menu(BattleType::WILD);
+            BattleMenuWatcher battle_menu(BattleType::WILD);
             int ret = run_until(
                 env, env.console,
                 [=](const BotBaseContext& context){

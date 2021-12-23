@@ -116,6 +116,11 @@ QJsonObject json_get_object_throw(const QJsonObject& obj, const QString& key){
 }
 
 
+QString json_get_string_nothrow(const QJsonObject& obj, const QString& key){
+    QString value;
+    json_get_string(value, obj, key);
+    return value;
+}
 QJsonValue json_get_value_nothrow(const QJsonObject& obj, const QString& key){
     auto iter = obj.find(key);
     if (iter == obj.end()){

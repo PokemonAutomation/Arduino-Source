@@ -115,19 +115,25 @@
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "CommonFramework/ImageTools/ColorClustering.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_ShinyEncounterDetector.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_ShinyTrigger.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
+#include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"
+#include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyTrigger.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MarkFinder.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameEntry.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MapDetector.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_BattleBallReader.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_BattleMenuDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_VSSeekerReaction.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_StartBattleDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h"
+#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxDetector.h"
+#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.h"
 #include "PokemonBDSP/Programs/Eggs/PokemonBDSP_EggRoutines.h"
+#include "PokemonBDSP/Programs/Eggs/PokemonBDSP_EggFeedback.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_RunFromBattle.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_BoxRelease.h"
+#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h"
 #include "TestProgram.h"
 
 #include <immintrin.h>
@@ -192,9 +198,26 @@ namespace PokemonBDSP{
 
 
 
+class EggReceivedDetector : public VisualInferenceCallback{
+public:
+    EggReceivedDetector();
+
+    bool detect(const QImage& frame);
+    virtual bool process_frame(
+        const QImage& frame,
+        std::chrono::system_clock::time_point timestamp
+    ) override;
+
+private:
+    ImageFloatBox m_left;
+    ImageFloatBox m_right;
+    ShortDialogDetector m_dialog;
+};
+
+
+
 
 }
-
 
 
 
@@ -213,8 +236,112 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
-    detach(console);
+//    IVCheckerReader reader;
+    IVCheckerReaderScope scope(overlay, Language::English);
 
+
+    scope.read(logger, feed.snapshot());
+
+
+#if 0
+    send_program_error_notification(
+        logger,
+        NOTIFICATION_ERROR_RECOVERABLE,
+        env.program_info(),
+        "Test Error",
+        "test status",
+        feed.snapshot()
+    );
+#endif
+
+
+#if 0
+    BoxShinyDetector detector;
+
+    QImage image = feed.snapshot();
+    cout << detector.is_panel(image) << endl;
+    cout << detector.detect(image) << endl;
+#endif
+
+
+#if 0
+    InferenceBoxScope box0(overlay, 0.960, 0.145, 0.030, 0.050);
+    InferenceBoxScope box1(overlay, 0.960, 0.200, 0.030, 0.400);
+
+    QImage image = feed.snapshot();
+    ImageStats stats0 = image_stats(extract_box(image, box0));
+    ImageStats stats1 = image_stats(extract_box(image, box1));
+    cout << stats0.average << stats0.stddev << endl;
+    cout << stats1.average << stats1.stddev << endl;
+#endif
+
+
+#if 0
+    InferenceBoxScope box0(overlay, 0.05, 0.10, 0.10, 0.80);
+    InferenceBoxScope box1(overlay, 0.87, 0.10, 0.10, 0.80);
+
+    QImage image = feed.snapshot();
+    ImageStats stats0 = image_stats(extract_box(image, box0));
+    ImageStats stats1 = image_stats(extract_box(image, box1));
+    cout << stats0.average << stats0.stddev << endl;
+    cout << stats1.average << stats1.stddev << endl;
+#endif
+
+
+//    BoxDetector detector;
+//    detector.detect(feed.snapshot());
+
+
+
+//    overworld_to_box(env, console);
+//    box_to_overworld(env, console);
+
+
+
+//    MenuDetector detector;
+//    detector.detect(feed.snapshot());
+
+
+
+
+//    hatch_party(env, console, 5);
+
+#if 0
+    QImage overworld("test-0.png");
+    ImageMatchDetector matcher(overworld, {0.10, 0.10, 0.80, 0.60}, 100);
+
+    QImage test("test-1.png");
+    cout << matcher.rmsd(test) << endl;
+#endif
+
+
+//    box_to_overworld(console);
+//    InferenceBoxScope box0(overlay, 0.02, 0.97, 0.10, 0.02);
+//    InferenceBoxScope box1(overlay, 0.265, 0.09, 0.03, 0.04);
+//    InferenceBoxScope box2(overlay, 0.650, 0.09, 0.03, 0.04);
+
+
+
+#if 0
+    SelectionArrowFinder detector(overlay, {0.50, 0.58, 0.40, 0.10});
+
+    std::deque<InferenceBoxScope> boxes;
+    detector.make_overlays(boxes, overlay);
+
+
+    detector.detect(feed.snapshot());
+#endif
+
+
+#if 0
+//    detach(console);
+
+    std::deque<InferenceBoxScope> boxes;
+
+    MapDetector detector;
+    detector.make_overlays(boxes, overlay);
+//    detector.detect(feed.snapshot());
+#endif
 
 
 #if 0

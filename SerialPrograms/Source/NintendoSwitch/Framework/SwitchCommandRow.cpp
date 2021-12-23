@@ -37,7 +37,7 @@ CommandRow::CommandRow(
     command_row->addWidget(m_inference_box, 3);
     command_row->addSpacing(5);
 
-    m_overlay_box = new QCheckBox("Show Inference Boxes", this);
+    m_overlay_box = new QCheckBox("Inference Boxes", this);
     m_overlay_box->setChecked(true);
     command_row->addWidget(m_overlay_box, 3);
 

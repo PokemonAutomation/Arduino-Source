@@ -20,9 +20,10 @@ namespace PokemonSwSh{
 FishingMissDetector::FishingMissDetector()
     : m_hook_box(0.1, 0.15, 0.8, 0.4)
     , m_miss_box(0.3, 0.9, 0.4, 0.05)
-{
-    add_box(m_hook_box);
-    add_box(m_miss_box);
+{}
+void FishingMissDetector::make_overlays(OverlaySet& items) const{
+    items.add(Qt::red, m_hook_box);
+    items.add(Qt::red, m_miss_box);
 }
 bool FishingMissDetector::detect(const QImage& frame){
     QImage miss_image = extract_box(frame, m_miss_box);
@@ -48,8 +49,9 @@ bool FishingMissDetector::process_frame(
 FishingHookDetector::FishingHookDetector(VideoOverlay& overlay)
     : m_overlay(overlay)
     , m_hook_box(0.1, 0.15, 0.8, 0.4)
-{
-    add_box(m_hook_box);
+{}
+void FishingHookDetector::make_overlays(OverlaySet& items) const{
+    items.add(Qt::red, m_hook_box);
 }
 bool FishingHookDetector::process_frame(
     const QImage& frame,

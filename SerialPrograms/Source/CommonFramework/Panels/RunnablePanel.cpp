@@ -20,7 +20,18 @@ namespace PokemonAutomation{
 
 RunnablePanelInstance::RunnablePanelInstance(const PanelDescriptor& descriptor)
     : PanelInstance(descriptor)
-    , NOTIFICATION_PROGRAM_ERROR("Fatal Program Error", true, true, {"Notifs", "LiveHost"})
+    , NOTIFICATION_ERROR_RECOVERABLE(
+        "Program Error (Recoverable)",
+        true, false,
+        ImageAttachmentMode::PNG,
+        {"Notifs"}
+    )
+    , NOTIFICATION_ERROR_FATAL(
+        "Program Error (Fatal)",
+        true, true,
+//        ImageAttachmentMode::PNG,
+        {"Notifs", "LiveHost"}
+    )
 {}
 
 void RunnablePanelInstance::from_json(const QJsonValue& json){

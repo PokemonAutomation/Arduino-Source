@@ -10,9 +10,9 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_StartBattleDetector.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_BattleMenuDetector.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_ShinyEncounterDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
+#include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameEntry.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_EncounterHandler.h"
 #include "PokemonBDSP_LegendaryReset.h"
@@ -44,7 +44,7 @@ LegendaryReset::LegendaryReset(const LegendaryReset_Descriptor& descriptor)
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -90,7 +90,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env){
         reset = true;
 
         StartBattleDetector start_battle(env.console);
-        BattleMenuDetector battle_menu(BattleType::WILD);
+        BattleMenuWatcher battle_menu(BattleType::WILD);
 
         int ret = run_until(
             env, env.console,

@@ -42,7 +42,7 @@ GenerateIVCheckerOCR::GenerateIVCheckerOCR(const GenerateIVCheckerOCR_Descriptor
     : SingleSwitchProgramInstance(descriptor)
     , LANGUAGE(
         "<b>Game Language:</b>",
-        m_reader.languages()
+        IVCheckerReader::instance().languages()
     )
     , HP("<b>HP:</b>")
     , ATTACK("<b>Attack:</b>")
@@ -62,7 +62,7 @@ GenerateIVCheckerOCR::GenerateIVCheckerOCR(const GenerateIVCheckerOCR_Descriptor
 
 
 void GenerateIVCheckerOCR::program(SingleSwitchProgramEnvironment& env){
-    IVCheckerReaderScope reader(m_reader, env.console, LANGUAGE);
+    IVCheckerReaderScope reader(env.console, LANGUAGE);
 
     QString path = "IVCheckerOCR/";
     path += QString::fromStdString(language_data(LANGUAGE).code);

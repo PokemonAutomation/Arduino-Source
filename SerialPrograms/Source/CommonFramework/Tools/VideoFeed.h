@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_VideoFeedInterface_H
 #define PokemonAutomation_VideoFeedInterface_H
 
+#include <deque>
 #include <QImage>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 
@@ -32,6 +33,14 @@ public:
 
 
 class InferenceBoxScope : public ImageFloatBox{
+public:
+    ~InferenceBoxScope(){
+        m_overlay.remove_box(*this);
+    }
+    InferenceBoxScope(const InferenceBoxScope&) = delete;
+    void operator=(const InferenceBoxScope&) = delete;
+
+
 public:
     InferenceBoxScope(
         VideoOverlay& overlay,
@@ -76,14 +85,32 @@ public:
         overlay.add_box(*this, color);
     }
 #endif
-    ~InferenceBoxScope(){
-        m_overlay.remove_box(*this);
-    }
 
 private:
     QColor m_color;
     VideoOverlay& m_overlay;
 };
+
+
+class OverlaySet{
+public:
+    OverlaySet(VideoOverlay& overlay)
+        : m_overlay(overlay)
+    {}
+
+    void clear(){
+        m_boxes.clear();
+    }
+    void add(QColor color, const ImageFloatBox& box){
+        m_boxes.emplace_back(m_overlay, box, color);
+    }
+
+private:
+    VideoOverlay& m_overlay;
+    std::deque<InferenceBoxScope> m_boxes;
+};
+
+
 
 
 }

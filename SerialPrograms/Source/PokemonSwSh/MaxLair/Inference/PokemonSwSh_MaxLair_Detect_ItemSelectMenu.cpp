@@ -18,12 +18,12 @@ ItemSelectDetector::ItemSelectDetector(bool stop_no_detect)
     , m_bottom_main(0.100, 0.970, 0.600, 0.020)
     , m_bottom_right(0.920, 0.970, 0.070, 0.020)
     , m_blue(0.600, 0.020, 0.200, 0.060)
-{
-    add_box(m_bottom_main, Qt::blue);
-    add_box(m_bottom_right, Qt::blue);
-    add_box(m_blue, Qt::blue);
+{}
+void ItemSelectDetector::make_overlays(OverlaySet& items) const{
+    items.add(Qt::blue, m_bottom_main);
+    items.add(Qt::blue, m_bottom_right);
+    items.add(Qt::blue, m_blue);
 }
-
 bool ItemSelectDetector::detect(const QImage& screen) const{
     ImageStats bottom_main = image_stats(extract_box(screen, m_bottom_main));
 //    cout << bottom_main.average << ", " << bottom_main.stddev << endl;

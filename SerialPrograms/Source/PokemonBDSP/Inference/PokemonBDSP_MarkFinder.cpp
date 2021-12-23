@@ -67,10 +67,11 @@ size_t find_exclamation_marks(
 MarkTracker::MarkTracker(VideoOverlay& overlay, const ImageFloatBox& box)
     : m_overlay(overlay)
     , m_box(box)
-{
-    add_box(m_box);
-}
+{}
 
+void MarkTracker::make_overlays(OverlaySet& items) const{
+    items.add(Qt::red, m_box);
+}
 bool MarkTracker::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point

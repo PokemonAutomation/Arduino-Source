@@ -9,9 +9,9 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_StartBattleDetector.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_BattleMenuDetector.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_ShinyEncounterDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
+#include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_EncounterHandler.h"
 #include "PokemonBDSP_ShinyHunt-Overworld.h"
 
@@ -44,7 +44,7 @@ ShinyHuntOverworld::ShinyHuntOverworld(const ShinyHuntOverworld_Descriptor& desc
 //        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_CATCH_SUCCESS,
 //        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_CATCH_FAILED,
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
@@ -88,7 +88,7 @@ std::unique_ptr<StatsTracker> ShinyHuntOverworld::make_stats() const{
 
 
 bool ShinyHuntOverworld::find_encounter(SingleSwitchProgramEnvironment& env) const{
-    BattleMenuDetector battle_menu_detector(BattleType::WILD);
+    BattleMenuWatcher battle_menu_detector(BattleType::WILD);
     StartBattleDetector start_battle_detector(env.console);
 
     int result = run_until(

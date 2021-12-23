@@ -47,7 +47,7 @@ PurpleBeamFinder::PurpleBeamFinder(const PurpleBeamFinder_Descriptor& descriptor
     , NOTIFICATIONS({
         &NOTIFICATION_RED_BEAM,
         &NOTIFICATION_PURPLE_BEAM,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> Don't adjust these unless you're having problems.</font>"

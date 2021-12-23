@@ -58,11 +58,11 @@ private:
 private:
     bool m_rare_stars;
 public:
-    EncounterAction action = EncounterAction::RunAway;
+    EncounterAction action = EncounterAction::StopProgram;
     std::string pokeball_slug = "poke-ball";
 
     std::string pokemon_slug;
-    ShinyFilter shininess = ShinyFilter::SQUARE_ONLY;
+    ShinyFilter shininess = ShinyFilter::NOT_SHINY;
 };
 
 class EncounterFilterOptionFactory : public EditableTableFactory{

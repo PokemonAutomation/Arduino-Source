@@ -50,7 +50,7 @@ ShinyHuntAutonomousSwordsOfJustice::ShinyHuntAutonomousSwordsOfJustice(const Shi
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
@@ -143,8 +143,8 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
 
         {
             //  Wait for start of battle.
-            StandardBattleMenuDetector battle_menu_detector(false);
-            StartBattleDetector start_back_detector(env.console);
+            StandardBattleMenuWatcher battle_menu_detector(false);
+            StartBattleWatcher start_back_detector;
             wait_until(
                 env, env.console,
                 std::chrono::seconds(30),

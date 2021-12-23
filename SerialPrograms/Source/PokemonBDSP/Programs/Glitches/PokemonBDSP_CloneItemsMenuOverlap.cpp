@@ -10,9 +10,10 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_StartBattleDetector.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_BattleMenuDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_GameEntry.h"
+#include "PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_RunFromBattle.h"
 #include "PokemonBDSP/Programs/Eggs/PokemonBDSP_EggRoutines.h"
 #include "PokemonBDSP_MenuOverlap.h"
@@ -28,9 +29,8 @@ CloneItemsMenuOverlap_Descriptor::CloneItemsMenuOverlap_Descriptor()
         "PokemonBDSP:CloneItemsMenuOverlap",
         STRING_POKEMON + " BDSP", "Clone Items (Menu Overlap)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/CloneItemsMenuOverlap.md",
-        "Clone 5 items at a time using the menu overlap glitch.<br>"
-        "<font color=\"red\">This program relies the menu overlap glitch which was patched out in v1.1.2. "
-        "Thus this program only works on v1.1.1 and earlier.</font>",
+        "Clone 5 items at a time using the menu overlap glitch. "
+        "<font color=\"red\">(This requires game version 1.1.1 or earlier. The glitch it relies on was patched in v1.1.2.)</font>",
         FeedbackType::REQUIRED,
         PABotBaseLevel::PABOTBASE_12KB
     )
@@ -54,7 +54,7 @@ CloneItemsMenuOverlap::CloneItemsMenuOverlap(const CloneItemsMenuOverlap_Descrip
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
@@ -152,7 +152,7 @@ void CloneItemsMenuOverlap::swap_party(ConsoleHandle& console){
     pbf_press_button(console, BUTTON_ZL, 10, BOX_PICKUP_DROP_DELAY);
 }
 void CloneItemsMenuOverlap::mash_B_to_battle(ProgramEnvironment& env, ConsoleHandle& console){
-    BattleMenuDetector detector(BattleType::WILD);
+    BattleMenuWatcher detector(BattleType::WILD);
     int ret = run_until(
         env, console,
         [=](const BotBaseContext& context){

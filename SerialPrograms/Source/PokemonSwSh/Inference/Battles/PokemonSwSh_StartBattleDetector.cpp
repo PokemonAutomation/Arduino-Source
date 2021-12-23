@@ -6,8 +6,6 @@
 
 #include "Common/Compiler.h"
 #include "CommonFramework/Inference/ImageTools.h"
-#include "CommonFramework/Inference/InferenceThrottler.h"
-#include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "PokemonSwSh_StartBattleDetector.h"
 
 #include <iostream>
@@ -20,22 +18,17 @@ namespace PokemonSwSh{
 
 
 
-
-
-StartBattleDetector::StartBattleDetector(VideoOverlay& overlay)
-    : m_screen_box(0.2, 0.2, 0.6, 0.6)
-    , m_dialog(overlay)
-{
-    add_box(m_screen_box);
+StartBattleWatcher::StartBattleWatcher(QColor color)
+    : m_color(color)
+    , m_screen_box(0.2, 0.2, 0.6, 0.6)
+{}
+void StartBattleWatcher::make_overlays(OverlaySet& items) const{
+    items.add(m_color, m_screen_box);
 }
-bool StartBattleDetector::process_frame(
+bool StartBattleWatcher::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
-    return detect(frame);
-}
-
-bool StartBattleDetector::detect(const QImage& frame){
     QImage image = extract_box(frame, m_screen_box);
 
     ImageStats stats = image_stats(image);
@@ -53,23 +46,6 @@ bool StartBattleDetector::detect(const QImage& frame){
     }
     return dialog;
 }
-
-
-
-#if 0
-bool wait_for_start_battle(
-    ProgramEnvironment& env,
-    VideoFeed& feed, VideoOverlay& overlay,
-    std::chrono::milliseconds timeout
-){
-    StartBattleDetector detector(overlay);
-    VisualInferenceWait inference(env, feed, overlay, timeout);
-    inference += detector;
-    return inference.run();
-}
-#endif
-
-
 
 
 

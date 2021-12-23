@@ -21,8 +21,8 @@ ActivateMenuGlitchPoketch_Descriptor::ActivateMenuGlitchPoketch_Descriptor()
         "PokemonBDSP:ActivateMenuGlitchPoketch",
         STRING_POKEMON + " BDSP", QString("Activate Menu Glitch (Pok") + QChar(0xe9) + "tch)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ActivateMenuGlitch-Poketch.md",
-        QString("Activate the menu glitch using the Pok") + QChar(0xe9) + "tch."
-        "<font color=\"red\">This method works on v1.1.2 and earlier. It may be patched out in the future.</font>",
+        QString("Activate the menu glitch using the Pok") + QChar(0xe9) + "tch. "
+        "<font color=\"red\">(This requires game version 1.1.2 or earlier. The glitch it relies on was patched in v1.1.3.)</font>",
         FeedbackType::REQUIRED,
         PABotBaseLevel::PABOTBASE_12KB
     )
@@ -42,7 +42,7 @@ ActivateMenuGlitchPoketch::ActivateMenuGlitchPoketch(const ActivateMenuGlitchPok
 
 void trigger_menu(ProgramEnvironment& env, ConsoleHandle& console){
     console.botbase().wait_for_all_requests();
-    MapDetector detector;
+    MapWatcher detector;
     int ret = run_until(
         env, console,
         [](const BotBaseContext& context){
@@ -62,6 +62,7 @@ void trigger_menu(ProgramEnvironment& env, ConsoleHandle& console){
         console.log("Map not detected after 60 seconds.", Qt::red);
         PA_THROW_StringException("Map not detected after 60 seconds.");
     }
+    console.log("Detected map!", Qt::blue);
 }
 void trigger_map_overlap(ProgramEnvironment& env, ConsoleHandle& console){
     for (size_t c = 0; c < 10; c++){
@@ -69,7 +70,7 @@ void trigger_map_overlap(ProgramEnvironment& env, ConsoleHandle& console){
 
         pbf_press_dpad(console, DPAD_UP, 50, 0);
         console.botbase().wait_for_all_requests();
-        BlackScreenDetector detector;
+        BlackScreenWatcher detector;
         int ret = wait_until(
             env, console, std::chrono::seconds(4),
             { &detector }
@@ -100,7 +101,7 @@ void ActivateMenuGlitchPoketch::program(SingleSwitchProgramEnvironment& env){
     pbf_move_left_joystick(console, 255, 128, 250, 5 * TICKS_PER_SECOND);
 
     //  Re-enter escalator.
-    pbf_press_dpad(console, DPAD_RIGHT, 125, 5 * TICKS_PER_SECOND);
+    pbf_press_dpad(console, DPAD_RIGHT, 125, 6 * TICKS_PER_SECOND);
 
     //  Leave Pokemon center.
     pbf_press_dpad(console, DPAD_LEFT, 20, 105);

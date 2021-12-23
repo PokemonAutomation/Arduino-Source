@@ -10,9 +10,9 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_StartBattleDetector.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_BattleMenuDetector.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_ShinyEncounterDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
+#include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_EncounterHandler.h"
 #include "PokemonBDSP_ShinyHunt-Shaymin.h"
 
@@ -25,7 +25,7 @@ ShinyHuntShaymin_Descriptor::ShinyHuntShaymin_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonBDSP:ShinyHuntShaymin",
         STRING_POKEMON + " BDSP", "Shiny Hunt - Shaymin",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ShinyHuntShaymin-Overworld.md",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ShinyHunt-Shaymin.md",
         "Shiny hunt Shaymin using the runaway method.",
         FeedbackType::REQUIRED,
         PABotBaseLevel::PABOTBASE_12KB
@@ -45,7 +45,7 @@ ShinyHuntShaymin::ShinyHuntShaymin(const ShinyHuntShaymin_Descriptor& descriptor
 //        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_CATCH_SUCCESS,
 //        &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_CATCH_FAILED,
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
@@ -75,14 +75,14 @@ std::unique_ptr<StatsTracker> ShinyHuntShaymin::make_stats() const{
 
 
 bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env) const{
-    BattleMenuDetector battle_menu_detector(BattleType::WILD);
+    BattleMenuWatcher battle_menu_detector(BattleType::WILD);
     StartBattleDetector start_battle_detector(env.console);
 
     int result = run_until(
         env, env.console,
         [&](const BotBaseContext& context){
             while (true){
-                pbf_mash_button(context, BUTTON_ZL, 125);
+                pbf_mash_button(context, BUTTON_ZL, 5 * TICKS_PER_SECOND);
             }
         },
         {

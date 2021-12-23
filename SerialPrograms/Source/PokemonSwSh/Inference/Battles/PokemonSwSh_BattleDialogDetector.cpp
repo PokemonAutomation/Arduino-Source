@@ -14,12 +14,17 @@ namespace PokemonSwSh{
 
 
 
-BattleDialogDetector::BattleDialogDetector(VideoOverlay& overlay)
-    : m_bottom(overlay, 0.50, 0.89, 0.40, 0.07)
-    , m_left(overlay, 0.01, 0.82, 0.03, 0.07)
-    , m_right(overlay, 0.97, 0.87, 0.02, 0.09)
+BattleDialogDetector::BattleDialogDetector(QColor color)
+    : m_color(color)
+    , m_bottom(0.50, 0.89, 0.40, 0.07)
+    , m_left(0.01, 0.82, 0.03, 0.07)
+    , m_right(0.97, 0.87, 0.02, 0.09)
 {}
-
+void BattleDialogDetector::make_overlays(OverlaySet& items) const{
+    items.add(m_color, m_bottom);
+    items.add(m_color, m_left);
+    items.add(m_color, m_right);
+}
 bool BattleDialogDetector::detect(const QImage& screen) const{
     ImageStats bottom = image_stats(extract_box(screen, m_bottom));
     if (!is_grey(bottom, 0, 200, 5)){

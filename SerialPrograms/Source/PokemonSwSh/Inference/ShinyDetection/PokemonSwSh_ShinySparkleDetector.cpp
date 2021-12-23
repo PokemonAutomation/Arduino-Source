@@ -21,8 +21,9 @@ ShinySparkleDetector::ShinySparkleDetector(
     , m_overlay(overlay)
     , m_detection_box(detection_box)
     , m_detection_threshold(detection_threshold)
-{
-    add_box(m_detection_box);
+{}
+void ShinySparkleDetector::make_overlays(OverlaySet& items) const{
+    items.add(Qt::red, m_detection_box);
 }
 
 

@@ -13,7 +13,7 @@
 #include "Pokemon/Pokemon_EncounterStats.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonBDSP/Options/PokemonBDSP_EncounterFilter.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_ShinyEncounterDetector.h"
+#include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

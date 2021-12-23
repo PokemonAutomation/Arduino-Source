@@ -63,7 +63,8 @@ private:
     friend class RunnablePanelWidget;
     BatchOption m_options;
 protected:
-    EventNotificationOption NOTIFICATION_PROGRAM_ERROR;
+    EventNotificationOption NOTIFICATION_ERROR_RECOVERABLE;
+    EventNotificationOption NOTIFICATION_ERROR_FATAL;
 };
 
 

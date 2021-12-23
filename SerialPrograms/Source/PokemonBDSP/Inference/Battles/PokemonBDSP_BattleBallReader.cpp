@@ -9,7 +9,7 @@
 #include "CommonFramework/OCR/OCR_StringNormalization.h"
 #include "CommonFramework/OCR/OCR_Filtering.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h"
-#include "PokemonBDSP_PokeballSpriteMatcher.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_PokeballSpriteMatcher.h"
 #include "PokemonBDSP_BattleBallReader.h"
 
 namespace PokemonAutomation{

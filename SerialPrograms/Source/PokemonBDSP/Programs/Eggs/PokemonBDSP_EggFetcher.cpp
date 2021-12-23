@@ -43,7 +43,7 @@ EggFetcher::EggFetcher(const EggFetcher_Descriptor& descriptor)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -86,7 +86,7 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env){
             stats.to_str()
         );
 
-        egg_spin(env.console, TRAVEL_TIME_PER_FETCH);
+        egg_spin_with_A(env.console, TRAVEL_TIME_PER_FETCH);
         SHORTCUT.run(env.console, 100);
 
         //  Move to man.

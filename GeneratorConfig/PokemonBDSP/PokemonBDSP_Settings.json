@@ -3,7 +3,7 @@
     "1-ConfigPath": "PokemonBDSP",
     "2-Documentation": "Microcontroller/blob/master/Wiki/Programs/PokemonBDSP/PokemonSettings.md",
     "3-Description": "Global Pokémon Settings",
-    "4-Header": "Libraries/PokemonSettings.h",
+    "4-Header": "Libraries/PokemonBDSP_Settings.h",
     "5-Options": [
         {
             "00-Type": "Divider",

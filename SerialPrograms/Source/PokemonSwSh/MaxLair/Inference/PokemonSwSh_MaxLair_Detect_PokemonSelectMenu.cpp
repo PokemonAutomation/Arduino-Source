@@ -30,14 +30,15 @@ PokemonSelectMenuDetector::PokemonSelectMenuDetector(bool stop_no_detect)
     , m_select0(0.630, 0.270 + 0*0.258, 0.030, 0.100)
     , m_select1(0.630, 0.270 + 1*0.258, 0.030, 0.100)
     , m_select2(0.630, 0.270 + 2*0.258, 0.030, 0.100)
-{
-    add_box(m_box0);
-    add_box(m_box1);
-    add_box(m_box2);
-    add_box(m_box3);
-    add_box(m_select0);
-    add_box(m_select1);
-    add_box(m_select2);
+{}
+void PokemonSelectMenuDetector::make_overlays(OverlaySet& items) const{
+    items.add(Qt::red, m_box0);
+    items.add(Qt::red, m_box1);
+    items.add(Qt::red, m_box2);
+    items.add(Qt::red, m_box3);
+    items.add(Qt::red, m_select0);
+    items.add(Qt::red, m_select1);
+    items.add(Qt::red, m_select2);
 }
 bool PokemonSelectMenuDetector::is_pink(const ImageStats& stats){
     if (stats.average.sum() < 400){

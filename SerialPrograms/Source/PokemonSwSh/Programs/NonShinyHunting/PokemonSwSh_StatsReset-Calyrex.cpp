@@ -43,7 +43,7 @@ StatsResetCalyrex::StatsResetCalyrex(const StatsResetCalyrex_Descriptor& descrip
     , BALL_SELECT("<b>Ball Select:</b>", "master-ball")
     , LANGUAGE(
         "<b>Game Language:</b>",
-        m_iv_checker_reader.languages(),
+        IVCheckerReader::instance().languages(),
         true
     )
     , CHECK_CALYREX_STATS(
@@ -73,7 +73,7 @@ StatsResetCalyrex::StatsResetCalyrex(const StatsResetCalyrex_Descriptor& descrip
         &NOTIFICATION_CATCH_SUCCESS,
         &NOTIFICATION_CATCH_FAILED,
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
 {
 
@@ -155,7 +155,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env){
             env.log("Talk to calyrex.", "purple");
             env.console.botbase().wait_for_all_requests();
             {
-                StandardBattleMenuDetector fight_detector(false);
+                StandardBattleMenuWatcher fight_detector(false);
                 int result = run_until(
                     env, env.console,
                     [=](const BotBaseContext& context){
@@ -251,7 +251,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env){
 
         if (CHECK_HORSE_STATS){
             env.console.botbase().wait_for_all_requests();
-            IVCheckerReaderScope reader(m_iv_checker_reader, env.console, LANGUAGE);
+            IVCheckerReaderScope reader(env.console, LANGUAGE);
             IVCheckerReader::Results results = reader.read(env.console, env.console.video().snapshot());
             bool horse_ok = true;
             horse_ok &= HORSE_HP.matches(stats.errors, results.hp);
@@ -268,7 +268,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env){
             pbf_press_dpad(env.console, DPAD_UP, 10, 1 * TICKS_PER_SECOND);
             env.console.botbase().wait_for_all_requests();
 
-            IVCheckerReaderScope reader(m_iv_checker_reader, env.console, LANGUAGE);
+            IVCheckerReaderScope reader(env.console, LANGUAGE);
             IVCheckerReader::Results results = reader.read(env.console, env.console.video().snapshot());
             bool calyrex_ok = true;
             calyrex_ok &= CALYREX_HP.matches(stats.errors, results.hp);

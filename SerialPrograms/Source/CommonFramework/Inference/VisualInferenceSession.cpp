@@ -37,9 +37,17 @@ void VisualInferenceSession::operator+=(std::function<bool(const QImage&)>&& cal
 }
 void VisualInferenceSession::operator+=(VisualInferenceCallback& callback){
     std::unique_lock<std::mutex> lg(m_lock);
-    std::deque<InferenceBoxScope>& boxes = m_callbacks1[&callback];
+    auto iter = m_callbacks1.find(&callback);
+    OverlaySet& boxes = iter != m_callbacks1.end()
+        ? iter->second
+        : m_callbacks1.emplace(
+            std::piecewise_construct,
+            std::forward_as_tuple(&callback),
+            std::forward_as_tuple(m_overlay)
+        ).first->second;
+
     boxes.clear();
-    callback.make_overlays(boxes, m_overlay);
+    callback.make_overlays(boxes);
 }
 void VisualInferenceSession::operator-=(VisualInferenceCallback& callback){
     std::unique_lock<std::mutex> lg(m_lock);

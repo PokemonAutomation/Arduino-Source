@@ -13,38 +13,58 @@
 
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
 
 
-class BlackScreenDetector : public VisualInferenceCallback{
+class BlackScreenDetector : public StaticScreenDetector{
 public:
-    BlackScreenDetector(const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8});
+    BlackScreenDetector(
+        const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8},
+        QColor color = Qt::red
+    );
 
-    virtual bool process_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-    ) override;
+    virtual void make_overlays(OverlaySet& items) const override;
+    virtual bool detect(const QImage& screen) const override;
 
 private:
+    QColor m_color;
     ImageFloatBox m_box;
 };
 
 
-class BlackScreenOverDetector : public VisualInferenceCallback{
+class BlackScreenWatcher : public BlackScreenDetector, public VisualInferenceCallback{
 public:
-    BlackScreenOverDetector(const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8});
+    using BlackScreenDetector::BlackScreenDetector;
+
+    virtual void make_overlays(OverlaySet& items) const override;
+    virtual bool process_frame(
+        const QImage& frame,
+        std::chrono::system_clock::time_point timestamp
+    ) override;
+};
+
+
+class BlackScreenOverWatcher : public VisualInferenceCallback{
+public:
+    BlackScreenOverWatcher(
+        const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8},
+        QColor color = Qt::red
+    );
 
     bool black_is_over(const QImage& frame);
+
+    virtual void make_overlays(OverlaySet& items) const override;
     virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
    ) override;
 
 private:
-    ImageFloatBox m_box;
-    bool m_has_been_black;
+    BlackScreenDetector m_detector;
+    bool m_has_been_black = false;
 };
 
 

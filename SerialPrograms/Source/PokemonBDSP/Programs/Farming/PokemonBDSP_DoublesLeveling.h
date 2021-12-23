@@ -37,7 +37,7 @@ public:
 private:
     struct Stats;
     bool find_encounter(SingleSwitchProgramEnvironment& env) const;
-    void battle(SingleSwitchProgramEnvironment& env);
+    bool battle(SingleSwitchProgramEnvironment& env);
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
@@ -45,6 +45,7 @@ private:
     Pokemon::EncounterBotLanguage LANGUAGE;
 
     OverworldTrigger TRIGGER_METHOD;
+    EnumDropdownOption ON_LEARN_MOVE;
 
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
 

@@ -7,8 +7,8 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Inference/InferenceThrottler.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
-#include "PokemonBDSP_DialogDetector.h"
-#include "PokemonBDSP_BattleMenuDetector.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP_ShinyTrigger.h"
 #include "PokemonBDSP_ShinyEncounterDetector.h"
 
@@ -101,7 +101,6 @@ ShinyEncounterDetector::ShinyEncounterDetector(
     , m_max_delay(SHINY_ANIMATION_DELAY + std::chrono::milliseconds(500))
     , m_overall_threshold(overall_threshold)
     , m_doubles_threshold(doubles_threshold)
-    , m_dialog_detector(overlay)
     , m_dialog_tracker(overlay, logger, m_dialog_detector)
     , m_best_type_alpha(0)
 {}
@@ -238,9 +237,9 @@ DoublesShinyDetection detect_shiny_battle(
     StatAccumulatorI32 inference_stats;
     StatAccumulatorI32 throttle_stats;
 
-    BattleMenuDetector menu(type.full_battle_menu ? BattleType::WILD : BattleType::STARTER);
-    std::deque<InferenceBoxScope> overlay_boxes;
-    menu.make_overlays(overlay_boxes, overlay);
+    BattleMenuWatcher menu(type.full_battle_menu ? BattleType::WILD : BattleType::STARTER);
+    OverlaySet overlay_boxes(overlay);
+    menu.make_overlays(overlay_boxes);
     ShinyEncounterDetector detector(
         logger, overlay,
         type,

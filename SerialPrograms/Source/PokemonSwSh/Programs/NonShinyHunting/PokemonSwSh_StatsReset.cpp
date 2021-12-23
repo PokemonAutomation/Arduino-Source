@@ -40,7 +40,7 @@ StatsReset::StatsReset(const StatsReset_Descriptor& descriptor)
     , GO_HOME_WHEN_DONE(false)
     , LANGUAGE(
         "<b>Game Language:</b>",
-        m_iv_checker_reader.languages()
+        IVCheckerReader::instance().languages()
     )
     , POKEMON(
         "<b>Gift " + STRING_POKEMON + ":</b>",
@@ -60,7 +60,7 @@ StatsReset::StatsReset(const StatsReset_Descriptor& descriptor)
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true, ImageAttachmentMode::JPG)
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
 {
     PA_ADD_OPTION(START_IN_GRIP_MENU);
@@ -117,7 +117,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env){
 
         env.console.botbase().wait_for_all_requests();
         {
-            BlackScreenOverDetector detector;
+            BlackScreenOverWatcher detector;
             int result = run_until(
                 env, env.console,
                 [=](const BotBaseContext& context){
@@ -147,7 +147,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env){
         env.console.botbase().wait_for_all_requests();
 
         {
-            IVCheckerReaderScope reader(m_iv_checker_reader, env.console, LANGUAGE);
+            IVCheckerReaderScope reader(env.console, LANGUAGE);
             screen = env.console.video().snapshot();
             IVCheckerReader::Results results = reader.read(env.console, screen);
             bool ok = true;

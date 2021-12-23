@@ -53,7 +53,7 @@ void run_professor_swap(
 #if 1
     //  Wait until we exit the window.
     {
-        BlackScreenDetector detector;
+        BlackScreenWatcher detector;
         int result = run_until(
             env, console,
             [&](const BotBaseContext& context){

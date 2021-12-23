@@ -11,6 +11,9 @@
 
 #include "Programs/General/PokemonBDSP_MassRelease.h"
 
+#include "Programs/Trading/PokemonBDSP_SelfBoxTrade.h"
+#include "Programs/Trading/PokemonBDSP_SelfTouchTrade.h"
+
 #include "Programs/Farming/PokemonBDSP_MoneyFarmerRoute210.h"
 #include "Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.h"
 #include "Programs/Farming/PokemonBDSP_DoublesLeveling.h"
@@ -24,6 +27,7 @@
 
 #include "Programs/Eggs/PokemonBDSP_EggFetcher.h"
 #include "Programs/Eggs/PokemonBDSP_EggHatcher.h"
+#include "Programs/Eggs/PokemonBDSP_EggAutonomous.h"
 
 #include "Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-Poketch.h"
 #include "Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy2.h"
@@ -44,6 +48,10 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_divider("---- General ----");
     add_settings<MassRelease_Descriptor, MassRelease>();
 
+    add_divider("---- Trading ----");
+    add_settings<SelfBoxTrade_Descriptor, SelfBoxTrade>();
+    add_settings<SelfTouchTrade_Descriptor, SelfTouchTrade>();
+
     add_divider("---- Farming ----");
     add_program<MoneyFarmerRoute212_Descriptor, MoneyFarmerRoute212>();
     add_program<MoneyFarmerRoute210_Descriptor, MoneyFarmerRoute210>();
@@ -55,13 +63,12 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<LegendaryReset_Descriptor, LegendaryReset>();
     add_program<ShinyHuntOverworld_Descriptor, ShinyHuntOverworld>();
     add_program<ShinyHuntFishing_Descriptor, ShinyHuntFishing>();
-    if (GlobalSettings::instance().DEVELOPER_MODE){
-        add_program<ShinyHuntShaymin_Descriptor, ShinyHuntShaymin>();
-    }
+    add_program<ShinyHuntShaymin_Descriptor, ShinyHuntShaymin>();
 
     add_divider("---- Eggs ----");
     add_program<EggFetcher_Descriptor, EggFetcher>();
     add_program<EggHatcher_Descriptor, EggHatcher>();
+    add_program<EggAutonomous_Descriptor, EggAutonomous>();
 
     add_divider("---- Glitches (v1.1.2) ----");
     add_program<ActivateMenuGlitchPoketch_Descriptor, ActivateMenuGlitchPoketch>();

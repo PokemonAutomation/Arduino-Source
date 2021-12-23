@@ -39,15 +39,16 @@ BattleMenuDetector::BattleMenuDetector()
 //    , m_info_right  (0.970, 0.500, 0.02, 0.03)
     , m_status0     (0.280, 0.870, 0.015, 0.030)
     , m_status1     (0.165, 0.945, 0.100, 0.020)
-{
-    add_box(m_icon_fight,   Qt::yellow);
-    add_box(m_icon_pokemon, Qt::yellow);
-    add_box(m_icon_run,     Qt::yellow);
-    add_box(m_text_fight,   Qt::yellow);
-    add_box(m_text_pokemon, Qt::yellow);
-    add_box(m_text_run,     Qt::yellow);
-    add_box(m_status0,      Qt::yellow);
-    add_box(m_status1,      Qt::yellow);
+{}
+void BattleMenuDetector::make_overlays(OverlaySet& items) const{
+    items.add(Qt::yellow, m_icon_fight);
+    items.add(Qt::yellow, m_icon_pokemon);
+    items.add(Qt::yellow, m_icon_run);
+    items.add(Qt::yellow, m_text_fight);
+    items.add(Qt::yellow, m_text_pokemon);
+    items.add(Qt::yellow, m_text_run);
+    items.add(Qt::yellow, m_status0);
+    items.add(Qt::yellow, m_status1);
 }
 bool BattleMenuDetector::process_frame(
     const QImage& frame,

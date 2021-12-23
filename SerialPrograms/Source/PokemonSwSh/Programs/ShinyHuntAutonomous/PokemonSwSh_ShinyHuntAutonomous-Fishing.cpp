@@ -48,7 +48,7 @@ ShinyHuntAutonomousFishing::ShinyHuntAutonomousFishing(const ShinyHuntAutonomous
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_CATCH_SUCCESS,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_CATCH_FAILED,
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
@@ -135,7 +135,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env){
 
             FishingMissDetector miss_detector;
             FishingHookDetector hook_detector(env.console);
-            StandardBattleMenuDetector menu_detector(false);
+            StandardBattleMenuWatcher menu_detector(false);
             int result = wait_until(
                 env, env.console,
                 std::chrono::seconds(12),

@@ -14,6 +14,7 @@
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
+#include "Pokemon/Options/Pokemon_IVCheckerOption.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
 
 namespace PokemonAutomation{
@@ -42,16 +43,14 @@ private:
     StartInGripOrGameOption START_IN_GRIP_MENU;
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    IVCheckerReader m_iv_checker_reader;
-
     OCR::LanguageOCR LANGUAGE;
     EnumDropdownOption POKEMON;
-    IVCheckerOption HP;
-    IVCheckerOption ATTACK;
-    IVCheckerOption DEFENSE;
-    IVCheckerOption SPATK;
-    IVCheckerOption SPDEF;
-    IVCheckerOption SPEED;
+    IVCheckerFilterOption HP;
+    IVCheckerFilterOption ATTACK;
+    IVCheckerFilterOption DEFENSE;
+    IVCheckerFilterOption SPATK;
+    IVCheckerFilterOption SPDEF;
+    IVCheckerFilterOption SPEED;
 
     EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;

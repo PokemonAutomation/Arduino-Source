@@ -44,7 +44,7 @@ StatsResetRegi::StatsResetRegi(const StatsResetRegi_Descriptor& descriptor)
     , BALL_SELECT("<b>Ball Select:</b>", "master-ball")
     , LANGUAGE(
         "<b>Game Language:</b>",
-        m_iv_checker_reader.languages(),
+        IVCheckerReader::instance().languages(),
         true
     )
     , HP("<b>HP:</b>")
@@ -60,7 +60,7 @@ StatsResetRegi::StatsResetRegi(const StatsResetRegi_Descriptor& descriptor)
         &NOTIFICATION_CATCH_SUCCESS,
         &NOTIFICATION_CATCH_FAILED,
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
 {
     PA_ADD_OPTION(START_IN_GRIP_MENU);
@@ -131,7 +131,7 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env){
             env.log("Talk to regi.", "purple");
             env.console.botbase().wait_for_all_requests();
             {
-                StandardBattleMenuDetector fight_detector(false);
+                StandardBattleMenuWatcher fight_detector(false);
                 int result = run_until(
                     env, env.console,
                     [=](const BotBaseContext& context){
@@ -209,7 +209,7 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env){
         pbf_press_dpad  (env.console, DPAD_UP   , 10, 1   * TICKS_PER_SECOND);
 
         env.console.botbase().wait_for_all_requests();
-        IVCheckerReaderScope reader(m_iv_checker_reader, env.console, LANGUAGE);
+        IVCheckerReaderScope reader(env.console, LANGUAGE);
         IVCheckerReader::Results results = reader.read(env.console, env.console.video().snapshot());
         bool ok = true;
         ok &= HP.matches(stats.errors, results.hp);

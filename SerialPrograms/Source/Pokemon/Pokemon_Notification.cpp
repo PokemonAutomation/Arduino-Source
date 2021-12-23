@@ -181,7 +181,8 @@ void send_encounter_notification(
             logger, settings_nonshiny,
             color, info,
             "Encounter Notification",
-            embeds
+            embeds,
+            screenshot, false
         );
     }
 }

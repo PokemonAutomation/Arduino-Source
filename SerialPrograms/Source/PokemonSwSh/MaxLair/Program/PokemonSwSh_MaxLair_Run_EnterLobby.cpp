@@ -44,6 +44,10 @@ public:
         }
         return true;
     }
+    virtual void make_overlays(OverlaySet& items) const override{
+        items.add(Qt::red, m_box0);
+        items.add(Qt::red, m_box1);
+    }
     virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
@@ -88,11 +92,11 @@ QImage enter_lobby(
         connect_to_internet_with_inference(env, console);
     }
 
-    std::deque<InferenceBoxScope> boxes;
+    OverlaySet boxes(console);
     SelectionArrowFinder arrow_detector(console, ImageFloatBox(0.350, 0.450, 0.500, 0.400));
     GreyDialogDetector dialog_detector;
-    arrow_detector.make_overlays(boxes, console);
-    dialog_detector.make_overlays(boxes, console);
+    arrow_detector.make_overlays(boxes);
+    dialog_detector.make_overlays(boxes);
 
     InferenceBoxScope ore_box(console, 0.900, 0.015, 0.020, 0.040);
     InferenceBoxScope ore_quantity(console, 0.945, 0.010, 0.0525, 0.050);

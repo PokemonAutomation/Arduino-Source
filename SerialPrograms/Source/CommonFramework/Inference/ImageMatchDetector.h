@@ -8,31 +8,49 @@
 #define PokemonAutomation_CommonFramework_ImageMatchDetector_H
 
 #include <chrono>
+#include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
 
-
-class ImageMatchDetector : public VisualInferenceCallback{
+class ImageMatchDetector : public StaticScreenDetector{
 public:
     ImageMatchDetector(
         QImage reference_image, const ImageFloatBox& box,
         double max_rmsd,
-        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(0)
+        QColor color = Qt::red
     );
 
-    double rmsd(const QImage& frame);
-    bool matches(const QImage& frame);
+    double rmsd(const QImage& frame) const;
 
+    virtual void make_overlays(OverlaySet& items) const override;
+    virtual bool detect(const QImage& screen) const override;
+
+private:
+    QImage m_reference_image;
+    double m_max_rmsd;
+
+    QColor m_color;
+    ImageFloatBox m_box;
+};
+
+
+class ImageMatchWatcher : public ImageMatchDetector, public VisualInferenceCallback{
+public:
+    ImageMatchWatcher(
+        QImage reference_image, const ImageFloatBox& box,
+        double max_rmsd,
+        std::chrono::milliseconds hold_duration = std::chrono::milliseconds(0),
+        QColor color = Qt::red
+    );
+
+    virtual void make_overlays(OverlaySet& items) const override;
     virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
    ) override;
 
 private:
-    QImage m_reference_image;
-    ImageFloatBox m_box;
-    double m_max_rmsd;
     std::chrono::milliseconds m_hold_duration;
 
     bool m_last_match;

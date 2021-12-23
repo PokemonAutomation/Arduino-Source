@@ -7,9 +7,6 @@
 #ifndef PokemonAutomation_PokemonBDSP_EncounterFilter_H
 #define PokemonAutomation_PokemonBDSP_EncounterFilter_H
 
-#include <QComboBox>
-#include <QPushButton>
-#include <QTableWidget>
 #include "Common/Qt/AutoHeightTable.h"
 #include "CommonFramework/Options/ConfigOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"
@@ -59,11 +56,11 @@ private:
     bool m_allow_autocatch;
     BallSelectWidget* m_ball_select;
 public:
-    EncounterAction action = EncounterAction::RunAway;
+    EncounterAction action = EncounterAction::StopProgram;
     std::string pokeball_slug = "poke-ball";
 
     std::string pokemon_slug;
-    ShinyFilter shininess = ShinyFilter::SHINY;
+    ShinyFilter shininess = ShinyFilter::ANYTHING;
 };
 
 class EncounterFilterOptionFactory : public EditableTableFactory{

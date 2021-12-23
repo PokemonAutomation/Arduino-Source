@@ -63,7 +63,7 @@ AutonomousBallThrower::AutonomousBallThrower(const AutonomousBallThrower_Descrip
         &NOTIFICATION_CATCH_SUCCESS,
         &NOTIFICATION_CATCH_FAILED,
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
 {
     PA_ADD_OPTION(START_IN_GRIP_MENU);
@@ -120,7 +120,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env){
         env.console.botbase().wait_for_all_requests();
         env.log("Wait for a pokemon to attack you.", "purple");
         {
-            StandardBattleMenuDetector fight_detector(false);
+            StandardBattleMenuWatcher fight_detector(false);
             int result = run_until(
                 env, env.console,
                 [=](const BotBaseContext& context){

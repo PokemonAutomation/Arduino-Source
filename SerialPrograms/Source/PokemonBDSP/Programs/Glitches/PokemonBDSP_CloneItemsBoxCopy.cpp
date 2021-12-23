@@ -6,6 +6,7 @@
 
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
+#include "PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_BoxRelease.h"
 #include "PokemonBDSP/Programs/Eggs/PokemonBDSP_EggRoutines.h"
 #include "PokemonBDSP_MenuOverlap.h"
@@ -21,9 +22,8 @@ CloneItemsBoxCopy_Descriptor::CloneItemsBoxCopy_Descriptor()
         "PokemonBDSP:CloneItemsBoxCopy",
         STRING_POKEMON + " BDSP", "Clone Items (Box Copy)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/CloneItemsBoxCopy.md",
-        "Clone 30 items at a time using the menu overlap glitch via the entire box cloning method.<br>"
-        "<font color=\"red\">This program relies the menu overlap glitch which was patched out in v1.1.2. "
-        "Thus this program only works on v1.1.1 and earlier.</font>",
+        "Clone 30 items at a time using the menu overlap glitch via the entire box cloning method. "
+        "<font color=\"red\">(This requires game version 1.1.2 or earlier. The glitch it relies on was patched in v1.1.3.)</font>",
         FeedbackType::REQUIRED,
         PABotBaseLevel::PABOTBASE_12KB
     )
@@ -41,7 +41,7 @@ CloneItemsBoxCopy::CloneItemsBoxCopy(const CloneItemsBoxCopy_Descriptor& descrip
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);

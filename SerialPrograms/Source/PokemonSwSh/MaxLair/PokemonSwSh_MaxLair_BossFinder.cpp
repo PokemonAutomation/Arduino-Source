@@ -64,7 +64,7 @@ MaxLairBossFinder::MaxLairBossFinder(const MaxLairBossFinder_Descriptor& descrip
         &NOTIFICATION_STATUS,
         &NOTIFICATION_SHINY,
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
 {
     PA_ADD_OPTION(START_IN_GRIP_MENU);

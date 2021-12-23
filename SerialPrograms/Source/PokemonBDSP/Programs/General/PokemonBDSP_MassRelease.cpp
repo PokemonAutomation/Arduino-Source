@@ -35,7 +35,7 @@ MassRelease::MassRelease(const MassRelease_Descriptor& descriptor)
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);

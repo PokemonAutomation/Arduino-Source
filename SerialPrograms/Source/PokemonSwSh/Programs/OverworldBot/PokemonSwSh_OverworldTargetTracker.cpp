@@ -43,8 +43,10 @@ OverworldTargetTracker::OverworldTargetTracker(
     , m_search_area(0.0, 0.2, 1.0, 0.8)
     , m_stop_on_target(false)
 {
-    add_box(m_search_area);
     m_best_target.first = -1;
+}
+void OverworldTargetTracker::make_overlays(OverlaySet& items) const{
+    items.add(Qt::red, m_search_area);
 }
 
 void OverworldTargetTracker::set_stop_on_target(bool stop){

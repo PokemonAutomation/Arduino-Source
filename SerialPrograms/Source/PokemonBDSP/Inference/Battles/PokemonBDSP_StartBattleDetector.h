@@ -29,6 +29,7 @@ public:
 
     bool detect(const QImage& frame);
 
+    virtual void make_overlays(OverlaySet& items) const override;
     virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
@@ -47,6 +48,7 @@ public:
     bool detected() const{ return m_battle_detected.load(std::memory_order_acquire); }
     bool detect(const QImage& frame);
 
+    virtual void make_overlays(OverlaySet& items) const override;
     virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp

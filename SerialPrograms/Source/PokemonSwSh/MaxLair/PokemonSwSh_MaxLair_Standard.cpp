@@ -77,7 +77,7 @@ MaxLairStandard::MaxLairStandard(const MaxLairStandard_Descriptor& descriptor)
         &NOTIFICATION_STATUS,
         &NOTIFICATION_SHINY,
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
 {
     PA_ADD_OPTION(START_IN_GRIP_MENU);

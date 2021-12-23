@@ -72,12 +72,15 @@ size_t find_selection_arrows(
 
 
 
-SelectionArrowFinder::SelectionArrowFinder(VideoOverlay& overlay, const ImageFloatBox& box)
+SelectionArrowFinder::SelectionArrowFinder(
+    VideoOverlay& overlay,
+    const ImageFloatBox& box,
+    QColor color
+)
     : m_overlay(overlay)
+    , m_color(color)
     , m_box(box)
-{
-    add_box(m_box);
-}
+{}
 
 void SelectionArrowFinder::detect(const QImage& screen){
     std::vector<ImagePixelBox> exclamation_marks;
@@ -88,6 +91,9 @@ void SelectionArrowFinder::detect(const QImage& screen){
     for (const ImagePixelBox& mark : exclamation_marks){
         m_arrow_boxes.emplace_back(m_overlay, translate_to_parent(screen, m_box, mark), Qt::magenta);
     }
+}
+void SelectionArrowFinder::make_overlays(OverlaySet& items) const{
+    items.add(m_color, m_box);
 }
 bool SelectionArrowFinder::process_frame(
     const QImage& frame,

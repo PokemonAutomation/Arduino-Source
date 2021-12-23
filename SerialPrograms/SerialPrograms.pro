@@ -67,6 +67,7 @@ SOURCES += \
     ../Common/CRC32.cpp \
     ../Common/Cpp/AsyncDispatcher.cpp \
     ../Common/Cpp/Exception.cpp \
+    ../Common/Cpp/FireForgetDispatcher.cpp \
     ../Common/Cpp/PanicDump.cpp \
     ../Common/Cpp/ParallelTaskRunner.cpp \
     ../Common/Cpp/PrettyPrint.cpp \
@@ -116,6 +117,7 @@ SOURCES += \
     Source/CommonFramework/Inference/FrozenImageDetector.cpp \
     Source/CommonFramework/Inference/ImageMatchDetector.cpp \
     Source/CommonFramework/Inference/ImageTools.cpp \
+    Source/CommonFramework/Inference/InferenceException.cpp \
     Source/CommonFramework/Inference/VisualInferenceCallback.cpp \
     Source/CommonFramework/Inference/VisualInferenceRoutines.cpp \
     Source/CommonFramework/Inference/VisualInferenceSession.cpp \
@@ -225,39 +227,52 @@ SOURCES += \
     Source/NintendoSwitch/Programs/PokemonHome_PageSwap.cpp \
     Source/NintendoSwitch/TestProgram.cpp \
     Source/PanelLists.cpp \
+    Source/Pokemon/Inference/Pokemon_IVCheckerReader.cpp \
     Source/Pokemon/Inference/Pokemon_NameReader.cpp \
     Source/Pokemon/Inference/Pokemon_PokeballNameReader.cpp \
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.cpp \
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.cpp \
     Source/Pokemon/Options/Pokemon_BallSelectOption.cpp \
     Source/Pokemon/Options/Pokemon_BallSelectWidget.cpp \
+    Source/Pokemon/Options/Pokemon_IVCheckerOption.cpp \
+    Source/Pokemon/Options/Pokemon_IVCheckerWidget.cpp \
     Source/Pokemon/Options/Pokemon_NameSelectOption.cpp \
     Source/Pokemon/Options/Pokemon_NameSelectWidget.cpp \
     Source/Pokemon/Pokemon_EncounterStats.cpp \
+    Source/Pokemon/Pokemon_IVChecker.cpp \
     Source/Pokemon/Pokemon_Notification.cpp \
     Source/Pokemon/Pokemon_Types.cpp \
     Source/Pokemon/Resources/Pokemon_PokeballNames.cpp \
     Source/Pokemon/Resources/Pokemon_PokemonNames.cpp \
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.cpp \
-    Source/PokemonBDSP/Inference/PokemonBDSP_BattleBallReader.cpp \
-    Source/PokemonBDSP/Inference/PokemonBDSP_BattleMenuDetector.cpp \
+    Source/PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.cpp \
+    Source/PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.cpp \
+    Source/PokemonBDSP/Inference/Battles/PokemonBDSP_EndBattleDetector.cpp \
+    Source/PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.cpp \
+    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxDetector.cpp \
+    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.cpp \
+    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_DialogDetector.cpp \
-    Source/PokemonBDSP/Inference/PokemonBDSP_EndBattleDetector.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_MapDetector.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_MarkFinder.cpp \
+    Source/PokemonBDSP/Inference/PokemonBDSP_MenuDetector.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_PokeballSpriteMatcher.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.cpp \
-    Source/PokemonBDSP/Inference/PokemonBDSP_ShinyEncounterDetector.cpp \
-    Source/PokemonBDSP/Inference/PokemonBDSP_ShinyTrigger.cpp \
-    Source/PokemonBDSP/Inference/PokemonBDSP_StartBattleDetector.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_VSSeekerReaction.cpp \
+    Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.cpp \
+    Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyTrigger.cpp \
+    Source/PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.cpp \
     Source/PokemonBDSP/Options/PokemonBDSP_EncounterFilter.cpp \
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.cpp \
     Source/PokemonBDSP/Panels_PokemonBDSP.cpp \
     Source/PokemonBDSP/PokemonBDSP_Settings.cpp \
+    Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggAutonomous.cpp \
+    Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggAutonomousState.cpp \
+    Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggFeedback.cpp \
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggFetcher.cpp \
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggHatcher.cpp \
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggRoutines.cpp \
+    Source/PokemonBDSP/Programs/Farming/PokemonBDSP_AmitySquarePickUpFarmer.cpp \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_DoublesLeveling.cpp \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute210.cpp \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.cpp \
@@ -271,12 +286,17 @@ SOURCES += \
     Source/PokemonBDSP/Programs/PokemonBDSP_EncounterDetection.cpp \
     Source/PokemonBDSP/Programs/PokemonBDSP_EncounterHandler.cpp \
     Source/PokemonBDSP/Programs/PokemonBDSP_GameEntry.cpp \
+    Source/PokemonBDSP/Programs/PokemonBDSP_GameNavigation.cpp \
     Source/PokemonBDSP/Programs/PokemonBDSP_OverworldTrigger.cpp \
     Source/PokemonBDSP/Programs/PokemonBDSP_RunFromBattle.cpp \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_LegendaryReset.cpp \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Fishing.cpp \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Overworld.cpp \
+    Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Shaymin.cpp \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_StarterReset.cpp \
+    Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfBoxTrade.cpp \
+    Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfTouchTrade.cpp \
+    Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.cpp \
@@ -461,6 +481,7 @@ HEADERS += \
     ../Common/Compiler.h \
     ../Common/Cpp/AsyncDispatcher.h \
     ../Common/Cpp/Exception.h \
+    ../Common/Cpp/FireForgetDispatcher.h \
     ../Common/Cpp/FixedLimitVector.h \
     ../Common/Cpp/PanicDump.h \
     ../Common/Cpp/ParallelTaskRunner.h \
@@ -525,9 +546,11 @@ HEADERS += \
     Source/CommonFramework/Inference/FrozenImageDetector.h \
     Source/CommonFramework/Inference/ImageMatchDetector.h \
     Source/CommonFramework/Inference/ImageTools.h \
+    Source/CommonFramework/Inference/InferenceException.h \
     Source/CommonFramework/Inference/InferenceThrottler.h \
     Source/CommonFramework/Inference/StatAccumulator.h \
     Source/CommonFramework/Inference/TimeWindowStatTracker.h \
+    Source/CommonFramework/Inference/VisualDetector.h \
     Source/CommonFramework/Inference/VisualInferenceCallback.h \
     Source/CommonFramework/Inference/VisualInferenceRoutines.h \
     Source/CommonFramework/Inference/VisualInferenceSession.h \
@@ -665,6 +688,7 @@ HEADERS += \
     Source/NintendoSwitch/Programs/PokemonHome_PageSwap.h \
     Source/NintendoSwitch/TestProgram.h \
     Source/PanelLists.h \
+    Source/Pokemon/Inference/Pokemon_IVCheckerReader.h \
     Source/Pokemon/Inference/Pokemon_NameReader.h \
     Source/Pokemon/Inference/Pokemon_PokeballNameReader.h \
     Source/Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h \
@@ -672,35 +696,47 @@ HEADERS += \
     Source/Pokemon/Options/Pokemon_BallSelectOption.h \
     Source/Pokemon/Options/Pokemon_BallSelectWidget.h \
     Source/Pokemon/Options/Pokemon_EncounterBotOptions.h \
+    Source/Pokemon/Options/Pokemon_IVCheckerOption.h \
+    Source/Pokemon/Options/Pokemon_IVCheckerWidget.h \
     Source/Pokemon/Options/Pokemon_NameSelectOption.h \
     Source/Pokemon/Options/Pokemon_NameSelectWidget.h \
     Source/Pokemon/Pokemon_DataTypes.h \
     Source/Pokemon/Pokemon_EncounterStats.h \
+    Source/Pokemon/Pokemon_IVChecker.h \
     Source/Pokemon/Pokemon_Notification.h \
     Source/Pokemon/Pokemon_Types.h \
     Source/Pokemon/Resources/Pokemon_PokeballNames.h \
     Source/Pokemon/Resources/Pokemon_PokemonNames.h \
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.h \
-    Source/PokemonBDSP/Inference/PokemonBDSP_BattleBallReader.h \
-    Source/PokemonBDSP/Inference/PokemonBDSP_BattleMenuDetector.h \
+    Source/PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.h \
+    Source/PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h \
+    Source/PokemonBDSP/Inference/Battles/PokemonBDSP_EndBattleDetector.h \
+    Source/PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h \
+    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxDetector.h \
+    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.h \
+    Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h \
-    Source/PokemonBDSP/Inference/PokemonBDSP_EndBattleDetector.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_MapDetector.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_MarkFinder.h \
+    Source/PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_PokeballSpriteMatcher.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h \
-    Source/PokemonBDSP/Inference/PokemonBDSP_ShinyEncounterDetector.h \
-    Source/PokemonBDSP/Inference/PokemonBDSP_ShinyTrigger.h \
-    Source/PokemonBDSP/Inference/PokemonBDSP_StartBattleDetector.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_VSSeekerReaction.h \
+    Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h \
+    Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyTrigger.h \
+    Source/PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.h \
     Source/PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h \
     Source/PokemonBDSP/Options/PokemonBDSP_EncounterFilter.h \
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h \
     Source/PokemonBDSP/Panels_PokemonBDSP.h \
     Source/PokemonBDSP/PokemonBDSP_Settings.h \
+    Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggAutonomous.h \
+    Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggAutonomousState.h \
+    Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggFeedback.h \
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggFetcher.h \
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggHatcher.h \
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggRoutines.h \
+    Source/PokemonBDSP/Programs/Farming/PokemonBDSP_AmitySquarePickUpFarmer.h \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_DoublesLeveling.h \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute210.h \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.h \
@@ -714,12 +750,17 @@ HEADERS += \
     Source/PokemonBDSP/Programs/PokemonBDSP_EncounterDetection.h \
     Source/PokemonBDSP/Programs/PokemonBDSP_EncounterHandler.h \
     Source/PokemonBDSP/Programs/PokemonBDSP_GameEntry.h \
+    Source/PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h \
     Source/PokemonBDSP/Programs/PokemonBDSP_OverworldTrigger.h \
     Source/PokemonBDSP/Programs/PokemonBDSP_RunFromBattle.h \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_LegendaryReset.h \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Fishing.h \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Overworld.h \
+    Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Shaymin.h \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_StarterReset.h \
+    Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfBoxTrade.h \
+    Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfTouchTrade.h \
+    Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h \

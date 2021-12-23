@@ -29,7 +29,7 @@ void run_away(
     ConsoleHandle& console,
     uint16_t exit_battle_time
 ){
-    BlackScreenOverDetector black_screen_detector;
+    BlackScreenOverWatcher black_screen_detector;
     run_until(
         env, console,
         [=](const BotBaseContext& context){
@@ -97,7 +97,7 @@ void StandardEncounterHandler::run_away_and_update_stats(
         &m_frequencies
     );
 
-    BlackScreenOverDetector black_screen_detector;
+    BlackScreenOverWatcher black_screen_detector;
     int ret = run_until(
         m_env, m_console,
         [=](const BotBaseContext& context){

@@ -8,6 +8,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_BoxRelease.h"
+#include "PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h"
 #include "PokemonBDSP/Programs/Eggs/PokemonBDSP_EggRoutines.h"
 #include "PokemonBDSP_MenuOverlap.h"
 #include "PokemonBDSP_CloneItemsBoxCopy2.h"
@@ -22,8 +23,8 @@ CloneItemsBoxCopy2_Descriptor::CloneItemsBoxCopy2_Descriptor()
         "PokemonBDSP:CloneItemsBoxCopy2",
         STRING_POKEMON + " BDSP", "Clone Items (Box Copy 2)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/CloneItemsBoxCopy2.md",
-        "With the menu glitch active, clone entire boxes of items at a time.<br>"
-        "<font color=\"red\">The menu glitch is still possible to activate as of version 1.1.2.</font>",
+        "With the menu glitch active, clone entire boxes of items at a time. "
+        "<font color=\"red\">(This requires game version 1.1.2 or earlier. The glitch it relies on was patched in v1.1.3.)</font>",
         FeedbackType::REQUIRED,
         PABotBaseLevel::PABOTBASE_12KB
     )
@@ -41,7 +42,7 @@ CloneItemsBoxCopy2::CloneItemsBoxCopy2(const CloneItemsBoxCopy2_Descriptor& desc
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
@@ -89,7 +90,7 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env){
 
     env.console.botbase().wait_for_all_requests();
     QImage expected = env.console.video().snapshot();
-    ImageMatchDetector matcher(expected, {0.02, 0.25, 0.96, 0.73}, 20);
+    ImageMatchWatcher matcher(expected, {0.02, 0.25, 0.96, 0.73}, 20);
 
     for (uint16_t box = 0; box < BOXES; box++){
         env.update_stats();
@@ -160,7 +161,7 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env){
         env.console.botbase().wait_for_all_requests();
         env.wait_for(std::chrono::milliseconds(500));
         QImage current = env.console.video().snapshot();
-        if (!matcher.matches(current)){
+        if (!matcher.detect(current)){
             stats.m_errors++;
             PA_THROW_StringException("Failed to return to starting position. Something is wrong.");
         }

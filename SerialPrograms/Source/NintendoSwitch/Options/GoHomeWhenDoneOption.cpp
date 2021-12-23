@@ -14,7 +14,7 @@ namespace NintendoSwitch{
 GoHomeWhenDoneOption::GoHomeWhenDoneOption(bool default_value)
     : BooleanCheckBoxOption(
         "<b>Go Home when Done:</b><br>"
-        "After finding a shiny, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
+        "When the program finishes, go to the Switch Home menu to idle. (turn this off for unattended streaming)",
         default_value
     )
 {}
@@ -25,6 +25,7 @@ void GoHomeWhenDoneOption::run_end_of_program(const BotBaseContext& context){
         pbf_press_button(context, BUTTON_HOME, 20, 125);
     }
 }
+
 
 
 }

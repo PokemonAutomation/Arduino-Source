@@ -13,6 +13,7 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_BasicCatcher.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
@@ -43,7 +44,7 @@ StatsResetMoltres::StatsResetMoltres(const StatsResetMoltres_Descriptor& descrip
     , GO_HOME_WHEN_DONE(false)
     , LANGUAGE(
         "<b>Game Language:</b>",
-        m_iv_checker_reader.languages(),
+        IVCheckerReader::instance().languages(),
         true
     )
     , HP("<b>HP:</b>")
@@ -55,7 +56,7 @@ StatsResetMoltres::StatsResetMoltres(const StatsResetMoltres_Descriptor& descrip
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
 {
     PA_ADD_OPTION(START_IN_GRIP_MENU);
@@ -109,7 +110,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env){
         env.console.botbase().wait_for_all_requests();
         env.log("Wait for moltres to attack you.", "purple");
         {
-            StandardBattleMenuDetector fight_detector(false);
+            StandardBattleMenuWatcher fight_detector(false);
             int result = run_until(
                 env, env.console,
                 [=](const BotBaseContext& context){
@@ -148,7 +149,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env){
         pbf_press_dpad  (env.console, DPAD_UP  , 10, 1   * TICKS_PER_SECOND);
 
         env.console.botbase().wait_for_all_requests();
-        IVCheckerReaderScope reader(m_iv_checker_reader, env.console, LANGUAGE);
+        IVCheckerReaderScope reader(env.console, LANGUAGE);
         IVCheckerReader::Results results = reader.read(env.console, env.console.video().snapshot());
         bool ok = true;
         ok &= HP.matches(stats.errors, results.hp);
@@ -172,7 +173,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env){
             env.console.botbase().wait_for_all_requests();
             env.log("Wait for moltres to attack you.", "purple");
             {
-                StandardBattleMenuDetector fight_detector(false);
+                StandardBattleMenuWatcher fight_detector(false);
                 int ret = run_until(
                     env, env.console,
                     [=](const BotBaseContext& context){

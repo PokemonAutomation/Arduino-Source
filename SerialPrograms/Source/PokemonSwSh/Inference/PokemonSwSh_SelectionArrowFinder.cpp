@@ -105,8 +105,9 @@ bool SelectionArrowDetector_is_arrow(
 SelectionArrowFinder::SelectionArrowFinder(VideoOverlay& overlay, const ImageFloatBox& box)
     : m_overlay(overlay)
     , m_box(box)
-{
-    add_box(m_box, Qt::yellow);
+{}
+void SelectionArrowFinder::make_overlays(OverlaySet& items) const{
+    items.add(Qt::yellow, m_box);
 }
 bool SelectionArrowFinder::detect(const QImage& screen){
     QImage image = extract_box(screen, m_box);

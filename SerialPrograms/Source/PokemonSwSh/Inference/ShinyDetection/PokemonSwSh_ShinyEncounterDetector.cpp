@@ -95,7 +95,6 @@ ShinyEncounterDetector::ShinyEncounterDetector(
     , m_min_delay(battle_settings.dialog_delay_when_shiny - std::chrono::milliseconds(300))
     , m_max_delay(battle_settings.dialog_delay_when_shiny + std::chrono::milliseconds(500))
     , m_detection_threshold(detection_threshold)
-    , m_dialog_detector(overlay)
     , m_dialog_tracker(overlay, logger, m_dialog_detector)
     , m_best_type_alpha(0)
 {}
@@ -208,9 +207,9 @@ ShinyDetectionResult detect_shiny_battle(
     StatAccumulatorI32 inference_stats;
     StatAccumulatorI32 throttle_stats;
 
-    StandardBattleMenuDetector menu(battle_settings.den);
-    std::deque<InferenceBoxScope> overlay_boxes;
-    menu.make_overlays(overlay_boxes, overlay);
+    StandardBattleMenuWatcher menu(battle_settings.den);
+    OverlaySet overlay_boxes(overlay);
+    menu.make_overlays(overlay_boxes);
     ShinyEncounterDetector detector(
         logger,
         overlay,

@@ -22,14 +22,15 @@ RaidCatchDetector::RaidCatchDetector(VideoOverlay& overlay)
     , m_text0 (0.82, 0.84 + 0 * 0.078, 0.15, 0.06)
     , m_text1 (0.82, 0.84 + 1 * 0.078, 0.15, 0.06)
     , m_arrow(overlay, ImageFloatBox(0.75, 0.82, 0.10, 0.10))
-{
-    add_box(m_left0);
-    add_box(m_right0);
-//    add_box(m_left1);
-//    add_box(m_right1);
-    add_box(m_text0);
-    add_box(m_text1);
-    add_boxes(m_arrow);
+{}
+void RaidCatchDetector::make_overlays(OverlaySet& items) const{
+    items.add(Qt::red, m_left0);
+    items.add(Qt::red, m_right0);
+//    items.add(Qt::red, m_left1);
+//    items.add(Qt::red, m_right1);
+    items.add(Qt::red, m_text0);
+    items.add(Qt::red, m_text1);
+    m_arrow.make_overlays(items);
 }
 bool RaidCatchDetector::detect(const QImage& screen){
     ImageStats left0 = image_stats(extract_box(screen, m_left0));

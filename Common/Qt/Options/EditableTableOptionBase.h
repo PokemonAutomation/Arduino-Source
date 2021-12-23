@@ -41,7 +41,10 @@ public:
 
 class EditableTableBase{
 public:
-    EditableTableBase(QString label, const EditableTableFactory& factory, bool margin);
+    EditableTableBase(
+        QString label, const EditableTableFactory& factory, bool margin,
+        std::vector<std::unique_ptr<EditableTableRow>> default_value = {}
+    );
 
     void load_default(const QJsonValue& json);
     void load_current(const QJsonValue& json);

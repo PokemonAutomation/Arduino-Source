@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_BattleMenuDetector_H
 
 #include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
@@ -15,21 +16,20 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class StandardBattleMenuDetector : public VisualInferenceCallback{
+class StandardBattleMenuDetector : public StaticScreenDetector{
 public:
-    StandardBattleMenuDetector(bool den);
+    StandardBattleMenuDetector(
+        bool den,
+        QColor color = Qt::red
+    );
 
-    bool detect(const QImage& screen) const;
-
-    virtual bool process_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-    ) override final;
-
+    virtual void make_overlays(OverlaySet& items) const override;
+    virtual bool detect(const QImage& screen) const override;
 
 private:
     bool m_den;
 
+    QColor m_color;
     ImageFloatBox m_ball_left;
     ImageFloatBox m_ball_right;
     ImageFloatBox m_icon_fight;
@@ -43,7 +43,20 @@ private:
 
 //    ImageFloatBox m_status0;
     ImageFloatBox m_status1;
+};
 
+
+class StandardBattleMenuWatcher : public StandardBattleMenuDetector, public VisualInferenceCallback{
+public:
+    using StandardBattleMenuDetector::StandardBattleMenuDetector;
+
+    virtual void make_overlays(OverlaySet& items) const override;
+    virtual bool process_frame(
+        const QImage& frame,
+        std::chrono::system_clock::time_point timestamp
+    ) override final;
+
+private:
     size_t m_trigger_count = 0;
 };
 

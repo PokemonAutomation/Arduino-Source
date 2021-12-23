@@ -7,12 +7,6 @@
 #ifndef PokemonAutomation_PokemonSwSh_StartBattleDetector_H
 #define PokemonAutomation_PokemonSwSh_StartBattleDetector_H
 
-#include <functional>
-#include <chrono>
-#include <thread>
-#include "CommonFramework/Tools/Logger.h"
-#include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogDetector.h"
 
@@ -22,33 +16,18 @@ namespace PokemonSwSh{
 
 
 
-//bool is_dialog_grey(const QImage& image);
-
-
-#if 0
-//  Return false if timed out.
-bool wait_for_start_battle(
-    ProgramEnvironment& env,
-    VideoFeed& feed,
-    VideoOverlay& overlay,
-    std::chrono::milliseconds timeout
-);
-#endif
-
-
-
-class StartBattleDetector : public VisualInferenceCallback{
+class StartBattleWatcher : public VisualInferenceCallback{
 public:
-    StartBattleDetector(VideoOverlay& overlay);
+    StartBattleWatcher(QColor color = Qt::red);
 
-    bool detect(const QImage& frame);
-
+    virtual void make_overlays(OverlaySet& items) const override;
     virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
     ) override final;
 
 private:
+    QColor m_color;
     ImageFloatBox m_screen_box;
     BattleDialogDetector m_dialog;
 };

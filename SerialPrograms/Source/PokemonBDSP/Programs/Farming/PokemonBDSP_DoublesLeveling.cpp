@@ -9,10 +9,11 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_StartBattleDetector.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_BattleMenuDetector.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_EndBattleDetector.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_ShinyEncounterDetector.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_EndBattleDetector.h"
+#include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_EncounterHandler.h"
 #include "PokemonBDSP_DoublesLeveling.h"
 
@@ -36,13 +37,21 @@ DoublesLeveling_Descriptor::DoublesLeveling_Descriptor()
 DoublesLeveling::DoublesLeveling(const DoublesLeveling_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
+    , ON_LEARN_MOVE(
+        "<b>On Learn Move:</b>",
+        {
+            "Don't learn moves.",
+            "Stop Program",
+        },
+        0
+    )
     , ENCOUNTER_BOT_OPTIONS(false, false)
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
         &NOTIFICATION_PROGRAM_FINISH,
-        &NOTIFICATION_PROGRAM_ERROR,
+        &NOTIFICATION_ERROR_FATAL,
     })
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
@@ -57,6 +66,7 @@ DoublesLeveling::DoublesLeveling(const DoublesLeveling_Descriptor& descriptor)
     PA_ADD_OPTION(LANGUAGE);
 
     PA_ADD_OPTION(TRIGGER_METHOD);
+    PA_ADD_OPTION(ON_LEARN_MOVE);
 
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -85,7 +95,7 @@ std::unique_ptr<StatsTracker> DoublesLeveling::make_stats() const{
 
 
 bool DoublesLeveling::find_encounter(SingleSwitchProgramEnvironment& env) const{
-    BattleMenuDetector battle_menu_detector(BattleType::WILD);
+    BattleMenuWatcher battle_menu_detector(BattleType::WILD);
     StartBattleDetector start_battle_detector(env.console);
 
     int result = run_until(
@@ -111,17 +121,18 @@ bool DoublesLeveling::find_encounter(SingleSwitchProgramEnvironment& env) const{
     }
     return false;
 }
-void DoublesLeveling::battle(SingleSwitchProgramEnvironment& env){
+bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env){
     Stats& stats = env.stats<Stats>();
 
     env.log("Starting battle!");
 
     //  State Machine
-    for (size_t c = 0; c < 5; c++){
+    for (size_t c = 0; c < 5;){
         env.console.botbase().wait_for_all_requests();
 
-        BattleMenuDetector battle_menu(BattleType::WILD);
-        EndBattleDetector end_battle;
+        BattleMenuWatcher battle_menu(BattleType::WILD);
+        EndBattleWatcher end_battle;
+        SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, Qt::yellow);
         int ret = run_until(
             env, env.console,
             [=](const BotBaseContext& context){
@@ -130,17 +141,29 @@ void DoublesLeveling::battle(SingleSwitchProgramEnvironment& env){
             {
                 &battle_menu,
                 &end_battle,
+                &learn_move,
             }
         );
         switch (ret){
         case 0:
             env.log("Battle menu detected!", Qt::blue);
             pbf_mash_button(env.console, BUTTON_ZL, 5 * TICKS_PER_SECOND);
+            c++;
             break;
         case 1:
             env.log("Battle finished!", Qt::blue);
             pbf_mash_button(env.console, BUTTON_B, 250);
-            return;
+            return false;
+        case 2:
+            env.log("Detected move learn!", Qt::blue);
+            if (ON_LEARN_MOVE == 0){
+                pbf_move_right_joystick(env.console, 128, 255, 20, 105);
+                pbf_press_button(env.console, BUTTON_A, 20, 105);
+                break;
+            }else{
+                return true;
+            }
+            break;
         default:
             env.log("Timed out.", Qt::red);
             stats.add_error();
@@ -191,7 +214,9 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env){
             break;
         }
 
-        this->battle(env);
+        if (this->battle(env)){
+            break;
+        }
     }
 
     send_program_finished_notification(

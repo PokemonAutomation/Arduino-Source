@@ -38,10 +38,10 @@ bool read_battle_menu(
 ){
     PlayerState& player = state.players[player_index];
 
-    std::deque<InferenceBoxScope> boxes;
+    OverlaySet boxes(console);
     BattleMenuReader reader(console, settings.language);
     BattleMoveArrowFinder arrow_finder(console);
-    arrow_finder.make_overlays(boxes, console);
+    arrow_finder.make_overlays(boxes);
 
 
     //  Read raid mon.

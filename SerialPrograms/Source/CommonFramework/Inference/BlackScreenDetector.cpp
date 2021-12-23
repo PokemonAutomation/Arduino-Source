@@ -19,39 +19,49 @@ using std::endl;
 
 namespace PokemonAutomation{
 
-BlackScreenDetector::BlackScreenDetector(const ImageFloatBox& box)
-    : m_box(0.1, 0.1, 0.8, 0.8)
-{
-    add_box(m_box);
+
+BlackScreenDetector::BlackScreenDetector(const ImageFloatBox& box, QColor color)
+    : m_color(color)
+    , m_box(box)
+{}
+
+void BlackScreenDetector::make_overlays(OverlaySet& items) const{
+    items.add(m_color, m_box);
 }
-bool BlackScreenDetector::process_frame(
+bool BlackScreenDetector::detect(const QImage& screen) const{
+    return is_black(extract_box(screen, m_box));
+}
+
+
+
+void BlackScreenWatcher::make_overlays(OverlaySet& items) const{
+    BlackScreenDetector::make_overlays(items);
+}
+bool BlackScreenWatcher::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
-    QImage image = extract_box(frame, m_box);
-    return is_black(image);
+    return detect(frame);
 }
 
 
 
 
-BlackScreenOverDetector::BlackScreenOverDetector(const ImageFloatBox& box)
-    : m_box(box)
-    , m_has_been_black(false)
-{
-    add_box(m_box);
+BlackScreenOverWatcher::BlackScreenOverWatcher(const ImageFloatBox& box, QColor color)
+    : m_detector(box, color)
+{}
+void BlackScreenOverWatcher::make_overlays(OverlaySet& items) const{
+    m_detector.make_overlays(items);
 }
 
-
-bool BlackScreenOverDetector::process_frame(
+bool BlackScreenOverWatcher::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
     return black_is_over(frame);
 }
-bool BlackScreenOverDetector::black_is_over(const QImage& frame){
-    QImage image = extract_box(frame, m_box);
-    if (is_black(image)){
+bool BlackScreenOverWatcher::black_is_over(const QImage& frame){
+    if (m_detector.detect(frame)){
         m_has_been_black = true;
         return false;
     }

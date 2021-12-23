@@ -18,7 +18,9 @@ FrozenImageDetector::FrozenImageDetector(std::chrono::milliseconds timeout, doub
     : m_timeout(timeout)
     , m_rmsd_threshold(rmsd_threshold)
 {}
+void FrozenImageDetector::make_overlays(OverlaySet&) const{
 
+}
 bool FrozenImageDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp

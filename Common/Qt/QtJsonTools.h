@@ -27,6 +27,7 @@ QString json_get_string_throw(const QJsonObject& obj, const QString& key);
 QJsonArray json_get_array_throw(const QJsonObject& obj, const QString& key);
 QJsonObject json_get_object_throw(const QJsonObject& obj, const QString& key);
 
+QString json_get_string_nothrow(const QJsonObject& obj, const QString& key);
 QJsonValue json_get_value_nothrow(const QJsonObject& obj, const QString& key);
 QJsonArray json_get_array_nothrow(const QJsonObject& obj, const QString& key);
 QJsonObject json_get_object_nothrow(const QJsonObject& obj, const QString& key);

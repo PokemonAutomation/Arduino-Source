@@ -19,16 +19,19 @@ namespace PokemonSwSh{
 
 ShinyDialogTracker::ShinyDialogTracker(
     VideoOverlay& overlay, Logger& logger,
-    ScreenDetector& detector
+    StaticScreenDetector& detector
 )
     : m_logger(logger)
     , m_detector(detector)
+    , m_overlays(overlay)
     , m_end_dialog(std::chrono::system_clock::now())
     , m_dialog_on(false)
     , m_state(EncounterState::BEFORE_ANYTHING)
     , m_wild_animation_duration(0)
     , m_your_animation_duration(0)
-{}
+{
+    detector.make_overlays(m_overlays);
+}
 
 
 void ShinyDialogTracker::push_frame(const QImage& screen, std::chrono::system_clock::time_point timestamp){
