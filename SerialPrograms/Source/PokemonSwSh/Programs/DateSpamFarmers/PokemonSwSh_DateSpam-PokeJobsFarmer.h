@@ -36,9 +36,12 @@ namespace PokemonAutomation
                 StartInGripOrGameOption START_IN_GRIP_MENU;
 
                 SimpleIntegerOption<uint32_t> SKIPS;
-                TimeExpressionOption<uint16_t> MASH_B_DURATION;
-                SimpleIntegerOption<uint32_t> MENU_INDEX;
                 SimpleIntegerOption<uint32_t> CONCURRENCY;
+                SimpleIntegerOption<uint32_t> MENU_INDEX;
+
+                SectionDividerOption m_advanced_options;
+                
+                TimeExpressionOption<uint16_t> MASH_B_DURATION;
             };
 
         }

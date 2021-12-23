@@ -33,22 +33,25 @@ namespace PokemonAutomation
 			PokeJobsFarmer::PokeJobsFarmer(const PokeJobsFarmer_Descriptor &descriptor)
 				: SingleSwitchProgramInstance(descriptor),
 				  SKIPS(
-					  "<b>Maximum number of Poke Jobs completed:</b>",
+					  "<b>Number of days:</b>",
 					  200),
-				  MASH_B_DURATION(
-					  "<b>Mash B for this long to exit the dialog:</b>",
-					  "8 * TICKS_PER_SECOND"),
+				  CONCURRENCY(
+					  "<b>Number of concurrent Poke Jobs per day:</b>",
+					  2),
 				  MENU_INDEX(
 					  "<b>Index of Poke Jobs in Rotom menu:</b>",
 					  3),
-				  CONCURRENCY(
-					  "<b>Number of concurrent Poke Jobs:</b>",
-					  2)
+    			  m_advanced_options(
+    			      "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"),
+				  MASH_B_DURATION(
+					  "<b>Mash B for this long upon completion of Poké Job:</b>",
+					  "8 * TICKS_PER_SECOND")
 			{
 				PA_ADD_OPTION(SKIPS);
-				PA_ADD_OPTION(MASH_B_DURATION);
-				PA_ADD_OPTION(MENU_INDEX);
 				PA_ADD_OPTION(CONCURRENCY);
+				PA_ADD_OPTION(MENU_INDEX);
+				PA_ADD_STATIC(m_advanced_options);
+				PA_ADD_OPTION(MASH_B_DURATION);
 			}
 
             static void enter_jobs(SingleSwitchProgramEnvironment &env, uint16_t index)
