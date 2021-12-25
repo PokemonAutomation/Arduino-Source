@@ -24,6 +24,7 @@ const auto SERIAL_REFRESH_RATE = std::chrono::milliseconds(1000);
 extern const QString STRING_POKEBALL;
 extern const QString STRING_POKEMON;
 extern const QString STRING_POKEDEX;
+extern const QString STRING_POKEJOB;
 
 const QString& RESOURCE_PATH();
 const QString& TRAINING_PATH();
