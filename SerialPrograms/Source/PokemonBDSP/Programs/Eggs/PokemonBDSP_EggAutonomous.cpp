@@ -54,10 +54,18 @@ EggAutonomous::EggAutonomous(const EggAutonomous_Descriptor& descriptor)
         "<b>Travel Time per Fetch:</b><br>Fetch an egg after traveling for this long.",
         "20 * TICKS_PER_SECOND"
     )
-    , CHECKPOINTING(
-        "<b>Error Recovery:</b><br>Save the game at program start and after each baby that is kept. "
-        "This allows the program to recover from errors and game crashes.",
-        true
+    , AUTO_SAVING(
+        "<b>Auto-Saving:</b><br>Automatically save the game to recover from crashes and allow eggs to be unhatched.<br>"
+        "(Unhatching eggs can be useful obtaining breeding parents by rehatching a perfect egg in a game with a different language.)<br><br>"
+        "To collect (unhatched) eggs with the desired stats, set this option to \"Save after every batch\". "
+        "Then set the Action Table below to \"Stop Program\" on the desired stats. "
+        "Once the program stops on the baby with the desired stats, you can manually reset the game and it will revert to an egg in your party.",
+        {
+            "No auto-saving. (No error/crash recovery.)",
+            "Save at beginning and after obtaining each baby that is kept. (Allows for error/crash recovery.)",
+            "Save after every batch. (Allows you to unhatch eggs.)",
+        },
+        1
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_NONSHINY_KEEP(
@@ -85,7 +93,7 @@ EggAutonomous::EggAutonomous(const EggAutonomous_Descriptor& descriptor)
     PA_ADD_OPTION(SHORTCUT);
     PA_ADD_OPTION(MAX_KEEPERS);
     PA_ADD_OPTION(TRAVEL_TIME_PER_FETCH);
-    PA_ADD_OPTION(CHECKPOINTING);
+    PA_ADD_OPTION(AUTO_SAVING);
     PA_ADD_OPTION(FILTERS);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -113,7 +121,22 @@ bool EggAutonomous::run_batch(
         stats.to_str()
     );
 
-    if (CHECKPOINTING && saved_state.babies_saved() != current_state.babies_saved()){
+    bool save = false;
+    switch (AUTO_SAVING){
+    case 0:
+        save = false;
+        break;
+    case 1:
+        save = saved_state.babies_saved() != current_state.babies_saved();
+        break;
+    case 2:
+        save = true;
+        break;
+    default:
+        PA_THROW_StringException("Invalid saving option.");
+    }
+
+    if (save){
         save_game(env, env.console);
         saved_state.set(current_state);
     }
@@ -141,7 +164,8 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env){
         LANGUAGE,
         SHORTCUT,
         TRAVEL_TIME_PER_FETCH,
-        FILTERS
+        FILTERS,
+        MAX_KEEPERS
     );
     EggAutonomousState saved_state = current_state;
 
@@ -149,14 +173,14 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env){
 //    current_state.withdraw_egg_column();
 //    box_to_overworld(env, env.console);
 
-    if (CHECKPOINTING){
+    if (AUTO_SAVING == 1){
         save_game(env, env.console);
         saved_state.set(current_state);
     }
 
     size_t consecutive_failures = 0;
     while (current_state.babies_saved() < MAX_KEEPERS){
-        if (!CHECKPOINTING){
+        if (AUTO_SAVING == 0){
             if (run_batch(env, saved_state, current_state)){
                 break;
             }
@@ -174,6 +198,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env){
             }
             pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, env.console, true);
+            current_state.set(saved_state);
         }
     }
 

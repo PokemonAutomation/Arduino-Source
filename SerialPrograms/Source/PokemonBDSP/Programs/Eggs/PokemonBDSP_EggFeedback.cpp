@@ -7,6 +7,7 @@
 #include "CommonFramework/Inference/InferenceException.h"
 #include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
+#include "CommonFramework/Inference/FrozenImageDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
@@ -26,6 +27,7 @@ void hatch_egg(ProgramEnvironment& env, ConsoleHandle& console){
     //  Spin until egg starts hatching.
     do{
         ShortDialogWatcher dialog;
+        FrozenImageDetector frozen(std::chrono::seconds(10), 20);
         if (dialog.detect(console.video().snapshot())){
             break;
         }
@@ -35,13 +37,20 @@ void hatch_egg(ProgramEnvironment& env, ConsoleHandle& console){
             [](const BotBaseContext& context){
                 egg_spin(context, 480 * TICKS_PER_SECOND);
             },
-            { &dialog }
+            {
+                &dialog,
+                &frozen,
+            }
         );
-        if (ret < 0){
+        switch (ret){
+        case 0:
+            console.log("Egg is hatching!");
+            break;
+        case 1:
+            PA_THROW_InferenceException(console, "Frozen screen detected!");
+        default:
             PA_THROW_InferenceException(console, "No hatch detected after 8 minutes of spinning.");
         }
-        console.log("Egg is hatching!");
-        console.botbase().wait_for_all_requests();
     }while (false);
 
 
@@ -89,6 +98,7 @@ void hatch_egg(ProgramEnvironment& env, ConsoleHandle& console){
         default:
             console.log("Failed to detect overworld after 30 seconds. Did day/night change?", Qt::red);
 //            pbf_mash_button(console, BUTTON_ZL, 30 * TICKS_PER_SECOND);
+            return;
         }
     }
 }

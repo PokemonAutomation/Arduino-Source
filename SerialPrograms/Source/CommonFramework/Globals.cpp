@@ -31,6 +31,7 @@ const QString STRING_POKEDEX = QString("Pok") + QChar(0xe9) + "dex";
 const QString STRING_POKEJOB = QString("Pok") + QChar(0xe9) + " Job";
 
 
+
 QString get_resource_path(){
     //  Find the resource directory.
     QString path = QCoreApplication::applicationDirPath();

@@ -124,7 +124,7 @@ QString json_get_string_nothrow(const QJsonObject& obj, const QString& key){
 QJsonValue json_get_value_nothrow(const QJsonObject& obj, const QString& key){
     auto iter = obj.find(key);
     if (iter == obj.end()){
-        return QJsonArray();
+        return QJsonValue();
     }
     return *iter;
 }

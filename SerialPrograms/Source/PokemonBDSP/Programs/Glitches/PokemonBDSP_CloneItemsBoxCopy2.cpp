@@ -24,7 +24,7 @@ CloneItemsBoxCopy2_Descriptor::CloneItemsBoxCopy2_Descriptor()
         STRING_POKEMON + " BDSP", "Clone Items (Box Copy 2)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/CloneItemsBoxCopy2.md",
         "With the menu glitch active, clone entire boxes of items at a time. "
-        "<font color=\"red\">(This requires game version 1.1.2 or earlier. The glitch it relies on was patched in v1.1.3.)</font>",
+        "<font color=\"red\">(This requires game versions 1.1.0 - 1.1.2. The glitch it relies on was patched in v1.1.3.)</font>",
         FeedbackType::REQUIRED,
         PABotBaseLevel::PABOTBASE_12KB
     )

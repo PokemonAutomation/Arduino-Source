@@ -28,7 +28,9 @@ EditableTableBase::EditableTableBase(
     , m_factory(factory)
     , m_margin(margin)
     , m_default(std::move(default_value))
-{}
+{
+    restore_defaults();
+}
 
 std::vector<std::unique_ptr<EditableTableRow>> EditableTableBase::load_json(const QJsonValue& json){
     std::vector<std::unique_ptr<EditableTableRow>> table;
@@ -49,7 +51,9 @@ void EditableTableBase::load_default(const QJsonValue& json){
     m_default = load_json(json);
 }
 void EditableTableBase::load_current(const QJsonValue& json){
-    m_current = load_json(json);
+    if (json.isArray()){
+        m_current = load_json(json);
+    }
 }
 QJsonValue EditableTableBase::write_default() const{
     return to_json(m_default);

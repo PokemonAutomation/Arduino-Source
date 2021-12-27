@@ -32,7 +32,7 @@ public:
     virtual QString check_validity() const override{
         return EditableTableBase::check_validity();
     };
-    virtual void restore_defaults() override{
+    virtual void restore_defaults() override final{
         EditableTableBase::restore_defaults();
     };
 

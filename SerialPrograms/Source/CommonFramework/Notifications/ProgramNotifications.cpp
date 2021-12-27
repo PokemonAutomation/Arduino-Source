@@ -236,7 +236,7 @@ void send_program_finished_notification(
         image, keep_file
     );
 }
-void send_program_error_notification(
+void send_program_recoverable_error_notification(
     Logger& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const QString& message,
@@ -246,7 +246,25 @@ void send_program_error_notification(
     send_program_notification(
         logger, settings,
         Qt::red, info,
-        "Program Stopped (Error)",
+        "Program Error (Recoverable)",
+        {
+            {"Message", message},
+            {"Session Stats", QString::fromStdString(stats)},
+        },
+        image, keep_file
+    );
+}
+void send_program_fatal_error_notification(
+    Logger& logger, EventNotificationOption& settings,
+    const ProgramInfo& info,
+    const QString& message,
+    const std::string& stats,
+    const QImage& image, bool keep_file
+){
+    send_program_notification(
+        logger, settings,
+        Qt::red, info,
+        "Program Stopped (Fatal Error)",
         {
             {"Message", message},
             {"Session Stats", QString::fromStdString(stats)},

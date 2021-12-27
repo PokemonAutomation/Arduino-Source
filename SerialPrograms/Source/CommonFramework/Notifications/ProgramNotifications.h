@@ -72,7 +72,14 @@ void send_program_finished_notification(
     const std::string& stats,
     const QImage& image = QImage(), bool keep_file = false
 );
-void send_program_error_notification(
+void send_program_recoverable_error_notification(
+    Logger& logger, EventNotificationOption& settings,
+    const ProgramInfo& info,
+    const QString& message,
+    const std::string& stats = "",
+    const QImage& image = QImage(), bool keep_file = false
+);
+void send_program_fatal_error_notification(
     Logger& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const QString& message,

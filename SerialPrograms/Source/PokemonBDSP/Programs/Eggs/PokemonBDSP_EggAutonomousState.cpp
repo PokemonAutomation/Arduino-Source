@@ -10,6 +10,7 @@
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Inference/InferenceException.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
+#include "CommonFramework/Inference/FrozenImageDetector.h"
 #include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "Pokemon/Pokemon_Notification.h"
@@ -98,7 +99,8 @@ EggAutonomousState::EggAutonomousState(
     Language language,
     ShortcutDirection& shortcut,
     uint16_t travel_time_per_fetch,
-    const EggHatchFilterOption& filters
+    const EggHatchFilterOption& filters,
+    uint8_t max_keepers
 )
     : m_env(env), m_console(console)
     , m_stats(stats)
@@ -109,6 +111,7 @@ EggAutonomousState::EggAutonomousState(
     , m_shortcut(shortcut)
     , m_travel_time_per_fetch(travel_time_per_fetch)
     , m_filters(filters)
+    , m_max_keepers(max_keepers)
 {}
 
 void EggAutonomousState::dump() const{
@@ -136,7 +139,7 @@ void EggAutonomousState::process_error(const std::string& name, const char* mess
         QString::fromStdString(name),
         screen
     );
-    send_program_error_notification(
+    send_program_recoverable_error_notification(
         m_console,
         m_notification_error,
         m_env.program_info(),
@@ -212,6 +215,7 @@ bool EggAutonomousState::process_party(){
             }
         }
         m_console.botbase().wait_for_all_requests();
+        m_env.wait_for(std::chrono::milliseconds(500));
 
         bool shiny = shiny_reader.detect(screen);
         if (shiny){
@@ -258,6 +262,10 @@ bool EggAutonomousState::process_party(){
             pbf_move_right_joystick(m_console, 128, 255, 20, 105);
             pbf_move_right_joystick(m_console, 128, 255, 20, 105);
             m_babies_saved++;
+            if (m_babies_saved >= m_max_keepers){
+                m_console.log("Max keepers reached. Stopping program...");
+                return true;
+            }
             break;
         case EggHatchAction::Release:
             m_console.log("Releasing Pokemon...", "purple");
@@ -427,6 +435,7 @@ void EggAutonomousState::hatch_egg(){
         default:
             m_console.log("Failed to detect overworld after 30 seconds. Did day/night change?", Qt::red);
 //            pbf_mash_button(console, BUTTON_ZL, 30 * TICKS_PER_SECOND);
+            return;
         }
     }
 }
@@ -436,20 +445,30 @@ void EggAutonomousState::hatch_rest_of_party(){
     while (m_eggs_in_party > 0){
         dump();
         ShortDialogWatcher dialog;
+        FrozenImageDetector frozen(std::chrono::seconds(60), 20);
         int ret = run_until(
             m_env, m_console,
             [&](const BotBaseContext& context){
                 egg_spin(context, 480 * TICKS_PER_SECOND);
 //                egg_spin(context, 5 * TICKS_PER_SECOND);
             },
-            { &dialog }
+            {
+                &dialog,
+                &frozen,
+            }
         );
-        if (ret < 0){
+        switch (ret){
+        case 0:
+            m_console.log("Egg is hatching!");
+            m_console.botbase().wait_for_all_requests();
+            hatch_egg();
+            break;
+        case 1:
+            process_error("FrozenScreen", "Frozen screen detected. Possible game crash.");
+        default:
             process_error("NoHatch", "No hatch detected after 8 minutes of spinning.");
         }
-        m_console.log("Egg is hatching!");
-        m_console.botbase().wait_for_all_requests();
-        hatch_egg();
+
     }
 }
 void EggAutonomousState::spin_until_fetch_or_hatch(){

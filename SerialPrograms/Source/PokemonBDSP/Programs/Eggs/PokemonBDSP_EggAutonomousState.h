@@ -40,7 +40,8 @@ public:
         Language language,
         ShortcutDirection& shortcut,
         uint16_t travel_time_per_fetch,
-        const EggHatchFilterOption& filters
+        const EggHatchFilterOption& filters,
+        uint8_t max_keepers
     );
 
     bool column_is_filled() const { return m_eggs_in_column >= 5; }
@@ -83,6 +84,7 @@ private:
     ShortcutDirection& m_shortcut;
     uint16_t m_travel_time_per_fetch;
     const EggHatchFilterOption& m_filters;
+    uint8_t m_max_keepers;
 
     bool m_on_bike = true;
     uint8_t m_eggs_in_column = 0;

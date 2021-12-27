@@ -23,7 +23,7 @@ CloneItemsBoxCopy_Descriptor::CloneItemsBoxCopy_Descriptor()
         STRING_POKEMON + " BDSP", "Clone Items (Box Copy)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/CloneItemsBoxCopy.md",
         "Clone 30 items at a time using the menu overlap glitch via the entire box cloning method. "
-        "<font color=\"red\">(This requires game version 1.1.2 or earlier. The glitch it relies on was patched in v1.1.3.)</font>",
+        "<font color=\"red\">(This requires game versions 1.1.0 - 1.1.1. The glitch it relies on was patched in v1.1.2.)</font>",
         FeedbackType::REQUIRED,
         PABotBaseLevel::PABOTBASE_12KB
     )

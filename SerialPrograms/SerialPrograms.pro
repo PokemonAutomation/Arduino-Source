@@ -365,6 +365,7 @@ SOURCES += \
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Types.cpp \
     Source/PokemonSwSh/PokemonSwSh_Panels.cpp \
     Source/PokemonSwSh/PokemonSwSh_Settings.cpp \
+    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-PokeJobsFarmer.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_AutonomousBallThrower.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_BallThrower.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_ClothingBuyer.cpp \
@@ -833,6 +834,7 @@ HEADERS += \
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Types.h \
     Source/PokemonSwSh/PokemonSwSh_Panels.h \
     Source/PokemonSwSh/PokemonSwSh_Settings.h \
+    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-PokeJobsFarmer.h \
     Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperStats.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_AutonomousBallThrower.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_BallThrower.h \

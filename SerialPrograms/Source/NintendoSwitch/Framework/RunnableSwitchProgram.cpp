@@ -211,7 +211,7 @@ void RunnableSwitchProgramWidget::run_program(){
     }catch (CancelledException&){
     }catch (StringException& e){
         signal_error(e.message_qt());
-        send_program_error_notification(
+        send_program_fatal_error_notification(
             m_logger, instance.NOTIFICATION_ERROR_FATAL,
             ProgramInfo(
                 instance.descriptor().identifier(),

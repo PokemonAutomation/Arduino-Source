@@ -52,7 +52,7 @@ private:
     SimpleIntegerOption<uint8_t> MAX_KEEPERS;
     TimeExpressionOption<uint16_t> TRAVEL_TIME_PER_FETCH;
 
-    BooleanCheckBoxOption CHECKPOINTING;
+    EnumDropdownOption AUTO_SAVING;
 
     EggHatchFilterOption FILTERS;
 
