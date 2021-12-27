@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_EggAutonomous_H
 #define PokemonAutomation_PokemonBDSP_EggAutonomous_H
 
+#include "CommonFramework/Options/StaticTextOption.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
@@ -61,6 +62,9 @@ private:
     EventNotificationOption NOTIFICATION_SHINY;
     EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
+
+    SectionDividerOption m_advanced_options;
+    TimeExpressionOption<uint16_t> SCROLL_TO_READ_DELAY;
 };
 
 

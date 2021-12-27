@@ -56,7 +56,7 @@ EggAutonomous::EggAutonomous(const EggAutonomous_Descriptor& descriptor)
     )
     , AUTO_SAVING(
         "<b>Auto-Saving:</b><br>Automatically save the game to recover from crashes and allow eggs to be unhatched.<br>"
-        "(Unhatching eggs can be useful obtaining breeding parents by rehatching a perfect egg in a game with a different language.)<br><br>"
+        "(Unhatching eggs can be useful for obtaining breeding parents by rehatching a perfect egg in a game with a different language.)<br><br>"
         "To collect (unhatched) eggs with the desired stats, set this option to \"Save after every batch\". "
         "Then set the Action Table below to \"Stop Program\" on the desired stats. "
         "Once the program stops on the baby with the desired stats, you can manually reset the game and it will revert to an egg in your party.",
@@ -87,6 +87,14 @@ EggAutonomous::EggAutonomous(const EggAutonomous_Descriptor& descriptor)
         &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
+    , m_advanced_options(
+        "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
+    )
+    , SCROLL_TO_READ_DELAY(
+        "<b>Scroll to Read Delay:</b><br>Wait this long after scrolling in the box to read the " + STRING_POKEMON + "'s stats. "
+        "Increase this if your video has high latency.",
+        "125"
+    )
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(LANGUAGE);
@@ -96,6 +104,8 @@ EggAutonomous::EggAutonomous(const EggAutonomous_Descriptor& descriptor)
     PA_ADD_OPTION(AUTO_SAVING);
     PA_ADD_OPTION(FILTERS);
     PA_ADD_OPTION(NOTIFICATIONS);
+    PA_ADD_STATIC(m_advanced_options);
+    PA_ADD_OPTION(SCROLL_TO_READ_DELAY);
 }
 
 
@@ -161,6 +171,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env){
         NOTIFICATION_NONSHINY_KEEP,
         NOTIFICATION_SHINY,
         NOTIFICATION_ERROR_RECOVERABLE,
+        SCROLL_TO_READ_DELAY,
         LANGUAGE,
         SHORTCUT,
         TRAVEL_TIME_PER_FETCH,

@@ -177,7 +177,7 @@ SOURCES += \
     Source/Integrations/DiscordIntegrationSettings.cpp \
     Source/Integrations/DiscordIntegrationTable.cpp \
     Source/Integrations/DiscordSettingsOption.cpp \
-    Source/Integrations/DiscordWebHook.cpp \
+    Source/Integrations/DiscordWebhook.cpp \
     Source/Integrations/DiscordWebhookSettings.cpp \
     Source/Integrations/IntegrationsAPI.cpp \
     Source/Integrations/ProgramTracker.cpp \
@@ -620,7 +620,7 @@ HEADERS += \
     Source/Integrations/DiscordIntegrationSettings.h \
     Source/Integrations/DiscordIntegrationTable.h \
     Source/Integrations/DiscordSettingsOption.h \
-    Source/Integrations/DiscordWebHook.h \
+    Source/Integrations/DiscordWebhook.h \
     Source/Integrations/DiscordWebhookSettings.h \
     Source/Integrations/IntegrationsAPI.h \
     Source/Integrations/ProgramTracker.h \

@@ -34,7 +34,8 @@ public:
 private:
     QColor m_color;
     BattleType m_battle_type;
-    ImageFloatBox m_left_status;
+    ImageFloatBox m_left0_status;
+    ImageFloatBox m_left1_status;
     ImageFloatBox m_right_status;
     ImageFloatBox m_ball_left;
     ImageFloatBox m_ball_right;

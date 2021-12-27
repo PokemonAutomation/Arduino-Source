@@ -40,6 +40,7 @@ bool BoxShinyDetector::detect(const QImage& screen) const{
         return false;
     }
     ImageStats symbol = image_stats(extract_box(screen, m_symbol));
+//    extract_box(screen, m_symbol).save("test.png");
 //    cout << symbol.average << symbol.stddev << endl;
 
     double average = symbol.average.sum();

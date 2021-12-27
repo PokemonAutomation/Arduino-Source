@@ -302,10 +302,10 @@ file(GLOB MAIN_SOURCES
     Source/Integrations/DiscordIntegrationTable.h
     Source/Integrations/DiscordSettingsOption.cpp
     Source/Integrations/DiscordSettingsOption.h
-    Source/Integrations/DiscordWebHook.cpp
-    Source/Integrations/DiscordWebHook.h
-    Source/Integrations/DiscordWebHookSettings.cpp
-    Source/Integrations/DiscordWebHookSettings.h
+    Source/Integrations/DiscordWebhook.cpp
+    Source/Integrations/DiscordWebhook.h
+    Source/Integrations/DiscordWebhookSettings.cpp
+    Source/Integrations/DiscordWebhookSettings.h
     Source/Integrations/IntegrationsAPI.cpp
     Source/Integrations/IntegrationsAPI.h
     Source/Integrations/ProgramTracker.cpp

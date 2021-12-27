@@ -37,6 +37,7 @@ public:
         EventNotificationOption& notification_nonshiny_keep,
         EventNotificationOption& notification_shiny,
         EventNotificationOption& notification_error,
+        uint16_t scroll_to_read_delay,
         Language language,
         ShortcutDirection& shortcut,
         uint16_t travel_time_per_fetch,
@@ -80,6 +81,7 @@ private:
     EventNotificationOption& m_notification_nonshiny_keep;
     EventNotificationOption& m_notification_shiny;
     EventNotificationOption& m_notification_error;
+    uint16_t m_scroll_to_read_delay;
     Language m_language;
     ShortcutDirection& m_shortcut;
     uint16_t m_travel_time_per_fetch;

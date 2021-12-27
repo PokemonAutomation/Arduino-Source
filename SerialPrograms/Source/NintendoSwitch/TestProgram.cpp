@@ -108,7 +108,7 @@
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h"
 //#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h"
 //#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h"
-#include "Integrations/DiscordWebHook.h"
+#include "Integrations/DiscordWebhook.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyDialogTracker.h"
@@ -235,11 +235,17 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoFeed& feed = env.consoles[0];
     VideoOverlay& overlay = env.consoles[0];
 
-//    BoxShinyDetector detector;
-//    detector.detect(feed.snapshot());
+    BoxShinyDetector detector;
+    cout << detector.detect(QImage("20211226-031611120900.jpg")) << endl;
 
 //    pbf_mash_button(console, BUTTON_X, 10 * TICKS_PER_SECOND);
 
+
+#if 0
+    BattleMenuDetector detector(BattleType::WILD);
+    OverlaySet overlays(overlay);
+    detector.make_overlays(overlays);
+#endif
 
 
     env.wait_for(std::chrono::seconds(60));

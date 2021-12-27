@@ -96,6 +96,7 @@ EggAutonomousState::EggAutonomousState(
     EventNotificationOption& notification_nonshiny_keep,
     EventNotificationOption& notification_shiny,
     EventNotificationOption& notification_error,
+    uint16_t scroll_to_read_delay,
     Language language,
     ShortcutDirection& shortcut,
     uint16_t travel_time_per_fetch,
@@ -107,6 +108,7 @@ EggAutonomousState::EggAutonomousState(
     , m_notification_nonshiny_keep(notification_nonshiny_keep)
     , m_notification_shiny(notification_shiny)
     , m_notification_error(notification_error)
+    , m_scroll_to_read_delay(scroll_to_read_delay)
     , m_language(language)
     , m_shortcut(shortcut)
     , m_travel_time_per_fetch(travel_time_per_fetch)
@@ -186,10 +188,13 @@ bool EggAutonomousState::process_party(){
     m_console.log("Processing party...");
 
     const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
+//    std::chrono::milliseconds SCROLL_TO_READ_DELAY((uint64_t)m_scroll_to_read_delay * 1000 / TICKS_PER_SECOND);
 
     pbf_move_right_joystick(m_console, 0, 128, 20, BOX_SCROLL_DELAY);
     pbf_move_right_joystick(m_console, 128, 255, 20, BOX_SCROLL_DELAY);
+    pbf_wait(m_console, m_scroll_to_read_delay);
     m_console.botbase().wait_for_all_requests();
+//    m_env.wait_for(SCROLL_TO_READ_DELAY);
 
     BoxShinyDetector shiny_reader;
     IVCheckerReaderScope iv_reader(m_console, m_language);
@@ -208,14 +213,16 @@ bool EggAutonomousState::process_party(){
         if (c != 0){
             pbf_move_right_joystick(m_console, 128, 0, 20, BOX_SCROLL_DELAY);
             pbf_move_right_joystick(m_console, 128, 255, 20, BOX_SCROLL_DELAY);
+            pbf_wait(m_console, m_scroll_to_read_delay);
             m_console.botbase().wait_for_all_requests();
+//            m_env.wait_for(SCROLL_TO_READ_DELAY);
+
             screen = m_console.video().snapshot();
             if (!shiny_reader.is_panel(screen)){
                 process_error("StatsPanel", "Stats panel not detected.");
             }
         }
-        m_console.botbase().wait_for_all_requests();
-        m_env.wait_for(std::chrono::milliseconds(500));
+//        m_console.botbase().wait_for_all_requests();
 
         bool shiny = shiny_reader.detect(screen);
         if (shiny){

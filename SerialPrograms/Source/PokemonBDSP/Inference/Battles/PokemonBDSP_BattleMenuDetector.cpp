@@ -22,8 +22,9 @@ namespace PokemonBDSP{
 BattleMenuDetector::BattleMenuDetector(BattleType battle_type, QColor color)
     : m_color(color)
     , m_battle_type(battle_type)
-    , m_left_status (0.685, 0.065, 0.025, 0.040)
-    , m_right_status(0.958, 0.065, 0.025, 0.040)
+    , m_left0_status(0.140, 0.922, 0.100, 0.010)
+    , m_left1_status(0.140, 0.910, 0.100, 0.010)
+    , m_right_status(0.405, 0.925, 0.100, 0.010)
     , m_ball_left   (0.890, 0.475, 0.02, 0.03)
     , m_ball_right  (0.960, 0.475, 0.03, 0.03)
     , m_menu_battle (0.817, 0.585 + 0 * 0.1075, 0.150, 0.070)
@@ -32,7 +33,8 @@ BattleMenuDetector::BattleMenuDetector(BattleType battle_type, QColor color)
     , m_menu_run    (0.817, 0.585 + 3 * 0.1075, 0.150, 0.070)
 {}
 void BattleMenuDetector::make_overlays(OverlaySet& items) const{
-    items.add(m_color, m_left_status);
+    items.add(m_color, m_left0_status);
+    items.add(m_color, m_left1_status);
     items.add(m_color, m_right_status);
     items.add(m_color, m_ball_left);
     items.add(m_color, m_ball_right);
@@ -43,9 +45,10 @@ void BattleMenuDetector::make_overlays(OverlaySet& items) const{
 }
 bool BattleMenuDetector::detect(const QImage& screen) const{
     {
-        bool left = is_white(extract_box(screen, m_left_status));
+        bool left0 = is_white(extract_box(screen, m_left0_status));
+        bool left1 = is_white(extract_box(screen, m_left1_status));
         bool right = is_white(extract_box(screen, m_right_status));
-        if (!left && !right){
+        if (!left0 && !left1 && !right){
             return false;
         }
     }

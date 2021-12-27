@@ -10,7 +10,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "Integrations/DiscordWebHook.h"
+#include "Integrations/DiscordWebhook.h"
 #include "Integrations/SleepyDiscordRunner.h"
 #include "ProgramNotifications.h"
 
@@ -96,7 +96,7 @@ void send_program_notification(
         embed_sleepy = embed;
     }
 
-    Integration::DiscordWebHook::send_message(logger, should_ping, tags, "", embeds, hasFile ? file : nullptr);
+    Integration::DiscordWebhook::send_message(logger, should_ping, tags, "", embeds, hasFile ? file : nullptr);
 #ifdef PA_SLEEPY
     Integration::SleepyDiscordRunner::send_message_sleepy(should_ping, tags, "", embed_sleepy, hasFile ? file : nullptr);
 #endif
@@ -186,9 +186,9 @@ void send_program_telemetry(
             : flip(TELEMETRY_URL, sizeof(TELEMETRY_URL))
     );
 
-    using namespace Integration::DiscordWebHook;
+    using namespace Integration::DiscordWebhook;
 
-    DiscordWebHookSender& sender = DiscordWebHookSender::instance();
+    DiscordWebhookSender& sender = DiscordWebhookSender::instance();
     if (hasFile){
         sender.send_json(logger, url, jsonContent, pending);
     }else{
