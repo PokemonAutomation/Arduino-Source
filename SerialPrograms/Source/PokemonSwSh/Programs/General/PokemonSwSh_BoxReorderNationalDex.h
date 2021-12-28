@@ -1,4 +1,4 @@
-/*  Ordering
+/*  Box Reorder National Dex
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -18,16 +18,16 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class Ordering_Descriptor : public RunnableSwitchProgramDescriptor{
+class BoxReorderNationalDex_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
-    Ordering_Descriptor();
+    BoxReorderNationalDex_Descriptor();
 };
 
 
 
-class Ordering : public SingleSwitchProgramInstance{
+class BoxReorderNationalDex : public SingleSwitchProgramInstance{
 public:
-    Ordering(const Ordering_Descriptor& descriptor);
+    BoxReorderNationalDex(const BoxReorderNationalDex_Descriptor& descriptor);
 
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 

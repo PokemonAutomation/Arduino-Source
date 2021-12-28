@@ -806,14 +806,14 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Programs/General/PokemonSwSh_AutonomousBallThrower.h
     Source/PokemonSwSh/Programs/General/PokemonSwSh_BallThrower.cpp
     Source/PokemonSwSh/Programs/General/PokemonSwSh_BallThrower.h
+    Source/PokemonSwSh/Programs/General/PokemonSwSh_BoxReorderNationalDex.cpp
+    Source/PokemonSwSh/Programs/General/PokemonSwSh_BoxReorderNationalDex.h
     Source/PokemonSwSh/Programs/General/PokemonSwSh_ClothingBuyer.cpp
     Source/PokemonSwSh/Programs/General/PokemonSwSh_ClothingBuyer.h
     Source/PokemonSwSh/Programs/General/PokemonSwSh_DexRecFinder.cpp
     Source/PokemonSwSh/Programs/General/PokemonSwSh_DexRecFinder.h
     Source/PokemonSwSh/Programs/General/PokemonSwSh_MassRelease.cpp
     Source/PokemonSwSh/Programs/General/PokemonSwSh_MassRelease.h
-    Source/PokemonSwSh/Programs/General/PokemonSwSh_Ordering.cpp
-    Source/PokemonSwSh/Programs/General/PokemonSwSh_Ordering.h
     Source/PokemonSwSh/Programs/General/PokemonSwSh_SurpriseTrade.cpp
     Source/PokemonSwSh/Programs/General/PokemonSwSh_SurpriseTrade.h
     Source/PokemonSwSh/Programs/General/PokemonSwSh_TradeBot.cpp

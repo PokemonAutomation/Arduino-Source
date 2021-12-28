@@ -1,4 +1,4 @@
-/*  Ordering
+/*  Box Reorder National Dex
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -12,7 +12,7 @@
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Programs/ReleaseHelpers.h"
-#include "PokemonSwSh_Ordering.h"
+#include "PokemonSwSh_BoxReorderNationalDex.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -94,11 +94,11 @@ namespace{
     }
 }
 
-Ordering_Descriptor::Ordering_Descriptor()
+BoxReorderNationalDex_Descriptor::BoxReorderNationalDex_Descriptor()
     : RunnableSwitchProgramDescriptor(
-        "PokemonSwSh:Ordering",
-        STRING_POKEMON + " SwSh", "Ordering",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/Ordering.md",
+        "PokemonSwSh:BoxReorderNationalDex",
+        STRING_POKEMON + " SwSh", "Box Reorder National Dex",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/BoxReorderNationalDex.md",
         "Order boxes of " + STRING_POKEMON + ".",
         FeedbackType::REQUIRED,
         PABotBaseLevel::PABOTBASE_12KB
@@ -107,7 +107,7 @@ Ordering_Descriptor::Ordering_Descriptor()
 
 
 
-Ordering::Ordering(const Ordering_Descriptor& descriptor)
+BoxReorderNationalDex::BoxReorderNationalDex(const BoxReorderNationalDex_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , LANGUAGE(
         "<b>Game Language:</b><br>This needs to be set correctly for " + STRING_POKEMON + " to be identified correctly.",
@@ -128,7 +128,7 @@ Ordering::Ordering(const Ordering_Descriptor& descriptor)
     PA_ADD_OPTION(DODGE_SYSTEM_UPDATE_WINDOW);
 }
 
-void Ordering::program(SingleSwitchProgramEnvironment& env){
+void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_no_interact(env.console, DODGE_SYSTEM_UPDATE_WINDOW);
