@@ -19,6 +19,7 @@
 #include "Programs/General/PokemonSwSh_BallThrower.h"
 #include "Programs/General/PokemonSwSh_AutonomousBallThrower.h"
 #include "Programs/General/PokemonSwSh_DexRecFinder.h"
+#include "Programs/General/PokemonSwSh_Ordering.h"
 
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-WattFarmer.h"
 #include "Programs/DateSpamFarmers/PokemonSwSh_DateSpam-BerryFarmer.h"
@@ -104,6 +105,7 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<BallThrower_Descriptor, BallThrower>();
     add_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>();
     add_program<DexRecFinder_Descriptor, DexRecFinder>();
+    add_program<Ordering_Descriptor, Ordering>();
 
     add_divider("---- Date-Spam Farmers ----");
     add_program<WattFarmer_Descriptor, WattFarmer>();
