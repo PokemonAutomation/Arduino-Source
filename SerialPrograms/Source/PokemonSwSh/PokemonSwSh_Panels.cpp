@@ -63,6 +63,7 @@
 #include "Programs/OverworldBot/PokemonSwSh_ShinyHuntAutonomous-Overworld.h"
 
 #include "Programs/EggPrograms/PokemonSwSh_EggFetcher2.h"
+#include "Programs/EggPrograms/PokemonSwSh_EggFetcherMultiple.h"
 #include "Programs/EggPrograms/PokemonSwSh_EggHatcher.h"
 #include "Programs/EggPrograms/PokemonSwSh_EggCombined2.h"
 #include "Programs/EggPrograms/PokemonSwSh_EggSuperCombined2.h"
@@ -154,6 +155,7 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
 
     add_divider("---- Eggs ----");
     add_program<EggFetcher2_Descriptor, EggFetcher2>();
+    add_program<EggFetcherMultiple_Descriptor, EggFetcherMultiple>();
     add_program<EggHatcher_Descriptor, EggHatcher>();
     add_program<EggCombined2_Descriptor, EggCombined2>();
     add_program<EggSuperCombined2_Descriptor, EggSuperCombined2>();

@@ -791,6 +791,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggCombinedShared.h
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggFetcher2.cpp
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggFetcher2.h
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggFetcherMultiple.cpp
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggFetcherMultiple.h
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggHatcher.cpp
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggHatcher.h
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggHelpers.h
