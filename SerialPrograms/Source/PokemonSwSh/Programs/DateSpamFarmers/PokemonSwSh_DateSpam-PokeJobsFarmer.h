@@ -1,4 +1,4 @@
-/*  PokéJobs Farmer
+/*  PokeJobs Farmer
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
