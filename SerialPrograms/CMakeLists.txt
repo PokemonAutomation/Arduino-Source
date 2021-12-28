@@ -806,6 +806,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Programs/General/PokemonSwSh_AutonomousBallThrower.h
     Source/PokemonSwSh/Programs/General/PokemonSwSh_BallThrower.cpp
     Source/PokemonSwSh/Programs/General/PokemonSwSh_BallThrower.h
+    Source/PokemonSwSh/Programs/General/PokemonSwSh_BoxReorderNationalDex.cpp
+    Source/PokemonSwSh/Programs/General/PokemonSwSh_BoxReorderNationalDex.h
     Source/PokemonSwSh/Programs/General/PokemonSwSh_ClothingBuyer.cpp
     Source/PokemonSwSh/Programs/General/PokemonSwSh_ClothingBuyer.h
     Source/PokemonSwSh/Programs/General/PokemonSwSh_DexRecFinder.cpp
