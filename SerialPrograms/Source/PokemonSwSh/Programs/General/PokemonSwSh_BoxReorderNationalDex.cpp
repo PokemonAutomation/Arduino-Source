@@ -20,7 +20,7 @@ namespace PokemonSwSh{
 
 namespace{
     constexpr uint16_t k_wait_after_move = TICKS_PER_SECOND / 1.5;
-    constexpr std::chrono::duration k_wait_after_read = std::chrono::milliseconds(200);
+    constexpr std::chrono::milliseconds k_wait_after_read = std::chrono::milliseconds(200);
 
     std::tuple<uint16_t, uint16_t, uint16_t> get_location(uint16_t index){
         uint16_t box = index / 30;

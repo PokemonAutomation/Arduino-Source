@@ -70,7 +70,7 @@ public:
     bool process_party();   //  Returns true if program should stop.
 
 private:
-    void process_error(const std::string& name, const char* message);
+    [[noreturn]] void process_error(const std::string& name, const char* message);
     void process_shiny(const QImage& screen);
 
 private:

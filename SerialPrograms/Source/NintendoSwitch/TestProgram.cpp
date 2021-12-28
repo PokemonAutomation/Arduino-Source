@@ -134,6 +134,7 @@
 #include "PokemonBDSP/Programs/PokemonBDSP_RunFromBattle.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_BoxRelease.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h"
+#include "CommonFramework/BinaryImage/BinaryImage.h"
 #include "TestProgram.h"
 
 #include <immintrin.h>
@@ -188,8 +189,8 @@ TestProgram::TestProgram(const TestProgram_Descriptor& descriptor)
 }
 
 
-using namespace Kernels;
-using namespace Kernels::WaterFill;
+//using namespace Kernels;
+//using namespace Kernels::WaterFill;
 
 
 
@@ -236,12 +237,30 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
+    QImage image("screenshot-20211227-082121670685.png");
+    image = extract_box(image, ImageFloatBox({0.95, 0.10, 0.05, 0.10}));
+    image.save("test.png");
+
+
+    BinaryImage binary_image = filter_rgb32_range(
+        image,
+        255, 255,
+        128, 255,
+        0, 128,
+        0, 128
+    );
+    cout << binary_image.dump() << endl;
+
+
+
+#if 0
     ShortDialogDetector detector;
     OverlaySet overlays(overlay);
     detector.make_overlays(overlays);
 
     cout << detector.detect(QImage("20211228-013942613330.jpg")) << endl;
 //    cout << detector.detect(feed.snapshot()) << endl;
+#endif
 
 
 

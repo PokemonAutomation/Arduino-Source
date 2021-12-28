@@ -7,8 +7,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_CommonFilters_H
-#define PokemonAutomation_CommonFramework_CommonFilters_H
+#ifndef PokemonAutomation_CommonFramework_ImageTools_CommonFilters_H
+#define PokemonAutomation_CommonFramework_ImageTools_CommonFilters_H
 
 #include "CellMatrix.h"
 
@@ -67,6 +67,7 @@ struct BrightFilter{
         count += set;
     }
 };
+
 
 
 }

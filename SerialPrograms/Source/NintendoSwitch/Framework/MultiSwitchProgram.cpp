@@ -4,10 +4,10 @@
  *
  */
 
+#include <cstddef>
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "MultiSwitchProgram.h"
 
-#include <cstddef>
 #include <iostream>
 using std::cout;
 using std::endl;

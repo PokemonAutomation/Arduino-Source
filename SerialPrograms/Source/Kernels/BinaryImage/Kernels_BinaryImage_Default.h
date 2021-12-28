@@ -13,7 +13,13 @@ namespace PokemonAutomation{
 namespace Kernels{
 
 
-class BinaryImage_Default : public BinaryImageBase<uint64_t>{
+struct BinaryImageContext_Default{
+    using vtype = uint64_t;
+};
+
+
+
+class BinaryImage_Default : public BinaryImageBase<BinaryImageContext_Default>{
     using Word = uint64_t;
 
 public:

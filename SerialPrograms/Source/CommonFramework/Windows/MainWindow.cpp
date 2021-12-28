@@ -116,7 +116,7 @@ MainWindow::MainWindow(QWidget* parent)
                 box.information(
                     nullptr,
                     "About",
-                    STRING_POKEMON + " Automation Feedback Programs (" + PROGRAM_VERSION + ")<br>" +
+                    STRING_POKEMON + " Automation Computer-Control Programs (" + PROGRAM_VERSION + ")<br>" +
                     "Copyright: 2020 - 2021<br>" +
                     "<br>"
                     "Made by the " + STRING_POKEMON + " Automation Discord Server.<br>"

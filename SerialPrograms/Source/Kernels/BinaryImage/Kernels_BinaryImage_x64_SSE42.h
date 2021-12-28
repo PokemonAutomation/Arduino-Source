@@ -14,7 +14,12 @@ namespace PokemonAutomation{
 namespace Kernels{
 
 
-class BinaryImage_x64_SSE42 : public BinaryImageBase<__m128i>{
+struct BinaryImageContext_x64_SSE42{
+    using vtype = __m128i;
+};
+
+
+class BinaryImage_x64_SSE42 : public BinaryImageBase<BinaryImageContext_x64_SSE42>{
     using Word = __m128i;
 
 public:

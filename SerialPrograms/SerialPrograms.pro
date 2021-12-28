@@ -20,7 +20,7 @@ exists(../../Internal/SerialPrograms/TelemetryURLs.h){
 }
 
 win32-g++{
-    CONFIG += c++14
+    CONFIG += c++1z
 
     QMAKE_CXXFLAGS += -march=nehalem
     QMAKE_CXXFLAGS += -Wno-comment
@@ -89,6 +89,7 @@ SOURCES += \
     ../Common/Qt/Options/SwitchDateOptionBase.cpp \
     ../Common/Qt/Options/TimeExpressionOptionBase.cpp \
     ../Common/Qt/QtJsonTools.cpp \
+    Source/CommonFramework/BinaryImage/BinaryImage.cpp \
     Source/CommonFramework/CrashDump.cpp \
     Source/CommonFramework/Environment/Environment.cpp \
     Source/CommonFramework/Environment/Environment_Linux.cpp \
@@ -366,8 +367,10 @@ SOURCES += \
     Source/PokemonSwSh/PokemonSwSh_Panels.cpp \
     Source/PokemonSwSh/PokemonSwSh_Settings.cpp \
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-PokeJobsFarmer.cpp \
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggFetcherMultiple.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_AutonomousBallThrower.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_BallThrower.cpp \
+    Source/PokemonSwSh/Programs/General/PokemonSwSh_BoxReorderNationalDex.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_ClothingBuyer.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_DexRecFinder.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_MassRelease.cpp \
@@ -520,6 +523,7 @@ HEADERS += \
     ../Common/Qt/Options/TimeExpressionOptionBase.h \
     ../Common/Qt/QtJsonTools.h \
     ../Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h \
+    Source/CommonFramework/BinaryImage/BinaryImage.h \
     Source/CommonFramework/CrashDump.h \
     Source/CommonFramework/Environment/Environment.h \
     Source/CommonFramework/Environment/HardwareValidation.h \
@@ -836,8 +840,10 @@ HEADERS += \
     Source/PokemonSwSh/PokemonSwSh_Settings.h \
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-PokeJobsFarmer.h \
     Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperStats.h \
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggFetcherMultiple.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_AutonomousBallThrower.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_BallThrower.h \
+    Source/PokemonSwSh/Programs/General/PokemonSwSh_BoxReorderNationalDex.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_ClothingBuyer.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_DexRecFinder.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_MassRelease.h \

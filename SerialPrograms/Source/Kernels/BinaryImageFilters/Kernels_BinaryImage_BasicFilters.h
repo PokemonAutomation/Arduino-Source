@@ -58,6 +58,14 @@ void filter_min_rgb32(
     const uint32_t* image, size_t bytes_per_row,
     uint8_t min_alpha, uint8_t min_red, uint8_t min_green, uint8_t min_blue
 );
+void filter_rgb32_range(
+    BinaryImage& binary_image,
+    const uint32_t* image, size_t bytes_per_row,
+    uint8_t min_alpha, uint8_t max_alpha,
+    uint8_t min_red, uint8_t max_red,
+    uint8_t min_green, uint8_t max_green,
+    uint8_t min_blue, uint8_t max_blue
+);
 
 
 }

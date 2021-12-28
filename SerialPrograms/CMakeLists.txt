@@ -116,6 +116,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/TimeExpressionOptionBase.h
     ../Common/Qt/QtJsonTools.cpp
     ../Common/Qt/QtJsonTools.h
+    Source/CommonFramework/BinaryImage/BinaryImage.cpp
+    Source/CommonFramework/BinaryImage/BinaryImage.h
     Source/CommonFramework/CrashDump.cpp
     Source/CommonFramework/CrashDump.h
     Source/CommonFramework/GlobalSettingsPanel.cpp
