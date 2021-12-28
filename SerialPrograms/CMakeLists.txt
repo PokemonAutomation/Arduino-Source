@@ -919,7 +919,7 @@ target_link_libraries(SerialPrograms Qt${QT_MAJOR}::Widgets Qt${QT_MAJOR}::Seria
 target_compile_definitions(SerialPrograms PRIVATE NOMINMAX)
 
 if (EXISTS "../../Internal/SerialPrograms/TelemetryURLs.h")
-target_compile_definitions(SerialPrograms PRIVATE PA_OFFICIAL)
+    target_compile_definitions(SerialPrograms PRIVATE PA_OFFICIAL)
 endif()
 
 #add include directory
@@ -939,6 +939,22 @@ if (MSVC)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512)
 else()
     target_compile_options(SerialPrograms PRIVATE -msse4.2)
+
+    #we hope to use our own Tesseract build in future so we can rid that dependency
+    #but right now to run on Linux and Mac we need to use external Tesseract library
+    if (UNIX_LINK_TESSERACT)
+        target_compile_definitions(SerialPrograms PRIVATE PA_TESSERACT UNIX_LINK_TESSERACT)
+        find_package(PkgConfig REQUIRED)
+        pkg_search_module(TESSERACT REQUIRED tesseract)
+        pkg_search_module(LEPTONICA REQUIRED lept)
+        include_directories(${TESSERACT_INCLUDE_DIRS})
+        include_directories(${LEPTONICA_INCLUDE_DIRS})
+        link_directories(${TESSERACT_LIBRARY_DIRS})
+        link_directories(${LEPTONICA_LIBRARY_DIRS})
+        target_link_libraries(SerialPrograms ${TESSERACT_LINK_LIBRARIES})
+        target_link_libraries(SerialPrograms ${LEPTONICA_LINK_LIBRARIES})
+    endif()
+
 endif()
 
 #copy needed dlls

@@ -1,5 +1,6 @@
 
 #include <QApplication>
+#include <QtGlobal>
 #include "Common/Cpp/Exception.h"
 #include "PersistentSettings.h"
 #include "CrashDump.h"
@@ -26,7 +27,9 @@ Q_DECLARE_METATYPE(std::string)
 int main(int argc, char *argv[]){
     setup_crash_handler();
 
+#if QT_VERSION_MAJOR == 5 // AA_EnableHighDpiScaling is deprecated in Qt6
     QApplication::setAttribute(Qt::AA_EnableHighDpiScaling);
+#endif
     QApplication application(argc, argv);
 
     qRegisterMetaType<uint8_t>("uint8_t");

@@ -29,7 +29,7 @@ public:
 
     bool detect(const QImage& frame);
 
-    virtual void make_overlays(OverlaySet& items) const;
+    virtual void make_overlays(OverlaySet& items) const override;
     virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
@@ -44,7 +44,7 @@ class FishingHookDetector : public VisualInferenceCallback{
 public:
     FishingHookDetector(VideoOverlay& overlay);
 
-    virtual void make_overlays(OverlaySet& items) const;
+    virtual void make_overlays(OverlaySet& items) const override;
     virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp

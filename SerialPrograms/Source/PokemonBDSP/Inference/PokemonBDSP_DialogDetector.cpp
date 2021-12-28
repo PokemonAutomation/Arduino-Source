@@ -8,6 +8,10 @@
 #include "CommonFramework/Inference/ImageTools.h"
 #include "PokemonBDSP_DialogDetector.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
@@ -15,15 +19,17 @@ namespace PokemonBDSP{
 
 ShortDialogDetector::ShortDialogDetector(QColor color)
     : m_color(color)
-    , m_bottom(0.50, 0.91, 0.29, 0.05)
+//    , m_bottom(0.50, 0.91, 0.29, 0.05)
     , m_left_white(0.21, 0.835, 0.008, 0.12)
     , m_left(0.18, 0.835, 0.02, 0.12)
+    , m_right_white(0.785, 0.835, 0.008, 0.12)
     , m_right(0.822, 0.835, 0.02, 0.12)
 {}
 void ShortDialogDetector::make_overlays(OverlaySet& items) const{
-    items.add(m_color, m_bottom);
+//    items.add(m_color, m_bottom);
     items.add(m_color, m_left_white);
     items.add(m_color, m_left);
+    items.add(m_color, m_right_white);
     items.add(m_color, m_right);
 }
 bool ShortDialogDetector::detect(const QImage& screen) const{
@@ -31,18 +37,22 @@ bool ShortDialogDetector::detect(const QImage& screen) const{
     if (!is_white(left_white)){
         return false;
     }
-    ImageStats bottom = image_stats(extract_box(screen, m_bottom));
-    if (!is_white(bottom)){
+    ImageStats right_white = image_stats(extract_box(screen, m_right_white));
+    if (!is_white(right_white)){
         return false;
     }
+//    ImageStats bottom = image_stats(extract_box(screen, m_bottom));
+//    if (!is_white(bottom)){
+//        return false;
+//    }
     ImageStats left = image_stats(extract_box(screen, m_left));
 //    cout << left.stddev << endl;
-    if (left.stddev.sum() < 50){
+    if (left.stddev.sum() < 30){
         return false;
     }
     ImageStats right = image_stats(extract_box(screen, m_right));
 //    cout << right.stddev << endl;
-    if (right.stddev.sum() < 50){
+    if (right.stddev.sum() < 30){
         return false;
     }
     return true;

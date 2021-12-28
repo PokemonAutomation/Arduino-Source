@@ -17,20 +17,20 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
-// Program component to trigger an overworld encounter.
+//  Program component to trigger an overworld encounter.
 class OverworldTrigger : public GroupOption{
 public:
     OverworldTrigger();
 
-    // Move character back and forth or use Sweet Scent to trigger an encounter.
-    // Return true if the start of a battle is detected.
-    // Return false if an unexpected battle happens where the battle menu is detected but not
-    //   the starting animation.
-    // Throw exception if inference times out after Sweet Scent is used.
+    //  Move character back and forth or use Sweet Scent to trigger an encounter.
+    //  Return true if the start of a battle is detected.
+    //  Return false if an unexpected battle happens where the battle menu is detected but
+    //  not the starting animation.
+    //  Throw exception if inference times out after Sweet Scent is used.
     bool find_encounter(SingleSwitchProgramEnvironment& env) const;
 
 private:
-    // Move character up and down or left and right once.
+    //  Move character up and down or left and right once.
     void run_trigger(const BotBaseContext& context) const;
 
 public:

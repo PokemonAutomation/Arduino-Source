@@ -84,13 +84,13 @@ void OverworldTrigger::run_trigger(const BotBaseContext& context) const{
     }
 }
 
-bool OverworldTrigger::find_encounter(SingleSwitchProgramEnvironment& env) const {
+bool OverworldTrigger::find_encounter(SingleSwitchProgramEnvironment& env) const{
     BattleMenuWatcher battle_menu_detector(BattleType::WILD);
     StartBattleDetector start_battle_detector(env.console);
 
     int result = 0;
-    if (TRIGGER_METHOD < 6) {
-        // Move character back and forth to trigger encounter.
+    if (TRIGGER_METHOD < 6){
+        //  Move character back and forth to trigger encounter.
         result = run_until(
             env, env.console,
             [&](const BotBaseContext& context){
@@ -103,36 +103,36 @@ bool OverworldTrigger::find_encounter(SingleSwitchProgramEnvironment& env) const
                 &start_battle_detector,
             }
         );
-    } else {
-        // Use Sweet Scent to trigger encounter.
+    }else{
+        //  Use Sweet Scent to trigger encounter.
         overworld_to_menu(env, env.console);
 
-        // Go to pokemon page
+        //  Go to pokemon page
         const uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
         pbf_press_button(env.console, BUTTON_ZL, 20, MENU_TO_POKEMON_DELAY);
 
-        // Go to the pokemon that knows Sweet Scent
+        //  Go to the pokemon that knows Sweet Scent
         const size_t location = SWEET_SCENT_POKEMON_LOCATION;
         const uint16_t change_pokemon_delay = 20;
-        if (location >= 1 && location <= 3) {
+        if (location >= 1 && location <= 3){
             const size_t move_down_times = location;
-            for(size_t i = 0; i < move_down_times; ++i) {
+            for(size_t i = 0; i < move_down_times; ++i){
                 pbf_press_dpad(env.console, DPAD_DOWN, 1, change_pokemon_delay);
             }
-        } else if (location >= 1) { // for location 4 and 5
+        }else if (location >= 1){ // for location 4 and 5
             const size_t move_down_times = 6 - location;
-            for(size_t i = 0; i < move_down_times; ++i) {
+            for (size_t i = 0; i < move_down_times; ++i){
                 pbf_press_dpad(env.console, DPAD_UP, 1, change_pokemon_delay);
             }
         }
 
-        // Open the pokemon menu of the first pokemon
+        //  Open the pokemon menu of the first pokemon
         const uint16_t pokemon_to_pokemon_menu_delay = 30;
         pbf_press_button(env.console, BUTTON_ZL, 20, pokemon_to_pokemon_menu_delay);
-        // Move down one menuitem to select "Sweet Scent"
+        //  Move down one menuitem to select "Sweet Scent"
         const uint16_t move_pokemon_menu_item_delay = 30;
         pbf_press_dpad(env.console, DPAD_DOWN, 1, move_pokemon_menu_item_delay);
-        // Use sweet scent
+        //  Use sweet scent
         pbf_mash_button(env.console, BUTTON_ZL, 30);
 
         result = wait_until(

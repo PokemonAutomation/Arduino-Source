@@ -235,10 +235,22 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoFeed& feed = env.consoles[0];
     VideoOverlay& overlay = env.consoles[0];
 
+
+    ShortDialogDetector detector;
+    OverlaySet overlays(overlay);
+    detector.make_overlays(overlays);
+
+    cout << detector.detect(QImage("20211228-013942613330.jpg")) << endl;
+//    cout << detector.detect(feed.snapshot()) << endl;
+
+
+
+#if 0
     BoxShinyDetector detector;
     cout << detector.detect(QImage("20211226-031611120900.jpg")) << endl;
 
 //    pbf_mash_button(console, BUTTON_X, 10 * TICKS_PER_SECOND);
+#endif
 
 
 #if 0
