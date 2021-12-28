@@ -4,6 +4,8 @@
  *
  */
 
+#include <cstddef>
+
 #include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
 #include "PokemonSwSh_MaxLair_AI_PathMatchup.h"
 

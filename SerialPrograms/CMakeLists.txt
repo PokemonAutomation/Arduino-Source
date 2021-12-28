@@ -19,6 +19,10 @@ set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
 
+#Find threads library
+set(THREADS_PREFER_PTHREAD_FLAG ON)
+find_package(Threads REQUIRED)
+
 #find Qt
 if(NOT QT_MAJOR)
     set(QT_MAJOR 5)
@@ -918,6 +922,7 @@ file(GLOB MAIN_SOURCES
 add_executable(SerialPrograms WIN32 ${MAIN_SOURCES})
 set_target_properties(SerialPrograms PROPERTIES LINKER_LANGUAGE CXX)
 target_link_libraries(SerialPrograms Qt${QT_MAJOR}::Widgets Qt${QT_MAJOR}::SerialPort Qt${QT_MAJOR}::Multimedia Qt${QT_MAJOR}::MultimediaWidgets)
+target_link_libraries(SerialPrograms Threads::Threads)
 
 #add defines
 target_compile_definitions(SerialPrograms PRIVATE NOMINMAX)

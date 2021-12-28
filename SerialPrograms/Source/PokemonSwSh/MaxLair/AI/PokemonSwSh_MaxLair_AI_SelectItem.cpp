@@ -4,6 +4,7 @@
  *
  */
 
+#include <cstddef>
 #include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
 
 namespace PokemonAutomation{

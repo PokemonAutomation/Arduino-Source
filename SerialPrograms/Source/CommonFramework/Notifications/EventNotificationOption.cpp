@@ -91,7 +91,7 @@ QJsonValue EventNotificationSettings::to_json(bool enable_screenshot) const{
         array.append(tag);
     }
     obj.insert("Tags", array);
-    obj.insert("RateLimitSeconds", rate_limit.count());
+    obj.insert("RateLimitSeconds", (qint64)rate_limit.count());
     return obj;
 }
 

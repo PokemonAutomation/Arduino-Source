@@ -8,6 +8,7 @@
 #define PokemonAutomation_AbstractBotBase_H
 
 #include <stdint.h>
+#include <cstring>
 #include <string>
 #include <atomic>
 #include "Common/Cpp/Exception.h"
