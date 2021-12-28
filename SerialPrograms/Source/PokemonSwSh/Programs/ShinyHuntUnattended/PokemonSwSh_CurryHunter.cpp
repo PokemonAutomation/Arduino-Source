@@ -251,7 +251,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env){
         }
 
 
-        //  If you talked to the curry Pokémon too early, you can end up talking to one of your Pokemon
+        //  If you talked to the curry Pokemon too early, you can end up talking to one of your Pokemon
         //  Once you reach this part of the program. The following sequence ensures that you
         //  Are in a correct state to cook again.
         pbf_move_left_joystick(env.console, 0xff, 0x80, 125, 5);
