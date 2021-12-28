@@ -15,7 +15,6 @@
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"
 #include "PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h"
-#include "PokemonBDSP/Programs/PokemonBDSP_OverworldTrigger.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
