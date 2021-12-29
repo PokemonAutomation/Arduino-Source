@@ -49,8 +49,7 @@ void fast_reset_game(
     uint16_t start_game_mash, uint16_t start_game_wait,
     uint16_t enter_game_mash, uint16_t enter_game_wait
 ){
-    context->issue_request(
-        &context.cancelled_bool(),
+    context.issue_request(
         DeviceRequest_fast_reset_game(
             start_game_mash, start_game_wait,
             enter_game_mash, enter_game_wait
@@ -89,8 +88,7 @@ void settings_to_enter_game_den_lobby(
     uint16_t enter_switch_pokemon_delay,
     uint16_t exit_switch_pokemon_delay
 ){
-    context->issue_request(
-        &context.cancelled_bool(),
+    context.issue_request(
         DeviceRequest_settings_to_enter_game_den_lobby(
             tolerate_update_menu, fast,
             enter_switch_pokemon_delay,
@@ -152,8 +150,7 @@ void start_game_from_home(const BotBaseContext& context, bool tolerate_update_me
 }
 
 void enter_game(const BotBaseContext& context, bool backup_save, uint16_t enter_game_mash, uint16_t enter_game_wait){
-    context->issue_request(
-        &context.cancelled_bool(),
+    context.issue_request(
         DeviceRequest_enter_game(backup_save, enter_game_mash, enter_game_wait)
     );
 }

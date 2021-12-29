@@ -14,50 +14,42 @@ namespace NintendoSwitch{
 
 
 void skipper_init_view(const BotBaseContext& context){
-    context->issue_request(
-        &context.cancelled_bool(),
+    context.issue_request(
         DeviceRequest_skipper_init_view()
     );
 }
 void skipper_auto_recovery(const BotBaseContext& context){
-    context->issue_request(
-        &context.cancelled_bool(),
+    context.issue_request(
         DeviceRequest_skipper_auto_recovery()
     );
 }
 void skipper_rollback_year_full(const BotBaseContext& context, bool date_us){
-    context->issue_request(
-        &context.cancelled_bool(),
+    context.issue_request(
         DeviceRequest_skipper_rollback_year_full(date_us)
     );
 }
 void skipper_rollback_year_sync(const BotBaseContext& context){
-    context->issue_request(
-        &context.cancelled_bool(),
+    context.issue_request(
         DeviceRequest_skipper_rollback_year_sync()
     );
 }
 void skipper_increment_day(const BotBaseContext& context, bool date_us){
-    context->issue_request(
-        &context.cancelled_bool(),
+    context.issue_request(
         DeviceRequest_skipper_increment_day(date_us)
     );
 }
 void skipper_increment_month(const BotBaseContext& context, uint8_t days){
-    context->issue_request(
-        &context.cancelled_bool(),
+    context.issue_request(
         DeviceRequest_skipper_increment_month(days)
     );
 }
 void skipper_increment_all(const BotBaseContext& context){
-    context->issue_request(
-        &context.cancelled_bool(),
+    context.issue_request(
         DeviceRequest_skipper_increment_all()
     );
 }
 void skipper_increment_all_rollback(const BotBaseContext& context){
-    context->issue_request(
-        &context.cancelled_bool(),
+    context.issue_request(
         DeviceRequest_skipper_increment_all_rollback()
     );
 }

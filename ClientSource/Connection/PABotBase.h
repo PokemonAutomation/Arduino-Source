@@ -151,16 +151,16 @@ private:
     );
 
     virtual bool try_issue_request(
-        const std::atomic<bool>* cancelled,
-        const BotBaseRequest& request
+        const BotBaseRequest& request,
+        const std::atomic<bool>* cancelled
     ) override;
     virtual void issue_request(
-        const std::atomic<bool>* cancelled,
-        const BotBaseRequest& request
+        const BotBaseRequest& request,
+        const std::atomic<bool>* cancelled
     ) override;
     virtual BotBaseMessage issue_request_and_wait(
-        const std::atomic<bool>* cancelled,
-        const BotBaseRequest& request
+        const BotBaseRequest& request,
+        const std::atomic<bool>* cancelled
     ) override;
 
 

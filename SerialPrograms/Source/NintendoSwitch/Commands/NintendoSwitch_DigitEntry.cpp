@@ -39,10 +39,7 @@ uint8_t convert_digit(uint8_t digit){
     return digit;
 }
 void enter_digits(const BotBaseContext& context, uint8_t count, const uint8_t* digits){
-    context->issue_request(
-        &context.cancelled_bool(),
-        DeviceRequest_enter_digits(count, digits)
-    );
+    context.issue_request(DeviceRequest_enter_digits(count, digits));
 }
 
 

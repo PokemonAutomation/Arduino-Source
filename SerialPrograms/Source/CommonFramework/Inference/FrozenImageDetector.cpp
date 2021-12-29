@@ -15,27 +15,39 @@ namespace PokemonAutomation{
 
 
 FrozenImageDetector::FrozenImageDetector(std::chrono::milliseconds timeout, double rmsd_threshold)
-    : m_timeout(timeout)
+    : m_color(Qt::cyan)
+    , m_box(0.0, 0.0, 1.0, 1.0)
+    , m_timeout(timeout)
     , m_rmsd_threshold(rmsd_threshold)
 {}
-void FrozenImageDetector::make_overlays(OverlaySet&) const{
-
+FrozenImageDetector::FrozenImageDetector(
+    QColor color, const ImageFloatBox& box,
+    std::chrono::milliseconds timeout, double rmsd_threshold
+)
+    : m_color(color)
+    , m_box(box)
+    , m_timeout(timeout)
+    , m_rmsd_threshold(rmsd_threshold)
+{}
+void FrozenImageDetector::make_overlays(OverlaySet& set) const{
+    set.add(m_color, m_box);
 }
 bool FrozenImageDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
-    if (m_last_delta.size() != frame.size()){
+    QImage image = extract_box(frame, m_box);
+    if (m_last_delta.size() != image.size()){
         m_timestamp = timestamp;
-        m_last_delta = frame;
+        m_last_delta = image;
         return false;
     }
 
-    double rmsd = ImageMatch::pixel_RMSD(m_last_delta, frame);
+    double rmsd = ImageMatch::pixel_RMSD(m_last_delta, image);
 //    cout << "rmsd = " << rmsd << endl;
     if (rmsd > m_rmsd_threshold){
         m_timestamp = timestamp;
-        m_last_delta = frame;
+        m_last_delta = image;
         return false;
     }
 

@@ -21,8 +21,7 @@ void connect_to_internet(
     uint16_t open_ycomm_delay,
     uint16_t connect_to_internet_delay
 ){
-    context->issue_request(
-        &context.cancelled_bool(),
+    context.issue_request(
         DeviceRequest_connect_to_internet(open_ycomm_delay, connect_to_internet_delay)
     );
 }
@@ -32,8 +31,7 @@ void home_to_add_friends(
     uint8_t scroll_down,
     bool fix_cursor
 ){
-    context->issue_request(
-        &context.cancelled_bool(),
+    context.issue_request(
         DeviceRequest_home_to_add_friends(user_slot, scroll_down, fix_cursor)
     );
 }

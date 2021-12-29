@@ -27,7 +27,7 @@ void hatch_egg(ProgramEnvironment& env, ConsoleHandle& console){
     //  Spin until egg starts hatching.
     do{
         ShortDialogWatcher dialog;
-        FrozenImageDetector frozen(std::chrono::seconds(10), 20);
+        FrozenImageDetector frozen(Qt::cyan, {0, 0, 1, 0.5}, std::chrono::seconds(10), 20);
         if (dialog.detect(console.video().snapshot())){
             break;
         }

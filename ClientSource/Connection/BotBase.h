@@ -40,16 +40,16 @@ public:
 
 public:
     virtual bool try_issue_request(
-        const std::atomic<bool>* cancelled,
-        const BotBaseRequest& request
+        const BotBaseRequest& request,
+        const std::atomic<bool>* cancelled = nullptr
     ) = 0;
     virtual void issue_request(
-        const std::atomic<bool>* cancelled,
-        const BotBaseRequest& request
+        const BotBaseRequest& request,
+        const std::atomic<bool>* cancelled = nullptr
     ) = 0;
     virtual BotBaseMessage issue_request_and_wait(
-        const std::atomic<bool>* cancelled,
-        const BotBaseRequest& request
+        const BotBaseRequest& request,
+        const std::atomic<bool>* cancelled = nullptr
     ) = 0;
 
 };
@@ -60,17 +60,17 @@ public:
 class BotBaseContext{
 public:
     BotBaseContext(BotBase& botbase)
-        : m_botbase(&botbase)
+        : m_botbase(botbase)
         , m_cancelled(false)
     {}
 
-    BotBase& botbase() const{ return *m_botbase; }
+    BotBase& botbase() const{ return m_botbase; }
 //    operator BotBase&() const{
 //        return *m_botbase;
 //    }
     BotBase* operator->() const{
         check_cancelled();
-        return m_botbase;
+        return &m_botbase;
     }
     void check_cancelled() const{
         if (m_cancelled.load(std::memory_order_acquire)){
@@ -79,15 +79,26 @@ public:
     }
     void cancel(){
         m_cancelled.store(true, std::memory_order_release);
-        m_botbase->stop_all_commands();
+        m_botbase.stop_all_commands();
     }
 
     const std::atomic<bool>& cancelled_bool() const{
         return m_cancelled;
     }
 
+
+public:
+    bool try_issue_request(const BotBaseRequest& request) const{
+        return m_botbase.try_issue_request(request, &m_cancelled);
+    }
+    void issue_request(const BotBaseRequest& request) const{
+        m_botbase.issue_request(request, &m_cancelled);
+    }
+    BotBaseMessage issue_request_and_wait(const BotBaseRequest& request) const;
+
+
 private:
-    BotBase* m_botbase;
+    BotBase& m_botbase;
     std::atomic<bool> m_cancelled;
 };
 

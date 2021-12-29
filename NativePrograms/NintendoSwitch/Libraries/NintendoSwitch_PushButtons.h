@@ -4,8 +4,8 @@
  * 
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_PushButtons_Protocol_H
-#define PokemonAutomation_NintendoSwitch_PushButtons_Protocol_H
+#ifndef PokemonAutomation_NintendoSwitch_PushButtons_H
+#define PokemonAutomation_NintendoSwitch_PushButtons_H
 
 //#ifdef __AVR__
 //#include "NativePrograms/NintendoSwitch/Framework/Master.h"

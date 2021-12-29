@@ -15,8 +15,7 @@ namespace NintendoSwitch{
 
 
 void close_game(const BotBaseContext& context){
-    context->issue_request(
-        &context.cancelled_bool(),
+    context.issue_request(
         DeviceRequest_close_game()
     );
 }

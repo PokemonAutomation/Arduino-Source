@@ -109,10 +109,10 @@ LobbyJoinedDetector::LobbyJoinedDetector(size_t consoles, bool invert)
     , m_box1(0.705, 0.337 + 0.0775*1, 0.034, 0.06)
     , m_box2(0.705, 0.337 + 0.0775*2, 0.034, 0.06)
     , m_box3(0.705, 0.337 + 0.0775*3, 0.034, 0.06)
-    , m_player0(std::chrono::seconds(1), 10)
-    , m_player1(std::chrono::seconds(1), 10)
-    , m_player2(std::chrono::seconds(1), 10)
-    , m_player3(std::chrono::seconds(1), 10)
+    , m_player0(Qt::cyan, {0, 0, 1, 0.5}, std::chrono::seconds(1), 10)
+    , m_player1(Qt::cyan, {0, 0, 1, 0.5}, std::chrono::seconds(1), 10)
+    , m_player2(Qt::cyan, {0, 0, 1, 0.5}, std::chrono::seconds(1), 10)
+    , m_player3(Qt::cyan, {0, 0, 1, 0.5}, std::chrono::seconds(1), 10)
 {}
 void LobbyJoinedDetector::make_overlays(OverlaySet& items) const{
     items.add(Qt::red, m_box0);

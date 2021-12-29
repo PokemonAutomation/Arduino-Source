@@ -1,4 +1,4 @@
-/*  Pokemon Automation Push Button Framework
+/*  Push Button Framework
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

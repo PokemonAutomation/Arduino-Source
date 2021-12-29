@@ -306,115 +306,13 @@ int register_message_converters_custom_info(){
     );
     return 0;
 }
-int register_message_converters_push_button_framework(){
-    register_message_converter(
-        PABB_MSG_COMMAND_PBF_WAIT,
-        [](const std::string& body){
-            std::stringstream ss;
-            ss << "pbf_wait() - ";
-            if (body.size() != sizeof(pabb_pbf_wait)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_pbf_wait*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", ticks = " << params->ticks;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_PBF_PRESS_BUTTON,
-        [](const std::string& body){
-            std::stringstream ss;
-            ss << "pbf_press_button() - ";
-            if (body.size() != sizeof(pabb_pbf_press_button)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_pbf_press_button*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", button = " << params->button;
-            ss << ", hold_ticks = " << params->hold_ticks;
-            ss << ", release_ticks = " << params->release_ticks;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_PBF_PRESS_DPAD,
-        [](const std::string& body){
-            std::stringstream ss;
-            ss << "pbf_press_dpad() - ";
-            if (body.size() != sizeof(pabb_pbf_press_dpad)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_pbf_press_dpad*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", dpad = " << (unsigned)params->dpad;
-            ss << ", hold_ticks = " << params->hold_ticks;
-            ss << ", release_ticks = " << params->release_ticks;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_PBF_MOVE_JOYSTICK_L,
-        [](const std::string& body){
-            std::stringstream ss;
-            ss << "pbf_move_left_joystick() - ";
-            if (body.size() != sizeof(pabb_pbf_move_joystick)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_pbf_move_joystick*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", x = " << (unsigned)params->x;
-            ss << ", y = " << (unsigned)params->y;
-            ss << ", hold_ticks = " << params->hold_ticks;
-            ss << ", release_ticks = " << params->release_ticks;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_PBF_MOVE_JOYSTICK_R,
-        [](const std::string& body){
-            std::stringstream ss;
-            ss << "pbf_move_right_joystick() - ";
-            if (body.size() != sizeof(pabb_pbf_move_joystick)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_pbf_move_joystick*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", x = " << (unsigned)params->x;
-            ss << ", y = " << (unsigned)params->y;
-            ss << ", hold_ticks = " << params->hold_ticks;
-            ss << ", release_ticks = " << params->release_ticks;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_COMMAND_MASH_BUTTON,
-        [](const std::string& body){
-            std::stringstream ss;
-            ss << "pbf_mash_button() - ";
-            if (body.size() != sizeof(pabb_pbf_mash_button)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_pbf_mash_button*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", button = " << params->button;
-            ss << ", ticks = " << params->ticks;
-            return ss.str();
-        }
-    );
-    register_message_converter(
-        PABB_MSG_CONTROLLER_STATE,
-        [](const std::string& body){
-            std::stringstream ss;
-            ss << "controller_state() - ";
-            if (body.size() != sizeof(pabb_controller_state)){ ss << "(invalid size)" << std::endl; return ss.str(); }
-            const auto* params = (const pabb_controller_state*)body.c_str();
-            ss << "seqnum = " << (uint64_t)params->seqnum;
-            ss << ", button = " << params->button;
-            ss << ", dpad = " << (int)params->dpad;
-            ss << ", LJ = (" << (int)params->left_joystick_x << "," << (int)params->left_joystick_y << ")";
-            ss << ", RJ = (" << (int)params->right_joystick_x << "," << (int)params->right_joystick_y << ")";
-            ss << ", ticks = " << (int)params->ticks;
-            return ss.str();
-        }
-    );
-    return 0;
-}
+
 
 int init_MessageLogger =
     register_message_converters_framework_errors() +
     register_message_converters_framework_acks() +
     register_message_converters_framework_requests() +
-    register_message_converters_custom_info() +
-    register_message_converters_push_button_framework();
+    register_message_converters_custom_info();
 
 
 std::string message_to_string(const BotBaseMessage& message){

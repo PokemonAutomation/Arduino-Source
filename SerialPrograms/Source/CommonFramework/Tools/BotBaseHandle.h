@@ -59,7 +59,7 @@ public:
 
 
 public:
-    //  Aync external requests. (typically from integration commands)
+    //  Async external requests. (typically from integration commands)
     //  Thread-safe with stop()/reset(). These may drop.
     const char* try_reset();
     const char* try_send_request(const BotBaseRequest& request);

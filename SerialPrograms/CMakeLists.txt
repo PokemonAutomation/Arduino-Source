@@ -973,6 +973,9 @@ target_compile_definitions(SerialPrograms PRIVATE NOMINMAX)
 
 if (EXISTS "../../Internal/SerialPrograms/TelemetryURLs.h")
     target_compile_definitions(SerialPrograms PRIVATE PA_OFFICIAL)
+    target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_ScalarButtons.cpp)
+    target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_ScalarButtons.h)
+    target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/TelemetryURLs.h)
 endif()
 
 #add include directory

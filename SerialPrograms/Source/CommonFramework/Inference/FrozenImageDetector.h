@@ -15,6 +15,10 @@ namespace PokemonAutomation{
 class FrozenImageDetector : public VisualInferenceCallback{
 public:
     FrozenImageDetector(std::chrono::milliseconds timeout, double rmsd_threshold);
+    FrozenImageDetector(
+        QColor color, const ImageFloatBox& box,
+        std::chrono::milliseconds timeout, double rmsd_threshold
+    );
 
     virtual void make_overlays(OverlaySet& items) const override;
     virtual bool process_frame(
@@ -23,6 +27,8 @@ public:
    ) override;
 
 private:
+    QColor m_color;
+    ImageFloatBox m_box;
     std::chrono::milliseconds m_timeout;
     double m_rmsd_threshold;
     std::chrono::system_clock::time_point m_timestamp;

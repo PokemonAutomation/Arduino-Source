@@ -63,7 +63,7 @@ StateMachineAction run_state_iteration(
     RaidCatchDetector catch_select(console);
     PokemonCaughtMenuDetector caught_menu;
     EntranceDetector entrance_detector(entrance);
-    FrozenImageDetector frozen_screen(std::chrono::seconds(30), 10);
+    FrozenImageDetector frozen_screen(Qt::cyan, {0, 0, 1, 0.5}, std::chrono::seconds(30), 10);
 
     int result = wait_until(
         env, console,

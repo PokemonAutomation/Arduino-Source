@@ -452,7 +452,7 @@ void EggAutonomousState::hatch_rest_of_party(){
     while (m_eggs_in_party > 0){
         dump();
         ShortDialogWatcher dialog;
-        FrozenImageDetector frozen(std::chrono::seconds(60), 20);
+        FrozenImageDetector frozen(Qt::cyan, {0, 0, 1, 0.5}, std::chrono::seconds(60), 20);
         int ret = run_until(
             m_env, m_console,
             [&](const BotBaseContext& context){

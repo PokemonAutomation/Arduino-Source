@@ -86,7 +86,7 @@ const char* BotBaseHandle::try_send_request(const BotBaseRequest& request){
     if (!m_allow_user_commands.load(std::memory_order_acquire)){
         return "Cannot accept commands while a program is running.";
     }
-    if (!botbase()->try_issue_request(nullptr, request)){
+    if (!botbase()->try_issue_request(request)){
         return "Command dropped.";
     }
     return nullptr;

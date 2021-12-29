@@ -13,32 +13,27 @@ namespace NintendoSwitch{
 
 
 void eggfetcher_loop(const BotBaseContext& context){
-    context->issue_request(
-        &context.cancelled_bool(),
+    context.issue_request(
         DeviceRequest_eggfetcher_loop()
     );
 }
 void move_while_mashing_B(const BotBaseContext& context, uint16_t duration){
-    context->issue_request(
-        &context.cancelled_bool(),
+    context.issue_request(
         DeviceRequest_move_while_mashing_B(duration)
     );
 }
 void spin_and_mash_A(const BotBaseContext& context, uint16_t duration){
-    context->issue_request(
-        &context.cancelled_bool(),
+    context.issue_request(
         DeviceRequest_spin_and_mash_A(duration)
     );
 }
 void travel_to_spin_location(const BotBaseContext& context){
-    context->issue_request(
-        &context.cancelled_bool(),
+    context.issue_request(
         DeviceRequest_travel_to_spin_location()
     );
 }
 void travel_back_to_lady(const BotBaseContext& context){
-    context->issue_request(
-        &context.cancelled_bool(),
+    context.issue_request(
         DeviceRequest_travel_back_to_lady()
     );
 }
