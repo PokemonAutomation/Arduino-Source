@@ -7,12 +7,10 @@
 #ifndef PokemonAutomation_PokemonBDSP_EggHatchFilter_H
 #define PokemonAutomation_PokemonBDSP_EggHatchFilter_H
 
-#include <QComboBox>
-#include "Common/Qt/AutoHeightTable.h"
 #include "CommonFramework/Options/ConfigOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"
-#include "Pokemon/Options/Pokemon_IVCheckerWidget.h"
-#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h"
+#include "Pokemon/Pokemon_IVChecker.h"
+#include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -42,9 +40,9 @@ public:
     virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
 
 private:
-    QComboBox* make_action_box(QWidget& parent);
-    QComboBox* make_shiny_box(QWidget& parent);
-    IVCheckerFilterWidget* make_iv_box(QWidget& parent, IVCheckerFilter& iv);
+    QWidget* make_action_box(QWidget& parent);
+    QWidget* make_shiny_box(QWidget& parent);
+    QWidget* make_iv_box(QWidget& parent, IVCheckerFilter& iv);
 
 public:
     EggHatchAction action = EggHatchAction::Keep;
@@ -75,7 +73,7 @@ public:
 
     virtual void restore_defaults() override;
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
     std::vector<std::unique_ptr<EditableTableRow>> make_defaults() const;

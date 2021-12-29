@@ -598,7 +598,10 @@ bool PABotBase::issue_command(
     }
 }
 
-bool PABotBase::try_issue_request(const std::atomic<bool>* cancelled, const BotBaseRequest& request){
+bool PABotBase::try_issue_request(
+    const std::atomic<bool>* cancelled,
+    const BotBaseRequest& request
+){
     if (!request.is_command()){
         std::map<uint64_t, PendingRequest>::iterator iter;
         return try_issue_request(iter, cancelled, request, true, MAX_PENDING_REQUESTS);
@@ -607,7 +610,10 @@ bool PABotBase::try_issue_request(const std::atomic<bool>* cancelled, const BotB
         return try_issue_command(iter, cancelled, request, true, MAX_PENDING_REQUESTS);
     }
 }
-void PABotBase::issue_request(const std::atomic<bool>* cancelled, const BotBaseRequest& request){
+void PABotBase::issue_request(
+    const std::atomic<bool>* cancelled,
+    const BotBaseRequest& request
+){
     if (!request.is_command()){
         std::map<uint64_t, PendingRequest>::iterator iter;
         issue_request(iter, cancelled, request, true);
@@ -616,7 +622,10 @@ void PABotBase::issue_request(const std::atomic<bool>* cancelled, const BotBaseR
         issue_command(iter, cancelled, request, true);
     }
 }
-BotBaseMessage PABotBase::issue_request_and_wait(const std::atomic<bool>* cancelled, const BotBaseRequest& request){
+BotBaseMessage PABotBase::issue_request_and_wait(
+    const std::atomic<bool>* cancelled,
+    const BotBaseRequest& request
+){
     if (request.is_command()){
         PA_THROW_StringException("This function only supports requests.");
     }

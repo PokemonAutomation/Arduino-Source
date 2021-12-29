@@ -224,9 +224,9 @@ void RunnablePanelWidget::construct(){
 QWidget* RunnablePanelWidget::make_body(QWidget& parent){
     return nullptr;
 }
-BatchOptionUI* RunnablePanelWidget::make_options(QWidget& parent){
+BatchWidget* RunnablePanelWidget::make_options(QWidget& parent){
     RunnablePanelInstance& instance = static_cast<RunnablePanelInstance&>(m_instance);
-    BatchOptionUI* options = static_cast<BatchOptionUI*>(instance.m_options.make_ui(parent));
+    BatchWidget* options = static_cast<BatchWidget*>(instance.m_options.make_ui(parent));
     options->update_visibility();
     return options;
 }

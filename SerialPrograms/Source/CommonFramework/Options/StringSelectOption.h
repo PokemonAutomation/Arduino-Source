@@ -9,7 +9,10 @@
 #ifndef PokemonAutomation_StringSelect_H
 #define PokemonAutomation_StringSelect_H
 
-#include <QComboBox>
+#include <vector>
+#include <map>
+#include <QString>
+#include <QIcon>
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -36,10 +39,10 @@ public:
 
     virtual void restore_defaults() override;
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class StringSelectOptionUI;
+    friend class StringSelectWidget;
     const QString m_label;
     std::vector<std::pair<QString, QIcon>> m_case_list;
     std::map<QString, size_t> m_case_map;
@@ -49,17 +52,6 @@ private:
 };
 
 
-
-class StringSelectOptionUI : public QWidget, public ConfigOptionUI{
-public:
-    StringSelectOptionUI(QWidget& parent, StringSelectOption& value);
-    virtual void restore_defaults() override;
-
-private:
-    StringSelectOption& m_value;
-    QComboBox* m_box;
-//    bool m_updating = false;
-};
 
 
 

@@ -7,12 +7,12 @@
 #ifndef PokemonAutomation_PokemonSwSh_AutoHostNotification_H
 #define PokemonAutomation_PokemonSwSh_AutoHostNotification_H
 
-#include "CommonFramework/Options/BatchOption.h"
+#include "CommonFramework/Options/BatchOption/GroupOption.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/TextEditOption.h"
-#include "CommonFramework/Options/ScreenshotFormatOption.h"
+//#include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
-#include "NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.h"
+//#include "NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

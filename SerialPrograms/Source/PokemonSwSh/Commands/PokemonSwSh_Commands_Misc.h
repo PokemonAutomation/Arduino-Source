@@ -9,6 +9,7 @@
 
 #include "Common/PokemonSwSh/PokemonSwSh_Protocol_Misc.h"
 #include "ClientSource/Connection/BotBase.h"
+#include "ClientSource/Connection/BotBaseMessage.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

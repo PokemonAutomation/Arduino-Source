@@ -7,14 +7,15 @@
 #ifndef PokemonAutomation_SimpleInteger_H
 #define PokemonAutomation_SimpleInteger_H
 
-#include "Common/Qt/Options/FloatingPointOptionBase.h"
+#include "Common/Qt/Options/FloatingPoint/FloatingPointBaseOption.h"
+#include "Common/Qt/Options/FloatingPoint/FloatingPointBaseWidget.h"
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
 
 
 
-class FloatingPoint : public SingleStatementOption, public FloatingPointOptionBase{
+class FloatingPoint : public SingleStatementOption, public FloatingPointBaseOption{
 public:
     static const QString OPTION_TYPE;
     static const QString JSON_MIN_VALUE;
@@ -36,7 +37,7 @@ private:
     friend class FloatingPointUI;
 };
 
-class FloatingPointUI : public FloatingPointOptionBaseUI{
+class FloatingPointUI : public FloatingPointBaseWidget{
 public:
     FloatingPointUI(QWidget& parent, FloatingPoint& value);
 };

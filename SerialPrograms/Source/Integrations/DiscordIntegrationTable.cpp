@@ -4,6 +4,7 @@
  *
  */
 
+#include <QHBoxLayout>
 #include <QCheckBox>
 #include <QLineEdit>
 #include "Common/Qt/QtJsonTools.h"

@@ -33,6 +33,7 @@
 #include "ClientSource/Connection/PABotBaseConnection.h"
 #include "ClientSource/Libraries/Logging.h"
 #include "BotBase.h"
+#include "BotBaseMessage.h"
 
 //#include <iostream>
 //using std::cout;
@@ -150,13 +151,16 @@ private:
     );
 
     virtual bool try_issue_request(
-        const std::atomic<bool>* cancelled, const BotBaseRequest& request
+        const std::atomic<bool>* cancelled,
+        const BotBaseRequest& request
     ) override;
     virtual void issue_request(
-        const std::atomic<bool>* cancelled, const BotBaseRequest& request
+        const std::atomic<bool>* cancelled,
+        const BotBaseRequest& request
     ) override;
     virtual BotBaseMessage issue_request_and_wait(
-        const std::atomic<bool>* cancelled, const BotBaseRequest& request
+        const std::atomic<bool>* cancelled,
+        const BotBaseRequest& request
     ) override;
 
 

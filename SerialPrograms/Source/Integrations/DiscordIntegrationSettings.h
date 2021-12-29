@@ -7,7 +7,8 @@
 #ifndef PokemonAutomation_DiscordIntegrationSettings_H
 #define PokemonAutomation_DiscordIntegrationSettings_H
 
-#include "CommonFramework/Options/BatchOption.h"
+#include "CommonFramework/Options/BatchOption/GroupOption.h"
+#include "CommonFramework/Options/BatchOption/GroupWidget.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/StringOption.h"
 #include "DiscordIntegrationTable.h"
@@ -19,7 +20,7 @@ namespace Integration{
 class DiscordIntegrationSettingsOption : public GroupOption{
 public:
     DiscordIntegrationSettingsOption(bool integration_enabled);
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
     bool m_integration_enabled = false;
     StringOption token;
@@ -31,12 +32,12 @@ public:
     StringOption owner;
     DiscordIntegrationTable channels;
 };
-class DiscordIntegrationSettingsOptionUI : public GroupOptionUI{
+class DiscordIntegrationSettingsOptionUI : public GroupWidget{
 public:
     DiscordIntegrationSettingsOptionUI(QWidget& parent, DiscordIntegrationSettingsOption& value);
     virtual void on_set_enabled(bool enabled) override;
 };
-inline ConfigOptionUI* DiscordIntegrationSettingsOption::make_ui(QWidget& parent){
+inline ConfigWidget* DiscordIntegrationSettingsOption::make_ui(QWidget& parent){
     return new DiscordIntegrationSettingsOptionUI(parent, *this);
 }
 

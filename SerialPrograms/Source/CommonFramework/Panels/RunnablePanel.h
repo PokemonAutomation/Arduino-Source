@@ -9,11 +9,13 @@
 
 #include <thread>
 #include <QLabel>
+#include <QBoxLayout>
 #include <QPushButton>
 #include <QScrollArea>
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/ConfigOption.h"
-#include "CommonFramework/Options/BatchOption.h"
+#include "CommonFramework/Options/BatchOption/BatchOption.h"
+#include "CommonFramework/Options/BatchOption/BatchWidget.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Panels/Panel.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
@@ -108,7 +110,7 @@ protected:
 
     //  Child classes can override these with their own customizations.
     virtual QWidget* make_body(QWidget& parent);
-    virtual BatchOptionUI* make_options(QWidget& parent);
+    virtual BatchWidget* make_options(QWidget& parent);
     virtual QLabel* make_status_bar(QWidget& parent);
     virtual QWidget* make_actions(QWidget& parent);
 
@@ -154,7 +156,7 @@ protected:
 
     QWidget* m_header = nullptr;
     QWidget* m_body = nullptr;
-    BatchOptionUI* m_options = nullptr;
+    BatchWidget* m_options = nullptr;
     QLabel* m_status_bar = nullptr;
     QWidget* m_actions = nullptr;
 

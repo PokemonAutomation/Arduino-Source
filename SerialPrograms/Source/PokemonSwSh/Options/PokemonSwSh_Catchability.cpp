@@ -4,8 +4,10 @@
  *
  */
 
+#include <QJsonValue>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QComboBox>
 #include "Common/Qt/NoWheelComboBox.h"
 #include "CommonFramework/Globals.h"
 #include "PokemonSwSh_Catchability.h"
@@ -14,6 +16,21 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+
+
+
+
+class CatchabilitySelectorWidget : public QWidget, public ConfigWidget{
+public:
+    CatchabilitySelectorWidget(QWidget& parent, CatchabilitySelectorOption& value);
+    virtual void restore_defaults() override;
+
+private:
+    CatchabilitySelectorOption& m_value;
+    QComboBox* m_box;
+};
+
+
 
 
 CatchabilitySelectorOption::CatchabilitySelectorOption()
@@ -34,16 +51,16 @@ void CatchabilitySelectorOption::restore_defaults(){
     m_current = m_default;
 };
 
-ConfigOptionUI* CatchabilitySelectorOption::make_ui(QWidget& parent){
-    return new CatchabilitySelectorUI(parent, *this);
+ConfigWidget* CatchabilitySelectorOption::make_ui(QWidget& parent){
+    return new CatchabilitySelectorWidget(parent, *this);
 }
 
 
 
 
-CatchabilitySelectorUI::CatchabilitySelectorUI(QWidget& parent, CatchabilitySelectorOption& value)
+CatchabilitySelectorWidget::CatchabilitySelectorWidget(QWidget& parent, CatchabilitySelectorOption& value)
     : QWidget(&parent)
-    , ConfigOptionUI(value, *this)
+    , ConfigWidget(value, *this)
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
@@ -65,7 +82,7 @@ CatchabilitySelectorUI::CatchabilitySelectorUI(QWidget& parent, CatchabilitySele
         }
     );
 }
-void CatchabilitySelectorUI::restore_defaults(){
+void CatchabilitySelectorWidget::restore_defaults(){
     m_value.restore_defaults();
     m_box->setCurrentIndex((int)(Catchability)m_value);
 }

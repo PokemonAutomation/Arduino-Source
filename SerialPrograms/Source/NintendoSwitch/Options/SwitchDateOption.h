@@ -9,63 +9,37 @@
 #ifndef PokemonAutomation_SwitchDate_H
 #define PokemonAutomation_SwitchDate_H
 
-#include "Common/Qt/Options/SwitchDateOptionBase.h"
+#include "Common/Qt/Options/SwitchDate/SwitchDateBaseOption.h"
 #include "CommonFramework/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class SwitchDateOption : public ConfigOption, private SwitchDateOptionBase{
+class SwitchDateOption : public ConfigOption, private SwitchDateBaseOption{
 public:
     SwitchDateOption(
         QString label,
         QDate default_value
-    )
-        : SwitchDateOptionBase(std::move(label), default_value)
-    {}
+    );
 
-    using SwitchDateOptionBase::label;
-    using SwitchDateOptionBase::operator QDate;
-    using SwitchDateOptionBase::get;
-    using SwitchDateOptionBase::set;
+    using SwitchDateBaseOption::label;
+    using SwitchDateBaseOption::operator QDate;
+    using SwitchDateBaseOption::get;
+    using SwitchDateBaseOption::set;
 
-    virtual void load_json(const QJsonValue& json) override{
-        return this->load_current(json);
-    }
-    virtual QJsonValue to_json() const override{
-        return this->write_current();
-    }
+    virtual void load_json(const QJsonValue& json) override;
+    virtual QJsonValue to_json() const override;
 
-    virtual QString check_validity() const override{
-        return SwitchDateOptionBase::check_validity();
-    }
-    virtual void restore_defaults() override{
-        SwitchDateOptionBase::restore_defaults();
-    }
+    virtual QString check_validity() const override;
+    virtual void restore_defaults() override;
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class SwitchDateOptionUI;
+    friend class SwitchDateWidget;
 };
 
-
-class SwitchDateOptionUI : private SwitchDateOptionBaseUI, public ConfigOptionUI{
-public:
-    SwitchDateOptionUI(QWidget& parent, SwitchDateOption& value)
-        : SwitchDateOptionBaseUI(parent, value)
-        , ConfigOptionUI(value, *this)
-    {}
-    virtual void restore_defaults() override{
-        SwitchDateOptionBaseUI::restore_defaults();
-    }
-};
-
-
-inline ConfigOptionUI* SwitchDateOption::make_ui(QWidget& parent){
-    return new SwitchDateOptionUI(parent, *this);
-}
 
 
 

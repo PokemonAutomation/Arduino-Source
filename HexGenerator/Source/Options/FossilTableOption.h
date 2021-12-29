@@ -40,7 +40,7 @@ public:
 private:
     friend class FossilTableUI;
     FossilGameOptionFactory m_factory;
-    EditableTableBase m_table;
+    EditableTableBaseOption m_table;
 };
 #endif
 

@@ -19,6 +19,22 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+
+class FriendCodeListOptionUI : public QWidget, public ConfigWidget{
+public:
+    FriendCodeListOptionUI(QWidget& parent, FriendCodeListOption& value);
+    virtual void restore_defaults() override;
+
+private:
+    class Box;
+
+    FriendCodeListOption& m_value;
+    Box* m_box;
+};
+
+
+
+
 FriendCodeListOption::FriendCodeListOption(QString label, std::vector<QString> default_lines)
     : m_label(std::move(label))
     , m_default(std::move(default_lines))
@@ -45,7 +61,7 @@ QJsonValue FriendCodeListOption::to_json() const{
 void FriendCodeListOption::restore_defaults(){
     m_lines = m_default;
 }
-ConfigOptionUI* FriendCodeListOption::make_ui(QWidget& parent){
+ConfigWidget* FriendCodeListOption::make_ui(QWidget& parent){
     return new FriendCodeListOptionUI(parent, *this);
 }
 
@@ -131,7 +147,7 @@ private:
 
 FriendCodeListOptionUI::FriendCodeListOptionUI(QWidget& parent, FriendCodeListOption& value)
     : QWidget(&parent)
-    , ConfigOptionUI(value, *this)
+    , ConfigWidget(value, *this)
     , m_value(value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);

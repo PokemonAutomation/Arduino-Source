@@ -9,6 +9,7 @@
 #include <QScrollArea>
 #include <QGroupBox>
 #include "Common/Qt/QtJsonTools.h"
+#include "CommonFramework/Options/BatchOption/BatchWidget.h"
 #include "SettingsPanel.h"
 
 #include <iostream>
@@ -68,7 +69,7 @@ QWidget* SettingsPanelWidget::make_options(QWidget& parent){
 
 
     SettingsPanelInstance& instance = static_cast<SettingsPanelInstance&>(m_instance);
-    m_options = static_cast<BatchOptionUI*>(instance.m_options.make_ui(parent));
+    m_options = static_cast<BatchWidget*>(instance.m_options.make_ui(parent));
     options_layout->addWidget(m_options);
     options_layout->addStretch();
 

@@ -10,6 +10,7 @@
 #include <string.h>
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_DigitEntry.h"
 #include "ClientSource/Connection/BotBase.h"
+#include "ClientSource/Connection/BotBaseMessage.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

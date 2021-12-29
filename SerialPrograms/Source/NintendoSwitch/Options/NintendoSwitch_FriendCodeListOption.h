@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_FriendCodeList_H
 #define PokemonAutomation_FriendCodeList_H
 
-#include <array>
 #include <vector>
+#include <QString>
 #include "CommonFramework/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -28,7 +28,7 @@ public:
 
     virtual void restore_defaults() override;
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
     friend class FriendCodeListOptionUI;
@@ -38,17 +38,6 @@ private:
 };
 
 
-class FriendCodeListOptionUI : public QWidget, public ConfigOptionUI{
-public:
-    FriendCodeListOptionUI(QWidget& parent, FriendCodeListOption& value);
-    virtual void restore_defaults() override;
-
-private:
-    class Box;
-
-    FriendCodeListOption& m_value;
-    Box* m_box;
-};
 
 
 }

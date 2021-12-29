@@ -4,14 +4,12 @@
  *
  */
 
+#include <QJsonValue>
 #include <QHBoxLayout>
 #include <QLabel>
 #include "Common/Qt/NoWheelComboBox.h"
 #include "EnumDropdownOption.h"
-
-#include <iostream>
-using std::cout;
-using std::endl;
+#include "EnumDropdownWidget.h"
 
 namespace PokemonAutomation{
 
@@ -62,15 +60,15 @@ void EnumDropdownOption::restore_defaults(){
     m_current.store(m_default, std::memory_order_relaxed);
 }
 
-ConfigOptionUI* EnumDropdownOption::make_ui(QWidget& parent){
-    return new EnumDropdownOptionUI(parent, *this);
+ConfigWidget* EnumDropdownOption::make_ui(QWidget& parent){
+    return new EnumDropdownWidget(parent, *this);
 }
 
 
 
-EnumDropdownOptionUI::EnumDropdownOptionUI(QWidget& parent, EnumDropdownOption& value)
+EnumDropdownWidget::EnumDropdownWidget(QWidget& parent, EnumDropdownOption& value)
     : QWidget(&parent)
-    , ConfigOptionUI(value, *this)
+    , ConfigWidget(value, *this)
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
@@ -100,7 +98,7 @@ EnumDropdownOptionUI::EnumDropdownOptionUI(QWidget& parent, EnumDropdownOption& 
 }
 
 
-void EnumDropdownOptionUI::restore_defaults(){
+void EnumDropdownWidget::restore_defaults(){
     m_value.restore_defaults();
     m_box->setCurrentIndex((int)m_value);
 }

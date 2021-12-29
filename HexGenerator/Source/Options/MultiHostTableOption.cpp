@@ -80,7 +80,7 @@ std::string MultiHostTable::to_cpp() const{
     return str;
 }
 QWidget* MultiHostTable::make_ui(QWidget& parent){
-    return new EditableTableBaseUI(parent, m_table);
+    return new EditableTableBaseWidget(parent, m_table);
 }
 
 

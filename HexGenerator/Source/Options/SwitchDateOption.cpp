@@ -31,16 +31,16 @@ int SwitchDate_init = register_option(
 
 SwitchDate::SwitchDate(const QJsonObject& obj)
     : SingleStatementOption(obj)
-    , SwitchDateOptionBase(SingleStatementOption::m_label, QDate(2000, 1, 1))
+    , SwitchDateBaseOption(SingleStatementOption::m_label, QDate(2000, 1, 1))
 {
     load_default(json_get_value_throw(obj, JSON_DEFAULT));
     load_current(json_get_value_throw(obj, JSON_CURRENT));
 }
 QString SwitchDate::check_validity() const{
-    return SwitchDateOptionBase::check_validity();
+    return SwitchDateBaseOption::check_validity();
 }
 void SwitchDate::restore_defaults(){
-    SwitchDateOptionBase::restore_defaults();
+    SwitchDateBaseOption::restore_defaults();
 }
 QJsonObject SwitchDate::to_json() const{
     QJsonObject root = SingleStatementOption::to_json();
@@ -65,7 +65,7 @@ QWidget* SwitchDate::make_ui(QWidget& parent){
 }
 
 SwitchDateUI::SwitchDateUI(QWidget& parent, SwitchDate& value)
-    : SwitchDateOptionBaseUI(parent, value)
+    : SwitchDateBaseWidget(parent, value)
 {}
 
 

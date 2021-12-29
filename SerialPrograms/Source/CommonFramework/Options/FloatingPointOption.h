@@ -9,64 +9,39 @@
 #ifndef PokemonAutomation_FloatingPoint_H
 #define PokemonAutomation_FloatingPoint_H
 
-#include "Common/Qt/Options/FloatingPointOptionBase.h"
+#include <limits>
+#include "Common/Qt/Options/FloatingPoint/FloatingPointBaseOption.h"
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
 
 
-class FloatingPointOption : public ConfigOption, private FloatingPointOptionBase{
+class FloatingPointOption : public ConfigOption, private FloatingPointBaseOption{
 public:
     FloatingPointOption(
         QString label,
         double default_value,
         double min_value = -std::numeric_limits<double>::max(),
         double max_value = std::numeric_limits<double>::max()
-    )
-        : FloatingPointOptionBase(std::move(label), min_value, max_value, default_value)
-    {}
+    );
 
-    using FloatingPointOptionBase::label;
-    using FloatingPointOptionBase::operator double;
-    using FloatingPointOptionBase::get;
-    using FloatingPointOptionBase::set;
+    using FloatingPointBaseOption::label;
+    using FloatingPointBaseOption::operator double;
+    using FloatingPointBaseOption::get;
+    using FloatingPointBaseOption::set;
 
-    virtual void load_json(const QJsonValue& json) override{
-        return this->load_current(json);
-    }
-    virtual QJsonValue to_json() const override{
-        return this->write_current();
-    }
+    virtual void load_json(const QJsonValue& json) override;
+    virtual QJsonValue to_json() const override;
 
-    virtual QString check_validity() const override{
-        return FloatingPointOptionBase::check_validity();
-    }
-    virtual void restore_defaults() override{
-        FloatingPointOptionBase::restore_defaults();
-    }
+    virtual QString check_validity() const override;
+    virtual void restore_defaults() override;
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
     friend class FloatingPointOptionUI;
 };
 
-
-class FloatingPointOptionUI : private FloatingPointOptionBaseUI, public ConfigOptionUI{
-public:
-    FloatingPointOptionUI(QWidget& parent, FloatingPointOption& value)
-        : FloatingPointOptionBaseUI(parent, value)
-        , ConfigOptionUI(value, *this)
-    {}
-    virtual void restore_defaults() override{
-        FloatingPointOptionBaseUI::restore_defaults();
-    }
-};
-
-
-inline ConfigOptionUI* FloatingPointOption::make_ui(QWidget& parent){
-    return new FloatingPointOptionUI(parent, *this);
-}
 
 
 

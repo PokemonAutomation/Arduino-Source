@@ -10,7 +10,7 @@
 #include <map>
 #include "Common/Qt/AutoHeightTable.h"
 #include "CommonFramework/Options/ConfigOption.h"
-#include "CommonFramework/Options/BatchOption.h"
+#include "CommonFramework/Options/BatchOption/GroupOption.h"
 #include "EventNotificationOption.h"
 
 namespace PokemonAutomation{
@@ -26,7 +26,7 @@ public:
     virtual void restore_defaults() override;
     virtual void reset_state() override;
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
     void set_enabled(bool enabled);
 
@@ -36,7 +36,7 @@ private:
     std::map<QString, EventNotificationOption*> m_name_map;
 };
 
-class EventNotificationsTableUI : public QWidget, public ConfigOptionUI{
+class EventNotificationsTableUI : public QWidget, public ConfigWidget{
 public:
     EventNotificationsTableUI(QWidget& parent, EventNotificationsTable& value);
 

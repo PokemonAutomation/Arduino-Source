@@ -39,7 +39,7 @@ public:
 private:
     friend class MultiHostTableUI;
     MultiHostSlotOptionFactory m_factory;
-    EditableTableBase m_table;
+    EditableTableBaseOption m_table;
 };
 
 

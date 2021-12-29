@@ -7,7 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_MultiHostTable_H
 #define PokemonAutomation_PokemonSwSh_MultiHostTable_H
 
-#include "Common/Qt/Options/MultiHostTableOptionBase.h"
+#include "Common/Qt/Options/EditableTable/EditableTableBaseOption.h"
+#include "Common/Qt/Options/MultiHostTableBaseOption.h"
 #include "CommonFramework/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -17,52 +18,23 @@ namespace PokemonSwSh{
 
 class MultiHostTableOption : public ConfigOption{
 public:
-    MultiHostTableOption()
-        : m_factory(true)
-        , m_table("<b>Game List:</b>", m_factory, true)
-    {}
-    virtual void load_json(const QJsonValue& json) override{
-        m_table.load_current(json);
-    }
-    virtual QJsonValue to_json() const override{
-        return m_table.write_current();
-    }
+    MultiHostTableOption();
+    virtual void load_json(const QJsonValue& json) override;
+    virtual QJsonValue to_json() const override;
 
-    size_t size() const{
-        return m_table.size();
-    }
-    const MultiHostSlot& operator[](size_t index) const{
-        return static_cast<const MultiHostSlot&>(m_table[index]);
-    }
+    size_t size() const;
+    const MultiHostSlot& operator[](size_t index) const;
 
-    virtual QString check_validity() const override{
-        return m_table.check_validity();
-    }
-    virtual void restore_defaults() override{
-        m_table.restore_defaults();
-    }
+    virtual QString check_validity() const override;
+    virtual void restore_defaults() override;
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
     friend class MultiHostTableOptionUI;
     MultiHostSlotOptionFactory m_factory;
-    EditableTableBase m_table;
+    EditableTableBaseOption m_table;
 };
-class MultiHostTableOptionUI : public EditableTableBaseUI, public ConfigOptionUI{
-public:
-    MultiHostTableOptionUI(QWidget& parent, MultiHostTableOption& value)
-        : EditableTableBaseUI(parent, value.m_table)
-        , ConfigOptionUI(value, *this)
-    {}
-    virtual void restore_defaults() override{
-        EditableTableBaseUI::restore_defaults();
-    }
-
-};
-inline ConfigOptionUI* MultiHostTableOption::make_ui(QWidget& parent){
-    return new MultiHostTableOptionUI(parent, *this);
-}
 
 
 

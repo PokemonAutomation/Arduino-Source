@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Options/EnumDropdownWidget.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh_MaxLair_Options_Consoles.h"
 
@@ -115,27 +116,27 @@ void Consoles::set_active_consoles(size_t consoles){
         PLAYERS[c]->visibility = ConfigOptionState::HIDDEN;
     }
 }
-ConfigOptionUI* Consoles::make_ui(QWidget& parent){
+ConfigWidget* Consoles::make_ui(QWidget& parent){
     return new ConsolesUI(parent, *this);
 }
 ConsolesUI::ConsolesUI(QWidget& parent, Consoles& value)
-    : BatchOptionUI(parent, value)
+    : BatchWidget(parent, value)
 {
-    EnumDropdownOptionUI* host = static_cast<EnumDropdownOptionUI*>(m_options[0]);
+    EnumDropdownWidget* host = static_cast<EnumDropdownWidget*>(m_options[0]);
     connect(
-        host, &EnumDropdownOptionUI::on_changed,
+        host, &EnumDropdownWidget::on_changed,
         this, [=]{ update_visibility(); }
     );
 }
 void ConsolesUI::update_visibility(){
-    EnumDropdownOptionUI* host = static_cast<EnumDropdownOptionUI*>(m_options[0]);
+    EnumDropdownWidget* host = static_cast<EnumDropdownWidget*>(m_options[0]);
     size_t host_index = static_cast<EnumDropdownOption&>(host->option());
     for (size_t c = 0; c < 4; c++){
-        ConfigOptionUI* console_widget = m_options[c + 1];
+        ConfigWidget* console_widget = m_options[c + 1];
         ConsoleSpecificOptions& console = static_cast<ConsoleSpecificOptions&>(console_widget->option());
         console.set_host(c == host_index);
     }
-    BatchOptionUI::update_visibility();
+    BatchWidget::update_visibility();
 }
 
 

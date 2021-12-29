@@ -7,9 +7,7 @@
 #ifndef PokemonAutomation_RandomCode_H
 #define PokemonAutomation_RandomCode_H
 
-#include <QJsonValue>
-#include <QLabel>
-#include <QLineEdit>
+#include <QString>
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -49,33 +47,18 @@ public:
     virtual QString check_validity() const override;
     virtual void restore_defaults() override;
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class RandomCodeOptionUI;
+    friend class RandomCodeWidget;
     QString m_label;
     const RaidCodeOption m_default;
     RaidCodeOption m_current;
 };
 
 
-class RandomCodeOptionUI : public QWidget, public ConfigOptionUI{
-public:
-    RandomCodeOptionUI(QWidget& parent, RandomCodeOption& value);
-    virtual void restore_defaults() override;
 
-private:
-    QString sanitized_code(const QString& text) const;
-    QString random_code_string() const;
-    void update_labels();
 
-private:
-    RandomCodeOption& m_value;
-    QLabel* m_label_code;
-    QLabel* m_under_text;
-    QLineEdit* m_box_random;
-    QLineEdit* m_box_code;
-};
 
 
 }

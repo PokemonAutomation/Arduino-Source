@@ -4,15 +4,29 @@
  *
  */
 
+#include <QJsonValue>
 #include <QVBoxLayout>
 #include <QLabel>
+#include <QTextEdit>
 #include "TextEditOption.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
-
 namespace PokemonAutomation{
+
+
+
+
+class TextEditWidget : public QWidget, public ConfigWidget{
+public:
+    TextEditWidget(QWidget& parent, TextEditOption& value);
+    virtual void restore_defaults() override;
+
+private:
+    class Box;
+
+    TextEditOption& m_value;
+    QTextEdit* m_box;
+};
+
 
 
 TextEditOption::TextEditOption(
@@ -48,8 +62,8 @@ void TextEditOption::restore_defaults(){
     SpinLockGuard lg(m_lock);
     m_current = m_default;
 }
-ConfigOptionUI* TextEditOption::make_ui(QWidget& parent){
-    return new TextEditOptionUI(parent, *this);
+ConfigWidget* TextEditOption::make_ui(QWidget& parent){
+    return new TextEditWidget(parent, *this);
 }
 
 
@@ -57,9 +71,9 @@ ConfigOptionUI* TextEditOption::make_ui(QWidget& parent){
 
 
 
-class TextEditOptionUI::Box : public QTextEdit{
+class TextEditWidget::Box : public QTextEdit{
 public:
-    Box(TextEditOptionUI& parent)
+    Box(TextEditWidget& parent)
         : QTextEdit(&parent)
         , m_parent(parent)
     {
@@ -79,7 +93,7 @@ public:
     }
 
 private:
-    TextEditOptionUI& m_parent;
+    TextEditWidget& m_parent;
 };
 
 
@@ -88,9 +102,9 @@ private:
 
 
 
-TextEditOptionUI::TextEditOptionUI(QWidget& parent, TextEditOption& value)
+TextEditWidget::TextEditWidget(QWidget& parent, TextEditOption& value)
     : QWidget(&parent)
-    , ConfigOptionUI(value, *this)
+    , ConfigWidget(value, *this)
     , m_value(value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -99,7 +113,7 @@ TextEditOptionUI::TextEditOptionUI(QWidget& parent, TextEditOption& value)
     m_box->setText(value);
     layout->addWidget(m_box);
 }
-void TextEditOptionUI::restore_defaults(){
+void TextEditWidget::restore_defaults(){
     m_value.restore_defaults();
 }
 

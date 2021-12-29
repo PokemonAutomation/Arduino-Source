@@ -11,6 +11,7 @@
 #include "Common/Cpp/Exception.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "Common/PokemonSwSh/PokemonProgramIDs.h"
+#include "ClientSource/Connection/BotBaseMessage.h"
 #include "MessageConverter.h"
 
 namespace PokemonAutomation{

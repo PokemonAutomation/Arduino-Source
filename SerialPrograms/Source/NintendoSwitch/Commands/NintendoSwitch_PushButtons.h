@@ -10,6 +10,7 @@
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "ClientSource/Connection/BotBase.h"
+#include "ClientSource/Connection/BotBaseMessage.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

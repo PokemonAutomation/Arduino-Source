@@ -35,7 +35,7 @@ int TimeExpression_init = register_option(
 
 TimeExpression::TimeExpression(const QJsonObject& obj)
     : SingleStatementOption(obj)
-    , TimeExpressionOptionBase<uint32_t>(
+    , TimeExpressionBaseOption<uint32_t>(
         SingleStatementOption::m_label,
         json_get_int_throw(obj, JSON_MIN_VALUE),
         json_get_int_throw(obj, JSON_MAX_VALUE),
@@ -46,10 +46,10 @@ TimeExpression::TimeExpression(const QJsonObject& obj)
 }
 
 QString TimeExpression::check_validity() const{
-    return TimeExpressionOptionBase<uint32_t>::check_validity();
+    return TimeExpressionBaseOption<uint32_t>::check_validity();
 }
 void TimeExpression::restore_defaults(){
-    TimeExpressionOptionBase<uint32_t>::restore_defaults();
+    TimeExpressionBaseOption<uint32_t>::restore_defaults();
 }
 QJsonObject TimeExpression::to_json() const{
     QJsonObject root = SingleStatementOption::to_json();
@@ -68,11 +68,11 @@ std::string TimeExpression::to_cpp() const{
     return str;
 }
 QWidget* TimeExpression::make_ui(QWidget& parent){
-    return new TimeExpressionOptionBaseUI<uint32_t>(parent, *this);
+    return new TimeExpressionBaseWidget<uint32_t>(parent, *this);
 }
 
 TimeExpressionUI::TimeExpressionUI(QWidget& parent, TimeExpression& value)
-    : TimeExpressionOptionBaseUI(parent, value)
+    : TimeExpressionBaseWidget(parent, value)
 {}
 
 

@@ -29,15 +29,22 @@ SOURCES += \
     ../Common/Qt/AutoHeightTable.cpp \
     ../Common/Qt/CodeValidator.cpp \
     ../Common/Qt/ExpressionEvaluator.cpp \
-    ../Common/Qt/Options/BooleanCheckBoxOptionBase.cpp \
-    ../Common/Qt/Options/EditableTableOptionBase.cpp \
-    ../Common/Qt/Options/FloatingPointOptionBase.cpp \
-    ../Common/Qt/Options/FossilTableOptionBase.cpp \
-    ../Common/Qt/Options/MultiHostTableOptionBase.cpp \
-    ../Common/Qt/Options/SimpleIntegerOptionBase.cpp \
-    ../Common/Qt/Options/StringOptionBase.cpp \
-    ../Common/Qt/Options/SwitchDateOptionBase.cpp \
-    ../Common/Qt/Options/TimeExpressionOptionBase.cpp \
+    ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseOption.cpp \
+    ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseWidget.cpp \
+    ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp \
+    ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp \
+    ../Common/Qt/Options/FloatingPoint/FloatingPointBaseOption.cpp \
+    ../Common/Qt/Options/FloatingPoint/FloatingPointBaseWidget.cpp \
+    ../Common/Qt/Options/FossilTableBaseOption.cpp \
+    ../Common/Qt/Options/MultiHostTableBaseOption.cpp \
+    ../Common/Qt/Options/SimpleInteger/SimpleIntegerBaseOption.cpp \
+    ../Common/Qt/Options/SimpleInteger/SimpleIntegerBaseWidget.cpp \
+    ../Common/Qt/Options/String/StringBaseOption.cpp \
+    ../Common/Qt/Options/String/StringBaseWidget.cpp \
+    ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.cpp \
+    ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.cpp \
+    ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.cpp \
+    ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.cpp \
     ../Common/Qt/QtJsonTools.cpp \
     Source/Main.cpp \
     Source/Options/BooleanCheckBoxOption.cpp \
@@ -74,15 +81,22 @@ HEADERS += \
     ../Common/Qt/AutoHeightTable.h \
     ../Common/Qt/CodeValidator.h \
     ../Common/Qt/ExpressionEvaluator.h \
-    ../Common/Qt/Options/BooleanCheckBoxOptionBase.h \
-    ../Common/Qt/Options/EditableTableOptionBase.h \
-    ../Common/Qt/Options/FloatingPointOptionBase.h \
-    ../Common/Qt/Options/FossilTableOptionBase.h \
-    ../Common/Qt/Options/MultiHostTableOptionBase.h \
-    ../Common/Qt/Options/SimpleIntegerOptionBase.h \
-    ../Common/Qt/Options/StringOptionBase.h \
-    ../Common/Qt/Options/SwitchDateOptionBase.h \
-    ../Common/Qt/Options/TimeExpressionOptionBase.h \
+    ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseWidget.h \
+    ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseOption.h \
+    ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h \
+    ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h \
+    ../Common/Qt/Options/FloatingPoint/FloatingPointBaseOption.h \
+    ../Common/Qt/Options/FloatingPoint/FloatingPointBaseWidget.h \
+    ../Common/Qt/Options/FossilTableBaseOption.h \
+    ../Common/Qt/Options/MultiHostTableBaseOption.h \
+    ../Common/Qt/Options/SimpleInteger/SimpleIntegerBaseOption.h \
+    ../Common/Qt/Options/SimpleInteger/SimpleIntegerBaseWidget.h \
+    ../Common/Qt/Options/String/StringBaseOption.h \
+    ../Common/Qt/Options/String/StringBaseWidget.h \
+    ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.h \
+    ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.h \
+    ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.h \
+    ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h \
     ../Common/Qt/QtJsonTools.h \
     Source/Options/BooleanCheckBoxOption.h \
     Source/Options/ConfigItem.h \

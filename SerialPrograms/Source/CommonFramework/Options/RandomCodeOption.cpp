@@ -8,12 +8,37 @@
 #include <QJsonObject>
 #include <QIntValidator>
 #include <QHBoxLayout>
+#include <QJsonValue>
+#include <QLabel>
+#include <QLineEdit>
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Common/Qt/CodeValidator.h"
 #include "RandomCodeOption.h"
 
 namespace PokemonAutomation{
+
+
+
+class RandomCodeWidget : public QWidget, public ConfigWidget{
+public:
+    RandomCodeWidget(QWidget& parent, RandomCodeOption& value);
+    virtual void restore_defaults() override;
+
+private:
+    QString sanitized_code(const QString& text) const;
+    QString random_code_string() const;
+    void update_labels();
+
+private:
+    RandomCodeOption& m_value;
+    QLabel* m_label_code;
+    QLabel* m_under_text;
+    QLineEdit* m_box_random;
+    QLineEdit* m_box_code;
+};
+
+
 
 
 RaidCodeOption::RaidCodeOption()
@@ -103,14 +128,14 @@ void RandomCodeOption::restore_defaults(){
     m_current = m_default;
 }
 
-ConfigOptionUI* RandomCodeOption::make_ui(QWidget& parent){
-    return new RandomCodeOptionUI(parent, *this);
+ConfigWidget* RandomCodeOption::make_ui(QWidget& parent){
+    return new RandomCodeWidget(parent, *this);
 }
 
 
-RandomCodeOptionUI::RandomCodeOptionUI(QWidget& parent, RandomCodeOption& value)
+RandomCodeWidget::RandomCodeWidget(QWidget& parent, RandomCodeOption& value)
     : QWidget(&parent)
-    , ConfigOptionUI(value, *this)
+    , ConfigWidget(value, *this)
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
@@ -169,7 +194,7 @@ RandomCodeOptionUI::RandomCodeOptionUI(QWidget& parent, RandomCodeOption& value)
         }
     );
 }
-QString RandomCodeOptionUI::sanitized_code(const QString& text) const{
+QString RandomCodeWidget::sanitized_code(const QString& text) const{
     if (text.isEmpty()){
         return "<font color=\"blue\">No Raid Code</font>";
     }
@@ -181,7 +206,7 @@ QString RandomCodeOptionUI::sanitized_code(const QString& text) const{
     }
     return message;
 }
-QString RandomCodeOptionUI::random_code_string() const{
+QString RandomCodeWidget::random_code_string() const{
     QString str;
     char ch = 'A' - 1;
     size_t c = 0;
@@ -194,7 +219,7 @@ QString RandomCodeOptionUI::random_code_string() const{
     }
     return str;
 }
-void RandomCodeOptionUI::update_labels(){
+void RandomCodeWidget::update_labels(){
     if (m_value.m_current.random_digits() == 0){
 //        m_label_code->setText("Raid Code: ");
 //        m_code_row->setEnabled(true);
@@ -207,7 +232,7 @@ void RandomCodeOptionUI::update_labels(){
         m_under_text->setText("Random Code: " + random_code_string());
     }
 }
-void RandomCodeOptionUI::restore_defaults(){
+void RandomCodeWidget::restore_defaults(){
     m_value.restore_defaults();
     m_box_random->setText(QString::number(m_value.m_current.random_digits()));
     m_box_code->setText(m_value.m_current.code_string());

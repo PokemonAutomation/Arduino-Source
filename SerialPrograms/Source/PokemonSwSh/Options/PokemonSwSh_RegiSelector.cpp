@@ -4,14 +4,29 @@
  *
  */
 
+#include <QJsonValue>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QComboBox>
 #include "Common/Qt/NoWheelComboBox.h"
 #include "PokemonSwSh_RegiSelector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+
+
+
+class RegiSelectorWidget : public QWidget, public ConfigWidget{
+public:
+    RegiSelectorWidget(QWidget& parent, RegiSelectorOption& value);
+    virtual void restore_defaults() override;
+
+private:
+    RegiSelectorOption& m_value;
+    QComboBox* m_box;
+};
+
 
 
 RegiSelectorOption::RegiSelectorOption()
@@ -32,16 +47,16 @@ void RegiSelectorOption::restore_defaults(){
     m_current = m_default;
 };
 
-ConfigOptionUI* RegiSelectorOption::make_ui(QWidget& parent){
-    return new RegiSelectorOptionUI(parent, *this);
+ConfigWidget* RegiSelectorOption::make_ui(QWidget& parent){
+    return new RegiSelectorWidget(parent, *this);
 }
 
 
 
 
-RegiSelectorOptionUI::RegiSelectorOptionUI(QWidget& parent, RegiSelectorOption& value)
+RegiSelectorWidget::RegiSelectorWidget(QWidget& parent, RegiSelectorOption& value)
     : QWidget(&parent)
-    , ConfigOptionUI(value, *this)
+    , ConfigWidget(value, *this)
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
@@ -65,7 +80,7 @@ RegiSelectorOptionUI::RegiSelectorOptionUI(QWidget& parent, RegiSelectorOption& 
         }
     );
 }
-void RegiSelectorOptionUI::restore_defaults(){
+void RegiSelectorWidget::restore_defaults(){
     m_value.restore_defaults();
     m_box->setCurrentIndex((int)(RegiGolem)m_value);
 }

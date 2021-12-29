@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Options/EnumDropdownWidget.h"
 #include "PokemonSwSh_MaxLair_Options_Hosting.h"
 
 namespace PokemonAutomation{
@@ -51,23 +52,23 @@ QString HostingSettings::check_validity(size_t consoles) const{
     }
     return QString();
 }
-ConfigOptionUI* HostingSettings::make_ui(QWidget& parent){
+ConfigWidget* HostingSettings::make_ui(QWidget& parent){
     return new HostingSettingsUI(parent, *this);
 }
 
 HostingSettingsUI::HostingSettingsUI(QWidget& parent, HostingSettings& value)
-    : GroupOptionUI(parent, value)
+    : GroupWidget(parent, value)
 {
     update_option_visibility();
 
-    EnumDropdownOptionUI* mode = nullptr;
-    for (ConfigOptionUI* option : m_options){
+    EnumDropdownWidget* mode = nullptr;
+    for (ConfigWidget* option : m_options){
         if (&option->option() == &value.MODE){
-            mode = static_cast<EnumDropdownOptionUI*>(option);
+            mode = static_cast<EnumDropdownWidget*>(option);
         }
     }
     connect(
-        mode, &EnumDropdownOptionUI::on_changed,
+        mode, &EnumDropdownWidget::on_changed,
         this, [=]{
             update_option_visibility();
             this->update_visibility();

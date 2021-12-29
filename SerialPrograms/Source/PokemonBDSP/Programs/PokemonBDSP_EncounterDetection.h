@@ -12,7 +12,7 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "Pokemon/Pokemon_EncounterStats.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
-#include "PokemonBDSP/Options/PokemonBDSP_EncounterFilter.h"
+#include "PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOption.h"
 #include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"
 
 namespace PokemonAutomation{

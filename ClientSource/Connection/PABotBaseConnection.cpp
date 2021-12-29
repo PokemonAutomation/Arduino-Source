@@ -10,6 +10,7 @@
 #include "Common/Cpp/Exception.h"
 #include "ClientSource/Libraries/Logging.h"
 #include "ClientSource/Libraries/MessageConverter.h"
+#include "BotBaseMessage.h"
 #include "PABotBaseConnection.h"
 
 namespace PokemonAutomation{

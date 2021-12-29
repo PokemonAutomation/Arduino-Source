@@ -9,7 +9,9 @@
 
 #include "Common/Cpp/FixedLimitVector.h"
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Options/BatchOption.h"
+#include "CommonFramework/Options/BatchOption/BatchOption.h"
+#include "CommonFramework/Options/BatchOption/BatchWidget.h"
+#include "CommonFramework/Options/BatchOption/GroupOption.h"
 #include "CommonFramework/Options/StaticTextOption.h"
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "Pokemon/Options/Pokemon_BallSelectOption.h"
@@ -76,7 +78,7 @@ public:
         return *PLAYERS[index];
     }
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
     LanguageSet m_languages;
@@ -84,7 +86,7 @@ public:
     HostingSwitch HOST;
     std::unique_ptr<ConsoleSpecificOptions> PLAYERS[4];
 };
-class ConsolesUI : public BatchOptionUI{
+class ConsolesUI : public BatchWidget{
 public:
     ConsolesUI(QWidget& parent, Consoles& value);
     virtual void update_visibility() override;

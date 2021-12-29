@@ -29,13 +29,13 @@ int BooleanCheckBox_init = register_option(
 
 BooleanCheckBox::BooleanCheckBox(const QJsonObject& obj)
     : SingleStatementOption(obj)
-    , BooleanCheckBoxOptionBase(SingleStatementOption::m_label, false)
+    , BooleanCheckBoxBaseOption(SingleStatementOption::m_label, false)
 {
     load_default(json_get_value_throw(obj, JSON_DEFAULT));
     load_current(json_get_value_throw(obj, JSON_CURRENT));
 }
 void BooleanCheckBox::restore_defaults(){
-    BooleanCheckBoxOptionBase::restore_defaults();
+    BooleanCheckBoxBaseOption::restore_defaults();
 }
 QJsonObject BooleanCheckBox::to_json() const{
     QJsonObject root = SingleStatementOption::to_json();
@@ -57,7 +57,7 @@ QWidget* BooleanCheckBox::make_ui(QWidget& parent){
 
 
 BooleanCheckBoxUI::BooleanCheckBoxUI(QWidget& parent, BooleanCheckBox& value)
-    : BooleanCheckBoxOptionBaseUI(parent, value)
+    : BooleanCheckBoxBaseWidget(parent, value)
 {}
 
 

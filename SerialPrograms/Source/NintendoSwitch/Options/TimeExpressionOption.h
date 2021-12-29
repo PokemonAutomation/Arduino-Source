@@ -10,7 +10,7 @@
 #define PokemonAutomation_TimeExpression_H
 
 #include <limits>
-#include "Common/Qt/Options/TimeExpressionOptionBase.h"
+#include "Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.h"
 #include "CommonFramework/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -22,60 +22,32 @@ class TimeExpressionOptionUI;
 
 
 template <typename Type>
-class TimeExpressionOption : public ConfigOption, private TimeExpressionOptionBase<Type>{
+class TimeExpressionOption : public ConfigOption, private TimeExpressionBaseOption<Type>{
 public:
     TimeExpressionOption(
         QString label,
         QString default_value,
         Type min_value = std::numeric_limits<Type>::min(),
         Type max_value = std::numeric_limits<Type>::max()
-    )
-        : TimeExpressionOptionBase<Type>(std::move(label), min_value, max_value, default_value)
-    {}
+    );
 
-    using TimeExpressionOptionBase<Type>::label;
-    using TimeExpressionOptionBase<Type>::operator Type;
-    using TimeExpressionOptionBase<Type>::get;
-    using TimeExpressionOptionBase<Type>::set;
+    using TimeExpressionBaseOption<Type>::label;
+    using TimeExpressionBaseOption<Type>::operator Type;
+    using TimeExpressionBaseOption<Type>::get;
+    using TimeExpressionBaseOption<Type>::set;
 
-    virtual void load_json(const QJsonValue& json) override{
-        this->load_current(json);
-    }
-    virtual QJsonValue to_json() const override{
-        return this->write_current();
-    }
+    virtual void load_json(const QJsonValue& json) override;
+    virtual QJsonValue to_json() const override;
 
-    virtual QString check_validity() const override{
-        return TimeExpressionOptionBase<Type>::check_validity();
-    }
-    virtual void restore_defaults() override{
-        TimeExpressionOptionBase<Type>::restore_defaults();
-    }
+    virtual QString check_validity() const override;
+    virtual void restore_defaults() override;
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
     friend class TimeExpressionOptionUI<Type>;
 };
 
-
-template <typename Type>
-class TimeExpressionOptionUI : private TimeExpressionOptionBaseUI<Type>, public ConfigOptionUI{
-public:
-    TimeExpressionOptionUI(QWidget& parent, TimeExpressionOption<Type>& value)
-        : TimeExpressionOptionBaseUI<Type>(parent, value)
-        , ConfigOptionUI(value, *this)
-    {}
-    virtual void restore_defaults() override{
-        return TimeExpressionOptionBaseUI<Type>::restore_defaults();
-    }
-};
-
-
-template <typename Type>
-ConfigOptionUI* TimeExpressionOption<Type>::make_ui(QWidget& parent){
-    return new TimeExpressionOptionUI<Type>(parent, *this);
-}
 
 
 

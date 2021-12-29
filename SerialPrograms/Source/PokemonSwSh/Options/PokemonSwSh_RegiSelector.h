@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_RegiSelector_H
 #define PokemonAutomation_PokemonSwSh_RegiSelector_H
 
-#include <QComboBox>
+#include <QString>
 #include "CommonFramework/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -34,26 +34,16 @@ public:
 
     virtual void restore_defaults() override;
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 
 private:
-    friend class RegiSelectorOptionUI;
+    friend class RegiSelectorWidget;
     QString m_label;
     const RegiGolem m_default;
     RegiGolem m_current;
 };
 
-
-class RegiSelectorOptionUI : public QWidget, public ConfigOptionUI{
-public:
-    RegiSelectorOptionUI(QWidget& parent, RegiSelectorOption& value);
-    virtual void restore_defaults() override;
-
-private:
-    RegiSelectorOption& m_value;
-    QComboBox* m_box;
-};
 
 
 

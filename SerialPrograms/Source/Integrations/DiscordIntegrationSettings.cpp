@@ -61,7 +61,7 @@ DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption(bool integrat
     PA_ADD_OPTION(channels);
 }
 DiscordIntegrationSettingsOptionUI::DiscordIntegrationSettingsOptionUI(QWidget& parent, DiscordIntegrationSettingsOption& value)
-    : GroupOptionUI(parent, value)
+    : GroupWidget(parent, value)
 {
     QWidget* control_buttons = new QWidget(this);
     m_options_layout->insertWidget(0, control_buttons);

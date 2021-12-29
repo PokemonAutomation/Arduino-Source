@@ -43,7 +43,7 @@ DiscordMessageSettingsOption::DiscordMessageSettingsOption()
     PA_ADD_OPTION(message);
 }
 DiscordMessageSettingsOptionUI::DiscordMessageSettingsOptionUI(QWidget& parent, DiscordMessageSettingsOption& value)
-    : BatchOptionUI(parent, value)
+    : BatchWidget(parent, value)
 {}
 
 

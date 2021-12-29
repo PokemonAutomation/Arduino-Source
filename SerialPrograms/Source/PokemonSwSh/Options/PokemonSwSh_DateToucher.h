@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_DateToucher_H
 #define PokemonAutomation_DateToucher_H
 
+#include <chrono>
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
@@ -46,7 +47,7 @@ public:
     virtual void restore_defaults() override;
     virtual void reset_state() override final;
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
     bool ok_to_touch_now();
     void touch_now_from_home_if_needed(const BotBaseContext& context);

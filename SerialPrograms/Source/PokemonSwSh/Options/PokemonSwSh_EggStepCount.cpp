@@ -4,8 +4,10 @@
  *
  */
 
+#include <QJsonValue>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QComboBox>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "PokemonSwSh_EggStepCount.h"
@@ -26,6 +28,19 @@ const std::vector<uint16_t> STEP_COUNTS{
 //    30720,
 };
 
+
+
+class EggStepCountWidget : public QWidget, public ConfigWidget{
+public:
+    EggStepCountWidget(QWidget& parent, EggStepCountOption& value);
+    virtual void restore_defaults() override;
+
+private:
+    EggStepCountOption& m_value;
+    QComboBox* m_box;
+};
+
+
 EggStepCountOption::EggStepCountOption()
     : m_label("<b>Step Count:</b><br>Lookup the # of steps on Serebii.")
     , m_default(3)
@@ -45,14 +60,14 @@ void EggStepCountOption::restore_defaults(){
     m_current = m_default;
 }
 
-ConfigOptionUI* EggStepCountOption::make_ui(QWidget& parent){
-    return new EggStepCountUI(parent, *this);
+ConfigWidget* EggStepCountOption::make_ui(QWidget& parent){
+    return new EggStepCountWidget(parent, *this);
 }
 
 
-EggStepCountUI::EggStepCountUI(QWidget& parent, EggStepCountOption& value)
+EggStepCountWidget::EggStepCountWidget(QWidget& parent, EggStepCountOption& value)
     : QWidget(&parent)
-    , ConfigOptionUI(value, *this)
+    , ConfigWidget(value, *this)
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
@@ -74,7 +89,7 @@ EggStepCountUI::EggStepCountUI(QWidget& parent, EggStepCountOption& value)
         }
     );
 }
-void EggStepCountUI::restore_defaults(){
+void EggStepCountWidget::restore_defaults(){
     m_value.restore_defaults();
     m_box->setCurrentIndex((int)m_value.m_current);
 }

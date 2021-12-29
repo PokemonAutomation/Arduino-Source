@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_DiscordWebhookSettings_H
 #define PokemonAutomation_DiscordWebhookSettings_H
 
-#include "CommonFramework/Options/BatchOption.h"
+#include "CommonFramework/Options/BatchOption/GroupOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"
 
 namespace PokemonAutomation{

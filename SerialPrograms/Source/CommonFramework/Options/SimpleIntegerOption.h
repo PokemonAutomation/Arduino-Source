@@ -6,75 +6,48 @@
  *
  */
 
-#ifndef PokemonAutomation_SimpleInteger_H
-#define PokemonAutomation_SimpleInteger_H
+#ifndef PokemonAutomation_SimpleIntegerOption_H
+#define PokemonAutomation_SimpleIntegerOption_H
 
 #include <limits>
-#include "Common/Qt/Options/SimpleIntegerOptionBase.h"
+#include "Common/Qt/Options/SimpleInteger/SimpleIntegerBaseOption.h"
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
 
 
 template <typename Type>
-class SimpleIntegerOptionUI;
+class SimpleIntegerWidget;
 
 
 template <typename Type>
-class SimpleIntegerOption : public ConfigOption, private SimpleIntegerOptionBase<Type>{
+class SimpleIntegerOption : public ConfigOption, private SimpleIntegerBaseOption<Type>{
 public:
     SimpleIntegerOption(
         QString label,
         Type default_value,
         Type min_value = std::numeric_limits<Type>::min(),
         Type max_value = std::numeric_limits<Type>::max()
-    )
-        : SimpleIntegerOptionBase<Type>(std::move(label), min_value, max_value, default_value)
-    {}
+    );
 
-    using SimpleIntegerOptionBase<Type>::label;
-    using SimpleIntegerOptionBase<Type>::operator Type;
-    using SimpleIntegerOptionBase<Type>::get;
-    using SimpleIntegerOptionBase<Type>::set;
+    using SimpleIntegerBaseOption<Type>::label;
+    using SimpleIntegerBaseOption<Type>::operator Type;
+    using SimpleIntegerBaseOption<Type>::get;
+    using SimpleIntegerBaseOption<Type>::set;
 
-    virtual void load_json(const QJsonValue& json) override{
-        return this->load_current(json);
-    }
-    virtual QJsonValue to_json() const override{
-        return this->write_current();
-    }
+    virtual void load_json(const QJsonValue& json) override;
+    virtual QJsonValue to_json() const override;
 
-    virtual QString check_validity() const override{
-        return SimpleIntegerOptionBase<Type>::check_validity();
-    }
-    virtual void restore_defaults() override{
-        SimpleIntegerOptionBase<Type>::restore_defaults();
-    }
+    virtual QString check_validity() const override;
+    virtual void restore_defaults() override;
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class SimpleIntegerOptionUI<Type>;
+    friend class SimpleIntegerWidget<Type>;
 };
 
 
-template <typename Type>
-class SimpleIntegerOptionUI : private SimpleIntegerOptionBaseUI<Type>, public ConfigOptionUI{
-public:
-    SimpleIntegerOptionUI(QWidget& parent, SimpleIntegerOption<Type>& value)
-        : SimpleIntegerOptionBaseUI<Type>(parent, value)
-        , ConfigOptionUI(value, *this)
-    {}
-    virtual void restore_defaults() override{
-        SimpleIntegerOptionBaseUI<Type>::restore_defaults();
-    }
-};
-
-
-template <typename Type>
-inline ConfigOptionUI* SimpleIntegerOption<Type>::make_ui(QWidget& parent){
-    return new SimpleIntegerOptionUI<Type>(parent, *this);
-}
 
 
 }

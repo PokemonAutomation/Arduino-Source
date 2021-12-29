@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_OverworldTrigger_H
 #define PokemonAutomation_PokemonBDSP_OverworldTrigger_H
 
-#include "CommonFramework/Options/BatchOption.h"
+#include "CommonFramework/Options/BatchOption/GroupOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/Framework/SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"

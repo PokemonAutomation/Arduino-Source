@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 #include <vector>
-#include <QComboBox>
+#include <QString>
 #include "CommonFramework/Options/ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -27,26 +27,17 @@ public:
 
     virtual void restore_defaults() override;
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 
 private:
-    friend class EggStepCountUI;
+    friend class EggStepCountWidget;
     QString m_label;
     const size_t m_default;
     size_t m_current;
 };
 
 
-class EggStepCountUI : public QWidget, public ConfigOptionUI{
-public:
-    EggStepCountUI(QWidget& parent, EggStepCountOption& value);
-    virtual void restore_defaults() override;
-
-private:
-    EggStepCountOption& m_value;
-    QComboBox* m_box;
-};
 
 
 }

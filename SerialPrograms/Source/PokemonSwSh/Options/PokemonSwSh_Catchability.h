@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonSwSh_Catchability_H
 #define PokemonAutomation_PokemonSwSh_Catchability_H
 
-#include <QComboBox>
 #include "CommonFramework/Options/ConfigOption.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 
@@ -27,25 +26,14 @@ public:
 
     virtual void restore_defaults() override;
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 
 private:
-    friend class CatchabilitySelectorUI;
+    friend class CatchabilitySelectorWidget;
     QString m_label;
     const Catchability m_default;
     Catchability m_current;
-};
-
-
-class CatchabilitySelectorUI : public QWidget, public ConfigOptionUI{
-public:
-    CatchabilitySelectorUI(QWidget& parent, CatchabilitySelectorOption& value);
-    virtual void restore_defaults() override;
-
-private:
-    CatchabilitySelectorOption& m_value;
-    QComboBox* m_box;
 };
 
 

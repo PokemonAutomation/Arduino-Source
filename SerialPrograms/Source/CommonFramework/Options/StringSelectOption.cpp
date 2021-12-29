@@ -4,8 +4,10 @@
  *
  */
 
+#include <QJsonValue>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QComboBox>
 #include <QCompleter>
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/NoWheelComboBox.h"
@@ -16,6 +18,22 @@ using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
+
+
+
+class StringSelectWidget : public QWidget, public ConfigWidget{
+public:
+    StringSelectWidget(QWidget& parent, StringSelectOption& value);
+    virtual void restore_defaults() override;
+
+private:
+    StringSelectOption& m_value;
+    QComboBox* m_box;
+//    bool m_updating = false;
+};
+
+
+
 
 
 StringSelectOption::StringSelectOption(
@@ -90,15 +108,15 @@ void StringSelectOption::restore_defaults(){
     m_current.store(m_default, std::memory_order_relaxed);
 }
 
-ConfigOptionUI* StringSelectOption::make_ui(QWidget& parent){
-    return new StringSelectOptionUI(parent, *this);
+ConfigWidget* StringSelectOption::make_ui(QWidget& parent){
+    return new StringSelectWidget(parent, *this);
 }
 
 
 
-StringSelectOptionUI::StringSelectOptionUI(QWidget& parent, StringSelectOption& value)
+StringSelectWidget::StringSelectWidget(QWidget& parent, StringSelectOption& value)
     : QWidget(&parent)
-    , ConfigOptionUI(value, *this)
+    , ConfigWidget(value, *this)
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
@@ -132,7 +150,7 @@ StringSelectOptionUI::StringSelectOptionUI(QWidget& parent, StringSelectOption& 
 }
 
 
-void StringSelectOptionUI::restore_defaults(){
+void StringSelectWidget::restore_defaults(){
     m_value.restore_defaults();
     m_box->setCurrentIndex((int)m_value);
 }

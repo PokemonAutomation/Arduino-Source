@@ -6,6 +6,7 @@
 
 #include <cstddef>
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
+#include "CommonFramework/Options/BatchOption/BatchWidget.h"
 #include "MultiSwitchProgram.h"
 
 #include <iostream>

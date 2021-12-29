@@ -7,9 +7,7 @@
 #ifndef PokemonAutomation_OCR_LanguageOCR_H
 #define PokemonAutomation_OCR_LanguageOCR_H
 
-#include <set>
-#include <QLabel>
-#include <QComboBox>
+#include <map>
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Options/ConfigOption.h"
 
@@ -31,10 +29,10 @@ public:
     virtual QString check_validity() const override;
     virtual void restore_defaults() override;
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class LanguageOCRUI;
+    friend class LanguageOCRWidget;
 
     QString m_label;
 
@@ -42,23 +40,6 @@ private:
     std::map<Language, size_t> m_case_map;
     size_t m_default;
     size_t m_current;
-};
-
-
-
-class LanguageOCRUI : public QWidget, public ConfigOptionUI{
-public:
-    LanguageOCRUI(QWidget& parent, LanguageOCR& value);
-    virtual void restore_defaults() override;
-
-private:
-    void update_status();
-
-private:
-    LanguageOCR& m_value;
-    QComboBox* m_box;
-    QLabel* m_status;
-    bool m_updating = false;
 };
 
 

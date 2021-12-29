@@ -12,6 +12,7 @@
 namespace PokemonAutomation{
 namespace Pokemon{
 
+
 class BallSelectWidget : public NoWheelComboBox{
 public:
     BallSelectWidget(

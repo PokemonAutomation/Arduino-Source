@@ -7,11 +7,11 @@
 #ifndef PokemonAutomation_PokemonBDSP_EncounterBotCommon_H
 #define PokemonAutomation_PokemonBDSP_EncounterBotCommon_H
 
-#include "CommonFramework/Options/BatchOption.h"
+#include "CommonFramework/Options/BatchOption/BatchOption.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
-#include "PokemonBDSP_EncounterFilter.h"
+#include "EncounterFilter/PokemonBDSP_EncounterFilterOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

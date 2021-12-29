@@ -7,10 +7,9 @@
 #ifndef PokemonAutomation_ConfigOption_H
 #define PokemonAutomation_ConfigOption_H
 
-#include <QString>
-#include <QJsonValue>
-#include <QWidget>
-#include "Common/Compiler.h"
+class QString;
+class QJsonValue;
+class QWidget;
 
 namespace PokemonAutomation{
 
@@ -22,7 +21,7 @@ enum class ConfigOptionState{
 };
 
 
-class ConfigOptionUI;
+class ConfigWidget;
 
 class ConfigOption{
 public:
@@ -32,7 +31,7 @@ public:
     virtual QJsonValue to_json() const = 0;
 
     //  Returns error message if invalid. Otherwise returns empty string.
-    virtual QString check_validity() const{ return QString(); };
+    virtual QString check_validity() const;
 
     virtual void restore_defaults(){};
 
@@ -40,22 +39,17 @@ public:
     //  transient state that the option object may have.
     virtual void reset_state(){};
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) = 0;
+    virtual ConfigWidget* make_ui(QWidget& parent) = 0;
 
 public:
     ConfigOptionState visibility = ConfigOptionState::ENABLED;
 };
 
 
-class ConfigOptionUI{
+class ConfigWidget{
 public:
-    virtual ~ConfigOptionUI() = default;
-    ConfigOptionUI(ConfigOption& m_value, QWidget& widget)
-        : m_value(m_value)
-        , m_widget(widget)
-    {
-        ConfigOptionUI::update_visibility();
-    }
+    virtual ~ConfigWidget() = default;
+    ConfigWidget(ConfigOption& m_value, QWidget& widget);
 
     const ConfigOption& option() const{ return m_value; }
     ConfigOption& option(){ return m_value; }
@@ -63,22 +57,7 @@ public:
     QWidget& widget(){ return m_widget; }
     virtual void restore_defaults() = 0;
 
-    virtual void update_visibility(){
-        switch (m_value.visibility){
-        case ConfigOptionState::ENABLED:
-            m_widget.setEnabled(true);
-            m_widget.setVisible(true);
-            break;
-        case ConfigOptionState::DISABLED:
-            m_widget.setEnabled(false);
-            m_widget.setVisible(true);
-            break;
-        case ConfigOptionState::HIDDEN:
-            m_widget.setEnabled(false);
-            m_widget.setVisible(false);
-            break;
-        }
-    }
+    virtual void update_visibility();
 
 private:
     ConfigOption& m_value;

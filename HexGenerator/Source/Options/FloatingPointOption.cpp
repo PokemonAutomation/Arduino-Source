@@ -32,7 +32,7 @@ int FloatingPoint_init = register_option(
 
 FloatingPoint::FloatingPoint(const QJsonObject& obj)
     : SingleStatementOption(obj)
-    , FloatingPointOptionBase(
+    , FloatingPointBaseOption(
         SingleStatementOption::m_label,
         json_get_double_throw(obj, JSON_MIN_VALUE),
         json_get_double_throw(obj, JSON_MAX_VALUE),
@@ -42,10 +42,10 @@ FloatingPoint::FloatingPoint(const QJsonObject& obj)
     m_current = json_get_double_throw(obj, JSON_CURRENT);
 }
 QString FloatingPoint::check_validity() const{
-    return FloatingPointOptionBase::check_validity();
+    return FloatingPointBaseOption::check_validity();
 }
 void FloatingPoint::restore_defaults(){
-    FloatingPointOptionBase::restore_defaults();
+    FloatingPointBaseOption::restore_defaults();
 }
 QJsonObject FloatingPoint::to_json() const{
     QJsonObject root = SingleStatementOption::to_json();
@@ -68,7 +68,7 @@ QWidget* FloatingPoint::make_ui(QWidget& parent){
 }
 
 FloatingPointUI::FloatingPointUI(QWidget& parent, FloatingPoint& value)
-    : FloatingPointOptionBaseUI(parent, value)
+    : FloatingPointBaseWidget(parent, value)
 {}
 
 

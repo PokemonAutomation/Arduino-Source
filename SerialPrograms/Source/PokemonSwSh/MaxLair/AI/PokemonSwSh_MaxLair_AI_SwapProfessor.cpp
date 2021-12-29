@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Exception.h"
 #include "PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Pokemon.h"
 #include "PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Matchup.h"
 #include "PokemonSwSh_MaxLair_AI.h"

@@ -4,8 +4,11 @@
  *
  */
 
+#include <QComboBox>
+#include "Common/Compiler.h"
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
+#include "Pokemon/Options/Pokemon_IVCheckerWidget.h"
 #include "PokemonBDSP_EggHatchFilter.h"
 
 #include <iostream>
@@ -97,7 +100,7 @@ std::vector<QWidget*> EggHatchFilterRow::make_widgets(QWidget& parent){
     widgets.emplace_back(make_iv_box(parent, iv_speed));
     return widgets;
 }
-QComboBox* EggHatchFilterRow::make_action_box(QWidget& parent){
+QWidget* EggHatchFilterRow::make_action_box(QWidget& parent){
     QComboBox* box = new NoWheelComboBox(&parent);
     box->addItem(EggHatchAction_NAMES[0]);
     box->addItem(EggHatchAction_NAMES[1]);
@@ -113,7 +116,7 @@ QComboBox* EggHatchFilterRow::make_action_box(QWidget& parent){
     );
     return box;
 }
-QComboBox* EggHatchFilterRow::make_shiny_box(QWidget& parent){
+QWidget* EggHatchFilterRow::make_shiny_box(QWidget& parent){
     QComboBox* box = new NoWheelComboBox(&parent);
     box->addItem(EggHatchShinyFilter_NAMES[0]);
     box->addItem(EggHatchShinyFilter_NAMES[1]);
@@ -130,7 +133,7 @@ QComboBox* EggHatchFilterRow::make_shiny_box(QWidget& parent){
     );
     return box;
 }
-IVCheckerFilterWidget* EggHatchFilterRow::make_iv_box(QWidget& parent, IVCheckerFilter& iv){
+QWidget* EggHatchFilterRow::make_iv_box(QWidget& parent, IVCheckerFilter& iv){
     IVCheckerFilterWidget* box = new IVCheckerFilterWidget(parent, iv);
     box->connect(
         box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -181,7 +184,7 @@ QJsonValue EggHatchFilterOption::to_json() const{
 void EggHatchFilterOption::restore_defaults(){
     m_table.restore_defaults();
 }
-ConfigOptionUI* EggHatchFilterOption::make_ui(QWidget& parent){
+ConfigWidget* EggHatchFilterOption::make_ui(QWidget& parent){
     return m_table.make_ui(parent);
 }
 

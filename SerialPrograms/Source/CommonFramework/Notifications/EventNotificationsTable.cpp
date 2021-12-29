@@ -5,6 +5,7 @@
  */
 
 #include <QtGlobal>
+#include <QVBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
 #include <QCheckBox>
@@ -66,7 +67,7 @@ void EventNotificationsTable::reset_state(){
         option->reset_rate_limit();
     }
 }
-ConfigOptionUI* EventNotificationsTable::make_ui(QWidget& parent){
+ConfigWidget* EventNotificationsTable::make_ui(QWidget& parent){
     return new EventNotificationsTableUI(parent, *this);
 }
 void EventNotificationsTable::set_enabled(bool enabled){
@@ -80,7 +81,7 @@ void EventNotificationsTable::set_enabled(bool enabled){
 
 EventNotificationsTableUI::EventNotificationsTableUI(QWidget& parent, EventNotificationsTable& value)
     : QWidget(&parent)
-    , ConfigOptionUI(value, *this)
+    , ConfigWidget(value, *this)
     , m_value(value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);

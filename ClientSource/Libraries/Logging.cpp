@@ -13,6 +13,7 @@
 #include "Common/Cpp/Exception.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
+#include "ClientSource/Connection/BotBaseMessage.h"
 #include "MessageConverter.h"
 #include "Logging.h"
 

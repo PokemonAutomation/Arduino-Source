@@ -7,7 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Options_Hosting_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Options_Hosting_H
 
-#include "CommonFramework/Options/BatchOption.h"
+#include "CommonFramework/Options/BatchOption/GroupOption.h"
+#include "CommonFramework/Options/BatchOption/GroupWidget.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/RandomCodeOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
@@ -32,7 +33,7 @@ public:
     using GroupOption::check_validity;
     QString check_validity(size_t consoles) const;
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
     EnumDropdownOption MODE;
     RandomCodeOption RAID_CODE;
@@ -42,7 +43,7 @@ public:
     AutoHostNotificationOption NOTIFICATIONS;
 };
 
-class HostingSettingsUI : public GroupOptionUI{
+class HostingSettingsUI : public GroupWidget{
 public:
     HostingSettingsUI(QWidget& parent, HostingSettings& value);
 private:

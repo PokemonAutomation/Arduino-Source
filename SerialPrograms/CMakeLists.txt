@@ -36,6 +36,7 @@ link_directories(${CMAKE_CURRENT_LIST_DIR})
 
 file(GLOB MAIN_SOURCES
     ../ClientSource/Connection/BotBase.h
+    ../ClientSource/Connection/BotBaseMessage.h
     ../ClientSource/Connection/PABotBase.cpp
     ../ClientSource/Connection/PABotBase.h
     ../ClientSource/Connection/PABotBaseConnection.cpp
@@ -96,24 +97,38 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/ExpressionEvaluator.cpp
     ../Common/Qt/ExpressionEvaluator.h
     ../Common/Qt/NoWheelComboBox.h
-    ../Common/Qt/Options/BooleanCheckBoxOptionBase.cpp
-    ../Common/Qt/Options/BooleanCheckBoxOptionBase.h
-    ../Common/Qt/Options/EditableTableOptionBase.cpp
-    ../Common/Qt/Options/EditableTableOptionBase.h
-    ../Common/Qt/Options/FloatingPointOptionBase.cpp
-    ../Common/Qt/Options/FloatingPointOptionBase.h
-    ../Common/Qt/Options/FossilTableOptionBase.cpp
-    ../Common/Qt/Options/FossilTableOptionBase.h
-    ../Common/Qt/Options/MultiHostTableOptionBase.cpp
-    ../Common/Qt/Options/MultiHostTableOptionBase.h
-    ../Common/Qt/Options/SimpleIntegerOptionBase.cpp
-    ../Common/Qt/Options/SimpleIntegerOptionBase.h
-    ../Common/Qt/Options/StringOptionBase.cpp
-    ../Common/Qt/Options/StringOptionBase.h
-    ../Common/Qt/Options/SwitchDateOptionBase.cpp
-    ../Common/Qt/Options/SwitchDateOptionBase.h
-    ../Common/Qt/Options/TimeExpressionOptionBase.cpp
-    ../Common/Qt/Options/TimeExpressionOptionBase.h
+    ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseOption.cpp
+    ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseOption.h
+    ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseWidget.cpp
+    ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseWidget.h
+    ../Common/Qt/Options/EditableTable/EditableTableBaseOption.cpp
+    ../Common/Qt/Options/EditableTable/EditableTableBaseOption.h
+    ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.cpp
+    ../Common/Qt/Options/EditableTable/EditableTableBaseWidget.h
+    ../Common/Qt/Options/FloatingPoint/FloatingPointBaseOption.cpp
+    ../Common/Qt/Options/FloatingPoint/FloatingPointBaseOption.h
+    ../Common/Qt/Options/FloatingPoint/FloatingPointBaseWidget.cpp
+    ../Common/Qt/Options/FloatingPoint/FloatingPointBaseWidget.h
+    ../Common/Qt/Options/FossilTableBaseOption.cpp
+    ../Common/Qt/Options/FossilTableBaseOption.h
+    ../Common/Qt/Options/MultiHostTableBaseOption.cpp
+    ../Common/Qt/Options/MultiHostTableBaseOption.h
+    ../Common/Qt/Options/SimpleInteger/SimpleIntegerBaseOption.cpp
+    ../Common/Qt/Options/SimpleInteger/SimpleIntegerBaseOption.h
+    ../Common/Qt/Options/SimpleInteger/SimpleIntegerBaseWidget.cpp
+    ../Common/Qt/Options/SimpleInteger/SimpleIntegerBaseWidget.h
+    ../Common/Qt/Options/String/StringBaseOption.cpp
+    ../Common/Qt/Options/String/StringBaseOption.h
+    ../Common/Qt/Options/String/StringBaseWidget.cpp
+    ../Common/Qt/Options/String/StringBaseWidget.h
+    ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.cpp
+    ../Common/Qt/Options/SwitchDate/SwitchDateBaseOption.h
+    ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.cpp
+    ../Common/Qt/Options/SwitchDate/SwitchDateBaseWidget.h
+    ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.cpp
+    ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.h
+    ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.cpp
+    ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h
     ../Common/Qt/QtJsonTools.cpp
     ../Common/Qt/QtJsonTools.h
     Source/CommonFramework/BinaryImage/BinaryImage.cpp
@@ -225,15 +240,24 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/OCR/OCR_TrainingTools.cpp
     Source/CommonFramework/OCR/OCR_TrainingTools.h
     Source/CommonFramework/OCR/TesseractPA.h
-    Source/CommonFramework/Options/BatchOption.cpp
-    Source/CommonFramework/Options/BatchOption.h
+    Source/CommonFramework/Options/BatchOption/BatchOption.cpp
+    Source/CommonFramework/Options/BatchOption/BatchOption.h
+    Source/CommonFramework/Options/BatchOption/BatchWidget.h
+    Source/CommonFramework/Options/BatchOption/GroupOption.cpp
+    Source/CommonFramework/Options/BatchOption/GroupOption.h
+    Source/CommonFramework/Options/BatchOption/GroupWidget.h
+    Source/CommonFramework/Options/BooleanCheckBoxOption.cpp
     Source/CommonFramework/Options/BooleanCheckBoxOption.h
+    Source/CommonFramework/Options/ConfigOption.cpp
     Source/CommonFramework/Options/ConfigOption.h
+    Source/CommonFramework/Options/EditableTableOption.cpp
     Source/CommonFramework/Options/EditableTableOption.h
     Source/CommonFramework/Options/EnumDropdownOption.cpp
     Source/CommonFramework/Options/EnumDropdownOption.h
+    Source/CommonFramework/Options/EnumDropdownWidget.h
     Source/CommonFramework/Options/FixedCodeOption.cpp
     Source/CommonFramework/Options/FixedCodeOption.h
+    Source/CommonFramework/Options/FloatingPointOption.cpp
     Source/CommonFramework/Options/FloatingPointOption.h
     Source/CommonFramework/Options/HiddenTextEditOption.cpp
     Source/CommonFramework/Options/HiddenTextEditOption.h
@@ -241,9 +265,11 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/RandomCodeOption.h
     Source/CommonFramework/Options/ScreenshotFormatOption.cpp
     Source/CommonFramework/Options/ScreenshotFormatOption.h
+    Source/CommonFramework/Options/SimpleIntegerOption.cpp
     Source/CommonFramework/Options/SimpleIntegerOption.h
     Source/CommonFramework/Options/StaticTextOption.cpp
     Source/CommonFramework/Options/StaticTextOption.h
+    Source/CommonFramework/Options/StringOption.cpp
     Source/CommonFramework/Options/StringOption.h
     Source/CommonFramework/Options/StringSelectOption.cpp
     Source/CommonFramework/Options/StringSelectOption.h
@@ -405,7 +431,9 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Options/GoHomeWhenDoneOption.cpp
     Source/NintendoSwitch/Options/GoHomeWhenDoneOption.h
     Source/NintendoSwitch/Options/StartInGripMenuOption.h
+    Source/NintendoSwitch/Options/SwitchDateOption.cpp
     Source/NintendoSwitch/Options/SwitchDateOption.h
+    Source/NintendoSwitch/Options/TimeExpressionOption.cpp
     Source/NintendoSwitch/Options/TimeExpressionOption.h
     Source/NintendoSwitch/NintendoSwitch_Panels.cpp
     Source/NintendoSwitch/NintendoSwitch_Panels.h
@@ -502,8 +530,14 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.cpp
     Source/PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.h
     Source/PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h
-    Source/PokemonBDSP/Options/PokemonBDSP_EncounterFilter.cpp
-    Source/PokemonBDSP/Options/PokemonBDSP_EncounterFilter.h
+    Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterEnums.cpp
+    Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterEnums.h
+    Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOption.cpp
+    Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOption.h
+    Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOverride.cpp
+    Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOverride.h
+    Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterWidget.cpp
+    Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterWidget.h
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.cpp
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h
     Source/PokemonBDSP/Programs/PokemonBDSP_BoxRelease.cpp
@@ -741,9 +775,17 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_EggStepCount.h
     Source/PokemonSwSh/Options/PokemonSwSh_EncounterBotCommon.h
-    Source/PokemonSwSh/Options/PokemonSwSh_EncounterFilter.cpp
-    Source/PokemonSwSh/Options/PokemonSwSh_EncounterFilter.h
+    Source/PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterEnums.cpp
+    Source/PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterEnums.h
+    Source/PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterOption.cpp
+    Source/PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterOption.h
+    Source/PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterOverride.cpp
+    Source/PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterOverride.h
+    Source/PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterWidget.cpp
+    Source/PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterWidget.h
+    Source/PokemonSwSh/Options/PokemonSwSh_FossilTable.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_FossilTable.h
+    Source/PokemonSwSh/Options/PokemonSwSh_MultiHostTable.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_MultiHostTable.h
     Source/PokemonSwSh/Options/PokemonSwSh_RegiSelector.cpp
     Source/PokemonSwSh/Options/PokemonSwSh_RegiSelector.h

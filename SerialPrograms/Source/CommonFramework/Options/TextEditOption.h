@@ -9,7 +9,7 @@
 #ifndef PokemonAutomation_TextEdit_H
 #define PokemonAutomation_TextEdit_H
 
-#include <QTextEdit>
+#include <QString>
 #include "Common/Cpp/SpinLock.h"
 #include "ConfigOption.h"
 
@@ -35,7 +35,7 @@ public:
 
     virtual void restore_defaults() override;
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
     const QString m_label;
@@ -47,17 +47,6 @@ private:
 };
 
 
-class TextEditOptionUI : public QWidget, public ConfigOptionUI{
-public:
-    TextEditOptionUI(QWidget& parent, TextEditOption& value);
-    virtual void restore_defaults() override;
-
-private:
-    class Box;
-
-    TextEditOption& m_value;
-    QTextEdit* m_box;
-};
 
 
 }

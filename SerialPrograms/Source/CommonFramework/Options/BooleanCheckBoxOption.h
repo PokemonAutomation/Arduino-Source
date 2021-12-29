@@ -6,62 +6,42 @@
  *
  */
 
-#ifndef PokemonAutomation_BooleanCheckBox_H
-#define PokemonAutomation_BooleanCheckBox_H
+#ifndef PokemonAutomation_BooleanCheckBoxOption_H
+#define PokemonAutomation_BooleanCheckBoxOption_H
 
-#include "Common/Qt/Options/BooleanCheckBoxOptionBase.h"
+#include "Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseOption.h"
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
 
 
-class BooleanCheckBoxOption : public ConfigOption, private BooleanCheckBoxOptionBase{
+class BooleanCheckBoxOption : public ConfigOption, private BooleanCheckBoxBaseOption{
 public:
     BooleanCheckBoxOption(
         QString label,
         bool default_value
     )
-        : BooleanCheckBoxOptionBase(std::move(label), default_value)
+        : BooleanCheckBoxBaseOption(std::move(label), default_value)
     {}
 
-    using BooleanCheckBoxOptionBase::label;
-    using BooleanCheckBoxOptionBase::operator bool;
-    using BooleanCheckBoxOptionBase::get;
-    using BooleanCheckBoxOptionBase::set;
+    using BooleanCheckBoxBaseOption::label;
+    using BooleanCheckBoxBaseOption::operator bool;
+    using BooleanCheckBoxBaseOption::get;
+    using BooleanCheckBoxBaseOption::set;
 
-    virtual void load_json(const QJsonValue& json) override{
-        load_current(json);
-    }
-    virtual QJsonValue to_json() const override{
-        return write_current();
-    }
+    virtual void load_json(const QJsonValue& json) override;
+    virtual QJsonValue to_json() const override;
 
-    virtual void restore_defaults() override{
-        BooleanCheckBoxOptionBase::restore_defaults();
-    }
+    virtual void restore_defaults() override;
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class BooleanCheckBoxOptionUI;
+    friend class BooleanCheckBoxWidget;
 };
 
 
-class BooleanCheckBoxOptionUI : private BooleanCheckBoxOptionBaseUI, public ConfigOptionUI{
-public:
-    BooleanCheckBoxOptionUI(QWidget& parent, BooleanCheckBoxOption& value)
-        : BooleanCheckBoxOptionBaseUI(parent, value)
-        , ConfigOptionUI(value, *this)
-    {}
-    virtual void restore_defaults() override{
-        BooleanCheckBoxOptionBaseUI::restore_defaults();
-    }
-};
 
-
-inline ConfigOptionUI* BooleanCheckBoxOption::make_ui(QWidget& parent){
-    return new BooleanCheckBoxOptionUI(parent, *this);
-}
 
 
 }

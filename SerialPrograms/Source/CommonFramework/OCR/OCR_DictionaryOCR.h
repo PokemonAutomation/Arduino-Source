@@ -10,10 +10,11 @@
 #include <vector>
 #include <set>
 #include <map>
-#include <QJsonObject>
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Tools/Logger.h"
-#include "CommonFramework/OCR/OCR_TextMatcher.h"
+#include "OCR_StringMatchResult.h"
+
+class QJsonObject;
 
 namespace PokemonAutomation{
 namespace OCR{

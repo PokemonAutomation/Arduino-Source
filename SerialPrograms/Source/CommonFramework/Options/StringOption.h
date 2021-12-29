@@ -9,66 +9,38 @@
 #ifndef PokemonAutomation_StringOption_H
 #define PokemonAutomation_StringOption_H
 
-#include "Common/Qt/Options/StringOptionBase.h"
+#include "Common/Qt/Options/String/StringBaseOption.h"
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
 
 
-class StringOption : public ConfigOption, private StringOptionBase{
+class StringOption : public ConfigOption, private StringBaseOption{
 public:
     StringOption(
         bool is_password,
         QString label,
         QString default_value,
         QString placeholder_text
-    )
-        : StringOptionBase(
-            is_password,
-            std::move(label),
-            default_value,
-            std::move(placeholder_text)
-        )
-    {}
+    );
 
-    using StringOptionBase::label;
-    using StringOptionBase::operator QString;
-    using StringOptionBase::get;
-    using StringOptionBase::set;
+    using StringBaseOption::label;
+    using StringBaseOption::operator QString;
+    using StringBaseOption::get;
+    using StringBaseOption::set;
 
-    virtual void load_json(const QJsonValue& json) override{
-        load_current(json);
-    }
-    virtual QJsonValue to_json() const override{
-        return write_current();
-    }
+    virtual void load_json(const QJsonValue& json) override;
+    virtual QJsonValue to_json() const override;
 
-    virtual void restore_defaults() override{
-        StringOptionBase::restore_defaults();
-    }
+    virtual void restore_defaults() override;
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class StringOptionUI;
+    friend class StringWidget;
 };
 
 
-class StringOptionUI : private StringOptionBaseUI, public ConfigOptionUI{
-public:
-    StringOptionUI(QWidget& parent, StringOption& value)
-        : StringOptionBaseUI(parent, value)
-        , ConfigOptionUI(value, *this)
-    {}
-    virtual void restore_defaults() override{
-        StringOptionBaseUI::restore_defaults();
-    }
-};
-
-
-inline ConfigOptionUI* StringOption::make_ui(QWidget& parent){
-    return new StringOptionUI(parent, *this);
-}
 
 
 }

@@ -32,7 +32,7 @@ int SimpleInteger_init = register_option(
 
 SimpleInteger::SimpleInteger(const QJsonObject& obj)
     : SingleStatementOption(obj)
-    , SimpleIntegerOptionBase<uint32_t>(
+    , SimpleIntegerBaseOption<uint32_t>(
         SingleStatementOption::m_label,
         json_get_int_throw(obj, JSON_MIN_VALUE),
         json_get_int_throw(obj, JSON_MAX_VALUE),
@@ -42,10 +42,10 @@ SimpleInteger::SimpleInteger(const QJsonObject& obj)
     m_current = json_get_int_throw(obj, JSON_CURRENT);
 }
 QString SimpleInteger::check_validity() const{
-    return SimpleIntegerOptionBase<uint32_t>::check_validity();
+    return SimpleIntegerBaseOption<uint32_t>::check_validity();
 }
 void SimpleInteger::restore_defaults(){
-    SimpleIntegerOptionBase<uint32_t>::restore_defaults();
+    SimpleIntegerBaseOption<uint32_t>::restore_defaults();
 }
 QJsonObject SimpleInteger::to_json() const{
     QJsonObject root = SingleStatementOption::to_json();
@@ -68,7 +68,7 @@ QWidget* SimpleInteger::make_ui(QWidget& parent){
 }
 
 SimpleIntegerUI::SimpleIntegerUI(QWidget& parent, SimpleInteger& value)
-    : SimpleIntegerOptionBaseUI<uint32_t>(parent, value)
+    : SimpleIntegerBaseWidget<uint32_t>(parent, value)
 {}
 
 

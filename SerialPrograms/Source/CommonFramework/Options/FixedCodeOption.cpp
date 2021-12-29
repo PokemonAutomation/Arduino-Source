@@ -4,13 +4,32 @@
  *
  */
 
+#include <QJsonValue>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QLineEdit>
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/CodeValidator.h"
 #include "FixedCodeOption.h"
 
 namespace PokemonAutomation{
+
+
+
+class FixedCodeWidget : public QWidget, public ConfigWidget{
+public:
+    FixedCodeWidget(QWidget& parent, FixedCodeOption& value);
+    virtual void restore_defaults() override;
+
+private:
+    QString sanitized_code(const QString& text) const;
+
+private:
+    FixedCodeOption& m_value;
+    QLineEdit* m_box;
+};
+
+
 
 
 FixedCodeOption::FixedCodeOption(
@@ -72,12 +91,12 @@ void FixedCodeOption::restore_defaults(){
     m_current = m_default;
 }
 
-ConfigOptionUI* FixedCodeOption::make_ui(QWidget& parent){
-    return new FixedCodeOptionUI(parent, *this);
+ConfigWidget* FixedCodeOption::make_ui(QWidget& parent){
+    return new FixedCodeWidget(parent, *this);
 }
 
 
-QString FixedCodeOptionUI::sanitized_code(const QString& text) const{
+QString FixedCodeWidget::sanitized_code(const QString& text) const{
     QString message;
     try{
         message = "Code: " + sanitize_code(m_value.m_digits, text);
@@ -86,9 +105,9 @@ QString FixedCodeOptionUI::sanitized_code(const QString& text) const{
     }
     return message;
 }
-FixedCodeOptionUI::FixedCodeOptionUI(QWidget& parent, FixedCodeOption& value)
+FixedCodeWidget::FixedCodeWidget(QWidget& parent, FixedCodeOption& value)
     : QWidget(&parent)
-    , ConfigOptionUI(value, *this)
+    , ConfigWidget(value, *this)
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
@@ -122,7 +141,7 @@ FixedCodeOptionUI::FixedCodeOptionUI(QWidget& parent, FixedCodeOption& value)
         }
     );
 }
-void FixedCodeOptionUI::restore_defaults(){
+void FixedCodeWidget::restore_defaults(){
     m_value.restore_defaults();
     m_box->setText(m_value);
 }

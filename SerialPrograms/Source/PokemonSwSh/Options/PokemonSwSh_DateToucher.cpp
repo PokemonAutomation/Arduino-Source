@@ -4,6 +4,7 @@
  *
  */
 
+#include <QJsonValue>
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh_DateToucher.h"
@@ -49,7 +50,7 @@ void TouchDateIntervalOption::restore_defaults(){
 void TouchDateIntervalOption::reset_state(){
     m_last_touch = std::chrono::system_clock::time_point::min();
 }
-ConfigOptionUI* TouchDateIntervalOption::make_ui(QWidget& parent){
+ConfigWidget* TouchDateIntervalOption::make_ui(QWidget& parent){
     return m_hours.make_ui(parent);
 }
 

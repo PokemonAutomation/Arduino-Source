@@ -4,10 +4,12 @@
  *
  */
 
+#include <QJsonValue>
 #include <QStandardItemModel>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QComboBox>
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "CommonFramework/Globals.h"
@@ -20,6 +22,24 @@ using std::endl;
 
 namespace PokemonAutomation{
 namespace OCR{
+
+
+
+class LanguageOCRWidget : public QWidget, public ConfigWidget{
+public:
+    LanguageOCRWidget(QWidget& parent, LanguageOCR& value);
+    virtual void restore_defaults() override;
+
+private:
+    void update_status();
+
+private:
+    LanguageOCR& m_value;
+    QComboBox* m_box;
+    QLabel* m_status;
+    bool m_updating = false;
+};
+
 
 
 
@@ -85,15 +105,15 @@ void LanguageOCR::restore_defaults(){
     m_current = m_default;
 }
 
-ConfigOptionUI* LanguageOCR::make_ui(QWidget& parent){
-    return new LanguageOCRUI(parent, *this);
+ConfigWidget* LanguageOCR::make_ui(QWidget& parent){
+    return new LanguageOCRWidget(parent, *this);
 }
 
 
 
-LanguageOCRUI::LanguageOCRUI(QWidget& parent, LanguageOCR& value)
+LanguageOCRWidget::LanguageOCRWidget(QWidget& parent, LanguageOCR& value)
     : QWidget(&parent)
-    , ConfigOptionUI(value, *this)
+    , ConfigWidget(value, *this)
     , m_value(value)
 {
     QHBoxLayout* hbox = new QHBoxLayout(this);
@@ -153,7 +173,7 @@ LanguageOCRUI::LanguageOCRUI(QWidget& parent, LanguageOCR& value)
     );
 }
 
-void LanguageOCRUI::update_status(){
+void LanguageOCRWidget::update_status(){
     const std::pair<Language, bool>& item = m_value.m_case_list[m_value.m_current];
     const LanguageData& data = language_data(m_value);
     if (item.second){
@@ -167,7 +187,7 @@ void LanguageOCRUI::update_status(){
     }
 }
 
-void LanguageOCRUI::restore_defaults(){
+void LanguageOCRWidget::restore_defaults(){
     m_value.restore_defaults();
     m_box->setCurrentIndex((int)m_value.m_current);
 }

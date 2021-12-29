@@ -10,7 +10,8 @@
 #include <memory>
 #include <QPushButton>
 #include "CommonFramework/Options/ConfigOption.h"
-#include "CommonFramework/Options/BatchOption.h"
+#include "CommonFramework/Options/BatchOption/BatchOption.h"
+#include "CommonFramework/Options/BatchOption/BatchWidget.h"
 #include "Panel.h"
 
 namespace PokemonAutomation{
@@ -62,7 +63,7 @@ private:
 private:
     friend class SettingsPanelInstance;
 
-    BatchOptionUI* m_options;
+    BatchWidget* m_options;
     QPushButton* m_default_button;
 };
 

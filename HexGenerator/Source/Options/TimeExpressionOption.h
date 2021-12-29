@@ -7,14 +7,15 @@
 #ifndef PokemonAutomation_TimeOption_H
 #define PokemonAutomation_TimeOption_H
 
-#include "Common/Qt/Options/TimeExpressionOptionBase.h"
+#include "Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.h"
+#include "Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h"
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-class TimeExpression : public SingleStatementOption, public TimeExpressionOptionBase<uint32_t>{
+class TimeExpression : public SingleStatementOption, public TimeExpressionBaseOption<uint32_t>{
 public:
     static const QString OPTION_TYPE;
     static const QString JSON_MIN_VALUE;
@@ -34,7 +35,7 @@ public:
 };
 
 
-class TimeExpressionUI : public TimeExpressionOptionBaseUI<uint32_t>{
+class TimeExpressionUI : public TimeExpressionBaseWidget<uint32_t>{
 public:
     TimeExpressionUI(QWidget& parent, TimeExpression& value);
 };

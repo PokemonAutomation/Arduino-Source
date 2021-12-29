@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_TestProgram_H
 #define PokemonAutomation_PokemonSwSh_TestProgram_H
 
-#include "CommonFramework/Options/BatchOption.h"
+#include "CommonFramework/Options/BatchOption/BatchOption.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/StringSelectOption.h"
@@ -16,7 +16,7 @@
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "NintendoSwitch/Framework/MultiSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_BallSelectOption.h"
-#include "PokemonSwSh/Options/PokemonSwSh_EncounterFilter.h"
+#include "PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterOption.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 

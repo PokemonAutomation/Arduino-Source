@@ -4,24 +4,66 @@
  *
  */
 
+#include <QJsonValue>
 #include <QVBoxLayout>
 #include <QFrame>
 #include <QLabel>
+#include "Common/Compiler.h"
 #include "StaticTextOption.h"
 
 namespace PokemonAutomation{
 
 
+
+class StaticTextWidget : public QWidget, public ConfigWidget{
+public:
+    StaticTextWidget(QWidget& parent, StaticTextOption& value);
+    virtual void restore_defaults() override{}
+};
+
+
+class SectionDividerWidget : public QWidget, public ConfigWidget{
+public:
+    SectionDividerWidget(QWidget& parent, SectionDividerOption& value);
+    virtual void restore_defaults() override{}
+};
+
+
+
+
 StaticTextOption::StaticTextOption(QString label)
     : m_label(std::move(label))
 {}
-
-ConfigOptionUI* StaticTextOption::make_ui(QWidget& parent){
-    return new StaticTextOptionUI(parent, *this);
+void StaticTextOption::load_json(const QJsonValue& json){
 }
-StaticTextOptionUI::StaticTextOptionUI(QWidget& parent, StaticTextOption& value)
+QJsonValue StaticTextOption::to_json() const{
+    return QJsonValue();
+}
+ConfigWidget* StaticTextOption::make_ui(QWidget& parent){
+    return new StaticTextWidget(parent, *this);
+}
+
+
+
+SectionDividerOption::SectionDividerOption(QString label)
+    : m_label(std::move(label))
+{}
+void SectionDividerOption::load_json(const QJsonValue& json){
+}
+QJsonValue SectionDividerOption::to_json() const{
+    return QJsonValue();
+}
+
+ConfigWidget* SectionDividerOption::make_ui(QWidget& parent){
+    return new SectionDividerWidget(parent, *this);
+}
+
+
+
+
+StaticTextWidget::StaticTextWidget(QWidget& parent, StaticTextOption& value)
     : QWidget(&parent)
-    , ConfigOptionUI(value, *this)
+    , ConfigWidget(value, *this)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
 
@@ -33,16 +75,10 @@ StaticTextOptionUI::StaticTextOptionUI(QWidget& parent, StaticTextOption& value)
 }
 
 
-SectionDividerOption::SectionDividerOption(QString label)
-    : m_label(std::move(label))
-{}
 
-ConfigOptionUI* SectionDividerOption::make_ui(QWidget& parent){
-    return new SectionDividerOptionUI(parent, *this);
-}
-SectionDividerOptionUI::SectionDividerOptionUI(QWidget& parent, SectionDividerOption& value)
+SectionDividerWidget::SectionDividerWidget(QWidget& parent, SectionDividerOption& value)
     : QWidget(&parent)
-    , ConfigOptionUI(value, *this)
+    , ConfigWidget(value, *this)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
 
@@ -56,6 +92,9 @@ SectionDividerOptionUI::SectionDividerOptionUI(QWidget& parent, SectionDividerOp
 //    text->setTextInteractionFlags(Qt::TextBrowserInteraction);
     text->setOpenExternalLinks(true);
 }
+
+
+
 
 
 

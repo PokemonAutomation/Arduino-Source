@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_DiscordIntegrationTable_H
 #define PokemonAutomation_DiscordIntegrationTable_H
 
-#include "CommonFramework/Options/BatchOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"
 
 namespace PokemonAutomation{

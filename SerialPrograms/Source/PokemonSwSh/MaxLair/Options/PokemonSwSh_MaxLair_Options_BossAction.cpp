@@ -9,6 +9,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QHeaderView>
+#include "Common/Compiler.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
@@ -96,7 +97,7 @@ void BossActionOption::restore_defaults(){
     }
 }
 
-ConfigOptionUI* BossActionOption::make_ui(QWidget& parent){
+ConfigWidget* BossActionOption::make_ui(QWidget& parent){
     return new BossActionOptionUI(parent, *this);
 }
 
@@ -105,7 +106,7 @@ ConfigOptionUI* BossActionOption::make_ui(QWidget& parent){
 
 BossActionOptionUI::BossActionOptionUI(QWidget& parent, BossActionOption& value)
     : QWidget(&parent)
-    , ConfigOptionUI(value, *this)
+    , ConfigWidget(value, *this)
     , m_value(value)
     , m_table(nullptr)
 {

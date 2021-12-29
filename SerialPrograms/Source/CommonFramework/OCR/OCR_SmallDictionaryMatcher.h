@@ -7,8 +7,9 @@
 #ifndef PokemonAutomation_OCR_SmallDictionaryMatcher_H
 #define PokemonAutomation_OCR_SmallDictionaryMatcher_H
 
-#include <QJsonObject>
 #include "OCR_DictionaryMatcher.h"
+
+class QJsonObject;
 
 namespace PokemonAutomation{
 namespace OCR{

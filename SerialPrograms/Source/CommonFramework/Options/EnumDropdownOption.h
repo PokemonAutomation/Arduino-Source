@@ -6,11 +6,13 @@
  *
  */
 
-#ifndef PokemonAutomation_EnumDropdown_H
-#define PokemonAutomation_EnumDropdown_H
+#ifndef PokemonAutomation_EnumDropdownOption_H
+#define PokemonAutomation_EnumDropdownOption_H
 
+#include <atomic>
+#include <vector>
 #include <map>
-#include <QComboBox>
+#include <QString>
 #include "ConfigOption.h"
 
 namespace PokemonAutomation{
@@ -36,7 +38,7 @@ public:
 
     virtual void restore_defaults() override;
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
     QString m_label;
@@ -46,22 +48,6 @@ private:
     std::atomic<size_t> m_current;
 };
 
-
-
-class EnumDropdownOptionUI : public QWidget, public ConfigOptionUI{
-    Q_OBJECT
-
-public:
-    EnumDropdownOptionUI(QWidget& parent, EnumDropdownOption& value);
-    virtual void restore_defaults() override;
-
-signals:
-    void on_changed();
-
-private:
-    EnumDropdownOption& m_value;
-    QComboBox* m_box;
-};
 
 
 

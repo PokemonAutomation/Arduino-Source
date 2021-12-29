@@ -9,8 +9,7 @@
 #ifndef PokemonAutomation_FixedCode_H
 #define PokemonAutomation_FixedCode_H
 
-#include <QJsonValue>
-#include <QLineEdit>
+#include <QString>
 #include "Common/Cpp/SpinLock.h"
 #include "ConfigOption.h"
 
@@ -37,10 +36,10 @@ public:
     virtual void load_json(const QJsonValue& json) override;
     virtual QJsonValue to_json() const override;
 
-    virtual ConfigOptionUI* make_ui(QWidget& parent) override;
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class FixedCodeOptionUI;
+    friend class FixedCodeWidget;
     QString m_label;
     const size_t m_digits;
     const QString m_default;
@@ -49,19 +48,6 @@ private:
     QString m_current;
 };
 
-
-class FixedCodeOptionUI : public QWidget, public ConfigOptionUI{
-public:
-    FixedCodeOptionUI(QWidget& parent, FixedCodeOption& value);
-    virtual void restore_defaults() override;
-
-private:
-    QString sanitized_code(const QString& text) const;
-
-private:
-    FixedCodeOption& m_value;
-    QLineEdit* m_box;
-};
 
 
 }

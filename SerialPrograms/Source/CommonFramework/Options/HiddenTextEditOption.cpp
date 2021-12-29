@@ -4,16 +4,30 @@
  *
  */
 
+#include <QJsonValue>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QCheckBox>
+#include <QTextEdit>
 #include "HiddenTextEditOption.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
-
 namespace PokemonAutomation{
+
+
+
+class HiddenTextEditWidget : public QWidget, public ConfigWidget{
+public:
+    HiddenTextEditWidget(QWidget& parent, HiddenTextEditOption& value);
+    virtual void restore_defaults() override;
+
+private:
+    class Box;
+
+    HiddenTextEditOption& m_value;
+    QTextEdit* m_box;
+};
+
+
 
 
 HiddenTextEditOption::HiddenTextEditOption(
@@ -52,8 +66,8 @@ void HiddenTextEditOption::restore_defaults(){
     SpinLockGuard lg(m_lock);
     m_current = m_default;
 }
-ConfigOptionUI* HiddenTextEditOption::make_ui(QWidget& parent){
-    return new HiddenTextEditOptionUI(parent, *this);
+ConfigWidget* HiddenTextEditOption::make_ui(QWidget& parent){
+    return new HiddenTextEditWidget(parent, *this);
 }
 
 
@@ -61,9 +75,9 @@ ConfigOptionUI* HiddenTextEditOption::make_ui(QWidget& parent){
 
 
 
-class HiddenTextEditOptionUI::Box : public QTextEdit{
+class HiddenTextEditWidget::Box : public QTextEdit{
 public:
-    Box(HiddenTextEditOptionUI& parent)
+    Box(HiddenTextEditWidget& parent)
         : QTextEdit(&parent)
         , m_parent(parent)
     {
@@ -95,7 +109,7 @@ public:
     }
 
 private:
-    HiddenTextEditOptionUI& m_parent;
+    HiddenTextEditWidget& m_parent;
 };
 
 
@@ -104,9 +118,9 @@ private:
 
 
 
-HiddenTextEditOptionUI::HiddenTextEditOptionUI(QWidget& parent, HiddenTextEditOption& value)
+HiddenTextEditWidget::HiddenTextEditWidget(QWidget& parent, HiddenTextEditOption& value)
     : QWidget(&parent)
-    , ConfigOptionUI(value, *this)
+    , ConfigWidget(value, *this)
     , m_value(value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -132,7 +146,7 @@ HiddenTextEditOptionUI::HiddenTextEditOptionUI(QWidget& parent, HiddenTextEditOp
         }
     );
 }
-void HiddenTextEditOptionUI::restore_defaults(){
+void HiddenTextEditWidget::restore_defaults(){
     m_value.restore_defaults();
 }
 
