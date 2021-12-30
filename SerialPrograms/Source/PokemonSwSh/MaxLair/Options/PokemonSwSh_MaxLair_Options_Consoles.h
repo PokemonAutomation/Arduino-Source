@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Options_Consoles_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Options_Consoles_H
 
+#include <memory>
 #include "Common/Cpp/FixedLimitVector.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Options/BatchOption/BatchOption.h"

@@ -8,7 +8,7 @@
 #define PokemonAutomation_CommonFramework_InferenceException_H
 
 #include "Common/Cpp/Exception.h"
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 
 namespace PokemonAutomation{
 

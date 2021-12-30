@@ -17,9 +17,10 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/BotBaseHandle.h"
 #include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/Panels/RunnablePanel.h"
 
 namespace PokemonAutomation{
+
+class RunnablePanelWidget;
 
 
 class ConsoleSystem{

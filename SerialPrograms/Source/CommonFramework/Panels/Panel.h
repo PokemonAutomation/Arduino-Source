@@ -8,13 +8,14 @@
 #define PokemonAutomation_Panel_H
 
 #include <memory>
-#include <QWidget>
 #include "Common/Compiler.h"
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
+
+class QJsonValue;
+class QWidget;
 
 namespace PokemonAutomation{
 
-class OutputWindow;
 class PanelInstance;
 
 
@@ -88,25 +89,6 @@ protected:
 };
 
 
-
-class PanelWidget : public QWidget{
-public:
-    PanelWidget(
-        QWidget& parent,
-        PanelInstance& instance,
-        PanelListener& listener
-    );
-    virtual ~PanelWidget() = default;
-
-    PanelInstance& instance(){ return m_instance; }
-
-protected:
-    virtual QWidget* make_header(QWidget& parent);
-
-protected:
-    PanelInstance& m_instance;
-    PanelListener& m_listener;
-};
 
 
 

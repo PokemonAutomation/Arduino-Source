@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_BallThrower_H
 
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
-#include "NintendoSwitch/Framework/SingleSwitchProgram.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

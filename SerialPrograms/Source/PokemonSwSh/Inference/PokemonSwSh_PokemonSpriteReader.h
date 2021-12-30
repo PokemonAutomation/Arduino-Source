@@ -7,8 +7,9 @@
 #ifndef PokemonAutomation_PokemonSwSh_PokemonSpriteReader_H
 #define PokemonAutomation_PokemonSwSh_PokemonSpriteReader_H
 
+#include <set>
 #include <QImage>
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageMatch/ImageMatchResult.h"
 #include "CommonFramework/ImageMatch/ExactImageDictionaryMatcher.h"
 #include "CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h"

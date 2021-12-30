@@ -4,11 +4,10 @@
  *
  */
 
+#include "ClientSource/Connection/BotBase.h"
 #include "VisualInferenceSession.h"
 
-
 namespace PokemonAutomation{
-
 
 
 VisualInferenceSession::VisualInferenceSession(

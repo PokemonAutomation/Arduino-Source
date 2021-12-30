@@ -7,9 +7,10 @@
 #ifndef PokemonAutomation_PokemonBDSP_TradeRoutines_H
 #define PokemonAutomation_PokemonBDSP_TradeRoutines_H
 
+#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "NintendoSwitch/Framework/MultiSwitchProgram.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

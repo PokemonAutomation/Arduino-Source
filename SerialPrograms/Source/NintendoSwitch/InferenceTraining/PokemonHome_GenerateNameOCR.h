@@ -9,7 +9,7 @@
 
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
-#include "NintendoSwitch/Framework/SingleSwitchProgram.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

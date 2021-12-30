@@ -4,6 +4,7 @@
  * 
  */
 
+#include <sstream>
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "NintendoSwitch_Device.h"
 #include "NintendoSwitch_PushButtons.h"

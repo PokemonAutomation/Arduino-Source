@@ -37,6 +37,9 @@ link_directories(${CMAKE_CURRENT_LIST_DIR})
 file(GLOB MAIN_SOURCES
     ../ClientSource/Connection/BotBase.h
     ../ClientSource/Connection/BotBaseMessage.h
+    ../ClientSource/Connection/MessageLogger.cpp
+    ../ClientSource/Connection/MessageLogger.h
+    ../ClientSource/Connection/MessageSniffer.h
     ../ClientSource/Connection/PABotBase.cpp
     ../ClientSource/Connection/PABotBase.h
     ../ClientSource/Connection/PABotBaseConnection.cpp
@@ -204,6 +207,16 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Environment/HardwareValidation.h
     Source/CommonFramework/Language.cpp
     Source/CommonFramework/Language.h
+    Source/CommonFramework/Logging/DeviceLogger.cpp
+    Source/CommonFramework/Logging/DeviceLogger.h
+    Source/CommonFramework/Logging/FileWindowLogger.cpp
+    Source/CommonFramework/Logging/FileWindowLogger.h
+    Source/CommonFramework/Logging/Logger.cpp
+    Source/CommonFramework/Logging/Logger.h
+    Source/CommonFramework/Logging/OutputRedirector.cpp
+    Source/CommonFramework/Logging/OutputRedirector.h
+    Source/CommonFramework/Logging/QueuedLogger.cpp
+    Source/CommonFramework/Logging/QueuedLogger.h
     Source/CommonFramework/Main.cpp
     Source/CommonFramework/Notifications/EventNotificationOption.cpp
     Source/CommonFramework/Notifications/EventNotificationOption.h
@@ -211,6 +224,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Notifications/EventNotificationsTable.h
     Source/CommonFramework/Notifications/MessageAttachment.cpp
     Source/CommonFramework/Notifications/MessageAttachment.h
+    Source/CommonFramework/Notifications/ProgramInfo.h
     Source/CommonFramework/Notifications/ProgramNotifications.cpp
     Source/CommonFramework/Notifications/ProgramNotifications.h
     Source/CommonFramework/Notifications/SenderNotificationTable.cpp
@@ -279,12 +293,20 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Panels/Panel.h
     Source/CommonFramework/Panels/PanelList.cpp
     Source/CommonFramework/Panels/PanelList.h
+    Source/CommonFramework/Panels/PanelWidget.cpp
+    Source/CommonFramework/Panels/PanelWidget.h
     Source/CommonFramework/Panels/RunnableComputerProgram.cpp
     Source/CommonFramework/Panels/RunnableComputerProgram.h
+    Source/CommonFramework/Panels/RunnableComputerProgramWidget.cpp
+    Source/CommonFramework/Panels/RunnableComputerProgramWidget.h
     Source/CommonFramework/Panels/RunnablePanel.cpp
     Source/CommonFramework/Panels/RunnablePanel.h
+    Source/CommonFramework/Panels/RunnablePanelWidget.cpp
+    Source/CommonFramework/Panels/RunnablePanelWidget.h
     Source/CommonFramework/Panels/SettingsPanel.cpp
     Source/CommonFramework/Panels/SettingsPanel.h
+    Source/CommonFramework/Panels/SettingsPanelWidget.cpp
+    Source/CommonFramework/Panels/SettingsPanelWidget.h
     Source/CommonFramework/PersistentSettings.cpp
     Source/CommonFramework/PersistentSettings.h
     Source/CommonFramework/Tools/BotBaseHandle.cpp
@@ -292,18 +314,10 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Tools/ConsoleHandle.h
     Source/CommonFramework/Tools/ErrorDumper.cpp
     Source/CommonFramework/Tools/ErrorDumper.h
-    Source/CommonFramework/Tools/FileWindowLogger.cpp
-    Source/CommonFramework/Tools/FileWindowLogger.h
     Source/CommonFramework/Tools/InterruptableCommands.cpp
     Source/CommonFramework/Tools/InterruptableCommands.h
-    Source/CommonFramework/Tools/Logger.cpp
-    Source/CommonFramework/Tools/Logger.h
-    Source/CommonFramework/Tools/OutputRedirector.cpp
-    Source/CommonFramework/Tools/OutputRedirector.h
     Source/CommonFramework/Tools/ProgramEnvironment.cpp
     Source/CommonFramework/Tools/ProgramEnvironment.h
-    Source/CommonFramework/Tools/QueuedLogger.cpp
-    Source/CommonFramework/Tools/QueuedLogger.h
     Source/CommonFramework/Tools/StatsDatabase.cpp
     Source/CommonFramework/Tools/StatsDatabase.h
     Source/CommonFramework/Tools/StatsTracking.cpp
@@ -405,14 +419,20 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Commands/NintendoSwitch_Routines.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Routines.h
     Source/NintendoSwitch/FixedInterval.h
-    Source/NintendoSwitch/Framework/MultiSwitchProgram.cpp
-    Source/NintendoSwitch/Framework/MultiSwitchProgram.h
+    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.cpp
+    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h
+    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramWidget.cpp
+    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramWidget.h
     Source/NintendoSwitch/Framework/MultiSwitchSystem.cpp
     Source/NintendoSwitch/Framework/MultiSwitchSystem.h
-    Source/NintendoSwitch/Framework/RunnableSwitchProgram.cpp
-    Source/NintendoSwitch/Framework/RunnableSwitchProgram.h
-    Source/NintendoSwitch/Framework/SingleSwitchProgram.cpp
-    Source/NintendoSwitch/Framework/SingleSwitchProgram.h
+    Source/NintendoSwitch/Framework/NintendoSwitch_RunnableProgram.cpp
+    Source/NintendoSwitch/Framework/NintendoSwitch_RunnableProgram.h
+    Source/NintendoSwitch/Framework/NintendoSwitch_RunnableProgramWidget.cpp
+    Source/NintendoSwitch/Framework/NintendoSwitch_RunnableProgramWidget.h
+    Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.cpp
+    Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h
+    Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramWidget.cpp
+    Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramWidget.h
     Source/NintendoSwitch/Framework/SwitchCommandRow.cpp
     Source/NintendoSwitch/Framework/SwitchCommandRow.h
     Source/NintendoSwitch/Framework/SwitchSetup.h

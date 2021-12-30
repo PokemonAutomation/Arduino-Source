@@ -4,6 +4,7 @@
  *
  */
 
+#include <sstream>
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/OCR/OCR_TextMatcher.h"

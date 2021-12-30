@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_RegiPatterns_H
 #define PokemonAutomation_PokemonSwSh_RegiPatterns_H
 
-#include "NintendoSwitch/Framework/SingleSwitchProgram.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_RegiSelector.h"
 
 namespace PokemonAutomation{

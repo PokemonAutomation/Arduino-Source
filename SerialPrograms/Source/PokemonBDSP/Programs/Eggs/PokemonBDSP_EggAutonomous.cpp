@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Inference/InferenceException.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_IVCheckerReader.h"

@@ -8,7 +8,7 @@
 #define PokemonAutomation_Pokemon_PokemonNameReader_H
 
 #include <QImage>
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/OCR/OCR_LargeDictionaryMatcher.h"
 
 namespace PokemonAutomation{

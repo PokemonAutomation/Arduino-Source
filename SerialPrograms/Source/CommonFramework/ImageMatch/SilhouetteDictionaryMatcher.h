@@ -8,6 +8,7 @@
 #define PokemonAutomation_CommonFramework_SilhouetteDictionaryMatcher_H
 
 #include <QImage>
+#include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/FloatPixel.h"
 #include "ImageMatchResult.h"
 #include "ExactImageMatcher.h"

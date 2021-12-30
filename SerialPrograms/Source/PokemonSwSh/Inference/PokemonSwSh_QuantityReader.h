@@ -10,7 +10,7 @@
 #include <stdint.h>
 #include <string>
 #include <QImage>
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

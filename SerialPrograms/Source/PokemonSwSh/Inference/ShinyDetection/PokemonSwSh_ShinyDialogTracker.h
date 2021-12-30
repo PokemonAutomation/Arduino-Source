@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_ShinyDialogTracker_H
 
 #include <chrono>
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"

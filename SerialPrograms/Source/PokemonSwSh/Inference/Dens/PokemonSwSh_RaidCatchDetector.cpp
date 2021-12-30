@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/ColorClustering.h"
 #include "CommonFramework/Inference/ImageTools.h"

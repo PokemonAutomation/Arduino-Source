@@ -8,7 +8,7 @@
 #define PokemonAutomation_OCR_NumberReader_H
 
 #include <QImage>
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 
 namespace PokemonAutomation{
 namespace OCR{

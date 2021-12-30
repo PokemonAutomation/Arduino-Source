@@ -13,7 +13,7 @@
 #include <QVBoxLayout>
 #include <QComboBox>
 #include <QPushButton>
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "VideoOverlayWidget.h"
 #include "VideoWidget.h"

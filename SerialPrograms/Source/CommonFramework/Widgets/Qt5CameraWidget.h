@@ -10,7 +10,7 @@
 #include <condition_variable>
 #include <QCameraViewfinder>
 #include <QCameraImageCapture>
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "VideoWidget.h"
 
 namespace PokemonAutomation{

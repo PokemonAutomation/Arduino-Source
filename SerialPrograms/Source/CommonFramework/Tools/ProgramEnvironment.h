@@ -7,28 +7,33 @@
 #ifndef PokemonAutomation_ProgramEnvironment_H
 #define PokemonAutomation_ProgramEnvironment_H
 
+#include <memory>
 #include <chrono>
-#include <atomic>
-#include <mutex>
-#include <condition_variable>
 #include <QObject>
-#include "Common/Cpp/AsyncDispatcher.h"
-#include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "Logger.h"
-#include "StatsTracking.h"
+#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Notifications/ProgramInfo.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
+
+namespace std{
+    class mutex;
+    class condition_variable;
+}
 
 namespace PokemonAutomation{
 
+class AsyncDispatcher;
+class StatsTracker;
+
+
+
+
+struct ProgramEnvironmentData;
 
 class ProgramEnvironment : public QObject{
     Q_OBJECT
 
 public:
+    ~ProgramEnvironment();
     ProgramEnvironment(
         ProgramInfo program_info,
         Logger& logger,
@@ -36,13 +41,13 @@ public:
         const StatsTracker* historical_stats
     );
 
-    const ProgramInfo& program_info() const{ return m_program_info; }
+    const ProgramInfo& program_info() const;
 
     template <class... Args>
     void log(Args&&... args);
     Logger& logger(){ return m_logger; }
 
-    AsyncDispatcher& dispatcher(){ return m_dispatcher; }
+    AsyncDispatcher& dispatcher();
 
     void update_stats(const std::string& override_current = "");
 
@@ -55,11 +60,10 @@ public:
 
 public:
     //  Use these since they will wake up on program stop.
-    std::mutex& lock(){ return m_lock; }
-    std::condition_variable& cv(){ return m_cv; }
+    std::mutex& lock();
+    std::condition_variable& cv();
 
-    template <typename Duration>
-    void wait_for(Duration duration);
+    void wait_for(std::chrono::milliseconds duration);
     void notify_all();
 
 
@@ -69,22 +73,17 @@ public:
 
 
 signals:
+    //  Called internally. You can connect to this.
     void set_status(QString status);
 
 
 private:
-    std::atomic<bool> m_enable_feedback;
-    std::atomic<bool> m_stopping;
-    std::mutex m_lock;
-    std::condition_variable m_cv;
-
-    const ProgramInfo m_program_info;
     Logger& m_logger;
-
-    AsyncDispatcher m_dispatcher;
 
     StatsTracker* m_current_stats;
     const StatsTracker* m_historical_stats;
+
+    std::unique_ptr<ProgramEnvironmentData> m_data;
 };
 
 
@@ -98,27 +97,11 @@ void ProgramEnvironment::log(Args&&... args){
     m_logger.log(std::forward<Args>(args)...);
 }
 
-
 template <typename StatsType>
 StatsType& ProgramEnvironment::stats(){
     return *static_cast<StatsType*>(m_current_stats);
 }
 
-template <typename Duration>
-void ProgramEnvironment::wait_for(Duration duration){
-    check_stopping();
-
-    auto start = std::chrono::system_clock::now();
-    std::unique_lock<std::mutex> lg(m_lock);
-    m_cv.wait_for(
-        lg, duration,
-        [=]{
-            return std::chrono::system_clock::now() - start >= duration || is_stopping();
-        }
-    );
-
-    check_stopping();
-}
 
 
 }

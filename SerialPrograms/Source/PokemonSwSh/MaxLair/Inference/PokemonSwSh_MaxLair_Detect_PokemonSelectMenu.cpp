@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/OCR/OCR_Filtering.h"

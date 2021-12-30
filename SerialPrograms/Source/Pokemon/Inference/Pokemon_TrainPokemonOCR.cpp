@@ -7,6 +7,7 @@
 #include <QDirIterator>
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/ParallelTaskRunner.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "CommonFramework/OCR/OCR_Filtering.h"

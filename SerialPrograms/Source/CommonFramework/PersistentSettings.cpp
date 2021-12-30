@@ -14,7 +14,7 @@
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "NintendoSwitch/Framework/VirtualSwitchControllerMapping.h"
 #include "PersistentSettings.h"
 

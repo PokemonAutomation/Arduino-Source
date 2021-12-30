@@ -9,7 +9,7 @@
 
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
-#include "NintendoSwitch/Framework/SingleSwitchProgram.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonSwSh_EggHelpers.h"
 
 namespace PokemonAutomation{

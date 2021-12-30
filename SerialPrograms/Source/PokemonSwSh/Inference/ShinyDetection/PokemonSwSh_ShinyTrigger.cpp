@@ -5,6 +5,7 @@
  */
 
 #include <cmath>
+#include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/FillGeometry.h"
 #include "PokemonSwSh_ShinyFilters.h"
 #include "PokemonSwSh_SparkleTrigger.h"

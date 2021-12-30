@@ -11,7 +11,7 @@
 #define PokemonAutomation_PokemonSwSh_SummaryShinySymbolDetector_H
 
 #include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 
 namespace PokemonAutomation{

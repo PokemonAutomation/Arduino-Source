@@ -4,6 +4,8 @@
  *
  */
 
+#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Inference/VisualInferenceSession.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "CommonFramework/Inference/ImageMatchDetector.h"

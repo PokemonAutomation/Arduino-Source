@@ -10,6 +10,7 @@
 #include <QCameraInfo>
 #include <QVBoxLayout>
 #include "Qt5CameraWidget.h"
+#include "Common/Compiler.h"
 
 #include <iostream>
 using std::cout;

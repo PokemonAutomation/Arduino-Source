@@ -4,6 +4,7 @@
  *
  */
 
+#include <ostream>
 #include "OutputRedirector.h"
 
 namespace PokemonAutomation{

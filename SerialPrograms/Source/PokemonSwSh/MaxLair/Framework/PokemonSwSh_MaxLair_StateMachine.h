@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_StateMachine_H
 
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
-#include "NintendoSwitch/Framework/MultiSwitchProgram.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_QuantityReader.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Consoles.h"

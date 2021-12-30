@@ -60,6 +60,7 @@ macx{
 
 
 SOURCES += \
+    ../ClientSource/Connection/MessageLogger.cpp \
     ../ClientSource/Connection/PABotBase.cpp \
     ../ClientSource/Connection/PABotBaseConnection.cpp \
     ../ClientSource/Libraries/Logging.cpp \
@@ -130,6 +131,11 @@ SOURCES += \
     Source/CommonFramework/Inference/VisualInferenceRoutines.cpp \
     Source/CommonFramework/Inference/VisualInferenceSession.cpp \
     Source/CommonFramework/Language.cpp \
+    Source/CommonFramework/Logging/DeviceLogger.cpp \
+    Source/CommonFramework/Logging/FileWindowLogger.cpp \
+    Source/CommonFramework/Logging/Logger.cpp \
+    Source/CommonFramework/Logging/OutputRedirector.cpp \
+    Source/CommonFramework/Logging/QueuedLogger.cpp \
     Source/CommonFramework/Main.cpp \
     Source/CommonFramework/Notifications/EventNotificationOption.cpp \
     Source/CommonFramework/Notifications/EventNotificationsTable.cpp \
@@ -166,18 +172,18 @@ SOURCES += \
     Source/CommonFramework/Options/TextEditOption.cpp \
     Source/CommonFramework/Panels/Panel.cpp \
     Source/CommonFramework/Panels/PanelList.cpp \
+    Source/CommonFramework/Panels/PanelWidget.cpp \
     Source/CommonFramework/Panels/RunnableComputerProgram.cpp \
+    Source/CommonFramework/Panels/RunnableComputerProgramWidget.cpp \
     Source/CommonFramework/Panels/RunnablePanel.cpp \
+    Source/CommonFramework/Panels/RunnablePanelWidget.cpp \
     Source/CommonFramework/Panels/SettingsPanel.cpp \
+    Source/CommonFramework/Panels/SettingsPanelWidget.cpp \
     Source/CommonFramework/PersistentSettings.cpp \
     Source/CommonFramework/Tools/BotBaseHandle.cpp \
     Source/CommonFramework/Tools/ErrorDumper.cpp \
-    Source/CommonFramework/Tools/FileWindowLogger.cpp \
     Source/CommonFramework/Tools/InterruptableCommands.cpp \
-    Source/CommonFramework/Tools/Logger.cpp \
-    Source/CommonFramework/Tools/OutputRedirector.cpp \
     Source/CommonFramework/Tools/ProgramEnvironment.cpp \
-    Source/CommonFramework/Tools/QueuedLogger.cpp \
     Source/CommonFramework/Tools/StatsDatabase.cpp \
     Source/CommonFramework/Tools/StatsTracking.cpp \
     Source/CommonFramework/Widgets/CameraImplementations.cpp \
@@ -219,10 +225,13 @@ SOURCES += \
     Source/NintendoSwitch/Commands/NintendoSwitch_DigitEntry.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_PushButtons.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Routines.cpp \
-    Source/NintendoSwitch/Framework/MultiSwitchProgram.cpp \
     Source/NintendoSwitch/Framework/MultiSwitchSystem.cpp \
-    Source/NintendoSwitch/Framework/RunnableSwitchProgram.cpp \
-    Source/NintendoSwitch/Framework/SingleSwitchProgram.cpp \
+    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.cpp \
+    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramWidget.cpp \
+    Source/NintendoSwitch/Framework/NintendoSwitch_RunnableProgram.cpp \
+    Source/NintendoSwitch/Framework/NintendoSwitch_RunnableProgramWidget.cpp \
+    Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.cpp \
+    Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramWidget.cpp \
     Source/NintendoSwitch/Framework/SwitchCommandRow.cpp \
     Source/NintendoSwitch/Framework/SwitchSystem.cpp \
     Source/NintendoSwitch/Framework/VirtualSwitchController.cpp \
@@ -497,6 +506,9 @@ SOURCES += \
 
 HEADERS += \
     ../ClientSource/Connection/BotBase.h \
+    ../ClientSource/Connection/BotBaseMessage.h \
+    ../ClientSource/Connection/MessageLogger.h \
+    ../ClientSource/Connection/MessageSniffer.h \
     ../ClientSource/Connection/PABotBase.h \
     ../ClientSource/Connection/PABotBaseConnection.h \
     ../ClientSource/Connection/SerialConnection.h \
@@ -591,9 +603,15 @@ HEADERS += \
     Source/CommonFramework/Inference/VisualInferenceRoutines.h \
     Source/CommonFramework/Inference/VisualInferenceSession.h \
     Source/CommonFramework/Language.h \
+    Source/CommonFramework/Logging/DeviceLogger.h \
+    Source/CommonFramework/Logging/FileWindowLogger.h \
+    Source/CommonFramework/Logging/Logger.h \
+    Source/CommonFramework/Logging/OutputRedirector.h \
+    Source/CommonFramework/Logging/QueuedLogger.h \
     Source/CommonFramework/Notifications/EventNotificationOption.h \
     Source/CommonFramework/Notifications/EventNotificationsTable.h \
     Source/CommonFramework/Notifications/MessageAttachment.h \
+    Source/CommonFramework/Notifications/ProgramInfo.h \
     Source/CommonFramework/Notifications/ProgramNotifications.h \
     Source/CommonFramework/Notifications/SenderNotificationTable.h \
     Source/CommonFramework/OCR/OCR_DictionaryMatcher.h \
@@ -630,18 +648,18 @@ HEADERS += \
     Source/CommonFramework/Options/TextEditOption.h \
     Source/CommonFramework/Panels/Panel.h \
     Source/CommonFramework/Panels/PanelList.h \
+    Source/CommonFramework/Panels/PanelWidget.h \
     Source/CommonFramework/Panels/RunnableComputerProgram.h \
+    Source/CommonFramework/Panels/RunnableComputerProgramWidget.h \
     Source/CommonFramework/Panels/RunnablePanel.h \
+    Source/CommonFramework/Panels/RunnablePanelWidget.h \
     Source/CommonFramework/Panels/SettingsPanel.h \
+    Source/CommonFramework/Panels/SettingsPanelWidget.h \
     Source/CommonFramework/PersistentSettings.h \
     Source/CommonFramework/Tools/ConsoleHandle.h \
     Source/CommonFramework/Tools/ErrorDumper.h \
-    Source/CommonFramework/Tools/FileWindowLogger.h \
     Source/CommonFramework/Tools/InterruptableCommands.h \
-    Source/CommonFramework/Tools/Logger.h \
-    Source/CommonFramework/Tools/OutputRedirector.h \
     Source/CommonFramework/Tools/ProgramEnvironment.h \
-    Source/CommonFramework/Tools/QueuedLogger.h \
     Source/CommonFramework/Tools/StatsDatabase.h \
     Source/CommonFramework/Tools/StatsTracking.h \
     Source/CommonFramework/Tools/VideoFeed.h \
@@ -701,10 +719,13 @@ HEADERS += \
     Source/NintendoSwitch/Commands/NintendoSwitch_PushButtons.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Routines.h \
     Source/NintendoSwitch/FixedInterval.h \
-    Source/NintendoSwitch/Framework/MultiSwitchProgram.h \
     Source/NintendoSwitch/Framework/MultiSwitchSystem.h \
-    Source/NintendoSwitch/Framework/RunnableSwitchProgram.h \
-    Source/NintendoSwitch/Framework/SingleSwitchProgram.h \
+    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h \
+    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramWidget.h \
+    Source/NintendoSwitch/Framework/NintendoSwitch_RunnableProgram.h \
+    Source/NintendoSwitch/Framework/NintendoSwitch_RunnableProgramWidget.h \
+    Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h \
+    Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramWidget.h \
     Source/NintendoSwitch/Framework/SwitchCommandRow.h \
     Source/NintendoSwitch/Framework/SwitchSetup.h \
     Source/NintendoSwitch/Framework/SwitchSystem.h \

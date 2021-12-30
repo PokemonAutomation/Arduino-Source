@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_ShinyEncounterDetector_H
 #define PokemonAutomation_PokemonSwSh_ShinyEncounterDetector_H
 
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "Pokemon/Pokemon_DataTypes.h"

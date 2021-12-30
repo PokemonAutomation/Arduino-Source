@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/FillGeometry.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyFilters.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleTrigger.h"

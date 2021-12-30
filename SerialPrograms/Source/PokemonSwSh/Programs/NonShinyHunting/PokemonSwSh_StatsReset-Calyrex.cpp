@@ -4,7 +4,7 @@
  *
  */
 
-#include "PokemonSwSh_StatsReset-Calyrex.h"
+#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -16,6 +16,7 @@
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_BasicCatcher.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
+#include "PokemonSwSh_StatsReset-Calyrex.h"
 
 #include <QJsonArray>
 

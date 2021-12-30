@@ -12,7 +12,7 @@
 #include <QComboBox>
 #include <QPushButton>
 #include "Common/PokemonSwSh/PokemonProgramIDs.h"
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/DeviceLogger.h"
 #include "CommonFramework/Tools/BotBaseHandle.h"
 
 namespace PokemonAutomation{

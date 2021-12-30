@@ -8,7 +8,7 @@
 #define PokemonAutomation_ConsoleHandle_H
 
 #include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Widgets/VideoOverlayWidget.h"
 

@@ -10,7 +10,7 @@
 #include <functional>
 #include <vector>
 #include <QString>
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "VideoWidget.h"
 
 namespace PokemonAutomation{

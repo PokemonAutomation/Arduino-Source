@@ -10,7 +10,7 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
-#include "NintendoSwitch/Framework/MultiSwitchProgram.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h"
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 #include "Options/PokemonSwSh_MaxLair_Options.h"
 #include "Options/PokemonSwSh_MaxLair_Options_Consoles.h"

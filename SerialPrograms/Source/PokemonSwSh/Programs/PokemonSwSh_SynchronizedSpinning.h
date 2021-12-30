@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_SynchronizedSpinning_H
 #define PokemonAutomation_PokemonSwSh_SynchronizedSpinning_H
 
-#include "NintendoSwitch/Framework/MultiSwitchProgram.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

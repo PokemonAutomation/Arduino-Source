@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "PokemonSwSh_MaxLair_Detect_ItemSelectMenu.h"
 

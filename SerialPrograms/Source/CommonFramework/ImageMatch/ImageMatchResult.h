@@ -9,7 +9,7 @@
 
 #include <string>
 #include <map>
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 
 namespace PokemonAutomation{
 namespace ImageMatch{

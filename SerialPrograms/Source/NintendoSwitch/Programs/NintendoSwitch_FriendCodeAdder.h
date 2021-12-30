@@ -11,7 +11,7 @@
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/NintendoSwitch_FriendCodeListOption.h"
-#include "NintendoSwitch/Framework/SingleSwitchProgram.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

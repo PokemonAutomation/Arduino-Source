@@ -8,9 +8,10 @@
 #define PokemonAutomation_EventNotificationOption_H
 
 #include <vector>
+#include <chrono>
 #include "CommonFramework/Options/ConfigOption.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 
 namespace PokemonAutomation{
 

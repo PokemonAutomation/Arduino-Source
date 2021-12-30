@@ -14,7 +14,7 @@
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/BotBaseHandle.h"
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "VirtualSwitchControllerMapping.h"
 
 namespace PokemonAutomation{

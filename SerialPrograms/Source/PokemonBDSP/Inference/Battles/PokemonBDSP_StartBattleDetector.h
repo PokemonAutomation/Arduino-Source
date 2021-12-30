@@ -10,7 +10,7 @@
 #include <functional>
 #include <chrono>
 #include <thread>
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"

@@ -4,6 +4,7 @@
 #include <stdint.h>
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
+#include "CommonFramework/Notifications/MessageAttachment.h"
 
 #ifdef SLEEPY_STATIC
     #define SLEEPY_EXPORT

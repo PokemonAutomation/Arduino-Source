@@ -7,12 +7,13 @@
 #ifndef PokemonAutomation_DiscordWebhook_H
 #define PokemonAutomation_DiscordWebhook_H
 
+#include <deque>
 #include <condition_variable>
 #include <thread>
 #include <QImage>
 #include <QNetworkReply>
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/MessageAttachment.h"
 
 class QJsonArray;

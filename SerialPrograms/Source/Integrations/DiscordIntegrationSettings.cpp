@@ -6,6 +6,7 @@
 
 #include <QLabel>
 #include <QPushButton>
+#include "Common/Compiler.h"
 #include "SleepyDiscordRunner.h"
 #include "DiscordIntegrationSettings.h"
 

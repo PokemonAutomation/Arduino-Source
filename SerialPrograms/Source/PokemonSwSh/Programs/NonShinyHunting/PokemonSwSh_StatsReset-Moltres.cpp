@@ -5,8 +5,9 @@
  */
 
 #include "Common/Cpp/Exception.h"
-#include "CommonFramework/Inference/VisualInferenceRoutines.h"
+#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
+#include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"

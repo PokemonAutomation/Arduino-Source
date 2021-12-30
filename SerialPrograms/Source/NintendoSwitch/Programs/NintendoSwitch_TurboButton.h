@@ -10,7 +10,7 @@
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
-#include "NintendoSwitch/Framework/SingleSwitchProgram.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

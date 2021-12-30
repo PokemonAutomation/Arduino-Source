@@ -7,10 +7,16 @@
 #ifndef PokemonAutomation_ScreenshotFormat_H
 #define PokemonAutomation_ScreenshotFormat_H
 
-#include "CommonFramework/Notifications/MessageAttachment.h"
 #include "EnumDropdownOption.h"
 
 namespace PokemonAutomation{
+
+
+enum class ImageAttachmentMode{
+    NO_SCREENSHOT,
+    JPG,
+    PNG,
+};
 
 
 class ScreenshotOption : public EnumDropdownOption{

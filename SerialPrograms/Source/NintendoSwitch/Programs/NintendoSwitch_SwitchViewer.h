@@ -9,6 +9,7 @@
 
 #include <QJsonObject>
 #include "CommonFramework/Panels/Panel.h"
+#include "CommonFramework/Panels/PanelWidget.h"
 #include "NintendoSwitch/Framework/MultiSwitchSystem.h"
 
 namespace PokemonAutomation{

@@ -10,7 +10,7 @@
 #include <string>
 #include <map>
 #include <QImage>
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "ImageMatchResult.h"
 #include "ExactImageMatcher.h"

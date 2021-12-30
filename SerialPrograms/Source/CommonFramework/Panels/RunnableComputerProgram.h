@@ -38,22 +38,6 @@ public:
 
 
 
-class RunnableComputerProgramWidget : public RunnablePanelWidget{
-public:
-    static RunnableComputerProgramWidget* make(
-        QWidget& parent,
-        RunnableComputerProgramInstance& instance,
-        PanelListener& listener
-    );
-
-private:
-    using RunnablePanelWidget::RunnablePanelWidget;
-    virtual ~RunnableComputerProgramWidget();
-
-    virtual void run_program() override final;
-};
-
-
 
 }
 #endif

@@ -4,6 +4,7 @@
  *
  */
 
+#include <mutex>
 #include <QDir>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"

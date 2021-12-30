@@ -20,17 +20,10 @@
 #include "Common/Compiler.h"
 #include "Common/Microcontroller/MessageProtocol.h"
 #include "BotBase.h"
+#include "MessageSniffer.h"
 #include "StreamInterface.h"
 
 namespace PokemonAutomation{
-
-
-class MessageSniffer{
-public:
-    virtual void log(std::string msg){}
-    virtual void on_send(const BotBaseMessage& message, bool is_retransmit){}
-    virtual void on_recv(const BotBaseMessage& message){}
-};
 
 
 class PABotBaseConnection : public StreamListener{

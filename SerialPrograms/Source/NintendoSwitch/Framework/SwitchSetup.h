@@ -10,7 +10,7 @@
 #include <QJsonValue>
 #include <QWidget>
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/BotBaseHandle.h"
 
 namespace PokemonAutomation{

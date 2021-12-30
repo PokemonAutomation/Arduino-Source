@@ -9,8 +9,8 @@
 
 #include <QMainWindow>
 #include <QVBoxLayout>
+#include "CommonFramework/Logging/FileWindowLogger.h"
 #include "CommonFramework/Panels/Panel.h"
-#include "CommonFramework/Tools/FileWindowLogger.h"
 #include "PanelLists.h"
 
 namespace PokemonAutomation{

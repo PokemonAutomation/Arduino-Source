@@ -9,7 +9,7 @@
 
 #include <vector>
 #include <set>
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "Pokemon/Pokemon_Types.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
 

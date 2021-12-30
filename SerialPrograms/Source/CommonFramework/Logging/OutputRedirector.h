@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_OutputRedirector_H
-#define PokemonAutomation_OutputRedirector_H
+#ifndef PokemonAutomation_Logging_OutputRedirector_H
+#define PokemonAutomation_Logging_OutputRedirector_H
 
 #include <streambuf>
 #include "Common/Cpp/SpinLock.h"

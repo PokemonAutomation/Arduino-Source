@@ -10,7 +10,7 @@
 #include <deque>
 #include <map>
 #include "Common/Cpp/SpinLock.h"
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 #include "PokemonSwSh/Programs/OverworldBot/PokemonSwSh_OverworldTrajectory.h"

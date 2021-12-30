@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_ShinySparkleDetector_H
 
 #include <deque>
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 #include "Pokemon/Pokemon_DataTypes.h"

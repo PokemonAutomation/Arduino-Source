@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Qt6VideoWidget_H
 #define PokemonAutomation_Qt6VideoWidget_H
 
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "VideoWidget.h"
 
 #include <QMediaDevices>

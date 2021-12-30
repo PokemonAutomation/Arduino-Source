@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_PreventSleep_H
 #define PokemonAutomation_NintendoSwitch_PreventSleep_H
 
-#include "NintendoSwitch/Framework/SingleSwitchProgram.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Compiler.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/EnumDropdownWidget.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"

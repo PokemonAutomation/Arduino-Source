@@ -7,7 +7,10 @@
 #ifndef PokemonAutomation_PokemonBDSP_EggAutonomousState_H
 #define PokemonAutomation_PokemonBDSP_EggAutonomousState_H
 
+#include "Common/Compiler.h"
 #include "CommonFramework/Language.h"
+#include "CommonFramework/Notifications/EventNotificationOption.h"
+#include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"

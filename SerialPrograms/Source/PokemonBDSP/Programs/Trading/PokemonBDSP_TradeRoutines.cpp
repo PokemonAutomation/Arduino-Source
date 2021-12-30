@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"

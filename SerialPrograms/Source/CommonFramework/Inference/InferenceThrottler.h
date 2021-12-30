@@ -34,7 +34,7 @@ public:
             return true;
         }
 
-        auto wait = m_wait_until - now;
+        std::chrono::milliseconds wait = std::chrono::duration_cast<std::chrono::milliseconds>(m_wait_until - now);
         if (wait <= std::chrono::milliseconds(0)){
             m_wait_until = now + m_period;
         }else{

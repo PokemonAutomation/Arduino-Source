@@ -7,7 +7,7 @@
 #if defined(__linux) || defined(__APPLE__)
 
 #include "Common/Cpp/Exception.h"
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "Environment.h"
 
 #ifndef cpuid_H

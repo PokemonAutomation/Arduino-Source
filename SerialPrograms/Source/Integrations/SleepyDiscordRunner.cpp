@@ -12,7 +12,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "IntegrationsAPI.h"
 #include "SleepyDiscordRunner.h"
 

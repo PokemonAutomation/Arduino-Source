@@ -8,7 +8,7 @@
 #define PokemonAutomation_ErrorDumper_H
 
 #include <QImage>
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 
 namespace PokemonAutomation{

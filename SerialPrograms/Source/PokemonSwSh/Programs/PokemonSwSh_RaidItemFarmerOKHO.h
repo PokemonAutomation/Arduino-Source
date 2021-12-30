@@ -10,7 +10,7 @@
 //#include "CommonFramework/Options/SectionDivider.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
-#include "NintendoSwitch/Framework/MultiSwitchProgram.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

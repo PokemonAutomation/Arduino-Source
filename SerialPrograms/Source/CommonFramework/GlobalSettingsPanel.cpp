@@ -4,6 +4,7 @@
  *
  */
 
+#include <set>
 #include <QCryptographicHash>
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"

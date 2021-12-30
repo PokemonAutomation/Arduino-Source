@@ -7,7 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_AI_Tools_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_AI_Tools_H
 
-#include "CommonFramework/Tools/Logger.h"
+#include <memory>
+#include "CommonFramework/Logging/Logger.h"
 #include "PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Pokemon.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
 

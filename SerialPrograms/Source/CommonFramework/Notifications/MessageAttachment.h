@@ -10,16 +10,12 @@
 #include <atomic>
 //#include <QFile>
 #include <QImage>
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Options/ScreenshotFormatOption.h"
 
 namespace PokemonAutomation{
 
 
-enum class ImageAttachmentMode{
-    NO_SCREENSHOT,
-    JPG,
-    PNG,
-};
 struct ImageAttachment{
     QImage image;
     ImageAttachmentMode mode = ImageAttachmentMode::NO_SCREENSHOT;

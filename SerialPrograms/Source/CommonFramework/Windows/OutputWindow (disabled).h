@@ -11,7 +11,7 @@
 #include <QTextEdit>
 #include <QMainWindow>
 #include "ClientSource/Libraries/Logging.h"
-#include "CommonFramework/Tools/Logger.h"
+#include "CommonFramework/Logging/Logger.h"
 
 namespace PokemonAutomation{
 
