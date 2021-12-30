@@ -9,6 +9,7 @@
 #include "Common/Cpp/Exception.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "Environment.h"
+#include <chrono>
 
 #ifndef cpuid_H
 #define cpuid_H
