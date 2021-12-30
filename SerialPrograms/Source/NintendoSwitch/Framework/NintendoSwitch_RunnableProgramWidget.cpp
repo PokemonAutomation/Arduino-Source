@@ -12,6 +12,7 @@
 #include "Common/Cpp/Exception.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "NintendoSwitch_SwitchSetupWidget.h"
 #include "NintendoSwitch_RunnableProgramWidget.h"
 
 namespace PokemonAutomation{

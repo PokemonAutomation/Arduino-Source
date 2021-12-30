@@ -8,6 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_SingleSwitchProgramWidget_H
 
 #include "NintendoSwitch_RunnableProgramWidget.h"
+#include "NintendoSwitch_SwitchSystemWidget.h"
 #include "NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -22,8 +23,8 @@ public:
         PanelListener& listener
     );
 
-    SwitchSystem& system(){
-        return *static_cast<SwitchSystem*>(m_setup);
+    SwitchSystemWidget& system(){
+        return *static_cast<SwitchSystemWidget*>(m_setup);
     }
 
 private:

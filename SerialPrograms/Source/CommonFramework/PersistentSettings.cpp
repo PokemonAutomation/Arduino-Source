@@ -15,7 +15,7 @@
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "NintendoSwitch/Framework/VirtualSwitchControllerMapping.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_VirtualControllerMapping.h"
 #include "PersistentSettings.h"
 
 #include <iostream>

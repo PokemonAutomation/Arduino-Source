@@ -10,6 +10,7 @@
 #include "CommonFramework/Options/StaticTextOption.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"
+#include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "Pokemon/Options/Pokemon_NameSelectOption.h"

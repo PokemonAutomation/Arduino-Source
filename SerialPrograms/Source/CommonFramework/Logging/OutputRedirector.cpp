@@ -26,9 +26,9 @@ OutputRedirector::~OutputRedirector(){
 
 OutputRedirector::int_type OutputRedirector::overflow(int_type ch){
     SpinLockGuard lg(m_lock);
-    m_old_buf->sputc(ch);
+    m_old_buf->sputc((char)ch);
     m_old_buf->pubsync();
-    m_buffer += ch;
+    m_buffer += (char)ch;
     if (ch == '\n'){
         m_logger.log(m_buffer, m_color);
         m_buffer.clear();

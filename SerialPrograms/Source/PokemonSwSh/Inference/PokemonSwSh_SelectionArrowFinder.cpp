@@ -39,7 +39,7 @@ struct BlackFilter{
         bool black = qRed(pixel) < 48 && qGreen(pixel) < 48 && qBlue(pixel) < 48;
 //        int set = (pixel & 0x00c0c080) == 0x00c0c080 ? 1 : 0;
         if (!black){
-            image.setPixel(x, y, QColor(COLOR_BLUE).rgb());
+            image.setPixel(x, y, (uint32_t)COLOR_BLUE);
         }
         CellMatrix::ObjectID set = black ? 1 : 0;
         cell = set;

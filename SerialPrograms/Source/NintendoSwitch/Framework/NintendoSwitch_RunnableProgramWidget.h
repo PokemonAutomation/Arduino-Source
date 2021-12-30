@@ -7,19 +7,21 @@
 #ifndef PokemonAutomation_NintendoSwitch_RunnableProgramWidget_H
 #define PokemonAutomation_NintendoSwitch_RunnableProgramWidget_H
 
+#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Panels/RunnablePanelWidget.h"
 #include "NintendoSwitch_RunnableProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
+class SwitchSetupWidget;
 
 
 class RunnableSwitchProgramWidget : public RunnablePanelWidget{
 public:
     virtual ~RunnableSwitchProgramWidget();
 
-    SwitchSetup& setup(){ return *m_setup; }
+    SwitchSetupWidget& setup(){ return *m_setup; }
 
 protected:
     RunnableSwitchProgramWidget(
@@ -53,7 +55,7 @@ protected:
 
     const std::string& m_program_name;
 
-    SwitchSetup* m_setup;
+    SwitchSetupWidget* m_setup;
 };
 
 

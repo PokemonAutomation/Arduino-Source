@@ -9,6 +9,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/OCR/OCR_Filtering.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"

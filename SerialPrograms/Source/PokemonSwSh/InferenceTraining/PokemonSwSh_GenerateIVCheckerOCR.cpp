@@ -5,7 +5,9 @@
  */
 
 #include <QDir>
+#include <QImage>
 #include "Common/Cpp/PrettyPrint.h"
+#include "CommonFramework/Tools/VideoFeed.h"
 #include "PokemonSwSh_GenerateIVCheckerOCR.h"
 
 namespace PokemonAutomation{

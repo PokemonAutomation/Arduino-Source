@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Options/BatchOption/BatchWidget.h"
+#include "NintendoSwitch_SwitchSystemWidget.h"
 #include "NintendoSwitch_MultiSwitchProgramWidget.h"
 
 namespace PokemonAutomation{
@@ -25,7 +26,7 @@ MultiSwitchProgramWidget* MultiSwitchProgramWidget::make(
     MultiSwitchProgramWidget* widget = new MultiSwitchProgramWidget(parent, instance, listener);
     widget->construct();
     connect(
-        widget->m_setup, &SwitchSetup::on_setup_changed,
+        widget->m_setup, &SwitchSetupWidget::on_setup_changed,
         widget, [=, &instance]{
             instance.update_active_consoles();
             widget->m_options->update_visibility();
@@ -41,7 +42,7 @@ void MultiSwitchProgramWidget::run_program(
     MultiSwitchProgramInstance& instance = static_cast<MultiSwitchProgramInstance&>(m_instance);
     FixedLimitVector<ConsoleHandle> switches(instance.system_count());
     for (size_t c = 0; c < instance.system_count(); c++){
-        SwitchSystem& system = this->system(c);
+        SwitchSystemWidget& system = this->system(c);
         switches.emplace_back(
             c,
             m_logger.base_logger(),

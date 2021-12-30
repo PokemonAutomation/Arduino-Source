@@ -7,10 +7,11 @@
 #ifndef PokemonAutomation_NintendoSwitch_MultiSwitchProgram_H
 #define PokemonAutomation_NintendoSwitch_MultiSwitchProgram_H
 
+#include <functional>
 #include "Common/Cpp/FixedLimitVector.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "MultiSwitchSystem.h"
+#include "NintendoSwitch_MultiSwitchSystem.h"
 #include "NintendoSwitch_RunnableProgram.h"
 
 namespace PokemonAutomation{

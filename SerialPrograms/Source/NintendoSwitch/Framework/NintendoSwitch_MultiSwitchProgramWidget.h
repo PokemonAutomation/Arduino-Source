@@ -9,6 +9,7 @@
 
 #include "NintendoSwitch_RunnableProgramWidget.h"
 #include "NintendoSwitch_MultiSwitchProgram.h"
+#include "NintendoSwitch_MultiSwitchSystemWidget.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -24,10 +25,10 @@ public:
     );
 
     size_t system_count() const{
-        return static_cast<MultiSwitchSystem&>(*m_setup).switch_count();
+        return static_cast<MultiSwitchSystemWidget&>(*m_setup).switch_count();
     }
-    SwitchSystem& system(size_t index){
-        return static_cast<MultiSwitchSystem&>(*m_setup)[index];
+    SwitchSystemWidget& system(size_t index){
+        return static_cast<MultiSwitchSystemWidget&>(*m_setup)[index];
     }
 
 private:

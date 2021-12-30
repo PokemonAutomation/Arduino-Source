@@ -7,18 +7,14 @@
 #ifndef PokemonAutomation_NintendoSwitch_RunnableProgram_H
 #define PokemonAutomation_NintendoSwitch_RunnableProgram_H
 
-#include <thread>
-#include <QLabel>
-#include <QPushButton>
+#include "Common/PokemonSwSh/PokemonProgramIDs.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Options/ConfigOption.h"
-#include "CommonFramework/Panels/Panel.h"
 #include "CommonFramework/Panels/RunnablePanel.h"
-#include "CommonFramework/Panels/RunnablePanelWidget.h"
-#include "SwitchSetup.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
+
+class SwitchSetupFactory;
 
 
 class RunnableSwitchProgramDescriptor : public RunnablePanelDescriptor{

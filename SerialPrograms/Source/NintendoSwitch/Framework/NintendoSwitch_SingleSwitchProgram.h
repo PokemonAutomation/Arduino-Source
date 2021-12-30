@@ -9,7 +9,7 @@
 
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "SwitchSystem.h"
+#include "NintendoSwitch_SwitchSystem.h"
 #include "NintendoSwitch_RunnableProgram.h"
 
 namespace PokemonAutomation{

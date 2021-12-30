@@ -4,6 +4,7 @@
  *
  */
 
+#include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystemWidget.h"
 #include "NintendoSwitch_VirtualConsole.h"
 
 namespace PokemonAutomation{
@@ -62,7 +63,7 @@ void VirtualConsole_Widget::construct(){
     layout->addWidget(make_header(*this));
 
     VirtualConsole& instance = static_cast<VirtualConsole&>(m_instance);
-    m_switch = (SwitchSystem*)instance.m_switch.make_ui(*this, m_listener.raw_logger(), 0);
+    m_switch = (SwitchSystemWidget*)instance.m_switch.make_ui(*this, m_listener.raw_logger(), 0);
     layout->addWidget(m_switch);
 }
 

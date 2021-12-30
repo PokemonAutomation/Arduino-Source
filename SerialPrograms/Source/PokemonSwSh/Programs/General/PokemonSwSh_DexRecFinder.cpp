@@ -4,6 +4,7 @@
  *
  */
 
+#include <QJsonValue>
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Inference/ImageTools.h"

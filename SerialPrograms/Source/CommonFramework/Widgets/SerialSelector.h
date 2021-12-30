@@ -8,17 +8,16 @@
 #define PokemonAutomation_SerialSelector_H
 
 #include <QSerialPortInfo>
-#include <QLabel>
-#include <QComboBox>
-#include <QPushButton>
 #include "Common/PokemonSwSh/PokemonProgramIDs.h"
 #include "CommonFramework/Logging/DeviceLogger.h"
-#include "CommonFramework/Tools/BotBaseHandle.h"
+
+class QJsonValue;
+class QWidget;
 
 namespace PokemonAutomation{
 
 
-class SerialSelectorUI;
+class SerialSelectorWidget;
 
 
 class SerialSelector{
@@ -38,10 +37,10 @@ public:
 
     const QSerialPortInfo* port() const;
 
-    SerialSelectorUI* make_ui(QWidget& parent, Logger& logger);
+    SerialSelectorWidget* make_ui(QWidget& parent, Logger& logger);
 
 private:
-    friend class SerialSelectorUI;
+    friend class SerialSelectorWidget;
 
     const QString m_label;
     const PABotBaseLevel m_minimum_pabotbase;
@@ -51,43 +50,6 @@ private:
 };
 
 
-class SerialSelectorUI : public QWidget{
-    Q_OBJECT
-
-public:
-    SerialSelectorUI(
-        QWidget& parent,
-        SerialSelector& value,
-        Logger& logger
-    );
-    ~SerialSelectorUI();
-
-    bool is_ready() const;
-    BotBaseHandle& botbase();
-
-    void set_options_enabled(bool enabled);
-
-    void stop();
-    void reset();
-
-signals:
-    void on_ready(bool ready);
-
-private:
-    void refresh();
-
-private:
-    SerialSelector& m_value;
-    SerialLogger m_logger;
-
-    QComboBox* m_serial_box;
-    QLabel* m_serial_program;
-    QLabel* m_serial_uptime;
-    QPushButton* m_reset_button;
-
-    QList<QSerialPortInfo> m_ports;
-    BotBaseHandle m_connection;
-};
 
 
 

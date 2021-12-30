@@ -7,31 +7,12 @@
 #ifndef PokemonAutomation_VideoWidget_H
 #define PokemonAutomation_VideoWidget_H
 
-#include <string>
 #include <vector>
-#include <QImage>
 #include <QWidget>
 
+class QImage;
+
 namespace PokemonAutomation{
-
-
-class CameraInfo{
-public:
-    CameraInfo() = default;
-    explicit CameraInfo(std::string device_name)
-        : m_device_name(std::move(device_name))
-    {}
-
-    operator bool() const{ return !m_device_name.empty(); }
-    const std::string& device_name() const{ return m_device_name; }
-
-    bool operator==(const CameraInfo& info){
-        return m_device_name == info.m_device_name;
-    }
-
-private:
-    std::string m_device_name;
-};
 
 
 class VideoWidget : public QWidget{

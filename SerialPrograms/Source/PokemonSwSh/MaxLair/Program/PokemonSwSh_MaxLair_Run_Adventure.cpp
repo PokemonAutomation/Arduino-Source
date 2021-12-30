@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Exception.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"

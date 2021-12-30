@@ -7,6 +7,7 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"

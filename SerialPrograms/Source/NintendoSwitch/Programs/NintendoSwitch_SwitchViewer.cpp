@@ -5,6 +5,7 @@
  */
 
 #include <QVBoxLayout>
+#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemWidget.h"
 #include "NintendoSwitch_SwitchViewer.h"
 
 namespace PokemonAutomation{
@@ -64,7 +65,7 @@ void SwitchViewer_Widget::construct(){
     layout->addWidget(make_header(*this));
 
     SwitchViewer& instance = static_cast<SwitchViewer&>(m_instance);
-    m_switches = (MultiSwitchSystem*)instance.m_switches.make_ui(*this, m_listener.raw_logger(), 0);
+    m_switches = (MultiSwitchSystemWidget*)instance.m_switches.make_ui(*this, m_listener.raw_logger(), 0);
     layout->addWidget(m_switches);
 }
 

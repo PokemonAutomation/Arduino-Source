@@ -6,10 +6,10 @@
 
 #if defined(__linux) || defined(__APPLE__)
 
+#include <chrono>
 #include "Common/Cpp/Exception.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "Environment.h"
-#include <chrono>
 
 #ifndef cpuid_H
 #define cpuid_H

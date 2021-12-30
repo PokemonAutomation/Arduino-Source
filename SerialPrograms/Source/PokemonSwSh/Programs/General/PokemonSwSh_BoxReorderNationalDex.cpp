@@ -7,6 +7,7 @@
 #include <sstream>
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Language.h"
+#include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/OCR/OCR_TextMatcher.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Device.h"

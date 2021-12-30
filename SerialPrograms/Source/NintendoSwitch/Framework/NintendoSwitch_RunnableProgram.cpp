@@ -11,6 +11,7 @@
 #include "ClientSource/Connection/PABotBase.h"
 #include "CommonFramework/Tools/StatsDatabase.h"
 #include "CommonFramework/Windows/MainWindow.h"
+#include "NintendoSwitch_SwitchSetup.h"
 #include "NintendoSwitch_RunnableProgram.h"
 
 #include <iostream>

@@ -327,14 +327,19 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Tools/VideoFeed.h
     Source/CommonFramework/Widgets/CameraImplementations.cpp
     Source/CommonFramework/Widgets/CameraImplementations.h
+    Source/CommonFramework/Widgets/CameraInfo.h
     Source/CommonFramework/Widgets/CameraSelector.cpp
     Source/CommonFramework/Widgets/CameraSelector.h
+    Source/CommonFramework/Widgets/CameraSelectorWidget.cpp
+    Source/CommonFramework/Widgets/CameraSelectorWidget.h
     Source/CommonFramework/Widgets/Qt5CameraWidget.cpp
     Source/CommonFramework/Widgets/Qt5CameraWidget.h
     Source/CommonFramework/Widgets/Qt6CameraWidget.cpp
     Source/CommonFramework/Widgets/Qt6CameraWidget.h
     Source/CommonFramework/Widgets/SerialSelector.cpp
     Source/CommonFramework/Widgets/SerialSelector.h
+    Source/CommonFramework/Widgets/SerialSelectorWidget.cpp
+    Source/CommonFramework/Widgets/SerialSelectorWidget.h
     Source/CommonFramework/Widgets/VideoWidget.h
     Source/CommonFramework/Widgets/VideoDisplayWidget.cpp
     Source/CommonFramework/Widgets/VideoDisplayWidget.h
@@ -425,8 +430,10 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramWidget.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramWidget.h
-    Source/NintendoSwitch/Framework/MultiSwitchSystem.cpp
-    Source/NintendoSwitch/Framework/MultiSwitchSystem.h
+    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystem.cpp
+    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystem.h
+    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemWidget.cpp
+    Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemWidget.h
     Source/NintendoSwitch/Framework/NintendoSwitch_RunnableProgram.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_RunnableProgram.h
     Source/NintendoSwitch/Framework/NintendoSwitch_RunnableProgramWidget.cpp
@@ -435,15 +442,18 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramWidget.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgramWidget.h
-    Source/NintendoSwitch/Framework/SwitchCommandRow.cpp
-    Source/NintendoSwitch/Framework/SwitchCommandRow.h
-    Source/NintendoSwitch/Framework/SwitchSetup.h
-    Source/NintendoSwitch/Framework/SwitchSystem.cpp
-    Source/NintendoSwitch/Framework/SwitchSystem.h
-    Source/NintendoSwitch/Framework/VirtualSwitchController.cpp
-    Source/NintendoSwitch/Framework/VirtualSwitchController.h
-    Source/NintendoSwitch/Framework/VirtualSwitchControllerMapping.cpp
-    Source/NintendoSwitch/Framework/VirtualSwitchControllerMapping.h
+    Source/NintendoSwitch/Framework/NintendoSwitch_CommandRow.cpp
+    Source/NintendoSwitch/Framework/NintendoSwitch_CommandRow.h
+    Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSetup.h
+    Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSetupWidget.h
+    Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystem.cpp
+    Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystem.h
+    Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemWidget.cpp
+    Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemWidget.h
+    Source/NintendoSwitch/Framework/NintendoSwitch_VirtualController.cpp
+    Source/NintendoSwitch/Framework/NintendoSwitch_VirtualController.h
+    Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerMapping.cpp
+    Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerMapping.h
     Source/NintendoSwitch/NintendoSwitch_Settings.cpp
     Source/NintendoSwitch/NintendoSwitch_Settings.h
     Source/NintendoSwitch/InferenceTraining/PokemonHome_GenerateNameOCR.cpp

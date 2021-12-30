@@ -11,6 +11,7 @@
 #include <vector>
 #include <QString>
 #include "CommonFramework/Logging/Logger.h"
+#include "CameraInfo.h"
 #include "VideoWidget.h"
 
 namespace PokemonAutomation{

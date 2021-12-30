@@ -4,6 +4,8 @@
  *
  */
 
+#include "Common/Compiler.h"
+#include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
 #include "PokemonSwSh_MaxLair_Run_Entrance.h"

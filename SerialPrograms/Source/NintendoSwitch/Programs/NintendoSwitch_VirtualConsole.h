@@ -12,7 +12,7 @@
 #include "CommonFramework/Panels/Panel.h"
 #include "CommonFramework/Panels/PanelWidget.h"
 #include "CommonFramework/Windows/MainWindow.h"
-#include "NintendoSwitch/Framework/SwitchSystem.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_SwitchSystem.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -61,7 +61,7 @@ private:
     void construct();
 
 private:
-    SwitchSystem* m_switch;
+    SwitchSystemWidget* m_switch;
 };
 
 

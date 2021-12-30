@@ -10,7 +10,7 @@
 #include <QJsonObject>
 #include "CommonFramework/Panels/Panel.h"
 #include "CommonFramework/Panels/PanelWidget.h"
-#include "NintendoSwitch/Framework/MultiSwitchSystem.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystem.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -58,7 +58,7 @@ private:
     void construct();
 
 private:
-    MultiSwitchSystem* m_switches;
+    MultiSwitchSystemWidget* m_switches;
 };
 
 
