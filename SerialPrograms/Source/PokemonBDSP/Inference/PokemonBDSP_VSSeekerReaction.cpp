@@ -72,7 +72,7 @@ VSSeekerReactionTracker::VSSeekerReactionTracker(VideoOverlay& overlay, const Im
     , m_box(box)
 {}
 void VSSeekerReactionTracker::make_overlays(OverlaySet& items) const{
-    items.add(Qt::red, m_box);
+    items.add(COLOR_RED, m_box);
 }
 bool VSSeekerReactionTracker::process_frame(
     const QImage& frame,
@@ -84,7 +84,7 @@ bool VSSeekerReactionTracker::process_frame(
 
     m_boxes.clear();
     for (const ImagePixelBox& mark : m_bubbles){
-        m_boxes.emplace_back(m_overlay, translate_to_parent(frame, m_box, mark), Qt::magenta);
+        m_boxes.emplace_back(m_overlay, translate_to_parent(frame, m_box, mark), COLOR_MAGENTA);
     }
     return false;
 }

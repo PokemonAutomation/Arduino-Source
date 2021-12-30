@@ -28,10 +28,10 @@ QString dump_image(
     name += "-";
     name += label;
     name += ".png";
-    logger.log("Saving failed inference image to: " + name, Qt::red);
+    logger.log("Saving failed inference image to: " + name, COLOR_RED);
     image.save(name);
     send_program_telemetry(
-        logger, true, Qt::red,
+        logger, true, COLOR_RED,
         program_info,
         label,
         {},

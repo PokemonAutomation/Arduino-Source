@@ -52,13 +52,13 @@ bool read_battle_menu(
             break;
         }
         if (mon.size() > 1){
-            console.log("Ambiguous Read Result: " + set_to_str(mon), "purple");
+            console.log("Ambiguous Read Result: " + set_to_str(mon), COLOR_PURPLE);
             if (state.opponent.size() == 1 && mon.find(*state.opponent.begin()) != mon.end()){
-                console.log("Using previous known value to disambiguate: " + set_to_str(mon), "purple");
+                console.log("Using previous known value to disambiguate: " + set_to_str(mon), COLOR_PURPLE);
                 break;
             }
         }
-        console.log("Attempting to read from summary.", "purple");
+        console.log("Attempting to read from summary.", COLOR_PURPLE);
         pbf_press_button(console, BUTTON_Y, 10, TICKS_PER_SECOND);
         pbf_press_dpad(console, DPAD_UP, 10, 50);
         pbf_press_button(console, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
@@ -69,7 +69,7 @@ bool read_battle_menu(
 
         if (state.wins == 3 && !state.boss.empty()){
             if (!state.opponent.empty() && *state.opponent.begin() != state.boss){
-                console.log("Inconsistent Boss: Expected " + state.boss + ", Read: " + *state.opponent.begin(), Qt::red);
+                console.log("Inconsistent Boss: Expected " + state.boss + ", Read: " + *state.opponent.begin(), COLOR_RED);
             }
             state.opponent = {state.boss};
             break;
@@ -82,10 +82,10 @@ bool read_battle_menu(
         : *state.opponent.begin();
 
     if (state.wins != 3 && is_boss(opponent)){
-        console.log("Boss found before 3 wins. Something is seriously out-of-sync.", Qt::red);
+        console.log("Boss found before 3 wins. Something is seriously out-of-sync.", COLOR_RED);
         dump_image(console, MODULE_NAME, "BossBeforeEnd", console.video().snapshot());
 //        send_program_telemetry(
-//            env.logger(), true, Qt::red, MODULE_NAME,
+//            env.logger(), true, COLOR_RED, MODULE_NAME,
 //            "Error",
 //            {{"Message", "Boss found before 3 wins."}},
 //            ""
@@ -113,7 +113,7 @@ bool read_battle_menu(
     if (currently_dmaxed){
         player.dmax_turns_left--;
         if (player.dmax_turns_left <= 0){
-            console.log("State Inconsistency: dmax_turns_left <= 0 && currently_dmaxed == true", Qt::red);
+            console.log("State Inconsistency: dmax_turns_left <= 0 && currently_dmaxed == true", COLOR_RED);
             player.dmax_turns_left = 1;
         }
     }else{
@@ -122,7 +122,7 @@ bool read_battle_menu(
             state.players[player_index].pokemon = std::move(name);
         }
         if (player.dmax_turns_left > 1){
-            console.log("State Inconsistency: dmax_turns_left > 0 && currently_dmaxed == false", Qt::red);
+            console.log("State Inconsistency: dmax_turns_left > 0 && currently_dmaxed == false", COLOR_RED);
             state.move_slot = 0;
         }
         if (player.dmax_turns_left == 1){
@@ -170,19 +170,19 @@ bool read_battle_menu(
 //    int8_t move_slot = arrow_finder.get_slot();
     int8_t move_slot = arrow_finder.detect(screen);
     if (move_slot < 0){
-        console.log("Unable to detect move slot.", Qt::red);
+        console.log("Unable to detect move slot.", COLOR_RED);
         dump_image(console, MODULE_NAME, "MoveSlot", screen);
         pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
         pbf_press_dpad(console, DPAD_RIGHT, 2 * TICKS_PER_SECOND, 0);
         pbf_press_dpad(console, DPAD_UP, 2 * TICKS_PER_SECOND, 0);
         move_slot = 0;
     }else{
-        console.log("Current Move Slot: " + std::to_string(move_slot), Qt::blue);
+        console.log("Current Move Slot: " + std::to_string(move_slot), COLOR_BLUE);
     }
     if (move_slot != state.move_slot){
         console.log(
             "Move Slot Mismatch: Expected = " + std::to_string(state.move_slot) + ", Actual = " + std::to_string(move_slot),
-            Qt::red
+            COLOR_RED
         );
     }
     state.move_slot = move_slot;
@@ -221,7 +221,7 @@ StateMachineAction run_move_select(
         console.log("Selecting move...");
 
         if (cheer_only){
-            console.log("Choosing move Cheer. (you are dead)", "purple");
+            console.log("Choosing move Cheer. (you are dead)", COLOR_PURPLE);
 //            pbf_mash_button(console, BUTTON_A, 2 * TICKS_PER_SECOND);
 //            console.botbase().wait_for_all_requests();
             break;
@@ -232,7 +232,7 @@ StateMachineAction run_move_select(
             inferred,
             player_index
         );
-        console.log("Choosing move " + std::to_string((int)move.first) + (move.second ? " (dmax)." : "."), "purple");
+        console.log("Choosing move " + std::to_string((int)move.first) + (move.second ? " (dmax)." : "."), COLOR_PURPLE);
 
         if (player.can_dmax && move.second){
             pbf_press_dpad(console, DPAD_LEFT, 10, 50);
@@ -270,7 +270,7 @@ StateMachineAction run_move_select(
 
         //  Battle menu detected. It means the move wasn't selectable.
 
-        console.log("Move not selectable.", Qt::magenta);
+        console.log("Move not selectable.", COLOR_MAGENTA);
         player.move_blocked[state.move_slot] = true;
 
         bool no_moves = true;
@@ -278,7 +278,7 @@ StateMachineAction run_move_select(
             no_moves &= player.move_blocked[c];
         }
         if (no_moves){
-            console.log("All moves reported as blocked. This is impossible. Clearing state.", Qt::red);
+            console.log("All moves reported as blocked. This is impossible. Clearing state.", COLOR_RED);
             for (size_t c = 0; c < 4; c++){
                 player.move_blocked[c] = false;
             }
@@ -341,7 +341,7 @@ StateMachineAction throw_balls(
     if (balls != 0){
         pbf_press_button(console, BUTTON_A, 10, 125);
     }else{
-        console.log("Unable to find appropriate ball. Did you run out?", Qt::red);
+        console.log("Unable to find appropriate ball. Did you run out?", COLOR_RED);
         PA_THROW_StringException("Unable to find appropriate ball. Did you run out?");
     }
 

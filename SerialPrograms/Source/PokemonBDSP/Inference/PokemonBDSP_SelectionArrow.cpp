@@ -75,7 +75,7 @@ size_t find_selection_arrows(
 SelectionArrowFinder::SelectionArrowFinder(
     VideoOverlay& overlay,
     const ImageFloatBox& box,
-    QColor color
+    Color color
 )
     : m_overlay(overlay)
     , m_color(color)
@@ -89,7 +89,7 @@ void SelectionArrowFinder::detect(const QImage& screen){
 
     m_arrow_boxes.clear();
     for (const ImagePixelBox& mark : exclamation_marks){
-        m_arrow_boxes.emplace_back(m_overlay, translate_to_parent(screen, m_box, mark), Qt::magenta);
+        m_arrow_boxes.emplace_back(m_overlay, translate_to_parent(screen, m_box, mark), COLOR_MAGENTA);
     }
 }
 void SelectionArrowFinder::make_overlays(OverlaySet& items) const{

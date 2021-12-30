@@ -40,13 +40,17 @@ void PanelList::finish_panel_setup(){
 
         const QString& display_name = item.second->display_name();
         if (!m_panel_map.emplace(display_name, item.second.get()).second){
-            global_logger_tagged().log("Duplicate program name: " + display_name, "red");
+            global_logger_tagged().log("Duplicate program name: " + display_name, COLOR_RED);
             PA_THROW_StringException("Duplicate program name: " + display_name);
         }
 
         addItem(display_name);
         QListWidgetItem* list_item = this->item(this->count() - 1);
-        list_item->setForeground(item.second->color());
+        Color color = item.second->color();
+        if (color){
+            QColor qcolor = QColor((uint32_t)color);
+            list_item->setForeground(qcolor);
+        }
         list_item->setToolTip(item.second->description());
     }
     connect(
@@ -62,7 +66,7 @@ void PanelList::finish_panel_setup(){
                 panel->from_json(PERSISTENT_SETTINGS().panels[QString::fromStdString(descriptor->identifier())]);
                 m_listener.on_panel_construct(std::move(panel));
             }catch (const StringException& error){
-                global_logger_tagged().log(error.what(), "red");
+                global_logger_tagged().log(error.what(), COLOR_RED);
                 QMessageBox box;
                 box.critical(
                     nullptr,

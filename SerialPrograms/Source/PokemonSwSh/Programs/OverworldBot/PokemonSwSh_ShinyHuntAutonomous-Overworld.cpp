@@ -159,7 +159,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
         env.console,
         OverworldTargetTracker::OVERWORLD_CENTER_X - 0.02,
         OverworldTargetTracker::OVERWORLD_CENTER_Y - 0.05,
-        0.04, 0.1, Qt::cyan
+        0.04, 0.1, COLOR_CYAN
     );
 
     OverworldTargetTracker target_tracker(
@@ -231,7 +231,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
 
             switch (result){
             case 0:
-                env.console.log("Unexpected Battle.", "red");
+                env.console.log("Unexpected Battle.", COLOR_RED);
                 return false;
             case 1:
                 env.console.log("Battle started!");
@@ -245,7 +245,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
 //        env.log("target: " + std::to_string(target.first));
 
         if (target.first < 0){
-            env.log("No targets found.", "orange");
+            env.log("No targets found.", COLOR_ORANGE);
             continue;
         }
         if (target.first > MAX_TARGET_ALPHA){
@@ -256,7 +256,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
                 QString::number(target.second.delta_x) + " , " +
                 QString::number(-target.second.delta_y) + "], alpha = " +
                 QString::number(target.first),
-                "orange"
+                COLOR_ORANGE
             );
             continue;
         }
@@ -272,7 +272,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
     ProgramEnvironment& env, ConsoleHandle& console,
     const std::pair<double, OverworldTarget>& target
 ) const{
-    InferenceBoxScope target_box(console, target.second.box, Qt::yellow);
+    InferenceBoxScope target_box(console, target.second.box, COLOR_YELLOW);
     env.log(
         QString("Best Target: ") +
         (target.second.mark == OverworldMark::EXCLAMATION_MARK ? "Exclamation" : "Question") +
@@ -280,7 +280,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
         QString::number(target.second.delta_x) + " , " +
         QString::number(-target.second.delta_y) + "], alpha = " +
         QString::number(target.first),
-        "purple"
+        COLOR_PURPLE
     );
 
     const Trajectory& trajectory = target.second.trajectory;
@@ -340,7 +340,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
 
     switch (result){
     case 0:
-        console.log("Unexpected Battle.", "red");
+        console.log("Unexpected Battle.", COLOR_RED);
         return true;
     case 1:
         console.log("Battle started!");

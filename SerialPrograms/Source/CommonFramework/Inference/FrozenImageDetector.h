@@ -16,7 +16,7 @@ class FrozenImageDetector : public VisualInferenceCallback{
 public:
     FrozenImageDetector(std::chrono::milliseconds timeout, double rmsd_threshold);
     FrozenImageDetector(
-        QColor color, const ImageFloatBox& box,
+        Color color, const ImageFloatBox& box,
         std::chrono::milliseconds timeout, double rmsd_threshold
     );
 
@@ -27,7 +27,7 @@ public:
    ) override;
 
 private:
-    QColor m_color;
+    Color m_color;
     ImageFloatBox m_box;
     std::chrono::milliseconds m_timeout;
     double m_rmsd_threshold;

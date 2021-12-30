@@ -125,20 +125,20 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
             );
             switch (ret){
             case 0:
-                env.log("Nothing found...", "orange");
+                env.log("Nothing found...", COLOR_ORANGE);
                 stats.m_nothing++;
                 continue;
             case 1:
-                env.log("Hooked something!", Qt::blue);
+                env.log("Hooked something!", COLOR_BLUE);
                 pbf_press_button(env.console, BUTTON_ZL, 10, TICKS_PER_SECOND);
                 break;
             case 2:
-                env.log("Unexpected battle menu.", Qt::red);
+                env.log("Unexpected battle menu.", COLOR_RED);
                 stats.add_error();
                 handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
                 continue;
             default:
-                env.log("Timed out.", Qt::red);
+                env.log("Timed out.", COLOR_RED);
                 stats.add_error();
                 continue;
             }
@@ -157,12 +157,12 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
                 pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
                 break;
             case 1:
-                env.log("Unexpected battle menu.", Qt::red);
+                env.log("Unexpected battle menu.", COLOR_RED);
                 stats.add_error();
                 handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
                 continue;
             default:
-                env.log("Timed out.", Qt::red);
+                env.log("Timed out.", COLOR_RED);
                 stats.add_error();
                 continue;
             }
@@ -181,12 +181,12 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
                 env.console.log("Battle started!");
                 break;
             case 1:
-                env.log("Unexpected battle menu.", Qt::red);
+                env.log("Unexpected battle menu.", COLOR_RED);
                 stats.add_error();
                 handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
                 continue;
             default:
-                env.log("Missed the hook.", "orange");
+                env.log("Missed the hook.", COLOR_ORANGE);
                 stats.m_misses++;
                 continue;
             }

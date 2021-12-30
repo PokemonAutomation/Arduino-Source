@@ -18,7 +18,7 @@ namespace PokemonAutomation{
 ImageMatchDetector::ImageMatchDetector(
     QImage reference_image, const ImageFloatBox& box,
     double max_rmsd,
-    QColor color
+    Color color
 )
     : m_reference_image(std::move(reference_image))
     , m_max_rmsd(max_rmsd)
@@ -55,7 +55,7 @@ ImageMatchWatcher::ImageMatchWatcher(
     QImage reference_image, const ImageFloatBox& box,
     double max_rmsd,
     std::chrono::milliseconds hold_duration,
-    QColor color
+    Color color
 )
     : ImageMatchDetector(std::move(reference_image), box, max_rmsd, color)
     , m_hold_duration(hold_duration)

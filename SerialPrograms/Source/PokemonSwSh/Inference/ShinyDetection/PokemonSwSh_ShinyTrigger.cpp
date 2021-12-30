@@ -96,7 +96,7 @@ void ShinyImageDetection::accumulate(
             str += "ShinyDetector: Ball [{" + QString::number(object.center_x()) + ", " + QString::number(object.center_y());
             str += "}, " + QString::number(object.area) + "]";
             if (logger){
-                logger->log(str, "purple");
+                logger->log(str, COLOR_PURPLE);
             }
         }
         if (detector.is_star()){
@@ -106,7 +106,7 @@ void ShinyImageDetection::accumulate(
             str += "ShinyDetector: Star [{" + QString::number(object.center_x()) + ", " + QString::number(object.center_y());
             str += "}, " + QString::number(object.area) + "]";
             if (logger){
-                logger->log(str, "purple");
+                logger->log(str, COLOR_PURPLE);
             }
         }
 //        auto time5 = std::chrono::system_clock::now();
@@ -121,7 +121,7 @@ void ShinyImageDetection::accumulate(
             str += "ShinyDetector: Square [{" + QString::number(object.center_x()) + ", " + QString::number(object.center_y());
             str += "}, " + QString::number(object.area) + "]";
             if (logger){
-                logger->log(str, "purple");
+                logger->log(str, COLOR_PURPLE);
             }
         }
 //        auto time7 = std::chrono::system_clock::now();
@@ -140,7 +140,7 @@ void ShinyImageDetection::accumulate(
             str += " : {" + QString::number(object.center_x()) + ", " + QString::number(object.center_y());
             str += "}, " + QString::number(object.area) + "]";
             if (logger){
-                logger->log(str, "purple");
+                logger->log(str, COLOR_PURPLE);
             }
         }
 //        auto time1 = std::chrono::system_clock::now();

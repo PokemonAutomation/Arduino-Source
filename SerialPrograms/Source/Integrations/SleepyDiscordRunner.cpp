@@ -135,7 +135,7 @@ public:
 
     void send(std::string embed, std::string channels, std::string messages, std::shared_ptr<PendingFileSend> file) {
         std::lock_guard<std::mutex> lg(m_lock);
-        sleepy_logger().log("Sending notification... (queue = " + tostr_u_commas(m_queue.size()) + ")", "purple");
+        sleepy_logger().log("Sending notification... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_PURPLE);
         m_queue.emplace_back(embed, channels, messages, std::move(file));
         m_cv.notify_all();
     }
@@ -202,7 +202,7 @@ public:
         if (m_sleepy_client != nullptr) {
             SleepyDiscordSender::instance().send(embed, channels, messages, std::move(file));
         }else{
-            sleepy_logger().log("SleepyDiscordClient::send(): Not connected.", Qt::red);
+            sleepy_logger().log("SleepyDiscordClient::send(): Not connected.", COLOR_RED);
         }
     }
 
@@ -212,7 +212,7 @@ public:
         }
 
         std::string msg = (std::string)message + " (Callback: " + (std::string)enum_str_callback[response] + ")";
-        const char* color = response == SleepyResponse::Disconnected || response == SleepyResponse::Fault ? "red" : "purple";
+        Color color = response == SleepyResponse::Disconnected || response == SleepyResponse::Fault ? COLOR_RED : COLOR_PURPLE;
 
         switch (response) {
         case SleepyResponse::Connected: m_connected = true; break;
@@ -224,7 +224,7 @@ public:
                 msg = "Removed sent file. (Callback: " + (std::string)enum_str_callback[response] + ")";
             }else{
                 msg = "Failed to remove sent file. (Callback: " + (std::string)enum_str_callback[response] + ")";
-                color = "red";
+                color = COLOR_RED;
             }
         }; break;
         }
@@ -240,7 +240,7 @@ public:
         cout << "cmd_callback(): " << request << endl;
 
         std::string cmd = "Received command: " + (std::string)enum_str_command[request] + ".";
-        sleepy_logger().log(cmd, "purple");
+        sleepy_logger().log(cmd, COLOR_PURPLE);
 
         switch (request) {
         case SleepyRequest::Click:
@@ -434,17 +434,17 @@ void sleepy_connect(){
 //            return;
 //        }
         if (m_sleepy_client != nullptr){
-            sleepy_logger().log("sleepy_connect(): Already initialized!", "purple");
+            sleepy_logger().log("sleepy_connect(): Already initialized!", COLOR_PURPLE);
             return;
         }
         if (!initialize_sleepy_settings()){
-            sleepy_logger().log("sleepy_connect(): initialize_sleepy_settings() failed.", Qt::red);
+            sleepy_logger().log("sleepy_connect(): initialize_sleepy_settings() failed.", COLOR_RED);
             return;
         }
-        sleepy_logger().log("Connecting...", "purple");
+        sleepy_logger().log("Connecting...", COLOR_PURPLE);
     }
     client_connect();
-    sleepy_logger().log("Finished Connecting...", "purple");
+    sleepy_logger().log("Finished Connecting...", COLOR_PURPLE);
 }
 
 void sleepy_terminate() {
@@ -552,7 +552,7 @@ void send_message_sleepy(bool should_ping, const std::vector<QString>& tags, con
         }
 
         std::string json = QJsonDocument(embed).toJson().toStdString();
-        sleepy_logger().log("send_message_sleepy(): Sending...", "purple");
+        sleepy_logger().log("send_message_sleepy(): Sending...", COLOR_PURPLE);
         m_sleepy_client->send(json, chanStr, messages, file == nullptr ? nullptr : std::move(file));
     }
 }
@@ -600,15 +600,15 @@ bool check_if_empty(const DiscordSettingsOption& settings) {
         return false;
     }
     else if (settings.integration.token.get().contains(",")) {
-        sleepy_logger().log("\"Token\" must only contain one token. Stopping...", "red");
+        sleepy_logger().log("\"Token\" must only contain one token. Stopping...", COLOR_RED);
         return false;
     }
     else if (settings.integration.owner.get().contains(",")) {
-        sleepy_logger().log("\"Owner\" must only contain one Discord ID (yours). Stopping...", "red");
+        sleepy_logger().log("\"Owner\" must only contain one Discord ID (yours). Stopping...", COLOR_RED);
         return false;
     }
     else if (settings.integration.command_prefix.get().isEmpty()) {
-        sleepy_logger().log("Please enter a Discord command prefix. Stopping...", "red");
+        sleepy_logger().log("Please enter a Discord command prefix. Stopping...", COLOR_RED);
         return false;
     }
     return true;

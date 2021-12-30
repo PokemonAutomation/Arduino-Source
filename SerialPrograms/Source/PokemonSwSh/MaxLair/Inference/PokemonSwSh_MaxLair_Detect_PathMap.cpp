@@ -41,7 +41,7 @@ bool read_type_array(
     hits.clear();
     size_t c = 0;
     for (const auto& item : candidates){
-        hits.emplace_back(console.overlay(), translate_to_parent(screen, box, item.second.second), Qt::green);
+        hits.emplace_back(console.overlay(), translate_to_parent(screen, box, item.second.second), COLOR_GREEN);
         sorted.emplace(item.second.second.min_x, &item.second);
         c++;
         if (c >= count){

@@ -37,7 +37,7 @@ private:
     LanguageOCR& m_value;
     QComboBox* m_box;
     QLabel* m_status;
-    bool m_updating = false;
+//    bool m_updating = false;
 };
 
 

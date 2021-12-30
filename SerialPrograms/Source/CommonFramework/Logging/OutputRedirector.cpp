@@ -10,7 +10,7 @@
 namespace PokemonAutomation{
 
 
-OutputRedirector::OutputRedirector(std::ostream& stream, std::string tag, QColor color)
+OutputRedirector::OutputRedirector(std::ostream& stream, std::string tag, Color color)
     : m_stream(stream)
     , m_old_buf(stream.rdbuf())
     , m_logger(global_logger_raw(), tag)

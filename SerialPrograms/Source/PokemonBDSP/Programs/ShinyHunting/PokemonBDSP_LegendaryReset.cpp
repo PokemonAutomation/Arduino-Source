@@ -113,10 +113,10 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env){
             env.log("Battle started!");
             break;
         case 1:
-            env.log("Unexpected battle menu.", Qt::red);
+            env.log("Unexpected battle menu.", COLOR_RED);
             continue;
         default:
-            env.log("Timed out.", Qt::red);
+            env.log("Timed out.", COLOR_RED);
             continue;
         }
 

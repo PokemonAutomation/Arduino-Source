@@ -4,6 +4,8 @@
  *
  */
 
+#include <QImage>
+#include "Common/Compiler.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Integrations/ProgramTracker.h"
 #include "IntegrationsAPI.h"

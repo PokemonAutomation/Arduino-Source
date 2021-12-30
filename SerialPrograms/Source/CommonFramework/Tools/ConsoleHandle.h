@@ -9,11 +9,11 @@
 
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/Widgets/VideoOverlayWidget.h"
 
 namespace PokemonAutomation{
 
+class VideoFeed;
+class VideoOverlay;
 
 
 class ConsoleHandle{

@@ -104,7 +104,7 @@ GlobalState GlobalStateTracker::synchronize(
     m_state_epoch++;
 
     time_point timestamp = std::chrono::system_clock::now();
-    logger.log("Synchronizing...", Qt::magenta);
+    logger.log("Synchronizing...", COLOR_MAGENTA);
 
     m_master_consoles[index] = m_consoles[index];
     m_master_consoles[index].timestamp = timestamp;
@@ -127,7 +127,7 @@ GlobalState GlobalStateTracker::synchronize(
         time_point now = std::chrono::system_clock::now();
         if (now > time_limit){
             m_state_epoch++;
-            logger.log("GlobalStateTracker::synchronize() timed out.", Qt::red);
+            logger.log("GlobalStateTracker::synchronize() timed out.", COLOR_RED);
             group_clear_status(m_groups[index]);
             update_groups_unprotected();
             return infer_actual_state_unprotected(index);

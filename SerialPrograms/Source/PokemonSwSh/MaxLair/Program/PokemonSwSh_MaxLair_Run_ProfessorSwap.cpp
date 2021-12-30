@@ -40,12 +40,12 @@ void run_professor_swap(
 
     bool swap = should_swap_with_professor(console, inferred, player_index);
     if (swap){
-        console.log("Choosing to swap.", "purple");
+        console.log("Choosing to swap.", COLOR_PURPLE);
         std::lock_guard<std::mutex> lg(env.lock());
         pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
         console.botbase().wait_for_all_requests();
     }else{
-        console.log("Choosing not to swap.", "purple");
+        console.log("Choosing not to swap.", COLOR_PURPLE);
         pbf_press_button(console, BUTTON_B, 10, TICKS_PER_SECOND);
     }
     console.botbase().wait_for_all_requests();
@@ -62,7 +62,7 @@ void run_professor_swap(
             { &detector }
         );
         if (result < 0){
-            console.log("Timed out waiting for black screen.", Qt::red);
+            console.log("Timed out waiting for black screen.", COLOR_RED);
         }else{
             console.log("Found path screen. Reading party...");
         }
@@ -77,7 +77,7 @@ void run_professor_swap(
             INFERENCE_RATE
         );
         if (result < 0){
-            console.log("Timed out waiting for path screen.", Qt::red);
+            console.log("Timed out waiting for path screen.", COLOR_RED);
         }else{
             console.log("Found path screen. Reading party...");
         }

@@ -13,6 +13,8 @@
 #include <vector>
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/Tools/VideoFeed.h"
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{

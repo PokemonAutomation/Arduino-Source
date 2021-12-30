@@ -133,7 +133,7 @@ void ShinyEncounterDetector::push(
         if (frame_alpha.shiny >= m_detection_threshold){
             str += " (threshold exceeded)";
         }
-        m_logger.log(str, "blue");
+        m_logger.log(str, COLOR_BLUE);
 
         double type_alpha = frame_alpha.star + frame_alpha.square;
         if (m_best_type_alpha < type_alpha){
@@ -146,19 +146,19 @@ void ShinyEncounterDetector::push(
     m_detection_overlays.clear();
     for (const auto& item : signatures.balls){
         ImageFloatBox box = translate_to_parent(screen, m_shiny_box, item);
-        m_detection_overlays.emplace_back(m_overlay, box, Qt::green);
+        m_detection_overlays.emplace_back(m_overlay, box, COLOR_GREEN);
     }
     for (const auto& item : signatures.stars){
         ImageFloatBox box = translate_to_parent(screen, m_shiny_box, item);
-        m_detection_overlays.emplace_back(m_overlay, box, Qt::green);
+        m_detection_overlays.emplace_back(m_overlay, box, COLOR_GREEN);
     }
     for (const auto& item : signatures.squares){
         ImageFloatBox box = translate_to_parent(screen, m_shiny_box, item);
-        m_detection_overlays.emplace_back(m_overlay, box, Qt::green);
+        m_detection_overlays.emplace_back(m_overlay, box, COLOR_GREEN);
     }
     for (const auto& item : signatures.lines){
         ImageFloatBox box = translate_to_parent(screen, m_shiny_box, item);
-        m_detection_overlays.emplace_back(m_overlay, box, Qt::green);
+        m_detection_overlays.emplace_back(m_overlay, box, COLOR_GREEN);
     }
 }
 
@@ -171,23 +171,23 @@ ShinyType ShinyEncounterDetector::shiny_type() const{
         "ShinyDetector: Overall Alpha = " + QString::number(alpha) +
         ", Star Alpha = " + QString::number(m_image_alpha.star) +
         ", Square Alpha = " + QString::number(m_image_alpha.square),
-        "purple"
+        COLOR_PURPLE
     );
 
     if (alpha < m_detection_threshold){
-        m_logger.log("ShinyDetector: Not Shiny.", "purple");
+        m_logger.log("ShinyDetector: Not Shiny.", COLOR_PURPLE);
         return ShinyType::NOT_SHINY;
     }
     if (m_image_alpha.star > 0 && m_image_alpha.star > m_image_alpha.square * 2){
-        m_logger.log("ShinyDetector: Detected Star Shiny!", "blue");
+        m_logger.log("ShinyDetector: Detected Star Shiny!", COLOR_BLUE);
         return ShinyType::STAR_SHINY;
     }
     if (m_image_alpha.square > 0 && m_image_alpha.square > m_image_alpha.star * 2){
-        m_logger.log("ShinyDetector: Detected Square Shiny!", "blue");
+        m_logger.log("ShinyDetector: Detected Square Shiny!", COLOR_BLUE);
         return ShinyType::SQUARE_SHINY;
     }
 
-    m_logger.log("ShinyDetector: Detected Shiny! But ambiguous shiny type.", "blue");
+    m_logger.log("ShinyDetector: Detected Shiny! But ambiguous shiny type.", COLOR_BLUE);
     return ShinyType::UNKNOWN_SHINY;
 }
 
@@ -233,7 +233,7 @@ ShinyDetectionResult detect_shiny_battle(
         auto timestamp = time1;
 
         if (menu.detect(screen)){
-            env.log("ShinyDetector: Battle menu found!", "purple");
+            env.log("ShinyDetector: Battle menu found!", COLOR_PURPLE);
             break;
         }
         auto time2 = std::chrono::system_clock::now();
@@ -256,13 +256,13 @@ ShinyDetectionResult detect_shiny_battle(
         throttle_stats += std::chrono::duration_cast<std::chrono::milliseconds>(time4 - time3).count();
     }
 
-    env.log("Diagnostics: Screenshot: " + capture_stats.dump(), Qt::magenta);
-    env.log("Diagnostics: Menu Detection: " + menu_stats.dump(), Qt::magenta);
-    env.log("Diagnostics: Inference: " + inference_stats.dump(), Qt::magenta);
-    env.log("Diagnostics: Throttle: " + throttle_stats.dump(), Qt::magenta);
+    env.log("Diagnostics: Screenshot: " + capture_stats.dump(), COLOR_MAGENTA);
+    env.log("Diagnostics: Menu Detection: " + menu_stats.dump(), COLOR_MAGENTA);
+    env.log("Diagnostics: Inference: " + inference_stats.dump(), COLOR_MAGENTA);
+    env.log("Diagnostics: Throttle: " + throttle_stats.dump(), COLOR_MAGENTA);
 
     if (no_detection){
-        env.log("ShinyDetector: Battle menu not found after timeout.", "red");
+        env.log("ShinyDetector: Battle menu not found after timeout.", COLOR_RED);
         return ShinyDetectionResult{ShinyType::UNKNOWN, QImage()};
     }
 

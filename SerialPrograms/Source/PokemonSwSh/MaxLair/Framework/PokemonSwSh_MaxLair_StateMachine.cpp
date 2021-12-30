@@ -63,7 +63,7 @@ StateMachineAction run_state_iteration(
     RaidCatchDetector catch_select(console);
     PokemonCaughtMenuDetector caught_menu;
     EntranceDetector entrance_detector(entrance);
-    FrozenImageDetector frozen_screen(Qt::cyan, {0, 0, 1, 0.5}, std::chrono::seconds(30), 10);
+    FrozenImageDetector frozen_screen(COLOR_CYAN, {0, 0, 1, 0.5}, std::chrono::seconds(30), 10);
 
     int result = wait_until(
         env, console,
@@ -136,13 +136,13 @@ StateMachineAction run_state_iteration(
         run_entrance(runtime, env, console, save_path, global_state);
         return StateMachineAction::DONE_WITH_ADVENTURE;
     case 8:
-        console.log("Current State: Frozen Screen", Qt::red);
+        console.log("Current State: Frozen Screen", COLOR_RED);
 //        pbf_mash_button(console, BUTTON_B, TICKS_PER_SECOND);
 //        console.botbase().wait_for_all_requests();
 //        return StateMachineAction::KEEP_GOING;
         return StateMachineAction::RESET_RECOVER;
     default:
-        console.log("Program hang. No state detected after 5 minutes.", Qt::red);
+        console.log("Program hang. No state detected after 5 minutes.", COLOR_RED);
         dump_image(console, MODULE_NAME, "ProgramHang", console.video().snapshot());
         global_state.mark_as_dead(console_index);
         return StateMachineAction::RESET_RECOVER;

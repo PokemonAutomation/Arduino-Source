@@ -260,7 +260,7 @@ void VirtualController::thread_loop(){
                 m_logger.log(
                     "System sleep latency (" + QString::number(average.count()) + " ms). "
                     "Increasing granularity to " + QString::number(m_granularity) + " ticks.",
-                    "red"
+                    COLOR_RED
                 );
             }
         }else if (delays.size() > 10 && average < granularity / 2){
@@ -269,7 +269,7 @@ void VirtualController::thread_loop(){
                 m_logger.log(
                     "System sleep latency (" + QString::number(average.count()) + " ms). "
                     "Decreasing granularity to " + QString::number(m_granularity) + " ticks.",
-                    "blue"
+                    COLOR_BLUE
                 );
             }
         }

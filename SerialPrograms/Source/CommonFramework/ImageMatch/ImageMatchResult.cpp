@@ -15,14 +15,14 @@ void ImageMatchResult::log(Logger& logger, double max_alpha) const{
 
     if (results.empty()){
         str += "no matches";
-        logger.log(str, Qt::red);
+        logger.log(str, COLOR_RED);
         return;
     }
 
     double best = results.begin()->first;
-    QColor color = best <= max_alpha
-        ? Qt::blue
-        : Qt::red;
+    Color color = best <= max_alpha
+        ? COLOR_BLUE
+        : COLOR_RED;
 
     if (results.size() == 1){
         auto iter = results.begin();

@@ -18,7 +18,7 @@ public:
     ImageMatchDetector(
         QImage reference_image, const ImageFloatBox& box,
         double max_rmsd,
-        QColor color = Qt::red
+        Color color = COLOR_RED
     );
 
     double rmsd(const QImage& frame) const;
@@ -30,7 +30,7 @@ private:
     QImage m_reference_image;
     double m_max_rmsd;
 
-    QColor m_color;
+    Color m_color;
     ImageFloatBox m_box;
 };
 
@@ -41,7 +41,7 @@ public:
         QImage reference_image, const ImageFloatBox& box,
         double max_rmsd,
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(0),
-        QColor color = Qt::red
+        Color color = COLOR_RED
     );
 
     virtual void make_overlays(OverlaySet& items) const override;

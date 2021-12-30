@@ -119,7 +119,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env){
     bool pokemon_caught = false;
     while (!pokemon_caught){
         env.console.botbase().wait_for_all_requests();
-        env.log("Wait for a pokemon to attack you.", "purple");
+        env.log("Wait for a pokemon to attack you.", COLOR_PURPLE);
         {
             StandardBattleMenuWatcher fight_detector(false);
             int result = run_until(
@@ -133,7 +133,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env){
                 { &fight_detector }
             );
             if (result == 0){
-                env.log("New fight detected.", "purple");
+                env.log("New fight detected.", COLOR_PURPLE);
                 pbf_mash_button(env.console, BUTTON_B, 1 * TICKS_PER_SECOND);
             }
         }
@@ -186,7 +186,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env){
         }
     }
 
-    env.log("Result Found!", Qt::blue);
+    env.log("Result Found!", COLOR_BLUE);
 
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,

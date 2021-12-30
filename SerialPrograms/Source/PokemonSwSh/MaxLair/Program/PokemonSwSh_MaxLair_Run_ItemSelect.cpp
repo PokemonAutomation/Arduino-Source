@@ -40,7 +40,7 @@ void run_item_select(
 
 
     int8_t item_index = select_item(console, inferred, player_index);
-    console.log("Choosing item " + std::to_string((int)item_index) + ".", "purple");
+    console.log("Choosing item " + std::to_string((int)item_index) + ".", COLOR_PURPLE);
 
     if (item_index < 0){
         pbf_press_button(console, BUTTON_B, 10, 50);

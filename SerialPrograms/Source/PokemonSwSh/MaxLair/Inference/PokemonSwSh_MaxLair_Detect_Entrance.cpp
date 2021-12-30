@@ -24,7 +24,7 @@ EntranceDetector::EntranceDetector(const QImage& entrance_screen)
     , m_entrance_screen(extract_box(entrance_screen, m_box0))
 {}
 void EntranceDetector::make_overlays(OverlaySet& items) const{
-    items.add(Qt::darkGreen, m_box0);
+    items.add(COLOR_DARKGREEN, m_box0);
 }
 bool EntranceDetector::process_frame(
     const QImage& frame,

@@ -20,13 +20,13 @@ namespace PokemonBDSP{
 
 
 void MultiConsoleErrorState::report_unrecoverable_error(Logger& logger, const std::string& msg){
-    logger.log(msg, Qt::red);
+    logger.log(msg, COLOR_RED);
     m_unrecoverable_error.store(true, std::memory_order_release);
     PA_THROW_StringException(msg);
 }
 void MultiConsoleErrorState::check_unrecoverable_error(Logger& logger){
     if (m_unrecoverable_error.load(std::memory_order_acquire)){
-        logger.log("Unrecoverable error reported from a different console. Breaking out.", Qt::red);
+        logger.log("Unrecoverable error reported from a different console. Breaking out.", COLOR_RED);
         throw CancelledException();
     }
 }
@@ -56,7 +56,7 @@ void trade_current_pokemon(
     {
         pbf_press_button(console, BUTTON_ZL, 20, 0);
         console.botbase().wait_for_all_requests();
-        SelectionArrowFinder detector(console, {0.50, 0.58, 0.40, 0.10}, Qt::red);
+        SelectionArrowFinder detector(console, {0.50, 0.58, 0.40, 0.10}, COLOR_RED);
         int ret = wait_until(
             env, console, std::chrono::seconds(120),
             { &detector }
@@ -72,7 +72,7 @@ void trade_current_pokemon(
     {
         pbf_press_button(console, BUTTON_ZL, 20, 0);
         console.botbase().wait_for_all_requests();
-        SelectionArrowFinder detector(console, {0.50, 0.52, 0.40, 0.10}, Qt::red);
+        SelectionArrowFinder detector(console, {0.50, 0.52, 0.40, 0.10}, COLOR_RED);
         int ret = wait_until(
             env, console, std::chrono::seconds(10),
             { &detector }

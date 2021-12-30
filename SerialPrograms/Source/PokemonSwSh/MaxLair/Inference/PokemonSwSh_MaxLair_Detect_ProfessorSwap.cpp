@@ -23,9 +23,9 @@ ProfessorSwapDetector::ProfessorSwapDetector(VideoOverlay& overlay)
 }
 void ProfessorSwapDetector::make_overlays(OverlaySet& items) const{
     SelectionArrowFinder::make_overlays(items);
-//    items.add(Qt::yellow, m_dialog0);
-//    items.add(Qt::yellow, m_dialog1);
-    items.add(Qt::yellow, m_bottom_main);
+//    items.add(COLOR_YELLOW, m_dialog0);
+//    items.add(COLOR_YELLOW, m_dialog1);
+    items.add(COLOR_YELLOW, m_bottom_main);
 }
 bool ProfessorSwapDetector::detect(const QImage& screen){
 //    ImageStats dialog_left = image_stats(extract_box(screen, m_dialog0));

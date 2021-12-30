@@ -31,7 +31,7 @@ struct PanelListener{
 class PanelDescriptor{
 public:
     PanelDescriptor(
-        QColor color,
+        Color color,
         std::string identifier,
         QString category, QString display_name,
         QString doc_link,
@@ -39,7 +39,7 @@ public:
     );
     virtual ~PanelDescriptor() = default;
 
-    QColor color() const{ return m_color; }
+    Color color() const{ return m_color; }
     const std::string& identifier() const{ return m_identifier; }
     const QString& category() const{ return m_category; }
     const QString& display_name() const{ return m_display_name; }
@@ -49,7 +49,7 @@ public:
     virtual std::unique_ptr<PanelInstance> make_panel() const = 0;
 
 private:
-    const QColor m_color;
+    const Color m_color;
     const std::string m_identifier;
     const QString m_category;
     const QString m_display_name;

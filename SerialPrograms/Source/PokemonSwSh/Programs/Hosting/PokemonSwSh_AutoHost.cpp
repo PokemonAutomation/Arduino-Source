@@ -120,7 +120,7 @@ void send_raid_notification(
 
     send_program_notification(
         console, settings.NOTIFICATION,
-        QColor(),
+        Color(),
         info,
         "Raid Notification",
         embeds,
@@ -160,7 +160,7 @@ void run_autohost(
         connect_to_internet_delay
     )){
         stats.add_timeout();
-        env.log("Timed out waiting for internet connection. Skipping raid.", Qt::red);
+        env.log("Timed out waiting for internet connection. Skipping raid.", COLOR_RED);
         return;
     }
 
@@ -179,7 +179,7 @@ void run_autohost(
             case DenMonReadResults::PURPLE_BEAM:
                 break;
             default:
-                console.log("Failed to detect den lobby. Skipping raid.", Qt::red);
+                console.log("Failed to detect den lobby. Skipping raid.", COLOR_RED);
                 return;
             }
         }
@@ -233,7 +233,7 @@ void run_autohost(
         uint32_t now = start;
         while (true){
             if (black_screen.black_is_over(console.video().snapshot())){
-                env.log("Raid has Started!", "blue");
+                env.log("Raid has Started!", COLOR_BLUE);
                 stats.add_raid(raid_state.raiders());
                 break;
             }

@@ -15,7 +15,7 @@ namespace PokemonBDSP{
 
 
 
-MenuDetector::MenuDetector(QColor color)
+MenuDetector::MenuDetector(Color color)
     : m_color(color)
     , m_line0(0.160 + 0.166 * 0, 0.110, 0.015, 0.488)
     , m_line1(0.160 + 0.166 * 1, 0.110, 0.015, 0.488)

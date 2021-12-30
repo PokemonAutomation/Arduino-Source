@@ -11,10 +11,10 @@ namespace PokemonAutomation{
 
 
 #if 0
-void QueuedLogger::log(const char* msg, QColor color){
+void QueuedLogger::log(const char* msg, Color color){
     log(std::string(msg), color);
 }
-void QueuedLogger::log(const std::string& msg, QColor color){
+void QueuedLogger::log(const std::string& msg, Color color){
     std::lock_guard<std::mutex> lg(m_lock);
     m_queue.emplace_back(new Entry{
         std::chrono::system_clock::now(),
@@ -23,7 +23,7 @@ void QueuedLogger::log(const std::string& msg, QColor color){
     });
     m_cv.notify_all();
 }
-void QueuedLogger::log(const QString& msg, QColor color){
+void QueuedLogger::log(const QString& msg, Color color){
     log(msg.toUtf8().toStdString(), color);
 }
 

@@ -66,12 +66,12 @@ void run_swap_pokemon(
     //  Make your selection.
     bool swap = should_swap_with_newly_caught(console, inferred, player_index, options);
     if (swap){
-        console.log("Choosing to swap for: " + options[1], "purple");
+        console.log("Choosing to swap for: " + options[1], COLOR_PURPLE);
         std::lock_guard<std::mutex> lg(env.lock());
         pbf_mash_button(console, BUTTON_A, TICKS_PER_SECOND);
         console.botbase().wait_for_all_requests();
     }else{
-        console.log("Choosing not to swap.", "purple");
+        console.log("Choosing not to swap.", COLOR_PURPLE);
         pbf_mash_button(console, BUTTON_B, TICKS_PER_SECOND);
         console.botbase().wait_for_all_requests();
     }
@@ -88,7 +88,7 @@ void run_swap_pokemon(
             { &detector }
         );
         if (result < 0){
-            console.log("Timed out waiting for black screen.", Qt::red);
+            console.log("Timed out waiting for black screen.", COLOR_RED);
         }else{
             console.log("Found path screen. Reading party...");
         }
@@ -103,7 +103,7 @@ void run_swap_pokemon(
             INFERENCE_RATE
         );
         if (result < 0){
-            console.log("Timed out waiting for path screen.", Qt::red);
+            console.log("Timed out waiting for path screen.", COLOR_RED);
         }else{
             console.log("Found path screen. Reading party...");
         }

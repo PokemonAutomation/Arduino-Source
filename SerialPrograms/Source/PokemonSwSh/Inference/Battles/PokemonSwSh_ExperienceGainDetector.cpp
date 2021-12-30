@@ -18,7 +18,7 @@ namespace PokemonSwSh{
 
 
 
-ExperienceGainDetector::ExperienceGainDetector(QColor color)
+ExperienceGainDetector::ExperienceGainDetector(Color color)
     : m_color(color)
     , m_dialog(color)
     , m_rows(6)

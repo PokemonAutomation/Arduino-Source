@@ -20,7 +20,7 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-BlackScreenDetector::BlackScreenDetector(const ImageFloatBox& box, QColor color)
+BlackScreenDetector::BlackScreenDetector(const ImageFloatBox& box, Color color)
     : m_color(color)
     , m_box(box)
 {}
@@ -47,7 +47,7 @@ bool BlackScreenWatcher::process_frame(
 
 
 
-BlackScreenOverWatcher::BlackScreenOverWatcher(const ImageFloatBox& box, QColor color)
+BlackScreenOverWatcher::BlackScreenOverWatcher(const ImageFloatBox& box, Color color)
     : m_detector(box, color)
 {}
 void BlackScreenOverWatcher::make_overlays(OverlaySet& items) const{

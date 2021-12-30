@@ -47,7 +47,7 @@ StateMachineAction mash_A_to_entrance(
     );
 
     if (result < 0){
-        console.log("Failed to detect entrance.", Qt::red);
+        console.log("Failed to detect entrance.", COLOR_RED);
 //        PA_THROW_StringException("Failed to detect entrance.");
         runtime.session_stats.add_error();
         dump_image(console, MODULE_NAME, "ResetRecovery", console.video().snapshot());
@@ -147,7 +147,7 @@ StateMachineAction run_caught_screen(
 
     switch (action){
     case CaughtScreenAction::STOP_PROGRAM:
-        console.log("Stopping program...", "purple");
+        console.log("Stopping program...", COLOR_PURPLE);
         synchronize_caught_screen(env, console, state_tracker);
         return StateMachineAction::STOP_PROGRAM;
 
@@ -156,14 +156,14 @@ StateMachineAction run_caught_screen(
             runtime.path_stats.clear();
         }
         if (shinies.empty() || shinies[0] == 3){
-            console.log("Quitting back to entrance.", "purple");
+            console.log("Quitting back to entrance.", COLOR_PURPLE);
             tracker.leave_summary();
             synchronize_caught_screen(env, console, state_tracker);
             pbf_press_dpad(console, DPAD_DOWN, 10, 50);
             pbf_press_button(console, BUTTON_B, 10, TICKS_PER_SECOND);
             return mash_A_to_entrance(runtime, env, console, entrance);
         }else{
-            console.log("Taking non-shiny boss and returning to entrance...", Qt::blue);
+            console.log("Taking non-shiny boss and returning to entrance...", COLOR_BLUE);
             tracker.scroll_to(shinies[0]);
             tracker.enter_summary();    //  Enter summary to verify you're on the right mon.
             tracker.leave_summary();
@@ -172,7 +172,7 @@ StateMachineAction run_caught_screen(
         }
 
     case CaughtScreenAction::RESET:
-        console.log("Resetting game...", Qt::blue);
+        console.log("Resetting game...", COLOR_BLUE);
         synchronize_caught_screen(env, console, state_tracker);
         pbf_press_button(console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
         reset_game_from_home_with_inference(env, console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);

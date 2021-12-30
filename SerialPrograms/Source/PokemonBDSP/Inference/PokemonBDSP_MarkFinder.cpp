@@ -70,7 +70,7 @@ MarkTracker::MarkTracker(VideoOverlay& overlay, const ImageFloatBox& box)
 {}
 
 void MarkTracker::make_overlays(OverlaySet& items) const{
-    items.add(Qt::red, m_box);
+    items.add(COLOR_RED, m_box);
 }
 bool MarkTracker::process_frame(
     const QImage& frame,
@@ -82,7 +82,7 @@ bool MarkTracker::process_frame(
 
     m_marks.clear();
     for (const ImagePixelBox& mark : exclamation_marks){
-        m_marks.emplace_back(m_overlay, translate_to_parent(frame, m_box, mark), Qt::magenta);
+        m_marks.emplace_back(m_overlay, translate_to_parent(frame, m_box, mark), COLOR_MAGENTA);
     }
     return false;
 }

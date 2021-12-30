@@ -32,7 +32,7 @@ bool run_from_battle(
         { &black_screen_detector }
     );
     if (ret < 0){
-        console.log("Timed out waiting for end of battle. Are you stuck in the battle?", Qt::red);
+        console.log("Timed out waiting for end of battle. Are you stuck in the battle?", COLOR_RED);
         return false;
     }
     pbf_wait(console, TICKS_PER_SECOND);

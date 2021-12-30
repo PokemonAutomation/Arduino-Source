@@ -29,7 +29,7 @@ bool should_swap_with_professor(
     logger.log(
         "Player " + std::to_string(player_index) +
         ": Deciding whether to swap with professor... State =>\n" + state.dump(),
-        "purple"
+        COLOR_PURPLE
     );
 
     using namespace papkmnlib;
@@ -138,7 +138,7 @@ bool should_swap_with_professor(
 
 
     if (rank.empty()){
-        logger.log("Unable to compute decisions. Taking if you have the least HP.", Qt::red);
+        logger.log("Unable to compute decisions. Taking if you have the least HP.", COLOR_RED);
         return swap_if_least_hp(state, player_index);
     }
 

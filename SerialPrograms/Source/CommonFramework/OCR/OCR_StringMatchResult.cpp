@@ -38,14 +38,14 @@ void StringMatchResult::log(Logger& logger, double max_log10p, const QString& ex
 
     if (results.empty()){
         str += "no matches";
-        logger.log(str, Qt::red);
+        logger.log(str, COLOR_RED);
         return;
     }
 
     double best = results.begin()->first;
-    QColor color = exact_match || best <= max_log10p
-        ? Qt::blue
-        : Qt::red;
+    Color color = exact_match || best <= max_log10p
+        ? COLOR_BLUE
+        : COLOR_RED;
 
     if (results.size() == 1){
         auto iter = results.begin();

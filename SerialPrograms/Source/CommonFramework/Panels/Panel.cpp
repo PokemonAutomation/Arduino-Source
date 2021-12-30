@@ -14,13 +14,13 @@ namespace PokemonAutomation{
 
 
 PanelDescriptor::PanelDescriptor(
-    QColor color,
+    Color color,
     std::string identifier,
     QString category, QString display_name,
     QString doc_link,
     QString description
 )
-    : m_color(std::move(color))
+    : m_color(color)
     , m_identifier(std::move(identifier))
     , m_category(std::move(category))
     , m_display_name(std::move(display_name))

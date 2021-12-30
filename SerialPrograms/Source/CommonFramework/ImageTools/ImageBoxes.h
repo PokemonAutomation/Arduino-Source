@@ -8,7 +8,8 @@
 #define PokemonAutomation_CommonFramework_ImageBoxes_H
 
 #include <stddef.h>
-#include <QImage>
+
+class QImage;
 
 namespace PokemonAutomation{
 

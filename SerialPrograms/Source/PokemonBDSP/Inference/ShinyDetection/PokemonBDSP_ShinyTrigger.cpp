@@ -73,7 +73,7 @@ void ShinyImageDetection::accumulate(
             str += "ShinyDetector: Ball [{" + QString::number(object.center_x()) + ", " + QString::number(object.center_y());
             str += "}, " + QString::number(object.area) + "]";
             if (logger){
-                logger->log(str, "purple");
+                logger->log(str, COLOR_PURPLE);
             }
         }
         if (detector.is_star()){
@@ -83,7 +83,7 @@ void ShinyImageDetection::accumulate(
             str += "ShinyDetector: Star [{" + QString::number(object.center_x()) + ", " + QString::number(object.center_y());
             str += "}, " + QString::number(object.area) + "]";
             if (logger){
-                logger->log(str, "purple");
+                logger->log(str, COLOR_PURPLE);
             }
         }
 //        extract_box(image, object.box).save("test-" + QString::number(count++) + ".png");
@@ -118,11 +118,11 @@ void ShinyImageDetection::add_overlays(
 ) const{
     for (const auto& item : balls){
         ImageFloatBox box = translate_to_parent(screen, inference_box, item);
-        overlays.emplace_back(overlay, box, Qt::green);
+        overlays.emplace_back(overlay, box, COLOR_GREEN);
     }
     for (const auto& item : stars){
         ImageFloatBox box = translate_to_parent(screen, inference_box, item);
-        overlays.emplace_back(overlay, box, Qt::green);
+        overlays.emplace_back(overlay, box, COLOR_GREEN);
     }
 }
 

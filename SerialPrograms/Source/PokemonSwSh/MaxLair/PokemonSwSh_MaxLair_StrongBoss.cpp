@@ -186,10 +186,10 @@ public:
         }
         double win_ratio = path_stats.win_ratio();
         if (win_ratio >= m_min_win_ratio){
-            m_logger.log("Win Ratio = " + QString::number(win_ratio) + ": Resetting to keep path.", Qt::blue);
+            m_logger.log("Win Ratio = " + QString::number(win_ratio) + ": Resetting to keep path.", COLOR_BLUE);
             return CaughtScreenAction::RESET;
         }else{
-            m_logger.log("Win Ratio = " + QString::number(win_ratio) + ": Continuing to get new path.", Qt::blue);
+            m_logger.log("Win Ratio = " + QString::number(win_ratio) + ": Continuing to get new path.", COLOR_BLUE);
             return CaughtScreenAction::TAKE_NON_BOSS_SHINY_AND_CONTINUE;
         }
     }

@@ -61,7 +61,7 @@ void send_status_notification(
     env.log(status_str);
     send_program_notification(
         env.logger(), runtime.notification_status,
-        QColor(), env.program_info(),
+        Color(), env.program_info(),
         "Max Lair Status Update",
         embeds
     );
@@ -118,7 +118,7 @@ void send_raid_notification(
 
     send_program_notification(
         console, settings.NOTIFICATION,
-        QColor(),
+        Color(),
         program_info,
         "Max Lair Notification",
         embeds,
@@ -182,7 +182,7 @@ void send_shiny_notification(
 
     send_program_notification(
         logger, settings,
-        0xffff00, program_info,
+        COLOR_YELLOW, program_info,
         "Max Lair Shiny Notification",
         embeds,
         image, true

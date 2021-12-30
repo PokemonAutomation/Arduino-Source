@@ -121,7 +121,7 @@ bool CloneItemsMenuOverlap::trigger_encounter(ProgramEnvironment& env, ConsoleHa
         console.log("Battle started!");
         return true;
     }else{
-        console.log("No battle detected after 2 minutes.", Qt::red);
+        console.log("No battle detected after 2 minutes.", COLOR_RED);
         return false;
     }
 }
@@ -163,7 +163,7 @@ void CloneItemsMenuOverlap::mash_B_to_battle(ProgramEnvironment& env, ConsoleHan
         { &detector }
     );
     if (ret < 0){
-        console.log("Battle menu not detected after 10 seconds.", Qt::red);
+        console.log("Battle menu not detected after 10 seconds.", COLOR_RED);
         PA_THROW_StringException("Battle menu not detected after 10 seconds.");
     }else{
         console.log("Battle menu found!");
@@ -233,7 +233,7 @@ void CloneItemsMenuOverlap::program(SingleSwitchProgramEnvironment& env){
         //  Run away.
         pbf_press_dpad(env.console, DPAD_UP, 10, 0);
         if (!run_from_battle(env, env.console, EXIT_BATTLE_TIMEOUT)){
-            env.log("Detected likely black screen freeze. Resetting game...", Qt::red);
+            env.log("Detected likely black screen freeze. Resetting game...", COLOR_RED);
             stats.m_resets++;
             pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);

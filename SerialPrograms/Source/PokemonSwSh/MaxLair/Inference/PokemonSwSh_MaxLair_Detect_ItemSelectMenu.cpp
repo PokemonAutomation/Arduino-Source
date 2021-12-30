@@ -21,9 +21,9 @@ ItemSelectDetector::ItemSelectDetector(bool stop_no_detect)
     , m_blue(0.600, 0.020, 0.200, 0.060)
 {}
 void ItemSelectDetector::make_overlays(OverlaySet& items) const{
-    items.add(Qt::blue, m_bottom_main);
-    items.add(Qt::blue, m_bottom_right);
-    items.add(Qt::blue, m_blue);
+    items.add(COLOR_BLUE, m_bottom_main);
+    items.add(COLOR_BLUE, m_bottom_right);
+    items.add(COLOR_BLUE, m_blue);
 }
 bool ItemSelectDetector::detect(const QImage& screen) const{
     ImageStats bottom_main = image_stats(extract_box(screen, m_bottom_main));

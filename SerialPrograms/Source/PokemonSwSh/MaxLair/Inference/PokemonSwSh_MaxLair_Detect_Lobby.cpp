@@ -46,8 +46,8 @@ LobbyDetector::LobbyDetector(bool invert)
     , m_white(0.800, 0.200, 0.150, 0.100)
 {}
 void LobbyDetector::make_overlays(OverlaySet& items) const{
-    items.add(Qt::red, m_pink);
-    items.add(Qt::red, m_white);
+    items.add(COLOR_RED, m_pink);
+    items.add(COLOR_RED, m_white);
 }
 bool LobbyDetector::process_frame(
     const QImage& frame,
@@ -76,8 +76,8 @@ LobbyDoneConnecting::LobbyDoneConnecting()
     , m_player0(0.669, 0.337 + 0.0775*1, 0.100, 0.06)
 {}
 void LobbyDoneConnecting::make_overlays(OverlaySet& items) const{
-    items.add(Qt::red, m_box);
-    items.add(Qt::red, m_player0);
+    items.add(COLOR_RED, m_box);
+    items.add(COLOR_RED, m_player0);
 }
 bool LobbyDoneConnecting::process_frame(
     const QImage& frame,
@@ -109,16 +109,16 @@ LobbyJoinedDetector::LobbyJoinedDetector(size_t consoles, bool invert)
     , m_box1(0.705, 0.337 + 0.0775*1, 0.034, 0.06)
     , m_box2(0.705, 0.337 + 0.0775*2, 0.034, 0.06)
     , m_box3(0.705, 0.337 + 0.0775*3, 0.034, 0.06)
-    , m_player0(Qt::cyan, {0, 0, 1, 0.5}, std::chrono::seconds(1), 10)
-    , m_player1(Qt::cyan, {0, 0, 1, 0.5}, std::chrono::seconds(1), 10)
-    , m_player2(Qt::cyan, {0, 0, 1, 0.5}, std::chrono::seconds(1), 10)
-    , m_player3(Qt::cyan, {0, 0, 1, 0.5}, std::chrono::seconds(1), 10)
+    , m_player0(COLOR_CYAN, {0, 0, 1, 0.5}, std::chrono::seconds(1), 10)
+    , m_player1(COLOR_CYAN, {0, 0, 1, 0.5}, std::chrono::seconds(1), 10)
+    , m_player2(COLOR_CYAN, {0, 0, 1, 0.5}, std::chrono::seconds(1), 10)
+    , m_player3(COLOR_CYAN, {0, 0, 1, 0.5}, std::chrono::seconds(1), 10)
 {}
 void LobbyJoinedDetector::make_overlays(OverlaySet& items) const{
-    items.add(Qt::red, m_box0);
-    items.add(Qt::red, m_box1);
-    items.add(Qt::red, m_box2);
-    items.add(Qt::red, m_box3);
+    items.add(COLOR_RED, m_box0);
+    items.add(COLOR_RED, m_box1);
+    items.add(COLOR_RED, m_box2);
+    items.add(COLOR_RED, m_box3);
     m_player0.make_overlays(items);
     m_player1.make_overlays(items);
     m_player2.make_overlays(items);
@@ -156,10 +156,10 @@ LobbyReadyDetector::LobbyReadyDetector()
     , m_checkbox3(0.669, 0.337 + 0.0775*3, 0.034, 0.06)
 {}
 void LobbyReadyDetector::make_overlays(OverlaySet& items) const{
-    items.add(Qt::red, m_checkbox0);
-    items.add(Qt::red, m_checkbox1);
-    items.add(Qt::red, m_checkbox2);
-    items.add(Qt::red, m_checkbox3);
+    items.add(COLOR_RED, m_checkbox0);
+    items.add(COLOR_RED, m_checkbox1);
+    items.add(COLOR_RED, m_checkbox2);
+    items.add(COLOR_RED, m_checkbox3);
 }
 size_t LobbyReadyDetector::ready_players(const QImage& screen){
     size_t ready = 0;

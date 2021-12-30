@@ -15,13 +15,13 @@ namespace PokemonAutomation{
 
 
 FrozenImageDetector::FrozenImageDetector(std::chrono::milliseconds timeout, double rmsd_threshold)
-    : m_color(Qt::cyan)
+    : m_color(COLOR_CYAN)
     , m_box(0.0, 0.0, 1.0, 1.0)
     , m_timeout(timeout)
     , m_rmsd_threshold(rmsd_threshold)
 {}
 FrozenImageDetector::FrozenImageDetector(
-    QColor color, const ImageFloatBox& box,
+    Color color, const ImageFloatBox& box,
     std::chrono::milliseconds timeout, double rmsd_threshold
 )
     : m_color(color)

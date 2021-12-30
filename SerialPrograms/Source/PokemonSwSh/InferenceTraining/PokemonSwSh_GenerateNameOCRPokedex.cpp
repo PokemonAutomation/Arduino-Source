@@ -130,13 +130,13 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env){
         break;
     }
 
-    InferenceBoxScope box0(env.console, 0.75, 0.146 + 0 * 0.1115, 0.18, 0.059, Qt::blue);
-    InferenceBoxScope box1(env.console, 0.75, 0.146 + 1 * 0.1115, 0.18, 0.059, Qt::blue);
-    InferenceBoxScope box2(env.console, 0.75, 0.146 + 2 * 0.1115, 0.18, 0.059, Qt::blue);
-    InferenceBoxScope box3(env.console, 0.75, 0.146 + 3 * 0.1115, 0.18, 0.059, Qt::blue);
-    InferenceBoxScope box4(env.console, 0.75, 0.146 + 4 * 0.1115, 0.18, 0.059, Qt::blue);
-    InferenceBoxScope box5(env.console, 0.75, 0.146 + 5 * 0.1115, 0.18, 0.059, Qt::blue);
-    InferenceBoxScope box6(env.console, 0.75, 0.146 + 6 * 0.1115, 0.18, 0.059, Qt::blue);
+    InferenceBoxScope box0(env.console, 0.75, 0.146 + 0 * 0.1115, 0.18, 0.059, COLOR_BLUE);
+    InferenceBoxScope box1(env.console, 0.75, 0.146 + 1 * 0.1115, 0.18, 0.059, COLOR_BLUE);
+    InferenceBoxScope box2(env.console, 0.75, 0.146 + 2 * 0.1115, 0.18, 0.059, COLOR_BLUE);
+    InferenceBoxScope box3(env.console, 0.75, 0.146 + 3 * 0.1115, 0.18, 0.059, COLOR_BLUE);
+    InferenceBoxScope box4(env.console, 0.75, 0.146 + 4 * 0.1115, 0.18, 0.059, COLOR_BLUE);
+    InferenceBoxScope box5(env.console, 0.75, 0.146 + 5 * 0.1115, 0.18, 0.059, COLOR_BLUE);
+    InferenceBoxScope box6(env.console, 0.75, 0.146 + 6 * 0.1115, 0.18, 0.059, COLOR_BLUE);
 
     std::vector<std::string> expected;
     QJsonArray actual;

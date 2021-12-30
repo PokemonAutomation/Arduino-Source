@@ -33,7 +33,7 @@ PokemonNameSelectData::PokemonNameSelectData(const std::vector<std::string>& slu
         const PokemonSprite* sprites = get_pokemon_sprite_nothrow(slug);
         if (sprites == nullptr){
             m_list.emplace_back(data.display_name(), QIcon());
-            global_logger_tagged().log("Missing sprite for: " + slug, "red");
+            global_logger_tagged().log("Missing sprite for: " + slug, COLOR_RED);
         }else{
             m_list.emplace_back(
                 data.display_name(),
@@ -56,7 +56,7 @@ PokemonNameSelectData::PokemonNameSelectData(const QString& json_file_slugs){
         const PokemonSprite* sprites = get_pokemon_sprite_nothrow(slug_str);
         if (sprites == nullptr){
             m_list.emplace_back(data.display_name(), QIcon());
-            global_logger_tagged().log("Missing sprite for: " + slug, "red");
+            global_logger_tagged().log("Missing sprite for: " + slug, COLOR_RED);
         }else{
             m_list.emplace_back(
                 data.display_name(),

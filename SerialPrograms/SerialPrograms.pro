@@ -520,6 +520,7 @@ HEADERS += \
     ../Common/CRC32.h \
     ../Common/Compiler.h \
     ../Common/Cpp/AsyncDispatcher.h \
+    ../Common/Cpp/Color.h \
     ../Common/Cpp/Exception.h \
     ../Common/Cpp/FireForgetDispatcher.h \
     ../Common/Cpp/FixedLimitVector.h \

@@ -36,7 +36,7 @@ std::vector<PathNode> select_path(
     logger.log(
         "Player " + std::to_string(player_index) +
         ": Choosing a path... State =>\n" + state.dump(),
-        "purple"
+        COLOR_PURPLE
     );
 
     std::vector<std::vector<PathNode>> paths = generate_paths(state.path, state.wins, state.path_side);

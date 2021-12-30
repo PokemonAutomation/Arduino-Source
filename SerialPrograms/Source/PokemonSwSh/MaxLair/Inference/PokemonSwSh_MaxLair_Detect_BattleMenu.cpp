@@ -41,14 +41,14 @@ BattleMenuDetector::BattleMenuDetector()
     , m_status1     (0.165, 0.945, 0.100, 0.020)
 {}
 void BattleMenuDetector::make_overlays(OverlaySet& items) const{
-    items.add(Qt::yellow, m_icon_fight);
-    items.add(Qt::yellow, m_icon_pokemon);
-    items.add(Qt::yellow, m_icon_run);
-    items.add(Qt::yellow, m_text_fight);
-    items.add(Qt::yellow, m_text_pokemon);
-    items.add(Qt::yellow, m_text_run);
-    items.add(Qt::yellow, m_status0);
-    items.add(Qt::yellow, m_status1);
+    items.add(COLOR_YELLOW, m_icon_fight);
+    items.add(COLOR_YELLOW, m_icon_pokemon);
+    items.add(COLOR_YELLOW, m_icon_run);
+    items.add(COLOR_YELLOW, m_text_fight);
+    items.add(COLOR_YELLOW, m_text_pokemon);
+    items.add(COLOR_YELLOW, m_text_run);
+    items.add(COLOR_YELLOW, m_status0);
+    items.add(COLOR_YELLOW, m_status1);
 }
 bool BattleMenuDetector::process_frame(
     const QImage& frame,
@@ -206,24 +206,24 @@ bool BattleMenuDetector::detect(const QImage& screen){
 
 BattleMenuReader::BattleMenuReader(VideoOverlay& overlay, Language language)
     : m_language(language)
-    , m_opponent_name(overlay, 0.3, 0.010, 0.4, 0.10, Qt::blue)
-    , m_summary_opponent_name(overlay, 0.200, 0.100, 0.300, 0.065, Qt::blue)
-    , m_summary_opponent_types(overlay, 0.200, 0.170, 0.300, 0.050, Qt::blue)
-    , m_own_name(overlay, 0.060, 0.860, 0.160, 0.045, Qt::blue)
-    , m_own_sprite(overlay, 0.002, 0.860, 0.060, 0.100, Qt::blue)
-    , m_opponent_hp(overlay, 0.360, 0.120, 0.280, 0.005, Qt::blue)
-    , m_own_hp(overlay, 0.069, 0.914, 0.204, 0.006, Qt::blue)
-    , m_hp0(overlay, 0.073, 0.096 + 0*0.096, 0.052, 0.005, Qt::blue)
-    , m_hp1(overlay, 0.073, 0.096 + 1*0.096, 0.052, 0.005, Qt::blue)
-    , m_hp2(overlay, 0.073, 0.096 + 2*0.096, 0.052, 0.005, Qt::blue)
-    , m_sprite0(overlay, 0.010, 0.040 + 0*0.096, 0.052, 0.061, Qt::blue)
-    , m_sprite1(overlay, 0.010, 0.040 + 1*0.096, 0.052, 0.061, Qt::blue)
-    , m_sprite2(overlay, 0.010, 0.040 + 2*0.096, 0.052, 0.061, Qt::blue)
-    , m_pp0(overlay, 0.902, 0.710 - 1*0.097, 0.070, 0.063, Qt::blue)
-    , m_pp1(overlay, 0.902, 0.710 + 0*0.097, 0.070, 0.063, Qt::blue)
-    , m_pp2(overlay, 0.902, 0.710 + 1*0.097, 0.070, 0.063, Qt::blue)
-    , m_pp3(overlay, 0.902, 0.710 + 2*0.097, 0.070, 0.063, Qt::blue)
-    , m_dmax(overlay, 0.541, 0.779, 0.105, 0.186, Qt::blue)
+    , m_opponent_name(overlay, 0.3, 0.010, 0.4, 0.10, COLOR_BLUE)
+    , m_summary_opponent_name(overlay, 0.200, 0.100, 0.300, 0.065, COLOR_BLUE)
+    , m_summary_opponent_types(overlay, 0.200, 0.170, 0.300, 0.050, COLOR_BLUE)
+    , m_own_name(overlay, 0.060, 0.860, 0.160, 0.045, COLOR_BLUE)
+    , m_own_sprite(overlay, 0.002, 0.860, 0.060, 0.100, COLOR_BLUE)
+    , m_opponent_hp(overlay, 0.360, 0.120, 0.280, 0.005, COLOR_BLUE)
+    , m_own_hp(overlay, 0.069, 0.914, 0.204, 0.006, COLOR_BLUE)
+    , m_hp0(overlay, 0.073, 0.096 + 0*0.096, 0.052, 0.005, COLOR_BLUE)
+    , m_hp1(overlay, 0.073, 0.096 + 1*0.096, 0.052, 0.005, COLOR_BLUE)
+    , m_hp2(overlay, 0.073, 0.096 + 2*0.096, 0.052, 0.005, COLOR_BLUE)
+    , m_sprite0(overlay, 0.010, 0.040 + 0*0.096, 0.052, 0.061, COLOR_BLUE)
+    , m_sprite1(overlay, 0.010, 0.040 + 1*0.096, 0.052, 0.061, COLOR_BLUE)
+    , m_sprite2(overlay, 0.010, 0.040 + 2*0.096, 0.052, 0.061, COLOR_BLUE)
+    , m_pp0(overlay, 0.902, 0.710 - 1*0.097, 0.070, 0.063, COLOR_BLUE)
+    , m_pp1(overlay, 0.902, 0.710 + 0*0.097, 0.070, 0.063, COLOR_BLUE)
+    , m_pp2(overlay, 0.902, 0.710 + 1*0.097, 0.070, 0.063, COLOR_BLUE)
+    , m_pp3(overlay, 0.902, 0.710 + 2*0.097, 0.070, 0.063, COLOR_BLUE)
+    , m_dmax(overlay, 0.541, 0.779, 0.105, 0.186, COLOR_BLUE)
 {}
 
 std::set<std::string> BattleMenuReader::read_opponent(
@@ -241,7 +241,7 @@ std::set<std::string> BattleMenuReader::read_opponent(
         if (!result.empty()){
             return result;
         }
-        logger.log("Failed to read opponent name. Retrying in 1 second...", "orange");
+        logger.log("Failed to read opponent name. Retrying in 1 second...", COLOR_ORANGE);
         env.wait_for(std::chrono::seconds(1));
     }
     dump_image(logger, MODULE_NAME, "MaxLair-read_opponent", screen);
@@ -281,14 +281,14 @@ std::set<std::string> BattleMenuReader::read_opponent_in_summary(Logger& logger,
     }
 
     if (slugs.size() == 1){
-        logger.log("Disambiguation succeeded: " + *slugs.begin(), Qt::blue);
+        logger.log("Disambiguation succeeded: " + *slugs.begin(), COLOR_BLUE);
         return slugs;
     }
 
     if (slugs.empty()){
-        logger.log("Disambiguation failed. No results.", Qt::red);
+        logger.log("Disambiguation failed. No results.", COLOR_RED);
     }else{
-        logger.log("Disambiguation failed. Still have multiple results: " + set_to_str(slugs), Qt::red);
+        logger.log("Disambiguation failed. Still have multiple results: " + set_to_str(slugs), COLOR_RED);
     }
 
     static std::set<std::string> KNOWN_BAD_SLUGS{
@@ -302,7 +302,7 @@ std::set<std::string> BattleMenuReader::read_opponent_in_summary(Logger& logger,
         auto iter = KNOWN_BAD_SLUGS.find(slug);
         if (iter != KNOWN_BAD_SLUGS.end()){
             error = false;
-            logger.log("Known case that cannot be disambiguated. Skipping error report.", Qt::red);
+            logger.log("Known case that cannot be disambiguated. Skipping error report.", COLOR_RED);
             break;
         }
     }
@@ -414,19 +414,19 @@ bool dmax_circle_ready(QImage image){
             int dy = r - 100;
             int dx = c - 100;
             if (dy < -60){
-//                image.setPixelColor(c, r, Qt::blue);
+//                image.setPixelColor(c, r, COLOR_BLUE);
                 continue;
             }
             if (-25 < dy && dy < 55){
-//                image.setPixelColor(c, r, Qt::blue);
+//                image.setPixelColor(c, r, COLOR_BLUE);
                 continue;
             }
             if (dx*dx + dy*dy < 72*72){
-//                image.setPixelColor(c, r, Qt::blue);
+//                image.setPixelColor(c, r, COLOR_BLUE);
                 continue;
             }
             if (dx*dx + dy*dy > 80*80){
-//                image.setPixelColor(c, r, Qt::blue);
+//                image.setPixelColor(c, r, COLOR_BLUE);
                 continue;
             }
             FloatPixel p(image.pixel(c, r));

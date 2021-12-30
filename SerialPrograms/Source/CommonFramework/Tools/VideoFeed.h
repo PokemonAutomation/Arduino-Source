@@ -8,8 +8,10 @@
 #define PokemonAutomation_VideoFeedInterface_H
 
 #include <deque>
-#include <QImage>
+#include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+
+class QImage;
 
 namespace PokemonAutomation{
 
@@ -27,7 +29,7 @@ public:
 class VideoOverlay{
 public:
     //  Add/remove inference boxes.
-    virtual void add_box(const ImageFloatBox& box, QColor color) = 0;
+    virtual void add_box(const ImageFloatBox& box, Color color) = 0;
     virtual void remove_box(const ImageFloatBox& box) = 0;
 };
 
@@ -45,7 +47,7 @@ public:
     InferenceBoxScope(
         VideoOverlay& overlay,
         const ImageFloatBox& box,
-        QColor color = Qt::red
+        Color color = COLOR_RED
     )
         : ImageFloatBox(box)
         , m_color(color)
@@ -57,7 +59,7 @@ public:
         VideoOverlay& overlay,
         double p_x, double p_y,
         double p_width, double p_height,
-        QColor color = Qt::red
+        Color color = COLOR_RED
     )
         : ImageFloatBox(p_x, p_y, p_width, p_height)
         , m_color(color)
@@ -65,29 +67,9 @@ public:
     {
         overlay.add_box(*this, color);
     }
-#if 1
-    InferenceBoxScope(
-        VideoOverlay& overlay,
-        QColor color,
-        double p_x, double p_y,
-        double p_width, double p_height
-    ) = delete;
-    InferenceBoxScope(
-        VideoOverlay& overlay,
-        double p_x, double p_y,
-        double p_width, double p_height,
-        Qt::GlobalColor color
-    )
-        : ImageFloatBox(p_x, p_y, p_width, p_height)
-        , m_color(color)
-        , m_overlay(overlay)
-    {
-        overlay.add_box(*this, color);
-    }
-#endif
 
 private:
-    QColor m_color;
+    Color m_color;
     VideoOverlay& m_overlay;
 };
 
@@ -101,7 +83,7 @@ public:
     void clear(){
         m_boxes.clear();
     }
-    void add(QColor color, const ImageFloatBox& box){
+    void add(Color color, const ImageFloatBox& box){
         m_boxes.emplace_back(m_overlay, box, color);
     }
 

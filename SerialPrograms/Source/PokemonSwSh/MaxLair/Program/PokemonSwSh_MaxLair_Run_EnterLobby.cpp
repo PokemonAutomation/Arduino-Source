@@ -45,8 +45,8 @@ public:
         return true;
     }
     virtual void make_overlays(OverlaySet& items) const override{
-        items.add(Qt::red, m_box0);
-        items.add(Qt::red, m_box1);
+        items.add(COLOR_RED, m_box0);
+        items.add(COLOR_RED, m_box1);
     }
     virtual bool process_frame(
         const QImage& frame,
@@ -122,7 +122,7 @@ QImage enter_lobby(
         //  We need to pay ore.
         ImageStats ore_stats = image_stats(extract_box(screen, ore_box));
         if (is_solid(ore_stats, {0.594724, 0.405276, 0.})){
-            console.log("Need to pay ore.", "purple");
+            console.log("Need to pay ore.", COLOR_PURPLE);
 
             arrow_count = 0;
             QImage image = extract_box(screen, ore_quantity);

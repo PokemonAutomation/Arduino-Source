@@ -59,10 +59,10 @@ void trigger_menu(ProgramEnvironment& env, ConsoleHandle& console){
         { &detector }
     );
     if (ret < 0){
-        console.log("Map not detected after 60 seconds.", Qt::red);
+        console.log("Map not detected after 60 seconds.", COLOR_RED);
         PA_THROW_StringException("Map not detected after 60 seconds.");
     }
-    console.log("Detected map!", Qt::blue);
+    console.log("Detected map!", COLOR_BLUE);
 }
 void trigger_map_overlap(ProgramEnvironment& env, ConsoleHandle& console){
     for (size_t c = 0; c < 10; c++){
@@ -76,14 +76,14 @@ void trigger_map_overlap(ProgramEnvironment& env, ConsoleHandle& console){
             { &detector }
         );
         if (ret >= 0){
-            console.log("Overlap detected! Entered Pokemon center.", Qt::blue);
+            console.log("Overlap detected! Entered Pokemon center.", COLOR_BLUE);
             return;
         }
-        console.log("Failed to activate map overlap.", "orange");
+        console.log("Failed to activate map overlap.", COLOR_ORANGE);
         pbf_mash_button(console, BUTTON_B, 3 * TICKS_PER_SECOND);
         pbf_press_button(console, BUTTON_R, 20, 230);
     }
-    console.log("Failed to trigger map overlap after 10 attempts.", Qt::red);
+    console.log("Failed to trigger map overlap after 10 attempts.", COLOR_RED);
     PA_THROW_StringException("Failed to trigger map overlap after 10 attempts.");
 }
 

@@ -131,9 +131,9 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env){
                 { &detector }
             );
             if (result == 0){
-                env.log(STRING_POKEMON + " receive menu detected.", "purple");
+                env.log(STRING_POKEMON + " receive menu detected.", COLOR_PURPLE);
             }else{
-                env.log(STRING_POKEMON + " receive menu timed out.", Qt::red);
+                env.log(STRING_POKEMON + " receive menu timed out.", COLOR_RED);
             }
         }
         stats.attempts++;
@@ -173,7 +173,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env){
 
     stats.matches++;
     env.update_stats();
-    env.log("Result Found!", Qt::blue);
+    env.log("Result Found!", COLOR_BLUE);
 
     pbf_wait(env.console, 5 * TICKS_PER_SECOND);
     pbf_press_button(env.console, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);

@@ -21,7 +21,7 @@ namespace PokemonBDSP{
 
 
 
-EndBattleWatcher::EndBattleWatcher(const ImageFloatBox& box, QColor color)
+EndBattleWatcher::EndBattleWatcher(const ImageFloatBox& box, Color color)
     : m_color(color)
     , m_box(box)
     , m_has_been_black(false)

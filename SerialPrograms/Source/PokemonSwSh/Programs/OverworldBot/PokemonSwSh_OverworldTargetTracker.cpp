@@ -46,7 +46,7 @@ OverworldTargetTracker::OverworldTargetTracker(
     m_best_target.first = -1;
 }
 void OverworldTargetTracker::make_overlays(OverlaySet& items) const{
-    items.add(Qt::red, m_search_area);
+    items.add(COLOR_RED, m_search_area);
 }
 
 void OverworldTargetTracker::set_stop_on_target(bool stop){
@@ -138,7 +138,7 @@ bool OverworldTargetTracker::save_target(std::multimap<double, OverworldTarget>:
         QString::number(target->second.delta_x) + " , " +
         QString::number(-target->second.delta_y) + "], alpha = " +
         QString::number(target->first),
-        "orange"
+        COLOR_ORANGE
     );
 #endif
 //    SpinLockGuard lg(m_lock, "OverworldTargetTracker::save_target()");
@@ -181,7 +181,7 @@ bool OverworldTargetTracker::process_frame(
         box.width *= 4;
         box.height *= 1.5;
         m_exclamations.emplace_back(Mark{timestamp, box});
-        m_detection_boxes.emplace_back(m_overlay, box, Qt::magenta);
+        m_detection_boxes.emplace_back(m_overlay, box, COLOR_MAGENTA);
 //        cout << "asdf = " << exclamations.size() << endl;
     }
     for (const ImagePixelBox& mark : question_marks){
@@ -190,7 +190,7 @@ bool OverworldTargetTracker::process_frame(
         box.width *= 2;
         box.height *= 1.5;
         m_questions.emplace_back(Mark{timestamp, box});
-        m_detection_boxes.emplace_back(m_overlay, box, Qt::magenta);
+        m_detection_boxes.emplace_back(m_overlay, box, COLOR_MAGENTA);
 //        cout << "qwer = " << questions.size() << endl;
     }
 

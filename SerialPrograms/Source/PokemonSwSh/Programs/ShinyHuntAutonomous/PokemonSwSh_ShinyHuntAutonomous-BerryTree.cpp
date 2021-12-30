@@ -124,7 +124,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env){
 
             switch (result){
             case 0:
-                env.log("Unexpected battle menu.", Qt::red);
+                env.log("Unexpected battle menu.", COLOR_RED);
                 stats.add_error();
                 env.update_stats();
                 pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);

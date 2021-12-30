@@ -26,15 +26,15 @@ public:
     void operator+=(FileWindowLoggerWindow& widget);
     void operator-=(FileWindowLoggerWindow& widget);
 
-    virtual void log(const char* msg, QColor color = QColor()) override;
-    virtual void log(const std::string& msg, QColor color = QColor()) override;
-    virtual void log(const QString& msg, QColor color = QColor()) override;
+    virtual void log(const char* msg, Color color = Color()) override;
+    virtual void log(const std::string& msg, Color color = Color()) override;
+    virtual void log(const QString& msg, Color color = Color()) override;
 
 private:
 
     static std::string normalize_newlines(const std::string& msg);
     static std::string to_file_str(const std::string& msg);
-    static QString to_window_str(const std::string& msg, QColor color);
+    static QString to_window_str(const std::string& msg, Color color);
 
 private:
     QFile m_file;

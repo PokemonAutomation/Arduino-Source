@@ -38,7 +38,7 @@ public:
     QImage snapshot();
 
 private:
-    virtual void add_box(const ImageFloatBox& box, QColor color) override;
+    virtual void add_box(const ImageFloatBox& box, Color color) override;
     virtual void remove_box(const ImageFloatBox& box) override;
 
     void update_size();

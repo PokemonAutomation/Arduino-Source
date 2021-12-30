@@ -107,7 +107,7 @@ void MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
         );
         if (ret < 0){
             stats.m_errors++;
-            env.log("Failed to detect start of battle after 20 seconds.", Qt::red);
+            env.log("Failed to detect start of battle after 20 seconds.", COLOR_RED);
             pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
             return;
         }
@@ -140,16 +140,16 @@ void MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
         case 0:
             break;
         case 1:
-            env.log("Battle finished!", Qt::blue);
+            env.log("Battle finished!", COLOR_BLUE);
             pbf_mash_button(env.console, BUTTON_B, 250);
             return;
         default:
-            env.log("Timed out.", Qt::red);
+            env.log("Timed out.", COLOR_RED);
             stats.m_errors++;
             PA_THROW_StringException("Timed out after 2 minutes.");
         }
 
-        env.log("Battle menu detected!", Qt::blue);
+        env.log("Battle menu detected!", COLOR_BLUE);
         battle_menu_seen = true;
 
         {
@@ -161,7 +161,7 @@ void MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
                 }
             }
             if (slot == 4){
-                env.log("Ran out of PP in a battle.", Qt::red);
+                env.log("Ran out of PP in a battle.", COLOR_RED);
                 PA_THROW_StringException("Ran out of PP in a battle.");
             }
 
@@ -182,7 +182,7 @@ void MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
                 }
             }
             if (slot == 4){
-                env.log("Ran out of PP in a battle.", Qt::red);
+                env.log("Ran out of PP in a battle.", COLOR_RED);
                 PA_THROW_StringException("Ran out of PP in a battle.");
             }
 
@@ -196,7 +196,7 @@ void MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
         }
     }
 
-    env.log("No progress detected after 5 battle menus.", Qt::red);
+    env.log("No progress detected after 5 battle menus.", COLOR_RED);
     PA_THROW_StringException("No progress detected after 5 battle menus. Are you out of PP?");
 }
 
@@ -323,14 +323,14 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env){
 
             bubbles = tracker.reactions();
             if (bubbles.empty()){
-                env.log("No reactions.", "orange");
+                env.log("No reactions.", COLOR_ORANGE);
                 stats.m_noreact++;
                 continue;
             }
             stats.m_react++;
         }
         for (const ImagePixelBox& box : bubbles){
-            env.log("Reaction at: " + std::to_string(box.min_x), Qt::blue);
+            env.log("Reaction at: " + std::to_string(box.min_x), COLOR_BLUE);
         }
 
         this->battle(env, pp0, pp1);

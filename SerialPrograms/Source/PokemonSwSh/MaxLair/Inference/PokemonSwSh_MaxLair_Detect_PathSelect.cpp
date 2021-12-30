@@ -35,12 +35,12 @@ PathScreenDetector::PathScreenDetector()
     , m_box3(0.074, 0.420 + 3*0.16315, 0.020, 0.007)
 {}
 void PathScreenDetector::make_overlays(OverlaySet& items) const{
-    items.add(Qt::cyan, m_bottom_main);
-    items.add(Qt::cyan, m_main);
-    items.add(Qt::cyan, m_box0);
-    items.add(Qt::cyan, m_box1);
-    items.add(Qt::cyan, m_box2);
-    items.add(Qt::cyan, m_box3);
+    items.add(COLOR_CYAN, m_bottom_main);
+    items.add(COLOR_CYAN, m_main);
+    items.add(COLOR_CYAN, m_box0);
+    items.add(COLOR_CYAN, m_box1);
+    items.add(COLOR_CYAN, m_box2);
+    items.add(COLOR_CYAN, m_box3);
 }
 
 bool PathScreenDetector::detect(const QImage& screen) const{
@@ -102,11 +102,11 @@ PathSelectDetector::PathSelectDetector()
     , m_left(0.050, 0.100, 0.200, 0.700)
 {}
 void PathSelectDetector::make_overlays(OverlaySet& items) const{
-    items.add(Qt::cyan, m_bottom_right);
-    items.add(Qt::cyan, m_dialog_left);
-    items.add(Qt::cyan, m_dialog_middle);
-//    items.add(Qt::cyan, m_dialog_right);
-    items.add(Qt::cyan, m_left);
+    items.add(COLOR_CYAN, m_bottom_right);
+    items.add(COLOR_CYAN, m_dialog_left);
+    items.add(COLOR_CYAN, m_dialog_middle);
+//    items.add(COLOR_CYAN, m_dialog_right);
+    items.add(COLOR_CYAN, m_left);
 }
 bool PathSelectDetector::detect(const QImage& screen) const{
     if (!PathScreenDetector::detect(screen)){
@@ -247,10 +247,10 @@ void PathReader::read_hp(
 void PathReader::read_path(ProgramEnvironment& env, ConsoleHandle& console, GlobalState& state){
     PathMap path;
     if (MaxLairInternal::read_path(env, console, path, m_path)){
-        console.log("Path Detection:\n" + path.dump(), Qt::blue);
+        console.log("Path Detection:\n" + path.dump(), COLOR_BLUE);
         state.path = path;
     }else{
-        console.log("Path Detection: Failed", Qt::red);
+        console.log("Path Detection: Failed", COLOR_RED);
     }
 }
 
@@ -265,13 +265,13 @@ void PathReader::read_side(
     int8_t path_side = MaxLairInternal::read_side(extract_box(screen, m_path));
     switch (path_side){
     case 0:
-        logger.log("Path Detection: Left side", Qt::blue);
+        logger.log("Path Detection: Left side", COLOR_BLUE);
         break;
     case 1:
-        logger.log("Path Detection: Right side", Qt::blue);
+        logger.log("Path Detection: Right side", COLOR_BLUE);
         break;
     default:
-        logger.log("Path Detection: Unable to read.", Qt::red);
+        logger.log("Path Detection: Unable to read.", COLOR_RED);
         dump_image(logger, MODULE_NAME, "ReadPathSide", screen);
         break;
     }

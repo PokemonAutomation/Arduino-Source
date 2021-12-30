@@ -47,13 +47,13 @@ bool wait_for_a_player(
         console.log("Connected to lobby.");
         break;
     case 1:
-        console.log("Detected entrance... Did you get disconnected?", Qt::red);
+        console.log("Detected entrance... Did you get disconnected?", COLOR_RED);
         return false;
     case 2:
-        console.log("Detected false start. Did you join the wrong lobby?", Qt::red);
+        console.log("Detected false start. Did you join the wrong lobby?", COLOR_RED);
         return false;
     default:
-        console.log("Timed out connecting to lobby.", Qt::red);
+        console.log("Timed out connecting to lobby.", COLOR_RED);
         return false;
     }
     return true;
@@ -84,10 +84,10 @@ bool wait_for_lobby_ready(
         console.log("Detected lobby ready...");
         return true;
     case 1:
-        console.log("Detected entrance... Did you get disconnected?", Qt::red);
+        console.log("Detected entrance... Did you get disconnected?", COLOR_RED);
         return false;
     case 2:
-        console.log("Detected false start. Did you join the wrong lobby?", Qt::red);
+        console.log("Detected false start. Did you join the wrong lobby?", COLOR_RED);
         return false;
     }
     return true;
@@ -99,7 +99,7 @@ bool start_adventure(
 ){
     LobbyMinReadyDetector ready_detector(consoles, true);
     if (ready_detector.ready_players(console.video().snapshot()) < consoles){
-        console.log("Number of players less than expected. Did someone join the wrong lobby?", Qt::red);
+        console.log("Number of players less than expected. Did someone join the wrong lobby?", COLOR_RED);
         return false;
     }
 
@@ -120,7 +120,7 @@ bool start_adventure(
     case 0:
         return true;
     default:
-        console.log("Timed out starting raid.", Qt::red);
+        console.log("Timed out starting raid.", COLOR_RED);
         return false;
     }
 }

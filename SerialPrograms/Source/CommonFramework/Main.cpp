@@ -35,8 +35,8 @@ int main(int argc, char *argv[]){
     qRegisterMetaType<uint8_t>("uint8_t");
     qRegisterMetaType<std::string>();
 
-    OutputRedirector redirect_stdout(std::cout, "stdout", QColor());
-    OutputRedirector redirect_stderr(std::cerr, "stderr", Qt::red);
+    OutputRedirector redirect_stdout(std::cout, "stdout", Color());
+    OutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
 
     if (!check_hardware()){
         return 1;
@@ -45,7 +45,7 @@ int main(int argc, char *argv[]){
     try{
         PERSISTENT_SETTINGS().read();
     }catch (const StringException& error){
-        global_logger_tagged().log(error.what(), "red");
+        global_logger_tagged().log(error.what(), COLOR_RED);
     }
 
 

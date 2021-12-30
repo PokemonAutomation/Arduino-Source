@@ -12,7 +12,7 @@ namespace PokemonAutomation{
 InferenceException::InferenceException(const char* location, Logger& logger, const char* message)
     : StringException(location, message)
 {
-    logger.log(message, Qt::red);
+    logger.log(message, COLOR_RED);
 }
 
 

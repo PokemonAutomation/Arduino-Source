@@ -305,7 +305,7 @@ int8_t read_side(const QImage& image, int p_min_rgb_sum){
             arrow = item;
             count++;
         }
-//        hits.emplace_back(overlay, translate_to_parent(screen, box, item.box), Qt::green);
+//        hits.emplace_back(overlay, translate_to_parent(screen, box, item.box), COLOR_GREEN);
     }
 //    cout << "count = " << count << endl;
     if (count != 1){

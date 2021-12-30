@@ -30,7 +30,7 @@ VideoOverlayWidget::VideoOverlayWidget(QWidget& parent)
 //    m_boxes.insert(&ENTIRE_VIDEO);
 }
 
-void VideoOverlayWidget::add_box(const ImageFloatBox& box, QColor color){
+void VideoOverlayWidget::add_box(const ImageFloatBox& box, Color color){
     SpinLockGuard lg(m_lock, "VideoOverlay::operator+=()");
     m_boxes[&box] = color;
 }
@@ -64,7 +64,7 @@ void VideoOverlayWidget::paintEvent(QPaintEvent*){
     SpinLockGuard lg(m_lock, "VideoOverlay::paintEvent()");
 //    cout << "paint: " << m_boxes.size() << endl;
     for (const auto& box : m_boxes){
-        painter.setPen(box.second);
+        painter.setPen(QColor((uint32_t)box.second));
 //        cout << box->x << " " << box->y << ", " << box->width << " x " << box->height << endl;
 //        cout << (int)(width * box->x + m_offset_x + 0.5)
 //             << " " << (int)(height * box->y + 0.5)

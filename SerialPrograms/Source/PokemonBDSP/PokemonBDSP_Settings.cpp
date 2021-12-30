@@ -105,7 +105,7 @@ GameSettings::GameSettings()
 
 GameSettings_Descriptor::GameSettings_Descriptor()
     : PanelDescriptor(
-        QColor(),
+        Color(),
         "PokemonBDSP:GlobalSettings",
         STRING_POKEMON + " BDSP", STRING_POKEMON + " Settings",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/PokemonSettings.md",

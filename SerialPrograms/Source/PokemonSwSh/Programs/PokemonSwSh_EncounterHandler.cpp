@@ -109,14 +109,14 @@ void StandardEncounterHandler::run_away_and_update_stats(
         { &black_screen_detector }
     );
     if (ret < 0){
-        m_console.log("Timed out waiting for end of battle. Are you stuck in the battle?", Qt::red);
+        m_console.log("Timed out waiting for end of battle. Are you stuck in the battle?", COLOR_RED);
     }
 }
 
 
 bool StandardEncounterHandler::handle_standard_encounter(const ShinyDetectionResult& result){
     if (result.shiny_type == ShinyType::UNKNOWN){
-        m_console.log("Unable to determine result of battle.", Qt::red);
+        m_console.log("Unable to determine result of battle.", COLOR_RED);
         m_session_stats.add_error();
         m_consecutive_failures++;
         if (m_consecutive_failures >= 3){
@@ -170,7 +170,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     uint16_t exit_battle_time
 ){
     if (result.shiny_type == ShinyType::UNKNOWN){
-        m_console.log("Unable to determine result of battle.", Qt::red);
+        m_console.log("Unable to determine result of battle.", COLOR_RED);
         m_session_stats.add_error();
         m_consecutive_failures++;
         if (m_consecutive_failures >= 3){

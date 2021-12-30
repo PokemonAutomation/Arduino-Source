@@ -14,7 +14,7 @@ namespace PokemonSwSh{
 
 
 
-BattleDialogDetector::BattleDialogDetector(QColor color)
+BattleDialogDetector::BattleDialogDetector(Color color)
     : m_color(color)
     , m_bottom(0.50, 0.89, 0.40, 0.07)
     , m_left(0.01, 0.82, 0.03, 0.07)

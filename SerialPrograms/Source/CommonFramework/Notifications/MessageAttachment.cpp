@@ -56,7 +56,7 @@ PendingFileSend::PendingFileSend(Logger& logger, const ImageAttachment& image)
         return;
     }
     if (image.image.isNull()){
-        logger.log("Screenshot is null.", "orange");
+        logger.log("Screenshot is null.", COLOR_ORANGE);
         return;
     }
 
@@ -83,9 +83,9 @@ PendingFileSend::PendingFileSend(Logger& logger, const ImageAttachment& image)
     }
 
     if (image.image.save(m_filepath)){
-        logger.log("Saved image to: " + m_filepath, "blue");
+        logger.log("Saved image to: " + m_filepath, COLOR_BLUE);
     }else{
-        logger.log("Unable to save screenshot to: " + m_filepath, "red");
+        logger.log("Unable to save screenshot to: " + m_filepath, COLOR_RED);
         m_filename.clear();
         m_filepath.clear();
     }

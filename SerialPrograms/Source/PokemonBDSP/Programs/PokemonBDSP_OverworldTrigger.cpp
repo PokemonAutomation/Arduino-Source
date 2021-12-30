@@ -146,7 +146,7 @@ bool OverworldTrigger::find_encounter(SingleSwitchProgramEnvironment& env) const
 
     switch (result){
     case 0:
-        env.console.log("Unexpected Battle.", "red");
+        env.console.log("Unexpected Battle.", COLOR_RED);
         return false;
     case 1:
         env.console.log("Battle started!");

@@ -17,13 +17,13 @@ namespace PokemonBDSP{
 
 class BoxDetector : public StaticScreenDetector{
 public:
-    BoxDetector(QColor color = Qt::red);
+    BoxDetector(Color color = COLOR_RED);
 
     virtual void make_overlays(OverlaySet& items) const override;
     virtual bool detect(const QImage& screen) const override;
 
 private:
-    QColor m_color;
+    Color m_color;
     ImageFloatBox m_left;
     ImageFloatBox m_right;
     ImageFloatBox m_bottom;

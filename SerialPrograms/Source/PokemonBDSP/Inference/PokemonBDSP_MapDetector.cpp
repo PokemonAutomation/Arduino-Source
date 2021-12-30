@@ -18,7 +18,7 @@ namespace PokemonBDSP{
 
 
 
-MapDetector::MapDetector(QColor color)
+MapDetector::MapDetector(Color color)
     : m_color(color)
     , m_box0(0.68, 0.08, 0.06, 0.05)
     , m_box1(0.02, 0.97, 0.12, 0.02)

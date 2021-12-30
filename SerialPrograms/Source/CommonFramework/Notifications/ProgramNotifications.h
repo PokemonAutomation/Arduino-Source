@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 
 void send_program_notification(
     Logger& logger, EventNotificationOption& settings,
-    QColor color,
+    Color color,
     const ProgramInfo& info,
     const QString& title,
     const std::vector<std::pair<QString, QString>>& messages,
@@ -28,7 +28,7 @@ void send_program_notification(
 );
 
 void send_program_telemetry(
-    Logger& logger, bool is_error, QColor color,
+    Logger& logger, bool is_error, Color color,
     const ProgramInfo& info,
     const QString& title,
     const std::vector<std::pair<QString, QString>>& messages,

@@ -177,7 +177,7 @@ std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_symbols(
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> filtered;
     for (const auto& candidate : candidates){
 //        cout << get_type_slug(candidate.second.first) << ": " << candidate.first << endl;
-//        hits.emplace_back(overlay, translate_to_parent(screen, box, candidate.second.second.box), Qt::green);
+//        hits.emplace_back(overlay, translate_to_parent(screen, box, candidate.second.second.box), COLOR_GREEN);
 
         bool is_dupe = false;
         for (const auto& item : filtered){
@@ -226,7 +226,7 @@ void test_find_symbols(
     cout << "---------------" << endl;
     for (const auto& item : candidates){
         cout << get_type_slug(item.second.first) << ": " << item.first << endl;
-        hits.emplace_back(overlay, translate_to_parent(screen, box, item.second.second), Qt::green);
+        hits.emplace_back(overlay, translate_to_parent(screen, box, item.second.second), COLOR_GREEN);
     }
 
     env.wait_for(std::chrono::seconds(10));

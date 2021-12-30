@@ -225,7 +225,7 @@ EggHatchAction EggHatchFilterOption::get_action(bool shiny, const IVCheckerReade
 
         //  Conflicting actions.
         if (action != filter.action){
-            global_logger_tagged().log("Multiple filters matched with conflicting actions. Stopping program...", Qt::red);
+            global_logger_tagged().log("Multiple filters matched with conflicting actions. Stopping program...", COLOR_RED);
             return EggHatchAction::StopProgram;
         }
     }

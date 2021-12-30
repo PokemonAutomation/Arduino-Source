@@ -18,7 +18,7 @@ namespace PokemonSwSh{
 
 
 
-StartBattleWatcher::StartBattleWatcher(QColor color)
+StartBattleWatcher::StartBattleWatcher(Color color)
     : m_color(color)
     , m_screen_box(0.2, 0.2, 0.6, 0.6)
 {}

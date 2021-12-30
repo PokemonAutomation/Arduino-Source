@@ -23,12 +23,12 @@ class TaggedLoggerOld : public QObject, public Logger{
 
 public:
     TaggedLoggerOld(OutputWindow& window, QString tag);
-    virtual void log(const char* msg, QColor color = QColor()) override;
-    virtual void log(const std::string& msg, QColor color = QColor()) override;
-    virtual void log(const QString& msg, QColor color = QColor()) override;
+    virtual void log(const char* msg, Color color = QColor()) override;
+    virtual void log(const std::string& msg, Color color = QColor()) override;
+    virtual void log(const QString& msg, Color color = QColor()) override;
 
 signals:
-    void signal_log(QString msg, QColor color);
+    void signal_log(QString msg, Color color);
 
 private:
     const QString m_tag;
@@ -53,7 +53,7 @@ public:
     void operator-=(TaggedLoggerOld& logger);
 
 public slots:
-    void log(QString msg, QColor color);
+    void log(QString msg, Color color);
 
 private:
     QColor m_default_color;

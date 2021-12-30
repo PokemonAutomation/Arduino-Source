@@ -27,7 +27,7 @@ namespace PokemonAutomation{
 
 void send_program_notification(
     Logger& logger,
-    QColor color, bool should_ping, const std::vector<QString>& tags,
+    Color color, bool should_ping, const std::vector<QString>& tags,
     const ProgramInfo& info,
     const QString& title,
     const std::vector<std::pair<QString, QString>>& messages,
@@ -50,8 +50,8 @@ void send_program_notification(
             embed["title"] = str;
         }
 
-        if (color.isValid()){
-            embed["color"] = (int)(color.rgb() & 0xffffff);
+        if (color){
+            embed["color"] = (int)((uint32_t)color & 0xffffff);
         }
 
         QJsonArray fields;
@@ -103,7 +103,7 @@ void send_program_notification(
 }
 void send_program_notification(
     Logger& logger, EventNotificationOption& settings,
-    QColor color,
+    Color color,
     const ProgramInfo& info,
     const QString& title,
     const std::vector<std::pair<QString, QString>>& messages,
@@ -123,7 +123,7 @@ void send_program_notification(
 }
 
 void send_program_telemetry(
-    Logger& logger, bool is_error, QColor color,
+    Logger& logger, bool is_error, Color color,
     const ProgramInfo& info,
     const QString& title,
     const std::vector<std::pair<QString, QString>>& messages,
@@ -143,8 +143,8 @@ void send_program_telemetry(
     {
         QJsonObject embed;
         embed["title"] = title;
-        if (color.isValid()){
-            embed["color"] = (int)(color.rgb() & 0xffffff);
+        if (color){
+            embed["color"] = (int)((uint32_t)color & 0xffffff);
         }
 
         QJsonArray fields;
@@ -209,7 +209,7 @@ void send_program_status_notification(
 ){
     send_program_notification(
         logger, settings,
-        QColor(), info,
+        Color(), info,
         "Program Status",
         {
             {"Message", message},
@@ -227,7 +227,7 @@ void send_program_finished_notification(
 ){
     send_program_notification(
         logger, settings,
-        Qt::green, info,
+        COLOR_GREEN, info,
         "Program Finished",
         {
             {"Message", message},
@@ -245,7 +245,7 @@ void send_program_recoverable_error_notification(
 ){
     send_program_notification(
         logger, settings,
-        Qt::red, info,
+        COLOR_RED, info,
         "Program Error (Recoverable)",
         {
             {"Message", message},
@@ -263,7 +263,7 @@ void send_program_fatal_error_notification(
 ){
     send_program_notification(
         logger, settings,
-        Qt::red, info,
+        COLOR_RED, info,
         "Program Stopped (Fatal Error)",
         {
             {"Message", message},

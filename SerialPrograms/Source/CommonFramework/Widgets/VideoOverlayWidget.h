@@ -20,7 +20,7 @@ public:
     VideoOverlayWidget(QWidget& parent);
 
     //  Add/remove inference boxes.
-    void add_box(const ImageFloatBox& box, QColor color);
+    void add_box(const ImageFloatBox& box, Color color);
     void remove_box(const ImageFloatBox& box);
 
     void update_size(const QSize& widget_size, const QSize& video_size);
@@ -35,7 +35,7 @@ private:
     double m_scale;
 
     SpinLock m_lock;
-    std::map<const ImageFloatBox*, QColor> m_boxes;
+    std::map<const ImageFloatBox*, Color> m_boxes;
 };
 
 

@@ -126,7 +126,7 @@ void MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
         );
         switch (ret){
         case 0:{
-            env.log("Battle menu detected!", Qt::blue);
+            env.log("Battle menu detected!", COLOR_BLUE);
             battle_menu_seen = true;
 
             pbf_press_button(env.console, BUTTON_ZL, 10, 125);
@@ -138,7 +138,7 @@ void MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
                 }
             }
             if (slot == 4){
-                env.log("Ran out of PP in a battle.", Qt::red);
+                env.log("Ran out of PP in a battle.", COLOR_RED);
                 PA_THROW_StringException("Ran out of PP in a battle.");
             }
 
@@ -152,21 +152,21 @@ void MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
             break;
         }
         case 1:
-            env.log("Battle finished!", Qt::blue);
+            env.log("Battle finished!", COLOR_BLUE);
             pbf_mash_button(env.console, BUTTON_B, 250);
             return;
 //        case 1:
-//            env.log("Dialog detected! Battle finished?", Qt::blue);
+//            env.log("Dialog detected! Battle finished?", COLOR_BLUE);
 //            pbf_mash_button(env.console, BUTTON_B, 250);
 //            return;
         default:
-            env.log("Timed out.", Qt::red);
+            env.log("Timed out.", COLOR_RED);
             stats.m_errors++;
             PA_THROW_StringException("Timed out after 30 seconds.");
         }
     }
 
-    env.log("No progress detected after 5 battle menus.", Qt::red);
+    env.log("No progress detected after 5 battle menus.", COLOR_RED);
     PA_THROW_StringException("No progress detected after 5 battle menus. Are you out of PP?");
 }
 void MoneyFarmerRoute212::heal_and_return(ConsoleHandle& console, uint8_t pp[4]){
@@ -276,7 +276,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env){
 
             bubbles = tracker.reactions();
             if (bubbles.empty()){
-                env.log("No reactions.", "orange");
+                env.log("No reactions.", COLOR_ORANGE);
                 stats.m_nothing++;
                 continue;
             }
@@ -285,7 +285,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env){
         bool man = false;
         bool woman = false;
         for (const ImagePixelBox& box : bubbles){
-            env.log("Reaction at: " + std::to_string(box.min_x), Qt::blue);
+            env.log("Reaction at: " + std::to_string(box.min_x), COLOR_BLUE);
             if (box.min_x < 400){
                 man = true;
             }

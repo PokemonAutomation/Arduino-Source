@@ -138,7 +138,7 @@ SwitchSystem::SwitchSystem(
                     return;
                 }
                 QString filename = QString::fromStdString("screenshot-" + now_to_filestring() + ".png");
-                m_logger.log("Saving screenshot to: " + filename, "purple");
+                m_logger.log("Saving screenshot to: " + filename, COLOR_PURPLE);
                 image.save(filename);
             });
         }

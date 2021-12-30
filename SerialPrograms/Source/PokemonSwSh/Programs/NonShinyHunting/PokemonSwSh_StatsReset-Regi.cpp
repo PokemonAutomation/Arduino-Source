@@ -129,7 +129,7 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env){
 
         bool regi_caught = false;
         while (!regi_caught){
-            env.log("Talk to regi.", "purple");
+            env.log("Talk to regi.", COLOR_PURPLE);
             env.console.botbase().wait_for_all_requests();
             {
                 StandardBattleMenuWatcher fight_detector(false);
@@ -143,12 +143,12 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env){
                     { &fight_detector }
                 );
                 if (result == 0){
-                    env.log("New fight detected, let's begin to throw balls.", "purple");
+                    env.log("New fight detected, let's begin to throw balls.", COLOR_PURPLE);
                     pbf_mash_button(env.console, BUTTON_B, 1 * TICKS_PER_SECOND);
                 }
             }
 
-            env.log("Catch regi.", "purple");
+            env.log("Catch regi.", COLOR_PURPLE);
             CatchResults result = basic_catcher(env, env.console, LANGUAGE, BALL_SELECT.slug());
             switch (result.result){
             case CatchResult::POKEMON_CAUGHT:
@@ -197,7 +197,7 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env){
             }
         }
 
-        env.log("Check the stats.", "purple");
+        env.log("Check the stats.", COLOR_PURPLE);
         for (int i = 0; i < 20; i++){
             pbf_press_button(env.console, BUTTON_B, 10, 1 * TICKS_PER_SECOND);
         }
@@ -231,7 +231,7 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env){
         }
     }
 
-    env.log("Result Found!", Qt::blue);
+    env.log("Result Found!", COLOR_BLUE);
     stats.matches++;
 
     env.update_stats();

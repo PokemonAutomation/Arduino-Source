@@ -24,7 +24,7 @@ CaughtPokemonScreen::CaughtPokemonScreen(ProgramEnvironment& env, ConsoleHandle&
     , m_total(count_catches(console, console.video().snapshot()))
 {
     if (m_total == 0 || m_total > 4){
-        console.log("Detected " + std::to_string(m_total) + " catches. Something is wrong.", Qt::red);
+        console.log("Detected " + std::to_string(m_total) + " catches. Something is wrong.", COLOR_RED);
     }
 }
 
@@ -83,7 +83,7 @@ void CaughtPokemonScreen::leave_summary(){
         m_console.botbase().wait_for_all_requests();
         break;
     default:
-        m_console.log("Failed to detect caught menu.", Qt::red);
+        m_console.log("Failed to detect caught menu.", COLOR_RED);
         dump_image(m_console, m_env.program_info(), "CaughtMenu", m_console.video().snapshot());
         PA_THROW_StringException("Failed to detect caught menu.");
     }
@@ -116,7 +116,7 @@ void CaughtPokemonScreen::process_detection(Detection detection){
         PA_THROW_StringException("Failed to detect summary screen.");
     case SummaryShinySymbolDetector::Detection::NOT_SHINY:
         if (!mon.read){
-            m_console.log("Not shiny.", Qt::blue);
+            m_console.log("Not shiny.", COLOR_BLUE);
             mon.shiny = false;
             mon.read = true;
         }else if (mon.shiny){
@@ -126,7 +126,7 @@ void CaughtPokemonScreen::process_detection(Detection detection){
         break;
     case SummaryShinySymbolDetector::Detection::SHINY:
         if (!mon.read){
-            m_console.log("Found shiny!", Qt::blue);
+            m_console.log("Found shiny!", COLOR_BLUE);
             mon.shiny = true;
             mon.read = true;
         }else if (!mon.shiny){

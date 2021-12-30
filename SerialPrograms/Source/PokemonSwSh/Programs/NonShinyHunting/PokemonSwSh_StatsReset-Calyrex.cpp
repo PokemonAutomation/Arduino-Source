@@ -153,7 +153,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env){
 
         bool calyrex_caught = false;
         while (!calyrex_caught){
-            env.log("Talk to calyrex.", "purple");
+            env.log("Talk to calyrex.", COLOR_PURPLE);
             env.console.botbase().wait_for_all_requests();
             {
                 StandardBattleMenuWatcher fight_detector(false);
@@ -167,7 +167,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env){
                 { &fight_detector }
                 );
                 if (result == 0) {
-                    env.log("New fight detected, let's begin to throw balls.", "purple");
+                    env.log("New fight detected, let's begin to throw balls.", COLOR_PURPLE);
                     pbf_mash_button(env.console, BUTTON_B, 1 * TICKS_PER_SECOND);
                 }
             }
@@ -221,7 +221,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env){
             }
         }
 
-        env.log("Unfuse calyrex.", "purple");
+        env.log("Unfuse calyrex.", COLOR_PURPLE);
         for (int i = 0; i < 40; i++){
             pbf_press_button(env.console, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
         }
@@ -238,7 +238,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env){
         pbf_press_button(env.console, BUTTON_A  , 10, 2   * TICKS_PER_SECOND);
         env.console.botbase().wait_for_all_requests();
 
-        env.log("Check the stats.", "purple");
+        env.log("Check the stats.", COLOR_PURPLE);
         for (int i = 0; i < 10; i++){
             pbf_press_button(env.console, BUTTON_B, 10, 1 * TICKS_PER_SECOND);
         }
@@ -291,7 +291,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env){
         }
     }
     stats.matches++;
-    env.log("Result Found!", Qt::blue);
+    env.log("Result Found!", COLOR_BLUE);
     env.update_stats();
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,

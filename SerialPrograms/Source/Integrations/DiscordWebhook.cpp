@@ -66,14 +66,14 @@ void DiscordWebhookSender::send_json(Logger& logger, const QUrl& url, const QJso
         QJsonDocument(obj).toJson(),
         file
     );
-    logger.log("Sending JSON to Discord... (queue = " + tostr_u_commas(m_queue.size()) + ")", "purple");
+    logger.log("Sending JSON to Discord... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_PURPLE);
     m_cv.notify_all();
 }
 
 void DiscordWebhookSender::send_file(Logger& logger, const QUrl& url, std::shared_ptr<PendingFileSend> file){
     std::lock_guard<std::mutex> lg(m_lock);
     m_queue.emplace_back(url, file);
-    logger.log("Sending File to Discord... (queue = " + tostr_u_commas(m_queue.size()) + ")", "purple");
+    logger.log("Sending File to Discord... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_PURPLE);
     m_cv.notify_all();
 }
 
@@ -123,7 +123,7 @@ void DiscordWebhookSender::thread_loop(){
 
 void DiscordWebhookSender::process_reply(QNetworkReply* reply){
     if (!reply){
-        m_logger.log("QNetworkReply is null.", "red");
+        m_logger.log("QNetworkReply is null.", COLOR_RED);
     }else if (reply->error() == QNetworkReply::NoError){
 //        QString contents = QString::fromUtf8(reply->readAll());
 //        qDebug() << contents;
@@ -134,7 +134,7 @@ void DiscordWebhookSender::process_reply(QNetworkReply* reply){
         if (index >= 0){
             error_string.replace(index, url.size(), "****************");
         }
-        m_logger.log("Discord Request Response: " + error_string, "red");
+        m_logger.log("Discord Request Response: " + error_string, COLOR_RED);
 //        QString err = reply->errorString();
 //        qDebug() << err;
     }
@@ -155,7 +155,7 @@ void DiscordWebhookSender::internal_send_json(const QUrl& url, const QByteArray&
 void DiscordWebhookSender::internal_send_file(const QUrl& url, const QString& filename){
     QFile file(filename);
     if (!file.open(QIODevice::ReadOnly)){
-        m_logger.log("File doesn't exist: " + filename, "red");
+        m_logger.log("File doesn't exist: " + filename, COLOR_RED);
         return;
     }
 
@@ -182,7 +182,7 @@ void DiscordWebhookSender::internal_send_file(const QUrl& url, const QString& fi
 void DiscordWebhookSender::internal_send_image_embed(const QUrl& url, const QByteArray& data, const QString& filepath, const QString& filename){
     QFile file(filepath);
     if (!file.open(QIODevice::ReadOnly)){
-        m_logger.log("File doesn't exist: " + filepath, "red");
+        m_logger.log("File doesn't exist: " + filepath, COLOR_RED);
         return;
     }
 

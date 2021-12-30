@@ -19,7 +19,7 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-BattleMenuDetector::BattleMenuDetector(BattleType battle_type, QColor color)
+BattleMenuDetector::BattleMenuDetector(BattleType battle_type, Color color)
     : m_color(color)
     , m_battle_type(battle_type)
     , m_left0_status(0.140, 0.922, 0.100, 0.010)

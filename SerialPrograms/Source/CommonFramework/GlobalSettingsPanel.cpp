@@ -128,7 +128,7 @@ PanelDescriptorWrapper<GlobalSettings_Descriptor, GlobalSettingsPanel> GlobalSet
 
 GlobalSettings_Descriptor::GlobalSettings_Descriptor()
     : PanelDescriptor(
-        QColor(),
+        Color(),
         "",
         "Global Settings", "Global Settings",
         "",

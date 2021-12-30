@@ -199,26 +199,10 @@ namespace PokemonBDSP{
 
 
 
-class EggReceivedDetector : public VisualInferenceCallback{
-public:
-    EggReceivedDetector();
-
-    bool detect(const QImage& frame);
-    virtual bool process_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-    ) override;
-
-private:
-    ImageFloatBox m_left;
-    ImageFloatBox m_right;
-    ShortDialogDetector m_dialog;
-};
-
-
 
 
 }
+
 
 
 
@@ -237,6 +221,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
+    cout << std::hex << QColor("green").rgb() << endl;
+    cout << std::hex << QColor(Qt::green).rgb() << endl;
+    cout << std::hex << QColor(Qt::darkGreen).rgb() << endl;
+    cout << std::hex << QColor(Qt::darkCyan).rgb() << endl;
+
+
+#if 0
     QImage image("screenshot-20211227-082121670685.png");
     image = extract_box(image, ImageFloatBox({0.95, 0.10, 0.05, 0.10}));
     image.save("test.png");
@@ -250,7 +241,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
         0, 128
     );
     cout << binary_image.dump() << endl;
-
+#endif
 
 
 #if 0

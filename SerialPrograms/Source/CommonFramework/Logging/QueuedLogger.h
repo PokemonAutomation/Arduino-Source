@@ -20,14 +20,14 @@ class QueuedLogger : public Logger{
 public:
     struct Entry{
         std::chrono::system_clock::time_point timestamp;
-        QColor color;
+        Color color;
         std::string line;
     };
 
 public:
-    virtual void log(const char* msg, QColor color = QColor()) override;
-    virtual void log(const std::string& msg, QColor color = QColor()) override;
-    virtual void log(const QString& msg, QColor color = QColor()) override;
+    virtual void log(const char* msg, Color color = QColor()) override;
+    virtual void log(const std::string& msg, Color color = QColor()) override;
+    virtual void log(const QString& msg, Color color = QColor()) override;
 
     //  Get a message from the queue. If it is empty, wait for a message.
     //  May return nullptr.

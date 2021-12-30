@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Compiler.h"
 #include "CommonFramework/Inference/InferenceException.h"
 #include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
@@ -27,7 +28,7 @@ void hatch_egg(ProgramEnvironment& env, ConsoleHandle& console){
     //  Spin until egg starts hatching.
     do{
         ShortDialogWatcher dialog;
-        FrozenImageDetector frozen(Qt::cyan, {0, 0, 1, 0.5}, std::chrono::seconds(10), 20);
+        FrozenImageDetector frozen(COLOR_CYAN, {0, 0, 1, 0.5}, std::chrono::seconds(10), 20);
         if (dialog.detect(console.video().snapshot())){
             break;
         }
@@ -80,7 +81,7 @@ void hatch_egg(ProgramEnvironment& env, ConsoleHandle& console){
         //  Wait for steady state and read it again.
         env.wait_for(std::chrono::milliseconds(200));
         ImageMatchWatcher matcher(overworld, {0.10, 0.10, 0.80, 0.60}, 100);
-        SelectionArrowFinder arrow(console, {0.50, 0.60, 0.30, 0.20}, Qt::green);
+        SelectionArrowFinder arrow(console, {0.50, 0.60, 0.30, 0.20}, COLOR_GREEN);
         int ret = wait_until(
             env, console, std::chrono::seconds(30),
             {
@@ -93,10 +94,10 @@ void hatch_egg(ProgramEnvironment& env, ConsoleHandle& console){
             console.log("Returned to overworld.");
             return;
         case 1:
-            console.log("Detected prompt. Please turn off nicknaming.", Qt::red);
+            console.log("Detected prompt. Please turn off nicknaming.", COLOR_RED);
             PA_THROW_StringException("Please turn off nicknaming.");
         default:
-            console.log("Failed to detect overworld after 30 seconds. Did day/night change?", Qt::red);
+            console.log("Failed to detect overworld after 30 seconds. Did day/night change?", COLOR_RED);
 //            pbf_mash_button(console, BUTTON_ZL, 30 * TICKS_PER_SECOND);
             return;
         }

@@ -21,7 +21,7 @@ public:
     SelectionArrowFinder(
         VideoOverlay& overlay,
         const ImageFloatBox& box,
-        QColor color
+        Color color
     );
 
     void detect(const QImage& screen);
@@ -34,7 +34,7 @@ public:
 
 protected:
     VideoOverlay& m_overlay;
-    QColor m_color;
+    Color m_color;
     ImageFloatBox m_box;
     std::deque<InferenceBoxScope> m_arrow_boxes;
 };

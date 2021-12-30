@@ -22,16 +22,16 @@ namespace NintendoSwitch{
 
 
 
-QColor pick_color(FeedbackType feedback, PABotBaseLevel size){
+Color pick_color(FeedbackType feedback, PABotBaseLevel size){
     switch (size){
     case PABotBaseLevel::NOT_PABOTBASE:
-        return QColor();
+        return Color();
     case PABotBaseLevel::PABOTBASE_12KB:
-        return feedback == FeedbackType::REQUIRED ? QColor("green") : QColor("blue");
+        return feedback == FeedbackType::REQUIRED ? COLOR_DARKGREEN : COLOR_BLUE;
     case PABotBaseLevel::PABOTBASE_31KB:
-        return feedback == FeedbackType::REQUIRED ? QColor("purple") : QColor("red");
+        return feedback == FeedbackType::REQUIRED ? COLOR_PURPLE : COLOR_RED;
     }
-    return QColor();
+    return Color();
 }
 RunnableSwitchProgramDescriptor::RunnableSwitchProgramDescriptor(
     std::string identifier,

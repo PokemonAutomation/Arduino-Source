@@ -28,14 +28,14 @@ int8_t select_starter(
     logger.log(
         "Player " + std::to_string(player_index) +
         ": Choosing a starter... State =>\n" + state.dump(),
-        "purple"
+        COLOR_PURPLE
     );
 
     using namespace papkmnlib;
 
     std::vector<const Pokemon*> bosses = get_boss_candidates(state);
     if (bosses.empty()){
-        logger.log("Cannot pick a starter since there are no boss candidates.", Qt::red);
+        logger.log("Cannot pick a starter since there are no boss candidates.", COLOR_RED);
         return 0;
     }
 
@@ -54,7 +54,7 @@ int8_t select_starter(
         rank.emplace(score, c);
     }
     if (rank.empty()){
-        logger.log("Cannot pick a starter since none of the choices could be read.", Qt::red);
+        logger.log("Cannot pick a starter since none of the choices could be read.", COLOR_RED);
         return 0;
     }
 

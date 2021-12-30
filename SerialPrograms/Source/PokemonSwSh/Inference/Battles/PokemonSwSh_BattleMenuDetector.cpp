@@ -24,7 +24,7 @@ namespace PokemonSwSh{
 
 StandardBattleMenuDetector::StandardBattleMenuDetector(
     bool den,
-    QColor color
+    Color color
 )
     : m_den(den)
     , m_color(color)

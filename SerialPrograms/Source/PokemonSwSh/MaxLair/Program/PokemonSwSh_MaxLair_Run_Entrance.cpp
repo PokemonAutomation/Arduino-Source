@@ -24,10 +24,10 @@ void run_entrance(
     GlobalState& state = state_tracker[console_index];
 
     if (!state.adventure_started){
-        console.log("Failed to start raid.", Qt::red);
+        console.log("Failed to start raid.", COLOR_RED);
         runtime.session_stats.add_error();
     }else if (state.wins == 0){
-        console.log("Lost on first raid.", "purple");
+        console.log("Lost on first raid.", COLOR_PURPLE);
         runtime.session_stats.add_run(0);
         if (console_index == runtime.host_index){
             runtime.path_stats.clear();

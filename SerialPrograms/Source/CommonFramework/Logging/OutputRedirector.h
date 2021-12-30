@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 
 class OutputRedirector : public std::basic_streambuf<char>{
 public:
-    OutputRedirector(std::ostream& stream, std::string tag, QColor color);
+    OutputRedirector(std::ostream& stream, std::string tag, Color color);
     ~OutputRedirector();
 
 private:
@@ -28,7 +28,7 @@ private:
     std::ostream& m_stream;
     std::streambuf* m_old_buf;
     TaggedLogger m_logger;
-    QColor m_color;
+    Color m_color;
     std::string m_buffer;
 };
 

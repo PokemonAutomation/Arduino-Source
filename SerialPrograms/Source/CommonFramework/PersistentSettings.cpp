@@ -48,7 +48,7 @@ void PersistentSettings::write() const{
     try{
         write_json_file(QCoreApplication::applicationFilePath() + "-Settings.json", QJsonDocument(root));
     }catch (FileException& e){
-        global_logger_tagged().log(e.message(), Qt::red);
+        global_logger_tagged().log(e.message(), COLOR_RED);
     }
 }
 void PersistentSettings::read(){

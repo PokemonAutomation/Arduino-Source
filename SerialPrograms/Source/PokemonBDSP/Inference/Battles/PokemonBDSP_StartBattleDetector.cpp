@@ -26,7 +26,7 @@ StartBattleDetector::StartBattleDetector(VideoOverlay& overlay)
     : m_screen_box(0.2, 0.2, 0.6, 0.6)
 {}
 void StartBattleDetector::make_overlays(OverlaySet& items) const{
-    items.add(Qt::red, m_screen_box);
+    items.add(COLOR_RED, m_screen_box);
     m_dialog.make_overlays(items);
 }
 bool StartBattleDetector::process_frame(
@@ -56,8 +56,8 @@ StartBattleMenuOverlapDetector::StartBattleMenuOverlapDetector(VideoOverlay& ove
     , m_battle_detected(false)
 {}
 void StartBattleMenuOverlapDetector::make_overlays(OverlaySet& items) const{
-    items.add(Qt::red, m_left);
-    items.add(Qt::red, m_right);
+    items.add(COLOR_RED, m_left);
+    items.add(COLOR_RED, m_right);
 }
 bool StartBattleMenuOverlapDetector::process_frame(
     const QImage& frame,

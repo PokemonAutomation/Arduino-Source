@@ -20,7 +20,7 @@ class EndBattleWatcher : public VisualInferenceCallback{
 public:
     EndBattleWatcher(
         const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8},
-        QColor color = Qt::red
+        Color color = COLOR_RED
     );
 
     virtual void make_overlays(OverlaySet& items) const override;
@@ -33,7 +33,7 @@ private:
     bool battle_is_over(const QImage& frame);
 
 private:
-    QColor m_color;
+    Color m_color;
     ImageFloatBox m_box;
     bool m_has_been_black = false;
 };

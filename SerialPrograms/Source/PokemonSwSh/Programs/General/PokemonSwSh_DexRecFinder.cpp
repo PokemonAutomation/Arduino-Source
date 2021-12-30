@@ -248,16 +248,16 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env){
             stats.attempts++;
             if (found){
                 if (excluded){
-                    env.log("Found desired, but contains exclusion.", Qt::blue);
+                    env.log("Found desired, but contains exclusion.", COLOR_BLUE);
                     stats.excluded++;
                 }else{
-                    env.log("Found a match!", Qt::blue);
+                    env.log("Found a match!", COLOR_BLUE);
                     stats.matches++;
                     break;
                 }
             }
             if (bad_read){
-                env.log("Read Errors. Pausing for user to see.", Qt::red);
+                env.log("Read Errors. Pausing for user to see.", COLOR_RED);
                 stats.errors++;
                 pbf_wait(env.console, VIEW_TIME);
             }

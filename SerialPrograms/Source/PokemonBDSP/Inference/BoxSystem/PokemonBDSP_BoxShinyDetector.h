@@ -16,7 +16,7 @@ namespace PokemonBDSP{
 
 class BoxShinyDetector : public StaticScreenDetector{
 public:
-    BoxShinyDetector(QColor color = Qt::red);
+    BoxShinyDetector(Color color = COLOR_RED);
 
     bool is_panel(const QImage& screen) const;
 
@@ -24,7 +24,7 @@ public:
     virtual bool detect(const QImage& screen) const override;
 
 private:
-    QColor m_color;
+    Color m_color;
     ImageFloatBox m_symbol;
     ImageFloatBox m_background;
 };

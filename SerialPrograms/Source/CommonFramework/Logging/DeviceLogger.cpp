@@ -15,7 +15,7 @@ SerialLogger::SerialLogger(Logger& logger, std::string tag)
     , PokemonAutomation::MessageLogger(GlobalSettings::instance().LOG_EVERYTHING)
 {}
 void SerialLogger::log(std::string msg){
-    TaggedLogger::log(msg, "green");
+    TaggedLogger::log(msg, COLOR_DARKGREEN);
 }
 
 

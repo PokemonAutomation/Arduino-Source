@@ -83,12 +83,12 @@ DenMonReadResults DenMonReader::read(const QImage& screen) const{
 
         if (is_solid(den_color, {0.593023, 0.204651, 0.202326})){
             results.type = DenMonReadResults::RED_BEAM;
-            m_logger.log("Den Type: Red Beam", Qt::blue);
+            m_logger.log("Den Type: Red Beam", COLOR_BLUE);
             break;
         }
         if (is_solid(den_color, {0.580866, 0.378132, 0.0410021})){
             results.type = DenMonReadResults::PURPLE_BEAM;
-            m_logger.log("Den Type: Purple Beam", Qt::blue);
+            m_logger.log("Den Type: Purple Beam", COLOR_BLUE);
             break;
         }
 
@@ -97,7 +97,7 @@ DenMonReadResults DenMonReader::read(const QImage& screen) const{
 
         if (is_solid(lair_pink, {0.448155, 0.177504, 0.374341})){
             results.type = DenMonReadResults::MAX_LAIR;
-            m_logger.log("Den Type: Max Lair", Qt::blue);
+            m_logger.log("Den Type: Max Lair", COLOR_BLUE);
             break;
         }
 

@@ -20,7 +20,7 @@ class StandardBattleMenuDetector : public StaticScreenDetector{
 public:
     StandardBattleMenuDetector(
         bool den,
-        QColor color = Qt::red
+        Color color = COLOR_RED
     );
 
     virtual void make_overlays(OverlaySet& items) const override;
@@ -29,7 +29,7 @@ public:
 private:
     bool m_den;
 
-    QColor m_color;
+    Color m_color;
     ImageFloatBox m_ball_left;
     ImageFloatBox m_ball_right;
     ImageFloatBox m_icon_fight;

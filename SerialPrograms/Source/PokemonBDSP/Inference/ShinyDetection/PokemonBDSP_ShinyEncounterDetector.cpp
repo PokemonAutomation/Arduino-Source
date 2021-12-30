@@ -159,7 +159,7 @@ void ShinyEncounterDetector::push(
         if (alpha_overall.shiny >= m_overall_threshold){
             str += " (threshold exceeded)";
         }
-        m_logger.log(str, "blue");
+        m_logger.log(str, COLOR_BLUE);
 
 #if 1
         double type_alpha = alpha_overall.shiny;
@@ -196,7 +196,7 @@ DoublesShinyDetection ShinyEncounterDetector::results(){
         "ShinyDetector: Overall Alpha = " + QString::number(alpha) +
         ", Left Alpha = " + QString::number(m_alpha_left.shiny) +
         ", Right Alpha = " + QString::number(m_alpha_right.shiny),
-        "purple"
+        COLOR_PURPLE
     );
 
     DoublesShinyDetection result;
@@ -207,12 +207,12 @@ DoublesShinyDetection ShinyEncounterDetector::results(){
 
 
     if (alpha < m_overall_threshold){
-        m_logger.log("ShinyDetector: Not Shiny.", "purple");
+        m_logger.log("ShinyDetector: Not Shiny.", COLOR_PURPLE);
         result.shiny_type = ShinyType::NOT_SHINY;
         return result;
     }
 
-    m_logger.log("ShinyDetector: Detected Shiny!", "blue");
+    m_logger.log("ShinyDetector: Detected Shiny!", COLOR_BLUE);
     result.shiny_type = ShinyType::UNKNOWN_SHINY;
     result.left_is_shiny = m_alpha_left.shiny >= m_doubles_threshold;
     result.right_is_shiny = m_alpha_right.shiny >= m_doubles_threshold;
@@ -264,13 +264,13 @@ DoublesShinyDetection detect_shiny_battle(
 #if 0
 //        cout << (int)detector.encounter_state() << endl;
         if (detector.encounter_state() == PokemonSwSh::EncounterState::YOUR_ANIMATION){
-            env.log("ShinyDetector: End of wild entry animation.", "purple");
+            env.log("ShinyDetector: End of wild entry animation.", COLOR_PURPLE);
             break;
         }
 #endif
 
         if (menu.detect(screen)){
-            env.log("ShinyDetector: Battle menu found!", "purple");
+            env.log("ShinyDetector: Battle menu found!", COLOR_PURPLE);
             detector.push_end();
             break;
         }
@@ -294,13 +294,13 @@ DoublesShinyDetection detect_shiny_battle(
         throttle_stats += std::chrono::duration_cast<std::chrono::milliseconds>(time4 - time3).count();
     }
 
-    env.log("Diagnostics: Screenshot: " + capture_stats.dump(), Qt::magenta);
-    env.log("Diagnostics: Menu Detection: " + menu_stats.dump(), Qt::magenta);
-    env.log("Diagnostics: Inference: " + inference_stats.dump(), Qt::magenta);
-    env.log("Diagnostics: Throttle: " + throttle_stats.dump(), Qt::magenta);
+    env.log("Diagnostics: Screenshot: " + capture_stats.dump(), COLOR_MAGENTA);
+    env.log("Diagnostics: Menu Detection: " + menu_stats.dump(), COLOR_MAGENTA);
+    env.log("Diagnostics: Inference: " + inference_stats.dump(), COLOR_MAGENTA);
+    env.log("Diagnostics: Throttle: " + throttle_stats.dump(), COLOR_MAGENTA);
 
     if (no_detection){
-        env.log("ShinyDetector: Battle menu not found after timeout.", "red");
+        env.log("ShinyDetector: Battle menu not found after timeout.", COLOR_RED);
         return DoublesShinyDetection();
     }
 

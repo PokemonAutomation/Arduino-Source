@@ -123,7 +123,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
         if (ret == 0){
             env.log("Detected briefcase!");
         }else{
-            env.log("Timed out waiting for briefcase.", Qt::red);
+            env.log("Timed out waiting for briefcase.", COLOR_RED);
             stats.add_error();
             consecutive_failures++;
             dump_image(env.logger(), env.program_info(), "Briefcase", env.console.video().snapshot());
@@ -154,7 +154,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
         env.console.botbase().wait_for_all_requests();
 
         {
-            SelectionArrowFinder selection_arrow(env.console, {0.50, 0.60, 0.35, 0.20}, Qt::red);
+            SelectionArrowFinder selection_arrow(env.console, {0.50, 0.60, 0.35, 0.20}, COLOR_RED);
             ret = wait_until(
                 env, env.console, std::chrono::seconds(5),
                 { &selection_arrow }
@@ -162,7 +162,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
             if (ret == 0){
                 env.log("Detected selection prompt!");
             }else{
-                env.log("Timed out waiting for selection prompt.", Qt::red);
+                env.log("Timed out waiting for selection prompt.", COLOR_RED);
                 consecutive_failures++;
             }
             pbf_wait(env.console, 50);

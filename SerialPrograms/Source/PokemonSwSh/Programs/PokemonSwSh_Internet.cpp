@@ -43,7 +43,7 @@ bool connect_to_internet_with_inference(
         if (result == 0){
             console.log("Y-COMM detected.");
         }else{
-            console.log("Failed to detect Y-COMM after timeout.", Qt::red);
+            console.log("Failed to detect Y-COMM after timeout.", COLOR_RED);
             dump_image(console, ProgramInfo(), "connect_to_internet_with_inference", console.video().snapshot());
             ok = false;
         }
@@ -70,7 +70,7 @@ bool connect_to_internet_with_inference(
         if (result == 0){
             console.log("Y-COMM no longer detected. Assume done connected to internet.");
         }else{
-            console.log("Failed to see Y-COMM go away after timeout.", Qt::red);
+            console.log("Failed to see Y-COMM go away after timeout.", COLOR_RED);
             ok = false;
         }
     }

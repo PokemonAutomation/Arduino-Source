@@ -23,8 +23,8 @@ FishingMissDetector::FishingMissDetector()
     , m_miss_box(0.3, 0.9, 0.4, 0.05)
 {}
 void FishingMissDetector::make_overlays(OverlaySet& items) const{
-    items.add(Qt::red, m_hook_box);
-    items.add(Qt::red, m_miss_box);
+    items.add(COLOR_RED, m_hook_box);
+    items.add(COLOR_RED, m_miss_box);
 }
 bool FishingMissDetector::detect(const QImage& frame){
     QImage miss_image = extract_box(frame, m_miss_box);
@@ -52,7 +52,7 @@ FishingHookDetector::FishingHookDetector(VideoOverlay& overlay)
     , m_hook_box(0.1, 0.15, 0.8, 0.4)
 {}
 void FishingHookDetector::make_overlays(OverlaySet& items) const{
-    items.add(Qt::red, m_hook_box);
+    items.add(COLOR_RED, m_hook_box);
 }
 bool FishingHookDetector::process_frame(
     const QImage& frame,
@@ -67,7 +67,7 @@ bool FishingHookDetector::process_frame(
         box.x -= box.width * 1.5;
         box.width *= 4;
         box.height *= 1.5;
-        m_marks.emplace_back(m_overlay, box, Qt::yellow);
+        m_marks.emplace_back(m_overlay, box, COLOR_YELLOW);
     }
 
     return !exclamation_marks.empty();

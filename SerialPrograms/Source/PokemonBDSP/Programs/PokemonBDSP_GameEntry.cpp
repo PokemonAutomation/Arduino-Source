@@ -33,8 +33,8 @@ public:
     {}
 
     virtual void make_overlays(OverlaySet& items) const override{
-        items.add(Qt::red, m_box0);
-        items.add(Qt::red, m_box1);
+        items.add(COLOR_RED, m_box0);
+        items.add(COLOR_RED, m_box1);
     }
 
     virtual bool process_frame(
@@ -71,7 +71,7 @@ bool openedgame_to_gamemenu(
             { &detector }
         );
         if (ret < 0){
-            console.log("Timed out waiting to enter game.", Qt::red);
+            console.log("Timed out waiting to enter game.", COLOR_RED);
             return false;
         }
     }
@@ -84,7 +84,7 @@ bool openedgame_to_gamemenu(
             { &detector }
         );
         if (ret < 0){
-            console.log("Timed out waiting for game menu.", Qt::red);
+            console.log("Timed out waiting for game menu.", COLOR_RED);
             return false;
         }
     }
@@ -108,7 +108,7 @@ bool gamemenu_to_ingame(
         console.log("Entered game!");
         return true;
     }else{
-        console.log("Timed out waiting to enter game.", Qt::red);
+        console.log("Timed out waiting to enter game.", COLOR_RED);
         return false;
     }
 }

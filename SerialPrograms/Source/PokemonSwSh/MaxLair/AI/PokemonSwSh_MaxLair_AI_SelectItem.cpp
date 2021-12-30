@@ -22,7 +22,7 @@ int8_t select_item(
     logger.log(
         "Player " + std::to_string(player_index) +
         ": Selecting an item... State =>\n" + state.dump(),
-        "purple"
+        COLOR_PURPLE
     );
 
     //  Can't do anything since there's no item detection yet.

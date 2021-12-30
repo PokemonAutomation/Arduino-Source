@@ -50,7 +50,7 @@ EggAutonomousStats::EggAutonomousStats()
 
 class EggReceivedDetector : public VisualInferenceCallback{
 public:
-    EggReceivedDetector(QColor color = Qt::red)
+    EggReceivedDetector(Color color = COLOR_RED)
         : m_fetched(false)
         , m_color(color)
         , m_box0(0.05, 0.10, 0.10, 0.80)
@@ -83,7 +83,7 @@ public:
 
 private:
     bool m_fetched;
-    QColor m_color;
+    Color m_color;
     ImageFloatBox m_box0;
     ImageFloatBox m_box1;
 };
@@ -134,7 +134,7 @@ void EggAutonomousState::set(const EggAutonomousState& state){
 
 void EggAutonomousState::process_error(const std::string& name, const char* message){
     m_stats.m_errors++;
-    m_console.log(message, Qt::red);
+    m_console.log(message, COLOR_RED);
     QImage screen = m_console.video().snapshot();
     dump_image(
         m_console, m_env.program_info(),
@@ -226,10 +226,10 @@ bool EggAutonomousState::process_party(){
 
         bool shiny = shiny_reader.detect(screen);
         if (shiny){
-            m_console.log("Pokemon " + std::to_string(c) + " is shiny!", Qt::blue);
+            m_console.log("Pokemon " + std::to_string(c) + " is shiny!", COLOR_BLUE);
             process_shiny(screen);
         }else{
-            m_console.log("Pokemon " + std::to_string(c) + " is not shiny.", "purple");
+            m_console.log("Pokemon " + std::to_string(c) + " is not shiny.", COLOR_PURPLE);
         }
         IVCheckerReader::Results IVs = iv_reader.read(m_console, screen);
 
@@ -239,7 +239,7 @@ bool EggAutonomousState::process_party(){
             m_console.log("Program stop requested...");
             return true;
         case EggHatchAction::Keep:
-            m_console.log("Moving Pokemon to keep box...", Qt::blue);
+            m_console.log("Moving Pokemon to keep box...", COLOR_BLUE);
             if (!shiny){
                 send_encounter_notification(
                     m_console,
@@ -275,7 +275,7 @@ bool EggAutonomousState::process_party(){
             }
             break;
         case EggHatchAction::Release:
-            m_console.log("Releasing Pokemon...", "purple");
+            m_console.log("Releasing Pokemon...", COLOR_PURPLE);
             release(m_env, m_console);
         }
     }
@@ -376,9 +376,9 @@ void EggAutonomousState::fetch_egg(){
         if (received.fetched()){
             m_eggs_in_column++;
             m_stats.m_fetch_success++;
-            m_console.log("Fetched an egg!", Qt::blue);
+            m_console.log("Fetched an egg!", COLOR_BLUE);
         }else{
-            m_console.log("No egg fetched.", "orange");
+            m_console.log("No egg fetched.", COLOR_ORANGE);
         }
         m_env.update_stats();
     }
@@ -422,7 +422,7 @@ void EggAutonomousState::hatch_egg(){
         //  Wait for steady state and read it again.
         m_env.wait_for(std::chrono::milliseconds(200));
         ImageMatchWatcher matcher(overworld, {0.10, 0.10, 0.80, 0.60}, 100);
-        SelectionArrowFinder arrow(m_console, {0.50, 0.60, 0.30, 0.20}, Qt::green);
+        SelectionArrowFinder arrow(m_console, {0.50, 0.60, 0.30, 0.20}, COLOR_GREEN);
         int ret = wait_until(
             m_env, m_console, std::chrono::seconds(30),
             {
@@ -436,11 +436,11 @@ void EggAutonomousState::hatch_egg(){
             m_eggs_in_party--;
             return;
         case 1:
-            m_console.log("Detected prompt. Please turn off nicknaming.", Qt::red);
+            m_console.log("Detected prompt. Please turn off nicknaming.", COLOR_RED);
             m_stats.m_errors++;
             PA_THROW_StringException("Please turn off nicknaming.");
         default:
-            m_console.log("Failed to detect overworld after 30 seconds. Did day/night change?", Qt::red);
+            m_console.log("Failed to detect overworld after 30 seconds. Did day/night change?", COLOR_RED);
 //            pbf_mash_button(console, BUTTON_ZL, 30 * TICKS_PER_SECOND);
             return;
         }
@@ -452,7 +452,7 @@ void EggAutonomousState::hatch_rest_of_party(){
     while (m_eggs_in_party > 0){
         dump();
         ShortDialogWatcher dialog;
-        FrozenImageDetector frozen(Qt::cyan, {0, 0, 1, 0.5}, std::chrono::seconds(60), 20);
+        FrozenImageDetector frozen(COLOR_CYAN, {0, 0, 1, 0.5}, std::chrono::seconds(60), 20);
         int ret = run_until(
             m_env, m_console,
             [&](const BotBaseContext& context){

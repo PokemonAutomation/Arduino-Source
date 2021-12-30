@@ -13,7 +13,7 @@ namespace NintendoSwitch{
 
 SwitchViewer_Descriptor::SwitchViewer_Descriptor()
     : PanelDescriptor(
-        QColor(),
+        Color(),
         "NintendoSwitch:SwitchViewer",
         "Nintendo Switch", "Switch Viewer",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/SwitchViewer.md",

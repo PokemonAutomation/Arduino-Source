@@ -55,7 +55,7 @@ ConsoleSettings::ConsoleSettings()
 
 ConsoleSettings_Descriptor::ConsoleSettings_Descriptor()
     : PanelDescriptor(
-        QColor(),
+        Color(),
         "NintendoSwitch:GlobalSettings",
         "Nintendo Switch", "Framework Settings",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/FrameworkSettings.md",

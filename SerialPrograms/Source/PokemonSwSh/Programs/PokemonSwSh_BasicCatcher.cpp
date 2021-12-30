@@ -81,7 +81,7 @@ int16_t move_to_ball(
         return 0;
     }
     if (ret > 0){
-        console.log("Fast ball scrolling overshot by " + std::to_string(ret) + " slot(s).", Qt::red);
+        console.log("Fast ball scrolling overshot by " + std::to_string(ret) + " slot(s).", COLOR_RED);
     }
     uint16_t quantity = reader.read_quantity(console.video().snapshot());
     return quantity == 0 ? -1 : quantity;
@@ -128,16 +128,16 @@ CatchResults throw_balls(
         switch (result){
         case 0:
             if (std::chrono::system_clock::now() < start + std::chrono::seconds(5)){
-                env.log("BasicCatcher: Unable to throw ball.", Qt::red);
+                env.log("BasicCatcher: Unable to throw ball.", COLOR_RED);
                 return {CatchResult::CANNOT_THROW_BALL, balls_used};
             }
-            env.log("BasicCatcher: Failed to catch.", "orange");
+            env.log("BasicCatcher: Failed to catch.", COLOR_ORANGE);
             continue;
         case 1:
-            env.log("BasicCatcher: End of battle detected.", "purple");
+            env.log("BasicCatcher: End of battle detected.", COLOR_PURPLE);
             return {CatchResult::POKEMON_FAINTED, balls_used};
          default:
-            env.log("BasicCatcher: Timed out.", Qt::red);
+            env.log("BasicCatcher: Timed out.", COLOR_RED);
             return {CatchResult::TIMEOUT, balls_used};
         }
     }
@@ -194,10 +194,10 @@ CatchResults basic_catcher(
 
         switch (result){
         case 0:
-            env.log("BasicCatcher: The wild " + STRING_POKEMON + " was caught!", "blue");
+            env.log("BasicCatcher: The wild " + STRING_POKEMON + " was caught!", COLOR_BLUE);
             break;
         default:
-            env.log("BasicCatcher: The wild " + STRING_POKEMON + " fainted.", "red");
+            env.log("BasicCatcher: The wild " + STRING_POKEMON + " fainted.", COLOR_RED);
             results.result = CatchResult::POKEMON_FAINTED;
             return results;
         }

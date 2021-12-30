@@ -17,13 +17,13 @@ namespace PokemonSwSh{
 
 class BattleDialogDetector : public StaticScreenDetector{
 public:
-    BattleDialogDetector(QColor color = Qt::red);
+    BattleDialogDetector(Color color = COLOR_RED);
 
     virtual void make_overlays(OverlaySet& items) const override;
     virtual bool detect(const QImage& screen) const override;
 
 private:
-    QColor m_color;
+    Color m_color;
     ImageFloatBox m_bottom;
     ImageFloatBox m_left;
     ImageFloatBox m_right;

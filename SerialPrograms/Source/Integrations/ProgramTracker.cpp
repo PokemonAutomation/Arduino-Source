@@ -54,7 +54,7 @@ std::string ProgramTracker::grab_screenshot(uint64_t console_id, QImage& image){
     auto iter = m_consoles.find(console_id);
     if (iter == m_consoles.end()){
         std::string error = "grab_screenshot(" + std::to_string(console_id) + ") - ID not found.";
-        global_logger_tagged().log("SwitchProgramTracker::" + error, "red");
+        global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
     image = iter->second.first->video().snapshot();
@@ -65,7 +65,7 @@ std::string ProgramTracker::reset_camera(uint64_t console_id){
     auto iter = m_consoles.find(console_id);
     if (iter == m_consoles.end()){
         std::string error = "reset_camera(" + std::to_string(console_id) + ") - ID not found.";
-        global_logger_tagged().log("SwitchProgramTracker::" + error, "red");
+        global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
     iter->second.first->video().async_reset_video();
@@ -76,7 +76,7 @@ std::string ProgramTracker::reset_serial(uint64_t console_id){
     auto iter = m_consoles.find(console_id);
     if (iter == m_consoles.end()){
         std::string error = "reset_serial(" + std::to_string(console_id) + ") - ID not found.";
-        global_logger_tagged().log("SwitchProgramTracker::" + error, "red");
+        global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
     const char* msg = iter->second.first->sender().try_reset();
@@ -87,7 +87,7 @@ std::string ProgramTracker::start_program(uint64_t program_id){
     auto iter = m_programs.find(program_id);
     if (iter == m_programs.end()){
         std::string error = "start_program(ID = " + std::to_string(program_id) + ") - ID not found.";
-        global_logger_tagged().log("SwitchProgramTracker::" + error, "red");
+        global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
     iter->second->program.async_start();
@@ -98,7 +98,7 @@ std::string ProgramTracker::stop_program(uint64_t program_id){
     auto iter = m_programs.find(program_id);
     if (iter == m_programs.end()){
         std::string error = "stop_program(ID = " + std::to_string(program_id) + ") - ID not found.";
-        global_logger_tagged().log("SwitchProgramTracker::" + error, "red");
+        global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
     iter->second->program.async_stop();
@@ -110,17 +110,17 @@ std::string ProgramTracker::nsw_press_button(uint64_t console_id, Button button,
     auto iter = m_consoles.find(console_id);
     if (iter == m_consoles.end()){
         std::string error = header + ": ID not found.";
-        global_logger_tagged().log("SwitchProgramTracker::" + error, "red");
+        global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
     const char* err = iter->second.first->sender().try_send_request(
         NintendoSwitch::DeviceRequest_pbf_press_button(button, ticks, 0)
     );
     if (err){
-        global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, "red");
+        global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, COLOR_RED);
         return err;
     }else{
-        global_logger_tagged().log("SwitchProgramTracker::" + header, "blue");
+        global_logger_tagged().log("SwitchProgramTracker::" + header, COLOR_BLUE);
         return "";
     }
 }
@@ -130,17 +130,17 @@ std::string ProgramTracker::nsw_press_dpad(uint64_t console_id, DpadPosition pos
     auto iter = m_consoles.find(console_id);
     if (iter == m_consoles.end()){
         std::string error = header + ": ID not found.";
-        global_logger_tagged().log("SwitchProgramTracker::" + error, "red");
+        global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
     const char* err = iter->second.first->sender().try_send_request(
         NintendoSwitch::DeviceRequest_pbf_press_dpad(position, ticks, 0)
     );
     if (err){
-        global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, "red");
+        global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, COLOR_RED);
         return err;
     }else{
-        global_logger_tagged().log("SwitchProgramTracker::" + header, "blue");
+        global_logger_tagged().log("SwitchProgramTracker::" + header, COLOR_BLUE);
         return "";
     }
 }
@@ -150,17 +150,17 @@ std::string ProgramTracker::nsw_press_left_joystick(uint64_t console_id, uint8_t
     auto iter = m_consoles.find(console_id);
     if (iter == m_consoles.end()){
         std::string error = header + ": ID not found.";
-        global_logger_tagged().log("SwitchProgramTracker::" + error, "red");
+        global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
     const char* err = iter->second.first->sender().try_send_request(
         NintendoSwitch::DeviceRequest_pbf_move_left_joystick(x, y, ticks, 0)
     );
     if (err){
-        global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, "red");
+        global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, COLOR_RED);
         return err;
     }else{
-        global_logger_tagged().log("SwitchProgramTracker::" + header, "blue");
+        global_logger_tagged().log("SwitchProgramTracker::" + header, COLOR_BLUE);
         return "";
     }
 }
@@ -170,17 +170,17 @@ std::string ProgramTracker::nsw_press_right_joystick(uint64_t console_id, uint8_
     auto iter = m_consoles.find(console_id);
     if (iter == m_consoles.end()){
         std::string error = header + ": ID not found.";
-        global_logger_tagged().log("SwitchProgramTracker::" + error, "red");
+        global_logger_tagged().log("SwitchProgramTracker::" + error, COLOR_RED);
         return error;
     }
     const char* err = iter->second.first->sender().try_send_request(
         NintendoSwitch::DeviceRequest_pbf_move_right_joystick(x, y, ticks, 0)
     );
     if (err){
-        global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, "red");
+        global_logger_tagged().log("SwitchProgramTracker::" + header + ": " + err, COLOR_RED);
         return err;
     }else{
-        global_logger_tagged().log("SwitchProgramTracker::" + header, "blue");
+        global_logger_tagged().log("SwitchProgramTracker::" + header, COLOR_BLUE);
         return "";
     }
 }

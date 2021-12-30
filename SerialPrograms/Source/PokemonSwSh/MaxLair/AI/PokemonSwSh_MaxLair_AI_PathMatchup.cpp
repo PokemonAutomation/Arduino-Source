@@ -249,14 +249,14 @@ std::vector<PathNode> select_path(
     const PathMap& pathmap, uint8_t wins, int8_t path_side
 ){
 //    if (boss.empty() && state.path.boss == PokemonType::NONE){
-//        logger.log("No information known about boss.", "orange");
+//        logger.log("No information known about boss.", COLOR_ORANGE);
 //        return {};
 //    }
 
     std::vector<std::vector<PathNode>> paths = generate_paths(pathmap, wins, path_side);
     if (paths.empty()){
         if (logger){
-            logger->log("No available paths due to read errors.", Qt::red);
+            logger->log("No available paths due to read errors.", COLOR_RED);
         }
         return {};
     }

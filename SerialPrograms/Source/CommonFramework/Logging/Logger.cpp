@@ -22,17 +22,17 @@ TaggedLogger::TaggedLogger(Logger& logger, std::string tag)
     , m_tag(std::move(tag))
 {}
 
-void TaggedLogger::log(const char* msg, QColor color){
+void TaggedLogger::log(const char* msg, Color color){
     log(std::string(msg), color);
 }
-void TaggedLogger::log(const std::string& msg, QColor color){
+void TaggedLogger::log(const std::string& msg, Color color){
     std::string str =
         current_time() +
         " - [" + m_tag + "]: " +
         msg;
     m_logger.log(str, color);
 }
-void TaggedLogger::log(const QString& msg, QColor color){
+void TaggedLogger::log(const QString& msg, Color color){
     log(msg.toUtf8().toStdString(), color);
 }
 

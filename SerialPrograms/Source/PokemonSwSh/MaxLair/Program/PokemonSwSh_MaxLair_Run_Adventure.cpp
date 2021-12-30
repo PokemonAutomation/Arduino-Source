@@ -80,17 +80,17 @@ AdventureResult run_adventure(
             case StateMachineAction::KEEP_GOING:
                 continue;
             case StateMachineAction::DONE_WITH_ADVENTURE:
-                env.log("End of adventure.", "purple");
+                env.log("End of adventure.", COLOR_PURPLE);
                 return;
             case StateMachineAction::STOP_PROGRAM:
-                env.log("End of adventure. Stop program requested...", "purple");
+                env.log("End of adventure. Stop program requested...", COLOR_PURPLE);
                 if (runtime.go_home_when_done){
                     pbf_press_button(console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
                 }
                 stop.store(true, std::memory_order_release);
                 return;
             case StateMachineAction::RESET_RECOVER:
-                env.log("Error detected. Attempting to correct by resetting...", Qt::red);
+                env.log("Error detected. Attempting to correct by resetting...", COLOR_RED);
                 runtime.session_stats.add_error();
                 error.store(true, std::memory_order_release);
                 pbf_press_button(console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
@@ -165,14 +165,14 @@ void loop_adventures(
             restart_count++;
             if (restart_count == 3){
                 send_program_telemetry(
-                    env.logger(), true, Qt::red, env.program_info(),
+                    env.logger(), true, COLOR_RED, env.program_info(),
                     "Error",
                     {{"Message", "Failed to start adventure 3 times in the row."}},
                     ""
                 );
                 PA_THROW_StringException("Failed to start adventure 3 times in the row.");
             }
-            env.log("Failed to start adventure. Resetting all Switches...", Qt::red);
+            env.log("Failed to start adventure. Resetting all Switches...", COLOR_RED);
             env.run_in_parallel([&](ConsoleHandle& console){
                 QImage screen = console.video().snapshot();
 //                dump_image(console, MODULE_NAME, "ResetRecovery", screen);

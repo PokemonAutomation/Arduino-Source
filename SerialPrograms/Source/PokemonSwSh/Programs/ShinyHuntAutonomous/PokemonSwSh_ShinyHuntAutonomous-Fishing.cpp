@@ -147,22 +147,22 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env){
             );
             switch (result){
             case 0:
-                env.log("Missed a hook.", "red");
+                env.log("Missed a hook.", COLOR_RED);
                 stats.m_misses++;
                 pbf_mash_button(env.console, BUTTON_B, 2 * TICKS_PER_SECOND);
                 continue;
             case 1:
-                env.log("Detected hook!", "purple");
+                env.log("Detected hook!", COLOR_PURPLE);
                 pbf_press_button(env.console, BUTTON_A, 10, 0);
                 break;
             case 2:
-                env.log("Unexpected battle menu.", "red");
+                env.log("Unexpected battle menu.", COLOR_RED);
                 stats.add_error();
                 env.update_stats();
                 run_away(env, env.console, EXIT_BATTLE_TIMEOUT);
                 continue;
             default:
-                env.log("Timed out.", "red");
+                env.log("Timed out.", COLOR_RED);
                 stats.add_error();
                 env.update_stats();
                 pbf_mash_button(env.console, BUTTON_B, 2 * TICKS_PER_SECOND);
@@ -170,7 +170,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env){
             }
             env.wait_for(std::chrono::seconds(3));
             if (miss_detector.detect(env.console.video().snapshot())){
-                env.log("False alarm! We actually missed.", "red");
+                env.log("False alarm! We actually missed.", COLOR_RED);
                 stats.m_misses++;
                 pbf_mash_button(env.console, BUTTON_B, 2 * TICKS_PER_SECOND);
                 continue;

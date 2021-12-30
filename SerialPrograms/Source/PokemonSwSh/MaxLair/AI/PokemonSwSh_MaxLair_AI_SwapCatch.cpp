@@ -32,13 +32,13 @@ bool should_swap_with_newly_caught(
     logger.log(
         "Player " + std::to_string(player_index) +
         ": Deciding whether to swap with newly caught... State =>\n" + state.dump(),
-        "purple"
+        COLOR_PURPLE
     );
 
     using namespace papkmnlib;
 
     if (options[1].empty()){
-        logger.log("Unable to read replacement candidate. Taking if you have the least HP.", Qt::red);
+        logger.log("Unable to read replacement candidate. Taking if you have the least HP.", COLOR_RED);
         return swap_if_least_hp(state, player_index);
     }
 
@@ -75,7 +75,7 @@ bool should_swap_with_newly_caught(
     }
 
     if (rank.empty()){
-        logger.log("Unable to compute decisions. Taking if you have the least HP.", Qt::red);
+        logger.log("Unable to compute decisions. Taking if you have the least HP.", COLOR_RED);
         return swap_if_least_hp(state, player_index);
     }
 

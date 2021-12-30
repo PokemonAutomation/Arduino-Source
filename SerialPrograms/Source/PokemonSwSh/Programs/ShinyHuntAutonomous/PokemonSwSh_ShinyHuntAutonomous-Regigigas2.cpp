@@ -102,7 +102,7 @@ bool ShinyHuntAutonomousRegigigas2::kill_and_return(SingleSwitchProgramEnvironme
         pbf_press_button(env.console, BUTTON_A, 10, CATCH_TO_OVERWORLD_DELAY);
         return true;
     default:
-        env.log("Raid Catch Menu not found.", Qt::red);
+        env.log("Raid Catch Menu not found.", COLOR_RED);
         return false;
     }
 }

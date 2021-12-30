@@ -63,7 +63,7 @@ bool back_out_to_overworld_with_overlap(
         console.botbase().wait_for_all_requests();
         backouts++;
         if (backouts > 15){
-            console.log("Overworld not detected after backing out 16 times.", Qt::red);
+            console.log("Overworld not detected after backing out 16 times.", COLOR_RED);
             return false;
         }
 
@@ -80,7 +80,7 @@ bool back_out_to_overworld_with_overlap(
     QImage current = console.video().snapshot();
     double rmsd_screen = background_all.rmsd(current);
     if (rmsd_screen < THRESHOLD){
-        console.log("Backed all the way out to overworld. Failed to activate menu overlap glitch.", Qt::red);
+        console.log("Backed all the way out to overworld. Failed to activate menu overlap glitch.", COLOR_RED);
         return false;
     }
 
@@ -107,7 +107,7 @@ void back_out_to_overworld(
         { &background_all }
     );
     if (ret < 0){
-        console.log("Failed to back out to overworld in 20 seconds. Something is wrong.", Qt::red);
+        console.log("Failed to back out to overworld in 20 seconds. Something is wrong.", COLOR_RED);
         PA_THROW_StringException("Failed to back out to overworld in 20 seconds. Something is wrong.");
     }
     console.log("Overworld detected.");

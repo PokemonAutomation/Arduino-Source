@@ -36,10 +36,10 @@ void FileWindowLogger::operator-=(FileWindowLoggerWindow& widget){
     m_windows.erase(&widget);
 }
 
-void FileWindowLogger::log(const char* msg, QColor color){
+void FileWindowLogger::log(const char* msg, Color color){
     log(std::string(msg), color);
 }
-void FileWindowLogger::log(const std::string& msg, QColor color){
+void FileWindowLogger::log(const std::string& msg, Color color){
     std::string line = normalize_newlines(msg);
     std::lock_guard<std::mutex> lg(m_lock);
     {
@@ -55,7 +55,7 @@ void FileWindowLogger::log(const std::string& msg, QColor color){
         m_file.flush();
     }
 }
-void FileWindowLogger::log(const QString& msg, QColor color){
+void FileWindowLogger::log(const QString& msg, Color color){
     log(msg.toUtf8().toStdString(), color);
 }
 
@@ -99,12 +99,13 @@ std::string FileWindowLogger::to_file_str(const std::string& msg){
 
     return str;
 }
-QString FileWindowLogger::to_window_str(const std::string& msg, QColor color){
+QString FileWindowLogger::to_window_str(const std::string& msg, Color color){
     //  Replace all newlines with:
     //      <br>    for the output window.
     //      \r\n    for the log file.
 
-    std::string str = "<font color=\"" + (color.isValid() ? color.name().toStdString() : "black") + "\">";
+    QColor qcolor = color ? QColor((uint32_t)color) : Qt::black;
+    std::string str = "<font color=\"" + qcolor.name().toStdString() + "\">";
     for (char ch : msg){
         if (ch == ' '){
             str += "&nbsp;";

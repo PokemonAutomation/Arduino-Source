@@ -106,7 +106,7 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env){
 
         BattleMenuWatcher battle_menu(BattleType::WILD);
         EndBattleWatcher end_battle;
-        SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, Qt::yellow);
+        SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         int ret = run_until(
             env, env.console,
             [=](const BotBaseContext& context){
@@ -120,16 +120,16 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env){
         );
         switch (ret){
         case 0:
-            env.log("Battle menu detected!", Qt::blue);
+            env.log("Battle menu detected!", COLOR_BLUE);
             pbf_mash_button(env.console, BUTTON_ZL, 5 * TICKS_PER_SECOND);
             c++;
             break;
         case 1:
-            env.log("Battle finished!", Qt::blue);
+            env.log("Battle finished!", COLOR_BLUE);
             pbf_mash_button(env.console, BUTTON_B, 250);
             return false;
         case 2:
-            env.log("Detected move learn!", Qt::blue);
+            env.log("Detected move learn!", COLOR_BLUE);
             if (ON_LEARN_MOVE == 0){
                 pbf_move_right_joystick(env.console, 128, 255, 20, 105);
                 pbf_press_button(env.console, BUTTON_A, 20, 105);
@@ -139,13 +139,13 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env){
             }
             break;
         default:
-            env.log("Timed out.", Qt::red);
+            env.log("Timed out.", COLOR_RED);
             stats.add_error();
             PA_THROW_StringException("Timed out after 2 minutes.");
         }
     }
 
-    env.log("No progress detected after 5 battle menus.", Qt::red);
+    env.log("No progress detected after 5 battle menus.", COLOR_RED);
     PA_THROW_StringException("No progress detected after 5 battle menus. Are you out of PP?");
 }
 

@@ -80,7 +80,7 @@ QImage VideoDisplayWidget::snapshot(){
 
 
 
-void VideoDisplayWidget::add_box(const ImageFloatBox& box, QColor color){
+void VideoDisplayWidget::add_box(const ImageFloatBox& box, Color color){
     m_overlay->add_box(box, color);
 }
 void VideoDisplayWidget::remove_box(const ImageFloatBox& box){

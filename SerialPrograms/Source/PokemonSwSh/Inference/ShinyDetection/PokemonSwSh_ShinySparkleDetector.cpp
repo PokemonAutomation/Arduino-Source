@@ -23,7 +23,7 @@ ShinySparkleDetector::ShinySparkleDetector(
     , m_detection_threshold(detection_threshold)
 {}
 void ShinySparkleDetector::make_overlays(OverlaySet& items) const{
-    items.add(Qt::red, m_detection_box);
+    items.add(COLOR_RED, m_detection_box);
 }
 
 
@@ -34,23 +34,23 @@ ShinyType ShinySparkleDetector::results() const{
         "ShinySparkleDetector: Overall Alpha = " + QString::number(alpha) +
         ", Star Alpha = " + QString::number(m_image_alpha.star) +
         ", Square Alpha = " + QString::number(m_image_alpha.square),
-        "purple"
+        COLOR_PURPLE
     );
 
     if (alpha < m_detection_threshold){
-        m_logger.log("ShinySparkleDetector: Not Shiny.", "purple");
+        m_logger.log("ShinySparkleDetector: Not Shiny.", COLOR_PURPLE);
         return ShinyType::NOT_SHINY;
     }
     if (m_image_alpha.star > 0 && m_image_alpha.star > m_image_alpha.square * 2){
-        m_logger.log("ShinySparkleDetector: Detected Star Shiny!", "blue");
+        m_logger.log("ShinySparkleDetector: Detected Star Shiny!", COLOR_BLUE);
         return ShinyType::STAR_SHINY;
     }
     if (m_image_alpha.square > 0 && m_image_alpha.square > m_image_alpha.star * 2){
-        m_logger.log("ShinySparkleDetector: Detected Square Shiny!", "blue");
+        m_logger.log("ShinySparkleDetector: Detected Square Shiny!", COLOR_BLUE);
         return ShinyType::SQUARE_SHINY;
     }
 
-    m_logger.log("ShinySparkleDetector: Detected Shiny! But ambiguous shiny type.", "blue");
+    m_logger.log("ShinySparkleDetector: Detected Shiny! But ambiguous shiny type.", COLOR_BLUE);
     return ShinyType::UNKNOWN_SHINY;
 }
 
@@ -72,12 +72,12 @@ bool ShinySparkleDetector::process_frame(
         if (frame_alpha.shiny >= m_detection_threshold){
             m_logger.log(
                 "ShinyDetector: alpha = " + QString::number(frame_alpha.shiny) + " / "  + QString::number(m_image_alpha.shiny) + " (threshold exceeded)",
-                "blue"
+                COLOR_BLUE
             );
         }else{
             m_logger.log(
                 "ShinyDetector: alpha = " + QString::number(frame_alpha.shiny) + " / "  + QString::number(m_image_alpha.shiny),
-                "blue"
+                COLOR_BLUE
             );
         }
     }
@@ -85,19 +85,19 @@ bool ShinySparkleDetector::process_frame(
     m_detection_overlays.clear();
     for (const auto& item : signatures.balls){
         ImageFloatBox box = translate_to_parent(frame, m_detection_box, item);
-        m_detection_overlays.emplace_back(m_overlay, box, Qt::green);
+        m_detection_overlays.emplace_back(m_overlay, box, COLOR_GREEN);
     }
     for (const auto& item : signatures.stars){
         ImageFloatBox box = translate_to_parent(frame, m_detection_box, item);
-        m_detection_overlays.emplace_back(m_overlay, box, Qt::green);
+        m_detection_overlays.emplace_back(m_overlay, box, COLOR_GREEN);
     }
     for (const auto& item : signatures.squares){
         ImageFloatBox box = translate_to_parent(frame, m_detection_box, item);
-        m_detection_overlays.emplace_back(m_overlay, box, Qt::green);
+        m_detection_overlays.emplace_back(m_overlay, box, COLOR_GREEN);
     }
     for (const auto& item : signatures.lines){
         ImageFloatBox box = translate_to_parent(frame, m_detection_box, item);
-        m_detection_overlays.emplace_back(m_overlay, box, Qt::green);
+        m_detection_overlays.emplace_back(m_overlay, box, COLOR_GREEN);
     }
 
     return false;

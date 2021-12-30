@@ -142,7 +142,7 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env){
 
             switch (result){
             case 0:
-                env.log("Unexpected battle menu.", Qt::red);
+                env.log("Unexpected battle menu.", COLOR_RED);
                 stats.m_unexpected_battles++;
                 env.update_stats();
                 pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);

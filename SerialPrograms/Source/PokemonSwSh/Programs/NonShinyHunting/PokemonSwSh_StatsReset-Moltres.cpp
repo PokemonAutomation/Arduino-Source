@@ -109,7 +109,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env){
 
     while (true){
         env.console.botbase().wait_for_all_requests();
-        env.log("Wait for moltres to attack you.", "purple");
+        env.log("Wait for moltres to attack you.", COLOR_PURPLE);
         {
             StandardBattleMenuWatcher fight_detector(false);
             int result = run_until(
@@ -122,7 +122,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env){
                 { &fight_detector }
             );
             if (result == 0){
-                env.log("New fight detected.", "purple");
+                env.log("New fight detected.", COLOR_PURPLE);
                 pbf_mash_button(env.console, BUTTON_B, 1 * TICKS_PER_SECOND);
             }
         }
@@ -134,13 +134,13 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env){
         }
 
         env.console.botbase().wait_for_all_requests();
-        env.log("Exit the fight.", "purple");
+        env.log("Exit the fight.", COLOR_PURPLE);
         for (int i = 0; i < 20; i++){
             pbf_press_button(env.console, BUTTON_B, 10, 1 * TICKS_PER_SECOND);
         }
 
         env.console.botbase().wait_for_all_requests();
-        env.log("Check the stats.", "purple");
+        env.log("Check the stats.", COLOR_PURPLE);
         pbf_press_button(env.console, BUTTON_X , 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
         pbf_press_dpad  (env.console, DPAD_UP  , 10, 0.5 * TICKS_PER_SECOND);
         pbf_press_button(env.console, BUTTON_A , 10, 2   * TICKS_PER_SECOND);
@@ -172,7 +172,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env){
             );
 
             env.console.botbase().wait_for_all_requests();
-            env.log("Wait for moltres to attack you.", "purple");
+            env.log("Wait for moltres to attack you.", COLOR_PURPLE);
             {
                 StandardBattleMenuWatcher fight_detector(false);
                 int ret = run_until(
@@ -185,7 +185,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env){
                     { &fight_detector }
                 );
                 if (ret == 0){
-                    env.log("New fight detected.", "purple");
+                    env.log("New fight detected.", COLOR_PURPLE);
                     pbf_mash_button(env.console, BUTTON_B, 1 * TICKS_PER_SECOND);
                     pbf_press_dpad(env.console  , DPAD_UP , 10, 1 * TICKS_PER_SECOND);
                     pbf_press_button(env.console, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
@@ -196,7 +196,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env){
             }
 
             env.console.botbase().wait_for_all_requests();
-            env.log("Let's camp.", "purple");
+            env.log("Let's camp.", COLOR_PURPLE);
             pbf_press_button(env.console, BUTTON_X  , 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
             pbf_press_dpad  (env.console, DPAD_RIGHT, 10, 1 * TICKS_PER_SECOND);
             pbf_press_dpad  (env.console, DPAD_DOWN , 10, 1 * TICKS_PER_SECOND);
@@ -206,7 +206,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env){
             pbf_press_button(env.console, BUTTON_A  , 10, 7 * TICKS_PER_SECOND);
 
             env.console.botbase().wait_for_all_requests();
-            env.log("Let's save.", "purple");
+            env.log("Let's save.", COLOR_PURPLE);
             pbf_press_button(env.console, BUTTON_X , 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
             pbf_press_button(env.console, BUTTON_R , 10, 1 * TICKS_PER_SECOND);
             pbf_press_button(env.console, BUTTON_A , 10, 1 * TICKS_PER_SECOND);
@@ -214,7 +214,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env){
         }
     }
 
-    env.log("Result Found!", Qt::blue);
+    env.log("Result Found!", COLOR_BLUE);
     stats.matches++;
 
     env.update_stats();

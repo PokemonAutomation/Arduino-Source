@@ -21,13 +21,13 @@ namespace PokemonSwSh{
 
 class ExperienceGainDetector : public StaticScreenDetector{
 public:
-    ExperienceGainDetector(QColor color = Qt::red);
+    ExperienceGainDetector(Color color = COLOR_RED);
 
     virtual void make_overlays(OverlaySet& items) const override;
     virtual bool detect(const QImage& screen) const override;
 
 private:
-    QColor m_color;
+    Color m_color;
     BattleDialogDetector m_dialog;
     FixedLimitVector<std::pair<ImageFloatBox, ImageFloatBox>> m_rows;
 };

@@ -39,7 +39,7 @@ struct BlackFilter{
         bool black = qRed(pixel) < 48 && qGreen(pixel) < 48 && qBlue(pixel) < 48;
 //        int set = (pixel & 0x00c0c080) == 0x00c0c080 ? 1 : 0;
         if (!black){
-            image.setPixel(x, y, QColor(Qt::blue).rgb());
+            image.setPixel(x, y, QColor(COLOR_BLUE).rgb());
         }
         CellMatrix::ObjectID set = black ? 1 : 0;
         cell = set;
@@ -107,7 +107,7 @@ SelectionArrowFinder::SelectionArrowFinder(VideoOverlay& overlay, const ImageFlo
     , m_box(box)
 {}
 void SelectionArrowFinder::make_overlays(OverlaySet& items) const{
-    items.add(Qt::yellow, m_box);
+    items.add(COLOR_YELLOW, m_box);
 }
 bool SelectionArrowFinder::detect(const QImage& screen){
     QImage image = extract_box(screen, m_box);
@@ -128,7 +128,7 @@ bool SelectionArrowFinder::detect(const QImage& screen){
             continue;
         }
         ImageFloatBox box = translate_to_parent(screen, m_box, object.box);
-        m_arrow_boxes.emplace_back(m_overlay, box, Qt::green);
+        m_arrow_boxes.emplace_back(m_overlay, box, COLOR_GREEN);
 //        arrow_y_center = box.y + box.height * 0.5;
     }
     return !m_arrow_boxes.empty();

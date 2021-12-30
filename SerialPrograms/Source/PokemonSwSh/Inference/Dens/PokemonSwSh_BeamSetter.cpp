@@ -32,8 +32,8 @@ namespace PokemonSwSh{
 BeamSetter::BeamSetter(ProgramEnvironment& env, ConsoleHandle& console)
     : m_env(env)
     , m_console(console)
-    , m_text_box(console, 0.400, 0.825, 0.05, 0.05, Qt::red)
-    , m_box(console, 0.10, 0.005, 0.8, 0.470, Qt::red)
+    , m_text_box(console, 0.400, 0.825, 0.05, 0.05, COLOR_RED)
+    , m_box(console, 0.10, 0.005, 0.8, 0.470, COLOR_RED)
 {
     for (size_t c = 0; c < 32; c++){
         m_boxes.emplace_back(0.10 + 0.025*c, 0.005, 0.025, 0.470);
@@ -54,7 +54,7 @@ BeamSetter::Detection BeamSetter::run(
     //  Grab baseline image.
     QImage baseline_image = m_console.video().snapshot();
     if (baseline_image.isNull()){
-        m_console.log("BeamSetter(): Screenshot failed.", "purple");
+        m_console.log("BeamSetter(): Screenshot failed.", COLOR_PURPLE);
         return Detection::NO_DETECTION;
     }
 
@@ -86,7 +86,7 @@ BeamSetter::Detection BeamSetter::run(
         //  Take screenshot.
         QImage current_screenshot = m_console.video().snapshot();
         if (current_screenshot.isNull()){
-            m_console.log("BeamSetter(): Screenshot failed.", "purple");
+            m_console.log("BeamSetter(): Screenshot failed.", COLOR_PURPLE);
             return Detection::NO_DETECTION;
         }
 
@@ -167,18 +167,18 @@ BeamSetter::Detection BeamSetter::run(
         str += ", sigma = " + QString::number(best_sigma);
 
         if (purple){
-            m_console.log(str, "blue");
-            m_console.log("BeamReader(): Purple beam found!", "blue");
+            m_console.log(str, COLOR_BLUE);
+            m_console.log("BeamReader(): Purple beam found!", COLOR_BLUE);
             if (save_screenshot){
                 current_screenshot.save("PurpleBeam-" + QString::fromStdString(now_to_filestring()) + ".png");
             }
             return Detection::PURPLE;
         }else{
-            m_console.log(str, "purple");
+            m_console.log(str, COLOR_PURPLE);
         }
 
         if (low_stddev_flag && text_stddev > 100){
-            m_console.log("BeamReader(): No beam detected with text. Resetting.", "blue");
+            m_console.log("BeamReader(): No beam detected with text. Resetting.", COLOR_BLUE);
             return Detection::RED_ASSUMED;
         }
 

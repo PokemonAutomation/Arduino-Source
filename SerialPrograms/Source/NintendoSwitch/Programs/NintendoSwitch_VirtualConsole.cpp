@@ -11,7 +11,7 @@ namespace NintendoSwitch{
 
 VirtualConsole_Descriptor::VirtualConsole_Descriptor()
     : PanelDescriptor(
-        QColor(),
+        Color(),
         "NintendoSwitch:VirtualConsole",
         "Nintendo Switch", "Virtual Console",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/VirtualConsole.md",

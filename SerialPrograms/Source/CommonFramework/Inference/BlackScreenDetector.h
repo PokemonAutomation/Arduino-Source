@@ -23,14 +23,14 @@ class BlackScreenDetector : public StaticScreenDetector{
 public:
     BlackScreenDetector(
         const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8},
-        QColor color = Qt::red
+        Color color = COLOR_RED
     );
 
     virtual void make_overlays(OverlaySet& items) const override;
     virtual bool detect(const QImage& screen) const override;
 
 private:
-    QColor m_color;
+    Color m_color;
     ImageFloatBox m_box;
 };
 
@@ -51,7 +51,7 @@ class BlackScreenOverWatcher : public VisualInferenceCallback{
 public:
     BlackScreenOverWatcher(
         const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8},
-        QColor color = Qt::red
+        Color color = COLOR_RED
     );
 
     bool black_is_over(const QImage& frame);

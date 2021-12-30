@@ -24,9 +24,9 @@ ReceivePokemonDetector::ReceivePokemonDetector()
     , m_has_been_orange(false)
 {}
 void ReceivePokemonDetector::make_overlays(OverlaySet& items) const{
-    items.add(Qt::red, m_box_top);
-    items.add(Qt::red, m_box_top_right);
-    items.add(Qt::red, m_box_bot_left);
+    items.add(COLOR_RED, m_box_top);
+    items.add(COLOR_RED, m_box_top_right);
+    items.add(COLOR_RED, m_box_bot_left);
 }
 
 bool ReceivePokemonDetector::process_frame(

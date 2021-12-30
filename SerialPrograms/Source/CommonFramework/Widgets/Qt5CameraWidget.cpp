@@ -9,8 +9,8 @@
 
 #include <QCameraInfo>
 #include <QVBoxLayout>
-#include "Qt5CameraWidget.h"
 #include "Common/Compiler.h"
+#include "Qt5CameraWidget.h"
 
 #include <iostream>
 using std::cout;
@@ -91,7 +91,7 @@ Qt5VideoWidget::Qt5VideoWidget(
             if (iter == m_pending_captures.end()){
                 m_logger.log(
                     "QCameraImageCapture::imageCaptured(): Unable to find capture ID: " + std::to_string(id),
-                    "red"
+                    COLOR_RED
                 );
 //                cout << "QCameraImageCapture::imageCaptured(): Unable to find capture ID: " << id << endl;
                 return;
@@ -108,7 +108,7 @@ Qt5VideoWidget::Qt5VideoWidget(
 //            cout << "error = " << id << endl;
             m_logger.log(
                 "QCameraImageCapture::error(): Capture ID: " + errorString,
-                "red"
+                COLOR_RED
             );
 //            cout << "QCameraImageCapture::error(): " << errorString.toUtf8().data() << endl;
             auto iter = m_pending_captures.find(id);

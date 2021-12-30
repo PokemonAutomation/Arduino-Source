@@ -33,13 +33,13 @@ PokemonSelectMenuDetector::PokemonSelectMenuDetector(bool stop_no_detect)
     , m_select2(0.630, 0.270 + 2*0.258, 0.030, 0.100)
 {}
 void PokemonSelectMenuDetector::make_overlays(OverlaySet& items) const{
-    items.add(Qt::red, m_box0);
-    items.add(Qt::red, m_box1);
-    items.add(Qt::red, m_box2);
-    items.add(Qt::red, m_box3);
-    items.add(Qt::red, m_select0);
-    items.add(Qt::red, m_select1);
-    items.add(Qt::red, m_select2);
+    items.add(COLOR_RED, m_box0);
+    items.add(COLOR_RED, m_box1);
+    items.add(COLOR_RED, m_box2);
+    items.add(COLOR_RED, m_box3);
+    items.add(COLOR_RED, m_select0);
+    items.add(COLOR_RED, m_select1);
+    items.add(COLOR_RED, m_select2);
 }
 bool PokemonSelectMenuDetector::is_pink(const ImageStats& stats){
     if (stats.average.sum() < 400){

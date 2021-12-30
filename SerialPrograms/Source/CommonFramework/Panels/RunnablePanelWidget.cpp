@@ -52,7 +52,7 @@ bool RunnablePanelWidget::start(){
     bool ret = false;
     switch (state()){
     case ProgramState::NOT_READY:
-        m_logger.log("Recevied Start Request: Program is not ready.", Qt::red);
+        m_logger.log("Recevied Start Request: Program is not ready.", COLOR_RED);
         break;
     case ProgramState::STOPPED:{
         m_logger.log("Received Start Request");
@@ -99,7 +99,7 @@ bool RunnablePanelWidget::stop(){
     bool ret = false;
     switch (state()){
     case ProgramState::NOT_READY:
-        m_logger.log("Recevied Stop Request: Program is not ready.", Qt::red);
+        m_logger.log("Recevied Stop Request: Program is not ready.", COLOR_RED);
         break;
     case ProgramState::STOPPED:
         m_logger.log("Received Stop Request: Program is not running.");
@@ -325,9 +325,9 @@ void RunnablePanelWidget::update_historical_stats(){
         );
     }
     if (ok){
-        m_logger.log("Stats successfully saved!", "Blue");
+        m_logger.log("Stats successfully saved!", COLOR_BLUE);
     }else{
-        m_logger.log("Unable to save stats.", "Red");
+        m_logger.log("Unable to save stats.", COLOR_RED);
         QMetaObject::invokeMethod(
             this,
             "show_stats_warning",

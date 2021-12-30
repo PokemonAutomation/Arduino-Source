@@ -33,7 +33,7 @@ RaidLobbyReader::RaidLobbyReader(Logger& logger, VideoOverlay& overlay)
 
 RaidLobbyState RaidLobbyReader::read(const QImage& screen){
     if (screen.isNull()){
-        m_logger.log("RaidLobbyReader(): Screenshot failed.", "purple");
+        m_logger.log("RaidLobbyReader(): Screenshot failed.", COLOR_PURPLE);
         return RaidLobbyState();
     }
 
@@ -62,7 +62,7 @@ RaidLobbyState RaidLobbyReader::read(const QImage& screen){
     str += QString::number(stddev2) + ", ";
     str += QString::number(stddev3) + "}";
 
-    m_logger.log("RaidLobbyReader(): " + str, "purple");
+    m_logger.log("RaidLobbyReader(): " + str, COLOR_PURPLE);
 
     const double PLAYER_READY = 100;
     const double PLAYER_EXISTS = 20;

@@ -115,9 +115,9 @@ double read_hp_bar(Logger& logger, const QImage& image){
 //    static int c = 0;
 //    image.save("test-" + QString::number(c++) + ".png");
     if (hp < 0){
-        logger.log("HP Read: ?", Qt::red);
+        logger.log("HP Read: ?", COLOR_RED);
     }else{
-        logger.log("HP Read: " + std::to_string(100 * hp) + "%", Qt::blue);
+        logger.log("HP Read: " + std::to_string(100 * hp) + "%", COLOR_BLUE);
     }
     return hp;
 }
@@ -125,7 +125,7 @@ Health read_in_battle_hp_box(Logger& logger, const QImage& sprite, const QImage&
     ImageStats stats = image_stats(sprite);
 //    cout << stats.average << stats.stddev << endl;
     if (is_solid(stats, {0., 0.389943, 0.610057})){
-        logger.log("HP Read: Dead", Qt::blue);
+        logger.log("HP Read: Dead", COLOR_BLUE);
         return {0, 1};
     }
     double hp = read_hp_bar(logger, hp_bar);
@@ -236,7 +236,7 @@ int8_t read_pp_text(Logger& logger, QImage image){
     }
     str += "\" -> (";
     str += pp < 0 ? "? PP)" : QString::number((int)pp) + " PP)";
-    logger.log(str, pp < 0 ? Qt::red : Qt::blue);
+    logger.log(str, pp < 0 ? COLOR_RED : COLOR_BLUE);
 
     return pp;
 }

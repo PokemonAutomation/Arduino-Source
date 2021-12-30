@@ -25,12 +25,12 @@ RaidCatchDetector::RaidCatchDetector(VideoOverlay& overlay)
     , m_arrow(overlay, ImageFloatBox(0.75, 0.82, 0.10, 0.10))
 {}
 void RaidCatchDetector::make_overlays(OverlaySet& items) const{
-    items.add(Qt::red, m_left0);
-    items.add(Qt::red, m_right0);
-//    items.add(Qt::red, m_left1);
-//    items.add(Qt::red, m_right1);
-    items.add(Qt::red, m_text0);
-    items.add(Qt::red, m_text1);
+    items.add(COLOR_RED, m_left0);
+    items.add(COLOR_RED, m_right0);
+//    items.add(COLOR_RED, m_left1);
+//    items.add(COLOR_RED, m_right1);
+    items.add(COLOR_RED, m_text0);
+    items.add(COLOR_RED, m_text1);
     m_arrow.make_overlays(items);
 }
 bool RaidCatchDetector::detect(const QImage& screen){

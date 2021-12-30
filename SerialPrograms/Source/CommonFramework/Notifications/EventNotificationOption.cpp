@@ -4,6 +4,7 @@
  *
  */
 
+#include <QStringList>
 #include "Common/Qt/QtJsonTools.h"
 #include "EventNotificationOption.h"
 
@@ -161,11 +162,11 @@ void EventNotificationOption::reset_rate_limit(){
 }
 bool EventNotificationOption::ok_to_send_now(Logger& logger){
     if (!m_enabled){
-        logger.log("EventNotification(" + m_label + "): Notifications not enabled.", "purple");
+        logger.log("EventNotification(" + m_label + "): Notifications not enabled.", COLOR_PURPLE);
         return false;
     }
     if (!m_current.enabled){
-        logger.log("EventNotification(" + m_label + "): Notifications disabled for this event type.", "purple");
+        logger.log("EventNotification(" + m_label + "): Notifications disabled for this event type.", COLOR_PURPLE);
         return false;
     }
 //    if (m_current.rate_limit == std::chrono::seconds(0)){
@@ -173,11 +174,11 @@ bool EventNotificationOption::ok_to_send_now(Logger& logger){
 //    }
     auto now = std::chrono::system_clock::now();
     if (now < m_last_sent + m_current.rate_limit){
-        logger.log("EventNotification(" + m_label + "): Notification dropped due to rate limit.", "purple");
+        logger.log("EventNotification(" + m_label + "): Notification dropped due to rate limit.", COLOR_PURPLE);
         return false;
     }
     m_last_sent = now;
-    logger.log("EventNotification(" + m_label + "): Sending notification.", Qt::blue);
+    logger.log("EventNotification(" + m_label + "): Sending notification.", COLOR_BLUE);
     return true;
 }
 

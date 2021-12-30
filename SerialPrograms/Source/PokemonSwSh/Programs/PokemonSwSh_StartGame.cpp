@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/Inference/InferenceThrottler.h"
@@ -40,14 +41,14 @@ void enter_loading_game(
 
             QImage screen = console.video().snapshot();
             if (screen.isNull()){
-                env.log("enter_loading_game(): Screenshot failed.", "purple");
+                env.log("enter_loading_game(): Screenshot failed.", COLOR_PURPLE);
                 throttler.set_period(std::chrono::milliseconds(1000));
             }else{
                 bool black0 = is_black(extract_box(screen, box0));
                 bool black1 = is_black(extract_box(screen, box1));
                 if (black0 && black1){
                     if (!black_found){
-                        env.log("start_game_with_inference(): Game load started.", "purple");
+                        env.log("start_game_with_inference(): Game load started.", COLOR_PURPLE);
                     }
                     black_found = true;
                 }else if (black_found){
@@ -56,13 +57,13 @@ void enter_loading_game(
             }
 
             if (throttler.end_iteration(env)){
-                env.log("enter_loading_game(): Game load timed out. Proceeding with default start delay.", "red");
+                env.log("enter_loading_game(): Game load timed out. Proceeding with default start delay.", COLOR_RED);
                 break;
             }
         }
     }
 
-    env.log("enter_loading_game(): Game Loaded. Entering game...", "purple");
+    env.log("enter_loading_game(): Game Loaded. Entering game...", COLOR_PURPLE);
     enter_game(console, backup_save, GameSettings::instance().ENTER_GAME_MASH, 0);
     console.botbase().wait_for_all_requests();
 
@@ -80,13 +81,13 @@ void enter_loading_game(
 
             QImage screen = console.video().snapshot();
             if (screen.isNull()){
-                env.log("enter_loading_game(): Screenshot failed.", "purple");
+                env.log("enter_loading_game(): Screenshot failed.", COLOR_PURPLE);
                 throttler.set_period(std::chrono::milliseconds(1000));
             }else{
                 bool black = is_black(extract_box(screen, box));
                 if (black){
                     if (!black_found){
-                        env.log("enter_loading_game(): Game entry started.", "purple");
+                        env.log("enter_loading_game(): Game entry started.", COLOR_PURPLE);
                     }
                     black_found = true;
                 }else if (black_found){
@@ -95,12 +96,12 @@ void enter_loading_game(
             }
 
             if (throttler.end_iteration(env)){
-                env.log("enter_loading_game(): Game entry timed out. Proceeding with default start delay.", "red");
+                env.log("enter_loading_game(): Game entry timed out. Proceeding with default start delay.", COLOR_RED);
                 break;
             }
         }
     }
-    env.log("start_game_with_inference(): Game started.", "purple");
+    env.log("start_game_with_inference(): Game started.", COLOR_PURPLE);
 
     if (post_wait_time != 0){
         pbf_wait(console, post_wait_time);

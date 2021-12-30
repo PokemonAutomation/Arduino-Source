@@ -243,11 +243,11 @@ std::string read_pokemon_sprite_with_item(
         return "";
     }
     if (iter->first > SpeciesReadDatabase::CROPPED_MAX_ALPHA){
-        logger.log("No good sprite match found.", Qt::red);
+        logger.log("No good sprite match found.", COLOR_RED);
         return "";
     }
     if (result.results.size() > 2){
-        logger.log("Multiple \"ok\" sprite matches with no clear winner.", Qt::red);
+        logger.log("Multiple \"ok\" sprite matches with no clear winner.", COLOR_RED);
         return "";
     }
     return std::move(iter->second);
@@ -289,7 +289,7 @@ std::string read_pokemon_name_sprite(
     //  No hit on sprite. Use OCR.
     if (!sprite_hit){
         std::string ret = ocr_unique ? *ocr_slugs.begin() : "";
-        logger.log("Failed to read sprite. Using OCR result: " + ret, Qt::red);
+        logger.log("Failed to read sprite. Using OCR result: " + ret, COLOR_RED);
 //        dump_image(logger, screen, "MaxLair-read_name_sprite");
         return ret;
     }
@@ -297,7 +297,7 @@ std::string read_pokemon_name_sprite(
     //  No hit on OCR. Use sprite.
     if (!ocr_hit){
         std::string ret = sprite_hit ? std::move(iter->second) : "";
-        logger.log("Failed to read name. Using sprite result: " + ret, Qt::red);
+        logger.log("Failed to read name. Using sprite result: " + ret, COLOR_RED);
 //        dump_image(logger, screen, "MaxLair-read_name_sprite");
         return ret;
     }
@@ -310,7 +310,7 @@ std::string read_pokemon_name_sprite(
         }
     }
     if (!common.empty()){
-        logger.log("Sprite and OCR agree. Picking best one: " + common.begin()->second, Qt::blue);
+        logger.log("Sprite and OCR agree. Picking best one: " + common.begin()->second, COLOR_BLUE);
         return std::move(common.begin()->second);
     }
 
@@ -319,18 +319,18 @@ std::string read_pokemon_name_sprite(
 
     //  If there is only one sprite match, use it.
     if (result.results.size() == 1){
-        logger.log("Sprite and OCR disagree. Attempt to arbitrate... Picking: " + result.results.begin()->second, Qt::red);
+        logger.log("Sprite and OCR disagree. Attempt to arbitrate... Picking: " + result.results.begin()->second, COLOR_RED);
         return std::move(result.results.begin()->second);
     }
 
     //  If there is only one OCR match, use it.
     if (ocr_slugs.size() == 1){
-        logger.log("Sprite and OCR disagree. Attempt to arbitrate... Picking: " + *ocr_slugs.begin(), Qt::red);
+        logger.log("Sprite and OCR disagree. Attempt to arbitrate... Picking: " + *ocr_slugs.begin(), COLOR_RED);
         return *ocr_slugs.begin();
     }
 
     //  At this point, both OCR and sprites have multiple items in completely disjoint sets.
-    logger.log("Sprite and OCR disagree so badly that no arbitration will be attempted.", Qt::red);
+    logger.log("Sprite and OCR disagree so badly that no arbitration will be attempted.", COLOR_RED);
     return "";
 }
 

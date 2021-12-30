@@ -17,7 +17,7 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-ShortDialogDetector::ShortDialogDetector(QColor color)
+ShortDialogDetector::ShortDialogDetector(Color color)
     : m_color(color)
 //    , m_bottom(0.50, 0.91, 0.29, 0.05)
     , m_left_white(0.21, 0.835, 0.008, 0.12)
@@ -72,7 +72,7 @@ bool ShortDialogWatcher::process_frame(
 
 
 
-BattleDialogDetector::BattleDialogDetector(QColor color)
+BattleDialogDetector::BattleDialogDetector(Color color)
     : m_color(color)
     , m_bottom(0.50, 0.91, 0.40, 0.05)
     , m_left_white(0.07, 0.835, 0.008, 0.12)

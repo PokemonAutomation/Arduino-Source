@@ -18,7 +18,7 @@ namespace PokemonSwSh{
 
 class StartBattleWatcher : public VisualInferenceCallback{
 public:
-    StartBattleWatcher(QColor color = Qt::red);
+    StartBattleWatcher(Color color = COLOR_RED);
 
     virtual void make_overlays(OverlaySet& items) const override;
     virtual bool process_frame(
@@ -27,7 +27,7 @@ public:
     ) override final;
 
 private:
-    QColor m_color;
+    Color m_color;
     ImageFloatBox m_screen_box;
     BattleDialogDetector m_dialog;
 };

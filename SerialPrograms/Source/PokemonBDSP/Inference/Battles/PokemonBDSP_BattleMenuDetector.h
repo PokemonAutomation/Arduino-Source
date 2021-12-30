@@ -26,13 +26,13 @@ enum class BattleType{
 
 class BattleMenuDetector : public StaticScreenDetector{
 public:
-    BattleMenuDetector(BattleType battle_type, QColor color = Qt::red);
+    BattleMenuDetector(BattleType battle_type, Color color = COLOR_RED);
 
     virtual void make_overlays(OverlaySet& items) const override;
     virtual bool detect(const QImage& screen) const override;
 
 private:
-    QColor m_color;
+    Color m_color;
     BattleType m_battle_type;
     ImageFloatBox m_left0_status;
     ImageFloatBox m_left1_status;

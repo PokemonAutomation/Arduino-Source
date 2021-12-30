@@ -79,7 +79,7 @@ void run_select_pokemon(
 
     //  Make your selection.
     int8_t selection = select_starter(console, inferred, player_index, options);
-    console.log("Choosing option " + std::to_string((int)selection) + ".", "purple");
+    console.log("Choosing option " + std::to_string((int)selection) + ".", COLOR_PURPLE);
     switch (selection){
     case 0:
         pbf_press_dpad(console, DPAD_UP, 10, 50);

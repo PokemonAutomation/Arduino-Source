@@ -44,7 +44,7 @@ void ShinyDialogTracker::push_frame(const QImage& screen, std::chrono::system_cl
 
     if (!dialog_on){
         m_end_dialog = timestamp;
-        m_logger.log("DialogTracker: Dialog on -> off. Starting timer.", "purple");
+        m_logger.log("DialogTracker: Dialog on -> off. Starting timer.", COLOR_PURPLE);
         return;
     }
 
@@ -52,26 +52,26 @@ void ShinyDialogTracker::push_frame(const QImage& screen, std::chrono::system_cl
     m_logger.log(
         "DialogTracker: Dialog off -> on. " +
         QString::number(gap_duration.count() / 1000.) + " seconds",
-        "purple"
+        COLOR_PURPLE
     );
 
     switch (m_state){
     case EncounterState::BEFORE_ANYTHING:
         m_state = (EncounterState)((size_t)m_state + 1);
-        m_logger.log("DialogTracker: Starting wild animation.", "purple");
+        m_logger.log("DialogTracker: Starting wild animation.", COLOR_PURPLE);
         break;
     case EncounterState::WILD_ANIMATION:
         m_state = (EncounterState)((size_t)m_state + 1);
-        m_logger.log("DialogTracker: Starting your animation.", "purple");
+        m_logger.log("DialogTracker: Starting your animation.", COLOR_PURPLE);
         m_wild_animation_duration = gap_duration;
         break;
     case EncounterState::YOUR_ANIMATION:
         m_state = (EncounterState)((size_t)m_state + 1);
-        m_logger.log("DialogTracker: Starting post-entry.", "purple");
+        m_logger.log("DialogTracker: Starting post-entry.", COLOR_PURPLE);
         m_your_animation_duration = gap_duration;
         break;
     case EncounterState::POST_ENTRY:
-        m_logger.log("DialogTracker: Starting post-entry.", "purple");
+        m_logger.log("DialogTracker: Starting post-entry.", COLOR_PURPLE);
         break;
     }
 }
@@ -80,7 +80,7 @@ void ShinyDialogTracker::push_end(std::chrono::system_clock::time_point timestam
     m_logger.log(
         "DialogTracker: End " +
         QString::number(gap_duration.count() / 1000.) + " seconds",
-        "purple"
+        COLOR_PURPLE
     );
     switch (m_state){
     case EncounterState::BEFORE_ANYTHING:

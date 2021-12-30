@@ -17,7 +17,7 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-BoxShinyDetector::BoxShinyDetector(QColor color)
+BoxShinyDetector::BoxShinyDetector(Color color)
     : m_color(color)
     , m_symbol(0.960, 0.145, 0.030, 0.050)
     , m_background(0.960, 0.200, 0.030, 0.400)

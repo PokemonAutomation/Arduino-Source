@@ -93,13 +93,13 @@ SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::wait_for_detec
 
     switch (last_detection){
     case Detection::NO_DETECTION:
-        m_logger.log("SummaryShinySymbolDetector: Nothing found after timeout.", "red");
+        m_logger.log("SummaryShinySymbolDetector: Nothing found after timeout.", COLOR_RED);
         break;
     case Detection::NOT_SHINY:
-        m_logger.log("SummaryShinySymbolDetector: Not shiny.", "purple");
+        m_logger.log("SummaryShinySymbolDetector: Not shiny.", COLOR_PURPLE);
         break;
     case Detection::SHINY:
-        m_logger.log("SummaryShinySymbolDetector: Shiny!", "blue");
+        m_logger.log("SummaryShinySymbolDetector: Shiny!", COLOR_BLUE);
         break;
     }
     return last_detection;

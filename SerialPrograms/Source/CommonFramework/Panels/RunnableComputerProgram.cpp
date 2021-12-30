@@ -17,7 +17,7 @@ RunnableComputerProgramDescriptor::RunnableComputerProgramDescriptor(
     QString description
 )
     : RunnablePanelDescriptor(
-        Qt::darkCyan,
+        COLOR_DARKCYAN,
         std::move(identifier),
         std::move(category), std::move(display_name),
         std::move(doc_link),

@@ -20,15 +20,15 @@ namespace PokemonAutomation{
 namespace Pokemon{
 
 
-QColor shiny_color(ShinyType shiny_type){
+Color shiny_color(ShinyType shiny_type){
     switch (shiny_type){
     case ShinyType::UNKNOWN_SHINY:
     case ShinyType::STAR_SHINY:
-        return 0xffff99;
+        return Color(0xffff99);
     case ShinyType::SQUARE_SHINY:
-        return 0xb266ff;
+        return Color(0xb266ff);
     default:
-        return QColor();
+        return Color();
     }
 }
 QString shiny_symbol(ShinyType shiny_type){
@@ -97,7 +97,7 @@ void send_encounter_notification(
         max_shiny_type = max_shiny_type < result.shininess ? result.shininess : max_shiny_type;
         shiny_count += is_shiny(result.shininess) ? 1 : 0;
     }
-    QColor color = shiny_color(max_shiny_type);
+    Color color = shiny_color(max_shiny_type);
     bool has_shiny = is_shiny(max_shiny_type) || shiny_detected;
 
     QString shinies;
@@ -198,7 +198,7 @@ void send_catch_notification(
     const std::string& ball_slug, int balls_used,
     bool success
 ){
-    QColor color = success ? 0x00ff00 : 0xffa500;
+    Color color = success ? COLOR_DARKGREEN : COLOR_ORANGE;
 
     std::vector<std::pair<QString, QString>> embeds;
 

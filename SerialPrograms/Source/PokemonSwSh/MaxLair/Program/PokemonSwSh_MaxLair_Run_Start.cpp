@@ -61,11 +61,11 @@ bool wait_for_all_join(
         console.log("Detected " + std::to_string(start_players) + " players in lobby!");
         return true;
     case 1:
-        console.log("Detected entrance... Did you get disconnected?", Qt::red);
+        console.log("Detected entrance... Did you get disconnected?", COLOR_RED);
 //        dump_image(console, MODULE_NAME, "wait_for_all_join", console.video().snapshot());
         return false;
     default:
-        console.log("Timed out waiting for everyone to join.", Qt::red);
+        console.log("Timed out waiting for everyone to join.", COLOR_RED);
 //        dump_image(console, MODULE_NAME, "wait_for_all_join", console.video().snapshot());
         return false;
     }
@@ -204,7 +204,7 @@ bool start_raid_local(
     env.run_in_parallel([&](ConsoleHandle& console){
         //  Wait for all consoles to join.
         if (!joined_tracker.report_joined()){
-            console.log("Not everyone was able to join.", Qt::red);
+            console.log("Not everyone was able to join.", COLOR_RED);
             errors.fetch_add(1);
             return;
         }
@@ -216,7 +216,7 @@ bool start_raid_local(
     env.run_in_parallel([&](ConsoleHandle& console){
         size_t index = console.index();
         if (!wait_for_all_join(env, console, entrance[index], env.consoles.size())){
-            console.log("Switches joined into different raids.", Qt::red);
+            console.log("Switches joined into different raids.", COLOR_RED);
             errors.fetch_add(1);
             return;
         }
@@ -360,7 +360,7 @@ bool start_raid_host(
     env.run_in_parallel([&](ConsoleHandle& console){
         //  Wait for all consoles to join.
         if (!joined_tracker.report_joined()){
-            console.log("Not everyone was able to join.", Qt::red);
+            console.log("Not everyone was able to join.", COLOR_RED);
             errors.fetch_add(1);
             return;
         }
@@ -372,7 +372,7 @@ bool start_raid_host(
     env.run_in_parallel([&](ConsoleHandle& console){
         size_t index = console.index();
         if (!wait_for_all_join(env, console, entrance[index], env.consoles.size())){
-            console.log("Switches joined into different raids.", Qt::red);
+            console.log("Switches joined into different raids.", COLOR_RED);
             errors.fetch_add(1);
             return;
         }
