@@ -253,6 +253,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/OCR/OCR_TextMatcher.h
     Source/CommonFramework/OCR/OCR_TrainingTools.cpp
     Source/CommonFramework/OCR/OCR_TrainingTools.h
+    Source/CommonFramework/OCR/TesseractPA.cpp
     Source/CommonFramework/OCR/TesseractPA.h
     Source/CommonFramework/Options/BatchOption/BatchOption.cpp
     Source/CommonFramework/Options/BatchOption/BatchOption.h

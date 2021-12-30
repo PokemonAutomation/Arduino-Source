@@ -14,9 +14,23 @@
 #include "CommonFramework/Notifications/ProgramInfo.h"
 
 
+// Forward declare std mutex and condition_variable
+// to reduce the amount of header includes.
 namespace std{
+
+// for libc++ used by clang, mutex and condition_variable are
+// defined in inline std::__1 namespace instead of std.
+#ifdef _LIBCPP_VERSION
+    inline namespace __1 {
+#endif
+
     class mutex;
     class condition_variable;
+
+#ifdef _LIBCPP_VERSION
+    }
+#endif
+
 }
 
 namespace PokemonAutomation{

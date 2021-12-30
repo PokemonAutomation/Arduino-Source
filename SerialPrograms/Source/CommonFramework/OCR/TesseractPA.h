@@ -8,6 +8,7 @@
 #define PokemonAutomation_TesseractPA_H
 
 #include <stdint.h>
+#include <cstddef>
 
 //#define TESSERACT_STATIC
 
@@ -23,12 +24,12 @@
 #define TESSERACT_EXPORT __declspec(dllimport)
 #endif
 
-#else
+#else // not on _WIN32
 
 #define TESSERACT_EXPORT __attribute__((visibility("default")))
 
-#endif
-#endif
+#endif // _WIN32
+#endif // TESSERACT_STATIC
 
 
 
@@ -36,7 +37,11 @@
 extern "C" {
 #endif
 
-
+// We build a custom Tesseract library,
+// https://github.com/PokemonAutomation/Tesseract-OCR_for_Windows
+// to ship with SerialProgram on Windows, in the form of tesseractPA.dll.
+// The following C API is a wrapper for the raw Tesseract API. The wrapper
+// along with Tesseract itself is implemented in tesseractPA.dll.
 struct TesseractAPI_internal;
 TESSERACT_EXPORT TesseractAPI_internal* TesseractAPI_construct(
     const char* path, const char* language
@@ -57,8 +62,6 @@ TESSERACT_EXPORT void Tesseract_delete(char* text);
 #ifdef __cplusplus
 }
 #endif
-
-
 
 
 class TesseractString{
