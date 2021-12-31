@@ -7,6 +7,7 @@
 #include <sstream>
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "PokemonSwSh_Commands_DateSpam.h"
+#include "PokemonSwSh_Messages_DateSpam.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

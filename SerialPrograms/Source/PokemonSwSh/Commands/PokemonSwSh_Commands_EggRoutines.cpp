@@ -7,6 +7,7 @@
 #include <sstream>
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "PokemonSwSh_Commands_EggRoutines.h"
+#include "PokemonSwSh_Messages_EggRoutines.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

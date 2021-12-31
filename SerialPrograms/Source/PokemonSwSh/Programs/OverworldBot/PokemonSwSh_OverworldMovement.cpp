@@ -4,7 +4,7 @@
  *
  */
 
-#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh_OverworldMovement.h"
 
 namespace PokemonAutomation{

@@ -5,8 +5,8 @@
  */
 
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_DigitEntry.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Lobby.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Entrance.h"

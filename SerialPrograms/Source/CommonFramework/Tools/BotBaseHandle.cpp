@@ -15,7 +15,7 @@
 #include "ClientSource/Connection/SerialConnection.h"
 #include "ClientSource/Connection/PABotBase.h"
 #include "CommonFramework/Globals.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "BotBaseHandle.h"
 
 namespace PokemonAutomation{

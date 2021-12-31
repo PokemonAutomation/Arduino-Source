@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_EggCombinedShared_H
 #define PokemonAutomation_PokemonSwSh_EggCombinedShared_H
 
-#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"

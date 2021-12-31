@@ -4,9 +4,9 @@
  *
  */
 
-#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_DigitEntry.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
 #include "PokemonSwSh_FastCodeEntry.h"
 
 namespace PokemonAutomation{

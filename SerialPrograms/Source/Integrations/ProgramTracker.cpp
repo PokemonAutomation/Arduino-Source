@@ -5,7 +5,8 @@
  */
 
 #include "CommonFramework/Panels/RunnablePanelWidget.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h"
 #include "ProgramTracker.h"
 
 #include <iostream>

@@ -223,10 +223,10 @@ SOURCES += \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX2.cpp \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.cpp \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp \
-    Source/NintendoSwitch/Commands/NintendoSwitch_Device.cpp \
-    Source/NintendoSwitch/Commands/NintendoSwitch_DigitEntry.cpp \
-    Source/NintendoSwitch/Commands/NintendoSwitch_PushButtons.cpp \
-    Source/NintendoSwitch/Commands/NintendoSwitch_Routines.cpp \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.cpp \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_CommandRow.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgramWidget.cpp \
@@ -722,10 +722,14 @@ HEADERS += \
     Source/Kernels/WaterFill/Kernels_WaterFill_FillQueue.h \
     Source/Kernels/WaterFill/Kernels_WaterFill_Intrinsics_SSE4.h \
     Source/Kernels/WaterFill/Kernels_WaterFill_Intrinsics_u64.h \
-    Source/NintendoSwitch/Commands/NintendoSwitch_Device.h \
-    Source/NintendoSwitch/Commands/NintendoSwitch_DigitEntry.h \
-    Source/NintendoSwitch/Commands/NintendoSwitch_PushButtons.h \
-    Source/NintendoSwitch/Commands/NintendoSwitch_Routines.h \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Device.h \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Messages_DigitEntry.h \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h \
+    Source/NintendoSwitch/Commands/NintendoSwitch_Messages_Routines.h \
     Source/NintendoSwitch/FixedInterval.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_CommandRow.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h \
@@ -842,6 +846,12 @@ HEADERS += \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_EggRoutines.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_Misc.h \
+    Source/PokemonSwSh/Commands/PokemonSwSh_Messages_AutoHosts.h \
+    Source/PokemonSwSh/Commands/PokemonSwSh_Messages_DateSpam.h \
+    Source/PokemonSwSh/Commands/PokemonSwSh_Messages_DaySkippers.h \
+    Source/PokemonSwSh/Commands/PokemonSwSh_Messages_EggRoutines.h \
+    Source/PokemonSwSh/Commands/PokemonSwSh_Messages_GameEntry.h \
+    Source/PokemonSwSh/Commands/PokemonSwSh_Messages_Misc.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogDetector.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h \

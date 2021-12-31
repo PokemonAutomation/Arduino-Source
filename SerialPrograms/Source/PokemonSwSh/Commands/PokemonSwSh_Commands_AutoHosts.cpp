@@ -6,10 +6,11 @@
 
 #include <sstream>
 #include "ClientSource/Libraries/MessageConverter.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh_Commands_AutoHosts.h"
+#include "PokemonSwSh_Messages_AutoHosts.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

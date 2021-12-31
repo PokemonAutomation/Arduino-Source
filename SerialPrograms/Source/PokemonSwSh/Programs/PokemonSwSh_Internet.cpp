@@ -6,7 +6,7 @@
 
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "PokemonSwSh_Internet.h"
 

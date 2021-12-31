@@ -4,7 +4,8 @@
  *
  */
 
-#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "Common/Cpp/Exception.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP_ShortcutDirection.h"
 
 namespace PokemonAutomation{

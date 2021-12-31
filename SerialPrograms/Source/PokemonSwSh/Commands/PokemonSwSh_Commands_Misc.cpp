@@ -7,6 +7,7 @@
 #include <sstream>
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "PokemonSwSh_Commands_Misc.h"
+#include "PokemonSwSh_Messages_Misc.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

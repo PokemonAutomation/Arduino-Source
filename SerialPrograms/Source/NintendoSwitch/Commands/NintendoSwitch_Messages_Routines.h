@@ -4,17 +4,15 @@
  *
  */
 
-#ifndef PokemonAutomation_NintendoSwitch_GameEntry_H
-#define PokemonAutomation_NintendoSwitch_GameEntry_H
+#ifndef PokemonAutomation_NintendoSwitch_Messages_Routines_H
+#define PokemonAutomation_NintendoSwitch_Messages_Routines_H
 
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_Routines.h"
-#include "ClientSource/Connection/BotBase.h"
+#include "ClientSource/Connection/BotBaseMessage.h"
+#include "NintendoSwitch_Commands_Routines.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-
-
-void close_game(const BotBaseContext& device);
 
 
 class DeviceRequest_close_game : public BotBaseRequest{
@@ -29,7 +27,6 @@ public:
         return BotBaseMessage(PABB_MSG_COMMAND_CLOSE_GAME, params);
     }
 };
-
 
 
 }

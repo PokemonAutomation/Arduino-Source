@@ -5,8 +5,8 @@
  */
 
 #include "Common/Qt/CodeValidator.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_DigitEntry.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/FixedInterval.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"

@@ -5,12 +5,13 @@
  */
 
 #include <sstream>
+#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/OCR/OCR_TextMatcher.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Device.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Programs/ReleaseHelpers.h"

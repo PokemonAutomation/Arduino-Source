@@ -129,15 +129,15 @@ void find_symbol_candidates(
     bool changed;
     do{
         changed = false;
-        for (auto& item0 : objmap){
-            for (auto& item1 : objmap){
-                if (item0.first >= item1.first){
+        for (auto iter0 = objmap.begin(); iter0 != objmap.end(); ++iter0){
+            for (auto iter1 = objmap.begin(); iter1 != objmap.end(); ++iter1){
+                if (iter0->first >= iter1->first){
                     continue;
                 }
-                size_t distance = distance_sqr(item0.second.box, item1.second.box);
+                size_t distance = distance_sqr(iter0->second.box, iter1->second.box);
                 if (distance < 5*5){
-                    item0.second.merge_assume_no_overlap(item1.second);
-                    objmap.erase(item1.second.id);
+                    iter0->second.merge_assume_no_overlap(iter1->second);
+                    iter1 = objmap.erase(iter1);
                     changed = true;
                 }
             }

@@ -4,7 +4,8 @@
  *
  */
 
-#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "Common/Cpp/Exception.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Types.h"
 #include "PokemonBDSP_RunFromBattle.h"
 #include "PokemonBDSP_EncounterHandler.h"

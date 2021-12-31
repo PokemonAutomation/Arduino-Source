@@ -15,7 +15,7 @@
 #include "CommonFramework/Inference/InferenceThrottler.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CommonFramework/Inference/TimeWindowStatTracker.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_PushButtons.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh_BeamSetter.h"
 
 //#include "CommonFramework/Inference/FillGeometry.h"
