@@ -1,1 +1,6 @@
 SerialPrograms/bin/*
+
+.vscode
+
+# macOS hidden system file
+.DS_Store

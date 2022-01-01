@@ -82,44 +82,41 @@ Qt6VideoWidget::Qt6VideoWidget(
             std::unique_lock<std::mutex> lg(m_lock);
             m_videoFrame = frame;
         }
-        // std::cout << "Video frame changed, " << frame.width() << "x" << frame.height() << std::endl;
         this->repaint();
-        // std::cout << "QtVideoWidget repaint() end in slot" << std::endl;
     });
 
-    const auto formats = m_info.videoFormats();
+    const QList<QCameraFormat> formats = m_info.videoFormats();
+    // Filter out additional formats that have the same resolutions:
     for (const auto& format : formats){
-        m_resolutions.emplace_back(format.resolution());
+        bool foundExistingResolution = false;
+        for (size_t i = 0; i < m_formats.size(); i++) {
+            if (m_formats[i].resolution() == format.resolution()) {
+                foundExistingResolution = true;
+                break;
+            }
+        }
+        if (foundExistingResolution == false) {
+            m_formats.push_back(format);
+        }
     }
 
-    m_resolution = m_camera->cameraFormat().resolution();
+    for (const auto& format : m_formats) {
+        m_resolutions.emplace_back(format.resolution());
+    }
 
     this->setMinimumSize(80, 45);
 
     //  Check if we can apply the recommended resolution.
-    QSize new_resolution = m_resolution;
-    for (const QSize& size : m_resolutions){
-        if (size == desired_resolution){
-            new_resolution = desired_resolution;
+    for (const auto& format : m_formats) {
+        if (format.resolution() == desired_resolution){
+            m_camera->setCameraFormat(format);
             break;
         }
-    }
-    if (m_resolution != new_resolution){
-        const auto formats = m_info.videoFormats();
-        for(const auto& format : formats) {
-            if (format.resolution() == new_resolution) {
-                m_camera->setCameraFormat(format);
-                break;
-            }
-        }
-        m_resolution = new_resolution;
     }
 
     m_camera->start();
 }
-Qt6VideoWidget::~Qt6VideoWidget(){
-
-}
+Qt6VideoWidget::~Qt6VideoWidget(){}
 
 QSize Qt6VideoWidget::resolution() const{
     std::lock_guard<std::mutex> lg(m_lock);
@@ -140,9 +137,8 @@ void Qt6VideoWidget::set_resolution(const QSize& size){
     if (format.resolution() == size) {
         return;
     }
-    const auto formats = m_info.videoFormats();
     bool formatSet = false;
-    for(const auto& format : formats) {
+    for(const auto& format : m_formats) {
         if (format.resolution() == size) {
             m_camera->setCameraFormat(format);
             formatSet = true;
@@ -152,7 +148,6 @@ void Qt6VideoWidget::set_resolution(const QSize& size){
     if (formatSet == false) {
         std::cout << "Wrong resolution: " << size.width() << "x" << size.height() << ", camera does not support it" << std::endl;
     }
-    m_resolution = size;
 }
 
 QImage Qt6VideoWidget::snapshot(){
