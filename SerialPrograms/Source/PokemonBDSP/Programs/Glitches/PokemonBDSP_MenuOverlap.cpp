@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exception.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -51,7 +52,7 @@ bool back_out_to_overworld_with_overlap(
     const double THRESHOLD = 50;
     const std::chrono::milliseconds HOLD_DURATION(200);
 
-    OverlaySet boxes(console);
+    VideoOverlaySet boxes(console);
     ImageMatchWatcher background_all(start, {0, 0, 1, 1}, THRESHOLD, HOLD_DURATION);
     ImageMatchWatcher background_left(start, {0.02, 0.2, 0.08, 0.5}, THRESHOLD, HOLD_DURATION);
     ImageMatchWatcher background_right(start, {0.90, 0.2, 0.08, 0.5}, THRESHOLD, HOLD_DURATION);
@@ -96,7 +97,7 @@ void back_out_to_overworld(
     const double THRESHOLD = 50;
     const std::chrono::milliseconds HOLD_DURATION(200);
 
-    OverlaySet boxes(console);
+    VideoOverlaySet boxes(console);
     ImageMatchWatcher background_all(start, {0, 0, 1, 1}, THRESHOLD, HOLD_DURATION);
     background_all.make_overlays(boxes);
 

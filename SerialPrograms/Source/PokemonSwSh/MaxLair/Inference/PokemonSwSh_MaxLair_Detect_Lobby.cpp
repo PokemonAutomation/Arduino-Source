@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
@@ -45,7 +46,7 @@ LobbyDetector::LobbyDetector(bool invert)
     , m_pink (0.575, 0.035, 0.050, 0.100)
     , m_white(0.800, 0.200, 0.150, 0.100)
 {}
-void LobbyDetector::make_overlays(OverlaySet& items) const{
+void LobbyDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_pink);
     items.add(COLOR_RED, m_white);
 }
@@ -75,7 +76,7 @@ LobbyDoneConnecting::LobbyDoneConnecting()
     : m_box(0.600, 0.820, 0.080, 0.100)
     , m_player0(0.669, 0.337 + 0.0775*1, 0.100, 0.06)
 {}
-void LobbyDoneConnecting::make_overlays(OverlaySet& items) const{
+void LobbyDoneConnecting::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box);
     items.add(COLOR_RED, m_player0);
 }
@@ -114,7 +115,7 @@ LobbyJoinedDetector::LobbyJoinedDetector(size_t consoles, bool invert)
     , m_player2(COLOR_CYAN, {0, 0, 1, 0.5}, std::chrono::seconds(1), 10)
     , m_player3(COLOR_CYAN, {0, 0, 1, 0.5}, std::chrono::seconds(1), 10)
 {}
-void LobbyJoinedDetector::make_overlays(OverlaySet& items) const{
+void LobbyJoinedDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box0);
     items.add(COLOR_RED, m_box1);
     items.add(COLOR_RED, m_box2);
@@ -155,7 +156,7 @@ LobbyReadyDetector::LobbyReadyDetector()
     , m_checkbox2(0.669, 0.337 + 0.0775*2, 0.034, 0.06)
     , m_checkbox3(0.669, 0.337 + 0.0775*3, 0.034, 0.06)
 {}
-void LobbyReadyDetector::make_overlays(OverlaySet& items) const{
+void LobbyReadyDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_checkbox0);
     items.add(COLOR_RED, m_checkbox1);
     items.add(COLOR_RED, m_checkbox2);

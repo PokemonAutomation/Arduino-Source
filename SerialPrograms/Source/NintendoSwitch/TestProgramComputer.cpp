@@ -4,11 +4,20 @@
  *
  */
 
+#include "Common/Cpp/AlignedVector.h"
+#include "Kernels/Kernels_Arch.h"
+#include "Kernels/BinaryMatrix/Kernels_BinaryMatrixBase.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Tile_Default.h"
-//#include "Kernels/Waterfill/Kernels_Waterfill_Tile_x64_SSE41.h"
-//#include "Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX2.h"
-//#include "Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX512.h"
-//#include "Kernels/Kernels_x64_AVX512.h"
+#include "Kernels/Kernels_x64_SSE41.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Tile_x64_SSE42.h"
+#ifdef PA_Arch_x64_AVX2
+#include "Kernels/Kernels_x64_AVX2.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX2.h"
+#endif
+#ifdef PA_Arch_x64_AVX512
+#include "Kernels/Kernels_x64_AVX512.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX512.h"
+#endif
 #include "TestProgramComputer.h"
 
 #include <iostream>
@@ -35,46 +44,6 @@ TestProgramComputer::TestProgramComputer(const TestProgramComputer_Descriptor& d
 }
 
 
-#if 0
-inline static void print_u64(__m128i x){
-    for (int i = 0; i < 2; i++){
-        std::cout << x.m128i_u64[i] << " ";
-    }
-    std::cout << std::endl;
-}
-inline static void print_u64(__m256i x){
-    for (int i = 0; i < 4; i++){
-        std::cout << x.m256i_u64[i] << " ";
-    }
-    std::cout << std::endl;
-}
-#endif
-#if 0
-inline static void print_u8(__m128i x){
-    for (int i = 0; i < 16; i++){
-        std::cout << (int)((const unsigned char*)&x)[i] << " ";
-    }
-    std::cout << std::endl;
-}
-inline static void print_u64(const __m512i& x){
-    union{
-        __m512i v;
-        uint64_t s[8];
-    };
-    v = x;
-    for (int i = 0; i < 8; i++){
-        std::cout << s[i] << " ";
-    }
-    std::cout << std::endl;
-}
-inline static void print_u8(__m512i x){
-    for (int i = 0; i < 64; i++){
-        std::cout << (int)((const unsigned char*)&x)[i] << " ";
-    }
-    std::cout << std::endl;
-}
-#endif
-
 inline std::string dump8(uint8_t x){
     std::string str;
     for (size_t c = 0; c < 8; c++){
@@ -85,8 +54,101 @@ inline std::string dump8(uint8_t x){
 
 
 
+
+
+
+
+
+
 void TestProgramComputer::program(ProgramEnvironment& env){
     using namespace Kernels;
+
+    BinaryTile_Default tile;
+    tile.set_zero();
+    tile.set_bit(20, 3, true);
+
+    cout << tile.dump() << endl;
+
+    size_t x, y;
+    if (find_bit(x, y, tile)){
+        cout << "(" << x << "," << y << ")" << endl;
+    }
+
+
+#if 0
+    BinaryMatrixBase<BinaryTile_SSE42> r0(100, 21);
+    r0.set_ones();
+
+    cout << r0.dump() << endl;
+    cout << r0.tile(0, 2).dump() << endl;
+    cout << r0.tile(1, 2).dump() << endl;
+#endif
+
+
+#if 0
+    BinaryTile_AVX512 m0, r0, rL;
+    m0.set_ones();
+    r0.set_zero();
+//    r0.set_bit(0, 2, true);
+
+    rL.set_zero();
+    rL.set_bit(0, 10, true);
+    cout << rL.dump() << endl;
+
+
+    bool changed = waterfill_touch_right(m0, r0, rL);
+    cout << "changed = " << changed << endl;
+    cout << r0.dump() << endl;
+#endif
+
+#if 0
+    BinaryTile_Default m0, r0;
+    m0.set_ones();
+    r0.set_zero();
+    r0.set_bit(4, 0, 1);
+
+    bool changed = waterfill_touch_top(m0, r0, 16);
+    cout << "changed = " << changed << endl;
+    cout << r0.dump() << endl;
+#endif
+
+
+
+
+#if 0
+
+
+    BinaryTile_AVX512 tile;
+    tile.set_zero();
+    tile.set_bit(10, 11, 1);
+    cout << tile.dump() << endl;
+    tile.set_bit(10, 11, 0);
+    cout << tile.dump() << endl;
+#endif
+
+#if 0
+    BinaryTile_AVX512 tile;
+    for (size_t c = 0; c < 64; c++){
+        tile.row(c) = -1;
+    }
+
+    uint64_t popcount, sum_x, sum_y;
+    popcount = popcount_sumcoord(sum_x, sum_y, tile);
+
+    cout << popcount << endl;
+    cout << sum_x << endl;
+    cout << sum_y << endl;
+#endif
+
+#if 0
+    __m512i popcount;
+    __m512i indexsum;
+    popcount = popcount_indexsum(indexsum, _mm512_set1_epi64(-1));
+
+//    cout << popcount << " " << indexsum << endl;
+    print_u64(popcount);
+    print_u64(indexsum);
+#endif
 
 #if 0
     __m512i r0 = _mm512_set1_epi64(0x0123456789abcdef);
@@ -213,7 +275,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
     cout << x.dump() << endl;
 #endif
 #if 0
-    BinaryTile_SSE41 m, x;
+    BinaryTile_SSE42 m, x;
     m.set_zero();
     x.set_zero();
 #if 0

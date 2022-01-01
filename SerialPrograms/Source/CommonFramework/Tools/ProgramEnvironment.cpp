@@ -6,6 +6,7 @@
 
 #include <mutex>
 #include <condition_variable>
+#include "Common/Cpp/Pimpl.tpp"
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "StatsTracking.h"
@@ -45,9 +46,7 @@ ProgramEnvironment::ProgramEnvironment(
     : m_logger(logger)
     , m_current_stats(current_stats)
     , m_historical_stats(historical_stats)
-    , m_data(new ProgramEnvironmentData(
-        std::move(program_info)
-    ))
+    , m_data(std::move(program_info))
 {}
 
 const ProgramInfo& ProgramEnvironment::program_info() const{

@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "PokemonSwSh_BattleDialogDetector.h"
@@ -20,7 +21,7 @@ BattleDialogDetector::BattleDialogDetector(Color color)
     , m_left(0.01, 0.82, 0.03, 0.07)
     , m_right(0.97, 0.87, 0.02, 0.09)
 {}
-void BattleDialogDetector::make_overlays(OverlaySet& items) const{
+void BattleDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_bottom);
     items.add(m_color, m_left);
     items.add(m_color, m_right);

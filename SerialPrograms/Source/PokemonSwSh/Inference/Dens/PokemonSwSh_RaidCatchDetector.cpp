@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/ColorClustering.h"
 #include "CommonFramework/Inference/ImageTools.h"
@@ -24,7 +25,7 @@ RaidCatchDetector::RaidCatchDetector(VideoOverlay& overlay)
     , m_text1 (0.82, 0.84 + 1 * 0.078, 0.15, 0.06)
     , m_arrow(overlay, ImageFloatBox(0.75, 0.82, 0.10, 0.10))
 {}
-void RaidCatchDetector::make_overlays(OverlaySet& items) const{
+void RaidCatchDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_left0);
     items.add(COLOR_RED, m_right0);
 //    items.add(COLOR_RED, m_left1);

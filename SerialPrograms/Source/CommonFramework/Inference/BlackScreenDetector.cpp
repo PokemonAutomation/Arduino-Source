@@ -9,6 +9,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "BlackScreenDetector.h"
@@ -25,7 +26,7 @@ BlackScreenDetector::BlackScreenDetector(const ImageFloatBox& box, Color color)
     , m_box(box)
 {}
 
-void BlackScreenDetector::make_overlays(OverlaySet& items) const{
+void BlackScreenDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
 bool BlackScreenDetector::detect(const QImage& screen) const{
@@ -34,7 +35,7 @@ bool BlackScreenDetector::detect(const QImage& screen) const{
 
 
 
-void BlackScreenWatcher::make_overlays(OverlaySet& items) const{
+void BlackScreenWatcher::make_overlays(VideoOverlaySet& items) const{
     BlackScreenDetector::make_overlays(items);
 }
 bool BlackScreenWatcher::process_frame(
@@ -50,7 +51,7 @@ bool BlackScreenWatcher::process_frame(
 BlackScreenOverWatcher::BlackScreenOverWatcher(const ImageFloatBox& box, Color color)
     : m_detector(box, color)
 {}
-void BlackScreenOverWatcher::make_overlays(OverlaySet& items) const{
+void BlackScreenOverWatcher::make_overlays(VideoOverlaySet& items) const{
     m_detector.make_overlays(items);
 }
 

@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "PokemonSwSh_YCommDetector.h"
@@ -23,7 +24,7 @@ YCommMenuDetector::YCommMenuDetector(bool is_on)
     , m_top(0.600, 0.020, 0.100, 0.040)
     , m_bottom(0.100, 0.970, 0.400, 0.020)
 {}
-void YCommMenuDetector::make_overlays(OverlaySet& items) const{
+void YCommMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_top);
     items.add(COLOR_RED, m_bottom);
 }

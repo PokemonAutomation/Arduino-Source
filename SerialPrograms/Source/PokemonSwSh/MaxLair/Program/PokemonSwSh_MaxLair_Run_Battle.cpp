@@ -7,6 +7,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/Exception.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Inference/VisualInferenceSession.h"
@@ -38,7 +39,7 @@ bool read_battle_menu(
 ){
     PlayerState& player = state.players[player_index];
 
-    OverlaySet boxes(console);
+    VideoOverlaySet boxes(console);
     BattleMenuReader reader(console, settings.language);
     BattleMoveArrowFinder arrow_finder(console);
     arrow_finder.make_overlays(boxes);

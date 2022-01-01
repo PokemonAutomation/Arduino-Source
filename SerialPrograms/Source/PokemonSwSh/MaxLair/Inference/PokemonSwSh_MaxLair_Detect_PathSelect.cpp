@@ -7,6 +7,7 @@
 #include <cmath>
 #include "Common/Compiler.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
@@ -34,7 +35,7 @@ PathScreenDetector::PathScreenDetector()
     , m_box2(0.074, 0.420 + 2*0.16315, 0.020, 0.007)
     , m_box3(0.074, 0.420 + 3*0.16315, 0.020, 0.007)
 {}
-void PathScreenDetector::make_overlays(OverlaySet& items) const{
+void PathScreenDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_CYAN, m_bottom_main);
     items.add(COLOR_CYAN, m_main);
     items.add(COLOR_CYAN, m_box0);
@@ -101,7 +102,7 @@ PathSelectDetector::PathSelectDetector()
 //    , m_dialog_right(0.710, 0.880, 0.030, 0.050)
     , m_left(0.050, 0.100, 0.200, 0.700)
 {}
-void PathSelectDetector::make_overlays(OverlaySet& items) const{
+void PathSelectDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_CYAN, m_bottom_right);
     items.add(COLOR_CYAN, m_dialog_left);
     items.add(COLOR_CYAN, m_dialog_middle);

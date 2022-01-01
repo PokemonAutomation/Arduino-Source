@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "FrozenImageDetector.h"
 
@@ -29,7 +30,7 @@ FrozenImageDetector::FrozenImageDetector(
     , m_timeout(timeout)
     , m_rmsd_threshold(rmsd_threshold)
 {}
-void FrozenImageDetector::make_overlays(OverlaySet& set) const{
+void FrozenImageDetector::make_overlays(VideoOverlaySet& set) const{
     set.add(m_color, m_box);
 }
 bool FrozenImageDetector::process_frame(

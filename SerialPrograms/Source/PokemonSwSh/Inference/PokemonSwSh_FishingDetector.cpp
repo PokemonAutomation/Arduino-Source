@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/Inference/InferenceThrottler.h"
@@ -22,7 +23,7 @@ FishingMissDetector::FishingMissDetector()
     : m_hook_box(0.1, 0.15, 0.8, 0.4)
     , m_miss_box(0.3, 0.9, 0.4, 0.05)
 {}
-void FishingMissDetector::make_overlays(OverlaySet& items) const{
+void FishingMissDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_hook_box);
     items.add(COLOR_RED, m_miss_box);
 }
@@ -51,7 +52,7 @@ FishingHookDetector::FishingHookDetector(VideoOverlay& overlay)
     : m_overlay(overlay)
     , m_hook_box(0.1, 0.15, 0.8, 0.4)
 {}
-void FishingHookDetector::make_overlays(OverlaySet& items) const{
+void FishingHookDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_hook_box);
 }
 bool FishingHookDetector::process_frame(

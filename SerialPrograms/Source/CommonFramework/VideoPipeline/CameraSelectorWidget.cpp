@@ -6,6 +6,8 @@
 
 #include <QHBoxLayout>
 #include <QLabel>
+#include <QComboBox>
+#include <QPushButton>
 #include "Common/Qt/NoWheelComboBox.h"
 #include "VideoDisplayWidget.h"
 #include "CameraImplementations.h"
@@ -76,7 +78,7 @@ CameraSelectorWidget::CameraSelectorWidget(
                 return;
             }
             QSize resolution = m_resolutions[index];
-            m_value.m_resolution = resolution;
+            m_value.m_current_resolution = resolution;
             m_display.set_resolution(resolution);
         }
     );
@@ -151,7 +153,7 @@ void CameraSelectorWidget::reset_video(){
 
     const CameraInfo& info = m_value.m_camera;
     if (info){
-        m_display.set_video(make_video_factory(m_logger, info, m_value.m_resolution));
+        m_display.set_video(make_video_factory(m_logger, info, m_value.m_current_resolution));
     }
 
     QSize resolution = m_display.resolution();
@@ -167,7 +169,7 @@ void CameraSelectorWidget::reset_video(){
         m_resolution_box->addItem(
             QString::number(size.width()) + " x " + QString::number(size.height()) + " " + aspect_ratio(size)
         );
-        if (size == m_value.m_resolution){
+        if (size == m_value.m_current_resolution){
             resolution_match = true;
             index = c;
 //            cout << "index0 = " << index << endl;
@@ -177,12 +179,12 @@ void CameraSelectorWidget::reset_video(){
         }
     }
     if (index >= 0){
-        m_value.m_resolution = m_resolutions[index];
+        m_value.m_current_resolution = m_resolutions[index];
         m_resolution_box->setCurrentIndex(index);
         m_resolution_box->activated(index);
     }else{
-        // Reset to default resolution.
-        m_value.m_resolution = QSize(1920, 1080);
+        //  Reset to default resolution.
+        m_value.m_current_resolution = m_value.m_default_resolution;
     }
 }
 void CameraSelectorWidget::async_reset_video(){

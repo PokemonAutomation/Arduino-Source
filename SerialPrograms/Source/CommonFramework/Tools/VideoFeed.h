@@ -74,23 +74,7 @@ private:
 };
 
 
-class OverlaySet{
-public:
-    OverlaySet(VideoOverlay& overlay)
-        : m_overlay(overlay)
-    {}
-
-    void clear(){
-        m_boxes.clear();
-    }
-    void add(Color color, const ImageFloatBox& box){
-        m_boxes.emplace_back(m_overlay, box, color);
-    }
-
-private:
-    VideoOverlay& m_overlay;
-    std::deque<InferenceBoxScope> m_boxes;
-};
+class VideoOverlaySet;
 
 
 

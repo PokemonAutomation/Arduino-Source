@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 
 class StaticScreenDetector{
 public:
-    virtual void make_overlays(OverlaySet& items) const = 0;
+    virtual void make_overlays(VideoOverlaySet& items) const = 0;
     virtual bool detect(const QImage& screen) const = 0;
 };
 

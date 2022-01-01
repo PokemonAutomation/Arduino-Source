@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "PokemonSwSh_ShinySparkleDetector.h"
 
 namespace PokemonAutomation{
@@ -22,7 +23,7 @@ ShinySparkleDetector::ShinySparkleDetector(
     , m_detection_box(detection_box)
     , m_detection_threshold(detection_threshold)
 {}
-void ShinySparkleDetector::make_overlays(OverlaySet& items) const{
+void ShinySparkleDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_detection_box);
 }
 

@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "PokemonBDSP_MenuDetector.h"
@@ -25,7 +26,7 @@ MenuDetector::MenuDetector(Color color)
     , m_cross(0.20, 0.15, 0.60, 0.37)
 {}
 
-void MenuDetector::make_overlays(OverlaySet& items) const{
+void MenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_line0);
     items.add(m_color, m_line1);
     items.add(m_color, m_line2);
@@ -62,7 +63,7 @@ bool MenuDetector::detect(const QImage& screen) const{
     return true;
 }
 
-void MenuWatcher::make_overlays(OverlaySet& items) const{
+void MenuWatcher::make_overlays(VideoOverlaySet& items) const{
     MenuDetector::make_overlays(items);
 }
 bool MenuWatcher::process_frame(

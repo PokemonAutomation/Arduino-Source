@@ -45,7 +45,7 @@ private:
     std::atomic<bool> m_stop;
 
     std::vector<std::function<bool(const QImage&)>> m_callbacks0;
-    std::map<VisualInferenceCallback*, OverlaySet> m_callbacks1;
+    std::map<VisualInferenceCallback*, VideoOverlaySet> m_callbacks1;
 
     std::mutex m_lock;
     std::condition_variable m_cv;

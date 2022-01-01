@@ -5,6 +5,7 @@
  */
 
 #include "ClientSource/Connection/BotBase.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "VisualInferenceSession.h"
 
 namespace PokemonAutomation{
@@ -37,7 +38,7 @@ void VisualInferenceSession::operator+=(std::function<bool(const QImage&)>&& cal
 void VisualInferenceSession::operator+=(VisualInferenceCallback& callback){
     std::unique_lock<std::mutex> lg(m_lock);
     auto iter = m_callbacks1.find(&callback);
-    OverlaySet& boxes = iter != m_callbacks1.end()
+    VideoOverlaySet& boxes = iter != m_callbacks1.end()
         ? iter->second
         : m_callbacks1.emplace(
             std::piecewise_construct,

@@ -9,9 +9,9 @@
 #include "Common/Compiler.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/FireForgetDispatcher.h"
-#include "CommonFramework/Widgets/VideoDisplayWidget.h"
-#include "CommonFramework/Widgets/SerialSelectorWidget.h"
-#include "CommonFramework/Widgets/CameraSelectorWidget.h"
+#include "CommonFramework/ControllerDevices/SerialSelectorWidget.h"
+#include "CommonFramework/VideoPipeline/CameraSelectorWidget.h"
+#include "CommonFramework/VideoPipeline/VideoDisplayWidget.h"
 #include "NintendoSwitch_CommandRow.h"
 #include "NintendoSwitch_SwitchSystemWidget.h"
 

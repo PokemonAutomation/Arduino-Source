@@ -39,7 +39,7 @@ DaySkipperEU::DaySkipperEU(const DaySkipperEU_Descriptor& descriptor)
     )
     , REAL_LIFE_YEAR(
         "<b>Real Life Year:</b>",
-        2021, 2000, 2060
+        2022, 2000, 2060
     )
     , NOTIFICATION_PROGRESS_UPDATE("Progress Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)

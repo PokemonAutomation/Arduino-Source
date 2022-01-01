@@ -10,6 +10,7 @@
 #include <chrono>
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 
@@ -46,7 +47,7 @@ public:
 private:
     Logger& m_logger;
     StaticScreenDetector& m_detector;
-    OverlaySet m_overlays;
+    VideoOverlaySet m_overlays;
     std::chrono::system_clock::time_point m_end_dialog;
     bool m_dialog_on;
 

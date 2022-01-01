@@ -9,13 +9,16 @@
  *  There are no requirements of the elements. They need not be copyable nor
  *  movable since they will stay in place.
  *
+ *
+ *      This file will compile with an imcomplete type for headers. But
+ *  you need to include "FixedLimitVector.tpp" to really use it.
+ *
  */
 
 #ifndef PokemonAutomation_FixedLimitVector_H
 #define PokemonAutomation_FixedLimitVector_H
 
-#include <new>
-#include <utility>
+#include <stddef.h>
 
 namespace PokemonAutomation{
 
@@ -49,10 +52,10 @@ public:
     bool emplace_back(Args&&... args);
     void pop_back();
 
-    const Object* begin() const;
-          Object* begin();
-    const Object* end() const;
-          Object* end();
+    const Object* begin() const{ return m_data; }
+          Object* begin()      { return m_data; };
+    const Object* end() const{ return m_data + m_size; }
+          Object* end()      { return m_data + m_size; }
 
 private:
     Object* m_data;
@@ -66,13 +69,6 @@ private:
 
 //  Implementations
 
-template <typename Object>
-FixedLimitVector<Object>::~FixedLimitVector(){
-    while (m_size > 0){
-        pop_back();
-    }
-    delete[] reinterpret_cast<char*>(m_data);
-}
 template <typename Object>
 FixedLimitVector<Object>::FixedLimitVector(FixedLimitVector&& x)
     : m_data(x.m_data)
@@ -100,66 +96,7 @@ FixedLimitVector<Object>::FixedLimitVector()
     , m_size(0)
     , m_capacity(0)
 {}
-template <typename Object>
-FixedLimitVector<Object>::FixedLimitVector(size_t capacity)
-    : m_size(0)
-    , m_capacity(capacity)
-{
-    m_data = reinterpret_cast<Object*>(new char[capacity * sizeof(Object)]);
-}
 
-template <typename Object>
-void FixedLimitVector<Object>::reset(){
-    while (m_size > 0){
-        pop_back();
-    }
-    delete[] reinterpret_cast<char*>(m_data);
-    m_data = nullptr;
-    m_capacity = 0;
-}
-template <typename Object>
-void FixedLimitVector<Object>::reset(size_t capacity){
-    Object* data = reinterpret_cast<Object*>(new char[capacity * sizeof(Object)]);
-    while (m_size > 0){
-        pop_back();
-    }
-    delete[] reinterpret_cast<char*>(m_data);
-    m_data = data;
-    m_capacity = capacity;
-}
-
-template <typename Object>
-template <class... Args>
-bool FixedLimitVector<Object>::emplace_back(Args&&... args){
-    if (m_size < m_capacity){
-        new (m_data + m_size) Object(std::forward<Args>(args)...);
-        m_size++;
-        return true;
-    }else{
-        return false;
-    }
-}
-template <typename Object>
-void FixedLimitVector<Object>::pop_back(){
-    m_data[--m_size].~Object();
-}
-
-template <typename Object>
-const Object* FixedLimitVector<Object>::begin() const{
-    return m_data;
-}
-template <typename Object>
-Object* FixedLimitVector<Object>::begin(){
-    return m_data;
-}
-template <typename Object>
-const Object* FixedLimitVector<Object>::end() const{
-    return m_data + m_size;
-}
-template <typename Object>
-Object* FixedLimitVector<Object>::end(){
-    return m_data + m_size;
-}
 
 
 

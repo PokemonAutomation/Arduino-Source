@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "PokemonSwSh_StartBattleDetector.h"
 
@@ -22,7 +23,7 @@ StartBattleWatcher::StartBattleWatcher(Color color)
     : m_color(color)
     , m_screen_box(0.2, 0.2, 0.6, 0.6)
 {}
-void StartBattleWatcher::make_overlays(OverlaySet& items) const{
+void StartBattleWatcher::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_screen_box);
 }
 bool StartBattleWatcher::process_frame(

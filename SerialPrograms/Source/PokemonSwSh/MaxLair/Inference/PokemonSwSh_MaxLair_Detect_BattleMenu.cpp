@@ -8,6 +8,7 @@
 #include "Common/Compiler.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/ColorClustering.h"
 #include "CommonFramework/OCR/OCR_Filtering.h"
@@ -40,7 +41,7 @@ BattleMenuDetector::BattleMenuDetector()
     , m_status0     (0.280, 0.870, 0.015, 0.030)
     , m_status1     (0.165, 0.945, 0.100, 0.020)
 {}
-void BattleMenuDetector::make_overlays(OverlaySet& items) const{
+void BattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_YELLOW, m_icon_fight);
     items.add(COLOR_YELLOW, m_icon_pokemon);
     items.add(COLOR_YELLOW, m_icon_run);

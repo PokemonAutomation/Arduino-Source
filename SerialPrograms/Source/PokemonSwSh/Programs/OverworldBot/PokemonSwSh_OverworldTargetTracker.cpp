@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h"
 #include "PokemonSwSh_OverworldTargetTracker.h"
@@ -45,7 +46,7 @@ OverworldTargetTracker::OverworldTargetTracker(
 {
     m_best_target.first = -1;
 }
-void OverworldTargetTracker::make_overlays(OverlaySet& items) const{
+void OverworldTargetTracker::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_search_area);
 }
 

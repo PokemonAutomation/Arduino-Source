@@ -4,10 +4,118 @@
  *
  */
 
+#include "Kernels/Kernels_TrailingZeros.h"
 #include "Kernels_Waterfill_Tile_Default.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
+
+
+
+bool find_bit(size_t& x, size_t& y, const BinaryTile_Default& tile){
+    uint64_t anything = tile.vec[0];
+    anything |= tile.vec[1];
+    anything |= tile.vec[2];
+    anything |= tile.vec[3];
+    if (!anything){
+        return false;
+    }
+    for (size_t c = 0; c < 4; c++){
+        size_t pos;
+        if (trailing_zeros(pos, tile.vec[c])){
+            x = pos;
+            y = c;
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
+uint64_t popcount_indexsum(uint64_t& sum_index, uint64_t x){
+    //  1 -> 2
+    uint64_t sum_high;
+    uint64_t pop_high = (x >> 1) & 0x5555555555555555;
+    uint64_t sumxaxis = pop_high;
+    uint64_t popcount = (x & 0x5555555555555555) + pop_high;
+
+    //  2 -> 4
+    sum_high = (sumxaxis >> 2) & 0x3333333333333333;
+    pop_high = (popcount >> 2) & 0x3333333333333333;
+    sumxaxis = (sumxaxis & 0x3333333333333333) + sum_high;
+    sumxaxis += pop_high << 1;
+    popcount = (popcount & 0x3333333333333333) + pop_high;
+
+    //  4 -> 8
+    sum_high = (sumxaxis >> 4) & 0x0f0f0f0f0f0f0f0f;
+    pop_high = (popcount >> 4) & 0x0f0f0f0f0f0f0f0f;
+    sumxaxis = (sumxaxis & 0x0f0f0f0f0f0f0f0f) + sum_high;
+    sumxaxis += pop_high << 2;
+    popcount = (popcount & 0x0f0f0f0f0f0f0f0f) + pop_high;
+
+    //  8 -> 16
+    sum_high = (sumxaxis >> 8) & 0x00ff00ff00ff00ff;
+    pop_high = (popcount >> 8) & 0x00ff00ff00ff00ff;
+    sumxaxis = (sumxaxis & 0x00ff00ff00ff00ff) + sum_high;
+    sumxaxis += pop_high << 3;
+    popcount = (popcount & 0x00ff00ff00ff00ff) + pop_high;
+
+    //  16 -> 32
+    sum_high = (sumxaxis >> 16) & 0x0000ffff0000ffff;
+    pop_high = (popcount >> 16) & 0x0000ffff0000ffff;
+    sumxaxis = (sumxaxis & 0x0000ffff0000ffff) + sum_high;
+    sumxaxis += pop_high << 4;
+    popcount = (popcount & 0x0000ffff0000ffff) + pop_high;
+
+    //  32 -> 64
+    sum_high = sumxaxis >> 32;
+    pop_high = popcount >> 32;
+    sumxaxis += sum_high;
+    sumxaxis += pop_high << 5;
+    popcount += pop_high;
+
+    sum_index = (uint32_t)sumxaxis;
+    return (uint32_t)popcount;
+}
+uint64_t popcount_sumcoord(
+    uint64_t& sum_xcoord, uint64_t& sum_ycoord,
+    const BinaryTile_Default& tile
+){
+    uint64_t sum_p = 0;
+    uint64_t sum_x = 0;
+    uint64_t sum_y = 0;
+    {
+        uint64_t sum;
+        sum_p += popcount_indexsum(sum, tile.vec[0]);
+        sum_x += sum;
+    }
+    {
+        uint64_t pop, sum;
+        pop = popcount_indexsum(sum, tile.vec[1]);
+        sum_p += pop;
+        sum_x += sum;
+        sum_y += pop;
+    }
+    {
+        uint64_t pop, sum;
+        pop = popcount_indexsum(sum, tile.vec[2]);
+        sum_p += pop;
+        sum_x += sum;
+        sum_y += pop * 2;
+    }
+    {
+        uint64_t pop, sum;
+        pop = popcount_indexsum(sum, tile.vec[3]);
+        sum_p += pop;
+        sum_x += sum;
+        sum_y += pop * 3;
+    }
+    sum_xcoord = sum_x;
+    sum_ycoord = sum_y;
+    return sum_p;
+}
+
 
 
 PA_FORCE_INLINE uint64_t bitreverse64(uint64_t x){
@@ -144,6 +252,53 @@ void waterfill_expand(const BinaryTile_Default& m, BinaryTile_Default& x){
 //        cout << x.dump() << endl;
     }while (changed);
 }
+
+
+
+bool waterfill_touch_top(const BinaryTile_Default& mask, BinaryTile_Default& tile, const BinaryTile_Default& border){
+    uint64_t available = mask.vec[0] & ~tile.vec[0];
+    uint64_t new_bits = available & border.vec[3];
+    if (new_bits == 0){
+        return false;
+    }
+    tile.vec[0] |= new_bits;
+    return true;
+}
+bool waterfill_touch_bottom(const BinaryTile_Default& mask, BinaryTile_Default& tile, const BinaryTile_Default& border){
+    uint64_t available = mask.vec[3] & ~tile.vec[3];
+    uint64_t new_bits = available & border.vec[0];
+    if (new_bits == 0){
+        return false;
+    }
+    tile.vec[3] |= new_bits;
+    return true;
+}
+bool waterfill_touch_left(const BinaryTile_Default& mask, BinaryTile_Default& tile, const BinaryTile_Default& border){
+    bool changed = false;
+    for (size_t c = 0; c < 4; c++){
+        uint64_t available = mask.vec[c] & ~tile.vec[c];
+        uint64_t new_bits = available & (border.vec[c] >> 63);
+        changed |= new_bits != 0;
+        tile.vec[c] |= new_bits;
+    }
+    return changed;
+}
+bool waterfill_touch_right(const BinaryTile_Default& mask, BinaryTile_Default& tile, const BinaryTile_Default& border){
+    bool changed = false;
+    for (size_t c = 0; c < 4; c++){
+        uint64_t available = mask.vec[c] & ~tile.vec[c];
+        uint64_t new_bits = available & (border.vec[c] << 63);
+        changed |= new_bits != 0;
+        tile.vec[c] |= new_bits;
+    }
+    return changed;
+}
+
+
+
+
+
+
 
 
 

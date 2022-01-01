@@ -238,7 +238,7 @@ DoublesShinyDetection detect_shiny_battle(
     StatAccumulatorI32 throttle_stats;
 
     BattleMenuWatcher menu(type.full_battle_menu ? BattleType::WILD : BattleType::STARTER);
-    OverlaySet overlay_boxes(overlay);
+    VideoOverlaySet overlay_boxes(overlay);
     menu.make_overlays(overlay_boxes);
     ShinyEncounterDetector detector(
         logger, overlay,

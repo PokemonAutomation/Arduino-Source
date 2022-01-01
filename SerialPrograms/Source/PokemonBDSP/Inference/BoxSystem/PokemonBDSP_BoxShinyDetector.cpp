@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "PokemonBDSP_BoxShinyDetector.h"
@@ -22,7 +23,7 @@ BoxShinyDetector::BoxShinyDetector(Color color)
     , m_symbol(0.960, 0.145, 0.030, 0.050)
     , m_background(0.960, 0.200, 0.030, 0.400)
 {}
-void BoxShinyDetector::make_overlays(OverlaySet& items) const{
+void BoxShinyDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_symbol);
     items.add(m_color, m_background);
 }

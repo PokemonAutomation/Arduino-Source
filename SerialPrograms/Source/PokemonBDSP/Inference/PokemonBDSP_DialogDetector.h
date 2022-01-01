@@ -19,7 +19,7 @@ class ShortDialogDetector : public StaticScreenDetector{
 public:
     ShortDialogDetector(Color color = COLOR_RED);
 
-    virtual void make_overlays(OverlaySet& items) const override;
+    virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const QImage& screen) const override;
 
 private:
@@ -34,7 +34,7 @@ class ShortDialogWatcher : public ShortDialogDetector, public VisualInferenceCal
 public:
     using ShortDialogDetector::ShortDialogDetector;
 
-    virtual void make_overlays(OverlaySet& items) const override;
+    virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
@@ -48,7 +48,7 @@ class BattleDialogDetector : public StaticScreenDetector{
 public:
     BattleDialogDetector(Color color = COLOR_RED);
 
-    virtual void make_overlays(OverlaySet& items) const override;
+    virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const QImage& screen) const override;
 
 private:

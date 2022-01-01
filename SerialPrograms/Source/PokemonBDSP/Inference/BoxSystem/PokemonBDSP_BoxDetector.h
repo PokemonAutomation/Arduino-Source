@@ -19,7 +19,7 @@ class BoxDetector : public StaticScreenDetector{
 public:
     BoxDetector(Color color = COLOR_RED);
 
-    virtual void make_overlays(OverlaySet& items) const override;
+    virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const QImage& screen) const override;
 
 private:
@@ -35,7 +35,7 @@ class BoxWatcher : public BoxDetector, public VisualInferenceCallback{
 public:
     using BoxDetector::BoxDetector;
 
-    virtual void make_overlays(OverlaySet& items) const override;
+    virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp

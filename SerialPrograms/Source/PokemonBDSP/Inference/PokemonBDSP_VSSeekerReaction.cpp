@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/CommonFilters.h"
 #include "CommonFramework/ImageTools/FillGeometry.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
@@ -71,7 +72,7 @@ VSSeekerReactionTracker::VSSeekerReactionTracker(VideoOverlay& overlay, const Im
     : m_overlay(overlay)
     , m_box(box)
 {}
-void VSSeekerReactionTracker::make_overlays(OverlaySet& items) const{
+void VSSeekerReactionTracker::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box);
 }
 bool VSSeekerReactionTracker::process_frame(

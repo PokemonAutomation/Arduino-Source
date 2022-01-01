@@ -208,7 +208,7 @@ ShinyDetectionResult detect_shiny_battle(
     StatAccumulatorI32 throttle_stats;
 
     StandardBattleMenuWatcher menu(battle_settings.den);
-    OverlaySet overlay_boxes(overlay);
+    VideoOverlaySet overlay_boxes(overlay);
     menu.make_overlays(overlay_boxes);
     ShinyEncounterDetector detector(
         logger,

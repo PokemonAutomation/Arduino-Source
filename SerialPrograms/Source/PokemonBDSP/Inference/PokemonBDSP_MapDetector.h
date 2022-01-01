@@ -19,7 +19,7 @@ class MapDetector : public StaticScreenDetector{
 public:
     MapDetector(Color color = COLOR_RED);
 
-    virtual void make_overlays(OverlaySet& items) const override;
+    virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const QImage& screen) const override;
 
 private:
@@ -34,7 +34,7 @@ class MapWatcher : public MapDetector, public VisualInferenceCallback{
 public:
     using MapDetector::MapDetector;
 
-    virtual void make_overlays(OverlaySet& items) const override;
+    virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp

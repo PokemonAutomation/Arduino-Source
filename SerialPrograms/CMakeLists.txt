@@ -69,10 +69,13 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/FireForgetDispatcher.cpp
     ../Common/Cpp/FireForgetDispatcher.h
     ../Common/Cpp/FixedLimitVector.h
+    ../Common/Cpp/FixedLimitVector.tpp
     ../Common/Cpp/PanicDump.cpp
     ../Common/Cpp/PanicDump.h
     ../Common/Cpp/ParallelTaskRunner.cpp
     ../Common/Cpp/ParallelTaskRunner.h
+    ../Common/Cpp/Pimpl.h
+    ../Common/Cpp/Pimpl.tpp
     ../Common/Cpp/PrettyPrint.cpp
     ../Common/Cpp/PrettyPrint.h
     ../Common/Cpp/SIMDDebuggers.h
@@ -141,6 +144,10 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/QtJsonTools.h
     Source/CommonFramework/BinaryImage/BinaryImage.cpp
     Source/CommonFramework/BinaryImage/BinaryImage.h
+    Source/CommonFramework/ControllerDevices/SerialSelector.cpp
+    Source/CommonFramework/ControllerDevices/SerialSelector.h
+    Source/CommonFramework/ControllerDevices/SerialSelectorWidget.cpp
+    Source/CommonFramework/ControllerDevices/SerialSelectorWidget.h
     Source/CommonFramework/CrashDump.cpp
     Source/CommonFramework/CrashDump.h
     Source/CommonFramework/GlobalSettingsPanel.cpp
@@ -329,26 +336,23 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Tools/StatsTracking.cpp
     Source/CommonFramework/Tools/StatsTracking.h
     Source/CommonFramework/Tools/VideoFeed.h
-    Source/CommonFramework/Widgets/CameraImplementations.cpp
-    Source/CommonFramework/Widgets/CameraImplementations.h
-    Source/CommonFramework/Widgets/CameraInfo.h
-    Source/CommonFramework/Widgets/CameraSelector.cpp
-    Source/CommonFramework/Widgets/CameraSelector.h
-    Source/CommonFramework/Widgets/CameraSelectorWidget.cpp
-    Source/CommonFramework/Widgets/CameraSelectorWidget.h
-    Source/CommonFramework/Widgets/Qt5CameraWidget.cpp
-    Source/CommonFramework/Widgets/Qt5CameraWidget.h
-    Source/CommonFramework/Widgets/Qt6CameraWidget.cpp
-    Source/CommonFramework/Widgets/Qt6CameraWidget.h
-    Source/CommonFramework/Widgets/SerialSelector.cpp
-    Source/CommonFramework/Widgets/SerialSelector.h
-    Source/CommonFramework/Widgets/SerialSelectorWidget.cpp
-    Source/CommonFramework/Widgets/SerialSelectorWidget.h
-    Source/CommonFramework/Widgets/VideoWidget.h
-    Source/CommonFramework/Widgets/VideoDisplayWidget.cpp
-    Source/CommonFramework/Widgets/VideoDisplayWidget.h
-    Source/CommonFramework/Widgets/VideoOverlayWidget.cpp
-    Source/CommonFramework/Widgets/VideoOverlayWidget.h
+    Source/CommonFramework/Tools/VideoOverlaySet.h
+    Source/CommonFramework/VideoPipeline/CameraImplementations.cpp
+    Source/CommonFramework/VideoPipeline/CameraImplementations.h
+    Source/CommonFramework/VideoPipeline/CameraInfo.h
+    Source/CommonFramework/VideoPipeline/CameraSelector.cpp
+    Source/CommonFramework/VideoPipeline/CameraSelector.h
+    Source/CommonFramework/VideoPipeline/CameraSelectorWidget.cpp
+    Source/CommonFramework/VideoPipeline/CameraSelectorWidget.h
+    Source/CommonFramework/VideoPipeline/Qt5CameraWidget.cpp
+    Source/CommonFramework/VideoPipeline/Qt5CameraWidget.h
+    Source/CommonFramework/VideoPipeline/Qt6CameraWidget.cpp
+    Source/CommonFramework/VideoPipeline/Qt6CameraWidget.h
+    Source/CommonFramework/VideoPipeline/VideoWidget.h
+    Source/CommonFramework/VideoPipeline/VideoDisplayWidget.cpp
+    Source/CommonFramework/VideoPipeline/VideoDisplayWidget.h
+    Source/CommonFramework/VideoPipeline/VideoOverlayWidget.cpp
+    Source/CommonFramework/VideoPipeline/VideoOverlayWidget.h
     Source/CommonFramework/Windows/ButtonDiagram.cpp
     Source/CommonFramework/Windows/ButtonDiagram.h
     Source/CommonFramework/Windows/MainWindow.cpp
@@ -381,11 +385,12 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h
-    Source/Kernels/BinaryMatrixTile/Kernels_BinaryMatrixTile_Debugging.h
-    Source/Kernels/BinaryMatrixTile/Kernels_BinaryMatrixTile_Default.h
-    Source/Kernels/BinaryMatrixTile/Kernels_BinaryMatrixTile_x64_AVX2.h
-    Source/Kernels/BinaryMatrixTile/Kernels_BinaryMatrixTile_x64_AVX512.h
-    Source/Kernels/BinaryMatrixTile/Kernels_BinaryMatrixTile_x64_SSE41.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixBase.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Debugging.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Default.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_AVX2.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_AVX512.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_SSE42.h
     Source/Kernels/Kernels_Alignment.h
     Source/Kernels/Kernels_Arch.h
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.cpp
@@ -418,6 +423,7 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX2.h
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.h
+    Source/Kernels/Kernels_TrailingZeros.h
     Source/Kernels/Kernels_x64_SSE41.h
     Source/Kernels/Kernels_x64_AVX2.h
     Source/Kernels/Kernels_x64_AVX512.h
@@ -432,8 +438,8 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX512.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX2.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX2.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_SSE41.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_SSE41.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_SSE42.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_SSE42.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp

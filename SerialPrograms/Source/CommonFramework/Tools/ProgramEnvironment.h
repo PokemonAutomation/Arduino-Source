@@ -10,6 +10,7 @@
 #include <memory>
 #include <chrono>
 #include <QObject>
+#include "Common/Cpp/Pimpl.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 
@@ -97,7 +98,7 @@ private:
     StatsTracker* m_current_stats;
     const StatsTracker* m_historical_stats;
 
-    std::unique_ptr<ProgramEnvironmentData> m_data;
+    Pimpl<ProgramEnvironmentData> m_data;
 };
 
 

@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "PokemonSwSh_ReceivePokemonDetector.h"
 
@@ -23,7 +24,7 @@ ReceivePokemonDetector::ReceivePokemonDetector()
     , m_box_bot_left(0.02, 0.85, 0.1, 0.1)
     , m_has_been_orange(false)
 {}
-void ReceivePokemonDetector::make_overlays(OverlaySet& items) const{
+void ReceivePokemonDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box_top);
     items.add(COLOR_RED, m_box_top_right);
     items.add(COLOR_RED, m_box_bot_left);

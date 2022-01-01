@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/FixedLimitVector.tpp"
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "NintendoSwitch_MultiSwitchProgram.h"
 #include "NintendoSwitch_MultiSwitchProgramWidget.h"
@@ -11,6 +12,7 @@
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
+MultiSwitchProgramEnvironment::~MultiSwitchProgramEnvironment(){}
 
 MultiSwitchProgramEnvironment::MultiSwitchProgramEnvironment(
     ProgramInfo program_info,

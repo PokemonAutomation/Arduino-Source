@@ -7,11 +7,120 @@
 #include "Kernels/Kernels_Arch.h"
 #ifdef PA_Arch_x64_AVX2
 
+#include "Kernels/Kernels_TrailingZeros.h"
 #include "Kernels/Kernels_x64_AVX2.h"
 #include "Kernels_Waterfill_Tile_x64_AVX2.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
+
+
+
+bool find_bit(size_t& x, size_t& y, const BinaryTile_AVX2& tile){
+    __m256i anything = tile.vec[0];
+    anything = _mm256_or_si256(anything, tile.vec[1]);
+    anything = _mm256_or_si256(anything, tile.vec[2]);
+    anything = _mm256_or_si256(anything, tile.vec[3]);
+    if (_mm256_testz_si256(anything, anything)){
+        return false;
+    }
+    for (size_t c = 0; c < 16; c++){
+        size_t pos;
+        if (trailing_zeros(pos, tile.row(c))){
+            x = pos;
+            y = c;
+            return true;
+        }
+    }
+    return false;
+}
+
+
+
+__m256i popcount_indexsum(__m256i& sum_index, __m256i x){
+    //  1 -> 2
+    __m256i sum_high;
+    __m256i pop_high = _mm256_and_si256(_mm256_srli_epi16(x, 1), _mm256_set1_epi8(0x55));
+    __m256i sumxaxis = pop_high;
+    __m256i popcount = _mm256_add_epi8(_mm256_and_si256(x, _mm256_set1_epi8(0x55)), pop_high);
+
+    //  2 -> 4
+    sum_high = _mm256_and_si256(_mm256_srli_epi16(sumxaxis, 2), _mm256_set1_epi8(0x33));
+    pop_high = _mm256_and_si256(_mm256_srli_epi16(popcount, 2), _mm256_set1_epi8(0x33));
+    sumxaxis = _mm256_add_epi8(_mm256_and_si256(sumxaxis, _mm256_set1_epi8(0x33)), sum_high);
+    sumxaxis = _mm256_add_epi8(sumxaxis, _mm256_slli_epi16(pop_high, 1));
+    popcount = _mm256_add_epi8(_mm256_and_si256(popcount, _mm256_set1_epi8(0x33)), pop_high);
+
+    //  4 -> 8
+    sum_high = _mm256_and_si256(_mm256_srli_epi16(sumxaxis, 4), _mm256_set1_epi8(0x0f));
+    pop_high = _mm256_and_si256(_mm256_srli_epi16(popcount, 4), _mm256_set1_epi8(0x0f));
+    sumxaxis = _mm256_add_epi8(_mm256_and_si256(sumxaxis, _mm256_set1_epi8(0x0f)), sum_high);
+    sumxaxis = _mm256_add_epi8(sumxaxis, _mm256_slli_epi16(pop_high, 2));
+    popcount = _mm256_add_epi8(_mm256_and_si256(popcount, _mm256_set1_epi8(0x0f)), pop_high);
+
+    //  8 -> 16
+    sum_high = _mm256_srli_epi16(sumxaxis, 8);
+    pop_high = _mm256_srli_epi16(popcount, 8);
+    sumxaxis = _mm256_add_epi16(_mm256_and_si256(sumxaxis, _mm256_set1_epi16(0x00ff)), sum_high);
+    sumxaxis = _mm256_add_epi16(sumxaxis, _mm256_slli_epi16(pop_high, 3));
+    popcount = _mm256_add_epi16(_mm256_and_si256(popcount, _mm256_set1_epi16(0x00ff)), pop_high);
+
+    //  16 -> 32
+    sum_high = _mm256_srli_epi32(sumxaxis, 16);
+    pop_high = _mm256_srli_epi32(popcount, 16);
+    sumxaxis = _mm256_add_epi32(sumxaxis, sum_high);
+    sumxaxis = _mm256_add_epi32(sumxaxis, _mm256_slli_epi32(pop_high, 4));
+    popcount = _mm256_add_epi32(popcount, pop_high);
+
+    //  32 -> 64
+    sum_high = _mm256_srli_epi64(sumxaxis, 32);
+    pop_high = _mm256_srli_epi64(popcount, 32);
+    sumxaxis = _mm256_add_epi64(sumxaxis, sum_high);
+    sumxaxis = _mm256_add_epi64(sumxaxis, _mm256_slli_epi64(pop_high, 5));
+    popcount = _mm256_add_epi64(popcount, pop_high);
+
+    sum_index = _mm256_and_si256(sumxaxis, _mm256_set1_epi64x(0x000000000000ffff));
+    return _mm256_and_si256(popcount, _mm256_set1_epi64x(0x000000000000ffff));
+}
+uint64_t popcount_sumcoord(
+    uint64_t& sum_xcoord, uint64_t& sum_ycoord,
+    const BinaryTile_AVX2& tile
+){
+    __m256i sum_p, sum_x, sum_y;
+    {
+        __m256i pop, sum;
+        pop = popcount_indexsum(sum, tile.vec[0]);
+        sum_p = pop;
+        sum_x = sum;
+        sum_y = _mm256_mul_epu32(pop, _mm256_setr_epi64x(0, 4, 8, 12));
+    }
+    {
+        __m256i pop, sum;
+        pop = popcount_indexsum(sum, tile.vec[1]);
+        sum_p = _mm256_add_epi64(sum_p, pop);
+        sum_x = _mm256_add_epi64(sum_x, sum);
+        sum_y = _mm256_add_epi64(sum_y, _mm256_mul_epu32(pop, _mm256_setr_epi64x(1, 5, 9, 13)));
+    }
+    {
+        __m256i pop, sum;
+        pop = popcount_indexsum(sum, tile.vec[2]);
+        sum_p = _mm256_add_epi64(sum_p, pop);
+        sum_x = _mm256_add_epi64(sum_x, sum);
+        sum_y = _mm256_add_epi64(sum_y, _mm256_mul_epu32(pop, _mm256_setr_epi64x(2, 6, 10, 14)));
+    }
+    {
+        __m256i pop, sum;
+        pop = popcount_indexsum(sum, tile.vec[3]);
+        sum_p = _mm256_add_epi64(sum_p, pop);
+        sum_x = _mm256_add_epi64(sum_x, sum);
+        sum_y = _mm256_add_epi64(sum_y, _mm256_mul_epu32(pop, _mm256_setr_epi64x(3, 7, 11, 15)));
+    }
+    sum_xcoord = reduce64_x64_AVX2(sum_x);
+    sum_ycoord = reduce64_x64_AVX2(sum_y);
+    return reduce64_x64_AVX2(sum_p);
+}
+
+
 
 
 PA_FORCE_INLINE __m256i bit_reverse(__m256i x){
@@ -169,6 +278,51 @@ void waterfill_expand(const BinaryTile_AVX2& m, BinaryTile_AVX2& x){
 //        cout << x.dump() << endl;
     }while (!_mm256_testz_si256(changed, changed));
 }
+
+
+
+bool waterfill_touch_top(const BinaryTile_AVX2& mask, BinaryTile_AVX2& tile, const BinaryTile_AVX2& border){
+    uint64_t available = mask.top() & ~tile.top();
+    uint64_t new_bits = available & border.bottom();
+    if (new_bits == 0){
+        return false;
+    }
+    tile.top() |= new_bits;
+    return true;
+}
+bool waterfill_touch_bottom(const BinaryTile_AVX2& mask, BinaryTile_AVX2& tile, const BinaryTile_AVX2& border){
+    uint64_t available = mask.bottom() & ~tile.bottom();
+    uint64_t new_bits = available & border.top();
+    if (new_bits == 0){
+        return false;
+    }
+    tile.bottom() |= new_bits;
+    return true;
+}
+bool waterfill_touch_left(const BinaryTile_AVX2& mask, BinaryTile_AVX2& tile, const BinaryTile_AVX2& border){
+    __m256i changed = _mm256_setzero_si256();
+    for (size_t c = 0; c < 4; c++){
+        __m256i available = _mm256_andnot_si256(tile.vec[c], mask.vec[c]);
+        __m256i new_bits = _mm256_and_si256(available, _mm256_srli_epi64(border.vec[c], 63));
+        changed = _mm256_or_si256(changed, new_bits);
+        tile.vec[c] = _mm256_or_si256(tile.vec[c], new_bits);
+    }
+    return !_mm256_testz_si256(changed, changed);
+}
+bool waterfill_touch_right(const BinaryTile_AVX2& mask, BinaryTile_AVX2& tile, const BinaryTile_AVX2& border){
+    __m256i changed = _mm256_setzero_si256();
+    for (size_t c = 0; c < 4; c++){
+        __m256i available = _mm256_andnot_si256(tile.vec[c], mask.vec[c]);
+        __m256i new_bits = _mm256_and_si256(available, _mm256_slli_epi64(border.vec[c], 63));
+        changed = _mm256_or_si256(changed, new_bits);
+        tile.vec[c] = _mm256_or_si256(tile.vec[c], new_bits);
+    }
+    return !_mm256_testz_si256(changed, changed);
+}
+
+
+
+
 
 
 

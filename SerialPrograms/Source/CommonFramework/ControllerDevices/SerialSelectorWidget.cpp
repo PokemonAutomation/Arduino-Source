@@ -4,6 +4,7 @@
  *
  */
 
+#include <QSerialPortInfo>
 #include <QHBoxLayout>
 #include "Common/Qt/NoWheelComboBox.h"
 #include "SerialSelectorWidget.h"

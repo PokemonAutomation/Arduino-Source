@@ -23,7 +23,7 @@ public:
 
     double rmsd(const QImage& frame) const;
 
-    virtual void make_overlays(OverlaySet& items) const override;
+    virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const QImage& screen) const override;
 
 private:
@@ -44,7 +44,7 @@ public:
         Color color = COLOR_RED
     );
 
-    virtual void make_overlays(OverlaySet& items) const override;
+    virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp

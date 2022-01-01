@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/CommonFilters.h"
 #include "CommonFramework/ImageTools/FillGeometry.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
@@ -69,7 +70,7 @@ MarkTracker::MarkTracker(VideoOverlay& overlay, const ImageFloatBox& box)
     , m_box(box)
 {}
 
-void MarkTracker::make_overlays(OverlaySet& items) const{
+void MarkTracker::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box);
 }
 bool MarkTracker::process_frame(

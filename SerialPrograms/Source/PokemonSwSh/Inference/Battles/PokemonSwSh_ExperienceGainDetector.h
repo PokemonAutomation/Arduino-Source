@@ -21,9 +21,10 @@ namespace PokemonSwSh{
 
 class ExperienceGainDetector : public StaticScreenDetector{
 public:
+    ~ExperienceGainDetector();
     ExperienceGainDetector(Color color = COLOR_RED);
 
-    virtual void make_overlays(OverlaySet& items) const override;
+    virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const QImage& screen) const override;
 
 private:
@@ -37,7 +38,7 @@ class ExperienceGainWatcher : public ExperienceGainDetector, public VisualInfere
 public:
     using ExperienceGainDetector::ExperienceGainDetector;
 
-    virtual void make_overlays(OverlaySet& items) const override;
+    virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp

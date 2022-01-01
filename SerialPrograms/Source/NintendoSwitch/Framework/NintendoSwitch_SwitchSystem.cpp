@@ -5,6 +5,7 @@
  */
 
 #include "Common/Qt/QtJsonTools.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch_SwitchSystem.h"
 #include "NintendoSwitch_SwitchSystemWidget.h"
 
@@ -26,7 +27,7 @@ SwitchSystemFactory::SwitchSystemFactory(
     , m_label(std::move(label))
     , m_logger_tag(std::move(logger_tag))
     , m_serial("<b>Serial Port:</b>", m_logger_tag, min_pabotbase)
-    , m_camera(std::move(label))
+    , m_camera(DEFAULT_RESOLUTION, std::move(label))
 {}
 SwitchSystemFactory::SwitchSystemFactory(
     QString label, std::string logger_tag,

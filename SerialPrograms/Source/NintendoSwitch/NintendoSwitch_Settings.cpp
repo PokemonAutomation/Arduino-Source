@@ -14,6 +14,9 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+const QSize DEFAULT_RESOLUTION(1920, 1080);
+
+
 ConsoleSettings& ConsoleSettings::instance(){
     static ConsoleSettings settings;
     return settings;

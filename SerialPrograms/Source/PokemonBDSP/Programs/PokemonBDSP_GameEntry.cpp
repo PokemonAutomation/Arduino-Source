@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
@@ -32,7 +33,7 @@ public:
         , m_invert(invert)
     {}
 
-    virtual void make_overlays(OverlaySet& items) const override{
+    virtual void make_overlays(VideoOverlaySet& items) const override{
         items.add(COLOR_RED, m_box0);
         items.add(COLOR_RED, m_box1);
     }

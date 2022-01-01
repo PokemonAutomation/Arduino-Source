@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/FixedLimitVector.tpp"
 #include "CommonFramework/Options/BatchOption/BatchWidget.h"
 #include "NintendoSwitch_SwitchSystemWidget.h"
 #include "NintendoSwitch_MultiSwitchProgramWidget.h"

@@ -18,7 +18,7 @@ namespace PokemonAutomation{
 
 class VisualInferenceCallback{
 public:
-    virtual void make_overlays(OverlaySet& items) const = 0;
+    virtual void make_overlays(VideoOverlaySet& items) const = 0;
 
     //  Return true if the inference session should stop.
     virtual bool process_frame(

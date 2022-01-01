@@ -12,8 +12,52 @@
 #include "Common/Compiler.h"
 #include "Kernels_x64_SSE41.h"
 
+#include <iostream>
+
 namespace PokemonAutomation{
 namespace Kernels{
+
+
+inline static void print_u8(__m256i x){
+    for (int i = 0; i < 32; i++){
+        std::cout << (int)((const unsigned char*)&x)[i] << " ";
+    }
+    std::cout << std::endl;
+}
+inline static void print_u16(const __m256i& x){
+    union{
+        __m256i v;
+        uint16_t s[16];
+    };
+    v = x;
+    for (int i = 0; i < 16; i++){
+        std::cout << s[i] << " ";
+    }
+    std::cout << std::endl;
+}
+inline static void print_u32(const __m256i& x){
+    union{
+        __m256i v;
+        uint32_t s[8];
+    };
+    v = x;
+    for (int i = 0; i < 8; i++){
+        std::cout << s[i] << " ";
+    }
+    std::cout << std::endl;
+}
+inline static void print_u64(const __m256i& x){
+    union{
+        __m256i v;
+        uint64_t s[4];
+    };
+    v = x;
+    for (int i = 0; i < 4; i++){
+        std::cout << s[i] << " ";
+    }
+    std::cout << std::endl;
+}
+
 
 
 PA_FORCE_INLINE uint64_t reduce32_x64_AVX2(__m256i ymm){
@@ -22,6 +66,14 @@ PA_FORCE_INLINE uint64_t reduce32_x64_AVX2(__m256i ymm){
         _mm256_extracti128_si256(ymm, 1)
     );
     return reduce32_x64_SSE41(xmm);
+}
+PA_FORCE_INLINE uint64_t reduce64_x64_AVX2(__m256i y){
+    __m128i x = _mm_add_epi64(
+        _mm256_castsi256_si128(y),
+        _mm256_extracti128_si256(y, 1)
+    );
+    x = _mm_add_epi64(x, _mm_unpackhi_epi64(x, x));
+    return _mm_cvtsi128_si64(x);
 }
 
 

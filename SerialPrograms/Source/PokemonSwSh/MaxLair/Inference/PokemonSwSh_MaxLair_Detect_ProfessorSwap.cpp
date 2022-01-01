@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "PokemonSwSh_MaxLair_Detect_ProfessorSwap.h"
 
@@ -21,7 +22,7 @@ ProfessorSwapDetector::ProfessorSwapDetector(VideoOverlay& overlay)
     , m_bottom_main(0.100, 0.970, 0.600, 0.020)
 {
 }
-void ProfessorSwapDetector::make_overlays(OverlaySet& items) const{
+void ProfessorSwapDetector::make_overlays(VideoOverlaySet& items) const{
     SelectionArrowFinder::make_overlays(items);
 //    items.add(COLOR_YELLOW, m_dialog0);
 //    items.add(COLOR_YELLOW, m_dialog1);

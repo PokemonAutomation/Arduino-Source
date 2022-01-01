@@ -11,8 +11,52 @@
 #include <immintrin.h>
 #include "Common/Compiler.h"
 
+#include <iostream>
+
 namespace PokemonAutomation{
 namespace Kernels{
+
+
+inline static void print_u8(__m512i x){
+    for (int i = 0; i < 64; i++){
+        std::cout << (int)((const unsigned char*)&x)[i] << " ";
+    }
+    std::cout << std::endl;
+}
+inline static void print_u16(const __m512i& x){
+    union{
+        __m512i v;
+        uint16_t s[32];
+    };
+    v = x;
+    for (int i = 0; i < 32; i++){
+        std::cout << s[i] << " ";
+    }
+    std::cout << std::endl;
+}
+inline static void print_u32(const __m512i& x){
+    union{
+        __m512i v;
+        uint32_t s[16];
+    };
+    v = x;
+    for (int i = 0; i < 16; i++){
+        std::cout << s[i] << " ";
+    }
+    std::cout << std::endl;
+}
+inline static void print_u64(const __m512i& x){
+    union{
+        __m512i v;
+        uint64_t s[8];
+    };
+    v = x;
+    for (int i = 0; i < 8; i++){
+        std::cout << s[i] << " ";
+    }
+    std::cout << std::endl;
+}
+
 
 
 #define _mm512_setr_epi16(  \

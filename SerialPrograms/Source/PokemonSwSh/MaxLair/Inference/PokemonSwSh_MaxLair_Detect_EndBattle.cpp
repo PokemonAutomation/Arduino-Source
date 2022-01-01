@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "PokemonSwSh_MaxLair_Detect_EndBattle.h"
 
@@ -27,7 +28,7 @@ PokemonCaughtMenuDetector::PokemonCaughtMenuDetector()
     , m_bottom_black(0.100, 0.970, 0.600, 0.020)
     , m_bottom_options(0.920, 0.970, 0.070, 0.020)
 {}
-void PokemonCaughtMenuDetector::make_overlays(OverlaySet& items) const{
+void PokemonCaughtMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_MAGENTA, m_top_white);
     items.add(COLOR_MAGENTA, m_caught_left);
     items.add(COLOR_MAGENTA, m_caught_right);

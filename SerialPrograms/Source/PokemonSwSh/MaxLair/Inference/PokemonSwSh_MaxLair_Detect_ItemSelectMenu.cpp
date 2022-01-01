@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "PokemonSwSh_MaxLair_Detect_ItemSelectMenu.h"
 
@@ -20,7 +21,7 @@ ItemSelectDetector::ItemSelectDetector(bool stop_no_detect)
     , m_bottom_right(0.920, 0.970, 0.070, 0.020)
     , m_blue(0.600, 0.020, 0.200, 0.060)
 {}
-void ItemSelectDetector::make_overlays(OverlaySet& items) const{
+void ItemSelectDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_BLUE, m_bottom_main);
     items.add(COLOR_BLUE, m_bottom_right);
     items.add(COLOR_BLUE, m_blue);

@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/Inference/InferenceThrottler.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
@@ -25,7 +26,7 @@ namespace PokemonBDSP{
 StartBattleDetector::StartBattleDetector(VideoOverlay& overlay)
     : m_screen_box(0.2, 0.2, 0.6, 0.6)
 {}
-void StartBattleDetector::make_overlays(OverlaySet& items) const{
+void StartBattleDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_screen_box);
     m_dialog.make_overlays(items);
 }
@@ -55,7 +56,7 @@ StartBattleMenuOverlapDetector::StartBattleMenuOverlapDetector(VideoOverlay& ove
     , m_right(0.90, 0.2, 0.08, 0.5)
     , m_battle_detected(false)
 {}
-void StartBattleMenuOverlapDetector::make_overlays(OverlaySet& items) const{
+void StartBattleMenuOverlapDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_left);
     items.add(COLOR_RED, m_right);
 }

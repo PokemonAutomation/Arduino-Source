@@ -5,6 +5,8 @@
  */
 
 #include "Common/Compiler.h"
+#include "Common/Cpp/FixedLimitVector.tpp"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "PokemonSwSh_ExperienceGainDetector.h"
 
@@ -17,7 +19,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-
+ExperienceGainDetector::~ExperienceGainDetector(){}
 ExperienceGainDetector::ExperienceGainDetector(Color color)
     : m_color(color)
     , m_dialog(color)
@@ -34,7 +36,7 @@ ExperienceGainDetector::ExperienceGainDetector(Color color)
     }
 }
 
-void ExperienceGainDetector::make_overlays(OverlaySet& items) const{
+void ExperienceGainDetector::make_overlays(VideoOverlaySet& items) const{
     m_dialog.make_overlays(items);
     for (const auto& item : m_rows){
         items.add(m_color, item.first);
@@ -66,7 +68,7 @@ bool ExperienceGainDetector::detect(const QImage& screen) const{
 }
 
 
-void ExperienceGainWatcher::make_overlays(OverlaySet& items) const{
+void ExperienceGainWatcher::make_overlays(VideoOverlaySet& items) const{
     ExperienceGainDetector::make_overlays(items);
 }
 bool ExperienceGainWatcher::process_frame(

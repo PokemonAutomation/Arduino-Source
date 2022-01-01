@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
@@ -26,7 +27,7 @@ EndBattleWatcher::EndBattleWatcher(const ImageFloatBox& box, Color color)
     , m_box(box)
     , m_has_been_black(false)
 {}
-void EndBattleWatcher::make_overlays(OverlaySet& items) const{
+void EndBattleWatcher::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
 bool EndBattleWatcher::process_frame(

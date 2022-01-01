@@ -61,7 +61,7 @@ public:
         return m_fetched;
     }
 
-    virtual void make_overlays(OverlaySet& items) const override{
+    virtual void make_overlays(VideoOverlaySet& items) const override{
         items.add(m_color, m_box0);
         items.add(m_color, m_box1);
     }
@@ -199,7 +199,7 @@ bool EggAutonomousState::process_party(){
     BoxShinyDetector shiny_reader;
     IVCheckerReaderScope iv_reader(m_console, m_language);
 
-    OverlaySet set(m_console);
+    VideoOverlaySet set(m_console);
     shiny_reader.make_overlays(set);
 
     //  Make sure the stats menu is up.

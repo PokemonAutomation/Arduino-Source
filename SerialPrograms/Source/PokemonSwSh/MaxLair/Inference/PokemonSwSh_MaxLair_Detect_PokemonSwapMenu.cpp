@@ -4,8 +4,9 @@
  *
  */
 
-#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/OCR/OCR_Filtering.h"
 #include "CommonFramework/OCR/OCR_StringNormalization.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
@@ -40,7 +41,7 @@ PokemonSwapMenuDetector::PokemonSwapMenuDetector(bool stop_no_detect)
     , m_bottom_main(0.100, 0.970, 0.600, 0.020)
     , m_bottom_right(0.920, 0.970, 0.070, 0.020)
 {}
-void PokemonSwapMenuDetector::make_overlays(OverlaySet& items) const{
+void PokemonSwapMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_pink0);
     items.add(COLOR_RED, m_pink1);
     items.add(COLOR_RED, m_pink2);

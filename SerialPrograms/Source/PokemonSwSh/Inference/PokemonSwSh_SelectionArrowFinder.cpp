@@ -6,6 +6,7 @@
 
 #include "Common/Compiler.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/CellMatrix.h"
 #include "CommonFramework/ImageTools/FillGeometry.h"
@@ -106,7 +107,7 @@ SelectionArrowFinder::SelectionArrowFinder(VideoOverlay& overlay, const ImageFlo
     : m_overlay(overlay)
     , m_box(box)
 {}
-void SelectionArrowFinder::make_overlays(OverlaySet& items) const{
+void SelectionArrowFinder::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_YELLOW, m_box);
 }
 bool SelectionArrowFinder::detect(const QImage& screen){

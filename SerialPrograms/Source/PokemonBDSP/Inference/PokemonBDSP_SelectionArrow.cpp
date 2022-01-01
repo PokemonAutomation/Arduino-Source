@@ -6,6 +6,7 @@
 
 #include "Common/Compiler.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/CommonFilters.h"
 #include "CommonFramework/ImageTools/CellMatrix.h"
@@ -92,7 +93,7 @@ void SelectionArrowFinder::detect(const QImage& screen){
         m_arrow_boxes.emplace_back(m_overlay, translate_to_parent(screen, m_box, mark), COLOR_MAGENTA);
     }
 }
-void SelectionArrowFinder::make_overlays(OverlaySet& items) const{
+void SelectionArrowFinder::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
 bool SelectionArrowFinder::process_frame(

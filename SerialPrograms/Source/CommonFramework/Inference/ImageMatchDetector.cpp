@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "ImageMatchDetector.h"
 
@@ -42,7 +43,7 @@ double ImageMatchDetector::rmsd(const QImage& frame) const{
     return ret;
 }
 
-void ImageMatchDetector::make_overlays(OverlaySet& items) const{
+void ImageMatchDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
 bool ImageMatchDetector::detect(const QImage& screen) const{
@@ -63,7 +64,7 @@ ImageMatchWatcher::ImageMatchWatcher(
     , m_start_of_match(std::chrono::system_clock::time_point::min())
 {}
 
-void ImageMatchWatcher::make_overlays(OverlaySet& items) const{
+void ImageMatchWatcher::make_overlays(VideoOverlaySet& items) const{
     ImageMatchDetector::make_overlays(items);
 }
 bool ImageMatchWatcher::process_frame(

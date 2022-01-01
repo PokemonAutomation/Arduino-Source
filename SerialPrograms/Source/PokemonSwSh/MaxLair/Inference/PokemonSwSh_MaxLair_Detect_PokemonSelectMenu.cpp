@@ -5,8 +5,9 @@
  */
 
 #include "Common/Compiler.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/OCR/OCR_Filtering.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh_MaxLair_Detect_PokemonReader.h"
@@ -32,7 +33,7 @@ PokemonSelectMenuDetector::PokemonSelectMenuDetector(bool stop_no_detect)
     , m_select1(0.630, 0.270 + 1*0.258, 0.030, 0.100)
     , m_select2(0.630, 0.270 + 2*0.258, 0.030, 0.100)
 {}
-void PokemonSelectMenuDetector::make_overlays(OverlaySet& items) const{
+void PokemonSelectMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box0);
     items.add(COLOR_RED, m_box1);
     items.add(COLOR_RED, m_box2);

@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/ColorClustering.h"
 #include "CommonFramework/Inference/ImageTools.h"
@@ -32,7 +33,7 @@ BattleMenuDetector::BattleMenuDetector(BattleType battle_type, Color color)
     , m_menu_bag    (0.817, 0.585 + 2 * 0.1075, 0.150, 0.070)
     , m_menu_run    (0.817, 0.585 + 3 * 0.1075, 0.150, 0.070)
 {}
-void BattleMenuDetector::make_overlays(OverlaySet& items) const{
+void BattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_left0_status);
     items.add(m_color, m_left1_status);
     items.add(m_color, m_right_status);
@@ -185,7 +186,7 @@ bool BattleMenuDetector::detect(const QImage& screen) const{
 
 
 
-void BattleMenuWatcher::make_overlays(OverlaySet& items) const{
+void BattleMenuWatcher::make_overlays(VideoOverlaySet& items) const{
     BattleMenuDetector::make_overlays(items);
 }
 bool BattleMenuWatcher::process_frame(

@@ -10,10 +10,12 @@
 #include <vector>
 #include <atomic>
 #include <mutex>
-#include <QComboBox>
-#include <QPushButton>
+#include <QWidget>
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CameraSelector.h"
+
+class QComboBox;
+class QPushButton;
 
 namespace PokemonAutomation{
 

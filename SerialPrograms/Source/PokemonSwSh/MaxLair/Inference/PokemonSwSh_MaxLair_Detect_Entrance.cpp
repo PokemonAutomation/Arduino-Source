@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "PokemonSwSh_MaxLair_Detect_Entrance.h"
@@ -23,7 +24,7 @@ EntranceDetector::EntranceDetector(const QImage& entrance_screen)
     : m_box0(0.020, 0.020, 0.500, 0.750)
     , m_entrance_screen(extract_box(entrance_screen, m_box0))
 {}
-void EntranceDetector::make_overlays(OverlaySet& items) const{
+void EntranceDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_DARKGREEN, m_box0);
 }
 bool EntranceDetector::process_frame(

@@ -20,7 +20,7 @@
 const uint32_t SKIPS            =   10;
 
 //  The current year in real life.
-const uint16_t REAL_LIFE_YEAR   =   2021;
+const uint16_t REAL_LIFE_YEAR   =   2022;
 
 
 ////////////////////////////////////////////////////////////////////////////////

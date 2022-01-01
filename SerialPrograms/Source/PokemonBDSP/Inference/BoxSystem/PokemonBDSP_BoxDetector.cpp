@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "PokemonBDSP_BoxDetector.h"
@@ -25,7 +26,7 @@ BoxDetector::BoxDetector(Color color)
     , m_bottom(0.02, 0.97, 0.10, 0.02)
     , m_row(0.26, 0.20, 0.40, 0.10)
 {}
-void BoxDetector::make_overlays(OverlaySet& items) const{
+void BoxDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_left);
     items.add(m_color, m_right);
     items.add(m_color, m_bottom);
@@ -57,7 +58,7 @@ bool BoxDetector::detect(const QImage& screen) const{
 
 
 
-void BoxWatcher::make_overlays(OverlaySet& items) const{
+void BoxWatcher::make_overlays(VideoOverlaySet& items) const{
     BoxDetector::make_overlays(items);
 }
 bool BoxWatcher::process_frame(

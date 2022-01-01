@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "PokemonBDSP_MapDetector.h"
 
@@ -24,7 +25,7 @@ MapDetector::MapDetector(Color color)
     , m_box1(0.02, 0.97, 0.12, 0.02)
     , m_box2(0.88, 0.84, 0.10, 0.04)
 {}
-void MapDetector::make_overlays(OverlaySet& items) const{
+void MapDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box0);
     items.add(m_color, m_box1);
     items.add(m_color, m_box2);
@@ -50,7 +51,7 @@ bool MapDetector::detect(const QImage& screen) const{
 
 
 
-void MapWatcher::make_overlays(OverlaySet& items) const{
+void MapWatcher::make_overlays(VideoOverlaySet& items) const{
     MapDetector::make_overlays(items);
 }
 bool MapWatcher::process_frame(

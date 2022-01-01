@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_NintendoSwitch_SwitchSystem_H
 #define PokemonAutomation_NintendoSwitch_SwitchSystem_H
 
-#include "CommonFramework/Widgets/SerialSelector.h"
-#include "CommonFramework/Widgets/CameraSelector.h"
+#include "CommonFramework/ControllerDevices/SerialSelector.h"
+#include "CommonFramework/VideoPipeline/CameraSelector.h"
 #include "NintendoSwitch_SwitchSetup.h"
 
 namespace PokemonAutomation{

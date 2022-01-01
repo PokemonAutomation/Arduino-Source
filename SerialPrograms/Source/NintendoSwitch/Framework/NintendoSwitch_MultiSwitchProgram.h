@@ -20,6 +20,8 @@ namespace NintendoSwitch{
 
 class MultiSwitchProgramEnvironment : public ProgramEnvironment{
 public:
+    ~MultiSwitchProgramEnvironment();
+
     FixedLimitVector<ConsoleHandle> consoles;
 
     //  Run the specified lambda for all switches in parallel.

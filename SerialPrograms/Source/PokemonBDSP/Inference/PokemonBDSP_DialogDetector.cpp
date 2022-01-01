@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "PokemonBDSP_DialogDetector.h"
@@ -25,7 +26,7 @@ ShortDialogDetector::ShortDialogDetector(Color color)
     , m_right_white(0.785, 0.835, 0.008, 0.12)
     , m_right(0.822, 0.835, 0.02, 0.12)
 {}
-void ShortDialogDetector::make_overlays(OverlaySet& items) const{
+void ShortDialogDetector::make_overlays(VideoOverlaySet& items) const{
 //    items.add(m_color, m_bottom);
     items.add(m_color, m_left_white);
     items.add(m_color, m_left);
@@ -59,7 +60,7 @@ bool ShortDialogDetector::detect(const QImage& screen) const{
 }
 
 
-void ShortDialogWatcher::make_overlays(OverlaySet& items) const{
+void ShortDialogWatcher::make_overlays(VideoOverlaySet& items) const{
     ShortDialogDetector::make_overlays(items);
 }
 bool ShortDialogWatcher::process_frame(
@@ -79,7 +80,7 @@ BattleDialogDetector::BattleDialogDetector(Color color)
     , m_left(0.04, 0.835, 0.02, 0.12)
     , m_right(0.965, 0.835, 0.02, 0.12)
 {}
-void BattleDialogDetector::make_overlays(OverlaySet& items) const{
+void BattleDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_bottom);
     items.add(m_color, m_left_white);
     items.add(m_color, m_left);

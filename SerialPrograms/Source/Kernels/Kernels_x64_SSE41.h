@@ -11,8 +11,52 @@
 #include <smmintrin.h>
 #include "Common/Compiler.h"
 
+#include <iostream>
+
 namespace PokemonAutomation{
 namespace Kernels{
+
+
+inline static void print_u8(__m128i x){
+    for (int i = 0; i < 16; i++){
+        std::cout << (int)((const unsigned char*)&x)[i] << " ";
+    }
+    std::cout << std::endl;
+}
+inline static void print_u16(const __m128i& x){
+    union{
+        __m128i v;
+        uint16_t s[8];
+    };
+    v = x;
+    for (int i = 0; i < 8; i++){
+        std::cout << s[i] << " ";
+    }
+    std::cout << std::endl;
+}
+inline static void print_u32(const __m128i& x){
+    union{
+        __m128i v;
+        uint32_t s[4];
+    };
+    v = x;
+    for (int i = 0; i < 4; i++){
+        std::cout << s[i] << " ";
+    }
+    std::cout << std::endl;
+}
+inline static void print_u64(const __m128i& x){
+    union{
+        __m128i v;
+        uint64_t s[2];
+    };
+    v = x;
+    for (int i = 0; i < 2; i++){
+        std::cout << s[i] << " ";
+    }
+    std::cout << std::endl;
+}
+
 
 
 PA_FORCE_INLINE uint64_t reduce32_x64_SSE41(__m128i x){
@@ -28,6 +72,7 @@ PA_FORCE_INLINE void transpose_i64_2x2_SSE2(__m128i& r0, __m128i& r1){
     r0 = _mm_unpacklo_epi64(r0, r1);
     r1 = _mm_unpackhi_epi64(a0, r1);
 }
+
 
 
 

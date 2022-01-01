@@ -6,6 +6,7 @@
 
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exception.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
@@ -46,7 +47,7 @@ public:
         }
         return true;
     }
-    virtual void make_overlays(OverlaySet& items) const override{
+    virtual void make_overlays(VideoOverlaySet& items) const override{
         items.add(COLOR_RED, m_box0);
         items.add(COLOR_RED, m_box1);
     }
@@ -94,7 +95,7 @@ QImage enter_lobby(
         connect_to_internet_with_inference(env, console);
     }
 
-    OverlaySet boxes(console);
+    VideoOverlaySet boxes(console);
     SelectionArrowFinder arrow_detector(console, ImageFloatBox(0.350, 0.450, 0.500, 0.400));
     GreyDialogDetector dialog_detector;
     arrow_detector.make_overlays(boxes);
