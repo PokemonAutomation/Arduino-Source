@@ -136,7 +136,7 @@ void sum_sqr_deviation_x64_AVX512(
     for (size_t r = 0; r < height; r++){
         sum_sqr_deviation_x64_AVX512<mode>(
             count, sumsqrs,
-            width, ref, img, vbackground
+            (uint16_t)width, ref, img, vbackground
         );
         ref = (const uint32_t*)((const char*)ref + ref_bytes_per_line);
         img = (const uint32_t*)((const char*)img + img_bytes_per_line);

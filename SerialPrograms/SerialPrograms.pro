@@ -223,6 +223,10 @@ SOURCES += \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX2.cpp \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.cpp \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_Default.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX2.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX512.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_SSE41.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp \
@@ -255,7 +259,8 @@ SOURCES += \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.cpp \
     Source/NintendoSwitch/Programs/PokemonHome_PageSwap.cpp \
-    Source/NintendoSwitch/TestProgram.cpp \
+    Source/NintendoSwitch/TestProgramComputer.cpp \
+    Source/NintendoSwitch/TestProgramSwitch.cpp \
     Source/PanelLists.cpp \
     Source/Pokemon/Inference/Pokemon_IVCheckerReader.cpp \
     Source/Pokemon/Inference/Pokemon_NameReader.cpp \
@@ -697,6 +702,11 @@ HEADERS += \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h \
+    Source/Kernels/BinaryMatrixTile/Kernels_BinaryMatrixTile_Debugging.h \
+    Source/Kernels/BinaryMatrixTile/Kernels_BinaryMatrixTile_Default.h \
+    Source/Kernels/BinaryMatrixTile/Kernels_BinaryMatrixTile_x64_AVX2.h \
+    Source/Kernels/BinaryMatrixTile/Kernels_BinaryMatrixTile_x64_AVX512.h \
+    Source/Kernels/BinaryMatrixTile/Kernels_BinaryMatrixTile_x64_SSE41.h \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Default.h \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.h \
@@ -719,9 +729,13 @@ HEADERS += \
     Source/Kernels/Kernels_x64_SSE41.h \
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h \
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h \
-    Source/Kernels/WaterFill/Kernels_WaterFill_FillQueue.h \
-    Source/Kernels/WaterFill/Kernels_WaterFill_Intrinsics_SSE4.h \
-    Source/Kernels/WaterFill/Kernels_WaterFill_Intrinsics_u64.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_FillQueue.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_SSE4.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_u64.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_Default.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX2.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX512.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_SSE41.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h \
@@ -762,7 +776,8 @@ HEADERS += \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboButton.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.h \
     Source/NintendoSwitch/Programs/PokemonHome_PageSwap.h \
-    Source/NintendoSwitch/TestProgram.h \
+    Source/NintendoSwitch/TestProgramComputer.h \
+    Source/NintendoSwitch/TestProgramSwitch.h \
     Source/PanelLists.h \
     Source/Pokemon/Inference/Pokemon_IVCheckerReader.h \
     Source/Pokemon/Inference/Pokemon_NameReader.h \

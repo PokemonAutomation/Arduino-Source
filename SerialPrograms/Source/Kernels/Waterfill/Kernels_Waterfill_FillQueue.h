@@ -1,11 +1,11 @@
-/*  Fill Queue
+/*  Waterfill Queue
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_Kernels_WaterFill_FillQueue_H
-#define PokemonAutomation_Kernels_WaterFill_FillQueue_H
+#ifndef PokemonAutomation_Kernels_Waterfill_FillQueue_H
+#define PokemonAutomation_Kernels_Waterfill_FillQueue_H
 
 #include <utility>
 #include <vector>
@@ -13,7 +13,7 @@
 
 namespace PokemonAutomation{
 namespace Kernels{
-namespace WaterFill{
+namespace Waterfill{
 
 
 template <typename Intrinsics>

@@ -1,4 +1,4 @@
-/*  Water Fill Mask (64-bit integer)
+/*  Waterfill Mask (64-bit integer)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

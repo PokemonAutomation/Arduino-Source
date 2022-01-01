@@ -23,6 +23,13 @@ PA_FORCE_INLINE uint64_t reduce32_x64_SSE41(__m128i x){
     return ret;
 }
 
+PA_FORCE_INLINE void transpose_i64_2x2_SSE2(__m128i& r0, __m128i& r1){
+    __m128i a0 = r0;
+    r0 = _mm_unpacklo_epi64(r0, r1);
+    r1 = _mm_unpackhi_epi64(a0, r1);
+}
+
+
 
 }
 }

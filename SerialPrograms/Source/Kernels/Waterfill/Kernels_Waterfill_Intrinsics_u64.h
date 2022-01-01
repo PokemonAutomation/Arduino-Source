@@ -1,11 +1,11 @@
-/*  Water Fill Intrinsics (64-bit integer)
+/*  Waterfill Intrinsics (64-bit integer)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_Kernels_WaterFill_Intrinsics_u64_H
-#define PokemonAutomation_Kernels_WaterFill_Intrinsics_u64_H
+#ifndef PokemonAutomation_Kernels_Waterfill_Intrinsics_u64_H
+#define PokemonAutomation_Kernels_Waterfill_Intrinsics_u64_H
 
 #include <stdint.h>
 #include <string>
@@ -17,7 +17,7 @@
 
 namespace PokemonAutomation{
 namespace Kernels{
-namespace WaterFill{
+namespace Waterfill{
 struct Intrinsics_u64{
 
 

@@ -1,16 +1,16 @@
-/*  Water Fill Intrinsics (SSE4)
+/*  Waterfill Intrinsics (SSE4)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_Kernels_WaterFill_Intrinsics_SSE4_H
-#define PokemonAutomation_Kernels_WaterFill_Intrinsics_SSE4_H
+#ifndef PokemonAutomation_Kernels_Waterfill_Intrinsics_SSE4_H
+#define PokemonAutomation_Kernels_Waterfill_Intrinsics_SSE4_H
 
 #include <stdint.h>
 #include <smmintrin.h>
 #include "Common/Compiler.h"
-#include "Kernels_WaterFill_Intrinsics_u64.h"
+#include "Kernels_Waterfill_Intrinsics_u64.h"
 
 #if _MSC_VER
 #include <intrin.h>
@@ -18,7 +18,7 @@
 
 namespace PokemonAutomation{
 namespace Kernels{
-namespace WaterFill{
+namespace Waterfill{
 struct Intrinsics_SSE4{
 
 

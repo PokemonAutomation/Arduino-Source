@@ -14,10 +14,14 @@ set(CMAKE_CXX_STANDARD_REQUIRED ON)
 
 #produce clang tidy file
 set(CMAKE_EXPORT_COMPILE_COMMANDS ON)
+#set(CMAKE_VERBOSE_MAKEFILE ON)
 
 set(CMAKE_AUTOMOC ON)
 set(CMAKE_AUTORCC ON)
 set(CMAKE_AUTOUIC ON)
+
+add_custom_target(build-time-make-directory ALL
+    COMMAND ${CMAKE_COMMAND} -E make_directory Assembly/)
 
 #Find threads library
 set(THREADS_PREFER_PTHREAD_FLAG ON)
@@ -377,6 +381,11 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h
+    Source/Kernels/BinaryMatrixTile/Kernels_BinaryMatrixTile_Debugging.h
+    Source/Kernels/BinaryMatrixTile/Kernels_BinaryMatrixTile_Default.h
+    Source/Kernels/BinaryMatrixTile/Kernels_BinaryMatrixTile_x64_AVX2.h
+    Source/Kernels/BinaryMatrixTile/Kernels_BinaryMatrixTile_x64_AVX512.h
+    Source/Kernels/BinaryMatrixTile/Kernels_BinaryMatrixTile_x64_SSE41.h
     Source/Kernels/Kernels_Alignment.h
     Source/Kernels/Kernels_Arch.h
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.cpp
@@ -414,9 +423,17 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/Kernels_x64_AVX512.h
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h
-    Source/Kernels/WaterFill/Kernels_WaterFill_FillQueue.h
-    Source/Kernels/WaterFill/Kernels_WaterFill_Intrinsics_SSE4.h
-    Source/Kernels/WaterFill/Kernels_WaterFill_Intrinsics_u64.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_FillQueue.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_SSE4.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_u64.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_Default.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_Default.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX512.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX512.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX2.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX2.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_SSE41.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_SSE41.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp
@@ -489,8 +506,10 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_VirtualConsole.h
     Source/NintendoSwitch/Programs/PokemonHome_PageSwap.cpp
     Source/NintendoSwitch/Programs/PokemonHome_PageSwap.h
-    Source/NintendoSwitch/TestProgram.cpp
-    Source/NintendoSwitch/TestProgram.h
+    Source/NintendoSwitch/TestProgramComputer.cpp
+    Source/NintendoSwitch/TestProgramComputer.h
+    Source/NintendoSwitch/TestProgramSwitch.cpp
+    Source/NintendoSwitch/TestProgramSwitch.h
     Source/PanelLists.cpp
     Source/PanelLists.h
     Source/Pokemon/Inference/Pokemon_IVCheckerReader.cpp
@@ -1015,9 +1034,9 @@ target_compile_definitions(SerialPrograms PRIVATE NOMINMAX)
 
 if (EXISTS "../../Internal/SerialPrograms/TelemetryURLs.h")
     target_compile_definitions(SerialPrograms PRIVATE PA_OFFICIAL)
+    target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/TelemetryURLs.h)
     target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_ScalarButtons.cpp)
     target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/NintendoSwitch_ScalarButtons.h)
-    target_sources(SerialPrograms PRIVATE ../../Internal/SerialPrograms/TelemetryURLs.h)
 endif()
 
 #add include directory
@@ -1028,13 +1047,15 @@ if (MSVC)
     target_link_libraries(SerialPrograms tesseractPA.lib Sleepy.lib)
     target_compile_definitions(SerialPrograms PRIVATE PA_TESSERACT PA_SLEEPY)
 
+    target_compile_options(SerialPrograms PRIVATE /FAs /FaAssembly/)
     target_compile_options(SerialPrograms PRIVATE /MP)
     target_compile_options(SerialPrograms PRIVATE /W4)
     target_compile_options(SerialPrograms PRIVATE /wd5054)  # Deprecated enum arithemtic
     target_compile_options(SerialPrograms PRIVATE /wd4505)  # unreferenced local function has been removed
 
-#    target_compile_options(SerialPrograms PRIVATE /arch:AVX2 /DPA_Arch_x64_AVX2)
+#    target_compile_options(SerialPrograms PRIVATE /arch:AVX2   /DPA_Arch_x64_AVX2)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512)
+#    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512GF)
 else()
     target_compile_options(SerialPrograms PRIVATE -msse4.2)
 
