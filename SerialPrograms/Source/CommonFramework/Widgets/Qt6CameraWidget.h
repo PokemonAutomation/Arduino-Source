@@ -56,9 +56,9 @@ private:
     QMediaCaptureSession m_captureSession;
     QVideoSink* m_videoSink = nullptr;
     QVideoFrame m_videoFrame;
+    std::vector<QCameraFormat> m_formats;
 
     mutable std::mutex m_lock;
-    QSize m_resolution;
 };
 
 

@@ -141,6 +141,10 @@ QString CameraSelectorWidget::aspect_ratio(const QSize& size){
     h /= gcd;
     return "(" + QString::number(w) + ":" + QString::number(h) + ")";
 }
+
+
+
+
 void CameraSelectorWidget::reset_video(){
     std::lock_guard<std::mutex> lg(m_camera_lock);
     m_display.close_video();
@@ -177,7 +181,8 @@ void CameraSelectorWidget::reset_video(){
         m_resolution_box->setCurrentIndex(index);
         m_resolution_box->activated(index);
     }else{
-        m_value.m_resolution = QSize();
+        // Reset to default resolution.
+        m_value.m_resolution = QSize(1920, 1080);
     }
 }
 void CameraSelectorWidget::async_reset_video(){
