@@ -12,7 +12,6 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
