@@ -8,20 +8,17 @@
 #define PokemonAutomation_PokemonSwSh_MarkFinder_H
 
 #include <vector>
-#include <QImage>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+
+class QImage;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-size_t find_marks(
-    const QImage& image,
-    std::vector<ImagePixelBox>* exclamation_marks,
-    std::vector<ImagePixelBox>* question_marks
-);
-
+std::vector<ImagePixelBox> find_exclamation_marks(const QImage& image);
+std::vector<ImagePixelBox> find_question_marks(const QImage& image);
 
 
 }

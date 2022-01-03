@@ -100,8 +100,8 @@ PA_FORCE_INLINE void sum_sqr_deviation_x64_AVX2(
         sum_sqr_deviation_x64_AVX2<mode>(total, sum, r, i, background);
     }
 
-    count += reduce32_x64_AVX2(total);
-    sumsqrs += reduce32_x64_AVX2(sum);
+    count += reduce_add32_x64_AVX2(total);
+    sumsqrs += reduce_add32_x64_AVX2(sum);
 }
 
 

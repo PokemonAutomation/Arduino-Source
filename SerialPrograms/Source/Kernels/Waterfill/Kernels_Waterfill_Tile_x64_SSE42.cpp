@@ -7,12 +7,13 @@
 #include "Kernels/Kernels_Arch.h"
 #ifdef PA_Arch_x64_SSE41
 
-#include "Kernels/Kernels_TrailingZeros.h"
+#include "Kernels/Kernels_BitScan.h"
 #include "Kernels/Kernels_x64_SSE41.h"
 #include "Kernels_Waterfill_Tile_x64_SSE42.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
+namespace Waterfill{
 
 
 
@@ -33,6 +34,35 @@ bool find_bit(size_t& x, size_t& y, const BinaryTile_SSE42& tile){
         }
     }
     return false;
+}
+
+
+
+void boundaries(
+    const BinaryTile_SSE42& tile,
+    size_t& min_x, size_t& max_x,
+    size_t& min_y, size_t& max_y
+){
+    __m128i all_or_v = tile.vec[0];
+    all_or_v = _mm_or_si128(all_or_v, tile.vec[1]);
+    all_or_v = _mm_or_si128(all_or_v, tile.vec[2]);
+    all_or_v = _mm_or_si128(all_or_v, tile.vec[3]);
+    uint64_t all_or = _mm_cvtsi128_si64(all_or_v) | _mm_extract_epi64(all_or_v, 1);
+    trailing_zeros(min_x, all_or);
+    max_x = bitlength(all_or);
+
+    for (size_t c = 0; c < 8; c++){
+        if (tile.row(c) != 0){
+            min_y = c;
+            break;
+        }
+    }
+    for (size_t c = 8; c > 0; c--){
+        if (tile.row(c - 1) != 0){
+            max_y = c;
+            break;
+        }
+    }
 }
 
 
@@ -240,11 +270,11 @@ PA_FORCE_INLINE void expand_vertical(
     transpose_i64_2x2_SSE2(x0, x1);
     transpose_i64_2x2_SSE2(x2, x3);
     x1 = _mm_or_si128(x1, _mm_and_si128(_mm_unpackhi_epi64(x0, x0), mask.f1));
-    x2 = _mm_or_si128(x2, _mm_and_si128(_mm_unpackhi_epi64(x3, x3), mask.r2));
+    x2 = _mm_or_si128(x2, _mm_and_si128(_mm_unpacklo_epi64(x3, x3), mask.r2));
     x2 = _mm_or_si128(x2, _mm_and_si128(_mm_unpackhi_epi64(x1, x1), mask.f2));
-    x1 = _mm_or_si128(x1, _mm_and_si128(_mm_unpackhi_epi64(x2, x2), mask.r1));
+    x1 = _mm_or_si128(x1, _mm_and_si128(_mm_unpacklo_epi64(x2, x2), mask.r1));
     x3 = _mm_or_si128(x3, _mm_and_si128(_mm_unpackhi_epi64(x2, x2), mask.f3));
-    x0 = _mm_or_si128(x0, _mm_and_si128(_mm_unpackhi_epi64(x1, x1), mask.r0));
+    x0 = _mm_or_si128(x0, _mm_and_si128(_mm_unpacklo_epi64(x1, x1), mask.r0));
     transpose_i64_2x2_SSE2(x0, x1);
     transpose_i64_2x2_SSE2(x2, x3);
 }
@@ -322,6 +352,7 @@ bool waterfill_touch_right(const BinaryTile_SSE42& mask, BinaryTile_SSE42& tile,
 
 
 
+}
 }
 }
 #endif

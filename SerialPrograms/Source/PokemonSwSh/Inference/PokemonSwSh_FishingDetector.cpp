@@ -61,8 +61,7 @@ bool FishingHookDetector::process_frame(
 ){
     QImage hook_image = extract_box(frame, m_hook_box);
 
-    std::vector<ImagePixelBox> exclamation_marks;
-    find_marks(hook_image, &exclamation_marks, nullptr);
+    std::vector<ImagePixelBox> exclamation_marks = find_exclamation_marks(hook_image);
     for (const ImagePixelBox& mark : exclamation_marks){
         ImageFloatBox box = translate_to_parent(frame, m_hook_box, mark);
         box.x -= box.width * 1.5;

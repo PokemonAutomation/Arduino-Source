@@ -4,11 +4,11 @@
  *
  */
 
+#include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
-#include "CommonFramework/ImageTools/CommonFilters.h"
-#include "CommonFramework/ImageTools/FillGeometry.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
+#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "PokemonBDSP_MarkFinder.h"
 
 #include <iostream>
@@ -19,6 +19,9 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
+using namespace Kernels;
+using namespace Kernels::Waterfill;
+
 
 const QImage& EXCLAMATION_MARK(){
     static QImage image(RESOURCE_PATH() + "PokemonBDSP/ExclamationMark-WhiteFill.png");
@@ -26,16 +29,21 @@ const QImage& EXCLAMATION_MARK(){
 }
 
 
-bool is_exclamation_mark(const QImage& image, const FillGeometry& object){
-    if (object.box.width() > 2 * object.box.height()){
+bool is_exclamation_mark(const QImage& image, const WaterFillObject& object){
+    size_t width = object.width();
+    size_t height = object.height();
+    if (width > 2 * height){
         return false;
     }
-    if (object.box.height() > 2 * object.box.width()){
+    if (height > 2 * width){
         return false;
     }
 
     const QImage& exclamation_mark = EXCLAMATION_MARK();
-    QImage scaled = image.copy(object.box.min_x, object.box.min_y, object.box.width(), object.box.height());
+    QImage scaled = image.copy(
+        (pxint_t)object.min_x, (pxint_t)object.min_y,
+        (pxint_t)width, (pxint_t)height
+    );
     scaled = scaled.scaled(exclamation_mark.width(), exclamation_mark.height());
     double rmsd = ImageMatch::pixel_RMSD(exclamation_mark, scaled);
 //    cout << "rmsd = " << rmsd << endl;
@@ -43,24 +51,18 @@ bool is_exclamation_mark(const QImage& image, const FillGeometry& object){
 }
 
 
-size_t find_exclamation_marks(
-    const QImage& image,
-    std::vector<ImagePixelBox>& exclamation_marks
-){
-    CellMatrix matrix(image);
-    WhiteFilter filter(200);
-    matrix.apply_filter(image, filter);
-
-    size_t count = 0;
-    std::vector<FillGeometry> objects = find_all_objects(matrix, 1, true, 400);
-//    cout << "objects = " << objects.size() << endl;
-    for (const FillGeometry& object : objects){
+std::vector<ImagePixelBox> find_exclamation_marks(const QImage& image){
+    PackedBinaryMatrix matrix = filter_rgb32_min(image, 200, 200, 200);
+    std::vector<WaterFillObject> objects = find_objects_inplace(matrix, 400, false);
+    std::vector<ImagePixelBox> ret;
+    for (const WaterFillObject& object : objects){
         if (is_exclamation_mark(image, object)){
-            exclamation_marks.emplace_back(object.box);
-            count++;
+            ret.emplace_back(
+                ImagePixelBox(object.min_x, object.min_y, object.max_x, object.max_y)
+            );
         }
     }
-    return count;
+    return ret;
 }
 
 
@@ -77,8 +79,7 @@ bool MarkTracker::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point
 ){
-    std::vector<ImagePixelBox> exclamation_marks;
-    find_exclamation_marks(extract_box(frame, m_box), exclamation_marks);
+    std::vector<ImagePixelBox> exclamation_marks = find_exclamation_marks(extract_box(frame, m_box));
 //        cout << exclamation_marks.size() << endl;
 
     m_marks.clear();

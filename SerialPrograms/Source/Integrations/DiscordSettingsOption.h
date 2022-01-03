@@ -45,8 +45,6 @@ public:
     DiscordSettingsOption();
     virtual void load_json(const QJsonValue& json) override;
 
-    void enable_integration();
-
     DiscordMessageSettingsOption message;
     DiscordWebhookSettingsOption webhooks;
     DiscordIntegrationSettingsOption integration;

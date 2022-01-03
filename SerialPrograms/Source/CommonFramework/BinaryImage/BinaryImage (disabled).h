@@ -16,6 +16,7 @@
 #include <memory>
 #include <string>
 #include <QImage>
+#include "Common/Cpp/Pimpl.h"
 
 namespace PokemonAutomation{
 
@@ -38,7 +39,7 @@ public:
 
     void set_zero();
 
-    bool pixel(size_t x, size_t y) const;
+    bool get_pixel(size_t x, size_t y) const;
     void set_pixel(size_t x, size_t y, bool set);
 
     std::string dump() const;
@@ -62,7 +63,6 @@ BinaryImage filter_rgb32_range(
     uint8_t min_green, uint8_t max_green,
     uint8_t min_blue, uint8_t max_blue
 );
-
 
 
 

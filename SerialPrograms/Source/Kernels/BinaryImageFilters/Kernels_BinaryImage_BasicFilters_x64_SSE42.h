@@ -8,7 +8,6 @@
 #define PokemonAutomation_Kernels_BinaryImage_BasicFilters_x64_SSE41_H
 
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
-#include "Kernels_BinaryImage_BasicFilters.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

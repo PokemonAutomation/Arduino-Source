@@ -97,7 +97,7 @@ SOURCES += \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.cpp \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.cpp \
     ../Common/Qt/QtJsonTools.cpp \
-    Source/CommonFramework/BinaryImage/BinaryImage.cpp \
+    Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.cpp \
     Source/CommonFramework/ControllerDevices/SerialSelector.cpp \
     Source/CommonFramework/ControllerDevices/SerialSelectorWidget.cpp \
     Source/CommonFramework/CrashDump.cpp \
@@ -223,6 +223,7 @@ SOURCES += \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX2.cpp \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.cpp \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Tile_Default.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX2.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX512.cpp \
@@ -577,7 +578,7 @@ HEADERS += \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h \
     ../Common/Qt/QtJsonTools.h \
     ../Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h \
-    Source/CommonFramework/BinaryImage/BinaryImage.h \
+    Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h \
     Source/CommonFramework/ControllerDevices/SerialSelector.h \
     Source/CommonFramework/ControllerDevices/SerialSelectorWidget.h \
     Source/CommonFramework/CrashDump.h \
@@ -697,10 +698,6 @@ HEADERS += \
     Source/Integrations/IntegrationsAPI.h \
     Source/Integrations/ProgramTracker.h \
     Source/Integrations/SleepyDiscordRunner.h \
-    Source/Kernels/BinaryImage/Kernels_BinaryImage.h \
-    Source/Kernels/BinaryImage/Kernels_BinaryImageBase.h \
-    Source/Kernels/BinaryImage/Kernels_BinaryImage_Default.h \
-    Source/Kernels/BinaryImage/Kernels_BinaryImage_x64_SSE42.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h \
@@ -726,19 +723,18 @@ HEADERS += \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.h \
     Source/Kernels/Kernels_Alignment.h \
     Source/Kernels/Kernels_Arch.h \
-    Source/Kernels/Kernels_TrailingZeros.h \
+    Source/Kernels/Kernels_BitScan.h \
     Source/Kernels/Kernels_x64_AVX2.h \
     Source/Kernels/Kernels_x64_AVX512.h \
     Source/Kernels/Kernels_x64_SSE41.h \
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h \
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h \
-    Source/Kernels/Waterfill/Kernels_Waterfill_FillQueue.h \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_SSE4.h \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_u64.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Tile_Default.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX2.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX512.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_SSE42.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Types.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h \

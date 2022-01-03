@@ -7,12 +7,13 @@
 #include "Kernels/Kernels_Arch.h"
 #ifdef PA_Arch_x64_AVX2
 
-#include "Kernels/Kernels_TrailingZeros.h"
+#include "Kernels/Kernels_BitScan.h"
 #include "Kernels/Kernels_x64_AVX2.h"
 #include "Kernels_Waterfill_Tile_x64_AVX2.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
+namespace Waterfill{
 
 
 
@@ -33,6 +34,66 @@ bool find_bit(size_t& x, size_t& y, const BinaryTile_AVX2& tile){
         }
     }
     return false;
+}
+
+
+
+void boundaries(
+    const BinaryTile_AVX2& tile,
+    size_t& min_x, size_t& max_x,
+    size_t& min_y, size_t& max_y
+){
+    __m256i all_or_v = tile.vec[0];
+    all_or_v = _mm256_or_si256(all_or_v, tile.vec[1]);
+    all_or_v = _mm256_or_si256(all_or_v, tile.vec[2]);
+    all_or_v = _mm256_or_si256(all_or_v, tile.vec[3]);
+    uint64_t all_or = reduce_or64_x64_AVX2(all_or_v);
+    trailing_zeros(min_x, all_or);
+    max_x = bitlength(all_or);
+
+#if 1
+    __m256i row = _mm256_setr_epi64x(0, 4, 8, 12);
+    __m256i min = _mm256_set1_epi64x(15);
+    __m256i max = _mm256_setzero_si256();
+    for (size_t c = 0; c < 4; c++){
+        __m256i vec = tile.vec[c];
+        __m256i mask = _mm256_cmpeq_epi64(vec, _mm256_setzero_si256());
+        __m256i minr = _mm256_or_si256(row, _mm256_and_si256(mask, _mm256_set1_epi64x(15)));
+        __m256i maxr = _mm256_andnot_si256(mask, row);
+        min = _mm256_min_epi32(min, minr);
+        max = _mm256_max_epi32(max, maxr);
+        row = _mm256_sub_epi64(row, _mm256_set1_epi64x(-1));
+    }
+    {
+        __m128i x = _mm_min_epi32(
+            _mm256_castsi256_si128(min),
+            _mm256_extracti128_si256(min, 1)
+        );
+        x = _mm_min_epi32(x, _mm_unpackhi_epi64(x, x));
+        min_y = _mm_cvtsi128_si64(x);
+    }
+    {
+        __m128i x = _mm_max_epi32(
+            _mm256_castsi256_si128(max),
+            _mm256_extracti128_si256(max, 1)
+        );
+        x = _mm_max_epi32(x, _mm_unpackhi_epi64(x, x));
+        max_y = _mm_cvtsi128_si64(x) + 1;
+    }
+#else
+    for (size_t c = 0; c < 16; c++){
+        if (tile.row(c) != 0){
+            min_y = c;
+            break;
+        }
+    }
+    for (size_t c = 16; c > 0; c--){
+        if (tile.row(c - 1) != 0){
+            max_y = c;
+            break;
+        }
+    }
+#endif
 }
 
 
@@ -115,9 +176,9 @@ uint64_t popcount_sumcoord(
         sum_x = _mm256_add_epi64(sum_x, sum);
         sum_y = _mm256_add_epi64(sum_y, _mm256_mul_epu32(pop, _mm256_setr_epi64x(3, 7, 11, 15)));
     }
-    sum_xcoord = reduce64_x64_AVX2(sum_x);
-    sum_ycoord = reduce64_x64_AVX2(sum_y);
-    return reduce64_x64_AVX2(sum_p);
+    sum_xcoord = reduce_add64_x64_AVX2(sum_x);
+    sum_ycoord = reduce_add64_x64_AVX2(sum_y);
+    return reduce_add64_x64_AVX2(sum_p);
 }
 
 
@@ -328,6 +389,7 @@ bool waterfill_touch_right(const BinaryTile_AVX2& mask, BinaryTile_AVX2& tile, c
 
 
 
+}
 }
 }
 #endif

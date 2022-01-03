@@ -4,27 +4,42 @@
  *
  */
 
+#include <set>
+#include <QImage>
 #include "Common/Cpp/AlignedVector.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
+#include "CommonFramework/ImageTools/FillGeometry.h"
+#include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyFilters.h"
+#include "TestProgramComputer.h"
+
 #include "Kernels/Kernels_Arch.h"
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrixBase.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Tile_Default.h"
 #include "Kernels/Kernels_x64_SSE41.h"
+#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Tile_x64_SSE42.h"
 #ifdef PA_Arch_x64_AVX2
 #include "Kernels/Kernels_x64_AVX2.h"
+#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX2.h"
 #endif
 #ifdef PA_Arch_x64_AVX512
 #include "Kernels/Kernels_x64_AVX512.h"
+#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX512.h"
 #endif
-#include "TestProgramComputer.h"
+#include "Kernels/BinaryMatrix/Kernels_PackedBinaryMatrix.h"
+#include "Kernels/Waterfill/Kernels_Waterfill.h"
 
 #include <iostream>
 using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
+
+using namespace Kernels;
+using namespace Kernels::Waterfill;
 
 
 TestProgramComputer_Descriptor::TestProgramComputer_Descriptor()
@@ -43,7 +58,6 @@ TestProgramComputer::TestProgramComputer(const TestProgramComputer_Descriptor& d
 {
 }
 
-
 inline std::string dump8(uint8_t x){
     std::string str;
     for (size_t c = 0; c < 8; c++){
@@ -60,19 +74,299 @@ inline std::string dump8(uint8_t x){
 
 
 
+
 void TestProgramComputer::program(ProgramEnvironment& env){
     using namespace Kernels;
+    using namespace NintendoSwitch::PokemonSwSh;
 
-    BinaryTile_Default tile;
+
+#if 0
+    QImage image("20220101-214116617784.jpg");
+    {
+        auto time0 = std::chrono::system_clock::now();
+        CellMatrix matrix0(image);
+        BrightYellowLightFilter filter;
+        matrix0.apply_filter(image, filter);
+        auto time1 = std::chrono::system_clock::now();
+        std::vector<FillGeometry> objects0 = find_all_objects(matrix0, 1, false, 10);
+        auto time2 = std::chrono::system_clock::now();
+        cout << "filter  = " << time1 - time0 << endl;
+        cout << "process = " << time2 - time1 << endl;
+        cout << "objects = " << objects0.size() << endl;
+    }
+    {
+        auto time0 = std::chrono::system_clock::now();
+        PackedBinaryMatrix matrix1 = filter_rgb32_range(
+            image,
+            255, 255,
+            192, 255,
+            192, 255,
+            128, 255
+        );
+        auto time1 = std::chrono::system_clock::now();
+        std::vector<WaterFillObject> objects1 = find_objects(matrix1, 10, true);
+        auto time2 = std::chrono::system_clock::now();
+        cout << "filter  = " << time1 - time0 << endl;
+        cout << "process = " << time2 - time1 << endl;
+        cout << "objects = " << objects1.size() << endl;
+    }
+#endif
+
+
+
+#if 0
+    QImage image("20220101-214116617784.jpg");
+    {
+        CellMatrix matrix0(image);
+        BrightYellowLightFilter filter;
+        matrix0.apply_filter(image, filter);
+        std::vector<FillGeometry> objects0 = find_all_objects(matrix0, 1, false, 1);
+        cout << "objects = " << objects0.size() << endl;
+        std::multimap<uint64_t, FillGeometry> sorted0;
+        for (const auto& item : objects0){
+            sorted0.emplace(item.area, item);
+        }
+        for (const auto& item : sorted0){
+            cout << "area = " << item.second.area
+                 << " - (" << item.second.box.min_x
+                 << "," << item.second.box.max_x
+                 << ")(" << item.second.box.min_y
+                 << "," << item.second.box.max_y
+                 << ")" << endl;
+        }
+    }
+    {
+        PackedBinaryMatrix matrix1 = filter_rgb32_range(
+            image,
+            255, 255,
+            192, 255,
+            192, 255,
+            128, 255
+        );
+        std::vector<WaterFillObject> objects1 = find_objects(matrix1);
+        cout << "objects = " << objects1.size() << endl;
+        std::multimap<uint64_t, WaterFillObject> sorted1;
+        for (const auto& item : objects1){
+            sorted1.emplace(item.m_area, item);
+        }
+        for (const auto& item : sorted1){
+            cout << "area = " << item.second.m_area
+                 << " - (" << item.second.m_min_x
+                 << "," << item.second.m_max_x
+                 << ")(" << item.second.m_min_y
+                 << "," << item.second.m_max_y
+                 << ")" << endl;
+        }
+    }
+#endif
+
+
+#if 0
+    QImage image("20220101-214116617784.jpg");
+    CellMatrix matrix0(image);
+    BrightYellowLightFilter filter;
+    matrix0.apply_filter(image, filter);
+    PackedBinaryMatrix matrix1 = filter_rgb32_range(
+        image,
+        255, 255,
+        192, 255,
+        192, 255,
+        128, 255
+    );
+
+//    cout << matrix0[425][819] << endl;
+//    cout << matrix0[425][820] << endl;
+//    cout << matrix1.get(819, 425) << endl;
+//    cout << matrix1.get(820, 425) << endl;
+    cout << matrix1.dump(694, 525, 719, 541) << endl;
+    cout << matrix1.dump(694, 526, 704, 540) << endl;
+//    matrix1.set(819, 425, 0);
+//    matrix1.set(820, 425, 0);
+//    cout << matrix1.dump(811, 403, 835, 435) << endl;
+
+//    cout << matrix1.dump(64*12, 8*53, 64*12 + 64, 8*53 + 8) << endl;
+
+#if 0
+    BinaryTile_AVX512& mask = matrix1.tile(12, 6);
+    cout << mask.dump() << endl;
+
+    BinaryTile_AVX512 tile;
     tile.set_zero();
-    tile.set_bit(20, 3, true);
+    tile.set_bit(63, 32, 1);
+
+    cout << "------------" << endl;
+    Waterfill::waterfill_expand(mask, tile);
+    cout << tile.dump() << endl;
+#endif
+
+#if 0
+    WaterFillObject object;
+    find_object(matrix1, object, 12, 50);
+    cout << "area = " << object.m_area
+         << " - (" << object.m_min_x
+         << "," << object.m_max_x
+         << ")(" << object.m_min_y
+         << "," << object.m_max_y
+         << ")" << endl;
+#endif
+
+#if 0
+    std::vector<FillGeometry> objects0 = find_all_objects(matrix0, 1, false, 1);
+    cout << "objects = " << objects0.size() << endl;
+    std::vector<WaterFillObject> objects1 = find_objects(matrix1);
+    cout << "objects = " << objects1.size() << endl;
+
+
+
+    std::multimap<uint64_t, FillGeometry> sorted0;
+    for (const auto& item : objects0){
+        sorted0.emplace(item.area, item);
+    }
+
+    std::multimap<uint64_t, WaterFillObject> sorted1;
+    for (const auto& item : objects1){
+        sorted1.emplace(item.m_area, item);
+    }
+#endif
+
+#if 0
+    for (const auto& item : sorted0){
+        cout << "area = " << item.second.area
+             << " - (" << item.second.box.min_x
+             << "," << item.second.box.max_x
+             << ")(" << item.second.box.min_y
+             << "," << item.second.box.max_y
+             << ")" << endl;
+    }
+    for (const auto& item : sorted1){
+        cout << "area = " << item.second.m_area
+             << " - (" << item.second.m_min_x
+             << "," << item.second.m_max_x
+             << ")(" << item.second.m_min_y
+             << "," << item.second.m_max_y
+             << ")" << endl;
+    }
+#endif
+#endif
+
+
+
+#if 0
+    QImage image("20220101-214116617784.jpg");
+
+
+    CellMatrix matrix0(image);
+    BrightYellowLightFilter filter;
+    matrix0.apply_filter(image, filter);
+
+    PackedBinaryMatrix matrix1 = filter_rgb32_range(
+        image,
+        255, 255,
+        192, 255,
+        192, 255,
+        128, 255
+    );
+
+    for (size_t r = 0; r < (size_t)matrix0.height(); r++){
+        for (size_t c = 0; c < (size_t)matrix0.width(); c++){
+            if (!!matrix0[r][c] != matrix1.get(c, r)){
+                cout << "(" << c << "," << r << ")" << endl;
+            }
+        }
+    }
+    cout << "asdf" << endl;
+
+#if 0
+    {
+        std::vector<FillGeometry> objects;
+        objects = find_all_objects(matrix0, 1, false, 1);
+        cout << "objects = " << objects.size() << endl;
+    }
+    {
+        std::vector<WaterFillObject> objects = find_objects(matrix1);
+        cout << "objects = " << objects.size() << endl;
+    }
+#endif
+#endif
+
+
+#if 0
+    QImage image("screenshot-20211227-082121670685.png");
+    image = extract_box(image, ImageFloatBox({0.95, 0.10, 0.05, 0.10}));
+    image.save("test.png");
+
+//    QImage image("screenshot-20211227-082121670685.png");
+
+#if 0
+    PackedBinaryMatrix matrix(image.width(), image.height());
+    cout << "width  = " << matrix.width() << endl;
+    cout << "height = " << matrix.height() << endl;
+    cout << "width  = " << matrix.tile_width() << endl;
+    cout << "height = " << matrix.tile_height() << endl;
+
+    RgbRangeFilter_x64_AVX512 filter(
+        255, 255,
+        128, 255,
+        0, 128,
+        0, 128
+    );
+#endif
+
+#if 1
+    PackedBinaryMatrix matrix = filter_rgb32_range(
+        image,
+        255, 255,
+        128, 255,
+        0, 128,
+        0, 128
+    );
+    cout << "width  = " << matrix.tile_width() << endl;
+    cout << "height = " << matrix.tile_height() << endl;
+    cout << matrix.dump() << endl;
+
+
+//    WaterFillObject object;
+//    find_object(matrix, object, 0, 0);
+    std::vector<WaterFillObject> objects = find_objects(matrix);
+
+    for (const auto& object : objects){
+        cout << "x = (" << object.m_min_x << "," << object.m_max_x << ")" << endl;
+        cout << "y = (" << object.m_min_y << "," << object.m_max_y << ")" << endl;
+        cout << "area = " << object.m_area << endl;
+        cout << "sum x = " << object.m_sum_x << endl;
+        cout << "sum y = " << object.m_sum_y << endl;
+    }
+
+#endif
+
+//    cout << matrix.tile(1, 1).dump() << endl;
+#endif
+
+
+
+
+#if 0
+    BinaryTile_AVX2 tile;
+    tile.set_zero();
+    tile.set_bit(10, 13, true);
+    tile.set_bit(20, 1, true);
+//    tile.set_bit(0, 0, true);
+//    tile.set_bit(63, 3, true);
 
     cout << tile.dump() << endl;
 
+    size_t min_x, max_x, min_y, max_y;
+    boundaries(tile, min_x, max_x, min_y, max_y);
+    cout << "x = (" << min_x << "," << max_x << ")" << endl;
+    cout << "y = (" << min_y << "," << max_y << ")" << endl;
+
+#if 0
     size_t x, y;
     if (find_bit(x, y, tile)){
         cout << "(" << x << "," << y << ")" << endl;
     }
+#endif
+#endif
 
 
 #if 0

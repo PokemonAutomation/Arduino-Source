@@ -1,11 +1,11 @@
-/*  Trailing Zeros (Bit Scan Forward)
+/*  Bit Scanning
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_Kernels_TrailingZeros_H
-#define PokemonAutomation_Kernels_TrailingZeros_H
+#ifndef PokemonAutomation_Kernels_BitScaning_H
+#define PokemonAutomation_Kernels_BitScaning_H
 
 #include <stdint.h>
 #include "Common/Compiler.h"
@@ -22,6 +22,10 @@ namespace Kernels{
         zeros = tmp;
         return ret != 0;
     }
+    PA_FORCE_INLINE size_t bitlength(uint64_t x){
+        unsigned long index;
+        return _BitScanReverse64(&index, x) ? index + 1 : 0;
+    }
 }
 }
 #elif __GNUC__
@@ -30,6 +34,10 @@ namespace Kernels{
     PA_FORCE_INLINE bool trailing_zeros(size_t& zeros, uint64_t x){
         zeros = __builtin_ctzll(x);
         return x != 0;
+    }
+    PA_FORCE_INLINE size_t bitlength(uint64_t x){
+        unsigned long index;
+        return x == 0 ? 0 : 64 - __builtin_clzll(x);
     }
 }
 }

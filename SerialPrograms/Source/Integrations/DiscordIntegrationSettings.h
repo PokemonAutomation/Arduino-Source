@@ -19,10 +19,9 @@ namespace Integration{
 
 class DiscordIntegrationSettingsOption : public GroupOption{
 public:
-    DiscordIntegrationSettingsOption(bool integration_enabled);
+    DiscordIntegrationSettingsOption();
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
-    bool m_integration_enabled = false;
     StringOption token;
     StringOption command_prefix;
     BooleanCheckBoxOption use_suffix;

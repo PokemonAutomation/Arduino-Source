@@ -7,8 +7,9 @@
 #ifndef PokemonAutomation_Kernels_BinaryImage_BasicFilters_x64_AVX512_H
 #define PokemonAutomation_Kernels_BinaryImage_BasicFilters_x64_AVX512_H
 
+#include <stdint.h>
 #include <immintrin.h>
-#include "Kernels_BinaryImage_BasicFilters.h"
+#include "Common/Compiler.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

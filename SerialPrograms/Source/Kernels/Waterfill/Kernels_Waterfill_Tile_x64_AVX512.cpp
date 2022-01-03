@@ -7,12 +7,13 @@
 #include "Kernels/Kernels_Arch.h"
 #ifdef PA_Arch_x64_AVX512
 
-#include "Kernels/Kernels_TrailingZeros.h"
+#include "Kernels/Kernels_BitScan.h"
 #include "Kernels/Kernels_x64_AVX512.h"
 #include "Kernels_Waterfill_Tile_x64_AVX512.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
+namespace Waterfill{
 
 
 
@@ -40,9 +41,42 @@ bool find_bit(size_t& x, size_t& y, const BinaryTile_AVX512& tile){
             trailing_zeros(x, word);
             return true;
         }
-        row = _mm512_add_epi64(row, _mm512_set1_epi64(1));
+        row = _mm512_sub_epi64(row, _mm512_set1_epi64(-1));
     }
     return false;
+}
+
+
+
+void boundaries(
+    const BinaryTile_AVX512& tile,
+    size_t& min_x, size_t& max_x,
+    size_t& min_y, size_t& max_y
+){
+    __m512i all_or_v = tile.vec[0];
+    all_or_v = _mm512_or_si512(all_or_v, tile.vec[1]);
+    all_or_v = _mm512_or_si512(all_or_v, tile.vec[2]);
+    all_or_v = _mm512_or_si512(all_or_v, tile.vec[3]);
+    all_or_v = _mm512_or_si512(all_or_v, tile.vec[4]);
+    all_or_v = _mm512_or_si512(all_or_v, tile.vec[5]);
+    all_or_v = _mm512_or_si512(all_or_v, tile.vec[6]);
+    all_or_v = _mm512_or_si512(all_or_v, tile.vec[7]);
+    uint64_t all_or = _mm512_reduce_or_epi64(all_or_v);
+    trailing_zeros(min_x, all_or);
+    max_x = bitlength(all_or);
+
+    __m512i row = _mm512_setr_epi64(0, 8, 16, 24, 32, 40, 48, 56);
+    __m512i min = _mm512_set1_epi64(-1);
+    __m512i max = _mm512_setzero_si512();
+    for (size_t c = 0; c < 8; c++){
+        __m512i vec = tile.vec[c];
+        __mmask8 mask = _mm512_cmpneq_epu64_mask(vec, _mm512_setzero_si512());
+        min = _mm512_mask_min_epu64(min, mask, min, row);
+        max = _mm512_mask_max_epu64(max, mask, max, row);
+        row = _mm512_sub_epi64(row, _mm512_set1_epi64(-1));
+    }
+    min_y = _mm512_reduce_min_epu64(min);
+    max_y = _mm512_reduce_max_epu64(max) + 1;
 }
 
 
@@ -396,7 +430,7 @@ bool waterfill_touch_bottom(const BinaryTile_AVX512& mask, BinaryTile_AVX512& ti
 }
 bool waterfill_touch_left(const BinaryTile_AVX512& mask, BinaryTile_AVX512& tile, const BinaryTile_AVX512& border){
     __m512i changed = _mm512_setzero_si512();
-    for (size_t c = 0; c < 4; c++){
+    for (size_t c = 0; c < 8; c++){
         __m512i available = _mm512_andnot_si512(tile.vec[c], mask.vec[c]);
         __m512i new_bits = _mm512_and_si512(available, _mm512_srli_epi64(border.vec[c], 63));
         changed = _mm512_or_si512(changed, new_bits);
@@ -406,7 +440,7 @@ bool waterfill_touch_left(const BinaryTile_AVX512& mask, BinaryTile_AVX512& tile
 }
 bool waterfill_touch_right(const BinaryTile_AVX512& mask, BinaryTile_AVX512& tile, const BinaryTile_AVX512& border){
     __m512i changed = _mm512_setzero_si512();
-    for (size_t c = 0; c < 4; c++){
+    for (size_t c = 0; c < 8; c++){
         __m512i available = _mm512_andnot_si512(tile.vec[c], mask.vec[c]);
         __m512i new_bits = _mm512_and_si512(available, _mm512_slli_epi64(border.vec[c], 63));
         changed = _mm512_or_si512(changed, new_bits);
@@ -423,6 +457,7 @@ bool waterfill_touch_right(const BinaryTile_AVX512& mask, BinaryTile_AVX512& til
 
 
 
+}
 }
 }
 #endif

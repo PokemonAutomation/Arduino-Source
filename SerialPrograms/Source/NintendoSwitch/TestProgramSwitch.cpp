@@ -100,14 +100,16 @@
 #include "Kernels/ImageStats/Kernels_ImagePixelSumSqr.h"
 #include "Kernels/ImageStats/Kernels_ImagePixelSumSqrDev.h"
 #include "Kernels/Kernels_Alignment.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Intrinsics_SSE4.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_FillQueue.h"
-#include "Kernels/BinaryImage/Kernels_BinaryImage_Default.h"
-#include "Kernels/BinaryImage/Kernels_BinaryImage_x64_SSE42.h"
+//#include "Kernels/Waterfill/Kernels_Waterfill_Intrinsics_SSE4.h"
+//#include "Kernels/Waterfill/Kernels_Waterfill_FillQueue.h"
+//#include "Kernels/BinaryImage/Kernels_BinaryImage_Default.h"
+//#include "Kernels/BinaryImage/Kernels_BinaryImage_x64_SSE42.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h"
 //#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h"
 //#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h"
+#include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "Integrations/DiscordWebhook.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
@@ -134,7 +136,7 @@
 #include "PokemonBDSP/Programs/PokemonBDSP_RunFromBattle.h"
 #include "PokemonBDSP/Programs/PokemonBDSP_BoxRelease.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h"
-#include "CommonFramework/BinaryImage/BinaryImage.h"
+//#include "CommonFramework/BinaryImage/BinaryImage.h"
 #include "TestProgramSwitch.h"
 
 #include <immintrin.h>
@@ -207,6 +209,8 @@ namespace PokemonBDSP{
 
 
 void TestProgram::program(MultiSwitchProgramEnvironment& env){
+    using namespace Kernels;
+    using namespace Kernels::Waterfill;
     using namespace OCR;
     using namespace Pokemon;
     using namespace PokemonBDSP;
@@ -218,7 +222,64 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
+//    InferenceBoxScope box(overlay, {0.23, 0.30, 0.35, 0.30});
 
+
+#if 1
+    QImage image("screenshot-20220103-011451179122.png");
+
+    PackedBinaryMatrix matrix = filter_rgb32_range(
+        image,
+        192, 255,
+        0, 160,
+        0, 192
+    );
+
+    std::vector<WaterFillObject> objects = find_objects(matrix, 100, false);
+    VideoOverlaySet set(overlay);
+    size_t c = 0;
+    for (const WaterFillObject& object : objects){
+        ImagePixelBox box(object.min_x, object.min_y, object.max_x, object.max_y);
+        ImageFloatBox fbox = translate_to_parent(image, {0, 0, 1, 1}, box);
+        set.add(COLOR_RED, fbox);
+
+        image.copy(object.min_x, object.min_y, object.width(), object.height()).save("test-" + QString::number(c++) + ".png");
+    }
+#endif
+
+
+#if 0
+    QImage image("ExclamationTop-0.png");
+
+    for (int r = 0; r < image.height(); r++){
+        for (int c = 0; c < image.width(); c++){
+            uint32_t pixel = image.pixel(c, r);
+            cout << "(" << qRed(pixel) << "," << qGreen(pixel) << "," << qBlue(pixel) << ")";
+        }
+        cout << endl;
+    }
+#endif
+
+
+
+#if 0
+    QImage image("QuestionTop-0.png");
+    image = image.convertToFormat(QImage::Format_ARGB32);
+
+    uint32_t* ptr = (uint32_t*)image.bits();
+    size_t words = image.bytesPerLine() / sizeof(uint32_t);
+
+    for (int r = 0; r < image.height(); r++){
+        for (int c = 0; c < image.width(); c++){
+            uint32_t pixel = ptr[r*words + c];
+            if (qRed(pixel) + qGreen(pixel) + qBlue(pixel) < 50){
+                ptr[r*words + c] = 0;
+            }
+        }
+    }
+
+    image.save("QuestionTop-1.png");
+#endif
 
 
 #if 0

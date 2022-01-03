@@ -4,11 +4,12 @@
  *
  */
 
-#include "Kernels/Kernels_TrailingZeros.h"
+#include "Kernels/Kernels_BitScan.h"
 #include "Kernels_Waterfill_Tile_Default.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
+namespace Waterfill{
 
 
 
@@ -29,6 +30,35 @@ bool find_bit(size_t& x, size_t& y, const BinaryTile_Default& tile){
         }
     }
     return false;
+}
+
+
+
+void boundaries(
+    const BinaryTile_Default& tile,
+    size_t& min_x, size_t& max_x,
+    size_t& min_y, size_t& max_y
+){
+    uint64_t all_or = 0;
+    all_or |= tile.vec[0];
+    all_or |= tile.vec[1];
+    all_or |= tile.vec[2];
+    all_or |= tile.vec[3];
+    trailing_zeros(min_x, all_or);
+    max_x = bitlength(all_or);
+
+    for (size_t c = 0; c < 4; c++){
+        if (tile.vec[c] != 0){
+            min_y = c;
+            break;
+        }
+    }
+    for (size_t c = 4; c > 0; c--){
+        if (tile.vec[c - 1] != 0){
+            max_y = c;
+            break;
+        }
+    }
 }
 
 
@@ -305,6 +335,6 @@ bool waterfill_touch_right(const BinaryTile_Default& mask, BinaryTile_Default& t
 
 
 
-
+}
 }
 }

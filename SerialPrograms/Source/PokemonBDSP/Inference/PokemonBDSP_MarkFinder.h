@@ -18,10 +18,7 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-size_t find_exclamation_marks(
-    const QImage& image,
-    std::vector<ImagePixelBox>& exclamation_marks
-);
+std::vector<ImagePixelBox> find_exclamation_marks(const QImage& image);
 
 
 

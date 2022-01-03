@@ -51,9 +51,7 @@ DiscordMessageSettingsOptionUI::DiscordMessageSettingsOptionUI(QWidget& parent, 
 
 
 
-DiscordSettingsOption::DiscordSettingsOption()
-    : integration(false)
-{
+DiscordSettingsOption::DiscordSettingsOption(){
     PA_ADD_OPTION(message);
     PA_ADD_OPTION(webhooks);
 #ifdef PA_SLEEPY
@@ -63,9 +61,6 @@ DiscordSettingsOption::DiscordSettingsOption()
 void DiscordSettingsOption::load_json(const QJsonValue& json){
     BatchOption::load_json(json);
 
-}
-void DiscordSettingsOption::enable_integration(){
-    integration.m_integration_enabled = true;
 }
 
 

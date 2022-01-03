@@ -154,14 +154,8 @@ bool OverworldTargetTracker::process_frame(
 ){
     QImage image = extract_box(frame, m_search_area);
 
-    std::vector<ImagePixelBox> exclamation_marks;
-    std::vector<ImagePixelBox> question_marks;
-    find_marks(
-        image,
-        &exclamation_marks,
-        &question_marks
-    );
-
+    std::vector<ImagePixelBox> exclamation_marks = find_exclamation_marks(image);
+    std::vector<ImagePixelBox> question_marks = find_question_marks(image);
 
     SpinLockGuard lg(m_lock, "OverworldTargetTracker::on_frame()");
 

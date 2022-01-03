@@ -113,13 +113,13 @@ PA_FORCE_INLINE void pixel_sum_sqr_x64_AVX2(
         sqrR = _mm256_add_epi32(sqrR, r2);
     }
 
-    sums.count += reduce32_x64_AVX2(sumA);
-    sums.sumR += reduce32_x64_AVX2(sumR);
-    sums.sumG += reduce32_x64_AVX2(sumG);
-    sums.sumB += reduce32_x64_AVX2(sumB);
-    sums.sqrR += reduce32_x64_AVX2(sqrR);
-    sums.sqrG += reduce32_x64_AVX2(sqrG);
-    sums.sqrB += reduce32_x64_AVX2(sqrB);
+    sums.count += reduce_add32_x64_AVX2(sumA);
+    sums.sumR += reduce_add32_x64_AVX2(sumR);
+    sums.sumG += reduce_add32_x64_AVX2(sumG);
+    sums.sumB += reduce_add32_x64_AVX2(sumB);
+    sums.sqrR += reduce_add32_x64_AVX2(sqrR);
+    sums.sqrG += reduce_add32_x64_AVX2(sqrG);
+    sums.sqrB += reduce_add32_x64_AVX2(sqrB);
 }
 void pixel_sum_sqr_x64_AVX2(
     PixelSums& sums,

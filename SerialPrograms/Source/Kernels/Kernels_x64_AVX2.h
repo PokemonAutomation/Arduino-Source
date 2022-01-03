@@ -60,19 +60,27 @@ inline static void print_u64(const __m256i& x){
 
 
 
-PA_FORCE_INLINE uint64_t reduce32_x64_AVX2(__m256i ymm){
+PA_FORCE_INLINE uint64_t reduce_add32_x64_AVX2(__m256i ymm){
     __m128i xmm = _mm_add_epi32(
         _mm256_castsi256_si128(ymm),
         _mm256_extracti128_si256(ymm, 1)
     );
     return reduce32_x64_SSE41(xmm);
 }
-PA_FORCE_INLINE uint64_t reduce64_x64_AVX2(__m256i y){
+PA_FORCE_INLINE uint64_t reduce_add64_x64_AVX2(__m256i y){
     __m128i x = _mm_add_epi64(
         _mm256_castsi256_si128(y),
         _mm256_extracti128_si256(y, 1)
     );
     x = _mm_add_epi64(x, _mm_unpackhi_epi64(x, x));
+    return _mm_cvtsi128_si64(x);
+}
+PA_FORCE_INLINE uint64_t reduce_or64_x64_AVX2(__m256i y){
+    __m128i x = _mm_or_si128(
+        _mm256_castsi256_si128(y),
+        _mm256_extracti128_si256(y, 1)
+    );
+    x = _mm_or_si128(x, _mm_unpackhi_epi64(x, x));
     return _mm_cvtsi128_si64(x);
 }
 

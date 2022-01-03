@@ -18,10 +18,7 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-size_t find_seeker_bubbles(
-    const QImage& image,
-    std::vector<ImagePixelBox>& exclamation_marks
-);
+std::vector<ImagePixelBox> find_seeker_bubbles(const QImage& image);
 
 
 
@@ -35,11 +32,13 @@ public:
         std::chrono::system_clock::time_point timestamp
     ) override;
 
+    QSize dimensions() const{ return m_dimensions; }
     const std::vector<ImagePixelBox>& reactions() const{ return m_bubbles; }
 
 protected:
     VideoOverlay& m_overlay;
     ImageFloatBox m_box;
+    QSize m_dimensions;
     std::vector<ImagePixelBox> m_bubbles;
     std::deque<InferenceBoxScope> m_boxes;
 };

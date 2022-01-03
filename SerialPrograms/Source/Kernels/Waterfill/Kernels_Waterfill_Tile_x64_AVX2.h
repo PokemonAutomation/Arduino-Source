@@ -11,6 +11,7 @@
 
 namespace PokemonAutomation{
 namespace Kernels{
+namespace Waterfill{
 
 
 
@@ -18,6 +19,17 @@ namespace Kernels{
 //  If found, (x, y) are set to its coordinates and returns true.
 //  If entire tile is zero, returns false.
 bool find_bit(size_t& x, size_t& y, const BinaryTile_AVX2& tile);
+
+
+
+//  Finds the boundaries of the one-bits inside the tile.
+//  Max values are one past the end.
+//  Behavior is undefined if tile is zero.
+void boundaries(
+    const BinaryTile_AVX2& tile,
+    size_t& min_x, size_t& max_x,
+    size_t& min_y, size_t& max_y
+);
 
 
 
@@ -47,6 +59,7 @@ bool waterfill_touch_right (const BinaryTile_AVX2& mask, BinaryTile_AVX2& tile, 
 
 
 
+}
 }
 }
 #endif

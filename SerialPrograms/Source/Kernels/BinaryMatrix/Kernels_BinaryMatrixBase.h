@@ -14,8 +14,11 @@ namespace PokemonAutomation{
 namespace Kernels{
 
 
-template <typename Tile>
+template <typename TileType>
 class BinaryMatrixBase{
+public:
+    using Tile = TileType;
+
 public:
     //  Rule of 5
     BinaryMatrixBase(BinaryMatrixBase&& x);
@@ -38,27 +41,33 @@ public:
     void set(size_t x, size_t y, bool set);
 
     std::string dump() const;
+    std::string dump(size_t min_x, size_t min_y, size_t max_x, size_t max_y) const;
 
 public:
     //  Tile Access
     size_t tile_width() const{ return m_tile_width; }
     size_t tile_height() const{ return m_tile_height; }
 
+    const TileType& tile(size_t x, size_t y) const;
+    TileType& tile(size_t x, size_t y);
+
+public:
+    //  Word Access
+    size_t word64_width() const{ return m_tile_width; }
+    size_t word64_height() const{ return m_logical_height; }
+
     uint64_t word64(size_t x, size_t y) const;
     uint64_t& word64(size_t x, size_t y);
 
-    const Tile& tile(size_t x, size_t y) const;
-    Tile& tile(size_t x, size_t y);
-
 private:
-    static constexpr size_t TILE_WIDTH = Tile::WIDTH;
-    static constexpr size_t TILE_HEIGHT = Tile::HEIGHT;
+    static constexpr size_t TILE_WIDTH = TileType::WIDTH;
+    static constexpr size_t TILE_HEIGHT = TileType::HEIGHT;
 
     size_t m_logical_width;
     size_t m_logical_height;
     size_t m_tile_width;
     size_t m_tile_height;
-    AlignedVector<Tile> m_data;
+    AlignedVector<TileType> m_data;
 };
 
 
@@ -67,6 +76,8 @@ private:
 
 //  Implementations
 
+
+//  Rule of 5
 
 template <typename Tile>
 BinaryMatrixBase<Tile>::BinaryMatrixBase(BinaryMatrixBase&& x)
@@ -119,6 +130,9 @@ void BinaryMatrixBase<Tile>::operator=(const BinaryMatrixBase& x){
     }
 }
 
+
+//  Construction
+
 template <typename Tile>
 BinaryMatrixBase<Tile>::BinaryMatrixBase(size_t width, size_t height)
     : m_logical_width(width)
@@ -129,49 +143,6 @@ BinaryMatrixBase<Tile>::BinaryMatrixBase(size_t width, size_t height)
 {
     set_zero();
 }
-
-template <typename Tile>
-const Tile& BinaryMatrixBase<Tile>::tile(size_t x, size_t y) const{
-    return m_data[x + y * m_tile_width];
-}
-template <typename Tile>
-Tile& BinaryMatrixBase<Tile>::tile(size_t x, size_t y){
-    return m_data[x + y * m_tile_width];
-}
-template <typename Tile>
-uint64_t BinaryMatrixBase<Tile>::word64(size_t x, size_t y) const{
-    static_assert(TILE_WIDTH == 64);
-    const Tile& tile = this->tile(x, y / TILE_HEIGHT);
-    return tile.row(y % TILE_HEIGHT);
-}
-template <typename Tile>
-uint64_t& BinaryMatrixBase<Tile>::word64(size_t x, size_t y){
-    static_assert(TILE_WIDTH == 64);
-    Tile& tile = this->tile(x, y / TILE_HEIGHT);
-    return tile.row(y % TILE_HEIGHT);
-}
-template <typename Tile>
-bool BinaryMatrixBase<Tile>::get(size_t x, size_t y) const{
-    const Tile& tile = this->tile(x / TILE_WIDTH, y / TILE_HEIGHT);
-    return tile.get_bit(x % TILE_WIDTH, y % TILE_HEIGHT);
-}
-template <typename Tile>
-void BinaryMatrixBase<Tile>::set(size_t x, size_t y, bool set){
-    Tile& tile = this->tile(x / TILE_WIDTH, y / TILE_HEIGHT);
-    tile.set_bit(x % TILE_WIDTH, y % TILE_HEIGHT, set);
-}
-template <typename Tile>
-std::string BinaryMatrixBase<Tile>::dump() const{
-    std::string str;
-    for (size_t r = 0; r < m_logical_height; r++){
-        for (size_t c = 0; c < m_logical_width; c++){
-            str += get(c, r) ? '1' : '0';
-        }
-        str += "\n";
-    }
-    return str;
-}
-
 template <typename Tile>
 void BinaryMatrixBase<Tile>::set_zero(){
     size_t stop = m_tile_width * m_tile_height;
@@ -211,6 +182,72 @@ void BinaryMatrixBase<Tile>::set_ones(){
 
     }
 }
+
+
+
+//  Tile Access
+
+template <typename Tile>
+const Tile& BinaryMatrixBase<Tile>::tile(size_t x, size_t y) const{
+    return m_data[x + y * m_tile_width];
+}
+template <typename Tile>
+Tile& BinaryMatrixBase<Tile>::tile(size_t x, size_t y){
+    return m_data[x + y * m_tile_width];
+}
+
+
+
+//  Word Access
+
+template <typename Tile>
+uint64_t BinaryMatrixBase<Tile>::word64(size_t x, size_t y) const{
+    static_assert(TILE_WIDTH == 64);
+    const Tile& tile = this->tile(x, y / TILE_HEIGHT);
+    return tile.row(y % TILE_HEIGHT);
+}
+template <typename Tile>
+uint64_t& BinaryMatrixBase<Tile>::word64(size_t x, size_t y){
+    static_assert(TILE_WIDTH == 64);
+    Tile& tile = this->tile(x, y / TILE_HEIGHT);
+    return tile.row(y % TILE_HEIGHT);
+}
+
+
+
+//  Bit Access
+
+template <typename Tile>
+bool BinaryMatrixBase<Tile>::get(size_t x, size_t y) const{
+    const Tile& tile = this->tile(x / TILE_WIDTH, y / TILE_HEIGHT);
+    return tile.get_bit(x % TILE_WIDTH, y % TILE_HEIGHT);
+}
+template <typename Tile>
+void BinaryMatrixBase<Tile>::set(size_t x, size_t y, bool set){
+    Tile& tile = this->tile(x / TILE_WIDTH, y / TILE_HEIGHT);
+    tile.set_bit(x % TILE_WIDTH, y % TILE_HEIGHT, set);
+}
+
+
+
+//  Debugging
+
+template <typename Tile>
+std::string BinaryMatrixBase<Tile>::dump() const{
+    return dump(0, 0, m_logical_width, m_logical_height);
+}
+template <typename Tile>
+std::string BinaryMatrixBase<Tile>::dump(size_t min_x, size_t min_y, size_t max_x, size_t max_y) const{
+    std::string str;
+    for (size_t r = min_y; r < max_y; r++){
+        for (size_t c = min_x; c < max_x; c++){
+            str += get(c, r) ? '1' : '0';
+        }
+        str += "\n";
+    }
+    return str;
+}
+
 
 
 }

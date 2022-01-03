@@ -23,6 +23,7 @@ namespace Kernels{
 
 
 
+#if 0
 void filter_min_rgb32(
     BinaryImage& binary_image,
     const uint32_t* image, size_t bytes_per_row,
@@ -81,7 +82,50 @@ void filter_rgb32_range(
 #endif
     rgb32_to_binary_image(binary_image, image, bytes_per_row, filter);
 }
+#endif
 
+
+
+void filter_rgb32_range(
+    PackedBinaryMatrix& binary_image,
+    const uint32_t* image, size_t bytes_per_row,
+    uint8_t min_alpha, uint8_t max_alpha,
+    uint8_t min_red, uint8_t max_red,
+    uint8_t min_green, uint8_t max_green,
+    uint8_t min_blue, uint8_t max_blue
+){
+#if 0
+#elif defined PA_Arch_x64_AVX512
+    RgbRangeFilter_x64_AVX512 filter(
+        min_alpha, max_alpha,
+        min_red, max_red,
+        min_green, max_green,
+        min_blue, max_blue
+    );
+#elif defined PA_Arch_x64_AVX2
+    RgbRangeFilter_x64_AVX2 filter(
+        min_alpha, max_alpha,
+        min_red, max_red,
+        min_green, max_green,
+        min_blue, max_blue
+    );
+#elif defined PA_Arch_x64_SSE42
+    RgbRangeFilter_x64_SSE41 filter(
+        min_alpha, max_alpha,
+        min_red, max_red,
+        min_green, max_green,
+        min_blue, max_blue
+    );
+#else
+    RgbRangeFilter_Default filter(
+        min_alpha, max_alpha,
+        min_red, max_red,
+        min_green, max_green,
+        min_blue, max_blue
+    );
+#endif
+    rgb32_to_binary_image2(binary_image, image, bytes_per_row, filter);
+}
 
 
 

@@ -14,9 +14,9 @@ namespace PokemonAutomation{
 namespace Integration{
 
 
-DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption(bool integration_enabled)
+DiscordIntegrationSettingsOption::DiscordIntegrationSettingsOption()
     : GroupOption("Discord Integration Settings", true, false)
-    , m_integration_enabled(integration_enabled)
+//    , m_integration_enabled(integration_enabled)
     , token(
         true,
         "<b>Discord token:</b><br>Enter your Discord bot's token. Keep it safe and don't share it with anyone.",
@@ -85,7 +85,7 @@ DiscordIntegrationSettingsOptionUI::DiscordIntegrationSettingsOptionUI(QWidget& 
     button_stop->setFont(font);
 
 #ifdef PA_SLEEPY
-    this->setVisible(value.m_integration_enabled);
+//    this->setVisible(value.m_integration_enabled);
     set_options_enabled(value.enabled() && !SleepyDiscordRunner::is_running());
 
     connect(
@@ -107,7 +107,7 @@ DiscordIntegrationSettingsOptionUI::DiscordIntegrationSettingsOptionUI(QWidget& 
 }
 void DiscordIntegrationSettingsOptionUI::on_set_enabled(bool enabled){
 #ifdef PA_SLEEPY
-    set_options_enabled(m_value.enabled() && !SleepyDiscordRunner::is_running());
+    set_options_enabled(enabled && !SleepyDiscordRunner::is_running());
 #endif
 }
 

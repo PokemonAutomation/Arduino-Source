@@ -5,13 +5,13 @@
  */
 
 #include "Common/Compiler.h"
+#include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/CommonFilters.h"
-#include "CommonFramework/ImageTools/CellMatrix.h"
-#include "CommonFramework/ImageTools/FillGeometry.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
+#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "PokemonBDSP_SelectionArrow.h"
 
@@ -23,6 +23,9 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
+using namespace Kernels;
+using namespace Kernels::Waterfill;
+
 
 const QImage& SELECTION_ARROW(){
     static QImage image(RESOURCE_PATH() + "PokemonBDSP/SelectionArrow.png");
@@ -30,16 +33,18 @@ const QImage& SELECTION_ARROW(){
 }
 
 
-bool is_selection_arrow(const QImage& image, const FillGeometry& object){
-    if (object.box.width() > object.box.height()){
+bool is_selection_arrow(const QImage& image, const WaterFillObject& object){
+    size_t width = object.width();
+    size_t height = object.height();
+    if (width > height){
         return false;
     }
-    if (object.box.height() > 3 * object.box.width()){
+    if (height > 3 * width){
         return false;
     }
 
     const QImage& exclamation_mark = SELECTION_ARROW();
-    QImage scaled = image.copy(object.box.min_x, object.box.min_y, object.box.width(), object.box.height());
+    QImage scaled = image.copy(object.min_x, object.min_y, width, height);
 
 //    static int c = 0;
 //    scaled.save("test-" + QString::number(c++) + ".png");
@@ -50,24 +55,19 @@ bool is_selection_arrow(const QImage& image, const FillGeometry& object){
     return rmsd <= 80;
 }
 
-size_t find_selection_arrows(
-    const QImage& image,
-    std::vector<ImagePixelBox>& exclamation_marks
-){
-    CellMatrix matrix(image);
-    BlackFilter filter(200);
-    matrix.apply_filter(image, filter);
 
-    size_t count = 0;
-    std::vector<FillGeometry> objects = find_all_objects(matrix, 1, false, 200);
-//    cout << "objects = " << objects.size() << endl;
-    for (const FillGeometry& object : objects){
+std::vector<ImagePixelBox> find_selection_arrows(const QImage& image){
+    PackedBinaryMatrix matrix = filter_rgb32_max(image, 200, 200, 200);
+    std::vector<WaterFillObject> objects = find_objects_inplace(matrix, 200, false);
+    std::vector<ImagePixelBox> ret;
+    for (const WaterFillObject& object : objects){
         if (is_selection_arrow(image, object)){
-            exclamation_marks.emplace_back(object.box);
-            count++;
+            ret.emplace_back(
+                ImagePixelBox(object.min_x, object.min_y, object.max_x, object.max_y)
+            );
         }
     }
-    return count;
+    return ret;
 }
 
 
@@ -84,12 +84,10 @@ SelectionArrowFinder::SelectionArrowFinder(
 {}
 
 void SelectionArrowFinder::detect(const QImage& screen){
-    std::vector<ImagePixelBox> exclamation_marks;
-    find_selection_arrows(extract_box(screen, m_box), exclamation_marks);
-//        cout << exclamation_marks.size() << endl;
+    std::vector<ImagePixelBox> arrows = find_selection_arrows(extract_box(screen, m_box));
 
     m_arrow_boxes.clear();
-    for (const ImagePixelBox& mark : exclamation_marks){
+    for (const ImagePixelBox& mark : arrows){
         m_arrow_boxes.emplace_back(m_overlay, translate_to_parent(screen, m_box, mark), COLOR_MAGENTA);
     }
 }

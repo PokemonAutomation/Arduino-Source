@@ -21,6 +21,7 @@ struct BinaryTile_AVX2{
 
     __m256i vec[4];
 
+
 public:
     PA_FORCE_INLINE BinaryTile_AVX2() = default;
     PA_FORCE_INLINE BinaryTile_AVX2(const BinaryTile_AVX2& x){
@@ -35,6 +36,7 @@ public:
         vec[2] = x.vec[2];
         vec[3] = x.vec[3];
     }
+
 
 public:
     PA_FORCE_INLINE void set_zero(){
@@ -69,18 +71,25 @@ public:
         vec[2] = _mm256_xor_si256(vec[2], x.vec[2]);
         vec[3] = _mm256_xor_si256(vec[3], x.vec[3]);
     }
-    PA_FORCE_INLINE void operator&=(const BinaryTile_AVX2& x){
-        vec[0] = _mm256_and_si256(vec[0], x.vec[0]);
-        vec[1] = _mm256_and_si256(vec[1], x.vec[1]);
-        vec[2] = _mm256_and_si256(vec[2], x.vec[2]);
-        vec[3] = _mm256_and_si256(vec[3], x.vec[3]);
-    }
     PA_FORCE_INLINE void operator|=(const BinaryTile_AVX2& x){
         vec[0] = _mm256_or_si256(vec[0], x.vec[0]);
         vec[1] = _mm256_or_si256(vec[1], x.vec[1]);
         vec[2] = _mm256_or_si256(vec[2], x.vec[2]);
         vec[3] = _mm256_or_si256(vec[3], x.vec[3]);
     }
+    PA_FORCE_INLINE void operator&=(const BinaryTile_AVX2& x){
+        vec[0] = _mm256_and_si256(vec[0], x.vec[0]);
+        vec[1] = _mm256_and_si256(vec[1], x.vec[1]);
+        vec[2] = _mm256_and_si256(vec[2], x.vec[2]);
+        vec[3] = _mm256_and_si256(vec[3], x.vec[3]);
+    }
+    PA_FORCE_INLINE void andnot(const BinaryTile_AVX2& x){
+        vec[0] = _mm256_andnot_si256(x.vec[0], vec[0]);
+        vec[1] = _mm256_andnot_si256(x.vec[1], vec[1]);
+        vec[2] = _mm256_andnot_si256(x.vec[2], vec[2]);
+        vec[3] = _mm256_andnot_si256(x.vec[3], vec[3]);
+    }
+
 
 public:
     uint64_t top() const{

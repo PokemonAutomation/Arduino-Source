@@ -20,8 +20,10 @@ struct BinaryTile_Default{
 
     uint64_t vec[4];
 
+
 public:
     PA_FORCE_INLINE BinaryTile_Default() = default;
+
 
 public:
     PA_FORCE_INLINE void set_zero(){
@@ -54,18 +56,25 @@ public:
         vec[2] ^= x.vec[2];
         vec[3] ^= x.vec[3];
     }
-    PA_FORCE_INLINE void operator&=(const BinaryTile_Default& x){
-        vec[0] &= x.vec[0];
-        vec[1] &= x.vec[1];
-        vec[2] &= x.vec[2];
-        vec[3] &= x.vec[3];
-    }
     PA_FORCE_INLINE void operator|=(const BinaryTile_Default& x){
         vec[0] |= x.vec[0];
         vec[1] |= x.vec[1];
         vec[2] |= x.vec[2];
         vec[3] |= x.vec[3];
     }
+    PA_FORCE_INLINE void operator&=(const BinaryTile_Default& x){
+        vec[0] &= x.vec[0];
+        vec[1] &= x.vec[1];
+        vec[2] &= x.vec[2];
+        vec[3] &= x.vec[3];
+    }
+    PA_FORCE_INLINE void andnot(const BinaryTile_Default& x){
+        vec[0] &= ~x.vec[0];
+        vec[1] &= ~x.vec[1];
+        vec[2] &= ~x.vec[2];
+        vec[3] &= ~x.vec[3];
+    }
+
 
 public:
     uint64_t top() const{

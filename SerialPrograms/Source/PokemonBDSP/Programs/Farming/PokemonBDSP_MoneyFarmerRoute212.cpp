@@ -258,12 +258,17 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env){
                 pbf_move_left_joystick(env.console, 255, 128, 180, 0);
             }
         }
+
+        //  Move to woman.
+        pbf_move_left_joystick(env.console, 0, 128, 52, 0);
+
         env.console.botbase().wait_for_all_requests();
         stats.m_searches++;
 
+        QSize dimensions;
         std::vector<ImagePixelBox> bubbles;
         {
-            VSSeekerReactionTracker tracker(env.console, {0.05, 0.30, 0.35, 0.30});
+            VSSeekerReactionTracker tracker(env.console, {0.23, 0.30, 0.35, 0.30});
             run_until(
                 env, env.console,
                 [=](const BotBaseContext& context){
@@ -275,6 +280,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env){
             need_to_charge = true;
             pbf_mash_button(env.console, BUTTON_B, 250);
 
+            dimensions = tracker.dimensions();
             bubbles = tracker.reactions();
             if (bubbles.empty()){
                 env.log("No reactions.", COLOR_ORANGE);
@@ -286,11 +292,12 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env){
         bool man = false;
         bool woman = false;
         for (const ImagePixelBox& box : bubbles){
-            env.log("Reaction at: " + std::to_string(box.min_x), COLOR_BLUE);
-            if (box.min_x < 400){
+            double x_coord = (double)box.min_x / dimensions.width();
+            env.log("Reaction at: " + std::to_string(x_coord), COLOR_BLUE);
+            if (x_coord < 0.5){
                 man = true;
             }
-            if (box.min_x > 400){
+            if (x_coord > 0.5){
                 woman = true;
             }
         }
@@ -304,7 +311,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env){
         }
 
         if (woman){
-            pbf_move_left_joystick(env.console, 0, 128, 52, 0);
+//            pbf_move_left_joystick(env.console, 0, 128, 52, 0);
             pbf_move_left_joystick(env.console, 128, 255, 10, 0);
 
             //  Battle woman.
@@ -315,25 +322,25 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env){
                 flyback_heal_and_return(env.console, pp);
                 need_to_charge = false;
                 continue;
-            }else{
-                pbf_move_left_joystick(env.console, 255, 128, 180, 0);
             }
         }
         if (man){
+#if 0
             //  Make sure we have enough PP.
             if (total_pp(pp) < 2){
                 flyback_heal_and_return(env.console, pp);
                 need_to_charge = false;
                 continue;
             }
+#endif
 
-            if (woman){
+//            if (woman){
                 pbf_move_left_joystick(env.console, 0, 128, 52, 0);
                 pbf_move_left_joystick(env.console, 128, 255, 10, 0);
-            }else{
-                pbf_move_left_joystick(env.console, 0, 128, 105, 0);
-                pbf_move_left_joystick(env.console, 128, 255, 10, 0);
-            }
+//            }else{
+//                pbf_move_left_joystick(env.console, 0, 128, 105, 0);
+//                pbf_move_left_joystick(env.console, 128, 255, 10, 0);
+//            }
 
             //  Battle man.
             battle(env, pp, true);
@@ -343,10 +350,9 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env){
                 flyback_heal_and_return(env.console, pp);
                 need_to_charge = false;
                 continue;
-            }else{
-                pbf_move_left_joystick(env.console, 255, 128, 180, 0);
             }
         }
+        pbf_move_left_joystick(env.console, 255, 128, 180, 0);
 
     }
 

@@ -142,8 +142,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h
     ../Common/Qt/QtJsonTools.cpp
     ../Common/Qt/QtJsonTools.h
-    Source/CommonFramework/BinaryImage/BinaryImage.cpp
-    Source/CommonFramework/BinaryImage/BinaryImage.h
+    Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.cpp
+    Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h
     Source/CommonFramework/ControllerDevices/SerialSelector.cpp
     Source/CommonFramework/ControllerDevices/SerialSelector.h
     Source/CommonFramework/ControllerDevices/SerialSelectorWidget.cpp
@@ -373,10 +373,6 @@ file(GLOB MAIN_SOURCES
     Source/Integrations/ProgramTracker.h
     Source/Integrations/SleepyDiscordRunner.cpp
     Source/Integrations/SleepyDiscordRunner.h
-    Source/Kernels/BinaryImage/Kernels_BinaryImage.h
-    Source/Kernels/BinaryImage/Kernels_BinaryImageBase.h
-    Source/Kernels/BinaryImage/Kernels_BinaryImage_Default.h
-    Source/Kernels/BinaryImage/Kernels_BinaryImage_x64_SSE42.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.cpp
@@ -391,6 +387,7 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_AVX2.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_AVX512.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_SSE42.h
+    Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrix.h
     Source/Kernels/Kernels_Alignment.h
     Source/Kernels/Kernels_Arch.h
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.cpp
@@ -423,15 +420,14 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX2.h
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.h
-    Source/Kernels/Kernels_TrailingZeros.h
+    Source/Kernels/Kernels_BitScan.h
     Source/Kernels/Kernels_x64_SSE41.h
     Source/Kernels/Kernels_x64_AVX2.h
     Source/Kernels/Kernels_x64_AVX512.h
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_FillQueue.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_SSE4.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_u64.h
+    Source/Kernels/Waterfill/Kernels_Waterfill.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Tile_Default.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Tile_Default.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX512.cpp
@@ -440,6 +436,7 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX2.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_SSE42.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_SSE42.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Types.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp

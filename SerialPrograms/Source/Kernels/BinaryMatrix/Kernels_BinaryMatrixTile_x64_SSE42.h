@@ -36,6 +36,7 @@ public:
         vec[3] = x.vec[3];
     }
 
+
 public:
     PA_FORCE_INLINE void set_zero(){
         vec[0] = _mm_setzero_si128();
@@ -72,18 +73,25 @@ public:
         vec[2] = _mm_xor_si128(vec[2], x.vec[2]);
         vec[3] = _mm_xor_si128(vec[3], x.vec[3]);
     }
-    PA_FORCE_INLINE void operator&=(const BinaryTile_SSE42& x){
-        vec[0] = _mm_and_si128(vec[0], x.vec[0]);
-        vec[1] = _mm_and_si128(vec[1], x.vec[1]);
-        vec[2] = _mm_and_si128(vec[2], x.vec[2]);
-        vec[3] = _mm_and_si128(vec[3], x.vec[3]);
-    }
     PA_FORCE_INLINE void operator|=(const BinaryTile_SSE42& x){
         vec[0] = _mm_or_si128(vec[0], x.vec[0]);
         vec[1] = _mm_or_si128(vec[1], x.vec[1]);
         vec[2] = _mm_or_si128(vec[2], x.vec[2]);
         vec[3] = _mm_or_si128(vec[3], x.vec[3]);
     }
+    PA_FORCE_INLINE void operator&=(const BinaryTile_SSE42& x){
+        vec[0] = _mm_and_si128(vec[0], x.vec[0]);
+        vec[1] = _mm_and_si128(vec[1], x.vec[1]);
+        vec[2] = _mm_and_si128(vec[2], x.vec[2]);
+        vec[3] = _mm_and_si128(vec[3], x.vec[3]);
+    }
+    PA_FORCE_INLINE void andnot(const BinaryTile_SSE42& x){
+        vec[0] = _mm_andnot_si128(x.vec[0], vec[0]);
+        vec[1] = _mm_andnot_si128(x.vec[1], vec[1]);
+        vec[2] = _mm_andnot_si128(x.vec[2], vec[2]);
+        vec[3] = _mm_andnot_si128(x.vec[3], vec[3]);
+    }
+
 
 public:
     uint64_t top() const{

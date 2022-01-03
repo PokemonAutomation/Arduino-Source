@@ -32,7 +32,7 @@ void BinaryImage::set_zero(){
     m_ptr->set_zero();
 }
 
-bool BinaryImage::pixel(size_t x, size_t y) const{
+bool BinaryImage::get_pixel(size_t x, size_t y) const{
     return m_ptr->pixel(x, y);
 }
 void BinaryImage::set_pixel(size_t x, size_t y, bool set){
