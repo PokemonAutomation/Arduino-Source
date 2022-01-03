@@ -55,6 +55,10 @@ EggAutonomous::EggAutonomous(const EggAutonomous_Descriptor& descriptor)
         "<b>Travel Time per Fetch:</b><br>Fetch an egg after traveling for this long.",
         "20 * TICKS_PER_SECOND"
     )
+    , NUM_EGGS_IN_COLUMN(
+        "<b>Num Eggs in Column:</b><br>How many eggs already deposited in the first column in Box 1.",
+        0, 0, 5
+    )
     , AUTO_SAVING(
         "<b>Auto-Saving:</b><br>Automatically save the game to recover from crashes and allow eggs to be unhatched.<br>"
         "(Unhatching eggs can be useful for obtaining breeding parents by rehatching a perfect egg in a game with a different language.)<br><br>"
@@ -102,6 +106,7 @@ EggAutonomous::EggAutonomous(const EggAutonomous_Descriptor& descriptor)
     PA_ADD_OPTION(SHORTCUT);
     PA_ADD_OPTION(MAX_KEEPERS);
     PA_ADD_OPTION(TRAVEL_TIME_PER_FETCH);
+    PA_ADD_OPTION(NUM_EGGS_IN_COLUMN);
     PA_ADD_OPTION(AUTO_SAVING);
     PA_ADD_OPTION(FILTERS);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -177,7 +182,8 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env){
         SHORTCUT,
         TRAVEL_TIME_PER_FETCH,
         FILTERS,
-        MAX_KEEPERS
+        MAX_KEEPERS,
+        NUM_EGGS_IN_COLUMN
     );
     EggAutonomousState saved_state = current_state;
 

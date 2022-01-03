@@ -101,7 +101,8 @@ EggAutonomousState::EggAutonomousState(
     ShortcutDirection& shortcut,
     uint16_t travel_time_per_fetch,
     const EggHatchFilterOption& filters,
-    uint8_t max_keepers
+    uint8_t max_keepers,
+    uint8_t existing_eggs_in_columns
 )
     : m_env(env), m_console(console)
     , m_stats(stats)
@@ -114,6 +115,7 @@ EggAutonomousState::EggAutonomousState(
     , m_travel_time_per_fetch(travel_time_per_fetch)
     , m_filters(filters)
     , m_max_keepers(max_keepers)
+    , m_eggs_in_column(existing_eggs_in_columns)
 {}
 
 void EggAutonomousState::dump() const{

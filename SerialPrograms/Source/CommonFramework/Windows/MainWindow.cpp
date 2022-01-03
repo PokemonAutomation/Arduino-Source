@@ -147,7 +147,8 @@ MainWindow::MainWindow(QWidget* parent)
         output, &QPushButton::clicked,
         this, [=](bool){
             m_output_window->show();
-            m_output_window->activateWindow();
+            m_output_window->raise(); // bring the window to front on macOS
+            m_output_window->activateWindow(); // bring the window to front on Windows
         }
     );
 

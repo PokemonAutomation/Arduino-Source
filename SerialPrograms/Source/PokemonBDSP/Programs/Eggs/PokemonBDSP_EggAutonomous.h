@@ -52,6 +52,7 @@ private:
     ShortcutDirection SHORTCUT;
     SimpleIntegerOption<uint8_t> MAX_KEEPERS;
     TimeExpressionOption<uint16_t> TRAVEL_TIME_PER_FETCH;
+    SimpleIntegerOption<uint8_t> NUM_EGGS_IN_COLUMN;
 
     EnumDropdownOption AUTO_SAVING;
 
