@@ -29,81 +29,30 @@ namespace PokemonAutomation{
 namespace Kernels{
 
 
-#if 0
-template <typename BinaryImageType, typename Filter>
-void rgb32_to_binary_image(
-    BinaryImageType& binary_image,
-    const uint32_t* image, size_t bytes_per_row,
-    const Filter& filter
-){
-    size_t width = binary_image.width();
-    for (size_t r = 0; r < binary_image.height(); r++){
-        const uint32_t* img = image;
-        uint64_t* bin = (uint64_t*)binary_image.row(r);
-        size_t left = width;
-        while (left >= 64){
-            *bin = filter.convert64(img);
-            bin++;
-            img += 64;
-            left -= 64;
-        }
-        if (left > 0){
-            *bin = filter.convert64(img, left);
-        }
-        image = (const uint32_t*)((const char*)image + bytes_per_row);
-    }
-}
-void filter_min_rgb32(
-    BinaryImage& binary_image,
-    const uint32_t* image, size_t bytes_per_row,
-    uint8_t min_alpha, uint8_t min_red, uint8_t min_green, uint8_t min_blue
-);
-void filter_rgb32_range(
-    BinaryImage& binary_image,
+//  Compress (image, bytes_per_row) into a binary_image.
+//  Use the specified RGB ranges to determine whether each pixel
+//  becomes a 0 or a 1.
+void compress_rgb32_to_binary_range(
+    PackedBinaryMatrix& matrix,
     const uint32_t* image, size_t bytes_per_row,
     uint8_t min_alpha, uint8_t max_alpha,
     uint8_t min_red, uint8_t max_red,
     uint8_t min_green, uint8_t max_green,
     uint8_t min_blue, uint8_t max_blue
 );
-#endif
-
-template <typename BinaryMatrixType, typename Filter>
-void rgb32_to_binary_image2(
-    BinaryMatrixType& binary_image,
-    const uint32_t* image, size_t bytes_per_row,
-    const Filter& filter
-){
-    size_t bit_width = binary_image.width();
-//    size_t bit_height = binary_image.height();
-//    size_t word_width = binary_image.word64_width();
-    size_t word_height = binary_image.word64_height();
-    for (size_t r = 0; r < word_height; r++){
-        const uint32_t* img = image;
-        size_t c = 0;
-        size_t left = bit_width;
-        while (left >= 64){
-            binary_image.word64(c, r) = filter.convert64(img);
-            c++;
-            img += 64;
-            left -= 64;
-        }
-        if (left > 0){
-            binary_image.word64(c, r) = filter.convert64(img, left);
-        }
-        image = (const uint32_t*)((const char*)image + bytes_per_row);
-    }
-}
 
 
-void filter_rgb32_range(
-    PackedBinaryMatrix& binary_image,
-    const uint32_t* image, size_t bytes_per_row,
-    uint8_t min_alpha, uint8_t max_alpha,
-    uint8_t min_red, uint8_t max_red,
-    uint8_t min_green, uint8_t max_green,
-    uint8_t min_blue, uint8_t max_blue
+
+//  Selectively replace each pixel in an rgb32 image with the specified pixel
+//  according to the respective bit in the binary matrix.
+void filter_rgb32(
+    const PackedBinaryMatrix& matrix,
+    uint32_t* image, size_t bytes_per_row,
+    uint32_t replace_with,
+    bool replace_if_zero    //  If false, replace if one.
 );
+
+
 
 
 }

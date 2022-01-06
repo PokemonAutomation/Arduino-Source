@@ -11,6 +11,7 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/CommonFilters.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
+#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/Inference/ImageTools.h"
 #include "PokemonBDSP_SelectionArrow.h"
@@ -27,9 +28,9 @@ using namespace Kernels;
 using namespace Kernels::Waterfill;
 
 
-const QImage& SELECTION_ARROW(){
-    static QImage image(RESOURCE_PATH() + "PokemonBDSP/SelectionArrow.png");
-    return image;
+const ImageMatch::ExactImageMatcher& SELECTION_ARROW(){
+    static ImageMatch::ExactImageMatcher matcher(QImage(RESOURCE_PATH() + "PokemonBDSP/SelectionArrow.png"));
+    return matcher;
 }
 
 
@@ -43,16 +44,21 @@ bool is_selection_arrow(const QImage& image, const WaterFillObject& object){
         return false;
     }
 
-    const QImage& exclamation_mark = SELECTION_ARROW();
-    QImage scaled = image.copy(object.min_x, object.min_y, width, height);
+//    const QImage& exclamation_mark = SELECTION_ARROW();
+    QImage cropped = image.copy(
+        (int)object.min_x, (int)object.min_y,
+        (int)width, (int)height
+    );
 
 //    static int c = 0;
 //    scaled.save("test-" + QString::number(c++) + ".png");
 
-    scaled = scaled.scaled(exclamation_mark.width(), exclamation_mark.height());
-    double rmsd = ImageMatch::pixel_RMSD(exclamation_mark, scaled);
+    double rmsd = SELECTION_ARROW().rmsd(cropped);
+
+//    scaled = scaled.scaled(exclamation_mark.width(), exclamation_mark.height());
+//    double rmsd = ImageMatch::pixel_RMSD(exclamation_mark, scaled);
 //    cout << "rmsd = " << rmsd << endl;
-    return rmsd <= 80;
+    return rmsd <= 90;
 }
 
 

@@ -198,7 +198,7 @@ void send_catch_notification(
     const std::string& ball_slug, int balls_used,
     bool success
 ){
-    Color color = success ? COLOR_DARKGREEN : COLOR_ORANGE;
+    Color color = success ? COLOR_GREEN : COLOR_ORANGE;
 
     std::vector<std::pair<QString, QString>> embeds;
 

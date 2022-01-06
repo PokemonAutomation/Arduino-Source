@@ -27,18 +27,21 @@ public:
     void operator=(const BinaryMatrixBase& x);
 
 public:
-    //  Basic Usage
+    //  Construction
     BinaryMatrixBase(size_t width, size_t height);
 
-    void set_zero();
-    void set_ones();
+    void set_zero();        //  Zero the entire matrix.
+    void set_ones();        //  Set entire matrix to ones.
 
+public:
     size_t width() const{ return m_logical_width; }
     size_t height() const{ return m_logical_height; }
 
     //  These are slow.
     bool get(size_t x, size_t y) const;
     void set(size_t x, size_t y, bool set);
+
+    BinaryMatrixBase submatrix(size_t x, size_t y, size_t width, size_t height) const;
 
     std::string dump() const;
     std::string dump(size_t min_x, size_t min_y, size_t max_x, size_t max_y) const;
@@ -75,113 +78,6 @@ private:
 
 
 //  Implementations
-
-
-//  Rule of 5
-
-template <typename Tile>
-BinaryMatrixBase<Tile>::BinaryMatrixBase(BinaryMatrixBase&& x)
-    : m_logical_width(x.m_logical_width)
-    , m_logical_height(x.m_logical_height)
-    , m_tile_width(x.m_tile_width)
-    , m_tile_height(x.m_tile_height)
-    , m_data(std::move(x.m_data))
-{
-    x.m_logical_width = 0;
-    x.m_logical_height = 0;
-    x.m_tile_width = 0;
-    x.m_tile_height = 0;
-}
-template <typename Tile>
-void BinaryMatrixBase<Tile>::operator=(BinaryMatrixBase&& x){
-    m_logical_width = x.m_logical_width;
-    m_logical_height = x.m_logical_height;
-    m_tile_width = x.m_tile_width;
-    m_tile_height = x.m_tile_height;
-    m_data = std::move(x.m_data);
-    x.m_logical_width = 0;
-    x.m_logical_height = 0;
-    x.m_tile_width = 0;
-    x.m_tile_height = 0;
-}
-template <typename Tile>
-BinaryMatrixBase<Tile>::BinaryMatrixBase(const BinaryMatrixBase& x)
-    : m_logical_width(x.m_logical_width)
-    , m_logical_height(x.m_logical_height)
-    , m_tile_width(x.m_tile_width)
-    , m_tile_height(x.m_tile_height)
-    , m_data(m_tile_width * m_tile_height)
-{
-    size_t stop = m_tile_width * m_tile_height;
-    for (size_t c = 0; c < stop; c++){
-        m_data[c] = x.m_data[c];
-    }
-}
-template <typename Tile>
-void BinaryMatrixBase<Tile>::operator=(const BinaryMatrixBase& x){
-    m_logical_width = x.m_logical_width;
-    m_logical_height = x.m_logical_height;
-    m_tile_width = x.m_tile_width;
-    m_tile_height = x.m_tile_height;
-    m_data = x.m_data;
-    size_t stop = m_tile_width * m_tile_height;
-    for (size_t c = 0; c < stop; c++){
-        m_data[c] = x.m_data[c];
-    }
-}
-
-
-//  Construction
-
-template <typename Tile>
-BinaryMatrixBase<Tile>::BinaryMatrixBase(size_t width, size_t height)
-    : m_logical_width(width)
-    , m_logical_height(height)
-    , m_tile_width((width + TILE_WIDTH - 1) / TILE_WIDTH)
-    , m_tile_height((height + TILE_HEIGHT - 1) / TILE_HEIGHT)
-    , m_data(m_tile_width * m_tile_height)
-{
-    set_zero();
-}
-template <typename Tile>
-void BinaryMatrixBase<Tile>::set_zero(){
-    size_t stop = m_tile_width * m_tile_height;
-    for (size_t c = 0; c < stop; c++){
-        m_data[c].set_zero();
-    }
-}
-template <typename Tile>
-void BinaryMatrixBase<Tile>::set_ones(){
-    size_t r = 0;
-    size_t r_left = m_logical_height;
-    while (r_left >= TILE_HEIGHT){
-        size_t c = 0;
-        size_t c_left = m_logical_width;
-        while (c_left >= TILE_WIDTH){
-            tile(c, r).set_ones();
-            c++;
-            c_left -= TILE_WIDTH;
-        }
-        if (c_left > 0){
-            tile(c, r).set_ones(c_left, TILE_HEIGHT);
-        }
-        r++;
-        r_left -= TILE_HEIGHT;
-    }
-    if (r_left > 0){
-        size_t c = 0;
-        size_t c_left = m_logical_width;
-        while (c_left >= TILE_WIDTH){
-            tile(c, r).set_ones(TILE_WIDTH, r_left);
-            c++;
-            c_left -= TILE_WIDTH;
-        }
-        if (c_left > 0){
-            tile(c, r).set_ones(c_left, r_left);
-        }
-
-    }
-}
 
 
 
@@ -226,26 +122,6 @@ template <typename Tile>
 void BinaryMatrixBase<Tile>::set(size_t x, size_t y, bool set){
     Tile& tile = this->tile(x / TILE_WIDTH, y / TILE_HEIGHT);
     tile.set_bit(x % TILE_WIDTH, y % TILE_HEIGHT, set);
-}
-
-
-
-//  Debugging
-
-template <typename Tile>
-std::string BinaryMatrixBase<Tile>::dump() const{
-    return dump(0, 0, m_logical_width, m_logical_height);
-}
-template <typename Tile>
-std::string BinaryMatrixBase<Tile>::dump(size_t min_x, size_t min_y, size_t max_x, size_t max_y) const{
-    std::string str;
-    for (size_t r = min_y; r < max_y; r++){
-        for (size_t c = min_x; c < max_x; c++){
-            str += get(c, r) ? '1' : '0';
-        }
-        str += "\n";
-    }
-    return str;
 }
 
 

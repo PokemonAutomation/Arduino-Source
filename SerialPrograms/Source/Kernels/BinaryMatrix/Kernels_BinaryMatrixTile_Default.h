@@ -50,6 +50,18 @@ public:
             vec[c] = 0;
         }
     }
+    PA_FORCE_INLINE void clear_padding(size_t width, size_t height){
+        uint64_t word = width < 64
+            ? ((uint64_t)1 << width) - 1
+            : 0xffffffffffffffff;
+        size_t c = 0;
+        for (; c < height; c++){
+            vec[c] &= word;
+        }
+        for (; c < 4; c++){
+            vec[c] = 0;
+        }
+    }
     PA_FORCE_INLINE void operator^=(const BinaryTile_Default& x){
         vec[0] ^= x.vec[0];
         vec[1] ^= x.vec[1];
@@ -115,6 +127,38 @@ public:
         }
         return str;
     }
+
+
+public:
+    //  Copy the current tile into "tile" while applying the specified shifts.
+    //  These are used to implement submatrix extraction where the desired
+    //  sub-matrix may of arbitrary shift and alignment.
+
+    void copy_to_shift_pp(BinaryTile_Default& tile, size_t shift_x, size_t shift_y) const{
+        //  (+x, +y)
+        for (size_t c = 0; shift_y < 4; shift_y++, c++){
+            tile.vec[c] |= vec[shift_y] >> shift_x;
+        }
+    }
+    void copy_to_shift_np(BinaryTile_Default& tile, size_t shift_x, size_t shift_y) const{
+        //  (-x, +y)
+        for (size_t c = 0; shift_y < 4; shift_y++, c++){
+            tile.vec[c] |= vec[shift_y] << shift_x;
+        }
+    }
+    void copy_to_shift_pn(BinaryTile_Default& tile, size_t shift_x, size_t shift_y) const{
+        //  (+x, -y)
+        for (size_t c = 0; shift_y < 4; shift_y++, c++){
+            tile.vec[shift_y] |= vec[c] >> shift_x;
+        }
+    }
+    void copy_to_shift_nn(BinaryTile_Default& tile, size_t shift_x, size_t shift_y) const{
+        //  (-x, -y)
+        for (size_t c = 0; shift_y < 4; shift_y++, c++){
+            tile.vec[shift_y] |= vec[c] << shift_x;
+        }
+    }
+
 };
 
 

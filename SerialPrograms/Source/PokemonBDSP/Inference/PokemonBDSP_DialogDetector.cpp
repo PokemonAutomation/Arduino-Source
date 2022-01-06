@@ -111,6 +111,31 @@ bool BattleDialogDetector::detect(const QImage& screen) const{
 
 
 
+ShortDialogPromptDetector::ShortDialogPromptDetector(
+    VideoOverlay& overlay,
+    const ImageFloatBox& box,
+    Color color
+)
+    : m_dialog(color)
+    , m_arrow(overlay, box, color)
+{}
+void ShortDialogPromptDetector::make_overlays(VideoOverlaySet& items) const{
+    m_dialog.make_overlays(items);
+    m_arrow.make_overlays(items);
+}
+bool ShortDialogPromptDetector::process_frame(
+    const QImage& screen,
+    std::chrono::system_clock::time_point timestamp
+){
+    return m_dialog.detect(screen) && m_arrow.process_frame(screen, timestamp);
+}
+
+
+
+
+
+
+
 }
 }
 }

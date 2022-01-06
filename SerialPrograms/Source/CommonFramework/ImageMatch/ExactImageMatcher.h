@@ -18,7 +18,7 @@ namespace ImageMatch{
 //  Matching with brightness scaling only.
 class ExactImageMatcher{
 public:
-    ExactImageMatcher(QImage image, void*);
+    ExactImageMatcher(QImage image);
 
     const ImageStats& stats() const{ return m_stats; }
 

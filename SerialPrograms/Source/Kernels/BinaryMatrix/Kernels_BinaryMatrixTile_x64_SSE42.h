@@ -11,6 +11,14 @@
 #include "Common/Compiler.h"
 #include "Kernels_BinaryMatrixTile_Debugging.h"
 
+//  Flat vs. Transposed
+//   -  Flat has cheap direct row access and better spatial locality.
+//   -  Transposed has a slightly cheaper waterfill expansion kernel.
+//
+//  DO NOT turns this off as submatrix extraction requires it now.
+//
+#define BINARY_TILE_X64_SSE42_FLAT
+
 namespace PokemonAutomation{
 namespace Kernels{
 
@@ -58,6 +66,16 @@ public:
         );
         __m128i vheight = _mm_set1_epi64x(height);
         __m128i mask;
+#ifdef BINARY_TILE_X64_SSE42_FLAT
+        mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(1, 0));
+        vec[0] = _mm_and_si128(mask, word);
+        mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(3, 2));
+        vec[1] = _mm_and_si128(mask, word);
+        mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(5, 4));
+        vec[2] = _mm_and_si128(mask, word);
+        mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(7, 6));
+        vec[3] = _mm_and_si128(mask, word);
+#else
         mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(2, 0));
         vec[0] = _mm_and_si128(mask, word);
         mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(3, 1));
@@ -66,6 +84,35 @@ public:
         vec[2] = _mm_and_si128(mask, word);
         mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(7, 5));
         vec[3] = _mm_and_si128(mask, word);
+#endif
+    }
+    PA_FORCE_INLINE void clear_padding(size_t width, size_t height){
+        __m128i word = _mm_set1_epi64x(
+            width < 64
+                ? ((uint64_t)1 << width) - 1
+                : 0xffffffffffffffff
+        );
+        __m128i vheight = _mm_set1_epi64x(height);
+        __m128i mask;
+#ifdef BINARY_TILE_X64_SSE42_FLAT
+        mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(1, 0));
+        vec[0] = _mm_and_si128(vec[0], _mm_and_si128(mask, word));
+        mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(3, 2));
+        vec[1] = _mm_and_si128(vec[1], _mm_and_si128(mask, word));
+        mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(5, 4));
+        vec[2] = _mm_and_si128(vec[2], _mm_and_si128(mask, word));
+        mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(7, 6));
+        vec[3] = _mm_and_si128(vec[3], _mm_and_si128(mask, word));
+#else
+        mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(2, 0));
+        vec[0] = _mm_and_si128(vec[0], _mm_and_si128(mask, word));
+        mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(3, 1));
+        vec[1] = _mm_and_si128(vec[1], _mm_and_si128(mask, word));
+        mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(6, 4));
+        vec[2] = _mm_and_si128(vec[2], _mm_and_si128(mask, word));
+        mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(7, 5));
+        vec[3] = _mm_and_si128(vec[3], _mm_and_si128(mask, word));
+#endif
     }
     PA_FORCE_INLINE void operator^=(const BinaryTile_SSE42& x){
         vec[0] = _mm_xor_si128(vec[0], x.vec[0]);
@@ -108,11 +155,15 @@ public:
     }
 
     uint64_t row(size_t index) const{
+#ifndef BINARY_TILE_X64_SSE42_FLAT
         index = ((index & 2) >> 1) | ((index & 1) << 1) | ((index & 4));
+#endif
         return ((const uint64_t*)vec)[index];
     }
     uint64_t& row(size_t index){
+#ifndef BINARY_TILE_X64_SSE42_FLAT
         index = ((index & 2) >> 1) | ((index & 1) << 1) | ((index & 4));
+#endif
         return ((uint64_t*)vec)[index];
     }
 
@@ -133,6 +184,85 @@ public:
             str += dump64(row(c)) + "\n";
         }
         return str;
+    }
+
+
+public:
+    //  Copy the current tile into "tile" while applying the specified shifts.
+    //  These are used to implement submatrix extraction where the desired
+    //  sub-matrix may of arbitrary shift and alignment.
+
+    void copy_to_shift_pp(BinaryTile_SSE42& tile, size_t shift_x, size_t shift_y) const{
+        //  (+x, +y)
+        __m128i shift = _mm_set1_epi64x(shift_x);
+        const uint64_t* src = (const uint64_t*)vec;
+        uint64_t* dest = (uint64_t*)tile.vec;
+        while (shift_y < 7){
+            __m128i r0 = _mm_loadu_si128((const __m128i*)(src + shift_y));
+            r0 = _mm_srl_epi64(r0, shift);
+            r0 = _mm_or_si128(r0, _mm_load_si128((__m128i*)dest));
+            _mm_store_si128((__m128i*)dest, r0);
+            dest += 2;
+            shift_y += 2;
+        }
+        if (shift_y < 8){
+            dest[0] |= src[shift_y] >> shift_x;
+        }
+    }
+    void copy_to_shift_np(BinaryTile_SSE42& tile, size_t shift_x, size_t shift_y) const{
+        //  (-x, +y)
+        __m128i shift = _mm_set1_epi64x(shift_x);
+        const uint64_t* src = (const uint64_t*)vec;
+        uint64_t* dest = (uint64_t*)tile.vec;
+        while (shift_y < 7){
+            __m128i r0 = _mm_loadu_si128((const __m128i*)(src + shift_y));
+            r0 = _mm_sll_epi64(r0, shift);
+            r0 = _mm_or_si128(r0, _mm_load_si128((__m128i*)dest));
+            _mm_store_si128((__m128i*)dest, r0);
+            dest += 2;
+            shift_y += 2;
+        }
+        if (shift_y < 8){
+            dest[0] |= src[shift_y] << shift_x;
+        }
+    }
+    void copy_to_shift_pn(BinaryTile_SSE42& tile, size_t shift_x, size_t shift_y) const{
+        //  (+x, -y)
+        __m128i shift = _mm_set1_epi64x(shift_x);
+        const uint64_t* src = (const uint64_t*)vec;
+        uint64_t* dest = (uint64_t*)tile.vec;
+        if (shift_y & 1){
+            dest[shift_y] |= src[0] >> shift_x;
+            src++;
+            shift_y++;
+        }
+        while (shift_y < 8){
+            __m128i r0 = _mm_loadu_si128((const __m128i*)src);
+            r0 = _mm_srl_epi64(r0, shift);
+            r0 = _mm_or_si128(r0, _mm_load_si128((__m128i*)(dest + shift_y)));
+            _mm_store_si128((__m128i*)(dest + shift_y), r0);
+            src += 2;
+            shift_y += 2;
+        }
+    }
+    void copy_to_shift_nn(BinaryTile_SSE42& tile, size_t shift_x, size_t shift_y) const{
+        //  (-x, -y)
+        __m128i shift = _mm_set1_epi64x(shift_x);
+        const uint64_t* src = (const uint64_t*)vec;
+        uint64_t* dest = (uint64_t*)tile.vec;
+        if (shift_y & 1){
+            dest[shift_y] |= src[0] << shift_x;
+            src++;
+            shift_y++;
+        }
+        while (shift_y < 8){
+            __m128i r0 = _mm_loadu_si128((const __m128i*)src);
+            r0 = _mm_sll_epi64(r0, shift);
+            r0 = _mm_or_si128(r0, _mm_load_si128((__m128i*)(dest + shift_y)));
+            _mm_store_si128((__m128i*)(dest + shift_y), r0);
+            src += 2;
+            shift_y += 2;
+        }
     }
 };
 

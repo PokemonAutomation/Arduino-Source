@@ -32,7 +32,7 @@ void SilhouetteDictionaryMatcher::add(const std::string& slug, QImage image){
     m_database.emplace(
         std::piecewise_construct,
         std::forward_as_tuple(slug),
-        std::forward_as_tuple(trim_image_alpha(image), nullptr)
+        std::forward_as_tuple(trim_image_alpha(image))
     );
 }
 

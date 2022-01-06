@@ -80,6 +80,200 @@ void TestProgramComputer::program(ProgramEnvironment& env){
     using namespace NintendoSwitch::PokemonSwSh;
 
 
+    QImage image("20220101-214116617784.jpg");
+    PackedBinaryMatrix matrix = filter_rgb32_range(
+        image,
+        192, 255,
+        192, 255,
+        128, 255
+    );
+
+    std::vector<WaterFillObject> objects1 = find_objects(matrix, 1, false);
+    cout << "objects = " << objects1.size() << endl;
+    std::multimap<uint64_t, WaterFillObject> sorted1;
+    for (const auto& item : objects1){
+        sorted1.emplace(item.area, item);
+    }
+    for (const auto& item : sorted1){
+        cout << "area = " << item.second.area
+             << " - (" << item.second.min_x
+             << "," << item.second.max_x
+             << ")(" << item.second.min_y
+             << "," << item.second.max_y
+             << ") - (" << item.second.center_x()
+             << "," << item.second.center_y()
+             << ")" << endl;
+    }
+    cout << matrix.dump(849, 365, 863, 376) << endl;
+
+    PackedBinaryMatrix submatrix = matrix.submatrix(849, 365, 863-849 - 1, 376-365 - 1);
+    cout << submatrix.width() << " x " << submatrix.height() << endl;
+    cout << submatrix.dump() << endl;
+    cout << submatrix.tile(0, 0).dump() << endl;
+//    cout << submatrix.tile(0, 1).dump() << endl;
+//    cout << submatrix.tile(0, 2).dump() << endl;
+
+
+#if 0
+    BinaryTile_AVX512 tile;
+    tile.set_ones();
+    cout << tile.dump() << endl;
+
+    {
+        BinaryTile_AVX512 dest;
+        dest.set_zero();
+        tile.copy_to_shift_pp(dest, 5, 9);
+        cout << dest.dump() << endl;
+    }
+    {
+        BinaryTile_AVX512 dest;
+        dest.set_zero();
+        tile.copy_to_shift_np(dest, 59, 9);
+        cout << dest.dump() << endl;
+    }
+    {
+        BinaryTile_AVX512 dest;
+        dest.set_zero();
+        tile.copy_to_shift_pn(dest, 5, 55);
+        cout << dest.dump() << endl;
+    }
+    {
+        BinaryTile_AVX512 dest;
+        dest.set_zero();
+        tile.copy_to_shift_nn(dest, 59, 55);
+        cout << dest.dump() << endl;
+    }
+#endif
+
+#if 0
+    BinaryTile_AVX2 tile;
+    tile.set_ones();
+    cout << tile.dump() << endl;
+
+    {
+        BinaryTile_AVX2 dest;
+        dest.set_zero();
+        tile.copy_to_shift_pp(dest, 5, 3);
+        cout << dest.dump() << endl;
+    }
+    {
+        BinaryTile_AVX2 dest;
+        dest.set_zero();
+        tile.copy_to_shift_np(dest, 59, 3);
+        cout << dest.dump() << endl;
+    }
+    {
+        BinaryTile_AVX2 dest;
+        dest.set_zero();
+        tile.copy_to_shift_pn(dest, 5, 13);
+        cout << dest.dump() << endl;
+    }
+    {
+        BinaryTile_AVX2 dest;
+        dest.set_zero();
+        tile.copy_to_shift_nn(dest, 59, 13);
+        cout << dest.dump() << endl;
+    }
+#endif
+
+
+#if 0
+    BinaryTile_SSE42 tile;
+    tile.set_ones();
+    cout << tile.dump() << endl;
+
+    {
+        BinaryTile_SSE42 dest;
+        dest.set_zero();
+        tile.copy_to_shift_pp(dest, 2, 2);
+        cout << dest.dump() << endl;
+    }
+    {
+        BinaryTile_SSE42 dest;
+        dest.set_zero();
+        tile.copy_to_shift_np(dest, 62, 2);
+        cout << dest.dump() << endl;
+    }
+    {
+        BinaryTile_SSE42 dest;
+        dest.set_zero();
+        tile.copy_to_shift_pn(dest, 2, 6);
+        cout << dest.dump() << endl;
+    }
+    {
+        BinaryTile_SSE42 dest;
+        dest.set_zero();
+        tile.copy_to_shift_nn(dest, 62, 6);
+        cout << dest.dump() << endl;
+    }
+#if 0
+    BinaryTile_SSE42 dest;
+    dest.set_zero();
+    tile.copy_to_shift_pp(dest, 2, 1);
+    tile.copy_to_shift_np(dest, 62, 1);
+    tile.copy_to_shift_pn(dest, 2, 7);
+    tile.copy_to_shift_nn(dest, 62, 7);
+    cout << dest.dump() << endl;
+#endif
+#endif
+
+
+#if 0
+    BinaryTile_Default tile;
+    tile.set_ones();
+//    tile.vec[0] = 14506275885351140242ull;
+//    tile.vec[1] = 11153623425119109148ull;
+//    tile.vec[2] = 4283232600608028042ull;
+//    tile.vec[3] = 11483095140456459570ull;
+    cout << tile.dump() << endl;
+
+    {
+        BinaryTile_Default dest;
+        dest.set_zero();
+        tile.copy_to_shift_pp(dest, 2, 1);
+        cout << dest.dump() << endl;
+    }
+    {
+        BinaryTile_Default dest;
+        dest.set_zero();
+        tile.copy_to_shift_np(dest, 62, 1);
+        cout << dest.dump() << endl;
+    }
+    {
+        BinaryTile_Default dest;
+        dest.set_zero();
+        tile.copy_to_shift_pn(dest, 2, 3);
+        cout << dest.dump() << endl;
+    }
+    {
+        BinaryTile_Default dest;
+        dest.set_zero();
+        tile.copy_to_shift_nn(dest, 62, 3);
+        cout << dest.dump() << endl;
+    }
+    BinaryTile_Default dest;
+    dest.set_zero();
+    tile.copy_to_shift_pp(dest, 2, 1);
+    tile.copy_to_shift_np(dest, 62, 1);
+    tile.copy_to_shift_pn(dest, 2, 3);
+    tile.copy_to_shift_nn(dest, 62, 3);
+    cout << dest.dump() << endl;
+#endif
+
+
+#if 0
+    QImage image("20220101-214116617784.jpg");
+
+    cout << (void*)image.constBits() << endl;
+    cout << image.bytesPerLine() << endl;
+
+    image = image.copy(100, 100, 100, 100);
+
+    cout << (void*)image.constBits() << endl;
+    cout << image.bytesPerLine() << endl;
+#endif
+
+
 #if 0
     QImage image("20220101-214116617784.jpg");
     {
@@ -104,7 +298,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
             128, 255
         );
         auto time1 = std::chrono::system_clock::now();
-        std::vector<WaterFillObject> objects1 = find_objects(matrix1, 10, true);
+        std::vector<WaterFillObject> objects1 = find_objects(matrix1, 10, false);
         auto time2 = std::chrono::system_clock::now();
         cout << "filter  = " << time1 - time0 << endl;
         cout << "process = " << time2 - time1 << endl;
@@ -132,6 +326,8 @@ void TestProgramComputer::program(ProgramEnvironment& env){
                  << "," << item.second.box.max_x
                  << ")(" << item.second.box.min_y
                  << "," << item.second.box.max_y
+                 << ") - (" << item.second.center_x()
+                 << "," << item.second.center_y()
                  << ")" << endl;
         }
     }
@@ -143,18 +339,20 @@ void TestProgramComputer::program(ProgramEnvironment& env){
             192, 255,
             128, 255
         );
-        std::vector<WaterFillObject> objects1 = find_objects(matrix1);
+        std::vector<WaterFillObject> objects1 = find_objects(matrix1, 1, false);
         cout << "objects = " << objects1.size() << endl;
         std::multimap<uint64_t, WaterFillObject> sorted1;
         for (const auto& item : objects1){
-            sorted1.emplace(item.m_area, item);
+            sorted1.emplace(item.area, item);
         }
         for (const auto& item : sorted1){
-            cout << "area = " << item.second.m_area
-                 << " - (" << item.second.m_min_x
-                 << "," << item.second.m_max_x
-                 << ")(" << item.second.m_min_y
-                 << "," << item.second.m_max_y
+            cout << "area = " << item.second.area
+                 << " - (" << item.second.min_x
+                 << "," << item.second.max_x
+                 << ")(" << item.second.min_y
+                 << "," << item.second.max_y
+                 << ") - (" << item.second.center_x()
+                 << "," << item.second.center_y()
                  << ")" << endl;
         }
     }
@@ -304,7 +502,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
     cout << "width  = " << matrix.tile_width() << endl;
     cout << "height = " << matrix.tile_height() << endl;
 
-    RgbRangeFilter_x64_AVX512 filter(
+    Compressor_RgbRange_x64_AVX512 filter(
         255, 255,
         128, 255,
         0, 128,

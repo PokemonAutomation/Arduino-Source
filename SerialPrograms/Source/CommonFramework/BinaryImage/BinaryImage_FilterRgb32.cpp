@@ -18,7 +18,7 @@ Kernels::PackedBinaryMatrix filter_rgb32_min(
     uint8_t min_blue
 ){
     Kernels::PackedBinaryMatrix ret(image.width(), image.height());
-    Kernels::filter_rgb32_range(
+    Kernels::compress_rgb32_to_binary_range(
         ret, (const uint32_t*)image.bits(), image.bytesPerLine(),
         0, 255,
         min_red, 255,
@@ -34,7 +34,7 @@ Kernels::PackedBinaryMatrix filter_rgb32_max(
     uint8_t max_blue
 ){
     Kernels::PackedBinaryMatrix ret(image.width(), image.height());
-    Kernels::filter_rgb32_range(
+    Kernels::compress_rgb32_to_binary_range(
         ret, (const uint32_t*)image.bits(), image.bytesPerLine(),
         0, 255,
         0, max_red,
@@ -50,7 +50,7 @@ Kernels::PackedBinaryMatrix filter_rgb32_range(
     uint8_t min_blue, uint8_t max_blue
 ){
     Kernels::PackedBinaryMatrix ret(image.width(), image.height());
-    Kernels::filter_rgb32_range(
+    Kernels::compress_rgb32_to_binary_range(
         ret, (const uint32_t*)image.bits(), image.bytesPerLine(),
         0, 255,
         min_red, max_red,
@@ -67,7 +67,7 @@ Kernels::PackedBinaryMatrix filter_rgb32_range(
     uint8_t min_blue, uint8_t max_blue
 ){
     Kernels::PackedBinaryMatrix ret(image.width(), image.height());
-    Kernels::filter_rgb32_range(
+    Kernels::compress_rgb32_to_binary_range(
         ret, (const uint32_t*)image.bits(), image.bytesPerLine(),
         min_alpha, max_alpha,
         min_red, max_red,

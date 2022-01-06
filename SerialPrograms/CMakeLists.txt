@@ -59,6 +59,7 @@ file(GLOB MAIN_SOURCES
     ../Common/CRC32.cpp
     ../Common/CRC32.h
     ../Common/Compiler.h
+    ../Common/Cpp/AlignedVector.tpp
     ../Common/Cpp/AlignedVector.h
     ../Common/Cpp/AsyncDispatcher.cpp
     ../Common/Cpp/AsyncDispatcher.h
@@ -172,6 +173,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ImageMatch/ImageMatchResult.h
     Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.cpp
     Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h
+    Source/CommonFramework/ImageMatch/ScaleBrightness.cpp
+    Source/CommonFramework/ImageMatch/ScaleBrightness.h
     Source/CommonFramework/ImageTools/CellMatrix.cpp
     Source/CommonFramework/ImageTools/CellMatrix.h
     Source/CommonFramework/ImageTools/ColorClustering.cpp
@@ -382,11 +385,13 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixBase.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixBase.tpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Debugging.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Default.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_AVX2.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_AVX512.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_SSE42.h
+    Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrix.cpp
     Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrix.h
     Source/Kernels/Kernels_Alignment.h
     Source/Kernels/Kernels_Arch.h

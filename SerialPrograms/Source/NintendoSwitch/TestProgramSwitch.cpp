@@ -222,10 +222,16 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
+
+    SelectionArrowFinder detector(overlay, {0.50, 0.58, 0.40, 0.10}, COLOR_RED);
+    detector.detect(feed.snapshot());
+
+
+
 //    InferenceBoxScope box(overlay, {0.23, 0.30, 0.35, 0.30});
 
 
-#if 1
+#if 0
     QImage image("screenshot-20220103-011451179122.png");
 
     PackedBinaryMatrix matrix = filter_rgb32_range(

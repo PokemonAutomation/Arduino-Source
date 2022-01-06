@@ -51,8 +51,11 @@ void boundaries(
     trailing_zeros(min_x, all_or);
     max_x = bitlength(all_or);
 
-#if 1
+#ifdef BINARY_TILE_X64_AVX2_FLAT
+    __m256i row = _mm256_setr_epi64x(0, 1, 2, 3);
+#else
     __m256i row = _mm256_setr_epi64x(0, 4, 8, 12);
+#endif
     __m256i min = _mm256_set1_epi64x(15);
     __m256i max = _mm256_setzero_si256();
     for (size_t c = 0; c < 4; c++){
@@ -62,7 +65,11 @@ void boundaries(
         __m256i maxr = _mm256_andnot_si256(mask, row);
         min = _mm256_min_epi32(min, minr);
         max = _mm256_max_epi32(max, maxr);
+#ifdef BINARY_TILE_X64_AVX2_FLAT
+        row = _mm256_add_epi64(row, _mm256_set1_epi64x(4));
+#else
         row = _mm256_sub_epi64(row, _mm256_set1_epi64x(-1));
+#endif
     }
     {
         __m128i x = _mm_min_epi32(
@@ -80,20 +87,6 @@ void boundaries(
         x = _mm_max_epi32(x, _mm_unpackhi_epi64(x, x));
         max_y = _mm_cvtsi128_si64(x) + 1;
     }
-#else
-    for (size_t c = 0; c < 16; c++){
-        if (tile.row(c) != 0){
-            min_y = c;
-            break;
-        }
-    }
-    for (size_t c = 16; c > 0; c--){
-        if (tile.row(c - 1) != 0){
-            max_y = c;
-            break;
-        }
-    }
-#endif
 }
 
 
@@ -153,28 +146,44 @@ uint64_t popcount_sumcoord(
         pop = popcount_indexsum(sum, tile.vec[0]);
         sum_p = pop;
         sum_x = sum;
+#ifdef BINARY_TILE_X64_AVX2_FLAT
+        sum_y = _mm256_mul_epu32(pop, _mm256_setr_epi64x(0, 1, 2, 3));
+#else
         sum_y = _mm256_mul_epu32(pop, _mm256_setr_epi64x(0, 4, 8, 12));
+#endif
     }
     {
         __m256i pop, sum;
         pop = popcount_indexsum(sum, tile.vec[1]);
         sum_p = _mm256_add_epi64(sum_p, pop);
         sum_x = _mm256_add_epi64(sum_x, sum);
+#ifdef BINARY_TILE_X64_AVX2_FLAT
+        sum_y = _mm256_add_epi64(sum_y, _mm256_mul_epu32(pop, _mm256_setr_epi64x(4, 5, 6, 7)));
+#else
         sum_y = _mm256_add_epi64(sum_y, _mm256_mul_epu32(pop, _mm256_setr_epi64x(1, 5, 9, 13)));
+#endif
     }
     {
         __m256i pop, sum;
         pop = popcount_indexsum(sum, tile.vec[2]);
         sum_p = _mm256_add_epi64(sum_p, pop);
         sum_x = _mm256_add_epi64(sum_x, sum);
+#ifdef BINARY_TILE_X64_AVX2_FLAT
+        sum_y = _mm256_add_epi64(sum_y, _mm256_mul_epu32(pop, _mm256_setr_epi64x(8, 9, 10, 11)));
+#else
         sum_y = _mm256_add_epi64(sum_y, _mm256_mul_epu32(pop, _mm256_setr_epi64x(2, 6, 10, 14)));
+#endif
     }
     {
         __m256i pop, sum;
         pop = popcount_indexsum(sum, tile.vec[3]);
         sum_p = _mm256_add_epi64(sum_p, pop);
         sum_x = _mm256_add_epi64(sum_x, sum);
+#ifdef BINARY_TILE_X64_AVX2_FLAT
+        sum_y = _mm256_add_epi64(sum_y, _mm256_mul_epu32(pop, _mm256_setr_epi64x(12, 13, 14, 15)));
+#else
         sum_y = _mm256_add_epi64(sum_y, _mm256_mul_epu32(pop, _mm256_setr_epi64x(3, 7, 11, 15)));
+#endif
     }
     sum_xcoord = reduce_add64_x64_AVX2(sum_x);
     sum_ycoord = reduce_add64_x64_AVX2(sum_y);
@@ -217,6 +226,51 @@ PA_FORCE_INLINE __m256i bit_reverse(__m256i x){
 }
 
 
+
+#ifdef BINARY_TILE_X64_AVX2_FLAT
+struct ProcessedMask{
+    __m256i m0, m1, m2, m3; //  Copy of the masks.
+    __m256i b0, b1, b2, b3; //  Bit-reversed copy of the masks.
+    __m256i t0, t1, t2, t3; //  Transposed masks.
+    __m256i f1, f2, f3;     //  Forward-carry mask.
+    __m256i r0, r1, r2;     //  Reverse-carry mask.
+
+    PA_FORCE_INLINE ProcessedMask(
+        const BinaryTile_AVX2& m,
+        __m256i x0, __m256i x1, __m256i x2, __m256i x3
+    ){
+        m0 = _mm256_or_si256(x0, m.vec[0]);
+        m1 = _mm256_or_si256(x1, m.vec[1]);
+        m2 = _mm256_or_si256(x2, m.vec[2]);
+        m3 = _mm256_or_si256(x3, m.vec[3]);
+
+        b0 = bit_reverse(m0);
+        b1 = bit_reverse(m1);
+        b2 = bit_reverse(m2);
+        b3 = bit_reverse(m3);
+
+        t0 = m0;
+        t1 = m1;
+        t2 = m2;
+        t3 = m3;
+        transpose_i64_4x4_AVX2(t0, t1, t2, t3);
+
+        //  Forward carry
+        __m256i f0 = t0;
+        f1 = _mm256_and_si256(f0, t1);
+        f2 = _mm256_and_si256(f1, t2);
+        f3 = _mm256_and_si256(f2, t3);
+        transpose_i64_4x4_AVX2(f0, f1, f2, f3);
+
+        //  Reverse carry
+        __m256i r3 = t3;
+        r2 = _mm256_and_si256(r3, t2);
+        r1 = _mm256_and_si256(r2, t1);
+        r0 = _mm256_and_si256(r1, t0);
+        transpose_i64_4x4_AVX2(r0, r1, r2, r3);
+    }
+};
+#else
 struct ProcessedMask{
     __m256i m0, m1, m2, m3; //  Copy of the masks.
     __m256i b0, b1, b2, b3; //  Bit-reversed copy of the masks.
@@ -252,6 +306,7 @@ struct ProcessedMask{
         transpose_i64_4x4_AVX2(r0, r1, r2, r3);
     }
 };
+#endif
 
 
 PA_FORCE_INLINE void expand_reverse(__m256i m, __m256i b, __m256i& x){
@@ -296,6 +351,25 @@ PA_FORCE_INLINE void expand_vertical(
     const ProcessedMask& mask,
     __m256i& x0, __m256i& x1, __m256i& x2, __m256i& x3
 ){
+#ifdef BINARY_TILE_X64_AVX2_FLAT
+    //  Carry across adjacent rows.
+    transpose_i64_4x4_AVX2(x0, x1, x2, x3);
+    x1 = _mm256_or_si256(x1, _mm256_and_si256(x0, mask.t1));
+    x2 = _mm256_or_si256(x2, _mm256_and_si256(x3, mask.t2));
+    x2 = _mm256_or_si256(x2, _mm256_and_si256(x1, mask.t2));
+    x1 = _mm256_or_si256(x1, _mm256_and_si256(x2, mask.t1));
+    x3 = _mm256_or_si256(x3, _mm256_and_si256(x2, mask.t3));
+    x0 = _mm256_or_si256(x0, _mm256_and_si256(x1, mask.t0));
+    transpose_i64_4x4_AVX2(x0, x1, x2, x3);
+
+    //  Carry across groups of 4 rows.
+    x1 = _mm256_or_si256(x1, _mm256_and_si256(_mm256_permute4x64_epi64(x0, 255), mask.f1));
+    x2 = _mm256_or_si256(x2, _mm256_and_si256(_mm256_permute4x64_epi64(x3,   0), mask.r2));
+    x2 = _mm256_or_si256(x2, _mm256_and_si256(_mm256_permute4x64_epi64(x1, 255), mask.f2));
+    x1 = _mm256_or_si256(x1, _mm256_and_si256(_mm256_permute4x64_epi64(x2,   0), mask.r1));
+    x3 = _mm256_or_si256(x3, _mm256_and_si256(_mm256_permute4x64_epi64(x2, 255), mask.f3));
+    x0 = _mm256_or_si256(x0, _mm256_and_si256(_mm256_permute4x64_epi64(x1,   0), mask.r0));
+#else
     //  Carry across adjacent rows.
     x1 = _mm256_or_si256(x1, _mm256_and_si256(x0, mask.m1));
     x2 = _mm256_or_si256(x2, _mm256_and_si256(x3, mask.m2));
@@ -313,6 +387,7 @@ PA_FORCE_INLINE void expand_vertical(
     x3 = _mm256_or_si256(x3, _mm256_and_si256(_mm256_permute4x64_epi64(x2, 255), mask.f3));
     x0 = _mm256_or_si256(x0, _mm256_and_si256(_mm256_permute4x64_epi64(x1,   0), mask.r0));
     transpose_i64_4x4_AVX2(x0, x1, x2, x3);
+#endif
 }
 
 void waterfill_expand(const BinaryTile_AVX2& m, BinaryTile_AVX2& x){

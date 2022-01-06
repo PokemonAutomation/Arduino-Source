@@ -424,12 +424,12 @@ void EggAutonomousState::hatch_egg(){
         //  Wait for steady state and read it again.
         m_env.wait_for(std::chrono::milliseconds(200));
         ImageMatchWatcher matcher(overworld, {0.10, 0.10, 0.80, 0.60}, 100);
-        SelectionArrowFinder arrow(m_console, {0.50, 0.60, 0.30, 0.20}, COLOR_GREEN);
+        ShortDialogPromptDetector prompt(m_console, {0.50, 0.60, 0.30, 0.20}, COLOR_GREEN);
         int ret = wait_until(
             m_env, m_console, std::chrono::seconds(30),
             {
                 &matcher,
-                &arrow,
+                &prompt,
             }
         );
         switch (ret){

@@ -115,6 +115,7 @@ SOURCES += \
     Source/CommonFramework/ImageMatch/ImageDiff.cpp \
     Source/CommonFramework/ImageMatch/ImageMatchOption.cpp \
     Source/CommonFramework/ImageMatch/ImageMatchResult.cpp \
+    Source/CommonFramework/ImageMatch/ScaleBrightness.cpp \
     Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.cpp \
     Source/CommonFramework/ImageTools/CellMatrix.cpp \
     Source/CommonFramework/ImageTools/ColorClustering.cpp \
@@ -208,6 +209,7 @@ SOURCES += \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.cpp \
+    Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrix.cpp \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.cpp \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Default.cpp \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.cpp \
@@ -594,6 +596,7 @@ HEADERS += \
     Source/CommonFramework/ImageMatch/ImageDiff.h \
     Source/CommonFramework/ImageMatch/ImageMatchOption.h \
     Source/CommonFramework/ImageMatch/ImageMatchResult.h \
+    Source/CommonFramework/ImageMatch/ScaleBrightness.h \
     Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h \
     Source/CommonFramework/ImageTools/CellMatrix.h \
     Source/CommonFramework/ImageTools/ColorClustering.h \

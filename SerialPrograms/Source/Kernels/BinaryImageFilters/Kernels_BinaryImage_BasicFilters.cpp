@@ -22,72 +22,34 @@ namespace PokemonAutomation{
 namespace Kernels{
 
 
-
-#if 0
-void filter_min_rgb32(
-    BinaryImage& binary_image,
+template <typename BinaryMatrixType, typename Compressor>
+void compress_rgb32_to_binary(
+    BinaryMatrixType& matrix,
     const uint32_t* image, size_t bytes_per_row,
-    uint8_t min_alpha, uint8_t min_red, uint8_t min_green, uint8_t min_blue
+    const Compressor& compressor
 ){
-#if 0
-#elif defined PA_Arch_x64_AVX512
-    MinRgbFilter_x64_AVX512 filter(min_alpha, min_red, min_green, min_blue);
-#elif defined PA_Arch_x64_AVX2
-    MinRgbFilter_x64_AVX2 filter(min_alpha, min_red, min_green, min_blue);
-#elif defined PA_Arch_x64_SSE42
-    MinRgbFilter_x64_SSE41 filter(min_alpha, min_red, min_green, min_blue);
-#else
-    MinRgbFilter_Default filter(min_alpha, min_red, min_green, min_blue);
-#endif
-    rgb32_to_binary_image(binary_image, image, bytes_per_row, filter);
+    size_t bit_width = matrix.width();
+//    size_t bit_height = binary_image.height();
+//    size_t word_width = binary_image.word64_width();
+    size_t word_height = matrix.word64_height();
+    for (size_t r = 0; r < word_height; r++){
+        const uint32_t* img = image;
+        size_t c = 0;
+        size_t left = bit_width;
+        while (left >= 64){
+            matrix.word64(c, r) = compressor.convert64(img);
+            c++;
+            img += 64;
+            left -= 64;
+        }
+        if (left > 0){
+            matrix.word64(c, r) = compressor.convert64(img, left);
+        }
+        image = (const uint32_t*)((const char*)image + bytes_per_row);
+    }
 }
-
-void filter_rgb32_range(
-    BinaryImage& binary_image,
-    const uint32_t* image, size_t bytes_per_row,
-    uint8_t min_alpha, uint8_t max_alpha,
-    uint8_t min_red, uint8_t max_red,
-    uint8_t min_green, uint8_t max_green,
-    uint8_t min_blue, uint8_t max_blue
-){
-#if 0
-#elif defined PA_Arch_x64_AVX512
-    RgbRangeFilter_x64_AVX512 filter(
-        min_alpha, max_alpha,
-        min_red, max_red,
-        min_green, max_green,
-        min_blue, max_blue
-    );
-#elif defined PA_Arch_x64_AVX2
-    RgbRangeFilter_x64_AVX2 filter(
-        min_alpha, max_alpha,
-        min_red, max_red,
-        min_green, max_green,
-        min_blue, max_blue
-    );
-#elif defined PA_Arch_x64_SSE42
-    RgbRangeFilter_x64_SSE41 filter(
-        min_alpha, max_alpha,
-        min_red, max_red,
-        min_green, max_green,
-        min_blue, max_blue
-    );
-#else
-    RgbRangeFilter_Default filter(
-        min_alpha, max_alpha,
-        min_red, max_red,
-        min_green, max_green,
-        min_blue, max_blue
-    );
-#endif
-    rgb32_to_binary_image(binary_image, image, bytes_per_row, filter);
-}
-#endif
-
-
-
-void filter_rgb32_range(
-    PackedBinaryMatrix& binary_image,
+void compress_rgb32_to_binary_range(
+    PackedBinaryMatrix& matrix,
     const uint32_t* image, size_t bytes_per_row,
     uint8_t min_alpha, uint8_t max_alpha,
     uint8_t min_red, uint8_t max_red,
@@ -96,41 +58,75 @@ void filter_rgb32_range(
 ){
 #if 0
 #elif defined PA_Arch_x64_AVX512
-    RgbRangeFilter_x64_AVX512 filter(
+    Compressor_RgbRange_x64_AVX512 compressor(
         min_alpha, max_alpha,
         min_red, max_red,
         min_green, max_green,
         min_blue, max_blue
     );
 #elif defined PA_Arch_x64_AVX2
-    RgbRangeFilter_x64_AVX2 filter(
+    Compressor_RgbRange_x64_AVX2 compressor(
         min_alpha, max_alpha,
         min_red, max_red,
         min_green, max_green,
         min_blue, max_blue
     );
 #elif defined PA_Arch_x64_SSE42
-    RgbRangeFilter_x64_SSE41 filter(
+    Compressor_RgbRange_x64_SSE41 compressor(
         min_alpha, max_alpha,
         min_red, max_red,
         min_green, max_green,
         min_blue, max_blue
     );
 #else
-    RgbRangeFilter_Default filter(
+    Compressor_RgbRange_Default compressor(
         min_alpha, max_alpha,
         min_red, max_red,
         min_green, max_green,
         min_blue, max_blue
     );
 #endif
-    rgb32_to_binary_image2(binary_image, image, bytes_per_row, filter);
+    compress_rgb32_to_binary(matrix, image, bytes_per_row, compressor);
 }
 
 
 
-
-
+template <typename BinaryMatrixType, typename Filter>
+void filter_rgb32(
+    const BinaryMatrixType& matrix,
+    uint32_t* image, size_t bytes_per_row,
+    const Filter& filter
+){
+    size_t bit_width = matrix.width();
+//    size_t bit_height = binary_image.height();
+//    size_t word_width = binary_image.word64_width();
+    size_t word_height = matrix.word64_height();
+    for (size_t r = 0; r < word_height; r++){
+        uint32_t* img = image;
+        size_t c = 0;
+        size_t left = bit_width;
+        while (left >= 64){
+            filter.filter64(matrix.word64(c, r), img);
+            c++;
+            img += 64;
+            left -= 64;
+        }
+        if (left > 0){
+            filter.filter64(matrix.word64(c, r), img, left);
+        }
+        image = (uint32_t*)((const char*)image + bytes_per_row);
+    }
+}
+void filter_rgb32(
+    const PackedBinaryMatrix& matrix,
+    uint32_t* image, size_t bytes_per_row,
+    uint32_t replace_with,
+    bool replace_if_zero    //  If false, replace if one.
+){
+    cout << "Untested code" << endl;
+    Filter_Default filter(replace_with, replace_if_zero);
+    filter_rgb32(matrix, image, bytes_per_row, filter);
+}
 
 
 

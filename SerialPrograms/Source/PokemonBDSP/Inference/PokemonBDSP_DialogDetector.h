@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
+#include "PokemonBDSP_SelectionArrow.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -58,6 +59,27 @@ private:
     ImageFloatBox m_left;
     ImageFloatBox m_right;
 };
+
+
+class ShortDialogPromptDetector : public VisualInferenceCallback{
+public:
+    ShortDialogPromptDetector(
+        VideoOverlay& overlay,
+        const ImageFloatBox& box,
+        Color color = COLOR_RED
+    );
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool process_frame(
+        const QImage& frame,
+        std::chrono::system_clock::time_point timestamp
+    ) override;
+
+private:
+    ShortDialogDetector m_dialog;
+    SelectionArrowFinder m_arrow;
+};
+
 
 
 

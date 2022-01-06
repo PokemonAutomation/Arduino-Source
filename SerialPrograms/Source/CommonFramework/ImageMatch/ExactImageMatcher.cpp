@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 namespace ImageMatch{
 
 
-ExactImageMatcher::ExactImageMatcher(QImage image, void*)
+ExactImageMatcher::ExactImageMatcher(QImage image)
     : m_image(std::move(image))
     , m_stats(image_stats(m_image))
 {
@@ -65,7 +65,7 @@ double ExactImageMatcher::rmsd_masked(QImage image) const{
 
 
 WeightedExactImageMatcher::WeightedExactImageMatcher(QImage image, const InverseStddevWeight& weight)
-    : ExactImageMatcher(std::move(image), nullptr)
+    : ExactImageMatcher(std::move(image))
     , m_multiplier(1. / (m_stats.stddev.sum() * weight.stddev_coefficient + weight.offset))
 {}
 
