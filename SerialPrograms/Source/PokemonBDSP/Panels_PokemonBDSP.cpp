@@ -18,6 +18,7 @@
 #include "Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.h"
 #include "Programs/Farming/PokemonBDSP_DoublesLeveling.h"
 #include "Programs/Farming/PokemonBDSP_AmitySquarePickUpFarmer.h"
+#include "Programs/Farming/PokemonBDSP_GiftBerryReset.h"
 
 #include "Programs/ShinyHunting/PokemonBDSP_StarterReset.h"
 #include "Programs/ShinyHunting/PokemonBDSP_LegendaryReset.h"
@@ -57,6 +58,7 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<MoneyFarmerRoute210_Descriptor, MoneyFarmerRoute210>();
     add_program<DoublesLeveling_Descriptor, DoublesLeveling>();
     add_program<AmitySquarePickUpFarmer_Descriptor, AmitySquarePickUpFarmer>();
+    add_program<GiftBerryReset_Descriptor, GiftBerryReset>();
 
     add_divider("---- Shiny Hunting ----");
     add_program<StarterReset_Descriptor, StarterReset>();
