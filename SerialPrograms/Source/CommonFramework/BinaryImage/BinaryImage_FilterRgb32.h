@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_CommonFramework_BinaryImage_FilterRgb32_H
 #define PokemonAutomation_CommonFramework_BinaryImage_FilterRgb32_H
 
-#include "Kernels/BinaryMatrix/Kernels_PackedBinaryMatrix.h"
+#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 
 class QImage;
 

@@ -4,11 +4,13 @@
  *
  */
 
+#include <QtGlobal>
 #include "Common/Cpp/Exception.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
+#include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MapDetector.h"
 #include "PokemonBDSP_ActivateMenuGlitch-Poketch.h"
 
@@ -33,7 +35,7 @@ ActivateMenuGlitchPoketch::ActivateMenuGlitchPoketch(const ActivateMenuGlitchPok
     : SingleSwitchProgramInstance(descriptor)
     , FLY_A_TO_X_DELAY(
         "<b>Fly Menu A-to-X Delay:</b><br>The delay between the A and X presses to overlap the menu with the fly option.",
-        "60", 20
+        "50", 20
     )
 {
     PA_ADD_OPTION(FLY_A_TO_X_DELAY);
@@ -64,6 +66,14 @@ void trigger_menu(ProgramEnvironment& env, ConsoleHandle& console){
         PA_THROW_StringException("Map not detected after 60 seconds.");
     }
     console.log("Detected map!", COLOR_BLUE);
+
+    env.wait_for(std::chrono::milliseconds(500));
+    ShortDialogDetector dialog;
+    while (dialog.detect(console.video().snapshot())){
+        console.log("Overshot mashing. Backing out.", COLOR_ORANGE);
+        pbf_press_button(console, BUTTON_B, 20, 105);
+        console.botbase().wait_for_all_requests();
+    }
 }
 void trigger_map_overlap(ProgramEnvironment& env, ConsoleHandle& console){
     for (size_t c = 0; c < 10; c++){
@@ -77,7 +87,7 @@ void trigger_map_overlap(ProgramEnvironment& env, ConsoleHandle& console){
             { &detector }
         );
         if (ret >= 0){
-            console.log("Overlap detected! Entered Pokemon center.", COLOR_BLUE);
+            console.log("Overlap detected! Entered " + STRING_POKEMON + " center.", COLOR_BLUE);
             return;
         }
         console.log("Failed to activate map overlap.", COLOR_ORANGE);
@@ -97,8 +107,8 @@ void ActivateMenuGlitchPoketch::program(SingleSwitchProgramEnvironment& env){
     pbf_wait(console, 3 * TICKS_PER_SECOND);
 
     //  Move to escalator.
-    pbf_press_dpad(console, DPAD_UP, 20, 105);
-    pbf_press_dpad(console, DPAD_UP, 20, 105);
+    pbf_press_dpad(console, DPAD_UP, 20, 125);
+    pbf_press_dpad(console, DPAD_UP, 20, 125);
     pbf_move_left_joystick(console, 255, 128, 250, 5 * TICKS_PER_SECOND);
 
     //  Re-enter escalator.
@@ -108,9 +118,26 @@ void ActivateMenuGlitchPoketch::program(SingleSwitchProgramEnvironment& env){
     pbf_press_dpad(console, DPAD_LEFT, 20, 105);
     pbf_press_dpad(console, DPAD_LEFT, 20, 105);
     pbf_press_dpad(console, DPAD_LEFT, 20, 105);
-    pbf_press_dpad(console, DPAD_LEFT, 20, 105);
-    pbf_press_dpad(console, DPAD_LEFT, 20, 105);
-    pbf_move_left_joystick(console, 128, 255, 125, 5 * TICKS_PER_SECOND);
+    {
+        console.botbase().wait_for_all_requests();
+        BlackScreenWatcher detector;
+        int ret = run_until(
+            env, console,
+            [](const BotBaseContext& context){
+                for (size_t c = 0; c < 5; c++){
+                    pbf_press_dpad(context, DPAD_LEFT, 20, 105);
+                    pbf_press_dpad(context, DPAD_DOWN, 20, 105);
+                }
+            },
+            { &detector }
+        );
+        if (ret < 0){
+            console.log("Unable to leave " + STRING_POKEMON + " center.", COLOR_RED);
+            PA_THROW_StringException("Unable to leave " + STRING_POKEMON + " center.");
+        }
+        console.log("Leaving " + STRING_POKEMON + " center detected!", COLOR_BLUE);
+    }
+    pbf_move_left_joystick(console, 128, 255, 125, 4 * TICKS_PER_SECOND);
 
     //  Center cursor.
     pbf_press_button(console, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);

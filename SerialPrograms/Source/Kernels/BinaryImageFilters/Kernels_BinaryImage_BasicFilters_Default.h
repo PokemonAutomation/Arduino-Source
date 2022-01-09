@@ -89,13 +89,13 @@ public:
         , m_replace_if_zero(replace_if_zero ? 1 : 0)
     {}
 
-    PA_FORCE_INLINE void filter64(uint64_t bits, uint32_t* pixels, size_t count = 64) const{
-        size_t c = 0;
+    PA_FORCE_INLINE void filter64(uint64_t bits, uint32_t* pixels, size_t start = 0, size_t stop = 64) const{
+        size_t c = start;
         do{
             filter1(bits & 1, pixels[c]);
             bits >>= 1;
             c++;
-        }while (c < count);
+        }while (c < stop);
     }
 
 private:

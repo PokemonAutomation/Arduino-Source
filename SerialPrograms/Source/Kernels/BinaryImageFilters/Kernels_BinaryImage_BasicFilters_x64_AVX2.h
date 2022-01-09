@@ -63,7 +63,8 @@ public:
         if (count){
             PartialWordLoader32_x64_AVX2 loader(count);
             __m256i pixel = loader.load(pixels);
-            bits |= convert8(pixel) << c;
+            uint64_t mask = ((uint64_t)1 << count) - 1;
+            bits |= (convert8(pixel) & mask) << c;
         }
         return bits;
     }

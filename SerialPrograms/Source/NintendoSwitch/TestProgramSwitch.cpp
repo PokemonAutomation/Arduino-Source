@@ -137,6 +137,7 @@
 #include "PokemonBDSP/Programs/PokemonBDSP_BoxRelease.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h"
 //#include "CommonFramework/BinaryImage/BinaryImage.h"
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "TestProgramSwitch.h"
 
 #include <immintrin.h>
@@ -222,9 +223,24 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
+    MapDetector detector;
+    VideoOverlaySet set(overlay);
+    detector.make_overlays(set);
 
-    SelectionArrowFinder detector(overlay, {0.50, 0.58, 0.40, 0.10}, COLOR_RED);
-    detector.detect(feed.snapshot());
+    cout << detector.detect(feed.snapshot()) << endl;
+
+
+
+//    QImage image("screenshot-20220108-185053570093.png");
+//    PokemonSwSh::MaxLairInternal::BattleMenuReader reader(overlay, Language::English);
+
+//    cout << reader.can_dmax(image) << endl;
+
+
+
+
+//    SelectionArrowFinder detector(overlay, {0.50, 0.58, 0.40, 0.10}, COLOR_RED);
+//    detector.detect(feed.snapshot());
 
 
 

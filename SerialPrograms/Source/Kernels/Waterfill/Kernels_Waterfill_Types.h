@@ -11,36 +11,11 @@
 #include <stdint.h>
 #include <map>
 #include <iostream>
-#include "Kernels/BinaryMatrix/Kernels_PackedBinaryMatrix.h"
+#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
 namespace Waterfill{
-
-
-class TileIndex{
-public:
-//    TileIndex(pxint_t x, pxint_t y)
-//        : m_index((uint32_t)x | ((uint64_t)y << 32))
-//    {}
-    TileIndex(size_t x, size_t y)
-        : m_index((uint32_t)x | ((uint64_t)y << 32))
-    {
-        if ((x | y) & 0xffffffff00000000){
-            std::cerr << "Pixel Overflow: (" << x << "," << y << ")" << std::endl;
-        }
-    }
-
-    size_t x() const{ return (uint32_t)m_index; }
-    size_t y() const{ return (uint32_t)(m_index >> 32); }
-
-    friend bool operator<(const TileIndex& a, const TileIndex& b){
-        return a.m_index < b.m_index;
-    }
-
-private:
-    uint64_t m_index;
-};
 
 
 
@@ -54,6 +29,10 @@ public:
 
     double aspect_ratio() const{ return (double)width() / height(); }
     double area_ratio() const{ return (double)area / (width() * height()); }
+
+    PackedBinaryMatrix matrix() const{
+        return object.submatrix(min_x, min_y, max_x - min_x, max_y - min_y);
+    }
 
 
 public:
@@ -96,9 +75,8 @@ public:
     uint64_t sum_x = 0;
     uint64_t sum_y = 0;
 
-    //  Contains the object itself in a sparse map of tiles.
-    //  This may be empty if not set.
-    std::map<TileIndex, PackedBinaryMatrix::Tile> object;
+    //  The object itself in the original image.
+    SparseBinaryMatrix object;
 };
 
 

@@ -141,26 +141,26 @@ public:
 
 
 public:
-    uint64_t top() const{
+    PA_FORCE_INLINE uint64_t top() const{
         return ((const uint64_t*)vec)[0];
     }
-    uint64_t& top(){
+    PA_FORCE_INLINE uint64_t& top(){
         return ((uint64_t*)vec)[0];
     }
-    uint64_t bottom() const{
+    PA_FORCE_INLINE uint64_t bottom() const{
         return ((const uint64_t*)vec)[7];
     }
-    uint64_t& bottom(){
+    PA_FORCE_INLINE uint64_t& bottom(){
         return ((uint64_t*)vec)[7];
     }
 
-    uint64_t row(size_t index) const{
+    PA_FORCE_INLINE uint64_t row(size_t index) const{
 #ifndef BINARY_TILE_X64_SSE42_FLAT
         index = ((index & 2) >> 1) | ((index & 1) << 1) | ((index & 4));
 #endif
         return ((const uint64_t*)vec)[index];
     }
-    uint64_t& row(size_t index){
+    PA_FORCE_INLINE uint64_t& row(size_t index){
 #ifndef BINARY_TILE_X64_SSE42_FLAT
         index = ((index & 2) >> 1) | ((index & 1) << 1) | ((index & 4));
 #endif

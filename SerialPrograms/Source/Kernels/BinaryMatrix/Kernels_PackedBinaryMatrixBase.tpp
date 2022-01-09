@@ -1,14 +1,14 @@
-/*  Binary Matrix Base
+/*  Packed Binary Matrix Base
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_Kernels_BinaryMatrixBase_TPP
-#define PokemonAutomation_Kernels_BinaryMatrixBase_TPP
+#ifndef PokemonAutomation_Kernels_PackedBinaryMatrixBase_TPP
+#define PokemonAutomation_Kernels_PackedBinaryMatrixBase_TPP
 
 #include "Common/Cpp/AlignedVector.tpp"
-#include "Kernels_BinaryMatrixBase.h"
+#include "Kernels_PackedBinaryMatrixBase.h"
 
 #include <iostream>
 using std::cout;
@@ -22,7 +22,9 @@ namespace Kernels{
 //  Rule of 5
 
 template <typename Tile>
-BinaryMatrixBase<Tile>::BinaryMatrixBase(BinaryMatrixBase&& x)
+PackedBinaryMatrixBase<Tile>::~PackedBinaryMatrixBase(){}
+template <typename Tile>
+PackedBinaryMatrixBase<Tile>::PackedBinaryMatrixBase(PackedBinaryMatrixBase&& x)
     : m_logical_width(x.m_logical_width)
     , m_logical_height(x.m_logical_height)
     , m_tile_width(x.m_tile_width)
@@ -35,7 +37,7 @@ BinaryMatrixBase<Tile>::BinaryMatrixBase(BinaryMatrixBase&& x)
     x.m_tile_height = 0;
 }
 template <typename Tile>
-void BinaryMatrixBase<Tile>::operator=(BinaryMatrixBase&& x){
+void PackedBinaryMatrixBase<Tile>::operator=(PackedBinaryMatrixBase&& x){
     m_logical_width = x.m_logical_width;
     m_logical_height = x.m_logical_height;
     m_tile_width = x.m_tile_width;
@@ -47,7 +49,7 @@ void BinaryMatrixBase<Tile>::operator=(BinaryMatrixBase&& x){
     x.m_tile_height = 0;
 }
 template <typename Tile>
-BinaryMatrixBase<Tile>::BinaryMatrixBase(const BinaryMatrixBase& x)
+PackedBinaryMatrixBase<Tile>::PackedBinaryMatrixBase(const PackedBinaryMatrixBase& x)
     : m_logical_width(x.m_logical_width)
     , m_logical_height(x.m_logical_height)
     , m_tile_width(x.m_tile_width)
@@ -60,23 +62,19 @@ BinaryMatrixBase<Tile>::BinaryMatrixBase(const BinaryMatrixBase& x)
     }
 }
 template <typename Tile>
-void BinaryMatrixBase<Tile>::operator=(const BinaryMatrixBase& x){
+void PackedBinaryMatrixBase<Tile>::operator=(const PackedBinaryMatrixBase& x){
     m_logical_width = x.m_logical_width;
     m_logical_height = x.m_logical_height;
     m_tile_width = x.m_tile_width;
     m_tile_height = x.m_tile_height;
     m_data = x.m_data;
-    size_t stop = m_tile_width * m_tile_height;
-    for (size_t c = 0; c < stop; c++){
-        m_data[c] = x.m_data[c];
-    }
 }
 
 
 //  Construction
 
 template <typename Tile>
-BinaryMatrixBase<Tile>::BinaryMatrixBase(size_t width, size_t height)
+PackedBinaryMatrixBase<Tile>::PackedBinaryMatrixBase(size_t width, size_t height)
     : m_logical_width(width)
     , m_logical_height(height)
     , m_tile_width((width + TILE_WIDTH - 1) / TILE_WIDTH)
@@ -86,14 +84,14 @@ BinaryMatrixBase<Tile>::BinaryMatrixBase(size_t width, size_t height)
     set_zero();
 }
 template <typename Tile>
-void BinaryMatrixBase<Tile>::set_zero(){
+void PackedBinaryMatrixBase<Tile>::set_zero(){
     size_t stop = m_tile_width * m_tile_height;
     for (size_t c = 0; c < stop; c++){
         m_data[c].set_zero();
     }
 }
 template <typename Tile>
-void BinaryMatrixBase<Tile>::set_ones(){
+void PackedBinaryMatrixBase<Tile>::set_ones(){
     //  This one is more complicated because because we need need to leave the
     //  padding its zero.
     size_t r = 0;
@@ -132,11 +130,14 @@ void BinaryMatrixBase<Tile>::set_ones(){
 //  Debugging
 
 template <typename Tile>
-std::string BinaryMatrixBase<Tile>::dump() const{
+std::string PackedBinaryMatrixBase<Tile>::dump() const{
     return dump(0, 0, m_logical_width, m_logical_height);
 }
 template <typename Tile>
-std::string BinaryMatrixBase<Tile>::dump(size_t min_x, size_t min_y, size_t max_x, size_t max_y) const{
+std::string PackedBinaryMatrixBase<Tile>::dump(
+    size_t min_x, size_t min_y,
+    size_t max_x, size_t max_y
+) const{
     std::string str;
     for (size_t r = min_y; r < max_y; r++){
         for (size_t c = min_x; c < max_x; c++){
@@ -151,8 +152,11 @@ std::string BinaryMatrixBase<Tile>::dump(size_t min_x, size_t min_y, size_t max_
 
 
 template <typename Tile>
-BinaryMatrixBase<Tile> BinaryMatrixBase<Tile>::submatrix(size_t x, size_t y, size_t width, size_t height) const{
-    BinaryMatrixBase ret(width, height);
+PackedBinaryMatrixBase<Tile> PackedBinaryMatrixBase<Tile>::submatrix(
+    size_t x, size_t y,
+    size_t width, size_t height
+) const{
+    PackedBinaryMatrixBase ret(width, height);
 
     //  Completely out-of-bounds.
     if (x >= m_logical_width){

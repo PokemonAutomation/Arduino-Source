@@ -384,15 +384,18 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixBase.h
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixBase.tpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Debugging.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Default.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_AVX2.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_AVX512.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_SSE42.h
-    Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrix.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile.h
     Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrix.h
+    Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixBase.h
+    Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixBase.tpp
+    Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixBase.h
+    Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixBase.tpp
     Source/Kernels/Kernels_Alignment.h
     Source/Kernels/Kernels_Arch.h
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.cpp

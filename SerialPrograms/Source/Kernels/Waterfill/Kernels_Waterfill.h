@@ -8,7 +8,7 @@
 #define PokemonAutomation_Kernels_Waterfill_H
 
 #include <vector>
-#include "Kernels/BinaryMatrix/Kernels_PackedBinaryMatrix.h"
+#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 #include "Kernels_Waterfill_Types.h"
 
 namespace PokemonAutomation{

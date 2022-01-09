@@ -41,7 +41,7 @@ bool MapDetector::detect(const QImage& screen) const{
     if (!is_solid(stats1, {0.190189, 0.32745, 0.482361})){
         return false;
     }
-    ImageStats stats2 = image_stats(extract_box(screen, m_box1));
+    ImageStats stats2 = image_stats(extract_box(screen, m_box2));
 //    cout << "m_box2: " << stats2.average << stats2.stddev << endl;
     if (!is_solid(stats2, {0.0668203, 0.4447, 0.488479})){
         return false;

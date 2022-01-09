@@ -14,7 +14,7 @@
 #include "TestProgramComputer.h"
 
 #include "Kernels/Kernels_Arch.h"
-#include "Kernels/BinaryMatrix/Kernels_BinaryMatrixBase.h"
+#include "Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixBase.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Tile_Default.h"
 #include "Kernels/Kernels_x64_SSE41.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h"
@@ -29,7 +29,7 @@
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX512.h"
 #endif
-#include "Kernels/BinaryMatrix/Kernels_PackedBinaryMatrix.h"
+#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 
 #include <iostream>
@@ -80,6 +80,38 @@ void TestProgramComputer::program(ProgramEnvironment& env){
     using namespace NintendoSwitch::PokemonSwSh;
 
 
+    QImage image("screenshot-20220108-185053570093.png");
+//    BattleMenuReader reader();
+
+    image = extract_box(image, ImageFloatBox(0.640, 0.600, 0.055, 0.380));
+    image.save("test.png");
+
+    PackedBinaryMatrix matrix = filter_rgb32_max(image, 64, 64, 64);
+#if 0
+    cout << "matrix: " << matrix.width() << " x " << matrix.height() << endl;
+    for (size_t r = 0; r < matrix.tile_height(); r++){
+        for (size_t c = 0; c < matrix.tile_width(); c++){
+            cout << "(" << c << ", " << r << ")" << endl;
+            cout << matrix.tile(c, r).dump() << endl;
+        }
+        break;
+    }
+#endif
+    std::vector<WaterFillObject> objects = find_objects(matrix, 200, false);
+
+    cout << objects.size() << endl;
+    size_t c = 0;
+    for (const WaterFillObject& object : objects){
+        ImagePixelBox box(object.min_x, object.min_y, object.max_x, object.max_y);
+        cout << object.min_x << ", " << object.min_y << ", " << object.max_x << ", " << object.max_y << endl;
+        extract_box(image, box).save("test-" + QString::number(c++) + ".png");
+    }
+
+    const WaterFillObject& object = objects[1];
+    cout << matrix.dump(object.min_x, object.min_y, object.max_x, object.max_y) << endl;
+
+
+#if 0
     QImage image("20220101-214116617784.jpg");
     PackedBinaryMatrix matrix = filter_rgb32_range(
         image,
@@ -112,7 +144,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
     cout << submatrix.tile(0, 0).dump() << endl;
 //    cout << submatrix.tile(0, 1).dump() << endl;
 //    cout << submatrix.tile(0, 2).dump() << endl;
-
+#endif
 
 #if 0
     BinaryTile_AVX512 tile;

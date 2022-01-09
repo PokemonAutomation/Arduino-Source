@@ -40,7 +40,7 @@ protected:
 
 class BattleMoveArrowFinder : public SelectionArrowFinder{
 public:
-    static const ImageFloatBox BATTLE_MOVE_SELECTION;
+//    static const ImageFloatBox BATTLE_MOVE_SELECTION;
 
 public:
     BattleMoveArrowFinder(VideoOverlay& overlay);

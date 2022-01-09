@@ -89,23 +89,23 @@ public:
 
 
 public:
-    uint64_t top() const{
+    PA_FORCE_INLINE uint64_t top() const{
         return vec[0];
     }
-    uint64_t& top(){
+    PA_FORCE_INLINE uint64_t& top(){
         return vec[0];
     }
-    uint64_t bottom() const{
+    PA_FORCE_INLINE uint64_t bottom() const{
         return vec[3];
     }
-    uint64_t& bottom(){
+    PA_FORCE_INLINE uint64_t& bottom(){
         return vec[3];
     }
 
-    uint64_t row(size_t index) const{
+    PA_FORCE_INLINE uint64_t row(size_t index) const{
         return vec[index];
     }
-    uint64_t& row(size_t index){
+    PA_FORCE_INLINE uint64_t& row(size_t index){
         return vec[index];
     }
 

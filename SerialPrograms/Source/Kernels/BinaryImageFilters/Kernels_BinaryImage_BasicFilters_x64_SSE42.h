@@ -60,7 +60,8 @@ public:
         if (count){
             PartialWordLoader_x64_SSE41 loader(count * sizeof(uint32_t));
             __m128i pixel = loader.load_no_read_past_end(pixels);
-            bits |= convert4(pixel) << c;
+            uint64_t mask = ((uint64_t)1 << count) - 1;
+            bits |= (convert4(pixel) & mask) << c;
         }
         return bits;
     }

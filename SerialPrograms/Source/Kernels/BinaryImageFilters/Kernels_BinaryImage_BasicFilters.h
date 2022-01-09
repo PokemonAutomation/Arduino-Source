@@ -23,7 +23,7 @@
 #define PokemonAutomation_Kernels_BinaryImage_BasicFilters_H
 
 //#include "Kernels/BinaryImage/Kernels_BinaryImage.h"
-#include "Kernels/BinaryMatrix/Kernels_PackedBinaryMatrix.h"
+#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

@@ -453,7 +453,7 @@ bool dmax_circle_ready(QImage image){
     if (stats.average.r < 128){
         return false;
     }
-    return is_solid(stats, {0.684591, 0.000481775, 0.314928}, 0.1, 50);
+    return is_solid(stats, {0.684591, 0.000481775, 0.314928}, 0.15, 50);
 
 //    ImageStats stats = image_stats(image);
 }

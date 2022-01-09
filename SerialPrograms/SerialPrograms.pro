@@ -209,7 +209,7 @@ SOURCES += \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.cpp \
-    Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrix.cpp \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.cpp \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.cpp \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Default.cpp \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.cpp \
@@ -704,11 +704,15 @@ HEADERS += \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.h \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Debugging.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Default.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_AVX2.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_AVX512.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_SSE42.h \
+    Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixBase.h \
+    Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixBase.tpp \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Default.h \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.h \

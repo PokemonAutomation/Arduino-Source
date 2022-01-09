@@ -29,8 +29,7 @@ bool find_object(
     WaterFillObject& object,
     size_t tile_x, size_t tile_y
 ){
-    using Tile = PackedBinaryMatrix::Tile;
-    Tile& start = matrix.tile(tile_x, tile_y);
+    BinaryMatrixTile& start = matrix.tile(tile_x, tile_y);
 
     size_t bit_x, bit_y;
     if (!find_bit(bit_x, bit_y, start)){
@@ -38,7 +37,7 @@ bool find_object(
     }
 
     std::set<TileIndex> busy;
-    std::map<TileIndex, Tile> obj;
+    std::map<TileIndex, BinaryMatrixTile> obj;
 
     //  Set first tile.
     busy.insert({tile_x, tile_y});
@@ -51,8 +50,8 @@ bool find_object(
         size_t x = index.x();
         size_t y = index.y();
 
-        Tile& mask = matrix.tile(x, y);
-        Tile& tile = obj[index];
+        BinaryMatrixTile& mask = matrix.tile(x, y);
+        BinaryMatrixTile& tile = obj[index];
 
         //  Expand current tile.
         waterfill_expand(mask, tile);
@@ -63,9 +62,9 @@ bool find_object(
 //        cout << mask.dump() << endl;
 //        break;
 
-        Tile neighbor_scratch;
+        BinaryMatrixTile neighbor_scratch;
         if (y > 0){
-            const Tile& neighbor_mask = matrix.tile(x, y - 1);
+            const BinaryMatrixTile& neighbor_mask = matrix.tile(x, y - 1);
             TileIndex neightbor_index(x, y - 1);
             auto iter = obj.find(neightbor_index);
             if (iter != obj.end()){
@@ -81,7 +80,7 @@ bool find_object(
             }
         }
         if (y + 1 < matrix.tile_height()){
-            const Tile& neighbor_mask = matrix.tile(x, y + 1);
+            const BinaryMatrixTile& neighbor_mask = matrix.tile(x, y + 1);
             TileIndex neightbor_index(x, y + 1);
             auto iter = obj.find(neightbor_index);
             if (iter != obj.end()){
@@ -97,7 +96,7 @@ bool find_object(
             }
         }
         if (x > 0){
-            const Tile& neighbor_mask = matrix.tile(x - 1, y);
+            const BinaryMatrixTile& neighbor_mask = matrix.tile(x - 1, y);
             TileIndex neightbor_index(x - 1, y);
             auto iter = obj.find(neightbor_index);
             if (iter != obj.end()){
@@ -113,7 +112,7 @@ bool find_object(
             }
         }
         if (x + 1 < matrix.tile_width()){
-            const Tile& neighbor_mask = matrix.tile(x + 1, y);
+            const BinaryMatrixTile& neighbor_mask = matrix.tile(x + 1, y);
             TileIndex neightbor_index(x + 1, y);
             auto iter = obj.find(neightbor_index);
             if (iter != obj.end()){
@@ -143,8 +142,8 @@ bool find_object(
     size_t tile_max_x = 0;
     size_t tile_max_y = 0;
     WaterFillObject stats;
-    stats.body_x = tile_x * Tile::WIDTH + bit_x;
-    stats.body_y = tile_y * Tile::HEIGHT + bit_y;
+    stats.body_x = tile_x * BinaryMatrixTile::WIDTH + bit_x;
+    stats.body_y = tile_y * BinaryMatrixTile::HEIGHT + bit_y;
     for (const auto& item : obj){
         size_t x = item.first.x();
         size_t y = item.first.y();
@@ -152,14 +151,14 @@ bool find_object(
         popcount = popcount_sumcoord(sum_x, sum_y, item.second);
 //        cout << popcount << ", " << sum_x << ", " << sum_y << endl;
         stats.accumulate_body(
-            x * Tile::WIDTH, y * Tile::HEIGHT,
+            x * BinaryMatrixTile::WIDTH, y * BinaryMatrixTile::HEIGHT,
             popcount, sum_x, sum_y
         );
         if (!(tile_min_x < x && x < tile_max_x && tile_min_y < y && y < tile_max_y)){
             size_t cmin_x, cmax_x, cmin_y, cmax_y;
             boundaries(item.second, cmin_x, cmax_x, cmin_y, cmax_y);
             stats.accumulate_boundary(
-                x * Tile::WIDTH, y * Tile::HEIGHT,
+                x * BinaryMatrixTile::WIDTH, y * BinaryMatrixTile::HEIGHT,
                 cmin_x, cmax_x, cmin_y, cmax_y
             );
         }
@@ -178,7 +177,8 @@ bool find_object(
 #endif
 
     object = stats;
-    object.object = std::move(obj);
+    object.object = SparseBinaryMatrix(matrix.width(), matrix.height());
+    object.object.set_data(std::move(obj));
 
     return true;
 }

@@ -58,9 +58,9 @@ public:
         }while (--lc);
         count %= 16;
         if (count){
-            __mmask16 mask = ((uint32_t)1 << count) - 1;
-            __m512i pixel = _mm512_maskz_load_epi32(mask, pixels);
-            bits |= convert16(pixel) << c;
+            uint64_t mask = ((uint64_t)1 << count) - 1;
+            __m512i pixel = _mm512_maskz_load_epi32((__mmask16)mask, pixels);
+            bits |= (convert16(pixel) & mask) << c;
         }
         return bits;
     }
