@@ -8,7 +8,7 @@
 #define PokemonAutomation_Kernels_BinaryImage_BasicFilters_Default_H
 
 #include <stdint.h>
-#include <cstddef> // used to define size_t on macOS
+#include <cstddef>
 #include "Common/Compiler.h"
 
 namespace PokemonAutomation{

@@ -6,6 +6,8 @@
 
 #include <QtGlobal>
 #include "Common/Cpp/Exception.h"
+#include "Common/Qt/QtJsonTools.h"
+#include "CommonFramework/Globals.h"
 #include "Pokemon_PokeballNames.h"
 
 namespace PokemonAutomation{
@@ -27,63 +29,34 @@ struct PokeballNameDatabase{
 };
 const std::string PokeballNameDatabase::NULL_SLUG;
 
-PokeballNameDatabase::PokeballNameDatabase()
-    : ordered_list{
-        "poke-ball",
-        "great-ball",
-        "ultra-ball",
-        "master-ball",
-        "premier-ball",
-        "heal-ball",
-        "net-ball",
-        "nest-ball",
-        "dive-ball",
-        "dusk-ball",
-        "timer-ball",
-        "quick-ball",
-        "repeat-ball",
-        "luxury-ball",
-        "fast-ball",
-        "friend-ball",
-        "lure-ball",
-        "level-ball",
-        "heavy-ball",
-        "love-ball",
-        "moon-ball",
-        "dream-ball",
-        "sport-ball",
-        "safari-ball",
-        "beast-ball",
-    }
-{
-    database["poke-ball"    ].m_display_name = QString("Pok") + QChar(0xe9) + " Ball";
-    database["great-ball"   ].m_display_name = "Great Ball";
-    database["ultra-ball"   ].m_display_name = "Ultra Ball";
-    database["master-ball"  ].m_display_name = "Master Ball";
-    database["premier-ball" ].m_display_name = "Premier Ball";
-    database["heal-ball"    ].m_display_name = "Heal Ball";
-    database["net-ball"     ].m_display_name = "Net Ball";
-    database["nest-ball"    ].m_display_name = "Nest Ball";
-    database["dive-ball"    ].m_display_name = "Dive Ball";
-    database["dusk-ball"    ].m_display_name = "Dusk Ball";
-    database["timer-ball"   ].m_display_name = "Timer Ball";
-    database["quick-ball"   ].m_display_name = "Quick Ball";
-    database["repeat-ball"  ].m_display_name = "Repeat Ball";
-    database["luxury-ball"  ].m_display_name = "Luxury Ball";
-    database["fast-ball"    ].m_display_name = "Fast Ball";
-    database["friend-ball"  ].m_display_name = "Friend Ball";
-    database["lure-ball"    ].m_display_name = "Lure Ball";
-    database["level-ball"   ].m_display_name = "Level Ball";
-    database["heavy-ball"   ].m_display_name = "Heavy Ball";
-    database["love-ball"    ].m_display_name = "Love Ball";
-    database["moon-ball"    ].m_display_name = "Moon Ball";
-    database["dream-ball"   ].m_display_name = "Dream Ball";
-    database["sport-ball"   ].m_display_name = "Sport Ball";
-    database["safari-ball"  ].m_display_name = "Safari Ball";
-    database["beast-ball"   ].m_display_name = "Beast Ball";
+PokeballNameDatabase::PokeballNameDatabase(){
+    QJsonArray slugs = read_json_file(
+        RESOURCE_PATH() + "Pokemon/ItemListBalls.json"
+    ).array();
 
-    for (const auto& item : database){
-        reverse_lookup[item.second.m_display_name] = item.first;
+    QJsonObject item_dict = read_json_file(
+        RESOURCE_PATH() + "Pokemon/ItemNameDisplay.json"
+    ).object();
+
+    for (const auto& item : slugs){
+        QString slug_qstr = item.toString();
+        std::string slug = slug_qstr.toStdString();
+        ordered_list.emplace_back(slug);
+
+        auto iter0 = item_dict.find(slug_qstr);
+        if (iter0 == item_dict.end()){
+            PA_THROW_StringException("Unknown item slug: " + slug);
+        }
+
+        QJsonObject languages = iter0.value().toObject();
+        auto iter1 = languages.find("eng");
+        if (iter1 == languages.end()){
+            PA_THROW_StringException("English display not found for: " + slug);
+        }
+
+        QString display_name = iter1->toString();
+        database[slug].m_display_name = display_name;
+        reverse_lookup[display_name] = slug;
     }
 }
 

@@ -64,7 +64,7 @@ GiftBerryReset::GiftBerryReset(const GiftBerryReset_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
     , LANGUAGE(
-        "<b>Game Language:</b><br>Attempt to read and log the encountered " + STRING_POKEMON + " in this language.<br>Set to \"None\" to disable this feature.",
+        "<b>Game Language:</b><br>This is needed to read the berry name.",
             Pokemon::BerryNameReader::instance().languages(), true
     )
     , TARGET_BERRIES(
@@ -110,7 +110,7 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env){
         env.console.log("Target berry: " + berry_slug);
         if (Pastoria_berry_list.find(berry_slug) == Pastoria_berry_list.end()){
             const std::string error_message = "The npc does not offer this berry: " + berry_slug;
-            PA_THROW_InferenceException(env.console, error_message.c_str());
+            PA_THROW_InferenceException(env.console, error_message);
         }
     }
 

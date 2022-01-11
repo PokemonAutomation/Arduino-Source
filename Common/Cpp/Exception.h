@@ -24,8 +24,8 @@ public:
     StringException(const char* location, const char* message)
         : StringException("StringException", location, std::string(message))
     {}
-    StringException(const char* location, const std::string& message)
-        : StringException("StringException", location, message)
+    StringException(const char* location, std::string message)
+        : StringException("StringException", location, std::move(message))
     {}
 #ifdef QT_VERSION
     StringException(const char* location, const QString& message)

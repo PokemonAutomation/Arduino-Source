@@ -16,6 +16,10 @@ namespace PokemonAutomation{
 class InferenceException : public StringException{
 public:
     InferenceException(const char* location, Logger& logger, const char* message);
+    InferenceException(const char* location, Logger& logger, std::string message);
+#ifdef QT_VERSION
+    InferenceException(const char* location, Logger& logger, const QString& message);
+#endif
 
     virtual const char* type() const{
         return "ParseException";
