@@ -8,6 +8,7 @@
 #define PokemonAutomation_Kernels_BitScaning_H
 
 #include <stdint.h>
+#include <cstddef> // used to define size_t on macOS 
 #include "Common/Compiler.h"
 
 #if 0

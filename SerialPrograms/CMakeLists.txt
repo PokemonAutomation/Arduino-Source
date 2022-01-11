@@ -523,6 +523,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/TestProgramSwitch.h
     Source/PanelLists.cpp
     Source/PanelLists.h
+    Source/Pokemon/Inference/Pokemon_BerryNameReader.cpp
+    Source/Pokemon/Inference/Pokemon_BerryNameReader.h
     Source/Pokemon/Inference/Pokemon_IVCheckerReader.cpp
     Source/Pokemon/Inference/Pokemon_IVCheckerReader.h
     Source/Pokemon/Inference/Pokemon_NameReader.cpp
@@ -537,6 +539,8 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Options/Pokemon_BallSelectOption.h
     Source/Pokemon/Options/Pokemon_BallSelectWidget.cpp
     Source/Pokemon/Options/Pokemon_BallSelectWidget.h
+    Source/Pokemon/Options/Pokemon_BerrySelectWidget.cpp
+    Source/Pokemon/Options/Pokemon_BerrySelectWidget.h
     Source/Pokemon/Options/Pokemon_EncounterBotOptions.h
     Source/Pokemon/Options/Pokemon_IVCheckerOption.cpp
     Source/Pokemon/Options/Pokemon_IVCheckerOption.h
@@ -555,6 +559,10 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Pokemon_Notification.h
     Source/Pokemon/Pokemon_Types.h
     Source/Pokemon/Pokemon_Types.cpp
+    Source/Pokemon/Resources/Pokemon_BerryNames.cpp
+    Source/Pokemon/Resources/Pokemon_BerryNames.h
+    Source/Pokemon/Resources/Pokemon_BerrySprites.cpp
+    Source/Pokemon/Resources/Pokemon_BerrySprites.h
     Source/Pokemon/Resources/Pokemon_PokeballNames.cpp
     Source/Pokemon/Resources/Pokemon_PokeballNames.h
     Source/Pokemon/Resources/Pokemon_PokemonNames.cpp
@@ -593,6 +601,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyTrigger.cpp
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyTrigger.h
+    Source/PokemonBDSP/Options/PokemonBDSP_BerrySelector.cpp
+    Source/PokemonBDSP/Options/PokemonBDSP_BerrySelector.h
     Source/PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.cpp
     Source/PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.h
     Source/PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h
@@ -624,6 +634,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_AmitySquarePickUpFarmer.h
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_DoublesLeveling.cpp
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_DoublesLeveling.h
+    Source/PokemonBDSP/Programs/Farming/PokemonBDSP_GiftBerryReset.cpp
+    Source/PokemonBDSP/Programs/Farming/PokemonBDSP_GiftBerryReset.h
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute210.cpp
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute210.h
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.cpp

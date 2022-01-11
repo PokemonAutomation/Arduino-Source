@@ -126,7 +126,7 @@ bool OverworldTrigger::find_encounter(SingleSwitchProgramEnvironment& env) const
             }
         }
 
-        //  Open the pokemon menu of the first pokemon
+        //  Open the pokemon menu of the selected pokemon
         const uint16_t pokemon_to_pokemon_menu_delay = 30;
         pbf_press_button(env.console, BUTTON_ZL, 20, pokemon_to_pokemon_menu_delay);
         //  Move down one menuitem to select "Sweet Scent"
