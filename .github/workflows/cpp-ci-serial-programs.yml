@@ -1,45 +1,86 @@
 name: C++ CI Serial Programs
 
-on: [push, pull_request, workflow_dispatch]
+on: [push, workflow_dispatch]
 
 jobs:
   build:
-    runs-on: [windows-latest]
+    runs-on: ${{ matrix.os }}
 
     strategy:
+      fail-fast: false
       matrix:
-        config: [Debug, Release]
+        os: [windows-latest, macos-latest]
+        qt_version: ['5.12.12', '6.2.2']
+        include:
+        - os: windows-latest
+          host: windows
+          cmake_args: '-G "Visual Studio 16 2019"'
+        - os: windows-latest
+          qt_version: '5.12.12'
+          qt_arch: win64_msvc2017_64
+          qt_arch_path: msvc2017_64
+        - os: windows-latest
+          qt_version: '6.2.2'
+          qt_arch: win64_msvc2019_64
+          qt_arch_path: msvc2019_64
+        - os: macos-latest
+          host: mac
+          cmake_args:
+          qt_arch: clang_64
+        - os: macos-latest
+          qt_version: '5.12.12'
+          qt_arch_path: clang_64
+        - os: macos-latest
+          qt_version: '6.2.2'
+          qt_arch_path: macos
+        - qt_version: '5.12.12'
+          qt_version_major: '5'
+          qt_modules:
+        - qt_version: '6.2.2'
+          qt_version_major: '6'
+          qt_modules: -m qtmultimedia qtserialport
 
     steps:
     - uses: actions/checkout@v2
       with:
-        path: .\Arduino-Source
+        path: Arduino-Source
     - uses: actions/checkout@v2
       with:
         repository: 'PokemonAutomation/Packages'
-        path: .\Packages
+        path: Packages
     - name: Add msbuild to PATH
+      if: startsWith(matrix.os, 'windows')
       uses: ilammy/msvc-dev-cmd@v1
     - name: Install Qt
-      uses: jurplel/install-qt-action@v2
-      with:
-        version: '5.12.10'
-        arch: 'win64_msvc2017_64'
-    - name: Generate binaries
       run: |
-        cd Arduino-Source\SerialPrograms\
+        python3 -m pip install aqtinstall
+        python3 -m aqt install-qt ${{ matrix.host }} desktop ${{ matrix.qt_version }} ${{ matrix.qt_arch }} ${{ matrix.qt_modules }}
+    - name: Run cmake
+      run: |
+        cd Arduino-Source/SerialPrograms
         mkdir bin
-        cd bin\
-        cmake ..\ -G "Visual Studio 16 2019" -DCMAKE_PREFIX_PATH=C:\Qt\5.12.10\msvc2019_64\
-        MSBuild.exe .\SerialPrograms.vcxproj /p:Configuration=${{ matrix.config }} /p:Platform=x64
-    - name: Copy resources
+        cd bin
+        cmake .. -DCMAKE_PREFIX_PATH=${{ github.workspace }}/${{ matrix.qt_version }}/${{ matrix.qt_arch_path }} -DQT_MAJOR:STRING=${{ matrix.qt_version_major }} ${{ matrix.cmake_args }}
+    - name: Generate binaries
+      if: startsWith(matrix.os, 'windows')
       run: |
-        robocopy Packages\SerialPrograms\Resources\                         Output\Resources\ /s
-        robocopy Packages\PABotBase\PABotBase-Switch\                       Output\PABotBase\ /s
-        robocopy Arduino-Source\SerialPrograms\bin\                         Output\Binaries\ libcrypto-1_1-x64.dll libssl-1_1-x64.dll Sleepy.dll tesseractPA.dll
-        robocopy Arduino-Source\SerialPrograms\bin\${{ matrix.config }}\    Output\Binaries\ SerialPrograms.exe
+        cd Arduino-Source/SerialPrograms/bin
+        MSBuild.exe ./SerialPrograms.vcxproj /p:Configuration=Release /p:Platform=x64
+    - name: Generate binaries
+      if: startsWith(matrix.os, 'macos')
+      run: |
+        cd Arduino-Source/SerialPrograms/bin
+        cmake --build . -j 10
+    - name: Copy resources
+      if: startsWith(matrix.os, 'windows')
+      run: |
+        robocopy Packages/SerialPrograms/Resources          Output/Resources /s
+        robocopy Packages/PABotBase/PABotBase-Switch        Output/PABotBase /s
+        robocopy Arduino-Source/SerialPrograms/bin          Output/Binaries libcrypto-1_1-x64.dll libssl-1_1-x64.dll Sleepy.dll tesseractPA.dll
+        robocopy Arduino-Source/SerialPrograms/bin/Release  Output/Binaries SerialPrograms.exe
         exit 0
     - uses: actions/upload-artifact@v2
+      if: startsWith(matrix.os, 'windows')
       with:
-        name: Serial Programs for windows ${{ matrix.config }}
-        path: Output\
+        name: Serial Programs for windows (${{ matrix.qt_version }})
+        path: Output
