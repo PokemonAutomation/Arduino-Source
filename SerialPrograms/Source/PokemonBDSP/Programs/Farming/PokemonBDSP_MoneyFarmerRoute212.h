@@ -34,15 +34,29 @@ public:
 
 private:
     struct Stats;
-    void battle(SingleSwitchProgramEnvironment& env, uint8_t pp[4], bool man);
-    void heal_and_return(ConsoleHandle& console, uint8_t pp[4]);
-    void flyback_heal_and_return(ConsoleHandle& console, uint8_t pp[4]);
+    // Run the battle loop. Return true if the program should stop.
+    bool battle(SingleSwitchProgramEnvironment& env, uint8_t pp[4], bool man);
+    // From the row above the old couple, heal Pokemon and return.
+    // Return true if VS Seeker needs charging.
+    bool heal_after_battle_and_return(SingleSwitchProgramEnvironment& env, ConsoleHandle& console, uint8_t pp[4]);
+    // Starting in front of the Hearthome Pokecenter, heal and return
+    // to the old couple.
+    void heal_at_center_and_return(ConsoleHandle& console, uint8_t pp[4]);
+    // Fly from the old couple to Hearthome Pokecenter, heal and return.
+    void fly_to_center_heal_and_return(ConsoleHandle& console, uint8_t pp[4]);
+    // Move around to charge VS Seeker.
+    void charge_vs_seeker(ConsoleHandle& console);
+
     static size_t total_pp(uint8_t pp[4]);
 
 private:
     ShortcutDirection SHORTCUT;
 
     EnumDropdownOption START_LOCATION;
+
+    EnumDropdownOption HEALING_METHOD;
+
+    EnumDropdownOption ON_LEARN_MOVE;
 
     SimpleIntegerOption<uint8_t> MOVE1_PP;
     SimpleIntegerOption<uint8_t> MOVE2_PP;
