@@ -36,7 +36,7 @@ ShinyHuntShaymin_Descriptor::ShinyHuntShaymin_Descriptor()
 ShinyHuntShaymin::ShinyHuntShaymin(const ShinyHuntShaymin_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
-    , SHORTCUT("<b>Bike Shortcut:</b>")
+//    , SHORTCUT("<b>Bike Shortcut:</b>")
     , ENCOUNTER_BOT_OPTIONS(false, false)
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
@@ -56,7 +56,7 @@ ShinyHuntShaymin::ShinyHuntShaymin(const ShinyHuntShaymin_Descriptor& descriptor
     )
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
-    PA_ADD_OPTION(SHORTCUT);
+//    PA_ADD_OPTION(SHORTCUT);
 
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -75,31 +75,56 @@ std::unique_ptr<StatsTracker> ShinyHuntShaymin::make_stats() const{
 
 
 bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env) const{
-    BattleMenuWatcher battle_menu_detector(BattleType::WILD);
-    StartBattleDetector start_battle_detector(env.console);
-
-    int result = run_until(
-        env, env.console,
-        [&](const BotBaseContext& context){
-            while (true){
-                pbf_mash_button(context, BUTTON_ZL, 5 * TICKS_PER_SECOND);
+    env.console.botbase().wait_for_all_requests();
+    {
+        BattleMenuWatcher battle_menu_detector(BattleType::WILD);
+        ShortDialogWatcher dialog_detector;
+        int result = run_until(
+            env, env.console,
+            [&](const BotBaseContext& context){
+                while (true){
+                    pbf_mash_button(context, BUTTON_ZL, 5 * TICKS_PER_SECOND);
+                }
+            },
+            {
+                &battle_menu_detector,
+                &dialog_detector,
             }
-        },
-        {
-            &battle_menu_detector,
-            &start_battle_detector,
+        );
+        switch (result){
+        case 0:
+            env.console.log("Unexpected Battle.", COLOR_RED);
+            return false;
+        case 1:
+            env.console.log("Talked to Shaymin!");
+            break;
         }
-    );
-
-    switch (result){
-    case 0:
-        env.console.log("Unexpected Battle.", COLOR_RED);
-        return false;
-    case 1:
-        env.console.log("Battle started!");
-        return true;
     }
-    return false;
+    {
+        BattleMenuWatcher battle_menu_detector(BattleType::WILD);
+        StartBattleDetector start_battle_detector(env.console);
+        int result = run_until(
+            env, env.console,
+            [&](const BotBaseContext& context){
+                while (true){
+                    pbf_mash_button(context, BUTTON_ZL, 5 * TICKS_PER_SECOND);
+                }
+            },
+            {
+                &battle_menu_detector,
+                &start_battle_detector,
+            }
+        );
+        switch (result){
+        case 0:
+            env.console.log("Unexpected Battle.", COLOR_RED);
+            return false;
+        case 1:
+            env.console.log("Battle started!");
+            break;
+        }
+    }
+    return true;
 }
 
 void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env){
@@ -143,9 +168,9 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env){
         pbf_mash_button(env.console, BUTTON_B, 75);
 
         //  Hop on bike, ride down to seabreak path
-        SHORTCUT.run(env.console, 0);
-        pbf_move_left_joystick(env.console, 128, 255, 315, 0);
-        pbf_move_left_joystick(env.console, 128, 0, 315, 0);
+//        SHORTCUT.run(env.console, 0);
+        pbf_move_left_joystick(env.console, 128, 255, 360, 0);
+        pbf_move_left_joystick(env.console, 128, 0, 370, 0);
     }
 
     send_program_finished_notification(

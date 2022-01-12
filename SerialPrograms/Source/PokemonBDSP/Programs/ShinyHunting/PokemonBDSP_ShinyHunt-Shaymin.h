@@ -41,7 +41,7 @@ private:
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
 
-    ShortcutDirection SHORTCUT;
+//    ShortcutDirection SHORTCUT;
 
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
 
