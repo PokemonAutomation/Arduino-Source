@@ -265,6 +265,7 @@ SOURCES += \
     Source/NintendoSwitch/TestProgramComputer.cpp \
     Source/NintendoSwitch/TestProgramSwitch.cpp \
     Source/PanelLists.cpp \
+    Source/Pokemon/Inference/Pokemon_BerryNameReader.cpp \
     Source/Pokemon/Inference/Pokemon_IVCheckerReader.cpp \
     Source/Pokemon/Inference/Pokemon_NameReader.cpp \
     Source/Pokemon/Inference/Pokemon_PokeballNameReader.cpp \
@@ -272,6 +273,7 @@ SOURCES += \
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.cpp \
     Source/Pokemon/Options/Pokemon_BallSelectOption.cpp \
     Source/Pokemon/Options/Pokemon_BallSelectWidget.cpp \
+    Source/Pokemon/Options/Pokemon_BerrySelectWidget.cpp \
     Source/Pokemon/Options/Pokemon_IVCheckerOption.cpp \
     Source/Pokemon/Options/Pokemon_IVCheckerWidget.cpp \
     Source/Pokemon/Options/Pokemon_NameSelectOption.cpp \
@@ -280,6 +282,8 @@ SOURCES += \
     Source/Pokemon/Pokemon_IVChecker.cpp \
     Source/Pokemon/Pokemon_Notification.cpp \
     Source/Pokemon/Pokemon_Types.cpp \
+    Source/Pokemon/Resources/Pokemon_BerryNames.cpp \
+    Source/Pokemon/Resources/Pokemon_BerrySprites.cpp \
     Source/Pokemon/Resources/Pokemon_PokeballNames.cpp \
     Source/Pokemon/Resources/Pokemon_PokemonNames.cpp \
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.cpp \
@@ -303,6 +307,7 @@ SOURCES += \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOption.cpp \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOverride.cpp \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterWidget.cpp \
+    Source/PokemonBDSP/Options/PokemonBDSP_BerrySelector.cpp \
     Source/PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.cpp \
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.cpp \
     Source/PokemonBDSP/Panels_PokemonBDSP.cpp \
@@ -315,10 +320,12 @@ SOURCES += \
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggRoutines.cpp \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_AmitySquarePickUpFarmer.cpp \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_DoublesLeveling.cpp \
+    Source/PokemonBDSP/Programs/Farming/PokemonBDSP_GiftBerryReset.cpp \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute210.cpp \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.cpp \
     Source/PokemonBDSP/Programs/General/PokemonBDSP_MassRelease.cpp \
-    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-Poketch.cpp \
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.3.cpp \
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.2.cpp \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy.cpp \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy2.cpp \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.cpp \
@@ -785,6 +792,7 @@ HEADERS += \
     Source/NintendoSwitch/TestProgramComputer.h \
     Source/NintendoSwitch/TestProgramSwitch.h \
     Source/PanelLists.h \
+    Source/Pokemon/Inference/Pokemon_BerryNameReader.h \
     Source/Pokemon/Inference/Pokemon_IVCheckerReader.h \
     Source/Pokemon/Inference/Pokemon_NameReader.h \
     Source/Pokemon/Inference/Pokemon_PokeballNameReader.h \
@@ -792,6 +800,7 @@ HEADERS += \
     Source/Pokemon/Inference/Pokemon_TrainPokemonOCR.h \
     Source/Pokemon/Options/Pokemon_BallSelectOption.h \
     Source/Pokemon/Options/Pokemon_BallSelectWidget.h \
+    Source/Pokemon/Options/Pokemon_BerrySelectWidget.h \
     Source/Pokemon/Options/Pokemon_EncounterBotOptions.h \
     Source/Pokemon/Options/Pokemon_IVCheckerOption.h \
     Source/Pokemon/Options/Pokemon_IVCheckerWidget.h \
@@ -802,6 +811,8 @@ HEADERS += \
     Source/Pokemon/Pokemon_IVChecker.h \
     Source/Pokemon/Pokemon_Notification.h \
     Source/Pokemon/Pokemon_Types.h \
+    Source/Pokemon/Resources/Pokemon_BerryNames.h \
+    Source/Pokemon/Resources/Pokemon_BerrySprites.h \
     Source/Pokemon/Resources/Pokemon_PokeballNames.h \
     Source/Pokemon/Resources/Pokemon_PokemonNames.h \
     Source/Pokemon/Resources/Pokemon_PokemonSlugs.h \
@@ -825,6 +836,7 @@ HEADERS += \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOption.h \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOverride.h \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterWidget.h \
+    Source/PokemonBDSP/Options/PokemonBDSP_BerrySelector.h \
     Source/PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.h \
     Source/PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h \
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h \
@@ -838,10 +850,12 @@ HEADERS += \
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggRoutines.h \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_AmitySquarePickUpFarmer.h \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_DoublesLeveling.h \
+    Source/PokemonBDSP/Programs/Farming/PokemonBDSP_GiftBerryReset.h \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute210.h \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.h \
     Source/PokemonBDSP/Programs/General/PokemonBDSP_MassRelease.h \
-    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-Poketch.h \
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.3.h \
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.2.h \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy.h \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy2.h \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.h \

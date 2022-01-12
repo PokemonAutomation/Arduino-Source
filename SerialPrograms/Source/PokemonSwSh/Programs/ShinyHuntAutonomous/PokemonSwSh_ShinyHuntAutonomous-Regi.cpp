@@ -144,6 +144,12 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env){
             std::chrono::seconds(30)
         );
 //        shininess = ShinyDetection::SQUARE_SHINY;
+        if (result.shiny_type == ShinyType::UNKNOWN){
+            pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
+            run_away(env, env.console, EXIT_BATTLE_TIMEOUT);
+            error = true;
+            continue;
+        }
 
         bool stop = handler.handle_standard_encounter_end_battle(result, EXIT_BATTLE_TIMEOUT);
         if (stop){

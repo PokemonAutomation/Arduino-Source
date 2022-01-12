@@ -642,8 +642,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.h
     Source/PokemonBDSP/Programs/General/PokemonBDSP_MassRelease.cpp
     Source/PokemonBDSP/Programs/General/PokemonBDSP_MassRelease.h
-    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-Poketch.cpp
-    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-Poketch.h
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.3.cpp
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.3.h
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.2.cpp
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.2.h
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy.cpp
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy.h
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy2.cpp

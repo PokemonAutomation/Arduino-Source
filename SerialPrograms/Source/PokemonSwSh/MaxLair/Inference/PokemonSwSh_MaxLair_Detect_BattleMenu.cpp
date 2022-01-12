@@ -36,6 +36,7 @@ BattleMenuDetector::BattleMenuDetector()
     , m_text_fight  (0.830, 0.576 + 1 * 0.1075, 0.08, 0.080)
     , m_text_pokemon(0.830, 0.576 + 2 * 0.1075, 0.08, 0.080)
     , m_text_run    (0.830, 0.576 + 3 * 0.1075, 0.08, 0.080)
+    , m_icon_cheer  (0.923, 0.636 + 1 * 0.1075, 0.05, 0.020)
 //    , m_info_left   (0.907, 0.500, 0.02, 0.03)
 //    , m_info_right  (0.970, 0.500, 0.02, 0.03)
     , m_status0     (0.280, 0.870, 0.015, 0.030)
@@ -48,6 +49,7 @@ void BattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_YELLOW, m_text_fight);
     items.add(COLOR_YELLOW, m_text_pokemon);
     items.add(COLOR_YELLOW, m_text_run);
+    items.add(COLOR_YELLOW, m_icon_cheer);
     items.add(COLOR_YELLOW, m_status0);
     items.add(COLOR_YELLOW, m_status1);
 }
@@ -139,10 +141,11 @@ bool BattleMenuDetector::detect(const QImage& screen){
 //    cout << "===============" << endl;
     if (!fight){
         fight = cluster_fit_2(   //  Cheer
-            extract_box(screen, m_icon_fight),
+            extract_box(screen, m_icon_cheer),
             qRgb(0, 0, 0), 2.2,
             qRgb(9, 162, 218), 1.0
         );
+//        cout << "fight = " << fight << endl;
         m_cheer = fight;
     }
     if (!fight){

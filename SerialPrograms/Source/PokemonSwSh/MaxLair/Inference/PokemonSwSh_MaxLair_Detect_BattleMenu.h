@@ -43,6 +43,7 @@ private:
     ImageFloatBox m_text_fight;
     ImageFloatBox m_text_pokemon;
     ImageFloatBox m_text_run;
+    ImageFloatBox m_icon_cheer; //  Specific for Italian
 //    ImageFloatBox m_info_left;
 //    ImageFloatBox m_info_right;
     ImageFloatBox m_status0;

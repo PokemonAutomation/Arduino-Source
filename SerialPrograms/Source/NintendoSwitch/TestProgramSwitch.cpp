@@ -157,6 +157,8 @@ using std::cout;
 using std::endl;
 
 
+//#include "../Internal/SerialPrograms/NintendoSwitch_ScalarButtons.h"
+
 
 
 
@@ -223,11 +225,67 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
+    uint16_t FLY_A_TO_X_DELAY = 50;
+
+
+    pbf_press_button(console, BUTTON_R, 5, 0);
+    pbf_press_dpad(console, DPAD_RIGHT, 10, 115);
+    pbf_press_button(console, BUTTON_ZL, 10, 0);
+    console.botbase().wait_for_all_requests();
+    MapWatcher detector;
+    int ret = wait_until(
+        env, console, std::chrono::seconds(2),
+        { &detector }
+    );
+    if (ret < 0){
+        console.log("Map not detected after 2 seconds.", COLOR_RED);
+//        PA_THROW_StringException("Map not detected after 2 seconds.");
+    }else{
+        console.log("Detected map!", COLOR_BLUE);
+    }
+
+    env.wait_for(std::chrono::seconds(1));
+
+    //  Move bolder and cursor to Celestial town.
+    pbf_press_dpad(console, DPAD_RIGHT, 30, 95);
+
+    //  Bring up menu
+    pbf_press_button(console, BUTTON_ZL, 20, FLY_A_TO_X_DELAY - 20);
+    pbf_press_button(console, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+
+    //  Fly
+    pbf_press_button(console, BUTTON_ZL, 20, 10 * TICKS_PER_SECOND);
+
+#if 0
+    //  Enter Pokemon.
+    pbf_press_button(console, BUTTON_ZL, 20, GameSettings::instance().MENU_TO_POKEMON_DELAY);
+
+    //  Enter Summary.
+    pbf_press_button(console, BUTTON_ZL, 20, 105);
+    pbf_press_button(console, BUTTON_ZL, 20, 5 * TICKS_PER_SECOND);
+
+    //  Local Room
+    pbf_press_button(console, BUTTON_Y, 20, 105);
+#endif
+
+
+
+
+//    QImage image("20220111-124433054843-PathPartyReader-ReadHP.png");
+
+//    NintendoSwitch::PokemonSwSh::MaxLairInternal::PathReader detector(overlay, 0);
+//    double hp[4];
+//    detector.read_hp(logger, image, hp);
+
+
+
+#if 0
     MapDetector detector;
     VideoOverlaySet set(overlay);
     detector.make_overlays(set);
 
     cout << detector.detect(feed.snapshot()) << endl;
+#endif
 
 
 

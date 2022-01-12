@@ -1,4 +1,4 @@
-/*  Activate Menu Glitch (Poketch)
+/*  Activate Menu Glitch (1.1.2)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -12,17 +12,17 @@
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MapDetector.h"
-#include "PokemonBDSP_ActivateMenuGlitch-Poketch.h"
+#include "PokemonBDSP_ActivateMenuGlitch-1.1.2.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-ActivateMenuGlitchPoketch_Descriptor::ActivateMenuGlitchPoketch_Descriptor()
+ActivateMenuGlitch112_Descriptor::ActivateMenuGlitch112_Descriptor()
     : RunnableSwitchProgramDescriptor(
-        "PokemonBDSP:ActivateMenuGlitchPoketch",
-        STRING_POKEMON + " BDSP", QString("Activate Menu Glitch (Pok") + QChar(0xe9) + "tch)",
+        "PokemonBDSP:ActivateMenuGlitch112",
+        STRING_POKEMON + " BDSP", "Activate Menu Glitch (1.1.2)",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ActivateMenuGlitch-Poketch.md",
         QString("Activate the menu glitch using the Pok") + QChar(0xe9) + "tch. "
         "<font color=\"red\">(This requires game versions 1.1.0 - 1.1.2. The glitch it relies on was patched in v1.1.3.)</font>",
@@ -31,7 +31,7 @@ ActivateMenuGlitchPoketch_Descriptor::ActivateMenuGlitchPoketch_Descriptor()
     )
 {}
 
-ActivateMenuGlitchPoketch::ActivateMenuGlitchPoketch(const ActivateMenuGlitchPoketch_Descriptor& descriptor)
+ActivateMenuGlitch112::ActivateMenuGlitch112(const ActivateMenuGlitch112_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , FLY_A_TO_X_DELAY(
         "<b>Fly Menu A-to-X Delay:</b><br>The delay between the A and X presses to overlap the menu with the fly option.",
@@ -100,7 +100,7 @@ void trigger_map_overlap(ProgramEnvironment& env, ConsoleHandle& console){
 
 
 
-void ActivateMenuGlitchPoketch::program(SingleSwitchProgramEnvironment& env){
+void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env){
     ConsoleHandle& console = env.console;
 
     trigger_map_overlap(env, console);

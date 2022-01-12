@@ -11,6 +11,8 @@
 #include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageTools/FillGeometry.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyFilters.h"
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
 #include "TestProgramComputer.h"
 
 #include "Kernels/Kernels_Arch.h"
@@ -80,6 +82,16 @@ void TestProgramComputer::program(ProgramEnvironment& env){
     using namespace NintendoSwitch::PokemonSwSh;
 
 
+
+#if 0
+    QImage image("20220111-125825502573-ProgramHang.png");
+
+    NintendoSwitch::PokemonSwSh::MaxLairInternal::BattleMenuDetector detector;
+    cout << detector.detect(image) << endl;
+#endif
+
+
+#if 0
     QImage image("screenshot-20220108-185053570093.png");
 //    BattleMenuReader reader();
 
@@ -109,6 +121,10 @@ void TestProgramComputer::program(ProgramEnvironment& env){
 
     const WaterFillObject& object = objects[1];
     cout << matrix.dump(object.min_x, object.min_y, object.max_x, object.max_y) << endl;
+#endif
+
+
+
 
 
 #if 0

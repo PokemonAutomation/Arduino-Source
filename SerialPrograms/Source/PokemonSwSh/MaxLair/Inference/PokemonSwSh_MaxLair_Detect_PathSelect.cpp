@@ -180,10 +180,10 @@ PathReader::PathReader(VideoOverlay& overlay, size_t player_index)
     , m_sprite1(overlay, 0.002, 0.345 + 1*0.16315, 0.071, 0.102)
     , m_sprite2(overlay, 0.002, 0.345 + 2*0.16315, 0.071, 0.102)
     , m_sprite3(overlay, 0.002, 0.345 + 3*0.16315, 0.071, 0.102)
-    , m_hp0(overlay, 0.074, 0.435 + 0*0.16315, player_index == 0 ? 0.052 : 0.041, 0.007)
-    , m_hp1(overlay, 0.074, 0.435 + 1*0.16315, player_index == 1 ? 0.052 : 0.041, 0.007)
-    , m_hp2(overlay, 0.074, 0.435 + 2*0.16315, player_index == 2 ? 0.052 : 0.041, 0.007)
-    , m_hp3(overlay, 0.074, 0.435 + 3*0.16315, player_index == 3 ? 0.052 : 0.041, 0.007)
+    , m_hp0(overlay, 0.074, 0.435 + 0*0.16315, player_index == 0 ? 0.052 : 0.041, 0.005)
+    , m_hp1(overlay, 0.074, 0.435 + 1*0.16315, player_index == 1 ? 0.052 : 0.041, 0.005)
+    , m_hp2(overlay, 0.074, 0.435 + 2*0.16315, player_index == 2 ? 0.052 : 0.041, 0.005)
+    , m_hp3(overlay, 0.074, 0.435 + 3*0.16315, player_index == 3 ? 0.052 : 0.041, 0.005)
 {}
 
 
