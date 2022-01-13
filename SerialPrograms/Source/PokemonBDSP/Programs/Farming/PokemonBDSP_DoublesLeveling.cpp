@@ -135,10 +135,8 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env){
                 pbf_move_right_joystick(env.console, 128, 255, 20, 105);
                 pbf_press_button(env.console, BUTTON_A, 20, 105);
                 break;
-            }else{
-                return true;
             }
-            break;
+            return true;
         default:
             env.log("Timed out.", COLOR_RED);
             stats.add_error();

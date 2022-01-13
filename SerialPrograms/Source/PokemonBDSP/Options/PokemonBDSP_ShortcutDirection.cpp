@@ -12,29 +12,48 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
+namespace{
+std::vector<QString> buildShortcutValues(bool required){
+    std::vector<QString> values;
+    if (!required){
+        values.emplace_back("None");
+    }
+    values.emplace_back("Up");
+    values.emplace_back("Right");
+    values.emplace_back("Down");
+    values.emplace_back("Left");
+    return values;
+}
+}
 
-ShortcutDirection::ShortcutDirection(QString label)
+ShortcutDirection::ShortcutDirection(QString label, bool required)
     : EnumDropdownOption(
         std::move(label),
-        {
-            "Up",
-            "Right",
-            "Down",
-            "Left",
-        }, 0
-    )
+        buildShortcutValues(required),
+        0
+    ), m_required(required)
 {}
 
 void ShortcutDirection::run(const BotBaseContext& context, uint16_t delay){
     uint8_t shortcut_x = 128;
     uint8_t shortcut_y = 128;
-    switch (*this){
+    size_t index = *this;
+    if (!m_required){
+        // If the shortcut direction is optional, the first value is "None".
+        if (index == 0) {
+            return;
+        }
+        --index;
+    }
+
+    switch (index){
     case 0: shortcut_y = 0; break;
     case 1: shortcut_x = 255; break;
     case 2: shortcut_y = 255; break;
     case 3: shortcut_x = 0; break;
     default: PA_THROW_StringException("Invalid shortcut value: " + std::to_string(*this));
     }
+
     pbf_mash_button(context, BUTTON_PLUS, 125);
     pbf_move_right_joystick(context, shortcut_x, shortcut_y, 20, delay);
 }
