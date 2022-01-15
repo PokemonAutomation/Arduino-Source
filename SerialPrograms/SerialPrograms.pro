@@ -335,6 +335,7 @@ SOURCES += \
     Source/PokemonBDSP/Programs/PokemonBDSP_EncounterHandler.cpp \
     Source/PokemonBDSP/Programs/PokemonBDSP_GameEntry.cpp \
     Source/PokemonBDSP/Programs/PokemonBDSP_GameNavigation.cpp \
+    Source/PokemonBDSP/Programs/PokemonBDSP_GlobalRoomHeal.cpp \
     Source/PokemonBDSP/Programs/PokemonBDSP_OverworldTrigger.cpp \
     Source/PokemonBDSP/Programs/PokemonBDSP_RunFromBattle.cpp \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_LegendaryReset.cpp \
@@ -865,6 +866,7 @@ HEADERS += \
     Source/PokemonBDSP/Programs/PokemonBDSP_EncounterHandler.h \
     Source/PokemonBDSP/Programs/PokemonBDSP_GameEntry.h \
     Source/PokemonBDSP/Programs/PokemonBDSP_GameNavigation.h \
+    Source/PokemonBDSP/Programs/PokemonBDSP_GlobalRoomHeal.h \
     Source/PokemonBDSP/Programs/PokemonBDSP_OverworldTrigger.h \
     Source/PokemonBDSP/Programs/PokemonBDSP_RunFromBattle.h \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_LegendaryReset.h \

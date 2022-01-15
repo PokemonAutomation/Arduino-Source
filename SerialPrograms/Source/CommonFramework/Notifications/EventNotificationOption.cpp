@@ -59,7 +59,7 @@ void EventNotificationSettings::load_json(bool enable_screenshot, const QJsonVal
     json_get_bool(ping, obj, "Ping");
     if (enable_screenshot){
         ScreenshotOption screenshot_option("");
-        screenshot_option.load_json(json_get_object_nothrow(obj, "Screenshot"));
+        screenshot_option.load_json(json_get_value_nothrow(obj, "Screenshot"));
         screenshot = screenshot_option;
     }
     QJsonArray array = json_get_array_nothrow(obj, "Tags");
