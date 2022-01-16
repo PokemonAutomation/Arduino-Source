@@ -30,6 +30,7 @@ public:
 
 public:
     //  Construction
+    PackedBinaryMatrixBase();
     PackedBinaryMatrixBase(size_t width, size_t height);
 
     void set_zero();        //  Zero the entire matrix.

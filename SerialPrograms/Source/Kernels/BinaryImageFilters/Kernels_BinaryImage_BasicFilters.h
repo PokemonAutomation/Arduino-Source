@@ -35,10 +35,23 @@ namespace Kernels{
 void compress_rgb32_to_binary_range(
     PackedBinaryMatrix& matrix,
     const uint32_t* image, size_t bytes_per_row,
-    uint8_t min_alpha, uint8_t max_alpha,
-    uint8_t min_red, uint8_t max_red,
-    uint8_t min_green, uint8_t max_green,
-    uint8_t min_blue, uint8_t max_blue
+    uint32_t mins, uint32_t maxs
+);
+
+//  Same as above, but multiple filters.
+//  The purpose is to reduce passes over the entire image.
+//  All matricies must have the same dimensions.
+void compress2_rgb32_to_binary_range(
+    const uint32_t* image, size_t bytes_per_row,
+    PackedBinaryMatrix& matrix0, uint32_t mins0, uint32_t maxs0,
+    PackedBinaryMatrix& matrix1, uint32_t mins1, uint32_t maxs1
+);
+void compress4_rgb32_to_binary_range(
+    const uint32_t* image, size_t bytes_per_row,
+    PackedBinaryMatrix& matrix0, uint32_t mins0, uint32_t maxs0,
+    PackedBinaryMatrix& matrix1, uint32_t mins1, uint32_t maxs1,
+    PackedBinaryMatrix& matrix2, uint32_t mins2, uint32_t maxs2,
+    PackedBinaryMatrix& matrix3, uint32_t mins3, uint32_t maxs3
 );
 
 

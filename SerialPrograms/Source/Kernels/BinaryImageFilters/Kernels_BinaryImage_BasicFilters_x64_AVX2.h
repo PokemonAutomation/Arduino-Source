@@ -17,25 +17,10 @@ namespace Kernels{
 
 class Compressor_RgbRange_x64_AVX2{
 public:
-    Compressor_RgbRange_x64_AVX2(
-        uint8_t min_alpha, uint8_t max_alpha,
-        uint8_t min_red, uint8_t max_red,
-        uint8_t min_green, uint8_t max_green,
-        uint8_t min_blue, uint8_t max_blue
-    ){
-        uint32_t smin =
-            ((uint32_t)min_alpha << 24) |
-            ((uint32_t)min_red << 16) |
-            ((uint32_t)min_green << 8) |
-            (uint32_t)min_blue;
-        uint32_t smax =
-            ((uint32_t)max_alpha << 24) |
-            ((uint32_t)max_red << 16) |
-            ((uint32_t)max_green << 8) |
-            (uint32_t)max_blue;
-        m_mins = _mm256_set1_epi32(smin ^ 0x80808080);
-        m_maxs = _mm256_set1_epi32(smax ^ 0x80808080);
-    }
+    Compressor_RgbRange_x64_AVX2(uint32_t mins, uint32_t maxs)
+        : m_mins(_mm256_set1_epi32(mins ^ 0x80808080))
+        , m_maxs(_mm256_set1_epi32(maxs ^ 0x80808080))
+    {}
 
     PA_FORCE_INLINE uint64_t convert64(const uint32_t* pixels) const{
         uint64_t bits = 0;

@@ -22,20 +22,15 @@ namespace Kernels{
 
 class Compressor_RgbRange_Default{
 public:
-    Compressor_RgbRange_Default(
-        uint8_t min_alpha, uint8_t max_alpha,
-        uint8_t min_red, uint8_t max_red,
-        uint8_t min_green, uint8_t max_green,
-        uint8_t min_blue, uint8_t max_blue
-    )
-        : m_minB(min_blue)
-        , m_maxB(max_blue)
-        , m_minG(min_green << 8)
-        , m_maxG(max_green << 8)
-        , m_minR(min_red << 16)
-        , m_maxR(max_red << 16)
-        , m_minA(min_alpha << 24)
-        , m_maxA(max_alpha << 24)
+    Compressor_RgbRange_Default(uint32_t mins, uint32_t maxs)
+        : m_minB(mins & 0x000000ff)
+        , m_maxB(maxs & 0x000000ff)
+        , m_minG(mins & 0x0000ff00)
+        , m_maxG(maxs & 0x0000ff00)
+        , m_minR(mins & 0x00ff0000)
+        , m_maxR(maxs & 0x00ff0000)
+        , m_minA(mins & 0xff000000)
+        , m_maxA(maxs & 0xff000000)
     {}
 
     PA_FORCE_INLINE uint64_t convert64(const uint32_t* pixels, size_t count = 64) const{

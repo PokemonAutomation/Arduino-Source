@@ -18,25 +18,10 @@ namespace Kernels{
 
 class Compressor_RgbRange_x64_AVX512{
 public:
-    Compressor_RgbRange_x64_AVX512(
-        uint8_t min_alpha, uint8_t max_alpha,
-        uint8_t min_red, uint8_t max_red,
-        uint8_t min_green, uint8_t max_green,
-        uint8_t min_blue, uint8_t max_blue
-    ){
-        uint32_t smin =
-            ((uint32_t)min_alpha << 24) |
-            ((uint32_t)min_red << 16) |
-            ((uint32_t)min_green << 8) |
-            (uint32_t)min_blue;
-        uint32_t smax =
-            ((uint32_t)max_alpha << 24) |
-            ((uint32_t)max_red << 16) |
-            ((uint32_t)max_green << 8) |
-            (uint32_t)max_blue;
-        m_mins = _mm512_set1_epi32(smin);
-        m_maxs = _mm512_set1_epi32(smax);
-    }
+    Compressor_RgbRange_x64_AVX512(uint32_t mins, uint32_t maxs)
+        : m_mins(_mm512_set1_epi32(mins))
+        , m_maxs(_mm512_set1_epi32(maxs))
+    {}
 
     PA_FORCE_INLINE uint64_t convert64(const uint32_t* pixels) const{
         uint64_t bits = 0;
@@ -62,6 +47,7 @@ public:
             __m512i pixel = _mm512_maskz_load_epi32((__mmask16)mask, pixels);
             bits |= (convert16(pixel) & mask) << c;
         }
+//        cout << "bits = " << bits << endl;
         return bits;
     }
 

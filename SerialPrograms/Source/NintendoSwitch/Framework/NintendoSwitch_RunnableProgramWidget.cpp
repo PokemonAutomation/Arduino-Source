@@ -61,7 +61,7 @@ QWidget* RunnableSwitchProgramWidget::make_header(QWidget& parent){
         break;
     case FeedbackType::REQUIRED:
         text = new QLabel(
-            "<font color=\"green\">(This program requires video feedback. Please make sure you choose the correct capture device.</font>)",
+            "<font color=\"green\">(This program requires video feedback. Please make sure you choose the correct capture device.)</font>",
             header
         );
         break;

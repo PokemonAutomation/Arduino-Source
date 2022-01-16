@@ -153,6 +153,18 @@ bool is_arrow_pointed_up(
         }
     }
 
+    //  Verify bottom.
+    WaterFillObject region2;
+    if (!find_object_on_bit(inverted, region2, width - 1, height - 1)){
+        return false;
+    }
+
+    if (region0.area + region1.area + region2.area < 0.9 * object.area){
+        return false;
+    }
+
+//    cout << "good!" << endl;
+
     return true;
 }
 bool is_arrow_pointed_corner(
@@ -267,12 +279,12 @@ bool is_arrow(const QImage& image, const WaterFillObject& object){
 
     size_t width = object.width();
     size_t height = object.height();
-    QImage cropped0 = image.copy(
+    QImage cropped = image.copy(
         (int)object.min_x, (int)object.min_y,
         (int)width, (int)height
     );
 
-    QImage cropped = cropped0;
+//    QImage cropped = cropped0;
     PackedBinaryMatrix matrix = object.packed_matrix();
     filter_rgb32(
         matrix,
@@ -293,6 +305,7 @@ bool is_arrow(const QImage& image, const WaterFillObject& object){
 //    static int c = 0;
 //    QString file = "test-" + QString::number(c++) + ".png";
 //    cout << file.toStdString() << endl;
+//    cout << object.min_x << endl;
 //    cropped0.save(file);
 
     if (is_arrow_pointed_up(matrix, inverted, object)){
@@ -322,10 +335,12 @@ int8_t read_side(const QImage& image, uint8_t pixel_threshold){
     size_t count = 0;
 
     WaterFillIterator finder(matrix, 300);
+    WaterFillObject arrow;
     WaterFillObject object;
     while (finder.find_next(object)){
         if (is_arrow(image, object)){
             count++;
+            arrow = object;
         }
     }
 //    cout << "count = " << count << endl;
@@ -333,7 +348,9 @@ int8_t read_side(const QImage& image, uint8_t pixel_threshold){
         return -1;
     }
 
-    return object.min_x < (size_t)image.width() / 3
+//    cout << arrow.min_x << " | " << (size_t)image.width() / 3 << endl;
+
+    return arrow.min_x < (size_t)image.width() / 3
         ? 0
         : 1;
 }

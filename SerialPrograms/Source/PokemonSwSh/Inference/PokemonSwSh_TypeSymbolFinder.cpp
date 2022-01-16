@@ -49,7 +49,7 @@ size_t distance_sqr(const ImagePixelBox& a, const ImagePixelBox& b){
 }
 
 
-std::pair<double, PokemonType> match_type_symbol(const QImage& image, int threshold){
+std::pair<double, PokemonType> match_type_symbol(const QImage& image){
     int width = image.width();
     int height = image.height();
     if (width * height < 100){
@@ -109,16 +109,13 @@ std::pair<double, PokemonType> match_type_symbol(const QImage& image, int thresh
 
 void find_symbol_candidates(
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>>& candidates,
-    const QImage& image, int min_rgb_brightness, double max_area_ratio
+    const QImage& image,
+    PackedBinaryMatrix& matrix, double max_area_ratio
 ){
     size_t max_area = (size_t)(image.width() * image.height() * max_area_ratio);
-
-    uint8_t pixel_threshold = (uint8_t)(min_rgb_brightness / 3);
-    PackedBinaryMatrix matrix = compress_rgb32_to_binary_min(
-        image, pixel_threshold, pixel_threshold, pixel_threshold
-    );
-
     std::vector<WaterFillObject> objects = find_objects_inplace(matrix, 20, false);
+
+    static int index = 0;
 
     std::map<size_t, WaterFillObject> objmap;
     for (size_t c = 0; c < objects.size(); c++){
@@ -126,7 +123,13 @@ void find_symbol_candidates(
             continue;
         }
         objmap[c] = objects[c];
+
+//        image.copy(
+//            objects[c].min_x, objects[c].min_y, objects[c].width(), objects[c].height()
+//        ).save("test-" + QString::number(index++) + ".png");
     }
+
+//    cout << "begin = " << objmap.size() << endl;
 
     //  Merge nearby objects.
     bool changed;
@@ -152,13 +155,15 @@ void find_symbol_candidates(
         }
     }while (changed);
 
+//    cout << "merged = " << objmap.size() << endl;
+
     //  Identify objects.
     for (const auto& item : objmap){
         QImage img = image.copy(
             (pxint_t)item.second.min_x, (pxint_t)item.second.min_y,
             (pxint_t)item.second.width(), (pxint_t)item.second.height()
         );
-        std::pair<double, PokemonType> result = match_type_symbol(img, min_rgb_brightness);
+        std::pair<double, PokemonType> result = match_type_symbol(img);
         if (result.second != PokemonType::NONE){
             const WaterFillObject& obj = item.second;
             candidates.emplace(
@@ -170,6 +175,8 @@ void find_symbol_candidates(
             );
         }
     }
+
+//    cout << "candidates = " << candidates.size() << endl;
 }
 
 
@@ -179,12 +186,30 @@ std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_symbols(
 ){
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates;
 
-    find_symbol_candidates(candidates, image, 450, max_area_ratio);
-    find_symbol_candidates(candidates, image, 500, max_area_ratio);
-    find_symbol_candidates(candidates, image, 550, max_area_ratio);
-    find_symbol_candidates(candidates, image, 600, max_area_ratio);
-    find_symbol_candidates(candidates, image, 650, max_area_ratio);
-    find_symbol_candidates(candidates, image, 700, max_area_ratio);
+    {
+        PackedBinaryMatrix matrix0, matrix1, matrix2, matrix3;
+        compress4_rgb32_to_binary_range(
+            image,
+            matrix0, 0xff909090, 0xffffffff,
+            matrix1, 0xffa0a0a0, 0xffffffff,
+            matrix2, 0xffb0b0b0, 0xffffffff,
+            matrix3, 0xffc0c0c0, 0xffffffff
+        );
+        find_symbol_candidates(candidates, image, matrix0, max_area_ratio);
+        find_symbol_candidates(candidates, image, matrix1, max_area_ratio);
+        find_symbol_candidates(candidates, image, matrix2, max_area_ratio);
+        find_symbol_candidates(candidates, image, matrix3, max_area_ratio);
+    }
+    {
+        PackedBinaryMatrix matrix0, matrix1;
+        compress2_rgb32_to_binary_range(
+            image,
+            matrix0, 0xffd0d0d0, 0xffffffff,
+            matrix1, 0xffe0e0e0, 0xffffffff
+        );
+        find_symbol_candidates(candidates, image, matrix0, max_area_ratio);
+        find_symbol_candidates(candidates, image, matrix1, max_area_ratio);
+    }
 
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> filtered;
     for (const auto& candidate : candidates){

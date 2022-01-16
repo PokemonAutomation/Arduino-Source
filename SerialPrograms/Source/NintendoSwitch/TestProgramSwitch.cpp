@@ -233,11 +233,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 //    cout << finder.detect(image) << endl;
 
 //    QImage image("20220111-124433054843-PathPartyReader-ReadHP.png");
-//    QImage image("20210908-130346-PathPartyReader-ReadSprites.png");
-    QImage image("ErrorDumps/20220116-004855607163-ReadPathSide.png");
+//    QImage image("20220116-044701249467-ReadPathSide.png");
 
 //    cout << (int)PokemonSwSh::MaxLairInternal::read_side(image) << endl;
 
+#if 1
+    QImage image("20220116-053836954926-ReadPath.png");
 
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = PokemonSwSh::find_symbols(image, 0.20);
 
@@ -249,6 +250,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
         cout << get_type_slug(item.second.first) << ": " << item.first << endl;
 //        hits.emplace_back(overlay, translate_to_parent(screen, box, item.second.second), COLOR_GREEN);
     }
+#endif
 
 
 #if 0

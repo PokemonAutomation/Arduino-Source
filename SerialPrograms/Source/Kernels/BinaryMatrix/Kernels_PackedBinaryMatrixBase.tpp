@@ -74,6 +74,13 @@ void PackedBinaryMatrixBase<Tile>::operator=(const PackedBinaryMatrixBase& x){
 //  Construction
 
 template <typename Tile>
+PackedBinaryMatrixBase<Tile>::PackedBinaryMatrixBase()
+    : m_logical_width(0)
+    , m_logical_height(0)
+    , m_tile_width(0)
+    , m_tile_height(0)
+{}
+template <typename Tile>
 PackedBinaryMatrixBase<Tile>::PackedBinaryMatrixBase(size_t width, size_t height)
     : m_logical_width(width)
     , m_logical_height(height)

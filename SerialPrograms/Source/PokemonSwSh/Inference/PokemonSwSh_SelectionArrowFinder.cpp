@@ -60,6 +60,7 @@ std::vector<ImagePixelBox> find_selection_arrows(const QImage& image){
     WaterFillIterator finder(matrix, 200);
     WaterFillObject object;
     while (finder.find_next(object)){
+//        cout << "asdf" << endl;
         if (is_selection_arrow(image, object)){
             ret.emplace_back(
                 ImagePixelBox(object.min_x, object.min_y, object.max_x, object.max_y)
