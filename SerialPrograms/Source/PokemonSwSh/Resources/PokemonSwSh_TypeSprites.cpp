@@ -8,6 +8,8 @@
 #include "Common/Cpp/Exception.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "PokemonSwSh_TypeSprites.h"
 
@@ -88,12 +90,12 @@ TypeSprite::TypeSprite(const std::string& slug)
     }
 
     QImage sprite = m_sprite.copy(
-        object.min_x,
-        object.min_y,
-        object.width(),
-        object.height()
+        (pxint_t)object.min_x,
+        (pxint_t)object.min_y,
+        (pxint_t)object.width(),
+        (pxint_t)object.height()
     );
-    sprite.save("symbol-" + QString::fromStdString(slug) + ".png");
+//    sprite.save("symbol-" + QString::fromStdString(slug) + ".png");
     m_matcher.reset(
         new ImageMatch::WeightedExactImageMatcher(
             std::move(sprite),
