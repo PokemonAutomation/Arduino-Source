@@ -5,10 +5,10 @@
  */
 
 #include "Common/Compiler.h"
+#include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/ImageTools/CommonFilters.h"
-#include "CommonFramework/Inference/ImageTools.h"
+#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "PokemonSwSh_TypeSymbolFinder.h"
 
 #include <iostream>
@@ -18,6 +18,9 @@ using std::endl;
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+
+using namespace Kernels;
+using namespace Kernels::Waterfill;
 
 
 
@@ -46,7 +49,7 @@ size_t distance_sqr(const ImagePixelBox& a, const ImagePixelBox& b){
 }
 
 
-std::pair<double, PokemonType> match_type_symbol(const QImage& image, int threshold, CellMatrix::ObjectID id){
+std::pair<double, PokemonType> match_type_symbol(const QImage& image, int threshold){
     int width = image.width();
     int height = image.height();
     if (width * height < 100){
@@ -63,7 +66,8 @@ std::pair<double, PokemonType> match_type_symbol(const QImage& image, int thresh
         return {1.0, PokemonType::NONE};
     }
 
-//    image.save("test-" + QString::number(threshold) + "-" + QString::number(id) + ".png");
+//    static int c = 0;
+//    image.save("test-" + QString::number(threshold) + "-" + QString::number(c++) + ".png");
 
 //    std::map<double, PokemonType> rank;
     double best_score = 0.4;
@@ -103,26 +107,25 @@ std::pair<double, PokemonType> match_type_symbol(const QImage& image, int thresh
     return {best_score, best_type};
 }
 
-
-
 void find_symbol_candidates(
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>>& candidates,
     const QImage& image, int min_rgb_brightness, double max_area_ratio
 ){
     size_t max_area = (size_t)(image.width() * image.height() * max_area_ratio);
 
-    CellMatrix matrix(image);
-    BrightFilter filter(min_rgb_brightness);
-    matrix.apply_filter(image, filter);
+    uint8_t pixel_threshold = (uint8_t)(min_rgb_brightness / 3);
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_min(
+        image, pixel_threshold, pixel_threshold, pixel_threshold
+    );
 
-    std::vector<FillGeometry> objects = find_all_objects(matrix, 1, false, 20);
+    std::vector<WaterFillObject> objects = find_objects_inplace(matrix, 20, false);
 
-    std::map<CellMatrix::ObjectID, FillGeometry> objmap;
-    for (const FillGeometry& item : objects){
-        if (item.box.area() > max_area){
+    std::map<size_t, WaterFillObject> objmap;
+    for (size_t c = 0; c < objects.size(); c++){
+        if (objects[c].area > max_area){
             continue;
         }
-        objmap[item.id] = item;
+        objmap[c] = objects[c];
     }
 
     //  Merge nearby objects.
@@ -134,7 +137,12 @@ void find_symbol_candidates(
                 if (iter0->first >= iter1->first){
                     continue;
                 }
-                size_t distance = distance_sqr(iter0->second.box, iter1->second.box);
+                const WaterFillObject& obj0 = iter0->second;
+                const WaterFillObject& obj1 = iter1->second;
+                size_t distance = distance_sqr(
+                    ImagePixelBox(obj0.min_x, obj0.min_y, obj0.max_x, obj0.max_y),
+                    ImagePixelBox(obj1.min_x, obj1.min_y, obj1.max_x, obj1.max_y)
+                );
                 if (distance < 5*5){
                     iter0->second.merge_assume_no_overlap(iter1->second);
                     iter1 = objmap.erase(iter1);
@@ -147,14 +155,18 @@ void find_symbol_candidates(
     //  Identify objects.
     for (const auto& item : objmap){
         QImage img = image.copy(
-            item.second.box.min_x, item.second.box.min_y,
-            item.second.box.width(), item.second.box.height()
+            (pxint_t)item.second.min_x, (pxint_t)item.second.min_y,
+            (pxint_t)item.second.width(), (pxint_t)item.second.height()
         );
-        std::pair<double, PokemonType> result = match_type_symbol(img, min_rgb_brightness, item.first);
+        std::pair<double, PokemonType> result = match_type_symbol(img, min_rgb_brightness);
         if (result.second != PokemonType::NONE){
+            const WaterFillObject& obj = item.second;
             candidates.emplace(
                 result.first,
-                std::pair<PokemonType, ImagePixelBox>(result.second, item.second.box)
+                std::pair<PokemonType, ImagePixelBox>(
+                    result.second,
+                    ImagePixelBox(obj.min_x, obj.min_y, obj.max_x, obj.max_y)
+                )
             );
         }
     }

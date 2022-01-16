@@ -80,7 +80,7 @@ private:
 
 
     static TileType make_zero_tile();
-    static TileType ZERO_TILE;
+    static const TileType ZERO_TILE;
 };
 
 

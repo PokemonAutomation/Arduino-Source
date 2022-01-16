@@ -30,20 +30,29 @@ HostingSettings::HostingSettings()
         "Random code is strongly recommended when hosting to ensure your own Switches get in.",
         4, ""
     )
-    , LOBBY_WAIT_DELAY(
-        "<b>Lobby Wait Delay:</b><br>Wait this long before starting raid. Start time is 3 minutes minus this number.",
-        "60 * TICKS_PER_SECOND"
-    )
     , CONNECT_TO_INTERNET_DELAY(
         "<b>Connect to Internet Delay:</b><br>Time from \"Connect to Internet\" to when you're ready to start adventure.",
         "20 * TICKS_PER_SECOND"
+    )
+    , START_DELAY(
+        "<b>Start Delay:</b><br>Wait this long before entering the lobby.<br><br>"
+        "If two Switches open a lobby at the same time, they might not see each other and "
+        "thus fail to join each other. If you are joining someone else's auto-host, you "
+        "will want to set this to 3 seconds or more to make sure that the host opens the "
+        "lobby before everyone else tries to join.",
+        "0 * TICKS_PER_SECOND"
+    )
+    , LOBBY_WAIT_DELAY(
+        "<b>Lobby Wait Delay:</b><br>Wait this long before starting raid. Start time is 3 minutes minus this number.",
+        "60 * TICKS_PER_SECOND"
     )
     , NOTIFICATIONS("Live-Hosting Announcements", true)
 {
     PA_ADD_OPTION(MODE);
     PA_ADD_OPTION(RAID_CODE);
-    PA_ADD_OPTION(LOBBY_WAIT_DELAY);
     PA_ADD_OPTION(CONNECT_TO_INTERNET_DELAY);
+    PA_ADD_OPTION(START_DELAY);
+    PA_ADD_OPTION(LOBBY_WAIT_DELAY);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 QString HostingSettings::check_validity(size_t consoles) const{
@@ -83,8 +92,10 @@ void HostingSettingsUI::update_option_visibility(){
         value.CONNECT_TO_INTERNET_DELAY.visibility = ConfigOptionState::DISABLED;
     }
     if ((size_t)value.MODE != (size_t)HostingMode::NOT_HOSTING){
+        value.START_DELAY.visibility = ConfigOptionState::ENABLED;
         value.NOTIFICATIONS.visibility = ConfigOptionState::ENABLED;
     }else{
+        value.START_DELAY.visibility = ConfigOptionState::DISABLED;
         value.NOTIFICATIONS.visibility = ConfigOptionState::DISABLED;
     }
 }

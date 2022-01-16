@@ -50,16 +50,16 @@ public:
         uint64_t bits = 0;
         size_t c = 0;
         size_t lc = count / 4;
-        do{
+        while (lc--){
             __m128i pixel = _mm_loadu_si128((const __m128i*)pixels);
             bits |= convert4(pixel) << c;
             pixels += 4;
             c += 4;
-        }while (--lc);
+        }
         count %= 4;
         if (count){
             PartialWordLoader_x64_SSE41 loader(count * sizeof(uint32_t));
-            __m128i pixel = loader.load_no_read_past_end(pixels);
+            __m128i pixel = loader.load(pixels);
             uint64_t mask = ((uint64_t)1 << count) - 1;
             bits |= (convert4(pixel) & mask) << c;
         }
@@ -79,6 +79,53 @@ private:
 private:
     __m128i m_mins;
     __m128i m_maxs;
+};
+
+
+
+class Filter_x64_SSE41{
+public:
+    Filter_x64_SSE41(uint32_t replacement, bool replace_if_zero)
+        : m_replacement(_mm_set1_epi32(replacement))
+        , m_replace_if_zero(_mm_set1_epi32(replace_if_zero ? 0 : 0xffffffff))
+    {}
+
+    PA_FORCE_INLINE void filter64(uint64_t bits, uint32_t* pixels, size_t count = 64) const{
+        size_t lc = count / 4;
+        while (lc--){
+            __m128i pixel = _mm_loadu_si128((const __m128i*)pixels);
+            pixel = filter4((uint32_t)bits & 15, pixel);
+            _mm_storeu_si128((__m128i*)pixels, pixel);
+            pixels += 4;
+            bits >>= 4;
+        }
+        count %= 4;
+        if (count){
+            PartialWordLoader_x64_SSE41 loader(count * sizeof(uint32_t));
+            __m128i pixel = loader.load(pixels);
+            pixel = filter4((uint32_t)bits & 15, pixel);
+            do{
+                pixels[0] = _mm_cvtsi128_si32(pixel);
+                pixel = _mm_srli_si128(pixel, 4);
+                pixels++;
+            }while(--count);
+        }
+    }
+
+private:
+    PA_FORCE_INLINE __m128i filter4(uint32_t bits, __m128i pixel) const{
+        bits *= 0x01010101;
+        bits &= 0x08040201;
+        __m128i mask = _mm_cvtsi32_si128(bits);
+        mask = _mm_cvtepu8_epi32(mask);
+        mask = _mm_cmpeq_epi32(mask, _mm_setzero_si128());
+        mask = _mm_xor_si128(mask, m_replace_if_zero);
+        return _mm_blendv_epi8(pixel, m_replacement, mask);
+    }
+
+private:
+    __m128i m_replacement;
+    __m128i m_replace_if_zero;
 };
 
 

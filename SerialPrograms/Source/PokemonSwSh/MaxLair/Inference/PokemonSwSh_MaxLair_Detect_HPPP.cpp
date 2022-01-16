@@ -71,7 +71,7 @@ double read_hp_bar_internal(const QImage& image){
         bar *= 0.5;
         if (c > 12){
             stats = image_stats(extract_box(image, ImageFloatBox(0.0, 0.0, 1.0, 1.0)));
-            cout << stats.average << stats.stddev << endl;
+//            cout << stats.average << stats.stddev << endl;
             image.save("test.png");
             return stats.average.sum() < 384 && stats.stddev.sum() < 80
                 ? 0.0

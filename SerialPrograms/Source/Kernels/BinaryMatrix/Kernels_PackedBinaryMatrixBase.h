@@ -34,6 +34,7 @@ public:
 
     void set_zero();        //  Zero the entire matrix.
     void set_ones();        //  Set entire matrix to ones.
+    void invert();          //  Invert all bits.
 
 public:
     size_t width() const{ return m_logical_width; }
@@ -47,6 +48,7 @@ public:
 
     std::string dump() const;
     std::string dump(size_t min_x, size_t min_y, size_t max_x, size_t max_y) const;
+    std::string dump_tiles() const;
 
 public:
     //  Tile Access

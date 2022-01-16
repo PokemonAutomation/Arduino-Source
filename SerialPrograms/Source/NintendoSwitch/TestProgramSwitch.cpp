@@ -138,6 +138,8 @@
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h"
 //#include "CommonFramework/BinaryImage/BinaryImage.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
+#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSide.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h"
 #include "TestProgramSwitch.h"
 
 #include <immintrin.h>
@@ -225,6 +227,31 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
+//    PokemonSwSh::SelectionArrowFinder finder(overlay, ImageFloatBox(0.640, 0.600, 0.055, 0.380));
+
+//    QImage image("screenshot-20220108-185053570093.png");
+//    cout << finder.detect(image) << endl;
+
+//    QImage image("20220111-124433054843-PathPartyReader-ReadHP.png");
+//    QImage image("20210908-130346-PathPartyReader-ReadSprites.png");
+    QImage image("ErrorDumps/20220116-004855607163-ReadPathSide.png");
+
+//    cout << (int)PokemonSwSh::MaxLairInternal::read_side(image) << endl;
+
+
+    std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = PokemonSwSh::find_symbols(image, 0.20);
+
+
+//    std::deque<InferenceBoxScope> hits;
+//    hits.clear();
+    cout << "---------------" << endl;
+    for (const auto& item : candidates){
+        cout << get_type_slug(item.second.first) << ": " << item.first << endl;
+//        hits.emplace_back(overlay, translate_to_parent(screen, box, item.second.second), COLOR_GREEN);
+    }
+
+
+#if 0
     uint16_t FLY_A_TO_X_DELAY = 50;
 
 
@@ -266,6 +293,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
     //  Local Room
     pbf_press_button(console, BUTTON_Y, 20, 105);
+#endif
 #endif
 
 

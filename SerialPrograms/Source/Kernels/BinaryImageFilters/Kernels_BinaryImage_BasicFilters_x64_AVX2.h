@@ -53,12 +53,12 @@ public:
         uint64_t bits = 0;
         size_t c = 0;
         size_t lc = count / 8;
-        do{
+        while (lc--){
             __m256i pixel = _mm256_loadu_si256((const __m256i*)pixels);
             bits |= convert8(pixel) << c;
             pixels += 8;
             c += 8;
-        }while (--lc);
+        }
         count %= 8;
         if (count){
             PartialWordLoader32_x64_AVX2 loader(count);
@@ -82,6 +82,48 @@ private:
 private:
     __m256i m_mins;
     __m256i m_maxs;
+};
+
+
+
+class Filter_x64_AVX2{
+public:
+    Filter_x64_AVX2(uint32_t replacement, bool replace_if_zero)
+        : m_replacement(_mm256_set1_epi32(replacement))
+        , m_replace_if_zero(_mm256_set1_epi32(replace_if_zero ? 0 : 0xffffffff))
+    {}
+
+    PA_FORCE_INLINE void filter64(uint64_t bits, uint32_t* pixels, size_t count = 64) const{
+        size_t lc = count / 8;
+        while (lc--){
+            __m256i pixel = _mm256_loadu_si256((const __m256i*)pixels);
+            pixel = filter8(bits & 255, pixel);
+            _mm256_storeu_si256((__m256i*)pixels, pixel);
+            pixels += 8;
+            bits >>= 8;
+        }
+        count %= 8;
+        if (count){
+            PartialWordLoader32_x64_AVX2 loader(count);
+            __m256i pixel = loader.load(pixels);
+            pixel = filter8(bits & 255, pixel);
+            loader.store(pixels, pixel);
+        }
+    }
+
+private:
+    PA_FORCE_INLINE __m256i filter8(uint64_t bits, __m256i pixel) const{
+        bits *= 0x0101010101010101;
+        bits &= 0x8040201008040201;
+        __m256i mask = _mm256_cvtepu8_epi32(_mm_cvtsi64_si128(bits));
+        mask = _mm256_cmpeq_epi32(mask, _mm256_setzero_si256());
+        mask = _mm256_xor_si256(mask, m_replace_if_zero);
+        return _mm256_blendv_epi8(pixel, m_replacement, mask);
+    }
+
+private:
+    __m256i m_replacement;
+    __m256i m_replace_if_zero;
 };
 
 

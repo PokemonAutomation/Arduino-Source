@@ -11,6 +11,10 @@
 #include <cstddef>
 #include "Common/Compiler.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace Kernels{
 
@@ -37,10 +41,10 @@ public:
     PA_FORCE_INLINE uint64_t convert64(const uint32_t* pixels, size_t count = 64) const{
         uint64_t bits = 0;
         size_t c = 0;
-        do{
+        while (c < count){
             bits |= convert1(pixels[c]) << c;
             c++;
-        }while (c < count);
+        }
         return bits;
     }
 
@@ -90,13 +94,13 @@ public:
         , m_replace_if_zero(replace_if_zero ? 1 : 0)
     {}
 
-    PA_FORCE_INLINE void filter64(uint64_t bits, uint32_t* pixels, size_t start = 0, size_t stop = 64) const{
-        size_t c = start;
-        do{
-            filter1(bits & 1, pixels[c]);
+    PA_FORCE_INLINE void filter64(uint64_t bits, uint32_t* pixels, size_t count = 64) const{
+        size_t c = 0;
+        while (c < count){
+            pixels[c] = filter1(bits & 1, pixels[c]);
             bits >>= 1;
             c++;
-        }while (c < stop);
+        }
     }
 
 private:

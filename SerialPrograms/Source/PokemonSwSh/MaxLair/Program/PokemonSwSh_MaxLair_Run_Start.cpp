@@ -330,6 +330,9 @@ bool start_raid_host(
         }
     });
 
+    //  Start delay.
+    env.wait_for(std::chrono::milliseconds(settings.START_DELAY * 1000 / TICKS_PER_SECOND));
+
     //  Open lobby.
     env.run_in_parallel([&](ConsoleHandle& console){
         //  If you start the raids at the same time, they won't find each other.

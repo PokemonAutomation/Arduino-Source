@@ -170,6 +170,9 @@ bool start_raid_host_solo(
 
     GlobalState& state = state_tracker[0];
 
+    //  Start delay.
+    env.wait_for(std::chrono::milliseconds(settings.START_DELAY * 1000 / TICKS_PER_SECOND));
+
     //  Enter lobby.
     entrance = enter_lobby(
         env, console, boss_slot,

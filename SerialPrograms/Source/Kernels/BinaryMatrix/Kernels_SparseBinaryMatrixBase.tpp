@@ -102,7 +102,7 @@ Tile SparseBinaryMatrixBase<Tile>::make_zero_tile(){
     return tile;
 }
 template <typename Tile>
-Tile SparseBinaryMatrixBase<Tile>::ZERO_TILE = SparseBinaryMatrixBase<Tile>::make_zero_tile();
+const Tile SparseBinaryMatrixBase<Tile>::ZERO_TILE = SparseBinaryMatrixBase<Tile>::make_zero_tile();
 
 
 
@@ -193,12 +193,16 @@ PackedBinaryMatrixBase<Tile> SparseBinaryMatrixBase<Tile>::submatrix(
 
 #if 1
     size_t wbits = width % TILE_WIDTH;
-    for (size_t r = 0; r < tile_height; r++){
-        ret.tile(tile_width - 1, r).clear_padding(wbits, TILE_HEIGHT);
+    if (wbits != 0){
+        for (size_t r = 0; r < tile_height; r++){
+            ret.tile(tile_width - 1, r).clear_padding(wbits, TILE_HEIGHT);
+        }
     }
     size_t hbits = height % TILE_HEIGHT;
-    for (size_t c = 0; c < tile_width; c++){
-        ret.tile(c, tile_height - 1).clear_padding(TILE_WIDTH, hbits);
+    if (hbits != 0){
+        for (size_t c = 0; c < tile_width; c++){
+            ret.tile(c, tile_height - 1).clear_padding(TILE_WIDTH, hbits);
+        }
     }
 #endif
 

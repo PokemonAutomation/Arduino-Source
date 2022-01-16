@@ -10,10 +10,9 @@
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/CommonFilters.h"
-#include "CommonFramework/ImageMatch/ImageDiff.h"
+//#include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/Inference/ImageTools.h"
 #include "PokemonBDSP_SelectionArrow.h"
 
 #include <iostream>
@@ -63,7 +62,7 @@ bool is_selection_arrow(const QImage& image, const WaterFillObject& object){
 
 
 std::vector<ImagePixelBox> find_selection_arrows(const QImage& image){
-    PackedBinaryMatrix matrix = filter_rgb32_max(image, 200, 200, 200);
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_max(image, 200, 200, 200);
     std::vector<WaterFillObject> objects = find_objects_inplace(matrix, 200, false);
     std::vector<ImagePixelBox> ret;
     for (const WaterFillObject& object : objects){

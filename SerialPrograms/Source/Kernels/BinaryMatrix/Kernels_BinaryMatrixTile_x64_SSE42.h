@@ -11,14 +11,6 @@
 #include "Common/Compiler.h"
 #include "Kernels_BinaryMatrixTile_Debugging.h"
 
-//  Flat vs. Transposed
-//   -  Flat has cheap direct row access and better spatial locality.
-//   -  Transposed has a slightly cheaper waterfill expansion kernel.
-//
-//  DO NOT turns this off as submatrix extraction requires it now.
-//
-#define BINARY_TILE_X64_SSE42_FLAT
-
 namespace PokemonAutomation{
 namespace Kernels{
 
@@ -66,7 +58,6 @@ public:
         );
         __m128i vheight = _mm_set1_epi64x(height);
         __m128i mask;
-#ifdef BINARY_TILE_X64_SSE42_FLAT
         mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(1, 0));
         vec[0] = _mm_and_si128(mask, word);
         mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(3, 2));
@@ -75,16 +66,6 @@ public:
         vec[2] = _mm_and_si128(mask, word);
         mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(7, 6));
         vec[3] = _mm_and_si128(mask, word);
-#else
-        mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(2, 0));
-        vec[0] = _mm_and_si128(mask, word);
-        mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(3, 1));
-        vec[1] = _mm_and_si128(mask, word);
-        mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(6, 4));
-        vec[2] = _mm_and_si128(mask, word);
-        mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(7, 5));
-        vec[3] = _mm_and_si128(mask, word);
-#endif
     }
     PA_FORCE_INLINE void clear_padding(size_t width, size_t height){
         __m128i word = _mm_set1_epi64x(
@@ -94,7 +75,6 @@ public:
         );
         __m128i vheight = _mm_set1_epi64x(height);
         __m128i mask;
-#ifdef BINARY_TILE_X64_SSE42_FLAT
         mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(1, 0));
         vec[0] = _mm_and_si128(vec[0], _mm_and_si128(mask, word));
         mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(3, 2));
@@ -103,16 +83,12 @@ public:
         vec[2] = _mm_and_si128(vec[2], _mm_and_si128(mask, word));
         mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(7, 6));
         vec[3] = _mm_and_si128(vec[3], _mm_and_si128(mask, word));
-#else
-        mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(2, 0));
-        vec[0] = _mm_and_si128(vec[0], _mm_and_si128(mask, word));
-        mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(3, 1));
-        vec[1] = _mm_and_si128(vec[1], _mm_and_si128(mask, word));
-        mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(6, 4));
-        vec[2] = _mm_and_si128(vec[2], _mm_and_si128(mask, word));
-        mask = _mm_cmpgt_epi64(vheight, _mm_set_epi64x(7, 5));
-        vec[3] = _mm_and_si128(vec[3], _mm_and_si128(mask, word));
-#endif
+    }
+    PA_FORCE_INLINE void invert(){
+        vec[0] = _mm_xor_si128(vec[0], _mm_set1_epi32(0xffffffff));
+        vec[1] = _mm_xor_si128(vec[1], _mm_set1_epi32(0xffffffff));
+        vec[2] = _mm_xor_si128(vec[2], _mm_set1_epi32(0xffffffff));
+        vec[3] = _mm_xor_si128(vec[3], _mm_set1_epi32(0xffffffff));
     }
     PA_FORCE_INLINE void operator^=(const BinaryTile_SSE42& x){
         vec[0] = _mm_xor_si128(vec[0], x.vec[0]);
@@ -155,15 +131,9 @@ public:
     }
 
     PA_FORCE_INLINE uint64_t row(size_t index) const{
-#ifndef BINARY_TILE_X64_SSE42_FLAT
-        index = ((index & 2) >> 1) | ((index & 1) << 1) | ((index & 4));
-#endif
         return ((const uint64_t*)vec)[index];
     }
     PA_FORCE_INLINE uint64_t& row(size_t index){
-#ifndef BINARY_TILE_X64_SSE42_FLAT
-        index = ((index & 2) >> 1) | ((index & 1) << 1) | ((index & 4));
-#endif
         return ((uint64_t*)vec)[index];
     }
 

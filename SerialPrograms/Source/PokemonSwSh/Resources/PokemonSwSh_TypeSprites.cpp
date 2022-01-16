@@ -6,9 +6,9 @@
 
 #include <QtGlobal>
 #include "Common/Cpp/Exception.h"
+#include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/ImageTools/CommonFilters.h"
-#include "CommonFramework/ImageMatch/ImageDiff.h"
+#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "PokemonSwSh_TypeSprites.h"
 
 #include <iostream>
@@ -18,6 +18,9 @@ using std::endl;
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
+
+using namespace Kernels;
+using namespace Kernels::Waterfill;
 
 
 
@@ -74,32 +77,29 @@ TypeSprite::TypeSprite(const std::string& slug)
     }
 
     //  Compute white objects.
-    CellMatrix matrix(m_sprite);
-    WhiteFilter filter(224);
-    matrix.apply_filter(m_sprite, filter);
-    std::vector<FillGeometry> objects = find_all_objects(matrix, 1, true);
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_min(m_sprite, 224, 224, 224);
 
-    FillGeometry object;
-    for (const FillGeometry& item : objects){
+    std::vector<WaterFillObject> objects = find_objects_inplace(matrix, 10, false);
+
+    WaterFillObject object;
+    for (const WaterFillObject& item : objects){
 //        cout << item.center_x() << "," << item.center_y() << endl;
         object.merge_assume_no_overlap(item);
     }
-//    cout << object.center_x() << "," << object.center_y() << endl;
-//    cout << "[" << object.box.min_x << "," << object.box.min_y << "][" << object.box.max_x << "," << object.box.max_y << "]" << endl;
 
+    QImage sprite = m_sprite.copy(
+        object.min_x,
+        object.min_y,
+        object.width(),
+        object.height()
+    );
+    sprite.save("symbol-" + QString::fromStdString(slug) + ".png");
     m_matcher.reset(
         new ImageMatch::WeightedExactImageMatcher(
-            m_sprite.copy(
-                object.box.min_x,
-                object.box.min_y,
-                object.box.width(),
-                object.box.height()
-            ),
+            std::move(sprite),
             ImageMatch::WeightedExactImageMatcher::InverseStddevWeight{1, 64}
         )
     );
-//    cout << slug << ": " << 1 / m_matcher->m_multiplier << endl;
-    m_matching_object = object;
 }
 
 

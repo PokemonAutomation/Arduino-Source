@@ -100,12 +100,12 @@ void PackedBinaryMatrixBase<Tile>::set_ones(){
         size_t c = 0;
         size_t c_left = m_logical_width;
         while (c_left >= TILE_WIDTH){
-            tile(c, r).set_ones();
+            this->tile(c, r).set_ones();
             c++;
             c_left -= TILE_WIDTH;
         }
         if (c_left > 0){
-            tile(c, r).set_ones(c_left, TILE_HEIGHT);
+            this->tile(c, r).set_ones(c_left, TILE_HEIGHT);
         }
         r++;
         r_left -= TILE_HEIGHT;
@@ -114,12 +114,52 @@ void PackedBinaryMatrixBase<Tile>::set_ones(){
         size_t c = 0;
         size_t c_left = m_logical_width;
         while (c_left >= TILE_WIDTH){
-            tile(c, r).set_ones(TILE_WIDTH, r_left);
+            this->tile(c, r).set_ones(TILE_WIDTH, r_left);
             c++;
             c_left -= TILE_WIDTH;
         }
         if (c_left > 0){
-            tile(c, r).set_ones(c_left, r_left);
+            this->tile(c, r).set_ones(c_left, r_left);
+        }
+
+    }
+}
+template <typename Tile>
+void PackedBinaryMatrixBase<Tile>::invert(){
+    //  This one is more complicated because because we need need to leave the
+    //  padding its zero.
+    size_t r = 0;
+    size_t r_left = m_logical_height;
+    while (r_left >= TILE_HEIGHT){
+        size_t c = 0;
+        size_t c_left = m_logical_width;
+        while (c_left >= TILE_WIDTH){
+            this->tile(c, r).invert();
+            c++;
+            c_left -= TILE_WIDTH;
+        }
+        if (c_left > 0){
+            Tile& tile = this->tile(c, r);
+            tile.invert();
+            tile.clear_padding(c_left, TILE_HEIGHT);
+        }
+        r++;
+        r_left -= TILE_HEIGHT;
+    }
+    if (r_left > 0){
+        size_t c = 0;
+        size_t c_left = m_logical_width;
+        while (c_left >= TILE_WIDTH){
+            Tile& tile = this->tile(c, r);
+            tile.invert();
+            tile.clear_padding(TILE_WIDTH, r_left);
+            c++;
+            c_left -= TILE_WIDTH;
+        }
+        if (c_left > 0){
+            Tile& tile = this->tile(c, r);
+            tile.invert();
+            tile.clear_padding(c_left, r_left);
         }
 
     }
@@ -146,6 +186,10 @@ std::string PackedBinaryMatrixBase<Tile>::dump(
         str += "\n";
     }
     return str;
+}
+template <typename Tile>
+std::string PackedBinaryMatrixBase<Tile>::dump_tiles() const{
+    return dump(0, 0, m_tile_width * TILE_WIDTH, m_tile_height * TILE_HEIGHT);
 }
 
 

@@ -18,8 +18,6 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh_BeamSetter.h"
 
-//#include "CommonFramework/Inference/FillGeometry.h"
-
 #include <iostream>
 using std::cout;
 using std::endl;

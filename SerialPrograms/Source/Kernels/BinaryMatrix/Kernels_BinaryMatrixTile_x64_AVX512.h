@@ -11,14 +11,6 @@
 #include "Common/Compiler.h"
 #include "Kernels_BinaryMatrixTile_Debugging.h"
 
-//  Flat vs. Transposed
-//   -  Flat has cheap direct row access and better spatial locality.
-//   -  Transposed has a slightly cheaper waterfill expansion kernel.
-//
-//  DO NOT turns this off as submatrix extraction requires it now.
-//
-#define BINARY_TILE_X64_AVX512_FLAT
-
 namespace PokemonAutomation{
 namespace Kernels{
 
@@ -81,19 +73,11 @@ public:
                 : 0xffffffffffffffff
         );
         __m512i vheight = _mm512_set1_epi64(height);
-#ifdef BINARY_TILE_X64_AVX512_FLAT
         __m512i index = _mm512_setr_epi64(0, 1, 2, 3, 4, 5, 6, 7);
-#else
-        __m512i index = _mm512_setr_epi64(0, 8, 16, 24, 32, 40, 48, 56);
-#endif
         for (size_t c = 0; c < 8; c++){
             __mmask8 mask = _mm512_cmplt_epi64_mask(index, vheight);
             vec[c] = _mm512_maskz_mov_epi64(mask, word);
-#ifdef BINARY_TILE_X64_AVX512_FLAT
             index = _mm512_add_epi64(index, _mm512_set1_epi64(8));
-#else
-            index = _mm512_sub_epi64(index, _mm512_set1_epi64(-1));
-#endif
         }
     }
     PA_FORCE_INLINE void clear_padding(size_t width, size_t height){
@@ -103,21 +87,23 @@ public:
                 : 0xffffffffffffffff
         );
         __m512i vheight = _mm512_set1_epi64(height);
-#ifdef BINARY_TILE_X64_AVX512_FLAT
         __m512i index = _mm512_setr_epi64(0, 1, 2, 3, 4, 5, 6, 7);
-#else
-        __m512i index = _mm512_setr_epi64(0, 8, 16, 24, 32, 40, 48, 56);
-#endif
         for (size_t c = 0; c < 8; c++){
             __mmask8 mask = _mm512_cmplt_epi64_mask(index, vheight);
             __m512i maskv = _mm512_maskz_mov_epi64(mask, word);
             vec[c] = _mm512_and_si512(vec[c], maskv);
-#ifdef BINARY_TILE_X64_AVX512_FLAT
             index = _mm512_add_epi64(index, _mm512_set1_epi64(8));
-#else
-            index = _mm512_sub_epi64(index, _mm512_set1_epi64(-1));
-#endif
         }
+    }
+    PA_FORCE_INLINE void invert(){
+        vec[0] = _mm512_xor_si512(vec[0], _mm512_set1_epi32(0xffffffff));
+        vec[1] = _mm512_xor_si512(vec[1], _mm512_set1_epi32(0xffffffff));
+        vec[2] = _mm512_xor_si512(vec[2], _mm512_set1_epi32(0xffffffff));
+        vec[3] = _mm512_xor_si512(vec[3], _mm512_set1_epi32(0xffffffff));
+        vec[4] = _mm512_xor_si512(vec[4], _mm512_set1_epi32(0xffffffff));
+        vec[5] = _mm512_xor_si512(vec[5], _mm512_set1_epi32(0xffffffff));
+        vec[6] = _mm512_xor_si512(vec[6], _mm512_set1_epi32(0xffffffff));
+        vec[7] = _mm512_xor_si512(vec[7], _mm512_set1_epi32(0xffffffff));
     }
     PA_FORCE_INLINE void operator^=(const BinaryTile_AVX512& x){
         vec[0] = _mm512_xor_si512(vec[0], x.vec[0]);
@@ -176,15 +162,9 @@ public:
     }
 
     PA_FORCE_INLINE uint64_t row(size_t index) const{
-#ifndef BINARY_TILE_X64_AVX512_FLAT
-        index = ((index & 7) << 3) | (index >> 3);
-#endif
         return ((const uint64_t*)vec)[index];
     }
     PA_FORCE_INLINE uint64_t& row(size_t index){
-#ifndef BINARY_TILE_X64_AVX512_FLAT
-        index = ((index & 7) << 3) | (index >> 3);
-#endif
         return ((uint64_t*)vec)[index];
     }
 

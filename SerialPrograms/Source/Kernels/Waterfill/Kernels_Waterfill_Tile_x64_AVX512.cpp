@@ -29,11 +29,7 @@ bool find_bit(size_t& x, size_t& y, const BinaryTile_AVX512& tile){
     if (!_mm512_test_epi64_mask(anything, anything)){
         return false;
     }
-#ifdef BINARY_TILE_X64_AVX512_FLAT
     __m512i row = _mm512_setr_epi64(0, 1, 2, 3, 4, 5, 6, 7);
-#else
-    __m512i row = _mm512_setr_epi64(0, 8, 16, 24, 32, 40, 48, 56);
-#endif
     for (size_t c = 0; c < 8; c++){
         __m512i vec = tile.vec[c];
         __mmask8 mask = _mm512_test_epi64_mask(vec, vec);
@@ -45,11 +41,7 @@ bool find_bit(size_t& x, size_t& y, const BinaryTile_AVX512& tile){
             trailing_zeros(x, word);
             return true;
         }
-#ifdef BINARY_TILE_X64_AVX512_FLAT
         row = _mm512_add_epi64(row, _mm512_set1_epi64(8));
-#else
-        row = _mm512_sub_epi64(row, _mm512_set1_epi64(-1));
-#endif
     }
     return false;
 }
@@ -73,11 +65,7 @@ void boundaries(
     trailing_zeros(min_x, all_or);
     max_x = bitlength(all_or);
 
-#ifdef BINARY_TILE_X64_AVX512_FLAT
     __m512i row = _mm512_setr_epi64(0, 1, 2, 3, 4, 5, 6, 7);
-#else
-    __m512i row = _mm512_setr_epi64(0, 8, 16, 24, 32, 40, 48, 56);
-#endif
     __m512i min = _mm512_set1_epi64(-1);
     __m512i max = _mm512_setzero_si512();
     for (size_t c = 0; c < 8; c++){
@@ -85,11 +73,7 @@ void boundaries(
         __mmask8 mask = _mm512_cmpneq_epu64_mask(vec, _mm512_setzero_si512());
         min = _mm512_mask_min_epu64(min, mask, min, row);
         max = _mm512_mask_max_epu64(max, mask, max, row);
-#ifdef BINARY_TILE_X64_AVX512_FLAT
         row = _mm512_add_epi64(row, _mm512_set1_epi64(8));
-#else
-        row = _mm512_sub_epi64(row, _mm512_set1_epi64(-1));
-#endif
     }
     min_y = _mm512_reduce_min_epu64(min);
     max_y = _mm512_reduce_max_epu64(max) + 1;
@@ -147,11 +131,7 @@ uint64_t popcount_sumcoord(
     const BinaryTile_AVX512& tile
 ){
     __m512i sum_p, sum_x, sum_y;
-#ifdef BINARY_TILE_X64_AVX512_FLAT
     __m512i offsets = _mm512_setr_epi64(0, 1, 2, 3, 4, 5, 6, 7);
-#else
-    __m512i offsets = _mm512_setr_epi64(0, 8, 16, 24, 32, 40, 48, 56);
-#endif
     {
         __m512i pop, sum;
         pop = popcount_indexsum(sum, tile.vec[0]);
@@ -164,11 +144,7 @@ uint64_t popcount_sumcoord(
         pop = popcount_indexsum(sum, tile.vec[c]);
         sum_p = _mm512_add_epi64(sum_p, pop);
         sum_x = _mm512_add_epi64(sum_x, sum);
-#ifdef BINARY_TILE_X64_AVX512_FLAT
         offsets = _mm512_add_epi64(offsets, _mm512_set1_epi64(8));
-#else
-        offsets = _mm512_sub_epi64(offsets, _mm512_set1_epi64(-1));
-#endif
         sum_y = _mm512_add_epi64(sum_y, _mm512_mul_epu32(pop, offsets));
     }
     sum_xcoord = _mm512_reduce_add_epi64(sum_x);
@@ -220,7 +196,6 @@ PA_FORCE_INLINE __m512i bit_reverse(__m512i x){
 
 
 
-#ifdef BINARY_TILE_X64_AVX512_FLAT
 struct ProcessedMask{
     __m512i m0, m1, m2, m3, m4, m5, m6, m7; //  Copy of the masks.
     __m512i b0, b1, b2, b3, b4, b5, b6, b7; //  Bit-reversed copy of the masks.
@@ -284,60 +259,6 @@ struct ProcessedMask{
         transpose_i64_8x8_AVX512(r0, r1, r2, r3, r4, r5, r6, r7);
     }
 };
-#else
-struct ProcessedMask{
-    __m512i m0, m1, m2, m3, m4, m5, m6, m7; //  Copy of the masks.
-    __m512i b0, b1, b2, b3, b4, b5, b6, b7; //  Bit-reversed copy of the masks.
-    __m512i f1, f2, f3, f4, f5, f6, f7;     //  Forward-carry mask.
-    __m512i r0, r1, r2, r3, r4, r5, r6;     //  Reverse-carry mask.
-
-    PA_FORCE_INLINE ProcessedMask(
-        const BinaryTile_AVX512& m,
-        __m512i x0, __m512i x1, __m512i x2, __m512i x3,
-        __m512i x4, __m512i x5, __m512i x6, __m512i x7
-    ){
-        m0 = _mm512_or_si512(x0, m.vec[0]);
-        m1 = _mm512_or_si512(x1, m.vec[1]);
-        m2 = _mm512_or_si512(x2, m.vec[2]);
-        m3 = _mm512_or_si512(x3, m.vec[3]);
-        m4 = _mm512_or_si512(x4, m.vec[4]);
-        m5 = _mm512_or_si512(x5, m.vec[5]);
-        m6 = _mm512_or_si512(x6, m.vec[6]);
-        m7 = _mm512_or_si512(x7, m.vec[7]);
-
-        b0 = bit_reverse(m0);
-        b1 = bit_reverse(m1);
-        b2 = bit_reverse(m2);
-        b3 = bit_reverse(m3);
-        b4 = bit_reverse(m4);
-        b5 = bit_reverse(m5);
-        b6 = bit_reverse(m6);
-        b7 = bit_reverse(m7);
-
-        //  Forward carry
-        __m512i f0 = m0;
-        f1 = _mm512_and_si512(f0, m1);
-        f2 = _mm512_and_si512(f1, m2);
-        f3 = _mm512_and_si512(f2, m3);
-        f4 = _mm512_and_si512(f3, m4);
-        f5 = _mm512_and_si512(f4, m5);
-        f6 = _mm512_and_si512(f5, m6);
-        f7 = _mm512_and_si512(f6, m7);
-        transpose_i64_8x8_AVX512(f0, f1, f2, f3, f4, f5, f6, f7);
-
-        //  Reverse carry
-        __m512i r7 = m7;
-        r6 = _mm512_and_si512(r7, m6);
-        r5 = _mm512_and_si512(r6, m5);
-        r4 = _mm512_and_si512(r5, m4);
-        r3 = _mm512_and_si512(r4, m3);
-        r2 = _mm512_and_si512(r3, m2);
-        r1 = _mm512_and_si512(r2, m1);
-        r0 = _mm512_and_si512(r1, m0);
-        transpose_i64_8x8_AVX512(r0, r1, r2, r3, r4, r5, r6, r7);
-    }
-};
-#endif
 
 
 PA_FORCE_INLINE void expand_reverse(__m512i m, __m512i b, __m512i& x){
@@ -391,7 +312,6 @@ PA_FORCE_INLINE void expand_vertical(
     __m512i& x0, __m512i& x1, __m512i& x2, __m512i& x3,
     __m512i& x4, __m512i& x5, __m512i& x6, __m512i& x7
 ){
-#ifdef BINARY_TILE_X64_AVX512_FLAT
     //  Carry across adjacent rows.
     transpose_i64_8x8_AVX512(x0, x1, x2, x3, x4, x5, x6, x7);
     x1 = _mm512_ternarylogic_epi64(x1, x0, mask.t1, 0b11111000);
@@ -425,77 +345,6 @@ PA_FORCE_INLINE void expand_vertical(
     x1 = _mm512_ternarylogic_epi64(x1, _mm512_broadcastq_epi64(_mm512_castsi512_si128(x2)), mask.r1, 0b11111000);
     x7 = _mm512_ternarylogic_epi64(x7, _mm512_permutexvar_epi64(_mm512_set1_epi64(7), x6), mask.f7, 0b11111000);
     x0 = _mm512_ternarylogic_epi64(x0, _mm512_broadcastq_epi64(_mm512_castsi512_si128(x1)), mask.r0, 0b11111000);
-#else
-#if 0
-    //  Carry across adjacent rows.
-    x1 = _mm512_or_si512(x1, _mm512_and_si512(x0, mask.m1));
-    x6 = _mm512_or_si512(x6, _mm512_and_si512(x7, mask.m6));
-    x2 = _mm512_or_si512(x2, _mm512_and_si512(x1, mask.m2));
-    x5 = _mm512_or_si512(x5, _mm512_and_si512(x6, mask.m5));
-    x3 = _mm512_or_si512(x3, _mm512_and_si512(x2, mask.m3));
-    x4 = _mm512_or_si512(x4, _mm512_and_si512(x5, mask.m4));
-    x4 = _mm512_or_si512(x4, _mm512_and_si512(x3, mask.m4));
-    x3 = _mm512_or_si512(x3, _mm512_and_si512(x4, mask.m3));
-    x5 = _mm512_or_si512(x5, _mm512_and_si512(x4, mask.m5));
-    x2 = _mm512_or_si512(x2, _mm512_and_si512(x3, mask.m2));
-    x6 = _mm512_or_si512(x6, _mm512_and_si512(x5, mask.m6));
-    x1 = _mm512_or_si512(x1, _mm512_and_si512(x2, mask.m1));
-    x7 = _mm512_or_si512(x7, _mm512_and_si512(x6, mask.m7));
-    x0 = _mm512_or_si512(x0, _mm512_and_si512(x1, mask.m0));
-
-    //  Carry across groups of 4 rows.
-    transpose_i64_8x8_AVX512(x0, x1, x2, x3, x4, x5, x6, x7);
-    x1 = _mm512_or_si512(x1, _mm512_and_si512(_mm512_permutexvar_epi64(_mm512_set1_epi64(7), x0), mask.f1));
-    x6 = _mm512_or_si512(x6, _mm512_and_si512(_mm512_broadcastq_epi64(_mm512_castsi512_si128(x7)), mask.r6));
-    x2 = _mm512_or_si512(x2, _mm512_and_si512(_mm512_permutexvar_epi64(_mm512_set1_epi64(7), x1), mask.f2));
-    x5 = _mm512_or_si512(x5, _mm512_and_si512(_mm512_broadcastq_epi64(_mm512_castsi512_si128(x6)), mask.r5));
-    x3 = _mm512_or_si512(x3, _mm512_and_si512(_mm512_permutexvar_epi64(_mm512_set1_epi64(7), x2), mask.f3));
-    x4 = _mm512_or_si512(x4, _mm512_and_si512(_mm512_broadcastq_epi64(_mm512_castsi512_si128(x5)), mask.r4));
-    x4 = _mm512_or_si512(x4, _mm512_and_si512(_mm512_permutexvar_epi64(_mm512_set1_epi64(7), x3), mask.f4));
-    x3 = _mm512_or_si512(x3, _mm512_and_si512(_mm512_broadcastq_epi64(_mm512_castsi512_si128(x4)), mask.r3));
-    x5 = _mm512_or_si512(x5, _mm512_and_si512(_mm512_permutexvar_epi64(_mm512_set1_epi64(7), x4), mask.f5));
-    x2 = _mm512_or_si512(x2, _mm512_and_si512(_mm512_broadcastq_epi64(_mm512_castsi512_si128(x3)), mask.r2));
-    x6 = _mm512_or_si512(x6, _mm512_and_si512(_mm512_permutexvar_epi64(_mm512_set1_epi64(7), x5), mask.f6));
-    x1 = _mm512_or_si512(x1, _mm512_and_si512(_mm512_broadcastq_epi64(_mm512_castsi512_si128(x2)), mask.r1));
-    x7 = _mm512_or_si512(x7, _mm512_and_si512(_mm512_permutexvar_epi64(_mm512_set1_epi64(7), x6), mask.f7));
-    x0 = _mm512_or_si512(x0, _mm512_and_si512(_mm512_broadcastq_epi64(_mm512_castsi512_si128(x1)), mask.r0));
-    transpose_i64_8x8_AVX512(x0, x1, x2, x3, x4, x5, x6, x7);
-#else
-    //  Carry across adjacent rows.
-    x1 = _mm512_ternarylogic_epi64(x1, x0, mask.m1, 0b11111000);
-    x6 = _mm512_ternarylogic_epi64(x6, x7, mask.m6, 0b11111000);
-    x2 = _mm512_ternarylogic_epi64(x2, x1, mask.m2, 0b11111000);
-    x5 = _mm512_ternarylogic_epi64(x5, x6, mask.m5, 0b11111000);
-    x3 = _mm512_ternarylogic_epi64(x3, x2, mask.m3, 0b11111000);
-    x4 = _mm512_ternarylogic_epi64(x4, x5, mask.m4, 0b11111000);
-    x4 = _mm512_ternarylogic_epi64(x4, x3, mask.m4, 0b11111000);
-    x3 = _mm512_ternarylogic_epi64(x3, x4, mask.m3, 0b11111000);
-    x5 = _mm512_ternarylogic_epi64(x5, x4, mask.m5, 0b11111000);
-    x2 = _mm512_ternarylogic_epi64(x2, x3, mask.m2, 0b11111000);
-    x6 = _mm512_ternarylogic_epi64(x6, x5, mask.m6, 0b11111000);
-    x1 = _mm512_ternarylogic_epi64(x1, x2, mask.m1, 0b11111000);
-    x7 = _mm512_ternarylogic_epi64(x7, x6, mask.m7, 0b11111000);
-    x0 = _mm512_ternarylogic_epi64(x0, x1, mask.m0, 0b11111000);
-
-    //  Carry across groups of 8 rows.
-    transpose_i64_8x8_AVX512(x0, x1, x2, x3, x4, x5, x6, x7);
-    x1 = _mm512_ternarylogic_epi64(x1, _mm512_permutexvar_epi64(_mm512_set1_epi64(7), x0), mask.f1, 0b11111000);
-    x6 = _mm512_ternarylogic_epi64(x6, _mm512_broadcastq_epi64(_mm512_castsi512_si128(x7)), mask.r6, 0b11111000);
-    x2 = _mm512_ternarylogic_epi64(x2, _mm512_permutexvar_epi64(_mm512_set1_epi64(7), x1), mask.f2, 0b11111000);
-    x5 = _mm512_ternarylogic_epi64(x5, _mm512_broadcastq_epi64(_mm512_castsi512_si128(x6)), mask.r5, 0b11111000);
-    x3 = _mm512_ternarylogic_epi64(x3, _mm512_permutexvar_epi64(_mm512_set1_epi64(7), x2), mask.f3, 0b11111000);
-    x4 = _mm512_ternarylogic_epi64(x4, _mm512_broadcastq_epi64(_mm512_castsi512_si128(x5)), mask.r4, 0b11111000);
-    x4 = _mm512_ternarylogic_epi64(x4, _mm512_permutexvar_epi64(_mm512_set1_epi64(7), x3), mask.f4, 0b11111000);
-    x3 = _mm512_ternarylogic_epi64(x3, _mm512_broadcastq_epi64(_mm512_castsi512_si128(x4)), mask.r3, 0b11111000);
-    x5 = _mm512_ternarylogic_epi64(x5, _mm512_permutexvar_epi64(_mm512_set1_epi64(7), x4), mask.f5, 0b11111000);
-    x2 = _mm512_ternarylogic_epi64(x2, _mm512_broadcastq_epi64(_mm512_castsi512_si128(x3)), mask.r2, 0b11111000);
-    x6 = _mm512_ternarylogic_epi64(x6, _mm512_permutexvar_epi64(_mm512_set1_epi64(7), x5), mask.f6, 0b11111000);
-    x1 = _mm512_ternarylogic_epi64(x1, _mm512_broadcastq_epi64(_mm512_castsi512_si128(x2)), mask.r1, 0b11111000);
-    x7 = _mm512_ternarylogic_epi64(x7, _mm512_permutexvar_epi64(_mm512_set1_epi64(7), x6), mask.f7, 0b11111000);
-    x0 = _mm512_ternarylogic_epi64(x0, _mm512_broadcastq_epi64(_mm512_castsi512_si128(x1)), mask.r0, 0b11111000);
-    transpose_i64_8x8_AVX512(x0, x1, x2, x3, x4, x5, x6, x7);
-#endif
-#endif
 }
 
 void waterfill_expand(const BinaryTile_AVX512& m, BinaryTile_AVX512& x){

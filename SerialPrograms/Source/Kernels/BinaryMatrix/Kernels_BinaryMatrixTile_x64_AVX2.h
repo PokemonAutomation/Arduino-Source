@@ -11,14 +11,6 @@
 #include "Common/Compiler.h"
 #include "Kernels_BinaryMatrixTile_Debugging.h"
 
-//  Flat vs. Transposed
-//   -  Flat has cheap direct row access and better spatial locality.
-//   -  Transposed has a slightly cheaper waterfill expansion kernel.
-//
-//  DO NOT turns this off as submatrix extraction requires it now.
-//
-#define BINARY_TILE_X64_AVX2_FLAT
-
 namespace PokemonAutomation{
 namespace Kernels{
 
@@ -66,19 +58,11 @@ public:
                 : 0xffffffffffffffff
         );
         __m256i vheight = _mm256_set1_epi64x(height);
-#ifdef BINARY_TILE_X64_AVX2_FLAT
         __m256i index = _mm256_setr_epi64x(0, 1, 2, 3);
-#else
-        __m256i index = _mm256_setr_epi64x(0, 4, 8, 12);
-#endif
         for (size_t c = 0; c < 4; c++){
             __m256i mask = _mm256_cmpgt_epi64(vheight, index);
             vec[c] = _mm256_and_si256(mask, word);
-#ifdef BINARY_TILE_X64_AVX2_FLAT
             index = _mm256_add_epi64(index, _mm256_set1_epi64x(4));
-#else
-            index = _mm256_sub_epi64(index, _mm256_set1_epi64x(-1));
-#endif
         }
     }
     PA_FORCE_INLINE void clear_padding(size_t width, size_t height){
@@ -88,21 +72,19 @@ public:
                 : 0xffffffffffffffff
         );
         __m256i vheight = _mm256_set1_epi64x(height);
-#ifdef BINARY_TILE_X64_AVX2_FLAT
         __m256i index = _mm256_setr_epi64x(0, 1, 2, 3);
-#else
-        __m256i index = _mm256_setr_epi64x(0, 4, 8, 12);
-#endif
         for (size_t c = 0; c < 4; c++){
             __m256i mask = _mm256_cmpgt_epi64(vheight, index);
             mask = _mm256_and_si256(mask, word);
             vec[c] = _mm256_and_si256(vec[c], mask);
-#ifdef BINARY_TILE_X64_AVX2_FLAT
             index = _mm256_add_epi64(index, _mm256_set1_epi64x(4));
-#else
-            index = _mm256_sub_epi64(index, _mm256_set1_epi64x(-1));
-#endif
         }
+    }
+    PA_FORCE_INLINE void invert(){
+        vec[0] = _mm256_xor_si256(vec[0], _mm256_set1_epi32(0xffffffff));
+        vec[1] = _mm256_xor_si256(vec[1], _mm256_set1_epi32(0xffffffff));
+        vec[2] = _mm256_xor_si256(vec[2], _mm256_set1_epi32(0xffffffff));
+        vec[3] = _mm256_xor_si256(vec[3], _mm256_set1_epi32(0xffffffff));
     }
     PA_FORCE_INLINE void operator^=(const BinaryTile_AVX2& x){
         vec[0] = _mm256_xor_si256(vec[0], x.vec[0]);
@@ -145,15 +127,9 @@ public:
     }
 
     PA_FORCE_INLINE uint64_t row(size_t index) const{
-#ifndef BINARY_TILE_X64_AVX2_FLAT
-        index = ((index & 3) << 2) | (index >> 2);
-#endif
         return ((const uint64_t*)vec)[index];
     }
     PA_FORCE_INLINE uint64_t& row(size_t index){
-#ifndef BINARY_TILE_X64_AVX2_FLAT
-        index = ((index & 3) << 2) | (index >> 2);
-#endif
         return ((uint64_t*)vec)[index];
     }
 

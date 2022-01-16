@@ -33,6 +33,7 @@
 #endif
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
 
 #include <iostream>
 using std::cout;
@@ -91,14 +92,14 @@ void TestProgramComputer::program(ProgramEnvironment& env){
 #endif
 
 
-#if 0
+#if 1
     QImage image("screenshot-20220108-185053570093.png");
 //    BattleMenuReader reader();
 
     image = extract_box(image, ImageFloatBox(0.640, 0.600, 0.055, 0.380));
     image.save("test.png");
 
-    PackedBinaryMatrix matrix = filter_rgb32_max(image, 64, 64, 64);
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_max(image, 64, 64, 64);
 #if 0
     cout << "matrix: " << matrix.width() << " x " << matrix.height() << endl;
     for (size_t r = 0; r < matrix.tile_height(); r++){
@@ -109,7 +110,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
         break;
     }
 #endif
-    std::vector<WaterFillObject> objects = find_objects(matrix, 200, false);
+    std::vector<WaterFillObject> objects = find_objects(matrix, 200, true);
 
     cout << objects.size() << endl;
     size_t c = 0;
@@ -119,8 +120,35 @@ void TestProgramComputer::program(ProgramEnvironment& env){
         extract_box(image, box).save("test-" + QString::number(c++) + ".png");
     }
 
-    const WaterFillObject& object = objects[1];
-    cout << matrix.dump(object.min_x, object.min_y, object.max_x, object.max_y) << endl;
+    WaterFillObject& object = objects[1];
+//    object.max_x -= 1;
+//    cout << matrix.dump(object.min_x, object.min_y, object.max_x, object.max_y) << endl;
+    {
+        PackedBinaryMatrix object_matrix = object.packed_matrix();
+        object_matrix.invert();
+        cout << object_matrix.dump(0, 0, object.width(), object.height()) << endl;
+    }
+
+    QImage objimg = image.copy(object.min_x, object.min_y, object.width(), object.height());
+
+#if 1
+    filter_rgb32(
+        object.packed_matrix(),
+        (uint32_t*)objimg.bits(), objimg.bytesPerLine(),
+        0xffffffff, true
+    );
+    cout << object.object.width() << " x " << object.object.height() << endl;
+    cout << objimg.width() << " x " << objimg.height() << endl;
+#endif
+#if 0
+    for (int r = 0; r < objimg.height(); r++){
+        for (int c = 0; c < objimg.width(); c++){
+            ((uint32_t*)objimg.bits())[c + objimg.bytesPerLine() / 4 * r] = 0xff00ff00;
+        }
+    }
+#endif
+    objimg.save("filtered.png");
+
 #endif
 
 

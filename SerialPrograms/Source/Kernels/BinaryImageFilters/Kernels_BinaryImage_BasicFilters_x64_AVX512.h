@@ -50,12 +50,12 @@ public:
         uint64_t bits = 0;
         size_t c = 0;
         size_t lc = count / 16;
-        do{
+        while (lc--){
             __m512i pixel = _mm512_loadu_si512((const __m512i*)pixels);
             bits |= convert16(pixel) << c;
             pixels += 16;
             c += 16;
-        }while (--lc);
+        }
         count %= 16;
         if (count){
             uint64_t mask = ((uint64_t)1 << count) - 1;
@@ -77,6 +77,44 @@ private:
 private:
     __m512i m_mins;
     __m512i m_maxs;
+};
+
+
+
+class Filter_x64_AVX512{
+public:
+    Filter_x64_AVX512(uint32_t replacement, bool replace_if_zero)
+        : m_replacement(_mm512_set1_epi32(replacement))
+        , m_replace_if_zero(replace_if_zero ? 0xffff : 0)
+    {}
+
+    PA_FORCE_INLINE void filter64(uint64_t bits, uint32_t* pixels, size_t count = 64) const{
+        size_t lc = count / 16;
+        while (lc--){
+            __m512i pixel = _mm512_loadu_si512((const __m512i*)pixels);
+            pixel = filter16(bits, pixel);
+            _mm512_storeu_si512((__m512i*)pixels, pixel);
+            pixels += 16;
+            bits >>= 16;
+        }
+        count %= 16;
+        if (count){
+            uint64_t mask = ((uint64_t)1 << count) - 1;
+            __m512i pixel = _mm512_maskz_load_epi32((__mmask16)mask, pixels);
+            pixel = filter16(bits, pixel);
+            _mm512_mask_storeu_epi32(pixels, (__mmask16)mask, pixel);
+        }
+    }
+
+private:
+    PA_FORCE_INLINE __m512i filter16(uint64_t mask, __m512i pixel) const{
+        mask ^= m_replace_if_zero;
+        return _mm512_mask_blend_epi32((__mmask16)mask, pixel, m_replacement);
+    }
+
+private:
+    __m512i m_replacement;
+    uint32_t m_replace_if_zero;
 };
 
 

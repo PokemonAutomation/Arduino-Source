@@ -62,6 +62,12 @@ public:
             vec[c] = 0;
         }
     }
+    PA_FORCE_INLINE void invert(){
+        vec[0] = ~vec[0];
+        vec[1] = ~vec[1];
+        vec[2] = ~vec[2];
+        vec[3] = ~vec[3];
+    }
     PA_FORCE_INLINE void operator^=(const BinaryTile_Default& x){
         vec[0] ^= x.vec[0];
         vec[1] ^= x.vec[1];

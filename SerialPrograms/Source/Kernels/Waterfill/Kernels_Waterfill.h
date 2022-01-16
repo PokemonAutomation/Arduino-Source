@@ -20,10 +20,19 @@ namespace Waterfill{
 //  Gets an object sitting on the specified tile.
 //  If an object is found, it is stored into "object". Returns true.
 //  If tile is empty, returns false.
-bool find_object(
+bool find_object_in_tile(
     PackedBinaryMatrix& matrix,
     WaterFillObject& object,
     size_t tile_x, size_t tile_y
+);
+
+//  Gets an object sitting on the specified bit.
+//  If an object is found, it is stored into "object". Returns true.
+//  If bit is 0, returns false.
+bool find_object_on_bit(
+    PackedBinaryMatrix& matrix,
+    WaterFillObject& object,
+    size_t x, size_t y
 );
 
 
@@ -39,6 +48,20 @@ std::vector<WaterFillObject> find_objects(const PackedBinaryMatrix& matrix, size
 std::vector<WaterFillObject> find_objects_inplace(PackedBinaryMatrix& matrix, size_t min_area, bool keep_objects);
 
 
+//  This one returns the objects one-by-one as they are found. This
+//  avoids needing to keep them all in memory at once.
+class WaterFillIterator{
+public:
+    WaterFillIterator(PackedBinaryMatrix& matrix, size_t min_area);
+
+    bool find_next(WaterFillObject& object);
+
+private:
+    PackedBinaryMatrix& m_matrix;
+    size_t m_min_area;
+    size_t m_tile_row;
+    size_t m_tile_col;
+};
 
 
 

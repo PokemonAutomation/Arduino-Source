@@ -70,7 +70,7 @@ bool is_question_mark(const QImage& image, const WaterFillObject& object){
 }
 
 std::vector<ImagePixelBox> find_exclamation_marks(const QImage& image){
-    PackedBinaryMatrix matrix = filter_rgb32_range(
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
         image,
         192, 255,
         0, 160,
@@ -91,7 +91,7 @@ std::vector<ImagePixelBox> find_exclamation_marks(const QImage& image){
     return ret;
 }
 std::vector<ImagePixelBox> find_question_marks(const QImage& image){
-    PackedBinaryMatrix matrix = filter_rgb32_range(
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
         image,
         0, 128,
         0, 255,

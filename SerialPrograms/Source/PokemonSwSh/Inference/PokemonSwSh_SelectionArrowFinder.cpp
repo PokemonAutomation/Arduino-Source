@@ -5,102 +5,69 @@
  */
 
 #include "Common/Compiler.h"
-//#include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/ImageTools/CellMatrix.h"
-#include "CommonFramework/ImageTools/FillGeometry.h"
-#include "CommonFramework/ImageMatch/ImageDiff.h"
-//#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/Inference/ImageTools.h"
+#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
+#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "PokemonSwSh_SelectionArrowFinder.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-
-#if 1
-struct BlackFilter{
-    size_t count = 0;
-
-    void operator()(CellMatrix::ObjectID& cell, const QImage& image, int x, int y){
-        QRgb pixel = image.pixel(x, y);
-        int set = qRed(pixel) < 64 && qGreen(pixel) < 64 && qBlue(pixel) < 64;
-//        int set = (pixel & 0x00c0c080) == 0x00c0c080 ? 1 : 0;
-        cell = set;
-        count += set;
-    }
-};
-#else
-struct BlackFilter{
-    size_t count = 0;
-
-    void operator()(CellMatrix::ObjectID& cell, QImage& image, int x, int y){
-        QRgb pixel = image.pixel(x, y);
-        bool black = qRed(pixel) < 48 && qGreen(pixel) < 48 && qBlue(pixel) < 48;
-//        int set = (pixel & 0x00c0c080) == 0x00c0c080 ? 1 : 0;
-        if (!black){
-            image.setPixel(x, y, (uint32_t)COLOR_BLUE);
-        }
-        CellMatrix::ObjectID set = black ? 1 : 0;
-        cell = set;
-        count += set;
-    }
-};
-#endif
+using namespace Kernels;
+using namespace Kernels::Waterfill;
 
 
-
-
-
-const QImage& SelectionArrowDetector_reference_image(){
-    static QImage image(RESOURCE_PATH() + "PokemonSwSh/BattleArrow.png");
-    return image;
+const ImageMatch::ExactImageMatcher& SELECTION_ARROW(){
+    static ImageMatch::ExactImageMatcher matcher(QImage(RESOURCE_PATH() + "PokemonSwSh/BattleArrow.png"));
+    return matcher;
 }
-bool SelectionArrowDetector_is_arrow(
-    const QImage& image, const CellMatrix& matrix,
-    const FillGeometry& object
-){
-    double area = (double)object.area / object.box.area();
+
+bool is_selection_arrow(const QImage& image, const WaterFillObject& object){
+    double area = (double)object.area_ratio();
     if (area < 0.4 || area > 0.5){
         return false;
     }
 
-    QImage oimage = image.copy(
-        object.box.min_x, object.box.min_y,
-        object.box.width(), object.box.height()
+    size_t width = object.width();
+    size_t height = object.height();
+    QImage cropped = image.copy(
+        (int)object.min_x, (int)object.min_y,
+        (int)width, (int)height
     );
-//    oimage.convertToFormat(QImage::Format::Format_ARGB32);
-//    cout << "asdf" << endl;
-//    oimage.save("test-" + QString::number(object.id) + ".png");
 
-    int width = oimage.width();
-    int height = oimage.height();
-    for (int r = 0; r < height; r++){
-        for (int c = 0; c < width; c++){
-            if (matrix[r + object.box.min_y][c + object.box.min_x] != object.id){
-//                cout << "asdf" << endl;
-//                QRgb pixel = oimage.pixel(c, r);
-//                pixel &= 0x00ffffff;
-                oimage.setPixel(c, r, 0xffffffff);
-            }
+    filter_rgb32(
+        object.packed_matrix(),
+        cropped,
+        COLOR_WHITE,
+        true
+    );
+
+    cropped.save("cropped.png");
+
+    double rmsd = SELECTION_ARROW().rmsd(cropped);
+//    cout << "rmsd = " << rmsd << endl;
+    return rmsd <= 100;
+}
+std::vector<ImagePixelBox> find_selection_arrows(const QImage& image){
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_max(image, 63, 63, 63);
+
+    std::vector<ImagePixelBox> ret;
+
+    WaterFillIterator finder(matrix, 200);
+    WaterFillObject object;
+    while (finder.find_next(object)){
+        if (is_selection_arrow(image, object)){
+            ret.emplace_back(
+                ImagePixelBox(object.min_x, object.min_y, object.max_x, object.max_y)
+            );
         }
     }
-//    oimage.save("test0.png");
 
-    const QImage& reference = SelectionArrowDetector_reference_image();
-    oimage = oimage.scaled(reference.size());
-//    oimage.save("test1.png");
-
-    double diff = ImageMatch::pixel_RMSD(reference, oimage, 0xffffffff);
-//    cout << "diff = " << diff << endl;
-
-//    image_diff_greyscale(oimage, reference).save("diff.png");
-
-//    return true;
-    return diff < 150;
+    return ret;
 }
 
 
@@ -113,26 +80,11 @@ void SelectionArrowFinder::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_YELLOW, m_box);
 }
 bool SelectionArrowFinder::detect(const QImage& screen){
-    QImage image = extract_box(screen, m_box);
+    std::vector<ImagePixelBox> arrows = find_selection_arrows(extract_box(screen, m_box));
 
-    CellMatrix matrix(image);
-
-    BlackFilter filter;
-    matrix.apply_filter(image, filter);
-
-    std::vector<FillGeometry> objects = find_all_objects(matrix, 1, false, 200);
-
-//    double arrow_y_center = -1;
     m_arrow_boxes.clear();
-//    cout << objects.size() << endl;
-
-    for (const FillGeometry& object : objects){
-        if (!SelectionArrowDetector_is_arrow(image, matrix, object)){
-            continue;
-        }
-        ImageFloatBox box = translate_to_parent(screen, m_box, object.box);
-        m_arrow_boxes.emplace_back(m_overlay, box, COLOR_GREEN);
-//        arrow_y_center = box.y + box.height * 0.5;
+    for (const ImagePixelBox& mark : arrows){
+        m_arrow_boxes.emplace_back(m_overlay, translate_to_parent(screen, m_box, mark), COLOR_MAGENTA);
     }
     return !m_arrow_boxes.empty();
 }

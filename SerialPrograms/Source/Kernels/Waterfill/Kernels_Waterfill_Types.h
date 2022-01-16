@@ -30,8 +30,24 @@ public:
     double aspect_ratio() const{ return (double)width() / height(); }
     double area_ratio() const{ return (double)area / (width() * height()); }
 
-    PackedBinaryMatrix matrix() const{
+    PackedBinaryMatrix packed_matrix() const{
         return object.submatrix(min_x, min_y, max_x - min_x, max_y - min_y);
+    }
+
+    void merge_assume_no_overlap(const WaterFillObject& obj){
+        if (obj.area == 0){
+            return;
+        }
+        if (area == 0){
+            *this = obj;
+        }
+        min_x = std::min(min_x, obj.min_x);
+        min_y = std::min(min_y, obj.min_y);
+        max_x = std::max(max_x, obj.max_x);
+        max_y = std::max(max_y, obj.max_y);
+        area += obj.area;
+        sum_x += obj.sum_x;
+        sum_y += obj.sum_y;
     }
 
 

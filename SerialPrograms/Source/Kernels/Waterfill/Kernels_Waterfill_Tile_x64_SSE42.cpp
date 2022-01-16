@@ -122,44 +122,28 @@ uint64_t popcount_sumcoord(
         pop = popcount_indexsum(sum, tile.vec[0]);
         sum_p = pop;
         sum_x = sum;
-#ifdef BINARY_TILE_X64_SSE42_FLAT
         sum_y = _mm_mul_epu32(pop, _mm_set_epi64x(1, 0));
-#else
-        sum_y = _mm_mul_epu32(pop, _mm_set_epi64x(2, 0));
-#endif
     }
     {
         __m128i pop, sum;
         pop = popcount_indexsum(sum, tile.vec[1]);
         sum_p = _mm_add_epi64(sum_p, pop);
         sum_x = _mm_add_epi64(sum_x, sum);
-#ifdef BINARY_TILE_X64_SSE42_FLAT
         sum_y = _mm_add_epi64(sum_y, _mm_mul_epu32(pop, _mm_set_epi64x(3, 2)));
-#else
-        sum_y = _mm_add_epi64(sum_y, _mm_mul_epu32(pop, _mm_set_epi64x(3, 1)));
-#endif
     }
     {
         __m128i pop, sum;
         pop = popcount_indexsum(sum, tile.vec[2]);
         sum_p = _mm_add_epi64(sum_p, pop);
         sum_x = _mm_add_epi64(sum_x, sum);
-#ifdef BINARY_TILE_X64_SSE42_FLAT
         sum_y = _mm_add_epi64(sum_y, _mm_mul_epu32(pop, _mm_set_epi64x(6, 5)));
-#else
-        sum_y = _mm_add_epi64(sum_y, _mm_mul_epu32(pop, _mm_set_epi64x(6, 4)));
-#endif
     }
     {
         __m128i pop, sum;
         pop = popcount_indexsum(sum, tile.vec[3]);
         sum_p = _mm_add_epi64(sum_p, pop);
         sum_x = _mm_add_epi64(sum_x, sum);
-#ifdef BINARY_TILE_X64_SSE42_FLAT
         sum_y = _mm_add_epi64(sum_y, _mm_mul_epu32(pop, _mm_set_epi64x(7, 6)));
-#else
-        sum_y = _mm_add_epi64(sum_y, _mm_mul_epu32(pop, _mm_set_epi64x(7, 5)));
-#endif
     }
     sum_xcoord = _mm_cvtsi128_si64(sum_x) + _mm_extract_epi64(sum_x, 1);
     sum_ycoord = _mm_cvtsi128_si64(sum_y) + _mm_extract_epi64(sum_y, 1);
@@ -196,7 +180,6 @@ PA_FORCE_INLINE __m128i bit_reverse(__m128i x){
 }
 
 
-#ifdef BINARY_TILE_X64_SSE42_FLAT
 struct ProcessedMask{
     __m128i m0, m1, m2, m3; //  Copy of the masks.
     __m128i b0, b1, b2, b3; //  Bit-reversed copy of the masks.
@@ -242,45 +225,6 @@ struct ProcessedMask{
         transpose_i64_2x2_SSE2(r0, r1);
     }
 };
-#else
-struct ProcessedMask{
-    __m128i m0, m1, m2, m3; //  Copy of the masks.
-    __m128i b0, b1, b2, b3; //  Bit-reversed copy of the masks.
-    __m128i f1, f2, f3;     //  Forward-carry mask.
-    __m128i r0, r1, r2;     //  Reverse-carry mask.
-
-    PA_FORCE_INLINE ProcessedMask(
-        const BinaryTile_SSE42& m,
-        __m128i x0, __m128i x1, __m128i x2, __m128i x3
-    ){
-        m0 = _mm_or_si128(x0, m.vec[0]);
-        m1 = _mm_or_si128(x1, m.vec[1]);
-        m2 = _mm_or_si128(x2, m.vec[2]);
-        m3 = _mm_or_si128(x3, m.vec[3]);
-
-        b0 = bit_reverse(m0);
-        b1 = bit_reverse(m1);
-        b2 = bit_reverse(m2);
-        b3 = bit_reverse(m3);
-
-        //  Forward carry
-        __m128i f0 = m0;
-        f1 = _mm_and_si128(f0, m1);
-        transpose_i64_2x2_SSE2(f0, f1);
-        f2 = m2;
-        f3 = _mm_and_si128(f2, m3);
-        transpose_i64_2x2_SSE2(f2, f3);
-
-        //  Reverse carry
-        __m128i r3 = m3;
-        r2 = _mm_and_si128(r3, m2);
-        transpose_i64_2x2_SSE2(r2, r3);
-        r1 = m1;
-        r0 = _mm_and_si128(r1, m0);
-        transpose_i64_2x2_SSE2(r0, r1);
-    }
-};
-#endif
 
 
 PA_FORCE_INLINE void expand_reverse(__m128i m, __m128i b, __m128i& x){
@@ -324,7 +268,6 @@ PA_FORCE_INLINE void expand_vertical(
     const ProcessedMask& mask,
     __m128i& x0, __m128i& x1, __m128i& x2, __m128i& x3
 ){
-#ifdef BINARY_TILE_X64_SSE42_FLAT
     //  Carry across adjacent rows.
     transpose_i64_2x2_SSE2(x0, x1);
     transpose_i64_2x2_SSE2(x2, x3);
@@ -342,25 +285,6 @@ PA_FORCE_INLINE void expand_vertical(
     x1 = _mm_or_si128(x1, _mm_and_si128(_mm_unpacklo_epi64(x2, x2), mask.r1));
     x3 = _mm_or_si128(x3, _mm_and_si128(_mm_unpackhi_epi64(x2, x2), mask.f3));
     x0 = _mm_or_si128(x0, _mm_and_si128(_mm_unpacklo_epi64(x1, x1), mask.r0));
-#else
-    //  Carry across adjacent rows.
-    x0 = _mm_or_si128(x0, _mm_and_si128(x1, mask.m0));
-    x1 = _mm_or_si128(x1, _mm_and_si128(x0, mask.m1));
-    x2 = _mm_or_si128(x2, _mm_and_si128(x3, mask.m2));
-    x3 = _mm_or_si128(x3, _mm_and_si128(x2, mask.m3));
-
-    //  Carry across groups of 2 rows.
-    transpose_i64_2x2_SSE2(x0, x1);
-    transpose_i64_2x2_SSE2(x2, x3);
-    x1 = _mm_or_si128(x1, _mm_and_si128(_mm_unpackhi_epi64(x0, x0), mask.f1));
-    x2 = _mm_or_si128(x2, _mm_and_si128(_mm_unpacklo_epi64(x3, x3), mask.r2));
-    x2 = _mm_or_si128(x2, _mm_and_si128(_mm_unpackhi_epi64(x1, x1), mask.f2));
-    x1 = _mm_or_si128(x1, _mm_and_si128(_mm_unpacklo_epi64(x2, x2), mask.r1));
-    x3 = _mm_or_si128(x3, _mm_and_si128(_mm_unpackhi_epi64(x2, x2), mask.f3));
-    x0 = _mm_or_si128(x0, _mm_and_si128(_mm_unpacklo_epi64(x1, x1), mask.r0));
-    transpose_i64_2x2_SSE2(x0, x1);
-    transpose_i64_2x2_SSE2(x2, x3);
-#endif
 }
 
 

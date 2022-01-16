@@ -17,7 +17,7 @@ namespace Kernels{
 
 class PartialWordLoader32_x64_AVX2{
 public:
-    PA_FORCE_INLINE PartialWordLoader32_x64_AVX2(size_t words){;
+    PA_FORCE_INLINE PartialWordLoader32_x64_AVX2(size_t words){
         m_mask = _mm256_cmpgt_epi32(
             _mm256_set1_epi32((uint32_t)words),
             _mm256_setr_epi32(0, 1, 2, 3, 4, 5, 6, 7)
@@ -26,6 +26,9 @@ public:
 
     PA_FORCE_INLINE __m256i load(const void* ptr){
         return _mm256_maskload_epi32((const int*)ptr, m_mask);
+    }
+    PA_FORCE_INLINE void store(const void* ptr, __m256i x){
+        _mm256_maskstore_epi32((int*)ptr, m_mask, x);
     }
 
 private:
