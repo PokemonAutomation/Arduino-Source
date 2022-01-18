@@ -1,0 +1,79 @@
+/*  Experience Gain Detector
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#include "Common/Compiler.h"
+#include "Common/Cpp/FixedLimitVector.tpp"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "CommonFramework/ImageTools/SolidColorTest.h"
+#include "PokemonBDSP_ExperienceGainDetector.h"
+
+#include <iostream>
+using std::cout;
+using std::endl;
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonBDSP{
+
+
+ExperienceGainDetector::~ExperienceGainDetector(){}
+ExperienceGainDetector::ExperienceGainDetector(Color color)
+    : m_color(color)
+    , m_dialog(color)
+    , m_middle_column(0.365, 0.01, 0.008, 0.79)
+    , m_left_column(0.006, 0.01, 0.03, 0.79)
+    , m_lower_left_region(0.006, 0.8, 0.16, 0.15)
+{}
+
+void ExperienceGainDetector::make_overlays(VideoOverlaySet& items) const{
+    m_dialog.make_overlays(items);
+    items.add(m_color, m_middle_column);
+    items.add(m_color, m_left_column);
+    items.add(m_color, m_lower_left_region);
+}
+bool ExperienceGainDetector::detect(const QImage& screen) const{
+    if (!m_dialog.detect(screen)){
+        // std::cout << "ExperienceGainDetector: No dialogue detected, return" << std::endl;
+        return false;
+    }
+
+    const ImageStats stats0 = image_stats(extract_box(screen, m_middle_column));
+    if (!is_solid(stats0, {0.16, 0.42, 0.42}, 0.1, 30)){
+        // std::cout << "ExperienceGainDetector: No m_middle_column detected, " << stats0.average.to_string() << ", " << stats0.stddev.to_string() << std::endl;
+        return false;
+    }
+    const ImageStats stats1 = image_stats(extract_box(screen, m_left_column));
+    if (!is_solid(stats1, {0.3, 0.35, 0.35}, 0.1, 40)){
+        // std::cout << "ExperienceGainDetector: No m_left_column detected, " << stats1.average.to_string() << ", " << stats1.stddev.to_string() << std::endl;
+        return false;
+    }
+    const ImageStats stats2 = image_stats(extract_box(screen, m_lower_left_region));
+    if (!is_solid(stats1, {0.3, 0.35, 0.35}, 0.1, 40)){
+        // std::cout << "ExperienceGainDetector: No m_lower_left_region detected, " << stats2.average.to_string() << ", " << stats2.stddev.to_string() << std::endl;
+        return false;
+    }
+
+    // std::cout << "ExperienceGainDetector: detect!" << std::endl;
+    return true;
+}
+
+
+void ExperienceGainWatcher::make_overlays(VideoOverlaySet& items) const{
+    ExperienceGainDetector::make_overlays(items);
+}
+bool ExperienceGainWatcher::process_frame(
+    const QImage& frame,
+    std::chrono::system_clock::time_point timestamp
+){
+    return detect(frame);
+}
+
+
+
+
+}
+}
+}

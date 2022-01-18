@@ -14,8 +14,11 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
-
-//  The cursor must be over the "Run" button.
+// Run from a wild battle.
+// The cursor must be over the "Run" button when starting this function.
+// It uses feedback to ensure battle ends by detecting a black screen.
+// Return true if a black screen is detected, false if not detected after
+// `exit_battle_time` of ticks have passed. 
 bool run_from_battle(
     ProgramEnvironment& env,
     ConsoleHandle& console,

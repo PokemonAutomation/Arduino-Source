@@ -28,9 +28,11 @@ public:
     void add_unknown_shiny();
     void add_star_shiny();
     void add_square_shiny();
+    void add_caught();
 
 private:
     std::atomic<uint64_t>& m_encounters;
+    std::atomic<uint64_t>& m_caught;
     std::atomic<uint64_t>& m_errors;
 
     std::atomic<uint64_t>& m_unknown_shinies;

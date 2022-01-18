@@ -16,7 +16,7 @@
 
 namespace PokemonAutomation{
 
-
+// A ConfigOption that groups one or more options.
 class BatchOption : public ConfigOption{
 public:
 //    BatchOption();

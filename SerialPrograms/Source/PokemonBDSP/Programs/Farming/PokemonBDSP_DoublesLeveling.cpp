@@ -133,7 +133,7 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env){
             env.log("Detected move learn!", COLOR_BLUE);
             if (ON_LEARN_MOVE == 0){
                 pbf_move_right_joystick(env.console, 128, 255, 20, 105);
-                pbf_press_button(env.console, BUTTON_A, 20, 105);
+                pbf_press_button(env.console, BUTTON_ZL, 20, 105);
                 break;
             }
             return true;
@@ -169,6 +169,7 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env){
         //  Find encounter.
         bool battle = TRIGGER_METHOD.find_encounter(env);
         if (!battle){
+            // Unexpected battle: detect battle menu but not battle starting animation.
             stats.add_error();
             handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
             continue;
