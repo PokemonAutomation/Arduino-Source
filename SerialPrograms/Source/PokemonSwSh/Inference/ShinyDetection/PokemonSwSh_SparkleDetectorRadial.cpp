@@ -1,4 +1,4 @@
-/*  Star Trigger
+/*  Shiny Sparkle Detector
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -6,9 +6,8 @@
 
 #include <cmath>
 #include <set>
-#include "Common/Compiler.h"
-#include "PokemonSwSh_ShinyFilters.h"
-#include "PokemonSwSh_SparkleTrigger.h"
+#include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "PokemonSwSh_SparkleDetectorRadial.h"
 
 #include <iostream>
 using std::cout;
@@ -18,46 +17,42 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-const double SparkleDetectorOld::ANGLE_TOLERANCE_DEGREES = 10.;
+using namespace Kernels;
+using namespace Kernels::Waterfill;
 
 
-SparkleDetectorOld::SparkleDetectorOld(
-    const CellMatrix& matrix,
-    const FillGeometry& object
-)
-    : m_box(object)
+const double STAR_SPARKLE_ANGLE_TOLERANCE_DEGREES = 10.;
+
+
+RadialSparkleDetector::~RadialSparkleDetector(){}
+RadialSparkleDetector::RadialSparkleDetector(const WaterFillObject& object)
+    : m_object(object)
 {
     if (object.area < 20){
         return;
     }
     if (object.area > 10000){
-//        cout << "box.area = " << object.area << endl;
         return;
     }
-    if (object.box.width() * object.box.height() > 10000){
-//        return;
-    }
-
-
-    //  Copy the relevant portion of the matrix and keep only the current object.
-    m_matrix = matrix.extract(object.box, object.id);
+    m_matrix = object.packed_matrix();
+//    cout << m_matrix.dump() << endl;
 
     //  Sort all pixels by distance from center.
-    pxint_t center_x = object.center_x() - object.box.min_x;
-    pxint_t center_y = object.center_y() - object.box.min_y;
+    size_t center_x = object.center_x() - object.min_x;
+    size_t center_y = object.center_y() - object.min_y;
     std::map<uint64_t, size_t> distances;
-    for (pxint_t r = 0; r < m_matrix.height(); r++){
-        for (pxint_t c = 0; c < m_matrix.width(); c++){
-            if (m_matrix[r][c] != 0){
-                pxint_t dist_x = c - center_x;
-                pxint_t dist_y = r - center_y;
+    for (size_t r = 0; r < m_matrix.height(); r++){
+        for (size_t c = 0; c < m_matrix.width(); c++){
+            if (m_matrix.get(c, r)){
+                size_t dist_x = c - center_x;
+                size_t dist_y = r - center_y;
                 uint64_t distance_sqr = (uint64_t)dist_x*dist_x + (uint64_t)dist_y*dist_y;
                 distances[distance_sqr]++;
             }
         }
     }
 
-    //  Filter out the bottom 80%.
+    //  Filter out the bottom 85%.
     size_t stop = (size_t)(0.85 * object.area);
     size_t count = 0;
     uint64_t distance = 0;
@@ -69,72 +64,54 @@ SparkleDetectorOld::SparkleDetectorOld(
         }
     }
     m_radius_sqr = distance;
-    for (pxint_t r = 0; r < m_matrix.height(); r++){
-        for (pxint_t c = 0; c < m_matrix.width(); c++){
-            pxint_t dist_x = c - center_x;
-            pxint_t dist_y = r - center_y;
+    for (size_t r = 0; r < m_matrix.height(); r++){
+        for (size_t c = 0; c < m_matrix.width(); c++){
+            size_t dist_x = c - center_x;
+            size_t dist_y = r - center_y;
             uint64_t distance_sqr = (uint64_t)dist_x*dist_x + (uint64_t)dist_y*dist_y;
             if (distance_sqr < distance){
-                m_matrix[r][c] = 0;
+                m_matrix.set(c, r, false);
             }
         }
     }
 
     //  Find new regions.
-    CellMatrix::ObjectID id = 2;
-    for (pxint_t r = 0; r < m_matrix.height(); r++){
-        for (pxint_t c = 0; c < m_matrix.width(); c++){
-            FillGeometry region;
-            if (!fill_geometry(region, m_matrix, 1, c, r, true, id)){
-                continue;
-            }
-            id++;
-//            if (region.area < 4){
-//                continue;
-//            }
-            m_regions.emplace(-(int64_t)region.area, region);
-//            cout << region.center_x << ", " << region.center_y << " : " << region.area << endl;
-        }
+    PackedBinaryMatrix matrix = m_matrix;
+    WaterFillIterator finder(matrix, 1);
+    WaterFillObject obj;
+    while (finder.find_next(obj)){
+        obj.object.clear();
+        m_regions.emplace(obj.area, std::move(obj));
     }
 
-#if 0
-    cout << "{" << endl;
-    for (size_t r = 0; r < m_matrix.height(); r++){
-        cout << "    {";
-        for (size_t c = 0; c < m_matrix.width(); c++){
-            cout << m_matrix[r][c] << ",";
-        }
-        cout << "}" << endl;
-    }
-    cout << "}" << endl;
-#endif
+//    cout << m_matrix.dump() << endl;
 }
 
-bool SparkleDetectorOld::is_ball(){
+bool RadialSparkleDetector::is_ball() const{
     //  Fewer than 4 regions, cannot be a ball.
     if (m_regions.size() < 4){
         return false;
     }
 
-    pxint_t width = m_box.box.width();
-    pxint_t height = m_box.box.height();
+    size_t width = m_object.width();
+    size_t height = m_object.height();
 
     //  Make sure area is less than 2/3 of the box.
 //    cout << "area = " << m_box.area * 2 << ", box = " << (uint64_t)width * height << endl;
-    if (m_box.area * 3 > (uint64_t)width * height * 2){
+    if (m_object.area * 3 > (uint64_t)width * height * 2){
 //        cout << "bad area" << endl;
         return false;
     }
 
     //  Compute angles for the 4 largest regions.
-    pxint_t center_x = m_box.center_x() - m_box.box.min_x;
-    pxint_t center_y = m_box.center_y() - m_box.box.min_y;
+    pxint_t center_x = (pxint_t)(m_object.center_x() - m_object.min_x);
+    pxint_t center_y = (pxint_t)(m_object.center_y() - m_object.min_y);
     std::set<double> angles;
     {
         size_t c = 0;
         for (const auto& region : m_regions){
-            pxint_t x = region.second.center_x() - center_x;
-            pxint_t y = region.second.center_y() - center_y;
+            pxint_t x = (pxint_t)region.second.center_x() - center_x;
+            pxint_t y = (pxint_t)region.second.center_y() - center_y;
             double angle = std::atan2(y, x) * 57.29577951308232;
             if (angle < 0){
                 angle += 360;
@@ -147,38 +124,26 @@ bool SparkleDetectorOld::is_ball(){
         }
     }
 
-#if 0
-    cout << "{" << endl;
-    for (size_t r = 0; r < m_matrix.height(); r++){
-        cout << "    {";
-        for (size_t c = 0; c < m_matrix.width(); c++){
-            cout << m_matrix[r][c] << ",";
-        }
-        cout << "}" << endl;
-    }
-    cout << "}" << endl;
-#endif
-
     //  Verify angles are aligned to the corners.
     for (double angle : angles){
         double n = angle - 45;
         double q = std::round(n / 90.);
         double m = n - 90. * q;
-        if (std::abs(m) > ANGLE_TOLERANCE_DEGREES){
+        if (std::abs(m) > STAR_SPARKLE_ANGLE_TOLERANCE_DEGREES){
             return false;
         }
     }
 
     //  Verify that all live pixels are near the diagonals.
-    for (pxint_t r = 0; r < m_matrix.height(); r++){
-        for (pxint_t c = 0; c < m_matrix.width(); c++){
-            if (m_matrix[r][c] == 0){
+    for (size_t r = 0; r < m_matrix.height(); r++){
+        for (size_t c = 0; c < m_matrix.width(); c++){
+            if (!m_matrix.get(c, r)){
                 continue;
             }
             double distance = std::sqrt(center_x*center_x + center_y*center_y);
-            pxint_t dist_x = std::abs(c - center_x);
-            pxint_t dist_y = std::abs(r - center_y);
-            pxint_t dist = std::abs(dist_y - dist_x);
+            pxint_t dist_x = std::abs((pxint_t)(c - center_x));
+            pxint_t dist_y = std::abs((pxint_t)(r - center_y));
+            pxint_t dist = std::abs((pxint_t)(dist_y - dist_x));
             if (dist > 2 + distance / 5.){
                 return false;
             }
@@ -187,14 +152,14 @@ bool SparkleDetectorOld::is_ball(){
 
     return true;
 }
-bool SparkleDetectorOld::is_star(){
+bool RadialSparkleDetector::is_star() const{
     //  Fewer than 5 regions, cannot be a star.
     if (m_regions.size() < 5){
         return false;
     }
 
-    pxint_t width = m_box.box.width();
-    pxint_t height = m_box.box.height();
+    size_t width = m_object.width();
+    size_t height = m_object.height();
 
     //  Make sure dimentions are roughly square-ish.
     if (width > 2 * height || height > 2 * width){
@@ -202,13 +167,13 @@ bool SparkleDetectorOld::is_star(){
     }
 
     //  Compute angles for the 5 largest regions.
-    pxint_t center_x = m_box.center_x() - m_box.box.min_x;
-    pxint_t center_y = m_box.center_y() - m_box.box.min_y;
+    pxint_t center_x = (pxint_t)(m_object.center_x() - m_object.min_x);
+    pxint_t center_y = (pxint_t)(m_object.center_y() - m_object.min_y);
     std::set<double> angles;
     size_t c = 0;
     for (const auto& region : m_regions){
-        pxint_t x = region.second.center_x() - center_x;
-        pxint_t y = region.second.center_y() - center_y;
+        pxint_t x = (pxint_t)region.second.center_x() - center_x;
+        pxint_t y = (pxint_t)region.second.center_y() - center_y;
         double angle = std::atan2(y, x) * 57.29577951308232;
         if (angle < 0){
             angle += 360;
@@ -230,7 +195,7 @@ bool SparkleDetectorOld::is_star(){
             double q = std::round(n / 72.);
             points |= (size_t)1 << ((size_t)q % 5);
             double m = n - 72. * q;
-            if (std::abs(m) > ANGLE_TOLERANCE_DEGREES){
+            if (std::abs(m) > STAR_SPARKLE_ANGLE_TOLERANCE_DEGREES){
                 bad++;
             }
         }
@@ -257,7 +222,20 @@ bool SparkleDetectorOld::is_star(){
 
 
 
-}
-}
-}
 
+
+
+
+
+
+
+
+
+
+
+
+
+
+}
+}
+}

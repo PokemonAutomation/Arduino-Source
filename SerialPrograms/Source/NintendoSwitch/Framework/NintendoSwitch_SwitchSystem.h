@@ -26,11 +26,13 @@ class SwitchSystemFactory : public SwitchSetupFactory{
 public:
     SwitchSystemFactory(
         QString label, std::string logger_tag,
-        PABotBaseLevel min_pabotbase, FeedbackType feedback
+        PABotBaseLevel min_pabotbase,
+        FeedbackType feedback, bool allow_commands_while_running
     );
     SwitchSystemFactory(
         QString label, std::string logger_tag,
-        PABotBaseLevel min_pabotbase, FeedbackType feedback,
+        PABotBaseLevel min_pabotbase,
+        FeedbackType feedback, bool allow_commands_while_running,
         const QJsonValue& json
     );
     virtual void load_json(const QJsonValue& json) override;

@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <QImage>
+#include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Inference/ImageTools.h"
@@ -43,6 +44,40 @@ struct ShinyImageDetection{
 
 
 
+struct SparkleSet{
+    std::vector<ImagePixelBox> balls;
+    std::vector<ImagePixelBox> stars;
+    std::vector<ImagePixelBox> squares;
+    std::vector<ImagePixelBox> lines;
+
+    double alpha_overall() const;
+    void draw_boxes(
+        VideoOverlaySet& overlays,
+        const QImage& frame,
+        const ImageFloatBox& inference_box
+    ) const;
+};
+
+SparkleSet find_sparkles(Kernels::PackedBinaryMatrix& matrix);
+SparkleSet find_sparkles(const QImage& image);
+
+
+
+
+
+#if 0
+class PerFrameSparkleTracker{
+public:
+
+
+
+private:
+//    std::multimap<double, ImagePixelBox, std::greater<double>> m_balls;
+//    std::multimap<double, ImagePixelBox, std::greater<double>> m_stars;
+//    std::multimap<double, ImagePixelBox, std::greater<double>> m_squares;
+//    std::multimap<double, ImagePixelBox, std::greater<double>> m_lines;
+};
+#endif
 
 
 

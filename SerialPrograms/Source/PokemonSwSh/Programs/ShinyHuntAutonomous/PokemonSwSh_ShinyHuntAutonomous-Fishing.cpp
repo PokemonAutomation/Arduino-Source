@@ -30,7 +30,7 @@ ShinyHuntAutonomousFishing_Descriptor::ShinyHuntAutonomousFishing_Descriptor()
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Fishing",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-Fishing.md",
         "Automatically hunt for shiny fishing " + STRING_POKEMON + " using video feedback.",
-        FeedbackType::REQUIRED,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

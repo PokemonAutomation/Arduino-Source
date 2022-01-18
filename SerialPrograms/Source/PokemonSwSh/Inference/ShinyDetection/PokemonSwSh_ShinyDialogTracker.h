@@ -1,11 +1,11 @@
-/*  Shiny Dialog Tracker
+/*  Encounter Dialog Tracker
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_PokemonSwSh_ShinyDialogTracker_H
-#define PokemonAutomation_PokemonSwSh_ShinyDialogTracker_H
+#ifndef PokemonAutomation_PokemonSwSh_EncounterDialogTracker_H
+#define PokemonAutomation_PokemonSwSh_EncounterDialogTracker_H
 
 #include <chrono>
 #include "CommonFramework/Logging/Logger.h"
@@ -26,11 +26,11 @@ enum class EncounterState{
 };
 
 
-class ShinyDialogTracker{
+class EncounterDialogTracker{
 public:
-    ShinyDialogTracker(
-        VideoOverlay& overlay, Logger& logger,
-        StaticScreenDetector& detector
+    EncounterDialogTracker(
+        Logger& logger, VideoOverlay& overlay,
+        StaticScreenDetector& dialog_detector
     );
 
     bool dialog_on() const{ return m_dialog_on; }
@@ -46,7 +46,7 @@ public:
 
 private:
     Logger& m_logger;
-    StaticScreenDetector& m_detector;
+    StaticScreenDetector& m_dialog_detector;
     VideoOverlaySet m_overlays;
     std::chrono::system_clock::time_point m_end_dialog;
     bool m_dialog_on;

@@ -40,6 +40,7 @@ public:
         }
         if (area == 0){
             *this = obj;
+            return;
         }
         min_x = std::min(min_x, obj.min_x);
         min_y = std::min(min_y, obj.min_y);
@@ -48,6 +49,7 @@ public:
         area += obj.area;
         sum_x += obj.sum_x;
         sum_y += obj.sum_y;
+        object |= obj.object;
     }
 
 

@@ -94,15 +94,20 @@ void SparseBinaryMatrixBase<Tile>::set_data(std::map<TileIndex, Tile> data){
     m_data = std::move(data);
 }
 
+template <typename Tile>
+void SparseBinaryMatrixBase<Tile>::operator|=(const SparseBinaryMatrixBase& x){
+    m_logical_width = std::max(m_logical_width, x.m_logical_width);
+    m_logical_height = std::max(m_logical_height, x.m_logical_height);
+    m_tile_width = std::max(m_tile_width, x.m_tile_width);
+    m_tile_height = std::max(m_tile_height, x.m_tile_height);
+    for (const auto& tile : x.m_data){
+        this->tile(tile.first) |= tile.second;
+    }
+}
+
 
 template <typename Tile>
-Tile SparseBinaryMatrixBase<Tile>::make_zero_tile(){
-    Tile tile;
-    tile.set_zero();
-    return tile;
-}
-template <typename Tile>
-const Tile SparseBinaryMatrixBase<Tile>::ZERO_TILE = SparseBinaryMatrixBase<Tile>::make_zero_tile();
+const Tile SparseBinaryMatrixBase<Tile>::ZERO_TILE;
 
 
 

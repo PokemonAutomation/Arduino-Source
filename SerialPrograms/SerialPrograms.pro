@@ -376,6 +376,8 @@ SOURCES += \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleDetector.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyTrigger.cpp \
+    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.cpp \
+    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorSquare.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleTrigger.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareDetector.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareTrigger.cpp \
@@ -914,6 +916,8 @@ HEADERS += \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyFilters.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleDetector.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyTrigger.h \
+    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.h \
+    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorSquare.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleTrigger.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareDetector.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareTrigger.h \

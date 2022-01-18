@@ -21,7 +21,7 @@ PageSwap_Descriptor::PageSwap_Descriptor()
         STRING_POKEMON + " Home", STRING_POKEMON + " Home: Page Swap",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/PokemonHome-PageSwap.md",
         "Swap 30 boxes (1 page) in " + STRING_POKEMON + " Home.",
-        FeedbackType::NONE,
+        FeedbackType::NONE, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

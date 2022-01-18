@@ -33,6 +33,8 @@ public:
     PackedBinaryMatrixBase();
     PackedBinaryMatrixBase(size_t width, size_t height);
 
+    void clear();
+
     void set_zero();        //  Zero the entire matrix.
     void set_ones();        //  Set entire matrix to ones.
     void invert();          //  Invert all bits.

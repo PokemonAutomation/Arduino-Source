@@ -29,7 +29,7 @@ DoublesLeveling_Descriptor::DoublesLeveling_Descriptor()
         STRING_POKEMON + " BDSP", "Double Battle Leveling",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/DoublesLeveling.md",
         "Level up your party by spamming spread moves in a double battle with a partner that heals you forever.",
-        FeedbackType::REQUIRED,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
@@ -133,7 +133,7 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env){
             env.log("Detected move learn!", COLOR_BLUE);
             if (ON_LEARN_MOVE == 0){
                 pbf_move_right_joystick(env.console, 128, 255, 20, 105);
-                pbf_press_button(env.console, BUTTON_A, 20, 105);
+                pbf_press_button(env.console, BUTTON_ZL, 20, 105);
                 break;
             }
             return true;

@@ -13,12 +13,13 @@ namespace NintendoSwitch{
 
 
 MultiSwitchSystemFactory::MultiSwitchSystemFactory(
-    PABotBaseLevel min_pabotbase, FeedbackType feedback,
+    PABotBaseLevel min_pabotbase,
+    FeedbackType feedback, bool allow_commands_while_running,
     size_t min_switches,
     size_t max_switches,
     size_t switches
 )
-    : SwitchSetupFactory(min_pabotbase, feedback)
+    : SwitchSetupFactory(min_pabotbase, feedback, allow_commands_while_running)
     , m_min_switches(std::max(min_switches, (size_t)1))
     , m_max_switches(std::min(max_switches, (size_t)MAX_SWITCHES))
     , m_active_switches(0)
@@ -28,12 +29,13 @@ MultiSwitchSystemFactory::MultiSwitchSystemFactory(
     resize(switches);
 }
 MultiSwitchSystemFactory::MultiSwitchSystemFactory(
-    PABotBaseLevel min_pabotbase, FeedbackType feedback,
+    PABotBaseLevel min_pabotbase,
+    FeedbackType feedback, bool allow_commands_while_running,
     size_t min_switches,
     size_t max_switches,
     const QJsonValue& json
 )
-    : SwitchSetupFactory(min_pabotbase, feedback)
+    : SwitchSetupFactory(min_pabotbase, feedback, allow_commands_while_running)
     , m_min_switches(std::max(min_switches, (size_t)1))
     , m_max_switches(std::min(max_switches, (size_t)MAX_SWITCHES))
     , m_active_switches(0)
@@ -55,7 +57,8 @@ void MultiSwitchSystemFactory::load_json(const QJsonValue& json){
             new SwitchSystemFactory(
                 QString("Switch ") + QString::number(c),
                 "Switch " + std::to_string(c),
-                m_min_pabotbase, m_feedback,
+                m_min_pabotbase,
+                m_feedback, m_allow_commands_while_running,
                 array[c]
             )
         );
@@ -78,7 +81,8 @@ void MultiSwitchSystemFactory::resize(size_t count){
             new SwitchSystemFactory(
                 QString("Switch ") + QString::number(m_switches.size()),
                 "Switch " + std::to_string(m_switches.size()),
-                m_min_pabotbase, m_feedback
+                m_min_pabotbase,
+                m_feedback, m_allow_commands_while_running
             )
         );
     }

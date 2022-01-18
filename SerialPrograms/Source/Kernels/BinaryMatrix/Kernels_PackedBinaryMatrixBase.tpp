@@ -87,8 +87,14 @@ PackedBinaryMatrixBase<Tile>::PackedBinaryMatrixBase(size_t width, size_t height
     , m_tile_width((width + TILE_WIDTH - 1) / TILE_WIDTH)
     , m_tile_height((height + TILE_HEIGHT - 1) / TILE_HEIGHT)
     , m_data(m_tile_width * m_tile_height)
-{
-    set_zero();
+{}
+template <typename Tile>
+void PackedBinaryMatrixBase<Tile>::clear(){
+    m_logical_width = 0;
+    m_logical_height = 0;
+    m_tile_width = 0;
+    m_tile_height = 0;
+    m_data.clear();
 }
 template <typename Tile>
 void PackedBinaryMatrixBase<Tile>::set_zero(){

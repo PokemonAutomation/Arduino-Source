@@ -28,7 +28,7 @@ StatsReset_Descriptor::StatsReset_Descriptor()
         STRING_POKEMON + " SwSh", "Stats Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/StatsReset.md",
         "Repeatedly receive gift " + STRING_POKEMON + " until you get the stats you want.",
-        FeedbackType::REQUIRED,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

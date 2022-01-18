@@ -34,7 +34,7 @@ CloneItemsMenuOverlap_Descriptor::CloneItemsMenuOverlap_Descriptor()
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/CloneItemsMenuOverlap.md",
         "Clone 5 items at a time using the menu overlap glitch. "
         "<font color=\"red\">(This requires game versions 1.1.0 - 1.1.1. The glitch it relies on was patched in v1.1.2.)</font>",
-        FeedbackType::REQUIRED,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

@@ -21,9 +21,14 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-VirtualController::VirtualController(BotBaseHandle& botbase, Logger& logger)
-    : m_botbase(botbase)
-    , m_logger(logger)
+VirtualController::VirtualController(
+    Logger& logger,
+    BotBaseHandle& botbase,
+    bool allow_commands_while_running
+)
+    : m_logger(logger)
+    , m_botbase(botbase)
+    , m_allow_commands_while_running(allow_commands_while_running)
     , m_last(std::chrono::system_clock::now())
     , m_last_known_state(ProgramState::STOPPED)
     , m_stop(false)
@@ -185,7 +190,9 @@ void VirtualController::thread_loop(){
 
         do{
 //            cout << (int)m_last_known_state.load(std::memory_order_acquire) << endl;
-            if (m_last_known_state.load(std::memory_order_acquire) != ProgramState::STOPPED){
+            if (!m_allow_commands_while_running &&
+                m_last_known_state.load(std::memory_order_acquire) != ProgramState::STOPPED
+            ){
                 break;
             }
             try{

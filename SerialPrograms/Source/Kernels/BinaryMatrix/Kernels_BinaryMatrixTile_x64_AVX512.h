@@ -22,7 +22,9 @@ struct BinaryTile_AVX512{
     __m512i vec[8];
 
 public:
-    PA_FORCE_INLINE BinaryTile_AVX512() = default;
+    PA_FORCE_INLINE BinaryTile_AVX512(){
+        set_zero();
+    }
     PA_FORCE_INLINE BinaryTile_AVX512(const BinaryTile_AVX512& x){
         vec[0] = x.vec[0];
         vec[1] = x.vec[1];

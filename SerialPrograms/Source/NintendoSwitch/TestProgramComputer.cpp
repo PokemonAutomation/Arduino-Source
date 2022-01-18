@@ -76,11 +76,13 @@ inline std::string dump8(uint8_t x){
 
 
 
-
-
 void TestProgramComputer::program(ProgramEnvironment& env){
     using namespace Kernels;
     using namespace NintendoSwitch::PokemonSwSh;
+
+
+
+
 
 
 
@@ -92,7 +94,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
 #endif
 
 
-#if 1
+#if 0
     QImage image("screenshot-20220108-185053570093.png");
 //    BattleMenuReader reader();
 

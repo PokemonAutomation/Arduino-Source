@@ -37,6 +37,8 @@ public:
     void clear();
     void set_data(std::map<TileIndex, TileType> data);
 
+    void operator|=(const SparseBinaryMatrixBase& x);
+
 public:
     size_t width() const{ return m_logical_width; }
     size_t height() const{ return m_logical_height; }
@@ -79,7 +81,6 @@ private:
     std::map<TileIndex, TileType> m_data;
 
 
-    static TileType make_zero_tile();
     static const TileType ZERO_TILE;
 };
 

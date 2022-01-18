@@ -15,11 +15,12 @@ CommandRow::CommandRow(
     QWidget& parent,
     BotBaseHandle& botbase,
     Logger& logger,
-    FeedbackType feedback
+    FeedbackType feedback, bool allow_commands_while_running
 )
     : QWidget(&parent)
-    , VirtualController(botbase, logger)
+    , VirtualController(logger, botbase, allow_commands_while_running)
     , m_botbase(botbase)
+    , m_allow_commands_while_running(allow_commands_while_running)
     , m_last_known_focus(false)
 {
     QHBoxLayout* command_row = new QHBoxLayout(this);
@@ -111,13 +112,15 @@ void CommandRow::set_focus(bool focused){
 }
 
 void CommandRow::update_ui(){
-    bool stopped = last_known_state() == ProgramState::STOPPED;
-//    m_reset_button->setEnabled(stopped);
-    if (!stopped){
-        m_status->setText(
-            "<font color=\"purple\">Not Active. Keyboard commands are disabled while a program is running.</font>"
-        );
-        return;
+    if (!m_allow_commands_while_running){
+        bool stopped = last_known_state() == ProgramState::STOPPED;
+//        m_reset_button->setEnabled(stopped);
+        if (!stopped){
+            m_status->setText(
+                "<font color=\"purple\">Not Active. Keyboard commands are disabled while a program is running.</font>"
+            );
+            return;
+        }
     }
 
     BotBaseHandle::State state = m_botbase.state();

@@ -16,11 +16,11 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-class SparkleDetector{
+class SparkleDetectorOld{
     static const double ANGLE_TOLERANCE_DEGREES;
 
 public:
-    SparkleDetector(
+    SparkleDetectorOld(
         const CellMatrix& matrix,
         const FillGeometry& box
     );
@@ -33,7 +33,7 @@ private:
     FillGeometry m_box;
     CellMatrix m_matrix;
 
-    std::multimap<int64_t, FillGeometry> m_regions;
+    std::multimap<size_t, FillGeometry, std::greater<size_t>> m_regions;
     uint64_t m_radius_sqr;
 };
 

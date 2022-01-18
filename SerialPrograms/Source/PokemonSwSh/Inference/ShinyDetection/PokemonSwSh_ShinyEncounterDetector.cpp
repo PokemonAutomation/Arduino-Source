@@ -69,7 +69,7 @@ private:
     double m_detection_threshold;
 
     BattleDialogDetector m_dialog_detector;
-    ShinyDialogTracker m_dialog_tracker;
+    EncounterDialogTracker m_dialog_tracker;
 
     std::deque<InferenceBoxScope> m_detection_overlays;
 
@@ -95,7 +95,7 @@ ShinyEncounterDetector::ShinyEncounterDetector(
     , m_min_delay(battle_settings.dialog_delay_when_shiny - std::chrono::milliseconds(300))
     , m_max_delay(battle_settings.dialog_delay_when_shiny + std::chrono::milliseconds(500))
     , m_detection_threshold(detection_threshold)
-    , m_dialog_tracker(overlay, logger, m_dialog_detector)
+    , m_dialog_tracker(logger, overlay, m_dialog_detector)
     , m_best_type_alpha(0)
 {}
 

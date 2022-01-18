@@ -26,7 +26,7 @@ public:
         QWidget& parent,
         BotBaseHandle& botbase,
         Logger& logger,
-        FeedbackType feedback
+        FeedbackType feedback, bool allow_commands_while_running
     );
 
     void on_key_press(Qt::Key key);
@@ -44,6 +44,7 @@ public slots:
 
 private:
     BotBaseHandle& m_botbase;
+    bool m_allow_commands_while_running;
     QComboBox* m_command_box;
     QLabel* m_status;
     QCheckBox* m_inference_box;

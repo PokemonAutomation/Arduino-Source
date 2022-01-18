@@ -23,7 +23,11 @@ namespace NintendoSwitch{
 
 class VirtualController{
 public:
-    VirtualController(BotBaseHandle& botbase, Logger& logger);
+    VirtualController(
+        Logger& logger,
+        BotBaseHandle& botbase,
+        bool allow_commands_while_running
+    );
     ~VirtualController();
 
     void clear_state();
@@ -38,8 +42,9 @@ private:
     void thread_loop();
 
 private:
-    BotBaseHandle& m_botbase;
     Logger& m_logger;
+    BotBaseHandle& m_botbase;
+    bool m_allow_commands_while_running;
 
     //  Keyboard State
     std::set<Qt::Key> m_pressed_buttons;

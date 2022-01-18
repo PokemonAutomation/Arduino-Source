@@ -31,7 +31,7 @@ ShinyHuntAutonomousRegigigas2_Descriptor::ShinyHuntAutonomousRegigigas2_Descript
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Regigigas2",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-Regigigas2.md",
         "Automatically hunt for shiny Regigigas using video feedback.",
-        FeedbackType::REQUIRED,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

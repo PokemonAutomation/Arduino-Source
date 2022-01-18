@@ -22,7 +22,9 @@ struct BinaryTile_Default{
 
 
 public:
-    PA_FORCE_INLINE BinaryTile_Default() = default;
+    PA_FORCE_INLINE BinaryTile_Default(){
+        set_zero();
+    }
 
 
 public:

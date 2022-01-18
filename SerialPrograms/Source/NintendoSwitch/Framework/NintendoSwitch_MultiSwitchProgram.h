@@ -56,7 +56,7 @@ public:
         QString category, QString display_name,
         QString doc_link,
         QString description,
-        FeedbackType feedback,
+        FeedbackType feedback, bool allow_commands_while_running,
         PABotBaseLevel min_pabotbase_level,
         size_t min_switches,
         size_t max_switches,

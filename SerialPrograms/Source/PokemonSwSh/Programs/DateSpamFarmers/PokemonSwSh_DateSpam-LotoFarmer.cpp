@@ -22,7 +22,7 @@ LotoFarmer_Descriptor::LotoFarmer_Descriptor()
         STRING_POKEMON + " SwSh", "Date Spam - Loto Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-LotoFarmer.md",
         "Farm the Loto ID.",
-        FeedbackType::NONE,
+        FeedbackType::NONE, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

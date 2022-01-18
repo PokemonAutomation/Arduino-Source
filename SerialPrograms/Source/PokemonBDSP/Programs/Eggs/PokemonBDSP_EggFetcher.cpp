@@ -22,7 +22,7 @@ EggFetcher_Descriptor::EggFetcher_Descriptor()
         STRING_POKEMON + " BDSP", "Egg Fetcher",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/EggFetcher.md",
         "Automatically fetch eggs from the daycare man.",
-        FeedbackType::NONE,
+        FeedbackType::NONE, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

@@ -30,7 +30,7 @@ StarterReset_Descriptor::StarterReset_Descriptor()
         STRING_POKEMON + " BDSP", "Starter Reset",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/StarterReset.md",
         "Shiny hunt your starter " + STRING_POKEMON + ".",
-        FeedbackType::REQUIRED,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

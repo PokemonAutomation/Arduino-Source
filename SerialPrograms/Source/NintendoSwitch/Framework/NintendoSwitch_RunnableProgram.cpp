@@ -39,7 +39,7 @@ RunnableSwitchProgramDescriptor::RunnableSwitchProgramDescriptor(
     QString category, QString display_name,
     QString doc_link,
     QString description,
-    FeedbackType feedback,
+    FeedbackType feedback, bool allow_commands_while_running,
     PABotBaseLevel min_pabotbase_level
 )
     : RunnablePanelDescriptor(
@@ -51,6 +51,7 @@ RunnableSwitchProgramDescriptor::RunnableSwitchProgramDescriptor(
     )
     , m_feedback(feedback)
     , m_min_pabotbase_level(min_pabotbase_level)
+    , m_allow_commands_while_running(allow_commands_while_running)
 {}
 
 

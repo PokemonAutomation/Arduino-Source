@@ -21,7 +21,7 @@ FriendCodeAdder_Descriptor::FriendCodeAdder_Descriptor()
         "Nintendo Switch", "Friend Code Adder",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/FriendCodeAdder.md",
         "Add a list of friend codes.",
-        FeedbackType::NONE,
+        FeedbackType::NONE, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

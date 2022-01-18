@@ -22,7 +22,7 @@ BerryFarmer_Descriptor::BerryFarmer_Descriptor()
         STRING_POKEMON + " SwSh", "Date Spam - Berry Farmer",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/DateSpam-BerryFarmer.md",
         "Farm berries.",
-        FeedbackType::NONE,
+        FeedbackType::NONE, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

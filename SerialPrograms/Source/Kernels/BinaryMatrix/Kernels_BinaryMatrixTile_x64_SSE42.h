@@ -22,7 +22,9 @@ struct BinaryTile_SSE42{
     __m128i vec[4];
 
 public:
-    PA_FORCE_INLINE BinaryTile_SSE42() = default;
+    PA_FORCE_INLINE BinaryTile_SSE42(){
+        set_zero();
+    }
     PA_FORCE_INLINE BinaryTile_SSE42(const BinaryTile_SSE42& x){
         vec[0] = x.vec[0];
         vec[1] = x.vec[1];

@@ -22,7 +22,7 @@ MassRelease_Descriptor::MassRelease_Descriptor()
         STRING_POKEMON + " BDSP", "Mass Release",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/MassRelease.md",
         "Mass release boxes of " + STRING_POKEMON + ".",
-        FeedbackType::NONE,
+        FeedbackType::NONE, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

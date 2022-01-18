@@ -50,7 +50,7 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
     QString category, QString display_name,
     QString doc_link,
     QString description,
-    FeedbackType feedback,
+    FeedbackType feedback, bool allow_commands_while_running,
     PABotBaseLevel min_pabotbase_level,
     size_t min_switches,
     size_t max_switches,
@@ -61,7 +61,7 @@ MultiSwitchProgramDescriptor::MultiSwitchProgramDescriptor(
         std::move(category), std::move(display_name),
         std::move(doc_link),
         std::move(description),
-        feedback,
+        feedback, allow_commands_while_running,
         min_pabotbase_level
     )
     , m_min_switches(min_switches)
@@ -76,6 +76,7 @@ MultiSwitchProgramInstance::MultiSwitchProgramInstance(const MultiSwitchProgramD
     , m_switches(
         descriptor.min_pabotbase_level(),
         descriptor.feedback(),
+        descriptor.allow_commands_while_running(),
         descriptor.min_switches(),
         descriptor.max_switches(),
         descriptor.default_switches()

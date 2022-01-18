@@ -65,7 +65,7 @@ void ShinyImageDetection::accumulate(
 //    size_t count = 0;
     for (FillGeometry& object : objects){
 
-        PokemonSwSh::SparkleDetector detector(matrix, object);
+        PokemonSwSh::SparkleDetectorOld detector(matrix, object);
         if (detector.is_ball()){
 //            detection = true;
             this->balls.emplace_back(object.box);

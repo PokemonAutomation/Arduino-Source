@@ -759,6 +759,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleTrigger.h
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareDetector.cpp
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareDetector.h
+    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.cpp
+    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.h
+    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorSquare.cpp
+    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorSquare.h
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareTrigger.cpp
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareTrigger.h
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateIVCheckerOCR.cpp

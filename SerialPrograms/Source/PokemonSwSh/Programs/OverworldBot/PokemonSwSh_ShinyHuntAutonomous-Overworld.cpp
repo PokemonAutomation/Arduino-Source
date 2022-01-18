@@ -35,7 +35,7 @@ ShinyHuntAutonomousOverworld_Descriptor::ShinyHuntAutonomousOverworld_Descriptor
         STRING_POKEMON + " SwSh", "Shiny Hunt Autonomous - Overworld",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/ShinyHuntAutonomous-Overworld.md",
         "Automatically shiny hunt overworld " + STRING_POKEMON + " with video feedback.",
-        FeedbackType::REQUIRED,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

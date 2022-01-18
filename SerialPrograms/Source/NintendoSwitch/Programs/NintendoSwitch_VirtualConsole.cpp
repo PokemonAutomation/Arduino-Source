@@ -26,7 +26,7 @@ VirtualConsole::VirtualConsole(const VirtualConsole_Descriptor& descriptor)
     : PanelInstance(descriptor)
     , m_switch(
         "Switch Settings", "Switch 0",
-        PABotBaseLevel::NOT_PABOTBASE, FeedbackType::NONE
+        PABotBaseLevel::NOT_PABOTBASE, FeedbackType::NONE, false
     )
 {}
 void VirtualConsole::from_json(const QJsonValue& json){

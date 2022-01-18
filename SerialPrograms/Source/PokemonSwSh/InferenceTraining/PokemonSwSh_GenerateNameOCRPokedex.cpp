@@ -33,7 +33,7 @@ GenerateNameOCRDataPokedex_Descriptor::GenerateNameOCRDataPokedex_Descriptor()
         STRING_POKEMON + " SwSh", "Generate " + STRING_POKEMON + " Name OCR Data",
         "",
         "Generate " + STRING_POKEMON + " Name OCR data by iterating the " + STRING_POKEDEX + ".",
-        FeedbackType::REQUIRED,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

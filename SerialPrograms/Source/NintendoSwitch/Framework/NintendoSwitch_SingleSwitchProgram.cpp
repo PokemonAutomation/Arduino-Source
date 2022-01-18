@@ -17,7 +17,8 @@ SingleSwitchProgramInstance::SingleSwitchProgramInstance(const RunnableSwitchPro
     , m_switch(
         "Switch Settings", "Switch 0",
         descriptor.min_pabotbase_level(),
-        descriptor.feedback()
+        descriptor.feedback(),
+        descriptor.allow_commands_while_running()
     )
 {
     m_setup = &m_switch;

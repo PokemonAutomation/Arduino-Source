@@ -27,7 +27,7 @@ ShinyHuntShaymin_Descriptor::ShinyHuntShaymin_Descriptor()
         STRING_POKEMON + " BDSP", "Shiny Hunt - Shaymin",
         "ComputerControl/blob/master/Wiki/Programs/PokemonBDSP/ShinyHunt-Shaymin.md",
         "Shiny hunt Shaymin using the runaway method.",
-        FeedbackType::REQUIRED,
+        FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

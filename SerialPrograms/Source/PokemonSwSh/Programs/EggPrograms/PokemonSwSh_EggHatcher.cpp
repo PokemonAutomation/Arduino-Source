@@ -22,7 +22,7 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
         STRING_POKEMON + " SwSh", "Egg Hatcher",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggHatcher.md",
         "Hatch eggs from boxes.",
-        FeedbackType::NONE,
+        FeedbackType::NONE, false,
         PABotBaseLevel::PABOTBASE_31KB
     )
 {}

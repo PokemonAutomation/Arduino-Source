@@ -23,13 +23,15 @@ public:
 
 public:
     MultiSwitchSystemFactory(
-        PABotBaseLevel min_pabotbase, FeedbackType feedback,
+        PABotBaseLevel min_pabotbase,
+        FeedbackType feedback, bool allow_commands_while_running,
         size_t min_switches,
         size_t max_switches,
         size_t switches
     );
     MultiSwitchSystemFactory(
-        PABotBaseLevel min_pabotbase, FeedbackType feedback,
+        PABotBaseLevel min_pabotbase,
+        FeedbackType feedback, bool allow_commands_while_running,
         size_t min_switches,
         size_t max_switches,
         const QJsonValue& json

@@ -72,7 +72,7 @@ private:
     double m_doubles_threshold;
 
     BattleDialogDetector m_dialog_detector;
-    PokemonSwSh::ShinyDialogTracker m_dialog_tracker;
+    PokemonSwSh::EncounterDialogTracker m_dialog_tracker;
 
     std::deque<InferenceBoxScope> m_detection_overlays;
 
@@ -101,7 +101,7 @@ ShinyEncounterDetector::ShinyEncounterDetector(
     , m_max_delay(SHINY_ANIMATION_DELAY + std::chrono::milliseconds(500))
     , m_overall_threshold(overall_threshold)
     , m_doubles_threshold(doubles_threshold)
-    , m_dialog_tracker(overlay, logger, m_dialog_detector)
+    , m_dialog_tracker(logger, overlay, m_dialog_detector)
     , m_best_type_alpha(0)
 {}
 

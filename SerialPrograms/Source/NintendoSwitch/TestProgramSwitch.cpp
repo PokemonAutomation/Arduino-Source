@@ -140,6 +140,8 @@
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSide.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h"
+#include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.h"
+#include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorSquare.h"
 #include "TestProgramSwitch.h"
 
 #include <immintrin.h>
@@ -174,7 +176,7 @@ TestProgram_Descriptor::TestProgram_Descriptor()
         "Nintendo Switch", "Test Program (Switch)",
         "",
         "Test Program (Switch)",
-        FeedbackType::REQUIRED,
+        FeedbackType::REQUIRED, true,
         PABotBaseLevel::PABOTBASE_12KB,
         1, 4, 1
     )
@@ -210,6 +212,88 @@ namespace PokemonBDSP{
 
 
 
+class ShinySparkleTracker : public VisualInferenceCallback{
+public:
+    ShinySparkleTracker(VideoOverlay& overlay, const ImageFloatBox& box)
+        : m_box(box)
+        , m_overlays(overlay)
+    {}
+
+    virtual void make_overlays(VideoOverlaySet& items) const override{}
+
+    virtual bool process_frame(
+        const QImage& frame,
+        std::chrono::system_clock::time_point timestamp
+    ) override{
+        QImage image = extract_box(frame, m_box);
+        PokemonSwSh::SparkleSet sparkles = PokemonSwSh::find_sparkles(image);
+        m_overlays.clear();
+        sparkles.draw_boxes(m_overlays, frame, m_box);
+        return false;
+    }
+
+private:
+    ImageFloatBox m_box;
+    VideoOverlaySet m_overlays;
+};
+
+
+namespace PokemonSwSh{
+
+
+class ShinyEncounterTracker : public VisualInferenceCallback{
+public:
+    ShinyEncounterTracker(
+        Logger& logger, VideoOverlay& overlay,
+        const ShinyDetectionBattle& battle_settings
+    )
+        : m_battle_settings(battle_settings)
+        , m_logger(logger), m_overlay(overlay)
+        , m_dialog_tracker(logger, overlay, m_dialog_detector)
+        , m_sparkle_tracker(overlay, battle_settings.detection_box)
+        , m_max_alpha_wild(0)
+    {}
+
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+
+    virtual bool process_frame(
+        const QImage& frame,
+        std::chrono::system_clock::time_point timestamp
+    ) override;
+
+
+private:
+    ShinyDetectionBattle m_battle_settings;
+
+    Logger& m_logger;
+    VideoOverlay& m_overlay;
+
+    BattleDialogDetector m_dialog_detector;
+    EncounterDialogTracker m_dialog_tracker;
+    ShinySparkleTracker m_sparkle_tracker;
+
+    double m_max_alpha_wild;
+};
+
+void ShinyEncounterTracker::make_overlays(VideoOverlaySet& items) const{
+    items.add(COLOR_RED, m_battle_settings.detection_box);
+}
+
+bool ShinyEncounterTracker::process_frame(
+    const QImage& frame,
+    std::chrono::system_clock::time_point timestamp
+){
+    m_dialog_tracker.push_frame(frame, timestamp);
+    m_sparkle_tracker.process_frame(frame, timestamp);
+    return false;
+}
+
+
+
+}
+
+
+
 
 
 
@@ -218,13 +302,105 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     using namespace Kernels::Waterfill;
     using namespace OCR;
     using namespace Pokemon;
-    using namespace PokemonBDSP;
+    using namespace PokemonSwSh;
+//    using namespace PokemonBDSP;
 
     Logger& logger = env.logger();
     ConsoleHandle& console = env.consoles[0];
     BotBase& botbase = env.consoles[0];
     VideoFeed& feed = env.consoles[0];
     VideoOverlay& overlay = env.consoles[0];
+
+
+
+    VisualInferenceSession session(env, feed, overlay);
+    ShinyEncounterTracker tracker(logger, overlay, SHINY_BATTLE_REGULAR);
+    session += tracker;
+    session.run();
+
+
+
+#if 0
+    VisualInferenceSession session(env, feed, overlay);
+    ShinySparkleTracker tracker(overlay);
+    session += tracker;
+    session.run();
+#endif
+
+
+
+
+
+
+
+
+#if 0
+    QImage image = feed.snapshot();
+    PokemonSwSh::SparkleSet sparkles = PokemonSwSh::find_sparkles(image);
+
+    VideoOverlaySet overlays(overlay);
+    sparkles.draw_boxes(overlays, image, {0, 0, 1, 1});
+#endif
+
+
+
+
+
+#if 0
+    Kernels::PackedBinaryMatrix matrix0;
+    matrix0 = compress_rgb32_to_binary_min(image, 192, 192, 0);
+
+//    std::vector<WaterFillObject> objects = find_objects_inplace(matrix0, 10, false);
+    WaterFillIterator finder(matrix0, 20);
+    WaterFillObject object;
+    size_t c = 0;
+    VideoOverlaySet overlays(overlay);
+    while (finder.find_next(object)){
+        image.copy(object.min_x, object.min_y, object.width(), object.height()).save("test-" + QString::number(c) + ".png");
+        cout << c++ << endl;
+        PokemonSwSh::RadialSparkleDetector radial(object);
+        if (radial.is_ball()){
+            overlays.add(
+                COLOR_GREEN,
+                translate_to_parent(
+                    image, {0, 0, 1, 1},
+                    {object.min_x, object.min_y, object.max_x, object.max_y}
+                )
+            );
+            continue;
+        }
+        if (radial.is_star()){
+            overlays.add(
+                COLOR_BLUE,
+                translate_to_parent(
+                    image, {0, 0, 1, 1},
+                    {object.min_x, object.min_y, object.max_x, object.max_y}
+                )
+            );
+            continue;
+        }
+        if (PokemonSwSh::is_line_sparkle(object, image.width() * 0.25)){
+            overlays.add(
+                COLOR_YELLOW,
+                translate_to_parent(
+                    image, {0, 0, 1, 1},
+                    {object.min_x, object.min_y, object.max_x, object.max_y}
+                )
+            );
+            continue;
+        }
+        if (PokemonSwSh::is_square_sparkle(object)){
+            overlays.add(
+                COLOR_MAGENTA,
+                translate_to_parent(
+                    image, {0, 0, 1, 1},
+                    {object.min_x, object.min_y, object.max_x, object.max_y}
+                )
+            );
+        }
+    }
+#endif
+
 
 
 //    PokemonSwSh::SelectionArrowFinder finder(overlay, ImageFloatBox(0.640, 0.600, 0.055, 0.380));
@@ -237,7 +413,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 //    cout << (int)PokemonSwSh::MaxLairInternal::read_side(image) << endl;
 
-#if 1
+#if 0
     QImage image("20220116-053836954926-ReadPath.png");
 
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = PokemonSwSh::find_symbols(image, 0.20);

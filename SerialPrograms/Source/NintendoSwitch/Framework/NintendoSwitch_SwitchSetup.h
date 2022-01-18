@@ -23,10 +23,12 @@ class SwitchSetupWidget;
 class SwitchSetupFactory{
 public:
     SwitchSetupFactory(
-        PABotBaseLevel min_pabotbase, FeedbackType feedback
+        PABotBaseLevel min_pabotbase,
+        FeedbackType feedback, bool allow_commands_while_running
     )
         : m_min_pabotbase(min_pabotbase)
         , m_feedback(feedback)
+        , m_allow_commands_while_running(allow_commands_while_running)
     {}
     virtual ~SwitchSetupFactory() = default;
 
@@ -38,6 +40,7 @@ public:
 protected:
     const PABotBaseLevel m_min_pabotbase;
     const FeedbackType m_feedback;
+    const bool m_allow_commands_while_running;
 };
 
 

@@ -22,7 +22,7 @@ EggFetcher2_Descriptor::EggFetcher2_Descriptor()
         STRING_POKEMON + " SwSh", "Egg Fetcher 2",
         "ComputerControl/blob/master/Wiki/Programs/PokemonSwSh/EggFetcher2.md",
         "Fetch eggs without hatching them.",
-        FeedbackType::NONE,
+        FeedbackType::NONE, false,
         PABotBaseLevel::PABOTBASE_31KB
     )
 {}

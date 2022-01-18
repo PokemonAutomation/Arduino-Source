@@ -1,4 +1,4 @@
-/*  Shiny Dialog Tracker
+/*  Encounter Dialog Tracker
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -17,12 +17,12 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-ShinyDialogTracker::ShinyDialogTracker(
-    VideoOverlay& overlay, Logger& logger,
-    StaticScreenDetector& detector
+EncounterDialogTracker::EncounterDialogTracker(
+    Logger& logger, VideoOverlay& overlay,
+    StaticScreenDetector& dialog_detector
 )
     : m_logger(logger)
-    , m_detector(detector)
+    , m_dialog_detector(dialog_detector)
     , m_overlays(overlay)
     , m_end_dialog(std::chrono::system_clock::now())
     , m_dialog_on(false)
@@ -30,12 +30,12 @@ ShinyDialogTracker::ShinyDialogTracker(
     , m_wild_animation_duration(0)
     , m_your_animation_duration(0)
 {
-    detector.make_overlays(m_overlays);
+    dialog_detector.make_overlays(m_overlays);
 }
 
 
-void ShinyDialogTracker::push_frame(const QImage& screen, std::chrono::system_clock::time_point timestamp){
-    bool dialog_on = m_detector.detect(screen);
+void EncounterDialogTracker::push_frame(const QImage& screen, std::chrono::system_clock::time_point timestamp){
+    bool dialog_on = m_dialog_detector.detect(screen);
 //    cout << dialog_on << endl;
     if (dialog_on == m_dialog_on){
         return;
@@ -75,7 +75,7 @@ void ShinyDialogTracker::push_frame(const QImage& screen, std::chrono::system_cl
         break;
     }
 }
-void ShinyDialogTracker::push_end(std::chrono::system_clock::time_point timestamp){
+void EncounterDialogTracker::push_end(std::chrono::system_clock::time_point timestamp){
     std::chrono::milliseconds gap_duration = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - m_end_dialog);
     m_logger.log(
         "DialogTracker: End " +

@@ -45,7 +45,7 @@ SwitchSystemWidget::SwitchSystemWidget(
         *this,
         m_serial->botbase(),
         m_logger,
-        factory.m_feedback
+        factory.m_feedback, factory.m_allow_commands_while_running
     );
     layout->addWidget(m_command);
 
@@ -132,7 +132,9 @@ BotBaseHandle& SwitchSystemWidget::sender(){
 }
 
 void SwitchSystemWidget::update_ui(ProgramState state){
-    m_serial->botbase().set_allow_user_commands(state == ProgramState::STOPPED);
+    if (!m_factory.m_allow_commands_while_running){
+        m_serial->botbase().set_allow_user_commands(state == ProgramState::STOPPED);
+    }
     switch (state){
     case ProgramState::NOT_READY:
         m_serial->set_options_enabled(false);

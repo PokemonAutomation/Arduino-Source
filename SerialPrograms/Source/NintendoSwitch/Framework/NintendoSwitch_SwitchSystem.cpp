@@ -21,9 +21,10 @@ const QString SwitchSystemFactory::JSON_CAMERA_RESOLUTION   = "CameraResolution"
 
 SwitchSystemFactory::SwitchSystemFactory(
     QString label, std::string logger_tag,
-    PABotBaseLevel min_pabotbase, FeedbackType feedback
+    PABotBaseLevel min_pabotbase,
+    FeedbackType feedback, bool allow_commands_while_running
 )
-    : SwitchSetupFactory(min_pabotbase, feedback)
+    : SwitchSetupFactory(min_pabotbase, feedback, allow_commands_while_running)
     , m_label(std::move(label))
     , m_logger_tag(std::move(logger_tag))
     , m_serial("<b>Serial Port:</b>", m_logger_tag, min_pabotbase)
@@ -31,13 +32,15 @@ SwitchSystemFactory::SwitchSystemFactory(
 {}
 SwitchSystemFactory::SwitchSystemFactory(
     QString label, std::string logger_tag,
-    PABotBaseLevel min_pabotbase, FeedbackType feedback,
+    PABotBaseLevel min_pabotbase,
+    FeedbackType feedback, bool allow_commands_while_running,
     const QJsonValue& json
 )
     : SwitchSystemFactory(
           std::move(label),
           std::move(logger_tag),
-          min_pabotbase, feedback
+          min_pabotbase,
+          feedback, allow_commands_while_running
      )
 {
     load_json(json);

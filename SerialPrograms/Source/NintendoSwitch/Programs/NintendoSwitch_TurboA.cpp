@@ -19,7 +19,7 @@ TurboA_Descriptor::TurboA_Descriptor()
         "Nintendo Switch", "Turbo A",
         "ComputerControl/blob/master/Wiki/Programs/NintendoSwitch/TurboA.md",
         "Endlessly mash A.",
-        FeedbackType::NONE,
+        FeedbackType::NONE, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}

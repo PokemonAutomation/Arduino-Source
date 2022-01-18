@@ -24,16 +24,18 @@ public:
         QString category, QString display_name,
         QString doc_link,
         QString description,
-        FeedbackType feedback,
+        FeedbackType feedback, bool allow_commands_while_running,
         PABotBaseLevel min_pabotbase_level
     );
 
     FeedbackType feedback() const{ return m_feedback; }
     PABotBaseLevel min_pabotbase_level() const{ return m_min_pabotbase_level; }
+    bool allow_commands_while_running() const{ return m_allow_commands_while_running; }
 
 protected:
     const FeedbackType m_feedback;
     const PABotBaseLevel m_min_pabotbase_level;
+    const bool m_allow_commands_while_running;
 };
 
 
