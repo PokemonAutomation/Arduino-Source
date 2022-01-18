@@ -115,7 +115,7 @@ void find_symbol_candidates(
     size_t max_area = (size_t)(image.width() * image.height() * max_area_ratio);
     std::vector<WaterFillObject> objects = find_objects_inplace(matrix, 20, false);
 
-    static int index = 0;
+//    static int index = 0;
 
     std::map<size_t, WaterFillObject> objmap;
     for (size_t c = 0; c < objects.size(); c++){

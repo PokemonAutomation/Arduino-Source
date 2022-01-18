@@ -557,6 +557,8 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Pokemon_IVChecker.h
     Source/Pokemon/Pokemon_Notification.cpp
     Source/Pokemon/Pokemon_Notification.h
+    Source/Pokemon/Pokemon_ShinySparkleSet.cpp
+    Source/Pokemon/Pokemon_ShinySparkleSet.h
     Source/Pokemon/Pokemon_Types.h
     Source/Pokemon/Pokemon_Types.cpp
     Source/Pokemon/Resources/Pokemon_BerryNames.cpp
@@ -753,6 +755,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyFilters.h
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleDetector.cpp
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleDetector.h
+    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleSet.cpp
+    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleSet.h
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyTrigger.cpp
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyTrigger.h
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleTrigger.cpp

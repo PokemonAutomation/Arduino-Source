@@ -4,6 +4,7 @@
  *
  */
 
+#include <QImage>
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "VisualInferenceSession.h"

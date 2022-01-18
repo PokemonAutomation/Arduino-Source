@@ -64,6 +64,7 @@ private:
     InferenceBoxScope m_overall_box;
     InferenceBoxScope m_left_box;
     InferenceBoxScope m_right_box;
+    VideoOverlaySet m_inference_boxes;
 
     std::chrono::milliseconds m_min_delay;
     std::chrono::milliseconds m_max_delay;
@@ -97,19 +98,22 @@ ShinyEncounterDetector::ShinyEncounterDetector(
     , m_overall_box(overlay, type.box)
     , m_left_box(overlay, {0.40, 0.02, 0.20, 0.48})
     , m_right_box(overlay, {0.70, 0.02, 0.20, 0.48})
+    , m_inference_boxes(overlay)
     , m_min_delay(SHINY_ANIMATION_DELAY - std::chrono::milliseconds(300))
     , m_max_delay(SHINY_ANIMATION_DELAY + std::chrono::milliseconds(500))
     , m_overall_threshold(overall_threshold)
     , m_doubles_threshold(doubles_threshold)
-    , m_dialog_tracker(logger, overlay, m_dialog_detector)
+    , m_dialog_tracker(logger, m_dialog_detector)
     , m_best_type_alpha(0)
-{}
+{
+    m_dialog_tracker.make_overlays(m_inference_boxes);
+}
 
 void ShinyEncounterDetector::push(
     const QImage& screen,
     std::chrono::system_clock::time_point timestamp
 ){
-    m_dialog_tracker.push_frame(screen, timestamp);
+    m_dialog_tracker.process_frame(screen, timestamp);
     std::chrono::milliseconds duration(0);
     switch (m_type.required_state){
     case PokemonSwSh::EncounterState::BEFORE_ANYTHING:

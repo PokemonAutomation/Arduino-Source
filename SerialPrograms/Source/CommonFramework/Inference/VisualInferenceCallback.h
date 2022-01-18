@@ -8,12 +8,13 @@
 #define PokemonAutomation_CommonFramework_VisualInferenceCallback_H
 
 #include <chrono>
-#include <vector>
-#include <deque>
-#include <QImage>
-#include "CommonFramework/Tools/VideoFeed.h"
+#include "Common/Compiler.h"
+
+class QImage;
 
 namespace PokemonAutomation{
+
+class VideoOverlaySet;
 
 
 class VisualInferenceCallback{

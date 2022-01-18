@@ -26,10 +26,10 @@ enum class EncounterState{
 };
 
 
-class EncounterDialogTracker{
+class EncounterDialogTracker : public VisualInferenceCallback{
 public:
     EncounterDialogTracker(
-        Logger& logger, VideoOverlay& overlay,
+        Logger& logger,
         StaticScreenDetector& dialog_detector
     );
 
@@ -38,16 +38,16 @@ public:
     std::chrono::milliseconds wild_animation_duration() const{ return m_wild_animation_duration; }
     std::chrono::milliseconds your_animation_duration() const{ return m_your_animation_duration; }
 
-    void push_frame(
+    virtual void make_overlays(VideoOverlaySet& items) const override;
+    virtual bool process_frame(
         const QImage& screen,
         std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now()
-    );
+    ) override;
     void push_end(std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now());
 
 private:
     Logger& m_logger;
     StaticScreenDetector& m_dialog_detector;
-    VideoOverlaySet m_overlays;
     std::chrono::system_clock::time_point m_end_dialog;
     bool m_dialog_on;
 

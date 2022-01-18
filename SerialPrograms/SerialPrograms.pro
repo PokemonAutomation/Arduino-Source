@@ -281,6 +281,7 @@ SOURCES += \
     Source/Pokemon/Pokemon_EncounterStats.cpp \
     Source/Pokemon/Pokemon_IVChecker.cpp \
     Source/Pokemon/Pokemon_Notification.cpp \
+    Source/Pokemon/Pokemon_ShinySparkleSet.cpp \
     Source/Pokemon/Pokemon_Types.cpp \
     Source/Pokemon/Resources/Pokemon_BerryNames.cpp \
     Source/Pokemon/Resources/Pokemon_BerrySprites.cpp \
@@ -375,6 +376,7 @@ SOURCES += \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyDialogTracker.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleDetector.cpp \
+    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleSet.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyTrigger.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorSquare.cpp \
@@ -813,6 +815,7 @@ HEADERS += \
     Source/Pokemon/Pokemon_EncounterStats.h \
     Source/Pokemon/Pokemon_IVChecker.h \
     Source/Pokemon/Pokemon_Notification.h \
+    Source/Pokemon/Pokemon_ShinySparkleSet.h \
     Source/Pokemon/Pokemon_Types.h \
     Source/Pokemon/Resources/Pokemon_BerryNames.h \
     Source/Pokemon/Resources/Pokemon_BerrySprites.h \
@@ -915,6 +918,7 @@ HEADERS += \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyFilters.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleDetector.h \
+    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleSet.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyTrigger.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorSquare.h \

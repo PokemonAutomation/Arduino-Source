@@ -62,6 +62,7 @@ private:
 
 //    InferenceBoxScope m_dialog_box;
     InferenceBoxScope m_shiny_box;
+    VideoOverlaySet m_inference_boxes;
 
     std::chrono::milliseconds m_min_delay;
     std::chrono::milliseconds m_max_delay;
@@ -90,21 +91,24 @@ ShinyEncounterDetector::ShinyEncounterDetector(
 )
     : m_logger(logger)
     , m_overlay(overlay)
-//    , m_dialog_box(feed, 0.50, 0.89, 0.40, 0.07)
+//    , m_dialog_box(overlay, battle_settings.detection_box)
     , m_shiny_box(overlay, battle_settings.detection_box)
+    , m_inference_boxes(overlay)
     , m_min_delay(battle_settings.dialog_delay_when_shiny - std::chrono::milliseconds(300))
     , m_max_delay(battle_settings.dialog_delay_when_shiny + std::chrono::milliseconds(500))
     , m_detection_threshold(detection_threshold)
-    , m_dialog_tracker(logger, overlay, m_dialog_detector)
+    , m_dialog_tracker(logger, m_dialog_detector)
     , m_best_type_alpha(0)
-{}
+{
+    m_dialog_tracker.make_overlays(m_inference_boxes);
+}
 
 
 void ShinyEncounterDetector::push(
     const QImage& screen,
     std::chrono::system_clock::time_point timestamp
 ){
-    m_dialog_tracker.push_frame(screen, timestamp);
+    m_dialog_tracker.process_frame(screen, timestamp);
     auto wild_animation_duration = m_dialog_tracker.wild_animation_duration();
     m_dialog_trigger |= m_min_delay < wild_animation_duration && wild_animation_duration < m_max_delay;
 

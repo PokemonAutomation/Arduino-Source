@@ -18,34 +18,33 @@ namespace PokemonSwSh{
 
 
 EncounterDialogTracker::EncounterDialogTracker(
-    Logger& logger, VideoOverlay& overlay,
+    Logger& logger,
     StaticScreenDetector& dialog_detector
 )
     : m_logger(logger)
     , m_dialog_detector(dialog_detector)
-    , m_overlays(overlay)
     , m_end_dialog(std::chrono::system_clock::now())
     , m_dialog_on(false)
     , m_state(EncounterState::BEFORE_ANYTHING)
     , m_wild_animation_duration(0)
     , m_your_animation_duration(0)
-{
-    dialog_detector.make_overlays(m_overlays);
+{}
+
+void EncounterDialogTracker::make_overlays(VideoOverlaySet& items) const{
+    m_dialog_detector.make_overlays(items);
 }
-
-
-void EncounterDialogTracker::push_frame(const QImage& screen, std::chrono::system_clock::time_point timestamp){
+bool EncounterDialogTracker::process_frame(const QImage& screen, std::chrono::system_clock::time_point timestamp){
     bool dialog_on = m_dialog_detector.detect(screen);
 //    cout << dialog_on << endl;
     if (dialog_on == m_dialog_on){
-        return;
+        return false;
     }
     m_dialog_on = dialog_on;
 
     if (!dialog_on){
         m_end_dialog = timestamp;
         m_logger.log("DialogTracker: Dialog on -> off. Starting timer.", COLOR_PURPLE);
-        return;
+        return false;
     }
 
     std::chrono::milliseconds gap_duration = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - m_end_dialog);
@@ -74,6 +73,7 @@ void EncounterDialogTracker::push_frame(const QImage& screen, std::chrono::syste
         m_logger.log("DialogTracker: Starting post-entry.", COLOR_PURPLE);
         break;
     }
+    return false;
 }
 void EncounterDialogTracker::push_end(std::chrono::system_clock::time_point timestamp){
     std::chrono::milliseconds gap_duration = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - m_end_dialog);

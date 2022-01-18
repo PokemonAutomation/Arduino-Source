@@ -7,7 +7,8 @@
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
-#include "CommonFramework/ImageMatch/ImageDiff.h"
+//#include "CommonFramework/ImageMatch/ImageDiff.h"
+#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "PokemonBDSP_MarkFinder.h"
 
@@ -23,9 +24,9 @@ using namespace Kernels;
 using namespace Kernels::Waterfill;
 
 
-const QImage& EXCLAMATION_MARK(){
-    static QImage image(RESOURCE_PATH() + "PokemonBDSP/ExclamationMark-WhiteFill.png");
-    return image;
+const ImageMatch::ExactImageMatcher& EXCLAMATION_MARK(){
+    static ImageMatch::ExactImageMatcher matcher(QImage(RESOURCE_PATH() + "PokemonBDSP/ExclamationMark-WhiteFill.png"));
+    return matcher;
 }
 
 
@@ -39,13 +40,14 @@ bool is_exclamation_mark(const QImage& image, const WaterFillObject& object){
         return false;
     }
 
-    const QImage& exclamation_mark = EXCLAMATION_MARK();
+//    const QImage& exclamation_mark = EXCLAMATION_MARK();
     QImage scaled = image.copy(
         (pxint_t)object.min_x, (pxint_t)object.min_y,
         (pxint_t)width, (pxint_t)height
     );
-    scaled = scaled.scaled(exclamation_mark.width(), exclamation_mark.height());
-    double rmsd = ImageMatch::pixel_RMSD(exclamation_mark, scaled);
+//    scaled = scaled.scaled(exclamation_mark.width(), exclamation_mark.height());
+    double rmsd = EXCLAMATION_MARK().rmsd(scaled);
+//    double rmsd = ImageMatch::pixel_RMSD(exclamation_mark, scaled);
 //    cout << "rmsd = " << rmsd << endl;
     return rmsd <= 80;
 }

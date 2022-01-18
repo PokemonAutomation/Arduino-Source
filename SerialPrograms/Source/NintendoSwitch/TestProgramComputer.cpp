@@ -34,6 +34,7 @@
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h"
 
 #include <iostream>
 using std::cout;
@@ -81,8 +82,10 @@ void TestProgramComputer::program(ProgramEnvironment& env){
     using namespace NintendoSwitch::PokemonSwSh;
 
 
+//    QImage image("screenshot-20220118-013744373530.png");
+    QImage image("screenshot-20220118-014219904700.png");
 
-
+    find_exclamation_marks(image);
 
 
 

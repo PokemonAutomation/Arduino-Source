@@ -7,6 +7,9 @@
 #ifndef PokemonAutomation_CommonFramework_FrozenImageDetector_H
 #define PokemonAutomation_CommonFramework_FrozenImageDetector_H
 
+#include <QImage>
+#include "Common/Cpp/Color.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{

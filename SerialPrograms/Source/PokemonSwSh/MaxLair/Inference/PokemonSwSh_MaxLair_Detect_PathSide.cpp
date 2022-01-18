@@ -100,7 +100,7 @@ bool is_arrow_pointed_up(
                 break;
             }
         }
-        for (; topR_x >= 0; topR_x--){
+        for (; topR_x > 0; topR_x--){
             if (matrix.get(topR_x, 0) == 1){
                 break;
             }

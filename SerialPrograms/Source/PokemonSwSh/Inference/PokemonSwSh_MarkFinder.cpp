@@ -7,6 +7,7 @@
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
+#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "PokemonSwSh_MarkFinder.h"
 
@@ -19,13 +20,13 @@ using namespace Kernels::Waterfill;
 
 
 
-const QImage& EXCLAMATION_TOP(){
-    static QImage image(RESOURCE_PATH() + "PokemonSwSh/ExclamationTop.png");
-    return image;
+const ImageMatch::ExactImageMatcher& EXCLAMATION_TOP(){
+    static ImageMatch::ExactImageMatcher matcher(QImage(RESOURCE_PATH() + "PokemonSwSh/ExclamationTop.png"));
+    return matcher;
 }
-const QImage& QUESTION_TOP(){
-    static QImage image(RESOURCE_PATH() + "PokemonSwSh/QuestionTop.png");
-    return image;
+const ImageMatch::ExactImageMatcher& QUESTION_TOP(){
+    static ImageMatch::ExactImageMatcher matcher(QImage(RESOURCE_PATH() + "PokemonSwSh/QuestionTop.png"));
+    return matcher;
 }
 
 bool is_exclamation_mark(const QImage& image, const WaterFillObject& object){
@@ -37,15 +38,18 @@ bool is_exclamation_mark(const QImage& image, const WaterFillObject& object){
         return false;
     }
 
-    const QImage& exclamation_mark = EXCLAMATION_TOP();
+//    const QImage& exclamation_mark = EXCLAMATION_TOP();
     QImage scaled = image.copy(
         (pxint_t)object.min_x, (pxint_t)object.min_y,
         (pxint_t)width, (pxint_t)height
     );
-    scaled = scaled.scaled(exclamation_mark.width(), exclamation_mark.height());
-    double rmsd = ImageMatch::pixel_RMSD(exclamation_mark, scaled);
-//    cout << "rmsd = " << rmsd << endl;
-    return rmsd <= 80;
+//    scaled = scaled.scaled(exclamation_mark.width(), exclamation_mark.height());
+    double rmsd = EXCLAMATION_TOP().rmsd(scaled);
+//    double rmsd = ImageMatch::pixel_RMSD(exclamation_mark, scaled);
+    if (rmsd <= 100){
+//        cout << "is_exclamation_mark(): rmsd = " << rmsd << endl;
+    }
+    return rmsd <= 100;
 }
 bool is_question_mark(const QImage& image, const WaterFillObject& object){
     size_t width = object.width();
@@ -58,15 +62,18 @@ bool is_question_mark(const QImage& image, const WaterFillObject& object){
         return false;
     }
 
-    const QImage& exclamation_mark = QUESTION_TOP();
+//    const QImage& exclamation_mark = QUESTION_TOP();
     QImage scaled = image.copy(
         (pxint_t)object.min_x, (pxint_t)object.min_y,
         (pxint_t)width, (pxint_t)height
     );
-    scaled = scaled.scaled(exclamation_mark.width(), exclamation_mark.height());
-    double rmsd = ImageMatch::pixel_RMSD(exclamation_mark, scaled);
-//    cout << "rmsd = " << rmsd << endl;
-    return rmsd <= 80;
+//    scaled = scaled.scaled(exclamation_mark.width(), exclamation_mark.height());
+    double rmsd = QUESTION_TOP().rmsd(scaled);
+//    double rmsd = ImageMatch::pixel_RMSD(exclamation_mark, scaled);
+    if (rmsd <= 100){
+//        cout << "is_question_mark(): rmsd = " << rmsd << endl;
+    }
+    return rmsd <= 100;
 }
 
 std::vector<ImagePixelBox> find_exclamation_marks(const QImage& image){
@@ -77,6 +84,15 @@ std::vector<ImagePixelBox> find_exclamation_marks(const QImage& image){
         0, 192
     );
     std::vector<WaterFillObject> objects = find_objects_inplace(matrix, 50, false);
+#if 0
+    cout << "objects = " << objects.size() << endl;
+    static int c = 0;
+    for (const auto& object : objects){
+        image.copy(
+            object.min_x, object.min_y, object.width(), object.height()
+        ).save("test-" + QString::number(c++) + ".png");
+    }
+#endif
     std::vector<ImagePixelBox> ret;
     for (const WaterFillObject& object : objects){
         if (is_exclamation_mark(image, object)){
