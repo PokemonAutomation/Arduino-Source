@@ -40,6 +40,10 @@ CloneItemsBoxCopy2::CloneItemsBoxCopy2(const CloneItemsBoxCopy2_Descriptor& desc
         "<b>Boxes to Clone:</b>",
         999, 0, 999
     )
+    , RELEASE(
+        "<b>Release the pokemon after cloning them. Beware, if set to false, the pokemons will be stores in the subsequents boxes, makes sure you have enough empty boxes.</b>",
+        true
+    )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
@@ -50,6 +54,7 @@ CloneItemsBoxCopy2::CloneItemsBoxCopy2(const CloneItemsBoxCopy2_Descriptor& desc
 {
     PA_ADD_OPTION(GO_HOME_WHEN_DONE);
     PA_ADD_OPTION(BOXES);
+    PA_ADD_OPTION(RELEASE);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -126,7 +131,7 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env){
         pbf_press_button(env.console, BUTTON_B, 20, 230);
 
 #else
-        //  Move entire box to next box.
+        //  Move entire box to a new box.
         pbf_press_button(env.console, BUTTON_Y, 20, 50);
         pbf_press_button(env.console, BUTTON_Y, 20, 50);
         pbf_press_button(env.console, BUTTON_ZL, 20, BOX_PICKUP_DROP_DELAY);
@@ -135,7 +140,10 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env){
             pbf_move_right_joystick(env.console, 128, 255, 5, 3);
         }
         pbf_press_button(env.console, BUTTON_ZL, 20, BOX_PICKUP_DROP_DELAY);
-        pbf_press_button(env.console, BUTTON_R, 20, BOX_CHANGE_DELAY);
+        int box_offset = RELEASE ? 1 : 1 + box;
+        for (int i = 0; i < box_offset; ++i){
+            pbf_press_button(env.console, BUTTON_R, 20, BOX_CHANGE_DELAY);
+        }
         pbf_press_button(env.console, BUTTON_ZL, 20, BOX_PICKUP_DROP_DELAY);
 
         //  Back to previous menu.
@@ -148,17 +156,19 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env){
         //  Back out.
         pbf_press_button(env.console, BUTTON_B, 20, 230);
 
-        //  Release the cloned box.
-        pbf_press_button(env.console, BUTTON_R, 20, BOX_CHANGE_DELAY);
-        release_box(env.console, BOX_SCROLL_DELAY);
-        pbf_press_button(env.console, BUTTON_L, 20, BOX_CHANGE_DELAY);
+        if (RELEASE){
+            //  Release the cloned box.
+            pbf_press_button(env.console, BUTTON_R, 20, BOX_CHANGE_DELAY);
+            release_box(env.console, BOX_SCROLL_DELAY);
+            pbf_press_button(env.console, BUTTON_L, 20, BOX_CHANGE_DELAY);
 
-        //  Move cursor back to starting position.
-        pbf_move_right_joystick(env.console, 128, 255, 20, BOX_SCROLL_DELAY);
-        pbf_move_right_joystick(env.console, 128, 255, 20, BOX_SCROLL_DELAY);
-        pbf_move_right_joystick(env.console, 128, 255, 20, BOX_SCROLL_DELAY);
-        pbf_move_right_joystick(env.console, 255, 128, 20, BOX_SCROLL_DELAY);
-        pbf_move_right_joystick(env.console, 255, 128, 20, BOX_SCROLL_DELAY);
+            //  Move cursor back to starting position.
+            pbf_move_right_joystick(env.console, 128, 255, 20, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(env.console, 128, 255, 20, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(env.console, 128, 255, 20, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(env.console, 255, 128, 20, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(env.console, 255, 128, 20, BOX_SCROLL_DELAY);
+        }
 #endif
 
         env.console.botbase().wait_for_all_requests();

@@ -39,6 +39,7 @@ private:
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
     SimpleIntegerOption<uint16_t> BOXES;
+    BooleanCheckBoxOption RELEASE;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
