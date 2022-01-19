@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_BotBaseHandle_H
-#define PokemonAutomation_BotBaseHandle_H
+#ifndef PokemonAutomation_CommonFramework_BotBaseHandle_H
+#define PokemonAutomation_CommonFramework_BotBaseHandle_H
 
 #include <memory>
 #include <mutex>

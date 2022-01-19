@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <cmath>
+#include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "StatAccumulator.h"
@@ -32,13 +33,13 @@ double StatAccumulatorI32::stddev() const{
 
 
 std::string StatAccumulatorI32::dump() const{
-    std::string str;
-    str += "Count = " + tostr_u_commas(m_count);
-    str += ", Mean = " + std::to_string(mean());
-    str += ", Stddev = " + std::to_string(stddev());
-    str += ", Min = " + std::to_string(min());
-    str += ", Max = " + std::to_string(max());
-    return str;
+    std::stringstream ss;
+    ss << "Count = " << tostr_u_commas(m_count);
+    ss << ", Mean = " << mean();
+    ss << ", Stddev = " << stddev();
+    ss << ", Min = " << min();
+    ss << ", Max = " << max();
+    return ss.str();
 }
 void StatAccumulatorI32::log(Logger& logger, const std::string& label) const{
     logger.log(label + ": " + dump(), COLOR_MAGENTA);

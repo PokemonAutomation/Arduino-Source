@@ -7,12 +7,11 @@
 #ifndef PokemonAutomation_CommonFramework_VisualDetector_H
 #define PokemonAutomation_CommonFramework_VisualDetector_H
 
-#include <vector>
-#include <deque>
-#include <QImage>
-#include "CommonFramework/Tools/VideoFeed.h"
+class QImage;
 
 namespace PokemonAutomation{
+
+class VideoOverlaySet;
 
 
 class StaticScreenDetector{

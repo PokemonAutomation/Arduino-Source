@@ -27,7 +27,7 @@ public:
             std::move(label),
             {
                 "No Good (0)",
-                "Decent (0-15)",
+                "Decent (1-15)",
                 "Pretty Good (16-25)",
                 "Very Good (26-29)",
                 "Fantastic (30)",

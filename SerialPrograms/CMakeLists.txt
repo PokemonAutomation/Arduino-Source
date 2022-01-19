@@ -194,6 +194,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ImageTools/SolidColorTest.h
     Source/CommonFramework/Inference/AnomalyDetector.cpp
     Source/CommonFramework/Inference/AnomalyDetector.h
+    Source/CommonFramework/Inference/BlackBorderDetector.cpp
+    Source/CommonFramework/Inference/BlackBorderDetector.h
     Source/CommonFramework/Inference/BlackScreenDetector.cpp
     Source/CommonFramework/Inference/BlackScreenDetector.h
     Source/CommonFramework/Inference/FrozenImageDetector.cpp
@@ -328,6 +330,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/PersistentSettings.h
     Source/CommonFramework/Tools/BotBaseHandle.cpp
     Source/CommonFramework/Tools/BotBaseHandle.h
+    Source/CommonFramework/Tools/BlackBorderCheck.cpp
+    Source/CommonFramework/Tools/BlackBorderCheck.h
     Source/CommonFramework/Tools/ConsoleHandle.h
     Source/CommonFramework/Tools/ErrorDumper.cpp
     Source/CommonFramework/Tools/ErrorDumper.h

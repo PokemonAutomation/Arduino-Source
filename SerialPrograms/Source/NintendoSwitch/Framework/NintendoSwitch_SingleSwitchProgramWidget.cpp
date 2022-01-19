@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Tools/BlackBorderCheck.h"
 #include "NintendoSwitch_SingleSwitchProgramWidget.h"
 
 namespace PokemonAutomation{
@@ -55,6 +56,7 @@ void SingleSwitchProgramWidget::run_program(
     );
 
     try{
+        start_program_video_check(env.console, instance.descriptor().feedback());
         instance.program(env);
     }catch (...){
         env.update_stats();

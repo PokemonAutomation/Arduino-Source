@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/FixedLimitVector.tpp"
 #include "CommonFramework/Options/BatchOption/BatchWidget.h"
+#include "CommonFramework/Tools/BlackBorderCheck.h"
 #include "NintendoSwitch_SwitchSystemWidget.h"
 #include "NintendoSwitch_MultiSwitchProgramWidget.h"
 
@@ -79,6 +80,7 @@ void MultiSwitchProgramWidget::run_program(
     );
 
     try{
+        start_program_video_check(env.consoles, instance.descriptor().feedback());
         instance.program(env);
     }catch (...){
         env.update_stats();

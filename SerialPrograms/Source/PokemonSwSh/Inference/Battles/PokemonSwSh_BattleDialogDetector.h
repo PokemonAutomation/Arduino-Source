@@ -7,6 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_BattleDialogDetector_H
 #define PokemonAutomation_PokemonSwSh_BattleDialogDetector_H
 
+#include "Common/Cpp/Color.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 
 namespace PokemonAutomation{

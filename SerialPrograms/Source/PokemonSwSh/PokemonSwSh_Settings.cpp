@@ -154,6 +154,11 @@ GameSettings::GameSettings()
         "<b>" + STRING_POKEMON + " to Menu Delay:</b><br>Delay to return to menu.",
         "250"
     )
+    , m_experimental("<font size=4><b>Experimental/Beta Features:</b></font>")
+    , USE_NEW_SHINY_DETECTOR(
+        "<b>Use New Shiny Detector:</b><br>Use the new version of the shiny detection algorithm.",
+        false
+    )
 {
     PA_ADD_STATIC(m_egg_options);
     PA_ADD_OPTION(AUTO_DEPOSIT);
@@ -202,6 +207,9 @@ GameSettings::GameSettings()
     PA_ADD_OPTION(POKEMON_TO_BOX_DELAY);
     PA_ADD_OPTION(BOX_TO_POKEMON_DELAY);
     PA_ADD_OPTION(POKEMON_TO_MENU_DELAY);
+
+    PA_ADD_STATIC(m_experimental);
+    PA_ADD_OPTION(USE_NEW_SHINY_DETECTOR);
 }
 
 

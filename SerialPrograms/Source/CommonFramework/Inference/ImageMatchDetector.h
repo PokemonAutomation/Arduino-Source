@@ -7,7 +7,9 @@
 #ifndef PokemonAutomation_CommonFramework_ImageMatchDetector_H
 #define PokemonAutomation_CommonFramework_ImageMatchDetector_H
 
-#include <chrono>
+#include <QImage>
+#include "Common/Cpp/Color.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 

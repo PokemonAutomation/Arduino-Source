@@ -1,4 +1,4 @@
-/*  Black Screen Detector
+/*  Black Border Detector
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

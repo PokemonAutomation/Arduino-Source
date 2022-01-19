@@ -125,6 +125,7 @@ SOURCES += \
     Source/CommonFramework/ImageTools/ImageStats.cpp \
     Source/CommonFramework/ImageTools/SolidColorTest.cpp \
     Source/CommonFramework/Inference/AnomalyDetector.cpp \
+    Source/CommonFramework/Inference/BlackBorderDetector.cpp \
     Source/CommonFramework/Inference/BlackScreenDetector.cpp \
     Source/CommonFramework/Inference/FrozenImageDetector.cpp \
     Source/CommonFramework/Inference/ImageMatchDetector.cpp \
@@ -184,6 +185,7 @@ SOURCES += \
     Source/CommonFramework/Panels/SettingsPanel.cpp \
     Source/CommonFramework/Panels/SettingsPanelWidget.cpp \
     Source/CommonFramework/PersistentSettings.cpp \
+    Source/CommonFramework/Tools/BlackBorderCheck.cpp \
     Source/CommonFramework/Tools/BotBaseHandle.cpp \
     Source/CommonFramework/Tools/ErrorDumper.cpp \
     Source/CommonFramework/Tools/InterruptableCommands.cpp \
@@ -623,6 +625,7 @@ HEADERS += \
     Source/CommonFramework/ImageTools/ImageStats.h \
     Source/CommonFramework/ImageTools/SolidColorTest.h \
     Source/CommonFramework/Inference/AnomalyDetector.h \
+    Source/CommonFramework/Inference/BlackBorderDetector.h \
     Source/CommonFramework/Inference/BlackScreenDetector.h \
     Source/CommonFramework/Inference/FrozenImageDetector.h \
     Source/CommonFramework/Inference/ImageMatchDetector.h \
@@ -689,6 +692,7 @@ HEADERS += \
     Source/CommonFramework/Panels/SettingsPanel.h \
     Source/CommonFramework/Panels/SettingsPanelWidget.h \
     Source/CommonFramework/PersistentSettings.h \
+    Source/CommonFramework/Tools/BlackBorderCheck.h \
     Source/CommonFramework/Tools/ConsoleHandle.h \
     Source/CommonFramework/Tools/ErrorDumper.h \
     Source/CommonFramework/Tools/InterruptableCommands.h \

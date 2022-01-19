@@ -5,6 +5,7 @@
  */
 
 #include <QtGlobal>
+#include <QImage>
 #include "Common/Cpp/Exception.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"

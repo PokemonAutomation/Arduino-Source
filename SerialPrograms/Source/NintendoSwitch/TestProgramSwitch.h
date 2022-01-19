@@ -14,6 +14,7 @@
 #include "CommonFramework/Options/EditableTableOption.h"
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_BallSelectOption.h"
 #include "PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterOption.h"

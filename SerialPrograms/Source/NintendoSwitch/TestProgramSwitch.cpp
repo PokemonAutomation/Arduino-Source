@@ -144,6 +144,7 @@
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorSquare.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleSet.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_ExperienceGainDetector.h"
+#include "CommonFramework/Inference/BlackBorderDetector.h"
 #include "TestProgramSwitch.h"
 
 #include <immintrin.h>
@@ -178,7 +179,7 @@ TestProgram_Descriptor::TestProgram_Descriptor()
         "Nintendo Switch", "Test Program (Switch)",
         "",
         "Test Program (Switch)",
-        FeedbackType::REQUIRED, true,
+        FeedbackType::OPTIONAL_, true,
         PABotBaseLevel::PABOTBASE_12KB,
         1, 4, 1
     )
@@ -208,17 +209,12 @@ TestProgram::TestProgram(const TestProgram_Descriptor& descriptor)
 
 
 
-
-
-
 namespace PokemonSwSh{
 
 
 
 
 }
-
-
 
 
 
@@ -236,6 +232,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     BotBase& botbase = env.consoles[0];
     VideoFeed& feed = env.consoles[0];
     VideoOverlay& overlay = env.consoles[0];
+
+
+#if 0
+    BlackBorderDetector detector;
+    VideoOverlaySet overlays(overlay);
+    detector.make_overlays(overlays);
+    detector.detect(feed.snapshot());
+#endif
 
 
 #if 0
