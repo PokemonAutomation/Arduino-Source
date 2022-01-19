@@ -15,7 +15,9 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
-
+// Detect short dialog boxes that are used in all kinds of ingame situations where texts are displayed.
+// The only place the long dialog boxes appear is during pokemon battles. But after battle, the exp gain
+// text is in a short dialog box.
 class ShortDialogDetector : public StaticScreenDetector{
 public:
     ShortDialogDetector(Color color = COLOR_RED);
@@ -44,7 +46,8 @@ public:
 
 
 
-
+// Detect the long dialog boxes that only appear during pokemon battles.
+// Note after battle, the exp gain text is in a short dialog box.
 class BattleDialogDetector : public StaticScreenDetector{
 public:
     BattleDialogDetector(Color color = COLOR_RED);

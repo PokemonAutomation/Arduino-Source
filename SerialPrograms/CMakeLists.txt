@@ -577,6 +577,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_EndBattleDetector.cpp
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_EndBattleDetector.h
+    Source/PokemonBDSP/Inference/Battles/PokemonBDSP_ExperienceGainDetector.cpp
+    Source/PokemonBDSP/Inference/Battles/PokemonBDSP_ExperienceGainDetector.h
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.cpp
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxDetector.cpp
@@ -595,6 +597,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h
     Source/PokemonBDSP/Inference/PokemonBDSP_PokeballSpriteMatcher.cpp
     Source/PokemonBDSP/Inference/PokemonBDSP_PokeballSpriteMatcher.h
+    Source/PokemonBDSP/Inference/PokemonBDSP_ReceivePokemonDetector.cpp
+    Source/PokemonBDSP/Inference/PokemonBDSP_ReceivePokemonDetector.h
     Source/PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.cpp
     Source/PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h
     Source/PokemonBDSP/Inference/PokemonBDSP_VSSeekerReaction.cpp
@@ -618,6 +622,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterWidget.h
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.cpp
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h
+    Source/PokemonBDSP/Programs/PokemonBDSP_BasicCatcher.cpp
+    Source/PokemonBDSP/Programs/PokemonBDSP_BasicCatcher.h
     Source/PokemonBDSP/Programs/PokemonBDSP_BoxRelease.cpp
     Source/PokemonBDSP/Programs/PokemonBDSP_BoxRelease.h
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggAutonomous.cpp

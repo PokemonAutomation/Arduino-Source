@@ -15,6 +15,7 @@ namespace PokemonSwSh{
 
 ShinyHuntTracker::ShinyHuntTracker(bool shiny_types)
     : m_encounters(m_stats["Encounters"])
+    , m_caught(m_stats["Caught"])
     , m_errors(m_stats["Errors"])
     , m_unknown_shinies(m_stats[shiny_types ? "Unknown Shinies" : "Shinies"])
     , m_star_shinies(m_stats["Star Shinies"])
@@ -29,6 +30,7 @@ ShinyHuntTracker::ShinyHuntTracker(bool shiny_types)
     }else{
         m_display_order.emplace_back("Shinies");
     }
+    m_display_order.emplace_back("Caught", true);
 }
 ShinyHuntTracker::ShinyHuntTracker(bool shiny_types, std::map<std::string, std::string> aliases)
     : ShinyHuntTracker(shiny_types)
@@ -75,6 +77,9 @@ void ShinyHuntTracker::add_star_shiny(){
 void ShinyHuntTracker::add_square_shiny(){
     m_encounters++;
     m_square_shinies++;
+}
+void ShinyHuntTracker::add_caught(){
+    m_caught++;
 }
 
 

@@ -23,6 +23,11 @@ enum class ConfigOptionState{
 
 class ConfigWidget;
 
+// An option of a program, like the number of boxes of eggs to hatch,
+// the number of frames to skip, or what type of pokeballs to throw.
+// It is responsible for setting the UI (by calling make_ui()) of this option.
+// It also uses load_json() and to_json() to load and save the option to
+// a json file, so that the program can remember what user has selected.
 class ConfigOption{
 public:
     virtual ~ConfigOption() = default;

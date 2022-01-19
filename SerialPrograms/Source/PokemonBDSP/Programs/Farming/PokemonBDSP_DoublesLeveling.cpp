@@ -169,6 +169,7 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env){
         //  Find encounter.
         bool battle = TRIGGER_METHOD.find_encounter(env);
         if (!battle){
+            // Unexpected battle: detect battle menu but not battle starting animation.
             stats.add_error();
             handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
             continue;
