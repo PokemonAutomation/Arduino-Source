@@ -179,21 +179,21 @@ CatchResults basic_catcher(
     const QString pokeball_str = QString::number(results.balls_used) + " " +
         QString(ball_slug.c_str()) + s;
 
-    if (results.result == CatchResult::OUT_OF_BALLS){
+    switch (results.result){
+    case CatchResult::OUT_OF_BALLS:
         env.log("BasicCatcher: Out of balls after throwing " + pokeball_str, COLOR_RED);
         return results;
-    }
-    if (results.result == CatchResult::CANNOT_THROW_BALL){
+    case CatchResult::CANNOT_THROW_BALL:
         env.log("BasicCatcher: cannot throw ball for some reason.", COLOR_RED);
         return results;
-    }
-    if (results.result == CatchResult::OWN_FAINTED){
+    case CatchResult::OWN_FAINTED:
         env.log("BasicCatcher: own pokemon fainted after throwing " + pokeball_str, COLOR_RED);
         return results;
-    }
-    if (results.result == CatchResult::TIMEOUT){
-        env.log("BasicCatcher: time out.");
+    case CatchResult::TIMEOUT:
+        env.log("BasicCatcher: time out.", COLOR_RED);
+        PA_THROW_StringException("No state detected within timeout period.");
         return results;
+    default:;
     }
 
     //  Need to distinguish between caught or faint.
@@ -242,8 +242,8 @@ CatchResults basic_catcher(
             if (results.result == CatchResult::POKEMON_CAUGHT){
                 PA_THROW_StringException("BasicCatcher: found receive pokemon screen two times.");
             }
-            env.log("BasicCatcher: The wild " + STRING_POKEMON + " was caught by " + 
-            pokeball_str, COLOR_BLUE);
+            env.log("BasicCatcher: The wild " + STRING_POKEMON + " was caught by " + pokeball_str, COLOR_BLUE);
+            pbf_wait(console, 50);
             results.result = CatchResult::POKEMON_CAUGHT;
             break; //  Continue the loop.
         case 2:

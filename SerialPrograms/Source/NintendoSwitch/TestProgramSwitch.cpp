@@ -143,6 +143,7 @@
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorSquare.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleSet.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_ExperienceGainDetector.h"
 #include "TestProgramSwitch.h"
 
 #include <immintrin.h>
@@ -359,8 +360,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     using namespace Kernels::Waterfill;
     using namespace OCR;
     using namespace Pokemon;
-    using namespace PokemonSwSh;
-//    using namespace PokemonBDSP;
+//    using namespace PokemonSwSh;
+    using namespace PokemonBDSP;
 
     Logger& logger = env.logger();
     ConsoleHandle& console = env.consoles[0];
@@ -369,7 +370,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
+    ExperienceGainDetector detector;
+    VideoOverlaySet overlays(overlay);
+    detector.make_overlays(overlays);
+    detector.detect(feed.snapshot());
 
+
+
+
+#if 0
     ShinyEncounterTracker tracker(logger, overlay, SHINY_BATTLE_REGULAR);
     {
         VisualInferenceSession session(env, feed, overlay);
@@ -382,6 +391,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
         tracker.dialog_timer(),
         tracker.sparkles_wild()
     );
+#endif
 
 
 

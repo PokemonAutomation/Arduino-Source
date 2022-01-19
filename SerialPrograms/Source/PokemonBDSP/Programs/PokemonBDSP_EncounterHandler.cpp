@@ -213,7 +213,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
 
         run_from_battle(m_env, m_console, exit_battle_time);
         return false;
-    
+
     case EncounterAction::ThrowBalls:
     case EncounterAction::ThrowBallsAndSave:
         {
@@ -227,7 +227,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
                     m_session_stats.to_str()
                 );
                 m_env.update_stats();
-                
+
                 if (action.first == EncounterAction::ThrowBallsAndSave){
                     //  Save the game
                     save_game(m_env, m_console);

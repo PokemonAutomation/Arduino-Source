@@ -6,7 +6,6 @@
 
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "PokemonSwSh_MarkFinder.h"

@@ -291,6 +291,7 @@ SOURCES += \
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.cpp \
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.cpp \
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_EndBattleDetector.cpp \
+    Source/PokemonBDSP/Inference/Battles/PokemonBDSP_ExperienceGainDetector.cpp \
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.cpp \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxDetector.cpp \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.cpp \
@@ -300,6 +301,7 @@ SOURCES += \
     Source/PokemonBDSP/Inference/PokemonBDSP_MarkFinder.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_MenuDetector.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_PokeballSpriteMatcher.cpp \
+    Source/PokemonBDSP/Inference/PokemonBDSP_ReceivePokemonDetector.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_VSSeekerReaction.cpp \
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.cpp \
@@ -331,6 +333,7 @@ SOURCES += \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy2.cpp \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.cpp \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_MenuOverlap.cpp \
+    Source/PokemonBDSP/Programs/PokemonBDSP_BasicCatcher.cpp \
     Source/PokemonBDSP/Programs/PokemonBDSP_BoxRelease.cpp \
     Source/PokemonBDSP/Programs/PokemonBDSP_EncounterDetection.cpp \
     Source/PokemonBDSP/Programs/PokemonBDSP_EncounterHandler.cpp \
@@ -825,6 +828,7 @@ HEADERS += \
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.h \
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h \
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_EndBattleDetector.h \
+    Source/PokemonBDSP/Inference/Battles/PokemonBDSP_ExperienceGainDetector.h \
     Source/PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxDetector.h \
     Source/PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.h \
@@ -834,6 +838,7 @@ HEADERS += \
     Source/PokemonBDSP/Inference/PokemonBDSP_MarkFinder.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_PokeballSpriteMatcher.h \
+    Source/PokemonBDSP/Inference/PokemonBDSP_ReceivePokemonDetector.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_VSSeekerReaction.h \
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h \
@@ -866,6 +871,7 @@ HEADERS += \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy2.h \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.h \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_MenuOverlap.h \
+    Source/PokemonBDSP/Programs/PokemonBDSP_BasicCatcher.h \
     Source/PokemonBDSP/Programs/PokemonBDSP_BoxRelease.h \
     Source/PokemonBDSP/Programs/PokemonBDSP_EncounterDetection.h \
     Source/PokemonBDSP/Programs/PokemonBDSP_EncounterHandler.h \
