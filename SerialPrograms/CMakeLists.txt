@@ -205,6 +205,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Inference/InferenceException.cpp
     Source/CommonFramework/Inference/InferenceException.h
     Source/CommonFramework/Inference/InferenceThrottler.h
+    Source/CommonFramework/Inference/StatAccumulator.cpp
     Source/CommonFramework/Inference/StatAccumulator.h
     Source/CommonFramework/Inference/TimeWindowStatTracker.h
     Source/CommonFramework/Inference/VisualDetector.h
@@ -718,6 +719,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogDetector.cpp
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogDetector.h
+    Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogTracker.cpp
+    Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogTracker.h
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.cpp
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_ExperienceGainDetector.cpp
@@ -754,8 +757,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h
     Source/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.cpp
     Source/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyDialogTracker.cpp
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyDialogTracker.h
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.cpp
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyFilters.h

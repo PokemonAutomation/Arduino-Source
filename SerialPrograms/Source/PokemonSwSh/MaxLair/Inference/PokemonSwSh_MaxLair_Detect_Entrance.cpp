@@ -21,7 +21,8 @@ namespace MaxLairInternal{
 
 
 EntranceDetector::EntranceDetector(const QImage& entrance_screen)
-    : m_box0(0.020, 0.020, 0.500, 0.750)
+    : VisualInferenceCallback("EntranceDetector")
+    , m_box0(0.020, 0.020, 0.500, 0.750)
     , m_entrance_screen(extract_box(entrance_screen, m_box0))
 {}
 void EntranceDetector::make_overlays(VideoOverlaySet& items) const{

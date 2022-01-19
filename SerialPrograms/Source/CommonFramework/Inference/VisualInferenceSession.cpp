@@ -12,12 +12,27 @@
 namespace PokemonAutomation{
 
 
+
+struct VisualInferenceSession::Callback{
+    VisualInferenceCallback* callback;
+    VideoOverlaySet overlays;
+    StatAccumulatorI32 stats;
+
+    Callback(VideoOverlay& overlay, VisualInferenceCallback* p_callback)
+        : callback(p_callback)
+        , overlays(overlay)
+    {}
+};
+
+
+
 VisualInferenceSession::VisualInferenceSession(
-    ProgramEnvironment& env,
+    ProgramEnvironment& env, Logger& logger,
     VideoFeed& feed, VideoOverlay& overlay,
     std::chrono::milliseconds period
 )
     : m_env(env)
+    , m_logger(logger)
     , m_feed(feed)
     , m_overlay(overlay)
     , m_period(period)
@@ -27,32 +42,55 @@ VisualInferenceSession::~VisualInferenceSession(){
     stop();
 }
 void VisualInferenceSession::stop(){
-    m_stop.store(true, std::memory_order_release);
-    std::unique_lock<std::mutex> lg(m_lock);
-    m_cv.notify_all();
+    bool expected = false;
+    if (!m_stop.compare_exchange_strong(expected, true)){
+        return;
+    }
+    {
+        std::unique_lock<std::mutex> lg(m_lock);
+        m_cv.notify_all();
+    }
+    m_stats_snapshot.log(m_logger, "Screenshot");
+    for (Callback* callback : m_callback_list){
+        callback->stats.log(m_logger, callback->callback->label());
+    }
 }
 
-void VisualInferenceSession::operator+=(std::function<bool(const QImage&)>&& callback){
-    std::unique_lock<std::mutex> lg(m_lock);
-    m_callbacks0.emplace_back(std::move(callback));
-}
 void VisualInferenceSession::operator+=(VisualInferenceCallback& callback){
     std::unique_lock<std::mutex> lg(m_lock);
-    auto iter = m_callbacks1.find(&callback);
-    VideoOverlaySet& boxes = iter != m_callbacks1.end()
-        ? iter->second
-        : m_callbacks1.emplace(
-            std::piecewise_construct,
-            std::forward_as_tuple(&callback),
-            std::forward_as_tuple(m_overlay)
-        ).first->second;
 
-    boxes.clear();
-    callback.make_overlays(boxes);
+    auto iter = m_callback_map.find(&callback);
+    if (iter != m_callback_map.end()){
+        return;
+    }
+
+    Callback& entry = m_callback_map.emplace(
+        std::piecewise_construct,
+        std::forward_as_tuple(&callback),
+        std::forward_as_tuple(m_overlay, &callback)
+    ).first->second;
+
+    try{
+        m_callback_list.emplace_back(&entry);
+        entry.overlays.clear();
+        callback.make_overlays(entry.overlays);
+    }catch (...){
+        m_callback_map.erase(&callback);
+        if (!m_callback_list.empty() && m_callback_list.back() == &entry){
+            m_callback_list.pop_back();
+        }
+        throw;
+    }
 }
 void VisualInferenceSession::operator-=(VisualInferenceCallback& callback){
     std::unique_lock<std::mutex> lg(m_lock);
-    m_callbacks1.erase(&callback);
+    auto iter0 = m_callback_map.find(&callback);
+    if (iter0 == m_callback_map.end()){
+        return;
+    }
+    auto iter1 = std::find(m_callback_list.begin(), m_callback_list.end(), &iter0->second);
+    m_callback_list.erase(iter1);
+    m_callback_map.erase(iter0);
 }
 
 VisualInferenceCallback* VisualInferenceSession::run(std::chrono::milliseconds timeout){
@@ -64,26 +102,30 @@ VisualInferenceCallback* VisualInferenceSession::run(std::chrono::milliseconds t
     return run(stop_time);
 }
 VisualInferenceCallback* VisualInferenceSession::run(std::chrono::system_clock::time_point stop){
+    using time_point = std::chrono::system_clock::time_point;
+
     auto now = std::chrono::system_clock::now();
     auto wait_until = now + m_period;
+
     while (true){
         m_env.check_stopping();
         if (m_stop.load(std::memory_order_acquire)){
             return nullptr;
         }
 
+        time_point time0_snapshot = std::chrono::system_clock::now();
         QImage screen = m_feed.snapshot();
-        std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now();
+        time_point time1_snapshot = std::chrono::system_clock::now();
+        m_stats_snapshot += std::chrono::duration_cast<std::chrono::milliseconds>(time1_snapshot - time0_snapshot).count();
 
         std::unique_lock<std::mutex> lg(m_lock);
-        for (auto& callback : m_callbacks0){
-            if (callback(screen)){
-                return nullptr;
-            }
-        }
-        for (auto& callback : m_callbacks1){
-            if (callback.first->process_frame(screen, timestamp)){
-                return callback.first;
+        for (Callback* callback : m_callback_list){
+            time_point time0 = std::chrono::system_clock::now();
+            bool done = callback->callback->process_frame(screen, time1_snapshot);
+            time_point time1 = std::chrono::system_clock::now();
+            callback->stats += std::chrono::duration_cast<std::chrono::milliseconds>(time1 - time0).count();
+            if (done){
+                return callback->callback;
             }
         }
 
@@ -132,11 +174,11 @@ VisualInferenceScope::~VisualInferenceScope(){
 
 
 AsyncVisualInferenceSession::AsyncVisualInferenceSession(
-    ProgramEnvironment& env,
+    ProgramEnvironment& env, Logger& logger,
     VideoFeed& feed, VideoOverlay& overlay,
     std::chrono::milliseconds period
 )
-    : VisualInferenceSession(env, feed, overlay, period)
+    : VisualInferenceSession(env, logger, feed, overlay, period)
     , m_callback(nullptr)
     , m_task(env.dispatcher().dispatch([this]{ thread_body(); }))
 {}

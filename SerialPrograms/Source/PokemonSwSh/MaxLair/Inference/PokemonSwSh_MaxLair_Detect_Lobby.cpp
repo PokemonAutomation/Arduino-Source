@@ -42,7 +42,8 @@ bool LobbyReadyButtonDetector::detect(const QImage& screen){
 
 #if 1
 LobbyDetector::LobbyDetector(bool invert)
-    : m_invert(invert)
+    : VisualInferenceCallback("LobbyDetector")
+    , m_invert(invert)
     , m_pink (0.575, 0.035, 0.050, 0.100)
     , m_white(0.800, 0.200, 0.150, 0.100)
 {}
@@ -73,7 +74,8 @@ bool LobbyDetector::detect(const QImage& screen){
 
 
 LobbyDoneConnecting::LobbyDoneConnecting()
-    : m_box(0.600, 0.820, 0.080, 0.100)
+    : VisualInferenceCallback("LobbyDoneConnecting")
+    , m_box(0.600, 0.820, 0.080, 0.100)
     , m_player0(0.669, 0.337 + 0.0775*1, 0.100, 0.06)
 {}
 void LobbyDoneConnecting::make_overlays(VideoOverlaySet& items) const{
@@ -104,7 +106,8 @@ bool LobbyDoneConnecting::detect(const QImage& screen){
 
 
 LobbyJoinedDetector::LobbyJoinedDetector(size_t consoles, bool invert)
-    : m_consoles(consoles)
+    : VisualInferenceCallback("LobbyJoinedDetector")
+    , m_consoles(consoles)
     , m_invert(invert)
     , m_box0(0.705, 0.337 + 0.0775*0, 0.034, 0.06)
     , m_box1(0.705, 0.337 + 0.0775*1, 0.034, 0.06)
@@ -151,7 +154,8 @@ bool LobbyJoinedDetector::process_frame(
 
 
 LobbyReadyDetector::LobbyReadyDetector()
-    : m_checkbox0(0.669, 0.337 + 0.0775*0, 0.034, 0.06)
+    : VisualInferenceCallback("LobbyReadyDetector")
+    , m_checkbox0(0.669, 0.337 + 0.0775*0, 0.034, 0.06)
     , m_checkbox1(0.669, 0.337 + 0.0775*1, 0.034, 0.06)
     , m_checkbox2(0.669, 0.337 + 0.0775*2, 0.034, 0.06)
     , m_checkbox3(0.669, 0.337 + 0.0775*3, 0.034, 0.06)

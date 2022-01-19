@@ -70,7 +70,8 @@ std::vector<ImagePixelBox> find_exclamation_marks(const QImage& image){
 
 
 MarkTracker::MarkTracker(VideoOverlay& overlay, const ImageFloatBox& box)
-    : m_overlay(overlay)
+    : VisualInferenceCallback("MarkTracker")
+    , m_overlay(overlay)
     , m_box(box)
 {}
 

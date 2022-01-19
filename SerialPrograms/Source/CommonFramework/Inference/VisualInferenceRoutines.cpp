@@ -34,7 +34,7 @@ int wait_until(
     std::map<VisualInferenceCallback*, size_t> map;
     VisualInferenceCallback* trigger = nullptr;
     {
-        VisualInferenceSession session(env, console, console, period);
+        VisualInferenceSession session(env, console, console, console, period);
 
         for (size_t c = 0; c < callbacks.size(); c++){
             VisualInferenceCallback* callback = callbacks[c];
@@ -65,7 +65,7 @@ int run_until(
     std::map<VisualInferenceCallback*, size_t> map;
     VisualInferenceCallback* trigger = nullptr;
     {
-        VisualInferenceSession session(env, console, console, period);
+        VisualInferenceSession session(env, console, console, console, period);
 
         for (size_t c = 0; c < callbacks.size(); c++){
             VisualInferenceCallback* callback = callbacks[c];

@@ -59,6 +59,7 @@ ImageMatchWatcher::ImageMatchWatcher(
     Color color
 )
     : ImageMatchDetector(std::move(reference_image), box, max_rmsd, color)
+    , VisualInferenceCallback("ImageMatchWatcher")
     , m_hold_duration(hold_duration)
     , m_last_match(false)
     , m_start_of_match(std::chrono::system_clock::time_point::min())

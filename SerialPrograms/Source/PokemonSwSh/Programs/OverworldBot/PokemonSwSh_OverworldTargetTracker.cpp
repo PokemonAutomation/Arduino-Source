@@ -35,7 +35,8 @@ OverworldTargetTracker::OverworldTargetTracker(
     MarkPriority mark_priority,
     double max_alpha
 )
-    : m_logger(logger)
+    : VisualInferenceCallback("OverworldTargetTracker")
+    , m_logger(logger)
     , m_overlay(overlay)
     , m_window(window)
     , m_mark_offset(mark_offset)

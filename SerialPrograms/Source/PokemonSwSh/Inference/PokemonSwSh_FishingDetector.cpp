@@ -20,7 +20,8 @@ namespace PokemonSwSh{
 
 
 FishingMissDetector::FishingMissDetector()
-    : m_hook_box(0.1, 0.15, 0.8, 0.4)
+    : VisualInferenceCallback("FishingMissDetector")
+    , m_hook_box(0.1, 0.15, 0.8, 0.4)
     , m_miss_box(0.3, 0.9, 0.4, 0.05)
 {}
 void FishingMissDetector::make_overlays(VideoOverlaySet& items) const{
@@ -49,7 +50,8 @@ bool FishingMissDetector::process_frame(
 }
 
 FishingHookDetector::FishingHookDetector(VideoOverlay& overlay)
-    : m_overlay(overlay)
+    : VisualInferenceCallback("FishingHookDetector")
+    , m_overlay(overlay)
     , m_hook_box(0.1, 0.15, 0.8, 0.4)
 {}
 void FishingHookDetector::make_overlays(VideoOverlaySet& items) const{

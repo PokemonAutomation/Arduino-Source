@@ -20,7 +20,8 @@ namespace MaxLairInternal{
 
 
 PokemonCaughtMenuDetector::PokemonCaughtMenuDetector()
-    : m_top_white(0.550, 0.020, 0.400, 0.020)
+    : VisualInferenceCallback("PokemonCaughtMenuDetector")
+    , m_top_white(0.550, 0.020, 0.400, 0.020)
     , m_caught_left(0.500, 0.080, 0.050, 0.070)
     , m_caught_right(0.930, 0.080, 0.050, 0.070)
     , m_middle_pink(0.930, 0.300, 0.050, 0.200)

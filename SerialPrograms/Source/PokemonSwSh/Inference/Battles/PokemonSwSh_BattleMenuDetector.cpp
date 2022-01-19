@@ -252,6 +252,10 @@ bool StandardBattleMenuDetector::detect(const QImage& screen) const{
 }
 
 
+StandardBattleMenuWatcher::StandardBattleMenuWatcher(bool den, Color color)
+    : StandardBattleMenuDetector(den, color)
+    , VisualInferenceCallback("StandardBattleMenuWatcher")
+{}
 void StandardBattleMenuWatcher::make_overlays(VideoOverlaySet& items) const{
     return StandardBattleMenuDetector::make_overlays(items);
 }

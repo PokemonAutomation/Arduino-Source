@@ -17,7 +17,8 @@ ShinySparkleTracker::ShinySparkleTracker(
     ShinySparkleSet& sparkle_set,
     const ImageFloatBox& box
 )
-    : m_box(box)
+    : VisualInferenceCallback("ShinySparkleTracker")
+    , m_box(box)
     , m_logger(logger)
     , m_current_sparkles(sparkle_set)
     , m_overlays(overlay)

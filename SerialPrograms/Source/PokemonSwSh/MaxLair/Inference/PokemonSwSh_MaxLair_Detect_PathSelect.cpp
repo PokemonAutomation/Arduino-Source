@@ -28,7 +28,8 @@ namespace MaxLairInternal{
 
 
 PathScreenDetector::PathScreenDetector()
-    : m_bottom_main(0.100, 0.970, 0.600, 0.020)
+    : VisualInferenceCallback("PathScreenDetector")
+    , m_bottom_main(0.100, 0.970, 0.600, 0.020)
     , m_main(0.100, 0.100, 0.800, 0.600)
     , m_box0(0.074, 0.420 + 0*0.16315, 0.020, 0.007)
     , m_box1(0.074, 0.420 + 1*0.16315, 0.020, 0.007)

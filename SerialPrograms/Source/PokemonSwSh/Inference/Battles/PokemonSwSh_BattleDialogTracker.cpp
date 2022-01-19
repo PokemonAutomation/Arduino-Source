@@ -6,7 +6,7 @@
 
 #include "CommonFramework/Inference/ImageTools.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
-#include "PokemonSwSh_ShinyDialogTracker.h"
+#include "PokemonSwSh_BattleDialogTracker.h"
 
 #include <iostream>
 using std::cout;
@@ -21,7 +21,8 @@ EncounterDialogTracker::EncounterDialogTracker(
     Logger& logger,
     StaticScreenDetector& dialog_detector
 )
-    : m_logger(logger)
+    : VisualInferenceCallback("EncounterDialogTracker")
+    , m_logger(logger)
     , m_dialog_detector(dialog_detector)
     , m_end_dialog(std::chrono::system_clock::now())
     , m_dialog_on(false)

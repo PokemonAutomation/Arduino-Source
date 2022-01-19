@@ -99,7 +99,7 @@ bool CloneItemsMenuOverlap::trigger_encounter(ProgramEnvironment& env, ConsoleHa
     console.log("Detected overworld. Triggering battle with menu overlap...");
 
     StartBattleMenuOverlapDetector detector(console);
-    AsyncVisualInferenceSession session(env, console, console);
+    AsyncVisualInferenceSession session(env, console, console, console);
     session += detector;
 
     for (size_t c = 0; c < 60; c++){

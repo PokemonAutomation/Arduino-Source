@@ -11,6 +11,7 @@
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/VideoFeed.h"
+#include "StatAccumulator.h"
 #include "VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
@@ -20,13 +21,12 @@ namespace PokemonAutomation{
 class VisualInferenceSession{
 public:
     VisualInferenceSession(
-        ProgramEnvironment& env,
+        ProgramEnvironment& env, Logger& logger,
         VideoFeed& feed, VideoOverlay& overlay,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)
     );
     ~VisualInferenceSession();
 
-    void operator+=(std::function<bool(const QImage&)>&& callback);
     void operator+=(VisualInferenceCallback& callback);
     void operator-=(VisualInferenceCallback& callback);
 
@@ -38,17 +38,22 @@ public:
     void stop();
 
 private:
+    struct Callback;
+
     ProgramEnvironment& m_env;
+    Logger& m_logger;
     VideoFeed& m_feed;
     VideoOverlay& m_overlay;
     std::chrono::milliseconds m_period;
     std::atomic<bool> m_stop;
 
-    std::vector<std::function<bool(const QImage&)>> m_callbacks0;
-    std::map<VisualInferenceCallback*, VideoOverlaySet> m_callbacks1;
+    std::vector<Callback*> m_callback_list;
+    std::map<VisualInferenceCallback*, Callback> m_callback_map;
 
     std::mutex m_lock;
     std::condition_variable m_cv;
+
+    StatAccumulatorI32 m_stats_snapshot;
 };
 
 
@@ -74,7 +79,7 @@ private:
 class AsyncVisualInferenceSession : public VisualInferenceSession{
 public:
     AsyncVisualInferenceSession(
-        ProgramEnvironment& env,
+        ProgramEnvironment& env, Logger& logger,
         VideoFeed& feed, VideoOverlay& overlay,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)
     );

@@ -48,7 +48,7 @@ private:
 
 class BattleMenuWatcher : public BattleMenuDetector, public VisualInferenceCallback{
 public:
-    using BattleMenuDetector::BattleMenuDetector;
+    BattleMenuWatcher(BattleType battle_type, Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(

@@ -82,7 +82,8 @@ SelectionArrowFinder::SelectionArrowFinder(
     const ImageFloatBox& box,
     Color color
 )
-    : m_overlay(overlay)
+    : VisualInferenceCallback("SelectionArrowFinder")
+    , m_overlay(overlay)
     , m_color(color)
     , m_box(box)
 {}

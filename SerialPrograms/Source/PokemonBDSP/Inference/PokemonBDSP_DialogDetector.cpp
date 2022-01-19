@@ -60,6 +60,10 @@ bool ShortDialogDetector::detect(const QImage& screen) const{
 }
 
 
+ShortDialogWatcher::ShortDialogWatcher(Color color)
+    : ShortDialogDetector(color)
+    , VisualInferenceCallback("ShortDialogWatcher")
+{}
 void ShortDialogWatcher::make_overlays(VideoOverlaySet& items) const{
     ShortDialogDetector::make_overlays(items);
 }
@@ -116,7 +120,8 @@ ShortDialogPromptDetector::ShortDialogPromptDetector(
     const ImageFloatBox& box,
     Color color
 )
-    : m_dialog(color)
+    : VisualInferenceCallback("ShortDialogPromptDetector")
+    , m_dialog(color)
     , m_arrow(overlay, box, color)
 {}
 void ShortDialogPromptDetector::make_overlays(VideoOverlaySet& items) const{

@@ -217,13 +217,13 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     case EncounterAction::ThrowBalls:
     case EncounterAction::ThrowBallsAndSave:
         {
-            const auto result = basic_catcher(m_env, m_console, m_language, action.second);
-            if (result.result == CatchResult::POKEMON_CAUGHT){
+            const auto catch_result = basic_catcher(m_env, m_console, m_language, action.second);
+            if (catch_result.result == CatchResult::POKEMON_CAUGHT){
                 m_session_stats.add_caught();
                 send_program_status_notification(
                     m_env.logger(), m_settings.NOTIFICATION_CATCH_SUCCESS,
                     m_env.program_info(),
-                    "Threw " + QString::number(result.balls_used) + " ball(s) and caught it.",
+                    "Threw " + QString::number(catch_result.balls_used) + " ball(s) and caught it.",
                     m_session_stats.to_str()
                 );
                 m_env.update_stats();
@@ -234,11 +234,11 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
                 }
                 return false;
             }
-            else if (result.result == CatchResult::POKEMON_FAINTED){
+            else if (catch_result.result == CatchResult::POKEMON_FAINTED){
                 send_program_status_notification(
                     m_env.logger(), m_settings.NOTIFICATION_CATCH_FAILED,
                     m_env.program_info(),
-                    "Threw " + QString::number(result.balls_used) + " ball(s) and did not catch it.",
+                    "Threw " + QString::number(catch_result.balls_used) + " ball(s) and did not catch it.",
                     m_session_stats.to_str()
                 );
                 return false;

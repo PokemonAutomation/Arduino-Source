@@ -20,7 +20,8 @@ namespace PokemonSwSh{
 
 
 YCommMenuDetector::YCommMenuDetector(bool is_on)
-    : m_is_on(is_on)
+    : VisualInferenceCallback("YCommMenuDetector")
+    , m_is_on(is_on)
     , m_top(0.600, 0.020, 0.100, 0.040)
     , m_bottom(0.100, 0.970, 0.400, 0.020)
 {}

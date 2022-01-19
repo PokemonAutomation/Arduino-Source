@@ -66,7 +66,8 @@ std::vector<ImagePixelBox> find_seeker_bubbles(const QImage& image){
 
 
 VSSeekerReactionTracker::VSSeekerReactionTracker(VideoOverlay& overlay, const ImageFloatBox& box)
-    : m_overlay(overlay)
+    : VisualInferenceCallback("VSSeekerReactionTracker")
+    , m_overlay(overlay)
     , m_box(box)
 {}
 void VSSeekerReactionTracker::make_overlays(VideoOverlaySet& items) const{

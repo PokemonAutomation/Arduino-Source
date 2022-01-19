@@ -41,7 +41,7 @@ private:
 // The experience screen still shows even if all party pokemon are max leveled and have max EVs.
 class ExperienceGainWatcher : public ExperienceGainDetector, public VisualInferenceCallback{
 public:
-    using ExperienceGainDetector::ExperienceGainDetector;
+    ExperienceGainWatcher(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     // Return true when the screen that the party pokemon are about to gain experience is found.

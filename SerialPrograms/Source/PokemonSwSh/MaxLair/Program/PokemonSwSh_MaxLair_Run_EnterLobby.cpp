@@ -32,7 +32,8 @@ namespace MaxLairInternal{
 class GreyDialogDetector : public VisualInferenceCallback{
 public:
     GreyDialogDetector()
-        : m_box0(0.180, 0.815, 0.015, 0.030)
+        : VisualInferenceCallback("GreyDialogDetector")
+        , m_box0(0.180, 0.815, 0.015, 0.030)
         , m_box1(0.785, 0.840, 0.030, 0.050)
     {}
 

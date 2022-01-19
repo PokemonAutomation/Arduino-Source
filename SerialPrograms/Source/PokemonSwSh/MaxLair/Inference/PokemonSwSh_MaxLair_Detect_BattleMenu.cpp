@@ -30,7 +30,8 @@ namespace MaxLairInternal{
 
 
 BattleMenuDetector::BattleMenuDetector()
-    : m_icon_fight  (0.923, 0.576 + 1 * 0.1075, 0.05, 0.080)
+    : VisualInferenceCallback("BattleMenuDetector")
+    , m_icon_fight  (0.923, 0.576 + 1 * 0.1075, 0.05, 0.080)
     , m_icon_pokemon(0.923, 0.576 + 2 * 0.1075, 0.05, 0.080)
     , m_icon_run    (0.923, 0.576 + 3 * 0.1075, 0.05, 0.080)
     , m_text_fight  (0.830, 0.576 + 1 * 0.1075, 0.08, 0.080)

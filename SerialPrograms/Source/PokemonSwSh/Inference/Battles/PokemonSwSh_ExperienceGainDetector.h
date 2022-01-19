@@ -36,7 +36,7 @@ private:
 
 class ExperienceGainWatcher : public ExperienceGainDetector, public VisualInferenceCallback{
 public:
-    using ExperienceGainDetector::ExperienceGainDetector;
+    ExperienceGainWatcher(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(

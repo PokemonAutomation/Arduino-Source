@@ -68,6 +68,10 @@ bool ExperienceGainDetector::detect(const QImage& screen) const{
 }
 
 
+ExperienceGainWatcher::ExperienceGainWatcher(Color color)
+    : ExperienceGainDetector(color)
+    , VisualInferenceCallback("ExperienceGainWatcher")
+{}
 void ExperienceGainWatcher::make_overlays(VideoOverlaySet& items) const{
     ExperienceGainDetector::make_overlays(items);
 }

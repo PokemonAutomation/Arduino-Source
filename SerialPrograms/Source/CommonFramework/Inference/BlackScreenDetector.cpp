@@ -35,6 +35,10 @@ bool BlackScreenDetector::detect(const QImage& screen) const{
 
 
 
+BlackScreenWatcher::BlackScreenWatcher(const ImageFloatBox& box, Color color)
+    : BlackScreenDetector(box, color)
+    , VisualInferenceCallback("BlackScreenWatcher")
+{}
 void BlackScreenWatcher::make_overlays(VideoOverlaySet& items) const{
     BlackScreenDetector::make_overlays(items);
 }
@@ -49,7 +53,8 @@ bool BlackScreenWatcher::process_frame(
 
 
 BlackScreenOverWatcher::BlackScreenOverWatcher(const ImageFloatBox& box, Color color)
-    : m_detector(box, color)
+    : VisualInferenceCallback("BlackScreenOverWatcher")
+    , m_detector(box, color)
 {}
 void BlackScreenOverWatcher::make_overlays(VideoOverlaySet& items) const{
     m_detector.make_overlays(items);

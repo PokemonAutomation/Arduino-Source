@@ -51,6 +51,11 @@ bool MapDetector::detect(const QImage& screen) const{
 
 
 
+
+MapWatcher::MapWatcher(Color color)
+    : MapDetector(color)
+    , VisualInferenceCallback("MapWatcher")
+{}
 void MapWatcher::make_overlays(VideoOverlaySet& items) const{
     MapDetector::make_overlays(items);
 }

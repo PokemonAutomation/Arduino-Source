@@ -20,7 +20,8 @@ namespace MaxLairInternal{
 
 
 PokemonSelectMenuDetector::PokemonSelectMenuDetector(bool stop_no_detect)
-    : m_stop_on_no_detect(stop_no_detect)
+    : VisualInferenceCallback("PokemonSelectMenuDetector")
+    , m_stop_on_no_detect(stop_no_detect)
     , m_box0(0.02, 0.02, 0.40, 0.04)
 //    , m_box1(overlay, 0.09, 0.18, 0.30, 0.10)
     , m_box1(0.10, 0.18, 0.27, 0.12)

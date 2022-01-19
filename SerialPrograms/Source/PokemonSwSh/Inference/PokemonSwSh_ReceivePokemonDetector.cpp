@@ -19,7 +19,8 @@ namespace PokemonSwSh{
 
 
 ReceivePokemonDetector::ReceivePokemonDetector()
-    : m_box_top(0.2, 0.02, 0.78, 0.02)
+    : VisualInferenceCallback("ReceivePokemonDetector")
+    , m_box_top(0.2, 0.02, 0.78, 0.02)
     , m_box_top_right(0.93, 0.02, 0.05, 0.1)
     , m_box_bot_left(0.02, 0.85, 0.1, 0.1)
     , m_has_been_orange(false)

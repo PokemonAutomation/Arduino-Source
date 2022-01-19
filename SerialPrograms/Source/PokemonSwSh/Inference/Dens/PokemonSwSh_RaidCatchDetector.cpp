@@ -17,7 +17,8 @@ namespace PokemonSwSh{
 
 
 RaidCatchDetector::RaidCatchDetector(VideoOverlay& overlay)
-    : m_left0 (0.82, 0.85 + 0 * 0.078, 0.01, 0.04)
+    : VisualInferenceCallback("RaidCatchDetector")
+    , m_left0 (0.82, 0.85 + 0 * 0.078, 0.01, 0.04)
     , m_right0(0.96, 0.85 + 0 * 0.078, 0.01, 0.04)
 //    , m_left1 (0.82, 0.85 + 1 * 0.078, 0.01, 0.04)
 //    , m_right1(0.96, 0.85 + 1 * 0.078, 0.01, 0.04)

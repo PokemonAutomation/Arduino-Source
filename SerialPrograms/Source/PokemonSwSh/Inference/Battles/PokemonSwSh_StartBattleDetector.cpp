@@ -20,7 +20,8 @@ namespace PokemonSwSh{
 
 
 StartBattleWatcher::StartBattleWatcher(Color color)
-    : m_color(color)
+    : VisualInferenceCallback("StartBattleWatcher")
+    , m_color(color)
     , m_screen_box(0.2, 0.2, 0.6, 0.6)
 {}
 void StartBattleWatcher::make_overlays(VideoOverlaySet& items) const{

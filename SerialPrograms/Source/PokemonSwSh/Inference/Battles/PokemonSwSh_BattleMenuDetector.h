@@ -18,10 +18,7 @@ namespace PokemonSwSh{
 
 class StandardBattleMenuDetector : public StaticScreenDetector{
 public:
-    StandardBattleMenuDetector(
-        bool den,
-        Color color = COLOR_RED
-    );
+    StandardBattleMenuDetector(bool den, Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const QImage& screen) const override;
@@ -48,7 +45,7 @@ private:
 
 class StandardBattleMenuWatcher : public StandardBattleMenuDetector, public VisualInferenceCallback{
 public:
-    using StandardBattleMenuDetector::StandardBattleMenuDetector;
+    StandardBattleMenuWatcher(bool den, Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(

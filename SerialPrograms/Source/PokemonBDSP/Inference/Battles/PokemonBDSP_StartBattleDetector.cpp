@@ -24,7 +24,8 @@ namespace PokemonBDSP{
 
 
 StartBattleDetector::StartBattleDetector(VideoOverlay& overlay)
-    : m_screen_box(0.2, 0.2, 0.6, 0.6)
+    : VisualInferenceCallback("StartBattleDetector")
+    , m_screen_box(0.2, 0.2, 0.6, 0.6)
 {}
 void StartBattleDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_screen_box);
@@ -52,7 +53,8 @@ bool StartBattleDetector::detect(const QImage& frame){
 
 
 StartBattleMenuOverlapDetector::StartBattleMenuOverlapDetector(VideoOverlay& overlay)
-    : m_left(0.02, 0.2, 0.08, 0.5)
+    : VisualInferenceCallback("StartBattleMenuOverlapDetector")
+    , m_left(0.02, 0.2, 0.08, 0.5)
     , m_right(0.90, 0.2, 0.08, 0.5)
     , m_battle_detected(false)
 {}

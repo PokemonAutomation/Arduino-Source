@@ -63,6 +63,11 @@ bool MenuDetector::detect(const QImage& screen) const{
     return true;
 }
 
+
+MenuWatcher::MenuWatcher(Color color)
+    : MenuDetector(color)
+    , VisualInferenceCallback("MenuWatcher")
+{}
 void MenuWatcher::make_overlays(VideoOverlaySet& items) const{
     MenuDetector::make_overlays(items);
 }

@@ -35,7 +35,7 @@ private:
 };
 class ShortDialogWatcher : public ShortDialogDetector, public VisualInferenceCallback{
 public:
-    using ShortDialogDetector::ShortDialogDetector;
+    ShortDialogWatcher(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(

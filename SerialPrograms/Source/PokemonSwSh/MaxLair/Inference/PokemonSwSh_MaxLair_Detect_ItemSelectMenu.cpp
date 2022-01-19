@@ -16,7 +16,8 @@ namespace MaxLairInternal{
 
 
 ItemSelectDetector::ItemSelectDetector(bool stop_no_detect)
-    : m_stop_on_no_detect(stop_no_detect)
+    : VisualInferenceCallback("ItemSelectDetector")
+    , m_stop_on_no_detect(stop_no_detect)
     , m_bottom_main(0.100, 0.970, 0.600, 0.020)
     , m_bottom_right(0.920, 0.970, 0.070, 0.020)
     , m_blue(0.600, 0.020, 0.200, 0.060)

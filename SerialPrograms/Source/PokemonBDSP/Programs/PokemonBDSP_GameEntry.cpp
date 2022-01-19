@@ -28,7 +28,8 @@ namespace PokemonBDSP{
 class LoadingDetector : public VisualInferenceCallback{
 public:
     LoadingDetector(bool invert)
-        : m_box0(0.2, 0.2, 0.6, 0.1)
+        : VisualInferenceCallback("LoadingDetector")
+        , m_box0(0.2, 0.2, 0.6, 0.1)
         , m_box1(0.2, 0.7, 0.6, 0.1)
         , m_invert(invert)
     {}

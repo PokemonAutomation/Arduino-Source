@@ -33,7 +33,7 @@ private:
 
 class BoxWatcher : public BoxDetector, public VisualInferenceCallback{
 public:
-    using BoxDetector::BoxDetector;
+    BoxWatcher(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(

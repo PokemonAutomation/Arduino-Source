@@ -12,7 +12,7 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "Pokemon/Pokemon_DataTypes.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
-#include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyDialogTracker.h"
+#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogTracker.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

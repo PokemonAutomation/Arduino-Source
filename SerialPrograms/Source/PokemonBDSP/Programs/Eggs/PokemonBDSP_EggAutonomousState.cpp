@@ -51,7 +51,8 @@ EggAutonomousStats::EggAutonomousStats()
 class EggReceivedDetector : public VisualInferenceCallback{
 public:
     EggReceivedDetector(Color color = COLOR_RED)
-        : m_fetched(false)
+        : VisualInferenceCallback("EggReceivedDetector")
+        , m_fetched(false)
         , m_color(color)
         , m_box0(0.05, 0.10, 0.10, 0.80)
         , m_box1(0.87, 0.10, 0.10, 0.80)

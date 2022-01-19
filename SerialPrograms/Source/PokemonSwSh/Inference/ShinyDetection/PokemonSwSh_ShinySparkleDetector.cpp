@@ -18,7 +18,8 @@ ShinySparkleDetector::ShinySparkleDetector(
     const ImageFloatBox& detection_box,
     double detection_threshold
 )
-    : m_logger(logger)
+    : VisualInferenceCallback("ShinySparkleDetector")
+    , m_logger(logger)
     , m_overlay(overlay)
     , m_detection_box(detection_box)
     , m_detection_threshold(detection_threshold)

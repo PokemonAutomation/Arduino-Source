@@ -130,6 +130,7 @@ SOURCES += \
     Source/CommonFramework/Inference/ImageMatchDetector.cpp \
     Source/CommonFramework/Inference/ImageTools.cpp \
     Source/CommonFramework/Inference/InferenceException.cpp \
+    Source/CommonFramework/Inference/StatAccumulator.cpp \
     Source/CommonFramework/Inference/VisualInferenceCallback.cpp \
     Source/CommonFramework/Inference/VisualInferenceRoutines.cpp \
     Source/CommonFramework/Inference/VisualInferenceSession.cpp \
@@ -358,6 +359,7 @@ SOURCES += \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_Misc.cpp \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.cpp \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogDetector.cpp \
+    Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogTracker.cpp \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.cpp \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_ExperienceGainDetector.cpp \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.cpp \
@@ -376,7 +378,6 @@ SOURCES += \
     Source/PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.cpp \
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyDialogTracker.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleDetector.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleSet.cpp \
@@ -902,6 +903,7 @@ HEADERS += \
     Source/PokemonSwSh/Commands/PokemonSwSh_Messages_Misc.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogDetector.h \
+    Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogTracker.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_ExperienceGainDetector.h \
     Source/PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h \
@@ -920,7 +922,6 @@ HEADERS += \
     Source/PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h \
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyDialogTracker.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyFilters.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleDetector.h \

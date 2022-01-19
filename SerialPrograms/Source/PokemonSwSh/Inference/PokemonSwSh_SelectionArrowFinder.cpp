@@ -74,7 +74,8 @@ std::vector<ImagePixelBox> find_selection_arrows(const QImage& image){
 
 
 SelectionArrowFinder::SelectionArrowFinder(VideoOverlay& overlay, const ImageFloatBox& box)
-    : m_overlay(overlay)
+    : VisualInferenceCallback("SelectionArrowFinder")
+    , m_overlay(overlay)
     , m_box(box)
 {}
 void SelectionArrowFinder::make_overlays(VideoOverlaySet& items) const{

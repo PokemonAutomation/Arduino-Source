@@ -35,7 +35,7 @@ private:
 
 class MenuWatcher : public MenuDetector, public VisualInferenceCallback{
 public:
-    using MenuDetector::MenuDetector;
+    MenuWatcher(Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(

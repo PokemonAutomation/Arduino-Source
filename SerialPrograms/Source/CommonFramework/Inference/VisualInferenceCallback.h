@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_CommonFramework_VisualInferenceCallback_H
 #define PokemonAutomation_CommonFramework_VisualInferenceCallback_H
 
+#include <string>
 #include <chrono>
 #include "Common/Compiler.h"
 
@@ -19,6 +20,12 @@ class VideoOverlaySet;
 
 class VisualInferenceCallback{
 public:
+    VisualInferenceCallback(std::string label)
+        : m_label(label)
+    {}
+
+    const std::string& label() const{ return m_label; }
+
     virtual void make_overlays(VideoOverlaySet& items) const = 0;
 
     //  Return true if the inference session should stop.
@@ -26,6 +33,9 @@ public:
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
     ) = 0;
+
+private:
+    std::string m_label;
 };
 
 

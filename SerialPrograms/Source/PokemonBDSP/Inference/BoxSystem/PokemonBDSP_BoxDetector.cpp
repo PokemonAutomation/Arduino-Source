@@ -58,6 +58,10 @@ bool BoxDetector::detect(const QImage& screen) const{
 
 
 
+BoxWatcher::BoxWatcher(Color color)
+    : BoxDetector(color)
+    , VisualInferenceCallback("BoxWatcher")
+{}
 void BoxWatcher::make_overlays(VideoOverlaySet& items) const{
     BoxDetector::make_overlays(items);
 }
