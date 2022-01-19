@@ -149,6 +149,7 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env){
         }
 
         stats.m_attempts++;
+        env.update_stats();
 
         if (found_berry){
             env.console.log("Found one target berry. Stop program.");
