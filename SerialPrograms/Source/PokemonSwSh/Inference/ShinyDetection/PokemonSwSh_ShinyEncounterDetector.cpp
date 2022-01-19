@@ -10,6 +10,7 @@
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CommonFramework/Inference/TimeWindowStatTracker.h"
 #include "CommonFramework/Inference/InferenceThrottler.h"
+#include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogTracker.h"
@@ -197,10 +198,10 @@ ShinyType ShinyEncounterDetector::shiny_type() const{
 
 
 
-
+#if 1
 ShinyDetectionResult detect_shiny_battle(
-    Logger& logger,
     ProgramEnvironment& env,
+    Logger& logger,
     VideoFeed& feed, VideoOverlay& overlay,
     const ShinyDetectionBattle& battle_settings,
     std::chrono::seconds timeout,
@@ -272,6 +273,32 @@ ShinyDetectionResult detect_shiny_battle(
 
     return detector.results();
 }
+#else
+ShinyDetectionResult detect_shiny_battle(
+    ProgramEnvironment& env, Logger& logger,
+    VideoFeed& feed, VideoOverlay& overlay,
+    const ShinyDetectionBattle& battle_settings,
+    std::chrono::seconds timeout,
+    double detection_threshold
+){
+    ShinyEncounterTracker tracker(logger, overlay, SHINY_BATTLE_REGULAR);
+    int result = wait_until(
+        env, logger, feed, overlay, timeout,
+        { &tracker }
+    );
+    if (result < 0){
+        env.log("ShinyDetector: Battle menu not found after timeout.", COLOR_RED);
+        return ShinyDetectionResult{ShinyType::UNKNOWN, QImage()};
+    }
+    ShinyType shiny_type = determine_shiny_status(
+        logger,
+        SHINY_BATTLE_REGULAR,
+        tracker.dialog_timer(),
+        tracker.sparkles_wild()
+    );
+    return ShinyDetectionResult{shiny_type, tracker.sparkles_wild().best_image()};
+}
+#endif
 
 
 

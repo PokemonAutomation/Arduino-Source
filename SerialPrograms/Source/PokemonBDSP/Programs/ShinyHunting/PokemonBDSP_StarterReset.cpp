@@ -174,8 +174,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
 
         //  Detect shiny.
         DoublesShinyDetection result = detect_shiny_battle(
-            env.console,
-            env, env.console, env.console,
+            env, env.console, env.console, env.console,
             YOUR_POKEMON,
             std::chrono::seconds(30)
         );

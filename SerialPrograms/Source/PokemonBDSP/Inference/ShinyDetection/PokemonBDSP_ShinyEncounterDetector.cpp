@@ -229,8 +229,7 @@ DoublesShinyDetection ShinyEncounterDetector::results(){
 
 
 DoublesShinyDetection detect_shiny_battle(
-    Logger& logger,
-    ProgramEnvironment& env,
+    ProgramEnvironment& env, Logger& logger,
     VideoFeed& feed, VideoOverlay& overlay,
     const DetectionType& type,
     std::chrono::seconds timeout,

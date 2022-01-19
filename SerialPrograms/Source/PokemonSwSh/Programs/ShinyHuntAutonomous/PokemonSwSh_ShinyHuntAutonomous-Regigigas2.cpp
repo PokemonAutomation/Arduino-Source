@@ -147,8 +147,7 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env)
             }
 
             ShinyDetectionResult result = detect_shiny_battle(
-                env.console,
-                env, env.console, env.console,
+            env, env.console, env.console, env.console,
                 SHINY_BATTLE_RAID,
                 std::chrono::seconds(30)
             );

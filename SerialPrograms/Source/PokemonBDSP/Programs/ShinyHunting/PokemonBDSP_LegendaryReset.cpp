@@ -122,8 +122,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env){
 
         //  Detect shiny.
         DoublesShinyDetection result = detect_shiny_battle(
-            env.console,
-            env, env.console, env.console,
+            env, env.console, env.console, env.console,
             WILD_POKEMON,
             std::chrono::seconds(30)
         );

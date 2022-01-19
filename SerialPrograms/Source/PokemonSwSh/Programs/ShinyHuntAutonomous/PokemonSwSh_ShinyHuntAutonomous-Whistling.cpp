@@ -156,8 +156,7 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env){
 
         //  Detect shiny.
         ShinyDetectionResult result = detect_shiny_battle(
-            env.console,
-            env, env.console, env.console,
+            env, env.console, env.console, env.console,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );

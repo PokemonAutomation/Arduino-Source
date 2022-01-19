@@ -28,6 +28,20 @@ namespace PokemonAutomation{
 //  Exceptions throw in either the commands or the triggers will stop
 //  everything and be passed out of this function.
 int wait_until(
+    ProgramEnvironment& env, Logger& logger,
+    VideoFeed& feed, VideoOverlay& overlay,
+    std::chrono::milliseconds timeout,
+    std::vector<VisualInferenceCallback*>&& callbacks,
+    std::chrono::milliseconds period = std::chrono::milliseconds(50)
+);
+int wait_until(
+    ProgramEnvironment& env, Logger& logger,
+    VideoFeed& feed, VideoOverlay& overlay,
+    std::chrono::system_clock::time_point time_limit,
+    std::vector<VisualInferenceCallback*>&& callbacks,
+    std::chrono::milliseconds period = std::chrono::milliseconds(50)
+);
+int wait_until(
     ProgramEnvironment& env, ConsoleHandle& console,
     std::chrono::milliseconds timeout,
     std::vector<VisualInferenceCallback*>&& callbacks,
