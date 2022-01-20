@@ -32,17 +32,18 @@ double StatAccumulatorI32::stddev() const{
 }
 
 
-std::string StatAccumulatorI32::dump() const{
+std::string StatAccumulatorI32::dump(const char* units, double divider) const{
+    divider = 1. / divider;
     std::stringstream ss;
     ss << "Count = " << tostr_u_commas(m_count);
-    ss << ", Mean = " << mean();
-    ss << ", Stddev = " << stddev();
-    ss << ", Min = " << min();
-    ss << ", Max = " << max();
+    ss << ", Mean = " << mean() * divider << units;
+    ss << ", Stddev = " << stddev() * divider << units;
+    ss << ", Min = " << min() * divider << units;
+    ss << ", Max = " << max() * divider << units;
     return ss.str();
 }
-void StatAccumulatorI32::log(Logger& logger, const std::string& label) const{
-    logger.log(label + ": " + dump(), COLOR_MAGENTA);
+void StatAccumulatorI32::log(Logger& logger, const std::string& label, const char* units, double divider) const{
+    logger.log(label + ": " + dump(units, divider), COLOR_MAGENTA);
 }
 
 

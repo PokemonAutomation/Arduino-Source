@@ -191,7 +191,6 @@ CatchResults basic_catcher(
         return results;
     case CatchResult::TIMEOUT:
         env.log("BasicCatcher: time out.", COLOR_RED);
-        PA_THROW_StringException("No state detected within timeout period.");
         return results;
     default:;
     }

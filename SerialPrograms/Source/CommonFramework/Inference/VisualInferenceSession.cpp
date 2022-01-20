@@ -50,9 +50,14 @@ void VisualInferenceSession::stop(){
         std::unique_lock<std::mutex> lg(m_lock);
         m_cv.notify_all();
     }
-    m_stats_snapshot.log(m_logger, "Screenshot");
+
+    const double DIVIDER = std::chrono::milliseconds(1) / std::chrono::microseconds(1);
+    const char* UNITS = " ms";
+
+
+    m_stats_snapshot.log(m_logger, "Screenshot", UNITS, DIVIDER);
     for (Callback* callback : m_callback_list){
-        callback->stats.log(m_logger, callback->callback->label());
+        callback->stats.log(m_logger, callback->callback->label(), UNITS, DIVIDER);
     }
 }
 
@@ -116,14 +121,14 @@ VisualInferenceCallback* VisualInferenceSession::run(std::chrono::system_clock::
         time_point time0_snapshot = std::chrono::system_clock::now();
         QImage screen = m_feed.snapshot();
         time_point time1_snapshot = std::chrono::system_clock::now();
-        m_stats_snapshot += std::chrono::duration_cast<std::chrono::milliseconds>(time1_snapshot - time0_snapshot).count();
+        m_stats_snapshot += std::chrono::duration_cast<std::chrono::microseconds>(time1_snapshot - time0_snapshot).count();
 
         std::unique_lock<std::mutex> lg(m_lock);
         for (Callback* callback : m_callback_list){
             time_point time0 = std::chrono::system_clock::now();
             bool done = callback->callback->process_frame(screen, time1_snapshot);
             time_point time1 = std::chrono::system_clock::now();
-            callback->stats += std::chrono::duration_cast<std::chrono::milliseconds>(time1 - time0).count();
+            callback->stats += std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count();
             if (done){
                 return callback->callback;
             }

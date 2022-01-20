@@ -6,13 +6,16 @@
 
 #include <set>
 #include <QImage>
+#include "Common/Cpp/Exception.h"
 #include "Common/Cpp/AlignedVector.h"
+#include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageTools/FillGeometry.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyFilters.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
+#include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "TestProgramComputer.h"
 
 #include "Kernels/Kernels_Arch.h"
@@ -77,15 +80,134 @@ inline std::string dump8(uint8_t x){
 
 
 
+
+
+
+
 void TestProgramComputer::program(ProgramEnvironment& env){
     using namespace Kernels;
     using namespace NintendoSwitch::PokemonSwSh;
 
 
-//    QImage image("screenshot-20220118-013744373530.png");
-    QImage image("screenshot-20220118-014219904700.png");
+//    QImage image("mark.png");
+//    image = image.convertToFormat(QImage::Format::Format_ARGB32);
 
+//    QImage image("screenshot-20220119-184839255629.png");
+    QImage image("screenshot-20220119-190101351053.png");
     find_exclamation_marks(image);
+
+//    ExclamationMatcher matcher;
+
+
+
+#if 0
+    QImage image("screenshot-20220119-190101351053.png");
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
+        image,
+        192, 255,
+        0, 160,
+        0, 192
+    );
+    std::vector<WaterFillObject> objects = find_objects_inplace(matrix, 50, false);
+#endif
+
+
+
+
+
+#if 0
+    extract_object_from_inner_feature(
+        QImage(100, 100, QImage::Format::Format_ARGB32),
+        ImagePixelBox(60, 60, 70, 70),
+        ImageFloatBox(0.5, 0.5, 0.5, 0.5)
+    );
+#endif
+
+
+#if 0
+    QImage image(RESOURCE_PATH() + "PokemonSwSh/ExclamationMark.png");
+
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
+        image,
+        192, 255,
+        0, 160,
+        0, 192
+    );
+    std::vector<WaterFillObject> objects = find_objects_inplace(matrix, 50, false);
+    if (objects.size() != 0){
+        PA_THROW_StringException("Failed to find exactly one object in resource.");
+    }
+#endif
+
+
+
+
+#if 0
+    QImage image(QImage(RESOURCE_PATH() + "PokemonSwSh/ExclamationMark.png"));
+    image = image.scaled(image.width() / 4, image.height() / 4);
+    image = image.convertToFormat(QImage::Format::Format_ARGB32);
+
+    uint32_t* ptr = (uint32_t*)image.bits();
+    size_t words = image.bytesPerLine() / sizeof(uint32_t);
+    for (int r = 0; r < image.height(); r++){
+        for (int c = 0; c < image.width(); c++){
+            uint32_t& pixel = ptr[r * words + c];
+            uint32_t red = qRed(pixel);
+            uint32_t green = qGreen(pixel);
+            uint32_t blue = qBlue(pixel);
+            if (red < 128 && green < 128 && blue < 128){
+                pixel = 0;
+            }
+            if (red >= 128 && green >= 128 && blue >= 128){
+                pixel = 0xffffffff;
+            }
+        }
+    }
+    image.save("test.png");
+#endif
+
+
+
+//    QImage image("mark0.png");
+//    image.scaled(image.width() / 4, image.height() / 4).save("mark1.png");
+
+
+
+#if 0
+    uint32_t* ptr = (uint32_t*)image.bits();
+    size_t words = image.bytesPerLine() / sizeof(uint32_t);
+    for (int r = 0; r < image.height(); r++){
+        for (int c = 0; c < image.width(); c++){
+            uint32_t& pixel = ptr[r * words + c];
+            uint32_t red = qRed(pixel);
+            uint32_t green = qGreen(pixel);
+            uint32_t blue = qBlue(pixel);
+            if (green >= 192 && blue >= 192){
+                continue;
+            }
+            if (red >= 192){
+                continue;
+            }
+            pixel = 0xff000000;
+        }
+    }
+    image.save("test.png");
+#endif
+
+
+
+#if 0
+    QImage image("screenshot-20220119-190101351053.png");
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_min(image, 192, 192, 192);
+    std::vector<WaterFillObject> objects = find_objects(matrix, 200, false);
+    cout << objects.size() << endl;
+
+    int c = 0;
+    for (const auto& item : objects){
+        image.copy(item.min_x, item.min_y, item.width(), item.height()).save("test-" + QString::number(c++) + ".png");
+    }
+#endif
+
 
 
 

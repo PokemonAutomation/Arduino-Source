@@ -222,10 +222,19 @@ std::pair<EncounterAction, std::string> StandardEncounterDetection::get_action()
     }
 
     //  Look for conflicts. If any, return stop program.
+    bool auto_catch = false;
     for (const std::pair<EncounterAction, std::string>& action : actions){
+        if (action.first == EncounterAction::ThrowBalls || action.first == EncounterAction::ThrowBallsAndSave){
+            auto_catch = true;
+        }
         if (action.first != actions[0].first || action.second != actions[0].second){
             return {EncounterAction::StopProgram, ""};
         }
+    }
+
+    //  Double battle and someone is set to auto-catch.
+    if (actions.size() > 1 && auto_catch){
+        return {EncounterAction::StopProgram, ""};
     }
 
     //  Otherwise, return the matching action.

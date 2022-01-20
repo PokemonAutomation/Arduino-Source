@@ -173,9 +173,9 @@ bool OverworldTargetTracker::process_frame(
     m_detection_boxes.clear();
     for (const ImagePixelBox& mark : exclamation_marks){
         ImageFloatBox box = translate_to_parent(frame, m_search_area, mark);
-        box.x -= box.width * 1.5;
-        box.width *= 4;
-        box.height *= 1.5;
+//        box.x -= box.width * 1.5;
+//        box.width *= 4;
+//        box.height *= 1.5;
         m_exclamations.emplace_back(Mark{timestamp, box});
         m_detection_boxes.emplace_back(m_overlay, box, COLOR_MAGENTA);
 //        cout << "asdf = " << exclamations.size() << endl;

@@ -280,10 +280,10 @@ ShinyDetectionResult detect_shiny_battle(
         throttle_stats += std::chrono::duration_cast<std::chrono::milliseconds>(time4 - time3).count();
     }
 
-    env.log("Diagnostics: Screenshot: " + capture_stats.dump(), COLOR_MAGENTA);
-    env.log("Diagnostics: Menu Detection: " + menu_stats.dump(), COLOR_MAGENTA);
-    env.log("Diagnostics: Inference: " + inference_stats.dump(), COLOR_MAGENTA);
-    env.log("Diagnostics: Throttle: " + throttle_stats.dump(), COLOR_MAGENTA);
+    env.log("Diagnostics: Screenshot: " + capture_stats.dump(" ms", 1), COLOR_MAGENTA);
+    env.log("Diagnostics: Menu Detection: " + menu_stats.dump(" ms", 1), COLOR_MAGENTA);
+    env.log("Diagnostics: Inference: " + inference_stats.dump(" ms", 1), COLOR_MAGENTA);
+    env.log("Diagnostics: Throttle: " + throttle_stats.dump(" ms", 1), COLOR_MAGENTA);
 
     if (no_detection){
         env.log("ShinyDetector: Battle menu not found after timeout.", COLOR_RED);

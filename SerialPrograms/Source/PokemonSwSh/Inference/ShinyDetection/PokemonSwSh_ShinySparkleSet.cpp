@@ -4,6 +4,7 @@
  *
  */
 
+#include <sstream>
 #include <QImage>
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
@@ -32,27 +33,25 @@ void ShinySparkleSetSwSh::clear(){
 }
 
 std::string ShinySparkleSetSwSh::to_str() const{
-    std::string str;
+    std::stringstream ss;
     if (m_alpha_overall < 1.0){
-        return str;
+        return "";
     }
-    str += "SparkleDetector";
+    ss << "SparkleDetector";
     if (!balls.empty()){
-        str += " - Balls: " + std::to_string(balls.size());
+        ss << " - Balls: " << balls.size();
     }
     if (!stars.empty()){
-        str += " - Stars: " + std::to_string(stars.size());
+        ss << " - Stars: " << stars.size();
     }
     if (!squares.empty()){
-        str += " - Squares: " + std::to_string(squares.size());
+        ss << " - Squares: " << squares.size();
     }
     if (!lines.empty()){
-        str += " - Lines: " + std::to_string(lines.size());
+        ss << " - Lines: " << lines.size();
     }
-    str += " - (alpha = ";
-    str += std::to_string(m_alpha_overall);
-    str += ")";
-    return str;
+    ss << " - (alpha = " << m_alpha_overall << ")";
+    return ss.str();
 }
 void ShinySparkleSetSwSh::draw_boxes(
     VideoOverlaySet& overlays,

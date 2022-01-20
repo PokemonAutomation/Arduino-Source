@@ -4,6 +4,7 @@
  *
  */
 
+#include <QtGlobal>
 #include "Common/Cpp/Exception.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Types.h"
@@ -129,6 +130,8 @@ bool StandardEncounterHandler::handle_standard_encounter(const DoublesShinyDetec
     }
 
     bool enable_names = m_language != Language::None;
+    std::vector<EncounterResult> encounter_results = results(encounter);
+
     update_frequencies(encounter);
     send_encounter_notification(
         m_console,
@@ -136,7 +139,7 @@ bool StandardEncounterHandler::handle_standard_encounter(const DoublesShinyDetec
         m_settings.NOTIFICATION_SHINY,
         m_env.program_info(),
         m_language != Language::None, is_shiny(result.shiny_type),
-        results(encounter),
+        encounter_results,
         result.best_screenshot,
         &m_session_stats,
         enable_names ? &m_frequencies : nullptr
@@ -189,15 +192,16 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     std::pair<EncounterAction, std::string> action = encounter.get_action();
 
     bool enable_names = m_language != Language::None;
-    update_frequencies(encounter);
+    std::vector<EncounterResult> encounter_results = results(encounter);
 
+    update_frequencies(encounter);
     send_encounter_notification(
         m_console,
         m_settings.NOTIFICATION_NONSHINY,
         m_settings.NOTIFICATION_SHINY,
         m_env.program_info(),
         enable_names, is_shiny(result.shiny_type),
-        results(encounter),
+        encounter_results,
         result.best_screenshot,
         &m_session_stats,
         enable_names ? &m_frequencies : nullptr
@@ -215,38 +219,41 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         return false;
 
     case EncounterAction::ThrowBalls:
-    case EncounterAction::ThrowBallsAndSave:
-        {
-            const auto catch_result = basic_catcher(m_env, m_console, m_language, action.second);
-            if (catch_result.result == CatchResult::POKEMON_CAUGHT){
-                m_session_stats.add_caught();
-                send_program_status_notification(
-                    m_env.logger(), m_settings.NOTIFICATION_CATCH_SUCCESS,
-                    m_env.program_info(),
-                    "Threw " + QString::number(catch_result.balls_used) + " ball(s) and caught it.",
-                    m_session_stats.to_str()
-                );
-                m_env.update_stats();
-
-                if (action.first == EncounterAction::ThrowBallsAndSave){
-                    //  Save the game
-                    save_game(m_env, m_console);
-                }
-                return false;
+    case EncounterAction::ThrowBallsAndSave:{
+        CatchResults catch_result = basic_catcher(m_env, m_console, m_language, action.second);
+        switch (catch_result.result){
+        case CatchResult::POKEMON_CAUGHT:
+            m_session_stats.add_caught();
+            m_env.update_stats();
+            if (action.first == EncounterAction::ThrowBallsAndSave){
+                //  Save the game
+                save_game(m_env, m_console);
             }
-            else if (catch_result.result == CatchResult::POKEMON_FAINTED){
-                send_program_status_notification(
-                    m_env.logger(), m_settings.NOTIFICATION_CATCH_FAILED,
-                    m_env.program_info(),
-                    "Threw " + QString::number(catch_result.balls_used) + " ball(s) and did not catch it.",
-                    m_session_stats.to_str()
-                );
-                return false;
-            }
-            //  For all other situations: out of balls, cannot throw ball, own fainted, timeout,
-            //  stop program.
-            return true;
+            break;
+        case CatchResult::POKEMON_FAINTED:
+            pbf_mash_button(m_console, BUTTON_B, 2 * TICKS_PER_SECOND);
+            break;
+        case CatchResult::OWN_FAINTED:
+            PA_THROW_StringException("Your " + STRING_POKEMON + " fainted after " + QString::number(catch_result.balls_used) + " balls.");
+        case CatchResult::OUT_OF_BALLS:
+            PA_THROW_StringException("Unable to find the desired ball after throwing " + QString::number(catch_result.balls_used) + " of them. Did you run out?");
+        case CatchResult::CANNOT_THROW_BALL:
+            PA_THROW_StringException("Unable to throw ball. Is the " + STRING_POKEMON + " semi-invulnerable?");
+        case CatchResult::TIMEOUT:
+            PA_THROW_StringException("Program has timed out. Did your lead " + STRING_POKEMON + " faint?");
         }
+        send_catch_notification(
+            m_console,
+            m_settings.NOTIFICATION_CATCH_SUCCESS,
+            m_settings.NOTIFICATION_CATCH_FAILED,
+            m_env.program_info(),
+            &encounter_results[0].slug_candidates,
+            action.second,
+            catch_result.balls_used,
+            catch_result.result == CatchResult::POKEMON_CAUGHT
+        );
+        return false;
+    }
     default:
         return true;
     }

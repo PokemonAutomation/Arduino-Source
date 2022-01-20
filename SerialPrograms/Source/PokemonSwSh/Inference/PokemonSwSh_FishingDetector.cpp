@@ -66,9 +66,6 @@ bool FishingHookDetector::process_frame(
     std::vector<ImagePixelBox> exclamation_marks = find_exclamation_marks(hook_image);
     for (const ImagePixelBox& mark : exclamation_marks){
         ImageFloatBox box = translate_to_parent(frame, m_hook_box, mark);
-        box.x -= box.width * 1.5;
-        box.width *= 4;
-        box.height *= 1.5;
         m_marks.emplace_back(m_overlay, box, COLOR_YELLOW);
     }
 

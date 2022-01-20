@@ -27,7 +27,11 @@ EncounterFilterOption::EncounterFilterOption(bool enable_overrides, bool allow_a
     , m_table(
         "<b>Overrides:</b><br>"
         "The game language must be properly set to read " + STRING_POKEMON + " names. "
-        "If multiple overrides apply and are conflicting, the program will stop.",
+        "If multiple overrides apply and are conflicting, the program will stop." +
+        (allow_autocatch
+            ? "<br>Auto-catching only applies in single battles. The program will stop if asked to auto-catch in a double-battle."
+            : ""
+        ),
         m_factory, false
     )
 {}

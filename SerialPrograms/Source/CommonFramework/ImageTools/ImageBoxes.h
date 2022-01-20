@@ -55,17 +55,51 @@ struct ImageFloatBox{
 };
 
 
+//  Given an image, extract the request box from it.
 QImage extract_box(const QImage& image, const ImagePixelBox& box);
 QImage extract_box(const QImage& image, const ImageFloatBox& box);
 QImage extract_box(const QImage& image, const ImageFloatBox& box, int offset_x, int offset_y);
 
-
+//  Given:
+//      -   "inference_box" is a box within "original_image".
+//      -   "box" is a box within "inference_box".
+//
+//  Translate "box" into a new box in the orignal image.
+//
+//  This is used for translating detection box within inference boxes back to
+//  the parent so it can be displayed in a VideoOverlay.
 ImageFloatBox translate_to_parent(
     const QImage& original_image,
     const ImageFloatBox& inference_box,
     const ImagePixelBox& box
 );
 
+
+//  Given a ImagePixelBox within an image, get the ImageFloatBox for it.
+ImagePixelBox floatbox_to_pixelbox(size_t width, size_t height, const ImageFloatBox& float_box);
+ImageFloatBox pixelbox_to_floatbox(size_t width, size_t height, const ImagePixelBox& pixel_box);
+ImageFloatBox pixelbox_to_floatbox(const QImage& image, const ImagePixelBox& pixel_box);
+
+
+//  Given:
+//      -   "inner" is a feature within an "object".
+//      -   "inner_relative_to_image" is the box for the "inner" feature relative to the image.
+//      -   "inner_relative_to_object" is the box for the "inner" feature within the object.
+//
+//  Return the enclosing box for the object in the original image.
+//
+//  This used by detection methods that detect a sub-feature within a larger
+//  object. But then you need to expand out the object to match against a
+//  template to confirm the detection.
+ImagePixelBox extract_object_from_inner_feature(
+    const ImagePixelBox& inner_relative_to_image,
+    const ImageFloatBox& inner_relative_to_object
+);
+QImage extract_object_from_inner_feature(
+    const QImage& image,
+    const ImagePixelBox& inner_relative_to_image,
+    const ImageFloatBox& inner_relative_to_object
+);
 
 
 
