@@ -93,10 +93,14 @@ void TestProgramComputer::program(ProgramEnvironment& env){
 //    image = image.convertToFormat(QImage::Format::Format_ARGB32);
 
 //    QImage image("screenshot-20220119-184839255629.png");
-    QImage image("screenshot-20220119-190101351053.png");
-    find_exclamation_marks(image);
+//    QImage image("screenshot-20220119-190101351053.png");
+//    find_exclamation_marks(image);
 
 //    ExclamationMatcher matcher;
+
+
+//    QImage image("20211008-053920535759.jpg");
+
 
 
 
@@ -281,11 +285,40 @@ void TestProgramComputer::program(ProgramEnvironment& env){
 
 
 
+#if 0
+    {
+        __m512i x = _mm512_set1_epi64(8723783780267303537);
+        x = _mm512_shuffle_epi8(
+            x,
+            _mm512_setr_epi8(
+                7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8,
+                7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8,
+                7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8,
+                7, 6, 5, 4, 3, 2, 1, 0, 15, 14, 13, 12, 11, 10, 9, 8
+            )
+        );
+        x = _mm512_gf2p8affine_epi64_epi8(x, _mm512_set1_epi64(0x8040201008040201), 0);
+        print_u8(x);
+    }
+    {
+        __m512i x = _mm512_set1_epi64(8723783780267303537);
+        x = _mm512_gf2p8affine_epi64_epi8(_mm512_set1_epi64(0x8040201008040201), x, 0);
+        print_u8(x);
+    }
+    {
+        __m512i x = _mm512_set1_epi64(8723783780267303537);
+        x = _mm512_gf2p8affine_epi64_epi8(_mm512_set1_epi64(0x0000000000000001), x, 0);
+        print_u8(x);
+    }
+#endif
+
+
 
 #if 0
-    QImage image("20220101-214116617784.jpg");
-    PackedBinaryMatrix matrix = filter_rgb32_range(
+    QImage image("20211008-053920535759.jpg");
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
         image,
+        255, 255,
         192, 255,
         192, 255,
         128, 255
@@ -305,14 +338,18 @@ void TestProgramComputer::program(ProgramEnvironment& env){
              << "," << item.second.max_y
              << ") - (" << item.second.center_x()
              << "," << item.second.center_y()
-             << ")" << endl;
+             << ")"
+             << " sum_y = " << item.second.sum_y
+             << endl;
     }
-    cout << matrix.dump(849, 365, 863, 376) << endl;
+//    cout << matrix.dump(1046, 588, 1048, 592) << endl;
+//    cout << matrix.tile(16, 73).dump() << endl;
+//    cout << matrix.tile(16, 74).dump() << endl;
 
-    PackedBinaryMatrix submatrix = matrix.submatrix(849, 365, 863-849 - 1, 376-365 - 1);
-    cout << submatrix.width() << " x " << submatrix.height() << endl;
-    cout << submatrix.dump() << endl;
-    cout << submatrix.tile(0, 0).dump() << endl;
+//    PackedBinaryMatrix submatrix = matrix.submatrix(849, 365, 863-849 - 1, 376-365 - 1);
+//    cout << submatrix.width() << " x " << submatrix.height() << endl;
+//    cout << submatrix.dump() << endl;
+//    cout << submatrix.tile(0, 0).dump() << endl;
 //    cout << submatrix.tile(0, 1).dump() << endl;
 //    cout << submatrix.tile(0, 2).dump() << endl;
 #endif

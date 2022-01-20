@@ -136,7 +136,7 @@ uint64_t popcount_sumcoord(
         pop = popcount_indexsum(sum, tile.vec[2]);
         sum_p = _mm_add_epi64(sum_p, pop);
         sum_x = _mm_add_epi64(sum_x, sum);
-        sum_y = _mm_add_epi64(sum_y, _mm_mul_epu32(pop, _mm_set_epi64x(6, 5)));
+        sum_y = _mm_add_epi64(sum_y, _mm_mul_epu32(pop, _mm_set_epi64x(5, 4)));
     }
     {
         __m128i pop, sum;

@@ -143,7 +143,10 @@ bool find_object(
         size_t y = item.first.y();
         uint64_t popcount, sum_x, sum_y;
         popcount = popcount_sumcoord(sum_x, sum_y, item.second);
-//        cout << popcount << ", " << sum_x << ", " << sum_y << endl;
+//        if (popcount == 7 && tile_x == 16 && tile_y == 73){
+//            cout << popcount << ", " << sum_x << ", " << sum_y << endl;
+//            cout << item.second.dump() << endl;
+//        }
         stats.accumulate_body(
             x * BinaryMatrixTile::WIDTH, y * BinaryMatrixTile::HEIGHT,
             popcount, sum_x, sum_y
