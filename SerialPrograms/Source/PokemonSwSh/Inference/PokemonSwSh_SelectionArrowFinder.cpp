@@ -46,7 +46,7 @@ bool is_selection_arrow(const QImage& image, const WaterFillObject& object){
         true
     );
 
-    cropped.save("cropped.png");
+//    cropped.save("cropped.png");
 
     double rmsd = SELECTION_ARROW().rmsd(cropped);
 //    cout << "rmsd = " << rmsd << endl;

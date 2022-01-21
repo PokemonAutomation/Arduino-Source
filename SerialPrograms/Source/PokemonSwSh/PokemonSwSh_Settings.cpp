@@ -157,7 +157,7 @@ GameSettings::GameSettings()
     , m_experimental("<font size=4><b>Experimental/Beta Features:</b></font>")
     , USE_NEW_SHINY_DETECTOR(
         "<b>Use New Shiny Detector:</b><br>Use the new version of the shiny detection algorithm.",
-        false
+        true
     )
 {
     PA_ADD_STATIC(m_egg_options);

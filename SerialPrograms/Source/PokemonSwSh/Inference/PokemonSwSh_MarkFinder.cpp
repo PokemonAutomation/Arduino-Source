@@ -65,7 +65,7 @@ public:
 //             << object_box.max_x << ", "
 //             << object_box.max_y << endl;
         QImage object = extract_box(image, object_box);
-        object.save("test.png");
+//        object.save("test.png");
         if (object.isNull()){
             return 99999.;
         }

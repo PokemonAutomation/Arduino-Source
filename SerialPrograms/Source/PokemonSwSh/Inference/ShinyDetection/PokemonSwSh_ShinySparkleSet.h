@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonSwSh_ShinySparkleSet_H
 #define PokemonAutomation_PokemonSwSh_ShinySparkleSet_H
 
-#include <vector>
 #include <QImage>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "Pokemon/Pokemon_ShinySparkleSet.h"
