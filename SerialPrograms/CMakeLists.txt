@@ -651,6 +651,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute210.h
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.cpp
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.h
+    Source/PokemonBDSP/Programs/General/PokemonBDSP_AutonomousBallThrower.cpp
+    Source/PokemonBDSP/Programs/General/PokemonBDSP_AutonomousBallThrower.h
     Source/PokemonBDSP/Programs/General/PokemonBDSP_MassRelease.cpp
     Source/PokemonBDSP/Programs/General/PokemonBDSP_MassRelease.h
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.3.cpp
