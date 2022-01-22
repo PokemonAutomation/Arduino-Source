@@ -77,7 +77,7 @@ std::unique_ptr<StatsTracker> ShinyHuntShaymin::make_stats() const{
 bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env) const{
     env.console.botbase().wait_for_all_requests();
     {
-        BattleMenuWatcher battle_menu_detector(BattleType::WILD);
+        BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
         ShortDialogWatcher dialog_detector;
         int result = run_until(
             env, env.console,
@@ -101,7 +101,7 @@ bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env) cons
         }
     }
     {
-        BattleMenuWatcher battle_menu_detector(BattleType::WILD);
+        BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
         StartBattleDetector start_battle_detector(env.console);
         int result = run_until(
             env, env.console,
@@ -152,13 +152,17 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env){
         }
 
         //  Detect shiny.
-        DoublesShinyDetection result = detect_shiny_battle(
-            env, env.console, env.console, env.console,
+        DoublesShinyDetection result_wild;
+        ShinyDetectionResult result_own;
+        detect_shiny_battle(
+            env, env.console,
+            result_wild, result_own,
+            env.console, env.console,
             WILD_POKEMON,
             std::chrono::seconds(30)
         );
 
-        bool stop = handler.handle_standard_encounter_end_battle(result, EXIT_BATTLE_TIMEOUT);
+        bool stop = handler.handle_standard_encounter_end_battle(result_wild, EXIT_BATTLE_TIMEOUT);
         if (stop){
             break;
         }

@@ -155,7 +155,7 @@ void CloneItemsMenuOverlap::swap_party(ConsoleHandle& console){
     pbf_press_button(console, BUTTON_ZL, 10, BOX_PICKUP_DROP_DELAY);
 }
 void CloneItemsMenuOverlap::mash_B_to_battle(ProgramEnvironment& env, ConsoleHandle& console){
-    BattleMenuWatcher detector(BattleType::WILD);
+    BattleMenuWatcher detector(BattleType::STANDARD);
     int ret = run_until(
         env, console,
         [=](const BotBaseContext& context){

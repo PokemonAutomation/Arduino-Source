@@ -85,7 +85,7 @@ void OverworldTrigger::run_trigger(const BotBaseContext& context) const{
 }
 
 bool OverworldTrigger::find_encounter(SingleSwitchProgramEnvironment& env) const{
-    BattleMenuWatcher battle_menu_detector(BattleType::WILD);
+    BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
     StartBattleDetector start_battle_detector(env.console);
 
     int result = 0;

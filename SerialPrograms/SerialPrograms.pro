@@ -308,6 +308,7 @@ SOURCES += \
     Source/PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.cpp \
     Source/PokemonBDSP/Inference/PokemonBDSP_VSSeekerReaction.cpp \
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.cpp \
+    Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinySparkleSet.cpp \
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyTrigger.cpp \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterEnums.cpp \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOption.cpp \
@@ -847,6 +848,7 @@ HEADERS += \
     Source/PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h \
     Source/PokemonBDSP/Inference/PokemonBDSP_VSSeekerReaction.h \
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h \
+    Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinySparkleSet.h \
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyTrigger.h \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterEnums.h \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOption.h \

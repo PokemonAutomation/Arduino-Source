@@ -43,8 +43,8 @@ bool ReceivePokemonDetector::process_frame(
         return m_received;
     }
     m_received = true;
-    static int c = 0;
-    frame.save("test-" + QString::number(c++) + ".png");
+//    static int c = 0;
+//    frame.save("test-" + QString::number(c++) + ".png");
     return false;
 }
 

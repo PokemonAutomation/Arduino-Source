@@ -220,7 +220,7 @@ ShinyDetectionResult detect_shiny_battle(
         ShinyType shiny_type = determine_shiny_status(
             logger,
             battle_settings,
-            tracker.dialog_timer(),
+            tracker.dialog_tracker(),
             tracker.sparkles_wild()
         );
         return ShinyDetectionResult{shiny_type, tracker.sparkles_wild().best_image()};

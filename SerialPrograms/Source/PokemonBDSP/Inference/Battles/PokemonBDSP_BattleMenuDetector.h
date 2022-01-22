@@ -19,7 +19,8 @@ namespace PokemonBDSP{
 
 enum class BattleType{
     STARTER,
-    WILD,
+    STANDARD,
+    GREAT_MARSH,
     TRAINER,
 };
 

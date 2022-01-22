@@ -45,6 +45,7 @@ public:
         const ImageFloatBox& box
     );
 
+    void clear_boxes();
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(
         const QImage& frame,

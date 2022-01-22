@@ -23,6 +23,9 @@ ShinySparkleTracker::ShinySparkleTracker(
     , m_current_sparkles(sparkle_set)
     , m_overlays(overlay)
 {}
+void ShinySparkleTracker::clear_boxes(){
+    m_overlays.clear();
+}
 void ShinySparkleTracker::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box);
 }

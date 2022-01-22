@@ -610,6 +610,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Inference/PokemonBDSP_VSSeekerReaction.h
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.cpp
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h
+    Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinySparkleSet.cpp
+    Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinySparkleSet.h
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyTrigger.cpp
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyTrigger.h
     Source/PokemonBDSP/Options/PokemonBDSP_BerrySelector.cpp

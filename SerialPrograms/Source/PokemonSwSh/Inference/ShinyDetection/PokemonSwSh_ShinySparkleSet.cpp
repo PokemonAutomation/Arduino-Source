@@ -128,7 +128,6 @@ void ShinySparkleSetSwSh::read_from_image(const QImage& image){
         matrix[3], 0xffd0d000, 0xffffffff
     );
 
-#if 1
     double best_alpha = 0;
     for (size_t c = 0; c < 4; c++){
         ShinySparkleSetSwSh sparkles = find_sparkles(matrix[c]);
@@ -139,16 +138,6 @@ void ShinySparkleSetSwSh::read_from_image(const QImage& image){
             *this = std::move(sparkles);
         }
     }
-#else
-    for (size_t c = 0; c < 4; c++){
-        SparkleSet sparkles = find_sparkles(matrix[c]);
-        sparkles.update_alphas();
-        set.balls.insert(set.balls.end(), sparkles.balls.begin(), sparkles.balls.end());
-        set.stars.insert(set.stars.end(), sparkles.stars.begin(), sparkles.stars.end());
-        set.squares.insert(set.squares.end(), sparkles.squares.begin(), sparkles.squares.end());
-        set.lines.insert(set.lines.end(), sparkles.lines.begin(), sparkles.lines.end());
-    }
-#endif
 }
 
 

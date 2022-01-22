@@ -37,6 +37,9 @@ protected:
     Color m_color;
     ImageFloatBox m_box;
     std::deque<InferenceBoxScope> m_arrow_boxes;
+
+private:
+    size_t m_trigger_count = 0;
 };
 
 

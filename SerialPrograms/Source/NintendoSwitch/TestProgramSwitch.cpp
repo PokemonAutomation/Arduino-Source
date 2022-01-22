@@ -224,8 +224,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     using namespace Kernels::Waterfill;
     using namespace OCR;
     using namespace Pokemon;
-    using namespace PokemonSwSh;
-//    using namespace PokemonBDSP;
+//    using namespace PokemonSwSh;
+    using namespace PokemonBDSP;
 
     Logger& logger = env.logger();
     ConsoleHandle& console = env.consoles[0];
@@ -252,18 +252,32 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 #if 1
-    ShinyEncounterTracker tracker(logger, overlay, SHINY_BATTLE_REGULAR);
+    ShinyEncounterTracker tracker(logger, overlay, BattleType::STANDARD);
     {
         VisualInferenceSession session(env, console, feed, overlay);
         session += tracker;
         session.run();
     }
+
+    DoublesShinyDetection wild_result;
+    ShinyDetectionResult your_result;
+    determine_shiny_status(
+        logger,
+        wild_result, your_result,
+        tracker.dialog_tracker(),
+        tracker.sparkles_wild_overall(),
+        tracker.sparkles_wild_left(),
+        tracker.sparkles_wild_right(),
+        tracker.sparkles_own()
+    );
+#if 0
     determine_shiny_status(
         logger,
         SHINY_BATTLE_REGULAR,
         tracker.dialog_timer(),
         tracker.sparkles_wild()
     );
+#endif
 #endif
 
 

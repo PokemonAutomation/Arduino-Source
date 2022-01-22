@@ -132,7 +132,7 @@ CatchResults throw_balls(
 
         auto start = std::chrono::system_clock::now();
 
-        BattleMenuWatcher menu_detector(BattleType::WILD);
+        BattleMenuWatcher menu_detector(BattleType::STANDARD);
         ExperienceGainWatcher experience_detector;
         SelectionArrowFinder own_fainted_detector(console, {0.18, 0.64, 0.46, 0.3}, COLOR_YELLOW);
         int result = wait_until(

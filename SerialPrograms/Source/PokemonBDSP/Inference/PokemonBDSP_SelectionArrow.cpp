@@ -109,7 +109,15 @@ bool SelectionArrowFinder::process_frame(
 //        extract_box(frame, m_arrow_boxes[0]).save("temp.png");
 //        frame.save("test.png");
 //    }
-    return !m_arrow_boxes.empty();
+//    return !m_arrow_boxes.empty();
+
+    //  Need 5 consecutive successful detections.
+    if (m_arrow_boxes.empty()){
+        m_trigger_count = 0;
+        return false;
+    }
+    m_trigger_count++;
+    return m_trigger_count >= 5;
 }
 
 

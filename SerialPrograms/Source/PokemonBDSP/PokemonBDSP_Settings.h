@@ -41,6 +41,9 @@ public:
     TimeExpressionOption<uint16_t> POKEMON_TO_BOX_DELAY0;
     TimeExpressionOption<uint16_t> BOX_TO_POKEMON_DELAY;
     TimeExpressionOption<uint16_t> POKEMON_TO_MENU_DELAY;
+
+    SectionDividerOption m_experimental;
+    BooleanCheckBoxOption USE_NEW_SHINY_DETECTOR;
 };
 
 

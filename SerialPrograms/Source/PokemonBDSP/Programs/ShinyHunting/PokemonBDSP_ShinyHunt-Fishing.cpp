@@ -111,7 +111,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
             ShortDialogWatcher dialog_detector;
             MarkDetector mark_detector(env.console, {0.4, 0.2, 0.2, 0.5});
             StartBattleDetector battle(env.console);
-            BattleMenuWatcher battle_menu(BattleType::WILD);
+            BattleMenuWatcher battle_menu(BattleType::STANDARD);
             int ret = run_until(
                 env, env.console,
                 [=](const BotBaseContext& context){
@@ -193,13 +193,17 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
         }
 
         //  Detect shiny.
-        DoublesShinyDetection result = detect_shiny_battle(
-            env, env.console, env.console, env.console,
+        DoublesShinyDetection result_wild;
+        ShinyDetectionResult result_own;
+        detect_shiny_battle(
+            env, env.console,
+            result_wild, result_own,
+            env.console, env.console,
             WILD_POKEMON,
             std::chrono::seconds(30)
         );
 
-        bool stop = handler.handle_standard_encounter_end_battle(result, EXIT_BATTLE_TIMEOUT);
+        bool stop = handler.handle_standard_encounter_end_battle(result_wild, EXIT_BATTLE_TIMEOUT);
         if (stop){
             break;
         }

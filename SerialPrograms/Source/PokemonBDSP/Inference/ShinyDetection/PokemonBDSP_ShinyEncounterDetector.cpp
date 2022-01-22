@@ -7,6 +7,8 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Inference/InferenceThrottler.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
+#include "CommonFramework/Inference/VisualInferenceRoutines.h"
+#include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP_ShinyTrigger.h"
@@ -228,87 +230,268 @@ DoublesShinyDetection ShinyEncounterDetector::results(){
 
 
 
-DoublesShinyDetection detect_shiny_battle(
+void detect_shiny_battle(
     ProgramEnvironment& env, Logger& logger,
+    DoublesShinyDetection& wild_result,
+    ShinyDetectionResult& your_result,
     VideoFeed& feed, VideoOverlay& overlay,
     const DetectionType& type,
     std::chrono::seconds timeout,
     double overall_threshold, double doubles_threshold
 ){
-    StatAccumulatorI32 capture_stats;
-    StatAccumulatorI32 menu_stats;
-    StatAccumulatorI32 inference_stats;
-    StatAccumulatorI32 throttle_stats;
+    if (GameSettings::instance().USE_NEW_SHINY_DETECTOR){
+        BattleType battle_type = type.full_battle_menu ? BattleType::STANDARD : BattleType::STARTER;
+        ShinyEncounterTracker tracker(logger, overlay, battle_type);
+        int result = wait_until(
+            env, logger, feed, overlay, timeout,
+            { &tracker }
+        );
+        if (result < 0){
+            env.log("ShinyDetector: Battle menu not found after timeout.", COLOR_RED);
+            return;
+        }
+        determine_shiny_status(
+            logger,
+            wild_result, your_result,
+            tracker.dialog_tracker(),
+            tracker.sparkles_wild_overall(),
+            tracker.sparkles_wild_left(),
+            tracker.sparkles_wild_right(),
+            tracker.sparkles_own()
+        );
+        wild_result.best_screenshot = tracker.sparkles_wild_overall().best_image();
+        your_result.best_screenshot = tracker.sparkles_own().best_image();
+        return;
+    }else{
+        StatAccumulatorI32 capture_stats;
+        StatAccumulatorI32 menu_stats;
+        StatAccumulatorI32 inference_stats;
+        StatAccumulatorI32 throttle_stats;
 
-    BattleMenuWatcher menu(type.full_battle_menu ? BattleType::WILD : BattleType::STARTER);
-    VideoOverlaySet overlay_boxes(overlay);
-    menu.make_overlays(overlay_boxes);
-    ShinyEncounterDetector detector(
-        logger, overlay,
-        type,
-        overall_threshold, doubles_threshold
+        BattleMenuWatcher menu(type.full_battle_menu ? BattleType::STANDARD : BattleType::STARTER);
+        VideoOverlaySet overlay_boxes(overlay);
+        menu.make_overlays(overlay_boxes);
+        ShinyEncounterDetector detector(
+            logger, overlay,
+            type,
+            overall_threshold, doubles_threshold
+        );
+
+        bool no_detection = false;
+
+        InferenceThrottler throttler(timeout, std::chrono::milliseconds(50));
+        while (true){
+            env.check_stopping();
+
+            auto time0 = std::chrono::system_clock::now();
+            QImage screen = feed.snapshot();
+    //        if (screen.isNull()){
+    //
+    //        }
+            auto time1 = std::chrono::system_clock::now();
+            capture_stats += std::chrono::duration_cast<std::chrono::milliseconds>(time1 - time0).count();
+            auto timestamp = time1;
+
+    #if 0
+    //        cout << (int)detector.encounter_state() << endl;
+            if (detector.encounter_state() == PokemonSwSh::EncounterState::YOUR_ANIMATION){
+                env.log("ShinyDetector: End of wild entry animation.", COLOR_PURPLE);
+                break;
+            }
+    #endif
+
+            if (menu.detect(screen)){
+                env.log("ShinyDetector: Battle menu found!", COLOR_PURPLE);
+                detector.push_end();
+                break;
+            }
+            auto time2 = std::chrono::system_clock::now();
+            menu_stats += std::chrono::duration_cast<std::chrono::milliseconds>(time2 - time1).count();
+
+            detector.push(screen, timestamp);
+            auto time3 = std::chrono::system_clock::now();
+            inference_stats += std::chrono::duration_cast<std::chrono::milliseconds>(time3 - time2).count();
+
+    //        if (time3 - time2 > std::chrono::milliseconds(50)){
+    //            screen.save("slow-inference.png");
+    //        }
+
+            if (throttler.end_iteration(env)){
+                no_detection = true;
+                dump_image(logger, env.program_info(), "BattleMenu", screen);
+                break;
+            }
+            auto time4 = std::chrono::system_clock::now();
+            throttle_stats += std::chrono::duration_cast<std::chrono::milliseconds>(time4 - time3).count();
+        }
+
+        env.log("Diagnostics: Screenshot: " + capture_stats.dump(" ms", 1), COLOR_MAGENTA);
+        env.log("Diagnostics: Menu Detection: " + menu_stats.dump(" ms", 1), COLOR_MAGENTA);
+        env.log("Diagnostics: Inference: " + inference_stats.dump(" ms", 1), COLOR_MAGENTA);
+        env.log("Diagnostics: Throttle: " + throttle_stats.dump(" ms", 1), COLOR_MAGENTA);
+
+        if (no_detection){
+            env.log("ShinyDetector: Battle menu not found after timeout.", COLOR_RED);
+            return;
+        }
+
+        if (type.full_battle_menu){
+            wild_result = detector.results();
+        }else{
+            your_result = detector.results();
+        }
+    }
+}
+
+
+
+
+
+
+
+
+ShinyEncounterTracker::ShinyEncounterTracker(
+    Logger& logger, VideoOverlay& overlay,
+    BattleType battle_type
+)
+    : VisualInferenceCallback("ShinyEncounterTracker")
+    , m_battle_type(battle_type)
+    , m_logger(logger)
+//    , m_overlay(overlay)
+    , m_battle_menu(battle_type)
+    , m_dialog_tracker(logger, m_dialog_detector)
+    , m_box_wild_left(0.40, 0.02, 0.20, 0.48)
+    , m_box_wild_right(0.70, 0.02, 0.20, 0.48)
+    , m_sparkle_tracker_wild(logger, overlay, m_sparkles_wild, {0.4, 0.02, 0.60, 0.93})
+    , m_sparkle_tracker_own(logger, overlay, m_sparkles_own, {0.0, 0.1, 0.8, 0.8})
+{}
+void ShinyEncounterTracker::make_overlays(VideoOverlaySet& items) const{
+    m_battle_menu.make_overlays(items);
+    m_dialog_tracker.make_overlays(items);
+    items.add(COLOR_RED, m_box_wild_left);
+    items.add(COLOR_RED, m_box_wild_right);
+    m_sparkle_tracker_wild.make_overlays(items);
+    m_sparkle_tracker_own.make_overlays(items);
+}
+bool ShinyEncounterTracker::process_frame(
+    const QImage& frame,
+    std::chrono::system_clock::time_point timestamp
+){
+    using PokemonSwSh::EncounterState;
+
+    if (frame.isNull()){
+        return false;
+    }
+
+    bool battle_menu = m_battle_menu.process_frame(frame, timestamp);
+    if (battle_menu){
+        m_dialog_tracker.push_end(timestamp);
+        return true;
+    }
+
+    m_dialog_tracker.process_frame(frame, timestamp);
+
+    switch (m_dialog_tracker.encounter_state()){
+    case EncounterState::BEFORE_ANYTHING:
+        break;
+    case EncounterState::WILD_ANIMATION:{
+        m_sparkle_tracker_wild.process_frame(frame, timestamp);
+        m_sparkle_tracker_own.clear_boxes();
+        m_best_wild_overall.add_frame(frame, m_sparkles_wild);
+
+        ImagePixelBox box_overall = floatbox_to_pixelbox(frame.width(), frame.height(), {0.4, 0.02, 0.60, 0.93});
+        ImagePixelBox box_left = floatbox_to_pixelbox(frame.width(), frame.height(), m_box_wild_left);
+        ImagePixelBox box_right = floatbox_to_pixelbox(frame.width(), frame.height(), m_box_wild_right);
+        box_left.min_x -= box_overall.min_x;
+        box_left.min_y -= box_overall.min_y;
+        box_left.max_x -= box_overall.min_x;
+        box_left.max_y -= box_overall.min_y;
+        box_right.min_x -= box_overall.min_x;
+        box_right.min_y -= box_overall.min_y;
+        box_right.max_x -= box_overall.min_x;
+        box_right.max_y -= box_overall.min_y;
+
+        m_best_wild_left.add_frame(QImage(), m_sparkles_wild.extract_subbox(box_left));
+        m_best_wild_right.add_frame(QImage(), m_sparkles_wild.extract_subbox(box_right));
+        break;
+    }
+    case EncounterState::YOUR_ANIMATION:
+        m_sparkle_tracker_wild.clear_boxes();
+        m_sparkle_tracker_own.process_frame(frame, timestamp);
+        m_best_own.add_frame(frame, m_sparkles_own);
+        break;
+    case EncounterState::POST_ENTRY:
+        break;
+    }
+
+    return false;
+}
+
+void determine_shiny_status(
+    Logger& logger,
+    DoublesShinyDetection& wild_result,
+    ShinyDetectionResult& your_result,
+    const PokemonSwSh::EncounterDialogTracker& dialog_tracker,
+    const ShinySparkleAggregator& sparkles_wild_overall,
+    const ShinySparkleAggregator& sparkles_wild_left,
+    const ShinySparkleAggregator& sparkles_wild_right,
+    const ShinySparkleAggregator& sparkles_own,
+    double overall_threshold,
+    double doubles_threshold
+){
+    double alpha_wild_overall = sparkles_wild_overall.best_overall();
+    double alpha_wild_left = sparkles_wild_left.best_overall();
+    double alpha_wild_right = sparkles_wild_right.best_overall();
+    double alpha_own = sparkles_own.best_overall();
+
+    {
+        std::chrono::milliseconds dialog_duration = dialog_tracker.wild_animation_duration();
+        std::chrono::milliseconds min_delay = SHINY_ANIMATION_DELAY - std::chrono::milliseconds(300);
+        std::chrono::milliseconds max_delay = SHINY_ANIMATION_DELAY + std::chrono::milliseconds(500);
+        if (min_delay <= dialog_duration && dialog_duration <= max_delay){
+            alpha_wild_overall += 3.5;
+        }
+    }
+    {
+        std::chrono::milliseconds dialog_duration = dialog_tracker.your_animation_duration();
+        std::chrono::milliseconds min_delay = SHINY_ANIMATION_DELAY - std::chrono::milliseconds(300);
+        std::chrono::milliseconds max_delay = SHINY_ANIMATION_DELAY + std::chrono::milliseconds(500);
+        if (min_delay <= dialog_duration && dialog_duration <= max_delay){
+            alpha_own += 3.5;
+        }
+    }
+    logger.log(
+        "ShinyDetector: Wild Alpha = " + QString::number(alpha_wild_overall) +
+        ", Left Alpha = " + QString::number(alpha_wild_left) +
+        ", Right Alpha = " + QString::number(alpha_wild_right) +
+        ", Your Alpha = " + QString::number(alpha_own),
+        COLOR_PURPLE
     );
 
-    bool no_detection = false;
+    wild_result.shiny_type = ShinyType::UNKNOWN;
+    wild_result.left_is_shiny = false;
+    wild_result.right_is_shiny = false;
 
-    InferenceThrottler throttler(timeout, std::chrono::milliseconds(50));
-    while (true){
-        env.check_stopping();
-
-        auto time0 = std::chrono::system_clock::now();
-        QImage screen = feed.snapshot();
-//        if (screen.isNull()){
-//
-//        }
-        auto time1 = std::chrono::system_clock::now();
-        capture_stats += std::chrono::duration_cast<std::chrono::milliseconds>(time1 - time0).count();
-        auto timestamp = time1;
-
-#if 0
-//        cout << (int)detector.encounter_state() << endl;
-        if (detector.encounter_state() == PokemonSwSh::EncounterState::YOUR_ANIMATION){
-            env.log("ShinyDetector: End of wild entry animation.", COLOR_PURPLE);
-            break;
-        }
-#endif
-
-        if (menu.detect(screen)){
-            env.log("ShinyDetector: Battle menu found!", COLOR_PURPLE);
-            detector.push_end();
-            break;
-        }
-        auto time2 = std::chrono::system_clock::now();
-        menu_stats += std::chrono::duration_cast<std::chrono::milliseconds>(time2 - time1).count();
-
-        detector.push(screen, timestamp);
-        auto time3 = std::chrono::system_clock::now();
-        inference_stats += std::chrono::duration_cast<std::chrono::milliseconds>(time3 - time2).count();
-
-//        if (time3 - time2 > std::chrono::milliseconds(50)){
-//            screen.save("slow-inference.png");
-//        }
-
-        if (throttler.end_iteration(env)){
-            no_detection = true;
-            dump_image(logger, env.program_info(), "BattleMenu", screen);
-            break;
-        }
-        auto time4 = std::chrono::system_clock::now();
-        throttle_stats += std::chrono::duration_cast<std::chrono::milliseconds>(time4 - time3).count();
+    if (alpha_wild_overall < overall_threshold){
+        logger.log("ShinyDetector: Wild not Shiny.", COLOR_PURPLE);
+        wild_result.shiny_type = ShinyType::NOT_SHINY;
+    }else{
+        logger.log("ShinyDetector: Detected Wild Shiny!", COLOR_BLUE);
+        wild_result.shiny_type = ShinyType::UNKNOWN_SHINY;
+        wild_result.left_is_shiny = alpha_wild_left >= doubles_threshold;
+        wild_result.right_is_shiny = alpha_wild_right >= doubles_threshold;
     }
 
-    env.log("Diagnostics: Screenshot: " + capture_stats.dump(" ms", 1), COLOR_MAGENTA);
-    env.log("Diagnostics: Menu Detection: " + menu_stats.dump(" ms", 1), COLOR_MAGENTA);
-    env.log("Diagnostics: Inference: " + inference_stats.dump(" ms", 1), COLOR_MAGENTA);
-    env.log("Diagnostics: Throttle: " + throttle_stats.dump(" ms", 1), COLOR_MAGENTA);
-
-    if (no_detection){
-        env.log("ShinyDetector: Battle menu not found after timeout.", COLOR_RED);
-        return DoublesShinyDetection();
+    if (alpha_own < overall_threshold){
+        logger.log("ShinyDetector: Lead not Shiny.", COLOR_PURPLE);
+        your_result.shiny_type = ShinyType::NOT_SHINY;
+    }else{
+        logger.log("ShinyDetector: Detected Lead Shiny!", COLOR_BLUE);
+        your_result.shiny_type = ShinyType::UNKNOWN_SHINY;
     }
-
-    return detector.results();
 }
+
+
 
 
 

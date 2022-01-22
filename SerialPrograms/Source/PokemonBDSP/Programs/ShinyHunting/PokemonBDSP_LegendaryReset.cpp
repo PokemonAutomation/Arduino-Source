@@ -90,7 +90,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env){
         reset = true;
 
         StartBattleDetector start_battle(env.console);
-        BattleMenuWatcher battle_menu(BattleType::WILD);
+        BattleMenuWatcher battle_menu(BattleType::STANDARD);
 
         int ret = run_until(
             env, env.console,
@@ -121,13 +121,17 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env){
         }
 
         //  Detect shiny.
-        DoublesShinyDetection result = detect_shiny_battle(
-            env, env.console, env.console, env.console,
+        DoublesShinyDetection result_wild;
+        ShinyDetectionResult result_own;
+        detect_shiny_battle(
+            env, env.console,
+            result_wild, result_own,
+            env.console, env.console,
             WILD_POKEMON,
             std::chrono::seconds(30)
         );
 
-        bool stop = handler.handle_standard_encounter(result);
+        bool stop = handler.handle_standard_encounter(result_wild);
         if (stop){
             break;
         }

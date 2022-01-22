@@ -52,7 +52,7 @@ public:
         const ShinyDetectionBattle& battle_settings
     );
 
-    const EncounterDialogTracker& dialog_timer() const{ return m_dialog_tracker; }
+    const EncounterDialogTracker& dialog_tracker() const{ return m_dialog_tracker; }
     const ShinySparkleAggregator& sparkles_wild() const{ return m_best_wild; }
 
     virtual void make_overlays(VideoOverlaySet& items) const override;

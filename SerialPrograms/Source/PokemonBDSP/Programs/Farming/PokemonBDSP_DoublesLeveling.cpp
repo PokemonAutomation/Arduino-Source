@@ -105,7 +105,7 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env){
     for (size_t c = 0; c < 5;){
         env.console.botbase().wait_for_all_requests();
 
-        BattleMenuWatcher battle_menu(BattleType::WILD);
+        BattleMenuWatcher battle_menu(BattleType::STANDARD);
         EndBattleWatcher end_battle;
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         int ret = run_until(
@@ -176,13 +176,17 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env){
         }
 
         //  Detect shiny.
-        DoublesShinyDetection result = detect_shiny_battle(
-            env, env.console, env.console, env.console,
+        DoublesShinyDetection result_wild;
+        ShinyDetectionResult result_own;
+        detect_shiny_battle(
+            env, env.console,
+            result_wild, result_own,
+            env.console, env.console,
             WILD_POKEMON,
             std::chrono::seconds(30)
         );
 
-        bool stop = handler.handle_standard_encounter(result);
+        bool stop = handler.handle_standard_encounter(result_wild);
         if (stop){
             break;
         }

@@ -67,7 +67,7 @@ bool BattleMenuDetector::detect(const QImage& screen) const{
     }
 
 
-    if (m_battle_type == BattleType::WILD){
+    if (m_battle_type == BattleType::STANDARD){
         if (!is_white(extract_box(screen, m_ball_left))){
 //            cout << "Not white" << endl;
             return false;

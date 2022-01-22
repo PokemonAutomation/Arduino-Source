@@ -74,15 +74,24 @@ StarterReset::StarterReset(const StarterReset_Descriptor& descriptor)
 
 
 
+struct StarterReset::Stats : public PokemonSwSh::ShinyHuntTracker{
+    Stats()
+        : ShinyHuntTracker(false)
+        , m_shiny_starly(m_stats["Shiny Starly"])
+    {
+        m_display_order.emplace_back("Shiny Starly", true);
+    }
+    std::atomic<uint64_t>& m_shiny_starly;
+};
 std::unique_ptr<StatsTracker> StarterReset::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new PokemonSwSh::ShinyHuntTracker(false));
+    return std::unique_ptr<StatsTracker>(new Stats());
 }
 
 
 
 
 void StarterReset::program(SingleSwitchProgramEnvironment& env){
-    PokemonSwSh::ShinyHuntTracker& stats = env.stats<PokemonSwSh::ShinyHuntTracker>();
+    Stats& stats = env.stats<Stats>();
 
     QImage briefcase(RESOURCE_PATH() + "PokemonBDSP/StarterBriefcase.png");
 
@@ -157,7 +166,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
         {
             SelectionArrowFinder selection_arrow(env.console, {0.50, 0.60, 0.35, 0.20}, COLOR_RED);
             ret = wait_until(
-                env, env.console, std::chrono::seconds(5),
+                env, env.console, std::chrono::seconds(3),
                 { &selection_arrow }
             );
             if (ret == 0){
@@ -173,31 +182,63 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
         }
 
         //  Detect shiny.
-        DoublesShinyDetection result = detect_shiny_battle(
-            env, env.console, env.console, env.console,
+        DoublesShinyDetection result_wild;
+        ShinyDetectionResult result_own;
+        detect_shiny_battle(
+            env, env.console,
+            result_wild, result_own,
+            env.console, env.console,
             YOUR_POKEMON,
             std::chrono::seconds(30)
         );
 
-        if (result.shiny_type == ShinyType::UNKNOWN){
+//        if (result_wild.shiny_type == ShinyType::UNKNOWN || result_own.shiny_type == ShinyType::UNKNOWN){
+        if (result_own.shiny_type == ShinyType::UNKNOWN){
             stats.add_error();
             consecutive_failures++;
             dump_image(env.logger(), env.program_info(), "UnknownShinyDetection", env.console.video().snapshot());
-        }else if (is_shiny(result.shiny_type)){
+        }else{
+            consecutive_failures = 0;
+        }
+
+        bool wild_shiny = is_shiny(result_wild.shiny_type);
+        if (wild_shiny){
+            stats.m_shiny_starly++;
+            send_encounter_notification(
+                env.console,
+                NOTIFICATION_NONSHINY,
+                NOTIFICATION_SHINY,
+                env.program_info(),
+                true, true, {{{"starly"}, ShinyType::UNKNOWN_SHINY}},
+                result_wild.best_screenshot,
+                &stats
+            );
+        }else{
+#if 0
+            send_encounter_notification(
+                env.console,
+                NOTIFICATION_NONSHINY,
+                NOTIFICATION_SHINY,
+                env.program_info(),
+                true, false, {{{"starly"}, ShinyType::NOT_SHINY}},
+                result_wild.best_screenshot,
+                &stats
+            );
+#endif
+        }
+
+        bool your_shiny = is_shiny(result_own.shiny_type);
+        if (your_shiny){
             stats.add_unknown_shiny();
             send_encounter_notification(
                 env.console,
                 NOTIFICATION_NONSHINY,
                 NOTIFICATION_SHINY,
                 env.program_info(),
-                false, true, {{{}, ShinyType::UNKNOWN_SHINY}},
-                result.best_screenshot,
+                true, true, {{{starter}, ShinyType::UNKNOWN_SHINY}},
+                result_own.best_screenshot,
                 &stats
             );
-            if (VIDEO_ON_SHINY){
-                pbf_wait(env.console, 5 * TICKS_PER_SECOND);
-                pbf_press_button(env.console, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
-            }
             break;
         }else{
             stats.add_non_shiny();
@@ -206,13 +247,17 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
                 NOTIFICATION_NONSHINY,
                 NOTIFICATION_SHINY,
                 env.program_info(),
-                false, false, {{{}, ShinyType::NOT_SHINY}},
-                QImage(),
+                true, false, {{{starter}, ShinyType::NOT_SHINY}},
+                result_own.best_screenshot,
                 &stats
             );
         }
 
-        consecutive_failures = 0;
+        if ((wild_shiny || your_shiny) && VIDEO_ON_SHINY){
+            pbf_wait(env.console, 5 * TICKS_PER_SECOND);
+            pbf_press_button(env.console, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+        }
+
     }
 
     env.update_stats();
