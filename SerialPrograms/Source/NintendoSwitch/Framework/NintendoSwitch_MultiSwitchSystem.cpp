@@ -55,8 +55,7 @@ void MultiSwitchSystemFactory::load_json(const QJsonValue& json){
     for (int c = 0; c < array.size(); c++){
         m_switches.emplace_back(
             new SwitchSystemFactory(
-                QString("Switch ") + QString::number(c),
-                "Switch " + std::to_string(c),
+                c,
                 m_min_pabotbase,
                 m_feedback, m_allow_commands_while_running,
                 array[c]
@@ -79,8 +78,7 @@ void MultiSwitchSystemFactory::resize(size_t count){
     while (m_switches.size() < count){
         m_switches.emplace_back(
             new SwitchSystemFactory(
-                QString("Switch ") + QString::number(m_switches.size()),
-                "Switch " + std::to_string(m_switches.size()),
+                m_switches.size(),
                 m_min_pabotbase,
                 m_feedback, m_allow_commands_while_running
             )

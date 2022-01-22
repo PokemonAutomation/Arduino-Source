@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QGroupBox>
+#include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Options/BatchOption/BatchWidget.h"
 #include "SettingsPanelWidget.h"
 

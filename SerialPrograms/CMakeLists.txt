@@ -106,6 +106,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/AutoWidthLineEdit.h
     ../Common/Qt/CodeValidator.cpp
     ../Common/Qt/CodeValidator.h
+    ../Common/Qt/CollapsibleGroupBox.cpp
+    ../Common/Qt/CollapsibleGroupBox.h
     ../Common/Qt/ExpressionEvaluator.cpp
     ../Common/Qt/ExpressionEvaluator.h
     ../Common/Qt/NoWheelComboBox.h

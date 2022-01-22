@@ -19,7 +19,7 @@ public:
     constexpr Color() : m_argb(0) {}
     constexpr explicit Color(uint32_t argb) : m_argb(argb) {}
 
-    constexpr operator bool() const{
+    constexpr explicit operator bool() const{
         return m_argb != 0;
     }
     constexpr explicit operator uint32_t() const{

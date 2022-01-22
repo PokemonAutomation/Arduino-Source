@@ -25,12 +25,12 @@ class SwitchSystemFactory : public SwitchSetupFactory{
 
 public:
     SwitchSystemFactory(
-        QString label, std::string logger_tag,
+        size_t console_id,
         PABotBaseLevel min_pabotbase,
         FeedbackType feedback, bool allow_commands_while_running
     );
     SwitchSystemFactory(
-        QString label, std::string logger_tag,
+        size_t console_id,
         PABotBaseLevel min_pabotbase,
         FeedbackType feedback, bool allow_commands_while_running,
         const QJsonValue& json
@@ -45,9 +45,10 @@ public:
 private:
     friend class SwitchSystemWidget;
 
-    QString m_label;
+    size_t m_console_id;
     std::string m_logger_tag;
 
+//    bool m_settings_visible;
     SerialSelector m_serial;
     CameraSelector m_camera;
 };

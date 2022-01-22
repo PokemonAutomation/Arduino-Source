@@ -4,12 +4,11 @@
  *
  */
 
+#include <QImage>
 #include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "PokemonBDSP_ReceivePokemonDetector.h"
-
-
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

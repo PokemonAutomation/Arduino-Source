@@ -12,8 +12,8 @@
 #include "NintendoSwitch_SwitchSystem.h"
 
 namespace PokemonAutomation{
+    class CollapsibleGroupBox;
 namespace NintendoSwitch{
-
 
 class CommandRow;
 
@@ -55,6 +55,8 @@ private:
     uint64_t m_instance_id = 0;
     SwitchSystemFactory& m_factory;
     SerialLogger m_logger;
+
+    CollapsibleGroupBox* m_group_box;
 
     SerialSelectorWidget* m_serial;
     CommandRow* m_command;

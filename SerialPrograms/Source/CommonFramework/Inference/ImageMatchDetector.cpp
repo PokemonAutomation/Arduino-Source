@@ -4,7 +4,9 @@
  *
  */
 
+#include <cmath>
 #include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "ImageMatchDetector.h"
 
@@ -18,11 +20,13 @@ namespace PokemonAutomation{
 
 ImageMatchDetector::ImageMatchDetector(
     QImage reference_image, const ImageFloatBox& box,
-    double max_rmsd,
+    double max_rmsd, bool scale_brightness,
     Color color
 )
     : m_reference_image(std::move(reference_image))
+    , m_average_brightness(image_stats(m_reference_image).average)
     , m_max_rmsd(max_rmsd)
+    , m_scale_brightness(scale_brightness)
     , m_color(color)
     , m_box(box)
 {
@@ -37,6 +41,17 @@ double ImageMatchDetector::rmsd(const QImage& frame) const{
     if (scaled.size() != m_reference_image.size()){
         scaled = scaled.scaled(m_reference_image.size());
     }
+
+    if (m_scale_brightness){
+        FloatPixel image_brightness = ImageMatch::pixel_average(scaled, m_reference_image);
+        FloatPixel scale = m_average_brightness / image_brightness;
+        if (std::isnan(scale.r)) scale.r = 1.0;
+        if (std::isnan(scale.g)) scale.g = 1.0;
+        if (std::isnan(scale.b)) scale.b = 1.0;
+        scale.bound(0.8, 1.2);
+        ImageMatch::scale_brightness(scaled, scale);
+    }
+
 //    cout << "asdf" << endl;
     double ret = ImageMatch::pixel_RMSD(m_reference_image, scaled);
 //    cout << "rmsd = " << ret << endl;
@@ -54,11 +69,11 @@ bool ImageMatchDetector::detect(const QImage& screen) const{
 
 ImageMatchWatcher::ImageMatchWatcher(
     QImage reference_image, const ImageFloatBox& box,
-    double max_rmsd,
+    double max_rmsd, bool scale_brightness,
     std::chrono::milliseconds hold_duration,
     Color color
 )
-    : ImageMatchDetector(std::move(reference_image), box, max_rmsd, color)
+    : ImageMatchDetector(std::move(reference_image), box, max_rmsd, scale_brightness, color)
     , VisualInferenceCallback("ImageMatchWatcher")
     , m_hold_duration(hold_duration)
     , m_last_match(false)

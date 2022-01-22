@@ -42,6 +42,7 @@ public:
 
     const QString& filename() const{ return m_filename; }
     const QString& filepath() const{ return m_filepath; }
+    bool keep_file() const{ return m_keep_file; }
 
     //  Work around bug in Sleepy that destroys file before it's not needed anymore.
     void extend_lifetime();

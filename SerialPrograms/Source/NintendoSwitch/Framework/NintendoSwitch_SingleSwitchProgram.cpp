@@ -15,7 +15,7 @@ namespace NintendoSwitch{
 SingleSwitchProgramInstance::SingleSwitchProgramInstance(const RunnableSwitchProgramDescriptor& descriptor)
     : RunnableSwitchProgramInstance(descriptor)
     , m_switch(
-        "Switch Settings", "Switch 0",
+        0,
         descriptor.min_pabotbase_level(),
         descriptor.feedback(),
         descriptor.allow_commands_while_running()

@@ -11,6 +11,7 @@
 #include <QGroupBox>
 #include <QScrollArea>
 #include "Common/Cpp/PanicDump.h"
+#include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Options/BatchOption/BatchWidget.h"
 #include "CommonFramework/Tools/StatsDatabase.h"

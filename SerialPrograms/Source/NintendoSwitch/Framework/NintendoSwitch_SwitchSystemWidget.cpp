@@ -6,9 +6,11 @@
 
 #include <QKeyEvent>
 #include <QVBoxLayout>
+#include <QGroupBox>
 #include "Common/Compiler.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/FireForgetDispatcher.h"
+#include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/ControllerDevices/SerialSelectorWidget.h"
 #include "CommonFramework/VideoPipeline/CameraSelectorWidget.h"
 #include "CommonFramework/VideoPipeline/VideoDisplayWidget.h"
@@ -31,23 +33,35 @@ SwitchSystemWidget::SwitchSystemWidget(
     , m_logger(logger, factory.m_logger_tag)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->setAlignment(Qt::AlignTop);
 
-    m_serial = factory.m_serial.make_ui(*this, logger);
-    layout->addWidget(m_serial);
+    m_group_box = new CollapsibleGroupBox(*this, "Console " + QString::number(factory.m_console_id) + " Settings");
+    layout->addWidget(m_group_box);
 
-    m_video_display = new VideoDisplayWidget(*this);
+    QWidget* widget = new QWidget(m_group_box);
+    m_group_box->set_widget(widget);
+    QVBoxLayout* group_layout = new QVBoxLayout(widget);
+    group_layout->setAlignment(Qt::AlignTop);
+    group_layout->setContentsMargins(0, 0, 0, 0);
 
-    m_camera = factory.m_camera.make_ui(*this, logger, *m_video_display);
-    layout->addWidget(m_camera);
+    {
+        m_serial = factory.m_serial.make_ui(*widget, logger);
+        group_layout->addWidget(m_serial);
 
-    m_command = new CommandRow(
-        *this,
-        m_serial->botbase(),
-        m_logger,
-        factory.m_feedback, factory.m_allow_commands_while_running
-    );
-    layout->addWidget(m_command);
+        m_video_display = new VideoDisplayWidget(*this);
+
+        m_camera = factory.m_camera.make_ui(*widget, logger, *m_video_display);
+        group_layout->addWidget(m_camera);
+
+        m_command = new CommandRow(
+            *widget,
+            m_serial->botbase(),
+            m_logger,
+            factory.m_feedback, factory.m_allow_commands_while_running
+        );
+        group_layout->addWidget(m_command);
+    }
 
     layout->addWidget(m_video_display);
     m_camera->reset_video();

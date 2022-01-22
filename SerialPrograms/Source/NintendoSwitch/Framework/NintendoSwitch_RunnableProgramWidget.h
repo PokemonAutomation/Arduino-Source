@@ -30,7 +30,7 @@ protected:
         PanelListener& listener
     );
     void construct();
-    virtual QWidget* make_header(QWidget& parent) override;
+    virtual CollapsibleGroupBox* make_header(QWidget& parent) override;
     virtual QWidget* make_body(QWidget& parent) override;
     virtual QWidget* make_actions(QWidget& parent) override;
 

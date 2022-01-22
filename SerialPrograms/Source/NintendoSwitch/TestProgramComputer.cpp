@@ -38,6 +38,8 @@
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h"
+#include "CommonFramework/Inference/ImageMatchDetector.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 
 #include <iostream>
 using std::cout;
@@ -87,6 +89,24 @@ inline std::string dump8(uint8_t x){
 void TestProgramComputer::program(ProgramEnvironment& env){
     using namespace Kernels;
     using namespace NintendoSwitch::PokemonSwSh;
+
+    QImage image("20220122-020706133705-Briefcase.png");
+
+    QImage briefcase(RESOURCE_PATH() + "PokemonBDSP/StarterBriefcase.png");
+    ImageMatchWatcher detector(briefcase, {0.5, 0.1, 0.5, 0.7}, 100);
+    detector.detect(image);
+
+    EventNotificationOption notification("Test Notification", true, true, ImageAttachmentMode::JPG);
+
+    send_program_notification(
+        env.logger(),
+        notification,
+        COLOR_GREEN,
+        env.program_info(),
+        "Image Test",
+        {},
+        image, false
+    );
 
 
 //    QImage image("mark.png");

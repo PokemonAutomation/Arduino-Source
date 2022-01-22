@@ -10,6 +10,7 @@
 #include <QScrollArea>
 #include <QMessageBox>
 #include "Common/Cpp/Exception.h"
+#include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch_SwitchSetupWidget.h"
@@ -40,10 +41,10 @@ void RunnableSwitchProgramWidget::construct(){
     m_state.store(ProgramState::STOPPED, std::memory_order_release);
     update_ui_after_program_state_change();
 }
-QWidget* RunnableSwitchProgramWidget::make_header(QWidget& parent){
+CollapsibleGroupBox* RunnableSwitchProgramWidget::make_header(QWidget& parent){
     RunnableSwitchProgramInstance& instance = static_cast<RunnableSwitchProgramInstance&>(m_instance);
-    QWidget* header = PanelWidget::make_header(parent);
-    QLayout* layout = header->layout();
+    CollapsibleGroupBox* header = PanelWidget::make_header(parent);
+    QLayout* layout = header->widget()->layout();
 
     QLabel* text = nullptr;
     switch (instance.descriptor().feedback()){

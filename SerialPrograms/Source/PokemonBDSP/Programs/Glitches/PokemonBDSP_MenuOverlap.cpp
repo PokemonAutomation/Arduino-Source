@@ -53,9 +53,9 @@ bool back_out_to_overworld_with_overlap(
     const std::chrono::milliseconds HOLD_DURATION(200);
 
     VideoOverlaySet boxes(console);
-    ImageMatchWatcher background_all(start, {0, 0, 1, 1}, THRESHOLD, HOLD_DURATION);
-    ImageMatchWatcher background_left(start, {0.02, 0.2, 0.08, 0.5}, THRESHOLD, HOLD_DURATION);
-    ImageMatchWatcher background_right(start, {0.90, 0.2, 0.08, 0.5}, THRESHOLD, HOLD_DURATION);
+    ImageMatchWatcher background_all(start, {0, 0, 1, 1}, THRESHOLD, false, HOLD_DURATION);
+    ImageMatchWatcher background_left(start, {0.02, 0.2, 0.08, 0.5}, THRESHOLD, false, HOLD_DURATION);
+    ImageMatchWatcher background_right(start, {0.90, 0.2, 0.08, 0.5}, THRESHOLD, false, HOLD_DURATION);
     background_all.make_overlays(boxes);
     background_left.make_overlays(boxes);
     background_right.make_overlays(boxes);
@@ -98,7 +98,7 @@ void back_out_to_overworld(
     const std::chrono::milliseconds HOLD_DURATION(200);
 
     VideoOverlaySet boxes(console);
-    ImageMatchWatcher background_all(start, {0, 0, 1, 1}, THRESHOLD, HOLD_DURATION);
+    ImageMatchWatcher background_all(start, {0, 0, 1, 1}, THRESHOLD, false, HOLD_DURATION);
     background_all.make_overlays(boxes);
 
     int ret = run_until(

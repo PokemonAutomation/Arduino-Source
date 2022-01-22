@@ -10,6 +10,7 @@
 #include <QImage>
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTools/FloatPixel.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 
@@ -19,7 +20,7 @@ class ImageMatchDetector : public StaticScreenDetector{
 public:
     ImageMatchDetector(
         QImage reference_image, const ImageFloatBox& box,
-        double max_rmsd,
+        double max_rmsd, bool scale_brightness = false,
         Color color = COLOR_RED
     );
 
@@ -30,7 +31,10 @@ public:
 
 private:
     QImage m_reference_image;
+    FloatPixel m_average_brightness;
+
     double m_max_rmsd;
+    bool m_scale_brightness;
 
     Color m_color;
     ImageFloatBox m_box;
@@ -41,7 +45,7 @@ class ImageMatchWatcher : public ImageMatchDetector, public VisualInferenceCallb
 public:
     ImageMatchWatcher(
         QImage reference_image, const ImageFloatBox& box,
-        double max_rmsd,
+        double max_rmsd, bool scale_brightness = false,
         std::chrono::milliseconds hold_duration = std::chrono::milliseconds(0),
         Color color = COLOR_RED
     );

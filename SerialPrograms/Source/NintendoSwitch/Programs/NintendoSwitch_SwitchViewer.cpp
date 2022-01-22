@@ -5,6 +5,7 @@
  */
 
 #include <QVBoxLayout>
+#include "Common/Qt/CollapsibleGroupBox.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchSystemWidget.h"
 #include "NintendoSwitch_SwitchViewer.h"
 

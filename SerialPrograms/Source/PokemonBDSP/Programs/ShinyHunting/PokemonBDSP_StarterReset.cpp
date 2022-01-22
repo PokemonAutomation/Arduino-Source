@@ -122,7 +122,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
         pbf_move_left_joystick(env.console, 128, 0, TICKS_PER_SECOND, 0);
 
         //  Mash B until we see the briefcase.
-        ImageMatchWatcher detector(briefcase, {0.5, 0.1, 0.5, 0.7}, 100);
+        ImageMatchWatcher detector(briefcase, {0.5, 0.1, 0.5, 0.7}, 100, true);
         int ret = run_until(
             env, env.console,
             [](const BotBaseContext& context){

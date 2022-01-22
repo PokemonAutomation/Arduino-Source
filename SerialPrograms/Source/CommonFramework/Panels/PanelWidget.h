@@ -12,6 +12,7 @@
 
 namespace PokemonAutomation{
 
+class CollapsibleGroupBox;
 
 class PanelWidget : public QWidget{
 public:
@@ -25,7 +26,7 @@ public:
     PanelInstance& instance(){ return m_instance; }
 
 protected:
-    virtual QWidget* make_header(QWidget& parent);
+    virtual CollapsibleGroupBox* make_header(QWidget& parent);
 
 protected:
     PanelInstance& m_instance;

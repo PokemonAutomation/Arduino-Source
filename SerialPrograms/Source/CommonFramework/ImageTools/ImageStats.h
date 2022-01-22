@@ -7,8 +7,9 @@
 #ifndef PokemonAutomation_CommonFramework_ImageStats_H
 #define PokemonAutomation_CommonFramework_ImageStats_H
 
-#include <QImage>
 #include "FloatPixel.h"
+
+class QImage;
 
 namespace PokemonAutomation{
 

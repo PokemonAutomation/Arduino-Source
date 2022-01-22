@@ -79,6 +79,7 @@ SOURCES += \
     ../Common/Qt/AutoHeightTable.cpp \
     ../Common/Qt/AutoWidthLineEdit.cpp \
     ../Common/Qt/CodeValidator.cpp \
+    ../Common/Qt/CollapsibleGroupBox.cpp \
     ../Common/Qt/ExpressionEvaluator.cpp \
     ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseOption.cpp \
     ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseWidget.cpp \
@@ -579,6 +580,7 @@ HEADERS += \
     ../Common/Qt/AutoHeightTable.h \
     ../Common/Qt/AutoWidthLineEdit.h \
     ../Common/Qt/CodeValidator.h \
+    ../Common/Qt/CollapsibleGroupBox.h \
     ../Common/Qt/ExpressionEvaluator.h \
     ../Common/Qt/NoWheelComboBox.h \
     ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseOption.h \

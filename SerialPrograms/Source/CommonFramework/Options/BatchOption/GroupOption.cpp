@@ -4,7 +4,9 @@
  *
  */
 
+#include <QVBoxLayout>
 #include <QLabel>
+#include <QGroupBox>
 #include "Common/Compiler.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "GroupOption.h"
@@ -32,7 +34,7 @@ bool GroupOption::enabled() const{
 void GroupOption::load_json(const QJsonValue& json){
     BatchOption::load_json(json);
     if (m_toggleable){
-        bool enabled;
+        bool enabled = true;
         json_get_bool(enabled, json.toObject(), "Enabled");
         m_enabled.store(enabled, std::memory_order_relaxed);
         on_set_enabled(enabled);

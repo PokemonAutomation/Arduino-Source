@@ -200,6 +200,10 @@ public:
 public:
     void send(std::string embed, std::string channels, std::string messages, std::shared_ptr<PendingFileSend> file) {
         if (m_sleepy_client != nullptr) {
+            if (file){
+//                cout << "Sending: " << file->filepath().toStdString() << endl;
+                m_active_list.emplace(file->filepath().toStdString(), file);
+            }
             SleepyDiscordSender::instance().send(embed, channels, messages, std::move(file));
         }else{
             sleepy_logger().log("SleepyDiscordClient::send(): Not connected.", COLOR_RED);
@@ -217,8 +221,20 @@ public:
         switch (response) {
         case SleepyResponse::Connected: m_connected = true; break;
         case SleepyResponse::Disconnected: m_connected = false; break;
-        case SleepyResponse::RemoveFile:
-        {
+        case SleepyResponse::RemoveFile:{
+#if 1
+            auto iter = m_active_list.find(message);
+//            cout << "Removing: " << message << endl;
+//            cout << "m_active_list = " << m_active_list.size() << endl;
+            if (iter != m_active_list.end()){
+                msg = "Marking sent file as done. (Callback: " + (std::string)enum_str_callback[response] + ")";
+                m_active_list.erase(iter);
+            }else{
+                msg = "Unknown sent file. (Callback: " + (std::string)enum_str_callback[response] + ")";
+                color = COLOR_RED;
+            }
+            m_active_list.erase(message);
+#else
             bool success = QFile(message).remove();
             if (success){
                 msg = "Removed sent file. (Callback: " + (std::string)enum_str_callback[response] + ")";
@@ -226,7 +242,9 @@ public:
                 msg = "Failed to remove sent file. (Callback: " + (std::string)enum_str_callback[response] + ")";
                 color = COLOR_RED;
             }
-        }; break;
+#endif
+            break;
+        }
         }
 
         sleepy_logger().log(msg, color);
@@ -408,6 +426,8 @@ private:
         std::string message = Integration::reset_serial(id);
         send_response(SleepyRequest::ResetSerial, channel, message);
     }
+
+    std::map<std::string, std::shared_ptr<PendingFileSend>> m_active_list;
 };
 
 
@@ -472,10 +492,10 @@ void sleepy_cmd_response(int request, char* channel, uint64_t console_id, uint16
 void send_message_sleepy(bool should_ping, const std::vector<QString>& tags, const QString& message, QJsonObject& embed, std::shared_ptr<PendingFileSend> file) {
     std::lock_guard<std::mutex> lg(m_client_lock);
     if (m_sleepy_client != nullptr) {
-        //  TODO: Once file cleanup works, remove this.
-        if (file){
-            file->extend_lifetime();
-        }
+//        //  TODO: Once file cleanup works, remove this.
+//        if (file){
+//            file->extend_lifetime();
+//        }
 
         std::set<QString> tag_set;
         for (const QString& tag : tags){

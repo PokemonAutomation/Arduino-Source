@@ -20,25 +20,25 @@ const QString SwitchSystemFactory::JSON_CAMERA_RESOLUTION   = "CameraResolution"
 
 
 SwitchSystemFactory::SwitchSystemFactory(
-    QString label, std::string logger_tag,
+    size_t console_id,
     PABotBaseLevel min_pabotbase,
     FeedbackType feedback, bool allow_commands_while_running
 )
     : SwitchSetupFactory(min_pabotbase, feedback, allow_commands_while_running)
-    , m_label(std::move(label))
-    , m_logger_tag(std::move(logger_tag))
+    , m_console_id(console_id)
+    , m_logger_tag("Console " + std::to_string(console_id))
+//    , m_settings_visible(true)
     , m_serial("<b>Serial Port:</b>", m_logger_tag, min_pabotbase)
-    , m_camera(DEFAULT_RESOLUTION, std::move(label))
+    , m_camera(DEFAULT_RESOLUTION)
 {}
 SwitchSystemFactory::SwitchSystemFactory(
-    QString label, std::string logger_tag,
+    size_t console_id,
     PABotBaseLevel min_pabotbase,
     FeedbackType feedback, bool allow_commands_while_running,
     const QJsonValue& json
 )
     : SwitchSystemFactory(
-          std::move(label),
-          std::move(logger_tag),
+          console_id,
           min_pabotbase,
           feedback, allow_commands_while_running
      )
@@ -47,11 +47,13 @@ SwitchSystemFactory::SwitchSystemFactory(
 }
 void SwitchSystemFactory::load_json(const QJsonValue& json){
     QJsonObject obj = json.toObject();
+//    json_get_bool(m_settings_visible, obj, "SettingsVisible");
     m_serial.load_json(json_get_value_nothrow(obj, JSON_SERIAL));
     m_camera.load_json(json_get_value_nothrow(obj, JSON_CAMERA));
 }
 QJsonValue SwitchSystemFactory::to_json() const{
     QJsonObject root;
+//    root.insert("SettingsVisible", m_settings_visible);
     root.insert(JSON_SERIAL, m_serial.to_json());
     root.insert(JSON_CAMERA, m_camera.to_json());
     return root;

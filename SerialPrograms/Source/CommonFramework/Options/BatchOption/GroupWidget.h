@@ -4,13 +4,14 @@
  *
  */
 
-#include <QVBoxLayout>
-#include <QGroupBox>
 #include "BatchWidget.h"
 #include "GroupOption.h"
 
 #ifndef PokemonAutomation_GroupWidget_H
 #define PokemonAutomation_GroupWidget_H
+
+class QVBoxLayout;
+class QGroupBox;
 
 namespace PokemonAutomation{
 
