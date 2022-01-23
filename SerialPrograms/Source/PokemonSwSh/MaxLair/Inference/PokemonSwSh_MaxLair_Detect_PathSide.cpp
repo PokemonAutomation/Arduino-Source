@@ -5,6 +5,7 @@
  */
 
 #include <cmath>
+#include "Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixBase.tpp"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"

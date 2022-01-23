@@ -5,6 +5,8 @@
  */
 
 #include <cmath>
+#include <vector>
+#include <QImage>
 #include "Common/Cpp/Exception.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "ImageDiff.h"
