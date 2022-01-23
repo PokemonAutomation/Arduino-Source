@@ -7,8 +7,6 @@
 #ifndef PokemonAutomation_PokemonSwSh_ShinyEncounterDetector_H
 #define PokemonAutomation_PokemonSwSh_ShinyEncounterDetector_H
 
-#include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 #include "Pokemon/Pokemon_DataTypes.h"
@@ -31,16 +29,6 @@ struct ShinyDetectionBattle{
 };
 extern const ShinyDetectionBattle SHINY_BATTLE_REGULAR;
 extern const ShinyDetectionBattle SHINY_BATTLE_RAID;
-
-
-
-ShinyDetectionResult detect_shiny_battle(
-    ProgramEnvironment& env, Logger& logger,
-    VideoFeed& feed, VideoOverlay& overlay,
-    const ShinyDetectionBattle& battle_settings,
-    std::chrono::seconds timeout,
-    double detection_threshold = 2.0
-);
 
 
 
@@ -86,6 +74,17 @@ ShinyType determine_shiny_status(
     const ShinyDetectionBattle& battle_settings,
     const EncounterDialogTracker& dialog_tracker,
     const ShinySparkleAggregator& sparkles,
+    double detection_threshold = 2.0
+);
+
+
+
+
+ShinyDetectionResult detect_shiny_battle(
+    ProgramEnvironment& env, Logger& logger,
+    VideoFeed& feed, VideoOverlay& overlay,
+    const ShinyDetectionBattle& battle_settings,
+    std::chrono::seconds timeout,
     double detection_threshold = 2.0
 );
 

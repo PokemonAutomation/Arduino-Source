@@ -10,8 +10,6 @@
 #include "ImageDiff.h"
 #include "SilhouetteDictionaryMatcher.h"
 
-#include "CommonFramework/Inference/ImageTools.h"
-
 #include <iostream>
 using std::cout;
 using std::endl;

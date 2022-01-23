@@ -4,10 +4,11 @@
  *
  */
 
+#include <QImage>
 #include "Common/Compiler.h"
-#include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/Inference/ImageTools.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "PokemonBDSP_EndBattleDetector.h"
 

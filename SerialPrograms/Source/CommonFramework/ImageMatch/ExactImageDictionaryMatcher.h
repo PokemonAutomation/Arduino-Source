@@ -9,13 +9,12 @@
 
 #include <string>
 #include <map>
-#include <QImage>
 #include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Inference/ImageTools.h"
 #include "ImageMatchResult.h"
 #include "ExactImageMatcher.h"
 
 namespace PokemonAutomation{
+    struct ImageFloatBox;
 namespace ImageMatch{
 
 

@@ -4,9 +4,10 @@
  *
  */
 
+#include <QImage>
 #include "Common/Compiler.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
-#include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/Inference/InferenceThrottler.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "PokemonBDSP_StartBattleDetector.h"

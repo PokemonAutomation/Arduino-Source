@@ -118,9 +118,7 @@ SOURCES += \
     Source/CommonFramework/ImageMatch/ImageMatchResult.cpp \
     Source/CommonFramework/ImageMatch/ScaleBrightness.cpp \
     Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.cpp \
-    Source/CommonFramework/ImageTools/CellMatrix.cpp \
     Source/CommonFramework/ImageTools/ColorClustering.cpp \
-    Source/CommonFramework/ImageTools/FillGeometry.cpp \
     Source/CommonFramework/ImageTools/FloatPixel.cpp \
     Source/CommonFramework/ImageTools/ImageBoxes.cpp \
     Source/CommonFramework/ImageTools/ImageStats.cpp \
@@ -310,7 +308,6 @@ SOURCES += \
     Source/PokemonBDSP/Inference/PokemonBDSP_VSSeekerReaction.cpp \
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.cpp \
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinySparkleSet.cpp \
-    Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyTrigger.cpp \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterEnums.cpp \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOption.cpp \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOverride.cpp \
@@ -383,14 +380,9 @@ SOURCES += \
     Source/PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.cpp \
     Source/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.cpp \
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleDetector.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleSet.cpp \
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyTrigger.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.cpp \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorSquare.cpp \
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleTrigger.cpp \
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareDetector.cpp \
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareTrigger.cpp \
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateIVCheckerOCR.cpp \
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateNameOCRPokedex.cpp \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.cpp \
@@ -619,10 +611,8 @@ HEADERS += \
     Source/CommonFramework/ImageMatch/ImageMatchResult.h \
     Source/CommonFramework/ImageMatch/ScaleBrightness.h \
     Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h \
-    Source/CommonFramework/ImageTools/CellMatrix.h \
     Source/CommonFramework/ImageTools/ColorClustering.h \
     Source/CommonFramework/ImageTools/DistanceToLine.h \
-    Source/CommonFramework/ImageTools/FillGeometry.h \
     Source/CommonFramework/ImageTools/FloatPixel.h \
     Source/CommonFramework/ImageTools/ImageBoxes.h \
     Source/CommonFramework/ImageTools/ImageStats.h \
@@ -851,7 +841,6 @@ HEADERS += \
     Source/PokemonBDSP/Inference/PokemonBDSP_VSSeekerReaction.h \
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h \
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinySparkleSet.h \
-    Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyTrigger.h \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterEnums.h \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOption.h \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOverride.h \
@@ -931,15 +920,9 @@ HEADERS += \
     Source/PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h \
     Source/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h \
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyFilters.h \
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleDetector.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleSet.h \
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyTrigger.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.h \
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorSquare.h \
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleTrigger.h \
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareDetector.h \
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareTrigger.h \
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateIVCheckerOCR.h \
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateNameOCRPokedex.h \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h \

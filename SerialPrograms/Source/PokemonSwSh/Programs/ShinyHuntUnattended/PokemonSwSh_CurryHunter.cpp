@@ -13,7 +13,7 @@
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_ReceivePokemonDetector.h"
-#include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleDetector.h"
+//#include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleDetector.h"
 #include "PokemonSwSh_CurryHunter.h"
 
 namespace PokemonAutomation{
@@ -149,13 +149,13 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env){
             env.console.botbase().wait_for_all_requests();
 
             ReceivePokemonDetector receive_detector;
-            ShinySparkleDetector shiny_detector(
-                env.console, env.console,
-                ImageFloatBox(0.1, 0.01, 0.8, 0.77)
-            );
+//            ShinySparkleDetector shiny_detector(
+//                env.console, env.console,
+//                ImageFloatBox(0.1, 0.01, 0.8, 0.77)
+//            );
             AsyncVisualInferenceSession inference(env, env.console, env.console, env.console);
             inference += receive_detector;
-            inference += shiny_detector;
+//            inference += shiny_detector;
 
             //  Different implementation of the "attract curry Pokemon" routine. DEFAULT
             pbf_move_left_joystick(env.console, 0x80, 0x00, 40, 5);     //  Move up a bit to avoid talking to your pokemon.
@@ -220,7 +220,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env){
             env.console.botbase().wait_for_all_requests();
             ShinyType shininess = ShinyType::NOT_SHINY;
             if (inference.stop() != nullptr){
-                shininess = shiny_detector.results();
+//                shininess = shiny_detector.results();
 #if 1
                 stats.add_non_shiny();
 #else

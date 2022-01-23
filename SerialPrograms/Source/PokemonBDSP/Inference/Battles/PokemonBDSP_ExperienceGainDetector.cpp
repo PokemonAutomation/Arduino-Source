@@ -4,8 +4,10 @@
  *
  */
 
+#include <QImage>
 #include "Common/Compiler.h"
 #include "Common/Cpp/FixedLimitVector.tpp"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "PokemonBDSP_ExperienceGainDetector.h"

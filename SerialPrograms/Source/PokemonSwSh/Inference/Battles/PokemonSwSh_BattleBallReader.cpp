@@ -5,7 +5,6 @@
  */
 
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/OCR/OCR_StringNormalization.h"
 #include "CommonFramework/OCR/OCR_Filtering.h"

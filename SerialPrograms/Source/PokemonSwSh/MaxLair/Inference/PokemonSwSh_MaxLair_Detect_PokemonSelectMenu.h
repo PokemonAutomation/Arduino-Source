@@ -10,10 +10,10 @@
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
+    struct ImageStats;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{

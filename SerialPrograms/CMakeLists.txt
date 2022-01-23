@@ -177,15 +177,9 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h
     Source/CommonFramework/ImageMatch/ScaleBrightness.cpp
     Source/CommonFramework/ImageMatch/ScaleBrightness.h
-    Source/CommonFramework/ImageTools/CellMatrix.cpp
-    Source/CommonFramework/ImageTools/CellMatrix.h
     Source/CommonFramework/ImageTools/ColorClustering.cpp
     Source/CommonFramework/ImageTools/ColorClustering.h
-    Source/CommonFramework/ImageTools/CommonFilters.cpp
-    Source/CommonFramework/ImageTools/CommonFilters.h
     Source/CommonFramework/ImageTools/DistanceToLine.h
-    Source/CommonFramework/ImageTools/FillGeometry.cpp
-    Source/CommonFramework/ImageTools/FillGeometry.h
     Source/CommonFramework/ImageTools/FloatPixel.cpp
     Source/CommonFramework/ImageTools/FloatPixel.h
     Source/CommonFramework/ImageTools/ImageBoxes.cpp
@@ -614,8 +608,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinySparkleSet.cpp
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinySparkleSet.h
-    Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyTrigger.cpp
-    Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyTrigger.h
     Source/PokemonBDSP/Options/PokemonBDSP_BerrySelector.cpp
     Source/PokemonBDSP/Options/PokemonBDSP_BerrySelector.h
     Source/PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.cpp
@@ -767,23 +759,12 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.cpp
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyFilters.h
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleDetector.cpp
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleDetector.h
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleSet.cpp
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleSet.h
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyTrigger.cpp
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyTrigger.h
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleTrigger.cpp
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleTrigger.h
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareDetector.cpp
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareDetector.h
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.cpp
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.h
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorSquare.cpp
     Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorSquare.h
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareTrigger.cpp
-    Source/PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SquareTrigger.h
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateIVCheckerOCR.cpp
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateIVCheckerOCR.h
     Source/PokemonSwSh/InferenceTraining/PokemonSwSh_GenerateNameOCRPokedex.cpp

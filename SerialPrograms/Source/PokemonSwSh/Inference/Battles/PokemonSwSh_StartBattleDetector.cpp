@@ -4,9 +4,10 @@
  *
  */
 
+#include <QImage>
 #include "Common/Compiler.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
-#include "CommonFramework/Inference/ImageTools.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
 #include "PokemonSwSh_StartBattleDetector.h"
 
 #include <iostream>

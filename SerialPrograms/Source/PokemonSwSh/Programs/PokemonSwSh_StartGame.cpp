@@ -4,9 +4,9 @@
  *
  */
 
-#include "CommonFramework/Tools/VideoFeed.h"
+#include <QImage>
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/Inference/ImageTools.h"
+#include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Inference/InferenceThrottler.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"

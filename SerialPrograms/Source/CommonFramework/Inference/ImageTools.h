@@ -7,17 +7,12 @@
 #ifndef PokemonAutomation_CommonFramework_ImageTools_H
 #define PokemonAutomation_CommonFramework_ImageTools_H
 
-#include <ostream>
-#include <QImage>
-#include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/ImageTools/FloatPixel.h"
-#include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/ImageTools/FillGeometry.h"
+class QImage;
 
 namespace PokemonAutomation{
 
 
-
+//  Deprecated
 QImage image_diff_greyscale(const QImage& x, const QImage& y);
 
 

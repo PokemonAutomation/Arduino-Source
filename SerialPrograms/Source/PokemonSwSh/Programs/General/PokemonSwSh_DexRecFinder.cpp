@@ -7,7 +7,6 @@
 #include <QJsonValue>
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "CommonFramework/OCR/OCR_Filtering.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"

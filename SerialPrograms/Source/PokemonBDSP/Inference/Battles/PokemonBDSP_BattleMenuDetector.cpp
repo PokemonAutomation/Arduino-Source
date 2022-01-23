@@ -8,7 +8,6 @@
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/ColorClustering.h"
-#include "CommonFramework/Inference/ImageTools.h"
 #include "PokemonBDSP_BattleMenuDetector.h"
 
 #include <iostream>

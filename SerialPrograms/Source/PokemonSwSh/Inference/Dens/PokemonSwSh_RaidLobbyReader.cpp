@@ -7,7 +7,9 @@
  *
  */
 
-#include "CommonFramework/Inference/ImageTools.h"
+#include <QImage>
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTools/ImageStats.h"
 #include "PokemonSwSh_RaidLobbyReader.h"
 
 //#include <iostream>

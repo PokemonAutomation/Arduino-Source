@@ -4,9 +4,9 @@
  *
  */
 
-#include "CommonFramework/Tools/VideoOverlaySet.h"
+#include <QImage>
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/Inference/ImageTools.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "PokemonBDSP_DialogDetector.h"
 
 #include <iostream>

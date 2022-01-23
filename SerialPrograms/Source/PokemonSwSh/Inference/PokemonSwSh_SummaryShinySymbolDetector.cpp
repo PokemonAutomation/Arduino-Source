@@ -9,7 +9,6 @@
 
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/ColorClustering.h"
-#include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/Inference/InferenceThrottler.h"
 #include "PokemonSwSh_SummaryShinySymbolDetector.h"
 

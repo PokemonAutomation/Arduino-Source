@@ -9,7 +9,6 @@
 
 #include "Common/Cpp/FixedLimitVector.h"
 #include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/Inference/ImageTools.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"

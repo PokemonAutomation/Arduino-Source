@@ -7,14 +7,12 @@
 #ifndef PokemonAutomation_PokemonBDSP_ShinyEncounterDetector_H
 #define PokemonAutomation_PokemonBDSP_ShinyEncounterDetector_H
 
-#include "CommonFramework/Logging/Logger.h"
-#include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "Pokemon/Pokemon_DataTypes.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
+#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogTracker.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
-#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogTracker.h"
 #include "PokemonBDSP_ShinySparkleSet.h"
 
 namespace PokemonAutomation{
@@ -38,19 +36,6 @@ struct DetectionType{
 };
 extern const DetectionType WILD_POKEMON;
 extern const DetectionType YOUR_POKEMON;
-
-
-void detect_shiny_battle(
-    ProgramEnvironment& env, Logger& logger,
-    DoublesShinyDetection& wild_result,
-    ShinyDetectionResult& your_result,
-    VideoFeed& feed, VideoOverlay& overlay,
-    const DetectionType& type,
-    std::chrono::seconds timeout,
-    double overall_threshold = 5.0,
-    double doubles_threshold = 3.0
-);
-
 
 
 
@@ -113,6 +98,19 @@ void determine_shiny_status(
     const ShinySparkleAggregator& sparkles_wild_left,
     const ShinySparkleAggregator& sparkles_wild_right,
     const ShinySparkleAggregator& sparkles_own,
+    double overall_threshold = 5.0,
+    double doubles_threshold = 3.0
+);
+
+
+
+void detect_shiny_battle(
+    ProgramEnvironment& env, Logger& logger,
+    DoublesShinyDetection& wild_result,
+    ShinyDetectionResult& your_result,
+    VideoFeed& feed, VideoOverlay& overlay,
+    const DetectionType& type,
+    std::chrono::seconds timeout,
     double overall_threshold = 5.0,
     double doubles_threshold = 3.0
 );

@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Inference/ImageTools.h"
+#include <QImage>
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
 #include "PokemonSwSh_BattleDialogTracker.h"
 

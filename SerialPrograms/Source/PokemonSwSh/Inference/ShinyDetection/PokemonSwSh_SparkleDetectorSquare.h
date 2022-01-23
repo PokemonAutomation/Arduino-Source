@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonSwSh_SquareDetector2_H
-#define PokemonAutomation_PokemonSwSh_SquareDetector2_H
+#ifndef PokemonAutomation_PokemonSwSh_SquareDetector_H
+#define PokemonAutomation_PokemonSwSh_SquareDetector_H
 
 #include <cstddef>
 

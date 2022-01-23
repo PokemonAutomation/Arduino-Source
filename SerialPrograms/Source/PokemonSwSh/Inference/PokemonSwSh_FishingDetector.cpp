@@ -4,10 +4,10 @@
  *
  */
 
+#include <QImage>
 #include "Common/Compiler.h"
-#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/Inference/ImageTools.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/Inference/InferenceThrottler.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "PokemonSwSh_MarkFinder.h"

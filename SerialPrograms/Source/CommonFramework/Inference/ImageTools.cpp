@@ -5,7 +5,9 @@
  */
 
 #include <cmath>
+#include <QImage>
 #include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/ImageTools/FloatPixel.h"
 #include "ImageTools.h"
 
 namespace PokemonAutomation{

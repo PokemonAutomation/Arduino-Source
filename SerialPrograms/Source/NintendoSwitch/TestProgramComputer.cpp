@@ -11,8 +11,6 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/ImageTools/FillGeometry.h"
-#include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyFilters.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
