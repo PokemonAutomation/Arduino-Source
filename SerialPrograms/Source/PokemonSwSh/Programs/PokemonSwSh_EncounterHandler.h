@@ -46,7 +46,6 @@ private:
 private:
     ProgramEnvironment& m_env;
     ConsoleHandle& m_console;
-    bool m_enable_notifications;
     const Language m_language;
     EncounterBotCommonOptions& m_settings;
 

@@ -95,6 +95,7 @@ TextImageFilter make_OCR_filter(const QImage& image){
     size_t lo = std::max((int)largest_index - 2, 0);
     size_t hi = std::min(largest_index + 2, BUCKETS);
 
+#if 0
     size_t below = 0;
     for (size_t c = 0; c < lo; c++){
         below += histogram[c];
@@ -105,8 +106,6 @@ TextImageFilter make_OCR_filter(const QImage& image){
         above += histogram[c];
     }
 
-
-#if 0
     TextImageFilter filter;
     if (below < above){
         filter.black_text = false;

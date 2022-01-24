@@ -26,12 +26,10 @@ StandardEncounterDetection::StandardEncounterDetection(
     const DoublesShinyDetection& shininess,
     std::chrono::milliseconds read_name_delay
 )
-    : m_env(env)
-    , m_console(console)
+    : m_console(console)
     , m_language(language)
     , m_filter(filter)
     , m_shininess(shininess)
-    , m_read_name_delay(read_name_delay)
     , m_double_battle(false)
 {
     InferenceBoxScope left_mon_white(console, {0.685, 0.065, 0.025, 0.040});

@@ -58,20 +58,17 @@ private:
     ) const;
 
 private:
-    ProgramEnvironment& m_env;
     ConsoleHandle& m_console;
 
     const Language m_language;
 
     const EncounterFilterOption& m_filter;
     const DoublesShinyDetection& m_shininess;
-    const std::chrono::milliseconds m_read_name_delay;
 
     bool m_double_battle = false;
     ShinyType m_shininess_left;
     ShinyType m_shininess_right;
 
-    bool m_name_read = false;
     PokemonDetection m_pokemon_left;
     PokemonDetection m_pokemon_right;
 };
