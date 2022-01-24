@@ -6,6 +6,7 @@
 
 #include <QImage>
 #include "Common/Cpp/Exception.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "ImageBoxes.h"
 
 #include <iostream>
@@ -30,6 +31,9 @@ ImagePixelBox::ImagePixelBox(size_t p_min_x, size_t p_min_y, size_t p_max_x, siz
         );
     }
 }
+ImagePixelBox::ImagePixelBox(const Kernels::Waterfill::WaterfillObject& object)
+    : ImagePixelBox(object.min_x, object.min_y, object.max_x, object.max_y)
+{}
 
 
 

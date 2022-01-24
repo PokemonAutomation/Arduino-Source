@@ -81,10 +81,10 @@ TypeSprite::TypeSprite(const std::string& slug)
     //  Compute white objects.
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_min(m_sprite, 224, 224, 224);
 
-    std::vector<WaterFillObject> objects = find_objects_inplace(matrix, 10, false);
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 10, false);
 
-    WaterFillObject object;
-    for (const WaterFillObject& item : objects){
+    WaterfillObject object;
+    for (const WaterfillObject& item : objects){
 //        cout << item.center_x() << "," << item.center_y() << endl;
         object.merge_assume_no_overlap(item);
     }

@@ -89,7 +89,7 @@ void ShinySparkleSetBDSP::update_alphas(){
 ShinySparkleSetBDSP find_sparkles(Kernels::PackedBinaryMatrix& matrix){
     ShinySparkleSetBDSP sparkles;
     WaterFillIterator finder(matrix, 20);
-    WaterFillObject object;
+    WaterfillObject object;
     while (finder.find_next(object)){
         PokemonSwSh::RadialSparkleDetector radial_sparkle(object);
         if (radial_sparkle.is_ball()){

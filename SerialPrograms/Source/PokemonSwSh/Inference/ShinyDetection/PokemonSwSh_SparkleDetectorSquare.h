@@ -13,7 +13,7 @@ namespace PokemonAutomation{
 namespace Kernels{
 namespace Waterfill{
 
-class WaterFillObject;
+class WaterfillObject;
 
 }
 }
@@ -25,8 +25,8 @@ namespace PokemonSwSh{
 
 
 
-bool is_square_sparkle(const Kernels::Waterfill::WaterFillObject& object, double max_deviation = 0.04);
-bool is_line_sparkle(const Kernels::Waterfill::WaterFillObject& object, size_t min_pixel_width = 100);
+bool is_square_sparkle(const Kernels::Waterfill::WaterfillObject& object, double max_deviation = 0.04);
+bool is_line_sparkle(const Kernels::Waterfill::WaterfillObject& object, size_t min_pixel_width = 100);
 
 
 

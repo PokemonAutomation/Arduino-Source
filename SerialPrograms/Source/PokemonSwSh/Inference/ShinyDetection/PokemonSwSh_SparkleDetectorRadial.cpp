@@ -25,7 +25,7 @@ const double STAR_SPARKLE_ANGLE_TOLERANCE_DEGREES = 10.;
 
 
 RadialSparkleDetector::~RadialSparkleDetector(){}
-RadialSparkleDetector::RadialSparkleDetector(const WaterFillObject& object)
+RadialSparkleDetector::RadialSparkleDetector(const WaterfillObject& object)
     : m_object(object)
 {
     if (object.area < 20){
@@ -78,7 +78,7 @@ RadialSparkleDetector::RadialSparkleDetector(const WaterFillObject& object)
     //  Find new regions.
     PackedBinaryMatrix matrix = m_matrix;
     WaterFillIterator finder(matrix, 1);
-    WaterFillObject obj;
+    WaterfillObject obj;
     while (finder.find_next(obj)){
         obj.object.clear();
         m_regions.emplace(obj.area, std::move(obj));

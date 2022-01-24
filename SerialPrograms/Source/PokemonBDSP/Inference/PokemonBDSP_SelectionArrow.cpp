@@ -31,7 +31,7 @@ const ImageMatch::ExactImageMatcher& SELECTION_ARROW(){
 }
 
 
-bool is_selection_arrow(const QImage& image, const WaterFillObject& object){
+bool is_selection_arrow(const QImage& image, const WaterfillObject& object){
     size_t width = object.width();
     size_t height = object.height();
     if (width > height){
@@ -61,9 +61,9 @@ bool is_selection_arrow(const QImage& image, const WaterFillObject& object){
 
 std::vector<ImagePixelBox> find_selection_arrows(const QImage& image){
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_max(image, 200, 200, 200);
-    std::vector<WaterFillObject> objects = find_objects_inplace(matrix, 200, false);
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 200, false);
     std::vector<ImagePixelBox> ret;
-    for (const WaterFillObject& object : objects){
+    for (const WaterfillObject& object : objects){
         if (is_selection_arrow(image, object)){
             ret.emplace_back(
                 ImagePixelBox(object.min_x, object.min_y, object.max_x, object.max_y)

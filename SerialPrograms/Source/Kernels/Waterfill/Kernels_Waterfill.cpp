@@ -26,7 +26,7 @@ namespace Waterfill{
 
 bool find_object(
     PackedBinaryMatrix& matrix,
-    WaterFillObject& object,
+    WaterfillObject& object,
     size_t tile_x, size_t tile_y,
     size_t bit_x, size_t bit_y
 ){
@@ -135,7 +135,7 @@ bool find_object(
     size_t tile_min_y = (size_t)0 - 1;
     size_t tile_max_x = 0;
     size_t tile_max_y = 0;
-    WaterFillObject stats;
+    WaterfillObject stats;
     stats.body_x = tile_x * BinaryMatrixTile::WIDTH + bit_x;
     stats.body_y = tile_y * BinaryMatrixTile::HEIGHT + bit_y;
     for (const auto& item : obj){
@@ -182,7 +182,7 @@ bool find_object(
 
 bool find_object_in_tile(
     PackedBinaryMatrix& matrix,
-    WaterFillObject& object,
+    WaterfillObject& object,
     size_t tile_x, size_t tile_y
 ){
     BinaryMatrixTile& start = matrix.tile(tile_x, tile_y);
@@ -196,7 +196,7 @@ bool find_object_in_tile(
 }
 bool find_object_on_bit(
     PackedBinaryMatrix& matrix,
-    WaterFillObject& object,
+    WaterfillObject& object,
     size_t x, size_t y
 ){
     if (!matrix.get(x, y)){
@@ -219,12 +219,12 @@ bool find_object_on_bit(
 }
 
 
-std::vector<WaterFillObject> find_objects_inplace(PackedBinaryMatrix& matrix, size_t min_area, bool keep_objects){
-    std::vector<WaterFillObject> ret;
+std::vector<WaterfillObject> find_objects_inplace(PackedBinaryMatrix& matrix, size_t min_area, bool keep_objects){
+    std::vector<WaterfillObject> ret;
     for (size_t r = 0; r < matrix.tile_height(); r++){
         for (size_t c = 0; c < matrix.tile_width(); c++){
             while (true){
-                WaterFillObject object;
+                WaterfillObject object;
                 if (!find_object_in_tile(matrix, object, c, r)){
                     break;
                 }
@@ -239,7 +239,7 @@ std::vector<WaterFillObject> find_objects_inplace(PackedBinaryMatrix& matrix, si
     }
     return ret;
 }
-std::vector<WaterFillObject> find_objects(const PackedBinaryMatrix& matrix, size_t min_area, bool keep_objects){
+std::vector<WaterfillObject> find_objects(const PackedBinaryMatrix& matrix, size_t min_area, bool keep_objects){
     PackedBinaryMatrix m(matrix);
     return find_objects_inplace(m, min_area, keep_objects);
 }
@@ -253,7 +253,7 @@ WaterFillIterator::WaterFillIterator(PackedBinaryMatrix& matrix, size_t min_area
     , m_tile_row(0)
     , m_tile_col(0)
 {}
-bool WaterFillIterator::find_next(WaterFillObject& object){
+bool WaterFillIterator::find_next(WaterfillObject& object){
     while (m_tile_row < m_matrix.tile_height()){
         while (m_tile_col < m_matrix.tile_width()){
             while (true){

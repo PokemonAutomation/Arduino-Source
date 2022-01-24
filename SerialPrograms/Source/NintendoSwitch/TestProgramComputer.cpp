@@ -83,11 +83,70 @@ inline std::string dump8(uint8_t x){
 
 
 
-
 void TestProgramComputer::program(ProgramEnvironment& env){
     using namespace Kernels;
     using namespace NintendoSwitch::PokemonSwSh;
 
+
+
+    QImage image("screenshot-20220123-215131034370.png");
+    std::vector<ImagePixelBox> objects = find_exclamation_marks(image);
+
+#if 0
+    QImage image("ExclamationMark1.png");
+    image = image.scaled(image.width() / 4, image.height() / 4);
+    image = image.convertToFormat(QImage::Format::Format_ARGB32);
+    uint32_t* ptr = (uint32_t*)image.bits();
+    size_t words = image.bytesPerLine() / sizeof(uint32_t);
+    for (int r = 0; r < image.height(); r++){
+        for (int c = 0; c < image.width(); c++){
+            uint32_t& pixel = ptr[r * words + c];
+            uint32_t red = qRed(pixel);
+            uint32_t green = qGreen(pixel);
+            uint32_t blue = qBlue(pixel);
+            if (red < 192 && green < 192){
+                pixel = 0x00000000;
+            }
+            if (blue > red + 20){
+                pixel = 0x00000000;
+            }
+        }
+    }
+    image.save("test.png");
+#endif
+
+
+#if 0
+    QImage image("screenshot-20220123-212415701291.png");
+//    std::vector<ImagePixelBox> objects = find_exclamation_marks(image);
+
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
+        image,
+        192, 255,
+        192, 255,
+        192, 255
+    );
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 50, false);
+    cout << "objects = " << objects.size() << endl;
+
+    int c = 0;
+    for (ImagePixelBox box : objects){
+        extract_box(image, box).save("image-" + QString::number(c++) + ".png");
+    }
+#endif
+
+
+
+#if 0
+    QImage image("screenshot-20220123-203000945405.png");
+
+
+    std::vector<ImagePixelBox> objects = find_exclamation_marks(image);
+#endif
+
+
+
+#if 0
     QImage image("20220122-020706133705-Briefcase.png");
 
     QImage briefcase(RESOURCE_PATH() + "PokemonBDSP/StarterBriefcase.png");
@@ -105,6 +164,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
         {},
         image, false
     );
+#endif
 
 
 //    QImage image("mark.png");
@@ -130,7 +190,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
         0, 160,
         0, 192
     );
-    std::vector<WaterFillObject> objects = find_objects_inplace(matrix, 50, false);
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 50, false);
 #endif
 
 
@@ -155,7 +215,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
         0, 160,
         0, 192
     );
-    std::vector<WaterFillObject> objects = find_objects_inplace(matrix, 50, false);
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 50, false);
     if (objects.size() != 0){
         PA_THROW_StringException("Failed to find exactly one object in resource.");
     }
@@ -165,7 +225,8 @@ void TestProgramComputer::program(ProgramEnvironment& env){
 
 
 #if 0
-    QImage image(QImage(RESOURCE_PATH() + "PokemonSwSh/ExclamationMark.png"));
+    QImage image(QImage(RESOURCE_PATH() + "PokemonSwSh/ExclamationMark-Original.png"));
+    image = image.copy(63, 5, 67, 143);
     image = image.scaled(image.width() / 4, image.height() / 4);
     image = image.convertToFormat(QImage::Format::Format_ARGB32);
 
@@ -221,7 +282,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
 #if 0
     QImage image("screenshot-20220119-190101351053.png");
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_min(image, 192, 192, 192);
-    std::vector<WaterFillObject> objects = find_objects(matrix, 200, false);
+    std::vector<WaterfillObject> objects = find_objects(matrix, 200, false);
     cout << objects.size() << endl;
 
     int c = 0;
@@ -259,17 +320,17 @@ void TestProgramComputer::program(ProgramEnvironment& env){
         break;
     }
 #endif
-    std::vector<WaterFillObject> objects = find_objects(matrix, 200, true);
+    std::vector<WaterfillObject> objects = find_objects(matrix, 200, true);
 
     cout << objects.size() << endl;
     size_t c = 0;
-    for (const WaterFillObject& object : objects){
+    for (const WaterfillObject& object : objects){
         ImagePixelBox box(object.min_x, object.min_y, object.max_x, object.max_y);
         cout << object.min_x << ", " << object.min_y << ", " << object.max_x << ", " << object.max_y << endl;
         extract_box(image, box).save("test-" + QString::number(c++) + ".png");
     }
 
-    WaterFillObject& object = objects[1];
+    WaterfillObject& object = objects[1];
 //    object.max_x -= 1;
 //    cout << matrix.dump(object.min_x, object.min_y, object.max_x, object.max_y) << endl;
     {
@@ -342,9 +403,9 @@ void TestProgramComputer::program(ProgramEnvironment& env){
         128, 255
     );
 
-    std::vector<WaterFillObject> objects1 = find_objects(matrix, 1, false);
+    std::vector<WaterfillObject> objects1 = find_objects(matrix, 1, false);
     cout << "objects = " << objects1.size() << endl;
-    std::multimap<uint64_t, WaterFillObject> sorted1;
+    std::multimap<uint64_t, WaterfillObject> sorted1;
     for (const auto& item : objects1){
         sorted1.emplace(item.area, item);
     }
@@ -556,7 +617,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
             128, 255
         );
         auto time1 = std::chrono::system_clock::now();
-        std::vector<WaterFillObject> objects1 = find_objects(matrix1, 10, false);
+        std::vector<WaterfillObject> objects1 = find_objects(matrix1, 10, false);
         auto time2 = std::chrono::system_clock::now();
         cout << "filter  = " << time1 - time0 << endl;
         cout << "process = " << time2 - time1 << endl;
@@ -597,9 +658,9 @@ void TestProgramComputer::program(ProgramEnvironment& env){
             192, 255,
             128, 255
         );
-        std::vector<WaterFillObject> objects1 = find_objects(matrix1, 1, false);
+        std::vector<WaterfillObject> objects1 = find_objects(matrix1, 1, false);
         cout << "objects = " << objects1.size() << endl;
-        std::multimap<uint64_t, WaterFillObject> sorted1;
+        std::multimap<uint64_t, WaterfillObject> sorted1;
         for (const auto& item : objects1){
             sorted1.emplace(item.area, item);
         }
@@ -656,7 +717,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
 #endif
 
 #if 0
-    WaterFillObject object;
+    WaterfillObject object;
     find_object(matrix1, object, 12, 50);
     cout << "area = " << object.m_area
          << " - (" << object.m_min_x
@@ -669,7 +730,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
 #if 0
     std::vector<FillGeometry> objects0 = find_all_objects(matrix0, 1, false, 1);
     cout << "objects = " << objects0.size() << endl;
-    std::vector<WaterFillObject> objects1 = find_objects(matrix1);
+    std::vector<WaterfillObject> objects1 = find_objects(matrix1);
     cout << "objects = " << objects1.size() << endl;
 
 
@@ -679,7 +740,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
         sorted0.emplace(item.area, item);
     }
 
-    std::multimap<uint64_t, WaterFillObject> sorted1;
+    std::multimap<uint64_t, WaterfillObject> sorted1;
     for (const auto& item : objects1){
         sorted1.emplace(item.m_area, item);
     }
@@ -739,7 +800,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
         cout << "objects = " << objects.size() << endl;
     }
     {
-        std::vector<WaterFillObject> objects = find_objects(matrix1);
+        std::vector<WaterfillObject> objects = find_objects(matrix1);
         cout << "objects = " << objects.size() << endl;
     }
 #endif
@@ -781,9 +842,9 @@ void TestProgramComputer::program(ProgramEnvironment& env){
     cout << matrix.dump() << endl;
 
 
-//    WaterFillObject object;
+//    WaterfillObject object;
 //    find_object(matrix, object, 0, 0);
-    std::vector<WaterFillObject> objects = find_objects(matrix);
+    std::vector<WaterfillObject> objects = find_objects(matrix);
 
     for (const auto& object : objects){
         cout << "x = (" << object.m_min_x << "," << object.m_max_x << ")" << endl;

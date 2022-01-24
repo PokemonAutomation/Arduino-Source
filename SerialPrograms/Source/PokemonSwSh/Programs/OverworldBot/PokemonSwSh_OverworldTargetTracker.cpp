@@ -157,6 +157,7 @@ bool OverworldTargetTracker::process_frame(
 
     std::vector<ImagePixelBox> exclamation_marks = find_exclamation_marks(image);
     std::vector<ImagePixelBox> question_marks = find_question_marks(image);
+//    question_marks.clear();
 
     SpinLockGuard lg(m_lock, "OverworldTargetTracker::on_frame()");
 
@@ -186,7 +187,7 @@ bool OverworldTargetTracker::process_frame(
         box.width *= 2;
         box.height *= 1.5;
         m_questions.emplace_back(Mark{timestamp, box});
-        m_detection_boxes.emplace_back(m_overlay, box, COLOR_MAGENTA);
+        m_detection_boxes.emplace_back(m_overlay, box, COLOR_BLUE);
 //        cout << "qwer = " << questions.size() << endl;
     }
 

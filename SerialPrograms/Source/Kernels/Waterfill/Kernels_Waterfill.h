@@ -22,7 +22,7 @@ namespace Waterfill{
 //  If tile is empty, returns false.
 bool find_object_in_tile(
     PackedBinaryMatrix& matrix,
-    WaterFillObject& object,
+    WaterfillObject& object,
     size_t tile_x, size_t tile_y
 );
 
@@ -31,7 +31,7 @@ bool find_object_in_tile(
 //  If bit is 0, returns false.
 bool find_object_on_bit(
     PackedBinaryMatrix& matrix,
-    WaterFillObject& object,
+    WaterfillObject& object,
     size_t x, size_t y
 );
 
@@ -40,12 +40,12 @@ bool find_object_on_bit(
 //  Find all the objects in the matrix.
 //  "keep_objects" will keep the object inside the "object" field, but
 //  the cost potentially a lot of memory.
-std::vector<WaterFillObject> find_objects(const PackedBinaryMatrix& matrix, size_t min_area, bool keep_objects);
+std::vector<WaterfillObject> find_objects(const PackedBinaryMatrix& matrix, size_t min_area, bool keep_objects);
 
 //  This one is faster (avoids a matrix copy), but will zero out the
 //  matrix as part of the algorithm. So make sure you copy it if you
 //  want to keep it.
-std::vector<WaterFillObject> find_objects_inplace(PackedBinaryMatrix& matrix, size_t min_area, bool keep_objects);
+std::vector<WaterfillObject> find_objects_inplace(PackedBinaryMatrix& matrix, size_t min_area, bool keep_objects);
 
 
 //  This one returns the objects one-by-one as they are found. This
@@ -54,7 +54,7 @@ class WaterFillIterator{
 public:
     WaterFillIterator(PackedBinaryMatrix& matrix, size_t min_area);
 
-    bool find_next(WaterFillObject& object);
+    bool find_next(WaterfillObject& object);
 
 private:
     PackedBinaryMatrix& m_matrix;

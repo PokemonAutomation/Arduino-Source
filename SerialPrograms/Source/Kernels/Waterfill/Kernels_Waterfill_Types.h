@@ -19,7 +19,7 @@ namespace Waterfill{
 
 
 
-class WaterFillObject{
+class WaterfillObject{
 public:
     size_t width() const{ return max_x - min_x; }
     size_t height() const{ return max_y - min_y; }
@@ -34,7 +34,7 @@ public:
         return object.submatrix(min_x, min_y, max_x - min_x, max_y - min_y);
     }
 
-    void merge_assume_no_overlap(const WaterFillObject& obj){
+    void merge_assume_no_overlap(const WaterfillObject& obj){
         if (obj.area == 0){
             return;
         }

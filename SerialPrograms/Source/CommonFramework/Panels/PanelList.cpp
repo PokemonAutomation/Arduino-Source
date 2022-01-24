@@ -28,6 +28,7 @@ void PanelList::add_divider(QString label){
 void PanelList::finish_panel_setup(){
 //    QFontMetrics fm(this->font());
     for (const auto& item : m_panels){
+        //  Label/divider
         if (item.second == nullptr){
             addItem(item.first);
             QListWidgetItem* list_item = this->item(this->count() - 1);
@@ -38,6 +39,7 @@ void PanelList::finish_panel_setup(){
             continue;
         }
 
+        //  Program
         const QString& display_name = item.second->display_name();
         if (!m_panel_map.emplace(display_name, item.second.get()).second){
             global_logger_tagged().log("Duplicate program name: " + display_name, COLOR_RED);

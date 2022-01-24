@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 namespace Kernels{
 namespace Waterfill{
 
-class WaterFillObject;
+class WaterfillObject;
 
 }
 }
@@ -28,21 +28,21 @@ namespace PokemonSwSh{
 
 
 struct RadialSparkleDetector{
-    using WaterFillObject = Kernels::Waterfill::WaterFillObject;
+    using WaterfillObject = Kernels::Waterfill::WaterfillObject;
 
 public:
     ~RadialSparkleDetector();
-    RadialSparkleDetector(const WaterFillObject& obj);
+    RadialSparkleDetector(const WaterfillObject& obj);
 
     bool is_ball() const;
     bool is_star() const;
 
 private:
-    const WaterFillObject& m_object;
+    const WaterfillObject& m_object;
     Kernels::PackedBinaryMatrix m_matrix;
 
     uint64_t m_radius_sqr;
-    std::multimap<int64_t, WaterFillObject> m_regions;
+    std::multimap<int64_t, WaterfillObject> m_regions;
 };
 
 

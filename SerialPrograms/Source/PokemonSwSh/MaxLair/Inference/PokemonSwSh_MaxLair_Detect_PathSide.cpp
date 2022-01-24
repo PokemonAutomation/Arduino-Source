@@ -30,13 +30,13 @@ const double ARROW_MAX_DISTANCE = 0.04;
 bool is_arrow_pointed_up(
     const PackedBinaryMatrix& matrix,
     PackedBinaryMatrix& inverted,
-    const WaterFillObject& object
+    const WaterfillObject& object
 ){
     size_t width = matrix.width();
     size_t height = matrix.height();
 
     //  Verify left edge.
-    WaterFillObject region0;
+    WaterfillObject region0;
     {
         size_t topL_x = 0;
         for (; topL_x < width; topL_x++){
@@ -91,7 +91,7 @@ bool is_arrow_pointed_up(
     }
 
     //  Verify right edge.
-    WaterFillObject region1;
+    WaterfillObject region1;
     {
         size_t topR_x = width - 1;
         size_t right_y = 0;
@@ -154,7 +154,7 @@ bool is_arrow_pointed_up(
     }
 
     //  Verify bottom.
-    WaterFillObject region2;
+    WaterfillObject region2;
     if (!find_object_on_bit(inverted, region2, width - 1, height - 1)){
         return false;
     }
@@ -170,7 +170,7 @@ bool is_arrow_pointed_up(
 bool is_arrow_pointed_corner(
     const PackedBinaryMatrix& matrix,
     PackedBinaryMatrix& inverted,
-    const WaterFillObject& object
+    const WaterfillObject& object
 ){
     size_t width = matrix.width();
     size_t height = matrix.height();
@@ -189,7 +189,7 @@ bool is_arrow_pointed_corner(
             width - 1, right_y
         );
 
-        WaterFillObject region0;
+        WaterfillObject region0;
         if (!find_object_on_bit(inverted, region0, width - 1, 0)){
             return false;
         }
@@ -233,7 +233,7 @@ bool is_arrow_pointed_corner(
             bottom_x, height - 1
         );
 
-        WaterFillObject region1;
+        WaterfillObject region1;
         if (!find_object_on_bit(inverted, region1, 0, height - 1)){
             return false;
         }
@@ -267,7 +267,7 @@ bool is_arrow_pointed_corner(
 }
 
 
-bool is_arrow(const QImage& image, const WaterFillObject& object){
+bool is_arrow(const QImage& image, const WaterfillObject& object){
     double area_ratio = object.area_ratio();
     if (area_ratio < 0.35 || area_ratio > 0.55){
         return false;
@@ -335,8 +335,8 @@ int8_t read_side(const QImage& image, uint8_t pixel_threshold){
     size_t count = 0;
 
     WaterFillIterator finder(matrix, 300);
-    WaterFillObject arrow;
-    WaterFillObject object;
+    WaterfillObject arrow;
+    WaterfillObject object;
     while (finder.find_next(object)){
         if (is_arrow(image, object)){
             count++;

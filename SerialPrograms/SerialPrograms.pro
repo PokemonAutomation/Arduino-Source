@@ -118,6 +118,7 @@ SOURCES += \
     Source/CommonFramework/ImageMatch/ImageMatchResult.cpp \
     Source/CommonFramework/ImageMatch/ScaleBrightness.cpp \
     Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.cpp \
+    Source/CommonFramework/ImageMatch/SubObjectTemplateMatcher.cpp \
     Source/CommonFramework/ImageTools/ColorClustering.cpp \
     Source/CommonFramework/ImageTools/FloatPixel.cpp \
     Source/CommonFramework/ImageTools/ImageBoxes.cpp \
@@ -611,6 +612,7 @@ HEADERS += \
     Source/CommonFramework/ImageMatch/ImageMatchResult.h \
     Source/CommonFramework/ImageMatch/ScaleBrightness.h \
     Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h \
+    Source/CommonFramework/ImageMatch/SubObjectTemplateMatcher.h \
     Source/CommonFramework/ImageTools/ColorClustering.h \
     Source/CommonFramework/ImageTools/DistanceToLine.h \
     Source/CommonFramework/ImageTools/FloatPixel.h \

@@ -46,7 +46,7 @@ GameSettings::GameSettings()
     )
     , ENTER_GAME_WAIT(
         "<b>4. Enter Game Wait:</b><br>Wait this long for the game to enter the overworld.",
-        "30 * TICKS_PER_SECOND"
+        "40 * TICKS_PER_SECOND"
     )
     , m_box_timings("<font size=4><b>Box Timings:</b></font> (for egg programs)")
     , BOX_SCROLL_DELAY_0(

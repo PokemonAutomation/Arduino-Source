@@ -134,6 +134,7 @@
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorSquare.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleSet.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_ExperienceGainDetector.h"
+#include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "CommonFramework/Inference/BlackBorderDetector.h"
 #include "TestProgramSwitch.h"
 
@@ -155,7 +156,8 @@ using std::endl;
 
 
 //#include "../Internal/SerialPrograms/NintendoSwitch_Commands_ScalarButtons.h"
-
+using namespace PokemonAutomation::Kernels;
+using namespace PokemonAutomation::Kernels::Waterfill;
 
 
 
@@ -195,16 +197,53 @@ TestProgram::TestProgram(const TestProgram_Descriptor& descriptor)
 //using namespace Kernels::Waterfill;
 
 
-
-
-
-
 namespace PokemonSwSh{
 
 
 
 
 }
+
+
+
+
+#if 0
+class ShinySymbolDetector : public ImageMatch::SubObjectTemplateMatcher{
+public:
+    ShinySymbolDetector()
+        : SubObjectTemplateMatcher("PokemonSwSh/ExclamationMark.png", 120)
+    {
+        PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
+            m_object,
+            128, 255,
+            128, 255,
+            128, 255
+        );
+        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
+        if (objects.size() != 2){
+            PA_THROW_StringException("Failed to find exactly two objects in resource.");
+        }
+        size_t index = 0;
+        if (objects[0].area < objects[1].area){
+            index = 1;
+        }
+        set_subobject(objects[index]);
+//        cout << m_feature_box.x << ", "
+//             << m_feature_box.y << ", "
+//             << m_feature_box.width << ", "
+//             << m_feature_box.height << endl;
+    }
+
+    static const ShinySymbolDetector& instance(){
+        static ShinySymbolDetector matcher;
+        return matcher;
+    }
+};
+#endif
+
+
+
+
 
 
 
@@ -224,6 +263,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
+
+
+//    QImage image("screenshot-20220123-152811325286.png");
+
+//    InferenceBoxScope box(overlay, 0.32, 0.87, 0.03, 0.04);
+
+
+
+
 #if 0
     BlackBorderDetector detector;
     VideoOverlaySet overlays(overlay);
@@ -241,7 +289,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 
-#if 1
+#if 0
     ShinyEncounterTracker tracker(logger, overlay, BattleType::STANDARD);
     {
         VisualInferenceSession session(env, console, feed, overlay);
@@ -302,9 +350,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     Kernels::PackedBinaryMatrix matrix0;
     matrix0 = compress_rgb32_to_binary_min(image, 192, 192, 0);
 
-//    std::vector<WaterFillObject> objects = find_objects_inplace(matrix0, 10, false);
+//    std::vector<WaterfillObject> objects = find_objects_inplace(matrix0, 10, false);
     WaterFillIterator finder(matrix0, 20);
-    WaterFillObject object;
+    WaterfillObject object;
     size_t c = 0;
     VideoOverlaySet overlays(overlay);
     while (finder.find_next(object)){
@@ -473,10 +521,10 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
         0, 192
     );
 
-    std::vector<WaterFillObject> objects = find_objects(matrix, 100, false);
+    std::vector<WaterfillObject> objects = find_objects(matrix, 100, false);
     VideoOverlaySet set(overlay);
     size_t c = 0;
-    for (const WaterFillObject& object : objects){
+    for (const WaterfillObject& object : objects){
         ImagePixelBox box(object.min_x, object.min_y, object.max_x, object.max_y);
         ImageFloatBox fbox = translate_to_parent(image, {0, 0, 1, 1}, box);
         set.add(COLOR_RED, fbox);

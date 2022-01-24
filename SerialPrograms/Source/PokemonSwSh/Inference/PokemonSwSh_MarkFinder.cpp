@@ -8,6 +8,7 @@
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
+#include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "PokemonSwSh_MarkFinder.h"
 
@@ -19,64 +20,58 @@ using namespace Kernels;
 using namespace Kernels::Waterfill;
 
 
-
-class ExclamationMatcher{
-public:
-    ExclamationMatcher()
-        : m_object(RESOURCE_PATH() + "PokemonSwSh/ExclamationMark.png")
-        , m_matcher(m_object)
-    {
-        PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
-            m_object,
-            192, 255,
-            0, 160,
-            0, 192
-        );
-        std::vector<WaterFillObject> objects = find_objects_inplace(matrix, 50, false);
-        if (objects.size() != 1){
-            PA_THROW_StringException("Failed to find exactly one object in resource.");
+void generate_exclamation_mark(){
+    QImage image("ExclamationMark1.png");
+    image = image.scaled(image.width() / 4, image.height() / 4);
+    image = image.convertToFormat(QImage::Format::Format_ARGB32);
+    uint32_t* ptr = (uint32_t*)image.bits();
+    size_t words = image.bytesPerLine() / sizeof(uint32_t);
+    for (int r = 0; r < image.height(); r++){
+        for (int c = 0; c < image.width(); c++){
+            uint32_t& pixel = ptr[r * words + c];
+            uint32_t red = qRed(pixel);
+            uint32_t green = qGreen(pixel);
+            uint32_t blue = qBlue(pixel);
+            if (red < 192 && green < 192){
+                pixel = 0xff000000;
+            }
+            if (blue > red + 20){
+                pixel = 0xff000000;
+            }
         }
-        m_feature_box = pixelbox_to_floatbox(
-            m_object,
-            ImagePixelBox(
-                objects[0].min_x, objects[0].min_y,
-                objects[0].max_x, objects[0].max_y
-            )
-        );
-//        cout << m_feature_box.x << ", "
-//             << m_feature_box.y << ", "
-//             << m_feature_box.width << ", "
-//             << m_feature_box.height << endl;
     }
+    image.save("test.png");
+}
 
+
+
+class ExclamationMatcher : public ImageMatch::SubObjectTemplateMatcher{
+public:
     static const ExclamationMatcher& instance(){
         static ExclamationMatcher matcher;
         return matcher;
     }
 
-    double rmsd(
-        ImagePixelBox& object_box,
-        const QImage& image,
-        const ImagePixelBox& exclamation_top
-    ) const{
-        object_box = extract_object_from_inner_feature(exclamation_top, m_feature_box);
-//        cout << object_box.min_x << ", "
-//             << object_box.min_y << ", "
-//             << object_box.max_x << ", "
-//             << object_box.max_y << endl;
-        QImage object = extract_box(image, object_box);
-//        object.save("test.png");
-        if (object.isNull()){
-            return 99999.;
+    ExclamationMatcher()
+        : SubObjectTemplateMatcher("PokemonSwSh/ExclamationMark1-Template.png", 80)
+    {
+        PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
+            m_object,
+            160, 255,
+            0, 160,
+            0, 192
+        );
+        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
+//        if (objects.size() != 1){
+//            PA_THROW_StringException("Failed to find exactly one object in resource: " + std::to_string(objects.size()));
+//        }
+        size_t index = 0;
+        if (objects[0].area < objects[1].area){
+            index = 1;
         }
-        return m_matcher.rmsd(object);
+        set_subobject(objects[index]);
     }
 
-
-private:
-    QImage m_object;
-    ImageMatch::ExactImageMatcher m_matcher;
-    ImageFloatBox m_feature_box;
 };
 
 
@@ -88,22 +83,7 @@ const ImageMatch::ExactImageMatcher& QUESTION_TOP(){
     return matcher;
 }
 
-bool is_exclamation_mark(ImagePixelBox& object_box, const QImage& image, const WaterFillObject& object){
-    double aspect_ratio = object.aspect_ratio();
-    if (!(0.3 < aspect_ratio && aspect_ratio < 0.7)){
-        return false;
-    }
-
-    double rmsd = ExclamationMatcher::instance().rmsd(
-        object_box, image,
-        ImagePixelBox(object.min_x, object.min_y, object.max_x, object.max_y)
-    );
-//    if (rmsd <= 120){
-//        cout << "is_exclamation_mark(): rmsd = " << rmsd << endl;
-//    }
-    return rmsd <= 120;
-}
-bool is_question_mark(const QImage& image, const WaterFillObject& object){
+bool is_question_mark(const QImage& image, const WaterfillObject& object){
     size_t width = object.width();
     size_t height = object.height();
 
@@ -131,11 +111,11 @@ bool is_question_mark(const QImage& image, const WaterFillObject& object){
 std::vector<ImagePixelBox> find_exclamation_marks(const QImage& image){
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
         image,
-        192, 255,
+        160, 255,
         0, 160,
         0, 192
     );
-    std::vector<WaterFillObject> objects = find_objects_inplace(matrix, 50, false);
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
 #if 0
     cout << "objects = " << objects.size() << endl;
     static int c = 0;
@@ -146,9 +126,9 @@ std::vector<ImagePixelBox> find_exclamation_marks(const QImage& image){
     }
 #endif
     std::vector<ImagePixelBox> ret;
-    for (const WaterFillObject& object : objects){
+    for (const WaterfillObject& object : objects){
         ImagePixelBox object_box;
-        if (is_exclamation_mark(object_box, image, object)){
+        if (ExclamationMatcher::instance().matches(object_box, image, object)){
             ret.emplace_back(object_box);
         }
     }
@@ -161,9 +141,10 @@ std::vector<ImagePixelBox> find_question_marks(const QImage& image){
         0, 255,
         128, 255
     );
-    std::vector<WaterFillObject> objects = find_objects_inplace(matrix, 50, false);
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 50, false);
     std::vector<ImagePixelBox> ret;
-    for (const WaterFillObject& object : objects){
+#if 1
+    for (const WaterfillObject& object : objects){
         if (is_question_mark(image, object)){
             ret.emplace_back(
                 ImagePixelBox(
@@ -173,6 +154,7 @@ std::vector<ImagePixelBox> find_question_marks(const QImage& image){
             );
         }
     }
+#endif
     return ret;
 }
 

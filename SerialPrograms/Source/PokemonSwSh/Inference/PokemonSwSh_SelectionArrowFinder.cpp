@@ -26,7 +26,7 @@ const ImageMatch::ExactImageMatcher& SELECTION_ARROW(){
     return matcher;
 }
 
-bool is_selection_arrow(const QImage& image, const WaterFillObject& object){
+bool is_selection_arrow(const QImage& image, const WaterfillObject& object){
     double area = (double)object.area_ratio();
     if (area < 0.4 || area > 0.5){
         return false;
@@ -58,7 +58,7 @@ std::vector<ImagePixelBox> find_selection_arrows(const QImage& image){
     std::vector<ImagePixelBox> ret;
 
     WaterFillIterator finder(matrix, 200);
-    WaterFillObject object;
+    WaterfillObject object;
     while (finder.find_next(object)){
 //        cout << "asdf" << endl;
         if (is_selection_arrow(image, object)){

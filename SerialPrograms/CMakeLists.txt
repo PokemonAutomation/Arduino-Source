@@ -175,6 +175,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ImageMatch/ImageMatchResult.h
     Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.cpp
     Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h
+    Source/CommonFramework/ImageMatch/SubObjectTemplateMatcher.cpp
+    Source/CommonFramework/ImageMatch/SubObjectTemplateMatcher.h
     Source/CommonFramework/ImageMatch/ScaleBrightness.cpp
     Source/CommonFramework/ImageMatch/ScaleBrightness.h
     Source/CommonFramework/ImageTools/ColorClustering.cpp

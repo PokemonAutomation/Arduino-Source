@@ -113,11 +113,11 @@ void find_symbol_candidates(
     PackedBinaryMatrix& matrix, double max_area_ratio
 ){
     size_t max_area = (size_t)(image.width() * image.height() * max_area_ratio);
-    std::vector<WaterFillObject> objects = find_objects_inplace(matrix, 20, false);
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
 
 //    static int index = 0;
 
-    std::map<size_t, WaterFillObject> objmap;
+    std::map<size_t, WaterfillObject> objmap;
     for (size_t c = 0; c < objects.size(); c++){
         if (objects[c].area > max_area){
             continue;
@@ -140,8 +140,8 @@ void find_symbol_candidates(
                 if (iter0->first >= iter1->first){
                     continue;
                 }
-                const WaterFillObject& obj0 = iter0->second;
-                const WaterFillObject& obj1 = iter1->second;
+                const WaterfillObject& obj0 = iter0->second;
+                const WaterfillObject& obj1 = iter1->second;
                 size_t distance = distance_sqr(
                     ImagePixelBox(obj0.min_x, obj0.min_y, obj0.max_x, obj0.max_y),
                     ImagePixelBox(obj1.min_x, obj1.min_y, obj1.max_x, obj1.max_y)
@@ -165,7 +165,7 @@ void find_symbol_candidates(
         );
         std::pair<double, PokemonType> result = match_type_symbol(img);
         if (result.second != PokemonType::NONE){
-            const WaterFillObject& obj = item.second;
+            const WaterfillObject& obj = item.second;
             candidates.emplace(
                 result.first,
                 std::pair<PokemonType, ImagePixelBox>(

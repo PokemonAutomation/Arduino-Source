@@ -87,7 +87,7 @@ void ShinySparkleSetSwSh::update_alphas(){
 ShinySparkleSetSwSh find_sparkles(Kernels::PackedBinaryMatrix& matrix){
     ShinySparkleSetSwSh sparkles;
     WaterFillIterator finder(matrix, 20);
-    WaterFillObject object;
+    WaterfillObject object;
     while (finder.find_next(object)){
         RadialSparkleDetector radial_sparkle(object);
         if (radial_sparkle.is_ball()){

@@ -28,11 +28,11 @@ ProgramTabs::ProgramTabs(QWidget& parent, PanelListener& listener)
 }
 
 void ProgramTabs::add(PanelList* list){
-    addTab(list, list->label());
-    if (list->items() == 0){
-        setTabEnabled((int)m_lists.size(), false);
+    if (list->items() != 0){
+        addTab(list, list->label());
+//        setTabEnabled((int)m_lists.size(), false);
+        m_lists.emplace_back(list);
     }
-    m_lists.emplace_back(list);
 }
 
 QSize ProgramTabs::sizeHint() const{

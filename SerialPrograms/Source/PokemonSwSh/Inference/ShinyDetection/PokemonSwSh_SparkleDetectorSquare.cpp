@@ -19,13 +19,13 @@ using namespace Kernels::Waterfill;
 
 //  Remove the background of 1's from "matrix".
 //  Return the background itself.
-WaterFillObject remove_background(PackedBinaryMatrix& matrix){
+WaterfillObject remove_background(PackedBinaryMatrix& matrix){
     size_t width = matrix.width();
     size_t height = matrix.height();
 
-    WaterFillObject background;
+    WaterfillObject background;
     for (size_t c = 0; c < width; c++){
-        WaterFillObject object;
+        WaterfillObject object;
         if (find_object_on_bit(matrix, object, c, 0)){
             background.merge_assume_no_overlap(object);
         }
@@ -34,7 +34,7 @@ WaterFillObject remove_background(PackedBinaryMatrix& matrix){
         }
     }
     for (size_t r = 0; r < height; r++){
-        WaterFillObject object;
+        WaterfillObject object;
         if (find_object_on_bit(matrix, object, 0, r)){
             background.merge_assume_no_overlap(object);
         }
@@ -49,7 +49,7 @@ WaterFillObject remove_background(PackedBinaryMatrix& matrix){
 //  Remove the hole of 1's from "matrix" at location (x, y).
 //  Return the total area of the hole.
 size_t remove_hole(PackedBinaryMatrix& matrix, size_t x, size_t y){
-    WaterFillObject object;
+    WaterfillObject object;
     if (!find_object_on_bit(matrix, object, x, y)){
         return 0;
     }
@@ -59,7 +59,7 @@ size_t remove_hole(PackedBinaryMatrix& matrix, size_t x, size_t y){
 
 //  Check if the object has a valid hole characteristic of a square.
 bool check_hole(
-    WaterFillObject& background,
+    WaterfillObject& background,
     const PackedBinaryMatrix& object,
     size_t box_area, size_t object_area,
     size_t center_x, size_t center_y
@@ -309,7 +309,7 @@ double normalize_angle_0_360_new(double angle){
 //  Get all the pixels that border the background.
 std::multimap<double, std::pair<size_t, size_t>> get_edge_pixels(
     const PackedBinaryMatrix& object,
-    const WaterFillObject& background,
+    const WaterfillObject& background,
     size_t center_x, size_t center_y,
     double base_angle
 ){
@@ -392,7 +392,7 @@ double sum_squares_from_line(
 
 
 
-bool is_square_sparkle(const Kernels::Waterfill::WaterFillObject& object, double max_deviation){
+bool is_square_sparkle(const Kernels::Waterfill::WaterfillObject& object, double max_deviation){
     size_t width = object.width();
     size_t height = object.height();
 //    cout << "width  = " << width << endl;
@@ -409,7 +409,7 @@ bool is_square_sparkle(const Kernels::Waterfill::WaterFillObject& object, double
 
 
     //  Check the hole.
-    WaterFillObject background;
+    WaterfillObject background;
     if (!check_hole(background, matrix, box_area, object.area, center_x, center_y)){
         return false;
     }
@@ -609,7 +609,7 @@ bool is_square_sparkle(const Kernels::Waterfill::WaterFillObject& object, double
 
 
 
-bool is_line_sparkle(const Kernels::Waterfill::WaterFillObject& object, size_t min_pixel_width){
+bool is_line_sparkle(const Kernels::Waterfill::WaterfillObject& object, size_t min_pixel_width){
     size_t width = object.width();
     size_t height = object.height();
     if (width < 5 || height < 5){
