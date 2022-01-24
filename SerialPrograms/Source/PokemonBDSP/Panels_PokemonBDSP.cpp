@@ -10,6 +10,7 @@
 #include "PokemonBDSP_Settings.h"
 
 #include "Programs/General/PokemonBDSP_MassRelease.h"
+#include "Programs/General/PokemonBDSP_AutonomousBallThrower.h"
 
 #include "Programs/Trading/PokemonBDSP_SelfBoxTrade.h"
 #include "Programs/Trading/PokemonBDSP_SelfTouchTrade.h"
@@ -49,6 +50,7 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
 
     add_divider("---- General ----");
     add_settings<MassRelease_Descriptor, MassRelease>();
+    add_program<AutonomousBallThrower_Descriptor, AutonomousBallThrower>();
 
     add_divider("---- Trading ----");
     add_settings<SelfBoxTrade_Descriptor, SelfBoxTrade>();
