@@ -13,6 +13,10 @@
 #include "PokemonBDSP_GameNavigation.h"
 #include "PokemonBDSP_RunFromBattle.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
@@ -114,8 +118,8 @@ bool StandardEncounterHandler::handle_standard_encounter(const DoublesShinyDetec
 
     m_session_stats += result.shiny_type;
     if (encounter.is_double_battle()){
-        bool left = is_shiny(encounter.left_shininess());
-        bool right = is_shiny(encounter.right_shininess());
+        bool left = is_confirmed_shiny(encounter.left_shininess());
+        bool right = is_confirmed_shiny(encounter.right_shininess());
         if (left && right){
             m_session_stats += ShinyType::UNKNOWN_SHINY;
         }else{
@@ -138,7 +142,7 @@ bool StandardEncounterHandler::handle_standard_encounter(const DoublesShinyDetec
         m_settings.NOTIFICATION_NONSHINY,
         m_settings.NOTIFICATION_SHINY,
         m_env.program_info(),
-        m_language != Language::None, is_shiny(result.shiny_type),
+        m_language != Language::None, is_likely_shiny(result.shiny_type),
         encounter_results,
         result.best_screenshot,
         &m_session_stats,
@@ -149,7 +153,7 @@ bool StandardEncounterHandler::handle_standard_encounter(const DoublesShinyDetec
         take_video(m_console);
     }
 
-    return encounter.get_action().first == EncounterAction::StopProgram;
+    return encounter.get_action().action == EncounterAction::StopProgram;
 }
 bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     const DoublesShinyDetection& result,
@@ -175,8 +179,8 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
 
     m_session_stats += result.shiny_type;
     if (encounter.is_double_battle()){
-        bool left = is_shiny(encounter.left_shininess());
-        bool right = is_shiny(encounter.right_shininess());
+        bool left = is_confirmed_shiny(encounter.left_shininess());
+        bool right = is_confirmed_shiny(encounter.right_shininess());
         if (left && right){
             m_session_stats += ShinyType::UNKNOWN_SHINY;
         }else{
@@ -189,8 +193,6 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         take_video(m_console);
     }
 
-    std::pair<EncounterAction, std::string> action = encounter.get_action();
-
     bool enable_names = m_language != Language::None;
     std::vector<EncounterResult> encounter_results = results(encounter);
 
@@ -200,14 +202,15 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         m_settings.NOTIFICATION_NONSHINY,
         m_settings.NOTIFICATION_SHINY,
         m_env.program_info(),
-        enable_names, is_shiny(result.shiny_type),
+        enable_names, is_likely_shiny(result.shiny_type),
         encounter_results,
         result.best_screenshot,
         &m_session_stats,
         enable_names ? &m_frequencies : nullptr
     );
 
-    switch (action.first){
+    EncounterActionFull action = encounter.get_action();
+    switch (action.action){
     case EncounterAction::StopProgram:
         return true;
     case EncounterAction::RunAway:
@@ -220,12 +223,12 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
 
     case EncounterAction::ThrowBalls:
     case EncounterAction::ThrowBallsAndSave:{
-        CatchResults catch_result = basic_catcher(m_env, m_console, m_language, action.second);
+        CatchResults catch_result = basic_catcher(m_env, m_console, m_language, action.pokeball_slug);
         switch (catch_result.result){
         case CatchResult::POKEMON_CAUGHT:
             m_session_stats.add_caught();
             m_env.update_stats();
-            if (action.first == EncounterAction::ThrowBallsAndSave){
+            if (action.action == EncounterAction::ThrowBallsAndSave){
                 //  Save the game
                 save_game(m_env, m_console);
             }
@@ -248,7 +251,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
             m_settings.NOTIFICATION_CATCH_FAILED,
             m_env.program_info(),
             &encounter_results[0].slug_candidates,
-            action.second,
+            action.pokeball_slug,
             catch_result.balls_used,
             catch_result.result == CatchResult::POKEMON_CAUGHT
         );

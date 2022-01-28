@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonBDSPPanels_H
-#define PokemonAutomation_PokemonBDSPPanels_H
+#ifndef PokemonAutomation_PokemonBDSP_Panels_H
+#define PokemonAutomation_PokemonBDSP_Panels_H
 
 #include "CommonFramework/Panels/PanelList.h"
 

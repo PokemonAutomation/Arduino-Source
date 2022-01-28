@@ -508,6 +508,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.h
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.h
+    Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.cpp
+    Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.h
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.cpp
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.h
     Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.cpp
@@ -701,6 +703,28 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Panels_PokemonBDSP.h
     Source/PokemonBDSP/PokemonBDSP_Settings.cpp
     Source/PokemonBDSP/PokemonBDSP_Settings.h
+    Source/PokemonLA/Inference/PokemonLA_ArcDetector.cpp
+    Source/PokemonLA/Inference/PokemonLA_ArcDetector.h
+    Source/PokemonLA/Inference/PokemonLA_BubbleDetector.cpp
+    Source/PokemonLA/Inference/PokemonLA_BubbleDetector.h
+    Source/PokemonLA/Inference/PokemonLA_FlagDetector.cpp
+    Source/PokemonLA/Inference/PokemonLA_FlagDetector.h
+    Source/PokemonLA/Inference/PokemonLA_QuestMarkDetector.cpp
+    Source/PokemonLA/Inference/PokemonLA_QuestMarkDetector.h
+    Source/PokemonLA/Inference/PokemonLA_ShinySymbolDetector.cpp
+    Source/PokemonLA/Inference/PokemonLA_ShinySymbolDetector.h
+    Source/PokemonLA/Inference/PokemonLA_WhiteObjectDetector.cpp
+    Source/PokemonLA/Inference/PokemonLA_WhiteObjectDetector.h
+    Source/PokemonLA/Panels_PokemonLA.cpp
+    Source/PokemonLA/Panels_PokemonLA.h
+    Source/PokemonLA/PokemonLA_Settings.cpp
+    Source/PokemonLA/PokemonLA_Settings.h
+    Source/PokemonLA/Programs/PokemonLA_GameEntry.cpp
+    Source/PokemonLA/Programs/PokemonLA_GameEntry.h
+    Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.cpp
+    Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.h
+    Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.cpp
+    Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp

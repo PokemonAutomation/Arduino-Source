@@ -47,15 +47,24 @@ public:
     ShinyType left_shininess() const{ return m_shininess_left; }
     ShinyType right_shininess() const{ return m_shininess_right; }
 
-    std::pair<EncounterAction, std::string> get_action();
+    EncounterActionFull get_action();
 
 private:
     std::set<std::string> read_name(const QImage& screen, const ImageFloatBox& box);
+#if 0
     void run_overrides(
         std::vector<std::pair<EncounterAction, std::string>>& actions,
         const std::vector<EncounterFilterOverride>& overrides,
-        const PokemonDetection& pokemon, bool side_shiny
+        const PokemonDetection& pokemon, ShinyType side_shiny
     ) const;
+#endif
+    bool run_overrides(
+        EncounterActionFull& action,
+        const std::vector<EncounterFilterOverride>& overrides,
+        const PokemonDetection& pokemon, ShinyType side_shiny
+    ) const;
+    EncounterActionFull get_action_singles();
+    EncounterActionFull get_action_doubles();
 
 private:
     ConsoleHandle& m_console;

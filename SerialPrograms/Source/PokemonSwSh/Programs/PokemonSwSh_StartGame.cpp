@@ -8,9 +8,10 @@
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Inference/InferenceThrottler.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Routines.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "NintendoSwitch/Programs/NintendoSwitch_GameEntry.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh_StartGame.h"
@@ -26,6 +27,7 @@ void enter_loading_game(
     bool backup_save,
     uint16_t post_wait_time
 ){
+#if 0
     //  Wait for game to load.
     {
         std::chrono::milliseconds timeout(GameSettings::instance().START_GAME_WAIT * (1000 / TICKS_PER_SECOND));
@@ -62,6 +64,9 @@ void enter_loading_game(
             }
         }
     }
+#else
+    openedgame_to_gamemenu(env, console, GameSettings::instance().START_GAME_WAIT);
+#endif
 
     env.log("enter_loading_game(): Game Loaded. Entering game...", COLOR_PURPLE);
     enter_game(console, backup_save, GameSettings::instance().ENTER_GAME_MASH, 0);
@@ -121,6 +126,7 @@ void start_game_from_home_with_inference(
 //    cout << "TOLERATE_SYSTEM_UPDATE_MENU_FAST = " << TOLERATE_SYSTEM_UPDATE_MENU_FAST << endl;
 //    cout << "TOLERATE_SYSTEM_UPDATE_MENU_FAST = " << &TOLERATE_SYSTEM_UPDATE_MENU_FAST << endl;
 
+#if 0
     if (game_slot != 0){
         pbf_press_button(console, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY - 10);
         for (uint8_t c = 1; c < game_slot; c++){
@@ -163,6 +169,15 @@ void start_game_from_home_with_inference(
         pbf_mash_button(console, BUTTON_ZR, duration);
     }
     console.botbase().wait_for_all_requests();
+#else
+    open_game_from_home(
+        env, console,
+        tolerate_update_menu,
+        game_slot,
+        user_slot,
+        GameSettings::instance().START_GAME_MASH
+    );
+#endif
 
     //  Wait for game to load.
     enter_loading_game(env, console, backup_save, post_wait_time);

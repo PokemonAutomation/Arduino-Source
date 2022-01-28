@@ -4,6 +4,7 @@
  *
  */
 
+#include <algorithm>
 #include <QImage>
 #include "Common/Cpp/Exception.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
@@ -34,6 +35,33 @@ ImagePixelBox::ImagePixelBox(size_t p_min_x, size_t p_min_y, size_t p_max_x, siz
 ImagePixelBox::ImagePixelBox(const Kernels::Waterfill::WaterfillObject& object)
     : ImagePixelBox(object.min_x, object.min_y, object.max_x, object.max_y)
 {}
+
+
+void ImagePixelBox::merge_with(const ImagePixelBox& box){
+    if (box.area() == 0){
+        return;
+    }
+    if (this->area() == 0){
+        *this = box;
+    }
+    min_x = std::min(min_x, box.min_x);
+    min_y = std::min(min_y, box.min_y);
+    max_x = std::max(max_x, box.max_x);
+    max_y = std::max(max_y, box.max_y);
+}
+size_t ImagePixelBox::overlap_with(const ImagePixelBox& box) const{
+    pxint_t min_x = std::max(this->min_x, box.min_x);
+    pxint_t max_x = std::min(this->max_x, box.max_x);
+    if (min_x >= max_x){
+        return 0;
+    }
+    pxint_t min_y = std::max(this->min_y, box.min_y);
+    pxint_t max_y = std::min(this->max_y, box.max_y);
+    if (min_y >= max_y){
+        return 0;
+    }
+    return (size_t)(max_x - min_x) * (size_t)(max_y - min_y);
+}
 
 
 

@@ -16,14 +16,29 @@ namespace Pokemon{
 enum class ShinyType{
     UNKNOWN,
     NOT_SHINY,
+    MAYBE_SHINY,    //  Unknown, but likely to be shiny.
     UNKNOWN_SHINY,
     STAR_SHINY,
     SQUARE_SHINY,
 };
-inline bool is_shiny(ShinyType type){
+inline bool is_likely_shiny(ShinyType type){
     switch (type){
     case ShinyType::UNKNOWN:
     case ShinyType::NOT_SHINY:
+        return false;
+    case ShinyType::MAYBE_SHINY:
+    case ShinyType::UNKNOWN_SHINY:
+    case ShinyType::STAR_SHINY:
+    case ShinyType::SQUARE_SHINY:
+        return true;
+    }
+    return false;
+}
+inline bool is_confirmed_shiny(ShinyType type){
+    switch (type){
+    case ShinyType::UNKNOWN:
+    case ShinyType::NOT_SHINY:
+    case ShinyType::MAYBE_SHINY:
         return false;
     case ShinyType::UNKNOWN_SHINY:
     case ShinyType::STAR_SHINY:

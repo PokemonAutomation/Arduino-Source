@@ -109,7 +109,7 @@ CatchResults throw_balls(
         {
             BattleBallReader reader(console, language);
 
-            pbf_press_button(console, BUTTON_X, 10, 50);
+            pbf_press_button(console, BUTTON_X, 20, 105);
             console.botbase().wait_for_all_requests();
 
             const int16_t num_balls = move_to_ball(reader, console, ball_slug);

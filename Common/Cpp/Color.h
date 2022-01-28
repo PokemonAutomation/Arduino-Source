@@ -25,6 +25,9 @@ public:
     constexpr explicit operator uint32_t() const{
         return m_argb;
     }
+    bool operator<(Color color) const{
+        return m_argb < color.m_argb;
+    }
 
 private:
     uint32_t m_argb;

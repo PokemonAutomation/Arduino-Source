@@ -201,7 +201,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
             consecutive_failures = 0;
         }
 
-        bool wild_shiny = is_shiny(result_wild.shiny_type);
+        bool wild_shiny = is_likely_shiny(result_wild.shiny_type);
         if (wild_shiny){
             stats.m_shiny_starly++;
             send_encounter_notification(
@@ -227,7 +227,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
 #endif
         }
 
-        bool your_shiny = is_shiny(result_own.shiny_type);
+        bool your_shiny = is_likely_shiny(result_own.shiny_type);
         if (your_shiny){
             stats.add_unknown_shiny();
             send_encounter_notification(

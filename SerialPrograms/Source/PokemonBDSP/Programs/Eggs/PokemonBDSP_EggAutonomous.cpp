@@ -42,7 +42,7 @@ EggAutonomous::EggAutonomous(const EggAutonomous_Descriptor& descriptor)
     , LANGUAGE(
         "<b>Game Language:</b>",
         IVCheckerReader::instance().languages(),
-        true
+        false
     )
     , SHORTCUT("<b>Bike Shortcut:</b>")
     , MAX_KEEPERS(

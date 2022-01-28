@@ -134,8 +134,15 @@
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorSquare.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleSet.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_ExperienceGainDetector.h"
+#include "PokemonLA/Inference/PokemonLA_BubbleDetector.h"
+#include "PokemonLA/Inference/PokemonLA_ArcDetector.h"
+#include "PokemonLA/Inference/PokemonLA_QuestMarkDetector.h"
+#include "PokemonLA/Inference/PokemonLA_ShinySymbolDetector.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "CommonFramework/Inference/BlackBorderDetector.h"
+#include "PokemonLA/Programs/PokemonLA_GameEntry.h"
+#include "PokemonLA/PokemonLA_Settings.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "TestProgramSwitch.h"
 
 #include <immintrin.h>
@@ -199,48 +206,7 @@ TestProgram::TestProgram(const TestProgram_Descriptor& descriptor)
 
 namespace PokemonSwSh{
 
-
-
-
 }
-
-
-
-
-#if 0
-class ShinySymbolDetector : public ImageMatch::SubObjectTemplateMatcher{
-public:
-    ShinySymbolDetector()
-        : SubObjectTemplateMatcher("PokemonSwSh/ExclamationMark.png", 120)
-    {
-        PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
-            m_object,
-            128, 255,
-            128, 255,
-            128, 255
-        );
-        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
-        if (objects.size() != 2){
-            PA_THROW_StringException("Failed to find exactly two objects in resource.");
-        }
-        size_t index = 0;
-        if (objects[0].area < objects[1].area){
-            index = 1;
-        }
-        set_subobject(objects[index]);
-//        cout << m_feature_box.x << ", "
-//             << m_feature_box.y << ", "
-//             << m_feature_box.width << ", "
-//             << m_feature_box.height << endl;
-    }
-
-    static const ShinySymbolDetector& instance(){
-        static ShinySymbolDetector matcher;
-        return matcher;
-    }
-};
-#endif
-
 
 
 
@@ -253,8 +219,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     using namespace Kernels::Waterfill;
     using namespace OCR;
     using namespace Pokemon;
-//    using namespace PokemonSwSh;
-    using namespace PokemonBDSP;
+    using namespace PokemonSwSh;
+//    using namespace PokemonBDSP;
+//    using namespace PokemonLA;
 
     Logger& logger = env.logger();
     ConsoleHandle& console = env.consoles[0];
@@ -265,9 +232,166 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 
-//    QImage image("screenshot-20220123-152811325286.png");
 
-//    InferenceBoxScope box(overlay, 0.32, 0.87, 0.03, 0.04);
+//    QImage image("2054071609223400_s.jpg");
+//    SelectionArrowFinder arrow_detector(console, ImageFloatBox(0.350, 0.450, 0.500, 0.400));
+//    arrow_detector.detect(image);
+
+
+
+#if 0
+
+//    ArcWatcher arcs(overlay);
+//    BubbleWatcher bubbles(overlay);
+
+    BubbleDetector bubbles;
+    ArcDetector arcs;
+    QuestMarkDetector quest_marks;
+    WhiteObjectWatcher watcher(
+        overlay,
+        {{bubbles, false}, {arcs, false}, {quest_marks, false}}
+    );
+//    watcher.process_frame(feed.snapshot(), std::chrono::system_clock::now());
+#if 1
+    {
+        VisualInferenceSession session(env, logger, feed, overlay);
+        session += watcher;
+        session.run();
+    }
+#endif
+
+
+#endif
+
+//    InferenceBoxScope box(overlay, 0.11, 0.868, 0.135, 0.043);
+
+
+
+
+
+
+//    ShinySymbolWatcher watcher(overlay, SHINY_SYMBOL_BOX_BOTTOM);
+//    watcher.process_frame(feed.snapshot(), std::chrono::system_clock::now());
+
+
+//    ArcDetector detector;
+
+
+//    QImage image("screenshot-20220124-212851483502.png");
+//    QImage image(feed.snapshot());
+//    find_arcs(image);
+
+#if 0
+    QImage image0("test-image.png");
+    QImage image1("test-sprite.png");
+    for (int r = 0; r < image0.height(); r++){
+        for (int c = 0; c < image0.width(); c++){
+            uint32_t pixel1 = image1.pixel(c, r);
+            if ((pixel1 >> 24) == 0){
+                image0.setPixel(c, r, 0xff00ff00);
+            }
+        }
+    }
+    image0.save("test.png");
+#endif
+
+
+
+#if 0
+    QImage image("screenshot-20220124-212851483502.png");
+
+    InferenceBoxScope box(overlay, 0.4, 0.4, 0.2, 0.2);
+    image = extract_box(image, box);
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
+        image,
+        128, 255,
+        128, 255,
+        128, 255
+    );
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
+    cout << objects.size() << endl;
+
+    int c = 0;
+    for (const auto& object : objects){
+        extract_box(image, object).save("test-" + QString::number(c++) + ".png");
+    }
+
+//    WaterfillObject object = objects[1];
+//    object.merge_assume_no_overlap(objects[2]);
+
+ //   extract_box(image, object).save("test.png");
+#endif
+
+
+#if 0
+    while (true){
+        pbf_press_button(console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+        reset_game_from_home(env, console, true);
+    }
+#endif
+
+
+
+#if 0
+    ArcWatcher arcs(overlay);
+    ShinySymbolWatcher symbols(overlay);
+    {
+        VisualInferenceSession session(env, logger, feed, overlay);
+        session += arcs;
+        session += symbols;
+        session.run();
+    }
+#endif
+
+
+
+#if 0
+    QImage image("ArcR-Original.png");
+
+    image = image.convertToFormat(QImage::Format::Format_ARGB32);
+    uint32_t* ptr = (uint32_t*)image.bits();
+    size_t words = image.bytesPerLine() / sizeof(uint32_t);
+    for (int r = 0; r < image.height(); r++){
+        for (int c = 0; c < image.width(); c++){
+            uint32_t& pixel = ptr[r * words + c];
+            uint32_t red = qRed(pixel);
+            uint32_t green = qGreen(pixel);
+            uint32_t blue = qBlue(pixel);
+            if (red < 128 || green < 128 || blue < 128){
+                pixel = 0x00000000;
+            }
+        }
+    }
+    image.save("test.png");
+#endif
+
+
+
+#if 0
+    QImage image("screenshot-20220123-225755803973.png");
+
+    InferenceBoxScope box(overlay, 0.32, 0.87, 0.03, 0.04);
+    image = extract_box(image, box);
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
+        image,
+        128, 255,
+        128, 255,
+        128, 255
+    );
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
+    cout << objects.size() << endl;
+
+//    int c = 0;
+//    for (const auto& object : objects){
+//        extract_box(image, object).save("test-" + QString::number(c++) + ".png");
+//    }
+
+    WaterfillObject object = objects[0];
+    object.merge_assume_no_overlap(objects[1]);
+    extract_box(image, object).save("Sparkle.png");
+
+#endif
+
 
 
 

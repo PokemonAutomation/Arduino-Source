@@ -38,6 +38,9 @@ struct ImagePixelBox{
     pxint_t width() const{ return max_x - min_x; }
     pxint_t height() const{ return max_y - min_y; }
     size_t area() const{ return (size_t)width() * (size_t)height(); }
+
+    void merge_with(const ImagePixelBox& box);
+    size_t overlap_with(const ImagePixelBox& box) const;
 };
 
 

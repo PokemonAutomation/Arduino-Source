@@ -46,8 +46,10 @@ void ExactImageMatcher::process_images(QImage& reference, QImage& image) const{
 double ExactImageMatcher::rmsd(QImage image) const{
     QImage reference;
     process_images(reference, image);
-//    image.save("test-image.png");
-//    reference.save("test-sprite.png");
+
+    image.save("test-image.png");
+    reference.save("test-sprite.png");
+
     return pixel_RMSD(reference, image);
 }
 double ExactImageMatcher::rmsd(QImage image, QRgb background) const{

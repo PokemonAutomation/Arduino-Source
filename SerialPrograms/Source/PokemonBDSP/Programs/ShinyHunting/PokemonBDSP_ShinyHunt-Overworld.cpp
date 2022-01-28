@@ -123,6 +123,10 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env){
             std::chrono::seconds(30)
         );
 
+//        result_wild.shiny_type = ShinyType::UNKNOWN_SHINY;
+//        result_wild.left_is_shiny = false;
+//        result_wild.right_is_shiny = true;
+
         bool stop = handler.handle_standard_encounter_end_battle(result_wild, EXIT_BATTLE_TIMEOUT);
         if (stop){
             break;

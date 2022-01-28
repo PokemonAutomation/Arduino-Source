@@ -35,14 +35,12 @@ StandardEncounterDetection::StandardEncounterDetection(
 bool StandardEncounterDetection::is_shiny() const{
     switch (m_shininess){
     case ShinyType::UNKNOWN:
-        return false;
     case ShinyType::NOT_SHINY:
         return false;
-    case ShinyType::STAR_SHINY:
-        return true;
-    case ShinyType::SQUARE_SHINY:
-        return true;
+    case ShinyType::MAYBE_SHINY:
     case ShinyType::UNKNOWN_SHINY:
+    case ShinyType::STAR_SHINY:
+    case ShinyType::SQUARE_SHINY:
         return true;
     }
     return false;

@@ -15,10 +15,6 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-bool openedgame_to_gamemenu(
-    ProgramEnvironment& env, ConsoleHandle& console,
-    uint16_t timeout
-);
 bool gamemenu_to_ingame(
     ProgramEnvironment& env, ConsoleHandle& console,
     uint16_t mash_duration, uint16_t enter_game_timeout

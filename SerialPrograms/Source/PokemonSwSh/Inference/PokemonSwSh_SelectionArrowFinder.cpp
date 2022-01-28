@@ -50,7 +50,7 @@ bool is_selection_arrow(const QImage& image, const WaterfillObject& object){
 
     double rmsd = SELECTION_ARROW().rmsd(cropped);
 //    cout << "rmsd = " << rmsd << endl;
-    return rmsd <= 100;
+    return rmsd <= 110;
 }
 std::vector<ImagePixelBox> find_selection_arrows(const QImage& image){
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_max(image, 63, 63, 63);

@@ -22,6 +22,7 @@ namespace Pokemon{
 
 Color shiny_color(ShinyType shiny_type){
     switch (shiny_type){
+    case ShinyType::MAYBE_SHINY:
     case ShinyType::UNKNOWN_SHINY:
     case ShinyType::STAR_SHINY:
         return Color(0xffff99);
@@ -33,6 +34,8 @@ Color shiny_color(ShinyType shiny_type){
 }
 QString shiny_symbol(ShinyType shiny_type){
     switch (shiny_type){
+    case ShinyType::MAYBE_SHINY:
+        return ":question:";
     case ShinyType::UNKNOWN_SHINY:
     case ShinyType::STAR_SHINY:
         return QChar(0x2728);
@@ -95,10 +98,13 @@ void send_encounter_notification(
         first = false;
         names += pokemon_to_string(result);
         max_shiny_type = max_shiny_type < result.shininess ? result.shininess : max_shiny_type;
-        shiny_count += is_shiny(result.shininess) ? 1 : 0;
+        shiny_count += is_confirmed_shiny(result.shininess) ? 1 : 0;
+    }
+    if (max_shiny_type == ShinyType::MAYBE_SHINY){
+        max_shiny_type = ShinyType::UNKNOWN_SHINY;
     }
     Color color = shiny_color(max_shiny_type);
-    bool has_shiny = is_shiny(max_shiny_type) || shiny_detected;
+    bool has_shiny = is_likely_shiny(max_shiny_type) || shiny_detected;
 
     QString shinies;
     if (results.size() == 1){
@@ -109,6 +115,9 @@ void send_encounter_notification(
             break;
         case ShinyType::NOT_SHINY:
             shinies = "Not Shiny";
+            break;
+        case ShinyType::MAYBE_SHINY:
+            shinies = "Maybe Shiny";
             break;
         case ShinyType::UNKNOWN_SHINY:
             shinies = symbol + QString(" Shiny ") + symbol;

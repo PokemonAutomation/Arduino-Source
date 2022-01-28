@@ -84,7 +84,7 @@ GameSettings::GameSettings()
 //    )
 {
     PA_ADD_OPTION(m_menu_navigation);
-    PA_ADD_OPTION(GAME_TO_HOME_DELAY);
+    PA_ADD_OPTION(OVERWORLD_TO_MENU_DELAY);
     PA_ADD_OPTION(MENU_TO_OVERWORLD_DELAY);
     PA_ADD_OPTION(GAME_TO_HOME_DELAY);
 

@@ -259,6 +259,7 @@ SOURCES += \
     Source/NintendoSwitch/Options/TimeExpressionOption.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.cpp \
+    Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.cpp \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.cpp \
@@ -329,6 +330,7 @@ SOURCES += \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_GiftBerryReset.cpp \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute210.cpp \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.cpp \
+    Source/PokemonBDSP/Programs/General/PokemonBDSP_AutonomousBallThrower.cpp \
     Source/PokemonBDSP/Programs/General/PokemonBDSP_MassRelease.cpp \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.3.cpp \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.2.cpp \
@@ -353,6 +355,17 @@ SOURCES += \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfBoxTrade.cpp \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfTouchTrade.cpp \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.cpp \
+    Source/PokemonLA/Inference/PokemonLA_ArcDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_BubbleDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_FlagDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_QuestMarkDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_ShinySymbolDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_WhiteObjectDetector.cpp \
+    Source/PokemonLA/Panels_PokemonLA.cpp \
+    Source/PokemonLA/PokemonLA_Settings.cpp \
+    Source/PokemonLA/Programs/PokemonLA_GameEntry.cpp \
+    Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.cpp \
+    Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.cpp \
@@ -791,6 +804,7 @@ HEADERS += \
     Source/NintendoSwitch/Options/TimeExpressionOption.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendCodeAdder.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_FriendDelete.h \
+    Source/NintendoSwitch/Programs/NintendoSwitch_GameEntry.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_PreventSleep.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_SwitchViewer.h \
     Source/NintendoSwitch/Programs/NintendoSwitch_TurboA.h \
@@ -864,6 +878,7 @@ HEADERS += \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_GiftBerryReset.h \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute210.h \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.h \
+    Source/PokemonBDSP/Programs/General/PokemonBDSP_AutonomousBallThrower.h \
     Source/PokemonBDSP/Programs/General/PokemonBDSP_MassRelease.h \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.3.h \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.2.h \
@@ -888,6 +903,17 @@ HEADERS += \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfBoxTrade.h \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfTouchTrade.h \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.h \
+    Source/PokemonLA/Inference/PokemonLA_ArcDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_BubbleDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_FlagDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_QuestMarkDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_ShinySymbolDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_WhiteObjectDetector.h \
+    Source/PokemonLA/Panels_PokemonLA.h \
+    Source/PokemonLA/PokemonLA_Settings.h \
+    Source/PokemonLA/Programs/PokemonLA_GameEntry.h \
+    Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.h \
+    Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h \

@@ -62,9 +62,9 @@ public:
             0, 192
         );
         std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
-//        if (objects.size() != 1){
-//            PA_THROW_StringException("Failed to find exactly one object in resource: " + std::to_string(objects.size()));
-//        }
+        if (objects.size() != 2){
+            PA_THROW_StringException("Failed to find exactly two objects in resource.");
+        }
         size_t index = 0;
         if (objects[0].area < objects[1].area){
             index = 1;

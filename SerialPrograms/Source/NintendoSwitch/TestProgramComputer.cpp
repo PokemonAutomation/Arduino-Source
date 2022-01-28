@@ -38,6 +38,9 @@
 #include "PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h"
 #include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "Pokemon/Inference/Pokemon_NameReader.h"
+#include "CommonFramework/OCR/OCR_Filtering.h"
+#include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 
 #include <iostream>
 using std::cout;
@@ -47,6 +50,7 @@ namespace PokemonAutomation{
 
 using namespace Kernels;
 using namespace Kernels::Waterfill;
+using namespace Pokemon;
 
 
 TestProgramComputer_Descriptor::TestProgramComputer_Descriptor()
@@ -77,6 +81,34 @@ inline std::string dump8(uint8_t x){
 
 
 
+std::set<std::string> read_name(
+    Logger& logger,
+    Language language,
+    const QImage& screen, const ImageFloatBox& box
+){
+    if (language == Language::None){
+        return {};
+    }
+
+    QImage image = extract_box(screen, box);
+    OCR::filter_smart(image);
+
+    std::set<std::string> ret;
+
+    OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(logger, language, image);
+    if (result.results.empty()){
+//        dump_image(
+//            logger, ProgramInfo(),
+//            QString::fromStdString("NameOCR-" + language_data(language).code),
+//            screen
+//        );
+    }else{
+        for (const auto& item : result.results){
+            ret.insert(item.second.token);
+        }
+    }
+    return ret;
+}
 
 
 
@@ -86,15 +118,72 @@ inline std::string dump8(uint8_t x){
 void TestProgramComputer::program(ProgramEnvironment& env){
     using namespace Kernels;
     using namespace NintendoSwitch::PokemonSwSh;
+    using namespace Pokemon;
 
 
-
-    QImage image("screenshot-20220123-215131034370.png");
-    std::vector<ImagePixelBox> objects = find_exclamation_marks(image);
 
 #if 0
-    QImage image("ExclamationMark1.png");
-    image = image.scaled(image.width() / 4, image.height() / 4);
+    QImage image("screenshot-20220127-200227422225.png");
+    image = extract_box(image, ImageFloatBox{0.4, 0.1, 0.05, 0.2});
+    image.save("test.png");
+
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
+        image,
+        128, 255,
+        128, 255,
+        128, 255
+    );
+
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 50, false);
+    cout << "objects = " << objects.size() << endl;
+
+    int c = 0;
+    for (ImagePixelBox box : objects){
+        extract_box(image, box).save("image-" + QString::number(c++) + ".png");
+    }
+
+    WaterfillObject obj = objects[3];
+    obj.merge_assume_no_overlap(objects[4]);
+
+    extract_box(image, obj).save("image.png");
+#endif
+
+
+#if 0
+    QImage image("screenshot-20220125-192616059686.png");
+
+    image = extract_box(image, ImageFloatBox{0.5, 0.05, 0.25, 0.4});
+    image.save("test.png");
+
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
+        image,
+        128, 255,
+        128, 255,
+        128, 255
+    );
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 50, false);
+    cout << "objects = " << objects.size() << endl;
+
+    int c = 0;
+    for (ImagePixelBox box : objects){
+        extract_box(image, box).save("image-" + QString::number(c++) + ".png");
+    }
+#endif
+
+
+
+//    QImage image("20220125-083836057990-NameOCR-eng.png");
+//    std::set<std::string> slugs = read_name(env.logger(), Language::English, image, {0.11, 0.868, 0.135, 0.043});
+
+
+
+
+//    QImage image("screenshot-20220123-215131034370.png");
+//    std::vector<ImagePixelBox> objects = find_exclamation_marks(image);
+
+#if 1
+    QImage image("Flag-Original.png");
+    image = image.scaled(image.width() / 2, image.height() / 2);
     image = image.convertToFormat(QImage::Format::Format_ARGB32);
     uint32_t* ptr = (uint32_t*)image.bits();
     size_t words = image.bytesPerLine() / sizeof(uint32_t);
@@ -104,15 +193,15 @@ void TestProgramComputer::program(ProgramEnvironment& env){
             uint32_t red = qRed(pixel);
             uint32_t green = qGreen(pixel);
             uint32_t blue = qBlue(pixel);
-            if (red < 192 && green < 192){
-                pixel = 0x00000000;
-            }
-            if (blue > red + 20){
+//            if (red < 128 && green < 128 && blue < 128){
+//                pixel = 0x00000000;
+//            }
+            if (red < 128 || green < 128 || blue < 128){
                 pixel = 0x00000000;
             }
         }
     }
-    image.save("test.png");
+    image.save("Flag-Template0.png");
 #endif
 
 

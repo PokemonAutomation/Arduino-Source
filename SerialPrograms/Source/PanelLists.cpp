@@ -10,6 +10,7 @@
 #include "NintendoSwitch/NintendoSwitch_Panels.h"
 #include "PokemonSwSh/PokemonSwSh_Panels.h"
 #include "PokemonBDSP/Panels_PokemonBDSP.h"
+#include "PokemonLA/Panels_PokemonLA.h"
 #include "PanelLists.h"
 
 #include <iostream>
@@ -25,14 +26,17 @@ ProgramTabs::ProgramTabs(QWidget& parent, PanelListener& listener)
     add(new NintendoSwitch::Panels(*this, listener));
     add(new NintendoSwitch::PokemonSwSh::Panels(*this, listener));
     add(new NintendoSwitch::PokemonBDSP::Panels(*this, listener));
+    if (GlobalSettings::instance().DEVELOPER_MODE){
+        add(new NintendoSwitch::PokemonLA::Panels(*this, listener));
+    }
 }
 
 void ProgramTabs::add(PanelList* list){
-    if (list->items() != 0){
-        addTab(list, list->label());
-//        setTabEnabled((int)m_lists.size(), false);
-        m_lists.emplace_back(list);
+    addTab(list, list->label());
+    if (list->items() == 0){
+        setTabEnabled((int)m_lists.size(), false);
     }
+    m_lists.emplace_back(list);
 }
 
 QSize ProgramTabs::sizeHint() const{

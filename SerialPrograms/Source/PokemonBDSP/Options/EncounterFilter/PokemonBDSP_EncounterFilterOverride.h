@@ -32,6 +32,14 @@ enum class EncounterAction{
     ThrowBalls,
     ThrowBallsAndSave,
 };
+struct EncounterActionFull{
+    EncounterAction action;
+    std::string pokeball_slug;
+
+    bool operator==(const EncounterActionFull& x) const;
+    bool operator!=(const EncounterActionFull& x) const;
+    QString to_str() const;
+};
 
 
 class EncounterFilterOverride : public EditableTableRow{

@@ -85,6 +85,10 @@ private:
 };
 
 
+template <typename Tile>
+const Tile SparseBinaryMatrixBase<Tile>::ZERO_TILE;
+
+
 
 
 

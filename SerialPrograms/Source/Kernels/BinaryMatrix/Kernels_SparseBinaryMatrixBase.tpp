@@ -106,10 +106,6 @@ void SparseBinaryMatrixBase<Tile>::operator|=(const SparseBinaryMatrixBase& x){
 }
 
 
-template <typename Tile>
-const Tile SparseBinaryMatrixBase<Tile>::ZERO_TILE;
-
-
 
 
 //  Debugging

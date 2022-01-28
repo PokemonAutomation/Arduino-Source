@@ -21,6 +21,32 @@ namespace PokemonBDSP{
 
 
 
+bool EncounterActionFull::operator==(const EncounterActionFull& x) const{
+    switch (action){
+    case EncounterAction::StopProgram:
+    case EncounterAction::RunAway:
+        return action == x.action;
+    case EncounterAction::ThrowBalls:
+    case EncounterAction::ThrowBallsAndSave:
+        return action == x.action && pokeball_slug == x.pokeball_slug;
+    }
+}
+bool EncounterActionFull::operator!=(const EncounterActionFull& x) const{
+    return !(*this == x);
+}
+QString EncounterActionFull::to_str() const{
+    QString str;
+    str += EncounterAction_NAMES[(size_t)action];
+    if (action == EncounterAction::ThrowBalls || action == EncounterAction::ThrowBallsAndSave){
+        str += " (";
+        str += get_pokeball_name(pokeball_slug).display_name();
+        str += ")";
+    }
+    return str;
+}
+
+
+
 EncounterFilterOverride::EncounterFilterOverride(bool allow_autocatch)
     : m_allow_autocatch(allow_autocatch)
     , m_ball_select(nullptr)
