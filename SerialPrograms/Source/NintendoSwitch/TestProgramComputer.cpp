@@ -295,7 +295,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
     const size_t LENGTH = (size_t)1 << k;
 
 //    TwiddleTable table(k);
-    float R[LENGTH] = {5, 8, 4, 0, 0, 3, 7, 7, 9, 9, 5, 3, 1, 9, 0, 8, 2, 4, 3, 7, 9, 8, 8, \
+    alignas(64) float R[LENGTH] = {5, 8, 4, 0, 0, 3, 7, 7, 9, 9, 5, 3, 1, 9, 0, 8, 2, 4, 3, 7, 9, 8, 8, \
 4, 2, 1, 5, 8, 0, 3, 2, 7, 4, 2, 0, 3, 3, 9, 2, 8, 7, 4, 0, 7, 4, 9, \
 5, 8, 8, 3, 8, 1, 9, 0, 3, 8, 8, 3, 9, 9, 0, 9, 0, 8, 2, 2, 1, 7, 0, \
 0, 7, 5, 9, 9, 2, 2, 0, 2, 3, 1, 3, 7, 4, 7, 1, 5, 4, 5, 8, 6, 7, 6, \
@@ -318,7 +318,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
 5, 1, 5, 9, 1, 7, 9, 2, 6, 3, 5, 4, 7, 9, 9, 3, 9, 3, 4, 1, 7, 3, 0, \
 9, 0, 7, 7, 2, 7, 6, 2, 2, 6, 1, 4, 0, 2, 8, 7, 3, 9, 2, 7, 1, 0, 9, \
 1, 0, 7, 0, 4, 3};
-    float A[LENGTH / 2];
+    alignas(64) float A[LENGTH / 2];
 
     fft_abs(k, A, R);
 

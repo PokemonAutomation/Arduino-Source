@@ -68,6 +68,9 @@ void TwiddleTable::expand(int k){
     if (size_k >= k){
         return;
     }
+    if (k > 31){
+        throw "Transform length limit exceeded.";
+    }
     for (; size_k < k;){
         size_k++;
         m_tables[size_k].w1 = make_table_row(size_k, 1, 2);
