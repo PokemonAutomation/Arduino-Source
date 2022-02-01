@@ -17,6 +17,17 @@ namespace PokemonAutomation{
 namespace Kernels{
 
 
+inline static void print(const __m128& x){
+    union{
+        __m128 v;
+        float s[4];
+    };
+    v = x;
+    for (int i = 0; i < 4; i++){
+        std::cout << s[i] << " ";
+    }
+    std::cout << std::endl;
+}
 inline static void print_u8(__m128i x){
     for (int i = 0; i < 16; i++){
         std::cout << (int)((const unsigned char*)&x)[i] << " ";

@@ -75,7 +75,7 @@ void ShinySparkleSetSwSh::update_alphas(){
     double ball_alpha   = 0.4 * balls.size();
     double star_alpha   = 0.5 * stars.size();
     double square_alpha = 0.3 * squares.size();
-    double line_alpha   = 0.3 * lines.size();
+    double line_alpha   = std::min(0.3 * lines.size(), square_alpha);
     m_alpha_overall = ball_alpha + star_alpha + square_alpha + line_alpha;
     m_alpha_star = star_alpha;
     m_alpha_square = square_alpha + line_alpha;

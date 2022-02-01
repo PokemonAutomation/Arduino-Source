@@ -379,6 +379,27 @@ file(GLOB MAIN_SOURCES
     Source/Integrations/ProgramTracker.h
     Source/Integrations/SleepyDiscordRunner.cpp
     Source/Integrations/SleepyDiscordRunner.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT.cpp
+    Source/Kernels/AbsFFT/Kernels_AbsFFT.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch_Default.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch_x86_AVX2.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch_x86_SSE41.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_BaseTransform_x86_AVX2.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_BaseTransform_x86_SSE41.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_BitReverse.cpp
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_BitReverse.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_Butterflies.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_ComplexScalar.cpp
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_ComplexScalar.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_ComplexToAbs.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_ComplexVector.cpp
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_ComplexVector.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_FullTransform.cpp
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_FullTransform.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_Reductions.h
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.cpp
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.cpp

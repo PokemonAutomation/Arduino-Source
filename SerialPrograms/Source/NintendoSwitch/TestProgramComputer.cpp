@@ -41,6 +41,20 @@
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "CommonFramework/OCR/OCR_Filtering.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
+#include "Common/Cpp/AlignedVector.tpp"
+
+#include "Kernels/AbsFFT/Kernels_AbsFFT.h"
+#include "Kernels/AbsFFT/Kernels_AbsFFT_Arch.h"
+#include "Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.h"
+#include "Kernels/AbsFFT/Kernels_AbsFFT_Butterflies.h"
+#include "Kernels/AbsFFT/Kernels_AbsFFT_ComplexScalar.h"
+#include "Kernels/AbsFFT/Kernels_AbsFFT_ComplexVector.h"
+#include "Kernels/AbsFFT/Kernels_AbsFFT_ComplexToAbs.h"
+#include "Kernels/AbsFFT/Kernels_AbsFFT_BitReverse.h"
+#include "Kernels/AbsFFT/Kernels_AbsFFT_Reductions.h"
+#include "Kernels/AbsFFT/Kernels_AbsFFT_FullTransform.h"
+
+//#include "Kernels/Kernels_x64_AVX2.h"
 
 #include <iostream>
 using std::cout;
@@ -51,6 +65,7 @@ namespace PokemonAutomation{
 using namespace Kernels;
 using namespace Kernels::Waterfill;
 using namespace Pokemon;
+using namespace Kernels::AbsFFT;
 
 
 TestProgramComputer_Descriptor::TestProgramComputer_Descriptor()
@@ -78,37 +93,51 @@ inline std::string dump8(uint8_t x){
 }
 
 
-
-
-
-std::set<std::string> read_name(
-    Logger& logger,
-    Language language,
-    const QImage& screen, const ImageFloatBox& box
-){
-    if (language == Language::None){
-        return {};
+void print(const uint64_t* ptr, size_t len){
+    cout << "{";
+    bool first = true;
+    for (size_t c = 0; c < len; c++){
+        if (!first){
+            cout << ", ";
+        }
+        first = false;
+        cout << ptr[c];
     }
-
-    QImage image = extract_box(screen, box);
-    OCR::filter_smart(image);
-
-    std::set<std::string> ret;
-
-    OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(logger, language, image);
-    if (result.results.empty()){
-//        dump_image(
-//            logger, ProgramInfo(),
-//            QString::fromStdString("NameOCR-" + language_data(language).code),
-//            screen
-//        );
-    }else{
-        for (const auto& item : result.results){
-            ret.insert(item.second.token);
+    cout << "}" << endl;
+}
+void print(const float* ptr, size_t len){
+    cout << "{";
+    bool first = true;
+    for (size_t c = 0; c < len; c++){
+        if (!first){
+            cout << ", ";
+        }
+        first = false;
+        cout << ptr[c];
+    }
+    cout << "}" << endl;
+}
+void print(const scomplex* ptr, size_t len){
+    cout << "{";
+    bool first = true;
+    for (size_t c = 0; c < len; c++){
+        if (!first){
+            cout << ", ";
+        }
+        first = false;
+        if (ptr[c].r == 0){
+            cout << ptr[c].i << " i";
+        }else if (ptr[c].i == 0){
+            cout << ptr[c].r;
+        }else if (ptr[c].i > 0){
+            cout << ptr[c].r << " + " << ptr[c].i << " i";
+        }else{
+            cout << ptr[c].r << " - " << -ptr[c].i << " i";
         }
     }
-    return ret;
+    cout << "}" << endl;
 }
+
 
 
 
@@ -119,6 +148,328 @@ void TestProgramComputer::program(ProgramEnvironment& env){
     using namespace Kernels;
     using namespace NintendoSwitch::PokemonSwSh;
     using namespace Pokemon;
+
+
+#if 0
+    float x[16];
+    for (int c = 0; c < 16; c++){
+        x[c] = c;
+    }
+    __m256 r0 = _mm256_loadu_ps(x +  0);
+    __m256 r1 = _mm256_loadu_ps(x +  8);
+    print(r0);
+    print(r1);
+    cout << "---------------" << endl;
+
+    r0 = _mm256_permutevar8x32_ps(r0, _mm256_setr_epi32(0, 7, 2, 5, 4, 3, 6, 1));
+    r1 = _mm256_permutevar8x32_ps(r1, _mm256_setr_epi32(0, 4, 1, 5, 2, 6, 3, 7));
+    print(r0);
+#endif
+
+#if 0
+    float x[16];
+    for (int c = 0; c < 16; c++){
+        x[c] = c;
+    }
+    __m256 r0 = _mm256_loadu_ps(x +  0);
+    __m256 r1 = _mm256_loadu_ps(x +  8);
+    print(r0);
+    print(r1);
+    cout << "---------------" << endl;
+
+    __m256 a0 = _mm256_permute2f128_ps(r0, r1, 32);
+    __m256 a1 = _mm256_permute2f128_ps(r0, r1, 49);
+    print(a0);
+    print(a1);
+    cout << "---------------" << endl;
+
+    r0 = _mm256_permutevar8x32_ps(a0, _mm256_setr_epi32(0, 4, 1, 5, 2, 6, 3, 7));
+    r1 = _mm256_permutevar8x32_ps(a1, _mm256_setr_epi32(0, 4, 1, 5, 2, 6, 3, 7));
+//    r0 = _mm256_castpd_ps(_mm256_permute4x64_pd(_mm256_castps_pd(a0), 216));
+//    r1 = _mm256_castpd_ps(_mm256_permute4x64_pd(_mm256_castps_pd(a1), 216));
+    print(r0);
+    print(r1);
+    cout << "---------------" << endl;
+#endif
+
+#if 0
+    float x[64];
+    for (int c = 0; c < 64; c++){
+        x[c] = c;
+    }
+
+    __m256 r0 = _mm256_loadu_ps(x +  0);
+    __m256 r1 = _mm256_loadu_ps(x +  8);
+    __m256 r2 = _mm256_loadu_ps(x + 16);
+    __m256 r3 = _mm256_loadu_ps(x + 24);
+    __m256 r4 = _mm256_loadu_ps(x + 32);
+    __m256 r5 = _mm256_loadu_ps(x + 40);
+    __m256 r6 = _mm256_loadu_ps(x + 48);
+    __m256 r7 = _mm256_loadu_ps(x + 56);
+    print(r0);
+    print(r1);
+    print(r2);
+    print(r3);
+    print(r4);
+    print(r5);
+    print(r6);
+    print(r7);
+    cout << "---------------" << endl;
+
+    vtranspose(r0, r1, r2, r3, r4, r5, r6, r7);
+    cout << "---------------" << endl;
+
+
+    print(r0);
+    print(r1);
+    print(r2);
+    print(r3);
+    print(r4);
+    print(r5);
+    print(r6);
+    print(r7);
+#endif
+
+
+
+#if 0
+    const int k = 5;
+    const size_t LENGTH = (size_t)1 << k;
+
+    uint64_t data[LENGTH];
+    uint64_t temp[LENGTH];
+    for (uint64_t c = 0; c < LENGTH; c++){
+        data[c] = c;
+    }
+
+    bitreverse_u64_ip(k, data, temp);
+    print(data, LENGTH);
+//    print(temp, LENGTH);
+
+
+    for (size_t c = 0; c < LENGTH; c++){
+        cout << bitreverse64(c, k) << ", ";
+    }
+#endif
+
+
+
+#if 0
+    float in[32] = {
+        0, 1, 16, 17, 8, 9, 24, 25, 4, 5, 20, 21, 12, 13, 28, 29,
+        2, 3, 18, 19, 10, 11, 26, 27, 6, 7, 22, 23, 14, 15, 30, 31
+    };
+    float out[32];
+
+    interleave_layers1_f32vk_Default(1, 5, out, in);
+    interleave_layers1_f32vk_Default(2, 5, in, out);
+    interleave_layers1_f32vk_Default(3, 5, out, in);
+    print(in, 32);
+    print(out, 32);
+#endif
+
+
+#if 0
+    __m128 r0 = _mm_setr_ps(0, 1, 2, 3);
+    __m128 r1 = _mm_setr_ps(4, 5, 6, 7);
+    print(r0);
+    print(r1);
+
+//    r0 = _mm_shuffle_ps(r0, r0, 108);
+//    r1 = _mm_shuffle_ps(r1, r1, 108);
+//    print(r0);
+
+//    print(_mm_blend_ps(r0, _mm_shuffle_ps(r1, r1, 108), 10));
+//    print(_mm_blend_ps(r1, _mm_shuffle_ps(r0, r0, 108), 10));
+
+    print(_mm_shuffle_ps(r0, r1, 68));
+    print(_mm_shuffle_ps(r0, r1, 238));
+
+
+#endif
+
+
+
+#if 1
+    const int k = 9;
+    const size_t LENGTH = (size_t)1 << k;
+
+//    TwiddleTable table(k);
+    float R[LENGTH] = {5, 8, 4, 0, 0, 3, 7, 7, 9, 9, 5, 3, 1, 9, 0, 8, 2, 4, 3, 7, 9, 8, 8, \
+4, 2, 1, 5, 8, 0, 3, 2, 7, 4, 2, 0, 3, 3, 9, 2, 8, 7, 4, 0, 7, 4, 9, \
+5, 8, 8, 3, 8, 1, 9, 0, 3, 8, 8, 3, 9, 9, 0, 9, 0, 8, 2, 2, 1, 7, 0, \
+0, 7, 5, 9, 9, 2, 2, 0, 2, 3, 1, 3, 7, 4, 7, 1, 5, 4, 5, 8, 6, 7, 6, \
+4, 5, 9, 9, 5, 9, 4, 2, 2, 9, 0, 5, 2, 2, 2, 9, 5, 6, 8, 8, 4, 6, 0, \
+4, 1, 2, 8, 8, 2, 3, 1, 3, 4, 7, 7, 9, 7, 4, 6, 8, 5, 3, 4, 0, 1, 0, \
+7, 0, 2, 6, 3, 3, 7, 6, 0, 0, 4, 3, 6, 2, 6, 9, 0, 3, 4, 2, 8, 0, 9, \
+2, 7, 5, 6, 4, 0, 3, 6, 1, 3, 0, 0, 4, 1, 3, 0, 0, 1, 1, 6, 3, 7, 0, \
+7, 2, 5, 7, 7, 5, 9, 7, 2, 2, 2, 6, 5, 8, 0, 3, 7, 0, 2, 8, 9, 4, 7, \
+4, 0, 3, 5, 8, 5, 6, 9, 1, 6, 0, 7, 2, 1, 7, 1, 0, 1, 0, 8, 8, 0, 4, \
+6, 8, 2, 1, 9, 9, 1, 0, 1, 1, 3, 8, 2, 3, 4, 6, 4, 1, 2, 6, 1, 2, 5, \
+5, 1, 7, 3, 4, 7, 2, 8, 7, 8, 0, 1, 2, 3, 4, 7, 3, 7, 5, 3, 1, 7, 3, \
+8, 8, 3, 2, 7, 7, 9, 2, 7, 9, 3, 2, 6, 7, 6, 0, 5, 5, 0, 3, 1, 7, 7, \
+1, 8, 4, 2, 8, 5, 8, 5, 3, 5, 1, 8, 5, 1, 9, 7, 4, 6, 8, 5, 7, 7, 9, \
+8, 3, 0, 3, 9, 4, 6, 7, 2, 2, 9, 9, 5, 8, 3, 5, 2, 4, 6, 4, 5, 5, 6, \
+2, 5, 4, 5, 5, 4, 2, 1, 9, 7, 7, 7, 2, 7, 6, 0, 2, 3, 1, 2, 4, 6, 8, \
+3, 0, 6, 8, 9, 6, 5, 2, 8, 9, 5, 5, 2, 6, 9, 5, 9, 8, 4, 7, 0, 5, 0, \
+6, 2, 7, 2, 2, 1, 4, 8, 4, 0, 0, 4, 4, 5, 9, 6, 4, 4, 2, 4, 5, 9, 2, \
+9, 8, 4, 5, 2, 6, 9, 4, 5, 8, 8, 7, 8, 4, 1, 6, 5, 5, 2, 9, 9, 4, 0, \
+4, 9, 8, 5, 2, 9, 7, 3, 1, 2, 9, 5, 8, 5, 3, 6, 0, 8, 4, 7, 9, 1, 8, \
+5, 1, 5, 9, 1, 7, 9, 2, 6, 3, 5, 4, 7, 9, 9, 3, 9, 3, 4, 1, 7, 3, 0, \
+9, 0, 7, 7, 2, 7, 6, 2, 2, 6, 1, 4, 0, 2, 8, 7, 3, 9, 2, 7, 1, 0, 9, \
+1, 0, 7, 0, 4, 3};
+    float A[LENGTH / 2];
+
+    fft_abs(k, A, R);
+
+//    print(R + 16, 16);
+    print(A, LENGTH / 2);
+#endif
+
+
+
+#if 0
+    float x[16];
+    for (int c = 0; c < 16; c++){
+        x[c] = c;
+    }
+
+    __m128 v0 = _mm_loadu_ps(x +  0);
+    __m128 v1 = _mm_loadu_ps(x +  4);
+    __m128 v2 = _mm_loadu_ps(x +  8);
+    __m128 v3 = _mm_loadu_ps(x + 12);
+    print(v0);
+    print(v1);
+    print(v2);
+    print(v3);
+    cout << "--------------" << endl;
+    transpose_f32_4x4_SSE2(v0, v1, v2, v3);
+    cout << "--------------" << endl;
+    print(v0);
+    print(v1);
+    print(v2);
+    print(v3);
+#endif
+
+
+#if 0
+    const int k = 6;
+    const size_t LENGTH = (size_t)1 << k;
+
+    TwiddleTable table(k);
+
+    float r[LENGTH] = {6, 5, 0, 8, 0, 3, 2, 0, 6, 8, 6, 7, 8, 5, 4, 2, 0, 7, 5, 2, 3, 0, 6, \
+9, 0, 2, 0, 5, 0, 7, 9, 5, 3, 0, 2, 7, 0, 9, 3, 6, 9, 8, 3, 2, 8, 7, \
+4, 4, 6, 0, 3, 9, 5, 9, 9, 2, 0, 9, 4, 2, 1, 6, 0, 3};
+    float i[LENGTH] = {2, 4, 3, 8, 8, 4, 8, 2, 7, 4, 5, 5, 0, 0, 1, 3, 4, 3, 0, 8, 3, 5, 1, \
+6, 1, 5, 0, 0, 9, 9, 0, 0, 7, 8, 2, 2, 5, 9, 9, 6, 4, 2, 4, 7, 5, 9, \
+7, 9, 2, 2, 0, 7, 9, 9, 5, 9, 1, 9, 2, 6, 4, 8, 4, 2};
+    float T[2*LENGTH];
+    float O[2*LENGTH];
+    for (size_t c = 0; c < LENGTH; c++){
+#if 0
+        T[2*c + 0] = r[c];
+        T[2*c + 1] = i[c];
+#else
+        size_t vindex = c / VECTOR_LENGTH;
+        size_t sindex = c % VECTOR_LENGTH;
+        T[vindex * 16 + sindex + 0] = r[c];
+        T[vindex * 16 + sindex + 8] = i[c];
+#endif
+    }
+
+
+//    print(T, 2*LENGTH);
+
+//    fft_complex_tk(table, k, T);
+    fft_complex_tk(table, k, (vtype*)T);
+
+//    print(T, LENGTH * 2);
+
+    for (size_t c = 0; c < LENGTH; c++){
+#if 0
+        O[2*c + 0] = T[2*c + 0];
+        O[2*c + 1] = T[2*c + 1];
+#else
+        size_t vindex = c / VECTOR_LENGTH;
+        size_t sindex = c % VECTOR_LENGTH;
+        O[2*c + 0] = T[vindex * 16 + sindex + 0];
+        O[2*c + 1] = T[vindex * 16 + sindex + 8];
+#endif
+    }
+    print(O, LENGTH * 2);
+
+    double sum = 0;
+    for (size_t c = 0; c < 2*LENGTH; c++){
+        sum += O[c];
+    }
+    cout << "sum = " << sum << endl;
+#endif
+
+
+//    fft_abssqr_t2(out, in);
+
+#if 0
+    int k = 4;
+    AlignedVector<vcomplex> row = make_table_row(k, 1);
+    size_t size = (1 << k) / 4;
+    for (size_t c = 0; c < size; c++){
+        const vcomplex& vec = row[c / VECTOR_LENGTH];
+        size_t index = c % VECTOR_LENGTH;
+        cout << "{" << vec.real(index) << " + " << vec.imag(index) << "}";
+    }
+    cout << endl;
+#endif
+
+//    TwiddleTable table(10);
+
+
+
+#if 0
+    float in[32] = {7, 9, 8, 9, 9, 0, 2, 9, 7, 8, 8, 2, 9, 3, 0, 9, 6, 4, 7, 0, 2, 5, 4, 8, 9, 3, 4, 2, 9, 7, 3, 6};
+    float br[32];
+    float out[16] = {};
+    cout << br << " : " << br + 32 << endl;
+
+    fft_real_br_t5(table, br, in);
+    print(br, 32);
+//    br_to_abssqr_k5(out, br);
+//    print(out, 16);
+#endif
+
+
+#if 0
+    const int k = 3;
+    const size_t LENGTH = (size_t)1 << k;
+
+
+    float r[LENGTH] = {5, 4, 5, 6, 5, 8, 4, 8};
+    float i[LENGTH] = {4, 5, 0, 3, 2, 5, 2, 7};
+    scomplex T[LENGTH];
+    for (size_t c = 0; c < LENGTH; c++){
+        T[c].r = r[c];
+        T[c].i = i[c];
+    }
+
+    print(T, 8);
+
+    fft_complex_posicyclic_br_t3(T);
+    print(T, 8);
+#endif
+
+
+
+#if 0
+    float in[8] = {5, 2, 7, 3, 3, 8, 1, 1};
+    float br[8];
+    float out[4] = {};
+
+    fft_real_br_t3(br, in);
+    print(br, 8);
+    br_to_abssqr_k3(out, br);
+    print(out, 4);
+#endif
+
 
 
 
@@ -181,7 +532,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
 //    QImage image("screenshot-20220123-215131034370.png");
 //    std::vector<ImagePixelBox> objects = find_exclamation_marks(image);
 
-#if 1
+#if 0
     QImage image("Flag-Original.png");
     image = image.scaled(image.width() / 2, image.height() / 2);
     image = image.convertToFormat(QImage::Format::Format_ARGB32);
@@ -1264,6 +1615,36 @@ void TestProgramComputer::program(ProgramEnvironment& env){
     print64(x1);
 #endif
 
+}
+
+
+std::set<std::string> read_name(
+    Logger& logger,
+    Language language,
+    const QImage& screen, const ImageFloatBox& box
+){
+    if (language == Language::None){
+        return {};
+    }
+
+    QImage image = extract_box(screen, box);
+    OCR::filter_smart(image);
+
+    std::set<std::string> ret;
+
+    OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(logger, language, image);
+    if (result.results.empty()){
+//        dump_image(
+//            logger, ProgramInfo(),
+//            QString::fromStdString("NameOCR-" + language_data(language).code),
+//            screen
+//        );
+    }else{
+        for (const auto& item : result.results){
+            ret.insert(item.second.token);
+        }
+    }
+    return ret;
 }
 
 
