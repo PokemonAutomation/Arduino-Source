@@ -17,6 +17,7 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/BotBaseHandle.h"
 #include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/Tools/AudioFeed.h"
 
 namespace PokemonAutomation{
 

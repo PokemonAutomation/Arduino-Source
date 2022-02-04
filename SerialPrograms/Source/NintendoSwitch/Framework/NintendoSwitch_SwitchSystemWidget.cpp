@@ -11,6 +11,8 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/FireForgetDispatcher.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
+#include "CommonFramework/AudioPipeline/AudioDisplayWidget.h"
+#include "CommonFramework/AudioPipeline/AudioSelectorWidget.h"
 #include "CommonFramework/ControllerDevices/SerialSelectorWidget.h"
 #include "CommonFramework/VideoPipeline/CameraSelectorWidget.h"
 #include "CommonFramework/VideoPipeline/VideoDisplayWidget.h"
@@ -50,9 +52,13 @@ SwitchSystemWidget::SwitchSystemWidget(
         group_layout->addWidget(m_serial);
 
         m_video_display = new VideoDisplayWidget(*this);
+        m_audio_display = new AudioDisplayWidget(*this);
 
         m_camera = factory.m_camera.make_ui(*widget, logger, *m_video_display);
         group_layout->addWidget(m_camera);
+
+        m_audio = factory.m_audio.make_ui(*widget, logger, *m_audio_display);
+        group_layout->addWidget(m_audio);
 
         m_command = new CommandRow(
             *widget,
@@ -63,8 +69,10 @@ SwitchSystemWidget::SwitchSystemWidget(
         group_layout->addWidget(m_command);
     }
 
+    layout->addWidget(m_audio_display);
     layout->addWidget(m_video_display);
     m_camera->reset_video();
+    m_audio->reset_audio();
 
 //    m_controller.reset(new VirtualController(m_serial->botbase()));
     setFocusPolicy(Qt::StrongFocus);
@@ -130,6 +138,9 @@ VideoFeed& SwitchSystemWidget::camera(){
 }
 VideoOverlay& SwitchSystemWidget::overlay(){
     return *m_video_display;
+}
+AudioFeed& SwitchSystemWidget::audio(){
+    return *m_audio;
 }
 void SwitchSystemWidget::stop_serial(){
     m_serial->stop();

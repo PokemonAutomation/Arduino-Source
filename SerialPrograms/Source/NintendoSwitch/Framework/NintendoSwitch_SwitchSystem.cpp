@@ -15,6 +15,7 @@ namespace NintendoSwitch{
 
 const QString SwitchSystemFactory::JSON_SERIAL  = "Serial";
 const QString SwitchSystemFactory::JSON_CAMERA  = "Camera";
+const QString SwitchSystemFactory::JSON_AUDIO  = "Audio";
 
 
 SwitchSystemFactory::SwitchSystemFactory(
@@ -28,6 +29,7 @@ SwitchSystemFactory::SwitchSystemFactory(
 //    , m_settings_visible(true)
     , m_serial("<b>Serial Port:</b>", m_logger_tag, min_pabotbase)
     , m_camera(DEFAULT_RESOLUTION)
+    , m_audio()
 {}
 SwitchSystemFactory::SwitchSystemFactory(
     size_t console_id,
@@ -48,12 +50,14 @@ void SwitchSystemFactory::load_json(const QJsonValue& json){
 //    json_get_bool(m_settings_visible, obj, "SettingsVisible");
     m_serial.load_json(json_get_value_nothrow(obj, JSON_SERIAL));
     m_camera.load_json(json_get_value_nothrow(obj, JSON_CAMERA));
+    m_audio.load_json(json_get_value_nothrow(obj, JSON_AUDIO));
 }
 QJsonValue SwitchSystemFactory::to_json() const{
     QJsonObject root;
 //    root.insert("SettingsVisible", m_settings_visible);
     root.insert(JSON_SERIAL, m_serial.to_json());
     root.insert(JSON_CAMERA, m_camera.to_json());
+    root.insert(JSON_AUDIO, m_audio.to_json());
     return root;
 }
 

@@ -47,6 +47,7 @@ public:
     void fill_rest_with_zeros(){
         memset(m_output, 0, m_samples_left * sizeof(Type));
         m_output += m_samples_left;
+        m_samples_left = 0;
     }
 
 

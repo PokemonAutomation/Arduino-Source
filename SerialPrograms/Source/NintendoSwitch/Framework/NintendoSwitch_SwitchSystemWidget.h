@@ -13,6 +13,8 @@
 
 namespace PokemonAutomation{
     class CollapsibleGroupBox;
+    class AudioDisplayWidget;
+
 namespace NintendoSwitch{
 
 class CommandRow;
@@ -40,6 +42,7 @@ public:
     BotBase* botbase();
     VideoFeed& camera();
     VideoOverlay& overlay();
+    AudioFeed& audio();
     virtual void update_ui(ProgramState state) override;
 
     virtual VideoFeed& video() override;
@@ -61,7 +64,10 @@ private:
     SerialSelectorWidget* m_serial;
     CommandRow* m_command;
     CameraSelectorWidget* m_camera;
+    AudioSelectorWidget* m_audio;
+    
     VideoDisplayWidget* m_video_display;
+    AudioDisplayWidget* m_audio_display;
 };
 
 

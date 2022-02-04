@@ -52,8 +52,9 @@ AlignedVector<Object>::AlignedVector(const AlignedVector& x)
     //  Shrink to fit.
     while (m_capacity > 0){
         size_t half = m_capacity / 2;
-        if (half > x.m_size){
+        if (half >= x.m_size){
             m_capacity = half;
+        } else{
             break;
         }
     }

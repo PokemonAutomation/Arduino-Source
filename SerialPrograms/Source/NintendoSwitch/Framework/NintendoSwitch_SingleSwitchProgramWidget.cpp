@@ -40,7 +40,8 @@ void SingleSwitchProgramWidget::run_program(
         m_logger.base_logger(),
         sanitize_botbase(system().botbase()),
         system().camera(),
-        system().overlay()
+        system().overlay(),
+        system().audio()
     );
     connect(
         this, &RunnableSwitchProgramWidget::signal_cancel,

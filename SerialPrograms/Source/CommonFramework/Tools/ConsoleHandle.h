@@ -14,6 +14,7 @@ namespace PokemonAutomation{
 
 class VideoFeed;
 class VideoOverlay;
+class AudioFeed;
 
 
 class ConsoleHandle{
@@ -23,13 +24,15 @@ public:
         Logger& logger,
         BotBase& botbase,
         VideoFeed& video,
-        VideoOverlay& overlay
+        VideoOverlay& overlay,
+        AudioFeed& audio
     )
         : m_index(index)
         , m_logger(logger, "Switch " + std::to_string(index))
         , m_context(botbase)
         , m_video(video)
         , m_overlay(overlay)
+        , m_audio(audio)
     {}
 
     template <class... Args>
@@ -44,12 +47,14 @@ public:
     BotBaseContext& context(){ return m_context; }
     VideoFeed& video(){ return m_video; }
     VideoOverlay& overlay(){ return m_overlay; }
+    AudioFeed& audio(){ return m_audio; }
 
     operator Logger&(){ return m_logger; }
     operator BotBase&(){ return m_context.botbase(); }
     operator BotBaseContext&(){ return m_context; }
     operator VideoFeed&(){ return m_video; }
     operator VideoOverlay&(){ return m_overlay; }
+    operator AudioFeed&() { return m_audio; }
 
 private:
     size_t m_index;
@@ -57,6 +62,7 @@ private:
     BotBaseContext m_context;
     VideoFeed& m_video;
     VideoOverlay& m_overlay;
+    AudioFeed& m_audio;
 };
 
 

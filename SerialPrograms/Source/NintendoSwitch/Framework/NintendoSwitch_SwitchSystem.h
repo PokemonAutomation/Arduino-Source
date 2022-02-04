@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_NintendoSwitch_SwitchSystem_H
 #define PokemonAutomation_NintendoSwitch_SwitchSystem_H
 
+#include "CommonFramework/AudioPipeline/AudioSelector.h"
 #include "CommonFramework/ControllerDevices/SerialSelector.h"
 #include "CommonFramework/VideoPipeline/CameraSelector.h"
 #include "NintendoSwitch_SwitchSetup.h"
@@ -20,6 +21,7 @@ class SwitchSystemWidget;
 class SwitchSystemFactory : public SwitchSetupFactory{
     static const QString JSON_SERIAL;
     static const QString JSON_CAMERA;
+    static const QString JSON_AUDIO;
 
 public:
     SwitchSystemFactory(
@@ -49,6 +51,7 @@ private:
 //    bool m_settings_visible;
     SerialSelector m_serial;
     CameraSelector m_camera;
+    AudioSelector m_audio;
 };
 
 
