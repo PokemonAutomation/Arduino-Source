@@ -15,8 +15,6 @@ namespace NintendoSwitch{
 
 const QString SwitchSystemFactory::JSON_SERIAL  = "Serial";
 const QString SwitchSystemFactory::JSON_CAMERA  = "Camera";
-const QString SwitchSystemFactory::JSON_CAMERA_INDEX        = "CameraIndex";
-const QString SwitchSystemFactory::JSON_CAMERA_RESOLUTION   = "CameraResolution";
 
 
 SwitchSystemFactory::SwitchSystemFactory(

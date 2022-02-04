@@ -20,8 +20,6 @@ class SwitchSystemWidget;
 class SwitchSystemFactory : public SwitchSetupFactory{
     static const QString JSON_SERIAL;
     static const QString JSON_CAMERA;
-    static const QString JSON_CAMERA_INDEX;
-    static const QString JSON_CAMERA_RESOLUTION;
 
 public:
     SwitchSystemFactory(
