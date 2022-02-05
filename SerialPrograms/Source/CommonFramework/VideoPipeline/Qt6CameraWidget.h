@@ -12,21 +12,18 @@
 #include "CameraInfo.h"
 #include "VideoWidget.h"
 
-#include <QMediaDevices>
-#include <QImageCapture>
-#include <QMediaCaptureSession>
 #include <QCameraDevice>
-#include <QVideoWidget>
-#include <QVideoSink>
+#include <QMediaCaptureSession>
 #include <QVideoFrame>
-#include <QCamera>
+
+class QCamera;
+class QVideoSink;
 
 namespace PokemonAutomation{
 
 
 std::vector<CameraInfo> qt6_get_all_cameras();
 QString qt6_get_camera_name(const CameraInfo& info);
-
 
 class Qt6VideoWidget : public VideoWidget{
 public:
@@ -52,7 +49,6 @@ private:
 
     QCameraDevice m_info;
     QCamera* m_camera = nullptr;
-    QImageCapture * m_capture = nullptr;
     QMediaCaptureSession m_captureSession;
     QVideoSink* m_videoSink = nullptr;
     QVideoFrame m_videoFrame;

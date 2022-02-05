@@ -21,7 +21,10 @@ class VideoDisplayWidget;
 
 class CameraSelectorWidget;
 
-
+// Handles the state of video selection: video source and resolution.
+// Call make_ui() to generate the UI friend class CameraSelectorWidget,
+// which directly modifies CameraSelector's internal state.
+// This separates state from UI.
 class CameraSelector{
     static const QString JSON_CAMERA;
     static const QString JSON_RESOLUTION;

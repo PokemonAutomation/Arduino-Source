@@ -1,4 +1,4 @@
-/*  Camera Selector
+/*  Camera Selector Widget
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

@@ -15,7 +15,8 @@ class QImage;
 
 namespace PokemonAutomation{
 
-
+//  Define basic interface of a video feed to be used
+//  by programs.
 class VideoFeed{
 public:
     //  Can call from anywhere.
