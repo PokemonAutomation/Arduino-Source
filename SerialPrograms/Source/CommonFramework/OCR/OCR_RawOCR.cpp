@@ -99,9 +99,9 @@ public:
             : QString::fromUtf8(str.c_str());
     }
 
-    ~TesseractPool(){
 #ifdef __APPLE__
 #ifdef UNIX_LINK_TESSERACT
+    ~TesseractPool(){
         // As of Feb 05, 2022, the newest Tesseract (5.0.1) installed by HomeBrew on macOS
         // has a bug that will crash the program when deleting internal Tesseract API intances,
         // giving error: 
