@@ -98,6 +98,8 @@ SOURCES += \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.cpp \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.cpp \
     ../Common/Qt/QtJsonTools.cpp \
+    Source/CommonFramework/AudioPipeline/TimeSampleBuffer.cpp \
+    Source/CommonFramework/AudioPipeline/TimeSampleBufferReader.cpp \
     Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.cpp \
     Source/CommonFramework/ControllerDevices/SerialSelector.cpp \
     Source/CommonFramework/ControllerDevices/SerialSelectorWidget.cpp \
@@ -613,6 +615,10 @@ HEADERS += \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h \
     ../Common/Qt/QtJsonTools.h \
     ../Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h \
+    Source/CommonFramework/AudioPipeline/AudioNormalization.h \
+    Source/CommonFramework/AudioPipeline/TimeSampleBuffer.h \
+    Source/CommonFramework/AudioPipeline/TimeSampleBufferReader.h \
+    Source/CommonFramework/AudioPipeline/TimeSampleWriter.h \
     Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h \
     Source/CommonFramework/ControllerDevices/SerialSelector.h \
     Source/CommonFramework/ControllerDevices/SerialSelectorWidget.h \

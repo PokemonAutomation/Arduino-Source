@@ -120,23 +120,22 @@ void base_transform(const TwiddleTable& table, vtype T[16]){
     );
 
     vtranspose(r0, r1, r2, r3, r4, r5, r6, r7);
-    vtranspose(i0, i1, i2, i3, i4, i5, i6, i7);
-
     T[ 0] = r0;
-    T[ 1] = i0;
     T[ 2] = r1;
-    T[ 3] = i1;
     T[ 4] = r2;
-    T[ 5] = i2;
     T[ 6] = r3;
-    T[ 7] = i3;
     T[ 8] = r4;
-    T[ 9] = i4;
     T[10] = r5;
-    T[11] = i5;
     T[12] = r6;
-    T[13] = i6;
     T[14] = r7;
+    vtranspose(i0, i1, i2, i3, i4, i5, i6, i7);
+    T[ 1] = i0;
+    T[ 3] = i1;
+    T[ 5] = i2;
+    T[ 7] = i3;
+    T[ 9] = i4;
+    T[11] = i5;
+    T[13] = i6;
     T[15] = i7;
 }
 

@@ -16,6 +16,8 @@
 #define PA_Kernels_AbsFFT_Arch_Default
 
 #else
+
+//  Select an FFT implementation based on the global arch setting.
 #if 0
 #elif defined PA_Arch_x64_AVX2
 #define PA_Kernels_AbsFFT_Arch_x86_AVX2
@@ -26,7 +28,7 @@
 #endif
 #endif
 
-
+//  Include the right arch header.
 #include "Kernels_AbsFFT_Arch_Default.h"
 #ifdef PA_Kernels_AbsFFT_Arch_x86_SSE41
 #include "Kernels_AbsFFT_Arch_x86_SSE41.h"
@@ -40,6 +42,7 @@ namespace PokemonAutomation{
 namespace Kernels{
 namespace AbsFFT{
 
+//  Set the right arch intrinsics class.
 #if 0
 #elif defined PA_Kernels_AbsFFT_Arch_x86_AVX2
 using Intrinsics = Intrinsics_x86_AVX2;

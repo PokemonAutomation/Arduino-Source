@@ -145,6 +145,13 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h
     ../Common/Qt/QtJsonTools.cpp
     ../Common/Qt/QtJsonTools.h
+    Source/CommonFramework/AudioPipeline/AudioNormalization.h
+    Source/CommonFramework/AudioPipeline/TimeSampleBuffer.cpp
+    Source/CommonFramework/AudioPipeline/TimeSampleBuffer.h
+    Source/CommonFramework/AudioPipeline/TimeSampleBufferReader.cpp
+    Source/CommonFramework/AudioPipeline/TimeSampleBufferReader.h
+    Source/CommonFramework/AudioPipeline/TimeSampleBuffer.h
+    Source/CommonFramework/AudioPipeline/TimeSampleWriter.h
     Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.cpp
     Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h
     Source/CommonFramework/ControllerDevices/SerialSelector.cpp

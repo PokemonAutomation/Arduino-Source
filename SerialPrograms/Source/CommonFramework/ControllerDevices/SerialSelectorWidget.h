@@ -50,7 +50,7 @@ private:
     QLabel* m_serial_uptime;
     QPushButton* m_reset_button;
 
-    QList<QSerialPortInfo> m_ports;
+    std::vector<QSerialPortInfo> m_ports;
     BotBaseHandle m_connection;
 };
 

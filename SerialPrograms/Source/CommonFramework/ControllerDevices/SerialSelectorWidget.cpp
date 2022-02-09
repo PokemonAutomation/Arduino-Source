@@ -9,6 +9,10 @@
 #include "Common/Qt/NoWheelComboBox.h"
 #include "SerialSelectorWidget.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -120,11 +124,21 @@ void SerialSelectorWidget::refresh(){
     m_serial_box->clear();
     m_serial_box->addItem("(none)");
 
-    m_ports = QSerialPortInfo::availablePorts();
+    m_ports.clear();
+    for (QSerialPortInfo& port : QSerialPortInfo::availablePorts()){
+#ifdef _WIN32
+        //  COM1 is never the correct port on Windows.
+        if (port.portName() == "COM1"){
+            continue;
+        }
+#endif
+        m_ports.emplace_back(std::move(port));
+    }
+
     QSerialPortInfo& current_port = m_value.m_port;
 
-    int index = 0;
-    for (int c = 0; c < m_ports.size(); c++){
+    size_t index = 0;
+    for (size_t c = 0; c < m_ports.size(); c++){
         const QSerialPortInfo& port = m_ports[c];
         m_serial_box->addItem(port.portName() + " - " + port.description());
 
@@ -133,7 +147,7 @@ void SerialSelectorWidget::refresh(){
         }
     }
     if (index != 0){
-        m_serial_box->setCurrentIndex(index);
+        m_serial_box->setCurrentIndex((int)index);
     }else{
         current_port = QSerialPortInfo();
         m_serial_box->setCurrentIndex(0);
