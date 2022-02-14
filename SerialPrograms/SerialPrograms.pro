@@ -121,6 +121,7 @@ SOURCES += \
     Source/CommonFramework/ImageMatch/ScaleBrightness.cpp \
     Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.cpp \
     Source/CommonFramework/ImageMatch/SubObjectTemplateMatcher.cpp \
+    Source/CommonFramework/ImageMatch/WaterfillTemplateMatcher.cpp \
     Source/CommonFramework/ImageTools/ColorClustering.cpp \
     Source/CommonFramework/ImageTools/FloatPixel.cpp \
     Source/CommonFramework/ImageTools/ImageBoxes.cpp \
@@ -194,6 +195,7 @@ SOURCES += \
     Source/CommonFramework/Tools/ProgramEnvironment.cpp \
     Source/CommonFramework/Tools/StatsDatabase.cpp \
     Source/CommonFramework/Tools/StatsTracking.cpp \
+    Source/CommonFramework/Tools/SuperControlSession.cpp \
     Source/CommonFramework/VideoPipeline/CameraImplementations.cpp \
     Source/CommonFramework/VideoPipeline/CameraSelector.cpp \
     Source/CommonFramework/VideoPipeline/CameraSelectorWidget.cpp \
@@ -365,12 +367,16 @@ SOURCES += \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.cpp \
     Source/PokemonLA/Inference/PokemonLA_ArcDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_BubbleDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_ButtonDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_FlagDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_FlagTracker.cpp \
+    Source/PokemonLA/Inference/PokemonLA_MountDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_QuestMarkDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_ShinySymbolDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_WhiteObjectDetector.cpp \
     Source/PokemonLA/Panels_PokemonLA.cpp \
     Source/PokemonLA/PokemonLA_Settings.cpp \
+    Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.cpp \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.cpp \
     Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.cpp \
     Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.cpp \
@@ -638,6 +644,7 @@ HEADERS += \
     Source/CommonFramework/ImageMatch/ScaleBrightness.h \
     Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h \
     Source/CommonFramework/ImageMatch/SubObjectTemplateMatcher.h \
+    Source/CommonFramework/ImageMatch/WaterfillTemplateMatcher.h \
     Source/CommonFramework/ImageTools/ColorClustering.h \
     Source/CommonFramework/ImageTools/DistanceToLine.h \
     Source/CommonFramework/ImageTools/FloatPixel.h \
@@ -719,6 +726,7 @@ HEADERS += \
     Source/CommonFramework/Tools/ProgramEnvironment.h \
     Source/CommonFramework/Tools/StatsDatabase.h \
     Source/CommonFramework/Tools/StatsTracking.h \
+    Source/CommonFramework/Tools/SuperControlSession.h \
     Source/CommonFramework/Tools/VideoFeed.h \
     Source/CommonFramework/Tools/BotBaseHandle.h \
     Source/CommonFramework/Tools/VideoOverlaySet.h \
@@ -932,12 +940,16 @@ HEADERS += \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.h \
     Source/PokemonLA/Inference/PokemonLA_ArcDetector.h \
     Source/PokemonLA/Inference/PokemonLA_BubbleDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_ButtonDetector.h \
     Source/PokemonLA/Inference/PokemonLA_FlagDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_FlagTracker.h \
+    Source/PokemonLA/Inference/PokemonLA_MountDetector.h \
     Source/PokemonLA/Inference/PokemonLA_QuestMarkDetector.h \
     Source/PokemonLA/Inference/PokemonLA_ShinySymbolDetector.h \
     Source/PokemonLA/Inference/PokemonLA_WhiteObjectDetector.h \
     Source/PokemonLA/Panels_PokemonLA.h \
     Source/PokemonLA/PokemonLA_Settings.h \
+    Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.h \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.h \
     Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.h \
     Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.h \

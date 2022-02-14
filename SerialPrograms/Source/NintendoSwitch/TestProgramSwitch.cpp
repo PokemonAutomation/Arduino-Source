@@ -143,6 +143,14 @@
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
+#include "PokemonLA/Inference/PokemonLA_MountDetector.h"
+#include "PokemonLA/Inference/PokemonLA_FlagDetector.h"
+#include "PokemonLA/Inference/PokemonLA_FlagTracker.h"
+#include "CommonFramework/Tools/InterruptableCommands.h"
+#include "CommonFramework/Tools/SuperControlSession.h"
+#include "PokemonLA/Programs/PokemonLA_FlagNavigationAir.h"
+#include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
+#include "PokemonLA/Inference/PokemonLA_ButtonDetector.h"
 #include "TestProgramSwitch.h"
 
 #include <immintrin.h>
@@ -208,6 +216,12 @@ namespace PokemonSwSh{
 
 }
 
+using namespace PokemonLA;
+
+
+
+
+
 
 
 
@@ -218,9 +232,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     using namespace Kernels::Waterfill;
     using namespace OCR;
     using namespace Pokemon;
-    using namespace PokemonSwSh;
+//    using namespace PokemonSwSh;
 //    using namespace PokemonBDSP;
-//    using namespace PokemonLA;
+    using namespace PokemonLA;
 
     Logger& logger = env.logger();
     ConsoleHandle& console = env.consoles[0];
@@ -228,6 +242,284 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoFeed& feed = env.consoles[0];
     VideoOverlay& overlay = env.consoles[0];
 
+
+#if 1
+    FlagNavigationAir session(env, console);
+    session.run_session();
+#endif
+
+
+#if 0
+    QImage image("screenshot-20220213-141558364230.png");
+
+//    CenterAButtonTracker tracker;
+//    WhiteObjectWatcher detector(console, {0.40, 0.50, 0.40, 0.50}, {{tracker, false}});
+
+//    detector.process_frame(image, std::chrono::system_clock::now());
+
+    ButtonDetector detector(console, console, ButtonType::ButtonA, {0.40, 0.50, 0.40, 0.50});
+
+
+    AsyncVisualInferenceSession visual(env, console, console, console);
+    visual += detector;
+#endif
+
+
+
+
+//    InferenceBoxScope box(overlay, 0.40, 0.50, 0.40, 0.50);
+
+
+//    cout << std::chrono::system_clock::time_point::min() - std::chrono::system_clock::now() << endl;
+
+//    pbf_move_right_joystick(console, 0, 128, 45, 0);
+
+#if 0
+                pbf_move_right_joystick(console, 128, 255, 200, 0);
+                pbf_move_right_joystick(console, 128, 0, 200, 0);
+                pbf_move_right_joystick(console, 128, 255, 80, 0);
+                pbf_move_right_joystick(console, 0, 128, 400, 0);
+                pbf_move_right_joystick(console, 128, 255, 120, 0);
+                pbf_move_right_joystick(console, 0, 128, 400, 0);
+                pbf_move_right_joystick(console, 128, 0, 200, 0);
+                pbf_move_right_joystick(console, 0, 128, 400, 0);
+#endif
+
+#if 0
+    FlagTracker flag(logger, overlay);
+    MountTracker mount(logger);
+
+    {
+        AsyncVisualInferenceSession visual(env, console, console, console);
+        visual += flag;
+        visual += mount;
+
+        AsyncCommandSession commands(env, console.botbase());
+
+        while (true){
+//            commands.dispatch([=](const BotBaseContext& context){
+//                pbf_move_right_joystick(context, 0, 128, 5 * TICKS_PER_SECOND, 0);
+//            });
+//            commands.wait();
+
+            double flag_distance, flag_x, flag_y;
+            bool flag_ok = flag.get(flag_distance, flag_x, flag_y);
+
+            if (flag_ok && 0.4 < flag_x && flag_x < 0.6 && flag_y > 0.6){
+            commands.dispatch([=](const BotBaseContext& context){
+                pbf_press_button(context, BUTTON_B, 300 * TICKS_PER_SECOND, 0);
+            });
+
+
+
+            }
+        }
+
+        commands.stop_session();
+        visual.stop();
+    }
+#endif
+
+
+
+#if 0
+    while (true){
+        //  Read current state.
+        MountState hm_state = MountState::NOTHING;
+        double flag_x = -1;
+
+        {
+            auto timestamp = std::chrono::system_clock::now();
+            QImage screen = feed.snapshot();
+
+            MountDetector hm_detector;
+            FlagDetector flag_detector;
+            WhiteObjectWatcher flag_watcher(overlay, {{flag_detector, false}});
+            hm_state = hm_detector.detect(screen);
+            flag_watcher.process_frame(screen, timestamp);
+
+            const std::vector<ImagePixelBox>& flags = flag_detector.detections();
+            if (flags.size() == 1){
+                flag_x = (double)(flags[0].min_x + flags[0].max_x) / (screen.width() * 2);
+            }
+        }
+
+        if (hm_state == MountState::BRAVIARY_ON){
+            //  Cruise
+            if (0.4 <= flag_x && flag_x <= 0.6){
+                pbf_move_left_joystick(console, 128, 0, 125, 0);
+                console.botbase().wait_for_all_requests();
+                run_steady_state(env, console);
+                continue;
+            }
+            if (0 <= flag_x && flag_x < 0.5){
+                console.log("Trajectory Correction: Turning left...", COLOR_ORANGE);
+                FlagDetector flag_detector;
+                WhiteObjectWatcher flag_watcher(overlay, {{flag_detector, false}});
+                run_until(
+                    env, console,
+                    [](const BotBaseContext& context){
+                        pbf_move_left_joystick(context, 128, 0, 125, 0);
+                        pbf_move_left_joystick(context, 0, 0, 125, 0);
+                    },
+                    { &flag_watcher }
+                );
+                continue;
+            }
+            if (0.5 < flag_x){
+                console.log("Trajectory Correction: Turning right...", COLOR_ORANGE);
+                FlagDetector flag_detector;
+                WhiteObjectWatcher flag_watcher(overlay, {{flag_detector, false}});
+                run_until(
+                    env, console,
+                    [](const BotBaseContext& context){
+                        pbf_move_left_joystick(context, 128, 0, 125, 0);
+                        pbf_move_left_joystick(context, 255, 0, 125, 0);
+                    },
+                    { &flag_watcher }
+                );
+                continue;
+            }
+        }
+
+        pbf_move_left_joystick(console, 128, 0, 125, 0);
+//        break;
+
+    }
+#endif
+
+
+
+#if 0
+    MountDetector mount_detector;
+    FlagDetector flags;
+    WhiteObjectWatcher watcher(console, {{flags, false}});
+
+    QImage image(feed.snapshot());
+
+    MountState mount_state = mount_detector.detect(image);
+    cout << MOUNT_STATE_STRINGS[(int)mount_state] << endl;
+
+//    watcher.process_frame(image, std::chrono::system_clock::now());
+//    flags.detections()
+
+#endif
+
+
+
+#if 0
+    QImage image("screenshot-20220211-023701107827.png");
+
+
+    FlagDetector flags;
+
+    WhiteObjectWatcher watcher(
+        console,
+        {{flags, false}}
+    );
+
+    watcher.process_frame(image, std::chrono::system_clock::now());
+#endif
+
+
+#if 0
+    QImage image(feed.snapshot());
+//    QImage image("screenshot-20220210-231922898436.png");
+//    QImage image("screenshot-20220211-005950586653.png");
+//    QImage image("screenshot-20220211-012426947705.png");
+//    QImage image("screenshot-20220211-014247032114.png");
+//    QImage image("screenshot-20220211-022344759878.png");
+
+    HmDetector detector(overlay);
+    cout << HM_STATE_STRINGS[(int)detector.detect(image)] << endl;
+#endif
+
+
+#if 0
+    InferenceBoxScope box(overlay, 0.905, 0.65, 0.08, 0.13);
+    QImage image = extract_box(feed.snapshot(), box);
+
+
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
+        image,
+        192, 255,
+        192, 255,
+        0, 255
+    );
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
+
+
+    ImagePixelBox result;
+    for (const WaterfillObject& object : objects){
+        int c = 0;
+        for (const auto& object : objects){
+            extract_box(image, object).save("test-" + QString::number(c++) + ".png");
+        }
+        if (HmWyrdeerMatcher::on().matches(result, image, object)){
+            cout << "Wyrdeer On" << endl;
+        }
+#if 0
+        if (HmWyrdeerMatcher::off().matches(result, image, object)){
+            cout << "Wyrdeer Off" << endl;
+        }
+        if (HmWyrdeerMatcher::on().matches(result, image, object)){
+            cout << "Wyrdeer On" << endl;
+        }
+        if (HmUrsalunaMatcher::off().matches(result, image, object)){
+            cout << "Ursaluna Off" << endl;
+        }
+        if (HmUrsalunaMatcher::on().matches(result, image, object)){
+            cout << "Ursaluna On" << endl;
+        }
+        if (HmSneaslerMatcher::off().matches(result, image, object)){
+            cout << "Sneasler Off" << endl;
+        }
+        if (HmSneaslerMatcher::on().matches(result, image, object)){
+            cout << "Sneasler On" << endl;
+        }
+        if (HmBraviaryMatcher::off().matches(result, image, object)){
+            cout << "Braviary Off" << endl;
+        }
+        if (HmBraviaryMatcher::on().matches(result, image, object)){
+            cout << "Braviary On" << endl;
+        }
+#endif
+    }
+#endif
+
+
+
+#if 0
+    InferenceBoxScope box(overlay, 0.905, 0.65, 0.08, 0.13);
+    QImage image = extract_box(feed.snapshot(), box);
+
+//    QImage image("test.png");
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
+        image,
+        128, 255,
+        128, 255,
+        0, 255
+    );
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
+    cout << objects.size() << endl;
+
+
+//    int c = 0;
+//    for (const auto& object : objects){
+//        extract_box(image, object).save("test-" + QString::number(c++) + ".png");
+//    }
+
+#if 1
+    WaterfillObject object;
+    for (const WaterfillObject& obj : objects){
+        object.merge_assume_no_overlap(obj);
+    }
+
+    ImagePixelBox sbox(object.min_x, object.min_y, object.max_x, object.max_y);
+    extract_box(image, sbox).save("test.png");
+#endif
+
+#endif
 
 
 
@@ -262,9 +554,27 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 #endif
 
-//    InferenceBoxScope box(overlay, 0.11, 0.868, 0.135, 0.043);
+#if 0
+//    InferenceBoxScope box(overlay, 0.40, 0.50, 0.40, 0.50);
+    InferenceBoxScope box(overlay, 0.02, 0.40, 0.05, 0.20);
 
+    QImage image(feed.snapshot());
+    image = extract_box(image, box);
 
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
+        image,
+        128, 255,
+        128, 255,
+        128, 255
+    );
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
+    cout << objects.size() << endl;
+
+    int c = 0;
+    for (const auto& object : objects){
+        extract_box(image, object).save("test-" + QString::number(c++) + ".png");
+    }
+#endif
 
 
 
@@ -345,7 +655,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 #if 0
-    QImage image("ArcR-Original.png");
+    QImage image("ButtonB-Original2.png");
 
     image = image.convertToFormat(QImage::Format::Format_ARGB32);
     uint32_t* ptr = (uint32_t*)image.bits();
@@ -356,12 +666,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
             uint32_t red = qRed(pixel);
             uint32_t green = qGreen(pixel);
             uint32_t blue = qBlue(pixel);
-            if (red < 128 || green < 128 || blue < 128){
+            if (red == 0 || green == 0 || blue == 0){
                 pixel = 0x00000000;
             }
         }
     }
-    image.save("test.png");
+    image.save("ButtonB-Template.png");
 #endif
 
 
