@@ -14,7 +14,9 @@
 #include <QVector>
 #include <QIODevice>
 #include <QAudioFormat>
+#include "Common/Compiler.h"
 #include "Common/Cpp/AlignedVector.h"
+#include "AudioInfo.h"
 
 
 #if QT_VERSION_MAJOR == 5
@@ -27,7 +29,6 @@
 
 namespace PokemonAutomation{
 
-class AudioInfo;
 class AudioIODevice;
 
 

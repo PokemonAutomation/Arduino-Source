@@ -82,9 +82,9 @@ void AudioDisplayWidget::loadFFTOutput(const QVector<float>& fftOutput){
 
     // For one window, use how many blocks to show all frequencies:
     const size_t numFreqPerBlock = m_numFreqs / m_numFreqVisBlocks;
-    for(int i = 0; i < m_numFreqVisBlocks; i++){
+    for(size_t i = 0; i < m_numFreqVisBlocks; i++){
         float mag = 0.0f;
-        for(int j = 0; j < numFreqPerBlock; j++){
+        for(size_t j = 0; j < numFreqPerBlock; j++){
             mag += fftOutput[i*numFreqPerBlock + j];
         }
         mag /= numFreqPerBlock;
@@ -106,7 +106,7 @@ void AudioDisplayWidget::loadFFTOutput(const QVector<float>& fftOutput){
     QWidget::update();
 
     if (m_saveFreqToDisk){
-        for(int i = 0; i < m_numFreqs; i++){
+        for(size_t i = 0; i < m_numFreqs; i++){
             m_freqStream << fftOutput[i] << " ";
         }
         m_freqStream << std::endl;
@@ -154,14 +154,14 @@ void AudioDisplayWidget::paintEvent(QPaintEvent* event){
     switch (m_audioDisplayType){
     case AudioDisplayType::FREQ_BARS:
     {
-        const int barPlusGapWidth = widgetWidth / numBars;
-        const int barWidth = 0.8 * barPlusGapWidth;
-        const int gapWidth = barPlusGapWidth - barWidth;
-        const int paddingWidth = widgetWidth - numBars * (barWidth + gapWidth);
-        const int leftPaddingWidth = (paddingWidth + gapWidth) / 2;
-        const int barHeight = widgetHeight - 2 * gapWidth;
+        const size_t barPlusGapWidth = widgetWidth / numBars;
+        const size_t barWidth = 0.8 * barPlusGapWidth;
+        const size_t gapWidth = barPlusGapWidth - barWidth;
+        const size_t paddingWidth = widgetWidth - numBars * (barWidth + gapWidth);
+        const size_t leftPaddingWidth = (paddingWidth + gapWidth) / 2;
+        const size_t barHeight = widgetHeight - 2 * gapWidth;
 
-        for (int i = 0; i < numBars; i++){
+        for (size_t i = 0; i < numBars; i++){
             size_t curWindow = (m_nextFFTWindowIndex + m_numFreqWindows - 1) % m_numFreqWindows;
             // +1 here to skip the freq-0 value
             float value = m_freqVisBlocks[curWindow * m_numFreqVisBlocks + i+1];
@@ -177,12 +177,12 @@ void AudioDisplayWidget::paintEvent(QPaintEvent* event){
     }
     case AudioDisplayType::SPECTROGRAM:
     {
-        const int barHeight = widgetHeight / numBars;
-        const int barWidth = widgetWidth;
-        for (int i = 0; i < numBars; i++){
+        const size_t barHeight = widgetHeight / numBars;
+        const size_t barWidth = widgetWidth;
+        for (size_t i = 0; i < numBars; i++){
             QLinearGradient colorGradient(0,barHeight/2,widgetWidth, barHeight/2);
             colorGradient.setSpread(QGradient::PadSpread);
-            for(int j = 0; j < m_numFreqWindows; j++){
+            for(size_t j = 0; j < m_numFreqWindows; j++){
                 // Start with the oldest window in time:
                 size_t curWindow = (m_nextFFTWindowIndex + m_numFreqWindows + j) % m_numFreqWindows;
                 // +1 here to skip the freq-0 value
