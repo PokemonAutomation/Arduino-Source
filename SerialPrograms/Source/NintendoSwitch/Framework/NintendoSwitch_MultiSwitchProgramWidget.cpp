@@ -50,7 +50,8 @@ void MultiSwitchProgramWidget::run_program(
             m_logger.base_logger(),
             sanitize_botbase(system.botbase()),
             system.camera(),
-            system.overlay()
+            system.overlay(),
+            system.audio()
         );
     }
     MultiSwitchProgramEnvironment env(
