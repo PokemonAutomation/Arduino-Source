@@ -47,8 +47,12 @@ double ExactImageMatcher::rmsd(QImage image) const{
     QImage reference;
     process_images(reference, image);
 
-    image.save("test-image.png");
-    reference.save("test-sprite.png");
+#if 0
+    static int c = 0;
+    image.save("test-" + QString::number(c) + "-image.png");
+    reference.save("test-" + QString::number(c) + "-sprite.png");
+    c++;
+#endif
 
     return pixel_RMSD(reference, image);
 }

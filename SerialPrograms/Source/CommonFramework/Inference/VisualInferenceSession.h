@@ -76,7 +76,7 @@ private:
 
 
 
-class AsyncVisualInferenceSession : public VisualInferenceSession{
+class AsyncVisualInferenceSession : private VisualInferenceSession{
 public:
     AsyncVisualInferenceSession(
         ProgramEnvironment& env, Logger& logger,
@@ -86,6 +86,9 @@ public:
 
     //  This will not rethrow exceptions in the inference thread.
     ~AsyncVisualInferenceSession();
+
+    using VisualInferenceSession::operator+=;
+    using VisualInferenceSession::operator-=;
 
     //  This will rethrow any exceptions in the inference thread.
     //  You should call this at all natural destruction points.

@@ -80,7 +80,7 @@ protected:
     double m_area_ratio_lower = 0.80;
     double m_area_ratio_upper = 1.25;
 
-    ImageMatch::ExactImageMatcher m_matcher;
+    ExactImageMatcher m_matcher;
     ImagePixelBox m_subobject_in_object_p;
     ImageFloatBox m_subobject_in_object_f;
     double m_subobject_area_ratio;
