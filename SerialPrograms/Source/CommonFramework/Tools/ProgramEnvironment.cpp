@@ -24,6 +24,8 @@ struct ProgramEnvironmentData{
     std::condition_variable m_cv;
     AsyncDispatcher m_dispatcher;
 
+    std::map<std::condition_variable*, std::mutex*> m_stop_signals;
+
     ProgramEnvironmentData(
         ProgramInfo program_info
     )
@@ -109,11 +111,23 @@ void ProgramEnvironment::check_stopping() const{
         throw PokemonAutomation::CancelledException();
     }
 }
+void ProgramEnvironment::register_stop_program_signal(std::mutex& lock, std::condition_variable& cv){
+    std::unique_lock<std::mutex> lg(m_data->m_lock);
+    m_data->m_stop_signals[&cv] = &lock;
+}
+void ProgramEnvironment::deregister_stop_program_signal(std::condition_variable& cv){
+    std::unique_lock<std::mutex> lg(m_data->m_lock);
+    m_data->m_stop_signals.erase(&cv);
+}
 void ProgramEnvironment::signal_stop(){
     m_data->m_stopping.store(true, std::memory_order_release);
-//    std::lock_guard<std::mutex> lg(m_lock);
-//    m_cv.notify_all();
-    notify_all();
+
+    std::lock_guard<std::mutex> lg(m_data->m_lock);
+    m_data->m_cv.notify_all();
+    for (auto& item : m_data->m_stop_signals){
+        std::lock_guard<std::mutex> lg0(*item.second);
+        item.first->notify_all();
+    }
 }
 
 

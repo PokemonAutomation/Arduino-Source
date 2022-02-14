@@ -74,6 +74,13 @@ public:
 
 
 public:
+    //  When the user issues a stop command, signal all the conditional variables
+    //  under their associated mutexes.
+    void register_stop_program_signal(std::mutex& lock, std::condition_variable& cv);
+    void deregister_stop_program_signal(std::condition_variable& cv);
+
+
+public:
     //  Use these since they will wake up on program stop.
     std::mutex& lock();
     std::condition_variable& cv();
@@ -103,6 +110,29 @@ private:
 
 
 
+class ProgramStopNotificationScope{
+public:
+    ProgramStopNotificationScope(
+        ProgramEnvironment& env,
+        std::mutex& lock,
+        std::condition_variable& cv
+    )
+        : m_env(env)
+        , m_cv(cv)
+    {
+        env.register_stop_program_signal(lock, cv);
+    }
+    ~ProgramStopNotificationScope(){
+        m_env.deregister_stop_program_signal(m_cv);
+    }
+
+private:
+    ProgramEnvironment& m_env;
+    std::condition_variable& m_cv;
+};
+
+
+
 
 //  Templates
 
@@ -116,6 +146,7 @@ template <typename StatsType>
 StatsType& ProgramEnvironment::stats(){
     return *static_cast<StatsType*>(m_current_stats);
 }
+
 
 
 
