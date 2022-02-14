@@ -145,6 +145,7 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env){
             ArcDetector arcs;
             WhiteObjectWatcher watcher(
                 env.console,
+                {0, 0, 1, 1},
                 {{arcs, true}}
             );
             int ret = run_until(
@@ -183,6 +184,7 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env){
             ArcDetector arcs;
             WhiteObjectWatcher watcher(
                 env.console,
+                {0, 0, 1, 1},
                 {{arcs, false}}
             );
             ShinySymbolWaiter shiny_symbol(env.console, SHINY_SYMBOL_BOX_BOTTOM);

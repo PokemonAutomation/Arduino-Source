@@ -21,7 +21,7 @@ using namespace Kernels::Waterfill;
 
 void find_overworld_white_objects(
     const std::vector<std::pair<WhiteObjectDetector&, bool>>& detectors,
-    const QImage& screen
+    const QImage& image
 ){
     std::set<Color> threshold_set;
     for (const auto& item : detectors){
@@ -36,7 +36,7 @@ void find_overworld_white_objects(
         size_t c = 0;
         for (; c + 3 < filters; c += 4){
             compress4_rgb32_to_binary_range(
-                screen,
+                image,
                 matrix[c + 0], (uint32_t)threshold_list[c + 0], 0xffffffff,
                 matrix[c + 1], (uint32_t)threshold_list[c + 1], 0xffffffff,
                 matrix[c + 2], (uint32_t)threshold_list[c + 2], 0xffffffff,
@@ -45,14 +45,14 @@ void find_overworld_white_objects(
         }
         for (; c + 1 < filters; c += 2){
             compress2_rgb32_to_binary_range(
-                screen,
+                image,
                 matrix[c + 0], (uint32_t)threshold_list[c + 0], 0xffffffff,
                 matrix[c + 1], (uint32_t)threshold_list[c + 1], 0xffffffff
             );
         }
         for (; c < filters; c++){
             matrix[c] = compress_rgb32_to_binary_range(
-                screen, (uint32_t)threshold_list[c + 0], 0xffffffff
+                image, (uint32_t)threshold_list[c + 0], 0xffffffff
             );
         }
     }
@@ -76,7 +76,7 @@ void find_overworld_white_objects(
             for (const auto& detector : detectors){
                 const std::set<Color>& thresholds = detector.first.thresholds();
                 if (thresholds.find(threshold_list[c]) != thresholds.end()){
-                    detector.first.process_object(screen, object);
+                    detector.first.process_object(image, object);
                 }
             }
         }
@@ -94,6 +94,7 @@ void WhiteObjectDetector::merge_heavily_overlapping(double tolerance){
         boxes.emplace(box.area(), box);
     }
     m_detections.clear();
+//    cout << "boxes.size() = " << boxes.size() << endl;
 
     double ratio = 1.0 + tolerance;
 
@@ -118,6 +119,7 @@ void WhiteObjectDetector::merge_heavily_overlapping(double tolerance){
         m_detections.emplace_back(current->second);
         current = boxes.erase(current);
     }
+//    cout << "m_detections.size() = " << m_detections.size() << endl;
 }
 
 
@@ -125,15 +127,18 @@ void WhiteObjectDetector::merge_heavily_overlapping(double tolerance){
 
 WhiteObjectWatcher::WhiteObjectWatcher(
     VideoOverlay& overlay,
+    const ImageFloatBox& box,
     std::vector<std::pair<WhiteObjectDetector&, bool>> detectors
 )
     : VisualInferenceCallback("WhiteObjectWatcher")
-    , m_box(0, 0, 1, 1)
+    , m_box(box)
     , m_overlays(overlay)
     , m_detectors(detectors)
 {}
 
-void WhiteObjectWatcher::make_overlays(VideoOverlaySet& items) const{}
+void WhiteObjectWatcher::make_overlays(VideoOverlaySet& items) const{
+    items.add(COLOR_RED, m_box);
+}
 bool WhiteObjectWatcher::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
@@ -142,7 +147,7 @@ bool WhiteObjectWatcher::process_frame(
         detector.first.clear();
     }
 
-    find_overworld_white_objects(m_detectors, frame);
+    find_overworld_white_objects(m_detectors, extract_box(frame, m_box));
     m_overlays.clear();
 
     for (auto& detector : m_detectors){

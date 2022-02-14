@@ -31,6 +31,9 @@ protected:
 
 public:
     virtual ~WhiteObjectDetector() = default;
+    WhiteObjectDetector(const WhiteObjectDetector&) = delete;
+    void operator=(const WhiteObjectDetector&) = delete;
+
     WhiteObjectDetector(Color color, std::set<Color> thresholds)
         : m_color(color)
         , m_thresholds(std::move(thresholds))
@@ -42,7 +45,7 @@ public:
     const std::vector<ImagePixelBox>& detections() const{ return m_detections; }
     void clear(){ m_detections.clear(); }
 
-    virtual void process_object(const QImage& screen, const WaterfillObject& object) = 0;
+    virtual void process_object(const QImage& image, const WaterfillObject& object) = 0;
     virtual void finish(){}
 
 protected:
@@ -68,6 +71,7 @@ class WhiteObjectWatcher : public VisualInferenceCallback{
 public:
     WhiteObjectWatcher(
         VideoOverlay& overlay,
+        const ImageFloatBox& box,
         std::vector<std::pair<WhiteObjectDetector&, bool>> detectors
     );
 

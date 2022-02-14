@@ -44,6 +44,7 @@ void OverworldWatcher::program(SingleSwitchProgramEnvironment& env){
 
     WhiteObjectWatcher watcher(
         env.console,
+        {0, 0, 1, 1},
         {
             {bubbles, false},
             {arcs, false},

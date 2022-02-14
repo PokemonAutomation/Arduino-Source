@@ -65,12 +65,12 @@ ArcDetector::ArcDetector()
         }
     )
 {}
-void ArcDetector::process_object(const QImage& screen, const WaterfillObject& object){
+void ArcDetector::process_object(const QImage& image, const WaterfillObject& object){
     ImagePixelBox object_box;
-    if (ArcMatcher::left().matches(object_box, screen, object)){
+    if (ArcMatcher::left().matches(object_box, image, object)){
         m_left.emplace_back(object_box);
     }
-    if (ArcMatcher::right().matches(object_box, screen, object)){
+    if (ArcMatcher::right().matches(object_box, image, object)){
         m_right.emplace_back(object_box);
     }
 }

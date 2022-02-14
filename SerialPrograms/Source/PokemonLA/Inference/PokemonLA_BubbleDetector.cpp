@@ -51,18 +51,18 @@ public:
 BubbleDetector::BubbleDetector()
     : WhiteObjectDetector(COLOR_GREEN, {Color(0xffb0b0b0)})
 {}
-void BubbleDetector::process_object(const QImage& screen, const WaterfillObject& object){
+void BubbleDetector::process_object(const QImage& image, const WaterfillObject& object){
     if (object.area < 200){
         return;
     }
-    if (object.width() < 0.03 * screen.width()){
+    if (object.width() < 0.03 * image.width()){
         return;
     }
-    if (object.width() > 0.06 * screen.width()){
+    if (object.width() > 0.06 * image.width()){
         return;
     }
     ImagePixelBox object_box;
-    if (BubbleMatcher::instance().matches(object_box, screen, object)){
+    if (BubbleMatcher::instance().matches(object_box, image, object)){
         m_detections.emplace_back(object_box);
     }
 }

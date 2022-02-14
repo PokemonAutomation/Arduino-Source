@@ -47,7 +47,7 @@ void FlagMatcher_make_template(){
 class FlagMatcher : public ImageMatch::SubObjectTemplateMatcher{
 public:
     FlagMatcher(bool left)
-        : SubObjectTemplateMatcher("PokemonLA/Flag-Template-S2.png", 100)
+        : SubObjectTemplateMatcher("PokemonLA/Flag-Template.png", 100)
     {
         PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
             m_object,
@@ -84,31 +84,31 @@ FlagDetector::FlagDetector()
     : WhiteObjectDetector(
         COLOR_CYAN,
         {
-//            Color(0xff808080),
-//            Color(0xff909090),
+            Color(0xff808080),
+            Color(0xff909090),
             Color(0xffa0a0a0),
-//            Color(0xffb0b0b0),
+            Color(0xffb0b0b0),
         }
     )
 {}
-void FlagDetector::process_object(const QImage& screen, const WaterfillObject& object){
+void FlagDetector::process_object(const QImage& image, const WaterfillObject& object){
     if (object.area < 100){
         return;
     }
-    if (object.height() > 0.04 * screen.height()){
+    if (object.height() > 0.04 * image.height()){
         return;
     }
-    if (object.height() < 0.01 * screen.height()){
+    if (object.height() < 0.01 * image.height()){
         return;
     }
-    if (object.width() > 0.03 * screen.width()){
+    if (object.width() > 0.03 * image.width()){
         return;
     }
     ImagePixelBox object_box;
-    if (FlagMatcher::left().matches(object_box, screen, object)){
+    if (FlagMatcher::left().matches(object_box, image, object)){
         m_left.emplace_back(object_box);
     }
-    if (FlagMatcher::right().matches(object_box, screen, object)){
+    if (FlagMatcher::right().matches(object_box, image, object)){
         m_right.emplace_back(object_box);
     }
 }

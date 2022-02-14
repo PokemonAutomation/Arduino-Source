@@ -18,7 +18,7 @@ namespace PokemonLA{
 class FlagDetector : public WhiteObjectDetector{
 public:
     FlagDetector();
-    virtual void process_object(const QImage& screen, const WaterfillObject& object) override;
+    virtual void process_object(const QImage& image, const WaterfillObject& object) override;
     virtual void finish() override;
 
 private:
