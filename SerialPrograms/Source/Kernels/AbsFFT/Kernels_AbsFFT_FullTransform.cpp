@@ -24,7 +24,7 @@ namespace AbsFFT{
 
 
 void fft_abs_k1(float abs[1], float real[2]){
-    abs[0] = real[0] + real[1];
+    abs[0] = std::abs(real[0] + real[1]);
 }
 void fft_abs_k2(float abs[2], float real[4]){
     float t0, t1, t2, t3;
@@ -33,7 +33,7 @@ void fft_abs_k2(float abs[2], float real[4]){
     t1 = real[1] + real[3];
     t3 = real[1] - real[3];
     t0 += t1;
-    abs[0] = t0;
+    abs[0] = std::abs(t0);
     abs[1] = std::sqrt(t2*t2 + t3*t3);
 }
 void fft_abs_k3(const TwiddleTable& table, float abs[4], float real[8]){

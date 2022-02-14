@@ -92,6 +92,7 @@ public:
     void fill_rest_with_zeros(){
         m_output -= m_samples_left;
         memset(m_output, 0, m_samples_left * sizeof(Type));
+        m_samples_left = 0;
     }
 
 
