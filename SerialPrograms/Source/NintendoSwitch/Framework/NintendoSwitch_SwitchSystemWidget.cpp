@@ -11,6 +11,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/FireForgetDispatcher.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/AudioPipeline/AudioDisplayWidget.h"
 #include "CommonFramework/AudioPipeline/AudioSelectorWidget.h"
 #include "CommonFramework/ControllerDevices/SerialSelectorWidget.h"
@@ -57,8 +58,10 @@ SwitchSystemWidget::SwitchSystemWidget(
         m_camera = factory.m_camera.make_ui(*widget, logger, *m_video_display);
         group_layout->addWidget(m_camera);
 
-        m_audio = factory.m_audio.make_ui(*widget, logger, *m_audio_display);
-        group_layout->addWidget(m_audio);
+        if (GlobalSettings::instance().DEVELOPER_MODE){
+            m_audio = factory.m_audio.make_ui(*widget, logger, *m_audio_display);
+            group_layout->addWidget(m_audio);
+        }
 
         m_command = new CommandRow(
             *widget,
@@ -72,7 +75,9 @@ SwitchSystemWidget::SwitchSystemWidget(
     layout->addWidget(m_audio_display);
     layout->addWidget(m_video_display);
     m_camera->reset_video();
-    m_audio->reset_audio();
+    if (GlobalSettings::instance().DEVELOPER_MODE){
+        m_audio->reset_audio();
+    }
 
 //    m_controller.reset(new VirtualController(m_serial->botbase()));
     setFocusPolicy(Qt::StrongFocus);
