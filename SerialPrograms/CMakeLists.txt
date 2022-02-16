@@ -433,6 +433,12 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.cpp
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.h
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Default.h
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.h
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.h
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Debugging.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Default.h
@@ -761,6 +767,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/PokemonLA_FlagTracker.h
     Source/PokemonLA/Inference/PokemonLA_MountDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_MountDetector.h
+    Source/PokemonLA/Inference/PokemonLA_NotificationReader.cpp
+    Source/PokemonLA/Inference/PokemonLA_NotificationReader.h
     Source/PokemonLA/Inference/PokemonLA_QuestMarkDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_QuestMarkDetector.h
     Source/PokemonLA/Inference/PokemonLA_ShinySymbolDetector.cpp
@@ -771,6 +779,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Panels_PokemonLA.h
     Source/PokemonLA/PokemonLA_Settings.cpp
     Source/PokemonLA/PokemonLA_Settings.h
+    Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.cpp
+    Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.h
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.cpp
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.h
     Source/PokemonLA/Programs/PokemonLA_GameEntry.cpp

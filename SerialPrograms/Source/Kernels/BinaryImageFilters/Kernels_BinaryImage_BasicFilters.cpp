@@ -236,7 +236,7 @@ void filter_rgb32(
 #elif defined PA_Arch_x64_SSE42
     Filter_x64_SSE41 filter(replace_with, replace_if_zero);
 #else
-    Filter_Default filter(replace_with, replace_if_zero);
+    BinaryFilter_RgbRange_Default filter(replace_with, replace_if_zero);
 #endif
     filter_rgb32(matrix, image, bytes_per_row, filter);
 }

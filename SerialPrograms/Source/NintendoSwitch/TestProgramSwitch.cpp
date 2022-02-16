@@ -151,6 +151,8 @@
 #include "PokemonLA/Programs/PokemonLA_FlagNavigationAir.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonLA/Inference/PokemonLA_ButtonDetector.h"
+#include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
+#include "PokemonLA/Inference/PokemonLA_NotificationReader.h"
 #include "TestProgramSwitch.h"
 
 #include <immintrin.h>
@@ -199,12 +201,15 @@ TestProgram::TestProgram(const TestProgram_Descriptor& descriptor)
         "<b>OCR Language:</b>",
         { Language::English }
     )
-//    , TABLE({
-//        {"Description", {true, true, false, ImageAttachmentMode::JPG, {"Notifs", "Showcase"}, std::chrono::seconds(60)}},
-//    })
+    , NOTIFICATION_TEST("Test", true, true, ImageAttachmentMode::JPG)
+    , NOTIFICATIONS({
+        &NOTIFICATION_TEST,
+//        &NOTIFICATION_ERROR_RECOVERABLE,
+//        &NOTIFICATION_ERROR_FATAL,
+    })
 {
     PA_ADD_OPTION(LANGUAGE);
-//    PA_ADD_OPTION(TABLE);
+    PA_ADD_OPTION(NOTIFICATIONS);
 }
 
 
@@ -243,7 +248,60 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
-#if 1
+//    NotificationReader reader(console);
+//    reader.detect(feed.snapshot());
+
+//    InferenceBoxScope box0(overlay, 0.30, 0.138, 0.40, 0.036);
+//    InferenceBoxScope box1(overlay, 0.30, 0.135, 0.40, 0.010);
+
+
+    NotificationDetector detector(logger, LANGUAGE);
+//    AsyncVisualInferenceSession visual(env, console, console, console);
+//    visual += detector;
+
+    int ret = wait_until(
+        env, console, console, console,
+        std::chrono::seconds(3600),
+        { &detector }
+    );
+    if (ret < 0){
+        PA_THROW_StringException("No distortion found after one hour.");
+    }
+
+    if (detector.result() == Notification::DISTORTION_FORMING){
+        send_program_notification(
+            logger, NOTIFICATION_TEST,
+            COLOR_GREEN,
+            env.program_info(),
+            "Found Distortion",
+            {},
+            feed.snapshot()
+        );
+        pbf_press_button(console, BUTTON_HOME, 20, PokemonLA::GameSettings::instance().GAME_TO_HOME_DELAY);
+    }
+
+
+
+#if 0
+    InferenceBoxScope box(overlay, 0.30, 0.138, 0.40, 0.036);
+    QImage image = extract_box(feed.snapshot(), box);
+
+    filter_rgb32_range(
+        (uint32_t*)image.bits(), image.bytesPerLine(), image.width(), image.height(),
+        (uint32_t*)image.bits(), image.bytesPerLine(), 0xff000000, 0xff808080, 0xffffffff
+    );
+
+    image.save("test.png");
+
+    QString text = OCR::ocr_read(Language::English, image);
+
+    StringMatchResult results;
+    NotificationOCR::instance().match_substring(results, Language::English, text);
+    results.log(logger, -5);
+#endif
+
+
+#if 0
     FlagNavigationAir session(env, console);
     session.run_session();
 #endif

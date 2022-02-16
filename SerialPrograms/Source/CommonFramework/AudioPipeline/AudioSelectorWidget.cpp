@@ -85,16 +85,16 @@ AudioSelectorWidget::AudioSelectorWidget(
     audio_row->addSpacing(5);
 
     m_audio_input_box = new NoWheelComboBox(this);
-    audio_row->addWidget(m_audio_input_box, 5);
+    audio_row->addWidget(m_audio_input_box, 2);
     audio_row->addSpacing(5);
 
     audio_row->addWidget(new QLabel("<b>Audio Output:</b>", this), 1);
     m_audio_output_box = new NoWheelComboBox(this);
-    audio_row->addWidget(m_audio_output_box, 5);
+    audio_row->addWidget(m_audio_output_box, 2);
     audio_row->addSpacing(5);
 
     m_audio_vis_box = new NoWheelComboBox(this);
-    audio_row->addWidget(m_audio_vis_box, 5);
+    audio_row->addWidget(m_audio_vis_box, 2);
     audio_row->addSpacing(5);
     m_audio_vis_box->addItem("No Audio Display");
     m_audio_vis_box->addItem("Frequency Bars");

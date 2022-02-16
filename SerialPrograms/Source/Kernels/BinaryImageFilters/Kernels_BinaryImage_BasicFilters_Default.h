@@ -82,9 +82,9 @@ private:
 
 
 
-class Filter_Default{
+class BinaryFilter_RgbRange_Default{
 public:
-    Filter_Default(uint32_t replacement, bool replace_if_zero)
+    BinaryFilter_RgbRange_Default(uint32_t replacement, bool replace_if_zero)
         : m_replacement(replacement)
         , m_replace_if_zero(replace_if_zero ? 1 : 0)
     {}

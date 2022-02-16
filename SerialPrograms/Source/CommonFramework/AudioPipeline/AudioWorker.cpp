@@ -12,14 +12,17 @@
 #include <QIODevice>
 #include <QThread>
 
-#include <iostream>
 #include <iomanip>
 #include <cfloat>
 #include <chrono>
 #include <memory>
 #include <cassert>
 
-// #define DEBUG_AUDIO_IO
+#include <iostream>
+using std::cout;
+using std::endl;
+
+//#define DEBUG_AUDIO_IO
 
 #if QT_VERSION_MAJOR == 5
 #include <QAudioDeviceInfo>
@@ -114,11 +117,11 @@ qint64 AudioIODevice::writeData(const char* data, qint64 len)
     // One audio frame consists of one or more channels.
     // Each channel in the frame has an audio sample that is made by one or
     // more bytes.
-    const int frameBytes = audioFormat.bytesPerFrame();
-    const int numChannels = audioFormat.channelCount();
-    const int sampleBytes = frameBytes / numChannels;
+    const size_t frameBytes = audioFormat.bytesPerFrame();
+    const size_t numChannels = audioFormat.channelCount();
+//    const size_t sampleBytes = frameBytes / numChannels;
     const size_t numSamples = len / frameBytes;
-    const size_t numFrames = len / frameBytes;
+//    const size_t numFrames = len / frameBytes;
     // We assert the data is always float with size of 4 bytes.
     const float * floatData = reinterpret_cast<const float *>(data);
 
@@ -247,6 +250,8 @@ void AudioWorker::startAudio(){
 #ifdef DEBUG_AUDIO_IO
     std::cout << "T" << QThread::currentThread() << " AudioWorker::startAudio()" << std::endl;
 #endif
+
+    cout << "AudioWorker::startAudio()" << endl;
 
     bool foundAudioInputInfo = false;
     bool foundAudioOutputInfo = false;

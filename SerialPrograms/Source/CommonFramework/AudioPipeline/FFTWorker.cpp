@@ -32,13 +32,13 @@
 namespace PokemonAutomation{
 
 
-FFTWorker::FFTWorker(int fftLengthPowerOfTwo) : m_fftLengthPowerOfTwo(fftLengthPowerOfTwo){
-    const int numFFTSamples = 1 << m_fftLengthPowerOfTwo;
-
-    m_fftInputBuffer = Vector(numFFTSamples);
-    m_fftOutputBuffer = Vector(numFFTSamples/2);
-
-    m_outputVector.resize(numFFTSamples/2);
+FFTWorker::FFTWorker(int fftLengthPowerOfTwo)
+    : m_fftLengthPowerOfTwo(fftLengthPowerOfTwo)
+    , m_fftLength((size_t)1 << m_fftLengthPowerOfTwo)
+    , m_fftInputBuffer(m_fftLength)
+    , m_fftOutputBuffer(m_fftLength / 2)
+{
+    m_outputVector.resize(m_fftLength / 2);
 }
 
 FFTWorker::~FFTWorker(){}
@@ -57,7 +57,7 @@ void FFTWorker::computeFFT(const QVector<float>& fftInput){
     //     m_fftInputBuffer[i] = (rawAudioSamples[i] + 1.0) / 2.0;
     // }
 
-    auto startTime = std::chrono::system_clock::now();
+//    auto startTime = std::chrono::system_clock::now();
 
 #ifdef USE_FFTREAL
     FFTRealWrapper fft;
@@ -77,8 +77,8 @@ void FFTWorker::computeFFT(const QVector<float>& fftInput){
     Kernels::AbsFFT::fft_abs(m_fftLengthPowerOfTwo, m_fftOutputBuffer.data(), m_fftInputBuffer.data());
 #endif
 
-    auto endTime = std::chrono::system_clock::now();
-    std::chrono::microseconds dur = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
+//    auto endTime = std::chrono::system_clock::now();
+//    std::chrono::microseconds dur = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);
     // std::cout << "T" << QThread::currentThread() << " FFTWorker::computeFFT() finished, time " dur.count() <<
     //     " ms" << std::endl;
 

@@ -57,7 +57,9 @@ private:
 
 private:
     OCR::LanguageOCR LANGUAGE;
-//    ProgramNotificationTable TABLE;
+
+    EventNotificationOption NOTIFICATION_TEST;
+    EventNotificationsOption NOTIFICATIONS;
 };
 
 

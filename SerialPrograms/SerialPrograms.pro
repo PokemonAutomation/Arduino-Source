@@ -98,6 +98,12 @@ SOURCES += \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.cpp \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.cpp \
     ../Common/Qt/QtJsonTools.cpp \
+    Source/CommonFramework/AudioPipeline/AudioDisplayWidget.cpp \
+    Source/CommonFramework/AudioPipeline/AudioSelector.cpp \
+    Source/CommonFramework/AudioPipeline/AudioSelectorWidget.cpp \
+    Source/CommonFramework/AudioPipeline/AudioThreadController.cpp \
+    Source/CommonFramework/AudioPipeline/AudioWorker.cpp \
+    Source/CommonFramework/AudioPipeline/FFTWorker.cpp \
     Source/CommonFramework/AudioPipeline/TimeSampleBuffer.cpp \
     Source/CommonFramework/AudioPipeline/TimeSampleBufferReader.cpp \
     Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.cpp \
@@ -223,6 +229,7 @@ SOURCES += \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.cpp \
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.cpp \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.cpp \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Default.cpp \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.cpp \
@@ -371,6 +378,7 @@ SOURCES += \
     Source/PokemonLA/Inference/PokemonLA_FlagDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_FlagTracker.cpp \
     Source/PokemonLA/Inference/PokemonLA_MountDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_NotificationReader.cpp \
     Source/PokemonLA/Inference/PokemonLA_QuestMarkDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_ShinySymbolDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_WhiteObjectDetector.cpp \
@@ -621,7 +629,15 @@ HEADERS += \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h \
     ../Common/Qt/QtJsonTools.h \
     ../Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h \
+    Source/CommonFramework/AudioPipeline/AudioConstants.h \
+    Source/CommonFramework/AudioPipeline/AudioDisplayWidget.h \
+    Source/CommonFramework/AudioPipeline/AudioInfo.h \
     Source/CommonFramework/AudioPipeline/AudioNormalization.h \
+    Source/CommonFramework/AudioPipeline/AudioSelector.h \
+    Source/CommonFramework/AudioPipeline/AudioSelectorWidget.h \
+    Source/CommonFramework/AudioPipeline/AudioThreadController.h \
+    Source/CommonFramework/AudioPipeline/AudioWorker.h \
+    Source/CommonFramework/AudioPipeline/FFTWorker.h \
     Source/CommonFramework/AudioPipeline/TimeSampleBuffer.h \
     Source/CommonFramework/AudioPipeline/TimeSampleBufferReader.h \
     Source/CommonFramework/AudioPipeline/TimeSampleWriter.h \
@@ -776,6 +792,11 @@ HEADERS += \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_SSE42.h \
     Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixBase.h \
     Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixBase.tpp \
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.h \
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Default.h \
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.h \
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.h \
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.h \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Default.h \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.h \
@@ -944,6 +965,7 @@ HEADERS += \
     Source/PokemonLA/Inference/PokemonLA_FlagDetector.h \
     Source/PokemonLA/Inference/PokemonLA_FlagTracker.h \
     Source/PokemonLA/Inference/PokemonLA_MountDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_NotificationReader.h \
     Source/PokemonLA/Inference/PokemonLA_QuestMarkDetector.h \
     Source/PokemonLA/Inference/PokemonLA_ShinySymbolDetector.h \
     Source/PokemonLA/Inference/PokemonLA_WhiteObjectDetector.h \

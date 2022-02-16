@@ -30,9 +30,6 @@ class FFTWorker: public QObject{
     //  like signals and slots on this class.
     Q_OBJECT
 
-    using Vector = std::vector<float>;
-    // using Vector = AlignedVector<float>;
-
 public:
     FFTWorker(int fftLengthPowerOfTwo);
     virtual ~FFTWorker();
@@ -48,11 +45,12 @@ signals:
 private:
 
     int m_fftLengthPowerOfTwo = 0;
+    size_t m_fftLength;
 
     // The buffer to store fft input
-    Vector m_fftInputBuffer;
+    AlignedVector<float> m_fftInputBuffer;
     // The buffer to save fft output.
-    Vector m_fftOutputBuffer;
+    AlignedVector<float> m_fftOutputBuffer;
 
     QVector<float> m_outputVector;
 };

@@ -4,12 +4,10 @@
  *
  */
 
-#include "AudioDisplayWidget.h"
-#include "AudioInfo.h"
-#include "AudioThreadController.h"
-#include "CommonFramework/Logging/Logger.h"
-#include "Kernels/AbsFFT/Kernels_AbsFFT.h"
 
+#include <cfloat>
+#include <cmath>
+#include <iostream>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QLinearGradient>
@@ -19,17 +17,18 @@
 #include <QColor>
 #include <QIODevice>
 #include <QBuffer>
+#include "Common/Compiler.h"
+#include "AudioConstants.h"
+#include "AudioInfo.h"
+#include "AudioDisplayWidget.h"
+#include "AudioThreadController.h"
+#include "CommonFramework/Logging/Logger.h"
+#include "Kernels/AbsFFT/Kernels_AbsFFT.h"
 
-#include <iostream>
-#include <cfloat>
 
 #ifdef USE_FFTREAL
 #include <fftreal_wrapper.h>
-#else
-const int FFTLengthPowerOfTwo = 14;
 #endif
-
-const int NUM_FFT_SAMPLES = 1 << FFTLengthPowerOfTwo;
 
 namespace PokemonAutomation{
 
@@ -37,8 +36,8 @@ namespace PokemonAutomation{
 AudioDisplayWidget::AudioDisplayWidget(QWidget& parent)
      : QWidget(&parent)
      , m_numFreqs(NUM_FFT_SAMPLES/2)
-     , m_numFreqWindows(80)
-     , m_numFreqVisBlocks(32)
+     , m_numFreqWindows(500)
+     , m_numFreqVisBlocks(64)
      , m_freqVisBlocks(m_numFreqVisBlocks * m_numFreqWindows){}
 
 AudioDisplayWidget::~AudioDisplayWidget(){ clear(); }
@@ -85,7 +84,7 @@ void AudioDisplayWidget::loadFFTOutput(const QVector<float>& fftOutput){
     for(size_t i = 0; i < m_numFreqVisBlocks; i++){
         float mag = 0.0f;
         for(size_t j = 0; j < numFreqPerBlock; j++){
-            mag += fftOutput[i*numFreqPerBlock + j];
+            mag += fftOutput[(int)(i*numFreqPerBlock + j)];
         }
         mag /= numFreqPerBlock;
         mag = std::log(mag * 10.0f + 1.0f);
@@ -107,7 +106,7 @@ void AudioDisplayWidget::loadFFTOutput(const QVector<float>& fftOutput){
 
     if (m_saveFreqToDisk){
         for(size_t i = 0; i < m_numFreqs; i++){
-            m_freqStream << fftOutput[i] << " ";
+            m_freqStream << fftOutput[(int)i] << " ";
         }
         m_freqStream << std::endl;
     }
@@ -166,10 +165,10 @@ void AudioDisplayWidget::paintEvent(QPaintEvent* event){
             // +1 here to skip the freq-0 value
             float value = m_freqVisBlocks[curWindow * m_numFreqVisBlocks + i+1];
             QRect bar = rect();
-            bar.setLeft(rect().left() + leftPaddingWidth + (i * (gapWidth + barWidth)));
-            bar.setWidth(barWidth);
-            bar.setTop(rect().top() + gapWidth + (1.0 - value) * barHeight);
-            bar.setBottom(rect().bottom() - gapWidth);
+            bar.setLeft((int)(rect().left() + leftPaddingWidth + (i * (gapWidth + barWidth))));
+            bar.setWidth((int)barWidth);
+            bar.setTop((int)(rect().top() + gapWidth + (1.0 - value) * barHeight));
+            bar.setBottom((int)(rect().bottom() - gapWidth));
 
             painter.fillRect(bar, jetColorMap(value));
         }
@@ -194,9 +193,9 @@ void AudioDisplayWidget::paintEvent(QPaintEvent* event){
 
             QRect bar = rect();
             bar.setLeft(rect().left());
-            bar.setWidth(barWidth);
-            bar.setTop(rect().top() + i * barHeight);
-            bar.setBottom(rect().top() + (i+1) * barHeight);
+            bar.setWidth((int)barWidth);
+            bar.setTop((int)(rect().top() + i * barHeight));
+            bar.setBottom((int)(rect().top() + (i+1) * barHeight));
 
             painter.fillRect(bar, QBrush(colorGradient));
         }
