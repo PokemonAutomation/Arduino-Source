@@ -578,6 +578,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/TestProgramComputer.h
     Source/NintendoSwitch/TestProgramSwitch.cpp
     Source/NintendoSwitch/TestProgramSwitch.h
+    Source/NintendoSwitch/TestProgramSwitchAudio.cpp
+    Source/NintendoSwitch/TestProgramSwitchAudio.h
     Source/PanelLists.cpp
     Source/PanelLists.h
     Source/Pokemon/Inference/Pokemon_BerryNameReader.cpp

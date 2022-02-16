@@ -20,7 +20,12 @@
 namespace PokemonAutomation{
 
 
-AudioThreadController::AudioThreadController(AudioDisplayWidget* parent, const AudioInfo& inputInfo, const AudioInfo& outputInfo){
+AudioThreadController::AudioThreadController(
+    AudioDisplayWidget* parent,
+    const AudioInfo& inputInfo,
+    const AudioInfo& outputInfo,
+    float outputVolume
+){
     QObject::setParent(parent);
 
     // std::cout << "Controller thread " << QThread::currentThread() << std::endl;
@@ -32,7 +37,7 @@ AudioThreadController::AudioThreadController(AudioDisplayWidget* parent, const A
     // So AudioWorker constructor is very light. The work to initialize and start audio processing
     // is done in AudioWorker::startAudio(). It will be called using a signal AudioThreadController::operate()
     // which is sent after the worker thread starts.
-    m_AudioWorker = new AudioWorker(inputInfo, outputInfo);
+    m_AudioWorker = new AudioWorker(inputInfo, outputInfo, outputVolume);
     m_AudioWorker->moveToThread(&m_audioThread);
     connect(&m_audioThread, &QThread::finished, m_AudioWorker, &QObject::deleteLater);
 
@@ -48,6 +53,8 @@ AudioThreadController::AudioThreadController(AudioDisplayWidget* parent, const A
 
     // Connect fft thread to audio display widget to pass fft outputs.
     connect(m_fftWorker, &FFTWorker::FFTFinished, parent, &AudioDisplayWidget::loadFFTOutput);
+
+    connect(parent, &AudioDisplayWidget::volumeChanged, m_AudioWorker, &AudioWorker::setVolume);
     
     m_audioThread.start();
     m_fftThread.start();

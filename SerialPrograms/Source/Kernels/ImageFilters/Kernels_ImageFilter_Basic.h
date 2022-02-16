@@ -10,6 +10,7 @@
 #define PokemonAutomation_Kernels_ImageFilter_Basic_H
 
 #include <stdint.h>
+#include <cstddef>
 
 namespace PokemonAutomation{
 namespace Kernels{

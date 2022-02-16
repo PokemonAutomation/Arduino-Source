@@ -39,7 +39,12 @@ class AudioThreadController: public QObject{
     Q_OBJECT
 
 public:
-    AudioThreadController(AudioDisplayWidget* parent, const AudioInfo& inputInfo, const AudioInfo& outputInfo);
+    AudioThreadController(
+        AudioDisplayWidget* parent,
+        const AudioInfo& inputInfo,
+        const AudioInfo& outputInfo,
+        float outputVolume
+    );
     virtual ~AudioThreadController();
 
 signals:

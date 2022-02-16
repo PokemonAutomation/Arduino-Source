@@ -62,7 +62,8 @@ public:
     AudioDisplayWidget(QWidget& parent);
     virtual ~AudioDisplayWidget();
 
-    void set_audio(Logger& logger, const AudioInfo& inputInfo, const AudioInfo& outputInfo);
+    // outputVolume: range [0.f, 1.f]
+    void set_audio(Logger& logger, const AudioInfo& inputInfo, const AudioInfo& outputInfo, float outputVolume);
 
     void close_audio();
 
@@ -80,6 +81,9 @@ public:
     // Development usage: save the FFT results to disk so that it can be examined
     // and edited to be used as samples for future audio matching.
     void saveAudioFrequenciesToDisk(bool enable);
+
+signals:
+    void volumeChanged(float volume);
 
 public slots:
     // The audio thread (managed by m_audioThreadController) send signal
@@ -101,6 +105,10 @@ private:
     size_t m_numFreqWindows = 0;
     // Num blocks of frequencies to visualize for one sliding window.
     size_t m_numFreqVisBlocks = 0;
+    // The boundaries to separate each frequency vis block.
+    // i-th freq vis block is made by frequencies whose indices in m_spectrums
+    // fall inside the range: [ m_freqVisBlockBoundaries[i], m_freqVisBlockBoundaries[i+1] )
+    std::vector<int> m_freqVisBlockBoundaries;
     // Group nearby frequencies into blocks.
     // Each block uses the log scaled averaged magnitude of the frequencies.
     // stores those blocks together for visualization.

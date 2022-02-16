@@ -85,12 +85,12 @@ void printAudioFormat(const QAudioFormat& format){
             channelConfigStr = "Stereo";
             break;
         case QAudioFormat::ChannelConfig::ChannelConfigUnknown:
-            channelConfigStr = "Error";
+            channelConfigStr = "Unkown";
             break;
         default:
             channelConfigStr = "Non Mono or Stereo";
     }
-    std::cout << "Audio format: sample format " << sampleFormatStr << 
+    std::cout << "sample format " << sampleFormatStr << 
         ", bytes per sample " << format.bytesPerSample() << 
         ", channel config " << channelConfigStr <<
         ", num channels " << format.channelCount() << 
@@ -103,9 +103,11 @@ void printAudioFormat(const QAudioFormat& format){
 namespace PokemonAutomation{
 
 
-AudioIODevice::AudioIODevice(const QAudioFormat & audioFormat)
+AudioIODevice::AudioIODevice(const QAudioFormat & audioFormat, AudioWorker::ChannelMode channelMode)
      : QIODevice(nullptr)
      , m_audioFormat(audioFormat)
+     , m_channelMode(channelMode)
+     , m_channelSwapBuffer(8192)
      , m_fftCircularBuffer(NUM_FFT_SAMPLES * 8)
      , m_fftInputVector(NUM_FFT_SAMPLES) {}
 
@@ -117,52 +119,91 @@ qint64 AudioIODevice::writeData(const char* data, qint64 len)
     // One audio frame consists of one or more channels.
     // Each channel in the frame has an audio sample that is made by one or
     // more bytes.
-    const size_t frameBytes = audioFormat.bytesPerFrame();
-    const size_t numChannels = audioFormat.channelCount();
-//    const size_t sampleBytes = frameBytes / numChannels;
-    const size_t numSamples = len / frameBytes;
-//    const size_t numFrames = len / frameBytes;
+    int frameBytes = audioFormat.bytesPerFrame();
+    int numChannels = audioFormat.channelCount();
+    int sampleBytes = frameBytes / numChannels;
+    size_t numSamples = len / sampleBytes;
+    size_t numFrames = len / frameBytes;
     // We assert the data is always float with size of 4 bytes.
     const float * floatData = reinterpret_cast<const float *>(data);
 
-    // We assert audio channel count is 1. This has the benefit that we can use memcpy
-    // to pass audio data to the FFT input buffer. The drawback is the user can not hear
-    // stereo sound.
-    // Note: I tried to do stereo sound but it seems QAudioSink somehow still plays it as
-    // mono sound on my machine.
-    if (numChannels != 1){
-        std::cout << "Error: AudioIODevice receives audio format with more than one channel count: "
-            << numChannels << ". We currently only support one channel" << std::endl;
-        return 0;
+    // Pass audio data to the audio sink for audio playback.
+    if (m_audioSinkDevice){
+        if (m_channelMode == AudioWorker::ChannelMode::Interleaved){
+            // Interleaved mode: numChannels == 1 and sample rate should be 2 times the 
+            // normal sample rate. The input device interleaved L and R stereo channels into
+            // one mono channel. The incoming samples follow the R - L order.
+            // Since the stereo format has L - R order. We need to swap L and R samples:
+            
+            // First we need to make sure there are equal number of L and R samples to swap:
+            if(numSamples % 2 != 0){
+                std::cout << "Error: audio in interleaved mode but the number of samples "
+                    << numSamples << " is not even" << std::endl;
+            }
+
+            // Swapping samples:
+            m_channelSwapBuffer.resize(numSamples);
+            for(size_t i = 0; i < numSamples/2; i++){
+                m_channelSwapBuffer[2*i] = floatData[2*i+1];
+                m_channelSwapBuffer[2*i+1] = floatData[2*i];
+            }
+            m_audioSinkDevice->write(reinterpret_cast<const char *>(m_channelSwapBuffer.data()), len);
+        } else{
+            // In other modes, we can safely pass data to output directly.
+            m_audioSinkDevice->write(data, len);
+        }
     }
 
-    // Pass audio samples to FFT input buffer:
+#define PASS_FFT
+#ifdef PASS_FFT
+    // Pass audio frames to FFT input buffer:
+    // If the input audio is mono channel, then the samples are directly written to FFT buffer.
+    // If the input audio is stero, then for each frame, average the left and right channel samples
+    // in the frame and send to the FFT buffer.
+    // If the input audio is interleaved mode, then its essentially the stereo mode, do the same
+    // as stereo.
+    if (m_channelMode == AudioWorker::ChannelMode::Interleaved){
+        frameBytes *= 2;
+        numChannels = 2;
+        numFrames /= 2;
+    }
 
-    // numTotalSamplesCopied: how many samples have been copied in the following loop
-    size_t numTotalSamplesCopied = 0;
+    // numTotalFramesCopied: how many audio frames have been copied in the following loop
+    size_t numTotalFramesCopied = 0;
     const size_t circularBufferSize = m_fftCircularBuffer.size();
 
     // while there are still samples not copied from audio source to the fft buffer:
-    while(numTotalSamplesCopied < numSamples){
+    while(numTotalFramesCopied < numFrames){
 
         // First, let's calculate how many more samples we need to file a FFT.
-        size_t nextFFTNumSamplesNeeded = computeNextFFTSamplesNeeded();
+        size_t nextFFTNumFramesNeeded = computeNextFFTSamplesNeeded();
 
         // Copy as much data as possible from the audio source until either the input samples are
         // all used or the circular buffer reaches the end.
-        size_t curNumSamplesCopied = std::min((size_t)m_fftCircularBuffer.size() - m_bufferNext, numSamples - numTotalSamplesCopied);
-        memcpy(m_fftCircularBuffer.data() + m_bufferNext, floatData + numTotalSamplesCopied, sizeof(float) * curNumSamplesCopied);
+        size_t curNumFramesCopied = std::min((size_t)m_fftCircularBuffer.size() - m_bufferNext,
+            numFrames - numTotalFramesCopied);
+        if (numChannels == 1){
+            // Mono channel, directly copy data:
+            memcpy(m_fftCircularBuffer.data() + m_bufferNext, floatData + numTotalFramesCopied,
+                sizeof(float) * curNumFramesCopied);
+        } else{
+            for(size_t i = 0; i < curNumFramesCopied; i++){
+                const float v0 = floatData[(numTotalFramesCopied+i) * numChannels];
+                const float v1 = floatData[(numTotalFramesCopied+i) * numChannels + 1];
+                m_fftCircularBuffer[m_bufferNext + i] = (v0 + v1) / 2.0f;
+            }
+        }
         
         // Update m_bufferNext to reflect new data added:
-        m_bufferNext = (m_bufferNext + curNumSamplesCopied) % circularBufferSize;
-        // Update numTotalSamplesCopied to reflect new data copied:
-        numTotalSamplesCopied += curNumSamplesCopied;
+        m_bufferNext = (m_bufferNext + curNumFramesCopied) % circularBufferSize;
+        // Update numTotalFramesCopied to reflect new data copied:
+        numTotalFramesCopied += curNumFramesCopied;
 
         // With new data added, we need to check whether we can file one or more FFTs:
 
-        size_t numNewDataForFFT = curNumSamplesCopied;
+        size_t numNewDataForFFT = curNumFramesCopied;
         // While we have enough new data to file an FFT:
-        while(nextFFTNumSamplesNeeded <= numNewDataForFFT){
+        while(nextFFTNumFramesNeeded <= numNewDataForFFT){
             // copy data from m_fftCircularBuffer to m_fftInputVector:
             moveDataToFFTInputVector();
             // std::cout << "FFT input copied " << std::endl;
@@ -171,18 +212,15 @@ qint64 AudioIODevice::writeData(const char* data, qint64 len)
             emit fftInputReady(m_fftInputVector);
 
             // Update numNewDataForFFT to account for fft samples consumed:
-            numNewDataForFFT -= nextFFTNumSamplesNeeded;
-            // Initialize nextFFTNumSamplesNeeded for next FFT:
-            nextFFTNumSamplesNeeded = FFT_SLIDING_WINDOW_STEP;
+            numNewDataForFFT -= nextFFTNumFramesNeeded;
+            // Initialize nextFFTNumFramesNeeded for next FFT:
+            nextFFTNumFramesNeeded = FFT_SLIDING_WINDOW_STEP;
             // Move m_fftStart forward for next FFT:
             m_fftStart = (m_fftStart + FFT_SLIDING_WINDOW_STEP) % circularBufferSize;
         }
     }
+#endif
 
-    // Pass audio data to the audio sink for audio playback.
-    if (m_audioSinkDevice){
-        m_audioSinkDevice->write(data, len);
-    }
 
 #ifdef DEBUG_AUDIO_IO
     std::vector<float> meanChannelVol(numChannels);
@@ -190,7 +228,7 @@ qint64 AudioIODevice::writeData(const char* data, qint64 len)
     std::vector<float> maxChannelVol(numChannels, -FLT_MAX);
     for(int i = 0; i < numFrames; i++){
         for(int j = 0; j < numChannels; j++){
-            const float v = floatData[i*numChannels+j]
+            const float v = floatData[i*numChannels+j];
             meanChannelVol[j] += v;
             minChannelVol[j] = std::min(minChannelVol[j], v);
             maxChannelVol[j] = std::max(maxChannelVol[j], v);
@@ -240,9 +278,10 @@ void AudioIODevice::moveDataToFFTInputVector(){
     }   
 }
 
-AudioWorker::AudioWorker(const AudioInfo& inputInfo, const AudioInfo& outputInfo){
+AudioWorker::AudioWorker(const AudioInfo& inputInfo, const AudioInfo& outputInfo, float outputVolume){
     m_inputInfo = inputInfo;
     m_outputInfo = outputInfo;
+    m_volume = std::max(std::min(outputVolume, 1.0f), 0.0f);
 }
 
 
@@ -250,8 +289,6 @@ void AudioWorker::startAudio(){
 #ifdef DEBUG_AUDIO_IO
     std::cout << "T" << QThread::currentThread() << " AudioWorker::startAudio()" << std::endl;
 #endif
-
-    cout << "AudioWorker::startAudio()" << endl;
 
     bool foundAudioInputInfo = false;
     bool foundAudioOutputInfo = false;
@@ -315,16 +352,58 @@ void AudioWorker::startAudio(){
         return;
     }
 
-    m_audioFormat = chosenAudioInputDevice.preferredFormat();
-    m_audioFormat.setSampleRate(AUDIO_SAMPLE_RATE);
+    const QAudioFormat defaultFormat = chosenAudioInputDevice.preferredFormat();
+    std::cout << "Default input audio format: ";
+    printAudioFormat(defaultFormat);
+    const int defaultChannelCount = defaultFormat.channelCount();
+    const int defaultSampleRate = defaultFormat.sampleRate();
+    
+    m_audioFormat = defaultFormat;
+    // For now we let Qt handle the audio sample type conversion for us:
 #if QT_VERSION_MAJOR == 5
-    m_audioFormat.setChannelCount(1);
-    m_audioFormat.setSampleType(QAudioFormat::SampleType::Float);
-    m_audioFormat.setSampleSize(32);
+        m_audioFormat.setSampleType(QAudioFormat::SampleType::Float);
+        m_audioFormat.setSampleSize(32);
 #elif QT_VERSION_MAJOR == 6
-    m_audioFormat.setChannelConfig(QAudioFormat::ChannelConfig::ChannelConfigMono);
-    m_audioFormat.setSampleFormat(QAudioFormat::SampleFormat::Float);
+        m_audioFormat.setSampleFormat(QAudioFormat::SampleFormat::Float);
 #endif
+
+    QAudioFormat m_outputAudioFormat = m_audioFormat;
+
+    if (false){
+        m_audioFormat.setChannelCount(1);
+        m_audioFormat.setChannelConfig(QAudioFormat::ChannelConfigMono);
+        m_audioFormat.setSampleRate(48000);
+        m_channelMode = ChannelMode::Mono;
+        m_outputAudioFormat = m_audioFormat;
+    }
+    else if (defaultChannelCount == 1 && defaultSampleRate <= 50000){
+        // The input audio device uses mono mode, nothing to change on the output format.
+        m_channelMode = ChannelMode::Mono;
+    } else if (defaultChannelCount >= 2 && defaultSampleRate <= 50000){
+        // The input audio device uses stereo mode, nothing to change on the output format.
+        m_channelMode = ChannelMode::Stereo;
+        // Reduce the channel count to 2 in case the input sound is surrounded stereo.
+        m_audioFormat.setChannelCount(2);
+        m_outputAudioFormat = m_audioFormat;
+    } else if (defaultChannelCount == 1 && defaultSampleRate >= 80000){
+        // The input audio device uses interleaved mode, where the stereo samples are
+        // interleaved into a mono channel.
+        // This is the mode many capture cards use. If the Swith audio comes as stereo 48KHz,
+        // the capture card generates a mono 96KHz audio stream.
+        // To handle this, we need to set the output audio format to be stereo with the correct
+        // sample rate.
+        m_outputAudioFormat.setChannelConfig(QAudioFormat::ChannelConfig::ChannelConfigStereo);
+        m_outputAudioFormat.setSampleRate(defaultSampleRate / 2);
+        m_channelMode = ChannelMode::Interleaved;
+    } else {
+        std::cout << "Error: unkown input audio configuration:" << std::endl;
+        return;
+    }
+
+    std::cout << "Set input audio format to: ";
+    printAudioFormat(m_audioFormat);
+    std::cout << "Set output audio format to: ";
+    printAudioFormat(m_outputAudioFormat);
     
     if (!chosenAudioInputDevice.isFormatSupported(m_audioFormat)){
         std::cout << "Error: audio input device cannot support desired audio format" << std::endl;
@@ -388,22 +467,21 @@ void AudioWorker::startAudio(){
         }
     });
 
-    m_audioIODevice = new AudioIODevice(m_audioFormat);
+    m_audioIODevice = new AudioIODevice(m_audioFormat, m_channelMode);
     m_audioIODevice->open(QIODevice::ReadWrite | QIODevice::Unbuffered);
     
     m_audioSource->start(m_audioIODevice);
 
     if (foundAudioOutputInfo){
-        bool outputSupported = chosenAudioOutputDevice.isFormatSupported(m_audioFormat);
+        bool outputSupported = chosenAudioOutputDevice.isFormatSupported(m_outputAudioFormat);
         if (!outputSupported){
-            std::cout << "Error the audio output device does not support the audio format used by the audio input device" << std::endl;
+            std::cout << "Error the audio output device does not support the audio format edited from the audio input device" << std::endl;
         } else{
-            m_audioSink = new AudioSink(chosenAudioOutputDevice, m_audioFormat, this);
+            m_audioSink = new AudioSink(chosenAudioOutputDevice, m_outputAudioFormat, this);
+            m_audioSink->setBufferSize(32768);
+            m_audioSink->setVolume(m_volume);
             m_audioIODevice->setAudioSinkDevice(m_audioSink->start());
-#ifdef DEBUG_AUDIO_IO
-            std::cout << "Audio output format: " << std::endl;
-            printAudioFormat(m_audioSink->format());
-#endif
+
             connect(m_audioSink, &AudioSink::stateChanged, this, [&](QAudio::State newState){
                 switch (newState) {
                 case QAudio::StoppedState:
@@ -476,5 +554,12 @@ AudioWorker::~AudioWorker(){
     }
 }
 
+void AudioWorker::setVolume(float volume){
+    volume = std::max(std::min(volume, 1.0f), 0.0f);
+    m_volume = volume;
+    if (m_audioSink){
+        m_audioSink->setVolume(volume);
+    }
+}
 
 }

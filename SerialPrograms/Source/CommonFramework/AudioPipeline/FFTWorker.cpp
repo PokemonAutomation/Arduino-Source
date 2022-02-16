@@ -4,7 +4,6 @@
  *
  */
 
-#include "AudioConstants.h"
 #include "AudioDisplayWidget.h"
 #include "Common/Cpp/AlignedVector.tpp"
 #include "CommonFramework/Logging/Logger.h"
@@ -61,13 +60,15 @@ void FFTWorker::computeFFT(const QVector<float>& fftInput){
 
 #ifdef USE_FFTREAL
     FFTRealWrapper fft;
-    fft.calculateFFT(m_fftOutputBuffer.data(), m_fftInputBuffer.data());
+    std::vector<float> FFTRealOutputBuffer(m_fftInputBuffer.size())
+    fft.calculateFFT(FFTRealOutputBuffer.data(), m_fftInputBuffer.data());
 
-    for(int i = 2; i <= NUM_FFT_SAMPLES/2; i++){
+    num_fft_samples = m_fftInputBuffer.size();
+    for(int i = 2; i <= num_fft_samples/2; i++){
         float real = m_fftOutputBuffer[i];
         float imag = 0.0;
-        if (i>0 && i<NUM_FFT_SAMPLES/2) {
-            imag = m_fftOutputBuffer[NUM_FFT_SAMPLES/2 + i];
+        if (i>0 && i<num_fft_samples/2) {
+            imag = m_fftOutputBuffer[num_fft_samples/2 + i];
         }
         float mag = std::sqrt(real * real + imag * imag);
         // std::cout << mag << " ";
@@ -76,6 +77,9 @@ void FFTWorker::computeFFT(const QVector<float>& fftInput){
 #else
     Kernels::AbsFFT::fft_abs(m_fftLengthPowerOfTwo, m_fftOutputBuffer.data(), m_fftInputBuffer.data());
 #endif
+    // The constant part of the frequency is the sum of all audio sample values.
+    // It may be negative. Use fabs() to get its magnitude.
+    m_fftOutputBuffer[0] = std::fabs(m_fftOutputBuffer[0]);
 
 //    auto endTime = std::chrono::system_clock::now();
 //    std::chrono::microseconds dur = std::chrono::duration_cast<std::chrono::microseconds>(endTime - startTime);

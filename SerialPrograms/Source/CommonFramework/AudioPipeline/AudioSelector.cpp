@@ -17,6 +17,7 @@ namespace PokemonAutomation{
 const QString AudioSelector::JSON_INPUT_DEVICE = "InputDevice";
 const QString AudioSelector::JSON_OUTPUT_DEVICE = "OutputDevice";
 const QString AudioSelector::JSON_AUDIO_VIS = "AudioVisualization";
+const QString AudioSelector::JSON_AUDIO_VOLUME = "Volume";
 
 AudioSelector::AudioDisplayType AudioSelector::stringToAudioDisplayType(const std::string& value){
     if (value == "FREQ_BARS"){
@@ -57,6 +58,9 @@ void AudioSelector::load_json(const QJsonValue& json){
     if (json_get_string(name, obj, JSON_AUDIO_VIS)){
         m_audioDisplayType = stringToAudioDisplayType(name.toStdString());
     }
+    if (json_get_string(name, obj, JSON_AUDIO_VOLUME)){
+        m_volume = name.toInt();
+    }
 }
 
 QJsonValue AudioSelector::to_json() const{
@@ -64,6 +68,7 @@ QJsonValue AudioSelector::to_json() const{
     root.insert(JSON_INPUT_DEVICE, QString::fromStdString(m_inputDevice.device_name()));
     root.insert(JSON_OUTPUT_DEVICE, QString::fromStdString(m_outputDevice.device_name()));
     root.insert(JSON_AUDIO_VIS, QString::fromStdString(audioDisplayTypeToString(m_audioDisplayType)));
+    root.insert(JSON_AUDIO_VOLUME, QString::number(m_volume));
     return root;
 }
 
