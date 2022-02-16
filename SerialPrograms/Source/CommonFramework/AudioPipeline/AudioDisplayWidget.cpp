@@ -57,7 +57,7 @@ AudioDisplayWidget::AudioDisplayWidget(QWidget& parent)
     m_freqVisBlockBoundaries[m_numFreqVisBlocks] = m_numFreqs;
 
     for(size_t i = 1; i <= m_numFreqVisBlocks; i++){
-        assert(m_numFreqVisBlocks[i-1] < m_numFreqVisBlocks[i]);
+        assert(m_freqVisBlockBoundaries[i-1] < m_freqVisBlockBoundaries[i]);
     }
 
     // std::cout << "Freq vis block boundaries: ";

@@ -369,14 +369,16 @@ void AudioWorker::startAudio(){
 
     QAudioFormat m_outputAudioFormat = m_audioFormat;
 
-    if (false){
+// #define FORCE_MONO
+#ifdef FORCE_MONO
+    if (true){
         m_audioFormat.setChannelCount(1);
-        m_audioFormat.setChannelConfig(QAudioFormat::ChannelConfigMono);
         m_audioFormat.setSampleRate(48000);
         m_channelMode = ChannelMode::Mono;
         m_outputAudioFormat = m_audioFormat;
-    }
-    else if (defaultChannelCount == 1 && defaultSampleRate <= 50000){
+    } else
+#endif
+    if (defaultChannelCount == 1 && defaultSampleRate <= 50000){
         // The input audio device uses mono mode, nothing to change on the output format.
         m_channelMode = ChannelMode::Mono;
     } else if (defaultChannelCount >= 2 && defaultSampleRate <= 50000){
@@ -392,7 +394,11 @@ void AudioWorker::startAudio(){
         // the capture card generates a mono 96KHz audio stream.
         // To handle this, we need to set the output audio format to be stereo with the correct
         // sample rate.
+#if QT_VERSION_MAJOR == 5        
+        m_outputAudioFormat.setChannelCount(2);
+#elif QT_VERSION_MAJOR == 6
         m_outputAudioFormat.setChannelConfig(QAudioFormat::ChannelConfig::ChannelConfigStereo);
+#endif
         m_outputAudioFormat.setSampleRate(defaultSampleRate / 2);
         m_channelMode = ChannelMode::Interleaved;
     } else {
