@@ -38,7 +38,34 @@ AudioDisplayWidget::AudioDisplayWidget(QWidget& parent)
      , m_numFreqs(NUM_FFT_SAMPLES/2)
      , m_numFreqWindows(500)
      , m_numFreqVisBlocks(64)
-     , m_freqVisBlocks(m_numFreqVisBlocks * m_numFreqWindows){}
+     , m_freqVisBlockBoundaries(m_numFreqVisBlocks+1)
+     , m_freqVisBlocks(m_numFreqVisBlocks * m_numFreqWindows)
+{
+    // We will display frequencies in log scale, so need to convert
+    // log scale: 0, 1/m_numFreqVisBlocks, 2/m_numFreqVisBlocks, ..., 1.0
+    // to linear scale:
+    // The conversion function is: linear_value = (exp(log_value * LOG_MAX) - 1) / 10
+    const float LOG_SCALE_MAX = std::log(11.0f);
+    
+    m_freqVisBlockBoundaries[0] = 0;
+    for(size_t i = 1; i < m_numFreqVisBlocks; i++){
+        const float logValue = i / (float)m_numFreqVisBlocks;
+        float linearValue = (std::exp(logValue * LOG_SCALE_MAX) - 1.f) / 10.f;
+        linearValue = std::max(std::min(linearValue, 1.0f), 0.0f);
+        m_freqVisBlockBoundaries[i] = std::min(size_t(linearValue * m_numFreqs + 0.5), m_numFreqs);
+    }
+    m_freqVisBlockBoundaries[m_numFreqVisBlocks] = m_numFreqs;
+
+    for(size_t i = 1; i <= m_numFreqVisBlocks; i++){
+        assert(m_numFreqVisBlocks[i-1] < m_numFreqVisBlocks[i]);
+    }
+
+    // std::cout << "Freq vis block boundaries: ";
+    // for(const auto v : m_freqVisBlockBoundaries){
+    //     std::cout << v << " ";
+    // }
+    // std::cout << std::endl;
+}
 
 AudioDisplayWidget::~AudioDisplayWidget(){ clear(); }
 
@@ -58,10 +85,12 @@ void AudioDisplayWidget::close_audio(){
     update_size();
 }
 
-void AudioDisplayWidget::set_audio(Logger& logger, const AudioInfo& inputInfo, const AudioInfo& outputInfo){
+void AudioDisplayWidget::set_audio(
+    Logger& logger, const AudioInfo& inputInfo, const AudioInfo& outputInfo, float outputVolume
+){
     clear();
 
-    m_audioThreadController = new AudioThreadController(this, inputInfo, outputInfo);
+    m_audioThreadController = new AudioThreadController(this, inputInfo, outputInfo, outputVolume);
 
     update_size();
 }
@@ -80,13 +109,12 @@ void AudioDisplayWidget::loadFFTOutput(const QVector<float>& fftOutput){
     }
 
     // For one window, use how many blocks to show all frequencies:
-    const size_t numFreqPerBlock = m_numFreqs / m_numFreqVisBlocks;
     for(size_t i = 0; i < m_numFreqVisBlocks; i++){
         float mag = 0.0f;
-        for(size_t j = 0; j < numFreqPerBlock; j++){
-            mag += fftOutput[(int)(i*numFreqPerBlock + j)];
+        for(size_t j = m_freqVisBlockBoundaries[i]; j < m_freqVisBlockBoundaries[i+1]; j++){
+            mag += fftOutput[j];
         }
-        mag /= numFreqPerBlock;
+        mag /= m_freqVisBlockBoundaries[i+1] - m_freqVisBlockBoundaries[i];
         mag = std::log(mag * 10.0f + 1.0f);
         // TODO: may need to scale based on game audio volume setting
         // Assuming the max freq magnitude we can get is 20.0, so

@@ -41,12 +41,22 @@ class AudioWorker: public QObject{
     //  like signals and slots on this class.
     Q_OBJECT
 public:
-    AudioWorker(const AudioInfo& inputInfo, const AudioInfo& outputInfo);
+    AudioWorker(const AudioInfo& inputInfo, const AudioInfo& outputInfo, float outputVolume);
     virtual ~AudioWorker();
 
     // Initialize all the Qt audio components to start all audio work: read from audio input device,
     // save audio samples for FFT and pass audio to audio output device.
     void startAudio();
+
+    enum class ChannelMode{
+        Mono,
+        Stereo,
+        Interleaved,
+    };
+
+public slots:
+    // Set volume of the audio output:
+    void setVolume(float volume);
 
 signals:
     // We would like to connect signals of FFT input from the audio thread to the FFT thread.
@@ -69,6 +79,10 @@ private:
     QAudioSource* m_audioSource = nullptr;
     QAudioSink* m_audioSink = nullptr;
 #endif
+
+    ChannelMode m_channelMode = ChannelMode::Mono;
+
+    float m_volume = 1.0f;
 };
 
 
@@ -87,7 +101,7 @@ class AudioIODevice : public QIODevice
     Q_OBJECT
 
 public:
-    AudioIODevice(const QAudioFormat& audioFormat);
+    AudioIODevice(const QAudioFormat& audioFormat, AudioWorker::ChannelMode channelMode);
     virtual ~AudioIODevice();
 
     // Called by QAudioSource to write data to AudioIODevice's buffer.
@@ -116,6 +130,10 @@ private:
     void moveDataToFFTInputVector();
 
     QAudioFormat m_audioFormat;
+    AudioWorker::ChannelMode m_channelMode;
+
+    // Used as a temporal buffer to swap L and R channels in the interleaved mode.
+    std::vector<float> m_channelSwapBuffer;
 
     // A large circular buffer to store multiple sliding windows of FFT inputs.
     // Because FFT windows may overlap, it may be more efficient to store

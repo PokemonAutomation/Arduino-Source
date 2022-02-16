@@ -30,6 +30,7 @@ class AudioSelector{
     static const QString JSON_INPUT_DEVICE;
     static const QString JSON_OUTPUT_DEVICE;
     static const QString JSON_AUDIO_VIS;
+    static const QString JSON_AUDIO_VOLUME;
 
 public:
     enum class AudioDisplayType{
@@ -52,6 +53,7 @@ private:
     friend class AudioSelectorWidget;
     AudioInfo m_inputDevice, m_outputDevice;
     AudioDisplayType m_audioDisplayType = AudioDisplayType::NO_DISPLAY;
+    int m_volume = 100; // volume range: [0, 100]
 };
 
 

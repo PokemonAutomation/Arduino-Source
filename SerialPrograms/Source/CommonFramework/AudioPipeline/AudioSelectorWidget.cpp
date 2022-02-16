@@ -65,6 +65,16 @@ std::tuple<std::vector<AudioInfo>, std::vector<QString>> get_all_audio_outputs()
     return ret;
 }
 
+// Slider bar volume: [0, 100], in log scale
+// Volume value passed to AudioDisplayWidget (and the audio thread it manages): [0.f, 1.f], linear scale
+float convertAudioVolumeFromSlider(int volume){
+    // The slider bar value is in the log scale because log scale matches human sound
+    // perception.
+    float linearVolume = QAudio::convertVolume(volume / float(100.0f),
+        QAudio::LogarithmicVolumeScale, QAudio::LinearVolumeScale);
+    return linearVolume;
+}
+
 AudioSelectorWidget::~AudioSelectorWidget(){}
 
 AudioSelectorWidget::AudioSelectorWidget(
@@ -81,14 +91,14 @@ AudioSelectorWidget::AudioSelectorWidget(
     QHBoxLayout* audio_row = new QHBoxLayout(this);
     audio_row->setContentsMargins(0, 0, 0, 0);
 
-    audio_row->addWidget(new QLabel("<b>Audio Input:</b>", this), 1);
+    audio_row->addWidget(new QLabel("<b>Audio:</b>", this), 1);
     audio_row->addSpacing(5);
 
     m_audio_input_box = new NoWheelComboBox(this);
     audio_row->addWidget(m_audio_input_box, 2);
     audio_row->addSpacing(5);
 
-    audio_row->addWidget(new QLabel("<b>Audio Output:</b>", this), 1);
+    // audio_row->addWidget(new QLabel("<b>Audio Output:</b>", this), 1);
     m_audio_output_box = new NoWheelComboBox(this);
     audio_row->addWidget(m_audio_output_box, 2);
     audio_row->addSpacing(5);
@@ -96,9 +106,16 @@ AudioSelectorWidget::AudioSelectorWidget(
     m_audio_vis_box = new NoWheelComboBox(this);
     audio_row->addWidget(m_audio_vis_box, 2);
     audio_row->addSpacing(5);
-    m_audio_vis_box->addItem("No Audio Display");
-    m_audio_vis_box->addItem("Frequency Bars");
+    m_audio_vis_box->addItem("No Display");
+    m_audio_vis_box->addItem("Spectrum");
     m_audio_vis_box->addItem("Spectrogram");
+    
+    m_volume_slider = new QSlider(Qt::Horizontal, this);
+    m_volume_slider->setRange(0, 100);
+    m_volume_slider->setMinimumWidth(40);
+    m_volume_slider->setTickPosition(QSlider::TicksBothSides);
+    audio_row->addWidget(m_volume_slider, 5);
+    audio_row->addSpacing(5);
 
     refresh();
 
@@ -169,6 +186,14 @@ AudioSelectorWidget::AudioSelectorWidget(
         }
     );
 
+    connect(
+        m_volume_slider, &QSlider::valueChanged, this, [=](){
+            m_value.m_volume = m_volume_slider->value();
+            m_value.m_volume = std::max(std::min(m_value.m_volume, 100), 0);
+            emit m_display.volumeChanged(convertAudioVolumeFromSlider(m_value.m_volume));
+        }
+    );
+
     // only in developer mode:
     // record audio
     if (GlobalSettings::instance().DEVELOPER_MODE){
@@ -236,6 +261,8 @@ void AudioSelectorWidget::refresh(){
             m_audio_vis_box->setCurrentIndex(0);
     }
     m_display.setAudioDisplayType(m_value.m_audioDisplayType);
+
+    m_volume_slider->setValue(m_value.m_volume);
 }
 
 void AudioSelectorWidget::reset_audio(){
@@ -244,7 +271,7 @@ void AudioSelectorWidget::reset_audio(){
 
     const AudioInfo& info = m_value.m_inputDevice;
     if (info){
-        m_display.set_audio(m_logger, info, m_value.m_outputDevice);
+        m_display.set_audio(m_logger, info, m_value.m_outputDevice, convertAudioVolumeFromSlider(m_value.m_volume));
     }
 }
 void AudioSelectorWidget::async_reset_audio(){
