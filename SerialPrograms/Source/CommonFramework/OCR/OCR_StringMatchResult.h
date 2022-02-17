@@ -33,6 +33,11 @@ struct StringMatchResult{
     std::multimap<double, StringMatchData> results;
     std::string expected_token;
 
+    void clear(){
+        exact_match = false;
+        results.clear();
+        expected_token.clear();
+    }
     void log(Logger& logger, double max_log10p, const QString& extra = QString()) const;
 
     void add(double log10p, StringMatchData data);

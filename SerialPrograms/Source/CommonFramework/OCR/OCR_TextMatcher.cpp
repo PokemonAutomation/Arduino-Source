@@ -178,11 +178,11 @@ double random_match_probability(size_t total, size_t matched, double random_matc
 
 
 
-void match_substring(
-    StringMatchResult& results,
+StringMatchResult match_substring(
     const std::map<QString, std::set<std::string>>& database, double random_match_chance,
     const QString& text, double log10p_spread
 ){
+    StringMatchResult results;
 //    result.original_text = text;
 //    result.normalized_text = normalize(text);
 
@@ -200,11 +200,11 @@ void match_substring(
                 StringMatchData{text, normalized, normalized, target}
             );
         }
-        return;
+        return results;
     }
 
 
-    for (auto item : database){
+    for (const auto& item : database){
         double token_length = item.first.size();
 
         size_t distance = levenshtein_distance_substring(item.first, normalized);
@@ -225,6 +225,8 @@ void match_substring(
             results.clear_beyond_spread(log10p_spread);
         }
     }
+
+    return results;
 }
 
 

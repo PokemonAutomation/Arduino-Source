@@ -24,8 +24,7 @@ public:
 public:
     const DictionaryOCR& dictionary(Language language) const;
 
-    void match_substring(
-        StringMatchResult& results,
+    StringMatchResult match_substring(
         Language language,
         const QString& text, double log10p_spread = 0.50
     ) const;

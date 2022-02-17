@@ -40,8 +40,7 @@ IVCheckerValue IVCheckerReaderScope::read(Logger& logger, const QImage& frame, c
 
     static constexpr double MAX_LOG10P = -1.40;
 
-    OCR::StringMatchResult result;
-    IVCheckerReader::instance().match_substring(result, m_language, text);
+    OCR::StringMatchResult result = IVCheckerReader::instance().match_substring(m_language, text);
     result.log(logger, MAX_LOG10P);
     result.clear_beyond_log10p(MAX_LOG10P);
     if (result.results.size() != 1){

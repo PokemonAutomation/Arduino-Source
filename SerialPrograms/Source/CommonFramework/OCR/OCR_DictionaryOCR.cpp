@@ -81,13 +81,11 @@ void DictionaryOCR::save_json(const QString& json_path) const{
 
 
 
-void DictionaryOCR::match_substring(
-    StringMatchResult& results,
+StringMatchResult DictionaryOCR::match_substring(
     const QString& text,
     double log10p_spread
 ) const{
-    OCR::match_substring(
-        results,
+    return OCR::match_substring(
         m_candidate_to_token, m_random_match_chance,
         text, log10p_spread
     );

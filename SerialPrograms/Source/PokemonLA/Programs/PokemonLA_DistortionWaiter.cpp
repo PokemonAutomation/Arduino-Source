@@ -92,10 +92,10 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env){
 //    AsyncVisualInferenceSession visual(env, console, console, console);
 //    visual += detector;
 
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
     while (true){
         env.update_stats();
 
-        std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
         int ret = run_until(
             env, env.console,
             [&](const BotBaseContext& context){
@@ -125,8 +125,12 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env){
             stats.distortions++;
             break;
         }
+        if (detector.result() == Notification::ERROR){
+            stats.errors++;
+        }else{
+            stats.other++;
+        }
 
-        stats.other++;
         env.wait_for(std::chrono::seconds(10));
     }
 

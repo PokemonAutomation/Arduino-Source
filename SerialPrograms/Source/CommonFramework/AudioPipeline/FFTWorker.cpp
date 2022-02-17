@@ -4,13 +4,6 @@
  *
  */
 
-#include "AudioDisplayWidget.h"
-#include "Common/Cpp/AlignedVector.tpp"
-#include "CommonFramework/Logging/Logger.h"
-#include "Kernels/AbsFFT/Kernels_AbsFFT.h"
-#include "FFTWorker.h"
-#include <QThread>
-
 #include <iostream>
 #include <iomanip>
 #include <fstream>
@@ -18,6 +11,12 @@
 #include <chrono>
 #include <memory>
 #include <cmath>
+#include <QThread>
+#include "Kernels/AbsFFT/Kernels_AbsFFT.h"
+#include "Common/Cpp/AlignedVector.tpp"
+#include "CommonFramework/Logging/Logger.h"
+#include "AudioDisplayWidget.h"
+#include "FFTWorker.h"
 
 
 // #define USE_FFTREAL
@@ -37,7 +36,7 @@ FFTWorker::FFTWorker(int fftLengthPowerOfTwo)
     , m_fftInputBuffer(m_fftLength)
     , m_fftOutputBuffer(m_fftLength / 2)
 {
-    m_outputVector.resize(m_fftLength / 2);
+    m_outputVector.resize((int)(m_fftLength / 2));
 }
 
 FFTWorker::~FFTWorker(){}

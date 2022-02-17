@@ -108,7 +108,7 @@ private:
     // The boundaries to separate each frequency vis block.
     // i-th freq vis block is made by frequencies whose indices in m_spectrums
     // fall inside the range: [ m_freqVisBlockBoundaries[i], m_freqVisBlockBoundaries[i+1] )
-    std::vector<int> m_freqVisBlockBoundaries;
+    std::vector<size_t> m_freqVisBlockBoundaries;
     // Group nearby frequencies into blocks.
     // Each block uses the log scaled averaged magnitude of the frequencies.
     // stores those blocks together for visualization.

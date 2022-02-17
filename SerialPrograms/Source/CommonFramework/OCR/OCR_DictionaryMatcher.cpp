@@ -28,13 +28,12 @@ DictionaryOCR& DictionaryMatcher::dictionary(Language language){
 }
 
 
-void DictionaryMatcher::match_substring(
-    StringMatchResult& results,
+StringMatchResult DictionaryMatcher::match_substring(
     Language language,
     const QString& text,
     double log10p_spread
 ) const{
-    dictionary(language).match_substring(results, text, log10p_spread);
+    return dictionary(language).match_substring(text, log10p_spread);
 }
 void DictionaryMatcher::add_candidate(Language language, std::string token, const QString& candidate){
     dictionary(language).add_candidate(std::move(token), candidate);

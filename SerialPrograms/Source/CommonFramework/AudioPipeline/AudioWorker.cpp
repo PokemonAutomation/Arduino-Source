@@ -359,6 +359,8 @@ void AudioWorker::startAudio(){
     const int defaultSampleRate = defaultFormat.sampleRate();
     
     m_audioFormat = defaultFormat;
+    m_audioFormat.setSampleRate(48000);
+
     // For now we let Qt handle the audio sample type conversion for us:
 #if QT_VERSION_MAJOR == 5
         m_audioFormat.setSampleType(QAudioFormat::SampleType::Float);

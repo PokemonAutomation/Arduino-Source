@@ -27,8 +27,7 @@ double random_match_probability(size_t total, size_t matched, double random_matc
 
 
 
-void match_substring(
-    StringMatchResult& results,
+StringMatchResult match_substring(
     const std::map<QString, std::set<std::string>>& database, double random_match_chance,
     const QString& text, double log10p_spread
 );

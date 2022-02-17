@@ -7,7 +7,6 @@
 
 #include <cfloat>
 #include <cmath>
-#include <iostream>
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QLinearGradient>
@@ -25,6 +24,9 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "Kernels/AbsFFT/Kernels_AbsFFT.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
 
 #ifdef USE_FFTREAL
 #include <fftreal_wrapper.h>
@@ -37,7 +39,7 @@ AudioDisplayWidget::AudioDisplayWidget(QWidget& parent)
      : QWidget(&parent)
      , m_numFreqs(NUM_FFT_SAMPLES/2)
      , m_numFreqWindows(500)
-     , m_numFreqVisBlocks(64)
+     , m_numFreqVisBlocks(84)
      , m_freqVisBlockBoundaries(m_numFreqVisBlocks+1)
      , m_freqVisBlocks(m_numFreqVisBlocks * m_numFreqWindows)
 {
@@ -45,14 +47,24 @@ AudioDisplayWidget::AudioDisplayWidget(QWidget& parent)
     // log scale: 0, 1/m_numFreqVisBlocks, 2/m_numFreqVisBlocks, ..., 1.0
     // to linear scale:
     // The conversion function is: linear_value = (exp(log_value * LOG_MAX) - 1) / 10
-    const float LOG_SCALE_MAX = std::log(11.0f);
+//    const float LOG_SCALE_MAX = std::log(11.0f);
     
     m_freqVisBlockBoundaries[0] = 0;
     for(size_t i = 1; i < m_numFreqVisBlocks; i++){
-        const float logValue = i / (float)m_numFreqVisBlocks;
-        float linearValue = (std::exp(logValue * LOG_SCALE_MAX) - 1.f) / 10.f;
-        linearValue = std::max(std::min(linearValue, 1.0f), 0.0f);
-        m_freqVisBlockBoundaries[i] = std::min(size_t(linearValue * m_numFreqs + 0.5), m_numFreqs);
+//        const float logValue = i / (float)m_numFreqVisBlocks;
+//        float linearValue = (std::exp(logValue * LOG_SCALE_MAX) - 1.f) / 10.f;
+//        linearValue = std::max(std::min(linearValue, 1.0f), 0.0f);
+//        m_freqVisBlockBoundaries[i] = std::min(size_t(linearValue * m_numFreqs + 0.5), m_numFreqs);
+
+        //  (96 / 8 = 12) give us 12 bars per octave.
+        const float x = (float)i / 96.;
+        float freq = std::exp2f(8.0f * x + 4);
+        size_t index = (size_t)freq;
+
+        index = std::min(index, m_numFreqs);
+        index = std::max(index, (size_t)0);
+        m_freqVisBlockBoundaries[i] = index;
+//        cout << "index = " << index << endl;
     }
     m_freqVisBlockBoundaries[m_numFreqVisBlocks] = m_numFreqs;
 
@@ -108,19 +120,34 @@ void AudioDisplayWidget::loadFFTOutput(const QVector<float>& fftOutput){
         }
     }
 
+    float scale = std::sqrt(0.5f / (float)fftOutput.size());
+//    scale *= m_numFreqVisBlocks;
+//    scale *= 100;
+
     // For one window, use how many blocks to show all frequencies:
     for(size_t i = 0; i < m_numFreqVisBlocks; i++){
         float mag = 0.0f;
         for(size_t j = m_freqVisBlockBoundaries[i]; j < m_freqVisBlockBoundaries[i+1]; j++){
-            mag += fftOutput[j];
+            mag += fftOutput[(int)j];
         }
+
         mag /= m_freqVisBlockBoundaries[i+1] - m_freqVisBlockBoundaries[i];
+        mag *= scale;
+
+        mag = std::sqrt(mag);
+#if 0
+//        cout << mag << endl;
+//        mag = std::log10(mag * 1000 + 1);
+//        mag /= 3;
+
         mag = std::log(mag * 10.0f + 1.0f);
         // TODO: may need to scale based on game audio volume setting
         // Assuming the max freq magnitude we can get is 20.0, so
         // log(20 * 10 + 1.0) = log(201)
         const float max_log = std::log(201.f);
         mag /= max_log;
+#endif
+
         // Clamp to [0.0, 1.0]
         mag = std::min(mag, 1.0f);
         mag = std::max(mag, 0.0f);

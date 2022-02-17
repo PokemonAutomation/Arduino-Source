@@ -30,8 +30,7 @@ OCR::StringMatchResult PokemonNameReader::read_substring(
     const QImage& image
 ) const{
     QString text = OCR::ocr_read(language, image);
-    OCR::StringMatchResult ret;
-    match_substring(ret, language, text);
+    OCR::StringMatchResult ret = match_substring(language, text);
     ret.log(logger, MAX_LOG10P);
     ret.clear_beyond_log10p(MAX_LOG10P);
     return ret;

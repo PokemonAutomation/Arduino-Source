@@ -19,6 +19,7 @@ namespace PokemonLA{
 
 enum class Notification{
     NOTHING,
+    ERROR,
     DISTORTION_FORMING,
     DISTORTION_APPEARED,
     DISTORTION_FADED,
@@ -69,6 +70,7 @@ public:
 private:
     NotificationReader m_reader;
     std::atomic<Notification> m_last;
+    std::chrono::system_clock::time_point m_last_check;
 };
 
 

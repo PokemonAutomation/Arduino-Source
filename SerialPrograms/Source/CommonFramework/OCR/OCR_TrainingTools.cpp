@@ -125,8 +125,7 @@ void TrainingSession::generate_small_dictionary(
                 QString text = OCR::ocr_read(language.first, image);
                 QString normalized = OCR::normalize(text);
 
-                OCR::StringMatchResult result;
-                baseline.match_substring(result, language.first, text, LOG10P_SPREAD);
+                OCR::StringMatchResult result = baseline.match_substring(language.first, text, LOG10P_SPREAD);
 
                 OCR::StringMatchResult result0 = result;
                 result.clear_beyond_log10p(MAX_LOG10P);
@@ -190,8 +189,7 @@ void TrainingSession::generate_large_dictionary(
                 QString text = OCR::ocr_read(language.first, image);
                 QString normalized = OCR::normalize(text);
 
-                OCR::StringMatchResult result;
-                baseline.match_substring(result, language.first, text, LOG10P_SPREAD);
+                OCR::StringMatchResult result = baseline.match_substring(language.first, text, LOG10P_SPREAD);
 
                 OCR::StringMatchResult result0 = result;
                 result.clear_beyond_log10p(MAX_LOG10P);

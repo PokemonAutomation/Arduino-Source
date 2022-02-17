@@ -38,7 +38,7 @@ public:
     QJsonObject to_json() const;
     void save_json(const QString& json_path) const;
 
-    void match_substring(StringMatchResult& results, const QString& text, double log10p_spread = 0.50) const;
+    StringMatchResult match_substring(const QString& text, double log10p_spread = 0.50) const;
 
 
 public:

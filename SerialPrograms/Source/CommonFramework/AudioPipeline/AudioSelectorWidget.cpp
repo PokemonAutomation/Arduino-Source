@@ -30,9 +30,11 @@ std::tuple<std::vector<AudioInfo>, std::vector<QString>> get_all_audio_inputs(){
     std::tuple<std::vector<AudioInfo>, std::vector<QString>> ret;
 #if QT_VERSION_MAJOR == 5
     const auto audioInfos = QAudioDeviceInfo::availableDevices(QAudio::AudioInput);
+//    cout << "audioInfos.size() = " << audioInfos.size() << endl;
     for (const auto &audioInfo : audioInfos){
         std::get<0>(ret).emplace_back(audioInfo.deviceName().toStdString());
         std::get<1>(ret).emplace_back(audioInfo.deviceName());
+//        cout << audioInfo.deviceName().toStdString() << " : " << audioInfo.realm().toStdString() << endl;
     }
 #elif QT_VERSION_MAJOR == 6
     const auto audioInfos = QMediaDevices::audioInputs();
@@ -88,39 +90,64 @@ AudioSelectorWidget::AudioSelectorWidget(
     , m_value(value)
     , m_display(holder)
 {
-    QHBoxLayout* audio_row = new QHBoxLayout(this);
-    audio_row->setContentsMargins(0, 0, 0, 0);
+    QVBoxLayout* vbox = new QVBoxLayout(this);
+    vbox->setContentsMargins(0, 0, 0, 0);
 
-    audio_row->addWidget(new QLabel("<b>Audio:</b>", this), 1);
-    audio_row->addSpacing(5);
+    {
+        QHBoxLayout* row0 = new QHBoxLayout();
+        row0->setContentsMargins(0, 0, 0, 0);
+        vbox->addLayout(row0);
 
-    m_audio_input_box = new NoWheelComboBox(this);
-    audio_row->addWidget(m_audio_input_box, 2);
-    audio_row->addSpacing(5);
+        row0->addWidget(new QLabel("<b>Audio Input:</b>", this), 1);
+        row0->addSpacing(5);
 
-    // audio_row->addWidget(new QLabel("<b>Audio Output:</b>", this), 1);
-    m_audio_output_box = new NoWheelComboBox(this);
-    audio_row->addWidget(m_audio_output_box, 2);
-    audio_row->addSpacing(5);
+        m_audio_input_box = new NoWheelComboBox(this);
+        row0->addWidget(m_audio_input_box, 5);
+        row0->addSpacing(5);
 
-    m_audio_vis_box = new NoWheelComboBox(this);
-    audio_row->addWidget(m_audio_vis_box, 2);
-    audio_row->addSpacing(5);
-    m_audio_vis_box->addItem("No Display");
-    m_audio_vis_box->addItem("Spectrum");
-    m_audio_vis_box->addItem("Spectrogram");
-    
-    m_volume_slider = new QSlider(Qt::Horizontal, this);
-    m_volume_slider->setRange(0, 100);
-    m_volume_slider->setMinimumWidth(40);
-    m_volume_slider->setTickPosition(QSlider::TicksBothSides);
-    audio_row->addWidget(m_volume_slider, 5);
-    audio_row->addSpacing(5);
+        m_audio_vis_box = new NoWheelComboBox(this);
+        m_audio_vis_box->addItem("No Display");
+        m_audio_vis_box->addItem("Spectrum");
+        m_audio_vis_box->addItem("Spectrogram");
+        row0->addWidget(m_audio_vis_box, 3);
+        row0->addSpacing(5);
+
+        m_reset_button = new QPushButton("Reset Audio", this);
+        row0->addWidget(m_reset_button, 1);
+    }
+
+    {
+        QHBoxLayout* row1 = new QHBoxLayout();
+        row1->setContentsMargins(0, 0, 0, 0);
+        vbox->addLayout(row1);
+
+        row1->addWidget(new QLabel("<b>Audio Output:</b>", this), 1);
+        row1->addSpacing(5);
+
+        m_audio_output_box = new NoWheelComboBox(this);
+        row1->addWidget(m_audio_output_box, 5);
+        row1->addSpacing(5);
+
+        m_volume_slider = new QSlider(Qt::Horizontal, this);
+        m_volume_slider->setRange(0, 100);
+        m_volume_slider->setTickInterval(10);
+        m_volume_slider->setMinimumWidth(40);
+        m_volume_slider->setTickPosition(QSlider::TicksBothSides);
+        row1->addWidget(m_volume_slider, 3);
+        row1->addSpacing(5);
+
+        if (GlobalSettings::instance().DEVELOPER_MODE){
+            m_record_button = new QPushButton("Record Frequencies", this);
+            row1->addWidget(m_record_button, 1);
+        }else{
+            row1->addStretch(1);
+        }
+    }
+
+
 
     refresh();
 
-    m_reset_button = new QPushButton("Reset Audio", this);
-    audio_row->addWidget(m_reset_button, 1);
 
     connect(
         m_audio_input_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -197,9 +224,6 @@ AudioSelectorWidget::AudioSelectorWidget(
     // only in developer mode:
     // record audio
     if (GlobalSettings::instance().DEVELOPER_MODE){
-        m_record_button = new QPushButton("Record Frequencies", this);
-        audio_row->addWidget(m_record_button, 1);
-
         connect(m_record_button, &QPushButton::clicked, this, [=](bool){
             m_record_is_on = !m_record_is_on;
             m_display.saveAudioFrequenciesToDisk(m_record_is_on);
