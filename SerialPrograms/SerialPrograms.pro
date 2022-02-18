@@ -99,6 +99,8 @@ SOURCES += \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.cpp \
     ../Common/Qt/QtJsonTools.cpp \
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.cpp \
+    Source/CommonFramework/AudioPipeline/AudioIODevice.cpp \
+    Source/CommonFramework/AudioPipeline/AudioInfo.cpp \
     Source/CommonFramework/AudioPipeline/AudioSelector.cpp \
     Source/CommonFramework/AudioPipeline/AudioSelectorWidget.cpp \
     Source/CommonFramework/AudioPipeline/AudioThreadController.cpp \
@@ -285,6 +287,7 @@ SOURCES += \
     Source/NintendoSwitch/Programs/PokemonHome_PageSwap.cpp \
     Source/NintendoSwitch/TestProgramComputer.cpp \
     Source/NintendoSwitch/TestProgramSwitch.cpp \
+    Source/NintendoSwitch/TestProgramSwitchAudio.cpp \
     Source/PanelLists.cpp \
     Source/Pokemon/Inference/Pokemon_BerryNameReader.cpp \
     Source/Pokemon/Inference/Pokemon_IVCheckerReader.cpp \
@@ -384,6 +387,7 @@ SOURCES += \
     Source/PokemonLA/Inference/PokemonLA_WhiteObjectDetector.cpp \
     Source/PokemonLA/Panels_PokemonLA.cpp \
     Source/PokemonLA/PokemonLA_Settings.cpp \
+    Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.cpp \
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.cpp \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.cpp \
     Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.cpp \
@@ -631,6 +635,7 @@ HEADERS += \
     ../Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h \
     Source/CommonFramework/AudioPipeline/AudioConstants.h \
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.h \
+    Source/CommonFramework/AudioPipeline/AudioIODevice.h \
     Source/CommonFramework/AudioPipeline/AudioInfo.h \
     Source/CommonFramework/AudioPipeline/AudioNormalization.h \
     Source/CommonFramework/AudioPipeline/AudioSelector.h \
@@ -869,6 +874,7 @@ HEADERS += \
     Source/NintendoSwitch/Programs/PokemonHome_PageSwap.h \
     Source/NintendoSwitch/TestProgramComputer.h \
     Source/NintendoSwitch/TestProgramSwitch.h \
+    Source/NintendoSwitch/TestProgramSwitchAudio.h \
     Source/PanelLists.h \
     Source/Pokemon/Inference/Pokemon_BerryNameReader.h \
     Source/Pokemon/Inference/Pokemon_IVCheckerReader.h \
@@ -971,6 +977,7 @@ HEADERS += \
     Source/PokemonLA/Inference/PokemonLA_WhiteObjectDetector.h \
     Source/PokemonLA/Panels_PokemonLA.h \
     Source/PokemonLA/PokemonLA_Settings.h \
+    Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.h \
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.h \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.h \
     Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.h \

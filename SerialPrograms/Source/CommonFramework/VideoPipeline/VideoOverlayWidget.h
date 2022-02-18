@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_VideoOverlayWidget_H
-#define PokemonAutomation_VideoOverlayWidget_H
+#ifndef PokemonAutomation_VideoPipeline_VideoOverlayWidget_H
+#define PokemonAutomation_VideoPipeline_VideoOverlayWidget_H
 
 #include <map>
 #include <QWidget>

@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_FFTWorker_H
-#define PokemonAutomation_FFTWorker_H
+#ifndef PokemonAutomation_AudioPipeline_FFTWorker_H
+#define PokemonAutomation_AudioPipeline_FFTWorker_H
 
 #include <vector>
 #include <chrono>

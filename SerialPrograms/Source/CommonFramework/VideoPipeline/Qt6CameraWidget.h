@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_Qt6VideoWidget_H
-#define PokemonAutomation_Qt6VideoWidget_H
+#ifndef PokemonAutomation_VideoPipeline_Qt6VideoWidget_H
+#define PokemonAutomation_VideoPipeline_Qt6VideoWidget_H
 
 #include <mutex>
 #include "CommonFramework/Logging/Logger.h"

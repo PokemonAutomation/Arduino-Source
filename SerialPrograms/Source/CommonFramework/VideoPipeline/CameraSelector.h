@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CameraSelector_H
-#define PokemonAutomation_CameraSelector_H
+#ifndef PokemonAutomation_VideoPipeline_CameraSelector_H
+#define PokemonAutomation_VideoPipeline_CameraSelector_H
 
 #include <QSize>
 #include "CommonFramework/Logging/Logger.h"

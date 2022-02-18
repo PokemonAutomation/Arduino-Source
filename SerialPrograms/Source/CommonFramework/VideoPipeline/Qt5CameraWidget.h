@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_Qt5VideoWidget_H
-#define PokemonAutomation_Qt5VideoWidget_H
+#ifndef PokemonAutomation_VideoPipeline_Qt5VideoWidget_H
+#define PokemonAutomation_VideoPipeline_Qt5VideoWidget_H
 
 #include <condition_variable>
 #include <QCameraViewfinder>

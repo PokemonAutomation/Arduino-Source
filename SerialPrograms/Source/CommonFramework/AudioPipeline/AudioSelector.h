@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_AudioSelector_H
-#define PokemonAutomation_AudioSelector_H
+#ifndef PokemonAutomation_AudioPipeline_AudioSelector_H
+#define PokemonAutomation_AudioPipeline_AudioSelector_H
 
 #include "CommonFramework/Logging/Logger.h"
 #include "AudioInfo.h"

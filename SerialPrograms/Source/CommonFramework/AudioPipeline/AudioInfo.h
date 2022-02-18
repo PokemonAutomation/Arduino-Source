@@ -1,13 +1,15 @@
-/*  Audio Input Device Info
+/*  Audio Device Info
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_AudioInfo_H
-#define PokemonAutomation_AudioInfo_H
+#ifndef PokemonAutomation_AudioPipeline_AudioInfo_H
+#define PokemonAutomation_AudioPipeline_AudioInfo_H
 
 #include <string>
+#include <vector>
+#include <QString>
 
 namespace PokemonAutomation{
 
@@ -31,6 +33,21 @@ public:
 private:
     std::string m_device_name;
 };
+
+
+struct AudioInfoData{
+    AudioInfo info;
+    QString display_name;
+
+    AudioInfoData(std::string device_name, QString p_display_name)
+        : info(std::move(device_name))
+        , display_name(std::move(p_display_name))
+    {}
+};
+
+std::vector<AudioInfoData> get_all_audio_inputs();
+std::vector<AudioInfoData> get_all_audio_outputs();
+
 
 
 

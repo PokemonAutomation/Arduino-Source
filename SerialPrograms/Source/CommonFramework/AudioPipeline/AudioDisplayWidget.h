@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_AudioDisplayWidget_H
-#define PokemonAutomation_AudioDisplayWidget_H
+#ifndef PokemonAutomation_AudioPipeline_AudioDisplayWidget_H
+#define PokemonAutomation_AudioPipeline_AudioDisplayWidget_H
 
 #include <QWidget>
 #include <QThread>

@@ -147,7 +147,10 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/QtJsonTools.h
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.cpp
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.h
+    Source/CommonFramework/AudioPipeline/AudioInfo.cpp
     Source/CommonFramework/AudioPipeline/AudioInfo.h
+    Source/CommonFramework/AudioPipeline/AudioIODevice.cpp
+    Source/CommonFramework/AudioPipeline/AudioIODevice.h
     Source/CommonFramework/AudioPipeline/AudioSelector.cpp
     Source/CommonFramework/AudioPipeline/AudioSelector.h
     Source/CommonFramework/AudioPipeline/AudioSelectorWidget.cpp

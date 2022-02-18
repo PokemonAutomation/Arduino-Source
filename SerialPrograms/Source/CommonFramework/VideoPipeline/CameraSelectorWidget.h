@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CameraSelectorWidget_H
-#define PokemonAutomation_CameraSelectorWidget_H
+#ifndef PokemonAutomation_VideoPipeline_CameraSelectorWidget_H
+#define PokemonAutomation_VideoPipeline_CameraSelectorWidget_H
 
 #include <vector>
 #include <atomic>

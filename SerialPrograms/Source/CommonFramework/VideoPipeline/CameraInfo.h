@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CameraInfo_H
-#define PokemonAutomation_CameraInfo_H
+#ifndef PokemonAutomation_VideoPipeline_CameraInfo_H
+#define PokemonAutomation_VideoPipeline_CameraInfo_H
 
 #include <string>
 

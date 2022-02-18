@@ -24,11 +24,11 @@ class TestProgramAudio : public SingleSwitchProgramInstance{
 public:
     TestProgramAudio(const TestProgramAudio_Descriptor& descriptor);
 
-    virtual std::unique_ptr<StatsTracker> make_stats() const override;
+//    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
-private:
-    struct Stats;
+//private:
+//    struct Stats;
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

@@ -39,7 +39,7 @@ AudioDisplayWidget::AudioDisplayWidget(QWidget& parent)
      : QWidget(&parent)
      , m_numFreqs(NUM_FFT_SAMPLES/2)
      , m_numFreqWindows(500)
-     , m_numFreqVisBlocks(84)
+     , m_numFreqVisBlocks(96)
      , m_freqVisBlockBoundaries(m_numFreqVisBlocks+1)
      , m_freqVisBlocks(m_numFreqVisBlocks * m_numFreqWindows)
 {
@@ -49,7 +49,7 @@ AudioDisplayWidget::AudioDisplayWidget(QWidget& parent)
     // The conversion function is: linear_value = (exp(log_value * LOG_MAX) - 1) / 10
 //    const float LOG_SCALE_MAX = std::log(11.0f);
     
-    m_freqVisBlockBoundaries[0] = 0;
+    m_freqVisBlockBoundaries[0] = 1;
     for(size_t i = 1; i < m_numFreqVisBlocks; i++){
 //        const float logValue = i / (float)m_numFreqVisBlocks;
 //        float linearValue = (std::exp(logValue * LOG_SCALE_MAX) - 1.f) / 10.f;
@@ -57,19 +57,36 @@ AudioDisplayWidget::AudioDisplayWidget(QWidget& parent)
 //        m_freqVisBlockBoundaries[i] = std::min(size_t(linearValue * m_numFreqs + 0.5), m_numFreqs);
 
         //  (96 / 8 = 12) give us 12 bars per octave.
-        const float x = (float)i / 96.;
-        float freq = std::exp2f(8.0f * x + 4);
+        const float x = (float)i / m_numFreqVisBlocks;
+        float freq = std::exp2f(8.0f * x + 3);
         size_t index = (size_t)freq;
 
+        index = std::max(index, (size_t)1);
         index = std::min(index, m_numFreqs);
-        index = std::max(index, (size_t)0);
         m_freqVisBlockBoundaries[i] = index;
-//        cout << "index = " << index << endl;
     }
     m_freqVisBlockBoundaries[m_numFreqVisBlocks] = m_numFreqs;
 
-    for(size_t i = 1; i <= m_numFreqVisBlocks; i++){
+    //  Iterate buckets in reverse order and push the lower frequencies over so that everyone has
+    //  a width of at least 1.
+    size_t last = m_freqVisBlockBoundaries[m_numFreqVisBlocks - 1];
+    for (size_t c = m_numFreqVisBlocks - 1; c-- > 0;){
+        size_t current = m_freqVisBlockBoundaries[c];
+        if (current >= last){
+            current = last - 1;
+            if (current == 0){
+                current = 1;
+            }
+            m_freqVisBlockBoundaries[c] = current;
+        }
+        last = current;
+    }
+
+    for (size_t i = 1; i <= m_numFreqVisBlocks; i++){
         assert(m_freqVisBlockBoundaries[i-1] < m_freqVisBlockBoundaries[i]);
+    }
+    for (size_t i = 0; i < m_numFreqVisBlocks; i++){
+//        cout << "index = " << m_freqVisBlockBoundaries[i] << endl;
     }
 
     // std::cout << "Freq vis block boundaries: ";
@@ -125,33 +142,42 @@ void AudioDisplayWidget::loadFFTOutput(const QVector<float>& fftOutput){
 //    scale *= 100;
 
     // For one window, use how many blocks to show all frequencies:
+    float previous = 0;
     for(size_t i = 0; i < m_numFreqVisBlocks; i++){
         float mag = 0.0f;
         for(size_t j = m_freqVisBlockBoundaries[i]; j < m_freqVisBlockBoundaries[i+1]; j++){
             mag += fftOutput[(int)j];
         }
 
-        mag /= m_freqVisBlockBoundaries[i+1] - m_freqVisBlockBoundaries[i];
-        mag *= scale;
+        size_t width = m_freqVisBlockBoundaries[i+1] - m_freqVisBlockBoundaries[i];
 
-        mag = std::sqrt(mag);
+        if (width == 0){
+            mag = previous;
+        }else{
+            mag /= width;
+            mag *= scale;
+
+            mag = std::sqrt(mag);
 #if 0
-//        cout << mag << endl;
-//        mag = std::log10(mag * 1000 + 1);
-//        mag /= 3;
+//            cout << mag << endl;
+//            mag = std::log10(mag * 1000 + 1);
+//            mag /= 3;
 
-        mag = std::log(mag * 10.0f + 1.0f);
-        // TODO: may need to scale based on game audio volume setting
-        // Assuming the max freq magnitude we can get is 20.0, so
-        // log(20 * 10 + 1.0) = log(201)
-        const float max_log = std::log(201.f);
-        mag /= max_log;
+            mag = std::log(mag * 10.0f + 1.0f);
+            // TODO: may need to scale based on game audio volume setting
+            // Assuming the max freq magnitude we can get is 20.0, so
+            // log(20 * 10 + 1.0) = log(201)
+            const float max_log = std::log(201.f);
+            mag /= max_log;
 #endif
 
-        // Clamp to [0.0, 1.0]
-        mag = std::min(mag, 1.0f);
-        mag = std::max(mag, 0.0f);
+            // Clamp to [0.0, 1.0]
+            mag = std::min(mag, 1.0f);
+            mag = std::max(mag, 0.0f);
+        }
+
         m_freqVisBlocks[m_nextFFTWindowIndex*m_numFreqVisBlocks + i] = mag;
+        previous = mag;
     }
     m_nextFFTWindowIndex = (m_nextFFTWindowIndex+1) % m_numFreqWindows;
     // std::cout << "Computed FFT! "  << magSum << std::endl;
@@ -201,24 +227,24 @@ void AudioDisplayWidget::paintEvent(QPaintEvent* event){
 
     const int widgetWidth = this->width();
     const int widgetHeight = this->height();
-    // num frequency bars
-    // -1 here because we don't show the freq-0 bar
-    const size_t numBars = m_numFreqVisBlocks-1;
+//    // num frequency bars
+//    // -1 here because we don't show the freq-0 bar
+//    const size_t numBars = m_numFreqVisBlocks-1;
 
     switch (m_audioDisplayType){
     case AudioDisplayType::FREQ_BARS:
     {
-        const size_t barPlusGapWidth = widgetWidth / numBars;
+        const size_t barPlusGapWidth = widgetWidth / m_numFreqVisBlocks;
         const size_t barWidth = 0.8 * barPlusGapWidth;
         const size_t gapWidth = barPlusGapWidth - barWidth;
-        const size_t paddingWidth = widgetWidth - numBars * (barWidth + gapWidth);
+        const size_t paddingWidth = widgetWidth - m_numFreqVisBlocks * (barWidth + gapWidth);
         const size_t leftPaddingWidth = (paddingWidth + gapWidth) / 2;
         const size_t barHeight = widgetHeight - 2 * gapWidth;
 
-        for (size_t i = 0; i < numBars; i++){
+        for (size_t i = 0; i < m_numFreqVisBlocks; i++){
             size_t curWindow = (m_nextFFTWindowIndex + m_numFreqWindows - 1) % m_numFreqWindows;
-            // +1 here to skip the freq-0 value
-            float value = m_freqVisBlocks[curWindow * m_numFreqVisBlocks + i+1];
+//            // +1 here to skip the freq-0 value
+            float value = m_freqVisBlocks[curWindow * m_numFreqVisBlocks + i];
             QRect bar = rect();
             bar.setLeft((int)(rect().left() + leftPaddingWidth + (i * (gapWidth + barWidth))));
             bar.setWidth((int)barWidth);
@@ -231,16 +257,16 @@ void AudioDisplayWidget::paintEvent(QPaintEvent* event){
     }
     case AudioDisplayType::SPECTROGRAM:
     {
-        const size_t barHeight = widgetHeight / numBars;
+        const size_t barHeight = widgetHeight / m_numFreqVisBlocks;
         const size_t barWidth = widgetWidth;
-        for (size_t i = 0; i < numBars; i++){
+        for (size_t i = 0; i < m_numFreqVisBlocks; i++){
             QLinearGradient colorGradient(0,barHeight/2,widgetWidth, barHeight/2);
             colorGradient.setSpread(QGradient::PadSpread);
             for(size_t j = 0; j < m_numFreqWindows; j++){
                 // Start with the oldest window in time:
                 size_t curWindow = (m_nextFFTWindowIndex + m_numFreqWindows + j) % m_numFreqWindows;
-                // +1 here to skip the freq-0 value
-                float value = m_freqVisBlocks[curWindow * m_numFreqVisBlocks + i+1];
+//                // +1 here to skip the freq-0 value
+                float value = m_freqVisBlocks[curWindow * m_numFreqVisBlocks + i];
 
                 float pos = (float)j/(m_numFreqWindows - 1);
                 colorGradient.setColorAt(pos, jetColorMap(value));

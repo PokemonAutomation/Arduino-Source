@@ -39,18 +39,18 @@ TestProgramAudio::TestProgramAudio(const TestProgramAudio_Descriptor& descriptor
 }
 
 
-struct TestProgramAudio::Stats : public StatsTracker{
-    Stats() {}
-};
+//struct TestProgramAudio::Stats : public StatsTracker{
+//    Stats() {}
+//};
 
-std::unique_ptr<StatsTracker> TestProgramAudio::make_stats() const{
-    return std::unique_ptr<StatsTracker>(new Stats());
-}
+//std::unique_ptr<StatsTracker> TestProgramAudio::make_stats() const{
+//    return std::unique_ptr<StatsTracker>(new Stats());
+//}
 
 
 void TestProgramAudio::program(SingleSwitchProgramEnvironment& env){
-    Stats& stats = env.stats<Stats>();
-    env.update_stats();
+//    Stats& stats = env.stats<Stats>();
+//    env.update_stats();
 
     //  Connect the controller.
     pbf_move_right_joystick(env.console, 0, 255, 10, 0);
@@ -71,7 +71,7 @@ void TestProgramAudio::program(SingleSwitchProgramEnvironment& env){
 
     std::cout << "Audio test program finished." << std::endl;
 
-    env.update_stats();
+//    env.update_stats();
     GO_HOME_WHEN_DONE.run_end_of_program(env.console);
 }
 

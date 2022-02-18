@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_VideoWidget_H
-#define PokemonAutomation_VideoWidget_H
+#ifndef PokemonAutomation_VideoPipeline_VideoWidget_H
+#define PokemonAutomation_VideoPipeline_VideoWidget_H
 
 #include <vector>
 #include <QWidget>

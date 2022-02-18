@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_VideoDisplayWidget_H
-#define PokemonAutomation_VideoDisplayWidget_H
+#ifndef PokemonAutomation_VideoPipeline_VideoDisplayWidget_H
+#define PokemonAutomation_VideoPipeline_VideoDisplayWidget_H
 
 #include <functional>
 #include <deque>
@@ -24,6 +24,7 @@ namespace PokemonAutomation{
 class VideoDisplayWidget : public QWidget, public VideoOverlay{
 public:
     VideoDisplayWidget(QWidget& parent);
+
 
     operator bool(){ return m_video != nullptr; }
     VideoOverlayWidget& overlay(){ return *m_overlay; }

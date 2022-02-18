@@ -30,6 +30,7 @@ bool EncounterActionFull::operator==(const EncounterActionFull& x) const{
     case EncounterAction::ThrowBallsAndSave:
         return action == x.action && pokeball_slug == x.pokeball_slug;
     }
+    PA_THROW_StringException("EncounterActionFull: Invalid Enum " + std::to_string((int)action));
 }
 bool EncounterActionFull::operator!=(const EncounterActionFull& x) const{
     return !(*this == x);

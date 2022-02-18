@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_AudioThreadController_H
-#define PokemonAutomation_AudioThreadController_H
+#ifndef PokemonAutomation_AudioPipeline_AudioThreadController_H
+#define PokemonAutomation_AudioPipeline_AudioThreadController_H
 
 #include <vector>
 #include <chrono>

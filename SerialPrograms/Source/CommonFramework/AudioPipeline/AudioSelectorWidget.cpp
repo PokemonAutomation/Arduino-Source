@@ -13,59 +13,12 @@
 #include "AudioSelectorWidget.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 
-#if QT_VERSION_MAJOR == 5
-#include <QAudioDeviceInfo>
-#elif QT_VERSION_MAJOR == 6
-#include <QMediaDevices>
-#include <QAudioDevice>
-#endif
-
 #include <iostream>
-#include <tuple>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
-// Get all system audio input devices and their human readable descriptions.
-std::tuple<std::vector<AudioInfo>, std::vector<QString>> get_all_audio_inputs(){
-    std::tuple<std::vector<AudioInfo>, std::vector<QString>> ret;
-#if QT_VERSION_MAJOR == 5
-    const auto audioInfos = QAudioDeviceInfo::availableDevices(QAudio::AudioInput);
-//    cout << "audioInfos.size() = " << audioInfos.size() << endl;
-    for (const auto &audioInfo : audioInfos){
-        std::get<0>(ret).emplace_back(audioInfo.deviceName().toStdString());
-        std::get<1>(ret).emplace_back(audioInfo.deviceName());
-//        cout << audioInfo.deviceName().toStdString() << " : " << audioInfo.realm().toStdString() << endl;
-    }
-#elif QT_VERSION_MAJOR == 6
-    const auto audioInfos = QMediaDevices::audioInputs();
-    for (const auto &audioInfo : audioInfos){
-        std::get<0>(ret).emplace_back(audioInfo.id().toStdString());
-        std::get<1>(ret).emplace_back(audioInfo.description());
-    }
-#endif
-
-    return ret;
-}
-
-// Get all system audio output devices and their human readable descriptions.
-std::tuple<std::vector<AudioInfo>, std::vector<QString>> get_all_audio_outputs(){
-    std::tuple<std::vector<AudioInfo>, std::vector<QString>> ret;
-#if QT_VERSION_MAJOR == 5
-    const auto audioInfos = QAudioDeviceInfo::availableDevices(QAudio::AudioOutput);
-    for (const auto &audioInfo : audioInfos){
-        std::get<0>(ret).emplace_back(audioInfo.deviceName().toStdString());
-        std::get<1>(ret).emplace_back(audioInfo.deviceName());
-    }
-#elif QT_VERSION_MAJOR == 6
-    const auto audioInfos = QMediaDevices::audioOutputs();
-    for (const auto &audioInfo : audioInfos){
-        std::get<0>(ret).emplace_back(audioInfo.id().toStdString());
-        std::get<1>(ret).emplace_back(audioInfo.description());
-    }
-#endif
-
-    return ret;
-}
 
 // Slider bar volume: [0, 100], in log scale
 // Volume value passed to AudioDisplayWidget (and the audio thread it manages): [0.f, 1.f], linear scale
@@ -156,7 +109,7 @@ AudioSelectorWidget::AudioSelectorWidget(
             if (index <= 0 || index > (int)m_input_audios.size()){
                 current = AudioInfo();
             }else{
-                const AudioInfo& audio = m_input_audios[index - 1];
+                const AudioInfo& audio = m_input_audios[index - 1].info;
                 if (current == audio){
                     return;
                 }
@@ -172,7 +125,7 @@ AudioSelectorWidget::AudioSelectorWidget(
             if (index <= 0 || index > (int)m_output_audios.size()){
                 current = AudioInfo();
             }else{
-                const AudioInfo& audio = m_output_audios[index - 1];
+                const AudioInfo& audio = m_output_audios[index - 1].info;
                 if (current == audio){
                     return;
                 }
@@ -238,18 +191,18 @@ AudioSelectorWidget::AudioSelectorWidget(
 void AudioSelectorWidget::refresh(){
 
     auto build_device_menu = [](
-            QComboBox* box,
-            const std::vector<AudioInfo>& audios,
-            const std::vector<QString>& descriptions,
-            AudioInfo& current_device){
+        QComboBox* box,
+        const std::vector<AudioInfoData>& list,
+        AudioInfo& current_device
+    ){
         
         box->clear();
         box->addItem("(none)");
 
         size_t index = 0;
-        for (size_t c = 0; c < audios.size(); c++){
-            const AudioInfo& audio = audios[c];
-            box->addItem(descriptions[c]);
+        for (size_t c = 0; c < list.size(); c++){
+            const AudioInfo& audio = list[c].info;
+            box->addItem(list[c].display_name);
 
             if (current_device == audio){
                 index = c + 1;
@@ -263,12 +216,11 @@ void AudioSelectorWidget::refresh(){
         }
     };
 
-    std::vector<QString> descriptions;
-    std::tie(m_input_audios, descriptions) = get_all_audio_inputs();
-    build_device_menu(m_audio_input_box, m_input_audios, descriptions, m_value.m_inputDevice);
 
-    std::tie(m_output_audios, descriptions) = get_all_audio_outputs();
-    build_device_menu(m_audio_output_box, m_output_audios, descriptions, m_value.m_outputDevice);
+    m_input_audios = get_all_audio_inputs();
+    m_output_audios = get_all_audio_outputs();
+    build_device_menu(m_audio_input_box, m_input_audios, m_value.m_inputDevice);
+    build_device_menu(m_audio_output_box, m_output_audios, m_value.m_outputDevice);
 
     // std::cout << "Refresh: " << AudioSelector::audioDisplayTypeToString(m_value.m_audioDisplayType) << std::endl;
     switch(m_value.m_audioDisplayType){
