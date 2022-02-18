@@ -35,12 +35,13 @@ std::vector<AudioInfoData> get_all_audio_outputs(){
 }
 #elif QT_VERSION_MAJOR == 6
 #include <QAudioDevice>
+#include <QMediaDevices>
 namespace PokemonAutomation{
 
 std::vector<AudioInfoData> get_all_audio_inputs(){
     QList<QAudioDevice> list = QMediaDevices::audioInputs();
     std::vector<AudioInfoData> ret;
-    for (const QAudioDeviceInfo& info : list){
+    for (const QAudioDevice& info : list){
         QString name = info.description();
         std::string id = info.id().data();
         ret.emplace_back(std::move(id), std::move(name));
@@ -50,7 +51,7 @@ std::vector<AudioInfoData> get_all_audio_inputs(){
 std::vector<AudioInfoData> get_all_audio_outputs(){
     QList<QAudioDevice> list = QMediaDevices::audioOutputs();
     std::vector<AudioInfoData> ret;
-    for (const QAudioDeviceInfo& info : list){
+    for (const QAudioDevice& info : list){
         QString name = info.description();
         std::string id = info.id().data();
         ret.emplace_back(std::move(id), std::move(name));
