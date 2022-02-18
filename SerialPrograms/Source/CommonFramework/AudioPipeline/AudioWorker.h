@@ -14,6 +14,8 @@
 #include <QVector>
 #include <QIODevice>
 #include <QAudioFormat>
+#include <QString>
+#include <QAudio>
 #include "Common/Compiler.h"
 #include "Common/Cpp/AlignedVector.h"
 #include "AudioInfo.h"
@@ -29,8 +31,9 @@
 #endif
 
 
-
 namespace PokemonAutomation{
+
+class AudioFileLoader;
 
 
 // This is the main Audio IO class, which owns all the audio input/output component.
@@ -42,7 +45,15 @@ class AudioWorker: public QObject{
     //  like signals and slots on this class.
     Q_OBJECT
 public:
-    AudioWorker(const AudioInfo& inputInfo, const AudioInfo& outputInfo, float outputVolume);
+    // If `inputAbsoluteFilepath` is not empty, load audio from file, otherwise, from the audio
+    // device specified by `inputInfo`.
+    // Note: we currently hardcode the audio format played from `inputAbsoluteFilepath` to be
+    // mono channel 48KHz.
+    // Note: there is a program-crashing bug in Qt's audio decoder that will be triggered
+    // when `inputAbsoluteFilepath` is a relative path. Do not pass in a relative path.
+    AudioWorker(const AudioInfo& inputInfo, const QString& inputAbsoluteFilepath,
+        const AudioInfo& outputInfo, float outputVolume);
+    
     virtual ~AudioWorker();
 
     // Initialize all the Qt audio components to start all audio work: read from audio input device,
@@ -61,8 +72,11 @@ signals:
     void fftInputReady(const QVector<float>& fftInput);
 
 private:
-    QAudioFormat m_audioFormat;
+    void handleDeviceErrorState(QAudio::State newState, QAudio::Error error, const char* deviceType);
+
+private:
     AudioInfo m_inputInfo;
+    QString m_inputAbsoluteFilepath;
     AudioInfo m_outputInfo;
 
     AudioIODevice* m_audioIODevice = nullptr;
@@ -78,6 +92,8 @@ private:
     ChannelMode m_channelMode = ChannelMode::Mono;
 
     float m_volume = 1.0f;
+
+    AudioFileLoader* m_FileLoader = nullptr;
 };
 
 

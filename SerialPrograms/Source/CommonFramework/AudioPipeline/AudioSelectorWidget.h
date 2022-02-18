@@ -12,6 +12,7 @@
 #include <mutex>
 #include <QWidget>
 #include <QSlider>
+#include <QString>
 #include "CommonFramework/Tools/AudioFeed.h"
 #include "AudioSelector.h"
 
@@ -74,6 +75,8 @@ private:
     QSlider* m_volume_slider = nullptr;
     
     QPushButton* m_reset_button = nullptr;
+    QPushButton* m_load_file_button = nullptr;
+    QString m_absoluteFilepath;
     QPushButton* m_record_button = nullptr;
     bool m_record_is_on = false;
 

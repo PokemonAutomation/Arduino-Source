@@ -20,6 +20,7 @@
 #include "CommonFramework/Tools/AudioFeed.h"
 
 class QBuffer;
+class QString;
 
 #include <QtGlobal>
 
@@ -32,6 +33,7 @@ class QAudioOutput;
 class QAudioSource;
 class QAudioSink;
 #endif
+
 
 namespace PokemonAutomation{
 
@@ -63,7 +65,8 @@ public:
     virtual ~AudioDisplayWidget();
 
     // outputVolume: range [0.f, 1.f]
-    void set_audio(Logger& logger, const AudioInfo& inputInfo, const AudioInfo& outputInfo, float outputVolume);
+    void set_audio(Logger& logger, const AudioInfo& inputInfo, const QString& inputAbsoluteFilepath, 
+        const AudioInfo& outputInfo, float outputVolume);
 
     void close_audio();
 

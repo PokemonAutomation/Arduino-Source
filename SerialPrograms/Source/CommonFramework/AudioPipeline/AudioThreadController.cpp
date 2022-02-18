@@ -14,6 +14,7 @@
 
 #include <QIODevice>
 #include <QThread>
+#include <QString>
 
 #include <iostream>
 
@@ -23,12 +24,13 @@ namespace PokemonAutomation{
 AudioThreadController::AudioThreadController(
     AudioDisplayWidget* parent,
     const AudioInfo& inputInfo,
+    const QString& inputAbsoluteFilepath,
     const AudioInfo& outputInfo,
     float outputVolume
 ){
     QObject::setParent(parent);
 
-    // std::cout << "Controller thread " << QThread::currentThread() << std::endl;
+    // std::cout << "Controller thread " << QThread::currentThread() << " " << inputAbsoluteFilepath.toStdString() << std::endl;
 
     // Note: there is no audio initialization work in AudioWorker constructor. This is intended.
     // Starting the audio will register internal QT audio code to the current thread. If the QT audio
@@ -37,7 +39,7 @@ AudioThreadController::AudioThreadController(
     // So AudioWorker constructor is very light. The work to initialize and start audio processing
     // is done in AudioWorker::startAudio(). It will be called using a signal AudioThreadController::operate()
     // which is sent after the worker thread starts.
-    m_AudioWorker = new AudioWorker(inputInfo, outputInfo, outputVolume);
+    m_AudioWorker = new AudioWorker(inputInfo, inputAbsoluteFilepath, outputInfo, outputVolume);
     m_AudioWorker->moveToThread(&m_audioThread);
     connect(&m_audioThread, &QThread::finished, m_AudioWorker, &QObject::deleteLater);
 

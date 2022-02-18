@@ -115,11 +115,15 @@ void AudioDisplayWidget::close_audio(){
 }
 
 void AudioDisplayWidget::set_audio(
-    Logger& logger, const AudioInfo& inputInfo, const AudioInfo& outputInfo, float outputVolume
+    Logger& logger,
+    const AudioInfo& inputInfo,
+    const QString& inputAbsoluteFilepath,
+    const AudioInfo& outputInfo,
+    float outputVolume
 ){
     clear();
-
-    m_audioThreadController = new AudioThreadController(this, inputInfo, outputInfo, outputVolume);
+    
+    m_audioThreadController = new AudioThreadController(this, inputInfo, inputAbsoluteFilepath, outputInfo, outputVolume);
 
     update_size();
 }

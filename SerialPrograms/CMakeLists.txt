@@ -147,6 +147,10 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/QtJsonTools.h
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.cpp
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.h
+    Source/CommonFramework/AudioPipeline/AudioFileLoader.cpp
+    Source/CommonFramework/AudioPipeline/AudioFileLoader.h
+    Source/CommonFramework/AudioPipeline/AudioFormatUtils.cpp
+    Source/CommonFramework/AudioPipeline/AudioFormatUtils.h
     Source/CommonFramework/AudioPipeline/AudioInfo.cpp
     Source/CommonFramework/AudioPipeline/AudioInfo.h
     Source/CommonFramework/AudioPipeline/AudioIODevice.cpp
@@ -168,6 +172,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/TimeSampleBufferReader.h
     Source/CommonFramework/AudioPipeline/TimeSampleBuffer.h
     Source/CommonFramework/AudioPipeline/TimeSampleWriter.h
+    Source/CommonFramework/AudioPipeline/WavFile.cpp
+    Source/CommonFramework/AudioPipeline/WavFile.h
     Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.cpp
     Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h
     Source/CommonFramework/ControllerDevices/SerialSelector.cpp
