@@ -19,27 +19,11 @@
 #include "AudioSelector.h"
 #include "CommonFramework/Tools/AudioFeed.h"
 
-class QBuffer;
 class QString;
-
-#include <QtGlobal>
-
-#if QT_VERSION_MAJOR == 5
-#include <QAudioDeviceInfo>
-class QAudioInput;
-class QAudioOutput;
-#elif QT_VERSION_MAJOR == 6
-#include <QAudioDevice>
-class QAudioSource;
-class QAudioSink;
-#endif
-
 
 namespace PokemonAutomation{
 
 class AudioThreadController;
-
-class AudioIODevice;
 class AudioInfo;
 class Logger;
 

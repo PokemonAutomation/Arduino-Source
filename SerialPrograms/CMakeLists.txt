@@ -160,6 +160,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/AudioSelectorWidget.cpp
     Source/CommonFramework/AudioPipeline/AudioSelectorWidget.h
     Source/CommonFramework/AudioPipeline/AudioNormalization.h
+    Source/CommonFramework/AudioPipeline/AudioTemplate.cpp
+    Source/CommonFramework/AudioPipeline/AudioTemplate.h
     Source/CommonFramework/AudioPipeline/AudioThreadController.cpp
     Source/CommonFramework/AudioPipeline/AudioThreadController.h
     Source/CommonFramework/AudioPipeline/AudioWorker.cpp

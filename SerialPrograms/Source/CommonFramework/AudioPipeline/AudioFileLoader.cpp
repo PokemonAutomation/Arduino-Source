@@ -141,6 +141,12 @@ bool AudioFileLoader::initWavFile(){
     std::cout << "Wav file audio format: ";
     printAudioFormat(m_wavFile->audioFormat());
 
+    int wavSampleRate = m_wavFile->audioFormat().sampleRate();
+    if (wavSampleRate != m_audioFormat.sampleRate()){
+        std::cout << "Error: we don't interpolate wav file sample rate " << wavSampleRate << " to " << m_audioFormat.sampleRate() << std::endl;
+        return false;
+    }
+
     return true;
 }
 
