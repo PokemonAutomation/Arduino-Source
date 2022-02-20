@@ -7,7 +7,9 @@
 #ifndef PokemonAutomation_CommonFramework_AudioPipeline_AudioNormalization_H
 #define PokemonAutomation_CommonFramework_AudioPipeline_AudioNormalization_H
 
+#include <stdint.h>
 #include <limits>
+#include <type_traits>
 #include "Common/Compiler.h"
 
 #if _WIN32

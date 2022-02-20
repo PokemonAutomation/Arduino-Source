@@ -9,6 +9,10 @@
 
 #include "ImageStats.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -47,7 +51,9 @@ inline bool is_black(
     double max_rgb_sum = 100,
     double max_stddev_sum = 10
 ){
-    return is_black(image_stats(image), max_rgb_sum, max_stddev_sum);
+    ImageStats stats = image_stats(image);
+//    cout << stats.average << stats.stddev << endl;
+    return is_black(stats, max_rgb_sum, max_stddev_sum);
 }
 inline bool is_grey(
     const QImage& image,

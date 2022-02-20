@@ -153,6 +153,10 @@
 #include "PokemonLA/Inference/PokemonLA_ButtonDetector.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
 #include "PokemonLA/Inference/PokemonLA_NotificationReader.h"
+#include "PokemonLA/Inference/PokemonLA_OutbreakReader.h"
+#include "PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h"
+#include "PokemonLA/Inference/PokemonLA_MapDetector.h"
+#include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "TestProgramSwitch.h"
 
 #include <immintrin.h>
@@ -228,10 +232,6 @@ using namespace PokemonLA;
 
 
 
-
-
-
-
 void TestProgram::program(MultiSwitchProgramEnvironment& env){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -248,13 +248,35 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
-//    NotificationReader reader(console);
-//    reader.detect(feed.snapshot());
+    QImage image("ErrorDumps/20220219-214838044213-OutbreakReader.png");
 
-//    InferenceBoxScope box0(overlay, 0.30, 0.138, 0.40, 0.036);
-//    InferenceBoxScope box1(overlay, 0.30, 0.135, 0.40, 0.010);
+    OutbreakReader reader(console, console, LANGUAGE);
+    OCR::StringMatchResult result = reader.read(image);
 
 
+
+//    InferenceBoxScope box0(overlay, 0.50, 0.50, 0.30, 0.30);
+
+
+
+
+
+
+
+
+#if 0
+    while (true){
+        pbf_press_button(console, BUTTON_Y, 30, 0);
+        pbf_press_button(console, BUTTON_PLUS, 30, 10);
+        pbf_press_button(console, BUTTON_PLUS, 30, 30);
+    }
+#endif
+
+
+
+
+
+#if 0
     NotificationDetector detector(logger, LANGUAGE);
 //    AsyncVisualInferenceSession visual(env, console, console, console);
 //    visual += detector;
@@ -279,7 +301,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
         );
         pbf_press_button(console, BUTTON_HOME, 20, PokemonLA::GameSettings::instance().GAME_TO_HOME_DELAY);
     }
-
+#endif
 
 
 #if 0

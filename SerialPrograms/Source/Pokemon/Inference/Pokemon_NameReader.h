@@ -16,6 +16,7 @@ namespace Pokemon{
 
 
 class PokemonNameReader : public OCR::LargeDictionaryMatcher{
+public:
     static constexpr double MAX_LOG10P = -1.40;
 
 private:

@@ -86,12 +86,11 @@ Notification NotificationReader::detect(const QImage& screen) const{
     };
     for (uint32_t filter : filters){
         Kernels::filter_rgb32_range(
-            (uint32_t*)image.bits(), image.bytesPerLine(), image.width(), image.height(),
+            (const uint32_t*)image.constBits(), image.bytesPerLine(), image.width(), image.height(),
             (uint32_t*)image_ocr.bits(), image_ocr.bytesPerLine(), 0xff000000, filter, 0xffffffff, false
         );
 
-        QString text = OCR::ocr_read(Language::English, image_ocr);
-
+        QString text = OCR::ocr_read(m_language, image_ocr);
         results = NotificationOCR::instance().match_substring(m_language, text, 4.0);
 
         results.clear_beyond_log10p(-2.0);

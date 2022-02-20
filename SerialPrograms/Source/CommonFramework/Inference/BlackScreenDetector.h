@@ -22,8 +22,9 @@ namespace PokemonAutomation{
 class BlackScreenDetector : public StaticScreenDetector{
 public:
     BlackScreenDetector(
+        Color color = COLOR_RED,
         const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8},
-        Color color = COLOR_RED
+        double max_stddev = 10
     );
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
@@ -32,14 +33,16 @@ public:
 private:
     Color m_color;
     ImageFloatBox m_box;
+    double m_max_stddev;
 };
 
 
 class BlackScreenWatcher : public BlackScreenDetector, public VisualInferenceCallback{
 public:
     BlackScreenWatcher(
+        Color color = COLOR_RED,
         const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8},
-        Color color = COLOR_RED
+        double max_stddev = 10
     );
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
@@ -53,8 +56,9 @@ public:
 class BlackScreenOverWatcher : public VisualInferenceCallback{
 public:
     BlackScreenOverWatcher(
+        Color color = COLOR_RED,
         const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8},
-        Color color = COLOR_RED
+        double max_stddev = 10
     );
 
     bool black_is_over(const QImage& frame);

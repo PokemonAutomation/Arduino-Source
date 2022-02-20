@@ -120,12 +120,6 @@ void AudioWorker::startAudio(){
     bool foundAudioOutputInfo = false;
 
 #if QT_VERSION_MAJOR == 5
-    // We need QVector<float> to be able to pass around by signals and slots mechanism to pass
-    // FFT input and output data across threads.
-    // In Qt6 it automatically registers QVector<float>. But in Qt5 we need to manually register
-    // the class.
-    qRegisterMetaType<QVector<float>>("QVector<float>");
-
     using AudioSource = QAudioInput;
     using AudioSink = QAudioOutput;
 

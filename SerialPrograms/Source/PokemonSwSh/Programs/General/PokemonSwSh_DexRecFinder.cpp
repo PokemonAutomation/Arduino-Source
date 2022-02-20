@@ -37,55 +37,6 @@ DexRecFinder_Descriptor::DexRecFinder_Descriptor()
 
 
 
-class DexRecExclusion : public EditableTableRow{
-public:
-    operator const std::string&() const{ return m_slug; }
-
-    virtual void load_json(const QJsonValue& json) override{
-        QString value = json.toString();
-        m_slug = value.toStdString();
-    }
-    virtual QJsonValue to_json() const override{
-        return QString::fromStdString(m_slug);
-    }
-
-    virtual std::unique_ptr<EditableTableRow> clone() const override{
-        return std::unique_ptr<EditableTableRow>(new DexRecExclusion(*this));
-    }
-    virtual std::vector<QWidget*> make_widgets(QWidget& parent) override{
-        using namespace Pokemon;
-        NameSelectWidget* box = new NameSelectWidget(parent, NATIONAL_DEX_SLUGS(), m_slug);
-        box->connect(
-            box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-            box, [&, box](int index){
-                m_slug = box->slug();
-            }
-        );
-        return {box};
-    }
-
-private:
-    std::string m_slug;
-};
-
-class DexRecExclusionFactory : public EditableTableFactory{
-public:
-    virtual QStringList make_header() const override{
-        QStringList list;
-        list << STRING_POKEMON;
-        return list;
-    }
-    virtual std::unique_ptr<EditableTableRow> make_row() const override{
-        return std::unique_ptr<EditableTableRow>(new DexRecExclusion());
-    }
-
-    static const DexRecExclusionFactory& instance(){
-        static DexRecExclusionFactory factory;
-        return factory;
-    }
-};
-
-
 DexRecFilters::DexRecFilters()
     : GroupOption("Stop Automatically (requires video feedback)", true, true)
     , LANGUAGE(
@@ -98,8 +49,7 @@ DexRecFilters::DexRecFilters()
     )
     , EXCLUSIONS(
         "<b>Exclusions:</b><br>Do not stop on these " + STRING_POKEMON + " even if the desired " + STRING_POKEMON + " is found. "
-        "Use this to avoid dex recs that include other " + STRING_POKEMON + " in the spawn pool you don't want.",
-        DexRecExclusionFactory::instance(), true
+        "Use this to avoid dex recs that include other " + STRING_POKEMON + " in the spawn pool you don't want."
     )
 {
     PA_ADD_OPTION(LANGUAGE);
@@ -211,7 +161,7 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env){
 
     std::set<std::string> exclusions;
     for (size_t c = 0; c < FILTERS.EXCLUSIONS.size(); c++){
-        exclusions.insert(static_cast<const DexRecExclusion&>(FILTERS.EXCLUSIONS[c]));
+        exclusions.insert(FILTERS.EXCLUSIONS[c]);
     }
 
     Stats& stats = env.stats<Stats>();

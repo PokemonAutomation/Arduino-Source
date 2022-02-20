@@ -70,11 +70,15 @@ void ButtonTracker::finish(){
 ButtonDetector::ButtonDetector(
     Logger& logger, VideoOverlay& overlay,
     ButtonType type,
-    const ImageFloatBox& box
+    const ImageFloatBox& box,
+    std::chrono::milliseconds min_streak,
+    bool stop_on_detected
 )
     : VisualInferenceCallback("CenterAButtonDetector")
     , m_logger(logger)
     , m_box(box)
+    , m_min_streak(min_streak)
+    , m_stop_on_detected(stop_on_detected)
     , m_tracker(type)
     , m_watcher(overlay, m_box, { {m_tracker, false} })
     , m_last_flip(std::chrono::system_clock::now())
@@ -101,7 +105,7 @@ bool ButtonDetector::process_frame(
     }
 
     //  Streak not long enough.
-    if (timestamp - m_last_flip < std::chrono::seconds(1)){
+    if (timestamp - m_last_flip < m_min_streak){
         return false;
     }
 
@@ -111,13 +115,13 @@ bool ButtonDetector::process_frame(
     }
 
     if (m_current_streak){
-        m_logger.log("Detected (A) Button suggestion.", COLOR_PURPLE);
+        m_logger.log("Detected (A) Button.", COLOR_PURPLE);
     }else{
-        m_logger.log("(A) Button suggestion has disappeared.", COLOR_PURPLE);
+        m_logger.log("(A) Button has disappeared.", COLOR_PURPLE);
     }
     m_detected.store(m_current_streak, std::memory_order_release);
 
-    return false;
+    return m_stop_on_detected;
 }
 
 

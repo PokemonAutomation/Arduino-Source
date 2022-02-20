@@ -8,9 +8,12 @@
 #include "Panels_PokemonLA.h"
 
 #include "PokemonLA_Settings.h"
-#include "PokemonLA/Programs/PokemonLA_OverworldWatcher.h"
 
+#include "Programs/PokemonLA_BraviaryHeightGlitch.h"
 #include "Programs/PokemonLA_DistortionWaiter.h"
+#include "Programs/PokemonLA_OutbreakFinder.h"
+
+#include "PokemonLA/Programs/PokemonLA_OverworldWatcher.h"
 #include "Programs/PokemonLA_ShinyHunt-LakeTrio.h"
 
 namespace PokemonAutomation{
@@ -25,7 +28,9 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_settings<GameSettings_Descriptor, GameSettingsPanel>();
 
     add_divider("---- General ----");
+    add_program<BraviaryHeightGlitch_Descriptor, BraviaryHeightGlitch>();
     add_program<DistortionWaiter_Descriptor, DistortionWaiter>();
+    add_program<OutbreakFinder_Descriptor, OutbreakFinder>();
 
     if (GlobalSettings::instance().DEVELOPER_MODE){
 //        add_divider("---- Shiny Hunting ----");

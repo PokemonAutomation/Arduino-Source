@@ -55,7 +55,9 @@ public:
     ButtonDetector(
         Logger& logger, VideoOverlay& overlay,
         ButtonType type,
-        const ImageFloatBox& box
+        const ImageFloatBox& box,
+        std::chrono::milliseconds min_streak,
+        bool stop_on_detected
     );
 
     bool detected() const{
@@ -72,6 +74,8 @@ public:
 private:
     Logger& m_logger;
     ImageFloatBox m_box;
+    std::chrono::milliseconds m_min_streak;
+    bool m_stop_on_detected;
 
     SpinLock m_lock;
     ButtonTracker m_tracker;

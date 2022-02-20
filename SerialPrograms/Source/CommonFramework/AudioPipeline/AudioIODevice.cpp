@@ -37,7 +37,7 @@ qint64 AudioIODevice::writeData(const char* data, qint64 len)
     size_t numSamples = len / sampleBytes;
     size_t numFrames = len / frameBytes;
     // We assert the data is always float with size of 4 bytes.
-    const float * floatData = reinterpret_cast<const float *>(data);
+    const float* floatData = reinterpret_cast<const float *>(data);
 
     // Pass audio data to the audio sink for audio playback.
     if (m_audioSinkDevice){
@@ -169,7 +169,7 @@ size_t AudioIODevice::computeNextFFTSamplesNeeded() const{
     size_t nextFFTNumSamplesFilled = 0;
     if (m_bufferNext >= m_fftStart){
         nextFFTNumSamplesFilled = m_bufferNext - m_fftStart;
-    } else{
+    }else{
         nextFFTNumSamplesFilled = m_bufferNext + m_fftCircularBuffer.size() - m_fftStart;
     }
     if (nextFFTNumSamplesFilled >= NUM_FFT_SAMPLES){

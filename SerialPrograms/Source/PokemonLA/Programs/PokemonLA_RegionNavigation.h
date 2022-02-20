@@ -1,0 +1,39 @@
+/*  Region Navigation
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#ifndef PokemonAutomation_PokemonLA_RegionNavigation_H
+#define PokemonAutomation_PokemonLA_RegionNavigation_H
+
+namespace PokemonAutomation{
+    class ProgramEnvironment;
+    class ConsoleHandle;
+namespace NintendoSwitch{
+namespace PokemonLA{
+
+
+enum class Camp{
+    FIELDLANDS_FIELDLANDS,
+    FIELDLANDS_HEIGHTS,
+    MIRELANDS_MIRELANDS,
+    MIRELANDS_BOGBOUND,
+    COASTLANDS_BEACHSIDE,
+    COASTLANDS_COASTLANDS,
+    HIGHLANDS_HIGHLANDS,
+    HIGHLANDS_MOUNTAIN,
+    HIGHLANDS_SUMMIT,
+    ICELANDS_SNOWFIELDS,
+    ICELANDS_ICEPEAK,
+};
+void goto_professor(ConsoleHandle& console, Camp camp);
+
+
+bool mash_A_to_change_region(ProgramEnvironment& env, ConsoleHandle& console);
+
+
+}
+}
+}
+#endif

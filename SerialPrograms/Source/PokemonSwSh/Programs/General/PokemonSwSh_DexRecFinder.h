@@ -14,6 +14,7 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "Pokemon/Options/Pokemon_NameSelectOption.h"
+#include "Pokemon/Options/Pokemon_NameListOption.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
@@ -39,7 +40,7 @@ public:
 
     OCR::LanguageOCR LANGUAGE;
     PokemonNameSelect DESIRED;
-    EditableTableOption EXCLUSIONS;
+    PokemonNameList EXCLUSIONS;
 };
 
 

@@ -608,6 +608,8 @@ file(GLOB MAIN_SOURCES
     Source/Pokemon/Options/Pokemon_IVCheckerOption.h
     Source/Pokemon/Options/Pokemon_IVCheckerWidget.cpp
     Source/Pokemon/Options/Pokemon_IVCheckerWidget.h
+    Source/Pokemon/Options/Pokemon_NameListOption.cpp
+    Source/Pokemon/Options/Pokemon_NameListOption.h
     Source/Pokemon/Options/Pokemon_NameSelectOption.cpp
     Source/Pokemon/Options/Pokemon_NameSelectOption.h
     Source/Pokemon/Options/Pokemon_NameSelectWidget.cpp
@@ -770,12 +772,18 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/PokemonLA_FlagDetector.h
     Source/PokemonLA/Inference/PokemonLA_FlagTracker.cpp
     Source/PokemonLA/Inference/PokemonLA_FlagTracker.h
+    Source/PokemonLA/Inference/PokemonLA_MapDetector.cpp
+    Source/PokemonLA/Inference/PokemonLA_MapDetector.h
     Source/PokemonLA/Inference/PokemonLA_MountDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_MountDetector.h
     Source/PokemonLA/Inference/PokemonLA_NotificationReader.cpp
     Source/PokemonLA/Inference/PokemonLA_NotificationReader.h
+    Source/PokemonLA/Inference/PokemonLA_OutbreakReader.cpp
+    Source/PokemonLA/Inference/PokemonLA_OutbreakReader.h
     Source/PokemonLA/Inference/PokemonLA_QuestMarkDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_QuestMarkDetector.h
+    Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.cpp
+    Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h
     Source/PokemonLA/Inference/PokemonLA_ShinySymbolDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_ShinySymbolDetector.h
     Source/PokemonLA/Inference/PokemonLA_WhiteObjectDetector.cpp
@@ -784,14 +792,20 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Panels_PokemonLA.h
     Source/PokemonLA/PokemonLA_Settings.cpp
     Source/PokemonLA/PokemonLA_Settings.h
+    Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.cpp
+    Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.h
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.cpp
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.h
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.cpp
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.h
     Source/PokemonLA/Programs/PokemonLA_GameEntry.cpp
     Source/PokemonLA/Programs/PokemonLA_GameEntry.h
+    Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.cpp
+    Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.h
     Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.cpp
     Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.h
+    Source/PokemonLA/Programs/PokemonLA_RegionNavigation.cpp
+    Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h
     Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.cpp
     Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp

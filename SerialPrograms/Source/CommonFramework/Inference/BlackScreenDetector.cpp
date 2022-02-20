@@ -21,22 +21,27 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-BlackScreenDetector::BlackScreenDetector(const ImageFloatBox& box, Color color)
+BlackScreenDetector::BlackScreenDetector(
+    Color color, const ImageFloatBox& box, double max_stddev
+)
     : m_color(color)
     , m_box(box)
+    , m_max_stddev(max_stddev)
 {}
 
 void BlackScreenDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
 bool BlackScreenDetector::detect(const QImage& screen) const{
-    return is_black(extract_box(screen, m_box));
+    return is_black(extract_box(screen, m_box), 100, m_max_stddev);
 }
 
 
 
-BlackScreenWatcher::BlackScreenWatcher(const ImageFloatBox& box, Color color)
-    : BlackScreenDetector(box, color)
+BlackScreenWatcher::BlackScreenWatcher(
+    Color color, const ImageFloatBox& box, double max_stddev
+)
+    : BlackScreenDetector(color, box, max_stddev)
     , VisualInferenceCallback("BlackScreenWatcher")
 {}
 void BlackScreenWatcher::make_overlays(VideoOverlaySet& items) const{
@@ -52,9 +57,11 @@ bool BlackScreenWatcher::process_frame(
 
 
 
-BlackScreenOverWatcher::BlackScreenOverWatcher(const ImageFloatBox& box, Color color)
+BlackScreenOverWatcher::BlackScreenOverWatcher(
+    Color color, const ImageFloatBox& box, double max_stddev
+)
     : VisualInferenceCallback("BlackScreenOverWatcher")
-    , m_detector(box, color)
+    , m_detector(color, box, max_stddev)
 {}
 void BlackScreenOverWatcher::make_overlays(VideoOverlaySet& items) const{
     m_detector.make_overlays(items);

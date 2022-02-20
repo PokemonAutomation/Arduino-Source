@@ -28,7 +28,7 @@ bool gamemenu_to_ingame(
     uint16_t mash_duration, uint16_t enter_game_timeout
 ){
     console.log("Mashing A to enter game...");
-    BlackScreenOverWatcher detector({0.2, 0.2, 0.6, 0.6});
+    BlackScreenOverWatcher detector(COLOR_RED, {0.2, 0.2, 0.6, 0.6});
     pbf_mash_button(console, BUTTON_A, mash_duration);
     console.botbase().wait_for_all_requests();
     console.log("Waiting to enter game...");
