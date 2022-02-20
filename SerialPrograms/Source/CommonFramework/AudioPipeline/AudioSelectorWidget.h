@@ -54,6 +54,8 @@ public:
 
     virtual void spectrums_latest(size_t numLatestSpectrums, std::vector<std::shared_ptr<AudioSpectrum>>& spectrums) override;
 
+    virtual void add_overlay(size_t startingStamp, size_t endStamp) override;
+
 signals:
     // Need to define this version of async_reset_audio()
     // because it will be used as a signal.

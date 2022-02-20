@@ -7,6 +7,8 @@
 
 #include <cfloat>
 #include <cmath>
+#include <utility>
+
 #include <QVBoxLayout>
 #include <QLabel>
 #include <QLinearGradient>
@@ -42,6 +44,7 @@ AudioDisplayWidget::AudioDisplayWidget(QWidget& parent)
      , m_numFreqVisBlocks(96)
      , m_freqVisBlockBoundaries(m_numFreqVisBlocks+1)
      , m_freqVisBlocks(m_numFreqVisBlocks * m_numFreqWindows)
+     , m_freqVisStamps(m_numFreqWindows)
 {
     // We will display frequencies in log scale, so need to convert
     // log scale: 0, 1/m_numFreqVisBlocks, 2/m_numFreqVisBlocks, ..., 1.0
@@ -105,6 +108,7 @@ void AudioDisplayWidget::clear(){
     }
 
     m_freqVisBlocks.assign(m_freqVisBlocks.size(), 0.f);
+    m_freqVisStamps.assign(m_freqVisStamps.size(), SIZE_MAX);
     m_spectrums.clear();
 }
 
@@ -134,11 +138,14 @@ void AudioDisplayWidget::loadFFTOutput(const QVector<float>& fftOutput){
     auto spectrum = std::make_shared<AudioSpectrum>(0, std::vector<float>(fftOutput.begin(), fftOutput.end()));
     {
         std::lock_guard<std::mutex> lock_gd(m_spectrums_lock);
-        spectrum->stamp = (m_spectrums.size() > 0) ? m_spectrums.back()->stamp + 1 : 0;
+        spectrum->stamp = (m_spectrums.size() > 0) ? m_spectrums.front()->stamp + 1 : 0;
         m_spectrums.push_front(spectrum);
         if (m_spectrums.size() > m_spectrum_history_length){
             m_spectrums.pop_back();
         }
+
+        // std::cout << "Loadd FFT output , stamp " << spectrum->stamp << std::endl;
+        m_freqVisStamps[m_nextFFTWindowIndex] = spectrum->stamp;
     }
 
     float scale = std::sqrt(0.5f / (float)fftOutput.size());
@@ -284,6 +291,56 @@ void AudioDisplayWidget::paintEvent(QPaintEvent* event){
 
             painter.fillRect(bar, QBrush(colorGradient));
         }
+        
+        // Now render overlays:
+        
+        // The oldest window on the spectrogram view has the oldest timestamp,
+        // and its position is left most on the spectrogram, assigning a window ID of 0.
+        size_t oldestStamp = m_freqVisStamps[m_nextFFTWindowIndex];
+        size_t oldestWindowID = 0;
+        // When the audio stream starts coming in, the history of the spectrogram
+        // is not fully filled. So the oldest stamp may not be the leftmost one on the display.
+        // Here we use the validity of the time stamp to find the real oldest one.
+        for(; oldestWindowID < m_numFreqWindows; oldestWindowID++){
+            if (oldestStamp != SIZE_MAX){
+                // it's a window with valid stamp
+                break;
+            }
+            oldestStamp = m_freqVisStamps[(m_nextFFTWindowIndex+oldestWindowID) % m_numFreqWindows];
+        }
+        if (oldestStamp == SIZE_MAX){
+            // we have no valid windows in the spectrogram, so no overlays to render:
+            break;
+        }
+        size_t newestStamp = m_freqVisStamps[(m_nextFFTWindowIndex+m_numFreqWindows-1) % m_numFreqWindows];
+        // size_t newestWindowID = m_numFreqWindows - 1;
+
+        // Each window has width: widgetWidth / (m_numFreqWindows-1) on the spectrogram
+        const float FFTWindowWidth = widgetWidth / float(m_numFreqWindows-1);
+
+        for(const auto& overlayRange: m_overlays){
+            const size_t startingStamp = overlayRange.first;
+            const size_t endStamp = overlayRange.second;
+            if (startingStamp >= endStamp){
+                continue;
+            }
+
+            // std::cout << "Render overlay at (" << startingStamp << ", " << endStamp
+            //     << ") oldestStamp " << oldestStamp << " wID " << oldestWindowID << " newest stamp " << newestStamp << std::endl;
+
+            if (endStamp <= oldestStamp || startingStamp > newestStamp){
+                continue;            
+            }
+
+
+            int xmin = int((startingStamp - oldestStamp + oldestWindowID - 0.5) * FFTWindowWidth + 0.5);
+            int ymin = rect().top();
+            int rangeWidth = int(FFTWindowWidth * (endStamp - startingStamp) + 0.5);
+            painter.setPen(Qt::red);
+            painter.drawRect(xmin, ymin, rangeWidth, widgetHeight);
+        }
+        
+        break;
     }
     default:
         break;
@@ -343,6 +400,26 @@ void AudioDisplayWidget::spectrums_latest(size_t numLatestSpectrums, std::vector
         }
         spectrums.push_back(ptr);
         i++;
+    }
+}
+
+
+void AudioDisplayWidget::add_overlay(size_t startingStamp, size_t endStamp){
+    m_overlays.push_front(std::make_pair(startingStamp, endStamp));
+
+    // Now try to remove old overlays that are no longer showed on the spectrogram view.
+
+    // get the timestamp of the oldest window in the display history.
+    size_t oldest_stamp = m_freqVisStamps[m_nextFFTWindowIndex];
+    // SIZE_MAX means this slot is not yet assigned an FFT window
+    if (oldest_stamp != SIZE_MAX){
+        while(!m_overlays.empty()){
+            if (m_overlays.back().second <= oldest_stamp){
+                m_overlays.pop_back();
+            } else{
+                break;
+            }
+        }
     }
 }
 

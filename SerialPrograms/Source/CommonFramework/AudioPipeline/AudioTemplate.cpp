@@ -63,7 +63,7 @@ AudioTemplate loadAudioTemplate(const QString& filename){
 
         for(size_t i = 0, start = 0; start+NUM_FFT_SAMPLES <= numSamples; i++, start += FFT_SLIDING_WINDOW_STEP){
             assert(i < numWindows);
-            const float* fftOutput = fft.fftKernel(data + i);
+            const float* fftOutput = fft.fftKernel(data + start);
             memcpy(spectrogram.data() + i*numFrequencies, fftOutput, sizeof(float) * numFrequencies);
         }
     }
