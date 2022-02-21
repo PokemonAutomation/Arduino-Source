@@ -10,21 +10,13 @@
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/Tools/MultiConsoleErrors.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
-
-class MultiConsoleErrorState{
-public:
-    void report_unrecoverable_error(Logger& logger, const std::string& msg);
-    void check_unrecoverable_error(Logger& logger);
-
-private:
-    std::atomic<bool> m_unrecoverable_error;
-};
 
 
 struct TradeStats : public StatsTracker{

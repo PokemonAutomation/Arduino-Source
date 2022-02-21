@@ -54,7 +54,7 @@ PA_FORCE_INLINE uint32_t byte_swap(uint32_t x){
 }
 PA_FORCE_INLINE int16_t byte_swap(int32_t x){
 #if _WIN32
-    return _byteswap_ulong(x);
+    return (int16_t)_byteswap_ulong(x);
 #elif  __GNUC__
     return __builtin_bswap32(x);
 #else

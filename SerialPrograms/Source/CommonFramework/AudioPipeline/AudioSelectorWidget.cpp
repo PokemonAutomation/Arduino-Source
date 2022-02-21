@@ -56,13 +56,17 @@ AudioSelectorWidget::AudioSelectorWidget(
         row0->addWidget(new QLabel("<b>Audio Input:</b>", this), 1);
         row0->addSpacing(5);
 
-        m_audio_input_box = new NoWheelComboBox(this);
-        row0->addWidget(m_audio_input_box, 5);
-        row0->addSpacing(5);
 
         if (GlobalSettings::instance().DEVELOPER_MODE){
+            m_audio_input_box = new NoWheelComboBox(this);
+            row0->addWidget(m_audio_input_box, 4);
             m_load_file_button = new QPushButton("Load File", this);
             row0->addWidget(m_load_file_button, 1);
+            row0->addSpacing(5);
+        }else{
+            m_audio_input_box = new NoWheelComboBox(this);
+            row0->addWidget(m_audio_input_box, 5);
+            row0->addSpacing(5);
         }
 
         m_audio_vis_box = new NoWheelComboBox(this);

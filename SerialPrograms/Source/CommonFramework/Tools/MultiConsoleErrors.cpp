@@ -1,0 +1,30 @@
+/*  Multi-Console Errors
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#include "Common/Cpp/Exception.h"
+#include "ClientSource/Connection/BotBase.h"
+#include "CommonFramework/Logging/Logger.h"
+#include "MultiConsoleErrors.h"
+
+namespace PokemonAutomation{
+
+
+
+void MultiConsoleErrorState::report_unrecoverable_error(Logger& logger, const std::string& msg){
+    logger.log(msg, COLOR_RED);
+    m_unrecoverable_error.store(true, std::memory_order_release);
+    PA_THROW_StringException(msg);
+}
+void MultiConsoleErrorState::check_unrecoverable_error(Logger& logger){
+    if (m_unrecoverable_error.load(std::memory_order_acquire)){
+        logger.log("Unrecoverable error reported from a different console. Breaking out.", COLOR_RED);
+        throw CancelledException();
+    }
+}
+
+
+
+}

@@ -16,6 +16,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{
 
+using namespace Pokemon;
 
 
 enum class BossAction{
@@ -60,6 +61,7 @@ public:
     virtual void restore_defaults() override;
 
 private:
+    void redraw_table();
     QComboBox* make_action_box(QWidget& parent, int row, BallSelectWidget& ball_select, BossAction action);
     BallSelectWidget* make_ball_select(QWidget& parent, int row, const std::string& slug);
 

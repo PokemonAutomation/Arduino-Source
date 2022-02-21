@@ -13,8 +13,10 @@
 #include "Programs/PokemonLA_DistortionWaiter.h"
 #include "Programs/PokemonLA_OutbreakFinder.h"
 
+#include "Programs/PokemonLA_SelfTouchTrade.h"
+
+//#include "Programs/PokemonLA_ShinyHunt-LakeTrio.h"
 #include "PokemonLA/Programs/PokemonLA_OverworldWatcher.h"
-#include "Programs/PokemonLA_ShinyHunt-LakeTrio.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -31,6 +33,9 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<BraviaryHeightGlitch_Descriptor, BraviaryHeightGlitch>();
     add_program<DistortionWaiter_Descriptor, DistortionWaiter>();
     add_program<OutbreakFinder_Descriptor, OutbreakFinder>();
+
+    add_program<SelfTouchTrade_Descriptor, SelfTouchTrade>();
+
 
     if (GlobalSettings::instance().DEVELOPER_MODE){
 //        add_divider("---- Shiny Hunting ----");

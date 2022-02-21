@@ -56,7 +56,7 @@ void ButtonTracker::process_object(const QImage& image, const WaterfillObject& o
 
     double rmsd = m_matcher.rmsd(extract_box(image, object));
 //    cout << "rmsd = " << rmsd << endl;
-    if (rmsd < 100){
+    if (rmsd < 80){
 //        cout << "rmsd = " << rmsd << endl;
         m_detections.emplace_back(object);
     }

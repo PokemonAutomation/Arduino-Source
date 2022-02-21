@@ -157,6 +157,8 @@
 #include "PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h"
 #include "PokemonLA/Inference/PokemonLA_MapDetector.h"
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
+#include "PokemonLA/Programs/PokemonLA_TradeRoutines.h"
+#include "CommonFramework/Tools/MultiConsoleErrors.h"
 #include "TestProgramSwitch.h"
 
 #include <immintrin.h>
@@ -220,11 +222,6 @@ TestProgram::TestProgram(const TestProgram_Descriptor& descriptor)
 //using namespace Kernels;
 //using namespace Kernels::Waterfill;
 
-
-namespace PokemonSwSh{
-
-}
-
 using namespace PokemonLA;
 
 
@@ -248,85 +245,39 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
-    QImage image("ErrorDumps/20220219-214838044213-OutbreakReader.png");
-
-    OutbreakReader reader(console, console, LANGUAGE);
-    OCR::StringMatchResult result = reader.read(image);
+    TradeNameReader reader(console, LANGUAGE, console);
+    reader.read(feed.snapshot());
 
 
-
-//    InferenceBoxScope box0(overlay, 0.50, 0.50, 0.30, 0.30);
-
-
-
-
-
-
-
-
-#if 0
-    while (true){
-        pbf_press_button(console, BUTTON_Y, 30, 0);
-        pbf_press_button(console, BUTTON_PLUS, 30, 10);
-        pbf_press_button(console, BUTTON_PLUS, 30, 30);
-    }
-#endif
-
-
-
-
-
-#if 0
-    NotificationDetector detector(logger, LANGUAGE);
-//    AsyncVisualInferenceSession visual(env, console, console, console);
-//    visual += detector;
-
-    int ret = wait_until(
-        env, console, console, console,
-        std::chrono::seconds(3600),
-        { &detector }
-    );
-    if (ret < 0){
-        PA_THROW_StringException("No distortion found after one hour.");
-    }
-
-    if (detector.result() == Notification::DISTORTION_FORMING){
-        send_program_notification(
-            logger, NOTIFICATION_TEST,
-            COLOR_GREEN,
-            env.program_info(),
-            "Found Distortion",
-            {},
-            feed.snapshot()
-        );
-        pbf_press_button(console, BUTTON_HOME, 20, PokemonLA::GameSettings::instance().GAME_TO_HOME_DELAY);
-    }
-#endif
-
-
-#if 0
-    InferenceBoxScope box(overlay, 0.30, 0.138, 0.40, 0.036);
+    InferenceBoxScope box(overlay, {0.920, 0.100, 0.020, 0.030});
     QImage image = extract_box(feed.snapshot(), box);
+    ImageStats stats = image_stats(image);
+    cout << stats.average << stats.stddev << endl;
 
-    filter_rgb32_range(
-        (uint32_t*)image.bits(), image.bytesPerLine(), image.width(), image.height(),
-        (uint32_t*)image.bits(), image.bytesPerLine(), 0xff000000, 0xff808080, 0xffffffff
-    );
+//    is_white()
 
-    image.save("test.png");
 
-    QString text = OCR::ocr_read(Language::English, image);
+//    std::map<std::string, int> catch_count;
 
-    StringMatchResult results;
-    NotificationOCR::instance().match_substring(results, Language::English, text);
-    results.log(logger, -5);
-#endif
+
+
 
 
 #if 0
-    FlagNavigationAir session(env, console);
-    session.run_session();
+    TradeStats stats;
+    MultiConsoleErrorState error_state;
+
+    env.run_in_parallel([&](ConsoleHandle& console){
+        trade_current_pokemon(env, console, error_state, stats);
+    });
 #endif
+
+
+//    trade_current_pokemon(env, console, error_state, stats);
+
+
+
+
 
 
 #if 0

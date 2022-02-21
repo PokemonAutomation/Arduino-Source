@@ -53,7 +53,7 @@ void BossActionOption::load_json(const QJsonValue& json){
         json_get_string(slug, obj, "Slug");
         QString action_str;
         BossAction action = BossAction::CATCH_AND_STOP_IF_SHINY;
-        json_get_string(action_str,obj, "Action");
+        json_get_string(action_str, obj, "Action");
         auto iter = BossAction_MAP.find(action_str);
         if (iter != BossAction_MAP.end()){
             action = iter->second;
@@ -112,9 +112,12 @@ BossActionOptionUI::BossActionOptionUI(QWidget& parent, BossActionOption& value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->addWidget(new QLabel(m_value.m_label));
-
+    redraw_table();
+}
+void BossActionOptionUI::redraw_table(){
+    delete m_table;
     m_table = new AutoHeightTableWidget(this);
-    layout->addWidget(m_table);
+    layout()->addWidget(m_table);
     m_table->setColumnCount(3);
 
     QStringList header;
@@ -137,7 +140,7 @@ BossActionOptionUI::BossActionOptionUI(QWidget& parent, BossActionOption& value)
         const QIcon& icon = get_pokemon_sprite(sprite_slug).icon();
         const QString& display_name = get_pokemon_name(name_slug).display_name();
         QTableWidgetItem* icon_item = new QTableWidgetItem(icon, display_name);
-        icon_item->setIcon(icon);
+//        icon_item->setIcon(icon);
         m_table->setItem(c, 0, icon_item);
 
         BallSelectWidget* ball_select = make_ball_select(*m_table, c, m_value.m_list[c].ball);
@@ -146,10 +149,10 @@ BossActionOptionUI::BossActionOptionUI(QWidget& parent, BossActionOption& value)
     }
 
     m_table->resizeColumnsToContents();
-
 }
 void BossActionOptionUI::restore_defaults(){
     m_value.restore_defaults();
+    redraw_table();
 }
 
 

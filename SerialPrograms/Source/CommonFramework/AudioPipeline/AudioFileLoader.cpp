@@ -85,7 +85,7 @@ bool AudioFileLoader::start(){
 void AudioFileLoader::buildTimer(){
     m_timer = new QTimer(this);
     m_timer->setTimerType(Qt::PreciseTimer);
-    m_timer->start(m_timer_interval_ms);
+    m_timer->start((int)m_timer_interval_ms);
 }
 
 std::tuple<const char*, size_t> AudioFileLoader::loadFullAudio(){
@@ -97,7 +97,7 @@ std::tuple<const char*, size_t> AudioFileLoader::loadFullAudio(){
 
         const size_t numBytes = m_wavFile->size() - m_wavFile->pos();
         m_rawBuffer.resize(numBytes);
-        const int bytesRead = m_wavFile->read(m_rawBuffer.data(), numBytes);
+        const size_t bytesRead = m_wavFile->read(m_rawBuffer.data(), numBytes);
         if (bytesRead != numBytes){
             std::cout << "Error: failed to read all bytes from wav file: " << bytesRead << " < " << numBytes << std::endl;
         }
@@ -153,13 +153,13 @@ bool AudioFileLoader::initWavFile(){
 
 void AudioFileLoader::sendDecodedBufferOnTimer(){
     const int bytesPerFrame = m_audioFormat.bytesPerFrame();
-    const int bytesToSend = bytesPerFrame * m_frames_per_timeout;
+    const size_t bytesToSend = bytesPerFrame * m_frames_per_timeout;
 
     const auto& buffer = m_rawBuffer;
 
     const size_t m_bufferEnd = std::min(m_bufferNext + bytesToSend, buffer.size());
 
-    const float* floatData = reinterpret_cast<const float*>(buffer.data() + m_bufferNext);
+//    const float* floatData = reinterpret_cast<const float*>(buffer.data() + m_bufferNext);
     // std::cout << "Timer: " << floatData[0] << " " << floatData[1] << "... " << buffer.size() << " " << m_bufferNext << std::endl;
 
     const size_t sentLen = m_bufferEnd - m_bufferNext;
@@ -178,7 +178,7 @@ void AudioFileLoader::sendDecodedBufferOnTimer(){
 void AudioFileLoader::sendBufferFromWavFileOnTimer(){
     const QAudioFormat& wavAudioFormat = m_wavFile->audioFormat();
     const int wavBytesPerFrame = wavAudioFormat.bytesPerFrame();
-    const int wavBytesToRead = wavBytesPerFrame * m_frames_per_timeout;
+    const int wavBytesToRead = (int)(wavBytesPerFrame * m_frames_per_timeout);
     m_rawBuffer.resize(wavBytesToRead);
     const int wavBytesRead = m_wavFile->read(m_rawBuffer.data(), wavBytesToRead);
     m_rawBuffer.resize(wavBytesRead);
@@ -198,7 +198,7 @@ void AudioFileLoader::sendBufferFromWavFileOnTimer(){
 std::tuple<const char*, size_t> AudioFileLoader::convertRawWavSamples(){
     const QAudioFormat& wavAudioFormat = m_wavFile->audioFormat();
 
-    const int wavBytesRead = m_rawBuffer.size();
+    const int wavBytesRead = (int)m_rawBuffer.size();
     
     // Simple case, the target audio format is the same as the format used in the wav file.
     if (m_audioFormat == wavAudioFormat){

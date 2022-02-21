@@ -52,14 +52,14 @@ private:
 
 
 
-std::string combine_string(const char* a, const char* b);
-std::string combine_string(const char* a, const std::string& b);
-QString combine_string(const char* a, const QString& b);
+//std::string combine_string(const char* a, const char* b);
+//std::string combine_string(const char* a, const std::string& b);
+//QString combine_string(const char* a, const QString& b);
 
-#define PA_THROW_AND_LOG_StringException(message){  \
-    global_logger().log(combine_string(__PRETTY_FUNCTION__, message), COLOR_RED); \
-    throw StringException(__PRETTY_FUNCTION__, message);    \
-}
+//#define PA_THROW_AND_LOG_StringException(message){  \
+//    global_logger().log(combine_string(__PRETTY_FUNCTION__, message), COLOR_RED); \
+//    throw StringException(__PRETTY_FUNCTION__, message);    \
+//}
 
 
 

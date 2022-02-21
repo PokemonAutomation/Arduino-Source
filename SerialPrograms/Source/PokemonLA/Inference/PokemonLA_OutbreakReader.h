@@ -20,7 +20,7 @@ namespace PokemonLA{
 
 class OutbreakReader{
 public:
-    OutbreakReader(Logger& logger, VideoOverlay& overlay, Language language);
+    OutbreakReader(Logger& logger, Language language, VideoOverlay& overlay);
 
     OCR::StringMatchResult read(const QImage& screen) const;
 

@@ -99,15 +99,19 @@ SOURCES += \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.cpp \
     ../Common/Qt/QtJsonTools.cpp \
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.cpp \
+    Source/CommonFramework/AudioPipeline/AudioFileLoader.cpp \
+    Source/CommonFramework/AudioPipeline/AudioFormatUtils.cpp \
     Source/CommonFramework/AudioPipeline/AudioIODevice.cpp \
     Source/CommonFramework/AudioPipeline/AudioInfo.cpp \
     Source/CommonFramework/AudioPipeline/AudioSelector.cpp \
     Source/CommonFramework/AudioPipeline/AudioSelectorWidget.cpp \
+    Source/CommonFramework/AudioPipeline/AudioTemplate.cpp \
     Source/CommonFramework/AudioPipeline/AudioThreadController.cpp \
     Source/CommonFramework/AudioPipeline/AudioWorker.cpp \
     Source/CommonFramework/AudioPipeline/FFTWorker.cpp \
     Source/CommonFramework/AudioPipeline/TimeSampleBuffer.cpp \
     Source/CommonFramework/AudioPipeline/TimeSampleBufferReader.cpp \
+    Source/CommonFramework/AudioPipeline/WavFile.cpp \
     Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.cpp \
     Source/CommonFramework/ControllerDevices/SerialSelector.cpp \
     Source/CommonFramework/ControllerDevices/SerialSelectorWidget.cpp \
@@ -200,6 +204,7 @@ SOURCES += \
     Source/CommonFramework/Tools/BotBaseHandle.cpp \
     Source/CommonFramework/Tools/ErrorDumper.cpp \
     Source/CommonFramework/Tools/InterruptableCommands.cpp \
+    Source/CommonFramework/Tools/MultiConsoleErrors.cpp \
     Source/CommonFramework/Tools/ProgramEnvironment.cpp \
     Source/CommonFramework/Tools/StatsDatabase.cpp \
     Source/CommonFramework/Tools/StatsTracking.cpp \
@@ -389,6 +394,7 @@ SOURCES += \
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_ShinySymbolDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_WhiteObjectDetector.cpp \
+    Source/PokemonLA/Options/PokemonLA_TradeCountTable.cpp \
     Source/PokemonLA/Panels_PokemonLA.cpp \
     Source/PokemonLA/PokemonLA_Settings.cpp \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.cpp \
@@ -398,7 +404,10 @@ SOURCES += \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.cpp \
     Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.cpp \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.cpp \
+    Source/PokemonLA/Programs/PokemonLA_SelfTouchTrade.cpp \
     Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.cpp \
+    Source/PokemonLA/Programs/PokemonLA_TradeRoutines.cpp \
+    Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.cpp \
@@ -642,17 +651,21 @@ HEADERS += \
     ../Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h \
     Source/CommonFramework/AudioPipeline/AudioConstants.h \
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.h \
+    Source/CommonFramework/AudioPipeline/AudioFileLoader.h \
+    Source/CommonFramework/AudioPipeline/AudioFormatUtils.h \
     Source/CommonFramework/AudioPipeline/AudioIODevice.h \
     Source/CommonFramework/AudioPipeline/AudioInfo.h \
     Source/CommonFramework/AudioPipeline/AudioNormalization.h \
     Source/CommonFramework/AudioPipeline/AudioSelector.h \
     Source/CommonFramework/AudioPipeline/AudioSelectorWidget.h \
+    Source/CommonFramework/AudioPipeline/AudioTemplate.h \
     Source/CommonFramework/AudioPipeline/AudioThreadController.h \
     Source/CommonFramework/AudioPipeline/AudioWorker.h \
     Source/CommonFramework/AudioPipeline/FFTWorker.h \
     Source/CommonFramework/AudioPipeline/TimeSampleBuffer.h \
     Source/CommonFramework/AudioPipeline/TimeSampleBufferReader.h \
     Source/CommonFramework/AudioPipeline/TimeSampleWriter.h \
+    Source/CommonFramework/AudioPipeline/WavFile.h \
     Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h \
     Source/CommonFramework/ControllerDevices/SerialSelector.h \
     Source/CommonFramework/ControllerDevices/SerialSelectorWidget.h \
@@ -751,6 +764,7 @@ HEADERS += \
     Source/CommonFramework/Tools/ConsoleHandle.h \
     Source/CommonFramework/Tools/ErrorDumper.h \
     Source/CommonFramework/Tools/InterruptableCommands.h \
+    Source/CommonFramework/Tools/MultiConsoleErrors.h \
     Source/CommonFramework/Tools/ProgramEnvironment.h \
     Source/CommonFramework/Tools/StatsDatabase.h \
     Source/CommonFramework/Tools/StatsTracking.h \
@@ -986,6 +1000,7 @@ HEADERS += \
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h \
     Source/PokemonLA/Inference/PokemonLA_ShinySymbolDetector.h \
     Source/PokemonLA/Inference/PokemonLA_WhiteObjectDetector.h \
+    Source/PokemonLA/Options/PokemonLA_TradeCountTable.h \
     Source/PokemonLA/Panels_PokemonLA.h \
     Source/PokemonLA/PokemonLA_Settings.h \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.h \
@@ -995,7 +1010,10 @@ HEADERS += \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.h \
     Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.h \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h \
+    Source/PokemonLA/Programs/PokemonLA_SelfTouchTrade.h \
     Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.h \
+    Source/PokemonLA/Programs/PokemonLA_TradeRoutines.h \
+    Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h \

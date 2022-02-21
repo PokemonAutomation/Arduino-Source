@@ -369,6 +369,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Tools/ErrorDumper.h
     Source/CommonFramework/Tools/InterruptableCommands.cpp
     Source/CommonFramework/Tools/InterruptableCommands.h
+    Source/CommonFramework/Tools/MultiConsoleErrors.cpp
+    Source/CommonFramework/Tools/MultiConsoleErrors.h
     Source/CommonFramework/Tools/ProgramEnvironment.cpp
     Source/CommonFramework/Tools/ProgramEnvironment.h
     Source/CommonFramework/Tools/StatsDatabase.cpp
@@ -814,8 +816,16 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.h
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.cpp
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h
+    Source/PokemonLA/Programs/PokemonLA_SelfTouchTrade.cpp
+    Source/PokemonLA/Programs/PokemonLA_SelfTouchTrade.h
     Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.cpp
     Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.h
+    Source/PokemonLA/Programs/PokemonLA_TradeRoutines.cpp
+    Source/PokemonLA/Programs/PokemonLA_TradeRoutines.h
+    Source/PokemonLA/Options/PokemonLA_TradeCountTable.cpp
+    Source/PokemonLA/Options/PokemonLA_TradeCountTable.h
+    Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.cpp
+    Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp

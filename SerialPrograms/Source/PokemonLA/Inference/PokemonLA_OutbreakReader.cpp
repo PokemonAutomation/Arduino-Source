@@ -18,7 +18,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-OutbreakReader::OutbreakReader(Logger& logger, VideoOverlay& overlay, Language language)
+OutbreakReader::OutbreakReader(Logger& logger, Language language, VideoOverlay& overlay)
     : m_logger(logger)
     , m_language(language)
     , m_dialog_box0(overlay, 0.030, 0.177, 0.020, 0.038)
@@ -40,6 +40,7 @@ OCR::StringMatchResult OutbreakReader::read(const QImage& screen) const{
     QImage filtered = image;
 
 #if 1
+    //  TODO: Clean this shit up.
     Kernels::filter_rgb32_range(
         (const uint32_t*)image.constBits(), image.bytesPerLine(), image.width(), image.height(),
         (uint32_t*)filtered.bits(), filtered.bytesPerLine(), 0xffffffff, 0xff808080, 0xffffffff, false

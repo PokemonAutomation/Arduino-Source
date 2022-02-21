@@ -58,7 +58,7 @@ SerialSelectorWidget::SerialSelectorWidget(
         m_serial_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::activated),
         this, [=](int index){
             QSerialPortInfo& current_port = m_value.m_port;
-            if (index <= 0 || index > m_ports.size()){
+            if (index <= 0 || (size_t)index > m_ports.size()){
                 current_port = QSerialPortInfo();
             }else{
                 const QSerialPortInfo& port = m_ports[index - 1];

@@ -115,7 +115,7 @@ bool OutbreakFinder::read_outbreaks(
         }
 
         if (current_region != MapRegion::JUBILIFE && current_region != MapRegion::RETREAT){
-            OutbreakReader reader(env.console, env.console, LANGUAGE);
+            OutbreakReader reader(env.console, LANGUAGE, env.console);
             OCR::StringMatchResult result = reader.read(env.console.video().snapshot());
             if (no_outbreak == MapRegion::NONE && result.results.empty()){
                 no_outbreak = current_region;
@@ -193,13 +193,13 @@ bool OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
         ButtonDetector button_detector(
             env.console, env.console,
             ButtonType::ButtonA, ImageFloatBox(0.50, 0.50, 0.30, 0.30),
-            std::chrono::milliseconds(0), true
+            std::chrono::milliseconds(200), true
         );
         int ret = run_until(
             env, env.console,
             [](const BotBaseContext& context){
                 for (size_t c = 0; c < 10; c++){
-                    pbf_press_button(context, BUTTON_A, 20, 105);
+                    pbf_press_button(context, BUTTON_A, 20, 125);
                 }
             },
             { &button_detector }
@@ -214,8 +214,7 @@ bool OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
         stats.errors++;
     }
 
-    mash_A_to_change_region(env, env.console);
-    return true;
+    return mash_A_to_change_region(env, env.console);
 }
 
 
@@ -280,7 +279,7 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env){
         env.console, NOTIFICATION_MATCHED,
         COLOR_GREEN,
         env.program_info(),
-        "Found Distortion",
+        "Found Outbreak",
         {{"Session Stats", QString::fromStdString(stats.to_str())}},
         env.console.video().snapshot()
     );
