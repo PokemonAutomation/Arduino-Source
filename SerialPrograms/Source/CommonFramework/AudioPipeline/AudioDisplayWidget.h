@@ -19,25 +19,11 @@
 #include "AudioSelector.h"
 #include "CommonFramework/Tools/AudioFeed.h"
 
-class QBuffer;
-
-#include <QtGlobal>
-
-#if QT_VERSION_MAJOR == 5
-#include <QAudioDeviceInfo>
-class QAudioInput;
-class QAudioOutput;
-#elif QT_VERSION_MAJOR == 6
-#include <QAudioDevice>
-class QAudioSource;
-class QAudioSink;
-#endif
+class QString;
 
 namespace PokemonAutomation{
 
 class AudioThreadController;
-
-class AudioIODevice;
 class AudioInfo;
 class Logger;
 
@@ -63,7 +49,8 @@ public:
     virtual ~AudioDisplayWidget();
 
     // outputVolume: range [0.f, 1.f]
-    void set_audio(Logger& logger, const AudioInfo& inputInfo, const AudioInfo& outputInfo, float outputVolume);
+    void set_audio(Logger& logger, const AudioInfo& inputInfo, const QString& inputAbsoluteFilepath, 
+        const AudioInfo& outputInfo, float outputVolume);
 
     void close_audio();
 
@@ -77,6 +64,8 @@ public:
     void spectrums_since(size_t startingStamp, std::vector<std::shared_ptr<AudioSpectrum>>& spectrums);
 
     void spectrums_latest(size_t numLatestSpectrums, std::vector<std::shared_ptr<AudioSpectrum>>& spectrums);
+
+    void add_overlay(size_t startingStamp, size_t endStamp);
 
     // Development usage: save the FFT results to disk so that it can be examined
     // and edited to be used as samples for future audio matching.
@@ -113,6 +102,8 @@ private:
     // Each block uses the log scaled averaged magnitude of the frequencies.
     // stores those blocks together for visualization.
     std::vector<float> m_freqVisBlocks;
+    // The timestamp of each window that's been visualized.
+    std::vector<size_t> m_freqVisStamps;
     // The index of the next window in m_freqVisBlocks.
     size_t m_nextFFTWindowIndex = 0;
 
@@ -130,6 +121,11 @@ private:
     // Since the spectrums will be probided to the automation programs in
     // other threads, we need to have a lock here.
     std::mutex m_spectrums_lock;
+
+    // The pairs of starting and end stamps to highlight FFT windows on
+    // spectrogram. Used to tell user which part of the audio is detected.
+    // The head of the list is the most recent overlay.
+    std::list<std::pair<size_t, size_t>> m_overlays;
 
     // Develop purpose: used to save received frequencies to disk
     bool m_saveFreqToDisk = false;

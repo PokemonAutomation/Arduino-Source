@@ -4,10 +4,12 @@
  *
  */
 
+#include <QAudio>
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QComboBox>
 #include <QPushButton>
+#include <QFileDialog>
 #include "Common/Qt/NoWheelComboBox.h"
 #include "AudioDisplayWidget.h"
 #include "AudioSelectorWidget.h"
@@ -58,6 +60,11 @@ AudioSelectorWidget::AudioSelectorWidget(
         row0->addWidget(m_audio_input_box, 5);
         row0->addSpacing(5);
 
+        if (GlobalSettings::instance().DEVELOPER_MODE){
+            m_load_file_button = new QPushButton("Load File", this);
+            row0->addWidget(m_load_file_button, 1);
+        }
+
         m_audio_vis_box = new NoWheelComboBox(this);
         m_audio_vis_box->addItem("No Display");
         m_audio_vis_box->addItem("Spectrum");
@@ -97,10 +104,7 @@ AudioSelectorWidget::AudioSelectorWidget(
         }
     }
 
-
-
     refresh();
-
 
     connect(
         m_audio_input_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
@@ -109,6 +113,11 @@ AudioSelectorWidget::AudioSelectorWidget(
             if (index <= 0 || index > (int)m_input_audios.size()){
                 current = AudioInfo();
             }else{
+                // The user selects an audio source. If previously the user was playing an
+                // audio file, then we shouldn't play the file any more.
+                // Clear m_absoluteFilepath here so that m_display will be initialized to load
+                // from audio source instead of a file.
+                m_absoluteFilepath = "";
                 const AudioInfo& audio = m_input_audios[index - 1].info;
                 if (current == audio){
                     return;
@@ -186,6 +195,20 @@ AudioSelectorWidget::AudioSelectorWidget(
                 m_record_button->setText("Record Frequencies");
             }
         });
+
+        connect(m_load_file_button,  &QPushButton::clicked, this, [=](bool){
+            m_absoluteFilepath = QFileDialog::getOpenFileName(this, tr("Open audio file"), ".", "*.wav *.mp3");
+            std::cout << "Select file " << m_absoluteFilepath.toStdString() << std::endl;
+            if (m_absoluteFilepath.size() > 0){
+                if (m_audio_input_box->currentIndex() != 0) {
+                    m_audio_input_box->setCurrentIndex(0);
+                    // We connect index changed signal to a lambda function which calls reset_audio().
+                    // So we don't call reset_audio() here. 
+                } else{
+                    reset_audio();
+                }
+            }
+        });
     }
 }
 void AudioSelectorWidget::refresh(){
@@ -242,12 +265,13 @@ void AudioSelectorWidget::refresh(){
 }
 
 void AudioSelectorWidget::reset_audio(){
+    std::cout << "reset audio: " << m_absoluteFilepath.toStdString() << std::endl;
     std::lock_guard<std::mutex> lg(m_audio_lock);
     m_display.close_audio();
 
     const AudioInfo& info = m_value.m_inputDevice;
-    if (info){
-        m_display.set_audio(m_logger, info, m_value.m_outputDevice, convertAudioVolumeFromSlider(m_value.m_volume));
+    if (info || m_absoluteFilepath.size() > 0){
+        m_display.set_audio(m_logger, info, m_absoluteFilepath, m_value.m_outputDevice, convertAudioVolumeFromSlider(m_value.m_volume));
     }
 }
 void AudioSelectorWidget::async_reset_audio(){
@@ -263,10 +287,12 @@ void AudioSelectorWidget::spectrums_latest(size_t numLatestSpectrums, std::vecto
     m_display.spectrums_latest(numLatestSpectrums, spectrums);
 }
 
+void AudioSelectorWidget::add_overlay(size_t startingStamp, size_t endStamp){
+    m_display.add_overlay(startingStamp, endStamp);
+}
+
 void AudioSelectorWidget::set_audio_enabled(bool enabled){
     m_audio_input_box->setEnabled(enabled);
 }
-
-
 
 }

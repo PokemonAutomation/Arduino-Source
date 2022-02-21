@@ -39,12 +39,18 @@ public:
     //  Can call from anywhere.
     virtual void async_reset_audio() = 0;
 
-    //  Return all the computed spectrums which stamps are greater
-    //  or equal to `startingStamp`
+    //  Return all the computed spectrums which stamps are greater or equal to `startingStamp`
+    //  Returned `spectrums` holds the queried spectrums in the order that the oldest (smallest timestamp)
+    //  was the last in the vector.
     virtual void spectrums_since(size_t startingStamp, std::vector<std::shared_ptr<AudioSpectrum>>& spectrums) = 0;
 
     //  Return the latest spectrums.
+    //  Returned `spectrums` holds the queried spectrums in the order that the oldest (smallest timestamp)
+    //  was the last in the vector.
     virtual void spectrums_latest(size_t numLatestSpectrums, std::vector<std::shared_ptr<AudioSpectrum>>& spectrums) = 0;
+
+    //  Add visual overlay to the spectrums starting at `startingStamp` and before `endStamp`.
+    virtual void add_overlay(size_t startingStamp, size_t endStamp) = 0;
 };
 
 

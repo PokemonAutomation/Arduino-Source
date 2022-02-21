@@ -34,6 +34,10 @@ public:
     FFTWorker(int fftLengthPowerOfTwo);
     virtual ~FFTWorker();
 
+    const float* fftKernel(const float* input);
+
+    size_t outputSize() const { return m_fftOutputBuffer.size(); }
+
 public slots:
     // Will be connected to the audio IO code to receive fft input audio sample vector.
     void computeFFT(const QVector<float>& rawAudioSamples);

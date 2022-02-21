@@ -7,16 +7,33 @@
 #include "AudioConstants.h"
 #include "AudioInfo.h"
 #include "AudioWorker.h"
+#include "AudioFileLoader.h"
+#include "AudioFormatUtils.h"
 #include "CommonFramework/Logging/Logger.h"
 
 #include <QIODevice>
 #include <QThread>
+
+#if QT_VERSION_MAJOR == 5
+#include <QAudioDeviceInfo>
+#include <QAudioInput>
+#include <QAudioOutput>
+#include <QtEndian>
+#elif QT_VERSION_MAJOR == 6
+#include <QMediaDevices>
+#include <QAudioSource>
+#include <QAudioSink>
+#include <QAudioDevice>
+#endif
+
 
 #include <iomanip>
 #include <cfloat>
 #include <chrono>
 #include <memory>
 #include <cassert>
+#include <cstring>
+#include <set>
 
 #include <iostream>
 using std::cout;
@@ -24,88 +41,13 @@ using std::endl;
 
 //#define DEBUG_AUDIO_IO
 
-#if QT_VERSION_MAJOR == 5
-#include <QAudioDeviceInfo>
-#include <QAudioInput>
-#include <QAudioOutput>
-#include <QtEndian>
-
-void printAudioFormat(const QAudioFormat& format){
-    std::string sampleTypeStr = "";
-    switch(format.sampleType()){
-        case QAudioFormat::SampleType::Float:
-            sampleTypeStr="Float";
-            break;
-        case QAudioFormat::SampleType::SignedInt:
-            sampleTypeStr="SignedInt";
-            break;
-        case QAudioFormat::SampleType::UnSignedInt:
-            sampleTypeStr="UnSignedInt";
-            break;
-        default:
-            sampleTypeStr="Error";
-    }
-
-    std::cout << "Audio format: sample type " << sampleTypeStr << 
-        ", bytes per sample " << format.bytesPerFrame() / format.channelCount() << 
-        ", num channels " << format.channelCount() << 
-        ", sample rate " << format.sampleRate() << std::endl;
-}
-#elif QT_VERSION_MAJOR == 6
-#include <QMediaDevices>
-#include <QAudioSource>
-#include <QAudioSink>
-#include <QAudioDevice>
-
-void printAudioFormat(const QAudioFormat& format){
-    std::string sampleFormatStr = "";
-    switch(format.sampleFormat()){
-        case QAudioFormat::SampleFormat::Float:
-            sampleFormatStr="Float";
-            break;
-        case QAudioFormat::SampleFormat::Int16:
-            sampleFormatStr="Int16";
-            break;
-        case QAudioFormat::SampleFormat::Int32:
-            sampleFormatStr="Int32";
-            break;
-        case QAudioFormat::SampleFormat::UInt8:
-            sampleFormatStr="UInt8";
-            break;
-        default:
-            sampleFormatStr="Error";
-    }
-
-    std::string channelConfigStr = "";
-    switch(format.channelConfig()){
-        case QAudioFormat::ChannelConfig::ChannelConfigMono:
-            channelConfigStr = "Mono";
-            break;
-        case QAudioFormat::ChannelConfig::ChannelConfigStereo:
-            channelConfigStr = "Stereo";
-            break;
-        case QAudioFormat::ChannelConfig::ChannelConfigUnknown:
-            channelConfigStr = "Unkown";
-            break;
-        default:
-            channelConfigStr = "Non Mono or Stereo";
-    }
-    std::cout << "sample format " << sampleFormatStr << 
-        ", bytes per sample " << format.bytesPerSample() << 
-        ", channel config " << channelConfigStr <<
-        ", num channels " << format.channelCount() << 
-        ", sample rate " << format.sampleRate() << std::endl;
-}
-
-#endif
-
-
 namespace PokemonAutomation{
 
 
 
-AudioWorker::AudioWorker(const AudioInfo& inputInfo, const AudioInfo& outputInfo, float outputVolume){
+AudioWorker::AudioWorker(const AudioInfo& inputInfo, const QString& inputAbsoluteFilepath, const AudioInfo& outputInfo, float outputVolume){
     m_inputInfo = inputInfo;
+    m_inputAbsoluteFilepath = inputAbsoluteFilepath;
     m_outputInfo = outputInfo;
     m_volume = std::max(std::min(outputVolume, 1.0f), 0.0f);
 }
@@ -118,6 +60,7 @@ void AudioWorker::startAudio(){
 
     bool foundAudioInputInfo = false;
     bool foundAudioOutputInfo = false;
+    QAudioFormat inputAudioFormat, outputAudioFormat;
 
 #if QT_VERSION_MAJOR == 5
     using AudioSource = QAudioInput;
@@ -167,193 +110,149 @@ void AudioWorker::startAudio(){
     }
 #endif
 
-    if (foundAudioInputInfo == false){
-        // std::cout << "Cannot build Qt6VideoWidget: cannot found audio device name matching: " << inputInfo.device_name() << std::endl;
-        return;
-    }
-
-    const QAudioFormat defaultFormat = chosenAudioInputDevice.preferredFormat();
-    std::cout << "Default input audio format: ";
-    printAudioFormat(defaultFormat);
-    const int defaultChannelCount = defaultFormat.channelCount();
-    const int defaultSampleRate = defaultFormat.sampleRate();
-    
-    m_audioFormat = defaultFormat;
-    m_audioFormat.setSampleRate(48000);
-
-    // For now we let Qt handle the audio sample type conversion for us:
+    // If input filename is not empty, load audio from file:
+    if (m_inputAbsoluteFilepath.size() > 0){
+        // We hard code file audio format to be mono channel 48KHz.
+        inputAudioFormat.setChannelCount(2);
 #if QT_VERSION_MAJOR == 5
-        m_audioFormat.setSampleType(QAudioFormat::SampleType::Float);
-        m_audioFormat.setSampleSize(32);
-#elif QT_VERSION_MAJOR == 6
-        m_audioFormat.setSampleFormat(QAudioFormat::SampleFormat::Float);
+        inputAudioFormat.setCodec("audio/pcm");
 #endif
+        inputAudioFormat.setSampleRate(48000);
+        setSampleFormatToFloat(inputAudioFormat);
+        m_channelMode = ChannelMode::Stereo;
 
-    QAudioFormat m_outputAudioFormat = m_audioFormat;
+        // Note: m_inputAbsoluteFilepath must be an absolute file path. Otherwise it may trigger a bug
+        // in QAudioDecoder used in AudioFileLoader, which will either stops the audio stream
+        // halfway or crash the program when deleting QAudioDecoder.
+        m_FileLoader = new AudioFileLoader(this, m_inputAbsoluteFilepath, inputAudioFormat);
+        if (m_FileLoader->start() == false){
+            return;
+        }
+        outputAudioFormat = m_FileLoader->audioFormat();
+        std::cout << "Set output audio format to: ";
+        printAudioFormat(outputAudioFormat);
+
+        connect(m_FileLoader, &AudioFileLoader::bufferReady, this, [&](const char* data, size_t len){
+            if (m_audioIODevice){
+                m_audioIODevice->writeData(data, len);
+            }
+        });
+
+    } else{
+        // Load from audio input device:
+
+        if (foundAudioInputInfo == false){
+            // std::cout << "Cannot build Qt6VideoWidget: cannot found audio device name matching: " << inputInfo.device_name() << std::endl;
+            return;
+        }
+
+        const QAudioFormat defaultInputFormat = chosenAudioInputDevice.preferredFormat();
+        std::cout << "Default input audio format: ";
+        printAudioFormat(defaultInputFormat);
+        const int defaultChannelCount = defaultInputFormat.channelCount();
+        const int defaultSampleRate = defaultInputFormat.sampleRate();
+        
+        inputAudioFormat = defaultInputFormat;
+        
+        // inputAudioFormat.setSampleRate(48000);
+
+        // For now we let Qt handle the audio sample type conversion for us:
+        setSampleFormatToFloat(inputAudioFormat);
+
+        if (defaultSampleRate <= 40000){
+            // Somehow Qt picks a suboptimal default format.
+            // Force it to be the standard 48000
+            inputAudioFormat.setSampleRate(48000);
+        }
+
+        outputAudioFormat = inputAudioFormat;
 
 // #define FORCE_MONO
 #ifdef FORCE_MONO
-    if (true){
-        m_audioFormat.setChannelCount(1);
-        m_audioFormat.setSampleRate(48000);
-        m_channelMode = ChannelMode::Mono;
-        m_outputAudioFormat = m_audioFormat;
-    } else
+        if (true){
+            inputAudioFormat.setChannelCount(1);
+            inputAudioFormat.setSampleRate(48000);
+            m_channelMode = ChannelMode::Mono;
+            outputAudioFormat = inputAudioFormat;
+        } else
 #endif
-    if (defaultChannelCount == 1 && defaultSampleRate <= 50000){
-        // The input audio device uses mono mode, nothing to change on the output format.
-        m_channelMode = ChannelMode::Mono;
-    } else if (defaultChannelCount >= 2 && defaultSampleRate <= 50000){
-        // The input audio device uses stereo mode, nothing to change on the output format.
-        m_channelMode = ChannelMode::Stereo;
-        // Reduce the channel count to 2 in case the input sound is surrounded stereo.
-        m_audioFormat.setChannelCount(2);
-        m_outputAudioFormat = m_audioFormat;
-    } else if (defaultChannelCount == 1 && defaultSampleRate >= 80000){
-        // The input audio device uses interleaved mode, where the stereo samples are
-        // interleaved into a mono channel.
-        // This is the mode many capture cards use. If the Swith audio comes as stereo 48KHz,
-        // the capture card generates a mono 96KHz audio stream.
-        // To handle this, we need to set the output audio format to be stereo with the correct
-        // sample rate.
-#if QT_VERSION_MAJOR == 5        
-        m_outputAudioFormat.setChannelCount(2);
-#elif QT_VERSION_MAJOR == 6
-        m_outputAudioFormat.setChannelConfig(QAudioFormat::ChannelConfig::ChannelConfigStereo);
-#endif
-        m_outputAudioFormat.setSampleRate(defaultSampleRate / 2);
-        m_channelMode = ChannelMode::Interleaved;
-    } else {
-        std::cout << "Error: unkown input audio configuration:" << std::endl;
-        return;
-    }
-
-    std::cout << "Set input audio format to: ";
-    printAudioFormat(m_audioFormat);
-    std::cout << "Set output audio format to: ";
-    printAudioFormat(m_outputAudioFormat);
-    
-    if (!chosenAudioInputDevice.isFormatSupported(m_audioFormat)){
-        std::cout << "Error: audio input device cannot support desired audio format" << std::endl;
-        return;
-    }
-
-    const int bytesPerSample = m_audioFormat.bytesPerFrame() / m_audioFormat.channelCount();
-    if (bytesPerSample != sizeof(float)){
-        std::cout << "Error: audio format is wrong. Set its sample format to float but the bytesPerSample is "
-            << bytesPerSample << ", different from float size " << sizeof(float) << std::endl;
-        return;
-    }
-
-#ifdef DEBUG_AUDIO_IO
-    std::cout << "Audio input format:" << std::endl;
-    printAudioFormat(m_audioFormat);
-#endif
-    
-    m_audioSource = new AudioSource(chosenAudioInputDevice, m_audioFormat, this);
-
-    connect(m_audioSource, &AudioSource::stateChanged, this, [&](QAudio::State newState){
-        // TODO connect logger output to it
-        switch (newState) {
-        case QAudio::StoppedState:
-            switch (m_audioSource->error()) {
-            case QAudio::NoError:
-                std::cout << "AudioSource stopped normally" << std::endl;
-                break;
-            case QAudio::OpenError:
-                std::cout << "AudioSource OpenError" << std::endl;
-                break;
-            case QAudio::IOError:
-                std::cout << "AudioSource IOError" << std::endl;
-                break;
-            case QAudio::UnderrunError:
-                std::cout << "AudioSource UnderrunError" << std::endl;
-                break;
-            case QAudio::FatalError:
-                std::cout << "AudioSource FatalError" << std::endl;
-                break;
-            }
-            break;
-
-        case QAudio::ActiveState:
-            // Started recording - read from IO device
-            // std::cout << "Audio started" << std::endl;
-            break;
-        
-        case QAudio::SuspendedState:
-            std::cout << "AudioSource is suspended" << std::endl;
-            break;
-
-        case QAudio::IdleState:
-            // std::cout << "AudioSource is idle, no input" << std::endl;
-            break;
+        if (defaultChannelCount == 1 && defaultSampleRate <= 50000){
+            // The input audio device uses mono mode, nothing to change on the output format.
+            m_channelMode = ChannelMode::Mono;
+        } else if (defaultChannelCount >= 2 && defaultSampleRate <= 50000){
+            // The input audio device uses stereo mode, nothing to change on the output format.
+            m_channelMode = ChannelMode::Stereo;
+            // Reduce the channel count to 2 in case the input sound is surrounded stereo.
+            inputAudioFormat.setChannelCount(2);
+            outputAudioFormat = inputAudioFormat;
+        } else if (defaultChannelCount == 1 && defaultSampleRate >= 80000){
+            // The input audio device uses interleaved mode, where the stereo samples are
+            // interleaved into a mono channel.
+            // This is the mode many capture cards use. If the Swith audio comes as stereo 48KHz,
+            // the capture card generates a mono 96KHz audio stream.
+            // To handle this, we need to set the output audio format to be stereo with the correct
+            // sample rate.
 #if QT_VERSION_MAJOR == 5
-        case QAudio::InterruptedState:
-            std::cout << "AudioSource is interrupted, no input" << std::endl;
-            break;
+          outputAudioFormat.setChannelCount(2);
+#elif QT_VERSION_MAJOR == 6
+         outputAudioFormat.setChannelConfig(QAudioFormat::ChannelConfig::ChannelConfigStereo);
 #endif
+            outputAudioFormat.setSampleRate(defaultSampleRate / 2);
+            m_channelMode = ChannelMode::Interleaved;
+        } else {
+            std::cout << "Error: unkown input audio configuration:" << std::endl;
+            return;
         }
-    });
 
-    m_audioIODevice = new AudioIODevice(m_audioFormat, m_channelMode);
+        std::cout << "Set input audio format to: ";
+        printAudioFormat(inputAudioFormat);
+        std::cout << "Set output audio format to: ";
+        printAudioFormat(outputAudioFormat);
+        
+        if (!chosenAudioInputDevice.isFormatSupported(inputAudioFormat)){
+            std::cout << "Error: audio input device cannot support desired audio format" << std::endl;
+            return;
+        }
+
+        const int bytesPerSample = inputAudioFormat.bytesPerFrame() / inputAudioFormat.channelCount();
+        if (bytesPerSample != sizeof(float)){
+            std::cout << "Error: audio format is wrong. Set its sample format to float but the bytesPerSample is "
+                << bytesPerSample << ", different from float size " << sizeof(float) << std::endl;
+            return;
+        }
+        
+
+        m_audioSource = new AudioSource(chosenAudioInputDevice, inputAudioFormat, this);
+
+        connect(m_audioSource, &AudioSource::stateChanged, this, [&](QAudio::State newState){
+            this->handleDeviceErrorState(newState, m_audioSource->error(), "AudioSource");
+        });
+    } // end if load audio from input audio device
+      
+
+    m_audioIODevice = new AudioIODevice(inputAudioFormat, m_channelMode);
     m_audioIODevice->open(QIODevice::ReadWrite | QIODevice::Unbuffered);
+    connect(m_audioIODevice, &AudioIODevice::fftInputReady, this, &AudioWorker::fftInputReady);
     
-    m_audioSource->start(m_audioIODevice);
+    if (m_audioSource){
+        m_audioSource->start(m_audioIODevice);
+    }
 
     if (foundAudioOutputInfo){
-        bool outputSupported = chosenAudioOutputDevice.isFormatSupported(m_outputAudioFormat);
+        bool outputSupported = chosenAudioOutputDevice.isFormatSupported(outputAudioFormat);
         if (!outputSupported){
-            std::cout << "Error the audio output device does not support the audio format edited from the audio input device" << std::endl;
+            std::cout << "Error the audio output device does not support the requested audio format" << std::endl;
         } else{
-            m_audioSink = new AudioSink(chosenAudioOutputDevice, m_outputAudioFormat, this);
+            m_audioSink = new AudioSink(chosenAudioOutputDevice, outputAudioFormat, this);
             m_audioSink->setBufferSize(32768);
             m_audioSink->setVolume(m_volume);
             m_audioIODevice->setAudioSinkDevice(m_audioSink->start());
 
             connect(m_audioSink, &AudioSink::stateChanged, this, [&](QAudio::State newState){
-                switch (newState) {
-                case QAudio::StoppedState:
-                    switch (m_audioSource->error()) {
-                    case QAudio::NoError:
-                        std::cout << "AudioSink stopped normally" << std::endl;
-                        break;
-                    case QAudio::OpenError:
-                        std::cout << "AudioSink OpenError" << std::endl;
-                        break;
-                    case QAudio::IOError:
-                        std::cout << "AudioSink IOError" << std::endl;
-                        break;
-                    case QAudio::UnderrunError:
-                        // Underrun error happens when the audio thread is closing.
-                        // std::cout << "AudioSink UnderrunError" << std::endl;
-                        break;
-                    case QAudio::FatalError:
-                        std::cout << "AudioSink FatalError" << std::endl;
-                        break;
-                    }
-                    break;
-
-                case QAudio::ActiveState:
-                    break;
-                
-                case QAudio::SuspendedState:
-                    std::cout << "AudioSink is suspended" << std::endl;
-                    break;
-
-                case QAudio::IdleState:
-                    // std::cout << "Audio is idle, no input" << std::endl;
-                    break;
-#if QT_VERSION_MAJOR == 5
-                case QAudio::InterruptedState:
-                    std::cout << "AudioSink is interrupted, no input" << std::endl;
-                    break;
-#endif
-                }
+                this->handleDeviceErrorState(newState, m_audioSink->error(), "AudioSink");
             });
         }
     }
-
-    connect(m_audioIODevice, &AudioIODevice::fftInputReady, this, &AudioWorker::fftInputReady);
 }
 
 AudioWorker::~AudioWorker(){
@@ -376,10 +275,17 @@ AudioWorker::~AudioWorker(){
         m_audioSource = nullptr;
     }
 
+    if (m_FileLoader){
+        delete m_FileLoader;
+        m_FileLoader = nullptr;
+    }
+
     if (m_audioIODevice){
         delete m_audioIODevice;
         m_audioIODevice = nullptr;
     }
+
+    std::cout << "AudioWorker destroyed" << std::endl;
 }
 
 void AudioWorker::setVolume(float volume){
@@ -389,5 +295,53 @@ void AudioWorker::setVolume(float volume){
         m_audioSink->setVolume(volume);
     }
 }
+
+void AudioWorker::handleDeviceErrorState(QAudio::State newState, QAudio::Error error, const char* deviceType){
+    // TODO connect logger output to it
+    switch (newState) {
+    case QAudio::StoppedState:
+        switch (error) {
+        case QAudio::NoError:
+            std::cout << deviceType << " stopped normally" << std::endl;
+            break;
+        case QAudio::OpenError:
+            std::cout << deviceType << " OpenError" << std::endl;
+            break;
+        case QAudio::IOError:
+            std::cout << deviceType <<  " IOError" << std::endl;
+            break;
+        case QAudio::UnderrunError:
+            // Underrun error happens on audio sink when the audio thread is closing.
+            // So we don't print this error if it's on audio sink.
+            if (strcmp(deviceType, "AudioSink") != 0){
+                std::cout << deviceType <<  " UnderrunError" << std::endl;
+            }
+            break;
+        case QAudio::FatalError:
+            std::cout << deviceType <<  " FatalError" << std::endl;
+            break;
+        }
+        break;
+
+    case QAudio::ActiveState:
+        // Started recording - read from IO device
+        // std::cout << "Audio started" << std::endl;
+        break;
+    
+    case QAudio::SuspendedState:
+        std::cout << deviceType <<  " is suspended" << std::endl;
+        break;
+
+    case QAudio::IdleState:
+        // std::cout << "AudioSource is idle, no input" << std::endl;
+        break;
+#if QT_VERSION_MAJOR == 5
+    case QAudio::InterruptedState:
+        std::cout << "AudioSource is interrupted, no input" << std::endl;
+        break;
+#endif
+    } // end switch newState
+}
+
 
 }

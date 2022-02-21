@@ -65,8 +65,8 @@ PA_FORCE_INLINE int16_t byte_swap(int32_t x){
 
 template <typename Type>
 void normalize_audio_le(float* out, const Type* in, size_t count){
-    const float rcp = 1. / std::numeric_limits<Type>::max();
-    const float sub = std::is_unsigned<Type>::value ? 1 : 0;
+    const float rcp = (std::is_unsigned<Type>::value ? 2.0f : 1.0f) / std::numeric_limits<Type>::max();
+    const float sub = std::is_unsigned<Type>::value ? 1.0f : 0.0f;
     for (size_t c = 0; c < count; c++){
         out[c] = (float)in[c] * rcp - sub;
     }
@@ -74,8 +74,8 @@ void normalize_audio_le(float* out, const Type* in, size_t count){
 
 template <typename Type>
 void normalize_audio_be(float* out, const Type* in, size_t count){
-    const float rcp = 1. / std::numeric_limits<Type>::max();
-    const float sub = std::is_unsigned<Type>::value ? 1 : 0;
+    const float rcp = (std::is_unsigned<Type>::value ? 2.0f : 1.0f) / std::numeric_limits<Type>::max();
+    const float sub = std::is_unsigned<Type>::value ? 1.0f : 0.0f;
     for (size_t c = 0; c < count; c++){
         out[c] = (float)byte_swap(in[c]) * rcp - sub;
     }

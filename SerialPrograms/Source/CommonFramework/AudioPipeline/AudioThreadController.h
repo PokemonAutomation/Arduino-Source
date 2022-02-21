@@ -12,8 +12,7 @@
 #include <QObject>
 #include <QThread>
 
-
-// #define USE_FFTREAL
+class QString;
 
 namespace PokemonAutomation{
 
@@ -42,6 +41,7 @@ public:
     AudioThreadController(
         AudioDisplayWidget* parent,
         const AudioInfo& inputInfo,
+        const QString& inputAbsoluteFilepath,
         const AudioInfo& outputInfo,
         float outputVolume
     );
