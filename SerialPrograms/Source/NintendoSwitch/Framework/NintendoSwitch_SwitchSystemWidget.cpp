@@ -58,10 +58,8 @@ SwitchSystemWidget::SwitchSystemWidget(
         m_camera = factory.m_camera.make_ui(*widget, logger, *m_video_display);
         group_layout->addWidget(m_camera);
 
-        if (GlobalSettings::instance().DEVELOPER_MODE){
-            m_audio = factory.m_audio.make_ui(*widget, logger, *m_audio_display);
-            group_layout->addWidget(m_audio);
-        }
+        m_audio = factory.m_audio.make_ui(*widget, logger, *m_audio_display);
+        group_layout->addWidget(m_audio);
 
         m_command = new CommandRow(
             *widget,
@@ -75,11 +73,8 @@ SwitchSystemWidget::SwitchSystemWidget(
     layout->addWidget(m_audio_display);
     layout->addWidget(m_video_display);
     m_camera->reset_video();
-    if (GlobalSettings::instance().DEVELOPER_MODE){
-        m_audio->reset_audio();
-    }
+    m_audio->reset_audio();
 
-//    m_controller.reset(new VirtualController(m_serial->botbase()));
     setFocusPolicy(Qt::StrongFocus);
 
 

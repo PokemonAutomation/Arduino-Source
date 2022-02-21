@@ -155,9 +155,9 @@ void AudioWorker::startAudio(){
             // To handle this, we need to set the output audio format to be stereo with the correct
             // sample rate.
 #if QT_VERSION_MAJOR == 5
-          outputAudioFormat.setChannelCount(2);
+            outputAudioFormat.setChannelCount(2);
 #elif QT_VERSION_MAJOR == 6
-         outputAudioFormat.setChannelConfig(QAudioFormat::ChannelConfig::ChannelConfigStereo);
+            outputAudioFormat.setChannelConfig(QAudioFormat::ChannelConfig::ChannelConfigStereo);
 #endif
             outputAudioFormat.setSampleRate(defaultSampleRate / 2);
             m_channelMode = ChannelMode::Interleaved;
