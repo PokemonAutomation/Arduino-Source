@@ -97,6 +97,8 @@ AudioDisplayWidget::AudioDisplayWidget(QWidget& parent)
     //     std::cout << v << " ";
     // }
     // std::cout << std::endl;
+
+    // saveAudioFrequenciesToDisk(true);
 }
 
 AudioDisplayWidget::~AudioDisplayWidget(){ clear(); }
@@ -109,6 +111,7 @@ void AudioDisplayWidget::clear(){
 
     m_freqVisBlocks.assign(m_freqVisBlocks.size(), 0.f);
     m_freqVisStamps.assign(m_freqVisStamps.size(), SIZE_MAX);
+    std::lock_guard<std::mutex> lock_gd(m_spectrums_lock);
     m_spectrums.clear();
 }
 
@@ -383,6 +386,7 @@ void AudioDisplayWidget::resizeEvent(QResizeEvent* event){
 
 
 void AudioDisplayWidget::spectrums_since(size_t startingStamp, std::vector<std::shared_ptr<AudioSpectrum>>& spectrums){
+    std::lock_guard<std::mutex> lock_gd(m_spectrums_lock);
     for(const auto& ptr : m_spectrums){
         if (ptr->stamp >= startingStamp){
             spectrums.push_back(ptr);
@@ -393,6 +397,7 @@ void AudioDisplayWidget::spectrums_since(size_t startingStamp, std::vector<std::
 }
 
 void AudioDisplayWidget::spectrums_latest(size_t numLatestSpectrums, std::vector<std::shared_ptr<AudioSpectrum>>& spectrums){
+    std::lock_guard<std::mutex> lock_gd(m_spectrums_lock);
     size_t i = 0;
     for(const auto& ptr : m_spectrums){
         if (i == numLatestSpectrums){
