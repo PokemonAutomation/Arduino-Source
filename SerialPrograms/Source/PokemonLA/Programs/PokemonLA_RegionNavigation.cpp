@@ -74,11 +74,12 @@ bool mash_A_to_change_region(ProgramEnvironment& env, ConsoleHandle& console){
     }
     env.wait_for(std::chrono::milliseconds(100));
 
-    BlackScreenOverWatcher black_screen1(COLOR_RED, {0.20, 0.95, 0.60, 0.03}, 20);
+    BlackScreenOverWatcher black_screen1a(COLOR_RED, {0.20, 0.02, 0.60, 0.05}, 150);
+    BlackScreenOverWatcher black_screen1b(COLOR_RED, {0.20, 0.93, 0.60, 0.05}, 150);
     ret = wait_until(
         env, console,
         std::chrono::seconds(20),
-        { &black_screen1 }
+        { &black_screen1a, &black_screen1b }
     );
     if (ret < 0){
         console.log("Failed to load into region after 20 seconds.", COLOR_RED);

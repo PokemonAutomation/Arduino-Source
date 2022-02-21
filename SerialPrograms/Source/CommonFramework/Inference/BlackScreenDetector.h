@@ -24,7 +24,8 @@ public:
     BlackScreenDetector(
         Color color = COLOR_RED,
         const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8},
-        double max_stddev = 10
+        double max_rgb_sum = 100,
+        double max_stddev_sum = 10
     );
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
@@ -33,7 +34,8 @@ public:
 private:
     Color m_color;
     ImageFloatBox m_box;
-    double m_max_stddev;
+    double m_max_rgb_sum;
+    double m_max_stddev_sum;
 };
 
 
@@ -42,7 +44,8 @@ public:
     BlackScreenWatcher(
         Color color = COLOR_RED,
         const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8},
-        double max_stddev = 10
+        double max_rgb_sum = 100,
+        double max_stddev_sum = 10
     );
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
@@ -58,7 +61,8 @@ public:
     BlackScreenOverWatcher(
         Color color = COLOR_RED,
         const ImageFloatBox& box = {0.1, 0.1, 0.8, 0.8},
-        double max_stddev = 10
+        double max_rgb_sum = 100,
+        double max_stddev_sum = 10
     );
 
     bool black_is_over(const QImage& frame);

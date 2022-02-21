@@ -164,7 +164,9 @@ bool OutbreakFinder::read_outbreaks(
 bool OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env, MapRegion region){
     Stats& stats = env.stats<Stats>();
 
-    mash_A_to_change_region(env, env.console);
+    if (!mash_A_to_change_region(env, env.console)){
+        return false;
+    }
     Camp camp = Camp::FIELDLANDS_FIELDLANDS;
     switch (region){
     case MapRegion::FIELDLANDS:

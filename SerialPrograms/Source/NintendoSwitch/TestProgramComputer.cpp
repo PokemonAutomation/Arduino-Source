@@ -46,6 +46,7 @@
 #include "CommonFramework/AudioPipeline/TimeSampleBuffer.h"
 #include "CommonFramework/AudioPipeline/TimeSampleBufferReader.h"
 #include "CommonFramework/AudioPipeline/AudioNormalization.h"
+#include "CommonFramework/Inference/BlackScreenDetector.h"
 
 #include "Kernels/AbsFFT/Kernels_AbsFFT.h"
 #include "Kernels/AbsFFT/Kernels_AbsFFT_Arch.h"
@@ -123,6 +124,13 @@ void TestProgramComputer::program(ProgramEnvironment& env){
     using namespace NintendoSwitch::PokemonSwSh;
     using namespace Pokemon;
 
+
+    BlackScreenOverWatcher black_screen1(COLOR_RED, {0.20, 0.95, 0.60, 0.03}, 20);
+
+    black_screen1.process_frame(QImage("screenshot-20220221-232325966395.png"), std::chrono::system_clock::now());
+
+
+#if 0
     float data[25];
     for (int c = 0; c < 25; c++){
         data[c] = c;
@@ -156,6 +164,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
     reader.read_samples(read, 25, REFERENCE + std::chrono::milliseconds(2500));
 
     print(read, 25);
+#endif
 #endif
 }
 
