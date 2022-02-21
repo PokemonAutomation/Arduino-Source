@@ -122,7 +122,7 @@ AudioSelectorWidget::AudioSelectorWidget(
                 // Clear m_absoluteFilepath here so that m_display will be initialized to load
                 // from audio source instead of a file.
                 m_absoluteFilepath = "";
-                const AudioInfo& audio = m_input_audios[index - 1].info;
+                const AudioInfo& audio = m_input_audios[index - 1];
                 if (current == audio){
                     return;
                 }
@@ -138,7 +138,7 @@ AudioSelectorWidget::AudioSelectorWidget(
             if (index <= 0 || index > (int)m_output_audios.size()){
                 current = AudioInfo();
             }else{
-                const AudioInfo& audio = m_output_audios[index - 1].info;
+                const AudioInfo& audio = m_output_audios[index - 1];
                 if (current == audio){
                     return;
                 }
@@ -219,7 +219,7 @@ void AudioSelectorWidget::refresh(){
 
     auto build_device_menu = [](
         QComboBox* box,
-        const std::vector<AudioInfoData>& list,
+        const std::vector<AudioInfo>& list,
         AudioInfo& current_device
     ){
         
@@ -228,8 +228,8 @@ void AudioSelectorWidget::refresh(){
 
         size_t index = 0;
         for (size_t c = 0; c < list.size(); c++){
-            const AudioInfo& audio = list[c].info;
-            box->addItem(list[c].display_name);
+            const AudioInfo& audio = list[c];
+            box->addItem(list[c].display_name());
 
             if (current_device == audio){
                 index = c + 1;
@@ -244,8 +244,8 @@ void AudioSelectorWidget::refresh(){
     };
 
 
-    m_input_audios = get_all_audio_inputs();
-    m_output_audios = get_all_audio_outputs();
+    m_input_audios = AudioInfo::all_input_devices();
+    m_output_audios = AudioInfo::all_output_devices();
     build_device_menu(m_audio_input_box, m_input_audios, m_value.m_inputDevice);
     build_device_menu(m_audio_output_box, m_output_audios, m_value.m_outputDevice);
 

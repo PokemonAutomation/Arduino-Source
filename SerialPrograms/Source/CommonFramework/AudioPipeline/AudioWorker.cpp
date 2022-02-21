@@ -19,11 +19,15 @@
 #include <QAudioInput>
 #include <QAudioOutput>
 #include <QtEndian>
+using AudioSource = QAudioInput;
+using AudioSink = QAudioOutput;
 #elif QT_VERSION_MAJOR == 6
 #include <QMediaDevices>
 #include <QAudioSource>
 #include <QAudioSink>
 #include <QAudioDevice>
+using AudioSource = QAudioSource;
+using AudioSink = QAudioSink;
 #endif
 
 
@@ -62,53 +66,11 @@ void AudioWorker::startAudio(){
     bool foundAudioOutputInfo = false;
     QAudioFormat inputAudioFormat, outputAudioFormat;
 
-#if QT_VERSION_MAJOR == 5
-    using AudioSource = QAudioInput;
-    using AudioSink = QAudioOutput;
+    NativeAudioInfo chosenAudioInputDevice = m_inputInfo.native_info();
+    foundAudioInputInfo = m_inputInfo;
 
-    const auto audioInputs = QAudioDeviceInfo::availableDevices(QAudio::AudioInput);
-    QAudioDeviceInfo chosenAudioInputDevice;
-    for (const auto &audioDevice : audioInputs){
-        if (audioDevice.deviceName().toStdString() == m_inputInfo.device_name()){
-            foundAudioInputInfo = true;
-            chosenAudioInputDevice = audioDevice;
-            break;
-        }
-    }
-
-    const auto audioOutputs = QAudioDeviceInfo::availableDevices(QAudio::AudioOutput);
-    QAudioDeviceInfo chosenAudioOutputDevice;
-    for (const auto &audioDevice : audioOutputs){
-        if (audioDevice.deviceName().toStdString() == m_outputInfo.device_name()){
-            foundAudioOutputInfo = true;
-            chosenAudioOutputDevice = audioDevice;
-            break;
-        }
-    }
-#elif QT_VERSION_MAJOR == 6
-    using AudioSource = QAudioSource;
-    using AudioSink = QAudioSink;
-
-    const auto audioInputs = QMediaDevices::audioInputs();
-    QAudioDevice chosenAudioInputDevice;
-    for (const auto &audioDevice : audioInputs){
-        if (audioDevice.id().toStdString() == m_inputInfo.device_name()){
-                foundAudioInputInfo = true;
-            chosenAudioInputDevice = audioDevice;
-            break;
-        }
-    }
-
-    const auto audioOutputs = QMediaDevices::audioOutputs();
-    QAudioDevice chosenAudioOutputDevice;
-    for (const auto &audioDevice : audioOutputs){
-        if (audioDevice.id().toStdString() == m_outputInfo.device_name()){
-                foundAudioOutputInfo = true;
-            chosenAudioOutputDevice = audioDevice;
-            break;
-        }
-    }
-#endif
+    NativeAudioInfo chosenAudioOutputDevice = m_outputInfo.native_info();
+    foundAudioOutputInfo = m_outputInfo;
 
     // If input filename is not empty, load audio from file:
     if (m_inputAbsoluteFilepath.size() > 0){

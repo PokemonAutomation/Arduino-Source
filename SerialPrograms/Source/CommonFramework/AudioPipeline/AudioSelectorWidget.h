@@ -82,8 +82,8 @@ private:
     QPushButton* m_record_button = nullptr;
     bool m_record_is_on = false;
 
-    std::vector<AudioInfoData> m_input_audios;
-    std::vector<AudioInfoData> m_output_audios;
+    std::vector<AudioInfo> m_input_audios;
+    std::vector<AudioInfo> m_output_audios;
 
     std::mutex m_audio_lock;
 };

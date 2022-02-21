@@ -9,44 +9,50 @@
 
 #include <string>
 #include <vector>
-#include <QString>
+#include <QtConfig>
+#include "Common/Cpp/Pimpl.h"
+
+class QString;
+
+#if QT_VERSION_MAJOR == 5
+class QAudioDeviceInfo;
+using NativeAudioInfo = QAudioDeviceInfo;
+#elif QT_VERSION_MAJOR == 6
+class QAudioDevice;
+using NativeAudioInfo = QAudioDevice;
+#else
+#error "Unknown Qt version."
+#endif
+
+
 
 namespace PokemonAutomation{
 
 
 class AudioInfo{
 public:
-    AudioInfo() = default;
-    explicit AudioInfo(std::string device_name)
-        : m_device_name(std::move(device_name))
-    {}
+    ~AudioInfo();
 
-    operator bool() const{ return !m_device_name.empty(); }
+public:
+    AudioInfo();
+    AudioInfo(const std::string& device_name);
 
-    //  Unique device identifier.
-    const std::string& device_name() const{ return m_device_name; }
+    operator bool() const;
 
-    bool operator==(const AudioInfo& info){
-        return m_device_name == info.m_device_name;
-    }
+    const std::string& device_name() const;
+    const QString& display_name() const;
+    const NativeAudioInfo& native_info() const;
+
+    bool operator==(const AudioInfo& info);
+
+    static std::vector<AudioInfo> all_input_devices();
+    static std::vector<AudioInfo> all_output_devices();
 
 private:
-    std::string m_device_name;
+    struct Data;
+    Pimpl<Data> m_body;
 };
 
-
-struct AudioInfoData{
-    AudioInfo info;
-    QString display_name;
-
-    AudioInfoData(std::string device_name, QString p_display_name)
-        : info(std::move(device_name))
-        , display_name(std::move(p_display_name))
-    {}
-};
-
-std::vector<AudioInfoData> get_all_audio_inputs();
-std::vector<AudioInfoData> get_all_audio_outputs();
 
 
 
