@@ -14,7 +14,7 @@
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
-#include "PokemonLA/Inference/PokemonLA_ButtonDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 #include "PokemonLA_TradeRoutines.h"
 
 namespace PokemonAutomation{

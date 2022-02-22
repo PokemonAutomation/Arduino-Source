@@ -6,10 +6,10 @@
 
 //#include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "CommonFramework/Inference/VisualInferenceSession.h"
-#include "PokemonLA/Inference/PokemonLA_BubbleDetector.h"
-#include "PokemonLA/Inference/PokemonLA_ArcDetector.h"
-#include "PokemonLA/Inference/PokemonLA_QuestMarkDetector.h"
-#include "PokemonLA/Inference/PokemonLA_FlagDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_ArcDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_FlagDetector.h"
 #include "PokemonLA_OverworldWatcher.h"
 
 namespace PokemonAutomation{

@@ -14,9 +14,6 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-const uint16_t GET_ON_BRAVIARY_TIME = 280;
-
-
 FlagNavigationAir::FlagNavigationAir(ProgramEnvironment& env, ConsoleHandle& console)
     : SuperControlSession(env, console)
     , m_flag(console, console)

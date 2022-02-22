@@ -12,7 +12,7 @@
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
-#include "PokemonLA/Inference/PokemonLA_WhiteObjectDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

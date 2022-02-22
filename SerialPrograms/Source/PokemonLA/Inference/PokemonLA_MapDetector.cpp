@@ -18,7 +18,7 @@ namespace PokemonLA{
 MapDetector::MapDetector()
     : VisualInferenceCallback("MapDetector")
     , m_bottom0(0.450, 0.935, 0.500, 0.015)
-    , m_bottom1(0.450, 0.965, 0.300, 0.020)
+    , m_bottom1(0.450, 0.965, 0.100, 0.020)
 {}
 
 void MapDetector::make_overlays(VideoOverlaySet& items) const{

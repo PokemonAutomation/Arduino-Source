@@ -134,23 +134,23 @@
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorSquare.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleSet.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_ExperienceGainDetector.h"
-#include "PokemonLA/Inference/PokemonLA_BubbleDetector.h"
-#include "PokemonLA/Inference/PokemonLA_ArcDetector.h"
-#include "PokemonLA/Inference/PokemonLA_QuestMarkDetector.h"
-#include "PokemonLA/Inference/PokemonLA_ShinySymbolDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_ArcDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "CommonFramework/Inference/BlackBorderDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
-#include "PokemonLA/Inference/PokemonLA_FlagDetector.h"
-#include "PokemonLA/Inference/PokemonLA_FlagTracker.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_FlagDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Tools/SuperControlSession.h"
 #include "PokemonLA/Programs/PokemonLA_FlagNavigationAir.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
-#include "PokemonLA/Inference/PokemonLA_ButtonDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
 #include "PokemonLA/Inference/PokemonLA_NotificationReader.h"
 #include "PokemonLA/Inference/PokemonLA_OutbreakReader.h"
@@ -158,7 +158,11 @@
 #include "PokemonLA/Inference/PokemonLA_MapDetector.h"
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "PokemonLA/Programs/PokemonLA_TradeRoutines.h"
+#include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
+#include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
 #include "CommonFramework/Tools/MultiConsoleErrors.h"
+#include "PokemonLA/Inference/PokemonLA_UnderAttackDetector.h"
+#include "PokemonLA/Programs/PokemonLA_EscapeFromAttack.h"
 #include "TestProgramSwitch.h"
 
 #include <immintrin.h>
@@ -228,6 +232,159 @@ using namespace PokemonLA;
 
 
 
+#if 0
+bool get_on_braviary(ProgramEnvironment& env, ConsoleHandle& console){
+    const uint16_t GET_ON_BRAVIARY_TIME = 280;
+
+    ButtonDetector centerA(
+        console, console,
+        ButtonType::ButtonA,
+        {0.40, 0.50, 0.40, 0.50},
+        std::chrono::milliseconds(500), false
+    );
+    ButtonDetector leftB(
+        console, console,
+        ButtonType::ButtonB,
+        {0.02, 0.40, 0.05, 0.20},
+        std::chrono::milliseconds(500), false
+    );
+
+    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+
+    MountDetector detector;
+    while (true){
+        console.botbase().wait_for_all_requests();
+
+        if (std::chrono::system_clock::now() - start > std::chrono::seconds(60)){
+            console.log("Failed to get on Braviary after 60 seconds.");
+            return false;
+        }
+
+        MountState state = detector.detect(console.video().snapshot());
+        switch (state){
+        case MountState::NOTHING:
+            pbf_mash_button(console, BUTTON_B, 125);
+            continue;
+        case MountState::WYRDEER_OFF:
+        case MountState::BASCULEGION_OFF:
+            pbf_press_button(console, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
+            continue;
+        case MountState::WYRDEER_ON:
+        case MountState::BASCULEGION_ON:
+            pbf_press_dpad(console, DPAD_RIGHT, 20, GET_ON_BRAVIARY_TIME);
+            continue;
+        case MountState::URSALUNA_OFF:
+            pbf_press_dpad(console, DPAD_RIGHT, 20, 50);
+            pbf_press_dpad(console, DPAD_RIGHT, 20, 50);
+            pbf_press_button(console, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
+            continue;
+        case MountState::URSALUNA_ON:
+            pbf_press_dpad(console, DPAD_RIGHT, 20, 50);
+            pbf_press_dpad(console, DPAD_RIGHT, 20, GET_ON_BRAVIARY_TIME);
+            continue;
+        case MountState::SNEASLER_OFF:
+            pbf_press_dpad(console, DPAD_LEFT, 20, 50);
+            pbf_press_button(console, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
+            continue;
+        case MountState::SNEASLER_ON:
+            if (!leftB.detected()){
+                console.log("Switching back to Braviary...");
+                pbf_move_left_joystick(console, 128, 0, 125, 0);
+                pbf_press_dpad(console, DPAD_LEFT, 20, GET_ON_BRAVIARY_TIME);
+                continue;
+            }
+            console.log("Climbing wall...");
+            pbf_move_left_joystick(console, 128, 0, 2 * TICKS_PER_SECOND, 0);
+            continue;
+        case MountState::BRAVIARY_OFF:
+            pbf_press_button(console, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
+            continue;
+        case MountState::BRAVIARY_ON:
+            return true;
+        default:
+            PA_THROW_StringException("Invalid Mount Enum: " + std::to_string((int)state));
+        }
+    }
+}
+#endif
+
+
+bool return_to_jubilife_from_overworld(ProgramEnvironment& env, ConsoleHandle& console){
+    while (true){
+        EscapeFromAttack session(env, console);
+        session.run_session();
+        if (session.state() != UnderAttackState::UNDER_ATTACK){
+            console.log("Unable to escape from being attacked.", COLOR_RED);
+            return false;
+        }
+
+        //  Open the map.
+        pbf_press_button(console, BUTTON_MINUS, 20, 30);
+        {
+            MapDetector detector;
+            int ret = wait_until(
+                env, console,
+                std::chrono::seconds(5),
+                { &detector }
+            );
+            if (ret < 0){
+                console.log("Map not detected after 5 seconds.", COLOR_RED);
+                return false;
+            }
+            console.log("Found map!");
+            env.wait_for(std::chrono::milliseconds(500));
+        }
+
+        //  Try to fly back to camp.
+        pbf_press_button(console, BUTTON_X, 20, 30);
+
+        {
+            ButtonDetector detector(
+                console, console,
+                ButtonType::ButtonA,
+                {0.55, 0.40, 0.20, 0.40},
+                std::chrono::milliseconds(200), true
+            );
+            int ret = wait_until(
+                env, console,
+                std::chrono::seconds(2),
+                { &detector }
+            );
+            if (ret >= 0){
+                console.log("Flying back to camp...");
+                pbf_mash_button(console, BUTTON_A, 125);
+                break;
+            }
+            console.log("Unable to fly. Are you under attack?", COLOR_RED);
+        }
+
+        pbf_mash_button(console, BUTTON_B, 125);
+    }
+
+    BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.6});
+    int ret = wait_until(
+        env, console,
+        std::chrono::seconds(20),
+        { &black_screen }
+    );
+    if (ret < 0){
+        console.log("Failed to fly to camp after 5 seconds.", COLOR_RED);
+        return false;
+    }
+    console.log("Arrived at camp...");
+    env.wait_for(std::chrono::seconds(1));
+    return true;
+}
+
+
+
+
+
+
+
+
+
+
 
 void TestProgram::program(MultiSwitchProgramEnvironment& env){
     using namespace Kernels;
@@ -245,6 +402,160 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
+    EscapeFromAttack session(env, console);
+    session.run_session();
+    cout << "Done escaping!" << endl;
+
+
+#if 0
+    MapDetector detector;
+    VideoOverlaySet overlays(overlay);
+    detector.make_overlays(overlays);
+#endif
+
+#if 0
+    ButtonDetector detector(
+        console, console,
+        ButtonType::ButtonA,
+        {0.55, 0.40, 0.20, 0.40},
+        std::chrono::milliseconds(200), true
+    );
+    VideoOverlaySet overlays(overlay);
+    detector.make_overlays(overlays);
+
+    detector.process_frame(feed.snapshot(), std::chrono::system_clock::now());
+#endif
+
+
+#if 0
+    UnderAttackWatcher watcher;
+    wait_until(
+        env, console,
+         std::chrono::seconds(60),
+         { &watcher }
+    );
+#endif
+
+
+//    InferenceBoxScope box(overlay, 0.49, 0.07, 0.02, 0.03);
+//    ImageStats stats = image_stats(extract_box(feed.snapshot(), box));
+//    cout << stats.average << stats.stddev << endl;
+
+
+//    return_to_jubilife_from_overworld(env, console);
+
+
+
+#if 0
+    bool reset_required = false;
+
+
+    while (true){
+        if (reset_required){
+            pbf_press_button(console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            PokemonLA::reset_game_from_home(env, console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        }
+
+        if (!goto_camp_from_jubilife(env, console, Camp::HIGHLANDS_MOUNTAIN)){
+            PA_THROW_StringException("Unable to enter Coronet Highlands.");
+        }
+
+        MountDetector mount_detector;
+        while (true){
+            MountState mount = mount_detector.detect(feed.snapshot());
+            if (mount == MountState::NOTHING){
+                console.log("Unable to detect mount.", COLOR_RED);
+                PA_THROW_StringException("Unable to detect mount.");
+            }
+            if (mount == MountState::WYRDEER_OFF){
+                pbf_press_button(console, BUTTON_PLUS, 20, 105);
+                break;
+            }
+            if (mount == MountState::WYRDEER_ON){
+                pbf_wait(console, 5 * TICKS_PER_SECOND);
+                break;
+            }
+            pbf_press_dpad(console, DPAD_LEFT, 20, 50);
+            console.botbase().wait_for_all_requests();
+        }
+
+        bool success = false;
+
+
+        console.log("Traveling to Charm's location...");
+        {
+            DialogDetector dialog_detector;
+            int ret = run_until(
+                env, console,
+                [](const BotBaseContext& context){
+                    pbf_move_left_joystick(context, 0, 212, 50, 0);
+                    pbf_press_button(context, BUTTON_ZL, 50, 0);
+                    pbf_press_button(context, BUTTON_B, 500, 125);
+
+                    pbf_move_left_joystick(context, 224, 0, 50, 0);
+                    pbf_press_button(context, BUTTON_ZL, 50, 0);
+                    pbf_press_button(context, BUTTON_B, 400, 125);
+
+                    pbf_move_left_joystick(context, 0, 128, 50, 0);
+                    pbf_press_button(context, BUTTON_ZL, 50, 0);
+                    pbf_press_button(context, BUTTON_B, 875, 0);
+                },
+                { &dialog_detector }
+            );
+            if (ret >= 0){
+                console.log("Found Charm!", COLOR_BLUE);
+                if (mash_A_until_end_of_battle(env, console)){
+                    console.log("Battle succeeded!", COLOR_BLUE);
+                    success = true;
+                }else{
+                    console.log("Battle failed! Resetting...", COLOR_RED);
+                    reset_required = true;
+                    continue;
+                }
+            }
+        }
+
+
+        console.log("Traveling to Coin's location...");
+        {
+            DialogDetector dialog_detector;
+
+        }
+
+
+        if (success){
+            console.log("Returning to Jubilife...");
+            reset_required = false;
+            break;
+        }else{
+            console.log("Nothing found. Resetting...");
+            reset_required = true;
+        }
+    }
+#endif
+
+
+
+
+
+#if 0
+    pbf_move_right_joystick(console, 0, 128, 145, 0);
+    pbf_move_left_joystick(console, 128, 0, 50, 0);
+    pbf_press_button(console, BUTTON_B, 500, 125);
+
+    pbf_move_right_joystick(console, 255, 128, 45, 0);
+    pbf_move_left_joystick(console, 128, 0, 50, 0);
+    pbf_press_button(console, BUTTON_B, 420, 125);
+
+    pbf_move_right_joystick(console, 0, 128, 100, 0);
+    pbf_move_left_joystick(console, 128, 0, 50, 0);
+    pbf_press_button(console, BUTTON_B, 420, 125);
+#endif
+
+
+
+#if 0
+
     TradeNameReader reader(console, LANGUAGE, console);
     reader.read(feed.snapshot());
 
@@ -258,7 +569,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 //    std::map<std::string, int> catch_count;
-
+#endif
 
 
 

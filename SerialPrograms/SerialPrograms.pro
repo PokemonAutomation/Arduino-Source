@@ -381,26 +381,30 @@ SOURCES += \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfBoxTrade.cpp \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfTouchTrade.cpp \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.cpp \
-    Source/PokemonLA/Inference/PokemonLA_ArcDetector.cpp \
-    Source/PokemonLA/Inference/PokemonLA_BubbleDetector.cpp \
-    Source/PokemonLA/Inference/PokemonLA_ButtonDetector.cpp \
-    Source/PokemonLA/Inference/PokemonLA_FlagDetector.cpp \
-    Source/PokemonLA/Inference/PokemonLA_FlagTracker.cpp \
+    Source/PokemonLA/Inference/Objects/PokemonLA_ArcDetector.cpp \
+    Source/PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.cpp \
+    Source/PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.cpp \
+    Source/PokemonLA/Inference/Objects/PokemonLA_FlagDetector.cpp \
+    Source/PokemonLA/Inference/Objects/PokemonLA_FlagTracker.cpp \
+    Source/PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.cpp \
+    Source/PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.cpp \
+    Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_DialogDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_MapDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_MountDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_NotificationReader.cpp \
     Source/PokemonLA/Inference/PokemonLA_OutbreakReader.cpp \
-    Source/PokemonLA/Inference/PokemonLA_QuestMarkDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.cpp \
-    Source/PokemonLA/Inference/PokemonLA_ShinySymbolDetector.cpp \
-    Source/PokemonLA/Inference/PokemonLA_WhiteObjectDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.cpp \
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.cpp \
     Source/PokemonLA/Panels_PokemonLA.cpp \
     Source/PokemonLA/PokemonLA_Settings.cpp \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.cpp \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.cpp \
+    Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp \
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.cpp \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.cpp \
+    Source/PokemonLA/Programs/PokemonLA_MoneyFarmerHighlands.cpp \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.cpp \
     Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.cpp \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.cpp \
@@ -987,26 +991,30 @@ HEADERS += \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfBoxTrade.h \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfTouchTrade.h \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.h \
-    Source/PokemonLA/Inference/PokemonLA_ArcDetector.h \
-    Source/PokemonLA/Inference/PokemonLA_BubbleDetector.h \
-    Source/PokemonLA/Inference/PokemonLA_ButtonDetector.h \
-    Source/PokemonLA/Inference/PokemonLA_FlagDetector.h \
-    Source/PokemonLA/Inference/PokemonLA_FlagTracker.h \
+    Source/PokemonLA/Inference/Objects/PokemonLA_ArcDetector.h \
+    Source/PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.h \
+    Source/PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h \
+    Source/PokemonLA/Inference/Objects/PokemonLA_FlagDetector.h \
+    Source/PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h \
+    Source/PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.h \
+    Source/PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h \
+    Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_DialogDetector.h \
     Source/PokemonLA/Inference/PokemonLA_MapDetector.h \
     Source/PokemonLA/Inference/PokemonLA_MountDetector.h \
     Source/PokemonLA/Inference/PokemonLA_NotificationReader.h \
     Source/PokemonLA/Inference/PokemonLA_OutbreakReader.h \
-    Source/PokemonLA/Inference/PokemonLA_QuestMarkDetector.h \
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h \
-    Source/PokemonLA/Inference/PokemonLA_ShinySymbolDetector.h \
-    Source/PokemonLA/Inference/PokemonLA_WhiteObjectDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.h \
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.h \
     Source/PokemonLA/Panels_PokemonLA.h \
     Source/PokemonLA/PokemonLA_Settings.h \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.h \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.h \
+    Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.h \
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.h \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.h \
+    Source/PokemonLA/Programs/PokemonLA_MoneyFarmerHighlands.h \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.h \
     Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.h \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h \

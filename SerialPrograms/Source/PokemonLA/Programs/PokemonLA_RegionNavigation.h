@@ -7,6 +7,8 @@
 #ifndef PokemonAutomation_PokemonLA_RegionNavigation_H
 #define PokemonAutomation_PokemonLA_RegionNavigation_H
 
+#include "PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h"
+
 namespace PokemonAutomation{
     class ProgramEnvironment;
     class ConsoleHandle;
@@ -31,6 +33,9 @@ void goto_professor(ConsoleHandle& console, Camp camp);
 
 
 bool mash_A_to_change_region(ProgramEnvironment& env, ConsoleHandle& console);
+
+bool goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Camp camp);
+
 
 
 }

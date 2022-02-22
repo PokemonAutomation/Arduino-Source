@@ -1,0 +1,104 @@
+/*  Under Attack Detector
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#include <QImage>
+#include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "PokemonLA_UnderAttackDetector.h"
+
+#include <iostream>
+using std::cout;
+using std::endl;
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonLA{
+
+
+const char* UNDER_ATTACK_STRINGS[] = {
+    "Unknown",
+    "Safe",
+    "Under Attack",
+};
+
+
+UnderAttackWatcher::UnderAttackWatcher(Logger& logger)
+    : VisualInferenceCallback("UnderAttackWatcher")
+    , m_logger(logger)
+    , m_box(0.49, 0.07, 0.02, 0.03)
+    , m_state(UnderAttackState::UNKONWN)
+{}
+
+void UnderAttackWatcher::make_overlays(VideoOverlaySet& items) const{
+    items.add(COLOR_CYAN, m_box);
+}
+bool UnderAttackWatcher::process_frame(
+    const QImage& frame,
+    std::chrono::system_clock::time_point timestamp
+){
+    UnderAttackState state = detect(frame);
+
+//    SpinLockGuard lg(m_lock);
+
+    //  Clear out old history.
+    std::chrono::system_clock::time_point threshold = timestamp - std::chrono::seconds(1);
+    while (!m_history.empty()){
+        Sample& sample = m_history.front();
+        if (m_history.front().timestamp >= threshold){
+            break;
+        }
+        m_counts[sample.state]--;
+        m_history.pop_front();
+    }
+
+    size_t& count = m_counts[state];
+    m_history.emplace_back(Sample{timestamp, state});
+    count++;
+
+    //  Return most reported state in the last window.
+    UnderAttackState best_state = UnderAttackState::UNKONWN;
+    size_t best_count = 0;
+    for (const auto& item : m_counts){
+        if (best_count < item.second){
+            best_count = item.second;
+            best_state = item.first;
+        }
+    }
+
+    UnderAttackState last_state = this->state();
+    if (last_state != best_state){
+        m_logger.log(
+            std::string("State changed from ") + UNDER_ATTACK_STRINGS[(int)last_state] +
+            " to " + UNDER_ATTACK_STRINGS[(int)best_state] + ".",
+            COLOR_PURPLE
+        );
+    }
+    m_state.store(best_state, std::memory_order_release);
+
+    return false;
+}
+
+
+UnderAttackState UnderAttackWatcher::detect(const QImage& frame){
+    ImageStats stats = image_stats(extract_box(frame, m_box));
+//    cout << stats.average << stats.stddev << endl;
+    if (stats.stddev.sum() > 100){
+        return UnderAttackState::SAFE;
+    }
+    if (stats.average.r < 160 || stats.average.g > 110 || stats.average.b > 80){
+        return UnderAttackState::SAFE;
+    }
+    if (stats.average.r < stats.average.g * 1.5 || stats.average.r < stats.average.g * 2.0){
+        return UnderAttackState::SAFE;
+    }
+//    cout << "Under attack!" << endl;
+    return UnderAttackState::UNDER_ATTACK;
+}
+
+
+}
+}
+}

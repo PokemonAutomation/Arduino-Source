@@ -54,7 +54,7 @@ SelfTouchTrade::SelfTouchTrade(const SelfTouchTrade_Descriptor& descriptor)
     )
     , BOXES_TO_TRADE(
         "<b>Number of Boxes to Touch-Trade:</b>",
-        2, 0, 31
+        2, 0, 32
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
@@ -172,6 +172,12 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env){
 
     for (uint8_t boxes = 0; boxes < BOXES_TO_TRADE;){
         env.update_stats();
+        send_program_status_notification(
+            env.logger(), NOTIFICATION_STATUS_UPDATE,
+            env.program_info(),
+            "",
+            stats.to_str()
+        );
 
         //  Make sure both consoles have selected something.
         bool host_ok, recv_ok;

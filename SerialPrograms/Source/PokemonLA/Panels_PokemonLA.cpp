@@ -12,6 +12,7 @@
 #include "Programs/PokemonLA_BraviaryHeightGlitch.h"
 #include "Programs/PokemonLA_DistortionWaiter.h"
 #include "Programs/PokemonLA_OutbreakFinder.h"
+#include "Programs/PokemonLA_MoneyFarmerHighlands.h"
 
 #include "Programs/PokemonLA_SelfTouchTrade.h"
 
@@ -33,6 +34,10 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<BraviaryHeightGlitch_Descriptor, BraviaryHeightGlitch>();
     add_program<DistortionWaiter_Descriptor, DistortionWaiter>();
     add_program<OutbreakFinder_Descriptor, OutbreakFinder>();
+
+    if (GlobalSettings::instance().DEVELOPER_MODE){
+        add_program<MoneyFarmerHighlands_Descriptor, MoneyFarmerHighlands>();
+    }
 
     add_program<SelfTouchTrade_Descriptor, SelfTouchTrade>();
 

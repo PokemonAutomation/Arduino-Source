@@ -15,8 +15,8 @@
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonLA/PokemonLA_Settings.h"
-#include "PokemonLA/Inference/PokemonLA_ArcDetector.h"
-#include "PokemonLA/Inference/PokemonLA_ShinySymbolDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_ArcDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA_ShinyHunt-LakeTrio.h"
 

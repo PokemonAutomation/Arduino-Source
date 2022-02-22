@@ -9,6 +9,7 @@
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "PokemonLA/Inference/PokemonLA_MapDetector.h"
 #include "PokemonLA_RegionNavigation.h"
 
 namespace PokemonAutomation{
@@ -90,6 +91,146 @@ bool mash_A_to_change_region(ProgramEnvironment& env, ConsoleHandle& console){
     env.wait_for(std::chrono::seconds(1));
     return true;
 }
+
+
+bool goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Camp camp){
+    //  Open the map.
+    pbf_move_left_joystick(console, 128, 255, 200, 0);
+    {
+        MapDetector detector;
+        int ret = run_until(
+            env, console,
+            [](const BotBaseContext& context){
+                for (size_t c = 0; c < 10; c++){
+                    pbf_press_button(context, BUTTON_A, 20, 105);
+                }
+            },
+            { &detector }
+        );
+        if (ret < 0){
+            console.log("Map not detected after 10 x A presses.", COLOR_RED);
+            return false;
+        }
+        console.log("Found map!");
+        env.wait_for(std::chrono::milliseconds(500));
+    }
+
+    MapRegion region;
+    size_t slot;
+    DpadPosition direction;
+    switch (camp){
+    case Camp::FIELDLANDS_FIELDLANDS:
+        region = MapRegion::FIELDLANDS;
+        slot = 0;
+        direction = DPAD_RIGHT;
+        break;
+    case Camp::FIELDLANDS_HEIGHTS:
+        region = MapRegion::FIELDLANDS;
+        slot = 1;
+        direction = DPAD_RIGHT;
+        break;
+    case Camp::MIRELANDS_MIRELANDS:
+        region = MapRegion::MIRELANDS;
+        slot = 0;
+        direction = DPAD_RIGHT;
+        break;
+    case Camp::MIRELANDS_BOGBOUND:
+        region = MapRegion::MIRELANDS;
+        slot = 1;
+        direction = DPAD_RIGHT;
+        break;
+    case Camp::COASTLANDS_BEACHSIDE:
+        region = MapRegion::COASTLANDS;
+        slot = 0;
+        direction = DPAD_RIGHT;
+        break;
+    case Camp::COASTLANDS_COASTLANDS:
+        region = MapRegion::COASTLANDS;
+        slot = 1;
+        direction = DPAD_RIGHT;
+        break;
+    case Camp::HIGHLANDS_HIGHLANDS:
+        region = MapRegion::HIGHLANDS;
+        slot = 0;
+        direction = DPAD_LEFT;
+        break;
+    case Camp::HIGHLANDS_MOUNTAIN:
+        region = MapRegion::HIGHLANDS;
+        slot = 1;
+        direction = DPAD_LEFT;
+        break;
+    case Camp::HIGHLANDS_SUMMIT:
+        region = MapRegion::HIGHLANDS;
+        slot = 2;
+        direction = DPAD_LEFT;
+        break;
+    case Camp::ICELANDS_SNOWFIELDS:
+        region = MapRegion::ICELANDS;
+        slot = 0;
+        direction = DPAD_LEFT;
+        break;
+    case Camp::ICELANDS_ICEPEAK:
+        region = MapRegion::ICELANDS;
+        slot = 1;
+        direction = DPAD_LEFT;
+        break;
+    default:
+        PA_THROW_StringException("Invalid Camp Enum: " + std::to_string((int)camp));
+    }
+
+
+    //  Move to region.
+    MapRegion current_region = MapRegion::NONE;
+    for (size_t c = 0; c < 10; c++){
+        current_region = detect_selected_region(env, console);
+        if (current_region == region){
+            break;
+        }
+        pbf_press_dpad(console, direction, 20, 40);
+        console.botbase().wait_for_all_requests();
+    }
+    if (current_region != region){
+        console.log(std::string("Unable to find ") + MAP_REGION_NAMES[(int)region] + ".", COLOR_RED);
+        return false;
+    }
+
+    if (slot != 0){
+        pbf_press_button(console, BUTTON_A, 20, 105);
+        for (size_t c = 0; c < slot; c++){
+            pbf_press_dpad(console, DPAD_DOWN, 20, 30);
+        }
+    }
+
+    //  Enter the region.
+    if (!mash_A_to_change_region(env, console)){
+        console.log(std::string("Unable to enter ") + MAP_REGION_NAMES[(int)region] + ".", COLOR_RED);
+        return false;
+    }
+    return true;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
