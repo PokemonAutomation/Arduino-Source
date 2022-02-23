@@ -291,8 +291,8 @@ void AudioSelectorWidget::spectrums_latest(size_t numLatestSpectrums, std::vecto
     m_display.spectrums_latest(numLatestSpectrums, spectrums);
 }
 
-void AudioSelectorWidget::add_overlay(size_t startingStamp, size_t endStamp){
-    m_display.add_overlay(startingStamp, endStamp);
+void AudioSelectorWidget::add_overlay(size_t startingStamp, size_t endStamp, Color color){
+    m_display.add_overlay(startingStamp, endStamp, color);
 }
 
 void AudioSelectorWidget::set_audio_enabled(bool enabled){

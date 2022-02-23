@@ -16,6 +16,7 @@
 
 #include "Programs/PokemonLA_SelfBoxTrade.h"
 #include "Programs/PokemonLA_SelfTouchTrade.h"
+#include "Programs/PokemonLA_ShinySoundListener.h"
 
 //#include "Programs/PokemonLA_ShinyHunt-LakeTrio.h"
 #include "PokemonLA/Programs/PokemonLA_OverworldWatcher.h"
@@ -50,6 +51,7 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
 //        add_program<ShinyHuntLakeTrio_Descriptor, ShinyHuntLakeTrio>();
         add_divider("---- Developer Tools ----");
         add_program<OverworldWatcher_Descriptor, OverworldWatcher>();
+        add_program<ShinySoundListener_Descriptor, ShinySoundListener>();
     }
 
     finish_panel_setup();

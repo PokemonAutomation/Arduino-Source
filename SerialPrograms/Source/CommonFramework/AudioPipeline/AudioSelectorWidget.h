@@ -46,15 +46,16 @@ public:
 
     void reset_audio();
 
-    //  Inplement AudioFeed::async_reset_audio().
-    //  Can be called from any thread.
+    // Functions below are implementations of the interfaces in `AudioFeed`.
+    // See class `AudioFeed` for the comments of those functions.
+
     virtual void async_reset_audio() override;
 
     virtual void spectrums_since(size_t startingStamp, std::vector<std::shared_ptr<AudioSpectrum>>& spectrums) override;
 
     virtual void spectrums_latest(size_t numLatestSpectrums, std::vector<std::shared_ptr<AudioSpectrum>>& spectrums) override;
 
-    virtual void add_overlay(size_t startingStamp, size_t endStamp) override;
+    virtual void add_overlay(size_t startingStamp, size_t endStamp, Color color) override;
 
 signals:
     // Need to define this version of async_reset_audio()
