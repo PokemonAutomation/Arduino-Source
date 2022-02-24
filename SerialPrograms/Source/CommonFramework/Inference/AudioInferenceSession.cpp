@@ -72,7 +72,12 @@ void AudioInferenceSession::operator+=(AudioInferenceCallback& callback){
         std::forward_as_tuple(&callback)
     ).first->second;
 
-    m_callback_list.emplace_back(&entry);
+    try{
+        m_callback_list.emplace_back(&entry);
+    }catch (...){
+        m_callback_map.erase(&callback);
+        throw;
+    }
 }
 void AudioInferenceSession::operator-=(AudioInferenceCallback& callback){
     std::unique_lock<std::mutex> lg(m_lock);
@@ -102,7 +107,7 @@ AudioInferenceCallback* AudioInferenceSession::run(std::chrono::system_clock::ti
     size_t lastTimestamp = SIZE_MAX;
     // Stores new spectrums from audio feed. The newest spectrum (with largest timestamp) is at
     // the front of the vector.
-    std::vector<std::shared_ptr<PokemonAutomation::AudioSpectrum>> spectrums;
+    std::vector<std::shared_ptr<const PokemonAutomation::AudioSpectrum>> spectrums;
 
     while (true){
         m_env.check_stopping();

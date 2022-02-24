@@ -66,9 +66,11 @@ public:
     // AudioSelectWidget inherits AudioFeed, and calls the functions below to fulfill the AudioFeed interface.
     // See class `AudioFeed` for the comments of those functions.
 
-    void spectrums_since(size_t startingStamp, std::vector<std::shared_ptr<AudioSpectrum>>& spectrums);
+    int sample_rate();
 
-    void spectrums_latest(size_t numLatestSpectrums, std::vector<std::shared_ptr<AudioSpectrum>>& spectrums);
+    void spectrums_since(size_t startingStamp, std::vector<std::shared_ptr<const AudioSpectrum>>& spectrums);
+
+    void spectrums_latest(size_t numLatestSpectrums, std::vector<std::shared_ptr<const AudioSpectrum>>& spectrums);
 
     void add_overlay(size_t startingStamp, size_t endStamp, Color color);
 
@@ -78,10 +80,11 @@ public:
     void saveAudioFrequenciesToDisk(bool enable);
 
 signals:
+    // Used to pass the changed volume from AudioSelectorWidget to audio thread.
     void volumeChanged(float volume);
 
 public slots:
-    // The audio thread (managed by m_audioThreadController) send signal
+    // The audio thread (managed by m_audioThreadController) sends signal
     // to this slot to pass FFT outputs to the display.
     void loadFFTOutput(const QVector<float>& fftOutput);
 
@@ -113,6 +116,11 @@ private:
     // The index of the next window in m_freqVisBlocks.
     size_t m_nextFFTWindowIndex = 0;
 
+    // The sample rate of the current audio stream.
+    int m_sampleRate = 0;
+    // Since other threads may query sample rate, add a lock.
+    std::mutex m_sampleRate_lock;
+
     std::deque<int> m_width_history;
     std::set<int> m_recent_widths;
 
@@ -122,7 +130,7 @@ private:
     // of audio inference for automation programs.
     // The head of the list is the most recent FFT window, while the tail
     // is the oldest in history.
-    std::list<std::shared_ptr<AudioSpectrum>> m_spectrums;
+    std::list<std::shared_ptr<const AudioSpectrum>> m_spectrums;
     size_t m_spectrum_history_length = 10;
     // Since the spectrums will be probided to the automation programs in
     // other threads, we need to have a lock here.

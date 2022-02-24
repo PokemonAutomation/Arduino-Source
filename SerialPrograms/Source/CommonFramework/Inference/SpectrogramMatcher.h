@@ -31,20 +31,23 @@ public:
         SPIKE_CONV,
     };
 
-    SpectrogramMatcher(const QString& templateFilename, Mode mode);
+    SpectrogramMatcher(const QString& templateFilename, Mode mode, int sampleRate=48000);
 
     // Match the newest spectrums and return a match score.
     // Newer (larger timestamp) spectrums at beginning of `newSpectrums` while older (smaller
     // timestamp) spectrums at the end.
     // In invalid cases (internal error or not enough windows), return FLT_MAX
-    float match(const std::vector<std::shared_ptr<AudioSpectrum>>& newSpectrums);
+    float match(const std::vector<std::shared_ptr<const AudioSpectrum>>& newSpectrums);
 
     // Pass some spectrums in but don't run match on them.
     // Used for skipping some spectrums to avoid unnecessary matching.
     // Newer (larger timestamp) spectrums at beginning of `newSpectrums` while older (smaller
     // timestamp) spectrums at the end.
     // Return true if there is no error.
-    bool skip(const std::vector<std::shared_ptr<AudioSpectrum>>& newSpectrums);
+    bool skip(const std::vector<std::shared_ptr<const AudioSpectrum>>& newSpectrums);
+
+    // Clear internal data to be used on another audio stream.
+    void clear();
 
     size_t numTemplateWindows() const { return m_template.numWindows(); }
 
@@ -52,17 +55,22 @@ public:
     // Return SIZE_MAX if there is no stored spectrum yet.
     size_t latestTimestamp() const;
 
+    // Return the scale found by the matcher to scale the input audio stream to best
+    // match the template in the last `match()`.
+    // Return 0.0f if the last scale is not available.
+    float lastMatchedScale() const { return m_lastScale; }
+
 private:
     void conv(const float* src, size_t num, float* dst);
     float templateNorm() const;
 
     // Update internal data for the next new spectrum. Called by `updateToNewSpectrums()`.
     // Return true if there is no error.
-    bool updateToNewSpectrum(std::shared_ptr<AudioSpectrum> newSpectrum);
+    bool updateToNewSpectrum(std::shared_ptr<const AudioSpectrum> newSpectrum);
 
     // Update internal data for the new specttrums.
     // Return true if there is no error.
-    bool updateToNewSpectrums(const std::vector<std::shared_ptr<AudioSpectrum>>& newSpectrums);
+    bool updateToNewSpectrums(const std::vector<std::shared_ptr<const AudioSpectrum>>& newSpectrums);
 
 private:
     AudioTemplate m_template;
@@ -76,12 +84,13 @@ private:
 
     Mode m_mode = Mode::NO_CONV;
 
-    const std::array<float, 18> m_spikeKernel = {-4.f, -3.f, -2.f, -1.f, 0.f, 1.f, 2.f, 3.f, 4.f, 4.f, 3.f, 2.f, 1.f, 0.f, -1.f, -2.f, -3.f, -4.f};
+    std::vector<float> m_spikeKernel;
 
-    std::list<std::shared_ptr<AudioSpectrum>> m_spectrums;
+    std::list<std::shared_ptr<const AudioSpectrum>> m_spectrums;
     std::list<float> m_spectrumNormSqrs;
 
     size_t m_lastStampTested = SIZE_MAX;
+    float m_lastScale = 0.0f;
 };
 
 

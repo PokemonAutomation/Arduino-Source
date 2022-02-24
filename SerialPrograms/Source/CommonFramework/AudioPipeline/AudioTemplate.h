@@ -35,7 +35,7 @@ private:
     std::vector<float> m_spectrogram;
 };
 
-AudioTemplate loadAudioTemplate(const QString& filename); 
+AudioTemplate loadAudioTemplate(const QString& filename, int sampleRate = 48000); 
 
 
 

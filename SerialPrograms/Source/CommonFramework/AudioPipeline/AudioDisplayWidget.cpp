@@ -119,6 +119,10 @@ void AudioDisplayWidget::clear(){
         std::lock_guard<std::mutex> lock_gd(m_overlay_lock);
         m_overlay.clear();
     }
+    {
+        std::lock_guard<std::mutex> lock_gd(m_sampleRate_lock);
+        m_sampleRate = 0;
+    }
 }
 
 void AudioDisplayWidget::close_audio(){
@@ -141,15 +145,38 @@ void AudioDisplayWidget::set_audio(
     update_size();
     // Tell Qt to repaint the widget in the next drawing phase in the main loop.
     QWidget::update();
+
+    {
+        std::lock_guard<std::mutex> lock_gd(m_sampleRate_lock);
+        // Compute sample rate based on input data:
+        // Note, here we replicate the logic of choosing sample rate in the audio thread,
+        // AudioWorker::startAudio().
+        // It is less than ideal to replicate code, but because AudioWorker is in another thread,
+        // it is difficult to communicate the sample rate from AudioWorker to the UI thread where
+        // this AudioDisplayWidget resides without blocking.
+        // So we choose this simpler approach with the benefit of no blocking.
+        if (inputAbsoluteFilepath.size() > 0){
+            // We hard code sample rate from file to be 48KHz.
+            m_sampleRate = 48000;
+        } else{
+            m_sampleRate = inputInfo.preferredSampleRate();
+            if (m_sampleRate <= 40000){
+                m_sampleRate = 48000;
+            } else if (m_sampleRate >= 8000){
+                m_sampleRate /= 2;
+            }
+        }
+    }
 }
 
 void AudioDisplayWidget::loadFFTOutput(const QVector<float>& fftOutput){
     // std::cout << "T" << QThread::currentThread() << " AudioDisplayWidget::loadFFTOutput() called" << std::endl;
 
-    auto spectrum = std::make_shared<AudioSpectrum>(0, std::vector<float>(fftOutput.begin(), fftOutput.end()));
+    std::vector<float> spectrumVector(fftOutput.begin(), fftOutput.end());
     {
         std::lock_guard<std::mutex> lock_gd(m_spectrums_lock);
-        spectrum->stamp = (m_spectrums.size() > 0) ? m_spectrums.front()->stamp + 1 : 0;
+        const size_t stamp = (m_spectrums.size() > 0) ? m_spectrums.front()->stamp + 1 : 0;
+        auto spectrum = std::make_shared<const AudioSpectrum>(stamp, std::move(spectrumVector));
         m_spectrums.push_front(spectrum);
         if (m_spectrums.size() > m_spectrum_history_length){
             m_spectrums.pop_back();
@@ -400,7 +427,13 @@ void AudioDisplayWidget::resizeEvent(QResizeEvent* event){
 }
 
 
-void AudioDisplayWidget::spectrums_since(size_t startingStamp, std::vector<std::shared_ptr<AudioSpectrum>>& spectrums){
+int AudioDisplayWidget::sample_rate(){
+    std::lock_guard<std::mutex> lock_gd(m_sampleRate_lock);
+    return m_sampleRate;
+}
+
+
+void AudioDisplayWidget::spectrums_since(size_t startingStamp, std::vector<std::shared_ptr<const AudioSpectrum>>& spectrums){
     std::lock_guard<std::mutex> lock_gd(m_spectrums_lock);
     for(const auto& ptr : m_spectrums){
         if (ptr->stamp >= startingStamp){
@@ -411,7 +444,7 @@ void AudioDisplayWidget::spectrums_since(size_t startingStamp, std::vector<std::
     }
 }
 
-void AudioDisplayWidget::spectrums_latest(size_t numLatestSpectrums, std::vector<std::shared_ptr<AudioSpectrum>>& spectrums){
+void AudioDisplayWidget::spectrums_latest(size_t numLatestSpectrums, std::vector<std::shared_ptr<const AudioSpectrum>>& spectrums){
     std::lock_guard<std::mutex> lock_gd(m_spectrums_lock);
     size_t i = 0;
     for(const auto& ptr : m_spectrums){

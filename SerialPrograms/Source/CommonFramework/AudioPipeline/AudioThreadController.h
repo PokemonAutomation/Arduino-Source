@@ -58,6 +58,8 @@ private:
     QThread m_fftThread;
     FFTWorker* m_fftWorker = nullptr;
 
+    int m_sampleRate = 0;
+
 };
 
 

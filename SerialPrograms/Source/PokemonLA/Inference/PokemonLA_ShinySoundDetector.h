@@ -9,23 +9,28 @@
 
 #include "CommonFramework/Logging/Logger.h"
 #include "CommonFramework/Inference/AudioInferenceCallback.h"
-#include "CommonFramework/Inference/SpectrogramMatcher.h"
 
 #include <memory>
 
 namespace PokemonAutomation{
+
+class SpectrogramMatcher;
+
 namespace NintendoSwitch{
 namespace PokemonLA{
 
 
 class ShinySoundDetector : public AudioInferenceCallback{
 public:
-    ShinySoundDetector(Logger& logger);
+    ShinySoundDetector(Logger& logger, int sampleRate);
 
     virtual bool process_spectrums(
-        const std::vector<std::shared_ptr<AudioSpectrum>>& newSpectrums,
+        const std::vector<std::shared_ptr<const AudioSpectrum>>& newSpectrums,
         AudioFeed& audioFeed
     ) override;
+
+    // Clear internal data to be used on another audio stream.
+    void clear();
 
 private:
 

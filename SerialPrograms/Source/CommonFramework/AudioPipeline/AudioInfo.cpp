@@ -160,6 +160,9 @@ bool AudioInfo::operator==(const AudioInfo& info){
     return device_name() == info.device_name();
 }
 
+int AudioInfo::preferredSampleRate() const{
+    return this->native_info().preferredFormat().sampleRate();
+}
 
 }
 

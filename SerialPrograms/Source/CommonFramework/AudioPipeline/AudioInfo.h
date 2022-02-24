@@ -43,6 +43,8 @@ public:
     const QString& display_name() const;
     const NativeAudioInfo& native_info() const;
 
+    int preferredSampleRate() const;
+
     bool operator==(const AudioInfo& info);
 
     static std::vector<AudioInfo> all_input_devices();

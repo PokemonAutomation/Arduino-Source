@@ -57,6 +57,14 @@ bool AudioFileLoader::start(){
             return false;
         }
 
+        const int wavSampleRate = m_wavFile->audioFormat().sampleRate();
+        if (wavSampleRate != m_audioFormat.sampleRate()){
+            std::cout << "Error: we don't interpolate wav file sample rate " << wavSampleRate << " to " << 
+                m_audioFormat.sampleRate() << " during playback" << std::endl;
+            return false;
+        }
+
+
         buildTimer();
         connect(m_timer, &QTimer::timeout, this, &AudioFileLoader::sendBufferFromWavFileOnTimer);
         
@@ -141,9 +149,9 @@ bool AudioFileLoader::initWavFile(){
     std::cout << "Wav file audio format: ";
     printAudioFormat(m_wavFile->audioFormat());
 
-    int wavSampleRate = m_wavFile->audioFormat().sampleRate();
-    if (wavSampleRate != m_audioFormat.sampleRate()){
-        std::cout << "Error: we don't interpolate wav file sample rate " << wavSampleRate << " to " << m_audioFormat.sampleRate() << std::endl;
+    if (m_audioFormat.sampleRate() != m_wavFile->audioFormat().sampleRate()){
+        std::cout << "Error: WavFile sample rate " << m_wavFile->audioFormat().sampleRate() <<
+            " does not match required " << m_audioFormat.sampleRate() << std::endl;
         return false;
     }
 
@@ -253,9 +261,6 @@ std::tuple<const char*, size_t> AudioFileLoader::convertRawWavSamples(){
     printAudioFormat(m_audioFormat);
     return std::make_tuple<const char*, size_t>(reinterpret_cast<const char*>(m_floatBuffer.data()), 0);
 }
-
-
-
 
 
 AudioDecoderWorker::AudioDecoderWorker(

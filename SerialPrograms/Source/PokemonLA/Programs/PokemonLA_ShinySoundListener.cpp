@@ -14,6 +14,7 @@
 #include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
 #include "CommonFramework/Inference/AudioInferenceSession.h"
+#include "CommonFramework/Inference/SpectrogramMatcher.h"
 
 #include <set>
 #include <iostream>
@@ -47,16 +48,25 @@ ShinySoundListener::ShinySoundListener(const ShinySoundListener_Descriptor& desc
 {}
 
 
+void searchAudioDump();
 
 void ShinySoundListener::program(SingleSwitchProgramEnvironment& env){
     //  Connect the controller.
     // pbf_move_right_joystick(env.console, 0, 255, 10, 0);
 
+    // searchAudioDump();
+
     std::cout << "Running audio test program." << std::endl;
 
     auto& audioFeed = env.console.audio();
+    const int sampleRate = audioFeed.sample_rate();
+
+    if (sampleRate == 0){
+        std::cout << "Error: sample rate 0, audio stream not initialized" << std::endl;
+        return;
+    }
     
-    ShinySoundDetector detector(env.console);
+    ShinySoundDetector detector(env.console, sampleRate);
 
 #if 0
     AsyncAudioInferenceSession session(env, env.console, audioFeed);
@@ -73,7 +83,7 @@ void ShinySoundListener::program(SingleSwitchProgramEnvironment& env){
     size_t lastTimestamp = SIZE_MAX;
     // Stores new spectrums from audio feed. The newest spectrum (with largest timestamp) is at
     // the front of the vector.
-    std::vector<std::shared_ptr<PokemonAutomation::AudioSpectrum>> spectrums;
+    std::vector<std::shared_ptr<const PokemonAutomation::AudioSpectrum>> spectrums;
 
     while(true){
         env.wait_for(std::chrono::milliseconds(10));
@@ -90,6 +100,11 @@ void ShinySoundListener::program(SingleSwitchProgramEnvironment& env){
         if (spectrums.size() > 0){
             // spectrums[0] has the newest spectrum with the largest stamp:
             lastTimestamp = spectrums[0]->stamp;
+            // std::cout << "Incoming stamps: ";
+            // for(auto it = spectrums.rbegin(); it != spectrums.rend(); it++){
+            //     std::cout << (*it)->stamp << " ";
+            // }
+            // std::cout << std::endl;
         }
 
         bool found = detector.process_spectrums(spectrums, audioFeed);
@@ -107,17 +122,10 @@ void ShinySoundListener::program(SingleSwitchProgramEnvironment& env){
 void searchAudioDump(){
 
     QString shinyFilename = "./heracrossShinyTemplateCompact.wav";
-    AudioTemplate shinyTemplate = loadAudioTemplate(shinyFilename);
-    const size_t numTemplateWindows = shinyTemplate.numWindows();
-    const size_t numTemplateFrequencies = shinyTemplate.numFrequencies();
-
+    SpectrogramMatcher matcher(shinyFilename, SpectrogramMatcher::Mode::SPIKE_CONV);
     
-    // TODO: get sample rate as part of the AudioFeed interface:
-    const int sampleRate = 48000;
-    const int halfSampleRate = sampleRate / 2;
-
-    std::string fileListFile = "./scripts/short_audio_files.txt";
-    // std::string fileListFile = "1.txt";
+    // std::string fileListFile = "./scripts/short_audio_files.txt";
+    std::string fileListFile = "1.txt";
     // std::string fileListFile = "./scripts/all_audio_files.txt";
     std::ifstream fin(fileListFile.c_str());
     std::vector<std::string> fileList;
@@ -134,6 +142,9 @@ void searchAudioDump(){
     std::ofstream fout("file_check_output.txt");
 
     for(size_t fileIdx = 0; fileIdx < fileList.size(); fileIdx++){
+        matcher.clear();
+
+
         const auto& path = fileList[fileIdx];
         std::ostringstream os;
         os << "File " << fileIdx << "/" << fileList.size() << " " << path << " ";
@@ -150,49 +161,29 @@ void searchAudioDump(){
         os << "#W " << audio.numWindows() << " ";
 
         // match!
-        float minDistance = FLT_MAX;
-        for(size_t audioIdx = 0; audioIdx < audio.numWindows(); audioIdx++){
-            float streamSumSqr = 0.0f;
-            float sumMulti = 0.0f;
-            for(size_t i = 0; i < numTemplateWindows; i++){
-                // match in order from latest window to oldest
-                const float* templateData = shinyTemplate.getWindow(i);
-                if (audioIdx + i < audio.numWindows()){
-                    const float* streamData = audio.getWindow(audioIdx+i);
-                    for(size_t j = 1; j < numTemplateFrequencies; j++){
-                        streamSumSqr += streamData[j] * streamData[j];
-                        sumMulti += templateData[j] * streamData[j];
-                    }
-                }
+        float minScore = FLT_MAX;
+        std::vector<std::shared_ptr<const AudioSpectrum>> newSpectrums;
+        size_t numStreamWindows = std::max(matcher.numTemplateWindows(), audio.numWindows());
+        for(size_t audioIdx = 0; audioIdx < numStreamWindows; audioIdx++){
+            newSpectrums.clear();
+            std::vector<float> freqVector(audio.numFrequencies());
+            if (audioIdx < audio.numWindows()){
+                const float * freq = audio.getWindow(audioIdx);
+                memcpy(freqVector.data(), freq, sizeof(float) * audio.numFrequencies());
+            } else{
+                // add zero-freq window
             }
-            float scale = (streamSumSqr < 1e-6f ? 1.0f : sumMulti / streamSumSqr);
-
-            float sum = 0.0f;
-            for(size_t i = 0; i < numTemplateWindows; i++){
-                // match in order from latest window to oldest
-                const float* templateData = shinyTemplate.getWindow(i);
-                if (audioIdx + i < audio.numWindows()){
-                    const float* streamData = audio.getWindow(audioIdx+i);
-                    for(size_t j = 1; j < numTemplateFrequencies; j++){
-                        float d = templateData[j] - scale * streamData[j];
-                        sum += d * d;
-                    }
-                }else{
-                    for(size_t j = 1; j < numTemplateFrequencies; j++){
-                        sum += templateData[j] * templateData[j];
-                    }
-                }
-            }
-            float distance = sqrt(sum);
-
-            minDistance = std::min(minDistance, distance);
+            auto spectrum = std::make_shared<const AudioSpectrum>(audioIdx, std::move(freqVector));
+            newSpectrums.push_back(spectrum);
+            float score = matcher.match(newSpectrums);
+            minScore = std::min(score, minScore);
         } // end audio Idx
 
-        os << "dist " << minDistance << std::endl;
+        os << "dist " << minScore << std::endl;
         fout << os.str();
         std::cout << os.str() << std::flush;
 
-        closestFiles.emplace(minDistance, path);
+        closestFiles.emplace(minScore, path);
     }
 
     fout.close();

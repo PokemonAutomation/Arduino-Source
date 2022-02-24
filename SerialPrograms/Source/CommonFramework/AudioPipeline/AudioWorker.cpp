@@ -190,8 +190,7 @@ void AudioWorker::startAudio(){
             this->handleDeviceErrorState(newState, m_audioSource->error(), "AudioSource");
         });
     } // end if load audio from input audio device
-      
-
+    
     m_audioIODevice = new AudioIODevice(inputAudioFormat, m_channelMode);
     m_audioIODevice->open(QIODevice::ReadWrite | QIODevice::Unbuffered);
     connect(m_audioIODevice, &AudioIODevice::fftInputReady, this, &AudioWorker::fftInputReady);

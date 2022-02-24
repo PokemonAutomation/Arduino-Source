@@ -3,31 +3,49 @@
 #include "CommonFramework/Tools/AudioFeed.h"
 
 #include <iostream>
+#include <fstream>
 #include <cfloat>
 
 namespace PokemonAutomation{
 
 
-SpectrogramMatcher::SpectrogramMatcher(const QString& templateFilename, Mode mode) : m_mode(mode) {
-    m_template = loadAudioTemplate(templateFilename);
+SpectrogramMatcher::SpectrogramMatcher(const QString& templateFilename, Mode mode, int sampleRate) : m_mode(mode) {
+    m_template = loadAudioTemplate(templateFilename, sampleRate);
     const size_t numTemplateWindows = m_template.numWindows();
     m_numOriginalFrequencies = m_template.numFrequencies();
     if (m_template.numFrequencies() == 0){  // Error case, failed to load template
+        std::cout << "Error: load audio template failed" << std::endl;
         return;
     }
 
-    // TODO: get sample rate as part of the AudioFeed interface:
-    const int sampleRate = 48000;
     const int halfSampleRate = sampleRate / 2;
 
-     // The frquency range from [0.0, (numTemplateFrequencies-1)/numTemplateFrequencies * halfSampleRate]
+    // The frquency range from [0.0, halfSampleRate / numFrequencies, 2.0 halfSampleRate / numFrequencies, ... (numFrequencies-1) halfSampleRate / numFrequencies]
     // Since human can only hear as high as 20KHz sound, matching on frequencies >= 20KHz is meaningless.
     // So the index i of the max frequency we should be matching is the one with
-    // i /numTemplateFrequencies * halfSampleRate <= 20KHz
-    // i <= numTemplateFrequencies * 20K / halfSampleRate
+    // i * halfSampleRate/numFrequencies  <= 20KHz
+    // i <= numFrequencies * 20K / halfSampleRate
+    // We also have a cut-off threshold to remove lower frequencies. We set it to be at frequency index 5 when sample rate is 48K and numFrequencies is 2048.
+    // So 5.0 24K / 2048 = 58.59375Hz. For other sample rate and numFrequencies combinations,
+    // j * halfSampleRate/numFrequencies >= 58.59375 -> j >= 58.59375 * numFrequnecies / halfSampleRate
 
-    m_originalFreqStart = 5;
+    m_originalFreqStart = int(58.59375 * m_numOriginalFrequencies / halfSampleRate + 0.5);
     m_originalFreqEnd = 20000 * m_numOriginalFrequencies / halfSampleRate + 1;
+
+    // Initialize the spike convolution kernel:
+    // We find a good kernel when sample rate is 48K and numFrequencies is 2048:
+    // [-4.f, -3.f, -2.f, -1.f, 0.f, 1.f, 2.f, 3.f, 4.f, 4.f, 3.f, 2.f, 1.f, 0.f, -1.f, -2.f, -3.f, -4.f]
+    // This spans frenquency range of 17 * halfSampleRate / numFrequencies = 199.21875Hz, where 17 is the number of intervals in the above series.
+    // For another sample rate and numFrequencies combination, the number of intervals is 
+    // 199.21875 * numFrequencies / halfSampleRate
+    size_t numKernelIntervals = int(199.21875 * m_numOriginalFrequencies / halfSampleRate + 0.5);
+    size_t slopeLen = numKernelIntervals / 2;
+    for(size_t i = 0; i <= slopeLen; i++){
+        m_spikeKernel.push_back(-4.0f + 8.f * i / (float)slopeLen);
+    }
+    for(size_t i = ((numKernelIntervals+1) % 2); i <= slopeLen; i++){
+        m_spikeKernel.push_back(-4.0f + 8.f * (slopeLen-i)/(float)slopeLen);
+    }
     
     if (m_mode == Mode::SPIKE_CONV){
         // Do convolution on audio template
@@ -78,7 +96,7 @@ float SpectrogramMatcher::templateNorm() const{
     return std::sqrt(sumSqr);
 }
 
-bool SpectrogramMatcher::updateToNewSpectrum(std::shared_ptr<AudioSpectrum> spectrum){
+bool SpectrogramMatcher::updateToNewSpectrum(std::shared_ptr<const AudioSpectrum> spectrum){
     if (m_numOriginalFrequencies != spectrum->magnitudes.size()){
         std::cout << "Error: number of frequencies don't match in SpectrogramMatcher::match() " << 
             m_numOriginalFrequencies << " " << spectrum->magnitudes.size() << std::endl;
@@ -91,10 +109,12 @@ bool SpectrogramMatcher::updateToNewSpectrum(std::shared_ptr<AudioSpectrum> spec
         conv(spectrum->magnitudes.data() + m_originalFreqStart, 
             m_originalFreqEnd - m_originalFreqStart, convedSpectrum.data());
         
-        spectrum = std::make_shared<AudioSpectrum>(spectrum->stamp, std::move(convedSpectrum));
+        spectrum = std::make_shared<const AudioSpectrum>(spectrum->stamp, std::move(convedSpectrum));
     }
 
     // Compute the norm square (= sum squares) of the spectrum, used for matching:
+    // TODO: if there will be multiple SpectrogramMatcher running on the same audio stream, can
+    // move this per-spectrum computation to a shared struct for those matchers to save computation.
     float spectrumNormSqr = 0.0f;
     for(size_t i = m_freqStart; i < m_freqEnd; i++){
         spectrumNormSqr += spectrum->magnitudes[i] * spectrum->magnitudes[i];
@@ -106,7 +126,7 @@ bool SpectrogramMatcher::updateToNewSpectrum(std::shared_ptr<AudioSpectrum> spec
     return true;
 }
 
-bool SpectrogramMatcher::updateToNewSpectrums(const std::vector<std::shared_ptr<AudioSpectrum>>& newSpectrums){
+bool SpectrogramMatcher::updateToNewSpectrums(const std::vector<std::shared_ptr<const AudioSpectrum>>& newSpectrums){
     for(auto it = newSpectrums.rbegin(); it != newSpectrums.rend(); it++){
         if(!updateToNewSpectrum(*it)){
             return false;
@@ -121,7 +141,7 @@ bool SpectrogramMatcher::updateToNewSpectrums(const std::vector<std::shared_ptr<
     return true;
 }
 
-float SpectrogramMatcher::match(const std::vector<std::shared_ptr<AudioSpectrum>>& newSpectrums){
+float SpectrogramMatcher::match(const std::vector<std::shared_ptr<const AudioSpectrum>>& newSpectrums){
     if (!updateToNewSpectrums(newSpectrums)){
         return FLT_MAX;
     }
@@ -166,6 +186,7 @@ float SpectrogramMatcher::match(const std::vector<std::shared_ptr<AudioSpectrum>
         }
     }
     float scale = (streamSumSqr < 1e-6f ? 1.0f : sumMulti / streamSumSqr);
+    m_lastScale = scale;  // record the scale to be given to the caller on request.
     // std::cout << curStamp << " Matcher " << scale << " " << sumMulti << "/" << streamSumSqr << std::endl;
 
     iter = m_spectrums.begin();
@@ -187,7 +208,7 @@ float SpectrogramMatcher::match(const std::vector<std::shared_ptr<AudioSpectrum>
     return distance;
 }
 
-bool SpectrogramMatcher::skip(const std::vector<std::shared_ptr<AudioSpectrum>>& newSpectrums){
+bool SpectrogramMatcher::skip(const std::vector<std::shared_ptr<const AudioSpectrum>>& newSpectrums){
     // Note: ideally we don't want to have any computation while skipping.
     // But updateToNewSpectrums() may still do some filtering and vector norm computation.
     // Since the computation is relatively small and we won't be skipping lots of frames anyway,
@@ -196,6 +217,11 @@ bool SpectrogramMatcher::skip(const std::vector<std::shared_ptr<AudioSpectrum>>&
     return updateToNewSpectrums(newSpectrums);
 }
 
+void SpectrogramMatcher::clear(){
+    m_spectrums.clear();
+    m_spectrumNormSqrs.clear();
+    m_lastStampTested = SIZE_MAX;
+}
 
 
 

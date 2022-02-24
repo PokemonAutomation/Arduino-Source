@@ -51,9 +51,11 @@ public:
 
     virtual void async_reset_audio() override;
 
-    virtual void spectrums_since(size_t startingStamp, std::vector<std::shared_ptr<AudioSpectrum>>& spectrums) override;
+    virtual int sample_rate() override;
 
-    virtual void spectrums_latest(size_t numLatestSpectrums, std::vector<std::shared_ptr<AudioSpectrum>>& spectrums) override;
+    virtual void spectrums_since(size_t startingStamp, std::vector<std::shared_ptr<const AudioSpectrum>>& spectrums) override;
+
+    virtual void spectrums_latest(size_t numLatestSpectrums, std::vector<std::shared_ptr<const AudioSpectrum>>& spectrums) override;
 
     virtual void add_overlay(size_t startingStamp, size_t endStamp, Color color) override;
 
