@@ -4,6 +4,8 @@
  *
  */
 
+#include "CommonFramework/ImageTools/ImageStats.h"
+#include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
@@ -93,6 +95,33 @@ bool reset_game_from_home(
     console.botbase().wait_for_all_requests();
     return ret;
 }
+
+
+
+bool save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console){
+    InferenceBoxScope box(console, {0.450, 0.005, 0.040, 0.010});
+
+    console.log("Saving game...");
+    pbf_press_dpad(console, DPAD_UP, 20, 355);
+
+    for (size_t c = 0; c < 10; c++){
+        console.botbase().wait_for_all_requests();
+
+        ImageStats stats = image_stats(extract_box(console.video().snapshot(), box));
+        if (is_solid(stats, {0.208333, 0.338542, 0.453125}, 0.15, 15)){
+            pbf_press_button(console, BUTTON_A, 20, 605);
+            pbf_press_button(console, BUTTON_B, 20, 230);
+            pbf_press_button(console, BUTTON_B, 20, 355);
+            return true;
+        }
+        pbf_press_button(console, BUTTON_ZR, 20, 105);
+    }
+
+    console.log("Unable to find save menu.", COLOR_RED);
+    return false;
+}
+
+
 
 
 

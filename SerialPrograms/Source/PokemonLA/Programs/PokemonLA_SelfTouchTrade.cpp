@@ -128,14 +128,14 @@ bool SelfTouchTrade::move_to_next(ConsoleHandle& host, uint8_t& row, uint8_t& co
 
     host.log("Moving to next slot.");
     if (col < 5){
-        pbf_press_dpad(host, DPAD_RIGHT, 20, 105);
+        pbf_press_dpad(host, DPAD_RIGHT, 20, 140);
         col++;
         return false;
     }
     if (row < 4){
         pbf_press_dpad(host, DPAD_RIGHT, 20, 105);
         pbf_press_dpad(host, DPAD_RIGHT, 20, 105);
-        pbf_press_dpad(host, DPAD_DOWN, 20, 105);
+        pbf_press_dpad(host, DPAD_DOWN, 20, 140);
         col = 0;
         row++;
         return false;
@@ -143,7 +143,7 @@ bool SelfTouchTrade::move_to_next(ConsoleHandle& host, uint8_t& row, uint8_t& co
     pbf_press_button(host, BUTTON_R, 20, 230);
     pbf_press_dpad(host, DPAD_RIGHT, 20, 105);
     pbf_press_dpad(host, DPAD_RIGHT, 20, 105);
-    pbf_press_dpad(host, DPAD_DOWN, 20, 105);
+    pbf_press_dpad(host, DPAD_DOWN, 20, 140);
     col = 0;
     row = 0;
     return true;

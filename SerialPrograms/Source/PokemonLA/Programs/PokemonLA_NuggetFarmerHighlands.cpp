@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exception.h"
+#include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
@@ -16,29 +17,28 @@
 #include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
-#include "PokemonLA/Programs/PokemonLA_EscapeFromAttack.h"
-#include "PokemonLA_MoneyFarmerHighlands.h"
+#include "PokemonLA_NuggetFarmerHighlands.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-MoneyFarmerHighlands_Descriptor::MoneyFarmerHighlands_Descriptor()
+NuggetFarmerHighlands_Descriptor::NuggetFarmerHighlands_Descriptor()
     : RunnableSwitchProgramDescriptor(
-        "PokemonLA:MoneyFarmerHighlands",
-        STRING_POKEMON + " LA", "Money Farmer (Highlands)",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/MoneyFarmerHighlands.md",
-        "Farm money off the Miss Fortune sisters in the Coronet Highlands.",
+        "PokemonLA:NuggetFarmerHighlands",
+        STRING_POKEMON + " LA", "Nugget Farmer (Highlands)",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/NuggetFarmerHighlands.md",
+        "Farm nuggets off the Miss Fortune sisters in the Coronet Highlands.",
         FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
 
 
-MoneyFarmerHighlands::MoneyFarmerHighlands(const MoneyFarmerHighlands_Descriptor& descriptor)
+MoneyFarmerHighlands::MoneyFarmerHighlands(const NuggetFarmerHighlands_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
-    , NOTIFICATION_STATUS("Status Update", true, false)
+    , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
         &NOTIFICATION_ERROR_RECOVERABLE,
@@ -77,7 +77,7 @@ std::unique_ptr<StatsTracker> MoneyFarmerHighlands::make_stats() const{
 
 
 bool mash_A_until_end_of_battle(ProgramEnvironment& env, ConsoleHandle& console){
-    OverworldDetector detector;
+    OverworldDetector detector(console, console);
     int ret = run_until(
         env, console,
         [](const BotBaseContext& context){
@@ -90,72 +90,6 @@ bool mash_A_until_end_of_battle(ProgramEnvironment& env, ConsoleHandle& console)
         return false;
     }
     console.log("Returned to overworld.");
-    return true;
-}
-bool goto_camp_from_overworld(ProgramEnvironment& env, ConsoleHandle& console){
-    while (true){
-        EscapeFromAttack session(env, console);
-        session.run_session();
-        if (session.state() != UnderAttackState::SAFE){
-            console.log("Unable to escape from being attacked.", COLOR_RED);
-            return false;
-        }
-
-        //  Open the map.
-        pbf_press_button(console, BUTTON_MINUS, 20, 30);
-        {
-            MapDetector detector;
-            int ret = wait_until(
-                env, console,
-                std::chrono::seconds(5),
-                { &detector }
-            );
-            if (ret < 0){
-                console.log("Map not detected after 5 seconds.", COLOR_RED);
-                return false;
-            }
-            console.log("Found map!");
-            env.wait_for(std::chrono::milliseconds(500));
-        }
-
-        //  Try to fly back to camp.
-        pbf_press_button(console, BUTTON_X, 20, 30);
-
-        {
-            ButtonDetector detector(
-                console, console,
-                ButtonType::ButtonA,
-                {0.55, 0.40, 0.20, 0.40},
-                std::chrono::milliseconds(200), true
-            );
-            int ret = wait_until(
-                env, console,
-                std::chrono::seconds(2),
-                { &detector }
-            );
-            if (ret >= 0){
-                console.log("Flying back to camp...");
-                pbf_mash_button(console, BUTTON_A, 125);
-                break;
-            }
-            console.log("Unable to fly. Are you under attack?", COLOR_RED);
-        }
-
-        pbf_mash_button(console, BUTTON_B, 125);
-    }
-
-    BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.6});
-    int ret = wait_until(
-        env, console,
-        std::chrono::seconds(20),
-        { &black_screen }
-    );
-    if (ret < 0){
-        console.log("Failed to fly to camp after 5 seconds.", COLOR_RED);
-        return false;
-    }
-    console.log("Arrived at camp...");
-    env.wait_for(std::chrono::seconds(1));
     return true;
 }
 
@@ -175,6 +109,12 @@ void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env){
 
     while (true){
         env.update_stats();
+        send_program_status_notification(
+            env.logger(), NOTIFICATION_STATUS,
+            env.program_info(),
+            "",
+            stats.to_str()
+        );
 
         if (reset_required){
             pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
@@ -223,22 +163,28 @@ void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env){
 
         env.console.log("Traveling to Charm's location...");
         {
-            DialogDetector dialog_detector;
+            DialogDetector dialog_detector(env.console, env.console);
             //  TODO: Add shiny sound detector.
             int ret = run_until(
                 env, env.console,
                 [](const BotBaseContext& context){
                     pbf_move_left_joystick(context, 0, 212, 50, 0);
-                    pbf_press_button(context, BUTTON_ZL, 50, 0);
-                    pbf_press_button(context, BUTTON_B, 500, 125);
+                    pbf_press_button(context, BUTTON_B, 500, 80);
 
                     pbf_move_left_joystick(context, 224, 0, 50, 0);
-                    pbf_press_button(context, BUTTON_ZL, 50, 0);
-                    pbf_press_button(context, BUTTON_B, 400, 125);
+                    pbf_press_button(context, BUTTON_B, 350, 80);
 
-                    pbf_move_left_joystick(context, 0, 128, 50, 0);
-                    pbf_press_button(context, BUTTON_ZL, 50, 0);
-                    pbf_press_button(context, BUTTON_B, 875, 0);
+                    pbf_move_left_joystick(context, 0, 64, 50, 0);
+                    pbf_press_button(context, BUTTON_B, 250, 80);
+
+                    pbf_move_left_joystick(context, 0, 48, 50, 0);
+                    pbf_press_button(context, BUTTON_B, 270, 0);
+
+                    pbf_move_left_joystick(context, 0, 255, 50, 0);
+                    pbf_press_button(context, BUTTON_B, 150, 250);
+
+//                    pbf_move_right_joystick(context, 0, 128, 200, 125);
+
                 },
                 { &dialog_detector }
             );
@@ -270,16 +216,25 @@ void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env){
         if (success){
             env.console.log("Returning to Jubilife...");
             if (!goto_camp_from_overworld(env, env.console)){
+                stats.errors++;
                 reset_required = true;
                 continue;
             }
             goto_professor(env.console, Camp::HIGHLANDS_HIGHLANDS);
-
-            PA_THROW_StringException("Not yet implemented: Return to Jubilife.");
-
-            reset_required = false;
+            from_professor_return_to_jubilife(env, env.console);
+            if (!save_game_from_overworld(env, env.console)){
+                stats.errors++;
+                reset_required = true;
+            }else{
+                reset_required = false;
+            }
+            env.console.botbase().wait_for_all_requests();
         }else{
             env.console.log("Nothing found. Resetting...");
+//            if (!goto_camp_from_overworld(env, env.console)){
+//                reset_required = true;
+//                continue;
+//            }
             reset_required = true;
         }
     }

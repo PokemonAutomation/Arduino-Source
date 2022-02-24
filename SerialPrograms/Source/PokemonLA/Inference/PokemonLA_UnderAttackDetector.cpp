@@ -85,13 +85,13 @@ bool UnderAttackWatcher::process_frame(
 UnderAttackState UnderAttackWatcher::detect(const QImage& frame){
     ImageStats stats = image_stats(extract_box(frame, m_box));
 //    cout << stats.average << stats.stddev << endl;
-    if (stats.stddev.sum() > 100){
+//    if (stats.stddev.sum() > 100){
+//        return UnderAttackState::SAFE;
+//    }
+    if (stats.average.r < 160 || stats.average.g > 170 || stats.average.b > 130){
         return UnderAttackState::SAFE;
     }
-    if (stats.average.r < 160 || stats.average.g > 110 || stats.average.b > 80){
-        return UnderAttackState::SAFE;
-    }
-    if (stats.average.r < stats.average.g * 1.5 || stats.average.r < stats.average.g * 2.0){
+    if (stats.average.r < stats.average.g * 1.4 || stats.average.r < stats.average.g * 1.8){
         return UnderAttackState::SAFE;
     }
 //    cout << "Under attack!" << endl;

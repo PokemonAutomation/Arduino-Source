@@ -41,7 +41,9 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
     }
 
     m_object = extract_box(reference, *best);
+//    m_object.save("test.png");
     m_matcher.reset(new ExactImageMatcher(m_object));
+    m_area_ratio = best->area_ratio();
 }
 
 double WaterfillTemplateMatcher::rmsd(const QImage& object) const{
@@ -68,6 +70,7 @@ bool WaterfillTemplateMatcher::check_area_ratio(double candidate_area_ratio) con
         return true;
     }
     double error = candidate_area_ratio / m_area_ratio;
+//    cout << "area = " << error << endl;
     return m_area_ratio_lower <= error && error <= m_area_ratio_upper;
 }
 double WaterfillTemplateMatcher::rmsd(const QImage& image, const WaterfillObject& object) const{

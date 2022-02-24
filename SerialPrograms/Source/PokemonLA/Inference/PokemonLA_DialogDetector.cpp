@@ -10,18 +10,23 @@
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "PokemonLA_DialogDetector.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-DialogDetector::DialogDetector()
+DialogDetector::DialogDetector(Logger& logger, VideoOverlay& overlay)
     : VisualInferenceCallback("DialogDetector")
-    , m_title_top   (0.295, 0.725, 0.100, 0.005)
+    , m_title_top   (0.295, 0.722, 0.100, 0.005)
     , m_title_bottom(0.295, 0.765, 0.100, 0.005)
     , m_top_white   (0.500, 0.760, 0.200, 0.020)
-    , m_bottom_white(0.500, 0.900, 0.200, 0.020)
+    , m_bottom_white(0.400, 0.900, 0.200, 0.020)
     , m_cursor      (0.720, 0.855, 0.030, 0.060)
+    , m_arc_phone(logger, overlay, std::chrono::milliseconds(0), false)
 {}
 void DialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_title_top);
@@ -29,42 +34,38 @@ void DialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_top_white);
     items.add(COLOR_RED, m_bottom_white);
     items.add(COLOR_RED, m_cursor);
+    m_arc_phone.make_overlays(items);
 }
 bool DialogDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
+    size_t hits = 0;
+
     ImageStats title_top = image_stats(extract_box(frame, m_title_top));
 //    cout << title_top.average << title_top.stddev << endl;
-    if (!is_solid(title_top, {0.234899, 0.33557, 0.42953})){
-        return false;
-    }
+    hits += is_solid(title_top, {0.218332, 0.330301, 0.451367}, 0.2, 15) ? 1 : 0;
 
     ImageStats title_bottom = image_stats(extract_box(frame, m_title_bottom));
 //    cout << title_bottom.average << title_bottom.stddev << endl;
-    if (!is_solid(title_bottom, {0.234899, 0.33557, 0.42953})){
-        return false;
-    }
+    hits += is_solid(title_bottom, {0.226944, 0.323437, 0.449619}, 0.2, 15) ? 1 : 0;
 
     ImageStats top_white = image_stats(extract_box(frame, m_top_white));
 //    cout << top_white.average << top_white.stddev << endl;
-    if (!is_solid(top_white, {0.344919, 0.350944, 0.304137})){
-        return false;
-    }
+    hits += is_white(top_white, 480, 20) ? 1 : 0;
 
     ImageStats bottom_white = image_stats(extract_box(frame, m_bottom_white));
 //    cout << bottom_white.average << bottom_white.stddev << endl;
-    if (!is_solid(bottom_white, {0.344919, 0.350944, 0.304137})){
-        return false;
-    }
+    hits += is_white(bottom_white, 480, 20) ? 1 : 0;
 
     ImageStats cursor = image_stats(extract_box(frame, m_cursor));
 //    cout << cursor.average << cursor.stddev << endl;
-    if (cursor.stddev.sum() < 50){
-        return false;
-    }
+    hits += cursor.stddev.sum() < 50 ? 1 : 0;
 
-    return true;
+    m_arc_phone.process_frame(frame, timestamp);
+    hits += !m_arc_phone.detected();
+
+    return hits >= 5;
 }
 
 

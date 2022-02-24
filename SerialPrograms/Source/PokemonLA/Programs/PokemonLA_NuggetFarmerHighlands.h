@@ -15,15 +15,15 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class MoneyFarmerHighlands_Descriptor : public RunnableSwitchProgramDescriptor{
+class NuggetFarmerHighlands_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
-    MoneyFarmerHighlands_Descriptor();
+    NuggetFarmerHighlands_Descriptor();
 };
 
 
 class MoneyFarmerHighlands : public SingleSwitchProgramInstance{
 public:
-    MoneyFarmerHighlands(const MoneyFarmerHighlands_Descriptor& descriptor);
+    MoneyFarmerHighlands(const NuggetFarmerHighlands_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env) override;

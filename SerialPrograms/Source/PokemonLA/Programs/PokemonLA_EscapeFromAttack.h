@@ -24,7 +24,8 @@ public:
     EscapeFromAttack(
         ProgramEnvironment& env,
         ConsoleHandle& console,
-        std::chrono::seconds time_limit = std::chrono::seconds(30)
+        std::chrono::seconds time_min,
+        std::chrono::seconds time_limit
     );
 
     UnderAttackState state() const{
@@ -39,6 +40,7 @@ private:
     bool run_climbing(AsyncCommandSession& commands, WallClock timestamp);
 
 private:
+    static const uint16_t GET_ON_MOUNT_TIME = 125;
     static const uint16_t GET_ON_BRAVIARY_TIME = 280;
 
     enum class CurrentAction{
@@ -47,6 +49,7 @@ private:
         CLIMBING,
     };
 
+    std::chrono::system_clock::time_point m_min_stop;
     std::chrono::system_clock::time_point m_deadline;
 
     UnderAttackWatcher m_attacked;

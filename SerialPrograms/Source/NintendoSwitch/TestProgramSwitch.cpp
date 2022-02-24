@@ -163,6 +163,7 @@
 #include "CommonFramework/Tools/MultiConsoleErrors.h"
 #include "PokemonLA/Inference/PokemonLA_UnderAttackDetector.h"
 #include "PokemonLA/Programs/PokemonLA_EscapeFromAttack.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "TestProgramSwitch.h"
 
 #include <immintrin.h>
@@ -232,155 +233,6 @@ using namespace PokemonLA;
 
 
 
-#if 0
-bool get_on_braviary(ProgramEnvironment& env, ConsoleHandle& console){
-    const uint16_t GET_ON_BRAVIARY_TIME = 280;
-
-    ButtonDetector centerA(
-        console, console,
-        ButtonType::ButtonA,
-        {0.40, 0.50, 0.40, 0.50},
-        std::chrono::milliseconds(500), false
-    );
-    ButtonDetector leftB(
-        console, console,
-        ButtonType::ButtonB,
-        {0.02, 0.40, 0.05, 0.20},
-        std::chrono::milliseconds(500), false
-    );
-
-    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
-
-    MountDetector detector;
-    while (true){
-        console.botbase().wait_for_all_requests();
-
-        if (std::chrono::system_clock::now() - start > std::chrono::seconds(60)){
-            console.log("Failed to get on Braviary after 60 seconds.");
-            return false;
-        }
-
-        MountState state = detector.detect(console.video().snapshot());
-        switch (state){
-        case MountState::NOTHING:
-            pbf_mash_button(console, BUTTON_B, 125);
-            continue;
-        case MountState::WYRDEER_OFF:
-        case MountState::BASCULEGION_OFF:
-            pbf_press_button(console, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
-            continue;
-        case MountState::WYRDEER_ON:
-        case MountState::BASCULEGION_ON:
-            pbf_press_dpad(console, DPAD_RIGHT, 20, GET_ON_BRAVIARY_TIME);
-            continue;
-        case MountState::URSALUNA_OFF:
-            pbf_press_dpad(console, DPAD_RIGHT, 20, 50);
-            pbf_press_dpad(console, DPAD_RIGHT, 20, 50);
-            pbf_press_button(console, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
-            continue;
-        case MountState::URSALUNA_ON:
-            pbf_press_dpad(console, DPAD_RIGHT, 20, 50);
-            pbf_press_dpad(console, DPAD_RIGHT, 20, GET_ON_BRAVIARY_TIME);
-            continue;
-        case MountState::SNEASLER_OFF:
-            pbf_press_dpad(console, DPAD_LEFT, 20, 50);
-            pbf_press_button(console, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
-            continue;
-        case MountState::SNEASLER_ON:
-            if (!leftB.detected()){
-                console.log("Switching back to Braviary...");
-                pbf_move_left_joystick(console, 128, 0, 125, 0);
-                pbf_press_dpad(console, DPAD_LEFT, 20, GET_ON_BRAVIARY_TIME);
-                continue;
-            }
-            console.log("Climbing wall...");
-            pbf_move_left_joystick(console, 128, 0, 2 * TICKS_PER_SECOND, 0);
-            continue;
-        case MountState::BRAVIARY_OFF:
-            pbf_press_button(console, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
-            continue;
-        case MountState::BRAVIARY_ON:
-            return true;
-        default:
-            PA_THROW_StringException("Invalid Mount Enum: " + std::to_string((int)state));
-        }
-    }
-}
-#endif
-
-
-bool return_to_jubilife_from_overworld(ProgramEnvironment& env, ConsoleHandle& console){
-    while (true){
-        EscapeFromAttack session(env, console);
-        session.run_session();
-        if (session.state() != UnderAttackState::UNDER_ATTACK){
-            console.log("Unable to escape from being attacked.", COLOR_RED);
-            return false;
-        }
-
-        //  Open the map.
-        pbf_press_button(console, BUTTON_MINUS, 20, 30);
-        {
-            MapDetector detector;
-            int ret = wait_until(
-                env, console,
-                std::chrono::seconds(5),
-                { &detector }
-            );
-            if (ret < 0){
-                console.log("Map not detected after 5 seconds.", COLOR_RED);
-                return false;
-            }
-            console.log("Found map!");
-            env.wait_for(std::chrono::milliseconds(500));
-        }
-
-        //  Try to fly back to camp.
-        pbf_press_button(console, BUTTON_X, 20, 30);
-
-        {
-            ButtonDetector detector(
-                console, console,
-                ButtonType::ButtonA,
-                {0.55, 0.40, 0.20, 0.40},
-                std::chrono::milliseconds(200), true
-            );
-            int ret = wait_until(
-                env, console,
-                std::chrono::seconds(2),
-                { &detector }
-            );
-            if (ret >= 0){
-                console.log("Flying back to camp...");
-                pbf_mash_button(console, BUTTON_A, 125);
-                break;
-            }
-            console.log("Unable to fly. Are you under attack?", COLOR_RED);
-        }
-
-        pbf_mash_button(console, BUTTON_B, 125);
-    }
-
-    BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.6});
-    int ret = wait_until(
-        env, console,
-        std::chrono::seconds(20),
-        { &black_screen }
-    );
-    if (ret < 0){
-        console.log("Failed to fly to camp after 5 seconds.", COLOR_RED);
-        return false;
-    }
-    console.log("Arrived at camp...");
-    env.wait_for(std::chrono::seconds(1));
-    return true;
-}
-
-
-
-
-
-
 
 
 
@@ -402,9 +254,75 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
-    EscapeFromAttack session(env, console);
-    session.run_session();
-    cout << "Done escaping!" << endl;
+//    goto_camp_from_overworld(env, console);
+
+
+    InferenceBoxScope box(console, {0.450, 0.005, 0.040, 0.010});
+    ImageStats stats = image_stats(extract_box(console.video().snapshot(), box));
+    cout << stats.average << stats.stddev << endl;
+
+
+
+#if 0
+    pbf_press_dpad(console, DPAD_UP, 20, 480);
+    pbf_press_button(console, BUTTON_A, 20, 480);
+    pbf_press_button(console, BUTTON_B, 20, 230);
+    pbf_press_button(console, BUTTON_B, 20, 230);
+#endif
+
+
+#if 0
+    auto& context = console;
+
+                    pbf_move_left_joystick(context, 0, 212, 50, 0);
+                    pbf_press_button(context, BUTTON_B, 500, 80);
+
+                    pbf_move_left_joystick(context, 224, 0, 50, 0);
+                    pbf_press_button(context, BUTTON_B, 350, 80);
+
+                    pbf_move_left_joystick(context, 0, 64, 50, 0);
+                    pbf_press_button(context, BUTTON_B, 250, 80);
+
+                    pbf_move_left_joystick(context, 0, 96, 50, 0);
+                    pbf_press_button(context, BUTTON_B, 500, 0);
+#endif
+
+
+#if 0
+    VideoOverlaySet set(overlay);
+    DialogDetector detector(console, console);
+    detector.make_overlays(set);
+    detector.process_frame(feed.snapshot(), std::chrono::system_clock::now());
+#endif
+
+
+
+
+#if 0
+    InferenceBoxScope box0(overlay, {0.010, 0.700, 0.050, 0.100});
+    QImage image = extract_box(feed.snapshot(), box0);
+
+    ArcPhoneDetector detector(console, console, std::chrono::milliseconds(200), true);
+    detector.process_frame(image, std::chrono::system_clock::now());
+    wait_until(
+        env, console, std::chrono::seconds(10),
+        { &detector }
+    );
+#endif
+
+
+//    from_professor_return_to_jubilife(env, console);
+
+
+
+//    InferenceBoxScope box0(overlay, {0.900, 0.955, 0.080, 0.045});
+//    InferenceBoxScope box1(overlay, {0.500, 0.621, 0.300, 0.043});
+
+
+
+//    EscapeFromAttack session(env, console);
+//    session.run_session();
+//    cout << "Done escaping!" << endl;
 
 
 #if 0
@@ -898,7 +816,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 #if 0
 //    InferenceBoxScope box(overlay, 0.40, 0.50, 0.40, 0.50);
-    InferenceBoxScope box(overlay, 0.02, 0.40, 0.05, 0.20);
+    InferenceBoxScope box(overlay, 0.010, 0.700, 0.050, 0.100);
 
     QImage image(feed.snapshot());
     image = extract_box(image, box);
@@ -974,30 +892,10 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 #endif
 
 
-#if 0
-    while (true){
-        pbf_press_button(console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-        reset_game_from_home(env, console, true);
-    }
-#endif
-
 
 
 #if 0
-    ArcWatcher arcs(overlay);
-    ShinySymbolWatcher symbols(overlay);
-    {
-        VisualInferenceSession session(env, logger, feed, overlay);
-        session += arcs;
-        session += symbols;
-        session.run();
-    }
-#endif
-
-
-
-#if 0
-    QImage image("ButtonB-Original2.png");
+    QImage image("ArcPhone-Original.png");
 
     image = image.convertToFormat(QImage::Format::Format_ARGB32);
     uint32_t* ptr = (uint32_t*)image.bits();
@@ -1008,12 +906,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
             uint32_t red = qRed(pixel);
             uint32_t green = qGreen(pixel);
             uint32_t blue = qBlue(pixel);
-            if (red == 0 || green == 0 || blue == 0){
+            if (red < 128 || green < 128 || blue < 128){
                 pixel = 0x00000000;
             }
         }
     }
-    image.save("ButtonB-Template.png");
+    image.save("ArcPhone-Template.png");
 #endif
 
 

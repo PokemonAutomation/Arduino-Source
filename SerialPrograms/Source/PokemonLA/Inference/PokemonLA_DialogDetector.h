@@ -9,6 +9,7 @@
 
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -16,7 +17,7 @@ namespace PokemonLA{
 
 class DialogDetector : public VisualInferenceCallback{
 public:
-    DialogDetector();
+    DialogDetector(Logger& logger, VideoOverlay& overlay);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(
@@ -30,6 +31,7 @@ private:
     ImageFloatBox m_top_white;
     ImageFloatBox m_bottom_white;
     ImageFloatBox m_cursor;
+    ArcPhoneDetector m_arc_phone;
 };
 
 

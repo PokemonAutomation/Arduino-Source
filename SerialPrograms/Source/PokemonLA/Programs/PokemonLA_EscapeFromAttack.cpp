@@ -18,14 +18,16 @@ namespace PokemonLA{
 EscapeFromAttack::EscapeFromAttack(
     ProgramEnvironment& env,
     ConsoleHandle& console,
+    std::chrono::seconds time_min,
     std::chrono::seconds time_limit
 )
     : SuperControlSession(env, console)
+    , m_min_stop(std::chrono::system_clock::now() + time_min)
     , m_deadline(std::chrono::system_clock::now() + time_limit)
     , m_attacked(console)
     , m_mount(console)
-    , m_centerA(console, console, ButtonType::ButtonA, {0.40, 0.50, 0.40, 0.50}, std::chrono::milliseconds(500), false)
-    , m_leftB(console, console, ButtonType::ButtonB, {0.02, 0.40, 0.05, 0.20}, std::chrono::milliseconds(500), false)
+    , m_centerA(console, console, ButtonType::ButtonA, {0.40, 0.50, 0.40, 0.50}, std::chrono::milliseconds(200), false)
+    , m_leftB(console, console, ButtonType::ButtonB, {0.02, 0.40, 0.05, 0.20}, std::chrono::milliseconds(200), false)
     , m_current_action(CurrentAction::OTHER)
 {
     m_visual_callbacks.emplace_back(&m_attacked);
@@ -39,7 +41,7 @@ bool EscapeFromAttack::run_state(AsyncCommandSession& commands){
         return true;
     }
 
-    if (m_attacked.state() == UnderAttackState::SAFE){
+    if (m_attacked.state() == UnderAttackState::SAFE && now >= m_min_stop){
         return true;
     }
 
@@ -49,7 +51,7 @@ bool EscapeFromAttack::run_state(AsyncCommandSession& commands){
     case MountState::WYRDEER_OFF:
     case MountState::BASCULEGION_OFF:
         commands.dispatch([=](const BotBaseContext& context){
-            pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
+            pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_MOUNT_TIME);
         });
         commands.wait();
         m_current_action = CurrentAction::OTHER;
@@ -119,7 +121,8 @@ bool EscapeFromAttack::run_flying(AsyncCommandSession& commands, WallClock times
     if (m_current_action != CurrentAction::CRUISE){
         m_console.log("Dash forward...");
         commands.dispatch([=](const BotBaseContext& context){
-            pbf_press_button(context, BUTTON_B, 300 * TICKS_PER_SECOND, 0);
+//            pbf_press_button(context, BUTTON_B, 300 * TICKS_PER_SECOND, 0);
+            pbf_mash_button(context, BUTTON_B, 300 * TICKS_PER_SECOND);
         });
         m_current_action = CurrentAction::CRUISE;
     }

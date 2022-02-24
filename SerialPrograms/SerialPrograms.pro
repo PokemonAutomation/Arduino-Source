@@ -382,6 +382,7 @@ SOURCES += \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfTouchTrade.cpp \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcDetector.cpp \
+    Source/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagDetector.cpp \
@@ -404,7 +405,7 @@ SOURCES += \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp \
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.cpp \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.cpp \
-    Source/PokemonLA/Programs/PokemonLA_MoneyFarmerHighlands.cpp \
+    Source/PokemonLA/Programs/PokemonLA_NuggetFarmerHighlands.cpp \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.cpp \
     Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.cpp \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.cpp \
@@ -992,6 +993,7 @@ HEADERS += \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfTouchTrade.h \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcDetector.h \
+    Source/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagDetector.h \
@@ -1014,7 +1016,7 @@ HEADERS += \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.h \
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.h \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.h \
-    Source/PokemonLA/Programs/PokemonLA_MoneyFarmerHighlands.h \
+    Source/PokemonLA/Programs/PokemonLA_NuggetFarmerHighlands.h \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.h \
     Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.h \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h \

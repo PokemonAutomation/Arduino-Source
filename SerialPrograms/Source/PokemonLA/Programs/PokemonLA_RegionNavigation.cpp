@@ -10,6 +10,8 @@
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA/Inference/PokemonLA_MapDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
+#include "PokemonLA/Programs/PokemonLA_EscapeFromAttack.h"
 #include "PokemonLA_RegionNavigation.h"
 
 namespace PokemonAutomation{
@@ -57,6 +59,56 @@ void goto_professor(ConsoleHandle& console, Camp camp){
         PA_THROW_StringException("Unknown Camp: " + std::to_string((int)camp));
     }
 }
+bool from_professor_return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& console){
+    ButtonDetector button_detector0(
+        console, console,
+        ButtonType::ButtonA, ImageFloatBox(0.500, 0.578, 0.300, 0.043),
+        std::chrono::milliseconds(200), true
+    );
+    ButtonDetector button_detector1(
+        console, console,
+        ButtonType::ButtonA, ImageFloatBox(0.500, 0.621, 0.300, 0.043),
+        std::chrono::milliseconds(200), true
+    );
+    ButtonDetector bottom_B(
+        console, console,
+        ButtonType::ButtonB, ImageFloatBox(0.900, 0.955, 0.080, 0.045),
+        std::chrono::milliseconds(100), true
+    );
+    while (true){
+        console.botbase().wait_for_all_requests();
+        int ret = run_until(
+            env, console,
+            [](const BotBaseContext& context){
+                for (size_t c = 0; c < 20; c++){
+                    pbf_press_button(context, BUTTON_A, 20, 125);
+                }
+            },
+            { &button_detector0, &button_detector1, &bottom_B }
+        );
+        env.wait_for(std::chrono::milliseconds(500));
+        switch (ret){
+        case 0:
+            console.log("Detected return option...");
+            pbf_press_dpad(console, DPAD_DOWN, 20, 105);
+            return mash_A_to_change_region(env, console);
+        case 1:
+            console.log("Detected report research option...");
+            break;
+        case 2:
+            console.log("Backing out of Pokedex...");
+            pbf_mash_button(console, BUTTON_B, 20);
+            break;
+        default:
+            console.log("Did not detect option to return to Jubilife.", COLOR_RED);
+//            pbf_mash_button(console, BUTTON_B, 5 * TICKS_PER_SECOND);
+            return false;
+        }
+    }
+}
+
+
+
 
 
 bool mash_A_to_change_region(ProgramEnvironment& env, ConsoleHandle& console){
@@ -212,6 +264,76 @@ bool goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Ca
 
 
 
+bool goto_camp_from_overworld(ProgramEnvironment& env, ConsoleHandle& console){
+    auto start = std::chrono::system_clock::now();
+    std::chrono::seconds grace_period(0);
+    while (true){
+        EscapeFromAttack session(env, console, grace_period, std::chrono::seconds(30));
+        session.run_session();
+
+        if (std::chrono::system_clock::now() - start > std::chrono::seconds(30)){
+            console.log("Unable to escape from being attacked.", COLOR_RED);
+            return false;
+        }
+
+        //  Open the map.
+        pbf_press_button(console, BUTTON_MINUS, 20, 30);
+        {
+            MapDetector detector;
+            int ret = wait_until(
+                env, console,
+                std::chrono::seconds(5),
+                { &detector }
+            );
+            if (ret < 0){
+                console.log("Map not detected after 5 seconds.", COLOR_RED);
+                return false;
+            }
+            console.log("Found map!");
+            env.wait_for(std::chrono::milliseconds(500));
+        }
+
+        //  Try to fly back to camp.
+        pbf_press_button(console, BUTTON_X, 20, 30);
+
+        {
+            ButtonDetector detector(
+                console, console,
+                ButtonType::ButtonA,
+                {0.55, 0.40, 0.20, 0.40},
+                std::chrono::milliseconds(200), true
+            );
+            int ret = wait_until(
+                env, console,
+                std::chrono::seconds(2),
+                { &detector }
+            );
+            if (ret >= 0){
+                console.log("Flying back to camp...");
+                pbf_mash_button(console, BUTTON_A, 125);
+                break;
+            }
+            console.log("Unable to fly. Are you under attack?", COLOR_RED);
+        }
+
+        pbf_mash_button(console, BUTTON_B, 125);
+        grace_period = std::chrono::seconds(5);
+    }
+
+    BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.6});
+    int ret = wait_until(
+        env, console,
+        std::chrono::seconds(20),
+        { &black_screen }
+    );
+    if (ret < 0){
+        console.log("Failed to fly to camp after 5 seconds.", COLOR_RED);
+        return false;
+    }
+    console.log("Arrived at camp...");
+    env.wait_for(std::chrono::seconds(1));
+    return true;
+}
 
 
 

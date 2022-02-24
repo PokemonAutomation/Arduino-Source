@@ -127,6 +127,9 @@ void AsyncCommandSession::stop_session(){
     m_stopping_session.store(true, std::memory_order_release);
     {
         std::lock_guard<std::mutex> lg(m_lock);
+        if (m_current != nullptr){
+            m_current->context.cancel();
+        }
         m_cv.notify_all();
     }
     m_task->wait_and_rethrow_exceptions();
