@@ -36,6 +36,13 @@ bool FlagNavigationAir::run_state(AsyncCommandSession& commands){
 
     switch (m_mount.state()){
     case MountState::NOTHING:
+        if (m_current_action != CurrentAction::MOVE){
+            m_console.log("Unable to detect mount. Moving foward...");
+            commands.dispatch([=](const BotBaseContext& context){
+                pbf_move_left_joystick(context, 128, 0, 300 * TICKS_PER_SECOND, 0);
+            });
+            m_current_action = CurrentAction::MOVE;
+        }
         break;
     case MountState::WYRDEER_OFF:
     case MountState::BASCULEGION_OFF:

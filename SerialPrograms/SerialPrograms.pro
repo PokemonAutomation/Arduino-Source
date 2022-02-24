@@ -409,6 +409,7 @@ SOURCES += \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.cpp \
     Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.cpp \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.cpp \
+    Source/PokemonLA/Programs/PokemonLA_SelfBoxTrade.cpp \
     Source/PokemonLA/Programs/PokemonLA_SelfTouchTrade.cpp \
     Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.cpp \
     Source/PokemonLA/Programs/PokemonLA_TradeRoutines.cpp \
@@ -1020,6 +1021,7 @@ HEADERS += \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.h \
     Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.h \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h \
+    Source/PokemonLA/Programs/PokemonLA_SelfBoxTrade.h \
     Source/PokemonLA/Programs/PokemonLA_SelfTouchTrade.h \
     Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.h \
     Source/PokemonLA/Programs/PokemonLA_TradeRoutines.h \

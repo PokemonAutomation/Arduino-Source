@@ -45,6 +45,7 @@ private:
 
     enum class CurrentAction{
         OTHER,
+        MOVE,
         CRUISE,
         CLIMBING,
     };

@@ -36,7 +36,7 @@ void trade_current_pokemon(
 
 class TradeNameReader{
 public:
-    TradeNameReader(Logger& logger, Language language, VideoOverlay& overlay);
+    TradeNameReader(Logger& logger, VideoOverlay& overlay, Language language);
 
     std::string read(const QImage& screen) const;
 

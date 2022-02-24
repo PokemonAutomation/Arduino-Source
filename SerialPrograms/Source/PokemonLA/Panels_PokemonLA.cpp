@@ -14,6 +14,7 @@
 #include "Programs/PokemonLA_OutbreakFinder.h"
 #include "Programs/PokemonLA_NuggetFarmerHighlands.h"
 
+#include "Programs/PokemonLA_SelfBoxTrade.h"
 #include "Programs/PokemonLA_SelfTouchTrade.h"
 
 //#include "Programs/PokemonLA_ShinyHunt-LakeTrio.h"
@@ -39,6 +40,8 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
         add_program<NuggetFarmerHighlands_Descriptor, MoneyFarmerHighlands>();
     }
 
+    add_divider("---- Trading ----");
+    add_program<SelfBoxTrade_Descriptor, SelfBoxTrade>();
     add_program<SelfTouchTrade_Descriptor, SelfTouchTrade>();
 
 

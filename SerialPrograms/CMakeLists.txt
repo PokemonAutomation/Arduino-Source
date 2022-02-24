@@ -825,6 +825,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.h
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.cpp
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h
+    Source/PokemonLA/Programs/PokemonLA_SelfBoxTrade.cpp
+    Source/PokemonLA/Programs/PokemonLA_SelfBoxTrade.h
     Source/PokemonLA/Programs/PokemonLA_SelfTouchTrade.cpp
     Source/PokemonLA/Programs/PokemonLA_SelfTouchTrade.h
     Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.cpp

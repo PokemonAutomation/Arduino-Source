@@ -257,9 +257,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 //    goto_camp_from_overworld(env, console);
 
 
-    InferenceBoxScope box(console, {0.450, 0.005, 0.040, 0.010});
-    ImageStats stats = image_stats(extract_box(console.video().snapshot(), box));
-    cout << stats.average << stats.stddev << endl;
+//    InferenceBoxScope box(console, {0.450, 0.005, 0.040, 0.010});
+//    ImageStats stats = image_stats(extract_box(console.video().snapshot(), box));
+//    cout << stats.average << stats.stddev << endl;
 
 
 

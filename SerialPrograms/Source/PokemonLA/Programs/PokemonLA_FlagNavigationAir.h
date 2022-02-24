@@ -36,6 +36,7 @@ private:
 
     enum class CurrentAction{
         OTHER,
+        MOVE,
         CRUISE,
         CRUISE_TURN,
         CAMERA_TURN,

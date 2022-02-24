@@ -4,12 +4,8 @@
  *
  */
 
-#include <QJsonValue>
-#include <QJsonArray>
-#include <QJsonObject>
+#include <QtGlobal>
 #include "Common/Cpp/Exception.h"
-#include "Common/Qt/QtJsonTools.h"
-#include "CommonFramework/Options/EditableTableOption.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
@@ -87,7 +83,7 @@ bool SelfTouchTrade::trade_one(MultiSwitchProgramEnvironment& env, std::map<std:
 //    ConsoleHandle& recv = HOSTING_SWITCH == 0 ? env.consoles[1] : env.consoles[0];
 
     //  Read the name and see if the receiver still needs it.
-    TradeNameReader name_reader(host, LANGUAGE, host);
+    TradeNameReader name_reader(host, host, LANGUAGE);
     QImage image = host.video().snapshot();
     std::string slug = name_reader.read(image);
     auto iter = trades_left.find(slug);
