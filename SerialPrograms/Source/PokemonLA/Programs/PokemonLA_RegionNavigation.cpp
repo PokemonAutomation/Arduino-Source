@@ -147,6 +147,7 @@ bool mash_A_to_change_region(ProgramEnvironment& env, ConsoleHandle& console){
 
 bool goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Camp camp){
     //  Open the map.
+    console.botbase().wait_for_all_requests();
     pbf_move_left_joystick(console, 128, 255, 200, 0);
     {
         MapDetector detector;

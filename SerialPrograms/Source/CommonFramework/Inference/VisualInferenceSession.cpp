@@ -107,10 +107,10 @@ VisualInferenceCallback* VisualInferenceSession::run(std::chrono::milliseconds t
     return run(stop_time);
 }
 VisualInferenceCallback* VisualInferenceSession::run(std::chrono::system_clock::time_point stop){
-    using time_point = std::chrono::system_clock::time_point;
+    using WallClock = std::chrono::system_clock::time_point;
 
-    auto now = std::chrono::system_clock::now();
-    auto wait_until = now + m_period;
+    WallClock now = std::chrono::system_clock::now();
+    auto next_tick = now + m_period;
 
     while (true){
         m_env.check_stopping();
@@ -118,16 +118,16 @@ VisualInferenceCallback* VisualInferenceSession::run(std::chrono::system_clock::
             return nullptr;
         }
 
-        time_point time0_snapshot = std::chrono::system_clock::now();
+        WallClock time0_snapshot = std::chrono::system_clock::now();
         QImage screen = m_feed.snapshot();
-        time_point time1_snapshot = std::chrono::system_clock::now();
+        WallClock time1_snapshot = std::chrono::system_clock::now();
         m_stats_snapshot += std::chrono::duration_cast<std::chrono::microseconds>(time1_snapshot - time0_snapshot).count();
 
         std::unique_lock<std::mutex> lg(m_lock);
         for (Callback* callback : m_callback_list){
-            time_point time0 = std::chrono::system_clock::now();
+            WallClock time0 = std::chrono::system_clock::now();
             bool done = callback->callback->process_frame(screen, time1_snapshot);
-            time_point time1 = std::chrono::system_clock::now();
+            WallClock time1 = std::chrono::system_clock::now();
             callback->stats += std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count();
             if (done){
                 return callback->callback;
@@ -138,22 +138,18 @@ VisualInferenceCallback* VisualInferenceSession::run(std::chrono::system_clock::
         if (now >= stop){
             return nullptr;
         }
-        auto wait = wait_until - now;
+        auto wait = next_tick - now;
         if (wait <= std::chrono::milliseconds(0)){
-            wait_until = now + m_period;
+            next_tick = now + m_period;
         }else{
-            m_cv.wait_for(
-                lg, wait,
+            WallClock stop_wait = std::min(next_tick, stop);
+            m_cv.wait_until(
+                lg, stop_wait,
                 [=]{
-                    auto now = std::chrono::system_clock::now();
-                    return
-                        now >= stop ||
-                        now >= wait_until ||
-                        m_env.is_stopping() ||
-                        m_stop.load(std::memory_order_acquire);
+                    return m_env.is_stopping() || m_stop.load(std::memory_order_acquire);
                 }
             );
-            wait_until += m_period;
+            next_tick += m_period;
         }
     }
 }

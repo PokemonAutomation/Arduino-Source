@@ -8,6 +8,7 @@
 #include "Common/Compiler.h"
 #include "CommonFramework/Globals.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
+#include "PokemonSwSh/Resources/PokemonSwSh_PokemonIcons.h"
 #include "Pokemon_NameSelectWidget.h"
 #include "Pokemon_NameListOption.h"
 
@@ -18,6 +19,10 @@ namespace Pokemon{
 
 class PokemonNameListRow : public EditableTableRow{
 public:
+    PokemonNameListRow(const PokemonNameListFactory& factory)
+        : m_factory(factory)
+    {}
+
     operator const std::string&() const{ return m_slug; }
 
     virtual void load_json(const QJsonValue& json) override{
@@ -33,7 +38,12 @@ public:
     }
     virtual std::vector<QWidget*> make_widgets(QWidget& parent) override{
         using namespace Pokemon;
-        NameSelectWidget* box = new NameSelectWidget(parent, NATIONAL_DEX_SLUGS(), m_slug);
+        NameSelectWidget* box = new NameSelectWidget(
+            parent,
+            m_factory.m_icons,
+            m_factory.m_slug_list,
+            m_slug
+        );
         box->connect(
             box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
             box, [&, box](int index){
@@ -44,34 +54,40 @@ public:
     }
 
 private:
+    const PokemonNameListFactory& m_factory;
     std::string m_slug;
 };
 
-class PokemonNameListFactory : public EditableTableFactory{
-public:
-    virtual QStringList make_header() const override{
-        QStringList list;
-        list << STRING_POKEMON;
-        return list;
-    }
-    virtual std::unique_ptr<EditableTableRow> make_row() const override{
-        return std::unique_ptr<EditableTableRow>(new PokemonNameListRow());
-    }
-
-    static const PokemonNameListFactory& instance(){
-        static PokemonNameListFactory factory;
-        return factory;
-    }
-};
 
 
 
+PokemonNameListFactory::PokemonNameListFactory(const std::map<std::string, QIcon>& icons)
+    : m_icons(icons)
+    , m_slug_list(NATIONAL_DEX_SLUGS())
+{}
+PokemonNameListFactory::PokemonNameListFactory(const std::map<std::string, QIcon>& icons, std::vector<std::string> slug_list)
+    : m_icons(icons)
+    , m_slug_list(std::move(slug_list))
+{}
+QStringList PokemonNameListFactory::make_header() const{
+    QStringList list;
+    list << STRING_POKEMON;
+    return list;
+}
+std::unique_ptr<EditableTableRow> PokemonNameListFactory::make_row() const{
+    return std::unique_ptr<EditableTableRow>(new PokemonNameListRow(*this));
+}
 
-PokemonNameList::PokemonNameList(QString label)
-    : EditableTableOption(
-        std::move(label),
-        PokemonNameListFactory::instance(), true
-    )
+
+
+
+PokemonNameList::PokemonNameList(QString label, const std::map<std::string, QIcon>& icons)
+    : PokemonNameListFactory(icons)
+    , EditableTableOption(std::move(label), *this, true)
+{}
+PokemonNameList::PokemonNameList(QString label, const std::map<std::string, QIcon>& icons, std::vector<std::string> slug_list)
+    : PokemonNameListFactory(icons, std::move(slug_list))
+    , EditableTableOption(std::move(label), *this, true)
 {}
 
 const std::string& PokemonNameList::operator[](size_t index) const{

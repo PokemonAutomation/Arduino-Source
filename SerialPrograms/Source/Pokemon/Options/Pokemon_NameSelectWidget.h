@@ -12,10 +12,12 @@
 namespace PokemonAutomation{
 namespace Pokemon{
 
+
 class NameSelectWidget : public NoWheelComboBox{
 public:
     NameSelectWidget(
         QWidget& parent,
+        const std::map<std::string, QIcon>& icons,
         const std::vector<std::string>& slugs,
         const std::string& current_slug
     );
@@ -24,6 +26,7 @@ public:
 
 private:
 };
+
 
 
 }

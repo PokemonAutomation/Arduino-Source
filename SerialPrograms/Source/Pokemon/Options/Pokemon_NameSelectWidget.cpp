@@ -8,7 +8,6 @@
 #include "Common/Cpp/Exception.h"
 #include "CommonFramework/Logging/Logger.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
-#include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
 #include "Pokemon_NameSelectWidget.h"
 
 #include <iostream>
@@ -20,6 +19,7 @@ namespace Pokemon{
 
 NameSelectWidget::NameSelectWidget(
     QWidget& parent,
+    const std::map<std::string, QIcon>& icons,
     const std::vector<std::string>& slugs,
     const std::string& current_slug
 )
@@ -29,23 +29,24 @@ NameSelectWidget::NameSelectWidget(
     this->setInsertPolicy(QComboBox::NoInsert);
     this->completer()->setCompletionMode(QCompleter::PopupCompletion);
     this->completer()->setFilterMode(Qt::MatchContains);
+    this->setIconSize(QSize(25, 25));
 
     for (size_t index = 0; index < slugs.size(); index++){
-        using namespace NintendoSwitch::PokemonSwSh;
-
         const std::string& slug = slugs[index];
-        const PokemonSprite* sprites = get_pokemon_sprite_nothrow(slug);
-        if (sprites == nullptr){
+
+        auto iter = icons.find(slug);
+        if (iter == icons.end()){
             this->addItem(
                 get_pokemon_name(slug).display_name()
             );
             global_logger_tagged().log("Missing sprite for: " + slug, COLOR_RED);
         }else{
             this->addItem(
-                sprites->icon(),
+                iter->second,
                 get_pokemon_name(slug).display_name()
             );
         }
+
         if (slug == current_slug){
             this->setCurrentIndex((int)index);
         }

@@ -414,6 +414,7 @@ SOURCES += \
     Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.cpp \
     Source/PokemonLA/Programs/PokemonLA_TradeRoutines.cpp \
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.cpp \
+    Source/PokemonLA/Resources/PokemonLA_PokemonIcons.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.cpp \
@@ -585,6 +586,7 @@ SOURCES += \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.cpp \
+    Source/PokemonSwSh/Resources/PokemonSwSh_PokemonIcons.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.cpp \
@@ -1026,6 +1028,7 @@ HEADERS += \
     Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.h \
     Source/PokemonLA/Programs/PokemonLA_TradeRoutines.h \
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.h \
+    Source/PokemonLA/Resources/PokemonLA_PokemonIcons.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DaySkippers.h \
@@ -1204,6 +1207,7 @@ HEADERS += \
     Source/PokemonSwSh/Programs/ReleaseHelpers.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h \
+    Source/PokemonSwSh/Resources/PokemonSwSh_PokemonIcons.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.h \

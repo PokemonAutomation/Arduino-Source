@@ -839,6 +839,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.h
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.cpp
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.h
+    Source/PokemonLA/Resources/PokemonLA_PokemonIcons.cpp
+    Source/PokemonLA/Resources/PokemonLA_PokemonIcons.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp
@@ -1188,6 +1190,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h
     Source/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.cpp
     Source/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h
+    Source/PokemonSwSh/Resources/PokemonSwSh_PokemonIcons.cpp
+    Source/PokemonSwSh/Resources/PokemonSwSh_PokemonIcons.h
     Source/PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.cpp
     Source/PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.cpp

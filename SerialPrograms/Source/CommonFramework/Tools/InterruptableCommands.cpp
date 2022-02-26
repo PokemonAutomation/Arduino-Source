@@ -46,6 +46,11 @@ AsyncCommandSession::~AsyncCommandSession(){
     m_env.deregister_stop_program_signal(m_cv);
 }
 
+bool AsyncCommandSession::command_is_running(){
+    std::lock_guard<std::mutex> lg(m_lock);
+    return m_current != nullptr;
+}
+
 void AsyncCommandSession::dispatch(std::function<void(const BotBaseContext&)>&& lambda){
     std::unique_lock<std::mutex> lg(m_lock);
     m_env.check_stopping();

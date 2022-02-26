@@ -23,9 +23,8 @@ public:
 
 
 private:
-    virtual bool run_state(AsyncCommandSession& commands) override;
+    virtual bool run_state(AsyncCommandSession& commands, WallClock timestamp) override;
 
-    using WallClock = std::chrono::system_clock::time_point;
     bool run_flying(AsyncCommandSession& commands, WallClock timestamp);
     bool run_climbing(AsyncCommandSession& commands, WallClock timestamp);
 
@@ -34,26 +33,39 @@ private:
     static const uint16_t GET_ON_MOUNT_TIME = 125;
     static const uint16_t GET_ON_BRAVIARY_TIME = 280;
 
-    enum class CurrentAction{
-        OTHER,
-        MOVE,
-        CRUISE,
-        CRUISE_TURN,
-        CAMERA_TURN,
-        FIND_FLAG,
+    enum class State{
+        UNKNOWN,
+        WYRDEER_BASCULEGION_OFF,
+        WYRDEER_BASCULEGION_ON,
+        URSALUNA_OFF,
+        URSALUNA_ON,
+        SNEASLER_OFF,
+        SNEASLER_ON,
+        BRAVIARY_OFF,
+        GET_ON_SNEASLER,
         CLIMBING,
+        DASH_FORWARD,
+        DASH_LEFT,
+        DASH_RIGHT,
+        TURN_LEFT,
+        TURN_RIGHT,
+        FIND_FLAG,
     };
+    void register_state_command(State state, std::function<bool()>&& action){
+        SuperControlSession::register_state_command((size_t)state, std::move(action));
+    }
+    bool run_state_action(State state){
+        return SuperControlSession::run_state_action((size_t)state);
+    }
 
     FlagTracker m_flag;
     MountTracker m_mount;
     ButtonDetector m_centerA;
     ButtonDetector m_leftB;
 
-    CurrentAction m_current_action;
     bool m_looking_straight_ahead;
 
-    WallClock m_last_turn;
-    WallClock m_last_flag_find;
+    double m_flag_x;
 };
 
 

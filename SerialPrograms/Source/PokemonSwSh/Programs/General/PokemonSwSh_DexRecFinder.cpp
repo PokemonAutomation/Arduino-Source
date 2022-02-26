@@ -15,6 +15,7 @@
 #include "Pokemon/Options/Pokemon_NameSelectWidget.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
+#include "PokemonSwSh/Resources/PokemonSwSh_PokemonIcons.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_GameEntry.h"
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh_DexRecFinder.h"
@@ -49,7 +50,8 @@ DexRecFilters::DexRecFilters()
     )
     , EXCLUSIONS(
         "<b>Exclusions:</b><br>Do not stop on these " + STRING_POKEMON + " even if the desired " + STRING_POKEMON + " is found. "
-        "Use this to avoid dex recs that include other " + STRING_POKEMON + " in the spawn pool you don't want."
+        "Use this to avoid dex recs that include other " + STRING_POKEMON + " in the spawn pool you don't want.",
+        ALL_POKEMON_ICONS()
     )
 {
     PA_ADD_OPTION(LANGUAGE);

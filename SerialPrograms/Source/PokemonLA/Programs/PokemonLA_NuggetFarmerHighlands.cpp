@@ -131,27 +131,25 @@ void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env){
         stats.attempts++;
 
         //  Switch to Wrydeer.
-        bool error = false;
+        bool error = true;
         MountDetector mount_detector;
-        while (true){
+        for (size_t c = 0; c < 10; c++){
             MountState mount = mount_detector.detect(env.console.video().snapshot());
-            if (mount == MountState::NOTHING){
-                env.console.log("Unable to detect mount.", COLOR_RED);
-                error = true;
-                continue;
-            }
             if (mount == MountState::WYRDEER_OFF){
                 pbf_press_button(env.console, BUTTON_PLUS, 20, 105);
+                error = false;
                 break;
             }
             if (mount == MountState::WYRDEER_ON){
                 pbf_wait(env.console, 5 * TICKS_PER_SECOND);
+                error = false;
                 break;
             }
             pbf_press_dpad(env.console, DPAD_LEFT, 20, 50);
             env.console.botbase().wait_for_all_requests();
         }
         if (error){
+            env.console.log("Unable to find Wyrdeer after 10 attempts.", COLOR_RED);
             stats.errors++;
             reset_required = true;
             continue;
@@ -172,7 +170,12 @@ void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env){
                     pbf_press_button(context, BUTTON_B, 500, 80);
 
                     pbf_move_left_joystick(context, 224, 0, 50, 0);
-                    pbf_press_button(context, BUTTON_B, 350, 80);
+//                    pbf_press_button(context, BUTTON_B, 350, 80);
+                    for (size_t c = 0; c < 35; c++){
+                        pbf_press_button(context, BUTTON_A | BUTTON_B, 5, 0);
+                        pbf_press_button(context, BUTTON_B, 5, 0);
+                    }
+                    pbf_wait(context, 80);
 
                     pbf_move_left_joystick(context, 0, 64, 50, 0);
                     pbf_press_button(context, BUTTON_B, 250, 80);
@@ -213,6 +216,29 @@ void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env){
 #endif
 
 
+#if 1
+        env.console.log("Returning to Jubilife...");
+        if (!goto_camp_from_overworld(env, env.console)){
+            stats.errors++;
+            reset_required = true;
+            continue;
+        }
+        goto_professor(env.console, Camp::HIGHLANDS_HIGHLANDS);
+        if (!from_professor_return_to_jubilife(env, env.console)){
+            stats.errors++;
+            reset_required = true;
+            continue;
+        }
+
+        reset_required = false;
+        if (success){
+            if (!save_game_from_overworld(env, env.console)){
+                stats.errors++;
+                reset_required = true;
+            }
+        }
+
+#else
         if (success){
             env.console.log("Returning to Jubilife...");
             if (!goto_camp_from_overworld(env, env.console)){
@@ -221,7 +247,11 @@ void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env){
                 continue;
             }
             goto_professor(env.console, Camp::HIGHLANDS_HIGHLANDS);
-            from_professor_return_to_jubilife(env, env.console);
+            if (!from_professor_return_to_jubilife(env, env.console)){
+                stats.errors++;
+                reset_required = true;
+                continue;
+            }
             if (!save_game_from_overworld(env, env.console)){
                 stats.errors++;
                 reset_required = true;
@@ -231,12 +261,13 @@ void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env){
             env.console.botbase().wait_for_all_requests();
         }else{
             env.console.log("Nothing found. Resetting...");
-//            if (!goto_camp_from_overworld(env, env.console)){
-//                reset_required = true;
-//                continue;
-//            }
+            if (!goto_camp_from_overworld(env, env.console)){
+                reset_required = true;
+                continue;
+            }
             reset_required = true;
         }
+#endif
     }
 
 

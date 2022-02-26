@@ -10,6 +10,8 @@
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
+#include "PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
+#include "PokemonLA/Resources/PokemonLA_PokemonIcons.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 #include "PokemonLA/Inference/PokemonLA_MapDetector.h"
 #include "PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h"
@@ -38,7 +40,11 @@ OutbreakFinder::OutbreakFinder(const OutbreakFinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
     , LANGUAGE("<b>Game Language:</b>", Pokemon::PokemonNameReader::instance().languages(), true)
-    , DESIRED_SLUGS("<b>Desired " + STRING_POKEMON + ":</b><br>Stop when anything on this list is found.")
+    , DESIRED_SLUGS(
+        "<b>Desired " + STRING_POKEMON + ":</b><br>Stop when anything on this list is found.",
+        ALL_POKEMON_ICONS(),
+        HISUI_DEX_SLUGS()
+    )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_MATCHED(
         "Match Found",

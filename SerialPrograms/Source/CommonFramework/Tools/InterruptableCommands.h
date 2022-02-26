@@ -25,6 +25,8 @@ public:
     AsyncCommandSession(ProgramEnvironment& env, BotBase& botbase);
     ~AsyncCommandSession();
 
+    bool command_is_running();
+
     //  Stop the entire session. This will rethrow exceptions in the command thread.
     //  This is not thread-safe with "run()" and "stop_commands()"
     //  You must call this prior to destruction unless it's during a stack-unwind.
