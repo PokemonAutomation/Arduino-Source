@@ -111,7 +111,7 @@ void EggFetcherMultiple::program(SingleSwitchProgramEnvironment& env){
         //add a new second pokemon from the daycare
         pbf_press_button(env.console, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
         pbf_press_button(env.console, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
-        pbf_press_button(env.console, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
+        pbf_press_button(env.console, BUTTON_A, 10, 1.5 * TICKS_PER_SECOND);
         pbf_press_button(env.console, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
         auto [box, row, column] = get_location(s);
         if (row == 0 && column == 0 && box != 0){
