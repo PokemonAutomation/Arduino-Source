@@ -7,12 +7,9 @@
 #ifndef PokemonAutomation_AudioFeedInterface_H
 #define PokemonAutomation_AudioFeedInterface_H
 
-#include <vector>
 #include <memory>
-
+#include <vector>
 #include "Common/Cpp/Color.h"
-
-class QImage;
 
 namespace PokemonAutomation{
 
@@ -20,7 +17,8 @@ namespace PokemonAutomation{
 //  frequencies.
 //  Each spectrum is computed using a sliding window on the incoming audio stream.
 //  It has a stamp to denote which window it is from.
-struct AudioSpectrum{
+class AudioSpectrum{
+public:
     //  The stamp to denote which audio window it is from.
     //  the stamp starts at 0 and becomes larger for later windows in the stream.
     size_t stamp = 0;

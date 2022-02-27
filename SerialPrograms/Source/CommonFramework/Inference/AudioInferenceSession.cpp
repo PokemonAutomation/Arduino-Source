@@ -7,6 +7,7 @@
 #include <QImage>
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "StatAccumulator.h"
 #include "AudioInferenceSession.h"
 
 #include <iostream>
@@ -36,9 +37,12 @@ AudioInferenceSession::AudioInferenceSession(
     , m_feed(feed)
     , m_period(period)
     , m_stop(false)
-{}
+{
+    env.register_stop_program_signal(m_lock, m_cv);
+}
 AudioInferenceSession::~AudioInferenceSession(){
     stop();
+    m_env.deregister_stop_program_signal(m_cv);
 }
 void AudioInferenceSession::stop(){
     bool expected = false;
@@ -99,12 +103,12 @@ AudioInferenceCallback* AudioInferenceSession::run(std::chrono::milliseconds tim
     return run(stop_time);
 }
 AudioInferenceCallback* AudioInferenceSession::run(std::chrono::system_clock::time_point stop){
-    using time_point = std::chrono::system_clock::time_point;
+    using WallClock = std::chrono::system_clock::time_point;
 
     auto now = std::chrono::system_clock::now();
-    auto wait_until = now + m_period;
+    auto next_tick = now + m_period;
 
-    size_t lastTimestamp = SIZE_MAX;
+    uint64_t lastTimestamp = ~(uint64_t)0;
     // Stores new spectrums from audio feed. The newest spectrum (with largest timestamp) is at
     // the front of the vector.
     std::vector<std::shared_ptr<const PokemonAutomation::AudioSpectrum>> spectrums;
@@ -130,10 +134,10 @@ AudioInferenceCallback* AudioInferenceSession::run(std::chrono::system_clock::ti
 
         std::unique_lock<std::mutex> lg(m_lock);
         for (Callback* callback : m_callback_list){
-            std::cout << "Run callback on spectrums " << spectrums.size() << std::endl;
-            time_point time0 = std::chrono::system_clock::now();
+//            std::cout << "Run callback on spectrums " << spectrums.size() << std::endl;
+            WallClock time0 = std::chrono::system_clock::now();
             bool done = callback->callback->process_spectrums(spectrums, m_feed);
-            time_point time1 = std::chrono::system_clock::now();
+            WallClock time1 = std::chrono::system_clock::now();
             callback->stats += std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count();
             if (done){
                 return callback->callback;
@@ -144,22 +148,18 @@ AudioInferenceCallback* AudioInferenceSession::run(std::chrono::system_clock::ti
         if (now >= stop){
             return nullptr;
         }
-        auto wait = wait_until - now;
+        auto wait = next_tick - now;
         if (wait <= std::chrono::milliseconds(0)){
-            wait_until = now + m_period;
+            next_tick = now + m_period;
         }else{
-            m_cv.wait_for(
-                lg, wait,
+            WallClock stop_wait = std::min(next_tick, stop);
+            m_cv.wait_until(
+                lg, stop_wait,
                 [=]{
-                    auto now = std::chrono::system_clock::now();
-                    return
-                        now >= stop ||
-                        now >= wait_until ||
-                        m_env.is_stopping() ||
-                        m_stop.load(std::memory_order_acquire);
+                    return m_env.is_stopping() || m_stop.load(std::memory_order_acquire);
                 }
             );
-            wait_until += m_period;
+            next_tick += m_period;
         }
     }
 }
@@ -177,6 +177,11 @@ AsyncAudioInferenceSession::AsyncAudioInferenceSession(
 {}
 AsyncAudioInferenceSession::~AsyncAudioInferenceSession(){
     AudioInferenceSession::stop();
+}
+void AsyncAudioInferenceSession::rethrow_exceptions(){
+    if (m_task){
+        m_task->rethrow_exceptions();
+    }
 }
 AudioInferenceCallback* AsyncAudioInferenceSession::stop(){
     AudioInferenceSession::stop();

@@ -141,12 +141,14 @@ SOURCES += \
     Source/CommonFramework/ImageTools/ImageStats.cpp \
     Source/CommonFramework/ImageTools/SolidColorTest.cpp \
     Source/CommonFramework/Inference/AnomalyDetector.cpp \
+    Source/CommonFramework/Inference/AudioInferenceSession.cpp \
     Source/CommonFramework/Inference/BlackBorderDetector.cpp \
     Source/CommonFramework/Inference/BlackScreenDetector.cpp \
     Source/CommonFramework/Inference/FrozenImageDetector.cpp \
     Source/CommonFramework/Inference/ImageMatchDetector.cpp \
     Source/CommonFramework/Inference/ImageTools.cpp \
     Source/CommonFramework/Inference/InferenceException.cpp \
+    Source/CommonFramework/Inference/SpectrogramMatcher.cpp \
     Source/CommonFramework/Inference/StatAccumulator.cpp \
     Source/CommonFramework/Inference/VisualInferenceCallback.cpp \
     Source/CommonFramework/Inference/VisualInferenceRoutines.cpp \
@@ -293,7 +295,6 @@ SOURCES += \
     Source/NintendoSwitch/Programs/PokemonHome_PageSwap.cpp \
     Source/NintendoSwitch/TestProgramComputer.cpp \
     Source/NintendoSwitch/TestProgramSwitch.cpp \
-    Source/NintendoSwitch/TestProgramSwitchAudio.cpp \
     Source/PanelLists.cpp \
     Source/Pokemon/Inference/Pokemon_BerryNameReader.cpp \
     Source/Pokemon/Inference/Pokemon_IVCheckerReader.cpp \
@@ -397,6 +398,7 @@ SOURCES += \
     Source/PokemonLA/Inference/PokemonLA_NotificationReader.cpp \
     Source/PokemonLA/Inference/PokemonLA_OutbreakReader.cpp \
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_ShinySoundDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.cpp \
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.cpp \
     Source/PokemonLA/Panels_PokemonLA.cpp \
@@ -413,6 +415,7 @@ SOURCES += \
     Source/PokemonLA/Programs/PokemonLA_SelfBoxTrade.cpp \
     Source/PokemonLA/Programs/PokemonLA_SelfTouchTrade.cpp \
     Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.cpp \
+    Source/PokemonLA/Programs/PokemonLA_ShinySoundListener.cpp \
     Source/PokemonLA/Programs/PokemonLA_TradeRoutines.cpp \
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.cpp \
     Source/PokemonLA/Resources/PokemonLA_PokemonIcons.cpp \
@@ -703,6 +706,8 @@ HEADERS += \
     Source/CommonFramework/ImageTools/ImageStats.h \
     Source/CommonFramework/ImageTools/SolidColorTest.h \
     Source/CommonFramework/Inference/AnomalyDetector.h \
+    Source/CommonFramework/Inference/AudioInferenceCallback.h \
+    Source/CommonFramework/Inference/AudioInferenceSession.h \
     Source/CommonFramework/Inference/BlackBorderDetector.h \
     Source/CommonFramework/Inference/BlackScreenDetector.h \
     Source/CommonFramework/Inference/FrozenImageDetector.h \
@@ -710,6 +715,7 @@ HEADERS += \
     Source/CommonFramework/Inference/ImageTools.h \
     Source/CommonFramework/Inference/InferenceException.h \
     Source/CommonFramework/Inference/InferenceThrottler.h \
+    Source/CommonFramework/Inference/SpectrogramMatcher.h \
     Source/CommonFramework/Inference/StatAccumulator.h \
     Source/CommonFramework/Inference/TimeWindowStatTracker.h \
     Source/CommonFramework/Inference/VisualDetector.h \
@@ -905,7 +911,6 @@ HEADERS += \
     Source/NintendoSwitch/Programs/PokemonHome_PageSwap.h \
     Source/NintendoSwitch/TestProgramComputer.h \
     Source/NintendoSwitch/TestProgramSwitch.h \
-    Source/NintendoSwitch/TestProgramSwitchAudio.h \
     Source/PanelLists.h \
     Source/Pokemon/Inference/Pokemon_BerryNameReader.h \
     Source/Pokemon/Inference/Pokemon_IVCheckerReader.h \
@@ -1011,7 +1016,9 @@ HEADERS += \
     Source/PokemonLA/Inference/PokemonLA_MountDetector.h \
     Source/PokemonLA/Inference/PokemonLA_NotificationReader.h \
     Source/PokemonLA/Inference/PokemonLA_OutbreakReader.h \
+    Source/PokemonLA/Inference/PokemonLA_OverworldDetector.h \
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_ShinySoundDetector.h \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.h \
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.h \
     Source/PokemonLA/Panels_PokemonLA.h \
@@ -1028,6 +1035,7 @@ HEADERS += \
     Source/PokemonLA/Programs/PokemonLA_SelfBoxTrade.h \
     Source/PokemonLA/Programs/PokemonLA_SelfTouchTrade.h \
     Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.h \
+    Source/PokemonLA/Programs/PokemonLA_ShinySoundListener.h \
     Source/PokemonLA/Programs/PokemonLA_TradeRoutines.h \
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.h \
     Source/PokemonLA/Resources/PokemonLA_PokemonIcons.h \

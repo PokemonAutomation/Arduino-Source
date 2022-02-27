@@ -18,12 +18,27 @@ AsyncTask::~AsyncTask(){
     std::unique_lock<std::mutex> lg(m_lock);
     m_cv.wait(lg, [=]{ return m_finished; });
 }
+void AsyncTask::rethrow_exceptions(){
+    if (!m_stopped_with_error.load(std::memory_order_acquire)){
+        return;
+    }
+    std::unique_lock<std::mutex> lg(m_lock);
+    if (m_exception){
+        std::rethrow_exception(m_exception);
+    }
+}
 void AsyncTask::wait_and_rethrow_exceptions(){
     std::unique_lock<std::mutex> lg(m_lock);
     m_cv.wait(lg, [=]{ return m_finished; });
+#if 0
     if (m_exception && std::uncaught_exceptions() == 0){
         std::rethrow_exception(m_exception);
     }
+#else
+    if (m_exception){
+        std::rethrow_exception(m_exception);
+    }
+#endif
 }
 void AsyncTask::signal(){
     std::lock_guard<std::mutex> lg(m_lock);
@@ -147,6 +162,7 @@ void AsyncDispatcher::thread_loop(){
             task->m_task();
         }catch (...){
             task->m_exception = std::current_exception();
+            task->m_stopped_with_error.store(true, std::memory_order_release);
 //            cout << "Task threw an exception." << endl;
 //            std::lock_guard<std::mutex> lg(m_lock);
 //            for (AsyncTask* t : m_queue){

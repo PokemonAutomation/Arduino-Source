@@ -57,7 +57,6 @@ void VisualInferenceSession::stop(){
     const double DIVIDER = std::chrono::milliseconds(1) / std::chrono::microseconds(1);
     const char* UNITS = " ms";
 
-
     m_stats_snapshot.log(m_logger, "Screenshot", UNITS, DIVIDER);
     for (Callback* callback : m_callback_list){
         callback->stats.log(m_logger, callback->callback->label(), UNITS, DIVIDER);
@@ -159,24 +158,6 @@ VisualInferenceCallback* VisualInferenceSession::run(std::chrono::system_clock::
 
 
 
-#if 0
-VisualInferenceScope::VisualInferenceScope(
-    VisualInferenceSession& session,
-    VisualInferenceCallback& callback
-)
-    : m_session(session)
-    , m_callback(callback)
-{
-    session += callback;
-}
-VisualInferenceScope::~VisualInferenceScope(){
-    m_session -= m_callback;
-}
-#endif
-
-
-
-
 AsyncVisualInferenceSession::AsyncVisualInferenceSession(
     ProgramEnvironment& env, Logger& logger,
     VideoFeed& feed, VideoOverlay& overlay,
@@ -188,6 +169,11 @@ AsyncVisualInferenceSession::AsyncVisualInferenceSession(
 {}
 AsyncVisualInferenceSession::~AsyncVisualInferenceSession(){
     VisualInferenceSession::stop();
+}
+void AsyncVisualInferenceSession::rethrow_exceptions(){
+    if (m_task){
+        m_task->rethrow_exceptions();
+    }
 }
 VisualInferenceCallback* AsyncVisualInferenceSession::stop(){
     VisualInferenceSession::stop();

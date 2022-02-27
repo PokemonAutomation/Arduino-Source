@@ -80,7 +80,7 @@ void ShinySoundListener::program(SingleSwitchProgramEnvironment& env){
     }
 #endif
 
-    size_t lastTimestamp = SIZE_MAX;
+    uint64_t lastTimestamp = ~(uint64_t)0;
     // Stores new spectrums from audio feed. The newest spectrum (with largest timestamp) is at
     // the front of the vector.
     std::vector<std::shared_ptr<const PokemonAutomation::AudioSpectrum>> spectrums;

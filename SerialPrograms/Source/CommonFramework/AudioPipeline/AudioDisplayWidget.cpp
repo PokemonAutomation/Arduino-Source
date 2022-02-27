@@ -465,7 +465,7 @@ void AudioDisplayWidget::add_overlay(size_t startingStamp, size_t endStamp, Colo
         // Now try to remove old overlays that are no longer showed on the spectrogram view.
 
         // get the timestamp of the oldest window in the display history.
-        size_t oldestStamp = m_freqVisStamps[m_nextFFTWindowIndex];
+        uint64_t oldestStamp = m_freqVisStamps[m_nextFFTWindowIndex];
         // SIZE_MAX means this slot is not yet assigned an FFT window
         if (oldestStamp != SIZE_MAX){
             // Note: in this file we never consider the case that stamp may overflow.

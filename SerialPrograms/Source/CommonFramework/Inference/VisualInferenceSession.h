@@ -58,24 +58,6 @@ private:
 
 
 
-#if 0
-//  RAII wrapper for adding/removing infererence callbacks.
-class VisualInferenceScope{
-public:
-    VisualInferenceScope(
-        VisualInferenceSession& session,
-        VisualInferenceCallback& callback
-    );
-    ~VisualInferenceScope();
-private:
-    VisualInferenceSession& m_session;
-    VisualInferenceCallback& m_callback;
-};
-#endif
-
-
-
-
 class AsyncVisualInferenceSession : private VisualInferenceSession{
 public:
     AsyncVisualInferenceSession(
@@ -89,6 +71,9 @@ public:
 
     using VisualInferenceSession::operator+=;
     using VisualInferenceSession::operator-=;
+
+    //  Check if the thread died from an exception. If so, rethrow it.
+    void rethrow_exceptions();
 
     //  This will rethrow any exceptions in the inference thread.
     //  You should call this at all natural destruction points.

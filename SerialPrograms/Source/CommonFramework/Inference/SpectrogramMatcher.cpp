@@ -1,10 +1,14 @@
+
+
+#include <cfloat>
+#include <cmath>
+#include <iostream>
+#include <fstream>
+#include <QString>
 #include "SpectrogramMatcher.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
 #include "CommonFramework/Tools/AudioFeed.h"
 
-#include <iostream>
-#include <fstream>
-#include <cfloat>
 
 namespace PokemonAutomation{
 

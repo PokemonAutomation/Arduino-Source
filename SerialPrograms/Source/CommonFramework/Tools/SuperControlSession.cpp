@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Exception.h"
 #include "CommonFramework/Inference/VisualInferenceSession.h"
+#include "CommonFramework/Inference/AudioInferenceSession.h"
 #include "ConsoleHandle.h"
 #include "InterruptableCommands.h"
 #include "SuperControlSession.h"
@@ -76,15 +77,13 @@ void SuperControlSession::run_session(){
         }
     }
 
-#if 0
     std::unique_ptr<AsyncAudioInferenceSession> audio;
     if (!m_audio_callbacks.empty()){
-        audio.reset(new AsyncAudioInferenceSession(m_env, m_console, m_console, m_console, m_audio_period));
+        audio.reset(new AsyncAudioInferenceSession(m_env, m_console, m_console, m_audio_period));
         for (AudioInferenceCallback* callback : m_audio_callbacks){
             *audio += *callback;
         }
     }
-#endif
 
     m_active_command.reset(new AsyncCommandSession(m_env, m_console.botbase()));
 
@@ -94,7 +93,15 @@ void SuperControlSession::run_session(){
     m_state = 0;
 
     while (true){
+        //  Check stop conditions.
         m_env.check_stopping();
+        if (visual){
+            visual->rethrow_exceptions();
+        }
+        if (audio){
+            audio->rethrow_exceptions();
+        }
+
         if (run_state(*m_active_command, std::chrono::system_clock::now())){
             break;
         }
@@ -120,12 +127,9 @@ void SuperControlSession::run_session(){
 //    cout << "SuperControlSession::run_session() - stop" << endl;
     m_active_command->stop_session();
 
-#if 0
     if (audio){
         audio->stop();
     }
-#endif
-
     if (visual){
         visual->stop();
     }

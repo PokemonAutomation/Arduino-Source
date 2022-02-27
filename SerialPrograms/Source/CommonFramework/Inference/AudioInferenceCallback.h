@@ -8,8 +8,8 @@
 #define PokemonAutomation_CommonFramework_AudioInferenceCallback_H
 
 #include <string>
-#include <vector>
 #include <memory>
+#include <vector>
 #include "Common/Compiler.h"
 
 class QImage;

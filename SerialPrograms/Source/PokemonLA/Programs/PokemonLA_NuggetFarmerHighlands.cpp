@@ -81,7 +81,7 @@ bool mash_A_until_end_of_battle(ProgramEnvironment& env, ConsoleHandle& console)
     int ret = run_until(
         env, console,
         [](const BotBaseContext& context){
-            pbf_mash_button(context, BUTTON_A, 300 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_A, 120 * TICKS_PER_SECOND);
         },
         { &detector }
     );

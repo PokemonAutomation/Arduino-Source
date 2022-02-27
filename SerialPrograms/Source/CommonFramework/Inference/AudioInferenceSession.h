@@ -11,7 +11,6 @@
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/AudioFeed.h"
-#include "StatAccumulator.h"
 #include "AudioInferenceCallback.h"
 
 namespace PokemonAutomation{
@@ -67,6 +66,9 @@ public:
 
     using AudioInferenceSession::operator+=;
     using AudioInferenceSession::operator-=;
+
+    //  Check if the thread died from an exception. If so, rethrow it.
+    void rethrow_exceptions();
 
     //  This will rethrow any exceptions in the inference thread.
     //  You should call this at all natural destruction points.

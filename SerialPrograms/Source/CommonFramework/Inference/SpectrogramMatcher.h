@@ -8,13 +8,13 @@
 #define PokemonAutomation_CommonFramework_SpectrogramMatcher_H
 
 #include <cstddef>
-#include <vector>
 #include <array>
+#include <memory>
+#include <vector>
 #include <list>
-
-#include <QString>
-
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
+
+class QString;
 
 namespace PokemonAutomation{
 
