@@ -15,19 +15,18 @@ namespace PokemonAutomation{
 
 SerialSelector::~SerialSelector(){}
 SerialSelector::SerialSelector(
-    QString label, std::string logger_tag,
+    QString label,
     PABotBaseLevel minimum_pabotbase
 )
     : m_label(std::move(label))
     , m_minimum_pabotbase(minimum_pabotbase)
-    , m_logger_tag(std::move(logger_tag))
 {}
 SerialSelector::SerialSelector(
-    QString label, std::string logger_tag,
+    QString label,
     PABotBaseLevel minimum_pabotbase,
     const QJsonValue& json
 )
-    : SerialSelector(std::move(label), std::move(logger_tag), minimum_pabotbase)
+    : SerialSelector(std::move(label), minimum_pabotbase)
 {
     load_json(json);
 }

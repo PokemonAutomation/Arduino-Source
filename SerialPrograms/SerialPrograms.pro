@@ -611,7 +611,10 @@ HEADERS += \
     ../ClientSource/Libraries/MessageConverter.h \
     ../Common/CRC32.h \
     ../Common/Compiler.h \
+    ../Common/Cpp/AlignedVector.h \
+    ../Common/Cpp/AlignedVector.tpp \
     ../Common/Cpp/AsyncDispatcher.h \
+    ../Common/Cpp/CancellationExceptions.h \
     ../Common/Cpp/Color.h \
     ../Common/Cpp/Exception.h \
     ../Common/Cpp/FireForgetDispatcher.h \

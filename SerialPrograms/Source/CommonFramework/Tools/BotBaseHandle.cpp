@@ -8,6 +8,7 @@
 #include <QtGlobal>
 #include <QMessageBox>
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/CancellationExceptions.h"
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Microcontroller/DeviceRoutines.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Tools.h"
@@ -209,7 +210,7 @@ void BotBaseHandle::thread_body(){
         QString error;
         try{
             m_botbase->connect();
-        }catch (CancelledException&){
+        }catch (InvalidConnectionStateException&){
             m_botbase->stop();
             on_stopped("");
             return;
@@ -232,7 +233,7 @@ void BotBaseHandle::thread_body(){
             verify_protocol();
             program_id = verify_pabotbase();
             version = Microcontroller::program_version(*m_botbase);
-        }catch (CancelledException&){
+        }catch (InvalidConnectionStateException&){
             return;
         }catch (const StringException& e){
             error = e.message_qt();
@@ -290,7 +291,7 @@ void BotBaseHandle::thread_body(){
             uint32_t wallclock = NintendoSwitch::system_clock(context);
 //            cout << "system_clock() - done" << endl;
             str = NintendoSwitch::ticks_to_time(wallclock);
-        }catch (CancelledException&){
+        }catch (InvalidConnectionStateException&){
             break;
         }catch (const StringException& e){
             error = e.message_qt();

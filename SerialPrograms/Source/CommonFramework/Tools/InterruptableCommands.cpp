@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/CancellationExceptions.h"
 #include "InterruptableCommands.h"
 
 #include <iostream>
@@ -107,8 +108,9 @@ void AsyncCommandSession::thread_loop(){
                 current->commands(current->context);
                 current->context.wait_for_all_requests();
 //                cout << "stop" << endl;
-            }catch (CancelledException&){
-//                cout << "canceled" << endl;
+            }catch (ProgramCancelledException&){
+                throw;
+            }catch (OperationCancelledException&){
             }
         }
     }

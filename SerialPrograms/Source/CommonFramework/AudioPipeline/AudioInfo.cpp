@@ -126,8 +126,10 @@ std::vector<AudioInfo> AudioInfo::all_output_devices(){
 namespace PokemonAutomation{
 
 
-AudioInfo::AudioInfo(){}
 AudioInfo::~AudioInfo(){}
+AudioInfo::AudioInfo(const AudioInfo&) = default;
+
+AudioInfo::AudioInfo(){}
 
 AudioInfo::AudioInfo(const std::string& device_name){
     for (AudioInfo& info : all_input_devices()){

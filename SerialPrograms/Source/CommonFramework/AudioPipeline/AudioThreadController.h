@@ -11,6 +11,7 @@
 #include <chrono>
 #include <QObject>
 #include <QThread>
+#include "CommonFramework/Logging/Logger.h"
 
 class QString;
 
@@ -39,6 +40,7 @@ class AudioThreadController: public QObject{
 
 public:
     AudioThreadController(
+        Logger& logger,
         AudioDisplayWidget* parent,
         const AudioInfo& inputInfo,
         const QString& inputAbsoluteFilepath,

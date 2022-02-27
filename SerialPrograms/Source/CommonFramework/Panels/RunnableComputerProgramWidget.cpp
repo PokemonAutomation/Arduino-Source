@@ -5,6 +5,7 @@
  */
 
 #include <QtGlobal>
+#include "Common/Cpp/CancellationExceptions.h"
 #include "Common/Cpp/Exception.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -64,7 +65,10 @@ void RunnableComputerProgramWidget::run_program(){
         m_logger.log("<b>Starting Program: " + program_identifier + "</b>");
         instance.program(env);
         m_logger.log("Ending Program...");
-    }catch (CancelledException&){
+    }catch (ProgramCancelledException&){
+    }catch (InvalidConnectionStateException&){
+    }catch (OperationCancelledException&){
+        signal_error("An OperationCancelledException has propagated to the top of the program.");
     }catch (StringException& e){
         signal_error(e.message_qt());
     }

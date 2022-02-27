@@ -191,9 +191,7 @@ AudioInferenceCallback* AsyncAudioInferenceSession::stop(){
     return m_callback;
 }
 void AsyncAudioInferenceSession::thread_body(){
-    try{
-        m_callback = run();
-    }catch (CancelledException&){}
+    m_callback = run();
 }
 
 

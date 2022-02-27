@@ -13,11 +13,17 @@
 namespace PokemonAutomation{
 
 
-class SerialLogger : public TaggedLogger, public MessageLogger{
+class SerialLogger : public Logger, public MessageLogger{
 public:
-    SerialLogger(Logger& logger, std::string tag);
-    using TaggedLogger::log;
+    SerialLogger(Logger& logger);
+
+    virtual void log(const char* msg, Color color = Color()) override;
+    virtual void log(const std::string& msg, Color color = Color()) override;
+    virtual void log(const QString& msg, Color color = Color()) override;
     virtual void log(std::string msg) override;
+
+private:
+    Logger& m_logger;
 };
 
 

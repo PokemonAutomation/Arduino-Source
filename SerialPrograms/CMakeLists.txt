@@ -63,6 +63,7 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/AlignedVector.h
     ../Common/Cpp/AsyncDispatcher.cpp
     ../Common/Cpp/AsyncDispatcher.h
+    ../Common/Cpp/CancellationExceptions.h
     ../Common/Cpp/Color.h
     ../Common/Cpp/DllSafeString.h
     ../Common/Cpp/Exception.cpp

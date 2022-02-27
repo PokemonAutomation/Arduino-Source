@@ -37,7 +37,7 @@ void SingleSwitchProgramWidget::run_program(
         ),
         m_logger,
         current_stats, historical_stats,
-        m_logger.base_logger(),
+        system().logger(),
         sanitize_botbase(system().botbase()),
         system().camera(),
         system().overlay(),

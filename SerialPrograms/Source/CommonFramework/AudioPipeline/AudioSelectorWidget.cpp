@@ -269,7 +269,7 @@ void AudioSelectorWidget::refresh(){
 }
 
 void AudioSelectorWidget::reset_audio(){
-    std::cout << "reset audio: " << m_absoluteFilepath.toStdString() << std::endl;
+    m_logger.log("reset audio: " + m_absoluteFilepath.toStdString());
     std::lock_guard<std::mutex> lg(m_audio_lock);
     m_display.close_audio();
 

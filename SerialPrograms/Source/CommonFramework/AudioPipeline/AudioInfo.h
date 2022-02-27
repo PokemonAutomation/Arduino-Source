@@ -32,6 +32,7 @@ namespace PokemonAutomation{
 class AudioInfo{
 public:
     ~AudioInfo();
+    AudioInfo(const AudioInfo&);
 
 public:
     AudioInfo();

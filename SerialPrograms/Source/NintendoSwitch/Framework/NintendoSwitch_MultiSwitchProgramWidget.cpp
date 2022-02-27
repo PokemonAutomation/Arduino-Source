@@ -47,7 +47,7 @@ void MultiSwitchProgramWidget::run_program(
         SwitchSystemWidget& system = this->system(c);
         switches.emplace_back(
             c,
-            m_logger.base_logger(),
+            system.logger(),
             sanitize_botbase(system.botbase()),
             system.camera(),
             system.overlay(),

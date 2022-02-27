@@ -9,6 +9,7 @@
 #include <QGroupBox>
 #include <QScrollArea>
 #include <QMessageBox>
+#include "Common/Cpp/CancellationExceptions.h"
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -157,7 +158,10 @@ void RunnableSwitchProgramWidget::run_program(){
         run_program(m_current_stats.get(), m_historical_stats.get());
         m_setup->wait_for_all_requests();
         m_logger.log("Ending Program...");
-    }catch (CancelledException&){
+    }catch (ProgramCancelledException&){
+    }catch (InvalidConnectionStateException&){
+    }catch (OperationCancelledException&){
+        signal_error("An OperationCancelledException has propagated to the top of the program.");
     }catch (StringException& e){
         signal_error(e.message_qt());
         send_program_fatal_error_notification(

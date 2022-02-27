@@ -28,12 +28,12 @@ namespace NintendoSwitch{
 SwitchSystemWidget::SwitchSystemWidget(
     QWidget& parent,
     SwitchSystemFactory& factory,
-    Logger& logger,
+    Logger& raw_logger,
     uint64_t program_id
 )
     : SwitchSetupWidget(parent, factory)
     , m_factory(factory)
-    , m_logger(logger, factory.m_logger_tag)
+    , m_logger(raw_logger, factory.m_logger_tag)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
     layout->setContentsMargins(0, 0, 0, 0);
@@ -49,16 +49,16 @@ SwitchSystemWidget::SwitchSystemWidget(
     group_layout->setContentsMargins(0, 0, 0, 0);
 
     {
-        m_serial = factory.m_serial.make_ui(*widget, logger);
+        m_serial = factory.m_serial.make_ui(*widget, m_logger);
         group_layout->addWidget(m_serial);
 
         m_video_display = new VideoDisplayWidget(*this);
         m_audio_display = new AudioDisplayWidget(*this);
 
-        m_camera = factory.m_camera.make_ui(*widget, logger, *m_video_display);
+        m_camera = factory.m_camera.make_ui(*widget, m_logger, *m_video_display);
         group_layout->addWidget(m_camera);
 
-        m_audio = factory.m_audio.make_ui(*widget, logger, *m_audio_display);
+        m_audio = factory.m_audio.make_ui(*widget, m_logger, *m_audio_display);
         group_layout->addWidget(m_audio);
 
         m_command = new CommandRow(
@@ -129,6 +129,9 @@ void SwitchSystemWidget::wait_for_all_requests(){
         return;
     }
     botbase->wait_for_all_requests();
+}
+Logger& SwitchSystemWidget::logger(){
+    return m_logger;
 }
 BotBase* SwitchSystemWidget::botbase(){
     return m_serial->botbase().botbase();

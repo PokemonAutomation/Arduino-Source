@@ -26,7 +26,7 @@ public:
     SwitchSystemWidget(
         QWidget& parent,
         SwitchSystemFactory& factory,
-        Logger& logger,
+        Logger& raw_logger,
         uint64_t program_id
     );
     virtual ~SwitchSystemWidget();
@@ -39,6 +39,7 @@ public:
     virtual void reset_serial() override;
 
 public:
+    Logger& logger();
     BotBase* botbase();
     VideoFeed& camera();
     VideoOverlay& overlay();
@@ -57,7 +58,7 @@ private:
 private:
     uint64_t m_instance_id = 0;
     SwitchSystemFactory& m_factory;
-    SerialLogger m_logger;
+    TaggedLogger m_logger;
 
     CollapsibleGroupBox* m_group_box;
 

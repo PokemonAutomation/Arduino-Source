@@ -12,13 +12,6 @@
 namespace PokemonAutomation{
 
 
-//  This is the universal "operation cancelled" exception that is used to break
-//  out of routines in a clean manner when a users requests a cancellation.
-struct CancelledException{
-    CancelledException(){}
-};
-
-
 struct BotBaseMessage;
 class BotBaseRequest;
 
@@ -70,16 +63,7 @@ public:
 
     //  Don't use this unless you really need to.
     BotBase& botbase() const{ return m_botbase; }
-//    BotBase* operator->() const{
-//        check_cancelled();
-//        return &m_botbase;
-//    }
 
-    void check_cancelled() const{
-        if (m_cancelled.load(std::memory_order_acquire)){
-            throw CancelledException();
-        }
-    }
     void cancel(){
         m_cancelled.store(true, std::memory_order_release);
         m_botbase.stop_all_commands();

@@ -146,8 +146,7 @@ bool AudioFileLoader::initWavFile(){
         return false;
     }
 
-    std::cout << "Wav file audio format: ";
-    printAudioFormat(m_wavFile->audioFormat());
+    std::cout << "Wav file audio format: " << dumpAudioFormat(m_wavFile->audioFormat());
 
     if (m_audioFormat.sampleRate() != m_wavFile->audioFormat().sampleRate()){
         std::cout << "Error: WavFile sample rate " << m_wavFile->audioFormat().sampleRate() <<
@@ -255,10 +254,8 @@ std::tuple<const char*, size_t> AudioFileLoader::convertRawWavSamples(){
     }
     
     std::cout << "Error format conversion" << std::endl;
-    std::cout << "Wav file format: ";
-    printAudioFormat(wavAudioFormat);
-    std::cout << "Audio format to convert to: ";
-    printAudioFormat(m_audioFormat);
+    std::cout << "Wav file format: " << dumpAudioFormat(wavAudioFormat);
+    std::cout << "Audio format to convert to: " << dumpAudioFormat(m_audioFormat);
     return std::make_tuple<const char*, size_t>(reinterpret_cast<const char*>(m_floatBuffer.data()), 0);
 }
 
@@ -359,6 +356,7 @@ void AudioDecoderWorker::handleAudioDecoderError(){
 #if QT_VERSION_MAJOR == 5
         case QAudioDecoder::ServiceMissingError:
             errorStr = "ServiceMissingError";
+            break;
 #elif QT_VERSION_MAJOR == 6
         case QAudioDecoder::NotSupportedError:
             errorStr = "NotSupportedError";

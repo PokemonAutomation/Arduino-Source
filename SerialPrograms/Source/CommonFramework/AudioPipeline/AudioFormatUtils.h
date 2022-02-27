@@ -8,11 +8,13 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioFormatUtils_H
 #define PokemonAutomation_AudioPipeline_AudioFormatUtils_H
 
+#include <string>
+
 class QAudioFormat;
 
 namespace PokemonAutomation{
 
-void printAudioFormat(const QAudioFormat& format);
+std::string dumpAudioFormat(const QAudioFormat& format);
 
 void setSampleFormatToFloat(QAudioFormat& format);
 

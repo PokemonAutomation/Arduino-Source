@@ -10,12 +10,21 @@
 namespace PokemonAutomation{
 
 
-SerialLogger::SerialLogger(Logger& logger, std::string tag)
-    : TaggedLogger(logger, std::move(tag))
-    , PokemonAutomation::MessageLogger(GlobalSettings::instance().LOG_EVERYTHING)
+SerialLogger::SerialLogger(Logger& logger)
+    : PokemonAutomation::MessageLogger(GlobalSettings::instance().LOG_EVERYTHING)
+    , m_logger(logger)
 {}
+void SerialLogger::log(const char* msg, Color color){
+    m_logger.log(msg, color);
+}
+void SerialLogger::log(const std::string& msg, Color color){
+    m_logger.log(msg, color);
+}
+void SerialLogger::log(const QString& msg, Color color){
+    m_logger.log(msg, color);
+}
 void SerialLogger::log(std::string msg){
-    TaggedLogger::log(msg, COLOR_DARKGREEN);
+    m_logger.log(msg, COLOR_DARKGREEN);
 }
 
 

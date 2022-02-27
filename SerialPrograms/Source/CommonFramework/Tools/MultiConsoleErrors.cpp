@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/CancellationExceptions.h"
 #include "Common/Cpp/Exception.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Logging/Logger.h"
@@ -21,7 +22,7 @@ void MultiConsoleErrorState::report_unrecoverable_error(Logger& logger, const st
 void MultiConsoleErrorState::check_unrecoverable_error(Logger& logger){
     if (m_unrecoverable_error.load(std::memory_order_acquire)){
         logger.log("Unrecoverable error reported from a different console. Breaking out.", COLOR_RED);
-        throw CancelledException();
+        throw ProgramCancelledException();
     }
 }
 

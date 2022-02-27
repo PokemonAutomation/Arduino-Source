@@ -183,9 +183,7 @@ VisualInferenceCallback* AsyncVisualInferenceSession::stop(){
     return m_callback;
 }
 void AsyncVisualInferenceSession::thread_body(){
-    try{
-        m_callback = run();
-    }catch (CancelledException&){}
+    m_callback = run();
 }
 
 

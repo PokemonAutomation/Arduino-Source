@@ -37,9 +37,9 @@ public:
 
     Logger& base_logger(){ return m_logger; }
 
-    void log(const char* msg, Color color = Color()) override;
-    void log(const std::string& msg, Color color = Color()) override;
-    void log(const QString& msg, Color color = Color()) override;
+    virtual void log(const char* msg, Color color = Color()) override;
+    virtual void log(const std::string& msg, Color color = Color()) override;
+    virtual void log(const QString& msg, Color color = Color()) override;
 
 private:
     Logger& m_logger;

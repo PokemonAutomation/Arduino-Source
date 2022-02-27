@@ -7,6 +7,7 @@
 #include <mutex>
 #include <condition_variable>
 #include "Common/Cpp/Pimpl.tpp"
+#include "Common/Cpp/CancellationExceptions.h"
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "StatsTracking.h"
@@ -108,7 +109,7 @@ bool ProgramEnvironment::is_stopping() const{
 }
 void ProgramEnvironment::check_stopping() const{
     if (is_stopping()){
-        throw PokemonAutomation::CancelledException();
+        throw ProgramCancelledException();
     }
 }
 void ProgramEnvironment::register_stop_program_signal(std::mutex& lock, std::condition_variable& cv){

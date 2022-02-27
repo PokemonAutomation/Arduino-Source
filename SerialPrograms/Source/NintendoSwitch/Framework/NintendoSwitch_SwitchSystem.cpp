@@ -27,7 +27,7 @@ SwitchSystemFactory::SwitchSystemFactory(
     , m_console_id(console_id)
     , m_logger_tag("Console " + std::to_string(console_id))
 //    , m_settings_visible(true)
-    , m_serial("<b>Serial Port:</b>", m_logger_tag, min_pabotbase)
+    , m_serial("<b>Serial Port:</b>", min_pabotbase)
     , m_camera(DEFAULT_RESOLUTION)
     , m_audio()
 {}
@@ -65,8 +65,8 @@ const QSerialPortInfo* SwitchSystemFactory::port() const{
     return m_serial.port();
 }
 
-SwitchSetupWidget* SwitchSystemFactory::make_ui(QWidget& parent, Logger& logger, uint64_t program_id){
-    return new SwitchSystemWidget(parent, *this, logger, program_id);
+SwitchSetupWidget* SwitchSystemFactory::make_ui(QWidget& parent, Logger& raw_logger, uint64_t program_id){
+    return new SwitchSystemWidget(parent, *this, raw_logger, program_id);
 }
 
 

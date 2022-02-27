@@ -6,6 +6,7 @@
 
 #include <functional>
 #include <deque>
+#include "Common/Cpp/CancellationExceptions.h"
 #include "Common/Cpp/Exception.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "ClientSource/Connection/BotBase.h"
@@ -203,8 +204,8 @@ void VirtualController::thread_loop(){
                     m_granularity
                 );
                 m_botbase.try_send_request(request);
-            }catch (PokemonAutomation::CancelledException&){
-            }catch (const StringException&){
+            }catch (ProgramCancelledException&){
+            }catch (InvalidConnectionStateException&){
             }
         }while (false);
 

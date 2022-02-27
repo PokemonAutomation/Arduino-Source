@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "Common/Cpp/CancellationExceptions.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh_OverworldMovement.h"
 #include "PokemonSwSh_OverworldTrigger.h"
@@ -30,7 +31,7 @@ void OverworldTrigger::whistle(const BotBaseContext& context, bool rotate){
     context.wait_for_all_requests();
     m_target_tracker.set_stop_on_target(true);
     if (m_target_tracker.has_good_target()){
-        throw CancelledException();
+        throw OperationCancelledException();
     }
 
     pbf_mash_button(context, BUTTON_B, 40);

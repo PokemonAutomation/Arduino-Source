@@ -28,7 +28,7 @@ public:
         AudioFeed& audio
     )
         : m_index(index)
-        , m_logger(logger, "Switch " + std::to_string(index))
+        , m_logger(logger)
         , m_context(botbase)
         , m_video(video)
         , m_overlay(overlay)
@@ -58,7 +58,7 @@ public:
 
 private:
     size_t m_index;
-    TaggedLogger m_logger;
+    Logger& m_logger;
     BotBaseContext m_context;
     VideoFeed& m_video;
     VideoOverlay& m_overlay;

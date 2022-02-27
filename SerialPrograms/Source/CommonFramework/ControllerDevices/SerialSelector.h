@@ -27,11 +27,11 @@ class SerialSelector{
 public:
     ~SerialSelector();
     SerialSelector(
-        QString label, std::string logger_tag,
+        QString label,
         PABotBaseLevel minimum_pabotbase
     );
     SerialSelector(
-        QString label, std::string logger_tag,
+        QString label,
         PABotBaseLevel minimum_pabotbase,
         const QJsonValue& json
     );
@@ -48,7 +48,6 @@ private:
 
     const QString m_label;
     const PABotBaseLevel m_minimum_pabotbase;
-    const std::string m_logger_tag;
 
     Pimpl<QSerialPortInfo> m_port;
 };

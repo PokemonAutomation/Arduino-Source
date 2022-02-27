@@ -171,10 +171,12 @@ void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env){
 
                     pbf_move_left_joystick(context, 224, 0, 50, 0);
 //                    pbf_press_button(context, BUTTON_B, 350, 80);
-                    for (size_t c = 0; c < 35; c++){
+                    pbf_press_button(context, BUTTON_B, 80, 0);
+                    for (size_t c = 0; c < 7; c++){
                         pbf_press_button(context, BUTTON_A | BUTTON_B, 5, 0);
                         pbf_press_button(context, BUTTON_B, 5, 0);
                     }
+                    pbf_press_button(context, BUTTON_B, 200, 80);
                     pbf_wait(context, 80);
 
                     pbf_move_left_joystick(context, 0, 64, 50, 0);

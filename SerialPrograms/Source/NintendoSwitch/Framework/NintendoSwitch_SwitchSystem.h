@@ -40,7 +40,7 @@ public:
 
     const QSerialPortInfo* port() const;
 
-    SwitchSetupWidget* make_ui(QWidget& parent, Logger& logger, uint64_t program_id) override;
+    SwitchSetupWidget* make_ui(QWidget& parent, Logger& raw_logger, uint64_t program_id) override;
 
 private:
     friend class SwitchSystemWidget;

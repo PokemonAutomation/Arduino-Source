@@ -1,35 +1,45 @@
+/*  Audio format Utils
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#include <iostream>
+#include <sstream>
+#include <QAudioFormat>
 #include "AudioFormatUtils.h"
 #include "AudioNormalization.h"
 
-#include <QAudioFormat>
 
-#include <iostream>
 
 namespace PokemonAutomation{
 
 #if QT_VERSION_MAJOR == 5
 
-void printAudioFormat(const QAudioFormat& format){
-    std::string sampleTypeStr = "";
+std::string dumpAudioFormat(const QAudioFormat& format){
+    std::stringstream ss;
+    ss << "Audio format: sample type ";
     switch(format.sampleType()){
         case QAudioFormat::SampleType::Float:
-            sampleTypeStr="Float";
+            ss << "Float";
             break;
         case QAudioFormat::SampleType::SignedInt:
-            sampleTypeStr="SignedInt";
+            ss << "SignedInt";
             break;
         case QAudioFormat::SampleType::UnSignedInt:
-            sampleTypeStr="UnSignedInt";
+            ss << "UnSignedInt";
             break;
         default:
-            sampleTypeStr="Error";
+            ss << "Error";
     }
 
-    std::cout << "Audio format: sample type " << sampleTypeStr << 
+    ss <<
         ", bytes per sample " << format.bytesPerFrame() / format.channelCount() << 
         ", num channels " << format.channelCount() << 
         ", sample rate " << format.sampleRate() << 
         ", codec " << format.codec().toStdString() << std::endl;
+
+    return ss.str();
 }
 
 void setSampleFormatToFloat(QAudioFormat& format){
@@ -89,7 +99,7 @@ void convertSamplesToFloat(const QAudioFormat& format, const char* data, int len
         break;
     }
     std::cout << "Error: Unkwnon sample format in convertSamplesToFloat(): ";
-    printAudioFormat(format);
+    dumpAudioFormat(format);
 }
 
 #elif QT_VERSION_MAJOR == 6

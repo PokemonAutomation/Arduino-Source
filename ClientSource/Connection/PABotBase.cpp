@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <iostream>
 #include <emmintrin.h>
+#include "Common/Cpp/CancellationExceptions.h"
 #include "Common/Microcontroller/MessageProtocol.h"
 #include "Common/Microcontroller/DeviceRoutines.h"
 #include "Common/Cpp/Exception.h"
@@ -89,10 +90,10 @@ void PABotBase::wait_for_all_requests(const std::atomic<bool>* cancelled){
     std::unique_lock<std::mutex> lg(m_sleep_lock);
     while (true){
         if (cancelled != nullptr && cancelled->load(std::memory_order_acquire)){
-            throw CancelledException();
+            throw OperationCancelledException();
         }
         if (m_state.load(std::memory_order_acquire) != State::RUNNING){
-            throw CancelledException();
+            throw InvalidConnectionStateException();
         }
         {
             SpinLockGuard lg1(m_state_lock, "PABotBase::wait_for_all_requests()");
@@ -420,12 +421,12 @@ bool PABotBase::try_issue_request(
 
     SpinLockGuard lg(m_state_lock, "PABotBase::try_issue_request()");
     if (cancelled != nullptr && cancelled->load(std::memory_order_acquire)){
-        throw CancelledException();
+        throw OperationCancelledException();
     }
 
     State state = m_state.load(std::memory_order_acquire);
     if (state != State::RUNNING){
-        throw CancelledException();
+        throw InvalidConnectionStateException();
     }
 
     //  Don't get too far ahead of the oldest seqnum.
@@ -476,12 +477,12 @@ bool PABotBase::try_issue_command(
 
     SpinLockGuard lg(m_state_lock, "PABotBase::try_issue_command()");
     if (cancelled != nullptr && cancelled->load(std::memory_order_acquire)){
-        throw CancelledException();
+        throw OperationCancelledException();
     }
 
     State state = m_state.load(std::memory_order_acquire);
     if (state != State::RUNNING){
-        throw CancelledException();
+        throw InvalidConnectionStateException();
     }
 
     //  Command queue is full.
@@ -555,10 +556,10 @@ bool PABotBase::issue_request(
         }
         std::unique_lock<std::mutex> lg(m_sleep_lock);
         if (cancelled != nullptr && cancelled->load(std::memory_order_acquire)){
-            throw CancelledException();
+            throw OperationCancelledException();
         }
         if (m_state.load(std::memory_order_acquire) != State::RUNNING){
-            throw CancelledException();
+            throw InvalidConnectionStateException();
         }
         m_cv.wait(lg);
     }
@@ -596,10 +597,10 @@ bool PABotBase::issue_command(
         }
         std::unique_lock<std::mutex> lg(m_sleep_lock);
         if (cancelled != nullptr && cancelled->load(std::memory_order_acquire)){
-            throw CancelledException();
+            throw OperationCancelledException();
         }
         if (m_state.load(std::memory_order_acquire) != State::RUNNING){
-            throw CancelledException();
+            throw InvalidConnectionStateException();
         }
         m_cv.wait(lg);
     }
@@ -650,7 +651,7 @@ BotBaseMessage PABotBase::issue_request_and_wait(
             State state = m_state.load(std::memory_order_acquire);
             if (state != State::RUNNING){
                 remove_request(iter);
-                throw CancelledException();
+                throw InvalidConnectionStateException();
             }
             if (iter->second.state == AckState::ACKED){
                 break;

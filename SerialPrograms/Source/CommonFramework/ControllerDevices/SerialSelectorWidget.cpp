@@ -23,7 +23,7 @@ SerialSelectorWidget::SerialSelectorWidget(
 )
     : QWidget(&parent)
     , m_value(value)
-    , m_logger(logger, value.m_logger_tag)
+    , m_logger(logger)
     , m_connection(value.m_port, value.m_minimum_pabotbase, m_logger)
 {
     QHBoxLayout* serial_row = new QHBoxLayout(this);

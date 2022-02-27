@@ -49,12 +49,19 @@ namespace PokemonAutomation{
 
 
 
-AudioWorker::AudioWorker(const AudioInfo& inputInfo, const QString& inputAbsoluteFilepath, const AudioInfo& outputInfo, float outputVolume){
-    m_inputInfo = inputInfo;
-    m_inputAbsoluteFilepath = inputAbsoluteFilepath;
-    m_outputInfo = outputInfo;
-    m_volume = std::max(std::min(outputVolume, 1.0f), 0.0f);
-}
+AudioWorker::AudioWorker(
+    Logger& logger,
+    const AudioInfo& inputInfo,
+    const QString& inputAbsoluteFilepath,
+    const AudioInfo& outputInfo,
+    float outputVolume
+)
+    : m_logger(logger)
+    , m_inputInfo(inputInfo)
+    , m_inputAbsoluteFilepath(inputAbsoluteFilepath)
+    , m_outputInfo(outputInfo)
+    , m_volume(std::max(std::min(outputVolume, 1.0f), 0.0f))
+{}
 
 
 void AudioWorker::startAudio(){
@@ -91,8 +98,7 @@ void AudioWorker::startAudio(){
             return;
         }
         outputAudioFormat = m_FileLoader->audioFormat();
-        std::cout << "Set output audio format to: ";
-        printAudioFormat(outputAudioFormat);
+        m_logger.log("Set output audio format to: " + dumpAudioFormat(outputAudioFormat));
 
         connect(m_FileLoader, &AudioFileLoader::bufferReady, this, [&](const char* data, size_t len){
             if (m_audioIODevice){
@@ -109,8 +115,7 @@ void AudioWorker::startAudio(){
         }
 
         const QAudioFormat defaultInputFormat = chosenAudioInputDevice.preferredFormat();
-        std::cout << "Default input audio format: ";
-        printAudioFormat(defaultInputFormat);
+        m_logger.log("Default input audio format: " + dumpAudioFormat(defaultInputFormat));
         const int defaultChannelCount = defaultInputFormat.channelCount();
         const int defaultSampleRate = defaultInputFormat.sampleRate();
         
@@ -166,10 +171,8 @@ void AudioWorker::startAudio(){
             return;
         }
 
-        std::cout << "Set input audio format to: ";
-        printAudioFormat(inputAudioFormat);
-        std::cout << "Set output audio format to: ";
-        printAudioFormat(outputAudioFormat);
+        m_logger.log("Set input audio format to: " + dumpAudioFormat(inputAudioFormat));
+        m_logger.log("Set output audio format to: " + dumpAudioFormat(outputAudioFormat));
         
         if (!chosenAudioInputDevice.isFormatSupported(inputAudioFormat)){
             std::cout << "Error: audio input device cannot support desired audio format" << std::endl;

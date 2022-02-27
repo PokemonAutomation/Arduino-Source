@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/CancellationExceptions.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "VisualInferenceSession.h"
 #include "VisualInferenceRoutines.h"
@@ -108,7 +109,12 @@ int run_until(
         try{
             command(context);
             context.wait_for_all_requests();
-        }catch (CancelledException&){};
+        }catch (ProgramCancelledException&){
+            throw;
+        }catch (InvalidConnectionStateException&){
+            throw;
+        }catch (OperationCancelledException&){
+        }
 
         session.stop();
         task->wait_and_rethrow_exceptions();
