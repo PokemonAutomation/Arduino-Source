@@ -97,6 +97,8 @@ AudioDisplayWidget::AudioDisplayWidget(QWidget& parent)
     //     std::cout << v << " ";
     // }
     // std::cout << std::endl;
+
+    // saveAudioFrequenciesToDisk(true);
 }
 
 AudioDisplayWidget::~AudioDisplayWidget(){ clear(); }
@@ -109,7 +111,18 @@ void AudioDisplayWidget::clear(){
 
     m_freqVisBlocks.assign(m_freqVisBlocks.size(), 0.f);
     m_freqVisStamps.assign(m_freqVisStamps.size(), SIZE_MAX);
-    m_spectrums.clear();
+    {
+        std::lock_guard<std::mutex> lock_gd(m_spectrums_lock);
+        m_spectrums.clear();
+    }
+    {
+        std::lock_guard<std::mutex> lock_gd(m_overlay_lock);
+        m_overlay.clear();
+    }
+    {
+        std::lock_guard<std::mutex> lock_gd(m_sampleRate_lock);
+        m_sampleRate = 0;
+    }
 }
 
 void AudioDisplayWidget::close_audio(){
@@ -130,15 +143,40 @@ void AudioDisplayWidget::set_audio(
     m_audioThreadController = new AudioThreadController(this, inputInfo, inputAbsoluteFilepath, outputInfo, outputVolume);
 
     update_size();
+    // Tell Qt to repaint the widget in the next drawing phase in the main loop.
+    QWidget::update();
+
+    {
+        std::lock_guard<std::mutex> lock_gd(m_sampleRate_lock);
+        // Compute sample rate based on input data:
+        // Note, here we replicate the logic of choosing sample rate in the audio thread,
+        // AudioWorker::startAudio().
+        // It is less than ideal to replicate code, but because AudioWorker is in another thread,
+        // it is difficult to communicate the sample rate from AudioWorker to the UI thread where
+        // this AudioDisplayWidget resides without blocking.
+        // So we choose this simpler approach with the benefit of no blocking.
+        if (inputAbsoluteFilepath.size() > 0){
+            // We hard code sample rate from file to be 48KHz.
+            m_sampleRate = 48000;
+        } else{
+            m_sampleRate = inputInfo.preferredSampleRate();
+            if (m_sampleRate <= 40000){
+                m_sampleRate = 48000;
+            } else if (m_sampleRate >= 8000){
+                m_sampleRate /= 2;
+            }
+        }
+    }
 }
 
 void AudioDisplayWidget::loadFFTOutput(const QVector<float>& fftOutput){
     // std::cout << "T" << QThread::currentThread() << " AudioDisplayWidget::loadFFTOutput() called" << std::endl;
 
-    auto spectrum = std::make_shared<AudioSpectrum>(0, std::vector<float>(fftOutput.begin(), fftOutput.end()));
+    std::vector<float> spectrumVector(fftOutput.begin(), fftOutput.end());
     {
         std::lock_guard<std::mutex> lock_gd(m_spectrums_lock);
-        spectrum->stamp = (m_spectrums.size() > 0) ? m_spectrums.front()->stamp + 1 : 0;
+        const size_t stamp = (m_spectrums.size() > 0) ? m_spectrums.front()->stamp + 1 : 0;
+        auto spectrum = std::make_shared<const AudioSpectrum>(stamp, std::move(spectrumVector));
         m_spectrums.push_front(spectrum);
         if (m_spectrums.size() > m_spectrum_history_length){
             m_spectrums.pop_back();
@@ -318,28 +356,30 @@ void AudioDisplayWidget::paintEvent(QPaintEvent* event){
         // Each window has width: widgetWidth / (m_numFreqWindows-1) on the spectrogram
         const float FFTWindowWidth = widgetWidth / float(m_numFreqWindows-1);
 
-        for(const auto& overlayRange: m_overlays){
-            const size_t startingStamp = overlayRange.first;
-            const size_t endStamp = overlayRange.second;
-            if (startingStamp >= endStamp){
-                continue;
+        {
+            std::lock_guard<std::mutex> lock_gd(m_overlay_lock);
+            for(const auto& box: m_overlay){
+                const size_t startingStamp = std::get<0>(box);
+                const size_t endStamp = std::get<1>(box);
+                const Color& color = std::get<2>(box);
+                if (startingStamp >= endStamp){
+                    continue;
+                }
+
+                // std::cout << "Render overlay at (" << startingStamp << ", " << endStamp
+                //     << ") oldestStamp " << oldestStamp << " wID " << oldestWindowID << " newest stamp " << newestStamp << std::endl;
+
+                if (endStamp <= oldestStamp || startingStamp > newestStamp){
+                    continue;            
+                }
+
+                int xmin = int((startingStamp - oldestStamp + oldestWindowID - 0.5) * FFTWindowWidth + 0.5);
+                int ymin = rect().top();
+                int rangeWidth = int(FFTWindowWidth * (endStamp - startingStamp) + 0.5);
+                painter.setPen(QColor((uint32_t)color));
+                painter.drawRect(xmin, ymin, rangeWidth, widgetHeight);
             }
-
-            // std::cout << "Render overlay at (" << startingStamp << ", " << endStamp
-            //     << ") oldestStamp " << oldestStamp << " wID " << oldestWindowID << " newest stamp " << newestStamp << std::endl;
-
-            if (endStamp <= oldestStamp || startingStamp > newestStamp){
-                continue;            
-            }
-
-
-            int xmin = int((startingStamp - oldestStamp + oldestWindowID - 0.5) * FFTWindowWidth + 0.5);
-            int ymin = rect().top();
-            int rangeWidth = int(FFTWindowWidth * (endStamp - startingStamp) + 0.5);
-            painter.setPen(Qt::red);
-            painter.drawRect(xmin, ymin, rangeWidth, widgetHeight);
         }
-        
         break;
     }
     default:
@@ -348,8 +388,13 @@ void AudioDisplayWidget::paintEvent(QPaintEvent* event){
 }
 
 void AudioDisplayWidget::setAudioDisplayType(AudioDisplayType type){
-    m_audioDisplayType = type;
-    update_size();
+    if (m_audioDisplayType != type){
+        m_audioDisplayType = type;
+        update_size();
+
+        // Tell Qt to repaint the widget in the next drawing phase in the main loop.
+        QWidget::update();
+    }
 }
 
 void AudioDisplayWidget::update_size(){
@@ -382,7 +427,14 @@ void AudioDisplayWidget::resizeEvent(QResizeEvent* event){
 }
 
 
-void AudioDisplayWidget::spectrums_since(size_t startingStamp, std::vector<std::shared_ptr<AudioSpectrum>>& spectrums){
+int AudioDisplayWidget::sample_rate(){
+    std::lock_guard<std::mutex> lock_gd(m_sampleRate_lock);
+    return m_sampleRate;
+}
+
+
+void AudioDisplayWidget::spectrums_since(size_t startingStamp, std::vector<std::shared_ptr<const AudioSpectrum>>& spectrums){
+    std::lock_guard<std::mutex> lock_gd(m_spectrums_lock);
     for(const auto& ptr : m_spectrums){
         if (ptr->stamp >= startingStamp){
             spectrums.push_back(ptr);
@@ -392,7 +444,8 @@ void AudioDisplayWidget::spectrums_since(size_t startingStamp, std::vector<std::
     }
 }
 
-void AudioDisplayWidget::spectrums_latest(size_t numLatestSpectrums, std::vector<std::shared_ptr<AudioSpectrum>>& spectrums){
+void AudioDisplayWidget::spectrums_latest(size_t numLatestSpectrums, std::vector<std::shared_ptr<const AudioSpectrum>>& spectrums){
+    std::lock_guard<std::mutex> lock_gd(m_spectrums_lock);
     size_t i = 0;
     for(const auto& ptr : m_spectrums){
         if (i == numLatestSpectrums){
@@ -404,23 +457,27 @@ void AudioDisplayWidget::spectrums_latest(size_t numLatestSpectrums, std::vector
 }
 
 
-void AudioDisplayWidget::add_overlay(size_t startingStamp, size_t endStamp){
-    m_overlays.push_front(std::make_pair(startingStamp, endStamp));
+void AudioDisplayWidget::add_overlay(size_t startingStamp, size_t endStamp, Color color){
+    {
+        std::lock_guard<std::mutex> lock_gd(m_overlay_lock);
+        m_overlay.emplace_front(std::forward_as_tuple(startingStamp, endStamp, color));
 
-    // Now try to remove old overlays that are no longer showed on the spectrogram view.
+        // Now try to remove old overlays that are no longer showed on the spectrogram view.
 
-    // get the timestamp of the oldest window in the display history.
-    size_t oldest_stamp = m_freqVisStamps[m_nextFFTWindowIndex];
-    // SIZE_MAX means this slot is not yet assigned an FFT window
-    if (oldest_stamp != SIZE_MAX){
-        while(!m_overlays.empty()){
-            if (m_overlays.back().second <= oldest_stamp){
-                m_overlays.pop_back();
-            } else{
-                break;
+        // get the timestamp of the oldest window in the display history.
+        size_t oldestStamp = m_freqVisStamps[m_nextFFTWindowIndex];
+        // SIZE_MAX means this slot is not yet assigned an FFT window
+        if (oldestStamp != SIZE_MAX){
+            // Note: in this file we never consider the case that stamp may overflow.
+            // It requires on the order of 1e10 years to overflow if we have about 25ms per stamp.
+            while(!m_overlay.empty() && std::get<1>(m_overlay.back()) <= oldestStamp){
+                m_overlay.pop_back();
             }
         }
     }
+
+    // Tell Qt to repaint the widget in the next drawing phase in the main loop.
+    QWidget::update();
 }
 
 

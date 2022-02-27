@@ -22,13 +22,13 @@ AudioTemplate::AudioTemplate(std::vector<float>&& spectrogram, size_t numWindows
     ,m_spectrogram(std::move(spectrogram)) {}
 
 
-AudioTemplate loadAudioTemplate(const QString& filename){
+AudioTemplate loadAudioTemplate(const QString& filename, int sampleRate){
     QAudioFormat outputAudioFormat;
     outputAudioFormat.setChannelCount(1);
 #if QT_VERSION_MAJOR == 5
     outputAudioFormat.setCodec("audio/pcm");
 #endif
-    outputAudioFormat.setSampleRate(48000);
+    outputAudioFormat.setSampleRate(sampleRate);
     setSampleFormatToFloat(outputAudioFormat);
     
     AudioFileLoader loader(nullptr, filename, outputAudioFormat);
@@ -68,7 +68,7 @@ AudioTemplate loadAudioTemplate(const QString& filename){
         }
     }
 
-    std::cout << "Built audio template with " << numWindows << " windows and " << numFrequencies << 
+    std::cout << "Built audio template with sample rate " << sampleRate << ", " << numWindows << " windows and " << numFrequencies << 
         " frequenices from " << filename.toStdString() << std::endl;
 
     return AudioTemplate(std::move(spectrogram), numWindows);

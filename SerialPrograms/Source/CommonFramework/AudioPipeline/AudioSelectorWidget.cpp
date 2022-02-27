@@ -282,17 +282,20 @@ void AudioSelectorWidget::async_reset_audio(){
     emit internal_async_reset_audio();
 }
 
+int AudioSelectorWidget::sample_rate(){
+    return m_display.sample_rate();
+}
 
-void AudioSelectorWidget::spectrums_since(size_t startingStamp, std::vector<std::shared_ptr<AudioSpectrum>>& spectrums){
+void AudioSelectorWidget::spectrums_since(size_t startingStamp, std::vector<std::shared_ptr<const AudioSpectrum>>& spectrums){
     m_display.spectrums_since(startingStamp, spectrums);
 }
 
-void AudioSelectorWidget::spectrums_latest(size_t numLatestSpectrums, std::vector<std::shared_ptr<AudioSpectrum>>& spectrums){
+void AudioSelectorWidget::spectrums_latest(size_t numLatestSpectrums, std::vector<std::shared_ptr<const AudioSpectrum>>& spectrums){
     m_display.spectrums_latest(numLatestSpectrums, spectrums);
 }
 
-void AudioSelectorWidget::add_overlay(size_t startingStamp, size_t endStamp){
-    m_display.add_overlay(startingStamp, endStamp);
+void AudioSelectorWidget::add_overlay(size_t startingStamp, size_t endStamp, Color color){
+    m_display.add_overlay(startingStamp, endStamp, color);
 }
 
 void AudioSelectorWidget::set_audio_enabled(bool enabled){

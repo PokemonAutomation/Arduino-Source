@@ -10,6 +10,8 @@
 #include <vector>
 #include <memory>
 
+#include "Common/Cpp/Color.h"
+
 class QImage;
 
 namespace PokemonAutomation{
@@ -32,25 +34,27 @@ struct AudioSpectrum{
     AudioSpectrum(AudioSpectrum&&) = default;
 };
 
-//  Define basic interface of an audio feed to be used
-//  by programs.
+//  Define basic interface of an audio feed to be used by programs or other services.
+//  All the functions in the interface should be thread safe.
 class AudioFeed{
 public:
-    //  Can call from anywhere.
+    //  Reset audio; Can be called from any thread.
     virtual void async_reset_audio() = 0;
 
-    //  Return all the computed spectrums which stamps are greater or equal to `startingStamp`
-    //  Returned `spectrums` holds the queried spectrums in the order that the oldest (smallest timestamp)
-    //  was the last in the vector.
-    virtual void spectrums_since(size_t startingStamp, std::vector<std::shared_ptr<AudioSpectrum>>& spectrums) = 0;
+    //  Return the sample rate of the current audio stream.
+    //  Return 0 if audio is not yet set up.
+    virtual int sample_rate() = 0;
 
-    //  Return the latest spectrums.
-    //  Returned `spectrums` holds the queried spectrums in the order that the oldest (smallest timestamp)
-    //  was the last in the vector.
-    virtual void spectrums_latest(size_t numLatestSpectrums, std::vector<std::shared_ptr<AudioSpectrum>>& spectrums) = 0;
+    //  Return all the spectrums with stamps greater or equal to `startingStamp`
+    //  Returned spectrums are ordered from newest (largest timestamp) to oldest (smallest timestamp) in the vector.
+    virtual void spectrums_since(size_t startingStamp, std::vector<std::shared_ptr<const AudioSpectrum>>& spectrums) = 0;
 
-    //  Add visual overlay to the spectrums starting at `startingStamp` and before `endStamp`.
-    virtual void add_overlay(size_t startingStamp, size_t endStamp) = 0;
+    //  Return a specific number of latest spectrums.
+    //  Returned spectrums are ordered from newest (largest timestamp) to oldest (smallest timestamp) in the vector.
+    virtual void spectrums_latest(size_t numLatestSpectrums, std::vector<std::shared_ptr<const AudioSpectrum>>& spectrums) = 0;
+
+    //  Add visual overlay to the spectrums starting at `startingStamp` and before `endStamp` with `color`.
+    virtual void add_overlay(size_t startingStamp, size_t endStamp, Color color) = 0;
 };
 
 

@@ -227,6 +227,9 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ImageTools/SolidColorTest.h
     Source/CommonFramework/Inference/AnomalyDetector.cpp
     Source/CommonFramework/Inference/AnomalyDetector.h
+    Source/CommonFramework/Inference/AudioInferenceCallback.h
+    Source/CommonFramework/Inference/AudioInferenceSession.cpp
+    Source/CommonFramework/Inference/AudioInferenceSession.h
     Source/CommonFramework/Inference/BlackBorderDetector.cpp
     Source/CommonFramework/Inference/BlackBorderDetector.h
     Source/CommonFramework/Inference/BlackScreenDetector.cpp
@@ -240,6 +243,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Inference/InferenceException.cpp
     Source/CommonFramework/Inference/InferenceException.h
     Source/CommonFramework/Inference/InferenceThrottler.h
+    Source/CommonFramework/Inference/SpectrogramMatcher.cpp
+    Source/CommonFramework/Inference/SpectrogramMatcher.h
     Source/CommonFramework/Inference/StatAccumulator.cpp
     Source/CommonFramework/Inference/StatAccumulator.h
     Source/CommonFramework/Inference/TimeWindowStatTracker.h
@@ -593,8 +598,6 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/TestProgramComputer.h
     Source/NintendoSwitch/TestProgramSwitch.cpp
     Source/NintendoSwitch/TestProgramSwitch.h
-    Source/NintendoSwitch/TestProgramSwitchAudio.cpp
-    Source/NintendoSwitch/TestProgramSwitchAudio.h
     Source/PanelLists.cpp
     Source/PanelLists.h
     Source/Pokemon/Inference/Pokemon_BerryNameReader.cpp
@@ -807,6 +810,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.h
+    Source/PokemonLA/Inference/PokemonLA_ShinySoundDetector.cpp
+    Source/PokemonLA/Inference/PokemonLA_ShinySoundDetector.h
     Source/PokemonLA/Panels_PokemonLA.cpp
     Source/PokemonLA/Panels_PokemonLA.h
     Source/PokemonLA/PokemonLA_Settings.cpp
@@ -833,6 +838,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/PokemonLA_SelfTouchTrade.h
     Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.cpp
     Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.h
+    Source/PokemonLA/Programs/PokemonLA_ShinySoundListener.h
+    Source/PokemonLA/Programs/PokemonLA_ShinySoundListener.cpp
     Source/PokemonLA/Programs/PokemonLA_TradeRoutines.cpp
     Source/PokemonLA/Programs/PokemonLA_TradeRoutines.h
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp

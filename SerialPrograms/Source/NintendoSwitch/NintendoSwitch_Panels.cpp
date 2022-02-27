@@ -24,7 +24,6 @@
 
 #include "TestProgramComputer.h"
 #include "TestProgramSwitch.h"
-#include "TestProgramSwitchAudio.h"
 #include "NintendoSwitch/InferenceTraining/PokemonHome_GenerateNameOCR.h"
 #include "Pokemon/Inference/Pokemon_TrainIVCheckerOCR.h"
 #include "Pokemon/Inference/Pokemon_TrainPokemonOCR.h"
@@ -58,7 +57,6 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
         add_divider("---- Developer Tools ----");
         add_program<TestProgramComputer_Descriptor, TestProgramComputer>();
         add_program<TestProgram_Descriptor, TestProgram>();
-        add_program<TestProgramAudio_Descriptor, TestProgramAudio>();
         add_program<PokemonHome::GenerateNameOCRData_Descriptor, PokemonHome::GenerateNameOCRData>();
         add_program<Pokemon::TrainIVCheckerOCR_Descriptor, Pokemon::TrainIVCheckerOCR>();
         add_program<Pokemon::TrainPokemonOCR_Descriptor, Pokemon::TrainPokemonOCR>();

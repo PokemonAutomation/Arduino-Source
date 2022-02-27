@@ -25,13 +25,21 @@ namespace PokemonAutomation{
 
 class AudioDecoderWorker;
 
-// Load mp3 audio from disk and optionally play at desired sample rate.
+// Load .wav and .mp3 audio from disk and optionally play at desired sample rate.
 
 // Note: for ease of implementation this class saves all the decoded raw samples to
 // memory before sending them out when `start()` is called. For a large audio file this
 // is problematic as it will consume lots of memory. But the purpose of this functionality
 // is to load recorded audio for testing and developing audio inference programs.
 // So the input audio files should be small.
+// You can also call `loadFullAudio()` to load the audio directly into memory.
+// The loader tries to convert the audio data into the format specified as `audioFormat`
+// in the constructor. For .mp3 files this conversion is done by QtAudioDecoder, while
+// for .wav files the converion is done in `AudioFileLoader`.
+// Currently we hard code the code to only return float data because that's the rest of
+// the audio pipeline uses.
+// For .wav file the format conversion is not fully implement: we cannot convert sampling
+// rate during playback (after 'start()' called), but support it in `loadFullAudio()`.
 class AudioFileLoader: public QObject{
     Q_OBJECT
 
@@ -43,14 +51,16 @@ public:
     // Send the sample buffers at the desired speed determined by sample rate in `audioFormat` passed
     // to the constructor.
     // Retrieve sample buffer by connecting to signal `bufferReady` from the same thread.
+    // See comments of the class full more details.
     bool start();
 
     // Load and decode full audio from file. Return the internal buffer (pointer and size) holding
     // the decoded audio data. If loading fails, the returned pointer is nullptr.
     // Note: this is a blocking operation.
+    // See comments of the class full more details.
     std::tuple<const char*, size_t> loadFullAudio();
 
-    QAudioFormat audioFormat() const { return m_audioFormat; }
+    const QAudioFormat& audioFormat() const { return m_audioFormat; }
 
 signals:
     // Send audio sample buffer at time interval `m_timer_interval_ms` after `start()` called

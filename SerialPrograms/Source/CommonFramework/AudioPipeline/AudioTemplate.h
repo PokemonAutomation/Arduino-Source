@@ -23,8 +23,11 @@ public:
     
     size_t numWindows() const { return m_numWindows; }
     size_t numFrequencies() const { return m_numFrequencies; }
+    const std::vector<float>& spectrogram() const { return m_spectrogram; }
 
     const float* getWindow(size_t windowIndex) const { return m_spectrogram.data() + windowIndex * m_numFrequencies; }
+
+    void scale(float s) { for(auto& v: m_spectrogram) v *= s; }
 
 private:
     size_t m_numWindows = 0;
@@ -32,7 +35,7 @@ private:
     std::vector<float> m_spectrogram;
 };
 
-AudioTemplate loadAudioTemplate(const QString& filename); 
+AudioTemplate loadAudioTemplate(const QString& filename, int sampleRate = 48000); 
 
 
 
