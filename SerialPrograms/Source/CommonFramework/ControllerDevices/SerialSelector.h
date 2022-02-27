@@ -11,7 +11,7 @@
 #include <QString>
 #include "Common/Cpp/Pimpl.h"
 #include "Common/PokemonSwSh/PokemonProgramIDs.h"
-#include "CommonFramework/Logging/DeviceLogger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 
 class QJsonValue;
 class QSerialPortInfo;
@@ -41,7 +41,7 @@ public:
 
     const QSerialPortInfo* port() const;
 
-    SerialSelectorWidget* make_ui(QWidget& parent, Logger& logger);
+    SerialSelectorWidget* make_ui(QWidget& parent, LoggerQt& logger);
 
 private:
     friend class SerialSelectorWidget;

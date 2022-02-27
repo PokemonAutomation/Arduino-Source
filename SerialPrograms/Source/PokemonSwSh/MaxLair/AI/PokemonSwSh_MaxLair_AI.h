@@ -24,7 +24,7 @@ int random(int min, int max);
 //  1 for middle Pokemon
 //  2 for bottom Pokemon
 int8_t select_starter(
-    Logger& logger,
+    LoggerQt& logger,
     const GlobalState& state,
     size_t player_index,
     const std::string options[3]
@@ -34,35 +34,35 @@ int8_t select_starter(
 //  1 for 2nd from left.
 //  2 ...
 std::vector<PathNode> select_path(
-    Logger& logger,
+    LoggerQt& logger,
     const GlobalState& state,
     size_t player_index
 );
 
 //  Return -1 if no selecting an item.
 int8_t select_item(
-    Logger& logger,
+    LoggerQt& logger,
     const GlobalState& state,
     size_t player_index
 );
 
 //  Professor offers to exchange a Pokemon.
 bool should_swap_with_professor(
-    Logger& logger,
+    LoggerQt& logger,
     const GlobalState& state,
     size_t player_index
 );
 
 //  Return 0 - 3 for move position. 2nd parameter is dmax.
 std::pair<uint8_t, bool> select_move(
-    Logger& logger,
+    LoggerQt& logger,
     const GlobalState& state,
     size_t player_index
 );
 
 //  Swap with newly caught Pokemon.
 bool should_swap_with_newly_caught(
-    Logger& logger,
+    LoggerQt& logger,
     const GlobalState& state,
     size_t player_index,
     const std::string options[2]

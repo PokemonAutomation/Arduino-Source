@@ -7,6 +7,7 @@
 #include <QSerialPortInfo>
 #include <QHBoxLayout>
 #include "Common/Qt/NoWheelComboBox.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "SerialSelectorWidget.h"
 
 #include <iostream>
@@ -19,12 +20,12 @@ namespace PokemonAutomation{
 SerialSelectorWidget::SerialSelectorWidget(
     QWidget& parent,
     SerialSelector& value,
-    Logger& logger
+    LoggerQt& logger
 )
     : QWidget(&parent)
     , m_value(value)
-    , m_logger(logger)
-    , m_connection(value.m_port, value.m_minimum_pabotbase, m_logger)
+    , m_logger(logger, GlobalSettings::instance().LOG_EVERYTHING)
+    , m_connection(m_logger, value.m_port, value.m_minimum_pabotbase)
 {
     QHBoxLayout* serial_row = new QHBoxLayout(this);
     serial_row->setContentsMargins(0, 0, 0, 0);

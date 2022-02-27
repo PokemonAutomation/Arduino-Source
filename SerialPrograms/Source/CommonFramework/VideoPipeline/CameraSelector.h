@@ -8,7 +8,7 @@
 #define PokemonAutomation_VideoPipeline_CameraSelector_H
 
 #include <QSize>
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CameraInfo.h"
 
 class QJsonValue;
@@ -36,7 +36,7 @@ public:
     void load_json(const QJsonValue& json);
     QJsonValue to_json() const;
 
-    CameraSelectorWidget* make_ui(QWidget& parent, Logger& logger, VideoDisplayWidget& holder);
+    CameraSelectorWidget* make_ui(QWidget& parent, LoggerQt& logger, VideoDisplayWidget& holder);
 
 private:
     friend class CameraSelectorWidget;

@@ -22,7 +22,7 @@ public:
     MultiSwitchSystemWidget(
         QWidget& parent,
         MultiSwitchSystemFactory& factory,
-        Logger& logger,
+        LoggerQt& logger,
         uint64_t program_id
     );
     void redraw_videos(size_t count);
@@ -44,7 +44,7 @@ private:
 private:
     uint64_t m_program_id;
     MultiSwitchSystemFactory& m_factory;
-    Logger& m_logger;
+    LoggerQt& m_logger;
     QComboBox* m_console_count_box;
     std::vector<SwitchSystemWidget*> m_switches;
     QWidget* m_videos;

@@ -307,7 +307,7 @@ MountState MountDetector::detect(const QImage& screen) const{
 
 
 
-MountTracker::MountTracker(Logger& logger)
+MountTracker::MountTracker(LoggerQt& logger)
     : VisualInferenceCallback("MountTracker")
     , m_logger(logger)
     , m_state(MountState::NOTHING)

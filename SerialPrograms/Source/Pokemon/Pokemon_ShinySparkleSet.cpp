@@ -5,7 +5,7 @@
  */
 
 #include <QImage>
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "Pokemon_ShinySparkleSet.h"
 
 namespace PokemonAutomation{
@@ -13,7 +13,7 @@ namespace Pokemon{
 
 
 ShinySparkleTracker::ShinySparkleTracker(
-    Logger& logger, VideoOverlay& overlay,
+    LoggerQt& logger, VideoOverlay& overlay,
     ShinySparkleSet& sparkle_set,
     const ImageFloatBox& box
 )

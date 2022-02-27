@@ -95,7 +95,7 @@ void GlobalStateTracker::mark_as_dead(size_t index){
 }
 
 GlobalState GlobalStateTracker::synchronize(
-    ProgramEnvironment& env, Logger& logger,
+    ProgramEnvironment& env, LoggerQt& logger,
     size_t index,
     std::chrono::milliseconds window
 ){

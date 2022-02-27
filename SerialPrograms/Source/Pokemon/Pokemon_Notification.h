@@ -11,7 +11,7 @@
 #include <set>
 #include <chrono>
 #include <QString>
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -30,7 +30,7 @@ struct EncounterResult{
 
 
 void send_encounter_notification(
-    Logger& logger,
+    LoggerQt& logger,
     EventNotificationOption& settings_nonshiny,
     EventNotificationOption& settings_shiny,
     const ProgramInfo& info,
@@ -43,7 +43,7 @@ void send_encounter_notification(
 );
 
 void send_catch_notification(
-    Logger& logger,
+    LoggerQt& logger,
     EventNotificationOption& settings_catch_success,
     EventNotificationOption& settings_catch_failed,
     const ProgramInfo& info,

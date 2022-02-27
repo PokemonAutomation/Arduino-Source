@@ -36,7 +36,7 @@ NotificationOCR::NotificationOCR()
 
 
 
-NotificationReader::NotificationReader(Logger& logger, Language language)
+NotificationReader::NotificationReader(LoggerQt& logger, Language language)
     : m_logger(logger)
     , m_language(language)
     , m_ocr_box(0.30, 0.138, 0.40, 0.036)
@@ -136,7 +136,7 @@ Notification NotificationReader::detect(const QImage& screen) const{
 
 
 
-NotificationDetector::NotificationDetector(Logger& logger, Language language)
+NotificationDetector::NotificationDetector(LoggerQt& logger, Language language)
     : VisualInferenceCallback("NotificationDetector")
     , m_reader(logger, language)
     , m_last(Notification::NOTHING)

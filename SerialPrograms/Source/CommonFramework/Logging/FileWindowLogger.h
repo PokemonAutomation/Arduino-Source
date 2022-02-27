@@ -12,14 +12,14 @@
 #include <QFile>
 #include <QTextEdit>
 #include <QMainWindow>
-#include "Logger.h"
+#include "LoggerQt.h"
 
 namespace PokemonAutomation{
 
 class FileWindowLoggerWindow;
 
 
-class FileWindowLogger : public Logger{
+class FileWindowLogger : public LoggerQt{
 public:
     FileWindowLogger(const QString& path);
 

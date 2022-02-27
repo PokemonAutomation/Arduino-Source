@@ -12,7 +12,7 @@
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
-    class Logger;
+    class LoggerQt;
 }
 
 namespace PokemonAutomation{
@@ -40,7 +40,7 @@ public:
 class ShinySparkleTracker : public VisualInferenceCallback{
 public:
     ShinySparkleTracker(
-        Logger& logger, VideoOverlay& overlay,
+        LoggerQt& logger, VideoOverlay& overlay,
         ShinySparkleSet& sparkle_set,
         const ImageFloatBox& box
     );
@@ -54,7 +54,7 @@ public:
 
 private:
     ImageFloatBox m_box;
-    Logger& m_logger;
+    LoggerQt& m_logger;
     ShinySparkleSet& m_current_sparkles;
     VideoOverlaySet m_overlays;
 };

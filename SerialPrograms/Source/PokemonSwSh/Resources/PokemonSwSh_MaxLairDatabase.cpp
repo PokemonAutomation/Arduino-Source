@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <map>
 #include <QtGlobal>
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
@@ -38,7 +39,11 @@ struct MaxLairSlugsDatabase{
         QString path = RESOURCE_PATH() + QString::fromStdString("PokemonSwSh/MaxLairSlugMap.json");
         QJsonObject json = read_json_file(path).object();
         if (json.empty()){
-            PA_THROW_FileException("Json is either empty or invalid.", path);
+            throw FileException(
+                nullptr, __PRETTY_FUNCTION__,
+                "Json is either empty or invalid.",
+                path.toStdString()
+            );
         }
 
         for (auto iter = json.begin(); iter != json.end(); ++iter){
@@ -48,7 +53,7 @@ struct MaxLairSlugsDatabase{
             for (const auto& item : obj["OCR"].toArray()){
                 std::string slug = item.toString().toStdString();
                 if (!slugs.name_slug.empty()){
-                    PA_THROW_ParseException("Multiple names specified for MaxLair slug.");
+                    throw FileException(nullptr, __PRETTY_FUNCTION__, "Multiple names specified for MaxLair slug.", path.toStdString());
                 }
                 slugs.name_slug = std::move(slug);
             }

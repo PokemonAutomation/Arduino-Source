@@ -18,7 +18,7 @@ namespace PokemonSwSh{
 
 
 EncounterDialogTracker::EncounterDialogTracker(
-    Logger& logger,
+    LoggerQt& logger,
     StaticScreenDetector& dialog_detector
 )
     : VisualInferenceCallback("EncounterDialogTracker")

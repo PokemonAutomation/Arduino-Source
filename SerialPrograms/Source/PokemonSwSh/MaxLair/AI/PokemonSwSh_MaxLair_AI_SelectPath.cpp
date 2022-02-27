@@ -29,7 +29,7 @@ namespace MaxLairInternal{
 //  1 for 2nd from left.
 //  2 ...
 std::vector<PathNode> select_path(
-    Logger& logger,
+    LoggerQt& logger,
     const GlobalState& state,
     size_t player_index
 ){

@@ -6,6 +6,7 @@
 
 #include <map>
 #include <QtGlobal>
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
@@ -44,7 +45,11 @@ private:
         QString path = RESOURCE_PATH() + QString::fromStdString("PokemonSwSh/MaxLair/boss_matchup_LUT.json");
         QJsonObject json = read_json_file(path).object();
         if (json.empty()){
-            PA_THROW_FileException("Json is either empty or invalid.", path);
+            throw FileException(
+                nullptr, __PRETTY_FUNCTION__,
+                "Json is either empty or invalid.",
+                path.toStdString()
+            );
         }
         for (auto iter0 = json.begin(); iter0 != json.end(); ++iter0){
             std::map<std::string, double>& sub = map[iter0.key().toStdString()];

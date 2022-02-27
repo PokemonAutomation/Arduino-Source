@@ -160,7 +160,7 @@ void EventNotificationOption::restore_defaults(){
 void EventNotificationOption::reset_rate_limit(){
     m_last_sent = std::chrono::system_clock::time_point::min();
 }
-bool EventNotificationOption::ok_to_send_now(Logger& logger){
+bool EventNotificationOption::ok_to_send_now(LoggerQt& logger){
     if (!m_enabled){
         logger.log("EventNotification(" + m_label + "): Notifications not enabled.", COLOR_PURPLE);
         return false;

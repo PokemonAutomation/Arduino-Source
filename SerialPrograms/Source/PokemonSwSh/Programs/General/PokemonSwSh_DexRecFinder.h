@@ -56,7 +56,7 @@ private:
         bool& found,
         bool& excluded,
         bool& bad_read,
-        Logger& logger,
+        LoggerQt& logger,
         Language language,
         const QImage& frame,
         const ImageFloatBox& box,

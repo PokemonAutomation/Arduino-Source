@@ -9,7 +9,7 @@
 
 #include <string>
 #include <map>
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 
 namespace PokemonAutomation{
 namespace ImageMatch{
@@ -18,7 +18,7 @@ namespace ImageMatch{
 struct ImageMatchResult{
     std::multimap<double, std::string> results;
 
-    void log(Logger& logger, double max_alpha) const;
+    void log(LoggerQt& logger, double max_alpha) const;
 
     void add(double alpha, std::string slug);
     void clear_beyond_spread(double max_alpha_spread);

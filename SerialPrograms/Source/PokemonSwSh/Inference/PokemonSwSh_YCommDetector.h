@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_YCommDetector_H
 #define PokemonAutomation_PokemonSwSh_YCommDetector_H
 
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 

@@ -26,7 +26,7 @@ public:
     SwitchSystemWidget(
         QWidget& parent,
         SwitchSystemFactory& factory,
-        Logger& raw_logger,
+        LoggerQt& raw_logger,
         uint64_t program_id
     );
     virtual ~SwitchSystemWidget();
@@ -39,7 +39,7 @@ public:
     virtual void reset_serial() override;
 
 public:
-    Logger& logger();
+    LoggerQt& logger();
     BotBase* botbase();
     VideoFeed& camera();
     VideoOverlay& overlay();

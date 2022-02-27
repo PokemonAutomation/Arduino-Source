@@ -22,7 +22,7 @@ namespace PokemonLA{
 
 
 
-ShinySoundDetector::ShinySoundDetector(Logger& logger, int sampleRate)
+ShinySoundDetector::ShinySoundDetector(LoggerQt& logger, int sampleRate)
     : AudioInferenceCallback("ShinySoundDetector")
     , m_logger(logger)
 {

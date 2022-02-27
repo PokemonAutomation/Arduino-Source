@@ -24,7 +24,7 @@ const ShinyDetectionBattle SHINY_BATTLE_RAID    {true,  {0.3, 0.01, 0.7, 0.75}, 
 
 
 ShinyEncounterTracker::ShinyEncounterTracker(
-    Logger& logger, VideoOverlay& overlay,
+    LoggerQt& logger, VideoOverlay& overlay,
     const ShinyDetectionBattle& battle_settings
 )
     : VisualInferenceCallback("ShinyEncounterTracker")
@@ -69,7 +69,7 @@ bool ShinyEncounterTracker::process_frame(
 }
 
 ShinyType determine_shiny_status(
-    Logger& logger,
+    LoggerQt& logger,
     const ShinyDetectionBattle& battle_settings,
     const EncounterDialogTracker& dialog_tracker,
     const ShinySparkleAggregator& sparkles,
@@ -114,7 +114,7 @@ ShinyType determine_shiny_status(
 
 ShinyDetectionResult detect_shiny_battle(
     ProgramEnvironment& env,
-    Logger& logger,
+    LoggerQt& logger,
     VideoFeed& feed, VideoOverlay& overlay,
     const ShinyDetectionBattle& battle_settings,
     std::chrono::seconds timeout,

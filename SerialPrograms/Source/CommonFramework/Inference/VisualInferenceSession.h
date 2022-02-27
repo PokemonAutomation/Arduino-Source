@@ -21,7 +21,7 @@ namespace PokemonAutomation{
 class VisualInferenceSession{
 public:
     VisualInferenceSession(
-        ProgramEnvironment& env, Logger& logger,
+        ProgramEnvironment& env, LoggerQt& logger,
         VideoFeed& feed, VideoOverlay& overlay,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)
     );
@@ -41,7 +41,7 @@ private:
     struct Callback;
 
     ProgramEnvironment& m_env;
-    Logger& m_logger;
+    LoggerQt& m_logger;
     VideoFeed& m_feed;
     VideoOverlay& m_overlay;
     std::chrono::milliseconds m_period;
@@ -61,7 +61,7 @@ private:
 class AsyncVisualInferenceSession : private VisualInferenceSession{
 public:
     AsyncVisualInferenceSession(
-        ProgramEnvironment& env, Logger& logger,
+        ProgramEnvironment& env, LoggerQt& logger,
         VideoFeed& feed, VideoOverlay& overlay,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)
     );

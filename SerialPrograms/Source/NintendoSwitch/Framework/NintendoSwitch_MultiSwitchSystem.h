@@ -45,7 +45,7 @@ public:
     const QSerialPortInfo* port(size_t index) const;
 //    const QCameraInfo* camera(size_t index) const;
 
-    SwitchSetupWidget* make_ui(QWidget& parent, Logger& logger, uint64_t program_id) override;
+    SwitchSetupWidget* make_ui(QWidget& parent, LoggerQt& logger, uint64_t program_id) override;
 
 private:
     friend class MultiSwitchSystemWidget;

@@ -12,7 +12,7 @@
 #include <set>
 #include <map>
 #include <QString>
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 
 namespace PokemonAutomation{
 namespace OCR{
@@ -38,7 +38,7 @@ struct StringMatchResult{
         results.clear();
         expected_token.clear();
     }
-    void log(Logger& logger, double max_log10p, const QString& extra = QString()) const;
+    void log(LoggerQt& logger, double max_log10p, const QString& extra = QString()) const;
 
     void add(double log10p, StringMatchData data);
     void clear_beyond_spread(double log10p_spread);

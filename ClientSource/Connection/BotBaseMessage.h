@@ -10,7 +10,7 @@
 #include <stdint.h>
 #include <cstring>
 #include <string>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "BotBase.h"
 
 namespace PokemonAutomation{
@@ -33,12 +33,12 @@ struct BotBaseMessage{
     {}
 
     template <uint8_t MessageType, typename MessageBody>
-    void convert(MessageBody& params) const{
+    void convert(Logger& logger, MessageBody& params) const{
         if (type != MessageType){
-            PA_THROW_StringException("Received incorrect response type: " + std::to_string(type));
+            throw SerialProtocolException(logger, "Received incorrect response type: " + std::to_string(type));
         }
         if (body.size() != sizeof(MessageBody)){
-            PA_THROW_StringException("Received incorrect response size: " + std::to_string(body.size()));
+            throw SerialProtocolException(logger, "Received incorrect response size: " + std::to_string(body.size()));
         }
         memcpy(&params, body.c_str(), body.size());
     }

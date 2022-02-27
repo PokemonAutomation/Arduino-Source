@@ -12,7 +12,7 @@
 
 namespace PokemonAutomation{
 
-class Logger;
+class LoggerQt;
 
 
 class StatAccumulatorI32{
@@ -29,7 +29,7 @@ public:
     double stddev() const;
 
     std::string dump(const char* units, double divider) const;
-    void log(Logger& logger, const std::string& label, const char* units, double divider) const;
+    void log(LoggerQt& logger, const std::string& label, const char* units, double divider) const;
 
 private:
     uint64_t m_count = 0;

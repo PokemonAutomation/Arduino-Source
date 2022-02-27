@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioSelector_H
 #define PokemonAutomation_AudioPipeline_AudioSelector_H
 
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "AudioInfo.h"
 
 class QJsonValue;
@@ -47,7 +47,7 @@ public:
     void load_json(const QJsonValue& json);
     QJsonValue to_json() const;
 
-    AudioSelectorWidget* make_ui(QWidget& parent, Logger& logger, AudioDisplayWidget& holder);
+    AudioSelectorWidget* make_ui(QWidget& parent, LoggerQt& logger, AudioDisplayWidget& holder);
 
 private:
     friend class AudioSelectorWidget;

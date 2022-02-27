@@ -7,7 +7,7 @@
 #include <QFile>
 #include <QJsonDocument>
 #include <QJsonArray>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "OCR_StringNormalization.h"

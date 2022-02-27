@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_ShinySoundDetector_H
 #define PokemonAutomation_PokemonLA_ShinySoundDetector_H
 
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Inference/AudioInferenceCallback.h"
 
 #include <memory>
@@ -22,7 +22,7 @@ namespace PokemonLA{
 
 class ShinySoundDetector : public AudioInferenceCallback{
 public:
-    ShinySoundDetector(Logger& logger, int sampleRate);
+    ShinySoundDetector(LoggerQt& logger, int sampleRate);
 
     virtual bool process_spectrums(
         const std::vector<std::shared_ptr<const AudioSpectrum>>& newSpectrums,
@@ -34,7 +34,7 @@ public:
 
 private:
 
-    Logger& m_logger;
+    LoggerQt& m_logger;
 
     std::unique_ptr<SpectrogramMatcher> m_matcher;
 };

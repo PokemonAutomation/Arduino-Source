@@ -217,7 +217,7 @@ void print(const scomplex* ptr, size_t len){
 
 
 std::set<std::string> read_name(
-    Logger& logger,
+    LoggerQt& logger,
     Language language,
     const QImage& screen, const ImageFloatBox& box
 ){

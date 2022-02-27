@@ -91,7 +91,7 @@ bool PokemonSelectMenuDetector::process_frame(
 
 
 PokemonSelectMenuReader::PokemonSelectMenuReader(
-    Logger& logger,
+    LoggerQt& logger,
     VideoOverlay& overlay,
     Language language
 )

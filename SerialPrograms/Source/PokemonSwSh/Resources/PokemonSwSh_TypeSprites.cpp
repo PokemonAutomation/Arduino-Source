@@ -5,6 +5,7 @@
  */
 
 #include <QtGlobal>
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Exception.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
@@ -57,7 +58,11 @@ TypeSprite::TypeSprite(const std::string& slug)
     QString path = RESOURCE_PATH() + "PokemonSwSh/Types/" + QString::fromStdString(slug) + ".png";
     m_sprite = QImage(path);
     if (m_sprite.isNull()){
-        PA_THROW_FileException("Unable to open file.", path);
+        throw FileException(
+            nullptr, __PRETTY_FUNCTION__,
+            "Unable to open file.",
+            path.toStdString()
+        );
     }
     if (m_sprite.format() != QImage::Format_RGB32 && m_sprite.format() != QImage::Format_ARGB32){
         m_sprite = m_sprite.convertToFormat(QImage::Format_RGB32);

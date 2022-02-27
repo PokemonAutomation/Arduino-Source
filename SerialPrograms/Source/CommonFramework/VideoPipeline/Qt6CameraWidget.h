@@ -8,7 +8,7 @@
 #define PokemonAutomation_VideoPipeline_Qt6VideoWidget_H
 
 #include <mutex>
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CameraInfo.h"
 #include "VideoWidget.h"
 

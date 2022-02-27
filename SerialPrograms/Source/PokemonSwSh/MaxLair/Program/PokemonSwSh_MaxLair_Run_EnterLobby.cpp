@@ -67,7 +67,7 @@ private:
 
 class OreReader{
 public:
-    OreReader(Logger& logger, VideoOverlay& overlay)
+    OreReader(LoggerQt& logger, VideoOverlay& overlay)
         : m_logger(logger)
         , m_box(overlay, 0.945, 0.010, 0.0525, 0.050)
     {}
@@ -79,7 +79,7 @@ public:
     }
 
 private:
-    Logger& m_logger;
+    LoggerQt& m_logger;
     InferenceBoxScope m_box;
 };
 

@@ -2,6 +2,9 @@
  * 
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  * 
+ *  This is the old deprecated exceptions header.
+ *
+ *
  */
 
 #ifndef PokemonAutomation_Exception_H
@@ -15,6 +18,7 @@
 #endif
 
 #include "Common/Compiler.h"
+#include "AbstractLogger.h"
 
 namespace PokemonAutomation{
 
@@ -62,36 +66,6 @@ protected:
 
 
 
-class ParseException : public StringException{
-public:
-    using StringException::StringException;
-
-    virtual const char* type() const{
-        return "ParseException";
-    }
-};
-#define PA_THROW_ParseException(message)    \
-    throw ParseException(__PRETTY_FUNCTION__, message)
-
-
-
-class FileException : public StringException{
-public:
-    FileException(const char* location, std::string message, const std::string& file);
-#ifdef QT_VERSION
-    FileException(const char* location, std::string message, const QString& file)
-        : FileException(location, std::move(message), std::string(file.toUtf8().data()))
-    {}
-#endif
-
-    virtual const char* type() const{
-        return "FileException";
-    }
-
-private:
-};
-#define PA_THROW_FileException(message, file) \
-    throw FileException(__PRETTY_FUNCTION__, message, file)
 
 
 }

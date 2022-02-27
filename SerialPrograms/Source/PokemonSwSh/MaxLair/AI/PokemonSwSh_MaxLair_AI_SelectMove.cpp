@@ -18,7 +18,7 @@ namespace MaxLairInternal{
 
 
 std::pair<uint8_t, bool> select_move_ai(
-    Logger& logger,
+    LoggerQt& logger,
     const GlobalState& state,
     size_t player_index
 ){
@@ -123,7 +123,7 @@ std::pair<uint8_t, bool> select_move_ai(
 
 //  Return 0 - 3 for move position. 2nd parameter is dmax.
 std::pair<uint8_t, bool> select_move(
-    Logger& logger,
+    LoggerQt& logger,
     const GlobalState& state,
     size_t player_index
 ){

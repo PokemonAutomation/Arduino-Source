@@ -25,7 +25,7 @@ private:
     template <class... Args>
     SingleSwitchProgramEnvironment(
         ProgramInfo program_info,
-        Logger& logger,
+        LoggerQt& logger,
         StatsTracker* current_stats,
         const StatsTracker* historical_stats,
         Args&&... args

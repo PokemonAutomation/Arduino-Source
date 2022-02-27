@@ -57,7 +57,7 @@ void ArcPhoneTracker::finish(){
 
 
 ArcPhoneDetector::ArcPhoneDetector(
-    Logger& logger, VideoOverlay& overlay,
+    LoggerQt& logger, VideoOverlay& overlay,
     std::chrono::milliseconds min_streak,
     bool stop_on_detected
 )

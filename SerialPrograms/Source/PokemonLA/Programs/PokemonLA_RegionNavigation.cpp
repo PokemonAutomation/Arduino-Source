@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Exception.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
@@ -59,7 +60,7 @@ void goto_professor(ConsoleHandle& console, Camp camp){
         PA_THROW_StringException("Unknown Camp: " + std::to_string((int)camp));
     }
 }
-bool from_professor_return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& console){
+void from_professor_return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& console){
     ButtonDetector button_detector0(
         console, console,
         ButtonType::ButtonA, ImageFloatBox(0.500, 0.578, 0.300, 0.043),
@@ -91,7 +92,8 @@ bool from_professor_return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& c
         case 0:
             console.log("Detected return option...");
             pbf_press_dpad(console, DPAD_DOWN, 20, 105);
-            return mash_A_to_change_region(env, console);
+            mash_A_to_change_region(env, console);
+            return;
         case 1:
             console.log("Detected report research option...");
             break;
@@ -100,9 +102,7 @@ bool from_professor_return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& c
             pbf_mash_button(console, BUTTON_B, 20);
             break;
         default:
-            console.log("Did not detect option to return to Jubilife.", COLOR_RED);
-//            pbf_mash_button(console, BUTTON_B, 5 * TICKS_PER_SECOND);
-            return false;
+            throw OperationFailedException(console, "Did not detect option to return to Jubilife.");
         }
     }
 }
@@ -111,7 +111,7 @@ bool from_professor_return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& c
 
 
 
-bool mash_A_to_change_region(ProgramEnvironment& env, ConsoleHandle& console){
+void mash_A_to_change_region(ProgramEnvironment& env, ConsoleHandle& console){
     BlackScreenOverWatcher black_screen0;
     int ret = run_until(
         env, console,
@@ -121,9 +121,7 @@ bool mash_A_to_change_region(ProgramEnvironment& env, ConsoleHandle& console){
         { &black_screen0 }
     );
     if (ret < 0){
-        console.log("Failed to load into region after 20 seconds.", COLOR_RED);
-//        PA_THROW_StringException("Failed to load into region after 20 seconds.");
-        return false;
+        throw OperationFailedException(console, "Failed to load into region after 20 seconds.");
     }
     env.wait_for(std::chrono::milliseconds(100));
 
@@ -135,17 +133,14 @@ bool mash_A_to_change_region(ProgramEnvironment& env, ConsoleHandle& console){
         { &black_screen1a, &black_screen1b }
     );
     if (ret < 0){
-        console.log("Failed to load into region after 20 seconds.", COLOR_RED);
-//        PA_THROW_StringException("Failed to load into region after 20 seconds.");
-        return false;
+        throw OperationFailedException(console, "Failed to load into region after 20 seconds.");
     }
     console.log("Loaded into map...");
     env.wait_for(std::chrono::seconds(1));
-    return true;
 }
 
 
-bool goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Camp camp){
+void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Camp camp){
     //  Open the map.
     console.botbase().wait_for_all_requests();
     pbf_move_left_joystick(console, 128, 255, 200, 0);
@@ -161,8 +156,7 @@ bool goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Ca
             { &detector }
         );
         if (ret < 0){
-            console.log("Map not detected after 10 x A presses.", COLOR_RED);
-            return false;
+            throw OperationFailedException(console, "Map not detected after 10 x A presses.");
         }
         console.log("Found map!");
         env.wait_for(std::chrono::milliseconds(500));
@@ -243,8 +237,7 @@ bool goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Ca
         console.botbase().wait_for_all_requests();
     }
     if (current_region != region){
-        console.log(std::string("Unable to find ") + MAP_REGION_NAMES[(int)region] + ".", COLOR_RED);
-        return false;
+        throw OperationFailedException(console, std::string("Unable to find ") + MAP_REGION_NAMES[(int)region] + ".");
     }
 
     if (slot != 0){
@@ -255,17 +248,13 @@ bool goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Ca
     }
 
     //  Enter the region.
-    if (!mash_A_to_change_region(env, console)){
-        console.log(std::string("Unable to enter ") + MAP_REGION_NAMES[(int)region] + ".", COLOR_RED);
-        return false;
-    }
-    return true;
+    mash_A_to_change_region(env, console);
 }
 
 
 
 
-bool goto_camp_from_overworld(ProgramEnvironment& env, ConsoleHandle& console){
+void goto_camp_from_overworld(ProgramEnvironment& env, ConsoleHandle& console){
     auto start = std::chrono::system_clock::now();
     std::chrono::seconds grace_period(0);
     while (true){
@@ -273,8 +262,7 @@ bool goto_camp_from_overworld(ProgramEnvironment& env, ConsoleHandle& console){
         session.run_session();
 
         if (std::chrono::system_clock::now() - start > std::chrono::seconds(60)){
-            console.log("Unable to escape from being attacked.", COLOR_RED);
-            return false;
+            throw OperationFailedException(console, "Unable to escape from being attacked.");
         }
 
         //  Open the map.
@@ -330,12 +318,10 @@ bool goto_camp_from_overworld(ProgramEnvironment& env, ConsoleHandle& console){
         { &black_screen }
     );
     if (ret < 0){
-        console.log("Failed to fly to camp after 5 seconds.", COLOR_RED);
-        return false;
+        throw OperationFailedException(console, "Failed to fly to camp after 5 seconds.");
     }
     console.log("Arrived at camp...");
     env.wait_for(std::chrono::seconds(1));
-    return true;
 }
 
 

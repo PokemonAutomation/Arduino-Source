@@ -5,6 +5,7 @@
  */
 
 #include <QtGlobal>
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
@@ -18,6 +19,7 @@ namespace PokemonSwSh{
 
 
 struct PokeballSpriteDatabase{
+    QString m_path;
     QImage m_sprites;
     std::map<std::string, PokeballSprite> m_slug_to_data;
 
@@ -26,7 +28,8 @@ struct PokeballSpriteDatabase{
         return data;
     }
     PokeballSpriteDatabase()
-        : m_sprites(RESOURCE_PATH() + "PokemonSwSh/PokeballSprites.png")
+        : m_path(RESOURCE_PATH() + "PokemonSwSh/PokeballSprites.png")
+        , m_sprites(m_path)
     {
         QJsonObject json = read_json_file(
             RESOURCE_PATH() + "PokemonSwSh/PokeballSprites.json"
@@ -35,10 +38,10 @@ struct PokeballSpriteDatabase{
         int width = json.find("spriteWidth")->toInt();
         int height = json.find("spriteHeight")->toInt();
         if (width <= 0){
-            PA_THROW_ParseException("Invalid width.");
+            throw FileException(nullptr, __PRETTY_FUNCTION__, "Invalid width.", m_path.toStdString());
         }
         if (height <= 0){
-            PA_THROW_ParseException("Invalid height.");
+            throw FileException(nullptr, __PRETTY_FUNCTION__, "Invalid height.", m_path.toStdString());
         }
 
         QJsonObject locations = json.find("spriteLocations")->toObject();

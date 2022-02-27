@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/CancellationExceptions.h"
+#include "Common/Cpp/Exceptions.h"
 #include "InterruptableCommands.h"
 
 #include <iostream>

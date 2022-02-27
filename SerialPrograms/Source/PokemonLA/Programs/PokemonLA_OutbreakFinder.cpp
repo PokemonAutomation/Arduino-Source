@@ -167,12 +167,11 @@ bool OutbreakFinder::read_outbreaks(
 
     return false;
 }
-bool OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env, MapRegion region){
+void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env, MapRegion region){
     Stats& stats = env.stats<Stats>();
 
-    if (!mash_A_to_change_region(env, env.console)){
-        return false;
-    }
+    mash_A_to_change_region(env, env.console);
+
     Camp camp = Camp::FIELDLANDS_FIELDLANDS;
     switch (region){
     case MapRegion::FIELDLANDS:
@@ -222,8 +221,57 @@ bool OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
         stats.errors++;
     }
 
-    return mash_A_to_change_region(env, env.console);
+    mash_A_to_change_region(env, env.console);
 }
+
+
+bool OutbreakFinder::run_iteration(SingleSwitchProgramEnvironment& env, const std::set<std::string>& desired){
+    Stats& stats = env.stats<Stats>();
+
+    //  Enter map.
+    pbf_move_left_joystick(env.console, 128, 255, 200, 0);
+
+    MapDetector detector;
+    int ret = run_until(
+        env, env.console,
+        [](const BotBaseContext& context){
+            for (size_t c = 0; c < 10; c++){
+                pbf_press_button(context, BUTTON_A, 20, 105);
+            }
+        },
+        { &detector }
+    );
+    if (ret < 0){
+        env.console.log("Map not detected after 10 x A presses.", COLOR_RED);
+        PA_THROW_StringException("Map not detected after 10 x A presses.");
+    }
+    env.console.log("Found map!");
+    env.wait_for(std::chrono::milliseconds(500));
+
+
+    MapRegion current_region;
+    if (read_outbreaks(env, current_region, desired)){
+        return true;
+    }
+    if (current_region == MapRegion::NONE){
+        stats.errors++;
+        PA_THROW_StringException("Unable to read map.");
+    }
+
+    env.update_stats();
+    send_program_status_notification(
+        env.console, NOTIFICATION_STATUS,
+        env.program_info(),
+        "",
+        stats.to_str()
+    );
+
+    //  Go to region and return.
+    goto_region_and_return(env, current_region);
+
+    return false;
+}
+
 
 
 void OutbreakFinder::program(SingleSwitchProgramEnvironment& env){
@@ -236,48 +284,8 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env){
 
 
     while (true){
-        //  Enter map.
-        pbf_move_left_joystick(env.console, 128, 255, 200, 0);
-
-        MapDetector detector;
-        int ret = run_until(
-            env, env.console,
-            [](const BotBaseContext& context){
-                for (size_t c = 0; c < 10; c++){
-                    pbf_press_button(context, BUTTON_A, 20, 105);
-                }
-            },
-            { &detector }
-        );
-        if (ret < 0){
-            env.console.log("Map not detected after 10 x A presses.", COLOR_RED);
-            PA_THROW_StringException("Map not detected after 10 x A presses.");
-        }
-        env.console.log("Found map!");
-        env.wait_for(std::chrono::milliseconds(500));
-
-
-        MapRegion current_region;
-        if (read_outbreaks(env, current_region, desired)){
+        if (run_iteration(env, desired)){
             break;
-        }
-        if (current_region == MapRegion::NONE){
-            stats.errors++;
-            PA_THROW_StringException("Unable to read map.");
-        }
-
-        env.update_stats();
-        send_program_status_notification(
-            env.console, NOTIFICATION_STATUS,
-            env.program_info(),
-            "",
-            stats.to_str()
-        );
-
-        //  Go to region and return.
-        if (!goto_region_and_return(env, current_region)){
-            stats.errors++;
-            PA_THROW_StringException("Failed to enter/exit region.");
         }
     }
 

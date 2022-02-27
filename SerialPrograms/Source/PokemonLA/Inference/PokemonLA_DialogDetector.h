@@ -17,7 +17,7 @@ namespace PokemonLA{
 
 class DialogDetector : public VisualInferenceCallback{
 public:
-    DialogDetector(Logger& logger, VideoOverlay& overlay);
+    DialogDetector(LoggerQt& logger, VideoOverlay& overlay);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(

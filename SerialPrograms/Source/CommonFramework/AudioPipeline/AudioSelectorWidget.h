@@ -36,7 +36,7 @@ class AudioSelectorWidget : public QWidget, public AudioFeed{
 public:
     AudioSelectorWidget(
         QWidget& parent,
-        Logger& logger,
+        LoggerQt& logger,
         AudioSelector& value,
         AudioDisplayWidget& holder
     );
@@ -68,7 +68,7 @@ private:
     void refresh();
 
 private:
-    Logger& m_logger;
+    LoggerQt& m_logger;
     AudioSelector& m_value;
 
     AudioDisplayWidget& m_display;

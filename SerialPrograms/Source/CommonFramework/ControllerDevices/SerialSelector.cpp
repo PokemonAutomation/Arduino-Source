@@ -47,7 +47,7 @@ const QSerialPortInfo* SerialSelector::port() const{
     return m_port.get();
 }
 
-SerialSelectorWidget* SerialSelector::make_ui(QWidget& parent, Logger& logger){
+SerialSelectorWidget* SerialSelector::make_ui(QWidget& parent, LoggerQt& logger){
     return new SerialSelectorWidget(parent, *this, logger);
 }
 

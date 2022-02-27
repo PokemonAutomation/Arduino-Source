@@ -110,7 +110,7 @@ double read_hp_bar(const QImage& image){
     return read_hp_bar_internal(image);
 }
 
-double read_hp_bar(Logger& logger, const QImage& image){
+double read_hp_bar(LoggerQt& logger, const QImage& image){
     double hp = read_hp_bar(image);
 //    static int c = 0;
 //    image.save("test-" + QString::number(c++) + ".png");
@@ -121,7 +121,7 @@ double read_hp_bar(Logger& logger, const QImage& image){
     }
     return hp;
 }
-Health read_in_battle_hp_box(Logger& logger, const QImage& sprite, const QImage& hp_bar){
+Health read_in_battle_hp_box(LoggerQt& logger, const QImage& sprite, const QImage& hp_bar){
     ImageStats stats = image_stats(sprite);
 //    cout << stats.average << stats.stddev << endl;
     if (is_solid(stats, {0., 0.389943, 0.610057})){
@@ -219,7 +219,7 @@ int8_t parse_pp(const std::string& str){
     return -1;
 }
 
-int8_t read_pp_text(Logger& logger, QImage image){
+int8_t read_pp_text(LoggerQt& logger, QImage image){
     OCR::binary_filter_solid_background(image);
 
     QString ocr_text = OCR::ocr_read(Language::English, image);

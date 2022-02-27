@@ -76,5 +76,21 @@ void MessageLogger::on_recv(const BotBaseMessage& message){
 
 
 
+SerialLogger::SerialLogger(Logger& logger, bool log_everything)
+    : MessageLogger(log_everything)
+    , m_logger(logger)
+{}
+void SerialLogger::log(const char* msg, Color color){
+    m_logger.log(msg, color);
+}
+void SerialLogger::log(const std::string& msg, Color color){
+    m_logger.log(msg, color);
+}
+void SerialLogger::log(std::string msg){
+    m_logger.log(msg, COLOR_DARKGREEN);
+}
+
+
+
 
 }

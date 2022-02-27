@@ -70,7 +70,7 @@ GenerateNameOCRDataPokedex::GenerateNameOCRDataPokedex(const GenerateNameOCRData
 
 void GenerateNameOCRDataPokedex::read(
     QJsonArray& output,
-    Logger& logger,
+    LoggerQt& logger,
     QImage image
 ) const{
     OCR::make_OCR_filter(image).apply(image);

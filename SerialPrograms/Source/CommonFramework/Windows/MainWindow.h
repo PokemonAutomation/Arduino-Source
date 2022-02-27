@@ -33,7 +33,7 @@ private:
 
     virtual void on_panel_construct(std::unique_ptr<PanelInstance> panel) override;
 public: //  Make private.
-    virtual Logger& raw_logger() override{ return global_logger_raw(); }
+    virtual LoggerQt& raw_logger() override{ return global_logger_raw(); }
 private:
     virtual void on_busy(PanelInstance& panel) override;
     virtual void on_idle(PanelInstance& panel) override;

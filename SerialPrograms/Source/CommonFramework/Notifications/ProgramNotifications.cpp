@@ -26,7 +26,7 @@ namespace PokemonAutomation{
 
 
 void send_program_notification(
-    Logger& logger,
+    LoggerQt& logger,
     Color color, bool should_ping, const std::vector<QString>& tags,
     const ProgramInfo& info,
     const QString& title,
@@ -102,7 +102,7 @@ void send_program_notification(
 #endif
 }
 void send_program_notification(
-    Logger& logger, EventNotificationOption& settings,
+    LoggerQt& logger, EventNotificationOption& settings,
     Color color,
     const ProgramInfo& info,
     const QString& title,
@@ -123,7 +123,7 @@ void send_program_notification(
 }
 
 void send_program_telemetry(
-    Logger& logger, bool is_error, Color color,
+    LoggerQt& logger, bool is_error, Color color,
     const ProgramInfo& info,
     const QString& title,
     const std::vector<std::pair<QString, QString>>& messages,
@@ -201,7 +201,7 @@ void send_program_telemetry(
 
 
 void send_program_status_notification(
-    Logger& logger, EventNotificationOption& settings,
+    LoggerQt& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const QString& message,
     const std::string& stats,
@@ -219,7 +219,7 @@ void send_program_status_notification(
     );
 }
 void send_program_finished_notification(
-    Logger& logger, EventNotificationOption& settings,
+    LoggerQt& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const QString& message,
     const std::string& stats,
@@ -237,7 +237,7 @@ void send_program_finished_notification(
     );
 }
 void send_program_recoverable_error_notification(
-    Logger& logger, EventNotificationOption& settings,
+    LoggerQt& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const QString& message,
     const std::string& stats,
@@ -255,7 +255,7 @@ void send_program_recoverable_error_notification(
     );
 }
 void send_program_fatal_error_notification(
-    Logger& logger, EventNotificationOption& settings,
+    LoggerQt& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const QString& message,
     const std::string& stats,

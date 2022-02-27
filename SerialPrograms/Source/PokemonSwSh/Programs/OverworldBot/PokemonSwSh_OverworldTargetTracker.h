@@ -10,7 +10,7 @@
 #include <deque>
 #include <map>
 #include "Common/Cpp/SpinLock.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 #include "PokemonSwSh/Programs/OverworldBot/PokemonSwSh_OverworldTrajectory.h"
@@ -51,7 +51,7 @@ public:
 
 public:
     OverworldTargetTracker(
-        Logger& logger, VideoOverlay& overlay,
+        LoggerQt& logger, VideoOverlay& overlay,
         std::chrono::milliseconds window,
         double mark_offset,
         MarkPriority mark_priority,
@@ -97,7 +97,7 @@ private:
 
 
 private:
-    Logger& m_logger;
+    LoggerQt& m_logger;
     VideoOverlay& m_overlay;
     std::chrono::milliseconds m_window;
     double m_mark_offset;

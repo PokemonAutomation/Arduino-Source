@@ -50,7 +50,7 @@ QJsonValue CameraSelector::to_json() const{
     return root;
 }
 
-CameraSelectorWidget* CameraSelector::make_ui(QWidget& parent, Logger& logger, VideoDisplayWidget& holder){
+CameraSelectorWidget* CameraSelector::make_ui(QWidget& parent, LoggerQt& logger, VideoDisplayWidget& holder){
     return new CameraSelectorWidget(parent, logger, *this, holder);
 }
 

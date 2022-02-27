@@ -35,7 +35,7 @@ QString qt5_get_camera_name(const CameraInfo& info){
 
 Qt5VideoWidget::Qt5VideoWidget(
     QWidget* parent,
-    Logger& logger,
+    LoggerQt& logger,
     const CameraInfo& info, const QSize& desired_resolution
 )
     : VideoWidget(parent)

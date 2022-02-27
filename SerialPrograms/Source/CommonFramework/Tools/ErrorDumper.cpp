@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 
 
 QString dump_image(
-    Logger& logger,
+    LoggerQt& logger,
     const ProgramInfo& program_info, const QString& label,
     const QImage& image
 ){

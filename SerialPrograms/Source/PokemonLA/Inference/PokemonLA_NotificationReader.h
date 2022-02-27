@@ -40,13 +40,13 @@ private:
 
 class NotificationReader{
 public:
-    NotificationReader(Logger& logger, Language language);
+    NotificationReader(LoggerQt& logger, Language language);
 
     void make_overlays(VideoOverlaySet& items) const;
     Notification detect(const QImage& screen) const;
 
 private:
-    Logger& m_logger;
+    LoggerQt& m_logger;
     Language m_language;
     ImageFloatBox m_ocr_box;
 };
@@ -54,7 +54,7 @@ private:
 
 class NotificationDetector : public VisualInferenceCallback{
 public:
-    NotificationDetector(Logger& logger, Language language);
+    NotificationDetector(LoggerQt& logger, Language language);
 
     Notification result() const{
         return m_last.load(std::memory_order_acquire);

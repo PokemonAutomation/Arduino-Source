@@ -28,7 +28,7 @@ namespace NintendoSwitch{
 SwitchSystemWidget::SwitchSystemWidget(
     QWidget& parent,
     SwitchSystemFactory& factory,
-    Logger& raw_logger,
+    LoggerQt& raw_logger,
     uint64_t program_id
 )
     : SwitchSetupWidget(parent, factory)
@@ -130,7 +130,7 @@ void SwitchSystemWidget::wait_for_all_requests(){
     }
     botbase->wait_for_all_requests();
 }
-Logger& SwitchSystemWidget::logger(){
+LoggerQt& SwitchSystemWidget::logger(){
     return m_logger;
 }
 BotBase* SwitchSystemWidget::botbase(){

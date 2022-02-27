@@ -22,7 +22,7 @@ PokeballNameReader::PokeballNameReader()
 {}
 
 OCR::StringMatchResult PokeballNameReader::read_substring(
-    Logger& logger,
+    LoggerQt& logger,
     Language language,
     const QImage& image
 ) const{

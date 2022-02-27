@@ -11,6 +11,7 @@
 #include <QComboBox>
 #include <QPushButton>
 #include "CommonFramework/Tools/BotBaseHandle.h"
+#include "ClientSource/Connection/MessageLogger.h"
 #include "SerialSelector.h"
 
 namespace PokemonAutomation{
@@ -23,7 +24,7 @@ public:
     SerialSelectorWidget(
         QWidget& parent,
         SerialSelector& value,
-        Logger& logger
+        LoggerQt& logger
     );
     ~SerialSelectorWidget();
 

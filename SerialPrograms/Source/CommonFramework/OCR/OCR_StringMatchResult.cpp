@@ -27,7 +27,7 @@ QString StringMatchData::to_qstr() const{
     return str;
 }
 
-void StringMatchResult::log(Logger& logger, double max_log10p, const QString& extra) const{
+void StringMatchResult::log(LoggerQt& logger, double max_log10p, const QString& extra) const{
     QString str = "String Match Result: ";
 
     if (!expected_token.empty()){

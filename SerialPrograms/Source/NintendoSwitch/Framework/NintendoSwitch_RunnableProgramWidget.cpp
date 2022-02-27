@@ -9,7 +9,7 @@
 #include <QGroupBox>
 #include <QScrollArea>
 #include <QMessageBox>
-#include "Common/Cpp/CancellationExceptions.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -160,10 +160,8 @@ void RunnableSwitchProgramWidget::run_program(){
         m_logger.log("Ending Program...");
     }catch (ProgramCancelledException&){
     }catch (InvalidConnectionStateException&){
-    }catch (OperationCancelledException&){
-        signal_error("An OperationCancelledException has propagated to the top of the program.");
     }catch (StringException& e){
-        signal_error(e.message_qt());
+        emit signal_error(e.message_qt());
         send_program_fatal_error_notification(
             m_logger, instance.NOTIFICATION_ERROR_FATAL,
             ProgramInfo(
@@ -175,6 +173,20 @@ void RunnableSwitchProgramWidget::run_program(){
             e.message_qt(),
             m_current_stats ? m_current_stats->to_str() : ""
         );
+    }catch (Exception& e){
+        QString message = QString::fromStdString(e.message());
+        emit signal_error(message);
+        send_program_fatal_error_notification(
+            m_logger, instance.NOTIFICATION_ERROR_FATAL,
+            ProgramInfo(
+                instance.descriptor().identifier(),
+                instance.descriptor().category(),
+                instance.descriptor().display_name(),
+                timestamp()
+            ),
+            std::move(message),
+            m_current_stats ? m_current_stats->to_str() : ""
+        );
     }
 
     m_state.store(ProgramState::STOPPING, std::memory_order_release);
@@ -182,7 +194,7 @@ void RunnableSwitchProgramWidget::run_program(){
 
     update_historical_stats();
 
-    signal_reset();
+    emit signal_reset();
     m_state.store(ProgramState::STOPPED, std::memory_order_release);
     m_logger.log("Now in STOPPED state.");
 //    cout << "Now in STOPPED state." << endl;

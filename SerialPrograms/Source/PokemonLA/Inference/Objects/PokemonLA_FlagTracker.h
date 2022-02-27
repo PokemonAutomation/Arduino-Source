@@ -9,7 +9,7 @@
 
 #include <deque>
 #include "Common/Cpp/SpinLock.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "PokemonLA_WhiteObjectDetector.h"
 #include "PokemonLA_FlagDetector.h"
 
@@ -20,7 +20,7 @@ namespace PokemonLA{
 
 class FlagTracker : public VisualInferenceCallback{
 public:
-    FlagTracker(Logger& logger, VideoOverlay& overlay);
+    FlagTracker(LoggerQt& logger, VideoOverlay& overlay);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
 
@@ -40,7 +40,7 @@ private:
     };
 
 private:
-    Logger& m_logger;
+    LoggerQt& m_logger;
 
     SpinLock m_lock;
     FlagDetector m_flags;

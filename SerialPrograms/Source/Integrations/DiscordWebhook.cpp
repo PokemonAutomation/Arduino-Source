@@ -15,7 +15,7 @@
 #include <QString>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "DiscordWebhook.h"
 
 #include <iostream>
@@ -59,7 +59,7 @@ DiscordWebhookSender& DiscordWebhookSender::instance(){
     return sender;
 }
 
-void DiscordWebhookSender::send_json(Logger& logger, const QUrl& url, const QJsonObject& obj, std::shared_ptr<PendingFileSend> file){
+void DiscordWebhookSender::send_json(LoggerQt& logger, const QUrl& url, const QJsonObject& obj, std::shared_ptr<PendingFileSend> file){
     std::lock_guard<std::mutex> lg(m_lock);
     m_queue.emplace_back(
         url,
@@ -70,7 +70,7 @@ void DiscordWebhookSender::send_json(Logger& logger, const QUrl& url, const QJso
     m_cv.notify_all();
 }
 
-void DiscordWebhookSender::send_file(Logger& logger, const QUrl& url, std::shared_ptr<PendingFileSend> file){
+void DiscordWebhookSender::send_file(LoggerQt& logger, const QUrl& url, std::shared_ptr<PendingFileSend> file){
     std::lock_guard<std::mutex> lg(m_lock);
     m_queue.emplace_back(url, file);
     logger.log("Sending File to Discord... (queue = " + tostr_u_commas(m_queue.size()) + ")", COLOR_PURPLE);
@@ -215,7 +215,7 @@ void DiscordWebhookSender::internal_send_image_embed(const QUrl& url, const QByt
 }
 
 void send_message(
-    Logger& logger,
+    LoggerQt& logger,
     bool should_ping,
     const std::vector<QString>& tags,
     const QString& message,

@@ -11,10 +11,11 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include <QJsonDocument>
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_VirtualControllerMapping.h"
 #include "PersistentSettings.h"
 
@@ -47,14 +48,14 @@ void PersistentSettings::write() const{
 
     try{
         write_json_file(QCoreApplication::applicationFilePath() + "-Settings.json", QJsonDocument(root));
-    }catch (FileException& e){
-        global_logger_tagged().log(e.message(), COLOR_RED);
+    }catch (FileException&){
     }
 }
 void PersistentSettings::read(){
-    QJsonDocument doc = read_json_file(QCoreApplication::applicationFilePath() + "-Settings.json");
+    QString path = QCoreApplication::applicationFilePath() + "-Settings.json";
+    QJsonDocument doc = read_json_file(path);
     if (!doc.isObject()){
-        PA_THROW_ParseException("Invalid settings file.");
+        throw FileException(nullptr, __PRETTY_FUNCTION__, "Invalid settings file.", path.toStdString());
     }
     QJsonObject root = doc.object();
 

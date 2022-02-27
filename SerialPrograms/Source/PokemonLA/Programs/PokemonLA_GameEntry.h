@@ -32,7 +32,7 @@ bool reset_game_from_home(
 );
 
 
-bool save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console);
+void save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console);
 
 
 

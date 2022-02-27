@@ -8,6 +8,7 @@
 #define PokemonAutomation_MessageLogger_H
 
 #include <atomic>
+#include "Common/Cpp/AbstractLogger.h"
 #include "MessageSniffer.h"
 
 namespace PokemonAutomation{
@@ -33,6 +34,21 @@ private:
     std::atomic<bool> m_log_everything_owner;
     std::atomic<bool>& m_log_everything;
 };
+
+
+
+class SerialLogger : public Logger, public MessageLogger{
+public:
+    SerialLogger(Logger& logger, bool log_everything);
+
+    virtual void log(const char* msg, Color color = Color()) override;
+    virtual void log(const std::string& msg, Color color = Color()) override;
+    virtual void log(std::string msg) override;
+
+private:
+    Logger& m_logger;
+};
+
 
 
 

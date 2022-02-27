@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CodeValidator.h"
 
 namespace PokemonAutomation{
@@ -41,16 +41,16 @@ QString sanitize_code(size_t digits, const QString& code){
             continue;
         }
         if (ch < '0' || ch > '9'){
-            PA_THROW_ParseException(std::string("Invalid code digit: ") + QString(ch).toUtf8().data());
+            throw ParseException(std::string("Invalid code digit: ") + QString(ch).toStdString());
         }
         c++;
         if (c > digits){
-            PA_THROW_ParseException(std::string("Code is too long: ") + code.toUtf8().data());
+            throw ParseException(std::string("Code is too long: ") + code.toStdString());
         }
         ret += ch;
     }
     if (c < digits){
-        PA_THROW_ParseException(std::string("Code is too short: ") + code.toUtf8().data());
+        throw ParseException(std::string("Code is too short: ") + code.toStdString());
     }
     return ret;
 }

@@ -35,7 +35,7 @@ class CameraSelectorWidget : public QWidget, public VideoFeed{
 public:
     CameraSelectorWidget(
         QWidget& parent,
-        Logger& logger,
+        LoggerQt& logger,
         CameraSelector& value,
         VideoDisplayWidget& holder
     );
@@ -66,7 +66,7 @@ private:
     static QString aspect_ratio(const QSize& size);
 
 private:
-    Logger& m_logger;
+    LoggerQt& m_logger;
     CameraSelector& m_value;
 
     VideoDisplayWidget& m_display;

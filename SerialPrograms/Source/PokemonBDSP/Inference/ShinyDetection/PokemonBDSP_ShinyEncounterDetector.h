@@ -45,7 +45,7 @@ class ShinyEncounterTracker : public VisualInferenceCallback{
 
 public:
     ShinyEncounterTracker(
-        Logger& logger, VideoOverlay& overlay,
+        LoggerQt& logger, VideoOverlay& overlay,
         BattleType battle_type
     );
 
@@ -67,7 +67,7 @@ public:
 private:
     BattleType m_battle_type;
 
-    Logger& m_logger;
+    LoggerQt& m_logger;
 //    VideoOverlay& m_overlay;
 
     BattleMenuWatcher m_battle_menu;
@@ -90,7 +90,7 @@ private:
 };
 
 void determine_shiny_status(
-    Logger& logger,
+    LoggerQt& logger,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
     const PokemonSwSh::EncounterDialogTracker& dialog_tracker,
@@ -105,7 +105,7 @@ void determine_shiny_status(
 
 
 void detect_shiny_battle(
-    ProgramEnvironment& env, Logger& logger,
+    ProgramEnvironment& env, LoggerQt& logger,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
     VideoFeed& feed, VideoOverlay& overlay,

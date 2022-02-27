@@ -8,14 +8,14 @@
 #define PokemonAutomation_ErrorDumper_H
 
 #include <QImage>
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 
 namespace PokemonAutomation{
 
 
 QString dump_image(
-    Logger& logger,
+    LoggerQt& logger,
     const ProgramInfo& program_info, const QString& label,
     const QImage& image
 );

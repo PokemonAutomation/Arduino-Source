@@ -32,7 +32,7 @@ IVCheckerReaderScope::IVCheckerReaderScope(VideoOverlay& overlay, Language langu
 {}
 
 
-IVCheckerValue IVCheckerReaderScope::read(Logger& logger, const QImage& frame, const InferenceBoxScope& box){
+IVCheckerValue IVCheckerReaderScope::read(LoggerQt& logger, const QImage& frame, const InferenceBoxScope& box){
     QImage image = extract_box(frame, box);
     OCR::make_OCR_filter(image).apply(image);
 //    image.save("test.png");
@@ -49,7 +49,7 @@ IVCheckerValue IVCheckerReaderScope::read(Logger& logger, const QImage& frame, c
     }
     return IVCheckerValue_string_to_enum(result.results.begin()->second.token);
 }
-IVCheckerReader::Results IVCheckerReaderScope::read(Logger& logger, const QImage& frame){
+IVCheckerReader::Results IVCheckerReaderScope::read(LoggerQt& logger, const QImage& frame){
     IVCheckerReader::Results results;
     results.hp      = read(logger, frame, m_box0);
     results.attack  = read(logger, frame, m_box1);

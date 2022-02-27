@@ -12,7 +12,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "IntegrationsAPI.h"
 #include "SleepyDiscordRunner.h"
 
@@ -95,7 +95,7 @@ std::unordered_map<uint16_t, std::string> str_dpad = {
 };
 
 
-Logger& sleepy_logger(){
+LoggerQt& sleepy_logger(){
     static TaggedLogger logger(global_logger_raw(), "SleepyDiscord");
     return logger;
 }

@@ -11,7 +11,7 @@
 #define PokemonAutomation_PokemonSwSh_SummaryShinySymbolDetector_H
 
 #include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 
 namespace PokemonAutomation{
@@ -28,7 +28,7 @@ public:
     };
 
 public:
-    SummaryShinySymbolDetector(Logger& logger, VideoOverlay& overlay);
+    SummaryShinySymbolDetector(LoggerQt& logger, VideoOverlay& overlay);
 
     Detection detect(const QImage& screen);
     Detection wait_for_detection(
@@ -38,7 +38,7 @@ public:
     );
 
 private:
-    Logger& m_logger;
+    LoggerQt& m_logger;
     InferenceBoxScope m_state0_box;
     InferenceBoxScope m_state1_box;
     InferenceBoxScope m_symbol_box;

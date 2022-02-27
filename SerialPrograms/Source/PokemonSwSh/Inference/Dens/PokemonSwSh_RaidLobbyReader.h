@@ -11,7 +11,7 @@
 #define PokemonAutomation_PokemonSwSh_RaidLobbyReader_H
 
 #include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -57,12 +57,12 @@ struct RaidLobbyState{
 
 class RaidLobbyReader{
 public:
-    RaidLobbyReader(Logger& logger, VideoOverlay& overlay);
+    RaidLobbyReader(LoggerQt& logger, VideoOverlay& overlay);
 
     RaidLobbyState read(const QImage& screen);
 
 private:
-    Logger& m_logger;
+    LoggerQt& m_logger;
     InferenceBoxScope m_checkbox0;
     InferenceBoxScope m_checkbox1;
     InferenceBoxScope m_checkbox2;

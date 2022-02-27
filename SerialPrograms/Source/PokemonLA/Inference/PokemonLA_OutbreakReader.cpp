@@ -18,7 +18,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-OutbreakReader::OutbreakReader(Logger& logger, Language language, VideoOverlay& overlay)
+OutbreakReader::OutbreakReader(LoggerQt& logger, Language language, VideoOverlay& overlay)
     : m_logger(logger)
     , m_language(language)
     , m_dialog_box0(overlay, 0.030, 0.177, 0.020, 0.038)

@@ -22,7 +22,7 @@ BerryNameReader::BerryNameReader()
 {}
 
 OCR::StringMatchResult BerryNameReader::read_substring(
-    Logger& logger,
+    LoggerQt& logger,
     Language language,
     const QImage& image
 ) const{

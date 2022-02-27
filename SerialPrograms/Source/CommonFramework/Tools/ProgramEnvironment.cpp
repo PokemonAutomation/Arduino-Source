@@ -7,7 +7,7 @@
 #include <mutex>
 #include <condition_variable>
 #include "Common/Cpp/Pimpl.tpp"
-#include "Common/Cpp/CancellationExceptions.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "StatsTracking.h"
@@ -42,7 +42,7 @@ ProgramEnvironment::~ProgramEnvironment(){}
 
 ProgramEnvironment::ProgramEnvironment(
     ProgramInfo program_info,
-    Logger& logger,
+    LoggerQt& logger,
     StatsTracker* current_stats,
     const StatsTracker* historical_stats
 )

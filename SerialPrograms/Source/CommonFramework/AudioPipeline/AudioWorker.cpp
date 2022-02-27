@@ -9,7 +9,7 @@
 #include "AudioWorker.h"
 #include "AudioFileLoader.h"
 #include "AudioFormatUtils.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 
 #include <QIODevice>
 #include <QThread>
@@ -50,7 +50,7 @@ namespace PokemonAutomation{
 
 
 AudioWorker::AudioWorker(
-    Logger& logger,
+    LoggerQt& logger,
     const AudioInfo& inputInfo,
     const QString& inputAbsoluteFilepath,
     const AudioInfo& outputInfo,
@@ -249,7 +249,7 @@ AudioWorker::~AudioWorker(){
         m_audioIODevice = nullptr;
     }
 
-    std::cout << "AudioWorker destroyed" << std::endl;
+    m_logger.log("AudioWorker destroyed");
 }
 
 void AudioWorker::setVolume(float volume){
@@ -266,42 +266,42 @@ void AudioWorker::handleDeviceErrorState(QAudio::State newState, QAudio::Error e
     case QAudio::StoppedState:
         switch (error) {
         case QAudio::NoError:
-            std::cout << deviceType << " stopped normally" << std::endl;
+            m_logger.log(std::string(deviceType) + " stopped normally");
             break;
         case QAudio::OpenError:
-            std::cout << deviceType << " OpenError" << std::endl;
+            m_logger.log(std::string(deviceType) + " OpenError");
             break;
         case QAudio::IOError:
-            std::cout << deviceType <<  " IOError" << std::endl;
+            m_logger.log(std::string(deviceType) + " IOError");
             break;
         case QAudio::UnderrunError:
             // Underrun error happens on audio sink when the audio thread is closing.
             // So we don't print this error if it's on audio sink.
             if (strcmp(deviceType, "AudioSink") != 0){
-                std::cout << deviceType <<  " UnderrunError" << std::endl;
+                m_logger.log(std::string(deviceType) + " UnderrunError");
             }
             break;
         case QAudio::FatalError:
-            std::cout << deviceType <<  " FatalError" << std::endl;
+            m_logger.log(std::string(deviceType) + " FatalError");
             break;
         }
         break;
 
     case QAudio::ActiveState:
         // Started recording - read from IO device
-        // std::cout << "Audio started" << std::endl;
+//        m_logger.log("Audio started");
         break;
     
     case QAudio::SuspendedState:
-        std::cout << deviceType <<  " is suspended" << std::endl;
+        m_logger.log(std::string(deviceType) + " suspended");
         break;
 
     case QAudio::IdleState:
-        // std::cout << "AudioSource is idle, no input" << std::endl;
+//        m_logger.log("AudioSource is idle, no input");
         break;
 #if QT_VERSION_MAJOR == 5
     case QAudio::InterruptedState:
-        std::cout << "AudioSource is interrupted, no input" << std::endl;
+        m_logger.log("AudioSource is interrupted, no input");
         break;
 #endif
     } // end switch newState

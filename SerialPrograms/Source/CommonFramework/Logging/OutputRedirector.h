@@ -9,7 +9,7 @@
 
 #include <streambuf>
 #include "Common/Cpp/SpinLock.h"
-#include "Logger.h"
+#include "LoggerQt.h"
 
 namespace PokemonAutomation{
 

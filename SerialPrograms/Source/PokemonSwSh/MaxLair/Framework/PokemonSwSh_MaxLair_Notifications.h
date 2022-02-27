@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_Notifications_H
 
 #include <QImage>
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h"
@@ -42,7 +42,7 @@ void send_raid_notification(
 );
 
 void send_shiny_notification(
-    Logger& logger, EventNotificationOption& settings,
+    LoggerQt& logger, EventNotificationOption& settings,
     const ProgramInfo& program_info,
     size_t console_index, size_t shinies,
     const std::set<std::string>* slugs,

@@ -39,7 +39,7 @@ public:
 private:
     void read(
         QJsonArray& output,
-        Logger& logger,
+        LoggerQt& logger,
         QImage image
     ) const;
     void dump_images(

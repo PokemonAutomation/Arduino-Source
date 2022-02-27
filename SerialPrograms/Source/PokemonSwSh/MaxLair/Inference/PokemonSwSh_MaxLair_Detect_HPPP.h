@@ -9,7 +9,7 @@
 
 #include <stdint.h>
 #include <QImage>
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
 
@@ -21,9 +21,9 @@ namespace MaxLairInternal{
 
 //double read_hp_bar(const QImage& image);
 
-double read_hp_bar(Logger& logger, const QImage& image);
-Health read_in_battle_hp_box(Logger& logger, const QImage& sprite, const QImage& hp_bar);
-int8_t read_pp_text(Logger& logger, QImage image);
+double read_hp_bar(LoggerQt& logger, const QImage& image);
+Health read_in_battle_hp_box(LoggerQt& logger, const QImage& sprite, const QImage& hp_bar);
+int8_t read_pp_text(LoggerQt& logger, QImage image);
 
 
 }

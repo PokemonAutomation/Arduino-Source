@@ -23,7 +23,7 @@
 #include "AudioInfo.h"
 #include "AudioDisplayWidget.h"
 #include "AudioThreadController.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "Kernels/AbsFFT/Kernels_AbsFFT.h"
 
 #include <iostream>
@@ -132,7 +132,7 @@ void AudioDisplayWidget::close_audio(){
 }
 
 void AudioDisplayWidget::set_audio(
-    Logger& logger,
+    LoggerQt& logger,
     const AudioInfo& inputInfo,
     const QString& inputAbsoluteFilepath,
     const AudioInfo& outputInfo,

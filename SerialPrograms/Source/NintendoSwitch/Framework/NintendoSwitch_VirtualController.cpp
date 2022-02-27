@@ -6,7 +6,7 @@
 
 #include <functional>
 #include <deque>
-#include "Common/Cpp/CancellationExceptions.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Exception.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "ClientSource/Connection/BotBase.h"
@@ -23,7 +23,7 @@ namespace NintendoSwitch{
 
 
 VirtualController::VirtualController(
-    Logger& logger,
+    LoggerQt& logger,
     BotBaseHandle& botbase,
     bool allow_commands_while_running
 )

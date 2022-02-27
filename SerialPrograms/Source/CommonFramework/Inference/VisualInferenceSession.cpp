@@ -27,7 +27,7 @@ struct VisualInferenceSession::Callback{
 
 
 VisualInferenceSession::VisualInferenceSession(
-    ProgramEnvironment& env, Logger& logger,
+    ProgramEnvironment& env, LoggerQt& logger,
     VideoFeed& feed, VideoOverlay& overlay,
     std::chrono::milliseconds period
 )
@@ -159,7 +159,7 @@ VisualInferenceCallback* VisualInferenceSession::run(std::chrono::system_clock::
 
 
 AsyncVisualInferenceSession::AsyncVisualInferenceSession(
-    ProgramEnvironment& env, Logger& logger,
+    ProgramEnvironment& env, LoggerQt& logger,
     VideoFeed& feed, VideoOverlay& overlay,
     std::chrono::milliseconds period
 )

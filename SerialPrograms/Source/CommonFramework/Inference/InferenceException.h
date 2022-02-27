@@ -8,21 +8,21 @@
 #define PokemonAutomation_CommonFramework_InferenceException_H
 
 #include "Common/Cpp/Exception.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 
 namespace PokemonAutomation{
 
 
 class InferenceException : public StringException{
 public:
-    InferenceException(const char* location, Logger& logger, const char* message);
-    InferenceException(const char* location, Logger& logger, std::string message);
+    InferenceException(const char* location, LoggerQt& logger, const char* message);
+    InferenceException(const char* location, LoggerQt& logger, std::string message);
 #ifdef QT_VERSION
-    InferenceException(const char* location, Logger& logger, const QString& message);
+    InferenceException(const char* location, LoggerQt& logger, const QString& message);
 #endif
 
     virtual const char* type() const{
-        return "ParseException";
+        return "InferenceException";
     }
 };
 #define PA_THROW_InferenceException(logger, message)    \

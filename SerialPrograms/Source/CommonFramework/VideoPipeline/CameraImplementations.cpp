@@ -26,7 +26,7 @@ QString get_camera_name(const CameraInfo& info){
     return qt5_get_camera_name(info);
 }
 std::function<VideoWidget*(QWidget& parent)> make_video_factory(
-    Logger& logger,
+    LoggerQt& logger,
     const CameraInfo& info, const QSize& desired_resolution
 ){
     return [&](QWidget& parent){

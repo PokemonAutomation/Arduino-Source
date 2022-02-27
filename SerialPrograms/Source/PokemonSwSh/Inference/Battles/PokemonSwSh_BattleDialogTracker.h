@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_EncounterDialogTracker_H
 
 #include <chrono>
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/Inference/VisualDetector.h"
@@ -29,7 +29,7 @@ enum class EncounterState{
 class EncounterDialogTracker : public VisualInferenceCallback{
 public:
     EncounterDialogTracker(
-        Logger& logger,
+        LoggerQt& logger,
         StaticScreenDetector& dialog_detector
     );
 
@@ -46,7 +46,7 @@ public:
     void push_end(std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now());
 
 private:
-    Logger& m_logger;
+    LoggerQt& m_logger;
     StaticScreenDetector& m_dialog_detector;
     std::chrono::system_clock::time_point m_end_dialog;
     bool m_dialog_on;

@@ -8,6 +8,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QLineEdit>
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/CodeValidator.h"
 #include "FixedCodeOption.h"
@@ -101,7 +102,7 @@ QString FixedCodeWidget::sanitized_code(const QString& text) const{
     try{
         message = "Code: " + sanitize_code(m_value.m_digits, text);
     }catch (const ParseException& e){
-        message = "<font color=\"red\">" + e.message_qt() + "</font>";
+        message = "<font color=\"red\">" + QString::fromStdString(e.message()) + "</font>";
     }
     return message;
 }

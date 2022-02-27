@@ -25,7 +25,7 @@ namespace PokemonAutomation{
 
 class AudioThreadController;
 class AudioInfo;
-class Logger;
+class LoggerQt;
 
 // Display audio on the UI panel.
 // This class will use AudioThreadController to control an audio thread doing the
@@ -50,7 +50,7 @@ public:
 
     // outputVolume: range [0.f, 1.f]
     void set_audio(
-        Logger& logger,
+        LoggerQt& logger,
         const AudioInfo& inputInfo, const QString& inputAbsoluteFilepath,
         const AudioInfo& outputInfo, float outputVolume
     );

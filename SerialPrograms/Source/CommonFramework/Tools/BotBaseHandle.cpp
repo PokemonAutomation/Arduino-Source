@@ -8,7 +8,7 @@
 #include <QtGlobal>
 #include <QMessageBox>
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/CancellationExceptions.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Microcontroller/DeviceRoutines.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Tools.h"
@@ -23,16 +23,16 @@ namespace PokemonAutomation{
 
 
 BotBaseHandle::BotBaseHandle(
+    SerialLogger& logger,
     const QSerialPortInfo& port,
-    PABotBaseLevel minimum_pabotbase,
-    MessageSniffer& logger
+    PABotBaseLevel minimum_pabotbase
 )
-    : m_port(port)
+    : m_logger(logger)
+    , m_port(port)
     , m_minimum_pabotbase(minimum_pabotbase)
     , m_current_pabotbase(PABotBaseLevel::NOT_PABOTBASE)
     , m_state(State::NOT_CONNECTED)
     , m_allow_user_commands(true)
-    , m_logger(logger)
 {
     reset(port);
 }
@@ -40,7 +40,7 @@ BotBaseHandle::~BotBaseHandle(){
     stop();
     m_botbase.reset();
     m_state.store(State::NOT_CONNECTED, std::memory_order_release);
-    on_not_connected("");
+    emit on_not_connected("");
 }
 
 BotBase* BotBaseHandle::botbase(){
@@ -107,7 +107,7 @@ void BotBaseHandle::stop_unprotected(){
         }
 
         m_state.store(State::SHUTDOWN, std::memory_order_release);
-        on_stopped("");
+        emit on_stopped("");
         m_botbase->stop();
 
         std::lock_guard<std::mutex> lg(m_cv_lock);
@@ -119,7 +119,7 @@ void BotBaseHandle::stop_unprotected(){
     }
 
     m_state.store(State::NOT_CONNECTED, std::memory_order_release);
-    on_not_connected("");
+    emit on_not_connected("");
 }
 void BotBaseHandle::reset_unprotected(const QSerialPortInfo& port){
     using namespace PokemonAutomation;
@@ -142,24 +142,24 @@ void BotBaseHandle::reset_unprotected(const QSerialPortInfo& port){
             "Prolific controllers do not work for Arduino and similar microntrollers.<br>"
             "You were warned of this in the setup instructions. Please buy a CP210x controller instead."
         );
-        on_not_connected("<font color=\"red\">Cannot connect to Prolific controller.</font>");
+        emit on_not_connected("<font color=\"red\">Cannot connect to Prolific controller.</font>");
         m_logger.log("Unable to connect due to Prolific controller.");
         return;
     }
 
     try{
         std::unique_ptr<SerialConnection> connection(new SerialConnection(name, PABB_BAUD_RATE));
-        m_botbase.reset(new PABotBase(std::move(connection), nullptr));
+        m_botbase.reset(new PABotBase(m_logger, std::move(connection), nullptr));
         m_current_pabotbase.store(PABotBaseLevel::NOT_PABOTBASE, std::memory_order_release);
     }catch (const StringException& e){
         error = e.message();
     }
     if (error.empty()){
         m_state.store(State::CONNECTING, std::memory_order_release);
-        on_connecting();
+        emit on_connecting();
     }else{
-        on_not_connected("<font color=\"red\">Unable to open port.</font>");
-        m_logger.log(error);
+        emit on_not_connected("<font color=\"red\">Unable to open port.</font>");
+        m_logger.log(error, Color());
         return;
     }
 
@@ -212,14 +212,14 @@ void BotBaseHandle::thread_body(){
             m_botbase->connect();
         }catch (InvalidConnectionStateException&){
             m_botbase->stop();
-            on_stopped("");
+            emit on_stopped("");
             return;
         }catch (const StringException& e){
             error = e.message_qt();
         }
         if (!error.isEmpty()){
             m_botbase->stop();
-            on_stopped("<font color=\"red\">" + error + "</font>");
+            emit on_stopped("<font color=\"red\">" + error + "</font>");
             return;
         }
     }
@@ -240,14 +240,14 @@ void BotBaseHandle::thread_body(){
         }
         if (error.isEmpty()){
             m_state.store(State::READY, std::memory_order_release);
-            on_ready(QString::fromStdString(
+            emit on_ready(QString::fromStdString(
                 "<font color=\"blue\">Program: " +
                 program_name(program_id) +
                 " (" + std::to_string(version) + ")</font>"
             ));
         }else{
             m_state.store(State::STOPPED, std::memory_order_release);
-            on_stopped("<font color=\"red\">" + error + "</font>");
+            emit on_stopped("<font color=\"red\">" + error + "</font>");
             m_botbase->stop();
             return;
         }
@@ -262,7 +262,7 @@ void BotBaseHandle::thread_body(){
             auto last = std::chrono::system_clock::now() - m_botbase->last_ack();
             std::chrono::duration<double> seconds = last;
             if (last > 2 * SERIAL_REFRESH_RATE){
-                uptime_status(
+                emit uptime_status(
                     QString("<font color=\"red\">Last Ack: ") +
                     QString::fromStdString(tostr_fixed(seconds.count(), 3)) + " seconds ago</font>"
                 );
@@ -297,9 +297,9 @@ void BotBaseHandle::thread_body(){
             error = e.message_qt();
         }
         if (error.isEmpty()){
-            uptime_status("<font color=\"blue\">Up Time: " + QString::fromStdString(str) + "</font>");
+            emit uptime_status("<font color=\"blue\">Up Time: " + QString::fromStdString(str) + "</font>");
         }else{
-            uptime_status("<font color=\"red\">Up Time: " + error + "</font>");
+            emit uptime_status("<font color=\"red\">Up Time: " + error + "</font>");
             error.clear();
         }
 

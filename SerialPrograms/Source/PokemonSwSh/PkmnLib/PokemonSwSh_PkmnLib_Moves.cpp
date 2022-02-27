@@ -7,6 +7,7 @@
 #include <deque>
 #include <fstream>
 #include <QtGlobal>
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
@@ -111,7 +112,11 @@ private:
         QString path = RESOURCE_PATH() + QString::fromStdString(filepath);
         QJsonObject json = read_json_file(path).object();
         if (json.empty()){
-            PA_THROW_FileException("Json is either empty or invalid.", path);
+            throw FileException(
+                nullptr, __PRETTY_FUNCTION__,
+                "Json is either empty or invalid.",
+                path.toStdString()
+            );
         }
 
         for (auto iter = json.begin(); iter != json.end(); ++iter){

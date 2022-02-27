@@ -36,7 +36,7 @@ AudioSelectorWidget::~AudioSelectorWidget(){}
 
 AudioSelectorWidget::AudioSelectorWidget(
     QWidget& parent,
-    Logger& logger,
+    LoggerQt& logger,
     AudioSelector& value,
     AudioDisplayWidget& holder
 )

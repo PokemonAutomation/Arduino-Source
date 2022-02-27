@@ -10,7 +10,7 @@
 #include <memory>
 #include <QString>
 #include "Common/Compiler.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 
 class QJsonValue;
 class QWidget;
@@ -22,7 +22,7 @@ class PanelInstance;
 
 struct PanelListener{
     virtual void on_panel_construct(std::unique_ptr<PanelInstance> panel) = 0;
-    virtual Logger& raw_logger() = 0;
+    virtual LoggerQt& raw_logger() = 0;
     virtual void on_busy(PanelInstance& panel) = 0;
     virtual void on_idle(PanelInstance& panel) = 0;
 };

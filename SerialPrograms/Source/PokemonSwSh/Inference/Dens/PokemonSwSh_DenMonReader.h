@@ -37,13 +37,13 @@ class DenMonReader{
     static constexpr double ALPHA_SPREAD = 20;
 
 public:
-    DenMonReader(Logger& logger, VideoOverlay& overlay);
+    DenMonReader(LoggerQt& logger, VideoOverlay& overlay);
 
     DenMonReadResults read(const QImage& screen) const;
 
 private:
     const ImageMatch::SilhouetteDictionaryMatcher& m_matcher;
-    Logger& m_logger;
+    LoggerQt& m_logger;
     InferenceBoxScope m_white;
     InferenceBoxScope m_den_color;
     InferenceBoxScope m_lair_pink;

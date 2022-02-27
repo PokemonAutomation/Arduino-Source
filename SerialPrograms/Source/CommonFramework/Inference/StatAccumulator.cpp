@@ -8,7 +8,7 @@
 #include <cmath>
 #include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "StatAccumulator.h"
 
 namespace PokemonAutomation{
@@ -42,7 +42,7 @@ std::string StatAccumulatorI32::dump(const char* units, double divider) const{
     ss << ", Max = " << max() * divider << units;
     return ss.str();
 }
-void StatAccumulatorI32::log(Logger& logger, const std::string& label, const char* units, double divider) const{
+void StatAccumulatorI32::log(LoggerQt& logger, const std::string& label, const char* units, double divider) const{
     logger.log(label + ": " + dump(units, divider), COLOR_MAGENTA);
 }
 

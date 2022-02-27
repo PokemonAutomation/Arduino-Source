@@ -8,6 +8,7 @@
 #define PokemonAutomation_AbstractBotBase_H
 
 #include <atomic>
+#include "Common/Cpp/AbstractLogger.h"
 
 namespace PokemonAutomation{
 
@@ -27,6 +28,8 @@ public:
 
 public:
     virtual ~BotBase() = default;
+
+    virtual Logger& logger() = 0;
     virtual State state() const = 0;
     virtual void wait_for_all_requests(const std::atomic<bool>* cancelled = nullptr) = 0;
     virtual void stop_all_commands() = 0;

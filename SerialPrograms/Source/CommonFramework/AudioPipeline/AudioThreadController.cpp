@@ -10,7 +10,7 @@
 #include "AudioWorker.h"
 #include "AudioThreadController.h"
 #include "FFTWorker.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 
 #include <QIODevice>
 #include <QThread>
@@ -22,7 +22,7 @@ namespace PokemonAutomation{
 
 
 AudioThreadController::AudioThreadController(
-    Logger& logger,
+    LoggerQt& logger,
     AudioDisplayWidget* parent,
     const AudioInfo& inputInfo,
     const QString& inputAbsoluteFilepath,

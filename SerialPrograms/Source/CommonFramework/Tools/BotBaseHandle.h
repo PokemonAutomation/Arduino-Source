@@ -15,6 +15,7 @@
 #include <QSerialPortInfo>
 #include "Common/PokemonSwSh/PokemonProgramIDs.h"
 #include "ClientSource/Connection/BotBase.h"
+#include "ClientSource/Connection/MessageLogger.h"
 
 namespace PokemonAutomation{
 
@@ -36,9 +37,9 @@ public:
 public:
     //  Must call on main thread.
     BotBaseHandle(
+        SerialLogger& logger,
         const QSerialPortInfo& port,
-        PABotBaseLevel minimum_pabotbase,
-        MessageSniffer& logger
+        PABotBaseLevel minimum_pabotbase
     );
     ~BotBaseHandle();
 
@@ -82,13 +83,13 @@ private:
 
 
 private:
+    SerialLogger& m_logger;
+
     const QSerialPortInfo m_port;
     PABotBaseLevel m_minimum_pabotbase;
     std::atomic<PABotBaseLevel> m_current_pabotbase;
     std::atomic<State> m_state;
     std::atomic<bool> m_allow_user_commands;
-
-    MessageSniffer& m_logger;
 
     std::thread m_status_thread;
     std::unique_ptr<PABotBase> m_botbase;

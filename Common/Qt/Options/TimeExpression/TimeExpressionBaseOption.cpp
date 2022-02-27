@@ -5,7 +5,7 @@
  */
 
 #include <QJsonValue>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/ExpressionEvaluator.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Tools.h"
@@ -117,7 +117,7 @@ QString TimeExpressionBaseOption<Type>::process(const QString& text, Type& value
     try{
         parsed = parse_ticks_i32(text);
     }catch (const ParseException& str){
-        return str.message_qt();
+        return QString::fromStdString(str.message());
     }
 //    cout << "value = " << parsed << endl;
 

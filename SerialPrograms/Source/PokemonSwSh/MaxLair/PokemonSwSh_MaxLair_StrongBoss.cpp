@@ -145,7 +145,7 @@ std::unique_ptr<StatsTracker> MaxLairStrongBoss::make_stats() const{
 class EndBattleDecider_StrongBoss : public EndBattleDecider{
 public:
     EndBattleDecider_StrongBoss(
-        Logger& logger,
+        LoggerQt& logger,
         const Consoles& consoles, size_t host_index,
         double min_win_ratio
     )
@@ -200,7 +200,7 @@ private:
         return static_cast<const MaxLairStrongBoss_ConsoleOptions&>(m_consoles[index]);
     }
 
-    Logger& m_logger;
+    LoggerQt& m_logger;
     const Consoles& m_consoles;
     size_t m_host_index;
     double m_min_win_ratio;

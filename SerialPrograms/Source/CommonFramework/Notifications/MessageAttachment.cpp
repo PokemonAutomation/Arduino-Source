@@ -48,7 +48,7 @@ PendingFileSend::PendingFileSend(const QString& file, bool keep_file)
     QFileInfo info(file);
     m_filename = info.fileName();
 }
-PendingFileSend::PendingFileSend(Logger& logger, const ImageAttachment& image)
+PendingFileSend::PendingFileSend(LoggerQt& logger, const ImageAttachment& image)
     : m_keep_file(image.keep_file)
     , m_extend_lifetime(false)
 {

@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
@@ -98,7 +99,7 @@ bool reset_game_from_home(
 
 
 
-bool save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console){
+void save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console){
     InferenceBoxScope box(console, {0.450, 0.005, 0.040, 0.010});
 
     console.log("Saving game...");
@@ -112,13 +113,13 @@ bool save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console){
             pbf_press_button(console, BUTTON_A, 20, 605);
             pbf_press_button(console, BUTTON_B, 20, 230);
             pbf_press_button(console, BUTTON_B, 20, 355);
-            return true;
+            return;
         }
         pbf_press_button(console, BUTTON_ZR, 20, 105);
     }
 
     console.log("Unable to find save menu.", COLOR_RED);
-    return false;
+    throw OperationFailedException(console, "Unable to find save menu.");
 }
 
 

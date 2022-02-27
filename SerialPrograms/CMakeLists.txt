@@ -59,15 +59,17 @@ file(GLOB MAIN_SOURCES
     ../Common/CRC32.cpp
     ../Common/CRC32.h
     ../Common/Compiler.h
+    ../Common/Cpp/AbstractLogger.h
     ../Common/Cpp/AlignedVector.tpp
     ../Common/Cpp/AlignedVector.h
     ../Common/Cpp/AsyncDispatcher.cpp
     ../Common/Cpp/AsyncDispatcher.h
-    ../Common/Cpp/CancellationExceptions.h
     ../Common/Cpp/Color.h
     ../Common/Cpp/DllSafeString.h
     ../Common/Cpp/Exception.cpp
     ../Common/Cpp/Exception.h
+    ../Common/Cpp/Exceptions.cpp
+    ../Common/Cpp/Exceptions.h
     ../Common/Cpp/FireForgetDispatcher.cpp
     ../Common/Cpp/FireForgetDispatcher.h
     ../Common/Cpp/FixedLimitVector.h
@@ -111,6 +113,7 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/CollapsibleGroupBox.h
     ../Common/Qt/ExpressionEvaluator.cpp
     ../Common/Qt/ExpressionEvaluator.h
+    ../Common/Qt/ImageOpener.h
     ../Common/Qt/NoWheelComboBox.h
     ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseOption.cpp
     ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseOption.h
@@ -264,12 +267,10 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Environment/HardwareValidation.h
     Source/CommonFramework/Language.cpp
     Source/CommonFramework/Language.h
-    Source/CommonFramework/Logging/DeviceLogger.cpp
-    Source/CommonFramework/Logging/DeviceLogger.h
     Source/CommonFramework/Logging/FileWindowLogger.cpp
     Source/CommonFramework/Logging/FileWindowLogger.h
-    Source/CommonFramework/Logging/Logger.cpp
-    Source/CommonFramework/Logging/Logger.h
+    Source/CommonFramework/Logging/LoggerQt.cpp
+    Source/CommonFramework/Logging/LoggerQt.h
     Source/CommonFramework/Logging/OutputRedirector.cpp
     Source/CommonFramework/Logging/OutputRedirector.h
     Source/CommonFramework/Logging/QueuedLogger.cpp

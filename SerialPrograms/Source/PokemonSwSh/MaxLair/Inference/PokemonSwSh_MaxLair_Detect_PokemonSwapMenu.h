@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_Detect_PokemonSwapMenu_H
 
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 
@@ -58,7 +58,7 @@ struct PokemonSwapMenuState{
 class PokemonSwapMenuReader{
 public:
     PokemonSwapMenuReader(
-        Logger& logger,
+        LoggerQt& logger,
         VideoOverlay& overlay,
         Language language
     );
@@ -71,7 +71,7 @@ public:
 
 
 private:
-    Logger& m_logger;
+    LoggerQt& m_logger;
     Language m_language;
     InferenceBoxScope m_sprite0;
     InferenceBoxScope m_sprite1;

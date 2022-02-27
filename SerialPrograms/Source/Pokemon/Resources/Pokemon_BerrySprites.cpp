@@ -6,6 +6,7 @@
 
 #include <QtGlobal>
 #include "Common/Cpp/Exception.h"
+#include "Common/Qt/ImageOpener.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageMatch/ImageCropper.h"
@@ -18,6 +19,7 @@ namespace Pokemon{
 
 
 struct BerrySpriteDatabase{
+    QString m_path;
     QImage m_sprites;
     std::map<std::string, BerrySprite> m_slug_to_data;
 
@@ -26,11 +28,10 @@ struct BerrySpriteDatabase{
         return data;
     }
     BerrySpriteDatabase()
-        : m_sprites(RESOURCE_PATH() + "Pokemon/BerrySprites.png")
+        : m_path(RESOURCE_PATH() + "Pokemon/BerrySprites.png")
+        , m_sprites(open_image(m_path))
     {
-        const QJsonObject json = read_json_file(
-            RESOURCE_PATH() + "Pokemon/BerrySprites.json"
-        ).object();
+        const QJsonObject json = read_json_file(RESOURCE_PATH() + "Pokemon/BerrySprites.json").object();
 
         const QJsonObject locations = json.find("spriteLocations")->toObject();
         for (auto iter = locations.begin(); iter != locations.end(); ++iter){
@@ -41,10 +42,10 @@ struct BerrySpriteDatabase{
             const int width = obj.find("width")->toInt();
             const int height = obj.find("height")->toInt();
             if (width <= 0){
-                PA_THROW_ParseException("Invalid width.");
+                throw FileException(nullptr, __PRETTY_FUNCTION__, "Invalid width.", m_path.toStdString());
             }
             if (height <= 0){
-                PA_THROW_ParseException("Invalid height.");
+                throw FileException(nullptr, __PRETTY_FUNCTION__, "Invalid height.", m_path.toStdString());
             }
 
             BerrySprite sprite;

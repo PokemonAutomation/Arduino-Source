@@ -9,7 +9,7 @@
 
 #include <chrono>
 #include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"

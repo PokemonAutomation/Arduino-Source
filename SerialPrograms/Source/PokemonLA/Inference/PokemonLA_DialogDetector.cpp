@@ -19,7 +19,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-DialogDetector::DialogDetector(Logger& logger, VideoOverlay& overlay)
+DialogDetector::DialogDetector(LoggerQt& logger, VideoOverlay& overlay)
     : VisualInferenceCallback("DialogDetector")
     , m_title_top   (0.295, 0.722, 0.100, 0.005)
     , m_title_bottom(0.295, 0.765, 0.100, 0.005)

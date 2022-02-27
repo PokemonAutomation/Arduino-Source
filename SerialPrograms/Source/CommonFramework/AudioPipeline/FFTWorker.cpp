@@ -14,7 +14,7 @@
 #include <QThread>
 #include "Kernels/AbsFFT/Kernels_AbsFFT.h"
 #include "Common/Cpp/AlignedVector.tpp"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "AudioDisplayWidget.h"
 #include "FFTWorker.h"
 

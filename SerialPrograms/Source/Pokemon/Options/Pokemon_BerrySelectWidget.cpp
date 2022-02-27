@@ -6,7 +6,7 @@
 
 #include <QCompleter>
 #include "Common/Cpp/Exception.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "Pokemon/Resources/Pokemon_BerryNames.h"
 #include "Pokemon/Resources/Pokemon_BerrySprites.h"
 #include "Pokemon_BerrySelectWidget.h"

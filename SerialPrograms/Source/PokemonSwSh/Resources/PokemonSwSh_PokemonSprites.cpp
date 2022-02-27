@@ -5,6 +5,7 @@
  */
 
 #include <QtGlobal>
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
@@ -23,6 +24,8 @@ namespace PokemonSwSh{
 
 
 struct PokemonSpriteDatabase{
+    QString m_sprite_path;
+    QString m_sprite_silhouette;
     QImage m_sprites;
     QImage m_silhouettes;
     std::map<std::string, PokemonSprite> m_slug_to_data;
@@ -32,8 +35,10 @@ struct PokemonSpriteDatabase{
         return data;
     }
     PokemonSpriteDatabase()
-        : m_sprites(RESOURCE_PATH() + "PokemonSwSh/PokemonSprites.png")
-        , m_silhouettes(RESOURCE_PATH() + "PokemonSwSh/PokemonSilhouettes.png")
+        : m_sprite_path(RESOURCE_PATH() + "PokemonSwSh/PokemonSprites.png")
+        , m_sprite_silhouette(RESOURCE_PATH() + "PokemonSwSh/PokemonSilhouettes.png")
+        , m_sprites(m_sprite_path)
+        , m_silhouettes(m_sprite_silhouette)
     {
         QJsonObject json = read_json_file(
             RESOURCE_PATH() + "PokemonSwSh/PokemonSprites.json"
@@ -42,10 +47,10 @@ struct PokemonSpriteDatabase{
         int width = json.find("spriteWidth")->toInt();
         int height = json.find("spriteHeight")->toInt();
         if (width <= 0){
-            PA_THROW_ParseException("Invalid width.");
+            throw FileException(nullptr, __PRETTY_FUNCTION__, "Invalid width.", m_sprite_path.toStdString());
         }
         if (height <= 0){
-            PA_THROW_ParseException("Invalid height.");
+            throw FileException(nullptr, __PRETTY_FUNCTION__, "Invalid height.", m_sprite_path.toStdString());
         }
 
         QJsonObject locations = json.find("spriteLocations")->toObject();

@@ -68,7 +68,7 @@ void ButtonTracker::finish(){
 
 
 ButtonDetector::ButtonDetector(
-    Logger& logger, VideoOverlay& overlay,
+    LoggerQt& logger, VideoOverlay& overlay,
     ButtonType type,
     const ImageFloatBox& box,
     std::chrono::milliseconds min_streak,

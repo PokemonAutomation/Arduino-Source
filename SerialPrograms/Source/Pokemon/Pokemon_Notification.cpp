@@ -74,7 +74,7 @@ QString pokemon_to_string(const EncounterResult& pokemon){
 
 
 void send_encounter_notification(
-    Logger& logger,
+    LoggerQt& logger,
     EventNotificationOption& settings_nonshiny,
     EventNotificationOption& settings_shiny,
     const ProgramInfo& info,
@@ -199,7 +199,7 @@ void send_encounter_notification(
 
 
 void send_catch_notification(
-    Logger& logger,
+    LoggerQt& logger,
     EventNotificationOption& settings_catch_success,
     EventNotificationOption& settings_catch_failed,
     const ProgramInfo& info,

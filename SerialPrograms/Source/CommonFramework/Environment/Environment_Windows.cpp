@@ -7,7 +7,7 @@
 #ifdef _WIN32
 #include <Windows.h>
 #include "Common/Cpp/Exception.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "Environment.h"
 
 #if __GNUC__

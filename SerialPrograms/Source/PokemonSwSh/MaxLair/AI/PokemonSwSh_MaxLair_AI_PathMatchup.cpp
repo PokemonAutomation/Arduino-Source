@@ -6,6 +6,7 @@
 
 #include <map>
 #include <QtGlobal>
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
@@ -33,7 +34,11 @@ private:
         QString path = RESOURCE_PATH() + QString::fromStdString("PokemonSwSh/MaxLair/path_tree.json");
         QJsonObject json = read_json_file(path).object();
         if (json.empty()){
-            PA_THROW_FileException("Json is either empty or invalid.", path);
+            throw FileException(
+                nullptr, __PRETTY_FUNCTION__,
+                "Json is either empty or invalid.",
+                path.toStdString()
+            );
         }
 
         {
@@ -244,7 +249,7 @@ double evaluate_path(const Boss& boss, const std::vector<PathNode>& path){
 
 
 std::vector<PathNode> select_path(
-    Logger* logger,
+    LoggerQt* logger,
     const std::string& boss,
     const PathMap& pathmap, uint8_t wins, int8_t path_side
 ){

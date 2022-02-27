@@ -72,7 +72,7 @@ QJsonValue AudioSelector::to_json() const{
     return root;
 }
 
-AudioSelectorWidget* AudioSelector::make_ui(QWidget& parent, Logger& logger, AudioDisplayWidget& holder){
+AudioSelectorWidget* AudioSelector::make_ui(QWidget& parent, LoggerQt& logger, AudioDisplayWidget& holder){
     return new AudioSelectorWidget(parent, logger, *this, holder);
 }
 

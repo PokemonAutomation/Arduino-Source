@@ -9,7 +9,7 @@
 
 #include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/Color.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h"
@@ -53,7 +53,7 @@ private:
 class ButtonDetector : public VisualInferenceCallback{
 public:
     ButtonDetector(
-        Logger& logger, VideoOverlay& overlay,
+        LoggerQt& logger, VideoOverlay& overlay,
         ButtonType type,
         const ImageFloatBox& box,
         std::chrono::milliseconds min_streak,
@@ -72,7 +72,7 @@ public:
     ) override;
 
 private:
-    Logger& m_logger;
+    LoggerQt& m_logger;
     ImageFloatBox m_box;
     std::chrono::milliseconds m_min_streak;
     bool m_stop_on_detected;

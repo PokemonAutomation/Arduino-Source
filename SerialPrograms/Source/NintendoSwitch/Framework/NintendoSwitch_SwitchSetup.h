@@ -9,7 +9,7 @@
 
 #include "Common/PokemonSwSh/PokemonProgramIDs.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 
 class QJsonValue;
 class QWidget;
@@ -35,7 +35,7 @@ public:
     virtual void load_json(const QJsonValue& json) = 0;
     virtual QJsonValue to_json() const = 0;
 
-    virtual SwitchSetupWidget* make_ui(QWidget& parent, Logger& logger, uint64_t program_id) = 0;
+    virtual SwitchSetupWidget* make_ui(QWidget& parent, LoggerQt& logger, uint64_t program_id) = 0;
 
 protected:
     const PABotBaseLevel m_min_pabotbase;

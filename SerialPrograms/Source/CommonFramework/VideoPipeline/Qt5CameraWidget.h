@@ -10,7 +10,7 @@
 #include <condition_variable>
 #include <QCameraViewfinder>
 #include <QCameraImageCapture>
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CameraInfo.h"
 #include "VideoWidget.h"
 
@@ -24,7 +24,7 @@ class Qt5VideoWidget : public VideoWidget{
 public:
     Qt5VideoWidget(
         QWidget* parent,
-        Logger& logger,
+        LoggerQt& logger,
         const CameraInfo& info, const QSize& desired_resolution
     );
     virtual ~Qt5VideoWidget();
@@ -49,7 +49,7 @@ private:
         std::condition_variable cv;
     };
 
-    Logger& m_logger;
+    LoggerQt& m_logger;
     QCamera* m_camera = nullptr;
     QCameraViewfinder* m_camera_view = nullptr;
     QCameraImageCapture* m_capture = nullptr;

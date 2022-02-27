@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Exception.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -76,7 +77,7 @@ std::unique_ptr<StatsTracker> MoneyFarmerHighlands::make_stats() const{
 
 
 
-bool mash_A_until_end_of_battle(ProgramEnvironment& env, ConsoleHandle& console){
+void mash_A_until_end_of_battle(ProgramEnvironment& env, ConsoleHandle& console){
     OverworldDetector detector(console, console);
     int ret = run_until(
         env, console,
@@ -86,26 +87,116 @@ bool mash_A_until_end_of_battle(ProgramEnvironment& env, ConsoleHandle& console)
         { &detector }
     );
     if (ret < 0){
-        console.log("Failed to return to overworld after 5 minutes.", COLOR_RED);
-        return false;
+        throw OperationFailedException(console, "Failed to return to overworld after 5 minutes.");
     }
     console.log("Returned to overworld.");
-    return true;
 }
 
 
+void MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
+    Stats& stats = env.stats<Stats>();
+
+    //  Go to Coronet Highlands Mountain camp.
+    goto_camp_from_jubilife(env, env.console, Camp::HIGHLANDS_MOUNTAIN);
+
+    stats.attempts++;
+
+    //  Switch to Wrydeer.
+    bool error = true;
+    MountDetector mount_detector;
+    for (size_t c = 0; c < 10; c++){
+        MountState mount = mount_detector.detect(env.console.video().snapshot());
+        if (mount == MountState::WYRDEER_OFF){
+            pbf_press_button(env.console, BUTTON_PLUS, 20, 105);
+            error = false;
+            break;
+        }
+        if (mount == MountState::WYRDEER_ON){
+            pbf_wait(env.console, 5 * TICKS_PER_SECOND);
+            error = false;
+            break;
+        }
+        pbf_press_dpad(env.console, DPAD_LEFT, 20, 50);
+        env.console.botbase().wait_for_all_requests();
+    }
+    if (error){
+        throw OperationFailedException(env.console, "Unable to find Wyrdeer after 10 attempts.");
+    }
+
+
+    bool success = false;
+
+
+    env.console.log("Traveling to Charm's location...");
+    {
+        DialogDetector dialog_detector(env.console, env.console);
+        //  TODO: Add shiny sound detector.
+        int ret = run_until(
+            env, env.console,
+            [](const BotBaseContext& context){
+                pbf_move_left_joystick(context, 0, 212, 50, 0);
+                pbf_press_button(context, BUTTON_B, 495, 80);
+
+                pbf_move_left_joystick(context, 224, 0, 50, 0);
+//                    pbf_press_button(context, BUTTON_B, 350, 80);
+                pbf_press_button(context, BUTTON_B, 80, 0);
+                for (size_t c = 0; c < 7; c++){
+                    pbf_press_button(context, BUTTON_A | BUTTON_B, 5, 0);
+                    pbf_press_button(context, BUTTON_B, 5, 0);
+                }
+                pbf_press_button(context, BUTTON_B, 200, 80);
+                pbf_wait(context, 80);
+
+                pbf_move_left_joystick(context, 0, 64, 50, 0);
+                pbf_press_button(context, BUTTON_B, 250, 80);
+
+                pbf_move_left_joystick(context, 0, 48, 50, 0);
+                pbf_press_button(context, BUTTON_B, 270, 0);
+
+                pbf_move_left_joystick(context, 64, 255, 50, 0);
+                pbf_press_button(context, BUTTON_B, 150, 250);
+
+//                pbf_move_right_joystick(context, 0, 128, 200, 125);
+
+            },
+            { &dialog_detector }
+        );
+        if (ret >= 0){
+            env.console.log("Found Charm!", COLOR_BLUE);
+            stats.charm++;
+            mash_A_until_end_of_battle(env, env.console);
+            env.console.log("Battle succeeded!", COLOR_BLUE);
+            success = true;
+        }
+    }
+
+
+#if 0
+    env.console.log("Traveling to Coin's location...");
+    {
+        DialogDetector dialog_detector;
+
+    }
+#endif
+
+
+    env.console.log("Returning to Jubilife...");
+    goto_camp_from_overworld(env, env.console);
+    goto_professor(env.console, Camp::HIGHLANDS_HIGHLANDS);
+    from_professor_return_to_jubilife(env, env.console);
+
+    if (success){
+        save_game_from_overworld(env, env.console);
+    }
+}
 
 
 
 void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env){
     Stats& stats = env.stats<Stats>();
 
-
     //  Connect the controller.
     pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
-
-
-    bool reset_required = false;
 
     while (true){
         env.update_stats();
@@ -115,164 +206,14 @@ void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env){
             "",
             stats.to_str()
         );
-
-        if (reset_required){
+        try{
+            run_iteration(env);
+        }catch (OperationFailedException&){
+            stats.errors++;
             pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
-
-        //  Go to Coronet Highlands Mountain camp.
-        if (!goto_camp_from_jubilife(env, env.console, Camp::HIGHLANDS_MOUNTAIN)){
-            stats.errors++;
-            reset_required = true;
-            continue;
-        }
-
-        stats.attempts++;
-
-        //  Switch to Wrydeer.
-        bool error = true;
-        MountDetector mount_detector;
-        for (size_t c = 0; c < 10; c++){
-            MountState mount = mount_detector.detect(env.console.video().snapshot());
-            if (mount == MountState::WYRDEER_OFF){
-                pbf_press_button(env.console, BUTTON_PLUS, 20, 105);
-                error = false;
-                break;
-            }
-            if (mount == MountState::WYRDEER_ON){
-                pbf_wait(env.console, 5 * TICKS_PER_SECOND);
-                error = false;
-                break;
-            }
-            pbf_press_dpad(env.console, DPAD_LEFT, 20, 50);
-            env.console.botbase().wait_for_all_requests();
-        }
-        if (error){
-            env.console.log("Unable to find Wyrdeer after 10 attempts.", COLOR_RED);
-            stats.errors++;
-            reset_required = true;
-            continue;
-        }
-
-
-        bool success = false;
-
-
-        env.console.log("Traveling to Charm's location...");
-        {
-            DialogDetector dialog_detector(env.console, env.console);
-            //  TODO: Add shiny sound detector.
-            int ret = run_until(
-                env, env.console,
-                [](const BotBaseContext& context){
-                    pbf_move_left_joystick(context, 0, 212, 50, 0);
-                    pbf_press_button(context, BUTTON_B, 495, 80);
-
-                    pbf_move_left_joystick(context, 224, 0, 50, 0);
-//                    pbf_press_button(context, BUTTON_B, 350, 80);
-                    pbf_press_button(context, BUTTON_B, 80, 0);
-                    for (size_t c = 0; c < 7; c++){
-                        pbf_press_button(context, BUTTON_A | BUTTON_B, 5, 0);
-                        pbf_press_button(context, BUTTON_B, 5, 0);
-                    }
-                    pbf_press_button(context, BUTTON_B, 200, 80);
-                    pbf_wait(context, 80);
-
-                    pbf_move_left_joystick(context, 0, 64, 50, 0);
-                    pbf_press_button(context, BUTTON_B, 250, 80);
-
-                    pbf_move_left_joystick(context, 0, 48, 50, 0);
-                    pbf_press_button(context, BUTTON_B, 270, 0);
-
-                    pbf_move_left_joystick(context, 0, 255, 50, 0);
-                    pbf_press_button(context, BUTTON_B, 150, 250);
-
-//                    pbf_move_right_joystick(context, 0, 128, 200, 125);
-
-                },
-                { &dialog_detector }
-            );
-            if (ret >= 0){
-                env.console.log("Found Charm!", COLOR_BLUE);
-                stats.charm++;
-                if (mash_A_until_end_of_battle(env, env.console)){
-                    env.console.log("Battle succeeded!", COLOR_BLUE);
-                    success = true;
-                }else{
-                    env.console.log("Battle failed! Resetting...", COLOR_RED);
-                    stats.errors++;
-                    reset_required = true;
-                    continue;
-                }
-            }
-        }
-
-
-#if 0
-        env.console.log("Traveling to Coin's location...");
-        {
-            DialogDetector dialog_detector;
-
-        }
-#endif
-
-
-#if 1
-        env.console.log("Returning to Jubilife...");
-        if (!goto_camp_from_overworld(env, env.console)){
-            stats.errors++;
-            reset_required = true;
-            continue;
-        }
-        goto_professor(env.console, Camp::HIGHLANDS_HIGHLANDS);
-        if (!from_professor_return_to_jubilife(env, env.console)){
-            stats.errors++;
-            reset_required = true;
-            continue;
-        }
-
-        reset_required = false;
-        if (success){
-            if (!save_game_from_overworld(env, env.console)){
-                stats.errors++;
-                reset_required = true;
-            }
-        }
-
-#else
-        if (success){
-            env.console.log("Returning to Jubilife...");
-            if (!goto_camp_from_overworld(env, env.console)){
-                stats.errors++;
-                reset_required = true;
-                continue;
-            }
-            goto_professor(env.console, Camp::HIGHLANDS_HIGHLANDS);
-            if (!from_professor_return_to_jubilife(env, env.console)){
-                stats.errors++;
-                reset_required = true;
-                continue;
-            }
-            if (!save_game_from_overworld(env, env.console)){
-                stats.errors++;
-                reset_required = true;
-            }else{
-                reset_required = false;
-            }
-            env.console.botbase().wait_for_all_requests();
-        }else{
-            env.console.log("Nothing found. Resetting...");
-            if (!goto_camp_from_overworld(env, env.console)){
-                reset_required = true;
-                continue;
-            }
-            reset_required = true;
-        }
-#endif
     }
-
-
 
 }
 

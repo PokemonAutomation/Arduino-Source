@@ -130,7 +130,7 @@ void send_raid_notification(
 
 
 void send_shiny_notification(
-    Logger& logger, EventNotificationOption& settings,
+    LoggerQt& logger, EventNotificationOption& settings,
     const ProgramInfo& program_info,
     size_t console_index, size_t shinies,
     const std::set<std::string>* slugs,

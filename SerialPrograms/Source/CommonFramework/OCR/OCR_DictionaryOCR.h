@@ -11,7 +11,7 @@
 #include <set>
 #include <map>
 #include "Common/Cpp/SpinLock.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "OCR_StringMatchResult.h"
 
 class QJsonObject;

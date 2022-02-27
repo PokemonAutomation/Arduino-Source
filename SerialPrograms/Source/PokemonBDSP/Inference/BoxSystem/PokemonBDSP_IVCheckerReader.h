@@ -21,12 +21,12 @@ class IVCheckerReaderScope{
 public:
     IVCheckerReaderScope(VideoOverlay& overlay, Language language);
 
-    IVCheckerReader::Results read(Logger& logger, const QImage& frame);
+    IVCheckerReader::Results read(LoggerQt& logger, const QImage& frame);
 
     std::vector<QImage> dump_images(const QImage& frame);
 
 private:
-    IVCheckerValue read(Logger& logger, const QImage& frame, const InferenceBoxScope& box);
+    IVCheckerValue read(LoggerQt& logger, const QImage& frame, const InferenceBoxScope& box);
 
 private:
     Language m_language;

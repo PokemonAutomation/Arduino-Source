@@ -30,14 +30,14 @@ enum class Camp{
     ICELANDS_ICEPEAK,
 };
 void goto_professor(ConsoleHandle& console, Camp camp);
-bool from_professor_return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& console);
+void from_professor_return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& console);
 
 
-bool mash_A_to_change_region(ProgramEnvironment& env, ConsoleHandle& console);
-bool goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Camp camp);
+void mash_A_to_change_region(ProgramEnvironment& env, ConsoleHandle& console);
+void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Camp camp);
 
 
-bool goto_camp_from_overworld(ProgramEnvironment& env, ConsoleHandle& console);
+void goto_camp_from_overworld(ProgramEnvironment& env, ConsoleHandle& console);
 
 
 

@@ -40,7 +40,7 @@ private:
     friend class MultiSwitchProgramUI;
     MultiSwitchProgramEnvironment(
         ProgramInfo program_info,
-        Logger& logger,
+        LoggerQt& logger,
         StatsTracker* current_stats,
         const StatsTracker* historical_stats,
         FixedLimitVector<ConsoleHandle> p_switches

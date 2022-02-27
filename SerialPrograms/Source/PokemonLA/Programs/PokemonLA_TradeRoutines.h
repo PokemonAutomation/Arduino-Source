@@ -36,12 +36,12 @@ void trade_current_pokemon(
 
 class TradeNameReader{
 public:
-    TradeNameReader(Logger& logger, VideoOverlay& overlay, Language language);
+    TradeNameReader(LoggerQt& logger, VideoOverlay& overlay, Language language);
 
     std::string read(const QImage& screen) const;
 
 private:
-    Logger& m_logger;
+    LoggerQt& m_logger;
     Language m_language;
     InferenceBoxScope m_box;
     std::set<std::string> m_slugs;

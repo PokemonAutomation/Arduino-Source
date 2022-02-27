@@ -9,7 +9,7 @@
 
 #include <vector>
 #include <set>
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "Pokemon/Pokemon_Types.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
 
@@ -32,7 +32,7 @@ std::vector<std::vector<PathNode>> generate_paths(
 
 
 std::vector<PathNode> select_path(
-    Logger* logger,
+    LoggerQt* logger,
     const std::string& boss,
     const PathMap& pathmap, uint8_t wins, int8_t path_side
 );

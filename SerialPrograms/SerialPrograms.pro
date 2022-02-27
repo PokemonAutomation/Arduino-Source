@@ -68,6 +68,7 @@ SOURCES += \
     ../Common/CRC32.cpp \
     ../Common/Cpp/AsyncDispatcher.cpp \
     ../Common/Cpp/Exception.cpp \
+    ../Common/Cpp/Exceptions.cpp \
     ../Common/Cpp/FireForgetDispatcher.cpp \
     ../Common/Cpp/PanicDump.cpp \
     ../Common/Cpp/ParallelTaskRunner.cpp \
@@ -154,9 +155,8 @@ SOURCES += \
     Source/CommonFramework/Inference/VisualInferenceRoutines.cpp \
     Source/CommonFramework/Inference/VisualInferenceSession.cpp \
     Source/CommonFramework/Language.cpp \
-    Source/CommonFramework/Logging/DeviceLogger.cpp \
     Source/CommonFramework/Logging/FileWindowLogger.cpp \
-    Source/CommonFramework/Logging/Logger.cpp \
+    Source/CommonFramework/Logging/LoggerQt.cpp \
     Source/CommonFramework/Logging/OutputRedirector.cpp \
     Source/CommonFramework/Logging/QueuedLogger.cpp \
     Source/CommonFramework/Main.cpp \
@@ -611,12 +611,13 @@ HEADERS += \
     ../ClientSource/Libraries/MessageConverter.h \
     ../Common/CRC32.h \
     ../Common/Compiler.h \
+    ../Common/Cpp/AbstractLogger.h \
     ../Common/Cpp/AlignedVector.h \
     ../Common/Cpp/AlignedVector.tpp \
     ../Common/Cpp/AsyncDispatcher.h \
-    ../Common/Cpp/CancellationExceptions.h \
     ../Common/Cpp/Color.h \
     ../Common/Cpp/Exception.h \
+    ../Common/Cpp/Exceptions.h \
     ../Common/Cpp/FireForgetDispatcher.h \
     ../Common/Cpp/FixedLimitVector.h \
     ../Common/Cpp/FixedLimitVector.tpp \
@@ -645,6 +646,7 @@ HEADERS += \
     ../Common/Qt/CodeValidator.h \
     ../Common/Qt/CollapsibleGroupBox.h \
     ../Common/Qt/ExpressionEvaluator.h \
+    ../Common/Qt/ImageOpener.h \
     ../Common/Qt/NoWheelComboBox.h \
     ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseOption.h \
     ../Common/Qt/Options/BooleanCheckBox/BooleanCheckBoxBaseWidget.h \
@@ -726,9 +728,8 @@ HEADERS += \
     Source/CommonFramework/Inference/VisualInferenceRoutines.h \
     Source/CommonFramework/Inference/VisualInferenceSession.h \
     Source/CommonFramework/Language.h \
-    Source/CommonFramework/Logging/DeviceLogger.h \
     Source/CommonFramework/Logging/FileWindowLogger.h \
-    Source/CommonFramework/Logging/Logger.h \
+    Source/CommonFramework/Logging/LoggerQt.h \
     Source/CommonFramework/Logging/OutputRedirector.h \
     Source/CommonFramework/Logging/QueuedLogger.h \
     Source/CommonFramework/Notifications/EventNotificationOption.h \

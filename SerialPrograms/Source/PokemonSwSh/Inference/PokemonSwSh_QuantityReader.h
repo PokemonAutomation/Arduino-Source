@@ -10,7 +10,7 @@
 #include <stdint.h>
 #include <string>
 #include <QImage>
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -29,7 +29,7 @@ struct ReadableQuantity999{
         int16_t max_quantity_differential = -1
     );
     void update_with_ocr(
-        Logger& logger, const QImage& image,
+        LoggerQt& logger, const QImage& image,
         int16_t max_quantity_differential = -1
     );
 };

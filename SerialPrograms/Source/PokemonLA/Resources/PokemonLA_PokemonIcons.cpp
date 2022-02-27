@@ -4,7 +4,9 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Exception.h"
+#include "Common/Qt/ImageOpener.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageMatch/ImageCropper.h"
@@ -16,7 +18,8 @@ namespace PokemonLA{
 
 
 std::map<std::string, QIcon> load_pokemon_icons(){
-    QImage sprites(RESOURCE_PATH() + "PokemonLA/PokemonSprites.png");
+    QString path = RESOURCE_PATH() + "PokemonLA/PokemonSprites.png";
+    QImage sprites = open_image(path);
     QJsonObject json = read_json_file(
         RESOURCE_PATH() + "PokemonLA/PokemonSprites.json"
     ).object();
@@ -24,10 +27,10 @@ std::map<std::string, QIcon> load_pokemon_icons(){
     int width = json.find("spriteWidth")->toInt();
     int height = json.find("spriteHeight")->toInt();
     if (width <= 0){
-        PA_THROW_ParseException("Invalid width.");
+        throw FileException(nullptr, __PRETTY_FUNCTION__, "Invalid width.", path.toStdString());
     }
     if (height <= 0){
-        PA_THROW_ParseException("Invalid height.");
+        throw FileException(nullptr, __PRETTY_FUNCTION__, "Invalid height.", path.toStdString());
     }
 
     std::map<std::string, QIcon> map;

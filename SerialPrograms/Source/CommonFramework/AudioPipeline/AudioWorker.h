@@ -18,7 +18,7 @@
 #include <QAudio>
 #include "Common/Compiler.h"
 #include "Common/Cpp/AlignedVector.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "AudioInfo.h"
 #include "AudioIODevice.h"
 
@@ -53,7 +53,7 @@ public:
     // Note: there is a program-crashing bug in Qt's audio decoder that will be triggered
     // when `inputAbsoluteFilepath` is a relative path. Do not pass in a relative path.
     AudioWorker(
-        Logger& logger,
+        LoggerQt& logger,
         const AudioInfo& inputInfo,
         const QString& inputAbsoluteFilepath,
         const AudioInfo& outputInfo,
@@ -81,7 +81,7 @@ private:
     void handleDeviceErrorState(QAudio::State newState, QAudio::Error error, const char* deviceType);
 
 private:
-    Logger& m_logger;
+    LoggerQt& m_logger;
     AudioInfo m_inputInfo;
     QString m_inputAbsoluteFilepath;
     AudioInfo m_outputInfo;

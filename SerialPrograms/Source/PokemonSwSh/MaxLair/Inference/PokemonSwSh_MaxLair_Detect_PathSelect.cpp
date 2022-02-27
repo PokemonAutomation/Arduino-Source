@@ -187,7 +187,7 @@ PathReader::PathReader(VideoOverlay& overlay, size_t player_index)
 {}
 
 
-void PathReader::read_sprites(Logger& logger, const QImage& screen, std::string slugs[4]) const{
+void PathReader::read_sprites(LoggerQt& logger, const QImage& screen, std::string slugs[4]) const{
     slugs[0] = read_pokemon_sprite_with_item(logger, screen, m_sprite0);
     slugs[1] = read_pokemon_sprite_with_item(logger, screen, m_sprite1);
     slugs[2] = read_pokemon_sprite_with_item(logger, screen, m_sprite2);
@@ -197,7 +197,7 @@ void PathReader::read_sprites(Logger& logger, const QImage& screen, std::string 
     }
 }
 void PathReader::read_sprites(
-    Logger& logger,
+    LoggerQt& logger,
     GlobalState& state,
     const QImage& screen
 ) const{
@@ -214,7 +214,7 @@ void PathReader::read_sprites(
 }
 
 
-void PathReader::read_hp(Logger& logger, const QImage& screen, double hp[4]) const{
+void PathReader::read_hp(LoggerQt& logger, const QImage& screen, double hp[4]) const{
     hp[0] = read_hp_bar(logger, extract_box(screen, m_hp0));
     hp[1] = read_hp_bar(logger, extract_box(screen, m_hp1));
     hp[2] = read_hp_bar(logger, extract_box(screen, m_hp2));
@@ -224,7 +224,7 @@ void PathReader::read_hp(Logger& logger, const QImage& screen, double hp[4]) con
     }
 }
 void PathReader::read_hp(
-    Logger& logger,
+    LoggerQt& logger,
     GlobalState& state,
     const QImage& screen
 ) const{
@@ -259,7 +259,7 @@ void PathReader::read_path(ProgramEnvironment& env, ConsoleHandle& console, Glob
 
 
 void PathReader::read_side(
-    Logger& logger,
+    LoggerQt& logger,
     GlobalState& state,
     const QImage& screen
 ){

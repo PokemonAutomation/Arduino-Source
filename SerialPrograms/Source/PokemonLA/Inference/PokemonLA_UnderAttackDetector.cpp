@@ -25,7 +25,7 @@ const char* UNDER_ATTACK_STRINGS[] = {
 };
 
 
-UnderAttackWatcher::UnderAttackWatcher(Logger& logger)
+UnderAttackWatcher::UnderAttackWatcher(LoggerQt& logger)
     : VisualInferenceCallback("UnderAttackWatcher")
     , m_logger(logger)
     , m_box(0.49, 0.07, 0.02, 0.03)

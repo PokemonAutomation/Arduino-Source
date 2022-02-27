@@ -35,7 +35,9 @@ public:
 
 private:
     bool read_outbreaks(SingleSwitchProgramEnvironment& env, MapRegion& region, const std::set<std::string>& desired);
-    bool goto_region_and_return(SingleSwitchProgramEnvironment& env, MapRegion region);
+    void goto_region_and_return(SingleSwitchProgramEnvironment& env, MapRegion region);
+
+    bool run_iteration(SingleSwitchProgramEnvironment& env, const std::set<std::string>& desired);
 
 private:
     class Stats;

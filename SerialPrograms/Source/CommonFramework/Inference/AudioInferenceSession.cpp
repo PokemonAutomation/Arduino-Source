@@ -28,7 +28,7 @@ struct AudioInferenceSession::Callback{
 
 
 AudioInferenceSession::AudioInferenceSession(
-    ProgramEnvironment& env, Logger& logger,
+    ProgramEnvironment& env, LoggerQt& logger,
     AudioFeed& feed,
     std::chrono::milliseconds period
 )
@@ -167,7 +167,7 @@ AudioInferenceCallback* AudioInferenceSession::run(std::chrono::system_clock::ti
 
 
 AsyncAudioInferenceSession::AsyncAudioInferenceSession(
-    ProgramEnvironment& env, Logger& logger,
+    ProgramEnvironment& env, LoggerQt& logger,
     AudioFeed& feed,
     std::chrono::milliseconds period
 )

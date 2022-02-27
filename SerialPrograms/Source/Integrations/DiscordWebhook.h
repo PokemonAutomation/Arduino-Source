@@ -13,7 +13,7 @@
 #include <QImage>
 #include <QNetworkReply>
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Notifications/MessageAttachment.h"
 
 class QJsonArray;
@@ -46,8 +46,8 @@ private:
 
 
 public:
-    void send_json(Logger& logger, const QUrl& url, const QJsonObject& obj, std::shared_ptr<PendingFileSend> file);
-    void send_file(Logger& logger, const QUrl& url, std::shared_ptr<PendingFileSend> file);
+    void send_json(LoggerQt& logger, const QUrl& url, const QJsonObject& obj, std::shared_ptr<PendingFileSend> file);
+    void send_file(LoggerQt& logger, const QUrl& url, std::shared_ptr<PendingFileSend> file);
 
     static DiscordWebhookSender& instance();
 
@@ -75,7 +75,7 @@ private:
 
 
 void send_message(
-    Logger& logger,
+    LoggerQt& logger,
     bool should_ping,
     const std::vector<QString>& tags,
     const QString& message,

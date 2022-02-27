@@ -25,7 +25,7 @@ public:
     CommandRow(
         QWidget& parent,
         BotBaseHandle& botbase,
-        Logger& logger,
+        LoggerQt& logger,
         FeedbackType feedback, bool allow_commands_while_running
     );
 

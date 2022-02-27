@@ -31,7 +31,7 @@ const DetectionType YOUR_POKEMON{
 
 
 ShinyEncounterTracker::ShinyEncounterTracker(
-    Logger& logger, VideoOverlay& overlay,
+    LoggerQt& logger, VideoOverlay& overlay,
     BattleType battle_type
 )
     : VisualInferenceCallback("ShinyEncounterTracker")
@@ -108,7 +108,7 @@ bool ShinyEncounterTracker::process_frame(
 }
 
 void determine_shiny_status(
-    Logger& logger,
+    LoggerQt& logger,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
     const PokemonSwSh::EncounterDialogTracker& dialog_tracker,
@@ -173,7 +173,7 @@ void determine_shiny_status(
 
 
 void detect_shiny_battle(
-    ProgramEnvironment& env, Logger& logger,
+    ProgramEnvironment& env, LoggerQt& logger,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
     VideoFeed& feed, VideoOverlay& overlay,

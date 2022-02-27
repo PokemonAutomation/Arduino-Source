@@ -9,7 +9,7 @@
 
 #include <set>
 #include <QImage>
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/ImageMatch/ImageMatchResult.h"
 #include "CommonFramework/ImageMatch/ExactImageDictionaryMatcher.h"
 #include "CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h"

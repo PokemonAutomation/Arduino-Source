@@ -14,7 +14,7 @@
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/BotBaseHandle.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "NintendoSwitch_VirtualControllerMapping.h"
 
 namespace PokemonAutomation{
@@ -24,7 +24,7 @@ namespace NintendoSwitch{
 class VirtualController{
 public:
     VirtualController(
-        Logger& logger,
+        LoggerQt& logger,
         BotBaseHandle& botbase,
         bool allow_commands_while_running
     );
@@ -42,7 +42,7 @@ private:
     void thread_loop();
 
 private:
-    Logger& m_logger;
+    LoggerQt& m_logger;
     BotBaseHandle& m_botbase;
     bool m_allow_commands_while_running;
 

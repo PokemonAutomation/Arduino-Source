@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 class AudioInferenceSession{
 public:
     AudioInferenceSession(
-        ProgramEnvironment& env, Logger& logger,
+        ProgramEnvironment& env, LoggerQt& logger,
         AudioFeed& feed,
         std::chrono::milliseconds period = std::chrono::milliseconds(20)
     );
@@ -40,7 +40,7 @@ private:
     struct Callback;
 
     ProgramEnvironment& m_env;
-    Logger& m_logger;
+    LoggerQt& m_logger;
     AudioFeed& m_feed;
     std::chrono::milliseconds m_period;
     std::atomic<bool> m_stop;
@@ -56,7 +56,7 @@ private:
 class AsyncAudioInferenceSession : private AudioInferenceSession{
 public:
     AsyncAudioInferenceSession(
-        ProgramEnvironment& env, Logger& logger,
+        ProgramEnvironment& env, LoggerQt& logger,
         AudioFeed& feed,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)
     );

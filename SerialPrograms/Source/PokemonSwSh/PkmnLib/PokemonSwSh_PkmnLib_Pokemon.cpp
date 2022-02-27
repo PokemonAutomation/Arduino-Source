@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <cmath>
 #include <QtGlobal>
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
@@ -349,7 +350,11 @@ std::map<std::string, Pokemon> load_pokemon(const std::string& filepath, bool is
     QString path = RESOURCE_PATH() + QString::fromStdString(filepath);
     QJsonObject json = read_json_file(path).object();
     if (json.empty()){
-        PA_THROW_FileException("Json is either empty or invalid.", path);
+        throw FileException(
+            nullptr, __PRETTY_FUNCTION__,
+            "Json is either empty or invalid.",
+            path.toStdString()
+        );
     }
 
     std::map<std::string, Pokemon> map;
@@ -373,7 +378,7 @@ std::map<std::string, Pokemon> load_pokemon(const std::string& filepath, bool is
         {
             QJsonArray array = json_get_array_throw(obj, "types");
             if (array.size() < 1){
-                PA_THROW_ParseException("Must have at least one type: " + slug);
+                throw FileException(nullptr, __PRETTY_FUNCTION__, "Must have at least one type: " + slug, path.toStdString());
             }
             type1 = get_type_from_string(array[0].toString().toStdString());
             if (array.size() > 1){
@@ -385,7 +390,7 @@ std::map<std::string, Pokemon> load_pokemon(const std::string& filepath, bool is
         {
             QJsonArray array = json_get_array_throw(obj, "moves");
             if (array.size() > move_limit){
-                PA_THROW_ParseException("Too many moves specified: " + slug);
+                throw FileException(nullptr, __PRETTY_FUNCTION__, "Too many moves specified: " + slug, path.toStdString());
             }
             for (int c = 0; c < array.size(); c++){
                 moves[c] = array[c].toInt();
@@ -396,7 +401,7 @@ std::map<std::string, Pokemon> load_pokemon(const std::string& filepath, bool is
         {
             QJsonArray array = json_get_array_throw(obj, "max_moves");
             if (array.size() > move_limit){
-                PA_THROW_ParseException("Too many moves specified: " + slug);
+                throw FileException(nullptr, __PRETTY_FUNCTION__, "Too many moves specified: " + slug, path.toStdString());
             }
             for (int c = 0; c < array.size(); c++){
                 max_moves[c] = array[c].toInt();
@@ -404,7 +409,7 @@ std::map<std::string, Pokemon> load_pokemon(const std::string& filepath, bool is
         }
         QJsonArray base_stats = json_get_array_throw(obj, "base_stats");
         if (base_stats.size() != 6){
-            PA_THROW_ParseException("Should be exactly 6 base stats: " + slug);
+            throw FileException(nullptr, __PRETTY_FUNCTION__, "Should be exactly 6 base stats: " + slug, path.toStdString());
         }
 
         map.emplace(

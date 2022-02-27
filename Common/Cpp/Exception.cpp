@@ -29,16 +29,6 @@ StringException::StringException(const char* type, const char* location, std::st
 
 
 
-FileException::FileException(const char* location, std::string message, const std::string& file)
-    : StringException("FileException", location, std::move(message))
-{
-    m_full_body += "\r\n\r\n";
-    m_full_body += file;
-
-    m_message += "\r\n\r\n";
-    m_message += file;
-}
-
 
 }
 

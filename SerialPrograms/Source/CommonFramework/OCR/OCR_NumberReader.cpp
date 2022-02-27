@@ -13,7 +13,7 @@ namespace OCR{
 
 
 
-int read_number(Logger& logger, const QImage& image){
+int read_number(LoggerQt& logger, const QImage& image){
     QString ocr_text = OCR::ocr_read(Language::English, image);
     QString normalized;
     bool has_digit = false;

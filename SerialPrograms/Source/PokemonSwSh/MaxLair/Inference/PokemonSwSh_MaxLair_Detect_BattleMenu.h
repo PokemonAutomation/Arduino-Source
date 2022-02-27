@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_Detect_BattleMenu_H
 
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
@@ -61,18 +61,18 @@ public:
     BattleMenuReader(VideoOverlay& overlay, Language language);
 
     std::set<std::string> read_opponent(
-        Logger& logger,
+        LoggerQt& logger,
         ProgramEnvironment& env,
         VideoFeed& feed
     ) const;
-    std::set<std::string> read_opponent_in_summary(Logger& logger, const QImage& screen) const;
+    std::set<std::string> read_opponent_in_summary(LoggerQt& logger, const QImage& screen) const;
 
-    std::string read_own_mon(Logger& logger, const QImage& screen) const;
+    std::string read_own_mon(LoggerQt& logger, const QImage& screen) const;
 
-    double read_opponent_hp(Logger& logger, const QImage& screen) const;
-    double read_own_hp(Logger& logger, const QImage& screen) const;
-    void read_hp(Logger& logger, const QImage& screen, Health health[4], size_t player_index);
-    void read_own_pp(Logger& logger, const QImage& screen, int8_t pp[4]) const;
+    double read_opponent_hp(LoggerQt& logger, const QImage& screen) const;
+    double read_own_hp(LoggerQt& logger, const QImage& screen) const;
+    void read_hp(LoggerQt& logger, const QImage& screen, Health health[4], size_t player_index);
+    void read_own_pp(LoggerQt& logger, const QImage& screen, int8_t pp[4]) const;
     bool can_dmax(const QImage& screen) const;
 
 private:

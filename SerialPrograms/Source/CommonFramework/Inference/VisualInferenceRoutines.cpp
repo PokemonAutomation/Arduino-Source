@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/CancellationExceptions.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "VisualInferenceSession.h"
 #include "VisualInferenceRoutines.h"
@@ -14,7 +14,7 @@ namespace PokemonAutomation{
 
 
 int wait_until(
-    ProgramEnvironment& env, Logger& logger,
+    ProgramEnvironment& env, LoggerQt& logger,
     VideoFeed& feed, VideoOverlay& overlay,
     std::chrono::milliseconds timeout,
     std::vector<VisualInferenceCallback*>&& callbacks,
@@ -28,7 +28,7 @@ int wait_until(
     );
 }
 int wait_until(
-    ProgramEnvironment& env, Logger& logger,
+    ProgramEnvironment& env, LoggerQt& logger,
     VideoFeed& feed, VideoOverlay& overlay,
     std::chrono::system_clock::time_point time_limit,
     std::vector<VisualInferenceCallback*>&& callbacks,

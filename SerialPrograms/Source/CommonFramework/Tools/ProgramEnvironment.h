@@ -11,7 +11,7 @@
 #include <chrono>
 #include <QObject>
 #include "Common/Cpp/Pimpl.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 
 
@@ -51,7 +51,7 @@ public:
     ~ProgramEnvironment();
     ProgramEnvironment(
         ProgramInfo program_info,
-        Logger& logger,
+        LoggerQt& logger,
         StatsTracker* current_stats,
         const StatsTracker* historical_stats
     );
@@ -60,7 +60,7 @@ public:
 
     template <class... Args>
     void log(Args&&... args);
-    Logger& logger(){ return m_logger; }
+    LoggerQt& logger(){ return m_logger; }
 
     AsyncDispatcher& dispatcher();
 
@@ -100,7 +100,7 @@ signals:
 
 
 private:
-    Logger& m_logger;
+    LoggerQt& m_logger;
 
     StatsTracker* m_current_stats;
     const StatsTracker* m_historical_stats;

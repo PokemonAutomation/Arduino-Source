@@ -30,6 +30,7 @@
 #include <condition_variable>
 #include <thread>
 #include "Common/Cpp/SpinLock.h"
+#include "Common/Cpp/AbstractLogger.h"
 #include "ClientSource/Connection/MessageLogger.h"
 #include "ClientSource/Connection/PABotBaseConnection.h"
 #include "BotBase.h"
@@ -49,8 +50,9 @@ class PABotBase : public BotBase, private PABotBaseConnection{
 
 public:
     PABotBase(
+        Logger& logger,
         std::unique_ptr<StreamConnection> connection,
-        MessageLogger* logger = nullptr,
+        MessageLogger* message_logger = nullptr,
         std::chrono::milliseconds retransmit_delay = std::chrono::milliseconds(PABB_RETRANSMIT_DELAY_MILLIS)
     );
     virtual ~PABotBase();
@@ -64,6 +66,9 @@ public:
         return m_last_ack.load(std::memory_order_acquire);
     }
 
+    virtual Logger& logger() override{
+        return m_logger;
+    }
     virtual State state() const override{
         return m_state.load(std::memory_order_acquire);
     }
@@ -165,6 +170,8 @@ private:
 
 
 private:
+    Logger& m_logger;
+
     uint64_t m_send_seq;
     std::chrono::milliseconds m_retransmit_delay;
     std::atomic<std::chrono::time_point<std::chrono::system_clock>> m_last_ack;

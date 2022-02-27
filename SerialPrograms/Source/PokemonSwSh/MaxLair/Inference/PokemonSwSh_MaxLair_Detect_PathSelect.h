@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Detect_PathSelect_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Detect_PathSelect_H
 
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
@@ -72,12 +72,12 @@ public:
     PathReader(VideoOverlay& overlay, size_t player_index);
 
     void read_sprites(
-        Logger& logger,
+        LoggerQt& logger,
         GlobalState& state,
         const QImage& screen
     ) const;
     void read_hp(
-        Logger& logger,
+        LoggerQt& logger,
         GlobalState& state,
         const QImage& screen
     ) const;
@@ -91,15 +91,15 @@ public:
     //      0   =   left
     //      1   =   right
     void read_side(
-        Logger& logger,
+        LoggerQt& logger,
         GlobalState& state,
         const QImage& screen
     );
 
 
 public:
-    void read_sprites(Logger& logger, const QImage& screen, std::string slugs[4]) const;
-    void read_hp(Logger& logger, const QImage& screen, double hp[4]) const;
+    void read_sprites(LoggerQt& logger, const QImage& screen, std::string slugs[4]) const;
+    void read_hp(LoggerQt& logger, const QImage& screen, double hp[4]) const;
 
     static int8_t read_side(const QImage& image, int p_min_rgb_sum);
 

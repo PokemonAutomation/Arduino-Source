@@ -11,7 +11,7 @@
 #include <deque>
 #include <map>
 #include "Common/Cpp/SpinLock.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 
@@ -32,7 +32,7 @@ class UnderAttackWatcher : public VisualInferenceCallback{
 public:
 
 public:
-    UnderAttackWatcher(Logger& logger);
+    UnderAttackWatcher(LoggerQt& logger);
 
     UnderAttackState state() const{
         return m_state.load(std::memory_order_acquire);
@@ -53,7 +53,7 @@ private:
         UnderAttackState state;
     };
 
-    Logger& m_logger;
+    LoggerQt& m_logger;
     ImageFloatBox m_box;
 
     std::atomic<UnderAttackState> m_state;

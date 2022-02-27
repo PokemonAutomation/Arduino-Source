@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exception.h"
+#include "Common/Qt/ImageOpener.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageMatch/ImageCropper.h"
@@ -16,18 +17,17 @@ namespace PokemonSwSh{
 
 
 std::map<std::string, QIcon> load_pokemon_icons(){
-    QImage sprites(RESOURCE_PATH() + "PokemonSwSh/PokemonSprites.png");
-    QJsonObject json = read_json_file(
-        RESOURCE_PATH() + "PokemonSwSh/PokemonSprites.json"
-    ).object();
+    QString path = RESOURCE_PATH() + "PokemonSwSh/PokemonSprites.png";
+    QImage sprites = open_image(path);
+    QJsonObject json = read_json_file(RESOURCE_PATH() + "PokemonSwSh/PokemonSprites.json").object();
 
     int width = json.find("spriteWidth")->toInt();
     int height = json.find("spriteHeight")->toInt();
     if (width <= 0){
-        PA_THROW_ParseException("Invalid width.");
+        throw FileException(nullptr, __PRETTY_FUNCTION__, "Invalid width.", path.toStdString());
     }
     if (height <= 0){
-        PA_THROW_ParseException("Invalid height.");
+        throw FileException(nullptr, __PRETTY_FUNCTION__, "Invalid height.", path.toStdString());
     }
 
     std::map<std::string, QIcon> map;

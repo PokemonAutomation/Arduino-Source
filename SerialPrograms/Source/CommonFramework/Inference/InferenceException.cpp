@@ -9,18 +9,18 @@
 namespace PokemonAutomation{
 
 
-InferenceException::InferenceException(const char* location, Logger& logger, const char* message)
+InferenceException::InferenceException(const char* location, LoggerQt& logger, const char* message)
     : StringException(location, message)
 {
     logger.log(message, COLOR_RED);
 }
-InferenceException::InferenceException(const char* location, Logger& logger, std::string message)
+InferenceException::InferenceException(const char* location, LoggerQt& logger, std::string message)
     : StringException("InferenceException", location, std::move(message))
 {
     logger.log(message, COLOR_RED);
 }
 #ifdef QT_VERSION
-InferenceException::InferenceException(const char* location, Logger& logger, const QString& message)
+InferenceException::InferenceException(const char* location, LoggerQt& logger, const QString& message)
     : StringException("InferenceException", location, message.toUtf8().data())
 {
     logger.log(message, COLOR_RED);

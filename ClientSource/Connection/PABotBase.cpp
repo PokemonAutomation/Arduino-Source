@@ -7,7 +7,7 @@
 #include <algorithm>
 #include <iostream>
 #include <emmintrin.h>
-#include "Common/Cpp/CancellationExceptions.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Microcontroller/MessageProtocol.h"
 #include "Common/Microcontroller/DeviceRoutines.h"
 #include "Common/Cpp/Exception.h"
@@ -23,18 +23,20 @@ namespace PokemonAutomation{
 
 
 PABotBase::PABotBase(
+    Logger& logger,
     std::unique_ptr<StreamConnection> connection,
-    MessageLogger* logger,
+    MessageLogger* message_logger,
     std::chrono::milliseconds retransmit_delay
 )
     : PABotBaseConnection(std::move(connection))
+    , m_logger(logger)
     , m_send_seq(1)
     , m_retransmit_delay(retransmit_delay)
     , m_last_ack(std::chrono::system_clock::now())
     , m_state(State::RUNNING)
     , m_retransmit_thread(run_with_catch, "PABotBase::retransmit_thread()", [=]{ retransmit_thread(); })
 {
-    set_sniffer(logger);
+    set_sniffer(message_logger);
 }
 PABotBase::~PABotBase(){
     stop();

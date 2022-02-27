@@ -35,7 +35,7 @@ public:
 
     //  Attempt to synchronize with other consoles.
     GlobalState synchronize(
-        ProgramEnvironment& env, Logger& logger,
+        ProgramEnvironment& env, LoggerQt& logger,
         size_t index,
         std::chrono::milliseconds window = std::chrono::seconds(5)
     );

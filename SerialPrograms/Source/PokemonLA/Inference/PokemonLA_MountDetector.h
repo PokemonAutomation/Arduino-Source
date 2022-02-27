@@ -10,7 +10,7 @@
 #include <deque>
 #include <map>
 #include "Common/Cpp/SpinLock.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualInferenceCallback.h"
 
@@ -51,7 +51,7 @@ private:
 
 class MountTracker : public VisualInferenceCallback{
 public:
-    MountTracker(Logger& logger);
+    MountTracker(LoggerQt& logger);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
 
@@ -69,7 +69,7 @@ private:
     };
 
 private:
-    Logger& m_logger;
+    LoggerQt& m_logger;
     std::atomic<MountState> m_state;
 
     SpinLock m_lock;

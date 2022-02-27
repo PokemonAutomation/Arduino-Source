@@ -11,7 +11,7 @@
 #include <chrono>
 #include "CommonFramework/Options/ConfigOption.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 
 namespace PokemonAutomation{
 
@@ -67,7 +67,7 @@ public:
     void restore_defaults();
     void reset_rate_limit();
 
-    bool ok_to_send_now(Logger& logger);
+    bool ok_to_send_now(LoggerQt& logger);
 
 private:
     friend class EventNotificationsTable;

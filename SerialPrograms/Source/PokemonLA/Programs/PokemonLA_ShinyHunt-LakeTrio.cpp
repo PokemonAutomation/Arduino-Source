@@ -79,7 +79,7 @@ std::unique_ptr<StatsTracker> ShinyHuntLakeTrio::make_stats() const{
 
 
 std::set<std::string> read_name(
-    Logger& logger,
+    LoggerQt& logger,
     Language language,
     const QImage& screen, const ImageFloatBox& box
 ){

@@ -10,7 +10,7 @@
 #include <atomic>
 //#include <QFile>
 #include <QImage>
-#include "CommonFramework/Logging/Logger.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 
 namespace PokemonAutomation{
@@ -38,7 +38,7 @@ public:
     ~PendingFileSend();
 
     PendingFileSend(const QString& file, bool keep_file);
-    PendingFileSend(Logger& logger, const ImageAttachment& image);
+    PendingFileSend(LoggerQt& logger, const ImageAttachment& image);
 
     const QString& filename() const{ return m_filename; }
     const QString& filepath() const{ return m_filepath; }
