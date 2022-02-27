@@ -21,15 +21,23 @@ FlagNavigationAir::FlagNavigationAir(ProgramEnvironment& env, ConsoleHandle& con
     , m_centerA(console, console, ButtonType::ButtonA, {0.40, 0.50, 0.40, 0.50}, std::chrono::milliseconds(200), false)
     , m_leftB(console, console, ButtonType::ButtonB, {0.02, 0.40, 0.05, 0.20}, std::chrono::milliseconds(200), false)
     , m_looking_straight_ahead(false)
+    , m_last_good_state(WallClock::min())
 {
     *this += m_flag;
     *this += m_mount;
     *this += m_centerA;
     *this += m_leftB;
     register_state_command(State::UNKNOWN, [=](){
-        m_console.log("Unknown state. Moving foward...");
+        m_console.log("Unknown state. Moving camera around...");
         m_active_command->dispatch([=](const BotBaseContext& context){
-            pbf_move_left_joystick(context, 128, 0, 300 * TICKS_PER_SECOND, 0);
+            pbf_move_right_joystick(context, 128, 255, 200, 0);
+            pbf_move_right_joystick(context, 128, 0, 200, 0);
+            pbf_move_right_joystick(context, 128, 255, 80, 0);
+            pbf_move_right_joystick(context, 0, 128, 400, 0);
+            pbf_move_right_joystick(context, 128, 255, 120, 0);
+            pbf_move_right_joystick(context, 0, 128, 400, 0);
+            pbf_move_right_joystick(context, 128, 0, 200, 0);
+            pbf_move_right_joystick(context, 0, 128, 400, 0);
         });
         return false;
     });
@@ -75,11 +83,11 @@ FlagNavigationAir::FlagNavigationAir(ProgramEnvironment& env, ConsoleHandle& con
     });
     register_state_command(State::SNEASLER_ON, [=](){
         m_console.log("Switching from Sneasler (on) to Braviary (on)...");
+        m_looking_straight_ahead.store(false, std::memory_order_release);
         m_active_command->dispatch([=](const BotBaseContext& context){
             pbf_move_left_joystick(context, 128, 0, 125, 0);
             pbf_press_dpad(context, DPAD_LEFT, 20, GET_ON_BRAVIARY_TIME);
         });
-        m_looking_straight_ahead = false;
         return false;
     });
     register_state_command(State::BRAVIARY_OFF, [=](){
@@ -91,79 +99,88 @@ FlagNavigationAir::FlagNavigationAir(ProgramEnvironment& env, ConsoleHandle& con
     });
     register_state_command(State::GET_ON_SNEASLER, [=](){
         m_console.log("Getting on Sneasler...");
+        m_looking_straight_ahead.store(false, std::memory_order_release);
         m_active_command->dispatch([=](const BotBaseContext& context){
             pbf_press_button(context, BUTTON_A, 20, 230);
         });
-        m_looking_straight_ahead = false;
         return false;
     });
     register_state_command(State::CLIMBING, [=](){
         m_console.log("Climbing wall...");
+        m_looking_straight_ahead.store(false, std::memory_order_release);
         m_active_command->dispatch([=](const BotBaseContext& context){
             pbf_move_left_joystick(context, 128, 0, 300 * TICKS_PER_SECOND, 0);
         });
-        m_looking_straight_ahead = false;
         return false;
     });
     register_state_command(State::DASH_FORWARD, [=](){
         m_console.log("Dashing forward...");
-        bool looking_straight_ahead = m_looking_straight_ahead;
         m_active_command->dispatch([=](const BotBaseContext& context){
             //  Move forward to straighten out direction.
-            if (!looking_straight_ahead){
-                pbf_move_left_joystick(context, 128, 0, 125, 0);
+            if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
+                pbf_move_left_joystick(context, 128, 0, 160, 0);
+                context.wait_for_all_requests();
+                m_looking_straight_ahead.store(true, std::memory_order_release);
+//                cout << "State::DASH_FORWARD: m_looking_straight_ahead = true" << endl;
             }
             pbf_mash_button(context, BUTTON_B, 300 * TICKS_PER_SECOND);
         });
-        m_looking_straight_ahead = true;
         return false;
     });
     register_state_command(State::DASH_LEFT, [=](){
         m_console.log("Dashing Left...");
-        bool looking_straight_ahead = m_looking_straight_ahead;
         m_active_command->dispatch([=](const BotBaseContext& context){
             //  Move forward to straighten out direction.
-            if (!looking_straight_ahead){
-                pbf_move_left_joystick(context, 128, 0, 125, 0);
+            if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
+                pbf_move_left_joystick(context, 128, 0, 160, 0);
+                context.wait_for_all_requests();
+                m_looking_straight_ahead.store(true, std::memory_order_release);
+//                cout << "State::DASH_LEFT: m_looking_straight_ahead = true" << endl;
             }
             pbf_press_button(context, BUTTON_B, 50, 0);
             pbf_controller_state(context, BUTTON_B, DPAD_NONE, 96, 128, 128, 128, 255);
         });
-        m_looking_straight_ahead = true;
         return false;
     });
     register_state_command(State::DASH_RIGHT, [=](){
         m_console.log("Dashing Right...");
-        bool looking_straight_ahead = m_looking_straight_ahead;
         m_active_command->dispatch([=](const BotBaseContext& context){
             //  Move forward to straighten out direction.
-            if (!looking_straight_ahead){
-                pbf_move_left_joystick(context, 128, 0, 125, 0);
+            if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
+                pbf_move_left_joystick(context, 128, 0, 160, 0);
+                context.wait_for_all_requests();
+                m_looking_straight_ahead.store(true, std::memory_order_release);
+//                cout << "State::DASH_RIGHT: m_looking_straight_ahead = true" << endl;
             }
             pbf_press_button(context, BUTTON_B, 50, 0);
             pbf_controller_state(context, BUTTON_B, DPAD_NONE, 160, 128, 128, 128, 255);
         });
-        m_looking_straight_ahead = true;
         return false;
     });
     register_state_command(State::TURN_LEFT, [=](){
         m_console.log("Turning Left...");
         m_active_command->dispatch([=](const BotBaseContext& context){
             pbf_wait(context, 125);
-            pbf_move_right_joystick(context, 0, 128, (uint16_t)(85 * (0.5 - m_flag_x)), 0);
-            pbf_move_left_joystick(context, 128, 0, 125, 125);
+            context.wait_for_all_requests();
+            double distance, flag_x, flag_y;
+            if (m_flag.get(distance, flag_x, flag_y)){
+                pbf_move_right_joystick(context, 0, 128, (uint16_t)(85 * (0.5 - flag_x)), 0);
+            }
         });
-        m_looking_straight_ahead = false;
+        m_looking_straight_ahead.store(false, std::memory_order_release);
         return false;
     });
     register_state_command(State::TURN_RIGHT, [=](){
         m_console.log("Turning Right...");
         m_active_command->dispatch([=](const BotBaseContext& context){
             pbf_wait(context, 125);
-            pbf_move_right_joystick(context, 255, 128, (uint16_t)(85 * (m_flag_x - 0.5)), 0);
-            pbf_move_left_joystick(context, 128, 0, 125, 125);
+            context.wait_for_all_requests();
+            double distance, flag_x, flag_y;
+            if (m_flag.get(distance, flag_x, flag_y)){
+                pbf_move_right_joystick(context, 255, 128, (uint16_t)(85 * (flag_x - 0.5)), 0);
+            }
         });
-        m_looking_straight_ahead = false;
+        m_looking_straight_ahead.store(false, std::memory_order_release);
         return false;
     });
     register_state_command(State::FIND_FLAG, [=](){
@@ -178,7 +195,7 @@ FlagNavigationAir::FlagNavigationAir(ProgramEnvironment& env, ConsoleHandle& con
             pbf_move_right_joystick(context, 128, 0, 200, 0);
             pbf_move_right_joystick(context, 0, 128, 400, 0);
         });
-        m_looking_straight_ahead = false;
+        m_looking_straight_ahead.store(false, std::memory_order_release);
         return false;
     });
 }
@@ -187,9 +204,22 @@ bool FlagNavigationAir::run_state(
     AsyncCommandSession& commands,
     std::chrono::system_clock::time_point timestamp
 ){
+    m_flag_detected = m_flag.get(m_flag_distance, m_flag_x, m_flag_y);
+//    cout << "flag_ok = " << flag_ok << ", x = " << m_flag_x << ", y = " << flag_y << endl;
+
+    MountState mount = m_mount.state();
+    if (mount == MountState::NOTHING){
+        if (m_last_good_state + std::chrono::seconds(2) < timestamp){
+            return run_state_action(State::UNKNOWN);
+        }
+        return false;
+    }else{
+        m_last_good_state = timestamp;
+    }
+
     switch (m_mount.state()){
     case MountState::NOTHING:
-        return run_state_action(State::UNKNOWN);
+        return false;
     case MountState::WYRDEER_OFF:
     case MountState::BASCULEGION_OFF:
         return run_state_action(State::WYRDEER_BASCULEGION_OFF);
@@ -214,38 +244,34 @@ bool FlagNavigationAir::run_state(
     return false;
 }
 bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock timestamp){
-    double flag_distance, flag_y;
-    bool flag_ok = m_flag.get(flag_distance, m_flag_x, flag_y);
-//    cout << "flag_ok = " << flag_ok << ", x = " << flag_x << ", y = " << flag_y << endl;
-
     //  Need to get on Sneasler.
     if (m_centerA.detected()){
         return run_state_action(State::GET_ON_SNEASLER);
     }
 
     //  Cruise
-    if (flag_ok && flag_y <= 0.6 && 0.45 <= m_flag_x && m_flag_x <= 0.55){
+    if (m_flag_detected && m_flag_y <= 0.6 && 0.45 <= m_flag_x && m_flag_x <= 0.55){
         return run_state_action(State::DASH_FORWARD);
     }
 
     //  Turning Cruise
-    if (flag_ok && flag_y <= 0.6 && 0.40 <= m_flag_x && m_flag_x <= 0.45){
+    if (m_flag_detected && m_flag_y <= 0.6 && 0.40 <= m_flag_x && m_flag_x <= 0.45){
         return run_state_action(State::DASH_LEFT);
     }
-    if (flag_ok && flag_y <= 0.6 && 0.55 <= m_flag_x && m_flag_x <= 0.60){
+    if (m_flag_detected && m_flag_y <= 0.6 && 0.55 <= m_flag_x && m_flag_x <= 0.60){
         return run_state_action(State::DASH_RIGHT);
     }
 
     //  Re-center the flag.
-    if (flag_ok && m_flag_x <= 0.4){
+    if (m_flag_detected && m_flag_x <= 0.4){
         return run_state_action(State::TURN_LEFT);
     }
-    if (flag_ok && m_flag_x >= 0.6){
+    if (m_flag_detected && m_flag_x >= 0.6){
         return run_state_action(State::TURN_RIGHT);
     }
 
     //  Find the flag.
-    if (!flag_ok){
+    if (!m_flag_detected){
         return run_state_action(State::FIND_FLAG);
     }
 

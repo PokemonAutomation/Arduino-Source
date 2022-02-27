@@ -20,7 +20,7 @@ public:
     static const size_t VECTOR_SIZE = 1;
 
 public:
-    ImageFilter_RgbRange_Default(uint32_t replacement, uint32_t mins, uint32_t maxs, bool invert)
+    ImageFilter_RgbRange_Default(uint32_t mins, uint32_t maxs, uint32_t replacement, bool invert)
         : m_replacement(replacement)
         , m_invert(invert ? 1 : 0)
         , m_minB(mins & 0x000000ff)

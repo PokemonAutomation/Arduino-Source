@@ -75,10 +75,12 @@ bool WaterfillTemplateMatcher::check_area_ratio(double candidate_area_ratio) con
 }
 double WaterfillTemplateMatcher::rmsd(const QImage& image, const WaterfillObject& object) const{
     if (!check_aspect_ratio(object.width(), object.height())){
+//        cout << "bad aspect ratio" << endl;
         return 99999.;
     }
     if (!check_area_ratio(object.area_ratio())){
-        return 99999.;
+//        cout << "bad area ratio" << endl;
+//        return 99999.;
     }
 
 //    static int c = 0;

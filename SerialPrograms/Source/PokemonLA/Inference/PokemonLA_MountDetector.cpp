@@ -5,13 +5,19 @@
  */
 
 #include "Common/Cpp/Exception.h"
+#include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "PokemonLA_MountDetector.h"
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -20,12 +26,47 @@ namespace PokemonLA{
 using namespace Kernels;
 using namespace Kernels::Waterfill;
 
+class MountMatcher : public ImageMatch::WaterfillTemplateMatcher{
+public:
+    using WaterfillTemplateMatcher::WaterfillTemplateMatcher;
 
-class MountWyrdeerMatcher : public ImageMatch::WaterfillTemplateMatcher{
+#if 0
+    virtual double rmsd(const QImage& image, const WaterfillObject& object) const override{
+        if (!check_aspect_ratio(object.width(), object.height())){
+//            cout << "bad aspect ratio" << endl;
+            return 99999.;
+        }
+        if (!check_area_ratio(object.area_ratio())){
+//            cout << "bad area ratio" << endl;
+            return 99999.;
+        }
+
+//        static int c = 0;
+//        cout << c << endl;
+
+        QImage filtered = extract_box(image, object);
+        filter_rgb32(object.packed_matrix(), filtered, COLOR_BLACK, true);
+
+        double rmsd = WaterfillTemplateMatcher::rmsd(filtered);
+
+        cout << "rmsd  = " << rmsd << endl;
+
+//        if (rmsd <= m_max_rmsd){
+            static int c = 0;
+            filtered.save("test-" + QString::number(c++) + "-" + QString::number(rmsd) + ".png");
+//        }
+
+        return rmsd;
+    }
+#endif
+
+};
+
+class MountWyrdeerMatcher : public MountMatcher{
 public:
     MountWyrdeerMatcher(bool on)
-        : WaterfillTemplateMatcher(
-            on ? "PokemonLA/Mounts/MountOn-Wyrdeer-Template.png" : "PokemonLA/Mounts/MountOff-Wyrdeer-Template.png",
+        : MountMatcher(
+            on ? "PokemonLA/Mounts/MountOn-Wyrdeer-Template-1.png" : "PokemonLA/Mounts/MountOff-Wyrdeer-Template.png",
             Color(0xff808000), Color(0xffffffff), 100
         )
     {}
@@ -38,11 +79,11 @@ public:
         return matcher;
     }
 };
-class MountUrsalunaMatcher : public ImageMatch::WaterfillTemplateMatcher{
+class MountUrsalunaMatcher : public MountMatcher{
 public:
     MountUrsalunaMatcher(bool on)
-        : WaterfillTemplateMatcher(
-            on ? "PokemonLA/Mounts/MountOn-Ursaluna-Template.png" : "PokemonLA/Mounts/MountOff-Ursaluna-Template.png",
+        : MountMatcher(
+            on ? "PokemonLA/Mounts/MountOn-Ursaluna-Template-1.png" : "PokemonLA/Mounts/MountOff-Ursaluna-Template.png",
             Color(0xff808000), Color(0xffffffff), 100
         )
     {}
@@ -55,11 +96,11 @@ public:
         return matcher;
     }
 };
-class MountBasculegionMatcher : public ImageMatch::WaterfillTemplateMatcher{
+class MountBasculegionMatcher : public MountMatcher{
 public:
     MountBasculegionMatcher(bool on)
-        : WaterfillTemplateMatcher(
-            on ? "PokemonLA/Mounts/MountOn-Basculegion-Template.png" : "PokemonLA/Mounts/MountOff-Basculegion-Template.png",
+        : MountMatcher(
+            on ? "PokemonLA/Mounts/MountOn-Basculegion-Template-1.png" : "PokemonLA/Mounts/MountOff-Basculegion-Template.png",
             Color(0xff808000), Color(0xffffffff), 100
         )
     {}
@@ -72,11 +113,11 @@ public:
         return matcher;
     }
 };
-class MountSneaslerMatcher : public ImageMatch::WaterfillTemplateMatcher{
+class MountSneaslerMatcher : public MountMatcher{
 public:
     MountSneaslerMatcher(bool on)
-        : WaterfillTemplateMatcher(
-            on ? "PokemonLA/Mounts/MountOn-Sneasler-Template.png" : "PokemonLA/Mounts/MountOff-Sneasler-Template.png",
+        : MountMatcher(
+            on ? "PokemonLA/Mounts/MountOn-Sneasler-Template-1.png" : "PokemonLA/Mounts/MountOff-Sneasler-Template.png",
             Color(0xff808000), Color(0xffffffff), 100
         )
     {}
@@ -89,14 +130,16 @@ public:
         return matcher;
     }
 };
-class MountBraviaryMatcher : public ImageMatch::WaterfillTemplateMatcher{
+class MountBraviaryMatcher : public MountMatcher{
 public:
     MountBraviaryMatcher(bool on)
-        : WaterfillTemplateMatcher(
-            on ? "PokemonLA/Mounts/MountOn-Braviary-Template.png" : "PokemonLA/Mounts/MountOff-Braviary-Template.png",
+        : MountMatcher(
+            on ? "PokemonLA/Mounts/MountOn-Braviary-Template-1.png" : "PokemonLA/Mounts/MountOff-Braviary-Template.png",
             Color(0xff808000), Color(0xffffffff), 100
         )
-    {}
+    {
+        m_area_ratio_upper = 1.4;
+    }
     static const MountBraviaryMatcher& on(){
         static MountBraviaryMatcher matcher(true);
         return matcher;
@@ -131,11 +174,18 @@ MountDetector::MountDetector()
 {}
 
 struct MountCandiateTracker{
-    double m_rmsd = 80;
+    double m_rmsd = 1000;
     MountState m_state = MountState::NOTHING;
 
-    void add(double rmsd, MountState state){
-        if (m_rmsd <= rmsd){
+    void add_filtered(double rmsd, MountState state){
+        if (rmsd > 150 || m_rmsd <= rmsd){
+            return;
+        }
+        m_rmsd = rmsd;
+        m_state = state;
+    }
+    void add_direct(double rmsd, MountState state){
+        if (rmsd > 80 || m_rmsd <= rmsd){
             return;
         }
         m_rmsd = rmsd;
@@ -152,13 +202,27 @@ MountState MountDetector::detect(const QImage& screen) const{
     MountCandiateTracker candidates;
 
     {
+        uint32_t filters[4][2]{
+            {0xff707070, 0xffffffff},
+            {0xff909090, 0xffffffff},
+            {0xffb0b0b0, 0xffffffff},
+            {0xffd0d0d0, 0xffffffff},
+        };
+        QImage filtered[4];
+        filter4_rgb32_range(
+            image,
+            filtered[0], filters[0][0], filters[0][1], COLOR_BLACK, false,
+            filtered[1], filters[1][0], filters[1][1], COLOR_BLACK, false,
+            filtered[2], filters[2][0], filters[2][1], COLOR_BLACK, false,
+            filtered[3], filters[3][0], filters[3][1], COLOR_BLACK, false
+        );
         PackedBinaryMatrix matrix[4];
         compress4_rgb32_to_binary_range(
             image,
-            matrix[0], 0xff707070, 0xffffffff,
-            matrix[1], 0xff909090, 0xffffffff,
-            matrix[2], 0xffb0b0b0, 0xffffffff,
-            matrix[3], 0xffd0d0d0, 0xffffffff
+            matrix[0], filters[0][0], filters[0][1],
+            matrix[1], filters[1][0], filters[1][1],
+            matrix[2], filters[2][0], filters[2][1],
+            matrix[3], filters[3][0], filters[3][1]
         );
         for (size_t c = 0; c < 4; c++){
             WaterFillIterator finder(matrix[c], 50);
@@ -170,24 +234,45 @@ MountState MountDetector::detect(const QImage& screen) const{
                 if (object.height() * 3 < (size_t)image.height() || object.height() == (size_t)image.height()){
                     continue;
                 }
-                candidates.add(MountWyrdeerMatcher::off().rmsd(image, object), MountState::WYRDEER_OFF);
-                candidates.add(MountUrsalunaMatcher::off().rmsd(image, object), MountState::URSALUNA_OFF);
-                candidates.add(MountBasculegionMatcher::off().rmsd(image, object), MountState::BASCULEGION_OFF);
-                candidates.add(MountSneaslerMatcher::off().rmsd(image, object), MountState::SNEASLER_OFF);
-                candidates.add(MountBraviaryMatcher::off().rmsd(image, object), MountState::BRAVIARY_OFF);
+                candidates.add_filtered(MountWyrdeerMatcher      ::off().rmsd(filtered[c], object), MountState::WYRDEER_OFF);
+                candidates.add_filtered(MountUrsalunaMatcher     ::off().rmsd(filtered[c], object), MountState::URSALUNA_OFF);
+                candidates.add_filtered(MountBasculegionMatcher  ::off().rmsd(filtered[c], object), MountState::BASCULEGION_OFF);
+                candidates.add_filtered(MountSneaslerMatcher     ::off().rmsd(filtered[c], object), MountState::SNEASLER_OFF);
+                candidates.add_filtered(MountBraviaryMatcher     ::off().rmsd(filtered[c], object), MountState::BRAVIARY_OFF);
+                candidates.add_direct  (MountWyrdeerMatcher      ::off().rmsd(image      , object), MountState::WYRDEER_OFF);
+                candidates.add_direct  (MountUrsalunaMatcher     ::off().rmsd(image      , object), MountState::URSALUNA_OFF);
+                candidates.add_direct  (MountBasculegionMatcher  ::off().rmsd(image      , object), MountState::BASCULEGION_OFF);
+                candidates.add_direct  (MountSneaslerMatcher     ::off().rmsd(image      , object), MountState::SNEASLER_OFF);
+                candidates.add_direct  (MountBraviaryMatcher     ::off().rmsd(image      , object), MountState::BRAVIARY_OFF);
             }
         }
     }
     {
+//        int i = 0;
+        uint32_t filters[4][2]{
+            {0xff606000, 0xffffff7f},
+            {0xff808000, 0xffffff6f},
+            {0xffa0a000, 0xffffff5f},
+            {0xffc0c000, 0xffffff4f},
+        };
+        QImage filtered[4];
+        filter4_rgb32_range(
+            image,
+            filtered[0], filters[0][0], filters[0][1], COLOR_BLACK, false,
+            filtered[1], filters[1][0], filters[1][1], COLOR_BLACK, false,
+            filtered[2], filters[2][0], filters[2][1], COLOR_BLACK, false,
+            filtered[3], filters[3][0], filters[3][1], COLOR_BLACK, false
+        );
         PackedBinaryMatrix matrix[4];
         compress4_rgb32_to_binary_range(
             image,
-            matrix[0], 0xff606000, 0xffffff7f,
-            matrix[1], 0xff808000, 0xffffff6f,
-            matrix[2], 0xffa0a000, 0xffffff5f,
-            matrix[3], 0xffc0c000, 0xffffff4f
+            matrix[0], filters[0][0], filters[0][1],
+            matrix[1], filters[1][0], filters[1][1],
+            matrix[2], filters[2][0], filters[2][1],
+            matrix[3], filters[3][0], filters[3][1]
         );
         for (size_t c = 0; c < 4; c++){
+//            cout << "Filter: " << c << endl;
             WaterFillIterator finder(matrix[c], 50);
             WaterfillObject object;
             while (finder.find_next(object)){
@@ -197,16 +282,24 @@ MountState MountDetector::detect(const QImage& screen) const{
                 if (object.height() * 3 < (size_t)image.height() || object.height() == (size_t)image.height()){
                     continue;
                 }
-                candidates.add(MountWyrdeerMatcher::on().rmsd(image, object), MountState::WYRDEER_ON);
-                candidates.add(MountUrsalunaMatcher::on().rmsd(image, object), MountState::URSALUNA_ON);
-                candidates.add(MountBasculegionMatcher::on().rmsd(image, object), MountState::BASCULEGION_ON);
-                candidates.add(MountSneaslerMatcher::on().rmsd(image, object), MountState::SNEASLER_ON);
-                candidates.add(MountBraviaryMatcher::on().rmsd(image, object), MountState::BRAVIARY_ON);
+                candidates.add_filtered(MountWyrdeerMatcher      ::on().rmsd(filtered[c], object), MountState::WYRDEER_ON);
+                candidates.add_filtered(MountUrsalunaMatcher     ::on().rmsd(filtered[c], object), MountState::URSALUNA_ON);
+                candidates.add_filtered(MountBasculegionMatcher  ::on().rmsd(filtered[c], object), MountState::BASCULEGION_ON);
+                candidates.add_filtered(MountSneaslerMatcher     ::on().rmsd(filtered[c], object), MountState::SNEASLER_ON);
+                candidates.add_filtered(MountBraviaryMatcher     ::on().rmsd(filtered[c], object), MountState::BRAVIARY_ON);
+                candidates.add_direct  (MountWyrdeerMatcher      ::on().rmsd(image      , object), MountState::WYRDEER_ON);
+                candidates.add_direct  (MountUrsalunaMatcher     ::on().rmsd(image      , object), MountState::URSALUNA_ON);
+                candidates.add_direct  (MountBasculegionMatcher  ::on().rmsd(image      , object), MountState::BASCULEGION_ON);
+                candidates.add_direct  (MountSneaslerMatcher     ::on().rmsd(image      , object), MountState::SNEASLER_ON);
+                candidates.add_direct  (MountBraviaryMatcher     ::on().rmsd(image      , object), MountState::BRAVIARY_ON);
+//                extract_box(image, object).save("test-" + QString::number(c) + "-" + QString::number(i) + ".png");
+//                i++;
             }
         }
+//        cout << "i = " << i << endl;
     }
 
-//    cout << "rmsd = " << candidates.m_rmsd << endl;
+//    cout << "rmsd = " << candidates.m_rmsd << ", state = " << (int)candidates.m_state << endl;
     return candidates.m_state;
 }
 
@@ -233,6 +326,7 @@ bool MountTracker::process_frame(
     std::chrono::system_clock::time_point timestamp
 ){
     MountState state = m_detector.detect(frame);
+//    cout << "state = " << (int)state << endl;
 
 //    SpinLockGuard lg(m_lock);
 

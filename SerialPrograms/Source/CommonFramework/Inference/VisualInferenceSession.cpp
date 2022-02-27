@@ -37,9 +37,12 @@ VisualInferenceSession::VisualInferenceSession(
     , m_overlay(overlay)
     , m_period(period)
     , m_stop(false)
-{}
+{
+    env.register_stop_program_signal(m_lock, m_cv);
+}
 VisualInferenceSession::~VisualInferenceSession(){
     stop();
+    m_env.deregister_stop_program_signal(m_cv);
 }
 void VisualInferenceSession::stop(){
     bool expected = false;

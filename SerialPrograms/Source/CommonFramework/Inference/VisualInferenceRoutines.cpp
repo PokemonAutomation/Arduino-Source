@@ -107,7 +107,7 @@ int run_until(
 
         try{
             command(context);
-            context->wait_for_all_requests();
+            context.wait_for_all_requests();
         }catch (CancelledException&){};
 
         session.stop();

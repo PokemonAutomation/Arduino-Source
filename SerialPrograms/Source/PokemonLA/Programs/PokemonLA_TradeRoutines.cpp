@@ -161,11 +161,11 @@ std::string TradeNameReader::read(const QImage& screen) const{
     //  TODO: Clean this shit up.
     Kernels::filter_rgb32_range(
         (const uint32_t*)image.constBits(), image.bytesPerLine(), image.width(), image.height(),
-        (uint32_t*)image.bits(), image.bytesPerLine(), 0xffffffff, 0xff808080, 0xffffffff, false
+        (uint32_t*)image.bits(), image.bytesPerLine(), 0xff808080, 0xffffffff, 0xffffffff, false
     );
     Kernels::filter_rgb32_range(
         (const uint32_t*)image.constBits(), image.bytesPerLine(), image.width(), image.height(),
-        (uint32_t*)image.bits(), image.bytesPerLine(), 0xff000000, 0xffffffff, 0xffffffff, false
+        (uint32_t*)image.bits(), image.bytesPerLine(), 0xffffffff, 0xffffffff, 0xff000000, false
     );
 
     OCR::StringMatchResult result = Pokemon::PokemonNameReader::instance().read_substring(m_logger, m_language, image);

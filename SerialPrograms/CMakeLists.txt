@@ -219,6 +219,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ImageTools/FloatPixel.h
     Source/CommonFramework/ImageTools/ImageBoxes.cpp
     Source/CommonFramework/ImageTools/ImageBoxes.h
+    Source/CommonFramework/ImageTools/ImageFilter.cpp
+    Source/CommonFramework/ImageTools/ImageFilter.h
     Source/CommonFramework/ImageTools/ImageStats.cpp
     Source/CommonFramework/ImageTools/ImageStats.h
     Source/CommonFramework/ImageTools/SolidColorTest.cpp

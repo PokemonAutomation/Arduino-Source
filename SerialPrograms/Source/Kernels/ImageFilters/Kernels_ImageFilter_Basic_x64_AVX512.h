@@ -21,7 +21,7 @@ public:
     static const size_t VECTOR_SIZE = 16;
 
 public:
-    ImageFilter_RgbRange_x64_AVX512(uint32_t replacement, uint32_t mins, uint32_t maxs, bool invert)
+    ImageFilter_RgbRange_x64_AVX512(uint32_t mins, uint32_t maxs, uint32_t replacement, bool invert)
         : m_replacement(_mm512_set1_epi32(replacement))
         , m_invert(invert ? 0xffff : 0)
         , m_mins(_mm512_set1_epi32(mins))

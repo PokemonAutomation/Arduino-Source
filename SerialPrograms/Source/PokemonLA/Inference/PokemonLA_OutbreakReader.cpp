@@ -43,11 +43,11 @@ OCR::StringMatchResult OutbreakReader::read(const QImage& screen) const{
     //  TODO: Clean this shit up.
     Kernels::filter_rgb32_range(
         (const uint32_t*)image.constBits(), image.bytesPerLine(), image.width(), image.height(),
-        (uint32_t*)filtered.bits(), filtered.bytesPerLine(), 0xffffffff, 0xff808080, 0xffffffff, false
+        (uint32_t*)filtered.bits(), filtered.bytesPerLine(), 0xff808080, 0xffffffff, 0xffffffff, false
     );
     Kernels::filter_rgb32_range(
         (const uint32_t*)filtered.constBits(), filtered.bytesPerLine(), filtered.width(), filtered.height(),
-        (uint32_t*)filtered.bits(), filtered.bytesPerLine(), 0xff000000, 0xffffffff, 0xffffffff, false
+        (uint32_t*)filtered.bits(), filtered.bytesPerLine(), 0xffffffff, 0xffffffff, 0xff000000, false
     );
 #else
     OCR::filter_smart(filtered);

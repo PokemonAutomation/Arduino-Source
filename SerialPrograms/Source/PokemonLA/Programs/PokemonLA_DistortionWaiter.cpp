@@ -101,7 +101,7 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env){
             [&](const BotBaseContext& context){
                 for (size_t c = 0; c < 60; c++){
                     pbf_press_button(context, BUTTON_LCLICK, 20, 60 * TICKS_PER_SECOND - 20);
-                    context->wait_for_all_requests();
+                    context.wait_for_all_requests();
                     auto elapsed = std::chrono::system_clock::now() - start;
                     uint64_t minutes = std::chrono::duration_cast<std::chrono::minutes>(elapsed).count();
                     if (minutes != stats.minutes_waited.load(std::memory_order_relaxed)){

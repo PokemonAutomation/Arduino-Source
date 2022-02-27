@@ -63,9 +63,13 @@ private:
     ButtonDetector m_centerA;
     ButtonDetector m_leftB;
 
-    bool m_looking_straight_ahead;
+    std::atomic<bool> m_looking_straight_ahead;
+    WallClock m_last_good_state;
 
+    bool m_flag_detected;
+    double m_flag_distance;
     double m_flag_x;
+    double m_flag_y;
 };
 
 

@@ -105,9 +105,11 @@ void AsyncCommandSession::thread_loop(){
             try{
 //                cout << "start" << endl;
                 current->commands(current->context);
+                current->context.wait_for_all_requests();
 //                cout << "stop" << endl;
-                current->context->wait_for_all_requests();
-            }catch (CancelledException&){}
+            }catch (CancelledException&){
+//                cout << "canceled" << endl;
+            }
         }
     }
 }

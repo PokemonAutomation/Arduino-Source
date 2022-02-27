@@ -72,7 +72,7 @@ public:
     //  Basic Requests
 
     //  Waits for all pending requests to finish.
-    virtual void wait_for_all_requests() override;
+    virtual void wait_for_all_requests(const std::atomic<bool>* cancelled = nullptr) override;
 
     //  Stop all pending commands. This wipes the command queue on both sides
     //  and stops any currently executing command.

@@ -137,6 +137,7 @@ SOURCES += \
     Source/CommonFramework/ImageTools/ColorClustering.cpp \
     Source/CommonFramework/ImageTools/FloatPixel.cpp \
     Source/CommonFramework/ImageTools/ImageBoxes.cpp \
+    Source/CommonFramework/ImageTools/ImageFilter.cpp \
     Source/CommonFramework/ImageTools/ImageStats.cpp \
     Source/CommonFramework/ImageTools/SolidColorTest.cpp \
     Source/CommonFramework/Inference/AnomalyDetector.cpp \
@@ -698,6 +699,7 @@ HEADERS += \
     Source/CommonFramework/ImageTools/DistanceToLine.h \
     Source/CommonFramework/ImageTools/FloatPixel.h \
     Source/CommonFramework/ImageTools/ImageBoxes.h \
+    Source/CommonFramework/ImageTools/ImageFilter.h \
     Source/CommonFramework/ImageTools/ImageStats.h \
     Source/CommonFramework/ImageTools/SolidColorTest.h \
     Source/CommonFramework/Inference/AnomalyDetector.h \

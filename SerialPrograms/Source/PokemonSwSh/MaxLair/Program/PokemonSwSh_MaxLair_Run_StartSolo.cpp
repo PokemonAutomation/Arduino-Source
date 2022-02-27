@@ -110,7 +110,7 @@ bool start_adventure(
         [](const BotBaseContext& context){
             for (size_t c = 0; c < 180; c++){
                 pbf_press_button(context, BUTTON_A, 10, 115);
-                context.botbase().wait_for_all_requests();
+                context.wait_for_all_requests();
             }
         },
         { &lobby_detector },

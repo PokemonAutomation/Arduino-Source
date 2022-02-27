@@ -13,6 +13,10 @@
 #include "Common/Cpp/PanicDump.h"
 #include "PABotBase.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -81,19 +85,22 @@ void PABotBase::stop(){
     m_state.store(State::STOPPED, std::memory_order_release);
 }
 
-void PABotBase::wait_for_all_requests(){
+void PABotBase::wait_for_all_requests(const std::atomic<bool>* cancelled){
     std::unique_lock<std::mutex> lg(m_sleep_lock);
-    bool canceled = false;
-    m_cv.wait(lg, [&]{
-        SpinLockGuard lg(m_state_lock, "PABotBase::wait_for_all_requests()");
-        if (m_state.load(std::memory_order_acquire) != State::RUNNING){
-            canceled = true;
-            return true;
+    while (true){
+        if (cancelled != nullptr && cancelled->load(std::memory_order_acquire)){
+            throw CancelledException();
         }
-        return m_pending_requests.empty() && m_pending_commands.empty();
-    });
-    if (canceled){
-        throw CancelledException();
+        if (m_state.load(std::memory_order_acquire) != State::RUNNING){
+            throw CancelledException();
+        }
+        {
+            SpinLockGuard lg1(m_state_lock, "PABotBase::wait_for_all_requests()");
+            if (m_pending_requests.empty() && m_pending_commands.empty()){
+                return;
+            }
+        }
+        m_cv.wait(lg);
     }
 }
 

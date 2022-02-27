@@ -254,6 +254,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
+    FlagNavigationAir session(env, console);
+    session.run_session();
+
+
+
 //    goto_camp_from_overworld(env, console);
 
 
@@ -582,71 +587,6 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 
-#if 0
-    while (true){
-        //  Read current state.
-        MountState hm_state = MountState::NOTHING;
-        double flag_x = -1;
-
-        {
-            auto timestamp = std::chrono::system_clock::now();
-            QImage screen = feed.snapshot();
-
-            MountDetector hm_detector;
-            FlagDetector flag_detector;
-            WhiteObjectWatcher flag_watcher(overlay, {{flag_detector, false}});
-            hm_state = hm_detector.detect(screen);
-            flag_watcher.process_frame(screen, timestamp);
-
-            const std::vector<ImagePixelBox>& flags = flag_detector.detections();
-            if (flags.size() == 1){
-                flag_x = (double)(flags[0].min_x + flags[0].max_x) / (screen.width() * 2);
-            }
-        }
-
-        if (hm_state == MountState::BRAVIARY_ON){
-            //  Cruise
-            if (0.4 <= flag_x && flag_x <= 0.6){
-                pbf_move_left_joystick(console, 128, 0, 125, 0);
-                console.botbase().wait_for_all_requests();
-                run_steady_state(env, console);
-                continue;
-            }
-            if (0 <= flag_x && flag_x < 0.5){
-                console.log("Trajectory Correction: Turning left...", COLOR_ORANGE);
-                FlagDetector flag_detector;
-                WhiteObjectWatcher flag_watcher(overlay, {{flag_detector, false}});
-                run_until(
-                    env, console,
-                    [](const BotBaseContext& context){
-                        pbf_move_left_joystick(context, 128, 0, 125, 0);
-                        pbf_move_left_joystick(context, 0, 0, 125, 0);
-                    },
-                    { &flag_watcher }
-                );
-                continue;
-            }
-            if (0.5 < flag_x){
-                console.log("Trajectory Correction: Turning right...", COLOR_ORANGE);
-                FlagDetector flag_detector;
-                WhiteObjectWatcher flag_watcher(overlay, {{flag_detector, false}});
-                run_until(
-                    env, console,
-                    [](const BotBaseContext& context){
-                        pbf_move_left_joystick(context, 128, 0, 125, 0);
-                        pbf_move_left_joystick(context, 255, 0, 125, 0);
-                    },
-                    { &flag_watcher }
-                );
-                continue;
-            }
-        }
-
-        pbf_move_left_joystick(console, 128, 0, 125, 0);
-//        break;
-
-    }
-#endif
 
 
 
@@ -895,7 +835,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 #if 0
-    QImage image("ArcPhone-Original.png");
+    QImage image("MountOn-Wyrdeer-Template.png");
 
     image = image.convertToFormat(QImage::Format::Format_ARGB32);
     uint32_t* ptr = (uint32_t*)image.bits();
@@ -906,12 +846,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
             uint32_t red = qRed(pixel);
             uint32_t green = qGreen(pixel);
             uint32_t blue = qBlue(pixel);
-            if (red < 128 || green < 128 || blue < 128){
+            if (red == 255 && green == 255 && blue == 255){
                 pixel = 0x00000000;
             }
         }
     }
-    image.save("ArcPhone-Template.png");
+    image.save("MountOn-Wyrdeer-Template-1.png");
 #endif
 
 

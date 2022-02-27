@@ -269,10 +269,10 @@ bool goto_camp_from_overworld(ProgramEnvironment& env, ConsoleHandle& console){
     auto start = std::chrono::system_clock::now();
     std::chrono::seconds grace_period(0);
     while (true){
-        EscapeFromAttack session(env, console, grace_period, std::chrono::seconds(30));
+        EscapeFromAttack session(env, console, grace_period, std::chrono::seconds(10));
         session.run_session();
 
-        if (std::chrono::system_clock::now() - start > std::chrono::seconds(30)){
+        if (std::chrono::system_clock::now() - start > std::chrono::seconds(60)){
             console.log("Unable to escape from being attacked.", COLOR_RED);
             return false;
         }
@@ -288,7 +288,9 @@ bool goto_camp_from_overworld(ProgramEnvironment& env, ConsoleHandle& console){
             );
             if (ret < 0){
                 console.log("Map not detected after 5 seconds.", COLOR_RED);
-                return false;
+                pbf_mash_button(console, BUTTON_B, TICKS_PER_SECOND);
+                console.botbase().wait_for_all_requests();
+                continue;
             }
             console.log("Found map!");
             env.wait_for(std::chrono::milliseconds(500));

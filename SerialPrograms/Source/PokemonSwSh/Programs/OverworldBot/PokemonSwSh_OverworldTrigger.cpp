@@ -18,7 +18,7 @@ OverworldTrigger::OverworldTrigger(OverworldTargetTracker& target_tracker)
     : m_target_tracker(target_tracker)
 {}
 void OverworldTrigger::whistle(const BotBaseContext& context, bool rotate){
-    context.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
     m_target_tracker.set_stop_on_target(false);
 
     if (rotate){
@@ -27,7 +27,7 @@ void OverworldTrigger::whistle(const BotBaseContext& context, bool rotate){
     pbf_press_button(context, BUTTON_LCLICK, 5, 0);
     pbf_mash_button(context, BUTTON_B, 120);
 
-    context.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
     m_target_tracker.set_stop_on_target(true);
     if (m_target_tracker.has_good_target()){
         throw CancelledException();
@@ -35,7 +35,7 @@ void OverworldTrigger::whistle(const BotBaseContext& context, bool rotate){
 
     pbf_mash_button(context, BUTTON_B, 40);
 
-    context.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
     m_target_tracker.set_stop_on_target(false);
 }
 
@@ -74,12 +74,12 @@ void OverworldTrigger_WhistleStaticAction::whistle_loop(const BotBaseContext& co
 }
 void OverworldTrigger_WhistleStaticAction::action_loop(const BotBaseContext& context){
     m_target_tracker.set_stop_on_target(true);
-    context->wait_for_all_requests();
+    context.wait_for_all_requests();
     for (size_t c = 0; c < m_action_count; c++){
         action(context);
         m_first_after_battle = false;
     }
-    context->wait_for_all_requests();
+    context.wait_for_all_requests();
     m_target_tracker.set_stop_on_target(false);
 }
 

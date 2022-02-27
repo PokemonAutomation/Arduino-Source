@@ -35,7 +35,7 @@ public:
 public:
     virtual ~BotBase() = default;
     virtual State state() const = 0;
-    virtual void wait_for_all_requests() = 0;
+    virtual void wait_for_all_requests(const std::atomic<bool>* cancelled = nullptr) = 0;
     virtual void stop_all_commands() = 0;
 
 public:
@@ -64,14 +64,17 @@ public:
         , m_cancelled(false)
     {}
 
-    BotBase& botbase() const{ return m_botbase; }
-//    operator BotBase&() const{
-//        return *m_botbase;
-//    }
-    BotBase* operator->() const{
-        check_cancelled();
-        return &m_botbase;
+    void wait_for_all_requests() const{
+        m_botbase.wait_for_all_requests(&m_cancelled);
     }
+
+    //  Don't use this unless you really need to.
+    BotBase& botbase() const{ return m_botbase; }
+//    BotBase* operator->() const{
+//        check_cancelled();
+//        return &m_botbase;
+//    }
+
     void check_cancelled() const{
         if (m_cancelled.load(std::memory_order_acquire)){
             throw CancelledException();

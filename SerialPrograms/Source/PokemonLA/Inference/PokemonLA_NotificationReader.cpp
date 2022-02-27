@@ -87,7 +87,7 @@ Notification NotificationReader::detect(const QImage& screen) const{
     for (uint32_t filter : filters){
         Kernels::filter_rgb32_range(
             (const uint32_t*)image.constBits(), image.bytesPerLine(), image.width(), image.height(),
-            (uint32_t*)image_ocr.bits(), image_ocr.bytesPerLine(), 0xff000000, filter, 0xffffffff, false
+            (uint32_t*)image_ocr.bits(), image_ocr.bytesPerLine(), filter, 0xffffffff, 0xff000000, false
         );
 
         QString text = OCR::ocr_read(m_language, image_ocr);
