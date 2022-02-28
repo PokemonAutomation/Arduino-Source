@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
@@ -109,8 +109,7 @@ void back_out_to_overworld(
         { &background_all }
     );
     if (ret < 0){
-        console.log("Failed to back out to overworld in 20 seconds. Something is wrong.", COLOR_RED);
-        PA_THROW_StringException("Failed to back out to overworld in 20 seconds. Something is wrong.");
+        throw OperationFailedException(console, "Failed to back out to overworld in 20 seconds. Something is wrong.");
     }
     console.log("Overworld detected.");
     pbf_mash_button(console, BUTTON_B, 250);

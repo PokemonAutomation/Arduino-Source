@@ -6,7 +6,7 @@
 
 #include <QVBoxLayout>
 #include <QLabel>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "PokemonSwSh_EncounterFilterEnums.h"
 #include "PokemonSwSh_EncounterFilterWidget.h"
@@ -64,7 +64,7 @@ EncounterFilterWidget::EncounterFilterWidget(QWidget& parent, EncounterFilterOpt
                 QString text = m_shininess->itemText(index);
                 auto iter = ShinyFilter_MAP.find(text);
                 if (iter == ShinyFilter_MAP.end()){
-                    PA_THROW_StringException("Invalid option: " + text);
+                    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid option: " + text.toStdString());
                 }
                 m_value.m_shiny_filter_current = iter->second;
             }

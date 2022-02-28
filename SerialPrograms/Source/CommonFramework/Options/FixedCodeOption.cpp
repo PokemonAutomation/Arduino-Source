@@ -9,7 +9,6 @@
 #include <QLabel>
 #include <QLineEdit>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Exception.h"
 #include "Common/Qt/CodeValidator.h"
 #include "FixedCodeOption.h"
 

@@ -5,8 +5,7 @@
  */
 
 #include <map>
-#include <QtGlobal>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "OCR_StringNormalization.h"
@@ -79,9 +78,8 @@ bool strip_leading_trailing_non_alphanumeric(QString& text){
 
 
 std::map<QChar, QString> make_substitution_map(){
-    QJsonObject obj = read_json_file(
-        RESOURCE_PATH() + "Tesseract/CharacterReductions.json"
-    ).object();
+    QString path = RESOURCE_PATH() + "Tesseract/CharacterReductions.json";
+    QJsonObject obj = read_json_file(path).object();
 
     std::map<QChar, QString> map;
     for (auto item = obj.begin(); item != obj.end(); ++item){
@@ -90,7 +88,11 @@ std::map<QChar, QString> make_substitution_map(){
         for (QChar ch : sources){
             auto iter = map.find(ch);
             if (iter != map.end()){
-                PA_THROW_StringException(QString("Duplicate character reduction: ") + ch);
+                throw FileException(
+                    nullptr, PA_CURRENT_FUNCTION,
+                    (QString("Duplicate character reduction: ") + ch).toStdString(),
+                    path.toStdString()
+                );
             }
             map[ch] = target;
         }

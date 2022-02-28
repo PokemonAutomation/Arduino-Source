@@ -6,7 +6,6 @@
 
 #include <QComboBox>
 #include "Common/Compiler.h"
-#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Pokemon/Options/Pokemon_IVCheckerWidget.h"
 #include "PokemonBDSP_EggHatchFilter.h"

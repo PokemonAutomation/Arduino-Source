@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
@@ -119,7 +119,6 @@ CatchResults throw_balls(
             if (num_balls == 0){
                 console.log("BasicCatcher: No ball " + ball_slug +
                     " found in bag or used them all during catching.");
-//                PA_THROW_StringException("Unable to find appropriate ball.");
                 return {CatchResult::OUT_OF_BALLS, balls_used};
             }
 
@@ -239,7 +238,7 @@ CatchResults basic_catcher(
             return results;
         case 1:
             if (results.result == CatchResult::POKEMON_CAUGHT){
-                PA_THROW_StringException("BasicCatcher: found receive pokemon screen two times.");
+                throw OperationFailedException(console, "BasicCatcher: Found receive pokemon screen two times.");
             }
             env.log("BasicCatcher: The wild " + STRING_POKEMON + " was caught by " + pokeball_str, COLOR_BLUE);
             pbf_wait(console, 50);
@@ -249,7 +248,7 @@ CatchResults basic_catcher(
             env.log("BasicCatcher: Detected move learn! Don't learn the new move.", COLOR_BLUE);
             num_learned_moves++;
             if (num_learned_moves == 100){
-                PA_THROW_StringException("BasicCatcher: Learn new move attempts reach 100.");
+                throw OperationFailedException(console, "BasicCatcher: Learn new move attempts reach 100.");
             }
             pbf_move_right_joystick(console, 128, 255, 20, 105);
             pbf_press_button(console, BUTTON_ZL, 20, 105);
@@ -257,7 +256,6 @@ CatchResults basic_catcher(
 
         default:
             env.log("BasicCatcher: Timed out.", COLOR_RED);
-            // PA_THROW_StringException("Timed out after 2 minutes.");
             results.result = CatchResult::TIMEOUT;
             return results;
         }

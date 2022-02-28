@@ -5,7 +5,7 @@
  */
 
 #include <QDir>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
@@ -52,16 +52,18 @@ GenerateNameOCRData::GenerateNameOCRData(const GenerateNameOCRData_Descriptor& d
 
 
 void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env){
-
-    QJsonArray array = read_json_file(
-        RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-National.json"
-    ).array();
+    QString resource_path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-National.json";
+    QJsonArray array = read_json_file(resource_path).array();
 
     std::vector<std::string> slugs;
     for (const auto& item : array){
         QString slug = item.toString();
         if (slug.size() <= 0){
-            PA_THROW_StringException("Expected non-empty string for Pokemon slug.");
+            throw FileException(
+                &env.logger(), PA_CURRENT_FUNCTION,
+                "Expected non-empty string for Pokemon slug.",
+                resource_path.toStdString()
+            );
         }
         slugs.emplace_back(slug.toUtf8().data());
     }

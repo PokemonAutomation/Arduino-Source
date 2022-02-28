@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
@@ -48,7 +48,6 @@ StateMachineAction mash_A_to_entrance(
 
     if (result < 0){
         console.log("Failed to detect entrance.", COLOR_RED);
-//        PA_THROW_StringException("Failed to detect entrance.");
         runtime.session_stats.add_error();
         dump_image(console, MODULE_NAME, "ResetRecovery", console.video().snapshot());
         return StateMachineAction::RESET_RECOVER;
@@ -179,7 +178,7 @@ StateMachineAction run_caught_screen(
         return StateMachineAction::DONE_WITH_ADVENTURE;
     }
 
-    PA_THROW_StringException("Invalid enum.");
+    throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION, "Invalid enum.");
 }
 
 

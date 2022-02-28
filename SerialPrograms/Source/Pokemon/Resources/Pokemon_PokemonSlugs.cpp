@@ -4,8 +4,7 @@
  *
  */
 
-#include <QtGlobal>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "Pokemon_PokemonSlugs.h"
@@ -25,14 +24,17 @@ struct PokemonSlugDatabase{
         return data;
     }
     PokemonSlugDatabase(){
-        QJsonArray json = read_json_file(
-            RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-National.json"
-        ).array();
+        QString path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-National.json";
+        QJsonArray json = read_json_file(path).array();
 
         for (const auto& item : json){
             QString slug_qstr = item.toString();
             if (slug_qstr.size() <= 0){
-                PA_THROW_StringException("Expected non-empty string for Pokemon slug.");
+                throw FileException(
+                    nullptr, PA_CURRENT_FUNCTION,
+                    "Expected non-empty string for Pokemon slug.",
+                    path.toStdString()
+                );
             }
             std::string slug = slug_qstr.toStdString();
             all_slugs.insert(slug);

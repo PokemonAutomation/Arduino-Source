@@ -152,7 +152,7 @@ bool EscapeFromAttack::run_state(AsyncCommandSession& commands, WallClock timest
     return false;
 }
 bool EscapeFromAttack::run_flying(AsyncCommandSession& commands, WallClock timestamp){
-    if (m_centerA.detected()){
+    if (m_centerA.detected() && timestamp - last_state_change() > std::chrono::seconds(3)){
         return run_state_action(State::GET_ON_SNEASLER);
     }
     return run_state_action(State::DASH_FORWARD);

@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
@@ -130,7 +130,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env){
         env.console.botbase().wait_for_all_requests();
         CatchResults result = basic_catcher(env, env.console, LANGUAGE, "master-ball");
         if (result.result != CatchResult::POKEMON_CAUGHT){
-            PA_THROW_StringException("Unable to catch Moltres.");
+            throw OperationFailedException(env.console, "Unable to catch Moltres.");
         }
 
         env.console.botbase().wait_for_all_requests();

@@ -4,8 +4,7 @@
  *
  */
 
-#include <QtGlobal>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "Pokemon_PokemonNames.h"
@@ -28,14 +27,17 @@ struct PokemonNameDatabase{
 const std::string PokemonNameDatabase::NULL_SLUG;
 
 PokemonNameDatabase::PokemonNameDatabase(){
-    QJsonObject displays = read_json_file(
-        RESOURCE_PATH() + "Pokemon/PokemonNameDisplay.json"
-    ).object();
+    QString path = RESOURCE_PATH() + "Pokemon/PokemonNameDisplay.json";
+    QJsonObject displays = read_json_file(path).object();
 
     for (auto iter = displays.begin(); iter != displays.end(); ++iter){
         QString slug_qstr = iter.key();
         if (slug_qstr.size() <= 0){
-            PA_THROW_StringException("Expected non-empty string for Pokemon slug.");
+            throw FileException(
+                nullptr, PA_CURRENT_FUNCTION,
+                "Expected non-empty string for Pokemon slug.",
+                path.toStdString()
+            );
         }
 
         std::string slug = slug_qstr.toStdString();
@@ -50,7 +52,11 @@ PokemonNameDatabase::PokemonNameDatabase(){
         //  Display name for English.
         auto iter2 = data.m_display_names.find(Language::English);
         if (iter2 == data.m_display_names.end()){
-            PA_THROW_StringException("Missing English translation for: " + slug_qstr);
+            throw FileException(
+                nullptr, PA_CURRENT_FUNCTION,
+                "Missing English translation for: " + slug_qstr.toStdString(),
+                path.toStdString()
+            );
         }
         data.m_display_name = iter2->second;
 
@@ -70,7 +76,7 @@ PokemonNameDatabase::PokemonNameDatabase(){
 const QString& PokemonNames::display_name(Language language) const{
     auto iter = m_display_names.find(language);
     if (iter == m_display_names.end()){
-        PA_THROW_StringException("No data loaded for this language.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "No data loaded for this language.");
     }
     return iter->second;
 }
@@ -81,7 +87,7 @@ const PokemonNames& get_pokemon_name(const std::string& slug){
     const std::map<std::string, PokemonNames>& database = PokemonNameDatabase::instance().m_slug_to_data;
     auto iter = database.find(slug);
     if (iter == database.end()){
-        PA_THROW_StringException("Pokemon slug not found in database: " + slug);
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Pokemon slug not found in database: " + slug);
     }
     return iter->second;
 }
@@ -97,7 +103,7 @@ const std::string& parse_pokemon_name(const QString& display_name){
     const std::map<QString, std::string>& database = PokemonNameDatabase::instance().m_display_name_to_slug;
     auto iter = database.find(display_name);
     if (iter == database.end()){
-        PA_THROW_StringException("Display name not found in database: " + display_name);
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Display name not found in database: " + display_name.toStdString());
     }
     return iter->second;
 }

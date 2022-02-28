@@ -5,7 +5,6 @@
  */
 
 #include <QJsonArray>
-#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "OCR_StringNormalization.h"
 #include "OCR_TextMatcher.h"

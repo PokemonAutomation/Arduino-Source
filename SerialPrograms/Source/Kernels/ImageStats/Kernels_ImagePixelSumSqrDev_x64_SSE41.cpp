@@ -8,7 +8,7 @@
 #ifdef PA_Arch_x64_SSE41
 
 #include <smmintrin.h>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Kernels/Kernels_x64_SSE41.h"
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
 #include "Kernels_ImagePixelSumSqrDev_Default.h"
@@ -130,7 +130,7 @@ void sum_sqr_deviation_x64_SSE41(
         return;
     }
     if (width > 22017){
-        PA_THROW_StringException("Kernels::sum_sqr_deviation_x64_SSE41(): Width limit exceeded.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Width limit exceeded: " + std::to_string(width));
     }
     __m128i vbackground = _mm_set1_epi32(background);
     for (size_t r = 0; r < height; r++){

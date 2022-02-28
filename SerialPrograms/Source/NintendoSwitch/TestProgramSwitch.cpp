@@ -7,7 +7,7 @@
 #include <cmath>
 //#include <QSystemTrayIcon>
 #include <QProcess>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/AlignedVector.h"
 #include "Common/Cpp/SIMDDebuggers.h"
@@ -254,8 +254,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
-    FlagNavigationAir session(env, console);
-    session.run_session();
+
+//    throw UserSetupError(env.logger(), "asdf");
+//    throw OperationFailedException(env.logger(), "asdf");
+
+
+
+//    FlagNavigationAir session(env, console);
+//    session.run_session();
 
 
 
@@ -368,94 +374,6 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 //    return_to_jubilife_from_overworld(env, console);
 
 
-
-#if 0
-    bool reset_required = false;
-
-
-    while (true){
-        if (reset_required){
-            pbf_press_button(console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            PokemonLA::reset_game_from_home(env, console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
-        }
-
-        if (!goto_camp_from_jubilife(env, console, Camp::HIGHLANDS_MOUNTAIN)){
-            PA_THROW_StringException("Unable to enter Coronet Highlands.");
-        }
-
-        MountDetector mount_detector;
-        while (true){
-            MountState mount = mount_detector.detect(feed.snapshot());
-            if (mount == MountState::NOTHING){
-                console.log("Unable to detect mount.", COLOR_RED);
-                PA_THROW_StringException("Unable to detect mount.");
-            }
-            if (mount == MountState::WYRDEER_OFF){
-                pbf_press_button(console, BUTTON_PLUS, 20, 105);
-                break;
-            }
-            if (mount == MountState::WYRDEER_ON){
-                pbf_wait(console, 5 * TICKS_PER_SECOND);
-                break;
-            }
-            pbf_press_dpad(console, DPAD_LEFT, 20, 50);
-            console.botbase().wait_for_all_requests();
-        }
-
-        bool success = false;
-
-
-        console.log("Traveling to Charm's location...");
-        {
-            DialogDetector dialog_detector;
-            int ret = run_until(
-                env, console,
-                [](const BotBaseContext& context){
-                    pbf_move_left_joystick(context, 0, 212, 50, 0);
-                    pbf_press_button(context, BUTTON_ZL, 50, 0);
-                    pbf_press_button(context, BUTTON_B, 500, 125);
-
-                    pbf_move_left_joystick(context, 224, 0, 50, 0);
-                    pbf_press_button(context, BUTTON_ZL, 50, 0);
-                    pbf_press_button(context, BUTTON_B, 400, 125);
-
-                    pbf_move_left_joystick(context, 0, 128, 50, 0);
-                    pbf_press_button(context, BUTTON_ZL, 50, 0);
-                    pbf_press_button(context, BUTTON_B, 875, 0);
-                },
-                { &dialog_detector }
-            );
-            if (ret >= 0){
-                console.log("Found Charm!", COLOR_BLUE);
-                if (mash_A_until_end_of_battle(env, console)){
-                    console.log("Battle succeeded!", COLOR_BLUE);
-                    success = true;
-                }else{
-                    console.log("Battle failed! Resetting...", COLOR_RED);
-                    reset_required = true;
-                    continue;
-                }
-            }
-        }
-
-
-        console.log("Traveling to Coin's location...");
-        {
-            DialogDetector dialog_detector;
-
-        }
-
-
-        if (success){
-            console.log("Returning to Jubilife...");
-            reset_required = false;
-            break;
-        }else{
-            console.log("Nothing found. Resetting...");
-            reset_required = true;
-        }
-    }
-#endif
 
 
 
@@ -1042,50 +960,6 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 #endif
 
 
-#if 0
-    uint16_t FLY_A_TO_X_DELAY = 50;
-
-
-    pbf_press_button(console, BUTTON_R, 5, 0);
-    pbf_press_dpad(console, DPAD_RIGHT, 10, 115);
-    pbf_press_button(console, BUTTON_ZL, 10, 0);
-    console.botbase().wait_for_all_requests();
-    MapWatcher detector;
-    int ret = wait_until(
-        env, console, std::chrono::seconds(2),
-        { &detector }
-    );
-    if (ret < 0){
-        console.log("Map not detected after 2 seconds.", COLOR_RED);
-//        PA_THROW_StringException("Map not detected after 2 seconds.");
-    }else{
-        console.log("Detected map!", COLOR_BLUE);
-    }
-
-    env.wait_for(std::chrono::seconds(1));
-
-    //  Move bolder and cursor to Celestial town.
-    pbf_press_dpad(console, DPAD_RIGHT, 30, 95);
-
-    //  Bring up menu
-    pbf_press_button(console, BUTTON_ZL, 20, FLY_A_TO_X_DELAY - 20);
-    pbf_press_button(console, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
-
-    //  Fly
-    pbf_press_button(console, BUTTON_ZL, 20, 10 * TICKS_PER_SECOND);
-
-#if 0
-    //  Enter Pokemon.
-    pbf_press_button(console, BUTTON_ZL, 20, GameSettings::instance().MENU_TO_POKEMON_DELAY);
-
-    //  Enter Summary.
-    pbf_press_button(console, BUTTON_ZL, 20, 105);
-    pbf_press_button(console, BUTTON_ZL, 20, 5 * TICKS_PER_SECOND);
-
-    //  Local Room
-    pbf_press_button(console, BUTTON_Y, 20, 105);
-#endif
-#endif
 
 
 

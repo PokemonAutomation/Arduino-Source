@@ -7,7 +7,7 @@
 #include <vector>
 #include <map>
 #include <QJsonObject>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "NintendoSwitch_VirtualControllerMapping.h"
 
@@ -250,7 +250,7 @@ std::map<Qt::Key, const ControllerButton&> make_keyboard_map(
     for (const auto& item : mapping){
         auto iter = map.find(item.first);
         if (iter != map.end()){
-            PA_THROW_StringException("Duplicate Key: " + QString::number((uint32_t)item.first));
+            throw ParseException("Duplicate Key: " + std::to_string((uint32_t)item.first));
         }
         map.emplace(
             std::piecewise_construct,

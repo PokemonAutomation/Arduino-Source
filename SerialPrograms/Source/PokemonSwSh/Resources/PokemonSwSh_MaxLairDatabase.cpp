@@ -6,9 +6,7 @@
 
 #include <algorithm>
 #include <map>
-#include <QtGlobal>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "Pokemon/Resources/Pokemon_PokemonSlugs.h"
@@ -40,7 +38,7 @@ struct MaxLairSlugsDatabase{
         QJsonObject json = read_json_file(path).object();
         if (json.empty()){
             throw FileException(
-                nullptr, __PRETTY_FUNCTION__,
+                nullptr, PA_CURRENT_FUNCTION,
                 "Json is either empty or invalid.",
                 path.toStdString()
             );
@@ -53,7 +51,7 @@ struct MaxLairSlugsDatabase{
             for (const auto& item : obj["OCR"].toArray()){
                 std::string slug = item.toString().toStdString();
                 if (!slugs.name_slug.empty()){
-                    throw FileException(nullptr, __PRETTY_FUNCTION__, "Multiple names specified for MaxLair slug.", path.toStdString());
+                    throw FileException(nullptr, PA_CURRENT_FUNCTION, "Multiple names specified for MaxLair slug.", path.toStdString());
                 }
                 slugs.name_slug = std::move(slug);
             }
@@ -75,7 +73,7 @@ const MaxLairSlugs& get_maxlair_slugs(const std::string& slug){
     const MaxLairSlugsDatabase& database = MaxLairSlugsDatabase::instance();
     auto iter = database.m_slugs.find(slug);
     if (iter == database.m_slugs.end()){
-        PA_THROW_StringException("Invalid Max Lair slug: " + slug);
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Max Lair slug: " + slug);
     }
     return iter->second;
 }
@@ -92,7 +90,7 @@ MoveCategory parse_category_slug(const std::string& slug){
     };
     auto iter = database.find(slug);
     if (iter == database.end()){
-        PA_THROW_StringException("Invalid Move Category: " + slug);
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Move Category: " + slug);
     }
     return iter->second;
 }
@@ -141,9 +139,8 @@ MaxLairMove parse_move(const QJsonObject& obj){
 
 
 std::map<std::string, MaxLairMon> build_maxlair_mon_database(const std::string& path){
-    QJsonObject json = read_json_file(
-        RESOURCE_PATH() + QString::fromStdString(path)
-    ).object();
+    QString qpath = RESOURCE_PATH() + QString::fromStdString(path);
+    QJsonObject json = read_json_file(qpath).object();
 
     std::map<std::string, MaxLairMon> database;
 
@@ -167,7 +164,7 @@ std::map<std::string, MaxLairMon> build_maxlair_mon_database(const std::string& 
         {
             QJsonArray array = obj["base_stats"].toArray();
             if (array.size() != 6){
-                PA_THROW_StringException("Base stats should contain 6 elements.");
+                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Base stats should contain 6 elements.", qpath.toStdString());
             }
             for (int c = 0; c < 6; c++){
                 mon.base_stats[c] = (uint8_t)array[c].toInt();
@@ -216,7 +213,7 @@ struct MaxLairDatabase{
             const MaxLairSlugs& slugs = get_maxlair_slugs(item.first);
             auto iter = national_dex.find(slugs.name_slug);
             if (iter == national_dex.end()){
-                PA_THROW_StringException("Slug not found in national dex: " + slugs.name_slug);
+                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Slug not found in national dex: " + slugs.name_slug);
             }
             m_bosses_by_dex[iter->second] = item.first;
         }
@@ -254,7 +251,7 @@ const MaxLairMon& get_maxlair_mon(const std::string& slug){
     if (iter1 != database.m_bosses.end()){
         return iter1->second;
     }
-    PA_THROW_StringException("Invalid Species Slug: " + slug);
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Species Slug: " + slug);
 }
 const MaxLairMon* get_maxlair_mon_nothrow(const std::string& slug){
     const MaxLairDatabase& database = MaxLairDatabase::instance();

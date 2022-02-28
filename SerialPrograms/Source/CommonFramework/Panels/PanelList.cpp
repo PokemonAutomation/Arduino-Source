@@ -6,7 +6,7 @@
 
 #include <QJsonObject>
 #include <QMessageBox>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "PanelList.h"
 
@@ -42,8 +42,7 @@ void PanelList::finish_panel_setup(){
         //  Program
         const QString& display_name = item.second->display_name();
         if (!m_panel_map.emplace(display_name, item.second.get()).second){
-            global_logger_tagged().log("Duplicate program name: " + display_name, COLOR_RED);
-            PA_THROW_StringException("Duplicate program name: " + display_name);
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate program name: " + display_name.toStdString());
         }
 
         addItem(display_name);
@@ -67,13 +66,12 @@ void PanelList::finish_panel_setup(){
                 std::unique_ptr<PanelInstance> panel = descriptor->make_panel();
                 panel->from_json(PERSISTENT_SETTINGS().panels[QString::fromStdString(descriptor->identifier())]);
                 m_listener.on_panel_construct(std::move(panel));
-            }catch (const StringException& error){
-                global_logger_tagged().log(error.what(), COLOR_RED);
+            }catch (const Exception& error){
                 QMessageBox box;
                 box.critical(
                     nullptr,
                     "Error",
-                    "Failed to load program.\n\n" + error.message_qt()
+                    "Failed to load program.\n\n" + QString::fromStdString(error.to_str())
                 );
             }
         }

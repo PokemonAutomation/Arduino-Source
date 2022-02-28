@@ -12,7 +12,6 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/LoggerQt.h"
@@ -55,7 +54,7 @@ void PersistentSettings::read(){
     QString path = QCoreApplication::applicationFilePath() + "-Settings.json";
     QJsonDocument doc = read_json_file(path);
     if (!doc.isObject()){
-        throw FileException(nullptr, __PRETTY_FUNCTION__, "Invalid settings file.", path.toStdString());
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid settings file.", path.toStdString());
     }
     QJsonObject root = doc.object();
 

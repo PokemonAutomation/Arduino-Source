@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Inference/InferenceException.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
@@ -109,8 +109,7 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env){
     for (const auto& berry_slug: selected_berries){
         env.console.log("Target berry: " + berry_slug);
         if (Pastoria_berry_list.find(berry_slug) == Pastoria_berry_list.end()){
-            const std::string error_message = "The npc does not offer this berry: " + berry_slug;
-            PA_THROW_InferenceException(env.console, error_message);
+            throw UserSetupError(env.console, "The npc does not offer this berry: " + berry_slug);
         }
     }
 
@@ -129,14 +128,14 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env){
         // dialog_detector.make_overlays(set);
         QImage screen = env.console.video().snapshot();
         if (!dialog_detector.detect(screen)){
-            PA_THROW_InferenceException(env.console, "No npc dialog box found when reading berry name");
+            throw OperationFailedException(env.console, "No npc dialog box found when reading berry name");
         }
 
         ImageFloatBox dialog_box(0.218, 0.835, 0.657, 0.12);
         QImage dialog_image = extract_box(screen, dialog_box);
         const auto result = Pokemon::BerryNameReader::instance().read_substring(env.console, LANGUAGE, dialog_image);
         if (result.results.empty()){
-            PA_THROW_InferenceException(env.console, "No berry name found in dialog box");
+            throw OperationFailedException(env.console, "No berry name found in dialog box");
         }
         bool found_berry = false;
         for (const auto& r: result.results){
@@ -159,7 +158,7 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env){
         // Reset game:
         pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
         if (!reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
-            PA_THROW_InferenceException(env.console, "Error resetting game");
+            throw OperationFailedException(env.console, "Error resetting game");
             break;
         }
     }

@@ -5,7 +5,6 @@
  */
 
 #include <QJsonObject>
-#include "Common/Cpp/Exception.h"
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "ClientSource/Connection/PABotBase.h"

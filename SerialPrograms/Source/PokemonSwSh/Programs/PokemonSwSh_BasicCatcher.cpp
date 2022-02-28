@@ -104,7 +104,6 @@ CatchResults throw_balls(
 
             bool success = move_to_ball(reader, console, ball_slug);
             if (!success){
-//                PA_THROW_StringException("Unable to find appropriate ball.");
                 return {CatchResult::OUT_OF_BALLS, balls_used};
             }
 

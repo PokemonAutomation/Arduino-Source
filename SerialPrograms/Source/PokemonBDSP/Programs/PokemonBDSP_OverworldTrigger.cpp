@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Inference/InferenceException.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
@@ -140,7 +140,7 @@ bool OverworldTrigger::find_encounter(SingleSwitchProgramEnvironment& env) const
             { &battle_menu_detector, &start_battle_detector }
         );
         if (result < 0){
-            PA_THROW_InferenceException(env.console, "Battle not detected after Sweet Scent for 30 seconds.");
+            throw OperationFailedException(env.console, "Battle not detected after Sweet Scent for 30 seconds.");
         }
     }
 

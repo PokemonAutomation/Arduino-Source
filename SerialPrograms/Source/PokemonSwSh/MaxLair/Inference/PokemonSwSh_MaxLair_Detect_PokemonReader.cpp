@@ -4,8 +4,7 @@
  *
  */
 
-#include <QtGlobal>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/OCR/OCR_Filtering.h"
@@ -91,10 +90,16 @@ std::string read_boss_sprite(ConsoleHandle& console){
     const SpeciesReadDatabase& database = SpeciesReadDatabase::instance();
     auto iter = database.sprite_map.find(sprite_slug);
     if (iter == database.sprite_map.end()){
-        PA_THROW_StringException("Slug doesn't exist in sprite map: " + sprite_slug);
+        throw InternalProgramError(
+            &console.logger(), PA_CURRENT_FUNCTION,
+            "Slug doesn't exist in sprite map: " + sprite_slug
+        );
     }
     if (iter->second.empty()){
-        PA_THROW_StringException("Sprite map is empty for slug: " + sprite_slug);
+        throw InternalProgramError(
+            &console.logger(), PA_CURRENT_FUNCTION,
+            "Sprite map is empty for slug: " + sprite_slug
+        );
     }
     return *iter->second.begin();
 }
@@ -120,7 +125,10 @@ std::set<std::string> read_pokemon_name(
     for (const auto& hit : result.results){
         auto iter = database.ocr_map.find(hit.second.token);
         if (iter == database.ocr_map.end()){
-            PA_THROW_StringException("Slug doesn't exist in OCR map: " + hit.second.token);
+            throw InternalProgramError(
+                &logger, PA_CURRENT_FUNCTION,
+                "Slug doesn't exist in OCR map: " + hit.second.token
+            );
         }
         for (const std::string& item : iter->second){
             ret.insert(item);
@@ -175,10 +183,16 @@ ImageMatch::ImageMatchResult read_pokemon_sprite_set(
     for (auto& item : result.results){
         auto iter = database.sprite_map.find(item.second);
         if (iter == database.sprite_map.end()){
-            PA_THROW_StringException("Slug doesn't exist in sprite map: " + item.second);
+            throw InternalProgramError(
+                &logger, PA_CURRENT_FUNCTION,
+                "Slug doesn't exist in sprite map: " + item.second
+            );
         }
         if (iter->second.empty()){
-            PA_THROW_StringException("Sprite map is empty for slug: " + item.second);
+            throw InternalProgramError(
+                &logger, PA_CURRENT_FUNCTION,
+                "Sprite map is empty for slug: " + item.second
+            );
         }
         item.second = *iter->second.begin();
     }
@@ -220,10 +234,16 @@ ImageMatch::ImageMatchResult read_pokemon_sprite_set_with_item(LoggerQt& logger,
     for (auto& item : result.results){
         auto iter = database.sprite_map.find(item.second);
         if (iter == database.sprite_map.end()){
-            PA_THROW_StringException("Slug doesn't exist in sprite map: " + item.second);
+            throw InternalProgramError(
+                &logger, PA_CURRENT_FUNCTION,
+                "Slug doesn't exist in sprite map: " + item.second
+            );
         }
         if (iter->second.empty()){
-            PA_THROW_StringException("Sprite map is empty for slug: " + item.second);
+            throw InternalProgramError(
+                &logger, PA_CURRENT_FUNCTION,
+                "Sprite map is empty for slug: " + item.second
+            );
         }
         item.second = *iter->second.begin();
     }

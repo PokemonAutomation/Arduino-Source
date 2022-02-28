@@ -28,7 +28,7 @@ namespace PokemonAutomation{
 #pragma warning(disable:4996)   //  Unsafe function
 
 
-#define __PRETTY_FUNCTION__ __FUNCSIG__
+#define PA_CURRENT_FUNCTION __FUNCSIG__
 
 
 #elif __GNUC__
@@ -39,6 +39,9 @@ namespace PokemonAutomation{
 #pragma GCC diagnostic ignored "-Wunused-parameter"
 #pragma GCC diagnostic ignored "-Wunused-function"
 #pragma GCC diagnostic ignored "-Wmissing-field-initializers"
+
+
+#define PA_CURRENT_FUNCTION __PRETTY_FUNCTION__
 
 
 #else

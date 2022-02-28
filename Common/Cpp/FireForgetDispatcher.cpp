@@ -4,7 +4,7 @@
  *
  */
 
-#include "Exception.h"
+#include "Exceptions.h"
 #include "FireForgetDispatcher.h"
 
 #include <iostream>
@@ -61,7 +61,7 @@ void FireForgetDispatcher::thread_loop(){
 
         try{
             task();
-        }catch (StringException& e){
+        }catch (Exception& e){
             cout << "Exception thrown from async task: " << e.message() << endl;
         }catch (...){
             cout << "Exception thrown from async task: Unknown" << endl;

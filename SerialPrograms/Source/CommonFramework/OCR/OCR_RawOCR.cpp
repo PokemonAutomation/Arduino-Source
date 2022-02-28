@@ -8,7 +8,7 @@
 #include <deque>
 #include <QFile>
 #include <iostream>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Globals.h"
 #include "TesseractPA.h"
@@ -63,7 +63,7 @@ public:
                 new TesseractAPI(m_training_data_path.c_str(), m_language_code.c_str())
             );
             if (!api->valid()){
-                PA_THROW_StringException("Could not initialize TesseractAPI.");
+                throw InternalSystemError(nullptr, PA_CURRENT_FUNCTION, "Could not initialize TesseractAPI.");
             }
 
             SpinLockGuard lg(m_lock, "TesseractPool::run()");

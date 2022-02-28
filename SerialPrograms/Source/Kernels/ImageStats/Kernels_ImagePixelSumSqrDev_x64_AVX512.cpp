@@ -8,7 +8,7 @@
 #ifdef PA_Arch_x64_AVX512
 
 #include <immintrin.h>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Kernels/Kernels_x64_AVX512.h"
 #include "Kernels_ImagePixelSumSqrDev_Default.h"
 #include "Kernels_ImagePixelSumSqrDev_x64_AVX512.h"
@@ -130,7 +130,7 @@ void sum_sqr_deviation_x64_AVX512(
         return;
     }
     if (width > 22017){
-        PA_THROW_StringException("Kernels::sum_sqr_deviation_x64_AVX512(): Width limit exceeded.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Width limit exceeded: " + std::to_string(width));
     }
     __m512i vbackground = _mm512_set1_epi32(background);
     for (size_t r = 0; r < height; r++){

@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Exception.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
@@ -57,7 +56,10 @@ void goto_professor(ConsoleHandle& console, Camp camp){
         pbf_move_left_joystick(console, 255, 48, 75, 0);
         return;
     default:
-        PA_THROW_StringException("Unknown Camp: " + std::to_string((int)camp));
+        throw InternalProgramError(
+            &console.logger(), PA_CURRENT_FUNCTION,
+            "Unknown Camp: " + std::to_string((int)camp)
+        );
     }
 }
 void from_professor_return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& console){
@@ -222,7 +224,10 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Ca
         direction = DPAD_LEFT;
         break;
     default:
-        PA_THROW_StringException("Invalid Camp Enum: " + std::to_string((int)camp));
+        throw InternalProgramError(
+            &console.logger(), PA_CURRENT_FUNCTION,
+            "Invalid Camp Enum: " + std::to_string((int)camp)
+        );
     }
 
 

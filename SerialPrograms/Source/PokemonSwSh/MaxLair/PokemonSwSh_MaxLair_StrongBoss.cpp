@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -210,7 +210,7 @@ private:
 
 void MaxLairStrongBoss::program(MultiSwitchProgramEnvironment& env){
     if (CONSOLES.HOST >= env.consoles.size()){
-        PA_THROW_StringException("Invalid Host Switch");
+        throw UserSetupError(env.logger(), "Invalid Host Switch");
     }
 
     env.run_in_parallel([&](ConsoleHandle& console){

@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_CommonFramework_AudioPipeline_TimeSampleBuffer_TPP
 #define PokemonAutomation_CommonFramework_AudioPipeline_TimeSampleBuffer_TPP
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "TimeSampleWriter.h"
 #include "TimeSampleBuffer.h"
 
@@ -28,7 +28,7 @@ TimeSampleBuffer<Type>::TimeSampleBuffer(
     , m_samples_stored(0)
 {
     if (gap_threshold < m_sample_period){
-        PA_THROW_StringException("Gap threshold cannot be smaller than sample period.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Gap threshold cannot be smaller than sample period.");
     }
 }
 

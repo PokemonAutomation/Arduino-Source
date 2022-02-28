@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -178,7 +178,7 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env){
         QImage current = env.console.video().snapshot();
         if (!matcher.detect(current)){
             stats.m_errors++;
-            PA_THROW_StringException("Failed to return to starting position. Something is wrong.");
+            throw OperationFailedException(env.console, "Failed to return to starting position. Something is wrong.");
         }
 
         stats.m_boxes++;

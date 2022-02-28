@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -38,8 +38,7 @@ bool heal_by_global_room(ProgramEnvironment& env, ConsoleHandle& console){
         { &arrow }
     );
     if (ret < 0){
-        console.log("No selection arrow detected when using Global Room.", COLOR_RED);
-        PA_THROW_StringException("No selection arrow detected when using Global Room.");
+        throw OperationFailedException(console, "No selection arrow detected when using Global Room.");
     }
 
     // Select "Yes"

@@ -4,7 +4,8 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
+#include "Common/Qt/ImageOpener.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
@@ -22,15 +23,17 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
     Color min_color, Color max_color,
     size_t min_area
 ){
-    QImage reference(RESOURCE_PATH() + path);
-    if (reference.isNull()){
-        PA_THROW_StringException(std::string("Unable to Open: ") + path);
-    }
+    QString qpath = RESOURCE_PATH() + path;
+    QImage reference = open_image(qpath);
 
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(reference, (uint32_t)min_color, (uint32_t)max_color);
     std::vector<WaterfillObject> objects = find_objects_inplace(matrix, min_area, false);
     if (objects.empty()){
-        PA_THROW_StringException("Failed to find exactly any objects in resource.");
+        throw FileException(
+            nullptr, PA_CURRENT_FUNCTION,
+            "Failed to find exactly any objects in resource.",
+            qpath.toStdString()
+        );
     }
 
     const WaterfillObject* best = &objects[0];

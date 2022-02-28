@@ -35,10 +35,16 @@ struct BotBaseMessage{
     template <uint8_t MessageType, typename MessageBody>
     void convert(Logger& logger, MessageBody& params) const{
         if (type != MessageType){
-            throw SerialProtocolException(logger, "Received incorrect response type: " + std::to_string(type));
+            throw SerialProtocolException(
+                logger, "BotBaseMessage::convert()",
+                "Received incorrect response type: " + std::to_string(type)
+            );
         }
         if (body.size() != sizeof(MessageBody)){
-            throw SerialProtocolException(logger, "Received incorrect response size: " + std::to_string(body.size()));
+            throw SerialProtocolException(
+                logger, "BotBaseMessage::convert()",
+                "Received incorrect response size: " + std::to_string(body.size())
+            );
         }
         memcpy(&params, body.c_str(), body.size());
     }

@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -140,12 +140,11 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env){
         default:
             env.log("Timed out.", COLOR_RED);
             stats.add_error();
-            PA_THROW_StringException("Timed out after 2 minutes.");
+            throw OperationFailedException(env.console, "Timed out after 2 minutes.");
         }
     }
 
-    env.log("No progress detected after 5 battle menus.", COLOR_RED);
-    PA_THROW_StringException("No progress detected after 5 battle menus. Are you out of PP?");
+    throw OperationFailedException(env.console, "No progress detected after 5 battle menus. Are you out of PP?");
 }
 
 

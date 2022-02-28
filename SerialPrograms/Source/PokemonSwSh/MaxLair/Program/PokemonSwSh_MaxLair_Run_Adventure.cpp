@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -171,7 +171,7 @@ void loop_adventures(
                     {{"Message", "Failed to start adventure 3 times in the row."}},
                     ""
                 );
-                PA_THROW_StringException("Failed to start adventure 3 times in the row.");
+                throw OperationFailedException(env.logger(), "Failed to start adventure 3 times in the row.");
             }
             env.log("Failed to start adventure. Resetting all Switches...", COLOR_RED);
             env.run_in_parallel([&](ConsoleHandle& console){

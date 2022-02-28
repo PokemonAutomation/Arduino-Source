@@ -5,7 +5,7 @@
  */
 
 #include <QImage>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Inference/BlackBorderDetector.h"
@@ -19,18 +19,21 @@ void start_program_video_check(ConsoleHandle& console, FeedbackType feedback){
         return;
     }
 
+    QImage screen = console.video().snapshot();
+
+    if (screen.isNull()){
+        if (feedback == FeedbackType::REQUIRED){
+            throw UserSetupError(console, "This program requires video feedback. Please make sure the video is working.");
+        }
+        return;
+    }
+
     BlackBorderDetector detector;
     VideoOverlaySet set(console);
     detector.make_overlays(set);
 
-    QImage screen = console.video().snapshot();
-    if (screen.isNull() && feedback == FeedbackType::OPTIONAL_){
-        return;
-    }
-
     if (detector.detect(screen)){
-        console.log("Black border detected! Please set your screen size to 100%.", COLOR_RED);
-        PA_THROW_StringException("Black border detected! Please set your screen size to 100%.");
+        throw UserSetupError(console, "Black border detected! Please set your screen size to 100%.");
     }
 }
 void start_program_video_check(FixedLimitVector<ConsoleHandle>& consoles, FeedbackType feedback){

@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -102,7 +102,7 @@ void CloneItemsBoxCopy::program(SingleSwitchProgramEnvironment& env){
             stats.m_errors++;
             consecutive_failures++;
             if (consecutive_failures >= 3){
-                PA_THROW_StringException("Failed to activate menu overlap glitch 3 times in the row.");
+                throw OperationFailedException(env.console, "Failed to activate menu overlap glitch 3 times in the row.");
             }
             pbf_mash_button(env.console, BUTTON_B, 10 * TICKS_PER_SECOND);
             continue;

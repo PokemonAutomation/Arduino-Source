@@ -6,7 +6,7 @@
 
 #include <set>
 #include <QImage>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/AlignedVector.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -125,10 +125,15 @@ void TestProgramComputer::program(ProgramEnvironment& env){
     using namespace Pokemon;
 
 
+//    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "asdf");
+    throw UserSetupError(env.logger(), "asdf");
+
+
+#if 0
     BlackScreenOverWatcher black_screen1(COLOR_RED, {0.20, 0.95, 0.60, 0.03}, 20);
 
     black_screen1.process_frame(QImage("screenshot-20220221-232325966395.png"), std::chrono::system_clock::now());
-
+#endif
 
 #if 0
     float data[25];

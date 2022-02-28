@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
@@ -178,8 +178,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
                     }
                 }
                 if (slot == 4){
-                    env.log("Ran out of PP in a battle.", COLOR_RED);
-                    PA_THROW_StringException("Ran out of PP in a battle.");
+                    throw OperationFailedException(env.console, "Ran out of PP in a battle.");
                 }
 
                 for (uint8_t move_slot = 0; move_slot < slot; move_slot++){
@@ -199,8 +198,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
                     }
                 }
                 if (slot == 4){
-                    env.log("Ran out of PP in a battle.", COLOR_RED);
-                    PA_THROW_StringException("Ran out of PP in a battle.");
+                    throw OperationFailedException(env.console, "Ran out of PP in a battle.");
                 }
 
                 for (uint8_t move_slot = 0; move_slot < slot; move_slot++){
@@ -225,14 +223,12 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
             }
             return true;
         default:
-            env.log("Timed out.", COLOR_RED);
             stats.m_errors++;
-            PA_THROW_StringException("Timed out after 2 minutes.");
+            throw OperationFailedException(env.console, "Timed out after 2 minutes.");
         }
     }
 
-    env.log("No progress detected after 5 battle menus.", COLOR_RED);
-    PA_THROW_StringException("No progress detected after 5 battle menus. Are you out of PP?");
+    throw OperationFailedException(env.console, "No progress detected after 5 battle menus. Are you out of PP?");
 }
 
 void MoneyFarmerRoute210::heal_at_center_and_return(ConsoleHandle& console, uint8_t pp0[4], uint8_t pp1[4]){

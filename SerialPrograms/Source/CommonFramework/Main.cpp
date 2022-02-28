@@ -1,7 +1,6 @@
 
 #include <QApplication>
-#include <QtGlobal>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "PersistentSettings.h"
 #include "CrashDump.h"
 #include "Environment/HardwareValidation.h"
@@ -45,8 +44,10 @@ int main(int argc, char *argv[]){
 
     try{
         PERSISTENT_SETTINGS().read();
-    }catch (const StringException& error){
-        global_logger_tagged().log(error.what(), COLOR_RED);
+    }catch (const FileException& error){
+        global_logger_tagged().log(error.message(), COLOR_RED);
+    }catch (const ParseException& error){
+        global_logger_tagged().log(error.message(), COLOR_RED);
     }
 
 

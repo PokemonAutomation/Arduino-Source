@@ -5,7 +5,7 @@
  */
 
 #include "Common/Compiler.h"
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
@@ -134,12 +134,12 @@ QImage enter_lobby(
             ore.update_with_ocr(console.logger(), image);
 
             if (ore.quantity < 20){
-                PA_THROW_StringException("You have less than 20 ore. Program stopped. (Quantity: " + ore.to_str() + ")");
+                throw OperationFailedException(console, "You have less than 20 ore. Program stopped. (Quantity: " + ore.to_str() + ")");
             }
 
             ore_dialog_count++;
             if (ore_dialog_count >= 2){
-                PA_THROW_StringException("Unable to start adventure. Are you out of ore? (Quantity: " + ore.to_str() + ")");
+                throw OperationFailedException(console, "Unable to start adventure. Are you out of ore? (Quantity: " + ore.to_str() + ")");
             }
 
             continue;

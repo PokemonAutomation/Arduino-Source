@@ -5,7 +5,7 @@
  */
 
 #include <QtGlobal>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "Pokemon/Resources/Pokemon_PokeballNames.h"
@@ -31,7 +31,10 @@ bool EncounterActionFull::operator==(const EncounterActionFull& x) const{
     case EncounterAction::ThrowBallsAndSave:
         return action == x.action && pokeball_slug == x.pokeball_slug;
     }
-    PA_THROW_StringException("EncounterActionFull: Invalid Enum " + std::to_string((int)action));
+    throw InternalProgramError(
+        nullptr, PA_CURRENT_FUNCTION,
+        "EncounterActionFull: Invalid Enum " + std::to_string((int)action)
+    );
 }
 bool EncounterActionFull::operator!=(const EncounterActionFull& x) const{
     return !(*this == x);
@@ -223,7 +226,7 @@ QWidget* EncounterFilterOverride::make_shiny_box(QWidget& parent){
             QString text = box->itemText(index);
             auto iter = ShinyFilter_MAP.find(text);
             if (iter == ShinyFilter_MAP.end()){
-                PA_THROW_StringException("Invalid option: " + text);
+                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid option: " + text.toStdString());
             }
             shininess = iter->second;
         }

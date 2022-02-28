@@ -5,7 +5,7 @@
  */
 
 #include <QImage>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
 #include "BinaryImage_FilterRgb32.h"
 
@@ -123,10 +123,10 @@ void filter_rgb32(
     bool replace_if_zero
 ){
     if ((int)matrix.width() > image.width()){
-        PA_THROW_StringException("Image width is too small.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image width is too small.");
     }
     if ((int)matrix.height() > image.height()){
-        PA_THROW_StringException("Image height is too small.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image height is too small.");
     }
     Kernels::filter_rgb32(
         matrix,

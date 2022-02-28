@@ -5,7 +5,6 @@
  */
 
 #include <QtGlobal>
-#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "OCR_StringNormalization.h"

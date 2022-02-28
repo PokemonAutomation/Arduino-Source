@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "CommonFramework/OCR/OCR_Filtering.h"

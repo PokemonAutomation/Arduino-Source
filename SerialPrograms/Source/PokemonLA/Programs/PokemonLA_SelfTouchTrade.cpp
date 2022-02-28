@@ -5,7 +5,7 @@
  */
 
 #include <QtGlobal>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
@@ -191,8 +191,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env){
         });
 
         if (!recv_ok){
-            recv.log("Receiving Switch has not selected a " + STRING_POKEMON + ".", COLOR_RED);
-            PA_THROW_StringException("Receiving Switch has not selected a " + STRING_POKEMON + ".");
+            throw UserSetupError(recv, "Receiving Switch has not selected a " + STRING_POKEMON.toStdString() + ".");
         }
 
         //  Perform trade.

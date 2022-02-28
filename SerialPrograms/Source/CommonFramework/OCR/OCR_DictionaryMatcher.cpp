@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "OCR_DictionaryMatcher.h"
 
 namespace PokemonAutomation{
@@ -14,7 +14,7 @@ namespace OCR{
 const DictionaryOCR& DictionaryMatcher::dictionary(Language language) const{
     auto iter = m_database.find(language);
     if (iter == m_database.end()){
-        PA_THROW_StringException("Language not loaded.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Language not loaded.");
     }
     return iter->second;
 }
@@ -22,7 +22,7 @@ DictionaryOCR& DictionaryMatcher::dictionary(Language language){
     SpinLockGuard lg(m_lock, "LargeDictionaryMatcher::dictionary()");
     auto iter = m_database.find(language);
     if (iter == m_database.end()){
-        PA_THROW_StringException("Language not loaded.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Language not loaded.");
     }
     return iter->second;
 }

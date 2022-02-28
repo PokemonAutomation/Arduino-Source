@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
@@ -111,7 +111,6 @@ bool OutbreakFinder::read_outbreaks(
         current_region = detect_selected_region(env, env.console);
         if (current_region == MapRegion::NONE){
             env.console.log("Unable to detect selected region.", COLOR_RED);
-//            PA_THROW_StringException("Unable to detect selected region.");
             return false;
         }
         if (start_region == MapRegion::NONE){
@@ -154,7 +153,6 @@ bool OutbreakFinder::read_outbreaks(
             current_region = detect_selected_region(env, env.console);
             if (current_region == MapRegion::NONE){
                 env.console.log("Unable to detect selected region.", COLOR_RED);
-//                PA_THROW_StringException("Unable to detect selected region.");
                 return false;
             }
             if (current_region == no_outbreak){
@@ -190,7 +188,7 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
         camp = Camp::ICELANDS_SNOWFIELDS;
         break;
     default:
-        PA_THROW_StringException("Invalid region.");
+        throw InternalProgramError(&env.console.logger(), PA_CURRENT_FUNCTION, "Invalid region.");
     }
     goto_professor(env.console, camp);
 
@@ -242,8 +240,8 @@ bool OutbreakFinder::run_iteration(SingleSwitchProgramEnvironment& env, const st
         { &detector }
     );
     if (ret < 0){
-        env.console.log("Map not detected after 10 x A presses.", COLOR_RED);
-        PA_THROW_StringException("Map not detected after 10 x A presses.");
+        stats.errors++;
+        throw OperationFailedException(env.console, "Map not detected after 10 x A presses.");
     }
     env.console.log("Found map!");
     env.wait_for(std::chrono::milliseconds(500));
@@ -255,7 +253,7 @@ bool OutbreakFinder::run_iteration(SingleSwitchProgramEnvironment& env, const st
     }
     if (current_region == MapRegion::NONE){
         stats.errors++;
-        PA_THROW_StringException("Unable to read map.");
+        throw OperationFailedException(env.console, "Unable to read map.");
     }
 
     env.update_stats();

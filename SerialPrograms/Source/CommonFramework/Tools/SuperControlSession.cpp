@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Inference/VisualInferenceSession.h"
 #include "CommonFramework/Inference/AudioInferenceSession.h"
 #include "ConsoleHandle.h"
@@ -31,6 +31,7 @@ SuperControlSession::SuperControlSession(
     , m_state_period(state_period)
     , m_visual_period(visual_period)
     , m_audio_period(audio_period)
+    , m_last_state_change(std::chrono::system_clock::now())
 {}
 
 void SuperControlSession::operator+=(VisualInferenceCallback& callback){
@@ -42,14 +43,14 @@ void SuperControlSession::operator+=(AudioInferenceCallback& callback){
 void SuperControlSession::register_state_command(size_t state, std::function<bool()>&& action){
     auto iter = m_state_actions.find(state);
     if (iter != m_state_actions.end()){
-        PA_THROW_StringException("Duplicate State Enum: " + std::to_string(state));
+        throw InternalProgramError(&m_console.logger(), PA_CURRENT_FUNCTION, "Duplicate State Enum: " + std::to_string(state));
     }
     m_state_actions.emplace(state, std::move(action));
 }
 bool SuperControlSession::run_state_action(size_t state){
     auto iter = m_state_actions.find(state);
     if (iter == m_state_actions.end()){
-        PA_THROW_StringException("Unknown State Enum: " + std::to_string(state));
+        throw InternalProgramError(&m_console.logger(), PA_CURRENT_FUNCTION, "Unknown State Enum: " + std::to_string(state));
     }
 
     //  Session isn't even active.
@@ -64,6 +65,7 @@ bool SuperControlSession::run_state_action(size_t state){
 
     //  Run the state.
     m_state = state;
+    m_last_state_change = std::chrono::system_clock::now();
     return iter->second();
 }
 

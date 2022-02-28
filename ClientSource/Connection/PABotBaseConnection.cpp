@@ -7,7 +7,6 @@
 #include <iostream>
 #include "Common/CRC32.h"
 #include "Common/Microcontroller/MessageProtocol.h"
-#include "Common/Cpp/Exception.h"
 #include "ClientSource/Libraries/Logging.h"
 #include "ClientSource/Libraries/MessageConverter.h"
 #include "BotBaseMessage.h"
@@ -17,8 +16,9 @@ namespace PokemonAutomation{
 
 MessageSniffer null_sniffer;
 
-PABotBaseConnection::PABotBaseConnection(std::unique_ptr<StreamConnection> connection)
+PABotBaseConnection::PABotBaseConnection(Logger& logger, std::unique_ptr<StreamConnection> connection)
     : m_connection(std::move(connection))
+    , m_logger(logger)
     , m_sniffer(&null_sniffer)
 {
     m_connection->add_listener(*this);
@@ -55,7 +55,7 @@ void PABotBaseConnection::send_message(const BotBaseMessage& message, bool is_re
 
     size_t total_bytes = PABB_PROTOCOL_OVERHEAD + message.body.size();
     if (total_bytes > PABB_MAX_PACKET_SIZE){
-        PA_THROW_StringException("Message is too long.");
+        throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Message is too long.");
     }
 
     std::string buffer;

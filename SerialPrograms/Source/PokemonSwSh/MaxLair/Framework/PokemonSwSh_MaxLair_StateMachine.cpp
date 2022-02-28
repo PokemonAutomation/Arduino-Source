@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
@@ -149,7 +148,6 @@ StateMachineAction run_state_iteration(
     }
 
 
-//    PA_THROW_StringException("Program hang. No state detected after 8 minutes.");
 }
 
 

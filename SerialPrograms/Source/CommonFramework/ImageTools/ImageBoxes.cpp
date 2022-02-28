@@ -6,7 +6,7 @@
 
 #include <algorithm>
 #include <QImage>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "ImageBoxes.h"
 
@@ -22,12 +22,14 @@ ImagePixelBox::ImagePixelBox(size_t p_min_x, size_t p_min_y, size_t p_max_x, siz
     , max_x((pxint_t)p_max_x), max_y((pxint_t)p_max_y)
 {
     if (min_x != (int64_t)p_min_x || max_x != (int64_t)p_max_x){
-        PA_THROW_StringException(
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
             "Pixel Overflow: x = (" + std::to_string(p_min_x) + "," + std::to_string(p_max_x) + ")"
         );
     }
     if (min_y != (int64_t)p_min_y || max_y != (int64_t)p_max_y){
-        PA_THROW_StringException(
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
             "Pixel Overflow: y = (" + std::to_string(p_min_y) + "," + std::to_string(p_max_y) + ")"
         );
     }

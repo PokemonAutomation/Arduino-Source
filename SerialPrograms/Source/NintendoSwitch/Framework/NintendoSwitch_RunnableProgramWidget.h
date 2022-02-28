@@ -48,7 +48,7 @@ protected:
     ) = 0;
 
 protected:
-    static BotBase& sanitize_botbase(BotBase* botbase);
+    BotBase& sanitize_botbase(BotBase* botbase);
 
 protected:
     friend class RunnableSwitchProgramInstance;

@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "PokemonLA_AvailablePokemon.h"
@@ -15,15 +15,18 @@ namespace PokemonLA{
 
 
 std::vector<std::string> load_hisui_dex(){
-    QJsonArray json = read_json_file(
-        RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-Hisui.json"
-    ).array();
+    QString path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-Hisui.json";
+    QJsonArray json = read_json_file(path).array();
 
     std::vector<std::string> list;
     for (const auto& item : json){
         QString slug_qstr = item.toString();
         if (slug_qstr.size() <= 0){
-            PA_THROW_StringException("Expected non-empty string for Pokemon slug.");
+            throw FileException(
+                nullptr, PA_CURRENT_FUNCTION,
+                "Expected non-empty string for Pokemon slug.",
+                path.toStdString()
+            );
         }
         list.emplace_back(slug_qstr.toStdString());
     }

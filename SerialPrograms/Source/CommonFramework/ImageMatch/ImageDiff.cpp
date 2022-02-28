@@ -7,7 +7,7 @@
 #include <cmath>
 #include <smmintrin.h>
 #include "Common/Compiler.h"
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/SIMDDebuggers.h"
 #include "Kernels/ImageStats/Kernels_ImagePixelSumSqr.h"
 #include "Kernels/ImageStats/Kernels_ImagePixelSumSqrDev.h"
@@ -24,10 +24,10 @@ namespace ImageMatch{
 
 FloatPixel pixel_average(const QImage& image, const QImage& alpha_mask){
     if (!image.size().isValid()){
-        PA_THROW_StringException("Invalid Dimensions");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Dimensions");
     }
     if (image.size() != alpha_mask.size()){
-        PA_THROW_StringException("Mismatching Dimensions");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching Dimensions");
     }
     Kernels::PixelSums sums;
     Kernels::pixel_sum_sqr(
@@ -55,10 +55,10 @@ void scale_brightness(QImage& image, const FloatPixel& multiplier){
 
 double pixel_RMSD(const QImage& reference, const QImage& image){
     if (!image.size().isValid()){
-        PA_THROW_StringException("Invalid Dimensions");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Dimensions");
     }
     if (reference.size() != image.size()){
-        PA_THROW_StringException("Mismatching Dimensions");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching Dimensions");
     }
     uint64_t count = 0;
     uint64_t sumsqrs = 0;
@@ -72,10 +72,10 @@ double pixel_RMSD(const QImage& reference, const QImage& image){
 }
 double pixel_RMSD(const QImage& reference, const QImage& image, QRgb background){
     if (!image.size().isValid()){
-        PA_THROW_StringException("Invalid Dimensions");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Dimensions");
     }
     if (reference.size() != image.size()){
-        PA_THROW_StringException("Mismatching Dimensions");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching Dimensions");
     }
     uint64_t count = 0;
     uint64_t sumsqrs = 0;
@@ -90,10 +90,10 @@ double pixel_RMSD(const QImage& reference, const QImage& image, QRgb background)
 }
 double pixel_RMSD_masked(const QImage& reference, const QImage& image){
     if (!image.size().isValid()){
-        PA_THROW_StringException("Invalid Dimensions");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Dimensions");
     }
     if (reference.size() != image.size()){
-        PA_THROW_StringException("Mismatching Dimensions");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching Dimensions");
     }
     uint64_t count = 0;
     uint64_t sumsqrs = 0;

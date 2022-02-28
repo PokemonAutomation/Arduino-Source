@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"

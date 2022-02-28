@@ -9,7 +9,7 @@
 #include <QLabel>
 #include <QComboBox>
 #include <QCompleter>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "StringSelectOption.h"
 
@@ -58,7 +58,7 @@ StringSelectOption::StringSelectOption(
             std::forward_as_tuple(index)
         );
         if (!ret.second){
-            PA_THROW_StringException("Duplicate enum label.");
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate enum label.");
         }
     }
     m_current.store(m_default, std::memory_order_relaxed);
@@ -84,7 +84,7 @@ StringSelectOption::StringSelectOption(
             std::forward_as_tuple(index)
         );
         if (!ret.second){
-            PA_THROW_StringException("Duplicate enum label.");
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate enum label.");
         }
     }
     m_current.store(m_default, std::memory_order_relaxed);

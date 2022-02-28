@@ -8,10 +8,9 @@
 #include <iostream>
 #include <emmintrin.h>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/PanicDump.h"
 #include "Common/Microcontroller/MessageProtocol.h"
 #include "Common/Microcontroller/DeviceRoutines.h"
-#include "Common/Cpp/Exception.h"
-#include "Common/Cpp/PanicDump.h"
 #include "PABotBase.h"
 
 #include <iostream>
@@ -28,7 +27,7 @@ PABotBase::PABotBase(
     MessageLogger* message_logger,
     std::chrono::milliseconds retransmit_delay
 )
-    : PABotBaseConnection(std::move(connection))
+    : PABotBaseConnection(logger, std::move(connection))
     , m_logger(logger)
     , m_send_seq(1)
     , m_retransmit_delay(retransmit_delay)
@@ -415,10 +414,10 @@ bool PABotBase::try_issue_request(
 ){
     BotBaseMessage message = request.message();
     if (message.body.size() < sizeof(uint32_t)){
-        PA_THROW_StringException("Message is too short.");
+        throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Message is too short.");
     }
     if (message.body.size() > PABB_MAX_MESSAGE_SIZE){
-        PA_THROW_StringException("Message is too long.");
+        throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Message is too long.");
     }
 
     SpinLockGuard lg(m_state_lock, "PABotBase::try_issue_request()");
@@ -446,7 +445,7 @@ bool PABotBase::try_issue_request(
         std::forward_as_tuple()
     );
     if (!ret.second){
-        PA_THROW_StringException("Duplicate sequence number: " + std::to_string(seqnum));
+        throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Duplicate sequence number: " + std::to_string(seqnum));
     }
 
     m_send_seq = seqnum + 1;
@@ -471,10 +470,10 @@ bool PABotBase::try_issue_command(
 ){
     BotBaseMessage message = request.message();
     if (message.body.size() < sizeof(uint32_t)){
-        PA_THROW_StringException("Message is too short.");
+        throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Message is too short.");
     }
     if (message.body.size() > PABB_MAX_MESSAGE_SIZE){
-        PA_THROW_StringException("Message is too long.");
+        throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Message is too long.");
     }
 
     SpinLockGuard lg(m_state_lock, "PABotBase::try_issue_command()");
@@ -508,7 +507,7 @@ bool PABotBase::try_issue_command(
         std::forward_as_tuple()
     );
     if (!ret.second){
-        PA_THROW_StringException("Duplicate sequence number: " + std::to_string(seqnum));
+        throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Duplicate sequence number: " + std::to_string(seqnum));
     }
 
     m_send_seq = seqnum + 1;
@@ -637,7 +636,7 @@ BotBaseMessage PABotBase::issue_request_and_wait(
     const std::atomic<bool>* cancelled
 ){
     if (request.is_command()){
-        PA_THROW_StringException("This function only supports requests.");
+        throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "This function only supports requests.");
     }
 
     BotBaseMessage message = request.message();

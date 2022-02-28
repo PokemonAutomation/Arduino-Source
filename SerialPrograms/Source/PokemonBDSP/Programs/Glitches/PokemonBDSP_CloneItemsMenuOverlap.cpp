@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Inference/VisualInferenceSession.h"
@@ -164,8 +164,7 @@ void CloneItemsMenuOverlap::mash_B_to_battle(ProgramEnvironment& env, ConsoleHan
         { &detector }
     );
     if (ret < 0){
-        console.log("Battle menu not detected after 10 seconds.", COLOR_RED);
-        PA_THROW_StringException("Battle menu not detected after 10 seconds.");
+        throw OperationFailedException(console, "Battle menu not detected after 10 seconds.");
     }else{
         console.log("Battle menu found!");
     }
@@ -210,7 +209,7 @@ void CloneItemsMenuOverlap::program(SingleSwitchProgramEnvironment& env){
             stats.m_errors++;
             consecutive_failures++;
             if (consecutive_failures >= 3){
-                PA_THROW_StringException("Failed to activate menu overlap glitch 3 times in the row.");
+                throw OperationFailedException(env.console, "Failed to activate menu overlap glitch 3 times in the row.");
             }
             pbf_mash_button(env.console, BUTTON_B, 10 * TICKS_PER_SECOND);
             continue;

@@ -7,7 +7,7 @@
 #include <cmath>
 #include <vector>
 #include <QImage>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "ImageDiff.h"
 #include "ExactImageDictionaryMatcher.h"
@@ -59,20 +59,20 @@ ExactImageDictionaryMatcher::ExactImageDictionaryMatcher(const WeightedExactImag
 {}
 void ExactImageDictionaryMatcher::add(const std::string& slug, QImage image){
     if (image.isNull()){
-        PA_THROW_StringException("Null image.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Null image.");
     }
 //    image = image.scaled(image.width() * 8, image.height() * 8);
 //    image = image.scaled(image.width() * 8, image.height() * 8, Qt::IgnoreAspectRatio, Qt::SmoothTransformation);
     if (m_dimensions.isValid()){
         if (image.size() != m_dimensions){
-            PA_THROW_StringException("Mismatching dimensions.");
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching dimensions.");
         }
     }else{
         m_dimensions = image.size();
     }
     auto iter = m_database.find(slug);
     if (iter != m_database.end()){
-        PA_THROW_StringException("Duplicate slug: " + slug);
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate slug: " + slug);
     }
 
     m_database.emplace(

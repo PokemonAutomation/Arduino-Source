@@ -67,7 +67,6 @@ SOURCES += \
     ../ClientSource/Libraries/MessageConverter.cpp \
     ../Common/CRC32.cpp \
     ../Common/Cpp/AsyncDispatcher.cpp \
-    ../Common/Cpp/Exception.cpp \
     ../Common/Cpp/Exceptions.cpp \
     ../Common/Cpp/FireForgetDispatcher.cpp \
     ../Common/Cpp/PanicDump.cpp \
@@ -148,7 +147,6 @@ SOURCES += \
     Source/CommonFramework/Inference/FrozenImageDetector.cpp \
     Source/CommonFramework/Inference/ImageMatchDetector.cpp \
     Source/CommonFramework/Inference/ImageTools.cpp \
-    Source/CommonFramework/Inference/InferenceException.cpp \
     Source/CommonFramework/Inference/SpectrogramMatcher.cpp \
     Source/CommonFramework/Inference/StatAccumulator.cpp \
     Source/CommonFramework/Inference/VisualInferenceCallback.cpp \
@@ -616,7 +614,6 @@ HEADERS += \
     ../Common/Cpp/AlignedVector.tpp \
     ../Common/Cpp/AsyncDispatcher.h \
     ../Common/Cpp/Color.h \
-    ../Common/Cpp/Exception.h \
     ../Common/Cpp/Exceptions.h \
     ../Common/Cpp/FireForgetDispatcher.h \
     ../Common/Cpp/FixedLimitVector.h \
@@ -718,7 +715,6 @@ HEADERS += \
     Source/CommonFramework/Inference/FrozenImageDetector.h \
     Source/CommonFramework/Inference/ImageMatchDetector.h \
     Source/CommonFramework/Inference/ImageTools.h \
-    Source/CommonFramework/Inference/InferenceException.h \
     Source/CommonFramework/Inference/InferenceThrottler.h \
     Source/CommonFramework/Inference/SpectrogramMatcher.h \
     Source/CommonFramework/Inference/StatAccumulator.h \

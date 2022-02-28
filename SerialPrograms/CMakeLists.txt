@@ -66,8 +66,6 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/AsyncDispatcher.h
     ../Common/Cpp/Color.h
     ../Common/Cpp/DllSafeString.h
-    ../Common/Cpp/Exception.cpp
-    ../Common/Cpp/Exception.h
     ../Common/Cpp/Exceptions.cpp
     ../Common/Cpp/Exceptions.h
     ../Common/Cpp/FireForgetDispatcher.cpp
@@ -244,8 +242,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Inference/ImageMatchDetector.h
     Source/CommonFramework/Inference/ImageTools.cpp
     Source/CommonFramework/Inference/ImageTools.h
-    Source/CommonFramework/Inference/InferenceException.cpp
-    Source/CommonFramework/Inference/InferenceException.h
     Source/CommonFramework/Inference/InferenceThrottler.h
     Source/CommonFramework/Inference/SpectrogramMatcher.cpp
     Source/CommonFramework/Inference/SpectrogramMatcher.h

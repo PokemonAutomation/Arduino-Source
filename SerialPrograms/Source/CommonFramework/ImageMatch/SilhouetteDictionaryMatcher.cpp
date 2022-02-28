@@ -5,7 +5,7 @@
  */
 
 #include <cmath>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "ImageCropper.h"
 #include "ImageDiff.h"
 #include "SilhouetteDictionaryMatcher.h"
@@ -20,11 +20,11 @@ namespace ImageMatch{
 
 void SilhouetteDictionaryMatcher::add(const std::string& slug, QImage image){
     if (image.isNull()){
-        PA_THROW_StringException("Null image.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Null image.");
     }
     auto iter = m_database.find(slug);
     if (iter != m_database.end()){
-        PA_THROW_StringException("Duplicate slug: " + slug);
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Duplicate slug: " + slug);
     }
 
     m_database.emplace(

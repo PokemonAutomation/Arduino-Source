@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Pokemon_Types.h"
 
 namespace PokemonAutomation{
@@ -36,7 +36,7 @@ const std::map<PokemonType, std::string> TYPE_ENUM_TO_SLUG{
 const std::string& get_type_slug(PokemonType type){
     auto it = TYPE_ENUM_TO_SLUG.find(type);
     if (it == TYPE_ENUM_TO_SLUG.end()){
-        PA_THROW_StringException("Invalid type enum.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid type enum.");
     }
     return it->second;
 }

@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "Pokemon/Resources/Pokemon_PokeballNames.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h"
@@ -17,7 +17,7 @@ namespace Pokemon{
 PokemonBallSelectData::PokemonBallSelectData(const std::vector<std::string>& slugs){
     for (const std::string& slug : slugs){
         if (slug.empty()){
-            PA_THROW_StringException("Expected non-empty string for Pokemon slug.");
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Expected non-empty string for pokeball slug.");
         }
 
         using namespace NintendoSwitch::PokemonSwSh;

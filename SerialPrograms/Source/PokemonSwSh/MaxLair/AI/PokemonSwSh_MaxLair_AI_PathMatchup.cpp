@@ -5,9 +5,7 @@
  */
 
 #include <map>
-#include <QtGlobal>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
@@ -35,7 +33,7 @@ private:
         QJsonObject json = read_json_file(path).object();
         if (json.empty()){
             throw FileException(
-                nullptr, __PRETTY_FUNCTION__,
+                nullptr, PA_CURRENT_FUNCTION,
                 "Json is either empty or invalid.",
                 path.toStdString()
             );
@@ -77,7 +75,7 @@ const std::set<std::string>& rentals_by_type(PokemonType type){
     const PathMatchDatabase& database = PathMatchDatabase::instance();
     auto iter = database.rentals_by_type.find(type);
     if (iter == database.rentals_by_type.end()){
-        PA_THROW_StringException("Invalid Type: " + std::to_string((int)type));
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Type: " + std::to_string((int)type));
     }
     return iter->second;
 }
@@ -87,12 +85,12 @@ double type_vs_boss(PokemonType type, const std::string& boss_slug){
 
     auto iter0 = database.type_vs_boss.find(boss_slug);
     if (iter0 == database.type_vs_boss.end()){
-        PA_THROW_StringException("Invalid Boss: " + boss_slug);
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Boss: " + boss_slug);
     }
 
     auto iter1 = iter0->second.find(type);
     if (iter1 == iter0->second.end()){
-        PA_THROW_StringException("Invalid Type: " + std::to_string((int)type));
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Type: " + std::to_string((int)type));
     }
 
     return iter1->second;
@@ -234,7 +232,7 @@ std::vector<std::vector<PathNode>> generate_paths(
 template <typename Boss>
 double evaluate_path(const Boss& boss, const std::vector<PathNode>& path){
     if (path.size() > 3){
-        PA_THROW_StringException("Path is longer than 3: " + std::to_string(path.size()));
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Path is longer than 3: " + std::to_string(path.size()));
     }
     const double weights[] = {1, 2, 3};
     double weight = 0;

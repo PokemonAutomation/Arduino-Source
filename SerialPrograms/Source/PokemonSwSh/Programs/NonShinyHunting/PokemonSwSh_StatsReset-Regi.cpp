@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"

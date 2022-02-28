@@ -6,7 +6,6 @@
 
 #include <QtGlobal>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Exception.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "RunnableComputerProgramWidget.h"
@@ -67,17 +66,16 @@ void RunnableComputerProgramWidget::run_program(){
         m_logger.log("Ending Program...");
     }catch (ProgramCancelledException&){
     }catch (InvalidConnectionStateException&){
-    }catch (StringException& e){
-        signal_error(e.message_qt());
+    }catch (UserSetupError& e){
+        emit signal_error(QString::fromStdString(e.message()));
     }catch (Exception& e){
-        QString message = QString::fromStdString(e.message());
-        emit signal_error(message);
+        emit signal_error(QString::fromStdString(e.to_str()));
     }
 
     m_state.store(ProgramState::STOPPING, std::memory_order_release);
     m_logger.log("Stopping Program...");
 
-    signal_reset();
+    emit signal_reset();
     m_state.store(ProgramState::STOPPED, std::memory_order_release);
     m_logger.log("Now in STOPPED state.");
 //    cout << "Now in STOPPED state." << endl;

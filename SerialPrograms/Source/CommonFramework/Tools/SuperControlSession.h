@@ -60,6 +60,7 @@ protected:
 
 protected:
     size_t current_state() const{ return m_state; }
+    WallClock last_state_change() const{ return m_last_state_change; }
 
     //  Return true if we should stop.
     virtual bool run_state(AsyncCommandSession& commands, WallClock timestamp) = 0;
@@ -89,6 +90,7 @@ private:
 private:
     //  Run-time state.
     size_t m_state;
+    WallClock m_last_state_change;
 };
 
 

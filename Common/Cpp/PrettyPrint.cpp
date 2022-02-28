@@ -8,7 +8,7 @@
 #include <chrono>
 #include <sstream>
 #include <iomanip>
-#include "Exception.h"
+#include "Exceptions.h"
 #include "PrettyPrint.h"
 
 namespace PokemonAutomation{
@@ -17,7 +17,7 @@ namespace PokemonAutomation{
 std::string to_string_padded(size_t digits, uint64_t x){
     std::string str = std::to_string(x);
     if (digits < str.size()){
-        PA_THROW_StringException("Number is too big to convert to fixed length string.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Number is too big to convert to fixed length string.");
     }
     return std::string(digits - str.size(), '0') + str;
 }

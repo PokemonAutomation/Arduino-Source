@@ -4,9 +4,8 @@
  *
  */
 
-#include <QtGlobal>
 #include <QString>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "Pokemon_BerryNames.h"
@@ -35,9 +34,8 @@ BerryNameDatabase::BerryNameDatabase()
 {
     // Load a list of berry slugs in the desired order:
     // ["cheri-berry", "chesto-berry", ... ]
-    const QJsonArray slug_list = read_json_file(
-        RESOURCE_PATH() + "Pokemon/ItemListBerries.json"
-    ).array();
+    QString path_slugs = RESOURCE_PATH() + "Pokemon/ItemListBerries.json";
+    const QJsonArray slug_list = read_json_file(path_slugs).array();
 
     // Load a map of berry slugs to berry names in all languages, e.g.:
     // {
@@ -48,22 +46,27 @@ BerryNameDatabase::BerryNameDatabase()
     //      },
     //      ....
     // }
-    const QJsonObject item_dict = read_json_file(
-        RESOURCE_PATH() + "Pokemon/ItemNameDisplay.json"
-    ).object();
+    QString path_disp = RESOURCE_PATH() + "Pokemon/ItemNameDisplay.json";
+    const QJsonObject item_disp = read_json_file(path_disp).object();
 
     for (auto iter = slug_list.begin(); iter != slug_list.end(); ++iter){
         const QString slug = iter->toString();
-        const auto berry_name_dict_iter = item_dict.find(slug);
-        if (berry_name_dict_iter == item_dict.end()){
-            const QString error_msg = "Fail to find berry " + slug + " in ItemNameDisplay.json";
-            PA_THROW_StringException(error_msg.toStdString());
+        const auto berry_name_dict_iter = item_disp.find(slug);
+        if (berry_name_dict_iter == item_disp.end()){
+            throw FileException(
+                nullptr, PA_CURRENT_FUNCTION,
+                "Fail to find berry " + slug.toStdString() + " in ItemNameDisplay.json",
+                path_disp.toStdString()
+            );
         }
         const auto berry_name_dict = berry_name_dict_iter->toObject();
         auto berry_eng_name_iter = berry_name_dict.find("eng");
         if (berry_eng_name_iter == berry_name_dict.end()){
-            const QString error_msg = "Fail to find English display name for berry " + slug;
-            PA_THROW_StringException(error_msg.toStdString());
+            throw FileException(
+                nullptr, PA_CURRENT_FUNCTION,
+                "Fail to find English display name for berry " + slug.toStdString(),
+                path_disp.toStdString()
+            );
         }
 
         QString display_name = berry_eng_name_iter->toString();
@@ -83,7 +86,10 @@ const BerryNames& get_berry_name(const std::string& slug){
     const std::map<std::string, BerryNames>& database = BerryNameDatabase::instance().database;
     auto iter = database.find(slug);
     if (iter == database.end()){
-        PA_THROW_StringException("Berry slug not found in database: " + slug);
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
+            "Berry slug not found in database: " + slug
+        );
     }
     return iter->second;
 }
@@ -91,7 +97,10 @@ const std::string& parse_berry_name(const QString& display_name){
     const std::map<QString, std::string>& database = BerryNameDatabase::instance().reverse_lookup;
     auto iter = database.find(display_name);
     if (iter == database.end()){
-        PA_THROW_StringException("Berry name not found in database: " + display_name);
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
+            "Berry name not found in database: " + display_name.toStdString()
+        );
     }
     return iter->second;
 }

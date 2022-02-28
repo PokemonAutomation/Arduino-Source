@@ -5,7 +5,6 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Exception.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
@@ -87,7 +86,7 @@ void mash_A_until_end_of_battle(ProgramEnvironment& env, ConsoleHandle& console)
         { &detector }
     );
     if (ret < 0){
-        throw OperationFailedException(console, "Failed to return to overworld after 5 minutes.");
+        throw OperationFailedException(console, "Failed to return to overworld after 2 minutes.");
     }
     console.log("Returned to overworld.");
 }

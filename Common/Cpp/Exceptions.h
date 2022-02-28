@@ -9,6 +9,7 @@
 #ifndef PokemonAutomation_Exceptions_H
 #define PokemonAutomation_Exceptions_H
 
+#include "Common/Compiler.h"
 #include "AbstractLogger.h"
 
 namespace PokemonAutomation{
@@ -19,21 +20,12 @@ namespace PokemonAutomation{
 //      Consume: To catch the exception and not rethrow it.
 
 
-
 //  Base class. Don't use this directly. This is for the infra to catch everything.
 class Exception{
 public:
     virtual const char* name() const = 0;
-    virtual std::string message() const{ return ""; };
-    virtual std::string to_str() const{
-        std::string str = name();
-        std::string msg = message();
-        if (!msg.empty()){
-            str += "\n\n";
-            str += msg;
-        }
-        return str;
-    }
+    virtual std::string message() const;
+    virtual std::string to_str() const;
 };
 
 
@@ -66,7 +58,7 @@ public:
 
 
 //  Thrown by subroutines if they fail for an in-game reason.
-//  These are generally recoverable errors and should be consumed by the program.
+//  These included recoverable errors which can be consumed by the program.
 class OperationFailedException : public Exception{
 public:
 //    OperationFailedException(std::string message) : m_message(message) {}
@@ -105,12 +97,50 @@ private:
 
 class SerialProtocolException : public Exception{
 public:
-    SerialProtocolException(Logger& logger, std::string message);
+    SerialProtocolException(Logger& logger, const char* location, std::string message);
     virtual const char* name() const override{ return "SerialProtocolException"; }
-    virtual std::string message() const override{ return m_message; }
+    virtual std::string message() const override;
+private:
+    const char* m_location;
+    std::string m_message;
+};
+
+
+//  These are thrown for logic errors. They are always bugs.
+class InternalProgramError : public Exception{
+public:
+    InternalProgramError(Logger* logger, const char* location, std::string message);
+    virtual const char* name() const override{ return "InternalProgramError"; }
+    virtual std::string message() const override;
+private:
+    const char* m_location;
+    std::string m_message;
+};
+
+
+//  These are thrown for failed system errors. They are not necessarily bugs.
+class InternalSystemError : public Exception{
+public:
+    InternalSystemError(Logger* logger, const char* location, std::string message);
+    virtual const char* name() const override{ return "InternalSystemError"; }
+    virtual std::string message() const override;
+private:
+    const char* m_location;
+    std::string m_message;
+};
+
+
+class UserSetupError : public Exception{
+public:
+    UserSetupError(Logger& logger, std::string message);
+    virtual const char* name() const override{ return "UserSetupError"; }
+    virtual std::string message() const override;
 private:
     std::string m_message;
 };
+
+
+
 
 
 

@@ -8,7 +8,7 @@
 #include <QLabel>
 #include <QLineEdit>
 #include <QHeaderView>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
@@ -39,7 +39,7 @@ int research_catch_count(const std::string& slug){
     static const std::map<std::string, int> database = make_research_catch_count_map();
     auto iter = database.find(slug);
     if (iter == database.end()){
-        PA_THROW_StringException("No research count for: " + slug);
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "No research count for: " + slug);
     }
     return iter->second;
 }

@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Pokemon.h"
 #include "PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Matchup.h"
 #include "PokemonSwSh_MaxLair_AI.h"
@@ -61,7 +61,7 @@ bool should_swap_with_professor(
         }
     }
     if (list.empty()){
-        PA_THROW_StringException("Opponent candidate list is empty.");
+        throw InternalProgramError(&logger, PA_CURRENT_FUNCTION, "Opponent candidate list is empty.");
     }
     size_t midpoint = list.size() / 2;
     for (size_t c = 0; c < midpoint; c++){

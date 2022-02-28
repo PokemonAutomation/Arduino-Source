@@ -6,7 +6,6 @@
 
 #include <map>
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/Exception.h"
 #include "Pokemon/Pokemon_Types.h"
 #include "PokemonSwSh_MaxLair_State.h"
 

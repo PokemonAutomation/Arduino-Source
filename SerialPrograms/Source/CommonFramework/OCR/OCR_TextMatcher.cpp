@@ -7,7 +7,7 @@
 #include <cmath>
 #include <vector>
 #include "Common/Cpp/SpinLock.h"
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "OCR_StringNormalization.h"
 #include "OCR_TextMatcher.h"
 
@@ -124,7 +124,7 @@ std::vector<uint64_t> binomial_row_u64(size_t degree){
 }
 uint64_t binomial_coefficient_u64(size_t degree, size_t index){
     if (degree > 62){
-        PA_THROW_StringException("Cannot go beyond degree 62.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Cannot go beyond degree 62.");
     }
 
     SpinLockGuard lg(binomial_lock, "binomial_coefficient_u64()");
@@ -144,7 +144,7 @@ uint64_t binomial_coefficient_u64(size_t degree, size_t index){
 
 double random_match_probability(size_t total, size_t matched, double random_match_chance){
     if (total > 62){
-        PA_THROW_StringException("Cannot go beyond degree 62.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Cannot go beyond degree 62.");
     }
 
     double c_match = 1 - random_match_chance;

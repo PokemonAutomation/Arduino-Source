@@ -6,7 +6,7 @@
 
 #include <QtGlobal>
 #include <QImage>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -64,8 +64,7 @@ void trigger_menu(ProgramEnvironment& env, ConsoleHandle& console){
         { &detector }
     );
     if (ret < 0){
-        console.log("Map not detected after 60 seconds.", COLOR_RED);
-        PA_THROW_StringException("Map not detected after 60 seconds.");
+        throw OperationFailedException(console, "Map not detected after 60 seconds.");
     }
     console.log("Detected map!", COLOR_BLUE);
 
@@ -96,8 +95,7 @@ void trigger_map_overlap(ProgramEnvironment& env, ConsoleHandle& console){
         pbf_mash_button(console, BUTTON_B, 3 * TICKS_PER_SECOND);
         pbf_press_button(console, BUTTON_R, 20, 230);
     }
-    console.log("Failed to trigger map overlap after 10 attempts.", COLOR_RED);
-    PA_THROW_StringException("Failed to trigger map overlap after 10 attempts.");
+    throw OperationFailedException(console, "Failed to trigger map overlap after 10 attempts.");
 }
 
 
@@ -134,8 +132,7 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env){
             { &detector }
         );
         if (ret < 0){
-            console.log("Unable to leave " + STRING_POKEMON + " center.", COLOR_RED);
-            PA_THROW_StringException("Unable to leave " + STRING_POKEMON + " center.");
+            throw OperationFailedException(console, "Unable to leave " + STRING_POKEMON.toStdString() + " center.");
         }
         console.log("Leaving " + STRING_POKEMON + " center detected!", COLOR_BLUE);
     }

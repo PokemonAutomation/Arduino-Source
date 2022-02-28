@@ -5,7 +5,7 @@
  */
 
 #include <map>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Pokemon_IVChecker.h"
 
 namespace PokemonAutomation{
@@ -41,7 +41,7 @@ IVCheckerValue IVCheckerValue_string_to_enum(const std::string& token){
 const std::string& IVCheckerValue_enum_to_string(IVCheckerValue result){
     auto iter = IVCheckerValue_ENUM_TO_TOKEN.find(result);
     if (iter == IVCheckerValue_ENUM_TO_TOKEN.end()){
-        PA_THROW_StringException("Invalid IV result enum.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid IV result enum.");
     }
     return iter->second;
 }

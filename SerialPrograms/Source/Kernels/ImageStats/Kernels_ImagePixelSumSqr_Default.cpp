@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Kernels_ImagePixelSumSqr_Default.h"
 
 namespace PokemonAutomation{
@@ -70,7 +70,7 @@ void pixel_sum_sqr_Default(
         return;
     }
     if (width > 65535){
-        PA_THROW_StringException("Kernels::pixel_sum_sqr_Default(): Width limit exceeded.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Width limit exceeded: " + std::to_string(width));
     }
     for (size_t r = 0; r < height; r++){
         pixel_sum_sqr_Default(sums, (uint16_t)width, image, alpha);

@@ -5,10 +5,10 @@
  */
 
 #include "Common/Compiler.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/Inference/InferenceException.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "CommonFramework/Inference/FrozenImageDetector.h"
 #include "CommonFramework/Inference/ImageMatchDetector.h"
@@ -152,7 +152,7 @@ void EggAutonomousState::process_error(const std::string& name, const char* mess
         m_stats.to_str(),
         screen
     );
-    PA_THROW_InferenceException(m_console, message);
+    throw OperationFailedException(m_console, message);
 }
 
 void EggAutonomousState::process_shiny(const QImage& screen){
@@ -409,7 +409,7 @@ void EggAutonomousState::hatch_egg(){
             { &dialog }
         );
         if (ret < 0){
-            PA_THROW_InferenceException(m_console, "End of hatch not detected after 30 seconds.");
+            throw OperationFailedException(m_console, "End of hatch not detected after 30 seconds.");
             process_error("NoHatchEnd", "End of hatch not detected after 30 seconds.");
         }
         m_console.log("Egg finished hatching.");
@@ -441,7 +441,7 @@ void EggAutonomousState::hatch_egg(){
         case 1:
             m_console.log("Detected prompt. Please turn off nicknaming.", COLOR_RED);
             m_stats.m_errors++;
-            PA_THROW_StringException("Please turn off nicknaming.");
+            throw UserSetupError(m_console, "Please turn off nicknaming.");
         default:
             m_console.log("Failed to detect overworld after 30 seconds. Did day/night change?", COLOR_RED);
 //            pbf_mash_button(console, BUTTON_ZL, 30 * TICKS_PER_SECOND);

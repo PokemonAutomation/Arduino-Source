@@ -8,7 +8,7 @@
 #ifdef PA_Arch_x64_AVX512
 
 #include <immintrin.h>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Kernels/Kernels_x64_AVX512.h"
 #include "Kernels_ImagePixelSumSqr_Default.h"
 #include "Kernels_ImagePixelSumSqr_x64_SSE41.h"
@@ -143,7 +143,7 @@ void pixel_sum_sqr_x64_AVX512(
         return;
     }
     if (width > 65535){
-        PA_THROW_StringException("Kernels::pixel_sum_sqr_x64_SSE41(): Width limit exceeded.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Width limit exceeded: " + std::to_string(width));
     }
     for (size_t r = 0; r < height; r++){
         pixel_sum_sqr_x64_AVX512(sums, (uint16_t)width, image, alpha);

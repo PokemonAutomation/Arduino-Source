@@ -28,7 +28,7 @@ namespace PokemonAutomation{
 
 class PABotBaseConnection : public StreamListener{
 public:
-    PABotBaseConnection(std::unique_ptr<StreamConnection> connection);
+    PABotBaseConnection(Logger& logger, std::unique_ptr<StreamConnection> connection);
     virtual ~PABotBaseConnection();
 
     void set_sniffer(MessageSniffer* sniffer);
@@ -50,6 +50,7 @@ private:
     std::deque<char> m_recv_buffer;
 
 protected:
+    Logger& m_logger;
     MessageSniffer* m_sniffer;
 };
 

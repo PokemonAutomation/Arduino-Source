@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA_BraviaryHeightGlitch.h"
 

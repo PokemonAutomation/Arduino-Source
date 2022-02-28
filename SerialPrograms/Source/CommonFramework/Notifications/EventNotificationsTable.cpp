@@ -4,7 +4,6 @@
  *
  */
 
-#include <QtGlobal>
 #include <QVBoxLayout>
 #include <QHeaderView>
 #include <QLabel>
@@ -12,7 +11,7 @@
 #include <QComboBox>
 #include <QLineEdit>
 #include <QPushButton>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "ProgramNotifications.h"
@@ -34,7 +33,10 @@ EventNotificationsTable::EventNotificationsTable(std::vector<EventNotificationOp
     for (EventNotificationOption* option : m_options){
         auto iter = m_name_map.find(option->label());
         if (iter != m_name_map.end()){
-            PA_THROW_StringException("Duplicate Key: " + option->label());
+            throw InternalProgramError(
+                nullptr, PA_CURRENT_FUNCTION,
+                "Duplicate Key: " + option->label().toStdString()
+            );
         }
         m_name_map.emplace(option->label(), option);
     }

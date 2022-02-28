@@ -6,7 +6,7 @@
 
 #include <stdint.h>
 #include "Common/Compiler.h"
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Kernels_ImagePixelSumSqrDev_Default.h"
 
 namespace PokemonAutomation{
@@ -75,7 +75,7 @@ void sum_sqr_deviation_Default(
     uint32_t background
 ){
     if (width > 22017){
-        PA_THROW_StringException("Kernels::sum_sqr_deviation_Default(): Width limit exceeded.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Width limit exceeded: " + std::to_string(width));
     }
     for (size_t r = 0; r < height; r++){
         sum_sqr_deviation_Default<mode>(

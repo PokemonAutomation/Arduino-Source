@@ -10,7 +10,6 @@
 #include <QScrollArea>
 #include <QMessageBox>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Exception.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -160,8 +159,8 @@ void RunnableSwitchProgramWidget::run_program(){
         m_logger.log("Ending Program...");
     }catch (ProgramCancelledException&){
     }catch (InvalidConnectionStateException&){
-    }catch (StringException& e){
-        emit signal_error(e.message_qt());
+    }catch (UserSetupError& e){
+        emit signal_error(QString::fromStdString(e.message()));
         send_program_fatal_error_notification(
             m_logger, instance.NOTIFICATION_ERROR_FATAL,
             ProgramInfo(
@@ -170,7 +169,7 @@ void RunnableSwitchProgramWidget::run_program(){
                 instance.descriptor().display_name(),
                 timestamp()
             ),
-            e.message_qt(),
+            QString::fromStdString(e.message()),
             m_current_stats ? m_current_stats->to_str() : ""
         );
     }catch (Exception& e){
@@ -206,7 +205,7 @@ BotBase& RunnableSwitchProgramWidget::sanitize_botbase(BotBase* botbase){
     if (botbase != nullptr){
         return *botbase;
     }
-    PA_THROW_StringException("Cannot Start: Serial connection not ready.");
+    throw UserSetupError(m_logger, "Cannot Start: Serial connection not ready.");
 }
 
 

@@ -5,7 +5,7 @@
  */
 
 #include <map>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Language.h"
 
 namespace PokemonAutomation{
@@ -55,7 +55,10 @@ void LanguageSet::operator-=(const LanguageSet& set){
 const LanguageData& language_data(Language language){
     auto iter = LANGUAGE_DATA.find(language);
     if (iter == LANGUAGE_DATA.end()){
-        PA_THROW_StringException("Invalid Language Enum: " + std::to_string((int)language));
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
+            "Invalid Language Enum: " + std::to_string((int)language)
+        );
     }
     return iter->second;
 }
@@ -73,7 +76,10 @@ const std::map<std::string, Language> CODE_TO_ENUM = build_code_to_enum_map();
 Language language_code_to_enum(const std::string& language){
     auto iter = CODE_TO_ENUM.find(language);
     if (iter == CODE_TO_ENUM.end()){
-        PA_THROW_StringException("Unknown Language Code: " + language);
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
+            "Unknown Language Code: " + language
+        );
     }
     return iter->second;
 }

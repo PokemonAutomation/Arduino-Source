@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -114,7 +114,7 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env){
         );
         if (ret < 0){
             stats.errors++;
-            PA_THROW_StringException("No distortion found after one hour.");
+            throw OperationFailedException(env.console, "No distortion found after one hour.");
         }
 
         auto elapsed = std::chrono::system_clock::now() - start;

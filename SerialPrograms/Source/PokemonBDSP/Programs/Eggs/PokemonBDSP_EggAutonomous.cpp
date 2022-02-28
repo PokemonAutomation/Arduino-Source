@@ -5,8 +5,8 @@
  */
 
 #include "Common/Compiler.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Inference/InferenceException.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
@@ -149,7 +149,7 @@ bool EggAutonomous::run_batch(
         save = true;
         break;
     default:
-        PA_THROW_StringException("Invalid saving option.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid saving option.");
     }
 
     if (save){
@@ -209,10 +209,10 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env){
                 break;
             }
             consecutive_failures = 0;
-        }catch (InferenceException&){
+        }catch (OperationFailedException&){
             consecutive_failures++;
             if (consecutive_failures >= 3){
-                PA_THROW_StringException("Failed 3 batches in the row.");
+                throw OperationFailedException(env.console, "Failed 3 batches in the row.");
             }
             pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, env.console, true);

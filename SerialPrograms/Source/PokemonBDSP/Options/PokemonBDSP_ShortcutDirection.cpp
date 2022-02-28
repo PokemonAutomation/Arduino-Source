@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP_ShortcutDirection.h"
 
@@ -51,7 +51,11 @@ void ShortcutDirection::run(const BotBaseContext& context, uint16_t delay){
     case 1: shortcut_x = 255; break;
     case 2: shortcut_y = 255; break;
     case 3: shortcut_x = 0; break;
-    default: PA_THROW_StringException("Invalid shortcut value: " + std::to_string(*this));
+    default:
+        throw InternalProgramError(
+            nullptr, PA_CURRENT_FUNCTION,
+            "Invalid shortcut value: " + std::to_string(*this)
+        );
     }
 
     pbf_mash_button(context, BUTTON_PLUS, 125);

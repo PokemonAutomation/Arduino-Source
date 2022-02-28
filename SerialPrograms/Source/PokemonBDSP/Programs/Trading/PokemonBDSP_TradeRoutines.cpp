@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/Inference/ImageMatchDetector.h"

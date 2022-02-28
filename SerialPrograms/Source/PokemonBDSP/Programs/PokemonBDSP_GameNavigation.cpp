@@ -4,7 +4,7 @@
  *
  */
 
-#include "CommonFramework/Inference/InferenceException.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
@@ -73,7 +73,7 @@ void overworld_to_menu(ProgramEnvironment& env, ConsoleHandle& console){
             { &detector }
         );
         if (ret < 0){
-            PA_THROW_InferenceException(console, "Menu not detected after 10 seconds.");
+            throw OperationFailedException(console, "Menu not detected after 10 seconds.");
         }
         console.log("Detected menu.");
     }
@@ -110,7 +110,7 @@ void overworld_to_box(ProgramEnvironment& env, ConsoleHandle& console){
             { &detector }
         );
         if (ret < 0){
-            PA_THROW_InferenceException(console, "Box system not detected after 10 seconds.");
+            throw OperationFailedException(console, "Box system not detected after 10 seconds.");
         }
         console.log("Detected box system.");
     }
@@ -141,7 +141,7 @@ void box_to_overworld(ProgramEnvironment& env, ConsoleHandle& console){
             { &detector }
         );
         if (ret < 0){
-            PA_THROW_InferenceException(console, "Menu not detected after 10 seconds.");
+            throw OperationFailedException(console, "Menu not detected after 10 seconds.");
         }
         console.log("Detected menu.");
     }

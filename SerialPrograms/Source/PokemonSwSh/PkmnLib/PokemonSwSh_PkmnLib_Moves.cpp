@@ -6,9 +6,7 @@
 
 #include <deque>
 #include <fstream>
-#include <QtGlobal>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "PokemonSwSh_PkmnLib_Types.h"
@@ -113,7 +111,7 @@ private:
         QJsonObject json = read_json_file(path).object();
         if (json.empty()){
             throw FileException(
-                nullptr, __PRETTY_FUNCTION__,
+                nullptr, PA_CURRENT_FUNCTION,
                 "Json is either empty or invalid.",
                 path.toStdString()
             );
@@ -205,7 +203,7 @@ const Move& id_to_move(uint32_t id){
             return *iter->second;
         }
     }
-    PA_THROW_StringException("Invalid Move ID: " + std::to_string(id));
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Move ID: " + std::to_string(id));
 }
 const Move& slug_to_move(const std::string& slug){
     {
@@ -222,7 +220,7 @@ const Move& slug_to_move(const std::string& slug){
             return *iter->second;
         }
     }
-    PA_THROW_StringException("Invalid Move Slug: " + slug);
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Move Slug: " + slug);
 }
 const std::string& verify_move_slug(const std::string& slug){
     //  Disable because not all moves are in AutoDA.

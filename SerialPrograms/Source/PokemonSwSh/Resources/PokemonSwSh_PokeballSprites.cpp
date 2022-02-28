@@ -4,9 +4,7 @@
  *
  */
 
-#include <QtGlobal>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageMatch/ImageCropper.h"
@@ -38,10 +36,10 @@ struct PokeballSpriteDatabase{
         int width = json.find("spriteWidth")->toInt();
         int height = json.find("spriteHeight")->toInt();
         if (width <= 0){
-            throw FileException(nullptr, __PRETTY_FUNCTION__, "Invalid width.", m_path.toStdString());
+            throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid width.", m_path.toStdString());
         }
         if (height <= 0){
-            throw FileException(nullptr, __PRETTY_FUNCTION__, "Invalid height.", m_path.toStdString());
+            throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid height.", m_path.toStdString());
         }
 
         QJsonObject locations = json.find("spriteLocations")->toObject();
@@ -77,7 +75,7 @@ const PokeballSprite& get_pokeball_sprite(const std::string& slug){
     const std::map<std::string, PokeballSprite>& database = PokeballSpriteDatabase::instance().m_slug_to_data;
     auto iter = database.find(slug);
     if (iter == database.end()){
-        PA_THROW_StringException("Pokeball slug not found in database: " + slug);
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Pokeball slug not found in database: " + slug);
     }
     return iter->second;
 }

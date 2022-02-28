@@ -4,8 +4,7 @@
  *
  */
 
-#include <QtGlobal>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "Pokemon/Resources/Pokemon_PokeballNames.h"
@@ -173,7 +172,7 @@ QWidget* EncounterFilterOverride::make_shiny_box(QWidget& parent){
             QString text = box->itemText(index);
             auto iter = ShinyFilter_MAP.find(text);
             if (iter == ShinyFilter_MAP.end()){
-                PA_THROW_StringException("Invalid option: " + text);
+                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid option: " + text.toStdString());
             }
             shininess = iter->second;
         }

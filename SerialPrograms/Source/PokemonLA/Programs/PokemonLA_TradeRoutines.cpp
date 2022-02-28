@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
 #include "CommonFramework/Globals.h"

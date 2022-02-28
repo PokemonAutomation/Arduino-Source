@@ -5,7 +5,7 @@
  */
 
 #include <vector>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Pokemon.h"
 #include "PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Matchup.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
@@ -95,7 +95,7 @@ double rental_vs_boss_matchup(const std::string& rental, const std::vector<const
     using namespace papkmnlib;
 
     if (bosses.empty()){
-        PA_THROW_StringException("Boss list cannot be empty.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Boss list cannot be empty.");
     }
     double score = 0;
     if (rental.empty()){

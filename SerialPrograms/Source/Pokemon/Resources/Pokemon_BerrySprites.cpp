@@ -4,8 +4,7 @@
  *
  */
 
-#include <QtGlobal>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/ImageOpener.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
@@ -42,10 +41,10 @@ struct BerrySpriteDatabase{
             const int width = obj.find("width")->toInt();
             const int height = obj.find("height")->toInt();
             if (width <= 0){
-                throw FileException(nullptr, __PRETTY_FUNCTION__, "Invalid width.", m_path.toStdString());
+                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid width.", m_path.toStdString());
             }
             if (height <= 0){
-                throw FileException(nullptr, __PRETTY_FUNCTION__, "Invalid height.", m_path.toStdString());
+                throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid height.", m_path.toStdString());
             }
 
             BerrySprite sprite;
@@ -73,7 +72,7 @@ const BerrySprite& get_berry_sprite(const std::string& slug){
     const std::map<std::string, BerrySprite>& database = BerrySpriteDatabase::instance().m_slug_to_data;
     auto iter = database.find(slug);
     if (iter == database.end()){
-        PA_THROW_StringException("Berry slug not found in berry sprite database: " + slug);
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Berry slug not found in berry sprite database: " + slug);
     }
     return iter->second;
 }

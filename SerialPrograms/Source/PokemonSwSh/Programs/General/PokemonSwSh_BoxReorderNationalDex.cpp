@@ -5,7 +5,7 @@
  */
 
 #include <sstream>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/VideoFeed.h"
@@ -141,15 +141,18 @@ void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env){
 
     std::vector<std::string> current_order = read_all_pokemon(env, POKEMON_COUNT, LANGUAGE);
 
-    QJsonArray array = read_json_file(
-        RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-National.json"
-    ).array();
+    QString path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-National.json";
+    QJsonArray array = read_json_file(path).array();
 
     std::vector<std::string> slugs;
     for (const auto& item : array) {
         QString slug = item.toString();
         if (slug.size() <= 0) {
-            PA_THROW_StringException("Expected non-empty string for Pokemon slug.");
+            throw FileException(
+                &env.logger(), PA_CURRENT_FUNCTION,
+                "Expected non-empty string for Pokemon slug.",
+                path.toStdString()
+            );
         }
         slugs.emplace_back(slug.toUtf8().data());
     }

@@ -12,7 +12,6 @@
 #include <QCheckBox>
 #include <QScrollBar>
 #include <QLineEdit>
-#include "Common/Cpp/Exception.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Common/Qt/ExpressionEvaluator.h"

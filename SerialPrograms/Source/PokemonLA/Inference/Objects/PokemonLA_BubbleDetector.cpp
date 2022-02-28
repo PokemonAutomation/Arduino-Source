@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
@@ -31,7 +31,11 @@ public:
         );
         std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
         if (objects.size() != 1){
-            PA_THROW_StringException("Failed to find exactly one object in resource.");
+            throw FileException(
+                nullptr, PA_CURRENT_FUNCTION,
+                "Failed to find exactly one object in resource.",
+                m_path.toStdString()
+            );
         }
         set_subobject(objects[0]);
     }

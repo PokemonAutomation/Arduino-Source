@@ -4,8 +4,7 @@
  *
  */
 
-#include <QtGlobal>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Logging/LoggerQt.h"
@@ -25,7 +24,7 @@ namespace Pokemon{
 PokemonNameSelectData::PokemonNameSelectData(const std::vector<std::string>& slugs){
     for (const std::string& slug : slugs){
         if (slug.size() <= 0){
-            PA_THROW_StringException("Expected non-empty string for Pokemon slug.");
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Expected non-empty string for Pokemon slug.");
         }
 
         using namespace NintendoSwitch::PokemonSwSh;
@@ -48,7 +47,7 @@ PokemonNameSelectData::PokemonNameSelectData(const QString& json_file_slugs){
         QString slug = item.toString();
         std::string slug_str = slug.toUtf8().data();
         if (slug.size() <= 0){
-            PA_THROW_StringException("Expected non-empty string for Pokemon slug.");
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Expected non-empty string for Pokemon slug.");
         }
 
         using namespace NintendoSwitch::PokemonSwSh;

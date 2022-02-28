@@ -5,7 +5,7 @@
  */
 
 #include <QtGlobal>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Types.h"
 #include "PokemonBDSP_BasicCatcher.h"
@@ -103,7 +103,7 @@ bool StandardEncounterHandler::handle_standard_encounter(const DoublesShinyDetec
         m_session_stats.add_error();
         m_consecutive_failures++;
         if (m_consecutive_failures >= 3){
-            PA_THROW_StringException("3 consecutive failed encounter detections.");
+            throw OperationFailedException(m_console, "3 consecutive failed encounter detections.");
         }
         return false;
     }
@@ -164,7 +164,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         m_session_stats.add_error();
         m_consecutive_failures++;
         if (m_consecutive_failures >= 3){
-            PA_THROW_StringException("3 consecutive failed encounter detections.");
+            throw OperationFailedException(m_console, "3 consecutive failed encounter detections.");
         }
         return false;
     }
@@ -237,13 +237,25 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
             pbf_mash_button(m_console, BUTTON_B, 2 * TICKS_PER_SECOND);
             break;
         case CatchResult::OWN_FAINTED:
-            PA_THROW_StringException("Your " + STRING_POKEMON + " fainted after " + QString::number(catch_result.balls_used) + " balls.");
+            throw OperationFailedException(
+                m_console,
+                "Your " + STRING_POKEMON.toStdString() + " fainted after " + std::to_string(catch_result.balls_used) + " balls."
+            );
         case CatchResult::OUT_OF_BALLS:
-            PA_THROW_StringException("Unable to find the desired ball after throwing " + QString::number(catch_result.balls_used) + " of them. Did you run out?");
+            throw OperationFailedException(
+                m_console,
+                "Unable to find the desired ball after throwing " + std::to_string(catch_result.balls_used) + " of them. Did you run out?"
+            );
         case CatchResult::CANNOT_THROW_BALL:
-            PA_THROW_StringException("Unable to throw ball. Is the " + STRING_POKEMON + " semi-invulnerable?");
+            throw OperationFailedException(
+                m_console,
+                "Unable to throw ball. Is the " + STRING_POKEMON.toStdString() + " semi-invulnerable?"
+            );
         case CatchResult::TIMEOUT:
-            PA_THROW_StringException("Program has timed out. Did your lead " + STRING_POKEMON + " faint?");
+            throw OperationFailedException(
+                m_console,
+                "Program has timed out. Did your lead " + STRING_POKEMON.toStdString() + " faint?"
+            );
         }
         send_catch_notification(
             m_console,

@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -83,9 +83,8 @@ void CaughtPokemonScreen::leave_summary(){
         m_console.botbase().wait_for_all_requests();
         break;
     default:
-        m_console.log("Failed to detect caught menu.", COLOR_RED);
         dump_image(m_console, m_env.program_info(), "CaughtMenu", m_console.video().snapshot());
-        PA_THROW_StringException("Failed to detect caught menu.");
+        throw OperationFailedException(m_console, "Failed to detect caught menu.");
     }
 
     m_in_summary = false;
@@ -113,7 +112,7 @@ void CaughtPokemonScreen::process_detection(Detection detection){
     switch (detection){
     case SummaryShinySymbolDetector::Detection::NO_DETECTION:
         dump_image(m_console, m_env.program_info(), "SummaryScreen", m_console.video().snapshot());
-        PA_THROW_StringException("Failed to detect summary screen.");
+        throw OperationFailedException(m_console, "Failed to detect summary screen.");
     case SummaryShinySymbolDetector::Detection::NOT_SHINY:
         if (!mon.read){
             m_console.log("Not shiny.", COLOR_BLUE);
@@ -121,7 +120,7 @@ void CaughtPokemonScreen::process_detection(Detection detection){
             mon.read = true;
         }else if (mon.shiny){
             dump_image(m_console, m_env.program_info(), "InconsistentShiny", m_console.video().snapshot());
-            PA_THROW_StringException("Fatal Inconsistency: Expected to see a non-shiny.");
+        throw OperationFailedException(m_console, "Fatal Inconsistency: Expected to see a non-shiny.");
         }
         break;
     case SummaryShinySymbolDetector::Detection::SHINY:
@@ -131,7 +130,7 @@ void CaughtPokemonScreen::process_detection(Detection detection){
             mon.read = true;
         }else if (!mon.shiny){
             dump_image(m_console, m_env.program_info(), "InconsistentShiny", m_console.video().snapshot());
-            PA_THROW_StringException("Fatal Inconsistency: Expected to see a shiny.");
+            throw OperationFailedException(m_console, "Fatal Inconsistency: Expected to see a shiny.");
         }
         break;
     }

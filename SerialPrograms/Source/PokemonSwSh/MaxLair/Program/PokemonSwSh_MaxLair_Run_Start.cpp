@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -455,7 +455,7 @@ bool start_adventure(
             console_stats
         );
     }
-    PA_THROW_StringException("Invalid mode enum.");
+    throw InternalProgramError(&env.logger(), PA_CURRENT_FUNCTION, "Invalid mode enum.");
 }
 
 

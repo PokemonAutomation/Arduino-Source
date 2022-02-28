@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
@@ -105,7 +105,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
         env.update_stats();
 
         if (consecutive_failures >= 3){
-            PA_THROW_StringException("Failed 3 times in the row.");
+            throw OperationFailedException(env.console, "Failed 3 times in the row.");
         }
 
         if (reset){

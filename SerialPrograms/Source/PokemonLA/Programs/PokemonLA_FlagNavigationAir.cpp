@@ -245,7 +245,7 @@ bool FlagNavigationAir::run_state(
 }
 bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock timestamp){
     //  Need to get on Sneasler.
-    if (m_centerA.detected()){
+    if (m_centerA.detected() && timestamp - last_state_change() > std::chrono::seconds(3)){
         return run_state_action(State::GET_ON_SNEASLER);
     }
 

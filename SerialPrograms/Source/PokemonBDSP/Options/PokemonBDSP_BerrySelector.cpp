@@ -7,7 +7,6 @@
 #include <QComboBox>
 #include <QString>
 #include "Common/Compiler.h"
-#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Pokemon/Options/Pokemon_BerrySelectWidget.h"
 #include "Pokemon/Resources/Pokemon_BerryNames.h"

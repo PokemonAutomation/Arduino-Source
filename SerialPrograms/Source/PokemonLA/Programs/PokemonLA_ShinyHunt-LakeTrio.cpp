@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/OCR/OCR_Filtering.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
@@ -173,7 +173,7 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env){
                 );
                 consecutive_errors++;
                 if (consecutive_errors >= 3){
-                    PA_THROW_StringException("Failed to detect an encounter 3 times in the row.");
+                    throw OperationFailedException(env.console, "Failed to detect an encounter 3 times in the row.");
                 }
                 continue;
             }

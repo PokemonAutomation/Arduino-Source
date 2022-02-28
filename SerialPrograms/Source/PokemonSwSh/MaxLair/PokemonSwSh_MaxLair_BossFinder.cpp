@@ -5,7 +5,7 @@
  */
 
 #include "Common/Compiler.h"
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -138,7 +138,7 @@ public:
                 ? CaughtScreenAction::STOP_PROGRAM
                 : CaughtScreenAction::TAKE_NON_BOSS_SHINY_AND_CONTINUE;
         }
-        PA_THROW_StringException("Invalid enum.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid enum.");
     }
 
 
@@ -149,7 +149,7 @@ private:
                 return filter;
             }
         }
-        PA_THROW_StringException("Unrecognized boss slug: " + boss_slug);
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unrecognized boss slug: " + boss_slug);
     }
 
 private:
@@ -168,7 +168,7 @@ private:
 
 void MaxLairBossFinder::program(MultiSwitchProgramEnvironment& env){
     if (CONSOLES.HOST >= env.consoles.size()){
-        PA_THROW_StringException("Invalid Host Switch");
+        throw UserSetupError(env.logger(), "Invalid Host Switch");
     }
 
     env.run_in_parallel([&](ConsoleHandle& console){

@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "ShinyHuntTracker.h"
 
 namespace PokemonAutomation{
@@ -48,7 +48,7 @@ void ShinyHuntTracker::operator+=(ShinyType detection){
         m_encounters++;
         break;
     case ShinyType::MAYBE_SHINY:
-        PA_THROW_StringException("Attempted to add a MAYBE_SHINY to stats.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Attempted to add a MAYBE_SHINY to stats.");
     case ShinyType::UNKNOWN_SHINY:
         m_encounters++;
         m_unknown_shinies++;

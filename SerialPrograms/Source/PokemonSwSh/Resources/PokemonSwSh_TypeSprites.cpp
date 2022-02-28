@@ -4,9 +4,7 @@
  *
  */
 
-#include <QtGlobal>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Exception.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -59,7 +57,7 @@ TypeSprite::TypeSprite(const std::string& slug)
     m_sprite = QImage(path);
     if (m_sprite.isNull()){
         throw FileException(
-            nullptr, __PRETTY_FUNCTION__,
+            nullptr, PA_CURRENT_FUNCTION,
             "Unable to open file.",
             path.toStdString()
         );
@@ -114,7 +112,7 @@ const TypeSprite& get_type_sprite(PokemonType type){
     const TypeSpriteDatabase& database = TypeSpriteDatabase::instance();
     auto it = database.m_type_map.find(type);
     if (it == database.m_type_map.end()){
-        PA_THROW_StringException("Invalid type enum.");
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid type enum.");
     }
     return it->second;
 }

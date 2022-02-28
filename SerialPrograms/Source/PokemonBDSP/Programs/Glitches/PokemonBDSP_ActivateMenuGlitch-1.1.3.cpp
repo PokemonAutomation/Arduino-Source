@@ -5,7 +5,7 @@
  */
 
 #include <QtGlobal>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
@@ -60,8 +60,7 @@ void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env){
         { &detector }
     );
     if (ret < 0){
-        console.log("Map not detected after 2 seconds.", COLOR_RED);
-//        PA_THROW_StringException("Map not detected after 2 seconds.");
+        throw OperationFailedException(console, "Map not detected after 2 seconds.");
     }else{
         console.log("Detected map!", COLOR_BLUE);
     }

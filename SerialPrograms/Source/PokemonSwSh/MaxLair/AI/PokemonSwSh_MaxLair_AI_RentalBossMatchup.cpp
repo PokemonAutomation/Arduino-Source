@@ -5,9 +5,7 @@
  */
 
 #include <map>
-#include <QtGlobal>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Exception.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Pokemon.h"
@@ -31,11 +29,11 @@ struct MatchupDatabase{
     double get(const std::string& rental, const std::string& boss) const{
         auto iter0 = map.find(rental);
         if (iter0 == map.end()){
-            PA_THROW_StringException("Rental not found: " + rental);
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Rental not found: " + rental);
         }
         auto iter1 = iter0->second.find(boss);
         if (iter1 == iter0->second.end()){
-            PA_THROW_StringException("Boss not found: " + boss);
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Boss not found: " + rental);
         }
         return iter1->second;
     }
@@ -46,7 +44,7 @@ private:
         QJsonObject json = read_json_file(path).object();
         if (json.empty()){
             throw FileException(
-                nullptr, __PRETTY_FUNCTION__,
+                nullptr, PA_CURRENT_FUNCTION,
                 "Json is either empty or invalid.",
                 path.toStdString()
             );

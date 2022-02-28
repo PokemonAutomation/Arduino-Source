@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_CommonFramework_ImageStats_H
-#define PokemonAutomation_CommonFramework_ImageStats_H
+#ifndef PokemonAutomation_CommonFramework_ImageOpener_H
+#define PokemonAutomation_CommonFramework_ImageOpener_H
 
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
@@ -18,7 +18,7 @@ inline QImage open_image(const QString& path){
     if (!image.isNull()){
         return image;
     }
-    throw FileException(nullptr, __PRETTY_FUNCTION__, "Unable to open image.", path.toStdString());
+    throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to open image.", path.toStdString());
 }
 
 

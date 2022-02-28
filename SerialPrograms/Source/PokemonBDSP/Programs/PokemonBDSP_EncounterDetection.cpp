@@ -4,8 +4,7 @@
  *
  */
 
-#include <QtGlobal>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
@@ -174,7 +173,7 @@ bool StandardEncounterDetection::run_overrides(
         ShinyType shiny = side_shiny;
         if (shiny == ShinyType::MAYBE_SHINY){
 //            actions.emplace_back(EncounterAction::StopProgram, "");
-            PA_THROW_StringException("Cannot run encounter actions due to low confidence shiny detection.");
+            throw OperationFailedException(m_console, "Cannot run encounter actions due to low confidence shiny detection.");
         }
 
         //  Matched the filter.
@@ -229,7 +228,10 @@ EncounterActionFull StandardEncounterDetection::get_action_doubles(){
     m_console.log(str_right);
 
     if (action_left != action_right){
-        PA_THROW_StringException("Conflicting actions requested.\n" + str_left + "\n" + str_right);
+        throw OperationFailedException(
+            m_console,
+            "Conflicting actions requested.\n" + str_left.toStdString() + "\n" + str_right.toStdString()
+        );
     }
 
     bool auto_catch = false;
@@ -240,7 +242,7 @@ EncounterActionFull StandardEncounterDetection::get_action_doubles(){
 
     //  Double battle and someone is set to auto-catch.
     if (auto_catch && m_double_battle){
-        PA_THROW_StringException("Cannot auto-catch in a double battle.");
+        throw OperationFailedException(m_console, "Cannot auto-catch in a double battle.");
     }
 
     //  Otherwise, return the matching action.

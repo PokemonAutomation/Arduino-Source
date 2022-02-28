@@ -5,7 +5,7 @@
  */
 
 #include <map>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "PokemonSwSh_TypeMatchup.h"
 
 namespace PokemonAutomation{
@@ -98,7 +98,7 @@ const std::map<PokemonType, std::map<PokemonType, double>> TYPE_EFFECTIVENESS{
 double type_multiplier(PokemonType attack_type, PokemonType defend_type0, PokemonType defend_type1){
     auto iter = TYPE_EFFECTIVENESS.find(attack_type);
     if (iter == TYPE_EFFECTIVENESS.end()){
-        PA_THROW_StringException("Invalid Type Enum: " + std::to_string((int)attack_type));
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Type Enum: " + std::to_string((int)attack_type));
     }
     double multiplier = 1.0;
     const std::map<PokemonType, double>& overrides = iter->second;

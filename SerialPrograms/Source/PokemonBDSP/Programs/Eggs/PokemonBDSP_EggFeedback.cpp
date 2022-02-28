@@ -5,7 +5,7 @@
  */
 
 #include "Common/Compiler.h"
-#include "CommonFramework/Inference/InferenceException.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "CommonFramework/Inference/FrozenImageDetector.h"
@@ -48,9 +48,9 @@ void hatch_egg(ProgramEnvironment& env, ConsoleHandle& console){
             console.log("Egg is hatching!");
             break;
         case 1:
-            PA_THROW_InferenceException(console, "Frozen screen detected!");
+            throw OperationFailedException(console, "Frozen screen detected!");
         default:
-            PA_THROW_InferenceException(console, "No hatch detected after 8 minutes of spinning.");
+            throw OperationFailedException(console, "No hatch detected after 8 minutes of spinning.");
         }
     }while (false);
 
@@ -68,7 +68,7 @@ void hatch_egg(ProgramEnvironment& env, ConsoleHandle& console){
             { &dialog }
         );
         if (ret < 0){
-            PA_THROW_InferenceException(console, "End of hatch not detected after 30 seconds.");
+            throw OperationFailedException(console, "End of hatch not detected after 30 seconds.");
         }
         console.log("Egg finished hatching.");
         pbf_mash_button(console, BUTTON_B, 1 * TICKS_PER_SECOND);
@@ -94,8 +94,7 @@ void hatch_egg(ProgramEnvironment& env, ConsoleHandle& console){
             console.log("Returned to overworld.");
             return;
         case 1:
-            console.log("Detected prompt. Please turn off nicknaming.", COLOR_RED);
-            PA_THROW_StringException("Please turn off nicknaming.");
+            throw UserSetupError(console, "Detected prompt. Please turn off nicknaming.");
         default:
             console.log("Failed to detect overworld after 30 seconds. Did day/night change?", COLOR_RED);
 //            pbf_mash_button(console, BUTTON_ZL, 30 * TICKS_PER_SECOND);
@@ -140,7 +139,7 @@ void release(ProgramEnvironment& env, ConsoleHandle& console){
         }
         pbf_press_button(console, BUTTON_ZL, 20, 105);
     }
-    PA_THROW_InferenceException(console, "Unexpected dialogs when releasing.");
+    throw OperationFailedException(console, "Unexpected dialogs when releasing.");
 }
 
 

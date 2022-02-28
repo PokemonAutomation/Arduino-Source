@@ -4,7 +4,7 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
@@ -15,13 +15,14 @@ namespace ImageMatch{
 
 
 SubObjectTemplateMatcher::SubObjectTemplateMatcher(const char* path, double max_rmsd)
-    : m_object(RESOURCE_PATH() + path)
+    : m_path(RESOURCE_PATH() + path)
+    , m_object(m_path)
     , m_max_rmsd(max_rmsd)
     , m_matcher(m_object)
     , m_subobject_area_ratio(0)
 {
     if (m_object.isNull()){
-        PA_THROW_StringException(std::string("Unable to Open: ") + path);
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, std::string("Unable to Open: ") + path);
     }
 }
 

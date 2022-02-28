@@ -8,7 +8,6 @@
 #include <QJsonArray>
 #include <QJsonObject>
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/Exception.h"
 #include "QtJsonTools.h"
 
 namespace PokemonAutomation{
@@ -17,7 +16,7 @@ namespace PokemonAutomation{
 QJsonDocument read_json_file(const QString& path){
     QFile file(path);
     if (!file.open(QFile::ReadOnly)){
-        throw FileException(nullptr, __PRETTY_FUNCTION__, "Unable to open file.", path.toStdString());
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to open file.", path.toStdString());
     }
 //    auto data = file.readAll();
 //    return QJsonDocument::fromJson(data);
@@ -38,10 +37,10 @@ void write_json_file(const QString& path, const QJsonDocument& json){
 
     QFile file(path);
     if (!file.open(QFile::WriteOnly)){
-        throw FileException(nullptr, __PRETTY_FUNCTION__, "Unable to create file.", path.toStdString());
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to create file.", path.toStdString());
     }
     if (file.write(json_out.c_str(), json_out.size()) != (int)json_out.size()){
-        throw FileException(nullptr, __PRETTY_FUNCTION__, "Unable to write file.", path.toStdString());
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to write file.", path.toStdString());
     }
     file.close();
 }

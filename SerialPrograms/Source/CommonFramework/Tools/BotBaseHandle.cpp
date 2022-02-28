@@ -151,7 +151,7 @@ void BotBaseHandle::reset_unprotected(const QSerialPortInfo& port){
         std::unique_ptr<SerialConnection> connection(new SerialConnection(name, PABB_BAUD_RATE));
         m_botbase.reset(new PABotBase(m_logger, std::move(connection), nullptr));
         m_current_pabotbase.store(PABotBaseLevel::NOT_PABOTBASE, std::memory_order_release);
-    }catch (const StringException& e){
+    }catch (const SerialProtocolException& e){
         error = e.message();
     }
     if (error.empty()){
@@ -181,7 +181,8 @@ void BotBaseHandle::verify_protocol(){
     uint32_t version_hi = protocol / 100;
     uint32_t version_lo = protocol % 100;
     if (version_hi != PABB_PROTOCOL_VERSION / 100 || version_lo < PABB_PROTOCOL_VERSION % 100){
-        PA_THROW_StringException(
+        throw SerialProtocolException(
+            m_logger, PA_CURRENT_FUNCTION,
             "Incompatible version. Client: " + std::to_string(PABB_PROTOCOL_VERSION) + ", Device: " + std::to_string(protocol) + "<br>"
             "Please install the .hex that came with this version of the program."
         );
@@ -194,7 +195,8 @@ uint8_t BotBaseHandle::verify_pabotbase(){
     PABotBaseLevel type = program_id_to_botbase_level(program_id);
     m_current_pabotbase.store(type, std::memory_order_release);
     if (type < m_minimum_pabotbase){
-        PA_THROW_StringException(
+        throw SerialProtocolException(
+            m_logger, PA_CURRENT_FUNCTION,
             "PABotBase level not met. (" + program_name(program_id) + ")"
         );
     }
@@ -214,8 +216,8 @@ void BotBaseHandle::thread_body(){
             m_botbase->stop();
             emit on_stopped("");
             return;
-        }catch (const StringException& e){
-            error = e.message_qt();
+        }catch (SerialProtocolException& e){
+            error = QString::fromStdString(e.message());
         }
         if (!error.isEmpty()){
             m_botbase->stop();
@@ -235,8 +237,8 @@ void BotBaseHandle::thread_body(){
             version = Microcontroller::program_version(*m_botbase);
         }catch (InvalidConnectionStateException&){
             return;
-        }catch (const StringException& e){
-            error = e.message_qt();
+        }catch (SerialProtocolException& e){
+            error = QString::fromStdString(e.message());
         }
         if (error.isEmpty()){
             m_state.store(State::READY, std::memory_order_release);
@@ -293,8 +295,8 @@ void BotBaseHandle::thread_body(){
             str = NintendoSwitch::ticks_to_time(wallclock);
         }catch (InvalidConnectionStateException&){
             break;
-        }catch (const StringException& e){
-            error = e.message_qt();
+        }catch (SerialProtocolException& e){
+            error = QString::fromStdString(e.message());
         }
         if (error.isEmpty()){
             emit uptime_status("<font color=\"blue\">Up Time: " + QString::fromStdString(str) + "</font>");

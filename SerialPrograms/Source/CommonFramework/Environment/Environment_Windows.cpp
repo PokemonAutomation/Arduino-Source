@@ -6,7 +6,7 @@
 
 #ifdef _WIN32
 #include <Windows.h>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "Environment.h"
 
@@ -42,8 +42,7 @@ uint64_t x86_measure_rdtsc_ticks_per_sec(){
 
     GROUP_AFFINITY before_affinity;
     if (GetThreadGroupAffinity(thread, &before_affinity) == 0){
-        global_logger_tagged().log("Unable to read thread affinity.");
-        PA_THROW_StringException("Unable to read thread affinity.");
+        throw InternalSystemError(nullptr, PA_CURRENT_FUNCTION, "GetThreadGroupAffinity() failed: Unable to read thread affinity.");
     }
 
     KAFFINITY t = 1;
@@ -55,14 +54,13 @@ uint64_t x86_measure_rdtsc_ticks_per_sec(){
     GROUP_AFFINITY new_affinity = before_affinity;
     new_affinity.Mask = t;
     if (SetThreadGroupAffinity(thread, &new_affinity, &placeholder) == 0){
-        global_logger_tagged().log("Unable to set Affinity Mask.");
-        PA_THROW_StringException("Unable to set Affinity Mask.");
+        throw InternalSystemError(nullptr, PA_CURRENT_FUNCTION, "SetThreadGroupAffinity() failed: Unable to set Affinity Mask.");
+
     }
 
     LARGE_INTEGER frequency;
     if (!QueryPerformanceFrequency(&frequency)){
-        global_logger_tagged().log("Unable to measure clock speed.");
-        PA_THROW_StringException("Unable to measure clock speed.");
+        throw InternalSystemError(nullptr, PA_CURRENT_FUNCTION, "QueryPerformanceFrequency() failed: Unable to measure clock speed.");
     }
     uint64_t freq = frequency.QuadPart;
     freq >>= 4;
@@ -72,22 +70,19 @@ uint64_t x86_measure_rdtsc_ticks_per_sec(){
 
     LARGE_INTEGER start_timer;
     if (!QueryPerformanceCounter(&start_timer)){
-        global_logger_tagged().log("Unable to measure clock speed.");
-        PA_THROW_StringException("Unable to measure clock speed.");
+        throw InternalSystemError(nullptr, PA_CURRENT_FUNCTION, "QueryPerformanceCounter() failed: Unable to measure clock speed.");
     }
     LARGE_INTEGER current_timer;
     do {
         if (!QueryPerformanceCounter(&current_timer)){
-            global_logger_tagged().log("Unable to measure clock speed.");
-            PA_THROW_StringException("Unable to measure clock speed.");
+            throw InternalSystemError(nullptr, PA_CURRENT_FUNCTION, "QueryPerformanceCounter() failed: Unable to measure clock speed.");
         }
     }while ((uint64_t)current_timer.QuadPart - (uint64_t)start_timer.QuadPart < freq);
 
     uint64_t end_cycles = __rdtsc();
 
     if (SetThreadGroupAffinity(thread, &before_affinity, &placeholder) == 0){
-        global_logger_tagged().log("Unable to set Affinity Mask.");
-        PA_THROW_StringException("Unable to set Affinity Mask.");
+        throw InternalSystemError(nullptr, PA_CURRENT_FUNCTION, "SetThreadGroupAffinity() failed: Unable to set Affinity Mask.");
     }
 
     double cycle_dif = (double)(end_cycles - start_cycles);

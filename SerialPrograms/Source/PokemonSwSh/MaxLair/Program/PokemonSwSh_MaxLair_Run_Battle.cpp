@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
@@ -342,8 +342,7 @@ StateMachineAction throw_balls(
     if (balls != 0){
         pbf_press_button(console, BUTTON_A, 10, 125);
     }else{
-        console.log("Unable to find appropriate ball. Did you run out?", COLOR_RED);
-        PA_THROW_StringException("Unable to find appropriate ball. Did you run out?");
+        throw OperationFailedException(console, "Unable to find appropriate ball. Did you run out?");
     }
 
     ReadableQuantity999& stat = boss

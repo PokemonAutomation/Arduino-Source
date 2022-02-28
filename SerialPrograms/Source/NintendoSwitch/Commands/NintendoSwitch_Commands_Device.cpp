@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Cpp/Exception.h"
 #include "NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch_Messages_Device.h"
 

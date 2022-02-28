@@ -10,7 +10,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QComboBox>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/NoWheelComboBox.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
@@ -84,8 +84,8 @@ void LanguageOCR::load_json(const QJsonValue& json){
     QString str = json.toString();
     Language language;
     try{
-        language = language_code_to_enum(str.toUtf8().data());
-    }catch (const StringException&){
+        language = language_code_to_enum(str.toStdString());
+    }catch (const InternalProgramError&){
         return;
     }
 
