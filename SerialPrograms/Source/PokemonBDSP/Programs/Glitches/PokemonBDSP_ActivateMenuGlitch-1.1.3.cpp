@@ -6,7 +6,7 @@
 
 #include <QtGlobal>
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_MapDetector.h"

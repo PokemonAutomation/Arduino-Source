@@ -8,7 +8,7 @@
 #include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "PokemonBDSP_StartBattleDetector.h"
 
 #include <iostream>

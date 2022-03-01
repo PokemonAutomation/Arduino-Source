@@ -8,7 +8,7 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/OCR/OCR_Filtering.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Notification.h"

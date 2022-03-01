@@ -5,7 +5,7 @@
  */
 
 //#include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh_ShinyEncounterDetector.h"
 
@@ -113,16 +113,14 @@ ShinyType determine_shiny_status(
 
 
 ShinyDetectionResult detect_shiny_battle(
-    ProgramEnvironment& env,
-    LoggerQt& logger,
-    VideoFeed& feed, VideoOverlay& overlay,
+    ProgramEnvironment& env, ConsoleHandle& console,
     const ShinyDetectionBattle& battle_settings,
     std::chrono::seconds timeout,
     double detection_threshold
 ){
-    ShinyEncounterTracker tracker(logger, overlay, battle_settings);
+    ShinyEncounterTracker tracker(console, console, battle_settings);
     int result = wait_until(
-        env, logger, feed, overlay, timeout,
+        env, console, timeout,
         { &tracker }
     );
     if (result < 0){
@@ -130,7 +128,7 @@ ShinyDetectionResult detect_shiny_battle(
         return ShinyDetectionResult{ShinyType::UNKNOWN, QImage()};
     }
     ShinyType shiny_type = determine_shiny_status(
-        logger,
+        console,
         battle_settings,
         tracker.dialog_tracker(),
         tracker.sparkles_wild()

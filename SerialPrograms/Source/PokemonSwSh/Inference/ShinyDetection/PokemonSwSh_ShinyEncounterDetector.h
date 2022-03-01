@@ -17,6 +17,7 @@
 #include "PokemonSwSh_ShinySparkleSet.h"
 
 namespace PokemonAutomation{
+    class ConsoleHandle;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 using namespace Pokemon;
@@ -81,8 +82,7 @@ ShinyType determine_shiny_status(
 
 
 ShinyDetectionResult detect_shiny_battle(
-    ProgramEnvironment& env, LoggerQt& logger,
-    VideoFeed& feed, VideoOverlay& overlay,
+    ProgramEnvironment& env, ConsoleHandle& console,
     const ShinyDetectionBattle& battle_settings,
     std::chrono::seconds timeout,
     double detection_threshold = 2.0

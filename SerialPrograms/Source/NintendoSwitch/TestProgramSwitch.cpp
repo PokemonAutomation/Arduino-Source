@@ -22,7 +22,7 @@
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CommonFramework/Inference/TimeWindowStatTracker.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceSession.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/FrozenImageDetector.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"

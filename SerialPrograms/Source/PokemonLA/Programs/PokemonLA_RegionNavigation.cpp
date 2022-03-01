@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA/Inference/PokemonLA_MapDetector.h"

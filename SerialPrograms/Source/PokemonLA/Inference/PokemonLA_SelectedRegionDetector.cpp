@@ -6,7 +6,7 @@
 
 #include <QImage>
 #include "CommonFramework/ImageMatch/ImageDiff.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "PokemonLA_SelectedRegionDetector.h"
 
@@ -97,7 +97,7 @@ private:
 MapRegion detect_selected_region(ProgramEnvironment& env, ConsoleHandle& console){
     MapLocationDetector detector(console.video().snapshot());
     int ret = wait_until(
-        env, console, console, console,
+        env, console,
         std::chrono::seconds(2),
         { &detector }
     );

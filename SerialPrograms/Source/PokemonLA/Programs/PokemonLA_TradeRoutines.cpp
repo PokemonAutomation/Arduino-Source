@@ -8,7 +8,7 @@
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"

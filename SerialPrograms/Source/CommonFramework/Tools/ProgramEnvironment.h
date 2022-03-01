@@ -86,6 +86,7 @@ public:
     std::condition_variable& cv();
 
     void wait_for(std::chrono::milliseconds duration);
+    void wait_until(std::chrono::system_clock::time_point stop);
     void notify_all();
 
 

@@ -5,7 +5,7 @@
  */
 
 //#include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "PokemonBDSP_ShinyEncounterDetector.h"
 
 namespace PokemonAutomation{
@@ -173,18 +173,17 @@ void determine_shiny_status(
 
 
 void detect_shiny_battle(
-    ProgramEnvironment& env, LoggerQt& logger,
+    ProgramEnvironment& env, ConsoleHandle& console,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
-    VideoFeed& feed, VideoOverlay& overlay,
     const DetectionType& type,
     std::chrono::seconds timeout,
     double overall_threshold, double doubles_threshold
 ){
     BattleType battle_type = type.full_battle_menu ? BattleType::STANDARD : BattleType::STARTER;
-    ShinyEncounterTracker tracker(logger, overlay, battle_type);
+    ShinyEncounterTracker tracker(console, console, battle_type);
     int result = wait_until(
-        env, logger, feed, overlay, timeout,
+        env, console, timeout,
         { &tracker }
     );
     if (result < 0){
@@ -192,7 +191,7 @@ void detect_shiny_battle(
         return;
     }
     determine_shiny_status(
-        logger,
+        console,
         wild_result, your_result,
         tracker.dialog_tracker(),
         tracker.sparkles_wild_overall(),

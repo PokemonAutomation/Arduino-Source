@@ -250,10 +250,10 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/InferenceInfra/AudioInferenceSession.cpp
     Source/CommonFramework/InferenceInfra/AudioInferenceSession.h
     Source/CommonFramework/InferenceInfra/InferenceCallback.h
+    Source/CommonFramework/InferenceInfra/InferenceRoutines.cpp
+    Source/CommonFramework/InferenceInfra/InferenceRoutines.h
     Source/CommonFramework/InferenceInfra/VisualInferenceCallback.cpp
     Source/CommonFramework/InferenceInfra/VisualInferenceCallback.h
-    Source/CommonFramework/InferenceInfra/VisualInferenceRoutines.cpp
-    Source/CommonFramework/InferenceInfra/VisualInferenceRoutines.h
     Source/CommonFramework/InferenceInfra/VisualInferenceSession.cpp
     Source/CommonFramework/InferenceInfra/VisualInferenceSession.h
     Source/CommonFramework/Environment/Environment_Linux.cpp

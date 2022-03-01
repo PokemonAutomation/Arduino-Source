@@ -153,6 +153,19 @@ void ProgramEnvironment::wait_for(std::chrono::milliseconds duration){
 
     check_stopping();
 }
+void ProgramEnvironment::wait_until(std::chrono::system_clock::time_point stop){
+    check_stopping();
+
+    std::unique_lock<std::mutex> lg(m_data->m_lock);
+    m_data->m_cv.wait_until(
+        lg, stop,
+        [=]{
+            return std::chrono::system_clock::now() >= stop || is_stopping();
+        }
+    );
+
+    check_stopping();
+}
 void ProgramEnvironment::notify_all(){
     std::lock_guard<std::mutex> lg(m_data->m_lock);
     m_data->m_cv.notify_all();

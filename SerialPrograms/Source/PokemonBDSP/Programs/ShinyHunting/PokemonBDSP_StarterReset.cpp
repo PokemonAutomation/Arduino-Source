@@ -7,7 +7,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -187,7 +187,6 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
         detect_shiny_battle(
             env, env.console,
             result_wild, result_own,
-            env.console, env.console,
             YOUR_POKEMON,
             std::chrono::seconds(30)
         );

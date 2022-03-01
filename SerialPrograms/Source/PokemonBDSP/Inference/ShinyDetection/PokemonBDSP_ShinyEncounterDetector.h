@@ -10,12 +10,13 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "Pokemon/Pokemon_DataTypes.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
-#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogTracker.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
+#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogTracker.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
 #include "PokemonBDSP_ShinySparkleSet.h"
 
 namespace PokemonAutomation{
+    class ConsoleHandle;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 using namespace Pokemon;
@@ -105,10 +106,9 @@ void determine_shiny_status(
 
 
 void detect_shiny_battle(
-    ProgramEnvironment& env, LoggerQt& logger,
+    ProgramEnvironment& env, ConsoleHandle& console,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
-    VideoFeed& feed, VideoOverlay& overlay,
     const DetectionType& type,
     std::chrono::seconds timeout,
     double overall_threshold = 5.0,

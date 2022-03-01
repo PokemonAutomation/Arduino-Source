@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
@@ -157,7 +157,6 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env){
         detect_shiny_battle(
             env, env.console,
             result_wild, result_own,
-            env.console, env.console,
             WILD_POKEMON,
             std::chrono::seconds(30)
         );

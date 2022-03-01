@@ -7,7 +7,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -143,7 +143,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env){
 
         //  Detect shiny.
         ShinyDetectionResult result = detect_shiny_battle(
-            env, env.console, env.console, env.console,
+            env, env.console,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );

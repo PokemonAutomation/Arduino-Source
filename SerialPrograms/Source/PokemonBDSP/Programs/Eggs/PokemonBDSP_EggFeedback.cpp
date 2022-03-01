@@ -6,7 +6,7 @@
 
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "CommonFramework/Inference/FrozenImageDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
