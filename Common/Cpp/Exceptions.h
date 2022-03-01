@@ -58,7 +58,7 @@ public:
 
 
 //  Thrown by subroutines if they fail for an in-game reason.
-//  These included recoverable errors which can be consumed by the program.
+//  These include recoverable errors which can be consumed by the program.
 class OperationFailedException : public Exception{
 public:
 //    OperationFailedException(std::string message) : m_message(message) {}

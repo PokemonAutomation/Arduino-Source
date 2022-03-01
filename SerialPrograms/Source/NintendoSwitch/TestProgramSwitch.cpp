@@ -255,6 +255,19 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 
+
+    InferenceBoxScope box0(console, {0.925, 0.100, 0.014, 0.030});
+
+//    QImage screen("screenshot-20220228-121927882824.png");
+    QImage screen = feed.snapshot();
+
+    QImage image = extract_box(screen, box0);
+    ImageStats stats = image_stats(image);
+    cout << stats.average << stats.stddev << endl;
+    bool ok = is_white(stats);
+    cout << ok << endl;
+
+
 //    throw UserSetupError(env.logger(), "asdf");
 //    throw OperationFailedException(env.logger(), "asdf");
 

@@ -177,13 +177,13 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env){
 
         //  Make sure both consoles have selected something.
         bool host_ok, recv_ok;
-        InferenceBoxScope box0(host, {0.920, 0.100, 0.020, 0.030});
-        InferenceBoxScope box1(recv, {0.920, 0.100, 0.020, 0.030});
+        InferenceBoxScope box0(host, {0.925, 0.100, 0.014, 0.030});
+        InferenceBoxScope box1(recv, {0.925, 0.100, 0.014, 0.030});
         env.run_in_parallel([&](ConsoleHandle& console){
             QImage image = extract_box(console.video().snapshot(), box0);
             ImageStats stats = image_stats(image);
             bool ok = is_white(stats);
-            if (console.index() == 0){
+            if (host.index() == console.index()){
                 host_ok = ok;
             }else{
                 recv_ok = ok;

@@ -96,8 +96,16 @@ EscapeFromAttack::EscapeFromAttack(
         return false;
     });
     register_state_command(State::DASH_FORWARD, [=](){
-        m_console.log("Dashing forward...");
+        bool delay_dash = (State)last_state() == State::SNEASLER_ON;
+        if (delay_dash){
+            m_console.log("Dashing forward... (delayed due to being on Sneasler)");
+        }else{
+            m_console.log("Dashing forward...");
+        }
         m_active_command->dispatch([=](const BotBaseContext& context){
+            if (delay_dash){
+                pbf_move_left_joystick(context, 128, 0, 125, 0);
+            }
             pbf_mash_button(context, BUTTON_B, 300 * TICKS_PER_SECOND);
         });
         return false;

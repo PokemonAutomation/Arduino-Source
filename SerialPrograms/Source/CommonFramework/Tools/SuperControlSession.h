@@ -59,7 +59,7 @@ protected:
 
 
 protected:
-    size_t current_state() const{ return m_state; }
+    size_t last_state() const{ return m_last_state; }
     WallClock last_state_change() const{ return m_last_state_change; }
 
     //  Return true if we should stop.
@@ -89,7 +89,7 @@ private:
 
 private:
     //  Run-time state.
-    size_t m_state;
+    size_t m_last_state;
     WallClock m_last_state_change;
 };
 

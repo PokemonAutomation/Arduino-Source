@@ -8,9 +8,9 @@
 #include "CameraImplementations.h"
 
 #if QT_VERSION_MAJOR == 5
-#include "Qt5CameraWidget.h"
+#include "CameraWidgetQt5.h"
 #elif QT_VERSION_MAJOR == 6
-#include "Qt6CameraWidget.h"
+#include "CameraWidgetQt6.h"
 #endif
 
 

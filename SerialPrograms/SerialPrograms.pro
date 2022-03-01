@@ -213,8 +213,8 @@ SOURCES += \
     Source/CommonFramework/VideoPipeline/CameraImplementations.cpp \
     Source/CommonFramework/VideoPipeline/CameraSelector.cpp \
     Source/CommonFramework/VideoPipeline/CameraSelectorWidget.cpp \
-    Source/CommonFramework/VideoPipeline/Qt5CameraWidget.cpp \
-    Source/CommonFramework/VideoPipeline/Qt6CameraWidget.cpp \
+    Source/CommonFramework/VideoPipeline/CameraWidgetQt5.cpp \
+    Source/CommonFramework/VideoPipeline/CameraWidgetQt6.cpp \
     Source/CommonFramework/VideoPipeline/VideoDisplayWidget.cpp \
     Source/CommonFramework/VideoPipeline/VideoOverlayWidget.cpp \
     Source/CommonFramework/Windows/ButtonDiagram.cpp \
@@ -792,8 +792,8 @@ HEADERS += \
     Source/CommonFramework/VideoPipeline/CameraInfo.h \
     Source/CommonFramework/VideoPipeline/CameraSelector.h \
     Source/CommonFramework/VideoPipeline/CameraSelectorWidget.h \
-    Source/CommonFramework/VideoPipeline/Qt5CameraWidget.h \
-    Source/CommonFramework/VideoPipeline/Qt6CameraWidget.h \
+    Source/CommonFramework/VideoPipeline/CameraWidgetQt5.h \
+    Source/CommonFramework/VideoPipeline/CameraWidgetQt6.h \
     Source/CommonFramework/VideoPipeline/VideoDisplayWidget.h \
     Source/CommonFramework/VideoPipeline/VideoOverlayWidget.h \
     Source/CommonFramework/VideoPipeline/VideoWidget.h \

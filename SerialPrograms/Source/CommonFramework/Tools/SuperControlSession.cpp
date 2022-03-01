@@ -59,12 +59,12 @@ bool SuperControlSession::run_state_action(size_t state){
     }
 
     //  If we're already in the state and a command is running, don't overwrite it.
-    if (state == m_state && m_active_command->command_is_running()){
+    if (state == m_last_state && m_active_command->command_is_running()){
         return false;
     }
 
     //  Run the state.
-    m_state = state;
+    m_last_state = state;
     m_last_state_change = std::chrono::system_clock::now();
     return iter->second();
 }
@@ -92,7 +92,7 @@ void SuperControlSession::run_session(){
     WallClock now = std::chrono::system_clock::now();
     WallClock next_tick = now + m_state_period;
 
-    m_state = 0;
+    m_last_state = 0;
 
     while (true){
         //  Check stop conditions.
