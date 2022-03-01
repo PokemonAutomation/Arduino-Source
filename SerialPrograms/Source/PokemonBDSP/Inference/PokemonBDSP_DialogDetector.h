@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonBDSP_BattleDialogDetector_H
 
 #include "CommonFramework/Inference/VisualDetector.h"
-#include "CommonFramework/Inference/VisualInferenceCallback.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "PokemonBDSP_SelectionArrow.h"
 
 namespace PokemonAutomation{

@@ -9,7 +9,7 @@
 
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Inference/VisualInferenceCallback.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

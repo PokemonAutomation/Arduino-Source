@@ -7,8 +7,8 @@
 #include <QtGlobal>
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
-#include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonBDSP/PokemonBDSP_Settings.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"

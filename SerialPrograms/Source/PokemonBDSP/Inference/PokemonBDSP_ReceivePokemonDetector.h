@@ -11,9 +11,9 @@
 #ifndef PokemonAutomation_PokemonBDSP_ReceivePokemonDetector_H
 #define PokemonAutomation_PokemonBDSP_ReceivePokemonDetector_H
 
-#include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Logging/LoggerQt.h"
-#include "CommonFramework/Inference/VisualInferenceCallback.h"
+#include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonLA_DialogDetector_H
 
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Inference/VisualInferenceCallback.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 
 namespace PokemonAutomation{
@@ -17,7 +17,11 @@ namespace PokemonLA{
 
 class DialogDetector : public VisualInferenceCallback{
 public:
-    DialogDetector(LoggerQt& logger, VideoOverlay& overlay);
+    DialogDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected);
+
+    bool detected() const{
+        return m_detected.load(std::memory_order_acquire);
+    }
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(
@@ -26,6 +30,8 @@ public:
     ) override;
 
 private:
+    bool m_stop_on_detected;
+    std::atomic<bool> m_detected;
     ImageFloatBox m_title_top;
     ImageFloatBox m_title_bottom;
     ImageFloatBox m_top_white;

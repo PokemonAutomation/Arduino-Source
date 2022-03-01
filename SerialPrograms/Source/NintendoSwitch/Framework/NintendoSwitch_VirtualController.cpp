@@ -204,6 +204,7 @@ void VirtualController::thread_loop(){
                 );
                 m_botbase.try_send_request(request);
             }catch (ProgramCancelledException&){
+            }catch (ProgramFinishedException&){
             }catch (InvalidConnectionStateException&){
             }
         }while (false);

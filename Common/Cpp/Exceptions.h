@@ -38,6 +38,13 @@ public:
 };
 
 
+//  Thrown when the program requests a normal stop to the program.
+class ProgramFinishedException : public Exception{
+public:
+    virtual const char* name() const override{ return "ProgramFinishedException"; }
+};
+
+
 //  Thrown by BotBase connections when a command is issued while the connection
 //  is in a state that isn't accepting commands.
 //    - This should not be consumed except by the infra.

@@ -6,7 +6,7 @@
 
 #include <QImage>
 #include "CommonFramework/ImageMatch/ImageDiff.h"
-#include "CommonFramework/Inference/VisualInferenceRoutines.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "PokemonLA_SelectedRegionDetector.h"
 

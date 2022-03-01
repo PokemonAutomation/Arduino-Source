@@ -12,7 +12,7 @@
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/Inference/VisualInferenceCallback.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "PokemonSwSh/Programs/OverworldBot/PokemonSwSh_OverworldTrajectory.h"
 
 namespace PokemonAutomation{

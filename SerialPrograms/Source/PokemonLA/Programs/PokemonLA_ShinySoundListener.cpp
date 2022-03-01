@@ -12,7 +12,7 @@
 #include "PokemonLA_ShinySoundListener.h"
 #include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
-#include "CommonFramework/Inference/AudioInferenceSession.h"
+#include "CommonFramework/InferenceInfra/AudioInferenceSession.h"
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
 
 #include <set>
@@ -65,20 +65,18 @@ void ShinySoundListener::program(SingleSwitchProgramEnvironment& env){
         return;
     }
     
-    ShinySoundDetector detector(env.console, sampleRate);
+    ShinySoundDetector detector(env.console, sampleRate, false);
 
-#if 0
+#if 1
     AsyncAudioInferenceSession session(env, env.console, audioFeed);
     session += detector;
 
-    pbf_wait(env.console, 125 * 30);
-    env.wait_for(std::chrono::milliseconds(30000));
+    env.wait_for(std::chrono::seconds(300));
 
-    if (session.stop()){
-        std::cout << "Found shiny!" << std::endl;
-    }
+    session.stop();
 #endif
 
+#if 0
     uint64_t lastTimestamp = ~(uint64_t)0;
     // Stores new spectrums from audio feed. The newest spectrum (with largest timestamp) is at
     // the front of the vector.
@@ -112,6 +110,7 @@ void ShinySoundListener::program(SingleSwitchProgramEnvironment& env){
             std::cout << "FOUND" << std::endl;
         }
     }
+#endif
 
     std::cout << "Audio test program finished." << std::endl;
 }

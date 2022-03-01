@@ -7,7 +7,9 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Inference/VisualInferenceRoutines.h"
+//#include "CommonFramework/Tools/InterruptableCommands.h"
+//#include "CommonFramework/Tools/SuperControlSession.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -41,10 +43,12 @@ MoneyFarmerHighlands::MoneyFarmerHighlands(const NuggetFarmerHighlands_Descripto
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
-        &NOTIFICATION_ERROR_RECOVERABLE,
+//        &SHINY_DETECTED.NOTIFICATIONS,
+//        &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+//    PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -76,6 +80,7 @@ std::unique_ptr<StatsTracker> MoneyFarmerHighlands::make_stats() const{
 
 
 
+
 void mash_A_until_end_of_battle(ProgramEnvironment& env, ConsoleHandle& console){
     OverworldDetector detector(console, console);
     int ret = run_until(
@@ -90,6 +95,65 @@ void mash_A_until_end_of_battle(ProgramEnvironment& env, ConsoleHandle& console)
     }
     console.log("Returned to overworld.");
 }
+
+
+#if 0
+class MoneyFarmerHighlands::RunRoute : public SuperControlSession{
+public:
+    RunRoute(ProgramEnvironment& env, ConsoleHandle& console)
+        : SuperControlSession(env, console)
+        , m_dialog_detector(console, console, false)
+    {
+        *this += m_dialog_detector;
+        register_state_command((size_t)State::NOT_STARTED, [=](){
+            m_active_command->dispatch([=](const BotBaseContext& context){
+                pbf_move_left_joystick(context, 0, 212, 50, 0);
+                pbf_press_button(context, BUTTON_B, 495, 80);
+
+                pbf_move_left_joystick(context, 224, 0, 50, 0);
+//                    pbf_press_button(context, BUTTON_B, 350, 80);
+                pbf_press_button(context, BUTTON_B, 80, 0);
+                for (size_t c = 0; c < 7; c++){
+                    pbf_press_button(context, BUTTON_A | BUTTON_B, 5, 0);
+                    pbf_press_button(context, BUTTON_B, 5, 0);
+                }
+                pbf_press_button(context, BUTTON_B, 200, 80);
+                pbf_wait(context, 80);
+
+                pbf_move_left_joystick(context, 0, 64, 50, 0);
+                pbf_press_button(context, BUTTON_B, 250, 80);
+
+                pbf_move_left_joystick(context, 0, 48, 50, 0);
+                pbf_press_button(context, BUTTON_B, 270, 0);
+
+                pbf_move_left_joystick(context, 64, 255, 50, 0);
+                pbf_press_button(context, BUTTON_B, 150, 250);
+
+//                pbf_move_right_joystick(context, 0, 128, 200, 125);
+            });
+            return false;
+        });
+    }
+
+    virtual bool run_state(AsyncCommandSession& commands, WallClock timestamp) override{
+        if (last_state() == (size_t)State::NOT_STARTED){
+            return run_state_action((size_t)State::RUNNING);
+        }
+        if (m_dialog_detector.detected()){
+            return true;
+        }
+        return !m_active_command->command_is_running();
+    }
+
+private:
+    enum class State{
+        NOT_STARTED,
+        RUNNING,
+    };
+    DialogDetector m_dialog_detector;
+};
+#endif
+
 
 
 void MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
@@ -128,7 +192,7 @@ void MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
 
     env.console.log("Traveling to Charm's location...");
     {
-        DialogDetector dialog_detector(env.console, env.console);
+        DialogDetector dialog_detector(env.console, env.console, true);
         //  TODO: Add shiny sound detector.
         int ret = run_until(
             env, env.console,

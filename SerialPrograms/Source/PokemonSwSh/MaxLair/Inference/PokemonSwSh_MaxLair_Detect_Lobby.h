@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_Detect_Lobby_H
 
 #include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/Inference/VisualInferenceCallback.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/FrozenImageDetector.h"
 
 namespace PokemonAutomation{

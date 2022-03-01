@@ -7,7 +7,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
-#include "CommonFramework/Inference/VisualInferenceRoutines.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"

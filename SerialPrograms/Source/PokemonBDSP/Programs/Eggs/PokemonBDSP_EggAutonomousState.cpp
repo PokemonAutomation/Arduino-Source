@@ -9,7 +9,7 @@
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/Inference/VisualInferenceRoutines.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
 #include "CommonFramework/Inference/FrozenImageDetector.h"
 #include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"

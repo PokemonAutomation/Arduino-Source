@@ -9,7 +9,7 @@
 
 #include <string>
 #include "CommonFramework/Tools/VideoOverlaySet.h"
-#include "CommonFramework/Inference/VisualInferenceCallback.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
     class LoggerQt;

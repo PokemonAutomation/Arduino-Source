@@ -9,7 +9,7 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
-#include "CommonFramework/Inference/VisualInferenceRoutines.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch_GameEntry.h"

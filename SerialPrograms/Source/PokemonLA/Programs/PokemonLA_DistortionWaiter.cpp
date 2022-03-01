@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Inference/VisualInferenceRoutines.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"

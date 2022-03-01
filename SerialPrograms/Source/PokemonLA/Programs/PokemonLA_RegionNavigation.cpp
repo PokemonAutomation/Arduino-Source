@@ -6,8 +6,8 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
-#include "CommonFramework/Inference/VisualInferenceRoutines.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA/Inference/PokemonLA_MapDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"

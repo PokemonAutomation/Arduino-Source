@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_StartBattleDetector_H
 #define PokemonAutomation_PokemonSwSh_StartBattleDetector_H
 
-#include "CommonFramework/Inference/VisualInferenceCallback.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogDetector.h"
 
 namespace PokemonAutomation{

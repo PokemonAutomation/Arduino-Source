@@ -7,7 +7,7 @@
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
-#include "CommonFramework/Inference/VisualInferenceRoutines.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
 #include "CommonFramework/Inference/FrozenImageDetector.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_RaidCatchDetector.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"

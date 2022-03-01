@@ -10,7 +10,7 @@
 #include <memory>
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Inference/VisualDetector.h"
-#include "CommonFramework/Inference/VisualInferenceCallback.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

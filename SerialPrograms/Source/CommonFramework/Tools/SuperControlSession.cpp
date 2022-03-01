@@ -5,8 +5,8 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Inference/VisualInferenceSession.h"
-#include "CommonFramework/Inference/AudioInferenceSession.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceSession.h"
+#include "CommonFramework/InferenceInfra/AudioInferenceSession.h"
 #include "ConsoleHandle.h"
 #include "InterruptableCommands.h"
 #include "SuperControlSession.h"
@@ -31,6 +31,7 @@ SuperControlSession::SuperControlSession(
     , m_state_period(state_period)
     , m_visual_period(visual_period)
     , m_audio_period(audio_period)
+    , m_last_state(0)
     , m_last_state_change(std::chrono::system_clock::now())
 {}
 

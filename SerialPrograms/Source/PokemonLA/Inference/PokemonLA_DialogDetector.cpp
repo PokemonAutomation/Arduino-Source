@@ -19,8 +19,9 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-DialogDetector::DialogDetector(LoggerQt& logger, VideoOverlay& overlay)
+DialogDetector::DialogDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected)
     : VisualInferenceCallback("DialogDetector")
+    , m_stop_on_detected(stop_on_detected)
     , m_title_top   (0.295, 0.722, 0.100, 0.005)
     , m_title_bottom(0.295, 0.765, 0.100, 0.005)
     , m_top_white   (0.500, 0.760, 0.200, 0.020)
@@ -65,7 +66,10 @@ bool DialogDetector::process_frame(
     m_arc_phone.process_frame(frame, timestamp);
     hits += !m_arc_phone.detected();
 
-    return hits >= 5;
+    bool detected = hits >= 5;
+    m_detected.store(detected, std::memory_order_release);
+
+    return detected && m_stop_on_detected;
 }
 
 

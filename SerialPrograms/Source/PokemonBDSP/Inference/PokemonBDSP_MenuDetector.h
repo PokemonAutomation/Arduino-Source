@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonBDSP_MenuDetector_H
 
 #include "CommonFramework/Inference/VisualDetector.h"
-#include "CommonFramework/Inference/VisualInferenceCallback.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

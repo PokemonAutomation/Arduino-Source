@@ -51,7 +51,7 @@ void RunnableComputerProgramWidget::run_program(){
         this, &RunnableComputerProgramWidget::signal_cancel,
         &env, [&]{
             m_state.store(ProgramState::STOPPING, std::memory_order_release);
-            env.signal_stop();
+            emit env.signal_stop();
         },
         Qt::DirectConnection
     );
@@ -65,6 +65,7 @@ void RunnableComputerProgramWidget::run_program(){
         instance.program(env);
         m_logger.log("Ending Program...");
     }catch (ProgramCancelledException&){
+    }catch (ProgramFinishedException&){
     }catch (InvalidConnectionStateException&){
     }catch (UserSetupError& e){
         emit signal_error(QString::fromStdString(e.message()));

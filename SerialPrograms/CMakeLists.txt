@@ -229,9 +229,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ImageTools/SolidColorTest.h
     Source/CommonFramework/Inference/AnomalyDetector.cpp
     Source/CommonFramework/Inference/AnomalyDetector.h
-    Source/CommonFramework/Inference/AudioInferenceCallback.h
-    Source/CommonFramework/Inference/AudioInferenceSession.cpp
-    Source/CommonFramework/Inference/AudioInferenceSession.h
     Source/CommonFramework/Inference/BlackBorderDetector.cpp
     Source/CommonFramework/Inference/BlackBorderDetector.h
     Source/CommonFramework/Inference/BlackScreenDetector.cpp
@@ -249,12 +246,16 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Inference/StatAccumulator.h
     Source/CommonFramework/Inference/TimeWindowStatTracker.h
     Source/CommonFramework/Inference/VisualDetector.h
-    Source/CommonFramework/Inference/VisualInferenceCallback.cpp
-    Source/CommonFramework/Inference/VisualInferenceCallback.h
-    Source/CommonFramework/Inference/VisualInferenceRoutines.cpp
-    Source/CommonFramework/Inference/VisualInferenceRoutines.h
-    Source/CommonFramework/Inference/VisualInferenceSession.cpp
-    Source/CommonFramework/Inference/VisualInferenceSession.h
+    Source/CommonFramework/InferenceInfra/AudioInferenceCallback.h
+    Source/CommonFramework/InferenceInfra/AudioInferenceSession.cpp
+    Source/CommonFramework/InferenceInfra/AudioInferenceSession.h
+    Source/CommonFramework/InferenceInfra/InferenceCallback.h
+    Source/CommonFramework/InferenceInfra/VisualInferenceCallback.cpp
+    Source/CommonFramework/InferenceInfra/VisualInferenceCallback.h
+    Source/CommonFramework/InferenceInfra/VisualInferenceRoutines.cpp
+    Source/CommonFramework/InferenceInfra/VisualInferenceRoutines.h
+    Source/CommonFramework/InferenceInfra/VisualInferenceSession.cpp
+    Source/CommonFramework/InferenceInfra/VisualInferenceSession.h
     Source/CommonFramework/Environment/Environment_Linux.cpp
     Source/CommonFramework/Environment/Environment_Windows.cpp
     Source/CommonFramework/Environment/Environment.cpp
@@ -842,6 +843,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/PokemonLA_TradeRoutines.h
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.h
+    Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.cpp
+    Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.h
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.cpp
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.h
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.cpp

@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Inference/VisualInferenceSession.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceSession.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"

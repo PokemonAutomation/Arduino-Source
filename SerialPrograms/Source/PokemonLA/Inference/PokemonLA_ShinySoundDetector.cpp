@@ -22,11 +22,11 @@ namespace PokemonLA{
 
 
 
-ShinySoundDetector::ShinySoundDetector(LoggerQt& logger, int sampleRate)
+ShinySoundDetector::ShinySoundDetector(LoggerQt& logger, int sampleRate, bool stop_on_detected)
     : AudioInferenceCallback("ShinySoundDetector")
     , m_logger(logger)
+    , m_stop_on_detected(stop_on_detected)
 {
-    // TODO: move the template file to the resource folder
     QString shinyFilename = RESOURCE_PATH() + "PokemonLA/shiny." + QString::number(sampleRate) + ".wav";
 
     m_matcher = std::make_unique<SpectrogramMatcher>(shinyFilename, SpectrogramMatcher::Mode::SPIKE_CONV, sampleRate);
@@ -65,7 +65,7 @@ bool ShinySoundDetector::process_spectrums(
             // called again on a newer batch of spectrums, m_matcher is happy.
             m_matcher->skip(std::vector<std::shared_ptr<const AudioSpectrum>>(newSpectrums.begin(), 
                 newSpectrums.begin() + std::distance(it+1, newSpectrums.rend())));
-            return true;
+            return m_stop_on_detected;
         }
     }
 

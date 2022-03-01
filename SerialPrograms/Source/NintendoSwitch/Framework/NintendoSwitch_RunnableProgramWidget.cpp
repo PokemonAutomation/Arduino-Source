@@ -158,6 +158,7 @@ void RunnableSwitchProgramWidget::run_program(){
         m_setup->wait_for_all_requests();
         m_logger.log("Ending Program...");
     }catch (ProgramCancelledException&){
+    }catch (ProgramFinishedException&){
     }catch (InvalidConnectionStateException&){
     }catch (UserSetupError& e){
         emit signal_error(QString::fromStdString(e.message()));

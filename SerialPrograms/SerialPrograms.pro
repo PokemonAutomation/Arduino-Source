@@ -141,7 +141,6 @@ SOURCES += \
     Source/CommonFramework/ImageTools/ImageStats.cpp \
     Source/CommonFramework/ImageTools/SolidColorTest.cpp \
     Source/CommonFramework/Inference/AnomalyDetector.cpp \
-    Source/CommonFramework/Inference/AudioInferenceSession.cpp \
     Source/CommonFramework/Inference/BlackBorderDetector.cpp \
     Source/CommonFramework/Inference/BlackScreenDetector.cpp \
     Source/CommonFramework/Inference/FrozenImageDetector.cpp \
@@ -149,9 +148,10 @@ SOURCES += \
     Source/CommonFramework/Inference/ImageTools.cpp \
     Source/CommonFramework/Inference/SpectrogramMatcher.cpp \
     Source/CommonFramework/Inference/StatAccumulator.cpp \
-    Source/CommonFramework/Inference/VisualInferenceCallback.cpp \
-    Source/CommonFramework/Inference/VisualInferenceRoutines.cpp \
-    Source/CommonFramework/Inference/VisualInferenceSession.cpp \
+    Source/CommonFramework/InferenceInfra/AudioInferenceSession.cpp \
+    Source/CommonFramework/InferenceInfra/VisualInferenceCallback.cpp \
+    Source/CommonFramework/InferenceInfra/VisualInferenceRoutines.cpp \
+    Source/CommonFramework/InferenceInfra/VisualInferenceSession.cpp \
     Source/CommonFramework/Language.cpp \
     Source/CommonFramework/Logging/FileWindowLogger.cpp \
     Source/CommonFramework/Logging/LoggerQt.cpp \
@@ -398,6 +398,7 @@ SOURCES += \
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_ShinySoundDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.cpp \
+    Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.cpp \
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.cpp \
     Source/PokemonLA/Panels_PokemonLA.cpp \
     Source/PokemonLA/PokemonLA_Settings.cpp \
@@ -708,8 +709,6 @@ HEADERS += \
     Source/CommonFramework/ImageTools/ImageStats.h \
     Source/CommonFramework/ImageTools/SolidColorTest.h \
     Source/CommonFramework/Inference/AnomalyDetector.h \
-    Source/CommonFramework/Inference/AudioInferenceCallback.h \
-    Source/CommonFramework/Inference/AudioInferenceSession.h \
     Source/CommonFramework/Inference/BlackBorderDetector.h \
     Source/CommonFramework/Inference/BlackScreenDetector.h \
     Source/CommonFramework/Inference/FrozenImageDetector.h \
@@ -720,9 +719,12 @@ HEADERS += \
     Source/CommonFramework/Inference/StatAccumulator.h \
     Source/CommonFramework/Inference/TimeWindowStatTracker.h \
     Source/CommonFramework/Inference/VisualDetector.h \
-    Source/CommonFramework/Inference/VisualInferenceCallback.h \
-    Source/CommonFramework/Inference/VisualInferenceRoutines.h \
-    Source/CommonFramework/Inference/VisualInferenceSession.h \
+    Source/CommonFramework/InferenceInfra/AudioInferenceCallback.h \
+    Source/CommonFramework/InferenceInfra/AudioInferenceSession.h \
+    Source/CommonFramework/InferenceInfra/InferenceCallback.h \
+    Source/CommonFramework/InferenceInfra/VisualInferenceCallback.h \
+    Source/CommonFramework/InferenceInfra/VisualInferenceRoutines.h \
+    Source/CommonFramework/InferenceInfra/VisualInferenceSession.h \
     Source/CommonFramework/Language.h \
     Source/CommonFramework/Logging/FileWindowLogger.h \
     Source/CommonFramework/Logging/LoggerQt.h \
@@ -1020,6 +1022,7 @@ HEADERS += \
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h \
     Source/PokemonLA/Inference/PokemonLA_ShinySoundDetector.h \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.h \
+    Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.h \
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.h \
     Source/PokemonLA/Panels_PokemonLA.h \
     Source/PokemonLA/PokemonLA_Settings.h \

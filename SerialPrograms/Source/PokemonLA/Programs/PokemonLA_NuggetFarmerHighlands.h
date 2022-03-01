@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -33,6 +34,9 @@ private:
 
 private:
     class Stats;
+    class RunRoute;
+
+    ShinyDetectedActionOption SHINY_DETECTED;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;

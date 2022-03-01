@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_ShinyEncounterDetector_H
 
 #include "CommonFramework/Tools/ProgramEnvironment.h"
-#include "CommonFramework/Inference/VisualInferenceCallback.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "Pokemon/Pokemon_DataTypes.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"

@@ -8,7 +8,7 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
-#include "CommonFramework/Inference/VisualInferenceSession.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceSession.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "PokemonSwSh_EncounterDetection.h"
 

@@ -5,7 +5,7 @@
  */
 
 //#include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Inference/VisualInferenceRoutines.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 #include "PokemonSwSh_ShinyEncounterDetector.h"
 

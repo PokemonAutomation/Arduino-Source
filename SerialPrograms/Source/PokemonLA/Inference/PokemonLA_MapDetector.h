@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonLA_MapDetector_H
 
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Inference/VisualInferenceCallback.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -168,12 +168,10 @@ void send_encounter_notification(
             session_stats_str += frequencies->dump_sorted_map("");
         }
         if (!session_stats_str.isEmpty()){
-            QJsonObject field;
             embeds.emplace_back("Session Stats", std::move(session_stats_str));
         }
     }
     if (alltime_stats){
-        QJsonObject field;
         embeds.emplace_back("All Time Stats", QString::fromStdString(alltime_stats->to_str()));
     }
 

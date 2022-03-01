@@ -11,7 +11,7 @@
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
-#include "CommonFramework/Inference/VisualInferenceCallback.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h"
 
 namespace PokemonAutomation{
