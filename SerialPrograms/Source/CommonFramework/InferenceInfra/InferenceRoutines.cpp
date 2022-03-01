@@ -37,7 +37,8 @@ int wait_until(
     std::chrono::milliseconds period
 ){
     std::map<InferenceCallback*, size_t> map;
-    InferenceCallback* trigger = nullptr;
+    InferenceCallback* visual_trigger = nullptr;
+    InferenceCallback* audio_trigger = nullptr;
     {
         //  Define the threads first so they get destructed *after* the sessions
         //  are destructed.
@@ -71,6 +72,7 @@ int wait_until(
                     audio_session.reset(new AudioInferenceSession(env, console, console, period));
                 }
                 *audio_session += static_cast<AudioInferenceCallback&>(*callback);
+                break;
             }
         }
 
@@ -83,7 +85,7 @@ int wait_until(
         if (visual_session){
             visual_thread = env.dispatcher().dispatch([&]{
                 try{
-                    trigger = visual_session->run();
+                    visual_trigger = visual_session->run();
                     std::lock_guard<std::mutex> lg(lock);
                     stopped = true;
                     cv.notify_all();
@@ -98,7 +100,7 @@ int wait_until(
         if (audio_session){
             audio_thread = env.dispatcher().dispatch([&]{
                 try{
-                    trigger = audio_session->run();
+                    audio_trigger = audio_session->run();
                     std::lock_guard<std::mutex> lg(lock);
                     stopped = true;
                     cv.notify_all();
@@ -130,8 +132,19 @@ int wait_until(
     }
 
     //  Lookup which callback triggered.
-    auto iter = map.find(trigger);
-    return iter == map.end() ? -1 : (int)iter->second;
+    if (visual_trigger){
+        auto iter = map.find(visual_trigger);
+        if (iter != map.end()){
+            return (int)iter->second;
+        }
+    }
+    if (audio_trigger){
+        auto iter = map.find(audio_trigger);
+        if (iter != map.end()){
+            return (int)iter->second;
+        }
+    }
+    return -1;
 }
 
 
@@ -144,7 +157,8 @@ int run_until(
     std::chrono::milliseconds period
 ){
     std::map<InferenceCallback*, size_t> map;
-    InferenceCallback* trigger = nullptr;
+    InferenceCallback* visual_trigger = nullptr;
+    InferenceCallback* audio_trigger = nullptr;
     {
         //  Define the threads first so they get destructed *after* the sessions
         //  are destructed.
@@ -178,6 +192,7 @@ int run_until(
                     audio_session.reset(new AudioInferenceSession(env, console, console, period));
                 }
                 *audio_session += static_cast<AudioInferenceCallback&>(*callback);
+                break;
             }
         }
 
@@ -187,7 +202,7 @@ int run_until(
         if (visual_session){
             visual_thread = env.dispatcher().dispatch([&]{
                 try{
-                    trigger = visual_session->run();
+                    visual_trigger = visual_session->run();
                     context.cancel();
                 }catch (...){
                     context.cancel();
@@ -198,7 +213,7 @@ int run_until(
         if (audio_session){
             audio_thread = env.dispatcher().dispatch([&]{
                 try{
-                    trigger = audio_session->run();
+                    audio_trigger = audio_session->run();
                     context.cancel();
                 }catch (...){
                     context.cancel();
@@ -231,8 +246,19 @@ int run_until(
     }
 
     //  Lookup which callback triggered.
-    auto iter = map.find(trigger);
-    return iter == map.end() ? -1 : (int)iter->second;
+    if (visual_trigger){
+        auto iter = map.find(visual_trigger);
+        if (iter != map.end()){
+            return (int)iter->second;
+        }
+    }
+    if (audio_trigger){
+        auto iter = map.find(audio_trigger);
+        if (iter != map.end()){
+            return (int)iter->second;
+        }
+    }
+    return -1;
 }
 
 

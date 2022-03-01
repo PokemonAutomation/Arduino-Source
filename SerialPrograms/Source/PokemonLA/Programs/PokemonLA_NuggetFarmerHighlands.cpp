@@ -17,6 +17,7 @@
 #include "PokemonLA/Inference/PokemonLA_MapDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 #include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
+#include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "PokemonLA_NuggetFarmerHighlands.h"
@@ -41,14 +42,16 @@ NuggetFarmerHighlands_Descriptor::NuggetFarmerHighlands_Descriptor()
 MoneyFarmerHighlands::MoneyFarmerHighlands(const NuggetFarmerHighlands_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
+    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
-//        &SHINY_DETECTED.NOTIFICATIONS,
+        &SHINY_DETECTED.NOTIFICATIONS,
+        &NOTIFICATION_PROGRAM_FINISH,
 //        &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
 {
-//    PA_ADD_OPTION(SHINY_DETECTED);
+    PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -97,66 +100,9 @@ void mash_A_until_end_of_battle(ProgramEnvironment& env, ConsoleHandle& console)
 }
 
 
-#if 0
-class MoneyFarmerHighlands::RunRoute : public SuperControlSession{
-public:
-    RunRoute(ProgramEnvironment& env, ConsoleHandle& console)
-        : SuperControlSession(env, console)
-        , m_dialog_detector(console, console, false)
-    {
-        *this += m_dialog_detector;
-        register_state_command((size_t)State::NOT_STARTED, [=](){
-            m_active_command->dispatch([=](const BotBaseContext& context){
-                pbf_move_left_joystick(context, 0, 212, 50, 0);
-                pbf_press_button(context, BUTTON_B, 495, 80);
-
-                pbf_move_left_joystick(context, 224, 0, 50, 0);
-//                    pbf_press_button(context, BUTTON_B, 350, 80);
-                pbf_press_button(context, BUTTON_B, 80, 0);
-                for (size_t c = 0; c < 7; c++){
-                    pbf_press_button(context, BUTTON_A | BUTTON_B, 5, 0);
-                    pbf_press_button(context, BUTTON_B, 5, 0);
-                }
-                pbf_press_button(context, BUTTON_B, 200, 80);
-                pbf_wait(context, 80);
-
-                pbf_move_left_joystick(context, 0, 64, 50, 0);
-                pbf_press_button(context, BUTTON_B, 250, 80);
-
-                pbf_move_left_joystick(context, 0, 48, 50, 0);
-                pbf_press_button(context, BUTTON_B, 270, 0);
-
-                pbf_move_left_joystick(context, 64, 255, 50, 0);
-                pbf_press_button(context, BUTTON_B, 150, 250);
-
-//                pbf_move_right_joystick(context, 0, 128, 200, 125);
-            });
-            return false;
-        });
-    }
-
-    virtual bool run_state(AsyncCommandSession& commands, WallClock timestamp) override{
-        if (last_state() == (size_t)State::NOT_STARTED){
-            return run_state_action((size_t)State::RUNNING);
-        }
-        if (m_dialog_detector.detected()){
-            return true;
-        }
-        return !m_active_command->command_is_running();
-    }
-
-private:
-    enum class State{
-        NOT_STARTED,
-        RUNNING,
-    };
-    DialogDetector m_dialog_detector;
-};
-#endif
 
 
-
-void MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
+bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
     Stats& stats = env.stats<Stats>();
 
     //  Go to Coronet Highlands Mountain camp.
@@ -193,7 +139,7 @@ void MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
     env.console.log("Traveling to Charm's location...");
     {
         DialogDetector dialog_detector(env.console, env.console, true);
-        //  TODO: Add shiny sound detector.
+        ShinySoundDetector shiny_detector(env.console, true);
         int ret = run_until(
             env, env.console,
             [](const BotBaseContext& context){
@@ -222,15 +168,23 @@ void MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
 //                pbf_move_right_joystick(context, 0, 128, 200, 125);
 
             },
-            { &dialog_detector }
+            { &dialog_detector, &shiny_detector }
         );
-        if (ret >= 0){
+        switch (ret){
+        case 0:
             env.console.log("Found Charm!", COLOR_BLUE);
             stats.charm++;
             mash_A_until_end_of_battle(env, env.console);
             env.console.log("Battle succeeded!", COLOR_BLUE);
             success = true;
+            break;
+        case 1:
+            if (run_on_shiny(env.console, SHINY_DETECTED)){
+                return true;
+            }
+            break;
         }
+
     }
 
 
@@ -251,6 +205,8 @@ void MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
     if (success){
         save_game_from_overworld(env, env.console);
     }
+
+    return false;
 }
 
 
@@ -270,7 +226,9 @@ void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env){
             stats.to_str()
         );
         try{
-            run_iteration(env);
+            if (run_iteration(env)){
+                break;
+            }
         }catch (OperationFailedException&){
             stats.errors++;
             pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
@@ -278,6 +236,13 @@ void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env){
         }
     }
 
+    env.update_stats();
+    send_program_finished_notification(
+        env.logger(), NOTIFICATION_PROGRAM_FINISH,
+        env.program_info(),
+        "",
+        stats.to_str()
+    );
 }
 
 

@@ -30,7 +30,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    void run_iteration(SingleSwitchProgramEnvironment& env);
+    bool run_iteration(SingleSwitchProgramEnvironment& env);
 
 private:
     class Stats;
@@ -39,6 +39,7 @@ private:
     ShinyDetectedActionOption SHINY_DETECTED;
 
     EventNotificationOption NOTIFICATION_STATUS;
+    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 };
 

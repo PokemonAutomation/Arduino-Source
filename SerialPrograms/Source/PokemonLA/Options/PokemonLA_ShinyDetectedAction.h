@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonLA_ShinyDetectedAction_H
 
 #include "CommonFramework/Options/BatchOption/GroupOption.h"
+#include "CommonFramework/Options/StaticTextOption.h"
 //#include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
@@ -39,6 +40,7 @@ public:
 
 //    BooleanCheckBoxOption STOP_PROGRAM;
 //    BooleanCheckBoxOption TAKE_VIDEO;
+    StaticTextOption DESCRIPTION;
     EnumDropdownOption ACTION;
     TimeExpressionOption<uint16_t> VIDEO_DELAY;
     EventNotificationOption NOTIFICATIONS;

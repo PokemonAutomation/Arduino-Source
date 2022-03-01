@@ -13,7 +13,9 @@
 namespace PokemonAutomation{
 
 
-SpectrogramMatcher::SpectrogramMatcher(const QString& templateFilename, Mode mode, int sampleRate) : m_mode(mode) {
+SpectrogramMatcher::SpectrogramMatcher(const QString& templateFilename, Mode mode, int sampleRate)
+    : m_mode(mode)
+{
     m_template = loadAudioTemplate(templateFilename, sampleRate);
     const size_t numTemplateWindows = m_template.numWindows();
     m_numOriginalFrequencies = m_template.numFrequencies();

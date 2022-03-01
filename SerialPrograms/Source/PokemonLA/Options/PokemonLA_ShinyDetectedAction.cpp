@@ -24,6 +24,7 @@ ShinyDetectedActionOption::ShinyDetectedActionOption()
     : GroupOption("Shiny Detected Actions")
 //    , STOP_PROGRAM("<b>Stop Program:</b><br>Stop the program and go Home if the program hears a shiny.", true)
 //    , TAKE_VIDEO("<b>Take Video:</b><br>Take a video if a shiny is heard.", true)
+    , DESCRIPTION("<font color=\"blue\">Shiny detection uses sound. Make sure you have the correct audio input set.</font>")
     , ACTION(
         "<b>Shiny Detected Action:</b>",
         {
@@ -41,6 +42,7 @@ ShinyDetectedActionOption::ShinyDetectedActionOption()
     )
     , NOTIFICATIONS("Shiny Detected", true, true, ImageAttachmentMode::JPG, {"Notifs", "Showcase"})
 {
+    PA_ADD_OPTION(DESCRIPTION);
 //    PA_ADD_OPTION(STOP_PROGRAM);
 //    PA_ADD_OPTION(TAKE_VIDEO);
     PA_ADD_OPTION(ACTION);

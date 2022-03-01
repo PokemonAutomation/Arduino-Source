@@ -14,6 +14,7 @@
 
 namespace PokemonAutomation{
 
+class ConsoleHandle;
 class SpectrogramMatcher;
 
 namespace NintendoSwitch{
@@ -22,7 +23,9 @@ namespace PokemonLA{
 
 class ShinySoundDetector : public AudioInferenceCallback{
 public:
+    virtual ~ShinySoundDetector();
     ShinySoundDetector(LoggerQt& logger, int sampleRate, bool stop_on_detected);
+    ShinySoundDetector(ConsoleHandle& console, bool stop_on_detected);
 
     virtual bool process_spectrums(
         const std::vector<std::shared_ptr<const AudioSpectrum>>& newSpectrums,
