@@ -104,7 +104,7 @@ void convertSamplesToFloat(const QAudioFormat& format, const char* data, int len
 
 #elif QT_VERSION_MAJOR == 6
 
-void printAudioFormat(const QAudioFormat& format){
+std::string dumpAudioFormat(const QAudioFormat& format){
     std::string sampleFormatStr = "";
     switch(format.sampleFormat()){
         case QAudioFormat::SampleFormat::Float:
@@ -137,11 +137,13 @@ void printAudioFormat(const QAudioFormat& format){
         default:
             channelConfigStr = "Non Mono or Stereo";
     }
-    std::cout << "sample format " << sampleFormatStr << 
+    std::stringstream ss;
+    ss << "sample format " << sampleFormatStr << 
         ", bytes per sample " << format.bytesPerSample() << 
         ", channel config " << channelConfigStr <<
         ", num channels " << format.channelCount() << 
         ", sample rate " << format.sampleRate() << std::endl;
+    return ss.str();
 }
 
 void setSampleFormatToFloat(QAudioFormat& format){

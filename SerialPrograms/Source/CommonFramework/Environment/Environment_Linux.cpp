@@ -7,8 +7,8 @@
 #if defined(__linux) || defined(__APPLE__)
 
 #include <chrono>
-#include "Common/Cpp/Exception.h"
-#include "CommonFramework/Logging/Logger.h"
+#include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 #include "Environment.h"
 
 #ifndef cpuid_H

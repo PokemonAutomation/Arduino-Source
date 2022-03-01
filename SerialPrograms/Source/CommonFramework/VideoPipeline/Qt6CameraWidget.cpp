@@ -72,7 +72,7 @@ Qt6VideoWidget::Qt6VideoWidget(
 
     connect(m_camera, &QCamera::errorOccurred, this, [&](){
         if (m_camera->error() != QCamera::NoError){
-            m_logger.log("QCamera error: " + m_camera->errorString());
+            m_logger.log("QCamera error: " + m_camera->errorString().toStdString());
         }
     });
 
