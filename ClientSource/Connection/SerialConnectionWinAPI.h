@@ -44,7 +44,7 @@ public:
         );
         if (m_handle == INVALID_HANDLE_VALUE){
             DWORD error = GetLastError();
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unable to open serial connection. Error = " + std::to_string(error));
+            throw ConnectionException(nullptr, "Unable to open serial connection. Error = " + std::to_string(error));
         }
 
         DCB serial_params{0};
@@ -53,7 +53,7 @@ public:
         if (!GetCommState(m_handle, &serial_params)){
             DWORD error = GetLastError();
             CloseHandle(m_handle);
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "GetCommState() failed. Error = " + std::to_string(error));
+            throw ConnectionException(nullptr, "GetCommState() failed. Error = " + std::to_string(error));
         }
 //        cout << "BaudRate = " << (int)serial_params.BaudRate << endl;
 //        cout << "ByteSize = " << (int)serial_params.ByteSize << endl;
@@ -66,7 +66,7 @@ public:
         if (!SetCommState(m_handle, &serial_params)){
             DWORD error = GetLastError();
             CloseHandle(m_handle);
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "SetCommState() failed. Error = " + std::to_string(error));
+            throw ConnectionException(nullptr, "SetCommState() failed. Error = " + std::to_string(error));
         }
 
 #if 1
@@ -74,7 +74,7 @@ public:
         if (!GetCommTimeouts(m_handle, &timeouts)){
             DWORD error = GetLastError();
             CloseHandle(m_handle);
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "GetCommTimeouts() failed. Error = " + std::to_string(error));
+            throw ConnectionException(nullptr, "GetCommTimeouts() failed. Error = " + std::to_string(error));
         }
 
         //std::cout << "ReadIntervalTimeout = " << timeouts.ReadIntervalTimeout << std::endl;
@@ -96,7 +96,7 @@ public:
         if (!SetCommTimeouts(m_handle, &timeouts)){
             DWORD error = GetLastError();
             CloseHandle(m_handle);
-            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "SetCommTimeouts() failed. Error = " + std::to_string(error));
+            throw ConnectionException(nullptr, "SetCommTimeouts() failed. Error = " + std::to_string(error));
         }
 #endif
 

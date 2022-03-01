@@ -151,6 +151,8 @@ void BotBaseHandle::reset_unprotected(const QSerialPortInfo& port){
         std::unique_ptr<SerialConnection> connection(new SerialConnection(name, PABB_BAUD_RATE));
         m_botbase.reset(new PABotBase(m_logger, std::move(connection), nullptr));
         m_current_pabotbase.store(PABotBaseLevel::NOT_PABOTBASE, std::memory_order_release);
+    }catch (const ConnectionException& e){
+        error = e.message();
     }catch (const SerialProtocolException& e){
         error = e.message();
     }
@@ -159,7 +161,7 @@ void BotBaseHandle::reset_unprotected(const QSerialPortInfo& port){
         emit on_connecting();
     }else{
         emit on_not_connected("<font color=\"red\">Unable to open port.</font>");
-        m_logger.log(error, Color());
+//        m_logger.log(error, Color());
         return;
     }
 

@@ -95,6 +95,16 @@ private:
 };
 
 
+class ConnectionException : public Exception{
+public:
+    ConnectionException(Logger* logger, std::string message);
+    virtual const char* name() const override{ return "ConnectionException"; }
+    virtual std::string message() const override{ return m_message; }
+private:
+    std::string m_message;
+};
+
+
 class SerialProtocolException : public Exception{
 public:
     SerialProtocolException(Logger& logger, const char* location, std::string message);

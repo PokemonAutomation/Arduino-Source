@@ -54,6 +54,18 @@ std::string FileException::message() const{
 
 
 
+ConnectionException::ConnectionException(Logger* logger, std::string message)
+    : m_message(std::move(message))
+{
+    if (logger != nullptr){
+        logger->log(std::string(ConnectionException::name()) + ": " + ConnectionException::message(), COLOR_RED);
+    }else{
+        std::cerr << std::string(ConnectionException::name()) + ": " + ConnectionException::message() << std::endl;
+    }
+}
+
+
+
 SerialProtocolException::SerialProtocolException(Logger& logger, const char* location, std::string message)
     : m_location(location)
     , m_message(std::move(message))
