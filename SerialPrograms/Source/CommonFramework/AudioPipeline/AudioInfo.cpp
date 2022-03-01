@@ -12,15 +12,24 @@
 
 #if QT_VERSION_MAJOR == 5
 #include <QAudioDeviceInfo>
+#elif QT_VERSION_MAJOR == 6
+#include <QAudioDevice>
+#include <QMediaDevices>
+#endif
 namespace PokemonAutomation{
 
 
 struct AudioInfo::Data{
     std::string device_name;    //  For serialization
     QString display_name;
+#if QT_VERSION_MAJOR == 5
     QAudioDeviceInfo info;
+#elif QT_VERSION_MAJOR == 6
+    QAudioDevice info;
+#endif
 };
 std::vector<AudioInfo> AudioInfo::all_input_devices(){
+#if QT_VERSION_MAJOR == 5
     QList<QAudioDeviceInfo> list = QAudioDeviceInfo::availableDevices(QAudio::AudioInput);
 
     std::set<QString> existing;
@@ -45,8 +54,22 @@ std::vector<AudioInfo> AudioInfo::all_input_devices(){
         data.info = std::move(info);
     }
     return ret;
+#elif QT_VERSION_MAJOR == 6
+    QList<QAudioDevice> list = QMediaDevices::audioInputs();
+    std::vector<AudioInfo> ret;
+    for (QAudioDevice& info : list){
+        ret.emplace_back();
+        Data& data = ret.back().m_body;
+
+        data.device_name = info.id().data();
+        data.display_name = info.description();
+        data.info = std::move(info);
+    }
+    return ret;
+#endif
 }
 std::vector<AudioInfo> AudioInfo::all_output_devices(){
+#if QT_VERSION_MAJOR == 5
     QList<QAudioDeviceInfo> list = QAudioDeviceInfo::availableDevices(QAudio::AudioOutput);
 
     std::set<QString> existing;
@@ -71,35 +94,7 @@ std::vector<AudioInfo> AudioInfo::all_output_devices(){
         data.info = std::move(info);
     }
     return ret;
-}
-
-
-}
 #elif QT_VERSION_MAJOR == 6
-#include <QAudioDevice>
-#include <QMediaDevices>
-namespace PokemonAutomation{
-
-
-struct AudioInfo::Data{
-    std::string device_name;    //  For serialization
-    QString display_name;
-    QAudioDevice info;
-};
-std::vector<AudioInfo> AudioInfo::all_input_devices(){
-    QList<QAudioDevice> list = QMediaDevices::audioInputs();
-    std::vector<AudioInfo> ret;
-    for (QAudioDevice& info : list){
-        ret.emplace_back();
-        Data& data = ret.back().m_body;
-
-        data.device_name = info.id().data();
-        data.display_name = info.description();
-        data.info = std::move(info);
-    }
-    return ret;
-}
-std::vector<AudioInfo> AudioInfo::all_output_devices(){
     QList<QAudioDevice> list = QMediaDevices::audioOutputs();
     std::vector<AudioInfo> ret;
     for (QAudioDevice& info : list){
@@ -111,19 +106,8 @@ std::vector<AudioInfo> AudioInfo::all_output_devices(){
         data.info = std::move(info);
     }
     return ret;
-}
-
-
-}
-#else
-#error "Unknown Qt Version."
 #endif
-
-
-
-
-
-namespace PokemonAutomation{
+}
 
 
 AudioInfo::~AudioInfo(){}
