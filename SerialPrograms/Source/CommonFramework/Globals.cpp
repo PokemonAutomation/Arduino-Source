@@ -10,7 +10,7 @@
 
 namespace PokemonAutomation{
 
-const QString PROGRAM_VERSION_BASE = "v0.11.15";
+const QString PROGRAM_VERSION_BASE = "v0.11.16";
 
 #ifdef PA_OFFICIAL
 const QString PROGRAM_VERSION = PROGRAM_VERSION_BASE;

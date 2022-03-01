@@ -115,7 +115,7 @@ int wait_until(
         //  Wait
         {
             std::unique_lock<std::mutex> lg(lock);
-            cv.wait_until(lg, deadline, [&](){ return stopped; });
+            cv.wait_until(lg, deadline, [&](){ return stopped || env.is_stopping(); });
         }
 
         //  Join the inference threads.
