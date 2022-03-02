@@ -60,6 +60,12 @@ public:
         AudioFeed& feed,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)
     );
+    AsyncAudioInferenceSession(
+        ProgramEnvironment& env, LoggerQt& logger,
+        AudioFeed& feed,
+        std::function<void()> on_finish_callback,
+        std::chrono::milliseconds period = std::chrono::milliseconds(50)
+    );
 
     //  This will not rethrow exceptions in the inference thread.
     ~AsyncAudioInferenceSession();
@@ -78,7 +84,8 @@ private:
     void thread_body();
 
 private:
-    AudioInferenceCallback* m_callback;
+    std::function<void()> m_on_finish_callback;
+    AudioInferenceCallback* m_triggering_callback;
     std::unique_ptr<AsyncTask> m_task;
 };
 

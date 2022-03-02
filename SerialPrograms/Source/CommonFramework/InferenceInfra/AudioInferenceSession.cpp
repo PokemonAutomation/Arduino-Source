@@ -172,7 +172,18 @@ AsyncAudioInferenceSession::AsyncAudioInferenceSession(
     std::chrono::milliseconds period
 )
     : AudioInferenceSession(env, logger, feed, period)
-    , m_callback(nullptr)
+    , m_triggering_callback(nullptr)
+    , m_task(env.dispatcher().dispatch([this]{ thread_body(); }))
+{}
+AsyncAudioInferenceSession::AsyncAudioInferenceSession(
+    ProgramEnvironment& env, LoggerQt& logger,
+    AudioFeed& feed,
+    std::function<void()> on_finish_callback,
+    std::chrono::milliseconds period
+)
+    : AudioInferenceSession(env, logger, feed, period)
+    , m_on_finish_callback(std::move(on_finish_callback))
+    , m_triggering_callback(nullptr)
     , m_task(env.dispatcher().dispatch([this]{ thread_body(); }))
 {}
 AsyncAudioInferenceSession::~AsyncAudioInferenceSession(){
@@ -188,10 +199,20 @@ AudioInferenceCallback* AsyncAudioInferenceSession::stop(){
     if (m_task){
         m_task->wait_and_rethrow_exceptions();
     }
-    return m_callback;
+    return m_triggering_callback;
 }
 void AsyncAudioInferenceSession::thread_body(){
-    m_callback = run();
+    try{
+        m_triggering_callback = run();
+        if (m_on_finish_callback){
+            m_on_finish_callback();
+        }
+    }catch (...){
+        if (m_on_finish_callback){
+            m_on_finish_callback();
+        }
+        throw;
+    }
 }
 
 

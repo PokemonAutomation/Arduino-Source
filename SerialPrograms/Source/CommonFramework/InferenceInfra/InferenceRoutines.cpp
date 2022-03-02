@@ -40,18 +40,19 @@ int wait_until(
     InferenceCallback* visual_trigger = nullptr;
     InferenceCallback* audio_trigger = nullptr;
     {
-        //  Define the threads first so they get destructed *after* the sessions
-        //  are destructed.
+        std::unique_ptr<AsyncVisualInferenceSession> visual_session;
+        std::unique_ptr<AsyncAudioInferenceSession> audio_session;
 
-        //  Destroying the sessions will automatically stop the threads. If you
-        //  try to destroy the threads first without destroying the sessions,
-        //  they will deadlock waiting for the session to finish.
+        std::mutex lock;
+        std::condition_variable cv;
+        ProgramStopNotificationScope stopper(env, lock, cv);
+        bool stopped = false;
 
-        std::unique_ptr<AsyncTask> visual_thread;
-        std::unique_ptr<AsyncTask> audio_thread;
-
-        std::unique_ptr<VisualInferenceSession> visual_session;
-        std::unique_ptr<AudioInferenceSession> audio_session;
+        std::function<void()> stop_callback = [&](){
+            std::lock_guard<std::mutex> lg(lock);
+            stopped = true;
+            cv.notify_all();
+        };
 
         //  Add all the callbacks. Lazy init the sessions only when needed.
         for (size_t c = 0; c < callbacks.size(); c++){
@@ -63,54 +64,23 @@ int wait_until(
             switch (callback->type()){
             case InferenceType::VISUAL:
                 if (visual_session == nullptr){
-                    visual_session.reset(new VisualInferenceSession(env, console, console, console, period));
+                    visual_session.reset(new AsyncVisualInferenceSession(
+                        env, console, console, console,
+                        stop_callback, period
+                    ));
                 }
                 *visual_session += static_cast<VisualInferenceCallback&>(*callback);
                 break;
             case InferenceType::AUDIO:
                 if (audio_session == nullptr){
-                    audio_session.reset(new AudioInferenceSession(env, console, console, period));
+                    audio_session.reset(new AsyncAudioInferenceSession(
+                        env, console, console,
+                        stop_callback, period
+                    ));
                 }
                 *audio_session += static_cast<AudioInferenceCallback&>(*callback);
                 break;
             }
-        }
-
-        std::mutex lock;
-        std::condition_variable cv;
-        ProgramStopNotificationScope stopper(env, lock, cv);
-        bool stopped = false;
-
-        //  Start the inference threads.
-        if (visual_session){
-            visual_thread = env.dispatcher().dispatch([&]{
-                try{
-                    visual_trigger = visual_session->run();
-                    std::lock_guard<std::mutex> lg(lock);
-                    stopped = true;
-                    cv.notify_all();
-                }catch (...){
-                    std::lock_guard<std::mutex> lg(lock);
-                    stopped = true;
-                    cv.notify_all();
-                    throw;
-                }
-            });
-        }
-        if (audio_session){
-            audio_thread = env.dispatcher().dispatch([&]{
-                try{
-                    audio_trigger = audio_session->run();
-                    std::lock_guard<std::mutex> lg(lock);
-                    stopped = true;
-                    cv.notify_all();
-                }catch (...){
-                    std::lock_guard<std::mutex> lg(lock);
-                    stopped = true;
-                    cv.notify_all();
-                    throw;
-                }
-            });
         }
 
 
@@ -120,14 +90,12 @@ int wait_until(
             cv.wait_until(lg, deadline, [&](){ return stopped || env.is_stopping(); });
         }
 
-        //  Join the inference threads.
+        //  Stop the inference threads (and rethrow exceptions).
         if (visual_session){
-            visual_session->stop();
-            visual_thread->wait_and_rethrow_exceptions();
+            visual_trigger = visual_session->stop();
         }
         if (audio_session){
-            audio_session->stop();
-            audio_thread->wait_and_rethrow_exceptions();
+            audio_trigger = audio_session->stop();
         }
     }
 
@@ -160,18 +128,10 @@ int run_until(
     InferenceCallback* visual_trigger = nullptr;
     InferenceCallback* audio_trigger = nullptr;
     {
-        //  Define the threads first so they get destructed *after* the sessions
-        //  are destructed.
+        std::unique_ptr<AsyncVisualInferenceSession> visual_session;
+        std::unique_ptr<AsyncAudioInferenceSession> audio_session;
 
-        //  Destroying the sessions will automatically stop the threads. If you
-        //  try to destroy the threads first without destroying the sessions,
-        //  they will deadlock waiting for the session to finish.
-
-        std::unique_ptr<AsyncTask> visual_thread;
-        std::unique_ptr<AsyncTask> audio_thread;
-
-        std::unique_ptr<VisualInferenceSession> visual_session;
-        std::unique_ptr<AudioInferenceSession> audio_session;
+        BotBaseContext context(console.botbase());
 
         //  Add all the callbacks. Lazy init the sessions only when needed.
         for (size_t c = 0; c < callbacks.size(); c++){
@@ -183,43 +143,25 @@ int run_until(
             switch (callback->type()){
             case InferenceType::VISUAL:
                 if (visual_session == nullptr){
-                    visual_session.reset(new VisualInferenceSession(env, console, console, console, period));
+                    visual_session.reset(new AsyncVisualInferenceSession(
+                        env, console, console, console,
+                        [&](){ context.cancel(); },
+                        period
+                    ));
                 }
                 *visual_session += static_cast<VisualInferenceCallback&>(*callback);
                 break;
             case InferenceType::AUDIO:
                 if (audio_session == nullptr){
-                    audio_session.reset(new AudioInferenceSession(env, console, console, period));
+                    audio_session.reset(new AsyncAudioInferenceSession(
+                        env, console, console,
+                        [&](){ context.cancel(); },
+                        period
+                    ));
                 }
                 *audio_session += static_cast<AudioInferenceCallback&>(*callback);
                 break;
             }
-        }
-
-        BotBaseContext context(console.botbase());
-
-        //  Start the inference threads.
-        if (visual_session){
-            visual_thread = env.dispatcher().dispatch([&]{
-                try{
-                    visual_trigger = visual_session->run();
-                    context.cancel();
-                }catch (...){
-                    context.cancel();
-                    throw;
-                }
-            });
-        }
-        if (audio_session){
-            audio_thread = env.dispatcher().dispatch([&]{
-                try{
-                    audio_trigger = audio_session->run();
-                    context.cancel();
-                }catch (...){
-                    context.cancel();
-                    throw;
-                }
-            });
         }
 
 
@@ -234,14 +176,12 @@ int run_until(
         }catch (OperationCancelledException&){
         }
 
-        //  Join the inference threads.
+        //  Stop the inference threads (and rethrow exceptions).
         if (visual_session){
-            visual_session->stop();
-            visual_thread->wait_and_rethrow_exceptions();
+            visual_trigger = visual_session->stop();
         }
         if (audio_session){
-            audio_session->stop();
-            audio_thread->wait_and_rethrow_exceptions();
+            audio_trigger = audio_session->stop();
         }
     }
 

@@ -65,6 +65,12 @@ public:
         VideoFeed& feed, VideoOverlay& overlay,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)
     );
+    AsyncVisualInferenceSession(
+        ProgramEnvironment& env, LoggerQt& logger,
+        VideoFeed& feed, VideoOverlay& overlay,
+        std::function<void()> on_finish_callback,
+        std::chrono::milliseconds period = std::chrono::milliseconds(50)
+    );
 
     //  This will not rethrow exceptions in the inference thread.
     ~AsyncVisualInferenceSession();
@@ -83,7 +89,8 @@ private:
     void thread_body();
 
 private:
-    VisualInferenceCallback* m_callback;
+    std::function<void()> m_on_finish_callback;
+    VisualInferenceCallback* m_triggering_callback;
     std::unique_ptr<AsyncTask> m_task;
 };
 
