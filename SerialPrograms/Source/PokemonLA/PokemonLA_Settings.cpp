@@ -50,11 +50,11 @@ GameSettings::GameSettings()
     )
     , SHINY_SHOUND_THRESHOLD(
         "<b>Shiny Sound Threshold:</b><br>The shiny sound detection threshold.",
-        0.85, 0, 1.0
+        0.80, 0, 1.0
     )
     , SHINY_SHOUND_LOW_FREQUENCY(
-        "<b>Shiny Sound Low Frequency:</b><br>Low pass filter frequency for shiny sound.",
-        58.59375, 0, 48000
+        "<b>Shiny Sound Low Frequency (Hz):</b><br>Low pass filter frequency for shiny sound.",
+        5000, 0, 48000
     )
 {
     PA_ADD_OPTION(m_menu_navigation);
