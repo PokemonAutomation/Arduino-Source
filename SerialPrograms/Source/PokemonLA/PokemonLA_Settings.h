@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Options/StaticTextOption.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Options/FloatingPointOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 
@@ -32,6 +33,9 @@ public:
     TimeExpressionOption<uint16_t> START_GAME_WAIT;
     TimeExpressionOption<uint16_t> ENTER_GAME_MASH;
     TimeExpressionOption<uint16_t> ENTER_GAME_WAIT;
+
+    FloatingPointOption SHINY_SHOUND_THRESHOLD;
+    FloatingPointOption SHINY_SHOUND_LOW_FREQUENCY;
 };
 
 

@@ -19,20 +19,24 @@ EscapeFromAttack::EscapeFromAttack(
     ProgramEnvironment& env,
     ConsoleHandle& console,
     std::chrono::seconds time_min,
-    std::chrono::seconds time_limit
+    std::chrono::seconds time_limit,
+    bool stop_on_shiny
 )
     : SuperControlSession(env, console)
     , m_min_stop(std::chrono::system_clock::now() + time_min)
     , m_deadline(std::chrono::system_clock::now() + time_limit)
+    , m_stop_on_shiny(stop_on_shiny)
     , m_attacked(console)
     , m_mount(console)
     , m_centerA(console, console, ButtonType::ButtonA, {0.40, 0.50, 0.40, 0.50}, std::chrono::milliseconds(200), false)
     , m_leftB(console, console, ButtonType::ButtonB, {0.02, 0.40, 0.05, 0.20}, std::chrono::milliseconds(200), false)
+    , m_shiny_listener(console, false)
 {
     *this += m_attacked;
     *this += m_mount;
     *this += m_centerA;
     *this += m_leftB;
+    *this += m_shiny_listener;
     register_state_command(State::UNKNOWN, [=](){
         m_console.log("Unknown state. Moving foward...");
         m_active_command->dispatch([=](const BotBaseContext& context){
@@ -130,6 +134,10 @@ bool EscapeFromAttack::run_state(AsyncCommandSession& commands, WallClock timest
         return true;
     }
     if (m_attacked.state() == UnderAttackState::SAFE && timestamp >= m_min_stop){
+        return true;
+    }
+    if (m_stop_on_shiny && m_shiny_listener.detected()){
+//        cout << "EscapeFromAttack::run_state(): shiny out" << endl;
         return true;
     }
 

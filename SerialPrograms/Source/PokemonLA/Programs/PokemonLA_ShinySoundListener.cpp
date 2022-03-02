@@ -7,13 +7,14 @@
 #include "CommonFramework/Tools/AudioFeed.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "PokemonLA_ShinySoundListener.h"
-#include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
 #include "CommonFramework/InferenceInfra/AudioInferenceSession.h"
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
+#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "NintendoSwitch/NintendoSwitch_Settings.h"
+#include "PokemonLA/PokemonLA_Settings.h"
+#include "PokemonLA_ShinySoundListener.h"
+#include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
 
 #include <set>
 #include <iostream>
@@ -57,6 +58,7 @@ void ShinySoundListener::program(SingleSwitchProgramEnvironment& env){
 
     std::cout << "Running audio test program." << std::endl;
 
+#if 0
     auto& audioFeed = env.console.audio();
     const int sampleRate = audioFeed.sample_rate();
 
@@ -64,11 +66,12 @@ void ShinySoundListener::program(SingleSwitchProgramEnvironment& env){
         std::cout << "Error: sample rate 0, audio stream not initialized" << std::endl;
         return;
     }
+#endif
     
-    ShinySoundDetector detector(env.console, sampleRate, false);
+    ShinySoundDetector detector(env.console, false);
 
 #if 1
-    AsyncAudioInferenceSession session(env, env.console, audioFeed);
+    AsyncAudioInferenceSession session(env, env.console, env.console);
     session += detector;
 
     env.wait_for(std::chrono::seconds(300));
@@ -120,7 +123,10 @@ void ShinySoundListener::program(SingleSwitchProgramEnvironment& env){
 void searchAudioDump(){
 
     QString shinyFilename = "./heracrossShinyTemplateCompact.wav";
-    SpectrogramMatcher matcher(shinyFilename, SpectrogramMatcher::Mode::SPIKE_CONV);
+    SpectrogramMatcher matcher(
+        shinyFilename, SpectrogramMatcher::Mode::SPIKE_CONV, 48000,
+        GameSettings::instance().SHINY_SHOUND_LOW_FREQUENCY
+    );
     
     // std::string fileListFile = "./scripts/short_audio_files.txt";
     std::string fileListFile = "1.txt";

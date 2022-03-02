@@ -7,6 +7,8 @@
 #ifndef PokemonAutomation_PokemonLA_ShinyDetectedAction_H
 #define PokemonAutomation_PokemonLA_ShinyDetectedAction_H
 
+#include <QImage>
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Options/BatchOption/GroupOption.h"
 #include "CommonFramework/Options/StaticTextOption.h"
 //#include "CommonFramework/Options/BooleanCheckBoxOption.h"
@@ -25,6 +27,22 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
+class ShinyDetectedException : public OperationCancelledException{
+public:
+    ShinyDetectedException(QImage image)
+        : m_screenshot(std::move(image))
+    {}
+    virtual const char* name() const override{ return "ShinyDetectedException"; }
+    QImage consume_screenshot(){
+        return m_screenshot;
+    }
+
+private:
+    QImage m_screenshot;
+};
+
+
+
 enum class ShinyDetectedAction{
     IGNORE,
     STOP_PROGRAM,
@@ -36,6 +54,7 @@ class ShinyDetectedActionOption : public GroupOption{
 public:
     ShinyDetectedActionOption();
 
+    bool stop_on_shiny() const;
     bool do_nothing() const;
 
 //    BooleanCheckBoxOption STOP_PROGRAM;
@@ -47,6 +66,7 @@ public:
 };
 
 
+#if 0
 //  Return true if program should stop.
 bool run_on_shiny(
     const BotBaseContext& context,
@@ -59,6 +79,14 @@ bool run_on_shiny(
     ShinyDetectedActionOption& option,
     const StatsTracker* session_stats
 );
+#endif
+
+
+void on_shiny(
+    ProgramEnvironment& env, ConsoleHandle& console,
+    ShinyDetectedActionOption& options, QImage screenshot
+);
+
 
 
 }

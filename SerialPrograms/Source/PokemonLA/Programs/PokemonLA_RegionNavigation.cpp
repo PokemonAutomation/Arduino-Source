@@ -259,12 +259,23 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Ca
 
 
 
-void goto_camp_from_overworld(ProgramEnvironment& env, ConsoleHandle& console){
+void goto_camp_from_overworld(
+    ProgramEnvironment& env, ConsoleHandle& console,
+    ShinyDetectedActionOption& options
+){
     auto start = std::chrono::system_clock::now();
     std::chrono::seconds grace_period(0);
     while (true){
-        EscapeFromAttack session(env, console, grace_period, std::chrono::seconds(10));
+        EscapeFromAttack session(
+            env, console,
+            grace_period, std::chrono::seconds(10),
+            options.stop_on_shiny()
+        );
         session.run_session();
+
+        if (session.detected_shiny()){
+            on_shiny(env, console, options, session.consume_shiny_screenshot());
+        }
 
         if (std::chrono::system_clock::now() - start > std::chrono::seconds(60)){
             throw OperationFailedException(console, "Unable to escape from being attacked.");

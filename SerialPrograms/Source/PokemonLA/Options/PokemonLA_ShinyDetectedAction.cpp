@@ -48,11 +48,15 @@ ShinyDetectedActionOption::ShinyDetectedActionOption()
     PA_ADD_OPTION(ACTION);
     PA_ADD_OPTION(VIDEO_DELAY);
 }
+bool ShinyDetectedActionOption::stop_on_shiny() const{
+    return ACTION != 0;
+}
 bool ShinyDetectedActionOption::do_nothing() const{
     return ACTION == 0;
 }
 
 
+#if 0
 bool run_on_shiny(
     const BotBaseContext& context,
     const ShinyDetectedActionOption& option
@@ -106,6 +110,46 @@ bool run_on_shiny(
 
     return (ShinyDetectedAction)(size_t)option.ACTION != ShinyDetectedAction::IGNORE;
 }
+#endif
+
+
+void on_shiny(
+    ProgramEnvironment& env, ConsoleHandle& console,
+    ShinyDetectedActionOption& options, QImage screenshot
+){
+    std::vector<std::pair<QString, QString>> embeds;
+    const StatsTracker* stats = env.stats();
+    if (stats){
+        std::string str = stats->to_str();
+        if (!str.empty()){
+            embeds.emplace_back("Session Stats", QString::fromStdString(str));
+        }
+    }
+
+    send_program_notification(
+        console, options.NOTIFICATIONS, Color(0xffff99),
+        env.program_info(),
+        "Detected Possible Shiny",
+        embeds,
+        screenshot, true
+    );
+
+    switch ((ShinyDetectedAction)(size_t)options.ACTION){
+    case ShinyDetectedAction::IGNORE:
+        return;
+    case ShinyDetectedAction::STOP_PROGRAM:
+        pbf_wait(console, options.VIDEO_DELAY);
+        pbf_press_button(console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+        throw ShinyDetectedException(std::move(screenshot));
+    case ShinyDetectedAction::TAKE_VIDEO_STOP_PROGRAM:
+        pbf_wait(console, options.VIDEO_DELAY);
+        pbf_press_button(console, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+        pbf_press_button(console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+        throw ShinyDetectedException(std::move(screenshot));
+    }
+}
+
+
 
 
 

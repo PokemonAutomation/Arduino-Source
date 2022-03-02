@@ -13,7 +13,10 @@
 namespace PokemonAutomation{
 
 
-SpectrogramMatcher::SpectrogramMatcher(const QString& templateFilename, Mode mode, int sampleRate)
+SpectrogramMatcher::SpectrogramMatcher(
+    const QString& templateFilename, Mode mode, int sampleRate,
+    double lowFrequencyFilter
+)
     : m_mode(mode)
 {
     m_template = loadAudioTemplate(templateFilename, sampleRate);
@@ -35,7 +38,7 @@ SpectrogramMatcher::SpectrogramMatcher(const QString& templateFilename, Mode mod
     // So 5.0 24K / 2048 = 58.59375Hz. For other sample rate and numFrequencies combinations,
     // j * halfSampleRate/numFrequencies >= 58.59375 -> j >= 58.59375 * numFrequnecies / halfSampleRate
 
-    m_originalFreqStart = int(58.59375 * m_numOriginalFrequencies / halfSampleRate + 0.5);
+    m_originalFreqStart = int(lowFrequencyFilter * m_numOriginalFrequencies / halfSampleRate + 0.5);
     m_originalFreqEnd = 20000 * m_numOriginalFrequencies / halfSampleRate + 1;
 
     // Initialize the spike convolution kernel:

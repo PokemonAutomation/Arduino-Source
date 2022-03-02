@@ -64,17 +64,20 @@ public:
         , errors(m_stats["Errors"])
         , charm(m_stats["Charm"])
         , coin(m_stats["Coin"])
+        , shinies(m_stats["Shinies"])
     {
         m_display_order.emplace_back("Attempts");
         m_display_order.emplace_back("Errors", true);
         m_display_order.emplace_back("Charm", true);
         m_display_order.emplace_back("Coin", true);
+        m_display_order.emplace_back("Shinies", true);
     }
 
     std::atomic<uint64_t>& attempts;
     std::atomic<uint64_t>& errors;
     std::atomic<uint64_t>& charm;
     std::atomic<uint64_t>& coin;
+    std::atomic<uint64_t>& shinies;
 };
 
 std::unique_ptr<StatsTracker> MoneyFarmerHighlands::make_stats() const{
@@ -138,7 +141,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
 
     env.console.log("Traveling to Charm's location...");
     {
-        DialogDetector dialog_detector(env.console, env.console, true);
+        DialogDetector dialog_detector(env.console, env.console, SHINY_DETECTED.stop_on_shiny());
         ShinySoundDetector shiny_detector(env.console, true);
         int ret = run_until(
             env, env.console,
@@ -160,7 +163,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
                 pbf_press_button(context, BUTTON_B, 250, 80);
 
                 pbf_move_left_joystick(context, 0, 48, 50, 0);
-                pbf_press_button(context, BUTTON_B, 270, 0);
+                pbf_press_button(context, BUTTON_B, 250, 0);
 
                 pbf_move_left_joystick(context, 64, 255, 50, 0);
                 pbf_press_button(context, BUTTON_B, 150, 250);
@@ -168,23 +171,20 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
 //                pbf_move_right_joystick(context, 0, 128, 200, 125);
 
             },
-            { &dialog_detector, &shiny_detector }
+            { &dialog_detector, //&shiny_detector
+            }
         );
-        switch (ret){
-        case 0:
+        if (shiny_detector.detected()){
+            stats.shinies++;
+            on_shiny(env, env.console, SHINY_DETECTED, shiny_detector.consume_screenshot());
+        }
+        if (ret == 0){
             env.console.log("Found Charm!", COLOR_BLUE);
             stats.charm++;
             mash_A_until_end_of_battle(env, env.console);
             env.console.log("Battle succeeded!", COLOR_BLUE);
             success = true;
-            break;
-        case 1:
-            if (run_on_shiny(env.console, SHINY_DETECTED)){
-                return true;
-            }
-            break;
         }
-
     }
 
 
@@ -198,7 +198,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
 
 
     env.console.log("Returning to Jubilife...");
-    goto_camp_from_overworld(env, env.console);
+    goto_camp_from_overworld(env, env.console, SHINY_DETECTED);
     goto_professor(env.console, Camp::HIGHLANDS_HIGHLANDS);
     from_professor_return_to_jubilife(env, env.console);
 
@@ -233,6 +233,8 @@ void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env){
             stats.errors++;
             pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        }catch (ShinyDetectedException&){
+            break;
         }
     }
 

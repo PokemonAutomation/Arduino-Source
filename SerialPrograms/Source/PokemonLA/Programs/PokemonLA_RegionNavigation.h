@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_RegionNavigation_H
 #define PokemonAutomation_PokemonLA_RegionNavigation_H
 
+#include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 #include "PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h"
 
 namespace PokemonAutomation{
@@ -37,7 +38,10 @@ void mash_A_to_change_region(ProgramEnvironment& env, ConsoleHandle& console);
 void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Camp camp);
 
 
-void goto_camp_from_overworld(ProgramEnvironment& env, ConsoleHandle& console);
+void goto_camp_from_overworld(
+    ProgramEnvironment& env, ConsoleHandle& console,
+    ShinyDetectedActionOption& options
+);
 
 
 

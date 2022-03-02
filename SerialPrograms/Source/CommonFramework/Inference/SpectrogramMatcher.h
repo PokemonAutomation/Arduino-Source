@@ -31,7 +31,10 @@ public:
         SPIKE_CONV,
     };
 
-    SpectrogramMatcher(const QString& templateFilename, Mode mode, int sampleRate=48000);
+    SpectrogramMatcher(
+        const QString& templateFilename, Mode mode, int sampleRate,
+        double lowFrequencyFilter
+    );
 
     // Match the newest spectrums and return a match score.
     // Newer (larger timestamp) spectrums at beginning of `newSpectrums` while older (smaller

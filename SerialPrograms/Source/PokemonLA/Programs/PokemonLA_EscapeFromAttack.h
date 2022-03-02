@@ -10,6 +10,7 @@
 #include "CommonFramework/Tools/SuperControlSession.h"
 #include "PokemonLA/Inference/PokemonLA_UnderAttackDetector.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
+#include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 
 namespace PokemonAutomation{
@@ -17,20 +18,26 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-//  TODO: Add shiny sound detector.
-
 class EscapeFromAttack : public SuperControlSession{
 public:
     EscapeFromAttack(
         ProgramEnvironment& env,
         ConsoleHandle& console,
         std::chrono::seconds time_min,
-        std::chrono::seconds time_limit
+        std::chrono::seconds time_limit,
+        bool stop_on_shiny
     );
 
     UnderAttackState state() const{
         return m_attacked.state();
     }
+    bool detected_shiny() const{
+        return m_shiny_listener.detected();
+    }
+    QImage consume_shiny_screenshot(){
+        return m_shiny_listener.consume_screenshot();
+    }
+
 
 private:
     enum class State{
@@ -65,11 +72,13 @@ private:
 
     std::chrono::system_clock::time_point m_min_stop;
     std::chrono::system_clock::time_point m_deadline;
+    bool m_stop_on_shiny;
 
     UnderAttackWatcher m_attacked;
     MountTracker m_mount;
     ButtonDetector m_centerA;
     ButtonDetector m_leftB;
+    ShinySoundDetector m_shiny_listener;
 };
 
 

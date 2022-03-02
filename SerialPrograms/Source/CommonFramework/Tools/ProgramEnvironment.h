@@ -68,6 +68,7 @@ public:
 
     template <typename StatsType>
     StatsType& stats();
+    const StatsTracker* stats() const{ return m_current_stats; }
 
     bool is_stopping() const;
     void check_stopping() const;
