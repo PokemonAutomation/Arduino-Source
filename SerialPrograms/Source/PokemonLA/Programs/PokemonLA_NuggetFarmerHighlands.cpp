@@ -171,8 +171,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
 //                pbf_move_right_joystick(context, 0, 128, 200, 125);
 
             },
-            { &dialog_detector, //&shiny_detector
-            }
+            { &dialog_detector, &shiny_detector }
         );
         if (shiny_detector.detected()){
             stats.shinies++;
