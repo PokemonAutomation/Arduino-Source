@@ -100,7 +100,7 @@ EscapeFromAttack::EscapeFromAttack(
         return false;
     });
     register_state_command(State::DASH_FORWARD, [=](){
-        bool delay_dash = (State)last_state() == State::SNEASLER_ON;
+        bool delay_dash = (State)last_state() == State::GET_ON_SNEASLER;
         if (delay_dash){
             m_console.log("Dashing forward... (delayed due to being on Sneasler)");
         }else{
