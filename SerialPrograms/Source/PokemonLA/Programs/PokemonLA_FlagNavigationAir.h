@@ -11,6 +11,7 @@
 #include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
+#include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -19,7 +20,17 @@ namespace PokemonLA{
 
 class FlagNavigationAir : public SuperControlSession{
 public:
-    FlagNavigationAir(ProgramEnvironment& env, ConsoleHandle& console);
+    FlagNavigationAir(
+        ProgramEnvironment& env, ConsoleHandle& console,
+        bool stop_on_shiny
+    );
+
+    bool detected_shiny() const{
+        return m_shiny_listener.detected();
+    }
+    QImage consume_shiny_screenshot(){
+        return m_shiny_listener.consume_screenshot();
+    }
 
 
 private:
@@ -58,10 +69,13 @@ private:
         return SuperControlSession::run_state_action((size_t)state);
     }
 
+    bool m_stop_on_shiny;
+
     FlagTracker m_flag;
     MountTracker m_mount;
     ButtonDetector m_centerA;
     ButtonDetector m_leftB;
+    ShinySoundDetector m_shiny_listener;
 
     std::atomic<bool> m_looking_straight_ahead;
     WallClock m_last_good_state;

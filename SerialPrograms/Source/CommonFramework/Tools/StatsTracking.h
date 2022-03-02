@@ -21,6 +21,7 @@ class StatsTracker{
 
 public:
     StatsTracker() = default;
+    virtual ~StatsTracker() = default;
 
     std::string to_str() const;
 

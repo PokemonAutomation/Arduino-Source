@@ -27,6 +27,13 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
+class ShinyStatIncrementer{
+public:
+    virtual void add_shiny() = 0;
+};
+
+
+//  Throw when you want to force the program to stop.
 class ShinyDetectedException : public OperationCancelledException{
 public:
     ShinyDetectedException(QImage image)

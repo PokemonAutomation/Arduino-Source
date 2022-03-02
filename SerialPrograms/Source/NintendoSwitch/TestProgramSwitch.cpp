@@ -254,8 +254,28 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
+    {
+        QImage image("screenshot-20220302-093842398427.png");
+
+        DialogDetector detector(logger, overlay, true);
+        detector.process_frame(image, std::chrono::system_clock::now());
+    }
+    {
+        QImage image("screenshot-20220302-094034596712.png");
+
+        DialogDetector detector(logger, overlay, true);
+        detector.process_frame(image, std::chrono::system_clock::now());
+    }
+    {
+        QImage image("screenshot-Gin");
+
+        DialogDetector detector(logger, overlay, true);
+        detector.process_frame(image, std::chrono::system_clock::now());
+    }
 
 
+
+#if 0
     InferenceBoxScope box0(console, {0.925, 0.100, 0.014, 0.030});
 
 //    QImage screen("screenshot-20220228-121927882824.png");
@@ -266,7 +286,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     cout << stats.average << stats.stddev << endl;
     bool ok = is_white(stats);
     cout << ok << endl;
-
+#endif
 
 //    throw UserSetupError(env.logger(), "asdf");
 //    throw OperationFailedException(env.logger(), "asdf");

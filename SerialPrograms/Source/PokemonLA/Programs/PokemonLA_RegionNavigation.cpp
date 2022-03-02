@@ -261,7 +261,8 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Ca
 
 void goto_camp_from_overworld(
     ProgramEnvironment& env, ConsoleHandle& console,
-    ShinyDetectedActionOption& options
+    ShinyDetectedActionOption& options,
+    ShinyStatIncrementer& shiny_stat_incrementer
 ){
     auto start = std::chrono::system_clock::now();
     std::chrono::seconds grace_period(0);
@@ -274,6 +275,7 @@ void goto_camp_from_overworld(
         session.run_session();
 
         if (session.detected_shiny()){
+            shiny_stat_incrementer.add_shiny();
             on_shiny(env, console, options, session.consume_shiny_screenshot());
         }
 

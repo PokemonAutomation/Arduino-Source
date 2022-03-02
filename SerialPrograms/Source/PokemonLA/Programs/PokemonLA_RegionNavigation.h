@@ -40,7 +40,8 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Ca
 
 void goto_camp_from_overworld(
     ProgramEnvironment& env, ConsoleHandle& console,
-    ShinyDetectedActionOption& options
+    ShinyDetectedActionOption& options,
+    ShinyStatIncrementer& shiny_stat_incrementer
 );
 
 

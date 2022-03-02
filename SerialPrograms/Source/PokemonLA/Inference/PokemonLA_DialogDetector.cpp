@@ -46,26 +46,44 @@ bool DialogDetector::process_frame(
 
     ImageStats title_top = image_stats(extract_box(frame, m_title_top));
 //    cout << title_top.average << title_top.stddev << endl;
-    hits += is_solid(title_top, {0.218332, 0.330301, 0.451367}, 0.2, 15) ? 1 : 0;
+//    hits += is_solid(title_top, {0.218332, 0.330301, 0.451367}, 0.2, 15) ? 1 : 0;
+    if (title_top.stddev.sum() <= 15 &&
+        title_top.average.b > title_top.average.r && title_top.average.b > title_top.average.g
+    ){
+        hits++;
+    }
+//    cout << "hits = " << hits << endl;
 
     ImageStats title_bottom = image_stats(extract_box(frame, m_title_bottom));
 //    cout << title_bottom.average << title_bottom.stddev << endl;
-    hits += is_solid(title_bottom, {0.226944, 0.323437, 0.449619}, 0.2, 15) ? 1 : 0;
+//    hits += is_solid(title_bottom, {0.226944, 0.323437, 0.449619}, 0.2, 15) ? 1 : 0;
+    if (title_bottom.stddev.sum() <= 15 &&
+        title_bottom.average.b > title_top.average.r && title_bottom.average.b > title_bottom.average.g
+    ){
+        hits++;
+    }
+//    cout << "hits = " << hits << endl;
 
     ImageStats top_white = image_stats(extract_box(frame, m_top_white));
 //    cout << top_white.average << top_white.stddev << endl;
     hits += is_white(top_white, 480, 20) ? 1 : 0;
+//    cout << "hits = " << hits << endl;
 
     ImageStats bottom_white = image_stats(extract_box(frame, m_bottom_white));
 //    cout << bottom_white.average << bottom_white.stddev << endl;
     hits += is_white(bottom_white, 480, 20) ? 1 : 0;
+//    cout << "hits = " << hits << endl;
 
     ImageStats cursor = image_stats(extract_box(frame, m_cursor));
 //    cout << cursor.average << cursor.stddev << endl;
-    hits += cursor.stddev.sum() < 50 ? 1 : 0;
+    hits += cursor.stddev.sum() > 50 ? 1 : 0;
+//    cout << "hits = " << hits << endl;
 
     m_arc_phone.process_frame(frame, timestamp);
-    hits += !m_arc_phone.detected();
+    bool phone = m_arc_phone.detected();
+//    cout << !phone << endl;
+    hits += !phone;
+//    cout << "hits = " << hits << endl;
 
     bool detected = hits >= 5;
     m_detected.store(detected, std::memory_order_release);

@@ -14,12 +14,17 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-FlagNavigationAir::FlagNavigationAir(ProgramEnvironment& env, ConsoleHandle& console)
+FlagNavigationAir::FlagNavigationAir(
+    ProgramEnvironment& env, ConsoleHandle& console,
+    bool stop_on_shiny
+)
     : SuperControlSession(env, console)
+    , m_stop_on_shiny(stop_on_shiny)
     , m_flag(console, console)
     , m_mount(console)
     , m_centerA(console, console, ButtonType::ButtonA, {0.40, 0.50, 0.40, 0.50}, std::chrono::milliseconds(200), false)
     , m_leftB(console, console, ButtonType::ButtonB, {0.02, 0.40, 0.05, 0.20}, std::chrono::milliseconds(200), false)
+    , m_shiny_listener(console, false)
     , m_looking_straight_ahead(false)
     , m_last_good_state(WallClock::min())
 {
@@ -204,6 +209,10 @@ bool FlagNavigationAir::run_state(
     AsyncCommandSession& commands,
     std::chrono::system_clock::time_point timestamp
 ){
+    if (m_stop_on_shiny && m_shiny_listener.detected()){
+        return true;
+    }
+
     m_flag_detected = m_flag.get(m_flag_distance, m_flag_x, m_flag_y);
 //    cout << "flag_ok = " << flag_ok << ", x = " << m_flag_x << ", y = " << flag_y << endl;
 

@@ -57,7 +57,7 @@ MoneyFarmerHighlands::MoneyFarmerHighlands(const NuggetFarmerHighlands_Descripto
 
 
 
-class MoneyFarmerHighlands::Stats : public StatsTracker{
+class MoneyFarmerHighlands::Stats : public StatsTracker, public ShinyStatIncrementer{
 public:
     Stats()
         : attempts(m_stats["Attempts"])
@@ -71,6 +71,9 @@ public:
         m_display_order.emplace_back("Charm", true);
         m_display_order.emplace_back("Coin", true);
         m_display_order.emplace_back("Shinies", true);
+    }
+    virtual void add_shiny() override{
+        shinies++;
     }
 
     std::atomic<uint64_t>& attempts;
@@ -197,7 +200,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
 
 
     env.console.log("Returning to Jubilife...");
-    goto_camp_from_overworld(env, env.console, SHINY_DETECTED);
+    goto_camp_from_overworld(env, env.console, SHINY_DETECTED, stats);
     goto_professor(env.console, Camp::HIGHLANDS_HIGHLANDS);
     from_professor_return_to_jubilife(env, env.console);
 
