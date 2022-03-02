@@ -125,6 +125,7 @@ void on_shiny(
             embeds.emplace_back("Session Stats", QString::fromStdString(str));
         }
     }
+    embeds.emplace_back("Detection Method", "Audio. (Shiny may not be visible on the screen.)");
 
     send_program_notification(
         console, options.NOTIFICATIONS, Color(0xffff99),
