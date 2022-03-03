@@ -70,7 +70,7 @@ bool ShinySoundDetector::process_spectrums(
             continue; // error or not enough spectrum history
         }
 
-        const float threshold = (float)GameSettings::instance().SHINY_SHOUND_THRESHOLD;
+        const float threshold = (float)GameSettings::instance().SHINY_SHOUND_THRESHOLD0;
         bool found = matcherScore <= threshold;
 //        cout << matcherScore << endl;
 
