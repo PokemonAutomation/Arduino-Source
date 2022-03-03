@@ -253,7 +253,7 @@ double terrain_damage_multiplier(const Pokemon& attacker, const Pokemon& defende
 //    const std::string& move_name = move.name();
     Type move_type = move.type();
 
-    bool is_flying = (attacker.type1() == Type::flying) or (attacker.type2() == Type::flying);
+    bool is_flying = (attacker.type1() == Type::flying) || (attacker.type2() == Type::flying);
     bool is_levitate = attacker.ability() == "levitate";
 
     if (!is_flying || !is_levitate)
@@ -305,10 +305,10 @@ double terrain_damage_multiplier(const Pokemon& attacker, const Pokemon& defende
     }
 
     // rising voltage applies if the defender is affected by the terrain
-    is_flying = (defender.type1() == Type::flying) or (defender.type2() == Type::flying);
+    is_flying = (defender.type1() == Type::flying) || (defender.type2() == Type::flying);
     is_levitate = defender.ability() == "levitate";
 
-    if (!is_flying or !is_levitate){
+    if (!is_flying || !is_levitate){
         if (field.is_electric()){
             if (move == "rising-voltage"){
                 modifier *= 2.0;

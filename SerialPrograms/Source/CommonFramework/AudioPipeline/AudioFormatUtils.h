@@ -18,11 +18,11 @@ std::string dumpAudioFormat(const QAudioFormat& format);
 
 void setSampleFormatToFloat(QAudioFormat& format);
 
-void convertSamplesToFloat(const QAudioFormat& format, const char* data, int len, float* out);
+void convertSamplesToFloat(const QAudioFormat& format, const char* data, size_t len, float* out);
 
 // Compute sum of the sample buffer.
 // Used to debug whether the audio stream is always the same values or always zeros.
-float audioSampleSum(const QAudioFormat& format, const char* data, int len);
+float audioSampleSum(const QAudioFormat& format, const char* data, size_t len);
 
 }
 

@@ -48,7 +48,7 @@ void setSampleFormatToFloat(QAudioFormat& format){
 }
 
 template <typename Type>
-void normalize_type(const QAudioFormat& format, const char* data, int len, float* out){
+void normalize_type(const QAudioFormat& format, const char* data, size_t len, float* out){
     if (format.byteOrder() == QAudioFormat::Endian::LittleEndian){
         normalize_audio_le<Type>(out, reinterpret_cast<const Type*>(data), len/sizeof(Type));
     } else{
@@ -56,7 +56,7 @@ void normalize_type(const QAudioFormat& format, const char* data, int len, float
     }
 }
 
-void convertSamplesToFloat(const QAudioFormat& format, const char* data, int len, float* out){
+void convertSamplesToFloat(const QAudioFormat& format, const char* data, size_t len, float* out){
 
     switch(format.sampleType()){
     case QAudioFormat::SampleType::Float:
@@ -150,7 +150,7 @@ void setSampleFormatToFloat(QAudioFormat& format){
     format.setSampleFormat(QAudioFormat::SampleFormat::Float);
 }
 
-void convertSamplesToFloat(const QAudioFormat& format, const char* data, int len, float* out){
+void convertSamplesToFloat(const QAudioFormat& format, const char* data, size_t len, float* out){
     switch(format.sampleFormat()){
     case QAudioFormat::SampleFormat::Float:
         memcpy(out, data, len);
@@ -172,11 +172,11 @@ void convertSamplesToFloat(const QAudioFormat& format, const char* data, int len
 #endif
 
 
-float audioSampleSum(const QAudioFormat& format, const char* data, int len){
-    const int frameBytes = format.bytesPerFrame();
-    const int numChannels = format.channelCount();
-    const int sampleBytes = frameBytes / numChannels;
-    const int numSamples = len / sampleBytes;
+float audioSampleSum(const QAudioFormat& format, const char* data, size_t len){
+    const size_t frameBytes = format.bytesPerFrame();
+    const size_t numChannels = format.channelCount();
+    const size_t sampleBytes = frameBytes / numChannels;
+    const size_t numSamples = len / sampleBytes;
     std::vector<float> buffer(numSamples);
     convertSamplesToFloat(format, data, len, buffer.data());
 

@@ -70,15 +70,17 @@ private:
     static const uint16_t GET_ON_BRAVIARY_TIME = 280;
 
 
-    std::chrono::system_clock::time_point m_min_stop;
-    std::chrono::system_clock::time_point m_deadline;
-    bool m_stop_on_shiny;
+    const WallClock m_min_stop;
+    const WallClock m_deadline;
+    const bool m_stop_on_shiny;
 
     UnderAttackWatcher m_attacked;
     MountTracker m_mount;
     ButtonDetector m_centerA;
     ButtonDetector m_leftB;
     ShinySoundDetector m_shiny_listener;
+
+    WallClock m_get_on_sneasler_time;
 };
 
 

@@ -85,7 +85,7 @@ bool ShinySoundDetector::process_spectrums(
             }
             std::ostringstream os;
             os << "Shiny sound find, score " << matcherScore << "/" << threshold << ", scale: " << m_matcher->lastMatchedScale();
-            m_console.log(os.str(), COLOR_RED);
+            m_console.log(os.str(), COLOR_BLUE);
             audioFeed.add_overlay(curStamp+1-m_matcher->numTemplateWindows(), curStamp+1, COLOR_RED);
             // Tell m_matcher to skip the remaining spectrums so that if `process_spectrums()` gets
             // called again on a newer batch of spectrums, m_matcher is happy.

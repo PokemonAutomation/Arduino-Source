@@ -31,12 +31,16 @@ EscapeFromAttack::EscapeFromAttack(
     , m_centerA(console, console, ButtonType::ButtonA, {0.40, 0.50, 0.40, 0.50}, std::chrono::milliseconds(200), false)
     , m_leftB(console, console, ButtonType::ButtonB, {0.02, 0.40, 0.05, 0.20}, std::chrono::milliseconds(200), false)
     , m_shiny_listener(console, false)
+    , m_get_on_sneasler_time(WallClock::min())
 {
     *this += m_attacked;
     *this += m_mount;
     *this += m_centerA;
     *this += m_leftB;
     *this += m_shiny_listener;
+
+    const std::chrono::milliseconds GET_ON_BRAVIARY_TIME_MILLIS(GET_ON_BRAVIARY_TIME * 1000 / TICKS_PER_SECOND);
+
     register_state_command(State::UNKNOWN, [=](){
         m_console.log("Unknown state. Moving foward...");
         m_active_command->dispatch([=](const BotBaseContext& context){
@@ -100,7 +104,8 @@ EscapeFromAttack::EscapeFromAttack(
         return false;
     });
     register_state_command(State::DASH_FORWARD, [=](){
-        bool delay_dash = (State)last_state() == State::GET_ON_SNEASLER;
+        bool delay_dash =
+            std::chrono::system_clock::now() < m_get_on_sneasler_time + GET_ON_BRAVIARY_TIME_MILLIS;
         if (delay_dash){
             m_console.log("Dashing forward... (delayed due to being on Sneasler)");
         }else{
@@ -119,6 +124,7 @@ EscapeFromAttack::EscapeFromAttack(
         m_active_command->dispatch([=](const BotBaseContext& context){
             pbf_press_button(context, BUTTON_A, 20, 230);
         });
+        m_get_on_sneasler_time = std::chrono::system_clock::now();
         return false;
     });
     register_state_command(State::CLIMBING, [=](){

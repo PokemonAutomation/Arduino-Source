@@ -139,11 +139,13 @@ void on_shiny(
     case ShinyDetectedAction::IGNORE:
         return;
     case ShinyDetectedAction::STOP_PROGRAM:
-        pbf_wait(console, options.VIDEO_DELAY);
+        pbf_press_button(console, BUTTON_ZL, 20, options.VIDEO_DELAY);
+//        pbf_wait(console, options.VIDEO_DELAY);
         pbf_press_button(console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
         throw ShinyDetectedException(std::move(screenshot));
     case ShinyDetectedAction::TAKE_VIDEO_STOP_PROGRAM:
-        pbf_wait(console, options.VIDEO_DELAY);
+        pbf_press_button(console, BUTTON_ZL, 20, options.VIDEO_DELAY);
+//        pbf_wait(console, options.VIDEO_DELAY);
         pbf_press_button(console, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
         pbf_press_button(console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
         throw ShinyDetectedException(std::move(screenshot));

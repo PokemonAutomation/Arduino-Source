@@ -83,7 +83,7 @@ private:
 
     // Convert raw samples read from m_wavFile (stored in m_rawBuffer) into
     // float type and return the pointer and length of the converted data.
-    std::tuple<const char*, size_t> convertRawWavSamples();
+    std::pair<const char*, size_t> convertRawWavSamples();
 
     // Send audio samples read fomr m_wavFile on m_timer.
     void sendBufferFromWavFileOnTimer();

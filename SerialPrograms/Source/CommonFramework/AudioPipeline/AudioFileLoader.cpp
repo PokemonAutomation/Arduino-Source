@@ -202,61 +202,65 @@ void AudioFileLoader::sendBufferFromWavFileOnTimer(){
     emit bufferReady(std::get<0>(bufferPtrLen), std::get<1>(bufferPtrLen));
 }
 
-std::tuple<const char*, size_t> AudioFileLoader::convertRawWavSamples(){
+std::pair<const char*, size_t> AudioFileLoader::convertRawWavSamples(){
     const QAudioFormat& wavAudioFormat = m_wavFile->audioFormat();
 
-    const int wavBytesRead = (int)m_rawBuffer.size();
+    const size_t wavBytesRead = m_rawBuffer.size();
     
     // Simple case, the target audio format is the same as the format used in the wav file.
     if (m_audioFormat == wavAudioFormat){
-        return std::make_tuple<const char*, size_t>(m_rawBuffer.data(), wavBytesRead);
+        return {m_rawBuffer.data(), wavBytesRead};
     }
 
     // Now we need to convert the audio samples to the target format:
 
-    const int wavBytesPerFrame = wavAudioFormat.bytesPerFrame();
-    const int wavNumChannels = wavAudioFormat.channelCount();
-    const int wavBytesPerSample = wavBytesPerFrame / wavNumChannels;
-    const int framesRead = wavBytesRead / wavBytesPerFrame;
-    const int samplesRead = wavBytesRead / wavBytesPerSample;
-    
+    const size_t wavBytesPerFrame = wavAudioFormat.bytesPerFrame();
+    const size_t wavNumChannels = wavAudioFormat.channelCount();
+    const size_t wavBytesPerSample = wavBytesPerFrame / wavNumChannels;
+    const size_t framesRead = wavBytesRead / wavBytesPerFrame;
+    const size_t samplesRead = wavBytesRead / wavBytesPerSample;
+
     // m_floatBuffer holds the converted float-type samples
     // TODO: design a general format conversion method
     m_floatBuffer.resize(samplesRead);
     convertSamplesToFloat(wavAudioFormat, m_rawBuffer.data(), wavBytesRead, m_floatBuffer.data());
     
     if (m_audioFormat.channelCount() == wavAudioFormat.channelCount()){
-        return std::make_tuple<const char*, size_t>(reinterpret_cast<const char*>(m_floatBuffer.data()),
-            m_floatBuffer.size() * sizeof(float));
+        return {
+            reinterpret_cast<const char*>(m_floatBuffer.data()),
+            m_floatBuffer.size() * sizeof(float)
+        };
     }
     
     if(m_audioFormat.channelCount() == 1){
         // Input wav file has stereo or more channels, but output format is mono,
         // average L and R channel samples per frame:
-        for(int i = 0; i < framesRead; i++){
+        for(size_t i = 0; i < framesRead; i++){
             m_floatBuffer[i] = (m_floatBuffer[2*i] + m_floatBuffer[2*i+1]) / 2.0f;
         }
-        return std::make_tuple<const char*, size_t>(reinterpret_cast<const char*>(m_floatBuffer.data()), framesRead * sizeof(float));
+        return {reinterpret_cast<const char*>(m_floatBuffer.data()), framesRead * sizeof(float)};
     }
     
     if(wavAudioFormat.channelCount() == 1){
         // Input wav is mono but output format is stereo,
         // Duplicate samples for each channel:
         m_floatBuffer.resize(samplesRead * m_audioFormat.channelCount());
-        for(int i = samplesRead-1; i >= 0; i--){
+        for(size_t i = samplesRead; i-- > 0;){
             const float v = m_floatBuffer[i];
             for(int j = m_audioFormat.channelCount()-1; j >= 0; j--){
                 m_floatBuffer[m_audioFormat.channelCount()*i+j] = v;
             }
         }
-        return std::make_tuple<const char*, size_t>(reinterpret_cast<const char*>(m_floatBuffer.data()),
-            framesRead * m_audioFormat.channelCount() * sizeof(float));
+        return {
+            reinterpret_cast<const char*>(m_floatBuffer.data()),
+            framesRead * m_audioFormat.channelCount() * sizeof(float)
+        };
     }
     
     std::cout << "Error format conversion" << std::endl;
     std::cout << "Wav file format: " << dumpAudioFormat(wavAudioFormat);
     std::cout << "Audio format to convert to: " << dumpAudioFormat(m_audioFormat);
-    return std::make_tuple<const char*, size_t>(reinterpret_cast<const char*>(m_floatBuffer.data()), 0);
+    return {reinterpret_cast<const char*>(m_floatBuffer.data()), 0};
 }
 
 

@@ -83,7 +83,10 @@ bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env) cons
             env, env.console,
             [&](const BotBaseContext& context){
                 while (true){
-                    pbf_mash_button(context, BUTTON_ZL, 5 * TICKS_PER_SECOND);
+                    for (size_t c = 0; c < 5; c++){
+                        pbf_press_button(context, BUTTON_ZL, 20, 105);
+                    }
+//                    pbf_mash_button(context, BUTTON_ZL, 5 * TICKS_PER_SECOND);
                 }
             },
             {
@@ -107,7 +110,10 @@ bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env) cons
             env, env.console,
             [&](const BotBaseContext& context){
                 while (true){
-                    pbf_mash_button(context, BUTTON_ZL, 5 * TICKS_PER_SECOND);
+                    for (size_t c = 0; c < 5; c++){
+                        pbf_press_button(context, BUTTON_ZL, 20, 105);
+                    }
+//                    pbf_mash_button(context, BUTTON_ZL, 5 * TICKS_PER_SECOND);
                 }
             },
             {
