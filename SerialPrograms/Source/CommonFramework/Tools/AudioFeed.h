@@ -28,17 +28,13 @@ public:
 
     //  The frequency magnitudes from FFT. The order in the vector is from lower to
     //  higher frequencies.
-    std::vector<float> magnitudes;
+    std::shared_ptr<const AlignedVector<float>> magnitudes;
 
-    AudioSpectrum(size_t s, size_t rate, std::vector<float>&& m)
+    AudioSpectrum(size_t s, size_t rate, std::shared_ptr<const AlignedVector<float>> m)
         : stamp(s)
         , sample_rate(rate)
         , magnitudes(std::move(m))
     {}
-
-    AudioSpectrum(const AudioSpectrum&) = delete;
-    void operator=(const AudioSpectrum&) = delete;
-    AudioSpectrum(AudioSpectrum&&) = default;
 };
 
 //  Define basic interface of an audio feed to be used by programs or other services.
@@ -54,11 +50,11 @@ public:
 
     //  Return all the spectrums with stamps greater or equal to `startingStamp`
     //  Returned spectrums are ordered from newest (largest timestamp) to oldest (smallest timestamp) in the vector.
-    virtual void spectrums_since(size_t startingStamp, std::vector<std::shared_ptr<const AudioSpectrum>>& spectrums) = 0;
+    virtual std::vector<AudioSpectrum> spectrums_since(size_t startingStamp) = 0;
 
     //  Return a specific number of latest spectrums.
     //  Returned spectrums are ordered from newest (largest timestamp) to oldest (smallest timestamp) in the vector.
-    virtual void spectrums_latest(size_t numLatestSpectrums, std::vector<std::shared_ptr<const AudioSpectrum>>& spectrums) = 0;
+    virtual std::vector<AudioSpectrum> spectrums_latest(size_t numLatestSpectrums) = 0;
 
     //  Add visual overlay to the spectrums starting at `startingStamp` and before `endStamp` with `color`.
     virtual void add_overlay(size_t startingStamp, size_t endStamp, Color color) = 0;

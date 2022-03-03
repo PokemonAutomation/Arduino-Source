@@ -71,12 +71,10 @@ void ShinySoundListener::program(SingleSwitchProgramEnvironment& env){
     ShinySoundDetector detector(env.console, false);
 
 #if 1
-    AsyncAudioInferenceSession session(env, env.console, env.console);
+    AudioInferenceSession session(env, env.console, env.console);
     session += detector;
 
-    env.wait_for(std::chrono::seconds(300));
-
-    session.stop();
+    session.run();
 #endif
 
 #if 0
@@ -168,19 +166,21 @@ void searchAudioDump(){
 
         // match!
         float minScore = FLT_MAX;
-        std::vector<std::shared_ptr<const AudioSpectrum>> newSpectrums;
+        std::vector<AudioSpectrum> newSpectrums;
         size_t numStreamWindows = std::max(matcher.numTemplateWindows(), audio.numWindows());
         for(size_t audioIdx = 0; audioIdx < numStreamWindows; audioIdx++){
             newSpectrums.clear();
-            std::vector<float> freqVector(audio.numFrequencies());
+            AlignedVector<float> freqVector(audio.numFrequencies());
             if (audioIdx < audio.numWindows()){
                 const float * freq = audio.getWindow(audioIdx);
                 memcpy(freqVector.data(), freq, sizeof(float) * audio.numFrequencies());
             } else{
                 // add zero-freq window
             }
-            auto spectrum = std::make_shared<const AudioSpectrum>(audioIdx, SAMPLE_RATE, std::move(freqVector));
-            newSpectrums.push_back(spectrum);
+            newSpectrums.emplace_back(
+                audioIdx, SAMPLE_RATE,
+                std::make_unique<AlignedVector<float>>(std::move(freqVector))
+            );
             float score = matcher.match(newSpectrums);
             minScore = std::min(score, minScore);
         } // end audio Idx

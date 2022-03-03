@@ -40,7 +40,7 @@ public slots:
 
 signals:
     // Will be connected to the audio UI widget to display FFT results.
-    void FFTFinished(std::shared_ptr<AlignedVector<float>> fftOutput);
+    void FFTFinished(std::shared_ptr<const AlignedVector<float>> fftOutput);
 
 private:
     int m_fftLengthPowerOfTwo = 0;

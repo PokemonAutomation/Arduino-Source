@@ -71,9 +71,9 @@ public:
 
     int sample_rate();
 
-    void spectrums_since(size_t startingStamp, std::vector<std::shared_ptr<const AudioSpectrum>>& spectrums);
+    std::vector<AudioSpectrum> spectrums_since(size_t startingStamp);
 
-    void spectrums_latest(size_t numLatestSpectrums, std::vector<std::shared_ptr<const AudioSpectrum>>& spectrums);
+    std::vector<AudioSpectrum> spectrums_latest(size_t numLatestSpectrums);
 
     void add_overlay(size_t startingStamp, size_t endStamp, Color color);
 
@@ -89,7 +89,7 @@ signals:
 public slots:
     // The audio thread (managed by m_audioThreadController) sends signal
     // to this slot to pass FFT outputs to the display.
-    void loadFFTOutput(std::shared_ptr<AlignedVector<float>> fftOutput);
+    void loadFFTOutput(std::shared_ptr<const AlignedVector<float>> fftOutput);
 
 private:
     void update_size();
@@ -133,7 +133,7 @@ private:
     // of audio inference for automation programs.
     // The head of the list is the most recent FFT window, while the tail
     // is the oldest in history.
-    std::list<std::shared_ptr<const AudioSpectrum>> m_spectrums;
+    std::list<AudioSpectrum> m_spectrums;
     size_t m_spectrum_history_length = 10;
     // Since the spectrums will be probided to the automation programs in
     // other threads, we need to have a lock here.

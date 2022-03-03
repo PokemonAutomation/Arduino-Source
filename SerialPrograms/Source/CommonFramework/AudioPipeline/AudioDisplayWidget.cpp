@@ -170,23 +170,22 @@ void AudioDisplayWidget::set_audio(
     }
 }
 
-void AudioDisplayWidget::loadFFTOutput(std::shared_ptr<AlignedVector<float>> fftOutput){
+void AudioDisplayWidget::loadFFTOutput(std::shared_ptr<const AlignedVector<float>> fftOutput){
 //    std::cout << "T" << QThread::currentThread() << " AudioDisplayWidget::loadFFTOutput() called" << std::endl;
 
-    AlignedVector<float>& output = *fftOutput;
+    const AlignedVector<float>& output = *fftOutput;
 
-    std::vector<float> spectrumVector(output.begin(), output.end());
+//    std::vector<float> spectrumVector(output.begin(), output.end());
     {
         std::lock_guard<std::mutex> lock_gd(m_spectrums_lock);
-        const size_t stamp = (m_spectrums.size() > 0) ? m_spectrums.front()->stamp + 1 : 0;
-        auto spectrum = std::make_shared<const AudioSpectrum>(stamp, m_sampleRate, std::move(spectrumVector));
-        m_spectrums.push_front(spectrum);
+        const size_t stamp = (m_spectrums.size() > 0) ? m_spectrums.front().stamp + 1 : 0;
+        m_spectrums.emplace_front(stamp, m_sampleRate, fftOutput);
         if (m_spectrums.size() > m_spectrum_history_length){
             m_spectrums.pop_back();
         }
 
         // std::cout << "Loadd FFT output , stamp " << spectrum->stamp << std::endl;
-        m_freqVisStamps[m_nextFFTWindowIndex] = spectrum->stamp;
+        m_freqVisStamps[m_nextFFTWindowIndex] = stamp;
     }
 
     float scale = std::sqrt(0.5f / (float)output.size());
@@ -436,18 +435,21 @@ int AudioDisplayWidget::sample_rate(){
 }
 
 
-void AudioDisplayWidget::spectrums_since(size_t startingStamp, std::vector<std::shared_ptr<const AudioSpectrum>>& spectrums){
+std::vector<AudioSpectrum> AudioDisplayWidget::spectrums_since(size_t startingStamp){
+    std::vector<AudioSpectrum> spectrums;
     std::lock_guard<std::mutex> lock_gd(m_spectrums_lock);
     for(const auto& ptr : m_spectrums){
-        if (ptr->stamp >= startingStamp){
-            spectrums.push_back(ptr);
+        if (ptr.stamp >= startingStamp){
+            spectrums.emplace_back(ptr);
         } else{
             break;
         }
     }
+    return spectrums;
 }
 
-void AudioDisplayWidget::spectrums_latest(size_t numLatestSpectrums, std::vector<std::shared_ptr<const AudioSpectrum>>& spectrums){
+std::vector<AudioSpectrum> AudioDisplayWidget::spectrums_latest(size_t numLatestSpectrums){
+    std::vector<AudioSpectrum> spectrums;
     std::lock_guard<std::mutex> lock_gd(m_spectrums_lock);
     size_t i = 0;
     for(const auto& ptr : m_spectrums){
@@ -457,6 +459,7 @@ void AudioDisplayWidget::spectrums_latest(size_t numLatestSpectrums, std::vector
         spectrums.push_back(ptr);
         i++;
     }
+    return spectrums;
 }
 
 

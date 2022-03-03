@@ -35,7 +35,7 @@ public:
     QImage consume_screenshot();
 
     virtual bool process_spectrums(
-        const std::vector<std::shared_ptr<const AudioSpectrum>>& newSpectrums,
+        const std::vector<AudioSpectrum>& newSpectrums,
         AudioFeed& audioFeed
     ) override;
 

@@ -286,12 +286,12 @@ int AudioSelectorWidget::sample_rate(){
     return m_display.sample_rate();
 }
 
-void AudioSelectorWidget::spectrums_since(size_t startingStamp, std::vector<std::shared_ptr<const AudioSpectrum>>& spectrums){
-    m_display.spectrums_since(startingStamp, spectrums);
+std::vector<AudioSpectrum> AudioSelectorWidget::spectrums_since(size_t startingStamp){
+    return m_display.spectrums_since(startingStamp);
 }
 
-void AudioSelectorWidget::spectrums_latest(size_t numLatestSpectrums, std::vector<std::shared_ptr<const AudioSpectrum>>& spectrums){
-    m_display.spectrums_latest(numLatestSpectrums, spectrums);
+std::vector<AudioSpectrum> AudioSelectorWidget::spectrums_latest(size_t numLatestSpectrums){
+    return m_display.spectrums_latest(numLatestSpectrums);
 }
 
 void AudioSelectorWidget::add_overlay(size_t startingStamp, size_t endStamp, Color color){

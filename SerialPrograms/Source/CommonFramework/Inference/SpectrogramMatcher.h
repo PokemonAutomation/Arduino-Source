@@ -40,14 +40,14 @@ public:
     // Newer (larger timestamp) spectrums at beginning of `newSpectrums` while older (smaller
     // timestamp) spectrums at the end.
     // In invalid cases (internal error or not enough windows), return FLT_MAX
-    float match(const std::vector<std::shared_ptr<const AudioSpectrum>>& newSpectrums);
+    float match(const std::vector<AudioSpectrum>& newSpectrums);
 
     // Pass some spectrums in but don't run match on them.
     // Used for skipping some spectrums to avoid unnecessary matching.
     // Newer (larger timestamp) spectrums at beginning of `newSpectrums` while older (smaller
     // timestamp) spectrums at the end.
     // Return true if there is no error.
-    bool skip(const std::vector<std::shared_ptr<const AudioSpectrum>>& newSpectrums);
+    bool skip(const std::vector<AudioSpectrum>& newSpectrums);
 
     // Clear internal data to be used on another audio stream.
     void clear();
@@ -69,11 +69,11 @@ private:
 
     // Update internal data for the next new spectrum. Called by `updateToNewSpectrums()`.
     // Return true if there is no error.
-    bool updateToNewSpectrum(std::shared_ptr<const AudioSpectrum> newSpectrum);
+    bool updateToNewSpectrum(AudioSpectrum newSpectrum);
 
     // Update internal data for the new specttrums.
     // Return true if there is no error.
-    bool updateToNewSpectrums(const std::vector<std::shared_ptr<const AudioSpectrum>>& newSpectrums);
+    bool updateToNewSpectrums(const std::vector<AudioSpectrum>& newSpectrums);
 
 private:
     AudioTemplate m_template;
@@ -89,7 +89,7 @@ private:
 
     std::vector<float> m_spikeKernel;
 
-    std::list<std::shared_ptr<const AudioSpectrum>> m_spectrums;
+    std::list<AudioSpectrum> m_spectrums;
     std::list<float> m_spectrumNormSqrs;
 
     size_t m_lastStampTested = SIZE_MAX;

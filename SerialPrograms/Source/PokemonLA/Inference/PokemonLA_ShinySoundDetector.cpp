@@ -55,7 +55,7 @@ QImage ShinySoundDetector::consume_screenshot(){
 
 
 bool ShinySoundDetector::process_spectrums(
-    const std::vector<std::shared_ptr<const AudioSpectrum>>& newSpectrums,
+    const std::vector<AudioSpectrum>& newSpectrums,
     AudioFeed& audioFeed
 ){
     // Feed spectrum one by one to the matcher:
@@ -63,7 +63,7 @@ bool ShinySoundDetector::process_spectrums(
     // To feed the spectrum from old to new, we need to go through the vector in the reverse order:
     
     for(auto it = newSpectrums.rbegin(); it != newSpectrums.rend(); it++){
-        std::vector<std::shared_ptr<const AudioSpectrum>> singleSpectrum = {*it};
+        std::vector<AudioSpectrum> singleSpectrum = {*it};
         float matcherScore = m_matcher->match(singleSpectrum);
 
         if (matcherScore == FLT_MAX){
@@ -89,8 +89,10 @@ bool ShinySoundDetector::process_spectrums(
             audioFeed.add_overlay(curStamp+1-m_matcher->numTemplateWindows(), curStamp+1, COLOR_RED);
             // Tell m_matcher to skip the remaining spectrums so that if `process_spectrums()` gets
             // called again on a newer batch of spectrums, m_matcher is happy.
-            m_matcher->skip(std::vector<std::shared_ptr<const AudioSpectrum>>(newSpectrums.begin(), 
-                newSpectrums.begin() + std::distance(it+1, newSpectrums.rend())));
+            m_matcher->skip(std::vector<AudioSpectrum>(
+                newSpectrums.begin(),
+                newSpectrums.begin() + std::distance(it + 1, newSpectrums.rend())
+            ));
             m_detected.store(true, std::memory_order_release);
             return m_stop_on_detected;
         }

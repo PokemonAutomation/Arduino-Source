@@ -80,7 +80,7 @@ size_t SpectrogramMatcher::latestTimestamp() const{
     if (m_spectrums.size() == 0){
         return SIZE_MAX;
     }
-    return m_spectrums.front()->stamp;
+    return m_spectrums.front().stamp;
 }
 
 void SpectrogramMatcher::conv(const float* src, size_t num, float* dst){
@@ -105,20 +105,23 @@ float SpectrogramMatcher::templateNorm() const{
     return std::sqrt(sumSqr);
 }
 
-bool SpectrogramMatcher::updateToNewSpectrum(std::shared_ptr<const AudioSpectrum> spectrum){
-    if (m_numOriginalFrequencies != spectrum->magnitudes.size()){
+bool SpectrogramMatcher::updateToNewSpectrum(AudioSpectrum spectrum){
+//    const std::vector<float>& magnitudes = spectrum->magnitudes;
+//    const AlignedVector<float>& magnitudes = *spectrum->magnitudes1;
+
+    if (m_numOriginalFrequencies != spectrum.magnitudes->size()){
         std::cout << "Error: number of frequencies don't match in SpectrogramMatcher::match() " << 
-            m_numOriginalFrequencies << " " << spectrum->magnitudes.size() << std::endl;
+            m_numOriginalFrequencies << " " << spectrum.magnitudes->size() << std::endl;
         return false;
     }
 
     if (m_mode == Mode::SPIKE_CONV){
         // Do the conv on new spectrum too.
-        std::vector<float> convedSpectrum(m_template.numFrequencies());
-        conv(spectrum->magnitudes.data() + m_originalFreqStart, 
+        AlignedVector<float> convedSpectrum(m_template.numFrequencies());
+        conv(spectrum.magnitudes->data() + m_originalFreqStart,
             m_originalFreqEnd - m_originalFreqStart, convedSpectrum.data());
         
-        spectrum = std::make_shared<const AudioSpectrum>(spectrum->stamp, spectrum->sample_rate, std::move(convedSpectrum));
+        spectrum.magnitudes = std::make_unique<AlignedVector<float>>(std::move(convedSpectrum));
     }
 
     // Compute the norm square (= sum squares) of the spectrum, used for matching:
@@ -126,7 +129,8 @@ bool SpectrogramMatcher::updateToNewSpectrum(std::shared_ptr<const AudioSpectrum
     // move this per-spectrum computation to a shared struct for those matchers to save computation.
     float spectrumNormSqr = 0.0f;
     for(size_t i = m_freqStart; i < m_freqEnd; i++){
-        spectrumNormSqr += spectrum->magnitudes[i] * spectrum->magnitudes[i];
+        float mag = (*spectrum.magnitudes)[i];
+        spectrumNormSqr += mag * mag;
     }
     m_spectrumNormSqrs.push_front(spectrumNormSqr);
 
@@ -135,7 +139,7 @@ bool SpectrogramMatcher::updateToNewSpectrum(std::shared_ptr<const AudioSpectrum
     return true;
 }
 
-bool SpectrogramMatcher::updateToNewSpectrums(const std::vector<std::shared_ptr<const AudioSpectrum>>& newSpectrums){
+bool SpectrogramMatcher::updateToNewSpectrums(const std::vector<AudioSpectrum>& newSpectrums){
     for(auto it = newSpectrums.rbegin(); it != newSpectrums.rend(); it++){
         if(!updateToNewSpectrum(*it)){
             return false;
@@ -150,7 +154,7 @@ bool SpectrogramMatcher::updateToNewSpectrums(const std::vector<std::shared_ptr<
     return true;
 }
 
-float SpectrogramMatcher::match(const std::vector<std::shared_ptr<const AudioSpectrum>>& newSpectrums){
+float SpectrogramMatcher::match(const std::vector<AudioSpectrum>& newSpectrums){
     if (!updateToNewSpectrums(newSpectrums)){
         return FLT_MAX;
     }
@@ -160,14 +164,14 @@ float SpectrogramMatcher::match(const std::vector<std::shared_ptr<const AudioSpe
     }
 
     // Check whether the stored spectrums' timestamps are continuous:
-    size_t curStamp = m_spectrums.front()->stamp;
+    size_t curStamp = m_spectrums.front().stamp;
     size_t lastStamp = curStamp + 1;
     for(const auto& s : m_spectrums){
-        if (s->stamp != lastStamp-1){
+        if (s.stamp != lastStamp - 1){
             std::cout << "Error: SpectrogramMatcher's spectrum timestamps are not continuous:" << std::endl;
 
             for(const auto& sp : m_spectrums){
-                std::cout << sp->stamp << ", ";
+                std::cout << sp.stamp << ", ";
             }
             std::cout << std::endl;
             return FLT_MAX;
@@ -188,7 +192,7 @@ float SpectrogramMatcher::match(const std::vector<std::shared_ptr<const AudioSpe
     for(size_t i = 0; i < m_template.numWindows(); i++, iter++, iter2++){
         // match in order from latest window to oldest
         const float* templateData = m_template.getWindow(m_template.numWindows()-1-i);
-        const float* streamData = (*iter)->magnitudes.data();
+        const float* streamData = iter->magnitudes->data();
         streamSumSqr += *iter2;
         for(size_t j = m_freqStart; j < m_freqEnd; j++){
             sumMulti += templateData[j] * streamData[j];
@@ -204,7 +208,7 @@ float SpectrogramMatcher::match(const std::vector<std::shared_ptr<const AudioSpe
     for(size_t i = 0; i < m_template.numWindows(); i++, iter++, iter2++){
         // match in order from latest window to oldest
         const float* templateData = m_template.getWindow(m_template.numWindows()-1-i);
-        const float* streamData = (*iter)->magnitudes.data();
+        const float* streamData = iter->magnitudes->data();
         for(size_t j = m_freqStart; j < m_freqEnd; j++){
             float d = templateData[j] - scale * streamData[j];
             sum += d * d;
@@ -217,7 +221,7 @@ float SpectrogramMatcher::match(const std::vector<std::shared_ptr<const AudioSpe
     return distance;
 }
 
-bool SpectrogramMatcher::skip(const std::vector<std::shared_ptr<const AudioSpectrum>>& newSpectrums){
+bool SpectrogramMatcher::skip(const std::vector<AudioSpectrum>& newSpectrums){
     // Note: ideally we don't want to have any computation while skipping.
     // But updateToNewSpectrums() may still do some filtering and vector norm computation.
     // Since the computation is relatively small and we won't be skipping lots of frames anyway,

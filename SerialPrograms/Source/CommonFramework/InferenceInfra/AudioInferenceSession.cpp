@@ -111,7 +111,7 @@ AudioInferenceCallback* AudioInferenceSession::run(std::chrono::system_clock::ti
     uint64_t lastTimestamp = ~(uint64_t)0;
     // Stores new spectrums from audio feed. The newest spectrum (with largest timestamp) is at
     // the front of the vector.
-    std::vector<std::shared_ptr<const PokemonAutomation::AudioSpectrum>> spectrums;
+    std::vector<AudioSpectrum> spectrums;
 
     while (true){
         m_env.check_stopping();
@@ -119,17 +119,16 @@ AudioInferenceCallback* AudioInferenceSession::run(std::chrono::system_clock::ti
             return nullptr;
         }
 
-        spectrums.clear();
         if (lastTimestamp == SIZE_MAX){
-            m_feed.spectrums_latest(1, spectrums);
+            spectrums = m_feed.spectrums_latest(1);
         } else{
             // Note: in this file we never consider the case that stamp may overflow.
             // It requires on the order of 1e10 years to overflow if we have about 25ms per stamp.
-            m_feed.spectrums_since(lastTimestamp+1, spectrums);
+            spectrums = m_feed.spectrums_since(lastTimestamp + 1);
         }
         if (spectrums.size() > 0){
             // spectrums[0] has the newest spectrum with the largest stamp:
-            lastTimestamp = spectrums[0]->stamp;
+            lastTimestamp = spectrums[0].stamp;
         }
 
         std::unique_lock<std::mutex> lg(m_lock);
