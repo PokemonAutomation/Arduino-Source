@@ -33,7 +33,7 @@ int main(int argc, char *argv[]){
 
     qRegisterMetaType<uint8_t>("uint8_t");
     qRegisterMetaType<std::string>();
-    qRegisterMetaType<QVector<float>>("QVector<float>");
+//    qRegisterMetaType<QVector<float>>("QVector<float>");
 
     OutputRedirector redirect_stdout(std::cout, "stdout", Color());
     OutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);

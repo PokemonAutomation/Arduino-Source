@@ -109,7 +109,10 @@ void save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console){
         console.botbase().wait_for_all_requests();
 
         ImageStats stats = image_stats(extract_box(console.video().snapshot(), box));
-        if (is_solid(stats, {0.208333, 0.338542, 0.453125}, 0.15, 15)){
+//        is_solid(stats, {0.208333, 0.338542, 0.453125}, 0.15, 15)
+        if (stats.stddev.sum() < 15 &&
+            stats.average.b > stats.average.r && stats.average.b > stats.average.g
+        ){
             pbf_press_button(console, BUTTON_A, 20, 605);
             pbf_press_button(console, BUTTON_B, 20, 230);
             pbf_press_button(console, BUTTON_B, 20, 355);

@@ -7,17 +7,17 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioDisplayWidget_H
 #define PokemonAutomation_AudioPipeline_AudioDisplayWidget_H
 
-#include <QWidget>
-#include <QThread>
+#include <memory>
 #include <deque>
 #include <set>
 #include <list>
 #include <fstream>
-#include <memory>
+#include <QWidget>
+#include <QThread>
 #include <QAudioFormat>
-
-#include "AudioSelector.h"
+#include "Common/Cpp/AlignedVector.h"
 #include "CommonFramework/Tools/AudioFeed.h"
+#include "AudioSelector.h"
 
 class QString;
 
@@ -89,7 +89,7 @@ signals:
 public slots:
     // The audio thread (managed by m_audioThreadController) sends signal
     // to this slot to pass FFT outputs to the display.
-    void loadFFTOutput(const QVector<float>& fftOutput);
+    void loadFFTOutput(std::shared_ptr<AlignedVector<float>> fftOutput);
 
 private:
     void update_size();
@@ -101,11 +101,11 @@ private:
     AudioThreadController* m_audioThreadController = nullptr;
 
     // Num frequencies to store for the output of one fft computation.
-    size_t m_numFreqs = 0;
+    const size_t m_numFreqs;
     // Num sliding fft windows to visualize.
-    size_t m_numFreqWindows = 0;
+    const size_t m_numFreqWindows;
     // Num blocks of frequencies to visualize for one sliding window.
-    size_t m_numFreqVisBlocks = 0;
+    const size_t m_numFreqVisBlocks;
     // The boundaries to separate each frequency vis block.
     // i-th freq vis block is made by frequencies whose indices in m_spectrums
     // fall inside the range: [ m_freqVisBlockBoundaries[i], m_freqVisBlockBoundaries[i+1] )

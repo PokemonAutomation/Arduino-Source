@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/AlignedVector.tpp"
 #include "AudioConstants.h"
 #include "AudioIODevice.h"
 
@@ -21,7 +22,8 @@ AudioIODevice::AudioIODevice(const QAudioFormat& audioFormat, ChannelMode channe
      , m_channelMode(channelMode)
      , m_channelSwapBuffer(8192)
      , m_fftCircularBuffer(NUM_FFT_SAMPLES * 8)
-     , m_fftInputVector(NUM_FFT_SAMPLES) {}
+//     , m_fftInputVector(NUM_FFT_SAMPLES)
+{}
 
 AudioIODevice::~AudioIODevice() {}
 
@@ -117,11 +119,11 @@ qint64 AudioIODevice::writeData(const char* data, qint64 len)
         // While we have enough new data to file an FFT:
         while(nextFFTNumFramesNeeded <= numNewDataForFFT){
             // copy data from m_fftCircularBuffer to m_fftInputVector:
-            moveDataToFFTInputVector();
+            std::shared_ptr<AlignedVector<float>> input_vector = std::make_unique<AlignedVector<float>>(moveDataToFFTInputVector());
             // std::cout << "FFT input copied " << std::endl;
 
             // emit signal for FFT:
-            emit fftInputReady(m_fftInputVector);
+            emit fftInputReady(std::move(input_vector));
 
             // Update numNewDataForFFT to account for fft samples consumed:
             numNewDataForFFT -= nextFFTNumFramesNeeded;
@@ -181,13 +183,17 @@ size_t AudioIODevice::computeNextFFTSamplesNeeded() const{
     return NUM_FFT_SAMPLES - nextFFTNumSamplesFilled;
 }
 
-void AudioIODevice::moveDataToFFTInputVector(){
+AlignedVector<float> AudioIODevice::moveDataToFFTInputVector(){
+    AlignedVector<float> out(NUM_FFT_SAMPLES);
     size_t num = std::min(m_fftCircularBuffer.size() - m_fftStart, (size_t)NUM_FFT_SAMPLES);
-    memcpy(m_fftInputVector.data(), m_fftCircularBuffer.data() + m_fftStart, sizeof(float) * num);
+//    memcpy(m_fftInputVector.data(), m_fftCircularBuffer.data() + m_fftStart, sizeof(float) * num);
+    memcpy(out.data(), m_fftCircularBuffer.data() + m_fftStart, sizeof(float) * num);
     if (num < NUM_FFT_SAMPLES){
         // We reach the end of the circular buffer, start from its beginning to copy the remaining part:
-        memcpy(m_fftInputVector.data() + num, m_fftCircularBuffer.data(), sizeof(float) * (NUM_FFT_SAMPLES - num));
+//        memcpy(m_fftInputVector.data() + num, m_fftCircularBuffer.data(), sizeof(float) * (NUM_FFT_SAMPLES - num));
+        memcpy(out.data() + num, m_fftCircularBuffer.data(), sizeof(float) * (NUM_FFT_SAMPLES - num));
     }
+    return out;
 }
 
 

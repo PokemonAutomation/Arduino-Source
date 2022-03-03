@@ -31,7 +31,7 @@ AudioThreadController::AudioThreadController(
 ){
     QObject::setParent(parent);
 
-    // std::cout << "Controller thread " << QThread::currentThread() << " " << inputAbsoluteFilepath.toStdString() << std::endl;
+    std::cout << "Controller thread " << QThread::currentThread() << " " << inputAbsoluteFilepath.toStdString() << std::endl;
 
     // Note: there is no audio initialization work in AudioWorker constructor. This is intended.
     // Starting the audio will register internal QT audio code to the current thread. If the QT audio

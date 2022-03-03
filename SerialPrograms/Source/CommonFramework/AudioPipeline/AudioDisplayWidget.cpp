@@ -19,6 +19,7 @@
 #include <QIODevice>
 #include <QBuffer>
 #include "Common/Compiler.h"
+#include "Common/Cpp/AlignedVector.tpp"
 #include "AudioConstants.h"
 #include "AudioInfo.h"
 #include "AudioDisplayWidget.h"
@@ -169,14 +170,16 @@ void AudioDisplayWidget::set_audio(
     }
 }
 
-void AudioDisplayWidget::loadFFTOutput(const QVector<float>& fftOutput){
-    // std::cout << "T" << QThread::currentThread() << " AudioDisplayWidget::loadFFTOutput() called" << std::endl;
+void AudioDisplayWidget::loadFFTOutput(std::shared_ptr<AlignedVector<float>> fftOutput){
+//    std::cout << "T" << QThread::currentThread() << " AudioDisplayWidget::loadFFTOutput() called" << std::endl;
 
-    std::vector<float> spectrumVector(fftOutput.begin(), fftOutput.end());
+    AlignedVector<float>& output = *fftOutput;
+
+    std::vector<float> spectrumVector(output.begin(), output.end());
     {
         std::lock_guard<std::mutex> lock_gd(m_spectrums_lock);
         const size_t stamp = (m_spectrums.size() > 0) ? m_spectrums.front()->stamp + 1 : 0;
-        auto spectrum = std::make_shared<const AudioSpectrum>(stamp, std::move(spectrumVector));
+        auto spectrum = std::make_shared<const AudioSpectrum>(stamp, m_sampleRate, std::move(spectrumVector));
         m_spectrums.push_front(spectrum);
         if (m_spectrums.size() > m_spectrum_history_length){
             m_spectrums.pop_back();
@@ -186,7 +189,7 @@ void AudioDisplayWidget::loadFFTOutput(const QVector<float>& fftOutput){
         m_freqVisStamps[m_nextFFTWindowIndex] = spectrum->stamp;
     }
 
-    float scale = std::sqrt(0.5f / (float)fftOutput.size());
+    float scale = std::sqrt(0.5f / (float)output.size());
 //    scale *= m_numFreqVisBlocks;
 //    scale *= 100;
 
@@ -195,7 +198,7 @@ void AudioDisplayWidget::loadFFTOutput(const QVector<float>& fftOutput){
     for(size_t i = 0; i < m_numFreqVisBlocks; i++){
         float mag = 0.0f;
         for(size_t j = m_freqVisBlockBoundaries[i]; j < m_freqVisBlockBoundaries[i+1]; j++){
-            mag += fftOutput[(int)j];
+            mag += output[j];
         }
 
         size_t width = m_freqVisBlockBoundaries[i+1] - m_freqVisBlockBoundaries[i];
@@ -236,7 +239,7 @@ void AudioDisplayWidget::loadFFTOutput(const QVector<float>& fftOutput){
 
     if (m_saveFreqToDisk){
         for(size_t i = 0; i < m_numFreqs; i++){
-            m_freqStream << fftOutput[(int)i] << " ";
+            m_freqStream << output[i] << " ";
         }
         m_freqStream << std::endl;
     }

@@ -4,6 +4,8 @@
  *
  */
 
+#include "Common/Cpp/AlignedVector.tpp"
+#include "Kernels/AbsFFT/Kernels_AbsFFT.h"
 #include "AudioConstants.h"
 #include "AudioTemplate.h"
 #include "AudioFileLoader.h"
@@ -17,9 +19,9 @@ namespace PokemonAutomation{
 
 
 AudioTemplate::AudioTemplate(std::vector<float>&& spectrogram, size_t numWindows)
-    :m_numWindows(numWindows)
-    ,m_numFrequencies(spectrogram.size()/numWindows)
-    ,m_spectrogram(std::move(spectrogram)) {}
+    : m_numWindows(numWindows)
+    , m_numFrequencies(spectrogram.size()/numWindows)
+    , m_spectrogram(std::move(spectrogram)) {}
 
 
 AudioTemplate loadAudioTemplate(const QString& filename, int sampleRate){
@@ -40,8 +42,9 @@ AudioTemplate loadAudioTemplate(const QString& filename, int sampleRate){
         return AudioTemplate();
     }
 
-    FFTWorker fft(FFT_LENGTH_POWER_OF_TWO);
-    const size_t numFrequencies = fft.outputSize();
+    size_t numFrequencies = NUM_FFT_SAMPLES / 2;
+    AlignedVector<float> input_buffer(NUM_FFT_SAMPLES);
+    AlignedVector<float> output_buffer(numFrequencies);
 
     size_t numWindows = 0;
     std::vector<float> spectrogram;
@@ -53,18 +56,19 @@ AudioTemplate loadAudioTemplate(const QString& filename, int sampleRate){
         numWindows = 1;
         spectrogram.resize(numFrequencies);
 
-        std::vector<float> paddedBuffer(NUM_FFT_SAMPLES);
-        memcpy(paddedBuffer.data(), data, sizeof(float) * numSamples);
-        const float* fftOutput = fft.fftKernel(paddedBuffer.data());
-        memcpy(spectrogram.data(), fftOutput, sizeof(float) * numFrequencies);
-    } else{
+        memset(input_buffer.data(), 0, sizeof(float) * NUM_FFT_SAMPLES);
+        memcpy(input_buffer.data(), data, sizeof(float) * numSamples);
+        Kernels::AbsFFT::fft_abs(FFT_LENGTH_POWER_OF_TWO, output_buffer.data(), input_buffer.data());
+        memcpy(spectrogram.data(), output_buffer.data(), sizeof(float) * numFrequencies);
+    }else{
         numWindows = (numSamples - NUM_FFT_SAMPLES) / FFT_SLIDING_WINDOW_STEP + 1;
         spectrogram.resize(numWindows * numFrequencies);
 
         for(size_t i = 0, start = 0; start+NUM_FFT_SAMPLES <= numSamples; i++, start += FFT_SLIDING_WINDOW_STEP){
             assert(i < numWindows);
-            const float* fftOutput = fft.fftKernel(data + start);
-            memcpy(spectrogram.data() + i*numFrequencies, fftOutput, sizeof(float) * numFrequencies);
+            memcpy(input_buffer.data(), data + start, sizeof(float) * NUM_FFT_SAMPLES);
+            Kernels::AbsFFT::fft_abs(FFT_LENGTH_POWER_OF_TWO, output_buffer.data(), input_buffer.data());
+            memcpy(spectrogram.data() + i*numFrequencies, output_buffer.data(), sizeof(float) * numFrequencies);
         }
     }
 

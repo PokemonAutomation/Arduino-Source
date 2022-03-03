@@ -144,8 +144,8 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
 
     env.console.log("Traveling to Charm's location...");
     {
-        DialogDetector dialog_detector(env.console, env.console, SHINY_DETECTED.stop_on_shiny());
-        ShinySoundDetector shiny_detector(env.console, true);
+        DialogDetector dialog_detector(env.console, env.console, true);
+        ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
         int ret = run_until(
             env, env.console,
             [](const BotBaseContext& context){
@@ -235,7 +235,7 @@ void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env){
             stats.errors++;
             pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
-        }catch (ShinyDetectedException&){
+        }catch (OperationCancelledException&){
             break;
         }
     }

@@ -10,6 +10,7 @@
 #include <memory>
 #include <vector>
 #include "Common/Cpp/Color.h"
+#include "Common/Cpp/AlignedVector.h"
 
 namespace PokemonAutomation{
 
@@ -22,13 +23,21 @@ public:
     //  The stamp to denote which audio window it is from.
     //  the stamp starts at 0 and becomes larger for later windows in the stream.
     size_t stamp = 0;
+
+    size_t sample_rate;
+
     //  The frequency magnitudes from FFT. The order in the vector is from lower to
     //  higher frequencies.
     std::vector<float> magnitudes;
 
-    AudioSpectrum(size_t s, const std::vector<float>& m) : stamp(s), magnitudes(m) {}
-    AudioSpectrum(size_t s, std::vector<float>&& m) : stamp(s), magnitudes(std::move(m)) {}
-    AudioSpectrum(const AudioSpectrum&) = default;
+    AudioSpectrum(size_t s, size_t rate, std::vector<float>&& m)
+        : stamp(s)
+        , sample_rate(rate)
+        , magnitudes(std::move(m))
+    {}
+
+    AudioSpectrum(const AudioSpectrum&) = delete;
+    void operator=(const AudioSpectrum&) = delete;
     AudioSpectrum(AudioSpectrum&&) = default;
 };
 

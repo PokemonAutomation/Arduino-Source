@@ -122,9 +122,11 @@ void ShinySoundListener::program(SingleSwitchProgramEnvironment& env){
 // But we didn't find the shound sound :P
 void searchAudioDump(){
 
+    const size_t SAMPLE_RATE = 48000;
+
     QString shinyFilename = "./heracrossShinyTemplateCompact.wav";
     SpectrogramMatcher matcher(
-        shinyFilename, SpectrogramMatcher::Mode::SPIKE_CONV, 48000,
+        shinyFilename, SpectrogramMatcher::Mode::SPIKE_CONV, SAMPLE_RATE,
         GameSettings::instance().SHINY_SHOUND_LOW_FREQUENCY
     );
     
@@ -177,7 +179,7 @@ void searchAudioDump(){
             } else{
                 // add zero-freq window
             }
-            auto spectrum = std::make_shared<const AudioSpectrum>(audioIdx, std::move(freqVector));
+            auto spectrum = std::make_shared<const AudioSpectrum>(audioIdx, SAMPLE_RATE, std::move(freqVector));
             newSpectrums.push_back(spectrum);
             float score = matcher.match(newSpectrums);
             minScore = std::min(score, minScore);

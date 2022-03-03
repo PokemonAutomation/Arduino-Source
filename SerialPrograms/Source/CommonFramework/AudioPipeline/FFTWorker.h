@@ -7,13 +7,13 @@
 #ifndef PokemonAutomation_AudioPipeline_FFTWorker_H
 #define PokemonAutomation_AudioPipeline_FFTWorker_H
 
+#include <memory>
 #include <vector>
 #include <chrono>
 #include <QObject>
 #include <QVector>
 #include <QAudioFormat>
 #include "Common/Cpp/AlignedVector.h"
-#include "FFTWorker.h"
 
 namespace PokemonAutomation{
 
@@ -34,29 +34,17 @@ public:
     FFTWorker(int fftLengthPowerOfTwo);
     virtual ~FFTWorker();
 
-    const float* fftKernel(const float* input);
-
-    size_t outputSize() const { return m_fftOutputBuffer.size(); }
-
 public slots:
     // Will be connected to the audio IO code to receive fft input audio sample vector.
-    void computeFFT(const QVector<float>& rawAudioSamples);
+    void computeFFT(std::shared_ptr<AlignedVector<float>> rawAudioSamples);
 
 signals:
     // Will be connected to the audio UI widget to display FFT results.
-    void FFTFinished(const QVector<float>& fftOutput);
+    void FFTFinished(std::shared_ptr<AlignedVector<float>> fftOutput);
 
 private:
-
     int m_fftLengthPowerOfTwo = 0;
     size_t m_fftLength;
-
-    // The buffer to store fft input
-    AlignedVector<float> m_fftInputBuffer;
-    // The buffer to save fft output.
-    AlignedVector<float> m_fftOutputBuffer;
-
-    QVector<float> m_outputVector;
 };
 
 

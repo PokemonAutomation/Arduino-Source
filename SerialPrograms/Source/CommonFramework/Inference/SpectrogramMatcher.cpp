@@ -118,7 +118,7 @@ bool SpectrogramMatcher::updateToNewSpectrum(std::shared_ptr<const AudioSpectrum
         conv(spectrum->magnitudes.data() + m_originalFreqStart, 
             m_originalFreqEnd - m_originalFreqStart, convedSpectrum.data());
         
-        spectrum = std::make_shared<const AudioSpectrum>(spectrum->stamp, std::move(convedSpectrum));
+        spectrum = std::make_shared<const AudioSpectrum>(spectrum->stamp, spectrum->sample_rate, std::move(convedSpectrum));
     }
 
     // Compute the norm square (= sum squares) of the spectrum, used for matching:

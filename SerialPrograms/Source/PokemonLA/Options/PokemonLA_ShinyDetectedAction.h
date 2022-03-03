@@ -11,7 +11,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Options/BatchOption/GroupOption.h"
 #include "CommonFramework/Options/StaticTextOption.h"
-//#include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
@@ -33,6 +33,7 @@ public:
 };
 
 
+#if 0
 //  Throw when you want to force the program to stop.
 class ShinyDetectedException : public OperationCancelledException{
 public:
@@ -47,7 +48,7 @@ public:
 private:
     QImage m_screenshot;
 };
-
+#endif
 
 
 enum class ShinyDetectedAction{
@@ -62,13 +63,12 @@ public:
     ShinyDetectedActionOption();
 
     bool stop_on_shiny() const;
-    bool do_nothing() const;
 
-//    BooleanCheckBoxOption STOP_PROGRAM;
-//    BooleanCheckBoxOption TAKE_VIDEO;
     StaticTextOption DESCRIPTION;
     EnumDropdownOption ACTION;
-    TimeExpressionOption<uint16_t> VIDEO_DELAY;
+//    BooleanCheckBoxOption STOP_PROGRAM;
+//    BooleanCheckBoxOption TAKE_VIDEO;
+    TimeExpressionOption<uint16_t> SCREENSHOT_DELAY;
     EventNotificationOption NOTIFICATIONS;
 };
 
@@ -91,7 +91,7 @@ bool run_on_shiny(
 
 void on_shiny(
     ProgramEnvironment& env, ConsoleHandle& console,
-    ShinyDetectedActionOption& options, QImage screenshot
+    ShinyDetectedActionOption& options, const QImage &screenshot
 );
 
 

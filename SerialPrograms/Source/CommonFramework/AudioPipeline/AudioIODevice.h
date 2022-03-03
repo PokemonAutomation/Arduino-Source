@@ -11,6 +11,7 @@
 #include <QAudioFormat>
 #include <QIODevice>
 #include "Common/Compiler.h"
+#include "Common/Cpp/AlignedVector.h"
 
 namespace PokemonAutomation{
 
@@ -55,7 +56,7 @@ public:
 
 signals:
     // Signal filed whenever the FFT input buffer is filled.
-    void fftInputReady(const QVector<float>& fftInput);
+    void fftInputReady(std::shared_ptr<AlignedVector<float>> fftInput);
 
 private:
     // how many more samples needed to file the next FFT
@@ -63,7 +64,7 @@ private:
 
     // move audio samples from m_fftCircularBuffer starting at m_fftStart to m_fftInputVector
     // to ready for next FFT signal.
-    void moveDataToFFTInputVector();
+    AlignedVector<float> moveDataToFFTInputVector();
 
     QAudioFormat m_audioFormat;
     ChannelMode m_channelMode;
@@ -82,8 +83,8 @@ private:
     // The index on the m_fftCircularBuffer as the next chunk of FFT input.
     size_t m_fftStart = 0;
 
-    // The vector to store the input of one fft call.
-    QVector<float> m_fftInputVector;
+//    // The vector to store the input of one fft call.
+//    QVector<float> m_fftInputVector;
 
     QIODevice* m_audioSinkDevice = nullptr;
 

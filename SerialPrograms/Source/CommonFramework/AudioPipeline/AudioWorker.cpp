@@ -61,7 +61,9 @@ AudioWorker::AudioWorker(
     , m_inputAbsoluteFilepath(inputAbsoluteFilepath)
     , m_outputInfo(outputInfo)
     , m_volume(std::max(std::min(outputVolume, 1.0f), 0.0f))
-{}
+{
+    qRegisterMetaType<std::shared_ptr<AlignedVector<float>>>("std::shared_ptr<AlignedVector<float>>");
+}
 
 
 void AudioWorker::startAudio(){
