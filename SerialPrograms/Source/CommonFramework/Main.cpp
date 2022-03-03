@@ -31,8 +31,9 @@ int main(int argc, char *argv[]){
 #endif
     QApplication application(argc, argv);
 
+    qRegisterMetaType<size_t>("size_t");
     qRegisterMetaType<uint8_t>("uint8_t");
-    qRegisterMetaType<std::string>();
+    qRegisterMetaType<std::string>("std::string");
 //    qRegisterMetaType<QVector<float>>("QVector<float>");
 
     OutputRedirector redirect_stdout(std::cout, "stdout", Color());

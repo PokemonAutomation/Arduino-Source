@@ -56,7 +56,7 @@ public:
 
 signals:
     // Signal filed whenever the FFT input buffer is filled.
-    void fftInputReady(std::shared_ptr<AlignedVector<float>> fftInput);
+    void fftInputReady(size_t sampleRate, std::shared_ptr<AlignedVector<float>> fftInput);
 
 private:
     // how many more samples needed to file the next FFT

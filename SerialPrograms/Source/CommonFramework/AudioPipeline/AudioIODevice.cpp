@@ -123,7 +123,7 @@ qint64 AudioIODevice::writeData(const char* data, qint64 len)
             // std::cout << "FFT input copied " << std::endl;
 
             // emit signal for FFT:
-            emit fftInputReady(std::move(input_vector));
+            emit fftInputReady(audioFormat.sampleRate(), std::move(input_vector));
 
             // Update numNewDataForFFT to account for fft samples consumed:
             numNewDataForFFT -= nextFFTNumFramesNeeded;

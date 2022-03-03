@@ -38,12 +38,12 @@ FFTWorker::FFTWorker(int fftLengthPowerOfTwo)
 FFTWorker::~FFTWorker(){}
 
 
-void FFTWorker::computeFFT(std::shared_ptr<AlignedVector<float>> fftInput){
+void FFTWorker::computeFFT(size_t sampleRate, std::shared_ptr<AlignedVector<float>> fftInput){
     std::shared_ptr<AlignedVector<float>> out = std::make_unique<AlignedVector<float>>(m_fftLength / 2);
 
     Kernels::AbsFFT::fft_abs(m_fftLengthPowerOfTwo, out->data(), fftInput->data());
 
-    emit FFTFinished(std::move(out));
+    emit FFTFinished(sampleRate, std::move(out));
 }
 
 

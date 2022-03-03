@@ -36,11 +36,11 @@ public:
 
 public slots:
     // Will be connected to the audio IO code to receive fft input audio sample vector.
-    void computeFFT(std::shared_ptr<AlignedVector<float>> rawAudioSamples);
+    void computeFFT(size_t sampleRate, std::shared_ptr<AlignedVector<float>> rawAudioSamples);
 
 signals:
     // Will be connected to the audio UI widget to display FFT results.
-    void FFTFinished(std::shared_ptr<const AlignedVector<float>> fftOutput);
+    void FFTFinished(size_t sampleRate, std::shared_ptr<const AlignedVector<float>> fftOutput);
 
 private:
     int m_fftLengthPowerOfTwo = 0;

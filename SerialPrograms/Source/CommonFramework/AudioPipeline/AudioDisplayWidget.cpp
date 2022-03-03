@@ -170,7 +170,7 @@ void AudioDisplayWidget::set_audio(
     }
 }
 
-void AudioDisplayWidget::loadFFTOutput(std::shared_ptr<const AlignedVector<float>> fftOutput){
+void AudioDisplayWidget::loadFFTOutput(size_t sampleRate, std::shared_ptr<const AlignedVector<float>> fftOutput){
 //    std::cout << "T" << QThread::currentThread() << " AudioDisplayWidget::loadFFTOutput() called" << std::endl;
 
     const AlignedVector<float>& output = *fftOutput;
@@ -179,7 +179,7 @@ void AudioDisplayWidget::loadFFTOutput(std::shared_ptr<const AlignedVector<float
     {
         std::lock_guard<std::mutex> lock_gd(m_spectrums_lock);
         const size_t stamp = (m_spectrums.size() > 0) ? m_spectrums.front().stamp + 1 : 0;
-        m_spectrums.emplace_front(stamp, m_sampleRate, fftOutput);
+        m_spectrums.emplace_front(stamp, sampleRate, fftOutput);
         if (m_spectrums.size() > m_spectrum_history_length){
             m_spectrums.pop_back();
         }

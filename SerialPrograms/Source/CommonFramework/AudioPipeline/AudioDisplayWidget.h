@@ -89,7 +89,7 @@ signals:
 public slots:
     // The audio thread (managed by m_audioThreadController) sends signal
     // to this slot to pass FFT outputs to the display.
-    void loadFFTOutput(std::shared_ptr<const AlignedVector<float>> fftOutput);
+    void loadFFTOutput(size_t sampleRate, std::shared_ptr<const AlignedVector<float>> fftOutput);
 
 private:
     void update_size();
