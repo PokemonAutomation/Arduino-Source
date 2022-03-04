@@ -36,10 +36,7 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<BraviaryHeightGlitch_Descriptor, BraviaryHeightGlitch>();
     add_program<DistortionWaiter_Descriptor, DistortionWaiter>();
     add_program<OutbreakFinder_Descriptor, OutbreakFinder>();
-
-    if (GlobalSettings::instance().DEVELOPER_MODE){
-        add_program<NuggetFarmerHighlands_Descriptor, MoneyFarmerHighlands>();
-    }
+    add_program<NuggetFarmerHighlands_Descriptor, MoneyFarmerHighlands>();
 
     add_divider("---- Trading ----");
     add_program<SelfBoxTrade_Descriptor, SelfBoxTrade>();
