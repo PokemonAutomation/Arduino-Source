@@ -6,6 +6,7 @@
 #include <fstream>
 #include <QString>
 #include "SpectrogramMatcher.h"
+#include "Common/Cpp/AlignedVector.tpp"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
 #include "CommonFramework/Tools/AudioFeed.h"
 

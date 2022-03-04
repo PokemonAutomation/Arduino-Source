@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/AlignedVector.tpp"
 #include "CommonFramework/Tools/AudioFeed.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
