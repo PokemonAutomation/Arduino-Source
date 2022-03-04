@@ -17,13 +17,20 @@ namespace PokemonAutomation{
 class AudioTemplate;
 
 
+
 class AudioTemplateCache{
 public:
-    const AudioTemplate* get(const QString& path, size_t sample_rate);
+    const AudioTemplate* get_nothrow(const QString& path, size_t sample_rate);
+    const AudioTemplate& get_throw(const QString& path, size_t sample_rate);
+
+    static AudioTemplateCache& instance();
 
 private:
     ~AudioTemplateCache();
     AudioTemplateCache();
+
+    const AudioTemplate* get_nothrow_internal(const QString& full_path, size_t sample_rate);
+
 
 private:
     SpinLock m_lock;
@@ -31,13 +38,6 @@ private:
 };
 
 
-
-class AudioSpectrumCache{
-public:
-
-private:
-
-};
 
 
 

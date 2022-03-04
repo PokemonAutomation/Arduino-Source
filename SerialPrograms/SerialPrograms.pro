@@ -141,6 +141,7 @@ SOURCES += \
     Source/CommonFramework/ImageTools/ImageStats.cpp \
     Source/CommonFramework/ImageTools/SolidColorTest.cpp \
     Source/CommonFramework/Inference/AnomalyDetector.cpp \
+    Source/CommonFramework/Inference/AudioTemplateCache.cpp \
     Source/CommonFramework/Inference/BlackBorderDetector.cpp \
     Source/CommonFramework/Inference/BlackScreenDetector.cpp \
     Source/CommonFramework/Inference/FrozenImageDetector.cpp \
@@ -709,6 +710,7 @@ HEADERS += \
     Source/CommonFramework/ImageTools/ImageStats.h \
     Source/CommonFramework/ImageTools/SolidColorTest.h \
     Source/CommonFramework/Inference/AnomalyDetector.h \
+    Source/CommonFramework/Inference/AudioTemplateCache.h \
     Source/CommonFramework/Inference/BlackBorderDetector.h \
     Source/CommonFramework/Inference/BlackScreenDetector.h \
     Source/CommonFramework/Inference/FrozenImageDetector.h \

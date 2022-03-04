@@ -282,10 +282,6 @@ void AudioSelectorWidget::async_reset_audio(){
     emit internal_async_reset_audio();
 }
 
-int AudioSelectorWidget::sample_rate(){
-    return m_display.sample_rate();
-}
-
 std::vector<AudioSpectrum> AudioSelectorWidget::spectrums_since(size_t startingStamp){
     return m_display.spectrums_since(startingStamp);
 }

@@ -44,10 +44,6 @@ public:
     //  Reset audio; Can be called from any thread.
     virtual void async_reset_audio() = 0;
 
-    //  Return the sample rate of the current audio stream.
-    //  Return 0 if audio is not yet set up.
-    virtual int sample_rate() = 0;
-
     //  Return all the spectrums with stamps greater or equal to `startingStamp`
     //  Returned spectrums are ordered from newest (largest timestamp) to oldest (smallest timestamp) in the vector.
     virtual std::vector<AudioSpectrum> spectrums_since(size_t startingStamp) = 0;

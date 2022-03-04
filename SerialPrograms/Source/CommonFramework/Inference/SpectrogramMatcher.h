@@ -32,13 +32,15 @@ public:
     };
 
     SpectrogramMatcher(
-        const AudioTemplate& audioTemplate, Mode mode, int sampleRate,
+        AudioTemplate audioTemplate, Mode mode, size_t sampleRate,
         double lowFrequencyFilter
     );
     SpectrogramMatcher(
-        const QString& templateFilename, Mode mode, int sampleRate,
+        const QString& templateFilename, Mode mode, size_t sampleRate,
         double lowFrequencyFilter
     );
+
+    size_t sampleRate() const{ return m_sampleRate; }
 
     // Match the newest spectrums and return a match score.
     // Newer (larger timestamp) spectrums at beginning of `newSpectrums` while older (smaller
@@ -81,6 +83,9 @@ private:
 
 private:
     AudioTemplate m_template;
+
+    size_t m_sampleRate;
+
     size_t m_numOriginalFrequencies = 0;
     size_t m_originalFreqStart = 0;
     size_t m_originalFreqEnd = 0;

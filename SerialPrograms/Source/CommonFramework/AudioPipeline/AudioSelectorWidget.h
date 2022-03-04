@@ -51,8 +51,6 @@ public:
 
     virtual void async_reset_audio() override;
 
-    virtual int sample_rate() override;
-
     virtual std::vector<AudioSpectrum> spectrums_since(size_t startingStamp) override;
 
     virtual std::vector<AudioSpectrum> spectrums_latest(size_t numLatestSpectrums) override;

@@ -15,12 +15,13 @@ namespace PokemonAutomation{
 
 
 SpectrogramMatcher::SpectrogramMatcher(
-    const QString& templateFilename, Mode mode, int sampleRate,
+    AudioTemplate audioTemplate, Mode mode, size_t sampleRate,
     double lowFrequencyFilter
 )
-    : m_mode(mode)
+    : m_template(std::move(audioTemplate))
+    , m_sampleRate(sampleRate)
+    , m_mode(mode)
 {
-    m_template = loadAudioTemplate(templateFilename, sampleRate);
     const size_t numTemplateWindows = m_template.numWindows();
     m_numOriginalFrequencies = m_template.numFrequencies();
     if (m_template.numFrequencies() == 0){  // Error case, failed to load template
@@ -29,7 +30,7 @@ SpectrogramMatcher::SpectrogramMatcher(
 //        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to load audio template file.", templateFilename.toStdString());
     }
 
-    const int halfSampleRate = sampleRate / 2;
+    const size_t halfSampleRate = sampleRate / 2;
 
     // The frquency range from [0.0, halfSampleRate / numFrequencies, 2.0 halfSampleRate / numFrequencies, ... (numFrequencies-1) halfSampleRate / numFrequencies]
     // Since human can only hear as high as 20KHz sound, matching on frequencies >= 20KHz is meaningless.
@@ -47,7 +48,7 @@ SpectrogramMatcher::SpectrogramMatcher(
     // We find a good kernel when sample rate is 48K and numFrequencies is 2048:
     // [-4.f, -3.f, -2.f, -1.f, 0.f, 1.f, 2.f, 3.f, 4.f, 4.f, 3.f, 2.f, 1.f, 0.f, -1.f, -2.f, -3.f, -4.f]
     // This spans frenquency range of 17 * halfSampleRate / numFrequencies = 199.21875Hz, where 17 is the number of intervals in the above series.
-    // For another sample rate and numFrequencies combination, the number of intervals is 
+    // For another sample rate and numFrequencies combination, the number of intervals is
     // 199.21875 * numFrequencies / halfSampleRate
     size_t numKernelIntervals = int(199.21875 * m_numOriginalFrequencies / halfSampleRate + 0.5);
     size_t slopeLen = numKernelIntervals / 2;
@@ -57,7 +58,7 @@ SpectrogramMatcher::SpectrogramMatcher(
     for(size_t i = ((numKernelIntervals+1) % 2); i <= slopeLen; i++){
         m_spikeKernel.push_back(-4.0f + 8.f * (slopeLen-i)/(float)slopeLen);
     }
-    
+
     if (m_mode == Mode::SPIKE_CONV){
         // Do convolution on audio template
         const size_t numConvedFrequencies = (m_originalFreqEnd - m_originalFreqStart) - m_spikeKernel.size() + 1;
@@ -74,9 +75,15 @@ SpectrogramMatcher::SpectrogramMatcher(
         m_freqStart = m_originalFreqStart;
         m_freqEnd = m_originalFreqEnd;
     }
-    
+
     m_templateNorm = templateNorm();
 }
+SpectrogramMatcher::SpectrogramMatcher(
+    const QString& templateFilename, Mode mode, size_t sampleRate,
+    double lowFrequencyFilter
+)
+    : SpectrogramMatcher(loadAudioTemplate(templateFilename, sampleRate), mode, sampleRate, lowFrequencyFilter)
+{}
 
 size_t SpectrogramMatcher::latestTimestamp() const{
     if (m_spectrums.size() == 0){
@@ -108,9 +115,6 @@ float SpectrogramMatcher::templateNorm() const{
 }
 
 bool SpectrogramMatcher::updateToNewSpectrum(AudioSpectrum spectrum){
-//    const std::vector<float>& magnitudes = spectrum->magnitudes;
-//    const AlignedVector<float>& magnitudes = *spectrum->magnitudes1;
-
     if (m_numOriginalFrequencies != spectrum.magnitudes->size()){
         std::cout << "Error: number of frequencies don't match in SpectrogramMatcher::match() " << 
             m_numOriginalFrequencies << " " << spectrum.magnitudes->size() << std::endl;

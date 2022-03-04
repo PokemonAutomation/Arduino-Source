@@ -119,10 +119,6 @@ void AudioDisplayWidget::clear(){
         std::lock_guard<std::mutex> lock_gd(m_overlay_lock);
         m_overlay.clear();
     }
-    {
-        std::lock_guard<std::mutex> lock_gd(m_sampleRate_lock);
-        m_sampleRate = 0;
-    }
 }
 
 void AudioDisplayWidget::close_audio(){
@@ -145,28 +141,6 @@ void AudioDisplayWidget::set_audio(
     update_size();
     // Tell Qt to repaint the widget in the next drawing phase in the main loop.
     QWidget::update();
-
-    {
-        std::lock_guard<std::mutex> lock_gd(m_sampleRate_lock);
-        // Compute sample rate based on input data:
-        // Note, here we replicate the logic of choosing sample rate in the audio thread,
-        // AudioWorker::startAudio().
-        // It is less than ideal to replicate code, but because AudioWorker is in another thread,
-        // it is difficult to communicate the sample rate from AudioWorker to the UI thread where
-        // this AudioDisplayWidget resides without blocking.
-        // So we choose this simpler approach with the benefit of no blocking.
-        if (inputAbsoluteFilepath.size() > 0){
-            // We hard code sample rate from file to be 48KHz.
-            m_sampleRate = 48000;
-        } else{
-            m_sampleRate = inputInfo.preferredSampleRate();
-            if (m_sampleRate <= 40000){
-                m_sampleRate = 48000;
-            } else if (m_sampleRate >= 8000){
-                m_sampleRate /= 2;
-            }
-        }
-    }
 }
 
 void AudioDisplayWidget::loadFFTOutput(size_t sampleRate, std::shared_ptr<const AlignedVector<float>> fftOutput){
@@ -425,12 +399,6 @@ void AudioDisplayWidget::resizeEvent(QResizeEvent* event){
     }
 
     update_size();
-}
-
-
-int AudioDisplayWidget::sample_rate(){
-    std::lock_guard<std::mutex> lock_gd(m_sampleRate_lock);
-    return m_sampleRate;
 }
 
 

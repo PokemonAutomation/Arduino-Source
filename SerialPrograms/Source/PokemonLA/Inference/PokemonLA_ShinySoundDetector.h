@@ -26,7 +26,6 @@ namespace PokemonLA{
 class ShinySoundDetector : public AudioInferenceCallback{
 public:
     virtual ~ShinySoundDetector();
-    ShinySoundDetector(ConsoleHandle& console, bool stop_on_detected, int sampleRate);
     ShinySoundDetector(ConsoleHandle& console, bool stop_on_detected);
 
     bool detected() const{

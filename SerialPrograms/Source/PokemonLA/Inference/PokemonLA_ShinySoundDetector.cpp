@@ -5,8 +5,8 @@
  */
 
 #include <QString>
-#include "CommonFramework/Globals.h"
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
+#include "CommonFramework/Inference/AudioTemplateCache.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/AudioFeed.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
@@ -26,26 +26,11 @@ namespace PokemonLA{
 
 
 ShinySoundDetector::~ShinySoundDetector(){}
-ShinySoundDetector::ShinySoundDetector(ConsoleHandle& console, bool stop_on_detected, int sampleRate)
+ShinySoundDetector::ShinySoundDetector(ConsoleHandle& console, bool stop_on_detected)
     : AudioInferenceCallback("ShinySoundDetector")
     , m_console(console)
     , m_stop_on_detected(stop_on_detected)
     , m_detected(false)
-{
-    if (sampleRate == 0){
-        console.log("Invalid Sample Rate: " + std::to_string(sampleRate), COLOR_RED);
-        return;
-    }
-
-    QString shinyFilename = RESOURCE_PATH() + "PokemonLA/shiny." + QString::number(sampleRate) + ".wav";
-
-    m_matcher = std::make_unique<SpectrogramMatcher>(
-        shinyFilename, SpectrogramMatcher::Mode::SPIKE_CONV, sampleRate,
-        GameSettings::instance().SHINY_SHOUND_LOW_FREQUENCY
-    );
-}
-ShinySoundDetector::ShinySoundDetector(ConsoleHandle& console, bool stop_on_detected)
-    : ShinySoundDetector(console, stop_on_detected, console.audio().sample_rate())
 {}
 
 QImage ShinySoundDetector::consume_screenshot(){
@@ -58,6 +43,21 @@ bool ShinySoundDetector::process_spectrums(
     const std::vector<AudioSpectrum>& newSpectrums,
     AudioFeed& audioFeed
 ){
+    if (newSpectrums.empty()){
+        m_detected.store(false, std::memory_order_release);
+        return false;
+    }
+
+    size_t sampleRate = newSpectrums[0].sample_rate;
+    if (m_matcher == nullptr || m_matcher->sampleRate() != sampleRate){
+        m_console.log("Loading spectrogram...");
+        m_matcher = std::make_unique<SpectrogramMatcher>(
+            AudioTemplateCache::instance().get_throw("PokemonLA/ShinySound", sampleRate),
+            SpectrogramMatcher::Mode::SPIKE_CONV, sampleRate,
+            GameSettings::instance().SHINY_SHOUND_LOW_FREQUENCY
+        );
+    }
+
     // Feed spectrum one by one to the matcher:
     // newSpectrums are ordered from newest (largest timestamp) to oldest (smallest timestamp).
     // To feed the spectrum from old to new, we need to go through the vector in the reverse order:

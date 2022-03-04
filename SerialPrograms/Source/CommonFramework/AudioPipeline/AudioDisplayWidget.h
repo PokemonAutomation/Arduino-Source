@@ -69,8 +69,6 @@ public:
     // AudioSelectWidget inherits AudioFeed, and calls the functions below to fulfill the AudioFeed interface.
     // See class `AudioFeed` for the comments of those functions.
 
-    int sample_rate();
-
     std::vector<AudioSpectrum> spectrums_since(size_t startingStamp);
 
     std::vector<AudioSpectrum> spectrums_latest(size_t numLatestSpectrums);
@@ -118,11 +116,6 @@ private:
     std::vector<size_t> m_freqVisStamps;
     // The index of the next window in m_freqVisBlocks.
     size_t m_nextFFTWindowIndex = 0;
-
-    // The sample rate of the current audio stream.
-    int m_sampleRate = 0;
-    // Since other threads may query sample rate, add a lock.
-    std::mutex m_sampleRate_lock;
 
     std::deque<int> m_width_history;
     std::set<int> m_recent_widths;

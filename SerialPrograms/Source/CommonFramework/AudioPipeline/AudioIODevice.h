@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_AudioPipeline_AudioIODevice_H
 #define PokemonAutomation_AudioPipeline_AudioIODevice_H
 
+#include <memory>
 #include <QVector>
 #include <QAudioFormat>
 #include <QIODevice>
