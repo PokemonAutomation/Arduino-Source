@@ -164,6 +164,7 @@
 #include "PokemonLA/Inference/PokemonLA_UnderAttackDetector.h"
 #include "PokemonLA/Programs/PokemonLA_EscapeFromAttack.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
+#include "CommonFramework/Inference/SpectrogramMatcher.h"
 #include "TestProgramSwitch.h"
 
 #include <immintrin.h>
@@ -235,9 +236,6 @@ using namespace PokemonLA;
 
 
 
-
-
-
 void TestProgram::program(MultiSwitchProgramEnvironment& env){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -254,6 +252,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
+    pbf_move_left_joystick(console, 0, 0, 50, 0);
+    pbf_press_button(console, BUTTON_B, 20, 250);
+    pbf_mash_button(console, BUTTON_ZL, 250);
+    pbf_press_button(console, BUTTON_HOME, 20, 230);
+
+
+
+#if 0
     {
         QImage image("screenshot-20220302-093842398427.png");
 
@@ -272,7 +278,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
         DialogDetector detector(logger, overlay, true);
         detector.process_frame(image, std::chrono::system_clock::now());
     }
-
+#endif
 
 
 #if 0

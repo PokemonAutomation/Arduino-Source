@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Cpp/AlignedVector.tpp"
 #include "AudioConstants.h"
 #include "AudioIODevice.h"
 

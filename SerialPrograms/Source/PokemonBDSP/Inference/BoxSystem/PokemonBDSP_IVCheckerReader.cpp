@@ -49,12 +49,14 @@ IVCheckerValue IVCheckerReaderScope::read(LoggerQt& logger, const QImage& frame,
 }
 IVCheckerReader::Results IVCheckerReaderScope::read(LoggerQt& logger, const QImage& frame){
     IVCheckerReader::Results results;
-    results.hp      = read(logger, frame, m_box0);
-    results.attack  = read(logger, frame, m_box1);
-    results.defense = read(logger, frame, m_box2);
-    results.spatk   = read(logger, frame, m_box3);
-    results.spdef   = read(logger, frame, m_box4);
-    results.speed   = read(logger, frame, m_box5);
+    if (m_language != Language::None){
+        results.hp      = read(logger, frame, m_box0);
+        results.attack  = read(logger, frame, m_box1);
+        results.defense = read(logger, frame, m_box2);
+        results.spatk   = read(logger, frame, m_box3);
+        results.spdef   = read(logger, frame, m_box4);
+        results.speed   = read(logger, frame, m_box5);
+    }
     return results;
 }
 

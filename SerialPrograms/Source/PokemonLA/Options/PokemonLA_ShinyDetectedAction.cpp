@@ -143,7 +143,8 @@ void on_shiny(
         return;
     }
 
-    pbf_press_button(console, BUTTON_ZL, 20, options.SCREENSHOT_DELAY);
+//    pbf_press_button(console, BUTTON_ZL, 20, options.SCREENSHOT_DELAY);
+    pbf_mash_button(console, BUTTON_ZL, options.SCREENSHOT_DELAY);
     console.botbase().wait_for_all_requests();
 
     QImage screen = console.video().snapshot();

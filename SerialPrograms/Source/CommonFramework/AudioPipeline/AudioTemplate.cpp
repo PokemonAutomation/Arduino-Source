@@ -4,7 +4,6 @@
  *
  */
 
-#include "Common/Cpp/AlignedVector.tpp"
 #include "Kernels/AbsFFT/Kernels_AbsFFT.h"
 #include "AudioConstants.h"
 #include "AudioTemplate.h"

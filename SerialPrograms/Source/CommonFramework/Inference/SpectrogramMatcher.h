@@ -32,6 +32,10 @@ public:
     };
 
     SpectrogramMatcher(
+        const AudioTemplate& audioTemplate, Mode mode, int sampleRate,
+        double lowFrequencyFilter
+    );
+    SpectrogramMatcher(
         const QString& templateFilename, Mode mode, int sampleRate,
         double lowFrequencyFilter
     );

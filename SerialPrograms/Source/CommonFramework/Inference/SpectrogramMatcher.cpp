@@ -5,10 +5,10 @@
 #include <iostream>
 #include <fstream>
 #include <QString>
-#include "SpectrogramMatcher.h"
-#include "Common/Cpp/AlignedVector.tpp"
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
 #include "CommonFramework/Tools/AudioFeed.h"
+#include "SpectrogramMatcher.h"
 
 
 namespace PokemonAutomation{
@@ -26,6 +26,7 @@ SpectrogramMatcher::SpectrogramMatcher(
     if (m_template.numFrequencies() == 0){  // Error case, failed to load template
         std::cout << "Error: load audio template failed" << std::endl;
         return;
+//        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to load audio template file.", templateFilename.toStdString());
     }
 
     const int halfSampleRate = sampleRate / 2;

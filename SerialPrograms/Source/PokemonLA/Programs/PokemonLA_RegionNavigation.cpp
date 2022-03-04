@@ -336,7 +336,7 @@ void goto_camp_from_overworld(
         { &black_screen }
     );
     if (ret < 0){
-        throw OperationFailedException(console, "Failed to fly to camp after 5 seconds.");
+        throw OperationFailedException(console, "Failed to fly to camp after 20 seconds.");
     }
     console.log("Arrived at camp...");
     env.wait_for(std::chrono::seconds(1));

@@ -153,7 +153,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
                 pbf_press_button(context, BUTTON_B, 495, 80);
 
                 pbf_move_left_joystick(context, 224, 0, 50, 0);
-//                    pbf_press_button(context, BUTTON_B, 350, 80);
+//                pbf_press_button(context, BUTTON_B, 350, 80);
                 pbf_press_button(context, BUTTON_B, 80, 0);
                 for (size_t c = 0; c < 7; c++){
                     pbf_press_button(context, BUTTON_A | BUTTON_B, 5, 0);

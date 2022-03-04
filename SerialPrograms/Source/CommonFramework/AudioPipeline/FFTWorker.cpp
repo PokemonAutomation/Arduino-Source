@@ -29,6 +29,9 @@
 
 namespace PokemonAutomation{
 
+//  Instantiate all of this.
+template class AlignedVector<float>;
+
 
 FFTWorker::FFTWorker(int fftLengthPowerOfTwo)
     : m_fftLengthPowerOfTwo(fftLengthPowerOfTwo)

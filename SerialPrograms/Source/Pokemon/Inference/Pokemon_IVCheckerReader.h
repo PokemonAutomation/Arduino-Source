@@ -18,12 +18,12 @@ namespace Pokemon{
 class IVCheckerReader : public OCR::SmallDictionaryMatcher{
 public:
     struct Results{
-        IVCheckerValue hp;
-        IVCheckerValue attack;
-        IVCheckerValue defense;
-        IVCheckerValue spatk;
-        IVCheckerValue spdef;
-        IVCheckerValue speed;
+        IVCheckerValue hp       = IVCheckerValue::UnableToDetect;
+        IVCheckerValue attack   = IVCheckerValue::UnableToDetect;
+        IVCheckerValue defense  = IVCheckerValue::UnableToDetect;
+        IVCheckerValue spatk    = IVCheckerValue::UnableToDetect;
+        IVCheckerValue spdef    = IVCheckerValue::UnableToDetect;
+        IVCheckerValue speed    = IVCheckerValue::UnableToDetect;
     };
 
     static const IVCheckerReader& instance();

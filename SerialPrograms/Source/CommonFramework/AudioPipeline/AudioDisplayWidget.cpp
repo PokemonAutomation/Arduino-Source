@@ -19,7 +19,6 @@
 #include <QIODevice>
 #include <QBuffer>
 #include "Common/Compiler.h"
-#include "Common/Cpp/AlignedVector.tpp"
 #include "AudioConstants.h"
 #include "AudioInfo.h"
 #include "AudioDisplayWidget.h"
