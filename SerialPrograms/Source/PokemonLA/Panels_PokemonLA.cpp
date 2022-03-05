@@ -13,6 +13,8 @@
 #include "Programs/PokemonLA_DistortionWaiter.h"
 #include "Programs/PokemonLA_OutbreakFinder.h"
 #include "Programs/PokemonLA_NuggetFarmerHighlands.h"
+#include "Programs/PokemonLA_GalladeFinder.h"
+#include "Programs/PokemonLA_CrobatFinder.h"
 
 #include "Programs/PokemonLA_SelfBoxTrade.h"
 #include "Programs/PokemonLA_SelfTouchTrade.h"
@@ -37,6 +39,10 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<DistortionWaiter_Descriptor, DistortionWaiter>();
     add_program<OutbreakFinder_Descriptor, OutbreakFinder>();
     add_program<NuggetFarmerHighlands_Descriptor, MoneyFarmerHighlands>();
+
+    add_divider("---- Shiny Hunting ----");
+    add_program<CrobatFinder_Descriptor, CrobatFinder>();
+    add_program<GalladeFinder_Descriptor, GalladeFinder>();
 
     add_divider("---- Trading ----");
     add_program<SelfBoxTrade_Descriptor, SelfBoxTrade>();
