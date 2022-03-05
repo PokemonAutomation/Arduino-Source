@@ -404,9 +404,11 @@ SOURCES += \
     Source/PokemonLA/Panels_PokemonLA.cpp \
     Source/PokemonLA/PokemonLA_Settings.cpp \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.cpp \
+    Source/PokemonLA/Programs/PokemonLA_CrobatFinder.cpp \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.cpp \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp \
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.cpp \
+    Source/PokemonLA/Programs/PokemonLA_GalladeFinder.cpp \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.cpp \
     Source/PokemonLA/Programs/PokemonLA_NuggetFarmerHighlands.cpp \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.cpp \
@@ -1029,9 +1031,11 @@ HEADERS += \
     Source/PokemonLA/Panels_PokemonLA.h \
     Source/PokemonLA/PokemonLA_Settings.h \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.h \
+    Source/PokemonLA/Programs/PokemonLA_CrobatFinder.h \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.h \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.h \
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.h \
+    Source/PokemonLA/Programs/PokemonLA_GalladeFinder.h \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.h \
     Source/PokemonLA/Programs/PokemonLA_NuggetFarmerHighlands.h \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.h \

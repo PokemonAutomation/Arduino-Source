@@ -34,6 +34,7 @@ void goto_professor(ConsoleHandle& console, Camp camp);
 void from_professor_return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& console);
 
 
+void mash_A_to_enter_sub_area(ProgramEnvironment& env, ConsoleHandle& console);
 void mash_A_to_change_region(ProgramEnvironment& env, ConsoleHandle& console);
 void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Camp camp);
 

@@ -60,17 +60,36 @@ void grip_menu_connect_go_home(const BotBaseContext& context){
     pbf_press_button(context, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
 }
 
+// void pbf_controller_state(
+//     const BotBaseContext& context,
+//     Button button,
+//     DpadPosition position,
+//     uint8_t left_x, uint8_t left_y,
+//     uint8_t right_x, uint8_t right_y,
+//     uint8_t ticks
+// ){
+//     context.issue_request(
+//         DeviceRequest_controller_state(button, position, left_x, left_y, right_x, right_y, ticks)
+//     );
+// }
+
+
 void pbf_controller_state(
     const BotBaseContext& context,
     Button button,
     DpadPosition position,
     uint8_t left_x, uint8_t left_y,
     uint8_t right_x, uint8_t right_y,
-    uint8_t ticks
+    uint16_t ticks
 ){
-    context.issue_request(
-        DeviceRequest_controller_state(button, position, left_x, left_y, right_x, right_y, ticks)
-    );
+    // divide the controller state into smaller chunks of 255 ticks
+    while (ticks > 0){
+        uint16_t curr_ticks = std::min(ticks, (uint16_t)255);
+        context.issue_request(
+            DeviceRequest_controller_state(button, position, left_x, left_y, right_x, right_y, (uint8_t)curr_ticks)
+        );
+        ticks -= curr_ticks;
+    } // end while loop, and function 
 }
 
 

@@ -110,7 +110,22 @@ void from_professor_return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& c
 }
 
 
+void mash_A_to_enter_sub_area(ProgramEnvironment& env, ConsoleHandle& console){
+    BlackScreenOverWatcher black_screen0(COLOR_RED, {0.2, 0.2, 0.6, 0.6}, 100, 10);
+    int ret = run_until(
+        env, console,
+        [](const BotBaseContext& context){
+            pbf_mash_button(context, BUTTON_A, 7 * TICKS_PER_SECOND);
+        },
+        { &black_screen0 }
+    );
+    if (ret < 0){
+        throw OperationFailedException(console, "Failed to load into sub area after 7 seconds.");
+    }
 
+    console.log("Loaded into sub area...");
+    env.wait_for(std::chrono::milliseconds(200));
+}
 
 
 void mash_A_to_change_region(ProgramEnvironment& env, ConsoleHandle& console){
