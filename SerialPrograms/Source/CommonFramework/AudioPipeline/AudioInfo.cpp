@@ -72,7 +72,7 @@ void set_format(QAudioFormat& native_format, AudioFormat format){
 //  Return a list of our formats that are supported by this device.
 //  "preferred_index" is set to the index of the list that is preferred by the device.
 //  If no preferred format matches our formats, -1 is returned.
-std::vector<AudioFormat> supported_input_formats(int& preferred_index, const NativeAudioInfo& info){
+std::vector<AudioFormat> supported_input_formats(int& preferred_index, const NativeAudioInfo& info, const QString& display_name){
     QAudioFormat preferred_format = info.preferredFormat();
     int preferred_channels = preferred_format.channelCount();
     int preferred_rate = preferred_format.sampleRate();
@@ -126,6 +126,11 @@ std::vector<AudioFormat> supported_input_formats(int& preferred_index, const Nat
         if (info.isFormatSupported(format)){
             if (format.channelCount() == preferred_channels && format.sampleRate() == preferred_rate){
                 preferred_index = (int)ret.size();
+                if (display_name.contains("ShadowCast")){
+                    preferred_index += 1;
+                }else{
+                    preferred_index += 2;
+                }
             }
             ret.emplace_back(AudioFormat::MONO_96000);
             ret.emplace_back(AudioFormat::INTERLEAVE_LR_96000);
@@ -220,23 +225,23 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
         list.emplace_back();
         Data& data = list.back().m_body;
 
-        data.supported_formats = supported_input_formats(data.preferred_format_index, device);
-
         QString name = device.deviceName();
         data.device_name = name.toStdString();
         data.display_name = std::move(name);
         data.info = std::move(device);
+
+        data.supported_formats = supported_input_formats(data.preferred_format_index, device, data.display_name);
     }
 #elif QT_VERSION_MAJOR == 6
     for (NativeAudioInfo& device : QMediaDevices::audioInputs()){
         list.emplace_back();
         Data& data = list.back().m_body;
 
-        data.supported_formats = supported_input_formats(data.preferred_format_index, device);
-
-        data.device_name = device.first.id().data();
-        data.display_name = device.first.description();
+        data.device_name = device.id().data();
+        data.display_name = device.description();
         data.info = std::move(device);
+
+        data.supported_formats = supported_input_formats(data.preferred_format_index, device, data.display_name);
     }
 #endif
 
@@ -289,23 +294,23 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_output_devices(){
         list.emplace_back();
         Data& data = list.back().m_body;
 
-        data.supported_formats = supported_output_formats(data.preferred_format_index, device);
-
         QString name = device.deviceName();
         data.device_name = name.toStdString();
         data.display_name = std::move(name);
         data.info = std::move(device);
+
+        data.supported_formats = supported_output_formats(data.preferred_format_index, device);
     }
 #elif QT_VERSION_MAJOR == 6
     for (NativeAudioInfo& device : QMediaDevices::audioOutputs()){
         list.emplace_back();
         Data& data = list.back().m_body;
 
-        data.supported_formats = supported_output_formats(data.preferred_format_index, device);
-
-        data.device_name = device.first.id().data();
-        data.display_name = device.first.description();
+        data.device_name = device.id().data();
+        data.display_name = device.description();
         data.info = std::move(device);
+
+        data.supported_formats = supported_output_formats(data.preferred_format_index, device);
     }
 #endif
 

@@ -64,6 +64,7 @@ void AudioSelector::load_json(const QJsonValue& json){
             }
         }
     }
+//    cout << AUDIO_FORMAT_LABELS[(size_t)m_inputFormat] << endl;
     if (json_get_string(str, obj, JSON_OUTPUT_DEVICE)){
         m_outputDevice = AudioDeviceInfo(str.toStdString());
     }

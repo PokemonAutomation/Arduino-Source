@@ -132,6 +132,7 @@ AudioSelectorWidget::AudioSelectorWidget(
                 }
                 current = audio;
             }
+            m_value.m_inputFormat = AudioFormat::NONE;
             update_formats();
             reset_audio();
         }
@@ -237,7 +238,7 @@ AudioSelectorWidget::AudioSelectorWidget(
 }
 void AudioSelectorWidget::update_formats(){
     const AudioDeviceInfo& device = m_value.m_inputDevice;
-    AudioFormat& current_format = m_value.m_inputFormat;
+    AudioFormat current_format = m_value.m_inputFormat;
 
     m_audio_format_box->clear();
     const std::vector<AudioFormat>& supported_formats = device.supported_formats();
@@ -246,16 +247,16 @@ void AudioSelectorWidget::update_formats(){
         return;
     }
 
-    size_t index = 0;
+    int index = device.preferred_format_index();
     for (size_t c = 0; c < supported_formats.size(); c++){
         m_audio_format_box->addItem(AUDIO_FORMAT_LABELS[(size_t)supported_formats[c]]);
         if (current_format == supported_formats[c]){
-            index = c;
+            index = (int)c;
         }
     }
 
+    m_value.m_inputFormat = supported_formats[index];
     m_audio_format_box->setCurrentIndex(index);
-    current_format = supported_formats[index];
 }
 void AudioSelectorWidget::refresh(){
 
