@@ -78,6 +78,7 @@ void AudioSelector::load_json(const QJsonValue& json){
 QJsonValue AudioSelector::to_json() const{
     QJsonObject root;
     root.insert(JSON_INPUT_DEVICE, QString::fromStdString(m_inputDevice.device_name()));
+    root.insert(JSON_INPUT_FORMAT, QString::fromStdString(AUDIO_FORMAT_LABELS[(size_t)m_inputFormat]));
     root.insert(JSON_OUTPUT_DEVICE, QString::fromStdString(m_outputDevice.device_name()));
     root.insert(JSON_AUDIO_VIS, QString::fromStdString(audioDisplayTypeToString(m_audioDisplayType)));
     root.insert(JSON_AUDIO_VOLUME, QString::number(m_volume));
