@@ -27,7 +27,7 @@ namespace PokemonLA{
 
 
 Panels::Panels(QTabWidget& parent, PanelListener& listener)
-    : PanelList(parent, "PLA", listener)
+    : PanelList(parent, "LA", listener)
 {
     add_divider("---- Settings ----");
     add_settings<GameSettings_Descriptor, GameSettingsPanel>();

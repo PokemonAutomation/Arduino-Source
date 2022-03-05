@@ -10,6 +10,7 @@
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
+#include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
 #include "PokemonSwSh_MaxLair_Notifications.h"
 
@@ -183,7 +184,7 @@ void send_shiny_notification(
 
     send_program_notification(
         logger, settings,
-        COLOR_YELLOW, program_info,
+        Pokemon::COLOR_STAR_SHINY, program_info,
         "Max Lair Shiny Notification",
         embeds,
         image, true

@@ -23,6 +23,11 @@ namespace PokemonAutomation{
 namespace Pokemon{
 
 
+const Color COLOR_STAR_SHINY(0xffff99);
+const Color COLOR_SQUARE_SHINY(0xb266ff);
+
+
+
 struct EncounterResult{
     std::set<std::string> slug_candidates;
     ShinyType shininess = ShinyType::UNKNOWN;

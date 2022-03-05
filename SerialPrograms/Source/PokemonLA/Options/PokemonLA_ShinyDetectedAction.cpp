@@ -11,6 +11,7 @@
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "Pokemon/Pokemon_Notification.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA_ShinyDetectedAction.h"
 
@@ -104,7 +105,7 @@ bool run_on_shiny(
     }
 
     send_program_notification(
-        console, option.NOTIFICATIONS, Color(0xffff99),
+        console, option.NOTIFICATIONS, Color(COLOR_STAR_SHINY),
         env.program_info(),
         "Detected Possible Shiny",
         embeds,
@@ -134,7 +135,7 @@ void on_shiny(
 
     if (action == ShinyDetectedAction::IGNORE){
         send_program_notification(
-            console, options.NOTIFICATIONS, Color(0xffff99),
+            console, options.NOTIFICATIONS, Pokemon::COLOR_STAR_SHINY,
             env.program_info(),
             "Detected Possible Shiny",
             embeds,
@@ -149,7 +150,7 @@ void on_shiny(
 
     QImage screen = console.video().snapshot();
     send_program_notification(
-        console, options.NOTIFICATIONS, Color(0xffff99),
+        console, options.NOTIFICATIONS, Pokemon::COLOR_STAR_SHINY,
         env.program_info(),
         "Detected Possible Shiny",
         embeds,

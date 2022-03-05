@@ -25,9 +25,9 @@ Color shiny_color(ShinyType shiny_type){
     case ShinyType::MAYBE_SHINY:
     case ShinyType::UNKNOWN_SHINY:
     case ShinyType::STAR_SHINY:
-        return Color(0xffff99);
+        return COLOR_STAR_SHINY;
     case ShinyType::SQUARE_SHINY:
-        return Color(0xb266ff);
+        return COLOR_SQUARE_SHINY;
     default:
         return Color();
     }
