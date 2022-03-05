@@ -845,6 +845,10 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/PokemonLA_TradeRoutines.h
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.h
+    Source/PokemonLA/Programs/PokemonLA_GalladeFinder.cpp
+    Source/PokemonLA/Programs/PokemonLA_GalladeFinder.h
+    Source/PokemonLA/Programs/PokemonLA_CrobatFinder.cpp
+    Source/PokemonLA/Programs/PokemonLA_CrobatFinder.h
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.cpp
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.h
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.cpp
