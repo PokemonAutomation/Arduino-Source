@@ -16,10 +16,9 @@ namespace PokemonAutomation{
 
 
 
-AudioIODevice::AudioIODevice(const QAudioFormat& audioFormat, ChannelMode channelMode, AudioFormat format)
+AudioIODevice::AudioIODevice(const QAudioFormat& audioFormat, AudioFormat format)
      : QIODevice(nullptr)
      , m_audioFormat(audioFormat)
-     , m_channelMode(channelMode)
      , m_format(format)
      , m_channelSwapBuffer(8192)
      , m_fft_input_buffer()

@@ -232,9 +232,9 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
 
         data.supported_formats = supported_input_formats(data.preferred_format_index, device);
 
-        data.device_name = info.first.id().data();
-        data.display_name = info.first.description();
-        data.info = std::move(info);
+        data.device_name = device.first.id().data();
+        data.display_name = device.first.description();
+        data.info = std::move(device);
     }
 #endif
 
@@ -301,9 +301,9 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_output_devices(){
 
         data.supported_formats = supported_output_formats(data.preferred_format_index, device);
 
-        data.device_name = info.first.id().data();
-        data.display_name = info.first.description();
-        data.info = std::move(info);
+        data.device_name = device.first.id().data();
+        data.display_name = device.first.description();
+        data.info = std::move(device);
     }
 #endif
 

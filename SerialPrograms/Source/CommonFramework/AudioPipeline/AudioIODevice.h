@@ -40,7 +40,7 @@ class AudioIODevice : public QIODevice
     Q_OBJECT
 
 public:
-    AudioIODevice(const QAudioFormat& audioFormat, ChannelMode channelMode, AudioFormat format);
+    AudioIODevice(const QAudioFormat& audioFormat, AudioFormat format);
     virtual ~AudioIODevice();
 
     // Called by QAudioSource to write data to AudioIODevice's buffer.
@@ -73,7 +73,6 @@ private:
 
 private:
     QAudioFormat m_audioFormat;
-    ChannelMode m_channelMode;
     AudioFormat m_format;
 
     // Used as a temporal buffer to swap L and R channels in the interleaved mode.

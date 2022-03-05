@@ -128,11 +128,8 @@ void AudioWorker::startAudio(){
         switch (m_inputFormat){
         case AudioFormat::MONO_48000:
         case AudioFormat::MONO_96000:
-            m_channelMode = ChannelMode::Mono;
-            break;
         case AudioFormat::DUAL_44100:
         case AudioFormat::DUAL_48000:
-            m_channelMode = ChannelMode::Stereo;
             break;
         case AudioFormat::INTERLEAVE_LR_96000:
         case AudioFormat::INTERLEAVE_RL_96000:
@@ -142,7 +139,6 @@ void AudioWorker::startAudio(){
             outputAudioFormat.setChannelConfig(QAudioFormat::ChannelConfig::ChannelConfigStereo);
 #endif
             outputAudioFormat.setSampleRate(48000);
-            m_channelMode = ChannelMode::Interleaved;
             break;
         default:
             m_logger.log(std::string("Invalid AudioFormat: ") + AUDIO_FORMAT_LABELS[(size_t)m_inputFormat]);
@@ -173,7 +169,7 @@ void AudioWorker::startAudio(){
         });
     } // end if load audio from input audio device
     
-    m_audioIODevice = new AudioIODevice(inputAudioFormat, m_channelMode, m_inputFormat);
+    m_audioIODevice = new AudioIODevice(inputAudioFormat, m_inputFormat);
     m_audioIODevice->open(QIODevice::ReadWrite | QIODevice::Unbuffered);
     connect(m_audioIODevice, &AudioIODevice::fftInputReady, this, &AudioWorker::fftInputReady);
     
