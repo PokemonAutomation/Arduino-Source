@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 #include "AudioConstants.h"
 #include "AudioIODevice.h"
 
@@ -15,97 +16,151 @@ namespace PokemonAutomation{
 
 
 
-AudioIODevice::AudioIODevice(const QAudioFormat& audioFormat, ChannelMode channelMode)
+AudioIODevice::AudioIODevice(const QAudioFormat& audioFormat, ChannelMode channelMode, AudioFormat format)
      : QIODevice(nullptr)
      , m_audioFormat(audioFormat)
      , m_channelMode(channelMode)
+     , m_format(format)
      , m_channelSwapBuffer(8192)
+     , m_fft_input_buffer()
      , m_fftCircularBuffer(NUM_FFT_SAMPLES * 8)
 //     , m_fftInputVector(NUM_FFT_SAMPLES)
 {}
 
 AudioIODevice::~AudioIODevice() {}
 
+
+void AudioIODevice::write_output(const float* data, size_t samples){
+    switch (m_format){
+    case AudioFormat::MONO_48000:
+    case AudioFormat::DUAL_44100:
+    case AudioFormat::DUAL_48000:
+    case AudioFormat::MONO_96000:
+    case AudioFormat::INTERLEAVE_RL_96000:
+        m_audioSinkDevice->write((const char*)data, samples * sizeof(float));
+        break;
+    case AudioFormat::INTERLEAVE_LR_96000:
+    {
+        // Interleaved mode: numChannels == 1 and sample rate should be 2 times the
+        // normal sample rate. The input device interleaved L and R stereo channels into
+        // one mono channel. The incoming samples follow the R - L order.
+        // Since the stereo format has L - R order. We need to swap L and R samples:
+
+        size_t out_samples = samples / 2;
+
+        // First we need to make sure there are equal number of L and R samples to swap:
+        if(samples % 2 != 0){
+            std::cout << "Error: audio in interleaved mode but the number of samples "
+                << samples << " is not even" << std::endl;
+        }
+
+        if (m_channelSwapBuffer.size() < samples){
+            m_channelSwapBuffer.resize(samples);
+        }
+
+        //  Swapping samples:
+        for(size_t i = 0; i < out_samples; i++){
+            m_channelSwapBuffer[2*i + 0] = data[2*i + 1];
+            m_channelSwapBuffer[2*i + 1] = data[2*i + 0];
+        }
+        m_audioSinkDevice->write((const char*)m_channelSwapBuffer.data(), samples * sizeof(float));
+
+        break;
+    }
+    default:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid AudioFormat: " + std::to_string((size_t)m_format));
+    }
+}
+
+
+
 qint64 AudioIODevice::writeData(const char* data, qint64 len)
 {
-    const auto& audioFormat = m_audioFormat;
+//    const auto& audioFormat = m_audioFormat;
     // One audio frame consists of one or more channels.
     // Each channel in the frame has an audio sample that is made by one or
     // more bytes.
-    int frameBytes = audioFormat.bytesPerFrame();
-    int numChannels = audioFormat.channelCount();
-    int sampleBytes = frameBytes / numChannels;
-    size_t numSamples = len / sampleBytes;
-    size_t numFrames = len / frameBytes;
+//    int frameBytes = audioFormat.bytesPerFrame();
+//    int numChannels = audioFormat.channelCount();
+//    int sampleBytes = frameBytes / numChannels;
+    size_t numSamples = len / sizeof(float);
+//    size_t numFrames = len / frameBytes;
     // We assert the data is always float with size of 4 bytes.
     const float* floatData = reinterpret_cast<const float *>(data);
 
     // Pass audio data to the audio sink for audio playback.
     if (m_audioSinkDevice){
-        if (m_channelMode == ChannelMode::Interleaved){
-            // Interleaved mode: numChannels == 1 and sample rate should be 2 times the
-            // normal sample rate. The input device interleaved L and R stereo channels into
-            // one mono channel. The incoming samples follow the R - L order.
-            // Since the stereo format has L - R order. We need to swap L and R samples:
+        write_output(floatData, numSamples);
+    }
 
-            // First we need to make sure there are equal number of L and R samples to swap:
-            if(numSamples % 2 != 0){
-                std::cout << "Error: audio in interleaved mode but the number of samples "
-                    << numSamples << " is not even" << std::endl;
-            }
 
-            // Swapping samples:
-            m_channelSwapBuffer.resize(numSamples);
-            for(size_t i = 0; i < numSamples/2; i++){
-                m_channelSwapBuffer[2*i] = floatData[2*i+1];
-                m_channelSwapBuffer[2*i+1] = floatData[2*i];
-            }
-            m_audioSinkDevice->write(reinterpret_cast<const char *>(m_channelSwapBuffer.data()), len);
-        } else{
-            // In other modes, we can safely pass data to output directly.
-            m_audioSinkDevice->write(data, len);
+
+    //  Convert the audio input stream into a stream that our FFT can handle.
+    size_t fft_sample_rate;
+    size_t fft_samples;
+    const float* fft_input;
+
+    bool average_adjacent_samples = false;
+
+    switch (m_format){
+    case AudioFormat::MONO_48000:
+        fft_sample_rate = 48000;
+        fft_samples = len / sizeof(float);
+        fft_input = floatData;
+        average_adjacent_samples = false;
+        break;
+    case AudioFormat::DUAL_44100:
+        fft_sample_rate = 44100;
+        average_adjacent_samples = true;
+        break;
+    case AudioFormat::DUAL_48000:
+    case AudioFormat::MONO_96000:
+    case AudioFormat::INTERLEAVE_LR_96000:
+    case AudioFormat::INTERLEAVE_RL_96000:
+        fft_sample_rate = 48000;
+        average_adjacent_samples = true;
+        break;
+    default:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid AudioFormat: " + std::to_string((size_t)m_format));
+    }
+
+    if (average_adjacent_samples){
+        fft_samples = len / (sizeof(float) * 2);
+        if (m_fft_input_buffer.size() < fft_samples){
+            m_fft_input_buffer.resize(fft_samples);
+        }
+        fft_input = m_fft_input_buffer.data();
+        for (size_t c = 0; c < fft_samples; c++){
+            m_fft_input_buffer[c] = (floatData[2*c + 0] + floatData[2*c + 1]) * 0.5;
         }
     }
 
+
+
 #define PASS_FFT
 #ifdef PASS_FFT
-    // Pass audio frames to FFT input buffer:
-    // If the input audio is mono channel, then the samples are directly written to FFT buffer.
-    // If the input audio is stero, then for each frame, average the left and right channel samples
-    // in the frame and send to the FFT buffer.
-    // If the input audio is interleaved mode, then its essentially the stereo mode, do the same
-    // as stereo.
-    if (m_channelMode == ChannelMode::Interleaved){
-        frameBytes *= 2;
-        numChannels = 2;
-        numFrames /= 2;
-    }
-
     // numTotalFramesCopied: how many audio frames have been copied in the following loop
     size_t numTotalFramesCopied = 0;
     const size_t circularBufferSize = m_fftCircularBuffer.size();
 
     // while there are still samples not copied from audio source to the fft buffer:
-    while(numTotalFramesCopied < numFrames){
+    while (numTotalFramesCopied < fft_samples){
 
         // First, let's calculate how many more samples we need to file a FFT.
         size_t nextFFTNumFramesNeeded = computeNextFFTSamplesNeeded();
 
         // Copy as much data as possible from the audio source until either the input samples are
         // all used or the circular buffer reaches the end.
-        size_t curNumFramesCopied = std::min((size_t)m_fftCircularBuffer.size() - m_bufferNext,
-            numFrames - numTotalFramesCopied);
-        if (numChannels == 1){
-            // Mono channel, directly copy data:
-            memcpy(m_fftCircularBuffer.data() + m_bufferNext, floatData + numTotalFramesCopied,
-                sizeof(float) * curNumFramesCopied);
-        } else{
-            for(size_t i = 0; i < curNumFramesCopied; i++){
-                const float v0 = floatData[(numTotalFramesCopied+i) * numChannels];
-                const float v1 = floatData[(numTotalFramesCopied+i) * numChannels + 1];
-                m_fftCircularBuffer[m_bufferNext + i] = (v0 + v1) / 2.0f;
-            }
-        }
+        size_t curNumFramesCopied = std::min(
+            (size_t)m_fftCircularBuffer.size() - m_bufferNext,
+            fft_samples - numTotalFramesCopied
+        );
+
+        memcpy(
+            m_fftCircularBuffer.data() + m_bufferNext,
+            fft_input + numTotalFramesCopied,
+            sizeof(float) * curNumFramesCopied
+        );
 
         // Update m_bufferNext to reflect new data added:
         m_bufferNext = (m_bufferNext + curNumFramesCopied) % circularBufferSize;
@@ -119,14 +174,10 @@ qint64 AudioIODevice::writeData(const char* data, qint64 len)
         while(nextFFTNumFramesNeeded <= numNewDataForFFT){
             // copy data from m_fftCircularBuffer to m_fftInputVector:
             std::shared_ptr<AlignedVector<float>> input_vector = std::make_unique<AlignedVector<float>>(moveDataToFFTInputVector());
-            // std::cout << "FFT input copied " << std::endl;
+//            std::cout << "FFT input copied " << std::endl;
 
             // emit signal for FFT:
-            int actualSampleRate = audioFormat.sampleRate();
-            if (m_channelMode == ChannelMode::Interleaved){
-                actualSampleRate /= 2;
-            }
-            emit fftInputReady(actualSampleRate, std::move(input_vector));
+            emit fftInputReady(fft_sample_rate, std::move(input_vector));
 
             // Update numNewDataForFFT to account for fft samples consumed:
             numNewDataForFFT -= nextFFTNumFramesNeeded;

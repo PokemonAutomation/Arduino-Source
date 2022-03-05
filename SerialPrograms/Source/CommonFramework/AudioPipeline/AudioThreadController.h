@@ -12,12 +12,13 @@
 #include <QObject>
 #include <QThread>
 #include "CommonFramework/Logging/LoggerQt.h"
+#include "AudioInfo.h"
 
 class QString;
 
 namespace PokemonAutomation{
 
-class AudioInfo;
+class AudioDeviceInfo;
 class AudioDisplayWidget;
 class AudioWorker;
 class FFTWorker;
@@ -42,9 +43,10 @@ public:
     AudioThreadController(
         LoggerQt& logger,
         AudioDisplayWidget* parent,
-        const AudioInfo& inputInfo,
+        const AudioDeviceInfo& inputInfo,
+        AudioFormat inputFormat,
         const QString& inputAbsoluteFilepath,
-        const AudioInfo& outputInfo,
+        const AudioDeviceInfo& outputInfo,
         float outputVolume
     );
     virtual ~AudioThreadController();

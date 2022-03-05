@@ -181,14 +181,14 @@ void CameraSelectorWidget::reset_video(){
     if (index >= 0){
         m_value.m_current_resolution = m_resolutions[index];
         m_resolution_box->setCurrentIndex(index);
-        m_resolution_box->activated(index);
+        emit m_resolution_box->activated(index);
     }else{
         //  Reset to default resolution.
         m_value.m_current_resolution = m_value.m_default_resolution;
     }
 }
 void CameraSelectorWidget::async_reset_video(){
-    internal_async_reset_video();
+    emit internal_async_reset_video();
 }
 
 

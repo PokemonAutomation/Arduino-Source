@@ -13,6 +13,7 @@
 #include "Common/Cpp/Pimpl.h"
 
 class QString;
+class QAudioFormat;
 
 #if QT_VERSION_MAJOR == 5
 class QAudioDeviceInfo;
@@ -29,27 +30,51 @@ using NativeAudioInfo = QAudioDevice;
 namespace PokemonAutomation{
 
 
-class AudioInfo{
+
+enum class AudioFormat{
+    NONE,
+    MONO_48000,
+    DUAL_44100,
+    DUAL_48000,
+    MONO_96000,
+    INTERLEAVE_LR_96000,
+    INTERLEAVE_RL_96000,
+    END_LIST,
+};
+extern const char* AUDIO_FORMAT_LABELS[];
+
+//  Set the QAudioFormat to the our audio format enum.
+void set_format(QAudioFormat& native_format, AudioFormat format);
+
+
+
+
+
+
+class AudioDeviceInfo{
 public:
-    ~AudioInfo();
-    AudioInfo(const AudioInfo&);
+    ~AudioDeviceInfo();
+    AudioDeviceInfo(const AudioDeviceInfo&);
 
 public:
-    AudioInfo();
-    AudioInfo(const std::string& device_name);
+    AudioDeviceInfo();
+    AudioDeviceInfo(const std::string& device_name);
 
     operator bool() const;
 
-    const std::string& device_name() const;
     const QString& display_name() const;
+    const std::string& device_name() const;
+
+    const std::vector<AudioFormat>& supported_formats() const;
+    int preferred_format_index() const;
+    QAudioFormat preferred_format() const;
+
     const NativeAudioInfo& native_info() const;
 
-    int preferredSampleRate() const;
+    bool operator==(const AudioDeviceInfo& info);
 
-    bool operator==(const AudioInfo& info);
-
-    static std::vector<AudioInfo> all_input_devices();
-    static std::vector<AudioInfo> all_output_devices();
+    static std::vector<AudioDeviceInfo> all_input_devices();
+    static std::vector<AudioDeviceInfo> all_output_devices();
 
 private:
     struct Data;

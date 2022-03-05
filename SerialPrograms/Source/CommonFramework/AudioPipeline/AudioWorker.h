@@ -54,9 +54,10 @@ public:
     // when `inputAbsoluteFilepath` is a relative path. Do not pass in a relative path.
     AudioWorker(
         LoggerQt& logger,
-        const AudioInfo& inputInfo,
+        const AudioDeviceInfo& inputInfo,
+        AudioFormat inputFormat,
         const QString& inputAbsoluteFilepath,
-        const AudioInfo& outputInfo,
+        const AudioDeviceInfo& outputInfo,
         float outputVolume
     );
     
@@ -82,9 +83,10 @@ private:
 
 private:
     LoggerQt& m_logger;
-    AudioInfo m_inputInfo;
+    AudioDeviceInfo m_inputInfo;
+    AudioFormat m_inputFormat;
     QString m_inputAbsoluteFilepath;
-    AudioInfo m_outputInfo;
+    AudioDeviceInfo m_outputInfo;
 
     AudioIODevice* m_audioIODevice = nullptr;
 

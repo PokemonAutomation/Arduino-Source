@@ -13,6 +13,7 @@
 #include <QIODevice>
 #include "Common/Compiler.h"
 #include "Common/Cpp/AlignedVector.h"
+#include "AudioInfo.h"
 
 namespace PokemonAutomation{
 
@@ -39,7 +40,7 @@ class AudioIODevice : public QIODevice
     Q_OBJECT
 
 public:
-    AudioIODevice(const QAudioFormat& audioFormat, ChannelMode channelMode);
+    AudioIODevice(const QAudioFormat& audioFormat, ChannelMode channelMode, AudioFormat format);
     virtual ~AudioIODevice();
 
     // Called by QAudioSource to write data to AudioIODevice's buffer.
@@ -67,11 +68,18 @@ private:
     // to ready for next FFT signal.
     AlignedVector<float> moveDataToFFTInputVector();
 
+    void write_output(const float* data, size_t samples);
+
+
+private:
     QAudioFormat m_audioFormat;
     ChannelMode m_channelMode;
+    AudioFormat m_format;
 
     // Used as a temporal buffer to swap L and R channels in the interleaved mode.
     std::vector<float> m_channelSwapBuffer;
+
+    std::vector<float> m_fft_input_buffer;
 
     // A large circular buffer to store multiple sliding windows of FFT inputs.
     // Because FFT windows may overlap, it may be more efficient to store

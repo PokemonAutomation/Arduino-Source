@@ -129,14 +129,22 @@ void AudioDisplayWidget::close_audio(){
 
 void AudioDisplayWidget::set_audio(
     LoggerQt& logger,
-    const AudioInfo& inputInfo,
+    const AudioDeviceInfo& inputInfo,
+    AudioFormat inputFormat,
     const QString& inputAbsoluteFilepath,
-    const AudioInfo& outputInfo,
+    const AudioDeviceInfo& outputInfo,
     float outputVolume
 ){
     clear();
     
-    m_audioThreadController = new AudioThreadController(logger, this, inputInfo, inputAbsoluteFilepath, outputInfo, outputVolume);
+    m_audioThreadController = new AudioThreadController(
+        logger, this,
+        inputInfo,
+        inputFormat,
+        inputAbsoluteFilepath,
+        outputInfo,
+        outputVolume
+    );
 
     update_size();
     // Tell Qt to repaint the widget in the next drawing phase in the main loop.

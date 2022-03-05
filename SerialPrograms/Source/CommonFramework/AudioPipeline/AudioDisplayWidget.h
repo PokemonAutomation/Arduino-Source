@@ -24,7 +24,7 @@ class QString;
 namespace PokemonAutomation{
 
 class AudioThreadController;
-class AudioInfo;
+class AudioDeviceInfo;
 class LoggerQt;
 
 // Display audio on the UI panel.
@@ -51,8 +51,11 @@ public:
     // outputVolume: range [0.f, 1.f]
     void set_audio(
         LoggerQt& logger,
-        const AudioInfo& inputInfo, const QString& inputAbsoluteFilepath,
-        const AudioInfo& outputInfo, float outputVolume
+        const AudioDeviceInfo& inputInfo,
+        AudioFormat inputFormat,
+        const QString& inputAbsoluteFilepath,
+        const AudioDeviceInfo& outputInfo,
+        float outputVolume
     );
 
     void close_audio();

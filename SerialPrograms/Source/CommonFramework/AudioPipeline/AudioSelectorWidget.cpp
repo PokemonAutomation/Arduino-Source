@@ -56,18 +56,13 @@ AudioSelectorWidget::AudioSelectorWidget(
         row0->addWidget(new QLabel("<b>Audio Input:</b>", this), 1);
         row0->addSpacing(5);
 
-
-        if (GlobalSettings::instance().DEVELOPER_MODE){
-            m_audio_input_box = new NoWheelComboBox(this);
-            row0->addWidget(m_audio_input_box, 4);
-            m_load_file_button = new QPushButton("Load File", this);
-            row0->addWidget(m_load_file_button, 1);
-            row0->addSpacing(5);
-        }else{
-            m_audio_input_box = new NoWheelComboBox(this);
-            row0->addWidget(m_audio_input_box, 5);
-            row0->addSpacing(5);
-        }
+        QHBoxLayout* input_layout = new QHBoxLayout();
+        row0->addLayout(input_layout, 5);
+        m_audio_input_box = new NoWheelComboBox(this);
+        input_layout->addWidget(m_audio_input_box, 3);
+        m_audio_format_box = new NoWheelComboBox(this);
+        input_layout->addWidget(m_audio_format_box, 2);
+        row0->addSpacing(5);
 
         m_audio_vis_box = new NoWheelComboBox(this);
         m_audio_vis_box->addItem("No Display");
@@ -88,8 +83,17 @@ AudioSelectorWidget::AudioSelectorWidget(
         row1->addWidget(new QLabel("<b>Audio Output:</b>", this), 1);
         row1->addSpacing(5);
 
-        m_audio_output_box = new NoWheelComboBox(this);
-        row1->addWidget(m_audio_output_box, 5);
+        QHBoxLayout* output_layout = new QHBoxLayout();
+        row1->addLayout(output_layout, 5);
+        if (GlobalSettings::instance().DEVELOPER_MODE){
+            m_audio_output_box = new NoWheelComboBox(this);
+            output_layout->addWidget(m_audio_output_box, 3);
+            m_load_file_button = new QPushButton("Load File", this);
+            output_layout->addWidget(m_load_file_button, 2);
+        }else{
+            m_audio_output_box = new NoWheelComboBox(this);
+            output_layout->addWidget(m_audio_output_box, 5);
+        }
         row1->addSpacing(5);
 
         m_volume_slider = new QSlider(Qt::Horizontal, this);
@@ -113,32 +117,44 @@ AudioSelectorWidget::AudioSelectorWidget(
     connect(
         m_audio_input_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
         this, [=](int index){
-            AudioInfo& current = m_value.m_inputDevice;
+            AudioDeviceInfo& current = m_value.m_inputDevice;
             if (index <= 0 || index > (int)m_input_audios.size()){
-                current = AudioInfo();
+                current = AudioDeviceInfo();
             }else{
                 // The user selects an audio source. If previously the user was playing an
                 // audio file, then we shouldn't play the file any more.
                 // Clear m_absoluteFilepath here so that m_display will be initialized to load
                 // from audio source instead of a file.
                 m_absoluteFilepath = "";
-                const AudioInfo& audio = m_input_audios[index - 1];
+                const AudioDeviceInfo& audio = m_input_audios[index - 1];
                 if (current == audio){
                     return;
                 }
                 current = audio;
             }
+            update_formats();
+            reset_audio();
+        }
+    );
+    connect(
+        m_audio_format_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
+        this, [=](int index){
+            AudioFormat& current = m_value.m_inputFormat;
+            const std::vector<AudioFormat>& supported_formats = m_value.m_inputDevice.supported_formats();
+            index = std::max(index, 0);
+            index = std::min(index, (int)supported_formats.size() - 1);
+            current = supported_formats[index];
             reset_audio();
         }
     );
     connect(
         m_audio_output_box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
         this, [=](int index){
-            AudioInfo& current = m_value.m_outputDevice;
+            AudioDeviceInfo& current = m_value.m_outputDevice;
             if (index <= 0 || index > (int)m_output_audios.size()){
-                current = AudioInfo();
+                current = AudioDeviceInfo();
             }else{
-                const AudioInfo& audio = m_output_audios[index - 1];
+                const AudioDeviceInfo& audio = m_output_audios[index - 1];
                 if (current == audio){
                     return;
                 }
@@ -215,12 +231,34 @@ AudioSelectorWidget::AudioSelectorWidget(
         });
     }
 }
+void AudioSelectorWidget::update_formats(){
+    const AudioDeviceInfo& device = m_value.m_inputDevice;
+    AudioFormat& current_format = m_value.m_inputFormat;
+
+    m_audio_format_box->clear();
+    const std::vector<AudioFormat>& supported_formats = device.supported_formats();
+    if (supported_formats.empty()){
+        m_value.m_inputFormat = AudioFormat::NONE;
+        return;
+    }
+
+    size_t index = 0;
+    for (size_t c = 0; c < supported_formats.size(); c++){
+        m_audio_format_box->addItem(AUDIO_FORMAT_LABELS[(size_t)supported_formats[c]]);
+        if (current_format == supported_formats[c]){
+            index = c;
+        }
+    }
+
+    m_audio_format_box->setCurrentIndex(index);
+    current_format = supported_formats[index];
+}
 void AudioSelectorWidget::refresh(){
 
     auto build_device_menu = [](
         QComboBox* box,
-        const std::vector<AudioInfo>& list,
-        AudioInfo& current_device
+        const std::vector<AudioDeviceInfo>& list,
+        AudioDeviceInfo& current_device
     ){
         
         box->clear();
@@ -228,7 +266,7 @@ void AudioSelectorWidget::refresh(){
 
         size_t index = 0;
         for (size_t c = 0; c < list.size(); c++){
-            const AudioInfo& audio = list[c];
+            const AudioDeviceInfo& audio = list[c];
             box->addItem(list[c].display_name());
 
             if (current_device == audio){
@@ -238,16 +276,18 @@ void AudioSelectorWidget::refresh(){
         if (index != 0){
             box->setCurrentIndex((int)index);
         }else{
-            current_device = AudioInfo();
+            current_device = AudioDeviceInfo();
             box->setCurrentIndex(0);
         }
     };
 
 
-    m_input_audios = AudioInfo::all_input_devices();
-    m_output_audios = AudioInfo::all_output_devices();
+    m_input_audios = AudioDeviceInfo::all_input_devices();
+    m_output_audios = AudioDeviceInfo::all_output_devices();
     build_device_menu(m_audio_input_box, m_input_audios, m_value.m_inputDevice);
     build_device_menu(m_audio_output_box, m_output_audios, m_value.m_outputDevice);
+
+    update_formats();
 
     // std::cout << "Refresh: " << AudioSelector::audioDisplayTypeToString(m_value.m_audioDisplayType) << std::endl;
     switch(m_value.m_audioDisplayType){
@@ -273,9 +313,16 @@ void AudioSelectorWidget::reset_audio(){
     std::lock_guard<std::mutex> lg(m_audio_lock);
     m_display.close_audio();
 
-    const AudioInfo& info = m_value.m_inputDevice;
-    if (info || m_absoluteFilepath.size() > 0){
-        m_display.set_audio(m_logger, info, m_absoluteFilepath, m_value.m_outputDevice, convertAudioVolumeFromSlider(m_value.m_volume));
+    const AudioDeviceInfo& info = m_value.m_inputDevice;
+    if ((info && m_value.m_inputFormat != AudioFormat::NONE) || m_absoluteFilepath.size() > 0){
+        m_display.set_audio(
+            m_logger,
+            info,
+            m_value.m_inputFormat,
+            m_absoluteFilepath,
+            m_value.m_outputDevice,
+            convertAudioVolumeFromSlider(m_value.m_volume)
+        );
     }
 }
 void AudioSelectorWidget::async_reset_audio(){

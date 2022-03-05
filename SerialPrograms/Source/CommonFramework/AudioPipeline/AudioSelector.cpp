@@ -11,10 +11,15 @@
 #include "AudioSelector.h"
 #include "AudioSelectorWidget.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 
 
 const QString AudioSelector::JSON_INPUT_DEVICE = "InputDevice";
+const QString AudioSelector::JSON_INPUT_FORMAT = "InputFormat";
 const QString AudioSelector::JSON_OUTPUT_DEVICE = "OutputDevice";
 const QString AudioSelector::JSON_AUDIO_VIS = "AudioVisualization";
 const QString AudioSelector::JSON_AUDIO_VOLUME = "Volume";
@@ -41,25 +46,32 @@ std::string AudioSelector::audioDisplayTypeToString(AudioSelector::AudioDisplayT
 }
 
 AudioSelector::AudioSelector() {}
-AudioSelector::AudioSelector(const QJsonValue& json)
-{
+AudioSelector::AudioSelector(const QJsonValue& json){
     load_json(json);
 }
 
 void AudioSelector::load_json(const QJsonValue& json){
     QJsonObject obj = json.toObject();
-    QString name;
-    if (json_get_string(name, obj, JSON_INPUT_DEVICE)){
-        m_inputDevice = AudioInfo(name.toStdString());
+    QString str;
+    if (json_get_string(str, obj, JSON_INPUT_DEVICE)){
+        m_inputDevice = AudioDeviceInfo(str.toStdString());
     }
-    if (json_get_string(name, obj, JSON_OUTPUT_DEVICE)){
-        m_outputDevice = AudioInfo(name.toStdString());
+    if (json_get_string(str, obj, JSON_INPUT_FORMAT)){
+        for (AudioFormat format : m_inputDevice.supported_formats()){
+            if (AUDIO_FORMAT_LABELS[(size_t)format] == str){
+                m_inputFormat = format;
+                break;
+            }
+        }
     }
-    if (json_get_string(name, obj, JSON_AUDIO_VIS)){
-        m_audioDisplayType = stringToAudioDisplayType(name.toStdString());
+    if (json_get_string(str, obj, JSON_OUTPUT_DEVICE)){
+        m_outputDevice = AudioDeviceInfo(str.toStdString());
     }
-    if (json_get_string(name, obj, JSON_AUDIO_VOLUME)){
-        m_volume = name.toInt();
+    if (json_get_string(str, obj, JSON_AUDIO_VIS)){
+        m_audioDisplayType = stringToAudioDisplayType(str.toStdString());
+    }
+    if (json_get_string(str, obj, JSON_AUDIO_VOLUME)){
+        m_volume = str.toInt();
     }
 }
 

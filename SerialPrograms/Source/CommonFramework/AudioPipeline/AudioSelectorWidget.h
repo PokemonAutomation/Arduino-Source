@@ -63,6 +63,7 @@ signals:
     void internal_async_reset_audio();
 
 private:
+    void update_formats();
     void refresh();
 
 private:
@@ -72,6 +73,7 @@ private:
     AudioDisplayWidget& m_display;
 
     QComboBox* m_audio_input_box = nullptr;
+    QComboBox* m_audio_format_box = nullptr;
     QComboBox* m_audio_output_box = nullptr;
     QComboBox* m_audio_vis_box = nullptr;
 
@@ -83,8 +85,8 @@ private:
     QPushButton* m_record_button = nullptr;
     bool m_record_is_on = false;
 
-    std::vector<AudioInfo> m_input_audios;
-    std::vector<AudioInfo> m_output_audios;
+    std::vector<AudioDeviceInfo> m_input_audios;
+    std::vector<AudioDeviceInfo> m_output_audios;
 
     std::mutex m_audio_lock;
 };

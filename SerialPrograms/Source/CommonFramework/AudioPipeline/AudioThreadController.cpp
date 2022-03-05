@@ -24,9 +24,10 @@ namespace PokemonAutomation{
 AudioThreadController::AudioThreadController(
     LoggerQt& logger,
     AudioDisplayWidget* parent,
-    const AudioInfo& inputInfo,
+    const AudioDeviceInfo& inputInfo,
+    AudioFormat inputFormat,
     const QString& inputAbsoluteFilepath,
-    const AudioInfo& outputInfo,
+    const AudioDeviceInfo& outputInfo,
     float outputVolume
 ){
     QObject::setParent(parent);
@@ -40,7 +41,7 @@ AudioThreadController::AudioThreadController(
     // So AudioWorker constructor is very light. The work to initialize and start audio processing
     // is done in AudioWorker::startAudio(). It will be called using a signal AudioThreadController::operate()
     // which is sent after the worker thread starts.
-    m_AudioWorker = new AudioWorker(logger, inputInfo, inputAbsoluteFilepath, outputInfo, outputVolume);
+    m_AudioWorker = new AudioWorker(logger, inputInfo, inputFormat, inputAbsoluteFilepath, outputInfo, outputVolume);
     m_AudioWorker->moveToThread(&m_audioThread);
     connect(&m_audioThread, &QThread::finished, m_AudioWorker, &QObject::deleteLater);
 

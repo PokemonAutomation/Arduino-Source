@@ -51,13 +51,15 @@ namespace PokemonAutomation{
 
 AudioWorker::AudioWorker(
     LoggerQt& logger,
-    const AudioInfo& inputInfo,
+    const AudioDeviceInfo& inputInfo,
+    AudioFormat inputFormat,
     const QString& inputAbsoluteFilepath,
-    const AudioInfo& outputInfo,
+    const AudioDeviceInfo& outputInfo,
     float outputVolume
 )
     : m_logger(logger)
     , m_inputInfo(inputInfo)
+    , m_inputFormat(inputFormat)
     , m_inputAbsoluteFilepath(inputAbsoluteFilepath)
     , m_outputInfo(outputInfo)
     , m_volume(std::max(std::min(outputVolume, 1.0f), 0.0f))
@@ -109,7 +111,7 @@ void AudioWorker::startAudio(){
             }
         });
 
-    } else{
+    }else{
         // Load from audio input device:
 
         if (foundAudioInputInfo == false){
@@ -117,62 +119,36 @@ void AudioWorker::startAudio(){
             return;
         }
 
-        const QAudioFormat defaultInputFormat = chosenAudioInputDevice.preferredFormat();
-        m_logger.log("Default input audio format: " + dumpAudioFormat(defaultInputFormat));
-        const int defaultChannelCount = defaultInputFormat.channelCount();
-        const int defaultSampleRate = defaultInputFormat.sampleRate();
-        
-        inputAudioFormat = defaultInputFormat;
-        
-        // inputAudioFormat.setSampleRate(48000);
+        inputAudioFormat = chosenAudioInputDevice.preferredFormat();
+        m_logger.log("Default input audio format: " + dumpAudioFormat(inputAudioFormat));
 
-        // For now we let Qt handle the audio sample type conversion for us:
-        setSampleFormatToFloat(inputAudioFormat);
-
-        if (defaultSampleRate <= 40000){
-            // Somehow Qt picks a suboptimal default format.
-            // Force it to be the standard 48000
-            inputAudioFormat.setSampleRate(48000);
-        }
-
+        set_format(inputAudioFormat, m_inputFormat);
         outputAudioFormat = inputAudioFormat;
 
-// #define FORCE_MONO
-#ifdef FORCE_MONO
-        if (true){
-            inputAudioFormat.setChannelCount(1);
-            inputAudioFormat.setSampleRate(48000);
+        switch (m_inputFormat){
+        case AudioFormat::MONO_48000:
+        case AudioFormat::MONO_96000:
             m_channelMode = ChannelMode::Mono;
-            outputAudioFormat = inputAudioFormat;
-        } else
-#endif
-        if (defaultChannelCount == 1 && defaultSampleRate <= 50000){
-            // The input audio device uses mono mode, nothing to change on the output format.
-            m_channelMode = ChannelMode::Mono;
-        } else if (defaultChannelCount >= 2 && defaultSampleRate <= 50000){
-            // The input audio device uses stereo mode, nothing to change on the output format.
+            break;
+        case AudioFormat::DUAL_44100:
+        case AudioFormat::DUAL_48000:
             m_channelMode = ChannelMode::Stereo;
-            // Reduce the channel count to 2 in case the input sound is surrounded stereo.
-            inputAudioFormat.setChannelCount(2);
-            outputAudioFormat = inputAudioFormat;
-        } else if (defaultChannelCount == 1 && defaultSampleRate >= 80000){
-            // The input audio device uses interleaved mode, where the stereo samples are
-            // interleaved into a mono channel.
-            // This is the mode many capture cards use. If the Swith audio comes as stereo 48KHz,
-            // the capture card generates a mono 96KHz audio stream.
-            // To handle this, we need to set the output audio format to be stereo with the correct
-            // sample rate.
+            break;
+        case AudioFormat::INTERLEAVE_LR_96000:
+        case AudioFormat::INTERLEAVE_RL_96000:
 #if QT_VERSION_MAJOR == 5
             outputAudioFormat.setChannelCount(2);
 #elif QT_VERSION_MAJOR == 6
             outputAudioFormat.setChannelConfig(QAudioFormat::ChannelConfig::ChannelConfigStereo);
 #endif
-            outputAudioFormat.setSampleRate(defaultSampleRate / 2);
+            outputAudioFormat.setSampleRate(48000);
             m_channelMode = ChannelMode::Interleaved;
-        } else {
-            std::cout << "Error: unkown input audio configuration:" << std::endl;
+            break;
+        default:
+            m_logger.log(std::string("Invalid AudioFormat: ") + AUDIO_FORMAT_LABELS[(size_t)m_inputFormat]);
             return;
         }
+
 
         m_logger.log("Set input audio format to: " + dumpAudioFormat(inputAudioFormat));
         m_logger.log("Set output audio format to: " + dumpAudioFormat(outputAudioFormat));
@@ -197,7 +173,7 @@ void AudioWorker::startAudio(){
         });
     } // end if load audio from input audio device
     
-    m_audioIODevice = new AudioIODevice(inputAudioFormat, m_channelMode);
+    m_audioIODevice = new AudioIODevice(inputAudioFormat, m_channelMode, m_inputFormat);
     m_audioIODevice->open(QIODevice::ReadWrite | QIODevice::Unbuffered);
     connect(m_audioIODevice, &AudioIODevice::fftInputReady, this, &AudioWorker::fftInputReady);
     
