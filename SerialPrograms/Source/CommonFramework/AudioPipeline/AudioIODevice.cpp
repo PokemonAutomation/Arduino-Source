@@ -35,10 +35,10 @@ void AudioIODevice::write_output(const float* data, size_t samples){
     case AudioFormat::DUAL_44100:
     case AudioFormat::DUAL_48000:
     case AudioFormat::MONO_96000:
-    case AudioFormat::INTERLEAVE_RL_96000:
+    case AudioFormat::INTERLEAVE_LR_96000:
         m_audioSinkDevice->write((const char*)data, samples * sizeof(float));
         break;
-    case AudioFormat::INTERLEAVE_LR_96000:
+    case AudioFormat::INTERLEAVE_RL_96000:
     {
         // Interleaved mode: numChannels == 1 and sample rate should be 2 times the
         // normal sample rate. The input device interleaved L and R stereo channels into
