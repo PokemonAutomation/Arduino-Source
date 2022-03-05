@@ -28,12 +28,12 @@ namespace PokemonAutomation{
 
 const char* AUDIO_FORMAT_LABELS[] = {
     "(none)",
-    "1 x 48000 Hz (Mono)",
-    "2 x 44100 Hz (Stereo)",
-    "2 x 48000 Hz (Stereo)",
-    "1 x 96000 Hz (Mono)",
-    "1 x 96000 Hz (Interleaved LR)",
-    "1 x 96000 Hz (Interleaved RL)",
+    "1 x 48 kHz (Mono)",
+    "2 x 44.1 kHz (Stereo)",
+    "2 x 48 kHz (Stereo)",
+    "1 x 96 kHz (Mono)",
+    "1 x 96 kHz (Stereo iLR)",
+    "1 x 96 kHz (Stereo iRL)",
 };
 
 void set_format(QAudioFormat& native_format, AudioFormat format){
@@ -91,6 +91,7 @@ std::vector<AudioFormat> supported_input_formats(int& preferred_index, const Nat
             ret.emplace_back(AudioFormat::MONO_48000);
         }
     }
+#if 1
     {
         QAudioFormat format = preferred_format;
         set_format(format, AudioFormat::DUAL_44100);
@@ -113,6 +114,7 @@ std::vector<AudioFormat> supported_input_formats(int& preferred_index, const Nat
             stereo = true;
         }
     }
+#endif
 
     if (stereo){
         return ret;

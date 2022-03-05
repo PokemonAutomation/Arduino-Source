@@ -87,6 +87,9 @@ qint64 AudioIODevice::writeData(const char* data, qint64 len)
     // We assert the data is always float with size of 4 bytes.
     const float* floatData = reinterpret_cast<const float *>(data);
 
+//    static uint64_t c = 0;
+//    cout << c++ << " - [0] = " << floatData[0] << ", [1] = " << floatData[1] << endl;
+
     // Pass audio data to the audio sink for audio playback.
     if (m_audioSinkDevice){
         write_output(floatData, numSamples);

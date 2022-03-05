@@ -141,9 +141,13 @@ AudioSelectorWidget::AudioSelectorWidget(
         this, [=](int index){
             AudioFormat& current = m_value.m_inputFormat;
             const std::vector<AudioFormat>& supported_formats = m_value.m_inputDevice.supported_formats();
-            index = std::max(index, 0);
-            index = std::min(index, (int)supported_formats.size() - 1);
-            current = supported_formats[index];
+            if (supported_formats.empty()){
+                current = AudioFormat::NONE;
+            }else{
+                index = std::max(index, 0);
+                index = std::min(index, (int)supported_formats.size() - 1);
+                current = supported_formats[index];
+            }
             reset_audio();
         }
     );
