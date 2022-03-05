@@ -255,6 +255,8 @@ void AudioSelectorWidget::update_formats(){
         }
     }
 
+    index = std::max(index, 0);
+
     m_value.m_inputFormat = supported_formats[index];
     m_audio_format_box->setCurrentIndex(index);
 }
