@@ -28,12 +28,12 @@ namespace PokemonAutomation{
 
 const char* AUDIO_FORMAT_LABELS[] = {
     "(none)",
-    "1 x 48 kHz (Mono)",
-    "2 x 44.1 kHz (Stereo)",
-    "2 x 48 kHz (Stereo)",
-    "1 x 96 kHz (Mono)",
-    "1 x 96 kHz (Interleaved Stereo L/R)",
-    "1 x 96 kHz (Interleaved Stereo R/L)",
+    "1 x 48,000 Hz (Mono)",
+    "2 x 44,100 Hz (Stereo)",
+    "2 x 48,000 Hz (Stereo)",
+    "1 x 96,000 Hz (Mono)",
+    "1 x 96,000 Hz (Interleaved Stereo L/R)",
+    "1 x 96,000 Hz (Interleaved Stereo R/L)",
 };
 
 void set_format(QAudioFormat& native_format, AudioFormat format){
