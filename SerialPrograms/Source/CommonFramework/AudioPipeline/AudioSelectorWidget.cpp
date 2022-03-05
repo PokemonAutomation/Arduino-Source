@@ -58,17 +58,20 @@ AudioSelectorWidget::AudioSelectorWidget(
 
         QHBoxLayout* input_layout = new QHBoxLayout();
         row0->addLayout(input_layout, 5);
-        m_audio_input_box = new NoWheelComboBox(this);
-        input_layout->addWidget(m_audio_input_box, 3);
-        m_audio_format_box = new NoWheelComboBox(this);
-        input_layout->addWidget(m_audio_format_box, 2);
+
+        if (GlobalSettings::instance().DEVELOPER_MODE){
+            m_audio_input_box = new NoWheelComboBox(this);
+            input_layout->addWidget(m_audio_input_box, 3);
+            m_load_file_button = new QPushButton("Load File", this);
+            input_layout->addWidget(m_load_file_button, 2);
+        }else{
+            m_audio_input_box = new NoWheelComboBox(this);
+            input_layout->addWidget(m_audio_input_box, 5);
+        }
         row0->addSpacing(5);
 
-        m_audio_vis_box = new NoWheelComboBox(this);
-        m_audio_vis_box->addItem("No Display");
-        m_audio_vis_box->addItem("Spectrum");
-        m_audio_vis_box->addItem("Spectrogram");
-        row0->addWidget(m_audio_vis_box, 3);
+        m_audio_format_box = new NoWheelComboBox(this);
+        row0->addWidget(m_audio_format_box, 3);
         row0->addSpacing(5);
 
         m_reset_button = new QPushButton("Reset Audio", this);
@@ -88,8 +91,8 @@ AudioSelectorWidget::AudioSelectorWidget(
         if (GlobalSettings::instance().DEVELOPER_MODE){
             m_audio_output_box = new NoWheelComboBox(this);
             output_layout->addWidget(m_audio_output_box, 3);
-            m_load_file_button = new QPushButton("Load File", this);
-            output_layout->addWidget(m_load_file_button, 2);
+            m_record_button = new QPushButton("Record Frequencies", this);
+            output_layout->addWidget(m_record_button, 2);
         }else{
             m_audio_output_box = new NoWheelComboBox(this);
             output_layout->addWidget(m_audio_output_box, 5);
@@ -104,12 +107,11 @@ AudioSelectorWidget::AudioSelectorWidget(
         row1->addWidget(m_volume_slider, 3);
         row1->addSpacing(5);
 
-        if (GlobalSettings::instance().DEVELOPER_MODE){
-            m_record_button = new QPushButton("Record Frequencies", this);
-            row1->addWidget(m_record_button, 1);
-        }else{
-            row1->addStretch(1);
-        }
+        m_audio_vis_box = new NoWheelComboBox(this);
+        m_audio_vis_box->addItem("No Display");
+        m_audio_vis_box->addItem("Spectrum");
+        m_audio_vis_box->addItem("Spectrogram");
+        row1->addWidget(m_audio_vis_box, 1);
     }
 
     refresh();

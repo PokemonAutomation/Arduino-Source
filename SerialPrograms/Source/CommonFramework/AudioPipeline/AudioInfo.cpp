@@ -32,8 +32,8 @@ const char* AUDIO_FORMAT_LABELS[] = {
     "2 x 44.1 kHz (Stereo)",
     "2 x 48 kHz (Stereo)",
     "1 x 96 kHz (Mono)",
-    "1 x 96 kHz (Stereo iLR)",
-    "1 x 96 kHz (Stereo iRL)",
+    "1 x 96 kHz (Interleaved Stereo L/R)",
+    "1 x 96 kHz (Interleaved Stereo R/L)",
 };
 
 void set_format(QAudioFormat& native_format, AudioFormat format){
