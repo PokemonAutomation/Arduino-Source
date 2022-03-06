@@ -11,6 +11,7 @@
 
 #include "Programs/PokemonLA_BraviaryHeightGlitch.h"
 #include "Programs/PokemonLA_DistortionWaiter.h"
+#include "Programs/PokemonLA_IngoBattleGrinder.h"
 #include "Programs/PokemonLA_OutbreakFinder.h"
 #include "Programs/PokemonLA_NuggetFarmerHighlands.h"
 #include "Programs/PokemonLA_GalladeFinder.h"
@@ -39,6 +40,7 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<DistortionWaiter_Descriptor, DistortionWaiter>();
     add_program<OutbreakFinder_Descriptor, OutbreakFinder>();
     add_program<NuggetFarmerHighlands_Descriptor, MoneyFarmerHighlands>();
+    add_program<IngoBattleGrinder_Descriptor, IngoBattleGrinder>();
 
     add_divider("---- Shiny Hunting ----");
     add_program<CrobatFinder_Descriptor, CrobatFinder>();

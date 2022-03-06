@@ -218,6 +218,9 @@ void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env){
     //  Connect the controller.
     pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
 
+    // Put a save here so that when the program reloads from error it won't break.
+    save_game_from_overworld(env, env.console);
+
     while (true){
         env.update_stats();
         send_program_status_notification(
