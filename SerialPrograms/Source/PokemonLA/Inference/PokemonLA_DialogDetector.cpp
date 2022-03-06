@@ -19,7 +19,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-DialogDetector::DialogDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected)
+DialogSurpriseDetector::DialogSurpriseDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected)
     : VisualInferenceCallback("DialogDetector")
     , m_stop_on_detected(stop_on_detected)
     , m_detected(false)
@@ -30,7 +30,7 @@ DialogDetector::DialogDetector(LoggerQt& logger, VideoOverlay& overlay, bool sto
     , m_cursor      (0.720, 0.855, 0.030, 0.060)
     , m_arc_phone(logger, overlay, std::chrono::milliseconds(0), false)
 {}
-void DialogDetector::make_overlays(VideoOverlaySet& items) const{
+void DialogSurpriseDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_title_top);
     items.add(COLOR_RED, m_title_bottom);
     items.add(COLOR_RED, m_top_white);
@@ -38,7 +38,7 @@ void DialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_cursor);
     m_arc_phone.make_overlays(items);
 }
-bool DialogDetector::process_frame(
+bool DialogSurpriseDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){

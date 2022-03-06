@@ -52,7 +52,7 @@ bool set_priority_by_index(int index){
     struct sched_param param;
     param.sched_priority = native_priority;
     if (pthread_setschedparam(pthread_self(), SCHED_RR, &param) == 0){
-        return;
+        return true;
     }
 
     int errorcode = errno;

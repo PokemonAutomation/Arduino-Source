@@ -144,7 +144,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
 
     env.console.log("Traveling to Charm's location...");
     {
-        DialogDetector dialog_detector(env.console, env.console, true);
+        DialogSurpriseDetector dialog_detector(env.console, env.console, true);
         ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
         int ret = run_until(
             env, env.console,

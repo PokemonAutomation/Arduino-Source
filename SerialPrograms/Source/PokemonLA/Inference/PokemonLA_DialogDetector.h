@@ -15,9 +15,9 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-class DialogDetector : public VisualInferenceCallback{
+class DialogSurpriseDetector : public VisualInferenceCallback{
 public:
-    DialogDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected);
+    DialogSurpriseDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected);
 
     bool detected() const{
         return m_detected.load(std::memory_order_acquire);
