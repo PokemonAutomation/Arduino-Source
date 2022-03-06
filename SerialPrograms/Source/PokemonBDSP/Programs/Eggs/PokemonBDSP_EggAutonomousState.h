@@ -75,7 +75,7 @@ public:
 
 private:
     [[noreturn]] void process_error(const std::string& name, const char* message);
-    void process_shiny(const QImage& screen);
+    void process_shiny(QImage screen);
 
 private:
     ProgramEnvironment& m_env;

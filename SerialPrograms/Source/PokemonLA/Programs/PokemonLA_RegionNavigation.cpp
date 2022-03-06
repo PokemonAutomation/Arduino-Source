@@ -291,7 +291,7 @@ void goto_camp_from_overworld(
 
         if (session.detected_shiny()){
             shiny_stat_incrementer.add_shiny();
-            on_shiny(env, console, options, session.consume_shiny_screenshot());
+            on_shiny_sound(env, console, options, session.shiny_sound_results());
         }
 
         if (std::chrono::system_clock::now() - start > std::chrono::seconds(60)){

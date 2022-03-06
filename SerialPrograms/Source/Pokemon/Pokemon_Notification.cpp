@@ -80,7 +80,7 @@ void send_encounter_notification(
     const ProgramInfo& info,
     bool enable_names, bool shiny_detected,
     const std::vector<EncounterResult>& results,
-    const QImage& screenshot,
+    QImage screenshot,
     const StatsTracker* session_stats,
     const EncounterFrequencies* frequencies,
     const StatsTracker* alltime_stats
@@ -181,7 +181,7 @@ void send_encounter_notification(
             color, info,
             "Encounter Notification",
             embeds,
-            screenshot, true
+            std::move(screenshot), true
         );
     }else{
         send_program_notification(
@@ -189,7 +189,7 @@ void send_encounter_notification(
             color, info,
             "Encounter Notification",
             embeds,
-            screenshot, false
+            std::move(screenshot), false
         );
     }
 }

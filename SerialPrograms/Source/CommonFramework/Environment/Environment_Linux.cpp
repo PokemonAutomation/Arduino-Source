@@ -7,6 +7,9 @@
 #if defined(__linux) || defined(__APPLE__)
 
 #include <chrono>
+#include <sys/types.h>
+#include <unistd.h>
+#include <sched.h>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "Environment.h"
@@ -20,9 +23,10 @@ namespace PokemonAutomation{
 
 
 
-extern const int DEFAULT_PRIORITY_INDEX = 0;
+extern const int DEFAULT_PRIORITY_INDEX = 1;
 const std::vector<QString> PRIORITY_MODES{
-    "Default Priority",
+    "Max Priority",
+    "Min Priority",
 };
 int priority_name_to_index(const QString& name){
     for (size_t c = 0; c < PRIORITY_MODES.size(); c++){
@@ -33,6 +37,26 @@ int priority_name_to_index(const QString& name){
     throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Priority String: " + name.toStdString());
 }
 bool set_priority_by_index(int index){
+    int native_priority = sched_get_priority_min(SCHED_RR);
+    switch (index){
+    case 0:
+        native_priority = sched_get_priority_max(SCHED_RR);
+        break;
+    case 1:
+        native_priority = sched_get_priority_min(SCHED_RR);
+        break;
+    default:
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Priority Index: " + std::to_string(index));
+    }
+
+    struct sched_param param;
+    param.sched_priority = native_priority;
+    if (pthread_setschedparam(pthread_self(), SCHED_RR, &param) == 0){
+        return;
+    }
+
+    int errorcode = errno;
+    global_logger_tagged().log("Unable to set process priority. Error Code = " + std::to_string(errorcode), COLOR_RED);
     return false;
 }
 bool set_priority_by_name(const QString& name){

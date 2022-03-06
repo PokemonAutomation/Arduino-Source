@@ -4,6 +4,7 @@
  *
  */
 
+#include <sstream>
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoFeed.h"
@@ -13,6 +14,7 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonLA/PokemonLA_Settings.h"
+#include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA_ShinyDetectedAction.h"
 
 namespace PokemonAutomation{
@@ -107,7 +109,7 @@ bool run_on_shiny(
     send_program_notification(
         console, option.NOTIFICATIONS, Color(COLOR_STAR_SHINY),
         env.program_info(),
-        "Detected Possible Shiny",
+        "Detected Shiny Sound",
         embeds,
         screenshot, true
     );
@@ -117,9 +119,10 @@ bool run_on_shiny(
 #endif
 
 
-void on_shiny(
+void on_shiny_sound(
     ProgramEnvironment& env, ConsoleHandle& console,
-    ShinyDetectedActionOption& options, const QImage &screenshot
+    ShinyDetectedActionOption& options,
+    const ShinySoundResults& results
 ){
     std::vector<std::pair<QString, QString>> embeds;
     const StatsTracker* stats = env.stats();
@@ -129,7 +132,13 @@ void on_shiny(
             embeds.emplace_back("Session Stats", QString::fromStdString(str));
         }
     }
-    embeds.emplace_back("Detection Method", "Audio. (Shiny may not be visible on the screen.)");
+
+    std::stringstream ss;
+    ss << "Error Coefficient = ";
+    ss << results.error_coefficient;
+    ss << " (Shiny may not be visible on the screen.)";
+
+    embeds.emplace_back("Detection Results", QString::fromStdString(ss.str()));
 
     ShinyDetectedAction action = (ShinyDetectedAction)(size_t)options.ACTION;
 
@@ -137,9 +146,9 @@ void on_shiny(
         send_program_notification(
             console, options.NOTIFICATIONS, Pokemon::COLOR_STAR_SHINY,
             env.program_info(),
-            "Detected Possible Shiny",
+            "Detected Shiny Sound",
             embeds,
-            screenshot, true
+            results.screenshot, true
         );
         return;
     }
@@ -152,7 +161,7 @@ void on_shiny(
     send_program_notification(
         console, options.NOTIFICATIONS, Pokemon::COLOR_STAR_SHINY,
         env.program_info(),
-        "Detected Possible Shiny",
+        "Detected Shiny Sound",
         embeds,
         screen, true
     );

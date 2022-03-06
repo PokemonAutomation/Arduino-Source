@@ -25,7 +25,7 @@ namespace PokemonAutomation{
 
 
 
-extern const int DEFAULT_PRIORITY_INDEX = 3;
+extern const int DEFAULT_PRIORITY_INDEX = 2;
 const std::vector<QString> PRIORITY_MODES{
     "Realtime",
     "High",

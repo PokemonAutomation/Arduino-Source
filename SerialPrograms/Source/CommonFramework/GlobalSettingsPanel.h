@@ -39,7 +39,7 @@ public:
     SimpleIntegerOption<uint32_t> WINDOW_WIDTH;
     SimpleIntegerOption<uint32_t> WINDOW_HEIGHT;
 
-    ProcessPriorityOption PROCESS_PRIORITY;
+    ProcessPriorityOption PROCESS_PRIORITY0;
 
     SectionDividerOption m_discord_settings;
     Integration::DiscordSettingsOption DISCORD;

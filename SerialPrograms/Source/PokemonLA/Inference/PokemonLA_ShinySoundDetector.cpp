@@ -25,17 +25,31 @@ namespace PokemonLA{
 
 
 
-ShinySoundDetector::~ShinySoundDetector(){}
+ShinySoundDetector::~ShinySoundDetector(){
+    log_results();
+}
 ShinySoundDetector::ShinySoundDetector(ConsoleHandle& console, bool stop_on_detected)
     : AudioInferenceCallback("ShinySoundDetector")
     , m_console(console)
     , m_stop_on_detected(stop_on_detected)
     , m_detected(false)
+    , m_error_coefficient(1.0)
 {}
-
-QImage ShinySoundDetector::consume_screenshot(){
+void ShinySoundDetector::log_results(){
+    std::stringstream ss;
+    ss << m_error_coefficient;
+    if (detected()){
+        m_console.log("Shiny Detected! Error Coefficient = " + ss.str(), COLOR_BLUE);
+    }else{
+        m_console.log("No shiny detected. Error Coefficient = " + ss.str(), COLOR_PURPLE);
+    }
+}
+ShinySoundResults ShinySoundDetector::results(){
+    ShinySoundResults results;
     SpinLockGuard lg(m_lock);
-    return std::move(m_screenshot);
+    results.screenshot = m_screenshot;
+    results.error_coefficient = m_error_coefficient;
+    return results;
 }
 
 
@@ -73,6 +87,8 @@ bool ShinySoundDetector::process_spectrums(
         const float threshold = (float)GameSettings::instance().SHINY_SHOUND_THRESHOLD0;
         bool found = matcherScore <= threshold;
 //        cout << matcherScore << endl;
+
+        m_error_coefficient = std::min(m_error_coefficient, matcherScore);
 
         size_t curStamp = m_matcher->latestTimestamp();
         // std::cout << "(" << curStamp+1-m_matcher->numTemplateWindows() << ", " <<  curStamp+1 << "): " << matcherScore << 

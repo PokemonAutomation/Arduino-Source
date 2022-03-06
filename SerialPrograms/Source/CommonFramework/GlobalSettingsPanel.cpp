@@ -86,7 +86,7 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(WINDOW_WIDTH);
     PA_ADD_OPTION(WINDOW_HEIGHT);
     if (PRIORITY_MODES.size() > 1){
-        PA_ADD_OPTION(PROCESS_PRIORITY);
+        PA_ADD_OPTION(PROCESS_PRIORITY0);
     }
     PA_ADD_STATIC(m_discord_settings);
     PA_ADD_OPTION(DISCORD);

@@ -107,7 +107,7 @@ void send_program_notification(
     const ProgramInfo& info,
     const QString& title,
     const std::vector<std::pair<QString, QString>>& messages,
-    const QImage& image, bool keep_file
+    QImage image, bool keep_file
 ){
     if (!settings.ok_to_send_now(logger)){
         return;
@@ -118,7 +118,7 @@ void send_program_notification(
         settings.ping(), settings.tags(),
         info, title,
         messages,
-        ImageAttachment(image, settings.screenshot(), keep_file)
+        ImageAttachment(std::move(image), settings.screenshot(), keep_file)
     );
 }
 
@@ -205,7 +205,7 @@ void send_program_status_notification(
     const ProgramInfo& info,
     const QString& message,
     const std::string& stats,
-    const QImage& image, bool keep_file
+    QImage image, bool keep_file
 ){
     send_program_notification(
         logger, settings,
@@ -215,7 +215,7 @@ void send_program_status_notification(
             {"Message", message},
             {"Session Stats", QString::fromStdString(stats)},
         },
-        image, keep_file
+        std::move(image), keep_file
     );
 }
 void send_program_finished_notification(
@@ -223,7 +223,7 @@ void send_program_finished_notification(
     const ProgramInfo& info,
     const QString& message,
     const std::string& stats,
-    const QImage& image, bool keep_file
+    QImage image, bool keep_file
 ){
     send_program_notification(
         logger, settings,
@@ -233,7 +233,7 @@ void send_program_finished_notification(
             {"Message", message},
             {"Session Stats", QString::fromStdString(stats)},
         },
-        image, keep_file
+        std::move(image), keep_file
     );
 }
 void send_program_recoverable_error_notification(
@@ -241,7 +241,7 @@ void send_program_recoverable_error_notification(
     const ProgramInfo& info,
     const QString& message,
     const std::string& stats,
-    const QImage& image, bool keep_file
+    QImage image, bool keep_file
 ){
     send_program_notification(
         logger, settings,
@@ -251,7 +251,7 @@ void send_program_recoverable_error_notification(
             {"Message", message},
             {"Session Stats", QString::fromStdString(stats)},
         },
-        image, keep_file
+        std::move(image), keep_file
     );
 }
 void send_program_fatal_error_notification(
@@ -259,7 +259,7 @@ void send_program_fatal_error_notification(
     const ProgramInfo& info,
     const QString& message,
     const std::string& stats,
-    const QImage& image, bool keep_file
+    QImage image, bool keep_file
 ){
     send_program_notification(
         logger, settings,
@@ -269,7 +269,7 @@ void send_program_fatal_error_notification(
             {"Message", message},
             {"Session Stats", QString::fromStdString(stats)},
         },
-        image, keep_file
+        std::move(image), keep_file
     );
 }
 

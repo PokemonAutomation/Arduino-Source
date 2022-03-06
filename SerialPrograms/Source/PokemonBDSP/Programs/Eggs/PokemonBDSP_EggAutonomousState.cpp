@@ -150,12 +150,12 @@ void EggAutonomousState::process_error(const std::string& name, const char* mess
         m_env.program_info(),
         message,
         m_stats.to_str(),
-        screen
+        std::move(screen)
     );
     throw OperationFailedException(m_console, message);
 }
 
-void EggAutonomousState::process_shiny(const QImage& screen){
+void EggAutonomousState::process_shiny(QImage screen){
 //    take_video(m_console);
     m_stats.m_shinies++;
     m_env.update_stats();
@@ -165,7 +165,7 @@ void EggAutonomousState::process_shiny(const QImage& screen){
         m_notification_shiny,
         m_env.program_info(),
         false, true, {{{}, ShinyType::UNKNOWN_SHINY}},
-        screen,
+        std::move(screen),
         &m_stats
     );
 }

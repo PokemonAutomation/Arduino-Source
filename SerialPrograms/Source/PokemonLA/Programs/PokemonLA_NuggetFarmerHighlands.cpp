@@ -178,7 +178,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
         );
         if (shiny_detector.detected()){
             stats.shinies++;
-            on_shiny(env, env.console, SHINY_DETECTED, shiny_detector.consume_screenshot());
+            on_shiny_sound(env, env.console, SHINY_DETECTED, shiny_detector.results());
         }
         if (ret == 0){
             env.console.log("Found Charm!", COLOR_BLUE);

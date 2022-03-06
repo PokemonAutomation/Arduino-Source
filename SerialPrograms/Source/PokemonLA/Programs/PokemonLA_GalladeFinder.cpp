@@ -136,7 +136,7 @@ bool GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env){
             { &shiny_detector });
         if (shiny_detector.detected()){
            stats.shinies++;
-           on_shiny(env, env.console, SHINY_DETECTED, shiny_detector.consume_screenshot());
+           on_shiny_sound(env, env.console, SHINY_DETECTED, shiny_detector.results());
         }
     };
 

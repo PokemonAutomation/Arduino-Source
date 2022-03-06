@@ -26,11 +26,20 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
+class ShinySoundDetector;
+
 
 class ShinyStatIncrementer{
 public:
     virtual void add_shiny() = 0;
 };
+
+struct ShinySoundResults{
+    float error_coefficient;
+    QImage screenshot;
+};
+
+
 
 
 #if 0
@@ -89,9 +98,10 @@ bool run_on_shiny(
 #endif
 
 
-void on_shiny(
+void on_shiny_sound(
     ProgramEnvironment& env, ConsoleHandle& console,
-    ShinyDetectedActionOption& options, const QImage &screenshot
+    ShinyDetectedActionOption& options,
+    const ShinySoundResults& results
 );
 
 

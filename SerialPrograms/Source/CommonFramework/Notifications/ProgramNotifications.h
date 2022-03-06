@@ -24,7 +24,7 @@ void send_program_notification(
     const ProgramInfo& info,
     const QString& title,
     const std::vector<std::pair<QString, QString>>& messages,
-    const QImage& image = QImage(), bool keep_file = false
+    QImage image = QImage(), bool keep_file = false
 );
 
 void send_program_telemetry(
@@ -40,28 +40,28 @@ void send_program_status_notification(
     const ProgramInfo& info,
     const QString& message = "",
     const std::string& stats = "",
-    const QImage& image = QImage(), bool keep_file = false
+    QImage image = QImage(), bool keep_file = false
 );
 void send_program_finished_notification(
     LoggerQt& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const QString& message,
     const std::string& stats,
-    const QImage& image = QImage(), bool keep_file = false
+    QImage image = QImage(), bool keep_file = false
 );
 void send_program_recoverable_error_notification(
     LoggerQt& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const QString& message,
     const std::string& stats = "",
-    const QImage& image = QImage(), bool keep_file = false
+    QImage image = QImage(), bool keep_file = false
 );
 void send_program_fatal_error_notification(
     LoggerQt& logger, EventNotificationOption& settings,
     const ProgramInfo& info,
     const QString& message,
     const std::string& stats = "",
-    const QImage& image = QImage(), bool keep_file = false
+    QImage image = QImage(), bool keep_file = false
 );
 
 

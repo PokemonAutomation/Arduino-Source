@@ -11,6 +11,7 @@
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/InferenceInfra/AudioInferenceCallback.h"
+#include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 
 #include <memory>
 
@@ -28,10 +29,12 @@ public:
     virtual ~ShinySoundDetector();
     ShinySoundDetector(ConsoleHandle& console, bool stop_on_detected);
 
+    void log_results();
+
     bool detected() const{
         return m_detected.load(std::memory_order_acquire);
     }
-    QImage consume_screenshot();
+    ShinySoundResults results();
 
     virtual bool process_spectrums(
         const std::vector<AudioSpectrum>& newSpectrums,
@@ -47,6 +50,7 @@ private:
 
     SpinLock m_lock;
     std::atomic<bool> m_detected;
+    float m_error_coefficient;
     QImage m_screenshot;
 
     std::unique_ptr<SpectrogramMatcher> m_matcher;

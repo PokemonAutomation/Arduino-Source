@@ -34,7 +34,14 @@ public:
 
 
 ProcessPriorityOption::ProcessPriorityOption()
-    : EnumDropdownOption("<b>Process Priority:</b><br>", PRIORITY_MODES, DEFAULT_PRIORITY_INDEX)
+    : EnumDropdownOption(
+        "<b>Process Priority:</b><br>"
+        "Set the priority of this process.<br>"
+        "Higher priority may reduce errors due to CPU starvation from background programs. "
+        "Lower priority may improve system responsiveness if your computer isn't powerful enough.<br>"
+        "On Mac and Linux, you may need to restart the program for this to properly take effect.",
+        PRIORITY_MODES, DEFAULT_PRIORITY_INDEX
+    )
 {}
 
 void ProcessPriorityOption::update_priority_to_option() const{

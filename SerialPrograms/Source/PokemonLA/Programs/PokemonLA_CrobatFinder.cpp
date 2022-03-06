@@ -140,10 +140,11 @@ bool CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env){
                 pbf_move_left_joystick(context, 128, 0, (uint16_t)(3.8 * TICKS_PER_SECOND), 0); // forward to crobat check
 
             },
-            { &shiny_detector });
+            { &shiny_detector }
+        );
         if (shiny_detector.detected()){
            stats.shinies++;
-           on_shiny(env, env.console, SHINY_DETECTED, shiny_detector.consume_screenshot());
+           on_shiny_sound(env, env.console, SHINY_DETECTED, shiny_detector.results());
         }
     };
 

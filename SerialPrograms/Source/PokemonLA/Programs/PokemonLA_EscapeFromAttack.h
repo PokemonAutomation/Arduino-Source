@@ -34,8 +34,8 @@ public:
     bool detected_shiny() const{
         return m_shiny_listener.detected();
     }
-    QImage consume_shiny_screenshot(){
-        return m_shiny_listener.consume_screenshot();
+    ShinySoundResults shiny_sound_results(){
+        return m_shiny_listener.results();
     }
 
 

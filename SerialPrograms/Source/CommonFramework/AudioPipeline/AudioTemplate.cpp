@@ -23,13 +23,13 @@ AudioTemplate::AudioTemplate(std::vector<float>&& spectrogram, size_t numWindows
     , m_spectrogram(std::move(spectrogram)) {}
 
 
-AudioTemplate loadAudioTemplate(const QString& filename, int sampleRate){
+AudioTemplate loadAudioTemplate(const QString& filename, size_t sampleRate){
     QAudioFormat outputAudioFormat;
     outputAudioFormat.setChannelCount(1);
 #if QT_VERSION_MAJOR == 5
     outputAudioFormat.setCodec("audio/pcm");
 #endif
-    outputAudioFormat.setSampleRate(sampleRate);
+    outputAudioFormat.setSampleRate((int)sampleRate);
     setSampleFormatToFloat(outputAudioFormat);
     
     AudioFileLoader loader(nullptr, filename, outputAudioFormat);
