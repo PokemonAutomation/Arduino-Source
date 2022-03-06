@@ -55,6 +55,7 @@ class AudioDeviceInfo{
 public:
     ~AudioDeviceInfo();
     AudioDeviceInfo(const AudioDeviceInfo&);
+    void operator=(const AudioDeviceInfo&);
 
 public:
     AudioDeviceInfo();

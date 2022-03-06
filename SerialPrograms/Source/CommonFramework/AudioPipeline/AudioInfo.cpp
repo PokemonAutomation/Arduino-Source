@@ -336,6 +336,7 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_output_devices(){
 
 AudioDeviceInfo::~AudioDeviceInfo(){}
 AudioDeviceInfo::AudioDeviceInfo(const AudioDeviceInfo&) = default;
+void AudioDeviceInfo::operator=(const AudioDeviceInfo&){}
 
 AudioDeviceInfo::AudioDeviceInfo(){}
 
