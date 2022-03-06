@@ -244,6 +244,7 @@ void AudioSelectorWidget::update_formats(){
 
     m_audio_format_box->clear();
     const std::vector<AudioFormat>& supported_formats = device.supported_formats();
+
     if (supported_formats.empty()){
         m_value.m_inputFormat = AudioFormat::NONE;
         return;
