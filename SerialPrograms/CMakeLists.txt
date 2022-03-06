@@ -333,6 +333,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/FloatingPointOption.h
     Source/CommonFramework/Options/HiddenTextEditOption.cpp
     Source/CommonFramework/Options/HiddenTextEditOption.h
+    Source/CommonFramework/Options/ProcessPriorityOption.cpp
+    Source/CommonFramework/Options/ProcessPriorityOption.h
     Source/CommonFramework/Options/RandomCodeOption.cpp
     Source/CommonFramework/Options/RandomCodeOption.h
     Source/CommonFramework/Options/ScreenshotFormatOption.cpp

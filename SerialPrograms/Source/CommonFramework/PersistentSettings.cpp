@@ -59,6 +59,8 @@ void PersistentSettings::read(){
     QJsonObject root = doc.object();
 
     GlobalSettings::instance().load_json(json_get_object_nothrow(root,"20-GlobalSettings"));
+    GlobalSettings::instance().PROCESS_PRIORITY.update_priority_to_option();
+
     NintendoSwitch::set_keyboard_mapping(json_get_array_nothrow(root, "50-SwitchKeyboardMapping"));
 
     panels = json_get_object_nothrow(root, "99-Panels");

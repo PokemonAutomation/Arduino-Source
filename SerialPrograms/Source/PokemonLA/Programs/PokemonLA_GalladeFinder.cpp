@@ -103,7 +103,7 @@ bool GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env){
             env, env.console,
             [](const BotBaseContext& context){
                 // forward portion
-                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, (6.8 * TICKS_PER_SECOND)); // forward while running until stairs, mash y a few times down the stairs
+                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, (uint16_t)(6.8 * TICKS_PER_SECOND)); // forward while running until stairs, mash y a few times down the stairs
                 pbf_mash_button(context, BUTTON_Y,(uint16_t)(2.8 * TICKS_PER_SECOND)); // roll down the stairs, recover stamina
                 pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, (uint16_t)(4.0 * TICKS_PER_SECOND)); // forward while sprinting again
                 pbf_mash_button(context, BUTTON_Y,(uint16_t)(2.0 * TICKS_PER_SECOND)); // two mashes and then one y
@@ -112,7 +112,7 @@ bool GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env){
 
                 // right portion
                 pbf_move_left_joystick(context, 255, 128, 0.5 * TICKS_PER_SECOND, 0); // right alone
-                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 255, 128, 128, 128, (2.4 * TICKS_PER_SECOND)); // forward while running until stairs
+                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 255, 128, 128, 128, (uint16_t)(2.4 * TICKS_PER_SECOND)); // forward while running until stairs
                 pbf_mash_button(context, BUTTON_Y,(uint16_t)(1.8 * TICKS_PER_SECOND)); // roll down the stairs, recover stamina
                 pbf_move_left_joystick(context, 255, 128, (uint16_t)(1.8 * TICKS_PER_SECOND), 20); // right alone
 
@@ -130,7 +130,7 @@ bool GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env){
                 pbf_move_left_joystick(context, 0, 0, (uint16_t)(1.1 * TICKS_PER_SECOND), 0);
 
                 //pbf_move_left_joystick(context, 128, 0, 3.9 * TICKS_PER_SECOND, 0); // OLD forward
-                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, (3.1 * TICKS_PER_SECOND)); // forward while sprinting until stairs, mash y a few times down the stairs
+                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, (uint16_t)(3.5 * TICKS_PER_SECOND)); // forward while sprinting until stairs, mash y a few times down the stairs
                 // we should easily be in range of gallade at this point, so if there's no shiny we're done
             },
             { &shiny_detector });

@@ -8,6 +8,7 @@
 #include <QCryptographicHash>
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Environment/Environment.h"
 #include "GlobalSettingsPanel.h"
 
 namespace PokemonAutomation{
@@ -21,6 +22,7 @@ const std::set<std::string> TOKENS{
     "8e48e38e49bffc8462ada9d2d9d850d5b3b5c9529d20978c09bc548bc9a614a4",
     "7694adee4419d62c6a923c4efc9e7b41def7b96bb84ea882701b0bf2e8c13bee",
 };
+
 
 
 
@@ -83,6 +85,9 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(STATS_FILE);
     PA_ADD_OPTION(WINDOW_WIDTH);
     PA_ADD_OPTION(WINDOW_HEIGHT);
+    if (PRIORITY_MODES.size() > 1){
+        PA_ADD_OPTION(PROCESS_PRIORITY);
+    }
     PA_ADD_STATIC(m_discord_settings);
     PA_ADD_OPTION(DISCORD);
     PA_ADD_STATIC(m_advanced_options);

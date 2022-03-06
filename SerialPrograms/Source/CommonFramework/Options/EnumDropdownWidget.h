@@ -24,7 +24,7 @@ public:
 signals:
     void on_changed();
 
-private:
+protected:
     EnumDropdownOption& m_value;
     QComboBox* m_box;
 };

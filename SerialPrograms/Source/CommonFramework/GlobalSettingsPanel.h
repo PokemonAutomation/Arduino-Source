@@ -11,6 +11,7 @@
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/StringOption.h"
+#include "CommonFramework/Options/ProcessPriorityOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "Integrations/DiscordSettingsOption.h"
 
@@ -19,7 +20,6 @@ using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
-
 
 
 
@@ -38,6 +38,8 @@ public:
 
     SimpleIntegerOption<uint32_t> WINDOW_WIDTH;
     SimpleIntegerOption<uint32_t> WINDOW_HEIGHT;
+
+    ProcessPriorityOption PROCESS_PRIORITY;
 
     SectionDividerOption m_discord_settings;
     Integration::DiscordSettingsOption DISCORD;

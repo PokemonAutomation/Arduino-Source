@@ -10,6 +10,8 @@
 #include "Integrations/SleepyDiscordRunner.h"
 #include "Windows/MainWindow.h"
 
+#include "GlobalSettingsPanel.h"
+
 #include <iostream>
 using std::cout;
 using std::endl;

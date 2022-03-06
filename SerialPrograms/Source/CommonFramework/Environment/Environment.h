@@ -8,8 +8,23 @@
 #define PokemonAutomation_Environment_H
 
 #include <stdint.h>
+#include <string>
+#include <vector>
+#include <QString>
 
 namespace PokemonAutomation{
+
+
+
+extern const int DEFAULT_PRIORITY_INDEX;
+extern const std::vector<QString> PRIORITY_MODES;
+int priority_name_to_index(const QString& name);
+bool set_priority_by_index(int index);
+bool set_priority_by_name(const QString& name);
+int read_priority_index();
+
+
+
 
 
 void x86_cpuid(uint32_t eabcdx[4], uint32_t eax, uint32_t ecx = 0);

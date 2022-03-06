@@ -185,6 +185,7 @@ SOURCES += \
     Source/CommonFramework/Options/FixedCodeOption.cpp \
     Source/CommonFramework/Options/FloatingPointOption.cpp \
     Source/CommonFramework/Options/HiddenTextEditOption.cpp \
+    Source/CommonFramework/Options/ProcessPriorityOption.cpp \
     Source/CommonFramework/Options/RandomCodeOption.cpp \
     Source/CommonFramework/Options/ScreenshotFormatOption.cpp \
     Source/CommonFramework/Options/SimpleIntegerOption.cpp \
@@ -765,6 +766,7 @@ HEADERS += \
     Source/CommonFramework/Options/FixedCodeOption.h \
     Source/CommonFramework/Options/FloatingPointOption.h \
     Source/CommonFramework/Options/HiddenTextEditOption.h \
+    Source/CommonFramework/Options/ProcessPriorityOption.h \
     Source/CommonFramework/Options/RandomCodeOption.h \
     Source/CommonFramework/Options/ScreenshotFormatOption.h \
     Source/CommonFramework/Options/SimpleIntegerOption.h \

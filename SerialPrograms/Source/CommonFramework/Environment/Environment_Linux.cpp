@@ -19,6 +19,34 @@
 namespace PokemonAutomation{
 
 
+
+extern const int DEFAULT_PRIORITY_INDEX = 0;
+const std::vector<QString> PRIORITY_MODES{
+    "Default Priority",
+};
+int priority_name_to_index(const QString& name){
+    for (size_t c = 0; c < PRIORITY_MODES.size(); c++){
+        if (name == PRIORITY_MODES[c]){
+            return (int)c;
+        }
+    }
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Priority String: " + name.toStdString());
+}
+bool set_priority_by_index(int index){
+    return false;
+}
+bool set_priority_by_name(const QString& name){
+    int index = priority_name_to_index(name);
+    return set_priority_by_index(index);
+}
+int read_priority_index(){
+    return -1;
+}
+
+
+
+
+
 void x86_cpuid(uint32_t eabcdx[4], uint32_t eax, uint32_t ecx){
     __cpuid_count(eax, ecx, eabcdx[0], eabcdx[1], eabcdx[2], eabcdx[3]);
 }
