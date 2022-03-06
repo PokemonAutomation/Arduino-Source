@@ -54,8 +54,8 @@ void set_format(QAudioFormat& native_format, AudioFormat format);
 class AudioDeviceInfo{
 public:
     ~AudioDeviceInfo();
-    AudioDeviceInfo(const AudioDeviceInfo&);
-    void operator=(const AudioDeviceInfo&);
+    AudioDeviceInfo(const AudioDeviceInfo& x);
+    void operator=(const AudioDeviceInfo& x);
 
 public:
     AudioDeviceInfo();
