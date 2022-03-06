@@ -39,22 +39,38 @@ const char* AUDIO_FORMAT_LABELS[] = {
 void set_format(QAudioFormat& native_format, AudioFormat format){
     switch (format){
     case AudioFormat::MONO_48000:
-        native_format.setChannelCount(1);
-        native_format.setSampleRate(48000);
+        if (native_format.channelCount() != 1){
+            native_format.setChannelCount(1);
+        }
+        if (native_format.sampleRate() != 48000){
+            native_format.setSampleRate(48000);
+        }
         break;
     case AudioFormat::DUAL_44100:
-        native_format.setChannelCount(2);
-        native_format.setSampleRate(44100);
+        if (native_format.channelCount() != 2){
+            native_format.setChannelCount(2);
+        }
+        if (native_format.sampleRate() != 44100){
+            native_format.setSampleRate(44100);
+        }
         break;
     case AudioFormat::DUAL_48000:
-        native_format.setChannelCount(2);
-        native_format.setSampleRate(48000);
+        if (native_format.channelCount() != 2){
+            native_format.setChannelCount(2);
+        }
+        if (native_format.sampleRate() != 48000){
+            native_format.setSampleRate(48000);
+        }
         break;
     case AudioFormat::MONO_96000:
     case AudioFormat::INTERLEAVE_LR_96000:
     case AudioFormat::INTERLEAVE_RL_96000:
-        native_format.setChannelCount(1);
-        native_format.setSampleRate(96000);
+        if (native_format.channelCount() != 1){
+            native_format.setChannelCount(1);
+        }
+        if (native_format.sampleRate() != 96000){
+            native_format.setSampleRate(96000);
+        }
         break;
     default:
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid AudioFormat: " + std::to_string((size_t)format));
@@ -115,10 +131,6 @@ std::vector<AudioFormat> supported_input_formats(int& preferred_index, const Nat
         }
     }
 #endif
-
-    if (stereo){
-        return ret;
-    }
 
     {
         QAudioFormat format = preferred_format;
@@ -230,7 +242,7 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
         data.display_name = std::move(name);
         data.info = std::move(device);
 
-        data.supported_formats = supported_input_formats(data.preferred_format_index, device, data.display_name);
+        data.supported_formats = supported_input_formats(data.preferred_format_index, data.info, data.display_name);
     }
 #elif QT_VERSION_MAJOR == 6
     for (NativeAudioInfo& device : QMediaDevices::audioInputs()){
@@ -241,7 +253,7 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_input_devices(){
         data.display_name = device.description();
         data.info = std::move(device);
 
-        data.supported_formats = supported_input_formats(data.preferred_format_index, device, data.display_name);
+        data.supported_formats = supported_input_formats(data.preferred_format_index, data.info, data.display_name);
     }
 #endif
 
@@ -299,7 +311,7 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_output_devices(){
         data.display_name = std::move(name);
         data.info = std::move(device);
 
-        data.supported_formats = supported_output_formats(data.preferred_format_index, device);
+        data.supported_formats = supported_output_formats(data.preferred_format_index, data.info);
     }
 #elif QT_VERSION_MAJOR == 6
     for (NativeAudioInfo& device : QMediaDevices::audioOutputs()){
@@ -310,7 +322,7 @@ std::vector<AudioDeviceInfo> AudioDeviceInfo::all_output_devices(){
         data.display_name = device.description();
         data.info = std::move(device);
 
-        data.supported_formats = supported_output_formats(data.preferred_format_index, device);
+        data.supported_formats = supported_output_formats(data.preferred_format_index, data.info);
     }
 #endif
 
