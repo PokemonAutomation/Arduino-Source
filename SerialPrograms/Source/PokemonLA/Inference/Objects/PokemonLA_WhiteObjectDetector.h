@@ -34,8 +34,11 @@ public:
     WhiteObjectDetector(const WhiteObjectDetector&) = delete;
     void operator=(const WhiteObjectDetector&) = delete;
 
-    WhiteObjectDetector(Color color, std::set<Color> thresholds)
-        : m_color(color)
+    // thresholds: thresholds for various filters. Each filter has a different threshold
+    // to filter out candidate objects on an image. The thresholds specified here are the
+    // min color thresholds. The max color thresholds for all filters are always 0xffffffff.
+    WhiteObjectDetector(Color inference_box_color, std::set<Color> thresholds)
+        : m_color(inference_box_color)
         , m_thresholds(std::move(thresholds))
     {}
 

@@ -24,6 +24,9 @@ protected:
 
 public:
     virtual ~WaterfillTemplateMatcher() = default;
+    // Load a template image from disk, min_color and max_color denote the
+    // color range of the object displayed in the image file while min_area
+    // is the minimum number of pixels required for an object.
     WaterfillTemplateMatcher(
         const char* path,
         Color min_color, Color max_color,
