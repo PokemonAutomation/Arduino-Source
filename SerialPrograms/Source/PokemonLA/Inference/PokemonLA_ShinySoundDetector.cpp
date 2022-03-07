@@ -33,6 +33,7 @@ ShinySoundDetector::ShinySoundDetector(ConsoleHandle& console, bool stop_on_dete
     , m_console(console)
     , m_stop_on_detected(stop_on_detected)
     , m_detected(false)
+    , m_time_detected(std::chrono::system_clock::time_point::min())
     , m_error_coefficient(1.0)
 {}
 void ShinySoundDetector::log_results(){
@@ -58,9 +59,10 @@ bool ShinySoundDetector::process_spectrums(
     AudioFeed& audioFeed
 ){
     if (newSpectrums.empty()){
-        m_detected.store(false, std::memory_order_release);
         return false;
     }
+
+    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
 
     size_t sampleRate = newSpectrums[0].sample_rate;
     if (m_matcher == nullptr || m_matcher->sampleRate() != sampleRate){
@@ -109,13 +111,25 @@ bool ShinySoundDetector::process_spectrums(
                 newSpectrums.begin(),
                 newSpectrums.begin() + std::distance(it + 1, newSpectrums.rend())
             ));
-            m_detected.store(true, std::memory_order_release);
-            return m_stop_on_detected;
+
+            if (!m_detected.load(std::memory_order_acquire)){
+                m_time_detected = now;
+                m_detected.store(true, std::memory_order_release);
+            }
+
+            break;
         }
     }
 
-    m_detected.store(false, std::memory_order_release);
-    return false;
+    if (!m_stop_on_detected){
+        return false;
+    }
+    if (!m_detected.load(std::memory_order_acquire)){
+        return false;
+    }
+
+    //  Don't return true for another 200ms so we can get a measurement of how strong this detection is.
+    return m_time_detected + std::chrono::milliseconds(200) <= now;
 }
 
 void ShinySoundDetector::clear(){

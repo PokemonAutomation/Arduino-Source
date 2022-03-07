@@ -103,7 +103,7 @@ void IngoBattleGrinder::use_move(const BotBaseContext &context, int cur_move, bo
         return;
     }
 
-    int style = 0;
+    size_t style = 0;
     switch(cur_move){
         case 0: style = MOVE1_STYLE_OPTION; break;
         case 1: style = MOVE2_STYLE_OPTION; break;
@@ -196,7 +196,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
             env.console.log("End of battle.");
 
             ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(110), stop_on_detected);
-            int ret = run_until(
+            run_until(
                 env, env.console,
                 [](const BotBaseContext& context){
                     pbf_mash_button(context, BUTTON_B, 20 * TICKS_PER_SECOND);

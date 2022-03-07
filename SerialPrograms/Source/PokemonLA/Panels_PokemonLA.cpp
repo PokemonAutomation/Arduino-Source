@@ -39,8 +39,12 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<BraviaryHeightGlitch_Descriptor, BraviaryHeightGlitch>();
     add_program<DistortionWaiter_Descriptor, DistortionWaiter>();
     add_program<OutbreakFinder_Descriptor, OutbreakFinder>();
+
+    add_divider("---- Farming ----");
     add_program<NuggetFarmerHighlands_Descriptor, MoneyFarmerHighlands>();
-    add_program<IngoBattleGrinder_Descriptor, IngoBattleGrinder>();
+    if (GlobalSettings::instance().DEVELOPER_MODE){
+        add_program<IngoBattleGrinder_Descriptor, IngoBattleGrinder>();
+    }
 
     add_divider("---- Shiny Hunting ----");
     add_program<CrobatFinder_Descriptor, CrobatFinder>();

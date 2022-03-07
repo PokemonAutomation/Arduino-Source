@@ -98,9 +98,9 @@ qint64 AudioIODevice::writeData(const char* data, qint64 len)
 
 
     //  Convert the audio input stream into a stream that our FFT can handle.
-    size_t fft_sample_rate;
-    size_t fft_samples;
-    const float* fft_input;
+    size_t fft_sample_rate = 0;
+    size_t fft_samples = 0;
+    const float* fft_input = nullptr;
 
     bool average_adjacent_samples = false;
 

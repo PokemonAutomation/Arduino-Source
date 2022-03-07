@@ -50,6 +50,8 @@ private:
 
     SpinLock m_lock;
     std::atomic<bool> m_detected;
+    std::chrono::system_clock::time_point m_time_detected;
+
     float m_error_coefficient;
     QImage m_screenshot;
 

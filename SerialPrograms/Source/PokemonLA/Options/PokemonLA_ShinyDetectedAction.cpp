@@ -134,9 +134,9 @@ void on_shiny_sound(
     }
 
     std::stringstream ss;
-    ss << "Error Coefficient = ";
+    ss << "Error Coefficient: ";
     ss << results.error_coefficient;
-    ss << " (Shiny may not be visible on the screen.)";
+    ss << "\n(Shiny may not be visible on the screen.)";
 
     embeds.emplace_back("Detection Results", QString::fromStdString(ss.str()));
 

@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonLA_ShinySoundListener_H
 #define PokemonAutomation_PokemonLA_ShinySoundListener_H
 
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 #include "NintendoSwitch/Options/GoHomeWhenDoneOption.h"
 
@@ -24,14 +25,10 @@ class ShinySoundListener : public SingleSwitchProgramInstance{
 public:
     ShinySoundListener(const ShinySoundListener_Descriptor& descriptor);
 
-//    virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
-//private:
-//    struct Stats;
-
 private:
-    // GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
+    BooleanCheckBoxOption STOP_ON_SHINY_SOUND;
 };
 
 

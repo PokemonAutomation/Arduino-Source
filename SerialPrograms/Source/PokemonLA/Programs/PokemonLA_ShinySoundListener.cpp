@@ -45,7 +45,10 @@ ShinySoundListener_Descriptor::ShinySoundListener_Descriptor()
 
 ShinySoundListener::ShinySoundListener(const ShinySoundListener_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
-{}
+    , STOP_ON_SHINY_SOUND("<b>Stop on Shiny Sound</b><br>Stop program when a shiny sound is heard.", false)
+{
+    PA_ADD_OPTION(STOP_ON_SHINY_SOUND);
+}
 
 
 void searchAudioDump();
@@ -68,7 +71,7 @@ void ShinySoundListener::program(SingleSwitchProgramEnvironment& env){
     }
 #endif
     
-    ShinySoundDetector detector(env.console, false);
+    ShinySoundDetector detector(env.console, STOP_ON_SHINY_SOUND);
 
 #if 1
     AudioInferenceSession session(env, env.console, env.console);
