@@ -24,9 +24,13 @@ GlobalStateTracker::GlobalStateTracker(ProgramEnvironment& env, size_t consoles)
         m_master_consoles[c].timestamp = timestamp;
     }
     update_groups_unprotected();
+    env.register_stop_program_signal(m_lock, m_cv);
+}
+GlobalStateTracker::~GlobalStateTracker(){
+    m_env.deregister_stop_program_signal(m_cv);
 }
 std::pair<uint64_t, std::string> GlobalStateTracker::dump(){
-    std::lock_guard<std::mutex> lg(m_env.lock());
+    std::lock_guard<std::mutex> lg(m_lock);
 //    SpinLockGuard lg(m_lock);
     std::string str;
     for (size_t c = 0; c < m_count; c++){
@@ -42,15 +46,15 @@ std::pair<uint64_t, std::string> GlobalStateTracker::dump(){
     return {m_state_epoch, str};
 }
 void GlobalStateTracker::push_update(size_t index){
-    std::lock_guard<std::mutex> lg(m_env.lock());
+    std::lock_guard<std::mutex> lg(m_lock);
     m_state_epoch++;
     m_master_consoles[index] = m_consoles[index];
     m_master_consoles[index].timestamp = std::chrono::system_clock::now();
-    m_env.cv().notify_all();
+    m_cv.notify_all();
 }
 
 GlobalState GlobalStateTracker::infer_actual_state(size_t index){
-    std::lock_guard<std::mutex> lg(m_env.lock());
+    std::lock_guard<std::mutex> lg(m_lock);
 //    SpinLockGuard lg(m_lock);
     return infer_actual_state_unprotected(index);
 }
@@ -89,7 +93,7 @@ void GlobalStateTracker::group_clear_status(uint8_t group){
     }
 }
 void GlobalStateTracker::mark_as_dead(size_t index){
-    std::lock_guard<std::mutex> lg(m_env.lock());
+    std::lock_guard<std::mutex> lg(m_lock);
     m_state_epoch++;
     m_groups[index] = 4;
 }
@@ -99,8 +103,7 @@ GlobalState GlobalStateTracker::synchronize(
     size_t index,
     std::chrono::milliseconds window
 ){
-//    std::unique_lock<std::mutex> lg(m_env.lock());
-    std::unique_lock<std::mutex> lg(m_env.lock());
+    std::unique_lock<std::mutex> lg(m_lock);
     m_state_epoch++;
 
     time_point timestamp = std::chrono::system_clock::now();
@@ -112,7 +115,7 @@ GlobalState GlobalStateTracker::synchronize(
 
     if (group_is_up_to_date(m_groups[index], timestamp - window)){
         //  We're the last one. Wake everyone up and return result.
-        m_env.cv().notify_all();
+        m_cv.notify_all();
         m_pending_sync[index] = SyncState::DONE;
         return infer_actual_state_unprotected(index);
     }
@@ -120,7 +123,7 @@ GlobalState GlobalStateTracker::synchronize(
     //  Not the last one. Need to wait.
     time_point time_limit = timestamp + window;
     while (true){
-        m_env.cv().wait_until(lg, time_limit);
+        m_cv.wait_until(lg, time_limit);
 
         env.check_stopping();
 

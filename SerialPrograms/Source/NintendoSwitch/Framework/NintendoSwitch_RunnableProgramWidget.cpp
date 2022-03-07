@@ -160,19 +160,6 @@ void RunnableSwitchProgramWidget::run_program(){
     }catch (ProgramCancelledException&){
     }catch (ProgramFinishedException&){
     }catch (InvalidConnectionStateException&){
-    }catch (UserSetupError& e){
-        emit signal_error(QString::fromStdString(e.message()));
-        send_program_fatal_error_notification(
-            m_logger, instance.NOTIFICATION_ERROR_FATAL,
-            ProgramInfo(
-                instance.descriptor().identifier(),
-                instance.descriptor().category(),
-                instance.descriptor().display_name(),
-                timestamp()
-            ),
-            QString::fromStdString(e.message()),
-            m_current_stats ? m_current_stats->to_str() : ""
-        );
     }catch (Exception& e){
         QString message = QString::fromStdString(e.message());
         emit signal_error(message);

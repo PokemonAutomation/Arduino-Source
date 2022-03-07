@@ -10,6 +10,7 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateTracker.h"
+#include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -18,8 +19,8 @@ namespace MaxLairInternal{
 
 
 void run_professor_swap(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    AdventureRuntime& runtime,
+    ProgramEnvironment& env, ConsoleHandle& console,
     GlobalStateTracker& state_tracker
 );
 

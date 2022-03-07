@@ -123,7 +123,7 @@ StateMachineAction run_caught_screen(
         tracker.leave_summary();
         QImage screen = console.video().snapshot();
 
-        std::lock_guard<std::mutex> lg(env.lock());
+        SpinLockGuard lg(runtime.m_lock);
         send_shiny_notification(
             console, runtime.notification_shiny,
             env.program_info(),

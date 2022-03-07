@@ -21,8 +21,8 @@ namespace MaxLairInternal{
 
 
 void run_professor_swap(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    AdventureRuntime& runtime,
+    ProgramEnvironment& env, ConsoleHandle& console,
     GlobalStateTracker& state_tracker
 ){
     size_t console_index = console.index();
@@ -43,7 +43,7 @@ void run_professor_swap(
     bool swap = should_swap_with_professor(console, inferred, player_index);
     if (swap){
         console.log("Choosing to swap.", COLOR_PURPLE);
-        std::lock_guard<std::mutex> lg(env.lock());
+        std::lock_guard<std::mutex> lg(runtime.m_delay_lock);
         pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
         console.botbase().wait_for_all_requests();
     }else{

@@ -12,6 +12,7 @@
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Consoles.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateTracker.h"
+#include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -20,8 +21,8 @@ namespace MaxLairInternal{
 
 
 void run_swap_pokemon(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    AdventureRuntime& runtime,
+    ProgramEnvironment& env, ConsoleHandle& console,
     GlobalStateTracker& state_tracker,
     const ConsoleSpecificOptions& settings
 );

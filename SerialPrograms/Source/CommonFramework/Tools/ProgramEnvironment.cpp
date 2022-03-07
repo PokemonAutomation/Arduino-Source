@@ -74,22 +74,19 @@ void ProgramEnvironment::update_stats(const std::string& override_current){
     }
 
     if (current.empty() && historical.empty()){
-        set_status("");
-//        m_data->status_update("");
+        emit set_status("");
         return;
     }
 
     if (!current.empty() && historical.empty()){
         QString str = QString::fromStdString(current);
-        set_status(str);
-//        m_data->status_update(str);
+        emit set_status(str);
         log(str);
         return;
     }
     if (current.empty() && !historical.empty()){
         QString str = QString::fromStdString(historical);
-        set_status("<b>Past Runs</b> - " + str);
-//        m_data->status_update("<b>Past Runs</b> - " + str);
+        emit set_status("<b>Past Runs</b> - " + str);
         return;
     }
 
@@ -100,8 +97,7 @@ void ProgramEnvironment::update_stats(const std::string& override_current){
     str += "<br>";
     str += "<b>Past Totals</b> - " + historical;
 
-    set_status(QString::fromStdString(str));
-//    m_data->status_update(QString::fromStdString(str));
+    emit set_status(QString::fromStdString(str));
 }
 
 bool ProgramEnvironment::is_stopping() const{
@@ -131,13 +127,6 @@ void ProgramEnvironment::signal_stop(){
     }
 }
 
-
-std::mutex& ProgramEnvironment::lock(){
-    return m_data->m_lock;
-}
-std::condition_variable& ProgramEnvironment::cv(){
-    return m_data->m_cv;
-}
 
 void ProgramEnvironment::wait_for(std::chrono::milliseconds duration){
     check_stopping();

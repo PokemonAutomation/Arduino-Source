@@ -91,7 +91,7 @@ StateMachineAction run_state_iteration(
             return StateMachineAction::KEEP_GOING;
         }else{
             console.log("Current State: " + STRING_POKEMON + " Swap");
-            run_swap_pokemon(env, console, global_state, runtime.console_settings[console_index]);
+            run_swap_pokemon(runtime, env, console, global_state, runtime.console_settings[console_index]);
             return StateMachineAction::KEEP_GOING;
         }
     case 1:
@@ -104,7 +104,7 @@ StateMachineAction run_state_iteration(
         return StateMachineAction::KEEP_GOING;
     case 3:
         console.log("Current State: Professor Swap");
-        run_professor_swap(env, console, global_state);
+        run_professor_swap(runtime, env, console, global_state);
         return StateMachineAction::KEEP_GOING;
     case 4:
         console.log("Current State: Move Select");

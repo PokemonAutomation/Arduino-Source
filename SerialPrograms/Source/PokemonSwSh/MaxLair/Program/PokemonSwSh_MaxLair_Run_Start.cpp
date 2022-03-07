@@ -81,17 +81,22 @@ public:
         , m_time_limit(time_limit)
         , m_consoles(consoles)
         , m_counter(0)
-    {}
+    {
+        env.register_stop_program_signal(m_lock, m_cv);
+    }
+    ~AllJoinedTracker(){
+        m_env.deregister_stop_program_signal(m_cv);
+    }
 
     bool report_joined(){
-        std::unique_lock<std::mutex> lg(m_env.lock());
+        std::unique_lock<std::mutex> lg(m_lock);
         m_counter++;
         if (m_counter >= m_consoles){
-            m_env.cv().notify_all();
+            m_cv.notify_all();
             return true;
         }
         while (true){
-            m_env.cv().wait_until(lg, m_time_limit);
+            m_cv.wait_until(lg, m_time_limit);
             m_env.check_stopping();
             if (m_counter >= m_consoles){
                 return true;
@@ -104,6 +109,9 @@ public:
 
 private:
     ProgramEnvironment& m_env;
+    std::mutex m_lock;
+    std::condition_variable m_cv;
+
     std::chrono::system_clock::time_point m_time_limit;
     size_t m_consoles;
     size_t m_counter;

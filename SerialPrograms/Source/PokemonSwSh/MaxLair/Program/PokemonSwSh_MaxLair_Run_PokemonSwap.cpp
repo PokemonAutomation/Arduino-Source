@@ -20,8 +20,8 @@ namespace MaxLairInternal{
 
 
 void run_swap_pokemon(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    AdventureRuntime& runtime,
+    ProgramEnvironment& env, ConsoleHandle& console,
     GlobalStateTracker& state_tracker,
     const ConsoleSpecificOptions& settings
 ){
@@ -67,7 +67,7 @@ void run_swap_pokemon(
     bool swap = should_swap_with_newly_caught(console, inferred, player_index, options);
     if (swap){
         console.log("Choosing to swap for: " + options[1], COLOR_PURPLE);
-        std::lock_guard<std::mutex> lg(env.lock());
+        std::lock_guard<std::mutex> lg(runtime.m_delay_lock);
         pbf_mash_button(console, BUTTON_A, TICKS_PER_SECOND);
         console.botbase().wait_for_all_requests();
     }else{

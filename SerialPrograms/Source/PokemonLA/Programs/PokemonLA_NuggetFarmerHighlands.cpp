@@ -193,7 +193,6 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
 #if 0
     env.console.log("Traveling to Coin's location...");
     {
-        DialogDetector dialog_detector;
 
     }
 #endif

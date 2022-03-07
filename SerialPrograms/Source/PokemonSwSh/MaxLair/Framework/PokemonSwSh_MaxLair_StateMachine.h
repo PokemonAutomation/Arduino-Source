@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_StateMachine_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_StateMachine_H
 
+#include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_QuantityReader.h"
@@ -82,6 +83,13 @@ struct AdventureRuntime{
     PathStats path_stats;
     std::string last_boss;
     ConsoleRuntime consoles[4];
+
+    //  State lock to protect fields of this class.
+    SpinLock m_lock;
+
+    //  A lock to allow timed-serialization of Switches.
+    //  For example: Don't let multiple Switches simultaneously choose to swap with Pokemon.
+    std::mutex m_delay_lock;
 };
 
 

@@ -83,8 +83,6 @@ public:
 
 public:
     //  Use these since they will wake up on program stop.
-    std::mutex& lock();
-    std::condition_variable& cv();
 
     void wait_for(std::chrono::milliseconds duration);
     void wait_until(std::chrono::system_clock::time_point stop);

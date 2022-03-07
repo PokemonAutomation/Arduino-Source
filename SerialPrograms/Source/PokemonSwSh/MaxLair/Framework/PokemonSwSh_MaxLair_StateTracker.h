@@ -7,6 +7,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_StateTracker_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_StateTracker_H
 
+#include <mutex>
+#include <condition_variable>
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "PokemonSwSh_MaxLair_State.h"
 
@@ -20,6 +22,7 @@ class GlobalStateTracker{
     using time_point = std::chrono::system_clock::time_point;
 public:
     GlobalStateTracker(ProgramEnvironment& env, size_t consoles);
+    ~GlobalStateTracker();
 
     //  Access the local copy for this console.
     //  This one is safe to directly access.
@@ -80,6 +83,8 @@ private:
 
 private:
     ProgramEnvironment& m_env;
+    std::mutex m_lock;
+    std::condition_variable m_cv;
 
     uint64_t m_state_epoch = 0;
 
