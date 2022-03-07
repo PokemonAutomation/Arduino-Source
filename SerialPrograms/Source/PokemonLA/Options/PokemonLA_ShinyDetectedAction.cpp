@@ -23,7 +23,7 @@ namespace PokemonLA{
 
 
 
-ShinyDetectedActionOption::ShinyDetectedActionOption()
+ShinyDetectedActionOption::ShinyDetectedActionOption(QString default_delay_ticks)
     : GroupOption("Shiny Detected Actions")
     , DESCRIPTION("<font color=\"blue\">Shiny detection uses sound. Make sure you have the correct audio input set.</font>")
     , ACTION(
@@ -47,7 +47,7 @@ ShinyDetectedActionOption::ShinyDetectedActionOption()
         "Align the camera, then wait this long before taking a screenshot + video of the shiny.<br>"
         "If set to zero or a small value, it will not be able to fully align the camera.<br>"
         "(Don't wait too long or the shiny may run away!)",
-        "2 * TICKS_PER_SECOND"
+        std::move(default_delay_ticks)
     )
     , NOTIFICATIONS("Shiny Detected", true, true, ImageAttachmentMode::JPG, {"Notifs", "Showcase"})
 {

@@ -41,6 +41,7 @@ GalladeFinder_Descriptor::GalladeFinder_Descriptor()
 
 GalladeFinder::GalladeFinder(const GalladeFinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
+    , SHINY_DETECTED("0 * TICKS_PER_SECOND")    //  Set to zero because the Ralts/Kirlia next to Gallade really likes to run away.
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({

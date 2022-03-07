@@ -104,14 +104,14 @@ AudioSelectorWidget::AudioSelectorWidget(
         m_volume_slider->setTickInterval(10);
         m_volume_slider->setMinimumWidth(40);
         m_volume_slider->setTickPosition(QSlider::TicksBothSides);
-        row1->addWidget(m_volume_slider, 3);
+        row1->addWidget(m_volume_slider, 2);
         row1->addSpacing(5);
 
         m_audio_vis_box = new NoWheelComboBox(this);
         m_audio_vis_box->addItem("No Display");
         m_audio_vis_box->addItem("Spectrum");
         m_audio_vis_box->addItem("Spectrogram");
-        row1->addWidget(m_audio_vis_box, 1);
+        row1->addWidget(m_audio_vis_box, 2);
     }
 
     refresh();

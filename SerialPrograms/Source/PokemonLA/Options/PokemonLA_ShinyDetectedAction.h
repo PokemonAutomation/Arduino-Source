@@ -69,7 +69,7 @@ enum class ShinyDetectedAction{
 
 class ShinyDetectedActionOption : public GroupOption{
 public:
-    ShinyDetectedActionOption();
+    ShinyDetectedActionOption(QString default_delay_ticks = "2 * TICKS_PER_SECOND");
 
     bool stop_on_shiny() const;
 
