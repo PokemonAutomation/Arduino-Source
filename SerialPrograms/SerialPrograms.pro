@@ -387,11 +387,15 @@ SOURCES += \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.cpp \
+    Source/PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagTracker.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_BattleMenuDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_BattleMoveSelectionDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_BattlePokemonSwitchDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_MapDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_MountDetector.cpp \
@@ -411,6 +415,7 @@ SOURCES += \
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.cpp \
     Source/PokemonLA/Programs/PokemonLA_GalladeFinder.cpp \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.cpp \
+    Source/PokemonLA/Programs/PokemonLA_IngoBattleGrinder.cpp \
     Source/PokemonLA/Programs/PokemonLA_NuggetFarmerHighlands.cpp \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.cpp \
     Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.cpp \
@@ -1014,11 +1019,15 @@ HEADERS += \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h \
+    Source/PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_BattleMenuDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_BattleMoveSelectionDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_BattlePokemonSwitchDetector.h \
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.h \
     Source/PokemonLA/Inference/PokemonLA_MapDetector.h \
     Source/PokemonLA/Inference/PokemonLA_MountDetector.h \
@@ -1039,6 +1048,7 @@ HEADERS += \
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.h \
     Source/PokemonLA/Programs/PokemonLA_GalladeFinder.h \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.h \
+    Source/PokemonLA/Programs/PokemonLA_IngoBattleGrinder.h \
     Source/PokemonLA/Programs/PokemonLA_NuggetFarmerHighlands.h \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.h \
     Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.h \
