@@ -4,7 +4,10 @@
  *
  */
 
+#include <map>
 #include <iostream>
+#include <thread>
+#include <nmmintrin.h>
 
 #ifdef _WIN32
 #include <Windows.h>
@@ -20,8 +23,6 @@
 #endif
 
 namespace PokemonAutomation{
-
-
 
 
 
@@ -74,10 +75,6 @@ bool set_priority_by_index(int index){
     global_logger_tagged().log("Unable to set process priority. Error Code = " + std::to_string(error), COLOR_RED);
     return false;
 }
-bool set_priority_by_name(const QString& name){
-    int index = priority_name_to_index(name);
-    return set_priority_by_index(index);
-}
 int read_priority_index(){
     switch (GetPriorityClass(GetCurrentProcess())){
     case REALTIME_PRIORITY_CLASS:
@@ -100,8 +97,9 @@ int read_priority_index(){
 }
 
 
-
-
+uint64_t x86_rdtsc(){
+    return __rdtsc();
+}
 
 
 #if __GNUC__
@@ -119,9 +117,7 @@ void x86_cpuid(uint32_t eabcdx[4], uint32_t eax, uint32_t ecx){
 }
 #endif
 
-uint64_t x86_rdtsc(){
-    return __rdtsc();
-}
+
 uint64_t x86_measure_rdtsc_ticks_per_sec(){
     HANDLE thread = GetCurrentThread();
 
@@ -175,6 +171,78 @@ uint64_t x86_measure_rdtsc_ticks_per_sec(){
 
     return (uint64_t)(cycle_dif / timer_dif * frequency.QuadPart);
 }
+
+
+
+
+
+
+
+ProcessorSpecs get_processor_specs(){
+    ProcessorSpecs specs;
+    specs.name = get_processor_name();
+    specs.base_frequency = x86_rdtsc_ticks_per_sec();
+
+    DWORD bytes = 0;
+    GetLogicalProcessorInformationEx(LOGICAL_PROCESSOR_RELATIONSHIP::RelationAll, nullptr, &bytes);
+    if (GetLastError() != ERROR_INSUFFICIENT_BUFFER){
+        throw InternalSystemError(nullptr, PA_CURRENT_FUNCTION, "GetLogicalProcessorInformationEx() failed.");
+    }
+
+    std::vector<char> ptr(bytes);
+    if (!GetLogicalProcessorInformationEx(LOGICAL_PROCESSOR_RELATIONSHIP::RelationAll, (SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*)ptr.data(), &bytes)){
+        throw InternalSystemError(nullptr, PA_CURRENT_FUNCTION, "GetLogicalProcessorInformationEx() failed.");
+    }
+
+    std::map<size_t, KAFFINITY> group_masks;
+
+    for (size_t c = 0; c < bytes;){
+        const SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX& info = *(const SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*)(ptr.data() + c);
+        switch (info.Relationship){
+        case LOGICAL_PROCESSOR_RELATIONSHIP::RelationProcessorCore:
+            for (size_t c = 0; c < info.Processor.GroupCount; c++){
+                const GROUP_AFFINITY& affinity = info.Processor.GroupMask[c];
+                group_masks[affinity.Group] |= affinity.Mask;
+            }
+            specs.cores++;
+            break;
+        case LOGICAL_PROCESSOR_RELATIONSHIP::RelationProcessorPackage:
+            specs.sockets++;
+            break;
+        case LOGICAL_PROCESSOR_RELATIONSHIP::RelationNumaNode:
+            specs.numa_nodes++;
+            break;
+        default:;
+        }
+        c += info.Size;
+    }
+
+    if (group_masks.size() == 0){
+        specs.threads = std::thread::hardware_concurrency();
+    }else{
+        for (const auto& group : group_masks){
+            specs.threads += _mm_popcnt_u64(group.second);
+        }
+    }
+
+    return specs;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

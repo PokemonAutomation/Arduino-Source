@@ -27,13 +27,25 @@ int read_priority_index();
 
 
 
-void x86_cpuid(uint32_t eabcdx[4], uint32_t eax, uint32_t ecx = 0);
 uint64_t x86_rdtsc();
+
+void x86_cpuid(uint32_t eabcdx[4], uint32_t eax, uint32_t ecx = 0);
+
+std::string get_processor_name();
+
 uint64_t x86_measure_rdtsc_ticks_per_sec();
-inline uint64_t x86_rdtsc_ticks_per_sec(){
-    static uint64_t cached = x86_measure_rdtsc_ticks_per_sec();
-    return cached;
-}
+uint64_t x86_rdtsc_ticks_per_sec();
+
+
+struct ProcessorSpecs{
+    std::string name;
+    size_t threads = 0;
+    size_t cores = 0;
+    size_t sockets = 0;
+    size_t numa_nodes = 0;
+    size_t base_frequency = 0;
+};
+ProcessorSpecs get_processor_specs();
 
 
 struct CPU_x86_Features{

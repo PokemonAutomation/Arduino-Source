@@ -7,6 +7,8 @@
 #if defined(__linux) || defined(__APPLE__)
 
 #include <chrono>
+#include <thread>
+#include <nmmintrin.h>
 #include <sys/types.h>
 #include <unistd.h>
 #include <sched.h>
@@ -59,25 +61,22 @@ bool set_priority_by_index(int index){
     global_logger_tagged().log("Unable to set process priority. Error Code = " + std::to_string(errorcode), COLOR_RED);
     return false;
 }
-bool set_priority_by_name(const QString& name){
-    int index = priority_name_to_index(name);
-    return set_priority_by_index(index);
-}
 int read_priority_index(){
     return -1;
 }
 
 
 
-
-
-void x86_cpuid(uint32_t eabcdx[4], uint32_t eax, uint32_t ecx){
-    __cpuid_count(eax, ecx, eabcdx[0], eabcdx[1], eabcdx[2], eabcdx[3]);
-}
 uint64_t x86_rdtsc(){
     unsigned int lo, hi;
     __asm__ volatile ("rdtsc" : "=a" (lo), "=d" (hi));
     return ((uint64_t)hi << 32) | lo;
+}
+
+
+
+void x86_cpuid(uint32_t eabcdx[4], uint32_t eax, uint32_t ecx){
+    __cpuid_count(eax, ecx, eabcdx[0], eabcdx[1], eabcdx[2], eabcdx[3]);
 }
 uint64_t x86_measure_rdtsc_ticks_per_sec(){
 //    Time::WallClock w_start = Time::WallClock::Now();
@@ -94,6 +93,94 @@ uint64_t x86_measure_rdtsc_ticks_per_sec(){
 
     return (uint64_t)((double)(r_end - r_start) / seconds);
 }
+
+
+
+
+
+ProcessorSpecs get_processor_specs(){
+    ProcessorSpecs specs;
+    specs.name = get_processor_name();
+    specs.base_frequency = x86_rdtsc_ticks_per_sec();
+
+    //  Cores + Sockets
+    {
+//        std::set<int> cores;
+        std::set<int> sockets;
+
+        int current_socket = 0;
+        std::map<int, std::set<int>> cores_per_socket;
+
+        std::ifstream file("/proc/cpuinfo");
+        std::string line;
+        while (std::getline(file, line)){
+            if (line.find("physical id") == 0){
+                size_t pos = line.find(": ");
+                if (pos == std::string::npos){
+                    throw InternalSystemError(nullptr, PA_CURRENT_FUNCTION, "Unable to parse: /proc/cpuinfo");
+                }
+                current_socket = atoi(&line[pos + 2]);
+                sockets.insert(current_socket);
+            }
+            if (line.find("core id") == 0){
+                size_t pos = line.find(": ");
+                if (pos == std::string::npos){
+                    throw InternalSystemError(nullptr, PA_CURRENT_FUNCTION, "Unable to parse: /proc/cpuinfo");
+                }
+                specs.threads++;
+                int core = atoi(&line[pos + 2]);
+                cores_per_socket[current_socket].insert(core);
+//                cores.insert(core);
+            }
+        }
+        specs.sockets = sockets.size();
+        specs.cores = 0;
+        for (const auto& socket : cores_per_socket){
+            specs.cores += socket.second.size();
+        }
+    }
+
+    //  NUMA Nodes
+    {
+        std::set<int> nodes;
+
+        std::ifstream file("/proc/zoneinfo");
+        std::string line;
+        while (std::getline(file, line)){
+            if (line.find("Node ") == 0){
+                nodes.insert(atoi(&line[5]));
+            }
+        }
+        specs.numa_nodes = nodes.size();
+    }
+
+    return specs;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
