@@ -167,7 +167,8 @@ MainWindow::MainWindow(QWidget* parent)
     hbox->addLayout(right, 4);
     right->setAlignment(Qt::AlignTop);
 
-
+    // Load the program panel specified in the persistent setting.
+    m_program_list->load_persistent_panel();
 }
 MainWindow::~MainWindow(){
     close_panel();

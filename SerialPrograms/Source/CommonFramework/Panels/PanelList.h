@@ -16,13 +16,20 @@ namespace PokemonAutomation{
 
 class PanelList : public QListWidget{
 public:
+    static const QString JSON_PROGRAM_PANEL;
+
+public:
     PanelList(QTabWidget& parent, QString label, PanelListener& listener);
 
     const QString& label() const{ return m_label; }
     size_t items() const{ return m_panels.size(); }
 
+    void set_panel(const QString& panel_name);
+
 protected:
     void add_divider(QString label);
+
+    void handle_panel_clicked(const QString text);
 
     template <typename Descriptor, typename Instance, class... Args>
     void add_settings(Args&&... args){
