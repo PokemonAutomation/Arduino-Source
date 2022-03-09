@@ -4,6 +4,12 @@
  *
  */
 
+#include <float.h>
+#include <chrono>
+#include <map>
+#include <iostream>
+#include <fstream>
+#include <sstream>
 #include "CommonFramework/Tools/AudioFeed.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
@@ -15,17 +21,6 @@
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA_ShinySoundListener.h"
 #include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
-
-#include <set>
-#include <iostream>
-#include <list>
-#include <thread>
-#include <chrono>
-#include <fstream>
-#include <cfloat>
-#include <map>
-#include <sstream>
-#include <array>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -80,41 +75,6 @@ void ShinySoundListener::program(SingleSwitchProgramEnvironment& env){
     session.run();
 #endif
 
-#if 0
-    uint64_t lastTimestamp = ~(uint64_t)0;
-    // Stores new spectrums from audio feed. The newest spectrum (with largest timestamp) is at
-    // the front of the vector.
-    std::vector<std::shared_ptr<const PokemonAutomation::AudioSpectrum>> spectrums;
-
-    while(true){
-        env.wait_for(std::chrono::milliseconds(10));
-        env.check_stopping();
-        
-        spectrums.clear();
-        if (lastTimestamp == SIZE_MAX){
-            audioFeed.spectrums_latest(1, spectrums);
-        } else{
-            // Note: in this file we never consider the case that stamp may overflow.
-            // It requires on the order of 1e10 years to overflow if we have about 25ms per stamp.
-            audioFeed.spectrums_since(lastTimestamp+1, spectrums);
-        }
-        if (spectrums.size() > 0){
-            // spectrums[0] has the newest spectrum with the largest stamp:
-            lastTimestamp = spectrums[0]->stamp;
-            // std::cout << "Incoming stamps: ";
-            // for(auto it = spectrums.rbegin(); it != spectrums.rend(); it++){
-            //     std::cout << (*it)->stamp << " ";
-            // }
-            // std::cout << std::endl;
-        }
-
-        bool found = detector.process_spectrums(spectrums, audioFeed);
-
-        if (found){
-            std::cout << "FOUND" << std::endl;
-        }
-    }
-#endif
 
     std::cout << "Audio test program finished." << std::endl;
 }

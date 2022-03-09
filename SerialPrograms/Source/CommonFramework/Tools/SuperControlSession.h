@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_CommonFramework_SuperControlSession_H
 #define PokemonAutomation_CommonFramework_SuperControlSession_H
 
+#include <memory>
 #include <vector>
 #include <map>
 #include <chrono>

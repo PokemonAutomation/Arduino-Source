@@ -118,8 +118,8 @@ FlagNavigationAir::FlagNavigationAir(
         });
         return false;
     });
-    register_state_command(State::DASH_FORWARD, [=](){
-        m_console.log("Dashing forward...");
+    register_state_command(State::DASH_FORWARD_MASH_B, [=](){
+        m_console.log("Dashing forward (mash B)...");
         m_active_command->dispatch([=](const BotBaseContext& context){
             //  Move forward to straighten out direction.
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
@@ -129,6 +129,34 @@ FlagNavigationAir::FlagNavigationAir(
 //                cout << "State::DASH_FORWARD: m_looking_straight_ahead = true" << endl;
             }
             pbf_mash_button(context, BUTTON_B, 300 * TICKS_PER_SECOND);
+        });
+        return false;
+    });
+    register_state_command(State::DASH_FORWARD_HOLD_B, [=](){
+        m_console.log("Dashing forward (hold B)...");
+        m_active_command->dispatch([=](const BotBaseContext& context){
+            //  Move forward to straighten out direction.
+            if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
+                pbf_move_left_joystick(context, 128, 0, 160, 0);
+                context.wait_for_all_requests();
+                m_looking_straight_ahead.store(true, std::memory_order_release);
+//                cout << "State::DASH_FORWARD: m_looking_straight_ahead = true" << endl;
+            }
+            pbf_press_button(context, BUTTON_B, 300 * TICKS_PER_SECOND, 0);
+        });
+        return false;
+    });
+    register_state_command(State::DIVE, [=](){
+        m_console.log("Diving...");
+        m_active_command->dispatch([=](const BotBaseContext& context){
+            //  Move forward to straighten out direction.
+            if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
+                pbf_move_left_joystick(context, 128, 0, 160, 0);
+                context.wait_for_all_requests();
+                m_looking_straight_ahead.store(true, std::memory_order_release);
+//                cout << "State::DASH_FORWARD: m_looking_straight_ahead = true" << endl;
+            }
+            pbf_press_button(context, BUTTON_Y, 60 * TICKS_PER_SECOND, 0);
         });
         return false;
     });
@@ -254,20 +282,37 @@ bool FlagNavigationAir::run_state(
 }
 bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock timestamp){
     //  Need to get on Sneasler.
-    if (m_centerA.detected() && timestamp - last_state_change() > std::chrono::seconds(3)){
+    if (m_centerA.detected() && timestamp - last_state_change() > std::chrono::seconds(2)){
         return run_state_action(State::GET_ON_SNEASLER);
     }
 
-    //  Cruise
-    if (m_flag_detected && m_flag_y <= 0.6 && 0.45 <= m_flag_x && m_flag_x <= 0.55){
-        return run_state_action(State::DASH_FORWARD);
+    //  Centered
+    if (m_flag_detected && (0.45 <= m_flag_x && m_flag_x <= 0.55)){
+        State state = (State)this->last_state();
+
+        //  Continue dive
+        if (state == State::DIVE && m_flag_y > 0.10){
+            return false;
+        }
+
+        //  Cruise
+        if (state != State::DIVE && m_flag_y <= 0.10){
+            return run_state_action(State::DASH_FORWARD_MASH_B);
+        }
+        if (m_flag_y <= 0.30){
+            return run_state_action(State::DASH_FORWARD_HOLD_B);
+        }
+
+        //  Dive
+        return run_state_action(State::DIVE);
     }
 
+
     //  Turning Cruise
-    if (m_flag_detected && m_flag_y <= 0.6 && 0.40 <= m_flag_x && m_flag_x <= 0.45){
+    if (m_flag_detected && (0.40 <= m_flag_x && m_flag_x <= 0.45) && m_flag_y <= 0.6){
         return run_state_action(State::DASH_LEFT);
     }
-    if (m_flag_detected && m_flag_y <= 0.6 && 0.55 <= m_flag_x && m_flag_x <= 0.60){
+    if (m_flag_detected && (0.55 <= m_flag_x && m_flag_x <= 0.60) && m_flag_y <= 0.6){
         return run_state_action(State::DASH_RIGHT);
     }
 

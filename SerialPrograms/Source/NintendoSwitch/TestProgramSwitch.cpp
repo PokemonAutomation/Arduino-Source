@@ -252,6 +252,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
+    QImage image("screenshot-20220308-225539293411.png");
+
+    MountDetector detector;
+    detector.detect(image);
+
+
 #if 0
     pbf_move_left_joystick(console, 0, 0, 50, 0);
     pbf_press_button(console, BUTTON_B, 20, 250);
@@ -259,7 +265,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     pbf_press_button(console, BUTTON_HOME, 20, 230);
 #endif
 
-
+#if 0
     {
         QImage image("screenshot-20220306-163207833403.png");
 //        QImage image("screenshot-20220306-172029164014.png");
@@ -267,6 +273,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
         DialogSurpriseDetector detector(logger, overlay, true);
         detector.process_frame(image, std::chrono::system_clock::now());
     }
+#endif
 #if 0
     {
         QImage image("screenshot-20220302-094034596712.png");

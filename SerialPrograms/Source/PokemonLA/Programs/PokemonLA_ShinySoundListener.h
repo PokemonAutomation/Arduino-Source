@@ -15,6 +15,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
+
 class ShinySoundListener_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     ShinySoundListener_Descriptor();

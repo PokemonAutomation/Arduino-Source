@@ -137,7 +137,7 @@ public:
             Color(0xff808000), Color(0xffffffff), 100
         )
     {
-        m_area_ratio_upper = 1.4;
+        m_area_ratio_upper = 1.65;
     }
     static const MountBraviaryMatcher& on(){
         static MountBraviaryMatcher matcher(true);
@@ -233,6 +233,7 @@ MountState MountDetector::detect(const QImage& screen) const{
                 if (object.height() * 3 < (size_t)image.height() || object.height() == (size_t)image.height()){
                     continue;
                 }
+#if 1
                 candidates.add_filtered(MountWyrdeerMatcher      ::off().rmsd(filtered[c], object), MountState::WYRDEER_OFF);
                 candidates.add_filtered(MountUrsalunaMatcher     ::off().rmsd(filtered[c], object), MountState::URSALUNA_OFF);
                 candidates.add_filtered(MountBasculegionMatcher  ::off().rmsd(filtered[c], object), MountState::BASCULEGION_OFF);
@@ -243,6 +244,7 @@ MountState MountDetector::detect(const QImage& screen) const{
                 candidates.add_direct  (MountBasculegionMatcher  ::off().rmsd(image      , object), MountState::BASCULEGION_OFF);
                 candidates.add_direct  (MountSneaslerMatcher     ::off().rmsd(image      , object), MountState::SNEASLER_OFF);
                 candidates.add_direct  (MountBraviaryMatcher     ::off().rmsd(image      , object), MountState::BRAVIARY_OFF);
+#endif
             }
         }
     }

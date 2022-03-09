@@ -413,6 +413,7 @@ SOURCES += \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.cpp \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp \
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.cpp \
+    Source/PokemonLA/Programs/PokemonLA_FlagNavigationTest.cpp \
     Source/PokemonLA/Programs/PokemonLA_GalladeFinder.cpp \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.cpp \
     Source/PokemonLA/Programs/PokemonLA_IngoBattleGrinder.cpp \
@@ -1046,6 +1047,7 @@ HEADERS += \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.h \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.h \
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.h \
+    Source/PokemonLA/Programs/PokemonLA_FlagNavigationTest.h \
     Source/PokemonLA/Programs/PokemonLA_GalladeFinder.h \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.h \
     Source/PokemonLA/Programs/PokemonLA_IngoBattleGrinder.h \

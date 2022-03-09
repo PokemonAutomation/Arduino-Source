@@ -158,29 +158,29 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
     pbf_press_button(env.console, BUTTON_A, 20, 120);
     // Choose which opponent
     if (OPPONENT < 5){
-        for(int i = 0; i < OPPONENT; i++){
+        for(size_t i = 0; i < OPPONENT; i++){
             pbf_press_dpad(env.console, DPAD_DOWN, 10, 60);
         }
     } else{
         // Go to next page
-        for(int i = 0; i < 2; i++){
+        for(size_t i = 0; i < 2; i++){
             pbf_press_dpad(env.console, DPAD_UP, 10, 60);
         }
         pbf_press_button(env.console, BUTTON_A, 10, 100);
 
         if (OPPONENT < 10){
-            for(int i = 5; i < OPPONENT; i++){
+            for(size_t i = 5; i < OPPONENT; i++){
                 pbf_press_dpad(env.console, DPAD_DOWN, 10, 60);
             }
         }
         else{
             // Go to next page
-            for(int i = 0; i < 2; i++){
+            for(size_t i = 0; i < 2; i++){
                 pbf_press_dpad(env.console, DPAD_UP, 10, 60);
             }
             pbf_press_button(env.console, BUTTON_A, 10, 100);
 
-            for(int i = 10; i < OPPONENT; i++){
+            for(size_t i = 10; i < OPPONENT; i++){
                 pbf_press_dpad(env.console, DPAD_DOWN, 10, 60);
             }
         }

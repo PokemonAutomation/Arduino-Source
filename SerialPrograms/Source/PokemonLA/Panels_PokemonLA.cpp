@@ -11,9 +11,11 @@
 
 #include "Programs/PokemonLA_BraviaryHeightGlitch.h"
 #include "Programs/PokemonLA_DistortionWaiter.h"
-#include "Programs/PokemonLA_IngoBattleGrinder.h"
 #include "Programs/PokemonLA_OutbreakFinder.h"
+
+#include "Programs/PokemonLA_IngoBattleGrinder.h"
 #include "Programs/PokemonLA_NuggetFarmerHighlands.h"
+
 #include "Programs/PokemonLA_GalladeFinder.h"
 #include "Programs/PokemonLA_CrobatFinder.h"
 
@@ -23,6 +25,7 @@
 
 //#include "Programs/PokemonLA_ShinyHunt-LakeTrio.h"
 #include "PokemonLA/Programs/PokemonLA_OverworldWatcher.h"
+#include "PokemonLA/Programs/PokemonLA_FlagNavigationTest.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -61,6 +64,7 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
         add_divider("---- Developer Tools ----");
         add_program<OverworldWatcher_Descriptor, OverworldWatcher>();
         add_program<ShinySoundListener_Descriptor, ShinySoundListener>();
+        add_program<FlagNavigationTest_Descriptor, FlagNavigationTest>();
     }
 
     finish_panel_setup();
