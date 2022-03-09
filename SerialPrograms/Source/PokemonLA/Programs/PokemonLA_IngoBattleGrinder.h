@@ -43,6 +43,8 @@ private:
 private:
     class Stats;
 
+    EnumDropdownOption OPPONENT;
+
     MoveStyleOption MOVE1_STYLE_OPTION;
     MoveStyleOption MOVE2_STYLE_OPTION;
     MoveStyleOption MOVE3_STYLE_OPTION;

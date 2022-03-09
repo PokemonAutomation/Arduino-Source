@@ -130,7 +130,7 @@ private:
     // The head of the list is the most recent FFT window, while the tail
     // is the oldest in history.
     std::list<AudioSpectrum> m_spectrums;
-    size_t m_spectrum_history_length = 10;
+    size_t m_spectrum_history_length = 40;
     // Since the spectrums will be probided to the automation programs in
     // other threads, we need to have a lock here.
     std::mutex m_spectrums_lock;
