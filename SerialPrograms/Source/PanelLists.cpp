@@ -4,6 +4,7 @@
  *
  */
 
+#include <array>
 #include <QLabel>
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -50,7 +51,7 @@ void ProgramTabs::load_persistent_panel(){
     if (json_get_string(str, PERSISTENT_SETTINGS().panels, JSON_TAB)){
         for(size_t i = 0; i < JSON_TAB_NAMES.size(); i++){
             if (str == JSON_TAB_NAMES[i]){
-                setCurrentIndex(i);
+                setCurrentIndex((int)i);
                 break;
             }
         }
