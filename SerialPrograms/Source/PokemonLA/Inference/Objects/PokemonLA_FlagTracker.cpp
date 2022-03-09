@@ -63,7 +63,7 @@ bool FlagTracker::process_frame(
         return false;
     }
     double x_axis = (double)(flags[0].min_x + flags[0].max_x) / (frame.width() * 2);
-    double y_axis = (double)(flags[0].min_y + flags[0].max_y) / (frame.width() * 2);
+    double y_axis = (double)(flags[0].min_y + flags[0].max_y) / (frame.height() * 2);
 
     m_history.emplace_back(Sample{timestamp, -1, x_axis, y_axis});
 //    cout << "m_history.size() = " << m_history.size() << endl;

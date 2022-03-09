@@ -252,7 +252,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
-    QImage image("screenshot-20220308-225539293411.png");
+    QImage image("screenshot-20220309-005426729947.png");
 
     MountDetector detector;
     detector.detect(image);

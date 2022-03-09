@@ -27,6 +27,8 @@ FlagNavigationAir::FlagNavigationAir(
     , m_shiny_listener(console, false)
     , m_looking_straight_ahead(false)
     , m_last_good_state(WallClock::min())
+    , m_find_flag_failed(false)
+    , m_last_known_flag_y(0)
 {
     *this += m_flag;
     *this += m_mount;
@@ -219,14 +221,18 @@ FlagNavigationAir::FlagNavigationAir(
     register_state_command(State::FIND_FLAG, [=](){
         m_console.log("Looking for flag...");
         m_active_command->dispatch([=](const BotBaseContext& context){
-            pbf_move_right_joystick(context, 128, 255, 200, 0);
-            pbf_move_right_joystick(context, 128, 0, 200, 0);
-            pbf_move_right_joystick(context, 128, 255, 80, 0);
-            pbf_move_right_joystick(context, 0, 128, 400, 0);
-            pbf_move_right_joystick(context, 128, 255, 120, 0);
-            pbf_move_right_joystick(context, 0, 128, 400, 0);
-            pbf_move_right_joystick(context, 128, 0, 200, 0);
-            pbf_move_right_joystick(context, 0, 128, 400, 0);
+            for (size_t c = 0; c < 2; c++){
+                pbf_move_right_joystick(context, 128, 255, 200, 0);
+                pbf_move_right_joystick(context, 128, 0, 200, 0);
+                pbf_move_right_joystick(context, 128, 255, 80, 0);
+                pbf_move_right_joystick(context, 0, 128, 400, 0);
+                pbf_move_right_joystick(context, 128, 255, 120, 0);
+                pbf_move_right_joystick(context, 0, 128, 400, 0);
+                pbf_move_right_joystick(context, 128, 0, 200, 0);
+                pbf_move_right_joystick(context, 0, 128, 400, 0);
+            }
+            context.wait_for_all_requests();
+            m_find_flag_failed.store(true, std::memory_order_release);
         });
         m_looking_straight_ahead.store(false, std::memory_order_release);
         return false;
@@ -241,10 +247,23 @@ bool FlagNavigationAir::run_state(
         return true;
     }
 
+    if (m_find_flag_failed.load(std::memory_order_acquire)){
+        m_console.log("Unable to find flag. Exiting routine...");
+        return true;
+    }
+
     m_flag_detected = m_flag.get(m_flag_distance, m_flag_x, m_flag_y);
 //    cout << "flag_ok = " << flag_ok << ", x = " << m_flag_x << ", y = " << flag_y << endl;
+    if (m_flag_detected){
+        m_last_known_flag_y = m_flag_y;
+    }
 
     MountState mount = m_mount.state();
+    if (mount == MountState::NOTHING){
+        m_console.log("Unable to detect mount. Assuming Braviary (on)...");
+        mount = MountState::BRAVIARY_ON;
+    }
+#if 0
     if (mount == MountState::NOTHING){
         if (m_last_good_state + std::chrono::seconds(2) < timestamp){
             return run_state_action(State::UNKNOWN);
@@ -253,8 +272,9 @@ bool FlagNavigationAir::run_state(
     }else{
         m_last_good_state = timestamp;
     }
+#endif
 
-    switch (m_mount.state()){
+    switch (mount){
     case MountState::NOTHING:
         return false;
     case MountState::WYRDEER_OFF:
@@ -286,42 +306,19 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
         return run_state_action(State::GET_ON_SNEASLER);
     }
 
-    //  Centered
-    if (m_flag_detected && (0.45 <= m_flag_x && m_flag_x <= 0.55)){
-        State state = (State)this->last_state();
+//    cout << "m_last_known_flag_y = " << m_last_known_flag_y << endl;
 
-        //  Continue dive
-        if (state == State::DIVE && m_flag_y > 0.10){
-            return false;
+    State state = (State)this->last_state();
+    if (m_last_known_flag_y > 0.9 && timestamp - last_state_change() > std::chrono::seconds(2)){
+//        cout << "state = " << (size_t)state << endl;
+        switch (state){
+        case State::DASH_FORWARD_MASH_B:
+        case State::DASH_FORWARD_HOLD_B:
+        case State::DIVE:
+            m_console.log("Target passed under you. Target reached.");
+            return true;
+        default:;
         }
-
-        //  Cruise
-        if (state != State::DIVE && m_flag_y <= 0.10){
-            return run_state_action(State::DASH_FORWARD_MASH_B);
-        }
-        if (m_flag_y <= 0.30){
-            return run_state_action(State::DASH_FORWARD_HOLD_B);
-        }
-
-        //  Dive
-        return run_state_action(State::DIVE);
-    }
-
-
-    //  Turning Cruise
-    if (m_flag_detected && (0.40 <= m_flag_x && m_flag_x <= 0.45) && m_flag_y <= 0.6){
-        return run_state_action(State::DASH_LEFT);
-    }
-    if (m_flag_detected && (0.55 <= m_flag_x && m_flag_x <= 0.60) && m_flag_y <= 0.6){
-        return run_state_action(State::DASH_RIGHT);
-    }
-
-    //  Re-center the flag.
-    if (m_flag_detected && m_flag_x <= 0.4){
-        return run_state_action(State::TURN_LEFT);
-    }
-    if (m_flag_detected && m_flag_x >= 0.6){
-        return run_state_action(State::TURN_RIGHT);
     }
 
     //  Find the flag.
@@ -329,7 +326,45 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
         return run_state_action(State::FIND_FLAG);
     }
 
-    return false;
+    //  Dive
+    if (m_flag_y > 0.50){
+        return run_state_action(State::DIVE);
+    }
+
+    //  Re-center the flag.
+    if (m_flag_x <= 0.4){
+        return run_state_action(State::TURN_LEFT);
+    }
+    if (m_flag_x >= 0.6){
+        return run_state_action(State::TURN_RIGHT);
+    }
+
+    //  Continue dive
+    if (state == State::DIVE && m_flag_y > 0.20){
+        return false;
+    }
+
+    //  Centered
+    if (0.45 <= m_flag_x && m_flag_x <= 0.55){
+        //  Cruise
+        if (state != State::DIVE && m_flag_y <= 0.25){
+            return run_state_action(State::DASH_FORWARD_MASH_B);
+        }
+        if (m_flag_y <= 0.50){
+            return run_state_action(State::DASH_FORWARD_HOLD_B);
+        }
+    }
+
+    //  Turning Cruise
+    if (0.40 <= m_flag_x && m_flag_x <= 0.45 && m_flag_y <= 0.6){
+        return run_state_action(State::DASH_LEFT);
+    }
+    if (0.55 <= m_flag_x && m_flag_x <= 0.60 && m_flag_y <= 0.6){
+        return run_state_action(State::DASH_RIGHT);
+    }
+
+    //  No known state left.
+    return run_state_action(State::DIVE);
 }
 bool FlagNavigationAir::run_climbing(AsyncCommandSession& commands, WallClock timestamp){
     //  Can't jump off means you're able to stand. Switch back to Braviary.

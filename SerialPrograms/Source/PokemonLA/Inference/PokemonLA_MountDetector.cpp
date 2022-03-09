@@ -235,14 +235,14 @@ MountState MountDetector::detect(const QImage& screen) const{
                 }
 #if 1
                 candidates.add_filtered(MountWyrdeerMatcher      ::off().rmsd(filtered[c], object), MountState::WYRDEER_OFF);
-                candidates.add_filtered(MountUrsalunaMatcher     ::off().rmsd(filtered[c], object), MountState::URSALUNA_OFF);
-                candidates.add_filtered(MountBasculegionMatcher  ::off().rmsd(filtered[c], object), MountState::BASCULEGION_OFF);
-                candidates.add_filtered(MountSneaslerMatcher     ::off().rmsd(filtered[c], object), MountState::SNEASLER_OFF);
-                candidates.add_filtered(MountBraviaryMatcher     ::off().rmsd(filtered[c], object), MountState::BRAVIARY_OFF);
                 candidates.add_direct  (MountWyrdeerMatcher      ::off().rmsd(image      , object), MountState::WYRDEER_OFF);
+                candidates.add_filtered(MountUrsalunaMatcher     ::off().rmsd(filtered[c], object), MountState::URSALUNA_OFF);
                 candidates.add_direct  (MountUrsalunaMatcher     ::off().rmsd(image      , object), MountState::URSALUNA_OFF);
+                candidates.add_filtered(MountBasculegionMatcher  ::off().rmsd(filtered[c], object), MountState::BASCULEGION_OFF);
                 candidates.add_direct  (MountBasculegionMatcher  ::off().rmsd(image      , object), MountState::BASCULEGION_OFF);
+                candidates.add_filtered(MountSneaslerMatcher     ::off().rmsd(filtered[c], object), MountState::SNEASLER_OFF);
                 candidates.add_direct  (MountSneaslerMatcher     ::off().rmsd(image      , object), MountState::SNEASLER_OFF);
+                candidates.add_filtered(MountBraviaryMatcher     ::off().rmsd(filtered[c], object), MountState::BRAVIARY_OFF);
                 candidates.add_direct  (MountBraviaryMatcher     ::off().rmsd(image      , object), MountState::BRAVIARY_OFF);
 #endif
             }
@@ -283,15 +283,17 @@ MountState MountDetector::detect(const QImage& screen) const{
                 if (object.height() * 3 < (size_t)image.height() || object.height() == (size_t)image.height()){
                     continue;
                 }
+#if 1
                 candidates.add_filtered(MountWyrdeerMatcher      ::on().rmsd(filtered[c], object), MountState::WYRDEER_ON);
-                candidates.add_filtered(MountUrsalunaMatcher     ::on().rmsd(filtered[c], object), MountState::URSALUNA_ON);
-                candidates.add_filtered(MountBasculegionMatcher  ::on().rmsd(filtered[c], object), MountState::BASCULEGION_ON);
-                candidates.add_filtered(MountSneaslerMatcher     ::on().rmsd(filtered[c], object), MountState::SNEASLER_ON);
-                candidates.add_filtered(MountBraviaryMatcher     ::on().rmsd(filtered[c], object), MountState::BRAVIARY_ON);
                 candidates.add_direct  (MountWyrdeerMatcher      ::on().rmsd(image      , object), MountState::WYRDEER_ON);
+                candidates.add_filtered(MountUrsalunaMatcher     ::on().rmsd(filtered[c], object), MountState::URSALUNA_ON);
                 candidates.add_direct  (MountUrsalunaMatcher     ::on().rmsd(image      , object), MountState::URSALUNA_ON);
+                candidates.add_filtered(MountBasculegionMatcher  ::on().rmsd(filtered[c], object), MountState::BASCULEGION_ON);
                 candidates.add_direct  (MountBasculegionMatcher  ::on().rmsd(image      , object), MountState::BASCULEGION_ON);
+                candidates.add_filtered(MountSneaslerMatcher     ::on().rmsd(filtered[c], object), MountState::SNEASLER_ON);
                 candidates.add_direct  (MountSneaslerMatcher     ::on().rmsd(image      , object), MountState::SNEASLER_ON);
+#endif
+                candidates.add_filtered(MountBraviaryMatcher     ::on().rmsd(filtered[c], object), MountState::BRAVIARY_ON);
                 candidates.add_direct  (MountBraviaryMatcher     ::on().rmsd(image      , object), MountState::BRAVIARY_ON);
 //                extract_box(image, object).save("test-" + QString::number(c) + "-" + QString::number(i) + ".png");
 //                i++;
