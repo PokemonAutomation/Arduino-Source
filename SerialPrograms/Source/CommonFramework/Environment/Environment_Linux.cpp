@@ -7,6 +7,8 @@
 #if defined(__linux) || defined(__APPLE__)
 
 #include <chrono>
+#include <set>
+#include <map>
 #include <thread>
 #include <nmmintrin.h>
 #include <sys/types.h>
