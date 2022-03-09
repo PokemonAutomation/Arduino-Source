@@ -17,6 +17,9 @@ class ProgramTabs : public QTabWidget{
 public:
     ProgramTabs(QWidget& parent, PanelListener& listener);
 
+    // Load the panel specified in the persistent setting.
+    void load_persistent_panel();
+
     virtual QSize sizeHint() const override;
 
 private:

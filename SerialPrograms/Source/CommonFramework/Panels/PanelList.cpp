@@ -7,6 +7,7 @@
 #include <QJsonObject>
 #include <QMessageBox>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "PanelList.h"
 
@@ -16,6 +17,7 @@ using std::endl;
 
 namespace PokemonAutomation{
 
+const QString PanelList::JSON_PROGRAM_PANEL = "ProgramPanel";
 
 PanelList::PanelList(QTabWidget& parent, QString label, PanelListener& listener)
     : QListWidget(&parent)
@@ -57,28 +59,44 @@ void PanelList::finish_panel_setup(){
     connect(
         this, &QListWidget::itemClicked,
         this, [=](QListWidgetItem* item){
-            auto iter = m_panel_map.find(item->text());
-            if (iter == m_panel_map.end()){
-                return;
-            }
-            const PanelDescriptor* descriptor = iter->second;
-            try{
-                std::unique_ptr<PanelInstance> panel = descriptor->make_panel();
-                panel->from_json(PERSISTENT_SETTINGS().panels[QString::fromStdString(descriptor->identifier())]);
-                m_listener.on_panel_construct(std::move(panel));
-            }catch (const Exception& error){
-                QMessageBox box;
-                box.critical(
-                    nullptr,
-                    "Error",
-                    "Failed to load program.\n\n" + QString::fromStdString(error.to_str())
-                );
-            }
+            handle_panel_clicked(item->text());
         }
     );
 }
 
+void PanelList::handle_panel_clicked(const QString text){
+    std::cout << "handle_panel_clicked " << text.toStdString() << std::endl;
+    auto iter = m_panel_map.find(text);
+    if (iter == m_panel_map.end()){
+        PERSISTENT_SETTINGS().panels.insert(JSON_PROGRAM_PANEL, "");
+        return;
+    }
+    const PanelDescriptor* descriptor = iter->second;
+    try{
+        std::unique_ptr<PanelInstance> panel = descriptor->make_panel();
+        const QString identifier = QString::fromStdString(descriptor->identifier());
+        panel->from_json(PERSISTENT_SETTINGS().panels[identifier]);
+        m_listener.on_panel_construct(std::move(panel));
 
+        PERSISTENT_SETTINGS().panels.insert(JSON_PROGRAM_PANEL, iter->first);
+    }catch (const Exception& error){
+        QMessageBox box;
+        box.critical(
+            nullptr,
+            "Error",
+            "Failed to load program.\n\n" + QString::fromStdString(error.to_str())
+        );
+    }
+}
+
+void PanelList::set_panel(const QString& panel_name){
+    const auto panels = findItems(panel_name, Qt::MatchExactly);
+    if (panels.size() > 0){
+        setCurrentItem(panels[0]);
+    }
+
+    handle_panel_clicked(panel_name);
+}
 
 
 
