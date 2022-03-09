@@ -93,6 +93,74 @@ bool DialogSurpriseDetector::process_frame(
 
 
 
+
+
+
+NormalDialogDetector::NormalDialogDetector(LoggerQt& logger, VideoOverlay& overlay, bool stop_on_detected)
+    : VisualInferenceCallback("DialogDetector")
+    , m_stop_on_detected(stop_on_detected)
+    , m_detected(false)
+    , m_title_top   (0.278, 0.712, 0.100, 0.005)
+    , m_title_bottom(0.278, 0.755, 0.100, 0.005)
+    , m_top_white   (0.500, 0.750, 0.200, 0.020)
+    , m_bottom_white(0.400, 0.895, 0.200, 0.020)
+    , m_left_white  (0.230, 0.805, 0.016, 0.057)
+    , m_right_white (0.755, 0.805, 0.016, 0.057)
+    // , m_arc_phone(logger, overlay, std::chrono::milliseconds(0), false)
+{}
+void NormalDialogDetector::make_overlays(VideoOverlaySet& items) const{
+    items.add(COLOR_RED, m_title_top);
+    items.add(COLOR_RED, m_title_bottom);
+    items.add(COLOR_RED, m_top_white);
+    items.add(COLOR_RED, m_bottom_white);
+    items.add(COLOR_RED, m_left_white);
+    items.add(COLOR_RED, m_right_white);
+    // m_arc_phone.make_overlays(items);
+}
+bool NormalDialogDetector::process_frame(
+    const QImage& frame,
+    std::chrono::system_clock::time_point timestamp
+){
+    size_t hits = 0;
+
+    ImageStats title_top = image_stats(extract_box(frame, m_title_top));
+    if (title_top.stddev.sum() <= 15 &&
+        title_top.average.b > title_top.average.r && title_top.average.b > title_top.average.g
+    ){
+        hits++;
+    }
+//    cout << "hits = " << hits << endl;
+
+    ImageStats title_bottom = image_stats(extract_box(frame, m_title_bottom));
+    if (title_bottom.stddev.sum() <= 15 &&
+        title_bottom.average.b > title_top.average.r && title_bottom.average.b > title_bottom.average.g
+    ){
+        hits++;
+    }
+//    cout << "hits = " << hits << endl;
+
+    ImageStats top_white = image_stats(extract_box(frame, m_top_white));
+    hits += is_white(top_white, 480, 20) ? 1 : 0;
+
+    ImageStats bottom_white = image_stats(extract_box(frame, m_bottom_white));
+    hits += is_white(bottom_white, 480, 20) ? 1 : 0;
+
+    ImageStats left_white = image_stats(extract_box(frame, m_left_white));
+    hits += is_white(left_white, 480, 20) ? 1 : 0;
+
+    ImageStats right_white = image_stats(extract_box(frame, m_right_white));
+    hits += is_white(right_white, 480, 20) ? 1 : 0;
+
+    // m_arc_phone.process_frame(frame, timestamp);
+    // bool phone = m_arc_phone.detected();
+    // hits += !phone;
+
+    bool detected = hits == 6;
+    m_detected.store(detected, std::memory_order_release);
+
+    return detected && m_stop_on_detected;
+}
+
 }
 }
 }

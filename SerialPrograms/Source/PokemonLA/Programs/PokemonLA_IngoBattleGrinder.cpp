@@ -19,6 +19,7 @@
 #include "PokemonLA_IngoBattleGrinder.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.h"
+#include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 
 #include <QImage>
 
@@ -52,6 +53,23 @@ IngoBattleGrinder_Descriptor::IngoBattleGrinder_Descriptor()
 
 IngoBattleGrinder::IngoBattleGrinder(const IngoBattleGrinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
+    , OPPONENT("<b>Opponent:</b>",
+    {
+        "Wenton",
+        "Bren",
+        "Zisu",
+        "Akari/Rei",
+        "Kamado",
+        // ---- new page
+        "Beni",
+        "Ingo",
+        "Ingo - but tougher",
+        "Mai",
+        "Sabi",
+        // ---- new page
+        "Ress",
+        "Ingo - but using alphas"
+    }, 0)
     , MOVE1_STYLE_OPTION("<b>Move 1 style:</b>")
     , MOVE2_STYLE_OPTION("<b>Move 2 style:</b>")
     , MOVE3_STYLE_OPTION("<b>Move 3 style:</b>")
@@ -64,11 +82,11 @@ IngoBattleGrinder::IngoBattleGrinder(const IngoBattleGrinder_Descriptor& descrip
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_OPTION(OPPONENT);
     PA_ADD_OPTION(MOVE1_STYLE_OPTION);
     PA_ADD_OPTION(MOVE2_STYLE_OPTION);
     PA_ADD_OPTION(MOVE3_STYLE_OPTION);
     PA_ADD_OPTION(MOVE4_STYLE_OPTION);
-    
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -133,29 +151,75 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
 
     env.console.log("Starting battle...");
 
-    // Talk to Ingo to select opponent:
-    pbf_mash_button(env.console, BUTTON_A, 10 * TICKS_PER_SECOND);
-    pbf_wait(env.console, 5 * TICKS_PER_SECOND);
-    pbf_press_button(env.console, BUTTON_B, 10, 115);
+    // Talk to Ingo to start conversation and select regular battles:
+    pbf_press_button(env.console, BUTTON_A, 20, 100);
+    pbf_press_button(env.console, BUTTON_A, 20, 100);
+    pbf_press_button(env.console, BUTTON_A, 20, 150);
+    pbf_press_button(env.console, BUTTON_A, 20, 120);
+    // Choose which opponent
+    if (OPPONENT < 5){
+        for(int i = 0; i < OPPONENT; i++){
+            pbf_press_dpad(env.console, DPAD_DOWN, 10, 60);
+        }
+    } else{
+        // Go to next page
+        for(int i = 0; i < 2; i++){
+            pbf_press_dpad(env.console, DPAD_UP, 10, 60);
+        }
+        pbf_press_button(env.console, BUTTON_A, 10, 100);
+
+        if (OPPONENT < 10){
+            for(int i = 5; i < OPPONENT; i++){
+                pbf_press_dpad(env.console, DPAD_DOWN, 10, 60);
+            }
+        }
+        else{
+            // Go to next page
+            for(int i = 0; i < 2; i++){
+                pbf_press_dpad(env.console, DPAD_UP, 10, 60);
+            }
+            pbf_press_button(env.console, BUTTON_A, 10, 100);
+
+            for(int i = 10; i < OPPONENT; i++){
+                pbf_press_dpad(env.console, DPAD_DOWN, 10, 60);
+            }
+        }
+    }
+
+    // Press the button to select the opponent
+    pbf_press_button(env.console, BUTTON_A, 10, 115);
+    pbf_wait(env.console, 1 * TICKS_PER_SECOND);
     env.console.context().wait_for_all_requests();
 
     // Which move (0, 1, 2 or 3) to use in next turn.
     int cur_move = 0;
+    // Track whether the intended pokemon, the first pokemon sent to battle, has fainted:
     bool intended_pokemon_fainted = false;
+    // Which pokemon in the party is not fainted
+    int next_non_fainted_pokemon = 0;
 
     while(true){
         const bool stop_on_detected = true;
         BattleMenuDetector battle_menu_detector(env.console, env.console, stop_on_detected);
+        // dialogue ellipse appears on a semi-transparent dialog box if you win the fight.
         DialogueEllipseDetector dialogue_ellipse_detector(env.console, env.console, std::chrono::milliseconds(110), stop_on_detected);
         BattlePokemonSwitchDetector pokemon_switch_detector(env.console, env.console, stop_on_detected);
+        // normal dialogue appears if you los the fight.
+        NormalDialogDetector normal_dialogue_detector(env.console, env.console, stop_on_detected);
+        ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(110), stop_on_detected);
         int ret = wait_until(
             env, env.console, std::chrono::minutes(2),
-            {&battle_menu_detector, &dialogue_ellipse_detector, &pokemon_switch_detector}
+            {
+                &battle_menu_detector,
+                &dialogue_ellipse_detector,
+                &normal_dialogue_detector,
+                &pokemon_switch_detector,
+                &arc_phone_detector
+            }
         );
         if (ret < 0){
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
             return true;
-
             // throw OperationFailedException(env.console, "Failed to find battle menu after 2 minutes.");
         }
 
@@ -192,28 +256,60 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
 
             env.update_stats();
         }
-        else if (ret == 1){
-            env.console.log("End of battle.");
+        else if (ret == 1 || ret == 2){
+            env.console.log("Dialogue box.");
 
-            ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(110), stop_on_detected);
-            run_until(
-                env, env.console,
-                [](const BotBaseContext& context){
-                    pbf_mash_button(context, BUTTON_B, 20 * TICKS_PER_SECOND);
-                },
-                { &arc_phone_detector }
-            );
-            break; // leave the battle loop
+            pbf_press_button(env.console, BUTTON_B, 20, 100);
+            env.console.context().wait_for_all_requests();
+            // run_until(
+            //     env, env.console,
+            //     [](const BotBaseContext& context){
+            //         pbf_mash_button(context, BUTTON_B, 20 * TICKS_PER_SECOND);
+            //     },
+            //     { &arc_phone_detector }
+            // );
+            // break; // leave the battle loop
         }
-        else{ // ret is 2
+        else if (ret == 3){
             env.console.log("Pokemon fainted.", COLOR_RED);
             intended_pokemon_fainted = true;
             cur_move = 0;
-            // Fall back to using the party lead. This pokemon should be very strong.
-            // We assume only using its first move with no style to finish the battle.
-            pbf_press_button(env.console, BUTTON_A, 20, 100);
-            pbf_press_button(env.console, BUTTON_A, 20, 100);
-            env.console.context().wait_for_all_requests();
+
+            // Move fast leading fainted pokemon
+            for(int i = 0; i < next_non_fainted_pokemon; i++){
+                pbf_press_dpad(env.console, DPAD_DOWN, 20, 80);
+            }
+
+            while(true){
+                // Fall back to using the party lead. This pokemon should be very strong.
+                // We assume only using its first move with no style to finish the battle.
+                pbf_press_button(env.console, BUTTON_A, 20, 100);
+                pbf_press_button(env.console, BUTTON_A, 20, 150);
+                env.console.context().wait_for_all_requests();
+
+                next_non_fainted_pokemon++;
+            
+                // Check whether we can send this pokemon to battle:
+                BattlePokemonSwitchDetector switch_detector(env.console, env.console, stop_on_detected);
+                QImage screen = env.console.video().snapshot();
+                if (switch_detector.process_frame(screen, std::chrono::system_clock::now()) == false){
+                    // No longer at the switching pokemon screen
+                    break;
+                }
+
+                // We are still in the switching pokemon screen. So the current selected pokemon is fainted
+                // and therefore cannot be used. Try the next pokemon:
+
+                // Fist hit B to clear the "cannot send pokemon" dialogue
+                pbf_press_button(env.console, BUTTON_B, 20, 100);
+                // Move to the next pokemon
+                pbf_press_dpad(env.console, DPAD_DOWN, 20, 80);
+            }
+
+        }
+        else{ // ret is 4
+            env.console.log("Battle finished.");
+            break;
         }
     }
 
