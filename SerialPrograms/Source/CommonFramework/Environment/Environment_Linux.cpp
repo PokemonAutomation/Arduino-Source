@@ -10,6 +10,7 @@
 #include <set>
 #include <map>
 #include <thread>
+#include <fstream>
 #include <nmmintrin.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -104,7 +105,9 @@ ProcessorSpecs get_processor_specs(){
     ProcessorSpecs specs;
     specs.name = get_processor_name();
     specs.base_frequency = x86_rdtsc_ticks_per_sec();
+    specs.threads = std::thread::hardware_concurrency();
 
+#ifdef __linux
     //  Cores + Sockets
     {
 //        std::set<int> cores;
@@ -129,7 +132,7 @@ ProcessorSpecs get_processor_specs(){
                 if (pos == std::string::npos){
                     throw InternalSystemError(nullptr, PA_CURRENT_FUNCTION, "Unable to parse: /proc/cpuinfo");
                 }
-                specs.threads++;
+//                specs.threads++;
                 int core = atoi(&line[pos + 2]);
                 cores_per_socket[current_socket].insert(core);
 //                cores.insert(core);
@@ -157,6 +160,7 @@ ProcessorSpecs get_processor_specs(){
     }
 
     return specs;
+#endif
 }
 
 

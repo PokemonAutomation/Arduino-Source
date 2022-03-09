@@ -62,6 +62,7 @@ bool check_hardware(){
         box.warning(nullptr, "Warning", str);
     }
 
+#if (defined _WIN32) || (defined __linux)
     size_t vcores = specs.threads > specs.cores
         ? specs.threads - specs.cores
         : 0;
@@ -83,6 +84,7 @@ bool check_hardware(){
         str += " GHz";
         box.warning(nullptr, "Warning", str);
     }
+#endif
 
     return true;
 }
