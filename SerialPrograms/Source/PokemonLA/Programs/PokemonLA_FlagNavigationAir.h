@@ -10,6 +10,7 @@
 #include "CommonFramework/Tools/SuperControlSession.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
+#include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
 
@@ -77,6 +78,7 @@ private:
     MountTracker m_mount;
     ButtonDetector m_centerA;
     ButtonDetector m_leftB;
+    DialogSurpriseDetector m_dialog_detector;
     ShinySoundDetector m_shiny_listener;
 
     std::atomic<bool> m_looking_straight_ahead;

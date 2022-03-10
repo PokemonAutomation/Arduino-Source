@@ -252,10 +252,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
+    goto_camp_from_jubilife(env, console, WarpSpot::ICELANDS_ICEPEAK_ARENA);
+
+#if 0
     QImage image("screenshot-20220309-005426729947.png");
 
     MountDetector detector;
     detector.detect(image);
+#endif
 
 
 #if 0

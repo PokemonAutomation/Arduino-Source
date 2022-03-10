@@ -31,6 +31,10 @@ GameSettings::GameSettings()
         "<b>Game to Home Delay:</b><br>Delay from pressing home to entering the the Switch home menu.",
         "125"
     )
+    , LOAD_REGION_TIMEOUT(
+        "<b>Load Region Timeout:</b><br>Wait at most this long to enter a region before giving up.",
+        "30 * TICKS_PER_SECOND"
+    )
     , m_start_game_timings("<font size=4><b>Start Game Timings:</b></font>")
     , START_GAME_MASH(
         "<b>1. Start Game Mash:</b><br>Mash A for this long to start the game.",
@@ -61,6 +65,7 @@ GameSettings::GameSettings()
 //    PA_ADD_OPTION(OVERWORLD_TO_MENU_DELAY);
 //    PA_ADD_OPTION(MENU_TO_OVERWORLD_DELAY);
     PA_ADD_OPTION(GAME_TO_HOME_DELAY);
+    PA_ADD_OPTION(LOAD_REGION_TIMEOUT);
 
     PA_ADD_OPTION(m_start_game_timings);
     PA_ADD_OPTION(START_GAME_MASH);

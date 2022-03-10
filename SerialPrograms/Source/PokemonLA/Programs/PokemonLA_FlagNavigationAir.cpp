@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -24,6 +25,7 @@ FlagNavigationAir::FlagNavigationAir(
     , m_mount(console)
     , m_centerA(console, console, ButtonType::ButtonA, {0.40, 0.50, 0.40, 0.50}, std::chrono::milliseconds(200), false)
     , m_leftB(console, console, ButtonType::ButtonB, {0.02, 0.40, 0.05, 0.20}, std::chrono::milliseconds(200), false)
+    , m_dialog_detector(console, console, false)
     , m_shiny_listener(console, false)
     , m_looking_straight_ahead(false)
     , m_last_good_state(WallClock::min())
@@ -34,6 +36,8 @@ FlagNavigationAir::FlagNavigationAir(
     *this += m_mount;
     *this += m_centerA;
     *this += m_leftB;
+//    *this += m_dialog_detector;
+    *this += m_shiny_listener;
     register_state_command(State::UNKNOWN, [=](){
         m_console.log("Unknown state. Moving camera around...");
         m_active_command->dispatch([=](const BotBaseContext& context){
@@ -245,6 +249,19 @@ bool FlagNavigationAir::run_state(
 ){
     if (m_stop_on_shiny && m_shiny_listener.detected()){
         return true;
+    }
+
+    if (last_state_change() + std::chrono::seconds(60) < timestamp){
+//        dump_image(m_console, m_env.program_info(), "NoStateChange", m_console.video().snapshot());
+        throw OperationFailedException(m_console, "No state change detected after 60 seconds.");
+    }
+    if (start_time() + std::chrono::seconds(180) < timestamp){
+//        dump_image(m_console, m_env.program_info(), "CantFindTarget", m_console.video().snapshot());
+        throw OperationFailedException(m_console, "Unable to reach target after 3 minutes.");
+    }
+    if (m_dialog_detector.detected()){
+//        dump_image(m_console, m_env.program_info(), "MissFortuneAmbush", m_console.video().snapshot());
+        throw OperationFailedException(m_console, "Potential ambush by Miss Fortune sister.");
     }
 
     if (m_find_flag_failed.load(std::memory_order_acquire)){

@@ -71,6 +71,7 @@ bool SuperControlSession::run_state_action(size_t state){
 }
 
 void SuperControlSession::run_session(){
+    m_start_time = std::chrono::system_clock::now();
 
     std::unique_ptr<AsyncVisualInferenceSession> visual;
     if (!m_visual_callbacks.empty()){

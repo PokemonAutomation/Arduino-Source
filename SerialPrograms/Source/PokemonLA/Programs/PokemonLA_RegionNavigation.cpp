@@ -5,10 +5,12 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA/Inference/PokemonLA_MapDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 #include "PokemonLA/Programs/PokemonLA_EscapeFromAttack.h"
@@ -104,6 +106,7 @@ void from_professor_return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& c
             pbf_mash_button(console, BUTTON_B, 20);
             break;
         default:
+            dump_image(env.logger(), env.program_info(), "ReturnToJubilife", console.video().snapshot());
             throw OperationFailedException(console, "Did not detect option to return to Jubilife.");
         }
     }
@@ -120,6 +123,7 @@ void mash_A_to_enter_sub_area(ProgramEnvironment& env, ConsoleHandle& console){
         { &black_screen0 }
     );
     if (ret < 0){
+        dump_image(env.logger(), env.program_info(), "LoadSubArea", console.video().snapshot());
         throw OperationFailedException(console, "Failed to load into sub area after 7 seconds.");
     }
 
@@ -133,12 +137,12 @@ void mash_A_to_change_region(ProgramEnvironment& env, ConsoleHandle& console){
     int ret = run_until(
         env, console,
         [](const BotBaseContext& context){
-            pbf_mash_button(context, BUTTON_A, 20 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_A, GameSettings::instance().LOAD_REGION_TIMEOUT);
         },
         { &black_screen0 }
     );
     if (ret < 0){
-        throw OperationFailedException(console, "Failed to load into region after 20 seconds.");
+        throw OperationFailedException(console, "Failed to load into region after timeout.");
     }
     env.wait_for(std::chrono::milliseconds(100));
 
@@ -146,18 +150,19 @@ void mash_A_to_change_region(ProgramEnvironment& env, ConsoleHandle& console){
     BlackScreenOverWatcher black_screen1b(COLOR_RED, {0.20, 0.93, 0.60, 0.05}, 150);
     ret = wait_until(
         env, console,
-        std::chrono::seconds(20),
+        std::chrono::milliseconds(1000 * GameSettings::instance().LOAD_REGION_TIMEOUT / TICKS_PER_SECOND),
         { &black_screen1a, &black_screen1b }
     );
     if (ret < 0){
-        throw OperationFailedException(console, "Failed to load into region after 20 seconds.");
+        dump_image(env.logger(), env.program_info(), "LoadRegion", console.video().snapshot());
+        throw OperationFailedException(console, "Failed to load into region after timeout.");
     }
     console.log("Loaded into map...");
     env.wait_for(std::chrono::seconds(1));
 }
 
 
-void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Camp camp){
+void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, WarpSpot camp){
     //  Open the map.
     console.botbase().wait_for_all_requests();
     pbf_move_left_joystick(console, 128, 255, 200, 0);
@@ -173,6 +178,7 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Ca
             { &detector }
         );
         if (ret < 0){
+            dump_image(env.logger(), env.program_info(), "MapNotDetected", console.video().snapshot());
             throw OperationFailedException(console, "Map not detected after 10 x A presses.");
         }
         console.log("Found map!");
@@ -180,64 +186,113 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Ca
     }
 
     MapRegion region;
-    size_t slot;
     DpadPosition direction;
+    size_t slot;
+    size_t sub_slot = 0;
     switch (camp){
-    case Camp::FIELDLANDS_FIELDLANDS:
+
+    case WarpSpot::FIELDLANDS_FIELDLANDS:
         region = MapRegion::FIELDLANDS;
-        slot = 0;
         direction = DPAD_RIGHT;
+        slot = 0;
         break;
-    case Camp::FIELDLANDS_HEIGHTS:
+    case WarpSpot::FIELDLANDS_HEIGHTS:
         region = MapRegion::FIELDLANDS;
-        slot = 1;
         direction = DPAD_RIGHT;
+        slot = 1;
         break;
-    case Camp::MIRELANDS_MIRELANDS:
+    case WarpSpot::FIELDLANDS_GRANDTREE_ARENA:
+        region = MapRegion::FIELDLANDS;
+        direction = DPAD_RIGHT;
+        slot = 0;
+        sub_slot = 2;
+        break;
+
+    case WarpSpot::MIRELANDS_MIRELANDS:
         region = MapRegion::MIRELANDS;
-        slot = 0;
         direction = DPAD_RIGHT;
+        slot = 0;
         break;
-    case Camp::MIRELANDS_BOGBOUND:
+    case WarpSpot::MIRELANDS_BOGBOUND:
         region = MapRegion::MIRELANDS;
-        slot = 1;
         direction = DPAD_RIGHT;
+        slot = 1;
         break;
-    case Camp::COASTLANDS_BEACHSIDE:
-        region = MapRegion::COASTLANDS;
+    case WarpSpot::MIRELANDS_DIAMOND_SETTLEMENT:
+        region = MapRegion::MIRELANDS;
+        direction = DPAD_RIGHT;
         slot = 0;
-        direction = DPAD_RIGHT;
+        sub_slot = 2;
         break;
-    case Camp::COASTLANDS_COASTLANDS:
-        region = MapRegion::COASTLANDS;
-        slot = 1;
+    case WarpSpot::MIRELANDS_BRAVA_ARENA:
+        region = MapRegion::MIRELANDS;
         direction = DPAD_RIGHT;
-        break;
-    case Camp::HIGHLANDS_HIGHLANDS:
-        region = MapRegion::HIGHLANDS;
         slot = 0;
-        direction = DPAD_LEFT;
+        sub_slot = 3;
         break;
-    case Camp::HIGHLANDS_MOUNTAIN:
-        region = MapRegion::HIGHLANDS;
+
+    case WarpSpot::COASTLANDS_BEACHSIDE:
+        region = MapRegion::COASTLANDS;
+        direction = DPAD_RIGHT;
+        slot = 0;
+        break;
+    case WarpSpot::COASTLANDS_COASTLANDS:
+        region = MapRegion::COASTLANDS;
+        direction = DPAD_RIGHT;
         slot = 1;
-        direction = DPAD_LEFT;
         break;
-    case Camp::HIGHLANDS_SUMMIT:
+    case WarpSpot::COASTLANDS_MOLTEN_ARENA:
+        region = MapRegion::COASTLANDS;
+        direction = DPAD_RIGHT;
+        slot = 0;
+        sub_slot = 2;
+        break;
+
+    case WarpSpot::HIGHLANDS_HIGHLANDS:
         region = MapRegion::HIGHLANDS;
+        direction = DPAD_LEFT;
+        slot = 0;
+        break;
+    case WarpSpot::HIGHLANDS_MOUNTAIN:
+        region = MapRegion::HIGHLANDS;
+        direction = DPAD_LEFT;
+        slot = 1;
+        break;
+    case WarpSpot::HIGHLANDS_SUMMIT:
+        region = MapRegion::HIGHLANDS;
+        direction = DPAD_LEFT;
         slot = 2;
-        direction = DPAD_LEFT;
         break;
-    case Camp::ICELANDS_SNOWFIELDS:
-        region = MapRegion::ICELANDS;
+    case WarpSpot::HIGHLANDS_MOONVIEW_ARENA:
+        region = MapRegion::HIGHLANDS;
+        direction = DPAD_LEFT;
         slot = 0;
-        direction = DPAD_LEFT;
+        sub_slot = 2;
         break;
-    case Camp::ICELANDS_ICEPEAK:
+
+    case WarpSpot::ICELANDS_SNOWFIELDS:
         region = MapRegion::ICELANDS;
-        slot = 1;
         direction = DPAD_LEFT;
+        slot = 0;
         break;
+    case WarpSpot::ICELANDS_ICEPEAK:
+        region = MapRegion::ICELANDS;
+        direction = DPAD_LEFT;
+        slot = 1;
+        break;
+    case WarpSpot::ICELANDS_PEARL_SETTLEMENT:
+        region = MapRegion::ICELANDS;
+        direction = DPAD_LEFT;
+        slot = 0;
+        sub_slot = 2;
+        break;
+    case WarpSpot::ICELANDS_ICEPEAK_ARENA:
+        region = MapRegion::ICELANDS;
+        direction = DPAD_LEFT;
+        slot = 0;
+        sub_slot = 3;
+        break;
+
     default:
         throw InternalProgramError(
             &console.logger(), PA_CURRENT_FUNCTION,
@@ -257,6 +312,7 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Ca
         console.botbase().wait_for_all_requests();
     }
     if (current_region != region){
+        dump_image(env.logger(), env.program_info(), "FindRegion", console.video().snapshot());
         throw OperationFailedException(console, std::string("Unable to find ") + MAP_REGION_NAMES[(int)region] + ".");
     }
 
@@ -269,6 +325,64 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Ca
 
     //  Enter the region.
     mash_A_to_change_region(env, console);
+
+    if (sub_slot == 0){
+        return;
+    }
+
+    //  Open the map.
+    pbf_press_button(console, BUTTON_MINUS, 20, 30);
+    {
+        MapDetector detector;
+        int ret = wait_until(
+            env, console,
+            std::chrono::seconds(5),
+            { &detector }
+        );
+        if (ret < 0){
+            dump_image(env.logger(), env.program_info(), "MapNotFound", console.video().snapshot());
+            throw OperationFailedException(console, "Map not detected after 5 seconds.");
+        }
+        console.log("Found map!");
+        env.wait_for(std::chrono::milliseconds(500));
+    }
+
+    //  Warp to sub-camp.
+    pbf_press_button(console, BUTTON_X, 20, 30);
+    {
+        ButtonDetector detector(
+            console, console,
+            ButtonType::ButtonA,
+            {0.55, 0.40, 0.20, 0.40},
+            std::chrono::milliseconds(200), true
+        );
+        int ret = wait_until(
+            env, console,
+            std::chrono::seconds(2),
+            { &detector }
+        );
+        if (ret < 0){
+            throw OperationFailedException(console, "Unable to fly. Are you under attack?");
+        }
+    }
+    pbf_wait(console, 50);
+    for (size_t c = 0; c < sub_slot; c++){
+        pbf_press_dpad(console, DPAD_DOWN, 20, 30);
+    }
+    pbf_mash_button(console, BUTTON_A, 125);
+
+    BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.6});
+    int ret = wait_until(
+        env, console,
+        std::chrono::seconds(20),
+        { &black_screen }
+    );
+    if (ret < 0){
+        dump_image(env.logger(), env.program_info(), "FlyToCamp", console.video().snapshot());
+        throw OperationFailedException(console, "Failed to fly to camp after 20 seconds.");
+    }
+    console.log("Arrived at sub-camp...");
+    env.wait_for(std::chrono::seconds(1));
 }
 
 
@@ -295,6 +409,7 @@ void goto_camp_from_overworld(
         }
 
         if (std::chrono::system_clock::now() - start > std::chrono::seconds(60)){
+            dump_image(env.logger(), env.program_info(), "EscapeFromAttack", console.video().snapshot());
             throw OperationFailedException(console, "Unable to escape from being attacked.");
         }
 
@@ -308,6 +423,7 @@ void goto_camp_from_overworld(
                 { &detector }
             );
             if (ret < 0){
+                dump_image(env.logger(), env.program_info(), "MapNotDetected", console.video().snapshot());
                 console.log("Map not detected after 5 seconds.", COLOR_RED);
                 pbf_mash_button(console, BUTTON_B, TICKS_PER_SECOND);
                 console.botbase().wait_for_all_requests();
@@ -351,6 +467,7 @@ void goto_camp_from_overworld(
         { &black_screen }
     );
     if (ret < 0){
+        dump_image(env.logger(), env.program_info(), "FlyToCamp", console.video().snapshot());
         throw OperationFailedException(console, "Failed to fly to camp after 20 seconds.");
     }
     console.log("Arrived at camp...");

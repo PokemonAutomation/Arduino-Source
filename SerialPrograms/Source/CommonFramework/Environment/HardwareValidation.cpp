@@ -29,13 +29,13 @@ bool check_hardware(){
 
     if (!features.HW_AVX2){
         QMessageBox box;
-        box.warning(
-            nullptr,
-            "Warning",
-            "This computer may not be powerful enough to run this program.<br><br>"
-            "You can continue, but the program may not work correctly.<br><br>"
-            "(Reason: Computers that lack AVX2 are likely to be too old and too slow to handle this program.)"
-        );
+        QString str;
+        str += "This computer may not be powerful enough to run this program.<br><br>";
+        str += "You can continue, but the program may not work correctly.<br>";
+        str += "(i.e. Increased error rate. Fail to reliably detect shinies, etc...)<br><br>";
+        str += "(Reason: Computers that lack AVX2 are likely to be too old and too slow to handle this program.)<br><br>";
+        str += "Recommendation: Use a more powerful computer.";
+        box.warning(nullptr, "Warning", str);
     }
 
     ProcessorSpecs specs = get_processor_specs();
@@ -44,10 +44,12 @@ bool check_hardware(){
         QMessageBox box;
         QString str;
         str += "This computer may not be powerful enough to run this program.<br><br>";
-        str += "You can continue, but the program may not work correctly.<br><br>";
+        str += "You can continue, but the program may not work correctly.<br>";
+        str += "(i.e. Increased error rate. Fail to reliably detect shinies, etc...)<br><br>";
         str += "(Reason: ";
         str += QString::number(specs.threads);
-        str += " vcores is a weak CPU.)";
+        str += " vcores is a weak CPU.)<br><br>";
+        str += "Recommendation: Use a more powerful computer.";
         box.warning(nullptr, "Warning", str);
     }
 
@@ -55,10 +57,12 @@ bool check_hardware(){
         QMessageBox box;
         QString str;
         str += "This computer may not be powerful enough to run this program.<br><br>";
-        str += "You can continue, but the program may not work correctly.<br><br>";
+        str += "You can continue, but the program may not work correctly.<br>";
+        str += "(i.e. Increased error rate. Fail to reliably detect shinies, etc...)<br><br>";
         str += "(Reason: Base frequency measured at ";
         str += QString::fromStdString(tostr_fixed(specs.base_frequency / 1000000000., 3));
-        str += " GHz which is very slow.)";
+        str += " GHz which is very slow.)<br><br>";
+        str += "Recommendation: Use a more powerful computer.";
         box.warning(nullptr, "Warning", str);
     }
 
@@ -71,7 +75,8 @@ bool check_hardware(){
         QMessageBox box;
         QString str;
         str += "This computer may not be powerful enough to run this program.<br><br>";
-        str += "You can continue, but the program may not work correctly.<br><br>";
+        str += "You can continue, but the program may not work correctly.<br>";
+        str += "(i.e. Increased error rate. Fail to reliably detect shinies, etc...)<br><br>";
         str += "CPU: " + QString::fromStdString(specs.name) + "<br>";
         str += "Cores: " + QString::number(specs.cores) + "<br>";
         str += "Threads: " + QString::number(specs.threads) + "<br>";
@@ -81,7 +86,8 @@ bool check_hardware(){
         str += "<br>";
         str += "(p-cores + 0.2 * v-cores) * base-frequency = ";
         str += QString::fromStdString(tostr_fixed(efreq / 1000000000., 3));
-        str += " GHz";
+        str += " GHz<br><br>";
+        str += "Recommendation: Use a more powerful computer.";
         box.warning(nullptr, "Warning", str);
     }
 #endif

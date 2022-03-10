@@ -16,14 +16,15 @@
 #include "Programs/PokemonLA_IngoBattleGrinder.h"
 #include "Programs/PokemonLA_NuggetFarmerHighlands.h"
 
-#include "Programs/PokemonLA_GalladeFinder.h"
-#include "Programs/PokemonLA_CrobatFinder.h"
+#include "Programs/ShinyHunting/PokemonLA_GalladeFinder.h"
+#include "Programs/ShinyHunting/PokemonLA_CrobatFinder.h"
+#include "Programs/ShinyHunting/PokemonLA_ShinyHunt-FixedPoint.h"
+//#include "Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h"
 
 #include "Programs/PokemonLA_SelfBoxTrade.h"
 #include "Programs/PokemonLA_SelfTouchTrade.h"
 #include "Programs/PokemonLA_ShinySoundListener.h"
 
-//#include "Programs/PokemonLA_ShinyHunt-LakeTrio.h"
 #include "PokemonLA/Programs/PokemonLA_OverworldWatcher.h"
 #include "PokemonLA/Programs/PokemonLA_FlagNavigationTest.h"
 
@@ -52,6 +53,10 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_divider("---- Shiny Hunting ----");
     add_program<CrobatFinder_Descriptor, CrobatFinder>();
     add_program<GalladeFinder_Descriptor, GalladeFinder>();
+//    add_program<ShinyHuntLakeTrio_Descriptor, ShinyHuntLakeTrio>();
+    if (GlobalSettings::instance().DEVELOPER_MODE){
+        add_program<ShinyHuntFixedPoint_Descriptor, ShinyHuntFixedPoint>();
+    }
 
     add_divider("---- Trading ----");
     add_program<SelfBoxTrade_Descriptor, SelfBoxTrade>();
@@ -59,8 +64,6 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
 
 
     if (GlobalSettings::instance().DEVELOPER_MODE){
-//        add_divider("---- Shiny Hunting ----");
-//        add_program<ShinyHuntLakeTrio_Descriptor, ShinyHuntLakeTrio>();
         add_divider("---- Developer Tools ----");
         add_program<OverworldWatcher_Descriptor, OverworldWatcher>();
         add_program<ShinySoundListener_Descriptor, ShinySoundListener>();

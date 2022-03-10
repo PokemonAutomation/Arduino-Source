@@ -60,6 +60,8 @@ protected:
 
 
 protected:
+    WallClock start_time() const{ return m_start_time; }
+
     size_t last_state() const{ return m_last_state; }
     WallClock last_state_change() const{ return m_last_state_change; }
 
@@ -90,6 +92,7 @@ private:
 
 private:
     //  Run-time state.
+    WallClock m_start_time;
     size_t m_last_state;
     WallClock m_last_state_change;
 };

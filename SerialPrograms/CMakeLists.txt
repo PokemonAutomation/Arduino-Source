@@ -825,6 +825,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/PokemonLA_ShinySoundDetector.h
     Source/PokemonLA/Panels_PokemonLA.cpp
     Source/PokemonLA/Panels_PokemonLA.h
+    Source/PokemonLA/PokemonLA_Locations.cpp
+    Source/PokemonLA/PokemonLA_Locations.h
     Source/PokemonLA/PokemonLA_Settings.cpp
     Source/PokemonLA/PokemonLA_Settings.h
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.cpp
@@ -851,18 +853,20 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/PokemonLA_SelfBoxTrade.h
     Source/PokemonLA/Programs/PokemonLA_SelfTouchTrade.cpp
     Source/PokemonLA/Programs/PokemonLA_SelfTouchTrade.h
-    Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.cpp
-    Source/PokemonLA/Programs/PokemonLA_ShinyHunt-LakeTrio.h
     Source/PokemonLA/Programs/PokemonLA_ShinySoundListener.h
     Source/PokemonLA/Programs/PokemonLA_ShinySoundListener.cpp
     Source/PokemonLA/Programs/PokemonLA_TradeRoutines.cpp
     Source/PokemonLA/Programs/PokemonLA_TradeRoutines.h
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.h
-    Source/PokemonLA/Programs/PokemonLA_GalladeFinder.cpp
-    Source/PokemonLA/Programs/PokemonLA_GalladeFinder.h
-    Source/PokemonLA/Programs/PokemonLA_CrobatFinder.cpp
-    Source/PokemonLA/Programs/PokemonLA_CrobatFinder.h
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.cpp
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.h
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_GalladeFinder.cpp
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_GalladeFinder.h
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FixedPoint.cpp
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FixedPoint.h
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.cpp
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.cpp
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.h
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.cpp

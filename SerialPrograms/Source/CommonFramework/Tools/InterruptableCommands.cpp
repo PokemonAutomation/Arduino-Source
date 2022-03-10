@@ -40,6 +40,9 @@ AsyncCommandSession::~AsyncCommandSession(){
         m_stopping_session.store(true, std::memory_order_release);
         {
             std::lock_guard<std::mutex> lg(m_lock);
+            if (m_current){
+                m_current->context.cancel();
+            }
             m_cv.notify_all();
         }
         m_task.reset();

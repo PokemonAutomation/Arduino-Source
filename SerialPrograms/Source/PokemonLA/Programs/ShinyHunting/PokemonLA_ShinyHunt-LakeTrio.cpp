@@ -28,7 +28,7 @@ namespace PokemonLA{
 
 ShinyHuntLakeTrio_Descriptor::ShinyHuntLakeTrio_Descriptor()
     : RunnableSwitchProgramDescriptor(
-        "PokemonLA:ShinyHuntLakeTrio",
+        "PokemonLA:ShinyHunt-LakeTrio",
         STRING_POKEMON + " LA", "Shiny Hunt - Lake Trio",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/ShinyHunt-LakeTrio.md",
         "Shiny hunt the lake trio legendaries.",
