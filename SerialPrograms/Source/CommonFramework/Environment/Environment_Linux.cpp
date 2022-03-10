@@ -158,9 +158,9 @@ ProcessorSpecs get_processor_specs(){
         }
         specs.numa_nodes = nodes.size();
     }
+#endif
 
     return specs;
-#endif
 }
 
 

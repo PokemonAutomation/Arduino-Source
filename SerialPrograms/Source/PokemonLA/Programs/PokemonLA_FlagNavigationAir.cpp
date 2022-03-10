@@ -225,7 +225,7 @@ FlagNavigationAir::FlagNavigationAir(
     register_state_command(State::FIND_FLAG, [=](){
         m_console.log("Looking for flag...");
         m_active_command->dispatch([=](const BotBaseContext& context){
-            for (size_t c = 0; c < 2; c++){
+            for (size_t c = 0; c < 1; c++){
                 pbf_move_right_joystick(context, 128, 255, 200, 0);
                 pbf_move_right_joystick(context, 128, 0, 200, 0);
                 pbf_move_right_joystick(context, 128, 255, 80, 0);
