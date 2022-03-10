@@ -28,9 +28,11 @@ FlagNavigationAir::FlagNavigationAir(
     , m_dialog_detector(console, console, false)
     , m_shiny_listener(console, false)
     , m_looking_straight_ahead(false)
-    , m_last_good_state(WallClock::min())
+//    , m_last_good_state(WallClock::min())
     , m_find_flag_failed(false)
-    , m_last_known_flag_y(0)
+    , m_last_flag_detection(WallClock::min())
+    , m_flag_x(0.5)
+    , m_flag_y(0.0)
 {
     *this += m_flag;
     *this += m_mount;
@@ -224,16 +226,17 @@ FlagNavigationAir::FlagNavigationAir(
     });
     register_state_command(State::FIND_FLAG, [=](){
         m_console.log("Looking for flag...");
+        uint8_t turn = m_flag_x <= 0.5 ? 0 : 255;
         m_active_command->dispatch([=](const BotBaseContext& context){
             for (size_t c = 0; c < 1; c++){
                 pbf_move_right_joystick(context, 128, 255, 200, 0);
                 pbf_move_right_joystick(context, 128, 0, 200, 0);
                 pbf_move_right_joystick(context, 128, 255, 80, 0);
-                pbf_move_right_joystick(context, 0, 128, 400, 0);
+                pbf_move_right_joystick(context, turn, 128, 400, 0);
                 pbf_move_right_joystick(context, 128, 255, 120, 0);
-                pbf_move_right_joystick(context, 0, 128, 400, 0);
+                pbf_move_right_joystick(context, turn, 128, 400, 0);
                 pbf_move_right_joystick(context, 128, 0, 200, 0);
-                pbf_move_right_joystick(context, 0, 128, 400, 0);
+                pbf_move_right_joystick(context, turn, 128, 400, 0);
             }
             context.wait_for_all_requests();
             m_find_flag_failed.store(true, std::memory_order_release);
@@ -272,7 +275,7 @@ bool FlagNavigationAir::run_state(
     m_flag_detected = m_flag.get(m_flag_distance, m_flag_x, m_flag_y);
 //    cout << "flag_ok = " << flag_ok << ", x = " << m_flag_x << ", y = " << flag_y << endl;
     if (m_flag_detected){
-        m_last_known_flag_y = m_flag_y;
+        m_last_flag_detection = timestamp;
     }
 
     MountState mount = m_mount.state();
@@ -319,14 +322,14 @@ bool FlagNavigationAir::run_state(
 }
 bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock timestamp){
     //  Need to get on Sneasler.
-    if (m_centerA.detected() && timestamp - last_state_change() > std::chrono::seconds(2)){
+    if (m_centerA.detected() && last_state_change() + std::chrono::seconds(2) < timestamp){
         return run_state_action(State::GET_ON_SNEASLER);
     }
 
 //    cout << "m_last_known_flag_y = " << m_last_known_flag_y << endl;
 
     State state = (State)this->last_state();
-    if (m_last_known_flag_y > 0.9 && timestamp - last_state_change() > std::chrono::seconds(2)){
+    if (m_flag_y > 0.9 && last_state_change() + std::chrono::seconds(2) < timestamp){
 //        cout << "state = " << (size_t)state << endl;
         switch (state){
         case State::DASH_FORWARD_MASH_B:
@@ -340,7 +343,11 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
 
     //  Find the flag.
     if (!m_flag_detected){
-        return run_state_action(State::FIND_FLAG);
+        if (m_last_flag_detection + std::chrono::seconds(5) < timestamp){
+            return run_state_action(State::FIND_FLAG);
+        }else{
+            return false;
+        }
     }
 
     //  Dive

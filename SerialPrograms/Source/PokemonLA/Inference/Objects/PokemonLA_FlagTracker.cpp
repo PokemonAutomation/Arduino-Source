@@ -31,9 +31,6 @@ void FlagTracker::make_overlays(VideoOverlaySet& items) const{
 bool FlagTracker::get(double& distance, double& x, double& y){
     SpinLockGuard lg(m_lock);
     if (m_history.empty()){
-        distance = -1;
-        x = std::nan("");
-        y = std::nan("");
         return false;
     }
     const Sample& sample = m_history.back();

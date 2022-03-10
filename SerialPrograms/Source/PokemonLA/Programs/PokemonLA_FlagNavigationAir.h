@@ -82,15 +82,17 @@ private:
     ShinySoundDetector m_shiny_listener;
 
     std::atomic<bool> m_looking_straight_ahead;
-    WallClock m_last_good_state;
+//    WallClock m_last_good_state;
 
     std::atomic<bool> m_find_flag_failed;
 
+    WallClock m_last_flag_detection;
     bool m_flag_detected;
+
+    //  Last known values.
     double m_flag_distance;
     double m_flag_x;
     double m_flag_y;
-    double m_last_known_flag_y;
 };
 
 
