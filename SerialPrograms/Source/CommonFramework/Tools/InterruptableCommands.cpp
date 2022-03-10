@@ -41,7 +41,13 @@ AsyncCommandSession::~AsyncCommandSession(){
         {
             std::lock_guard<std::mutex> lg(m_lock);
             if (m_current){
-                m_current->context.cancel();
+                try{
+                    m_current->context.cancel();
+                }catch (InvalidConnectionStateException&){
+                }catch (OperationCancelledException&){
+                }catch (...){
+                    m_env.log("AsyncCommandSession::~AsyncCommandSession() - Uncaught Exception", COLOR_RED);
+                }
             }
             m_cv.notify_all();
         }
