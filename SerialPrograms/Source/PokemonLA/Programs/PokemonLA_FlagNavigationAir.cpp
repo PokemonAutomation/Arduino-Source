@@ -17,10 +17,12 @@ namespace PokemonLA{
 
 FlagNavigationAir::FlagNavigationAir(
     ProgramEnvironment& env, ConsoleHandle& console,
-    bool stop_on_shiny
+    bool stop_on_shiny,
+    std::chrono::seconds navigate_timeout
 )
     : SuperControlSession(env, console)
     , m_stop_on_shiny(stop_on_shiny)
+    , m_navigate_timeout(navigate_timeout)
     , m_flag(console, console)
     , m_mount(console)
     , m_centerA(console, console, ButtonType::ButtonA, {0.40, 0.50, 0.40, 0.50}, std::chrono::milliseconds(200), false)
@@ -274,9 +276,9 @@ bool FlagNavigationAir::run_state(
 //        dump_image(m_console, m_env.program_info(), "NoStateChange", m_console.video().snapshot());
         throw OperationFailedException(m_console, "No state change detected after 60 seconds.");
     }
-    if (start_time() + std::chrono::seconds(180) < timestamp){
+    if (start_time() + m_navigate_timeout < timestamp){
 //        dump_image(m_console, m_env.program_info(), "CantFindTarget", m_console.video().snapshot());
-        throw OperationFailedException(m_console, "Unable to reach target after 3 minutes.");
+        throw OperationFailedException(m_console, "Unable to reach flag after timeout period.");
     }
     if (m_dialog_detector.detected()){
 //        dump_image(m_console, m_env.program_info(), "MissFortuneAmbush", m_console.video().snapshot());

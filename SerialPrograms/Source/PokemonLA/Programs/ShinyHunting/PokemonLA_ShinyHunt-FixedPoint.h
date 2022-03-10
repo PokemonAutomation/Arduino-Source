@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonLA_ShinyHuntFixedPoint_H
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/PokemonLA_Locations.h"
@@ -49,6 +50,8 @@ private:
     class Stats;
 
     WarpLocationOption WARP_SPOT;
+
+    SimpleIntegerOption<uint64_t> NAVIGATION_TIMEOUT;
 
     ShinyDetectedActionOption SHINY_DETECTED;
 

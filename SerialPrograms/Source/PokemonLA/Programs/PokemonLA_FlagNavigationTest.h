@@ -7,7 +7,9 @@
 #ifndef PokemonAutomation_PokemonLA_FlagNavigationTest_H
 #define PokemonAutomation_PokemonLA_FlagNavigationTest_H
 
+#include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -28,6 +30,8 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
+    SimpleIntegerOption<uint64_t> NAVIGATION_TIMEOUT;
+    ShinyDetectedActionOption SHINY_DETECTED;
 };
 
 

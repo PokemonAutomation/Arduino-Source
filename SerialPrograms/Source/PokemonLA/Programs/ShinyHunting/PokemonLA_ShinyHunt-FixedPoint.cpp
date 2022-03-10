@@ -44,6 +44,10 @@ ShinyHuntFixedPoint_Descriptor::ShinyHuntFixedPoint_Descriptor()
 
 ShinyHuntFixedPoint::ShinyHuntFixedPoint(const ShinyHuntFixedPoint_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
+    , NAVIGATION_TIMEOUT(
+        "<b>Navigation Timeout:</b><br>Give up and reset if flag is not reached after this many seconds.",
+        180, 0
+    )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
@@ -55,6 +59,7 @@ ShinyHuntFixedPoint::ShinyHuntFixedPoint(const ShinyHuntFixedPoint_Descriptor& d
     })
 {
     PA_ADD_OPTION(WARP_SPOT);
+    PA_ADD_OPTION(NAVIGATION_TIMEOUT);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -91,7 +96,11 @@ void ShinyHuntFixedPoint::run_iteration(SingleSwitchProgramEnvironment& env){
     goto_camp_from_jubilife(env, env.console, WARP_SPOT);
 
     {
-        FlagNavigationAir session(env, env.console, SHINY_DETECTED.stop_on_shiny());
+        FlagNavigationAir session(
+            env, env.console,
+            SHINY_DETECTED.stop_on_shiny(),
+            std::chrono::seconds(NAVIGATION_TIMEOUT)
+        );
         session.run_session();
 
         if (session.detected_shiny()){

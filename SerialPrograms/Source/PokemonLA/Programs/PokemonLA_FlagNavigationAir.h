@@ -23,7 +23,8 @@ class FlagNavigationAir : public SuperControlSession{
 public:
     FlagNavigationAir(
         ProgramEnvironment& env, ConsoleHandle& console,
-        bool stop_on_shiny
+        bool stop_on_shiny,
+        std::chrono::seconds navigate_timeout
     );
 
     bool detected_shiny() const{
@@ -73,6 +74,7 @@ private:
     }
 
     bool m_stop_on_shiny;
+    std::chrono::seconds m_navigate_timeout;
 
     FlagTracker m_flag;
     MountTracker m_mount;
