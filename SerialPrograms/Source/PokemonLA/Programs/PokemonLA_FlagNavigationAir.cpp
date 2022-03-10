@@ -179,7 +179,15 @@ FlagNavigationAir::FlagNavigationAir(
 //                cout << "State::DASH_LEFT: m_looking_straight_ahead = true" << endl;
             }
             pbf_press_button(context, BUTTON_B, 50, 0);
-            pbf_controller_state(context, BUTTON_B, DPAD_NONE, 96, 128, 128, 128, 255);
+            uint8_t shift = 32;
+            double distance, flag_x, flag_y;
+            if (m_flag.get(distance, flag_x, flag_y)){
+                double s = (0.5 - flag_x) * 320;
+                s = std::max(s, 0.);
+                s = std::min(s, 32.);
+                shift = (uint8_t)s;
+            }
+            pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128 - shift, 128, 128, 128, 255);
         });
         return false;
     });
@@ -194,14 +202,22 @@ FlagNavigationAir::FlagNavigationAir(
 //                cout << "State::DASH_RIGHT: m_looking_straight_ahead = true" << endl;
             }
             pbf_press_button(context, BUTTON_B, 50, 0);
-            pbf_controller_state(context, BUTTON_B, DPAD_NONE, 160, 128, 128, 128, 255);
+            uint8_t shift = 32;
+            double distance, flag_x, flag_y;
+            if (m_flag.get(distance, flag_x, flag_y)){
+                double s = (flag_x - 0.5) * 320;
+                s = std::max(s, 0.);
+                s = std::min(s, 32.);
+                shift = (uint8_t)s;
+            }
+            pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128 + shift, 128, 128, 128, 255);
         });
         return false;
     });
     register_state_command(State::TURN_LEFT, [=](){
         m_console.log("Turning Left...");
         m_active_command->dispatch([=](const BotBaseContext& context){
-            pbf_wait(context, 125);
+            pbf_wait(context, 150);
             context.wait_for_all_requests();
             double distance, flag_x, flag_y;
             if (m_flag.get(distance, flag_x, flag_y)){
@@ -214,7 +230,7 @@ FlagNavigationAir::FlagNavigationAir(
     register_state_command(State::TURN_RIGHT, [=](){
         m_console.log("Turning Right...");
         m_active_command->dispatch([=](const BotBaseContext& context){
-            pbf_wait(context, 125);
+            pbf_wait(context, 150);
             context.wait_for_all_requests();
             double distance, flag_x, flag_y;
             if (m_flag.get(distance, flag_x, flag_y)){
@@ -356,20 +372,20 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
     }
 
     //  Re-center the flag.
-    if (m_flag_x <= 0.4){
+    if (m_flag_x <= 0.30){
         return run_state_action(State::TURN_LEFT);
     }
-    if (m_flag_x >= 0.6){
+    if (m_flag_x >= 0.70){
         return run_state_action(State::TURN_RIGHT);
     }
 
     //  Continue dive
-    if (state == State::DIVE && m_flag_y > 0.20){
+    if (state == State::DIVE && m_flag_y > 0.15){
         return false;
     }
 
     //  Centered
-    if (0.45 <= m_flag_x && m_flag_x <= 0.55){
+    if (0.48 <= m_flag_x && m_flag_x <= 0.52){
         //  Cruise
         if (state != State::DIVE && m_flag_y <= 0.25){
             return run_state_action(State::DASH_FORWARD_MASH_B);
@@ -380,10 +396,10 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
     }
 
     //  Turning Cruise
-    if (0.40 <= m_flag_x && m_flag_x <= 0.45 && m_flag_y <= 0.6){
+    if (m_flag_x <= 0.48 && m_flag_y <= 0.6){
         return run_state_action(State::DASH_LEFT);
     }
-    if (0.55 <= m_flag_x && m_flag_x <= 0.60 && m_flag_y <= 0.6){
+    if (0.52 <= m_flag_x && m_flag_y <= 0.6){
         return run_state_action(State::DASH_RIGHT);
     }
 
