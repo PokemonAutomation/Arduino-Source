@@ -10,7 +10,10 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Options/BatchOption/GroupOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -38,7 +41,9 @@ public:
 private:
     bool run_iteration(SingleSwitchProgramEnvironment& env);
 
-    void use_move(const BotBaseContext &context, int cur_move, bool intended_pokemon_fainted);
+    void use_move(const BotBaseContext &context, int cur_move, bool intended_pokemon_left);
+
+    void switch_pokemon(SingleSwitchProgramEnvironment& env, int& next_non_fainted_pokemon);
 
 private:
     class Stats;
@@ -49,6 +54,9 @@ private:
     MoveStyleOption MOVE2_STYLE_OPTION;
     MoveStyleOption MOVE3_STYLE_OPTION;
     MoveStyleOption MOVE4_STYLE_OPTION;
+
+    BooleanCheckBoxOption SWITCH_FIRST_POKEMON;
+    SimpleIntegerOption<uint8_t> NUM_TURNS_TO_SWITCH;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
