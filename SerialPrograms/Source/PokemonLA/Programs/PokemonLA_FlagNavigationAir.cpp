@@ -4,6 +4,7 @@
  *
  */
 
+#include <sstream>
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
@@ -311,8 +312,8 @@ bool FlagNavigationAir::run_state(
 
     //  Check if we've reached the target.
     State state = (State)this->last_state();
-    if (m_flag_distance <= m_stop_radius &&
-        m_flag_y > 0.9 && state != State::FIND_FLAG &&
+    if (m_flag_distance >= 0 && m_flag_distance <= m_stop_radius &&
+        m_flag_y > 0.8 && state != State::FIND_FLAG &&
         m_last_flag_detection + std::chrono::seconds(2) > timestamp &&
 //        last_state_change() + std::chrono::seconds(2) < timestamp &&
         true
@@ -394,6 +395,10 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
         }
     }
 #endif
+
+//    if (m_last_flag_detection + std::chrono::seconds(20) < timestamp){
+//        throw OperationFailedException(m_console, "Flag not detected after 20 seconds.");
+//    }
 
     //  Find the flag.
     if (!m_flag_detected){
