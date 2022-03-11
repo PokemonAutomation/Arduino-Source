@@ -65,7 +65,6 @@ void PanelList::finish_panel_setup(){
 }
 
 void PanelList::handle_panel_clicked(const QString text){
-    std::cout << "handle_panel_clicked " << text.toStdString() << std::endl;
     auto iter = m_panel_map.find(text);
     if (iter == m_panel_map.end()){
         PERSISTENT_SETTINGS().panels.insert(JSON_PROGRAM_PANEL, "");
