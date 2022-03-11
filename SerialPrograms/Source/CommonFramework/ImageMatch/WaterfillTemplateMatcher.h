@@ -23,7 +23,11 @@ protected:
     using WaterfillObject = Kernels::Waterfill::WaterfillObject;
 
 public:
+    WaterfillTemplateMatcher(WaterfillTemplateMatcher&&) = default;
     virtual ~WaterfillTemplateMatcher() = default;
+
+
+public:
     // Load a template image from disk, min_color and max_color denote the
     // color range of the object displayed in the image file while min_area
     // is the minimum number of pixels required for an object.

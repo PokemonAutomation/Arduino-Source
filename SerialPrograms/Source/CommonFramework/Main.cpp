@@ -24,7 +24,6 @@ Q_DECLARE_METATYPE(std::string)
 
 
 
-
 int main(int argc, char *argv[]){
     setup_crash_handler();
 

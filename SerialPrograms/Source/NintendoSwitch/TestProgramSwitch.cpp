@@ -165,6 +165,7 @@
 #include "PokemonLA/Programs/PokemonLA_EscapeFromAttack.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
+#include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "TestProgramSwitch.h"
 
 #include <immintrin.h>
@@ -236,6 +237,8 @@ using namespace PokemonLA;
 
 
 
+
+
 void TestProgram::program(MultiSwitchProgramEnvironment& env){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -252,7 +255,74 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
-    goto_camp_from_jubilife(env, console, WarpSpot::ICELANDS_ICEPEAK_ARENA);
+
+#if 0
+    for (size_t c = 0; c < 10; c++){
+        QImage image("Digit-" + QString::number(c) + "-Original.png");
+
+        image = image.convertToFormat(QImage::Format::Format_ARGB32);
+        uint32_t* ptr = (uint32_t*)image.bits();
+        size_t words = image.bytesPerLine() / sizeof(uint32_t);
+        for (int r = 0; r < image.height(); r++){
+            for (int c = 0; c < image.width(); c++){
+                uint32_t& pixel = ptr[r * words + c];
+                uint32_t red = qRed(pixel);
+                uint32_t green = qGreen(pixel);
+                uint32_t blue = qBlue(pixel);
+                if (red < 0xa0 || green < 0xa0 || blue < 0xa0){
+                    pixel = 0x00000000;
+                }
+            }
+        }
+        image.save("Digit-" + QString::number(c) + "-Template.png");
+    }
+#endif
+
+
+
+
+
+//    QImage image("Distance-test.png");
+
+    QImage frame = feed.snapshot();
+
+    FlagTracker tracker(console, console);
+    tracker.process_frame(frame, std::chrono::system_clock::now());
+
+    double distance, flag_x, flag_y;
+    tracker.get(distance, flag_x, flag_y);
+
+
+#if 0
+    ImageFloatBox box(flag_x - 0.017, flag_y - 0.055, 0.032, 0.025);
+    QImage image = extract_box(frame, box);
+
+
+
+    int c = 0;
+
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xff808080, 0xffffffff);
+//    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xffd0d0d0, 0xffffffff);
+    WaterFillIterator finder(matrix, 30);
+    WaterfillObject object;
+    while (finder.find_next(object)){
+        //  Skip anything that touches the edge.
+        if (object.min_x == 0 || object.min_y == 0 ||
+            object.max_x + 1 == matrix.width() || object.max_y + 1 == matrix.height()
+        ){
+            continue;
+        }
+//        extract_box(image, object).save("image-" + QString::number(c++) + ".png");
+        read_digit(image, object);
+    }
+#endif
+
+
+
+
+
+
+//    goto_camp_from_jubilife(env, console, WarpSpot::ICELANDS_ICEPEAK_ARENA);
 
 #if 0
     QImage image("screenshot-20220309-005426729947.png");
@@ -816,7 +886,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
             uint32_t red = qRed(pixel);
             uint32_t green = qGreen(pixel);
             uint32_t blue = qBlue(pixel);
-            if (red == 255 && green == 255 && blue == 255){
+            if (red < 0xa0 || green < 0xa0 || blue < 0xa0){
                 pixel = 0x00000000;
             }
         }

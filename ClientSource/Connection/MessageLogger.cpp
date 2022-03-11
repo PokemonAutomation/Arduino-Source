@@ -32,7 +32,9 @@ void MessageLogger::on_send(const BotBaseMessage& message, bool is_retransmit){
             print = false;
         }
         if (message.type == PABB_MSG_CONTROLLER_STATE){
-            print = false;
+            pabb_controller_state body;
+            memcpy(&body, message.body.c_str(), sizeof(pabb_controller_state));
+            print = body.ticks >= 5;
         }
 
         if (m_log_everything.load(std::memory_order_relaxed)){

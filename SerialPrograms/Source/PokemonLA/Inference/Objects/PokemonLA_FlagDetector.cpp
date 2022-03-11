@@ -4,9 +4,11 @@
  *
  */
 
+#include <map>
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
+#include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "PokemonLA_FlagDetector.h"
 
@@ -92,6 +94,8 @@ FlagDetector::FlagDetector()
             Color(0xff909090),
             Color(0xffa0a0a0),
             Color(0xffb0b0b0),
+            Color(0xffc0c0c0),
+            Color(0xffd0d0d0),
         }
     )
 {}
@@ -165,6 +169,142 @@ void FlagDetector::finish(){
     merge_heavily_overlapping();
 }
 
+
+
+
+
+
+
+class DigitMatcher : public ImageMatch::WaterfillTemplateMatcher{
+public:
+    DigitMatcher(const char* path)
+        : WaterfillTemplateMatcher(path, Color(0xffa0a0a0), Color(0xffffffff), 30)
+    {}
+};
+
+std::vector<std::pair<int, DigitMatcher>> make_digit_matchers(){
+    std::vector<std::pair<int, DigitMatcher>> matchers;
+    matchers.emplace_back(0, "PokemonLA/Digits/Digit-0-Template.png");
+    matchers.emplace_back(1, "PokemonLA/Digits/Digit-1-Template.png");
+    matchers.emplace_back(2, "PokemonLA/Digits/Digit-2-Template.png");
+    matchers.emplace_back(3, "PokemonLA/Digits/Digit-3-Template.png");
+    matchers.emplace_back(4, "PokemonLA/Digits/Digit-4-Template.png");
+    matchers.emplace_back(5, "PokemonLA/Digits/Digit-5-Template.png");
+    matchers.emplace_back(6, "PokemonLA/Digits/Digit-6-Template.png");
+    matchers.emplace_back(7, "PokemonLA/Digits/Digit-7-Template.png");
+    matchers.emplace_back(8, "PokemonLA/Digits/Digit-8-Template.png");
+    matchers.emplace_back(9, "PokemonLA/Digits/Digit-9-Template.png");
+    return matchers;
+}
+
+
+std::pair<double, int> read_digit(const QImage& image, const WaterfillObject& object){
+    static const std::vector<std::pair<int, DigitMatcher>> MATCHERS = make_digit_matchers();
+    double best_rmsd = 99999;
+    int best_digit = -1;
+    for (const auto& item : MATCHERS){
+//        cout << item.first << " : " <<  << endl;
+        double rmsd = item.second.rmsd(image, object);
+        if (best_rmsd > rmsd){
+            best_rmsd = rmsd;
+            best_digit = item.first;
+        }
+    }
+    if (best_rmsd > 80){
+        best_digit = -1;
+    }
+    return {best_rmsd, best_digit};
+}
+
+
+
+int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
+    ImageFloatBox box(flag_x - 0.017, flag_y - 0.055, 0.032, 0.025);
+    QImage image = extract_box(screen, box);
+//    image.save("test.png");
+
+    PackedBinaryMatrix matrix[6];
+    compress4_rgb32_to_binary_range(
+        image,
+        matrix[0], 0xff808080, 0xffffffff,
+        matrix[1], 0xff909090, 0xffffffff,
+        matrix[2], 0xffa0a0a0, 0xffffffff,
+        matrix[3], 0xffb0b0b0, 0xffffffff
+    );
+    compress2_rgb32_to_binary_range(
+        image,
+        matrix[4], 0xffc0c0c0, 0xffffffff,
+        matrix[5], 0xffd0d0d0, 0xffffffff
+    );
+
+    size_t width = matrix[0].width();
+    size_t height = matrix[0].height();
+
+    struct Hit{
+        size_t min_x;
+        size_t max_x;
+        double rmsd;
+        int digit;
+    };
+
+    std::multimap<size_t, Hit> hits;
+
+    for (size_t c = 0; c < 6; c++){
+        WaterFillIterator finder(matrix[c], 30);
+        WaterfillObject object;
+        while (finder.find_next(object)){
+            //  Skip anything that touches the edge.
+            if (object.min_x == 0 || object.min_y == 0 ||
+                object.max_x + 1 == width || object.max_y + 1 == height
+            ){
+                continue;
+            }
+    //        extract_box(image, object).save("image-" + QString::number(c++) + ".png");
+            std::pair<double, int> digit = read_digit(image, object);
+            if (digit.second >= 0){
+                hits.emplace(
+                    object.min_x,
+                    Hit{object.min_x, object.max_x, digit.first, digit.second}
+                );
+            }
+        }
+    }
+
+    if (hits.empty()){
+        return -1;
+    }
+
+//    for (const auto& item : hits){
+//        cout << item.first << " : " << item.second.second << " - " << item.second.first << endl;
+//    }
+
+    int ret = 0;
+
+    //  De-dupe
+    auto best = hits.begin();
+    auto iter = best;
+    ++iter;
+
+    for (; iter != hits.end(); ++iter){
+        //  Next digit
+        if (best->second.max_x < iter->second.min_x){
+            ret *= 10;
+            ret += best->second.digit;
+            best = iter;
+        }
+
+        //  Overlapping. Pick better score.
+        if (best->second.rmsd > iter->second.rmsd){
+            best = iter;
+        }
+    }
+    ret *= 10;
+    ret += best->second.digit;
+
+//    cout << ret << endl;
+
+    return ret;
+}
 
 
 

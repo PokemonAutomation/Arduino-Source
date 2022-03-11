@@ -44,6 +44,10 @@ ShinyHuntFixedPoint_Descriptor::ShinyHuntFixedPoint_Descriptor()
 
 ShinyHuntFixedPoint::ShinyHuntFixedPoint(const ShinyHuntFixedPoint_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
+    , STOP_DISTANCE(
+        "<b>Stop Distance:</b><br>Don't reset until you come within this distance of the flag.",
+        30, 10, 999
+    )
     , NAVIGATION_TIMEOUT(
         "<b>Navigation Timeout:</b><br>Give up and reset if flag is not reached after this many seconds.",
         180, 0
@@ -59,6 +63,7 @@ ShinyHuntFixedPoint::ShinyHuntFixedPoint(const ShinyHuntFixedPoint_Descriptor& d
     })
 {
     PA_ADD_OPTION(WARP_SPOT);
+    PA_ADD_OPTION(STOP_DISTANCE);
     PA_ADD_OPTION(NAVIGATION_TIMEOUT);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -99,6 +104,7 @@ void ShinyHuntFixedPoint::run_iteration(SingleSwitchProgramEnvironment& env){
         FlagNavigationAir session(
             env, env.console,
             SHINY_DETECTED.stop_on_shiny(),
+            STOP_DISTANCE,
             std::chrono::seconds(NAVIGATION_TIMEOUT)
         );
         session.run_session();

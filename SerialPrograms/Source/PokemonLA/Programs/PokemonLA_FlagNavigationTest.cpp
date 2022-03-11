@@ -27,6 +27,10 @@ FlagNavigationTest_Descriptor::FlagNavigationTest_Descriptor()
 
 FlagNavigationTest::FlagNavigationTest(const FlagNavigationTest_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
+    , STOP_DISTANCE(
+        "<b>Stop Distance:</b><br>Don't reset until you come within this distance of the flag.",
+        30, 10, 999
+    )
     , NAVIGATION_TIMEOUT(
         "<b>Navigation Timeout:</b><br>Give up if flag is not reached after this many seconds.",
         180, 0
@@ -42,6 +46,7 @@ void FlagNavigationTest::program(SingleSwitchProgramEnvironment& env){
     FlagNavigationAir session(
         env, env.console,
         SHINY_DETECTED.stop_on_shiny(),
+        STOP_DISTANCE,
         std::chrono::seconds(NAVIGATION_TIMEOUT)
     );
     session.run_session();

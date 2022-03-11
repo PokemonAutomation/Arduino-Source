@@ -40,9 +40,9 @@ GameSettings::GameSettings()
         "<b>1. Start Game Mash:</b><br>Mash A for this long to start the game.",
         "2 * TICKS_PER_SECOND"
     )
-    , START_GAME_WAIT(
+    , START_GAME_WAIT0(
         "<b>2. Start Game Wait:</b><br>Wait this long for the game to load.",
-        "25 * TICKS_PER_SECOND"
+        "40 * TICKS_PER_SECOND"
     )
     , ENTER_GAME_MASH(
         "<b>3. Enter Game Mash:</b><br>Mash A for this long to enter the game.",
@@ -69,7 +69,7 @@ GameSettings::GameSettings()
 
     PA_ADD_OPTION(m_start_game_timings);
     PA_ADD_OPTION(START_GAME_MASH);
-    PA_ADD_OPTION(START_GAME_WAIT);
+    PA_ADD_OPTION(START_GAME_WAIT0);
     PA_ADD_OPTION(ENTER_GAME_MASH);
     PA_ADD_OPTION(ENTER_GAME_WAIT);
     PA_ADD_OPTION(SHINY_SHOUND_THRESHOLD0);

@@ -34,7 +34,7 @@ public:
 private:
     struct Sample{
         std::chrono::system_clock::time_point timestamp;
-        double distance;
+        int distance;
         double x;
         double y;
     };

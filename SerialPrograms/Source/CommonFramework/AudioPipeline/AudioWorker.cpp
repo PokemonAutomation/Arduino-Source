@@ -160,16 +160,18 @@ void AudioWorker::startAudio(){
                 << bytesPerSample << ", different from float size " << sizeof(float) << std::endl;
             return;
         }
-        
 
         m_audioSource = new AudioSource(chosenAudioInputDevice, inputAudioFormat, this);
 
-        connect(m_audioSource, &AudioSource::stateChanged, this, [&](QAudio::State newState){
-            this->handleDeviceErrorState(newState, m_audioSource->error(), "AudioSource");
-        });
+        connect(
+            m_audioSource, &AudioSource::stateChanged,
+            this, [&](QAudio::State newState){
+                this->handleDeviceErrorState(newState, m_audioSource->error(), "AudioSource");
+            }
+        );
     } // end if load audio from input audio device
     
-    m_audioIODevice = new AudioIODevice(inputAudioFormat, m_inputFormat);
+    m_audioIODevice = new AudioIODevice(m_inputFormat);
     m_audioIODevice->open(QIODevice::ReadWrite | QIODevice::Unbuffered);
     connect(m_audioIODevice, &AudioIODevice::fftInputReady, this, &AudioWorker::fftInputReady);
     
@@ -187,9 +189,12 @@ void AudioWorker::startAudio(){
             m_audioSink->setVolume(m_volume);
             m_audioIODevice->setAudioSinkDevice(m_audioSink->start());
 
-            connect(m_audioSink, &AudioSink::stateChanged, this, [&](QAudio::State newState){
-                this->handleDeviceErrorState(newState, m_audioSink->error(), "AudioSink");
-            });
+            connect(
+                m_audioSink, &AudioSink::stateChanged,
+                this, [&](QAudio::State newState){
+                    this->handleDeviceErrorState(newState, m_audioSink->error(), "AudioSink");
+                }
+            );
         }
     }
 }
@@ -204,7 +209,6 @@ AudioWorker::~AudioWorker(){
     if (m_audioSink){
         m_audioSink->stop();
         delete m_audioSink;
-
         m_audioSink = nullptr;
     }
 

@@ -18,10 +18,12 @@ namespace PokemonLA{
 FlagNavigationAir::FlagNavigationAir(
     ProgramEnvironment& env, ConsoleHandle& console,
     bool stop_on_shiny,
+    uint16_t stop_radius,
     std::chrono::seconds navigate_timeout
 )
     : SuperControlSession(env, console)
     , m_stop_on_shiny(stop_on_shiny)
+    , m_stop_radius(stop_radius)
     , m_navigate_timeout(navigate_timeout)
     , m_flag(console, console)
     , m_mount(console)
@@ -31,6 +33,7 @@ FlagNavigationAir::FlagNavigationAir(
     , m_shiny_listener(console, false)
     , m_looking_straight_ahead(false)
 //    , m_last_good_state(WallClock::min())
+    , m_last_known_mount(MountState::NOTHING)
     , m_find_flag_failed(false)
     , m_last_flag_detection(WallClock::min())
     , m_flag_x(0.5)
@@ -44,16 +47,22 @@ FlagNavigationAir::FlagNavigationAir(
     *this += m_shiny_listener;
     register_state_command(State::UNKNOWN, [=](){
         m_console.log("Unknown state. Moving camera around...");
+        uint8_t turn = m_flag_x <= 0.5 ? 0 : 255;
         m_active_command->dispatch([=](const BotBaseContext& context){
-            pbf_move_right_joystick(context, 128, 255, 200, 0);
-            pbf_move_right_joystick(context, 128, 0, 200, 0);
-            pbf_move_right_joystick(context, 128, 255, 80, 0);
-            pbf_move_right_joystick(context, 0, 128, 400, 0);
-            pbf_move_right_joystick(context, 128, 255, 120, 0);
-            pbf_move_right_joystick(context, 0, 128, 400, 0);
-            pbf_move_right_joystick(context, 128, 0, 200, 0);
-            pbf_move_right_joystick(context, 0, 128, 400, 0);
+            for (size_t c = 0; c < 1; c++){
+                pbf_move_right_joystick(context, 128, 255, 200, 0);
+                pbf_move_right_joystick(context, 128, 0, 200, 0);
+                pbf_move_right_joystick(context, 128, 255, 80, 0);
+                pbf_move_right_joystick(context, turn, 128, 400, 0);
+                pbf_move_right_joystick(context, 128, 255, 120, 0);
+                pbf_move_right_joystick(context, turn, 128, 400, 0);
+                pbf_move_right_joystick(context, 128, 0, 200, 0);
+                pbf_move_right_joystick(context, turn, 128, 400, 0);
+            }
+            context.wait_for_all_requests();
+            m_find_flag_failed.store(true, std::memory_order_release);
         });
+        m_looking_straight_ahead.store(false, std::memory_order_release);
         return false;
     });
     register_state_command(State::WYRDEER_BASCULEGION_OFF, [=](){
@@ -107,6 +116,7 @@ FlagNavigationAir::FlagNavigationAir(
     });
     register_state_command(State::BRAVIARY_OFF, [=](){
         m_console.log("Switching from Braviary (off) to Braviary (on)...");
+        m_looking_straight_ahead.store(false, std::memory_order_release);
         m_active_command->dispatch([=](const BotBaseContext& context){
             pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
         });
@@ -273,33 +283,57 @@ bool FlagNavigationAir::run_state(
     }
 
     if (last_state_change() + std::chrono::seconds(60) < timestamp){
-//        dump_image(m_console, m_env.program_info(), "NoStateChange", m_console.video().snapshot());
         throw OperationFailedException(m_console, "No state change detected after 60 seconds.");
     }
     if (start_time() + m_navigate_timeout < timestamp){
-//        dump_image(m_console, m_env.program_info(), "CantFindTarget", m_console.video().snapshot());
         throw OperationFailedException(m_console, "Unable to reach flag after timeout period.");
     }
     if (m_dialog_detector.detected()){
-//        dump_image(m_console, m_env.program_info(), "MissFortuneAmbush", m_console.video().snapshot());
         throw OperationFailedException(m_console, "Potential ambush by Miss Fortune sister.");
     }
-
     if (m_find_flag_failed.load(std::memory_order_acquire)){
-        m_console.log("Unable to find flag. Exiting routine...");
-        return true;
+        throw OperationFailedException(m_console, "Unable to find flag.");
     }
 
+    //  Read flag.
     m_flag_detected = m_flag.get(m_flag_distance, m_flag_x, m_flag_y);
-//    cout << "flag_ok = " << flag_ok << ", x = " << m_flag_x << ", y = " << flag_y << endl;
+#if 1
+    if (m_flag_detected){
+        std::stringstream ss;
+        ss << "distance = " << (m_flag_distance < 0 ? "?" : std::to_string(m_flag_distance))
+             << ", x = " << m_flag_x << ", y = " << m_flag_y << endl;
+        m_console.log(ss.str());
+    }
+#endif
     if (m_flag_detected){
         m_last_flag_detection = timestamp;
     }
 
+    //  Check if we've reached the target.
+    State state = (State)this->last_state();
+    if (m_flag_distance <= m_stop_radius &&
+        m_flag_y > 0.9 && state != State::FIND_FLAG &&
+        m_last_flag_detection + std::chrono::seconds(2) > timestamp &&
+//        last_state_change() + std::chrono::seconds(2) < timestamp &&
+        true
+    ){
+        m_console.log("Target reached.");
+        return true;
+    }
+
+
     MountState mount = m_mount.state();
+    if (mount != MountState::NOTHING){
+        m_last_known_mount = mount;
+    }else{
+        m_console.log(
+            std::string("Unable to detect mount. Assuming last known mount: ") +
+            MOUNT_STATE_STRINGS[(size_t)m_last_known_mount]
+        );
+        mount = m_last_known_mount;
+    }
     if (mount == MountState::NOTHING){
-        m_console.log("Unable to detect mount. Assuming Braviary (on)...");
-        mount = MountState::BRAVIARY_ON;
+        return run_state_action(State::UNKNOWN);
     }
 #if 0
     if (mount == MountState::NOTHING){
@@ -347,6 +381,7 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
 //    cout << "m_last_known_flag_y = " << m_last_known_flag_y << endl;
 
     State state = (State)this->last_state();
+#if 0
     if (m_flag_y > 0.9 && last_state_change() + std::chrono::seconds(2) < timestamp){
 //        cout << "state = " << (size_t)state << endl;
         switch (state){
@@ -358,6 +393,7 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
         default:;
         }
     }
+#endif
 
     //  Find the flag.
     if (!m_flag_detected){

@@ -24,6 +24,7 @@ public:
     FlagNavigationAir(
         ProgramEnvironment& env, ConsoleHandle& console,
         bool stop_on_shiny,
+        uint16_t stop_radius,
         std::chrono::seconds navigate_timeout
     );
 
@@ -74,6 +75,7 @@ private:
     }
 
     bool m_stop_on_shiny;
+    uint16_t m_stop_radius;
     std::chrono::seconds m_navigate_timeout;
 
     FlagTracker m_flag;
@@ -85,6 +87,7 @@ private:
 
     std::atomic<bool> m_looking_straight_ahead;
 //    WallClock m_last_good_state;
+    MountState m_last_known_mount;
 
     std::atomic<bool> m_find_flag_failed;
 

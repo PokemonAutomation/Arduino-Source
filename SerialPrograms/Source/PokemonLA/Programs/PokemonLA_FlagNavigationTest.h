@@ -30,6 +30,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
+    SimpleIntegerOption<uint64_t> STOP_DISTANCE;
     SimpleIntegerOption<uint64_t> NAVIGATION_TIMEOUT;
     ShinyDetectedActionOption SHINY_DETECTED;
 };

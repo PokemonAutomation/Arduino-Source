@@ -51,6 +51,7 @@ private:
 
     WarpLocationOption WARP_SPOT;
 
+    SimpleIntegerOption<uint64_t> STOP_DISTANCE;
     SimpleIntegerOption<uint64_t> NAVIGATION_TIMEOUT;
 
     ShinyDetectedActionOption SHINY_DETECTED;

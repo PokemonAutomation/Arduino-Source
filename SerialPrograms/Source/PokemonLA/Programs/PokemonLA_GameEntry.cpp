@@ -88,7 +88,7 @@ bool reset_game_from_home(
     }
     bool ret = openedgame_to_ingame(
         env, console,
-        GameSettings::instance().START_GAME_WAIT,
+        GameSettings::instance().START_GAME_WAIT0,
         GameSettings::instance().ENTER_GAME_MASH,
         GameSettings::instance().ENTER_GAME_WAIT,
         post_wait_time
