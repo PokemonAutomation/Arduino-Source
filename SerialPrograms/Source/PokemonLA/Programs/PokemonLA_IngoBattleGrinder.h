@@ -56,6 +56,9 @@ public:
 private:
     bool run_iteration(SingleSwitchProgramEnvironment& env);
 
+    //  Returns true if version 1.0.
+    bool start_dialog(SingleSwitchProgramEnvironment& env);
+
     // cur_pokemon: which pokemon is currently on the field, in terms of battle order
     // The first pokemon sent to the battle has cur_pokemon == 0
     // cur_move: which move to use, can be: 0, 1, 2, 3

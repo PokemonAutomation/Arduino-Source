@@ -255,6 +255,14 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
+    QImage image("screenshot-20220312-205511196842.png");
+
+    InferenceBoxScope box0(overlay, 0.50, 0.450, 0.40, 0.042);
+    InferenceBoxScope box1(overlay, 0.50, 0.492, 0.40, 0.042);
+
+    extract_box(image, box0).save("test-0.png");
+    extract_box(image, box1).save("test-1.png");
+
 
 #if 0
     for (size_t c = 0; c < 10; c++){
@@ -282,6 +290,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 
+#if 0
 //    QImage image("Distance-test.png");
 
     QImage frame = feed.snapshot();
@@ -293,6 +302,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     tracker.get(distance, flag_x, flag_y);
 
 //    cout << distance << endl;
+#endif
+
 
 
 #if 0

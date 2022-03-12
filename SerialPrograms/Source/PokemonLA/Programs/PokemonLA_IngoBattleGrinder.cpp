@@ -140,6 +140,28 @@ std::unique_ptr<StatsTracker> IngoBattleGrinder::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
+bool IngoBattleGrinder::start_dialog(SingleSwitchProgramEnvironment& env){
+    ButtonDetector button0(env.console, env.console, ButtonType::ButtonA, {0.50, 0.450, 0.40, 0.042}, std::chrono::milliseconds(100), true);
+    ButtonDetector button1(env.console, env.console, ButtonType::ButtonA, {0.50, 0.492, 0.40, 0.042}, std::chrono::milliseconds(100), true);
+    int ret = run_until(
+        env, env.console,
+        [&](const BotBaseContext& context){
+            for (size_t c = 0; c < 10; c++){
+                pbf_press_button(context, BUTTON_A, 20, 150);
+            }
+        },
+        { &button0, &button1 }
+    );
+    switch (ret){
+    case 0:
+        return true;
+    case 1:
+        return false;
+    default:
+        throw OperationFailedException(env.console, "Unable to detect options after 10 A presses.");
+    }
+}
+
 void IngoBattleGrinder::use_move(const BotBaseContext &context, int cur_pokemon, int cur_move){
     const PokemonBattleDecisionOption* pokemon = get_pokemon(cur_pokemon);
 
@@ -218,10 +240,8 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
     env.console.log("Starting battle...");
 
     // Talk to Ingo to start conversation and select regular battles:
-    pbf_press_button(env.console, BUTTON_A, 20, 100);
-    pbf_press_button(env.console, BUTTON_A, 20, 100);
-    pbf_press_button(env.console, BUTTON_A, 20, 150);
-    pbf_press_button(env.console, BUTTON_A, 20, 120);
+    bool version_10 = start_dialog(env);
+
     // Choose which opponent
     if (OPPONENT < 5){
         for(size_t i = 0; i < OPPONENT; i++){
