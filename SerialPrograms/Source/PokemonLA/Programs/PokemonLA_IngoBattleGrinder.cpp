@@ -295,7 +295,9 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
     env.console.log("Starting battle...");
 
     // Talk to Ingo to start conversation and select regular battles:
+    // The dialogues are different between version 10 (the vanilla version) and later versions.
     bool version_10 = start_dialog(env);
+
     IngoOpponentMenuLocation menu_location = version_10
         ? INGO_OPPONENT_MENU_LOCATIONS_V10[OPPONENT]
         : INGO_OPPONENT_MENU_LOCATIONS_V10[OPPONENT];
@@ -337,7 +339,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
         // dialogue ellipse appears on a semi-transparent dialog box if you win the fight.
         DialogueEllipseDetector dialogue_ellipse_detector(env.console, env.console, std::chrono::milliseconds(110), stop_on_detected);
         BattlePokemonSwitchDetector pokemon_switch_detector(env.console, env.console, stop_on_detected);
-        // normal dialogue appears if you los the fight.
+        // normal dialogue appears if you lose the fight.
         NormalDialogDetector normal_dialogue_detector(env.console, env.console, stop_on_detected);
         ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(110), stop_on_detected);
         int ret = wait_until(

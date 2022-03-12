@@ -22,6 +22,7 @@ namespace PokemonLA{
 enum class ButtonType{
     ButtonA,
     ButtonB,
+    ButtonPlus,
 };
 
 
@@ -32,6 +33,7 @@ public:
     ButtonMatcher(ButtonType type);
     static const ButtonMatcher& A();
     static const ButtonMatcher& B();
+    static const ButtonMatcher& Plus();
 };
 
 

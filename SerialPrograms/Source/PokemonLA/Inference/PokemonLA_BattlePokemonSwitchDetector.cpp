@@ -29,6 +29,7 @@ BattlePokemonSwitchDetector::BattlePokemonSwitchDetector(LoggerQt& logger, Video
     , m_white_bg_4(0.924, 0.185, 0.019, 0.076)
     , m_ready_to_battle_bg_1(0.54, 0.216, 0.016, 0.018)
     , m_ready_to_battle_bg_2(0.676, 0.216, 0.016, 0.018)
+    , m_button_plus_detector(logger, overlay, ButtonType::ButtonPlus, ImageFloatBox{0.044, 0.091, 0.043, 0.077}, std::chrono::milliseconds(0), false)
 {}
 
 void BattlePokemonSwitchDetector::make_overlays(VideoOverlaySet& items) const{
@@ -48,35 +49,35 @@ bool BattlePokemonSwitchDetector::process_frame(
 //    size_t highlighted = 0;
 
     const ImageStats white_1 = image_stats(extract_box(frame, m_white_bg_1));
-    if(is_white(white_1) == false){
+    if(is_white(white_1, 600, 10) == false){
         // std::cout << "no white_1" << std::endl;
         m_detected.store(false, std::memory_order_release);
         return false;
     }
 
     const ImageStats white_2 = image_stats(extract_box(frame, m_white_bg_2));
-    if(is_white(white_2) == false){
+    if(is_white(white_2, 600, 10) == false){
         // std::cout << "no white_2" << std::endl;
         m_detected.store(false, std::memory_order_release);
         return false;
     }
 
     const ImageStats white_3 = image_stats(extract_box(frame, m_white_bg_3));
-    if(is_white(white_3) == false){
+    if(is_white(white_3, 600, 10) == false){
         // std::cout << "no white_3" << std::endl;
         m_detected.store(false, std::memory_order_release);
         return false;
     }
 
     const ImageStats white_4 = image_stats(extract_box(frame, m_white_bg_4));
-    if(is_white(white_4) == false){
+    if(is_white(white_4, 600, 10) == false){
         // std::cout << "no white_4" << std::endl;
         m_detected.store(false, std::memory_order_release);
         return false;
     }
 
     const ImageStats battle_1 = image_stats(extract_box(frame, m_ready_to_battle_bg_1));
-    if ((battle_1.stddev.sum() <= 15 &&
+    if ((battle_1.average.sum() <= 300 && battle_1.stddev.sum() <= 10 &&
         battle_1.average.b > battle_1.average.r && battle_1.average.b > battle_1.average.g) == false
     ){
         // std::cout << "battle_1 not enough " << battle_1.average << " " << battle_1.stddev << std::endl;
@@ -86,8 +87,16 @@ bool BattlePokemonSwitchDetector::process_frame(
 
     const ImageStats battle_2 = image_stats(extract_box(frame, m_ready_to_battle_bg_2));
     // std::cout << "battle_2  " << battle_2.average << " " << battle_2.stddev << std::endl;
-    const bool detected = (battle_2.stddev.sum() <= 15 &&
-        battle_2.average.b > battle_2.average.r && battle_2.average.b > battle_2.average.g);
+    if ((battle_1.average.sum() <= 300 && battle_2.stddev.sum() <= 10 &&
+        battle_2.average.b > battle_2.average.r && battle_2.average.b > battle_2.average.g) == false
+    ){
+        m_detected.store(false, std::memory_order_release);
+        return false;
+    }
+    
+
+    m_button_plus_detector.process_frame(frame, timestamp);
+    bool detected = m_button_plus_detector.detected();
     m_detected.store(detected, std::memory_order_release);
 
     return detected && m_stop_on_detected;
