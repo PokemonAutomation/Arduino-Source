@@ -45,7 +45,7 @@ bool BattlePokemonSwitchDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
-    size_t highlighted = 0;
+//    size_t highlighted = 0;
 
     const ImageStats white_1 = image_stats(extract_box(frame, m_white_bg_1));
     if(is_white(white_1) == false){

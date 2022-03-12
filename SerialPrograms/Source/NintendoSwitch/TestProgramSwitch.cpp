@@ -255,13 +255,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
-    QImage image("screenshot-20220312-205511196842.png");
+    QImage image("screenshot-20220312-205532347068.png");
 
     InferenceBoxScope box0(overlay, 0.50, 0.450, 0.40, 0.042);
     InferenceBoxScope box1(overlay, 0.50, 0.492, 0.40, 0.042);
+    InferenceBoxScope box2(overlay, 0.50, 0.350, 0.40, 0.400);
 
     extract_box(image, box0).save("test-0.png");
     extract_box(image, box1).save("test-1.png");
+    extract_box(image, box2).save("test-2.png");
 
 
 #if 0

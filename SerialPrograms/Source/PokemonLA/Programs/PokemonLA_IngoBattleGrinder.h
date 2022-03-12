@@ -8,16 +8,43 @@
 #define PokemonAutomation_PokemonLA_IngoBattleGrinder_H
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/BatchOption/GroupOption.h"
+#include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
+
+
+enum class IngoOpponents{
+    Wenton,
+    Bren,
+    Zisu,
+    Akari_Rei,
+    Kamado,
+    Beni,
+    Ingo,
+    Ingo_Tougher,
+    Mai,
+    Sabi,
+    Ress,
+    Ingo_Alphas,
+    END_LIST,
+};
+extern const char* INGO_OPPONENT_STRINGS[];
+
+struct IngoOpponentMenuLocation{
+    int8_t page;
+    int8_t index;
+};
+extern const IngoOpponentMenuLocation INGO_OPPONENT_MENU_LOCATIONS_V10[];
+extern const IngoOpponentMenuLocation INGO_OPPONENT_MENU_LOCATIONS_V12[];
+
+
 
 
 // The program option for choosing which move style: no style, agile or strong.

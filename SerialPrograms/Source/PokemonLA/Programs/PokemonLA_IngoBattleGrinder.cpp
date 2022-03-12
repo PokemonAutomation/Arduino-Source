@@ -4,6 +4,8 @@
  *
  */
 
+#include <chrono>
+#include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -21,13 +23,56 @@
 #include "PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 
-#include <QImage>
-
-#include <chrono>
-
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
+
+
+
+const char* INGO_OPPONENT_STRINGS[] = {
+    "Wenton",
+    "Bren",
+    "Zisu",
+    "Akari/Rei",
+    "Kamado",
+    "Beni",
+    "Ingo",
+    "Ingo - but tougher",
+    "Mai",
+    "Sabi",
+    "Ress",
+    "Ingo - but using alphas",
+};
+const IngoOpponentMenuLocation INGO_OPPONENT_MENU_LOCATIONS_V10[] = {
+    {0, 0},     //  Wenton
+    {0, 1},     //  Bren
+    {0, 2},     //  Zisu
+    {0, 3},     //  Akari/Rei
+    {1, 0},     //  Kamado
+    {1, 1},     //  Beni
+    {1, 2},     //  Ingo
+    {-1, -1},   //  Ingo - but tougher
+    {-1, -1},   //  Mai
+    {-1, -1},   //  Sabi
+    {-1, -1},   //  Ress
+    {-1, -1},   //  Ingo - but using alphas
+};
+const IngoOpponentMenuLocation INGO_OPPONENT_MENU_LOCATIONS_V12[] = {
+    {0, 0},     //  Wenton
+    {0, 1},     //  Bren
+    {0, 2},     //  Zisu
+    {0, 3},     //  Akari/Rei
+    {0, 4},     //  Kamado
+    {1, 0},     //  Beni
+    {1, 1},     //  Ingo
+    {1, 2},     //  Ingo - but tougher
+    {1, 3},     //  Mai
+    {1, 4},     //  Sabi
+    {2, 0},     //  Ress
+    {2, 1},     //  Ingo - but using alphas
+};
+
+
 
 MoveStyleOption::MoveStyleOption(const char* label) : EnumDropdownOption(
     label,
@@ -72,23 +117,11 @@ IngoBattleGrinder_Descriptor::IngoBattleGrinder_Descriptor()
 
 IngoBattleGrinder::IngoBattleGrinder(const IngoBattleGrinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
-    , OPPONENT("<b>Opponent:</b>",
-    {
-        "Wenton",
-        "Bren",
-        "Zisu",
-        "Akari/Rei",
-        "Kamado",
-        // ---- new page
-        "Beni",
-        "Ingo",
-        "Ingo - but tougher",
-        "Mai",
-        "Sabi",
-        // ---- new page
-        "Ress",
-        "Ingo - but using alphas"
-    }, 0)
+    , OPPONENT(
+        "<b>Opponent:</b>",
+        std::vector<QString>(INGO_OPPONENT_STRINGS, INGO_OPPONENT_STRINGS + (size_t)IngoOpponents::END_LIST),
+        0
+    )
     , POKEMON_1("First " + STRING_POKEMON)
     , POKEMON_2("Second " + STRING_POKEMON)
     , POKEMON_3("Third " + STRING_POKEMON)
@@ -141,24 +174,43 @@ std::unique_ptr<StatsTracker> IngoBattleGrinder::make_stats() const{
 }
 
 bool IngoBattleGrinder::start_dialog(SingleSwitchProgramEnvironment& env){
-    ButtonDetector button0(env.console, env.console, ButtonType::ButtonA, {0.50, 0.450, 0.40, 0.042}, std::chrono::milliseconds(100), true);
-    ButtonDetector button1(env.console, env.console, ButtonType::ButtonA, {0.50, 0.492, 0.40, 0.042}, std::chrono::milliseconds(100), true);
+    {
+        ButtonDetector button0(env.console, env.console, ButtonType::ButtonA, {0.50, 0.450, 0.40, 0.042}, std::chrono::milliseconds(100), true);
+        ButtonDetector button1(env.console, env.console, ButtonType::ButtonA, {0.50, 0.492, 0.40, 0.042}, std::chrono::milliseconds(100), true);
+        int ret = run_until(
+            env, env.console,
+            [&](const BotBaseContext& context){
+                for (size_t c = 0; c < 10; c++){
+                    pbf_press_button(context, BUTTON_A, 20, 150);
+                }
+            },
+            { &button0, &button1 }
+        );
+        switch (ret){
+        case 0:
+            return true;
+        case 1:
+            break;
+        default:
+            throw OperationFailedException(env.console, "Unable to detect options after 10 A presses.");
+        }
+    }
+
+    ButtonDetector button2(env.console, env.console, ButtonType::ButtonA, {0.50, 0.350, 0.40, 0.400}, std::chrono::milliseconds(100), true);
     int ret = run_until(
         env, env.console,
         [&](const BotBaseContext& context){
-            for (size_t c = 0; c < 10; c++){
+            for (size_t c = 0; c < 5; c++){
                 pbf_press_button(context, BUTTON_A, 20, 150);
             }
         },
-        { &button0, &button1 }
+        { &button2 }
     );
     switch (ret){
     case 0:
-        return true;
-    case 1:
         return false;
     default:
-        throw OperationFailedException(env.console, "Unable to detect options after 10 A presses.");
+        throw OperationFailedException(env.console, "Unable to opponent list options after 5 A presses.");
     }
 }
 
@@ -241,35 +293,25 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
 
     // Talk to Ingo to start conversation and select regular battles:
     bool version_10 = start_dialog(env);
+    IngoOpponentMenuLocation menu_location = version_10
+        ? INGO_OPPONENT_MENU_LOCATIONS_V10[OPPONENT]
+        : INGO_OPPONENT_MENU_LOCATIONS_V10[OPPONENT];
 
     // Choose which opponent
-    if (OPPONENT < 5){
-        for(size_t i = 0; i < OPPONENT; i++){
-            pbf_press_dpad(env.console, DPAD_DOWN, 10, 60);
-        }
-    } else{
-        // Go to next page
-        for(size_t i = 0; i < 2; i++){
-            pbf_press_dpad(env.console, DPAD_UP, 10, 60);
-        }
+    if (menu_location.page < 0){
+        throw UserSetupError(env.console, "Opponent doesn't exist in this version of the game.");
+    }
+
+    //  Move to page.
+    for (int8_t c = 0; c < menu_location.page; c++){
+        pbf_press_dpad(env.console, DPAD_UP, 10, 60);
+        pbf_press_dpad(env.console, DPAD_UP, 10, 60);
         pbf_press_button(env.console, BUTTON_A, 10, 100);
+    }
 
-        if (OPPONENT < 10){
-            for(size_t i = 5; i < OPPONENT; i++){
-                pbf_press_dpad(env.console, DPAD_DOWN, 10, 60);
-            }
-        }
-        else{
-            // Go to next page
-            for(size_t i = 0; i < 2; i++){
-                pbf_press_dpad(env.console, DPAD_UP, 10, 60);
-            }
-            pbf_press_button(env.console, BUTTON_A, 10, 100);
-
-            for(size_t i = 10; i < OPPONENT; i++){
-                pbf_press_dpad(env.console, DPAD_DOWN, 10, 60);
-            }
-        }
+    //  Move to slot.
+    for (int8_t c = 0; c < menu_location.index; c++){
+        pbf_press_dpad(env.console, DPAD_DOWN, 10, 60);
     }
 
     // Press the button to select the opponent
