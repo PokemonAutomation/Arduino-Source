@@ -9,6 +9,7 @@
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Options/FloatingPointOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/PokemonLA_Locations.h"
@@ -51,7 +52,8 @@ private:
 
     WarpLocationOption WARP_SPOT;
 
-    SimpleIntegerOption<uint64_t> STOP_DISTANCE;
+    SimpleIntegerOption<uint16_t> STOP_DISTANCE;
+    FloatingPointOption FLAG_REACHED_DELAY;
     SimpleIntegerOption<uint64_t> NAVIGATION_TIMEOUT;
 
     ShinyDetectedActionOption SHINY_DETECTED;

@@ -125,8 +125,14 @@ void TestProgramComputer::program(ProgramEnvironment& env){
     using namespace Pokemon;
 
 
+    using WallClock = std::chrono::system_clock::time_point;
+
+    cout << (WallClock::min() < WallClock::max()) << endl;
+
+
+
 //    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "asdf");
-    throw UserSetupError(env.logger(), "asdf");
+//    throw UserSetupError(env.logger(), "asdf");
 
 
 #if 0

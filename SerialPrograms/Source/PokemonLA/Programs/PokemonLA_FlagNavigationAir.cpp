@@ -20,11 +20,13 @@ FlagNavigationAir::FlagNavigationAir(
     ProgramEnvironment& env, ConsoleHandle& console,
     bool stop_on_shiny,
     uint16_t stop_radius,
+    double flag_reached_delay,
     std::chrono::seconds navigate_timeout
 )
     : SuperControlSession(env, console)
     , m_stop_on_shiny(stop_on_shiny)
     , m_stop_radius(stop_radius)
+    , m_flag_reached_delay(std::chrono::milliseconds((uint64_t)(flag_reached_delay * 1000)))
     , m_navigate_timeout(navigate_timeout)
     , m_flag(console, console)
     , m_mount(console)
@@ -36,7 +38,9 @@ FlagNavigationAir::FlagNavigationAir(
 //    , m_last_good_state(WallClock::min())
     , m_last_known_mount(MountState::NOTHING)
     , m_find_flag_failed(false)
+    , m_flag_reached_time(WallClock::max())
     , m_last_flag_detection(WallClock::min())
+    , m_flag_distance(-1)
     , m_flag_x(0.5)
     , m_flag_y(0.0)
 {
@@ -298,6 +302,9 @@ bool FlagNavigationAir::run_state(
 
     //  Read flag.
     m_flag_detected = m_flag.get(m_flag_distance, m_flag_x, m_flag_y);
+    if (m_flag_detected){
+        m_last_flag_detection = timestamp;
+    }
 #if 1
     if (m_flag_detected){
         std::stringstream ss;
@@ -306,19 +313,15 @@ bool FlagNavigationAir::run_state(
         m_console.log(ss.str());
     }
 #endif
-    if (m_flag_detected){
-        m_last_flag_detection = timestamp;
-    }
 
-    //  Check if we've reached the target.
-    State state = (State)this->last_state();
-    if (m_flag_distance >= 0 && m_flag_distance <= m_stop_radius &&
-        m_flag_y > 0.8 && state != State::FIND_FLAG &&
-        m_last_flag_detection + std::chrono::seconds(2) > timestamp &&
-//        last_state_change() + std::chrono::seconds(2) < timestamp &&
-        true
-    ){
-        m_console.log("Target reached.");
+
+    //  Check if we've reached the flag.
+    if (m_flag_distance >= 0 && m_flag_distance <= m_stop_radius && m_flag_reached_time == WallClock::max()){
+        m_console.log("Target reached. Waiting out grace period...");
+        m_flag_reached_time = timestamp;
+    }
+    if (m_flag_reached_time <= timestamp - m_flag_reached_delay){
+        m_console.log("Grace period finished. Stopping flag navigation...");
         return true;
     }
 

@@ -166,7 +166,7 @@ void FlagDetector::finish(){
     }
     m_left.clear();
     m_right.clear();
-    merge_heavily_overlapping();
+    merge_heavily_overlapping(0.3);
 }
 
 
@@ -219,7 +219,7 @@ std::pair<double, int> read_digit(const QImage& image, const WaterfillObject& ob
 
 
 int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
-    ImageFloatBox box(flag_x - 0.017, flag_y - 0.055, 0.032, 0.025);
+    ImageFloatBox box(flag_x - 0.025, flag_y - 0.055, 0.045, 0.025);
     QImage image = extract_box(screen, box);
 //    image.save("test.png");
 
@@ -239,16 +239,19 @@ int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
 
     size_t width = matrix[0].width();
     size_t height = matrix[0].height();
+    double inv_width = 0.5 / width;
 
     struct Hit{
         size_t min_x;
         size_t max_x;
+        double mid_x;
         double rmsd;
         int digit;
     };
 
-    std::multimap<size_t, Hit> hits;
 
+    //  Detect all the digits.
+    std::multimap<size_t, Hit> hits;
     for (size_t c = 0; c < 6; c++){
         WaterFillIterator finder(matrix[c], 30);
         WaterfillObject object;
@@ -264,12 +267,17 @@ int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
             if (digit.second >= 0){
                 hits.emplace(
                     object.min_x,
-                    Hit{object.min_x, object.max_x, digit.first, digit.second}
+                    Hit{
+                        object.min_x,
+                        object.max_x,
+                        (object.min_x + object.max_x) * inv_width,
+                        digit.first,
+                        digit.second
+                    }
                 );
             }
         }
     }
-
     if (hits.empty()){
         return -1;
     }
@@ -278,18 +286,17 @@ int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
 //        cout << item.first << " : " << item.second.second << " - " << item.second.first << endl;
 //    }
 
-    int ret = 0;
 
-    //  De-dupe
+
+    //  Remove overlapping detections by picking the one with strongest detection on each overlap.
+    std::vector<Hit> digits;
     auto best = hits.begin();
     auto iter = best;
     ++iter;
-
     for (; iter != hits.end(); ++iter){
         //  Next digit
         if (best->second.max_x < iter->second.min_x){
-            ret *= 10;
-            ret += best->second.digit;
+            digits.emplace_back(best->second);
             best = iter;
         }
 
@@ -298,12 +305,101 @@ int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
             best = iter;
         }
     }
-    ret *= 10;
-    ret += best->second.digit;
+    digits.emplace_back(best->second);
 
-//    cout << ret << endl;
 
-    return ret;
+
+    //  Now we use the position of the digits to correct for errors.
+
+    int even_buckets[4] = {-1, -1, -1, -1};
+    int odd_buckets[3] = {-1, -1, -1};
+    size_t even_count = 0;
+    size_t odd_count = 0;
+
+    //  Put every digit into one of 7 buckets.
+    for (const Hit& digit : digits){
+//        cout << "[" << digit.mid_x << " : " << digit.digit << "]";
+        int bucket = (int)(digit.mid_x * 9.55557 - 1.4);
+        bucket = std::max(bucket, 0);
+        bucket = std::min(bucket, 6);
+        if (bucket % 2){
+            odd_buckets[bucket / 2] = digit.digit;
+            odd_count++;
+        }else{
+            even_buckets[bucket / 2] = digit.digit;
+            even_count++;
+        }
+    }
+//    cout << endl;
+
+//    cout << "even = " << even_count << endl;
+//    cout << "odd  = " << odd_count << endl;
+
+
+    //  All the digits must call into either odd or even buckets.
+    //  Anything else is a misread and we must return undetected.
+    if ((even_count != 0) == (odd_count != 0)){
+        return -1;
+    }
+
+//    cout << odd_buckets[0] << odd_buckets[1] << odd_buckets[2] << endl;
+
+    if (odd_count != 0){
+        //  1 digit only.
+        if (odd_buckets[0] < 0 && odd_buckets[2] < 0){
+            //  Return unconditionally. If it's one digit, then it matters so don't try to assume anything if it can't be read.
+            return odd_buckets[1];
+        }
+
+        //  Now we know it's 3 digits for sure.
+
+        //  If we can't read the first 2 digits, we're stuck.
+        if (odd_buckets[0] < 0 || odd_buckets[1] < 0){
+            return -1;
+        }
+
+        //  If we can't read the 3rd digit, then assume it's 5.
+        if (odd_buckets[2] < 0){
+            odd_buckets[2] = 5;
+        }
+
+        return odd_buckets[0] * 100 + odd_buckets[1] * 10 + odd_buckets[2];
+    }else{
+        //  2 digits only.
+        if (even_buckets[0] < 0 && even_buckets[3] < 0){
+            //  If we can't read the first digit, we're stuck.
+            if (even_buckets[1] < 0){
+                return -1;
+            }
+            //  If we can't read the 2nd digit, then assume it's 5.
+            if (even_buckets[2] < 0){
+                even_buckets[2] = 5;
+            }
+            return even_buckets[1] * 10 + even_buckets[2];
+        }
+
+        //  Now we know it's 4 digits for sure.
+
+        //  If we can't read either of the first 2 digits, assume they are 1.
+        if (even_buckets[0] < 0){
+            even_buckets[0] = 1;
+        }
+        if (even_buckets[1] < 0){
+            even_buckets[1] = 1;
+        }
+
+        //  If we can't read either of the last digits, assume they are 5.
+        if (even_buckets[2] < 0){
+            even_buckets[2] = 5;
+        }
+        if (even_buckets[3] < 0){
+            even_buckets[3] = 5;
+        }
+
+        return even_buckets[0] * 1000 + even_buckets[1] * 100 + even_buckets[2] * 10 + even_buckets[3];
+    }
+
+//    return ret;
 }
 
 

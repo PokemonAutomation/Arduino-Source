@@ -292,6 +292,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     double distance, flag_x, flag_y;
     tracker.get(distance, flag_x, flag_y);
 
+//    cout << distance << endl;
+
 
 #if 0
     ImageFloatBox box(flag_x - 0.017, flag_y - 0.055, 0.032, 0.025);

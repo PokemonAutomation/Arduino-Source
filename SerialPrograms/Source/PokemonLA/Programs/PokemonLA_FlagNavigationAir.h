@@ -25,6 +25,7 @@ public:
         ProgramEnvironment& env, ConsoleHandle& console,
         bool stop_on_shiny,
         uint16_t stop_radius,
+        double flag_reached_delay,
         std::chrono::seconds navigate_timeout
     );
 
@@ -76,6 +77,7 @@ private:
 
     bool m_stop_on_shiny;
     uint16_t m_stop_radius;
+    std::chrono::milliseconds m_flag_reached_delay;
     std::chrono::seconds m_navigate_timeout;
 
     FlagTracker m_flag;
@@ -90,6 +92,7 @@ private:
     MountState m_last_known_mount;
 
     std::atomic<bool> m_find_flag_failed;
+    WallClock m_flag_reached_time;
 
     WallClock m_last_flag_detection;
     bool m_flag_detected;

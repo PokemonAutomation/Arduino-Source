@@ -51,16 +51,27 @@ bool FlagTracker::get(double& distance, double& x, double& y){
     }
 
     //  Find the median.
-    size_t mid = distances.size() / 2;
-    auto iter = distances.begin();
-    for (size_t c = 0; c < mid; c++){
-        ++iter;
+    double median;
+    {
+        size_t mid = distances.size() / 2;
+        auto iter = distances.begin();
+        for (size_t c = 0; c < mid; c++){
+            ++iter;
+        }
+        median = iter->first;
     }
-    double median = iter->first;
 
-    distance = median;
+//    distance = median;
 //    cout << distance << endl;
 
+    //  Pick the latest value that isn't too far from the median.
+    for (auto iter = m_history.rbegin(); iter != m_history.rend(); ++iter){
+        if (std::abs(iter->distance - median) < 20){
+            distance = iter->distance;
+            return true;
+        }
+    }
+    distance = -1;
     return true;
 }
 
@@ -79,6 +90,7 @@ bool FlagTracker::process_frame(
         sample.x = (double)(flags[0].min_x + flags[0].max_x) / (frame.width() * 2);
         sample.y = (double)(flags[0].min_y + flags[0].max_y) / (frame.height() * 2);
         sample.distance = read_flag_distance(frame, sample.x, sample.y);
+//        cout << sample.distance << endl;
     }
 
 

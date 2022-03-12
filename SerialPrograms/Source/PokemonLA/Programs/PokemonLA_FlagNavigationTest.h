@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonLA_FlagNavigationTest_H
 
 #include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "CommonFramework/Options/FloatingPointOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 
@@ -30,7 +31,9 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    SimpleIntegerOption<uint64_t> STOP_DISTANCE;
+    SimpleIntegerOption<uint16_t> STOP_DISTANCE;
+    FloatingPointOption FLAG_REACHED_DELAY;
+
     SimpleIntegerOption<uint64_t> NAVIGATION_TIMEOUT;
     ShinyDetectedActionOption SHINY_DETECTED;
 };
