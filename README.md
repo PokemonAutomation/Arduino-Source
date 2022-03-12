@@ -11,7 +11,7 @@ This is the source code for all the main Arduino programs.
 1. Install Visual Studio 2019:
     1. [Download Page](https://docs.microsoft.com/en-us/visualstudio/releases/2019/release-notes)
     2. Make sure you select the C++ development tools.
-2. Install Windows Development SDK:
+2. Install Windows Development SDK: (optional)
     1. [Download Page](https://developer.microsoft.com/en-us/windows/downloads/windows-sdk/)
 3. Install CMake:
     1. [Download Page](https://cmake.org/download/)
@@ -44,13 +44,15 @@ This is the source code for all the main Arduino programs.
 4. Open Qt Creator.
 5. Click on `Projects` -> `Open`.
 6. Navigate to [`SerialPrograms`](GeneratorSource) and select `CMakeLists.txt`.`.
-7. It will then ask you to configure the project. Select `Desktop Qt 5.12.12 MSVC2017 64bit`*.
+7. It will then ask you to configure the project. Select `Desktop Qt 5.12.12 MSVC2017 64bit`.*
 8. At the bottom left corner, click on the little monitor and select `Release with Debug Information`.
-9. Click the green arrow to compile and launch the program.
+9. Click the green arrow to compile and launch the program.**
 
 ![](BuildSetup/Windows-Configuration.png)
 
-* Even though it says "MSVC2017", it will be using your MSVC 2019 installation instead.
+*Even though it says "MSVC2017", it will be using your MSVC 2019 installation instead.
+
+**Note that you will not be able to feasibly run with a debugger attached. This is because Qt Creator places a breakpoint on every single thrown exception and this application heavily uses exceptions even for non-error situations. So the debugger will break on literally everything. If you know how to disable break on exceptions, please let us know.
 
 
 # Licensing:
