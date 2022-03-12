@@ -133,7 +133,7 @@ bool NormalDialogDetector::process_frame(
 
     ImageStats title_bottom = image_stats(extract_box(frame, m_title_bottom));
     if (title_bottom.stddev.sum() <= 15 &&
-        title_bottom.average.b > title_top.average.r && title_bottom.average.b > title_bottom.average.g
+        title_bottom.average.b > title_bottom.average.r && title_bottom.average.b > title_bottom.average.g
     ){
         hits++;
     }

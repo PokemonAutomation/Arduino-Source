@@ -35,6 +35,9 @@ void BattleMoveSelectionDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_BLUE, m_move_3_highlight);
     items.add(COLOR_BLUE, m_move_4_highlight);
 }
+
+
+
 bool BattleMoveSelectionDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
@@ -42,24 +45,29 @@ bool BattleMoveSelectionDetector::process_frame(
     size_t highlighted = 0;
 
     const ImageStats move_1 = image_stats(extract_box(frame, m_move_1_highlight));
-    highlighted += is_solid(move_1, {0.34,0.34,0.34}, 0.15);
+    highlighted += is_white(move_1);
+    // std::cout << "highlighted is now " << highlighted << std::endl;
 
     const ImageStats move_2 = image_stats(extract_box(frame, m_move_2_highlight));
-    highlighted += is_solid(move_2, {0.34,0.34,0.34}, 0.15);
+    highlighted += is_white(move_2);
+    // std::cout << "highlighted is now " << highlighted << std::endl;
     if (highlighted > 1){
         m_detected.store(false, std::memory_order_release);
         return false;
     }
     
     const ImageStats move_3 = image_stats(extract_box(frame, m_move_3_highlight));
-    highlighted += is_solid(move_3, {0.34,0.34,0.34}, 0.15);
+    highlighted += is_white(move_3);
+    // std::cout << "highlighted is now " << highlighted << std::endl;
     if (highlighted > 1){
         m_detected.store(false, std::memory_order_release);
         return false;
     }
 
     const ImageStats move_4 = image_stats(extract_box(frame, m_move_4_highlight));
-    highlighted += is_solid(move_4, {0.34,0.34,0.34}, 0.15);
+    highlighted += is_white(move_4);
+
+    // std::cout << "move selection highlighted " << highlighted << std::endl;
 
     bool detected = highlighted == 1;
     m_detected.store(detected, std::memory_order_release);
