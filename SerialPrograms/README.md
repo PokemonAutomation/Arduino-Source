@@ -51,6 +51,9 @@ Source code for the "Computer Control" programs.
 
 ![](../BuildSetup/Windows-Configuration.png)
 
-* Even though it says "MSVC2017", it will be using your MSVC 2019 installation instead.
+
+*Even though it says "MSVC2017", it will be using your MSVC 2019 installation instead.
+
+**Note that you will not be able to feasibly run with a debugger attached. This is because Qt Creator places a breakpoint on every single thrown exception and this application heavily uses exceptions even for non-error situations. So the debugger will break on literally everything. If you know how to disable break on exceptions, please let us know.
 
 
