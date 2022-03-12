@@ -56,5 +56,6 @@ This is the source code for all the main Arduino programs.
 
 
 # Licensing:
-- All source code in this repository is under the MIT license.
+- Unless otherwise specified, all source code in this repository is under the MIT license.
+- Some files may be under other (compatible) licenses.
 - All precompiled binaries and object files are free for non-commercial use only. For all other uses, please contact the Pokémon Automation server admins.
