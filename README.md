@@ -31,7 +31,7 @@ This is the source code for all the main Arduino programs.
             - MinGW 7.3.0 32-bit
             - MinGW 7.3.0 64-bit
 
-![](Qt-Installation.png)
+![](BuildSetup/Windows-Install-Qt.png)
 
 **Setup:**
 
@@ -39,7 +39,7 @@ This is the source code for all the main Arduino programs.
 2. Clone the [Packages Repo](https://github.com/PokemonAutomation/Packages).
 3. In the `Packages` repo, copy the `SerialPrograms/Resources` folder into the root of the `Arduino-Source` repo.
 
-![](Directory.png)
+![](BuildSetup/Directory.png)
 
 4. Open Qt Creator.
 5. Click on `Projects` -> `Open`.
@@ -47,6 +47,8 @@ This is the source code for all the main Arduino programs.
 7. It will then ask you to configure the project. Select `Desktop Qt 5.12.12 MSVC2017 64bit`*.
 8. At the bottom left corner, click on the little monitor and select `Release with Debug Information`.
 9. Click the green arrow to compile and launch the program.
+
+![](BuildSetup/Windows-Configuration.png)
 
 * Even though it says "MSVC2017", it will be using your MSVC 2019 installation instead.
 
