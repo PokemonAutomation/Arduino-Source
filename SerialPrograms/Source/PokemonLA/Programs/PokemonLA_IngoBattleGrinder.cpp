@@ -196,6 +196,9 @@ bool IngoBattleGrinder::start_dialog(SingleSwitchProgramEnvironment& env){
         }
     }
 
+    pbf_press_button(env.console, BUTTON_A, 20, 150);
+    env.console.botbase().wait_for_all_requests();
+
     ButtonDetector button2(env.console, env.console, ButtonType::ButtonA, {0.50, 0.350, 0.40, 0.400}, std::chrono::milliseconds(100), true);
     int ret = run_until(
         env, env.console,

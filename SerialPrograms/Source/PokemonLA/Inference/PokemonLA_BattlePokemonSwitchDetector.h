@@ -8,9 +8,10 @@
 #ifndef PokemonAutomation_PokemonLA_BattlePokemonSwitchDetector_H
 #define PokemonAutomation_PokemonLA_BattlePokemonSwitchDetector_H
 
-#include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
