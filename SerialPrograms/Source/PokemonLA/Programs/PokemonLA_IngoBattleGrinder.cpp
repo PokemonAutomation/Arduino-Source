@@ -39,6 +39,25 @@ MoveStyleOption::MoveStyleOption(const char* label) : EnumDropdownOption(
     0
 ){}
 
+
+PokemonBattleDecisionOption::PokemonBattleDecisionOption(QString description): 
+    GroupOption(std::move(description))
+    , MOVE_1("<b>Move 1 style:</b>")
+    , MOVE_2("<b>Move 2 style:</b>")
+    , MOVE_3("<b>Move 3 style:</b>")
+    , MOVE_4("<b>Move 4 style:</b>")
+    , SWITCH("<b>Switch this " + STRING_POKEMON + " in battle:</b>", false)
+    , NUM_TURNS_TO_SWITCH("<b>Num turns to switch:</b>", 1)
+{
+    PA_ADD_OPTION(MOVE_1);
+    PA_ADD_OPTION(MOVE_2);
+    PA_ADD_OPTION(MOVE_3);
+    PA_ADD_OPTION(MOVE_4);
+    PA_ADD_OPTION(SWITCH);
+    PA_ADD_OPTION(NUM_TURNS_TO_SWITCH);
+}
+
+
 IngoBattleGrinder_Descriptor::IngoBattleGrinder_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonLA:IngoBattleGrinder",
@@ -70,12 +89,11 @@ IngoBattleGrinder::IngoBattleGrinder(const IngoBattleGrinder_Descriptor& descrip
         "Ress",
         "Ingo - but using alphas"
     }, 0)
-    , MOVE1_STYLE_OPTION("<b>Move 1 style:</b>")
-    , MOVE2_STYLE_OPTION("<b>Move 2 style:</b>")
-    , MOVE3_STYLE_OPTION("<b>Move 3 style:</b>")
-    , MOVE4_STYLE_OPTION("<b>Move 4 style:</b>")
-    , SWITCH_FIRST_POKEMON("<b>Switch first " + STRING_POKEMON + " in battle:</b>", false)
-    , NUM_TURNS_TO_SWITCH("<b>Num turns to switch first " + STRING_POKEMON + ":</b>", 1)
+    , POKEMON_1("First " + STRING_POKEMON)
+    , POKEMON_2("Second " + STRING_POKEMON)
+    , POKEMON_3("Third " + STRING_POKEMON)
+    , POKEMON_4("Fourth " + STRING_POKEMON)
+    , POKEMON_5("Remaining " + STRING_POKEMON)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
@@ -85,12 +103,11 @@ IngoBattleGrinder::IngoBattleGrinder(const IngoBattleGrinder_Descriptor& descrip
     })
 {
     PA_ADD_OPTION(OPPONENT);
-    PA_ADD_OPTION(MOVE1_STYLE_OPTION);
-    PA_ADD_OPTION(MOVE2_STYLE_OPTION);
-    PA_ADD_OPTION(MOVE3_STYLE_OPTION);
-    PA_ADD_OPTION(MOVE4_STYLE_OPTION);
-    PA_ADD_OPTION(SWITCH_FIRST_POKEMON);
-    PA_ADD_OPTION(NUM_TURNS_TO_SWITCH);
+    PA_ADD_OPTION(POKEMON_1);
+    PA_ADD_OPTION(POKEMON_2);
+    PA_ADD_OPTION(POKEMON_3);
+    PA_ADD_OPTION(POKEMON_4);
+    PA_ADD_OPTION(POKEMON_5);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -123,20 +140,15 @@ std::unique_ptr<StatsTracker> IngoBattleGrinder::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-void IngoBattleGrinder::use_move(const BotBaseContext &context, int cur_move, bool intended_pokemon_left){
-    if (intended_pokemon_left){
-        pbf_press_button(context, BUTTON_A, 10, 125);
-        pbf_wait(context, 1 * TICKS_PER_SECOND);
-        context.wait_for_all_requests();
-        return;
-    }
+void IngoBattleGrinder::use_move(const BotBaseContext &context, int cur_pokemon, int cur_move){
+    const PokemonBattleDecisionOption* pokemon = get_pokemon(cur_pokemon);
 
     size_t style = 0;
     switch(cur_move){
-        case 0: style = MOVE1_STYLE_OPTION; break;
-        case 1: style = MOVE2_STYLE_OPTION; break;
-        case 2: style = MOVE3_STYLE_OPTION; break;
-        case 3: style = MOVE4_STYLE_OPTION; break;
+        case 0: style = pokemon->MOVE_1; break;
+        case 1: style = pokemon->MOVE_2; break;
+        case 2: style = pokemon->MOVE_3; break;
+        case 3: style = pokemon->MOVE_4; break;
     }
 
     // Select move styles
@@ -154,9 +166,9 @@ void IngoBattleGrinder::use_move(const BotBaseContext &context, int cur_move, bo
     context.wait_for_all_requests();
 }
 
-void IngoBattleGrinder::switch_pokemon(SingleSwitchProgramEnvironment& env, int& next_non_fainted_pokemon){
+void IngoBattleGrinder::switch_pokemon(SingleSwitchProgramEnvironment& env, int& next_pokemon_in_party_order){
     // Move fast leading fainted pokemon
-    for(int i = 0; i < next_non_fainted_pokemon; i++){
+    for(int i = 0; i < next_pokemon_in_party_order; i++){
         pbf_press_dpad(env.console, DPAD_DOWN, 20, 80);
     }
 
@@ -167,7 +179,7 @@ void IngoBattleGrinder::switch_pokemon(SingleSwitchProgramEnvironment& env, int&
         pbf_press_button(env.console, BUTTON_A, 20, 150);
         env.console.context().wait_for_all_requests();
 
-        next_non_fainted_pokemon++;
+        next_pokemon_in_party_order++;
     
         // Check whether we can send this pokemon to battle:
         const bool stop_on_detected = true;
@@ -185,6 +197,16 @@ void IngoBattleGrinder::switch_pokemon(SingleSwitchProgramEnvironment& env, int&
         pbf_press_button(env.console, BUTTON_B, 20, 100);
         // Move to the next pokemon
         pbf_press_dpad(env.console, DPAD_DOWN, 20, 80);
+    }
+}
+
+const PokemonBattleDecisionOption* IngoBattleGrinder::get_pokemon(int cur_pokemon) const {
+    switch (cur_pokemon){
+        case 0: return &POKEMON_1;
+        case 1: return &POKEMON_2;
+        case 2: return &POKEMON_3;
+        case 3: return &POKEMON_4;
+        default: return &POKEMON_5;
     }
 }
 
@@ -237,12 +259,12 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
 
     // Which move (0, 1, 2 or 3) to use in next turn.
     int cur_move = 0;
-    // Track whether the intended pokemon, the first pokemon sent to battle, has fainted or switched:
-    bool intended_pokemon_left = false;
     // Which pokemon in the party is not fainted
-    int next_non_fainted_pokemon = 0;
+    int cur_pokemon = 0;
     // How many turns have passed in this battle:
     int num_turns = 0;
+    // Used to skip fainted pokemon in the party when switching a pokemon
+    int next_pokemon_in_party_order = 0;
 
     while(true){
         const bool stop_on_detected = true;
@@ -273,30 +295,31 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
             env.console.log("Our turn!", COLOR_BLUE);
             stats.turns++;
 
-            // User may want to switch the first pokemon after some turns, to get more exp, or prevent if from
+            // User may want to switch the pokemon after some turns, to get more exp, or prevent if from
             // fainting.
-            // If next_non_fainted_pokemon is not 0, then the first pokemon is already fainted, we don't need to
-            // switch again.
-            if (SWITCH_FIRST_POKEMON && NUM_TURNS_TO_SWITCH == num_turns && next_non_fainted_pokemon == 0){
+            const PokemonBattleDecisionOption* pokemon = get_pokemon(cur_pokemon);
+            if (pokemon->SWITCH && pokemon->NUM_TURNS_TO_SWITCH == num_turns){
                 env.console.log("Switch pokemon");
 
                 // Go to the switching pokemon screen:
                 pbf_press_dpad(env.console, DPAD_DOWN, 20, 100);
 
-                intended_pokemon_left = true;
                 cur_move = 0;
-                switch_pokemon(env, next_non_fainted_pokemon);
+                num_turns = 0;
+                switch_pokemon(env, next_pokemon_in_party_order);
+                cur_pokemon++;
             }
             else{
                 // Choose move to use!
-                if (!intended_pokemon_left){
+                if (cur_pokemon == 0){
+                    // We collect the stat of move attempts of the first pokemon.
                     stats.move_attempts++;
                 }
 
                 // Press A to select moves
                 pbf_press_button(env.console, BUTTON_A, 10, 125);
 
-                use_move(env.console, cur_move, intended_pokemon_left);
+                use_move(env.console, cur_pokemon, cur_move);
 
                 // Check if the move cannot be used due to no PP.
                 // In this case, we will still be on the move selection screen:
@@ -315,7 +338,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
                     // env.console.context().wait_for_all_requests();
                     cur_move++;
 
-                    use_move(env.console, cur_move, intended_pokemon_left);
+                    use_move(env.console, cur_pokemon, cur_move);
                 }
             }
 
@@ -333,9 +356,10 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
             stats.faint_switches++;
             env.update_stats();
 
-            intended_pokemon_left = true;
             cur_move = 0;
-            switch_pokemon(env, next_non_fainted_pokemon);
+            num_turns = 0;
+            switch_pokemon(env, next_pokemon_in_party_order);
+            cur_pokemon++;
         }
         else{ // ret is 4
             env.console.log("Battle finished.");
