@@ -23,8 +23,8 @@ BattlePokemonSwitchDetector::BattlePokemonSwitchDetector(LoggerQt& logger, Video
     : VisualInferenceCallback("BattlePokemonSwitchDetector")
     , m_stop_on_detected(stop_on_detected)
     , m_detected(false)
-    , m_white_bg_1(0.541, 0.251, 0.15, 0.026)
-    , m_white_bg_2(0.541, 0.171, 0.15, 0.026)
+    , m_white_bg_1(0.641, 0.178, 0.05, 0.023)
+    , m_white_bg_2(0.641, 0.248, 0.05, 0.023)
     , m_white_bg_3(0.517, 0.195, 0.011, 0.061)
     , m_white_bg_4(0.924, 0.185, 0.019, 0.076)
     , m_ready_to_battle_bg_1(0.54, 0.216, 0.016, 0.018)
@@ -48,37 +48,46 @@ bool BattlePokemonSwitchDetector::process_frame(
     size_t highlighted = 0;
 
     const ImageStats white_1 = image_stats(extract_box(frame, m_white_bg_1));
-    if(is_solid(white_1, {0.34,0.34,0.34}, 0.15) == false){
+    if(is_white(white_1) == false){
+        // std::cout << "no white_1" << std::endl;
         m_detected.store(false, std::memory_order_release);
         return false;
     }
 
     const ImageStats white_2 = image_stats(extract_box(frame, m_white_bg_2));
-    if(is_solid(white_2, {0.34,0.34,0.34}, 0.15) == false){
+    if(is_white(white_2) == false){
+        // std::cout << "no white_2" << std::endl;
         m_detected.store(false, std::memory_order_release);
         return false;
     }
 
     const ImageStats white_3 = image_stats(extract_box(frame, m_white_bg_3));
-    if(is_solid(white_3, {0.34,0.34,0.34}, 0.15) == false){
+    if(is_white(white_3) == false){
+        // std::cout << "no white_3" << std::endl;
         m_detected.store(false, std::memory_order_release);
         return false;
     }
 
     const ImageStats white_4 = image_stats(extract_box(frame, m_white_bg_4));
-    if(is_solid(white_4, {0.34,0.34,0.34}, 0.15) == false){
+    if(is_white(white_4) == false){
+        // std::cout << "no white_4" << std::endl;
         m_detected.store(false, std::memory_order_release);
         return false;
     }
 
     const ImageStats battle_1 = image_stats(extract_box(frame, m_ready_to_battle_bg_1));
-    if(is_solid(battle_1, {0.216,0.338,0.446}, 0.15) == false){
+    if ((battle_1.stddev.sum() <= 15 &&
+        battle_1.average.b > battle_1.average.r && battle_1.average.b > battle_1.average.g) == false
+    ){
+        // std::cout << "battle_1 not enough " << battle_1.average << " " << battle_1.stddev << std::endl;
         m_detected.store(false, std::memory_order_release);
         return false;
     }
 
     const ImageStats battle_2 = image_stats(extract_box(frame, m_ready_to_battle_bg_2));
-    const bool detected = is_solid(battle_2, {0.216,0.338,0.446}, 0.15);
+    // std::cout << "battle_2  " << battle_2.average << " " << battle_2.stddev << std::endl;
+    const bool detected = (battle_2.stddev.sum() <= 15 &&
+        battle_2.average.b > battle_2.average.r && battle_2.average.b > battle_2.average.g);
     m_detected.store(detected, std::memory_order_release);
 
     return detected && m_stop_on_detected;
