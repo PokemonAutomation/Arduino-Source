@@ -171,8 +171,30 @@ FlagNavigationAir::FlagNavigationAir(
         });
         return false;
     });
-    register_state_command(State::DIVE, [=](){
-        m_console.log("Diving...");
+    register_state_command(State::DASH_TURN, [=](){
+        m_console.log("Dashing Turn...");
+        m_active_command->dispatch([=](const BotBaseContext& context){
+            //  Move forward to straighten out direction.
+            if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
+                pbf_move_left_joystick(context, 128, 0, 160, 0);
+                context.wait_for_all_requests();
+                m_looking_straight_ahead.store(true, std::memory_order_release);
+//                cout << "State::DASH_LEFT: m_looking_straight_ahead = true" << endl;
+            }
+            pbf_press_button(context, BUTTON_B, 10, 0);
+            double shift = 0;
+            double distance, flag_x, flag_y;
+            if (m_flag.get(distance, flag_x, flag_y)){
+                shift = (flag_x - 0.5) * 320;
+                shift = std::max(shift, -32.);
+                shift = std::min(shift, 32.);
+            }
+            pbf_controller_state(context, BUTTON_B, DPAD_NONE, (int8_t)(128 + shift), 128, 128, 128, 255);
+        });
+        return false;
+    });
+    register_state_command(State::DIVE_STRAIGHT, [=](){
+        m_console.log("Diving Straight...");
         m_active_command->dispatch([=](const BotBaseContext& context){
             //  Move forward to straighten out direction.
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
@@ -185,8 +207,8 @@ FlagNavigationAir::FlagNavigationAir(
         });
         return false;
     });
-    register_state_command(State::DASH_LEFT, [=](){
-        m_console.log("Dashing Left...");
+    register_state_command(State::DIVE_TURN, [=](){
+        m_console.log("Diving Turn...");
         m_active_command->dispatch([=](const BotBaseContext& context){
             //  Move forward to straighten out direction.
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
@@ -195,39 +217,15 @@ FlagNavigationAir::FlagNavigationAir(
                 m_looking_straight_ahead.store(true, std::memory_order_release);
 //                cout << "State::DASH_LEFT: m_looking_straight_ahead = true" << endl;
             }
-            pbf_press_button(context, BUTTON_B, 50, 0);
-            uint8_t shift = 32;
+            pbf_press_button(context, BUTTON_Y, 10, 0);
+            double shift = 0;
             double distance, flag_x, flag_y;
             if (m_flag.get(distance, flag_x, flag_y)){
-                double s = (0.5 - flag_x) * 320;
-                s = std::max(s, 0.);
-                s = std::min(s, 32.);
-                shift = (uint8_t)s;
+                shift = (flag_x - 0.5) * 320;
+                shift = std::max(shift, -32.);
+                shift = std::min(shift, 32.);
             }
-            pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128 - shift, 128, 128, 128, 255);
-        });
-        return false;
-    });
-    register_state_command(State::DASH_RIGHT, [=](){
-        m_console.log("Dashing Right...");
-        m_active_command->dispatch([=](const BotBaseContext& context){
-            //  Move forward to straighten out direction.
-            if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
-                pbf_move_left_joystick(context, 128, 0, 160, 0);
-                context.wait_for_all_requests();
-                m_looking_straight_ahead.store(true, std::memory_order_release);
-//                cout << "State::DASH_RIGHT: m_looking_straight_ahead = true" << endl;
-            }
-            pbf_press_button(context, BUTTON_B, 50, 0);
-            uint8_t shift = 32;
-            double distance, flag_x, flag_y;
-            if (m_flag.get(distance, flag_x, flag_y)){
-                double s = (flag_x - 0.5) * 320;
-                s = std::max(s, 0.);
-                s = std::min(s, 32.);
-                shift = (uint8_t)s;
-            }
-            pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128 + shift, 128, 128, 128, 255);
+            pbf_controller_state(context, BUTTON_Y, DPAD_NONE, (int8_t)(128 + shift), 128, 128, 128, 255);
         });
         return false;
     });
@@ -418,11 +416,6 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
         }
     }
 
-    //  Dive
-    if (m_flag_y > 0.50){
-        return run_state_action(State::DIVE);
-    }
-
     //  Re-center the flag.
     if (m_flag_x <= 0.30){
         return run_state_action(State::TURN_LEFT);
@@ -431,32 +424,31 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
         return run_state_action(State::TURN_RIGHT);
     }
 
-    //  Continue dive
-    if (state == State::DIVE && m_flag_y > 0.15){
-        return false;
-    }
-
-    //  Centered
-    if (0.48 <= m_flag_x && m_flag_x <= 0.52){
-        //  Cruise
-        if (state != State::DIVE && m_flag_y <= 0.25){
-            return run_state_action(State::DASH_FORWARD_MASH_B);
-        }
-        if (m_flag_y <= 0.50){
-            return run_state_action(State::DASH_FORWARD_HOLD_B);
+    //  Dive
+    bool currently_diving = state == State::DIVE_STRAIGHT || state == State::DIVE_TURN;
+    if (m_flag_y > 0.45 || (currently_diving && m_flag_y > 0.15)){
+        if (0.48 <= m_flag_x && m_flag_x <= 0.52){
+            return run_state_action(State::DIVE_STRAIGHT);
+        }else{
+            return run_state_action(State::DIVE_TURN);
         }
     }
 
     //  Turning Cruise
-    if (m_flag_x <= 0.48 && m_flag_y <= 0.6){
-        return run_state_action(State::DASH_LEFT);
+    if (0.48 > m_flag_x || m_flag_x > 0.52){
+        return run_state_action(State::DASH_TURN);
     }
-    if (0.52 <= m_flag_x && m_flag_y <= 0.6){
-        return run_state_action(State::DASH_RIGHT);
+
+    if (m_flag_y <= 0.50){
+        //  Normal Cruise
+        return run_state_action(State::DASH_FORWARD_HOLD_B);
+    }else{
+        //  B-mash Cruise
+        return run_state_action(State::DASH_FORWARD_MASH_B);
     }
 
     //  No known state left.
-    return run_state_action(State::DIVE);
+    return run_state_action(State::DIVE_STRAIGHT);
 }
 bool FlagNavigationAir::run_climbing(AsyncCommandSession& commands, WallClock timestamp){
     //  Can't jump off means you're able to stand. Switch back to Braviary.
