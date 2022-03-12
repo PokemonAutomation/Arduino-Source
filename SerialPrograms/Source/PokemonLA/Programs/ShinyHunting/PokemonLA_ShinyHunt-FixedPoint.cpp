@@ -21,7 +21,7 @@ namespace PokemonLA{
 
 WarpLocationOption::WarpLocationOption()
     : EnumDropdownOption(
-        "<b>Warp Spot</b><br>Travel from this location.",
+        "<b>Warp Spot:</b><br>Travel from this location.",
         std::vector<QString>(WARP_SPOT_NAMES + 0, WARP_SPOT_NAMES + (size_t)WarpSpot::END_LIST),
         0
     )

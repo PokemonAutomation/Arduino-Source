@@ -316,9 +316,15 @@ bool FlagNavigationAir::run_state(
 
 
     //  Check if we've reached the flag.
-    if (m_flag_distance >= 0 && m_flag_distance <= m_stop_radius && m_flag_reached_time == WallClock::max()){
-        m_console.log("Target reached. Waiting out grace period...");
-        m_flag_reached_time = timestamp;
+    if (m_flag_distance >= 0){
+        if (m_flag_distance > m_stop_radius){
+            //  If we haven't reached the flag, reset the timer.
+            m_flag_reached_time = WallClock::max();
+        }else if (m_flag_distance <= m_stop_radius && m_flag_reached_time == WallClock::max()){
+            //  If we've reached the flag, start timer if we haven't already.
+            m_console.log("Target reached. Waiting out grace period...");
+            m_flag_reached_time = timestamp;
+        }
     }
     if (m_flag_reached_time <= timestamp - m_flag_reached_delay){
         m_console.log("Grace period finished. Stopping flag navigation...");
