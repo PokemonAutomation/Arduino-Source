@@ -21,7 +21,7 @@ Source code for the "Computer Control" programs.
     1. [Download the offline installer.](https://www.qt.io/offline-installers) [Direct Download Link](https://download.qt.io/official_releases/qt/5.12/5.12.12/qt-opensource-windows-x86-5.12.12.exe)
     2. Disconnect from the internet. This is needed to keep it from forcing you to create an account.
     3. Run the installer.
-    4. When prompted for components select all of the following:
+    4. When prompted for components, select all of the following:
         - Qt 5.12.12
             - MSVC 2017 32-bit
             - MSVC 2017 64-bit
@@ -44,10 +44,10 @@ Source code for the "Computer Control" programs.
 
 4. Open Qt Creator.
 5. Click on `Projects` -> `Open`.
-6. Navigate to [`SerialPrograms`](./) and select `CMakeLists.txt`.`.
+6. Navigate to [`SerialPrograms`](./) and select `CMakeLists.txt`.
 7. It will then ask you to configure the project. Select `Desktop Qt 5.12.12 MSVC2017 64bit`*.
 8. At the bottom left corner, click on the little monitor and select `Release with Debug Information`.
-9. Click the green arrow to compile and launch the program.
+9. Click the upper green arrow** to compile and launch the program.
 
 ![](../BuildSetup/Windows-Configuration.png)
 
