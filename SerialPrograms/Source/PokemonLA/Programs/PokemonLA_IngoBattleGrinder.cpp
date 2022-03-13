@@ -300,7 +300,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
 
     IngoOpponentMenuLocation menu_location = version_10
         ? INGO_OPPONENT_MENU_LOCATIONS_V10[OPPONENT]
-        : INGO_OPPONENT_MENU_LOCATIONS_V10[OPPONENT];
+        : INGO_OPPONENT_MENU_LOCATIONS_V12[OPPONENT];
 
     // Choose which opponent
     if (menu_location.page < 0){
