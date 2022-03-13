@@ -238,7 +238,6 @@ using namespace PokemonLA;
 
 
 
-
 void TestProgram::program(MultiSwitchProgramEnvironment& env){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -255,6 +254,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
+
+
+
+
+#if 0
     QImage image("screenshot-20220312-205532347068.png");
 
     InferenceBoxScope box0(overlay, 0.50, 0.450, 0.40, 0.042);
@@ -264,6 +268,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     extract_box(image, box0).save("test-0.png");
     extract_box(image, box1).save("test-1.png");
     extract_box(image, box2).save("test-2.png");
+#endif
+
 
 
 #if 0

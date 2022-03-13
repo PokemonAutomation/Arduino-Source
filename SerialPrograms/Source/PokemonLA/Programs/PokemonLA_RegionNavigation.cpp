@@ -162,7 +162,9 @@ void mash_A_to_change_region(ProgramEnvironment& env, ConsoleHandle& console){
 }
 
 
-void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, WarpSpot camp){
+
+
+void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, const TravelLocation& location){
     //  Open the map.
     console.botbase().wait_for_all_requests();
     pbf_move_left_joystick(console, 128, 255, 200, 0);
@@ -185,140 +187,26 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Wa
         env.wait_for(std::chrono::milliseconds(500));
     }
 
-    MapRegion region;
-    DpadPosition direction;
-    size_t slot;
-    size_t sub_slot = 0;
-    switch (camp){
-
-    case WarpSpot::FIELDLANDS_FIELDLANDS:
-        region = MapRegion::FIELDLANDS;
-        direction = DPAD_RIGHT;
-        slot = 0;
-        break;
-    case WarpSpot::FIELDLANDS_HEIGHTS:
-        region = MapRegion::FIELDLANDS;
-        direction = DPAD_RIGHT;
-        slot = 1;
-        break;
-    case WarpSpot::FIELDLANDS_GRANDTREE_ARENA:
-        region = MapRegion::FIELDLANDS;
-        direction = DPAD_RIGHT;
-        slot = 0;
-        sub_slot = 2;
-        break;
-
-    case WarpSpot::MIRELANDS_MIRELANDS:
-        region = MapRegion::MIRELANDS;
-        direction = DPAD_RIGHT;
-        slot = 0;
-        break;
-    case WarpSpot::MIRELANDS_BOGBOUND:
-        region = MapRegion::MIRELANDS;
-        direction = DPAD_RIGHT;
-        slot = 1;
-        break;
-    case WarpSpot::MIRELANDS_DIAMOND_SETTLEMENT:
-        region = MapRegion::MIRELANDS;
-        direction = DPAD_RIGHT;
-        slot = 0;
-        sub_slot = 2;
-        break;
-    case WarpSpot::MIRELANDS_BRAVA_ARENA:
-        region = MapRegion::MIRELANDS;
-        direction = DPAD_RIGHT;
-        slot = 0;
-        sub_slot = 3;
-        break;
-
-    case WarpSpot::COASTLANDS_BEACHSIDE:
-        region = MapRegion::COASTLANDS;
-        direction = DPAD_RIGHT;
-        slot = 0;
-        break;
-    case WarpSpot::COASTLANDS_COASTLANDS:
-        region = MapRegion::COASTLANDS;
-        direction = DPAD_RIGHT;
-        slot = 1;
-        break;
-    case WarpSpot::COASTLANDS_MOLTEN_ARENA:
-        region = MapRegion::COASTLANDS;
-        direction = DPAD_RIGHT;
-        slot = 0;
-        sub_slot = 2;
-        break;
-
-    case WarpSpot::HIGHLANDS_HIGHLANDS:
-        region = MapRegion::HIGHLANDS;
-        direction = DPAD_LEFT;
-        slot = 0;
-        break;
-    case WarpSpot::HIGHLANDS_MOUNTAIN:
-        region = MapRegion::HIGHLANDS;
-        direction = DPAD_LEFT;
-        slot = 1;
-        break;
-    case WarpSpot::HIGHLANDS_SUMMIT:
-        region = MapRegion::HIGHLANDS;
-        direction = DPAD_LEFT;
-        slot = 2;
-        break;
-    case WarpSpot::HIGHLANDS_MOONVIEW_ARENA:
-        region = MapRegion::HIGHLANDS;
-        direction = DPAD_LEFT;
-        slot = 0;
-        sub_slot = 2;
-        break;
-
-    case WarpSpot::ICELANDS_SNOWFIELDS:
-        region = MapRegion::ICELANDS;
-        direction = DPAD_LEFT;
-        slot = 0;
-        break;
-    case WarpSpot::ICELANDS_ICEPEAK:
-        region = MapRegion::ICELANDS;
-        direction = DPAD_LEFT;
-        slot = 1;
-        break;
-    case WarpSpot::ICELANDS_PEARL_SETTLEMENT:
-        region = MapRegion::ICELANDS;
-        direction = DPAD_LEFT;
-        slot = 0;
-        sub_slot = 2;
-        break;
-    case WarpSpot::ICELANDS_ICEPEAK_ARENA:
-        region = MapRegion::ICELANDS;
-        direction = DPAD_LEFT;
-        slot = 0;
-        sub_slot = 3;
-        break;
-
-    default:
-        throw InternalProgramError(
-            &console.logger(), PA_CURRENT_FUNCTION,
-            "Invalid Camp Enum: " + std::to_string((int)camp)
-        );
-    }
-
+    DpadPosition direction = location.region < MapRegion::HIGHLANDS ? DPAD_RIGHT : DPAD_LEFT;
 
     //  Move to region.
     MapRegion current_region = MapRegion::NONE;
     for (size_t c = 0; c < 10; c++){
         current_region = detect_selected_region(env, console);
-        if (current_region == region){
+        if (current_region == location.region){
             break;
         }
         pbf_press_dpad(console, direction, 20, 40);
         console.botbase().wait_for_all_requests();
     }
-    if (current_region != region){
+    if (current_region != location.region){
         dump_image(env.logger(), env.program_info(), "FindRegion", console.video().snapshot());
-        throw OperationFailedException(console, std::string("Unable to find ") + MAP_REGION_NAMES[(int)region] + ".");
+        throw OperationFailedException(console, std::string("Unable to find: ") + location.label);
     }
 
-    if (slot != 0){
+    if (location.warp_slot != 0){
         pbf_press_button(console, BUTTON_A, 20, 105);
-        for (size_t c = 0; c < slot; c++){
+        for (size_t c = 0; c < location.warp_slot; c++){
             pbf_press_dpad(console, DPAD_DOWN, 20, 30);
         }
     }
@@ -326,7 +214,7 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Wa
     //  Enter the region.
     mash_A_to_change_region(env, console);
 
-    if (sub_slot == 0){
+    if (location.warp_sub_slot == 0){
         return;
     }
 
@@ -366,7 +254,7 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Wa
         }
     }
     pbf_wait(console, 50);
-    for (size_t c = 0; c < sub_slot; c++){
+    for (size_t c = 0; c < location.warp_sub_slot; c++){
         pbf_press_dpad(console, DPAD_DOWN, 20, 30);
     }
     pbf_mash_button(console, BUTTON_A, 125);
@@ -383,6 +271,10 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, Wa
     }
     console.log("Arrived at sub-camp...");
     env.wait_for(std::chrono::seconds(1));
+
+    if (location.post_arrival_maneuver == nullptr){
+        return;
+    }
 }
 
 

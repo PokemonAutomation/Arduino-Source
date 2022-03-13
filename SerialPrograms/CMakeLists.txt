@@ -235,6 +235,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Inference/BlackBorderDetector.h
     Source/CommonFramework/Inference/BlackScreenDetector.cpp
     Source/CommonFramework/Inference/BlackScreenDetector.h
+    Source/CommonFramework/Inference/DetectionDebouncer.h
     Source/CommonFramework/Inference/FrozenImageDetector.cpp
     Source/CommonFramework/Inference/FrozenImageDetector.h
     Source/CommonFramework/Inference/ImageMatchDetector.cpp
@@ -829,6 +830,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/PokemonLA_Locations.h
     Source/PokemonLA/PokemonLA_Settings.cpp
     Source/PokemonLA/PokemonLA_Settings.h
+    Source/PokemonLA/PokemonLA_TravelLocations.cpp
+    Source/PokemonLA/PokemonLA_TravelLocations.h
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.cpp
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.h
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.cpp

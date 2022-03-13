@@ -11,6 +11,7 @@
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
+#include "CommonFramework/Inference/DetectionDebouncer.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h"
 
@@ -63,7 +64,7 @@ public:
     );
 
     bool detected() const{
-        return m_detected.load(std::memory_order_acquire);
+        return m_debouncer.get();
     }
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
@@ -76,17 +77,12 @@ public:
 private:
     LoggerQt& m_logger;
     ImageFloatBox m_box;
-    std::chrono::milliseconds m_min_streak;
     bool m_stop_on_detected;
 
-    SpinLock m_lock;
     ButtonTracker m_tracker;
     WhiteObjectWatcher m_watcher;
 
-    std::chrono::system_clock::time_point m_last_flip;
-    bool m_current_streak;
-
-    std::atomic<bool> m_detected;
+    DetectionDebouncer<bool> m_debouncer;
 };
 
 

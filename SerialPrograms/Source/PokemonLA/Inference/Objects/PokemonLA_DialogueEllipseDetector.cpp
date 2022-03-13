@@ -70,12 +70,18 @@ DialogueEllipseDetector::DialogueEllipseDetector(
     : VisualInferenceCallback("CenterAButtonDetector")
     , m_logger(logger)
     , m_box(0.741, 0.811, 0.028, 0.023)
-    , m_min_streak(min_streak)
     , m_stop_on_detected(stop_on_detected)
     , m_watcher(overlay, m_box, { {m_tracker, false} })
-    , m_last_flip(std::chrono::system_clock::now())
-    , m_current_streak(false)
-    , m_detected(false)
+    , m_debouncer(
+        false, min_streak,
+        [&](bool value){
+            if (value){
+                m_logger.log("Detected transparent dialogue box ellipse button.", COLOR_PURPLE);
+            }else{
+                m_logger.log("Transparent dialogue box ellipse button disappeared.", COLOR_PURPLE);
+            }
+        }
+    )
 {}
 
 
@@ -87,34 +93,8 @@ bool DialogueEllipseDetector::process_frame(
     std::chrono::system_clock::time_point timestamp
 ){
     m_watcher.process_frame(frame, timestamp);
-
-    SpinLockGuard lg(m_lock);
-
-    //  Streak ends
-    if (m_current_streak == m_tracker.detections().empty()){
-        m_current_streak = !m_tracker.detections().empty();
-        m_last_flip = timestamp;
-        return false;
-    }
-
-    //  Streak not long enough.
-    if (timestamp - m_last_flip < m_min_streak){
-        return false;
-    }
-
-    //  No state change.
-    if (m_current_streak == detected()){
-        return false;
-    }
-
-    if (m_current_streak){
-        m_logger.log("Detected transparent dialogue box ellipse button.", COLOR_PURPLE);
-    }else{
-        m_logger.log("Transparent dialogue box ellipse button disappeared.", COLOR_PURPLE);
-    }
-    m_detected.store(m_current_streak, std::memory_order_release);
-
-    return m_stop_on_detected;
+    bool detected = m_debouncer.push_value(!m_tracker.detections().empty(), timestamp);
+    return detected && m_stop_on_detected;
 }
 
 

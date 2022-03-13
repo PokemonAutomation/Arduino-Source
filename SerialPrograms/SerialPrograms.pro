@@ -409,6 +409,7 @@ SOURCES += \
     Source/PokemonLA/Panels_PokemonLA.cpp \
     Source/PokemonLA/PokemonLA_Locations.cpp \
     Source/PokemonLA/PokemonLA_Settings.cpp \
+    Source/PokemonLA/PokemonLA_TravelLocations.cpp \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.cpp \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.cpp \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp \
@@ -724,6 +725,7 @@ HEADERS += \
     Source/CommonFramework/Inference/AudioTemplateCache.h \
     Source/CommonFramework/Inference/BlackBorderDetector.h \
     Source/CommonFramework/Inference/BlackScreenDetector.h \
+    Source/CommonFramework/Inference/DetectionDebouncer.h \
     Source/CommonFramework/Inference/FrozenImageDetector.h \
     Source/CommonFramework/Inference/ImageMatchDetector.h \
     Source/CommonFramework/Inference/ImageTools.h \
@@ -1045,6 +1047,7 @@ HEADERS += \
     Source/PokemonLA/Panels_PokemonLA.h \
     Source/PokemonLA/PokemonLA_Locations.h \
     Source/PokemonLA/PokemonLA_Settings.h \
+    Source/PokemonLA/PokemonLA_TravelLocations.h \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.h \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.h \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.h \

@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonLA_RegionNavigation_H
 
 #include "PokemonLA/PokemonLA_Locations.h"
+#include "PokemonLA/PokemonLA_TravelLocations.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 #include "PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h"
 
@@ -24,7 +25,7 @@ void from_professor_return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& c
 
 void mash_A_to_enter_sub_area(ProgramEnvironment& env, ConsoleHandle& console);
 void mash_A_to_change_region(ProgramEnvironment& env, ConsoleHandle& console);
-void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, WarpSpot camp);
+void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, const TravelLocation& location);
 
 
 void goto_camp_from_overworld(

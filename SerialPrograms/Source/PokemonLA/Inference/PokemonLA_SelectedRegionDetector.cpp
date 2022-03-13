@@ -15,18 +15,6 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-const char* MAP_REGION_NAMES[] = {
-    "None",
-    "Jubilife Village",
-    "Obsidian Fieldlands",
-    "Crimson Mirelands",
-    "Cobalt Coastlands",
-    "Coronet Highlands",
-    "Alabaster Islands",
-    "Ancient Retreat",
-};
-
-
 class MapLocationDetector : public VisualInferenceCallback{
 public:
     MapLocationDetector(const QImage& screen)

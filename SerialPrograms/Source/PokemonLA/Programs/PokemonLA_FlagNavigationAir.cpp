@@ -143,6 +143,7 @@ FlagNavigationAir::FlagNavigationAir(
         });
         return false;
     });
+
     register_state_command(State::DASH_FORWARD_MASH_B, [=](){
         m_console.log("Dashing forward (mash B)...");
         m_active_command->dispatch([=](const BotBaseContext& context){
@@ -171,7 +172,8 @@ FlagNavigationAir::FlagNavigationAir(
         });
         return false;
     });
-    register_state_command(State::DASH_TURN, [=](){
+
+    auto dash_turn = [=](){
         m_console.log("Dashing Turn...");
         m_active_command->dispatch([=](const BotBaseContext& context){
             //  Move forward to straighten out direction.
@@ -192,7 +194,10 @@ FlagNavigationAir::FlagNavigationAir(
             pbf_controller_state(context, BUTTON_B, DPAD_NONE, (int8_t)(128 + shift), 128, 128, 128, 255);
         });
         return false;
-    });
+    };
+    register_state_command(State::DASH_LEFT, dash_turn);
+    register_state_command(State::DASH_RIGHT, dash_turn);
+
     register_state_command(State::DIVE_STRAIGHT, [=](){
         m_console.log("Diving Straight...");
         m_active_command->dispatch([=](const BotBaseContext& context){
@@ -207,7 +212,8 @@ FlagNavigationAir::FlagNavigationAir(
         });
         return false;
     });
-    register_state_command(State::DIVE_TURN, [=](){
+
+    auto dive_turn = [=](){
         m_console.log("Diving Turn...");
         m_active_command->dispatch([=](const BotBaseContext& context){
             //  Move forward to straighten out direction.
@@ -228,7 +234,10 @@ FlagNavigationAir::FlagNavigationAir(
             pbf_controller_state(context, BUTTON_Y, DPAD_NONE, (int8_t)(128 + shift), 128, 128, 128, 255);
         });
         return false;
-    });
+    };
+    register_state_command(State::DIVE_LEFT, dive_turn);
+    register_state_command(State::DIVE_RIGHT, dive_turn);
+
     register_state_command(State::TURN_LEFT, [=](){
         m_console.log("Turning Left...");
         m_active_command->dispatch([=](const BotBaseContext& context){
@@ -255,6 +264,7 @@ FlagNavigationAir::FlagNavigationAir(
         m_looking_straight_ahead.store(false, std::memory_order_release);
         return false;
     });
+
     register_state_command(State::FIND_FLAG, [=](){
         m_console.log("Looking for flag...");
         uint8_t turn = m_flag_x <= 0.5 ? 0 : 255;
@@ -304,7 +314,7 @@ bool FlagNavigationAir::run_state(
         m_last_flag_detection = timestamp;
     }
 #if 1
-    if (m_flag_detected){
+    if (m_flag_detected && m_flag_distance >= 0 && m_flag_distance < 50){
         std::stringstream ss;
         ss << "distance = " << (m_flag_distance < 0 ? "?" : std::to_string(m_flag_distance))
              << ", x = " << m_flag_x << ", y = " << m_flag_y << endl;
@@ -425,18 +435,21 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
     }
 
     //  Dive
-    bool currently_diving = state == State::DIVE_STRAIGHT || state == State::DIVE_TURN;
+    bool currently_diving =
+        state == State::DIVE_STRAIGHT ||
+        state == State::DIVE_LEFT ||
+        state == State::DIVE_RIGHT;
     if (m_flag_y > 0.45 || (currently_diving && m_flag_y > 0.15)){
         if (0.48 <= m_flag_x && m_flag_x <= 0.52){
             return run_state_action(State::DIVE_STRAIGHT);
         }else{
-            return run_state_action(State::DIVE_TURN);
+            return run_state_action(m_flag_x < 0.5 ? State::DIVE_LEFT : State::DIVE_RIGHT);
         }
     }
 
     //  Turning Cruise
     if (0.48 > m_flag_x || m_flag_x > 0.52){
-        return run_state_action(State::DASH_TURN);
+        return run_state_action(m_flag_x < 0.5 ? State::DASH_LEFT : State::DASH_RIGHT);
     }
 
     if (m_flag_y <= 0.50){

@@ -26,6 +26,19 @@ const char* templatePath(ButtonType type){
     }
 }
 
+const char* button_name(ButtonType type){
+    switch (type){
+    case ButtonType::ButtonA:
+        return "A";
+    case ButtonType::ButtonB:
+        return "B";
+    case ButtonType::ButtonPlus:
+        return "+";
+    default:
+        return "";
+    }
+}
+
 const ButtonMatcher& getButtonMatcher(ButtonType type){
     switch (type){
     case ButtonType::ButtonA:
@@ -106,13 +119,19 @@ ButtonDetector::ButtonDetector(
     : VisualInferenceCallback("CenterAButtonDetector")
     , m_logger(logger)
     , m_box(box)
-    , m_min_streak(min_streak)
     , m_stop_on_detected(stop_on_detected)
     , m_tracker(type)
     , m_watcher(overlay, m_box, { {m_tracker, false} })
-    , m_last_flip(std::chrono::system_clock::now())
-    , m_current_streak(false)
-    , m_detected(false)
+    , m_debouncer(
+        false, min_streak,
+        [=](bool value){
+            if (value){
+                m_logger.log(std::string("Detected (") + button_name(type) + ") Button.", COLOR_PURPLE);
+            }else{
+                m_logger.log(std::string("(") + button_name(type) + ") Button has disappeared.", COLOR_PURPLE);
+            }
+        }
+    )
 {}
 
 void ButtonDetector::make_overlays(VideoOverlaySet& items) const{
@@ -123,34 +142,8 @@ bool ButtonDetector::process_frame(
     std::chrono::system_clock::time_point timestamp
 ){
     m_watcher.process_frame(frame, timestamp);
-
-    SpinLockGuard lg(m_lock);
-
-    //  Streak ends
-    if (m_current_streak == m_tracker.detections().empty()){
-        m_current_streak = !m_tracker.detections().empty();
-        m_last_flip = timestamp;
-        return false;
-    }
-
-    //  Streak not long enough.
-    if (timestamp - m_last_flip < m_min_streak){
-        return false;
-    }
-
-    //  No state change.
-    if (m_current_streak == detected()){
-        return false;
-    }
-
-    if (m_current_streak){
-        m_logger.log("Detected (A) Button.", COLOR_PURPLE);
-    }else{
-        m_logger.log("(A) Button has disappeared.", COLOR_PURPLE);
-    }
-    m_detected.store(m_current_streak, std::memory_order_release);
-
-    return m_stop_on_detected;
+    bool detected = m_debouncer.push_value(!m_tracker.detections().empty(), timestamp);
+    return detected && m_stop_on_detected;
 }
 
 

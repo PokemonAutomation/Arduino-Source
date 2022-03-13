@@ -13,6 +13,7 @@
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/PokemonLA_Locations.h"
+#include "PokemonLA/PokemonLA_TravelLocations.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 
 namespace PokemonAutomation{
@@ -20,12 +21,10 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class WarpLocationOption : public EnumDropdownOption{
+class TravelLocationOption : public EnumDropdownOption{
 public:
-    WarpLocationOption();
-    operator WarpSpot() const{
-        return (WarpSpot)(size_t)*this;
-    }
+    TravelLocationOption();
+    operator TravelLocation() const;
 };
 
 
@@ -50,7 +49,7 @@ private:
 private:
     class Stats;
 
-    WarpLocationOption WARP_SPOT;
+    TravelLocationOption TRAVEL_LOCATION;
 
     SimpleIntegerOption<uint16_t> STOP_DISTANCE;
     FloatingPointOption FLAG_REACHED_DELAY;

@@ -19,14 +19,24 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-WarpLocationOption::WarpLocationOption()
+TravelLocationOption::TravelLocationOption()
     : EnumDropdownOption(
         "<b>Warp Spot:</b><br>Travel from this location.",
-        std::vector<QString>(WARP_SPOT_NAMES + 0, WARP_SPOT_NAMES + (size_t)WarpSpot::END_LIST),
+        TravelLocations::instance().all_location_names(),
         0
     )
 {}
 
+TravelLocationOption::operator TravelLocation() const{
+    size_t index = (size_t)*this;
+    const QString& label = this->case_list()[index];
+    std::string str = label.toStdString();
+    const TravelLocation* location = TravelLocations::instance().get_from_name(str);
+    if (location == nullptr){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid TravelLocation: " + str);
+    }
+    return *location;
+}
 
 
 
@@ -69,7 +79,7 @@ ShinyHuntFixedPoint::ShinyHuntFixedPoint(const ShinyHuntFixedPoint_Descriptor& d
         &NOTIFICATION_ERROR_FATAL,
     })
 {
-    PA_ADD_OPTION(WARP_SPOT);
+    PA_ADD_OPTION(TRAVEL_LOCATION);
     PA_ADD_OPTION(STOP_DISTANCE);
     PA_ADD_OPTION(FLAG_REACHED_DELAY);
     PA_ADD_OPTION(NAVIGATION_TIMEOUT);
@@ -106,7 +116,7 @@ void ShinyHuntFixedPoint::run_iteration(SingleSwitchProgramEnvironment& env){
     Stats& stats = env.stats<Stats>();
     stats.attempts++;
 
-    goto_camp_from_jubilife(env, env.console, WARP_SPOT);
+    goto_camp_from_jubilife(env, env.console, TRAVEL_LOCATION);
 
     {
         FlagNavigationAir session(

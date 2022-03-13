@@ -113,7 +113,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
     Stats& stats = env.stats<Stats>();
 
     //  Go to Coronet Highlands Mountain camp.
-    goto_camp_from_jubilife(env, env.console, WarpSpot::HIGHLANDS_MOUNTAIN);
+    goto_camp_from_jubilife(env, env.console, TravelLocations::instance().Highlands_Mountain);
 
     stats.attempts++;
 
