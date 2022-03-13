@@ -275,6 +275,8 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, co
     if (location.post_arrival_maneuver == nullptr){
         return;
     }
+
+    location.post_arrival_maneuver(console);
 }
 
 

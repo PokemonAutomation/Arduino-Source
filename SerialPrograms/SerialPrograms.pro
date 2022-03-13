@@ -414,21 +414,21 @@ SOURCES += \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.cpp \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp \
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.cpp \
-    Source/PokemonLA/Programs/PokemonLA_FlagNavigationTest.cpp \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.cpp \
-    Source/PokemonLA/Programs/PokemonLA_IngoBattleGrinder.cpp \
-    Source/PokemonLA/Programs/PokemonLA_NuggetFarmerHighlands.cpp \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.cpp \
-    Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.cpp \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.cpp \
     Source/PokemonLA/Programs/PokemonLA_SelfBoxTrade.cpp \
     Source/PokemonLA/Programs/PokemonLA_SelfTouchTrade.cpp \
-    Source/PokemonLA/Programs/PokemonLA_ShinySoundListener.cpp \
     Source/PokemonLA/Programs/PokemonLA_TradeRoutines.cpp \
+    Source/PokemonLA/Programs/Farming/PokemonLA_NuggetFarmerHighlands.cpp \
+    Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_GalladeFinder.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FixedPoint.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.cpp \
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_OverworldWatcher.cpp \
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_ShinySoundListener.cpp \
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_FlagNavigationTest.cpp \
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.cpp \
     Source/PokemonLA/Resources/PokemonLA_PokemonIcons.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp \
@@ -1052,21 +1052,21 @@ HEADERS += \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.h \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.h \
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.h \
-    Source/PokemonLA/Programs/PokemonLA_FlagNavigationTest.h \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.h \
-    Source/PokemonLA/Programs/PokemonLA_IngoBattleGrinder.h \
-    Source/PokemonLA/Programs/PokemonLA_NuggetFarmerHighlands.h \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.h \
-    Source/PokemonLA/Programs/PokemonLA_OverworldWatcher.h \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h \
     Source/PokemonLA/Programs/PokemonLA_SelfBoxTrade.h \
     Source/PokemonLA/Programs/PokemonLA_SelfTouchTrade.h \
-    Source/PokemonLA/Programs/PokemonLA_ShinySoundListener.h \
     Source/PokemonLA/Programs/PokemonLA_TradeRoutines.h \
+    Source/PokemonLA/Programs/Farming/PokemonLA_NuggetFarmerHighlands.h \
+    Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_GalladeFinder.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FixedPoint.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h \
+    Source/PokemonLA/Programs/TestPrograms/okemonLA_FlagNavigationTest.h \
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_OverworldWatcher.h \
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_ShinySoundListener.h \
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.h \
     Source/PokemonLA/Resources/PokemonLA_PokemonIcons.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h \

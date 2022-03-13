@@ -452,12 +452,12 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
         return run_state_action(m_flag_x < 0.5 ? State::DASH_LEFT : State::DASH_RIGHT);
     }
 
-    if (m_flag_y <= 0.50){
-        //  Normal Cruise
-        return run_state_action(State::DASH_FORWARD_HOLD_B);
-    }else{
+    if (m_flag_y <= 0.40){
         //  B-mash Cruise
         return run_state_action(State::DASH_FORWARD_MASH_B);
+    }else{
+        //  Normal Cruise
+        return run_state_action(State::DASH_FORWARD_HOLD_B);
     }
 
     //  No known state left.

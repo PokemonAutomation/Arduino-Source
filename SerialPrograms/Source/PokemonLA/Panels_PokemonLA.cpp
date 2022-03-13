@@ -13,8 +13,8 @@
 #include "Programs/PokemonLA_DistortionWaiter.h"
 #include "Programs/PokemonLA_OutbreakFinder.h"
 
-#include "Programs/PokemonLA_IngoBattleGrinder.h"
-#include "Programs/PokemonLA_NuggetFarmerHighlands.h"
+#include "Programs/Farming/PokemonLA_IngoBattleGrinder.h"
+#include "Programs/Farming/PokemonLA_NuggetFarmerHighlands.h"
 
 #include "Programs/ShinyHunting/PokemonLA_GalladeFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_CrobatFinder.h"
@@ -23,10 +23,10 @@
 
 #include "Programs/PokemonLA_SelfBoxTrade.h"
 #include "Programs/PokemonLA_SelfTouchTrade.h"
-#include "Programs/PokemonLA_ShinySoundListener.h"
 
-#include "PokemonLA/Programs/PokemonLA_OverworldWatcher.h"
-#include "PokemonLA/Programs/PokemonLA_FlagNavigationTest.h"
+#include "Programs/TestPrograms/PokemonLA_OverworldWatcher.h"
+#include "Programs/TestPrograms/PokemonLA_ShinySoundListener.h"
+#include "Programs/TestPrograms/PokemonLA_FlagNavigationTest.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

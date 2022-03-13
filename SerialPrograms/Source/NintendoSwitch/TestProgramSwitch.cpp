@@ -258,6 +258,22 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 
+
+#if 0
+    QImage image("test-fail.png");
+
+//    QImage image = feed.snapshot();
+
+    MountDetector detector;
+    MountState state = detector.detect(image);
+
+//    if (state == MountState::NOTHING){
+//        image.save("test.png");
+//    }
+#endif
+
+
+
 #if 0
     QImage image("screenshot-20220312-205532347068.png");
 

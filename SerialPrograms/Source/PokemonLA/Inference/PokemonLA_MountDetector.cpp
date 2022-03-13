@@ -102,7 +102,9 @@ public:
             on ? "PokemonLA/Mounts/MountOn-Basculegion-Template-1.png" : "PokemonLA/Mounts/MountOff-Basculegion-Template.png",
             Color(0xff808000), Color(0xffffffff), 100
         )
-    {}
+    {
+        m_area_ratio_upper = 1.50;
+    }
     static const MountBasculegionMatcher& on(){
         static MountBasculegionMatcher matcher(true);
         return matcher;
@@ -177,14 +179,14 @@ struct MountCandiateTracker{
     MountState m_state = MountState::NOTHING;
 
     void add_filtered(double rmsd, MountState state){
-        if (rmsd > 150 || m_rmsd <= rmsd){
+        if (rmsd > 1500 || m_rmsd <= rmsd){
             return;
         }
         m_rmsd = rmsd;
         m_state = state;
     }
     void add_direct(double rmsd, MountState state){
-        if (rmsd > 80 || m_rmsd <= rmsd){
+        if (rmsd > 800 || m_rmsd <= rmsd){
             return;
         }
         m_rmsd = rmsd;
@@ -249,7 +251,7 @@ MountState MountDetector::detect(const QImage& screen) const{
         }
     }
     {
-//        int i = 0;
+        int i = 0;
         uint32_t filters[4][2]{
             {0xff606000, 0xffffff7f},
             {0xff808000, 0xffffff6f},
@@ -292,11 +294,11 @@ MountState MountDetector::detect(const QImage& screen) const{
                 candidates.add_direct  (MountBasculegionMatcher  ::on().rmsd(image      , object), MountState::BASCULEGION_ON);
                 candidates.add_filtered(MountSneaslerMatcher     ::on().rmsd(filtered[c], object), MountState::SNEASLER_ON);
                 candidates.add_direct  (MountSneaslerMatcher     ::on().rmsd(image      , object), MountState::SNEASLER_ON);
-#endif
                 candidates.add_filtered(MountBraviaryMatcher     ::on().rmsd(filtered[c], object), MountState::BRAVIARY_ON);
                 candidates.add_direct  (MountBraviaryMatcher     ::on().rmsd(image      , object), MountState::BRAVIARY_ON);
-//                extract_box(image, object).save("test-" + QString::number(c) + "-" + QString::number(i) + ".png");
-//                i++;
+#endif
+                extract_box(image, object).save("test-" + QString::number(c) + "-" + QString::number(i) + ".png");
+                i++;
             }
         }
 //        cout << "i = " << i << endl;

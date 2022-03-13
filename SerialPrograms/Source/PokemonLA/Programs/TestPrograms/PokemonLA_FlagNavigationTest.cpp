@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/Globals.h"
-#include "PokemonLA_FlagNavigationAir.h"
+#include "PokemonLA/Programs/PokemonLA_FlagNavigationAir.h"
 #include "PokemonLA_FlagNavigationTest.h"
 
 namespace PokemonAutomation{
