@@ -11,12 +11,39 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
+namespace{
+
+const char* templatePath(ButtonType type){
+    switch (type){
+    case ButtonType::ButtonA:
+        return "PokemonLA/Buttons/ButtonA-Template.png";
+    case ButtonType::ButtonB:
+        return "PokemonLA/Buttons/ButtonB-Template.png";
+    case ButtonType::ButtonPlus:
+        return "PokemonLA/Buttons/ButtonPlus-Template.png";
+    default:
+        return "";
+    }
+}
+
+const ButtonMatcher& getButtonMatcher(ButtonType type){
+    switch (type){
+    case ButtonType::ButtonA:
+        return ButtonMatcher::A();
+    case ButtonType::ButtonB:
+        return ButtonMatcher::B();
+    case ButtonType::ButtonPlus:
+        return ButtonMatcher::Plus();
+    default:
+        throw std::runtime_error("No corresponding ButtonMatcher for ButtonType");
+    }
+}
+
+}
 
 ButtonMatcher::ButtonMatcher(ButtonType type)
     : WaterfillTemplateMatcher(
-        type == ButtonType::ButtonA ? "PokemonLA/Buttons/ButtonA-Template.png" :
-        type == ButtonType::ButtonB ? "PokemonLA/Buttons/ButtonB-Template.png" : "",
-        Color(0xff808008), Color(0xffffffff), 100
+        templatePath(type), Color(0xff808008), Color(0xffffffff), 100
     )
 {}
 const ButtonMatcher& ButtonMatcher::A(){
@@ -25,6 +52,10 @@ const ButtonMatcher& ButtonMatcher::A(){
 }
 const ButtonMatcher& ButtonMatcher::B(){
     static ButtonMatcher matcher(ButtonType::ButtonB);
+    return matcher;
+}
+const ButtonMatcher& ButtonMatcher::Plus(){
+    static ButtonMatcher matcher(ButtonType::ButtonPlus);
     return matcher;
 }
 
@@ -42,9 +73,7 @@ ButtonTracker::ButtonTracker(ButtonType type)
             Color(0xffb0b0b0),
         }
     )
-    , m_matcher(
-        type == ButtonType::ButtonA ? ButtonMatcher::A() : ButtonMatcher::B()
-    )
+    , m_matcher(getButtonMatcher(type))
 {}
 
 void ButtonTracker::process_object(const QImage& image, const WaterfillObject& object){

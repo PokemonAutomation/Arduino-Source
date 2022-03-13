@@ -12,6 +12,7 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -44,6 +45,8 @@ private:
     // The dark blue background of "Ready to battle":
     ImageFloatBox m_ready_to_battle_bg_1;
     ImageFloatBox m_ready_to_battle_bg_2;
+
+    ButtonDetector m_button_plus_detector;
 };
 
 
