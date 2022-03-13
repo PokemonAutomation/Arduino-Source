@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonLA_ShinyHuntFixedPoint_H
-#define PokemonAutomation_PokemonLA_ShinyHuntFixedPoint_H
+#ifndef PokemonAutomation_PokemonLA_ShinyHuntFlagPin_H
+#define PokemonAutomation_PokemonLA_ShinyHuntFlagPin_H
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
@@ -30,15 +30,15 @@ public:
 
 
 
-class ShinyHuntFixedPoint_Descriptor : public RunnableSwitchProgramDescriptor{
+class ShinyHuntFlagPin_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
-    ShinyHuntFixedPoint_Descriptor();
+    ShinyHuntFlagPin_Descriptor();
 };
 
 
-class ShinyHuntFixedPoint : public SingleSwitchProgramInstance{
+class ShinyHuntFlagPin : public SingleSwitchProgramInstance{
 public:
-    ShinyHuntFixedPoint(const ShinyHuntFixedPoint_Descriptor& descriptor);
+    ShinyHuntFlagPin(const ShinyHuntFlagPin_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env) override;

@@ -13,16 +13,16 @@
 #include "Programs/PokemonLA_DistortionWaiter.h"
 #include "Programs/PokemonLA_OutbreakFinder.h"
 
+#include "Programs/Trading/PokemonLA_SelfBoxTrade.h"
+#include "Programs/Trading/PokemonLA_SelfTouchTrade.h"
+
 #include "Programs/Farming/PokemonLA_IngoBattleGrinder.h"
 #include "Programs/Farming/PokemonLA_NuggetFarmerHighlands.h"
 
 #include "Programs/ShinyHunting/PokemonLA_GalladeFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_CrobatFinder.h"
-#include "Programs/ShinyHunting/PokemonLA_ShinyHunt-FixedPoint.h"
+#include "Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.h"
 //#include "Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h"
-
-#include "Programs/PokemonLA_SelfBoxTrade.h"
-#include "Programs/PokemonLA_SelfTouchTrade.h"
 
 #include "Programs/TestPrograms/PokemonLA_OverworldWatcher.h"
 #include "Programs/TestPrograms/PokemonLA_ShinySoundListener.h"
@@ -44,6 +44,10 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<DistortionWaiter_Descriptor, DistortionWaiter>();
     add_program<OutbreakFinder_Descriptor, OutbreakFinder>();
 
+    add_divider("---- Trading ----");
+    add_program<SelfBoxTrade_Descriptor, SelfBoxTrade>();
+    add_program<SelfTouchTrade_Descriptor, SelfTouchTrade>();
+
     add_divider("---- Farming ----");
     add_program<NuggetFarmerHighlands_Descriptor, MoneyFarmerHighlands>();
     if (GlobalSettings::instance().DEVELOPER_MODE){
@@ -55,12 +59,8 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<GalladeFinder_Descriptor, GalladeFinder>();
 //    add_program<ShinyHuntLakeTrio_Descriptor, ShinyHuntLakeTrio>();
     if (GlobalSettings::instance().DEVELOPER_MODE){
-        add_program<ShinyHuntFixedPoint_Descriptor, ShinyHuntFixedPoint>();
+        add_program<ShinyHuntFlagPin_Descriptor, ShinyHuntFlagPin>();
     }
-
-    add_divider("---- Trading ----");
-    add_program<SelfBoxTrade_Descriptor, SelfBoxTrade>();
-    add_program<SelfTouchTrade_Descriptor, SelfTouchTrade>();
 
 
     if (GlobalSettings::instance().DEVELOPER_MODE){

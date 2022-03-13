@@ -277,6 +277,7 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, co
     }
 
     location.post_arrival_maneuver(console);
+    console.botbase().wait_for_all_requests();
 }
 
 

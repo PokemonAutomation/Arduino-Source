@@ -157,7 +157,6 @@
 #include "PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h"
 #include "PokemonLA/Inference/PokemonLA_MapDetector.h"
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
-#include "PokemonLA/Programs/PokemonLA_TradeRoutines.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 #include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
 #include "CommonFramework/Tools/MultiConsoleErrors.h"
@@ -166,6 +165,7 @@
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
+#include "PokemonLA/Programs/PokemonLA_MountChange.h"
 #include "TestProgramSwitch.h"
 
 #include <immintrin.h>
@@ -254,7 +254,10 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
+    change_mount(console, MountState::BRAVIARY_ON);
 
+    pbf_move_left_joystick(console, 160, 0, 160, 0);
+    pbf_mash_button(console, BUTTON_B, 375);
 
 
 

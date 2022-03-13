@@ -1,0 +1,26 @@
+/*  Mount Change
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#ifndef PokemonAutomation_PokemonLA_MountChange_H
+#define PokemonAutomation_PokemonLA_MountChange_H
+
+#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "PokemonLA/Inference/PokemonLA_MountDetector.h"
+
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonLA{
+
+
+//  Be careful when changing away from Braviary (on) since you will fall down.
+void change_mount(ConsoleHandle& console, MountState mount);
+
+
+
+}
+}
+}
+#endif

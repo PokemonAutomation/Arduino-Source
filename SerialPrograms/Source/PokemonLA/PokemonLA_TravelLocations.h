@@ -18,6 +18,7 @@
 class QString;
 
 namespace PokemonAutomation{
+    class ConsoleHandle;
 namespace NintendoSwitch{
 namespace PokemonLA{
 
@@ -30,13 +31,13 @@ struct TravelLocation{
     uint8_t warp_slot;
     uint8_t warp_sub_slot;
 
-    std::function<void(const BotBaseContext& context)> post_arrival_maneuver;
+    std::function<void(ConsoleHandle& console)> post_arrival_maneuver;
 
     TravelLocation(
         const char* p_label,
         MapRegion p_region,
         uint8_t p_warp_slot, uint8_t p_warp_sub_slot,
-        std::function<void(const BotBaseContext& context)>&& p_post_arrival_maneuver
+        std::function<void(ConsoleHandle& console)>&& p_post_arrival_maneuver
     );
 };
 
@@ -63,6 +64,7 @@ public:
     const TravelLocation Coastlands_Beachside;
     const TravelLocation Coastlands_Coastlands;
     const TravelLocation Coastlands_Arena;
+    const TravelLocation Coastlands_Arena_NW;
 
     const TravelLocation Highlands_Highlands;
     const TravelLocation Highlands_Mountain;

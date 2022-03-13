@@ -19,6 +19,7 @@
 #include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
 #include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
+#include "PokemonLA/Programs/PokemonLA_MountChange.h"
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "PokemonLA_NuggetFarmerHighlands.h"
 
@@ -117,27 +118,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
 
     stats.attempts++;
 
-    //  Switch to Wrydeer.
-    bool error = true;
-    MountDetector mount_detector;
-    for (size_t c = 0; c < 10; c++){
-        MountState mount = mount_detector.detect(env.console.video().snapshot());
-        if (mount == MountState::WYRDEER_OFF){
-            pbf_press_button(env.console, BUTTON_PLUS, 20, 105);
-            error = false;
-            break;
-        }
-        if (mount == MountState::WYRDEER_ON){
-            pbf_wait(env.console, 5 * TICKS_PER_SECOND);
-            error = false;
-            break;
-        }
-        pbf_press_dpad(env.console, DPAD_LEFT, 20, 50);
-        env.console.botbase().wait_for_all_requests();
-    }
-    if (error){
-        throw OperationFailedException(env.console, "Unable to find Wyrdeer after 10 attempts.");
-    }
+    change_mount(env.console, MountState::WYRDEER_ON);
 
 
     bool success = false;

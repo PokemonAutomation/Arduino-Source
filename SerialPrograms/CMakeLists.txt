@@ -840,18 +840,20 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.h
     Source/PokemonLA/Programs/PokemonLA_GameEntry.cpp
     Source/PokemonLA/Programs/PokemonLA_GameEntry.h
+    Source/PokemonLA/Programs/PokemonLA_MountChange.cpp
+    Source/PokemonLA/Programs/PokemonLA_MountChange.h
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.cpp
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.h
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.cpp
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h
-    Source/PokemonLA/Programs/PokemonLA_SelfBoxTrade.cpp
-    Source/PokemonLA/Programs/PokemonLA_SelfBoxTrade.h
-    Source/PokemonLA/Programs/PokemonLA_SelfTouchTrade.cpp
-    Source/PokemonLA/Programs/PokemonLA_SelfTouchTrade.h
-    Source/PokemonLA/Programs/PokemonLA_TradeRoutines.cpp
-    Source/PokemonLA/Programs/PokemonLA_TradeRoutines.h
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.h
+    Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.cpp
+    Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.h
+    Source/PokemonLA/Programs/Trading/PokemonLA_SelfTouchTrade.cpp
+    Source/PokemonLA/Programs/Trading/PokemonLA_SelfTouchTrade.h
+    Source/PokemonLA/Programs/Trading/PokemonLA_TradeRoutines.cpp
+    Source/PokemonLA/Programs/Trading/PokemonLA_TradeRoutines.h
     Source/PokemonLA/Programs/Farming/PokemonLA_NuggetFarmerHighlands.cpp
     Source/PokemonLA/Programs/Farming/PokemonLA_NuggetFarmerHighlands.h
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.cpp
@@ -860,8 +862,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_GalladeFinder.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_GalladeFinder.h
-    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FixedPoint.cpp
-    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FixedPoint.h
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.cpp
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_FlagNavigationTest.cpp

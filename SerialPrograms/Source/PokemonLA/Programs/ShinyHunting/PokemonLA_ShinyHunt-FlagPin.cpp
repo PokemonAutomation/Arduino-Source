@@ -12,7 +12,7 @@
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "PokemonLA/Programs/PokemonLA_FlagNavigationAir.h"
-#include "PokemonLA_ShinyHunt-FixedPoint.h"
+#include "PokemonLA_ShinyHunt-FlagPin.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -21,7 +21,7 @@ namespace PokemonLA{
 
 TravelLocationOption::TravelLocationOption()
     : EnumDropdownOption(
-        "<b>Warp Spot:</b><br>Travel from this location.",
+        "<b>Start Location:</b><br>Travel from this location.",
         TravelLocations::instance().all_location_names(),
         0
     )
@@ -40,11 +40,11 @@ TravelLocationOption::operator TravelLocation() const{
 
 
 
-ShinyHuntFixedPoint_Descriptor::ShinyHuntFixedPoint_Descriptor()
+ShinyHuntFlagPin_Descriptor::ShinyHuntFlagPin_Descriptor()
     : RunnableSwitchProgramDescriptor(
-        "PokemonLA:ShinyHunt-FixedPoint",
-        STRING_POKEMON + " LA", "Shiny Hunt - Fixed Point",
-        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/ShinyHunt-FixedPoint.md",
+        "PokemonLA:ShinyHunt-FlagPin",
+        STRING_POKEMON + " LA", "Shiny Hunt - Flag Pin",
+        "ComputerControl/blob/master/Wiki/Programs/PokemonLA/ShinyHunt-FlagPin.md",
         "Repeatedly travel to a flag pin to shiny hunt " + STRING_POKEMON + " around it.",
         FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
@@ -52,7 +52,7 @@ ShinyHuntFixedPoint_Descriptor::ShinyHuntFixedPoint_Descriptor()
 {}
 
 
-ShinyHuntFixedPoint::ShinyHuntFixedPoint(const ShinyHuntFixedPoint_Descriptor& descriptor)
+ShinyHuntFlagPin::ShinyHuntFlagPin(const ShinyHuntFlagPin_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , STOP_DISTANCE(
         "<b>Stop Distance:</b><br>"
@@ -87,7 +87,7 @@ ShinyHuntFixedPoint::ShinyHuntFixedPoint(const ShinyHuntFixedPoint_Descriptor& d
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
-class ShinyHuntFixedPoint::Stats : public StatsTracker, public ShinyStatIncrementer{
+class ShinyHuntFlagPin::Stats : public StatsTracker, public ShinyStatIncrementer{
 public:
     Stats()
         : attempts(m_stats["Attempts"])
@@ -107,12 +107,12 @@ public:
     std::atomic<uint64_t>& shinies;
 };
 
-std::unique_ptr<StatsTracker> ShinyHuntFixedPoint::make_stats() const{
+std::unique_ptr<StatsTracker> ShinyHuntFlagPin::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
 
-void ShinyHuntFixedPoint::run_iteration(SingleSwitchProgramEnvironment& env){
+void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env){
     Stats& stats = env.stats<Stats>();
     stats.attempts++;
 
@@ -139,7 +139,7 @@ void ShinyHuntFixedPoint::run_iteration(SingleSwitchProgramEnvironment& env){
 }
 
 
-void ShinyHuntFixedPoint::program(SingleSwitchProgramEnvironment& env){
+void ShinyHuntFlagPin::program(SingleSwitchProgramEnvironment& env){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.
