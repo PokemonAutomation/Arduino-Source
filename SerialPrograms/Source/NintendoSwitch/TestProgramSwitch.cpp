@@ -254,18 +254,26 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
-    change_mount(console, MountState::BRAVIARY_ON);
 
-    pbf_move_left_joystick(console, 160, 0, 160, 0);
-    pbf_mash_button(console, BUTTON_B, 375);
 
 
 
 
 #if 0
-    QImage image("test-fail.png");
+    change_mount(console, MountState::BRAVIARY_ON);
 
-//    QImage image = feed.snapshot();
+    pbf_move_left_joystick(console, 160, 0, 160, 0);
+    pbf_mash_button(console, BUTTON_B, 375);
+#endif
+
+
+
+#if 1
+//    QImage image("basculegion-detection-bad.png");
+//    QRgb pixel = image.pixel(1848, 761);
+//    cout << qRed(pixel) << ", " << qGreen(pixel) << ", " << qBlue(pixel) << endl;
+
+    QImage image = feed.snapshot();
 
     MountDetector detector;
     MountState state = detector.detect(image);

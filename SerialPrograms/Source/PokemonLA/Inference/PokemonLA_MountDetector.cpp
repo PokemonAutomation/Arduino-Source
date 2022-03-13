@@ -179,14 +179,14 @@ struct MountCandiateTracker{
     MountState m_state = MountState::NOTHING;
 
     void add_filtered(double rmsd, MountState state){
-        if (rmsd > 1500 || m_rmsd <= rmsd){
+        if (rmsd > 150 || m_rmsd <= rmsd){
             return;
         }
         m_rmsd = rmsd;
         m_state = state;
     }
     void add_direct(double rmsd, MountState state){
-        if (rmsd > 800 || m_rmsd <= rmsd){
+        if (rmsd > 80 || m_rmsd <= rmsd){
             return;
         }
         m_rmsd = rmsd;
@@ -197,36 +197,74 @@ struct MountCandiateTracker{
 void MountDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box);
 }
+
+
+struct MountDetectorFilteredImage{
+    QImage image;
+    PackedBinaryMatrix matrix;
+};
+
+std::vector<MountDetectorFilteredImage> run_filters(const QImage& image, const std::vector<std::pair<uint32_t, uint32_t>>& range){
+    std::vector<MountDetectorFilteredImage> ret(range.size());
+    size_t c = 0;
+    for (; c + 3 < range.size(); c += 4){
+        filter4_rgb32_range(
+            image,
+            ret[0].image, range[0].first, range[0].second, COLOR_BLACK, false,
+            ret[1].image, range[1].first, range[1].second, COLOR_BLACK, false,
+            ret[2].image, range[2].first, range[2].second, COLOR_BLACK, false,
+            ret[3].image, range[3].first, range[3].second, COLOR_BLACK, false
+        );
+        compress4_rgb32_to_binary_range(
+            image,
+            ret[0].matrix, range[0].first, range[0].second,
+            ret[1].matrix, range[1].first, range[1].second,
+            ret[2].matrix, range[2].first, range[2].second,
+            ret[3].matrix, range[3].first, range[3].second
+        );
+    }
+    for (; c + 1 < range.size(); c += 2){
+        filter2_rgb32_range(
+            image,
+            ret[0].image, range[0].first, range[0].second, COLOR_BLACK, false,
+            ret[1].image, range[1].first, range[1].second, COLOR_BLACK, false
+        );
+        compress2_rgb32_to_binary_range(
+            image,
+            ret[0].matrix, range[0].first, range[0].second,
+            ret[1].matrix, range[1].first, range[1].second
+        );
+    }
+    if (c < range.size()){
+        filter1_rgb32_range(
+            image,
+            ret[0].image, range[0].first, range[0].second, COLOR_BLACK, false
+        );
+        ret[0].matrix = compress_rgb32_to_binary_range(
+            image, range[0].first, range[0].second
+        );
+    }
+    return ret;
+}
+
+
 MountState MountDetector::detect(const QImage& screen) const{
     QImage image = extract_box(screen, m_box);
 
     MountCandiateTracker candidates;
 
     {
-        uint32_t filters[4][2]{
-            {0xff707070, 0xffffffff},
-            {0xff909090, 0xffffffff},
-            {0xffb0b0b0, 0xffffffff},
-            {0xffd0d0d0, 0xffffffff},
-        };
-        QImage filtered[4];
-        filter4_rgb32_range(
+        std::vector<MountDetectorFilteredImage> filtered_images = run_filters(
             image,
-            filtered[0], filters[0][0], filters[0][1], COLOR_BLACK, false,
-            filtered[1], filters[1][0], filters[1][1], COLOR_BLACK, false,
-            filtered[2], filters[2][0], filters[2][1], COLOR_BLACK, false,
-            filtered[3], filters[3][0], filters[3][1], COLOR_BLACK, false
+            {
+                {0xff707070, 0xffffffff},
+                {0xff909090, 0xffffffff},
+                {0xffb0b0b0, 0xffffffff},
+                {0xffd0d0d0, 0xffffffff},
+            }
         );
-        PackedBinaryMatrix matrix[4];
-        compress4_rgb32_to_binary_range(
-            image,
-            matrix[0], filters[0][0], filters[0][1],
-            matrix[1], filters[1][0], filters[1][1],
-            matrix[2], filters[2][0], filters[2][1],
-            matrix[3], filters[3][0], filters[3][1]
-        );
-        for (size_t c = 0; c < 4; c++){
-            WaterFillIterator finder(matrix[c], 50);
+        for (MountDetectorFilteredImage& filtered : filtered_images){
+            WaterFillIterator finder(filtered.matrix, 50);
             WaterfillObject object;
             while (finder.find_next(object)){
                 if (object.width() * 2 < (size_t)image.width() || object.width() == (size_t)image.width()){
@@ -236,47 +274,37 @@ MountState MountDetector::detect(const QImage& screen) const{
                     continue;
                 }
 #if 1
-                candidates.add_filtered(MountWyrdeerMatcher      ::off().rmsd(filtered[c], object), MountState::WYRDEER_OFF);
-                candidates.add_direct  (MountWyrdeerMatcher      ::off().rmsd(image      , object), MountState::WYRDEER_OFF);
-                candidates.add_filtered(MountUrsalunaMatcher     ::off().rmsd(filtered[c], object), MountState::URSALUNA_OFF);
-                candidates.add_direct  (MountUrsalunaMatcher     ::off().rmsd(image      , object), MountState::URSALUNA_OFF);
-                candidates.add_filtered(MountBasculegionMatcher  ::off().rmsd(filtered[c], object), MountState::BASCULEGION_OFF);
-                candidates.add_direct  (MountBasculegionMatcher  ::off().rmsd(image      , object), MountState::BASCULEGION_OFF);
-                candidates.add_filtered(MountSneaslerMatcher     ::off().rmsd(filtered[c], object), MountState::SNEASLER_OFF);
-                candidates.add_direct  (MountSneaslerMatcher     ::off().rmsd(image      , object), MountState::SNEASLER_OFF);
-                candidates.add_filtered(MountBraviaryMatcher     ::off().rmsd(filtered[c], object), MountState::BRAVIARY_OFF);
-                candidates.add_direct  (MountBraviaryMatcher     ::off().rmsd(image      , object), MountState::BRAVIARY_OFF);
+                candidates.add_filtered(MountWyrdeerMatcher      ::off().rmsd(filtered.image, object), MountState::WYRDEER_OFF);
+                candidates.add_direct  (MountWyrdeerMatcher      ::off().rmsd(image         , object), MountState::WYRDEER_OFF);
+                candidates.add_filtered(MountUrsalunaMatcher     ::off().rmsd(filtered.image, object), MountState::URSALUNA_OFF);
+                candidates.add_direct  (MountUrsalunaMatcher     ::off().rmsd(image         , object), MountState::URSALUNA_OFF);
+                candidates.add_filtered(MountBasculegionMatcher  ::off().rmsd(filtered.image, object), MountState::BASCULEGION_OFF);
+                candidates.add_direct  (MountBasculegionMatcher  ::off().rmsd(image         , object), MountState::BASCULEGION_OFF);
+                candidates.add_filtered(MountSneaslerMatcher     ::off().rmsd(filtered.image, object), MountState::SNEASLER_OFF);
+                candidates.add_direct  (MountSneaslerMatcher     ::off().rmsd(image         , object), MountState::SNEASLER_OFF);
+                candidates.add_filtered(MountBraviaryMatcher     ::off().rmsd(filtered.image, object), MountState::BRAVIARY_OFF);
+                candidates.add_direct  (MountBraviaryMatcher     ::off().rmsd(image         , object), MountState::BRAVIARY_OFF);
 #endif
             }
         }
     }
     {
-        int i = 0;
-        uint32_t filters[4][2]{
-            {0xff606000, 0xffffff7f},
-            {0xff808000, 0xffffff6f},
-            {0xffa0a000, 0xffffff5f},
-            {0xffc0c000, 0xffffff4f},
-        };
-        QImage filtered[4];
-        filter4_rgb32_range(
+        std::vector<MountDetectorFilteredImage> filtered_images = run_filters(
             image,
-            filtered[0], filters[0][0], filters[0][1], COLOR_BLACK, false,
-            filtered[1], filters[1][0], filters[1][1], COLOR_BLACK, false,
-            filtered[2], filters[2][0], filters[2][1], COLOR_BLACK, false,
-            filtered[3], filters[3][0], filters[3][1], COLOR_BLACK, false
+            {
+                {0xff606000, 0xffffff7f},
+                {0xff808000, 0xffffff6f},
+                {0xffa0a000, 0xffffff5f},
+                {0xffc0c000, 0xffffff4f},
+                {0xff606000, 0xffffffff},
+                {0xff808000, 0xffffffff},
+                {0xffa0a000, 0xffffffff},
+                {0xffc0c000, 0xffffffff},
+            }
         );
-        PackedBinaryMatrix matrix[4];
-        compress4_rgb32_to_binary_range(
-            image,
-            matrix[0], filters[0][0], filters[0][1],
-            matrix[1], filters[1][0], filters[1][1],
-            matrix[2], filters[2][0], filters[2][1],
-            matrix[3], filters[3][0], filters[3][1]
-        );
-        for (size_t c = 0; c < 4; c++){
-//            cout << "Filter: " << c << endl;
-            WaterFillIterator finder(matrix[c], 50);
+//        int i = 0;
+        for (MountDetectorFilteredImage& filtered : filtered_images){
+            WaterFillIterator finder(filtered.matrix, 50);
             WaterfillObject object;
             while (finder.find_next(object)){
                 if (object.width() * 2 < (size_t)image.width() || object.width() == (size_t)image.width()){
@@ -286,25 +314,28 @@ MountState MountDetector::detect(const QImage& screen) const{
                     continue;
                 }
 #if 1
-                candidates.add_filtered(MountWyrdeerMatcher      ::on().rmsd(filtered[c], object), MountState::WYRDEER_ON);
-                candidates.add_direct  (MountWyrdeerMatcher      ::on().rmsd(image      , object), MountState::WYRDEER_ON);
-                candidates.add_filtered(MountUrsalunaMatcher     ::on().rmsd(filtered[c], object), MountState::URSALUNA_ON);
-                candidates.add_direct  (MountUrsalunaMatcher     ::on().rmsd(image      , object), MountState::URSALUNA_ON);
-                candidates.add_filtered(MountBasculegionMatcher  ::on().rmsd(filtered[c], object), MountState::BASCULEGION_ON);
-                candidates.add_direct  (MountBasculegionMatcher  ::on().rmsd(image      , object), MountState::BASCULEGION_ON);
-                candidates.add_filtered(MountSneaslerMatcher     ::on().rmsd(filtered[c], object), MountState::SNEASLER_ON);
-                candidates.add_direct  (MountSneaslerMatcher     ::on().rmsd(image      , object), MountState::SNEASLER_ON);
-                candidates.add_filtered(MountBraviaryMatcher     ::on().rmsd(filtered[c], object), MountState::BRAVIARY_ON);
-                candidates.add_direct  (MountBraviaryMatcher     ::on().rmsd(image      , object), MountState::BRAVIARY_ON);
+                candidates.add_filtered(MountWyrdeerMatcher      ::on().rmsd(filtered.image, object), MountState::WYRDEER_ON);
+                candidates.add_direct  (MountWyrdeerMatcher      ::on().rmsd(image         , object), MountState::WYRDEER_ON);
+                candidates.add_filtered(MountUrsalunaMatcher     ::on().rmsd(filtered.image, object), MountState::URSALUNA_ON);
+                candidates.add_direct  (MountUrsalunaMatcher     ::on().rmsd(image         , object), MountState::URSALUNA_ON);
+                candidates.add_filtered(MountBasculegionMatcher  ::on().rmsd(filtered.image, object), MountState::BASCULEGION_ON);
+                candidates.add_direct  (MountBasculegionMatcher  ::on().rmsd(image         , object), MountState::BASCULEGION_ON);
+                candidates.add_filtered(MountSneaslerMatcher     ::on().rmsd(filtered.image, object), MountState::SNEASLER_ON);
+                candidates.add_direct  (MountSneaslerMatcher     ::on().rmsd(image         , object), MountState::SNEASLER_ON);
+                candidates.add_filtered(MountBraviaryMatcher     ::on().rmsd(filtered.image, object), MountState::BRAVIARY_ON);
+                candidates.add_direct  (MountBraviaryMatcher     ::on().rmsd(image         , object), MountState::BRAVIARY_ON);
 #endif
-                extract_box(image, object).save("test-" + QString::number(c) + "-" + QString::number(i) + ".png");
-                i++;
+//                extract_box(image, object).save("test-" + QString::number(c) + "-" + QString::number(i) + ".png");
+//                i++;
             }
         }
 //        cout << "i = " << i << endl;
     }
 
 //    cout << "rmsd = " << candidates.m_rmsd << ", state = " << (int)candidates.m_state << endl;
+//    if (candidates.m_state == MountState::BASCULEGION_ON){
+//        screen.save("basculegion-detection.png");
+//    }
     return candidates.m_state;
 }
 
