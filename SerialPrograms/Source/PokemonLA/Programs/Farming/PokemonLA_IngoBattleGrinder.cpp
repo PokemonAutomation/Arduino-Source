@@ -354,8 +354,8 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
         );
         if (ret < 0){
             env.console.log("Error: Failed to find battle menu after 2 minutes.");
-            return true;
-            // throw OperationFailedException(env.console, "Failed to find battle menu after 2 minutes.");
+//            return true;
+            throw OperationFailedException(env.console, "Failed to find battle menu after 2 minutes.");
         }
 
         if (ret == 0){
@@ -473,9 +473,7 @@ void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env){
             }
         }catch (OperationFailedException&){
             stats.errors++;
-            break;
-            // pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            // reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            throw;
         }catch (OperationCancelledException&){
             break;
         }

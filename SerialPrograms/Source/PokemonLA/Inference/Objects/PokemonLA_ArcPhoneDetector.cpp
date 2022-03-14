@@ -88,6 +88,14 @@ bool ArcPhoneDetector::process_frame(
 ){
     m_watcher.process_frame(frame, timestamp);
     bool detected = m_debouncer.push_value(!m_tracker.detections().empty(), timestamp);
+
+#if 0
+    if (detected){
+        static size_t c = 0;
+        frame.save("ArcPhoneTriggered-" + QString::number(c++) + ".png");
+    }
+#endif
+
     return detected && m_stop_on_detected;
 }
 

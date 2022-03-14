@@ -55,12 +55,10 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     }
 
     add_divider("---- Shiny Hunting ----");
+//    add_program<ShinyHuntLakeTrio_Descriptor, ShinyHuntLakeTrio>();
     add_program<CrobatFinder_Descriptor, CrobatFinder>();
     add_program<GalladeFinder_Descriptor, GalladeFinder>();
-//    add_program<ShinyHuntLakeTrio_Descriptor, ShinyHuntLakeTrio>();
-    if (GlobalSettings::instance().DEVELOPER_MODE){
-        add_program<ShinyHuntFlagPin_Descriptor, ShinyHuntFlagPin>();
-    }
+    add_program<ShinyHuntFlagPin_Descriptor, ShinyHuntFlagPin>();
 
 
     if (GlobalSettings::instance().DEVELOPER_MODE){
