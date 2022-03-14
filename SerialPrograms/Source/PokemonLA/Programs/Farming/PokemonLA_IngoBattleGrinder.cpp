@@ -445,6 +445,16 @@ void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env){
     //  Connect the controller.
     pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
 
+    // {
+    //     // QImage image("./scripts/LA_switch_pokemon_Kuro.png");
+    //     QImage image("./PLA_test_data/ingoBattle/LA_pokemon_switch_fp.png");
+    //     const bool stop_on_detected = true;
+    //     BattlePokemonSwitchDetector switch_detector(env.console, env.console, stop_on_detected);
+    //     bool detected = switch_detector.process_frame(image, std::chrono::system_clock::now());
+    //     std::cout << "switch detector " << detected << std::endl;
+    //     return;
+    // }
+
     // Put a save here so that when the program reloads from error it won't break.
     // save_game_from_overworld(env, env.console);
     // env.console.context().wait_for_all_requests();
