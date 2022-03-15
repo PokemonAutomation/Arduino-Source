@@ -8,6 +8,7 @@
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "PokemonLA_CommonColorCheck.h"
 #include "PokemonLA_DialogDetector.h"
 
 #include <iostream>
@@ -47,9 +48,7 @@ bool DialogSurpriseDetector::process_frame(
     ImageStats title_top = image_stats(extract_box(frame, m_title_top));
 //    cout << title_top.average << title_top.stddev << endl;
 //    hits += is_solid(title_top, {0.218332, 0.330301, 0.451367}, 0.2, 15) ? 1 : 0;
-    if (title_top.stddev.sum() <= 15 &&
-        title_top.average.b > title_top.average.r && title_top.average.b > title_top.average.g
-    ){
+    if (is_LA_dark_blue(title_top)){
         hits++;
     }
 //    cout << "hits = " << hits << endl;
@@ -57,9 +56,7 @@ bool DialogSurpriseDetector::process_frame(
     ImageStats title_bottom = image_stats(extract_box(frame, m_title_bottom));
 //    cout << title_bottom.average << title_bottom.stddev << endl;
 //    hits += is_solid(title_bottom, {0.226944, 0.323437, 0.449619}, 0.2, 15) ? 1 : 0;
-    if (title_bottom.stddev.sum() <= 15 &&
-        title_bottom.average.b > title_top.average.r && title_bottom.average.b > title_bottom.average.g
-    ){
+    if (is_LA_dark_blue(title_bottom)){
         hits++;
     }
 //    cout << "hits = " << hits << endl;
@@ -124,17 +121,13 @@ bool NormalDialogDetector::process_frame(
     size_t hits = 0;
 
     ImageStats title_top = image_stats(extract_box(frame, m_title_top));
-    if (title_top.stddev.sum() <= 15 &&
-        title_top.average.b > title_top.average.r && title_top.average.b > title_top.average.g
-    ){
+    if (is_LA_dark_blue(title_top)){
         hits++;
     }
 //    cout << "hits = " << hits << endl;
 
     ImageStats title_bottom = image_stats(extract_box(frame, m_title_bottom));
-    if (title_bottom.stddev.sum() <= 15 &&
-        title_bottom.average.b > title_bottom.average.r && title_bottom.average.b > title_bottom.average.g
-    ){
+    if (is_LA_dark_blue(title_bottom)){
         hits++;
     }
 //    cout << "hits = " << hits << endl;

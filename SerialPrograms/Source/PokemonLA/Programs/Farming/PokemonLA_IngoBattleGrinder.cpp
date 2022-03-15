@@ -236,6 +236,8 @@ void IngoBattleGrinder::use_move(const BotBaseContext &context, int cur_pokemon,
         // Strong style
         pbf_press_button(context, BUTTON_R, 10, 125);
     }
+    std::cout << "Use pokemon " << cur_pokemon << " move " << cur_move << " style " << 
+        (style == 0 ? "No Style" : (style == 1 ? "Agile" : "Strong")) << std::endl;
 
     // Choose the move
     pbf_press_button(context, BUTTON_A, 10, 125);
@@ -341,7 +343,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
         BattlePokemonSwitchDetector pokemon_switch_detector(env.console, env.console, stop_on_detected);
         // normal dialogue appears if you lose the fight.
         NormalDialogDetector normal_dialogue_detector(env.console, env.console, stop_on_detected);
-        ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(110), stop_on_detected);
+        ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(200), stop_on_detected);
         int ret = wait_until(
             env, env.console, std::chrono::minutes(2),
             {
