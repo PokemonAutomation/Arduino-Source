@@ -227,7 +227,7 @@ FlagNavigationAir::FlagNavigationAir(
             double shift = 0;
             double distance, flag_x, flag_y;
             if (m_flag.get(distance, flag_x, flag_y)){
-                shift = (flag_x - 0.5) * 320;
+                shift = (flag_x - 0.5) * 640;
                 shift = std::max(shift, -32.);
                 shift = std::min(shift, 32.);
             }
@@ -440,7 +440,7 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
         state == State::DIVE_LEFT ||
         state == State::DIVE_RIGHT;
     if (m_flag_y > 0.45 || (currently_diving && m_flag_y > 0.15)){
-        if (0.48 <= m_flag_x && m_flag_x <= 0.52){
+        if (0.49 <= m_flag_x && m_flag_x <= 0.51){
             return run_state_action(State::DIVE_STRAIGHT);
         }else{
             return run_state_action(m_flag_x < 0.5 ? State::DIVE_LEFT : State::DIVE_RIGHT);

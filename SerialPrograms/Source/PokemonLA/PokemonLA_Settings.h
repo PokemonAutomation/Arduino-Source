@@ -36,6 +36,7 @@ public:
     TimeExpressionOption<uint16_t> ENTER_GAME_MASH;
     TimeExpressionOption<uint16_t> ENTER_GAME_WAIT;
 
+    SectionDividerOption m_advanced_options;
     FloatingPointOption SHINY_SHOUND_THRESHOLD2;
     FloatingPointOption SHINY_SHOUND_LOW_FREQUENCY;
 };

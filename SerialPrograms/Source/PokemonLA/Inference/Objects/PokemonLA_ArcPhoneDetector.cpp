@@ -4,6 +4,7 @@
  *
  */
 
+#include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonLA_ArcPhoneDetector.h"
 
 namespace PokemonAutomation{
@@ -43,10 +44,18 @@ void ArcPhoneTracker::process_object(const QImage& image, const WaterfillObject&
 //    image.save("test-" + QString::number(c++) + "-A.png");
 //    extract_box(image, object).save("test-" + QString::number(c++) + "-B.png");
 
+    double width = (double)object.width() / image.width();
+    if (width < 0.40 || width > 0.50){
+        return;
+    }
+
+//    cout << (double)object.width() / image.width() << endl;
+
     double rmsd = ArcPhoneMatcher::instance().rmsd(image, object);
 //    cout << "rmsd = " << rmsd << endl;
     if (rmsd < 80){
 //        cout << "rmsd = " << rmsd << endl;
+//         extract_box(image, object).save("test.png");
         m_detections.emplace_back(object);
     }
 }

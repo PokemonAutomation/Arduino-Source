@@ -254,8 +254,10 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
-
-
+    QImage image("ArcPhoneTriggered-31.png");
+//    QImage image("screenshot-20220308-225539293411.png");
+    ArcPhoneDetector detector(console, console, std::chrono::milliseconds(0), true);
+    detector.process_frame(image, std::chrono::system_clock::now());
 
 
 
@@ -268,7 +270,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 
-#if 1
+#if 0
 //    QImage image("basculegion-detection-bad.png");
 //    QRgb pixel = image.pixel(1848, 761);
 //    cout << qRed(pixel) << ", " << qGreen(pixel) << ", " << qBlue(pixel) << endl;

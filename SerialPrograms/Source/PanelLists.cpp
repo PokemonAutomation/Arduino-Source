@@ -9,6 +9,7 @@
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/PersistentSettings.h"
+#include "CommonFramework/Windows/DpiScaler.h"
 #include "NintendoSwitch/NintendoSwitch_Panels.h"
 #include "PokemonSwSh/PokemonSwSh_Panels.h"
 #include "PokemonBDSP/Panels_PokemonBDSP.h"
@@ -73,7 +74,7 @@ QSize ProgramTabs::sizeHint() const{
     QSize size = QTabWidget::sizeHint();
 //    cout << size.width() << " x " << size.height() << endl;
 //    cout << this->size().width() << " x " << this->size().height() << endl;
-    size.setWidth(size.width() + 10);
+    size.setWidth(scale_dpi_width(size.width() + 10));
     return size;
 }
 

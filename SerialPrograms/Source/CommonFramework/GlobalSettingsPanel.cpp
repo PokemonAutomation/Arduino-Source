@@ -9,6 +9,7 @@
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Environment/Environment.h"
+#include "CommonFramework/Windows/DpiScaler.h"
 #include "GlobalSettingsPanel.h"
 
 namespace PokemonAutomation{
@@ -47,14 +48,14 @@ GlobalSettings::GlobalSettings()
         "Set the width of the window. Restart application to take effect.<br>"
         "Use this to easily set the window to a specific resolution for streaming alignment.<br>"
         "Note that the actual resolution will be subject to your monitor's DPI scaling.",
-        1280
+        scale_dpi_width(1280)
     )
     , WINDOW_HEIGHT(
         "<b>Window Size (Height):</b><br>"
         "Set the height of the window. Restart application to take effect.<br>"
         "Use this to easily set the window to a specific resolution for streaming alignment.<br>"
         "Note that the actual resolution will be subject to your monitor's DPI scaling.",
-        720
+        scale_dpi_height(720)
     )
     , m_discord_settings(
         "<font size=4><b>Discord Settings:</b> Integrate with Discord. "

@@ -817,6 +817,7 @@ HEADERS += \
     Source/CommonFramework/VideoPipeline/VideoOverlayWidget.h \
     Source/CommonFramework/VideoPipeline/VideoWidget.h \
     Source/CommonFramework/Windows/ButtonDiagram.h \
+    Source/CommonFramework/Windows/DpiScaler.h \
     Source/CommonFramework/Windows/MainWindow.h \
     Source/Integrations/DiscordIntegrationSettings.h \
     Source/Integrations/DiscordIntegrationTable.h \

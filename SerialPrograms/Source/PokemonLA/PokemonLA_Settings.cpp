@@ -52,12 +52,15 @@ GameSettings::GameSettings()
         "<b>4. Enter Game Wait:</b><br>Wait this long for the game to enter the overworld.",
         "15 * TICKS_PER_SECOND"
     )
+    , m_advanced_options(
+        "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
+    )
     , SHINY_SHOUND_THRESHOLD2(
-        "<b>Shiny Sound Threshold:</b><br>The shiny sound detection threshold.",
+        "<b>Shiny Sound Threshold:</b><br>Maximum error coefficient to trigger a shiny detection.",
         0.87, 0, 1.0
     )
     , SHINY_SHOUND_LOW_FREQUENCY(
-        "<b>Shiny Sound Low Frequency (Hz):</b><br>Low pass filter frequency for shiny sound.",
+        "<b>Shiny Sound Low Frequency (Hz):</b><br>High pass filter frequency for shiny sound.",
         5000, 0, 48000
     )
 {
@@ -72,6 +75,8 @@ GameSettings::GameSettings()
     PA_ADD_OPTION(START_GAME_WAIT0);
     PA_ADD_OPTION(ENTER_GAME_MASH);
     PA_ADD_OPTION(ENTER_GAME_WAIT);
+
+    PA_ADD_OPTION(m_advanced_options);
     PA_ADD_OPTION(SHINY_SHOUND_THRESHOLD2);
     PA_ADD_OPTION(SHINY_SHOUND_LOW_FREQUENCY);
 }

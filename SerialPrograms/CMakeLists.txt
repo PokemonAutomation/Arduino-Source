@@ -410,6 +410,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/VideoOverlayWidget.h
     Source/CommonFramework/Windows/ButtonDiagram.cpp
     Source/CommonFramework/Windows/ButtonDiagram.h
+    Source/CommonFramework/Windows/DpiScaler.h
     Source/CommonFramework/Windows/MainWindow.cpp
     Source/CommonFramework/Windows/MainWindow.h
     Source/Integrations/DiscordIntegrationSettings.cpp
