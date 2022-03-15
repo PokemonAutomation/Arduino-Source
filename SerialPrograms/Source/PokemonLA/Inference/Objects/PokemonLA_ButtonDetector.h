@@ -31,14 +31,14 @@ enum class ButtonType{
 
 class ButtonMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
-
-public:
-    ButtonMatcher(ButtonType type);
+    ButtonMatcher(ButtonType type, double max_rmsd);
     static const ButtonMatcher& A();
     static const ButtonMatcher& B();
     static const ButtonMatcher& Plus();
     static const ButtonMatcher& ArrowLeft();
     static const ButtonMatcher& ArrowRight();
+
+    double m_max_rmsd;
 };
 
 

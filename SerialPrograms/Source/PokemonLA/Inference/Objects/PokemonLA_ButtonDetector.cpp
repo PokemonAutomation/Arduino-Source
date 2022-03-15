@@ -66,29 +66,30 @@ const ButtonMatcher& getButtonMatcher(ButtonType type){
 
 }
 
-ButtonMatcher::ButtonMatcher(ButtonType type)
+ButtonMatcher::ButtonMatcher(ButtonType type, double max_rmsd)
     : WaterfillTemplateMatcher(
         templatePath(type), Color(0xff808008), Color(0xffffffff), 100
     )
+    , m_max_rmsd(max_rmsd)
 {}
 const ButtonMatcher& ButtonMatcher::A(){
-    static ButtonMatcher matcher(ButtonType::ButtonA);
+    static ButtonMatcher matcher(ButtonType::ButtonA, 80);
     return matcher;
 }
 const ButtonMatcher& ButtonMatcher::B(){
-    static ButtonMatcher matcher(ButtonType::ButtonB);
+    static ButtonMatcher matcher(ButtonType::ButtonB, 80);
     return matcher;
 }
 const ButtonMatcher& ButtonMatcher::Plus(){
-    static ButtonMatcher matcher(ButtonType::ButtonPlus);
+    static ButtonMatcher matcher(ButtonType::ButtonPlus, 120);
     return matcher;
 }
 const ButtonMatcher& ButtonMatcher::ArrowLeft(){
-    static ButtonMatcher matcher(ButtonType::ArrowLeft);
+    static ButtonMatcher matcher(ButtonType::ArrowLeft, 180);
     return matcher;
 }
 const ButtonMatcher& ButtonMatcher::ArrowRight(){
-    static ButtonMatcher matcher(ButtonType::ArrowRight);
+    static ButtonMatcher matcher(ButtonType::ArrowRight, 180);
     return matcher;
 }
 
@@ -118,7 +119,7 @@ void ButtonTracker::process_object(const QImage& image, const WaterfillObject& o
 
     double rmsd = m_matcher.rmsd(extract_box(image, object));
 //    cout << "rmsd = " << rmsd << endl;
-    if (rmsd < 80){
+    if (rmsd < m_matcher.m_max_rmsd){
 //        cout << "rmsd = " << rmsd << endl;
         m_detections.emplace_back(object);
     }

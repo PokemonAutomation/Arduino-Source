@@ -218,7 +218,7 @@ TestProgram::TestProgram(const TestProgram_Descriptor& descriptor)
     , NOTIFICATIONS({
         &NOTIFICATION_TEST,
 //        &NOTIFICATION_ERROR_RECOVERABLE,
-//        &NOTIFICATION_ERROR_FATAL,
+        &NOTIFICATION_ERROR_FATAL,
     })
 {
     PA_ADD_OPTION(LANGUAGE);
@@ -298,11 +298,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 #if 1
-//    QImage image("screenshot-20220315-003502483423.png");
+    QImage image("screenshot-20220315-045259006353.png");
 //    QRgb pixel = image.pixel(1848, 761);
 //    cout << qRed(pixel) << ", " << qGreen(pixel) << ", " << qBlue(pixel) << endl;
 
-    QImage image = feed.snapshot();
+//    QImage image = feed.snapshot();
 
     MountDetector detector;
     MountState state = detector.detect(image);

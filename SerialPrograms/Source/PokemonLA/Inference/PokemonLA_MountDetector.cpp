@@ -4,6 +4,7 @@
  *
  */
 
+#include <sstream>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/ImageOpener.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
@@ -82,34 +83,45 @@ QImage make_MountMatcher2Image(const char* path){
 //    image.save("test.png");
 //    static int c = 0;
 
+
+    double rmsd_plus = 99999;
+    double rmsd_arrowL = 99999;
+    double rmsd_arrowR = 99999;
+
+
     WaterfillObject object;
     while (finder.find_next(object)){
         QImage cropped = extract_box(image, object);
 //        cropped.save("test-" + QString::number(c++) + ".png");
-        if (ButtonMatcher::Plus().rmsd_precropped(cropped, object) < 80){
-            plus = std::move(object);
-            continue;
+
+        double current_rmsd_plus = ButtonMatcher::Plus().rmsd_precropped(cropped, object);
+        if (rmsd_plus > current_rmsd_plus){
+            rmsd_plus = current_rmsd_plus;
+            plus = object;
         }
-        if (ButtonMatcher::ArrowLeft().rmsd_precropped(cropped, object) < 120){
-            arrowL = std::move(object);
-            continue;
+        double current_rmsd_arrowL = ButtonMatcher::ArrowLeft().rmsd_precropped(cropped, object);
+        if (rmsd_arrowL > current_rmsd_arrowL){
+            rmsd_arrowL = current_rmsd_arrowL;
+            arrowL = object;
         }
-        double rmsd = ButtonMatcher::ArrowRight().rmsd_precropped(cropped, object);
-//        cout << c - 1 << " : " << rmsd << endl;
-        if (rmsd < 120){
-            arrowR = std::move(object);
+        double current_rmsd_arrowR = ButtonMatcher::ArrowRight().rmsd_precropped(cropped, object);
+        if (rmsd_arrowR > current_rmsd_arrowR){
+            rmsd_arrowR = current_rmsd_arrowR;
+            arrowR = object;
             continue;
         }
     }
 
-    if (plus.area == 0){
-        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to find (+) button in resource.", path);
+//    cout << "plus = " << rmsd_plus << ", arrowL = " << rmsd_arrowL << ", arrowR = " << rmsd_arrowR << endl;
+
+    if (rmsd_plus > 80){
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to find (+) button in resource. rmsd = " + std::to_string(rmsd_plus), path);
     }
-    if (arrowL.area == 0){
-        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to find (<) button in resource.", path);
+    if (rmsd_arrowL > 180){
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to find (<) button in resource. rmsd = " + std::to_string(rmsd_arrowL), path);
     }
-    if (arrowR.area == 0){
-        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to find (>) button in resource.", path);
+    if (rmsd_arrowR > 180){
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to find (>) button in resource. rmsd = " + std::to_string(rmsd_arrowR), path);
     }
 
     plus.merge_assume_no_overlap(arrowL);
@@ -228,7 +240,7 @@ public:
 class MountWyrdeerMatcherButtons : public MountMatcherButtons{
 public:
     MountWyrdeerMatcherButtons()
-        : MountMatcherButtons("PokemonLA/Mounts/MountOn-Wyrdeer-Original.png")
+        : MountMatcherButtons("PokemonLA/Mounts/MountOn-Wyrdeer-Template.png")
     {}
     static const MountWyrdeerMatcherButtons& on(){
         static MountWyrdeerMatcherButtons matcher;
@@ -238,7 +250,7 @@ public:
 class MountUrsalunaMatcherButtons : public MountMatcherButtons{
 public:
     MountUrsalunaMatcherButtons()
-        : MountMatcherButtons("PokemonLA/Mounts/MountOn-Ursaluna-Original.png")
+        : MountMatcherButtons("PokemonLA/Mounts/MountOn-Ursaluna-Template.png")
     {}
     static const MountUrsalunaMatcherButtons& on(){
         static MountUrsalunaMatcherButtons matcher;
@@ -248,7 +260,7 @@ public:
 class MountBasculegionMatcherButtons : public MountMatcherButtons{
 public:
     MountBasculegionMatcherButtons()
-        : MountMatcherButtons("PokemonLA/Mounts/MountOn-Basculegion-Original.png")
+        : MountMatcherButtons("PokemonLA/Mounts/MountOn-Basculegion-Template.png")
     {}
     static const MountBasculegionMatcherButtons& on(){
         static MountBasculegionMatcherButtons matcher;
@@ -258,7 +270,7 @@ public:
 class MountSneaslerMatcherButtons : public MountMatcherButtons{
 public:
     MountSneaslerMatcherButtons()
-        : MountMatcherButtons("PokemonLA/Mounts/MountOn-Sneasler-Original.png")
+        : MountMatcherButtons("PokemonLA/Mounts/MountOn-Sneasler-Template.png")
     {}
     static const MountSneaslerMatcherButtons& on(){
         static MountSneaslerMatcherButtons matcher;
@@ -268,7 +280,7 @@ public:
 class MountBraviaryMatcherButtons : public MountMatcherButtons{
 public:
     MountBraviaryMatcherButtons()
-        : MountMatcherButtons("PokemonLA/Mounts/MountOn-Braviary-Original.png")
+        : MountMatcherButtons("PokemonLA/Mounts/MountOn-Braviary-Template.png")
     {}
     static const MountBraviaryMatcherButtons& on(){
         static MountBraviaryMatcherButtons matcher;
@@ -311,7 +323,14 @@ struct MountCandiateTracker{
         m_state = state;
     }
     void add_direct(double rmsd, MountState state){
-        if (rmsd > 100 || m_rmsd <= rmsd){
+        if (rmsd > 80 || m_rmsd <= rmsd){
+            return;
+        }
+        m_rmsd = rmsd;
+        m_state = state;
+    }
+    void add_button_crop(double rmsd, MountState state){
+        if (rmsd > 80 || m_rmsd <= rmsd){
             return;
         }
         m_rmsd = rmsd;
@@ -380,14 +399,21 @@ MountState MountDetector::detect(const QImage& screen) const{
     WaterfillObject plus, arrowL, arrowR;
 
     //  Detect off-mounts as well as the buttons.
+    double rmsd_plus = 99999;
+    double rmsd_arrowL = 99999;
+    double rmsd_arrowR = 99999;
     {
         std::vector<MountDetectorFilteredImage> filtered_images = run_filters(
             image,
             {
                 {0xff707070, 0xffffffff},
+                {0xff808080, 0xffffffff},
                 {0xff909090, 0xffffffff},
+                {0xffa0a0a0, 0xffffffff},
                 {0xffb0b0b0, 0xffffffff},
+                {0xffc0c0c0, 0xffffffff},
                 {0xffd0d0d0, 0xffffffff},
+                {0xffe0e0e0, 0xffffffff},
             }
         );
 //        static int c = 0;
@@ -405,22 +431,25 @@ MountState MountDetector::detect(const QImage& screen) const{
 
                 QImage cropped = extract_box(image, object);
 //                cout << "object = " << c << endl;
-//                cropped.save("object-" + QString::number(c) + ".png");
+//                cropped.save("object-" + QString::number(c++) + ".png");
+
 
                 //  Read the buttons.
-                if (ButtonMatcher::Plus().rmsd_precropped(cropped, object) < 80){
-                    plus = std::move(object);
-                    continue;
+                double current_rmsd_plus = ButtonMatcher::Plus().rmsd_precropped(cropped, object);
+                if (rmsd_plus > current_rmsd_plus){
+                    rmsd_plus = current_rmsd_plus;
+                    plus = object;
                 }
-                if (ButtonMatcher::ArrowLeft().rmsd_precropped(cropped, object) < 120){
-                    arrowL = std::move(object);
-                    continue;
+                double current_rmsd_arrowL = ButtonMatcher::ArrowLeft().rmsd_precropped(cropped, object);
+                if (rmsd_arrowL > current_rmsd_arrowL){
+                    rmsd_arrowL = current_rmsd_arrowL;
+                    arrowL = object;
                 }
-                double rmsd_arrowR = ButtonMatcher::ArrowRight().rmsd_precropped(cropped, object);
+                double current_rmsd_arrowR = ButtonMatcher::ArrowRight().rmsd_precropped(cropped, object);
 //                cout << "rmsd_arrowR = " << rmsd_arrowR << endl;
-                if (rmsd_arrowR < 120){
-                    arrowR = std::move(object);
-                    continue;
+                if (rmsd_arrowR > current_rmsd_arrowR){
+                    rmsd_arrowR = current_rmsd_arrowR;
+                    arrowR = object;
                 }
 
                 //  Skip bad geometry.
@@ -432,7 +461,6 @@ MountState MountDetector::detect(const QImage& screen) const{
                 }
 
                 QImage filtered_cropped = extract_box(filtered.image, object);
-
 #if 1
                 candidates.add_filtered(MountWyrdeerMatcher      ::off().rmsd_precropped(filtered_cropped, object), MountState::WYRDEER_OFF);
                 candidates.add_direct  (MountWyrdeerMatcher      ::off().rmsd_precropped(cropped         , object), MountState::WYRDEER_OFF);
@@ -445,6 +473,7 @@ MountState MountDetector::detect(const QImage& screen) const{
                 candidates.add_filtered(MountBraviaryMatcher     ::off().rmsd_precropped(filtered_cropped, object), MountState::BRAVIARY_OFF);
                 candidates.add_direct  (MountBraviaryMatcher     ::off().rmsd_precropped(cropped         , object), MountState::BRAVIARY_OFF);
 #endif
+
             }
         }
     }
@@ -454,9 +483,15 @@ MountState MountDetector::detect(const QImage& screen) const{
 //    cout << "arrowR = " << arrowR.area << endl;
 
     //  No buttons detected means mounts aren't available or we're on Basculegion.
-    bool buttons_detected = plus.area != 0 && arrowL.area != 0 && arrowR.area != 0;
+    bool buttons_detected = rmsd_plus < 120 && rmsd_arrowL < 180 && rmsd_arrowR < 180;
     if (!buttons_detected){
-//        cout << "rmsd = " << candidates.m_rmsd << ", state = " << (int)candidates.m_state << endl;
+#if 0
+        std::stringstream ss;
+//        ss << "Unable to detect mount buttons: " << ", arrowL = " << rmsd_arrowL << ", arrowR = " << rmsd_arrowR;
+//        global_logger_tagged().log(ss.str(), COLOR_ORANGE);
+        cout << "plus = " << rmsd_plus << ", arrowL = " << rmsd_arrowL << ", arrowR = " << rmsd_arrowR << endl;
+        cout << "No Button: rmsd = " << candidates.m_rmsd << ", state = " << (int)candidates.m_state << endl;
+#endif
         return candidates.m_state;
     }
 
@@ -466,13 +501,15 @@ MountState MountDetector::detect(const QImage& screen) const{
 
     QImage cropped = extract_box(image, object);
 
-    candidates.add_direct(MountWyrdeerMatcherButtons    ::on().rmsd(cropped), MountState::WYRDEER_ON);
-    candidates.add_direct(MountBasculegionMatcherButtons::on().rmsd(cropped), MountState::URSALUNA_ON);
-    candidates.add_direct(MountUrsalunaMatcherButtons   ::on().rmsd(cropped), MountState::BASCULEGION_ON);
-    candidates.add_direct(MountSneaslerMatcherButtons   ::on().rmsd(cropped), MountState::SNEASLER_ON);
-    candidates.add_direct(MountBraviaryMatcherButtons   ::on().rmsd(cropped), MountState::BRAVIARY_ON);
+//    cout << "Start mounts" << endl;
 
-#if 0
+    candidates.add_button_crop(MountWyrdeerMatcherButtons    ::on().rmsd(cropped), MountState::WYRDEER_ON);
+    candidates.add_button_crop(MountBasculegionMatcherButtons::on().rmsd(cropped), MountState::URSALUNA_ON);
+    candidates.add_button_crop(MountUrsalunaMatcherButtons   ::on().rmsd(cropped), MountState::BASCULEGION_ON);
+    candidates.add_button_crop(MountSneaslerMatcherButtons   ::on().rmsd(cropped), MountState::SNEASLER_ON);
+    candidates.add_button_crop(MountBraviaryMatcherButtons   ::on().rmsd(cropped), MountState::BRAVIARY_ON);
+
+#if 1
     {
         std::vector<MountDetectorFilteredImage> filtered_images = run_filters(
             image,
@@ -481,34 +518,14 @@ MountState MountDetector::detect(const QImage& screen) const{
                 {0xff808000, 0xffffff6f},
                 {0xffa0a000, 0xffffff5f},
                 {0xffc0c000, 0xffffff4f},
-                {0xff606000, 0xffffffff},
-                {0xff808000, 0xffffffff},
-                {0xffa0a000, 0xffffffff},
-                {0xffc0c000, 0xffffffff},
+//                {0xff606000, 0xffffffff},
+//                {0xff808000, 0xffffffff},
+//                {0xffa0a000, 0xffffffff},
+//                {0xffc0c000, 0xffffffff},
             }
         );
-        int i = 0;
+//        int i = 0;
         for (MountDetectorFilteredImage& filtered : filtered_images){
-#if 0
-            std::vector<WaterfillObject> objects = find_objects_inplace(filtered.matrix, 50, false);
-            std::vector<WaterfillObject> candidates;
-
-            //  Filter out anything that touches the borders.
-            for (const WaterfillObject& object : objects){
-                //  Skip anything that touches the borders.
-                if (object.min_x == 0 || object.min_y == 0 ||
-                    object.max_x - 1 == (size_t)image.width() ||
-                    object.max_y - 1 == (size_t)image.height()
-                ){
-                    continue;
-                }
-                candidates.emplace_back(object);
-            }
-            objects = std::move(candidates);
-#endif
-
-
-
             WaterFillIterator finder(filtered.matrix, 50);
             WaterfillObject object;
             while (finder.find_next(object)){
@@ -519,33 +536,36 @@ MountState MountDetector::detect(const QImage& screen) const{
                 ){
                     continue;
                 }
-                if (object.width() * 2 < (size_t)image.width() || object.width() == (size_t)image.width()){
-//                    continue;
+                if (object.width() * 2 < (size_t)image.width()){
+                    continue;
                 }
-                if (object.height() * 3 < (size_t)image.height() || object.height() == (size_t)image.height()){
-//                    continue;
+                if (object.height() * 3 < (size_t)image.height()){
+                    continue;
                 }
-#if 0
-                candidates.add_filtered(MountWyrdeerMatcher      ::on().rmsd(filtered.image, object), MountState::WYRDEER_ON);
-                candidates.add_direct  (MountWyrdeerMatcher      ::on().rmsd(image         , object), MountState::WYRDEER_ON);
-                candidates.add_filtered(MountUrsalunaMatcher     ::on().rmsd(filtered.image, object), MountState::URSALUNA_ON);
-                candidates.add_direct  (MountUrsalunaMatcher     ::on().rmsd(image         , object), MountState::URSALUNA_ON);
-                candidates.add_filtered(MountBasculegionMatcher  ::on().rmsd(filtered.image, object), MountState::BASCULEGION_ON);
-                candidates.add_direct  (MountBasculegionMatcher  ::on().rmsd(image         , object), MountState::BASCULEGION_ON);
-                candidates.add_filtered(MountSneaslerMatcher     ::on().rmsd(filtered.image, object), MountState::SNEASLER_ON);
-                candidates.add_direct  (MountSneaslerMatcher     ::on().rmsd(image         , object), MountState::SNEASLER_ON);
-                candidates.add_filtered(MountBraviaryMatcher     ::on().rmsd(filtered.image, object), MountState::BRAVIARY_ON);
-                candidates.add_direct  (MountBraviaryMatcher     ::on().rmsd(image         , object), MountState::BRAVIARY_ON);
+
+                QImage cropped = extract_box(image, object);
+                QImage filtered_cropped = extract_box(filtered.image, object);
+#if 1
+                candidates.add_filtered(MountWyrdeerMatcher      ::on().rmsd(filtered_cropped), MountState::WYRDEER_ON);
+                candidates.add_direct  (MountWyrdeerMatcher      ::on().rmsd(cropped         ), MountState::WYRDEER_ON);
+                candidates.add_filtered(MountUrsalunaMatcher     ::on().rmsd(filtered_cropped), MountState::URSALUNA_ON);
+                candidates.add_direct  (MountUrsalunaMatcher     ::on().rmsd(cropped         ), MountState::URSALUNA_ON);
+                candidates.add_filtered(MountBasculegionMatcher  ::on().rmsd(filtered_cropped), MountState::BASCULEGION_ON);
+                candidates.add_direct  (MountBasculegionMatcher  ::on().rmsd(cropped         ), MountState::BASCULEGION_ON);
+                candidates.add_filtered(MountSneaslerMatcher     ::on().rmsd(filtered_cropped), MountState::SNEASLER_ON);
+                candidates.add_direct  (MountSneaslerMatcher     ::on().rmsd(cropped         ), MountState::SNEASLER_ON);
+                candidates.add_filtered(MountBraviaryMatcher     ::on().rmsd(filtered_cropped), MountState::BRAVIARY_ON);
+                candidates.add_direct  (MountBraviaryMatcher     ::on().rmsd(cropped         ), MountState::BRAVIARY_ON);
 #endif
-                extract_box(image, object).save("test-" + QString::number(i) + ".png");
-                i++;
+//                extract_box(image, object).save("test-" + QString::number(i) + ".png");
+//                i++;
             }
         }
 //        cout << "i = " << i << endl;
     }
 #endif
 
-//    cout << "rmsd = " << candidates.m_rmsd << ", state = " << (int)candidates.m_state << endl;
+//    cout << "Button: rmsd = " << candidates.m_rmsd << ", state = " << (int)candidates.m_state << endl;
 //    if (candidates.m_state == MountState::BASCULEGION_ON){
 //        screen.save("basculegion-detection.png");
 //    }
