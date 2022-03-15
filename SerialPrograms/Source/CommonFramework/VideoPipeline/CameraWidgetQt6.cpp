@@ -135,9 +135,11 @@ std::vector<QSize> Qt6VideoWidget::resolutions() const{
 
 void Qt6VideoWidget::set_resolution(const QSize& size){
     std::lock_guard<std::mutex> lg(m_lock);
-    const auto format = m_camera->cameraFormat();
-    if (format.resolution() == size){
-        return;
+    {
+        const auto format = m_camera->cameraFormat();
+        if (format.resolution() == size){
+            return;
+        }
     }
     bool formatSet = false;
     for(const auto& format : m_formats){

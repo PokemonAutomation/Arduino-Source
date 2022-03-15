@@ -34,9 +34,12 @@ bool FlagTracker::get(double& distance, double& x, double& y){
     if (m_history.empty()){
         return false;
     }
-    const Sample& sample = m_history.back();
-    x = sample.x;
-    y = sample.y;
+
+    {
+        const Sample& sample = m_history.back();
+        x = sample.x;
+        y = sample.y;
+    }
 
     std::multimap<int, std::chrono::system_clock::time_point> distances;
     for (const Sample& sample : m_history){

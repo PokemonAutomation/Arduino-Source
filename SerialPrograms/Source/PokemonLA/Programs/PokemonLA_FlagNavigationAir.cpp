@@ -473,6 +473,9 @@ bool FlagNavigationAir::run_climbing(AsyncCommandSession& commands, WallClock ti
 
 
 
+
+
+
 }
 }
 }

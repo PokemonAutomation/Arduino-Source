@@ -8,16 +8,26 @@
 #define PokemonAutomation_DpiScaler_H
 
 #include <QApplication>
-#include <QDesktopWidget>
+#include <QScreen>
 
 namespace PokemonAutomation{
 
 
 inline int scale_dpi_width(int width){
-    return width * QApplication::desktop()->logicalDpiX() / 96;
+    int dpi = 96;
+    QScreen* primaryScreen = QGuiApplication::primaryScreen();
+    if (primaryScreen != nullptr){
+        dpi = primaryScreen->logicalDotsPerInchX();
+    }
+    return width * dpi / 96;
 }
 inline int scale_dpi_height(int height){
-    return height * QApplication::desktop()->logicalDpiY() / 96;
+    int dpi = 96;
+    QScreen* primaryScreen = QGuiApplication::primaryScreen();
+    if (primaryScreen != nullptr){
+        dpi = primaryScreen->logicalDotsPerInchY();
+    }
+    return height * dpi / 96;
 }
 
 
