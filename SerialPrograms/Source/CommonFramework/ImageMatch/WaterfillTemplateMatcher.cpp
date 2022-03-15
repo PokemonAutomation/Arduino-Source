@@ -76,7 +76,7 @@ bool WaterfillTemplateMatcher::check_area_ratio(double candidate_area_ratio) con
 //    cout << "area = " << error << endl;
     return m_area_ratio_lower <= error && error <= m_area_ratio_upper;
 }
-double WaterfillTemplateMatcher::rmsd(const QImage& image, const WaterfillObject& object) const{
+double WaterfillTemplateMatcher::rmsd_precropped(const QImage& cropped_image, const WaterfillObject& object) const{
     if (!check_aspect_ratio(object.width(), object.height())){
 //        cout << "bad aspect ratio" << endl;
         return 99999.;
@@ -89,7 +89,31 @@ double WaterfillTemplateMatcher::rmsd(const QImage& image, const WaterfillObject
 //    static int c = 0;
 //    cout << c << endl;
 
-    double rmsd = this->rmsd(extract_box(image, object));
+    double rmsd = this->rmsd(cropped_image);
+
+//    cout << "rmsd  = " << rmsd << endl;
+
+//    if (rmsd <= m_max_rmsd){
+//        static int c = 0;
+//        extract_box(image, object).save("test-" + QString::number(c++) + "-" + QString::number(rmsd) + ".png");
+//    }
+
+    return rmsd;
+}
+double WaterfillTemplateMatcher::rmsd_original(const QImage& original_image, const WaterfillObject& object) const{
+    if (!check_aspect_ratio(object.width(), object.height())){
+//        cout << "bad aspect ratio" << endl;
+        return 99999.;
+    }
+    if (!check_area_ratio(object.area_ratio())){
+//        cout << "bad area ratio" << endl;
+        return 99999.;
+    }
+
+//    static int c = 0;
+//    cout << c << endl;
+
+    double rmsd = this->rmsd(extract_box(original_image, object));
 
 //    cout << "rmsd  = " << rmsd << endl;
 

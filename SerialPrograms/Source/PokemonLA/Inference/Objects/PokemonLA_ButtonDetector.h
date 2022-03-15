@@ -24,6 +24,8 @@ enum class ButtonType{
     ButtonA,
     ButtonB,
     ButtonPlus,
+    ArrowLeft,
+    ArrowRight,
 };
 
 
@@ -35,6 +37,8 @@ public:
     static const ButtonMatcher& A();
     static const ButtonMatcher& B();
     static const ButtonMatcher& Plus();
+    static const ButtonMatcher& ArrowLeft();
+    static const ButtonMatcher& ArrowRight();
 };
 
 

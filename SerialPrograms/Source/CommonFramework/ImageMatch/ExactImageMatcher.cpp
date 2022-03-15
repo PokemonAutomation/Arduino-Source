@@ -54,7 +54,9 @@ double ExactImageMatcher::rmsd(QImage image) const{
     c++;
 #endif
 
-    return pixel_RMSD(reference, image);
+    double rmsd = pixel_RMSD(reference, image);
+//    cout << "rmsd = " << rmsd << endl;
+    return rmsd;
 }
 double ExactImageMatcher::rmsd(QImage image, QRgb background) const{
     QImage reference;

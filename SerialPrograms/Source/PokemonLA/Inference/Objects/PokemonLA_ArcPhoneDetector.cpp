@@ -51,7 +51,7 @@ void ArcPhoneTracker::process_object(const QImage& image, const WaterfillObject&
 
 //    cout << (double)object.width() / image.width() << endl;
 
-    double rmsd = ArcPhoneMatcher::instance().rmsd(image, object);
+    double rmsd = ArcPhoneMatcher::instance().rmsd_original(image, object);
 //    cout << "rmsd = " << rmsd << endl;
     if (rmsd < 80){
 //        cout << "rmsd = " << rmsd << endl;

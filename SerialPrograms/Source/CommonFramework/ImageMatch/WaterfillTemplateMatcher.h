@@ -40,7 +40,8 @@ public:
     //  Compute RMSD of current object against the template as-is.
     double rmsd(const QImage& object) const;
 
-    virtual double rmsd(const QImage& image, const WaterfillObject& object) const;
+    virtual double rmsd_precropped(const QImage& cropped_image, const WaterfillObject& object) const;
+    virtual double rmsd_original(const QImage& original_image, const WaterfillObject& object) const;
 
 protected:
     virtual bool check_image(const QImage& image) const{ return true; };

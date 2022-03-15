@@ -21,6 +21,10 @@ const char* templatePath(ButtonType type){
         return "PokemonLA/Buttons/ButtonB-Template.png";
     case ButtonType::ButtonPlus:
         return "PokemonLA/Buttons/ButtonPlus-Template.png";
+    case ButtonType::ArrowLeft:
+        return "PokemonLA/Buttons/ArrowLeft-Template.png";
+    case ButtonType::ArrowRight:
+        return "PokemonLA/Buttons/ArrowRight-Template.png";
     default:
         return "";
     }
@@ -34,6 +38,10 @@ const char* button_name(ButtonType type){
         return "B";
     case ButtonType::ButtonPlus:
         return "+";
+    case ButtonType::ArrowLeft:
+        return "<";
+    case ButtonType::ArrowRight:
+        return ">";
     default:
         return "";
     }
@@ -47,6 +55,10 @@ const ButtonMatcher& getButtonMatcher(ButtonType type){
         return ButtonMatcher::B();
     case ButtonType::ButtonPlus:
         return ButtonMatcher::Plus();
+    case ButtonType::ArrowLeft:
+        return ButtonMatcher::ArrowLeft();
+    case ButtonType::ArrowRight:
+        return ButtonMatcher::ArrowRight();
     default:
         throw std::runtime_error("No corresponding ButtonMatcher for ButtonType");
     }
@@ -69,6 +81,14 @@ const ButtonMatcher& ButtonMatcher::B(){
 }
 const ButtonMatcher& ButtonMatcher::Plus(){
     static ButtonMatcher matcher(ButtonType::ButtonPlus);
+    return matcher;
+}
+const ButtonMatcher& ButtonMatcher::ArrowLeft(){
+    static ButtonMatcher matcher(ButtonType::ArrowLeft);
+    return matcher;
+}
+const ButtonMatcher& ButtonMatcher::ArrowRight(){
+    static ButtonMatcher matcher(ButtonType::ArrowRight);
     return matcher;
 }
 

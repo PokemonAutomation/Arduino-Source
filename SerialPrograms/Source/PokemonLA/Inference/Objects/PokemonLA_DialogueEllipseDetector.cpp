@@ -49,7 +49,7 @@ void DialogueEllipseTracker::process_object(const QImage& image, const Waterfill
 //    image.save("test-" + QString::number(c++) + "-A.png");
 //    extract_box(image, object).save("test-" + QString::number(c++) + "-B.png");
 
-    double rmsd = DialogueEllipseMatcher::instance().rmsd(image, object);
+    double rmsd = DialogueEllipseMatcher::instance().rmsd_original(image, object);
 //    cout << "rmsd = " << rmsd << endl;
     if (rmsd < 80){
 //        cout << "rmsd = " << rmsd << endl;

@@ -204,7 +204,7 @@ std::pair<double, int> read_digit(const QImage& image, const WaterfillObject& ob
     int best_digit = -1;
     for (const auto& item : MATCHERS){
 //        cout << item.first << " : " <<  << endl;
-        double rmsd = item.second.rmsd(image, object);
+        double rmsd = item.second.rmsd_original(image, object);
         if (best_rmsd > rmsd){
             best_rmsd = rmsd;
             best_digit = item.first;

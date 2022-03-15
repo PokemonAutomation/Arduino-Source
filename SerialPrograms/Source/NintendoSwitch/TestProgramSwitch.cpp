@@ -254,11 +254,38 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
+#if 0
+    QImage image("MountOn-Braviary-Original.png");
+    image = image.convertToFormat(QImage::Format_ARGB32);
+
+    int width = image.width();
+    int height = image.height();
+    int plus_min_x = width - 29;
+    int plus_max_x = width - 10;
+    int plus_min_y = height - 23;
+    int plus_max_y = height - 4;
+    for (int r = 0; r < height; r++){
+        for (int c = 0; c < width; c++){
+            if (plus_min_x < c && c < plus_max_x && plus_min_y < r && r < plus_max_y){
+                continue;
+            }
+            QRgb pixel = image.pixel(c, r);
+            if (qRed(pixel) < 128 || qGreen(pixel) < 128){
+                image.setPixel(c, r, 0);
+            }
+        }
+    }
+
+    image.save("MountOn-Braviary-Template.png");
+#endif
+
+
+#if 0
     QImage image("ArcPhoneTriggered-31.png");
 //    QImage image("screenshot-20220308-225539293411.png");
     ArcPhoneDetector detector(console, console, std::chrono::milliseconds(0), true);
     detector.process_frame(image, std::chrono::system_clock::now());
-
+#endif
 
 
 #if 0
@@ -270,8 +297,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 
-#if 0
-//    QImage image("basculegion-detection-bad.png");
+#if 1
+//    QImage image("screenshot-20220315-003502483423.png");
 //    QRgb pixel = image.pixel(1848, 761);
 //    cout << qRed(pixel) << ", " << qGreen(pixel) << ", " << qBlue(pixel) << endl;
 
@@ -284,6 +311,12 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 //        image.save("test.png");
 //    }
 #endif
+
+
+
+
+
+
 
 
 
@@ -629,153 +662,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 //    pbf_move_right_joystick(console, 0, 128, 45, 0);
 
-#if 0
-                pbf_move_right_joystick(console, 128, 255, 200, 0);
-                pbf_move_right_joystick(console, 128, 0, 200, 0);
-                pbf_move_right_joystick(console, 128, 255, 80, 0);
-                pbf_move_right_joystick(console, 0, 128, 400, 0);
-                pbf_move_right_joystick(console, 128, 255, 120, 0);
-                pbf_move_right_joystick(console, 0, 128, 400, 0);
-                pbf_move_right_joystick(console, 128, 0, 200, 0);
-                pbf_move_right_joystick(console, 0, 128, 400, 0);
-#endif
-
-#if 0
-    FlagTracker flag(logger, overlay);
-    MountTracker mount(logger);
-
-    {
-        AsyncVisualInferenceSession visual(env, console, console, console);
-        visual += flag;
-        visual += mount;
-
-        AsyncCommandSession commands(env, console.botbase());
-
-        while (true){
-//            commands.dispatch([=](const BotBaseContext& context){
-//                pbf_move_right_joystick(context, 0, 128, 5 * TICKS_PER_SECOND, 0);
-//            });
-//            commands.wait();
-
-            double flag_distance, flag_x, flag_y;
-            bool flag_ok = flag.get(flag_distance, flag_x, flag_y);
-
-            if (flag_ok && 0.4 < flag_x && flag_x < 0.6 && flag_y > 0.6){
-            commands.dispatch([=](const BotBaseContext& context){
-                pbf_press_button(context, BUTTON_B, 300 * TICKS_PER_SECOND, 0);
-            });
 
 
-
-            }
-        }
-
-        commands.stop_session();
-        visual.stop();
-    }
-#endif
-
-
-
-
-
-
-#if 0
-    MountDetector mount_detector;
-    FlagDetector flags;
-    WhiteObjectWatcher watcher(console, {{flags, false}});
-
-    QImage image(feed.snapshot());
-
-    MountState mount_state = mount_detector.detect(image);
-    cout << MOUNT_STATE_STRINGS[(int)mount_state] << endl;
-
-//    watcher.process_frame(image, std::chrono::system_clock::now());
-//    flags.detections()
-
-#endif
-
-
-
-#if 0
-    QImage image("screenshot-20220211-023701107827.png");
-
-
-    FlagDetector flags;
-
-    WhiteObjectWatcher watcher(
-        console,
-        {{flags, false}}
-    );
-
-    watcher.process_frame(image, std::chrono::system_clock::now());
-#endif
-
-
-#if 0
-    QImage image(feed.snapshot());
-//    QImage image("screenshot-20220210-231922898436.png");
-//    QImage image("screenshot-20220211-005950586653.png");
-//    QImage image("screenshot-20220211-012426947705.png");
-//    QImage image("screenshot-20220211-014247032114.png");
-//    QImage image("screenshot-20220211-022344759878.png");
-
-    HmDetector detector(overlay);
-    cout << HM_STATE_STRINGS[(int)detector.detect(image)] << endl;
-#endif
-
-
-#if 0
-    InferenceBoxScope box(overlay, 0.905, 0.65, 0.08, 0.13);
-    QImage image = extract_box(feed.snapshot(), box);
-
-
-    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
-        image,
-        192, 255,
-        192, 255,
-        0, 255
-    );
-    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
-
-
-    ImagePixelBox result;
-    for (const WaterfillObject& object : objects){
-        int c = 0;
-        for (const auto& object : objects){
-            extract_box(image, object).save("test-" + QString::number(c++) + ".png");
-        }
-        if (HmWyrdeerMatcher::on().matches(result, image, object)){
-            cout << "Wyrdeer On" << endl;
-        }
-#if 0
-        if (HmWyrdeerMatcher::off().matches(result, image, object)){
-            cout << "Wyrdeer Off" << endl;
-        }
-        if (HmWyrdeerMatcher::on().matches(result, image, object)){
-            cout << "Wyrdeer On" << endl;
-        }
-        if (HmUrsalunaMatcher::off().matches(result, image, object)){
-            cout << "Ursaluna Off" << endl;
-        }
-        if (HmUrsalunaMatcher::on().matches(result, image, object)){
-            cout << "Ursaluna On" << endl;
-        }
-        if (HmSneaslerMatcher::off().matches(result, image, object)){
-            cout << "Sneasler Off" << endl;
-        }
-        if (HmSneaslerMatcher::on().matches(result, image, object)){
-            cout << "Sneasler On" << endl;
-        }
-        if (HmBraviaryMatcher::off().matches(result, image, object)){
-            cout << "Braviary Off" << endl;
-        }
-        if (HmBraviaryMatcher::on().matches(result, image, object)){
-            cout << "Braviary On" << endl;
-        }
-#endif
-    }
-#endif
 
 
 
@@ -844,12 +732,17 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 #endif
 
+
+
+
 #if 0
 //    InferenceBoxScope box(overlay, 0.40, 0.50, 0.40, 0.50);
-    InferenceBoxScope box(overlay, 0.010, 0.700, 0.050, 0.100);
+//    InferenceBoxScope box(overlay, 0.010, 0.700, 0.050, 0.100);
 
-    QImage image(feed.snapshot());
-    image = extract_box(image, box);
+//    QImage image(feed.snapshot());
+//    image = extract_box(image, box);
+
+    QImage image("MountOn-Braviary-Original.png");
 
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
         image,
@@ -925,7 +818,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 #if 0
-    QImage image("MountOn-Wyrdeer-Template.png");
+    QImage image("ArrowRight-Original.png");
 
     image = image.convertToFormat(QImage::Format::Format_ARGB32);
     uint32_t* ptr = (uint32_t*)image.bits();
@@ -936,12 +829,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
             uint32_t red = qRed(pixel);
             uint32_t green = qGreen(pixel);
             uint32_t blue = qBlue(pixel);
-            if (red < 0xa0 || green < 0xa0 || blue < 0xa0){
+//            if (8 < c && c < 31 && 8 < r && r < 31){
+//                continue;
+//            }
+            if (red < 0x80 || green < 0x80 || blue < 0x80){
                 pixel = 0x00000000;
             }
         }
     }
-    image.save("MountOn-Wyrdeer-Template-1.png");
+    image.save("ArrowRight-Template.png");
 #endif
 
 
@@ -1049,233 +945,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 
-#if 0
-    Kernels::PackedBinaryMatrix matrix0;
-    matrix0 = compress_rgb32_to_binary_min(image, 192, 192, 0);
-
-//    std::vector<WaterfillObject> objects = find_objects_inplace(matrix0, 10, false);
-    WaterFillIterator finder(matrix0, 20);
-    WaterfillObject object;
-    size_t c = 0;
-    VideoOverlaySet overlays(overlay);
-    while (finder.find_next(object)){
-        image.copy(object.min_x, object.min_y, object.width(), object.height()).save("test-" + QString::number(c) + ".png");
-        cout << c++ << endl;
-        PokemonSwSh::RadialSparkleDetector radial(object);
-        if (radial.is_ball()){
-            overlays.add(
-                COLOR_GREEN,
-                translate_to_parent(
-                    image, {0, 0, 1, 1},
-                    {object.min_x, object.min_y, object.max_x, object.max_y}
-                )
-            );
-            continue;
-        }
-        if (radial.is_star()){
-            overlays.add(
-                COLOR_BLUE,
-                translate_to_parent(
-                    image, {0, 0, 1, 1},
-                    {object.min_x, object.min_y, object.max_x, object.max_y}
-                )
-            );
-            continue;
-        }
-        if (PokemonSwSh::is_line_sparkle(object, image.width() * 0.25)){
-            overlays.add(
-                COLOR_YELLOW,
-                translate_to_parent(
-                    image, {0, 0, 1, 1},
-                    {object.min_x, object.min_y, object.max_x, object.max_y}
-                )
-            );
-            continue;
-        }
-        if (PokemonSwSh::is_square_sparkle(object)){
-            overlays.add(
-                COLOR_MAGENTA,
-                translate_to_parent(
-                    image, {0, 0, 1, 1},
-                    {object.min_x, object.min_y, object.max_x, object.max_y}
-                )
-            );
-        }
-    }
-#endif
-
-
-
-//    PokemonSwSh::SelectionArrowFinder finder(overlay, ImageFloatBox(0.640, 0.600, 0.055, 0.380));
-
-//    QImage image("screenshot-20220108-185053570093.png");
-//    cout << finder.detect(image) << endl;
-
-//    QImage image("20220111-124433054843-PathPartyReader-ReadHP.png");
-//    QImage image("20220116-044701249467-ReadPathSide.png");
-
-//    cout << (int)PokemonSwSh::MaxLairInternal::read_side(image) << endl;
-
-#if 0
-    QImage image("20220116-053836954926-ReadPath.png");
-
-    std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = PokemonSwSh::find_symbols(image, 0.20);
-
-
-//    std::deque<InferenceBoxScope> hits;
-//    hits.clear();
-    cout << "---------------" << endl;
-    for (const auto& item : candidates){
-        cout << get_type_slug(item.second.first) << ": " << item.first << endl;
-//        hits.emplace_back(overlay, translate_to_parent(screen, box, item.second.second), COLOR_GREEN);
-    }
-#endif
 
 
 
 
 
-
-//    QImage image("20220111-124433054843-PathPartyReader-ReadHP.png");
-
-//    NintendoSwitch::PokemonSwSh::MaxLairInternal::PathReader detector(overlay, 0);
-//    double hp[4];
-//    detector.read_hp(logger, image, hp);
-
-
-
-#if 0
-    MapDetector detector;
-    VideoOverlaySet set(overlay);
-    detector.make_overlays(set);
-
-    cout << detector.detect(feed.snapshot()) << endl;
-#endif
-
-
-
-//    QImage image("screenshot-20220108-185053570093.png");
-//    PokemonSwSh::MaxLairInternal::BattleMenuReader reader(overlay, Language::English);
-
-//    cout << reader.can_dmax(image) << endl;
-
-
-
-
-//    SelectionArrowFinder detector(overlay, {0.50, 0.58, 0.40, 0.10}, COLOR_RED);
-//    detector.detect(feed.snapshot());
-
-
-
-//    InferenceBoxScope box(overlay, {0.23, 0.30, 0.35, 0.30});
-
-
-#if 0
-    QImage image("screenshot-20220103-011451179122.png");
-
-    PackedBinaryMatrix matrix = filter_rgb32_range(
-        image,
-        192, 255,
-        0, 160,
-        0, 192
-    );
-
-    std::vector<WaterfillObject> objects = find_objects(matrix, 100, false);
-    VideoOverlaySet set(overlay);
-    size_t c = 0;
-    for (const WaterfillObject& object : objects){
-        ImagePixelBox box(object.min_x, object.min_y, object.max_x, object.max_y);
-        ImageFloatBox fbox = translate_to_parent(image, {0, 0, 1, 1}, box);
-        set.add(COLOR_RED, fbox);
-
-        image.copy(object.min_x, object.min_y, object.width(), object.height()).save("test-" + QString::number(c++) + ".png");
-    }
-#endif
-
-
-#if 0
-    QImage image("ExclamationTop-0.png");
-
-    for (int r = 0; r < image.height(); r++){
-        for (int c = 0; c < image.width(); c++){
-            uint32_t pixel = image.pixel(c, r);
-            cout << "(" << qRed(pixel) << "," << qGreen(pixel) << "," << qBlue(pixel) << ")";
-        }
-        cout << endl;
-    }
-#endif
-
-
-
-#if 0
-    QImage image("QuestionTop-0.png");
-    image = image.convertToFormat(QImage::Format_ARGB32);
-
-    uint32_t* ptr = (uint32_t*)image.bits();
-    size_t words = image.bytesPerLine() / sizeof(uint32_t);
-
-    for (int r = 0; r < image.height(); r++){
-        for (int c = 0; c < image.width(); c++){
-            uint32_t pixel = ptr[r*words + c];
-            if (qRed(pixel) + qGreen(pixel) + qBlue(pixel) < 50){
-                ptr[r*words + c] = 0;
-            }
-        }
-    }
-
-    image.save("QuestionTop-1.png");
-#endif
-
-
-#if 0
-    cout << std::hex << QColor("green").rgb() << endl;
-    cout << std::hex << QColor(Qt::green).rgb() << endl;
-    cout << std::hex << QColor(Qt::darkGreen).rgb() << endl;
-    cout << std::hex << QColor(Qt::darkCyan).rgb() << endl;
-#endif
-
-
-#if 0
-    QImage image("screenshot-20211227-082121670685.png");
-    image = extract_box(image, ImageFloatBox({0.95, 0.10, 0.05, 0.10}));
-    image.save("test.png");
-
-
-    BinaryImage binary_image = filter_rgb32_range(
-        image,
-        255, 255,
-        128, 255,
-        0, 128,
-        0, 128
-    );
-    cout << binary_image.dump() << endl;
-#endif
-
-
-#if 0
-    ShortDialogDetector detector;
-    OverlaySet overlays(overlay);
-    detector.make_overlays(overlays);
-
-    cout << detector.detect(QImage("20211228-013942613330.jpg")) << endl;
-//    cout << detector.detect(feed.snapshot()) << endl;
-#endif
-
-
-
-#if 0
-    BoxShinyDetector detector;
-    cout << detector.detect(QImage("20211226-031611120900.jpg")) << endl;
-
-//    pbf_mash_button(console, BUTTON_X, 10 * TICKS_PER_SECOND);
-#endif
-
-
-#if 0
-    BattleMenuDetector detector(BattleType::WILD);
-    OverlaySet overlays(overlay);
-    detector.make_overlays(overlays);
-#endif
 
 
     env.wait_for(std::chrono::seconds(60));

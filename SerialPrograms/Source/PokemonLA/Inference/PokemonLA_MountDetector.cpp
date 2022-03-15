@@ -4,6 +4,8 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
+#include "Common/Qt/ImageOpener.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
@@ -12,6 +14,7 @@
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 #include "PokemonLA_MountDetector.h"
 
 #include <iostream>
@@ -58,8 +61,75 @@ public:
         return rmsd;
     }
 #endif
+};
+
+
+#if 1
+
+QImage make_MountMatcher2Image(const char* path){
+    QString qpath = RESOURCE_PATH() + path;
+    QImage image = open_image(qpath);
+
+    if (image.format() != QImage::Format_ARGB32){
+        image = image.convertToFormat(QImage::Format_ARGB32);
+    }
+
+    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xff808080, 0xffffffff);
+    WaterFillIterator finder(matrix, 50);
+
+    WaterfillObject plus, arrowL, arrowR;
+
+//    image.save("test.png");
+//    static int c = 0;
+
+    WaterfillObject object;
+    while (finder.find_next(object)){
+        QImage cropped = extract_box(image, object);
+//        cropped.save("test-" + QString::number(c++) + ".png");
+        if (ButtonMatcher::Plus().rmsd_precropped(cropped, object) < 80){
+            plus = std::move(object);
+            continue;
+        }
+        if (ButtonMatcher::ArrowLeft().rmsd_precropped(cropped, object) < 120){
+            arrowL = std::move(object);
+            continue;
+        }
+        double rmsd = ButtonMatcher::ArrowRight().rmsd_precropped(cropped, object);
+//        cout << c - 1 << " : " << rmsd << endl;
+        if (rmsd < 120){
+            arrowR = std::move(object);
+            continue;
+        }
+    }
+
+    if (plus.area == 0){
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to find (+) button in resource.", path);
+    }
+    if (arrowL.area == 0){
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to find (<) button in resource.", path);
+    }
+    if (arrowR.area == 0){
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to find (>) button in resource.", path);
+    }
+
+    plus.merge_assume_no_overlap(arrowL);
+    plus.merge_assume_no_overlap(arrowR);
+
+    return extract_box(image, plus);
+}
+
+class MountMatcherButtons : public ImageMatch::ExactImageMatcher{
+public:
+    MountMatcherButtons(const char* path)
+        : ExactImageMatcher(make_MountMatcher2Image(path))
+    {}
 
 };
+#endif
+
+
+
+
 
 class MountWyrdeerMatcher : public MountMatcher{
 public:
@@ -154,6 +224,61 @@ public:
 
 
 
+
+class MountWyrdeerMatcherButtons : public MountMatcherButtons{
+public:
+    MountWyrdeerMatcherButtons()
+        : MountMatcherButtons("PokemonLA/Mounts/MountOn-Wyrdeer-Original.png")
+    {}
+    static const MountWyrdeerMatcherButtons& on(){
+        static MountWyrdeerMatcherButtons matcher;
+        return matcher;
+    }
+};
+class MountUrsalunaMatcherButtons : public MountMatcherButtons{
+public:
+    MountUrsalunaMatcherButtons()
+        : MountMatcherButtons("PokemonLA/Mounts/MountOn-Ursaluna-Original.png")
+    {}
+    static const MountUrsalunaMatcherButtons& on(){
+        static MountUrsalunaMatcherButtons matcher;
+        return matcher;
+    }
+};
+class MountBasculegionMatcherButtons : public MountMatcherButtons{
+public:
+    MountBasculegionMatcherButtons()
+        : MountMatcherButtons("PokemonLA/Mounts/MountOn-Basculegion-Original.png")
+    {}
+    static const MountBasculegionMatcherButtons& on(){
+        static MountBasculegionMatcherButtons matcher;
+        return matcher;
+    }
+};
+class MountSneaslerMatcherButtons : public MountMatcherButtons{
+public:
+    MountSneaslerMatcherButtons()
+        : MountMatcherButtons("PokemonLA/Mounts/MountOn-Sneasler-Original.png")
+    {}
+    static const MountSneaslerMatcherButtons& on(){
+        static MountSneaslerMatcherButtons matcher;
+        return matcher;
+    }
+};
+class MountBraviaryMatcherButtons : public MountMatcherButtons{
+public:
+    MountBraviaryMatcherButtons()
+        : MountMatcherButtons("PokemonLA/Mounts/MountOn-Braviary-Original.png")
+    {}
+    static const MountBraviaryMatcherButtons& on(){
+        static MountBraviaryMatcherButtons matcher;
+        return matcher;
+    }
+};
+
+
+
+
 const char* MOUNT_STATE_STRINGS[] = {
     "No Detection",
     "Wrydeer Off",
@@ -186,7 +311,7 @@ struct MountCandiateTracker{
         m_state = state;
     }
     void add_direct(double rmsd, MountState state){
-        if (rmsd > 80 || m_rmsd <= rmsd){
+        if (rmsd > 100 || m_rmsd <= rmsd){
             return;
         }
         m_rmsd = rmsd;
@@ -252,7 +377,9 @@ MountState MountDetector::detect(const QImage& screen) const{
     QImage image = extract_box(screen, m_box);
 
     MountCandiateTracker candidates;
+    WaterfillObject plus, arrowL, arrowR;
 
+    //  Detect off-mounts as well as the buttons.
     {
         std::vector<MountDetectorFilteredImage> filtered_images = run_filters(
             image,
@@ -263,31 +390,89 @@ MountState MountDetector::detect(const QImage& screen) const{
                 {0xffd0d0d0, 0xffffffff},
             }
         );
+//        static int c = 0;
         for (MountDetectorFilteredImage& filtered : filtered_images){
             WaterFillIterator finder(filtered.matrix, 50);
             WaterfillObject object;
             while (finder.find_next(object)){
-                if (object.width() * 2 < (size_t)image.width() || object.width() == (size_t)image.width()){
+                //  Skip anything that touches the borders.
+                if (object.min_x == 0 || object.min_y == 0 ||
+                    object.max_x - 1 == (size_t)image.width() ||
+                    object.max_y - 1 == (size_t)image.height()
+                ){
                     continue;
                 }
-                if (object.height() * 3 < (size_t)image.height() || object.height() == (size_t)image.height()){
+
+                QImage cropped = extract_box(image, object);
+//                cout << "object = " << c << endl;
+//                cropped.save("object-" + QString::number(c) + ".png");
+
+                //  Read the buttons.
+                if (ButtonMatcher::Plus().rmsd_precropped(cropped, object) < 80){
+                    plus = std::move(object);
                     continue;
                 }
+                if (ButtonMatcher::ArrowLeft().rmsd_precropped(cropped, object) < 120){
+                    arrowL = std::move(object);
+                    continue;
+                }
+                double rmsd_arrowR = ButtonMatcher::ArrowRight().rmsd_precropped(cropped, object);
+//                cout << "rmsd_arrowR = " << rmsd_arrowR << endl;
+                if (rmsd_arrowR < 120){
+                    arrowR = std::move(object);
+                    continue;
+                }
+
+                //  Skip bad geometry.
+                if (object.width() * 2 < (size_t)image.width()){
+                    continue;
+                }
+                if (object.height() * 3 < (size_t)image.height()){
+                    continue;
+                }
+
+                QImage filtered_cropped = extract_box(filtered.image, object);
+
 #if 1
-                candidates.add_filtered(MountWyrdeerMatcher      ::off().rmsd(filtered.image, object), MountState::WYRDEER_OFF);
-                candidates.add_direct  (MountWyrdeerMatcher      ::off().rmsd(image         , object), MountState::WYRDEER_OFF);
-                candidates.add_filtered(MountUrsalunaMatcher     ::off().rmsd(filtered.image, object), MountState::URSALUNA_OFF);
-                candidates.add_direct  (MountUrsalunaMatcher     ::off().rmsd(image         , object), MountState::URSALUNA_OFF);
-                candidates.add_filtered(MountBasculegionMatcher  ::off().rmsd(filtered.image, object), MountState::BASCULEGION_OFF);
-                candidates.add_direct  (MountBasculegionMatcher  ::off().rmsd(image         , object), MountState::BASCULEGION_OFF);
-                candidates.add_filtered(MountSneaslerMatcher     ::off().rmsd(filtered.image, object), MountState::SNEASLER_OFF);
-                candidates.add_direct  (MountSneaslerMatcher     ::off().rmsd(image         , object), MountState::SNEASLER_OFF);
-                candidates.add_filtered(MountBraviaryMatcher     ::off().rmsd(filtered.image, object), MountState::BRAVIARY_OFF);
-                candidates.add_direct  (MountBraviaryMatcher     ::off().rmsd(image         , object), MountState::BRAVIARY_OFF);
+                candidates.add_filtered(MountWyrdeerMatcher      ::off().rmsd_precropped(filtered_cropped, object), MountState::WYRDEER_OFF);
+                candidates.add_direct  (MountWyrdeerMatcher      ::off().rmsd_precropped(cropped         , object), MountState::WYRDEER_OFF);
+                candidates.add_filtered(MountUrsalunaMatcher     ::off().rmsd_precropped(filtered_cropped, object), MountState::URSALUNA_OFF);
+                candidates.add_direct  (MountUrsalunaMatcher     ::off().rmsd_precropped(cropped         , object), MountState::URSALUNA_OFF);
+                candidates.add_filtered(MountBasculegionMatcher  ::off().rmsd_precropped(filtered_cropped, object), MountState::BASCULEGION_OFF);
+                candidates.add_direct  (MountBasculegionMatcher  ::off().rmsd_precropped(cropped         , object), MountState::BASCULEGION_OFF);
+                candidates.add_filtered(MountSneaslerMatcher     ::off().rmsd_precropped(filtered_cropped, object), MountState::SNEASLER_OFF);
+                candidates.add_direct  (MountSneaslerMatcher     ::off().rmsd_precropped(cropped         , object), MountState::SNEASLER_OFF);
+                candidates.add_filtered(MountBraviaryMatcher     ::off().rmsd_precropped(filtered_cropped, object), MountState::BRAVIARY_OFF);
+                candidates.add_direct  (MountBraviaryMatcher     ::off().rmsd_precropped(cropped         , object), MountState::BRAVIARY_OFF);
 #endif
             }
         }
     }
+
+//    cout << "plus   = " << plus.area << endl;
+//    cout << "arrowL = " << arrowL.area << endl;
+//    cout << "arrowR = " << arrowR.area << endl;
+
+    //  No buttons detected means mounts aren't available or we're on Basculegion.
+    bool buttons_detected = plus.area != 0 && arrowL.area != 0 && arrowR.area != 0;
+    if (!buttons_detected){
+//        cout << "rmsd = " << candidates.m_rmsd << ", state = " << (int)candidates.m_state << endl;
+        return candidates.m_state;
+    }
+
+    WaterfillObject object = std::move(plus);
+    object.merge_assume_no_overlap(arrowL);
+    object.merge_assume_no_overlap(arrowR);
+
+    QImage cropped = extract_box(image, object);
+
+    candidates.add_direct(MountWyrdeerMatcherButtons    ::on().rmsd(cropped), MountState::WYRDEER_ON);
+    candidates.add_direct(MountBasculegionMatcherButtons::on().rmsd(cropped), MountState::URSALUNA_ON);
+    candidates.add_direct(MountUrsalunaMatcherButtons   ::on().rmsd(cropped), MountState::BASCULEGION_ON);
+    candidates.add_direct(MountSneaslerMatcherButtons   ::on().rmsd(cropped), MountState::SNEASLER_ON);
+    candidates.add_direct(MountBraviaryMatcherButtons   ::on().rmsd(cropped), MountState::BRAVIARY_ON);
+
+#if 0
     {
         std::vector<MountDetectorFilteredImage> filtered_images = run_filters(
             image,
@@ -302,18 +487,45 @@ MountState MountDetector::detect(const QImage& screen) const{
                 {0xffc0c000, 0xffffffff},
             }
         );
-//        int i = 0;
+        int i = 0;
         for (MountDetectorFilteredImage& filtered : filtered_images){
+#if 0
+            std::vector<WaterfillObject> objects = find_objects_inplace(filtered.matrix, 50, false);
+            std::vector<WaterfillObject> candidates;
+
+            //  Filter out anything that touches the borders.
+            for (const WaterfillObject& object : objects){
+                //  Skip anything that touches the borders.
+                if (object.min_x == 0 || object.min_y == 0 ||
+                    object.max_x - 1 == (size_t)image.width() ||
+                    object.max_y - 1 == (size_t)image.height()
+                ){
+                    continue;
+                }
+                candidates.emplace_back(object);
+            }
+            objects = std::move(candidates);
+#endif
+
+
+
             WaterFillIterator finder(filtered.matrix, 50);
             WaterfillObject object;
             while (finder.find_next(object)){
-                if (object.width() * 2 < (size_t)image.width() || object.width() == (size_t)image.width()){
+                //  Skip anything that touches the borders.
+                if (object.min_x == 0 || object.min_y == 0 ||
+                    object.max_x - 1 == (size_t)image.width() ||
+                    object.max_y - 1 == (size_t)image.height()
+                ){
                     continue;
+                }
+                if (object.width() * 2 < (size_t)image.width() || object.width() == (size_t)image.width()){
+//                    continue;
                 }
                 if (object.height() * 3 < (size_t)image.height() || object.height() == (size_t)image.height()){
-                    continue;
+//                    continue;
                 }
-#if 1
+#if 0
                 candidates.add_filtered(MountWyrdeerMatcher      ::on().rmsd(filtered.image, object), MountState::WYRDEER_ON);
                 candidates.add_direct  (MountWyrdeerMatcher      ::on().rmsd(image         , object), MountState::WYRDEER_ON);
                 candidates.add_filtered(MountUrsalunaMatcher     ::on().rmsd(filtered.image, object), MountState::URSALUNA_ON);
@@ -325,12 +537,13 @@ MountState MountDetector::detect(const QImage& screen) const{
                 candidates.add_filtered(MountBraviaryMatcher     ::on().rmsd(filtered.image, object), MountState::BRAVIARY_ON);
                 candidates.add_direct  (MountBraviaryMatcher     ::on().rmsd(image         , object), MountState::BRAVIARY_ON);
 #endif
-//                extract_box(image, object).save("test-" + QString::number(c) + "-" + QString::number(i) + ".png");
-//                i++;
+                extract_box(image, object).save("test-" + QString::number(i) + ".png");
+                i++;
             }
         }
 //        cout << "i = " << i << endl;
     }
+#endif
 
 //    cout << "rmsd = " << candidates.m_rmsd << ", state = " << (int)candidates.m_state << endl;
 //    if (candidates.m_state == MountState::BASCULEGION_ON){
@@ -404,6 +617,33 @@ bool MountTracker::process_frame(
     return false;
 }
 
+
+
+
+void make_mount_template(){
+    QImage image("MountOn-Braviary-Original.png");
+    image = image.convertToFormat(QImage::Format_ARGB32);
+
+    int width = image.width();
+    int height = image.height();
+    int plus_min_x = width - 29;
+    int plus_max_x = width - 10;
+    int plus_min_y = height - 23;
+    int plus_max_y = height - 4;
+    for (int r = 0; r < height; r++){
+        for (int c = 0; c < width; c++){
+            if (plus_min_x < c && c < plus_max_x && plus_min_y < r && r < plus_max_y){
+                continue;
+            }
+            QRgb pixel = image.pixel(c, r);
+            if (qRed(pixel) < 128 || qGreen(pixel) < 128){
+                image.setPixel(c, r, 0);
+            }
+        }
+    }
+
+    image.save("MountOn-Braviary-Template.png");
+}
 
 
 
