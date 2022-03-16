@@ -4,6 +4,7 @@
  *
  *  Detect the move selection screen. Useful to detect whether a move has no PP so it can
  *  not be used.
+ *  Note: this detector is very easy to get false positives. Can be deleted if it is not used in future.
  */
 
 #ifndef PokemonAutomation_PokemonLA_BattleMoveSelectionDetector_H
