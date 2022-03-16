@@ -808,6 +808,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/PokemonLA_BattleMoveSelectionDetector.h
     Source/PokemonLA/Inference/PokemonLA_BattlePokemonSwitchDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_BattlePokemonSwitchDetector.h
+    Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.cpp
+    Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.h
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.h
     Source/PokemonLA/Inference/PokemonLA_MapDetector.cpp

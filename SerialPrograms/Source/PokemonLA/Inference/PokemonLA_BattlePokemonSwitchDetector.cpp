@@ -9,6 +9,7 @@
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "PokemonLA_BattlePokemonSwitchDetector.h"
+#include "PokemonLA_CommonColorCheck.h"
 
 #include <iostream>
 using std::cout;
@@ -75,18 +76,14 @@ bool BattlePokemonSwitchDetector::process_frame(
     }
 
     const ImageStats battle_1 = image_stats(extract_box(frame, m_ready_to_battle_bg_1));
-    if ((battle_1.average.sum() <= 300 && battle_1.stddev.sum() <= 10 &&
-        battle_1.average.b > battle_1.average.r && battle_1.average.b > battle_1.average.g) == false
-    ){
+    if (!is_LA_dark_blue(battle_1)){
         // std::cout << "battle_1 not enough " << battle_1.average << " " << battle_1.stddev << std::endl;
         m_detected.store(false, std::memory_order_release);
         return false;
     }
 
     const ImageStats battle_2 = image_stats(extract_box(frame, m_ready_to_battle_bg_2));
-    if ((battle_1.average.sum() <= 300 && battle_2.stddev.sum() <= 10 &&
-        battle_2.average.b > battle_2.average.r && battle_2.average.b > battle_2.average.g) == false
-    ){
+    if (!is_LA_dark_blue(battle_2)){
         // std::cout << "battle_2  not enough" << battle_2.average << " " << battle_2.stddev << std::endl;
         m_detected.store(false, std::memory_order_release);
         return false;

@@ -2,6 +2,7 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
+ *  Detect if the entire screen is frozen.
  */
 
 #ifndef PokemonAutomation_CommonFramework_FrozenImageDetector_H

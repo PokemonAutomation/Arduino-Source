@@ -10,12 +10,11 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA/Inference/PokemonLA_BattleMenuDetector.h"
-#include "PokemonLA/Inference/PokemonLA_BattleMoveSelectionDetector.h"
 #include "PokemonLA/Inference/PokemonLA_BattlePokemonSwitchDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA_IngoBattleGrinder.h"
@@ -27,6 +26,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
+// #define DEBUG_INGO_BATTLE
 
 
 const char* INGO_OPPONENT_STRINGS[] = {
@@ -236,6 +236,8 @@ void IngoBattleGrinder::use_move(const BotBaseContext &context, int cur_pokemon,
         // Strong style
         pbf_press_button(context, BUTTON_R, 10, 125);
     }
+    std::cout << "Use pokemon " << cur_pokemon << " move " << cur_move << " style " << 
+        (style == 0 ? "No Style" : (style == 1 ? "Agile" : "Strong")) << std::endl;
 
     // Choose the move
     pbf_press_button(context, BUTTON_A, 10, 125);
@@ -254,7 +256,7 @@ void IngoBattleGrinder::switch_pokemon(SingleSwitchProgramEnvironment& env, int&
         // We assume only using its first move with no style to finish the battle.
         pbf_press_button(env.console, BUTTON_A, 20, 100);
         pbf_press_button(env.console, BUTTON_A, 20, 150);
-        env.console.context().wait_for_all_requests();
+        env.console.botbase().wait_for_all_requests();
 
         next_pokemon_in_party_order++;
     
@@ -290,7 +292,15 @@ const PokemonBattleDecisionOption* IngoBattleGrinder::get_pokemon(int cur_pokemo
 bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
     Stats& stats = env.stats<Stats>();
 
-    stats.battles++;
+    // The location of the move slot when choosing which move to use during battle.
+    // These boxes will be used to check whether the content in those boxes are changed or not
+    // after selecting one move to use. In this way we can detect whether the move is out of PP.
+    ImageFloatBox move_slot_boxes[4] = {
+        {0.6600, 0.6220, 0.2500, 0.0320},
+        {0.6395, 0.6875, 0.2500, 0.0320},
+        {0.6190, 0.7530, 0.2500, 0.0320},
+        {0.5985, 0.8185, 0.2500, 0.0320},
+    };
 
     env.console.log("Starting battle...");
 
@@ -337,11 +347,11 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
         const bool stop_on_detected = true;
         BattleMenuDetector battle_menu_detector(env.console, env.console, stop_on_detected);
         // dialogue ellipse appears on a semi-transparent dialog box if you win the fight.
-        DialogueEllipseDetector dialogue_ellipse_detector(env.console, env.console, std::chrono::milliseconds(110), stop_on_detected);
+        DialogueEllipseDetector dialogue_ellipse_detector(env.console, env.console, std::chrono::milliseconds(200), stop_on_detected);
         BattlePokemonSwitchDetector pokemon_switch_detector(env.console, env.console, stop_on_detected);
         // normal dialogue appears if you lose the fight.
         NormalDialogDetector normal_dialogue_detector(env.console, env.console, stop_on_detected);
-        ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(110), stop_on_detected);
+        ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(200), stop_on_detected);
         int ret = wait_until(
             env, env.console, std::chrono::minutes(2),
             {
@@ -385,15 +395,18 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
 
                 // Press A to select moves
                 pbf_press_button(env.console, BUTTON_A, 10, 125);
+                env.console.botbase().wait_for_all_requests();
 
+                const auto& move_box = move_slot_boxes[cur_move];
+                QImage screen = env.console.video().snapshot();
+                ImageMatchDetector move_slot_detector(std::move(screen), move_box, 10.0);
+                
                 use_move(env.console, cur_pokemon, cur_move);
 
-                // Check if the move cannot be used due to no PP.
-                // In this case, we will still be on the move selection screen:
-                BattleMoveSelectionDetector move_selection_detector(env.console, env.console, stop_on_detected);
-                QImage screen = env.console.video().snapshot();
-                if (move_selection_detector.process_frame(screen, std::chrono::system_clock::now())){
-                    // We are still on the move selection screen. No PP
+                // Check if the move cannot be used due to no PP:
+                screen = env.console.video().snapshot();
+                if (move_slot_detector.detect(screen)){
+                    // We are still on the move selection screen. No PP.
                     if (cur_move == 3){
                         // Pokemon has zero PP on all moves.
                         env.console.log("No PP on all moves. Abort program.", COLOR_RED);
@@ -406,17 +419,28 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
                     cur_move++;
 
                     use_move(env.console, cur_pokemon, cur_move);
+
+#ifdef DEBUG_INGO_BATTLE                    
+                    std::cout << "Moved to next move " << cur_move << std::endl;
+                    static int count = 0;
+                    screen.save("./no_pp." + QString::number(count++) + ".png");
+#endif
                 }
             }
 
             env.update_stats();
             num_turns++;
         }
-        else if (ret == 1 || ret == 2){
-            env.console.log("Dialogue box.");
+        else if (ret == 1){
+            env.console.log("Transparent dialogue box.");
+            
+            pbf_press_button(env.console, BUTTON_B, 20, 100);
+            env.console.botbase().wait_for_all_requests();
+        } else if(ret == 2){
+            env.console.log("Normal dialogue box.");
 
             pbf_press_button(env.console, BUTTON_B, 20, 100);
-            env.console.context().wait_for_all_requests();
+            env.console.botbase().wait_for_all_requests();
         }
         else if (ret == 3){
             env.console.log("Pokemon fainted.", COLOR_RED);
@@ -433,6 +457,9 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
             break;
         }
     }
+
+    stats.battles++;
+    env.update_stats();
 
     return false;
 }
