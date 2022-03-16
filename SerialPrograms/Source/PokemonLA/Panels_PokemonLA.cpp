@@ -50,9 +50,7 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
 
     add_divider("---- Farming ----");
     add_program<NuggetFarmerHighlands_Descriptor, MoneyFarmerHighlands>();
-    if (GlobalSettings::instance().DEVELOPER_MODE){
-        add_program<IngoBattleGrinder_Descriptor, IngoBattleGrinder>();
-    }
+    add_program<IngoBattleGrinder_Descriptor, IngoBattleGrinder>();
 
     add_divider("---- Shiny Hunting ----");
 //    add_program<ShinyHuntLakeTrio_Descriptor, ShinyHuntLakeTrio>();

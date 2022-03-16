@@ -439,7 +439,7 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
         state == State::DIVE_STRAIGHT ||
         state == State::DIVE_LEFT ||
         state == State::DIVE_RIGHT;
-    if (m_flag_y > 0.45 || (currently_diving && m_flag_y > 0.15)){
+    if (m_flag_y > 0.45 || (currently_diving && m_flag_y > 0.10)){
         if (0.49 <= m_flag_x && m_flag_x <= 0.51){
             return run_state_action(State::DIVE_STRAIGHT);
         }else{
