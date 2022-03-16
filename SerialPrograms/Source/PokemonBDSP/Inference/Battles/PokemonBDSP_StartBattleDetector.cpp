@@ -43,10 +43,10 @@ bool StartBattleDetector::detect(const QImage& frame){
 
     ImageStats stats = image_stats(image);
 
-    //  Solid screen that's not black.
-    if (stats.average.sum() > 50 && stats.stddev.sum() < 10){
-        return true;
-    }
+//    //  Solid screen that's not black.
+//    if (stats.average.sum() > 50 && stats.stddev.sum() < 10){
+//        return true;
+//    }
 
     return m_dialog.detect(frame);
 }
