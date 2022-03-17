@@ -11,6 +11,7 @@
 #include <map>
 #include <thread>
 #include <fstream>
+#include <iostream>
 #include <nmmintrin.h>
 #include <sys/types.h>
 #include <unistd.h>
@@ -95,7 +96,7 @@ bool set_thread_priority(int priority){
     }
 
     int errorcode = errno;
-    std::cerr << "Unable to set thread priority. Error Code = " << error << std::endl;
+    std::cerr << "Unable to set thread priority. Error Code = " << errorcode << std::endl;
     return false;
 }
 QThread::Priority to_qt_priority(int priority){

@@ -1,4 +1,4 @@
-/*  Shiny Sound Detector
+/*  Alpha Roar Detector
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -11,7 +11,7 @@
 #include "CommonFramework/Tools/AudioFeed.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonLA/PokemonLA_Settings.h"
-#include "PokemonLA_ShinySoundDetector.h"
+#include "PokemonLA_AlphaRoarDetector.h"
 
 #include <sstream>
 #include <cfloat>
@@ -25,27 +25,27 @@ namespace PokemonLA{
 
 
 
-ShinySoundDetector::~ShinySoundDetector(){
+AlphaRoarDetector::~AlphaRoarDetector(){
     log_results();
 }
-ShinySoundDetector::ShinySoundDetector(ConsoleHandle& console, bool stop_on_detected)
-    : AudioInferenceCallback("ShinySoundDetector")
+AlphaRoarDetector::AlphaRoarDetector(ConsoleHandle& console, bool stop_on_detected)
+    : AudioInferenceCallback("AlphaRoarDetector")
     , m_console(console)
     , m_stop_on_detected(stop_on_detected)
     , m_detected(false)
     , m_time_detected(std::chrono::system_clock::time_point::min())
     , m_error_coefficient(1.0)
 {}
-void ShinySoundDetector::log_results(){
+void AlphaRoarDetector::log_results(){
     std::stringstream ss;
     ss << m_error_coefficient;
     if (detected()){
-        m_console.log("Shiny detected! Error Coefficient = " + ss.str(), COLOR_BLUE);
+        m_console.log("Alpha roar detected! Error Coefficient = " + ss.str(), COLOR_BLUE);
     }else{
-        m_console.log("No shiny detected. Error Coefficient = " + ss.str(), COLOR_PURPLE);
+        m_console.log("No alpha roar detected. Error Coefficient = " + ss.str(), COLOR_PURPLE);
     }
 }
-ShinySoundResults ShinySoundDetector::results(){
+ShinySoundResults AlphaRoarDetector::results(){
     ShinySoundResults results;
     SpinLockGuard lg(m_lock);
     results.screenshot = m_screenshot;
@@ -54,7 +54,7 @@ ShinySoundResults ShinySoundDetector::results(){
 }
 
 
-bool ShinySoundDetector::process_spectrums(
+bool AlphaRoarDetector::process_spectrums(
     const std::vector<AudioSpectrum>& newSpectrums,
     AudioFeed& audioFeed
 ){
@@ -67,10 +67,11 @@ bool ShinySoundDetector::process_spectrums(
     size_t sampleRate = newSpectrums[0].sample_rate;
     if (m_matcher == nullptr || m_matcher->sampleRate() != sampleRate){
         m_console.log("Loading spectrogram...");
+        const double lowFrequencyFilter = 100.0; // we don't match frequencies under 100.0 Hz
         m_matcher = std::make_unique<SpectrogramMatcher>(
-            AudioTemplateCache::instance().get_throw("PokemonLA/ShinySound", sampleRate),
-            SpectrogramMatcher::Mode::SPIKE_CONV, sampleRate,
-            GameSettings::instance().SHINY_SHOUND_LOW_FREQUENCY
+            AudioTemplateCache::instance().get_throw("PokemonLA/AlphaRoar", sampleRate),
+            SpectrogramMatcher::Mode::NO_CONV, sampleRate,
+            lowFrequencyFilter
         );
     }
 
@@ -86,8 +87,8 @@ bool ShinySoundDetector::process_spectrums(
             continue; // error or not enough spectrum history
         }
 
-        const float threshold = (float)GameSettings::instance().SHINY_SHOUND_THRESHOLD2;
-        bool found = matcherScore <= threshold;
+        const float threshold = (float)GameSettings::instance().ALPHA_ROAR_THRESHOLD;
+        const bool found = matcherScore <= threshold;
 //        cout << matcherScore << endl;
 
         m_error_coefficient = std::min(m_error_coefficient, matcherScore);
@@ -102,7 +103,7 @@ bool ShinySoundDetector::process_spectrums(
                 m_screenshot = m_console.video().snapshot();
             }
             std::ostringstream os;
-            os << "Shiny sound find, score " << matcherScore << "/" << threshold << ", scale: " << m_matcher->lastMatchedScale();
+            os << "Alpha roar find, score " << matcherScore << "/" << threshold << ", scale: " << m_matcher->lastMatchedScale();
             m_console.log(os.str(), COLOR_BLUE);
             audioFeed.add_overlay(curStamp+1-m_matcher->numTemplateWindows(), curStamp+1, COLOR_RED);
             // Tell m_matcher to skip the remaining spectrums so that if `process_spectrums()` gets
@@ -132,7 +133,7 @@ bool ShinySoundDetector::process_spectrums(
     return m_time_detected + std::chrono::milliseconds(200) <= now;
 }
 
-void ShinySoundDetector::clear(){
+void AlphaRoarDetector::clear(){
     m_matcher->clear();
 }
 

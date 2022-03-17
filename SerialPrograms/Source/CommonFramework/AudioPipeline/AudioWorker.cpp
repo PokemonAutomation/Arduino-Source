@@ -94,6 +94,7 @@ void AudioWorker::startAudio(){
         inputAudioFormat.setSampleRate(48000);
         setSampleFormatToFloat(inputAudioFormat);
         m_channelMode = ChannelMode::Stereo;
+        m_inputFormat = AudioFormat::DUAL_48000;
 
         // Note: m_inputAbsoluteFilepath must be an absolute file path. Otherwise it may trigger a bug
         // in QAudioDecoder used in AudioFileLoader, which will either stops the audio stream

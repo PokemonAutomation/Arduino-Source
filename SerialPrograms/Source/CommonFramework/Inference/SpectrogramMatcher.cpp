@@ -14,6 +14,33 @@
 namespace PokemonAutomation{
 
 
+std::vector<float> buildSpikeKernel(size_t numFrequencies, size_t halfSampleRate){
+    std::vector<float> kernel;
+    // We find a good kernel when sample rate is 48K and numFrequencies is 2048:
+    // [-4.f, -3.f, -2.f, -1.f, 0.f, 1.f, 2.f, 3.f, 4.f, 4.f, 3.f, 2.f, 1.f, 0.f, -1.f, -2.f, -3.f, -4.f]
+    // This spans frenquency range of 17 * halfSampleRate / numFrequencies = 199.21875Hz, where 17 is the number of intervals in the above series.
+    // For another sample rate and numFrequencies combination, the number of intervals is
+    // 199.21875 * numFrequencies / halfSampleRate
+    size_t numKernelIntervals = int(199.21875 * numFrequencies / halfSampleRate + 0.5);
+    size_t slopeLen = numKernelIntervals / 2;
+    for(size_t i = 0; i <= slopeLen; i++){
+        kernel.push_back(-4.0f + 8.f * i / (float)slopeLen);
+    }
+    for(size_t i = ((numKernelIntervals+1) % 2); i <= slopeLen; i++){
+        kernel.push_back(-4.0f + 8.f * (slopeLen-i)/(float)slopeLen);
+    }
+    return kernel;
+}
+
+// std::vector<float> buildSmoothKernel(size_t numFrequencies, size_t halfSampleRate){
+//     std::vector<float> kernel;
+//     // We find a good kernel when sample rate is 48K and numFrequencies is 2048:
+//     // [0.0111, 0.135, 0.606, 1.0, 0.606, 0.135, 0.0111], built as Gaussian distribution with sigma(stddev) as 1.0
+//     // The equation for Gaussian is exp(-x^2/(2 sigma^2))
+//     // We can think sigma value as 1.0 * frequency_gap = 1.0 * halfSampleRate / numFrequencies = 11.71875 Hz
+// }
+
+
 SpectrogramMatcher::SpectrogramMatcher(
     AudioTemplate audioTemplate, Mode mode, size_t sampleRate,
     double lowFrequencyFilter
@@ -45,23 +72,11 @@ SpectrogramMatcher::SpectrogramMatcher(
     m_originalFreqEnd = 20000 * m_numOriginalFrequencies / halfSampleRate + 1;
 
     // Initialize the spike convolution kernel:
-    // We find a good kernel when sample rate is 48K and numFrequencies is 2048:
-    // [-4.f, -3.f, -2.f, -1.f, 0.f, 1.f, 2.f, 3.f, 4.f, 4.f, 3.f, 2.f, 1.f, 0.f, -1.f, -2.f, -3.f, -4.f]
-    // This spans frenquency range of 17 * halfSampleRate / numFrequencies = 199.21875Hz, where 17 is the number of intervals in the above series.
-    // For another sample rate and numFrequencies combination, the number of intervals is
-    // 199.21875 * numFrequencies / halfSampleRate
-    size_t numKernelIntervals = int(199.21875 * m_numOriginalFrequencies / halfSampleRate + 0.5);
-    size_t slopeLen = numKernelIntervals / 2;
-    for(size_t i = 0; i <= slopeLen; i++){
-        m_spikeKernel.push_back(-4.0f + 8.f * i / (float)slopeLen);
-    }
-    for(size_t i = ((numKernelIntervals+1) % 2); i <= slopeLen; i++){
-        m_spikeKernel.push_back(-4.0f + 8.f * (slopeLen-i)/(float)slopeLen);
-    }
+    m_convKernel = buildSpikeKernel(m_numOriginalFrequencies, halfSampleRate);
 
     if (m_mode == Mode::SPIKE_CONV){
         // Do convolution on audio template
-        const size_t numConvedFrequencies = (m_originalFreqEnd - m_originalFreqStart) - m_spikeKernel.size() + 1;
+        const size_t numConvedFrequencies = (m_originalFreqEnd - m_originalFreqStart) - m_convKernel.size() + 1;
         std::vector<float> temporaryBuffer(numConvedFrequencies * numTemplateWindows);
         for(size_t i = 0; i < numTemplateWindows; i++){
             conv(m_template.getWindow(i) + m_originalFreqStart, m_originalFreqEnd - m_originalFreqStart,
@@ -93,13 +108,13 @@ size_t SpectrogramMatcher::latestTimestamp() const{
 }
 
 void SpectrogramMatcher::conv(const float* src, size_t num, float* dst){
-    if (num < m_spikeKernel.size()){
+    if (num < m_convKernel.size()){
         return;
     }
-    for(size_t i = 0; i < num-m_spikeKernel.size()+1; i++){
+    for(size_t i = 0; i < num-m_convKernel.size()+1; i++){
         dst[i] = 0.0f;
-        for(size_t j = 0; j < m_spikeKernel.size(); j++){
-            dst[i] += src[i+j] * m_spikeKernel[j];
+        for(size_t j = 0; j < m_convKernel.size(); j++){
+            dst[i] += src[i+j] * m_convKernel[j];
         }
     }
 }

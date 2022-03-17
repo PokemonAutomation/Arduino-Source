@@ -39,6 +39,7 @@ public:
     SectionDividerOption m_advanced_options;
     FloatingPointOption SHINY_SHOUND_THRESHOLD2;
     FloatingPointOption SHINY_SHOUND_LOW_FREQUENCY;
+    FloatingPointOption ALPHA_ROAR_THRESHOLD;
 };
 
 

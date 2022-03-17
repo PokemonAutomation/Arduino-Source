@@ -802,6 +802,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.cpp
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h
+    Source/PokemonLA/Inference/PokemonLA_AlphaRoarDetector.cpp
+    Source/PokemonLA/Inference/PokemonLA_AlphaRoarDetector.h
     Source/PokemonLA/Inference/PokemonLA_BattleMenuDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_BattleMenuDetector.h
     Source/PokemonLA/Inference/PokemonLA_BattleMoveSelectionDetector.cpp
@@ -869,6 +871,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.cpp
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.h
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_FlagNavigationTest.cpp
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_FlagNavigationTest.h
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_OverworldWatcher.cpp

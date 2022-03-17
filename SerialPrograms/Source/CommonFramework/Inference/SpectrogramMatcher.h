@@ -29,6 +29,8 @@ public:
         NO_CONV,
         // Do convolution on each window of spectrum with a peak detection kernel, before matching spectrums.
         SPIKE_CONV,
+        // Do convolution on each window of spectrum with a Gaussian smooth kernel, before matching spectrums.
+        // GAUSSIAN_CONV,
     };
 
     SpectrogramMatcher(
@@ -96,7 +98,7 @@ private:
 
     Mode m_mode = Mode::NO_CONV;
 
-    std::vector<float> m_spikeKernel;
+    std::vector<float> m_convKernel;
 
     std::list<AudioSpectrum> m_spectrums;
     std::list<float> m_spectrumNormSqrs;
