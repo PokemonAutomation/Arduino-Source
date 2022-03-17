@@ -4,6 +4,7 @@
  *
  */
 
+#include <QHBoxLayout>
 #include <QComboBox>
 #include <QCheckBox>
 #include <QLineEdit>
@@ -99,19 +100,25 @@ QWidget* BattlePokemonActionRow::make_style_box(QWidget& parent, MoveStyle& styl
 }
 
 QWidget* BattlePokemonActionRow::make_switch_box(QWidget& parent){
+    QWidget* widget = new QWidget(&parent);
+    QHBoxLayout* layout = new QHBoxLayout(widget);
+    layout->setAlignment(Qt::AlignHCenter);
+    layout->setContentsMargins(0, 0, 0, 0);
     QCheckBox* box = new QCheckBox(&parent);
-    box->setChecked(switch_pokemon);
+    layout->addWidget(box);
+    box->setChecked(this->switch_pokemon);
     box->connect(
         box, &QCheckBox::stateChanged,
-        box, [=](int){
+        box, [&, box](int){
             this->switch_pokemon = box->isChecked();
         }
     );
-    return box;
+    return widget;
 }
 
 QWidget* BattlePokemonActionRow::make_turns_box(QWidget& parent){
     QLineEdit* box = new QLineEdit(QString::number(num_turns_to_switch), &parent);
+    box->setAlignment(Qt::AlignHCenter);
     box->connect(
         box, &QLineEdit::textChanged,
         box, [=](const QString& text){
@@ -193,7 +200,7 @@ MoveStyle BattlePokemonActionTable::get_style(size_t pokemon, size_t move){
     return action.style[move];
 }
 
-bool BattlePokemonActionTable::swith_pokemon(size_t pokemon, size_t num_turns){
+bool BattlePokemonActionTable::switch_pokemon(size_t pokemon, size_t num_turns){
     if (pokemon >= m_table.size()){
         return false;
     }

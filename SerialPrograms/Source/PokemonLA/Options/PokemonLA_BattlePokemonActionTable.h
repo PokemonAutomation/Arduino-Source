@@ -67,7 +67,7 @@ public:
     // Whether to switch the pokemon at current turns.
     // pokemon: pokemon index, usually at range [0, 5]
     // num_turns: num turns passed so far since the pokemon is sent to the battle.
-    bool swith_pokemon(size_t pokemon, size_t num_turns);
+    bool switch_pokemon(size_t pokemon, size_t num_turns);
 
     virtual void load_json(const QJsonValue& json) override;
     virtual QJsonValue to_json() const override;

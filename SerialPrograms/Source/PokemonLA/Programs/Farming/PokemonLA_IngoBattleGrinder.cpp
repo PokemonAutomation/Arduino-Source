@@ -319,7 +319,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
 
             // User may want to switch the pokemon after some turns, to get more exp, or prevent if from
             // fainting.
-            if (POKEMON_ACTIONS.swith_pokemon(cur_pokemon, num_turns)){
+            if (POKEMON_ACTIONS.switch_pokemon(cur_pokemon, num_turns)){
                 env.console.log("Switch pokemon");
 
                 // Go to the switching pokemon screen:
