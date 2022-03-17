@@ -74,35 +74,6 @@ const IngoOpponentMenuLocation INGO_OPPONENT_MENU_LOCATIONS_V12[] = {
 
 
 
-MoveStyleOption::MoveStyleOption(const char* label) : EnumDropdownOption(
-    label,
-    {
-        "No style",
-        "Agile",
-        "Strong"
-    },
-    0
-){}
-
-
-PokemonBattleDecisionOption::PokemonBattleDecisionOption(QString description): 
-    GroupOption(std::move(description))
-    , MOVE_1("<b>Move 1 style:</b>")
-    , MOVE_2("<b>Move 2 style:</b>")
-    , MOVE_3("<b>Move 3 style:</b>")
-    , MOVE_4("<b>Move 4 style:</b>")
-    , SWITCH("<b>Switch this " + STRING_POKEMON + " in battle:</b>", false)
-    , NUM_TURNS_TO_SWITCH("<b>Num turns to switch:</b>", 1)
-{
-    PA_ADD_OPTION(MOVE_1);
-    PA_ADD_OPTION(MOVE_2);
-    PA_ADD_OPTION(MOVE_3);
-    PA_ADD_OPTION(MOVE_4);
-    PA_ADD_OPTION(SWITCH);
-    PA_ADD_OPTION(NUM_TURNS_TO_SWITCH);
-}
-
-
 IngoBattleGrinder_Descriptor::IngoBattleGrinder_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonLA:IngoBattleGrinder",
@@ -122,11 +93,6 @@ IngoBattleGrinder::IngoBattleGrinder(const IngoBattleGrinder_Descriptor& descrip
         std::vector<QString>(INGO_OPPONENT_STRINGS, INGO_OPPONENT_STRINGS + (size_t)IngoOpponents::END_LIST),
         0
     )
-    , POKEMON_1("First " + STRING_POKEMON)
-    , POKEMON_2("Second " + STRING_POKEMON)
-    , POKEMON_3("Third " + STRING_POKEMON)
-    , POKEMON_4("Fourth " + STRING_POKEMON)
-    , POKEMON_5("Remaining " + STRING_POKEMON)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
@@ -136,11 +102,8 @@ IngoBattleGrinder::IngoBattleGrinder(const IngoBattleGrinder_Descriptor& descrip
     })
 {
     PA_ADD_OPTION(OPPONENT);
-    PA_ADD_OPTION(POKEMON_1);
-    PA_ADD_OPTION(POKEMON_2);
-    PA_ADD_OPTION(POKEMON_3);
-    PA_ADD_OPTION(POKEMON_4);
-    PA_ADD_OPTION(POKEMON_5);
+    PA_ADD_OPTION(POKEMON_ACTIONS);
+
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -217,27 +180,19 @@ bool IngoBattleGrinder::start_dialog(SingleSwitchProgramEnvironment& env){
     }
 }
 
-void IngoBattleGrinder::use_move(const BotBaseContext &context, int cur_pokemon, int cur_move){
-    const PokemonBattleDecisionOption* pokemon = get_pokemon(cur_pokemon);
-
-    size_t style = 0;
-    switch(cur_move){
-        case 0: style = pokemon->MOVE_1; break;
-        case 1: style = pokemon->MOVE_2; break;
-        case 2: style = pokemon->MOVE_3; break;
-        case 3: style = pokemon->MOVE_4; break;
-    }
+void IngoBattleGrinder::use_move(const BotBaseContext &context, size_t cur_pokemon, size_t cur_move){
+    const MoveStyle style = POKEMON_ACTIONS.get_style(cur_pokemon, cur_move);
 
     // Select move styles
-    if (style == 1){
+    if (style == MoveStyle::Agile){
         // Agile style
         pbf_press_button(context, BUTTON_L, 10, 125);
-    } else if (style == 2){
+    } else if (style == MoveStyle::Strong){
         // Strong style
         pbf_press_button(context, BUTTON_R, 10, 125);
     }
     std::cout << "Use pokemon " << cur_pokemon << " move " << cur_move << " style " << 
-        (style == 0 ? "No Style" : (style == 1 ? "Agile" : "Strong")) << std::endl;
+        MoveStyle_NAMES[(int)style].toStdString() << std::endl;
 
     // Choose the move
     pbf_press_button(context, BUTTON_A, 10, 125);
@@ -245,7 +200,7 @@ void IngoBattleGrinder::use_move(const BotBaseContext &context, int cur_pokemon,
     context.wait_for_all_requests();
 }
 
-void IngoBattleGrinder::switch_pokemon(SingleSwitchProgramEnvironment& env, int& next_pokemon_in_party_order){
+void IngoBattleGrinder::switch_pokemon(SingleSwitchProgramEnvironment& env, size_t& next_pokemon_in_party_order){
     // Move fast leading fainted pokemon
     for(int i = 0; i < next_pokemon_in_party_order; i++){
         pbf_press_dpad(env.console, DPAD_DOWN, 20, 80);
@@ -276,16 +231,6 @@ void IngoBattleGrinder::switch_pokemon(SingleSwitchProgramEnvironment& env, int&
         pbf_press_button(env.console, BUTTON_B, 20, 100);
         // Move to the next pokemon
         pbf_press_dpad(env.console, DPAD_DOWN, 20, 80);
-    }
-}
-
-const PokemonBattleDecisionOption* IngoBattleGrinder::get_pokemon(int cur_pokemon) const {
-    switch (cur_pokemon){
-        case 0: return &POKEMON_1;
-        case 1: return &POKEMON_2;
-        case 2: return &POKEMON_3;
-        case 3: return &POKEMON_4;
-        default: return &POKEMON_5;
     }
 }
 
@@ -335,13 +280,13 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
     env.console.context().wait_for_all_requests();
 
     // Which move (0, 1, 2 or 3) to use in next turn.
-    int cur_move = 0;
+    size_t cur_move = 0;
     // Which pokemon in the party is not fainted
-    int cur_pokemon = 0;
+    size_t cur_pokemon = 0;
     // How many turns have passed in this battle:
-    int num_turns = 0;
+    size_t num_turns = 0;
     // Used to skip fainted pokemon in the party when switching a pokemon
-    int next_pokemon_in_party_order = 0;
+    size_t next_pokemon_in_party_order = 0;
 
     while(true){
         const bool stop_on_detected = true;
@@ -374,8 +319,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
 
             // User may want to switch the pokemon after some turns, to get more exp, or prevent if from
             // fainting.
-            const PokemonBattleDecisionOption* pokemon = get_pokemon(cur_pokemon);
-            if (pokemon->SWITCH && pokemon->NUM_TURNS_TO_SWITCH == num_turns){
+            if (POKEMON_ACTIONS.swith_pokemon(cur_pokemon, num_turns)){
                 env.console.log("Switch pokemon");
 
                 // Go to the switching pokemon screen:

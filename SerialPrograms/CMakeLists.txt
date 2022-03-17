@@ -875,6 +875,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_OverworldWatcher.h
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_ShinySoundListener.cpp
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_ShinySoundListener.h
+    Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.cpp
+    Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.cpp
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.h
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.cpp
