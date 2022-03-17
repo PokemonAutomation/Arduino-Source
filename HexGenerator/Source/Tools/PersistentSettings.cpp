@@ -8,7 +8,7 @@
 #include <QJsonObject>
 #include <QJsonDocument>
 #include <QDir>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Tools.h"
 #include "PersistentSettings.h"
@@ -20,7 +20,7 @@ using std::endl;
 namespace PokemonAutomation{
 
 
-const QString VERSION = "v0.5.17";
+const QString VERSION = "v0.5.18";
 const QString DISCORD = "https://discord.gg/cQ4gWxN";
 const QString GITHUB_REPO = "https://github.com/PokemonAutomation/";
 
@@ -61,16 +61,17 @@ void PersistentSettings::load(){
     cout << ("Root Path: " + path).toUtf8().data() << endl;
 
     try{
-        QJsonDocument doc = read_json_file(path + SETTINGS_NAME);
+        QString full_path = path + SETTINGS_NAME;
+        QJsonDocument doc = read_json_file(full_path);
         if (!doc.isObject()){
-            PA_THROW_ParseException("Invalid settings file.");
+            throw FileException(nullptr, PA_CURRENT_FUNCTION, "Invalid settings file.", full_path.toStdString());
         }
 
         QJsonObject root = doc.object();
 
         json_get_int(board_index, root, "Board", 0, 3);
 
-    }catch (const StringException& e){
+    }catch (const Exception& e){
         std::cout << std::string("Error Parsing ") + SETTINGS_NAME.toUtf8().data() + ": " + e.message() << std::endl;
     }
 }

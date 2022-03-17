@@ -14,9 +14,6 @@
 namespace PokemonAutomation{
 namespace Microcontroller{
 
-void seqnum_reset(BotBase& botbase);
-uint32_t request_stop(BotBase& botbase);
-
 uint32_t protocol_version(const BotBaseContext& context);
 uint32_t program_version(const BotBaseContext& context);
 uint8_t program_id(const BotBaseContext& context);
@@ -40,6 +37,16 @@ public:
     {}
     virtual BotBaseMessage message() const override{
         return BotBaseMessage(PABB_MSG_REQUEST_STOP, params);
+    }
+};
+class DeviceRequest_next_command_interrupt : public BotBaseRequest{
+public:
+    pabb_MsgRequestNextCmdInterrupt params;
+    DeviceRequest_next_command_interrupt()
+        : BotBaseRequest(false)
+    {}
+    virtual BotBaseMessage message() const override{
+        return BotBaseMessage(PABB_MSG_REQUEST_NEXT_CMD_INTERRUPT, params);
     }
 };
 class DeviceRequest_protocol_version : public BotBaseRequest{

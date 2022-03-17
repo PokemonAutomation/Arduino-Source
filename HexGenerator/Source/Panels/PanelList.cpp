@@ -6,7 +6,7 @@
 
 #include <QFile>
 #include <QTextStream>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Tools/PersistentSettings.h"
 #include "UI/MainWindow.h"
@@ -25,17 +25,17 @@ PanelList::PanelList(QWidget& parent, MainWindow& window, const QJsonValue& json
     , m_window(window)
 {
     if (!json.isObject()){
-        PA_THROW_ParseException("Expected an object.");
+        throw ParseException("Expected an object.");
     }
     const QJsonObject& category = json.toObject();
 
     QString category_name;
     if (!json_get_string(category_name, category, "Name")){
-        PA_THROW_ParseException("Expected string field: Name");
+        throw ParseException("Expected string field: Name");
     }
 
     if (!json_get_string(m_display_name, category, "Display")){
-        PA_THROW_ParseException("Expected string field: Display");
+        throw ParseException("Expected string field: Display");
     }
 
     //  Populate Settings
@@ -43,7 +43,7 @@ PanelList::PanelList(QWidget& parent, MainWindow& window, const QJsonValue& json
     bool first = true;
     for (const auto& item : json_get_array_nothrow(category, "Settings")){
         if (!item.isString()){
-            PA_THROW_ParseException("Expected string field: Settings");
+            throw ParseException("Expected string field: Settings");
         }
         QString setting = item.toString();
 //        settings.emplace_back(setting.toString());
@@ -55,7 +55,7 @@ PanelList::PanelList(QWidget& parent, MainWindow& window, const QJsonValue& json
 //            m_list.emplace_back(std::move(config));
             const QString& name = config->name();
             if (!m_map.emplace(name, std::move(config)).second){
-                PA_THROW_ParseException("Duplicate: Program name");
+                throw ParseException("Duplicate: Program name");
             }
             if (first){
                 addItem("---- Settings ----");
@@ -66,7 +66,7 @@ PanelList::PanelList(QWidget& parent, MainWindow& window, const QJsonValue& json
                 first = false;
             }
             addItem(name);
-        }catch (const StringException& e){
+        }catch (const Exception& e){
             cout << "Error: " << e.message() << endl;
         }
     }
@@ -101,10 +101,10 @@ PanelList::PanelList(QWidget& parent, MainWindow& window, const QJsonValue& json
 //                m_list.emplace_back(std::move(config));
                 const QString& name = config->name();
                 if (!m_map.emplace(name, std::move(config)).second){
-                    PA_THROW_StringException("Duplicate: Program name");
+                    throw ParseException("Duplicate: Program name");
                 }
                 addItem(name);
-            }catch (const StringException& e){
+            }catch (const Exception& e){
                 cout << "Error: " << e.message() << endl;
             }
         }

@@ -76,12 +76,9 @@ public:
 public:
     //  Basic Requests
 
-    //  Waits for all pending requests to finish.
     virtual void wait_for_all_requests(const std::atomic<bool>* cancelled = nullptr) override;
-
-    //  Stop all pending commands. This wipes the command queue on both sides
-    //  and stops any currently executing command.
     virtual void stop_all_commands() override;
+    virtual void next_command_interrupt() override;
 
 
 public:
@@ -124,6 +121,7 @@ private:
     template <typename Params> void process_command_finished(BotBaseMessage message);
     virtual void on_recv_message(BotBaseMessage message) override;
 
+    void clear_all_active_commands(uint64_t seqnum);
     void remove_request(std::map<uint64_t, PendingRequest>::iterator iter);
     void remove_command(std::map<uint64_t, PendingCommand>::iterator iter);
 
@@ -142,13 +140,13 @@ private:
         const BotBaseRequest& request,
         bool silent_remove, size_t queue_limit
     );
-    bool issue_request(
+    void issue_request(
         std::map<uint64_t, PendingRequest>::iterator& iter,
         const std::atomic<bool>* cancelled,
         const BotBaseRequest& request,
         bool silent_remove
     );
-    bool issue_command(
+    void issue_command(
         std::map<uint64_t, PendingCommand>::iterator& iter,
         const std::atomic<bool>* cancelled,
         const BotBaseRequest& request,
@@ -168,6 +166,7 @@ private:
         const std::atomic<bool>* cancelled
     ) override;
 
+    BotBaseMessage wait_for_request(std::map<uint64_t, PendingRequest>::iterator iter);
 
 private:
     Logger& m_logger;

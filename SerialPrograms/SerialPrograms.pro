@@ -7,6 +7,7 @@ QT += multimediawidgets
 greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 
 INCLUDEPATH += ../
+INCLUDEPATH += ../../Internal/
 INCLUDEPATH += Source/
 
 CONFIG += force_debug_info
@@ -396,6 +397,7 @@ SOURCES += \
     Source/PokemonLA/Inference/PokemonLA_BattleMenuDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_BattleMoveSelectionDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_BattlePokemonSwitchDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.cpp \
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_MapDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_MountDetector.cpp \
@@ -404,6 +406,7 @@ SOURCES += \
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_ShinySoundDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.cpp \
+    Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.cpp \
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.cpp \
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.cpp \
     Source/PokemonLA/Panels_PokemonLA.cpp \
@@ -1035,6 +1038,7 @@ HEADERS += \
     Source/PokemonLA/Inference/PokemonLA_BattleMenuDetector.h \
     Source/PokemonLA/Inference/PokemonLA_BattleMoveSelectionDetector.h \
     Source/PokemonLA/Inference/PokemonLA_BattlePokemonSwitchDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.h \
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.h \
     Source/PokemonLA/Inference/PokemonLA_MapDetector.h \
     Source/PokemonLA/Inference/PokemonLA_MountDetector.h \
@@ -1044,6 +1048,7 @@ HEADERS += \
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h \
     Source/PokemonLA/Inference/PokemonLA_ShinySoundDetector.h \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.h \
+    Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h \
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.h \
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.h \
     Source/PokemonLA/Panels_PokemonLA.h \

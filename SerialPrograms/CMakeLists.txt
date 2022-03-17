@@ -1260,7 +1260,7 @@ if (EXISTS "../../Internal/SerialPrograms/TelemetryURLs.h")
 endif()
 
 #add include directory
-target_include_directories(SerialPrograms PRIVATE Source/ ../)
+target_include_directories(SerialPrograms PRIVATE ../ ../../Internal/ Source/)
 
 #enable MP with MSVC (Build with Multiple Processes)
 if (MSVC)

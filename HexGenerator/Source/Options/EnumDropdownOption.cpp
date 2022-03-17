@@ -10,7 +10,7 @@
 #include <QHBoxLayout>
 #include <QLabel>
 #include <QComboBox>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Tools/Tools.h"
 #include "EnumDropdownOption.h"
@@ -38,14 +38,14 @@ EnumDropdown::EnumDropdown(const QJsonObject& obj)
     QJsonArray options = json_get_array_throw(obj, JSON_OPTIONS);
     for (const auto option : options){
         if (!option.isArray()){
-            PA_THROW_ParseException("Config Error - Expected Array: " + JSON_OPTIONS);
+            throw ParseException("Config Error - Expected Array: " + JSON_OPTIONS.toStdString());
         }
         QJsonArray pair = option.toArray();
         if (pair.size() != 2){
-            PA_THROW_ParseException("Config Error - Enum pairs should be 2 elements: " + JSON_OPTIONS);
+            throw ParseException("Config Error - Enum pairs should be 2 elements: " + JSON_OPTIONS.toStdString());
         }
         if (!pair[0].isString() || !pair[1].isString()){
-            PA_THROW_ParseException("Config Error - Enum pairs should be strings: " + JSON_OPTIONS);
+            throw ParseException("Config Error - Enum pairs should be strings: " + JSON_OPTIONS.toStdString());
         }
         m_options.emplace_back(
             pair[0].toString(),
@@ -54,20 +54,20 @@ EnumDropdown::EnumDropdown(const QJsonObject& obj)
     }
     for (size_t c = 0; c < m_options.size(); c++){
         if (!m_map.emplace(m_options[c].first, c).second){
-            PA_THROW_ParseException("Config Error - Duplicate option token.");
+            throw ParseException("Config Error - Duplicate option token.");
         }
     }
     {
         auto iter = m_map.find(json_get_string_throw(obj, JSON_DEFAULT));
         if (iter == m_map.end()){
-            PA_THROW_ParseException("Config Error - Unrecognized token.");
+            throw ParseException("Config Error - Unrecognized token.");
         }
         m_default = iter->second;
     }
     {
         auto iter = m_map.find(json_get_string_throw(obj, JSON_CURRENT));
         if (iter == m_map.end()){
-            PA_THROW_ParseException("Config Error - Unrecognized token.");
+            throw ParseException("Config Error - Unrecognized token.");
         }
         m_current = iter->second;
     }

@@ -10,21 +10,6 @@ namespace PokemonAutomation{
 namespace Microcontroller{
 
 
-void seqnum_reset(BotBase& botbase){
-    pabb_MsgAckRequest response;
-    botbase.issue_request_and_wait(
-        DeviceRequest_seqnum_reset()
-    ).convert<PABB_MSG_ACK_REQUEST>(botbase.logger(), response);
-}
-uint32_t request_stop(BotBase& botbase){
-    pabb_MsgAckRequest response;
-    botbase.issue_request_and_wait(
-        DeviceRequest_request_stop()
-    ).convert<PABB_MSG_ACK_REQUEST>(botbase.logger(), response);
-    return response.seqnum;
-}
-
-
 uint32_t protocol_version(const BotBaseContext& context){
     pabb_MsgAckRequestI32 response;
     context.issue_request_and_wait(

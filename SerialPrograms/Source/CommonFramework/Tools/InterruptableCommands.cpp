@@ -42,7 +42,7 @@ AsyncCommandSession::~AsyncCommandSession(){
             std::lock_guard<std::mutex> lg(m_lock);
             if (m_current){
                 try{
-                    m_current->context.cancel();
+                    m_current->context.cancel_now();
                 }catch (InvalidConnectionStateException&){
                 }catch (OperationCancelledException&){
                 }catch (...){
@@ -69,7 +69,7 @@ void AsyncCommandSession::dispatch(std::function<void(const BotBaseContext&)>&& 
     }
 
     if (m_current){
-        m_current->context.cancel();
+        m_current->context.cancel_lazy();
         m_cv.wait(lg, [=]{
             return
                 m_env.is_stopping() ||
@@ -127,12 +127,14 @@ void AsyncCommandSession::thread_loop(){
 
 
 
+#if 0
 void AsyncCommandSession::stop_commands(){
     std::lock_guard<std::mutex> lg(m_lock);
     if (m_current){
-        m_current->context.cancel();
+        m_current->context.cancel_now();
     }
 }
+#endif
 void AsyncCommandSession::wait(){
     std::unique_lock<std::mutex> lg(m_lock);
 //    cout << "wait() - start" << endl;
@@ -146,7 +148,7 @@ void AsyncCommandSession::stop_session(){
     {
         std::lock_guard<std::mutex> lg(m_lock);
         if (m_current != nullptr){
-            m_current->context.cancel();
+            m_current->context.cancel_now();
         }
         m_cv.notify_all();
     }

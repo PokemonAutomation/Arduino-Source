@@ -38,8 +38,8 @@ public:
     //  stopped and replaced with this one.
     void dispatch(std::function<void(const BotBaseContext&)>&& lambda);
 
-    //  Stop the currently running command.
-    void stop_commands();
+//    //  Stop the currently running command.
+//    void stop_commands();
 
     //  Wait for currently running command to finish.
     void wait();

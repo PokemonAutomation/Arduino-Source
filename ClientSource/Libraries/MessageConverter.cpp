@@ -267,6 +267,17 @@ int register_message_converters_framework_requests(){
         }
     );
     register_message_converter(
+        PABB_MSG_REQUEST_NEXT_CMD_INTERRUPT,
+        [](const std::string& body){
+            std::stringstream ss;
+            ss << "PABB_MSG_REQUEST_NEXT_CMD_INTERRUPT - ";
+            if (body.size() != sizeof(pabb_MsgRequestStop)){ ss << "(invalid size)" << std::endl; return ss.str(); }
+            const auto* params = (const pabb_MsgRequestStop*)body.c_str();
+            ss << "seqnum = " << (uint64_t)params->seqnum;
+            return ss.str();
+        }
+    );
+    register_message_converter(
         PABB_MSG_COMMAND_END_PROGRAM_CALLBACK,
         [](const std::string& body){
             std::stringstream ss;

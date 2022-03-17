@@ -200,8 +200,8 @@ ProcessorSpecs get_processor_specs(){
         const SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX& info = *(const SYSTEM_LOGICAL_PROCESSOR_INFORMATION_EX*)(ptr.data() + c);
         switch (info.Relationship){
         case LOGICAL_PROCESSOR_RELATIONSHIP::RelationProcessorCore:
-            for (size_t c = 0; c < info.Processor.GroupCount; c++){
-                const GROUP_AFFINITY& affinity = info.Processor.GroupMask[c];
+            for (size_t g = 0; g < info.Processor.GroupCount; g++){
+                const GROUP_AFFINITY& affinity = info.Processor.GroupMask[g];
                 group_masks[affinity.Group] |= affinity.Mask;
             }
             specs.cores++;

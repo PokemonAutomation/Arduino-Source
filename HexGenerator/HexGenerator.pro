@@ -21,7 +21,7 @@ win32-msvc{
 }
 
 SOURCES += \
-    ../Common/Cpp/Exception.cpp \
+    ../Common/Cpp/Exceptions.cpp \
     ../Common/Cpp/PrettyPrint.cpp \
     ../Common/Cpp/SpinLock.cpp \
     ../Common/Cpp/Unicode.cpp \
@@ -73,7 +73,7 @@ SOURCES += \
     Source/UI/MainWindow.cpp
 
 HEADERS += \
-    ../Common/Cpp/Exception.h \
+    ../Common/Cpp/Exceptions.h \
     ../Common/Cpp/PrettyPrint.h \
     ../Common/Cpp/SpinLock.h \
     ../Common/Cpp/Unicode.h \

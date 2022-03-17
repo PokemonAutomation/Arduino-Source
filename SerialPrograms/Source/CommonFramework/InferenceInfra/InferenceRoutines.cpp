@@ -145,7 +145,7 @@ int run_until(
                 if (visual_session == nullptr){
                     visual_session.reset(new AsyncVisualInferenceSession(
                         env, console, console, console,
-                        [&](){ context.cancel(); },
+                        [&](){ context.cancel_now(); },
                         period
                     ));
                 }
@@ -155,7 +155,7 @@ int run_until(
                 if (audio_session == nullptr){
                     audio_session.reset(new AsyncAudioInferenceSession(
                         env, console, console,
-                        [&](){ context.cancel(); },
+                        [&](){ context.cancel_now(); },
                         period
                     ));
                 }

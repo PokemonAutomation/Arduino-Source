@@ -7,7 +7,7 @@
 #include <QScrollArea>
 #include <QVBoxLayout>
 #include <QLabel>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Tools/Tools.h"
 #include "JsonProgram.h"
@@ -23,7 +23,7 @@ Program_JsonFile::Program_JsonFile(QString category, const QJsonObject& obj)
 {
     for (const auto item : json_get_array_throw(obj, JSON_PARAMETERS)){
         if (!item.isObject()){
-            PA_THROW_ParseException("Config Error - Expected and object.");
+            throw ParseException("Config Error - Expected and object.");
         }
         m_options.emplace_back(parse_option(item.toObject()));
     }

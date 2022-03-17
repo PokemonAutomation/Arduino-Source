@@ -12,7 +12,7 @@
 #include <QComboBox>
 #include <QCheckBox>
 #include <QPushButton>
-#include "Common/Qt/Options/MultiHostTableOptionBase.h"
+#include "Common/Qt/Options/MultiHostTableBaseOption.h"
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{

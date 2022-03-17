@@ -8,7 +8,7 @@
 #include <QFile>
 #include <QLabel>
 #include <QMessageBox>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Tools/PersistentSettings.h"
 #include "PanelList.h"
@@ -46,7 +46,7 @@ PanelLists::PanelLists(QWidget& parent, MainWindow& window)
             if (tab->count() == 0){
                 setTabEnabled(this->count() - 1, false);
             }
-        }catch (StringException&){
+        }catch (Exception&){
             continue;
         }
     }

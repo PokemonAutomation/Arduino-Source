@@ -77,6 +77,7 @@ void overworld_to_menu(ProgramEnvironment& env, ConsoleHandle& console){
         }
         console.log("Detected menu.");
     }
+    env.wait_for(std::chrono::milliseconds(100));
 }
 
 void save_game(ProgramEnvironment& env, ConsoleHandle& console){

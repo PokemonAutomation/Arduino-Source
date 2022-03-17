@@ -12,7 +12,7 @@
 #include <QComboBox>
 #include <QLineEdit>
 #include <QPushButton>
-#include "Common/Qt/Options/FossilTableOptionBase.h"
+#include "Common/Qt/Options/FossilTableBaseOption.h"
 #include "SingleStatementOption.h"
 
 namespace PokemonAutomation{

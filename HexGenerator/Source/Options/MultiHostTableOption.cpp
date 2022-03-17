@@ -14,6 +14,7 @@
 #include <QScrollBar>
 #include "Common/Qt/QtJsonTools.h"
 #include "Common/Qt/ExpressionEvaluator.h"
+#include "Common/Qt/Options/EditableTable/EditableTableBaseWidget.h"
 #include "Tools/Tools.h"
 #include "MultiHostTableOption.h"
 

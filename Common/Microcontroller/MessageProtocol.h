@@ -153,10 +153,10 @@
 //      (version / 100) must be the same on both server and client.
 //      (version % 100) can be higher on server than client.
 //
-#define PABB_PROTOCOL_VERSION           2021052610
+#define PABB_PROTOCOL_VERSION           2021052611
 
 //  Program versioning doesn't matter. It's just for informational purposes.
-#define PABB_PROGRAM_VERSION            2021122800
+#define PABB_PROGRAM_VERSION            2022031600
 
 #define PABB_BAUD_RATE                  115200
 #define PABB_RETRANSMIT_DELAY_MILLIS    80
@@ -289,6 +289,11 @@ typedef struct{
 typedef struct{
     seqnum_t seqnum;
 } PABB_PACK pabb_MsgRequestStop;
+
+#define PABB_MSG_REQUEST_NEXT_CMD_INTERRUPT     0x47
+typedef struct{
+    seqnum_t seqnum;
+} PABB_PACK pabb_MsgRequestNextCmdInterrupt;
 
 ////////////////////////////////////////////////////////////////////////////////
 //  Custom Info

@@ -45,7 +45,10 @@ PABotBase::~PABotBase(){
 }
 
 void PABotBase::connect(){
-    Microcontroller::seqnum_reset(*this);
+    pabb_MsgAckRequest response;
+    issue_request_and_wait(
+        Microcontroller::DeviceRequest_seqnum_reset(), nullptr
+    ).convert<PABB_MSG_ACK_REQUEST>(logger(), response);
 }
 void PABotBase::stop(){
 //    cout << "stop" << endl;
@@ -107,25 +110,37 @@ void PABotBase::wait_for_all_requests(const std::atomic<bool>* cancelled){
 }
 
 void PABotBase::stop_all_commands(){
-    uint32_t msg_seqnum = Microcontroller::request_stop(*this);
-    {
-        std::lock_guard<std::mutex> lg0(m_sleep_lock);
-        SpinLockGuard lg1(m_state_lock, "PABotBase::stop_all_commands()");
+    std::map<uint64_t, PendingRequest>::iterator iter;
+    issue_request(iter, nullptr, Microcontroller::DeviceRequest_request_stop(), false);
 
-        if (!m_pending_commands.empty()){
-            //  Remove all commands that are before the stop seqnum.
-            uint64_t seqnum = infer_full_seqnum(m_pending_commands, msg_seqnum);
-            while (true){
-                auto iter = m_pending_commands.begin();
-                if (iter == m_pending_commands.end() || iter->first > seqnum){
-                    break;
-                }
-                m_pending_commands.erase(iter);
+    pabb_MsgAckRequest response;
+    wait_for_request(iter).convert<PABB_MSG_ACK_REQUEST>(m_logger, response);
+
+    clear_all_active_commands(iter->first);
+}
+void PABotBase::next_command_interrupt(){
+    std::map<uint64_t, PendingRequest>::iterator iter;
+    issue_request(iter, nullptr, Microcontroller::DeviceRequest_next_command_interrupt(), true);
+    clear_all_active_commands(iter->first);
+}
+void PABotBase::clear_all_active_commands(uint64_t seqnum){
+    //  Remove all commands at or before the specified seqnum.
+
+    std::lock_guard<std::mutex> lg0(m_sleep_lock);
+    SpinLockGuard lg1(m_state_lock, "PABotBase::next_command_interrupt()");
+
+    if (!m_pending_commands.empty()){
+        //  Remove all commands that are before the stop seqnum.
+        while (true){
+            auto iter1 = m_pending_commands.begin();
+            if (iter1 == m_pending_commands.end() || iter1->first > seqnum){
+                break;
             }
+            m_pending_commands.erase(iter1);
         }
-
-        m_cv.notify_all();
     }
+
+    m_cv.notify_all();
 }
 void PABotBase::remove_request(std::map<uint64_t, PendingRequest>::iterator iter){
     //  Must be called under both sleep and state locks.
@@ -524,7 +539,7 @@ bool PABotBase::try_issue_command(
 
     return true;
 }
-bool PABotBase::issue_request(
+void PABotBase::issue_request(
     std::map<uint64_t, PendingRequest>::iterator& iter,
     const std::atomic<bool>* cancelled,
     const BotBaseRequest& request,
@@ -553,7 +568,7 @@ bool PABotBase::issue_request(
             iter, cancelled, request,
             silent_remove, MAX_PENDING_REQUESTS
         )){
-            return true;
+            return;
         }
         std::unique_lock<std::mutex> lg(m_sleep_lock);
         if (cancelled != nullptr && cancelled->load(std::memory_order_acquire)){
@@ -565,7 +580,7 @@ bool PABotBase::issue_request(
         m_cv.wait(lg);
     }
 }
-bool PABotBase::issue_command(
+void PABotBase::issue_command(
     std::map<uint64_t, PendingCommand>::iterator& iter,
     const std::atomic<bool>* cancelled,
     const BotBaseRequest& request,
@@ -594,7 +609,7 @@ bool PABotBase::issue_command(
             iter, cancelled, request,
             silent_remove, MAX_PENDING_REQUESTS
         )){
-            return true;
+            return;
         }
         std::unique_lock<std::mutex> lg(m_sleep_lock);
         if (cancelled != nullptr && cancelled->load(std::memory_order_acquire)){
@@ -631,6 +646,7 @@ void PABotBase::issue_request(
         issue_command(iter, cancelled, request, true);
     }
 }
+
 BotBaseMessage PABotBase::issue_request_and_wait(
     const BotBaseRequest& request,
     const std::atomic<bool>* cancelled
@@ -639,11 +655,12 @@ BotBaseMessage PABotBase::issue_request_and_wait(
         throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "This function only supports requests.");
     }
 
-    BotBaseMessage message = request.message();
-
     std::map<uint64_t, PendingRequest>::iterator iter;
     issue_request(iter, cancelled, request, false);
 
+    return wait_for_request(iter);
+}
+BotBaseMessage PABotBase::wait_for_request(std::map<uint64_t, PendingRequest>::iterator iter){
     //  Wait for ack.
     while (true){
         std::unique_lock<std::mutex> lg(m_sleep_lock);

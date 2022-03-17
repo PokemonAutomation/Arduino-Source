@@ -10,7 +10,7 @@
 #include <QLabel>
 #include <QPushButton>
 #include <QMessageBox>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Tools/Tools.h"
 #include "Tools/PersistentSettings.h"
@@ -67,10 +67,10 @@ QString ConfigSet::save_cfile() const{
     std::string cpp = to_cfile();
     QFile file(name);
     if (!file.open(QFile::WriteOnly)){
-        PA_THROW_FileException("Unable to create source file.", name);
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to create source file.", name.toStdString());
     }
     if (file.write(cpp.c_str(), cpp.size()) != cpp.size()){
-        PA_THROW_FileException("Unable to write source file.", name);
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to write source file.", name.toStdString());
     }
     file.close();
     return name;
@@ -110,9 +110,9 @@ QWidget* ConfigSet::make_ui(MainWindow& parent){
                     QString cfile = save_cfile();
                     QMessageBox box;
                     box.information(nullptr, "Success!", "Settings saved to:\n" + json + "\n" + cfile);
-                }catch (const StringException& e){
+                }catch (const Exception& e){
                     QMessageBox box;
-                    box.critical(nullptr, "Error", e.message_qt());
+                    box.critical(nullptr, "Error", QString::fromStdString(e.message()));
                     return;
                 }
             }

@@ -16,7 +16,7 @@ using std::endl;
 #include <QLabel>
 #include <QPushButton>
 #include <QMessageBox>
-#include "Common/Cpp/Exception.h"
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "Tools/Tools.h"
 #include "Tools/PersistentSettings.h"
@@ -97,10 +97,10 @@ QString Program::save_cfile() const{
     std::string cpp = to_cfile();
     QFile file(name);
     if (!file.open(QFile::WriteOnly)){
-        PA_THROW_FileException("Unable to create source file.", name);
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to create source file.", name.toStdString());
     }
     if (file.write(cpp.c_str(), cpp.size()) != cpp.size()){
-        PA_THROW_FileException("Unable to write source file.", name);
+        throw FileException(nullptr, PA_CURRENT_FUNCTION, "Unable to write source file.", name.toStdString());
     }
     file.close();
     return name;
@@ -145,8 +145,8 @@ void Program::save_and_build(const std::string& board){
         try{
             save_json();
             save_cfile();
-        }catch (const StringException& e){
-            QString error = e.message_qt();
+        }catch (const Exception& e){
+            QString error = QString::fromStdString(e.message());
             run_on_main_thread([=]{
                 QMessageBox box;
                 box.critical(nullptr, "Error", error);
