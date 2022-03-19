@@ -66,6 +66,22 @@ GlobalSettings::GlobalSettings()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
+    , REALTIME_THREAD_PRIORITY(
+        "<b>Realtime Thread Priority:</b><br>"
+        "Thread priority of real-time threads. (UI thread, audio threads)<br>"
+        "Restart the program for this to fully take effect.",
+        2 - THREAD_PRIORITY_MIN
+    )
+    , INFERENCE_PRIORITY(
+        "<b>Inference Priority:</b><br>"
+        "Thread priority of inference threads. (image/sound recognition)",
+        1 - THREAD_PRIORITY_MIN
+    )
+    , COMPUTE_PRIORITY(
+        "<b>Compute Priority:</b><br>"
+        "Thread priority of computation threads.",
+        -1 - THREAD_PRIORITY_MIN
+    )
     , LOG_EVERYTHING(
         "<b>Log Everything:</b><br>Log everything to the output window and output log. Will be very spammy.",
         false
@@ -86,12 +102,15 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(STATS_FILE);
     PA_ADD_OPTION(WINDOW_WIDTH);
     PA_ADD_OPTION(WINDOW_HEIGHT);
-    if (PRIORITY_MODES.size() > 1){
-        PA_ADD_OPTION(PROCESS_PRIORITY0);
-    }
     PA_ADD_STATIC(m_discord_settings);
     PA_ADD_OPTION(DISCORD);
     PA_ADD_STATIC(m_advanced_options);
+//    if (PRIORITY_MODES.size() > 1){
+//        PA_ADD_OPTION(PROCESS_PRIORITY0);
+//    }
+    PA_ADD_STATIC(REALTIME_THREAD_PRIORITY);
+    PA_ADD_STATIC(INFERENCE_PRIORITY);
+    PA_ADD_STATIC(COMPUTE_PRIORITY);
     PA_ADD_OPTION(LOG_EVERYTHING);
     PA_ADD_OPTION(SAVE_DEBUG_IMAGES);
 //    PA_ADD_OPTION(NAUGHTY_MODE);

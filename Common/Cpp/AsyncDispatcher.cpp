@@ -47,8 +47,14 @@ void AsyncTask::signal(){
 }
 
 
+#if 0
 AsyncDispatcher::AsyncDispatcher(size_t starting_threads)
-    : m_stopping(false)
+    : AsyncDispatcher(nullptr, starting_threads)
+{}
+#endif
+AsyncDispatcher::AsyncDispatcher(std::function<void()>&& new_thread_callback, size_t starting_threads)
+    : m_new_thread_callback(std::move(new_thread_callback))
+    , m_stopping(false)
     , m_busy_count(0)
 {
     for (size_t c = 0; c < starting_threads; c++){
@@ -133,6 +139,9 @@ void AsyncDispatcher::run_in_parallel(
 
 
 void AsyncDispatcher::thread_loop(){
+    if (m_new_thread_callback){
+        m_new_thread_callback();
+    }
     bool busy = false;
     while (true){
         AsyncTask* task;

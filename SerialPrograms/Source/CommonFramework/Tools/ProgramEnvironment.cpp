@@ -10,6 +10,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "ClientSource/Connection/BotBase.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "StatsTracking.h"
 #include "ProgramEnvironment.h"
 
@@ -23,7 +24,8 @@ struct ProgramEnvironmentData{
     std::atomic<bool> m_stopping;
     std::mutex m_lock;
     std::condition_variable m_cv;
-    AsyncDispatcher m_dispatcher;
+    AsyncDispatcher m_realtime_dispatcher;
+    AsyncDispatcher m_inference_dispatcher;
 
     std::map<std::condition_variable*, std::mutex*> m_stop_signals;
 
@@ -32,6 +34,18 @@ struct ProgramEnvironmentData{
     )
         : m_program_info(std::move(program_info))
         , m_stopping(false)
+        , m_realtime_dispatcher(
+            [](){
+                GlobalSettings::instance().REALTIME_THREAD_PRIORITY.set_on_this_thread();
+            },
+            0
+        )
+        , m_inference_dispatcher(
+            [](){
+                GlobalSettings::instance().INFERENCE_PRIORITY.set_on_this_thread();
+            },
+            0
+        )
     {}
 };
 
@@ -55,8 +69,11 @@ ProgramEnvironment::ProgramEnvironment(
 const ProgramInfo& ProgramEnvironment::program_info() const{
     return m_data->m_program_info;
 }
-AsyncDispatcher& ProgramEnvironment::dispatcher(){
-    return m_data->m_dispatcher;
+AsyncDispatcher& ProgramEnvironment::realtime_dispatcher(){
+    return m_data->m_realtime_dispatcher;
+}
+AsyncDispatcher& ProgramEnvironment::inference_dispatcher(){
+    return m_data->m_inference_dispatcher;
 }
 
 

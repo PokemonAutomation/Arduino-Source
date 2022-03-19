@@ -176,7 +176,7 @@ bool IngoBattleGrinder::start_dialog(SingleSwitchProgramEnvironment& env){
     case 0:
         return false;
     default:
-        throw OperationFailedException(env.console, "Unable to opponent list options after 5 A presses.");
+        throw OperationFailedException(env.console, "Unable to find opponent list options after 5 A presses.");
     }
 }
 
@@ -202,7 +202,7 @@ void IngoBattleGrinder::use_move(const BotBaseContext &context, size_t cur_pokem
 
 void IngoBattleGrinder::switch_pokemon(SingleSwitchProgramEnvironment& env, size_t& next_pokemon_in_party_order){
     // Move fast leading fainted pokemon
-    for(int i = 0; i < next_pokemon_in_party_order; i++){
+    for(size_t i = 0; i < next_pokemon_in_party_order; i++){
         pbf_press_dpad(env.console, DPAD_DOWN, 20, 80);
     }
 

@@ -10,6 +10,7 @@
 #include "AudioWorker.h"
 #include "AudioThreadController.h"
 #include "FFTWorker.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 
 #include <QIODevice>
@@ -59,9 +60,12 @@ AudioThreadController::AudioThreadController(
     connect(m_fftWorker, &FFTWorker::FFTFinished, parent, &AudioDisplayWidget::loadFFTOutput);
 
     connect(parent, &AudioDisplayWidget::volumeChanged, m_AudioWorker, &AudioWorker::setVolume);
-    
+
     m_audioThread.start();
     m_fftThread.start();
+
+    GlobalSettings::instance().REALTIME_THREAD_PRIORITY.set_on_qthread(m_audioThread);
+    GlobalSettings::instance().REALTIME_THREAD_PRIORITY.set_on_qthread(m_fftThread);
 
     // Send the signal to start audio processing after the worker thread is started.
     emit operate();

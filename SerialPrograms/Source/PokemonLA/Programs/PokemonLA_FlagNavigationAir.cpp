@@ -417,13 +417,9 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
 //        throw OperationFailedException(m_console, "Flag not detected after 20 seconds.");
 //    }
 
-    //  Find the flag.
-    if (!m_flag_detected){
-        if (m_last_flag_detection + std::chrono::seconds(5) < timestamp){
-            return run_state_action(State::FIND_FLAG);
-        }else{
-            return false;
-        }
+    //  Flag not detected and is stale.
+    if (!m_flag_detected && m_last_flag_detection + std::chrono::seconds(2) < timestamp){
+        return run_state_action(State::FIND_FLAG);
     }
 
     //  Re-center the flag.
@@ -452,6 +448,10 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
         return run_state_action(m_flag_x < 0.5 ? State::DASH_LEFT : State::DASH_RIGHT);
     }
 
+    //  B-mash Cruise
+    return run_state_action(State::DASH_FORWARD_MASH_B);
+
+#if 0
     if (m_flag_y <= 0.40){
         //  B-mash Cruise
         return run_state_action(State::DASH_FORWARD_MASH_B);
@@ -462,6 +462,7 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
 
     //  No known state left.
     return run_state_action(State::DIVE_STRAIGHT);
+#endif
 }
 bool FlagNavigationAir::run_climbing(AsyncCommandSession& commands, WallClock timestamp){
     //  Can't jump off means you're able to stand. Switch back to Braviary.

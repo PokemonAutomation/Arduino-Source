@@ -34,7 +34,7 @@ void MultiSwitchProgramEnvironment::run_in_parallel(
     size_t s, size_t e,
     const std::function<void(ConsoleHandle& console)>& func
 ){
-    dispatcher().run_in_parallel(
+    realtime_dispatcher().run_in_parallel(
         s, e,
         [&](size_t index){
             func(consoles[index]);

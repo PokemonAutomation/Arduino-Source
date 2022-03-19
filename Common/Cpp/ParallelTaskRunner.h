@@ -14,7 +14,11 @@ namespace PokemonAutomation{
 
 class ParallelTaskRunner{
 public:
-    ParallelTaskRunner(size_t starting_threads = 0, size_t max_threads = 0);
+    ParallelTaskRunner(
+        std::function<void()>&& new_thread_callback,
+        size_t starting_threads,
+        size_t max_threads
+    );
     ~ParallelTaskRunner();
 
     void wait_for_everything();
@@ -28,6 +32,7 @@ private:
 
 
 private:
+    std::function<void()> m_new_thread_callback;
     size_t m_max_threads;
     std::deque<std::shared_ptr<AsyncTask>> m_queue;
     std::vector<std::thread> m_threads;

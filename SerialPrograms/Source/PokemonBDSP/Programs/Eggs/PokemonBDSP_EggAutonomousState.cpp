@@ -240,6 +240,17 @@ bool EggAutonomousState::process_party(){
         switch (action){
         case EggHatchAction::StopProgram:
             m_console.log("Program stop requested...");
+            if (!shiny){
+                send_encounter_notification(
+                    m_console,
+                    m_notification_nonshiny_keep,
+                    m_notification_shiny,
+                    m_env.program_info(),
+                    false, false, {},
+                    screen,
+                    &m_stats
+                );
+            }
             return true;
         case EggHatchAction::Keep:
             m_console.log("Moving Pokemon to keep box...", COLOR_BLUE);

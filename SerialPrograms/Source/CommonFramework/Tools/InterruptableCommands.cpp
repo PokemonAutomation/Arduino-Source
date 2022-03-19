@@ -29,7 +29,7 @@ AsyncCommandSession::AsyncCommandSession(ProgramEnvironment& env, BotBase& botba
 {
     env.register_stop_program_signal(m_lock, m_cv);
 //    m_thread = std::thread(&AsyncCommandSession::thread_loop, this);
-    m_task = env.dispatcher().dispatch([this]{ thread_loop(); });
+    m_task = env.realtime_dispatcher().dispatch([this]{ thread_loop(); });
 }
 AsyncCommandSession::~AsyncCommandSession(){
 //    cout << "~AsyncCommandSession()" << endl;

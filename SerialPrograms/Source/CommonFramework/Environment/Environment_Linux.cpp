@@ -70,6 +70,50 @@ int read_priority_index(){
 
 
 
+extern const int THREAD_PRIORITY_MIN = 0;
+extern const int THREAD_PRIORITY_MAX = 1;
+const char* thread_priority_name(int priority){
+    switch (priority){
+    case 0:
+        return "Min Priority";
+    case 1:
+        return "Max Priority";
+    default:
+        return nullptr;
+    }
+}
+bool set_thread_priority(int priority){
+    int native_priority = priority < 0
+        ? sched_get_priority_min(SCHED_RR)
+        : sched_get_priority_max(SCHED_RR);
+
+    struct sched_param param;
+    param.sched_priority = native_priority;
+
+    if (pthread_setschedparam(pthread_self(), SCHED_RR, &param) == 0){
+        return true;
+    }
+
+    int errorcode = errno;
+    std::cerr << "Unable to set thread priority. Error Code = " << error << std::endl;
+    return false;
+}
+QThread::Priority to_qt_priority(int priority){
+    if (priority < 0){
+        return QThread::LowPriority;
+    }else{
+        return QThread::HighPriority;
+    }
+}
+
+
+
+
+
+
+
+
+
 uint64_t x86_rdtsc(){
     unsigned int lo, hi;
     __asm__ volatile ("rdtsc" : "=a" (lo), "=d" (hi));

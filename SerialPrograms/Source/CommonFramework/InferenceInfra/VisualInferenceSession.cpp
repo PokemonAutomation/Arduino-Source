@@ -165,7 +165,7 @@ AsyncVisualInferenceSession::AsyncVisualInferenceSession(
 )
     : VisualInferenceSession(env, logger, feed, overlay, period)
     , m_triggering_callback(nullptr)
-    , m_task(env.dispatcher().dispatch([this]{ thread_body(); }))
+    , m_task(env.inference_dispatcher().dispatch([this]{ thread_body(); }))
 {}
 AsyncVisualInferenceSession::AsyncVisualInferenceSession(
     ProgramEnvironment& env, LoggerQt& logger,
@@ -176,7 +176,7 @@ AsyncVisualInferenceSession::AsyncVisualInferenceSession(
     : VisualInferenceSession(env, logger, feed, overlay, period)
     , m_on_finish_callback(std::move(on_finish_callback))
     , m_triggering_callback(nullptr)
-    , m_task(env.dispatcher().dispatch([this]{ thread_body(); }))
+    , m_task(env.inference_dispatcher().dispatch([this]{ thread_body(); }))
 {}
 AsyncVisualInferenceSession::~AsyncVisualInferenceSession(){
     VisualInferenceSession::stop();

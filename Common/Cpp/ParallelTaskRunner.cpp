@@ -14,8 +14,13 @@ namespace PokemonAutomation{
 
 
 
-ParallelTaskRunner::ParallelTaskRunner(size_t starting_threads, size_t max_threads)
-    : m_max_threads(max_threads == 0 ? std::thread::hardware_concurrency() : max_threads)
+ParallelTaskRunner::ParallelTaskRunner(
+    std::function<void()>&& new_thread_callback,
+    size_t starting_threads,
+    size_t max_threads
+)
+    : m_new_thread_callback(std::move(new_thread_callback))
+    , m_max_threads(max_threads == 0 ? std::thread::hardware_concurrency() : max_threads)
     , m_stopping(false)
     , m_busy_count(0)
 {
@@ -68,9 +73,12 @@ std::shared_ptr<AsyncTask> ParallelTaskRunner::dispatch(std::function<void()>&& 
 
 
 void ParallelTaskRunner::thread_loop(){
-#if _WIN32
-    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_IDLE);
-#endif
+//#if _WIN32
+//    SetThreadPriority(GetCurrentThread(), THREAD_PRIORITY_IDLE);
+//#endif
+    if (m_new_thread_callback){
+        m_new_thread_callback();
+    }
 
     bool busy = false;
     while (true){

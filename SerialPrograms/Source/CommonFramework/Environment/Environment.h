@@ -11,6 +11,9 @@
 #include <string>
 #include <vector>
 #include <QString>
+#include <QThread>
+
+
 
 namespace PokemonAutomation{
 
@@ -24,6 +27,11 @@ bool set_priority_by_name(const QString& name);
 int read_priority_index();
 
 
+extern const int THREAD_PRIORITY_MIN;
+extern const int THREAD_PRIORITY_MAX;
+const char* thread_priority_name(int priority);
+bool set_thread_priority(int priority);
+QThread::Priority to_qt_priority(int priority);
 
 
 

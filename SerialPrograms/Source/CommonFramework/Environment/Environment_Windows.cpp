@@ -22,6 +22,10 @@
 #endif
 #endif
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -95,6 +99,101 @@ int read_priority_index(){
     }
     return -1;
 }
+
+
+
+extern const int THREAD_PRIORITY_MIN = -3;
+extern const int THREAD_PRIORITY_MAX = 3;
+const char* thread_priority_name(int priority){
+    switch (priority){
+    case -3:
+        return "Idle Priority";
+    case -2:
+        return "Lowest Priority";
+    case -1:
+        return "Below Normal Priority";
+    case 0:
+        return "Normal Priority";
+    case 1:
+        return "Above Normal Priority";
+    case 2:
+        return "Highest Priority";
+    case 3:
+        return "Time Critical Priority";
+    default:
+        return nullptr;
+    }
+}
+bool set_thread_priority(int priority){
+    int native_priority;
+    switch (priority){
+    case -3:
+        native_priority = THREAD_PRIORITY_IDLE;
+        break;
+    case -2:
+        native_priority = THREAD_PRIORITY_LOWEST;
+        break;
+    case -1:
+        native_priority = THREAD_PRIORITY_BELOW_NORMAL;
+        break;
+    case 0:
+        native_priority = THREAD_PRIORITY_NORMAL;
+        break;
+    case 1:
+        native_priority = THREAD_PRIORITY_ABOVE_NORMAL;
+        break;
+    case 2:
+        native_priority = THREAD_PRIORITY_HIGHEST;
+        break;
+    case 3:
+        native_priority = THREAD_PRIORITY_TIME_CRITICAL;
+        break;
+    default:
+        if (priority < 0){
+            native_priority = THREAD_PRIORITY_IDLE;
+        }else{
+            native_priority = THREAD_PRIORITY_TIME_CRITICAL;
+        }
+    }
+    if (!SetThreadPriority(GetCurrentThread(), native_priority)){
+        DWORD error = GetLastError();
+        std::cerr << "Unable to set thread priority. Error Code = " << error << std::endl;
+        return false;
+    }
+    return true;
+}
+QThread::Priority to_qt_priority(int priority){
+    switch (priority){
+    case -3:
+        return QThread::IdlePriority;
+    case -2:
+        return QThread::LowestPriority;
+    case -1:
+        return QThread::LowPriority;
+    case 0:
+        return QThread::NormalPriority;
+    case 1:
+        return QThread::HighPriority;
+    case 2:
+        return QThread::HighestPriority;
+    case 3:
+        return QThread::TimeCriticalPriority;
+    default:
+        if (priority < 0){
+            return QThread::IdlePriority;
+        }else{
+            return QThread::TimeCriticalPriority;
+        }
+    }
+}
+
+
+
+
+
+
+
+
 
 
 uint64_t x86_rdtsc(){

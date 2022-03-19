@@ -8,6 +8,7 @@
 #include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/ParallelTaskRunner.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "CommonFramework/OCR/OCR_Filtering.h"
 #include "CommonFramework/OCR/OCR_StringNormalization.h"
@@ -106,7 +107,10 @@ void TrainingSession::generate_small_dictionary(
     OCR::SmallDictionaryMatcher baseline(ocr_json_file, !incremental);
     OCR::SmallDictionaryMatcher trained(ocr_json_file, !incremental);
 
-    ParallelTaskRunner task_runner(0, threads);
+    ParallelTaskRunner task_runner(
+        [](){ GlobalSettings::instance().COMPUTE_PRIORITY.set_on_this_thread(); },
+        0, threads
+    );
 
     std::atomic<size_t> matched(0);
     std::atomic<size_t> failed(0);
@@ -170,7 +174,10 @@ void TrainingSession::generate_large_dictionary(
     OCR::LargeDictionaryMatcher baseline(ocr_json_directory + output_prefix, nullptr, !incremental);
     OCR::LargeDictionaryMatcher trained(ocr_json_directory + output_prefix, nullptr, !incremental);
 
-    ParallelTaskRunner task_runner(0, threads);
+    ParallelTaskRunner task_runner(
+        [](){ GlobalSettings::instance().COMPUTE_PRIORITY.set_on_this_thread(); },
+        0, threads
+    );
 
     std::atomic<size_t> matched(0);
     std::atomic<size_t> failed(0);

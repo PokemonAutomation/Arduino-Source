@@ -172,7 +172,7 @@ AsyncAudioInferenceSession::AsyncAudioInferenceSession(
 )
     : AudioInferenceSession(env, logger, feed, period)
     , m_triggering_callback(nullptr)
-    , m_task(env.dispatcher().dispatch([this]{ thread_body(); }))
+    , m_task(env.inference_dispatcher().dispatch([this]{ thread_body(); }))
 {}
 AsyncAudioInferenceSession::AsyncAudioInferenceSession(
     ProgramEnvironment& env, LoggerQt& logger,
@@ -183,7 +183,7 @@ AsyncAudioInferenceSession::AsyncAudioInferenceSession(
     : AudioInferenceSession(env, logger, feed, period)
     , m_on_finish_callback(std::move(on_finish_callback))
     , m_triggering_callback(nullptr)
-    , m_task(env.dispatcher().dispatch([this]{ thread_body(); }))
+    , m_task(env.inference_dispatcher().dispatch([this]{ thread_body(); }))
 {}
 AsyncAudioInferenceSession::~AsyncAudioInferenceSession(){
     AudioInferenceSession::stop();

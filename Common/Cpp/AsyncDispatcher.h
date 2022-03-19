@@ -63,19 +63,9 @@ private:
 
 class AsyncDispatcher{
 public:
-    AsyncDispatcher(size_t starting_threads = 0);
+//    AsyncDispatcher(size_t starting_threads);
+    AsyncDispatcher(std::function<void()>&& new_thread_callback, size_t starting_threads);
     ~AsyncDispatcher();
-
-#if 0
-    //  Dispatch the specified task and return a handle to it.
-    //  Call "handle->wait()" to wait for the task to finish.
-    template <class... Args>
-    std::unique_ptr<AsyncTask> dispatch(Args&&... args){
-        std::unique_ptr<AsyncTask> task(new AsyncTask(std::forward<Args>(args)...));
-        dispatch_task(task.get());
-        return task;
-    }
-#endif
 
     //  Dispatch the specified task and return a handle to it.
     //  Call "handle->wait()" to wait for the task to finish.
@@ -92,6 +82,7 @@ private:
     void thread_loop();
 
 private:
+    std::function<void()> m_new_thread_callback;
     std::deque<AsyncTask*> m_queue;
     std::vector<std::thread> m_threads;
     bool m_stopping;

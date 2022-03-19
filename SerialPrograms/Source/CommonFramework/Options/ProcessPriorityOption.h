@@ -9,6 +9,8 @@
 
 #include "EnumDropdownOption.h"
 
+class QThread;
+
 namespace PokemonAutomation{
 
 
@@ -18,6 +20,15 @@ public:
     void update_priority_to_option() const;
 
     virtual ConfigWidget* make_ui(QWidget& parent) override;
+};
+
+
+
+class ThreadPriorityOption : public EnumDropdownOption{
+public:
+    ThreadPriorityOption(QString label, int default_priority);
+    void set_on_this_thread() const;
+    void set_on_qthread(QThread& thread) const;
 };
 
 

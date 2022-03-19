@@ -62,7 +62,8 @@ public:
     void log(Args&&... args);
     LoggerQt& logger(){ return m_logger; }
 
-    AsyncDispatcher& dispatcher();
+    AsyncDispatcher& realtime_dispatcher();
+    AsyncDispatcher& inference_dispatcher();
 
     void update_stats(const std::string& override_current = "");
 

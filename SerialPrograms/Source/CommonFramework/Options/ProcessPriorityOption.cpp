@@ -28,11 +28,6 @@ public:
         );
     }
 };
-
-
-
-
-
 ProcessPriorityOption::ProcessPriorityOption()
     : EnumDropdownOption(
         "<b>Process Priority:</b><br>"
@@ -43,16 +38,45 @@ ProcessPriorityOption::ProcessPriorityOption()
         PRIORITY_MODES, DEFAULT_PRIORITY_INDEX
     )
 {}
-
 void ProcessPriorityOption::update_priority_to_option() const{
     if (PRIORITY_MODES.size() > 1){
         set_priority_by_name(current_case());
     }
 }
-
 ConfigWidget* ProcessPriorityOption::make_ui(QWidget& parent){
     return new ProcessPriorityWidget(parent, *this);
 }
+
+
+
+
+
+
+std::vector<QString> make_thread_priority_list(){
+    std::vector<QString> ret;
+    for (int priority = THREAD_PRIORITY_MIN; priority <= THREAD_PRIORITY_MAX; priority++){
+        ret.emplace_back(thread_priority_name(priority));
+    }
+    return ret;
+}
+ThreadPriorityOption::ThreadPriorityOption(QString label, int default_priority)
+    : EnumDropdownOption(std::move(label),
+        make_thread_priority_list(), default_priority
+    )
+{}
+void ThreadPriorityOption::set_on_this_thread() const{
+    int priority = (int)(size_t)*this + THREAD_PRIORITY_MIN;
+    set_thread_priority(priority);
+}
+void ThreadPriorityOption::set_on_qthread(QThread& thread) const{
+    int priority = (int)(size_t)*this + THREAD_PRIORITY_MIN;
+    thread.setPriority(to_qt_priority(priority));
+}
+
+
+
+
+
 
 
 
