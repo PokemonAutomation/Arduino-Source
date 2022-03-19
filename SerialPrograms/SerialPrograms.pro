@@ -394,6 +394,7 @@ SOURCES += \
     Source/PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_AlphaRoarDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_BattleMenuDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_BattleMoveSelectionDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_BattlePokemonSwitchDetector.cpp \
@@ -421,6 +422,7 @@ SOURCES += \
     Source/PokemonLA/Programs/PokemonLA_MountChange.cpp \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.cpp \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.cpp \
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.cpp \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.cpp \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfTouchTrade.cpp \
     Source/PokemonLA/Programs/Trading/PokemonLA_TradeRoutines.cpp \
@@ -1035,6 +1037,7 @@ HEADERS += \
     Source/PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_AlphaRoarDetector.h \
     Source/PokemonLA/Inference/PokemonLA_BattleMenuDetector.h \
     Source/PokemonLA/Inference/PokemonLA_BattleMoveSelectionDetector.h \
     Source/PokemonLA/Inference/PokemonLA_BattlePokemonSwitchDetector.h \
@@ -1063,6 +1066,7 @@ HEADERS += \
     Source/PokemonLA/Programs/PokemonLA_MountChange.h \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.h \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h \
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.h \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.h \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfTouchTrade.h \
     Source/PokemonLA/Programs/Trading/PokemonLA_TradeRoutines.h \
