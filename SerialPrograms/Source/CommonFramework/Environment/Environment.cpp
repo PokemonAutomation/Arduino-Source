@@ -4,6 +4,7 @@
  *
  */
 
+#include <algorithm>
 #include "Environment.h"
 
 namespace PokemonAutomation{
@@ -14,6 +15,13 @@ bool set_priority_by_name(const QString& name){
     int index = priority_name_to_index(name);
     return set_priority_by_index(index);
 }
+
+int clip_priority(int priority){
+    priority = std::min(priority, THREAD_PRIORITY_MAX);
+    priority = std::max(priority, THREAD_PRIORITY_MIN);
+    return priority;
+}
+
 
 
 

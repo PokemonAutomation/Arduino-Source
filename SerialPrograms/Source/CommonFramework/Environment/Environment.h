@@ -29,6 +29,7 @@ int read_priority_index();
 
 extern const int THREAD_PRIORITY_MIN;
 extern const int THREAD_PRIORITY_MAX;
+int clip_priority(int priority);
 const char* thread_priority_name(int priority);
 bool set_thread_priority(int priority);
 QThread::Priority to_qt_priority(int priority);

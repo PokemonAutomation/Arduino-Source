@@ -60,8 +60,9 @@ std::vector<QString> make_thread_priority_list(){
     return ret;
 }
 ThreadPriorityOption::ThreadPriorityOption(QString label, int default_priority)
-    : EnumDropdownOption(std::move(label),
-        make_thread_priority_list(), default_priority
+    : EnumDropdownOption(
+        std::move(label),
+        make_thread_priority_list(), clip_priority(default_priority) - THREAD_PRIORITY_MIN
     )
 {}
 void ThreadPriorityOption::set_on_this_thread() const{
