@@ -1,4 +1,4 @@
-/*  Shiny Sound Listener
+/*  Alpha Roar Listener
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -19,40 +19,41 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonLA/PokemonLA_Settings.h"
-#include "PokemonLA_ShinySoundListener.h"
-#include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
+#include "PokemonLA_AlphaRoarListener.h"
+#include "PokemonLA/Inference/PokemonLA_AlphaRoarDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-ShinySoundListener_Descriptor::ShinySoundListener_Descriptor()
+AlphaRoarListener_Descriptor::AlphaRoarListener_Descriptor()
     : RunnableSwitchProgramDescriptor(
-        "PokemonLA:ShinySoundListener",
-        STRING_POKEMON + " LA", "Shiny Sound Listener",
+        "PokemonLA:AlphaRoarListener",
+        STRING_POKEMON + " LA", "Alpha Roar Listener",
         "",
-        "Detect shiny sound from audio stream.",
+        "Detect alpha roar from audio stream.",
         FeedbackType::REQUIRED, true,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
 
 
-ShinySoundListener::ShinySoundListener(const ShinySoundListener_Descriptor& descriptor)
+AlphaRoarListener::AlphaRoarListener(const AlphaRoarListener_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
-    , STOP_ON_SHINY_SOUND("<b>Stop on Shiny Sound</b><br>Stop program when a shiny sound is heard.", false)
+    , STOP_ON_ALPHA_ROAR("<b>Stop on Alpha Roar</b><br>Stop program when an alpha roar is heard.", false)
 {
-    PA_ADD_OPTION(STOP_ON_SHINY_SOUND);
+    PA_ADD_OPTION(STOP_ON_ALPHA_ROAR);
 }
 
 
-void searchShinySoundFromAudioDump();
+void searchAlphaRoarFromAudioDump();
 
-void ShinySoundListener::program(SingleSwitchProgramEnvironment& env){
+void AlphaRoarListener::program(SingleSwitchProgramEnvironment& env){
     //  Connect the controller.
     // pbf_move_right_joystick(env.console, 0, 255, 10, 0);
 
-    // searchShinySoundFromAudioDump();
+    // searchAlphaRoarFromAudioDump();
+    // return;
 
     std::cout << "Running audio test program." << std::endl;
 
@@ -66,7 +67,7 @@ void ShinySoundListener::program(SingleSwitchProgramEnvironment& env){
     }
 #endif
     
-    ShinySoundDetector detector(env.console, STOP_ON_SHINY_SOUND);
+    AlphaRoarDetector detector(env.console, STOP_ON_ALPHA_ROAR);
 
 #if 1
     AudioInferenceSession session(env, env.console, env.console);
@@ -81,14 +82,14 @@ void ShinySoundListener::program(SingleSwitchProgramEnvironment& env){
 
 // A function used to search for the shiny sound on LA audio dump.
 // But we didn't find the shound sound :P
-void searchShinySoundFromAudioDump(){
+void searchAlphaRoarFromAudioDump(){
 
     const size_t SAMPLE_RATE = 48000;
 
-    QString shinyFilename = "./heracrossShinyTemplateCompact.wav";
+    QString shinyFilename = "../Resources/PokemonLA/AlphaRoar-48000.wav";
     SpectrogramMatcher matcher(
-        shinyFilename, SpectrogramMatcher::Mode::SPIKE_CONV, SAMPLE_RATE,
-        GameSettings::instance().SHINY_SHOUND_LOW_FREQUENCY
+        shinyFilename, SpectrogramMatcher::Mode::NO_CONV, SAMPLE_RATE,
+        100.0
     );
     
     // std::string fileListFile = "./scripts/short_audio_files.txt";

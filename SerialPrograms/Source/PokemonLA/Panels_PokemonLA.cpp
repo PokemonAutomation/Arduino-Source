@@ -24,6 +24,7 @@
 #include "Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.h"
 //#include "Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h"
 
+#include "Programs/TestPrograms/PokemonLA_AlphaRoarListener.h"
 #include "Programs/TestPrograms/PokemonLA_OverworldWatcher.h"
 #include "Programs/TestPrograms/PokemonLA_ShinySoundListener.h"
 #include "Programs/TestPrograms/PokemonLA_FlagNavigationTest.h"
@@ -63,6 +64,7 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
         add_divider("---- Developer Tools ----");
         add_program<OverworldWatcher_Descriptor, OverworldWatcher>();
         add_program<ShinySoundListener_Descriptor, ShinySoundListener>();
+        add_program<AlphaRoarListener_Descriptor, AlphaRoarListener>();
         add_program<FlagNavigationTest_Descriptor, FlagNavigationTest>();
     }
 

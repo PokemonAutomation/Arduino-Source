@@ -63,6 +63,10 @@ GameSettings::GameSettings()
         "<b>Shiny Sound Low Frequency (Hz):</b><br>High pass filter frequency for shiny sound.",
         5000, 0, 48000
     )
+    , ALPHA_ROAR_THRESHOLD(
+        "<b>Alpha Roar Threshold:</b><br>Maximum error coefficient to trigger an alpha roar detection.",
+        0.65, 0, 1.0
+    )
 {
     PA_ADD_OPTION(m_menu_navigation);
 //    PA_ADD_OPTION(OVERWORLD_TO_MENU_DELAY);
@@ -79,6 +83,7 @@ GameSettings::GameSettings()
     PA_ADD_OPTION(m_advanced_options);
     PA_ADD_OPTION(SHINY_SHOUND_THRESHOLD2);
     PA_ADD_OPTION(SHINY_SHOUND_LOW_FREQUENCY);
+    PA_ADD_OPTION(ALPHA_ROAR_THRESHOLD);
 }
 
 
