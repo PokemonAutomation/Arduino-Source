@@ -65,6 +65,8 @@ ConfigWidget* TimeExpressionOption<Type>::make_ui(QWidget& parent){
 
 template class TimeExpressionOption<uint16_t>;
 template class TimeExpressionOption<uint32_t>;
+template class TimeExpressionOption<int16_t>;
+template class TimeExpressionOption<int32_t>;
 
 
 

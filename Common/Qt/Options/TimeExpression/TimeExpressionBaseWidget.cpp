@@ -67,6 +67,8 @@ void TimeExpressionBaseWidget<Type>::restore_defaults(){
 
 template class TimeExpressionBaseWidget<uint16_t>;
 template class TimeExpressionBaseWidget<uint32_t>;
+template class TimeExpressionBaseWidget<int16_t>;
+template class TimeExpressionBaseWidget<int32_t>;
 
 
 
