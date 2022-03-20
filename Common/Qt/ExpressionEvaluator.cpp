@@ -224,13 +224,21 @@ int32_t parse_expression(
             continue;
         }
         case '-':{
-            if (stack.size() < 2){
+            if (stack.size() == 0){
                 throw ParseException("Invalid expression: unexpected -");
             }
-            int64_t x = stack[stack.size() - 2];
+
+            // If we have at least two integers (x, y) in the stack, perform x - y
+            // If we have only one integer y in the stack, perform - y (by leaving x = 0)
+
             int64_t y = stack[stack.size() - 1];
             stack.pop_back();
-            stack.pop_back();
+
+            int64_t x = 0;
+            if (stack.size() > 0){
+                int64_t x = stack[stack.size() - 1];
+                stack.pop_back();
+            }
             x -= y;
             if ((int32_t)x != x){
                 throw ParseException("Overflow");
@@ -271,7 +279,7 @@ const std::map<std::string, int64_t>& SYMBOLS(){
 }
 
 
-uint32_t parse_ticks_i32(const QString& expression){
+uint32_t parse_ticks_ui32(const QString& expression){
     int32_t x = parse_expression(SYMBOLS(), expression.toUtf8().toStdString());
     if (x < 0){
         throw ParseException("Value cannot be negative.");
@@ -279,6 +287,11 @@ uint32_t parse_ticks_i32(const QString& expression){
     return x;
 }
 
+
+int32_t parse_ticks_i32(const QString& expression){
+    int32_t x = parse_expression(SYMBOLS(), expression.toUtf8().toStdString());
+    return x;
+}
 
 
 }
