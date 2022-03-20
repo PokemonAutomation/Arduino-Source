@@ -28,8 +28,8 @@ using namespace Kernels::Waterfill;
 const double ARROW_MAX_DISTANCE = 0.04;
 
 bool is_arrow_pointed_up(
-    const PackedBinaryMatrix& matrix,
-    PackedBinaryMatrix& inverted,
+    const PackedBinaryMatrix2& matrix,
+    PackedBinaryMatrix2& inverted,
     const WaterfillObject& object
 ){
     size_t width = matrix.width();
@@ -68,7 +68,7 @@ bool is_arrow_pointed_up(
         double border_sumsqr = 0;
         for (size_t r = region0.min_y; r < region0.max_y; r++){
             for (size_t c = region0.min_x; c < region0.max_x; c++){
-                if (!region0.object.get(c, r)){
+                if (!region0.object->get(c, r)){
                     continue;
                 }
 
@@ -132,7 +132,7 @@ bool is_arrow_pointed_up(
         double border_sumsqr = 0;
         for (size_t r = region1.min_y; r < region1.max_y; r++){
             for (size_t c = region1.min_x; c < region1.max_x; c++){
-                if (!region1.object.get(c, r)){
+                if (!region1.object->get(c, r)){
                     continue;
                 }
                 if ((c     > 0      && matrix.get(c - 1, r)) ||
@@ -168,9 +168,8 @@ bool is_arrow_pointed_up(
     return true;
 }
 bool is_arrow_pointed_corner(
-    const PackedBinaryMatrix& matrix,
-    PackedBinaryMatrix& inverted,
-    const WaterfillObject& object
+    const PackedBinaryMatrix2& matrix,
+    PackedBinaryMatrix2& inverted
 ){
     size_t width = matrix.width();
     size_t height = matrix.height();
@@ -198,7 +197,7 @@ bool is_arrow_pointed_corner(
         double border_sumsqr = 0;
         for (size_t r = region0.min_y; r < region0.max_y; r++){
             for (size_t c = region0.min_x; c < region0.max_x; c++){
-                if (!region0.object.get(c, r)){
+                if (!region0.object->get(c, r)){
                     continue;
                 }
                 if ((c     > 0      && matrix.get(c - 1, r)) ||
@@ -242,7 +241,7 @@ bool is_arrow_pointed_corner(
         double border_sumsqr = 0;
         for (size_t r = region1.min_y; r < region1.max_y; r++){
             for (size_t c = region1.min_x; c < region1.max_x; c++){
-                if (!region1.object.get(c, r)){
+                if (!region1.object->get(c, r)){
                     continue;
                 }
                 if ((c     > 0      && matrix.get(c - 1, r)) ||
@@ -285,7 +284,7 @@ bool is_arrow(const QImage& image, const WaterfillObject& object){
     );
 
 //    QImage cropped = cropped0;
-    PackedBinaryMatrix matrix = object.packed_matrix();
+    PackedBinaryMatrix2 matrix = object.packed_matrix();
     filter_rgb32(
         matrix,
         cropped,
@@ -299,7 +298,7 @@ bool is_arrow(const QImage& image, const WaterfillObject& object){
         return false;
     }
 
-    PackedBinaryMatrix inverted = matrix;
+    PackedBinaryMatrix2 inverted = matrix;
     inverted.invert();
 
 //    static int c = 0;
@@ -314,7 +313,7 @@ bool is_arrow(const QImage& image, const WaterfillObject& object){
         return true;
     }
 
-    if (is_arrow_pointed_corner(matrix, inverted, object)){
+    if (is_arrow_pointed_corner(matrix, inverted)){
 //        cout << "up" << endl;
 //        cropped0.save(file);
         return true;
@@ -326,7 +325,7 @@ bool is_arrow(const QImage& image, const WaterfillObject& object){
 
 
 int8_t read_side(const QImage& image, uint8_t pixel_threshold){
-    PackedBinaryMatrix matrix = compress_rgb32_to_binary_min(
+    PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_min(
         image, pixel_threshold, pixel_threshold, pixel_threshold
     );
 
@@ -334,10 +333,10 @@ int8_t read_side(const QImage& image, uint8_t pixel_threshold){
 
     size_t count = 0;
 
-    WaterFillIterator finder(matrix, 300);
+    auto finder = make_WaterfillIterator(matrix, 300);
     WaterfillObject arrow;
     WaterfillObject object;
-    while (finder.find_next(object)){
+    while (finder->find_next(object)){
         if (is_arrow(image, object)){
             count++;
             arrow = object;

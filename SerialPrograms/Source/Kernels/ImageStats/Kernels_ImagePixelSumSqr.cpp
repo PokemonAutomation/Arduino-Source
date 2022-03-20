@@ -4,22 +4,38 @@
  *
  */
 
+#include "Common/Cpp/CpuId.h"
 #include "Kernels_ImagePixelSumSqr.h"
-
-#include "Kernels/Kernels_Arch.h"
-#include "Kernels_ImagePixelSumSqr_Default.h"
-#ifdef PA_Arch_x64_SSE41
-#include "Kernels_ImagePixelSumSqr_x64_SSE41.h"
-#endif
-#ifdef PA_Arch_x64_AVX2
-#include "Kernels_ImagePixelSumSqr_x64_AVX2.h"
-#endif
-#ifdef PA_Arch_x64_AVX512
-#include "Kernels_ImagePixelSumSqr_x64_AVX512.h"
-#endif
 
 namespace PokemonAutomation{
 namespace Kernels{
+
+
+void pixel_sum_sqr_Default(
+    PixelSums& sums,
+    size_t width, size_t height,
+    const uint32_t* image, size_t image_bytes_per_row,
+    const uint32_t* alpha, size_t alpha_bytes_per_row
+);
+void pixel_sum_sqr_x64_SSE41(
+    PixelSums& sums,
+    size_t width, size_t height,
+    const uint32_t* image, size_t image_bytes_per_row,
+    const uint32_t* alpha, size_t alpha_bytes_per_row
+);
+void pixel_sum_sqr_x64_AVX2(
+    PixelSums& sums,
+    size_t width, size_t height,
+    const uint32_t* image, size_t image_bytes_per_row,
+    const uint32_t* alpha, size_t alpha_bytes_per_row
+);
+void pixel_sum_sqr_x64_AVX512(
+    PixelSums& sums,
+    size_t width, size_t height,
+    const uint32_t* image, size_t image_bytes_per_row,
+    const uint32_t* alpha, size_t alpha_bytes_per_row
+);
+
 
 
 void pixel_sum_sqr(
@@ -28,36 +44,45 @@ void pixel_sum_sqr(
     const uint32_t* image, size_t image_bytes_per_row,
     const uint32_t* alpha, size_t alpha_bytes_per_row
 ){
-#if 0
-#elif defined PA_Arch_x64_AVX512
-    pixel_sum_sqr_x64_AVX512(
-        sums,
-        width, height,
-        image, image_bytes_per_row,
-        alpha, alpha_bytes_per_row
-    );
-#elif defined PA_Arch_x64_AVX2
-    pixel_sum_sqr_x64_AVX2(
-        sums,
-        width, height,
-        image, image_bytes_per_row,
-        alpha, alpha_bytes_per_row
-    );
-#elif defined PA_Arch_x64_SSE41
-    pixel_sum_sqr_x64_SSE41(
-        sums,
-        width, height,
-        image, image_bytes_per_row,
-        alpha, alpha_bytes_per_row
-    );
-#else
+#ifdef PA_AutoDispatch_17_Skylake
+    if (CPU_CAPABILITY_CURRENT.OS_AVX512 && CPU_CAPABILITY_CURRENT.HW_AVX512_DQ){
+        pixel_sum_sqr_x64_AVX512(
+            sums,
+            width, height,
+            image, image_bytes_per_row,
+            alpha, alpha_bytes_per_row
+        );
+        return;
+    }
+#endif
+#ifdef PA_AutoDispatch_13_Haswell
+    if (CPU_CAPABILITY_CURRENT.OS_AVX && CPU_CAPABILITY_CURRENT.HW_AVX2){
+        pixel_sum_sqr_x64_AVX2(
+            sums,
+            width, height,
+            image, image_bytes_per_row,
+            alpha, alpha_bytes_per_row
+        );
+        return;
+    }
+#endif
+#ifdef PA_AutoDispatch_08_Nehalem
+    if (CPU_CAPABILITY_CURRENT.HW_SSE42){
+        pixel_sum_sqr_x64_SSE41(
+            sums,
+            width, height,
+            image, image_bytes_per_row,
+            alpha, alpha_bytes_per_row
+        );
+        return;
+    }
+#endif
     pixel_sum_sqr_Default(
         sums,
         width, height,
         image, image_bytes_per_row,
         alpha, alpha_bytes_per_row
     );
-#endif
 }
 
 

@@ -27,7 +27,7 @@ public:
     ShinySymbolDetector()
         : SubObjectTemplateMatcher("PokemonLA/ShinySymbol-Template1.png", COLOR_BLACK, 100)
     {
-        PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
+        PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(
             m_object,
             128, 255,
             128, 255,
@@ -61,7 +61,7 @@ public:
 
 
 std::vector<ImagePixelBox> find_shiny_symbols(const QImage& image){
-    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
+    PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(
         image,
         128, 255,
         128, 255,
@@ -69,10 +69,10 @@ std::vector<ImagePixelBox> find_shiny_symbols(const QImage& image){
     );
     std::vector<ImagePixelBox> ret;
     {
-        PackedBinaryMatrix copy = matrix;
-        WaterFillIterator finder(copy, 20);
+        PackedBinaryMatrix2 copy = matrix;
+        auto finder = make_WaterfillIterator(copy, 20);
         WaterfillObject object;
-        while (finder.find_next(object)){
+        while (finder->find_next(object)){
             ImagePixelBox object_box;
             if (ShinySymbolDetector::instance().matches_with_background_replace(object_box, image, matrix, object)){
                 ret.emplace_back(object_box);

@@ -4,22 +4,34 @@
  *
  */
 
+#include "Common/Cpp/CpuId.h"
 #include "Kernels_ImageScaleBrightness.h"
-
-#include "Kernels/Kernels_Arch.h"
-#include "Kernels_ImageScaleBrightness_Default.h"
-#ifdef PA_Arch_x64_SSE41
-#include "Kernels_ImageScaleBrightness_x64_SSE41.h"
-#endif
-#ifdef PA_Arch_x64_AVX2
-#include "Kernels_ImageScaleBrightness_x64_AVX2.h"
-#endif
-#ifdef PA_Arch_x64_AVX512
-#include "Kernels_ImageScaleBrightness_x64_AVX512.h"
-#endif
 
 namespace PokemonAutomation{
 namespace Kernels{
+
+
+void scale_brightness_Default(
+    size_t width, size_t height,
+    uint32_t* image, size_t bytes_per_row,
+    float scaleR, float scaleG, float scaleB
+);
+void scale_brightness_x64_SSE41(
+    size_t width, size_t height,
+    uint32_t* image, size_t bytes_per_row,
+    float scaleR, float scaleG, float scaleB
+);
+void scale_brightness_x64_AVX2(
+    size_t width, size_t height,
+    uint32_t* image, size_t bytes_per_row,
+    float scaleR, float scaleG, float scaleB
+);
+void scale_brightness_x64_AVX512(
+    size_t width, size_t height,
+    uint32_t* image, size_t bytes_per_row,
+    float scaleR, float scaleG, float scaleB
+);
+
 
 
 void scale_brightness(
@@ -27,16 +39,25 @@ void scale_brightness(
     uint32_t* image, size_t bytes_per_row,
     float scaleR, float scaleG, float scaleB
 ){
-#if 0
-#elif defined PA_Arch_x64_AVX512
-    scale_brightness_x64_AVX512(width, height, image, bytes_per_row, scaleR, scaleG, scaleB);
-#elif defined PA_Arch_x64_AVX2
-    scale_brightness_x64_AVX2(width, height, image, bytes_per_row, scaleR, scaleG, scaleB);
-#elif defined PA_Arch_x64_SSE41
-    scale_brightness_x64_SSE41(width, height, image, bytes_per_row, scaleR, scaleG, scaleB);
-#else
-    scale_brightness_Default(width, height, image, bytes_per_row, scaleR, scaleG, scaleB);
+#ifdef PA_AutoDispatch_17_Skylake
+    if (CPU_CAPABILITY_CURRENT.OS_AVX512 && CPU_CAPABILITY_CURRENT.HW_AVX512_DQ){
+        scale_brightness_x64_AVX512(width, height, image, bytes_per_row, scaleR, scaleG, scaleB);
+        return;
+    }
 #endif
+#ifdef PA_AutoDispatch_13_Haswell
+    if (CPU_CAPABILITY_CURRENT.OS_AVX && CPU_CAPABILITY_CURRENT.HW_AVX2){
+        scale_brightness_x64_AVX2(width, height, image, bytes_per_row, scaleR, scaleG, scaleB);
+        return;
+    }
+#endif
+#ifdef PA_AutoDispatch_08_Nehalem
+    if (CPU_CAPABILITY_CURRENT.HW_SSE42){
+        scale_brightness_x64_SSE41(width, height, image, bytes_per_row, scaleR, scaleG, scaleB);
+        return;
+    }
+#endif
+    scale_brightness_Default(width, height, image, bytes_per_row, scaleR, scaleG, scaleB);
 }
 
 

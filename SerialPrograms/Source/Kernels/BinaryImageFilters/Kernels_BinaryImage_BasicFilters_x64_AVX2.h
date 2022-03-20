@@ -71,9 +71,9 @@ private:
 
 
 
-class Filter_x64_AVX2{
+class Filter_RgbRange_x64_AVX2{
 public:
-    Filter_x64_AVX2(uint32_t replacement, bool replace_if_zero)
+    Filter_RgbRange_x64_AVX2(uint32_t replacement, bool replace_if_zero)
         : m_replacement(_mm256_set1_epi32(replacement))
         , m_replace_if_zero(_mm256_set1_epi32(replace_if_zero ? 0 : 0xffffffff))
     {}

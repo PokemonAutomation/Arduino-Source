@@ -8,7 +8,8 @@
 #define PokemonAutomation_PokemonSwSh_SparkleDetector_H
 
 #include <vector>
-#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
+#include <map>
+#include "CommonFramework/BinaryImage/BinaryImage.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 
 namespace PokemonAutomation{
@@ -39,7 +40,7 @@ public:
 
 private:
     const WaterfillObject& m_object;
-    Kernels::PackedBinaryMatrix m_matrix;
+    PackedBinaryMatrix2 m_matrix;
 
     uint64_t m_radius_sqr;
     std::multimap<int64_t, WaterfillObject> m_regions;

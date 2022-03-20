@@ -5,8 +5,10 @@
  */
 
 #include <cmath>
+#include <map>
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/ImageTools/DistanceToLine.h"
+#include "CommonFramework/BinaryImage/BinaryImage.h"
 #include "PokemonSwSh_SparkleDetectorSquare.h"
 
 namespace PokemonAutomation{
@@ -19,7 +21,7 @@ using namespace Kernels::Waterfill;
 
 //  Remove the background of 1's from "matrix".
 //  Return the background itself.
-WaterfillObject remove_background(PackedBinaryMatrix& matrix){
+WaterfillObject remove_background(PackedBinaryMatrix2& matrix){
     size_t width = matrix.width();
     size_t height = matrix.height();
 
@@ -48,7 +50,7 @@ WaterfillObject remove_background(PackedBinaryMatrix& matrix){
 
 //  Remove the hole of 1's from "matrix" at location (x, y).
 //  Return the total area of the hole.
-size_t remove_hole(PackedBinaryMatrix& matrix, size_t x, size_t y){
+size_t remove_hole(PackedBinaryMatrix2& matrix, size_t x, size_t y){
     WaterfillObject object;
     if (!find_object_on_bit(matrix, object, x, y)){
         return 0;
@@ -60,11 +62,11 @@ size_t remove_hole(PackedBinaryMatrix& matrix, size_t x, size_t y){
 //  Check if the object has a valid hole characteristic of a square.
 bool check_hole(
     WaterfillObject& background,
-    const PackedBinaryMatrix& object,
+    const PackedBinaryMatrix2& object,
     size_t box_area, size_t object_area,
     size_t center_x, size_t center_y
 ){
-    PackedBinaryMatrix inverted = object;
+    PackedBinaryMatrix2 inverted = object;
     inverted.invert();
 
     //  Edge area is too large relative to the entire enclosing box.
@@ -106,7 +108,7 @@ struct Point2{
         return x == point.x && y == point.y;
     }
 };
-std::vector<Point2> keep_furthest_points(const PackedBinaryMatrix& matrix, size_t center_x, size_t center_y){
+std::vector<Point2> keep_furthest_points(const PackedBinaryMatrix2& matrix, size_t center_x, size_t center_y){
     size_t width = matrix.width();
     size_t height = matrix.height();
 
@@ -308,7 +310,7 @@ double normalize_angle_0_360_new(double angle){
 
 //  Get all the pixels that border the background.
 std::multimap<double, std::pair<size_t, size_t>> get_edge_pixels(
-    const PackedBinaryMatrix& object,
+    const PackedBinaryMatrix2& object,
     const WaterfillObject& background,
     size_t center_x, size_t center_y,
     double base_angle
@@ -316,7 +318,7 @@ std::multimap<double, std::pair<size_t, size_t>> get_edge_pixels(
     size_t width = object.width();
     size_t height = object.height();
 
-    PackedBinaryMatrix background_matrix = background.object.submatrix(0, 0, width, height);
+    PackedBinaryMatrix2 background_matrix = background.object->submatrix(0, 0, width, height);
 
     std::multimap<double, std::pair<size_t, size_t>> edge_pixels;
     for (size_t r = 0; r < height; r++){
@@ -402,7 +404,7 @@ bool is_square_sparkle(const Kernels::Waterfill::WaterfillObject& object, double
     }
 
     size_t box_area = width * height;
-    const PackedBinaryMatrix matrix = object.packed_matrix();
+    const PackedBinaryMatrix2 matrix = object.packed_matrix();
 
     size_t center_x = object.center_x() - object.min_x;
     size_t center_y = object.center_y() - object.min_y;
@@ -506,7 +508,7 @@ bool is_square_sparkle(const Kernels::Waterfill::WaterfillObject& object, double
 //    }
 
 
-    PackedBinaryMatrix test(width, height);
+    PackedBinaryMatrix2 test(width, height);
     for (const auto& item : edge_pixels){
         test.set(item.second.first, item.second.second, true);
     }
@@ -625,7 +627,7 @@ bool is_line_sparkle(const Kernels::Waterfill::WaterfillObject& object, size_t m
         return false;
     }
 
-    PackedBinaryMatrix matrix = object.packed_matrix();
+    PackedBinaryMatrix2 matrix = object.packed_matrix();
 
     //  Make sure it's actually a line.
 

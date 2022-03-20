@@ -86,11 +86,11 @@ void ShinySparkleSetBDSP::update_alphas(){
 
 
 
-ShinySparkleSetBDSP find_sparkles(Kernels::PackedBinaryMatrix& matrix){
+ShinySparkleSetBDSP find_sparkles(PackedBinaryMatrix2& matrix){
     ShinySparkleSetBDSP sparkles;
-    WaterFillIterator finder(matrix, 20);
+    auto finder = make_WaterfillIterator(matrix, 20);
     WaterfillObject object;
-    while (finder.find_next(object)){
+    while (finder->find_next(object)){
         PokemonSwSh::RadialSparkleDetector radial_sparkle(object);
         if (radial_sparkle.is_ball()){
             sparkles.balls.emplace_back(object.min_x, object.min_y, object.max_x, object.max_y);
@@ -109,7 +109,7 @@ void ShinySparkleSetBDSP::read_from_image(const QImage& image){
         return;
     }
 
-    Kernels::PackedBinaryMatrix matrix[4];
+    PackedBinaryMatrix2 matrix[4];
     compress4_rgb32_to_binary_range(
         image,
         matrix[0], 0xff606000, 0xffffffff,

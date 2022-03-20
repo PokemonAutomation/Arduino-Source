@@ -1,0 +1,30 @@
+/*  Binary Matrix (x64 AVX512)
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#ifndef PokemonAutomation_Kernels_BinaryMatrix_Arch_x64_AVX512_H
+#define PokemonAutomation_Kernels_BinaryMatrix_Arch_x64_AVX512_H
+
+#include "Kernels_BinaryMatrixTile_x64_AVX512.h"
+#include "Kernels_BinaryMatrix_t.h"
+#include "Kernels_PackedBinaryMatrixCore.h"
+#include "Kernels_SparseBinaryMatrixCore.h"
+
+namespace PokemonAutomation{
+namespace Kernels{
+
+
+using PackedBinaryMatrixCore_x64_AVX512 = PackedBinaryMatrixCore<BinaryTile_AVX512>;
+using SparseBinaryMatrixCore_x64_AVX512 = SparseBinaryMatrixCore<BinaryTile_AVX512>;
+
+using PackedBinaryMatrix_x64_AVX512 = PackedBinaryMatrix_t<BinaryTile_AVX512>;
+using SparseBinaryMatrix_x64_AVX512 = SparseBinaryMatrix_t<BinaryTile_AVX512>;
+
+
+
+
+}
+}
+#endif

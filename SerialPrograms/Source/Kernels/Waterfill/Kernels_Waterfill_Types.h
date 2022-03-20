@@ -9,7 +9,7 @@
 
 #include <stddef.h>
 #include <stdint.h>
-#include <map>
+//#include <map>
 #include <iostream>
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 
@@ -21,6 +21,29 @@ namespace Waterfill{
 
 class WaterfillObject{
 public:
+    WaterfillObject(WaterfillObject&& x) = default;
+    WaterfillObject& operator=(WaterfillObject&& x) = default;
+    WaterfillObject(const WaterfillObject& x){
+        *this = x;
+    }
+    void operator=(const WaterfillObject& x){
+        body_x = x.body_x;
+        body_y = x.body_y;
+        min_x = x.min_x;
+        min_y = x.min_y;
+        max_x = x.max_x;
+        max_y = x.max_y;
+        area = x.area;
+        sum_x = x.sum_x;
+        sum_y = x.sum_y;
+        if (x.object){
+            object = x.object->clone();
+        }
+    }
+
+public:
+    WaterfillObject() = default;
+
     size_t width() const{ return max_x - min_x; }
     size_t height() const{ return max_y - min_y; }
 
@@ -30,8 +53,8 @@ public:
     double aspect_ratio() const{ return (double)width() / height(); }
     double area_ratio() const{ return (double)area / (width() * height()); }
 
-    PackedBinaryMatrix packed_matrix() const{
-        return object.submatrix(min_x, min_y, max_x - min_x, max_y - min_y);
+    std::unique_ptr<PackedBinaryMatrix_IB> packed_matrix() const{
+        return object->submatrix(min_x, min_y, max_x - min_x, max_y - min_y);
     }
 
     void merge_assume_no_overlap(const WaterfillObject& obj){
@@ -49,7 +72,9 @@ public:
         area += obj.area;
         sum_x += obj.sum_x;
         sum_y += obj.sum_y;
-        object |= obj.object;
+        if (object && obj.object){
+            *object |= *obj.object;
+        }
     }
 
 
@@ -94,7 +119,8 @@ public:
     uint64_t sum_y = 0;
 
     //  The object itself in the original image.
-    SparseBinaryMatrix object;
+//    SparseBinaryMatrix object;
+    std::unique_ptr<SparseBinaryMatrix_IB> object;
 };
 
 

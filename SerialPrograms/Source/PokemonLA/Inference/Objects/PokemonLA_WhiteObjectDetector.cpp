@@ -30,7 +30,7 @@ void find_overworld_white_objects(
     std::vector<Color> threshold_list(threshold_set.begin(), threshold_set.end());
 
     size_t filters = threshold_set.size();
-    std::vector<PackedBinaryMatrix> matrix(filters);
+    std::vector<PackedBinaryMatrix2> matrix(filters);
     {
         size_t c = 0;
         for (; c + 3 < filters; c += 4){
@@ -56,22 +56,11 @@ void find_overworld_white_objects(
         }
     }
 
-#if 0
-    const size_t FILTERS = 4;
-    PackedBinaryMatrix matrix[FILTERS];
-    compress4_rgb32_to_binary_range(
-        screen,
-        matrix[0], 0xff909090, 0xffffffff,
-        matrix[1], 0xffa0a0a0, 0xffffffff,
-        matrix[2], 0xffb0b0b0, 0xffffffff,
-        matrix[3], 0xffc0c0c0, 0xffffffff
-    );
-#endif
-
     for (size_t c = 0; c < filters; c++){
-        WaterFillIterator finder(matrix[c], 50);
+        auto finder = make_WaterfillIterator(matrix[c], 50);
+//        WaterfillIterator finder(matrix[c], 50);
         WaterfillObject object;
-        while (finder.find_next(object)){
+        while (finder->find_next(object)){
             for (const auto& detector : detectors){
                 const std::set<Color>& thresholds = detector.first.thresholds();
                 if (thresholds.find(threshold_list[c]) != thresholds.end()){

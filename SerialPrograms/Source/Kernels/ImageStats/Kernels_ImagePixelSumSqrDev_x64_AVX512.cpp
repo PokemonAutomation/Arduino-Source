@@ -4,14 +4,12 @@
  *
  */
 
-#include "Kernels/Kernels_Arch.h"
-#ifdef PA_Arch_x64_AVX512
+#ifdef PA_AutoDispatch_17_Skylake
 
 #include <immintrin.h>
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Kernels_x64_AVX512.h"
-#include "Kernels_ImagePixelSumSqrDev_Default.h"
-#include "Kernels_ImagePixelSumSqrDev_x64_AVX512.h"
+#include "Kernels_ImagePixelSumSqrDev.h"
 
 #include <iostream>
 using std::cout;
@@ -19,6 +17,17 @@ using std::endl;
 
 namespace PokemonAutomation{
 namespace Kernels{
+
+
+template <SumSquareMode mode>
+void sum_sqr_deviation_Default(
+    uint64_t& count, uint64_t& sumsqrs,
+    size_t width, size_t height,
+    const uint32_t* ref, size_t ref_bytes_per_line,
+    const uint32_t* img, size_t img_bytes_per_line,
+    uint32_t background
+);
+
 
 
 template <SumSquareMode mode>

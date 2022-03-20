@@ -15,8 +15,9 @@
 #ifndef PokemonAutomation_CommonFramework_SubObjectTemplateMatcher_H
 #define PokemonAutomation_CommonFramework_SubObjectTemplateMatcher_H
 
+#include "Common/Compiler.h"
 #include "Common/Cpp/Color.h"
-#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
+#include "CommonFramework/BinaryImage/BinaryImage.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 
@@ -26,7 +27,6 @@ namespace ImageMatch{
 
 class SubObjectTemplateMatcher{
 protected:
-    using PackedBinaryMatrix = Kernels::PackedBinaryMatrix;
     using WaterfillObject = Kernels::Waterfill::WaterfillObject;
 
 public:
@@ -47,7 +47,7 @@ public:
     //  The background is defined by zero-bits in the binary matrix in "binary_image".
     double rmsd_with_background_replace(
         ImagePixelBox& object_box,
-        const QImage& image, const PackedBinaryMatrix& binary_image,
+        const QImage& image, const PackedBinaryMatrix2& binary_image,
         const ImagePixelBox& subobject_in_image
     ) const;
 
@@ -58,7 +58,7 @@ public:
     ) const;
     virtual bool matches_with_background_replace(
         ImagePixelBox& object_box,
-        const QImage& image, const PackedBinaryMatrix& binary_image,
+        const QImage& image, const PackedBinaryMatrix2& binary_image,
         const WaterfillObject& subobject_in_image
     ) const;
 

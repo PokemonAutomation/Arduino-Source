@@ -51,7 +51,7 @@ public:
     FlagMatcher(bool left)
         : SubObjectTemplateMatcher("PokemonLA/Flag-Template.png", 100)
     {
-        PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
+        PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(
             m_object,
             128, 255,
             128, 255,
@@ -223,7 +223,7 @@ int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
     QImage image = extract_box(screen, box);
 //    image.save("test.png");
 
-    PackedBinaryMatrix matrix[6];
+    PackedBinaryMatrix2 matrix[6];
     compress4_rgb32_to_binary_range(
         image,
         matrix[0], 0xff808080, 0xffffffff,
@@ -253,9 +253,9 @@ int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
     //  Detect all the digits.
     std::multimap<size_t, Hit> hits;
     for (size_t c = 0; c < 6; c++){
-        WaterFillIterator finder(matrix[c], 30);
+        auto finder = make_WaterfillIterator(matrix[c], 30);
         WaterfillObject object;
-        while (finder.find_next(object)){
+        while (finder->find_next(object)){
             //  Skip anything that touches the edge.
             if (object.min_x == 0 || object.min_y == 0 ||
                 object.max_x + 1 == width || object.max_y + 1 == height

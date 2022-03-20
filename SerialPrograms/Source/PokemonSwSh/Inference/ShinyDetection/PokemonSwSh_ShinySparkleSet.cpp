@@ -84,11 +84,11 @@ void ShinySparkleSetSwSh::update_alphas(){
 
 
 
-ShinySparkleSetSwSh find_sparkles(Kernels::PackedBinaryMatrix& matrix){
+ShinySparkleSetSwSh find_sparkles(PackedBinaryMatrix2& matrix){
     ShinySparkleSetSwSh sparkles;
-    WaterFillIterator finder(matrix, 20);
+    auto finder = make_WaterfillIterator(matrix, 20);
     WaterfillObject object;
-    while (finder.find_next(object)){
+    while (finder->find_next(object)){
         RadialSparkleDetector radial_sparkle(object);
         if (radial_sparkle.is_ball()){
             sparkles.balls.emplace_back(object.min_x, object.min_y, object.max_x, object.max_y);
@@ -115,7 +115,7 @@ void ShinySparkleSetSwSh::read_from_image(const QImage& image){
         return;
     }
 
-    Kernels::PackedBinaryMatrix matrix[4];
+    PackedBinaryMatrix2 matrix[4];
 //    matrix0 = compress_rgb32_to_binary_min(image, 160, 160, 0);
 //    matrix1 = compress_rgb32_to_binary_min(image, 176, 176, 0);
 //    matrix2 = compress_rgb32_to_binary_min(image, 192, 192, 0);

@@ -254,6 +254,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
+//    change_mount(console, MountState::WYRDEER_ON);
+
+
+
+
 #if 0
     QImage image("MountOn-Braviary-Original.png");
     image = image.convertToFormat(QImage::Format_ARGB32);
@@ -298,7 +303,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 #if 1
-    QImage image("screenshot-20220315-045259006353.png");
+    QImage image("screenshot-20220320-021110586101.png");
 //    QRgb pixel = image.pixel(1848, 761);
 //    cout << qRed(pixel) << ", " << qGreen(pixel) << ", " << qBlue(pixel) << endl;
 
@@ -386,7 +391,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
     PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xff808080, 0xffffffff);
 //    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xffd0d0d0, 0xffffffff);
-    WaterFillIterator finder(matrix, 30);
+    WaterfillIterator finder(matrix, 30);
     WaterfillObject object;
     while (finder.find_next(object)){
         //  Skip anything that touches the edge.

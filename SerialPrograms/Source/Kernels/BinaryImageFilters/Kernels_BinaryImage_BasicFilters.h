@@ -33,9 +33,8 @@ namespace Kernels{
 //  Use the specified RGB ranges to determine whether each pixel
 //  becomes a 0 or a 1.
 void compress_rgb32_to_binary_range(
-    PackedBinaryMatrix& matrix,
     const uint32_t* image, size_t bytes_per_row,
-    uint32_t mins, uint32_t maxs
+    PackedBinaryMatrix_IB& matrix0, uint32_t mins0, uint32_t maxs0
 );
 
 //  Same as above, but multiple filters.
@@ -43,15 +42,15 @@ void compress_rgb32_to_binary_range(
 //  All matricies must have the same dimensions.
 void compress2_rgb32_to_binary_range(
     const uint32_t* image, size_t bytes_per_row,
-    PackedBinaryMatrix& matrix0, uint32_t mins0, uint32_t maxs0,
-    PackedBinaryMatrix& matrix1, uint32_t mins1, uint32_t maxs1
+    PackedBinaryMatrix_IB& matrix0, uint32_t mins0, uint32_t maxs0,
+    PackedBinaryMatrix_IB& matrix1, uint32_t mins1, uint32_t maxs1
 );
 void compress4_rgb32_to_binary_range(
     const uint32_t* image, size_t bytes_per_row,
-    PackedBinaryMatrix& matrix0, uint32_t mins0, uint32_t maxs0,
-    PackedBinaryMatrix& matrix1, uint32_t mins1, uint32_t maxs1,
-    PackedBinaryMatrix& matrix2, uint32_t mins2, uint32_t maxs2,
-    PackedBinaryMatrix& matrix3, uint32_t mins3, uint32_t maxs3
+    PackedBinaryMatrix_IB& matrix0, uint32_t mins0, uint32_t maxs0,
+    PackedBinaryMatrix_IB& matrix1, uint32_t mins1, uint32_t maxs1,
+    PackedBinaryMatrix_IB& matrix2, uint32_t mins2, uint32_t maxs2,
+    PackedBinaryMatrix_IB& matrix3, uint32_t mins3, uint32_t maxs3
 );
 
 
@@ -59,7 +58,7 @@ void compress4_rgb32_to_binary_range(
 //  Selectively replace each pixel in an rgb32 image with the specified pixel
 //  according to the respective bit in the binary matrix.
 void filter_rgb32(
-    const PackedBinaryMatrix& matrix,
+    const PackedBinaryMatrix_IB& matrix,
     uint32_t* image, size_t bytes_per_row,
     uint32_t replace_with,
     bool replace_if_zero    //  If false, replace if one.

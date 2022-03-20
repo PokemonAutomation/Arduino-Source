@@ -4,22 +4,46 @@
  *
  */
 
+#include "Common/Cpp/CpuId.h"
 #include "Kernels_ImagePixelSumSqrDev.h"
-
-#include "Kernels/Kernels_Arch.h"
-#include "Kernels_ImagePixelSumSqrDev_Default.h"
-#ifdef PA_Arch_x64_SSE41
-#include "Kernels_ImagePixelSumSqrDev_x64_SSE41.h"
-#endif
-#ifdef PA_Arch_x64_AVX2
-#include "Kernels_ImagePixelSumSqrDev_x64_AVX2.h"
-#endif
-#ifdef PA_Arch_x64_AVX512
-#include "Kernels_ImagePixelSumSqrDev_x64_AVX512.h"
-#endif
 
 namespace PokemonAutomation{
 namespace Kernels{
+
+
+template <SumSquareMode mode>
+void sum_sqr_deviation_Default(
+    uint64_t& count, uint64_t& sumsqrs,
+    size_t width, size_t height,
+    const uint32_t* ref, size_t ref_bytes_per_line,
+    const uint32_t* img, size_t img_bytes_per_line,
+    uint32_t background
+);
+template <SumSquareMode mode>
+void sum_sqr_deviation_x64_SSE41(
+    uint64_t& count, uint64_t& sumsqrs,
+    size_t width, size_t height,
+    const uint32_t* ref, size_t ref_bytes_per_line,
+    const uint32_t* img, size_t img_bytes_per_line,
+    uint32_t background
+);
+template <SumSquareMode mode>
+void sum_sqr_deviation_x64_AVX2(
+    uint64_t& count, uint64_t& sumsqrs,
+    size_t width, size_t height,
+    const uint32_t* ref, size_t ref_bytes_per_line,
+    const uint32_t* img, size_t img_bytes_per_line,
+    uint32_t background
+);
+template <SumSquareMode mode>
+void sum_sqr_deviation_x64_AVX512(
+    uint64_t& count, uint64_t& sumsqrs,
+    size_t width, size_t height,
+    const uint32_t* ref, size_t ref_bytes_per_line,
+    const uint32_t* img, size_t img_bytes_per_line,
+    uint32_t background
+);
+
 
 
 template <SumSquareMode mode>
@@ -30,32 +54,42 @@ void sum_sqr_deviation(
     const uint32_t* img, size_t img_bytes_per_line,
     uint32_t background = 0
 ){
-#if 0
-#elif defined PA_Arch_x64_AVX512
-    sum_sqr_deviation_x64_AVX512<mode>(
-        count, sumsqrs,
-        width, height,
-        ref, ref_bytes_per_line,
-        img, img_bytes_per_line,
-        background
-    );
-#elif defined PA_Arch_x64_AVX2
-    sum_sqr_deviation_x64_AVX2<mode>(
-        count, sumsqrs,
-        width, height,
-        ref, ref_bytes_per_line,
-        img, img_bytes_per_line,
-        background
-    );
-#elif defined PA_Arch_x64_SSE41
-    sum_sqr_deviation_x64_SSE41<mode>(
-        count, sumsqrs,
-        width, height,
-        ref, ref_bytes_per_line,
-        img, img_bytes_per_line,
-        background
-    );
-#else
+#ifdef PA_AutoDispatch_17_Skylake
+    if (CPU_CAPABILITY_CURRENT.OS_AVX512 && CPU_CAPABILITY_CURRENT.HW_AVX512_DQ){
+        sum_sqr_deviation_x64_AVX512<mode>(
+            count, sumsqrs,
+            width, height,
+            ref, ref_bytes_per_line,
+            img, img_bytes_per_line,
+            background
+        );
+        return;
+    }
+#endif
+#ifdef PA_AutoDispatch_13_Haswell
+    if (CPU_CAPABILITY_CURRENT.OS_AVX && CPU_CAPABILITY_CURRENT.HW_AVX2){
+        sum_sqr_deviation_x64_AVX2<mode>(
+            count, sumsqrs,
+            width, height,
+            ref, ref_bytes_per_line,
+            img, img_bytes_per_line,
+            background
+        );
+        return;
+    }
+#endif
+#ifdef PA_AutoDispatch_08_Nehalem
+    if (CPU_CAPABILITY_CURRENT.HW_SSE42){
+        sum_sqr_deviation_x64_SSE41<mode>(
+            count, sumsqrs,
+            width, height,
+            ref, ref_bytes_per_line,
+            img, img_bytes_per_line,
+            background
+        );
+        return;
+    }
+#endif
     sum_sqr_deviation_Default<mode>(
         count, sumsqrs,
         width, height,
@@ -63,7 +97,6 @@ void sum_sqr_deviation(
         img, img_bytes_per_line,
         background
     );
-#endif
 }
 
 

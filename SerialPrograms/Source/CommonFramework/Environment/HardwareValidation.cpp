@@ -7,6 +7,7 @@
 #include <thread>
 #include <QMessageBox>
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/CpuId.h"
 #include "Environment.h"
 #include "HardwareValidation.h"
 
@@ -14,8 +15,7 @@ namespace PokemonAutomation{
 
 
 bool check_hardware(){
-    CPU_x86_Features features;
-    if (!features.HW_SSE42){
+    if (!CPU_CAPABILITY_NATIVE.HW_SSE42){
         QMessageBox box;
         box.critical(
             nullptr,
@@ -27,7 +27,7 @@ bool check_hardware(){
         return false;
     }
 
-    if (!features.HW_AVX2){
+    if (!CPU_CAPABILITY_NATIVE.HW_AVX2){
         QMessageBox box;
         QString str;
         str += "This computer may not be powerful enough to run this program.<br><br>";

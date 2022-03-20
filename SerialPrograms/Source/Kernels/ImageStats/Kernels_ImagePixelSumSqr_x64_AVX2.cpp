@@ -4,15 +4,13 @@
  *
  */
 
-#include "Kernels/Kernels_Arch.h"
-#ifdef PA_Arch_x64_AVX2
+#ifdef PA_AutoDispatch_13_Haswell
 
 #include <smmintrin.h>
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Kernels_x64_AVX2.h"
 #include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
-#include "Kernels_ImagePixelSumSqr_Default.h"
-#include "Kernels_ImagePixelSumSqr_x64_SSE41.h"
+#include "Kernels_ImagePixelSumSqr.h"
 
 #include <iostream>
 using std::cout;
@@ -20,6 +18,15 @@ using std::endl;
 
 namespace PokemonAutomation{
 namespace Kernels{
+
+
+void pixel_sum_sqr_Default(
+    PixelSums& sums,
+    size_t width, size_t height,
+    const uint32_t* image, size_t image_bytes_per_row,
+    const uint32_t* alpha, size_t alpha_bytes_per_row
+);
+
 
 
 PA_FORCE_INLINE void pixel_sum_sqr_x64_AVX2(

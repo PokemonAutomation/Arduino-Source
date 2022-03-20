@@ -53,13 +53,13 @@ bool is_selection_arrow(const QImage& image, const WaterfillObject& object){
     return rmsd <= 110;
 }
 std::vector<ImagePixelBox> find_selection_arrows(const QImage& image){
-    PackedBinaryMatrix matrix = compress_rgb32_to_binary_max(image, 63, 63, 63);
+    PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_max(image, 63, 63, 63);
 
     std::vector<ImagePixelBox> ret;
 
-    WaterFillIterator finder(matrix, 200);
+    auto finder = make_WaterfillIterator(matrix, 200);
     WaterfillObject object;
-    while (finder.find_next(object)){
+    while (finder->find_next(object)){
 //        cout << "asdf" << endl;
         if (is_selection_arrow(image, object)){
             ret.emplace_back(

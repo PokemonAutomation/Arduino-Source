@@ -96,7 +96,7 @@ std::vector<AudioFormat> supported_input_formats(int& preferred_index, const Nat
     std::vector<AudioFormat> ret;
     preferred_index = -1;
 
-    bool stereo = false;
+//    bool stereo = false;
     {
         QAudioFormat format = preferred_format;
         set_format(format, AudioFormat::MONO_48000);
@@ -116,7 +116,7 @@ std::vector<AudioFormat> supported_input_formats(int& preferred_index, const Nat
                 preferred_index = (int)ret.size();
             }
             ret.emplace_back(AudioFormat::DUAL_44100);
-            stereo = true;
+//            stereo = true;
         }
     }
     {
@@ -127,7 +127,7 @@ std::vector<AudioFormat> supported_input_formats(int& preferred_index, const Nat
                 preferred_index = (int)ret.size();
             }
             ret.emplace_back(AudioFormat::DUAL_48000);
-            stereo = true;
+//            stereo = true;
         }
     }
 #endif

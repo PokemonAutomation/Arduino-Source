@@ -65,6 +65,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/AsyncDispatcher.cpp
     ../Common/Cpp/AsyncDispatcher.h
     ../Common/Cpp/Color.h
+    ../Common/Cpp/CpuId.cpp
+    ../Common/Cpp/CpuId.h
     ../Common/Cpp/DllSafeString.h
     ../Common/Cpp/Exceptions.cpp
     ../Common/Cpp/Exceptions.h
@@ -178,6 +180,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/TimeSampleWriter.h
     Source/CommonFramework/AudioPipeline/WavFile.cpp
     Source/CommonFramework/AudioPipeline/WavFile.h
+    Source/CommonFramework/BinaryImage/BinaryImage.cpp
+    Source/CommonFramework/BinaryImage/BinaryImage.h
     Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.cpp
     Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h
     Source/CommonFramework/ControllerDevices/SerialSelector.cpp
@@ -334,6 +338,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/FloatingPointOption.h
     Source/CommonFramework/Options/HiddenTextEditOption.cpp
     Source/CommonFramework/Options/HiddenTextEditOption.h
+    Source/CommonFramework/Options/ProcessorLevelOption.cpp
+    Source/CommonFramework/Options/ProcessorLevelOption.h
     Source/CommonFramework/Options/ProcessPriorityOption.cpp
     Source/CommonFramework/Options/ProcessPriorityOption.h
     Source/CommonFramework/Options/RandomCodeOption.cpp
@@ -452,62 +458,63 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Routines.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.h
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_Default.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_SSE42.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_AVX2.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_AVX512.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.h
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Default.h
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.h
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.h
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.h
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Default.cpp
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.cpp
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_t.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_Default.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_x64_SSE42.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_x64_AVX2.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_x64_AVX512.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_Default.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_SSE42.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_AVX2.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_AVX512.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Debugging.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Default.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_SSE42.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_AVX2.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_AVX512.h
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_SSE42.h
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile.h
     Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrix.h
-    Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixBase.h
-    Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixBase.tpp
-    Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixBase.h
-    Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixBase.tpp
+    Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.h
+    Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.tpp
+    Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixCore.h
+    Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixCore.tpp
     Source/Kernels/Kernels_Alignment.h
     Source/Kernels/Kernels_Arch.h
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.cpp
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Default.cpp
-    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Default.h
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_SSE41.cpp
-    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_SSE41.h
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.cpp
-    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.h
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX512.cpp
-    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX512.h
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr.h
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_Default.cpp
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_Default.h
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.h
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX2.cpp
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX2.h
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.cpp
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.h
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev.h
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_Default.cpp
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_Default.h
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_SSE41.cpp
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_SSE41.h
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX2.cpp
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX2.h
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.cpp
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.h
     Source/Kernels/Kernels_BitScan.h
     Source/Kernels/Kernels_x64_SSE41.h
     Source/Kernels/Kernels_x64_AVX2.h
@@ -516,14 +523,17 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h
     Source/Kernels/Waterfill/Kernels_Waterfill.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_Default.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_Default.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX512.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX512.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX2.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX2.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_SSE42.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_SSE42.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Routines.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_Default.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_Default.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_SSE42.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_SSE42.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX2.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX2.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512-GF.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512-GF.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h
@@ -1266,6 +1276,9 @@ endif()
 #add include directory
 target_include_directories(SerialPrograms PRIVATE ../ ../../Internal/ Source/)
 
+
+
+
 #enable MP with MSVC (Build with Multiple Processes)
 if (MSVC)
     target_link_libraries(SerialPrograms tesseractPA.lib Sleepy.lib)
@@ -1277,12 +1290,21 @@ if (MSVC)
     target_compile_options(SerialPrograms PRIVATE /wd5054)  # Deprecated enum arithemtic
     target_compile_options(SerialPrograms PRIVATE /wd4505)  # unreferenced local function has been removed
 
+    set(ARCH_FLAGS_09_Nehalem       /W4)    # Dummy parameter
+    set(ARCH_FLAGS_13_Haswell       /arch:AVX2)
+    set(ARCH_FLAGS_17_Skylake       /arch:AVX512)
+    set(ARCH_FLAGS_19_IceLake       /arch:AVX512)
+
+    #   Run-time ISA dispatching
+    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_08_Nehalem)
+    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_13_Haswell)
+    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_17_Skylake)
+    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_19_IceLake)
+
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX2   /DPA_Arch_x64_AVX2)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512GF)
 else()
-    target_compile_options(SerialPrograms PRIVATE -msse4.2)
-
     #we hope to use our own Tesseract build in future so we can rid that dependency
     #but right now to run on Linux and Mac we need to use external Tesseract library
     if (UNIX_LINK_TESSERACT)
@@ -1298,7 +1320,65 @@ else()
         target_link_libraries(SerialPrograms ${LEPTONICA_LINK_LIBRARIES})
     endif()
 
+    target_compile_options(SerialPrograms PRIVATE -msse4.2)
+    set(ARCH_FLAGS_09_Nehalem       -march=nehalem)
+#    set(ARCH_FLAGS_13_Haswell       -march=haswell)
+#    set(ARCH_FLAGS_17_Skylake       -march=skylake-avx512)
+#    set(ARCH_FLAGS_19_IceLake       -march=icelake-client)
+
+    #   Run-time ISA dispatching
+    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_08_Nehalem)
+#    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_13_Haswell)
+#    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_17_Skylake)
+#    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_19_IceLake)
+
+
 endif()
+
+if (ARCH_FLAGS_09_Nehalem)
+    SET_SOURCE_FILES_PROPERTIES(
+        Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_SSE41.cpp
+        Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp
+        Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_SSE41.cpp
+        Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_SSE42.cpp
+        Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_SSE42.cpp
+        Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_SSE42.cpp
+        PROPERTIES COMPILE_FLAGS ${ARCH_FLAGS_09_Nehalem}
+    )
+endif()
+if (ARCH_FLAGS_13_Haswell)
+SET_SOURCE_FILES_PROPERTIES(
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.cpp
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX2.cpp
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX2.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_AVX2.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_AVX2.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX2.cpp
+    PROPERTIES COMPILE_FLAGS ${ARCH_FLAGS_13_Haswell}
+)
+endif()
+if (ARCH_FLAGS_17_Skylake)
+SET_SOURCE_FILES_PROPERTIES(
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX512.cpp
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.cpp
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_AVX512.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_AVX512.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512.cpp
+    PROPERTIES COMPILE_FLAGS ${ARCH_FLAGS_17_Skylake}
+)
+endif()
+if (ARCH_FLAGS_19_IceLake)
+SET_SOURCE_FILES_PROPERTIES(
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512-GF.cpp
+    PROPERTIES COMPILE_FLAGS ${ARCH_FLAGS_19_IceLake}
+)
+endif()
+
+
+
+
+
 
 #copy needed dlls
 #file(COPY *.dll DESTINATION ${CMAKE_CURRENT_BINARY_DIR})

@@ -10,12 +10,14 @@
 #include <immintrin.h>
 #include "Common/Compiler.h"
 #include "Kernels_BinaryMatrixTile_Debugging.h"
+#include "Kernels_BinaryMatrix.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
 
 
 struct BinaryTile_AVX2{
+    static constexpr BinaryMatrixType TYPE = BinaryMatrixType::AVX2;
     static constexpr size_t WIDTH = 64;
     static constexpr size_t HEIGHT = 16;
 

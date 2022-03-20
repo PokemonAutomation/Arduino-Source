@@ -8,8 +8,8 @@
 #define PokemonAutomation_CommonFramework_WaterfillTemplateMatcher_H
 
 #include <memory>
+#include "Common/Compiler.h"
 #include "Common/Cpp/Color.h"
-#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 
@@ -19,7 +19,6 @@ namespace ImageMatch{
 
 class WaterfillTemplateMatcher{
 protected:
-    using PackedBinaryMatrix = Kernels::PackedBinaryMatrix;
     using WaterfillObject = Kernels::Waterfill::WaterfillObject;
 
 public:

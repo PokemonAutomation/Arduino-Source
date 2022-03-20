@@ -317,7 +317,7 @@ bool FlagNavigationAir::run_state(
     if (m_flag_detected && m_flag_distance >= 0 && m_flag_distance < 50){
         std::stringstream ss;
         ss << "distance = " << (m_flag_distance < 0 ? "?" : std::to_string(m_flag_distance))
-             << ", x = " << m_flag_x << ", y = " << m_flag_y << endl;
+           << ", x = " << m_flag_x << ", y = " << m_flag_y << std::endl;
         m_console.log(ss.str());
     }
 #endif

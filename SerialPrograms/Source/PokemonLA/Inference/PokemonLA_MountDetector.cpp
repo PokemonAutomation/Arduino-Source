@@ -75,8 +75,8 @@ QImage make_MountMatcher2Image(const char* path){
         image = image.convertToFormat(QImage::Format_ARGB32);
     }
 
-    PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(image, 0xff808080, 0xffffffff);
-    WaterFillIterator finder(matrix, 50);
+    PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(image, 0xff808080, 0xffffffff);
+    auto finder = make_WaterfillIterator(matrix, 50);
 
     WaterfillObject plus, arrowL, arrowR;
 
@@ -90,7 +90,7 @@ QImage make_MountMatcher2Image(const char* path){
 
 
     WaterfillObject object;
-    while (finder.find_next(object)){
+    while (finder->find_next(object)){
         QImage cropped = extract_box(image, object);
 //        cropped.save("test-" + QString::number(c++) + ".png");
 
@@ -345,7 +345,7 @@ void MountDetector::make_overlays(VideoOverlaySet& items) const{
 
 struct MountDetectorFilteredImage{
     QImage image;
-    PackedBinaryMatrix matrix;
+    PackedBinaryMatrix2 matrix;
 };
 
 std::vector<MountDetectorFilteredImage> run_filters(const QImage& image, const std::vector<std::pair<uint32_t, uint32_t>>& range){
@@ -418,9 +418,11 @@ MountState MountDetector::detect(const QImage& screen) const{
         );
 //        static int c = 0;
         for (MountDetectorFilteredImage& filtered : filtered_images){
-            WaterFillIterator finder(filtered.matrix, 50);
+            auto finder = make_WaterfillIterator(filtered.matrix, 50);
             WaterfillObject object;
-            while (finder.find_next(object)){
+            int c = 0;
+            while (finder->find_next(object)){
+                c++;
                 //  Skip anything that touches the borders.
                 if (object.min_x == 0 || object.min_y == 0 ||
                     object.max_x - 1 == (size_t)image.width() ||
@@ -430,8 +432,9 @@ MountState MountDetector::detect(const QImage& screen) const{
                 }
 
                 QImage cropped = extract_box(image, object);
+
 //                cout << "object = " << c << endl;
-//                cropped.save("object-" + QString::number(c++) + ".png");
+//                cropped.save("object-" + QString::number(c) + ".png");
 
 
                 //  Read the buttons.
@@ -495,19 +498,21 @@ MountState MountDetector::detect(const QImage& screen) const{
         return candidates.m_state;
     }
 
-    WaterfillObject object = std::move(plus);
-    object.merge_assume_no_overlap(arrowL);
-    object.merge_assume_no_overlap(arrowR);
+    {
+        WaterfillObject arrows = std::move(plus);
+        arrows.merge_assume_no_overlap(arrowL);
+        arrows.merge_assume_no_overlap(arrowR);
 
-    QImage cropped = extract_box(image, object);
+        QImage cropped = extract_box(image, arrows);
 
-//    cout << "Start mounts" << endl;
+//        cout << "Start mounts" << endl;
 
-    candidates.add_button_crop(MountWyrdeerMatcherButtons    ::on().rmsd(cropped), MountState::WYRDEER_ON);
-    candidates.add_button_crop(MountBasculegionMatcherButtons::on().rmsd(cropped), MountState::URSALUNA_ON);
-    candidates.add_button_crop(MountUrsalunaMatcherButtons   ::on().rmsd(cropped), MountState::BASCULEGION_ON);
-    candidates.add_button_crop(MountSneaslerMatcherButtons   ::on().rmsd(cropped), MountState::SNEASLER_ON);
-    candidates.add_button_crop(MountBraviaryMatcherButtons   ::on().rmsd(cropped), MountState::BRAVIARY_ON);
+        candidates.add_button_crop(MountWyrdeerMatcherButtons    ::on().rmsd(cropped), MountState::WYRDEER_ON);
+        candidates.add_button_crop(MountBasculegionMatcherButtons::on().rmsd(cropped), MountState::URSALUNA_ON);
+        candidates.add_button_crop(MountUrsalunaMatcherButtons   ::on().rmsd(cropped), MountState::BASCULEGION_ON);
+        candidates.add_button_crop(MountSneaslerMatcherButtons   ::on().rmsd(cropped), MountState::SNEASLER_ON);
+        candidates.add_button_crop(MountBraviaryMatcherButtons   ::on().rmsd(cropped), MountState::BRAVIARY_ON);
+    }
 
 #if 1
     {
@@ -526,9 +531,9 @@ MountState MountDetector::detect(const QImage& screen) const{
         );
 //        int i = 0;
         for (MountDetectorFilteredImage& filtered : filtered_images){
-            WaterFillIterator finder(filtered.matrix, 50);
+            auto finder = make_WaterfillIterator(filtered.matrix, 50);
             WaterfillObject object;
-            while (finder.find_next(object)){
+            while (finder->find_next(object)){
                 //  Skip anything that touches the borders.
                 if (object.min_x == 0 || object.min_y == 0 ||
                     object.max_x - 1 == (size_t)image.width() ||

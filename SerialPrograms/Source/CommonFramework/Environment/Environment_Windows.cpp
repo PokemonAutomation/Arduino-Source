@@ -201,21 +201,6 @@ uint64_t x86_rdtsc(){
 }
 
 
-#if __GNUC__
-void x86_cpuid(uint32_t eabcdx[4], uint32_t eax, uint32_t ecx){
-    __cpuid_count(eax, ecx, eabcdx[0], eabcdx[1], eabcdx[2], eabcdx[3]);
-}
-#else
-void x86_cpuid(uint32_t eabcdx[4], uint32_t eax, uint32_t ecx){
-    int out[4];
-    __cpuidex(out, eax, ecx);
-    eabcdx[0] = out[0];
-    eabcdx[1] = out[1];
-    eabcdx[2] = out[2];
-    eabcdx[3] = out[3];
-}
-#endif
-
 
 uint64_t x86_measure_rdtsc_ticks_per_sec(){
     HANDLE thread = GetCurrentThread();

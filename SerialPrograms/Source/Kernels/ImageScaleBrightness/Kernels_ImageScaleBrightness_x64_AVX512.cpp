@@ -4,12 +4,11 @@
  *
  */
 
-#include "Kernels/Kernels_Arch.h"
-#ifdef PA_Arch_x64_AVX512
+#ifdef PA_AutoDispatch_17_Skylake
 
+#include <stdint.h>
 #include <immintrin.h>
 #include "Common/Compiler.h"
-#include "Kernels_ImageScaleBrightness_x64_AVX512.h"
 
 #include <iostream>
 using std::cout;

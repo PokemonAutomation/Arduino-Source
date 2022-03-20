@@ -4,9 +4,9 @@
  *
  */
 
+#include <stdint.h>
 #include <algorithm>
 #include "Common/Compiler.h"
-#include "Kernels_ImageScaleBrightness_Default.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

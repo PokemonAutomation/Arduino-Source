@@ -4,276 +4,119 @@
  *
  */
 
-#include <set>
-#include <map>
+#include "Common/Cpp/CpuId.h"
 #include "Kernels_Waterfill.h"
 
-#if 0
-#elif defined PA_Arch_x64_AVX512
-#include "Kernels_Waterfill_Tile_x64_AVX512.h"
-#elif defined PA_Arch_x64_AVX2
-#include "Kernels_Waterfill_Tile_x64_AVX2.h"
-#elif defined PA_Arch_x64_SSE42
-#include "Kernels_Waterfill_Tile_x64_SSE42.h"
-#else
-#include "Kernels_Waterfill_Tile_Default.h"
-#endif
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace Kernels{
 namespace Waterfill{
 
 
-bool find_object(
-    PackedBinaryMatrix& matrix,
-    WaterfillObject& object,
-    size_t tile_x, size_t tile_y,
-    size_t bit_x, size_t bit_y
-){
-    std::set<TileIndex> busy;
-    std::map<TileIndex, BinaryMatrixTile> obj;
 
-    //  Set first tile.
-    busy.insert({tile_x, tile_y});
-    obj[{tile_x, tile_y}].set_bit(bit_x, bit_y, 1);
+bool find_object_on_bit_Default     (PackedBinaryMatrix_IB& matrix, WaterfillObject& object, size_t x, size_t y);
+bool find_object_on_bit_x64_SSE42   (PackedBinaryMatrix_IB& matrix, WaterfillObject& object, size_t x, size_t y);
+bool find_object_on_bit_x64_AVX2    (PackedBinaryMatrix_IB& matrix, WaterfillObject& object, size_t x, size_t y);
+bool find_object_on_bit_x64_AVX512  (PackedBinaryMatrix_IB& matrix, WaterfillObject& object, size_t x, size_t y);
+bool find_object_on_bit_x64_AVX512GF(PackedBinaryMatrix_IB& matrix, WaterfillObject& object, size_t x, size_t y);
 
-    //  Iterate waterfill...
-    while (!busy.empty()){
-        auto current = busy.begin();
-        TileIndex index = *current;
-        size_t x = index.x();
-        size_t y = index.y();
-
-        BinaryMatrixTile& mask = matrix.tile(x, y);
-        BinaryMatrixTile& tile = obj[index];
-
-        //  Expand current tile.
-        waterfill_expand(mask, tile);
-        mask.andnot(tile);
-        busy.erase(current);
-
-//        cout << tile.dump() << endl;
-//        cout << mask.dump() << endl;
-//        break;
-
-        BinaryMatrixTile neighbor_scratch;
-        if (y > 0){
-            const BinaryMatrixTile& neighbor_mask = matrix.tile(x, y - 1);
-            TileIndex neightbor_index(x, y - 1);
-            auto iter = obj.find(neightbor_index);
-            if (iter != obj.end()){
-                if (waterfill_touch_bottom(neighbor_mask, iter->second, tile)){
-                    busy.insert(neightbor_index);
-                }
-            }else{
-                neighbor_scratch.set_zero();
-                if (waterfill_touch_bottom(neighbor_mask, neighbor_scratch, tile)){
-                    busy.insert(neightbor_index);
-                    obj[neightbor_index] = neighbor_scratch;
-                }
-            }
+bool find_object_on_bit(PackedBinaryMatrix_IB& matrix, WaterfillObject& object, size_t x, size_t y){
+    switch (matrix.type()){
+#ifdef PA_AutoDispatch_17_Skylake
+    case BinaryMatrixType::AVX512:
+        if (CPU_CAPABILITY_CURRENT.HW_GFNI){
+            return find_object_on_bit_x64_AVX512GF(matrix, object, x, y);
+        }else{
+            return find_object_on_bit_x64_AVX512(matrix, object, x, y);
         }
-        if (y + 1 < matrix.tile_height()){
-            const BinaryMatrixTile& neighbor_mask = matrix.tile(x, y + 1);
-            TileIndex neightbor_index(x, y + 1);
-            auto iter = obj.find(neightbor_index);
-            if (iter != obj.end()){
-                if (waterfill_touch_top(neighbor_mask, iter->second, tile)){
-                    busy.insert(neightbor_index);
-                }
-            }else{
-                neighbor_scratch.set_zero();
-                if (waterfill_touch_top(neighbor_mask, neighbor_scratch, tile)){
-                    busy.insert(neightbor_index);
-                    obj[neightbor_index] = neighbor_scratch;
-                }
-            }
-        }
-        if (x > 0){
-            const BinaryMatrixTile& neighbor_mask = matrix.tile(x - 1, y);
-            TileIndex neightbor_index(x - 1, y);
-            auto iter = obj.find(neightbor_index);
-            if (iter != obj.end()){
-                if (waterfill_touch_right(neighbor_mask, iter->second, tile)){
-                    busy.insert(neightbor_index);
-                }
-            }else{
-                neighbor_scratch.set_zero();
-                if (waterfill_touch_right(neighbor_mask, neighbor_scratch, tile)){
-                    busy.insert(neightbor_index);
-                    obj[neightbor_index] = neighbor_scratch;
-                }
-            }
-        }
-        if (x + 1 < matrix.tile_width()){
-            const BinaryMatrixTile& neighbor_mask = matrix.tile(x + 1, y);
-            TileIndex neightbor_index(x + 1, y);
-            auto iter = obj.find(neightbor_index);
-            if (iter != obj.end()){
-                if (waterfill_touch_left(neighbor_mask, iter->second, tile)){
-                    busy.insert(neightbor_index);
-                }
-            }else{
-                neighbor_scratch.set_zero();
-                if (waterfill_touch_left(neighbor_mask, neighbor_scratch, tile)){
-                    busy.insert(neightbor_index);
-                    obj[neightbor_index] = neighbor_scratch;
-                }
-            }
-        }
-
-//        return true;
-    }
-
-//    for (const auto& item : obj){
-//        cout << "(" << item.first.x() << "," << item.first.y() << ")" << endl;
-//        cout << item.second.dump() << endl;
-//    }
-
-    //  Compute stats.
-    size_t tile_min_x = (size_t)0 - 1;
-    size_t tile_min_y = (size_t)0 - 1;
-    size_t tile_max_x = 0;
-    size_t tile_max_y = 0;
-    WaterfillObject stats;
-    stats.body_x = tile_x * BinaryMatrixTile::WIDTH + bit_x;
-    stats.body_y = tile_y * BinaryMatrixTile::HEIGHT + bit_y;
-    for (const auto& item : obj){
-        size_t x = item.first.x();
-        size_t y = item.first.y();
-        uint64_t popcount, sum_x, sum_y;
-        popcount = popcount_sumcoord(sum_x, sum_y, item.second);
-//        if (popcount == 7 && tile_x == 16 && tile_y == 73){
-//            cout << popcount << ", " << sum_x << ", " << sum_y << endl;
-//            cout << item.second.dump() << endl;
-//        }
-        stats.accumulate_body(
-            x * BinaryMatrixTile::WIDTH, y * BinaryMatrixTile::HEIGHT,
-            popcount, sum_x, sum_y
-        );
-        if (!(tile_min_x < x && x < tile_max_x && tile_min_y < y && y < tile_max_y)){
-            size_t cmin_x, cmax_x, cmin_y, cmax_y;
-            boundaries(item.second, cmin_x, cmax_x, cmin_y, cmax_y);
-            stats.accumulate_boundary(
-                x * BinaryMatrixTile::WIDTH, y * BinaryMatrixTile::HEIGHT,
-                cmin_x, cmax_x, cmin_y, cmax_y
-            );
-        }
-        tile_min_x = std::min(tile_min_x, x);
-        tile_max_x = std::max(tile_max_x, x);
-        tile_min_y = std::min(tile_min_y, y);
-        tile_max_y = std::max(tile_max_y, y);
-    }
-
-#if 0
-    cout << "x = (" << stats.m_min_x << "," << stats.m_max_x << ")" << endl;
-    cout << "y = (" << stats.m_min_y << "," << stats.m_max_y << ")" << endl;
-    cout << "area = " << stats.m_area << endl;
-    cout << "sum x = " << stats.m_sum_x << endl;
-    cout << "sum y = " << stats.m_sum_y << endl;
 #endif
-
-    object = stats;
-    object.object = SparseBinaryMatrix(matrix.width(), matrix.height());
-    object.object.set_data(std::move(obj));
-
-    return true;
-}
-
-bool find_object_in_tile(
-    PackedBinaryMatrix& matrix,
-    WaterfillObject& object,
-    size_t tile_x, size_t tile_y
-){
-    BinaryMatrixTile& start = matrix.tile(tile_x, tile_y);
-
-    size_t bit_x, bit_y;
-    if (!find_bit(bit_x, bit_y, start)){
-        return false;
+#ifdef PA_AutoDispatch_13_Haswell
+    case BinaryMatrixType::AVX2:
+        return find_object_on_bit_x64_AVX2(matrix, object, x, y);
+#endif
+#ifdef PA_AutoDispatch_08_Nehalem
+    case BinaryMatrixType::SSE42:
+        return find_object_on_bit_x64_SSE42(matrix, object, x, y);
+#endif
+    default:
+        return find_object_on_bit_Default(matrix, object, x, y);
     }
-
-    return find_object(matrix, object, tile_x, tile_y, bit_x, bit_y);
-}
-bool find_object_on_bit(
-    PackedBinaryMatrix& matrix,
-    WaterfillObject& object,
-    size_t x, size_t y
-){
-    if (!matrix.get(x, y)){
-        return false;
-    }
-
-    std::set<TileIndex> busy;
-    std::map<TileIndex, BinaryMatrixTile> obj;
-
-    size_t tile_x = x / PackedBinaryMatrix::Tile::WIDTH;
-    size_t tile_y = y / PackedBinaryMatrix::Tile::HEIGHT;
-    size_t bit_x = x % PackedBinaryMatrix::Tile::WIDTH;
-    size_t bit_y = y % PackedBinaryMatrix::Tile::HEIGHT;
-
-    return find_object(
-        matrix, object,
-        tile_x, tile_y,
-        bit_x, bit_y
-    );
 }
 
 
-std::vector<WaterfillObject> find_objects_inplace(PackedBinaryMatrix& matrix, size_t min_area, bool keep_objects){
-    std::vector<WaterfillObject> ret;
-    for (size_t r = 0; r < matrix.tile_height(); r++){
-        for (size_t c = 0; c < matrix.tile_width(); c++){
-            while (true){
-                WaterfillObject object;
-                if (!find_object_in_tile(matrix, object, c, r)){
-                    break;
-                }
-                if (!keep_objects){
-                    object.object.clear();
-                }
-                if (object.area >= min_area){
-                    ret.emplace_back(object);
-                }
-            }
+
+
+
+std::vector<WaterfillObject> find_objects_inplace_Default       (PackedBinaryMatrix_IB& matrix, size_t min_area, bool keep_objects);
+std::vector<WaterfillObject> find_objects_inplace_x64_SSE42     (PackedBinaryMatrix_IB& matrix, size_t min_area, bool keep_objects);
+std::vector<WaterfillObject> find_objects_inplace_x64_AVX2      (PackedBinaryMatrix_IB& matrix, size_t min_area, bool keep_objects);
+std::vector<WaterfillObject> find_objects_inplace_x64_AVX512    (PackedBinaryMatrix_IB& matrix, size_t min_area, bool keep_objects);
+std::vector<WaterfillObject> find_objects_inplace_x64_AVX512GF  (PackedBinaryMatrix_IB& matrix, size_t min_area, bool keep_objects);
+
+std::vector<WaterfillObject> find_objects_inplace(PackedBinaryMatrix_IB& matrix, size_t min_area, bool keep_objects){
+    switch (matrix.type()){
+#ifdef PA_AutoDispatch_17_Skylake
+    case BinaryMatrixType::AVX512:
+        if (CPU_CAPABILITY_CURRENT.HW_GFNI){
+            return find_objects_inplace_x64_AVX512GF(matrix, min_area, keep_objects);
+        }else{
+            return find_objects_inplace_x64_AVX512(matrix, min_area, keep_objects);
         }
+#endif
+#ifdef PA_AutoDispatch_13_Haswell
+    case BinaryMatrixType::AVX2:
+        return find_objects_inplace_x64_AVX2(matrix, min_area, keep_objects);
+#endif
+#ifdef PA_AutoDispatch_08_Nehalem
+    case BinaryMatrixType::SSE42:
+        return find_objects_inplace_x64_SSE42(matrix, min_area, keep_objects);
+#endif
+    default:
+        return find_objects_inplace_Default(matrix, min_area, keep_objects);
     }
-    return ret;
 }
-std::vector<WaterfillObject> find_objects(const PackedBinaryMatrix& matrix, size_t min_area, bool keep_objects){
-    PackedBinaryMatrix m(matrix);
-    return find_objects_inplace(m, min_area, keep_objects);
+std::vector<WaterfillObject> find_objects(const PackedBinaryMatrix_IB& matrix, size_t min_area, bool keep_objects){
+    std::unique_ptr<PackedBinaryMatrix_IB> m = matrix.clone();
+    return find_objects_inplace(*m, min_area, keep_objects);
 }
 
 
 
 
-WaterFillIterator::WaterFillIterator(PackedBinaryMatrix& matrix, size_t min_area)
-    : m_matrix(matrix)
-    , m_min_area(min_area)
-    , m_tile_row(0)
-    , m_tile_col(0)
-{}
-bool WaterFillIterator::find_next(WaterfillObject& object){
-    while (m_tile_row < m_matrix.tile_height()){
-        while (m_tile_col < m_matrix.tile_width()){
-            while (true){
-                //  Not object found. Move to next tile.
-                if (!find_object_in_tile(m_matrix, object, m_tile_col, m_tile_row)){
-                    break;
-                }
-                //  Object too small. Skip it.
-                if (object.area < m_min_area){
-                    continue;
-                }
-                return true;
-            }
-            m_tile_col++;
+
+std::unique_ptr<WaterfillIterator2> make_WaterfillIterator_Default      (PackedBinaryMatrix_IB& matrix, size_t min_area);
+std::unique_ptr<WaterfillIterator2> make_WaterfillIterator_x64_SSE42    (PackedBinaryMatrix_IB& matrix, size_t min_area);
+std::unique_ptr<WaterfillIterator2> make_WaterfillIterator_x64_AVX2     (PackedBinaryMatrix_IB& matrix, size_t min_area);
+std::unique_ptr<WaterfillIterator2> make_WaterfillIterator_x64_AVX512   (PackedBinaryMatrix_IB& matrix, size_t min_area);
+std::unique_ptr<WaterfillIterator2> make_WaterfillIterator_x64_AVX512GF (PackedBinaryMatrix_IB& matrix, size_t min_area);
+
+std::unique_ptr<WaterfillIterator2> make_WaterfillIterator(PackedBinaryMatrix_IB& matrix, size_t min_area){
+    switch (matrix.type()){
+#ifdef PA_AutoDispatch_17_Skylake
+    case BinaryMatrixType::AVX512:
+        if (CPU_CAPABILITY_CURRENT.HW_GFNI){
+            return make_WaterfillIterator_x64_AVX512GF(matrix, min_area);
+        }else{
+            return make_WaterfillIterator_x64_AVX512(matrix, min_area);
         }
-        m_tile_col = 0;
-        m_tile_row++;
+#endif
+#ifdef PA_AutoDispatch_13_Haswell
+    case BinaryMatrixType::AVX2:
+        return make_WaterfillIterator_x64_AVX2(matrix, min_area);
+#endif
+#ifdef PA_AutoDispatch_08_Nehalem
+    case BinaryMatrixType::SSE42:
+        return make_WaterfillIterator_x64_SSE42(matrix, min_area);
+#endif
+    default:
+        return make_WaterfillIterator_Default(matrix, min_area);
     }
-    return false;
 }
+
+
 
 
 

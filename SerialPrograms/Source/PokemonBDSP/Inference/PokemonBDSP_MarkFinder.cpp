@@ -54,7 +54,7 @@ bool is_exclamation_mark(const QImage& image, const WaterfillObject& object){
 
 
 std::vector<ImagePixelBox> find_exclamation_marks(const QImage& image){
-    PackedBinaryMatrix matrix = compress_rgb32_to_binary_min(image, 200, 200, 200);
+    PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_min(image, 200, 200, 200);
     std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 400, false);
     std::vector<ImagePixelBox> ret;
     for (const WaterfillObject& object : objects){

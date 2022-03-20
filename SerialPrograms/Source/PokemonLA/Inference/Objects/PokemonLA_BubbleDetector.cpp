@@ -23,7 +23,7 @@ public:
     BubbleMatcher()
         : SubObjectTemplateMatcher("PokemonLA/Bubble-Template0.png", 40)
     {
-        PackedBinaryMatrix matrix = compress_rgb32_to_binary_range(
+        PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(
             m_object,
             128, 255,
             128, 255,

@@ -67,9 +67,9 @@ private:
 
 
 
-class Filter_x64_AVX512{
+class Filter_RgbRange_x64_AVX512{
 public:
-    Filter_x64_AVX512(uint32_t replacement, bool replace_if_zero)
+    Filter_RgbRange_x64_AVX512(uint32_t replacement, bool replace_if_zero)
         : m_replacement(_mm512_set1_epi32(replacement))
         , m_replace_if_zero(replace_if_zero ? 0xffff : 0)
     {}

@@ -123,9 +123,6 @@ uint64_t x86_rdtsc(){
 
 
 
-void x86_cpuid(uint32_t eabcdx[4], uint32_t eax, uint32_t ecx){
-    __cpuid_count(eax, ecx, eabcdx[0], eabcdx[1], eabcdx[2], eabcdx[3]);
-}
 uint64_t x86_measure_rdtsc_ticks_per_sec(){
 //    Time::WallClock w_start = Time::WallClock::Now();
     auto w_start = std::chrono::system_clock::now();

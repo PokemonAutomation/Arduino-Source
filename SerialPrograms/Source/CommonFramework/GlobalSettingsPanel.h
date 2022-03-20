@@ -12,6 +12,7 @@
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/StringOption.h"
 #include "CommonFramework/Options/ProcessPriorityOption.h"
+#include "CommonFramework/Options/ProcessorLevelOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "Integrations/DiscordSettingsOption.h"
 
@@ -44,14 +45,17 @@ public:
 
     SectionDividerOption m_advanced_options;
 
+    BooleanCheckBoxOption LOG_EVERYTHING;
+    BooleanCheckBoxOption SAVE_DEBUG_IMAGES;
+    BooleanCheckBoxOption NAUGHTY_MODE;
+
+    ProcessorLevelOption PROCESSOR_LEVEL;
+
 //    ProcessPriorityOption PROCESS_PRIORITY0;
     ThreadPriorityOption REALTIME_THREAD_PRIORITY;
     ThreadPriorityOption INFERENCE_PRIORITY;
     ThreadPriorityOption COMPUTE_PRIORITY;
 
-    BooleanCheckBoxOption LOG_EVERYTHING;
-    BooleanCheckBoxOption SAVE_DEBUG_IMAGES;
-    BooleanCheckBoxOption NAUGHTY_MODE;
     StringOption DEVELOPER_TOKEN;
 
     bool DEVELOPER_MODE;

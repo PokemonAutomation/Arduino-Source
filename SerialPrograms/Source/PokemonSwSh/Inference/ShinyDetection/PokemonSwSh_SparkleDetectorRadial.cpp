@@ -76,11 +76,11 @@ RadialSparkleDetector::RadialSparkleDetector(const WaterfillObject& object)
     }
 
     //  Find new regions.
-    PackedBinaryMatrix matrix = m_matrix;
-    WaterFillIterator finder(matrix, 1);
+    PackedBinaryMatrix2 matrix = m_matrix;
+    auto finder = make_WaterfillIterator(matrix, 1);
     WaterfillObject obj;
-    while (finder.find_next(obj)){
-        obj.object.clear();
+    while (finder->find_next(obj)){
+        obj.object.reset();
         m_regions.emplace(obj.area, std::move(obj));
     }
 

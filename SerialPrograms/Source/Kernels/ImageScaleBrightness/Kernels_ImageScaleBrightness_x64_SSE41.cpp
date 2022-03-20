@@ -4,12 +4,11 @@
  *
  */
 
-#include "Kernels/Kernels_Arch.h"
-#ifdef PA_Arch_x64_SSE41
+#ifdef PA_AutoDispatch_08_Nehalem
 
+#include <stdint.h>
 #include <smmintrin.h>
 #include "Common/Compiler.h"
-#include "Kernels_ImageScaleBrightness_x64_SSE41.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

@@ -8,6 +8,8 @@
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "CommonFramework/BinaryImage/BinaryImage.h"
+#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
@@ -54,15 +56,10 @@ Notification NotificationReader::detect(const QImage& screen) const{
     //  Check if there anything that looks like text.
     size_t objects = 0;
     {
-        PackedBinaryMatrix matrix(image.width(), image.height());
-        compress_rgb32_to_binary_range(
-            matrix,
-            (uint32_t*)image.bits(), image.bytesPerLine(),
-            0xff808080, 0xffffffff
-        );
-        WaterFillIterator iter(matrix, 20);
+        PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(image, 0xff808080, 0xffffffff);
+        auto finder = make_WaterfillIterator(matrix, 20);
         WaterfillObject object;
-        while (iter.find_next(object)){
+        while (finder->find_next(object)){
             objects++;
         }
         if (objects < 20){

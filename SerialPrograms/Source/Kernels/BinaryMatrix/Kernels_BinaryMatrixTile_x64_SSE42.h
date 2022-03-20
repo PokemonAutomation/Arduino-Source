@@ -10,12 +10,14 @@
 #include <nmmintrin.h>
 #include "Common/Compiler.h"
 #include "Kernels_BinaryMatrixTile_Debugging.h"
+#include "Kernels_BinaryMatrix.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
 
 
 struct BinaryTile_SSE42{
+    static constexpr BinaryMatrixType TYPE = BinaryMatrixType::SSE42;
     static constexpr size_t WIDTH = 64;
     static constexpr size_t HEIGHT = 8;
 

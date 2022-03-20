@@ -5,6 +5,7 @@
  */
 
 #include <chrono>
+#include <iostream>
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -21,6 +22,7 @@
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
+
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

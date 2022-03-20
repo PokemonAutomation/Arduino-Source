@@ -35,6 +35,7 @@ win32-g++{
 
     DEFINES += WIN32
     DEFINES += PA_TESSERACT
+    DEFINES += PA_AutoDispatch_08_Nehalem
     LIBS += ../SerialPrograms/tesseractPA.lib
 
     DEFINES += WIN32
@@ -47,6 +48,7 @@ win32-msvc{
 
     DEFINES += WIN32
     DEFINES += PA_TESSERACT
+    DEFINES += PA_AutoDispatch_08_Nehalem
     LIBS += ../SerialPrograms/tesseractPA.lib
 
     DEFINES += WIN32
@@ -55,6 +57,8 @@ win32-msvc{
 }
 macx{
     QMAKE_CXXFLAGS += -std=c++14
+
+    DEFINES += PA_AutoDispatch_08_Nehalem
 
     QMAKE_INFO_PLIST = macos/Info.plist
 }
@@ -68,6 +72,7 @@ SOURCES += \
     ../ClientSource/Libraries/MessageConverter.cpp \
     ../Common/CRC32.cpp \
     ../Common/Cpp/AsyncDispatcher.cpp \
+    ../Common/Cpp/CpuId.cpp \
     ../Common/Cpp/Exceptions.cpp \
     ../Common/Cpp/FireForgetDispatcher.cpp \
     ../Common/Cpp/PanicDump.cpp \
@@ -113,6 +118,7 @@ SOURCES += \
     Source/CommonFramework/AudioPipeline/TimeSampleBuffer.cpp \
     Source/CommonFramework/AudioPipeline/TimeSampleBufferReader.cpp \
     Source/CommonFramework/AudioPipeline/WavFile.cpp \
+    Source/CommonFramework/BinaryImage/BinaryImage.cpp \
     Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.cpp \
     Source/CommonFramework/ControllerDevices/SerialSelector.cpp \
     Source/CommonFramework/ControllerDevices/SerialSelectorWidget.cpp \
@@ -187,6 +193,7 @@ SOURCES += \
     Source/CommonFramework/Options/FloatingPointOption.cpp \
     Source/CommonFramework/Options/HiddenTextEditOption.cpp \
     Source/CommonFramework/Options/ProcessPriorityOption.cpp \
+    Source/CommonFramework/Options/ProcessorLevelOption.cpp \
     Source/CommonFramework/Options/RandomCodeOption.cpp \
     Source/CommonFramework/Options/ScreenshotFormatOption.cpp \
     Source/CommonFramework/Options/SimpleIntegerOption.cpp \
@@ -237,10 +244,20 @@ SOURCES += \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_FullTransform.cpp \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.cpp \
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.cpp \
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.cpp \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_Default.cpp \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_AVX2.cpp \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_AVX512.cpp \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_SSE42.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.cpp \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_Default.cpp \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_AVX2.cpp \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_AVX512.cpp \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_SSE42.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.cpp \
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Default.cpp \
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.cpp \
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp \
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.cpp \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Default.cpp \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.cpp \
@@ -257,10 +274,10 @@ SOURCES += \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.cpp \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill.cpp \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_Default.cpp \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX2.cpp \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX512.cpp \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_SSE42.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_Default.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX2.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_SSE42.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp \
@@ -634,6 +651,7 @@ HEADERS += \
     ../Common/Cpp/AlignedVector.tpp \
     ../Common/Cpp/AsyncDispatcher.h \
     ../Common/Cpp/Color.h \
+    ../Common/Cpp/CpuId.h \
     ../Common/Cpp/Exceptions.h \
     ../Common/Cpp/FireForgetDispatcher.h \
     ../Common/Cpp/FixedLimitVector.h \
@@ -700,6 +718,7 @@ HEADERS += \
     Source/CommonFramework/AudioPipeline/TimeSampleBufferReader.h \
     Source/CommonFramework/AudioPipeline/TimeSampleWriter.h \
     Source/CommonFramework/AudioPipeline/WavFile.h \
+    Source/CommonFramework/BinaryImage/BinaryImage.h \
     Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h \
     Source/CommonFramework/ControllerDevices/SerialSelector.h \
     Source/CommonFramework/ControllerDevices/SerialSelectorWidget.h \
@@ -783,6 +802,7 @@ HEADERS += \
     Source/CommonFramework/Options/FloatingPointOption.h \
     Source/CommonFramework/Options/HiddenTextEditOption.h \
     Source/CommonFramework/Options/ProcessPriorityOption.h \
+    Source/CommonFramework/Options/ProcessorLevelOption.h \
     Source/CommonFramework/Options/RandomCodeOption.h \
     Source/CommonFramework/Options/ScreenshotFormatOption.h \
     Source/CommonFramework/Options/SimpleIntegerOption.h \
@@ -849,36 +869,29 @@ HEADERS += \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.h \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Routines.h \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.h \
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Debugging.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Default.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_AVX2.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_AVX512.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_SSE42.h \
-    Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixBase.h \
-    Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixBase.tpp \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_Default.h \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_x64_AVX2.h \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_x64_AVX512.h \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_x64_SSE42.h \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_t.h \
+    Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.h \
+    Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.tpp \
+    Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixCore.h \
+    Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixCore.tpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.h \
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Default.h \
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.h \
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.h \
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.h \
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h \
-    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Default.h \
-    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.h \
-    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX512.h \
-    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_SSE41.h \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr.h \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev.h \
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_Default.h \
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX2.h \
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.h \
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_SSE41.h \
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_Default.h \
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX2.h \
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.h \
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.h \
     Source/Kernels/Kernels_Alignment.h \
     Source/Kernels/Kernels_Arch.h \
     Source/Kernels/Kernels_BitScan.h \
@@ -888,10 +901,11 @@ HEADERS += \
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h \
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h \
     Source/Kernels/Waterfill/Kernels_Waterfill.h \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_Default.h \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX2.h \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX512.h \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Tile_x64_SSE42.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_Default.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX2.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_SSE42.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Routines.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h \

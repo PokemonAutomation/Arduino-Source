@@ -17,11 +17,11 @@
 #include "TestProgramComputer.h"
 
 #include "Kernels/Kernels_Arch.h"
-#include "Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixBase.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Tile_Default.h"
+#include "Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Core_Default.h"
 #include "Kernels/Kernels_x64_SSE41.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Tile_x64_SSE42.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Core_x64_SSE42.h"
 #ifdef PA_Arch_x64_AVX2
 #include "Kernels/Kernels_x64_AVX2.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h"

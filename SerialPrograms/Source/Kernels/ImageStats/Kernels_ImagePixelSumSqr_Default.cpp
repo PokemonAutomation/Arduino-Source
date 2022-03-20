@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "Kernels_ImagePixelSumSqr_Default.h"
+#include "Kernels_ImagePixelSumSqr.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

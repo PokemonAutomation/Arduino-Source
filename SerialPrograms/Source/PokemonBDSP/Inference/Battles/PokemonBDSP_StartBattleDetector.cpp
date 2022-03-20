@@ -41,7 +41,7 @@ bool StartBattleDetector::process_frame(
 bool StartBattleDetector::detect(const QImage& frame){
     QImage image = extract_box(frame, m_screen_box);
 
-    ImageStats stats = image_stats(image);
+//    ImageStats stats = image_stats(image);
 
 //    //  Solid screen that's not black.
 //    if (stats.average.sum() > 50 && stats.stddev.sum() < 10){

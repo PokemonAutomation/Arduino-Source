@@ -4,12 +4,11 @@
  *
  */
 
-#include "Kernels/Kernels_Arch.h"
-#ifdef PA_Arch_x64_AVX2
+#ifdef PA_AutoDispatch_13_Haswell
 
+#include <stdint.h>
 #include <immintrin.h>
 #include "Common/Compiler.h"
-#include "Kernels_ImageScaleBrightness_x64_AVX2.h"
 
 #include <iostream>
 using std::cout;
