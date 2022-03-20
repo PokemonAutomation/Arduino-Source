@@ -1291,15 +1291,15 @@ if (MSVC)
     target_compile_options(SerialPrograms PRIVATE /wd4505)  # unreferenced local function has been removed
 
     set(ARCH_FLAGS_09_Nehalem       /W4)    # Dummy parameter
-    set(ARCH_FLAGS_13_Haswell       /arch:AVX2)
-    set(ARCH_FLAGS_17_Skylake       /arch:AVX512)
-    set(ARCH_FLAGS_19_IceLake       /arch:AVX512)
+#    set(ARCH_FLAGS_13_Haswell       /arch:AVX2)
+#    set(ARCH_FLAGS_17_Skylake       /arch:AVX512)
+#    set(ARCH_FLAGS_19_IceLake       /arch:AVX512)
 
     #   Run-time ISA dispatching
     target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_08_Nehalem)
-    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_13_Haswell)
-    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_17_Skylake)
-    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_19_IceLake)
+#    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_13_Haswell)
+#    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_17_Skylake)
+#    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_19_IceLake)
 
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX2   /DPA_Arch_x64_AVX2)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512)
