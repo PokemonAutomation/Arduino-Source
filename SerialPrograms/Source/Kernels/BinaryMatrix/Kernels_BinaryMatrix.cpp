@@ -16,13 +16,13 @@ namespace Kernels{
 
 
 BinaryMatrixType get_BinaryMatrixType(){
-    if (CPU_CAPABILITY_CURRENT.OS_AVX512 && CPU_CAPABILITY_CURRENT.HW_AVX512_DQ){
+    if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
         return BinaryMatrixType::AVX512;
     }
-    if (CPU_CAPABILITY_CURRENT.OS_AVX && CPU_CAPABILITY_CURRENT.HW_AVX2){
+    if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
         return BinaryMatrixType::AVX2;
     }
-    if (CPU_CAPABILITY_CURRENT.HW_SSE42){
+    if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
         return BinaryMatrixType::SSE42;
     }
     return BinaryMatrixType::Default;

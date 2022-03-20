@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 
 
 bool check_hardware(){
-    if (!CPU_CAPABILITY_NATIVE.HW_SSE42){
+    if (!CPU_CAPABILITY_NATIVE.OK_08_Nehalem){
         QMessageBox box;
         box.critical(
             nullptr,
@@ -27,7 +27,7 @@ bool check_hardware(){
         return false;
     }
 
-    if (!CPU_CAPABILITY_NATIVE.HW_AVX2){
+    if (!CPU_CAPABILITY_NATIVE.OK_13_Haswell){
         QMessageBox box;
         QString str;
         str += "This computer may not be powerful enough to run this program.<br><br>";

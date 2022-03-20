@@ -90,7 +90,7 @@ void filter_rgb32_range(
     uint32_t* out0, size_t bytes_per_row0, uint32_t mins0, uint32_t maxs0, uint32_t replacement0, bool invert0
 ){
 #ifdef PA_AutoDispatch_17_Skylake
-    if (CPU_CAPABILITY_CURRENT.OS_AVX512 && CPU_CAPABILITY_CURRENT.HW_AVX512_DQ){
+    if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
         filter_rgb32_range_x64_AVX512(
             image, bytes_per_row, width, height,
             out0, bytes_per_row0, mins0, maxs0, replacement0, invert0
@@ -99,7 +99,7 @@ void filter_rgb32_range(
     }
 #endif
 #ifdef PA_AutoDispatch_13_Haswell
-    if (CPU_CAPABILITY_CURRENT.OS_AVX && CPU_CAPABILITY_CURRENT.HW_AVX2){
+    if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
         filter_rgb32_range_x64_AVX2(
             image, bytes_per_row, width, height,
             out0, bytes_per_row0, mins0, maxs0, replacement0, invert0
@@ -108,7 +108,7 @@ void filter_rgb32_range(
     }
 #endif
 #ifdef PA_AutoDispatch_08_Nehalem
-    if (CPU_CAPABILITY_CURRENT.HW_SSE42){
+    if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
         filter_rgb32_range_x64_SSE42(
             image, bytes_per_row, width, height,
             out0, bytes_per_row0, mins0, maxs0, replacement0, invert0
@@ -127,7 +127,7 @@ void filter2_rgb32_range(
     uint32_t* out1, size_t bytes_per_row1, uint32_t mins1, uint32_t maxs1, uint32_t replacement1, bool invert1
 ){
 #ifdef PA_AutoDispatch_17_Skylake
-    if (CPU_CAPABILITY_CURRENT.OS_AVX512 && CPU_CAPABILITY_CURRENT.HW_AVX512_DQ){
+    if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
         filter2_rgb32_range_x64_AVX512(
             image, bytes_per_row, width, height,
             out0, bytes_per_row0, mins0, maxs0, replacement0, invert0,
@@ -137,7 +137,7 @@ void filter2_rgb32_range(
     }
 #endif
 #ifdef PA_AutoDispatch_13_Haswell
-    if (CPU_CAPABILITY_CURRENT.OS_AVX && CPU_CAPABILITY_CURRENT.HW_AVX2){
+    if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
         filter2_rgb32_range_x64_AVX2(
             image, bytes_per_row, width, height,
             out0, bytes_per_row0, mins0, maxs0, replacement0, invert0,
@@ -147,7 +147,7 @@ void filter2_rgb32_range(
     }
 #endif
 #ifdef PA_AutoDispatch_08_Nehalem
-    if (CPU_CAPABILITY_CURRENT.HW_SSE42){
+    if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
         filter2_rgb32_range_x64_SSE42(
             image, bytes_per_row, width, height,
             out0, bytes_per_row0, mins0, maxs0, replacement0, invert0,
@@ -170,7 +170,7 @@ void filter4_rgb32_range(
     uint32_t* out3, size_t bytes_per_row3, uint32_t mins3, uint32_t maxs3, uint32_t replacement3, bool invert3
 ){
 #ifdef PA_AutoDispatch_17_Skylake
-    if (CPU_CAPABILITY_CURRENT.OS_AVX512 && CPU_CAPABILITY_CURRENT.HW_AVX512_DQ){
+    if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
         filter4_rgb32_range_x64_AVX512(
             image, bytes_per_row, width, height,
             out0, bytes_per_row0, mins0, maxs0, replacement0, invert0,
@@ -182,7 +182,7 @@ void filter4_rgb32_range(
     }
 #endif
 #ifdef PA_AutoDispatch_13_Haswell
-    if (CPU_CAPABILITY_CURRENT.OS_AVX && CPU_CAPABILITY_CURRENT.HW_AVX2){
+    if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
         filter4_rgb32_range_x64_AVX2(
             image, bytes_per_row, width, height,
             out0, bytes_per_row0, mins0, maxs0, replacement0, invert0,
@@ -194,7 +194,7 @@ void filter4_rgb32_range(
     }
 #endif
 #ifdef PA_AutoDispatch_08_Nehalem
-    if (CPU_CAPABILITY_CURRENT.HW_SSE42){
+    if (CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
         filter4_rgb32_range_x64_SSE42(
             image, bytes_per_row, width, height,
             out0, bytes_per_row0, mins0, maxs0, replacement0, invert0,
