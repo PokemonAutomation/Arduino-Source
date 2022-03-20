@@ -67,7 +67,7 @@ MainWindow::MainWindow(QWidget* parent)
 
     QGroupBox* support_box = new QGroupBox(
 //        STRING_POKEMON + " Automation " + PROGRAM_VERSION + " (" + PA_ARCH_STRING + ")",
-        STRING_POKEMON + " Automation " + PROGRAM_VERSION + " (x64 Multi-Arch)",
+        STRING_POKEMON + " Automation " + PROGRAM_VERSION + " (x64)",
         centralwidget
     );
     left_layout->addWidget(support_box);

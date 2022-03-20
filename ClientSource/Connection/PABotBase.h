@@ -128,29 +128,30 @@ private:
     void retransmit_thread();
 
 private:
-    bool try_issue_request(
-        std::map<uint64_t, PendingRequest>::iterator& iter,
+    //  Returns the seqnum of the request. If failed, returns zero.
+    uint64_t try_issue_request(
+        std::map<uint64_t, PendingRequest>::iterator* iter, //  If null, it means silent remove.
         const std::atomic<bool>* cancelled,
         const BotBaseRequest& request,
-        bool silent_remove, size_t queue_limit
+        size_t queue_limit
     );
-    bool try_issue_command(
-        std::map<uint64_t, PendingCommand>::iterator& iter,
+    uint64_t try_issue_command(
+        std::map<uint64_t, PendingCommand>::iterator* iter, //  If null, it means silent remove.
         const std::atomic<bool>* cancelled,
         const BotBaseRequest& request,
-        bool silent_remove, size_t queue_limit
+        size_t queue_limit
     );
-    void issue_request(
-        std::map<uint64_t, PendingRequest>::iterator& iter,
+
+    //  Returns the seqnum of the request.
+    uint64_t issue_request(
+        std::map<uint64_t, PendingRequest>::iterator* iter, //  If null, it means silent remove.
         const std::atomic<bool>* cancelled,
-        const BotBaseRequest& request,
-        bool silent_remove
+        const BotBaseRequest& request
     );
-    void issue_command(
-        std::map<uint64_t, PendingCommand>::iterator& iter,
+    uint64_t issue_command(
+        std::map<uint64_t, PendingCommand>::iterator* iter, //  If null, it means silent remove.
         const std::atomic<bool>* cancelled,
-        const BotBaseRequest& request,
-        bool silent_remove
+        const BotBaseRequest& request
     );
 
     virtual bool try_issue_request(
