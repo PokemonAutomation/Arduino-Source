@@ -8,6 +8,7 @@
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/AlignedVector.h"
+#include "Common/Cpp/CpuId.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
@@ -125,9 +126,15 @@ void TestProgramComputer::program(ProgramEnvironment& env){
     using namespace Pokemon;
 
 
-    using WallClock = std::chrono::system_clock::time_point;
+    cout << CPU_CAPABILITY_CURRENT.OK_08_Nehalem << endl;
+    cout << CPU_CAPABILITY_CURRENT.OK_13_Haswell << endl;
+    cout << CPU_CAPABILITY_CURRENT.OK_17_Skylake << endl;
+    cout << CPU_CAPABILITY_CURRENT.OK_19_IceLake << endl;
 
-    cout << (WallClock::min() < WallClock::max()) << endl;
+
+//    using WallClock = std::chrono::system_clock::time_point;
+
+//    cout << (WallClock::min() < WallClock::max()) << endl;
 
 
 

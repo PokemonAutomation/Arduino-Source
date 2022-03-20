@@ -236,7 +236,7 @@ int32_t parse_expression(
 
             int64_t x = 0;
             if (stack.size() > 0){
-                int64_t x = stack[stack.size() - 1];
+                x = stack[stack.size() - 1];
                 stack.pop_back();
             }
             x -= y;

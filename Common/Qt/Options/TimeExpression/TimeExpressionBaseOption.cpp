@@ -121,10 +121,10 @@ QString TimeExpressionBaseOption<Type>::process(const QString& text, Type& value
     }
     // std::cout << "value = " << parsed << " " << m_min_value << " " << m_max_value << std::endl;
 
-    if (parsed < m_min_value){
+    if (parsed < (int64_t)m_min_value){
         return "Overflow: Number is too small.";
     }
-    if (parsed > m_max_value){
+    if (parsed > (int64_t)m_max_value){
         return "Overflow: Number is too large.";
     }
     value = (Type)parsed;

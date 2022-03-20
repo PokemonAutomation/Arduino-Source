@@ -439,6 +439,7 @@ SOURCES += \
     Source/PokemonLA/Programs/PokemonLA_MountChange.cpp \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.cpp \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.cpp \
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.cpp \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.cpp \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.cpp \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfTouchTrade.cpp \
@@ -1080,6 +1081,7 @@ HEADERS += \
     Source/PokemonLA/Programs/PokemonLA_MountChange.h \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.h \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h \
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.h \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.h \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.h \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfTouchTrade.h \
