@@ -95,8 +95,6 @@ std::unique_ptr<StatsTracker> PostMMOSpawnReset::make_stats() const{
 
 
 bool PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env){
-    // NOTE: there's no "stunned by alpha" detection in case the first spawn is an alpha!
-    // NOTE: there is also no mitigation for if you get attacked by a Kirlia if she hates you
     Stats& stats = env.stats<Stats>();
 
     env.console.log("Checking shiny sound...");
