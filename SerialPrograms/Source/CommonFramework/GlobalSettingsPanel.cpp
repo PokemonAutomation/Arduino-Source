@@ -76,21 +76,21 @@ GlobalSettings::GlobalSettings()
         true
     )
     , NAUGHTY_MODE("<b>Naughty Mode:</b>", false)
-    , REALTIME_THREAD_PRIORITY(
+    , REALTIME_THREAD_PRIORITY0(
         "<b>Realtime Thread Priority:</b><br>"
         "Thread priority of real-time threads. (UI thread, audio threads)<br>"
         "Restart the program for this to fully take effect.",
-        2 - THREAD_PRIORITY_MIN
+        2
     )
-    , INFERENCE_PRIORITY(
+    , INFERENCE_PRIORITY0(
         "<b>Inference Priority:</b><br>"
         "Thread priority of inference threads. (image/sound recognition)",
-        1 - THREAD_PRIORITY_MIN
+        1
     )
-    , COMPUTE_PRIORITY(
+    , COMPUTE_PRIORITY0(
         "<b>Compute Priority:</b><br>"
         "Thread priority of computation threads.",
-        -1 - THREAD_PRIORITY_MIN
+        -1
     )
     , DEVELOPER_TOKEN(
         true,
@@ -110,9 +110,9 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(LOG_EVERYTHING);
     PA_ADD_OPTION(SAVE_DEBUG_IMAGES);
 //    PA_ADD_OPTION(NAUGHTY_MODE);
-    PA_ADD_OPTION(REALTIME_THREAD_PRIORITY);
-    PA_ADD_OPTION(INFERENCE_PRIORITY);
-    PA_ADD_OPTION(COMPUTE_PRIORITY);
+    PA_ADD_OPTION(REALTIME_THREAD_PRIORITY0);
+    PA_ADD_OPTION(INFERENCE_PRIORITY0);
+    PA_ADD_OPTION(COMPUTE_PRIORITY0);
     PA_ADD_OPTION(PROCESSOR_LEVEL);
     PA_ADD_OPTION(DEVELOPER_TOKEN);
 }

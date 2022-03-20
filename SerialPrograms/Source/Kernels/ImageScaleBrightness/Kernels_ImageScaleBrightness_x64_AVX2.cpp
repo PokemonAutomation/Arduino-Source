@@ -39,7 +39,7 @@ PA_FORCE_INLINE void scale_brightness_x64_AVX2(
 
         pixel = _mm_or_si128(
             _mm256_castsi256_si128(pi),
-            _mm256_extracti64x2_epi64(pi, 1)
+            _mm256_extracti128_si256(pi, 1)
         );
 
         _mm_storel_epi64((__m128i*)image, pixel);

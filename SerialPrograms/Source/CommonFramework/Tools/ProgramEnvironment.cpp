@@ -36,13 +36,13 @@ struct ProgramEnvironmentData{
         , m_stopping(false)
         , m_realtime_dispatcher(
             [](){
-                GlobalSettings::instance().REALTIME_THREAD_PRIORITY.set_on_this_thread();
+                GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_this_thread();
             },
             0
         )
         , m_inference_dispatcher(
             [](){
-                GlobalSettings::instance().INFERENCE_PRIORITY.set_on_this_thread();
+                GlobalSettings::instance().INFERENCE_PRIORITY0.set_on_this_thread();
             },
             0
         )

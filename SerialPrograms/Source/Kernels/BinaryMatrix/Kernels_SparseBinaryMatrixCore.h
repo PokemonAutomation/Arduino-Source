@@ -80,12 +80,9 @@ private:
     std::map<TileIndex, TileType> m_data;
 
 
-    static const TileType ZERO_TILE;
+    static const TileType& ZERO_TILE();
 };
 
-
-template <typename Tile>
-const Tile SparseBinaryMatrixCore<Tile>::ZERO_TILE;
 
 
 
@@ -101,7 +98,7 @@ template <typename Tile> PA_FORCE_INLINE
 const Tile& SparseBinaryMatrixCore<Tile>::tile(TileIndex index) const{
     auto iter = m_data.find(index);
     if (iter == m_data.end()){
-        return ZERO_TILE;
+        return ZERO_TILE();
     }
     return iter->second;
 }
