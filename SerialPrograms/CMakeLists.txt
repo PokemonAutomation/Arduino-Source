@@ -879,6 +879,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_GalladeFinder.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_UnownFinder.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_UnownFinder.cpp
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.cpp
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.cpp
@@ -1323,6 +1325,9 @@ else()
     endif()
 
     target_compile_options(SerialPrograms PRIVATE -msse4.2)
+
+    target_compile_options(SerialPrograms PRIVATE -Wall -Wpedantic)
+
     set(ARCH_FLAGS_09_Nehalem       -march=nehalem)
 #    set(ARCH_FLAGS_13_Haswell       -march=haswell)
 #    set(ARCH_FLAGS_17_Skylake       -march=skylake-avx512)

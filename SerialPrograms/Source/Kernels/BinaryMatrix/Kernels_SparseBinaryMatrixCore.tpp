@@ -106,6 +106,13 @@ void SparseBinaryMatrixCore<Tile>::operator|=(const SparseBinaryMatrixCore& x){
 }
 
 
+template <typename Tile>
+const Tile& SparseBinaryMatrixCore<Tile>::ZERO_TILE(){
+    static Tile ZERO;
+    return ZERO;
+}
+
+
 
 
 //  Debugging

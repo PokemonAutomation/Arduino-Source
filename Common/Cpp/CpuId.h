@@ -18,6 +18,15 @@ void x86_cpuid(uint32_t eabcdx[4], uint32_t eax, uint32_t ecx);
 struct CPU_x86_Features{
     CPU_x86_Features& set_to_current();
 
+    //  CPU Compatibility
+    bool OK_08_Nehalem  = false;
+    bool OK_13_Haswell  = false;
+    bool OK_17_Skylake  = false;
+    bool OK_19_IceLake  = false;
+
+    void update_CPU_compatibility();
+
+
     //  OS Features
     bool OS_AVX         = false;
     bool OS_AVX512      = false;

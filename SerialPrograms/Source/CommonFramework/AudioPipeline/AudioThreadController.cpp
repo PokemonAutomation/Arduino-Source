@@ -64,8 +64,8 @@ AudioThreadController::AudioThreadController(
     m_audioThread.start();
     m_fftThread.start();
 
-    GlobalSettings::instance().REALTIME_THREAD_PRIORITY.set_on_qthread(m_audioThread);
-    GlobalSettings::instance().REALTIME_THREAD_PRIORITY.set_on_qthread(m_fftThread);
+    GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_qthread(m_audioThread);
+    GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_qthread(m_fftThread);
 
     // Send the signal to start audio processing after the worker thread is started.
     emit operate();

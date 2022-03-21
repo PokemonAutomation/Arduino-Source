@@ -22,19 +22,20 @@ namespace PokemonAutomation{
 
 
 
-void RunnablePanelWidget::on_destruct_stop(){
-    if (m_destructing){
-        return;
-    }
-    m_destructing = true;
-    stop();
+void RunnablePanelWidget::join_program_thread(){
+//    if (m_destructing){
+//        return;
+//    }
+//    m_destructing = true;
+//    stop();
     if (m_thread.joinable()){
         m_thread.join();
     }
 }
 RunnablePanelWidget::~RunnablePanelWidget(){
     ProgramTracker::instance().remove_program(m_instance_id);
-    on_destruct_stop();
+    RunnablePanelWidget::request_program_stop();
+    join_program_thread();
 }
 
 std::string RunnablePanelWidget::stats(){
@@ -84,8 +85,8 @@ bool RunnablePanelWidget::start(){
     case ProgramState::RUNNING:
 //    case ProgramState::FINISHED:
         m_logger.log("Received Start Request: Program is already running.");
-        m_state.store(ProgramState::STOPPING, std::memory_order_release);
-        on_stop();
+//        m_state.store(ProgramState::STOPPING, std::memory_order_release);
+//        on_stop();
         ret = false;
         break;
     case ProgramState::STOPPING:
@@ -96,30 +97,18 @@ bool RunnablePanelWidget::start(){
     update_ui_after_program_state_change();
     return ret;
 }
-bool RunnablePanelWidget::stop(){
-    bool ret = false;
-    switch (state()){
-    case ProgramState::NOT_READY:
-        m_logger.log("Recevied Stop Request: Program is not ready.", COLOR_RED);
-        break;
-    case ProgramState::STOPPED:
-        m_logger.log("Received Stop Request: Program is not running.");
-        ret = false;
-        break;
-    case ProgramState::RUNNING:
-//    case ProgramState::FINISHED:
-        m_logger.log("Received Stop Request");
-        m_state.store(ProgramState::STOPPING, std::memory_order_release);
-        on_stop();
-        ret = true;
-        break;
-    case ProgramState::STOPPING:
-        m_logger.log("Received Stop Request: Program is already stopping.");
-        ret = false;
-        break;
+bool RunnablePanelWidget::request_program_stop(){
+    if (state() != ProgramState::RUNNING){
+        return false;
     }
-    update_ui_after_program_state_change();
-    return ret;
+    m_logger.log("Received Stop Request");
+    m_state.store(ProgramState::STOPPING, std::memory_order_release);
+    if (m_start_button == nullptr){
+        return true;
+    }
+    m_start_button->setText("Stopping Program...");
+    m_listener.on_busy(m_instance);
+    return true;
 }
 
 
@@ -174,7 +163,7 @@ RunnablePanelWidget::RunnablePanelWidget(
     );
     connect(
         this, &RunnablePanelWidget::async_stop,
-        this, &RunnablePanelWidget::stop
+        this, &RunnablePanelWidget::request_program_stop
     );
     connect(
         this, &RunnablePanelWidget::async_set_status,
@@ -254,7 +243,7 @@ QWidget* RunnablePanelWidget::make_actions(QWidget& parent){
                 break;
             case ProgramState::RUNNING:
 //            case ProgramState::FINISHED:
-                stop();
+                request_program_stop();
                 break;
             case ProgramState::STOPPING:
                 break;
@@ -303,7 +292,7 @@ void RunnablePanelWidget::load_historical_stats(){
         if (list.size() != 0){
             list.aggregate(*stats);
         }
-        async_set_status(QString::fromStdString(stats->to_str()));
+        emit async_set_status(QString::fromStdString(stats->to_str()));
 //        m_status_bar->setText(QString::fromStdString(stats->to_str()));
 //        m_status_bar->setVisible(true);
     }
@@ -383,10 +372,6 @@ void RunnablePanelWidget::status_update(QString status){
         m_status_bar->setText(status);
         m_status_bar->setVisible(true);
     }
-}
-
-void RunnablePanelWidget::on_stop(){
-    signal_cancel();
 }
 
 

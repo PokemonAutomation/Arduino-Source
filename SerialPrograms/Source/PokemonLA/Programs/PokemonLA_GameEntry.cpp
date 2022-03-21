@@ -48,31 +48,10 @@ bool gamemenu_to_ingame(
         return false;
     }
 }
-bool openedgame_to_ingame(
+
+bool switch_home_to_gamemenu(
     ProgramEnvironment& env, ConsoleHandle& console,
-    uint16_t load_game_timeout,
-    uint16_t mash_duration, uint16_t enter_game_timeout,
-    uint16_t post_wait_time
-){
-    bool ok = true;
-    ok &= openedgame_to_gamemenu(env, console, load_game_timeout);
-    ok &= gamemenu_to_ingame(env, console, mash_duration, enter_game_timeout);
-    if (!ok){
-        dump_image(env.logger(), env.program_info(), "StartGame", console.video().snapshot());
-    }
-    console.log("Entered game! Waiting out grace period.");
-    pbf_wait(console, post_wait_time);
-    console.botbase().wait_for_all_requests();
-    return ok;
-}
-
-
-
-
-bool reset_game_from_home(
-    ProgramEnvironment& env, ConsoleHandle& console,
-    bool tolerate_update_menu,
-    uint16_t post_wait_time
+    bool tolerate_update_menu
 ){
     if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET || tolerate_update_menu){
         close_game(console);
@@ -86,15 +65,26 @@ bool reset_game_from_home(
         pbf_press_button(console, BUTTON_X, 50, 0);
         pbf_mash_button(console, BUTTON_A, GameSettings::instance().START_GAME_MASH);
     }
-    bool ret = openedgame_to_ingame(
-        env, console,
-        GameSettings::instance().START_GAME_WAIT0,
-        GameSettings::instance().ENTER_GAME_MASH,
-        GameSettings::instance().ENTER_GAME_WAIT,
-        post_wait_time
-    );
+
+    // Now the game has opened:
+    return openedgame_to_gamemenu(env, console, GameSettings::instance().START_GAME_WAIT0);
+}
+
+bool reset_game_from_home(
+    ProgramEnvironment& env, ConsoleHandle& console,
+    bool tolerate_update_menu,
+    uint16_t post_wait_time
+){
+    bool ok = true;
+    ok &= switch_home_to_gamemenu(env, console, tolerate_update_menu);
+    ok &= gamemenu_to_ingame(env, console, GameSettings::instance().ENTER_GAME_MASH, GameSettings::instance().ENTER_GAME_WAIT);
+    if (!ok){
+        dump_image(env.logger(), env.program_info(), "StartGame", console.video().snapshot());
+    }
+    console.log("Entered game! Waiting out grace period.");
+    pbf_wait(console, post_wait_time);
     console.botbase().wait_for_all_requests();
-    return ret;
+    return ok;
 }
 
 

@@ -81,7 +81,7 @@ std::unique_ptr<StatsTracker> GalladeFinder::make_stats() const{
 
 bool GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env){
     // NOTE: there's no "stunned by alpha" detection in case the first spawn is an alpha!
-    // NOTE: there is also no mitigation for if you get attacked by a Kirlia if she hates you
+    // NOTE: there is also no mitigation for if you get attacked by a Kirlia if it hates you
     Stats& stats = env.stats<Stats>();
 
     stats.attempts++;

@@ -21,19 +21,20 @@ std::string to_string_padded(size_t digits, uint64_t x){
     }
     return std::string(digits - str.size(), '0') + str;
 }
-std::string tostr_u_commas(uint64_t x){
+std::string tostr_u_commas(int64_t x){
     //  Prints out x with comma separators.
 
     std::string str = std::to_string(x);
     std::string out;
 
     const char* ptr = str.c_str();
-    size_t len = str.size();
+    // len: how many digits, don't count "-" in the negative numbers
+    size_t len = str.size() - (x < 0);
 
     size_t commas = (len + 2) / 3 - 1;
-    size_t shift = len - commas * 3;
+    size_t shift = len - commas * 3 + (x < 0);
 
-    while (1){
+    while (true){
         char ch = *ptr++;
         if (ch == '\0')
             break;

@@ -23,7 +23,8 @@ namespace NintendoSwitch{
 
 
 RunnableSwitchProgramWidget::~RunnableSwitchProgramWidget(){
-    on_destruct_stop();
+    RunnableSwitchProgramWidget::request_program_stop();
+    join_program_thread();
 }
 
 RunnableSwitchProgramWidget::RunnableSwitchProgramWidget(
@@ -130,11 +131,17 @@ void RunnableSwitchProgramWidget::update_ui_after_program_state_change(){
     if (m_setup) m_setup->update_ui(state);
 }
 
-void RunnableSwitchProgramWidget::on_stop(){
-    RunnablePanelWidget::on_stop();
+bool RunnableSwitchProgramWidget::request_program_stop(){
+    if (!RunnablePanelWidget::request_program_stop()){
+        return false;
+    }
+    emit signal_cancel();
+    ProgramState state = m_state.load(std::memory_order_acquire);
     if (m_setup){
         m_setup->stop_serial();
+        m_setup->update_ui(state);
     }
+    return true;
 }
 
 void RunnableSwitchProgramWidget::run_program(){
@@ -154,7 +161,7 @@ void RunnableSwitchProgramWidget::run_program(){
 
     try{
         m_logger.log("<b>Starting Program: " + program_identifier + "</b>");
-        run_program(m_current_stats.get(), m_historical_stats.get());
+        run_switch_program();
         m_setup->wait_for_all_requests();
         m_logger.log("Ending Program...");
     }catch (ProgramCancelledException&){

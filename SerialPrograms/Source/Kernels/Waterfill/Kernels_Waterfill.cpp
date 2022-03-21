@@ -27,7 +27,7 @@ bool find_object_on_bit(PackedBinaryMatrix_IB& matrix, WaterfillObject& object, 
     switch (matrix.type()){
 #ifdef PA_AutoDispatch_17_Skylake
     case BinaryMatrixType::AVX512:
-        if (CPU_CAPABILITY_CURRENT.HW_GFNI){
+        if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
             return find_object_on_bit_x64_AVX512GF(matrix, object, x, y);
         }else{
             return find_object_on_bit_x64_AVX512(matrix, object, x, y);
@@ -60,7 +60,7 @@ std::vector<WaterfillObject> find_objects_inplace(PackedBinaryMatrix_IB& matrix,
     switch (matrix.type()){
 #ifdef PA_AutoDispatch_17_Skylake
     case BinaryMatrixType::AVX512:
-        if (CPU_CAPABILITY_CURRENT.HW_GFNI){
+        if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
             return find_objects_inplace_x64_AVX512GF(matrix, min_area, keep_objects);
         }else{
             return find_objects_inplace_x64_AVX512(matrix, min_area, keep_objects);
@@ -97,7 +97,7 @@ std::unique_ptr<WaterfillIterator2> make_WaterfillIterator(PackedBinaryMatrix_IB
     switch (matrix.type()){
 #ifdef PA_AutoDispatch_17_Skylake
     case BinaryMatrixType::AVX512:
-        if (CPU_CAPABILITY_CURRENT.HW_GFNI){
+        if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
             return make_WaterfillIterator_x64_AVX512GF(matrix, min_area);
         }else{
             return make_WaterfillIterator_x64_AVX512(matrix, min_area);

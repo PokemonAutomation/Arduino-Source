@@ -113,18 +113,18 @@ QString TimeExpressionBaseOption<Type>::process(const QString& text, Type& value
     if (text.isEmpty() || text.isNull()){
         return "Expression is empty.";
     }
-    uint32_t parsed;
+    int32_t parsed;
     try{
         parsed = parse_ticks_i32(text);
     }catch (const ParseException& str){
         return QString::fromStdString(str.message());
     }
-//    cout << "value = " << parsed << endl;
+    // std::cout << "value = " << parsed << " " << m_min_value << " " << m_max_value << std::endl;
 
-    if (parsed < m_min_value){
+    if (parsed < (int64_t)m_min_value){
         return "Overflow: Number is too small.";
     }
-    if (parsed > m_max_value){
+    if (parsed > (int64_t)m_max_value){
         return "Overflow: Number is too large.";
     }
     value = (Type)parsed;
@@ -136,6 +136,8 @@ QString TimeExpressionBaseOption<Type>::process(const QString& text, Type& value
 
 template class TimeExpressionBaseOption<uint16_t>;
 template class TimeExpressionBaseOption<uint32_t>;
+template class TimeExpressionBaseOption<int16_t>;
+template class TimeExpressionBaseOption<int32_t>;
 
 
 

@@ -52,9 +52,9 @@ public:
     ProcessorLevelOption PROCESSOR_LEVEL;
 
 //    ProcessPriorityOption PROCESS_PRIORITY0;
-    ThreadPriorityOption REALTIME_THREAD_PRIORITY;
-    ThreadPriorityOption INFERENCE_PRIORITY;
-    ThreadPriorityOption COMPUTE_PRIORITY;
+    ThreadPriorityOption REALTIME_THREAD_PRIORITY0;
+    ThreadPriorityOption INFERENCE_PRIORITY0;
+    ThreadPriorityOption COMPUTE_PRIORITY0;
 
     StringOption DEVELOPER_TOKEN;
 

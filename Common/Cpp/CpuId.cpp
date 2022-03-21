@@ -158,7 +158,37 @@ CPU_x86_Features& CPU_x86_Features::set_to_current(){
         HW_FMA4         = (info[2] & ((int)1 << 16)) != 0;
     }
 
+    update_CPU_compatibility();
     return *this;
+}
+
+void CPU_x86_Features::update_CPU_compatibility(){
+    OK_08_Nehalem = true;
+    OK_08_Nehalem &= HW_SSE42;
+
+    OK_13_Haswell = OK_08_Nehalem;
+    OK_13_Haswell &= OS_AVX;
+    OK_13_Haswell &= HW_BMI2;
+    OK_13_Haswell &= HW_FMA3;
+    OK_13_Haswell &= HW_AVX2;
+
+    OK_17_Skylake = OK_13_Haswell;
+    OK_17_Skylake &= HW_AVX512_F;
+    OK_17_Skylake &= HW_AVX512_CD;
+    OK_17_Skylake &= HW_AVX512_VL;
+    OK_17_Skylake &= HW_AVX512_BW;
+    OK_17_Skylake &= HW_AVX512_DQ;
+
+    OK_19_IceLake = OK_17_Skylake;
+    OK_19_IceLake &= HW_AVX512_IFMA;
+    OK_19_IceLake &= HW_AVX512_VBMI;
+    OK_19_IceLake &= HW_AVX512_VPOPCNTDQ;
+    OK_19_IceLake &= HW_AVX512_VNNI;
+    OK_19_IceLake &= HW_AVX512_VBMI2;
+    OK_19_IceLake &= HW_GFNI;
+    OK_19_IceLake &= HW_VAES;
+    OK_19_IceLake &= HW_AVX512_VPCLMUL;
+    OK_19_IceLake &= HW_AVX512_BITALG;
 }
 
 
@@ -167,6 +197,7 @@ const CPU_x86_Features CPU_CAPABILITY_NATIVE = CPU_x86_Features().set_to_current
 
 CPU_x86_Features make_09_Nehalem(){
     CPU_x86_Features ret;
+
     ret.HW_MMX = true;
     ret.HW_x64 = true;
 
@@ -176,6 +207,8 @@ CPU_x86_Features make_09_Nehalem(){
     ret.HW_SSSE3 = true;
     ret.HW_SSE41 = true;
     ret.HW_SSE42 = true;
+
+    ret.update_CPU_compatibility();
     return ret;
 }
 const CPU_x86_Features CPU_CAPABILITY_09_NEHALEM = make_09_Nehalem();
@@ -203,6 +236,7 @@ CPU_x86_Features make_13_Haswell(){
     ret.HW_FMA3 = true;
     ret.HW_AVX2 = true;
 
+    ret.update_CPU_compatibility();
     return ret;
 }
 const CPU_x86_Features CPU_CAPABILITY_13_Haswell = make_13_Haswell();
@@ -241,6 +275,7 @@ CPU_x86_Features make_17_Skylake(){
     ret.HW_AVX512_BW = true;
     ret.HW_AVX512_DQ = true;
 
+    ret.update_CPU_compatibility();
     return ret;
 }
 const CPU_x86_Features CPU_CAPABILITY_17_Skylake = make_17_Skylake();
@@ -288,6 +323,7 @@ CPU_x86_Features make_19_IceLake(){
     ret.HW_AVX512_VPCLMUL = true;
     ret.HW_AVX512_BITALG = true;
 
+    ret.update_CPU_compatibility();
     return ret;
 }
 const CPU_x86_Features CPU_CAPABILITY_19_IceLake = make_19_IceLake();

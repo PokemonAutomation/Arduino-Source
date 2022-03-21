@@ -111,17 +111,16 @@ void PABotBase::wait_for_all_requests(const std::atomic<bool>* cancelled){
 
 void PABotBase::stop_all_commands(){
     std::map<uint64_t, PendingRequest>::iterator iter;
-    issue_request(iter, nullptr, Microcontroller::DeviceRequest_request_stop(), false);
+    uint64_t seqnum = issue_request(&iter, nullptr, Microcontroller::DeviceRequest_request_stop());
 
     pabb_MsgAckRequest response;
     wait_for_request(iter).convert<PABB_MSG_ACK_REQUEST>(m_logger, response);
 
-    clear_all_active_commands(iter->first);
+    clear_all_active_commands(seqnum);
 }
 void PABotBase::next_command_interrupt(){
-    std::map<uint64_t, PendingRequest>::iterator iter;
-    issue_request(iter, nullptr, Microcontroller::DeviceRequest_next_command_interrupt(), true);
-    clear_all_active_commands(iter->first);
+    uint64_t seqnum = issue_request(nullptr, nullptr, Microcontroller::DeviceRequest_next_command_interrupt());
+    clear_all_active_commands(seqnum);
 }
 void PABotBase::clear_all_active_commands(uint64_t seqnum){
     //  Remove all commands at or before the specified seqnum.
@@ -421,11 +420,11 @@ void PABotBase::retransmit_thread(){
 
 
 
-bool PABotBase::try_issue_request(
-    std::map<uint64_t, PendingRequest>::iterator& iter,
+uint64_t PABotBase::try_issue_request(
+    std::map<uint64_t, PendingRequest>::iterator* iter,
     const std::atomic<bool>* cancelled,
     const BotBaseRequest& request,
-    bool silent_remove, size_t queue_limit
+    size_t queue_limit
 ){
     BotBaseMessage message = request.message();
     if (message.body.size() < sizeof(uint32_t)){
@@ -448,7 +447,7 @@ bool PABotBase::try_issue_request(
     //  Don't get too far ahead of the oldest seqnum.
     uint64_t seqnum = m_send_seq;
     if (seqnum - oldest_live_seqnum() > MAX_SEQNUM_GAP){
-        return false;
+        return 0;
     }
 
     seqnum_t seqnum_s = (seqnum_t)seqnum;
@@ -467,21 +466,23 @@ bool PABotBase::try_issue_request(
 
     PendingRequest* handle = &ret.first->second;
 
-    handle->silent_remove = silent_remove;
+    handle->silent_remove = iter == nullptr;
     handle->request = std::move(message);
     handle->first_sent = std::chrono::system_clock::now();
 
     send_message(handle->request, false);
 
-    iter = ret.first;
+    if (iter){
+        *iter = ret.first;
+    }
 
-    return true;
+    return seqnum;
 }
-bool PABotBase::try_issue_command(
-    std::map<uint64_t, PendingCommand>::iterator& iter,
+uint64_t PABotBase::try_issue_command(
+    std::map<uint64_t, PendingCommand>::iterator* iter,
     const std::atomic<bool>* cancelled,
     const BotBaseRequest& request,
-    bool silent_remove, size_t queue_limit
+    size_t queue_limit
 ){
     BotBaseMessage message = request.message();
     if (message.body.size() < sizeof(uint32_t)){
@@ -510,7 +511,7 @@ bool PABotBase::try_issue_command(
     //  Don't get too far ahead of the oldest seqnum.
     uint64_t seqnum = m_send_seq;
     if (seqnum - oldest_live_seqnum() > MAX_SEQNUM_GAP){
-        return false;
+        return 0;
     }
 
     seqnum_t seqnum_s = (seqnum_t)seqnum;
@@ -529,21 +530,22 @@ bool PABotBase::try_issue_command(
 
     PendingCommand* handle = &ret.first->second;
 
-    handle->silent_remove = silent_remove;
+    handle->silent_remove = iter == nullptr;
     handle->request = std::move(message);
     handle->first_sent = std::chrono::system_clock::now();
 
     send_message(handle->request, false);
 
-    iter = ret.first;
+    if (iter){
+        *iter = ret.first;
+    }
 
-    return true;
+    return seqnum;
 }
-void PABotBase::issue_request(
-    std::map<uint64_t, PendingRequest>::iterator& iter,
+uint64_t PABotBase::issue_request(
+    std::map<uint64_t, PendingRequest>::iterator* iter,
     const std::atomic<bool>* cancelled,
-    const BotBaseRequest& request,
-    bool silent_remove
+    const BotBaseRequest& request
 ){
     //  Issue a request or a command and return.
     //
@@ -564,11 +566,9 @@ void PABotBase::issue_request(
     //
 
     while (true){
-        if (try_issue_request(
-            iter, cancelled, request,
-            silent_remove, MAX_PENDING_REQUESTS
-        )){
-            return;
+        uint64_t seqnum = try_issue_request(iter, cancelled, request, MAX_PENDING_REQUESTS);
+        if (seqnum != 0){
+            return seqnum;
         }
         std::unique_lock<std::mutex> lg(m_sleep_lock);
         if (cancelled != nullptr && cancelled->load(std::memory_order_acquire)){
@@ -580,11 +580,10 @@ void PABotBase::issue_request(
         m_cv.wait(lg);
     }
 }
-void PABotBase::issue_command(
-    std::map<uint64_t, PendingCommand>::iterator& iter,
+uint64_t PABotBase::issue_command(
+    std::map<uint64_t, PendingCommand>::iterator* iter,
     const std::atomic<bool>* cancelled,
-    const BotBaseRequest& request,
-    bool silent_remove
+    const BotBaseRequest& request
 ){
     //  Issue a request or a command and return.
     //
@@ -605,11 +604,9 @@ void PABotBase::issue_command(
     //
 
     while (true){
-        if (try_issue_command(
-            iter, cancelled, request,
-            silent_remove, MAX_PENDING_REQUESTS
-        )){
-            return;
+        uint64_t seqnum = try_issue_command(iter, cancelled, request, MAX_PENDING_REQUESTS);
+        if (seqnum != 0){
+            return seqnum;
         }
         std::unique_lock<std::mutex> lg(m_sleep_lock);
         if (cancelled != nullptr && cancelled->load(std::memory_order_acquire)){
@@ -627,11 +624,9 @@ bool PABotBase::try_issue_request(
     const std::atomic<bool>* cancelled
 ){
     if (!request.is_command()){
-        std::map<uint64_t, PendingRequest>::iterator iter;
-        return try_issue_request(iter, cancelled, request, true, MAX_PENDING_REQUESTS);
+        return try_issue_request(nullptr, cancelled, request, MAX_PENDING_REQUESTS) != 0;
     }else{
-        std::map<uint64_t, PendingCommand>::iterator iter;
-        return try_issue_command(iter, cancelled, request, true, MAX_PENDING_REQUESTS);
+        return try_issue_command(nullptr, cancelled, request, MAX_PENDING_REQUESTS) != 0;
     }
 }
 void PABotBase::issue_request(
@@ -639,11 +634,9 @@ void PABotBase::issue_request(
     const std::atomic<bool>* cancelled
 ){
     if (!request.is_command()){
-        std::map<uint64_t, PendingRequest>::iterator iter;
-        issue_request(iter, cancelled, request, true);
+        issue_request(nullptr, cancelled, request);
     }else{
-        std::map<uint64_t, PendingCommand>::iterator iter;
-        issue_command(iter, cancelled, request, true);
+        issue_command(nullptr, cancelled, request);
     }
 }
 
@@ -656,7 +649,7 @@ BotBaseMessage PABotBase::issue_request_and_wait(
     }
 
     std::map<uint64_t, PendingRequest>::iterator iter;
-    issue_request(iter, cancelled, request, false);
+    issue_request(&iter, cancelled, request);
 
     return wait_for_request(iter);
 }

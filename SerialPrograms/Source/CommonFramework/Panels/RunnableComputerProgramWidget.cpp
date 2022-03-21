@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 
 
 RunnableComputerProgramWidget::~RunnableComputerProgramWidget(){
-    on_destruct_stop();
+    join_program_thread();
 }
 
 RunnableComputerProgramWidget* RunnableComputerProgramWidget::make(

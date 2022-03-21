@@ -36,10 +36,7 @@ private:
     virtual ~MultiSwitchProgramWidget();
 
 private:
-    virtual void run_program(
-        StatsTracker* current_stats,
-        const StatsTracker* historical_stats
-    ) override;
+    virtual void run_switch_program() override;
 
 private:
     friend class MultiSwitchProgramInstance;
