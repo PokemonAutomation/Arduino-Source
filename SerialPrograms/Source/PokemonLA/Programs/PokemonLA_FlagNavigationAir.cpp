@@ -50,23 +50,28 @@ FlagNavigationAir::FlagNavigationAir(
     *this += m_leftB;
 //    *this += m_dialog_detector;
     *this += m_shiny_listener;
+
+    auto find_flag = [=](const BotBaseContext& context){
+        for (size_t c = 0; c < 1; c++){
+            uint8_t turn = m_flag_x <= 0.5 ? 0 : 255;
+            pbf_press_button(context, BUTTON_ZL, 20, 30);
+            pbf_move_right_joystick(context, turn, 128, 400, 0);
+//            pbf_move_right_joystick(context, 128, 255, 200, 0);
+//            pbf_move_right_joystick(context, 128, 0, 200, 0);
+//            pbf_move_right_joystick(context, 128, 255, 80, 0);
+            pbf_move_right_joystick(context, 128, 255, 120, 0);
+            pbf_move_right_joystick(context, turn, 128, 400, 0);
+            pbf_move_right_joystick(context, 128, 0, 200, 0);
+            pbf_move_right_joystick(context, turn, 128, 400, 0);
+        }
+        context.wait_for_all_requests();
+        m_find_flag_failed.store(true, std::memory_order_release);
+    };
+
+
     register_state_command(State::UNKNOWN, [=](){
         m_console.log("Unknown state. Moving camera around...");
-        uint8_t turn = m_flag_x <= 0.5 ? 0 : 255;
-        m_active_command->dispatch([=](const BotBaseContext& context){
-            for (size_t c = 0; c < 1; c++){
-                pbf_move_right_joystick(context, 128, 255, 200, 0);
-                pbf_move_right_joystick(context, 128, 0, 200, 0);
-                pbf_move_right_joystick(context, 128, 255, 80, 0);
-                pbf_move_right_joystick(context, turn, 128, 400, 0);
-                pbf_move_right_joystick(context, 128, 255, 120, 0);
-                pbf_move_right_joystick(context, turn, 128, 400, 0);
-                pbf_move_right_joystick(context, 128, 0, 200, 0);
-                pbf_move_right_joystick(context, turn, 128, 400, 0);
-            }
-            context.wait_for_all_requests();
-            m_find_flag_failed.store(true, std::memory_order_release);
-        });
+        m_active_command->dispatch(find_flag);
         m_looking_straight_ahead.store(false, std::memory_order_release);
         return false;
     });
@@ -267,21 +272,7 @@ FlagNavigationAir::FlagNavigationAir(
 
     register_state_command(State::FIND_FLAG, [=](){
         m_console.log("Looking for flag...");
-        uint8_t turn = m_flag_x <= 0.5 ? 0 : 255;
-        m_active_command->dispatch([=](const BotBaseContext& context){
-            for (size_t c = 0; c < 1; c++){
-                pbf_move_right_joystick(context, 128, 255, 200, 0);
-                pbf_move_right_joystick(context, 128, 0, 200, 0);
-                pbf_move_right_joystick(context, 128, 255, 80, 0);
-                pbf_move_right_joystick(context, turn, 128, 400, 0);
-                pbf_move_right_joystick(context, 128, 255, 120, 0);
-                pbf_move_right_joystick(context, turn, 128, 400, 0);
-                pbf_move_right_joystick(context, 128, 0, 200, 0);
-                pbf_move_right_joystick(context, turn, 128, 400, 0);
-            }
-            context.wait_for_all_requests();
-            m_find_flag_failed.store(true, std::memory_order_release);
-        });
+        m_active_command->dispatch(find_flag);
         m_looking_straight_ahead.store(false, std::memory_order_release);
         return false;
     });

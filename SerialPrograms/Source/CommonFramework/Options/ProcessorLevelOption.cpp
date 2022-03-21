@@ -57,10 +57,10 @@ std::vector<QString> make_processor_labels(){
 
 ProcessorLevelOption::ProcessorLevelOption()
     : EnumDropdownOption(
-        "<b>Processor Specific Optimization:</b><br>"
-        "Don't set this higher than what your CPU supports or the program may crash!",
+        "<b>Processor Specific Optimization:</b>",
         make_processor_labels(),
-        AVAILABLE_CAPABILITIES().size() - 1
+//        AVAILABLE_CAPABILITIES().size() - 1
+        0
     )
 {
     set_global();
