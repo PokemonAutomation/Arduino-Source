@@ -20,9 +20,11 @@
 #include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
 #include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Inference/PokemonLA_UnderAttackDetector.h"
+#include "PokemonLA/Programs/PokemonLA_MountChange.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "PokemonLA/Programs/ShinyHunting/PokemonLA_UnownFinder.h"
+
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -85,85 +87,8 @@ std::unique_ptr<StatsTracker> UnownFinder::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-void UnownFinder::enter_map(SingleSwitchProgramEnvironment& env){
-    Stats& stats = env.stats<Stats>();
-
-    pbf_move_left_joystick(env.console, 128, 255, 200, 0);
-
-    MapDetector detector;
-    int ret = run_until(
-        env, env.console,
-        [](const BotBaseContext& context){
-            for (size_t c = 0; c < 10; c++){
-                pbf_press_button(context, BUTTON_A, 20, 105);
-            }
-        },
-        { &detector }
-    );
-    if (ret < 0){
-        stats.errors++;
-        throw OperationFailedException(env.console, "Map not detected after 10 x A presses.");
-    }
-    env.console.log("Found map!");
-    env.wait_for(std::chrono::milliseconds(500));
-}
-
-bool UnownFinder::select_map(SingleSwitchProgramEnvironment &env, MapRegion &region){
-    MapRegion start_region = MapRegion::NONE;
-    MapRegion current_region = MapRegion::NONE;
-
-    while (true){
-        current_region = detect_selected_region(env, env.console);
-        if (current_region == MapRegion::NONE){
-            env.console.log("Unable to detect selected region.", COLOR_RED);
-            return false;
-        }
-        if (start_region == MapRegion::NONE){
-            start_region = current_region;
-        }else if (start_region == current_region){
-            break;
-        }
-
-        if (current_region == region)
-        {
-           break;
-        }
-        pbf_press_dpad(env.console, DPAD_RIGHT, 20, 40);
-        env.console.botbase().wait_for_all_requests();
-    }
-
-    //Enter region
-    mash_A_to_change_region(env, env.console);
-    return true;
-}
-
-bool UnownFinder::pick_mount(SingleSwitchProgramEnvironment &env, MountState &mount_on, MountState &mount_off){
-    bool error = true;
-    MountDetector mount_detector;
-    for (size_t c = 0; c < 10; c++){
-        MountState mount = mount_detector.detect(env.console.video().snapshot());
-        if (mount == mount_off){
-            pbf_press_button(env.console, BUTTON_PLUS, 20, 105);
-            error = false;
-            break;
-        }
-        if (mount == mount_on){
-            pbf_wait(env.console, 5 * TICKS_PER_SECOND);
-            error = false;
-            break;
-        }
-        pbf_press_dpad(env.console, DPAD_LEFT, 20, 50);
-        env.console.botbase().wait_for_all_requests();
-    }
-    if (error){
-        throw OperationFailedException(env.console, "Unable to find Braviary after 10 attempts.");
-    }
-
-    return true;
-}
-
 void ruins_entrance_route(const BotBaseContext& context){
-    pbf_wait(context, (uint16_t)(0.6 * TICKS_PER_SECOND));
+    pbf_wait(context, (uint16_t)(0.5 * TICKS_PER_SECOND));
     pbf_move_left_joystick(context, 139, 120, 10, 10);
     pbf_wait(context, (uint16_t)(1.3 * TICKS_PER_SECOND));
 
@@ -188,50 +113,45 @@ bool UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env){
 
     stats.attempts++;
 
-    enter_map(env);
+    goto_camp_from_jubilife(env, env.console, TravelLocations::instance().Mirelands_Mirelands);
 
-    MapRegion target_region = MapRegion::MIRELANDS;
-    if (!select_map(env, target_region)) return false;
-
-    MountState target_mount_on = MountState::BRAVIARY_ON;
-    MountState target_mount_off = MountState::BRAVIARY_OFF;
-    if (!pick_mount(env, target_mount_on, target_mount_off)) return false;
+    change_mount(env.console, MountState::BRAVIARY_ON );
 
     //Start path
     env.console.log("Beginning Shiny Detection...");
     {
-        ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
+        ShinyDetectedActionOption SHINY_DETECTED_ON_ROUTE("0");
+        SHINY_DETECTED_ON_ROUTE.NOTIFICATIONS = SHINY_DETECTED.NOTIFICATIONS;
+        SHINY_DETECTED_ON_ROUTE.ACTION.set(!SKIP_PATH_SHINY);
 
-        if(SKIP_PATH_SHINY){
+        ShinySoundDetector shiny_detector_route(env.console, SHINY_DETECTED_ON_ROUTE.stop_on_shiny());
+        run_until(
+            env, env.console,
+            [](const BotBaseContext& context){
+               ruins_entrance_route(context);
+            },
+            { &shiny_detector_route }
+        );
 
-            env.console.log("Skipping Shinies in the path...");
-
-            ruins_entrance_route(env.console);
-
-            run_until(
-                env, env.console,
-                [](const BotBaseContext& context){
-                   enter_ruins(context);
-                },
-                { &shiny_detector }
-            );
-         }
-         else{
-            env.console.log("Shinies on path won't be ignored...");
-
-             run_until(
-                 env, env.console,
-                 [](const BotBaseContext& context){
-                    ruins_entrance_route(context);
-                    enter_ruins(context);
-                 },
-                 { &shiny_detector }
-             );
-         }
-
-        if (shiny_detector.detected()){
+        if (shiny_detector_route.detected()){
            stats.shinies++;
-           on_shiny_sound(env, env.console, SHINY_DETECTED, shiny_detector.results());
+           on_shiny_sound(env, env.console, SHINY_DETECTED_ON_ROUTE, shiny_detector_route.results());
+        }
+
+
+        ShinySoundDetector shiny_detector_ruins(env.console, SHINY_DETECTED.stop_on_shiny());
+
+        run_until(env, env.console,
+            [](const BotBaseContext& context){
+               enter_ruins(context);
+            },
+            { &shiny_detector_ruins }
+        );
+
+
+        if (shiny_detector_ruins.detected()){
+           stats.shinies++;
+           on_shiny_sound(env, env.console, SHINY_DETECTED, shiny_detector_ruins.results());
         }
     };
 

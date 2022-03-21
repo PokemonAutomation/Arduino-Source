@@ -30,9 +30,6 @@ public:
 
 private:
     bool run_iteration(SingleSwitchProgramEnvironment& env);
-    void enter_map(SingleSwitchProgramEnvironment& env);
-    bool select_map(SingleSwitchProgramEnvironment& env, MapRegion& region);
-    bool pick_mount(SingleSwitchProgramEnvironment& env, MountState& mount_on, MountState& mount_off);
 
 private:
     class Stats;
