@@ -97,12 +97,18 @@ std::unique_ptr<StatsTracker> PostMMOSpawnReset::make_stats() const{
 bool PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env){
     Stats& stats = env.stats<Stats>();
 
-    env.console.log("Checking shiny sound...");
+    // From game to Switch Home
+    pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    // Restart the game and go to game menu (where "Press A" is shown to enter the game)
+    switch_home_to_gamemenu(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     {
         ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
         run_until(
             env, env.console,
-            [this](const BotBaseContext& context){
+            [this, &env](const BotBaseContext& context){
+                gamemenu_to_ingame(env, env.console, GameSettings::instance().ENTER_GAME_MASH, GameSettings::instance().ENTER_GAME_WAIT);
+                env.console.log("Entered game! Checking shiny sound...");
+
                 // forward portion
                 if (TURN_DURATION > 0){
                     pbf_move_right_joystick(context, 255, 128, uint16_t(TURN_DURATION), 0);
@@ -124,12 +130,7 @@ bool PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env){
     };
 
     stats.attempts++;
-
-    // then reset
     env.console.log("No shiny detected, restarting the game!");
-
-    pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-    reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 
     return false;
 }
@@ -155,8 +156,10 @@ void PostMMOSpawnReset::program(SingleSwitchProgramEnvironment& env){
             }
         }catch (OperationFailedException&){
             stats.errors++;
-            pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            // run_iteration() restarts the game first then listens to shiny sound.
+            // If there is any error generated when the game is running and is caught here,
+            // we just do nothing to handle the error as in the next iteration of run_iteration()
+            // the game will be immediately restarted.
         }catch (OperationCancelledException&){
             break;
         }
