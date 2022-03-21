@@ -115,12 +115,12 @@ bool UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env){
 
     goto_camp_from_jubilife(env, env.console, TravelLocations::instance().Mirelands_Mirelands);
 
-    change_mount(env.console, MountState::BRAVIARY_ON );
+    change_mount(env.console, MountState::BRAVIARY_ON);
 
     //Start path
     env.console.log("Beginning Shiny Detection...");
     {
-        ShinyDetectedActionOption SHINY_DETECTED_ON_ROUTE("0");
+        ShinyDetectedActionOption SHINY_DETECTED_ON_ROUTE(QString::number(SHINY_DETECTED.SCREENSHOT_DELAY));
         SHINY_DETECTED_ON_ROUTE.NOTIFICATIONS = SHINY_DETECTED.NOTIFICATIONS;
         SHINY_DETECTED_ON_ROUTE.ACTION.set(!SKIP_PATH_SHINY);
 
