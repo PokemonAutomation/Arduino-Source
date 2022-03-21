@@ -118,7 +118,7 @@ public:
     virtual const char* name() const override{ return "SerialProtocolException"; }
     virtual std::string message() const override;
 private:
-    const char* m_location;
+    // const char* m_location;
     std::string m_message;
 };
 

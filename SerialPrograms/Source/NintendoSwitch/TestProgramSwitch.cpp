@@ -247,11 +247,11 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 //    using namespace PokemonBDSP;
     using namespace PokemonLA;
 
-    LoggerQt& logger = env.logger();
-    ConsoleHandle& console = env.consoles[0];
-    BotBase& botbase = env.consoles[0];
-    VideoFeed& feed = env.consoles[0];
-    VideoOverlay& overlay = env.consoles[0];
+//     LoggerQt& logger = env.logger();
+//     ConsoleHandle& console = env.consoles[0];
+//     BotBase& botbase = env.consoles[0];
+//     VideoFeed& feed = env.consoles[0];
+//     VideoOverlay& overlay = env.consoles[0];
 
 
 //    change_mount(console, MountState::WYRDEER_ON);
@@ -310,7 +310,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 //    QImage image = feed.snapshot();
 
     MountDetector detector;
-    MountState state = detector.detect(image);
+//    MountState state = detector.detect(image);
 
 //    if (state == MountState::NOTHING){
 //        image.save("test.png");
