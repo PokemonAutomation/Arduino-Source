@@ -17,7 +17,8 @@ namespace NintendoSwitch{
 
 
 MultiSwitchProgramWidget::~MultiSwitchProgramWidget(){
-    on_destruct_stop();
+    RunnableSwitchProgramWidget::request_program_stop();
+    join_program_thread();
 }
 MultiSwitchProgramWidget* MultiSwitchProgramWidget::make(
     QWidget& parent,
@@ -37,10 +38,7 @@ MultiSwitchProgramWidget* MultiSwitchProgramWidget::make(
     );
     return widget;
 }
-void MultiSwitchProgramWidget::run_program(
-    StatsTracker* current_stats,
-    const StatsTracker* historical_stats
-){
+void MultiSwitchProgramWidget::run_switch_program(){
     MultiSwitchProgramInstance& instance = static_cast<MultiSwitchProgramInstance&>(m_instance);
     FixedLimitVector<ConsoleHandle> switches(instance.system_count());
     for (size_t c = 0; c < instance.system_count(); c++){
@@ -62,7 +60,7 @@ void MultiSwitchProgramWidget::run_program(
             timestamp()
         ),
         m_logger,
-        current_stats, historical_stats,
+        m_current_stats.get(), m_historical_stats.get(),
         std::move(switches)
     );
     connect(

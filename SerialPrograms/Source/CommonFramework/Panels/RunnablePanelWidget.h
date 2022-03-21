@@ -39,7 +39,8 @@ public:
     bool start();           //  Must call on main thread.
 
     //  Stops the program if it is running.
-    bool stop();            //  Must call on main thread.
+//    bool stop();            //  Must call on main thread.
+    virtual bool request_program_stop();    //  Must call on main thread.
 
 signals:    //  Public Signals
     void async_start();
@@ -48,7 +49,7 @@ signals:    //  Public Signals
 
 protected:
     //  Call this in the destructor of all child classes.
-    void on_destruct_stop();
+    void join_program_thread();
 
     RunnablePanelWidget(
         QWidget& parent,
@@ -76,8 +77,6 @@ protected:
 
     virtual void update_ui_after_program_state_change();
     void status_update(QString status);
-
-    virtual void on_stop();
 
     virtual void run_program() = 0;
 
@@ -118,7 +117,7 @@ protected:
     std::atomic<ProgramState> m_state;
     std::thread m_thread;
 
-    bool m_destructing = false;
+//    bool m_destructing = false;
 
     std::mutex m_lock;
     std::unique_ptr<StatsTracker> m_historical_stats;

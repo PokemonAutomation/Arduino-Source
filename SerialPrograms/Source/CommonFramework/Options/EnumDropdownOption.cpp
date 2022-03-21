@@ -92,7 +92,7 @@ EnumDropdownWidget::EnumDropdownWidget(QWidget& parent, EnumDropdownOption& valu
                 return;
             }
             m_value.set(index);
-            on_changed();
+            emit on_changed();
         }
     );
 }

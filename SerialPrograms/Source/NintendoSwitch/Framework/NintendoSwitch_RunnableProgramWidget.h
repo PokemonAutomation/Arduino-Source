@@ -39,13 +39,10 @@ protected:
 
     virtual void update_ui_after_program_state_change() override;
 
-    virtual void on_stop() override;
+    virtual bool request_program_stop() override;
 
     virtual void run_program() override final;
-    virtual void run_program(
-        StatsTracker* current_stats,
-        const StatsTracker* historical_stats
-    ) = 0;
+    virtual void run_switch_program() = 0;
 
 protected:
     BotBase& sanitize_botbase(BotBase* botbase);
