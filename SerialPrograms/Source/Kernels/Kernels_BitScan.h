@@ -37,7 +37,6 @@ namespace Kernels{
         return x != 0;
     }
     PA_FORCE_INLINE size_t bitlength(uint64_t x){
-        unsigned long index;
         return x == 0 ? 0 : 64 - __builtin_clzll(x);
     }
 }

@@ -66,9 +66,9 @@ ConnectionException::ConnectionException(Logger* logger, std::string message)
 
 
 
-SerialProtocolException::SerialProtocolException(Logger& logger, const char* location, std::string message)
-    : m_location(location)
-    , m_message(std::move(message))
+SerialProtocolException::SerialProtocolException(Logger& logger, const char* /*location*/, std::string message)
+    //: m_location(location)
+    : m_message(std::move(message))
 {
     logger.log(std::string(SerialProtocolException::name()) + ": " + SerialProtocolException::message(), COLOR_RED);
 }

@@ -19,9 +19,9 @@ namespace PokemonLA{
 
 
 
-FlagTracker::FlagTracker(LoggerQt& logger, VideoOverlay& overlay)
+FlagTracker::FlagTracker(LoggerQt& /*logger*/, VideoOverlay& overlay)
     : VisualInferenceCallback("FlagTracker")
-    , m_logger(logger)
+    // , m_logger(logger)
     , m_watcher(overlay, {0, 0, 1, 1}, {{m_flags, false}})
 {}
 
