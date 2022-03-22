@@ -23,16 +23,6 @@
 #include "Kernels/Kernels_x64_SSE41.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Core_x64_SSE42.h"
-#ifdef PA_Arch_x64_AVX2
-#include "Kernels/Kernels_x64_AVX2.h"
-#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX2.h"
-#endif
-#ifdef PA_Arch_x64_AVX512
-#include "Kernels/Kernels_x64_AVX512.h"
-#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Tile_x64_AVX512.h"
-#endif
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
@@ -49,18 +39,6 @@
 #include "CommonFramework/AudioPipeline/AudioNormalization.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 
-#include "Kernels/AbsFFT/Kernels_AbsFFT.h"
-#include "Kernels/AbsFFT/Kernels_AbsFFT_Arch.h"
-#include "Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.h"
-#include "Kernels/AbsFFT/Kernels_AbsFFT_Butterflies.h"
-#include "Kernels/AbsFFT/Kernels_AbsFFT_ComplexScalar.h"
-#include "Kernels/AbsFFT/Kernels_AbsFFT_ComplexVector.h"
-#include "Kernels/AbsFFT/Kernels_AbsFFT_ComplexToAbs.h"
-#include "Kernels/AbsFFT/Kernels_AbsFFT_BitReverse.h"
-#include "Kernels/AbsFFT/Kernels_AbsFFT_Reductions.h"
-#include "Kernels/AbsFFT/Kernels_AbsFFT_FullTransform.h"
-
-//#include "Kernels/Kernels_x64_AVX2.h"
 
 #include <iostream>
 using std::cout;
@@ -71,7 +49,6 @@ namespace PokemonAutomation{
 using namespace Kernels;
 using namespace Kernels::Waterfill;
 using namespace Pokemon;
-using namespace Kernels::AbsFFT;
 
 
 TestProgramComputer_Descriptor::TestProgramComputer_Descriptor()

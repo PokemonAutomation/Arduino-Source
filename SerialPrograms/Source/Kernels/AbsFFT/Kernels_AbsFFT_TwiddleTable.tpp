@@ -13,23 +13,24 @@ namespace Kernels{
 namespace AbsFFT{
 
 
-AlignedVector<vcomplex> make_table_row(int k, double angle_multiplier, size_t length_multipler){
+template <typename Context>
+AlignedVector<vcomplex<Context>> make_table_row(int k, double angle_multiplier, size_t length_multipler){
     if (k < 2){
-        return AlignedVector<vcomplex>();
+        return AlignedVector<vcomplex<Context>>();
     }
     size_t length = (size_t)1 << (k - 2);
-    size_t vlen = length * length_multipler / VECTOR_LENGTH;
+    size_t vlen = length * length_multipler / Context::VECTOR_LENGTH;
     if (vlen < Context::MIN_TABLE_WIDTH){
         vlen = Context::MIN_TABLE_WIDTH;
     }
-    AlignedVector<vcomplex> row(vlen);
+    AlignedVector<vcomplex<Context>> row(vlen);
 
     double w = 1.5707963267948966192 * angle_multiplier / length;
 
     for (size_t v = 0; v < vlen; v++){
-        vcomplex& vec = row[v];
-        for (size_t i = 0; i < VECTOR_LENGTH; i++){
-            double angle = (double)(v * VECTOR_LENGTH + i) * w;
+        vcomplex<Context>& vec = row[v];
+        for (size_t i = 0; i < Context::VECTOR_LENGTH; i++){
+            double angle = (double)(v * Context::VECTOR_LENGTH + i) * w;
             vec.real(i) = (float)std::cos(angle);
             vec.imag(i) = (float)std::sin(angle);
         }
@@ -40,14 +41,17 @@ AlignedVector<vcomplex> make_table_row(int k, double angle_multiplier, size_t le
 
 
 
-TwiddleTable::~TwiddleTable(){}
-TwiddleTable::TwiddleTable(int initial_size)
+template <typename Context>
+TwiddleTable<Context>::~TwiddleTable(){}
+template <typename Context>
+TwiddleTable<Context>::TwiddleTable(int initial_size)
     : m_size_k(0)
 {
     expand(initial_size);
 }
 
-const PerSizeTables& TwiddleTable::operator[](int k) const{
+template <typename Context>
+const PerSizeTables<Context>& TwiddleTable<Context>::operator[](int k) const{
     int size_k = m_size_k.load(std::memory_order_acquire);
     if (k > size_k){
         throw "Twiddle table is too small.";
@@ -55,14 +59,16 @@ const PerSizeTables& TwiddleTable::operator[](int k) const{
     return m_tables[k];
 }
 
-void TwiddleTable::ensure(int k){
+template <typename Context>
+void TwiddleTable<Context>::ensure(int k){
     int size_k = m_size_k.load(std::memory_order_acquire);
     if (size_k >= k){
         return;
     }
     expand(k);
 }
-void TwiddleTable::expand(int k){
+template <typename Context>
+void TwiddleTable<Context>::expand(int k){
     SpinLockGuard lg(m_resize_lock);
     int size_k = m_size_k.load(std::memory_order_acquire);
     if (size_k >= k){
@@ -73,11 +79,13 @@ void TwiddleTable::expand(int k){
     }
     for (; size_k < k;){
         size_k++;
-        m_tables[size_k].w1 = make_table_row(size_k, 1, 2);
-        m_tables[size_k].w3 = make_table_row(size_k, 3, 1);
+        m_tables[size_k].w1 = make_table_row<Context>(size_k, 1, 2);
+        m_tables[size_k].w3 = make_table_row<Context>(size_k, 3, 1);
         m_size_k.store(size_k, std::memory_order_release);
     }
 }
+
+
 
 
 

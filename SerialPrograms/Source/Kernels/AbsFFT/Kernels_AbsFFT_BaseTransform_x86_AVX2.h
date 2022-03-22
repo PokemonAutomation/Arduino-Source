@@ -7,12 +7,10 @@
 #ifndef PokemonAutomation_Kernels_AbsFFT_BaseTransform_x86_AVX2_H
 #define PokemonAutomation_Kernels_AbsFFT_BaseTransform_x86_AVX2_H
 
-#include "Kernels_AbsFFT_Butterflies.h"
-
 #include "Kernels/Kernels_x64_AVX2.h"
-#include <iostream>
-using std::cout;
-using std::endl;
+#include "Kernels_AbsFFT_Arch_x86_AVX2.h"
+#include "Kernels_AbsFFT_Butterflies.h"
+#include "Kernels_AbsFFT_ComplexVector.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -53,9 +51,10 @@ PA_FORCE_INLINE void vtranspose(
     r7 = _mm256_permute2f128_ps(b3, b7, 49);
 }
 
-void base_transform(const TwiddleTable& table, vtype T[16]){
-    vtype r0, r1, r2, r3, r4, r5, r6, r7;
-    vtype i0, i1, i2, i3, i4, i5, i6, i7;
+template <>
+void base_transform<Context_x86_AVX2>(const TwiddleTable<Context_x86_AVX2>& table, Context_x86_AVX2::vtype* T){
+    __m256 r0, r1, r2, r3, r4, r5, r6, r7;
+    __m256 i0, i1, i2, i3, i4, i5, i6, i7;
 
     r0 = T[ 0];
     i0 = T[ 1];
@@ -75,16 +74,16 @@ void base_transform(const TwiddleTable& table, vtype T[16]){
     i7 = T[15];
 
     {
-        const vcomplex* w1 = table[6].w1.data();
+        const vcomplex<Context_x86_AVX2>* w1 = table[6].w1.data();
         Butterflies<Context_x86_AVX2>::butterfly2(r0, i0, r4, i4, w1[0].r, w1[0].i);
         Butterflies<Context_x86_AVX2>::butterfly2(r1, i1, r5, i5, w1[1].r, w1[1].i);
         Butterflies<Context_x86_AVX2>::butterfly2(r2, i2, r6, i6, w1[2].r, w1[2].i);
         Butterflies<Context_x86_AVX2>::butterfly2(r3, i3, r7, i7, w1[3].r, w1[3].i);
     }
     {
-        const vcomplex* w1 = table[4].w1.data();
-        const vcomplex* w2 = table[5].w1.data();
-        const vcomplex* w3 = table[5].w3.data();
+        const vcomplex<Context_x86_AVX2>* w1 = table[4].w1.data();
+        const vcomplex<Context_x86_AVX2>* w2 = table[5].w1.data();
+        const vcomplex<Context_x86_AVX2>* w3 = table[5].w3.data();
         Butterflies<Context_x86_AVX2>::butterfly4(
             r0, i0,
             r1, i1, w1[0].r, w1[0].i,

@@ -14,8 +14,11 @@ namespace Kernels{
 namespace AbsFFT{
 
 
-void fft_abs_scalar(const TwiddleTable& table, int k, float* abs, float* real);
-void fft_abs(const TwiddleTable& table, int k, float* abs, float* real);
+template <typename Context>
+void fft_abs_scalar(const TwiddleTable<Context>& table, int k, float* abs, float* real);
+
+template <typename Context>
+void fft_abs(const TwiddleTable<Context>& table, int k, float* abs, float* real);
 
 
 

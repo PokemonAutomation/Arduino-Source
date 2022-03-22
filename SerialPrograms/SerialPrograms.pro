@@ -238,11 +238,9 @@ SOURCES += \
     Source/Integrations/ProgramTracker.cpp \
     Source/Integrations/SleepyDiscordRunner.cpp \
     Source/Kernels/AbsFFT/Kernels_AbsFFT.cpp \
-    Source/Kernels/AbsFFT/Kernels_AbsFFT_BitReverse.cpp \
-    Source/Kernels/AbsFFT/Kernels_AbsFFT_ComplexScalar.cpp \
-    Source/Kernels/AbsFFT/Kernels_AbsFFT_ComplexVector.cpp \
-    Source/Kernels/AbsFFT/Kernels_AbsFFT_FullTransform.cpp \
-    Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.cpp \
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_Default.cpp \
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_AVX2.cpp \
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_SSE41.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_Default.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_AVX2.cpp \
@@ -868,8 +866,10 @@ HEADERS += \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_ComplexToAbs.h \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_ComplexVector.h \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_FullTransform.h \
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_FullTransform.tpp \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Reductions.h \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.h \
+    Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.tpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Routines.h \

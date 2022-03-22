@@ -17,22 +17,25 @@ namespace Kernels{
 namespace AbsFFT{
 
 
-AlignedVector<vcomplex> make_table_row(int k, double angle_multiplier, size_t length_multipler);
+
+template <typename Context>
+AlignedVector<vcomplex<Context>> make_table_row(int k, double angle_multiplier, size_t length_multipler);
 
 
-
+template <typename Context>
 struct PerSizeTables{
-    AlignedVector<vcomplex> w1;
-    AlignedVector<vcomplex> w3;
+    AlignedVector<vcomplex<Context>> w1;
+    AlignedVector<vcomplex<Context>> w3;
 };
 
 
+template <typename Context>
 class TwiddleTable{
 public:
     ~TwiddleTable();
     TwiddleTable(int initial_size = 14);
 
-    const PerSizeTables& operator[](int k) const;
+    const PerSizeTables<Context>& operator[](int k) const;
     void ensure(int k);
 
 private:
@@ -41,30 +44,31 @@ private:
 private:
     std::atomic<int> m_size_k;
     SpinLock m_resize_lock;
-    PerSizeTables m_tables[32];
+    PerSizeTables<Context> m_tables[32];
 };
 
 
 
+template <typename Context>
 struct TableRowReader{
-    using vtype = Context::vtype;
+    using vtype = typename Context::vtype;
 
-    const vcomplex* data;
+    const vcomplex<Context>* data;
 
-    TableRowReader(const vcomplex* p_data)
+    TableRowReader(const vcomplex<Context>* p_data)
         : data(p_data)
     {}
 
 
     PA_FORCE_INLINE void get(float& real, float& imag, size_t index) const{
-        const vcomplex& point = data[index / VECTOR_LENGTH];
-        size_t sindex = index % VECTOR_LENGTH;
+        const vcomplex<Context>& point = data[index / Context::VECTOR_LENGTH];
+        size_t sindex = index % Context::VECTOR_LENGTH;
         real = point.real(sindex);
         imag = point.imag(sindex);
     }
 #if 0
     PA_FORCE_INLINE void get(vtype& real, vtype& imag, size_t index) const{
-        const vcomplex& point = data[index];
+        const vcomplex<Context>& point = data[index];
         real = point.r;
         imag = point.i;
     }

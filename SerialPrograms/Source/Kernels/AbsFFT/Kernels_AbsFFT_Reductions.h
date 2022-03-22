@@ -7,15 +7,19 @@
 #ifndef PokemonAutomation_Kernels_AbsFFT_Reductions_H
 #define PokemonAutomation_Kernels_AbsFFT_Reductions_H
 
-#include "Kernels_AbsFFT_Arch.h"
+#include "Kernels_AbsFFT_Arch_Default.h"
 #include "Kernels_AbsFFT_TwiddleTable.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
 namespace AbsFFT{
+template <typename Context>
+struct Reductions{
+
+using vtype = typename Context::vtype;
 
 
-PA_FORCE_INLINE void fft_real_split_reduce(const TwiddleTable& table, int k, float* real, float* upper_complex){
+static PA_FORCE_INLINE void fft_real_split_reduce_scalar(const TwiddleTable<Context>& table, int k, float* real, float* upper_complex){
     size_t stride = (size_t)1 << (k - 2);
     for (size_t c = 0; c < stride; c++){
         float r0 = real[c + 0*stride];
@@ -28,8 +32,8 @@ PA_FORCE_INLINE void fft_real_split_reduce(const TwiddleTable& table, int k, flo
         r0 -= r2;
         r1 -= r3;
 
-        const vcomplex& vec = table[k].w1[c / VECTOR_LENGTH];
-        size_t sindex = c % VECTOR_LENGTH;
+        const vcomplex<Context>& vec = table[k].w1[c / Context::VECTOR_LENGTH];
+        size_t sindex = c % Context::VECTOR_LENGTH;
 
         Context_Default::cmul_pp(
             r0, r1,
@@ -40,14 +44,13 @@ PA_FORCE_INLINE void fft_real_split_reduce(const TwiddleTable& table, int k, flo
     }
 }
 
-#ifndef PA_Kernels_AbsFFT_Arch_Default
-PA_FORCE_INLINE void fft_real_split_reduce(const TwiddleTable& table, int k, vtype* real, vtype* upper_complex){
-    size_t vstride = (size_t)1 << (k - 2 - VECTOR_K);
+static PA_FORCE_INLINE void fft_real_split_reduce(const TwiddleTable<Context>& table, int k, vtype* real, vtype* upper_complex){
+    size_t vstride = (size_t)1 << (k - 2 - Context::VECTOR_K);
     vtype* R0 = real;
     vtype* R1 = R0 + vstride;
     vtype* R2 = R1 + vstride;
     vtype* R3 = R2 + vstride;
-    const vcomplex* w = table[k].w1.data();
+    const vcomplex<Context>* w = table[k].w1.data();
     size_t lc = vstride;
     do{
         vtype r0 = R0[0];
@@ -73,10 +76,10 @@ PA_FORCE_INLINE void fft_real_split_reduce(const TwiddleTable& table, int k, vty
         w++;
     }while (--lc);
 }
-#endif
 
 
 
+};
 }
 }
 }

@@ -8,7 +8,6 @@
 #define PokemonAutomation_Kernels_AbsFFT_Butterflies_H
 
 #include "Common/Compiler.h"
-#include "Kernels_AbsFFT_Arch.h"
 #include "Kernels_AbsFFT_TwiddleTable.h"
 
 namespace PokemonAutomation{
@@ -79,11 +78,11 @@ static PA_FORCE_INLINE void butterfly4(
 }
 
 
-static PA_FORCE_INLINE void reduce2(const TwiddleTable& table, int k, vtype* T){
-    size_t stride = (size_t)1 << (k - 1 - VECTOR_K);
+static PA_FORCE_INLINE void reduce2(const TwiddleTable<Context>& table, int k, vtype* T){
+    size_t stride = (size_t)1 << (k - 1 - Context::VECTOR_K);
     vtype* T0 = T;
     vtype* T1 = T0 + 2*stride;
-    const vcomplex* w1 = table[k].w1.data();
+    const vcomplex<Context>* w1 = table[k].w1.data();
     size_t lc = stride;
     do{
         vtype r0, r1;
@@ -107,15 +106,15 @@ static PA_FORCE_INLINE void reduce2(const TwiddleTable& table, int k, vtype* T){
         w1++;
     }while (--lc);
 }
-static PA_FORCE_INLINE void reduce4(const TwiddleTable& table, int k, vtype* T){
-    size_t stride = (size_t)1 << (k - 2 - VECTOR_K);
+static PA_FORCE_INLINE void reduce4(const TwiddleTable<Context>& table, int k, vtype* T){
+    size_t stride = (size_t)1 << (k - 2 - Context::VECTOR_K);
     vtype* T0 = T;
     vtype* T1 = T0 + 2*stride;
     vtype* T2 = T1 + 2*stride;
     vtype* T3 = T2 + 2*stride;
-    const vcomplex* w1 = table[k - 1].w1.data();
-    const vcomplex* w2 = table[k].w1.data();
-    const vcomplex* w3 = table[k].w3.data();
+    const vcomplex<Context>* w1 = table[k - 1].w1.data();
+    const vcomplex<Context>* w2 = table[k].w1.data();
+    const vcomplex<Context>* w3 = table[k].w3.data();
     size_t lc = stride;
     do{
         vtype r0, r1, r2, r3;

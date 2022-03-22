@@ -7,58 +7,16 @@
 #ifndef PokemonAutomation_Kernels_AbsFFT_Arch_H
 #define PokemonAutomation_Kernels_AbsFFT_Arch_H
 
-#include "Kernels/Kernels_Arch.h"
-
-#if 0
-//  Arch Override
-//#define PA_Kernels_AbsFFT_Arch_x86_AVX2
-//#define PA_Kernels_AbsFFT_Arch_x86_SSE41
-#define PA_Kernels_AbsFFT_Arch_Default
-
-#else
-
-//  Select an FFT implementation based on the global arch setting.
-#if 0
-#elif defined PA_Arch_x64_AVX2
-#define PA_Kernels_AbsFFT_Arch_x86_AVX2
-#elif defined PA_Arch_x64_SSE42
-#define PA_Kernels_AbsFFT_Arch_x86_SSE41
-#else
-#define PA_Kernels_AbsFFT_Arch_Default
-#endif
-#endif
-
-//  Include the right arch header.
-#include "Kernels_AbsFFT_Arch_Default.h"
-#ifdef PA_Kernels_AbsFFT_Arch_x86_SSE41
-#include "Kernels_AbsFFT_Arch_x86_SSE41.h"
-#endif
-#ifdef PA_Kernels_AbsFFT_Arch_x86_AVX2
-#include "Kernels_AbsFFT_Arch_x86_AVX2.h"
-#endif
-
+#include "Common/Compiler.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
 namespace AbsFFT{
 
-//  Set the right arch intrinsics class.
-#if 0
-#elif defined PA_Kernels_AbsFFT_Arch_x86_AVX2
-using Context = Context_x86_AVX2;
-#elif defined PA_Kernels_AbsFFT_Arch_x86_SSE41
-using Context = Context_x86_SSE41;
-#elif defined PA_Kernels_AbsFFT_Arch_Default
-using Context = Context_Default;
-#endif
-
-using vtype = Context::vtype;
-
-const size_t VECTOR_K = Context::VECTOR_K;
-const size_t VECTOR_LENGTH = (size_t)1 << VECTOR_K;
 
 const float TW8_1 = 0.70710678118654752440f;
 
+#if 0
 PA_FORCE_INLINE void cmul_pp(
     float& Or, float& Oi,
     float Xr, float Xi,
@@ -68,7 +26,6 @@ PA_FORCE_INLINE void cmul_pp(
     Oi = Xr*Wi + Xi*Wr;
 }
 
-#if 0
 struct scomplex{
     float r;
     float i;
@@ -90,8 +47,9 @@ struct scomplex{
 #endif
 
 
+template <typename Context>
 struct vcomplex{
-    using vtype = Context::vtype;
+    using vtype = typename Context::vtype;
 
     vtype r;
     vtype i;
