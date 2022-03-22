@@ -158,7 +158,7 @@ void mash_A_to_change_region(ProgramEnvironment& env, ConsoleHandle& console){
         throw OperationFailedException(console, "Failed to load into region after timeout.");
     }
     console.log("Loaded into map...");
-    env.wait_for(std::chrono::seconds(1));
+    env.wait_for(std::chrono::milliseconds((uint64_t)(GameSettings::instance().POST_WARP_DELAY * 1000)));
 }
 
 
@@ -270,7 +270,7 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, co
         throw OperationFailedException(console, "Failed to fly to camp after 20 seconds.");
     }
     console.log("Arrived at sub-camp...");
-    env.wait_for(std::chrono::seconds(1));
+    env.wait_for(std::chrono::milliseconds((uint64_t)(GameSettings::instance().POST_WARP_DELAY * 1000)));
 
     if (location.post_arrival_maneuver == nullptr){
         return;
@@ -366,7 +366,7 @@ void goto_camp_from_overworld(
         throw OperationFailedException(console, "Failed to fly to camp after 20 seconds.");
     }
     console.log("Arrived at camp...");
-    env.wait_for(std::chrono::seconds(1));
+    env.wait_for(std::chrono::milliseconds((uint64_t)(GameSettings::instance().POST_WARP_DELAY * 1000)));
 }
 
 

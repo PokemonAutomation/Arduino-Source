@@ -83,12 +83,12 @@ GameSettings::GameSettings()
 //        true
 //    )
 {
-    PA_ADD_OPTION(m_menu_navigation);
+    PA_ADD_STATIC(m_menu_navigation);
     PA_ADD_OPTION(OVERWORLD_TO_MENU_DELAY);
     PA_ADD_OPTION(MENU_TO_OVERWORLD_DELAY);
     PA_ADD_OPTION(GAME_TO_HOME_DELAY);
 
-    PA_ADD_OPTION(m_start_game_timings);
+    PA_ADD_STATIC(m_start_game_timings);
     PA_ADD_OPTION(START_GAME_MASH);
     PA_ADD_OPTION(START_GAME_WAIT);
     PA_ADD_OPTION(ENTER_GAME_MASH);

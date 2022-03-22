@@ -23,12 +23,14 @@ class GameSettings : public BatchOption{
 public:
     static GameSettings& instance();
 
+    SectionDividerOption m_general;
+    FloatingPointOption POST_WARP_DELAY;
+
     SectionDividerOption m_menu_navigation;
 //    TimeExpressionOption<uint16_t> OVERWORLD_TO_MENU_DELAY;
 //    TimeExpressionOption<uint16_t> MENU_TO_OVERWORLD_DELAY;
     TimeExpressionOption<uint16_t> GAME_TO_HOME_DELAY;
     TimeExpressionOption<uint16_t> LOAD_REGION_TIMEOUT;
-
 
     SectionDividerOption m_start_game_timings;
     TimeExpressionOption<uint16_t> START_GAME_MASH;

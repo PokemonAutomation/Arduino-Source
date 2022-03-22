@@ -18,7 +18,12 @@ GameSettings& GameSettings::instance(){
     return settings;
 }
 GameSettings::GameSettings()
-    : m_menu_navigation("<font size=4><b>Menu Navigation Timings:</b></font>")
+    : m_general("<font size=4><b>General Settings:</b></font>")
+    , POST_WARP_DELAY(
+        "<b>Post-Warp Delay:</b><br>After warping, wait this many seconds before continuing.",
+        1.0, 0, 100
+    )
+    , m_menu_navigation("<font size=4><b>Menu Navigation Timings:</b></font>")
 //    , OVERWORLD_TO_MENU_DELAY(
 //        "<b>Overworld to Menu Delay:</b><br>Delay to bring up the menu when pressing X in the overworld.",
 //        "250"
@@ -68,19 +73,22 @@ GameSettings::GameSettings()
         0.65, 0, 1.0
     )
 {
-    PA_ADD_OPTION(m_menu_navigation);
+    PA_ADD_STATIC(m_general);
+    PA_ADD_OPTION(POST_WARP_DELAY);
+
+    PA_ADD_STATIC(m_menu_navigation);
 //    PA_ADD_OPTION(OVERWORLD_TO_MENU_DELAY);
 //    PA_ADD_OPTION(MENU_TO_OVERWORLD_DELAY);
     PA_ADD_OPTION(GAME_TO_HOME_DELAY);
     PA_ADD_OPTION(LOAD_REGION_TIMEOUT);
 
-    PA_ADD_OPTION(m_start_game_timings);
+    PA_ADD_STATIC(m_start_game_timings);
     PA_ADD_OPTION(START_GAME_MASH);
     PA_ADD_OPTION(START_GAME_WAIT0);
     PA_ADD_OPTION(ENTER_GAME_MASH);
     PA_ADD_OPTION(ENTER_GAME_WAIT);
 
-    PA_ADD_OPTION(m_advanced_options);
+    PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(SHINY_SHOUND_THRESHOLD2);
     PA_ADD_OPTION(SHINY_SHOUND_LOW_FREQUENCY);
     PA_ADD_OPTION(ALPHA_ROAR_THRESHOLD);
