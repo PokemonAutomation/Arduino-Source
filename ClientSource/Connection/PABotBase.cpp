@@ -299,9 +299,11 @@ void PABotBase::process_command_finished(BotBaseMessage message){
 //    m_send_queue.emplace_back((uint8_t)PABB_MSG_ACK, std::string((char*)&ack, sizeof(ack)));
     send_message(BotBaseMessage(PABB_MSG_ACK_REQUEST, std::string((char*)&ack, sizeof(ack))), false);
 
+    std::lock_guard<std::mutex> lg0(m_sleep_lock);
+    SpinLockGuard lg1(m_state_lock, "PABotBase::process_command_finished() - 0");
+
     std::map<uint64_t, PendingCommand>::iterator iter;
     {
-        SpinLockGuard lg(m_state_lock, "PABotBase::process_command_finished() - 0");
         if (m_pending_commands.empty()){
             m_sniffer->log(
                 "Unexpected command finished message: seqnum = " + std::to_string(seqnum) +
@@ -327,13 +329,9 @@ void PABotBase::process_command_finished(BotBaseMessage message){
         iter->second.state = AckState::FINISHED;
         iter->second.ack = std::move(message);
         if (iter->second.silent_remove){
-            SpinLockGuard lg(m_state_lock, "PABotBase::process_command_finished() - 1");
             m_pending_commands.erase(iter);
         }
-        {
-            std::lock_guard<std::mutex> lg(m_sleep_lock);
-            m_cv.notify_all();
-        }
+        m_cv.notify_all();
         return;
     case AckState::FINISHED:
         m_sniffer->log("Duplicate command finish: seqnum = " + std::to_string(seqnum));

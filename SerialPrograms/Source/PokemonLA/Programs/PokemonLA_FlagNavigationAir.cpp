@@ -54,7 +54,7 @@ FlagNavigationAir::FlagNavigationAir(
     auto find_flag = [=](const BotBaseContext& context){
         uint8_t turn = m_flag_x <= 0.5 ? 0 : 255;
         for (size_t c = 0; c < 2; c++){
-            pbf_press_button(context, BUTTON_ZL, 20, 30);
+            pbf_press_button(context, BUTTON_ZL, 20, 105);
             pbf_move_right_joystick(context, turn, 128, 400, 0);
 //            pbf_move_right_joystick(context, 128, 255, 200, 0);
 //            pbf_move_right_joystick(context, 128, 0, 200, 0);
@@ -228,7 +228,7 @@ FlagNavigationAir::FlagNavigationAir(
                 m_looking_straight_ahead.store(true, std::memory_order_release);
 //                cout << "State::DASH_LEFT: m_looking_straight_ahead = true" << endl;
             }
-            pbf_press_button(context, BUTTON_Y, 10, 0);
+//            pbf_press_button(context, BUTTON_Y, 10, 0);
             double shift = 0;
             double distance, flag_x, flag_y;
             if (m_flag.get(distance, flag_x, flag_y)){
@@ -236,7 +236,7 @@ FlagNavigationAir::FlagNavigationAir(
                 shift = std::max(shift, -32.);
                 shift = std::min(shift, 32.);
             }
-            pbf_controller_state(context, BUTTON_Y, DPAD_NONE, (int8_t)(128 + shift), 128, 128, 128, 255);
+            pbf_controller_state(context, BUTTON_Y, DPAD_NONE, (int8_t)(128 + shift), 128, 128, 128, 125);
         });
         return false;
     };
