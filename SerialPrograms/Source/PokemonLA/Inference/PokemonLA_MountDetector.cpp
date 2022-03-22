@@ -10,6 +10,7 @@
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
@@ -147,7 +148,9 @@ class MountWyrdeerMatcher : public MountMatcher{
 public:
     MountWyrdeerMatcher(bool on)
         : MountMatcher(
-            on ? "PokemonLA/Mounts/MountOn-Wyrdeer-Template-1.png" : "PokemonLA/Mounts/MountOff-Wyrdeer-Template.png",
+            on
+                ? "PokemonLA/Mounts/MountOn-Wyrdeer-Template-1.png"
+                : "PokemonLA/Mounts/MountOff-Wyrdeer-Template.png",
             Color(0xff808000), Color(0xffffffff), 100
         )
     {}
@@ -164,7 +167,9 @@ class MountUrsalunaMatcher : public MountMatcher{
 public:
     MountUrsalunaMatcher(bool on)
         : MountMatcher(
-            on ? "PokemonLA/Mounts/MountOn-Ursaluna-Template-1.png" : "PokemonLA/Mounts/MountOff-Ursaluna-Template.png",
+            on
+                ? "PokemonLA/Mounts/MountOn-Ursaluna-Template-1.png"
+                : "PokemonLA/Mounts/MountOff-Ursaluna-Template.png",
             Color(0xff808000), Color(0xffffffff), 100
         )
     {}
@@ -181,7 +186,9 @@ class MountBasculegionMatcher : public MountMatcher{
 public:
     MountBasculegionMatcher(bool on)
         : MountMatcher(
-            on ? "PokemonLA/Mounts/MountOn-Basculegion-Template-1.png" : "PokemonLA/Mounts/MountOff-Basculegion-Template.png",
+            on
+                ? "PokemonLA/Mounts/MountOn-Basculegion-Template-1.png"
+                : "PokemonLA/Mounts/MountOff-Basculegion-Template.png",
             Color(0xff808000), Color(0xffffffff), 100
         )
     {
@@ -200,7 +207,9 @@ class MountSneaslerMatcher : public MountMatcher{
 public:
     MountSneaslerMatcher(bool on)
         : MountMatcher(
-            on ? "PokemonLA/Mounts/MountOn-Sneasler-Template-1.png" : "PokemonLA/Mounts/MountOff-Sneasler-Template.png",
+            on
+                ? "PokemonLA/Mounts/MountOn-Sneasler-Template-1.png"
+                : "PokemonLA/Mounts/MountOff-Sneasler-Template.png",
             Color(0xff808000), Color(0xffffffff), 100
         )
     {}
@@ -217,7 +226,9 @@ class MountBraviaryMatcher : public MountMatcher{
 public:
     MountBraviaryMatcher(bool on)
         : MountMatcher(
-            on ? "PokemonLA/Mounts/MountOn-Braviary-Template-1.png" : "PokemonLA/Mounts/MountOff-Braviary-Template.png",
+            on
+                ? "PokemonLA/Mounts/MountOn-Braviary-Template-1.png"
+                : "PokemonLA/Mounts/MountOff-Braviary-Template.png",
             Color(0xff808000), Color(0xffffffff), 100
         )
     {
@@ -239,51 +250,86 @@ public:
 
 class MountWyrdeerMatcherButtons : public MountMatcherButtons{
 public:
-    MountWyrdeerMatcherButtons()
-        : MountMatcherButtons("PokemonLA/Mounts/MountOn-Wyrdeer-Template.png")
+    MountWyrdeerMatcherButtons(bool on)
+        : MountMatcherButtons(on
+            ? "PokemonLA/Mounts/MountOn-Wyrdeer-Template.png"
+            : "PokemonLA/Mounts/MountOff-Wyrdeer-Template.png"
+        )
     {}
     static const MountWyrdeerMatcherButtons& on(){
-        static MountWyrdeerMatcherButtons matcher;
+        static MountWyrdeerMatcherButtons matcher(true);
+        return matcher;
+    }
+    static const MountWyrdeerMatcherButtons& off(){
+        static MountWyrdeerMatcherButtons matcher(false);
         return matcher;
     }
 };
 class MountUrsalunaMatcherButtons : public MountMatcherButtons{
 public:
-    MountUrsalunaMatcherButtons()
-        : MountMatcherButtons("PokemonLA/Mounts/MountOn-Ursaluna-Template.png")
+    MountUrsalunaMatcherButtons(bool on)
+        : MountMatcherButtons(on
+            ? "PokemonLA/Mounts/MountOn-Ursaluna-Template.png"
+            : "PokemonLA/Mounts/MountOff-Ursaluna-Template.png"
+        )
     {}
     static const MountUrsalunaMatcherButtons& on(){
-        static MountUrsalunaMatcherButtons matcher;
+        static MountUrsalunaMatcherButtons matcher(true);
+        return matcher;
+    }
+    static const MountUrsalunaMatcherButtons& off(){
+        static MountUrsalunaMatcherButtons matcher(false);
         return matcher;
     }
 };
 class MountBasculegionMatcherButtons : public MountMatcherButtons{
 public:
-    MountBasculegionMatcherButtons()
-        : MountMatcherButtons("PokemonLA/Mounts/MountOn-Basculegion-Template.png")
+    MountBasculegionMatcherButtons(bool on)
+        : MountMatcherButtons(on
+            ? "PokemonLA/Mounts/MountOn-Basculegion-Template.png"
+            : "PokemonLA/Mounts/MountOff-Basculegion-Template.png"
+        )
     {}
     static const MountBasculegionMatcherButtons& on(){
-        static MountBasculegionMatcherButtons matcher;
+        static MountBasculegionMatcherButtons matcher(true);
         return matcher;
     }
+//    static const MountBasculegionMatcherButtons& off(){
+//        static MountBasculegionMatcherButtons matcher(false);
+//        return matcher;
+//    }
 };
 class MountSneaslerMatcherButtons : public MountMatcherButtons{
 public:
-    MountSneaslerMatcherButtons()
-        : MountMatcherButtons("PokemonLA/Mounts/MountOn-Sneasler-Template.png")
+    MountSneaslerMatcherButtons(bool on)
+        : MountMatcherButtons(on
+            ? "PokemonLA/Mounts/MountOn-Sneasler-Template.png"
+            : "PokemonLA/Mounts/MountOff-Sneasler-Template.png"
+        )
     {}
     static const MountSneaslerMatcherButtons& on(){
-        static MountSneaslerMatcherButtons matcher;
+        static MountSneaslerMatcherButtons matcher(true);
+        return matcher;
+    }
+    static const MountSneaslerMatcherButtons& off(){
+        static MountSneaslerMatcherButtons matcher(false);
         return matcher;
     }
 };
 class MountBraviaryMatcherButtons : public MountMatcherButtons{
 public:
-    MountBraviaryMatcherButtons()
-        : MountMatcherButtons("PokemonLA/Mounts/MountOn-Braviary-Template.png")
+    MountBraviaryMatcherButtons(bool on)
+        : MountMatcherButtons(on
+            ? "PokemonLA/Mounts/MountOn-Braviary-Template.png"
+            : "PokemonLA/Mounts/MountOff-Braviary-Template.png"
+        )
     {}
     static const MountBraviaryMatcherButtons& on(){
-        static MountBraviaryMatcherButtons matcher;
+        static MountBraviaryMatcherButtons matcher(true);
+        return matcher;
+    }
+    static const MountBraviaryMatcherButtons& off(){
+        static MountBraviaryMatcherButtons matcher(false);
         return matcher;
     }
 };
@@ -307,8 +353,9 @@ const char* MOUNT_STATE_STRINGS[] = {
 
 
 
-MountDetector::MountDetector()
+MountDetector::MountDetector(MountDetectorLogging logging)
     : m_box(0.905, 0.65, 0.08, 0.13)
+    , m_logging(logging)
 {}
 
 struct MountCandiateTracker{
@@ -398,7 +445,7 @@ MountState MountDetector::detect(const QImage& screen) const{
     MountCandiateTracker candidates;
     WaterfillObject plus, arrowL, arrowR;
 
-    //  Detect off-mounts as well as the buttons.
+    //  Run direct-waterfill to detect all the off-mounts.
     double rmsd_plus = 99999;
     double rmsd_arrowL = 99999;
     double rmsd_arrowR = 99999;
@@ -406,7 +453,6 @@ MountState MountDetector::detect(const QImage& screen) const{
         std::vector<MountDetectorFilteredImage> filtered_images = run_filters(
             image,
             {
-                {0xff707070, 0xffffffff},
                 {0xff808080, 0xffffffff},
                 {0xff909090, 0xffffffff},
                 {0xffa0a0a0, 0xffffffff},
@@ -414,15 +460,17 @@ MountState MountDetector::detect(const QImage& screen) const{
                 {0xffc0c0c0, 0xffffffff},
                 {0xffd0d0d0, 0xffffffff},
                 {0xffe0e0e0, 0xffffffff},
+                {0xfff0f0f0, 0xffffffff},
             }
         );
 //        static int c = 0;
         for (MountDetectorFilteredImage& filtered : filtered_images){
+//            cout << filtered.matrix.dump() << endl;
             auto finder = make_WaterfillIterator(filtered.matrix, 50);
             WaterfillObject object;
-            int c = 0;
+//            int c = 0;
             while (finder->find_next(object)){
-                c++;
+//                c++;
                 //  Skip anything that touches the borders.
                 if (object.min_x == 0 || object.min_y == 0 ||
                     object.max_x - 1 == (size_t)image.width() ||
@@ -443,11 +491,13 @@ MountState MountDetector::detect(const QImage& screen) const{
                     rmsd_plus = current_rmsd_plus;
                     plus = object;
                 }
+//                cout << "Arrow (left)" << endl;
                 double current_rmsd_arrowL = ButtonMatcher::ArrowLeft().rmsd_precropped(cropped, object);
                 if (rmsd_arrowL > current_rmsd_arrowL){
                     rmsd_arrowL = current_rmsd_arrowL;
                     arrowL = object;
                 }
+//                cout << "Arrow (right)" << endl;
                 double current_rmsd_arrowR = ButtonMatcher::ArrowRight().rmsd_precropped(cropped, object);
 //                cout << "rmsd_arrowR = " << rmsd_arrowR << endl;
                 if (rmsd_arrowR > current_rmsd_arrowR){
@@ -488,17 +538,11 @@ MountState MountDetector::detect(const QImage& screen) const{
     //  No buttons detected means mounts aren't available or we're on Basculegion.
     bool buttons_detected = rmsd_plus < 120 && rmsd_arrowL < 180 && rmsd_arrowR < 180;
     if (!buttons_detected){
-#if 0
-        std::stringstream ss;
-//        ss << "Unable to detect mount buttons: " << ", arrowL = " << rmsd_arrowL << ", arrowR = " << rmsd_arrowR;
-//        global_logger_tagged().log(ss.str(), COLOR_ORANGE);
-        cout << "plus = " << rmsd_plus << ", arrowL = " << rmsd_arrowL << ", arrowR = " << rmsd_arrowR << endl;
-        cout << "No Button: rmsd = " << candidates.m_rmsd << ", state = " << (int)candidates.m_state << endl;
-#endif
-        return candidates.m_state;
+//        cout << "plus = " << rmsd_plus << ", arrowL = " << rmsd_arrowL << ", arrowR = " << rmsd_arrowR << endl;
     }
 
-    {
+    //  If we detected buttons, run the detections that align to the buttons.
+    if (buttons_detected){
         WaterfillObject arrows = std::move(plus);
         arrows.merge_assume_no_overlap(arrowL);
         arrows.merge_assume_no_overlap(arrowR);
@@ -507,14 +551,22 @@ MountState MountDetector::detect(const QImage& screen) const{
 
 //        cout << "Start mounts" << endl;
 
+#if 1
+        candidates.add_button_crop(MountWyrdeerMatcherButtons    ::off().rmsd(cropped), MountState::WYRDEER_OFF);
+//        candidates.add_button_crop(MountBasculegionMatcherButtons::off().rmsd(cropped), MountState::URSALUNA_OFF);
+        candidates.add_button_crop(MountUrsalunaMatcherButtons   ::off().rmsd(cropped), MountState::BASCULEGION_OFF);
+        candidates.add_button_crop(MountSneaslerMatcherButtons   ::off().rmsd(cropped), MountState::SNEASLER_OFF);
+        candidates.add_button_crop(MountBraviaryMatcherButtons   ::off().rmsd(cropped), MountState::BRAVIARY_OFF);
         candidates.add_button_crop(MountWyrdeerMatcherButtons    ::on().rmsd(cropped), MountState::WYRDEER_ON);
         candidates.add_button_crop(MountBasculegionMatcherButtons::on().rmsd(cropped), MountState::URSALUNA_ON);
         candidates.add_button_crop(MountUrsalunaMatcherButtons   ::on().rmsd(cropped), MountState::BASCULEGION_ON);
         candidates.add_button_crop(MountSneaslerMatcherButtons   ::on().rmsd(cropped), MountState::SNEASLER_ON);
         candidates.add_button_crop(MountBraviaryMatcherButtons   ::on().rmsd(cropped), MountState::BRAVIARY_ON);
+#endif
     }
 
 #if 1
+    //  Now run all the direct-waterfill to detect all the yellow mounts.
     {
         std::vector<MountDetectorFilteredImage> filtered_images = run_filters(
             image,
@@ -574,6 +626,13 @@ MountState MountDetector::detect(const QImage& screen) const{
 //    if (candidates.m_state == MountState::BASCULEGION_ON){
 //        screen.save("basculegion-detection.png");
 //    }
+    if (m_logging != MountDetectorLogging::NONE){
+        std::cout << "MountDetector: " << MOUNT_STATE_STRINGS[(size_t)candidates.m_state]
+                  << ", rmsd = " << candidates.m_rmsd << (buttons_detected ? " (button)" : " (no button)") << std::endl;
+        if (m_logging == MountDetectorLogging::LOG_AND_DUMP_FAILURES && candidates.m_state == MountState::NOTHING){
+            dump_image(global_logger_tagged(), ProgramInfo(), "MountDetection", screen);
+        }
+    }
     return candidates.m_state;
 }
 
@@ -581,10 +640,11 @@ MountState MountDetector::detect(const QImage& screen) const{
 
 
 
-MountTracker::MountTracker(LoggerQt& logger)
+MountTracker::MountTracker(LoggerQt& logger, MountDetectorLogging logging)
     : VisualInferenceCallback("MountTracker")
     , m_logger(logger)
     , m_state(MountState::NOTHING)
+    , m_detector(logging)
 {}
 
 void MountTracker::make_overlays(VideoOverlaySet& items) const{

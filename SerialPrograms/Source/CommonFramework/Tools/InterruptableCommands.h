@@ -9,7 +9,6 @@
 
 #include <mutex>
 #include <condition_variable>
-#include <thread>
 #include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "ClientSource/Connection/BotBase.h"
@@ -64,7 +63,6 @@ private:
     std::atomic<bool> m_stopping_session;
     std::mutex m_lock;
     std::condition_variable m_cv;
-//    std::thread m_thread;
 //    std::exception_ptr m_exception;
 
     std::unique_ptr<AsyncTask> m_task;

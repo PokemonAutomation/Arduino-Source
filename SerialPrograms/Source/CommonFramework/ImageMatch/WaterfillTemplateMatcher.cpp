@@ -11,6 +11,10 @@
 #include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "WaterfillTemplateMatcher.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace ImageMatch{
 
@@ -95,7 +99,7 @@ double WaterfillTemplateMatcher::rmsd_precropped(const QImage& cropped_image, co
 
 //    if (rmsd <= m_max_rmsd){
 //        static int c = 0;
-//        extract_box(image, object).save("test-" + QString::number(c++) + "-" + QString::number(rmsd) + ".png");
+//        cropped_image.save("test-" + QString::number(c++) + "-" + QString::number(rmsd) + ".png");
 //    }
 
     return rmsd;

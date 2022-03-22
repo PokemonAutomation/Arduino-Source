@@ -7,6 +7,7 @@
 #include <functional>
 #include <deque>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/PanicDump.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -33,7 +34,7 @@ VirtualController::VirtualController(
     , m_last_known_state(ProgramState::STOPPED)
     , m_stop(false)
     , m_granularity(1)
-    , m_thread(&VirtualController::thread_loop, this)
+    , m_thread(run_with_catch, "VirtualController::thread_loop()", [=]{ thread_loop(); })
 {}
 VirtualController::~VirtualController(){
     m_stop.store(true, std::memory_order_release);

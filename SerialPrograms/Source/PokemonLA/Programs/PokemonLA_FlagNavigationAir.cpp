@@ -52,8 +52,8 @@ FlagNavigationAir::FlagNavigationAir(
     *this += m_shiny_listener;
 
     auto find_flag = [=](const BotBaseContext& context){
-        for (size_t c = 0; c < 1; c++){
-            uint8_t turn = m_flag_x <= 0.5 ? 0 : 255;
+        uint8_t turn = m_flag_x <= 0.5 ? 0 : 255;
+        for (size_t c = 0; c < 2; c++){
             pbf_press_button(context, BUTTON_ZL, 20, 30);
             pbf_move_right_joystick(context, turn, 128, 400, 0);
 //            pbf_move_right_joystick(context, 128, 255, 200, 0);
@@ -300,9 +300,11 @@ bool FlagNavigationAir::run_state(
     }
 
     //  Read flag.
-    m_flag_detected = m_flag.get(m_flag_distance, m_flag_x, m_flag_y);
+    m_flag_detected = m_flag.get(m_flag_distance, m_flag_x, m_flag_y, timestamp);
     if (m_flag_detected){
         m_last_flag_detection = timestamp;
+    }else{
+//        m_console.log("Flag not detected.", COLOR_ORANGE);
     }
 #if 1
     if (m_flag_detected && m_flag_distance >= 0 && m_flag_distance < 50){
@@ -407,11 +409,16 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
 //    if (m_last_flag_detection + std::chrono::seconds(20) < timestamp){
 //        throw OperationFailedException(m_console, "Flag not detected after 20 seconds.");
 //    }
+//    double flag_age = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - m_last_flag_detection).count() / 1000.;
+//    if (flag_age > 0){
+//        m_console.log("Flag Age = " + std::to_string(flag_age));
+//    }
 
-    //  Flag not detected and is stale.
-    if (!m_flag_detected && m_last_flag_detection + std::chrono::seconds(2) < timestamp){
+    //  Flag is stale.
+    if (m_last_flag_detection + std::chrono::seconds(1) < timestamp){
         return run_state_action(State::FIND_FLAG);
     }
+
 
     //  Re-center the flag.
     if (m_flag_x <= 0.30){

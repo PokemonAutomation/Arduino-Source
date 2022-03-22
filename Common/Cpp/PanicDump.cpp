@@ -35,14 +35,8 @@ void panic_dump(const char* location, const char* message){
 void run_with_catch(const char* location, std::function<void()>&& lambda){
     try{
         lambda();
-    }catch (ProgramCancelledException&){
+    }catch (Exception&){
         panic_dump(location, "ProgramCancelledException");
-        throw;
-    }catch (InvalidConnectionStateException&){
-        panic_dump(location, "InvalidConnectionStateException");
-        throw;
-    }catch (OperationCancelledException&){
-        panic_dump(location, "OperationCancelledException");
         throw;
     }catch (const char* e){
         panic_dump(location, e);

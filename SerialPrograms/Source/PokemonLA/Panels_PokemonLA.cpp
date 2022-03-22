@@ -25,10 +25,11 @@
 #include "Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.h"
 //#include "Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h"
 
-#include "Programs/TestPrograms/PokemonLA_AlphaRoarListener.h"
+#include "Programs/TestPrograms/PokemonLA_MountDetectionTest.h"
 #include "Programs/TestPrograms/PokemonLA_OverworldWatcher.h"
 #include "Programs/TestPrograms/PokemonLA_ShinySoundListener.h"
 #include "Programs/TestPrograms/PokemonLA_FlagNavigationTest.h"
+#include "Programs/TestPrograms/PokemonLA_AlphaRoarListener.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -59,11 +60,14 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<CrobatFinder_Descriptor, CrobatFinder>();
     add_program<GalladeFinder_Descriptor, GalladeFinder>();
     add_program<ShinyHuntFlagPin_Descriptor, ShinyHuntFlagPin>();
-    add_program<PostMMOSpawnReset_Descriptor, PostMMOSpawnReset>();
-
-
     if (GlobalSettings::instance().DEVELOPER_MODE){
-        add_divider("---- Developer Tools ----");
+        add_program<PostMMOSpawnReset_Descriptor, PostMMOSpawnReset>();
+    }
+
+
+    add_divider("---- Developer Tools ----");
+    add_program<MountDetectionTest_Descriptor, MountDetectionTest>();
+    if (GlobalSettings::instance().DEVELOPER_MODE){
         add_program<OverworldWatcher_Descriptor, OverworldWatcher>();
         add_program<ShinySoundListener_Descriptor, ShinySoundListener>();
         add_program<AlphaRoarListener_Descriptor, AlphaRoarListener>();

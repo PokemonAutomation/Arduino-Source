@@ -10,6 +10,7 @@
 #include <QJsonObject>
 #include <QString>
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/PanicDump.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/LoggerQt.h"
@@ -117,7 +118,10 @@ struct SleepyDiscordRequest {
 
 class SleepyDiscordSender {
 private:
-    SleepyDiscordSender() : m_stopping(false), m_thread(&SleepyDiscordSender::thread_loop, this) {}
+    SleepyDiscordSender()
+        : m_stopping(false)
+        , m_thread(run_with_catch, "SleepyDiscordSender::thread_loop()", [=]{ thread_loop(); })
+    {}
     ~SleepyDiscordSender() {
         {
             std::lock_guard<std::mutex> lg(m_lock);

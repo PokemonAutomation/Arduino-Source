@@ -129,7 +129,7 @@ void PABotBase::clear_all_active_commands(uint64_t seqnum){
     SpinLockGuard lg1(m_state_lock, "PABotBase::next_command_interrupt()");
 
     if (!m_pending_commands.empty()){
-        //  Remove all commands that are before the stop seqnum.
+        //  Remove all active commands up to the seqnum.
         while (true){
             auto iter1 = m_pending_commands.begin();
             if (iter1 == m_pending_commands.end() || iter1->first > seqnum){

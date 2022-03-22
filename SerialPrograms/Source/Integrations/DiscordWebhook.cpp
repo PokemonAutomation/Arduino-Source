@@ -14,6 +14,7 @@
 #include <QNetworkAccessManager>
 #include <QString>
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/PanicDump.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "DiscordWebhook.h"
@@ -42,7 +43,7 @@ DiscordWebhookRequest::DiscordWebhookRequest( QUrl p_url, std::shared_ptr<Pendin
 DiscordWebhookSender::DiscordWebhookSender()
     : m_logger(global_logger_raw(), "DiscordWebhookSender")
     , m_stopping(false)
-    , m_thread(&DiscordWebhookSender::thread_loop, this)
+    , m_thread(run_with_catch, "DiscordWebhookSender::thread_loop()", [=]{ thread_loop(); })
 {}
 
 DiscordWebhookSender::~DiscordWebhookSender(){

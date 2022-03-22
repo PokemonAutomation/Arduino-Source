@@ -24,7 +24,10 @@ public:
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
 
-    bool get(double& distance, double& x, double& y);
+    bool get(
+        double& distance, double& x, double& y,
+        std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now()
+    );
 
     virtual bool process_frame(
         const QImage& frame,

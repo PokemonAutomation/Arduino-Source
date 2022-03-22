@@ -36,22 +36,30 @@ enum class MountState{
 extern const char* MOUNT_STATE_STRINGS[];
 
 
+enum class MountDetectorLogging{
+    NONE,
+    LOG_ONLY,
+    LOG_AND_DUMP_FAILURES,
+};
+
+
 class MountDetector{
 public:
-    MountDetector();
+    MountDetector(MountDetectorLogging logging = MountDetectorLogging::NONE);
 
     void make_overlays(VideoOverlaySet& items) const;
     MountState detect(const QImage& screen) const;
 
 private:
     ImageFloatBox m_box;
+    MountDetectorLogging m_logging;
 };
 
 
 
 class MountTracker : public VisualInferenceCallback{
 public:
-    MountTracker(LoggerQt& logger);
+    MountTracker(LoggerQt& logger, MountDetectorLogging logging = MountDetectorLogging::NONE);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
 

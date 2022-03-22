@@ -887,6 +887,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.h
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_FlagNavigationTest.cpp
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_FlagNavigationTest.h
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_MountDetectionTest.cpp
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_MountDetectionTest.h
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_OverworldWatcher.cpp
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_OverworldWatcher.h
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_ShinySoundListener.cpp
@@ -1286,22 +1288,20 @@ if (MSVC)
     target_link_libraries(SerialPrograms tesseractPA.lib Sleepy.lib)
     target_compile_definitions(SerialPrograms PRIVATE PA_TESSERACT PA_SLEEPY)
 
-    target_compile_options(SerialPrograms PRIVATE /FAs /FaAssembly/)
-    target_compile_options(SerialPrograms PRIVATE /MP)
-    target_compile_options(SerialPrograms PRIVATE /W4)
+    target_compile_options(SerialPrograms PRIVATE /FAs /FaAssembly/ /MP /W4)
     target_compile_options(SerialPrograms PRIVATE /wd5054)  # Deprecated enum arithemtic
     target_compile_options(SerialPrograms PRIVATE /wd4505)  # unreferenced local function has been removed
 
     set(ARCH_FLAGS_09_Nehalem       /W4)    # Dummy parameter
-#    set(ARCH_FLAGS_13_Haswell       /arch:AVX2)
-#    set(ARCH_FLAGS_17_Skylake       /arch:AVX512)
-#    set(ARCH_FLAGS_19_IceLake       /arch:AVX512)
+    set(ARCH_FLAGS_13_Haswell       /arch:AVX2)
+    set(ARCH_FLAGS_17_Skylake       /arch:AVX512)
+    set(ARCH_FLAGS_19_IceLake       /arch:AVX512)
 
     #   Run-time ISA dispatching
     target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_08_Nehalem)
-#    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_13_Haswell)
-#    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_17_Skylake)
-#    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_19_IceLake)
+    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_13_Haswell)
+    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_17_Skylake)
+    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_19_IceLake)
 
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX2   /DPA_Arch_x64_AVX2)
 #    target_compile_options(SerialPrograms PRIVATE /arch:AVX512 /DPA_Arch_x64_AVX512)
@@ -1327,18 +1327,20 @@ else()
     target_compile_options(SerialPrograms PRIVATE -Wall -Wpedantic)
 
     set(ARCH_FLAGS_09_Nehalem       -march=nehalem)
-#    set(ARCH_FLAGS_13_Haswell       -march=haswell)
+    set(ARCH_FLAGS_13_Haswell       -march=haswell)
 #    set(ARCH_FLAGS_17_Skylake       -march=skylake-avx512)
 #    set(ARCH_FLAGS_19_IceLake       -march=icelake-client)
 
     #   Run-time ISA dispatching
     target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_08_Nehalem)
-#    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_13_Haswell)
+    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_13_Haswell)
 #    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_17_Skylake)
 #    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_19_IceLake)
-
-
 endif()
+
+
+
+#   Run-time CPU dispatching.
 
 if (ARCH_FLAGS_09_Nehalem)
     SET_SOURCE_FILES_PROPERTIES(

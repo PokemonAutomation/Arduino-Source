@@ -29,9 +29,14 @@ void FlagTracker::make_overlays(VideoOverlaySet& items) const{
     m_watcher.make_overlays(items);
 }
 
-bool FlagTracker::get(double& distance, double& x, double& y){
+bool FlagTracker::get(
+    double& distance, double& x, double& y,
+    std::chrono::system_clock::time_point timestamp
+){
     SpinLockGuard lg(m_lock);
-    if (m_history.empty()){
+
+    //  If history is empty or stale, return no detection.
+    if (m_history.empty() || m_history.back().timestamp + std::chrono::milliseconds(500) < timestamp){
         return false;
     }
 
@@ -41,6 +46,7 @@ bool FlagTracker::get(double& distance, double& x, double& y){
         y = sample.y;
     }
 
+    //  Distance reading is unreliable. So look at the last 2 seconds of history to infer it.
     std::multimap<int, std::chrono::system_clock::time_point> distances;
     for (const Sample& sample : m_history){
         if (0 <= sample.distance && sample.distance <= 999){

@@ -5,6 +5,7 @@
  */
 
 #include "Exceptions.h"
+#include "PanicDump.h"
 #include "FireForgetDispatcher.h"
 
 #include <iostream>
@@ -38,7 +39,7 @@ void FireForgetDispatcher::dispatch(std::function<void()>&& func){
 
     //  Lazy create thread.
     if (!m_thread.joinable()){
-        m_thread = std::thread(&FireForgetDispatcher::thread_loop, this);
+        m_thread = std::thread(run_with_catch, "FireForgetDispatcher::thread_loop()", [=]{ thread_loop(); });
     }
 }
 
@@ -59,13 +60,7 @@ void FireForgetDispatcher::thread_loop(){
             m_queue.pop_front();
         }
 
-        try{
-            task();
-        }catch (Exception& e){
-            cout << "Exception thrown from async task: " << e.message() << endl;
-        }catch (...){
-            cout << "Exception thrown from async task: Unknown" << endl;
-        }
+        task();
     }
 }
 

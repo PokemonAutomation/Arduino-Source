@@ -93,6 +93,7 @@ long WINAPI crash_handler(EXCEPTION_POINTERS* e){
 
 
 void setup_crash_handler(){
+    AddVectoredExceptionHandler(0, crash_handler);
     SetUnhandledExceptionFilter(crash_handler);
 }
 
