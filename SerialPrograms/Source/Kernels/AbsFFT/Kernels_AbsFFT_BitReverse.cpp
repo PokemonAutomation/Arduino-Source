@@ -44,7 +44,7 @@ void interleave_f32(int len_k, float* out, const float* in){
     size_t lc = vstride;
     do{
         vtype r0, r1;
-        Intrinsics::interleave_v0(r0, r1, in0[0], in1[0]);
+        Context::interleave_v0(r0, r1, in0[0], in1[0]);
         out0[0] = r0;
         out0[1] = r1;
         in0 += 1;
@@ -82,7 +82,7 @@ PA_FORCE_INLINE void interleave_u64(int len_k, uint64_t* out, const uint64_t* in
     size_t lc = vstride;
     do{
         vtype r0, r1;
-        Intrinsics::interleave_v1(r0, r1, in0[0], in1[0]);
+        Context::interleave_v1(r0, r1, in0[0], in1[0]);
         out0[0] = r0;
         out0[1] = r1;
         in0 += 1;

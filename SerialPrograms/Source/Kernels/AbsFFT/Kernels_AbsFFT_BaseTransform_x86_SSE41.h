@@ -41,7 +41,7 @@ void base_transform(const TwiddleTable& table, vtype T[8]){
     const vcomplex* w1 = table[3].w1.data();
     const vcomplex* w2 = table[4].w1.data();
     const vcomplex* w3 = table[4].w3.data();
-    Butterflies<Intrinsics_x86_SSE41>::butterfly4(
+    Butterflies<Context_x86_SSE41>::butterfly4(
         r0, i0,
         r1, i1, w1[0].r, w1[0].i,
         r2, i2, w2[0].r, w2[0].i,
@@ -51,7 +51,7 @@ void base_transform(const TwiddleTable& table, vtype T[8]){
     vtranspose(r0, r1, r2, r3);
     vtranspose(i0, i1, i2, i3);
 
-    Butterflies<Intrinsics_x86_SSE41>::butterfly4(
+    Butterflies<Context_x86_SSE41>::butterfly4(
         r0, i0,
         r1, i1,
         r2, i2,

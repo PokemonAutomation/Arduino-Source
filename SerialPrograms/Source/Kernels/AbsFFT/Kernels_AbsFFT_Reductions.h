@@ -31,7 +31,7 @@ PA_FORCE_INLINE void fft_real_split_reduce(const TwiddleTable& table, int k, flo
         const vcomplex& vec = table[k].w1[c / VECTOR_LENGTH];
         size_t sindex = c % VECTOR_LENGTH;
 
-        Intrinsics_Default::cmul_pp(
+        Context_Default::cmul_pp(
             r0, r1,
             vec.real(sindex), vec.imag(sindex)
         );
@@ -55,12 +55,12 @@ PA_FORCE_INLINE void fft_real_split_reduce(const TwiddleTable& table, int k, vty
         vtype r2 = R2[0];
         vtype r3 = R3[0];
 
-        R0[0] = Intrinsics::vadd(r0, r2);
-        R1[0] = Intrinsics::vadd(r1, r3);
+        R0[0] = Context::vadd(r0, r2);
+        R1[0] = Context::vadd(r1, r3);
 
-        r0 = Intrinsics::vsub(r0, r2);
-        r1 = Intrinsics::vsub(r1, r3);
-        Intrinsics::cmul_pp(r0, r1, w[0].r, w[0].i);
+        r0 = Context::vsub(r0, r2);
+        r1 = Context::vsub(r1, r3);
+        Context::cmul_pp(r0, r1, w[0].r, w[0].i);
 
         upper_complex[0] = r0;
         upper_complex[1] = r1;

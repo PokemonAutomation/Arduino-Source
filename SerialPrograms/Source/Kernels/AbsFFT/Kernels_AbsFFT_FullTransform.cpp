@@ -47,7 +47,7 @@ void fft_abs_k3(const TwiddleTable& table, float abs[4], float real[8]){
     fft_complex_tk_scalar(table, k - 2, abs);
 
     //  Compute abs and reverse order of odd terms.
-    MiscRoutines<Intrinsics_Default>::complex_to_abs(real + 3*block, abs, block);
+    MiscRoutines<Context_Default>::complex_to_abs(real + 3*block, abs, block);
 
     //  Recurse into lower-half.
     fft_abs_k2(real + 2*block, real);
@@ -83,7 +83,7 @@ void fft_abs_scalar(const TwiddleTable& table, int k, float* abs, float* real){
     fft_complex_tk_scalar(table, k - 2, abs);
 
     //  Compute abs and reverse order of odd terms.
-    MiscRoutines<Intrinsics_Default>::complex_to_abs_swap_odd(real + 3*block, abs, block);
+    MiscRoutines<Context_Default>::complex_to_abs_swap_odd(real + 3*block, abs, block);
 
     //  Recurse into lower-half.
     fft_abs_scalar(table, k - 1, real + 2*block, real);
@@ -96,7 +96,7 @@ void fft_abs_scalar(const TwiddleTable& table, int k, float* abs, float* real){
 
 
 void fft_abs(const TwiddleTable& table, int k, float* abs, float* real){
-    if (k - 2 < Intrinsics::BASE_COMPLEX_TRANSFORM_K){
+    if (k - 2 < Context::BASE_COMPLEX_TRANSFORM_K){
         fft_abs_scalar(table, k, abs, real);
         return;
     }
@@ -110,7 +110,7 @@ void fft_abs(const TwiddleTable& table, int k, float* abs, float* real){
     fft_complex_tk(table, k - 2, (vtype*)abs);
 
     //  Compute abs and reverse order of odd terms.
-    MiscRoutines<Intrinsics>::complex_to_abs_swap_odd(
+    MiscRoutines<Context>::complex_to_abs_swap_odd(
         (vtype*)(real + 3*block),
         (vtype*)(abs),
         block >> VECTOR_K

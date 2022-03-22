@@ -39,7 +39,7 @@ void reduce4_scalar(const TwiddleTable& table, int k, float* T){
         w1.get(w1r, w1i, c);
         w2.get(w2r, w2i, c);
         w3.get(w3r, w3i, c);
-        Butterflies<Intrinsics_Default>::butterfly4(
+        Butterflies<Context_Default>::butterfly4(
             r0, i0,
             r1, i1, w1r, w1i,
             r2, i2, w2r, w2i,
@@ -71,7 +71,7 @@ void fft_complex_t1_scalar(float T[4]){
     i0 = T[1];
     r1 = T[2];
     i1 = T[3];
-    Butterflies<Intrinsics_Default>::butterfly2(r0, i0, r1, i1);
+    Butterflies<Context_Default>::butterfly2(r0, i0, r1, i1);
     T[0] = r0;
     T[1] = i0;
     T[2] = r1;
@@ -88,7 +88,7 @@ void fft_complex_t2_scalar(float T[8]){
     i2 = T[5];
     r3 = T[6];
     i3 = T[7];
-    Butterflies<Intrinsics_Default>::butterfly4(
+    Butterflies<Context_Default>::butterfly4(
         r0, i0,
         r1, i1,
         r2, i2,
@@ -115,7 +115,7 @@ void fft_complex_t3_scalar(float T[16]){
         i2 = T[ 9];
         r3 = T[12];
         i3 = T[13];
-        Butterflies<Intrinsics_Default>::butterfly4(
+        Butterflies<Context_Default>::butterfly4(
             r0, i0,
             r1, i1,
             r2, i2,
@@ -141,7 +141,7 @@ void fft_complex_t3_scalar(float T[16]){
         i2 = T[11];
         r3 = T[14];
         i3 = T[15];
-        Butterflies<Intrinsics_Default>::butterfly4(
+        Butterflies<Context_Default>::butterfly4(
             r0, i0,
             r1, i1, 0, 1,
             r2, i2, TW8_1, TW8_1,

@@ -19,8 +19,8 @@ AlignedVector<vcomplex> make_table_row(int k, double angle_multiplier, size_t le
     }
     size_t length = (size_t)1 << (k - 2);
     size_t vlen = length * length_multipler / VECTOR_LENGTH;
-    if (vlen < Intrinsics::MIN_TABLE_WIDTH){
-        vlen = Intrinsics::MIN_TABLE_WIDTH;
+    if (vlen < Context::MIN_TABLE_WIDTH){
+        vlen = Context::MIN_TABLE_WIDTH;
     }
     AlignedVector<vcomplex> row(vlen);
 

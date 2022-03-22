@@ -76,22 +76,22 @@ void base_transform(const TwiddleTable& table, vtype T[16]){
 
     {
         const vcomplex* w1 = table[6].w1.data();
-        Butterflies<Intrinsics_x86_AVX2>::butterfly2(r0, i0, r4, i4, w1[0].r, w1[0].i);
-        Butterflies<Intrinsics_x86_AVX2>::butterfly2(r1, i1, r5, i5, w1[1].r, w1[1].i);
-        Butterflies<Intrinsics_x86_AVX2>::butterfly2(r2, i2, r6, i6, w1[2].r, w1[2].i);
-        Butterflies<Intrinsics_x86_AVX2>::butterfly2(r3, i3, r7, i7, w1[3].r, w1[3].i);
+        Butterflies<Context_x86_AVX2>::butterfly2(r0, i0, r4, i4, w1[0].r, w1[0].i);
+        Butterflies<Context_x86_AVX2>::butterfly2(r1, i1, r5, i5, w1[1].r, w1[1].i);
+        Butterflies<Context_x86_AVX2>::butterfly2(r2, i2, r6, i6, w1[2].r, w1[2].i);
+        Butterflies<Context_x86_AVX2>::butterfly2(r3, i3, r7, i7, w1[3].r, w1[3].i);
     }
     {
         const vcomplex* w1 = table[4].w1.data();
         const vcomplex* w2 = table[5].w1.data();
         const vcomplex* w3 = table[5].w3.data();
-        Butterflies<Intrinsics_x86_AVX2>::butterfly4(
+        Butterflies<Context_x86_AVX2>::butterfly4(
             r0, i0,
             r1, i1, w1[0].r, w1[0].i,
             r2, i2, w2[0].r, w2[0].i,
             r3, i3, w3[0].r, w3[0].i
         );
-        Butterflies<Intrinsics_x86_AVX2>::butterfly4(
+        Butterflies<Context_x86_AVX2>::butterfly4(
             r4, i4,
             r5, i5, w1[0].r, w1[0].i,
             r6, i6, w2[0].r, w2[0].i,
@@ -102,17 +102,17 @@ void base_transform(const TwiddleTable& table, vtype T[16]){
     vtranspose(r0, r1, r2, r3, r4, r5, r6, r7);
     vtranspose(i0, i1, i2, i3, i4, i5, i6, i7);
 
-    Butterflies<Intrinsics_x86_AVX2>::butterfly2(r0, i0, r4, i4);
-    Butterflies<Intrinsics_x86_AVX2>::butterfly2(r1, i1, r5, i5, Intrinsics_x86_AVX2::vset1(TW8_1), Intrinsics_x86_AVX2::vset1(TW8_1));
-    Butterflies<Intrinsics_x86_AVX2>::butterfly2(r2, i2, r6, i6, Intrinsics_x86_AVX2::vset1(0), Intrinsics_x86_AVX2::vset1(1));
-    Butterflies<Intrinsics_x86_AVX2>::butterfly2(r3, i3, r7, i7, Intrinsics_x86_AVX2::vset1(-TW8_1), Intrinsics_x86_AVX2::vset1(TW8_1));
-    Butterflies<Intrinsics_x86_AVX2>::butterfly4(
+    Butterflies<Context_x86_AVX2>::butterfly2(r0, i0, r4, i4);
+    Butterflies<Context_x86_AVX2>::butterfly2(r1, i1, r5, i5, Context_x86_AVX2::vset1(TW8_1), Context_x86_AVX2::vset1(TW8_1));
+    Butterflies<Context_x86_AVX2>::butterfly2(r2, i2, r6, i6, Context_x86_AVX2::vset1(0), Context_x86_AVX2::vset1(1));
+    Butterflies<Context_x86_AVX2>::butterfly2(r3, i3, r7, i7, Context_x86_AVX2::vset1(-TW8_1), Context_x86_AVX2::vset1(TW8_1));
+    Butterflies<Context_x86_AVX2>::butterfly4(
         r0, i0,
         r1, i1,
         r2, i2,
         r3, i3
     );
-    Butterflies<Intrinsics_x86_AVX2>::butterfly4(
+    Butterflies<Context_x86_AVX2>::butterfly4(
         r4, i4,
         r5, i5,
         r6, i6,

@@ -1330,14 +1330,14 @@ else()
 
     set(ARCH_FLAGS_09_Nehalem       -march=nehalem)
     set(ARCH_FLAGS_13_Haswell       -march=haswell)
-#    set(ARCH_FLAGS_17_Skylake       -march=skylake-avx512)
-#    set(ARCH_FLAGS_19_IceLake       -march=icelake-client)
+    set(ARCH_FLAGS_17_Skylake       -march=skylake-avx512)
+    set(ARCH_FLAGS_19_IceLake       -march=icelake-client)
 
     #   Run-time ISA dispatching
     target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_08_Nehalem)
     target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_13_Haswell)
-#    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_17_Skylake)
-#    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_19_IceLake)
+    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_17_Skylake)
+    target_compile_definitions(SerialPrograms PRIVATE PA_AutoDispatch_19_IceLake)
 endif()
 
 

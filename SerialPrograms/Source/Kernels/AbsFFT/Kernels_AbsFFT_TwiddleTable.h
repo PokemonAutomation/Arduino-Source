@@ -47,7 +47,7 @@ private:
 
 
 struct TableRowReader{
-    using vtype = Intrinsics::vtype;
+    using vtype = Context::vtype;
 
     const vcomplex* data;
 

@@ -13,7 +13,7 @@
 namespace PokemonAutomation{
 namespace Kernels{
 namespace AbsFFT{
-struct Intrinsics_Default{
+struct Context_Default{
 
 
 using vtype = float;

@@ -93,7 +93,7 @@ static PA_FORCE_INLINE void reduce2(const TwiddleTable& table, int k, vtype* T){
         i0 = T0[1];
         r1 = T1[0];
         i1 = T1[1];
-        Butterflies<Intrinsics>::butterfly2(
+        Butterflies<Context>::butterfly2(
             r0, i0,
             r1, i1, w1[0].r, w1[0].i
         );
@@ -129,7 +129,7 @@ static PA_FORCE_INLINE void reduce4(const TwiddleTable& table, int k, vtype* T){
         i2 = T2[1];
         r3 = T3[0];
         i3 = T3[1];
-        Butterflies<Intrinsics>::butterfly4(
+        Butterflies<Context>::butterfly4(
             r0, i0,
             r1, i1, w1[0].r, w1[0].i,
             r2, i2, w2[0].r, w2[0].i,

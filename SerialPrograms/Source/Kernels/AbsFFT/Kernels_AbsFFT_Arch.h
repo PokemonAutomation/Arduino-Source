@@ -45,16 +45,16 @@ namespace AbsFFT{
 //  Set the right arch intrinsics class.
 #if 0
 #elif defined PA_Kernels_AbsFFT_Arch_x86_AVX2
-using Intrinsics = Intrinsics_x86_AVX2;
+using Context = Context_x86_AVX2;
 #elif defined PA_Kernels_AbsFFT_Arch_x86_SSE41
-using Intrinsics = Intrinsics_x86_SSE41;
+using Context = Context_x86_SSE41;
 #elif defined PA_Kernels_AbsFFT_Arch_Default
-using Intrinsics = Intrinsics_Default;
+using Context = Context_Default;
 #endif
 
-using vtype = Intrinsics::vtype;
+using vtype = Context::vtype;
 
-const size_t VECTOR_K = Intrinsics::VECTOR_K;
+const size_t VECTOR_K = Context::VECTOR_K;
 const size_t VECTOR_LENGTH = (size_t)1 << VECTOR_K;
 
 const float TW8_1 = 0.70710678118654752440f;
@@ -89,8 +89,9 @@ struct scomplex{
 };
 #endif
 
+
 struct vcomplex{
-    using vtype = Intrinsics::vtype;
+    using vtype = Context::vtype;
 
     vtype r;
     vtype i;

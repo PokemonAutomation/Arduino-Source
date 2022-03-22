@@ -13,7 +13,7 @@
 namespace PokemonAutomation{
 namespace Kernels{
 namespace AbsFFT{
-struct Intrinsics_x86_SSE41{
+struct Context_x86_SSE41{
 
 
 using vtype = __m128;

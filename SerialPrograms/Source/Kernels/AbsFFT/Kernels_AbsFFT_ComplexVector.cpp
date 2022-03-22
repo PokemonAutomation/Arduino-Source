@@ -38,19 +38,19 @@ namespace AbsFFT{
 
 
 void fft_complex_tk(const TwiddleTable& table, int k, vtype* T){
-    if (k == Intrinsics::BASE_COMPLEX_TRANSFORM_K){
+    if (k == Context::BASE_COMPLEX_TRANSFORM_K){
         base_transform(table, T);
         return;
     }
-    if (k == Intrinsics::BASE_COMPLEX_TRANSFORM_K + 1){
-        Butterflies<Intrinsics>::reduce2(table, k, T);
+    if (k == Context::BASE_COMPLEX_TRANSFORM_K + 1){
+        Butterflies<Context>::reduce2(table, k, T);
         size_t stride = 2 << (k - 1 - VECTOR_K);
         base_transform(table, T + 0*stride);
         base_transform(table, T + 1*stride);
         return;
     }
 
-    Butterflies<Intrinsics>::reduce4(table, k, T);
+    Butterflies<Context>::reduce4(table, k, T);
     k -= 2;
     size_t stride = 2 << (k - VECTOR_K);
     fft_complex_tk(table, k, T + 0*stride);
