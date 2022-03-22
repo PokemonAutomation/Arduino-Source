@@ -82,7 +82,7 @@ std::unique_ptr<StatsTracker> CrobatFinder::make_stats() const{
 }
 
 
-bool CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env){
+void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env){
     // NOTE: there's no "stunned by alpha" detection in case any of the close ones are alphas!
     Stats& stats = env.stats<Stats>();
 
@@ -154,8 +154,6 @@ bool CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env){
 
     pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
     reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
-
-    return false;
 }
 
 
@@ -174,9 +172,7 @@ void CrobatFinder::program(SingleSwitchProgramEnvironment& env){
             stats.to_str()
         );
         try{
-            if (run_iteration(env)){
-                break;
-            }
+            run_iteration(env);
         }catch (OperationFailedException&){
             stats.errors++;
             pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);

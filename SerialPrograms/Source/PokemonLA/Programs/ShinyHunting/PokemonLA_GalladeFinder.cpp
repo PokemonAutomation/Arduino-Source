@@ -79,7 +79,7 @@ std::unique_ptr<StatsTracker> GalladeFinder::make_stats() const{
 }
 
 
-bool GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env){
+void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env){
     // NOTE: there's no "stunned by alpha" detection in case the first spawn is an alpha!
     // NOTE: there is also no mitigation for if you get attacked by a Kirlia if it hates you
     Stats& stats = env.stats<Stats>();
@@ -130,7 +130,8 @@ bool GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env){
                 pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, (uint16_t)(3.5 * TICKS_PER_SECOND)); // forward while sprinting until stairs, mash y a few times down the stairs
                 // we should easily be in range of gallade at this point, so if there's no shiny we're done
             },
-            { &shiny_detector });
+            { &shiny_detector }
+        );
         if (shiny_detector.detected()){
            stats.shinies++;
            on_shiny_sound(env, env.console, SHINY_DETECTED, shiny_detector.results());
@@ -142,8 +143,6 @@ bool GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env){
 
     pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
     reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
-
-    return false;
 }
 
 
@@ -162,9 +161,7 @@ void GalladeFinder::program(SingleSwitchProgramEnvironment& env){
             stats.to_str()
         );
         try{
-            if (run_iteration(env)){
-                break;
-            }
+            run_iteration(env);
         }catch (OperationFailedException&){
             stats.errors++;
             pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);

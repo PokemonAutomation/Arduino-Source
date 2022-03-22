@@ -30,7 +30,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env) override;
 
 private:
-    bool run_iteration(SingleSwitchProgramEnvironment& env);
+    void run_iteration(SingleSwitchProgramEnvironment& env);
 
 private:
     class Stats;

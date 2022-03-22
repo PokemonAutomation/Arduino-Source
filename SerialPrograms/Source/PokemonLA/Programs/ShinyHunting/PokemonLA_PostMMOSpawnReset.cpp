@@ -94,7 +94,7 @@ std::unique_ptr<StatsTracker> PostMMOSpawnReset::make_stats() const{
 }
 
 
-bool PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env){
+void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env){
     Stats& stats = env.stats<Stats>();
 
     // From game to Switch Home
@@ -131,8 +131,6 @@ bool PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env){
 
     stats.attempts++;
     env.console.log("No shiny detected, restarting the game!");
-
-    return false;
 }
 
 
@@ -151,9 +149,7 @@ void PostMMOSpawnReset::program(SingleSwitchProgramEnvironment& env){
             stats.to_str()
         );
         try{
-            if (run_iteration(env)){
-                break;
-            }
+            run_iteration(env);
         }catch (OperationFailedException&){
             stats.errors++;
             // run_iteration() restarts the game first then listens to shiny sound.

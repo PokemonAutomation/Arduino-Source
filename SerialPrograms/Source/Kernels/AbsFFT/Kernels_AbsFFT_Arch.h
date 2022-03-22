@@ -68,6 +68,7 @@ PA_FORCE_INLINE void cmul_pp(
     Oi = Xr*Wi + Xi*Wr;
 }
 
+#if 0
 struct scomplex{
     float r;
     float i;
@@ -86,6 +87,7 @@ struct scomplex{
         return scomplex{-i, r};
     }
 };
+#endif
 
 struct vcomplex{
     using vtype = Intrinsics::vtype;

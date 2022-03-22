@@ -108,7 +108,7 @@ void enter_ruins(const BotBaseContext& context){
 }
 
 
-bool UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env){
+void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env){
     Stats& stats = env.stats<Stats>();
 
     stats.attempts++;
@@ -160,8 +160,6 @@ bool UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env){
     pbf_press_dpad(env.console, DPAD_RIGHT, 10, 10);
     goto_professor(env.console, Camp::MIRELANDS_MIRELANDS);
     from_professor_return_to_jubilife(env, env.console);
-
-    return false;
 }
 
 
@@ -180,9 +178,7 @@ void UnownFinder::program(SingleSwitchProgramEnvironment& env){
             stats.to_str()
         );
         try{
-            if (run_iteration(env)){
-                break;
-            }
+            run_iteration(env);
         }catch (OperationFailedException&){
             stats.errors++;
             pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);

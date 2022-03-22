@@ -211,26 +211,6 @@ void print(const uint64_t* ptr, size_t len){
     }
     cout << "}" << endl;
 }
-void print(const scomplex* ptr, size_t len){
-    cout << "{";
-    bool first = true;
-    for (size_t c = 0; c < len; c++){
-        if (!first){
-            cout << ", ";
-        }
-        first = false;
-        if (ptr[c].r == 0){
-            cout << ptr[c].i << " i";
-        }else if (ptr[c].i == 0){
-            cout << ptr[c].r;
-        }else if (ptr[c].i > 0){
-            cout << ptr[c].r << " + " << ptr[c].i << " i";
-        }else{
-            cout << ptr[c].r << " - " << -ptr[c].i << " i";
-        }
-    }
-    cout << "}" << endl;
-}
 
 
 
