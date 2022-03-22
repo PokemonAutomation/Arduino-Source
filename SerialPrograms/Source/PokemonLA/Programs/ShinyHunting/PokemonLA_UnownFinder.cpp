@@ -46,7 +46,7 @@ UnownFinder_Descriptor::UnownFinder_Descriptor()
 UnownFinder::UnownFinder(const UnownFinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , SHINY_DETECTED("0 * TICKS_PER_SECOND")
-    , SKIP_PATH_SHINY("<b>Skip any shinies in the path", false)
+    , SKIP_PATH_SHINY("<b>Skip any Shines on the Path:</b><br>Only care about shines inside the ruins.", false)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
