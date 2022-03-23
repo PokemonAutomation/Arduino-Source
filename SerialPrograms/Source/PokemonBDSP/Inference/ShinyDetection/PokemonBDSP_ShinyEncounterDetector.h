@@ -66,8 +66,6 @@ public:
 
 
 private:
-    BattleType m_battle_type;
-
     LoggerQt& m_logger;
 //    VideoOverlay& m_overlay;
 

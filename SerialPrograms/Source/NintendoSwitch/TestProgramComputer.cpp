@@ -38,6 +38,7 @@
 #include "CommonFramework/AudioPipeline/TimeSampleBufferReader.h"
 #include "CommonFramework/AudioPipeline/AudioNormalization.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 
 
 #include <iostream>
@@ -82,9 +83,6 @@ void print(const float* ptr, size_t len){
 std::chrono::system_clock::time_point REFERENCE = std::chrono::system_clock::now();
 
 
-using Type = float;
-
-
 
 
 
@@ -99,14 +97,25 @@ using Type = float;
 
 void TestProgramComputer::program(ProgramEnvironment& env){
     using namespace Kernels;
-    using namespace NintendoSwitch::PokemonSwSh;
+    using namespace NintendoSwitch::PokemonLA;
     using namespace Pokemon;
 
 
+    QImage image("DetectionImages/20220322-210628266511-MountDetection.png");
+
+
+    MountDetector detector(MountDetectorLogging::LOG_ONLY);
+
+    detector.detect(image);
+
+
+
+#if 0
     cout << CPU_CAPABILITY_CURRENT.OK_08_Nehalem << endl;
     cout << CPU_CAPABILITY_CURRENT.OK_13_Haswell << endl;
     cout << CPU_CAPABILITY_CURRENT.OK_17_Skylake << endl;
     cout << CPU_CAPABILITY_CURRENT.OK_19_IceLake << endl;
+#endif
 
 
 //    using WallClock = std::chrono::system_clock::time_point;

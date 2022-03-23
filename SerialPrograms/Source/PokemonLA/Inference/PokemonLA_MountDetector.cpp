@@ -401,38 +401,38 @@ std::vector<MountDetectorFilteredImage> run_filters(const QImage& image, const s
     for (; c + 3 < range.size(); c += 4){
         filter4_rgb32_range(
             image,
-            ret[0].image, range[0].first, range[0].second, COLOR_BLACK, false,
-            ret[1].image, range[1].first, range[1].second, COLOR_BLACK, false,
-            ret[2].image, range[2].first, range[2].second, COLOR_BLACK, false,
-            ret[3].image, range[3].first, range[3].second, COLOR_BLACK, false
+            ret[c + 0].image, range[c + 0].first, range[c + 0].second, COLOR_BLACK, false,
+            ret[c + 1].image, range[c + 1].first, range[c + 1].second, COLOR_BLACK, false,
+            ret[c + 2].image, range[c + 2].first, range[c + 2].second, COLOR_BLACK, false,
+            ret[c + 3].image, range[c + 3].first, range[c + 3].second, COLOR_BLACK, false
         );
         compress4_rgb32_to_binary_range(
             image,
-            ret[0].matrix, range[0].first, range[0].second,
-            ret[1].matrix, range[1].first, range[1].second,
-            ret[2].matrix, range[2].first, range[2].second,
-            ret[3].matrix, range[3].first, range[3].second
+            ret[c + 0].matrix, range[c + 0].first, range[c + 0].second,
+            ret[c + 1].matrix, range[c + 1].first, range[c + 1].second,
+            ret[c + 2].matrix, range[c + 2].first, range[c + 2].second,
+            ret[c + 3].matrix, range[c + 3].first, range[c + 3].second
         );
     }
     for (; c + 1 < range.size(); c += 2){
         filter2_rgb32_range(
             image,
-            ret[0].image, range[0].first, range[0].second, COLOR_BLACK, false,
-            ret[1].image, range[1].first, range[1].second, COLOR_BLACK, false
+            ret[c + 0].image, range[c + 0].first, range[c + 0].second, COLOR_BLACK, false,
+            ret[c + 1].image, range[c + 1].first, range[c + 1].second, COLOR_BLACK, false
         );
         compress2_rgb32_to_binary_range(
             image,
-            ret[0].matrix, range[0].first, range[0].second,
-            ret[1].matrix, range[1].first, range[1].second
+            ret[c + 0].matrix, range[c + 0].first, range[c + 0].second,
+            ret[c + 1].matrix, range[c + 1].first, range[c + 1].second
         );
     }
     if (c < range.size()){
         filter1_rgb32_range(
             image,
-            ret[0].image, range[0].first, range[0].second, COLOR_BLACK, false
+            ret[c].image, range[c].first, range[c].second, COLOR_BLACK, false
         );
-        ret[0].matrix = compress_rgb32_to_binary_range(
-            image, range[0].first, range[0].second
+        ret[c].matrix = compress_rgb32_to_binary_range(
+            image, range[c].first, range[c].second
         );
     }
     return ret;
@@ -453,14 +453,14 @@ MountState MountDetector::detect(const QImage& screen) const{
         std::vector<MountDetectorFilteredImage> filtered_images = run_filters(
             image,
             {
-                {0xff808080, 0xffffffff},
-                {0xff909090, 0xffffffff},
-                {0xffa0a0a0, 0xffffffff},
-                {0xffb0b0b0, 0xffffffff},
-                {0xffc0c0c0, 0xffffffff},
-                {0xffd0d0d0, 0xffffffff},
-                {0xffe0e0e0, 0xffffffff},
-                {0xfff0f0f0, 0xffffffff},
+                {0xff808060, 0xffffffff},
+                {0xff909070, 0xffffffff},
+                {0xffa0a080, 0xffffffff},
+                {0xffb0b090, 0xffffffff},
+                {0xffc0c0a0, 0xffffffff},
+                {0xffd0d0b0, 0xffffffff},
+                {0xffe0e0c0, 0xffffffff},
+                {0xfff0f0d0, 0xffffffff},
             }
         );
 //        static int c = 0;

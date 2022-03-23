@@ -279,6 +279,31 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
 
 
 
+
+LeadingShinyTracker::LeadingShinyTracker(Logger& logger)
+    : m_logger(logger)
+    , m_consecutive_shinies(0)
+{}
+
+void LeadingShinyTracker::report_result(ShinyType type){
+    if (is_confirmed_shiny(type)){
+        m_consecutive_shinies++;
+//        cout << "own shiny = " << m_consecutive_shinies << endl;
+        if (m_consecutive_shinies >= 3){
+            throw UserSetupError(m_logger, "Don't use a shiny as your lead. It causes false positive detections.");
+        }
+    }else{
+        m_consecutive_shinies = 0;
+    }
+}
+
+
+
+
+
+
+
+
 }
 }
 }
