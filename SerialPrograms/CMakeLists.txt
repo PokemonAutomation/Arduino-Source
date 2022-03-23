@@ -329,6 +329,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/BooleanCheckBoxOption.h
     Source/CommonFramework/Options/ConfigOption.cpp
     Source/CommonFramework/Options/ConfigOption.h
+    Source/CommonFramework/Options/EditableTableOption-EnumTableCell.h
     Source/CommonFramework/Options/EditableTableOption.cpp
     Source/CommonFramework/Options/EditableTableOption.h
     Source/CommonFramework/Options/EnumDropdownOption.cpp
@@ -878,6 +879,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/Farming/PokemonLA_NuggetFarmerHighlands.h
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.cpp
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.h
+    Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.cpp
+    Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_GalladeFinder.cpp
@@ -886,6 +889,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_UnownFinder.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.h
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.cpp
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.cpp
@@ -902,10 +907,14 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_ShinySoundListener.h
     Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.cpp
     Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h
+    Source/PokemonLA/Options/PokemonLA_CustomPathTable.cpp
+    Source/PokemonLA/Options/PokemonLA_CustomPathTable.h
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.cpp
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.h
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.cpp
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.h
+    Source/PokemonLA/Options/PokemonLA_TravelLocation.cpp
+    Source/PokemonLA/Options/PokemonLA_TravelLocation.h
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.cpp
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.h
     Source/PokemonLA/Resources/PokemonLA_PokemonIcons.cpp

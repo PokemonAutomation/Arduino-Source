@@ -34,7 +34,6 @@ private:
 
 private:
     class Stats;
-    class RunRoute;
 
     ShinyDetectedActionOption SHINY_DETECTED;
 
