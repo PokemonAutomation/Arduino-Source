@@ -117,9 +117,6 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env){
                 pbf_wait(context, (uint16_t)(1.1 * TICKS_PER_SECOND));
                 pbf_press_button(context, BUTTON_PLUS, 10,10);
                 pbf_press_button(context, BUTTON_B, (uint16_t)(3.2 * TICKS_PER_SECOND), 10); //Braviary Second Push
-                pbf_press_dpad(context, DPAD_LEFT, 20, 20);
-                pbf_press_button(context, BUTTON_B, (uint16_t)(2 * TICKS_PER_SECOND), 10); //Weyrdeer Path until Misdreavus
-                //pbf_press_button(context, BUTTON_PLUS, 10,10);
             },
             { &shiny_detector_route }
         );
@@ -133,8 +130,8 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env){
         ShinySoundDetector shiny_detector_ruins(env.console, SHINY_DETECTED.stop_on_shiny());
         run_until(env, env.console,
             [](const BotBaseContext& context){
-                pbf_wait(context, (uint16_t)(0.3 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_B, (uint16_t)(1.6 * TICKS_PER_SECOND), 10); //Weyrdeer Path
+                pbf_press_dpad(context, DPAD_LEFT, 20, 20);
+                pbf_press_button(context, BUTTON_B, (uint16_t)(3.7 * TICKS_PER_SECOND), 10);
                 pbf_wait(context, (uint16_t)(0.3 * TICKS_PER_SECOND));
             },
             { &shiny_detector_ruins }
