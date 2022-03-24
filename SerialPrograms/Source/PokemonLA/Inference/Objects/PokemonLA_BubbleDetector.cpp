@@ -55,7 +55,7 @@ public:
 BubbleDetector::BubbleDetector()
     : WhiteObjectDetector(COLOR_GREEN, {Color(0xffb0b0b0)})
 {}
-void BubbleDetector::process_object(const QImage& image, const WaterfillObject& object){
+void BubbleDetector::process_object(const ConstImageRef& image, const WaterfillObject& object){
     if (object.area < 200){
         return;
     }

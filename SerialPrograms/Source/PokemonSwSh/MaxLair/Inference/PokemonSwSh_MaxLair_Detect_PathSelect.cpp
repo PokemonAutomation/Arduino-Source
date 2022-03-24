@@ -45,36 +45,36 @@ void PathScreenDetector::make_overlays(VideoOverlaySet& items) const{
 }
 
 bool PathScreenDetector::detect(const QImage& screen) const{
-    ImageStats box0 = image_stats(extract_box(screen, m_box0));
+    ImageStats box0 = image_stats(extract_box_shallow(screen, m_box0));
     if (!is_white(box0, 500, 40)){
 //        global_logger().log("box0 out");
         return false;
     }
-    ImageStats box1 = image_stats(extract_box(screen, m_box1));
+    ImageStats box1 = image_stats(extract_box_shallow(screen, m_box1));
     if (!is_white(box1, 500, 40)){
 //        global_logger().log("box1 out");
 //        cout << "box1 = " << box1.average << box1.stddev << endl;
         return false;
     }
-    ImageStats box2 = image_stats(extract_box(screen, m_box2));
+    ImageStats box2 = image_stats(extract_box_shallow(screen, m_box2));
     if (!is_white(box2, 500, 40)){
 //        global_logger().log("box2 out");
 //        cout << "box2 = " << box2.average << box2.stddev << endl;
         return false;
     }
-    ImageStats box3 = image_stats(extract_box(screen, m_box3));
+    ImageStats box3 = image_stats(extract_box_shallow(screen, m_box3));
     if (!is_white(box3, 500, 40)){
 //        global_logger().log("box3 out");
 //        cout << "box3 = " << box3.average << box3.stddev << endl;
         return false;
     }
 
-    ImageStats bottom_main = image_stats(extract_box(screen, m_bottom_main));
+    ImageStats bottom_main = image_stats(extract_box_shallow(screen, m_bottom_main));
     if (!is_black(bottom_main)){
 //        global_logger().log("m_bottom_main out");
         return false;
     }
-    ImageStats main = image_stats(extract_box(screen, m_main));
+    ImageStats main = image_stats(extract_box_shallow(screen, m_main));
 //    cout << main.average << main.stddev << endl;
     if (main.stddev.sum() < 50){
 //        global_logger().log("m_main out");
@@ -114,27 +114,27 @@ bool PathSelectDetector::detect(const QImage& screen) const{
         return false;
     }
 
-    ImageStats bottom_right = image_stats(extract_box(screen, m_bottom_right));
+    ImageStats bottom_right = image_stats(extract_box_shallow(screen, m_bottom_right));
     if (bottom_right.stddev.sum() < 30){
 //        cout << "m_bottom_right = " << bottom_right.average << bottom_right.stddev << endl;
 //        global_logger().log("m_bottom_right out");
         return false;
     }
-    ImageStats dialog_left = image_stats(extract_box(screen, m_dialog_left));
+    ImageStats dialog_left = image_stats(extract_box_shallow(screen, m_dialog_left));
     if (!is_grey(dialog_left, 0, 200)){
 //        global_logger().log("m_dialog_left out");
         return false;
     }
-    ImageStats dialog_middle = image_stats(extract_box(screen, m_dialog_middle));
+    ImageStats dialog_middle = image_stats(extract_box_shallow(screen, m_dialog_middle));
     if (!is_grey(dialog_middle, 0, 200)){
 //        global_logger().log("m_dialog_middle out");
         return false;
     }
-//    ImageStats dialog_right = image_stats(extract_box(screen, m_dialog_right));
+//    ImageStats dialog_right = image_stats(extract_box_shallow(screen, m_dialog_right));
 //    if (!is_grey(dialog_right, 0, 200)){
 //        return false;
 //    }
-    ImageStats left = image_stats(extract_box(screen, m_left));
+    ImageStats left = image_stats(extract_box_shallow(screen, m_left));
 //    cout << left.average << left.stddev << endl;
     if (left.stddev.sum() < 100){
 //        global_logger().log("m_left out");

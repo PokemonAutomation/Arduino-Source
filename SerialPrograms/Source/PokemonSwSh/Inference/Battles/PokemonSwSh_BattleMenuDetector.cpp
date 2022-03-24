@@ -59,14 +59,14 @@ void StandardBattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
 }
 bool StandardBattleMenuDetector::detect(const QImage& screen) const{
     if (!m_den){
-        if (!is_white(extract_box(screen, m_ball_left))){
+        if (!is_white(extract_box_shallow(screen, m_ball_left))){
             return false;
         }
-        if (!is_white(extract_box(screen, m_ball_right))){
+        if (!is_white(extract_box_shallow(screen, m_ball_right))){
             return false;
         }
     }else{
-        ImageStats health = image_stats(extract_box(screen, m_status1));
+        ImageStats health = image_stats(extract_box_shallow(screen, m_status1));
         if (!is_white(health)){
 //            cout << "Failed: m_status1" << endl;
             return false;

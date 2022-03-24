@@ -28,21 +28,21 @@ OutbreakReader::OutbreakReader(LoggerQt& logger, Language language, VideoOverlay
 
 OCR::StringMatchResult OutbreakReader::read(const QImage& screen) const{
     OCR::StringMatchResult result;
-    ImageStats box0 = image_stats(extract_box(screen, m_dialog_box0));
-    ImageStats box1 = image_stats(extract_box(screen, m_dialog_box1));
+    ImageStats box0 = image_stats(extract_box_shallow(screen, m_dialog_box0));
+    ImageStats box1 = image_stats(extract_box_shallow(screen, m_dialog_box1));
     double distance = euclidean_distance(box0.average, box1.average);
     if (distance < 20){
         m_logger.log("No outbreak found.", COLOR_ORANGE);
         return result;
     }
 
-    QImage image = extract_box(screen, m_text_box);
-    QImage filtered = image;
+    ConstImageRef image = extract_box_shallow(screen, m_text_box);
+    QImage filtered = image.to_qimage();
 
 #if 1
     //  TODO: Clean this shit up.
     Kernels::filter_rgb32_range(
-        (const uint32_t*)image.constBits(), image.bytesPerLine(), image.width(), image.height(),
+        image.data(), image.bytes_per_row(), image.width(), image.height(),
         (uint32_t*)filtered.bits(), filtered.bytesPerLine(), 0xff808080, 0xffffffff, 0xffffffff, false
     );
     Kernels::filter_rgb32_range(

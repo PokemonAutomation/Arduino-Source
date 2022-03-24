@@ -32,7 +32,7 @@ class ArcPhoneTracker : public WhiteObjectDetector{
 public:
     ArcPhoneTracker();
 
-    virtual void process_object(const QImage& image, const WaterfillObject& object) override;
+    virtual void process_object(const ConstImageRef& image, const WaterfillObject& object) override;
     virtual void finish() override;
 };
 

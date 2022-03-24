@@ -487,7 +487,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 //    InferenceBoxScope box(console, {0.450, 0.005, 0.040, 0.010});
-//    ImageStats stats = image_stats(extract_box(console.video().snapshot(), box));
+//    ImageStats stats = image_stats(extract_box_shallow(console.video().snapshot(), box));
 //    cout << stats.average << stats.stddev << endl;
 
 
@@ -585,7 +585,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 //    InferenceBoxScope box(overlay, 0.49, 0.07, 0.02, 0.03);
-//    ImageStats stats = image_stats(extract_box(feed.snapshot(), box));
+//    ImageStats stats = image_stats(extract_box_shallow(feed.snapshot(), box));
 //    cout << stats.average << stats.stddev << endl;
 
 

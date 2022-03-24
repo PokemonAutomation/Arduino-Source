@@ -21,7 +21,7 @@ using namespace Kernels::Waterfill;
 
 void find_overworld_white_objects(
     const std::vector<std::pair<WhiteObjectDetector&, bool>>& detectors,
-    const QImage& image
+    const ConstImageRef& image
 ){
     std::set<Color> threshold_set;
     for (const auto& item : detectors){
@@ -136,7 +136,7 @@ bool WhiteObjectWatcher::process_frame(
         detector.first.clear();
     }
 
-    find_overworld_white_objects(m_detectors, extract_box(frame, m_box));
+    find_overworld_white_objects(m_detectors, extract_box_shallow(frame, m_box));
     m_overlays.clear();
 
     for (auto& detector : m_detectors){

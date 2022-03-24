@@ -41,7 +41,7 @@ DialogueEllipseTracker::DialogueEllipseTracker()
     )
 {}
 
-void DialogueEllipseTracker::process_object(const QImage& image, const WaterfillObject& object){
+void DialogueEllipseTracker::process_object(const ConstImageRef& image, const WaterfillObject& object){
 //    cout << "asdf" << endl;
 //    static int c = 0;
 //    cout << "c = " << c << endl;

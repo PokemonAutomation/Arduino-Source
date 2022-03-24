@@ -33,11 +33,11 @@ bool ReceivePokemonDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
-    const ImageStats stats0 = image_stats(extract_box(frame, m_box0));
+    const ImageStats stats0 = image_stats(extract_box_shallow(frame, m_box0));
     if (stats0.average.sum() < 100 || !is_solid(stats0, {0.22951, 0.340853, 0.429638}, 0.15, 20)){
         return m_received;
     }
-    const ImageStats stats1 = image_stats(extract_box(frame, m_box1));
+    const ImageStats stats1 = image_stats(extract_box_shallow(frame, m_box1));
     if (stats1.average.sum() < 100 || !is_solid(stats1, {0.22951, 0.340853, 0.429638}, 0.15, 20)){
         return m_received;
     }

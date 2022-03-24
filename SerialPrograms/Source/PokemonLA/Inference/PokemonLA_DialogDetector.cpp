@@ -45,7 +45,7 @@ bool DialogSurpriseDetector::process_frame(
 ){
     size_t hits = 0;
 
-    ImageStats title_top = image_stats(extract_box(frame, m_title_top));
+    ImageStats title_top = image_stats(extract_box_shallow(frame, m_title_top));
 //    cout << title_top.average << title_top.stddev << endl;
 //    hits += is_solid(title_top, {0.218332, 0.330301, 0.451367}, 0.2, 15) ? 1 : 0;
     if (is_LA_dark_blue(title_top)){
@@ -53,7 +53,7 @@ bool DialogSurpriseDetector::process_frame(
     }
 //    cout << "hits = " << hits << endl;
 
-    ImageStats title_bottom = image_stats(extract_box(frame, m_title_bottom));
+    ImageStats title_bottom = image_stats(extract_box_shallow(frame, m_title_bottom));
 //    cout << title_bottom.average << title_bottom.stddev << endl;
 //    hits += is_solid(title_bottom, {0.226944, 0.323437, 0.449619}, 0.2, 15) ? 1 : 0;
     if (is_LA_dark_blue(title_bottom)){
@@ -61,17 +61,17 @@ bool DialogSurpriseDetector::process_frame(
     }
 //    cout << "hits = " << hits << endl;
 
-    ImageStats top_white = image_stats(extract_box(frame, m_top_white));
+    ImageStats top_white = image_stats(extract_box_shallow(frame, m_top_white));
 //    cout << top_white.average << top_white.stddev << endl;
     hits += is_white(top_white, 480, 20) ? 1 : 0;
 //    cout << "hits = " << hits << endl;
 
-    ImageStats bottom_white = image_stats(extract_box(frame, m_bottom_white));
+    ImageStats bottom_white = image_stats(extract_box_shallow(frame, m_bottom_white));
 //    cout << bottom_white.average << bottom_white.stddev << endl;
     hits += is_white(bottom_white, 480, 20) ? 1 : 0;
 //    cout << "hits = " << hits << endl;
 
-    ImageStats cursor = image_stats(extract_box(frame, m_cursor));
+    ImageStats cursor = image_stats(extract_box_shallow(frame, m_cursor));
 //    cout << cursor.average << cursor.stddev << endl;
     hits += cursor.stddev.sum() > 50 ? 1 : 0;
 //    cout << "hits = " << hits << endl;
@@ -120,28 +120,28 @@ bool NormalDialogDetector::process_frame(
 ){
     size_t hits = 0;
 
-    ImageStats title_top = image_stats(extract_box(frame, m_title_top));
+    ImageStats title_top = image_stats(extract_box_shallow(frame, m_title_top));
     if (is_LA_dark_blue(title_top)){
         hits++;
     }
 //    cout << "hits = " << hits << endl;
 
-    ImageStats title_bottom = image_stats(extract_box(frame, m_title_bottom));
+    ImageStats title_bottom = image_stats(extract_box_shallow(frame, m_title_bottom));
     if (is_LA_dark_blue(title_bottom)){
         hits++;
     }
 //    cout << "hits = " << hits << endl;
 
-    ImageStats top_white = image_stats(extract_box(frame, m_top_white));
+    ImageStats top_white = image_stats(extract_box_shallow(frame, m_top_white));
     hits += is_white(top_white, 480, 20) ? 1 : 0;
 
-    ImageStats bottom_white = image_stats(extract_box(frame, m_bottom_white));
+    ImageStats bottom_white = image_stats(extract_box_shallow(frame, m_bottom_white));
     hits += is_white(bottom_white, 480, 20) ? 1 : 0;
 
-    ImageStats left_white = image_stats(extract_box(frame, m_left_white));
+    ImageStats left_white = image_stats(extract_box_shallow(frame, m_left_white));
     hits += is_white(left_white, 480, 20) ? 1 : 0;
 
-    ImageStats right_white = image_stats(extract_box(frame, m_right_white));
+    ImageStats right_white = image_stats(extract_box_shallow(frame, m_right_white));
     hits += is_white(right_white, 480, 20) ? 1 : 0;
 
     // m_arc_phone.process_frame(frame, timestamp);

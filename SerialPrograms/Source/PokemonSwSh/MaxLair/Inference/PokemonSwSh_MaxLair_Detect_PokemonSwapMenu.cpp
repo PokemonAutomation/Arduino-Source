@@ -59,16 +59,16 @@ bool PokemonSwapMenuDetector::process_frame(
         : detect(frame);
 }
 bool PokemonSwapMenuDetector::detect(const QImage& screen) const{
-    ImageStats pink0 = image_stats(extract_box(screen, m_pink0));
+    ImageStats pink0 = image_stats(extract_box_shallow(screen, m_pink0));
     if (!is_solid(pink0, {0.448591, 0.176516, 0.374892}, 0.1, 20)) return false;
-    ImageStats pink1 = image_stats(extract_box(screen, m_pink1));
+    ImageStats pink1 = image_stats(extract_box_shallow(screen, m_pink1));
     if (!is_solid(pink1, {0.448591, 0.176516, 0.374892}, 0.1, 20)) return false;
-    ImageStats pink2 = image_stats(extract_box(screen, m_pink2));
+    ImageStats pink2 = image_stats(extract_box_shallow(screen, m_pink2));
     if (!is_solid(pink2, {0.464402, 0.156018, 0.379581}, 0.1, 20)) return false;
-    ImageStats white0 = image_stats(extract_box(screen, m_white0));
+    ImageStats white0 = image_stats(extract_box_shallow(screen, m_white0));
 //    cout << white0.average << ", " << white0.stddev << endl;
     if (!is_solid(white0, {0.318115, 0.33587, 0.346015})) return false;
-    ImageStats white1 = image_stats(extract_box(screen, m_white1));
+    ImageStats white1 = image_stats(extract_box_shallow(screen, m_white1));
 //    cout << white.average << ", " << white.stddev << endl;
     if (!is_solid(white1, {0.310994, 0.344503, 0.344503})) return false;
 //    ImageStats bottom = pixel_stats(extract_box(screen, m_bottom));
@@ -78,12 +78,12 @@ bool PokemonSwapMenuDetector::detect(const QImage& screen) const{
 //    ImageStats box1 = pixel_stats(extract_box(screen, m_box1));
 //    if (!is_white(box1)) return false;
 
-    ImageStats bottom_main = image_stats(extract_box(screen, m_bottom_main));
+    ImageStats bottom_main = image_stats(extract_box_shallow(screen, m_bottom_main));
 //    cout << bottom_main.average << ", " << bottom_main.stddev << endl;
     if (!is_black(bottom_main)){
         return false;
     }
-    ImageStats bottom_right = image_stats(extract_box(screen, m_bottom_right));
+    ImageStats bottom_right = image_stats(extract_box_shallow(screen, m_bottom_right));
 //    cout << bottom_right.average << ", " << bottom_right.stddev << endl;
     if (bottom_right.stddev.sum() < 30){
         return false;

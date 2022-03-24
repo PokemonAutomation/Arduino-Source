@@ -110,14 +110,14 @@ ButtonTracker::ButtonTracker(ButtonType type)
     , m_matcher(getButtonMatcher(type))
 {}
 
-void ButtonTracker::process_object(const QImage& image, const WaterfillObject& object){
+void ButtonTracker::process_object(const ConstImageRef& image, const WaterfillObject& object){
 //    cout << "asdf" << endl;
 //    static int c = 0;
 //    extract_box(image, object).save("test-" + QString::number(c++) + ".png");
 //    image.save("test-" + QString::number(c++) + "-A.png");
 //    extract_box(image, object).save("test-" + QString::number(c++) + "-B.png");
 
-    double rmsd = m_matcher.rmsd(extract_box(image, object));
+    double rmsd = m_matcher.rmsd(extract_box_shallow(image, object));
 //    cout << "rmsd = " << rmsd << endl;
     if (rmsd < m_matcher.m_max_rmsd){
 //        cout << "rmsd = " << rmsd << endl;

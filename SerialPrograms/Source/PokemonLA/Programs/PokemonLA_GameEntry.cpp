@@ -98,7 +98,7 @@ void save_game_from_overworld(ProgramEnvironment& env, ConsoleHandle& console){
     for (size_t c = 0; c < 10; c++){
         console.botbase().wait_for_all_requests();
 
-        ImageStats stats = image_stats(extract_box(console.video().snapshot(), box));
+        ImageStats stats = image_stats(extract_box_shallow(console.video().snapshot(), box));
 //        is_solid(stats, {0.208333, 0.338542, 0.453125}, 0.15, 15)
         if (stats.stddev.sum() < 15 &&
             stats.average.b > stats.average.r && stats.average.b > stats.average.g

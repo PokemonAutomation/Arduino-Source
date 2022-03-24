@@ -70,8 +70,8 @@ public:
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
     ) override{
-        ImageStats stats0 = image_stats(extract_box(frame, m_box0));
-        ImageStats stats1 = image_stats(extract_box(frame, m_box1));
+        ImageStats stats0 = image_stats(extract_box_shallow(frame, m_box0));
+        ImageStats stats1 = image_stats(extract_box_shallow(frame, m_box1));
         if (!is_solid(stats0, {0.22951, 0.340853, 0.429638}, 0.15, 20)){
             return false;
         }

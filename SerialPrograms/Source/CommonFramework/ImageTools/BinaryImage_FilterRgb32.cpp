@@ -14,7 +14,7 @@ namespace PokemonAutomation{
 
 
 PackedBinaryMatrix2 compress_rgb32_to_binary_min(
-    const QImage& image,
+    const ConstImageRef& image,
     uint8_t min_red,
     uint8_t min_green,
     uint8_t min_blue
@@ -28,7 +28,7 @@ PackedBinaryMatrix2 compress_rgb32_to_binary_min(
     );
 }
 PackedBinaryMatrix2 compress_rgb32_to_binary_max(
-    const QImage& image,
+    const ConstImageRef& image,
     uint8_t max_red,
     uint8_t max_green,
     uint8_t max_blue
@@ -42,7 +42,7 @@ PackedBinaryMatrix2 compress_rgb32_to_binary_max(
     );
 }
 PackedBinaryMatrix2 compress_rgb32_to_binary_range(
-    const QImage& image,
+    const ConstImageRef& image,
     uint8_t min_red, uint8_t max_red,
     uint8_t min_green, uint8_t max_green,
     uint8_t min_blue, uint8_t max_blue
@@ -56,7 +56,7 @@ PackedBinaryMatrix2 compress_rgb32_to_binary_range(
     );
 }
 PackedBinaryMatrix2 compress_rgb32_to_binary_range(
-    const QImage& image,
+    const ConstImageRef& image,
     uint8_t min_alpha, uint8_t max_alpha,
     uint8_t min_red, uint8_t max_red,
     uint8_t min_green, uint8_t max_green,
@@ -64,39 +64,39 @@ PackedBinaryMatrix2 compress_rgb32_to_binary_range(
 ){
     PackedBinaryMatrix2 ret(image.width(), image.height());
     Kernels::compress_rgb32_to_binary_range(
-        (const uint32_t*)image.bits(), image.bytesPerLine(), ret,
+        image.data(), image.bytes_per_row(), ret,
         ((uint32_t)min_alpha << 24) | ((uint32_t)min_red << 16) | ((uint32_t)min_green << 8) | (uint32_t)min_blue,
         ((uint32_t)max_alpha << 24) | ((uint32_t)max_red << 16) | ((uint32_t)max_green << 8) | (uint32_t)max_blue
     );
     return ret;
 }
 PackedBinaryMatrix2 compress_rgb32_to_binary_range(
-    const QImage& image,
+    const ConstImageRef& image,
     uint32_t mins, uint32_t maxs
 ){
     PackedBinaryMatrix2 ret(image.width(), image.height());
     Kernels::compress_rgb32_to_binary_range(
-        (const uint32_t*)image.bits(), image.bytesPerLine(),
+        image.data(), image.bytes_per_row(),
         ret, mins, maxs
     );
     return ret;
 }
 
 void compress2_rgb32_to_binary_range(
-    const QImage& image,
+    const ConstImageRef& image,
     PackedBinaryMatrix2& matrix0, uint32_t mins0, uint32_t maxs0,
     PackedBinaryMatrix2& matrix1, uint32_t mins1, uint32_t maxs1
 ){
     matrix0 = PackedBinaryMatrix2(image.width(), image.height());
     matrix1 = PackedBinaryMatrix2(image.width(), image.height());
     Kernels::compress2_rgb32_to_binary_range(
-        (const uint32_t*)image.bits(), image.bytesPerLine(),
+        image.data(), image.bytes_per_row(),
         matrix0, mins0, maxs0,
         matrix1, mins1, maxs1
     );
 }
 void compress4_rgb32_to_binary_range(
-    const QImage& image,
+    const ConstImageRef& image,
     PackedBinaryMatrix2& matrix0, uint32_t mins0, uint32_t maxs0,
     PackedBinaryMatrix2& matrix1, uint32_t mins1, uint32_t maxs1,
     PackedBinaryMatrix2& matrix2, uint32_t mins2, uint32_t maxs2,
@@ -107,7 +107,7 @@ void compress4_rgb32_to_binary_range(
     matrix2 = PackedBinaryMatrix2(image.width(), image.height());
     matrix3 = PackedBinaryMatrix2(image.width(), image.height());
     Kernels::compress4_rgb32_to_binary_range(
-        (const uint32_t*)image.bits(), image.bytesPerLine(),
+        image.data(), image.bytes_per_row(),
         matrix0, mins0, maxs0,
         matrix1, mins1, maxs1,
         matrix2, mins2, maxs2,

@@ -47,42 +47,42 @@ bool BattlePokemonSwitchDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
-    const ImageStats white_1 = image_stats(extract_box(frame, m_white_bg_1));
+    const ImageStats white_1 = image_stats(extract_box_shallow(frame, m_white_bg_1));
     if(is_white(white_1, 500, 10) == false){
         // std::cout << "no white_1" << std::endl;
         m_detected.store(false, std::memory_order_release);
         return false;
     }
 
-    const ImageStats white_2 = image_stats(extract_box(frame, m_white_bg_2));
+    const ImageStats white_2 = image_stats(extract_box_shallow(frame, m_white_bg_2));
     if(is_white(white_2, 500, 10) == false){
         // std::cout << "no white_2" << std::endl;
         m_detected.store(false, std::memory_order_release);
         return false;
     }
 
-    const ImageStats white_3 = image_stats(extract_box(frame, m_white_bg_3));
+    const ImageStats white_3 = image_stats(extract_box_shallow(frame, m_white_bg_3));
     if(is_white(white_3, 500, 10) == false){
         // std::cout << "no white_3" << std::endl;
         m_detected.store(false, std::memory_order_release);
         return false;
     }
 
-    const ImageStats white_4 = image_stats(extract_box(frame, m_white_bg_4));
+    const ImageStats white_4 = image_stats(extract_box_shallow(frame, m_white_bg_4));
     if(is_white(white_4, 500, 10) == false){
         // std::cout << "no white_4" << std::endl;
         m_detected.store(false, std::memory_order_release);
         return false;
     }
 
-    const ImageStats battle_1 = image_stats(extract_box(frame, m_ready_to_battle_bg_1));
+    const ImageStats battle_1 = image_stats(extract_box_shallow(frame, m_ready_to_battle_bg_1));
     if (!is_LA_dark_blue(battle_1)){
         // std::cout << "battle_1 not enough " << battle_1.average << " " << battle_1.stddev << std::endl;
         m_detected.store(false, std::memory_order_release);
         return false;
     }
 
-    const ImageStats battle_2 = image_stats(extract_box(frame, m_ready_to_battle_bg_2));
+    const ImageStats battle_2 = image_stats(extract_box_shallow(frame, m_ready_to_battle_bg_2));
     if (!is_LA_dark_blue(battle_2)){
         // std::cout << "battle_2  not enough" << battle_2.average << " " << battle_2.stddev << std::endl;
         m_detected.store(false, std::memory_order_release);

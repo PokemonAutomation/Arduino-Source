@@ -35,21 +35,21 @@ void RaidCatchDetector::make_overlays(VideoOverlaySet& items) const{
     m_arrow.make_overlays(items);
 }
 bool RaidCatchDetector::detect(const QImage& screen){
-    ImageStats left0 = image_stats(extract_box(screen, m_left0));
+    ImageStats left0 = image_stats(extract_box_shallow(screen, m_left0));
     if (!is_black(left0)){
         return false;
     }
-    ImageStats right0 = image_stats(extract_box(screen, m_right0));
+    ImageStats right0 = image_stats(extract_box_shallow(screen, m_right0));
     if (!is_black(right0)){
         return false;
     }
     if (euclidean_distance(left0.average, right0.average) > 10) return false;
 #if 0
-    ImageStats left1 = image_stats(extract_box(screen, m_left1));
+    ImageStats left1 = image_stats(extract_box_shallow(screen, m_left1));
     if (!is_white(left1)){
         return false;
     }
-    ImageStats right1 = image_stats(extract_box(screen, m_right1));
+    ImageStats right1 = image_stats(extract_box_shallow(screen, m_right1));
     if (!is_white(right1)){
         return false;
     }

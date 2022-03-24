@@ -20,42 +20,42 @@ namespace PokemonAutomation{
 
 
 PackedBinaryMatrix2 compress_rgb32_to_binary_min(
-    const QImage& image,
+    const ConstImageRef& image,
     uint8_t min_red,
     uint8_t min_green,
     uint8_t min_blue
 );
 PackedBinaryMatrix2 compress_rgb32_to_binary_max(
-    const QImage& image,
+    const ConstImageRef& image,
     uint8_t max_red,
     uint8_t max_green,
     uint8_t max_blue
 );
 PackedBinaryMatrix2 compress_rgb32_to_binary_range(
-    const QImage& image,
+    const ConstImageRef& image,
     uint8_t min_red, uint8_t max_red,
     uint8_t min_green, uint8_t max_green,
     uint8_t min_blue, uint8_t max_blue
 );
 PackedBinaryMatrix2 compress_rgb32_to_binary_range(
-    const QImage& image,
+    const ConstImageRef& image,
     uint8_t min_alpha, uint8_t max_alpha,
     uint8_t min_red, uint8_t max_red,
     uint8_t min_green, uint8_t max_green,
     uint8_t min_blue, uint8_t max_blue
 );
 PackedBinaryMatrix2 compress_rgb32_to_binary_range(
-    const QImage& image,
+    const ConstImageRef& image,
     uint32_t mins, uint32_t maxs
 );
 
 void compress2_rgb32_to_binary_range(
-    const QImage& image,
+    const ConstImageRef& image,
     PackedBinaryMatrix2& matrix0, uint32_t mins0, uint32_t maxs0,
     PackedBinaryMatrix2& matrix1, uint32_t mins1, uint32_t maxs1
 );
 void compress4_rgb32_to_binary_range(
-    const QImage& image,
+    const ConstImageRef& image,
     PackedBinaryMatrix2& matrix0, uint32_t mins0, uint32_t maxs0,
     PackedBinaryMatrix2& matrix1, uint32_t mins1, uint32_t maxs1,
     PackedBinaryMatrix2& matrix2, uint32_t mins2, uint32_t maxs2,

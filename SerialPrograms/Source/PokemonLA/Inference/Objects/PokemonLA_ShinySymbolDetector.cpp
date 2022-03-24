@@ -60,7 +60,7 @@ public:
 
 
 
-std::vector<ImagePixelBox> find_shiny_symbols(const QImage& image){
+std::vector<ImagePixelBox> find_shiny_symbols(const ConstImageRef& image){
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(
         image,
         128, 255,
@@ -105,7 +105,7 @@ bool ShinySymbolWatcher::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
-    m_matches = find_shiny_symbols(extract_box(frame, m_box));
+    m_matches = find_shiny_symbols(extract_box_shallow(frame, m_box));
     m_overlays.clear();
     for (const ImagePixelBox& hit : m_matches){
         ImageFloatBox box = translate_to_parent(frame, m_box, hit);

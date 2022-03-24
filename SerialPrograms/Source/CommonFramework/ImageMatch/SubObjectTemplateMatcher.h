@@ -39,7 +39,7 @@ public:
     //  Compute RMSD of current object against the template as-is.
     double rmsd(
         ImagePixelBox& object_box,
-        const QImage& image, const ImagePixelBox& subobject_in_image
+        const ConstImageRef& image, const ImagePixelBox& subobject_in_image
     ) const;
 
     //  Replace the background of the image with the "m_background_replacement".
@@ -47,18 +47,18 @@ public:
     //  The background is defined by zero-bits in the binary matrix in "binary_image".
     double rmsd_with_background_replace(
         ImagePixelBox& object_box,
-        const QImage& image, const PackedBinaryMatrix2& binary_image,
+        const ConstImageRef& image, const PackedBinaryMatrix2& binary_image,
         const ImagePixelBox& subobject_in_image
     ) const;
 
     virtual bool matches(
         ImagePixelBox& object_box,
-        const QImage& image,
+        const ConstImageRef& image,
         const WaterfillObject& subobject_in_image
     ) const;
     virtual bool matches_with_background_replace(
         ImagePixelBox& object_box,
-        const QImage& image, const PackedBinaryMatrix2& binary_image,
+        const ConstImageRef& image, const PackedBinaryMatrix2& binary_image,
         const WaterfillObject& subobject_in_image
     ) const;
 

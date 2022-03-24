@@ -36,7 +36,7 @@ void BlackScreenDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
 bool BlackScreenDetector::detect(const QImage& screen) const{
-    return is_black(extract_box(screen, m_box), m_max_rgb_sum, m_max_stddev_sum);
+    return is_black(extract_box_shallow(screen, m_box), m_max_rgb_sum, m_max_stddev_sum);
 }
 
 
