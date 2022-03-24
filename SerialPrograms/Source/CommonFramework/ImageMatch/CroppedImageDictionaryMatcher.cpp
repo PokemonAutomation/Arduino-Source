@@ -41,26 +41,26 @@ void CroppedImageDictionaryMatcher::add(const std::string& slug, QImage image){
 
 
 ImageMatchResult CroppedImageDictionaryMatcher::match(
-    QImage image,
+    const ConstImageRef& image,
     double alpha_spread
 ) const{
     ImageMatchResult results;
-    if (image.isNull()){
+    if (!image){
         return results;
     }
 
-
-    QRgb background = crop_image(image);
+    QImage processed = image.to_qimage();
+    QRgb background = crop_image(processed);
 //    image.save("test.png");
 //    cout << FloatPixel(background) << endl;
-    set_alpha_channels(image);
+    set_alpha_channels(processed);
 
 
     for (const auto& item : m_database){
 //        if (item.first != "solosis"){
 //            continue;
 //        }
-        double alpha = item.second.diff(image, background);
+        double alpha = item.second.diff(processed, background);
         results.add(alpha, item.first);
         results.clear_beyond_spread(alpha_spread);
     }
