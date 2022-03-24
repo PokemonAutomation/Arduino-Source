@@ -22,12 +22,12 @@ public:
 
     const ImageStats& stats() const{ return m_stats; }
 
-    double rmsd(QImage image) const;
-    double rmsd(QImage image, QRgb background) const;
-    double rmsd_masked(QImage image) const;
+    double rmsd(const ConstImageRef& image) const;
+    double rmsd(const ConstImageRef& image, QRgb background) const;
+    double rmsd_masked(const ConstImageRef& image) const;
 
 private:
-    void process_images(QImage& reference, QImage& image) const;
+    void process_images(QImage& reference, const ConstImageRef& image) const;
 
 public:
     QImage m_image;
@@ -45,9 +45,9 @@ public:
 
     WeightedExactImageMatcher(QImage image, const InverseStddevWeight& weight);
 
-    double diff(QImage image) const;
-    double diff(QImage image, QRgb background) const;
-    double diff_masked(QImage image) const;
+    double diff(const ConstImageRef& image) const;
+    double diff(const ConstImageRef& image, QRgb background) const;
+    double diff_masked(const ConstImageRef& image) const;
 
 public:
     double m_multiplier;

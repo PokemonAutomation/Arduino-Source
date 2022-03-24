@@ -8,6 +8,7 @@
 #define PokemonAutomation_CommonFramework_ImageBoxes_H
 
 #include <stddef.h>
+#include "CommonFramework/ImageTypes/ImageReference.h"
 
 class QImage;
 
@@ -65,6 +66,12 @@ struct ImageFloatBox{
 
 
 //  Given an image, extract the request box from it.
+
+//  Return a reference to the sub-region of the image.
+ConstImageRef extract_box_shallow(const ConstImageRef& image, const ImagePixelBox& box);
+ConstImageRef extract_box_shallow(const ConstImageRef& image, const ImageFloatBox& box);
+
+//  Deep copy the sub-region.
 QImage extract_box(const QImage& image, const ImagePixelBox& box);
 QImage extract_box(const QImage& image, const ImageFloatBox& box);
 QImage extract_box(const QImage& image, const ImageFloatBox& box, int offset_x, int offset_y);

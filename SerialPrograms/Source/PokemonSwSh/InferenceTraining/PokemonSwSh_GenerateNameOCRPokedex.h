@@ -45,7 +45,7 @@ private:
     void dump_images(
         const std::vector<std::string>& expected,
         size_t index,
-        QImage image
+        const QImage& image
     ) const;
 
 private:

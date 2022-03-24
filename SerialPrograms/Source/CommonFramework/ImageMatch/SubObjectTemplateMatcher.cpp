@@ -7,7 +7,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "SubObjectTemplateMatcher.h"
 
 namespace PokemonAutomation{
@@ -45,11 +45,14 @@ double SubObjectTemplateMatcher::rmsd(
 //         << object_box.min_y << ", "
 //         << object_box.max_x << ", "
 //         << object_box.max_y << endl;
-    QImage object = extract_box(image, object_box);
+    ConstImageRef object = extract_box_shallow(image, object_box);
+//    QImage object = extract_box(image, object_box);
 
 //    object.save("test.png");
 
-    if (object.isNull() || !check_image(object)){
+//    QImage object = ref.to_qimage();
+
+    if (!object || !check_image(object)){
         return 99999.;
     }
 

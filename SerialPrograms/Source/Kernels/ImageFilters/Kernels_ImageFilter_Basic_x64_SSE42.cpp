@@ -34,7 +34,7 @@ public:
         _mm_storeu_si128((__m128i*)out, pixel);
     }
     PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, size_t left) const{
-        PartialWordLoader_x64_SSE41 loader(left * sizeof(uint32_t));
+        PartialWordAccess_x64_SSE41 loader(left * sizeof(uint32_t));
         __m128i pixel = loader.load(in);
         pixel = process_word(pixel);
         do{

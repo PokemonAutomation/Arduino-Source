@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_CommonFramework_SolidColorTest_H
 #define PokemonAutomation_CommonFramework_SolidColorTest_H
 
+#include "CommonFramework/ImageTypes/ImageReference.h"
 #include "ImageStats.h"
 
 //#include <iostream>

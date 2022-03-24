@@ -118,8 +118,6 @@ SOURCES += \
     Source/CommonFramework/AudioPipeline/TimeSampleBuffer.cpp \
     Source/CommonFramework/AudioPipeline/TimeSampleBufferReader.cpp \
     Source/CommonFramework/AudioPipeline/WavFile.cpp \
-    Source/CommonFramework/BinaryImage/BinaryImage.cpp \
-    Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.cpp \
     Source/CommonFramework/ControllerDevices/SerialSelector.cpp \
     Source/CommonFramework/ControllerDevices/SerialSelectorWidget.cpp \
     Source/CommonFramework/CrashDump.cpp \
@@ -141,12 +139,15 @@ SOURCES += \
     Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.cpp \
     Source/CommonFramework/ImageMatch/SubObjectTemplateMatcher.cpp \
     Source/CommonFramework/ImageMatch/WaterfillTemplateMatcher.cpp \
+    Source/CommonFramework/ImageTools/BinaryImage_FilterRgb32.cpp \
     Source/CommonFramework/ImageTools/ColorClustering.cpp \
     Source/CommonFramework/ImageTools/FloatPixel.cpp \
     Source/CommonFramework/ImageTools/ImageBoxes.cpp \
     Source/CommonFramework/ImageTools/ImageFilter.cpp \
     Source/CommonFramework/ImageTools/ImageStats.cpp \
     Source/CommonFramework/ImageTools/SolidColorTest.cpp \
+    Source/CommonFramework/ImageTypes/BinaryImage.cpp \
+    Source/CommonFramework/ImageTypes/ImageReference.cpp \
     Source/CommonFramework/Inference/AnomalyDetector.cpp \
     Source/CommonFramework/Inference/AudioTemplateCache.cpp \
     Source/CommonFramework/Inference/BlackBorderDetector.cpp \
@@ -719,8 +720,6 @@ HEADERS += \
     Source/CommonFramework/AudioPipeline/TimeSampleBufferReader.h \
     Source/CommonFramework/AudioPipeline/TimeSampleWriter.h \
     Source/CommonFramework/AudioPipeline/WavFile.h \
-    Source/CommonFramework/BinaryImage/BinaryImage.h \
-    Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h \
     Source/CommonFramework/ControllerDevices/SerialSelector.h \
     Source/CommonFramework/ControllerDevices/SerialSelectorWidget.h \
     Source/CommonFramework/CrashDump.h \
@@ -740,6 +739,7 @@ HEADERS += \
     Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h \
     Source/CommonFramework/ImageMatch/SubObjectTemplateMatcher.h \
     Source/CommonFramework/ImageMatch/WaterfillTemplateMatcher.h \
+    Source/CommonFramework/ImageTools/BinaryImage_FilterRgb32.h \
     Source/CommonFramework/ImageTools/ColorClustering.h \
     Source/CommonFramework/ImageTools/DistanceToLine.h \
     Source/CommonFramework/ImageTools/FloatPixel.h \
@@ -747,6 +747,8 @@ HEADERS += \
     Source/CommonFramework/ImageTools/ImageFilter.h \
     Source/CommonFramework/ImageTools/ImageStats.h \
     Source/CommonFramework/ImageTools/SolidColorTest.h \
+    Source/CommonFramework/ImageTypes/BinaryImage.h \
+    Source/CommonFramework/ImageTypes/ImageReference.h \
     Source/CommonFramework/Inference/AnomalyDetector.h \
     Source/CommonFramework/Inference/AudioTemplateCache.h \
     Source/CommonFramework/Inference/BlackBorderDetector.h \

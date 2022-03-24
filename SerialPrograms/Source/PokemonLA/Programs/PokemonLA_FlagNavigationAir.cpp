@@ -54,7 +54,7 @@ FlagNavigationAir::FlagNavigationAir(
     auto find_flag = [=](const BotBaseContext& context){
         uint8_t turn = m_flag_x <= 0.5 ? 0 : 255;
         for (size_t c = 0; c < 2; c++){
-            pbf_press_button(context, BUTTON_ZL, 20, 105);
+            pbf_mash_button(context, BUTTON_ZL, 2 * TICKS_PER_SECOND);
             pbf_move_right_joystick(context, turn, 128, 400, 0);
 //            pbf_move_right_joystick(context, 128, 255, 200, 0);
 //            pbf_move_right_joystick(context, 128, 0, 200, 0);

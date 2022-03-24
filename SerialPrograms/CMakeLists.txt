@@ -180,10 +180,10 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/TimeSampleWriter.h
     Source/CommonFramework/AudioPipeline/WavFile.cpp
     Source/CommonFramework/AudioPipeline/WavFile.h
-    Source/CommonFramework/BinaryImage/BinaryImage.cpp
-    Source/CommonFramework/BinaryImage/BinaryImage.h
-    Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.cpp
-    Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h
+    Source/CommonFramework/ImageTypes/BinaryImage.cpp
+    Source/CommonFramework/ImageTypes/BinaryImage.h
+    Source/CommonFramework/ImageTypes/ImageReference.cpp
+    Source/CommonFramework/ImageTypes/ImageReference.h
     Source/CommonFramework/ControllerDevices/SerialSelector.cpp
     Source/CommonFramework/ControllerDevices/SerialSelector.h
     Source/CommonFramework/ControllerDevices/SerialSelectorWidget.cpp
@@ -218,6 +218,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ImageMatch/SubObjectTemplateMatcher.h
     Source/CommonFramework/ImageMatch/WaterfillTemplateMatcher.cpp
     Source/CommonFramework/ImageMatch/WaterfillTemplateMatcher.h
+    Source/CommonFramework/ImageTools/BinaryImage_FilterRgb32.cpp
+    Source/CommonFramework/ImageTools/BinaryImage_FilterRgb32.h
     Source/CommonFramework/ImageTools/ColorClustering.cpp
     Source/CommonFramework/ImageTools/ColorClustering.h
     Source/CommonFramework/ImageTools/DistanceToLine.h

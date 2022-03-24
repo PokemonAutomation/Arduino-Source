@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
-#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "PokemonLA_BubbleDetector.h"
 
@@ -40,7 +40,7 @@ public:
         set_subobject(objects[0]);
     }
 
-    virtual bool check_image(const QImage& image) const{
+    virtual bool check_image(const ConstImageRef& image) const override{
         return image_stddev(image).sum() > 100;
     };
 

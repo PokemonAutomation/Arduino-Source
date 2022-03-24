@@ -15,9 +15,9 @@ namespace PokemonAutomation{
 namespace Kernels{
 
 
-class PartialWordLoader32_x64_AVX2{
+class PartialWordAccess32_x64_AVX2{
 public:
-    PA_FORCE_INLINE PartialWordLoader32_x64_AVX2(size_t words){
+    PA_FORCE_INLINE PartialWordAccess32_x64_AVX2(size_t words){
         m_mask = _mm256_cmpgt_epi32(
             _mm256_set1_epi32((uint32_t)words),
             _mm256_setr_epi32(0, 1, 2, 3, 4, 5, 6, 7)

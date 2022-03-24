@@ -43,7 +43,7 @@ public:
         }
         count %= 4;
         if (count){
-            PartialWordLoader_x64_SSE41 loader(count * sizeof(uint32_t));
+            PartialWordAccess_x64_SSE41 loader(count * sizeof(uint32_t));
             __m128i pixel = loader.load(pixels);
             uint64_t mask = ((uint64_t)1 << count) - 1;
             bits |= (convert4(pixel) & mask) << c;
@@ -86,7 +86,7 @@ public:
         }
         count %= 4;
         if (count){
-            PartialWordLoader_x64_SSE41 loader(count * sizeof(uint32_t));
+            PartialWordAccess_x64_SSE41 loader(count * sizeof(uint32_t));
             __m128i pixel = loader.load(pixels);
             pixel = filter4((uint32_t)bits & 15, pixel);
             do{

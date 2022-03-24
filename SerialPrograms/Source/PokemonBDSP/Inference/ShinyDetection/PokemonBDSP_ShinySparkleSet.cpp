@@ -7,8 +7,8 @@
 #include <sstream>
 #include <QImage>
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
-#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.h"
 #include "PokemonBDSP_ShinySparkleSet.h"
 

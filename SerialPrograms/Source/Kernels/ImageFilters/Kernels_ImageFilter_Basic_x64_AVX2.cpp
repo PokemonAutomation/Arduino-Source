@@ -34,7 +34,7 @@ public:
         _mm256_storeu_si256((__m256i*)out, pixel);
     }
     PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, size_t left) const{
-        PartialWordLoader32_x64_AVX2 loader(left);
+        PartialWordAccess32_x64_AVX2 loader(left);
         __m256i pixel = loader.load(in);
         pixel = process_word(pixel);
         loader.store(out, pixel);

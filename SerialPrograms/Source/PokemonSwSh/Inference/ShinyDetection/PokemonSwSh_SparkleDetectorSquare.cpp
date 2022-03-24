@@ -7,8 +7,8 @@
 #include <cmath>
 #include <map>
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/ImageTools/DistanceToLine.h"
-#include "CommonFramework/BinaryImage/BinaryImage.h"
 #include "PokemonSwSh_SparkleDetectorSquare.h"
 
 namespace PokemonAutomation{

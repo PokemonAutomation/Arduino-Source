@@ -87,7 +87,7 @@ void GenerateNameOCRDataPokedex::read(
 void GenerateNameOCRDataPokedex::dump_images(
     const std::vector<std::string>& expected,
     size_t index,
-    QImage image
+    const QImage& image
 ) const{
     if (index >= expected.size()){
         return;
@@ -108,7 +108,7 @@ void GenerateNameOCRDataPokedex::dump_images(
     path += ".png";
     image.save(path);
 
-    OCR::make_OCR_filter(image).apply(image);
+//    OCR::make_OCR_filter(image).apply(image);
 }
 
 void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env){

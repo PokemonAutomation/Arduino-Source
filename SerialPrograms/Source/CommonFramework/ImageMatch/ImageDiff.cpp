@@ -22,18 +22,18 @@ namespace PokemonAutomation{
 namespace ImageMatch{
 
 
-FloatPixel pixel_average(const QImage& image, const QImage& alpha_mask){
-    if (!image.size().isValid()){
+FloatPixel pixel_average(const ConstImageRef& image, const ConstImageRef& alpha_mask){
+    if (!image){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Dimensions");
     }
-    if (image.size() != alpha_mask.size()){
+    if (image.width() != alpha_mask.width() || image.height() != alpha_mask.height()){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching Dimensions");
     }
     Kernels::PixelSums sums;
     Kernels::pixel_sum_sqr(
         sums, image.width(), image.height(),
-        (const uint32_t*)image.bits(), image.bytesPerLine(),
-        (const uint32_t*)alpha_mask.bits(), alpha_mask.bytesPerLine()
+        image.data(), image.bytes_per_row(),
+        alpha_mask.data(), alpha_mask.bytes_per_row()
     );
 
     FloatPixel sum(sums.sumR, sums.sumG, sums.sumB);
@@ -43,21 +43,21 @@ FloatPixel pixel_average(const QImage& image, const QImage& alpha_mask){
 
 
 
-void scale_brightness(QImage& image, const FloatPixel& multiplier){
+void scale_brightness(const ImageRef& image, const FloatPixel& multiplier){
     Kernels::scale_brightness(
         image.width(), image.height(),
-        (uint32_t*)image.bits(), image.bytesPerLine(),
+        image.data(), image.bytes_per_row(),
         (float)multiplier.r, (float)multiplier.g, (float)multiplier.b
     );
 }
 
 
 
-double pixel_RMSD(const QImage& reference, const QImage& image){
-    if (!image.size().isValid()){
+double pixel_RMSD(const ConstImageRef& reference, const ConstImageRef& image){
+    if (!image){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Dimensions");
     }
-    if (reference.size() != image.size()){
+    if (reference.width() != image.width() || reference.height() != image.height()){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching Dimensions");
     }
     uint64_t count = 0;
@@ -65,16 +65,16 @@ double pixel_RMSD(const QImage& reference, const QImage& image){
     Kernels::sum_sqr_deviation(
         count, sumsqrs,
         reference.width(), reference.height(),
-        (const uint32_t*)reference.bits(), reference.bytesPerLine(),
-        (const uint32_t*)image.bits(), image.bytesPerLine()
+        reference.data(), reference.bytes_per_row(),
+        image.data(), image.bytes_per_row()
     );
     return std::sqrt((double)sumsqrs / (double)count);
 }
-double pixel_RMSD(const QImage& reference, const QImage& image, QRgb background){
-    if (!image.size().isValid()){
+double pixel_RMSD(const ConstImageRef& reference, const ConstImageRef& image, QRgb background){
+    if (!image){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Dimensions");
     }
-    if (reference.size() != image.size()){
+    if (reference.width() != image.width() || reference.height() != image.height()){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching Dimensions");
     }
     uint64_t count = 0;
@@ -82,17 +82,17 @@ double pixel_RMSD(const QImage& reference, const QImage& image, QRgb background)
     Kernels::sum_sqr_deviation(
         count, sumsqrs,
         reference.width(), reference.height(),
-        (const uint32_t*)reference.bits(), reference.bytesPerLine(),
-        (const uint32_t*)image.bits(), image.bytesPerLine(),
+        reference.data(), reference.bytes_per_row(),
+        image.data(), image.bytes_per_row(),
         background
     );
     return std::sqrt((double)sumsqrs / (double)count);
 }
-double pixel_RMSD_masked(const QImage& reference, const QImage& image){
-    if (!image.size().isValid()){
+double pixel_RMSD_masked(const ConstImageRef& reference, const ConstImageRef& image){
+    if (!image){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Dimensions");
     }
-    if (reference.size() != image.size()){
+    if (reference.width() != image.width() || reference.height() != image.height()){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching Dimensions");
     }
     uint64_t count = 0;
@@ -100,8 +100,8 @@ double pixel_RMSD_masked(const QImage& reference, const QImage& image){
     Kernels::sum_sqr_deviation_masked(
         count, sumsqrs,
         reference.width(), reference.height(),
-        (const uint32_t*)reference.bits(), reference.bytesPerLine(),
-        (const uint32_t*)image.bits(), image.bytesPerLine()
+        reference.data(), reference.bytes_per_row(),
+        image.data(), image.bytes_per_row()
     );
     return std::sqrt((double)sumsqrs / (double)count);
 }

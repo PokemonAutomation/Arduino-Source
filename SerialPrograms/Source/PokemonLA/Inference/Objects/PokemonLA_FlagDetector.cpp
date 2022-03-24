@@ -7,7 +7,7 @@
 #include <map>
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
-#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "PokemonLA_FlagDetector.h"

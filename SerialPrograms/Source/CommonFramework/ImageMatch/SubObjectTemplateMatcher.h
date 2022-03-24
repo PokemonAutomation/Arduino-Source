@@ -17,7 +17,7 @@
 
 #include "Common/Compiler.h"
 #include "Common/Cpp/Color.h"
-#include "CommonFramework/BinaryImage/BinaryImage.h"
+#include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 
@@ -64,7 +64,7 @@ public:
 
 
 protected:
-    virtual bool check_image(const QImage& image) const{ return true; };
+    virtual bool check_image(const ConstImageRef& image) const{ return true; };
 
     void set_subobject(const WaterfillObject& subobject_in_object);
     bool check_aspect_ratio(size_t candidate_width, size_t candidate_height) const;

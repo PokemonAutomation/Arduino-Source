@@ -100,7 +100,6 @@
 //#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h"
 //#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
-#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "Integrations/DiscordWebhook.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
@@ -247,15 +246,24 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 //    using namespace PokemonBDSP;
     using namespace PokemonLA;
 
-//     LoggerQt& logger = env.logger();
-//     ConsoleHandle& console = env.consoles[0];
-//     BotBase& botbase = env.consoles[0];
-//     VideoFeed& feed = env.consoles[0];
-//     VideoOverlay& overlay = env.consoles[0];
+     LoggerQt& logger = env.logger();
+     ConsoleHandle& console = env.consoles[0];
+     BotBase& botbase = env.consoles[0];
+     VideoFeed& feed = env.consoles[0];
+     VideoOverlay& overlay = env.consoles[0];
 
 
 //    change_mount(console, MountState::WYRDEER_ON);
 
+
+    FlagTracker tracker(logger, overlay);
+
+
+    QImage src("20220315-055335301551.jpg");
+    while (true){
+        tracker.process_frame(src, std::chrono::system_clock::now());
+        env.check_stopping();
+    }
 
 
 
