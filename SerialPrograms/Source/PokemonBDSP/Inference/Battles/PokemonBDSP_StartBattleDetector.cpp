@@ -39,7 +39,7 @@ bool StartBattleDetector::process_frame(
 }
 
 bool StartBattleDetector::detect(const QImage& frame){
-//    ConstImageRef image = extract_box_shallow(frame, m_screen_box);
+//    ConstImageRef image = extract_box_reference(frame, m_screen_box);
 
 //    ImageStats stats = image_stats(image);
 
@@ -73,14 +73,14 @@ bool StartBattleMenuOverlapDetector::process_frame(
     return false;
 }
 bool StartBattleMenuOverlapDetector::detect(const QImage& frame){
-    ConstImageRef image0 = extract_box_shallow(frame, m_left);
+    ConstImageRef image0 = extract_box_reference(frame, m_left);
     ImageStats stats0 = image_stats(image0);
     //  Solid screen that's not black.
     if (stats0.average.sum() < 50 || stats0.stddev.sum() > 10){
         return false;
     }
 
-    ConstImageRef image1 = extract_box_shallow(frame, m_right);
+    ConstImageRef image1 = extract_box_reference(frame, m_right);
     ImageStats stats1 = image_stats(image1);
     //  Solid screen that's not black.
     if (stats1.average.sum() < 50 && stats1.stddev.sum() > 10){

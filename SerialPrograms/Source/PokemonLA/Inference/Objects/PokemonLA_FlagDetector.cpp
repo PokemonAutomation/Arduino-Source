@@ -220,7 +220,7 @@ std::pair<double, int> read_digit(const ConstImageRef& image, const WaterfillObj
 
 int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
     ImageFloatBox box(flag_x - 0.025, flag_y - 0.055, 0.045, 0.025);
-    ConstImageRef image = extract_box_shallow(screen, box);
+    ConstImageRef image = extract_box_reference(screen, box);
 //    image.save("test.png");
 
     PackedBinaryMatrix2 matrix[6];

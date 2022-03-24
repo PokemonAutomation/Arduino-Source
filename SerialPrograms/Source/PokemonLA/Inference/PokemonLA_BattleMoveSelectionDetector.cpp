@@ -44,11 +44,11 @@ bool BattleMoveSelectionDetector::process_frame(
 ){
     size_t highlighted = 0;
 
-    const ImageStats move_1 = image_stats(extract_box_shallow(frame, m_move_1_highlight));
+    const ImageStats move_1 = image_stats(extract_box_reference(frame, m_move_1_highlight));
     highlighted += is_white(move_1);
     // std::cout << "highlighted is now " << highlighted << std::endl;
 
-    const ImageStats move_2 = image_stats(extract_box_shallow(frame, m_move_2_highlight));
+    const ImageStats move_2 = image_stats(extract_box_reference(frame, m_move_2_highlight));
     highlighted += is_white(move_2);
     // std::cout << "highlighted is now " << highlighted << std::endl;
     if (highlighted > 1){
@@ -56,7 +56,7 @@ bool BattleMoveSelectionDetector::process_frame(
         return false;
     }
     
-    const ImageStats move_3 = image_stats(extract_box_shallow(frame, m_move_3_highlight));
+    const ImageStats move_3 = image_stats(extract_box_reference(frame, m_move_3_highlight));
     highlighted += is_white(move_3);
     // std::cout << "highlighted is now " << highlighted << std::endl;
     if (highlighted > 1){
@@ -64,7 +64,7 @@ bool BattleMoveSelectionDetector::process_frame(
         return false;
     }
 
-    const ImageStats move_4 = image_stats(extract_box_shallow(frame, m_move_4_highlight));
+    const ImageStats move_4 = image_stats(extract_box_reference(frame, m_move_4_highlight));
     highlighted += is_white(move_4);
 
     // std::cout << "move selection highlighted " << highlighted << std::endl;

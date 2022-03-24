@@ -42,17 +42,17 @@ bool ExperienceGainDetector::detect(const QImage& screen) const{
         return false;
     }
 
-    const ImageStats stats0 = image_stats(extract_box_shallow(screen, m_middle_column));
+    const ImageStats stats0 = image_stats(extract_box_reference(screen, m_middle_column));
 //    cout << "ExperienceGainDetector: No m_middle_column detected, " << stats0.average.to_string() << ", " << stats0.stddev.to_string() << endl;
     if (!is_solid(stats0, {0.16, 0.42, 0.42}, 0.1, 40)){
         return false;
     }
-    const ImageStats stats1 = image_stats(extract_box_shallow(screen, m_left_column));
+    const ImageStats stats1 = image_stats(extract_box_reference(screen, m_left_column));
 //    cout << "ExperienceGainDetector: No m_left_column detected, " << stats1.average.to_string() << ", " << stats1.stddev.to_string() << endl;
     if (!is_solid(stats1, {0.3, 0.35, 0.35}, 0.1, 40)){
         return false;
     }
-    const ImageStats stats2 = image_stats(extract_box_shallow(screen, m_lower_left_region));
+    const ImageStats stats2 = image_stats(extract_box_reference(screen, m_lower_left_region));
 //    cout << "ExperienceGainDetector: No m_lower_left_region detected, " << stats2.average.to_string() << ", " << stats2.stddev.to_string() << endl;
     if (!is_solid(stats2, {0.3, 0.35, 0.35}, 0.1, 40)){
         return false;

@@ -31,12 +31,12 @@ bool MapDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
-    ImageStats bottom0 = image_stats(extract_box_shallow(frame, m_bottom0));
+    ImageStats bottom0 = image_stats(extract_box_reference(frame, m_bottom0));
 //    cout << bottom0.average << bottom0.stddev << endl;
     if (!is_solid(bottom0, {0.330212, 0.334083, 0.335705})){
         return false;
     }
-    ImageStats bottom1 = image_stats(extract_box_shallow(frame, m_bottom1));
+    ImageStats bottom1 = image_stats(extract_box_reference(frame, m_bottom1));
 //    cout << bottom1.average << bottom1.stddev << endl;
     if (!is_solid(bottom1, {0.32716, 0.33642, 0.33642})){
         return false;

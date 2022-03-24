@@ -44,10 +44,10 @@ StandardEncounterDetection::StandardEncounterDetection(
 
     //  Check if it's a double battle.
     do{
-        if (!is_white(extract_box_shallow(screen, left_mon_white))){
+        if (!is_white(extract_box_reference(screen, left_mon_white))){
             break;
         }
-        ImageStats stats_hp = image_stats(extract_box_shallow(screen, left_mon_hp));
+        ImageStats stats_hp = image_stats(extract_box_reference(screen, left_mon_hp));
 //        cout << stats_hp.average << stats_hp.stddev << endl;
         if (!is_solid(stats_hp, {0.27731, 0.461346, 0.261344}, 0.1, 50)){
             break;

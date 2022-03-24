@@ -68,20 +68,20 @@ size_t ImagePixelBox::overlap_with(const ImagePixelBox& box) const{
 
 
 
-ConstImageRef extract_box_shallow(const ConstImageRef& image, const ImagePixelBox& box){
+ConstImageRef extract_box_reference(const ConstImageRef& image, const ImagePixelBox& box){
     return image.sub_image(box.min_x, box.min_y, box.width(), box.height());
 }
-ConstImageRef extract_box_shallow(const ConstImageRef& image, const ImageFloatBox& box){
+ConstImageRef extract_box_reference(const ConstImageRef& image, const ImageFloatBox& box){
     size_t min_x = (size_t)(image.width() * box.x + 0.5);
     size_t min_y = (size_t)(image.height() * box.y + 0.5);
     size_t width = (size_t)(image.width() * box.width + 0.5);
     size_t height = (size_t)(image.height() * box.height + 0.5);
     return image.sub_image(min_x, min_y, width, height);
 }
-ImageRef extract_box_shallow(const ImageRef& image, const ImagePixelBox& box){
+ImageRef extract_box_reference(const ImageRef& image, const ImagePixelBox& box){
     return image.sub_image(box.min_x, box.min_y, box.width(), box.height());
 }
-ImageRef extract_box_shallow(const ImageRef& image, const ImageFloatBox& box){
+ImageRef extract_box_reference(const ImageRef& image, const ImageFloatBox& box){
     size_t min_x = (size_t)(image.width() * box.x + 0.5);
     size_t min_y = (size_t)(image.height() * box.y + 0.5);
     size_t width = (size_t)(image.width() * box.width + 0.5);
@@ -89,17 +89,17 @@ ImageRef extract_box_shallow(const ImageRef& image, const ImageFloatBox& box){
     return image.sub_image(min_x, min_y, width, height);
 }
 
-ConstImageRef extract_box_shallow(const QImage& image, const ImagePixelBox& box){
-    return extract_box_shallow(ConstImageRef(image), box);
+ConstImageRef extract_box_reference(const QImage& image, const ImagePixelBox& box){
+    return extract_box_reference(ConstImageRef(image), box);
 }
-ConstImageRef extract_box_shallow(const QImage& image, const ImageFloatBox& box){
-    return extract_box_shallow(ConstImageRef(image), box);
+ConstImageRef extract_box_reference(const QImage& image, const ImageFloatBox& box){
+    return extract_box_reference(ConstImageRef(image), box);
 }
-ImageRef extract_box_shallow(QImage& image, const ImagePixelBox& box){
-    return extract_box_shallow(ImageRef(image), box);
+ImageRef extract_box_reference(QImage& image, const ImagePixelBox& box){
+    return extract_box_reference(ImageRef(image), box);
 }
-ImageRef extract_box_shallow(QImage& image, const ImageFloatBox& box){
-    return extract_box_shallow(ImageRef(image), box);
+ImageRef extract_box_reference(QImage& image, const ImageFloatBox& box){
+    return extract_box_reference(ImageRef(image), box);
 }
 
 

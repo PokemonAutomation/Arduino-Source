@@ -95,10 +95,10 @@ public:
         const QImage& frame,
         std::chrono::system_clock::time_point timestamp
     ) override{
-        if (!is_black(extract_box_shallow(frame, m_box0))){
+        if (!is_black(extract_box_reference(frame, m_box0))){
             return m_invert;
         }
-        if (!is_black(extract_box_shallow(frame, m_box1))){
+        if (!is_black(extract_box_reference(frame, m_box1))){
             return m_invert;
         }
         return !m_invert;

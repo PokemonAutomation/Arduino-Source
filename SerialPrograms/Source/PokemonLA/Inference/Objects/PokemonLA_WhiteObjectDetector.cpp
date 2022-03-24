@@ -136,7 +136,7 @@ bool WhiteObjectWatcher::process_frame(
         detector.first.clear();
     }
 
-    find_overworld_white_objects(m_detectors, extract_box_shallow(frame, m_box));
+    find_overworld_white_objects(m_detectors, extract_box_reference(frame, m_box));
     m_overlays.clear();
 
     for (auto& detector : m_detectors){

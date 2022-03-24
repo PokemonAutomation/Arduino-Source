@@ -37,7 +37,7 @@ double ImageMatchDetector::rmsd(const QImage& frame) const{
     if (frame.isNull()){
         return 1000;
     }
-    ConstImageRef image = extract_box_shallow(frame, m_box);
+    ConstImageRef image = extract_box_reference(frame, m_box);
     QImage scaled = image.scaled_to_qimage(m_reference_image.width(), m_reference_image.height());
 
     if (m_scale_brightness){

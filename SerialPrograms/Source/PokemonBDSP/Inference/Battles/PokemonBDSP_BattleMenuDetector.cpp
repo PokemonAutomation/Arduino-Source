@@ -45,9 +45,9 @@ void BattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
 }
 bool BattleMenuDetector::detect(const QImage& screen) const{
     {
-        bool left0 = is_white(extract_box_shallow(screen, m_left0_status));
-        bool left1 = is_white(extract_box_shallow(screen, m_left1_status));
-        bool right = is_white(extract_box_shallow(screen, m_right_status));
+        bool left0 = is_white(extract_box_reference(screen, m_left0_status));
+        bool left1 = is_white(extract_box_reference(screen, m_left1_status));
+        bool right = is_white(extract_box_reference(screen, m_right_status));
         if (!left0 && !left1 && !right){
             return false;
         }
@@ -55,7 +55,7 @@ bool BattleMenuDetector::detect(const QImage& screen) const{
 
     if (m_battle_type == BattleType::STARTER){
         if (!cluster_fit_2(
-            extract_box_shallow(screen, m_menu_battle),
+            extract_box_reference(screen, m_menu_battle),
             qRgb(200, 70, 85), 0.8,
             qRgb(240, 170, 180), 0.2,
             0.2, 80, 0.1
@@ -67,11 +67,11 @@ bool BattleMenuDetector::detect(const QImage& screen) const{
 
 
     if (m_battle_type == BattleType::STANDARD){
-        if (!is_white(extract_box_shallow(screen, m_ball_left))){
+        if (!is_white(extract_box_reference(screen, m_ball_left))){
 //            cout << "Not white" << endl;
             return false;
         }
-        if (!is_white(extract_box_shallow(screen, m_ball_right))){
+        if (!is_white(extract_box_reference(screen, m_ball_right))){
 //            cout << "Not white" << endl;
             return false;
         }
@@ -89,7 +89,7 @@ bool BattleMenuDetector::detect(const QImage& screen) const{
     }
 #else
     {
-        ImageStats stats = image_stats(extract_box_shallow(screen, m_menu_battle));
+        ImageStats stats = image_stats(extract_box_reference(screen, m_menu_battle));
 //        cout << stats.average << stats.stddev << endl;
         double stddev = stats.stddev.sum();
         if (stddev < 30 || stddev > 150){
@@ -115,7 +115,7 @@ bool BattleMenuDetector::detect(const QImage& screen) const{
     }
 #else
     {
-        ImageStats stats = image_stats(extract_box_shallow(screen, m_menu_pokemon));
+        ImageStats stats = image_stats(extract_box_reference(screen, m_menu_pokemon));
 //        cout << stats.average << stats.stddev << endl;
         double stddev = stats.stddev.sum();
         if (stddev < 30 || stddev > 150){
@@ -141,7 +141,7 @@ bool BattleMenuDetector::detect(const QImage& screen) const{
     }
 #else
     {
-        ImageStats stats = image_stats(extract_box_shallow(screen, m_menu_bag));
+        ImageStats stats = image_stats(extract_box_reference(screen, m_menu_bag));
 //        cout << stats.average << stats.stddev << endl;
         double stddev = stats.stddev.sum();
         if (stddev < 30 || stddev > 100){
@@ -166,7 +166,7 @@ bool BattleMenuDetector::detect(const QImage& screen) const{
     }
 #else
     {
-        ImageStats stats = image_stats(extract_box_shallow(screen, m_menu_run));
+        ImageStats stats = image_stats(extract_box_reference(screen, m_menu_run));
 //        cout << stats.average << stats.stddev << endl;
         double stddev = stats.stddev.sum();
         if (stddev < 30 || stddev > 100){

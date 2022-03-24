@@ -68,14 +68,14 @@ struct ImageFloatBox{
 //  Given an image, extract the request box from it.
 
 //  Return a reference to the sub-region of the image.
-ConstImageRef extract_box_shallow(const ConstImageRef& image, const ImagePixelBox& box);
-ConstImageRef extract_box_shallow(const ConstImageRef& image, const ImageFloatBox& box);
-ConstImageRef extract_box_shallow(const QImage& image, const ImagePixelBox& box);
-ConstImageRef extract_box_shallow(const QImage& image, const ImageFloatBox& box);
-ImageRef extract_box_shallow(const ImageRef& image, const ImagePixelBox& box);
-ImageRef extract_box_shallow(const ImageRef& image, const ImageFloatBox& box);
-ImageRef extract_box_shallow(QImage& image, const ImagePixelBox& box);
-ImageRef extract_box_shallow(QImage& image, const ImageFloatBox& box);
+ConstImageRef extract_box_reference(const ConstImageRef& image, const ImagePixelBox& box);
+ConstImageRef extract_box_reference(const ConstImageRef& image, const ImageFloatBox& box);
+ConstImageRef extract_box_reference(const QImage& image, const ImagePixelBox& box);
+ConstImageRef extract_box_reference(const QImage& image, const ImageFloatBox& box);
+ImageRef extract_box_reference(const ImageRef& image, const ImagePixelBox& box);
+ImageRef extract_box_reference(const ImageRef& image, const ImageFloatBox& box);
+ImageRef extract_box_reference(QImage& image, const ImagePixelBox& box);
+ImageRef extract_box_reference(QImage& image, const ImageFloatBox& box);
 
 //  Deep copy the sub-region.
 QImage extract_box(const QImage& image, const ImagePixelBox& box);

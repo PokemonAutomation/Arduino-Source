@@ -50,12 +50,12 @@ bool ExperienceGainDetector::detect(const QImage& screen) const{
     }
 
     for (auto& row : m_rows){
-        ImageStats stats0 = image_stats(extract_box_shallow(screen, row.first));
+        ImageStats stats0 = image_stats(extract_box_reference(screen, row.first));
 //        cout << stats0.average << " " << stats0.stddev << endl;
         if (!is_grey(stats0, 400, 1000)){
             return false;
         }
-        ImageStats stats1 = image_stats(extract_box_shallow(screen, row.second));
+        ImageStats stats1 = image_stats(extract_box_reference(screen, row.second));
 //        cout << stats1.average << " " << stats1.stddev << endl;
         if (!is_white(stats1)){
             return false;

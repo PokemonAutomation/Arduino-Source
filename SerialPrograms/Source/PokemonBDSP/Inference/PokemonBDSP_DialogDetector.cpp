@@ -34,24 +34,24 @@ void ShortDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_right);
 }
 bool ShortDialogDetector::detect(const QImage& screen) const{
-    ImageStats left_white = image_stats(extract_box_shallow(screen, m_left_white));
+    ImageStats left_white = image_stats(extract_box_reference(screen, m_left_white));
     if (!is_white(left_white)){
         return false;
     }
-    ImageStats right_white = image_stats(extract_box_shallow(screen, m_right_white));
+    ImageStats right_white = image_stats(extract_box_reference(screen, m_right_white));
     if (!is_white(right_white)){
         return false;
     }
-//    ImageStats bottom = image_stats(extract_box_shallow(screen, m_bottom));
+//    ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
 //    if (!is_white(bottom)){
 //        return false;
 //    }
-    ImageStats left = image_stats(extract_box_shallow(screen, m_left));
+    ImageStats left = image_stats(extract_box_reference(screen, m_left));
 //    cout << left.stddev << endl;
     if (left.stddev.sum() < 30){
         return false;
     }
-    ImageStats right = image_stats(extract_box_shallow(screen, m_right));
+    ImageStats right = image_stats(extract_box_reference(screen, m_right));
 //    cout << right.stddev << endl;
     if (right.stddev.sum() < 30){
         return false;
@@ -91,20 +91,20 @@ void BattleDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_right);
 }
 bool BattleDialogDetector::detect(const QImage& screen) const{
-    ImageStats left_white = image_stats(extract_box_shallow(screen, m_left_white));
+    ImageStats left_white = image_stats(extract_box_reference(screen, m_left_white));
     if (!is_white(left_white)){
         return false;
     }
-    ImageStats bottom = image_stats(extract_box_shallow(screen, m_bottom));
+    ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
     if (!is_white(bottom)){
         return false;
     }
-    ImageStats left = image_stats(extract_box_shallow(screen, m_left));
+    ImageStats left = image_stats(extract_box_reference(screen, m_left));
 //    cout << left.stddev << endl;
     if (left.stddev.sum() < 50){
         return false;
     }
-    ImageStats right = image_stats(extract_box_shallow(screen, m_right));
+    ImageStats right = image_stats(extract_box_reference(screen, m_right));
 //    cout << right.stddev << endl;
     if (right.stddev.sum() < 50){
         return false;

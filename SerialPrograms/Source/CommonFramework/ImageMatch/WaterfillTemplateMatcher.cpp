@@ -117,7 +117,7 @@ double WaterfillTemplateMatcher::rmsd_original(const ConstImageRef& original_ima
 //    static int c = 0;
 //    cout << c << endl;
 
-    double rmsd = this->rmsd(extract_box_shallow(original_image, object));
+    double rmsd = this->rmsd(extract_box_reference(original_image, object));
 
 //    cout << "rmsd  = " << rmsd << endl;
 

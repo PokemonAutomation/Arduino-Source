@@ -83,7 +83,7 @@ bool UnderAttackWatcher::process_frame(
 
 
 UnderAttackState UnderAttackWatcher::detect(const QImage& frame){
-    ImageStats stats = image_stats(extract_box_shallow(frame, m_box));
+    ImageStats stats = image_stats(extract_box_reference(frame, m_box));
 //    cout << stats.average << stats.stddev << endl;
 //    if (stats.stddev.sum() > 100){
 //        return UnderAttackState::SAFE;

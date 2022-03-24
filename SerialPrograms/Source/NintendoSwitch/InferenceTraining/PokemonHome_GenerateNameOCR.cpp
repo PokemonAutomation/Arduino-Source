@@ -76,7 +76,7 @@ void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env){
         env.console.botbase().wait_for_all_requests();
 
         QImage screen = env.console.video().snapshot();
-        ImageRef image = extract_box_shallow(screen, box);
+        ImageRef image = extract_box_reference(screen, box);
 
         QString path = "PokemonNameOCR/";
         path += language_code;

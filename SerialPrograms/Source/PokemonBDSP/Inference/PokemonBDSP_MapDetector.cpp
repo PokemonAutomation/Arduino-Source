@@ -32,17 +32,17 @@ void MapDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box2);
 }
 bool MapDetector::detect(const QImage& screen) const{
-    ImageStats stats0 = image_stats(extract_box_shallow(screen, m_box0));
+    ImageStats stats0 = image_stats(extract_box_reference(screen, m_box0));
 //    cout << "m_box0: " << stats0.average << stats0.stddev << endl;
     if (!is_solid(stats0, {0.0668203, 0.4447, 0.488479})){
         return false;
     }
-    ImageStats stats1 = image_stats(extract_box_shallow(screen, m_box1));
+    ImageStats stats1 = image_stats(extract_box_reference(screen, m_box1));
 //    cout << "m_box1: " << stats1.average << stats1.stddev << endl;
     if (!is_solid(stats1, {0.190189, 0.32745, 0.482361})){
         return false;
     }
-    ImageStats stats2 = image_stats(extract_box_shallow(screen, m_box2));
+    ImageStats stats2 = image_stats(extract_box_reference(screen, m_box2));
 //    cout << "m_box2: " << stats2.average << stats2.stddev << endl;
     if (!is_solid(stats2, {0.0668203, 0.4447, 0.488479})){
         return false;

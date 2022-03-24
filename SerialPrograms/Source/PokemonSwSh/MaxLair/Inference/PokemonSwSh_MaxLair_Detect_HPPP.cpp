@@ -60,7 +60,7 @@ double read_hp_bar_internal(const QImage& image){
     ImageStats stats;
     double bar = 0.5;
     for (size_t c = 0;; c++){
-        stats = image_stats(extract_box_shallow(image, ImageFloatBox(0.0, 0.0, bar, 1.0)));
+        stats = image_stats(extract_box_reference(image, ImageFloatBox(0.0, 0.0, bar, 1.0)));
         double max_color = 0;
         max_color = std::max(max_color, stats.average.r);
         max_color = std::max(max_color, stats.average.g);
@@ -70,7 +70,7 @@ double read_hp_bar_internal(const QImage& image){
         }
         bar *= 0.5;
         if (c > 12){
-            stats = image_stats(extract_box_shallow(image, ImageFloatBox(0.0, 0.0, 1.0, 1.0)));
+            stats = image_stats(extract_box_reference(image, ImageFloatBox(0.0, 0.0, 1.0, 1.0)));
 //            cout << stats.average << stats.stddev << endl;
 //            image.save("test.png");
             return stats.average.sum() < 384 && stats.stddev.sum() < 80

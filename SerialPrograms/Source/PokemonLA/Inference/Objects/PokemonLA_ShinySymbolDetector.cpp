@@ -105,7 +105,7 @@ bool ShinySymbolWatcher::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
-    m_matches = find_shiny_symbols(extract_box_shallow(frame, m_box));
+    m_matches = find_shiny_symbols(extract_box_reference(frame, m_box));
     m_overlays.clear();
     for (const ImagePixelBox& hit : m_matches){
         ImageFloatBox box = translate_to_parent(frame, m_box, hit);

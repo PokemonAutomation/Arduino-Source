@@ -27,19 +27,19 @@ SummaryShinySymbolDetector::SummaryShinySymbolDetector(LoggerQt& logger, VideoOv
 
 SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::detect(const QImage& screen){
     {
-        ImageStats stats = image_stats(extract_box_shallow(screen, m_state1_box));
+        ImageStats stats = image_stats(extract_box_reference(screen, m_state1_box));
         if (!is_black(stats)){
             return Detection::NO_DETECTION;
         }
     }
     {
-        ImageStats stats = image_stats(extract_box_shallow(screen, m_state0_box));
+        ImageStats stats = image_stats(extract_box_reference(screen, m_state0_box));
         if (!is_solid(stats, {0.70, 0.07, 0.23}, 0.2, 10)){
             return Detection::NO_DETECTION;
         }
     }
 
-    ConstImageRef symbol = extract_box_shallow(screen, m_symbol_box);
+    ConstImageRef symbol = extract_box_reference(screen, m_symbol_box);
     if (cluster_fit_2(
         symbol,
         qRgb(255, 255, 255), 0.84,

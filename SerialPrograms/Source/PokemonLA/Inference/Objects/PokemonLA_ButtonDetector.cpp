@@ -117,7 +117,7 @@ void ButtonTracker::process_object(const ConstImageRef& image, const WaterfillOb
 //    image.save("test-" + QString::number(c++) + "-A.png");
 //    extract_box(image, object).save("test-" + QString::number(c++) + "-B.png");
 
-    double rmsd = m_matcher.rmsd(extract_box_shallow(image, object));
+    double rmsd = m_matcher.rmsd(extract_box_reference(image, object));
 //    cout << "rmsd = " << rmsd << endl;
     if (rmsd < m_matcher.m_max_rmsd){
 //        cout << "rmsd = " << rmsd << endl;

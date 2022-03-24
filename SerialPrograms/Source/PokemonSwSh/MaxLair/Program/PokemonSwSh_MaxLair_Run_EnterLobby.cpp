@@ -38,11 +38,11 @@ public:
     {}
 
     bool detect(const QImage& screen){
-        ImageStats stats0 = image_stats(extract_box_shallow(screen, m_box0));
+        ImageStats stats0 = image_stats(extract_box_reference(screen, m_box0));
         if (!is_grey(stats0, 0, 200)){
             return false;
         }
-        ImageStats stats1 = image_stats(extract_box_shallow(screen, m_box1));
+        ImageStats stats1 = image_stats(extract_box_reference(screen, m_box1));
         if (!is_grey(stats1, 0, 200)){
             return false;
         }
@@ -124,7 +124,7 @@ QImage enter_lobby(
 //        screen.save("test.png");
 
         //  We need to pay ore.
-        ImageStats ore_stats = image_stats(extract_box_shallow(screen, ore_box));
+        ImageStats ore_stats = image_stats(extract_box_reference(screen, ore_box));
         if (is_solid(ore_stats, {0.594724, 0.405276, 0.})){
             console.log("Need to pay ore.", COLOR_PURPLE);
 

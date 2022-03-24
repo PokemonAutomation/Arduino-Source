@@ -45,7 +45,7 @@ double SubObjectTemplateMatcher::rmsd(
 //         << object_box.min_y << ", "
 //         << object_box.max_x << ", "
 //         << object_box.max_y << endl;
-    ConstImageRef object = extract_box_shallow(image, object_box);
+    ConstImageRef object = extract_box_reference(image, object_box);
 //    QImage object = extract_box(image, object_box);
 
 //    object.save("test.png");
@@ -64,7 +64,7 @@ double SubObjectTemplateMatcher::rmsd_with_background_replace(
     const ImagePixelBox& subobject_in_image
 ) const{
     object_box = object_from_subobject(subobject_in_image);
-    QImage object = extract_box_shallow(image, object_box).to_qimage();
+    QImage object = extract_box_reference(image, object_box).to_qimage();
     if (object.isNull() || !check_image(object)){
         return 99999.;
     }

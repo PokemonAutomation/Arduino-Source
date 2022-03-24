@@ -58,8 +58,8 @@ bool LobbyDetector::process_frame(
     return detect(frame);
 }
 bool LobbyDetector::detect(const QImage& screen){
-    ImageStats stats0 = image_stats(extract_box_shallow(screen, m_pink));
-    ImageStats stats1 = image_stats(extract_box_shallow(screen, m_white));
+    ImageStats stats0 = image_stats(extract_box_reference(screen, m_pink));
+    ImageStats stats1 = image_stats(extract_box_reference(screen, m_white));
 //    cout << stats0.average << ", " << stats0.stddev << endl;
 //    cout << stats1.average << ", " << stats1.stddev << endl;
     if (!is_solid(stats0, {0.444944, 0.150562, 0.404494})){
@@ -89,12 +89,12 @@ bool LobbyDoneConnecting::process_frame(
     return detect(frame);
 }
 bool LobbyDoneConnecting::detect(const QImage& screen){
-    ImageStats stats0 = image_stats(extract_box_shallow(screen, m_box));
+    ImageStats stats0 = image_stats(extract_box_reference(screen, m_box));
 //    cout << stats0.average << ", " << stats0.stddev << endl;
     if (is_grey(stats0, 0, 200)){
         return false;
     }
-    ImageStats player0 = image_stats(extract_box_shallow(screen, m_player0));
+    ImageStats player0 = image_stats(extract_box_reference(screen, m_player0));
 //    cout << player0.average << player0.stddev << endl;
     if (is_white(player0, 300, 20)){
         return false;
@@ -168,10 +168,10 @@ void LobbyReadyDetector::make_overlays(VideoOverlaySet& items) const{
 }
 size_t LobbyReadyDetector::ready_players(const QImage& screen){
     size_t ready = 0;
-    ImageStats stats0 = image_stats(extract_box_shallow(screen, m_checkbox0));
-    ImageStats stats1 = image_stats(extract_box_shallow(screen, m_checkbox1));
-    ImageStats stats2 = image_stats(extract_box_shallow(screen, m_checkbox2));
-    ImageStats stats3 = image_stats(extract_box_shallow(screen, m_checkbox3));
+    ImageStats stats0 = image_stats(extract_box_reference(screen, m_checkbox0));
+    ImageStats stats1 = image_stats(extract_box_reference(screen, m_checkbox1));
+    ImageStats stats2 = image_stats(extract_box_reference(screen, m_checkbox2));
+    ImageStats stats3 = image_stats(extract_box_reference(screen, m_checkbox3));
     if (stats0.stddev.sum() > 50) ready++;
     if (stats1.stddev.sum() > 50) ready++;
     if (stats2.stddev.sum() > 50) ready++;

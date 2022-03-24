@@ -41,7 +41,7 @@ bool is_exclamation_mark(const ConstImageRef& image, const WaterfillObject& obje
     }
 
 //    const QImage& exclamation_mark = EXCLAMATION_MARK();
-    ConstImageRef obj = extract_box_shallow(image, object);
+    ConstImageRef obj = extract_box_reference(image, object);
     double rmsd = EXCLAMATION_MARK().rmsd(obj);
 //    double rmsd = ImageMatch::pixel_RMSD(exclamation_mark, scaled);
 //    cout << "rmsd = " << rmsd << endl;
