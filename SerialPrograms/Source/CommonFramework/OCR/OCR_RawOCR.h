@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_OCR_RawOCR_H
 #define PokemonAutomation_OCR_RawOCR_H
 
-#include <QImage>
 #include "CommonFramework/Language.h"
+#include "CommonFramework/ImageTypes/ImageReference.h"
 
 namespace PokemonAutomation{
 namespace OCR{
@@ -16,7 +16,7 @@ namespace OCR{
 
 bool language_available(Language language);
 
-QString ocr_read(Language language, const QImage& image);
+QString ocr_read(Language language, const ConstImageRef& image);
 
 
 

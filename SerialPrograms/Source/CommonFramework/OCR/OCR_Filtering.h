@@ -8,6 +8,7 @@
 #define PokemonAutomation_OCR_Filtering_H
 
 #include <QImage>
+#include "CommonFramework/ImageTypes/ImageReference.h"
 
 namespace PokemonAutomation{
 namespace OCR{
@@ -20,7 +21,7 @@ public:
 
 public:
     BrightnessHistogram();
-    BrightnessHistogram(const QImage& image);
+    BrightnessHistogram(const ConstImageRef& image);
 
     void operator+=(QRgb pixel);
 
@@ -45,17 +46,17 @@ struct TextImageFilter{
     bool black_text;
     uint16_t threshold;
 
-    void apply(QImage& image) const;
+    void apply(const ImageRef& image) const;
 };
 
 
-TextImageFilter make_OCR_filter(const QImage& image);
+TextImageFilter make_OCR_filter(const ConstImageRef& image);
 
 
-void filter_smart(QImage& image);
+void filter_smart(const ImageRef& image);
 
-void binary_filter_black_text(QImage& image, int max_rgb_sum = 250);
-void binary_filter_solid_background(QImage& image, double euclidean_distance = 128);
+void binary_filter_black_text(const ImageRef& image, int max_rgb_sum = 250);
+void binary_filter_solid_background(const ImageRef& image, double euclidean_distance = 128);
 
 
 

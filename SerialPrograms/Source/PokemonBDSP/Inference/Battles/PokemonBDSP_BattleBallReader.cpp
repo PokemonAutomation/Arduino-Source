@@ -50,8 +50,8 @@ std::string BattleBallReader::read_ball(const QImage& screen) const{
 
     ImageMatch::ImageMatchResult sprite_result;
     {
-        QImage cropped = extract_box(screen, m_box_sprite);
-        sprite_result = m_matcher.match(cropped, ALPHA_SPREAD);
+        ConstImageRef image = extract_box_shallow(screen, m_box_sprite);
+        sprite_result = m_matcher.match(image, ALPHA_SPREAD);
         sprite_result.log(m_console, 0.50);
         if (!sprite_result.results.empty() && sprite_result.results.begin()->first > MAX_ALPHA){
             sprite_result.results.clear();

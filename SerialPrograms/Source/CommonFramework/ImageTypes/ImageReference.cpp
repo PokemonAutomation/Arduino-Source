@@ -6,6 +6,7 @@
 
 #include <algorithm>
 #include <QImage>
+#include "Common/Cpp/Exceptions.h"
 #include "ImageReference.h"
 
 namespace PokemonAutomation{
@@ -30,6 +31,10 @@ ImageRef::ImageRef(QImage& image){
         m_width = 0;
         m_height = 0;
     }else{
+        QImage::Format format = image.format();
+        if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid QImage format.");
+        }
         m_data = (uint32_t*)image.bits();
         m_bytes_per_row = image.bytesPerLine();
         m_width = image.width();
@@ -48,12 +53,16 @@ ImageRef ImageRef::sub_image(size_t min_x, size_t min_y, size_t width, size_t he
         width, height
     );
 }
+void ImageRef::save(const QString& path) const{
+    QImage tmp((const uchar*)m_data, (int)m_width, (int)m_height, (int)m_bytes_per_row, QImage::Format_ARGB32);
+    tmp.save(path);
+}
 QImage ImageRef::to_qimage() const{
-    QImage tmp((const uchar*)m_data, (int)m_width, (int)m_height, m_bytes_per_row, QImage::Format_ARGB32);
+    QImage tmp((const uchar*)m_data, (int)m_width, (int)m_height, (int)m_bytes_per_row, QImage::Format_ARGB32);
     return tmp.copy();
 }
 QImage ImageRef::scaled_to_qimage(size_t width, size_t height) const{
-    QImage tmp((const uchar*)m_data, (int)m_width, (int)m_height, m_bytes_per_row, QImage::Format_ARGB32);
+    QImage tmp((const uchar*)m_data, (int)m_width, (int)m_height, (int)m_bytes_per_row, QImage::Format_ARGB32);
     if (m_width == width && m_height == height){
         return tmp.copy();
     }
@@ -82,6 +91,10 @@ ConstImageRef::ConstImageRef(const QImage& image){
         m_width = 0;
         m_height = 0;
     }else{
+        QImage::Format format = image.format();
+        if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid QImage format.");
+        }
         m_data = (const uint32_t*)image.bits();
         m_bytes_per_row = image.bytesPerLine();
         m_width = image.width();
@@ -100,12 +113,16 @@ ConstImageRef ConstImageRef::sub_image(size_t min_x, size_t min_y, size_t width,
         width, height
     );
 }
+void ConstImageRef::save(const QString& path) const{
+    QImage tmp((const uchar*)m_data, (int)m_width, (int)m_height, (int)m_bytes_per_row, QImage::Format_ARGB32);
+    tmp.save(path);
+}
 QImage ConstImageRef::to_qimage() const{
-    QImage tmp((const uchar*)m_data, (int)m_width, (int)m_height, m_bytes_per_row, QImage::Format_ARGB32);
+    QImage tmp((const uchar*)m_data, (int)m_width, (int)m_height, (int)m_bytes_per_row, QImage::Format_ARGB32);
     return tmp.copy();
 }
 QImage ConstImageRef::scaled_to_qimage(size_t width, size_t height) const{
-    QImage tmp((const uchar*)m_data, (int)m_width, (int)m_height, m_bytes_per_row, QImage::Format_ARGB32);
+    QImage tmp((const uchar*)m_data, (int)m_width, (int)m_height, (int)m_bytes_per_row, QImage::Format_ARGB32);
     if (m_width == width && m_height == height){
         return tmp.copy();
     }

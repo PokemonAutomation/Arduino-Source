@@ -181,6 +181,10 @@ QImage Qt5VideoWidget::snapshot(){
 
     QImage ret = std::move(capture.image);
     m_pending_captures.erase(iter.first);
+    QImage::Format format = ret.format();
+    if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
+        ret = ret.convertToFormat(QImage::Format_ARGB32);
+    }
     return ret;
 }
 

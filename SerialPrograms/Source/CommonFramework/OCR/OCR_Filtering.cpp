@@ -21,11 +21,11 @@ namespace OCR{
 BrightnessHistogram::BrightnessHistogram(){
     memset(m_count, 0, sizeof(m_count));
 }
-BrightnessHistogram::BrightnessHistogram(const QImage& image)
+BrightnessHistogram::BrightnessHistogram(const ConstImageRef& image)
     : BrightnessHistogram()
 {
-    for (int y = 0; y < image.height(); y++){
-        for (int x = 0; x < image.width(); x++){
+    for (size_t y = 0; y < image.height(); y++){
+        for (size_t x = 0; x < image.width(); x++){
             *this += image.pixel(x, y);
         }
     }
@@ -49,24 +49,24 @@ std::string BrightnessHistogram::dump() const{
 
 
 
-void TextImageFilter::apply(QImage& image) const{
+void TextImageFilter::apply(const ImageRef& image) const{
     if (black_text){
-        for (int y = 0; y < image.height(); y++){
-            for (int x = 0; x < image.width(); x++){
+        for (size_t y = 0; y < image.height(); y++){
+            for (size_t x = 0; x < image.width(); x++){
                 QRgb pixel = image.pixel(x, y);
                 int sum = qRed(pixel) + qGreen(pixel) + qBlue(pixel);
                 pixel = sum < threshold ? qRgb(0, 0, 0) : qRgb(255, 255, 255);
-                image.setPixel(x, y, pixel);
+                image.pixel(x, y) = pixel;
 
             }
         }
     }else{
-        for (int y = 0; y < image.height(); y++){
-            for (int x = 0; x < image.width(); x++){
+        for (size_t y = 0; y < image.height(); y++){
+            for (size_t x = 0; x < image.width(); x++){
                 QRgb pixel = image.pixel(x, y);
                 int sum = qRed(pixel) + qGreen(pixel) + qBlue(pixel);
                 pixel = sum > threshold ? qRgb(0, 0, 0) : qRgb(255, 255, 255);
-                image.setPixel(x, y, pixel);
+                image.pixel(x, y) = pixel;
 
             }
         }
@@ -76,7 +76,7 @@ void TextImageFilter::apply(QImage& image) const{
 
 
 
-TextImageFilter make_OCR_filter(const QImage& image){
+TextImageFilter make_OCR_filter(const ConstImageRef& image){
     const size_t BUCKETS = BrightnessHistogram::BUCKETS;
     const uint16_t BUCKET_SIZE = BrightnessHistogram::BUCKET_SIZE;
 
@@ -152,16 +152,16 @@ TextImageFilter make_OCR_filter(const QImage& image){
 
 
 
-void filter_smart(QImage& image){
+void filter_smart(const ImageRef& image){
     OCR::TextImageFilter filter = OCR::make_OCR_filter(image);
     filter.apply(image);
 }
 
 
 
-void binary_filter_black_text(QImage& image, int max_rgb_sum){
-    pxint_t w = image.width();
-    pxint_t h = image.height();
+void binary_filter_black_text(const ImageRef& image, int max_rgb_sum){
+    size_t w = image.width();
+    size_t h = image.height();
 #if 0
     int min = 0;
     for (pxint_t r = 0; r < h; r++){
@@ -177,12 +177,12 @@ void binary_filter_black_text(QImage& image, int max_rgb_sum){
 //    int threshold = min + 250;
 //    int threshold = 250;
 
-    for (pxint_t r = 0; r < h; r++){
-        for (pxint_t c = 0; c < w; c++){
+    for (size_t r = 0; r < h; r++){
+        for (size_t c = 0; c < w; c++){
             QRgb pixel = image.pixel(c, r);
             int sum = qRed(pixel) + qGreen(pixel) + qBlue(pixel);
             pixel = sum < max_rgb_sum ? qRgb(0, 0, 0) : qRgb(255, 255, 255);
-            image.setPixel(c, r, pixel);
+            image.pixel(c, r) = pixel;
         }
     }
 
@@ -190,19 +190,19 @@ void binary_filter_black_text(QImage& image, int max_rgb_sum){
 //    image.save("test-" + QString::number(c++) + ".png");
 }
 
-void binary_filter_solid_background(QImage& image, double euclidean_distance){
+void binary_filter_solid_background(const ImageRef& image, double euclidean_distance){
     euclidean_distance *= euclidean_distance;
     ImageStats stats = image_border_stats(image);
-    pxint_t w = image.width();
-    pxint_t h = image.height();
-    for (pxint_t r = 0; r < h; r++){
-        for (pxint_t c = 0; c < w; c++){
+    size_t w = image.width();
+    size_t h = image.height();
+    for (size_t r = 0; r < h; r++){
+        for (size_t c = 0; c < w; c++){
             QRgb pixel = image.pixel(c, r);
             double R = (double)qRed(pixel) - stats.average.r;
             double g = (double)qGreen(pixel) - stats.average.g;
             double b = (double)qBlue(pixel) - stats.average.b;
             bool text = R*R + g*g + b*b >= euclidean_distance;
-            image.setPixel(c, r, text ? 0 : 0x00ffffff);
+            image.pixel(c, r) = text ? 0 : 0x00ffffff;
         }
     }
 }

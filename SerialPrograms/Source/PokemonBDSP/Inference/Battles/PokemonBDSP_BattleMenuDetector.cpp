@@ -55,7 +55,7 @@ bool BattleMenuDetector::detect(const QImage& screen) const{
 
     if (m_battle_type == BattleType::STARTER){
         if (!cluster_fit_2(
-            extract_box(screen, m_menu_battle),
+            extract_box_shallow(screen, m_menu_battle),
             qRgb(200, 70, 85), 0.8,
             qRgb(240, 170, 180), 0.2,
             0.2, 80, 0.1

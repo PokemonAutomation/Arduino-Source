@@ -30,7 +30,7 @@ const ImageMatch::ExactImageMatcher& EXCLAMATION_MARK(){
 }
 
 
-bool is_exclamation_mark(const QImage& image, const WaterfillObject& object){
+bool is_exclamation_mark(const ConstImageRef& image, const WaterfillObject& object){
     size_t width = object.width();
     size_t height = object.height();
     if (width > 2 * height){
@@ -41,19 +41,15 @@ bool is_exclamation_mark(const QImage& image, const WaterfillObject& object){
     }
 
 //    const QImage& exclamation_mark = EXCLAMATION_MARK();
-    QImage scaled = image.copy(
-        (pxint_t)object.min_x, (pxint_t)object.min_y,
-        (pxint_t)width, (pxint_t)height
-    );
-//    scaled = scaled.scaled(exclamation_mark.width(), exclamation_mark.height());
-    double rmsd = EXCLAMATION_MARK().rmsd(scaled);
+    ConstImageRef obj = extract_box_shallow(image, object);
+    double rmsd = EXCLAMATION_MARK().rmsd(obj);
 //    double rmsd = ImageMatch::pixel_RMSD(exclamation_mark, scaled);
 //    cout << "rmsd = " << rmsd << endl;
     return rmsd <= 80;
 }
 
 
-std::vector<ImagePixelBox> find_exclamation_marks(const QImage& image){
+std::vector<ImagePixelBox> find_exclamation_marks(const ConstImageRef& image){
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_min(image, 200, 200, 200);
     std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 400, false);
     std::vector<ImagePixelBox> ret;

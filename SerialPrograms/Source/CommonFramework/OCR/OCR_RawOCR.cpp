@@ -40,7 +40,7 @@ public:
         )
     {}
 
-    QString run(const QImage& image){
+    QString run(const ConstImageRef& image){
         TesseractAPI* instance;
         do{
             {
@@ -81,10 +81,10 @@ public:
 
 //        auto start = std::chrono::system_clock::now();
         TesseractString str = instance->read32(
-            image.bits(),
+            (const unsigned char*)image.data(),
             image.width(),
             image.height(),
-            image.bytesPerLine()
+            image.bytes_per_row()
         );
 //        auto end = std::chrono::system_clock::now();
 //        cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << endl;
@@ -132,13 +132,9 @@ SpinLock ocr_pool_lock;
 std::map<Language, TesseractPool> ocr_pool;
 
 
-QString ocr_read(Language language, const QImage& image){
+QString ocr_read(Language language, const ConstImageRef& image){
 //    static size_t c = 0;
 //    image.save("test-" + QString::number(c++) + ".png");
-
-    const QImage& ready = image.format() == QImage::Format_RGB32
-        ? image
-        : image.convertToFormat(QImage::Format_RGB32);
 
     std::map<Language, TesseractPool>::iterator iter;
     {
@@ -148,7 +144,7 @@ QString ocr_read(Language language, const QImage& image){
             iter = ocr_pool.emplace(language, language).first;
         }
     }
-    return iter->second.run(ready);
+    return iter->second.run(image);
 }
 
 

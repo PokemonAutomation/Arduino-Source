@@ -5,6 +5,7 @@
  */
 
 #include <sstream>
+#include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Language.h"

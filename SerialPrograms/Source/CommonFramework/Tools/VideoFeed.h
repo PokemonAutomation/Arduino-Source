@@ -23,6 +23,7 @@ public:
     virtual void async_reset_video() = 0;
 
     //  Do not call this on the main thread or it will deadlock.
+    //  Format must be "Format_ARGB32" or "Format_RGB32".
     virtual QImage snapshot() = 0;
 };
 

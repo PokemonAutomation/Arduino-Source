@@ -37,10 +37,8 @@ double ImageMatchDetector::rmsd(const QImage& frame) const{
     if (frame.isNull()){
         return 1000;
     }
-    QImage scaled = extract_box(frame, m_box);
-    if (scaled.size() != m_reference_image.size()){
-        scaled = scaled.scaled(m_reference_image.size());
-    }
+    ConstImageRef image = extract_box_shallow(frame, m_box);
+    QImage scaled = image.scaled_to_qimage(m_reference_image.width(), m_reference_image.height());
 
     if (m_scale_brightness){
         FloatPixel image_brightness = ImageMatch::pixel_average(scaled, m_reference_image);

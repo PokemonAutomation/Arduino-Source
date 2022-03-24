@@ -161,7 +161,10 @@ QImage Qt6VideoWidget::snapshot(){
     }
 
     QImage ret = m_videoFrame.toImage();
-
+    QImage::Format format = ret.format();
+    if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
+        ret = ret.convertToFormat(QImage::Format_ARGB32);
+    }
     return ret;
 }
 

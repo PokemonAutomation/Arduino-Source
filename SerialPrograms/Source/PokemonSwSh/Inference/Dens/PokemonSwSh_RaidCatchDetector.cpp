@@ -58,7 +58,7 @@ bool RaidCatchDetector::detect(const QImage& screen){
 
 //    cout << "==================" << endl;
     if (!cluster_fit_2(
-        extract_box(screen, m_text0),
+        extract_box_shallow(screen, m_text0),
         qRgb(0, 0, 0), 0.90,
         qRgb(255, 255, 255), 0.10
     )){
@@ -66,7 +66,7 @@ bool RaidCatchDetector::detect(const QImage& screen){
     }
 //    cout << "------------------" << endl;
     if (!cluster_fit_2(
-        extract_box(screen, m_text1),
+        extract_box_shallow(screen, m_text1),
         qRgb(255, 255, 255), 0.90,
         qRgb(0, 0, 0), 0.10
     )){

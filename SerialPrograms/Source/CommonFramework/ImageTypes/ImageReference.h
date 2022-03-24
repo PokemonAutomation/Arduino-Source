@@ -11,6 +11,7 @@
 #include <stdint.h>
 #include "Common/Compiler.h"
 
+class QString;
 class QImage;
 
 namespace PokemonAutomation{
@@ -41,6 +42,7 @@ public:
 
 
 public:
+    void save(const QString& path) const;
     QImage to_qimage() const;
     QImage scaled_to_qimage(size_t width, size_t height) const;
 
@@ -80,6 +82,7 @@ public:
 
 
 public:
+    void save(const QString& path) const;
     QImage to_qimage() const;
     QImage scaled_to_qimage(size_t width, size_t height) const;
 
