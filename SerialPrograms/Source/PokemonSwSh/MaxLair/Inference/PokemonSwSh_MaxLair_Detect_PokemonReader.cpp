@@ -222,6 +222,7 @@ ImageMatch::ImageMatchResult read_pokemon_sprite_set_with_item(
     double max_alpha = SpeciesReadDatabase::CROPPED_MAX_ALPHA;
 
     ImageMatch::ImageMatchResult result = database.sprite_reader->match(image, SpeciesReadDatabase::CROPPED_ALPHA_SPREAD);
+//    result.results.clear();
 //    result.log(logger, SpeciesReadDatabase::CROPPED_MAX_ALPHA);
 
     //  Try with exact matcher.

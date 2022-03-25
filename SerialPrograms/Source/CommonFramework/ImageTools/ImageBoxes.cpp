@@ -102,10 +102,22 @@ ImageRef extract_box_reference(QImage& image, const ImageFloatBox& box){
     return extract_box_reference(ImageRef(image), box);
 }
 ConstImageRef extract_box_reference(const ConstImageRef& image, const ImageFloatBox& box, int offset_x, int offset_y){
-    size_t min_x = (size_t)(image.width() * box.x + 0.5) + offset_x;
-    size_t min_y = (size_t)(image.height() * box.y + 0.5) + offset_y;
-    size_t width = (size_t)(image.width() * box.width + 0.5);
-    size_t height = (size_t)(image.height() * box.height + 0.5);
+    ptrdiff_t min_x = (ptrdiff_t)(image.width() * box.x + 0.5) + offset_x;
+    ptrdiff_t min_y = (ptrdiff_t)(image.height() * box.y + 0.5) + offset_y;
+    ptrdiff_t width = (ptrdiff_t)(image.width() * box.width + 0.5);
+    ptrdiff_t height = (ptrdiff_t)(image.height() * box.height + 0.5);
+
+    if (min_x < 0){
+        width += min_x;
+        min_x = 0;
+        width = std::max<ptrdiff_t>(width, 0);
+    }
+    if (min_y < 0){
+        height += min_y;
+        min_y = 0;
+        height = std::max<ptrdiff_t>(height, 0);
+    }
+
     return image.sub_image(min_x, min_y, width, height);
 }
 
@@ -117,6 +129,14 @@ QImage extract_box_copy(const QImage& image, const ImageFloatBox& box){
     return image.copy(
         (pxint_t)(image.width() * box.x + 0.5),
         (pxint_t)(image.height() * box.y + 0.5),
+        (pxint_t)(image.width() * box.width + 0.5),
+        (pxint_t)(image.height() * box.height + 0.5)
+    );
+}
+QImage extract_box(const QImage& image, const ImageFloatBox& box, int offset_x, int offset_y){
+    return image.copy(
+        (pxint_t)(image.width() * box.x + 0.5) + offset_x,
+        (pxint_t)(image.height() * box.y + 0.5) + offset_y,
         (pxint_t)(image.width() * box.width + 0.5),
         (pxint_t)(image.height() * box.height + 0.5)
     );

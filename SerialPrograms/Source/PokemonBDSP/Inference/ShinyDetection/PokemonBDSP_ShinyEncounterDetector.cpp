@@ -200,7 +200,7 @@ void detect_shiny_battle(
     );
     wild_result.best_screenshot = tracker.sparkles_wild_overall().best_image();
     your_result.best_screenshot = tracker.sparkles_own().best_image();
-    your_result.best_screenshot.save("test.png");
+//    your_result.best_screenshot.save("test.png");
 }
 
 

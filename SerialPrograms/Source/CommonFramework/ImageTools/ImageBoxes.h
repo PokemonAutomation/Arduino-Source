@@ -81,6 +81,7 @@ ConstImageRef extract_box_reference(const ConstImageRef& image, const ImageFloat
 //  Deep copy the sub-region.
 QImage extract_box_copy(const QImage& image, const ImagePixelBox& box);
 QImage extract_box_copy(const QImage& image, const ImageFloatBox& box);
+QImage extract_box_copy(const QImage& image, const ImageFloatBox& box, int offset_x, int offset_y);
 
 //  Given:
 //      -   "inference_box" is a box within "original_image".

@@ -11,6 +11,10 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA_FlagNavigationAir.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
@@ -94,8 +98,8 @@ FlagNavigationAir::FlagNavigationAir(
         m_console.log("Switching from Ursaluna (off) to Braviary (on)...");
         m_active_command->dispatch([=](const BotBaseContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
-            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
-            pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
+//            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
+//            pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
@@ -103,7 +107,7 @@ FlagNavigationAir::FlagNavigationAir(
         m_console.log("Switching from Ursaluna (on) to Braviary (on)...");
         m_active_command->dispatch([=](const BotBaseContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
-            pbf_press_dpad(context, DPAD_RIGHT, 20, GET_ON_BRAVIARY_TIME);
+//            pbf_press_dpad(context, DPAD_RIGHT, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
@@ -156,6 +160,7 @@ FlagNavigationAir::FlagNavigationAir(
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
                 context.wait_for_all_requests();
+                m_looking_straight_ahead_timestamp.store(std::chrono::system_clock::now());
                 m_looking_straight_ahead.store(true, std::memory_order_release);
 //                cout << "State::DASH_FORWARD: m_looking_straight_ahead = true" << endl;
             }
@@ -170,6 +175,7 @@ FlagNavigationAir::FlagNavigationAir(
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
                 context.wait_for_all_requests();
+                m_looking_straight_ahead_timestamp.store(std::chrono::system_clock::now());
                 m_looking_straight_ahead.store(true, std::memory_order_release);
 //                cout << "State::DASH_FORWARD: m_looking_straight_ahead = true" << endl;
             }
@@ -185,10 +191,11 @@ FlagNavigationAir::FlagNavigationAir(
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
                 context.wait_for_all_requests();
+                m_looking_straight_ahead_timestamp.store(std::chrono::system_clock::now());
                 m_looking_straight_ahead.store(true, std::memory_order_release);
 //                cout << "State::DASH_LEFT: m_looking_straight_ahead = true" << endl;
             }
-            pbf_press_button(context, BUTTON_B, 10, 0);
+//            pbf_press_button(context, BUTTON_B, 10, 0);
             double shift = 0;
             double distance, flag_x, flag_y;
             if (m_flag.get(distance, flag_x, flag_y)){
@@ -210,6 +217,7 @@ FlagNavigationAir::FlagNavigationAir(
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
                 context.wait_for_all_requests();
+                m_looking_straight_ahead_timestamp.store(std::chrono::system_clock::now());
                 m_looking_straight_ahead.store(true, std::memory_order_release);
 //                cout << "State::DASH_FORWARD: m_looking_straight_ahead = true" << endl;
             }
@@ -225,6 +233,7 @@ FlagNavigationAir::FlagNavigationAir(
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
                 context.wait_for_all_requests();
+                m_looking_straight_ahead_timestamp.store(std::chrono::system_clock::now());
                 m_looking_straight_ahead.store(true, std::memory_order_release);
 //                cout << "State::DASH_LEFT: m_looking_straight_ahead = true" << endl;
             }
@@ -429,11 +438,27 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
     }
 
     //  Dive
-    bool currently_diving =
-        state == State::DIVE_STRAIGHT ||
-        state == State::DIVE_LEFT ||
-        state == State::DIVE_RIGHT;
-    if (m_flag_y > 0.45 || (currently_diving && m_flag_y > 0.10)){
+    double dive_threshold = 0.80;
+    switch (state){
+    case State::DIVE_STRAIGHT:
+    case State::DIVE_LEFT:
+    case State::DIVE_RIGHT:
+        dive_threshold = 0.10;
+        break;
+    case State::DASH_FORWARD_HOLD_B:
+    case State::DASH_FORWARD_MASH_B:
+    case State::DASH_LEFT:
+    case State::DASH_RIGHT:{
+        if (m_looking_straight_ahead.load(std::memory_order_acquire) &&
+            m_looking_straight_ahead_timestamp.load(std::memory_order_acquire) + std::chrono::seconds(1) < timestamp){
+            dive_threshold = 0.45;
+        }
+        break;
+    }
+    default:;
+    }
+//    cout << "m_flag_y = " << m_flag_y << endl;
+    if (m_flag_y > dive_threshold){
         if (0.49 <= m_flag_x && m_flag_x <= 0.51){
             return run_state_action(State::DIVE_STRAIGHT);
         }else{
