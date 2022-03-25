@@ -5,16 +5,20 @@
  */
 
 #include <map>
+#include "Common/Cpp/FixedLimitVector.tpp"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "PokemonLA_WhiteObjectDetector.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-using namespace Kernels;
 using namespace Kernels::Waterfill;
 
 
@@ -28,43 +32,20 @@ void find_overworld_white_objects(
         const std::set<Color>& thresholds = item.first.thresholds();
         threshold_set.insert(thresholds.begin(), thresholds.end());
     }
-    std::vector<Color> threshold_list(threshold_set.begin(), threshold_set.end());
 
-    size_t filters = threshold_set.size();
-    std::vector<PackedBinaryMatrix2> matrix(filters);
-    {
-        size_t c = 0;
-        for (; c + 3 < filters; c += 4){
-            compress4_rgb32_to_binary_range(
-                image,
-                matrix[c + 0], (uint32_t)threshold_list[c + 0], 0xffffffff,
-                matrix[c + 1], (uint32_t)threshold_list[c + 1], 0xffffffff,
-                matrix[c + 2], (uint32_t)threshold_list[c + 2], 0xffffffff,
-                matrix[c + 3], (uint32_t)threshold_list[c + 3], 0xffffffff
-            );
-        }
-        for (; c + 1 < filters; c += 2){
-            compress2_rgb32_to_binary_range(
-                image,
-                matrix[c + 0], (uint32_t)threshold_list[c + 0], 0xffffffff,
-                matrix[c + 1], (uint32_t)threshold_list[c + 1], 0xffffffff
-            );
-        }
-        for (; c < filters; c++){
-            matrix[c] = compress_rgb32_to_binary_range(
-                image, (uint32_t)threshold_list[c + 0], 0xffffffff
-            );
-        }
+    FixedLimitVector<CompressRgb32ToBinaryRangeFilter> filters(threshold_set.size());
+    for (Color filter : threshold_set){
+        filters.emplace_back(image.width(), image.height(), (uint32_t)filter, 0xffffffff);
     }
+    compress_rgb32_to_binary_range(image, filters.data(), filters.size());
 
-    for (size_t c = 0; c < filters; c++){
-        auto finder = make_WaterfillIterator(matrix[c], 50);
-//        WaterfillIterator finder(matrix[c], 50);
+    for (CompressRgb32ToBinaryRangeFilter& filter : filters){
+        auto finder = make_WaterfillIterator(filter.matrix, 50);
         WaterfillObject object;
         while (finder->find_next(object)){
             for (const auto& detector : detectors){
                 const std::set<Color>& thresholds = detector.first.thresholds();
-                if (thresholds.find(threshold_list[c]) != thresholds.end()){
+                if (thresholds.find((Color)filter.mins) != thresholds.end()){
                     detector.first.process_object(image, object);
                 }
             }

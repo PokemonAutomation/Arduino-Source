@@ -57,6 +57,14 @@ void compress4_rgb32_to_binary_range_x64_SSE42(
         static_cast<PackedBinaryMatrix_x64_SSE42&>(matrix3).get(), compressor3
     );
 }
+void compress_rgb32_to_binary_range_x64_SSE42(
+    const uint32_t* image, size_t bytes_per_row,
+    CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
+){
+    compress_rgb32_to_binary<PackedBinaryMatrix_x64_SSE42, Compressor_RgbRange_x64_SSE41>(
+        image, bytes_per_row, filter, filter_count
+    );
+}
 
 
 

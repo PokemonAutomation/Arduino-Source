@@ -31,7 +31,7 @@ const ImageMatch::ExactImageMatcher& SELECTION_ARROW(){
 }
 
 
-bool is_selection_arrow(const QImage& image, const WaterfillObject& object){
+bool is_selection_arrow(const ConstImageRef& image, const WaterfillObject& object){
     size_t width = object.width();
     size_t height = object.height();
     if (width > height){
@@ -42,10 +42,11 @@ bool is_selection_arrow(const QImage& image, const WaterfillObject& object){
     }
 
 //    const QImage& exclamation_mark = SELECTION_ARROW();
-    QImage cropped = image.copy(
-        (int)object.min_x, (int)object.min_y,
-        (int)width, (int)height
-    );
+//    QImage cropped = image.copy(
+//        (int)object.min_x, (int)object.min_y,
+//        (int)width, (int)height
+//    );
+    ConstImageRef cropped = extract_box_reference(image, object);
 
 //    static int c = 0;
 //    scaled.save("test-" + QString::number(c++) + ".png");
@@ -59,7 +60,7 @@ bool is_selection_arrow(const QImage& image, const WaterfillObject& object){
 }
 
 
-std::vector<ImagePixelBox> find_selection_arrows(const QImage& image){
+std::vector<ImagePixelBox> find_selection_arrows(const ConstImageRef& image){
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_max(image, 200, 200, 200);
     std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 200, false);
     std::vector<ImagePixelBox> ret;
@@ -88,7 +89,7 @@ SelectionArrowFinder::SelectionArrowFinder(
 {}
 
 void SelectionArrowFinder::detect(const QImage& screen){
-    std::vector<ImagePixelBox> arrows = find_selection_arrows(extract_box(screen, m_box));
+    std::vector<ImagePixelBox> arrows = find_selection_arrows(extract_box_reference(screen, m_box));
 
     m_arrow_boxes.clear();
     for (const ImagePixelBox& mark : arrows){

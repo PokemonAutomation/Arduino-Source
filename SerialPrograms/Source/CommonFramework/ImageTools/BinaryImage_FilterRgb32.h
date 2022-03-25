@@ -10,6 +10,7 @@
 #include <stdint.h>
 #include "Common/Cpp/Color.h"
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
+#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
 #include "CommonFramework/ImageTypes/ImageReference.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 
@@ -60,6 +61,23 @@ void compress4_rgb32_to_binary_range(
     PackedBinaryMatrix2& matrix1, uint32_t mins1, uint32_t maxs1,
     PackedBinaryMatrix2& matrix2, uint32_t mins2, uint32_t maxs2,
     PackedBinaryMatrix2& matrix3, uint32_t mins3, uint32_t maxs3
+);
+
+
+struct CompressRgb32ToBinaryRangeFilter{
+    PackedBinaryMatrix2 matrix;
+    uint32_t mins;
+    uint32_t maxs;
+
+    CompressRgb32ToBinaryRangeFilter(size_t width, size_t height, uint32_t p_mins, uint32_t p_maxs)
+        : matrix(width, height)
+        , mins(p_mins)
+        , maxs(p_maxs)
+    {}
+};
+void compress_rgb32_to_binary_range(
+    const ConstImageRef& image,
+    CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
 );
 
 

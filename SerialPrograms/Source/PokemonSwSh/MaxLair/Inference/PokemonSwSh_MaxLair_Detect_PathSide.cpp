@@ -298,7 +298,7 @@ bool is_arrow(const QImage& image, const WaterfillObject& object){
         return false;
     }
 
-    PackedBinaryMatrix2 inverted = matrix;
+    PackedBinaryMatrix2 inverted = matrix.copy();
     inverted.invert();
 
 //    static int c = 0;

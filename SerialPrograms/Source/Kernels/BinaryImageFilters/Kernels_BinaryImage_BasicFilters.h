@@ -53,6 +53,23 @@ void compress4_rgb32_to_binary_range(
     PackedBinaryMatrix_IB& matrix3, uint32_t mins3, uint32_t maxs3
 );
 
+struct CompressRgb32ToBinaryRangeFilter{
+    PackedBinaryMatrix_IB& matrix;
+    uint32_t mins;
+    uint32_t maxs;
+
+    CompressRgb32ToBinaryRangeFilter(PackedBinaryMatrix_IB& p_matrix, uint32_t p_mins, uint32_t p_maxs)
+        : matrix(p_matrix)
+        , mins(p_mins)
+        , maxs(p_maxs)
+    {}
+};
+void compress_rgb32_to_binary_range(
+    const uint32_t* image, size_t bytes_per_row,
+    CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
+);
+
+
 
 
 //  Selectively replace each pixel in an rgb32 image with the specified pixel

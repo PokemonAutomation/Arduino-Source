@@ -66,7 +66,7 @@ bool check_hole(
     size_t box_area, size_t object_area,
     size_t center_x, size_t center_y
 ){
-    PackedBinaryMatrix2 inverted = object;
+    PackedBinaryMatrix2 inverted = object.copy();
     inverted.invert();
 
     //  Edge area is too large relative to the entire enclosing box.

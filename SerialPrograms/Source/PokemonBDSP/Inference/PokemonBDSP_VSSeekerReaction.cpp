@@ -39,11 +39,14 @@ bool is_seeker_bubble(const QImage& image, const WaterfillObject& object){
     }
 
     const QImage& exclamation_mark = VS_SEEKER_REACTION_BUBBLE();
+    QImage scaled = extract_box_reference(image, object).scaled_to_qimage(exclamation_mark.width(), exclamation_mark.height());
+#if 0
     QImage scaled = image.copy(
         (pxint_t)object.min_x, (pxint_t)object.min_y,
         (pxint_t)width, (pxint_t)height
     );
     scaled = scaled.scaled(exclamation_mark.width(), exclamation_mark.height());
+#endif
     double rmsd = ImageMatch::pixel_RMSD(exclamation_mark, scaled);
 //    cout << "rmsd = " << rmsd << endl;
     return rmsd <= 80;

@@ -259,6 +259,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     FlagTracker tracker(logger, overlay);
 
 
+//    QImage src("20220315-054734853907.jpg");
     QImage src("20220315-055335301551.jpg");
     while (true){
         tracker.process_frame(src, std::chrono::system_clock::now());

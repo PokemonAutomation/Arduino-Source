@@ -9,6 +9,8 @@
 
 #include <stddef.h>
 #include <stdint.h>
+#include "Common/Cpp/FixedLimitVector.tpp"
+#include "Kernels_BinaryImage_BasicFilters.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -102,6 +104,52 @@ void compress4_rgb32_to_binary(
         image = (const uint32_t*)((const char*)image + bytes_per_row);
     }
 }
+
+
+template <typename BinaryMatrixType, typename Compressor>
+struct CompressRgb32ToBinaryRangeEntry{
+    BinaryMatrixType& matrix;
+    Compressor compressor;
+
+    CompressRgb32ToBinaryRangeEntry(BinaryMatrixType& p_matrix, uint32_t mins, uint32_t maxs)
+        : matrix(p_matrix)
+        , compressor(mins, maxs)
+    {}
+};
+template <typename BinaryMatrixType, typename Compressor>
+void compress_rgb32_to_binary(
+    const uint32_t* image, size_t bytes_per_row,
+    CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
+){
+    using Entry = CompressRgb32ToBinaryRangeEntry<BinaryMatrixType, Compressor>;
+    FixedLimitVector<Entry> entries(filter_count);
+    for (size_t c = 0; c < filter_count; c++){
+        entries.emplace_back(static_cast<BinaryMatrixType&>(filter[c].matrix), filter[c].mins, filter[c].maxs);
+    }
+
+    size_t bit_width = entries[0].matrix.get().width();
+    size_t word_height = entries[0].matrix.get().word64_height();
+    for (size_t r = 0; r < word_height; r++){
+        const uint32_t* img = image;
+        size_t c = 0;
+        size_t left = bit_width;
+        while (left >= 64){
+            for (Entry& entry : entries){
+                entry.matrix.get().word64(c, r) = entry.compressor.convert64(img);
+            }
+            c++;
+            img += 64;
+            left -= 64;
+        }
+        if (left > 0){
+            for (Entry& entry : entries){
+                entry.matrix.get().word64(c, r) = entry.compressor.convert64(img, left);
+            }
+        }
+        image = (const uint32_t*)((const char*)image + bytes_per_row);
+    }
+}
+
 
 
 template <typename BinaryMatrixType, typename Filter>

@@ -180,8 +180,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env){
         InferenceBoxScope box0(host, {0.925, 0.100, 0.014, 0.030});
         InferenceBoxScope box1(recv, {0.925, 0.100, 0.014, 0.030});
         env.run_in_parallel([&](ConsoleHandle& console){
-            QImage image = extract_box(console.video().snapshot(), box0);
-            ImageStats stats = image_stats(image);
+            ImageStats stats = image_stats(extract_box_reference(console.video().snapshot(), box0));
             bool ok = is_white(stats);
             if (host.index() == console.index()){
                 host_ok = ok;

@@ -6,6 +6,7 @@
 
 #ifdef PA_AutoDispatch_17_Skylake
 
+#include "Common/Cpp/FixedLimitVector.tpp"
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_x64_AVX512.h"
 #include "Kernels_BinaryImage_BasicFilters_Routines.h"
 #include "Kernels_BinaryImage_BasicFilters_x64_AVX512.h"
@@ -55,6 +56,14 @@ void compress4_rgb32_to_binary_range_x64_AVX512(
         static_cast<PackedBinaryMatrix_x64_AVX512&>(matrix1).get(), compressor1,
         static_cast<PackedBinaryMatrix_x64_AVX512&>(matrix2).get(), compressor2,
         static_cast<PackedBinaryMatrix_x64_AVX512&>(matrix3).get(), compressor3
+    );
+}
+void compress_rgb32_to_binary_range_x64_AVX512(
+    const uint32_t* image, size_t bytes_per_row,
+    CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
+){
+    compress_rgb32_to_binary<PackedBinaryMatrix_x64_AVX512, Compressor_RgbRange_x64_AVX512>(
+        image, bytes_per_row, filter, filter_count
     );
 }
 

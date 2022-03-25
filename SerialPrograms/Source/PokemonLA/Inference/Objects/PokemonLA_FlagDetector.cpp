@@ -12,11 +12,14 @@
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "PokemonLA_FlagDetector.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-using namespace Kernels;
 using namespace Kernels::Waterfill;
 
 
@@ -223,22 +226,20 @@ int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
     ConstImageRef image = extract_box_reference(screen, box);
 //    image.save("test.png");
 
-    PackedBinaryMatrix2 matrix[6];
-    compress4_rgb32_to_binary_range(
-        image,
-        matrix[0], 0xff808080, 0xffffffff,
-        matrix[1], 0xff909090, 0xffffffff,
-        matrix[2], 0xffa0a0a0, 0xffffffff,
-        matrix[3], 0xffb0b0b0, 0xffffffff
-    );
-    compress2_rgb32_to_binary_range(
-        image,
-        matrix[4], 0xffc0c0c0, 0xffffffff,
-        matrix[5], 0xffd0d0d0, 0xffffffff
-    );
+    size_t width = image.width();
+    size_t height = image.height();
+    CompressRgb32ToBinaryRangeFilter filters[] = {
+        {width, height, 0xff808080, 0xffffffff},
+        {width, height, 0xff909090, 0xffffffff},
+        {width, height, 0xffa0a0a0, 0xffffffff},
+        {width, height, 0xffb0b0b0, 0xffffffff},
+        {width, height, 0xffc0c0c0, 0xffffffff},
+        {width, height, 0xffd0d0d0, 0xffffffff},
+        {width, height, 0xffe0e0e0, 0xffffffff},
+        {width, height, 0xfff0f0f0, 0xffffffff},
+    };
+    compress_rgb32_to_binary_range(image, filters, 8);
 
-    size_t width = matrix[0].width();
-    size_t height = matrix[0].height();
     double inv_width = 0.5 / width;
 
     struct Hit{
@@ -252,8 +253,9 @@ int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
 
     //  Detect all the digits.
     std::multimap<size_t, Hit> hits;
-    for (size_t c = 0; c < 6; c++){
-        auto finder = make_WaterfillIterator(matrix[c], 30);
+    for (size_t c = 0; c < 8; c++){
+//        cout << (int)filters[c].matrix.type() << endl;
+        auto finder = make_WaterfillIterator(filters[c].matrix, 30);
         WaterfillObject object;
         while (finder->find_next(object)){
             //  Skip anything that touches the edge.
@@ -283,7 +285,7 @@ int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
     }
 
 //    for (const auto& item : hits){
-//        cout << item.first << " : " << item.second.second << " - " << item.second.first << endl;
+//        cout << item.first << " : " << item.second.min_x << " - " << item.second.max_x << endl;
 //    }
 
 

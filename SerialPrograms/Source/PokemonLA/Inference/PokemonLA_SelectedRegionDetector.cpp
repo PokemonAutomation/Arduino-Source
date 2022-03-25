@@ -49,10 +49,10 @@ public:
         }
 
         for (RegionState& region : m_regions){
-            QImage current = extract_box(frame, region.box);
+            ConstImageRef current = extract_box_reference(frame, region.box);
 
-            if (current.size() != region.start.size()){
-                region.start = current;
+            if (current.width() != (size_t)region.start.width() || current.height() != (size_t)region.start.height()){
+                region.start = current.to_qimage();
                 continue;
             }
 

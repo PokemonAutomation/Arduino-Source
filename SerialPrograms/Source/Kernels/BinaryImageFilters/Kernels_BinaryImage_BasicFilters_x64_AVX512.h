@@ -53,10 +53,17 @@ public:
 
 private:
     PA_FORCE_INLINE uint64_t convert16(__m512i pixel) const{
+#if 0
         __mmask64 cmp64A = _mm512_cmpgt_epu8_mask(m_mins, pixel);
         __mmask64 cmp64B = _mm512_cmpgt_epu8_mask(pixel, m_maxs);
         pixel = _mm512_movm_epi8(cmp64A | cmp64B);
         __mmask16 cmp16 = _mm512_cmpeq_epi32_mask(pixel, _mm512_setzero_si512());
+#else
+        __mmask64 cmp64A = _mm512_cmple_epu8_mask(m_mins, pixel);
+        __mmask64 cmp64B = _mm512_mask_cmple_epu8_mask(cmp64A, pixel, m_maxs);
+        pixel = _mm512_movm_epi8(cmp64B);
+        __mmask16 cmp16 = _mm512_cmpeq_epi32_mask(pixel, _mm512_set1_epi32(-1));
+#endif
         return cmp16;
     }
 

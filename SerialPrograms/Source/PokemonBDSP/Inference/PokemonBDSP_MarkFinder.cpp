@@ -78,7 +78,7 @@ bool MarkTracker::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point
 ){
-    std::vector<ImagePixelBox> exclamation_marks = find_exclamation_marks(extract_box(frame, m_box));
+    std::vector<ImagePixelBox> exclamation_marks = find_exclamation_marks(extract_box_reference(frame, m_box));
 //        cout << exclamation_marks.size() << endl;
 
     m_marks.clear();

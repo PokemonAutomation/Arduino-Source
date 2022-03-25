@@ -69,7 +69,7 @@ std::vector<ImagePixelBox> find_shiny_symbols(const ConstImageRef& image){
     );
     std::vector<ImagePixelBox> ret;
     {
-        PackedBinaryMatrix2 copy = matrix;
+        PackedBinaryMatrix2 copy = matrix.copy();
         auto finder = make_WaterfillIterator(copy, 20);
         WaterfillObject object;
         while (finder->find_next(object)){

@@ -132,7 +132,7 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env){
         }
 
         ImageFloatBox dialog_box(0.218, 0.835, 0.657, 0.12);
-        QImage dialog_image = extract_box(screen, dialog_box);
+        ConstImageRef dialog_image = extract_box_reference(screen, dialog_box);
         const auto result = Pokemon::BerryNameReader::instance().read_substring(env.console, LANGUAGE, dialog_image);
         if (result.results.empty()){
             throw OperationFailedException(env.console, "No berry name found in dialog box");

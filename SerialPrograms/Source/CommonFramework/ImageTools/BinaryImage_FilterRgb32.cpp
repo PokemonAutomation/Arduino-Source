@@ -4,10 +4,14 @@
  *
  */
 
-#include <QImage>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/FixedLimitVector.tpp"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
 #include "BinaryImage_FilterRgb32.h"
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -112,6 +116,19 @@ void compress4_rgb32_to_binary_range(
         matrix1, mins1, maxs1,
         matrix2, mins2, maxs2,
         matrix3, mins3, maxs3
+    );
+}
+void compress_rgb32_to_binary_range(
+    const ConstImageRef& image,
+    CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
+){
+    FixedLimitVector<Kernels::CompressRgb32ToBinaryRangeFilter> filters(filter_count);
+    for (size_t c = 0; c < filter_count; c++){
+        filters.emplace_back(filter[c].matrix, filter[c].mins, filter[c].maxs);
+    }
+    compress_rgb32_to_binary_range(
+        image.data(), image.bytes_per_row(),
+        filters.data(), filter_count
     );
 }
 

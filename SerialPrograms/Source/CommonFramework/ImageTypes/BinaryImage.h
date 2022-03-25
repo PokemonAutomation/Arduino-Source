@@ -17,8 +17,11 @@ public:
     //  Rule of 5
     PackedBinaryMatrix2(PackedBinaryMatrix2&& x) : m_matrix(std::move(x.m_matrix)) {}
     void operator=(PackedBinaryMatrix2&& x){ m_matrix = std::move(x.m_matrix); }
-    PackedBinaryMatrix2(const PackedBinaryMatrix2& x) : m_matrix(x.m_matrix->clone()) {}
-    void operator=(const PackedBinaryMatrix2& x){ m_matrix = x.m_matrix->clone(); }
+//    PackedBinaryMatrix2(const PackedBinaryMatrix2& x) : m_matrix(x.m_matrix->clone()) {}
+//    void operator=(const PackedBinaryMatrix2& x){ m_matrix = x.m_matrix->clone(); }
+
+    //  Don't allow implicit copying.
+    PackedBinaryMatrix2 copy() const{ return m_matrix->clone(); };
 
 public:
     //  Construction

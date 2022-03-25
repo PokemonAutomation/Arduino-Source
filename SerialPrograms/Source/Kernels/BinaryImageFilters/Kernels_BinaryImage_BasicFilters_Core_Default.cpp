@@ -55,6 +55,14 @@ void compress4_rgb32_to_binary_range_Default(
         static_cast<PackedBinaryMatrix_Default&>(matrix3).get(), compressor3
     );
 }
+void compress_rgb32_to_binary_range_Default(
+    const uint32_t* image, size_t bytes_per_row,
+    CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
+){
+    compress_rgb32_to_binary<PackedBinaryMatrix_Default, Compressor_RgbRange_Default>(
+        image, bytes_per_row, filter, filter_count
+    );
+}
 
 
 
