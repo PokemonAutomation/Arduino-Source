@@ -40,19 +40,6 @@ void compress_rgb32_to_binary_range(
 //  Same as above, but multiple filters.
 //  The purpose is to reduce passes over the entire image.
 //  All matricies must have the same dimensions.
-void compress2_rgb32_to_binary_range(
-    const uint32_t* image, size_t bytes_per_row,
-    PackedBinaryMatrix_IB& matrix0, uint32_t mins0, uint32_t maxs0,
-    PackedBinaryMatrix_IB& matrix1, uint32_t mins1, uint32_t maxs1
-);
-void compress4_rgb32_to_binary_range(
-    const uint32_t* image, size_t bytes_per_row,
-    PackedBinaryMatrix_IB& matrix0, uint32_t mins0, uint32_t maxs0,
-    PackedBinaryMatrix_IB& matrix1, uint32_t mins1, uint32_t maxs1,
-    PackedBinaryMatrix_IB& matrix2, uint32_t mins2, uint32_t maxs2,
-    PackedBinaryMatrix_IB& matrix3, uint32_t mins3, uint32_t maxs3
-);
-
 struct CompressRgb32ToBinaryRangeFilter{
     PackedBinaryMatrix_IB& matrix;
     uint32_t mins;

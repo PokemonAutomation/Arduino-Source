@@ -109,18 +109,19 @@ void ShinySparkleSetBDSP::read_from_image(const QImage& image){
         return;
     }
 
-    PackedBinaryMatrix2 matrix[4];
-    compress4_rgb32_to_binary_range(
+    std::vector<PackedBinaryMatrix2> matrices = compress_rgb32_to_binary_range(
         image,
-        matrix[0], 0xff606000, 0xffffffff,
-        matrix[1], 0xff707000, 0xffffffff,
-        matrix[2], 0xff808000, 0xffffffff,
-        matrix[3], 0xff909000, 0xffffffff
+        {
+            {0xff606000, 0xffffffff},
+            {0xff707000, 0xffffffff},
+            {0xff808000, 0xffffffff},
+            {0xff909000, 0xffffffff},
+        }
     );
 
     double best_alpha = 0;
-    for (size_t c = 0; c < 4; c++){
-        ShinySparkleSetBDSP sparkles = find_sparkles(matrix[c]);
+    for (PackedBinaryMatrix2& matrix : matrices){
+        ShinySparkleSetBDSP sparkles = find_sparkles(matrix);
         sparkles.update_alphas();
         double alpha = sparkles.alpha_overall();
         if (best_alpha < alpha){

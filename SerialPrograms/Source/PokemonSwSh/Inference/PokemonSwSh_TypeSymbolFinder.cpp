@@ -187,28 +187,20 @@ std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_symbols(
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates;
 
     {
-        PackedBinaryMatrix2 matrix0, matrix1, matrix2, matrix3;
-        compress4_rgb32_to_binary_range(
+        std::vector<PackedBinaryMatrix2> matrices = compress_rgb32_to_binary_range(
             image,
-            matrix0, 0xff909090, 0xffffffff,
-            matrix1, 0xffa0a0a0, 0xffffffff,
-            matrix2, 0xffb0b0b0, 0xffffffff,
-            matrix3, 0xffc0c0c0, 0xffffffff
+            {
+                {0xff909090, 0xffffffff},
+                {0xffa0a0a0, 0xffffffff},
+                {0xffb0b0b0, 0xffffffff},
+                {0xffc0c0c0, 0xffffffff},
+                {0xffd0d0d0, 0xffffffff},
+                {0xffe0e0e0, 0xffffffff},
+            }
         );
-        find_symbol_candidates(candidates, image, matrix0, max_area_ratio);
-        find_symbol_candidates(candidates, image, matrix1, max_area_ratio);
-        find_symbol_candidates(candidates, image, matrix2, max_area_ratio);
-        find_symbol_candidates(candidates, image, matrix3, max_area_ratio);
-    }
-    {
-        PackedBinaryMatrix2 matrix0, matrix1;
-        compress2_rgb32_to_binary_range(
-            image,
-            matrix0, 0xffd0d0d0, 0xffffffff,
-            matrix1, 0xffe0e0e0, 0xffffffff
-        );
-        find_symbol_candidates(candidates, image, matrix0, max_area_ratio);
-        find_symbol_candidates(candidates, image, matrix1, max_area_ratio);
+        for (PackedBinaryMatrix2& matrix : matrices){
+            find_symbol_candidates(candidates, image, matrix, max_area_ratio);
+        }
     }
 
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> filtered;

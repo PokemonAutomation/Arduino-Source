@@ -85,51 +85,21 @@ PackedBinaryMatrix2 compress_rgb32_to_binary_range(
     );
     return ret;
 }
-
-void compress2_rgb32_to_binary_range(
+std::vector<PackedBinaryMatrix2> compress_rgb32_to_binary_range(
     const ConstImageRef& image,
-    PackedBinaryMatrix2& matrix0, uint32_t mins0, uint32_t maxs0,
-    PackedBinaryMatrix2& matrix1, uint32_t mins1, uint32_t maxs1
+    const std::vector<std::pair<uint32_t, uint32_t>>& filters
 ){
-    matrix0 = PackedBinaryMatrix2(image.width(), image.height());
-    matrix1 = PackedBinaryMatrix2(image.width(), image.height());
-    Kernels::compress2_rgb32_to_binary_range(
-        image.data(), image.bytes_per_row(),
-        matrix0, mins0, maxs0,
-        matrix1, mins1, maxs1
-    );
-}
-void compress4_rgb32_to_binary_range(
-    const ConstImageRef& image,
-    PackedBinaryMatrix2& matrix0, uint32_t mins0, uint32_t maxs0,
-    PackedBinaryMatrix2& matrix1, uint32_t mins1, uint32_t maxs1,
-    PackedBinaryMatrix2& matrix2, uint32_t mins2, uint32_t maxs2,
-    PackedBinaryMatrix2& matrix3, uint32_t mins3, uint32_t maxs3
-){
-    matrix0 = PackedBinaryMatrix2(image.width(), image.height());
-    matrix1 = PackedBinaryMatrix2(image.width(), image.height());
-    matrix2 = PackedBinaryMatrix2(image.width(), image.height());
-    matrix3 = PackedBinaryMatrix2(image.width(), image.height());
-    Kernels::compress4_rgb32_to_binary_range(
-        image.data(), image.bytes_per_row(),
-        matrix0, mins0, maxs0,
-        matrix1, mins1, maxs1,
-        matrix2, mins2, maxs2,
-        matrix3, mins3, maxs3
-    );
-}
-void compress_rgb32_to_binary_range(
-    const ConstImageRef& image,
-    CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
-){
-    FixedLimitVector<Kernels::CompressRgb32ToBinaryRangeFilter> filters(filter_count);
-    for (size_t c = 0; c < filter_count; c++){
-        filters.emplace_back(filter[c].matrix, filter[c].mins, filter[c].maxs);
+    std::vector<PackedBinaryMatrix2> ret;
+    FixedLimitVector<Kernels::CompressRgb32ToBinaryRangeFilter> vec(filters.size());
+    for (size_t c = 0; c < filters.size(); c++){
+        ret.emplace_back(image.width(), image.height());
+        vec.emplace_back(ret[c], filters[c].first, filters[c].second);
     }
     compress_rgb32_to_binary_range(
         image.data(), image.bytes_per_row(),
-        filters.data(), filter_count
+        vec.data(), vec.size()
     );
+    return ret;
 }
 
 

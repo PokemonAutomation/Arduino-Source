@@ -228,17 +228,20 @@ int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
 
     size_t width = image.width();
     size_t height = image.height();
-    CompressRgb32ToBinaryRangeFilter filters[] = {
-        {width, height, 0xff808080, 0xffffffff},
-        {width, height, 0xff909090, 0xffffffff},
-        {width, height, 0xffa0a0a0, 0xffffffff},
-        {width, height, 0xffb0b0b0, 0xffffffff},
-        {width, height, 0xffc0c0c0, 0xffffffff},
-        {width, height, 0xffd0d0d0, 0xffffffff},
-        {width, height, 0xffe0e0e0, 0xffffffff},
-        {width, height, 0xfff0f0f0, 0xffffffff},
-    };
-    compress_rgb32_to_binary_range(image, filters, 8);
+
+    std::vector<PackedBinaryMatrix2> matrices = compress_rgb32_to_binary_range(
+        image,
+        {
+            {0xff808080, 0xffffffff},
+            {0xff909090, 0xffffffff},
+            {0xffa0a0a0, 0xffffffff},
+            {0xffb0b0b0, 0xffffffff},
+            {0xffc0c0c0, 0xffffffff},
+            {0xffd0d0d0, 0xffffffff},
+            {0xffe0e0e0, 0xffffffff},
+            {0xfff0f0f0, 0xffffffff},
+        }
+    );
 
     double inv_width = 0.5 / width;
 
@@ -253,9 +256,9 @@ int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
 
     //  Detect all the digits.
     std::multimap<size_t, Hit> hits;
-    for (size_t c = 0; c < 8; c++){
+    for (PackedBinaryMatrix2& matrix : matrices){
 //        cout << (int)filters[c].matrix.type() << endl;
-        auto finder = make_WaterfillIterator(filters[c].matrix, 30);
+        auto finder = make_WaterfillIterator(matrix, 30);
         WaterfillObject object;
         while (finder->find_next(object)){
             //  Skip anything that touches the edge.

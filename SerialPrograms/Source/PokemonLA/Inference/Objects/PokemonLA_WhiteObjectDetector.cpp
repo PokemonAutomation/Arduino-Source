@@ -33,19 +33,25 @@ void find_overworld_white_objects(
         threshold_set.insert(thresholds.begin(), thresholds.end());
     }
 
-    FixedLimitVector<CompressRgb32ToBinaryRangeFilter> filters(threshold_set.size());
-    for (Color filter : threshold_set){
-        filters.emplace_back(image.width(), image.height(), (uint32_t)filter, 0xffffffff);
-    }
-    compress_rgb32_to_binary_range(image, filters.data(), filters.size());
+//    FixedLimitVector<CompressRgb32ToBinaryRangeFilter> filters(threshold_set.size());
+//    for (Color filter : threshold_set){
+//        filters.emplace_back(image.width(), image.height(), (uint32_t)filter, 0xffffffff);
+//    }
+//    compress_rgb32_to_binary_range(image, filters.data(), filters.size());
 
-    for (CompressRgb32ToBinaryRangeFilter& filter : filters){
-        auto finder = make_WaterfillIterator(filter.matrix, 50);
+    std::vector<std::pair<uint32_t, uint32_t>> filters;
+    for (Color filter : threshold_set){
+        filters.emplace_back((uint32_t)filter, 0xffffffff);
+    }
+    std::vector<PackedBinaryMatrix2> matrix = compress_rgb32_to_binary_range(image, filters);
+
+    for (size_t c = 0; c < filters.size(); c++){
+        auto finder = make_WaterfillIterator(matrix[c], 50);
         WaterfillObject object;
         while (finder->find_next(object)){
             for (const auto& detector : detectors){
                 const std::set<Color>& thresholds = detector.first.thresholds();
-                if (thresholds.find((Color)filter.mins) != thresholds.end()){
+                if (thresholds.find((Color)filters[c].first) != thresholds.end()){
                     detector.first.process_object(image, object);
                 }
             }

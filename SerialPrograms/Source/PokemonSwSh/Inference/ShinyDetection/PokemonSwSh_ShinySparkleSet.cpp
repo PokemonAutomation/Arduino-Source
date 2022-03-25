@@ -115,22 +115,19 @@ void ShinySparkleSetSwSh::read_from_image(const QImage& image){
         return;
     }
 
-    PackedBinaryMatrix2 matrix[4];
-//    matrix0 = compress_rgb32_to_binary_min(image, 160, 160, 0);
-//    matrix1 = compress_rgb32_to_binary_min(image, 176, 176, 0);
-//    matrix2 = compress_rgb32_to_binary_min(image, 192, 192, 0);
-//    matrix3 = compress_rgb32_to_binary_min(image, 208, 208, 0);
-    compress4_rgb32_to_binary_range(
+    std::vector<PackedBinaryMatrix2> matrices = compress_rgb32_to_binary_range(
         image,
-        matrix[0], 0xffa0a000, 0xffffffff,
-        matrix[1], 0xffb0b000, 0xffffffff,
-        matrix[2], 0xffc0c000, 0xffffffff,
-        matrix[3], 0xffd0d000, 0xffffffff
+        {
+            {0xffa0a000, 0xffffffff},
+            {0xffb0b000, 0xffffffff},
+            {0xffc0c000, 0xffffffff},
+            {0xffd0d000, 0xffffffff},
+        }
     );
 
     double best_alpha = 0;
-    for (size_t c = 0; c < 4; c++){
-        ShinySparkleSetSwSh sparkles = find_sparkles(matrix[c]);
+    for (PackedBinaryMatrix2& matrix : matrices){
+        ShinySparkleSetSwSh sparkles = find_sparkles(matrix);
         sparkles.update_alphas();
         double alpha = sparkles.alpha_overall();
         if (best_alpha < alpha){
