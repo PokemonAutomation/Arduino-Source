@@ -110,16 +110,15 @@ void PABotBase::wait_for_all_requests(const std::atomic<bool>* cancelled){
 }
 
 void PABotBase::stop_all_commands(){
-    std::map<uint64_t, PendingRequest>::iterator iter;
-    uint64_t seqnum = issue_request(&iter, nullptr, Microcontroller::DeviceRequest_request_stop());
+    uint64_t seqnum = issue_request(nullptr, Microcontroller::DeviceRequest_request_stop(), false);
 
     pabb_MsgAckRequest response;
-    wait_for_request(iter).convert<PABB_MSG_ACK_REQUEST>(m_logger, response);
+    wait_for_request(seqnum).convert<PABB_MSG_ACK_REQUEST>(m_logger, response);
 
     clear_all_active_commands(seqnum);
 }
 void PABotBase::next_command_interrupt(){
-    uint64_t seqnum = issue_request(nullptr, nullptr, Microcontroller::DeviceRequest_next_command_interrupt());
+    uint64_t seqnum = issue_request(nullptr, Microcontroller::DeviceRequest_next_command_interrupt(), true);
     clear_all_active_commands(seqnum);
 }
 void PABotBase::clear_all_active_commands(uint64_t seqnum){
@@ -251,20 +250,18 @@ void PABotBase::process_ack_command(BotBaseMessage message){
     const Params* params = (const Params*)message.body.c_str();
     seqnum_t seqnum = params->seqnum;
 
-    std::map<uint64_t, PendingCommand>::iterator iter;
-    {
-        SpinLockGuard lg(m_state_lock, "PABotBase::process_ack_command()");
-        if (m_pending_commands.empty()){
-            m_sniffer->log("Unexpected command ack message: seqnum = " + std::to_string(seqnum));
-            return;
-        }
+    SpinLockGuard lg(m_state_lock, "PABotBase::process_ack_command()");
 
-        uint64_t full_seqnum = infer_full_seqnum(m_pending_commands, seqnum);
-        iter = m_pending_commands.find(full_seqnum);
-        if (iter == m_pending_commands.end()){
-            m_sniffer->log("Unexpected command ack message: seqnum = " + std::to_string(seqnum));
-            return;
-        }
+    if (m_pending_commands.empty()){
+        m_sniffer->log("Unexpected command ack message: seqnum = " + std::to_string(seqnum));
+        return;
+    }
+
+    uint64_t full_seqnum = infer_full_seqnum(m_pending_commands, seqnum);
+    auto iter = m_pending_commands.find(full_seqnum);
+    if (iter == m_pending_commands.end()){
+        m_sniffer->log("Unexpected command ack message: seqnum = " + std::to_string(seqnum));
+        return;
     }
 
     m_last_ack.store(std::chrono::system_clock::now(), std::memory_order_release);
@@ -302,25 +299,22 @@ void PABotBase::process_command_finished(BotBaseMessage message){
     std::lock_guard<std::mutex> lg0(m_sleep_lock);
     SpinLockGuard lg1(m_state_lock, "PABotBase::process_command_finished() - 0");
 
-    std::map<uint64_t, PendingCommand>::iterator iter;
-    {
-        if (m_pending_commands.empty()){
-            m_sniffer->log(
-                "Unexpected command finished message: seqnum = " + std::to_string(seqnum) +
-                ", command_seqnum = " + std::to_string(command_seqnum)
-            );
-            return;
-        }
+    if (m_pending_commands.empty()){
+        m_sniffer->log(
+            "Unexpected command finished message: seqnum = " + std::to_string(seqnum) +
+            ", command_seqnum = " + std::to_string(command_seqnum)
+        );
+        return;
+    }
 
-        uint64_t full_seqnum = infer_full_seqnum(m_pending_commands, command_seqnum);
-        iter = m_pending_commands.find(full_seqnum);
-        if (iter == m_pending_commands.end()){
-            m_sniffer->log(
-                "Unexpected command finished message: seqnum = " + std::to_string(seqnum) +
-                ", command_seqnum = " + std::to_string(command_seqnum)
-            );
-            return;
-        }
+    uint64_t full_seqnum = infer_full_seqnum(m_pending_commands, command_seqnum);
+    auto iter = m_pending_commands.find(full_seqnum);
+    if (iter == m_pending_commands.end()){
+        m_sniffer->log(
+            "Unexpected command finished message: seqnum = " + std::to_string(seqnum) +
+            ", command_seqnum = " + std::to_string(command_seqnum)
+        );
+        return;
     }
 
     switch (iter->second.state){
@@ -419,9 +413,8 @@ void PABotBase::retransmit_thread(){
 
 
 uint64_t PABotBase::try_issue_request(
-    std::map<uint64_t, PendingRequest>::iterator* iter,
     const std::atomic<bool>* cancelled,
-    const BotBaseRequest& request,
+    const BotBaseRequest& request, bool silent_remove,
     size_t queue_limit
 ){
     BotBaseMessage message = request.message();
@@ -464,22 +457,17 @@ uint64_t PABotBase::try_issue_request(
 
     PendingRequest* handle = &ret.first->second;
 
-    handle->silent_remove = iter == nullptr;
+    handle->silent_remove = silent_remove;
     handle->request = std::move(message);
     handle->first_sent = std::chrono::system_clock::now();
 
     send_message(handle->request, false);
 
-    if (iter){
-        *iter = ret.first;
-    }
-
     return seqnum;
 }
 uint64_t PABotBase::try_issue_command(
-    std::map<uint64_t, PendingCommand>::iterator* iter,
     const std::atomic<bool>* cancelled,
-    const BotBaseRequest& request,
+    const BotBaseRequest& request, bool silent_remove,
     size_t queue_limit
 ){
     BotBaseMessage message = request.message();
@@ -528,22 +516,17 @@ uint64_t PABotBase::try_issue_command(
 
     PendingCommand* handle = &ret.first->second;
 
-    handle->silent_remove = iter == nullptr;
+    handle->silent_remove = silent_remove;
     handle->request = std::move(message);
     handle->first_sent = std::chrono::system_clock::now();
 
     send_message(handle->request, false);
 
-    if (iter){
-        *iter = ret.first;
-    }
-
     return seqnum;
 }
 uint64_t PABotBase::issue_request(
-    std::map<uint64_t, PendingRequest>::iterator* iter,
     const std::atomic<bool>* cancelled,
-    const BotBaseRequest& request
+    const BotBaseRequest& request, bool silent_remove
 ){
     //  Issue a request or a command and return.
     //
@@ -564,7 +547,7 @@ uint64_t PABotBase::issue_request(
     //
 
     while (true){
-        uint64_t seqnum = try_issue_request(iter, cancelled, request, MAX_PENDING_REQUESTS);
+        uint64_t seqnum = try_issue_request(cancelled, request, silent_remove, MAX_PENDING_REQUESTS);
         if (seqnum != 0){
             return seqnum;
         }
@@ -579,9 +562,8 @@ uint64_t PABotBase::issue_request(
     }
 }
 uint64_t PABotBase::issue_command(
-    std::map<uint64_t, PendingCommand>::iterator* iter,
     const std::atomic<bool>* cancelled,
-    const BotBaseRequest& request
+    const BotBaseRequest& request, bool silent_remove
 ){
     //  Issue a request or a command and return.
     //
@@ -602,7 +584,7 @@ uint64_t PABotBase::issue_command(
     //
 
     while (true){
-        uint64_t seqnum = try_issue_command(iter, cancelled, request, MAX_PENDING_REQUESTS);
+        uint64_t seqnum = try_issue_command(cancelled, request, silent_remove, MAX_PENDING_REQUESTS);
         if (seqnum != 0){
             return seqnum;
         }
@@ -622,9 +604,9 @@ bool PABotBase::try_issue_request(
     const std::atomic<bool>* cancelled
 ){
     if (!request.is_command()){
-        return try_issue_request(nullptr, cancelled, request, MAX_PENDING_REQUESTS) != 0;
+        return try_issue_request(cancelled, request, true, MAX_PENDING_REQUESTS) != 0;
     }else{
-        return try_issue_command(nullptr, cancelled, request, MAX_PENDING_REQUESTS) != 0;
+        return try_issue_command(cancelled, request, true, MAX_PENDING_REQUESTS) != 0;
     }
 }
 void PABotBase::issue_request(
@@ -632,9 +614,9 @@ void PABotBase::issue_request(
     const std::atomic<bool>* cancelled
 ){
     if (!request.is_command()){
-        issue_request(nullptr, cancelled, request);
+        issue_request(cancelled, request, true);
     }else{
-        issue_command(nullptr, cancelled, request);
+        issue_command(cancelled, request, true);
     }
 }
 
@@ -647,35 +629,32 @@ BotBaseMessage PABotBase::issue_request_and_wait(
     }
 
     std::map<uint64_t, PendingRequest>::iterator iter;
-    issue_request(&iter, cancelled, request);
+    uint64_t seqnum = issue_request(cancelled, request, false);
 
-    return wait_for_request(iter);
+    return wait_for_request(seqnum);
 }
-BotBaseMessage PABotBase::wait_for_request(std::map<uint64_t, PendingRequest>::iterator iter){
-    //  Wait for ack.
+BotBaseMessage PABotBase::wait_for_request(uint64_t seqnum){
+    std::unique_lock<std::mutex> lg(m_sleep_lock);
     while (true){
-        std::unique_lock<std::mutex> lg(m_sleep_lock);
         {
-            SpinLockGuard slg(m_state_lock, "PABotBase::issue_request_and_wait() - 0");
+            SpinLockGuard slg(m_state_lock, "PABotBase::issue_request_and_wait()");
+            auto iter = m_pending_requests.find(seqnum);
+            if (iter == m_pending_requests.end()){
+                throw OperationCancelledException();
+            }
             State state = m_state.load(std::memory_order_acquire);
             if (state != State::RUNNING){
                 remove_request(iter);
                 throw InvalidConnectionStateException();
             }
             if (iter->second.state == AckState::ACKED){
-                break;
+                BotBaseMessage ret = std::move(iter->second.ack);
+                remove_request(iter);
+                return ret;
             }
         }
         m_cv.wait(lg);
     }
-
-    std::unique_lock<std::mutex> lg(m_sleep_lock);
-    SpinLockGuard slg(m_state_lock, "PABotBase::issue_request_and_wait() - 1");
-
-    BotBaseMessage ret = std::move(iter->second.ack);
-    remove_request(iter);
-
-    return ret;
 }
 
 
