@@ -247,9 +247,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     using namespace PokemonLA;
 
      LoggerQt& logger = env.logger();
-     ConsoleHandle& console = env.consoles[0];
-     BotBase& botbase = env.consoles[0];
-     VideoFeed& feed = env.consoles[0];
+//     ConsoleHandle& console = env.consoles[0];
+//     BotBase& botbase = env.consoles[0];
+//     VideoFeed& feed = env.consoles[0];
      VideoOverlay& overlay = env.consoles[0];
 
 
