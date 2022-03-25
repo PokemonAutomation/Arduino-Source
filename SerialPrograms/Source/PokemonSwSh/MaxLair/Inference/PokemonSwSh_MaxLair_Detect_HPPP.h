@@ -21,9 +21,9 @@ namespace MaxLairInternal{
 
 //double read_hp_bar(const QImage& image);
 
-double read_hp_bar(LoggerQt& logger, const QImage& image);
-Health read_in_battle_hp_box(LoggerQt& logger, const QImage& sprite, const QImage& hp_bar);
-int8_t read_pp_text(LoggerQt& logger, QImage image);
+double read_hp_bar(LoggerQt& logger, const ConstImageRef& image);
+Health read_in_battle_hp_box(LoggerQt& logger, const ConstImageRef& sprite, const ConstImageRef& hp_bar);
+int8_t read_pp_text(LoggerQt& logger, const ConstImageRef& image);
 
 
 }

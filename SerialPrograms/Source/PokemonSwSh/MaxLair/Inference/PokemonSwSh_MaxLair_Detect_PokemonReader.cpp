@@ -107,7 +107,7 @@ std::string read_boss_sprite(ConsoleHandle& console){
 
 std::set<std::string> read_pokemon_name(
     LoggerQt& logger,
-    const QImage& screen, const QImage& image,
+    const ConstImageRef& screen, const ConstImageRef& image,
     Language language
 ){
     const SpeciesReadDatabase& database = SpeciesReadDatabase::instance();
@@ -141,7 +141,7 @@ std::set<std::string> read_pokemon_name(
 
 ImageMatch::ImageMatchResult read_pokemon_sprite_set(
     LoggerQt& logger,
-    const QImage& screen,
+    const ConstImageRef& screen,
     const ImageFloatBox& box,
     bool allow_exact_match_fallback
 ){
@@ -157,7 +157,7 @@ ImageMatch::ImageMatchResult read_pokemon_sprite_set(
     large_box.height += 0.002;
 //    large_box.width -= 0.010;
 //    large_box.x += 0.005;
-    QImage image = extract_box(screen, large_box);
+    ConstImageRef image = extract_box_reference(screen, large_box);
 
 //    image.save("test.png");
 
@@ -206,7 +206,10 @@ ImageMatch::ImageMatchResult read_pokemon_sprite_set(
 
 
 
-ImageMatch::ImageMatchResult read_pokemon_sprite_set_with_item(LoggerQt& logger, const QImage& screen, const ImageFloatBox& box){
+ImageMatch::ImageMatchResult read_pokemon_sprite_set_with_item(
+    LoggerQt& logger,
+    const ConstImageRef& screen, const ImageFloatBox& box
+){
     const SpeciesReadDatabase& database = SpeciesReadDatabase::instance();
 
     //  Try with cropped matcher.
@@ -214,7 +217,7 @@ ImageMatch::ImageMatchResult read_pokemon_sprite_set_with_item(LoggerQt& logger,
     large_box.height += 0.002;
     large_box.width -= 0.010;
     large_box.x += 0.005;
-    QImage image = extract_box(screen, large_box);
+    ConstImageRef image = extract_box_reference(screen, large_box);
 
     double max_alpha = SpeciesReadDatabase::CROPPED_MAX_ALPHA;
 

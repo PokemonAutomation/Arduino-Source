@@ -101,6 +101,13 @@ ImageRef extract_box_reference(QImage& image, const ImagePixelBox& box){
 ImageRef extract_box_reference(QImage& image, const ImageFloatBox& box){
     return extract_box_reference(ImageRef(image), box);
 }
+ConstImageRef extract_box_reference(const ConstImageRef& image, const ImageFloatBox& box, int offset_x, int offset_y){
+    size_t min_x = (size_t)(image.width() * box.x + 0.5) + offset_x;
+    size_t min_y = (size_t)(image.height() * box.y + 0.5) + offset_y;
+    size_t width = (size_t)(image.width() * box.width + 0.5);
+    size_t height = (size_t)(image.height() * box.height + 0.5);
+    return image.sub_image(min_x, min_y, width, height);
+}
 
 
 QImage extract_box(const QImage& image, const ImagePixelBox& box){
@@ -125,7 +132,7 @@ QImage extract_box(const QImage& image, const ImageFloatBox& box, int offset_x, 
 
 
 ImageFloatBox translate_to_parent(
-    const QImage& original_image,
+    const ConstImageRef& original_image,
     const ImageFloatBox& inference_box,
     const ImagePixelBox& box
 ){

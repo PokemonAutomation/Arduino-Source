@@ -215,10 +215,10 @@ void PathReader::read_sprites(
 
 
 void PathReader::read_hp(LoggerQt& logger, const QImage& screen, double hp[4]) const{
-    hp[0] = read_hp_bar(logger, extract_box(screen, m_hp0));
-    hp[1] = read_hp_bar(logger, extract_box(screen, m_hp1));
-    hp[2] = read_hp_bar(logger, extract_box(screen, m_hp2));
-    hp[3] = read_hp_bar(logger, extract_box(screen, m_hp3));
+    hp[0] = read_hp_bar(logger, extract_box_reference(screen, m_hp0));
+    hp[1] = read_hp_bar(logger, extract_box_reference(screen, m_hp1));
+    hp[2] = read_hp_bar(logger, extract_box_reference(screen, m_hp2));
+    hp[3] = read_hp_bar(logger, extract_box_reference(screen, m_hp3));
     if (hp[0] < 0 || hp[1] < 0 || hp[2] < 0 || hp[3] < 0){
         dump_image(logger, MODULE_NAME, "PathPartyReader-ReadHP", screen);
     }

@@ -26,18 +26,15 @@ const ImageMatch::ExactImageMatcher& SELECTION_ARROW(){
     return matcher;
 }
 
-bool is_selection_arrow(const QImage& image, const WaterfillObject& object){
+bool is_selection_arrow(const ConstImageRef& image, const WaterfillObject& object){
     double area = (double)object.area_ratio();
     if (area < 0.4 || area > 0.5){
         return false;
     }
 
-    size_t width = object.width();
-    size_t height = object.height();
-    QImage cropped = image.copy(
-        (int)object.min_x, (int)object.min_y,
-        (int)width, (int)height
-    );
+//    size_t width = object.width();
+//    size_t height = object.height();
+    QImage cropped = extract_box_reference(image, object).to_qimage();
 
     filter_rgb32(
         object.packed_matrix(),
@@ -52,7 +49,7 @@ bool is_selection_arrow(const QImage& image, const WaterfillObject& object){
 //    cout << "rmsd = " << rmsd << endl;
     return rmsd <= 110;
 }
-std::vector<ImagePixelBox> find_selection_arrows(const QImage& image){
+std::vector<ImagePixelBox> find_selection_arrows(const ConstImageRef& image){
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_max(image, 63, 63, 63);
 
     std::vector<ImagePixelBox> ret;
@@ -62,9 +59,7 @@ std::vector<ImagePixelBox> find_selection_arrows(const QImage& image){
     while (finder->find_next(object)){
 //        cout << "asdf" << endl;
         if (is_selection_arrow(image, object)){
-            ret.emplace_back(
-                ImagePixelBox(object.min_x, object.min_y, object.max_x, object.max_y)
-            );
+            ret.emplace_back(object);
         }
     }
 
@@ -82,7 +77,7 @@ void SelectionArrowFinder::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_YELLOW, m_box);
 }
 bool SelectionArrowFinder::detect(const QImage& screen){
-    std::vector<ImagePixelBox> arrows = find_selection_arrows(extract_box(screen, m_box));
+    std::vector<ImagePixelBox> arrows = find_selection_arrows(extract_box_reference(screen, m_box));
 
     m_arrow_boxes.clear();
     for (const ImagePixelBox& mark : arrows){

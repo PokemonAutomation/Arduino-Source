@@ -28,7 +28,7 @@ public:
     void scale_to_dimensions(QImage& image) const;
 
     ImageMatchResult match(
-        const QImage& screen, const ImageFloatBox& box,
+        const ConstImageRef& image, const ImageFloatBox& box,
         size_t tolerance,
         double alpha_spread
     ) const;

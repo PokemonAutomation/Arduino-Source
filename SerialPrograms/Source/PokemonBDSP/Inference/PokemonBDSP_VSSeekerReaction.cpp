@@ -28,7 +28,7 @@ const QImage& VS_SEEKER_REACTION_BUBBLE(){
     return image;
 }
 
-bool is_seeker_bubble(const QImage& image, const WaterfillObject& object){
+bool is_seeker_bubble(const ConstImageRef& image, const WaterfillObject& object){
     size_t width = object.width();
     size_t height = object.height();
     if (width > 2 * height){
@@ -52,7 +52,7 @@ bool is_seeker_bubble(const QImage& image, const WaterfillObject& object){
     return rmsd <= 80;
 }
 
-std::vector<ImagePixelBox> find_seeker_bubbles(const QImage& image){
+std::vector<ImagePixelBox> find_seeker_bubbles(const ConstImageRef& image){
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_min(image, 200, 200, 200);
     std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 400, false);
     std::vector<ImagePixelBox> ret;
@@ -80,8 +80,8 @@ bool VSSeekerReactionTracker::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point
 ){
-    QImage cropped = extract_box(frame, m_box);
-    m_dimensions = cropped.size();
+    ConstImageRef cropped = extract_box_reference(frame, m_box);
+    m_dimensions = QSize((int)cropped.width(), (int)cropped.height());
     m_bubbles = find_seeker_bubbles(cropped);
 //        cout << exclamation_marks.size() << endl;
 

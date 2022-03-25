@@ -37,22 +37,24 @@ void SilhouetteDictionaryMatcher::add(const std::string& slug, QImage image){
 
 
 ImageMatchResult SilhouetteDictionaryMatcher::match(
-    QImage image,
+    const ConstImageRef& image,
     double alpha_spread
 ) const{
     ImageMatchResult results;
-    if (image.isNull()){
+    if (!image){
         return results;
     }
 
-    crop_image(image);
-    set_alpha_channels(image);
+    QImage processed = image.to_qimage();
+
+    crop_image(processed);
+    set_alpha_channels(processed);
 
     for (const auto& item : m_database){
 //        if (item.first != "solosis"){
 //            continue;
 //        }
-        double alpha = item.second.rmsd_masked(image);
+        double alpha = item.second.rmsd_masked(processed);
         results.add(alpha, item.first);
         results.clear_beyond_spread(alpha_spread);
     }

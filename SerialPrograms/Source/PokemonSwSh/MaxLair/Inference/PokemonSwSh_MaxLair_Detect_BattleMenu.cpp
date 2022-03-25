@@ -73,13 +73,13 @@ bool BattleMenuDetector::detect(const QImage& screen){
 
     fight = false;
     fight |= !fight && cluster_fit_2(
-        extract_box(screen, m_text_fight),
+        extract_box_reference(screen, m_text_fight),
         qRgb(0, 0, 0), 0.9,
         qRgb(255, 255, 255), 0.1,
         0.2, 50, 0.1
     );
     fight |= !fight && cluster_fit_2(
-        extract_box(screen, m_text_fight),
+        extract_box_reference(screen, m_text_fight),
         qRgb(0, 0, 0), 0.1,
         qRgb(255, 255, 255), 0.9,
         0.2, 50, 0.1
@@ -90,13 +90,13 @@ bool BattleMenuDetector::detect(const QImage& screen){
 
     fight = false;
     fight |= !fight && cluster_fit_2(
-        extract_box(screen, m_text_pokemon),
+        extract_box_reference(screen, m_text_pokemon),
         qRgb(0, 0, 0), 0.1,
         qRgb(255, 255, 255), 0.9,
         0.2, 50, 0.1
     );
     fight |= !fight && cluster_fit_2(
-        extract_box(screen, m_text_pokemon),
+        extract_box_reference(screen, m_text_pokemon),
         qRgb(0, 0, 0), 0.9,
         qRgb(255, 255, 255), 0.1,
         0.2, 50, 0.1
@@ -107,13 +107,13 @@ bool BattleMenuDetector::detect(const QImage& screen){
 
     fight = false;
     fight |= !fight && cluster_fit_2(
-        extract_box(screen, m_text_run),
+        extract_box_reference(screen, m_text_run),
         qRgb(0, 0, 0), 0.1,
         qRgb(255, 255, 255), 0.9,
         0.2, 50, 0.1
     );
     fight |= !fight && cluster_fit_2(
-        extract_box(screen, m_text_run),
+        extract_box_reference(screen, m_text_run),
         qRgb(0, 0, 0), 0.9,
         qRgb(255, 255, 255), 0.1,
         0.2, 50, 0.1
@@ -125,24 +125,24 @@ bool BattleMenuDetector::detect(const QImage& screen){
 
     fight = false;
     fight |= !fight && cluster_fit_2(
-        extract_box(screen, m_icon_fight),
+        extract_box_reference(screen, m_icon_fight),
         qRgb(255, 255, 255), 1.7,
         qRgb(153, 75, 112), 1.0
     );
     fight |= !fight && cluster_fit_2(
-        extract_box(screen, m_icon_fight),
+        extract_box_reference(screen, m_icon_fight),
         qRgb(0, 0, 0), 1.4,
         qRgb(185, 6, 40), 1.0
     );
     fight |= !fight && cluster_fit_2(   //  Max raid Fight button is a bit different.
-        extract_box(screen, m_icon_fight),
+        extract_box_reference(screen, m_icon_fight),
         qRgb(0, 0, 0), 1.7,
         qRgb(182, 33, 82), 1.0
     );
 //    cout << "===============" << endl;
     if (!fight){
         fight = cluster_fit_2(   //  Cheer
-            extract_box(screen, m_icon_cheer),
+            extract_box_reference(screen, m_icon_cheer),
             qRgb(0, 0, 0), 2.2,
             qRgb(9, 162, 218), 1.0
         );
@@ -155,12 +155,12 @@ bool BattleMenuDetector::detect(const QImage& screen){
 
     bool pokemon = false;
     pokemon |= !pokemon && cluster_fit_2(
-        extract_box(screen, m_icon_pokemon),
+        extract_box_reference(screen, m_icon_pokemon),
         qRgb(255, 255, 255), 3.1,
         qRgb(126, 224, 142), 1.0
     );
     pokemon |= !pokemon && cluster_fit_2(
-        extract_box(screen, m_icon_pokemon),
+        extract_box_reference(screen, m_icon_pokemon),
         qRgb(0, 0, 0), 2.7,
         qRgb(8, 158, 18), 1.0
     );
@@ -170,12 +170,12 @@ bool BattleMenuDetector::detect(const QImage& screen){
 
     bool run = false;
     run |= !run && cluster_fit_2(
-        extract_box(screen, m_icon_run),
+        extract_box_reference(screen, m_icon_run),
         qRgb(255, 255, 255), 2.3,
         qRgb(216, 150, 230), 1.0
     );
     run |= !run && cluster_fit_2(
-        extract_box(screen, m_icon_run),
+        extract_box_reference(screen, m_icon_run),
         qRgb(0, 0, 0), 1.9,
         qRgb(179, 15, 195), 1.0
     );
@@ -253,10 +253,10 @@ std::set<std::string> BattleMenuReader::read_opponent(
     return result;
 }
 std::set<std::string> BattleMenuReader::read_opponent_in_summary(LoggerQt& logger, const QImage& screen) const{
-    QImage name = extract_box(screen, m_summary_opponent_name);
+    ConstImageRef name = extract_box_reference(screen, m_summary_opponent_name);
     std::set<std::string> slugs = read_pokemon_name(logger, screen, name, m_language);
 
-    QImage types = extract_box(screen, m_summary_opponent_types);
+    ConstImageRef types = extract_box_reference(screen, m_summary_opponent_types);
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_symbols(types, 0.2);
 //    for (const auto& item : candidates){
 //        cout << get_type_slug(item.second.first) << ": " << item.first << endl;
@@ -328,7 +328,7 @@ std::string BattleMenuReader::read_own_mon(LoggerQt& logger, const QImage& scree
 }
 
 double BattleMenuReader::read_opponent_hp(LoggerQt& logger, const QImage& screen) const{
-    QImage image = extract_box(screen, m_opponent_hp);
+    ConstImageRef image = extract_box_reference(screen, m_opponent_hp);
 //    image.save("test.png");
 
 //    ImageStats stats = image_stats(image);
@@ -345,7 +345,7 @@ double BattleMenuReader::read_opponent_hp(LoggerQt& logger, const QImage& screen
     return read_hp_bar(logger, image);
 }
 double BattleMenuReader::read_own_hp(LoggerQt& logger, const QImage& screen) const{
-    QImage image = extract_box(screen, m_own_hp);
+    ConstImageRef image = extract_box_reference(screen, m_own_hp);
 //    image.save("test.png");
 #if 0
     double hp = read_hp_bar(image);
@@ -362,9 +362,9 @@ double BattleMenuReader::read_own_hp(LoggerQt& logger, const QImage& screen) con
 void BattleMenuReader::read_hp(LoggerQt& logger, const QImage& screen, Health health[4], size_t player_index){
     Health tmp_hp[4];
     tmp_hp[0] = {read_own_hp(logger, screen), false};
-    tmp_hp[1] = read_in_battle_hp_box(logger, extract_box(screen, m_sprite0), extract_box(screen, m_hp0));
-    tmp_hp[2] = read_in_battle_hp_box(logger, extract_box(screen, m_sprite1), extract_box(screen, m_hp1));
-    tmp_hp[3] = read_in_battle_hp_box(logger, extract_box(screen, m_sprite2), extract_box(screen, m_hp2));
+    tmp_hp[1] = read_in_battle_hp_box(logger, extract_box_reference(screen, m_sprite0), extract_box_reference(screen, m_hp0));
+    tmp_hp[2] = read_in_battle_hp_box(logger, extract_box_reference(screen, m_sprite1), extract_box_reference(screen, m_hp1));
+    tmp_hp[3] = read_in_battle_hp_box(logger, extract_box_reference(screen, m_sprite2), extract_box_reference(screen, m_hp2));
     bool bad = false;
     for (size_t c = 0; c < 4; c++){
         bad |= tmp_hp[c].hp < 0;
@@ -376,10 +376,10 @@ void BattleMenuReader::read_hp(LoggerQt& logger, const QImage& screen, Health he
     }
 }
 void BattleMenuReader::read_own_pp(LoggerQt& logger, const QImage& screen, int8_t pp[4]) const{
-    pp[0] = read_pp_text(logger, extract_box(screen, m_pp0));
-    pp[1] = read_pp_text(logger, extract_box(screen, m_pp1));
-    pp[2] = read_pp_text(logger, extract_box(screen, m_pp2));
-    pp[3] = read_pp_text(logger, extract_box(screen, m_pp3));
+    pp[0] = read_pp_text(logger, extract_box_reference(screen, m_pp0));
+    pp[1] = read_pp_text(logger, extract_box_reference(screen, m_pp1));
+    pp[2] = read_pp_text(logger, extract_box_reference(screen, m_pp2));
+    pp[3] = read_pp_text(logger, extract_box_reference(screen, m_pp3));
     if (pp[0] < 0 && pp[1] < 0 && pp[2] < 0 && pp[3] < 0){
         dump_image(logger, MODULE_NAME, "BattleMenuReader-read_own_pp", screen);
         return;

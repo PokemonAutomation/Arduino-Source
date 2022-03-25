@@ -153,7 +153,7 @@ bool OverworldTargetTracker::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
-    QImage image = extract_box(frame, m_search_area);
+    ConstImageRef image = extract_box_reference(frame, m_search_area);
 
     std::vector<ImagePixelBox> exclamation_marks = find_exclamation_marks(image);
     std::vector<ImagePixelBox> question_marks = find_question_marks(image);

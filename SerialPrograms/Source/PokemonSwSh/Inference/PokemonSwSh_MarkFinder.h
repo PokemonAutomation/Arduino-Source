@@ -17,8 +17,8 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-std::vector<ImagePixelBox> find_exclamation_marks(const QImage& image);
-std::vector<ImagePixelBox> find_question_marks(const QImage& image);
+std::vector<ImagePixelBox> find_exclamation_marks(const ConstImageRef& image);
+std::vector<ImagePixelBox> find_question_marks(const ConstImageRef& image);
 
 
 }

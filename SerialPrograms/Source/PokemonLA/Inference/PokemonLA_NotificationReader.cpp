@@ -50,7 +50,7 @@ void NotificationReader::make_overlays(VideoOverlaySet& items) const{
 Notification NotificationReader::detect(const QImage& screen) const{
     const double max_log10p = -8.0;
 
-    QImage image = extract_box(screen, m_ocr_box);
+    ConstImageRef image = extract_box_reference(screen, m_ocr_box);
 
 
     //  Check if there anything that looks like text.
@@ -68,8 +68,8 @@ Notification NotificationReader::detect(const QImage& screen) const{
     }
 
 
-    image = image.convertToFormat(QImage::Format::Format_ARGB32);
-    QImage image_ocr = image;
+//    image = image.convertToFormat(QImage::Format::Format_ARGB32);
+    QImage image_ocr(image.width(), image.height(), QImage::Format_ARGB32);
 
 
     m_logger.log("NotificationReader: Possible text found (" + std::to_string(objects) + " objects). Attempting to read it...", COLOR_PURPLE);
@@ -83,7 +83,7 @@ Notification NotificationReader::detect(const QImage& screen) const{
     };
     for (uint32_t filter : filters){
         Kernels::filter_rgb32_range(
-            (const uint32_t*)image.constBits(), image.bytesPerLine(), image.width(), image.height(),
+            image.data(), image.bytes_per_row(), image.width(), image.height(),
             (uint32_t*)image_ocr.bits(), image_ocr.bytesPerLine(), filter, 0xffffffff, 0xff000000, false
         );
 

@@ -52,10 +52,10 @@ double read_hp_green(const QImage& image){
 }
 #endif
 
-double read_hp_bar_internal(const QImage& image){
-    int width = image.width();
-    int height = image.height();
-    int area = width * height;
+double read_hp_bar_internal(const ConstImageRef& image){
+    size_t width = image.width();
+    size_t height = image.height();
+    size_t area = width * height;
 
     ImageStats stats;
     double bar = 0.5;
@@ -85,8 +85,8 @@ double read_hp_bar_internal(const QImage& image){
     int bar_B = qBlue(color);
 
     int bar_area = 0;
-    for (int r = 0; r < height; r++){
-        for (int c = 0; c < width; c++){
+    for (size_t r = 0; r < height; r++){
+        for (size_t c = 0; c < width; c++){
             QRgb pixel = image.pixel(c, r);
             int R = qRed(pixel) - bar_R;
             int G = qGreen(pixel) - bar_G;
@@ -99,9 +99,9 @@ double read_hp_bar_internal(const QImage& image){
 
     return std::min((double)bar_area / area, bar * 4);
 }
-double read_hp_bar(const QImage& image){
+double read_hp_bar(const ConstImageRef& image){
     //  Try reading just the upper half first.
-    double hp = read_hp_bar_internal(extract_box(image, ImageFloatBox(0.5, 0.0, 0.5, 1.0)));
+    double hp = read_hp_bar_internal(extract_box_reference(image, ImageFloatBox(0.5, 0.0, 0.5, 1.0)));
     if (hp > 0){
         return (1.0 + hp) * 0.5;
     }
@@ -110,7 +110,7 @@ double read_hp_bar(const QImage& image){
     return read_hp_bar_internal(image);
 }
 
-double read_hp_bar(LoggerQt& logger, const QImage& image){
+double read_hp_bar(LoggerQt& logger, const ConstImageRef& image){
     double hp = read_hp_bar(image);
 //    static int c = 0;
 //    image.save("test-" + QString::number(c++) + ".png");
@@ -121,7 +121,7 @@ double read_hp_bar(LoggerQt& logger, const QImage& image){
     }
     return hp;
 }
-Health read_in_battle_hp_box(LoggerQt& logger, const QImage& sprite, const QImage& hp_bar){
+Health read_in_battle_hp_box(LoggerQt& logger, const ConstImageRef& sprite, const ConstImageRef& hp_bar){
     ImageStats stats = image_stats(sprite);
 //    cout << stats.average << stats.stddev << endl;
     if (is_solid(stats, {0., 0.389943, 0.610057})){
@@ -219,10 +219,12 @@ int8_t parse_pp(const std::string& str){
     return -1;
 }
 
-int8_t read_pp_text(LoggerQt& logger, QImage image){
-    OCR::binary_filter_solid_background(image);
+int8_t read_pp_text(LoggerQt& logger, const ConstImageRef& image){
+    QImage processed = image.to_qimage();
 
-    QString ocr_text = OCR::ocr_read(Language::English, image);
+    OCR::binary_filter_solid_background(processed);
+
+    QString ocr_text = OCR::ocr_read(Language::English, processed);
 
     ocr_text = OCR::run_character_reductions(ocr_text);
     int8_t pp = parse_pp(ocr_text.toStdString());

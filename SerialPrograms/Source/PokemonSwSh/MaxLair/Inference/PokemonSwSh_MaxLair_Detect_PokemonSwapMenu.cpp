@@ -119,9 +119,9 @@ PokemonSwapMenuReader::PokemonSwapMenuReader(
     , m_hp3(overlay, 0.226, 0.3435 + 3*0.089, 0.112, 0.005)
 {}
 bool PokemonSwapMenuReader::my_turn(const QImage& screen){
-    double box0 = image_average(extract_box(screen, m_select0)).sum();
+    double box0 = image_average(extract_box_reference(screen, m_select0)).sum();
     if (box0 < 200) return true;
-    double box1 = image_average(extract_box(screen, m_select1)).sum();
+    double box1 = image_average(extract_box_reference(screen, m_select1)).sum();
     if (box1 < 200) return true;
     return false;
 }
@@ -131,19 +131,19 @@ void PokemonSwapMenuReader::read_options(const QImage& screen, std::string optio
 }
 
 void PokemonSwapMenuReader::read_hp(const QImage& screen, double hp[4]){
-    hp[0] = read_hp_bar(m_logger, extract_box(screen, m_hp0));
-    hp[1] = read_hp_bar(m_logger, extract_box(screen, m_hp1));
-    hp[2] = read_hp_bar(m_logger, extract_box(screen, m_hp2));
-    hp[3] = read_hp_bar(m_logger, extract_box(screen, m_hp3));
+    hp[0] = read_hp_bar(m_logger, extract_box_reference(screen, m_hp0));
+    hp[1] = read_hp_bar(m_logger, extract_box_reference(screen, m_hp1));
+    hp[2] = read_hp_bar(m_logger, extract_box_reference(screen, m_hp2));
+    hp[3] = read_hp_bar(m_logger, extract_box_reference(screen, m_hp3));
     if (hp[0] < 0 || hp[1] < 0 || hp[2] < 0 || hp[3] < 0){
         dump_image(m_logger, MODULE_NAME, "PokemonSwapMenuReader-read_hp", screen);
     }
 }
 void PokemonSwapMenuReader::read_pp(const QImage& screen, int8_t pp[4]){
-    pp[0] = read_pp_text(m_logger, extract_box(screen, m_pp0));
-    pp[1] = read_pp_text(m_logger, extract_box(screen, m_pp1));
-    pp[2] = read_pp_text(m_logger, extract_box(screen, m_pp2));
-    pp[3] = read_pp_text(m_logger, extract_box(screen, m_pp3));
+    pp[0] = read_pp_text(m_logger, extract_box_reference(screen, m_pp0));
+    pp[1] = read_pp_text(m_logger, extract_box_reference(screen, m_pp1));
+    pp[2] = read_pp_text(m_logger, extract_box_reference(screen, m_pp2));
+    pp[3] = read_pp_text(m_logger, extract_box_reference(screen, m_pp3));
     if (pp[0] < 0 && pp[1] < 0 && pp[2] < 0 && pp[3] < 0){
         dump_image(m_logger, MODULE_NAME, "PokemonSwapMenuReader-read_pp", screen);
         return;

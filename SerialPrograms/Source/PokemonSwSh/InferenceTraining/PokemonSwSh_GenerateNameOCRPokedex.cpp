@@ -181,13 +181,13 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env){
             read(actual, env.console, std::move(image6));
             break;
         case Mode::GENERATE_TRAINING_DATA:
-            dump_images(expected, c - 1 + 0, std::move(image0));
-            dump_images(expected, c - 1 + 1, std::move(image1));
-            dump_images(expected, c - 1 + 2, std::move(image2));
-            dump_images(expected, c - 1 + 3, std::move(image3));
-            dump_images(expected, c - 1 + 4, std::move(image4));
-            dump_images(expected, c - 1 + 5, std::move(image5));
-            dump_images(expected, c - 1 + 6, std::move(image6));
+            dump_images(expected, c - 1 + 0, image0);
+            dump_images(expected, c - 1 + 1, image1);
+            dump_images(expected, c - 1 + 2, image2);
+            dump_images(expected, c - 1 + 3, image3);
+            dump_images(expected, c - 1 + 4, image4);
+            dump_images(expected, c - 1 + 5, image5);
+            dump_images(expected, c - 1 + 6, image6);
             break;
         }
 

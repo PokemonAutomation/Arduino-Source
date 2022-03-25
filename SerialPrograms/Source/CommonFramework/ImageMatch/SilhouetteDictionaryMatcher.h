@@ -24,7 +24,7 @@ public:
 
     void add(const std::string& slug, QImage image);
 
-    ImageMatchResult match(QImage image, double alpha_spread) const;
+    ImageMatchResult match(const ConstImageRef& image, double alpha_spread) const;
 
 
 protected:

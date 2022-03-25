@@ -49,9 +49,9 @@ size_t distance_sqr(const ImagePixelBox& a, const ImagePixelBox& b){
 }
 
 
-std::pair<double, PokemonType> match_type_symbol(const QImage& image){
-    int width = image.width();
-    int height = image.height();
+std::pair<double, PokemonType> match_type_symbol(const ConstImageRef& image){
+    size_t width = image.width();
+    size_t height = image.height();
     if (width * height < 100){
         return {1.0, PokemonType::NONE};
     }
@@ -109,7 +109,7 @@ std::pair<double, PokemonType> match_type_symbol(const QImage& image){
 
 void find_symbol_candidates(
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>>& candidates,
-    const QImage& image,
+    const ConstImageRef& image,
     PackedBinaryMatrix2& matrix, double max_area_ratio
 ){
     size_t max_area = (size_t)(image.width() * image.height() * max_area_ratio);
@@ -159,10 +159,7 @@ void find_symbol_candidates(
 
     //  Identify objects.
     for (const auto& item : objmap){
-        QImage img = image.copy(
-            (pxint_t)item.second.min_x, (pxint_t)item.second.min_y,
-            (pxint_t)item.second.width(), (pxint_t)item.second.height()
-        );
+        ConstImageRef img = extract_box_reference(image, item.second);
         std::pair<double, PokemonType> result = match_type_symbol(img);
         if (result.second != PokemonType::NONE){
             const WaterfillObject& obj = item.second;
@@ -182,7 +179,7 @@ void find_symbol_candidates(
 
 
 std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_symbols(
-    const QImage& image, double max_area_ratio
+    const ConstImageRef& image, double max_area_ratio
 ){
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates;
 
@@ -245,7 +242,7 @@ void test_find_symbols(
     const ImageFloatBox& box,
     const QImage& screen, double max_area_ratio
 ){
-    QImage image = extract_box(screen, box);
+    ConstImageRef image = extract_box_reference(screen, box);
 
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_symbols(image, 0.20);
 
