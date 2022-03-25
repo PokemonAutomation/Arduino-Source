@@ -17,7 +17,7 @@ class BlackBorderDetector : public StaticScreenDetector{
 public:
     BlackBorderDetector();
 
-    virtual void make_overlays(VideoOverlaySet& items) const;
+    virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool detect(const QImage& screen) const override;
 
 private:

@@ -39,15 +39,15 @@ PostMMOSpawnReset_Descriptor::PostMMOSpawnReset_Descriptor()
 PostMMOSpawnReset::PostMMOSpawnReset(const PostMMOSpawnReset_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , TURN_DURATION(
-        "<b>Time to first turn around the character:</b><br>Positive values for right turns. Negative values for left turns.",
+        "<b>Camera Turn:</b><br>How many ticks to turn the camera. <br>Positive values for right turns. Negative values for left turns.",
         "0"
     )
     , FORWARD_DURATION(
-        "<b>Time to run forward after turning:</b>",
+        "<b>Move Forward:</b><br>After turning the camera, how many ticks to move forward.",
         "0"
     )
     , WAIT_DURATION(
-        "<b>Time to wait for shiny sound before SR:</b>",
+        "<b>Wait Time:</b><br> Wait time after movement.",
         "3 * TICKS_PER_SECOND"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
