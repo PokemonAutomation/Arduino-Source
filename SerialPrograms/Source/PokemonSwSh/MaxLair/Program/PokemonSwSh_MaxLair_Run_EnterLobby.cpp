@@ -73,7 +73,7 @@ public:
     {}
 
     int read(const QImage& screen){
-        QImage image = extract_box(screen, m_box);
+        QImage image = extract_box_copy(screen, m_box);
         OCR::TextImageFilter{false, 600}.apply(image);
         return OCR::read_number(m_logger, image);
     }
@@ -129,7 +129,7 @@ QImage enter_lobby(
             console.log("Need to pay ore.", COLOR_PURPLE);
 
             arrow_count = 0;
-            QImage image = extract_box(screen, ore_quantity);
+            QImage image = extract_box_copy(screen, ore_quantity);
             OCR::TextImageFilter{false, 600}.apply(image);
             ore.update_with_ocr(console.logger(), image);
 

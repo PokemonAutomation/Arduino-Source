@@ -103,9 +103,9 @@ ShinySparkleSetBDSP find_sparkles(PackedBinaryMatrix2& matrix){
     }
     return sparkles;
 }
-void ShinySparkleSetBDSP::read_from_image(const QImage& image){
+void ShinySparkleSetBDSP::read_from_image(const ConstImageRef& image){
     clear();
-    if (image.isNull()){
+    if (!image){
         return;
     }
 

@@ -263,7 +263,7 @@ void PathReader::read_side(
     GlobalState& state,
     const QImage& screen
 ){
-    int8_t path_side = MaxLairInternal::read_side(extract_box(screen, m_path));
+    int8_t path_side = MaxLairInternal::read_side(extract_box_reference(screen, m_path));
     switch (path_side){
     case 0:
         logger.log("Path Detection: Left side", COLOR_BLUE);

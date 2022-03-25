@@ -5,6 +5,7 @@
  */
 
 #include <cmath>
+#include <QImage>
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
@@ -349,7 +350,7 @@ int8_t read_side(const ConstImageRef& image, uint8_t pixel_threshold){
         : 1;
 }
 
-int8_t read_side(const QImage& image){
+int8_t read_side(const ConstImageRef& image){
     int8_t ret;
     if ((ret = read_side(image, 160)) != -1) return ret;
     if ((ret = read_side(image, 176)) != -1) return ret;

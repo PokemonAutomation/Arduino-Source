@@ -72,7 +72,7 @@ bool PokemonSelectMenuDetector::detect(const QImage& screen) const{
 //    if (euclidean_distance(box3.average, box5.average) > 10) return false;
 ///    if (euclidean_distance(box3.average, box6.average) > 10) return false;
 
-    double select0 = image_average(extract_box(screen, m_select0)).sum();
+    double select0 = image_average(extract_box_reference(screen, m_select0)).sum();
     if (select0 < 200) return true;
 //    double select1 = image_average(extract_box(screen, m_select1)).sum();
 //    if (select1 < 200) return true;

@@ -134,10 +134,10 @@ size_t LobbyJoinedDetector::joined(
     std::chrono::system_clock::time_point timestamp
 ){
     size_t count = 0;
-    if (m_player0.process_frame(extract_box(screen, m_box0), timestamp)) count++;
-    if (m_player1.process_frame(extract_box(screen, m_box1), timestamp)) count++;
-    if (m_player2.process_frame(extract_box(screen, m_box2), timestamp)) count++;
-    if (m_player3.process_frame(extract_box(screen, m_box3), timestamp)) count++;
+    if (m_player0.process_frame(extract_box_copy(screen, m_box0), timestamp)) count++;
+    if (m_player1.process_frame(extract_box_copy(screen, m_box1), timestamp)) count++;
+    if (m_player2.process_frame(extract_box_copy(screen, m_box2), timestamp)) count++;
+    if (m_player3.process_frame(extract_box_copy(screen, m_box3), timestamp)) count++;
     return count;
 }
 

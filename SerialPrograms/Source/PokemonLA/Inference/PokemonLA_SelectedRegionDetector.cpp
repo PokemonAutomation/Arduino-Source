@@ -73,7 +73,7 @@ private:
         RegionState(MapRegion p_region, const ImageFloatBox& p_box, const QImage& screen)
             : region(p_region)
             , box(p_box)
-            , start(extract_box(screen, box))
+            , start(extract_box_copy(screen, box))
         {}
     };
 

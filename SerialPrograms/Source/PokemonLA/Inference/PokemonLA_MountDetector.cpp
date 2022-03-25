@@ -128,7 +128,7 @@ QImage make_MountMatcher2Image(const char* path){
     plus.merge_assume_no_overlap(arrowL);
     plus.merge_assume_no_overlap(arrowR);
 
-    return extract_box(image, plus);
+    return extract_box_copy(image, plus);
 }
 
 class MountMatcherButtons : public ImageMatch::ExactImageMatcher{

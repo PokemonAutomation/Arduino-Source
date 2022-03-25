@@ -47,7 +47,7 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
         }
     }
 
-    m_object = extract_box(reference, *best);
+    m_object = extract_box_copy(reference, *best);
 //    m_object.save("test.png");
     m_matcher.reset(new ExactImageMatcher(m_object));
     m_area_ratio = best->area_ratio();

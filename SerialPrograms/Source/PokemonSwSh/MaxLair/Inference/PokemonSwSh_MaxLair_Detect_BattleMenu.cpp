@@ -240,7 +240,7 @@ std::set<std::string> BattleMenuReader::read_opponent(
     QImage screen;
     for (size_t c = 0; c < 3; c++){
         screen = feed.snapshot();
-        QImage image = extract_box(screen, m_opponent_name);
+        QImage image = extract_box_copy(screen, m_opponent_name);
         OCR::TextImageFilter{false, 600}.apply(image);
         result = read_pokemon_name(logger, screen, image, m_language);
         if (!result.empty()){
@@ -462,7 +462,7 @@ bool dmax_circle_ready(QImage image){
 //    ImageStats stats = image_stats(image);
 }
 bool BattleMenuReader::can_dmax(const QImage& screen) const{
-    return dmax_circle_ready(extract_box(screen, m_dmax));
+    return dmax_circle_ready(extract_box_copy(screen, m_dmax));
 }
 
 

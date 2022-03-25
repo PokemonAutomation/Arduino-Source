@@ -109,9 +109,9 @@ ShinySparkleSetSwSh find_sparkles(PackedBinaryMatrix2& matrix){
     }
     return sparkles;
 }
-void ShinySparkleSetSwSh::read_from_image(const QImage& image){
+void ShinySparkleSetSwSh::read_from_image(const ConstImageRef& image){
     clear();
-    if (image.isNull()){
+    if (!image){
         return;
     }
 

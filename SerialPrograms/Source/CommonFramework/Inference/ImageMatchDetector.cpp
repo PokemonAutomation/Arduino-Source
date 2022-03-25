@@ -30,7 +30,7 @@ ImageMatchDetector::ImageMatchDetector(
     , m_color(color)
     , m_box(box)
 {
-    m_reference_image = extract_box(m_reference_image, m_box);
+    m_reference_image = extract_box_copy(m_reference_image, m_box);
 }
 
 double ImageMatchDetector::rmsd(const QImage& frame) const{

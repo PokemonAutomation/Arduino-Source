@@ -160,13 +160,13 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env){
 //        cout << "dex: " << c << endl;
 
         QImage frame = env.console.video().snapshot();
-        QImage image0 = extract_box(frame, box0);
-        QImage image1 = extract_box(frame, box1);
-        QImage image2 = extract_box(frame, box2);
-        QImage image3 = extract_box(frame, box3);
-        QImage image4 = extract_box(frame, box4);
-        QImage image5 = extract_box(frame, box5);
-        QImage image6 = extract_box(frame, box6);
+        QImage image0 = extract_box_copy(frame, box0);
+        QImage image1 = extract_box_copy(frame, box1);
+        QImage image2 = extract_box_copy(frame, box2);
+        QImage image3 = extract_box_copy(frame, box3);
+        QImage image4 = extract_box_copy(frame, box4);
+        QImage image5 = extract_box_copy(frame, box5);
+        QImage image6 = extract_box_copy(frame, box6);
 
 //        image1.save("test.png");
 

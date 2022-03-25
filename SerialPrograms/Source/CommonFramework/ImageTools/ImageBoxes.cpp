@@ -110,21 +110,13 @@ ConstImageRef extract_box_reference(const ConstImageRef& image, const ImageFloat
 }
 
 
-QImage extract_box(const QImage& image, const ImagePixelBox& box){
+QImage extract_box_copy(const QImage& image, const ImagePixelBox& box){
     return image.copy(box.min_x, box.min_y, box.width(), box.height());
 }
-QImage extract_box(const QImage& image, const ImageFloatBox& box){
+QImage extract_box_copy(const QImage& image, const ImageFloatBox& box){
     return image.copy(
         (pxint_t)(image.width() * box.x + 0.5),
         (pxint_t)(image.height() * box.y + 0.5),
-        (pxint_t)(image.width() * box.width + 0.5),
-        (pxint_t)(image.height() * box.height + 0.5)
-    );
-}
-QImage extract_box(const QImage& image, const ImageFloatBox& box, int offset_x, int offset_y){
-    return image.copy(
-        (pxint_t)(image.width() * box.x + 0.5) + offset_x,
-        (pxint_t)(image.height() * box.y + 0.5) + offset_y,
         (pxint_t)(image.width() * box.width + 0.5),
         (pxint_t)(image.height() * box.height + 0.5)
     );
@@ -194,7 +186,7 @@ QImage extract_object_from_inner_feature(
     const ImagePixelBox& inner_relative_to_image,
     const ImageFloatBox& inner_relative_to_object
 ){
-    return extract_box(
+    return extract_box_copy(
         image,
         extract_object_from_inner_feature(
             inner_relative_to_image,

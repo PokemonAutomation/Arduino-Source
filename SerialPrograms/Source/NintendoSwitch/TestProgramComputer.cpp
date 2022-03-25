@@ -665,7 +665,7 @@ std::set<std::string> read_name(
         return {};
     }
 
-    QImage image = extract_box(screen, box);
+    QImage image = extract_box_copy(screen, box);
     OCR::filter_smart(image);
 
     std::set<std::string> ret;
