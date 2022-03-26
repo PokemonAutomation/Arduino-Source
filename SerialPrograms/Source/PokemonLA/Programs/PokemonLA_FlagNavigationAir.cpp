@@ -458,7 +458,7 @@ bool FlagNavigationAir::run_flying(AsyncCommandSession& commands, WallClock time
     default:;
     }
 //    cout << "m_flag_y = " << m_flag_y << endl;
-    if (m_flag_y > dive_threshold){
+    if (m_flag_detected && m_flag_y > dive_threshold){
         if (0.49 <= m_flag_x && m_flag_x <= 0.51){
             return run_state_action(State::DIVE_STRAIGHT);
         }else{
