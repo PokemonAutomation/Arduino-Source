@@ -7,6 +7,7 @@
 #include <sstream>
 #include <QImage>
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.h"
@@ -86,9 +87,9 @@ void ShinySparkleSetBDSP::update_alphas(){
 
 
 
-ShinySparkleSetBDSP find_sparkles(PackedBinaryMatrix2& matrix){
+ShinySparkleSetBDSP find_sparkles(WaterfillSession& session){
     ShinySparkleSetBDSP sparkles;
-    auto finder = make_WaterfillIterator(matrix, 20);
+    auto finder = session.make_iterator(20);
     WaterfillObject object;
     while (finder->find_next(object, true)){
         PokemonSwSh::RadialSparkleDetector radial_sparkle(object);
@@ -118,10 +119,12 @@ void ShinySparkleSetBDSP::read_from_image(const ConstImageRef& image){
             {0xff909000, 0xffffffff},
         }
     );
+    auto session = make_WaterfillSession();
 
     double best_alpha = 0;
     for (PackedBinaryMatrix2& matrix : matrices){
-        ShinySparkleSetBDSP sparkles = find_sparkles(matrix);
+        session->set_source(matrix);
+        ShinySparkleSetBDSP sparkles = find_sparkles(*session);
         sparkles.update_alphas();
         double alpha = sparkles.alpha_overall();
         if (best_alpha < alpha){

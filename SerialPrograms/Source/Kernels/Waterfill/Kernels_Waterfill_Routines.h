@@ -49,49 +49,6 @@ std::vector<WaterfillObject> find_objects_inplace(PackedBinaryMatrixCore<Tile>& 
 
 
 
-template <typename Tile, typename TileRoutines>
-class WaterfillIterator_TI final : public WaterfillIterator{
-public:
-    WaterfillIterator_TI(PackedBinaryMatrixCore<Tile>& matrix, size_t min_area)
-        : m_min_area(min_area)
-        , m_session(matrix)
-    {}
-    virtual bool find_next(WaterfillObject& object, bool keep_object) override{
-        object.session = this;
-        while (m_tile_row < m_session.tile_height()){
-            while (m_tile_col < m_session.tile_width()){
-                while (true){
-                    //  Not object found. Move to next tile.
-                    if (!m_session.find_object_in_tile(object, keep_object, m_tile_col, m_tile_row)){
-                        break;
-                    }
-                    //  Object too small. Skip it.
-                    if (object.area < m_min_area){
-                        continue;
-                    }
-                    return true;
-                }
-                m_tile_col++;
-            }
-            m_tile_col = 0;
-            m_tile_row++;
-        }
-        return false;
-    }
-
-private:
-    WaterfillSession_t<Tile, TileRoutines> m_session;
-    size_t m_min_area;
-    size_t m_tile_row = 0;
-    size_t m_tile_col = 0;
-
-    std::unique_ptr<SparseBinaryMatrix_IB> m_object;
-};
-
-
-
-
-
 
 }
 }

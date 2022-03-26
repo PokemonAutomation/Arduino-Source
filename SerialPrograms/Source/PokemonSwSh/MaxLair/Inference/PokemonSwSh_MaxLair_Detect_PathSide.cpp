@@ -325,18 +325,18 @@ bool is_arrow(const ConstImageRef& image, const WaterfillObject& object){
 
 
 
-int8_t read_side(const ConstImageRef& image, uint8_t pixel_threshold){
+int8_t read_side(WaterfillSession& session, const ConstImageRef& image, uint8_t pixel_threshold){
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_min(
         image, pixel_threshold, pixel_threshold, pixel_threshold
     );
 
 //    cout << "pixel_threshold = " << (int)pixel_threshold << endl;
+    session.set_source(matrix);
 
-    size_t count = 0;
-
-    auto finder = make_WaterfillIterator(matrix, 300);
+    auto finder = session.make_iterator(300);
     WaterfillObject arrow;
     WaterfillObject object;
+    size_t count = 0;
     while (finder->find_next(object, true)){
         if (is_arrow(image, object)){
             count++;
@@ -356,12 +356,13 @@ int8_t read_side(const ConstImageRef& image, uint8_t pixel_threshold){
 }
 
 int8_t read_side(const ConstImageRef& image){
+    auto session = make_WaterfillSession();
     int8_t ret;
-    if ((ret = read_side(image, 160)) != -1) return ret;
-    if ((ret = read_side(image, 176)) != -1) return ret;
-    if ((ret = read_side(image, 192)) != -1) return ret;
-    if ((ret = read_side(image, 208)) != -1) return ret;
-    if ((ret = read_side(image, 224)) != -1) return ret;
+    if ((ret = read_side(*session, image, 160)) != -1) return ret;
+    if ((ret = read_side(*session, image, 176)) != -1) return ret;
+    if ((ret = read_side(*session, image, 192)) != -1) return ret;
+    if ((ret = read_side(*session, image, 208)) != -1) return ret;
+    if ((ret = read_side(*session, image, 224)) != -1) return ret;
     return ret;
 }
 

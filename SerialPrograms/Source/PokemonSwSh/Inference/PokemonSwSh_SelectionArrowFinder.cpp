@@ -6,6 +6,7 @@
 
 #include "Common/Compiler.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -51,10 +52,9 @@ bool is_selection_arrow(const ConstImageRef& image, const WaterfillObject& objec
 }
 std::vector<ImagePixelBox> find_selection_arrows(const ConstImageRef& image){
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_max(image, 63, 63, 63);
-
+    auto session = make_WaterfillSession(matrix);
+    auto finder = session->make_iterator(200);
     std::vector<ImagePixelBox> ret;
-
-    auto finder = make_WaterfillIterator(matrix, 200);
     WaterfillObject object;
     while (finder->find_next(object, true)){
 //        cout << "asdf" << endl;
@@ -62,7 +62,6 @@ std::vector<ImagePixelBox> find_selection_arrows(const ConstImageRef& image){
             ret.emplace_back(object);
         }
     }
-
     return ret;
 }
 

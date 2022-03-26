@@ -8,6 +8,7 @@
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
@@ -57,7 +58,8 @@ Notification NotificationReader::detect(const QImage& screen) const{
     size_t objects = 0;
     {
         PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(image, 0xff808080, 0xffffffff);
-        auto finder = make_WaterfillIterator(matrix, 20);
+        auto session = make_WaterfillSession(matrix);
+        auto finder = session->make_iterator(20);
         WaterfillObject object;
         while (finder->find_next(object, false)){
             objects++;

@@ -40,21 +40,24 @@ void find_overworld_white_objects(
 //    }
 //    compress_rgb32_to_binary_range(image, filters.data(), filters.size());
 
-    std::vector<std::pair<uint32_t, uint32_t>> filters;
-    for (Color filter : threshold_set){
-        filters.emplace_back((uint32_t)filter, 0xffffffff);
-    }
-    std::vector<PackedBinaryMatrix2> matrix = compress_rgb32_to_binary_range(image, filters);
+    {
+        std::vector<std::pair<uint32_t, uint32_t>> filters;
+        for (Color filter : threshold_set){
+            filters.emplace_back((uint32_t)filter, 0xffffffff);
+        }
+        std::vector<PackedBinaryMatrix2> matrix = compress_rgb32_to_binary_range(image, filters);
 
-//    std::unique_ptr<WaterfillSession> session = make_WaterfillSession();
-    for (size_t c = 0; c < filters.size(); c++){
-        auto finder = make_WaterfillIterator(matrix[c], 50);
-        WaterfillObject object;
-        while (finder->find_next(object, false)){
-            for (const auto& detector : detectors){
-                const std::set<Color>& thresholds = detector.first.thresholds();
-                if (thresholds.find((Color)filters[c].first) != thresholds.end()){
-                    detector.first.process_object(image, object);
+        std::unique_ptr<WaterfillSession> session = make_WaterfillSession();
+        for (size_t c = 0; c < filters.size(); c++){
+            session->set_source(matrix[c]);
+            auto finder = session->make_iterator(50);
+            WaterfillObject object;
+            while (finder->find_next(object, false)){
+                for (const auto& detector : detectors){
+                    const std::set<Color>& thresholds = detector.first.thresholds();
+                    if (thresholds.find((Color)filters[c].first) != thresholds.end()){
+                        detector.first.process_object(image, object);
+                    }
                 }
             }
         }

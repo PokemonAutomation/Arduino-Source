@@ -15,7 +15,7 @@ namespace Kernels{
 namespace Waterfill{
 
 
-class WaterfillIterator2;
+class WaterfillIterator;
 
 
 class WaterfillSession{
@@ -23,7 +23,7 @@ public:
     virtual ~WaterfillSession() = default;
     virtual void set_source(PackedBinaryMatrix_IB& source) = 0;
 
-    virtual std::unique_ptr<WaterfillIterator2> make_iterator(size_t min_area) = 0;
+    virtual std::unique_ptr<WaterfillIterator> make_iterator(size_t min_area) = 0;
 
     //  Get the object at the specific bit position.
     //  The object will be removed from the input matrix.
@@ -38,9 +38,9 @@ std::unique_ptr<WaterfillSession> make_WaterfillSession(PackedBinaryMatrix_IB& m
 
 
 
-class WaterfillIterator2{
+class WaterfillIterator{
 public:
-    virtual ~WaterfillIterator2() = default;
+    virtual ~WaterfillIterator() = default;
     virtual bool find_next(WaterfillObject& object, bool keep_object) = 0;
 };
 

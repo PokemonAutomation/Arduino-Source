@@ -242,8 +242,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     using namespace Kernels::Waterfill;
     using namespace OCR;
     using namespace Pokemon;
-    using namespace PokemonSwSh;
-//    using namespace PokemonBDSP;
+//    using namespace PokemonSwSh;
+    using namespace PokemonBDSP;
 //    using namespace PokemonLA;
 
      LoggerQt& logger = env.logger();
@@ -255,10 +255,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 //    change_mount(console, MountState::WYRDEER_ON);
 
-#if 0
-    ShinySparkleSetSwSh set;
+#if 1
+    ShinySparkleSetBDSP set;
     ShinySparkleTracker tracker(logger, overlay, set, {0, 0, 1, 1});
-
 
     AsyncVisualInferenceSession visual(env, console, console, console);
     visual += tracker;
@@ -266,16 +265,22 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 #endif
 
 
-#if 1
+#if 0
     FlagTracker tracker(logger, overlay);
 
 
 //    QImage src("20220315-054734853907.jpg");
     QImage src("20220315-055335301551.jpg");
-    while (true){
+    auto start = std::chrono::system_clock::now();
+    uint64_t c = 0;
+    while (std::chrono::system_clock::now() - start < std::chrono::seconds(10)){
         tracker.process_frame(src, std::chrono::system_clock::now());
         env.check_stopping();
+        c++;
     }
+    auto elapsed = std::chrono::system_clock::now() - start;
+    auto micros = std::chrono::duration_cast<std::chrono::microseconds>(elapsed);
+    cout << "iterations/sec = " << (double)c / micros.count() * 1000000 << endl;
 #endif
 
 

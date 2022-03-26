@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "PokemonLA_ShinySymbolDetector.h"
@@ -70,7 +71,8 @@ std::vector<ImagePixelBox> find_shiny_symbols(const ConstImageRef& image){
     std::vector<ImagePixelBox> ret;
     {
         PackedBinaryMatrix2 copy = matrix.copy();
-        auto finder = make_WaterfillIterator(copy, 20);
+        auto session = make_WaterfillSession(copy);
+        auto finder = session->make_iterator(20);
         WaterfillObject object;
         while (finder->find_next(object, false)){
             ImagePixelBox object_box;

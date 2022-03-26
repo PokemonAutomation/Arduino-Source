@@ -275,9 +275,10 @@ SOURCES += \
     Source/Kernels/Waterfill/Kernels_Waterfill.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_Default.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX2.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512-GF.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_SSE42.cpp \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Routines.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Session.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp \
@@ -909,6 +910,7 @@ HEADERS += \
     Source/Kernels/Waterfill/Kernels_Waterfill.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_Default.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX2.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512-GF.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_SSE42.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Routines.h \

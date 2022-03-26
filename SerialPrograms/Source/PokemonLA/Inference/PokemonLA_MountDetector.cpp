@@ -9,6 +9,7 @@
 #include "Common/Qt/ImageOpener.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
@@ -77,7 +78,8 @@ QImage make_MountMatcher2Image(const char* path){
     }
 
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(image, 0xff808080, 0xffffffff);
-    auto finder = make_WaterfillIterator(matrix, 50);
+    auto session = make_WaterfillSession(matrix);
+    auto finder = session->make_iterator(50);
 
     WaterfillObject plus, arrowL, arrowR;
 
@@ -440,6 +442,7 @@ MountState MountDetector::detect(const QImage& screen) const{
     double rmsd_plus = 99999;
     double rmsd_arrowL = 99999;
     double rmsd_arrowR = 99999;
+    auto session = make_WaterfillSession();
     {
         std::vector<MountDetectorFilteredImage> filtered_images = run_filters(
             image,
@@ -457,7 +460,8 @@ MountState MountDetector::detect(const QImage& screen) const{
 //        static int c = 0;
         for (MountDetectorFilteredImage& filtered : filtered_images){
 //            cout << filtered.matrix.dump() << endl;
-            auto finder = make_WaterfillIterator(filtered.matrix, 50);
+            session->set_source(filtered.matrix);
+            auto finder = session->make_iterator(50);
             WaterfillObject object;
 //            int c = 0;
             while (finder->find_next(object, false)){
@@ -574,7 +578,8 @@ MountState MountDetector::detect(const QImage& screen) const{
         );
 //        int i = 0;
         for (MountDetectorFilteredImage& filtered : filtered_images){
-            auto finder = make_WaterfillIterator(filtered.matrix, 50);
+            session->set_source(filtered.matrix);
+            auto finder = session->make_iterator(50);
             WaterfillObject object;
             while (finder->find_next(object, false)){
                 //  Skip anything that touches the borders.

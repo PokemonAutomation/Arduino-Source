@@ -391,12 +391,6 @@ std::unique_ptr<WaterfillSession> make_WaterfillSession_x64_AVX2(PackedBinaryMat
             static_cast<PackedBinaryMatrix_x64_AVX2*>(matrix)->get()
         );
 }
-std::unique_ptr<WaterfillIterator> make_WaterfillIterator_x64_AVX2(PackedBinaryMatrix_IB& matrix, size_t min_area){
-    return std::make_unique<WaterfillIterator_TI<BinaryTile_AVX2, Waterfill_x64_AVX2>>(
-        static_cast<PackedBinaryMatrix_x64_AVX2&>(matrix).get(),
-        min_area
-    );
-}
 
 
 

@@ -7,6 +7,7 @@
 #include <map>
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
@@ -229,22 +230,7 @@ int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
     size_t width = image.width();
     size_t height = image.height();
 
-    std::vector<PackedBinaryMatrix2> matrices = compress_rgb32_to_binary_range(
-        image,
-        {
-            {0xff808080, 0xffffffff},
-            {0xff909090, 0xffffffff},
-            {0xffa0a0a0, 0xffffffff},
-            {0xffb0b0b0, 0xffffffff},
-            {0xffc0c0c0, 0xffffffff},
-            {0xffd0d0d0, 0xffffffff},
-            {0xffe0e0e0, 0xffffffff},
-            {0xfff0f0f0, 0xffffffff},
-        }
-    );
-
-    double inv_width = 0.5 / width;
-
+    //  Detect all the digits.
     struct Hit{
         size_t min_x;
         size_t max_x;
@@ -252,34 +238,52 @@ int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
         double rmsd;
         int digit;
     };
-
-
-    //  Detect all the digits.
     std::multimap<size_t, Hit> hits;
-    for (PackedBinaryMatrix2& matrix : matrices){
-//        cout << (int)filters[c].matrix.type() << endl;
-        auto finder = make_WaterfillIterator(matrix, 30);
-        WaterfillObject object;
-        while (finder->find_next(object, false)){
-            //  Skip anything that touches the edge.
-            if (object.min_x == 0 || object.min_y == 0 ||
-                object.max_x + 1 == width || object.max_y + 1 == height
-            ){
-                continue;
+
+    {
+        std::vector<PackedBinaryMatrix2> matrices = compress_rgb32_to_binary_range(
+            image,
+            {
+                {0xff808080, 0xffffffff},
+                {0xff909090, 0xffffffff},
+                {0xffa0a0a0, 0xffffffff},
+                {0xffb0b0b0, 0xffffffff},
+                {0xffc0c0c0, 0xffffffff},
+                {0xffd0d0d0, 0xffffffff},
+                {0xffe0e0e0, 0xffffffff},
+                {0xfff0f0f0, 0xffffffff},
             }
-    //        extract_box(image, object).save("image-" + QString::number(c++) + ".png");
-            std::pair<double, int> digit = read_digit(image, object);
-            if (digit.second >= 0){
-                hits.emplace(
-                    object.min_x,
-                    Hit{
+        );
+
+        double inv_width = 0.5 / width;
+
+        std::unique_ptr<WaterfillSession> session = make_WaterfillSession();
+        for (PackedBinaryMatrix2& matrix : matrices){
+//            cout << (int)filters[c].matrix.type() << endl;
+            session->set_source(matrix);
+            auto finder = session->make_iterator(30);
+            WaterfillObject object;
+            while (finder->find_next(object, false)){
+                //  Skip anything that touches the edge.
+                if (object.min_x == 0 || object.min_y == 0 ||
+                    object.max_x + 1 == width || object.max_y + 1 == height
+                ){
+                    continue;
+                }
+//                extract_box(image, object).save("image-" + QString::number(c++) + ".png");
+                std::pair<double, int> digit = read_digit(image, object);
+                if (digit.second >= 0){
+                    hits.emplace(
                         object.min_x,
-                        object.max_x,
-                        (object.min_x + object.max_x) * inv_width,
-                        digit.first,
-                        digit.second
-                    }
-                );
+                        Hit{
+                            object.min_x,
+                            object.max_x,
+                            (object.min_x + object.max_x) * inv_width,
+                            digit.first,
+                            digit.second
+                        }
+                    );
+                }
             }
         }
     }

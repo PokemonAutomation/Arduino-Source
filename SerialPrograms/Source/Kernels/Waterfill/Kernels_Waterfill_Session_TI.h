@@ -36,7 +36,7 @@ public:
         if (m_object.width() < source.width() || m_object.height() < source.height()){
             m_object = PackedBinaryMatrixCore<Tile>(source.width(), source.height());
         }else{
-//            m_object.set_zero();
+            m_object.set_zero();
         }
     }
     virtual void set_source(PackedBinaryMatrix_IB& source) override{
@@ -49,7 +49,7 @@ public:
     size_t tile_width() const{ return m_source->tile_width(); }
     size_t tile_height() const{ return m_source->tile_height(); }
 
-    virtual std::unique_ptr<WaterfillIterator2> make_iterator(size_t min_area) override;
+    virtual std::unique_ptr<WaterfillIterator> make_iterator(size_t min_area) override;
 
     virtual bool find_object_on_bit(
         WaterfillObject& object, bool keep_object,
@@ -78,9 +78,9 @@ public:
 
 
 template <typename Tile, typename TileRoutines>
-class WaterfillIterator2_t final : public WaterfillIterator2{
+class WaterfillIterator_t final : public WaterfillIterator{
 public:
-    WaterfillIterator2_t(WaterfillSession_t<Tile, TileRoutines>& session, size_t min_area)
+    WaterfillIterator_t(WaterfillSession_t<Tile, TileRoutines>& session, size_t min_area)
         : m_session(session)
         , m_min_area(min_area)
     {}
@@ -98,8 +98,8 @@ private:
 
 
 template <typename Tile, typename TileRoutines>
-std::unique_ptr<WaterfillIterator2> WaterfillSession_t<Tile, TileRoutines>::make_iterator(size_t min_area){
-    return std::make_unique<WaterfillIterator2_t<Tile, TileRoutines>>(*this, min_area);
+std::unique_ptr<WaterfillIterator> WaterfillSession_t<Tile, TileRoutines>::make_iterator(size_t min_area){
+    return std::make_unique<WaterfillIterator_t<Tile, TileRoutines>>(*this, min_area);
 }
 
 
@@ -276,7 +276,7 @@ bool WaterfillSession_t<Tile, TileRoutines>::find_object(
 
 
 template <typename Tile, typename TileRoutines>
-bool WaterfillIterator2_t<Tile, TileRoutines>::find_next(WaterfillObject& object, bool keep_object){
+bool WaterfillIterator_t<Tile, TileRoutines>::find_next(WaterfillObject& object, bool keep_object){
     while (m_tile_row < m_session.tile_height()){
         while (m_tile_col < m_session.tile_width()){
             while (true){
