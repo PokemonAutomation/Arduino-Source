@@ -60,7 +60,7 @@ public:
             128, 255,
             128, 255
         );
-        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
+        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20);
         if (objects.size() != 2){
             throw FileException(
                 nullptr, PA_CURRENT_FUNCTION,
@@ -260,7 +260,7 @@ int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
 //        cout << (int)filters[c].matrix.type() << endl;
         auto finder = make_WaterfillIterator(matrix, 30);
         WaterfillObject object;
-        while (finder->find_next(object)){
+        while (finder->find_next(object, false)){
             //  Skip anything that touches the edge.
             if (object.min_x == 0 || object.min_y == 0 ||
                 object.max_x + 1 == width || object.max_y + 1 == height

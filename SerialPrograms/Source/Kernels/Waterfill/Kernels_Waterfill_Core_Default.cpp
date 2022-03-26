@@ -5,6 +5,7 @@
  */
 
 #include "Kernels/Kernels_BitScan.h"
+#include "Kernels_Waterfill_Session_TI.h"
 #include "Kernels_Waterfill_Routines.h"
 #include "Kernels_Waterfill_Core_Default.h"
 
@@ -329,20 +330,21 @@ bool Waterfill_Default::Waterfill_touch_right(const BinaryTile_Default& mask, Bi
 
 
 
-bool find_object_on_bit_Default(PackedBinaryMatrix_IB& matrix, WaterfillObject& object, size_t x, size_t y){
-    return find_object_on_bit<BinaryTile_Default, Waterfill_Default>(
+std::vector<WaterfillObject> find_objects_inplace_Default(PackedBinaryMatrix_IB& matrix, size_t min_area){
+    return find_objects_inplace<BinaryTile_Default, Waterfill_Default>(
         static_cast<PackedBinaryMatrix_Default&>(matrix).get(),
-        object, x, y
+        min_area
     );
 }
 
-std::vector<WaterfillObject> find_objects_inplace_Default(PackedBinaryMatrix_IB& matrix, size_t min_area, bool keep_objects){
-    return find_objects_inplace<BinaryTile_Default, Waterfill_Default>(
-        static_cast<PackedBinaryMatrix_Default&>(matrix).get(),
-        min_area, keep_objects
-    );
+std::unique_ptr<WaterfillSession> make_WaterfillSession_Default(PackedBinaryMatrix_IB* matrix){
+    return matrix == nullptr
+        ? std::make_unique<WaterfillSession_t<BinaryTile_Default, Waterfill_Default>>()
+        : std::make_unique<WaterfillSession_t<BinaryTile_Default, Waterfill_Default>>(
+            static_cast<PackedBinaryMatrix_Default*>(matrix)->get()
+        );
 }
-std::unique_ptr<WaterfillIterator2> make_WaterfillIterator_Default(PackedBinaryMatrix_IB& matrix, size_t min_area){
+std::unique_ptr<WaterfillIterator> make_WaterfillIterator_Default(PackedBinaryMatrix_IB& matrix, size_t min_area){
     return std::make_unique<WaterfillIterator_TI<BinaryTile_Default, Waterfill_Default>>(
         static_cast<PackedBinaryMatrix_Default&>(matrix).get(),
         min_area

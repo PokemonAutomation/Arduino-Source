@@ -56,7 +56,7 @@ std::vector<ImagePixelBox> find_selection_arrows(const ConstImageRef& image){
 
     auto finder = make_WaterfillIterator(matrix, 200);
     WaterfillObject object;
-    while (finder->find_next(object)){
+    while (finder->find_next(object, true)){
 //        cout << "asdf" << endl;
         if (is_selection_arrow(image, object)){
             ret.emplace_back(object);

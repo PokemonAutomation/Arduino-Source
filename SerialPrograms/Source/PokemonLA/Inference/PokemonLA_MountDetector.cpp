@@ -91,7 +91,7 @@ QImage make_MountMatcher2Image(const char* path){
 
 
     WaterfillObject object;
-    while (finder->find_next(object)){
+    while (finder->find_next(object, false)){
         ConstImageRef cropped = extract_box_reference(image, object);
 //        cropped.save("test-" + QString::number(c++) + ".png");
 
@@ -460,7 +460,7 @@ MountState MountDetector::detect(const QImage& screen) const{
             auto finder = make_WaterfillIterator(filtered.matrix, 50);
             WaterfillObject object;
 //            int c = 0;
-            while (finder->find_next(object)){
+            while (finder->find_next(object, false)){
 //                c++;
                 //  Skip anything that touches the borders.
                 if (object.min_x == 0 || object.min_y == 0 ||
@@ -576,7 +576,7 @@ MountState MountDetector::detect(const QImage& screen) const{
         for (MountDetectorFilteredImage& filtered : filtered_images){
             auto finder = make_WaterfillIterator(filtered.matrix, 50);
             WaterfillObject object;
-            while (finder->find_next(object)){
+            while (finder->find_next(object, false)){
                 //  Skip anything that touches the borders.
                 if (object.min_x == 0 || object.min_y == 0 ||
                     object.max_x - 1 == (size_t)image.width() ||

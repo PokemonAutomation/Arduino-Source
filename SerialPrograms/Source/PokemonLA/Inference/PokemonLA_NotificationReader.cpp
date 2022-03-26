@@ -59,7 +59,7 @@ Notification NotificationReader::detect(const QImage& screen) const{
         PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(image, 0xff808080, 0xffffffff);
         auto finder = make_WaterfillIterator(matrix, 20);
         WaterfillObject object;
-        while (finder->find_next(object)){
+        while (finder->find_next(object, false)){
             objects++;
         }
         if (objects < 20){
@@ -69,7 +69,7 @@ Notification NotificationReader::detect(const QImage& screen) const{
 
 
 //    image = image.convertToFormat(QImage::Format::Format_ARGB32);
-    QImage image_ocr(image.width(), image.height(), QImage::Format_ARGB32);
+    QImage image_ocr((int)image.width(), (int)image.height(), QImage::Format_ARGB32);
 
 
     m_logger.log("NotificationReader: Possible text found (" + std::to_string(objects) + " objects). Attempting to read it...", COLOR_PURPLE);

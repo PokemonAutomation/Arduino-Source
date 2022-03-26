@@ -7,6 +7,7 @@
 #include <cmath>
 #include <QImage>
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/DistanceToLine.h"
@@ -36,6 +37,8 @@ bool is_arrow_pointed_up(
     size_t width = matrix.width();
     size_t height = matrix.height();
 
+    std::unique_ptr<WaterfillSession> session = make_WaterfillSession(inverted);
+
     //  Verify left edge.
     WaterfillObject region0;
     {
@@ -59,7 +62,7 @@ bool is_arrow_pointed_up(
 //        cout << "topL_x = " << topL_x << endl;
 //        cout << "left_y = " << left_y << endl;
 
-        if (!find_object_on_bit(inverted, region0, 0, 0)){
+        if (!session->find_object_on_bit(region0, true, 0, 0)){
             return false;
         }
 //        PackedBinaryMatrix matrix0 = region0.packed_matrix();
@@ -118,7 +121,7 @@ bool is_arrow_pointed_up(
 //        cout << inverted.dump() << endl;
 //        cout << inverted.dump_tiles() << endl;
 
-        if (!find_object_on_bit(inverted, region1, width - 1, 0)){
+        if (!session->find_object_on_bit(region1, true, width - 1, 0)){
             return false;
         }
 //        cout << inverted.dump() << endl;
@@ -156,7 +159,7 @@ bool is_arrow_pointed_up(
 
     //  Verify bottom.
     WaterfillObject region2;
-    if (!find_object_on_bit(inverted, region2, width - 1, height - 1)){
+    if (!session->find_object_on_bit(region2, false, width - 1, height - 1)){
         return false;
     }
 
@@ -175,6 +178,8 @@ bool is_arrow_pointed_corner(
     size_t width = matrix.width();
     size_t height = matrix.height();
 
+    std::unique_ptr<WaterfillSession> session = make_WaterfillSession(inverted);
+
     //  Verify right edge.
     {
         size_t right_y = 0;
@@ -190,7 +195,7 @@ bool is_arrow_pointed_corner(
         );
 
         WaterfillObject region0;
-        if (!find_object_on_bit(inverted, region0, width - 1, 0)){
+        if (!session->find_object_on_bit(region0, true, width - 1, 0)){
             return false;
         }
 
@@ -234,7 +239,7 @@ bool is_arrow_pointed_corner(
         );
 
         WaterfillObject region1;
-        if (!find_object_on_bit(inverted, region1, 0, height - 1)){
+        if (!session->find_object_on_bit(region1, true, 0, height - 1)){
             return false;
         }
 
@@ -332,7 +337,7 @@ int8_t read_side(const ConstImageRef& image, uint8_t pixel_threshold){
     auto finder = make_WaterfillIterator(matrix, 300);
     WaterfillObject arrow;
     WaterfillObject object;
-    while (finder->find_next(object)){
+    while (finder->find_next(object, true)){
         if (is_arrow(image, object)){
             count++;
             arrow = object;

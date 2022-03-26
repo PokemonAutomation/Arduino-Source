@@ -34,7 +34,7 @@ public:
             128, 255,
             128, 255
         );
-        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
+        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20);
         if (objects.size() != 1){
             throw FileException(
                 nullptr, PA_CURRENT_FUNCTION,

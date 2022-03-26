@@ -7,6 +7,7 @@
 #include <map>
 #include "Common/Cpp/FixedLimitVector.tpp"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "PokemonLA_WhiteObjectDetector.h"
@@ -45,10 +46,11 @@ void find_overworld_white_objects(
     }
     std::vector<PackedBinaryMatrix2> matrix = compress_rgb32_to_binary_range(image, filters);
 
+//    std::unique_ptr<WaterfillSession> session = make_WaterfillSession();
     for (size_t c = 0; c < filters.size(); c++){
         auto finder = make_WaterfillIterator(matrix[c], 50);
         WaterfillObject object;
-        while (finder->find_next(object)){
+        while (finder->find_next(object, false)){
             for (const auto& detector : detectors){
                 const std::set<Color>& thresholds = detector.first.thresholds();
                 if (thresholds.find((Color)filters[c].first) != thresholds.end()){

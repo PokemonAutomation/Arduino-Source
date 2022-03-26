@@ -39,6 +39,7 @@ FlagNavigationAir::FlagNavigationAir(
     , m_dialog_detector(console, console, false)
     , m_shiny_listener(console, false)
     , m_looking_straight_ahead(false)
+    , m_looking_straight_ahead_timestamp(WallClock::min())
 //    , m_last_good_state(WallClock::min())
     , m_last_known_mount(MountState::NOTHING)
     , m_find_flag_failed(false)

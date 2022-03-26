@@ -29,7 +29,7 @@ public:
             128, 255,
             128, 255
         );
-        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 100, false);
+        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 100);
 
         //  Get largest white object.
         size_t area = 0;

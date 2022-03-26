@@ -7,6 +7,7 @@
 #include <cmath>
 #include <map>
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/ImageTools/DistanceToLine.h"
 #include "PokemonSwSh_SparkleDetectorSquare.h"
@@ -25,22 +26,24 @@ WaterfillObject remove_background(PackedBinaryMatrix2& matrix){
     size_t width = matrix.width();
     size_t height = matrix.height();
 
+    std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
+
     WaterfillObject background;
     for (size_t c = 0; c < width; c++){
         WaterfillObject object;
-        if (find_object_on_bit(matrix, object, c, 0)){
+        if (session->find_object_on_bit(object, true, c, 0)){
             background.merge_assume_no_overlap(object);
         }
-        if (find_object_on_bit(matrix, object, c, height - 1)){
+        if (session->find_object_on_bit(object, true, c, height - 1)){
             background.merge_assume_no_overlap(object);
         }
     }
     for (size_t r = 0; r < height; r++){
         WaterfillObject object;
-        if (find_object_on_bit(matrix, object, 0, r)){
+        if (session->find_object_on_bit(object, true, 0, r)){
             background.merge_assume_no_overlap(object);
         }
-        if (find_object_on_bit(matrix, object, width - 1, r)){
+        if (session->find_object_on_bit(object, true, width - 1, r)){
             background.merge_assume_no_overlap(object);
         }
     }
@@ -51,8 +54,9 @@ WaterfillObject remove_background(PackedBinaryMatrix2& matrix){
 //  Remove the hole of 1's from "matrix" at location (x, y).
 //  Return the total area of the hole.
 size_t remove_hole(PackedBinaryMatrix2& matrix, size_t x, size_t y){
+    std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
     WaterfillObject object;
-    if (!find_object_on_bit(matrix, object, x, y)){
+    if (!session->find_object_on_bit(object, false, x, y)){
         return 0;
     }
     return object.area;

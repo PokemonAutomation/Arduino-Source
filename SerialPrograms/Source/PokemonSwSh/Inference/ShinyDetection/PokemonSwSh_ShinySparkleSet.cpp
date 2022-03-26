@@ -88,7 +88,7 @@ ShinySparkleSetSwSh find_sparkles(PackedBinaryMatrix2& matrix){
     ShinySparkleSetSwSh sparkles;
     auto finder = make_WaterfillIterator(matrix, 20);
     WaterfillObject object;
-    while (finder->find_next(object)){
+    while (finder->find_next(object, true)){
         RadialSparkleDetector radial_sparkle(object);
         if (radial_sparkle.is_ball()){
             sparkles.balls.emplace_back(object.min_x, object.min_y, object.max_x, object.max_y);

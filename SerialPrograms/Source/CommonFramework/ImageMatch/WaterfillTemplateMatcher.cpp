@@ -31,7 +31,7 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
     QImage reference = open_image(qpath);
 
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(reference, (uint32_t)min_color, (uint32_t)max_color);
-    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, min_area, false);
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, min_area);
     if (objects.empty()){
         throw FileException(
             nullptr, PA_CURRENT_FUNCTION,

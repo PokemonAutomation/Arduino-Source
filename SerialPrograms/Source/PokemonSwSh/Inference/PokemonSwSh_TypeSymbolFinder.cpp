@@ -113,7 +113,7 @@ void find_symbol_candidates(
     PackedBinaryMatrix2& matrix, double max_area_ratio
 ){
     size_t max_area = (size_t)(image.width() * image.height() * max_area_ratio);
-    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20);
 
 //    static int index = 0;
 

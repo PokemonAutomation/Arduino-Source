@@ -61,7 +61,7 @@ public:
             0, 160,
             0, 192
         );
-        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
+        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20);
         if (objects.size() != 2){
             throw FileException(
                 nullptr, PA_CURRENT_FUNCTION,
@@ -116,7 +116,7 @@ std::vector<ImagePixelBox> find_exclamation_marks(const ConstImageRef& image){
         0, 160,
         0, 192
     );
-    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20);
 #if 0
     cout << "objects = " << objects.size() << endl;
     static int c = 0;
@@ -142,7 +142,7 @@ std::vector<ImagePixelBox> find_question_marks(const ConstImageRef& image){
         0, 255,
         128, 255
     );
-    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 50, false);
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 50);
     std::vector<ImagePixelBox> ret;
 #if 1
     for (const WaterfillObject& object : objects){

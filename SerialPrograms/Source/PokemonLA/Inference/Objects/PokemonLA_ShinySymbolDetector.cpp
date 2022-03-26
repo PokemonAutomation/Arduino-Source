@@ -33,7 +33,7 @@ public:
             128, 255,
             128, 255
         );
-        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
+        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20);
         if (objects.size() != 2){
             throw FileException(
                 nullptr, PA_CURRENT_FUNCTION,
@@ -72,7 +72,7 @@ std::vector<ImagePixelBox> find_shiny_symbols(const ConstImageRef& image){
         PackedBinaryMatrix2 copy = matrix.copy();
         auto finder = make_WaterfillIterator(copy, 20);
         WaterfillObject object;
-        while (finder->find_next(object)){
+        while (finder->find_next(object, false)){
             ImagePixelBox object_box;
             if (ShinySymbolDetector::instance().matches_with_background_replace(object_box, image, matrix, object)){
                 ret.emplace_back(object_box);

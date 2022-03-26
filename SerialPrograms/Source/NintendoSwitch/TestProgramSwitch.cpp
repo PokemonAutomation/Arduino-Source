@@ -242,20 +242,31 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     using namespace Kernels::Waterfill;
     using namespace OCR;
     using namespace Pokemon;
-//    using namespace PokemonSwSh;
+    using namespace PokemonSwSh;
 //    using namespace PokemonBDSP;
-    using namespace PokemonLA;
+//    using namespace PokemonLA;
 
      LoggerQt& logger = env.logger();
-//     ConsoleHandle& console = env.consoles[0];
+     ConsoleHandle& console = env.consoles[0];
 //     BotBase& botbase = env.consoles[0];
-//     VideoFeed& feed = env.consoles[0];
+     VideoFeed& feed = env.consoles[0];
      VideoOverlay& overlay = env.consoles[0];
 
 
 //    change_mount(console, MountState::WYRDEER_ON);
 
+#if 0
+    ShinySparkleSetSwSh set;
+    ShinySparkleTracker tracker(logger, overlay, set, {0, 0, 1, 1});
 
+
+    AsyncVisualInferenceSession visual(env, console, console, console);
+    visual += tracker;
+//    tracker.process_frame(feed.snapshot(), std::chrono::system_clock::now());
+#endif
+
+
+#if 1
     FlagTracker tracker(logger, overlay);
 
 
@@ -265,7 +276,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
         tracker.process_frame(src, std::chrono::system_clock::now());
         env.check_stopping();
     }
-
+#endif
 
 
 #if 0

@@ -232,20 +232,20 @@ bool Waterfill_x64_AVX512::Waterfill_touch_right(const BinaryTile_AVX512& mask, 
 
 
 
-bool find_object_on_bit_x64_AVX512(PackedBinaryMatrix_IB& matrix, WaterfillObject& object, size_t x, size_t y){
-    return find_object_on_bit<BinaryTile_AVX512, Waterfill_x64_AVX512>(
-        static_cast<PackedBinaryMatrix_x64_AVX512&>(matrix).get(),
-        object, x, y
-    );
-}
-
-std::vector<WaterfillObject> find_objects_inplace_x64_AVX512(PackedBinaryMatrix_IB& matrix, size_t min_area, bool keep_objects){
+std::vector<WaterfillObject> find_objects_inplace_x64_AVX512(PackedBinaryMatrix_IB& matrix, size_t min_area){
     return find_objects_inplace<BinaryTile_AVX512, Waterfill_x64_AVX512>(
         static_cast<PackedBinaryMatrix_x64_AVX512&>(matrix).get(),
-        min_area, keep_objects
+        min_area
     );
 }
-std::unique_ptr<WaterfillIterator2> make_WaterfillIterator_x64_AVX512(PackedBinaryMatrix_IB& matrix, size_t min_area){
+std::unique_ptr<WaterfillSession> make_WaterfillSession_x64_AVX512(PackedBinaryMatrix_IB* matrix){
+    return matrix == nullptr
+        ? std::make_unique<WaterfillSession_t<BinaryTile_AVX512, Waterfill_x64_AVX512>>()
+        : std::make_unique<WaterfillSession_t<BinaryTile_AVX512, Waterfill_x64_AVX512>>(
+            static_cast<PackedBinaryMatrix_x64_AVX512*>(matrix)->get()
+        );
+}
+std::unique_ptr<WaterfillIterator> make_WaterfillIterator_x64_AVX512(PackedBinaryMatrix_IB& matrix, size_t min_area){
     return std::make_unique<WaterfillIterator_TI<BinaryTile_AVX512, Waterfill_x64_AVX512>>(
         static_cast<PackedBinaryMatrix_x64_AVX512&>(matrix).get(),
         min_area

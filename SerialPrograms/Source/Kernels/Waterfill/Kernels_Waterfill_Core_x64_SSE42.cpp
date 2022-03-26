@@ -359,20 +359,20 @@ bool Waterfill_x64_SSE42::Waterfill_touch_right(const BinaryTile_SSE42& mask, Bi
 
 
 
-bool find_object_on_bit_x64_SSE42(PackedBinaryMatrix_IB& matrix, WaterfillObject& object, size_t x, size_t y){
-    return find_object_on_bit<BinaryTile_SSE42, Waterfill_x64_SSE42>(
-        static_cast<PackedBinaryMatrix_x64_SSE42&>(matrix).get(),
-        object, x, y
-    );
-}
-
-std::vector<WaterfillObject> find_objects_inplace_x64_SSE42(PackedBinaryMatrix_IB& matrix, size_t min_area, bool keep_objects){
+std::vector<WaterfillObject> find_objects_inplace_x64_SSE42(PackedBinaryMatrix_IB& matrix, size_t min_area){
     return find_objects_inplace<BinaryTile_SSE42, Waterfill_x64_SSE42>(
         static_cast<PackedBinaryMatrix_x64_SSE42&>(matrix).get(),
-        min_area, keep_objects
+        min_area
     );
 }
-std::unique_ptr<WaterfillIterator2> make_WaterfillIterator_x64_SSE42(PackedBinaryMatrix_IB& matrix, size_t min_area){
+std::unique_ptr<WaterfillSession> make_WaterfillSession_x64_SSE42(PackedBinaryMatrix_IB* matrix){
+    return matrix == nullptr
+        ? std::make_unique<WaterfillSession_t<BinaryTile_SSE42, Waterfill_x64_SSE42>>()
+        : std::make_unique<WaterfillSession_t<BinaryTile_SSE42, Waterfill_x64_SSE42>>(
+            static_cast<PackedBinaryMatrix_x64_SSE42*>(matrix)->get()
+        );
+}
+std::unique_ptr<WaterfillIterator> make_WaterfillIterator_x64_SSE42(PackedBinaryMatrix_IB& matrix, size_t min_area){
     return std::make_unique<WaterfillIterator_TI<BinaryTile_SSE42, Waterfill_x64_SSE42>>(
         static_cast<PackedBinaryMatrix_x64_SSE42&>(matrix).get(),
         min_area

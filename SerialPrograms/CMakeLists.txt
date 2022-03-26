@@ -525,6 +525,7 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h
     Source/Kernels/Waterfill/Kernels_Waterfill.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Routines.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Routines.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_Default.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_Default.h
@@ -537,6 +538,7 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512-GF.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512-GF.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Session.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp

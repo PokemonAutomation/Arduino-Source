@@ -54,7 +54,7 @@ bool is_seeker_bubble(const ConstImageRef& image, const WaterfillObject& object)
 
 std::vector<ImagePixelBox> find_seeker_bubbles(const ConstImageRef& image){
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_min(image, 200, 200, 200);
-    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 400, false);
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 400);
     std::vector<ImagePixelBox> ret;
     for (const WaterfillObject& object : objects){
         if (is_seeker_bubble(image, object)){
