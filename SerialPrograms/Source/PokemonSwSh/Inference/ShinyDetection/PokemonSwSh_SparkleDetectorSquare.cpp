@@ -318,9 +318,32 @@ std::multimap<double, std::pair<size_t, size_t>> get_edge_pixels(
     size_t width = object.width();
     size_t height = object.height();
 
-    PackedBinaryMatrix2 background_matrix = background.object->submatrix(0, 0, width, height);
-
     std::multimap<double, std::pair<size_t, size_t>> edge_pixels;
+    if (background.area == 0){
+        //  No background. Grab the entire edge.
+        for (size_t r = 0; r < height; r++){
+            for (size_t c = 0; c < width; c++){
+                //  Not part of the object.
+                if (!object.get(c, r)){
+                    continue;
+                }
+                if (c == 0 || r == 0 || c == width - 1 || r == height - 1){
+                    double angle = std::atan2(
+                        (ptrdiff_t)r - (ptrdiff_t)center_y,
+                        (ptrdiff_t)c - (ptrdiff_t)center_x
+                    ) * 57.295779513082320877;
+                    angle = normalize_angle_0_360_new(angle - base_angle);
+                    edge_pixels.emplace(
+                        angle,
+                        std::pair<size_t, size_t>{c, r}
+                    );
+                }
+            }
+        }
+        return edge_pixels;
+    }
+
+    PackedBinaryMatrix2 background_matrix = background.object->submatrix(0, 0, width, height);
     for (size_t r = 0; r < height; r++){
         for (size_t c = 0; c < width; c++){
             //  Not part of the object.
