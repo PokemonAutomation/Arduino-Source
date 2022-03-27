@@ -126,7 +126,7 @@ bool PathSelectDetector::detect(const QImage& screen) const{
         return false;
     }
     ImageStats dialog_middle = image_stats(extract_box_reference(screen, m_dialog_middle));
-    if (!is_grey(dialog_middle, 0, 200)){
+    if (!is_grey(dialog_middle, 0, 300)){
 //        global_logger().log("m_dialog_middle out");
         return false;
     }
