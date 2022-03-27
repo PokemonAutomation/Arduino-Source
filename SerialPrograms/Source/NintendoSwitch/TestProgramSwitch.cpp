@@ -255,7 +255,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 //    change_mount(console, MountState::WYRDEER_ON);
 
-#if 0
+#if 1
     ShinySparkleSetSwSh set;
     ShinySparkleTracker tracker(logger, overlay, set, {0, 0, 1, 1});
 
@@ -265,7 +265,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 #endif
 
 
-#if 1
+#if 0
     FlagTracker tracker(logger, overlay);
 
 

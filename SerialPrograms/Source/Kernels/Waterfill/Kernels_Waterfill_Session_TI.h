@@ -41,9 +41,9 @@ public:
             m_busy_tiles = BitSet2D(source.width(), source.height());
             m_object_tiles = BitSet2D(source.width(), source.height());
         }else{
-            m_object.set_zero();
-            m_busy_tiles.clear();
-            m_object_tiles.clear();
+            clear_dirty_tiles();
+//            m_busy_tiles.clear();
+//            m_object_tiles.clear();
         }
     }
     virtual void set_source(PackedBinaryMatrix_IB& source) override{
@@ -74,11 +74,23 @@ private:
         size_t tile_x, size_t tile_y,
         size_t bit_x, size_t bit_y
     );
+    void clear_dirty_tiles(){
+        for (auto tile : m_dirty_tiles){
+            m_object.tile(tile.first, tile.second).set_zero();
+        }
+        m_dirty_tiles.clear();
+    }
 
 
-public:
+private:
+    //  Source matrix. This is zeroed as objects are found.
     PackedBinaryMatrixCore<Tile>* m_source = nullptr;
+
+    //  Current object.
     PackedBinaryMatrixCore<Tile> m_object;
+    std::vector<std::pair<size_t, size_t>> m_dirty_tiles;
+
+    //  Reused scratch buffers. Only used inside "find_object()".
     BitSet2D m_busy_tiles;
     BitSet2D m_object_tiles;
 };
@@ -153,6 +165,8 @@ bool WaterfillSession_t<Tile, TileRoutines>::find_object(
     size_t tile_x, size_t tile_y,
     size_t bit_x, size_t bit_y
 ){
+    clear_dirty_tiles();
+
     size_t tile_width = m_source->tile_width();
     size_t tile_height = m_source->tile_height();
 
@@ -219,6 +233,7 @@ bool WaterfillSession_t<Tile, TileRoutines>::find_object(
     std::map<TileIndex, Tile> sparse_set;
 
     while (m_object_tiles.pop(x, y)){
+        m_dirty_tiles.emplace_back(x, y);
         Tile& tile = m_object.tile(x, y);
 
         if (keep_object){
@@ -248,7 +263,7 @@ bool WaterfillSession_t<Tile, TileRoutines>::find_object(
         tile_min_y = std::min(tile_min_y, y);
         tile_max_y = std::max(tile_max_y, y);
 
-        tile.set_zero();
+//        tile.set_zero();
     }
 
 #if 0

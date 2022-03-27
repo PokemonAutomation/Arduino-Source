@@ -30,7 +30,9 @@ public:
     }
 
     PA_FORCE_INLINE void clear(){
-        memset(m_dense.data(), 0, m_dense.size() * sizeof(uint32_t));
+        for (uint64_t index : m_sparse){
+            m_dense[index / WORD_BITS] = 0;
+        }
         m_sparse.clear();
     }
 
@@ -95,7 +97,12 @@ public:
     }
 
     PA_FORCE_INLINE void clear(){
-        memset(m_dense.data(), 0, m_dense.size() * sizeof(uint32_t));
+        for (uint64_t i : m_sparse){
+            size_t current_x = (uint32_t)i;
+            size_t current_y = (size_t)(i >> 32);
+            size_t index = current_x + current_y * m_width;
+            m_dense[index / WORD_BITS] = 0;
+        }
         m_sparse.clear();
     }
 
@@ -117,7 +124,7 @@ public:
             return true;
         }else{
             ref = value | mask;
-            m_sparse.emplace_back(x | (y << 32));
+            m_sparse.emplace_back(x | ((uint64_t)y << 32));
             return false;
         }
     }
@@ -126,7 +133,7 @@ public:
             size_t current = m_sparse.back();
             m_sparse.pop_back();
             size_t current_x = (uint32_t)current;
-            size_t current_y = current >> 32;
+            size_t current_y = (size_t)(current >> 32);
             size_t index = current_x + current_y * m_width;
             size_t word = index / WORD_BITS;
             size_t shift = index % WORD_BITS;
