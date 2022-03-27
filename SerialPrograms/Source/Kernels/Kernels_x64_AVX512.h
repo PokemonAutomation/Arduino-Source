@@ -17,13 +17,13 @@ namespace PokemonAutomation{
 namespace Kernels{
 
 
-inline static void print_u8(__m512i x){
+inline void print_u8(__m512i x){
     for (int i = 0; i < 64; i++){
         std::cout << (int)((const unsigned char*)&x)[i] << " ";
     }
     std::cout << std::endl;
 }
-inline static void print_u16(const __m512i& x){
+inline void print_u16(const __m512i& x){
     union{
         __m512i v;
         uint16_t s[32];
@@ -34,7 +34,7 @@ inline static void print_u16(const __m512i& x){
     }
     std::cout << std::endl;
 }
-inline static void print_u32(const __m512i& x){
+inline void print_u32(const __m512i& x){
     union{
         __m512i v;
         uint32_t s[16];
@@ -45,7 +45,7 @@ inline static void print_u32(const __m512i& x){
     }
     std::cout << std::endl;
 }
-inline static void print_u64(const __m512i& x){
+inline void print_u64(const __m512i& x){
     union{
         __m512i v;
         uint64_t s[8];

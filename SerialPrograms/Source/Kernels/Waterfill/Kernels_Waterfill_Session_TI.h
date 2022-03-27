@@ -157,7 +157,6 @@ bool WaterfillSession_t<Tile, TileRoutines>::find_object(
     size_t tile_height = m_source->tile_height();
 
     //  Set first tile.
-    TileIndex index{tile_x, tile_y};
     m_busy_tiles.set(tile_x, tile_y);
     m_object_tiles.set(tile_x, tile_y);
     m_object.tile(tile_x, tile_y).set_bit(bit_x, bit_y, 1);
@@ -165,8 +164,6 @@ bool WaterfillSession_t<Tile, TileRoutines>::find_object(
     //  Iterate Waterfill...
     size_t x, y;
     while (m_busy_tiles.pop(x, y)){
-        index = TileIndex{x, y};
-
         Tile& mask = m_source->tile(x, y);
         Tile& tile = m_object.tile(x, y);
 
@@ -179,7 +176,6 @@ bool WaterfillSession_t<Tile, TileRoutines>::find_object(
             current_y = y - 1;
             const Tile& neighbor_mask = m_source->tile(x, current_y);
             if (TileRoutines::Waterfill_touch_bottom(neighbor_mask, m_object.tile(x, current_y), tile)){
-                TileIndex neightbor_index(x, current_y);
                 m_busy_tiles.set(x, current_y);
                 m_object_tiles.set(x, current_y);
             }
@@ -188,7 +184,6 @@ bool WaterfillSession_t<Tile, TileRoutines>::find_object(
         if (current_y < tile_height){
             const Tile& neighbor_mask = m_source->tile(x, current_y);
             if (TileRoutines::Waterfill_touch_top(neighbor_mask, m_object.tile(x, current_y), tile)){
-                TileIndex neightbor_index(x, current_y);
                 m_busy_tiles.set(x, current_y);
                 m_object_tiles.set(x, current_y);
             }
@@ -197,7 +192,6 @@ bool WaterfillSession_t<Tile, TileRoutines>::find_object(
             current_x = x - 1;
             const Tile& neighbor_mask = m_source->tile(current_x, y);
             if (TileRoutines::Waterfill_touch_right(neighbor_mask, m_object.tile(current_x, y), tile)){
-                TileIndex neightbor_index(current_x, y);
                 m_busy_tiles.set(current_x, y);
                 m_object_tiles.set(current_x, y);
             }
@@ -206,7 +200,6 @@ bool WaterfillSession_t<Tile, TileRoutines>::find_object(
         if (current_x < tile_width){
             const Tile& neighbor_mask = m_source->tile(current_x, y);
             if (TileRoutines::Waterfill_touch_left(neighbor_mask, m_object.tile(current_x, y), tile)){
-                TileIndex neightbor_index(current_x, y);
                 m_busy_tiles.set(current_x, y);
                 m_object_tiles.set(current_x, y);
             }

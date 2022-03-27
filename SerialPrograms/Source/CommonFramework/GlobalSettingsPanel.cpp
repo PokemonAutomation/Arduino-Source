@@ -26,7 +26,6 @@ const std::set<std::string> TOKENS{
 
 
 
-
 GlobalSettings& GlobalSettings::instance(){
     static GlobalSettings settings;
     return settings;
