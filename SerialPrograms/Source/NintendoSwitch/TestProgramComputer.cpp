@@ -406,6 +406,7 @@ void scale_vertical_shrink(
 
 
 
+
 void TestProgramComputer::program(ProgramEnvironment& env){
     using namespace Kernels;
     using namespace NintendoSwitch::PokemonLA;
@@ -413,6 +414,16 @@ void TestProgramComputer::program(ProgramEnvironment& env){
 
 
 
+#if 0
+    BitSet2D set(100, 30);
+    cout << set.get(10, 20) << endl;
+    set.set(10, 20);
+    cout << set.get(10, 20) << endl;
+
+    size_t x, y;
+    cout << set.pop(x, y) << endl;
+    cout << x << " " << y << endl;
+#endif
 
 
 #if 0

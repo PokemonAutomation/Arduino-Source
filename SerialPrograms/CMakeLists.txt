@@ -518,6 +518,7 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX2.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.cpp
     Source/Kernels/Kernels_BitScan.h
+    Source/Kernels/Kernels_BitSet.h
     Source/Kernels/Kernels_x64_SSE41.h
     Source/Kernels/Kernels_x64_AVX2.h
     Source/Kernels/Kernels_x64_AVX512.h

@@ -10,6 +10,7 @@
 #include <set>
 #include <map>
 #include "Common/Cpp/Exceptions.h"
+#include "Kernels/Kernels_BitSet.h"
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_t.h"
 #include "Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.h"
 #include "Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixCore.h"
@@ -29,14 +30,20 @@ public:
     WaterfillSession_t(PackedBinaryMatrixCore<Tile>& source)
         : m_source(&source)
         , m_object(source.width(), source.height())
+        , m_busy_tiles(source.width(), source.height())
+        , m_object_tiles(source.width(), source.height())
     {}
 
     void set_source(PackedBinaryMatrixCore<Tile>& source){
         m_source = &source;
         if (m_object.width() < source.width() || m_object.height() < source.height()){
             m_object = PackedBinaryMatrixCore<Tile>(source.width(), source.height());
+            m_busy_tiles = BitSet2D(source.width(), source.height());
+            m_object_tiles = BitSet2D(source.width(), source.height());
         }else{
             m_object.set_zero();
+            m_busy_tiles.clear();
+            m_object_tiles.clear();
         }
     }
     virtual void set_source(PackedBinaryMatrix_IB& source) override{
@@ -72,6 +79,8 @@ private:
 public:
     PackedBinaryMatrixCore<Tile>* m_source = nullptr;
     PackedBinaryMatrixCore<Tile> m_object;
+    BitSet2D m_busy_tiles;
+    BitSet2D m_object_tiles;
 };
 
 
@@ -147,21 +156,16 @@ bool WaterfillSession_t<Tile, TileRoutines>::find_object(
     size_t tile_width = m_source->tile_width();
     size_t tile_height = m_source->tile_height();
 
-    std::set<TileIndex> busy;
-    std::set<TileIndex> obj;
-
     //  Set first tile.
     TileIndex index{tile_x, tile_y};
-    busy.insert(index);
-    obj.insert(index);
+    m_busy_tiles.set(tile_x, tile_y);
+    m_object_tiles.set(tile_x, tile_y);
     m_object.tile(tile_x, tile_y).set_bit(bit_x, bit_y, 1);
 
     //  Iterate Waterfill...
-    while (!busy.empty()){
-        auto current = busy.begin();
-        index = *current;
-        size_t x = index.x();
-        size_t y = index.y();
+    size_t x, y;
+    while (m_busy_tiles.pop(x, y)){
+        index = TileIndex{x, y};
 
         Tile& mask = m_source->tile(x, y);
         Tile& tile = m_object.tile(x, y);
@@ -169,39 +173,42 @@ bool WaterfillSession_t<Tile, TileRoutines>::find_object(
         //  Expand current tile.
         TileRoutines::Waterfill_expand(mask, tile);
         mask.andnot(tile);
-        busy.erase(current);
 
-        Tile neighbor_scratch;
+        size_t current_x, current_y;
         if (y > 0){
-            const Tile& neighbor_mask = m_source->tile(x, y - 1);
-            if (TileRoutines::Waterfill_touch_bottom(neighbor_mask, m_object.tile(x, y - 1), tile)){
-                TileIndex neightbor_index(x, y - 1);
-                busy.insert(neightbor_index);
-                obj.insert(neightbor_index);
+            current_y = y - 1;
+            const Tile& neighbor_mask = m_source->tile(x, current_y);
+            if (TileRoutines::Waterfill_touch_bottom(neighbor_mask, m_object.tile(x, current_y), tile)){
+                TileIndex neightbor_index(x, current_y);
+                m_busy_tiles.set(x, current_y);
+                m_object_tiles.set(x, current_y);
             }
         }
-        if (y + 1 < tile_height){
-            const Tile& neighbor_mask = m_source->tile(x, y + 1);
-            if (TileRoutines::Waterfill_touch_top(neighbor_mask, m_object.tile(x, y + 1), tile)){
-                TileIndex neightbor_index(x, y + 1);
-                busy.insert(neightbor_index);
-                obj.insert(neightbor_index);
+        current_y = y + 1;
+        if (current_y < tile_height){
+            const Tile& neighbor_mask = m_source->tile(x, current_y);
+            if (TileRoutines::Waterfill_touch_top(neighbor_mask, m_object.tile(x, current_y), tile)){
+                TileIndex neightbor_index(x, current_y);
+                m_busy_tiles.set(x, current_y);
+                m_object_tiles.set(x, current_y);
             }
         }
         if (x > 0){
-            const Tile& neighbor_mask = m_source->tile(x - 1, y);
-            if (TileRoutines::Waterfill_touch_right(neighbor_mask, m_object.tile(x - 1, y), tile)){
-                TileIndex neightbor_index(x - 1, y);
-                busy.insert(neightbor_index);
-                obj.insert(neightbor_index);
+            current_x = x - 1;
+            const Tile& neighbor_mask = m_source->tile(current_x, y);
+            if (TileRoutines::Waterfill_touch_right(neighbor_mask, m_object.tile(current_x, y), tile)){
+                TileIndex neightbor_index(current_x, y);
+                m_busy_tiles.set(current_x, y);
+                m_object_tiles.set(current_x, y);
             }
         }
-        if (x + 1 < tile_width){
-            const Tile& neighbor_mask = m_source->tile(x + 1, y);
-            if (TileRoutines::Waterfill_touch_left(neighbor_mask, m_object.tile(x + 1, y), tile)){
-                TileIndex neightbor_index(x + 1, y);
-                busy.insert(neightbor_index);
-                obj.insert(neightbor_index);
+        current_x = x + 1;
+        if (current_x < tile_width){
+            const Tile& neighbor_mask = m_source->tile(current_x, y);
+            if (TileRoutines::Waterfill_touch_left(neighbor_mask, m_object.tile(current_x, y), tile)){
+                TileIndex neightbor_index(current_x, y);
+                m_busy_tiles.set(current_x, y);
+                m_object_tiles.set(current_x, y);
             }
         }
     }
@@ -218,13 +225,11 @@ bool WaterfillSession_t<Tile, TileRoutines>::find_object(
     stats.object = std::make_unique<SparseBinaryMatrix_t<Tile>>(m_source->width(), m_source->height());
     std::map<TileIndex, Tile> sparse_set;
 
-    for (TileIndex item : obj){
-        size_t x = item.x();
-        size_t y = item.y();
+    while (m_object_tiles.pop(x, y)){
         Tile& tile = m_object.tile(x, y);
 
         if (keep_object){
-            sparse_set[item] = tile;
+            sparse_set[TileIndex{x, y}] = tile;
         }
 
         uint64_t popcount, sum_x, sum_y;

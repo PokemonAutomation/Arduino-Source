@@ -242,8 +242,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     using namespace Kernels::Waterfill;
     using namespace OCR;
     using namespace Pokemon;
-//    using namespace PokemonSwSh;
-    using namespace PokemonBDSP;
+    using namespace PokemonSwSh;
+//    using namespace PokemonBDSP;
 //    using namespace PokemonLA;
 
      LoggerQt& logger = env.logger();
@@ -255,8 +255,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 //    change_mount(console, MountState::WYRDEER_ON);
 
-#if 1
-    ShinySparkleSetBDSP set;
+#if 0
+    ShinySparkleSetSwSh set;
     ShinySparkleTracker tracker(logger, overlay, set, {0, 0, 1, 1});
 
     AsyncVisualInferenceSession visual(env, console, console, console);
@@ -265,7 +265,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 #endif
 
 
-#if 0
+#if 1
     FlagTracker tracker(logger, overlay);
 
 
