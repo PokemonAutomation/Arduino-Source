@@ -8,7 +8,6 @@
 #include <iomanip>
 #include <fstream>
 #include <cfloat>
-#include <chrono>
 #include <memory>
 #include <cmath>
 #include <QThread>

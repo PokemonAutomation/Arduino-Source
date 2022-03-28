@@ -17,6 +17,7 @@
 #include "Programs/Trading/PokemonLA_SelfTouchTrade.h"
 
 #include "Programs/Farming/PokemonLA_IngoBattleGrinder.h"
+#include "Programs/Farming/PokemonLA_MagikarpMoveGrinder.h"
 #include "Programs/Farming/PokemonLA_NuggetFarmerHighlands.h"
 
 #include "Programs/ShinyHunting/PokemonLA_GalladeFinder.h"
@@ -24,6 +25,7 @@
 #include "Programs/ShinyHunting/PokemonLA_UnownFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.h"
 #include "Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.h"
+#include "Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.h"
 //#include "Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h"
 
 #include "Programs/TestPrograms/PokemonLA_MountDetectionTest.h"
@@ -55,6 +57,9 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_divider("---- Farming ----");
     add_program<NuggetFarmerHighlands_Descriptor, MoneyFarmerHighlands>();
     add_program<IngoBattleGrinder_Descriptor, IngoBattleGrinder>();
+    if (GlobalSettings::instance().DEVELOPER_MODE){
+        add_program<MagikarpMoveGrinder_Descriptor, MagikarpMoveGrinder>();
+    }
 
     add_divider("---- Shiny Hunting ----");
 //    add_program<ShinyHuntLakeTrio_Descriptor, ShinyHuntLakeTrio>();
@@ -63,7 +68,9 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<UnownFinder_Descriptor, UnownFinder>();
     add_program<ShinyHuntFlagPin_Descriptor, ShinyHuntFlagPin>();
     add_program<PostMMOSpawnReset_Descriptor, PostMMOSpawnReset>();
-
+    if (GlobalSettings::instance().DEVELOPER_MODE){
+        add_program<ShinyHuntCustomPath_Descriptor, ShinyHuntCustomPath>();
+    }
 
     add_divider("---- Developer Tools ----");
     add_program<MountDetectionTest_Descriptor, MountDetectionTest>();

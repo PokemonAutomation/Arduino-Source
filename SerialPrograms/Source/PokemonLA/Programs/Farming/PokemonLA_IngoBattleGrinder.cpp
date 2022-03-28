@@ -81,7 +81,7 @@ IngoBattleGrinder_Descriptor::IngoBattleGrinder_Descriptor()
         "PokemonLA:IngoBattleGrinder",
         STRING_POKEMON + " LA", "Ingo Battle Grinder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/IngoBattleGrinder.md",
-        "Attend Ingo's battles to grind exp and move related pokedex research tasks.",
+        "Attend Ingo's battles to grind exp and move related " + STRING_POKEDEX + " research tasks.",
         FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
@@ -193,6 +193,7 @@ void IngoBattleGrinder::use_move(const BotBaseContext &context, size_t cur_pokem
         // Strong style
         pbf_press_button(context, BUTTON_R, 10, 125);
     }
+    
     std::cout << "Use pokemon " << cur_pokemon << " move " << cur_move << " style " << 
         MoveStyle_NAMES[(int)style].toStdString() << std::endl;
 
@@ -203,14 +204,13 @@ void IngoBattleGrinder::use_move(const BotBaseContext &context, size_t cur_pokem
 }
 
 void IngoBattleGrinder::switch_pokemon(SingleSwitchProgramEnvironment& env, size_t& next_pokemon_in_party_order){
-    // Move fast leading fainted pokemon
+    // Move past leading fainted pokemon
     for(size_t i = 0; i < next_pokemon_in_party_order; i++){
         pbf_press_dpad(env.console, DPAD_DOWN, 20, 80);
     }
 
     while(true){
-        // Fall back to using the party lead. This pokemon should be very strong.
-        // We assume only using its first move with no style to finish the battle.
+        // Choose the next pokemon to battle.
         pbf_press_button(env.console, BUTTON_A, 20, 100);
         pbf_press_button(env.console, BUTTON_A, 20, 150);
         env.console.botbase().wait_for_all_requests();
@@ -239,10 +239,10 @@ void IngoBattleGrinder::switch_pokemon(SingleSwitchProgramEnvironment& env, size
 bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
     Stats& stats = env.stats<Stats>();
 
-    // The location of the move slot when choosing which move to use during battle.
+    // The location of the move slots when choosing which move to use during battle.
     // These boxes will be used to check whether the content in those boxes are changed or not
     // after selecting one move to use. In this way we can detect whether the move is out of PP.
-    ImageFloatBox move_slot_boxes[4] = {
+    const ImageFloatBox move_slot_boxes[4] = {
         {0.6600, 0.6220, 0.2500, 0.0320},
         {0.6395, 0.6875, 0.2500, 0.0320},
         {0.6190, 0.7530, 0.2500, 0.0320},

@@ -4,14 +4,11 @@
  *
  */
 
-#include <QHBoxLayout>
-#include <QComboBox>
-#include <QCheckBox>
-#include <QLineEdit>
 
 #include "Common/Compiler.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Options/EditableTableOption-EnumTableCell.h"
 #include "Pokemon/Options/Pokemon_IVCheckerWidget.h"
 #include "PokemonLA_BattlePokemonActionTable.h"
 
@@ -74,75 +71,12 @@ std::unique_ptr<EditableTableRow> BattlePokemonActionRow::clone() const{
 std::vector<QWidget*> BattlePokemonActionRow::make_widgets(QWidget& parent){
     std::vector<QWidget*> widgets;
     for(int i = 0; i < 4; i++){
-        widgets.emplace_back(make_style_box(parent, style[i]));
+        widgets.emplace_back(make_enum_table_cell(parent, MoveStyle_MAP.size(), MoveStyle_NAMES, style[i]));
     }
-    widgets.emplace_back(make_switch_box(parent));
-    widgets.emplace_back(make_turns_box(parent));
+    widgets.emplace_back(make_boolean_table_cell(parent, this->switch_pokemon));
+    widgets.emplace_back(make_number_table_cell(parent, this->num_turns_to_switch));
     return widgets;
 }
-
-QWidget* BattlePokemonActionRow::make_style_box(QWidget& parent, MoveStyle& style){
-    QComboBox* box = new NoWheelComboBox(&parent);
-    box->addItem(MoveStyle_NAMES[0]);
-    box->addItem(MoveStyle_NAMES[1]);
-    box->addItem(MoveStyle_NAMES[2]);
-    box->setCurrentIndex((int)style);
-    box->connect(
-        box, static_cast<void(QComboBox::*)(int)>(&QComboBox::currentIndexChanged),
-        box, [&](int index){
-            if (index < 0){
-                index = 0;
-            }
-            style = (MoveStyle)index;
-        }
-    );
-    return box;
-}
-
-QWidget* BattlePokemonActionRow::make_switch_box(QWidget& parent){
-    QWidget* widget = new QWidget(&parent);
-    QHBoxLayout* layout = new QHBoxLayout(widget);
-    layout->setAlignment(Qt::AlignHCenter);
-    layout->setContentsMargins(0, 0, 0, 0);
-    QCheckBox* box = new QCheckBox(&parent);
-    layout->addWidget(box);
-    box->setChecked(this->switch_pokemon);
-    box->connect(
-        box, &QCheckBox::stateChanged,
-        box, [&, box](int){
-            this->switch_pokemon = box->isChecked();
-        }
-    );
-    return widget;
-}
-
-QWidget* BattlePokemonActionRow::make_turns_box(QWidget& parent){
-    QLineEdit* box = new QLineEdit(QString::number(num_turns_to_switch), &parent);
-    box->setAlignment(Qt::AlignHCenter);
-    box->connect(
-        box, &QLineEdit::textChanged,
-        box, [=](const QString& text){
-            bool ok = false;
-            const int current = (int)text.toLong(&ok);
-            QPalette palette;
-            if (ok && current >= 0){
-                this->num_turns_to_switch = current;
-                palette.setColor(QPalette::Text, Qt::black);
-            }else{
-                palette.setColor(QPalette::Text, Qt::red);
-            }
-            box->setPalette(palette);
-        }
-    );
-    box->connect(
-        box, &QLineEdit::editingFinished,
-        box, [=](){
-            box->setText(QString::number(this->num_turns_to_switch));
-        }
-    );
-    return box;
-}
-
 
 
 
@@ -214,9 +148,88 @@ bool BattlePokemonActionTable::switch_pokemon(size_t pokemon, size_t num_turns){
 
 
 
+OneMoveBattlePokemonActionRow::OneMoveBattlePokemonActionRow() {}
+
+void OneMoveBattlePokemonActionRow::load_json(const QJsonValue& json){
+    QJsonObject obj = json.toObject();
+    {
+        QString value;
+        if (json_get_string(value, obj, "Style")){
+            const auto iter = MoveStyle_MAP.find(value);
+            if (iter != MoveStyle_MAP.end()){
+                style = iter->second;
+            }
+        }
+    }
+}
+
+QJsonValue OneMoveBattlePokemonActionRow::to_json() const{
+    QJsonObject obj;
+    obj.insert("Style", MoveStyle_NAMES[(size_t)style]);
+    return obj;
+}
+
+std::unique_ptr<EditableTableRow> OneMoveBattlePokemonActionRow::clone() const{
+    return std::unique_ptr<EditableTableRow>(new OneMoveBattlePokemonActionRow(*this));
+}
+
+std::vector<QWidget*> OneMoveBattlePokemonActionRow::make_widgets(QWidget& parent){
+    std::vector<QWidget*> widgets;
+    widgets.emplace_back(make_enum_table_cell(parent, MoveStyle_MAP.size(), MoveStyle_NAMES, style));
+    return widgets;
+}
 
 
 
+QStringList OneMoveBattlePokemonActionTableFactory::make_header() const{
+    QStringList list;
+    list << "Move Style";
+    return list;
+}
+
+std::unique_ptr<EditableTableRow> OneMoveBattlePokemonActionTableFactory::make_row() const{
+    return std::unique_ptr<EditableTableRow>(new OneMoveBattlePokemonActionRow());
+}
+
+
+
+
+std::vector<std::unique_ptr<EditableTableRow>> OneMoveBattlePokemonActionTable::make_defaults() const{
+    std::vector<std::unique_ptr<EditableTableRow>> ret;
+    ret.emplace_back(std::unique_ptr<OneMoveBattlePokemonActionRow>(new OneMoveBattlePokemonActionRow()));
+    return ret;
+}
+
+OneMoveBattlePokemonActionTable::OneMoveBattlePokemonActionTable()
+    : m_table(
+        "<b>" + STRING_POKEMON + " Action Table:</b><br>"
+        "Set what move style to use for each " + STRING_POKEMON + " to grind against a Magikarp. "
+        "Each row is the action for one " + STRING_POKEMON + ". "
+        "The table follows the order that " + STRING_POKEMON + " are sent to battle.",
+        m_factory, true, make_defaults()
+    )
+{}
+
+void OneMoveBattlePokemonActionTable::load_json(const QJsonValue& json){
+    m_table.load_json(json);
+}
+
+QJsonValue OneMoveBattlePokemonActionTable::to_json() const{
+    return m_table.to_json();
+}
+
+void OneMoveBattlePokemonActionTable::restore_defaults(){
+    m_table.restore_defaults();
+}
+
+ConfigWidget* OneMoveBattlePokemonActionTable::make_ui(QWidget& parent){
+    return m_table.make_ui(parent);
+}
+
+MoveStyle OneMoveBattlePokemonActionTable::get_style(size_t pokemon){
+    const OneMoveBattlePokemonActionRow& action = static_cast<const OneMoveBattlePokemonActionRow&>(m_table[pokemon]);
+    return action.style;
+}
 
 
 

@@ -33,7 +33,6 @@ using AudioSink = QAudioSink;
 
 #include <iomanip>
 #include <cfloat>
-#include <chrono>
 #include <memory>
 #include <cassert>
 #include <cstring>

@@ -353,6 +353,20 @@ const char* MOUNT_STATE_STRINGS[] = {
     "Braviary On",
 };
 
+const std::map<QString, MountState> MOUNT_STATE_MAP{
+    {MOUNT_STATE_STRINGS[0], MountState::NOTHING},
+    {MOUNT_STATE_STRINGS[1], MountState::WYRDEER_OFF},
+    {MOUNT_STATE_STRINGS[2], MountState::WYRDEER_ON},
+    {MOUNT_STATE_STRINGS[3], MountState::URSALUNA_OFF},
+    {MOUNT_STATE_STRINGS[4], MountState::URSALUNA_ON},
+    {MOUNT_STATE_STRINGS[5], MountState::BASCULEGION_OFF},
+    {MOUNT_STATE_STRINGS[6], MountState::BASCULEGION_ON},
+    {MOUNT_STATE_STRINGS[7], MountState::SNEASLER_OFF},
+    {MOUNT_STATE_STRINGS[8], MountState::SNEASLER_ON},
+    {MOUNT_STATE_STRINGS[9], MountState::BRAVIARY_OFF},
+    {MOUNT_STATE_STRINGS[10], MountState::BRAVIARY_ON},
+};
+
 
 
 MountDetector::MountDetector(MountDetectorLogging logging)

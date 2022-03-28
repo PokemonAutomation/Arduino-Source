@@ -127,7 +127,7 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env){
            stats.shinies++;
            on_shiny_sound(env, env.console, SHINY_DETECTED, shiny_detector.results());
         }
-    };
+    }
 
     stats.attempts++;
     env.console.log("No shiny detected, restarting the game!");

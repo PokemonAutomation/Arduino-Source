@@ -1,4 +1,4 @@
-/*  Money Farmer (Highlands)
+/*  Ingo Battle Grinder
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *

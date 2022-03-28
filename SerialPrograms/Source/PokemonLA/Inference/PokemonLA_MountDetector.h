@@ -9,6 +9,7 @@
 
 #include <deque>
 #include <map>
+#include <QString>
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
@@ -34,6 +35,7 @@ enum class MountState{
     BRAVIARY_ON,
 };
 extern const char* MOUNT_STATE_STRINGS[];
+extern const std::map<QString, MountState> MOUNT_STATE_MAP;
 
 
 enum class MountDetectorLogging{

@@ -1,11 +1,11 @@
-/*  Shiny Hunt - Fixed Point
+/*  Shiny Hunt - Custom Path
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_PokemonLA_ShinyHuntFlagPin_H
-#define PokemonAutomation_PokemonLA_ShinyHuntFlagPin_H
+#ifndef PokemonAutomation_PokemonLA_ShinyHuntCustomPath_H
+#define PokemonAutomation_PokemonLA_ShinyHuntCustomPath_H
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
@@ -16,21 +16,23 @@
 #include "PokemonLA/PokemonLA_TravelLocations.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 #include "PokemonLA/Options/PokemonLA_TravelLocation.h"
+#include "PokemonLA/Options/PokemonLA_CustomPathTable.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class ShinyHuntFlagPin_Descriptor : public RunnableSwitchProgramDescriptor{
+
+class ShinyHuntCustomPath_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
-    ShinyHuntFlagPin_Descriptor();
+    ShinyHuntCustomPath_Descriptor();
 };
 
 
-class ShinyHuntFlagPin : public SingleSwitchProgramInstance{
+class ShinyHuntCustomPath : public SingleSwitchProgramInstance{
 public:
-    ShinyHuntFlagPin(const ShinyHuntFlagPin_Descriptor& descriptor);
+    ShinyHuntCustomPath(const ShinyHuntCustomPath_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env) override;
@@ -43,9 +45,7 @@ private:
 
     TravelLocationOption TRAVEL_LOCATION;
 
-    SimpleIntegerOption<uint16_t> STOP_DISTANCE;
-    FloatingPointOption FLAG_REACHED_DELAY;
-    SimpleIntegerOption<uint64_t> NAVIGATION_TIMEOUT;
+    CustomPathTableTable CUSTOM_PATH_TABLE;
 
     ShinyDetectedActionOption SHINY_DETECTED;
 
