@@ -4,7 +4,7 @@
  *
  */
 
-#include "Kernels_Waterfill_Session_TI.h"
+#include "Kernels_Waterfill_Session.tpp"
 #include "Kernels_Waterfill_Routines.h"
 #include "Kernels_Waterfill_Core_Default.h"
 

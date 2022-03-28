@@ -529,6 +529,7 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/Waterfill/Kernels_Waterfill.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Session.tpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Routines.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_Default.cpp

@@ -426,12 +426,15 @@ SOURCES += \
     Source/PokemonLA/Inference/PokemonLA_ShinySoundDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.cpp \
     Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.cpp \
+    Source/PokemonLA/Options/PokemonLA_CustomPathTable.cpp \
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.cpp \
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.cpp \
+    Source/PokemonLA/Options/PokemonLA_TravelLocation.cpp \
     Source/PokemonLA/Panels_PokemonLA.cpp \
     Source/PokemonLA/PokemonLA_Locations.cpp \
     Source/PokemonLA/PokemonLA_Settings.cpp \
     Source/PokemonLA/PokemonLA_TravelLocations.cpp \
+    Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.cpp \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.cpp \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.cpp \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp \
@@ -441,6 +444,7 @@ SOURCES += \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.cpp \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.cpp \
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.cpp \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.cpp \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_MountDetectionTest.cpp \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.cpp \
@@ -916,7 +920,7 @@ HEADERS += \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_SSE42.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Routines.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.h \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Session_TI.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Session.tpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h \
@@ -1077,12 +1081,15 @@ HEADERS += \
     Source/PokemonLA/Inference/PokemonLA_ShinySoundDetector.h \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.h \
     Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h \
+    Source/PokemonLA/Options/PokemonLA_CustomPathTable.h \
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.h \
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.h \
+    Source/PokemonLA/Options/PokemonLA_TravelLocation.h \
     Source/PokemonLA/Panels_PokemonLA.h \
     Source/PokemonLA/PokemonLA_Locations.h \
     Source/PokemonLA/PokemonLA_Settings.h \
     Source/PokemonLA/PokemonLA_TravelLocations.h \
+    Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.h \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.h \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.h \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.h \
@@ -1092,6 +1099,7 @@ HEADERS += \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.h \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.h \
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.h \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.h \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_MountDetectionTest.h \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.h \

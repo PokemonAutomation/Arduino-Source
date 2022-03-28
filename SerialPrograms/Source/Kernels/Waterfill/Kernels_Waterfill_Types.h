@@ -38,7 +38,6 @@ public:
         area = x.area;
         sum_x = x.sum_x;
         sum_y = x.sum_y;
-        session = x.session;
         if (x.object){
             object = x.object->clone();
         }
@@ -75,9 +74,6 @@ public:
         area += obj.area;
         sum_x += obj.sum_x;
         sum_y += obj.sum_y;
-        if (session != obj.session){
-            session = nullptr;
-        }
         if (object && obj.object){
             *object |= *obj.object;
         }
@@ -124,9 +120,6 @@ public:
     uint64_t sum_x = 0;
     uint64_t sum_y = 0;
 
-    //  The object itself in the original image.
-    WaterfillIterator* session = nullptr;
-//    SparseBinaryMatrix object;
     std::unique_ptr<SparseBinaryMatrix_IB> object;
 };
 

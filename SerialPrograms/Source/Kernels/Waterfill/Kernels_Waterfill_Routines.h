@@ -13,7 +13,7 @@
 #include "Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.h"
 #include "Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixCore.h"
 #include "Kernels_Waterfill_Types.h"
-#include "Kernels_Waterfill_Session_TI.h"
+#include "Kernels_Waterfill_Session.tpp"
 #include "Kernels_Waterfill.h"
 
 namespace PokemonAutomation{

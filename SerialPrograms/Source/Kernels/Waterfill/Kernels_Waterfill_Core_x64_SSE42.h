@@ -192,12 +192,14 @@ static PA_FORCE_INLINE void boundaries(
     trailing_zeros(min_x, all_or);
     max_x = bitlength(all_or);
 
+    min_y = 0;
     for (size_t c = 0; c < 8; c++){
         if (tile.row(c) != 0){
             min_y = c;
             break;
         }
     }
+    max_y = 0;
     for (size_t c = 8; c > 0; c--){
         if (tile.row(c - 1) != 0){
             max_y = c;

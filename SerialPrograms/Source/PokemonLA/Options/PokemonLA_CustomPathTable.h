@@ -78,7 +78,7 @@ class CustomPathTableTable : public ConfigOption{
 public:
     CustomPathTableTable();
 
-    const size_t num_actions() const { return m_table.size(); }
+    size_t num_actions() const { return m_table.size(); }
 
     const CustomPathTableRow& get_action(size_t action_index) const {
         return static_cast<const CustomPathTableRow&>(m_table[action_index]);
