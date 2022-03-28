@@ -409,8 +409,14 @@ void scale_vertical_shrink(
 
 void TestProgramComputer::program(ProgramEnvironment& env){
     using namespace Kernels;
-    using namespace NintendoSwitch::PokemonLA;
+    using namespace NintendoSwitch::PokemonSwSh;
     using namespace Pokemon;
+
+
+    QImage image("screenshot-20220327-190703102304.png");
+
+    MaxLairInternal::PathSelectDetector detector;
+    cout << detector.detect(image) << endl;
 
 
 

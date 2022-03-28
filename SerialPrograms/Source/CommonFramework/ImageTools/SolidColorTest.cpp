@@ -38,6 +38,7 @@ bool is_grey(
     double max_stddev_sum
 ){
     double sum = stats.average.sum();
+//    cout << stats.average << stats.stddev << endl;
     if (sum < min_rgb_sum || sum > max_rgb_sum){
         return false;
     }
