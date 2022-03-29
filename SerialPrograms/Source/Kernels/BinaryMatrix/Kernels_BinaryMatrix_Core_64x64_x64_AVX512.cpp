@@ -20,18 +20,18 @@ template class PackedBinaryMatrix_t<BinaryTile_64x64_x64_AVX512>;
 template class SparseBinaryMatrix_t<BinaryTile_64x64_x64_AVX512>;
 
 
-std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_x64_AVX512(){
-    return std::make_unique<PackedBinaryMatrix_x64_AVX512>();
+std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x64_x64_AVX512(){
+    return std::make_unique<PackedBinaryMatrix_64x64_x64_AVX512>();
 }
-std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_x64_AVX512(size_t width, size_t height){
-    return std::make_unique<PackedBinaryMatrix_x64_AVX512>(width, height);
+std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x64_x64_AVX512(size_t width, size_t height){
+    return std::make_unique<PackedBinaryMatrix_64x64_x64_AVX512>(width, height);
 }
 
-std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_x64_AVX512(){
-    return std::make_unique<SparseBinaryMatrix_x64_AVX512>();
+std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_64x64_x64_AVX512(){
+    return std::make_unique<SparseBinaryMatrix_64x64_x64_AVX512>();
 }
-std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_x64_AVX512(size_t width, size_t height){
-    return std::make_unique<SparseBinaryMatrix_x64_AVX512>(width, height);
+std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_64x64_x64_AVX512(size_t width, size_t height){
+    return std::make_unique<SparseBinaryMatrix_64x64_x64_AVX512>(width, height);
 }
 
 

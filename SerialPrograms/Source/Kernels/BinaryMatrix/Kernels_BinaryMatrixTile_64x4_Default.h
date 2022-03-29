@@ -16,7 +16,7 @@ namespace Kernels{
 
 
 struct BinaryTile_64x4_Default{
-    static constexpr BinaryMatrixType TYPE = BinaryMatrixType::Default;
+    static constexpr BinaryMatrixType TYPE = BinaryMatrixType::i64x4_Default;
     static constexpr size_t WIDTH = 64;
     static constexpr size_t HEIGHT = 4;
 

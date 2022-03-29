@@ -1,4 +1,4 @@
-/*  Binary Matrix Tile (AVX2)
+/*  Binary Matrix Tile (x64 AVX2)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -17,7 +17,7 @@ namespace Kernels{
 
 
 struct BinaryTile_64x16_x64_AVX2{
-    static constexpr BinaryMatrixType TYPE = BinaryMatrixType::AVX2;
+    static constexpr BinaryMatrixType TYPE = BinaryMatrixType::i64x16_AVX2;
     static constexpr size_t WIDTH = 64;
     static constexpr size_t HEIGHT = 16;
 

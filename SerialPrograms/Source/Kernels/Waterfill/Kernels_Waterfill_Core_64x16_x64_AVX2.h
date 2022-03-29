@@ -49,14 +49,14 @@ PA_FORCE_INLINE __m256i bit_reverse(__m256i x){
 }
 
 
-struct Waterfill_x64_AVX2_ProcessedMask{
+struct Waterfill_64x16_x64_AVX2_ProcessedMask{
     __m256i m0, m1, m2, m3; //  Copy of the masks.
     __m256i b0, b1, b2, b3; //  Bit-reversed copy of the masks.
     __m256i t0, t1, t2, t3; //  Transposed masks.
     __m256i f1, f2, f3;     //  Forward-carry mask.
     __m256i r0, r1, r2;     //  Reverse-carry mask.
 
-    PA_FORCE_INLINE Waterfill_x64_AVX2_ProcessedMask(
+    PA_FORCE_INLINE Waterfill_64x16_x64_AVX2_ProcessedMask(
         const BinaryTile_64x16_x64_AVX2& m,
         __m256i x0, __m256i x1, __m256i x2, __m256i x3
     ){
@@ -94,7 +94,7 @@ struct Waterfill_x64_AVX2_ProcessedMask{
 
 
 PA_FORCE_INLINE void expand_forward(
-    const Waterfill_x64_AVX2_ProcessedMask& mask,
+    const Waterfill_64x16_x64_AVX2_ProcessedMask& mask,
     __m256i& x0, __m256i& x1, __m256i& x2, __m256i& x3
 ){
     __m256i s0 = _mm256_add_epi64(x0, mask.m0);
@@ -118,7 +118,7 @@ PA_FORCE_INLINE void expand_reverse(__m256i m, __m256i b, __m256i& x){
     x = _mm256_or_si256(x, s);
 }
 PA_FORCE_INLINE void expand_reverse(
-    const Waterfill_x64_AVX2_ProcessedMask& mask,
+    const Waterfill_64x16_x64_AVX2_ProcessedMask& mask,
     __m256i& x0, __m256i& x1, __m256i& x2, __m256i& x3
 ){
     expand_reverse(mask.m0, mask.b0, x0);
@@ -127,7 +127,7 @@ PA_FORCE_INLINE void expand_reverse(
     expand_reverse(mask.m3, mask.b3, x3);
 }
 PA_FORCE_INLINE void expand_vertical(
-    const Waterfill_x64_AVX2_ProcessedMask& mask,
+    const Waterfill_64x16_x64_AVX2_ProcessedMask& mask,
     __m256i& x0, __m256i& x1, __m256i& x2, __m256i& x3
 ){
     //  Carry across adjacent rows.
@@ -156,7 +156,7 @@ PA_FORCE_INLINE void expand_vertical(
 
 
 
-struct Waterfill_x64_AVX2{
+struct Waterfill_64x16_x64_AVX2{
 
 
 
@@ -332,7 +332,7 @@ static PA_FORCE_INLINE void waterfill_expand(const BinaryTile_64x16_x64_AVX2& m,
     __m256i x2 = x.vec[2];
     __m256i x3 = x.vec[3];
 
-    Waterfill_x64_AVX2_ProcessedMask mask(m, x0, x1, x2, x3);
+    Waterfill_64x16_x64_AVX2_ProcessedMask mask(m, x0, x1, x2, x3);
 
     __m256i changed;
     do{

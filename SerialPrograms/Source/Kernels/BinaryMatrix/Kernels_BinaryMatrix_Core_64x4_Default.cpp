@@ -18,18 +18,18 @@ template class PackedBinaryMatrix_t<BinaryTile_64x4_Default>;
 template class SparseBinaryMatrix_t<BinaryTile_64x4_Default>;
 
 
-std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_Default(){
-    return std::make_unique<PackedBinaryMatrix_Default>();
+std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x4_Default(){
+    return std::make_unique<PackedBinaryMatrix_64x4_Default>();
 }
-std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_Default(size_t width, size_t height){
-    return std::make_unique<PackedBinaryMatrix_Default>(width, height);
+std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x4_Default(size_t width, size_t height){
+    return std::make_unique<PackedBinaryMatrix_64x4_Default>(width, height);
 }
 
 std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_Default(){
-    return std::make_unique<SparseBinaryMatrix_x64_Default>();
+    return std::make_unique<SparseBinaryMatrix_64x4_Default>();
 }
 std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_Default(size_t width, size_t height){
-    return std::make_unique<SparseBinaryMatrix_x64_Default>(width, height);
+    return std::make_unique<SparseBinaryMatrix_64x4_Default>(width, height);
 }
 
 

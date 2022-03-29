@@ -25,10 +25,11 @@ namespace Kernels{
 
 
 enum class BinaryMatrixType{
-    Default,
-    SSE42,
-    AVX2,
-    AVX512,
+    i64x4_Default,
+    i64x8_SSE42,
+    i64x16_AVX2,
+    i64x64_AVX512,
+    i64x32_AVX512,
 };
 
 BinaryMatrixType get_BinaryMatrixType();

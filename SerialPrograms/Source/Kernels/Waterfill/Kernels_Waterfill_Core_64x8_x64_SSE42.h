@@ -43,14 +43,14 @@ PA_FORCE_INLINE __m128i bit_reverse(__m128i x){
 }
 
 
-struct Waterfill_x64_SSE42_ProcessedMask{
+struct Waterfill_64x8_x64_SSE42_ProcessedMask{
     __m128i m0, m1, m2, m3; //  Copy of the masks.
     __m128i b0, b1, b2, b3; //  Bit-reversed copy of the masks.
     __m128i t0, t1, t2, t3; //  Transposed masks.
     __m128i f1, f2, f3;     //  Forward-carry mask.
     __m128i r0, r1, r2;     //  Reverse-carry mask.
 
-    PA_FORCE_INLINE Waterfill_x64_SSE42_ProcessedMask(
+    PA_FORCE_INLINE Waterfill_64x8_x64_SSE42_ProcessedMask(
         const BinaryTile_64x8_x64_SSE42& m,
         __m128i x0, __m128i x1, __m128i x2, __m128i x3
     ){
@@ -91,7 +91,7 @@ struct Waterfill_x64_SSE42_ProcessedMask{
 
 
 PA_FORCE_INLINE void expand_forward(
-    const Waterfill_x64_SSE42_ProcessedMask& mask,
+    const Waterfill_64x8_x64_SSE42_ProcessedMask& mask,
     __m128i& x0, __m128i& x1, __m128i& x2, __m128i& x3
 ){
     __m128i s0 = _mm_add_epi64(x0, mask.m0);
@@ -116,7 +116,7 @@ PA_FORCE_INLINE void expand_reverse(__m128i m, __m128i b, __m128i& x){
     x = _mm_or_si128(x, s);
 }
 PA_FORCE_INLINE void expand_reverse(
-    const Waterfill_x64_SSE42_ProcessedMask& mask,
+    const Waterfill_64x8_x64_SSE42_ProcessedMask& mask,
     __m128i& x0, __m128i& x1, __m128i& x2, __m128i& x3
 ){
     expand_reverse(mask.m0, mask.b0, x0);
@@ -125,7 +125,7 @@ PA_FORCE_INLINE void expand_reverse(
     expand_reverse(mask.m3, mask.b3, x3);
 }
 PA_FORCE_INLINE void expand_vertical(
-    const Waterfill_x64_SSE42_ProcessedMask& mask,
+    const Waterfill_64x8_x64_SSE42_ProcessedMask& mask,
     __m128i& x0, __m128i& x1, __m128i& x2, __m128i& x3
 ){
     //  Carry across adjacent rows.
@@ -149,7 +149,7 @@ PA_FORCE_INLINE void expand_vertical(
 
 
 
-struct Waterfill_x64_SSE42{
+struct Waterfill_64x8_x64_SSE42{
 
 
 
@@ -312,7 +312,7 @@ static PA_FORCE_INLINE void waterfill_expand(const BinaryTile_64x8_x64_SSE42& m,
     __m128i x2 = x.vec[2];
     __m128i x3 = x.vec[3];
 
-    Waterfill_x64_SSE42_ProcessedMask mask(m, x0, x1, x2, x3);
+    Waterfill_64x8_x64_SSE42_ProcessedMask mask(m, x0, x1, x2, x3);
 
     __m128i changed;
     do{

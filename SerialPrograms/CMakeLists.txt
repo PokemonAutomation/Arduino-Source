@@ -483,15 +483,18 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x4_Default.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x8_x64_SSE42.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x16_x64_AVX2.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x32_x64_AVX512.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x64_x64_AVX512.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x4_Default.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x8_x64_SSE42.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x16_x64_AVX2.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x32_x64_AVX512.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x64_x64_AVX512.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Debugging.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x4_Default.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x8_x64_SSE42.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x16_x64_AVX2.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x32_x64_AVX512.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x64_x64_AVX512.h
     Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrix.h
     Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.h
@@ -542,6 +545,8 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512-GF.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp
@@ -1391,6 +1396,7 @@ SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX512.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x32_x64_AVX512.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x64_x64_AVX512.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_AVX512.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.cpp

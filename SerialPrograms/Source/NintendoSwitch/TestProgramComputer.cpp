@@ -43,6 +43,8 @@
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 
 #include "Kernels/Kernels_x64_AVX512.h"
+//#include "Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512-GF.h"
+//#include "Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h"
 
 
 #include <iostream>
@@ -167,14 +169,25 @@ void TestProgramComputer::program(ProgramEnvironment& env){
 
     print_8x64(r0);
     print_8x64(r1);
+    print_8x64(r2);
+    print_8x64(r3);
     cout << "---------" << endl;
-
-    r0 = bit_reverse(r0);
-    r1 = bit_reverse(r1);
-    transpose_1x16x16x4_bitreverse_in(r0, r1);
+    Intrinsics_x64_AVX512GF::transpose_1x16x16x4(r0, r1);
+    Intrinsics_x64_AVX512GF::transpose_1x16x16x4(r2, r3);
+    Intrinsics_x64_AVX512GF::transpose_16x2x2x2(r0, r1, r2, r3);
 
     print_8x64(r0);
     print_8x64(r1);
+    print_8x64(r2);
+    print_8x64(r3);
+
+
+//    r0 = bit_reverse(r0);
+//    r1 = bit_reverse(r1);
+//    transpose_1x16x16x4_bitreverse_in(r0, r1);
+
+//    print_8x64(r0);
+//    print_8x64(r1);
 
 
 #if 0

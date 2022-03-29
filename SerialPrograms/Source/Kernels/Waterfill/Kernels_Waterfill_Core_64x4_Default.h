@@ -51,11 +51,11 @@ PA_FORCE_INLINE uint64_t bitreverse64(uint64_t x){
 }
 
 
-struct Waterfill_Default_ProcessedMask{
+struct Waterfill_64x4_Default_ProcessedMask{
     uint64_t m0, m1, m2, m3; //  Copy of the masks.
     uint64_t b0, b1, b2, b3; //  Bit-reversed copy of the masks.
 
-    PA_FORCE_INLINE Waterfill_Default_ProcessedMask(
+    PA_FORCE_INLINE Waterfill_64x4_Default_ProcessedMask(
         const BinaryTile_64x4_Default& m,
         uint64_t x0, uint64_t x1, uint64_t x2, uint64_t x3
     ){
@@ -73,7 +73,7 @@ struct Waterfill_Default_ProcessedMask{
 
 
 PA_FORCE_INLINE void expand_forward(
-    const Waterfill_Default_ProcessedMask& mask,
+    const Waterfill_64x4_Default_ProcessedMask& mask,
     uint64_t& x0, uint64_t& x1, uint64_t& x2, uint64_t& x3
 ){
     uint64_t s0 = x0 + mask.m0;
@@ -103,7 +103,7 @@ PA_FORCE_INLINE void expand_reverse(uint64_t m, uint64_t b, uint64_t& x){
     x |= s;
 }
 PA_FORCE_INLINE void expand_reverse(
-    const Waterfill_Default_ProcessedMask& mask,
+    const Waterfill_64x4_Default_ProcessedMask& mask,
     uint64_t& x0, uint64_t& x1, uint64_t& x2, uint64_t& x3
 ){
     expand_reverse(mask.m0, mask.b0, x0);
@@ -112,7 +112,7 @@ PA_FORCE_INLINE void expand_reverse(
     expand_reverse(mask.m3, mask.b3, x3);
 }
 PA_FORCE_INLINE void expand_vertical(
-    const Waterfill_Default_ProcessedMask& mask,
+    const Waterfill_64x4_Default_ProcessedMask& mask,
     uint64_t& x0, uint64_t& x1, uint64_t& x2, uint64_t& x3
 ){
     x1 |= x0 & mask.m1;
@@ -127,7 +127,7 @@ PA_FORCE_INLINE void expand_vertical(
 
 
 
-struct Waterfill_Default{
+struct Waterfill_64x4_Default{
 
 
 
@@ -285,7 +285,7 @@ static PA_FORCE_INLINE void waterfill_expand(const BinaryTile_64x4_Default& m, B
     uint64_t x2 = x.vec[2];
     uint64_t x3 = x.vec[3];
 
-    Waterfill_Default_ProcessedMask mask(m, x0, x1, x2, x3);
+    Waterfill_64x4_Default_ProcessedMask mask(m, x0, x1, x2, x3);
 
     uint64_t changed;
     do{

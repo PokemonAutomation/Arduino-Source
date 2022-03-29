@@ -16,11 +16,11 @@ namespace PokemonAutomation{
 namespace Kernels{
 
 
-using PackedBinaryMatrixCore_x64_AVX2 = PackedBinaryMatrixCore<BinaryTile_64x16_x64_AVX2>;
-using SparseBinaryMatrixCore_x64_AVX2 = SparseBinaryMatrixCore<BinaryTile_64x16_x64_AVX2>;
+using PackedBinaryMatrixCore_64x16_x64_AVX2 = PackedBinaryMatrixCore<BinaryTile_64x16_x64_AVX2>;
+using SparseBinaryMatrixCore_64x16_x64_AVX2 = SparseBinaryMatrixCore<BinaryTile_64x16_x64_AVX2>;
 
-using PackedBinaryMatrix_x64_AVX2 = PackedBinaryMatrix_t<BinaryTile_64x16_x64_AVX2>;
-using SparseBinaryMatrix_x64_AVX2 = SparseBinaryMatrix_t<BinaryTile_64x16_x64_AVX2>;
+using PackedBinaryMatrix_64x16_x64_AVX2 = PackedBinaryMatrix_t<BinaryTile_64x16_x64_AVX2>;
+using SparseBinaryMatrix_64x16_x64_AVX2 = SparseBinaryMatrix_t<BinaryTile_64x16_x64_AVX2>;
 
 
 

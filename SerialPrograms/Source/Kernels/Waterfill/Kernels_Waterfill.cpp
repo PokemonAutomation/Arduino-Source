@@ -27,7 +27,7 @@ std::vector<WaterfillObject> find_objects_inplace_x64_AVX512GF  (PackedBinaryMat
 std::vector<WaterfillObject> find_objects_inplace(PackedBinaryMatrix_IB& matrix, size_t min_area){
     switch (matrix.type()){
 #ifdef PA_AutoDispatch_17_Skylake
-    case BinaryMatrixType::AVX512:
+    case BinaryMatrixType::i64x64_AVX512:
         if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
             return find_objects_inplace_x64_AVX512GF(matrix, min_area);
         }else{
@@ -35,11 +35,11 @@ std::vector<WaterfillObject> find_objects_inplace(PackedBinaryMatrix_IB& matrix,
         }
 #endif
 #ifdef PA_AutoDispatch_13_Haswell
-    case BinaryMatrixType::AVX2:
+    case BinaryMatrixType::i64x16_AVX2:
         return find_objects_inplace_x64_AVX2(matrix, min_area);
 #endif
 #ifdef PA_AutoDispatch_08_Nehalem
-    case BinaryMatrixType::SSE42:
+    case BinaryMatrixType::i64x8_SSE42:
         return find_objects_inplace_x64_SSE42(matrix, min_area);
 #endif
     default:

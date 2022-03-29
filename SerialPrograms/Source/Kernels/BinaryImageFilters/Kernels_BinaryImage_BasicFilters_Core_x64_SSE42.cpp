@@ -22,14 +22,14 @@ void compress_rgb32_to_binary_range_x64_SSE42(
     Compressor_RgbRange_x64_SSE41 compressor0(mins0, maxs0);
     compress_rgb32_to_binary(
         image, bytes_per_row,
-        static_cast<PackedBinaryMatrix_x64_SSE42&>(matrix0).get(), compressor0
+        static_cast<PackedBinaryMatrix_64x8_x64_SSE42&>(matrix0).get(), compressor0
     );
 }
 void compress_rgb32_to_binary_range_x64_SSE42(
     const uint32_t* image, size_t bytes_per_row,
     CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
 ){
-    compress_rgb32_to_binary<PackedBinaryMatrix_x64_SSE42, Compressor_RgbRange_x64_SSE41>(
+    compress_rgb32_to_binary<PackedBinaryMatrix_64x8_x64_SSE42, Compressor_RgbRange_x64_SSE41>(
         image, bytes_per_row, filter, filter_count
     );
 }
@@ -42,7 +42,7 @@ void filter_rgb32_x64_SSE42(
     uint32_t replace_with, bool replace_if_zero
 ){
     Filter_RgbRange_x64_SSE41 filter(replace_with, replace_if_zero);
-    filter_rgb32(static_cast<const PackedBinaryMatrix_x64_SSE42&>(matrix).get(), image, bytes_per_row, filter);
+    filter_rgb32(static_cast<const PackedBinaryMatrix_64x8_x64_SSE42&>(matrix).get(), image, bytes_per_row, filter);
 }
 
 

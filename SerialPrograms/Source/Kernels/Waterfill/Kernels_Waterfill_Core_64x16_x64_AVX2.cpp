@@ -15,16 +15,16 @@ namespace Waterfill{
 
 
 std::vector<WaterfillObject> find_objects_inplace_x64_AVX2(PackedBinaryMatrix_IB& matrix, size_t min_area){
-    return find_objects_inplace<BinaryTile_64x16_x64_AVX2, Waterfill_x64_AVX2>(
-        static_cast<PackedBinaryMatrix_x64_AVX2&>(matrix).get(),
+    return find_objects_inplace<BinaryTile_64x16_x64_AVX2, Waterfill_64x16_x64_AVX2>(
+        static_cast<PackedBinaryMatrix_64x16_x64_AVX2&>(matrix).get(),
         min_area
     );
 }
 std::unique_ptr<WaterfillSession> make_WaterfillSession_x64_AVX2(PackedBinaryMatrix_IB* matrix){
     return matrix == nullptr
-        ? std::make_unique<WaterfillSession_t<BinaryTile_64x16_x64_AVX2, Waterfill_x64_AVX2>>()
-        : std::make_unique<WaterfillSession_t<BinaryTile_64x16_x64_AVX2, Waterfill_x64_AVX2>>(
-            static_cast<PackedBinaryMatrix_x64_AVX2*>(matrix)->get()
+        ? std::make_unique<WaterfillSession_t<BinaryTile_64x16_x64_AVX2, Waterfill_64x16_x64_AVX2>>()
+        : std::make_unique<WaterfillSession_t<BinaryTile_64x16_x64_AVX2, Waterfill_64x16_x64_AVX2>>(
+            static_cast<PackedBinaryMatrix_64x16_x64_AVX2*>(matrix)->get()
         );
 }
 

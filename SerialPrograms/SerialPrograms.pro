@@ -249,6 +249,7 @@ SOURCES += \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_SSE42.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x16_x64_AVX2.cpp \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x32_x64_AVX512.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x4_Default.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x64_x64_AVX512.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x8_x64_SSE42.cpp \
@@ -886,11 +887,13 @@ HEADERS += \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x16_x64_AVX2.h \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x32_x64_AVX512.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x4_Default.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x64_x64_AVX512.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x8_x64_SSE42.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Debugging.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x16_x64_AVX2.h \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x32_x64_AVX512.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x4_Default.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x64_x64_AVX512.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x8_x64_SSE42.h \
@@ -914,14 +917,18 @@ HEADERS += \
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h \
     Source/Kernels/Waterfill/Kernels_Waterfill.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h.autosave \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Routines.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.tpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512-GF.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h \

@@ -20,18 +20,18 @@ template class PackedBinaryMatrix_t<BinaryTile_64x8_x64_SSE42>;
 template class SparseBinaryMatrix_t<BinaryTile_64x8_x64_SSE42>;
 
 
-std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_x64_SSE42(){
-    return std::make_unique<PackedBinaryMatrix_x64_SSE42>();
+std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x8_x64_SSE42(){
+    return std::make_unique<PackedBinaryMatrix_64x8_x64_SSE42>();
 }
-std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_x64_SSE42(size_t width, size_t height){
-    return std::make_unique<PackedBinaryMatrix_x64_SSE42>(width, height);
+std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x8_x64_SSE42(size_t width, size_t height){
+    return std::make_unique<PackedBinaryMatrix_64x8_x64_SSE42>(width, height);
 }
 
-std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_x64_SSE42(){
-    return std::make_unique<SparseBinaryMatrix_x64_SSE42>();
+std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_64x8_x64_SSE42(){
+    return std::make_unique<SparseBinaryMatrix_64x8_x64_SSE42>();
 }
-std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_x64_SSE42(size_t width, size_t height){
-    return std::make_unique<SparseBinaryMatrix_x64_SSE42>(width, height);
+std::unique_ptr<SparseBinaryMatrix_IB> make_SparseBinaryMatrix_64x8_x64_SSE42(size_t width, size_t height){
+    return std::make_unique<SparseBinaryMatrix_64x8_x64_SSE42>(width, height);
 }
 
 
