@@ -99,6 +99,7 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env){
         pbf_move_right_joystick(env.console, 0, 130, 60, 10);
         pbf_wait(env.console, (uint16_t)(0.5 * TICKS_PER_SECOND));
         change_mount(env.console, MountState::BRAVIARY_ON);
+        pbf_wait(env.console, (uint16_t)(0.5 * TICKS_PER_SECOND));
 
         ShinyDetectedActionOption SHINY_DETECTED_ON_ROUTE(QString::number(SHINY_DETECTED.SCREENSHOT_DELAY));
         SHINY_DETECTED_ON_ROUTE.NOTIFICATIONS = SHINY_DETECTED.NOTIFICATIONS;
@@ -111,7 +112,7 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env){
             [](const BotBaseContext& context){
                 pbf_press_button(context, BUTTON_B, (uint16_t)(2 * TICKS_PER_SECOND), 10);  //Get some distance from the moutain
                 pbf_press_button(context, BUTTON_Y, (uint16_t)(4 * TICKS_PER_SECOND), 10);  //Descend
-                pbf_press_button(context, BUTTON_B, (uint16_t)(7.95 * TICKS_PER_SECOND), 10); //Reach to the cave entrance
+                pbf_press_button(context, BUTTON_B, (uint16_t)(7.99 * TICKS_PER_SECOND), 10); //Reach to the cave entrance
                 pbf_wait(context, (uint16_t)(0.5 * TICKS_PER_SECOND));
                 pbf_press_button(context, BUTTON_PLUS, 10,10);
                 pbf_wait(context, (uint16_t)(1.1 * TICKS_PER_SECOND));
@@ -131,8 +132,10 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env){
         run_until(env, env.console,
             [](const BotBaseContext& context){
                 pbf_press_dpad(context, DPAD_LEFT, 20, 20);
-                pbf_press_button(context, BUTTON_B, (uint16_t)(3.7 * TICKS_PER_SECOND), 10);
-                pbf_wait(context, (uint16_t)(0.3 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_B, (uint16_t)(4.5 * TICKS_PER_SECOND), 10);
+
+                //pbf_press_button(context, BUTTON_B, (uint16_t)(3.6 * TICKS_PER_SECOND), 10);
+                //pbf_wait(context, (uint16_t)(1.4 * TICKS_PER_SECOND));
             },
             { &shiny_detector_ruins }
         );
@@ -146,9 +149,11 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env){
     };
 
     env.console.log("No shiny detected, returning to Jubilife!");
-    goto_camp_from_overworld(env, env.console, SHINY_DETECTED, stats);
-    goto_professor(env.console, Camp::ICELANDS_SNOWFIELDS);
-    from_professor_return_to_jubilife(env, env.console);
+    //goto_camp_from_overworld(env, env.console, SHINY_DETECTED, stats);
+    //goto_professor(env.console, Camp::ICELANDS_SNOWFIELDS);
+    //from_professor_return_to_jubilife(env, env.console);
+    pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 }
 
 
