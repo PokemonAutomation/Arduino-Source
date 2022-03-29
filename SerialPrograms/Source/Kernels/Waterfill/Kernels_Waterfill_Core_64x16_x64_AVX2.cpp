@@ -7,7 +7,7 @@
 #ifdef PA_AutoDispatch_13_Haswell
 
 #include "Kernels_Waterfill_Routines.h"
-#include "Kernels_Waterfill_Core_x64_AVX2.h"
+#include "Kernels_Waterfill_Core_64x16_x64_AVX2.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

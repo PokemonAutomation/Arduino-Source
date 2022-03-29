@@ -273,11 +273,11 @@ SOURCES += \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.cpp \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill.cpp \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_Default.cpp \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX2.cpp \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512-GF.cpp \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512.cpp \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_SSE42.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp \
@@ -913,11 +913,11 @@ HEADERS += \
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h \
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h \
     Source/Kernels/Waterfill/Kernels_Waterfill.h \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_Default.h \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX2.h \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512-GF.h \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512.h \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_SSE42.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Routines.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.tpp \

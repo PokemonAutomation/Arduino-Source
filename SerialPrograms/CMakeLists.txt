@@ -532,16 +532,16 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.tpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Routines.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_Default.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_Default.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_SSE42.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_SSE42.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX2.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX2.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512-GF.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512-GF.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp
@@ -1366,9 +1366,9 @@ SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_SSE41.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_SSE41.cpp
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_SSE42.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x8_x64_SSE42.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_SSE42.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_SSE42.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.cpp
     PROPERTIES COMPILE_FLAGS ${ARCH_FLAGS_09_Nehalem}
 )
 endif()
@@ -1379,9 +1379,9 @@ SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX2.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX2.cpp
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_AVX2.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x16_x64_AVX2.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_AVX2.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX2.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.cpp
     PROPERTIES COMPILE_FLAGS ${ARCH_FLAGS_13_Haswell}
 )
 endif()
@@ -1391,15 +1391,15 @@ SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX512.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.cpp
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_AVX512.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x64_x64_AVX512.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_AVX512.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.cpp
     PROPERTIES COMPILE_FLAGS ${ARCH_FLAGS_17_Skylake}
 )
 endif()
 if (ARCH_FLAGS_19_IceLake)
 SET_SOURCE_FILES_PROPERTIES(
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512-GF.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.cpp
     PROPERTIES COMPILE_FLAGS ${ARCH_FLAGS_19_IceLake}
 )
 endif()

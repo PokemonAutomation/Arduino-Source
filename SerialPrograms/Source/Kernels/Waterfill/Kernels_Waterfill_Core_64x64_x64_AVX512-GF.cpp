@@ -9,7 +9,7 @@
 #include "Kernels/Kernels_BitScan.h"
 #include "Kernels/Kernels_x64_AVX512.h"
 #include "Kernels_Waterfill_Routines.h"
-#include "Kernels_Waterfill_Core_x64_AVX512-GF.h"
+#include "Kernels_Waterfill_Core_64x64_x64_AVX512-GF.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

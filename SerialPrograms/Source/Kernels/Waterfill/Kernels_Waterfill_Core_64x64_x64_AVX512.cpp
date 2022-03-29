@@ -7,7 +7,7 @@
 #ifdef PA_AutoDispatch_17_Skylake
 
 #include "Kernels_Waterfill_Routines.h"
-#include "Kernels_Waterfill_Core_x64_AVX512.h"
+#include "Kernels_Waterfill_Core_64x64_x64_AVX512.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

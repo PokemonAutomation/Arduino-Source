@@ -18,11 +18,11 @@
 
 #include "Kernels/Kernels_Arch.h"
 #include "Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Core_Default.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.h"
 #include "Kernels/Kernels_x64_SSE41.h"
 //#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Core_x64_SSE42.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.h"
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"

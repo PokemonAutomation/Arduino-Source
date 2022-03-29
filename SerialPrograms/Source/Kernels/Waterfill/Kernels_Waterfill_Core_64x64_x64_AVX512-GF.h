@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_Kernels_Waterfill_Core_64x64_x64_AVX512GF_H
 #define PokemonAutomation_Kernels_Waterfill_Core_64x64_x64_AVX512GF_H
 
-#include "Kernels_Waterfill_Core_x64_AVX512.h"
+#include "Kernels_Waterfill_Core_64x64_x64_AVX512.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
