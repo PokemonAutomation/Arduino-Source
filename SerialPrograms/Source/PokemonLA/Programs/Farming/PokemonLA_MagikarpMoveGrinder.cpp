@@ -233,8 +233,7 @@ void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env){
     Stats& stats = env.stats<Stats>();
 
     if (POKEMON_ACTIONS.num_pokemon() == 0){
-        env.console.log("No Pokemon sepecified to grind. Stop program.");
-        return;
+        throw OperationFailedException(env.console, "No Pokemon sepecified to grind.");
     }
 
     //  Connect the controller.
