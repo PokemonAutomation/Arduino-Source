@@ -16,6 +16,10 @@
 #include "Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixCore.h"
 #include "Kernels_Waterfill_Session.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace Kernels{
 namespace Waterfill{
@@ -169,49 +173,75 @@ bool WaterfillSession_t<Tile, TileRoutines>::find_object(
     size_t tile_height = m_source->tile_height();
 
     //  Set first tile.
-    m_busy_tiles.set(tile_x, tile_y);
-    m_object_tiles.set(tile_x, tile_y);
-    m_object.tile(tile_x, tile_y).set_bit(bit_x, bit_y, 1);
+    size_t x = tile_x;
+    size_t y = tile_y;
+    m_busy_tiles.set(x, y);
+    m_object_tiles.set(x, y);
+    m_object.tile(x, y).set_bit(bit_x, bit_y);
+
+    //  Special case for isolated bit.
+    bool first_expand = true;
+#if 1
+    {
+        bool top_edge = bit_y == 0;
+        bool bottom_edge = bit_y == Tile::HEIGHT - 1;
+//        bool left_edge = bit_x == 0;
+//        bool right_edge = bit_x == Tile::WIDTH - 1;
+
+        Tile& tile = m_source->tile(x, y);
+        uint64_t rowC = tile.row(bit_y);
+        uint64_t rowA = top_edge ? 0 : tile.row(bit_y - 1);
+        uint64_t rowB = bottom_edge ? 0 : tile.row(bit_y + 1);
+        uint64_t test = rowA | rowB | (rowC << 1) | (rowC >> 1);
+        test &= (uint64_t)1 << bit_x;
+
+        first_expand = test;
+    }
+#endif
 
     //  Iterate Waterfill...
-    size_t x, y;
     while (m_busy_tiles.pop(x, y)){
         Tile& mask = m_source->tile(x, y);
         Tile& tile = m_object.tile(x, y);
 
         //  Expand current tile.
-        TileRoutines::Waterfill_expand(mask, tile);
+        if (first_expand){
+            TileRoutines::waterfill_expand(mask, tile);
+        }
+        first_expand = true;
         mask.andnot(tile);
 
         size_t current_x, current_y;
-        if (y > 0){
+        if (y > 0 && tile.top() != 0){
             current_y = y - 1;
             const Tile& neighbor_mask = m_source->tile(x, current_y);
-            if (TileRoutines::Waterfill_touch_bottom(neighbor_mask, m_object.tile(x, current_y), tile)){
+            if (TileRoutines::waterfill_touch_bottom(neighbor_mask, m_object.tile(x, current_y), tile)){
                 m_busy_tiles.set(x, current_y);
                 m_object_tiles.set(x, current_y);
             }
         }
         current_y = y + 1;
-        if (current_y < tile_height){
+        if (current_y < tile_height && tile.bottom() != 0){
             const Tile& neighbor_mask = m_source->tile(x, current_y);
-            if (TileRoutines::Waterfill_touch_top(neighbor_mask, m_object.tile(x, current_y), tile)){
+            if (TileRoutines::waterfill_touch_top(neighbor_mask, m_object.tile(x, current_y), tile)){
                 m_busy_tiles.set(x, current_y);
                 m_object_tiles.set(x, current_y);
             }
         }
-        if (x > 0){
+        uint64_t row_or = TileRoutines::row_or(tile);
+        if (x > 0 && (row_or & 1)){
             current_x = x - 1;
             const Tile& neighbor_mask = m_source->tile(current_x, y);
-            if (TileRoutines::Waterfill_touch_right(neighbor_mask, m_object.tile(current_x, y), tile)){
+            if (TileRoutines::waterfill_touch_right(neighbor_mask, m_object.tile(current_x, y), tile)){
                 m_busy_tiles.set(current_x, y);
                 m_object_tiles.set(current_x, y);
             }
         }
         current_x = x + 1;
-        if (current_x < tile_width){
+        const uint64_t MASK = (uint64_t)1 << (Tile::WIDTH - 1);
+        if (current_x < tile_width && (row_or & MASK)){
             const Tile& neighbor_mask = m_source->tile(current_x, y);
-            if (TileRoutines::Waterfill_touch_left(neighbor_mask, m_object.tile(current_x, y), tile)){
+            if (TileRoutines::waterfill_touch_left(neighbor_mask, m_object.tile(current_x, y), tile)){
                 m_busy_tiles.set(current_x, y);
                 m_object_tiles.set(current_x, y);
             }

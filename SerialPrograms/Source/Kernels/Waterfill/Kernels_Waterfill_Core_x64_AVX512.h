@@ -48,7 +48,10 @@ template <> PA_FORCE_INLINE __m512i bit_reverse<false>(__m512i x){
 
 
 template <bool AVX512GF>
-struct Waterfill_x64_AVX512_ProcessedMask{
+struct Waterfill_x64_AVX512_ProcessedMask;
+
+template <>
+struct Waterfill_x64_AVX512_ProcessedMask<false>{
     __m512i m0, m1, m2, m3, m4, m5, m6, m7; //  Copy of the masks.
     __m512i b0, b1, b2, b3, b4, b5, b6, b7; //  Bit-reversed copy of the masks.
     __m512i t0, t1, t2, t3, t4, t5, t6, t7; //  Transposed masks.
@@ -69,14 +72,14 @@ struct Waterfill_x64_AVX512_ProcessedMask{
         m6 = _mm512_or_si512(x6, m.vec[6]);
         m7 = _mm512_or_si512(x7, m.vec[7]);
 
-        b0 = bit_reverse<AVX512GF>(m0);
-        b1 = bit_reverse<AVX512GF>(m1);
-        b2 = bit_reverse<AVX512GF>(m2);
-        b3 = bit_reverse<AVX512GF>(m3);
-        b4 = bit_reverse<AVX512GF>(m4);
-        b5 = bit_reverse<AVX512GF>(m5);
-        b6 = bit_reverse<AVX512GF>(m6);
-        b7 = bit_reverse<AVX512GF>(m7);
+        b0 = bit_reverse<false>(m0);
+        b1 = bit_reverse<false>(m1);
+        b2 = bit_reverse<false>(m2);
+        b3 = bit_reverse<false>(m3);
+        b4 = bit_reverse<false>(m4);
+        b5 = bit_reverse<false>(m5);
+        b6 = bit_reverse<false>(m6);
+        b7 = bit_reverse<false>(m7);
 
         t0 = m0;
         t1 = m1;
@@ -164,6 +167,12 @@ PA_FORCE_INLINE void expand_vertical(
     const Waterfill_x64_AVX512_ProcessedMask<AVX512GF>& mask,
     __m512i& x0, __m512i& x1, __m512i& x2, __m512i& x3,
     __m512i& x4, __m512i& x5, __m512i& x6, __m512i& x7
+);
+template <>
+PA_FORCE_INLINE void expand_vertical<false>(
+    const Waterfill_x64_AVX512_ProcessedMask<false>& mask,
+    __m512i& x0, __m512i& x1, __m512i& x2, __m512i& x3,
+    __m512i& x4, __m512i& x5, __m512i& x6, __m512i& x7
 ){
     //  Carry across adjacent rows.
     transpose_i64_8x8_AVX512(x0, x1, x2, x3, x4, x5, x6, x7);
@@ -200,7 +209,7 @@ PA_FORCE_INLINE void expand_vertical(
     x0 = _mm512_ternarylogic_epi64(x0, _mm512_broadcastq_epi64(_mm512_castsi512_si128(x1)), mask.r0, 0b11111000);
 }
 template <bool AVX512GF>
-PA_FORCE_INLINE void Waterfill_expand(const BinaryTile_AVX512& m, BinaryTile_AVX512& x){
+PA_FORCE_INLINE void waterfill_expand(const BinaryTile_AVX512& m, BinaryTile_AVX512& x){
     __m512i x0 = x.vec[0];
     __m512i x1 = x.vec[1];
     __m512i x2 = x.vec[2];
@@ -212,6 +221,7 @@ PA_FORCE_INLINE void Waterfill_expand(const BinaryTile_AVX512& m, BinaryTile_AVX
 
     Waterfill_x64_AVX512_ProcessedMask<AVX512GF> mask(m, x0, x1, x2, x3, x4, x5, x6, x7);
 
+//    uint64_t c = 0;
     __m512i changed;
     do{
         expand_forward(mask, x0, x1, x2, x3, x4, x5, x6, x7);
@@ -234,7 +244,34 @@ PA_FORCE_INLINE void Waterfill_expand(const BinaryTile_AVX512& m, BinaryTile_AVX
         changed = _mm512_ternarylogic_epi64(changed, x7, x.vec[7], 0b11110110);
         x.vec[7] = x7;
 //        cout << x.dump() << endl;
+//        c++;
     }while (_mm512_test_epi64_mask(changed, changed));
+
+#if 0
+    cout << c << endl;
+    if (c == 1){
+        cout << x.dump() << endl;
+    }
+    {
+        __m512i anything = m.vec[0];
+        anything = _mm512_or_si512(anything, m.vec[1]);
+        anything = _mm512_or_si512(anything, m.vec[2]);
+        anything = _mm512_or_si512(anything, m.vec[3]);
+        anything = _mm512_or_si512(anything, m.vec[4]);
+        anything = _mm512_or_si512(anything, m.vec[5]);
+        anything = _mm512_or_si512(anything, m.vec[6]);
+        anything = _mm512_or_si512(anything, m.vec[7]);
+        if (!_mm512_test_epi64_mask(anything, anything)){
+            cout << "zero tile" << endl;
+            return;
+        }
+    }
+    static std::map<uint64_t, uint64_t> counts;
+    counts[c]++;
+    for (const auto& item : counts){
+        cout << item.first << " : " << item.second << endl;
+    }
+#endif
 }
 
 
@@ -245,18 +282,27 @@ PA_FORCE_INLINE void Waterfill_expand(const BinaryTile_AVX512& m, BinaryTile_AVX
 struct Waterfill_x64_AVX512{
 
 
+
+static PA_FORCE_INLINE __m512i vec_or(const BinaryTile_AVX512& tile){
+    __m512i v0 = _mm512_or_si512(tile.vec[0], tile.vec[1]);
+    __m512i v1 = _mm512_or_si512(tile.vec[2], tile.vec[3]);
+    __m512i v2 = _mm512_or_si512(tile.vec[4], tile.vec[5]);
+    __m512i v3 = _mm512_or_si512(tile.vec[6], tile.vec[7]);
+    v0 = _mm512_or_si512(v0, v1);
+    v2 = _mm512_or_si512(v2, v3);
+    v0 = _mm512_or_si512(v0, v2);
+    return v0;
+}
+static PA_FORCE_INLINE uint64_t row_or(const BinaryTile_AVX512& tile){
+    return _mm512_reduce_or_epi64(vec_or(tile));
+}
+
+
 //  Find a one bit in the specified tile.
 //  If found, (x, y) are set to its coordinates and returns true.
 //  If entire tile is zero, returns false.
 static PA_FORCE_INLINE bool find_bit(size_t& x, size_t& y, const BinaryTile_AVX512& tile){
-    __m512i anything = tile.vec[0];
-    anything = _mm512_or_si512(anything, tile.vec[1]);
-    anything = _mm512_or_si512(anything, tile.vec[2]);
-    anything = _mm512_or_si512(anything, tile.vec[3]);
-    anything = _mm512_or_si512(anything, tile.vec[4]);
-    anything = _mm512_or_si512(anything, tile.vec[5]);
-    anything = _mm512_or_si512(anything, tile.vec[6]);
-    anything = _mm512_or_si512(anything, tile.vec[7]);
+    __m512i anything = vec_or(tile);
     if (!_mm512_test_epi64_mask(anything, anything)){
         return false;
     }
@@ -287,15 +333,7 @@ static PA_FORCE_INLINE void boundaries(
     size_t& min_x, size_t& max_x,
     size_t& min_y, size_t& max_y
 ){
-    __m512i all_or_v = tile.vec[0];
-    all_or_v = _mm512_or_si512(all_or_v, tile.vec[1]);
-    all_or_v = _mm512_or_si512(all_or_v, tile.vec[2]);
-    all_or_v = _mm512_or_si512(all_or_v, tile.vec[3]);
-    all_or_v = _mm512_or_si512(all_or_v, tile.vec[4]);
-    all_or_v = _mm512_or_si512(all_or_v, tile.vec[5]);
-    all_or_v = _mm512_or_si512(all_or_v, tile.vec[6]);
-    all_or_v = _mm512_or_si512(all_or_v, tile.vec[7]);
-    uint64_t all_or = _mm512_reduce_or_epi64(all_or_v);
+    uint64_t all_or = row_or(tile);
     trailing_zeros(min_x, all_or);
     max_x = bitlength(all_or);
 
@@ -393,15 +431,15 @@ static PA_FORCE_INLINE uint64_t popcount_sumcoord(
 
 //  Run Waterfill algorithm on mask "m" with starting point "x".
 //  Save result back into "x".
-static PA_FORCE_INLINE void Waterfill_expand(const BinaryTile_AVX512& m, BinaryTile_AVX512& x){
-    Waterfill::Waterfill_expand<false>(m, x);
+static PA_FORCE_INLINE void waterfill_expand(const BinaryTile_AVX512& m, BinaryTile_AVX512& x){
+    Waterfill::waterfill_expand<false>(m, x);
 }
 
 
 
 //  Touch the edge of "tile" with the specified border.
 //  Returns true if "tile" has changed and needs to be updated.
-static bool Waterfill_touch_top(const BinaryTile_AVX512& mask, BinaryTile_AVX512& tile, const BinaryTile_AVX512& border){
+static PA_FORCE_INLINE bool waterfill_touch_top(const BinaryTile_AVX512& mask, BinaryTile_AVX512& tile, const BinaryTile_AVX512& border){
     uint64_t available = mask.top() & ~tile.top();
     uint64_t new_bits = available & border.bottom();
     if (new_bits == 0){
@@ -410,7 +448,7 @@ static bool Waterfill_touch_top(const BinaryTile_AVX512& mask, BinaryTile_AVX512
     tile.top() |= new_bits;
     return true;
 }
-static bool Waterfill_touch_bottom(const BinaryTile_AVX512& mask, BinaryTile_AVX512& tile, const BinaryTile_AVX512& border){
+static PA_FORCE_INLINE bool waterfill_touch_bottom(const BinaryTile_AVX512& mask, BinaryTile_AVX512& tile, const BinaryTile_AVX512& border){
     uint64_t available = mask.bottom() & ~tile.bottom();
     uint64_t new_bits = available & border.top();
     if (new_bits == 0){
@@ -419,7 +457,7 @@ static bool Waterfill_touch_bottom(const BinaryTile_AVX512& mask, BinaryTile_AVX
     tile.bottom() |= new_bits;
     return true;
 }
-static bool Waterfill_touch_left(const BinaryTile_AVX512& mask, BinaryTile_AVX512& tile, const BinaryTile_AVX512& border){
+static PA_FORCE_INLINE bool waterfill_touch_left(const BinaryTile_AVX512& mask, BinaryTile_AVX512& tile, const BinaryTile_AVX512& border){
     __m512i changed = _mm512_setzero_si512();
     for (size_t c = 0; c < 8; c++){
         __m512i available = _mm512_andnot_si512(tile.vec[c], mask.vec[c]);
@@ -429,7 +467,7 @@ static bool Waterfill_touch_left(const BinaryTile_AVX512& mask, BinaryTile_AVX51
     }
     return _mm512_test_epi64_mask(changed, changed);
 }
-static bool Waterfill_touch_right(const BinaryTile_AVX512& mask, BinaryTile_AVX512& tile, const BinaryTile_AVX512& border){
+static PA_FORCE_INLINE bool waterfill_touch_right(const BinaryTile_AVX512& mask, BinaryTile_AVX512& tile, const BinaryTile_AVX512& border){
     __m512i changed = _mm512_setzero_si512();
     for (size_t c = 0; c < 8; c++){
         __m512i available = _mm512_andnot_si512(tile.vec[c], mask.vec[c]);

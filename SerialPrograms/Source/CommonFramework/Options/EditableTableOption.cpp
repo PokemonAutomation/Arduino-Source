@@ -7,7 +7,7 @@
 #include <QJsonValue>
 #include <QWidget>
 #include <QLineEdit>
-#include <QCheckbox>
+#include <QCheckBox>
 #include <QHBoxLayout>
 #include "Common/Qt/Options/EditableTable/EditableTableBaseWidget.h"
 #include "EditableTableOption.h"

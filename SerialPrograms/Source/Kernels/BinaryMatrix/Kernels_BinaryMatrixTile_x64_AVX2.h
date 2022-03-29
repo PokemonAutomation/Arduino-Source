@@ -141,6 +141,9 @@ public:
     bool get_bit(size_t x, size_t y) const{
         return (row(y) >> x) & 1;
     }
+    void set_bit(size_t x, size_t y){
+        row(y) |= (uint64_t)1 << x;
+    }
     void set_bit(size_t x, size_t y, bool set){
         uint64_t bit = (uint64_t)(set ? 1 : 0) << x;
         uint64_t mask = (uint64_t)1 << x;
@@ -178,7 +181,7 @@ public:
         if (shift_y < 16){
             __m256i mask = _mm256_set1_epi64x(shift_y);
             mask = _mm256_cmpgt_epi64(_mm256_setr_epi64x(16, 15, 14, 13), mask);
-            __m256i r0 = _mm256_maskload_epi64((const int64_t*)(src + shift_y), mask);
+            __m256i r0 = _mm256_maskload_epi64((const long long*)(src + shift_y), mask);
             r0 = _mm256_srl_epi64(r0, shift);
             r0 = _mm256_or_si256(r0, _mm256_load_si256((__m256i*)dest));
             _mm256_store_si256((__m256i*)dest, r0);
@@ -200,7 +203,7 @@ public:
         if (shift_y < 16){
             __m256i mask = _mm256_set1_epi64x(shift_y);
             mask = _mm256_cmpgt_epi64(_mm256_setr_epi64x(16, 15, 14, 13), mask);
-            __m256i r0 = _mm256_maskload_epi64((const int64_t*)(src + shift_y), mask);
+            __m256i r0 = _mm256_maskload_epi64((const long long*)(src + shift_y), mask);
             r0 = _mm256_sll_epi64(r0, shift);
             r0 = _mm256_or_si256(r0, _mm256_load_si256((__m256i*)dest));
             _mm256_store_si256((__m256i*)dest, r0);
@@ -217,7 +220,7 @@ public:
             shift_y += align - 4;
             __m256i mask = _mm256_set1_epi64x(align);
             mask = _mm256_cmpgt_epi64(mask, _mm256_setr_epi64x(3, 2, 1, 0));
-            __m256i r0 = _mm256_maskload_epi64((const int64_t*)src, mask);
+            __m256i r0 = _mm256_maskload_epi64((const long long*)src, mask);
             r0 = _mm256_srl_epi64(r0, shift);
             r0 = _mm256_or_si256(r0, _mm256_load_si256((__m256i*)(dest + shift_y)));
             _mm256_store_si256((__m256i*)(dest + shift_y), r0);
@@ -244,7 +247,7 @@ public:
             shift_y += align - 4;
             __m256i mask = _mm256_set1_epi64x(align);
             mask = _mm256_cmpgt_epi64(mask, _mm256_setr_epi64x(3, 2, 1, 0));
-            __m256i r0 = _mm256_maskload_epi64((const int64_t*)src, mask);
+            __m256i r0 = _mm256_maskload_epi64((const long long*)src, mask);
             r0 = _mm256_sll_epi64(r0, shift);
             r0 = _mm256_or_si256(r0, _mm256_load_si256((__m256i*)(dest + shift_y)));
             _mm256_store_si256((__m256i*)(dest + shift_y), r0);

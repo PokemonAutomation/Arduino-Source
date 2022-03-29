@@ -160,14 +160,22 @@ struct Waterfill_x64_AVX2{
 
 
 
+static PA_FORCE_INLINE __m256i vec_or(const BinaryTile_AVX2& tile){
+    __m256i v0 = _mm256_or_si256(tile.vec[0], tile.vec[1]);
+    __m256i v1 = _mm256_or_si256(tile.vec[2], tile.vec[3]);
+    v0 = _mm256_or_si256(v0, v1);
+    return v0;
+}
+static PA_FORCE_INLINE uint64_t row_or(const BinaryTile_AVX2& tile){
+    return reduce_or64_x64_AVX2(vec_or(tile));
+}
+
+
 //  Find a one bit in the specified tile.
 //  If found, (x, y) are set to its coordinates and returns true.
 //  If entire tile is zero, returns false.
 static PA_FORCE_INLINE bool find_bit(size_t& x, size_t& y, const BinaryTile_AVX2& tile){
-    __m256i anything = tile.vec[0];
-    anything = _mm256_or_si256(anything, tile.vec[1]);
-    anything = _mm256_or_si256(anything, tile.vec[2]);
-    anything = _mm256_or_si256(anything, tile.vec[3]);
+    __m256i anything = vec_or(tile);
     if (_mm256_testz_si256(anything, anything)){
         return false;
     }
@@ -192,11 +200,7 @@ static PA_FORCE_INLINE void boundaries(
     size_t& min_x, size_t& max_x,
     size_t& min_y, size_t& max_y
 ){
-    __m256i all_or_v = tile.vec[0];
-    all_or_v = _mm256_or_si256(all_or_v, tile.vec[1]);
-    all_or_v = _mm256_or_si256(all_or_v, tile.vec[2]);
-    all_or_v = _mm256_or_si256(all_or_v, tile.vec[3]);
-    uint64_t all_or = reduce_or64_x64_AVX2(all_or_v);
+    uint64_t all_or = row_or(tile);
     trailing_zeros(min_x, all_or);
     max_x = bitlength(all_or);
 
@@ -322,7 +326,7 @@ static PA_FORCE_INLINE uint64_t popcount_sumcoord(
 
 //  Run Waterfill algorithm on mask "m" with starting point "x".
 //  Save result back into "x".
-static PA_FORCE_INLINE void Waterfill_expand(const BinaryTile_AVX2& m, BinaryTile_AVX2& x){
+static PA_FORCE_INLINE void waterfill_expand(const BinaryTile_AVX2& m, BinaryTile_AVX2& x){
     __m256i x0 = x.vec[0];
     __m256i x1 = x.vec[1];
     __m256i x2 = x.vec[2];
@@ -351,7 +355,7 @@ static PA_FORCE_INLINE void Waterfill_expand(const BinaryTile_AVX2& m, BinaryTil
 
 //  Touch the edge of "tile" with the specified border.
 //  Returns true if "tile" has changed and needs to be updated.
-static PA_FORCE_INLINE bool Waterfill_touch_top(const BinaryTile_AVX2& mask, BinaryTile_AVX2& tile, const BinaryTile_AVX2& border){
+static PA_FORCE_INLINE bool waterfill_touch_top(const BinaryTile_AVX2& mask, BinaryTile_AVX2& tile, const BinaryTile_AVX2& border){
     uint64_t available = mask.top() & ~tile.top();
     uint64_t new_bits = available & border.bottom();
     if (new_bits == 0){
@@ -360,7 +364,7 @@ static PA_FORCE_INLINE bool Waterfill_touch_top(const BinaryTile_AVX2& mask, Bin
     tile.top() |= new_bits;
     return true;
 }
-static PA_FORCE_INLINE bool Waterfill_touch_bottom(const BinaryTile_AVX2& mask, BinaryTile_AVX2& tile, const BinaryTile_AVX2& border){
+static PA_FORCE_INLINE bool waterfill_touch_bottom(const BinaryTile_AVX2& mask, BinaryTile_AVX2& tile, const BinaryTile_AVX2& border){
     uint64_t available = mask.bottom() & ~tile.bottom();
     uint64_t new_bits = available & border.top();
     if (new_bits == 0){
@@ -369,7 +373,7 @@ static PA_FORCE_INLINE bool Waterfill_touch_bottom(const BinaryTile_AVX2& mask, 
     tile.bottom() |= new_bits;
     return true;
 }
-static PA_FORCE_INLINE bool Waterfill_touch_left(const BinaryTile_AVX2& mask, BinaryTile_AVX2& tile, const BinaryTile_AVX2& border){
+static PA_FORCE_INLINE bool waterfill_touch_left(const BinaryTile_AVX2& mask, BinaryTile_AVX2& tile, const BinaryTile_AVX2& border){
     __m256i changed = _mm256_setzero_si256();
     for (size_t c = 0; c < 4; c++){
         __m256i available = _mm256_andnot_si256(tile.vec[c], mask.vec[c]);
@@ -379,7 +383,7 @@ static PA_FORCE_INLINE bool Waterfill_touch_left(const BinaryTile_AVX2& mask, Bi
     }
     return !_mm256_testz_si256(changed, changed);
 }
-static PA_FORCE_INLINE bool Waterfill_touch_right(const BinaryTile_AVX2& mask, BinaryTile_AVX2& tile, const BinaryTile_AVX2& border){
+static PA_FORCE_INLINE bool waterfill_touch_right(const BinaryTile_AVX2& mask, BinaryTile_AVX2& tile, const BinaryTile_AVX2& border){
     __m256i changed = _mm256_setzero_si256();
     for (size_t c = 0; c < 4; c++){
         __m256i available = _mm256_andnot_si256(tile.vec[c], mask.vec[c]);

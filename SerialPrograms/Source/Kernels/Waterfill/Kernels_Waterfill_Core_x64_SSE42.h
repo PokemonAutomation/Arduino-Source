@@ -152,14 +152,24 @@ PA_FORCE_INLINE void expand_vertical(
 struct Waterfill_x64_SSE42{
 
 
+
+static PA_FORCE_INLINE __m128i vec_or(const BinaryTile_SSE42& tile){
+    __m128i v0 = _mm_or_si128(tile.vec[0], tile.vec[1]);
+    __m128i v1 = _mm_or_si128(tile.vec[2], tile.vec[3]);
+    v0 = _mm_or_si128(v0, v1);
+    return v0;
+}
+static PA_FORCE_INLINE uint64_t row_or(const BinaryTile_SSE42& tile){
+    __m128i v = vec_or(tile);
+    return _mm_cvtsi128_si64(v) | _mm_extract_epi64(v, 1);
+}
+
+
 //  Find a one bit in the specified tile.
 //  If found, (x, y) are set to its coordinates and returns true.
 //  If entire tile is zero, returns false.
 static PA_FORCE_INLINE bool find_bit(size_t& x, size_t& y, const BinaryTile_SSE42& tile){
-    __m128i anything = tile.vec[0];
-    anything = _mm_or_si128(anything, tile.vec[1]);
-    anything = _mm_or_si128(anything, tile.vec[2]);
-    anything = _mm_or_si128(anything, tile.vec[3]);
+    __m128i anything = vec_or(tile);
     if (_mm_test_all_zeros(anything, anything)){
         return false;
     }
@@ -184,11 +194,7 @@ static PA_FORCE_INLINE void boundaries(
     size_t& min_x, size_t& max_x,
     size_t& min_y, size_t& max_y
 ){
-    __m128i all_or_v = tile.vec[0];
-    all_or_v = _mm_or_si128(all_or_v, tile.vec[1]);
-    all_or_v = _mm_or_si128(all_or_v, tile.vec[2]);
-    all_or_v = _mm_or_si128(all_or_v, tile.vec[3]);
-    uint64_t all_or = _mm_cvtsi128_si64(all_or_v) | _mm_extract_epi64(all_or_v, 1);
+    uint64_t all_or = row_or(tile);
     trailing_zeros(min_x, all_or);
     max_x = bitlength(all_or);
 
@@ -300,7 +306,7 @@ static PA_FORCE_INLINE uint64_t popcount_sumcoord(
 
 //  Run Waterfill algorithm on mask "m" with starting point "x".
 //  Save result back into "x".
-static PA_FORCE_INLINE void Waterfill_expand(const BinaryTile_SSE42& m, BinaryTile_SSE42& x){
+static PA_FORCE_INLINE void waterfill_expand(const BinaryTile_SSE42& m, BinaryTile_SSE42& x){
     __m128i x0 = x.vec[0];
     __m128i x1 = x.vec[1];
     __m128i x2 = x.vec[2];
@@ -329,7 +335,7 @@ static PA_FORCE_INLINE void Waterfill_expand(const BinaryTile_SSE42& m, BinaryTi
 
 //  Touch the edge of "tile" with the specified border.
 //  Returns true if "tile" has changed and needs to be updated.
-static PA_FORCE_INLINE bool Waterfill_touch_top(const BinaryTile_SSE42& mask, BinaryTile_SSE42& tile, const BinaryTile_SSE42& border){
+static PA_FORCE_INLINE bool waterfill_touch_top(const BinaryTile_SSE42& mask, BinaryTile_SSE42& tile, const BinaryTile_SSE42& border){
     uint64_t available = mask.top() & ~tile.top();
     uint64_t new_bits = available & border.bottom();
     if (new_bits == 0){
@@ -338,7 +344,7 @@ static PA_FORCE_INLINE bool Waterfill_touch_top(const BinaryTile_SSE42& mask, Bi
     tile.top() |= new_bits;
     return true;
 }
-static PA_FORCE_INLINE bool Waterfill_touch_bottom(const BinaryTile_SSE42& mask, BinaryTile_SSE42& tile, const BinaryTile_SSE42& border){
+static PA_FORCE_INLINE bool waterfill_touch_bottom(const BinaryTile_SSE42& mask, BinaryTile_SSE42& tile, const BinaryTile_SSE42& border){
     uint64_t available = mask.bottom() & ~tile.bottom();
     uint64_t new_bits = available & border.top();
     if (new_bits == 0){
@@ -347,7 +353,7 @@ static PA_FORCE_INLINE bool Waterfill_touch_bottom(const BinaryTile_SSE42& mask,
     tile.bottom() |= new_bits;
     return true;
 }
-static PA_FORCE_INLINE bool Waterfill_touch_left(const BinaryTile_SSE42& mask, BinaryTile_SSE42& tile, const BinaryTile_SSE42& border){
+static PA_FORCE_INLINE bool waterfill_touch_left(const BinaryTile_SSE42& mask, BinaryTile_SSE42& tile, const BinaryTile_SSE42& border){
     __m128i changed = _mm_setzero_si128();
     for (size_t c = 0; c < 4; c++){
         __m128i available = _mm_andnot_si128(tile.vec[c], mask.vec[c]);
@@ -357,7 +363,7 @@ static PA_FORCE_INLINE bool Waterfill_touch_left(const BinaryTile_SSE42& mask, B
     }
     return !_mm_test_all_zeros(changed, changed);
 }
-static PA_FORCE_INLINE bool Waterfill_touch_right(const BinaryTile_SSE42& mask, BinaryTile_SSE42& tile, const BinaryTile_SSE42& border){
+static PA_FORCE_INLINE bool waterfill_touch_right(const BinaryTile_SSE42& mask, BinaryTile_SSE42& tile, const BinaryTile_SSE42& border){
     __m128i changed = _mm_setzero_si128();
     for (size_t c = 0; c < 4; c++){
         __m128i available = _mm_andnot_si128(tile.vec[c], mask.vec[c]);

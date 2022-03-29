@@ -234,9 +234,6 @@ using namespace PokemonLA;
 
 
 
-
-
-
 void TestProgram::program(MultiSwitchProgramEnvironment& env){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -256,7 +253,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 //    change_mount(console, MountState::WYRDEER_ON);
 
 #if 0
-    ShinySparkleSetSwSh set;
+    PokemonBDSP::ShinySparkleSetBDSP set;
     ShinySparkleTracker tracker(logger, overlay, set, {0, 0, 1, 1});
 
     AsyncVisualInferenceSession visual(env, console, console, console);
@@ -277,6 +274,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
         tracker.process_frame(src, std::chrono::system_clock::now());
         env.check_stopping();
         c++;
+//        break;
     }
     auto elapsed = std::chrono::system_clock::now() - start;
     auto micros = std::chrono::duration_cast<std::chrono::microseconds>(elapsed);

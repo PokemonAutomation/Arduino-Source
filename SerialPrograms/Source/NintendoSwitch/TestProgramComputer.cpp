@@ -38,7 +38,11 @@
 #include "CommonFramework/AudioPipeline/TimeSampleBufferReader.h"
 #include "CommonFramework/AudioPipeline/AudioNormalization.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
+
+#include "Kernels/Kernels_x64_AVX512.h"
 
 
 #include <iostream>
@@ -65,6 +69,7 @@ TestProgramComputer::TestProgramComputer(const TestProgramComputer_Descriptor& d
 {
 }
 
+std::chrono::system_clock::time_point REFERENCE = std::chrono::system_clock::now();
 
 
 void print(const float* ptr, size_t len){
@@ -79,8 +84,547 @@ void print(const float* ptr, size_t len){
     }
     cout << "}" << endl;
 }
+void print(uint64_t m){
+    for (int i = 0; i < 8; i++){
+        for (int j = 0; j < 8; j++){
+            cout << (m & 1);
+            m >>= 1;
+        }
+        cout << endl;
+    }
+    cout << endl;
+}
+void print_8x8(uint64_t m){
+    for (int i = 0; i < 8; i++){
+        for (int j = 0; j < 8; j++){
+            cout << (m & 1);
+            m >>= 1;
+        }
+        cout << " ";
+    }
+    cout << endl;
+}
+void print_8x64(__m512i m){
+    for (int i = 0; i < 8; i++){
+        print_8x8(((const uint64_t*)&m)[i]);
+    }
+    cout << endl;
+}
 
-std::chrono::system_clock::time_point REFERENCE = std::chrono::system_clock::now();
+
+
+
+void TestProgramComputer::program(ProgramEnvironment& env){
+    using namespace Kernels;
+    using namespace NintendoSwitch::PokemonSwSh;
+    using namespace Pokemon;
+
+
+#if 1
+    QImage image("20220328-043030682479.jpg");
+    auto matrix = compress_rgb32_to_binary_range(image, 0xff808080, 0xffffffff);
+    auto session = Waterfill::make_WaterfillSession(matrix);
+    auto iter = session->make_iterator(10);
+    WaterfillObject object;
+
+    std::multimap<size_t, WaterfillObject> map;
+    while (iter->find_next(object, false)){
+        map.emplace(object.area, object);
+    }
+
+    for (const auto& item : map){
+        cout << item.first << " : " << item.second.center_x() << ", " << item.second.center_y() << endl;
+    }
+#endif
+
+
+#if 0
+    __m512i r0 = _mm512_setr_epi64(6421819613966474057, 1548476234046137462, 14049977668605968662, \
+708058441056082392, 11428559378587094239, 12213545342139629759, \
+17862567678864820755, 11987104709490241592);
+    __m512i r1 = _mm512_setr_epi64(7012288692411820516, 6973886362582395245, 11364415477305886278, \
+10322188229391563915, 3708453892541429721, 8855683905787960164, \
+2605976889027609101, 403416096811372768);
+    __m512i r2 = _mm512_setr_epi64(17665478609307226908, 16752009108812571050, 4454511097901708078, \
+12609186068992939628, 12108615882447791236, 15410920961313526119, \
+4023827012830538432, 7936743448756384845);
+    __m512i r3 = _mm512_setr_epi64(3537199782762716869, 14555250848951445739, 15852154872900097320, \
+10410088093334275802, 11385802811118213207, 17289061284642715804, \
+7799622589958222536, 14466268115045276806);
+    __m512i r4 = _mm512_setr_epi64(13769594536536065114, 12515743165021122815, 4161499395208112919, \
+18168754753082368138, 4817283361637148180, 7505890873922854790, \
+7303930153414137652, 1842561318276695663);
+    __m512i r5 = _mm512_setr_epi64(15976838521025854814, 7681872885215311593, 900077199972924276, \
+15389419866922739680, 13257707967426128688, 5781805437221625080, \
+430817187407044403, 15537562097183591203);
+    __m512i r6 = _mm512_setr_epi64(12804211154189096457, 8060644897201369778, 2802370319901243535, \
+9320484187102063985, 1250153720052910342, 16023311416566244278, \
+24977779547950565, 13830241077450685593);
+    __m512i r7 = _mm512_setr_epi64(5190206910167014533, 10216993842832427235, 3528454829789924720, \
+11269157269833931374, 17983684737911214650, 12805961291569691763, \
+9605022433230136624, 5249211048379677373);
+
+
+    print_8x64(r0);
+    print_8x64(r1);
+    cout << "---------" << endl;
+
+    r0 = bit_reverse(r0);
+    r1 = bit_reverse(r1);
+    transpose_1x16x16x4_bitreverse_in(r0, r1);
+
+    print_8x64(r0);
+    print_8x64(r1);
+
+
+#if 0
+    __m512i x = r0;
+    print_8x64(x);
+
+
+    const __m512i INDEX0 = _mm512_setr_epi8(
+        63, 55, 47, 39, 31, 23, 15,  7,
+        62, 54, 46, 38, 30, 22, 14,  6,
+        61, 53, 45, 37, 29, 21, 13,  5,
+        60, 52, 44, 36, 28, 20, 12,  4,
+        59, 51, 43, 35, 27, 19, 11,  3,
+        58, 50, 42, 34, 26, 18, 10,  2,
+        57, 49, 41, 33, 25, 17,  9,  1,
+        56, 48, 40, 32, 24, 16,  8,  0
+    );
+    const __m512i INDEX1 = _mm512_setr_epi8(
+         7, 15, 23, 31, 39, 47, 55, 63,
+         6, 14, 22, 30, 38, 46, 54, 62,
+         5, 13, 21, 29, 37, 45, 53, 61,
+         4, 12, 20, 28, 36, 44, 52, 60,
+         3, 11, 19, 27, 35, 43, 51, 59,
+         2, 10, 18, 26, 34, 42, 50, 58,
+         1,  9, 17, 25, 33, 41, 49, 57,
+         0,  8, 16, 24, 32, 40, 48, 56
+    );
+
+    x = bit_reverse(x);
+
+    x = _mm512_permutexvar_epi8(INDEX0, x);
+//    x = _mm512_gf2p8affine_epi64_epi8(x, _mm512_set1_epi64(0x8040201008040201), 0);
+
+    cout << "--------------" << endl;
+    print_8x64(x);
+    x = _mm512_gf2p8affine_epi64_epi8(_mm512_set1_epi64(0x8040201008040201), x, 0);
+    print_8x64(x);
+    cout << "--------------" << endl;
+    x = _mm512_permutexvar_epi8(INDEX1, x);
+
+    print_8x64(x);
+#endif
+
+
+#if 0
+    print_8x64(r0);
+    print_8x64(r1);
+    print_8x64(r2);
+    print_8x64(r3);
+    print_8x64(r4);
+    print_8x64(r5);
+    print_8x64(r6);
+    print_8x64(r7);
+    cout << "------------" << endl;
+
+    transpose_1x16x16x4(r0, r1);
+    transpose_1x16x16x4(r2, r3);
+    transpose_1x16x16x4(r4, r5);
+    transpose_1x16x16x4(r6, r7);
+    transpose_16x2x2x2(r0, r1, r2, r3);
+    transpose_16x2x2x2(r4, r5, r6, r7);
+    transpose_32x2x2(r0, r1, r2, r3, r4, r5, r6, r7);
+
+    print_8x64(r0);
+    print_8x64(r1);
+    print_8x64(r2);
+    print_8x64(r3);
+    print_8x64(r4);
+    print_8x64(r5);
+    print_8x64(r6);
+    print_8x64(r7);
+#endif
+
+#endif
+
+#if 0
+    __m512i r0 = _mm512_setr_epi16(
+        0, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 13, 14, 15, 16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+    );
+    __m512i r1 = _mm512_setr_epi16(
+        32, 33, 34, 35, 36, 37, 38, 39, 40, 41, 42, 43, 44, 45, 46, 47, 48, 49, 50, 51, 52, 53, 54, 55, 56, 57, 58, 59, 60, 61, 62, 63
+    );
+    __m512i r2 = _mm512_setr_epi16(
+        64, 65, 66, 67, 68, 69, 70, 71, 72, 73, 74, 75, 76, 77, 78, 79, 80, 81, 82, 83, 84, 85, 86, 87, 88, 89, 90, 91, 92, 93, 94, 95
+    );
+    __m512i r3 = _mm512_setr_epi16(
+        96, 97, 98, 99, 100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115, 116, 117, 118, 119, 120, 121, 122, 123, 124, 125, 126, 127
+    );
+    print_8x64(r0);
+    print_8x64(r1);
+    print_8x64(r2);
+    print_8x64(r3);
+    cout << "------------" << endl;
+
+    transpose_16x2x2x2(r0, r1, r2, r3);
+    print_8x64(r0);
+    print_8x64(r1);
+    print_8x64(r2);
+    print_8x64(r3);
+#endif
+
+
+
+
+#if 0
+    __m512i INDEX = _mm512_setr_epi8(
+         0,  8, 16, 24, 32, 40, 48, 56,
+         1,  9, 17, 25, 33, 41, 49, 57,
+         2, 10, 18, 26, 34, 42, 50, 58,
+         3, 11, 19, 27, 35, 43, 51, 59,
+         4, 12, 20, 28, 36, 44, 52, 60,
+         5, 13, 21, 29, 37, 45, 53, 61,
+         6, 14, 22, 30, 38, 46, 54, 62,
+         7, 15, 23, 31, 39, 47, 55, 63
+    );
+    __m512i INDEX1 = _mm512_setr_epi8(
+        56, 48, 40, 32, 24, 16,  8,  0,
+        57, 49, 41, 33, 25, 17,  9,  1,
+        58, 50, 42, 34, 26, 18, 10,  2,
+        59, 51, 43, 35, 27, 19, 11,  3,
+        60, 52, 44, 36, 28, 20, 12,  4,
+        61, 53, 45, 37, 29, 21, 13,  5,
+        62, 54, 46, 38, 30, 22, 14,  6,
+        63, 55, 47, 39, 31, 23, 15,  7
+    );
+    __m512i INDEX2 = _mm512_setr_epi8(
+         7, 15, 23, 31, 39, 47, 55, 63,
+         6, 14, 22, 30, 38, 46, 54, 62,
+         5, 13, 21, 29, 37, 45, 53, 61,
+         4, 12, 20, 28, 36, 44, 52, 60,
+         3, 11, 19, 27, 35, 43, 51, 59,
+         2, 10, 18, 26, 34, 42, 50, 58,
+         1,  9, 17, 25, 33, 41, 49, 57,
+         0,  8, 16, 24, 32, 40, 48, 56
+    );
+
+    __m512i x = _mm512_setr_epi64(6421819613966474057, 1548476234046137462, 14049977668605968662, \
+708058441056082392, 11428559378587094239, 12213545342139629759, \
+17862567678864820755, 11987104709490241592);
+    print_8x64(x);
+
+    x = _mm512_permutexvar_epi8(INDEX1, x);
+
+    print_8x64(x);
+
+//    x = _mm512_gf2p8affine_epi64_epi8(_mm512_set1_epi64(0x0102040810204080), x, 0);
+    x = _mm512_gf2p8affine_epi64_epi8(_mm512_set1_epi64(0x8040201008040201), x, 0);
+
+//    print_8x64(x);
+
+    x = _mm512_gf2p8affine_epi64_epi8(x, _mm512_set1_epi64(0x8040201008040201), 0);
+
+    x = _mm512_gf2p8affine_epi64_epi8(_mm512_set1_epi64(0x8040201008040201), x, 0);
+//    x = _mm512_gf2p8affine_epi64_epi8(_mm512_set1_epi64(0x0102040810204080), x, 0);
+    x = _mm512_gf2p8affine_epi64_epi8(x, _mm512_set1_epi64(0x8040201008040201), 0);
+
+    print_8x64(x);
+
+//    x = _mm512_permutexvar_epi8(INDEX, x);
+
+    x = _mm512_permutexvar_epi8(INDEX2, x);
+    print_8x64(x);
+#endif
+
+
+
+
+#if 0
+    BitSet2D set(100, 30);
+    cout << set.get(10, 20) << endl;
+    set.set(10, 20);
+    cout << set.get(10, 20) << endl;
+
+    size_t x, y;
+    cout << set.pop(x, y) << endl;
+    cout << x << " " << y << endl;
+#endif
+
+
+#if 0
+    uint8_t x[32] = {
+         0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
+        16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
+    };
+
+    PartialWordAccess_x64_SSE41 access(2);
+
+    access.store_no_past_end(x + 14, _mm_setr_epi8(100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115));
+
+    for (size_t c = 0; c < 32; c++){
+        cout << (int)x[c] << " ";
+    }
+    cout << endl;
+#endif
+
+#if 0
+    QImage src("20220315-055335301551.jpg");
+    while (true){
+//        src.scaled(src.width(), 500);
+        QImage dst(src.width(), 500, QImage::Format_ARGB32);
+        scale_vertical_shrink<Uint8Scaler_x32_AVX2>(
+            src.width(),
+            (const uint32_t*)src.constBits(), src.bytesPerLine(), src.height(),
+            (uint32_t*)dst.bits(), dst.bytesPerLine(), dst.height()
+        );
+    }
+#endif
+
+#if 0
+    QImage src("20220315-055335301551.jpg");
+    src = src.scaled(96, 54);
+
+    size_t height = 33;
+
+//    QImage dst(src.width(), height, QImage::Format_ARGB32);
+//    cout << dst.width() << " x " << dst.height() << endl;
+
+    {
+        auto start = std::chrono::system_clock::now();
+        for (size_t c = 0; c < 1000000; c++){
+            QImage dst(src.width(), height, QImage::Format_ARGB32);
+            scale_vertical_shrink_Default(
+                src.width(),
+                (const uint32_t*)src.constBits(), src.bytesPerLine(), src.height(),
+                (uint32_t*)dst.bits(), dst.bytesPerLine(), dst.height()
+            );
+        }
+        auto end = std::chrono::system_clock::now();
+        cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start) << endl;
+    }
+    {
+        auto start = std::chrono::system_clock::now();
+        for (size_t c = 0; c < 1000000; c++){
+            QImage dst = src.scaled(src.width(), height);
+        }
+        auto end = std::chrono::system_clock::now();
+        cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start) << endl;
+    }
+    {
+        auto start = std::chrono::system_clock::now();
+        for (size_t c = 0; c < 1000000; c++){
+            QImage dst(src.width(), height, QImage::Format_ARGB32);
+            scale_vertical_shrink<Uint8Scaler_x16_SSE41>(
+                src.width(),
+                (const uint32_t*)src.constBits(), src.bytesPerLine(), src.height(),
+                (uint32_t*)dst.bits(), dst.bytesPerLine(), dst.height()
+            );
+        }
+        auto end = std::chrono::system_clock::now();
+        cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start) << endl;
+    }
+    {
+        auto start = std::chrono::system_clock::now();
+        for (size_t c = 0; c < 1000000; c++){
+            QImage dst(src.width(), height, QImage::Format_ARGB32);
+            scale_vertical_shrink<Uint8Scaler_x32_AVX2>(
+                src.width(),
+                (const uint32_t*)src.constBits(), src.bytesPerLine(), src.height(),
+                (uint32_t*)dst.bits(), dst.bytesPerLine(), dst.height()
+            );
+        }
+        auto end = std::chrono::system_clock::now();
+        cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start) << endl;
+    }
+
+//    cout << dst.save("test.png") << endl;
+#endif
+
+
+
+
+#if 0
+    cout << (int)scale_Default(255, 256) << endl;
+    cout << (int)scale_Default(255, 128) << endl;
+
+    {
+        __m128i x = _mm_set1_epi8(255);
+        __m128i scale = _mm_set1_epi16(256);
+        x = scale_SSE2(x, scale);
+        print_u8(x);
+    }
+    {
+        __m128i x = _mm_set1_epi8(255);
+        __m128i scale = _mm_set1_epi16(128);
+        x = scale_SSE2(x, scale);
+        print_u8(x);
+    }
+
+
+
+
+    uint8_t src[15] = {4, 8, 9, 7, 6, 4, 8, 5, 0, 7, 9, 3, 6, 2, 4};
+    double dst[7];
+    memset(dst, 0, sizeof(dst));
+
+    size_t index_src = 0;
+    size_t index_dst = 0;
+    size_t stop_src = 15;
+    size_t stop_dst = 7;
+    double ratio = (double)stop_dst / stop_src;
+    for (; index_src < stop_src; index_src++){
+        double src_s = ratio * (double)index_src;
+        double src_e = ratio * (double)(index_src + 1);
+        size_t index = (size_t)src_s;
+        if (src_e <= index + 1){
+            dst[index] += src[index_src] * ratio;
+        }else{
+            double lower = index + 1 - src_s;
+            double upper = src_e - (index + 1);
+            dst[index + 0] += src[index_src] * lower;
+            dst[index + 1] += src[index_src] * upper;
+        }
+    }
+
+    for (size_t c = 0; c < stop_dst; c++){
+        cout << dst[c] << ", ";
+    }
+    cout << endl;
+#endif
+
+
+
+#if 0
+    QImage image("DetectionImages/20220322-210628266511-MountDetection.png");
+
+    MountDetector detector(MountDetectorLogging::LOG_ONLY);
+    detector.detect(image);
+#endif
+
+
+#if 0
+    cout << CPU_CAPABILITY_CURRENT.OK_08_Nehalem << endl;
+    cout << CPU_CAPABILITY_CURRENT.OK_13_Haswell << endl;
+    cout << CPU_CAPABILITY_CURRENT.OK_17_Skylake << endl;
+    cout << CPU_CAPABILITY_CURRENT.OK_19_IceLake << endl;
+#endif
+
+
+//    using WallClock = std::chrono::system_clock::time_point;
+
+//    cout << (WallClock::min() < WallClock::max()) << endl;
+
+
+
+//    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "asdf");
+//    throw UserSetupError(env.logger(), "asdf");
+
+
+#if 0
+    BlackScreenOverWatcher black_screen1(COLOR_RED, {0.20, 0.95, 0.60, 0.03}, 20);
+
+    black_screen1.process_frame(QImage("screenshot-20220221-232325966395.png"), std::chrono::system_clock::now());
+#endif
+
+#if 0
+    float data[25];
+    for (int c = 0; c < 25; c++){
+        data[c] = c;
+    }
+    print(data, 25);
+
+//    auto start = std::chrono::system_clock::now();
+
+    TimeSampleBuffer<float> buffer(10, std::chrono::seconds(10));
+
+    buffer.push_samples(data +  0, 5, REFERENCE + std::chrono::milliseconds( 500));
+    buffer.push_samples(data +  5, 5, REFERENCE + std::chrono::milliseconds(1000));
+    buffer.push_samples(data + 10, 5, REFERENCE + std::chrono::milliseconds(1500));
+    buffer.push_samples(data + 15, 5, REFERENCE + std::chrono::milliseconds(2200));
+    buffer.push_samples(data + 20, 5, REFERENCE + std::chrono::milliseconds(2500));
+
+    cout << buffer.dump() << endl;
+
+
+
+    TimeSampleBufferReader reader(buffer);
+//    reader.set_to_timestamp(REFERENCE + std::chrono::milliseconds(2610));
+//    cout << "block = " << reader.m_current_block - REFERENCE << endl;
+//    cout << "index = " << reader.m_current_index << endl;
+
+#if 1
+    float read[25];
+    for (int c = 0; c < 25; c++){
+        read[c] = -1;
+    }
+    reader.read_samples(read, 25, REFERENCE + std::chrono::milliseconds(2500));
+
+    print(read, 25);
+#endif
+#endif
+}
+
+
+
+
+
+inline std::string dump8(uint8_t x){
+    std::string str;
+    for (size_t c = 0; c < 8; c++){
+        str += ((x >> c) & 1) ? "1" : "0";
+    }
+    return str;
+}
+
+
+void print(const uint64_t* ptr, size_t len){
+    cout << "{";
+    bool first = true;
+    for (size_t c = 0; c < len; c++){
+        if (!first){
+            cout << ", ";
+        }
+        first = false;
+        cout << ptr[c];
+    }
+    cout << "}" << endl;
+}
+
+
+
+std::set<std::string> read_name(
+    LoggerQt& logger,
+    Language language,
+    const QImage& screen, const ImageFloatBox& box
+){
+    if (language == Language::None){
+        return {};
+    }
+
+    QImage image = extract_box_copy(screen, box);
+    OCR::filter_smart(image);
+
+    std::set<std::string> ret;
+
+    OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(logger, language, image);
+    if (result.results.empty()){
+//        dump_image(
+//            logger, ProgramInfo(),
+//            QString::fromStdString("NameOCR-" + language_data(language).code),
+//            screen
+//        );
+    }else{
+        for (const auto& item : result.results){
+            ret.insert(item.second.token);
+        }
+    }
+    return ret;
+}
+
+
 
 
 #if 0
@@ -402,305 +946,6 @@ void scale_vertical_shrink(
 }
 #endif
 
-
-
-
-
-
-void TestProgramComputer::program(ProgramEnvironment& env){
-    using namespace Kernels;
-    using namespace NintendoSwitch::PokemonSwSh;
-    using namespace Pokemon;
-
-
-    QImage image("screenshot-20220327-190703102304.png");
-
-    MaxLairInternal::PathSelectDetector detector;
-    cout << detector.detect(image) << endl;
-
-
-
-#if 0
-    BitSet2D set(100, 30);
-    cout << set.get(10, 20) << endl;
-    set.set(10, 20);
-    cout << set.get(10, 20) << endl;
-
-    size_t x, y;
-    cout << set.pop(x, y) << endl;
-    cout << x << " " << y << endl;
-#endif
-
-
-#if 0
-    uint8_t x[32] = {
-         0,  1,  2,  3,  4,  5,  6,  7,  8,  9, 10, 11, 12, 13, 14, 15,
-        16, 17, 18, 19, 20, 21, 22, 23, 24, 25, 26, 27, 28, 29, 30, 31
-    };
-
-    PartialWordAccess_x64_SSE41 access(2);
-
-    access.store_no_past_end(x + 14, _mm_setr_epi8(100, 101, 102, 103, 104, 105, 106, 107, 108, 109, 110, 111, 112, 113, 114, 115));
-
-    for (size_t c = 0; c < 32; c++){
-        cout << (int)x[c] << " ";
-    }
-    cout << endl;
-#endif
-
-#if 0
-    QImage src("20220315-055335301551.jpg");
-    while (true){
-//        src.scaled(src.width(), 500);
-        QImage dst(src.width(), 500, QImage::Format_ARGB32);
-        scale_vertical_shrink<Uint8Scaler_x32_AVX2>(
-            src.width(),
-            (const uint32_t*)src.constBits(), src.bytesPerLine(), src.height(),
-            (uint32_t*)dst.bits(), dst.bytesPerLine(), dst.height()
-        );
-    }
-#endif
-
-#if 0
-    QImage src("20220315-055335301551.jpg");
-    src = src.scaled(96, 54);
-
-    size_t height = 33;
-
-//    QImage dst(src.width(), height, QImage::Format_ARGB32);
-//    cout << dst.width() << " x " << dst.height() << endl;
-
-    {
-        auto start = std::chrono::system_clock::now();
-        for (size_t c = 0; c < 1000000; c++){
-            QImage dst(src.width(), height, QImage::Format_ARGB32);
-            scale_vertical_shrink_Default(
-                src.width(),
-                (const uint32_t*)src.constBits(), src.bytesPerLine(), src.height(),
-                (uint32_t*)dst.bits(), dst.bytesPerLine(), dst.height()
-            );
-        }
-        auto end = std::chrono::system_clock::now();
-        cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start) << endl;
-    }
-    {
-        auto start = std::chrono::system_clock::now();
-        for (size_t c = 0; c < 1000000; c++){
-            QImage dst = src.scaled(src.width(), height);
-        }
-        auto end = std::chrono::system_clock::now();
-        cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start) << endl;
-    }
-    {
-        auto start = std::chrono::system_clock::now();
-        for (size_t c = 0; c < 1000000; c++){
-            QImage dst(src.width(), height, QImage::Format_ARGB32);
-            scale_vertical_shrink<Uint8Scaler_x16_SSE41>(
-                src.width(),
-                (const uint32_t*)src.constBits(), src.bytesPerLine(), src.height(),
-                (uint32_t*)dst.bits(), dst.bytesPerLine(), dst.height()
-            );
-        }
-        auto end = std::chrono::system_clock::now();
-        cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start) << endl;
-    }
-    {
-        auto start = std::chrono::system_clock::now();
-        for (size_t c = 0; c < 1000000; c++){
-            QImage dst(src.width(), height, QImage::Format_ARGB32);
-            scale_vertical_shrink<Uint8Scaler_x32_AVX2>(
-                src.width(),
-                (const uint32_t*)src.constBits(), src.bytesPerLine(), src.height(),
-                (uint32_t*)dst.bits(), dst.bytesPerLine(), dst.height()
-            );
-        }
-        auto end = std::chrono::system_clock::now();
-        cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start) << endl;
-    }
-
-//    cout << dst.save("test.png") << endl;
-#endif
-
-
-
-
-#if 0
-    cout << (int)scale_Default(255, 256) << endl;
-    cout << (int)scale_Default(255, 128) << endl;
-
-    {
-        __m128i x = _mm_set1_epi8(255);
-        __m128i scale = _mm_set1_epi16(256);
-        x = scale_SSE2(x, scale);
-        print_u8(x);
-    }
-    {
-        __m128i x = _mm_set1_epi8(255);
-        __m128i scale = _mm_set1_epi16(128);
-        x = scale_SSE2(x, scale);
-        print_u8(x);
-    }
-
-
-
-
-    uint8_t src[15] = {4, 8, 9, 7, 6, 4, 8, 5, 0, 7, 9, 3, 6, 2, 4};
-    double dst[7];
-    memset(dst, 0, sizeof(dst));
-
-    size_t index_src = 0;
-    size_t index_dst = 0;
-    size_t stop_src = 15;
-    size_t stop_dst = 7;
-    double ratio = (double)stop_dst / stop_src;
-    for (; index_src < stop_src; index_src++){
-        double src_s = ratio * (double)index_src;
-        double src_e = ratio * (double)(index_src + 1);
-        size_t index = (size_t)src_s;
-        if (src_e <= index + 1){
-            dst[index] += src[index_src] * ratio;
-        }else{
-            double lower = index + 1 - src_s;
-            double upper = src_e - (index + 1);
-            dst[index + 0] += src[index_src] * lower;
-            dst[index + 1] += src[index_src] * upper;
-        }
-    }
-
-    for (size_t c = 0; c < stop_dst; c++){
-        cout << dst[c] << ", ";
-    }
-    cout << endl;
-#endif
-
-
-
-#if 0
-    QImage image("DetectionImages/20220322-210628266511-MountDetection.png");
-
-    MountDetector detector(MountDetectorLogging::LOG_ONLY);
-    detector.detect(image);
-#endif
-
-
-#if 0
-    cout << CPU_CAPABILITY_CURRENT.OK_08_Nehalem << endl;
-    cout << CPU_CAPABILITY_CURRENT.OK_13_Haswell << endl;
-    cout << CPU_CAPABILITY_CURRENT.OK_17_Skylake << endl;
-    cout << CPU_CAPABILITY_CURRENT.OK_19_IceLake << endl;
-#endif
-
-
-//    using WallClock = std::chrono::system_clock::time_point;
-
-//    cout << (WallClock::min() < WallClock::max()) << endl;
-
-
-
-//    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "asdf");
-//    throw UserSetupError(env.logger(), "asdf");
-
-
-#if 0
-    BlackScreenOverWatcher black_screen1(COLOR_RED, {0.20, 0.95, 0.60, 0.03}, 20);
-
-    black_screen1.process_frame(QImage("screenshot-20220221-232325966395.png"), std::chrono::system_clock::now());
-#endif
-
-#if 0
-    float data[25];
-    for (int c = 0; c < 25; c++){
-        data[c] = c;
-    }
-    print(data, 25);
-
-//    auto start = std::chrono::system_clock::now();
-
-    TimeSampleBuffer<float> buffer(10, std::chrono::seconds(10));
-
-    buffer.push_samples(data +  0, 5, REFERENCE + std::chrono::milliseconds( 500));
-    buffer.push_samples(data +  5, 5, REFERENCE + std::chrono::milliseconds(1000));
-    buffer.push_samples(data + 10, 5, REFERENCE + std::chrono::milliseconds(1500));
-    buffer.push_samples(data + 15, 5, REFERENCE + std::chrono::milliseconds(2200));
-    buffer.push_samples(data + 20, 5, REFERENCE + std::chrono::milliseconds(2500));
-
-    cout << buffer.dump() << endl;
-
-
-
-    TimeSampleBufferReader reader(buffer);
-//    reader.set_to_timestamp(REFERENCE + std::chrono::milliseconds(2610));
-//    cout << "block = " << reader.m_current_block - REFERENCE << endl;
-//    cout << "index = " << reader.m_current_index << endl;
-
-#if 1
-    float read[25];
-    for (int c = 0; c < 25; c++){
-        read[c] = -1;
-    }
-    reader.read_samples(read, 25, REFERENCE + std::chrono::milliseconds(2500));
-
-    print(read, 25);
-#endif
-#endif
-}
-
-
-
-
-
-inline std::string dump8(uint8_t x){
-    std::string str;
-    for (size_t c = 0; c < 8; c++){
-        str += ((x >> c) & 1) ? "1" : "0";
-    }
-    return str;
-}
-
-
-void print(const uint64_t* ptr, size_t len){
-    cout << "{";
-    bool first = true;
-    for (size_t c = 0; c < len; c++){
-        if (!first){
-            cout << ", ";
-        }
-        first = false;
-        cout << ptr[c];
-    }
-    cout << "}" << endl;
-}
-
-
-
-std::set<std::string> read_name(
-    LoggerQt& logger,
-    Language language,
-    const QImage& screen, const ImageFloatBox& box
-){
-    if (language == Language::None){
-        return {};
-    }
-
-    QImage image = extract_box_copy(screen, box);
-    OCR::filter_smart(image);
-
-    std::set<std::string> ret;
-
-    OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(logger, language, image);
-    if (result.results.empty()){
-//        dump_image(
-//            logger, ProgramInfo(),
-//            QString::fromStdString("NameOCR-" + language_data(language).code),
-//            screen
-//        );
-    }else{
-        for (const auto& item : result.results){
-            ret.insert(item.second.token);
-        }
-    }
-    return ret;
-}
 
 
 
