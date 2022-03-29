@@ -1,15 +1,15 @@
-/*  Waterfill Core (AVX512)
+/*  Waterfill Core (x64 AVX512)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_Kernels_Waterfill_Core_x64_AVX512_H
-#define PokemonAutomation_Kernels_Waterfill_Core_x64_AVX512_H
+#ifndef PokemonAutomation_Kernels_Waterfill_Core_64x64_x64_AVX512_H
+#define PokemonAutomation_Kernels_Waterfill_Core_64x64_x64_AVX512_H
 
 #include "Kernels/Kernels_BitScan.h"
 #include "Kernels/Kernels_x64_AVX512.h"
-#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_x64_AVX512.h"
+#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x64_x64_AVX512.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -59,7 +59,7 @@ struct Waterfill_x64_AVX512_ProcessedMask<false>{
     __m512i r0, r1, r2, r3, r4, r5, r6;     //  Reverse-carry mask.
 
     PA_FORCE_INLINE Waterfill_x64_AVX512_ProcessedMask(
-        const BinaryTile_AVX512& m,
+        const BinaryTile_64x64_x64_AVX512& m,
         __m512i x0, __m512i x1, __m512i x2, __m512i x3,
         __m512i x4, __m512i x5, __m512i x6, __m512i x7
     ){
@@ -209,7 +209,7 @@ PA_FORCE_INLINE void expand_vertical<false>(
     x0 = _mm512_ternarylogic_epi64(x0, _mm512_broadcastq_epi64(_mm512_castsi512_si128(x1)), mask.r0, 0b11111000);
 }
 template <bool AVX512GF>
-PA_FORCE_INLINE void waterfill_expand(const BinaryTile_AVX512& m, BinaryTile_AVX512& x){
+PA_FORCE_INLINE void waterfill_expand(const BinaryTile_64x64_x64_AVX512& m, BinaryTile_64x64_x64_AVX512& x){
     __m512i x0 = x.vec[0];
     __m512i x1 = x.vec[1];
     __m512i x2 = x.vec[2];
@@ -283,7 +283,7 @@ struct Waterfill_x64_AVX512{
 
 
 
-static PA_FORCE_INLINE __m512i vec_or(const BinaryTile_AVX512& tile){
+static PA_FORCE_INLINE __m512i vec_or(const BinaryTile_64x64_x64_AVX512& tile){
     __m512i v0 = _mm512_or_si512(tile.vec[0], tile.vec[1]);
     __m512i v1 = _mm512_or_si512(tile.vec[2], tile.vec[3]);
     __m512i v2 = _mm512_or_si512(tile.vec[4], tile.vec[5]);
@@ -293,7 +293,7 @@ static PA_FORCE_INLINE __m512i vec_or(const BinaryTile_AVX512& tile){
     v0 = _mm512_or_si512(v0, v2);
     return v0;
 }
-static PA_FORCE_INLINE uint64_t row_or(const BinaryTile_AVX512& tile){
+static PA_FORCE_INLINE uint64_t row_or(const BinaryTile_64x64_x64_AVX512& tile){
     return _mm512_reduce_or_epi64(vec_or(tile));
 }
 
@@ -301,7 +301,7 @@ static PA_FORCE_INLINE uint64_t row_or(const BinaryTile_AVX512& tile){
 //  Find a one bit in the specified tile.
 //  If found, (x, y) are set to its coordinates and returns true.
 //  If entire tile is zero, returns false.
-static PA_FORCE_INLINE bool find_bit(size_t& x, size_t& y, const BinaryTile_AVX512& tile){
+static PA_FORCE_INLINE bool find_bit(size_t& x, size_t& y, const BinaryTile_64x64_x64_AVX512& tile){
     __m512i anything = vec_or(tile);
     if (!_mm512_test_epi64_mask(anything, anything)){
         return false;
@@ -329,7 +329,7 @@ static PA_FORCE_INLINE bool find_bit(size_t& x, size_t& y, const BinaryTile_AVX5
 //  Max values are one past the end.
 //  Behavior is undefined if tile is zero.
 static PA_FORCE_INLINE void boundaries(
-    const BinaryTile_AVX512& tile,
+    const BinaryTile_64x64_x64_AVX512& tile,
     size_t& min_x, size_t& max_x,
     size_t& min_y, size_t& max_y
 ){
@@ -403,7 +403,7 @@ static PA_FORCE_INLINE __m512i popcount_indexsum(__m512i& sum_index, __m512i x){
 }
 static PA_FORCE_INLINE uint64_t popcount_sumcoord(
     uint64_t& sum_xcoord, uint64_t& sum_ycoord,
-    const BinaryTile_AVX512& tile
+    const BinaryTile_64x64_x64_AVX512& tile
 ){
     __m512i sum_p, sum_x, sum_y;
     __m512i offsets = _mm512_setr_epi64(0, 1, 2, 3, 4, 5, 6, 7);
@@ -431,7 +431,7 @@ static PA_FORCE_INLINE uint64_t popcount_sumcoord(
 
 //  Run Waterfill algorithm on mask "m" with starting point "x".
 //  Save result back into "x".
-static PA_FORCE_INLINE void waterfill_expand(const BinaryTile_AVX512& m, BinaryTile_AVX512& x){
+static PA_FORCE_INLINE void waterfill_expand(const BinaryTile_64x64_x64_AVX512& m, BinaryTile_64x64_x64_AVX512& x){
     Waterfill::waterfill_expand<false>(m, x);
 }
 
@@ -439,7 +439,7 @@ static PA_FORCE_INLINE void waterfill_expand(const BinaryTile_AVX512& m, BinaryT
 
 //  Touch the edge of "tile" with the specified border.
 //  Returns true if "tile" has changed and needs to be updated.
-static PA_FORCE_INLINE bool waterfill_touch_top(const BinaryTile_AVX512& mask, BinaryTile_AVX512& tile, const BinaryTile_AVX512& border){
+static PA_FORCE_INLINE bool waterfill_touch_top(const BinaryTile_64x64_x64_AVX512& mask, BinaryTile_64x64_x64_AVX512& tile, const BinaryTile_64x64_x64_AVX512& border){
     uint64_t available = mask.top() & ~tile.top();
     uint64_t new_bits = available & border.bottom();
     if (new_bits == 0){
@@ -448,7 +448,7 @@ static PA_FORCE_INLINE bool waterfill_touch_top(const BinaryTile_AVX512& mask, B
     tile.top() |= new_bits;
     return true;
 }
-static PA_FORCE_INLINE bool waterfill_touch_bottom(const BinaryTile_AVX512& mask, BinaryTile_AVX512& tile, const BinaryTile_AVX512& border){
+static PA_FORCE_INLINE bool waterfill_touch_bottom(const BinaryTile_64x64_x64_AVX512& mask, BinaryTile_64x64_x64_AVX512& tile, const BinaryTile_64x64_x64_AVX512& border){
     uint64_t available = mask.bottom() & ~tile.bottom();
     uint64_t new_bits = available & border.top();
     if (new_bits == 0){
@@ -457,7 +457,7 @@ static PA_FORCE_INLINE bool waterfill_touch_bottom(const BinaryTile_AVX512& mask
     tile.bottom() |= new_bits;
     return true;
 }
-static PA_FORCE_INLINE bool waterfill_touch_left(const BinaryTile_AVX512& mask, BinaryTile_AVX512& tile, const BinaryTile_AVX512& border){
+static PA_FORCE_INLINE bool waterfill_touch_left(const BinaryTile_64x64_x64_AVX512& mask, BinaryTile_64x64_x64_AVX512& tile, const BinaryTile_64x64_x64_AVX512& border){
     __m512i changed = _mm512_setzero_si512();
     for (size_t c = 0; c < 8; c++){
         __m512i available = _mm512_andnot_si512(tile.vec[c], mask.vec[c]);
@@ -467,7 +467,7 @@ static PA_FORCE_INLINE bool waterfill_touch_left(const BinaryTile_AVX512& mask, 
     }
     return _mm512_test_epi64_mask(changed, changed);
 }
-static PA_FORCE_INLINE bool waterfill_touch_right(const BinaryTile_AVX512& mask, BinaryTile_AVX512& tile, const BinaryTile_AVX512& border){
+static PA_FORCE_INLINE bool waterfill_touch_right(const BinaryTile_64x64_x64_AVX512& mask, BinaryTile_64x64_x64_AVX512& tile, const BinaryTile_64x64_x64_AVX512& border){
     __m512i changed = _mm512_setzero_si512();
     for (size_t c = 0; c < 8; c++){
         __m512i available = _mm512_andnot_si512(tile.vec[c], mask.vec[c]);

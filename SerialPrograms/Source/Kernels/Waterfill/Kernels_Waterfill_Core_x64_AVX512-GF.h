@@ -1,11 +1,11 @@
-/*  Waterfill Core (AVX512-GF)
+/*  Waterfill Core (x64 AVX512-GF)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_Kernels_Waterfill_Core_x64_AVX512GF_H
-#define PokemonAutomation_Kernels_Waterfill_Core_x64_AVX512GF_H
+#ifndef PokemonAutomation_Kernels_Waterfill_Core_64x64_x64_AVX512GF_H
+#define PokemonAutomation_Kernels_Waterfill_Core_64x64_x64_AVX512GF_H
 
 #include "Kernels_Waterfill_Core_x64_AVX512.h"
 
@@ -300,7 +300,7 @@ struct Waterfill_x64_AVX512_ProcessedMask<true>{
     __m512i r0, r1, r2, r3, r4, r5, r6, r7; //  Reverse transposed.
 
     PA_FORCE_INLINE Waterfill_x64_AVX512_ProcessedMask(
-        const BinaryTile_AVX512& m,
+        const BinaryTile_64x64_x64_AVX512& m,
         __m512i x0, __m512i x1, __m512i x2, __m512i x3,
         __m512i x4, __m512i x5, __m512i x6, __m512i x7
     ){
@@ -396,7 +396,7 @@ struct Waterfill_x64_AVX512GF : public Waterfill_x64_AVX512{
 
 //  Run Waterfill algorithm on mask "m" with starting point "x".
 //  Save result back into "x".
-PA_FORCE_INLINE static void waterfill_expand(const BinaryTile_AVX512& m, BinaryTile_AVX512& x){
+PA_FORCE_INLINE static void waterfill_expand(const BinaryTile_64x64_x64_AVX512& m, BinaryTile_64x64_x64_AVX512& x){
     Waterfill::waterfill_expand<true>(m, x);
 }
 

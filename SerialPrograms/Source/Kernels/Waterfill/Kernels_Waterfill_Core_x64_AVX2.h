@@ -1,15 +1,15 @@
-/*  Waterfill Core (AVX2)
+/*  Waterfill Core (x64 AVX2)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_Kernels_Waterfill_Core_x64_AVX2_H
-#define PokemonAutomation_Kernels_Waterfill_Core_x64_AVX2_H
+#ifndef PokemonAutomation_Kernels_Waterfill_Core_64x16_x64_AVX2_H
+#define PokemonAutomation_Kernels_Waterfill_Core_64x16_x64_AVX2_H
 
 #include "Kernels/Kernels_BitScan.h"
 #include "Kernels/Kernels_x64_AVX2.h"
-#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_x64_AVX2.h"
+#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x16_x64_AVX2.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -57,7 +57,7 @@ struct Waterfill_x64_AVX2_ProcessedMask{
     __m256i r0, r1, r2;     //  Reverse-carry mask.
 
     PA_FORCE_INLINE Waterfill_x64_AVX2_ProcessedMask(
-        const BinaryTile_AVX2& m,
+        const BinaryTile_64x16_x64_AVX2& m,
         __m256i x0, __m256i x1, __m256i x2, __m256i x3
     ){
         m0 = _mm256_or_si256(x0, m.vec[0]);
@@ -160,13 +160,13 @@ struct Waterfill_x64_AVX2{
 
 
 
-static PA_FORCE_INLINE __m256i vec_or(const BinaryTile_AVX2& tile){
+static PA_FORCE_INLINE __m256i vec_or(const BinaryTile_64x16_x64_AVX2& tile){
     __m256i v0 = _mm256_or_si256(tile.vec[0], tile.vec[1]);
     __m256i v1 = _mm256_or_si256(tile.vec[2], tile.vec[3]);
     v0 = _mm256_or_si256(v0, v1);
     return v0;
 }
-static PA_FORCE_INLINE uint64_t row_or(const BinaryTile_AVX2& tile){
+static PA_FORCE_INLINE uint64_t row_or(const BinaryTile_64x16_x64_AVX2& tile){
     return reduce_or64_x64_AVX2(vec_or(tile));
 }
 
@@ -174,7 +174,7 @@ static PA_FORCE_INLINE uint64_t row_or(const BinaryTile_AVX2& tile){
 //  Find a one bit in the specified tile.
 //  If found, (x, y) are set to its coordinates and returns true.
 //  If entire tile is zero, returns false.
-static PA_FORCE_INLINE bool find_bit(size_t& x, size_t& y, const BinaryTile_AVX2& tile){
+static PA_FORCE_INLINE bool find_bit(size_t& x, size_t& y, const BinaryTile_64x16_x64_AVX2& tile){
     __m256i anything = vec_or(tile);
     if (_mm256_testz_si256(anything, anything)){
         return false;
@@ -196,7 +196,7 @@ static PA_FORCE_INLINE bool find_bit(size_t& x, size_t& y, const BinaryTile_AVX2
 //  Max values are one past the end.
 //  Behavior is undefined if tile is zero.
 static PA_FORCE_INLINE void boundaries(
-    const BinaryTile_AVX2& tile,
+    const BinaryTile_64x16_x64_AVX2& tile,
     size_t& min_x, size_t& max_x,
     size_t& min_y, size_t& max_y
 ){
@@ -286,7 +286,7 @@ static PA_FORCE_INLINE __m256i popcount_indexsum(__m256i& sum_index, __m256i x){
 }
 static PA_FORCE_INLINE uint64_t popcount_sumcoord(
     uint64_t& sum_xcoord, uint64_t& sum_ycoord,
-    const BinaryTile_AVX2& tile
+    const BinaryTile_64x16_x64_AVX2& tile
 ){
     __m256i sum_p, sum_x, sum_y;
     {
@@ -326,7 +326,7 @@ static PA_FORCE_INLINE uint64_t popcount_sumcoord(
 
 //  Run Waterfill algorithm on mask "m" with starting point "x".
 //  Save result back into "x".
-static PA_FORCE_INLINE void waterfill_expand(const BinaryTile_AVX2& m, BinaryTile_AVX2& x){
+static PA_FORCE_INLINE void waterfill_expand(const BinaryTile_64x16_x64_AVX2& m, BinaryTile_64x16_x64_AVX2& x){
     __m256i x0 = x.vec[0];
     __m256i x1 = x.vec[1];
     __m256i x2 = x.vec[2];
@@ -355,7 +355,7 @@ static PA_FORCE_INLINE void waterfill_expand(const BinaryTile_AVX2& m, BinaryTil
 
 //  Touch the edge of "tile" with the specified border.
 //  Returns true if "tile" has changed and needs to be updated.
-static PA_FORCE_INLINE bool waterfill_touch_top(const BinaryTile_AVX2& mask, BinaryTile_AVX2& tile, const BinaryTile_AVX2& border){
+static PA_FORCE_INLINE bool waterfill_touch_top(const BinaryTile_64x16_x64_AVX2& mask, BinaryTile_64x16_x64_AVX2& tile, const BinaryTile_64x16_x64_AVX2& border){
     uint64_t available = mask.top() & ~tile.top();
     uint64_t new_bits = available & border.bottom();
     if (new_bits == 0){
@@ -364,7 +364,7 @@ static PA_FORCE_INLINE bool waterfill_touch_top(const BinaryTile_AVX2& mask, Bin
     tile.top() |= new_bits;
     return true;
 }
-static PA_FORCE_INLINE bool waterfill_touch_bottom(const BinaryTile_AVX2& mask, BinaryTile_AVX2& tile, const BinaryTile_AVX2& border){
+static PA_FORCE_INLINE bool waterfill_touch_bottom(const BinaryTile_64x16_x64_AVX2& mask, BinaryTile_64x16_x64_AVX2& tile, const BinaryTile_64x16_x64_AVX2& border){
     uint64_t available = mask.bottom() & ~tile.bottom();
     uint64_t new_bits = available & border.top();
     if (new_bits == 0){
@@ -373,7 +373,7 @@ static PA_FORCE_INLINE bool waterfill_touch_bottom(const BinaryTile_AVX2& mask, 
     tile.bottom() |= new_bits;
     return true;
 }
-static PA_FORCE_INLINE bool waterfill_touch_left(const BinaryTile_AVX2& mask, BinaryTile_AVX2& tile, const BinaryTile_AVX2& border){
+static PA_FORCE_INLINE bool waterfill_touch_left(const BinaryTile_64x16_x64_AVX2& mask, BinaryTile_64x16_x64_AVX2& tile, const BinaryTile_64x16_x64_AVX2& border){
     __m256i changed = _mm256_setzero_si256();
     for (size_t c = 0; c < 4; c++){
         __m256i available = _mm256_andnot_si256(tile.vec[c], mask.vec[c]);
@@ -383,7 +383,7 @@ static PA_FORCE_INLINE bool waterfill_touch_left(const BinaryTile_AVX2& mask, Bi
     }
     return !_mm256_testz_si256(changed, changed);
 }
-static PA_FORCE_INLINE bool waterfill_touch_right(const BinaryTile_AVX2& mask, BinaryTile_AVX2& tile, const BinaryTile_AVX2& border){
+static PA_FORCE_INLINE bool waterfill_touch_right(const BinaryTile_64x16_x64_AVX2& mask, BinaryTile_64x16_x64_AVX2& tile, const BinaryTile_64x16_x64_AVX2& border){
     __m256i changed = _mm256_setzero_si256();
     for (size_t c = 0; c < 4; c++){
         __m256i available = _mm256_andnot_si256(tile.vec[c], mask.vec[c]);

@@ -6,7 +6,7 @@
 
 #ifdef PA_AutoDispatch_13_Haswell
 
-#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_x64_AVX2.h"
+#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x16_x64_AVX2.h"
 #include "Kernels_BinaryImage_BasicFilters_Routines.h"
 #include "Kernels_BinaryImage_BasicFilters_x64_AVX2.h"
 

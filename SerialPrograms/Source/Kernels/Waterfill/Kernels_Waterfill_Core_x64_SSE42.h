@@ -1,15 +1,15 @@
-/*  Waterfill Core (SSE4.1)
+/*  Waterfill Core (x64 SSE4.1)
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_Kernels_Waterfill_Core_x64_SSE41_H
-#define PokemonAutomation_Kernels_Waterfill_Core_x64_SSE41_H
+#ifndef PokemonAutomation_Kernels_Waterfill_Core_64x8_x64_SSE41_H
+#define PokemonAutomation_Kernels_Waterfill_Core_64x8_x64_SSE41_H
 
 #include "Kernels/Kernels_BitScan.h"
 #include "Kernels/Kernels_x64_SSE41.h"
-#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_x64_SSE42.h"
+#include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x8_x64_SSE42.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -51,7 +51,7 @@ struct Waterfill_x64_SSE42_ProcessedMask{
     __m128i r0, r1, r2;     //  Reverse-carry mask.
 
     PA_FORCE_INLINE Waterfill_x64_SSE42_ProcessedMask(
-        const BinaryTile_SSE42& m,
+        const BinaryTile_64x8_x64_SSE42& m,
         __m128i x0, __m128i x1, __m128i x2, __m128i x3
     ){
         m0 = _mm_or_si128(x0, m.vec[0]);
@@ -153,13 +153,13 @@ struct Waterfill_x64_SSE42{
 
 
 
-static PA_FORCE_INLINE __m128i vec_or(const BinaryTile_SSE42& tile){
+static PA_FORCE_INLINE __m128i vec_or(const BinaryTile_64x8_x64_SSE42& tile){
     __m128i v0 = _mm_or_si128(tile.vec[0], tile.vec[1]);
     __m128i v1 = _mm_or_si128(tile.vec[2], tile.vec[3]);
     v0 = _mm_or_si128(v0, v1);
     return v0;
 }
-static PA_FORCE_INLINE uint64_t row_or(const BinaryTile_SSE42& tile){
+static PA_FORCE_INLINE uint64_t row_or(const BinaryTile_64x8_x64_SSE42& tile){
     __m128i v = vec_or(tile);
     return _mm_cvtsi128_si64(v) | _mm_extract_epi64(v, 1);
 }
@@ -168,7 +168,7 @@ static PA_FORCE_INLINE uint64_t row_or(const BinaryTile_SSE42& tile){
 //  Find a one bit in the specified tile.
 //  If found, (x, y) are set to its coordinates and returns true.
 //  If entire tile is zero, returns false.
-static PA_FORCE_INLINE bool find_bit(size_t& x, size_t& y, const BinaryTile_SSE42& tile){
+static PA_FORCE_INLINE bool find_bit(size_t& x, size_t& y, const BinaryTile_64x8_x64_SSE42& tile){
     __m128i anything = vec_or(tile);
     if (_mm_test_all_zeros(anything, anything)){
         return false;
@@ -190,7 +190,7 @@ static PA_FORCE_INLINE bool find_bit(size_t& x, size_t& y, const BinaryTile_SSE4
 //  Max values are one past the end.
 //  Behavior is undefined if tile is zero.
 static PA_FORCE_INLINE void boundaries(
-    const BinaryTile_SSE42& tile,
+    const BinaryTile_64x8_x64_SSE42& tile,
     size_t& min_x, size_t& max_x,
     size_t& min_y, size_t& max_y
 ){
@@ -266,7 +266,7 @@ static PA_FORCE_INLINE __m128i popcount_indexsum(__m128i& sum_index, __m128i x){
 }
 static PA_FORCE_INLINE uint64_t popcount_sumcoord(
     uint64_t& sum_xcoord, uint64_t& sum_ycoord,
-    const BinaryTile_SSE42& tile
+    const BinaryTile_64x8_x64_SSE42& tile
 ){
     __m128i sum_p, sum_x, sum_y;
     {
@@ -306,7 +306,7 @@ static PA_FORCE_INLINE uint64_t popcount_sumcoord(
 
 //  Run Waterfill algorithm on mask "m" with starting point "x".
 //  Save result back into "x".
-static PA_FORCE_INLINE void waterfill_expand(const BinaryTile_SSE42& m, BinaryTile_SSE42& x){
+static PA_FORCE_INLINE void waterfill_expand(const BinaryTile_64x8_x64_SSE42& m, BinaryTile_64x8_x64_SSE42& x){
     __m128i x0 = x.vec[0];
     __m128i x1 = x.vec[1];
     __m128i x2 = x.vec[2];
@@ -335,7 +335,7 @@ static PA_FORCE_INLINE void waterfill_expand(const BinaryTile_SSE42& m, BinaryTi
 
 //  Touch the edge of "tile" with the specified border.
 //  Returns true if "tile" has changed and needs to be updated.
-static PA_FORCE_INLINE bool waterfill_touch_top(const BinaryTile_SSE42& mask, BinaryTile_SSE42& tile, const BinaryTile_SSE42& border){
+static PA_FORCE_INLINE bool waterfill_touch_top(const BinaryTile_64x8_x64_SSE42& mask, BinaryTile_64x8_x64_SSE42& tile, const BinaryTile_64x8_x64_SSE42& border){
     uint64_t available = mask.top() & ~tile.top();
     uint64_t new_bits = available & border.bottom();
     if (new_bits == 0){
@@ -344,7 +344,7 @@ static PA_FORCE_INLINE bool waterfill_touch_top(const BinaryTile_SSE42& mask, Bi
     tile.top() |= new_bits;
     return true;
 }
-static PA_FORCE_INLINE bool waterfill_touch_bottom(const BinaryTile_SSE42& mask, BinaryTile_SSE42& tile, const BinaryTile_SSE42& border){
+static PA_FORCE_INLINE bool waterfill_touch_bottom(const BinaryTile_64x8_x64_SSE42& mask, BinaryTile_64x8_x64_SSE42& tile, const BinaryTile_64x8_x64_SSE42& border){
     uint64_t available = mask.bottom() & ~tile.bottom();
     uint64_t new_bits = available & border.top();
     if (new_bits == 0){
@@ -353,7 +353,7 @@ static PA_FORCE_INLINE bool waterfill_touch_bottom(const BinaryTile_SSE42& mask,
     tile.bottom() |= new_bits;
     return true;
 }
-static PA_FORCE_INLINE bool waterfill_touch_left(const BinaryTile_SSE42& mask, BinaryTile_SSE42& tile, const BinaryTile_SSE42& border){
+static PA_FORCE_INLINE bool waterfill_touch_left(const BinaryTile_64x8_x64_SSE42& mask, BinaryTile_64x8_x64_SSE42& tile, const BinaryTile_64x8_x64_SSE42& border){
     __m128i changed = _mm_setzero_si128();
     for (size_t c = 0; c < 4; c++){
         __m128i available = _mm_andnot_si128(tile.vec[c], mask.vec[c]);
@@ -363,7 +363,7 @@ static PA_FORCE_INLINE bool waterfill_touch_left(const BinaryTile_SSE42& mask, B
     }
     return !_mm_test_all_zeros(changed, changed);
 }
-static PA_FORCE_INLINE bool waterfill_touch_right(const BinaryTile_SSE42& mask, BinaryTile_SSE42& tile, const BinaryTile_SSE42& border){
+static PA_FORCE_INLINE bool waterfill_touch_right(const BinaryTile_64x8_x64_SSE42& mask, BinaryTile_64x8_x64_SSE42& tile, const BinaryTile_64x8_x64_SSE42& border){
     __m128i changed = _mm_setzero_si128();
     for (size_t c = 0; c < 4; c++){
         __m128i available = _mm_andnot_si128(tile.vec[c], mask.vec[c]);
