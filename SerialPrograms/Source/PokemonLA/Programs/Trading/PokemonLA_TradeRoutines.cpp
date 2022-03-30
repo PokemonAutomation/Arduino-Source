@@ -155,7 +155,7 @@ TradeNameReader::TradeNameReader(LoggerQt& logger, VideoOverlay& overlay, Langua
 }
 
 std::string TradeNameReader::read(const QImage& screen) const{
-    QImage image = extract_box(screen, m_box);
+    QImage image = extract_box_copy(screen, m_box);
 
     //  TODO: Clean this shit up.
     Kernels::filter_rgb32_range(

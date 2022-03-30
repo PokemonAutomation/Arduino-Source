@@ -59,7 +59,7 @@ BeamSetter::Detection BeamSetter::run(
     std::vector<FloatPixel> baseline_values(m_boxes.size());
     std::vector<FloatPixel> baseline_ratios(m_boxes.size());
     for (size_t c = 0; c < m_boxes.size(); c++){
-        baseline_values[c] = image_average(extract_box(baseline_image, m_boxes[c]));
+        baseline_values[c] = image_average(extract_box_reference(baseline_image, m_boxes[c]));
         baseline_ratios[c] = baseline_values[c] / baseline_values[c].sum();
     }
 
@@ -89,7 +89,7 @@ BeamSetter::Detection BeamSetter::run(
         }
 
         //  Text detection.
-        double text_stddev = image_stddev(extract_box(current_screenshot, m_text_box)).sum();
+        double text_stddev = image_stddev(extract_box_reference(current_screenshot, m_text_box)).sum();
         if (text_stddev < 10){
             low_stddev_flag = true;
         }
@@ -107,8 +107,8 @@ BeamSetter::Detection BeamSetter::run(
         for (size_t c = 0; c < m_boxes.size(); c++){
             FloatStatAccumulator stats = trackers[c].accumulate_all();
 
-            QImage previous_box = extract_box(last_screenshot, m_boxes[c]);
-            QImage current_box = extract_box(current_screenshot, m_boxes[c]);
+            ConstImageRef previous_box = extract_box_reference(last_screenshot, m_boxes[c]);
+            ConstImageRef current_box = extract_box_reference(current_screenshot, m_boxes[c]);
 
             FloatPixel current_average = image_average(current_box);
             double delta = ImageMatch::pixel_RMSD(current_box, previous_box);
@@ -120,7 +120,7 @@ BeamSetter::Detection BeamSetter::run(
 
             double stddev = current_average.stddev();
             double brightness = current_average.sum();
-            double average_euclidean_diff = image_average(extract_box(baseline_diff, m_boxes[c])).r;
+            double average_euclidean_diff = image_average(extract_box_reference(baseline_diff, m_boxes[c])).r;
 
             if (best_sigma <= sigma){
                 best_index = c;

@@ -34,22 +34,22 @@ void BoxDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_row);
 }
 bool BoxDetector::detect(const QImage& screen) const{
-    ImageStats left = image_stats(extract_box(screen, m_left));
+    ImageStats left = image_stats(extract_box_reference(screen, m_left));
 //    cout << left.average << left.stddev << endl;
     if (!is_solid(left, {0.274119, 0.355324, 0.370557})){
         return false;
     }
-    ImageStats right = image_stats(extract_box(screen, m_right));
+    ImageStats right = image_stats(extract_box_reference(screen, m_right));
 //    cout << right.average << right.stddev << endl;
     if (!is_solid(right, {0.274119, 0.355324, 0.370557})){
         return false;
     }
-    ImageStats bottom = image_stats(extract_box(screen, m_bottom));
+    ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
 //    cout << bottom.average << bottom.stddev << endl;
     if (!is_solid(bottom, {0.190353, 0.327458, 0.482189})){
         return false;
     }
-    ImageStats row = image_stats(extract_box(screen, m_row));
+    ImageStats row = image_stats(extract_box_reference(screen, m_row));
 //    cout << row.average << row.stddev << endl;
     if (row.stddev.sum() < 50){
         return false;

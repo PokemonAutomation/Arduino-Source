@@ -37,13 +37,13 @@ public:
     );
 
     //  Compute RMSD of current object against the template as-is.
-    double rmsd(const QImage& object) const;
+    double rmsd(const ConstImageRef& object) const;
 
-    virtual double rmsd_precropped(const QImage& cropped_image, const WaterfillObject& object) const;
-    virtual double rmsd_original(const QImage& original_image, const WaterfillObject& object) const;
+    virtual double rmsd_precropped(const ConstImageRef& cropped_image, const WaterfillObject& object) const;
+    virtual double rmsd_original(const ConstImageRef& original_image, const WaterfillObject& object) const;
 
 protected:
-    virtual bool check_image(const QImage& image) const{ return true; };
+    virtual bool check_image(const ConstImageRef& image) const{ return true; };
     bool check_aspect_ratio(size_t candidate_width, size_t candidate_height) const;
     bool check_area_ratio(double candidate_area_ratio) const;
 

@@ -215,7 +215,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         return true;
     case EncounterAction::RunAway:
         //  Fast run-away sequence to save time.
-        pbf_press_dpad(m_console, DPAD_UP, 10, 0);
+        pbf_press_dpad(m_console, DPAD_UP, 20, 0);
         m_console.botbase().wait_for_all_requests();
 
         run_from_battle(m_env, m_console, exit_battle_time);
@@ -275,6 +275,31 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
 
     return false;
 }
+
+
+
+
+
+LeadingShinyTracker::LeadingShinyTracker(Logger& logger)
+    : m_logger(logger)
+    , m_consecutive_shinies(0)
+{}
+
+void LeadingShinyTracker::report_result(ShinyType type){
+    if (is_confirmed_shiny(type)){
+        m_consecutive_shinies++;
+//        cout << "own shiny = " << m_consecutive_shinies << endl;
+        if (m_consecutive_shinies >= 3){
+            throw UserSetupError(m_logger, "Don't use a shiny as your lead. It causes false positive detections.");
+        }
+    }else{
+        m_consecutive_shinies = 0;
+    }
+}
+
+
+
+
 
 
 

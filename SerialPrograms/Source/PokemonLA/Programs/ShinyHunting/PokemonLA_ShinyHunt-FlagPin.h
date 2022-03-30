@@ -15,19 +15,11 @@
 #include "PokemonLA/PokemonLA_Locations.h"
 #include "PokemonLA/PokemonLA_TravelLocations.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
+#include "PokemonLA/Options/PokemonLA_TravelLocation.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
-
-
-class TravelLocationOption : public EnumDropdownOption{
-public:
-    TravelLocationOption();
-    operator TravelLocation() const;
-};
-
-
 
 
 class ShinyHuntFlagPin_Descriptor : public RunnableSwitchProgramDescriptor{

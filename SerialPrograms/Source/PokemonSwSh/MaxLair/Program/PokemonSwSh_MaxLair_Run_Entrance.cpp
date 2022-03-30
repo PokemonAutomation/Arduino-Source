@@ -49,7 +49,7 @@ void run_entrance(
         console.botbase().wait_for_all_requests();
 
         QImage screen = console.video().snapshot();
-        ImageStats stats = image_stats(extract_box(screen, box));
+        ImageStats stats = image_stats(extract_box_reference(screen, box));
         if (!is_grey(stats, 400, 1000)){
             break;
         }

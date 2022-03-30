@@ -8,7 +8,7 @@
 #include "Common/Qt/ImageOpener.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "WaterfillTemplateMatcher.h"
 
 #include <iostream>
@@ -31,7 +31,7 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
     QImage reference = open_image(qpath);
 
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(reference, (uint32_t)min_color, (uint32_t)max_color);
-    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, min_area, false);
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, min_area);
     if (objects.empty()){
         throw FileException(
             nullptr, PA_CURRENT_FUNCTION,
@@ -47,14 +47,14 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
         }
     }
 
-    m_object = extract_box(reference, *best);
+    m_object = extract_box_copy(reference, *best);
 //    m_object.save("test.png");
     m_matcher.reset(new ExactImageMatcher(m_object));
     m_area_ratio = best->area_ratio();
 }
 
-double WaterfillTemplateMatcher::rmsd(const QImage& object) const{
-    if (object.isNull() || !check_image(object)){
+double WaterfillTemplateMatcher::rmsd(const ConstImageRef& object) const{
+    if (!object || !check_image(object)){
         return 99999.;
     }
     return m_matcher->rmsd(object);
@@ -80,7 +80,7 @@ bool WaterfillTemplateMatcher::check_area_ratio(double candidate_area_ratio) con
 //    cout << "area = " << error << endl;
     return m_area_ratio_lower <= error && error <= m_area_ratio_upper;
 }
-double WaterfillTemplateMatcher::rmsd_precropped(const QImage& cropped_image, const WaterfillObject& object) const{
+double WaterfillTemplateMatcher::rmsd_precropped(const ConstImageRef& cropped_image, const WaterfillObject& object) const{
     if (!check_aspect_ratio(object.width(), object.height())){
 //        cout << "bad aspect ratio" << endl;
         return 99999.;
@@ -104,7 +104,7 @@ double WaterfillTemplateMatcher::rmsd_precropped(const QImage& cropped_image, co
 
     return rmsd;
 }
-double WaterfillTemplateMatcher::rmsd_original(const QImage& original_image, const WaterfillObject& object) const{
+double WaterfillTemplateMatcher::rmsd_original(const ConstImageRef& original_image, const WaterfillObject& object) const{
     if (!check_aspect_ratio(object.width(), object.height())){
 //        cout << "bad aspect ratio" << endl;
         return 99999.;
@@ -117,7 +117,7 @@ double WaterfillTemplateMatcher::rmsd_original(const QImage& original_image, con
 //    static int c = 0;
 //    cout << c << endl;
 
-    double rmsd = this->rmsd(extract_box(original_image, object));
+    double rmsd = this->rmsd(extract_box_reference(original_image, object));
 
 //    cout << "rmsd  = " << rmsd << endl;
 

@@ -130,28 +130,24 @@ private:
 private:
     //  Returns the seqnum of the request. If failed, returns zero.
     uint64_t try_issue_request(
-        std::map<uint64_t, PendingRequest>::iterator* iter, //  If null, it means silent remove.
         const std::atomic<bool>* cancelled,
-        const BotBaseRequest& request,
+        const BotBaseRequest& request, bool silent_remove,
         size_t queue_limit
     );
     uint64_t try_issue_command(
-        std::map<uint64_t, PendingCommand>::iterator* iter, //  If null, it means silent remove.
         const std::atomic<bool>* cancelled,
-        const BotBaseRequest& request,
+        const BotBaseRequest& request, bool silent_remove,
         size_t queue_limit
     );
 
     //  Returns the seqnum of the request.
     uint64_t issue_request(
-        std::map<uint64_t, PendingRequest>::iterator* iter, //  If null, it means silent remove.
         const std::atomic<bool>* cancelled,
-        const BotBaseRequest& request
+        const BotBaseRequest& request, bool silent_remove
     );
     uint64_t issue_command(
-        std::map<uint64_t, PendingCommand>::iterator* iter, //  If null, it means silent remove.
         const std::atomic<bool>* cancelled,
-        const BotBaseRequest& request
+        const BotBaseRequest& request, bool silent_remove
     );
 
     virtual bool try_issue_request(
@@ -167,7 +163,7 @@ private:
         const std::atomic<bool>* cancelled
     ) override;
 
-    BotBaseMessage wait_for_request(std::map<uint64_t, PendingRequest>::iterator iter);
+    BotBaseMessage wait_for_request(uint64_t seqnum);
 
 private:
     Logger& m_logger;

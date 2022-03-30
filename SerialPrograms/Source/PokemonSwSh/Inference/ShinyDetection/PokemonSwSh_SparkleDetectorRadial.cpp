@@ -7,6 +7,7 @@
 #include <cmath>
 #include <set>
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "PokemonSwSh_SparkleDetectorRadial.h"
 
 #include <iostream>
@@ -76,11 +77,11 @@ RadialSparkleDetector::RadialSparkleDetector(const WaterfillObject& object)
     }
 
     //  Find new regions.
-    PackedBinaryMatrix2 matrix = m_matrix;
-    auto finder = make_WaterfillIterator(matrix, 1);
+    PackedBinaryMatrix2 matrix = m_matrix.copy();
+    auto session = make_WaterfillSession(matrix);
+    auto finder = session->make_iterator(1);
     WaterfillObject obj;
-    while (finder->find_next(obj)){
-        obj.object.reset();
+    while (finder->find_next(obj, false)){
         m_regions.emplace(obj.area, std::move(obj));
     }
 

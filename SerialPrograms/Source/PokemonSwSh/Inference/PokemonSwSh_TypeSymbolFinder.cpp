@@ -8,7 +8,7 @@
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "PokemonSwSh_TypeSymbolFinder.h"
 
 #include <iostream>
@@ -49,9 +49,9 @@ size_t distance_sqr(const ImagePixelBox& a, const ImagePixelBox& b){
 }
 
 
-std::pair<double, PokemonType> match_type_symbol(const QImage& image){
-    int width = image.width();
-    int height = image.height();
+std::pair<double, PokemonType> match_type_symbol(const ConstImageRef& image){
+    size_t width = image.width();
+    size_t height = image.height();
     if (width * height < 100){
         return {1.0, PokemonType::NONE};
     }
@@ -109,11 +109,11 @@ std::pair<double, PokemonType> match_type_symbol(const QImage& image){
 
 void find_symbol_candidates(
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>>& candidates,
-    const QImage& image,
+    const ConstImageRef& image,
     PackedBinaryMatrix2& matrix, double max_area_ratio
 ){
     size_t max_area = (size_t)(image.width() * image.height() * max_area_ratio);
-    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20);
 
 //    static int index = 0;
 
@@ -159,10 +159,7 @@ void find_symbol_candidates(
 
     //  Identify objects.
     for (const auto& item : objmap){
-        QImage img = image.copy(
-            (pxint_t)item.second.min_x, (pxint_t)item.second.min_y,
-            (pxint_t)item.second.width(), (pxint_t)item.second.height()
-        );
+        ConstImageRef img = extract_box_reference(image, item.second);
         std::pair<double, PokemonType> result = match_type_symbol(img);
         if (result.second != PokemonType::NONE){
             const WaterfillObject& obj = item.second;
@@ -182,33 +179,25 @@ void find_symbol_candidates(
 
 
 std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_symbols(
-    const QImage& image, double max_area_ratio
+    const ConstImageRef& image, double max_area_ratio
 ){
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates;
 
     {
-        PackedBinaryMatrix2 matrix0, matrix1, matrix2, matrix3;
-        compress4_rgb32_to_binary_range(
+        std::vector<PackedBinaryMatrix2> matrices = compress_rgb32_to_binary_range(
             image,
-            matrix0, 0xff909090, 0xffffffff,
-            matrix1, 0xffa0a0a0, 0xffffffff,
-            matrix2, 0xffb0b0b0, 0xffffffff,
-            matrix3, 0xffc0c0c0, 0xffffffff
+            {
+                {0xff909090, 0xffffffff},
+                {0xffa0a0a0, 0xffffffff},
+                {0xffb0b0b0, 0xffffffff},
+                {0xffc0c0c0, 0xffffffff},
+                {0xffd0d0d0, 0xffffffff},
+                {0xffe0e0e0, 0xffffffff},
+            }
         );
-        find_symbol_candidates(candidates, image, matrix0, max_area_ratio);
-        find_symbol_candidates(candidates, image, matrix1, max_area_ratio);
-        find_symbol_candidates(candidates, image, matrix2, max_area_ratio);
-        find_symbol_candidates(candidates, image, matrix3, max_area_ratio);
-    }
-    {
-        PackedBinaryMatrix2 matrix0, matrix1;
-        compress2_rgb32_to_binary_range(
-            image,
-            matrix0, 0xffd0d0d0, 0xffffffff,
-            matrix1, 0xffe0e0e0, 0xffffffff
-        );
-        find_symbol_candidates(candidates, image, matrix0, max_area_ratio);
-        find_symbol_candidates(candidates, image, matrix1, max_area_ratio);
+        for (PackedBinaryMatrix2& matrix : matrices){
+            find_symbol_candidates(candidates, image, matrix, max_area_ratio);
+        }
     }
 
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> filtered;
@@ -253,7 +242,7 @@ void test_find_symbols(
     const ImageFloatBox& box,
     const QImage& screen, double max_area_ratio
 ){
-    QImage image = extract_box(screen, box);
+    ConstImageRef image = extract_box_reference(screen, box);
 
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_symbols(image, 0.20);
 

@@ -7,16 +7,20 @@
 #include <map>
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
-#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "PokemonLA_FlagDetector.h"
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-using namespace Kernels;
 using namespace Kernels::Waterfill;
 
 
@@ -57,7 +61,7 @@ public:
             128, 255,
             128, 255
         );
-        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
+        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20);
         if (objects.size() != 2){
             throw FileException(
                 nullptr, PA_CURRENT_FUNCTION,
@@ -99,7 +103,7 @@ FlagDetector::FlagDetector()
         }
     )
 {}
-void FlagDetector::process_object(const QImage& image, const WaterfillObject& object){
+void FlagDetector::process_object(const ConstImageRef& image, const WaterfillObject& object){
     if (object.area < 100){
         return;
     }
@@ -198,7 +202,7 @@ std::vector<std::pair<int, DigitMatcher>> make_digit_matchers(){
 }
 
 
-std::pair<double, int> read_digit(const QImage& image, const WaterfillObject& object){
+std::pair<double, int> read_digit(const ConstImageRef& image, const WaterfillObject& object){
     static const std::vector<std::pair<int, DigitMatcher>> MATCHERS = make_digit_matchers();
     double best_rmsd = 99999;
     int best_digit = -1;
@@ -220,27 +224,13 @@ std::pair<double, int> read_digit(const QImage& image, const WaterfillObject& ob
 
 int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
     ImageFloatBox box(flag_x - 0.025, flag_y - 0.055, 0.045, 0.025);
-    QImage image = extract_box(screen, box);
+    ConstImageRef image = extract_box_reference(screen, box);
 //    image.save("test.png");
 
-    PackedBinaryMatrix2 matrix[6];
-    compress4_rgb32_to_binary_range(
-        image,
-        matrix[0], 0xff808080, 0xffffffff,
-        matrix[1], 0xff909090, 0xffffffff,
-        matrix[2], 0xffa0a0a0, 0xffffffff,
-        matrix[3], 0xffb0b0b0, 0xffffffff
-    );
-    compress2_rgb32_to_binary_range(
-        image,
-        matrix[4], 0xffc0c0c0, 0xffffffff,
-        matrix[5], 0xffd0d0d0, 0xffffffff
-    );
+    size_t width = image.width();
+    size_t height = image.height();
 
-    size_t width = matrix[0].width();
-    size_t height = matrix[0].height();
-    double inv_width = 0.5 / width;
-
+    //  Detect all the digits.
     struct Hit{
         size_t min_x;
         size_t max_x;
@@ -248,33 +238,52 @@ int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
         double rmsd;
         int digit;
     };
-
-
-    //  Detect all the digits.
     std::multimap<size_t, Hit> hits;
-    for (size_t c = 0; c < 6; c++){
-        auto finder = make_WaterfillIterator(matrix[c], 30);
-        WaterfillObject object;
-        while (finder->find_next(object)){
-            //  Skip anything that touches the edge.
-            if (object.min_x == 0 || object.min_y == 0 ||
-                object.max_x + 1 == width || object.max_y + 1 == height
-            ){
-                continue;
+
+    {
+        std::vector<PackedBinaryMatrix2> matrices = compress_rgb32_to_binary_range(
+            image,
+            {
+                {0xff808080, 0xffffffff},
+                {0xff909090, 0xffffffff},
+                {0xffa0a0a0, 0xffffffff},
+                {0xffb0b0b0, 0xffffffff},
+                {0xffc0c0c0, 0xffffffff},
+                {0xffd0d0d0, 0xffffffff},
+                {0xffe0e0e0, 0xffffffff},
+                {0xfff0f0f0, 0xffffffff},
             }
-    //        extract_box(image, object).save("image-" + QString::number(c++) + ".png");
-            std::pair<double, int> digit = read_digit(image, object);
-            if (digit.second >= 0){
-                hits.emplace(
-                    object.min_x,
-                    Hit{
+        );
+
+        double inv_width = 0.5 / width;
+
+        std::unique_ptr<WaterfillSession> session = make_WaterfillSession();
+        for (PackedBinaryMatrix2& matrix : matrices){
+//            cout << (int)filters[c].matrix.type() << endl;
+            session->set_source(matrix);
+            auto finder = session->make_iterator(30);
+            WaterfillObject object;
+            while (finder->find_next(object, false)){
+                //  Skip anything that touches the edge.
+                if (object.min_x == 0 || object.min_y == 0 ||
+                    object.max_x + 1 == width || object.max_y + 1 == height
+                ){
+                    continue;
+                }
+//                extract_box(image, object).save("image-" + QString::number(c++) + ".png");
+                std::pair<double, int> digit = read_digit(image, object);
+                if (digit.second >= 0){
+                    hits.emplace(
                         object.min_x,
-                        object.max_x,
-                        (object.min_x + object.max_x) * inv_width,
-                        digit.first,
-                        digit.second
-                    }
-                );
+                        Hit{
+                            object.min_x,
+                            object.max_x,
+                            (object.min_x + object.max_x) * inv_width,
+                            digit.first,
+                            digit.second
+                        }
+                    );
+                }
             }
         }
     }
@@ -283,7 +292,7 @@ int read_flag_distance(const QImage& screen, double flag_x, double flag_y){
     }
 
 //    for (const auto& item : hits){
-//        cout << item.first << " : " << item.second.second << " - " << item.second.first << endl;
+//        cout << item.first << " : " << item.second.min_x << " - " << item.second.max_x << endl;
 //    }
 
 

@@ -50,13 +50,13 @@ bool PokemonSelectMenuDetector::is_pink(const ImageStats& stats){
     return is_solid(stats, {0.448935, 0.176565, 0.3745});
 }
 bool PokemonSelectMenuDetector::detect(const QImage& screen) const{
-    ImageStats box0 = image_stats(extract_box(screen, m_box0));
+    ImageStats box0 = image_stats(extract_box_reference(screen, m_box0));
     if (!is_pink(box0)) return false;
-    ImageStats box1 = image_stats(extract_box(screen, m_box1));
+    ImageStats box1 = image_stats(extract_box_reference(screen, m_box1));
     if (!is_pink(box1)) return false;
-    ImageStats box2 = image_stats(extract_box(screen, m_box2));
+    ImageStats box2 = image_stats(extract_box_reference(screen, m_box2));
     if (!is_solid(box2, {0.53822, 0.077108, 0.384672})) return false;
-    ImageStats box3 = image_stats(extract_box(screen, m_box3));
+    ImageStats box3 = image_stats(extract_box_reference(screen, m_box3));
 //    cout << box3.average << box3.stddev << endl;
     if (!is_solid(box3, {0.316905, 0.339245, 0.34385})) return false;
 //    ImageStats box4 = pixel_stats(extract_box(screen, m_box4));
@@ -72,7 +72,7 @@ bool PokemonSelectMenuDetector::detect(const QImage& screen) const{
 //    if (euclidean_distance(box3.average, box5.average) > 10) return false;
 ///    if (euclidean_distance(box3.average, box6.average) > 10) return false;
 
-    double select0 = image_average(extract_box(screen, m_select0)).sum();
+    double select0 = image_average(extract_box_reference(screen, m_select0)).sum();
     if (select0 < 200) return true;
 //    double select1 = image_average(extract_box(screen, m_select1)).sum();
 //    if (select1 < 200) return true;
@@ -110,13 +110,13 @@ PokemonSelectMenuReader::PokemonSelectMenuReader(
 {}
 int8_t PokemonSelectMenuReader::who_is_selecting(const QImage& screen) const{
 //    cout << slot0.average << ", " << slot0.stddev << endl;
-    ImageStats slot3 = image_stats(extract_box(screen, m_player3));
+    ImageStats slot3 = image_stats(extract_box_reference(screen, m_player3));
     if (slot3.stddev.sum() > 30) return 3;
-    ImageStats slot2 = image_stats(extract_box(screen, m_player2));
+    ImageStats slot2 = image_stats(extract_box_reference(screen, m_player2));
     if (slot2.stddev.sum() > 30) return 2;
-    ImageStats slot1 = image_stats(extract_box(screen, m_player1));
+    ImageStats slot1 = image_stats(extract_box_reference(screen, m_player1));
     if (slot1.stddev.sum() > 30) return 1;
-    ImageStats slot0 = image_stats(extract_box(screen, m_player0));
+    ImageStats slot0 = image_stats(extract_box_reference(screen, m_player0));
     if (slot0.stddev.sum() > 30) return 0;
     return -1;
 }

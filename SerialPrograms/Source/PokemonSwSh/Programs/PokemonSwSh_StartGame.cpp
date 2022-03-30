@@ -46,8 +46,8 @@ void enter_loading_game(
                 env.log("enter_loading_game(): Screenshot failed.", COLOR_PURPLE);
                 throttler.set_period(std::chrono::milliseconds(1000));
             }else{
-                bool black0 = is_black(extract_box(screen, box0));
-                bool black1 = is_black(extract_box(screen, box1));
+                bool black0 = is_black(extract_box_reference(screen, box0));
+                bool black1 = is_black(extract_box_reference(screen, box1));
                 if (black0 && black1){
                     if (!black_found){
                         env.log("start_game_with_inference(): Game load started.", COLOR_PURPLE);
@@ -89,7 +89,7 @@ void enter_loading_game(
                 env.log("enter_loading_game(): Screenshot failed.", COLOR_PURPLE);
                 throttler.set_period(std::chrono::milliseconds(1000));
             }else{
-                bool black = is_black(extract_box(screen, box));
+                bool black = is_black(extract_box_reference(screen, box));
                 if (black){
                     if (!black_found){
                         env.log("enter_loading_game(): Game entry started.", COLOR_PURPLE);

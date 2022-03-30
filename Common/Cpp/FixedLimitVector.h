@@ -57,6 +57,9 @@ public:
     const Object* end() const{ return m_data + m_size; }
           Object* end()      { return m_data + m_size; }
 
+    const Object* data() const{ return m_data; }
+          Object* data()      { return m_data; };
+
 private:
     Object* m_data;
     size_t m_size;

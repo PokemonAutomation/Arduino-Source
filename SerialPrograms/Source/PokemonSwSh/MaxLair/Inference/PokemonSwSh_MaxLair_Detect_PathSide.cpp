@@ -5,11 +5,13 @@
  */
 
 #include <cmath>
+#include <QImage>
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/DistanceToLine.h"
-#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "PokemonSwSh_MaxLair_Detect_PathSide.h"
 
 #include <iostream>
@@ -35,6 +37,8 @@ bool is_arrow_pointed_up(
     size_t width = matrix.width();
     size_t height = matrix.height();
 
+    std::unique_ptr<WaterfillSession> session = make_WaterfillSession(inverted);
+
     //  Verify left edge.
     WaterfillObject region0;
     {
@@ -58,7 +62,7 @@ bool is_arrow_pointed_up(
 //        cout << "topL_x = " << topL_x << endl;
 //        cout << "left_y = " << left_y << endl;
 
-        if (!find_object_on_bit(inverted, region0, 0, 0)){
+        if (!session->find_object_on_bit(region0, true, 0, 0)){
             return false;
         }
 //        PackedBinaryMatrix matrix0 = region0.packed_matrix();
@@ -117,7 +121,7 @@ bool is_arrow_pointed_up(
 //        cout << inverted.dump() << endl;
 //        cout << inverted.dump_tiles() << endl;
 
-        if (!find_object_on_bit(inverted, region1, width - 1, 0)){
+        if (!session->find_object_on_bit(region1, true, width - 1, 0)){
             return false;
         }
 //        cout << inverted.dump() << endl;
@@ -155,7 +159,7 @@ bool is_arrow_pointed_up(
 
     //  Verify bottom.
     WaterfillObject region2;
-    if (!find_object_on_bit(inverted, region2, width - 1, height - 1)){
+    if (!session->find_object_on_bit(region2, false, width - 1, height - 1)){
         return false;
     }
 
@@ -174,6 +178,8 @@ bool is_arrow_pointed_corner(
     size_t width = matrix.width();
     size_t height = matrix.height();
 
+    std::unique_ptr<WaterfillSession> session = make_WaterfillSession(inverted);
+
     //  Verify right edge.
     {
         size_t right_y = 0;
@@ -189,7 +195,7 @@ bool is_arrow_pointed_corner(
         );
 
         WaterfillObject region0;
-        if (!find_object_on_bit(inverted, region0, width - 1, 0)){
+        if (!session->find_object_on_bit(region0, true, width - 1, 0)){
             return false;
         }
 
@@ -233,7 +239,7 @@ bool is_arrow_pointed_corner(
         );
 
         WaterfillObject region1;
-        if (!find_object_on_bit(inverted, region1, 0, height - 1)){
+        if (!session->find_object_on_bit(region1, true, 0, height - 1)){
             return false;
         }
 
@@ -266,7 +272,7 @@ bool is_arrow_pointed_corner(
 }
 
 
-bool is_arrow(const QImage& image, const WaterfillObject& object){
+bool is_arrow(const ConstImageRef& image, const WaterfillObject& object){
     double area_ratio = object.area_ratio();
     if (area_ratio < 0.35 || area_ratio > 0.55){
         return false;
@@ -276,12 +282,7 @@ bool is_arrow(const QImage& image, const WaterfillObject& object){
         return false;
     }
 
-    size_t width = object.width();
-    size_t height = object.height();
-    QImage cropped = image.copy(
-        (int)object.min_x, (int)object.min_y,
-        (int)width, (int)height
-    );
+    QImage cropped = extract_box_reference(image, object).to_qimage();
 
 //    QImage cropped = cropped0;
     PackedBinaryMatrix2 matrix = object.packed_matrix();
@@ -298,7 +299,7 @@ bool is_arrow(const QImage& image, const WaterfillObject& object){
         return false;
     }
 
-    PackedBinaryMatrix2 inverted = matrix;
+    PackedBinaryMatrix2 inverted = matrix.copy();
     inverted.invert();
 
 //    static int c = 0;
@@ -324,19 +325,19 @@ bool is_arrow(const QImage& image, const WaterfillObject& object){
 
 
 
-int8_t read_side(const QImage& image, uint8_t pixel_threshold){
+int8_t read_side(WaterfillSession& session, const ConstImageRef& image, uint8_t pixel_threshold){
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_min(
         image, pixel_threshold, pixel_threshold, pixel_threshold
     );
 
 //    cout << "pixel_threshold = " << (int)pixel_threshold << endl;
+    session.set_source(matrix);
 
-    size_t count = 0;
-
-    auto finder = make_WaterfillIterator(matrix, 300);
+    auto finder = session.make_iterator(300);
     WaterfillObject arrow;
     WaterfillObject object;
-    while (finder->find_next(object)){
+    size_t count = 0;
+    while (finder->find_next(object, true)){
         if (is_arrow(image, object)){
             count++;
             arrow = object;
@@ -354,13 +355,14 @@ int8_t read_side(const QImage& image, uint8_t pixel_threshold){
         : 1;
 }
 
-int8_t read_side(const QImage& image){
+int8_t read_side(const ConstImageRef& image){
+    auto session = make_WaterfillSession();
     int8_t ret;
-    if ((ret = read_side(image, 160)) != -1) return ret;
-    if ((ret = read_side(image, 176)) != -1) return ret;
-    if ((ret = read_side(image, 192)) != -1) return ret;
-    if ((ret = read_side(image, 208)) != -1) return ret;
-    if ((ret = read_side(image, 224)) != -1) return ret;
+    if ((ret = read_side(*session, image, 160)) != -1) return ret;
+    if ((ret = read_side(*session, image, 176)) != -1) return ret;
+    if ((ret = read_side(*session, image, 192)) != -1) return ret;
+    if ((ret = read_side(*session, image, 208)) != -1) return ret;
+    if ((ret = read_side(*session, image, 224)) != -1) return ret;
     return ret;
 }
 

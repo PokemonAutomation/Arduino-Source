@@ -5,70 +5,64 @@
  */
 
 #include <map>
+#include "Common/Cpp/FixedLimitVector.tpp"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
-#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "PokemonLA_WhiteObjectDetector.h"
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-using namespace Kernels;
 using namespace Kernels::Waterfill;
 
 
 
 void find_overworld_white_objects(
     const std::vector<std::pair<WhiteObjectDetector&, bool>>& detectors,
-    const QImage& image
+    const ConstImageRef& image
 ){
     std::set<Color> threshold_set;
     for (const auto& item : detectors){
         const std::set<Color>& thresholds = item.first.thresholds();
         threshold_set.insert(thresholds.begin(), thresholds.end());
     }
-    std::vector<Color> threshold_list(threshold_set.begin(), threshold_set.end());
 
-    size_t filters = threshold_set.size();
-    std::vector<PackedBinaryMatrix2> matrix(filters);
+//    FixedLimitVector<CompressRgb32ToBinaryRangeFilter> filters(threshold_set.size());
+//    for (Color filter : threshold_set){
+//        filters.emplace_back(image.width(), image.height(), (uint32_t)filter, 0xffffffff);
+//    }
+//    compress_rgb32_to_binary_range(image, filters.data(), filters.size());
+
     {
-        size_t c = 0;
-        for (; c + 3 < filters; c += 4){
-            compress4_rgb32_to_binary_range(
-                image,
-                matrix[c + 0], (uint32_t)threshold_list[c + 0], 0xffffffff,
-                matrix[c + 1], (uint32_t)threshold_list[c + 1], 0xffffffff,
-                matrix[c + 2], (uint32_t)threshold_list[c + 2], 0xffffffff,
-                matrix[c + 3], (uint32_t)threshold_list[c + 3], 0xffffffff
-            );
+        std::vector<std::pair<uint32_t, uint32_t>> filters;
+        for (Color filter : threshold_set){
+            filters.emplace_back((uint32_t)filter, 0xffffffff);
         }
-        for (; c + 1 < filters; c += 2){
-            compress2_rgb32_to_binary_range(
-                image,
-                matrix[c + 0], (uint32_t)threshold_list[c + 0], 0xffffffff,
-                matrix[c + 1], (uint32_t)threshold_list[c + 1], 0xffffffff
-            );
-        }
-        for (; c < filters; c++){
-            matrix[c] = compress_rgb32_to_binary_range(
-                image, (uint32_t)threshold_list[c + 0], 0xffffffff
-            );
-        }
-    }
+        std::vector<PackedBinaryMatrix2> matrix = compress_rgb32_to_binary_range(image, filters);
 
-    for (size_t c = 0; c < filters; c++){
-        auto finder = make_WaterfillIterator(matrix[c], 50);
-//        WaterfillIterator finder(matrix[c], 50);
-        WaterfillObject object;
-        while (finder->find_next(object)){
-            for (const auto& detector : detectors){
-                const std::set<Color>& thresholds = detector.first.thresholds();
-                if (thresholds.find(threshold_list[c]) != thresholds.end()){
-                    detector.first.process_object(image, object);
+#if 1
+        std::unique_ptr<WaterfillSession> session = make_WaterfillSession();
+        for (size_t c = 0; c < filters.size(); c++){
+            session->set_source(matrix[c]);
+            auto finder = session->make_iterator(50);
+            WaterfillObject object;
+            while (finder->find_next(object, false)){
+                for (const auto& detector : detectors){
+                    const std::set<Color>& thresholds = detector.first.thresholds();
+                    if (thresholds.find((Color)filters[c].first) != thresholds.end()){
+                        detector.first.process_object(image, object);
+                    }
                 }
             }
         }
+#endif
     }
 
     for (const auto& detector : detectors){
@@ -136,7 +130,7 @@ bool WhiteObjectWatcher::process_frame(
         detector.first.clear();
     }
 
-    find_overworld_white_objects(m_detectors, extract_box(frame, m_box));
+    find_overworld_white_objects(m_detectors, extract_box_reference(frame, m_box));
     m_overlays.clear();
 
     for (auto& detector : m_detectors){

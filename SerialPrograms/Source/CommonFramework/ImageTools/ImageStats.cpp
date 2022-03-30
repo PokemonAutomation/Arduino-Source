@@ -18,12 +18,12 @@ namespace PokemonAutomation{
 
 
 
-FloatPixel image_average(const QImage& image){
+FloatPixel image_average(const ConstImageRef& image){
     Kernels::PixelSums sums;
     Kernels::pixel_sum_sqr(
         sums, image.width(), image.height(),
-        (const uint32_t*)image.bits(), image.bytesPerLine(),
-        (const uint32_t*)image.bits(), image.bytesPerLine()
+        image.data(), image.bytes_per_row(),
+        image.data(), image.bytes_per_row()
     );
 
     ImageStats stats;
@@ -31,12 +31,12 @@ FloatPixel image_average(const QImage& image){
 
     return sum / sums.count;
 }
-FloatPixel image_stddev(const QImage& image){
+FloatPixel image_stddev(const ConstImageRef& image){
     Kernels::PixelSums sums;
     Kernels::pixel_sum_sqr(
         sums, image.width(), image.height(),
-        (const uint32_t*)image.bits(), image.bytesPerLine(),
-        (const uint32_t*)image.bits(), image.bytesPerLine()
+        image.data(), image.bytes_per_row(),
+        image.data(), image.bytes_per_row()
     );
 
     FloatPixel sum(sums.sumR, sums.sumG, sums.sumB);
@@ -50,12 +50,12 @@ FloatPixel image_stddev(const QImage& image){
         std::sqrt(variance.b)
     );
 }
-ImageStats image_stats(const QImage& image){
+ImageStats image_stats(const ConstImageRef& image){
     Kernels::PixelSums sums;
     Kernels::pixel_sum_sqr(
         sums, image.width(), image.height(),
-        (const uint32_t*)image.bits(), image.bytesPerLine(),
-        (const uint32_t*)image.bits(), image.bytesPerLine()
+        image.data(), image.bytes_per_row(),
+        image.data(), image.bytes_per_row()
     );
 
     ImageStats stats;
@@ -78,9 +78,9 @@ ImageStats image_stats(const QImage& image){
 
 
 
-ImageStats image_border_stats(const QImage& image){
-    pxint_t w = image.width();
-    pxint_t h = image.height();
+ImageStats image_border_stats(const ConstImageRef& image){
+    size_t w = image.width();
+    size_t h = image.height();
     if (w * h <= 1){
         return ImageStats();
     }
@@ -88,22 +88,22 @@ ImageStats image_border_stats(const QImage& image){
     FloatPixel sum;
     FloatPixel sqr_sum;
 
-    for (pxint_t c = 0; c < w; c++){
+    for (size_t c = 0; c < w; c++){
         FloatPixel p(image.pixel(c, 0));
         sum += p;
         sqr_sum += p * p;
     }
-    for (pxint_t c = 0; c < w; c++){
+    for (size_t c = 0; c < w; c++){
         FloatPixel p(image.pixel(c, h - 1));
         sum += p;
         sqr_sum += p * p;
     }
-    for (pxint_t r = 0; r < h; r++){
+    for (size_t r = 0; r < h; r++){
         FloatPixel p(image.pixel(0, r));
         sum += p;
         sqr_sum += p * p;
     }
-    for (pxint_t r = 0; r < h; r++){
+    for (size_t r = 0; r < h; r++){
         FloatPixel p(image.pixel(0, h - 1));
         sum += p;
         sqr_sum += p * p;

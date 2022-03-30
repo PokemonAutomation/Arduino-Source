@@ -5,6 +5,7 @@
  */
 
 #include <cmath>
+#include "Common/Cpp/Exceptions.h"
 #include "ImageDiff.h"
 #include "ExactImageMatcher.h"
 
@@ -20,14 +21,14 @@ ExactImageMatcher::ExactImageMatcher(QImage image)
     : m_image(std::move(image))
     , m_stats(image_stats(m_image))
 {
+    if (m_image.isNull()){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Image is null.");
+    }
 //    cout << m_stats.stddev.sum() << endl;
 }
 
-void ExactImageMatcher::process_images(QImage& reference, QImage& image) const{
-    if (image.size() != m_image.size()){
-        image = image.scaled(m_image.size());
-    }
-
+void ExactImageMatcher::process_images(QImage& reference, const ConstImageRef& image) const{
+//    cout << "ExactImageMatcher::process_images(): " << image.width() << " x " << image.height() << endl;
     FloatPixel image_brightness = pixel_average(image, m_image);
     FloatPixel scale = image_brightness / m_stats.average;
 
@@ -43,9 +44,16 @@ void ExactImageMatcher::process_images(QImage& reference, QImage& image) const{
 }
 
 
-double ExactImageMatcher::rmsd(QImage image) const{
+double ExactImageMatcher::rmsd(const ConstImageRef& image) const{
+    if (!image){
+        return 1000.;
+    }
+
+//    cout << "ExactImageMatcher::rmsd(): image = " << image.width() << " x " << image.height() << endl;
+    QImage scaled = image.scaled_to_qimage(m_image.width(), m_image.height());
+//    cout << "ExactImageMatcher::rmsd(): scaled = " << scaled.width() << " x " << scaled.height() << endl;
     QImage reference;
-    process_images(reference, image);
+    process_images(reference, scaled);
 
 #if 0
     static int c = 0;
@@ -54,19 +62,27 @@ double ExactImageMatcher::rmsd(QImage image) const{
     c++;
 #endif
 
-    double rmsd = pixel_RMSD(reference, image);
+    double rmsd = pixel_RMSD(reference, scaled);
 //    cout << "rmsd = " << rmsd << endl;
     return rmsd;
 }
-double ExactImageMatcher::rmsd(QImage image, QRgb background) const{
+double ExactImageMatcher::rmsd(const ConstImageRef& image, QRgb background) const{
+    if (!image){
+        return 1000.;
+    }
+    QImage scaled = image.scaled_to_qimage(m_image.width(), m_image.height());
     QImage reference;
-    process_images(reference, image);
-    return pixel_RMSD(reference, image, background);
+    process_images(reference, scaled);
+    return pixel_RMSD(reference, scaled, background);
 }
-double ExactImageMatcher::rmsd_masked(QImage image) const{
+double ExactImageMatcher::rmsd_masked(const ConstImageRef& image) const{
+    if (!image){
+        return 1000.;
+    }
+    QImage scaled = image.scaled_to_qimage(m_image.width(), m_image.height());
     QImage reference;
-    process_images(reference, image);
-    return pixel_RMSD_masked(reference, image);
+    process_images(reference, scaled);
+    return pixel_RMSD_masked(reference, scaled);
 }
 
 
@@ -78,14 +94,23 @@ WeightedExactImageMatcher::WeightedExactImageMatcher(QImage image, const Inverse
 {}
 
 
-double WeightedExactImageMatcher::diff(QImage image) const{
-    return rmsd(std::move(image)) * m_multiplier;
+double WeightedExactImageMatcher::diff(const ConstImageRef& image) const{
+    if (!image){
+        return 1000.;
+    }
+    return rmsd(image) * m_multiplier;
 }
-double WeightedExactImageMatcher::diff(QImage image, QRgb background) const{
-    return rmsd(std::move(image), background) * m_multiplier;
+double WeightedExactImageMatcher::diff(const ConstImageRef& image, QRgb background) const{
+    if (!image){
+        return 1000.;
+    }
+    return rmsd(image, background) * m_multiplier;
 }
-double WeightedExactImageMatcher::diff_masked(QImage image) const{
-    return rmsd_masked(std::move(image)) * m_multiplier;
+double WeightedExactImageMatcher::diff_masked(const ConstImageRef& image) const{
+    if (!image){
+        return 1000.;
+    }
+    return rmsd_masked(image) * m_multiplier;
 }
 
 

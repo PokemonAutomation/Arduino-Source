@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "EnumDropdownWidget.h"
 #include "ProcessorLevelOption.h"
@@ -24,6 +25,7 @@ struct CpuCapabilityOption{
 
 std::vector<CpuCapabilityOption> make_AVAILABLE_CAPABILITIES(){
     std::vector<CpuCapabilityOption> list;
+//    list.emplace_back("Nothing (C++ Only)", CPU_CAPABILITY_NOTHING);
     if (CPU_CAPABILITY_NATIVE.OK_08_Nehalem){
         list.emplace_back("Intel Nehalem (x64 SSE4.2)", CPU_CAPABILITY_09_NEHALEM);
     }

@@ -7,9 +7,9 @@
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 //#include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
-#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "PokemonBDSP_MarkFinder.h"
 
 #include <iostream>
@@ -30,7 +30,7 @@ const ImageMatch::ExactImageMatcher& EXCLAMATION_MARK(){
 }
 
 
-bool is_exclamation_mark(const QImage& image, const WaterfillObject& object){
+bool is_exclamation_mark(const ConstImageRef& image, const WaterfillObject& object){
     size_t width = object.width();
     size_t height = object.height();
     if (width > 2 * height){
@@ -41,21 +41,17 @@ bool is_exclamation_mark(const QImage& image, const WaterfillObject& object){
     }
 
 //    const QImage& exclamation_mark = EXCLAMATION_MARK();
-    QImage scaled = image.copy(
-        (pxint_t)object.min_x, (pxint_t)object.min_y,
-        (pxint_t)width, (pxint_t)height
-    );
-//    scaled = scaled.scaled(exclamation_mark.width(), exclamation_mark.height());
-    double rmsd = EXCLAMATION_MARK().rmsd(scaled);
+    ConstImageRef obj = extract_box_reference(image, object);
+    double rmsd = EXCLAMATION_MARK().rmsd(obj);
 //    double rmsd = ImageMatch::pixel_RMSD(exclamation_mark, scaled);
 //    cout << "rmsd = " << rmsd << endl;
     return rmsd <= 80;
 }
 
 
-std::vector<ImagePixelBox> find_exclamation_marks(const QImage& image){
+std::vector<ImagePixelBox> find_exclamation_marks(const ConstImageRef& image){
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_min(image, 200, 200, 200);
-    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 400, false);
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 400);
     std::vector<ImagePixelBox> ret;
     for (const WaterfillObject& object : objects){
         if (is_exclamation_mark(image, object)){
@@ -82,7 +78,7 @@ bool MarkTracker::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point
 ){
-    std::vector<ImagePixelBox> exclamation_marks = find_exclamation_marks(extract_box(frame, m_box));
+    std::vector<ImagePixelBox> exclamation_marks = find_exclamation_marks(extract_box_reference(frame, m_box));
 //        cout << exclamation_marks.size() << endl;
 
     m_marks.clear();

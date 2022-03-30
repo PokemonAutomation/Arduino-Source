@@ -32,8 +32,7 @@ bool StartBattleWatcher::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
-    QImage image = extract_box(frame, m_screen_box);
-
+    ConstImageRef image = extract_box_reference(frame, m_screen_box);
     ImageStats stats = image_stats(image);
 
     //  White screen.

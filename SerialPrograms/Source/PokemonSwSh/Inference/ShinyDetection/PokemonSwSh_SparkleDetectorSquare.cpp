@@ -7,8 +7,9 @@
 #include <cmath>
 #include <map>
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/ImageTools/DistanceToLine.h"
-#include "CommonFramework/BinaryImage/BinaryImage.h"
 #include "PokemonSwSh_SparkleDetectorSquare.h"
 
 namespace PokemonAutomation{
@@ -25,22 +26,24 @@ WaterfillObject remove_background(PackedBinaryMatrix2& matrix){
     size_t width = matrix.width();
     size_t height = matrix.height();
 
+    std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
+
     WaterfillObject background;
     for (size_t c = 0; c < width; c++){
         WaterfillObject object;
-        if (find_object_on_bit(matrix, object, c, 0)){
+        if (session->find_object_on_bit(object, true, c, 0)){
             background.merge_assume_no_overlap(object);
         }
-        if (find_object_on_bit(matrix, object, c, height - 1)){
+        if (session->find_object_on_bit(object, true, c, height - 1)){
             background.merge_assume_no_overlap(object);
         }
     }
     for (size_t r = 0; r < height; r++){
         WaterfillObject object;
-        if (find_object_on_bit(matrix, object, 0, r)){
+        if (session->find_object_on_bit(object, true, 0, r)){
             background.merge_assume_no_overlap(object);
         }
-        if (find_object_on_bit(matrix, object, width - 1, r)){
+        if (session->find_object_on_bit(object, true, width - 1, r)){
             background.merge_assume_no_overlap(object);
         }
     }
@@ -51,8 +54,9 @@ WaterfillObject remove_background(PackedBinaryMatrix2& matrix){
 //  Remove the hole of 1's from "matrix" at location (x, y).
 //  Return the total area of the hole.
 size_t remove_hole(PackedBinaryMatrix2& matrix, size_t x, size_t y){
+    std::unique_ptr<WaterfillSession> session = make_WaterfillSession(matrix);
     WaterfillObject object;
-    if (!find_object_on_bit(matrix, object, x, y)){
+    if (!session->find_object_on_bit(object, false, x, y)){
         return 0;
     }
     return object.area;
@@ -66,7 +70,7 @@ bool check_hole(
     size_t box_area, size_t object_area,
     size_t center_x, size_t center_y
 ){
-    PackedBinaryMatrix2 inverted = object;
+    PackedBinaryMatrix2 inverted = object.copy();
     inverted.invert();
 
     //  Edge area is too large relative to the entire enclosing box.
@@ -318,9 +322,32 @@ std::multimap<double, std::pair<size_t, size_t>> get_edge_pixels(
     size_t width = object.width();
     size_t height = object.height();
 
-    PackedBinaryMatrix2 background_matrix = background.object->submatrix(0, 0, width, height);
-
     std::multimap<double, std::pair<size_t, size_t>> edge_pixels;
+    if (background.area == 0){
+        //  No background. Grab the entire edge.
+        for (size_t r = 0; r < height; r++){
+            for (size_t c = 0; c < width; c++){
+                //  Not part of the object.
+                if (!object.get(c, r)){
+                    continue;
+                }
+                if (c == 0 || r == 0 || c == width - 1 || r == height - 1){
+                    double angle = std::atan2(
+                        (ptrdiff_t)r - (ptrdiff_t)center_y,
+                        (ptrdiff_t)c - (ptrdiff_t)center_x
+                    ) * 57.295779513082320877;
+                    angle = normalize_angle_0_360_new(angle - base_angle);
+                    edge_pixels.emplace(
+                        angle,
+                        std::pair<size_t, size_t>{c, r}
+                    );
+                }
+            }
+        }
+        return edge_pixels;
+    }
+
+    PackedBinaryMatrix2 background_matrix = background.object->submatrix(0, 0, width, height);
     for (size_t r = 0; r < height; r++){
         for (size_t c = 0; c < width; c++){
             //  Not part of the object.

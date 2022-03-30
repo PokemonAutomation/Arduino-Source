@@ -39,7 +39,7 @@ bool FrozenImageDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
-    QImage image = extract_box(frame, m_box);
+    QImage image = extract_box_copy(frame, m_box);
     if (m_last_delta.size() != image.size()){
         m_timestamp = timestamp;
         m_last_delta = image;

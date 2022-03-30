@@ -95,12 +95,11 @@
 //#include "Kernels/Waterfill/Kernels_Waterfill_FillQueue.h"
 //#include "Kernels/BinaryImage/Kernels_BinaryImage_Default.h"
 //#include "Kernels/BinaryImage/Kernels_BinaryImage_x64_SSE42.h"
-#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.h"
-#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h"
+//#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.h"
+//#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h"
 //#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h"
 //#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
-#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "Integrations/DiscordWebhook.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
@@ -235,28 +234,52 @@ using namespace PokemonLA;
 
 
 
-
-
-
 void TestProgram::program(MultiSwitchProgramEnvironment& env){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
     using namespace OCR;
     using namespace Pokemon;
-//    using namespace PokemonSwSh;
+    using namespace PokemonSwSh;
 //    using namespace PokemonBDSP;
-    using namespace PokemonLA;
+//    using namespace PokemonLA;
 
-//     LoggerQt& logger = env.logger();
-//     ConsoleHandle& console = env.consoles[0];
+     LoggerQt& logger = env.logger();
+     ConsoleHandle& console = env.consoles[0];
 //     BotBase& botbase = env.consoles[0];
-//     VideoFeed& feed = env.consoles[0];
-//     VideoOverlay& overlay = env.consoles[0];
+     VideoFeed& feed = env.consoles[0];
+     VideoOverlay& overlay = env.consoles[0];
 
 
 //    change_mount(console, MountState::WYRDEER_ON);
 
+#if 0
+    PokemonBDSP::ShinySparkleSetBDSP set;
+    ShinySparkleTracker tracker(logger, overlay, set, {0, 0, 1, 1});
 
+    AsyncVisualInferenceSession visual(env, console, console, console);
+    visual += tracker;
+//    tracker.process_frame(feed.snapshot(), std::chrono::system_clock::now());
+#endif
+
+
+#if 1
+    FlagTracker tracker(logger, overlay);
+
+
+//    QImage src("20220315-054734853907.jpg");
+    QImage src("20220315-055335301551.jpg");
+    auto start = std::chrono::system_clock::now();
+    uint64_t c = 0;
+    while (std::chrono::system_clock::now() - start < std::chrono::seconds(10)){
+        tracker.process_frame(src, std::chrono::system_clock::now());
+        env.check_stopping();
+        c++;
+//        break;
+    }
+    auto elapsed = std::chrono::system_clock::now() - start;
+    auto micros = std::chrono::duration_cast<std::chrono::microseconds>(elapsed);
+    cout << "iterations/sec = " << (double)c / micros.count() * 1000000 << endl;
+#endif
 
 
 #if 0
@@ -479,7 +502,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 //    InferenceBoxScope box(console, {0.450, 0.005, 0.040, 0.010});
-//    ImageStats stats = image_stats(extract_box(console.video().snapshot(), box));
+//    ImageStats stats = image_stats(extract_box_reference(console.video().snapshot(), box));
 //    cout << stats.average << stats.stddev << endl;
 
 
@@ -577,7 +600,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 //    InferenceBoxScope box(overlay, 0.49, 0.07, 0.02, 0.03);
-//    ImageStats stats = image_stats(extract_box(feed.snapshot(), box));
+//    ImageStats stats = image_stats(extract_box_reference(feed.snapshot(), box));
 //    cout << stats.average << stats.stddev << endl;
 
 

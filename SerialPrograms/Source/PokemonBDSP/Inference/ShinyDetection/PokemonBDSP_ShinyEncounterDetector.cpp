@@ -35,7 +35,6 @@ ShinyEncounterTracker::ShinyEncounterTracker(
     BattleType battle_type
 )
     : VisualInferenceCallback("ShinyEncounterTracker")
-    , m_battle_type(battle_type)
     , m_logger(logger)
 //    , m_overlay(overlay)
     , m_battle_menu(battle_type)
@@ -135,7 +134,7 @@ void determine_shiny_status(
     {
         std::chrono::milliseconds dialog_duration = dialog_tracker.your_animation_duration();
         std::chrono::milliseconds min_delay = SHINY_ANIMATION_DELAY - std::chrono::milliseconds(300);
-        std::chrono::milliseconds max_delay = SHINY_ANIMATION_DELAY + std::chrono::milliseconds(500);
+        std::chrono::milliseconds max_delay = SHINY_ANIMATION_DELAY + std::chrono::milliseconds(2000);  //  Add headroom for happiness.
         if (min_delay <= dialog_duration && dialog_duration <= max_delay){
             alpha_own += 3.5;
         }
@@ -201,6 +200,7 @@ void detect_shiny_battle(
     );
     wild_result.best_screenshot = tracker.sparkles_wild_overall().best_image();
     your_result.best_screenshot = tracker.sparkles_own().best_image();
+//    your_result.best_screenshot.save("test.png");
 }
 
 

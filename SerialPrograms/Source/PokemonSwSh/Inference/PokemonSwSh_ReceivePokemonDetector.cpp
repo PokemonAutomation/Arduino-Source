@@ -40,13 +40,9 @@ bool ReceivePokemonDetector::process_frame(
     return receive_is_over(frame);
 }
 bool ReceivePokemonDetector::receive_is_over(const QImage& frame){
-    QImage image0 = extract_box(frame, m_box_top);
-    QImage image1 = extract_box(frame, m_box_top_right);
-    QImage image2 = extract_box(frame, m_box_bot_left);
-
-    ImageStats stats0 = image_stats(image0);
-    ImageStats stats1 = image_stats(image1);
-    ImageStats stats2 = image_stats(image2);
+    ImageStats stats0 = image_stats(extract_box_reference(frame, m_box_top));
+    ImageStats stats1 = image_stats(extract_box_reference(frame, m_box_top_right));
+    ImageStats stats2 = image_stats(extract_box_reference(frame, m_box_bot_left));
 
     FloatPixel expected(193, 78, 56);
     FloatPixel actual0 = stats0.average;

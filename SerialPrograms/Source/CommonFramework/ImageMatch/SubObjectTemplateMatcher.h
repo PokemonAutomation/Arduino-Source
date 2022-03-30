@@ -17,7 +17,7 @@
 
 #include "Common/Compiler.h"
 #include "Common/Cpp/Color.h"
-#include "CommonFramework/BinaryImage/BinaryImage.h"
+#include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 
@@ -39,7 +39,7 @@ public:
     //  Compute RMSD of current object against the template as-is.
     double rmsd(
         ImagePixelBox& object_box,
-        const QImage& image, const ImagePixelBox& subobject_in_image
+        const ConstImageRef& image, const ImagePixelBox& subobject_in_image
     ) const;
 
     //  Replace the background of the image with the "m_background_replacement".
@@ -47,24 +47,24 @@ public:
     //  The background is defined by zero-bits in the binary matrix in "binary_image".
     double rmsd_with_background_replace(
         ImagePixelBox& object_box,
-        const QImage& image, const PackedBinaryMatrix2& binary_image,
+        const ConstImageRef& image, const PackedBinaryMatrix2& binary_image,
         const ImagePixelBox& subobject_in_image
     ) const;
 
     virtual bool matches(
         ImagePixelBox& object_box,
-        const QImage& image,
+        const ConstImageRef& image,
         const WaterfillObject& subobject_in_image
     ) const;
     virtual bool matches_with_background_replace(
         ImagePixelBox& object_box,
-        const QImage& image, const PackedBinaryMatrix2& binary_image,
+        const ConstImageRef& image, const PackedBinaryMatrix2& binary_image,
         const WaterfillObject& subobject_in_image
     ) const;
 
 
 protected:
-    virtual bool check_image(const QImage& image) const{ return true; };
+    virtual bool check_image(const ConstImageRef& image) const{ return true; };
 
     void set_subobject(const WaterfillObject& subobject_in_object);
     bool check_aspect_ratio(size_t candidate_width, size_t candidate_height) const;

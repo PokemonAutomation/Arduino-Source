@@ -9,7 +9,7 @@
 
 #include <vector>
 #include <map>
-#include "CommonFramework/BinaryImage/BinaryImage.h"
+#include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 
 namespace PokemonAutomation{

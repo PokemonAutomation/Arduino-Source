@@ -7,8 +7,10 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Detect_PathMap_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Detect_PathMap_H
 
+#include <deque>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "Pokemon/Pokemon_Types.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
@@ -22,7 +24,7 @@ using namespace Pokemon;
 
 bool read_type_array(
     ConsoleHandle& console,
-    const QImage& screen,
+    const ConstImageRef& screen,
     const ImageFloatBox& box,
     std::deque<InferenceBoxScope>& hits,
     size_t count,

@@ -7,7 +7,8 @@
 #include <sstream>
 #include <QImage>
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
-#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "PokemonSwSh_SparkleDetectorRadial.h"
 #include "PokemonSwSh_SparkleDetectorSquare.h"
@@ -84,11 +85,11 @@ void ShinySparkleSetSwSh::update_alphas(){
 
 
 
-ShinySparkleSetSwSh find_sparkles(PackedBinaryMatrix2& matrix){
+ShinySparkleSetSwSh find_sparkles(WaterfillSession& session){
     ShinySparkleSetSwSh sparkles;
-    auto finder = make_WaterfillIterator(matrix, 20);
+    auto finder = session.make_iterator(20);
     WaterfillObject object;
-    while (finder->find_next(object)){
+    while (finder->find_next(object, true)){
         RadialSparkleDetector radial_sparkle(object);
         if (radial_sparkle.is_ball()){
             sparkles.balls.emplace_back(object.min_x, object.min_y, object.max_x, object.max_y);
@@ -109,28 +110,27 @@ ShinySparkleSetSwSh find_sparkles(PackedBinaryMatrix2& matrix){
     }
     return sparkles;
 }
-void ShinySparkleSetSwSh::read_from_image(const QImage& image){
+void ShinySparkleSetSwSh::read_from_image(const ConstImageRef& image){
     clear();
-    if (image.isNull()){
+    if (!image){
         return;
     }
 
-    PackedBinaryMatrix2 matrix[4];
-//    matrix0 = compress_rgb32_to_binary_min(image, 160, 160, 0);
-//    matrix1 = compress_rgb32_to_binary_min(image, 176, 176, 0);
-//    matrix2 = compress_rgb32_to_binary_min(image, 192, 192, 0);
-//    matrix3 = compress_rgb32_to_binary_min(image, 208, 208, 0);
-    compress4_rgb32_to_binary_range(
+    std::vector<PackedBinaryMatrix2> matrices = compress_rgb32_to_binary_range(
         image,
-        matrix[0], 0xffa0a000, 0xffffffff,
-        matrix[1], 0xffb0b000, 0xffffffff,
-        matrix[2], 0xffc0c000, 0xffffffff,
-        matrix[3], 0xffd0d000, 0xffffffff
+        {
+            {0xffa0a000, 0xffffffff},
+            {0xffb0b000, 0xffffffff},
+            {0xffc0c000, 0xffffffff},
+            {0xffd0d000, 0xffffffff},
+        }
     );
+    auto session = make_WaterfillSession();
 
     double best_alpha = 0;
-    for (size_t c = 0; c < 4; c++){
-        ShinySparkleSetSwSh sparkles = find_sparkles(matrix[c]);
+    for (PackedBinaryMatrix2& matrix : matrices){
+        session->set_source(matrix);
+        ShinySparkleSetSwSh sparkles = find_sparkles(*session);
         sparkles.update_alphas();
         double alpha = sparkles.alpha_overall();
         if (best_alpha < alpha){

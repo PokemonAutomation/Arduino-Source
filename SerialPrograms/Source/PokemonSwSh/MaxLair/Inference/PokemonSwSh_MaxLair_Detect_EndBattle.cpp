@@ -48,18 +48,18 @@ bool PokemonCaughtMenuDetector::process_frame(
 
 
 bool PokemonCaughtMenuDetector::detect(const QImage& screen){
-    ImageStats top_white = image_stats(extract_box(screen, m_top_white));
+    ImageStats top_white = image_stats(extract_box_reference(screen, m_top_white));
 //    cout << top_white.average << ", " << top_white.stddev << endl;
     if (!is_solid(top_white, {0.316068, 0.341966, 0.341966})){
 //        cout << "Failed: m_top_white" << endl;
         return false;
     }
-    ImageStats caught_left = image_stats(extract_box(screen, m_caught_left));
+    ImageStats caught_left = image_stats(extract_box_reference(screen, m_caught_left));
     if (!is_black(caught_left)){
 //        cout << "Failed: m_caught_left" << endl;
         return false;
     }
-    ImageStats caught_right = image_stats(extract_box(screen, m_caught_right));
+    ImageStats caught_right = image_stats(extract_box_reference(screen, m_caught_right));
     if (!is_black(caught_right)){
 //        cout << "Failed: m_caught_right" << endl;
         return false;
@@ -68,22 +68,22 @@ bool PokemonCaughtMenuDetector::detect(const QImage& screen){
 //        cout << "Bad left/right distance." << endl;
         return false;
     }
-    ImageStats middle_pink = image_stats(extract_box(screen, m_middle_pink));
+    ImageStats middle_pink = image_stats(extract_box_reference(screen, m_middle_pink));
     if (!is_solid(middle_pink, {0.485975, 0.0980567, 0.415969})){
 //        cout << middle_pink.average << ", " << middle_pink.stddev << endl;
 //        cout << "Failed: m_middle_pink" << endl;
         return false;
     }
-    ImageStats bottom_white = image_stats(extract_box(screen, m_bottom_white));
+    ImageStats bottom_white = image_stats(extract_box_reference(screen, m_bottom_white));
 //    cout << bottom_white.average << ", " << bottom_white.stddev << endl;
     if (!is_solid(bottom_white, {0.331264, 0.332167, 0.336569}, 0.1, 20)){
         return false;
     }
-    ImageStats bottom_black = image_stats(extract_box(screen, m_bottom_black));
+    ImageStats bottom_black = image_stats(extract_box_reference(screen, m_bottom_black));
     if (!is_black(bottom_black)){
         return false;
     }
-    ImageStats bottom_options = image_stats(extract_box(screen, m_bottom_options));
+    ImageStats bottom_options = image_stats(extract_box_reference(screen, m_bottom_options));
     if (bottom_options.stddev.sum() < 30){
         return false;
     }
@@ -100,16 +100,16 @@ size_t count_catches(VideoOverlay& overlay, const QImage& screen){
     InferenceBoxScope box3(overlay, 0.780, 0.400 + 3*0.133, 0.030, 0.030, COLOR_BLUE);
 
     size_t count = 0;
-    if (is_black(image_stats(extract_box(screen, box0)))){
+    if (is_black(image_stats(extract_box_reference(screen, box0)))){
         count++;
     }
-    if (is_white(image_stats(extract_box(screen, box1)))){
+    if (is_white(image_stats(extract_box_reference(screen, box1)))){
         count++;
     }
-    if (is_white(image_stats(extract_box(screen, box2)))){
+    if (is_white(image_stats(extract_box_reference(screen, box2)))){
         count++;
     }
-    if (is_white(image_stats(extract_box(screen, box3)))){
+    if (is_white(image_stats(extract_box_reference(screen, box3)))){
         count++;
     }
 

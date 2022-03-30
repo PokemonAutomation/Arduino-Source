@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_CommonFramework_SolidColorTest_H
 #define PokemonAutomation_CommonFramework_SolidColorTest_H
 
+#include "CommonFramework/ImageTypes/ImageReference.h"
 #include "ImageStats.h"
 
 //#include <iostream>
@@ -40,14 +41,14 @@ bool is_solid(
 
 
 inline bool is_white(
-    const QImage& image,
+    const ConstImageRef& image,
     double min_rgb_sum = 500,
     double max_stddev_sum = 10
 ){
     return is_white(image_stats(image), min_rgb_sum, max_stddev_sum);
 }
 inline bool is_black(
-    const QImage& image,
+    const ConstImageRef& image,
     double max_rgb_sum = 100,
     double max_stddev_sum = 10
 ){
@@ -56,14 +57,14 @@ inline bool is_black(
     return is_black(stats, max_rgb_sum, max_stddev_sum);
 }
 inline bool is_grey(
-    const QImage& image,
+    const ConstImageRef& image,
     double min_rgb_sum, double max_rgb_sum,
     double max_stddev_sum = 10
 ){
     return is_grey(image_stats(image), min_rgb_sum, max_rgb_sum, max_stddev_sum);
 }
 inline bool is_solid(
-    const QImage& image,
+    const ConstImageRef& image,
     const FloatPixel& expected_color_ratio,
     double max_euclidean_distance = 0.15,
     double max_stddev_sum = 10

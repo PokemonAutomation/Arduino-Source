@@ -24,7 +24,7 @@ std::string read_boss_sprite(ConsoleHandle& console);
 //  OCR the Pokemon name and return all possible candidates.
 std::set<std::string> read_pokemon_name(
     LoggerQt& logger,
-    const QImage& screen, const QImage& image,
+    const ConstImageRef& screen, const ConstImageRef& image,
     Language language
 );
 

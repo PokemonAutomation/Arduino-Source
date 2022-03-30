@@ -9,10 +9,11 @@
 #include "Common/Qt/ImageOpener.h"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
-#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
@@ -77,7 +78,8 @@ QImage make_MountMatcher2Image(const char* path){
     }
 
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(image, 0xff808080, 0xffffffff);
-    auto finder = make_WaterfillIterator(matrix, 50);
+    auto session = make_WaterfillSession(matrix);
+    auto finder = session->make_iterator(50);
 
     WaterfillObject plus, arrowL, arrowR;
 
@@ -91,8 +93,8 @@ QImage make_MountMatcher2Image(const char* path){
 
 
     WaterfillObject object;
-    while (finder->find_next(object)){
-        QImage cropped = extract_box(image, object);
+    while (finder->find_next(object, false)){
+        ConstImageRef cropped = extract_box_reference(image, object);
 //        cropped.save("test-" + QString::number(c++) + ".png");
 
         double current_rmsd_plus = ButtonMatcher::Plus().rmsd_precropped(cropped, object);
@@ -128,7 +130,7 @@ QImage make_MountMatcher2Image(const char* path){
     plus.merge_assume_no_overlap(arrowL);
     plus.merge_assume_no_overlap(arrowR);
 
-    return extract_box(image, plus);
+    return extract_box_copy(image, plus);
 }
 
 class MountMatcherButtons : public ImageMatch::ExactImageMatcher{
@@ -351,6 +353,20 @@ const char* MOUNT_STATE_STRINGS[] = {
     "Braviary On",
 };
 
+const std::map<QString, MountState> MOUNT_STATE_MAP{
+    {MOUNT_STATE_STRINGS[0], MountState::NOTHING},
+    {MOUNT_STATE_STRINGS[1], MountState::WYRDEER_OFF},
+    {MOUNT_STATE_STRINGS[2], MountState::WYRDEER_ON},
+    {MOUNT_STATE_STRINGS[3], MountState::URSALUNA_OFF},
+    {MOUNT_STATE_STRINGS[4], MountState::URSALUNA_ON},
+    {MOUNT_STATE_STRINGS[5], MountState::BASCULEGION_OFF},
+    {MOUNT_STATE_STRINGS[6], MountState::BASCULEGION_ON},
+    {MOUNT_STATE_STRINGS[7], MountState::SNEASLER_OFF},
+    {MOUNT_STATE_STRINGS[8], MountState::SNEASLER_ON},
+    {MOUNT_STATE_STRINGS[9], MountState::BRAVIARY_OFF},
+    {MOUNT_STATE_STRINGS[10], MountState::BRAVIARY_ON},
+};
+
 
 
 MountDetector::MountDetector(MountDetectorLogging logging)
@@ -395,44 +411,35 @@ struct MountDetectorFilteredImage{
     PackedBinaryMatrix2 matrix;
 };
 
-std::vector<MountDetectorFilteredImage> run_filters(const QImage& image, const std::vector<std::pair<uint32_t, uint32_t>>& range){
+std::vector<MountDetectorFilteredImage> run_filters(const ConstImageRef& image, const std::vector<std::pair<uint32_t, uint32_t>>& range){
+    std::vector<PackedBinaryMatrix2> matrices = compress_rgb32_to_binary_range(image, range);
+
     std::vector<MountDetectorFilteredImage> ret(range.size());
+    for (size_t c = 0; c < range.size(); c++){
+        ret[c].matrix = std::move(matrices[c]);
+    }
+
     size_t c = 0;
     for (; c + 3 < range.size(); c += 4){
         filter4_rgb32_range(
             image,
-            ret[0].image, range[0].first, range[0].second, COLOR_BLACK, false,
-            ret[1].image, range[1].first, range[1].second, COLOR_BLACK, false,
-            ret[2].image, range[2].first, range[2].second, COLOR_BLACK, false,
-            ret[3].image, range[3].first, range[3].second, COLOR_BLACK, false
-        );
-        compress4_rgb32_to_binary_range(
-            image,
-            ret[0].matrix, range[0].first, range[0].second,
-            ret[1].matrix, range[1].first, range[1].second,
-            ret[2].matrix, range[2].first, range[2].second,
-            ret[3].matrix, range[3].first, range[3].second
+            ret[c + 0].image, range[c + 0].first, range[c + 0].second, COLOR_BLACK, false,
+            ret[c + 1].image, range[c + 1].first, range[c + 1].second, COLOR_BLACK, false,
+            ret[c + 2].image, range[c + 2].first, range[c + 2].second, COLOR_BLACK, false,
+            ret[c + 3].image, range[c + 3].first, range[c + 3].second, COLOR_BLACK, false
         );
     }
     for (; c + 1 < range.size(); c += 2){
         filter2_rgb32_range(
             image,
-            ret[0].image, range[0].first, range[0].second, COLOR_BLACK, false,
-            ret[1].image, range[1].first, range[1].second, COLOR_BLACK, false
-        );
-        compress2_rgb32_to_binary_range(
-            image,
-            ret[0].matrix, range[0].first, range[0].second,
-            ret[1].matrix, range[1].first, range[1].second
+            ret[c + 0].image, range[c + 0].first, range[c + 0].second, COLOR_BLACK, false,
+            ret[c + 1].image, range[c + 1].first, range[c + 1].second, COLOR_BLACK, false
         );
     }
     if (c < range.size()){
         filter1_rgb32_range(
             image,
-            ret[0].image, range[0].first, range[0].second, COLOR_BLACK, false
-        );
-        ret[0].matrix = compress_rgb32_to_binary_range(
-            image, range[0].first, range[0].second
+            ret[c].image, range[c].first, range[c].second, COLOR_BLACK, false
         );
     }
     return ret;
@@ -440,7 +447,7 @@ std::vector<MountDetectorFilteredImage> run_filters(const QImage& image, const s
 
 
 MountState MountDetector::detect(const QImage& screen) const{
-    QImage image = extract_box(screen, m_box);
+    ConstImageRef image = extract_box_reference(screen, m_box);
 
     MountCandiateTracker candidates;
     WaterfillObject plus, arrowL, arrowR;
@@ -449,27 +456,29 @@ MountState MountDetector::detect(const QImage& screen) const{
     double rmsd_plus = 99999;
     double rmsd_arrowL = 99999;
     double rmsd_arrowR = 99999;
+    auto session = make_WaterfillSession();
     {
         std::vector<MountDetectorFilteredImage> filtered_images = run_filters(
             image,
             {
-                {0xff808080, 0xffffffff},
-                {0xff909090, 0xffffffff},
-                {0xffa0a0a0, 0xffffffff},
-                {0xffb0b0b0, 0xffffffff},
-                {0xffc0c0c0, 0xffffffff},
-                {0xffd0d0d0, 0xffffffff},
-                {0xffe0e0e0, 0xffffffff},
-                {0xfff0f0f0, 0xffffffff},
+                {0xff808060, 0xffffffff},
+                {0xff909070, 0xffffffff},
+                {0xffa0a080, 0xffffffff},
+                {0xffb0b090, 0xffffffff},
+                {0xffc0c0a0, 0xffffffff},
+                {0xffd0d0b0, 0xffffffff},
+                {0xffe0e0c0, 0xffffffff},
+                {0xfff0f0d0, 0xffffffff},
             }
         );
 //        static int c = 0;
         for (MountDetectorFilteredImage& filtered : filtered_images){
 //            cout << filtered.matrix.dump() << endl;
-            auto finder = make_WaterfillIterator(filtered.matrix, 50);
+            session->set_source(filtered.matrix);
+            auto finder = session->make_iterator(50);
             WaterfillObject object;
 //            int c = 0;
-            while (finder->find_next(object)){
+            while (finder->find_next(object, false)){
 //                c++;
                 //  Skip anything that touches the borders.
                 if (object.min_x == 0 || object.min_y == 0 ||
@@ -479,7 +488,7 @@ MountState MountDetector::detect(const QImage& screen) const{
                     continue;
                 }
 
-                QImage cropped = extract_box(image, object);
+                ConstImageRef cropped = extract_box_reference(image, object);
 
 //                cout << "object = " << c << endl;
 //                cropped.save("object-" + QString::number(c) + ".png");
@@ -506,14 +515,14 @@ MountState MountDetector::detect(const QImage& screen) const{
                 }
 
                 //  Skip bad geometry.
-                if (object.width() * 2 < (size_t)image.width()){
+                if (object.width() * 2 < image.width()){
                     continue;
                 }
-                if (object.height() * 3 < (size_t)image.height()){
+                if (object.height() * 3 < image.height()){
                     continue;
                 }
 
-                QImage filtered_cropped = extract_box(filtered.image, object);
+                ConstImageRef filtered_cropped = extract_box_reference(filtered.image, object);
 #if 1
                 candidates.add_filtered(MountWyrdeerMatcher      ::off().rmsd_precropped(filtered_cropped, object), MountState::WYRDEER_OFF);
                 candidates.add_direct  (MountWyrdeerMatcher      ::off().rmsd_precropped(cropped         , object), MountState::WYRDEER_OFF);
@@ -547,7 +556,7 @@ MountState MountDetector::detect(const QImage& screen) const{
         arrows.merge_assume_no_overlap(arrowL);
         arrows.merge_assume_no_overlap(arrowR);
 
-        QImage cropped = extract_box(image, arrows);
+        ConstImageRef cropped = extract_box_reference(image, arrows);
 
 //        cout << "Start mounts" << endl;
 
@@ -583,9 +592,10 @@ MountState MountDetector::detect(const QImage& screen) const{
         );
 //        int i = 0;
         for (MountDetectorFilteredImage& filtered : filtered_images){
-            auto finder = make_WaterfillIterator(filtered.matrix, 50);
+            session->set_source(filtered.matrix);
+            auto finder = session->make_iterator(50);
             WaterfillObject object;
-            while (finder->find_next(object)){
+            while (finder->find_next(object, false)){
                 //  Skip anything that touches the borders.
                 if (object.min_x == 0 || object.min_y == 0 ||
                     object.max_x - 1 == (size_t)image.width() ||
@@ -600,8 +610,8 @@ MountState MountDetector::detect(const QImage& screen) const{
                     continue;
                 }
 
-                QImage cropped = extract_box(image, object);
-                QImage filtered_cropped = extract_box(filtered.image, object);
+                ConstImageRef cropped = extract_box_reference(image, object);
+                ConstImageRef filtered_cropped = extract_box_reference(filtered.image, object);
 #if 1
                 candidates.add_filtered(MountWyrdeerMatcher      ::on().rmsd(filtered_cropped), MountState::WYRDEER_ON);
                 candidates.add_direct  (MountWyrdeerMatcher      ::on().rmsd(cropped         ), MountState::WYRDEER_ON);

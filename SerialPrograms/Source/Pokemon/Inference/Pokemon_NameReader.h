@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_Pokemon_PokemonNameReader_H
 #define PokemonAutomation_Pokemon_PokemonNameReader_H
 
-#include <QImage>
 #include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/ImageTypes/ImageReference.h"
 #include "CommonFramework/OCR/OCR_LargeDictionaryMatcher.h"
 
 namespace PokemonAutomation{
@@ -30,7 +30,7 @@ public:
     OCR::StringMatchResult read_substring(
         LoggerQt& logger,
         Language language,
-        const QImage& image
+        const ConstImageRef& image
     ) const;
 
 };

@@ -17,13 +17,13 @@ namespace PokemonAutomation{
 namespace Kernels{
 
 
-inline static void print_u8(__m512i x){
+inline void print_u8(__m512i x){
     for (int i = 0; i < 64; i++){
         std::cout << (int)((const unsigned char*)&x)[i] << " ";
     }
     std::cout << std::endl;
 }
-inline static void print_u16(const __m512i& x){
+inline void print_u16(const __m512i& x){
     union{
         __m512i v;
         uint16_t s[32];
@@ -34,7 +34,7 @@ inline static void print_u16(const __m512i& x){
     }
     std::cout << std::endl;
 }
-inline static void print_u32(const __m512i& x){
+inline void print_u32(const __m512i& x){
     union{
         __m512i v;
         uint32_t s[16];
@@ -45,7 +45,7 @@ inline static void print_u32(const __m512i& x){
     }
     std::cout << std::endl;
 }
-inline static void print_u64(const __m512i& x){
+inline void print_u64(const __m512i& x){
     union{
         __m512i v;
         uint64_t s[8];
@@ -82,14 +82,14 @@ inline static void print_u64(const __m512i& x){
     e56, e57, e58, e59, e60, e61, e62, e63  \
 )   \
     _mm512_setr_epi16(  \
-        (e00) | ((e01) << 8), (e02) | ((e03) << 8), (e04) | ((e05) << 8), (e06) | ((e07) << 8), \
-        (e08) | ((e09) << 8), (e10) | ((e11) << 8), (e12) | ((e13) << 8), (e14) | ((e15) << 8), \
-        (e16) | ((e17) << 8), (e18) | ((e19) << 8), (e20) | ((e21) << 8), (e22) | ((e23) << 8), \
-        (e24) | ((e25) << 8), (e26) | ((e27) << 8), (e28) | ((e29) << 8), (e30) | ((e31) << 8), \
-        (e32) | ((e33) << 8), (e34) | ((e35) << 8), (e36) | ((e37) << 8), (e38) | ((e39) << 8), \
-        (e40) | ((e41) << 8), (e42) | ((e43) << 8), (e44) | ((e45) << 8), (e46) | ((e47) << 8), \
-        (e48) | ((e49) << 8), (e50) | ((e51) << 8), (e52) | ((e53) << 8), (e54) | ((e55) << 8), \
-        (e56) | ((e57) << 8), (e58) | ((e59) << 8), (e60) | ((e61) << 8), (e62) | ((e63) << 8)  \
+        (uint8_t)(e00) | ((uint8_t)(e01) << 8), (uint8_t)(e02) | ((uint8_t)(e03) << 8), (uint8_t)(e04) | ((uint8_t)(e05) << 8), (uint8_t)(e06) | ((uint8_t)(e07) << 8), \
+        (uint8_t)(e08) | ((uint8_t)(e09) << 8), (uint8_t)(e10) | ((uint8_t)(e11) << 8), (uint8_t)(e12) | ((uint8_t)(e13) << 8), (uint8_t)(e14) | ((uint8_t)(e15) << 8), \
+        (uint8_t)(e16) | ((uint8_t)(e17) << 8), (uint8_t)(e18) | ((uint8_t)(e19) << 8), (uint8_t)(e20) | ((uint8_t)(e21) << 8), (uint8_t)(e22) | ((uint8_t)(e23) << 8), \
+        (uint8_t)(e24) | ((uint8_t)(e25) << 8), (uint8_t)(e26) | ((uint8_t)(e27) << 8), (uint8_t)(e28) | ((uint8_t)(e29) << 8), (uint8_t)(e30) | ((uint8_t)(e31) << 8), \
+        (uint8_t)(e32) | ((uint8_t)(e33) << 8), (uint8_t)(e34) | ((uint8_t)(e35) << 8), (uint8_t)(e36) | ((uint8_t)(e37) << 8), (uint8_t)(e38) | ((uint8_t)(e39) << 8), \
+        (uint8_t)(e40) | ((uint8_t)(e41) << 8), (uint8_t)(e42) | ((uint8_t)(e43) << 8), (uint8_t)(e44) | ((uint8_t)(e45) << 8), (uint8_t)(e46) | ((uint8_t)(e47) << 8), \
+        (uint8_t)(e48) | ((uint8_t)(e49) << 8), (uint8_t)(e50) | ((uint8_t)(e51) << 8), (uint8_t)(e52) | ((uint8_t)(e53) << 8), (uint8_t)(e54) | ((uint8_t)(e55) << 8), \
+        (uint8_t)(e56) | ((uint8_t)(e57) << 8), (uint8_t)(e58) | ((uint8_t)(e59) << 8), (uint8_t)(e60) | ((uint8_t)(e61) << 8), (uint8_t)(e62) | ((uint8_t)(e63) << 8)  \
     )
 
 

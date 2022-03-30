@@ -7,6 +7,7 @@
  *
  */
 
+#include <QImage>
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/ColorClustering.h"
 #include "CommonFramework/Inference/InferenceThrottler.h"
@@ -26,21 +27,19 @@ SummaryShinySymbolDetector::SummaryShinySymbolDetector(LoggerQt& logger, VideoOv
 
 SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::detect(const QImage& screen){
     {
-        QImage state = extract_box(screen, m_state1_box);
-        ImageStats stats = image_stats(state);
+        ImageStats stats = image_stats(extract_box_reference(screen, m_state1_box));
         if (!is_black(stats)){
             return Detection::NO_DETECTION;
         }
     }
     {
-        QImage state = extract_box(screen, m_state0_box);
-        ImageStats stats = image_stats(state);
+        ImageStats stats = image_stats(extract_box_reference(screen, m_state0_box));
         if (!is_solid(stats, {0.70, 0.07, 0.23}, 0.2, 10)){
             return Detection::NO_DETECTION;
         }
     }
 
-    QImage symbol = extract_box(screen, m_symbol_box);
+    ConstImageRef symbol = extract_box_reference(screen, m_symbol_box);
     if (cluster_fit_2(
         symbol,
         qRgb(255, 255, 255), 0.84,

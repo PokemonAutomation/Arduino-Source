@@ -30,15 +30,15 @@ void ProfessorSwapDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_YELLOW, m_bottom_main);
 }
 bool ProfessorSwapDetector::detect(const QImage& screen){
-//    ImageStats dialog_left = image_stats(extract_box(screen, m_dialog0));
+//    ImageStats dialog_left = image_stats(extract_box_reference(screen, m_dialog0));
 //    if (!is_grey(dialog_left, 0, 200)){
 //        return false;
 //    }
-//    ImageStats dialog_right = image_stats(extract_box(screen, m_dialog1));
+//    ImageStats dialog_right = image_stats(extract_box_reference(screen, m_dialog1));
 //    if (!is_grey(dialog_right, 0, 200)){
 //        return false;
 //    }
-    ImageStats dialog_left = image_stats(extract_box(screen, m_bottom_main));
+    ImageStats dialog_left = image_stats(extract_box_reference(screen, m_bottom_main));
     if (!is_black(dialog_left)){
         return false;
     }

@@ -87,7 +87,7 @@ void GenerateNameOCRDataPokedex::read(
 void GenerateNameOCRDataPokedex::dump_images(
     const std::vector<std::string>& expected,
     size_t index,
-    QImage image
+    const QImage& image
 ) const{
     if (index >= expected.size()){
         return;
@@ -108,7 +108,7 @@ void GenerateNameOCRDataPokedex::dump_images(
     path += ".png";
     image.save(path);
 
-    OCR::make_OCR_filter(image).apply(image);
+//    OCR::make_OCR_filter(image).apply(image);
 }
 
 void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env){
@@ -160,13 +160,13 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env){
 //        cout << "dex: " << c << endl;
 
         QImage frame = env.console.video().snapshot();
-        QImage image0 = extract_box(frame, box0);
-        QImage image1 = extract_box(frame, box1);
-        QImage image2 = extract_box(frame, box2);
-        QImage image3 = extract_box(frame, box3);
-        QImage image4 = extract_box(frame, box4);
-        QImage image5 = extract_box(frame, box5);
-        QImage image6 = extract_box(frame, box6);
+        QImage image0 = extract_box_copy(frame, box0);
+        QImage image1 = extract_box_copy(frame, box1);
+        QImage image2 = extract_box_copy(frame, box2);
+        QImage image3 = extract_box_copy(frame, box3);
+        QImage image4 = extract_box_copy(frame, box4);
+        QImage image5 = extract_box_copy(frame, box5);
+        QImage image6 = extract_box_copy(frame, box6);
 
 //        image1.save("test.png");
 
@@ -181,13 +181,13 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env){
             read(actual, env.console, std::move(image6));
             break;
         case Mode::GENERATE_TRAINING_DATA:
-            dump_images(expected, c - 1 + 0, std::move(image0));
-            dump_images(expected, c - 1 + 1, std::move(image1));
-            dump_images(expected, c - 1 + 2, std::move(image2));
-            dump_images(expected, c - 1 + 3, std::move(image3));
-            dump_images(expected, c - 1 + 4, std::move(image4));
-            dump_images(expected, c - 1 + 5, std::move(image5));
-            dump_images(expected, c - 1 + 6, std::move(image6));
+            dump_images(expected, c - 1 + 0, image0);
+            dump_images(expected, c - 1 + 1, image1);
+            dump_images(expected, c - 1 + 2, image2);
+            dump_images(expected, c - 1 + 3, image3);
+            dump_images(expected, c - 1 + 4, image4);
+            dump_images(expected, c - 1 + 5, image5);
+            dump_images(expected, c - 1 + 6, image6);
             break;
         }
 

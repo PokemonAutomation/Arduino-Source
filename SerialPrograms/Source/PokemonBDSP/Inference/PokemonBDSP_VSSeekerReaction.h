@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <deque>
+#include <QSize>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"

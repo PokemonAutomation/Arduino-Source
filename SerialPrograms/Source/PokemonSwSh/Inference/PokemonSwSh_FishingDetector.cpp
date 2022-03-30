@@ -28,13 +28,13 @@ void FishingMissDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_miss_box);
 }
 bool FishingMissDetector::detect(const QImage& frame){
-    QImage miss_image = extract_box(frame, m_miss_box);
+    ConstImageRef miss_image = extract_box_reference(frame, m_miss_box);
     ImageStats miss_stats = image_stats(miss_image);
     if (!is_white(miss_stats)){
         return false;
     }
 
-    QImage hook_image = extract_box(frame, m_hook_box);
+    ConstImageRef hook_image = extract_box_reference(frame, m_hook_box);
     if (image_stddev(hook_image).sum() < 50){
         return false;
     }
@@ -60,7 +60,7 @@ bool FishingHookDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
-    QImage hook_image = extract_box(frame, m_hook_box);
+    ConstImageRef hook_image = extract_box_reference(frame, m_hook_box);
 
     std::vector<ImagePixelBox> exclamation_marks = find_exclamation_marks(hook_image);
     for (const ImagePixelBox& mark : exclamation_marks){

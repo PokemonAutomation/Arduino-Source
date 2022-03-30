@@ -118,8 +118,6 @@ SOURCES += \
     Source/CommonFramework/AudioPipeline/TimeSampleBuffer.cpp \
     Source/CommonFramework/AudioPipeline/TimeSampleBufferReader.cpp \
     Source/CommonFramework/AudioPipeline/WavFile.cpp \
-    Source/CommonFramework/BinaryImage/BinaryImage.cpp \
-    Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.cpp \
     Source/CommonFramework/ControllerDevices/SerialSelector.cpp \
     Source/CommonFramework/ControllerDevices/SerialSelectorWidget.cpp \
     Source/CommonFramework/CrashDump.cpp \
@@ -141,12 +139,15 @@ SOURCES += \
     Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.cpp \
     Source/CommonFramework/ImageMatch/SubObjectTemplateMatcher.cpp \
     Source/CommonFramework/ImageMatch/WaterfillTemplateMatcher.cpp \
+    Source/CommonFramework/ImageTools/BinaryImage_FilterRgb32.cpp \
     Source/CommonFramework/ImageTools/ColorClustering.cpp \
     Source/CommonFramework/ImageTools/FloatPixel.cpp \
     Source/CommonFramework/ImageTools/ImageBoxes.cpp \
     Source/CommonFramework/ImageTools/ImageFilter.cpp \
     Source/CommonFramework/ImageTools/ImageStats.cpp \
     Source/CommonFramework/ImageTools/SolidColorTest.cpp \
+    Source/CommonFramework/ImageTypes/BinaryImage.cpp \
+    Source/CommonFramework/ImageTypes/ImageReference.cpp \
     Source/CommonFramework/Inference/AnomalyDetector.cpp \
     Source/CommonFramework/Inference/AudioTemplateCache.cpp \
     Source/CommonFramework/Inference/BlackBorderDetector.cpp \
@@ -242,15 +243,16 @@ SOURCES += \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_AVX2.cpp \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_SSE41.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.cpp \
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_Default.cpp \
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_AVX2.cpp \
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_AVX512.cpp \
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_SSE42.cpp \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x16_x64_AVX2.cpp \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x4_Default.cpp \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x64_x64_AVX512.cpp \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x8_x64_SSE42.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.cpp \
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_Default.cpp \
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_AVX2.cpp \
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_AVX512.cpp \
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_SSE42.cpp \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x16_x64_AVX2.cpp \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x32_x64_AVX512.cpp \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x4_Default.cpp \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x64_x64_AVX512.cpp \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x8_x64_SSE42.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Default.cpp \
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.cpp \
@@ -272,10 +274,12 @@ SOURCES += \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.cpp \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill.cpp \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_Default.cpp \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX2.cpp \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512.cpp \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_SSE42.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Session.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.cpp \
@@ -423,12 +427,15 @@ SOURCES += \
     Source/PokemonLA/Inference/PokemonLA_ShinySoundDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.cpp \
     Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.cpp \
+    Source/PokemonLA/Options/PokemonLA_CustomPathTable.cpp \
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.cpp \
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.cpp \
+    Source/PokemonLA/Options/PokemonLA_TravelLocation.cpp \
     Source/PokemonLA/Panels_PokemonLA.cpp \
     Source/PokemonLA/PokemonLA_Locations.cpp \
     Source/PokemonLA/PokemonLA_Settings.cpp \
     Source/PokemonLA/PokemonLA_TravelLocations.cpp \
+    Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.cpp \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.cpp \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.cpp \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp \
@@ -438,6 +445,7 @@ SOURCES += \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.cpp \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.cpp \
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.cpp \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.cpp \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_MountDetectionTest.cpp \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.cpp \
@@ -719,8 +727,6 @@ HEADERS += \
     Source/CommonFramework/AudioPipeline/TimeSampleBufferReader.h \
     Source/CommonFramework/AudioPipeline/TimeSampleWriter.h \
     Source/CommonFramework/AudioPipeline/WavFile.h \
-    Source/CommonFramework/BinaryImage/BinaryImage.h \
-    Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h \
     Source/CommonFramework/ControllerDevices/SerialSelector.h \
     Source/CommonFramework/ControllerDevices/SerialSelectorWidget.h \
     Source/CommonFramework/CrashDump.h \
@@ -740,6 +746,7 @@ HEADERS += \
     Source/CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h \
     Source/CommonFramework/ImageMatch/SubObjectTemplateMatcher.h \
     Source/CommonFramework/ImageMatch/WaterfillTemplateMatcher.h \
+    Source/CommonFramework/ImageTools/BinaryImage_FilterRgb32.h \
     Source/CommonFramework/ImageTools/ColorClustering.h \
     Source/CommonFramework/ImageTools/DistanceToLine.h \
     Source/CommonFramework/ImageTools/FloatPixel.h \
@@ -747,6 +754,8 @@ HEADERS += \
     Source/CommonFramework/ImageTools/ImageFilter.h \
     Source/CommonFramework/ImageTools/ImageStats.h \
     Source/CommonFramework/ImageTools/SolidColorTest.h \
+    Source/CommonFramework/ImageTypes/BinaryImage.h \
+    Source/CommonFramework/ImageTypes/ImageReference.h \
     Source/CommonFramework/Inference/AnomalyDetector.h \
     Source/CommonFramework/Inference/AudioTemplateCache.h \
     Source/CommonFramework/Inference/BlackBorderDetector.h \
@@ -877,15 +886,17 @@ HEADERS += \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.h \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x16_x64_AVX2.h \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x32_x64_AVX512.h \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x4_Default.h \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x64_x64_AVX512.h \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x8_x64_SSE42.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Debugging.h \
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Default.h \
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_AVX2.h \
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_AVX512.h \
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_SSE42.h \
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_Default.h \
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_x64_AVX2.h \
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_x64_AVX512.h \
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_x64_SSE42.h \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x16_x64_AVX2.h \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x32_x64_AVX512.h \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x4_Default.h \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x64_x64_AVX512.h \
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x8_x64_SSE42.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_t.h \
     Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.h \
     Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.tpp \
@@ -898,18 +909,26 @@ HEADERS += \
     Source/Kernels/Kernels_Alignment.h \
     Source/Kernels/Kernels_Arch.h \
     Source/Kernels/Kernels_BitScan.h \
+    Source/Kernels/Kernels_BitSet.h \
     Source/Kernels/Kernels_x64_AVX2.h \
     Source/Kernels/Kernels_x64_AVX512.h \
     Source/Kernels/Kernels_x64_SSE41.h \
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h \
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h \
     Source/Kernels/Waterfill/Kernels_Waterfill.h \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_Default.h \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX2.h \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512.h \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_SSE42.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h.autosave \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Routines.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Session.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Session.tpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512-GF.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h \
@@ -1069,12 +1088,15 @@ HEADERS += \
     Source/PokemonLA/Inference/PokemonLA_ShinySoundDetector.h \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.h \
     Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h \
+    Source/PokemonLA/Options/PokemonLA_CustomPathTable.h \
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.h \
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.h \
+    Source/PokemonLA/Options/PokemonLA_TravelLocation.h \
     Source/PokemonLA/Panels_PokemonLA.h \
     Source/PokemonLA/PokemonLA_Locations.h \
     Source/PokemonLA/PokemonLA_Settings.h \
     Source/PokemonLA/PokemonLA_TravelLocations.h \
+    Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.h \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.h \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.h \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.h \
@@ -1084,6 +1106,7 @@ HEADERS += \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.h \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.h \
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.h \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.h \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_MountDetectionTest.h \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.h \

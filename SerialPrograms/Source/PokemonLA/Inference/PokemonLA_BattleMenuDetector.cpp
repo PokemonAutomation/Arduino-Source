@@ -39,14 +39,14 @@ bool BattleMenuDetector::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
-    const ImageStats stroke_left = image_stats(extract_box(frame, m_pokemon_stroke_bg_left));
+    const ImageStats stroke_left = image_stats(extract_box_reference(frame, m_pokemon_stroke_bg_left));
     if (is_solid(stroke_left,{0.179,0.386,0.435}, 0.2, 15) == false){
         m_detected.store(false, std::memory_order_release);
         return false;
     }
     
 
-    const ImageStats stroke_right = image_stats(extract_box(frame, m_pokemon_stroke_bg_right));
+    const ImageStats stroke_right = image_stats(extract_box_reference(frame, m_pokemon_stroke_bg_right));
     if (is_solid(stroke_right, {0.228,0.358,0.414}, 0.2, 15) == false){
         m_detected.store(false, std::memory_order_release);
         return false;

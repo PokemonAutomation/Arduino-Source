@@ -5,6 +5,7 @@
  */
 
 #include <cmath>
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
@@ -30,17 +31,22 @@ ImageMatchDetector::ImageMatchDetector(
     , m_color(color)
     , m_box(box)
 {
-    m_reference_image = extract_box(m_reference_image, m_box);
+    m_reference_image = extract_box_copy(m_reference_image, m_box);
 }
 
 double ImageMatchDetector::rmsd(const QImage& frame) const{
     if (frame.isNull()){
         return 1000;
     }
-    QImage scaled = extract_box(frame, m_box);
-    if (scaled.size() != m_reference_image.size()){
-        scaled = scaled.scaled(m_reference_image.size());
+    ConstImageRef image = extract_box_reference(frame, m_box);
+    QImage scaled = image.scaled_to_qimage(m_reference_image.width(), m_reference_image.height());
+
+#if 0
+    if (image.width() != (size_t)scaled.width() || image.height() != (size_t)scaled.height()){
+        cout << image.width() << " x " << image.height() << " - " << scaled.width() << " x " << scaled.height() << endl;
+        dump_image(global_logger_tagged(), ProgramInfo(), "ImageMatchDetector-rmsd", frame);
     }
+#endif
 
     if (m_scale_brightness){
         FloatPixel image_brightness = ImageMatch::pixel_average(scaled, m_reference_image);

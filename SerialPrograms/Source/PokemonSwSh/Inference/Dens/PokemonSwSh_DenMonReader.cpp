@@ -73,12 +73,12 @@ DenMonReadResults DenMonReader::read(const QImage& screen) const{
         return results;
     }
 
-    ImageStats white = image_stats(extract_box(screen, m_white));
+    ImageStats white = image_stats(extract_box_reference(screen, m_white));
     if (!is_solid(white, {0.303079, 0.356564, 0.340357})){
         return results;
     }
     do{
-        ImageStats den_color = image_stats(extract_box(screen, m_den_color));
+        ImageStats den_color = image_stats(extract_box_reference(screen, m_den_color));
 
         if (is_solid(den_color, {0.593023, 0.204651, 0.202326})){
             results.type = DenMonReadResults::RED_BEAM;
@@ -91,7 +91,7 @@ DenMonReadResults DenMonReader::read(const QImage& screen) const{
             break;
         }
 
-        ImageStats lair_pink = image_stats(extract_box(screen, m_lair_pink));
+        ImageStats lair_pink = image_stats(extract_box_reference(screen, m_lair_pink));
 //        cout << lair_pink.average << lair_pink.stddev << endl;
 
         if (is_solid(lair_pink, {0.448155, 0.177504, 0.374341})){
@@ -104,10 +104,10 @@ DenMonReadResults DenMonReader::read(const QImage& screen) const{
     }while (false);
 
 
-    QImage processed = extract_box(screen, m_sprite);
+    ConstImageRef processed = extract_box_reference(screen, m_sprite);
 //    processed.save("processed.png");
 //    processed = ImageMatch::black_filter_to_alpha(processed);
-    results.slugs = m_matcher.match(std::move(processed), ALPHA_SPREAD);
+    results.slugs = m_matcher.match(processed, ALPHA_SPREAD);
     results.slugs.log(m_logger, MAX_ALPHA);
 
     results.slugs.clear_beyond_alpha(MAX_ALPHA);

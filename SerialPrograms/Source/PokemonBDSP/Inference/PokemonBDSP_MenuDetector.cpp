@@ -36,27 +36,27 @@ void MenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_cross);
 }
 bool MenuDetector::detect(const QImage& screen) const{
-    ImageStats stats0 = image_stats(extract_box(screen, m_line0));
+    ImageStats stats0 = image_stats(extract_box_reference(screen, m_line0));
     if (!is_white(stats0)){
         return false;
     }
-    ImageStats stats1 = image_stats(extract_box(screen, m_line1));
+    ImageStats stats1 = image_stats(extract_box_reference(screen, m_line1));
     if (!is_white(stats1)){
         return false;
     }
-    ImageStats stats2 = image_stats(extract_box(screen, m_line2));
+    ImageStats stats2 = image_stats(extract_box_reference(screen, m_line2));
     if (!is_white(stats2)){
         return false;
     }
-    ImageStats stats3 = image_stats(extract_box(screen, m_line3));
+    ImageStats stats3 = image_stats(extract_box_reference(screen, m_line3));
     if (!is_white(stats3)){
         return false;
     }
-    ImageStats stats4 = image_stats(extract_box(screen, m_line4));
+    ImageStats stats4 = image_stats(extract_box_reference(screen, m_line4));
     if (!is_white(stats4)){
         return false;
     }
-    ImageStats cross = image_stats(extract_box(screen, m_cross));
+    ImageStats cross = image_stats(extract_box_reference(screen, m_cross));
 //    cout << cross.average << cross.stddev << endl;
     if (cross.stddev.sum() < 100){
         return false;

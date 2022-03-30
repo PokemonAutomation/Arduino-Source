@@ -32,7 +32,7 @@ IVCheckerReaderScope::IVCheckerReaderScope(VideoOverlay& overlay, Language langu
 
 
 IVCheckerValue IVCheckerReaderScope::read(LoggerQt& logger, const QImage& frame, const InferenceBoxScope& box){
-    QImage image = extract_box(frame, box);
+    QImage image = extract_box_copy(frame, box);
     OCR::make_OCR_filter(image).apply(image);
 //    image.save("test.png");
 
@@ -61,12 +61,12 @@ IVCheckerReader::Results IVCheckerReaderScope::read(LoggerQt& logger, const QIma
 
 std::vector<QImage> IVCheckerReaderScope::dump_images(const QImage& frame){
     std::vector<QImage> images;
-    images.emplace_back(extract_box(frame, m_box0));
-    images.emplace_back(extract_box(frame, m_box1));
-    images.emplace_back(extract_box(frame, m_box2));
-    images.emplace_back(extract_box(frame, m_box3));
-    images.emplace_back(extract_box(frame, m_box4));
-    images.emplace_back(extract_box(frame, m_box5));
+    images.emplace_back(extract_box_copy(frame, m_box0));
+    images.emplace_back(extract_box_copy(frame, m_box1));
+    images.emplace_back(extract_box_copy(frame, m_box2));
+    images.emplace_back(extract_box_copy(frame, m_box3));
+    images.emplace_back(extract_box_copy(frame, m_box4));
+    images.emplace_back(extract_box_copy(frame, m_box5));
     return images;
 }
 

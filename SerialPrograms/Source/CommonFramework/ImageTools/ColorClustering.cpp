@@ -48,12 +48,12 @@ double PixelEuclideanStatAccumulator::deviation() const{
 
 
 double cluster_fit_2(
-    const QImage& image,
+    const ConstImageRef& image,
     QRgb color0, PixelEuclideanStatAccumulator& cluster0,
     QRgb color1, PixelEuclideanStatAccumulator& cluster1
 ){
-    pxint_t width = image.width();
-    pxint_t height = image.height();
+    size_t width = image.width();
+    size_t height = image.height();
 
     FloatPixel f0(color0);
     FloatPixel f1(color1);
@@ -64,8 +64,8 @@ double cluster_fit_2(
 //    image.save("points.png");
 //    std::fstream ss("points.txt", std::fstream::out);
 
-    for (pxint_t r = 0; r < height; r++){
-        for (pxint_t c = 0; c < width; c++){
+    for (size_t r = 0; r < height; r++){
+        for (size_t c = 0; c < width; c++){
             QRgb pixel = image.pixel(c, r);
 //            ss << "{" << qRed(pixel) << ", " << qGreen(pixel) << ", " << qBlue(pixel) << "}," << endl;
             FloatPixel p0 = f0 - pixel;
@@ -94,7 +94,7 @@ double cluster_fit_2(
 }
 
 bool cluster_fit_2(
-    const QImage& image,
+    const ConstImageRef& image,
     QRgb color0, double ratio0,
     QRgb color1, double ratio1,
     double ratio_threshold,
@@ -103,10 +103,10 @@ bool cluster_fit_2(
 ){
     const size_t NUM_CLUSTERS = 2;
 
-    if (image.isNull()){
+    if (!image){
         return false;
     }
-    size_t total = (size_t)image.width() * image.height();
+    size_t total = image.width() * image.height();
 
     FloatPixel center_desired[NUM_CLUSTERS] = {color0, color1};
     double count_ratio_desired[NUM_CLUSTERS] = {ratio0, ratio1};

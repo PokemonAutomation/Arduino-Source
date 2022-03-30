@@ -7,9 +7,9 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
-#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
 #include "PokemonSwSh_MarkFinder.h"
 
 namespace PokemonAutomation{
@@ -61,7 +61,7 @@ public:
             0, 160,
             0, 192
         );
-        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
+        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20);
         if (objects.size() != 2){
             throw FileException(
                 nullptr, PA_CURRENT_FUNCTION,
@@ -87,7 +87,7 @@ const ImageMatch::ExactImageMatcher& QUESTION_TOP(){
     return matcher;
 }
 
-bool is_question_mark(const QImage& image, const WaterfillObject& object){
+bool is_question_mark(const ConstImageRef& image, const WaterfillObject& object){
     size_t width = object.width();
     size_t height = object.height();
 
@@ -99,10 +99,7 @@ bool is_question_mark(const QImage& image, const WaterfillObject& object){
     }
 
 //    const QImage& exclamation_mark = QUESTION_TOP();
-    QImage scaled = image.copy(
-        (pxint_t)object.min_x, (pxint_t)object.min_y,
-        (pxint_t)width, (pxint_t)height
-    );
+    ConstImageRef scaled = extract_box_reference(image, object);
 //    scaled = scaled.scaled(exclamation_mark.width(), exclamation_mark.height());
     double rmsd = QUESTION_TOP().rmsd(scaled);
 //    double rmsd = ImageMatch::pixel_RMSD(exclamation_mark, scaled);
@@ -112,14 +109,14 @@ bool is_question_mark(const QImage& image, const WaterfillObject& object){
     return rmsd <= 100;
 }
 
-std::vector<ImagePixelBox> find_exclamation_marks(const QImage& image){
+std::vector<ImagePixelBox> find_exclamation_marks(const ConstImageRef& image){
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(
         image,
         160, 255,
         0, 160,
         0, 192
     );
-    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20);
 #if 0
     cout << "objects = " << objects.size() << endl;
     static int c = 0;
@@ -138,14 +135,14 @@ std::vector<ImagePixelBox> find_exclamation_marks(const QImage& image){
     }
     return ret;
 }
-std::vector<ImagePixelBox> find_question_marks(const QImage& image){
+std::vector<ImagePixelBox> find_question_marks(const ConstImageRef& image){
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(
         image,
         0, 128,
         0, 255,
         128, 255
     );
-    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 50, false);
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 50);
     std::vector<ImagePixelBox> ret;
 #if 1
     for (const WaterfillObject& object : objects){

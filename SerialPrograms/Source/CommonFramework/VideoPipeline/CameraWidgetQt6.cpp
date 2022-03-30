@@ -13,6 +13,7 @@
 #include <QVideoSink>
 #include "CameraWidgetQt6.h"
 
+#include <chrono>
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -155,13 +156,25 @@ void Qt6VideoWidget::set_resolution(const QSize& size){
 }
 
 QImage Qt6VideoWidget::snapshot(){
-    std::unique_lock<std::mutex> lg(m_lock);
-    if (m_camera == nullptr){
-        return QImage();
+    QVideoFrame frame;
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        if (m_camera == nullptr || !m_videoFrame.isValid()){
+            return QImage();
+        }
+        frame = m_videoFrame; // Fast due to ref-count.
     }
 
-    QImage ret = m_videoFrame.toImage();
-
+    // auto time1 = std::chrono::system_clock::now();
+    QImage ret = frame.toImage();
+    // auto time2 = std::chrono::system_clock::now();
+    // std::chrono::duration<double> elapsed_seconds = time2 - time1;
+    // std::cout << "snapshot image conversion time " << elapsed_seconds.count() << "s" << std::endl;
+    // std::cout << "QVideoFrame pixel format " << int(frame.pixelFormat()) << std::endl;
+    QImage::Format format = ret.format();
+    if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
+        ret = ret.convertToFormat(QImage::Format_ARGB32);
+    }
     return ret;
 }
 

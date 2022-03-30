@@ -35,7 +35,6 @@ private:
 
 private:
     class Stats;
-    class RunRoute;
 
     TimeExpressionOption<int16_t> TURN_DURATION;
     TimeExpressionOption<uint16_t> FORWARD_DURATION;

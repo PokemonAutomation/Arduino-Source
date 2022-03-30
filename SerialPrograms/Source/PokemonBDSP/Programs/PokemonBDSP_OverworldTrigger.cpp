@@ -58,27 +58,33 @@ OverworldTrigger::OverworldTrigger()
 void OverworldTrigger::run_trigger(const BotBaseContext& context) const{
     switch (TRIGGER_METHOD){
     case 0:
-        pbf_move_left_joystick(context, 0, 128, MOVE_DURATION, 0);
+        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 0, 128, 128, 128, MOVE_DURATION);
+//        pbf_move_left_joystick(context, 0, 128, MOVE_DURATION, 0);
         pbf_move_left_joystick(context, 255, 128, MOVE_DURATION, 0);
         break;
     case 1:
-        pbf_move_left_joystick(context, 0, 128, MOVE_DURATION + 25, 0);
+        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 0, 128, 128, 128, MOVE_DURATION + 25);
+//        pbf_move_left_joystick(context, 0, 128, MOVE_DURATION + 25, 0);
         pbf_move_left_joystick(context, 255, 128, MOVE_DURATION, 0);
         break;
     case 2:
-        pbf_move_left_joystick(context, 255, 128, MOVE_DURATION + 25, 0);
+        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 255, 128, 128, 128, MOVE_DURATION + 25);
+//        pbf_move_left_joystick(context, 255, 128, MOVE_DURATION + 25, 0);
         pbf_move_left_joystick(context, 0, 128, MOVE_DURATION, 0);
         break;
     case 3:
-        pbf_move_left_joystick(context, 128, 0, MOVE_DURATION, 0);
+        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, MOVE_DURATION);
+//        pbf_move_left_joystick(context, 128, 0, MOVE_DURATION, 0);
         pbf_move_left_joystick(context, 128, 255, MOVE_DURATION, 0);
         break;
     case 4:
-        pbf_move_left_joystick(context, 128, 0, MOVE_DURATION + 25, 0);
+        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 0, 128, 128, MOVE_DURATION + 25);
+//        pbf_move_left_joystick(context, 128, 0, MOVE_DURATION + 25, 0);
         pbf_move_left_joystick(context, 128, 255, MOVE_DURATION, 0);
         break;
     case 5:
-        pbf_move_left_joystick(context, 128, 255, MOVE_DURATION + 25, 0);
+        pbf_controller_state(context, BUTTON_B, DPAD_NONE, 128, 255, 128, 128, MOVE_DURATION + 25);
+//        pbf_move_left_joystick(context, 128, 255, MOVE_DURATION + 25, 0);
         pbf_move_left_joystick(context, 128, 0, MOVE_DURATION, 0);
         break;
     }

@@ -18,6 +18,8 @@ namespace Kernels{
 namespace Waterfill{
 
 
+class WaterfillIterator;
+
 
 class WaterfillObject{
 public:
@@ -118,8 +120,6 @@ public:
     uint64_t sum_x = 0;
     uint64_t sum_y = 0;
 
-    //  The object itself in the original image.
-//    SparseBinaryMatrix object;
     std::unique_ptr<SparseBinaryMatrix_IB> object;
 };
 

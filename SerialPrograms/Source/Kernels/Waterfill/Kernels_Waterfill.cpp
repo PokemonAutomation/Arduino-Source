@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/CpuId.h"
 #include "Kernels_Waterfill.h"
+#include "Kernels_Waterfill_Session.h"
 
 #include <iostream>
 using std::cout;
@@ -17,106 +18,39 @@ namespace Waterfill{
 
 
 
-bool find_object_on_bit_Default     (PackedBinaryMatrix_IB& matrix, WaterfillObject& object, size_t x, size_t y);
-bool find_object_on_bit_x64_SSE42   (PackedBinaryMatrix_IB& matrix, WaterfillObject& object, size_t x, size_t y);
-bool find_object_on_bit_x64_AVX2    (PackedBinaryMatrix_IB& matrix, WaterfillObject& object, size_t x, size_t y);
-bool find_object_on_bit_x64_AVX512  (PackedBinaryMatrix_IB& matrix, WaterfillObject& object, size_t x, size_t y);
-bool find_object_on_bit_x64_AVX512GF(PackedBinaryMatrix_IB& matrix, WaterfillObject& object, size_t x, size_t y);
+std::vector<WaterfillObject> find_objects_inplace_64x4_Default      (PackedBinaryMatrix_IB& matrix, size_t min_area);
+std::vector<WaterfillObject> find_objects_inplace_64x8_x64_SSE42    (PackedBinaryMatrix_IB& matrix, size_t min_area);
+std::vector<WaterfillObject> find_objects_inplace_64x16_x64_AVX2    (PackedBinaryMatrix_IB& matrix, size_t min_area);
+std::vector<WaterfillObject> find_objects_inplace_64x64_x64_AVX512  (PackedBinaryMatrix_IB& matrix, size_t min_area);
+std::vector<WaterfillObject> find_objects_inplace_64x64_x64_AVX512GF(PackedBinaryMatrix_IB& matrix, size_t min_area);
+std::vector<WaterfillObject> find_objects_inplace_64x32_x64_AVX512GF(PackedBinaryMatrix_IB& matrix, size_t min_area);
 
-bool find_object_on_bit(PackedBinaryMatrix_IB& matrix, WaterfillObject& object, size_t x, size_t y){
+std::vector<WaterfillObject> find_objects_inplace(PackedBinaryMatrix_IB& matrix, size_t min_area){
     switch (matrix.type()){
+#ifdef PA_AutoDispatch_19_IceLake
+    case BinaryMatrixType::i64x32_AVX512:
+            return find_objects_inplace_64x32_x64_AVX512GF(matrix, min_area);
+#endif
 #ifdef PA_AutoDispatch_17_Skylake
-    case BinaryMatrixType::AVX512:
+    case BinaryMatrixType::i64x64_AVX512:
         if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
-            return find_object_on_bit_x64_AVX512GF(matrix, object, x, y);
+            return find_objects_inplace_64x64_x64_AVX512GF(matrix, min_area);
         }else{
-            return find_object_on_bit_x64_AVX512(matrix, object, x, y);
+            return find_objects_inplace_64x64_x64_AVX512(matrix, min_area);
         }
 #endif
 #ifdef PA_AutoDispatch_13_Haswell
-    case BinaryMatrixType::AVX2:
-        return find_object_on_bit_x64_AVX2(matrix, object, x, y);
+    case BinaryMatrixType::i64x16_AVX2:
+        return find_objects_inplace_64x16_x64_AVX2(matrix, min_area);
 #endif
 #ifdef PA_AutoDispatch_08_Nehalem
-    case BinaryMatrixType::SSE42:
-        return find_object_on_bit_x64_SSE42(matrix, object, x, y);
+    case BinaryMatrixType::i64x8_SSE42:
+        return find_objects_inplace_64x8_x64_SSE42(matrix, min_area);
 #endif
     default:
-        return find_object_on_bit_Default(matrix, object, x, y);
+        return find_objects_inplace_64x4_Default(matrix, min_area);
     }
 }
-
-
-
-
-
-std::vector<WaterfillObject> find_objects_inplace_Default       (PackedBinaryMatrix_IB& matrix, size_t min_area, bool keep_objects);
-std::vector<WaterfillObject> find_objects_inplace_x64_SSE42     (PackedBinaryMatrix_IB& matrix, size_t min_area, bool keep_objects);
-std::vector<WaterfillObject> find_objects_inplace_x64_AVX2      (PackedBinaryMatrix_IB& matrix, size_t min_area, bool keep_objects);
-std::vector<WaterfillObject> find_objects_inplace_x64_AVX512    (PackedBinaryMatrix_IB& matrix, size_t min_area, bool keep_objects);
-std::vector<WaterfillObject> find_objects_inplace_x64_AVX512GF  (PackedBinaryMatrix_IB& matrix, size_t min_area, bool keep_objects);
-
-std::vector<WaterfillObject> find_objects_inplace(PackedBinaryMatrix_IB& matrix, size_t min_area, bool keep_objects){
-    switch (matrix.type()){
-#ifdef PA_AutoDispatch_17_Skylake
-    case BinaryMatrixType::AVX512:
-        if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
-            return find_objects_inplace_x64_AVX512GF(matrix, min_area, keep_objects);
-        }else{
-            return find_objects_inplace_x64_AVX512(matrix, min_area, keep_objects);
-        }
-#endif
-#ifdef PA_AutoDispatch_13_Haswell
-    case BinaryMatrixType::AVX2:
-        return find_objects_inplace_x64_AVX2(matrix, min_area, keep_objects);
-#endif
-#ifdef PA_AutoDispatch_08_Nehalem
-    case BinaryMatrixType::SSE42:
-        return find_objects_inplace_x64_SSE42(matrix, min_area, keep_objects);
-#endif
-    default:
-        return find_objects_inplace_Default(matrix, min_area, keep_objects);
-    }
-}
-std::vector<WaterfillObject> find_objects(const PackedBinaryMatrix_IB& matrix, size_t min_area, bool keep_objects){
-    std::unique_ptr<PackedBinaryMatrix_IB> m = matrix.clone();
-    return find_objects_inplace(*m, min_area, keep_objects);
-}
-
-
-
-
-
-std::unique_ptr<WaterfillIterator2> make_WaterfillIterator_Default      (PackedBinaryMatrix_IB& matrix, size_t min_area);
-std::unique_ptr<WaterfillIterator2> make_WaterfillIterator_x64_SSE42    (PackedBinaryMatrix_IB& matrix, size_t min_area);
-std::unique_ptr<WaterfillIterator2> make_WaterfillIterator_x64_AVX2     (PackedBinaryMatrix_IB& matrix, size_t min_area);
-std::unique_ptr<WaterfillIterator2> make_WaterfillIterator_x64_AVX512   (PackedBinaryMatrix_IB& matrix, size_t min_area);
-std::unique_ptr<WaterfillIterator2> make_WaterfillIterator_x64_AVX512GF (PackedBinaryMatrix_IB& matrix, size_t min_area);
-
-std::unique_ptr<WaterfillIterator2> make_WaterfillIterator(PackedBinaryMatrix_IB& matrix, size_t min_area){
-    switch (matrix.type()){
-#ifdef PA_AutoDispatch_17_Skylake
-    case BinaryMatrixType::AVX512:
-        if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
-            return make_WaterfillIterator_x64_AVX512GF(matrix, min_area);
-        }else{
-            return make_WaterfillIterator_x64_AVX512(matrix, min_area);
-        }
-#endif
-#ifdef PA_AutoDispatch_13_Haswell
-    case BinaryMatrixType::AVX2:
-        return make_WaterfillIterator_x64_AVX2(matrix, min_area);
-#endif
-#ifdef PA_AutoDispatch_08_Nehalem
-    case BinaryMatrixType::SSE42:
-        return make_WaterfillIterator_x64_SSE42(matrix, min_area);
-#endif
-    default:
-        return make_WaterfillIterator_Default(matrix, min_area);
-    }
-}
-
-
 
 
 

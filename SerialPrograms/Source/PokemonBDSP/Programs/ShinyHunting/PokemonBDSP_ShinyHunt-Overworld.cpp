@@ -98,6 +98,7 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env){
         ENCOUNTER_BOT_OPTIONS,
         stats
     );
+    LeadingShinyTracker lead_tracker(env.console);
 
     //  Connect the controller.
     pbf_press_button(env.console, BUTTON_B, 5, 5);
@@ -130,6 +131,7 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env){
         if (stop){
             break;
         }
+        lead_tracker.report_result(result_own.shiny_type);
     }
 
     send_program_finished_notification(

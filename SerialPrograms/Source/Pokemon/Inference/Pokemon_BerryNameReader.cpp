@@ -24,7 +24,7 @@ BerryNameReader::BerryNameReader()
 OCR::StringMatchResult BerryNameReader::read_substring(
     LoggerQt& logger,
     Language language,
-    const QImage& image
+    const ConstImageRef& image
 ) const{
     QString text = OCR::ocr_read(language, image);
     OCR::StringMatchResult ret = match_substring(language, text);

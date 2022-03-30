@@ -90,6 +90,7 @@ private:
     ShinySoundDetector m_shiny_listener;
 
     std::atomic<bool> m_looking_straight_ahead;
+    std::atomic<std::chrono::system_clock::time_point> m_looking_straight_ahead_timestamp;
 //    WallClock m_last_good_state;
     MountState m_last_known_mount;
 

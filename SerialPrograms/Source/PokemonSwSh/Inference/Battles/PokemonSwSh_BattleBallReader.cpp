@@ -62,7 +62,7 @@ std::string BattleBallReader::read_ball(const QImage& screen) const{
     }
     OCR::StringMatchResult name_result;
     {
-        QImage cropped = extract_box(screen, m_box_name);
+        QImage cropped = extract_box_copy(screen, m_box_name);
         OCR::make_OCR_filter(cropped).apply(cropped);
         name_result = m_name_reader.read_substring(m_console, m_language, cropped);
     }
@@ -98,7 +98,7 @@ std::string BattleBallReader::read_ball(const QImage& screen) const{
     return overlap[0];
 }
 uint16_t BattleBallReader::read_quantity(const QImage& screen) const{
-    QImage image = extract_box(screen, m_box_quantity);
+    QImage image = extract_box_copy(screen, m_box_quantity);
     auto filter = OCR::make_OCR_filter(image);
     filter.apply(image);
     return OCR::read_number(m_console, image);

@@ -195,6 +195,9 @@ void CPU_x86_Features::update_CPU_compatibility(){
 const CPU_x86_Features CPU_CAPABILITY_NATIVE = CPU_x86_Features().set_to_current();
 
 
+
+const CPU_x86_Features CPU_CAPABILITY_NOTHING;
+
 CPU_x86_Features make_09_Nehalem(){
     CPU_x86_Features ret;
 

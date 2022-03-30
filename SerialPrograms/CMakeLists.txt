@@ -180,10 +180,10 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/TimeSampleWriter.h
     Source/CommonFramework/AudioPipeline/WavFile.cpp
     Source/CommonFramework/AudioPipeline/WavFile.h
-    Source/CommonFramework/BinaryImage/BinaryImage.cpp
-    Source/CommonFramework/BinaryImage/BinaryImage.h
-    Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.cpp
-    Source/CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h
+    Source/CommonFramework/ImageTypes/BinaryImage.cpp
+    Source/CommonFramework/ImageTypes/BinaryImage.h
+    Source/CommonFramework/ImageTypes/ImageReference.cpp
+    Source/CommonFramework/ImageTypes/ImageReference.h
     Source/CommonFramework/ControllerDevices/SerialSelector.cpp
     Source/CommonFramework/ControllerDevices/SerialSelector.h
     Source/CommonFramework/ControllerDevices/SerialSelectorWidget.cpp
@@ -218,6 +218,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ImageMatch/SubObjectTemplateMatcher.h
     Source/CommonFramework/ImageMatch/WaterfillTemplateMatcher.cpp
     Source/CommonFramework/ImageMatch/WaterfillTemplateMatcher.h
+    Source/CommonFramework/ImageTools/BinaryImage_FilterRgb32.cpp
+    Source/CommonFramework/ImageTools/BinaryImage_FilterRgb32.h
     Source/CommonFramework/ImageTools/ColorClustering.cpp
     Source/CommonFramework/ImageTools/ColorClustering.h
     Source/CommonFramework/ImageTools/DistanceToLine.h
@@ -327,6 +329,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/BooleanCheckBoxOption.h
     Source/CommonFramework/Options/ConfigOption.cpp
     Source/CommonFramework/Options/ConfigOption.h
+    Source/CommonFramework/Options/EditableTableOption-EnumTableCell.h
     Source/CommonFramework/Options/EditableTableOption.cpp
     Source/CommonFramework/Options/EditableTableOption.h
     Source/CommonFramework/Options/EnumDropdownOption.cpp
@@ -463,10 +466,11 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_Default.cpp
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_SSE42.cpp
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_AVX2.cpp
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_AVX512.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x4_Default.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x8_x64_SSE42.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x16_x64_AVX2.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x32_x64_AVX512.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x64_x64_AVX512.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.h
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h
@@ -477,19 +481,22 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_t.h
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_Default.h
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_x64_SSE42.h
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_x64_AVX2.h
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_x64_AVX512.h
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_Default.cpp
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_SSE42.cpp
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_AVX2.cpp
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_AVX512.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x4_Default.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x8_x64_SSE42.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x16_x64_AVX2.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x32_x64_AVX512.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x64_x64_AVX512.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x4_Default.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x8_x64_SSE42.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x16_x64_AVX2.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x32_x64_AVX512.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x64_x64_AVX512.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Debugging.h
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_Default.h
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_SSE42.h
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_AVX2.h
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_x64_AVX512.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x4_Default.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x8_x64_SSE42.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x16_x64_AVX2.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x32_x64_AVX512.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x64_x64_AVX512.h
     Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrix.h
     Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.h
     Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.tpp
@@ -516,6 +523,7 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX2.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.cpp
     Source/Kernels/Kernels_BitScan.h
+    Source/Kernels/Kernels_BitSet.h
     Source/Kernels/Kernels_x64_SSE41.h
     Source/Kernels/Kernels_x64_AVX2.h
     Source/Kernels/Kernels_x64_AVX512.h
@@ -523,18 +531,25 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h
     Source/Kernels/Waterfill/Kernels_Waterfill.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Routines.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_Default.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_Default.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_SSE42.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_SSE42.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX2.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX2.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512.h
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512-GF.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512-GF.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Session.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Session.tpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Session.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Routines.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512-GF.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.cpp
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.cpp
@@ -873,6 +888,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/Farming/PokemonLA_NuggetFarmerHighlands.h
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.cpp
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.h
+    Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.cpp
+    Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_GalladeFinder.cpp
@@ -883,6 +900,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_FroslassFinder.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.h
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.cpp
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.cpp
@@ -899,10 +918,14 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_ShinySoundListener.h
     Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.cpp
     Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h
+    Source/PokemonLA/Options/PokemonLA_CustomPathTable.cpp
+    Source/PokemonLA/Options/PokemonLA_CustomPathTable.h
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.cpp
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.h
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.cpp
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.h
+    Source/PokemonLA/Options/PokemonLA_TravelLocation.cpp
+    Source/PokemonLA/Options/PokemonLA_TravelLocation.h
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.cpp
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.h
     Source/PokemonLA/Resources/PokemonLA_PokemonIcons.cpp
@@ -1353,9 +1376,9 @@ SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_SSE41.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_SSE41.cpp
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_SSE42.cpp
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_SSE42.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_SSE42.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x8_x64_SSE42.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x8_x64_SSE42.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.cpp
     PROPERTIES COMPILE_FLAGS ${ARCH_FLAGS_09_Nehalem}
 )
 endif()
@@ -1366,9 +1389,9 @@ SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX2.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX2.cpp
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_AVX2.cpp
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_AVX2.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX2.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x16_x64_AVX2.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x16_x64_AVX2.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.cpp
     PROPERTIES COMPILE_FLAGS ${ARCH_FLAGS_13_Haswell}
 )
 endif()
@@ -1378,15 +1401,18 @@ SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX512.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.cpp
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_x64_AVX512.cpp
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_AVX512.cpp
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x32_x64_AVX512.cpp
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x64_x64_AVX512.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x32_x64_AVX512.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x64_x64_AVX512.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.cpp
     PROPERTIES COMPILE_FLAGS ${ARCH_FLAGS_17_Skylake}
 )
 endif()
 if (ARCH_FLAGS_19_IceLake)
 SET_SOURCE_FILES_PROPERTIES(
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_x64_AVX512-GF.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.cpp
     PROPERTIES COMPILE_FLAGS ${ARCH_FLAGS_19_IceLake}
 )
 endif()

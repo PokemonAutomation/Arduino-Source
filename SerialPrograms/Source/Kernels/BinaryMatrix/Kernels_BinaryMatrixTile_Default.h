@@ -123,6 +123,9 @@ public:
     bool get_bit(size_t x, size_t y) const{
         return (row(y) >> x) & 1;
     }
+    void set_bit(size_t x, size_t y){
+        row(y) |= (uint64_t)1 << x;
+    }
     void set_bit(size_t x, size_t y, bool set){
         uint64_t bit = (uint64_t)(set ? 1 : 0) << x;
         uint64_t mask = (uint64_t)1 << x;

@@ -23,7 +23,7 @@ namespace MaxLairInternal{
 EntranceDetector::EntranceDetector(const QImage& entrance_screen)
     : VisualInferenceCallback("EntranceDetector")
     , m_box0(0.020, 0.020, 0.500, 0.750)
-    , m_entrance_screen(extract_box(entrance_screen, m_box0))
+    , m_entrance_screen(extract_box_copy(entrance_screen, m_box0))
 {}
 void EntranceDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_DARKGREEN, m_box0);
@@ -40,9 +40,12 @@ bool EntranceDetector::detect(const QImage& screen){
         return false;
     }
 
-    QImage image = extract_box(screen, m_box0);
-    if (image.size() != m_entrance_screen.size()){
-        image = image.scaled(m_entrance_screen.size());
+    QImage copy;
+
+    ConstImageRef image = extract_box_reference(screen, m_box0);
+    if (image.width() != (size_t)m_entrance_screen.width() || image.height() != (size_t)m_entrance_screen.height()){
+        copy = image.scaled_to_qimage(m_entrance_screen.width(), m_entrance_screen.height());
+        image = copy;
     }
 
     double diff = ImageMatch::pixel_RMSD(m_entrance_screen, image);

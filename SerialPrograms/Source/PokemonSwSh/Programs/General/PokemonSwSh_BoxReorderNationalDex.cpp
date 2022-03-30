@@ -5,6 +5,7 @@
  */
 
 #include <sstream>
+#include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Language.h"
@@ -77,7 +78,7 @@ namespace{
         env.wait_for(k_wait_after_read);
 
         QImage screen = console.video().snapshot();
-        QImage frame = extract_box(screen, box);
+        ConstImageRef frame = extract_box_reference(screen, box);
 
         OCR::StringMatchResult result = Pokemon::PokemonNameReader::instance().read_substring(console, language, frame);
         static constexpr double MAX_LOG10P = -1.40;

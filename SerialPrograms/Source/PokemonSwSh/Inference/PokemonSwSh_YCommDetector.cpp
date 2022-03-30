@@ -32,13 +32,13 @@ void YCommMenuDetector::make_overlays(VideoOverlaySet& items) const{
 }
 
 bool YCommMenuDetector::detect(const QImage& screen){
-    ImageStats bottom = image_stats(extract_box(screen, m_bottom));
+    ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
 //    cout << bottom.average << bottom.stddev << endl;
     if (!is_black(bottom)){
         return false;
     }
 
-    ImageStats top = image_stats(extract_box(screen, m_top));
+    ImageStats top = image_stats(extract_box_reference(screen, m_top));
 //    cout << top.average << top.stddev << endl;
     if (!is_solid(top, {0.167835, 0.134728, 0.697437}, 0.2)){
         return false;

@@ -8,8 +8,9 @@
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
 #include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
-#include "CommonFramework/BinaryImage/BinaryImage.h"
-#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "CommonFramework/ImageTypes/BinaryImage.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
@@ -50,16 +51,17 @@ void NotificationReader::make_overlays(VideoOverlaySet& items) const{
 Notification NotificationReader::detect(const QImage& screen) const{
     const double max_log10p = -8.0;
 
-    QImage image = extract_box(screen, m_ocr_box);
+    ConstImageRef image = extract_box_reference(screen, m_ocr_box);
 
 
     //  Check if there anything that looks like text.
     size_t objects = 0;
     {
         PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(image, 0xff808080, 0xffffffff);
-        auto finder = make_WaterfillIterator(matrix, 20);
+        auto session = make_WaterfillSession(matrix);
+        auto finder = session->make_iterator(20);
         WaterfillObject object;
-        while (finder->find_next(object)){
+        while (finder->find_next(object, false)){
             objects++;
         }
         if (objects < 20){
@@ -68,8 +70,8 @@ Notification NotificationReader::detect(const QImage& screen) const{
     }
 
 
-    image = image.convertToFormat(QImage::Format::Format_ARGB32);
-    QImage image_ocr = image;
+//    image = image.convertToFormat(QImage::Format::Format_ARGB32);
+    QImage image_ocr((int)image.width(), (int)image.height(), QImage::Format_ARGB32);
 
 
     m_logger.log("NotificationReader: Possible text found (" + std::to_string(objects) + " objects). Attempting to read it...", COLOR_PURPLE);
@@ -83,7 +85,7 @@ Notification NotificationReader::detect(const QImage& screen) const{
     };
     for (uint32_t filter : filters){
         Kernels::filter_rgb32_range(
-            (const uint32_t*)image.constBits(), image.bytesPerLine(), image.width(), image.height(),
+            image.data(), image.bytes_per_row(), image.width(), image.height(),
             (uint32_t*)image_ocr.bits(), image_ocr.bytesPerLine(), filter, 0xffffffff, 0xff000000, false
         );
 

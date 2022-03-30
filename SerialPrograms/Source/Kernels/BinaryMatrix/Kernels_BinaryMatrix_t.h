@@ -18,7 +18,7 @@ namespace Kernels{
 
 
 template <typename Tile>
-class PackedBinaryMatrix_t : public PackedBinaryMatrix_IB{
+class PackedBinaryMatrix_t final : public PackedBinaryMatrix_IB{
 public:
     PackedBinaryMatrix_t() = default;
     PackedBinaryMatrix_t(size_t width, size_t height)
@@ -65,7 +65,7 @@ private:
 
 
 template <typename Tile>
-class SparseBinaryMatrix_t : public SparseBinaryMatrix_IB{
+class SparseBinaryMatrix_t final : public SparseBinaryMatrix_IB{
 public:
     SparseBinaryMatrix_t() = default;
     SparseBinaryMatrix_t(size_t width, size_t height)

@@ -78,6 +78,20 @@ void run_away(
 
 
 
+class LeadingShinyTracker{
+public:
+    LeadingShinyTracker(Logger& logger);
+
+    void report_result(ShinyType type);
+
+private:
+    Logger& m_logger;
+    size_t m_consecutive_shinies;
+};
+
+
+
+
 }
 }
 }

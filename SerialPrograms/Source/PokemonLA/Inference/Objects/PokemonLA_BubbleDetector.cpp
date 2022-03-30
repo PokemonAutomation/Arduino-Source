@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
-#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "PokemonLA_BubbleDetector.h"
 
@@ -29,7 +29,7 @@ public:
             128, 255,
             128, 255
         );
-        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
+        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20);
         if (objects.size() != 1){
             throw FileException(
                 nullptr, PA_CURRENT_FUNCTION,
@@ -40,7 +40,7 @@ public:
         set_subobject(objects[0]);
     }
 
-    virtual bool check_image(const QImage& image) const{
+    virtual bool check_image(const ConstImageRef& image) const override{
         return image_stddev(image).sum() > 100;
     };
 
@@ -55,7 +55,7 @@ public:
 BubbleDetector::BubbleDetector()
     : WhiteObjectDetector(COLOR_GREEN, {Color(0xffb0b0b0)})
 {}
-void BubbleDetector::process_object(const QImage& image, const WaterfillObject& object){
+void BubbleDetector::process_object(const ConstImageRef& image, const WaterfillObject& object){
     if (object.area < 200){
         return;
     }

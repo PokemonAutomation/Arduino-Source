@@ -6,7 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
-#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "PokemonLA_ArcDetector.h"
 
@@ -34,7 +34,7 @@ public:
             128, 255,
             128, 255
         );
-        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
+        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20);
         if (objects.size() != 1){
             throw FileException(
                 nullptr, PA_CURRENT_FUNCTION,
@@ -69,7 +69,7 @@ ArcDetector::ArcDetector()
         }
     )
 {}
-void ArcDetector::process_object(const QImage& image, const WaterfillObject& object){
+void ArcDetector::process_object(const ConstImageRef& image, const WaterfillObject& object){
     ImagePixelBox object_box;
     if (ArcMatcher::left().matches(object_box, image, object)){
         m_left.emplace_back(object_box);

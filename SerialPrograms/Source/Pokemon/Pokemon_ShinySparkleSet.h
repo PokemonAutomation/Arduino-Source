@@ -26,7 +26,7 @@ public:
 
     virtual std::string to_str() const = 0;
 
-    virtual void read_from_image(const QImage& image) = 0;
+    virtual void read_from_image(const ConstImageRef& image) = 0;
     virtual void draw_boxes(
         VideoOverlaySet& overlays,
         const QImage& frame,

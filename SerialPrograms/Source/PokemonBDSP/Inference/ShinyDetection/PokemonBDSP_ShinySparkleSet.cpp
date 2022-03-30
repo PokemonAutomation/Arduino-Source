@@ -7,8 +7,9 @@
 #include <sstream>
 #include <QImage>
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
-#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.h"
 #include "PokemonBDSP_ShinySparkleSet.h"
 
@@ -86,11 +87,11 @@ void ShinySparkleSetBDSP::update_alphas(){
 
 
 
-ShinySparkleSetBDSP find_sparkles(PackedBinaryMatrix2& matrix){
+ShinySparkleSetBDSP find_sparkles(WaterfillSession& session){
     ShinySparkleSetBDSP sparkles;
-    auto finder = make_WaterfillIterator(matrix, 20);
+    auto finder = session.make_iterator(20);
     WaterfillObject object;
-    while (finder->find_next(object)){
+    while (finder->find_next(object, true)){
         PokemonSwSh::RadialSparkleDetector radial_sparkle(object);
         if (radial_sparkle.is_ball()){
             sparkles.balls.emplace_back(object.min_x, object.min_y, object.max_x, object.max_y);
@@ -103,24 +104,27 @@ ShinySparkleSetBDSP find_sparkles(PackedBinaryMatrix2& matrix){
     }
     return sparkles;
 }
-void ShinySparkleSetBDSP::read_from_image(const QImage& image){
+void ShinySparkleSetBDSP::read_from_image(const ConstImageRef& image){
     clear();
-    if (image.isNull()){
+    if (!image){
         return;
     }
 
-    PackedBinaryMatrix2 matrix[4];
-    compress4_rgb32_to_binary_range(
+    std::vector<PackedBinaryMatrix2> matrices = compress_rgb32_to_binary_range(
         image,
-        matrix[0], 0xff606000, 0xffffffff,
-        matrix[1], 0xff707000, 0xffffffff,
-        matrix[2], 0xff808000, 0xffffffff,
-        matrix[3], 0xff909000, 0xffffffff
+        {
+            {0xff606000, 0xffffffff},
+            {0xff707000, 0xffffffff},
+            {0xff808000, 0xffffffff},
+            {0xff909000, 0xffffffff},
+        }
     );
+    auto session = make_WaterfillSession();
 
     double best_alpha = 0;
-    for (size_t c = 0; c < 4; c++){
-        ShinySparkleSetBDSP sparkles = find_sparkles(matrix[c]);
+    for (PackedBinaryMatrix2& matrix : matrices){
+        session->set_source(matrix);
+        ShinySparkleSetBDSP sparkles = find_sparkles(*session);
         sparkles.update_alphas();
         double alpha = sparkles.alpha_overall();
         if (best_alpha < alpha){

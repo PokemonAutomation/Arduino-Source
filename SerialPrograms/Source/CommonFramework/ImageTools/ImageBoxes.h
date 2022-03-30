@@ -8,6 +8,7 @@
 #define PokemonAutomation_CommonFramework_ImageBoxes_H
 
 #include <stddef.h>
+#include "CommonFramework/ImageTypes/ImageReference.h"
 
 class QImage;
 
@@ -65,9 +66,22 @@ struct ImageFloatBox{
 
 
 //  Given an image, extract the request box from it.
-QImage extract_box(const QImage& image, const ImagePixelBox& box);
-QImage extract_box(const QImage& image, const ImageFloatBox& box);
-QImage extract_box(const QImage& image, const ImageFloatBox& box, int offset_x, int offset_y);
+
+//  Return a reference to the sub-region of the image.
+ConstImageRef extract_box_reference(const ConstImageRef& image, const ImagePixelBox& box);
+ConstImageRef extract_box_reference(const ConstImageRef& image, const ImageFloatBox& box);
+ConstImageRef extract_box_reference(const QImage& image, const ImagePixelBox& box);
+ConstImageRef extract_box_reference(const QImage& image, const ImageFloatBox& box);
+ImageRef extract_box_reference(const ImageRef& image, const ImagePixelBox& box);
+ImageRef extract_box_reference(const ImageRef& image, const ImageFloatBox& box);
+ImageRef extract_box_reference(QImage& image, const ImagePixelBox& box);
+ImageRef extract_box_reference(QImage& image, const ImageFloatBox& box);
+ConstImageRef extract_box_reference(const ConstImageRef& image, const ImageFloatBox& box, int offset_x, int offset_y);
+
+//  Deep copy the sub-region.
+QImage extract_box_copy(const QImage& image, const ImagePixelBox& box);
+QImage extract_box_copy(const QImage& image, const ImageFloatBox& box);
+QImage extract_box_copy(const QImage& image, const ImageFloatBox& box, int offset_x, int offset_y);
 
 //  Given:
 //      -   "inference_box" is a box within "original_image".
@@ -78,7 +92,7 @@ QImage extract_box(const QImage& image, const ImageFloatBox& box, int offset_x, 
 //  This is used for translating detection box within inference boxes back to
 //  the parent so it can be displayed in a VideoOverlay.
 ImageFloatBox translate_to_parent(
-    const QImage& original_image,
+    const ConstImageRef& original_image,
     const ImageFloatBox& inference_box,
     const ImagePixelBox& box
 );

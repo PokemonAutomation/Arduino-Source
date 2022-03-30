@@ -5,7 +5,7 @@
  */
 
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
-#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "PokemonLA_QuestMarkDetector.h"
 
@@ -29,7 +29,7 @@ public:
             128, 255,
             128, 255
         );
-        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 100, false);
+        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 100);
 
         //  Get largest white object.
         size_t area = 0;
@@ -63,7 +63,7 @@ QuestMarkDetector::QuestMarkDetector()
         }
     )
 {}
-void QuestMarkDetector::process_object(const QImage& image, const WaterfillObject& object){
+void QuestMarkDetector::process_object(const ConstImageRef& image, const WaterfillObject& object){
     ImagePixelBox object_box;
     if (QuestMarkMatcher::instance().matches(object_box, image, object)){
         m_detections.emplace_back(object_box);

@@ -9,7 +9,7 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "PokemonSwSh_TypeSprites.h"
 
 #include <iostream>
@@ -84,7 +84,7 @@ TypeSprite::TypeSprite(const std::string& slug)
     //  Compute white objects.
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_min(m_sprite, 224, 224, 224);
 
-    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 10, false);
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 10);
 
     WaterfillObject object;
     for (const WaterfillObject& item : objects){

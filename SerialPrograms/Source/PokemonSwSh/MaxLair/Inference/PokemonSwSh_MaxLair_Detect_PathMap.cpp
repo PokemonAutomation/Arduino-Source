@@ -18,13 +18,13 @@ namespace MaxLairInternal{
 
 bool read_type_array(
     ConsoleHandle& console,
-    const QImage& screen,
+    const ConstImageRef& screen,
     const ImageFloatBox& box,
     std::deque<InferenceBoxScope>& hits,
     size_t count,
     PokemonType* type, ImagePixelBox* boxes
 ){
-    QImage image = extract_box(screen, box);
+    ConstImageRef image = extract_box_reference(screen, box);
     for (size_t c = 0; c < count; c++){
         type[c] = PokemonType::NONE;
     }

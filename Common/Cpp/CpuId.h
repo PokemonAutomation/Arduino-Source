@@ -102,6 +102,7 @@ struct CPU_x86_Features{
 
 extern const CPU_x86_Features CPU_CAPABILITY_NATIVE;
 
+extern const CPU_x86_Features CPU_CAPABILITY_NOTHING;
 extern const CPU_x86_Features CPU_CAPABILITY_09_NEHALEM;
 extern const CPU_x86_Features CPU_CAPABILITY_13_Haswell;
 extern const CPU_x86_Features CPU_CAPABILITY_17_Skylake;

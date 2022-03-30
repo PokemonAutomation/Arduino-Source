@@ -107,6 +107,36 @@ void change_mount(ConsoleHandle& console, MountState mount){
     );
 }
 
+void dismount(ConsoleHandle& console){
+    MountDetector mount_detector;
+    for (size_t c = 0; c < 10; c++){
+        console.botbase().wait_for_all_requests();
+
+        MountState current = mount_detector.detect(console.video().snapshot());
+        switch (current){
+        case MountState::WYRDEER_OFF:
+        case MountState::URSALUNA_OFF:
+        case MountState::BASCULEGION_OFF:
+        case MountState::SNEASLER_OFF:
+        case MountState::BRAVIARY_OFF:
+            // Already unmount
+            return;
+        default:
+            break;
+        }
+
+        if (current == MountState::NOTHING){
+            pbf_press_dpad(console, DPAD_RIGHT, 20, 50);
+            continue;
+        }
+
+        // We are mounted. Press + to unmount
+        pbf_press_button(console, BUTTON_PLUS, 20, 105);
+    }
+
+    throw OperationFailedException(console, "Unable to dismount after 10 attempts.");
+}
+
 
 }
 }

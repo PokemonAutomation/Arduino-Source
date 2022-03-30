@@ -6,7 +6,8 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
-#include "CommonFramework/BinaryImage/BinaryImage_FilterRgb32.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
 #include "PokemonLA_ShinySymbolDetector.h"
 
@@ -33,7 +34,7 @@ public:
             128, 255,
             128, 255
         );
-        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20, false);
+        std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20);
         if (objects.size() != 2){
             throw FileException(
                 nullptr, PA_CURRENT_FUNCTION,
@@ -60,7 +61,7 @@ public:
 
 
 
-std::vector<ImagePixelBox> find_shiny_symbols(const QImage& image){
+std::vector<ImagePixelBox> find_shiny_symbols(const ConstImageRef& image){
     PackedBinaryMatrix2 matrix = compress_rgb32_to_binary_range(
         image,
         128, 255,
@@ -69,10 +70,11 @@ std::vector<ImagePixelBox> find_shiny_symbols(const QImage& image){
     );
     std::vector<ImagePixelBox> ret;
     {
-        PackedBinaryMatrix2 copy = matrix;
-        auto finder = make_WaterfillIterator(copy, 20);
+        PackedBinaryMatrix2 copy = matrix.copy();
+        auto session = make_WaterfillSession(copy);
+        auto finder = session->make_iterator(20);
         WaterfillObject object;
-        while (finder->find_next(object)){
+        while (finder->find_next(object, false)){
             ImagePixelBox object_box;
             if (ShinySymbolDetector::instance().matches_with_background_replace(object_box, image, matrix, object)){
                 ret.emplace_back(object_box);
@@ -105,7 +107,7 @@ bool ShinySymbolWatcher::process_frame(
     const QImage& frame,
     std::chrono::system_clock::time_point timestamp
 ){
-    m_matches = find_shiny_symbols(extract_box(frame, m_box));
+    m_matches = find_shiny_symbols(extract_box_reference(frame, m_box));
     m_overlays.clear();
     for (const ImagePixelBox& hit : m_matches){
         ImageFloatBox box = translate_to_parent(frame, m_box, hit);

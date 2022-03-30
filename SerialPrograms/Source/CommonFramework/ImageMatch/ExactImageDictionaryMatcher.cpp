@@ -23,7 +23,7 @@ namespace ImageMatch{
 
 
 std::vector<QImage> make_image_set(
-    const QImage& screen,
+    const ConstImageRef& screen,
     const ImageFloatBox& box,
     const QSize& dimensions,
     size_t tolerance
@@ -42,7 +42,10 @@ std::vector<QImage> make_image_set(
 //                continue;
 //            }
 
-            ret.emplace_back(extract_box(screen, box, x * scale, y * scale).scaled(dimensions));
+            ret.emplace_back(
+                extract_box_reference(screen, box, x * scale, y * scale).scaled_to_qimage(dimensions.width(), dimensions.height())
+            );
+//            cout << "make_image_set(): image = " << ret.back().width() << " x " << ret.back().height() << endl;  //  REMOVE
 //            if (x == 0 && y == 0){
 //                ret.back().save("image.png");
 //            }
@@ -116,16 +119,16 @@ double ExactImageDictionaryMatcher::compare(
 }
 
 ImageMatchResult ExactImageDictionaryMatcher::match(
-    const QImage& screen, const ImageFloatBox& box,
+    const ConstImageRef& image, const ImageFloatBox& box,
     size_t tolerance,
     double alpha_spread
 ) const{
     ImageMatchResult results;
-    if (screen.isNull()){
+    if (!image){
         return results;
     }
 
-    std::vector<QImage> image_set = make_image_set(screen, box, m_dimensions, tolerance);
+    std::vector<QImage> image_set = make_image_set(image, box, m_dimensions, tolerance);
     for (const auto& item : m_database){
 //        if (item.first != "linoone-galar"){
 //            continue;

@@ -29,17 +29,17 @@ void ItemSelectDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_BLUE, m_blue);
 }
 bool ItemSelectDetector::detect(const QImage& screen) const{
-    ImageStats bottom_main = image_stats(extract_box(screen, m_bottom_main));
+    ImageStats bottom_main = image_stats(extract_box_reference(screen, m_bottom_main));
 //    cout << bottom_main.average << ", " << bottom_main.stddev << endl;
     if (!is_black(bottom_main)){
         return false;
     }
-    ImageStats bottom_right = image_stats(extract_box(screen, m_bottom_right));
+    ImageStats bottom_right = image_stats(extract_box_reference(screen, m_bottom_right));
 //    cout << bottom_right.average << ", " << bottom_right.stddev << endl;
     if (bottom_right.stddev.sum() < 30){
         return false;
     }
-    ImageStats blue = image_stats(extract_box(screen, m_blue));
+    ImageStats blue = image_stats(extract_box_reference(screen, m_blue));
 //    cout << blue.average << ", " << blue.stddev << endl;
     if (!is_solid(blue, {0.0286572, 0.40799, 0.563353})){
         return false;
