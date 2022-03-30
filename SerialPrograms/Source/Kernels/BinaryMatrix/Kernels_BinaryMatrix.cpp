@@ -16,6 +16,11 @@ namespace Kernels{
 
 
 BinaryMatrixType get_BinaryMatrixType(){
+#if 1
+    if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
+        return BinaryMatrixType::i64x32_AVX512;
+    }
+#endif
     if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
         return BinaryMatrixType::i64x64_AVX512;
     }

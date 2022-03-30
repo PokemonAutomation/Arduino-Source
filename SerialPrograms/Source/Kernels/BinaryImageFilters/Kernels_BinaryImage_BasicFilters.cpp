@@ -70,6 +70,9 @@ void compress_rgb32_to_binary_range(
     case BinaryMatrixType::i64x64_AVX512:
         compress_rgb32_to_binary_range_64x64_x64_AVX512(image, bytes_per_row, matrix0, mins0, maxs0);
         return;
+    case BinaryMatrixType::i64x32_AVX512:
+        compress_rgb32_to_binary_range_64x32_x64_AVX512(image, bytes_per_row, matrix0, mins0, maxs0);
+        return;
 #endif
 #ifdef PA_AutoDispatch_13_Haswell
     case BinaryMatrixType::i64x16_AVX2:
@@ -106,6 +109,9 @@ void compress_rgb32_to_binary_range(
     case BinaryMatrixType::i64x64_AVX512:
         compress_rgb32_to_binary_range_64x64_x64_AVX512(image, bytes_per_row, filter, filter_count);
         return;
+    case BinaryMatrixType::i64x32_AVX512:
+        compress_rgb32_to_binary_range_64x32_x64_AVX512(image, bytes_per_row, filter, filter_count);
+        return;
 #endif
 #ifdef PA_AutoDispatch_13_Haswell
     case BinaryMatrixType::i64x16_AVX2:
@@ -133,6 +139,7 @@ void compress_rgb32_to_binary_range(
 void filter_rgb32_64x4_Default      (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
 void filter_rgb32_64x8_x64_SSE42    (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
 void filter_rgb32_64x16_x64_AVX2    (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
+void filter_rgb32_64x32_x64_AVX512  (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
 void filter_rgb32_64x64_x64_AVX512  (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
 
 void filter_rgb32(
@@ -145,6 +152,9 @@ void filter_rgb32(
 #ifdef PA_AutoDispatch_17_Skylake
     case BinaryMatrixType::i64x64_AVX512:
         filter_rgb32_64x64_x64_AVX512(matrix, image, bytes_per_row, replace_with, replace_if_zero);
+        return;
+    case BinaryMatrixType::i64x32_AVX512:
+        filter_rgb32_64x32_x64_AVX512(matrix, image, bytes_per_row, replace_with, replace_if_zero);
         return;
 #endif
 #ifdef PA_AutoDispatch_13_Haswell

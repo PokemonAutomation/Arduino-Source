@@ -47,6 +47,7 @@ void find_overworld_white_objects(
         }
         std::vector<PackedBinaryMatrix2> matrix = compress_rgb32_to_binary_range(image, filters);
 
+#if 1
         std::unique_ptr<WaterfillSession> session = make_WaterfillSession();
         for (size_t c = 0; c < filters.size(); c++){
             session->set_source(matrix[c]);
@@ -61,6 +62,7 @@ void find_overworld_white_objects(
                 }
             }
         }
+#endif
     }
 
     for (const auto& detector : detectors){
