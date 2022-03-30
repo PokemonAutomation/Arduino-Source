@@ -8,7 +8,7 @@
 
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x8_x64_SSE42.h"
 #include "Kernels_BinaryImage_BasicFilters_Routines.h"
-#include "Kernels_BinaryImage_BasicFilters_64x8_x64_SSE42.h"
+#include "Kernels_BinaryImage_BasicFilters_x64_SSE42.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

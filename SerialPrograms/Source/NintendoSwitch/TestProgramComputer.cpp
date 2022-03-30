@@ -172,9 +172,15 @@ void TestProgramComputer::program(ProgramEnvironment& env){
     print_8x64(r2);
     print_8x64(r3);
     cout << "---------" << endl;
-    Intrinsics_x64_AVX512GF::transpose_1x16x16x4(r0, r1);
-    Intrinsics_x64_AVX512GF::transpose_1x16x16x4(r2, r3);
-    Intrinsics_x64_AVX512GF::transpose_16x2x2x2(r0, r1, r2, r3);
+//    Intrinsics_x64_AVX512GF::transpose_1x16x16x4(r0, r1);
+//    Intrinsics_x64_AVX512GF::transpose_1x16x16x4(r2, r3);
+//    Intrinsics_x64_AVX512GF::transpose_16x2x2x2(r0, r1, r2, r3);
+    Intrinsics_x64_AVX512GF::transpose_1x64x32(r0, r1, r2, r3);
+    r0 = Intrinsics_x64_AVX512GF::bit_reverse(r0);
+    r1 = Intrinsics_x64_AVX512GF::bit_reverse(r1);
+    r2 = Intrinsics_x64_AVX512GF::bit_reverse(r2);
+    r3 = Intrinsics_x64_AVX512GF::bit_reverse(r3);
+    Intrinsics_x64_AVX512GF::transpose_1x64x32_bitreverse_in(r0, r1, r2, r3);
 
     print_8x64(r0);
     print_8x64(r1);

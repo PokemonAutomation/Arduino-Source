@@ -6,7 +6,7 @@
 
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x4_Default.h"
 #include "Kernels_BinaryImage_BasicFilters_Routines.h"
-#include "Kernels_BinaryImage_BasicFilters_64x4_Default.h"
+#include "Kernels_BinaryImage_BasicFilters_Default.h"
 
 namespace PokemonAutomation{
 namespace Kernels{

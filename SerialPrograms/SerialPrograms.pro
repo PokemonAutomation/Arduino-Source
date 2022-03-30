@@ -880,11 +880,11 @@ HEADERS += \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.h \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.tpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h \
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x16_x64_AVX2.h \
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x4_Default.h \
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x64_x64_AVX512.h \
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x8_x64_SSE42.h \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Routines.h \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h \
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x16_x64_AVX2.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x32_x64_AVX512.h \
