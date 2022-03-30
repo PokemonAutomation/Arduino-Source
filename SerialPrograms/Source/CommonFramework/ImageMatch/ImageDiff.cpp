@@ -55,7 +55,8 @@ void scale_brightness(const ImageRef& image, const FloatPixel& multiplier){
 
 double pixel_RMSD(const ConstImageRef& reference, const ConstImageRef& image){
     if (!image){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Dimensions");
+//        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Dimensions");
+        return 765; //  Max possible deviation.
     }
     if (reference.width() != image.width() || reference.height() != image.height()){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching Dimensions");
@@ -72,7 +73,8 @@ double pixel_RMSD(const ConstImageRef& reference, const ConstImageRef& image){
 }
 double pixel_RMSD(const ConstImageRef& reference, const ConstImageRef& image, QRgb background){
     if (!image){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Dimensions");
+//        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Dimensions");
+        return 765; //  Max possible deviation.
     }
     if (reference.width() != image.width() || reference.height() != image.height()){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching Dimensions");
@@ -90,7 +92,8 @@ double pixel_RMSD(const ConstImageRef& reference, const ConstImageRef& image, QR
 }
 double pixel_RMSD_masked(const ConstImageRef& reference, const ConstImageRef& image){
     if (!image){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Dimensions");
+//        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid Dimensions");
+        return 765; //  Max possible deviation.
     }
     if (reference.width() != image.width() || reference.height() != image.height()){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching Dimensions");
