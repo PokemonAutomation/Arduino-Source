@@ -82,6 +82,7 @@ std::unique_ptr<StatsTracker> FroslassFinder::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
+
 void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env){
     Stats& stats = env.stats<Stats>();
 
@@ -95,8 +96,6 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env){
         //Setup
         pbf_move_left_joystick(env.console, 108, 255, 20, 20);
         pbf_press_button(env.console, BUTTON_ZL, 10,10);
-        pbf_wait(env.console, (uint16_t)(0.5 * TICKS_PER_SECOND));
-        pbf_move_right_joystick(env.console, 0, 130, 60, 10);
         pbf_wait(env.console, (uint16_t)(0.5 * TICKS_PER_SECOND));
         change_mount(env.console, MountState::BRAVIARY_ON);
         pbf_wait(env.console, (uint16_t)(0.5 * TICKS_PER_SECOND));
@@ -133,14 +132,9 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env){
             [](const BotBaseContext& context){
                 pbf_press_dpad(context, DPAD_LEFT, 20, 20);
                 pbf_press_button(context, BUTTON_B, (uint16_t)(4.5 * TICKS_PER_SECOND), 10);
-
-                //pbf_press_button(context, BUTTON_B, (uint16_t)(3.6 * TICKS_PER_SECOND), 10);
-                //pbf_wait(context, (uint16_t)(1.4 * TICKS_PER_SECOND));
             },
             { &shiny_detector_ruins }
         );
-
-        dump_image(env.logger(), env.program_info(), "Froslass", env.console.video().snapshot());
 
         if (shiny_detector_ruins.detected()){
            stats.shinies++;
@@ -149,9 +143,6 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env){
     };
 
     env.console.log("No shiny detected, returning to Jubilife!");
-    //goto_camp_from_overworld(env, env.console, SHINY_DETECTED, stats);
-    //goto_professor(env.console, Camp::ICELANDS_SNOWFIELDS);
-    //from_professor_return_to_jubilife(env, env.console);
     pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
     reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 }
