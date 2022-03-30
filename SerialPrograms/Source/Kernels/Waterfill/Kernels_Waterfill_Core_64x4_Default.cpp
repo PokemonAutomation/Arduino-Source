@@ -15,13 +15,13 @@ namespace Waterfill{
 
 
 
-std::vector<WaterfillObject> find_objects_inplace_Default(PackedBinaryMatrix_IB& matrix, size_t min_area){
+std::vector<WaterfillObject> find_objects_inplace_64x4_Default(PackedBinaryMatrix_IB& matrix, size_t min_area){
     return find_objects_inplace<BinaryTile_64x4_Default, Waterfill_64x4_Default>(
         static_cast<PackedBinaryMatrix_64x4_Default&>(matrix).get(),
         min_area
     );
 }
-std::unique_ptr<WaterfillSession> make_WaterfillSession_Default(PackedBinaryMatrix_IB* matrix){
+std::unique_ptr<WaterfillSession> make_WaterfillSession_64x4_Default(PackedBinaryMatrix_IB* matrix){
     return matrix == nullptr
         ? std::make_unique<WaterfillSession_t<BinaryTile_64x4_Default, Waterfill_64x4_Default>>()
         : std::make_unique<WaterfillSession_t<BinaryTile_64x4_Default, Waterfill_64x4_Default>>(

@@ -8,14 +8,14 @@
 
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x8_x64_SSE42.h"
 #include "Kernels_BinaryImage_BasicFilters_Routines.h"
-#include "Kernels_BinaryImage_BasicFilters_x64_SSE42.h"
+#include "Kernels_BinaryImage_BasicFilters_64x8_x64_SSE42.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
 
 
 
-void compress_rgb32_to_binary_range_x64_SSE42(
+void compress_rgb32_to_binary_range_64x8_x64_SSE42(
     const uint32_t* image, size_t bytes_per_row,
     PackedBinaryMatrix_IB& matrix0, uint32_t mins0, uint32_t maxs0
 ){
@@ -25,7 +25,7 @@ void compress_rgb32_to_binary_range_x64_SSE42(
         static_cast<PackedBinaryMatrix_64x8_x64_SSE42&>(matrix0).get(), compressor0
     );
 }
-void compress_rgb32_to_binary_range_x64_SSE42(
+void compress_rgb32_to_binary_range_64x8_x64_SSE42(
     const uint32_t* image, size_t bytes_per_row,
     CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
 ){
@@ -36,7 +36,7 @@ void compress_rgb32_to_binary_range_x64_SSE42(
 
 
 
-void filter_rgb32_x64_SSE42(
+void filter_rgb32_64x8_x64_SSE42(
     const PackedBinaryMatrix_IB& matrix,
     uint32_t* image, size_t bytes_per_row,
     uint32_t replace_with, bool replace_if_zero

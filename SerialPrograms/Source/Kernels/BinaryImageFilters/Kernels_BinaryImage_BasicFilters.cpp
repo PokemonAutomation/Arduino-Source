@@ -16,38 +16,47 @@ namespace PokemonAutomation{
 namespace Kernels{
 
 
-void compress_rgb32_to_binary_range_Default(
+void compress_rgb32_to_binary_range_64x4_Default(
     const uint32_t* image, size_t bytes_per_row,
     PackedBinaryMatrix_IB& matrix0, uint32_t mins0, uint32_t maxs0
 );
-void compress_rgb32_to_binary_range_Default(
+void compress_rgb32_to_binary_range_64x4_Default(
     const uint32_t* image, size_t bytes_per_row,
     CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
 );
 
-void compress_rgb32_to_binary_range_x64_SSE42(
+void compress_rgb32_to_binary_range_64x8_x64_SSE42(
     const uint32_t* image, size_t bytes_per_row,
     PackedBinaryMatrix_IB& matrix0, uint32_t mins0, uint32_t maxs0
 );
-void compress_rgb32_to_binary_range_x64_SSE42(
+void compress_rgb32_to_binary_range_64x8_x64_SSE42(
     const uint32_t* image, size_t bytes_per_row,
     CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
 );
 
-void compress_rgb32_to_binary_range_x64_AVX2(
+void compress_rgb32_to_binary_range_64x16_x64_AVX2(
     const uint32_t* image, size_t bytes_per_row,
     PackedBinaryMatrix_IB& matrix0, uint32_t mins0, uint32_t maxs0
 );
-void compress_rgb32_to_binary_range_x64_AVX2(
+void compress_rgb32_to_binary_range_64x16_x64_AVX2(
     const uint32_t* image, size_t bytes_per_row,
     CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
 );
 
-void compress_rgb32_to_binary_range_x64_AVX512(
+void compress_rgb32_to_binary_range_64x32_x64_AVX512(
     const uint32_t* image, size_t bytes_per_row,
     PackedBinaryMatrix_IB& matrix0, uint32_t mins0, uint32_t maxs0
 );
-void compress_rgb32_to_binary_range_x64_AVX512(
+void compress_rgb32_to_binary_range_64x32_x64_AVX512(
+    const uint32_t* image, size_t bytes_per_row,
+    CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
+);
+
+void compress_rgb32_to_binary_range_64x64_x64_AVX512(
+    const uint32_t* image, size_t bytes_per_row,
+    PackedBinaryMatrix_IB& matrix0, uint32_t mins0, uint32_t maxs0
+);
+void compress_rgb32_to_binary_range_64x64_x64_AVX512(
     const uint32_t* image, size_t bytes_per_row,
     CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
 );
@@ -59,21 +68,21 @@ void compress_rgb32_to_binary_range(
     switch (matrix0.type()){
 #ifdef PA_AutoDispatch_17_Skylake
     case BinaryMatrixType::i64x64_AVX512:
-        compress_rgb32_to_binary_range_x64_AVX512(image, bytes_per_row, matrix0, mins0, maxs0);
+        compress_rgb32_to_binary_range_64x64_x64_AVX512(image, bytes_per_row, matrix0, mins0, maxs0);
         return;
 #endif
 #ifdef PA_AutoDispatch_13_Haswell
     case BinaryMatrixType::i64x16_AVX2:
-        compress_rgb32_to_binary_range_x64_AVX2(image, bytes_per_row, matrix0, mins0, maxs0);
+        compress_rgb32_to_binary_range_64x16_x64_AVX2(image, bytes_per_row, matrix0, mins0, maxs0);
         return;
 #endif
 #ifdef PA_AutoDispatch_08_Nehalem
     case BinaryMatrixType::i64x8_SSE42:
-        compress_rgb32_to_binary_range_x64_SSE42(image, bytes_per_row, matrix0, mins0, maxs0);
+        compress_rgb32_to_binary_range_64x8_x64_SSE42(image, bytes_per_row, matrix0, mins0, maxs0);
         return;
 #endif
     case BinaryMatrixType::i64x4_Default:
-        compress_rgb32_to_binary_range_Default(image, bytes_per_row, matrix0, mins0, maxs0);
+        compress_rgb32_to_binary_range_64x4_Default(image, bytes_per_row, matrix0, mins0, maxs0);
         return;
     default:
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unsupported matrix format.");
@@ -95,21 +104,21 @@ void compress_rgb32_to_binary_range(
     switch (type){
 #ifdef PA_AutoDispatch_17_Skylake
     case BinaryMatrixType::i64x64_AVX512:
-        compress_rgb32_to_binary_range_x64_AVX512(image, bytes_per_row, filter, filter_count);
+        compress_rgb32_to_binary_range_64x64_x64_AVX512(image, bytes_per_row, filter, filter_count);
         return;
 #endif
 #ifdef PA_AutoDispatch_13_Haswell
     case BinaryMatrixType::i64x16_AVX2:
-        compress_rgb32_to_binary_range_x64_AVX2(image, bytes_per_row, filter, filter_count);
+        compress_rgb32_to_binary_range_64x16_x64_AVX2(image, bytes_per_row, filter, filter_count);
         return;
 #endif
 #ifdef PA_AutoDispatch_08_Nehalem
     case BinaryMatrixType::i64x8_SSE42:
-        compress_rgb32_to_binary_range_x64_SSE42(image, bytes_per_row, filter, filter_count);
+        compress_rgb32_to_binary_range_64x8_x64_SSE42(image, bytes_per_row, filter, filter_count);
         return;
 #endif
     case BinaryMatrixType::i64x4_Default:
-        compress_rgb32_to_binary_range_Default(image, bytes_per_row, filter, filter_count);
+        compress_rgb32_to_binary_range_64x4_Default(image, bytes_per_row, filter, filter_count);
         return;
     default:
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unsupported matrix format.");
@@ -121,10 +130,10 @@ void compress_rgb32_to_binary_range(
 
 
 
-void filter_rgb32_Default       (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
-void filter_rgb32_x64_SSE42     (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
-void filter_rgb32_x64_AVX2      (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
-void filter_rgb32_x64_AVX512    (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
+void filter_rgb32_64x4_Default      (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
+void filter_rgb32_64x8_x64_SSE42    (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
+void filter_rgb32_64x16_x64_AVX2    (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
+void filter_rgb32_64x64_x64_AVX512  (const PackedBinaryMatrix_IB& matrix, uint32_t* image, size_t bytes_per_row, uint32_t replace_with, bool replace_if_zero);
 
 void filter_rgb32(
     const PackedBinaryMatrix_IB& matrix,
@@ -135,21 +144,21 @@ void filter_rgb32(
     switch (matrix.type()){
 #ifdef PA_AutoDispatch_17_Skylake
     case BinaryMatrixType::i64x64_AVX512:
-        filter_rgb32_x64_AVX512(matrix, image, bytes_per_row, replace_with, replace_if_zero);
+        filter_rgb32_64x64_x64_AVX512(matrix, image, bytes_per_row, replace_with, replace_if_zero);
         return;
 #endif
 #ifdef PA_AutoDispatch_13_Haswell
     case BinaryMatrixType::i64x16_AVX2:
-        filter_rgb32_x64_AVX2(matrix, image, bytes_per_row, replace_with, replace_if_zero);
+        filter_rgb32_64x16_x64_AVX2(matrix, image, bytes_per_row, replace_with, replace_if_zero);
         return;
 #endif
 #ifdef PA_AutoDispatch_08_Nehalem
     case BinaryMatrixType::i64x8_SSE42:
-        filter_rgb32_x64_SSE42(matrix, image, bytes_per_row, replace_with, replace_if_zero);
+        filter_rgb32_64x8_x64_SSE42(matrix, image, bytes_per_row, replace_with, replace_if_zero);
         return;
 #endif
     case BinaryMatrixType::i64x4_Default:
-        filter_rgb32_Default(matrix, image, bytes_per_row, replace_with, replace_if_zero);
+        filter_rgb32_64x4_Default(matrix, image, bytes_per_row, replace_with, replace_if_zero);
         return;
     default:
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unsupported matrix format.");

@@ -6,14 +6,14 @@
 
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x4_Default.h"
 #include "Kernels_BinaryImage_BasicFilters_Routines.h"
-#include "Kernels_BinaryImage_BasicFilters_Default.h"
+#include "Kernels_BinaryImage_BasicFilters_64x4_Default.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
 
 
 
-void compress_rgb32_to_binary_range_Default(
+void compress_rgb32_to_binary_range_64x4_Default(
     const uint32_t* image, size_t bytes_per_row,
     PackedBinaryMatrix_IB& matrix0, uint32_t mins0, uint32_t maxs0
 ){
@@ -23,7 +23,7 @@ void compress_rgb32_to_binary_range_Default(
         static_cast<PackedBinaryMatrix_64x4_Default&>(matrix0).get(), compressor0
     );
 }
-void compress_rgb32_to_binary_range_Default(
+void compress_rgb32_to_binary_range_64x4_Default(
     const uint32_t* image, size_t bytes_per_row,
     CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
 ){
@@ -34,7 +34,7 @@ void compress_rgb32_to_binary_range_Default(
 
 
 
-void filter_rgb32_Default(
+void filter_rgb32_64x4_Default(
     const PackedBinaryMatrix_IB& matrix,
     uint32_t* image, size_t bytes_per_row,
     uint32_t replace_with, bool replace_if_zero

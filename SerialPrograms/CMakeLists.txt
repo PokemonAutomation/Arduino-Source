@@ -462,14 +462,14 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Routines.h
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.h
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_Default.cpp
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_SSE42.cpp
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_AVX2.cpp
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_AVX512.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x4_Default.h
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x8_x64_SSE42.h
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x16_x64_AVX2.h
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x64_x64_AVX512.h
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x4_Default.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x8_x64_SSE42.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x16_x64_AVX2.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x64_x64_AVX512.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.h
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h
@@ -541,6 +541,8 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.cpp
@@ -1372,7 +1374,7 @@ SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_SSE41.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x8_x64_SSE42.cpp
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_SSE42.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x8_Core_x64_SSE42.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.cpp
     PROPERTIES COMPILE_FLAGS ${ARCH_FLAGS_09_Nehalem}
 )
@@ -1385,7 +1387,7 @@ SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX2.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX2.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x16_x64_AVX2.cpp
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_AVX2.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x16_Core_x64_AVX2.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.cpp
     PROPERTIES COMPILE_FLAGS ${ARCH_FLAGS_13_Haswell}
 )
@@ -1398,13 +1400,14 @@ SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x32_x64_AVX512.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x64_x64_AVX512.cpp
-    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_x64_AVX512.cpp
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x64_Core_x64_AVX512.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.cpp
     PROPERTIES COMPILE_FLAGS ${ARCH_FLAGS_17_Skylake}
 )
 endif()
 if (ARCH_FLAGS_19_IceLake)
 SET_SOURCE_FILES_PROPERTIES(
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.cpp
     PROPERTIES COMPILE_FLAGS ${ARCH_FLAGS_19_IceLake}
 )

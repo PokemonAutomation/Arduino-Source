@@ -46,6 +46,10 @@ std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix_64x64_x64_AVX512(
 
 std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix(BinaryMatrixType type){
     switch (type){
+#ifdef PA_AutoDispatch_19_IceLake
+    case BinaryMatrixType::i64x32_AVX512:
+        return make_PackedBinaryMatrix_64x32_x64_AVX512();
+#endif
 #ifdef PA_AutoDispatch_17_Skylake
     case BinaryMatrixType::i64x64_AVX512:
         return make_PackedBinaryMatrix_64x64_x64_AVX512();
@@ -64,6 +68,10 @@ std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix(BinaryMatrixType 
 }
 std::unique_ptr<PackedBinaryMatrix_IB> make_PackedBinaryMatrix(BinaryMatrixType type, size_t width, size_t height){
     switch (type){
+#ifdef PA_AutoDispatch_19_IceLake
+    case BinaryMatrixType::i64x32_AVX512:
+        return make_PackedBinaryMatrix_64x32_x64_AVX512(width, height);
+#endif
 #ifdef PA_AutoDispatch_17_Skylake
     case BinaryMatrixType::i64x64_AVX512:
         return make_PackedBinaryMatrix_64x64_x64_AVX512(width, height);
