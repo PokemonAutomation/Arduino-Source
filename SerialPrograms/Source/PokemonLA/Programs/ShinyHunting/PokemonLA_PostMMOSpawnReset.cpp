@@ -106,6 +106,9 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env){
         run_until(
             env, env.console,
             [this, &env](const BotBaseContext& context){
+                // TODO: gamemenu_to_ingame has wait_until(). Nesting wait_until() into run_until() is not the intended usage of run_until().
+                // When outer run_until() wants to break out, the inner wait_until() may not be able to do that until itself is finished.
+                // But this is fine in the current use case, as we are OK with the shiny sound detector stopping the program a little late.
                 gamemenu_to_ingame(env, env.console, GameSettings::instance().ENTER_GAME_MASH, GameSettings::instance().ENTER_GAME_WAIT);
                 env.console.log("Entered game! Checking shiny sound...");
 
