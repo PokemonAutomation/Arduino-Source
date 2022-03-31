@@ -42,9 +42,9 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 
-#include "Kernels/Kernels_x64_AVX2.h"
-#include "Kernels/Kernels_x64_AVX512.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512.h"
+//#include "Kernels/Kernels_x64_AVX2.h"
+//#include "Kernels/Kernels_x64_AVX512.h"
+//#include "Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512.h"
 //#include "Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h"
 
 
@@ -117,49 +117,6 @@ void print_8x64(__m512i m){
 
 
 
-PA_FORCE_INLINE void transpose_64x8x4_forward(
-    __m512i z0, __m512i z1, __m512i z2, __m512i z3,
-    __m256i& y0, __m256i& y1, __m256i& y2, __m256i& y3, __m256i& y4, __m256i& y5, __m256i& y6, __m256i& y7
-){
-    __m512i s0, s1, s2, s3;
-    s0 = _mm512_unpacklo_epi64(z0, z1);
-    s1 = _mm512_unpackhi_epi64(z0, z1);
-    s2 = _mm512_unpacklo_epi64(z2, z3);
-    s3 = _mm512_unpackhi_epi64(z2, z3);
-    z0 = _mm512_mask_permutex_epi64(s0, 0xcc, s2, 78);
-    z1 = _mm512_mask_permutex_epi64(s1, 0xcc, s3, 78);
-    z2 = _mm512_mask_permutex_epi64(s2, 0x33, s0, 78);
-    z3 = _mm512_mask_permutex_epi64(s3, 0x33, s1, 78);
-    y0 = _mm512_castsi512_si256(z0);
-    y1 = _mm512_castsi512_si256(z1);
-    y2 = _mm512_castsi512_si256(z2);
-    y3 = _mm512_castsi512_si256(z3);
-    y4 = _mm512_extracti64x4_epi64(z0, 1);
-    y5 = _mm512_extracti64x4_epi64(z1, 1);
-    y6 = _mm512_extracti64x4_epi64(z2, 1);
-    y7 = _mm512_extracti64x4_epi64(z3, 1);
-}
-PA_FORCE_INLINE void transpose_64x8x4_inverse(
-    __m512i& z0, __m512i& z1, __m512i& z2, __m512i& z3,
-    __m256i y0, __m256i y1, __m256i y2, __m256i y3, __m256i y4, __m256i y5, __m256i y6, __m256i y7
-){
-    __m512i s0, s1, s2, s3;
-    z0 = _mm512_inserti64x4(_mm512_castsi256_si512(y0), y4, 1);
-    z1 = _mm512_inserti64x4(_mm512_castsi256_si512(y1), y5, 1);
-    z2 = _mm512_inserti64x4(_mm512_castsi256_si512(y2), y6, 1);
-    z3 = _mm512_inserti64x4(_mm512_castsi256_si512(y3), y7, 1);
-    s0 = _mm512_mask_permutex_epi64(z0, 0xcc, z2, 78);
-    s1 = _mm512_mask_permutex_epi64(z1, 0xcc, z3, 78);
-    s2 = _mm512_mask_permutex_epi64(z2, 0x33, z0, 78);
-    s3 = _mm512_mask_permutex_epi64(z3, 0x33, z1, 78);
-    z0 = _mm512_unpacklo_epi64(s0, s1);
-    z1 = _mm512_unpackhi_epi64(s0, s1);
-    z2 = _mm512_unpacklo_epi64(s2, s3);
-    z3 = _mm512_unpackhi_epi64(s2, s3);
-}
-
-
-
 
 
 void TestProgramComputer::program(ProgramEnvironment& env){
@@ -186,6 +143,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
 #endif
 
 
+#if 0
     __m512i r0 = _mm512_setr_epi64(0, 1, 2, 3, 4, 5, 6, 7);
     __m512i r1 = _mm512_setr_epi64(8, 9, 10, 11, 12, 13, 14, 15);
     __m512i r2 = _mm512_setr_epi64(16, 17, 18, 19, 20, 21, 22, 23);
@@ -201,6 +159,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
     print_u64(r1);
     print_u64(r2);
     print_u64(r3);
+#endif
 
 
 #if 0

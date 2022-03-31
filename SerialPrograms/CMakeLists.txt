@@ -1407,6 +1407,7 @@ SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x64_x64_AVX512.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x32_x64_AVX512.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x64_x64_AVX512.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.cpp
     PROPERTIES COMPILE_FLAGS ${ARCH_FLAGS_17_Skylake}
 )
