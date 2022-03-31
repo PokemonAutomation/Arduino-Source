@@ -112,7 +112,7 @@ struct Waterfill_64x64_x64_AVX512GF : public Waterfill_64x64_x64_AVX512{
 
 //  Run Waterfill algorithm on mask "m" with starting point "x".
 //  Save result back into "x".
-PA_FORCE_INLINE static void waterfill_expand(const BinaryTile_64x64_x64_AVX512& m, BinaryTile_64x64_x64_AVX512& x){
+PA_FORCE_INLINE static void waterfill_expand(BinaryTile_64x64_x64_AVX512& m, BinaryTile_64x64_x64_AVX512& x){
     __m512i x0 = x.vec[0];
     __m512i x1 = x.vec[1];
     __m512i x2 = x.vec[2];
@@ -123,32 +123,34 @@ PA_FORCE_INLINE static void waterfill_expand(const BinaryTile_64x64_x64_AVX512& 
     __m512i x7 = x.vec[7];
 
     Waterfill_64x64_x64_AVX512GF_ProcessedMask mask(m, x0, x1, x2, x3, x4, x5, x6, x7);
+    Intrinsics_x64_AVX512::expand_forward(mask, x0, x1, x2, x3, x4, x5, x6, x7);
 
-//    uint64_t c = 0;
-    __m512i changed;
+    __m512i m0, m1, m2, m3, m4, m5, m6, m7;
     do{
-        Intrinsics_x64_AVX512::expand_forward(mask, x0, x1, x2, x3, x4, x5, x6, x7);
         expand_vertical(mask, x0, x1, x2, x3, x4, x5, x6, x7);
         Intrinsics_x64_AVX512GF::expand_reverse(mask, x0, x1, x2, x3, x4, x5, x6, x7);
-        changed = _mm512_xor_si512(x0, x.vec[0]);
-        x.vec[0] = x0;
-        changed = _mm512_ternarylogic_epi64(changed, x1, x.vec[1], 0b11110110);
-        x.vec[1] = x1;
-        changed = _mm512_ternarylogic_epi64(changed, x2, x.vec[2], 0b11110110);
-        x.vec[2] = x2;
-        changed = _mm512_ternarylogic_epi64(changed, x3, x.vec[3], 0b11110110);
-        x.vec[3] = x3;
-        changed = _mm512_ternarylogic_epi64(changed, x4, x.vec[4], 0b11110110);
-        x.vec[4] = x4;
-        changed = _mm512_ternarylogic_epi64(changed, x5, x.vec[5], 0b11110110);
-        x.vec[5] = x5;
-        changed = _mm512_ternarylogic_epi64(changed, x6, x.vec[6], 0b11110110);
-        x.vec[6] = x6;
-        changed = _mm512_ternarylogic_epi64(changed, x7, x.vec[7], 0b11110110);
-        x.vec[7] = x7;
-//        cout << x.dump() << endl;
-//        c++;
-    }while (_mm512_test_epi64_mask(changed, changed));
+        Intrinsics_x64_AVX512::expand_forward(mask, x0, x1, x2, x3, x4, x5, x6, x7);
+    }while (Intrinsics_x64_AVX512::keep_going(
+        mask,
+        m0, m1, m2, m3, m4, m5, m6, m7,
+        x0, x1, x2, x3, x4, x5, x6, x7
+    ));
+    x.vec[0] = x0;
+    x.vec[1] = x1;
+    x.vec[2] = x2;
+    x.vec[3] = x3;
+    x.vec[4] = x4;
+    x.vec[5] = x5;
+    x.vec[6] = x6;
+    x.vec[7] = x7;
+    m.vec[0] = m0;
+    m.vec[1] = m1;
+    m.vec[2] = m2;
+    m.vec[3] = m3;
+    m.vec[4] = m4;
+    m.vec[5] = m5;
+    m.vec[6] = m6;
+    m.vec[7] = m7;
 }
 
 

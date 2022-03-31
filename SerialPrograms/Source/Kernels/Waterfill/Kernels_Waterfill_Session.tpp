@@ -207,9 +207,10 @@ bool WaterfillSession_t<Tile, TileRoutines>::find_object(
         //  Expand current tile.
         if (first_expand){
             TileRoutines::waterfill_expand(mask, tile);
+        }else{
+            mask.andnot(tile);
         }
         first_expand = true;
-        mask.andnot(tile);
 
         size_t current_x, current_y;
         if (y > 0 && tile.top() != 0){

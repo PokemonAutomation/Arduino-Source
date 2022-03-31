@@ -275,6 +275,8 @@ SOURCES += \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.cpp \
@@ -919,6 +921,7 @@ HEADERS += \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h.autosave \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.h \

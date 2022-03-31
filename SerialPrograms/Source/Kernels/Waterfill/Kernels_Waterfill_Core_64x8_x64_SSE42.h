@@ -43,6 +43,7 @@ PA_FORCE_INLINE __m128i bit_reverse(__m128i x){
 }
 
 
+
 struct Waterfill_64x8_x64_SSE42_ProcessedMask{
     __m128i m0, m1, m2, m3; //  Copy of the masks.
     __m128i b0, b1, b2, b3; //  Bit-reversed copy of the masks.
@@ -88,6 +89,47 @@ struct Waterfill_64x8_x64_SSE42_ProcessedMask{
         transpose_i64_2x2_SSE2(r0, r1);
     }
 };
+
+
+
+PA_FORCE_INLINE bool keep_going(
+    const Waterfill_64x8_x64_SSE42_ProcessedMask& mask,
+    __m128i& m0, __m128i& m1, __m128i& m2, __m128i& m3,
+    __m128i& x0, __m128i& x1, __m128i& x2, __m128i& x3
+){
+    m0 = _mm_andnot_si128(x0, mask.m0);
+    m1 = _mm_andnot_si128(x1, mask.m1);
+    m2 = _mm_andnot_si128(x2, mask.m2);
+    m3 = _mm_andnot_si128(x3, mask.m3);
+
+    __m128i r0;
+
+    r0 = _mm_slli_epi64(m0, 1);
+    r0 = _mm_or_si128(r0, _mm_castpd_si128(_mm_shuffle_pd(_mm_castsi128_pd(m0), _mm_castsi128_pd(m1), 1)));
+    r0 = _mm_or_si128(r0, _mm_castpd_si128(_mm_shuffle_pd(_mm_setzero_pd(), _mm_castsi128_pd(m0), 1)));
+    __m128i changed = _mm_and_si128(r0, x0);
+
+    r0 = _mm_slli_epi64(m1, 1);
+    r0 = _mm_or_si128(r0, _mm_castpd_si128(_mm_shuffle_pd(_mm_castsi128_pd(m1), _mm_castsi128_pd(m2), 1)));
+    r0 = _mm_or_si128(r0, _mm_castpd_si128(_mm_shuffle_pd(_mm_castsi128_pd(m0), _mm_castsi128_pd(m1), 1)));
+    r0 = _mm_and_si128(r0, x1);
+    changed = _mm_or_si128(changed, r0);
+
+    r0 = _mm_slli_epi64(m2, 1);
+    r0 = _mm_or_si128(r0, _mm_castpd_si128(_mm_shuffle_pd(_mm_castsi128_pd(m2), _mm_castsi128_pd(m3), 1)));
+    r0 = _mm_or_si128(r0, _mm_castpd_si128(_mm_shuffle_pd(_mm_castsi128_pd(m1), _mm_castsi128_pd(m2), 1)));
+    r0 = _mm_and_si128(r0, x2);
+    changed = _mm_or_si128(changed, r0);
+
+    r0 = _mm_slli_epi64(m3, 1);
+    r0 = _mm_or_si128(r0, _mm_castpd_si128(_mm_shuffle_pd(_mm_castsi128_pd(m3), _mm_setzero_pd(), 1)));
+    r0 = _mm_or_si128(r0, _mm_castpd_si128(_mm_shuffle_pd(_mm_castsi128_pd(m2), _mm_castsi128_pd(m3), 1)));
+    r0 = _mm_and_si128(r0, x3);
+    changed = _mm_or_si128(changed, r0);
+
+    return !_mm_test_all_zeros(changed, changed);
+}
+
 
 
 PA_FORCE_INLINE void expand_forward(
@@ -306,29 +348,33 @@ static PA_FORCE_INLINE uint64_t popcount_sumcoord(
 
 //  Run Waterfill algorithm on mask "m" with starting point "x".
 //  Save result back into "x".
-static PA_FORCE_INLINE void waterfill_expand(const BinaryTile_64x8_x64_SSE42& m, BinaryTile_64x8_x64_SSE42& x){
+static PA_FORCE_INLINE void waterfill_expand(BinaryTile_64x8_x64_SSE42& m, BinaryTile_64x8_x64_SSE42& x){
     __m128i x0 = x.vec[0];
     __m128i x1 = x.vec[1];
     __m128i x2 = x.vec[2];
     __m128i x3 = x.vec[3];
 
     Waterfill_64x8_x64_SSE42_ProcessedMask mask(m, x0, x1, x2, x3);
+    expand_forward(mask, x0, x1, x2, x3);
 
-    __m128i changed;
+    __m128i m0, m1, m2, m3;
     do{
-        expand_forward(mask, x0, x1, x2, x3);
         expand_vertical(mask, x0, x1, x2, x3);
         expand_reverse(mask, x0, x1, x2, x3);
-        changed = _mm_xor_si128(x0, x.vec[0]);
-        x.vec[0] = x0;
-        changed = _mm_or_si128(changed, _mm_xor_si128(x1, x.vec[1]));
-        x.vec[1] = x1;
-        changed = _mm_or_si128(changed, _mm_xor_si128(x2, x.vec[2]));
-        x.vec[2] = x2;
-        changed = _mm_or_si128(changed, _mm_xor_si128(x3, x.vec[3]));
-        x.vec[3] = x3;
-//        cout << x.dump() << endl;
-    }while (!_mm_test_all_zeros(changed, changed));
+        expand_forward(mask, x0, x1, x2, x3);
+    }while (keep_going(
+        mask,
+        m0, m1, m2, m3,
+        x0, x1, x2, x3
+    ));
+    x.vec[0] = x0;
+    x.vec[1] = x1;
+    x.vec[2] = x2;
+    x.vec[3] = x3;
+    m.vec[0] = m0;
+    m.vec[1] = m1;
+    m.vec[2] = m2;
+    m.vec[3] = m3;
 }
 
 

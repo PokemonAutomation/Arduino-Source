@@ -15,23 +15,26 @@ namespace Waterfill{
 std::unique_ptr<WaterfillSession> make_WaterfillSession_64x4_Default        (PackedBinaryMatrix_IB* matrix);
 std::unique_ptr<WaterfillSession> make_WaterfillSession_64x8_x64_SSE42      (PackedBinaryMatrix_IB* matrix);
 std::unique_ptr<WaterfillSession> make_WaterfillSession_64x16_x64_AVX2      (PackedBinaryMatrix_IB* matrix);
+std::unique_ptr<WaterfillSession> make_WaterfillSession_64x32_x64_AVX512    (PackedBinaryMatrix_IB* matrix);
+std::unique_ptr<WaterfillSession> make_WaterfillSession_64x32_x64_AVX512GF  (PackedBinaryMatrix_IB* matrix);
 std::unique_ptr<WaterfillSession> make_WaterfillSession_64x64_x64_AVX512    (PackedBinaryMatrix_IB* matrix);
 std::unique_ptr<WaterfillSession> make_WaterfillSession_64x64_x64_AVX512GF  (PackedBinaryMatrix_IB* matrix);
-std::unique_ptr<WaterfillSession> make_WaterfillSession_64x32_x64_AVX512GF  (PackedBinaryMatrix_IB* matrix);
 
 std::unique_ptr<WaterfillSession> make_WaterfillSession(){
     BinaryMatrixType type = get_BinaryMatrixType();
     switch (type){
-#ifdef PA_AutoDispatch_19_IceLake
-    case BinaryMatrixType::i64x32_AVX512:
-        return make_WaterfillSession_64x32_x64_AVX512GF(nullptr);
-#endif
 #ifdef PA_AutoDispatch_17_Skylake
     case BinaryMatrixType::i64x64_AVX512:
         if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
             return make_WaterfillSession_64x64_x64_AVX512GF(nullptr);
         }else{
             return make_WaterfillSession_64x64_x64_AVX512(nullptr);
+        }
+    case BinaryMatrixType::i64x32_AVX512:
+        if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
+            return make_WaterfillSession_64x32_x64_AVX512GF(nullptr);
+        }else{
+            return make_WaterfillSession_64x32_x64_AVX512(nullptr);
         }
 #endif
 #ifdef PA_AutoDispatch_13_Haswell
@@ -48,16 +51,18 @@ std::unique_ptr<WaterfillSession> make_WaterfillSession(){
 }
 std::unique_ptr<WaterfillSession> make_WaterfillSession(PackedBinaryMatrix_IB& matrix){
     switch (matrix.type()){
-#ifdef PA_AutoDispatch_19_IceLake
-    case BinaryMatrixType::i64x32_AVX512:
-        return make_WaterfillSession_64x32_x64_AVX512GF(&matrix);
-#endif
 #ifdef PA_AutoDispatch_17_Skylake
     case BinaryMatrixType::i64x64_AVX512:
         if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
             return make_WaterfillSession_64x64_x64_AVX512GF(&matrix);
         }else{
             return make_WaterfillSession_64x64_x64_AVX512(&matrix);
+        }
+    case BinaryMatrixType::i64x32_AVX512:
+        if (CPU_CAPABILITY_CURRENT.OK_19_IceLake){
+            return make_WaterfillSession_64x32_x64_AVX512GF(&matrix);
+        }else{
+            return make_WaterfillSession_64x32_x64_AVX512(&matrix);
         }
 #endif
 #ifdef PA_AutoDispatch_13_Haswell
