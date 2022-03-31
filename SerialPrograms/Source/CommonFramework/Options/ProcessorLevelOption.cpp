@@ -61,8 +61,7 @@ ProcessorLevelOption::ProcessorLevelOption()
     : EnumDropdownOption(
         "<b>Processor Specific Optimization:</b>",
         make_processor_labels(),
-//        AVAILABLE_CAPABILITIES().size() - 1
-        0
+        AVAILABLE_CAPABILITIES().size() - 1
     )
 {
     set_global();
