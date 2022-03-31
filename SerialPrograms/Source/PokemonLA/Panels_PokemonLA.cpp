@@ -20,6 +20,8 @@
 #include "Programs/Farming/PokemonLA_MagikarpMoveGrinder.h"
 #include "Programs/Farming/PokemonLA_NuggetFarmerHighlands.h"
 
+#include "Programs/General/PokemonLA_ClothingBuyer.h"
+
 #include "Programs/ShinyHunting/PokemonLA_GalladeFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_CrobatFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_UnownFinder.h"
@@ -49,6 +51,7 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<BraviaryHeightGlitch_Descriptor, BraviaryHeightGlitch>();
     add_program<DistortionWaiter_Descriptor, DistortionWaiter>();
     add_program<OutbreakFinder_Descriptor, OutbreakFinder>();
+    add_program<ClothingBuyer_Descriptor, ClothingBuyer>();
 
     add_divider("---- Trading ----");
     add_program<SelfBoxTrade_Descriptor, SelfBoxTrade>();
