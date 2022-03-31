@@ -368,7 +368,7 @@ static PA_FORCE_INLINE uint64_t popcount_sumcoord(
 
 
 //  Run Waterfill algorithm on mask "m" with starting point "x".
-//  Save result back into "x".
+//  Save result back into "x". Clear bits of object from "m".
 static PA_FORCE_INLINE void waterfill_expand(BinaryTile_64x16_x64_AVX2& m, BinaryTile_64x16_x64_AVX2& x){
     __m256i x0 = x.vec[0];
     __m256i x1 = x.vec[1];

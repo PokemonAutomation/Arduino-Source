@@ -193,7 +193,7 @@ PA_FORCE_INLINE static void waterfill_expand(BinaryTile_64x32_x64_AVX512& m, Bin
     __m512i m0, m1, m2, m3;
     do{
         expand_vertical(mask, x0, x1, x2, x3);
-        Intrinsics_x64_AVX512::expand_reverse(mask, x0, x1, x2, x3);
+        Intrinsics_x64_AVX512GF::expand_reverse(mask, x0, x1, x2, x3);
         Intrinsics_x64_AVX512::expand_forward(mask, x0, x1, x2, x3);
     }while (Intrinsics_x64_AVX512::keep_going(
         mask,
