@@ -78,7 +78,6 @@ private:
     BattlePokemonActionTable POKEMON_ACTIONS;
 
     EventNotificationOption NOTIFICATION_STATUS;
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 };
 

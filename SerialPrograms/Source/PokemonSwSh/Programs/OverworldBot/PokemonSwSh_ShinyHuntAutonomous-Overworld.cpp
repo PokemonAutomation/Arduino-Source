@@ -83,7 +83,6 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld(const ShinyHuntAutono
         70000, 0
     )
     , ENCOUNTER_BOT_OPTIONS(true, true)
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,

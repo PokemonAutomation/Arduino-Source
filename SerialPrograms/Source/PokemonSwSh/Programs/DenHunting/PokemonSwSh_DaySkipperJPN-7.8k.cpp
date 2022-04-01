@@ -41,7 +41,6 @@ DaySkipperJPN7p8k::DaySkipperJPN7p8k(const DaySkipperJPN7p8k_Descriptor& descrip
         QDate(2000, 1, 1)
     )
     , NOTIFICATION_PROGRESS_UPDATE("Progress Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRESS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,

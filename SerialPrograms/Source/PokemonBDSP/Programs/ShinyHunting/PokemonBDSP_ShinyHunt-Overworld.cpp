@@ -37,7 +37,6 @@ ShinyHuntOverworld::ShinyHuntOverworld(const ShinyHuntOverworld_Descriptor& desc
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
     , ENCOUNTER_BOT_OPTIONS(true, true)
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,

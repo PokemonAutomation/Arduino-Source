@@ -58,7 +58,6 @@ AutonomousBallThrower::AutonomousBallThrower(const AutonomousBallThrower_Descrip
     )
     , NOTIFICATION_CATCH_SUCCESS("Catch Success", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_CATCH_FAILED("Catch Failed", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_CATCH_SUCCESS,
         &NOTIFICATION_CATCH_FAILED,

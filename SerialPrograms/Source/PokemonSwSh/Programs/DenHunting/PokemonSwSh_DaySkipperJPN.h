@@ -35,7 +35,6 @@ private:
     SimpleIntegerOption<uint32_t> SKIPS;
 
     EventNotificationOption NOTIFICATION_PROGRESS_UPDATE;
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;

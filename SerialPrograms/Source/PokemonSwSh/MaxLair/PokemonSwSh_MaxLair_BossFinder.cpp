@@ -60,7 +60,6 @@ MaxLairBossFinder::MaxLairBossFinder(const MaxLairBossFinder_Descriptor& descrip
     , CONSOLES(MaxLairBossFinder_ConsoleFactory())
     , NOTIFICATION_STATUS("Status Update", true, false)
     , NOTIFICATION_SHINY("Shiny Catch", true, true, ImageAttachmentMode::JPG, {"Notifs", "Showcase"})
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &HOSTING.NOTIFICATIONS.NOTIFICATION,
         &NOTIFICATION_STATUS,

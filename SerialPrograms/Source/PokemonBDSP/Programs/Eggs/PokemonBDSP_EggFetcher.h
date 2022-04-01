@@ -47,7 +47,6 @@ private:
     TimeExpressionOption<uint16_t> TRAVEL_TIME_PER_FETCH;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 };
 

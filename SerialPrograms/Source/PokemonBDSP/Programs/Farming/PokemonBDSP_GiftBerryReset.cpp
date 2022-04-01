@@ -71,7 +71,6 @@ GiftBerryReset::GiftBerryReset(const GiftBerryReset_Descriptor& descriptor)
         "<b>Berries:</b><br>Multiple berries can be selected. The program will stop if one of the selected berries is received."
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,

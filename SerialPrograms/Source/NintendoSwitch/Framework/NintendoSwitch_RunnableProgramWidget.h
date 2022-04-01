@@ -8,6 +8,7 @@
 #define PokemonAutomation_NintendoSwitch_RunnableProgramWidget_H
 
 #include "ClientSource/Connection/BotBase.h"
+#include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Panels/RunnablePanelWidget.h"
 #include "NintendoSwitch_RunnableProgram.h"
 
@@ -42,7 +43,7 @@ protected:
     virtual bool request_program_stop() override;
 
     virtual void run_program() override final;
-    virtual void run_switch_program() = 0;
+    virtual void run_switch_program(const ProgramInfo& info) = 0;
 
 protected:
     BotBase& sanitize_botbase(BotBase* botbase);

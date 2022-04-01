@@ -45,7 +45,6 @@ private:
     EncounterBotLanguage LANGUAGE;
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
 
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 
 //    SectionDivider m_advanced_options;

@@ -8,8 +8,9 @@
 #define PokemonAutomation_CommonFramework_AudioInferenceSession_H
 
 #include <map>
+#include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/AsyncDispatcher.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "Common/Cpp/CancellableScope.h"
 #include "CommonFramework/Tools/AudioFeed.h"
 #include "AudioInferenceCallback.h"
 
@@ -17,14 +18,14 @@ namespace PokemonAutomation{
 
 
 
-class AudioInferenceSession{
+class AudioInferenceSession : private Cancellable{
 public:
     AudioInferenceSession(
-        ProgramEnvironment& env, LoggerQt& logger,
+        CancellableScope& scope, Logger& logger,
         AudioFeed& feed,
         std::chrono::milliseconds period = std::chrono::milliseconds(20)
     );
-    ~AudioInferenceSession();
+    virtual ~AudioInferenceSession();
 
     void operator+=(AudioInferenceCallback& callback);
     void operator-=(AudioInferenceCallback& callback);
@@ -37,10 +38,12 @@ public:
     void stop();
 
 private:
+    virtual void cancel() override;
+
+private:
     struct Callback;
 
-    ProgramEnvironment& m_env;
-    LoggerQt& m_logger;
+    Logger& m_logger;
     AudioFeed& m_feed;
     std::chrono::milliseconds m_period;
     std::atomic<bool> m_stop;
@@ -56,19 +59,19 @@ private:
 class AsyncAudioInferenceSession : private AudioInferenceSession{
 public:
     AsyncAudioInferenceSession(
-        ProgramEnvironment& env, LoggerQt& logger,
+        CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
         AudioFeed& feed,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)
     );
     AsyncAudioInferenceSession(
-        ProgramEnvironment& env, LoggerQt& logger,
+        CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
         AudioFeed& feed,
         std::function<void()> on_finish_callback,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)
     );
 
     //  This will not rethrow exceptions in the inference thread.
-    ~AsyncAudioInferenceSession();
+    virtual ~AsyncAudioInferenceSession();
 
     using AudioInferenceSession::operator+=;
     using AudioInferenceSession::operator-=;

@@ -49,7 +49,6 @@ private:
     IVCheckerFilterOption SPDEF;
     IVCheckerFilterOption SPEED;
 
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 };
 

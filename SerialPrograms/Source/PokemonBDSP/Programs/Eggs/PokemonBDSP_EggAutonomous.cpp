@@ -83,7 +83,6 @@ EggAutonomous::EggAutonomous(const EggAutonomous_Descriptor& descriptor)
         true, true, ImageAttachmentMode::JPG,
         {"Notifs", "Showcase"}
     )
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_NONSHINY_KEEP,

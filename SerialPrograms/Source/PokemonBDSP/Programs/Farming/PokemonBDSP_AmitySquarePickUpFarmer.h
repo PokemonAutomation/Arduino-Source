@@ -44,7 +44,6 @@ private:
     TimeExpressionOption<uint16_t> WAIT_TIME_FOR_POKEMON;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 };
 

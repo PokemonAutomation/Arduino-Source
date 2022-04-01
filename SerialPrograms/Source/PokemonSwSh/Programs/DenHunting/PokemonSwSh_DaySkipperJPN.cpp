@@ -38,7 +38,6 @@ DaySkipperJPN::DaySkipperJPN(const DaySkipperJPN_Descriptor& descriptor)
         10
     )
     , NOTIFICATION_PROGRESS_UPDATE("Progress Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRESS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,

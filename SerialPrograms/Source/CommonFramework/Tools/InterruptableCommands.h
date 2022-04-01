@@ -18,10 +18,13 @@
 namespace PokemonAutomation{
 
 
-class AsyncCommandSession{
+class AsyncCommandSession : public Cancellable{
 
 public:
-    AsyncCommandSession(ProgramEnvironment& env, BotBase& botbase);
+    AsyncCommandSession(
+        CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
+        BotBase& botbase
+    );
     ~AsyncCommandSession();
 
     bool command_is_running();
@@ -45,6 +48,7 @@ public:
 
 
 private:
+    virtual void cancel() override;
     void thread_loop();
 
 
@@ -55,7 +59,7 @@ private:
         std::function<void(const BotBaseContext&)> commands;
     };
 
-    ProgramEnvironment& m_env;
+    Logger& m_logger;
     BotBase& m_botbase;
     std::unique_ptr<CommandSet> m_current;
 //    std::unique_ptr<CommandSet> m_pending;

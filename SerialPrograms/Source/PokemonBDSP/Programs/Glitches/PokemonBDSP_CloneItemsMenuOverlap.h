@@ -48,7 +48,6 @@ private:
     SimpleIntegerOption<uint16_t> SAVE_INTERVAL;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;

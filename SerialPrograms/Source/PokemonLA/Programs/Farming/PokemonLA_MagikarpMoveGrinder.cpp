@@ -44,7 +44,6 @@ MagikarpMoveGrinder_Descriptor::MagikarpMoveGrinder_Descriptor()
 MagikarpMoveGrinder::MagikarpMoveGrinder(const MagikarpMoveGrinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
         &NOTIFICATION_PROGRAM_FINISH,
@@ -251,7 +250,7 @@ void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env){
     }catch (OperationFailedException&){
         stats.errors++;
         throw;
-    }catch (OperationCancelledException&){}
+    }
 
     env.update_stats();
     send_program_finished_notification(

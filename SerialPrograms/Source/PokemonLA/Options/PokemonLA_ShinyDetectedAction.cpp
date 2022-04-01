@@ -171,7 +171,7 @@ void on_shiny_sound(
     }
 
     pbf_press_button(console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-    throw OperationCancelledException();
+    throw ProgramFinishedException();
 }
 
 

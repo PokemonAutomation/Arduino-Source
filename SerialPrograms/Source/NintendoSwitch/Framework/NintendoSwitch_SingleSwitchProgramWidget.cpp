@@ -24,15 +24,10 @@ SingleSwitchProgramWidget* SingleSwitchProgramWidget::make(
     widget->construct();
     return widget;
 }
-void SingleSwitchProgramWidget::run_switch_program(){
+void SingleSwitchProgramWidget::run_switch_program(const ProgramInfo& info){
     SingleSwitchProgramInstance& instance = static_cast<SingleSwitchProgramInstance&>(m_instance);
     SingleSwitchProgramEnvironment env(
-        ProgramInfo(
-            instance.descriptor().identifier(),
-            instance.descriptor().category(),
-            instance.descriptor().display_name(),
-            timestamp()
-        ),
+        info,
         m_logger,
         m_current_stats.get(), m_historical_stats.get(),
         system().logger(),

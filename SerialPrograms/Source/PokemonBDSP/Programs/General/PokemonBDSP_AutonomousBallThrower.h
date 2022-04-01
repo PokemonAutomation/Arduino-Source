@@ -43,7 +43,6 @@ private:
 
     EventNotificationOption NOTIFICATION_CATCH_SUCCESS;
     EventNotificationOption NOTIFICATION_CATCH_FAILED;
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 };
 

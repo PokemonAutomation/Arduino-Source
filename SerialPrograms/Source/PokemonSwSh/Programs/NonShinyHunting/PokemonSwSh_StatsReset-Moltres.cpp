@@ -54,7 +54,6 @@ StatsResetMoltres::StatsResetMoltres(const StatsResetMoltres_Descriptor& descrip
     , SPATK("<b>Sp. Atk:</b>")
     , SPDEF("<b>Sp. Def:</b>")
     , SPEED("<b>Speed:</b>")
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,

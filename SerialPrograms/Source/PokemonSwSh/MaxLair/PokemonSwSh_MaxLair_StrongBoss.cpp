@@ -93,7 +93,6 @@ MaxLairStrongBoss::MaxLairStrongBoss(const MaxLairStrongBoss_Descriptor& descrip
     , CONSOLES(MaxLairStrongBoss_ConsoleFactory())
     , NOTIFICATION_STATUS("Status Update", true, false)
     , NOTIFICATION_SHINY("Shiny Catch", true, true, ImageAttachmentMode::JPG, {"Notifs", "Showcase"})
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &HOSTING.NOTIFICATIONS.NOTIFICATION,
         &NOTIFICATION_STATUS,

@@ -42,7 +42,6 @@ SelfTouchTrade::SelfTouchTrade(const SelfTouchTrade_Descriptor& descriptor)
         2, 0, 40
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,

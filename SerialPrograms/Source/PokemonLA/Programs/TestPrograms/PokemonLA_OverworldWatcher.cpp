@@ -57,7 +57,7 @@ void OverworldWatcher::program(SingleSwitchProgramEnvironment& env){
     watcher.process_frame(env.console.video().snapshot(), std::chrono::system_clock::now());
 #else
     {
-        VisualInferenceSession session(env, env.console, env.console, env.console);
+        VisualInferenceSession session(env.scope(), env.console, env.console, env.console);
         session += watcher;
         session.run();
     }

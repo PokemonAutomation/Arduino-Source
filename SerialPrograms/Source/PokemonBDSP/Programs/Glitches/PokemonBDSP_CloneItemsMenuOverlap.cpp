@@ -53,7 +53,6 @@ CloneItemsMenuOverlap::CloneItemsMenuOverlap(const CloneItemsMenuOverlap_Descrip
         0, 0, 999
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
@@ -99,7 +98,7 @@ bool CloneItemsMenuOverlap::trigger_encounter(ProgramEnvironment& env, ConsoleHa
     console.log("Detected overworld. Triggering battle with menu overlap...");
 
     StartBattleMenuOverlapDetector detector(console);
-    AsyncVisualInferenceSession session(env, console, console, console);
+    AsyncVisualInferenceSession session(env.scope(), console, env.inference_dispatcher(), console, console);
     session += detector;
 
     for (size_t c = 0; c < 60; c++){

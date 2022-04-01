@@ -5,6 +5,7 @@
  */
 
 #include <QImage>
+#include "Common/Cpp/Exceptions.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "VisualInferenceSession.h"
@@ -27,22 +28,19 @@ struct VisualInferenceSession::Callback{
 
 
 VisualInferenceSession::VisualInferenceSession(
-    ProgramEnvironment& env, LoggerQt& logger,
+    CancellableScope& scope, Logger& logger,
     VideoFeed& feed, VideoOverlay& overlay,
     std::chrono::milliseconds period
 )
-    : m_env(env)
+    : Cancellable(scope)
     , m_logger(logger)
     , m_feed(feed)
     , m_overlay(overlay)
     , m_period(period)
     , m_stop(false)
-{
-    env.register_stop_program_signal(m_lock, m_cv);
-}
+{}
 VisualInferenceSession::~VisualInferenceSession(){
     stop();
-    m_env.deregister_stop_program_signal(m_cv);
 }
 void VisualInferenceSession::stop(){
     bool expected = false;
@@ -61,6 +59,9 @@ void VisualInferenceSession::stop(){
     for (Callback* callback : m_callback_list){
         callback->stats.log(m_logger, callback->callback->label(), UNITS, DIVIDER);
     }
+}
+void VisualInferenceSession::cancel(){
+    stop();
 }
 
 void VisualInferenceSession::operator+=(VisualInferenceCallback& callback){
@@ -115,7 +116,7 @@ VisualInferenceCallback* VisualInferenceSession::run(std::chrono::system_clock::
     auto next_tick = now + m_period;
 
     while (true){
-        m_env.check_stopping();
+        check_parent_cancelled();
         if (m_stop.load(std::memory_order_acquire)){
             return nullptr;
         }
@@ -148,7 +149,7 @@ VisualInferenceCallback* VisualInferenceSession::run(std::chrono::system_clock::
             m_cv.wait_until(
                 lg, stop_wait,
                 [=]{
-                    return m_env.is_stopping() || m_stop.load(std::memory_order_acquire);
+                    return m_stop.load(std::memory_order_acquire);
                 }
             );
             next_tick += m_period;
@@ -159,24 +160,24 @@ VisualInferenceCallback* VisualInferenceSession::run(std::chrono::system_clock::
 
 
 AsyncVisualInferenceSession::AsyncVisualInferenceSession(
-    ProgramEnvironment& env, LoggerQt& logger,
+    CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
     VideoFeed& feed, VideoOverlay& overlay,
     std::chrono::milliseconds period
 )
-    : VisualInferenceSession(env, logger, feed, overlay, period)
+    : VisualInferenceSession(scope, logger, feed, overlay, period)
     , m_triggering_callback(nullptr)
-    , m_task(env.inference_dispatcher().dispatch([this]{ thread_body(); }))
+    , m_task(dispatcher.dispatch([this]{ thread_body(); }))
 {}
 AsyncVisualInferenceSession::AsyncVisualInferenceSession(
-    ProgramEnvironment& env, LoggerQt& logger,
+    CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
     VideoFeed& feed, VideoOverlay& overlay,
     std::function<void()> on_finish_callback,
     std::chrono::milliseconds period
 )
-    : VisualInferenceSession(env, logger, feed, overlay, period)
+    : VisualInferenceSession(scope, logger, feed, overlay, period)
     , m_on_finish_callback(std::move(on_finish_callback))
     , m_triggering_callback(nullptr)
-    , m_task(env.inference_dispatcher().dispatch([this]{ thread_body(); }))
+    , m_task(dispatcher.dispatch([this]{ thread_body(); }))
 {}
 AsyncVisualInferenceSession::~AsyncVisualInferenceSession(){
     VisualInferenceSession::stop();

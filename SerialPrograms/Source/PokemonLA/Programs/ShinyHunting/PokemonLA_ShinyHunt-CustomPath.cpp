@@ -42,7 +42,6 @@ ShinyHuntCustomPath::ShinyHuntCustomPath(const ShinyHuntCustomPath_Descriptor& d
         false
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
         &SHINY_DETECTED.NOTIFICATIONS,
@@ -242,21 +241,19 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env){
             stats.to_str()
         );
         try{
-            Stats& stats = env.stats<Stats>();
+//            Stats& stats = env.stats<Stats>();
 
-        goto_camp_from_jubilife(env, env.console, TRAVEL_LOCATION);
-        run_path(env);
+            goto_camp_from_jubilife(env, env.console, TRAVEL_LOCATION);
+            run_path(env);
 
-        stats.attempts++;
+            stats.attempts++;
 
-        pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-        reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }catch (OperationFailedException&){
             stats.errors++;
             pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
-        }catch (OperationCancelledException&){
-            break;
         }
 
     }

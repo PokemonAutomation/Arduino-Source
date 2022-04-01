@@ -75,7 +75,7 @@ void SuperControlSession::run_session(){
 
     std::unique_ptr<AsyncVisualInferenceSession> visual;
     if (!m_visual_callbacks.empty()){
-        visual.reset(new AsyncVisualInferenceSession(m_env, m_console, m_console, m_console, m_visual_period));
+        visual.reset(new AsyncVisualInferenceSession(m_env.scope(), m_console, m_env.inference_dispatcher(), m_console, m_console, m_visual_period));
         for (VisualInferenceCallback* callback : m_visual_callbacks){
             *visual += *callback;
         }
@@ -83,13 +83,18 @@ void SuperControlSession::run_session(){
 
     std::unique_ptr<AsyncAudioInferenceSession> audio;
     if (!m_audio_callbacks.empty()){
-        audio.reset(new AsyncAudioInferenceSession(m_env, m_console, m_console, m_audio_period));
+        audio.reset(new AsyncAudioInferenceSession(m_env.scope(), m_console, m_env.inference_dispatcher(), m_console, m_audio_period));
         for (AudioInferenceCallback* callback : m_audio_callbacks){
             *audio += *callback;
         }
     }
 
-    m_active_command.reset(new AsyncCommandSession(m_env, m_console.botbase()));
+    m_active_command.reset(
+        new AsyncCommandSession(
+            m_env.scope(), m_env.logger(), m_env.realtime_dispatcher(),
+            m_console.botbase()
+        )
+    );
 
     WallClock now = std::chrono::system_clock::now();
     WallClock next_tick = now + m_state_period;

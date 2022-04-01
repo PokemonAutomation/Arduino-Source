@@ -51,7 +51,6 @@ PostMMOSpawnReset::PostMMOSpawnReset(const PostMMOSpawnReset_Descriptor& descrip
         "3 * TICKS_PER_SECOND"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
         &SHINY_DETECTED.NOTIFICATIONS,
@@ -159,8 +158,6 @@ void PostMMOSpawnReset::program(SingleSwitchProgramEnvironment& env){
             // If there is any error generated when the game is running and is caught here,
             // we just do nothing to handle the error as in the next iteration of run_iteration()
             // the game will be immediately restarted.
-        }catch (OperationCancelledException&){
-            break;
         }
     }
 

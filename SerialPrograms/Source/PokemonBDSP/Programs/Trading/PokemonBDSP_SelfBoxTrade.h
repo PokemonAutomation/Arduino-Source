@@ -32,7 +32,6 @@ public:
 private:
     SimpleIntegerOption<uint8_t> BOXES_TO_TRADE;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 };
 

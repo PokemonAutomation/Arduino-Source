@@ -36,7 +36,6 @@ private:
     SimpleIntegerOption<uint16_t> REAL_LIFE_YEAR;
 
     EventNotificationOption NOTIFICATION_PROGRESS_UPDATE;
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;

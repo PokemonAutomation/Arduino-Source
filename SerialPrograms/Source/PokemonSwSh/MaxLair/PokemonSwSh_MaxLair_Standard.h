@@ -57,7 +57,6 @@ private:
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationOption NOTIFICATION_SHINY;
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 };
 

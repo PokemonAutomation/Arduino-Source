@@ -38,7 +38,7 @@ MultiSwitchProgramWidget* MultiSwitchProgramWidget::make(
     );
     return widget;
 }
-void MultiSwitchProgramWidget::run_switch_program(){
+void MultiSwitchProgramWidget::run_switch_program(const ProgramInfo& info){
     MultiSwitchProgramInstance& instance = static_cast<MultiSwitchProgramInstance&>(m_instance);
     FixedLimitVector<ConsoleHandle> switches(instance.system_count());
     for (size_t c = 0; c < instance.system_count(); c++){
@@ -53,12 +53,7 @@ void MultiSwitchProgramWidget::run_switch_program(){
         );
     }
     MultiSwitchProgramEnvironment env(
-        ProgramInfo(
-            instance.descriptor().identifier(),
-            instance.descriptor().category(),
-            instance.descriptor().display_name(),
-            timestamp()
-        ),
+        info,
         m_logger,
         m_current_stats.get(), m_historical_stats.get(),
         std::move(switches)

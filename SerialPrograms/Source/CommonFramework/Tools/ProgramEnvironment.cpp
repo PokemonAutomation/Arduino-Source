@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 
 
 struct ProgramEnvironmentData{
-    const ProgramInfo m_program_info;
+    const ProgramInfo& m_program_info;
 
     std::atomic<bool> m_stopping;
     std::mutex m_lock;
@@ -30,9 +30,9 @@ struct ProgramEnvironmentData{
     std::map<std::condition_variable*, std::mutex*> m_stop_signals;
 
     ProgramEnvironmentData(
-        ProgramInfo program_info
+        const ProgramInfo& program_info
     )
-        : m_program_info(std::move(program_info))
+        : m_program_info(program_info)
         , m_stopping(false)
         , m_realtime_dispatcher(
             [](){
@@ -55,7 +55,7 @@ struct ProgramEnvironmentData{
 ProgramEnvironment::~ProgramEnvironment(){}
 
 ProgramEnvironment::ProgramEnvironment(
-    ProgramInfo program_info,
+    const ProgramInfo& program_info,
     LoggerQt& logger,
     StatsTracker* current_stats,
     const StatsTracker* historical_stats
@@ -63,7 +63,7 @@ ProgramEnvironment::ProgramEnvironment(
     : m_logger(logger)
     , m_current_stats(current_stats)
     , m_historical_stats(historical_stats)
-    , m_data(std::move(program_info))
+    , m_data(program_info)
 {}
 
 const ProgramInfo& ProgramEnvironment::program_info() const{
@@ -78,42 +78,7 @@ AsyncDispatcher& ProgramEnvironment::inference_dispatcher(){
 
 
 void ProgramEnvironment::update_stats(const std::string& override_current){
-    std::string current;
-    if (!override_current.empty()){
-        current = override_current;
-    }else if (m_current_stats){
-        current = m_current_stats->to_str();
-    }
-
-    std::string historical;
-    if (m_historical_stats){
-        historical = m_historical_stats->to_str();
-    }
-
-    if (current.empty() && historical.empty()){
-        emit set_status("");
-        return;
-    }
-
-    if (!current.empty() && historical.empty()){
-        QString str = QString::fromStdString(current);
-        emit set_status(str);
-        log(str);
-        return;
-    }
-    if (current.empty() && !historical.empty()){
-        QString str = QString::fromStdString(historical);
-        emit set_status("<b>Past Runs</b> - " + str);
-        return;
-    }
-
-    log(QString::fromStdString(current));
-
-    std::string str;
-    str += "<b>Current Run</b> - " + current;
-    str += "<br>";
-    str += "<b>Past Totals</b> - " + historical;
-
+    std::string str = stats_to_bar(m_logger, m_historical_stats, m_current_stats, override_current);
     emit set_status(QString::fromStdString(str));
 }
 
@@ -142,6 +107,7 @@ void ProgramEnvironment::signal_stop(){
         std::lock_guard<std::mutex> lg0(*item.second);
         item.first->notify_all();
     }
+    m_scope.cancel();
 }
 
 

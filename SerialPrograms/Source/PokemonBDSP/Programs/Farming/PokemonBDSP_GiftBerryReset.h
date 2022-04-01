@@ -43,7 +43,6 @@ private:
     BerrySelectorOption TARGET_BERRIES;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 };
 

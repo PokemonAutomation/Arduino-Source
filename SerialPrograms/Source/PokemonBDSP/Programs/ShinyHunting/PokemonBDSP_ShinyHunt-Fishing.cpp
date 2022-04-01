@@ -39,7 +39,6 @@ ShinyHuntFishing::ShinyHuntFishing(const ShinyHuntFishing_Descriptor& descriptor
     , GO_HOME_WHEN_DONE(false)
     , SHORTCUT("<b>Fishing Shortcut:</b>")
     , ENCOUNTER_BOT_OPTIONS(true, true)
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,

@@ -153,7 +153,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env){
 //                env.console, env.console,
 //                ImageFloatBox(0.1, 0.01, 0.8, 0.77)
 //            );
-            AsyncVisualInferenceSession inference(env, env.console, env.console, env.console);
+            AsyncVisualInferenceSession inference(env.scope(), env.console, env.inference_dispatcher(), env.console, env.console);
             inference += receive_detector;
 //            inference += shiny_detector;
 

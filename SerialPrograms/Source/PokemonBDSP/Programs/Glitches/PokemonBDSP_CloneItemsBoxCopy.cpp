@@ -40,7 +40,6 @@ CloneItemsBoxCopy::CloneItemsBoxCopy(const CloneItemsBoxCopy_Descriptor& descrip
         999, 0, 999
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,

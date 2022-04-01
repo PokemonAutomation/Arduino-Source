@@ -8,8 +8,9 @@
 #define PokemonAutomation_CommonFramework_VisualInferenceSession_H
 
 #include <map>
+#include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/AsyncDispatcher.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "Common/Cpp/CancellableScope.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "VisualInferenceCallback.h"
@@ -18,10 +19,10 @@ namespace PokemonAutomation{
 
 
 
-class VisualInferenceSession{
+class VisualInferenceSession : private Cancellable{
 public:
     VisualInferenceSession(
-        ProgramEnvironment& env, LoggerQt& logger,
+        CancellableScope& scope, Logger& logger,
         VideoFeed& feed, VideoOverlay& overlay,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)
     );
@@ -38,10 +39,12 @@ public:
     void stop();
 
 private:
+    virtual void cancel() override;
+
+private:
     struct Callback;
 
-    ProgramEnvironment& m_env;
-    LoggerQt& m_logger;
+    Logger& m_logger;
     VideoFeed& m_feed;
     VideoOverlay& m_overlay;
     std::chrono::milliseconds m_period;
@@ -61,12 +64,12 @@ private:
 class AsyncVisualInferenceSession : private VisualInferenceSession{
 public:
     AsyncVisualInferenceSession(
-        ProgramEnvironment& env, LoggerQt& logger,
+        CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
         VideoFeed& feed, VideoOverlay& overlay,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)
     );
     AsyncVisualInferenceSession(
-        ProgramEnvironment& env, LoggerQt& logger,
+        CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
         VideoFeed& feed, VideoOverlay& overlay,
         std::function<void()> on_finish_callback,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)

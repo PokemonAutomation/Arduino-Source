@@ -48,7 +48,6 @@ private:
     RegiSelectorOption REGI_NAME;
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
 
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;

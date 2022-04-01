@@ -11,6 +11,7 @@
 #include <chrono>
 #include <QObject>
 #include "Common/Cpp/Pimpl.h"
+#include "Common/Cpp/CancellableScope.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 
@@ -50,12 +51,13 @@ class ProgramEnvironment : public QObject{
 public:
     ~ProgramEnvironment();
     ProgramEnvironment(
-        ProgramInfo program_info,
+        const ProgramInfo& program_info,
         LoggerQt& logger,
         StatsTracker* current_stats,
         const StatsTracker* historical_stats
     );
 
+    CancellableScope& scope(){ return m_scope; }
     const ProgramInfo& program_info() const;
 
     template <class... Args>
@@ -105,6 +107,8 @@ private:
 
     StatsTracker* m_current_stats;
     const StatsTracker* m_historical_stats;
+
+    CancellableScope m_scope;
 
     Pimpl<ProgramEnvironmentData> m_data;
 };

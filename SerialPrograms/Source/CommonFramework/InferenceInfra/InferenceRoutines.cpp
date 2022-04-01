@@ -65,7 +65,8 @@ int wait_until(
             case InferenceType::VISUAL:
                 if (visual_session == nullptr){
                     visual_session.reset(new AsyncVisualInferenceSession(
-                        env, console, console, console,
+                        env.scope(), console, env.inference_dispatcher(),
+                        console, console,
                         stop_callback, period
                     ));
                 }
@@ -74,7 +75,8 @@ int wait_until(
             case InferenceType::AUDIO:
                 if (audio_session == nullptr){
                     audio_session.reset(new AsyncAudioInferenceSession(
-                        env, console, console,
+                        env.scope(), console, env.inference_dispatcher(),
+                        console,
                         stop_callback, period
                     ));
                 }
@@ -144,7 +146,8 @@ int run_until(
             case InferenceType::VISUAL:
                 if (visual_session == nullptr){
                     visual_session.reset(new AsyncVisualInferenceSession(
-                        env, console, console, console,
+                        env.scope(), console, env.inference_dispatcher(),
+                        console, console,
                         [&](){ context.cancel_now(); },
                         period
                     ));
@@ -154,7 +157,8 @@ int run_until(
             case InferenceType::AUDIO:
                 if (audio_session == nullptr){
                     audio_session.reset(new AsyncAudioInferenceSession(
-                        env, console, console,
+                        env.scope(), console, env.inference_dispatcher(),
+                        console,
                         [&](){ context.cancel_now(); },
                         period
                     ));

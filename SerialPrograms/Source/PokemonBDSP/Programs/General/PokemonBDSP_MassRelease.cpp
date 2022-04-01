@@ -34,7 +34,6 @@ MassRelease::MassRelease(const MassRelease_Descriptor& descriptor)
         "<b>Number of Boxes to Release:</b>",
         2, 0, 40
     )
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,
