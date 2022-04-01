@@ -72,34 +72,36 @@ const ButtonMatcher& getButtonMatcher(ButtonType type){
 
 }
 
-ButtonMatcher::ButtonMatcher(ButtonType type, double max_rmsd)
+ButtonMatcher::ButtonMatcher(ButtonType type, size_t min_width, size_t max_width, double max_rmsd)
     : WaterfillTemplateMatcher(
         templatePath(type), Color(0xff808008), Color(0xffffffff), 100
     )
+    , m_min_width(min_width)
+    , m_min_height(max_width)
     , m_max_rmsd(max_rmsd)
 {}
 const ButtonMatcher& ButtonMatcher::A(){
-    static ButtonMatcher matcher(ButtonType::ButtonA, 80);
+    static ButtonMatcher matcher(ButtonType::ButtonA, 15, 15, 80);
     return matcher;
 }
 const ButtonMatcher& ButtonMatcher::B(){
-    static ButtonMatcher matcher(ButtonType::ButtonB, 80);
+    static ButtonMatcher matcher(ButtonType::ButtonB, 15, 15, 80);
     return matcher;
 }
 const ButtonMatcher& ButtonMatcher::Plus(){
-    static ButtonMatcher matcher(ButtonType::ButtonPlus, 120);
+    static ButtonMatcher matcher(ButtonType::ButtonPlus, 15, 15, 120);
     return matcher;
 }
 const ButtonMatcher& ButtonMatcher::Minus(){
-    static ButtonMatcher matcher(ButtonType::ButtonMinus, 120);
+    static ButtonMatcher matcher(ButtonType::ButtonMinus, 15, 15, 120);
     return matcher;
 }
 const ButtonMatcher& ButtonMatcher::ArrowLeft(){
-    static ButtonMatcher matcher(ButtonType::ArrowLeft, 180);
+    static ButtonMatcher matcher(ButtonType::ArrowLeft, 5, 10, 180);
     return matcher;
 }
 const ButtonMatcher& ButtonMatcher::ArrowRight(){
-    static ButtonMatcher matcher(ButtonType::ArrowRight, 180);
+    static ButtonMatcher matcher(ButtonType::ArrowRight, 5, 10, 180);
     return matcher;
 }
 
