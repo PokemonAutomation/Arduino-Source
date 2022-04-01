@@ -24,6 +24,7 @@ enum class ButtonType{
     ButtonA,
     ButtonB,
     ButtonPlus,
+    ButtonMinus,
     ArrowLeft,
     ArrowRight,
 };
@@ -35,8 +36,13 @@ public:
     static const ButtonMatcher& A();
     static const ButtonMatcher& B();
     static const ButtonMatcher& Plus();
+    static const ButtonMatcher& Minus();
     static const ButtonMatcher& ArrowLeft();
     static const ButtonMatcher& ArrowRight();
+
+    virtual bool check_image(const ConstImageRef& image) const override{
+        return image.width() > 15 && image.height();
+    };
 
     double m_max_rmsd;
 };

@@ -7,6 +7,10 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "PokemonLA_ArcPhoneDetector.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
@@ -40,7 +44,7 @@ void ArcPhoneTracker::process_object(const ConstImageRef& image, const Waterfill
 //    cout << "asdf" << endl;
 //    static int c = 0;
 //    cout << "c = " << c << endl;
-//    extract_box(image, object).save("test-" + QString::number(c++) + ".png");
+//    extract_box_reference(image, object).save("test-" + QString::number(c++) + ".png");
 //    image.save("test-" + QString::number(c++) + "-A.png");
 //    extract_box(image, object).save("test-" + QString::number(c++) + "-B.png");
 
@@ -74,14 +78,30 @@ ArcPhoneDetector::ArcPhoneDetector(
     , m_logger(logger)
     , m_box(0.010, 0.700, 0.050, 0.100)
     , m_stop_on_detected(stop_on_detected)
-    , m_watcher(overlay, m_box, { {m_tracker, false} })
-    , m_debouncer(
+    , m_tracker_button(ButtonType::ButtonMinus)
+    , m_watcher(
+        overlay, m_box, {
+            {m_tracker_phone, false},
+            {m_tracker_button, false},
+        }
+    )
+    , m_debouncer_phone(
         false, min_streak,
         [&](bool value){
             if (value){
                 m_logger.log("Detected Arc Phone.", COLOR_PURPLE);
             }else{
                 m_logger.log("Arc Phone has disappeared.", COLOR_PURPLE);
+            }
+        }
+    )
+    , m_debouncer_button(
+        false, min_streak,
+        [&](bool value){
+            if (value){
+                m_logger.log("Detected (-) Button.", COLOR_PURPLE);
+            }else{
+                m_logger.log("(-) button has disappeared.", COLOR_PURPLE);
             }
         }
     )
@@ -96,7 +116,8 @@ bool ArcPhoneDetector::process_frame(
     std::chrono::system_clock::time_point timestamp
 ){
     m_watcher.process_frame(frame, timestamp);
-    bool detected = m_debouncer.push_value(!m_tracker.detections().empty(), timestamp);
+    bool detected0 = m_debouncer_phone.push_value(!m_tracker_phone.detections().empty(), timestamp);
+    bool detected1 = m_debouncer_button.push_value(!m_tracker_phone.detections().empty(), timestamp);
 
 #if 0
     if (detected){
@@ -105,7 +126,7 @@ bool ArcPhoneDetector::process_frame(
     }
 #endif
 
-    return detected && m_stop_on_detected;
+    return detected0 && detected1 && m_stop_on_detected;
 }
 
 

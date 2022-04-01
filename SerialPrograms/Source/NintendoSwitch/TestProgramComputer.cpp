@@ -41,6 +41,7 @@
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 
 //#include "Kernels/Kernels_x64_AVX2.h"
 //#include "Kernels/Kernels_x64_AVX512.h"
@@ -121,11 +122,13 @@ void print_8x64(__m512i m){
 
 void TestProgramComputer::program(ProgramEnvironment& env){
     using namespace Kernels;
-    using namespace NintendoSwitch::PokemonSwSh;
+    using namespace NintendoSwitch::PokemonLA;
     using namespace Pokemon;
 
 
-#if 1
+
+
+#if 0
     QImage image("20220328-043030682479.jpg");
     auto matrix = compress_rgb32_to_binary_range(image, 0xff808080, 0xffffffff);
     auto session = Waterfill::make_WaterfillSession(matrix);
@@ -141,6 +144,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
         cout << item.first << " : " << item.second.center_x() << ", " << item.second.center_y() << endl;
     }
 #endif
+
 
 
 #if 0

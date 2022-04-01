@@ -21,6 +21,8 @@ const char* templatePath(ButtonType type){
         return "PokemonLA/Buttons/ButtonB-Template.png";
     case ButtonType::ButtonPlus:
         return "PokemonLA/Buttons/ButtonPlus-Template.png";
+    case ButtonType::ButtonMinus:
+        return "PokemonLA/Buttons/ButtonMinus-Template.png";
     case ButtonType::ArrowLeft:
         return "PokemonLA/Buttons/ArrowLeft-Template.png";
     case ButtonType::ArrowRight:
@@ -38,6 +40,8 @@ const char* button_name(ButtonType type){
         return "B";
     case ButtonType::ButtonPlus:
         return "+";
+    case ButtonType::ButtonMinus:
+        return "-";
     case ButtonType::ArrowLeft:
         return "<";
     case ButtonType::ArrowRight:
@@ -55,6 +59,8 @@ const ButtonMatcher& getButtonMatcher(ButtonType type){
         return ButtonMatcher::B();
     case ButtonType::ButtonPlus:
         return ButtonMatcher::Plus();
+    case ButtonType::ButtonMinus:
+        return ButtonMatcher::Minus();
     case ButtonType::ArrowLeft:
         return ButtonMatcher::ArrowLeft();
     case ButtonType::ArrowRight:
@@ -82,6 +88,10 @@ const ButtonMatcher& ButtonMatcher::B(){
 }
 const ButtonMatcher& ButtonMatcher::Plus(){
     static ButtonMatcher matcher(ButtonType::ButtonPlus, 120);
+    return matcher;
+}
+const ButtonMatcher& ButtonMatcher::Minus(){
+    static ButtonMatcher matcher(ButtonType::ButtonMinus, 120);
     return matcher;
 }
 const ButtonMatcher& ButtonMatcher::ArrowLeft(){
@@ -117,7 +127,7 @@ void ButtonTracker::process_object(const ConstImageRef& image, const WaterfillOb
 //    image.save("test-" + QString::number(c++) + "-A.png");
 //    extract_box(image, object).save("test-" + QString::number(c++) + "-B.png");
 
-    double rmsd = m_matcher.rmsd(extract_box_reference(image, object));
+    double rmsd = m_matcher.rmsd_precropped(extract_box_reference(image, object), object);
 //    cout << "rmsd = " << rmsd << endl;
     if (rmsd < m_matcher.m_max_rmsd){
 //        cout << "rmsd = " << rmsd << endl;

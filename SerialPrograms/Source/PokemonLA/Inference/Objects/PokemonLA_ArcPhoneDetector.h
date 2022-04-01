@@ -13,7 +13,8 @@
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/Inference/DetectionDebouncer.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h"
+#include "PokemonLA_WhiteObjectDetector.h"
+#include "PokemonLA_ButtonDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -47,7 +48,7 @@ public:
     );
 
     bool detected() const{
-        return m_debouncer.get();
+        return m_debouncer_phone.get() && m_debouncer_button.get();
     }
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
@@ -63,10 +64,12 @@ private:
     bool m_stop_on_detected;
 
     SpinLock m_lock;
-    ArcPhoneTracker m_tracker;
+    ArcPhoneTracker m_tracker_phone;
+    ButtonTracker m_tracker_button;
     WhiteObjectWatcher m_watcher;
 
-    DetectionDebouncer<bool> m_debouncer;
+    DetectionDebouncer<bool> m_debouncer_phone;
+    DetectionDebouncer<bool> m_debouncer_button;
 };
 
 
