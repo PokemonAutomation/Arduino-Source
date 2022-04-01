@@ -420,11 +420,11 @@ void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env){
 
     // {
     //     // QImage image("./scripts/LA_switch_pokemon_Kuro.png");
-    //     QImage image("./PLA_test_data/ingoBattle/LA_pokemon_switch_fp.png");
+    //     QImage image("./PLA_test_data/ingoBattle/broken_dialogue_detector.png");
     //     const bool stop_on_detected = true;
-    //     BattlePokemonSwitchDetector switch_detector(env.console, env.console, stop_on_detected);
-    //     bool detected = switch_detector.process_frame(image, std::chrono::system_clock::now());
-    //     std::cout << "switch detector " << detected << std::endl;
+    //     NormalDialogDetector detector(env.console, env.console, stop_on_detected);
+    //     bool detected = detector.process_frame(image, std::chrono::system_clock::now());
+    //     std::cout << "detector " << detected << std::endl;
     //     return;
     // }
 

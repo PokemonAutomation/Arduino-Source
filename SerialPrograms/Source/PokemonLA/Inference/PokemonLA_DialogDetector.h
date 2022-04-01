@@ -61,6 +61,8 @@ private:
     std::atomic<bool> m_detected;
     ImageFloatBox m_title_top;
     ImageFloatBox m_title_bottom;
+    ImageFloatBox m_title_left;
+    ImageFloatBox m_title_right;
     ImageFloatBox m_top_white;
     ImageFloatBox m_bottom_white;
     ImageFloatBox m_left_white;

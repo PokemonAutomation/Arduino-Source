@@ -85,6 +85,14 @@ bool DialogSurpriseDetector::process_frame(
     bool detected = hits >= 5;
     m_detected.store(detected, std::memory_order_release);
 
+#if 0
+    if (detected){
+        static size_t c = 0;
+        frame.save("SurpriseDialogueBoxTriggered-" + QString::number(c++) + ".png");
+    }
+#endif
+
+
     return detected && m_stop_on_detected;
 }
 
@@ -99,6 +107,8 @@ NormalDialogDetector::NormalDialogDetector(LoggerQt& logger, VideoOverlay& overl
     , m_detected(false)
     , m_title_top   (0.278, 0.712, 0.100, 0.005)
     , m_title_bottom(0.278, 0.755, 0.100, 0.005)
+    , m_title_left  (0.259, 0.715, 0.003, 0.043)
+    , m_title_right (0.390, 0.715, 0.003, 0.043)
     , m_top_white   (0.500, 0.750, 0.200, 0.020)
     , m_bottom_white(0.400, 0.895, 0.200, 0.020)
     , m_left_white  (0.230, 0.805, 0.016, 0.057)
@@ -120,35 +130,32 @@ bool NormalDialogDetector::process_frame(
 ){
     size_t hits = 0;
 
-    ImageStats title_top = image_stats(extract_box_reference(frame, m_title_top));
-    if (is_LA_dark_blue(title_top)){
+    const ImageStats title_top = image_stats(extract_box_reference(frame, m_title_top));
+    const ImageStats title_bottom = image_stats(extract_box_reference(frame, m_title_bottom));
+    const ImageStats title_left = image_stats(extract_box_reference(frame, m_title_left));
+    const ImageStats title_right = image_stats(extract_box_reference(frame, m_title_right));
+    // If three of the four passes, then we are good for title check
+    if (is_LA_dark_blue(title_top) + is_LA_dark_blue(title_bottom) + is_LA_dark_blue(title_left) + is_LA_dark_blue(title_right) >= 3){
         hits++;
     }
-//    cout << "hits = " << hits << endl;
-
-    ImageStats title_bottom = image_stats(extract_box_reference(frame, m_title_bottom));
-    if (is_LA_dark_blue(title_bottom)){
-        hits++;
-    }
-//    cout << "hits = " << hits << endl;
 
     ImageStats top_white = image_stats(extract_box_reference(frame, m_top_white));
-    hits += is_white(top_white, 480, 20) ? 1 : 0;
+    hits += is_white(top_white, 480, 30) ? 1 : 0;
 
     ImageStats bottom_white = image_stats(extract_box_reference(frame, m_bottom_white));
-    hits += is_white(bottom_white, 480, 20) ? 1 : 0;
+    hits += is_white(bottom_white, 480, 30) ? 1 : 0;
 
     ImageStats left_white = image_stats(extract_box_reference(frame, m_left_white));
-    hits += is_white(left_white, 480, 20) ? 1 : 0;
+    hits += is_white(left_white, 480, 30) ? 1 : 0;
 
     ImageStats right_white = image_stats(extract_box_reference(frame, m_right_white));
-    hits += is_white(right_white, 480, 20) ? 1 : 0;
+    hits += is_white(right_white, 480, 30) ? 1 : 0;
 
     // m_arc_phone.process_frame(frame, timestamp);
     // bool phone = m_arc_phone.detected();
     // hits += !phone;
 
-    bool detected = hits == 6;
+    bool detected = hits == 5;
     m_detected.store(detected, std::memory_order_release);
 
     return detected && m_stop_on_detected;

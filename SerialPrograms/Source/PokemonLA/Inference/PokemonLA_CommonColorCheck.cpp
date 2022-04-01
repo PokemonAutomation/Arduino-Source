@@ -14,7 +14,7 @@ namespace PokemonLA{
 
 
 bool is_LA_dark_blue(const ImageStats& stats){
-    return (stats.average.sum() <= 300 && stats.stddev.sum() <= 10 &&
+    return (stats.average.sum() <= 300 && stats.stddev.sum() <= 15 &&
         stats.average.b > stats.average.r && stats.average.b > stats.average.g
     );
 }
