@@ -167,6 +167,7 @@
 #include "PokemonLA/Programs/PokemonLA_MountChange.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "Common/Cpp/CancellableScope.h"
 #include "TestProgramSwitch.h"
 
 #include <immintrin.h>
@@ -236,6 +237,13 @@ using namespace PokemonLA;
 
 
 
+
+
+
+
+
+
+
 void TestProgram::program(MultiSwitchProgramEnvironment& env){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
@@ -252,11 +260,41 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
     VideoOverlay& overlay = env.consoles[0];
 
 
+    {
+        std::unique_ptr<CancellableScope> scope0(new CancellableScope());
+//        std::unique_ptr<CancellableScope> scope1;
+//        std::unique_ptr<CancellableScope> scope2;
+        auto task = env.inference_dispatcher().dispatch([&]{
+            CancellableScope scope1(*scope0);
+            CancellableScope scope2(scope1);
+//            scope1 = std::make_unique<CancellableScope>(*scope0);
+//            scope2 = std::make_unique<CancellableScope>(*scope1);
+            scope2.wait_for(std::chrono::seconds(10));
+            scope1.wait_for(std::chrono::seconds(4));
 
+
+        });
+        cout << "waiting..." << endl;
+
+        scope0->wait_for(std::chrono::seconds(4));
+        cout << "stopping" << endl;
+//        scope0.cancel();
+        scope0.reset();
+
+//        scope0.wait_for(std::chrono::seconds(20));
+    }
+    cout << "stopped" << endl;
+
+
+
+
+#if 0
 //    QImage image("screenshot-20220327-190703102304.png");
     QImage image = feed.snapshot();
     ArcPhoneDetector detector(console, console, std::chrono::milliseconds(0), true);
     detector.process_frame(image, std::chrono::system_clock::now());
+#endif
+
 
 
 #if 0

@@ -49,7 +49,7 @@ public:
     BooleanCheckBoxOption SAVE_DEBUG_IMAGES;
     BooleanCheckBoxOption NAUGHTY_MODE;
 
-    ProcessorLevelOption PROCESSOR_LEVEL;
+    ProcessorLevelOption PROCESSOR_LEVEL0;
 
 //    ProcessPriorityOption PROCESS_PRIORITY0;
     ThreadPriorityOption REALTIME_THREAD_PRIORITY0;

@@ -72,6 +72,7 @@ SOURCES += \
     ../ClientSource/Libraries/MessageConverter.cpp \
     ../Common/CRC32.cpp \
     ../Common/Cpp/AsyncDispatcher.cpp \
+    ../Common/Cpp/CancellableScope.cpp \
     ../Common/Cpp/CpuId.cpp \
     ../Common/Cpp/Exceptions.cpp \
     ../Common/Cpp/FireForgetDispatcher.cpp \
@@ -662,6 +663,7 @@ HEADERS += \
     ../Common/Cpp/AlignedVector.h \
     ../Common/Cpp/AlignedVector.tpp \
     ../Common/Cpp/AsyncDispatcher.h \
+    ../Common/Cpp/CancellableScope.h \
     ../Common/Cpp/Color.h \
     ../Common/Cpp/CpuId.h \
     ../Common/Cpp/Exceptions.h \

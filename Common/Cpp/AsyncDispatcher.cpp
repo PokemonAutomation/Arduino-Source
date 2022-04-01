@@ -75,6 +75,7 @@ AsyncDispatcher::~AsyncDispatcher(){
     }
 }
 void AsyncDispatcher::dispatch_task(AsyncTask& task){
+    cout << "dispatch_task() - enter" << endl;
     std::lock_guard<std::mutex> lg(m_lock);
 
     //  Enqueue task.
@@ -86,11 +87,13 @@ void AsyncDispatcher::dispatch_task(AsyncTask& task){
     }
 
     m_cv.notify_one();
+    cout << "dispatch_task() - exit" << endl;
 }
 
 std::unique_ptr<AsyncTask> AsyncDispatcher::dispatch(std::function<void()>&& func){
     std::unique_ptr<AsyncTask> task(new AsyncTask(std::move(func)));
     dispatch_task(*task);
+    cout << "dispatch_task - 1() - exit" << endl;
     return task;
 }
 void AsyncDispatcher::run_in_parallel(

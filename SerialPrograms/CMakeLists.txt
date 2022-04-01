@@ -64,6 +64,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/AlignedVector.h
     ../Common/Cpp/AsyncDispatcher.cpp
     ../Common/Cpp/AsyncDispatcher.h
+    ../Common/Cpp/CancellableScope.cpp
+    ../Common/Cpp/CancellableScope.h
     ../Common/Cpp/Color.h
     ../Common/Cpp/CpuId.cpp
     ../Common/Cpp/CpuId.h
