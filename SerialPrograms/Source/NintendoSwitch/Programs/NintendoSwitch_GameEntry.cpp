@@ -18,7 +18,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void move_to_user(const BotBaseContext& context, uint8_t user_slot){
+void move_to_user(BotBaseContext& context, uint8_t user_slot){
     if (user_slot != 0){
         //  Move to correct user.
         for (uint8_t c = 0; c < 8; c++){
@@ -31,7 +31,7 @@ void move_to_user(const BotBaseContext& context, uint8_t user_slot){
 }
 
 void open_game_from_home(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     bool tolerate_update_menu,
     uint8_t game_slot,
     uint8_t user_slot,
@@ -111,7 +111,7 @@ private:
 
 
 bool openedgame_to_gamemenu(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     uint16_t timeout
 ){
     {

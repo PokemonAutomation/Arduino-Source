@@ -31,7 +31,7 @@ class ShinyHuntUnattendedStrongSpawn : public SingleSwitchProgramInstance{
 public:
     ShinyHuntUnattendedStrongSpawn(const ShinyHuntUnattendedStrongSpawn_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     StartInGripOrClosedOption START_IN_GRIP_MENU;

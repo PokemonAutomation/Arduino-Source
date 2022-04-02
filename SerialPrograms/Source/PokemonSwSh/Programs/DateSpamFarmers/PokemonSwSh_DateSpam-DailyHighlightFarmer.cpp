@@ -45,7 +45,7 @@ DailyHighlightFarmer::DailyHighlightFarmer(const DailyHighlightFarmer_Descriptor
     PA_ADD_OPTION(SAVE_ITERATIONS);
 }
 
-void DailyHighlightFarmer::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void DailyHighlightFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
     }else{

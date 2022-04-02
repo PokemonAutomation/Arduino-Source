@@ -46,7 +46,7 @@ GodEggDuplication::GodEggDuplication(const GodEggDuplication_Descriptor& descrip
 }
 
 
-void GodEggDuplication::collect_godegg(const BotBaseContext& context, uint8_t party_slot) const{
+void GodEggDuplication::collect_godegg(BotBaseContext& context, uint8_t party_slot) const{
     pbf_wait(context, 50);
     ssf_press_button1(context, BUTTON_B, 100);
     ssf_press_button1(context, BUTTON_B, 100);
@@ -108,7 +108,7 @@ void GodEggDuplication::run_program(SingleSwitchProgramEnvironment& env, uint16_
     }
 }
 
-void GodEggDuplication::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void GodEggDuplication::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);

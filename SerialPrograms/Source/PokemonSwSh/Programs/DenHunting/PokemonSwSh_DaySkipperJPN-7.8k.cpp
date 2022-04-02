@@ -93,7 +93,7 @@ typedef struct{
 bool is_start(const DateSmall* date){
     return date->year != 0 || date->month != 1 || date->day != 1;
 }
-bool date_increment_day(const BotBaseContext& context, DateSmall* date, bool press){
+bool date_increment_day(BotBaseContext& context, DateSmall* date, bool press){
     uint8_t days = days_in_month(date->year, date->month);
     if (date->day != days){
         if (press){
@@ -131,7 +131,7 @@ bool date_increment_day(const BotBaseContext& context, DateSmall* date, bool pre
     return false;
 }
 
-void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     SkipperStats& stats = env.stats<SkipperStats>();
     stats.runs++;
 

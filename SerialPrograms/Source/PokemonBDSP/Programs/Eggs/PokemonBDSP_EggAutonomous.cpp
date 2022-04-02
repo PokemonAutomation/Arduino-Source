@@ -122,7 +122,7 @@ std::unique_ptr<StatsTracker> EggAutonomous::make_stats() const{
 
 
 bool EggAutonomous::run_batch(
-    SingleSwitchProgramEnvironment& env, const BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
     EggAutonomousState& saved_state,
     EggAutonomousState& current_state
 ){
@@ -160,7 +160,7 @@ bool EggAutonomous::run_batch(
     return current_state.process_batch();
 }
 
-void EggAutonomous::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     EggAutonomousStats& stats = env.stats<EggAutonomousStats>();
     env.update_stats();
 

@@ -22,7 +22,7 @@ namespace MaxLairInternal{
 
 void run_swap_pokemon(
     AdventureRuntime& runtime,
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     GlobalStateTracker& state_tracker,
     const ConsoleSpecificOptions& settings
 );

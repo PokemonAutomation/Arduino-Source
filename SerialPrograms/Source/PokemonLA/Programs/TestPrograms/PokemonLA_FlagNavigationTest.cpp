@@ -50,7 +50,7 @@ FlagNavigationTest::FlagNavigationTest(const FlagNavigationTest_Descriptor& desc
 }
 
 
-void FlagNavigationTest::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void FlagNavigationTest::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 
     FlagNavigationAir session(
         env, env.console,

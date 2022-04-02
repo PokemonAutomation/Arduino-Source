@@ -22,7 +22,7 @@ namespace PokemonSwSh{
 
 
 void enter_loading_game(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     bool backup_save,
     uint16_t post_wait_time
 ){
@@ -74,7 +74,7 @@ void enter_loading_game(
 }
 
 void start_game_from_home_with_inference(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     bool tolerate_update_menu,
     uint8_t game_slot,
     uint8_t user_slot,
@@ -94,7 +94,7 @@ void start_game_from_home_with_inference(
 }
 
 void reset_game_from_home_with_inference(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     bool tolerate_update_menu,
     bool backup_save,
     uint16_t post_wait_time

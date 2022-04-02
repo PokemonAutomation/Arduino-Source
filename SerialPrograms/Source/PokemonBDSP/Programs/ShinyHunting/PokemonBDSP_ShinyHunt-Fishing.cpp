@@ -87,7 +87,7 @@ std::unique_ptr<StatsTracker> ShinyHuntFishing::make_stats() const{
 
 
 
-void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     StandardEncounterHandler handler(
@@ -114,7 +114,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, const BotBas
             BattleMenuWatcher battle_menu(BattleType::STANDARD);
             int ret = run_until(
                 env, context, env.console,
-                [=](const BotBaseContext& context){
+                [=](BotBaseContext& context){
                     SHORTCUT.run(context, 30 * TICKS_PER_SECOND);
                 },
                 {

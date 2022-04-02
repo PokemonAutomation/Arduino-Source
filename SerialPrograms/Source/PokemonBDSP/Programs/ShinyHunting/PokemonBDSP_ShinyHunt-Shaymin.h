@@ -32,11 +32,11 @@ public:
     ShinyHuntShaymin(const ShinyHuntShaymin_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 
 private:
-    bool start_encounter(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) const;
+    bool start_encounter(SingleSwitchProgramEnvironment& env, BotBaseContext& context) const;
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

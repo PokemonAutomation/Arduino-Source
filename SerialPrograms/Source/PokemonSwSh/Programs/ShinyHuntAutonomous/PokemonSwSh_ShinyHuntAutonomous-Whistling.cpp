@@ -90,7 +90,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousWhistling::make_stats() const{
 
 
 
-void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
@@ -127,7 +127,7 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, 
 
             int result = run_until(
                 env, context, env.console,
-                [](const BotBaseContext& context){
+                [](BotBaseContext& context){
                     while (true){
                         pbf_mash_button(context, BUTTON_LCLICK, TICKS_PER_SECOND);
                         pbf_move_right_joystick(context, 192, 128, TICKS_PER_SECOND, 0);

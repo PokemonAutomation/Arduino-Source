@@ -150,7 +150,7 @@ void DexRecFinder::read_line(
     }
 }
 
-void DexRecFinder::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void DexRecFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
     }else{

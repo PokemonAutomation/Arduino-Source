@@ -14,9 +14,9 @@
 namespace PokemonAutomation{
 namespace Microcontroller{
 
-uint32_t protocol_version(const BotBaseContext& context);
-uint32_t program_version(const BotBaseContext& context);
-uint8_t program_id(const BotBaseContext& context);
+uint32_t protocol_version(BotBase& botbase);
+uint32_t program_version(BotBase& botbase);
+uint8_t program_id(BotBase& botbase);
 
 
 class DeviceRequest_seqnum_reset : public BotBaseRequest{

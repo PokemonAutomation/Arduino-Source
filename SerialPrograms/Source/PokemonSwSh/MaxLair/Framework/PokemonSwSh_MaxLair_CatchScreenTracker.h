@@ -26,7 +26,7 @@ class CaughtPokemonScreen{
     using Detection = SummaryShinySymbolDetector::Detection;
 
 public:
-    CaughtPokemonScreen(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console);
+    CaughtPokemonScreen(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console);
 
     size_t total() const;
     const CaughtPokemon& operator[](size_t position) const;
@@ -44,7 +44,7 @@ private:
 
 private:
     ProgramEnvironment& m_env;
-    const BotBaseContext& m_context;
+    BotBaseContext& m_context;
     ConsoleHandle& m_console;
     size_t m_total;
     size_t m_current_position = 0;

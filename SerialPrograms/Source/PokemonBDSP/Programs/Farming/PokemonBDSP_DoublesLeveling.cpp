@@ -95,7 +95,7 @@ std::unique_ptr<StatsTracker> DoublesLeveling::make_stats() const{
 
 
 
-bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     env.log("Starting battle!");
@@ -109,7 +109,7 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, const BotBaseC
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         int ret = run_until(
             env, context, env.console,
-            [=](const BotBaseContext& context){
+            [=](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {
@@ -148,7 +148,7 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, const BotBaseC
 
 
 
-void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
     env.update_stats();
 

@@ -20,7 +20,7 @@ namespace PokemonSwSh{
 //  Returns the quantity of the ball.
 //  Returns -1 if unable to read.
 int16_t move_to_ball(
-    const BattleBallReader& reader, const BotBaseContext& context, ConsoleHandle& console,
+    const BattleBallReader& reader, BotBaseContext& context, ConsoleHandle& console,
     const std::string& ball_slug
 );
 
@@ -43,7 +43,7 @@ struct CatchResults{
     uint16_t balls_used;
 };
 CatchResults basic_catcher(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     Language language,
     const std::string& ball_slug
 );

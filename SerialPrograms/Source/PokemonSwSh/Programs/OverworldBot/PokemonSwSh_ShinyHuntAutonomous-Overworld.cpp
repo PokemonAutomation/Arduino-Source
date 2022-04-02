@@ -150,7 +150,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousOverworld::make_stats() const{
 
 
 bool ShinyHuntAutonomousOverworld::find_encounter(
-    SingleSwitchProgramEnvironment& env, const BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
     Stats& stats,
     std::chrono::system_clock::time_point expiration
 ) const{
@@ -218,7 +218,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
 
             int result = run_until(
                 env, context, env.console,
-                [&](const BotBaseContext& context){
+                [&](BotBaseContext& context){
                     trigger->run(context);
                 },
                 {
@@ -268,7 +268,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
 
 
 bool ShinyHuntAutonomousOverworld::charge_at_target(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     const std::pair<double, OverworldTarget>& target
 ) const{
     InferenceBoxScope target_box(console, target.second.box, COLOR_YELLOW);
@@ -310,7 +310,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
 
     int result = run_until(
         env, context, console,
-        [&](const BotBaseContext& context){
+        [&](BotBaseContext& context){
             //  Move to target.
             pbf_move_left_joystick(
                 context,
@@ -354,7 +354,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
 
 
 
-void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     srand(time(nullptr));
 
     if (START_IN_GRIP_MENU){

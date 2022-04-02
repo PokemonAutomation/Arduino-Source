@@ -55,7 +55,7 @@ OverworldTrigger::OverworldTrigger()
 }
 
 
-void OverworldTrigger::run_trigger(const BotBaseContext& context) const{
+void OverworldTrigger::run_trigger(BotBaseContext& context) const{
     switch (TRIGGER_METHOD){
     case 0:
         pbf_controller_state(context, BUTTON_B, DPAD_NONE, 0, 128, 128, 128, MOVE_DURATION);
@@ -90,7 +90,7 @@ void OverworldTrigger::run_trigger(const BotBaseContext& context) const{
     }
 }
 
-bool OverworldTrigger::find_encounter(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) const{
+bool OverworldTrigger::find_encounter(SingleSwitchProgramEnvironment& env, BotBaseContext& context) const{
     BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
     StartBattleDetector start_battle_detector(env.console);
 
@@ -99,7 +99,7 @@ bool OverworldTrigger::find_encounter(SingleSwitchProgramEnvironment& env, const
         //  Move character back and forth to trigger encounter.
         result = run_until(
             env, context, env.console,
-            [&](const BotBaseContext& context){
+            [&](BotBaseContext& context){
                 while (true) {
                     run_trigger(context);
                 }

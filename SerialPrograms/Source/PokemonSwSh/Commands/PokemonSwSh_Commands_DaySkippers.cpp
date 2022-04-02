@@ -14,42 +14,42 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void skipper_init_view(const BotBaseContext& context){
+void skipper_init_view(BotBaseContext& context){
     context.issue_request(
         DeviceRequest_skipper_init_view()
     );
 }
-void skipper_auto_recovery(const BotBaseContext& context){
+void skipper_auto_recovery(BotBaseContext& context){
     context.issue_request(
         DeviceRequest_skipper_auto_recovery()
     );
 }
-void skipper_rollback_year_full(const BotBaseContext& context, bool date_us){
+void skipper_rollback_year_full(BotBaseContext& context, bool date_us){
     context.issue_request(
         DeviceRequest_skipper_rollback_year_full(date_us)
     );
 }
-void skipper_rollback_year_sync(const BotBaseContext& context){
+void skipper_rollback_year_sync(BotBaseContext& context){
     context.issue_request(
         DeviceRequest_skipper_rollback_year_sync()
     );
 }
-void skipper_increment_day(const BotBaseContext& context, bool date_us){
+void skipper_increment_day(BotBaseContext& context, bool date_us){
     context.issue_request(
         DeviceRequest_skipper_increment_day(date_us)
     );
 }
-void skipper_increment_month(const BotBaseContext& context, uint8_t days){
+void skipper_increment_month(BotBaseContext& context, uint8_t days){
     context.issue_request(
         DeviceRequest_skipper_increment_month(days)
     );
 }
-void skipper_increment_all(const BotBaseContext& context){
+void skipper_increment_all(BotBaseContext& context){
     context.issue_request(
         DeviceRequest_skipper_increment_all()
     );
 }
-void skipper_increment_all_rollback(const BotBaseContext& context){
+void skipper_increment_all_rollback(BotBaseContext& context){
     context.issue_request(
         DeviceRequest_skipper_increment_all_rollback()
     );

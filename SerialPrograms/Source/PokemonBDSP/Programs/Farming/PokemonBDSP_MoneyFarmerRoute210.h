@@ -29,15 +29,15 @@ public:
     MoneyFarmerRoute210(const MoneyFarmerRoute210_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     struct Stats;
     // Run the battle loop. Return true if the program should stop.
-    bool battle(SingleSwitchProgramEnvironment& env, const BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]);
+    bool battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]);
     // From the bottom row of the Ace Trainer pair, heal Pokemon and return.
     // Return true if VS Seeker needs charging.
-    bool heal_after_battle_and_return(SingleSwitchProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console, uint8_t pp0[4], uint8_t pp1[4]);
+    bool heal_after_battle_and_return(SingleSwitchProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console, uint8_t pp0[4], uint8_t pp1[4]);
     // Starting in front of the Celestic Town Pokecenter, heal and return
     // to the Ace Trainer pair.
     void heal_at_center_and_return(ConsoleHandle& console, uint8_t pp0[4], uint8_t pp1[4]);

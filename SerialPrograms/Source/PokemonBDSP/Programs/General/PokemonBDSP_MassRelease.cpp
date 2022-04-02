@@ -61,7 +61,7 @@ std::unique_ptr<StatsTracker> MassRelease::make_stats() const{
 
 
 
-void MassRelease::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void MassRelease::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
     env.update_stats();
 

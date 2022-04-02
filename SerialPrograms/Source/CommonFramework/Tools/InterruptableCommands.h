@@ -37,7 +37,7 @@ public:
 public:
     //  Dispath the following lambda. If something is already running, it will be
     //  stopped and replaced with this one.
-    void dispatch(std::function<void(const BotBaseContext&)>&& lambda);
+    void dispatch(std::function<void(BotBaseContext&)>&& lambda);
 
 //    //  Stop the currently running command.
 //    void stop_commands();

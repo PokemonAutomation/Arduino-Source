@@ -22,7 +22,7 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-void enter_den(const BotBaseContext& context, uint16_t ENTER_ONLINE_DEN_DELAY, bool watts, bool online){
+void enter_den(BotBaseContext& context, uint16_t ENTER_ONLINE_DEN_DELAY, bool watts, bool online){
     if (!online){
         if (!watts){
             ssf_press_button2(context, BUTTON_A, GameSettings::instance().ENTER_OFFLINE_DEN_DELAY, 10);
@@ -43,7 +43,7 @@ void enter_den(const BotBaseContext& context, uint16_t ENTER_ONLINE_DEN_DELAY, b
 }
 
 
-void enter_lobby(const BotBaseContext& context, uint16_t OPEN_ONLINE_DEN_LOBBY_DELAY, bool online, Catchability catchability){
+void enter_lobby(BotBaseContext& context, uint16_t OPEN_ONLINE_DEN_LOBBY_DELAY, bool online, Catchability catchability){
     if (online){
         switch (catchability){
         case Catchability::ALWAYS_CATCHABLE:
@@ -87,7 +87,7 @@ void enter_lobby(const BotBaseContext& context, uint16_t OPEN_ONLINE_DEN_LOBBY_D
 
 
 void roll_den(
-    const BotBaseContext& context,
+    BotBaseContext& context,
     uint16_t ENTER_ONLINE_DEN_DELAY,
     uint16_t OPEN_ONLINE_DEN_LOBBY_DELAY,
     uint8_t skips, Catchability catchability
@@ -116,7 +116,7 @@ void roll_den(
         ssf_press_button2(context, BUTTON_A, GameSettings::instance().REENTER_DEN_DELAY, 50);
     }
 }
-void rollback_date_from_home(const BotBaseContext& context, uint8_t skips){
+void rollback_date_from_home(BotBaseContext& context, uint8_t skips){
     if (skips == 0){
         return;
     }

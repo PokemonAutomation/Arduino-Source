@@ -64,7 +64,7 @@ bool ShinyDetectedActionOption::stop_on_shiny() const{
 
 #if 0
 bool run_on_shiny(
-    const BotBaseContext& context,
+    BotBaseContext& context,
     const ShinyDetectedActionOption& option
 ){
     switch ((ShinyDetectedAction)(size_t)option.ACTION){
@@ -92,7 +92,7 @@ bool run_on_shiny(
 ){
     QImage screenshot = console.video().snapshot();
     if (!option.do_nothing()){
-        command_session.dispatch([&](const BotBaseContext& context){
+        command_session.dispatch([&](BotBaseContext& context){
             run_on_shiny(context, option);
         });
         command_session.wait();

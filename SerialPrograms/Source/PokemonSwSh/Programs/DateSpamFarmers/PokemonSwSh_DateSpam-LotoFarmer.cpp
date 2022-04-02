@@ -45,7 +45,7 @@ LotoFarmer::LotoFarmer(const LotoFarmer_Descriptor& descriptor)
     PA_ADD_OPTION(MASH_B_DURATION);
 }
 
-void LotoFarmer::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void LotoFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
     }else{

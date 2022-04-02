@@ -14,7 +14,7 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-void egg_spin(const BotBaseContext& context, uint16_t duration){
+void egg_spin(BotBaseContext& context, uint16_t duration){
     for (uint16_t c = 0; c < duration; c += 41){
         pbf_controller_state(context, 0, DPAD_NONE, 128, 0, 128, 128, 5);
         pbf_controller_state(context, 0, DPAD_NONE, 255, 0, 128, 128, 5);
@@ -26,7 +26,7 @@ void egg_spin(const BotBaseContext& context, uint16_t duration){
         pbf_controller_state(context, 0, DPAD_NONE, 0, 0, 128, 128, 5);
     }
 }
-void egg_spin_with_A(const BotBaseContext& context, uint16_t duration){
+void egg_spin_with_A(BotBaseContext& context, uint16_t duration){
     for (uint16_t c = 0; c < duration; c += 41){
 #if 0
         pbf_move_left_joystick(context, 128, 0, 5, 0);
@@ -49,7 +49,7 @@ void egg_spin_with_A(const BotBaseContext& context, uint16_t duration){
     }
 }
 
-void pickup_column(const BotBaseContext& context){
+void pickup_column(BotBaseContext& context){
 //    const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
     pbf_press_button(context, BUTTON_ZL, 20, 50);
     for (size_t c = 0; c < 10; c++){
@@ -57,7 +57,7 @@ void pickup_column(const BotBaseContext& context){
     }
     pbf_press_button(context, BUTTON_ZL, 20, GameSettings::instance().BOX_PICKUP_DROP_DELAY);
 }
-void party_to_column(const BotBaseContext& context, uint8_t column){
+void party_to_column(BotBaseContext& context, uint8_t column){
     const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
     pbf_move_right_joystick(context, 128, 0, 20, BOX_SCROLL_DELAY);
     if (column < 3){
@@ -70,7 +70,7 @@ void party_to_column(const BotBaseContext& context, uint8_t column){
         }
     }
 }
-void column_to_party(const BotBaseContext& context, uint8_t column){
+void column_to_party(BotBaseContext& context, uint8_t column){
     const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
     if (column < 3){
         for (uint8_t c = 0; c <= column; c++){
@@ -84,7 +84,7 @@ void column_to_party(const BotBaseContext& context, uint8_t column){
     pbf_move_right_joystick(context, 128, 255, 20, BOX_SCROLL_DELAY);
 }
 
-void withdraw_1st_column_from_overworld(const BotBaseContext& context){
+void withdraw_1st_column_from_overworld(BotBaseContext& context){
     const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
     const uint16_t BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY;
     overworld_to_box(context);
@@ -96,7 +96,7 @@ void withdraw_1st_column_from_overworld(const BotBaseContext& context){
     pbf_press_button(context, BUTTON_ZL, 20, BOX_PICKUP_DROP_DELAY);
     box_to_overworld(context);
 }
-void deposit_party_to_column(const BotBaseContext& context, uint8_t column){
+void deposit_party_to_column(BotBaseContext& context, uint8_t column){
     const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
     const uint16_t BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY;
     overworld_to_box(context);
@@ -110,7 +110,7 @@ void deposit_party_to_column(const BotBaseContext& context, uint8_t column){
     party_to_column(context, column);
     pbf_press_button(context, BUTTON_ZL, 20, BOX_PICKUP_DROP_DELAY);
 }
-void swap_party(const BotBaseContext& context, uint8_t current_column){
+void swap_party(BotBaseContext& context, uint8_t current_column){
     deposit_party_to_column(context, current_column);
 
     const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;

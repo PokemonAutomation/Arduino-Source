@@ -137,7 +137,7 @@ std::unique_ptr<StatsTracker> StatsResetCalyrex::make_stats() const{
 
 
 
-void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
@@ -158,7 +158,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, const BotBa
                 StandardBattleMenuWatcher fight_detector(false);
                 int result = run_until(
                     env, context, env.console,
-                    [=](const BotBaseContext& context){
+                    [=](BotBaseContext& context){
                     while (true){
                         pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
                     }

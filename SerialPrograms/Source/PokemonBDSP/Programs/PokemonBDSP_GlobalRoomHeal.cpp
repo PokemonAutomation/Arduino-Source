@@ -17,7 +17,7 @@ namespace PokemonBDSP{
 
 
 
-bool heal_by_global_room(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console){
+bool heal_by_global_room(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console){
     // Go to union room menu.
     const uint16_t overworld_to_room_delay = 125;
     pbf_press_button(console, BUTTON_Y, 10, overworld_to_room_delay);
@@ -30,7 +30,7 @@ bool heal_by_global_room(ProgramEnvironment& env, const BotBaseContext& context,
     SelectionArrowFinder arrow(console, {0.50, 0.45, 0.20, 0.20}, COLOR_GREEN);
     int ret = run_until(
         env, context, console,
-        [=](const BotBaseContext& context){
+        [=](BotBaseContext& context){
             for (int i = 0; i < 5; i++){
                 pbf_press_button(context, BUTTON_ZL, 10, 125);
             }

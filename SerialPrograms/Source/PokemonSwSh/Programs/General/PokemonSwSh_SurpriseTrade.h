@@ -29,10 +29,10 @@ class SurpriseTrade : public SingleSwitchProgramInstance{
 public:
     SurpriseTrade(const SurpriseTrade_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    void trade_slot(const BotBaseContext& context, uint8_t slot, bool next_box) const;
+    void trade_slot(BotBaseContext& context, uint8_t slot, bool next_box) const;
 
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;

@@ -36,7 +36,7 @@ OverworldWatcher::OverworldWatcher(const OverworldWatcher_Descriptor& descriptor
 }
 
 
-void OverworldWatcher::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void OverworldWatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     BubbleDetector bubbles;
     ArcDetector arcs;
     QuestMarkDetector quest_marks;

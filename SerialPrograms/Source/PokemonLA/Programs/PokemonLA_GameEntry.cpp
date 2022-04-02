@@ -27,7 +27,7 @@ namespace PokemonLA{
 
 
 bool gamemenu_to_ingame(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     uint16_t mash_duration, uint16_t enter_game_timeout
 ){
     console.log("Mashing A to enter game...");
@@ -50,7 +50,7 @@ bool gamemenu_to_ingame(
 }
 
 bool switch_home_to_gamemenu(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     bool tolerate_update_menu
 ){
     if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET || tolerate_update_menu){
@@ -71,7 +71,7 @@ bool switch_home_to_gamemenu(
 }
 
 bool reset_game_from_home(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     bool tolerate_update_menu,
     uint16_t post_wait_time
 ){
@@ -89,7 +89,7 @@ bool reset_game_from_home(
 
 
 
-void save_game_from_overworld(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console){
+void save_game_from_overworld(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console){
     InferenceBoxScope box(console, {0.450, 0.005, 0.040, 0.010});
 
     console.log("Saving game...");

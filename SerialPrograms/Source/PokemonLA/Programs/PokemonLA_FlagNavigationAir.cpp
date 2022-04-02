@@ -56,7 +56,7 @@ FlagNavigationAir::FlagNavigationAir(
 //    *this += m_dialog_detector;
     *this += m_shiny_listener;
 
-    auto find_flag = [=](const BotBaseContext& context){
+    auto find_flag = [=](BotBaseContext& context){
         uint8_t turn = m_flag_x <= 0.5 ? 0 : 255;
         for (size_t c = 0; c < 2; c++){
             pbf_mash_button(context, BUTTON_ZL, 2 * TICKS_PER_SECOND);
@@ -82,7 +82,7 @@ FlagNavigationAir::FlagNavigationAir(
     });
     register_state_command(State::WYRDEER_BASCULEGION_OFF, [=](){
         m_console.log("Switching from Wyrdeer/Basculegion (off) to Braviary (on)...");
-        m_active_command->dispatch([=](const BotBaseContext& context){
+        m_active_command->dispatch([=](BotBaseContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
             pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
         });
@@ -90,14 +90,14 @@ FlagNavigationAir::FlagNavigationAir(
     });
     register_state_command(State::WYRDEER_BASCULEGION_ON, [=](){
         m_console.log("Switching from Wyrdeer/Basculegion (on) to Braviary (on)...");
-        m_active_command->dispatch([=](const BotBaseContext& context){
+        m_active_command->dispatch([=](BotBaseContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
     });
     register_state_command(State::URSALUNA_OFF, [=](){
         m_console.log("Switching from Ursaluna (off) to Braviary (on)...");
-        m_active_command->dispatch([=](const BotBaseContext& context){
+        m_active_command->dispatch([=](BotBaseContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
 //            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
 //            pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
@@ -106,7 +106,7 @@ FlagNavigationAir::FlagNavigationAir(
     });
     register_state_command(State::URSALUNA_ON, [=](){
         m_console.log("Switching from Ursaluna (on) to Braviary (on)...");
-        m_active_command->dispatch([=](const BotBaseContext& context){
+        m_active_command->dispatch([=](BotBaseContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
 //            pbf_press_dpad(context, DPAD_RIGHT, 20, GET_ON_BRAVIARY_TIME);
         });
@@ -114,7 +114,7 @@ FlagNavigationAir::FlagNavigationAir(
     });
     register_state_command(State::SNEASLER_OFF, [=](){
         m_console.log("Switching from Sneasler (off) to Braviary (on)...");
-        m_active_command->dispatch([=](const BotBaseContext& context){
+        m_active_command->dispatch([=](BotBaseContext& context){
             pbf_press_dpad(context, DPAD_LEFT, 20, 50);
             pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
         });
@@ -123,7 +123,7 @@ FlagNavigationAir::FlagNavigationAir(
     register_state_command(State::SNEASLER_ON, [=](){
         m_console.log("Switching from Sneasler (on) to Braviary (on)...");
         m_looking_straight_ahead.store(false, std::memory_order_release);
-        m_active_command->dispatch([=](const BotBaseContext& context){
+        m_active_command->dispatch([=](BotBaseContext& context){
             pbf_move_left_joystick(context, 128, 0, 125, 0);
             pbf_press_dpad(context, DPAD_LEFT, 20, GET_ON_BRAVIARY_TIME);
         });
@@ -132,7 +132,7 @@ FlagNavigationAir::FlagNavigationAir(
     register_state_command(State::BRAVIARY_OFF, [=](){
         m_console.log("Switching from Braviary (off) to Braviary (on)...");
         m_looking_straight_ahead.store(false, std::memory_order_release);
-        m_active_command->dispatch([=](const BotBaseContext& context){
+        m_active_command->dispatch([=](BotBaseContext& context){
             pbf_press_button(context, BUTTON_PLUS, 20, GET_ON_BRAVIARY_TIME);
         });
         return false;
@@ -140,7 +140,7 @@ FlagNavigationAir::FlagNavigationAir(
     register_state_command(State::GET_ON_SNEASLER, [=](){
         m_console.log("Getting on Sneasler...");
         m_looking_straight_ahead.store(false, std::memory_order_release);
-        m_active_command->dispatch([=](const BotBaseContext& context){
+        m_active_command->dispatch([=](BotBaseContext& context){
             pbf_press_button(context, BUTTON_A, 20, 230);
         });
         return false;
@@ -148,7 +148,7 @@ FlagNavigationAir::FlagNavigationAir(
     register_state_command(State::CLIMBING, [=](){
         m_console.log("Climbing wall...");
         m_looking_straight_ahead.store(false, std::memory_order_release);
-        m_active_command->dispatch([=](const BotBaseContext& context){
+        m_active_command->dispatch([=](BotBaseContext& context){
             pbf_move_left_joystick(context, 128, 0, 300 * TICKS_PER_SECOND, 0);
         });
         return false;
@@ -156,7 +156,7 @@ FlagNavigationAir::FlagNavigationAir(
 
     register_state_command(State::DASH_FORWARD_MASH_B, [=](){
         m_console.log("Dashing forward (mash B)...");
-        m_active_command->dispatch([=](const BotBaseContext& context){
+        m_active_command->dispatch([=](BotBaseContext& context){
             //  Move forward to straighten out direction.
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
@@ -171,7 +171,7 @@ FlagNavigationAir::FlagNavigationAir(
     });
     register_state_command(State::DASH_FORWARD_HOLD_B, [=](){
         m_console.log("Dashing forward (hold B)...");
-        m_active_command->dispatch([=](const BotBaseContext& context){
+        m_active_command->dispatch([=](BotBaseContext& context){
             //  Move forward to straighten out direction.
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
@@ -187,7 +187,7 @@ FlagNavigationAir::FlagNavigationAir(
 
     auto dash_turn = [=](){
         m_console.log("Dashing Turn...");
-        m_active_command->dispatch([=](const BotBaseContext& context){
+        m_active_command->dispatch([=](BotBaseContext& context){
             //  Move forward to straighten out direction.
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
@@ -213,7 +213,7 @@ FlagNavigationAir::FlagNavigationAir(
 
     register_state_command(State::DIVE_STRAIGHT, [=](){
         m_console.log("Diving Straight...");
-        m_active_command->dispatch([=](const BotBaseContext& context){
+        m_active_command->dispatch([=](BotBaseContext& context){
             //  Move forward to straighten out direction.
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
@@ -229,7 +229,7 @@ FlagNavigationAir::FlagNavigationAir(
 
     auto dive_turn = [=](){
         m_console.log("Diving Turn...");
-        m_active_command->dispatch([=](const BotBaseContext& context){
+        m_active_command->dispatch([=](BotBaseContext& context){
             //  Move forward to straighten out direction.
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
@@ -255,7 +255,7 @@ FlagNavigationAir::FlagNavigationAir(
 
     register_state_command(State::TURN_LEFT, [=](){
         m_console.log("Turning Left...");
-        m_active_command->dispatch([=](const BotBaseContext& context){
+        m_active_command->dispatch([=](BotBaseContext& context){
             pbf_wait(context, 150);
             context.wait_for_all_requests();
             double distance, flag_x, flag_y;
@@ -268,7 +268,7 @@ FlagNavigationAir::FlagNavigationAir(
     });
     register_state_command(State::TURN_RIGHT, [=](){
         m_console.log("Turning Right...");
-        m_active_command->dispatch([=](const BotBaseContext& context){
+        m_active_command->dispatch([=](BotBaseContext& context){
             pbf_wait(context, 150);
             context.wait_for_all_requests();
             double distance, flag_x, flag_y;

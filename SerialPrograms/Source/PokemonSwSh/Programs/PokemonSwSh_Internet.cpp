@@ -16,7 +16,7 @@ namespace PokemonSwSh{
 
 
 bool connect_to_internet_with_inference(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     std::chrono::milliseconds post_wait_time,
     uint16_t timeout_ticks
 ){
@@ -57,7 +57,7 @@ bool connect_to_internet_with_inference(
         YCommMenuDetector detector(false);
         int result = run_until(
             env, context, console,
-            [&](const BotBaseContext& context){
+            [&](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, timeout_ticks);
             },
             { &detector }

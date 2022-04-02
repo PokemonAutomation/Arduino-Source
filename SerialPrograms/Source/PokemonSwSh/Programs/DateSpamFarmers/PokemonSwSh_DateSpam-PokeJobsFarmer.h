@@ -28,7 +28,7 @@ class PokeJobsFarmer : public SingleSwitchProgramInstance
 public:
     PokeJobsFarmer(const PokeJobsFarmer_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;

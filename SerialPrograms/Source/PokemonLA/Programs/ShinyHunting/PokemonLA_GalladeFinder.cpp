@@ -78,7 +78,7 @@ std::unique_ptr<StatsTracker> GalladeFinder::make_stats() const{
 }
 
 
-void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     // NOTE: there's no "stunned by alpha" detection in case the first spawn is an alpha!
     // NOTE: there is also no mitigation for if you get attacked by a Kirlia if it hates you
     Stats& stats = env.stats<Stats>();
@@ -97,7 +97,7 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, const Bot
         ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
         run_until(
             env, context, env.console,
-            [](const BotBaseContext& context){
+            [](BotBaseContext& context){
                 // forward portion
                 pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, (uint16_t)(6.8 * TICKS_PER_SECOND)); // forward while running until stairs, mash y a few times down the stairs
                 pbf_mash_button(context, BUTTON_Y,(uint16_t)(2.8 * TICKS_PER_SECOND)); // roll down the stairs, recover stamina
@@ -145,7 +145,7 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, const Bot
 }
 
 
-void GalladeFinder::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void GalladeFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.

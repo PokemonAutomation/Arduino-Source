@@ -82,7 +82,7 @@ private:
 };
 
 
-MapRegion detect_selected_region(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console){
+MapRegion detect_selected_region(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console){
     MapLocationDetector detector(console.video().snapshot());
     int ret = wait_until(
         env, context, console,

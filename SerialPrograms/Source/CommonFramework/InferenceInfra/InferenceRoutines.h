@@ -28,13 +28,13 @@ namespace PokemonAutomation{
 //  Exceptions throw in either the commands or the triggers will stop
 //  everything and be passed out of this function.
 int wait_until(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     std::chrono::system_clock::time_point deadline,
     std::vector<InferenceCallback*>&& callbacks,
     std::chrono::milliseconds period = std::chrono::milliseconds(50)
 );
 inline int wait_until(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     std::chrono::milliseconds timeout,
     std::vector<InferenceCallback*>&& callbacks,
     std::chrono::milliseconds period = std::chrono::milliseconds(50)
@@ -58,8 +58,8 @@ inline int wait_until(
 //  Exceptions throw in either the commands or the triggers will stop
 //  everything and be passed out of this function.
 int run_until(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
-    std::function<void(const BotBaseContext& context)>&& command,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    std::function<void(BotBaseContext& context)>&& command,
     std::vector<InferenceCallback*>&& callbacks,
     std::chrono::milliseconds period = std::chrono::milliseconds(50)
 );

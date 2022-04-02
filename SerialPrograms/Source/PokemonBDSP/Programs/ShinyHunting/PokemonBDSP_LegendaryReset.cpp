@@ -63,7 +63,7 @@ std::unique_ptr<StatsTracker> LegendaryReset::make_stats() const{
 }
 
 
-void LegendaryReset::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void LegendaryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     PokemonSwSh::ShinyHuntTracker& stats = env.stats<PokemonSwSh::ShinyHuntTracker>();
 
     StandardEncounterHandler handler(
@@ -95,7 +95,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, const BotBaseC
 
         int ret = run_until(
             env, context, env.console,
-            [=](const BotBaseContext& context){
+            [=](BotBaseContext& context){
                 size_t stop = WALK_UP ? 30 : 60;
                 for (size_t c = 0; c < stop; c++){
                     if (WALK_UP){

@@ -105,7 +105,7 @@ std::unique_ptr<StatsTracker> AutonomousBallThrower::make_stats() const{
 
 
 
-void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
@@ -123,7 +123,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, const B
             StandardBattleMenuWatcher fight_detector(false);
             int result = run_until(
                 env, context, env.console,
-                [=](const BotBaseContext& context){
+                [=](BotBaseContext& context){
                     while (true){
                         //TODO edit here for what to do
                         pbf_wait(context, 1 * TICKS_PER_SECOND);

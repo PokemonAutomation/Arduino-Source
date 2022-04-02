@@ -82,12 +82,12 @@ RaidItemFarmerOHKO::RaidItemFarmerOHKO(const RaidItemFarmerOHKO_Descriptor& desc
 }
 
 void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
-    BotBase& host = env.consoles[0];
+    BotBaseContext host(env.scope(), env.consoles[0]);
     size_t switches = env.consoles.size();
 
     env.run_in_parallel(
-        [](ConsoleHandle& console){
-            grip_menu_connect_go_home(console);
+        [](BotBaseContext& context, ConsoleHandle& console){
+            grip_menu_connect_go_home(context);
         }
     );
 
@@ -97,11 +97,11 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
         last_touch = system_clock(host);
     }
     env.run_in_parallel(
-        [](ConsoleHandle& console){
+        [](BotBaseContext& context, ConsoleHandle& console){
             if (console.index() == 0){
-                resume_game_front_of_den_nowatts(console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+                resume_game_front_of_den_nowatts(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
             }else{
-                resume_game_no_interact(console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+                resume_game_no_interact(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
             }
         }
     );
@@ -112,14 +112,14 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
 
         host.wait_for_all_requests();
         env.run_in_parallel(
-            [&](ConsoleHandle& console){
+            [&](BotBaseContext& context, ConsoleHandle& console){
                 if (console.index() == 0){
-                    enter_den(console, 0, false, false);
+                    enter_den(context, 0, false, false);
                 }else{
-                    pbf_press_button(console, BUTTON_Y, 10, GameSettings::instance().OPEN_YCOMM_DELAY);
-                    pbf_press_dpad(console, DPAD_UP, 5, 0);
-                    pbf_move_right_joystick(console, 128, 0, 5, 0);
-                    pbf_press_button(console, BUTTON_X, 10, 10);
+                    pbf_press_button(context, BUTTON_Y, 10, GameSettings::instance().OPEN_YCOMM_DELAY);
+                    pbf_press_dpad(context, DPAD_UP, 5, 0);
+                    pbf_move_right_joystick(context, 128, 0, 5, 0);
+                    pbf_press_button(context, BUTTON_X, 10, 10);
                 }
             }
         );
@@ -129,11 +129,11 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
         host.wait_for_all_requests();
         env.run_in_parallel(
             1, switches,
-            [&](ConsoleHandle& console){
-                pbf_wait(console, WAIT_FOR_STAMP_DELAY);
-                pbf_press_button(console, BUTTON_X, 10, 10);
-                pbf_press_dpad(console, DPAD_RIGHT, 10, 10);
-                pbf_mash_button(console, BUTTON_A, ENTER_STAMP_MASH_DURATION);
+            [&](BotBaseContext& context, ConsoleHandle& console){
+                pbf_wait(context, WAIT_FOR_STAMP_DELAY);
+                pbf_press_button(context, BUTTON_X, 10, 10);
+                pbf_press_dpad(context, DPAD_RIGHT, 10, 10);
+                pbf_mash_button(context, BUTTON_A, ENTER_STAMP_MASH_DURATION);
             }
         );
 
@@ -142,36 +142,36 @@ void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, Cancellable
 
         host.wait_for_all_requests();
         env.run_in_parallel(
-            [&](ConsoleHandle& console){
-                pbf_mash_button(console, BUTTON_A, RAID_START_MASH_DURATION);
-                pbf_wait(console, RAID_START_TO_ATTACK_DELAY);
-                pbf_mash_button(console, BUTTON_A, 5 * TICKS_PER_SECOND);
-                pbf_wait(console, ATTACK_TO_CATCH_DELAY);
+            [&](BotBaseContext& context, ConsoleHandle& console){
+                pbf_mash_button(context, BUTTON_A, RAID_START_MASH_DURATION);
+                pbf_wait(context, RAID_START_TO_ATTACK_DELAY);
+                pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
+                pbf_wait(context, ATTACK_TO_CATCH_DELAY);
 
                 if (console.index() == 0){
                     //  Add a little extra wait time since correctness matters here.
-                    ssf_press_button2(host, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
+                    ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
 
-                    close_game(console);
+                    close_game(context);
 
                     //  Touch the date.
-                    if (TOUCH_DATE_INTERVAL > 0 && system_clock(console) - last_touch >= TOUCH_DATE_INTERVAL){
-                        touch_date_from_home(console, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+                    if (TOUCH_DATE_INTERVAL > 0 && system_clock(context) - last_touch >= TOUCH_DATE_INTERVAL){
+                        touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
                         last_touch += TOUCH_DATE_INTERVAL;
                     }
                     start_game_from_home(
-                        console,
+                        context,
                         ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW,
                         0, 0,
                         BACKUP_SAVE
                     );
                 }else{
-                    pbf_press_dpad(console, DPAD_DOWN, 10, 10);
+                    pbf_press_dpad(context, DPAD_DOWN, 10, 10);
                     if (RETURN_TO_OVERWORLD_DELAY > 5 * TICKS_PER_SECOND){
-                        pbf_mash_button(console, BUTTON_A, RETURN_TO_OVERWORLD_DELAY - 5 * TICKS_PER_SECOND);
-                        pbf_mash_button(console, BUTTON_B, 5 * TICKS_PER_SECOND);
+                        pbf_mash_button(context, BUTTON_A, RETURN_TO_OVERWORLD_DELAY - 5 * TICKS_PER_SECOND);
+                        pbf_mash_button(context, BUTTON_B, 5 * TICKS_PER_SECOND);
                     }else{
-                        pbf_mash_button(console, BUTTON_A, RETURN_TO_OVERWORLD_DELAY);
+                        pbf_mash_button(context, BUTTON_A, RETURN_TO_OVERWORLD_DELAY);
                     }
                 }
             }

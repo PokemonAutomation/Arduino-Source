@@ -91,11 +91,11 @@ std::unique_ptr<StatsTracker> MoneyFarmerHighlands::make_stats() const{
 
 
 
-void mash_A_until_end_of_battle(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console){
+void mash_A_until_end_of_battle(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console){
     OverworldDetector detector(console, console);
     int ret = run_until(
         env, context, console,
-        [](const BotBaseContext& context){
+        [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, 120 * TICKS_PER_SECOND);
         },
         { &detector }
@@ -109,7 +109,7 @@ void mash_A_until_end_of_battle(ProgramEnvironment& env, const BotBaseContext& c
 
 
 
-bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     //  Go to Coronet Highlands Mountain camp.
@@ -129,7 +129,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, co
         ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
         int ret = run_until(
             env, context, env.console,
-            [](const BotBaseContext& context){
+            [](BotBaseContext& context){
                 pbf_move_left_joystick(context, 0, 212, 50, 0);
                 pbf_press_button(context, BUTTON_B, 495, 80);
 
@@ -193,7 +193,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, co
 
 
 
-void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.

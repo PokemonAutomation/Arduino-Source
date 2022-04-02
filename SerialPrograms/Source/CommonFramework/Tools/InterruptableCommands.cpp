@@ -18,18 +18,18 @@ namespace PokemonAutomation{
 struct AsyncCommandSession::CommandSet{
     CommandSet(
         CancellableScope& parent, BotBase& botbase,
-        std::function<void(const BotBaseContext&)>&& lambda
+        std::function<void(BotBaseContext&)>&& lambda
     );
     CancellableScope scope;
     BotBaseContext context;
-    std::function<void(const BotBaseContext&)> commands;
+    std::function<void(BotBaseContext&)> commands;
 };
 
 
 
 AsyncCommandSession::CommandSet::CommandSet(
     CancellableScope& parent, BotBase& botbase,
-    std::function<void(const BotBaseContext&)>&& lambda
+    std::function<void(BotBaseContext&)>&& lambda
 )
     : scope(parent)
     , context(scope, botbase)
@@ -62,7 +62,7 @@ bool AsyncCommandSession::command_is_running(){
     return m_current != nullptr;
 }
 
-void AsyncCommandSession::dispatch(std::function<void(const BotBaseContext&)>&& lambda){
+void AsyncCommandSession::dispatch(std::function<void(BotBaseContext&)>&& lambda){
     std::unique_lock<std::mutex> lg(m_lock);
     if (cancelled()){
         return;

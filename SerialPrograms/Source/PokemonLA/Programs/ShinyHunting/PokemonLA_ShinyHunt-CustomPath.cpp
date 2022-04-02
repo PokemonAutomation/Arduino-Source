@@ -165,7 +165,7 @@ void ShinyHuntCustomPath::do_non_listen_action(SingleSwitchProgramEnvironment& e
 }
 
 
-void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     for(size_t action_index = 0; action_index < CUSTOM_PATH_TABLE.num_actions(); action_index++){
@@ -177,12 +177,12 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, const Bo
             // Build shiny sound detector and start listens:
             ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
             // TODO: run_until() is not designed to pass `env` inside. run_until() relies on the usage
-            // of the passed in const BotBaseContext& context to stop the code inside the lambda function,
+            // of the passed in BotBaseContext& context to stop the code inside the lambda function,
             // but the code using the passed in `env` may still runs. This will delay the program stop
             // on shiny sound but should be genearally OK in this use case.
             run_until(
                 env, context, env.console,
-                [&env, &action_index, this](const BotBaseContext& context){
+                [&env, &action_index, this](BotBaseContext& context){
                     for(; action_index < CUSTOM_PATH_TABLE.num_actions(); action_index++){
                         const auto& listened_row = CUSTOM_PATH_TABLE.get_action(action_index);
                         if (listened_row.action != PathAction::END_LISTEN){
@@ -205,7 +205,7 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, const Bo
 }
 
 
-void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.

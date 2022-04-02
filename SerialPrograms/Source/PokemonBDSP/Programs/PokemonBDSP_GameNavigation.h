@@ -17,20 +17,20 @@ namespace PokemonBDSP{
 
 //  Non-Feedback
 
-void save_game(const BotBaseContext& context);
+void save_game(BotBaseContext& context);
 
-void menu_to_box(const BotBaseContext& context);
-void overworld_to_box(const BotBaseContext& context);
-void box_to_overworld(const BotBaseContext& context);
+void menu_to_box(BotBaseContext& context);
+void overworld_to_box(BotBaseContext& context);
+void box_to_overworld(BotBaseContext& context);
 
 
 //  Feedback
 
-void overworld_to_menu(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console);
-void save_game(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console);
+void overworld_to_menu(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console);
+void save_game(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console);
 
-void overworld_to_box(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console);
-void box_to_overworld(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console);
+void overworld_to_box(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console);
+void box_to_overworld(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console);
 
 
 }

@@ -23,7 +23,7 @@ namespace PokemonBDSP{
 
 
 
-void take_video(const BotBaseContext& context){
+void take_video(BotBaseContext& context){
     pbf_wait(context, 5 * TICKS_PER_SECOND);
     pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
 //    context->wait_for_all_requests();
@@ -31,7 +31,7 @@ void take_video(const BotBaseContext& context){
 
 
 StandardEncounterHandler::StandardEncounterHandler(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     Language language,
     EncounterBotCommonOptions& settings,
     PokemonSwSh::ShinyHuntTracker& session_stats

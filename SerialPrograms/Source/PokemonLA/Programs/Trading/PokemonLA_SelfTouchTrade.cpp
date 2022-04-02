@@ -105,8 +105,7 @@ bool SelfTouchTrade::trade_one(MultiSwitchProgramEnvironment& env, std::map<std:
     host.log("\"" + slug + "\" - Trades Remaining: " + std::to_string(iter->second));
 #if 1
     MultiConsoleErrorState error_state;
-    env.run_in_parallel([&](ConsoleHandle& console){
-        BotBaseContext context(env.scope(), console);
+    env.run_in_parallel([&](BotBaseContext& context, ConsoleHandle& console){
         trade_current_pokemon(env, context, console, error_state, stats);
     });
     stats.m_trades++;
@@ -156,8 +155,8 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
     }
 
     //  Connect both controllers.
-    env.run_in_parallel([&](ConsoleHandle& console){
-        pbf_press_button(console, BUTTON_LCLICK, 10, 0);
+    env.run_in_parallel([&](BotBaseContext& context, ConsoleHandle& console){
+        pbf_press_button(context, BUTTON_LCLICK, 10, 0);
     });
 
     uint8_t row = 0;
@@ -179,7 +178,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
         bool host_ok, recv_ok;
         InferenceBoxScope box0(host, {0.925, 0.100, 0.014, 0.030});
         InferenceBoxScope box1(recv, {0.925, 0.100, 0.014, 0.030});
-        env.run_in_parallel([&](ConsoleHandle& console){
+        env.run_in_parallel([&](BotBaseContext& context, ConsoleHandle& console){
             ImageStats stats = image_stats(extract_box_reference(console.video().snapshot(), box0));
             bool ok = is_white(stats);
             if (host.index() == console.index()){

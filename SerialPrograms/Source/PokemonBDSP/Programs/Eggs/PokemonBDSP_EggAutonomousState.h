@@ -35,7 +35,7 @@ struct EggAutonomousStats : public StatsTracker{
 class EggAutonomousState{
 public:
     EggAutonomousState(
-        ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+        ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
         EggAutonomousStats& stats,
         EventNotificationOption& notification_nonshiny_keep,
         EventNotificationOption& notification_shiny,
@@ -79,7 +79,7 @@ private:
 
 private:
     ProgramEnvironment& m_env;
-    const BotBaseContext& m_context;
+    BotBaseContext& m_context;
     ConsoleHandle& m_console;
     EggAutonomousStats& m_stats;
     EventNotificationOption m_notification_noop;

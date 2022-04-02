@@ -54,7 +54,7 @@ GodEggItemDupe::GodEggItemDupe(const GodEggItemDupe_Descriptor& descriptor)
 
 
 void GodEggItemDupe::collect_godegg(
-    const BotBaseContext& context,
+    BotBaseContext& context,
     uint8_t party_slot,
     bool map_to_pokemon,
     bool pokemon_to_map
@@ -160,7 +160,7 @@ void GodEggItemDupe::run_program(SingleSwitchProgramEnvironment& env, uint16_t a
     }
 }
 
-void GodEggItemDupe::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void GodEggItemDupe::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);

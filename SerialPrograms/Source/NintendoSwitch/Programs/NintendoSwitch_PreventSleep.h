@@ -23,7 +23,7 @@ class PreventSleep : public SingleSwitchProgramInstance{
 public:
     PreventSleep(const PreventSleep_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 
 };

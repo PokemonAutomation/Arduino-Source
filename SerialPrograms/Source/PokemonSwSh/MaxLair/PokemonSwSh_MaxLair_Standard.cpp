@@ -166,12 +166,12 @@ void MaxLairStandard::program(MultiSwitchProgramEnvironment& env, CancellableSco
         throw UserSetupError(env.logger(), "Invalid Host Switch");
     }
 
-    env.run_in_parallel([&](ConsoleHandle& console){
+    env.run_in_parallel([&](BotBaseContext& context, ConsoleHandle& console){
         if (START_IN_GRIP_MENU){
-            grip_menu_connect_go_home(console);
-            resume_game_no_interact(console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            grip_menu_connect_go_home(context);
+            resume_game_no_interact(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }else{
-            pbf_press_button(console, BUTTON_B, 5, 5);
+            pbf_press_button(context, BUTTON_B, 5, 5);
         }
     });
 

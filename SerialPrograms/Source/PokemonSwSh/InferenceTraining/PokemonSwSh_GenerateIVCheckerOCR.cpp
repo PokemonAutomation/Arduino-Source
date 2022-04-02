@@ -63,7 +63,7 @@ GenerateIVCheckerOCR::GenerateIVCheckerOCR(const GenerateIVCheckerOCR_Descriptor
 }
 
 
-void GenerateIVCheckerOCR::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void GenerateIVCheckerOCR::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     IVCheckerReaderScope reader(env.console, LANGUAGE);
 
     QString path = "IVCheckerOCR/";

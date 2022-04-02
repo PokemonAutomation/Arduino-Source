@@ -97,7 +97,7 @@ std::unique_ptr<StatsTracker> GiftBerryReset::make_stats() const{
 }
 
 
-void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
     env.update_stats();
 

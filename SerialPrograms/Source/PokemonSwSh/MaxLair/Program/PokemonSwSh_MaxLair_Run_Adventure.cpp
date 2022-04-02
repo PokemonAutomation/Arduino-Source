@@ -57,8 +57,7 @@ AdventureResult run_adventure(
     std::atomic<bool> stop(false);
     std::atomic<bool> error(false);
 
-    env.run_in_parallel([&](ConsoleHandle& console){
-        BotBaseContext context(env.scope(), console);
+    env.run_in_parallel([&](BotBaseContext& context, ConsoleHandle& console){
         StateMachineAction action;
         while (true){
             //  Dump current state, but don't spam if nothing has changed.
@@ -148,11 +147,11 @@ void loop_adventures(
     while (true){
         //  Touch the date.
         if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
-            env.run_in_parallel([&](ConsoleHandle& console){
+            env.run_in_parallel([&](BotBaseContext& context, ConsoleHandle& console){
                 env.log("Touching date to prevent rollover.");
-                pbf_press_button(console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-                touch_date_from_home(console, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-                resume_game_back_out(console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 5 * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+                touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+                resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 5 * TICKS_PER_SECOND);
             });
         }
 
@@ -175,11 +174,10 @@ void loop_adventures(
                 throw OperationFailedException(env.logger(), "Failed to start adventure 3 times in the row.");
             }
             env.log("Failed to start adventure. Resetting all Switches...", COLOR_RED);
-            env.run_in_parallel([&](ConsoleHandle& console){
-                BotBaseContext context(env.scope(), console);
+            env.run_in_parallel([&](BotBaseContext& context, ConsoleHandle& console){
 //                QImage screen = console.video().snapshot();
 //                dump_image(console, MODULE_NAME, "ResetRecovery", screen);
-                pbf_press_button(console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+                pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
                 reset_game_from_home_with_inference(env, context, console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             });
             continue;

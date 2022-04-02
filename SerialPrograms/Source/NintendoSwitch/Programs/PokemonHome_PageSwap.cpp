@@ -39,7 +39,7 @@ PageSwap::PageSwap(const PageSwap_Descriptor& descriptor)
     PA_ADD_OPTION(DODGE_SYSTEM_UPDATE_WINDOW);
 }
 
-void PageSwap::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void PageSwap::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         PokemonSwSh::resume_game_no_interact(env.console, DODGE_SYSTEM_UPDATE_WINDOW);

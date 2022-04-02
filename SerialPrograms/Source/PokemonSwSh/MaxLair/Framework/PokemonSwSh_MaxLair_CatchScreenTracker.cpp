@@ -18,7 +18,7 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-CaughtPokemonScreen::CaughtPokemonScreen(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console)
+CaughtPokemonScreen::CaughtPokemonScreen(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console)
     : m_env(env)
     , m_context(context)
     , m_console(console)

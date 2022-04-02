@@ -87,7 +87,7 @@ std::unique_ptr<StatsTracker> EggHatcher::make_stats() const{
 
 
 
-void EggHatcher::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     uint16_t INCUBATION_TIME = (uint16_t)((1258.5 + 4.05 * STEPS_TO_HATCH) * 1.05);

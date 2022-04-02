@@ -90,7 +90,7 @@ std::unique_ptr<StatsTracker> StarterReset::make_stats() const{
 
 
 
-void StarterReset::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     QImage briefcase(RESOURCE_PATH() + "PokemonBDSP/StarterBriefcase.png");
@@ -125,7 +125,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, const BotBaseCon
         ImageMatchWatcher detector(briefcase, {0.5, 0.1, 0.5, 0.7}, 100, true);
         int ret = run_until(
             env, context, env.console,
-            [](const BotBaseContext& context){
+            [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             { &detector }

@@ -91,7 +91,7 @@ std::unique_ptr<StatsTracker> ShinyHuntFlagPin::make_stats() const{
 }
 
 
-void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
     stats.attempts++;
 
@@ -118,7 +118,7 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, const 
 }
 
 
-void ShinyHuntFlagPin::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void ShinyHuntFlagPin::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.

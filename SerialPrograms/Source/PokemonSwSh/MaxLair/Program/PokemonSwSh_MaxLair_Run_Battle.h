@@ -20,7 +20,7 @@ namespace MaxLairInternal{
 
 
 StateMachineAction run_move_select(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     GlobalStateTracker& state_tracker,
     const ConsoleSpecificOptions& settings,
     bool currently_dmaxed, bool cheer_only
@@ -28,7 +28,7 @@ StateMachineAction run_move_select(
 
 StateMachineAction throw_balls(
     AdventureRuntime& runtime,
-    ProgramEnvironment& env, const BotBaseContext& context,
+    ProgramEnvironment& env, BotBaseContext& context,
     ConsoleHandle& console, Language language,
     GlobalStateTracker& state_tracker,
     const EndBattleDecider& decider

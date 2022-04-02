@@ -15,13 +15,13 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-void hatch_egg(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console);
-void hatch_party(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console, size_t eggs = 5);
+void hatch_egg(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console);
+void hatch_party(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console, size_t eggs = 5);
 
-void withdraw_1st_column_from_overworld(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console);
+void withdraw_1st_column_from_overworld(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console);
 
 
-void release(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console);
+void release(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console);
 
 
 

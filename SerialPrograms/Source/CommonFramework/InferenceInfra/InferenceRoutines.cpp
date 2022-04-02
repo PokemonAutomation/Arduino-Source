@@ -18,7 +18,7 @@ namespace PokemonAutomation{
 
 
 int wait_until(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     std::chrono::system_clock::time_point deadline,
     std::vector<InferenceCallback*>&& callbacks,
     std::chrono::milliseconds period
@@ -103,8 +103,8 @@ int wait_until(
 
 
 int run_until(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
-    std::function<void(const BotBaseContext& context)>&& command,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    std::function<void(BotBaseContext& context)>&& command,
     std::vector<InferenceCallback*>&& callbacks,
     std::chrono::milliseconds period
 ){

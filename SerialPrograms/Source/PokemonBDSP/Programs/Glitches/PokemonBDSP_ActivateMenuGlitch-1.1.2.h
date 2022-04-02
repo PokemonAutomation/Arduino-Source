@@ -26,7 +26,7 @@ class ActivateMenuGlitch112 : public SingleSwitchProgramInstance{
 public:
     ActivateMenuGlitch112(const ActivateMenuGlitch112_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     TimeExpressionOption<uint16_t> FLY_A_TO_X_DELAY;

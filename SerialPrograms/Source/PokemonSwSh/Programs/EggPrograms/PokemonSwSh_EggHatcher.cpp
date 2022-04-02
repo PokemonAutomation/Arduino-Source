@@ -29,7 +29,7 @@ EggHatcher_Descriptor::EggHatcher_Descriptor()
 
 
 
-void withdraw_column(const BotBaseContext& context, uint8_t column){
+void withdraw_column(BotBaseContext& context, uint8_t column){
     menu_to_box(context, false);
     party_to_column(context, column);
     pickup_column(context, false);
@@ -37,14 +37,14 @@ void withdraw_column(const BotBaseContext& context, uint8_t column){
     ssf_press_button1(context, BUTTON_A, GameSettings::instance().BOX_PICKUP_DROP_DELAY);
     box_to_menu(context);
 }
-void deposit_column(const BotBaseContext& context, uint8_t column){
+void deposit_column(BotBaseContext& context, uint8_t column){
     menu_to_box(context, true);
     pickup_column(context, true);
     party_to_column(context, column);
     ssf_press_button1(context, BUTTON_A, GameSettings::instance().BOX_PICKUP_DROP_DELAY);
     box_to_menu(context);
 }
-uint8_t swap_party(const BotBaseContext& context, uint8_t column){
+uint8_t swap_party(BotBaseContext& context, uint8_t column){
     menu_to_box(context, true);
     pickup_column(context, true);
 
@@ -105,7 +105,7 @@ EggHatcher::EggHatcher(const EggHatcher_Descriptor& descriptor)
     PA_ADD_OPTION(SAFETY_TIME);
     PA_ADD_OPTION(HATCH_DELAY);
 }
-void EggHatcher::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     //  Calculate upper bounds for incubation time.
     uint16_t INCUBATION_DELAY_UPPER = (uint16_t)((uint32_t)STEPS_TO_HATCH * (uint32_t)103180 >> 16);
     uint16_t TOTAL_DELAY = INCUBATION_DELAY_UPPER + HATCH_DELAY + SAFETY_TIME - TRAVEL_RIGHT_DURATION;

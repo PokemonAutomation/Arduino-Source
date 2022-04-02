@@ -31,10 +31,10 @@ public:
     MagikarpMoveGrinder(const MagikarpMoveGrinder_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    bool battle_magikarp(SingleSwitchProgramEnvironment& env, const BotBaseContext& context);
+    bool battle_magikarp(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     void switch_pokemon(SingleSwitchProgramEnvironment& env, size_t& next_pokemon_in_party_order);
 

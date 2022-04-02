@@ -22,7 +22,7 @@ namespace PokemonLA{
 
 
 
-void goto_professor(Logger& logger, const BotBaseContext& context, Camp camp){
+void goto_professor(Logger& logger, BotBaseContext& context, Camp camp){
     switch (camp){
     case Camp::FIELDLANDS_FIELDLANDS:
         pbf_move_left_joystick(context, 255, 0, 125, 0);
@@ -65,7 +65,7 @@ void goto_professor(Logger& logger, const BotBaseContext& context, Camp camp){
     }
 }
 void from_professor_return_to_jubilife(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console
 ){
     ButtonDetector button_detector0(
         console, console,
@@ -86,7 +86,7 @@ void from_professor_return_to_jubilife(
         console.botbase().wait_for_all_requests();
         int ret = run_until(
             env, context, console,
-            [](const BotBaseContext& context){
+            [](BotBaseContext& context){
                 for (size_t c = 0; c < 20; c++){
                     pbf_press_button(context, BUTTON_A, 20, 125);
                 }
@@ -116,12 +116,12 @@ void from_professor_return_to_jubilife(
 
 
 void mash_A_to_enter_sub_area(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console
 ){
     BlackScreenOverWatcher black_screen0(COLOR_RED, {0.2, 0.2, 0.6, 0.6}, 100, 10);
     int ret = run_until(
         env, context, console,
-        [](const BotBaseContext& context){
+        [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, 7 * TICKS_PER_SECOND);
         },
         { &black_screen0 }
@@ -137,12 +137,12 @@ void mash_A_to_enter_sub_area(
 
 
 void mash_A_to_change_region(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console
 ){
     BlackScreenOverWatcher black_screen0;
     int ret = run_until(
         env, context, console,
-        [](const BotBaseContext& context){
+        [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, GameSettings::instance().LOAD_REGION_TIMEOUT);
         },
         { &black_screen0 }
@@ -171,7 +171,7 @@ void mash_A_to_change_region(
 
 
 void goto_camp_from_jubilife(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     const TravelLocation& location
 ){
     //  Open the map.
@@ -181,7 +181,7 @@ void goto_camp_from_jubilife(
         MapDetector detector;
         int ret = run_until(
             env, context, console,
-            [](const BotBaseContext& context){
+            [](BotBaseContext& context){
                 for (size_t c = 0; c < 10; c++){
                     pbf_press_button(context, BUTTON_A, 20, 105);
                 }
@@ -293,7 +293,7 @@ void goto_camp_from_jubilife(
 
 
 void goto_camp_from_overworld(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     ShinyDetectedActionOption& options,
     ShinyStatIncrementer& shiny_stat_incrementer
 ){

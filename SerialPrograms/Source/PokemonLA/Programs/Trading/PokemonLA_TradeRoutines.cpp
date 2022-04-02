@@ -33,7 +33,7 @@ TradeStats::TradeStats()
 
 
 void trade_current_pokemon(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     MultiConsoleErrorState& tracker,
     TradeStats& stats
 ){
@@ -108,7 +108,7 @@ void trade_current_pokemon(
         BlackScreenWatcher black_screen;
         int ret = run_until(
             env, context, console,
-            [](const BotBaseContext& context){
+            [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             { &black_screen }

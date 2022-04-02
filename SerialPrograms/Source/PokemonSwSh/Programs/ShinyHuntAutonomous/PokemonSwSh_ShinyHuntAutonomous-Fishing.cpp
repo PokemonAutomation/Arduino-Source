@@ -93,7 +93,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousFishing::make_stats() const{
 
 
 
-void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);

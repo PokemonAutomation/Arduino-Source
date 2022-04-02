@@ -36,7 +36,7 @@ ClothingBuyer::ClothingBuyer(const ClothingBuyer_Descriptor& descriptor)
 }
 
 
-void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     //  Connect the controller.
     pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
 

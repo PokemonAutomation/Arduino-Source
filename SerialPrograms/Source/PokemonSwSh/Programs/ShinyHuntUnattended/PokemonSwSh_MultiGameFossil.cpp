@@ -39,7 +39,7 @@ MultiGameFossil::MultiGameFossil(const MultiGameFossil_Descriptor& descriptor)
 }
 
 void run_fossil_batch(
-    const BotBaseContext& context,
+    BotBaseContext& context,
     const FossilGame& batch,
     bool* game_slot_flipped,
     bool save_and_exit
@@ -118,7 +118,7 @@ void run_fossil_batch(
 }
 
 
-void MultiGameFossil::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void MultiGameFossil::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
     }else{

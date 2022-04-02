@@ -137,13 +137,13 @@ std::unique_ptr<StatsTracker> IngoBattleGrinder::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-bool IngoBattleGrinder::start_dialog(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+bool IngoBattleGrinder::start_dialog(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     {
         ButtonDetector button0(env.console, env.console, ButtonType::ButtonA, {0.50, 0.450, 0.40, 0.042}, std::chrono::milliseconds(100), true);
         ButtonDetector button1(env.console, env.console, ButtonType::ButtonA, {0.50, 0.492, 0.40, 0.042}, std::chrono::milliseconds(100), true);
         int ret = run_until(
             env, context, env.console,
-            [&](const BotBaseContext& context){
+            [&](BotBaseContext& context){
                 for (size_t c = 0; c < 10; c++){
                     pbf_press_button(context, BUTTON_A, 20, 150);
                 }
@@ -166,7 +166,7 @@ bool IngoBattleGrinder::start_dialog(SingleSwitchProgramEnvironment& env, const 
     ButtonDetector button2(env.console, env.console, ButtonType::ButtonA, {0.50, 0.350, 0.40, 0.400}, std::chrono::milliseconds(100), true);
     int ret = run_until(
         env, context, env.console,
-        [&](const BotBaseContext& context){
+        [&](BotBaseContext& context){
             for (size_t c = 0; c < 5; c++){
                 pbf_press_button(context, BUTTON_A, 20, 150);
             }
@@ -181,7 +181,7 @@ bool IngoBattleGrinder::start_dialog(SingleSwitchProgramEnvironment& env, const 
     }
 }
 
-void IngoBattleGrinder::use_move(const BotBaseContext &context, size_t cur_pokemon, size_t cur_move){
+void IngoBattleGrinder::use_move(BotBaseContext& context, size_t cur_pokemon, size_t cur_move){
     const MoveStyle style = POKEMON_ACTIONS.get_style(cur_pokemon, cur_move);
 
     // Select move styles
@@ -235,7 +235,7 @@ void IngoBattleGrinder::switch_pokemon(SingleSwitchProgramEnvironment& env, size
     }
 }
 
-bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     // The location of the move slots when choosing which move to use during battle.
@@ -411,7 +411,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, const
 
 
 
-void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.

@@ -54,7 +54,7 @@ int move_to_ball(
 //  Returns the quantity of the ball.
 //  Returns -1 if unable to read.
 int16_t move_to_ball(
-    const BattleBallReader& reader, const BotBaseContext& context, ConsoleHandle& console,
+    const BattleBallReader& reader, BotBaseContext& context, ConsoleHandle& console,
     const std::string& ball_slug
 ){
     //  Search forward at high speed.
@@ -86,7 +86,7 @@ int16_t move_to_ball(
 
 
 CatchResults throw_balls(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     Language language,
     const std::string& ball_slug
 ){
@@ -140,7 +140,7 @@ CatchResults throw_balls(
 
 
 CatchResults basic_catcher(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     Language language,
     const std::string& ball_slug
 ){
@@ -167,7 +167,7 @@ CatchResults basic_catcher(
         BlackScreenOverWatcher black_screen_detector;
         run_until(
             env, context, console,
-            [=](const BotBaseContext& context){
+            [=](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             { &black_screen_detector }
@@ -180,7 +180,7 @@ CatchResults basic_catcher(
 
         int result = run_until(
             env, context, console,
-            [=](const BotBaseContext& context){
+            [=](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 4 * TICKS_PER_SECOND);
             },
             { &caught_detector }
@@ -202,7 +202,7 @@ CatchResults basic_catcher(
         BlackScreenOverWatcher black_screen_detector;
         run_until(
             env, context, console,
-            [=](const BotBaseContext& context){
+            [=](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
             },
             { &black_screen_detector }

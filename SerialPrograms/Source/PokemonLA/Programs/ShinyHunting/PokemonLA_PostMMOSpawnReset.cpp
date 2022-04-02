@@ -93,7 +93,7 @@ std::unique_ptr<StatsTracker> PostMMOSpawnReset::make_stats() const{
 }
 
 
-void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     // From game to Switch Home
@@ -104,7 +104,7 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, const
         ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
         run_until(
             env, context, env.console,
-            [this, &env](const BotBaseContext& context){
+            [this, &env](BotBaseContext& context){
                 // TODO: gamemenu_to_ingame has wait_until(). Nesting wait_until() into run_until() is not the intended usage of run_until().
                 // When outer run_until() wants to break out, the inner wait_until() may not be able to do that until itself is finished.
                 // But this is fine in the current use case, as we are OK with the shiny sound detector stopping the program a little late.
@@ -136,7 +136,7 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, const
 }
 
 
-void PostMMOSpawnReset::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void PostMMOSpawnReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.

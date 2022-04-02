@@ -81,7 +81,7 @@ std::unique_ptr<StatsTracker> CrobatFinder::make_stats() const{
 }
 
 
-void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     // NOTE: there's no "stunned by alpha" detection in case any of the close ones are alphas!
     Stats& stats = env.stats<Stats>();
 
@@ -121,7 +121,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, const BotB
         ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
         run_until(
             env, context, env.console,
-            [](const BotBaseContext& context){
+            [](BotBaseContext& context){
 
                 // FORWARD PORTION OF CAVE UNTIL LEDGE
                 pbf_press_button(context, BUTTON_B, (uint16_t)(2.2 * TICKS_PER_SECOND), 80); // wyrdeer sprint
@@ -156,7 +156,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, const BotB
 }
 
 
-void CrobatFinder::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void CrobatFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.

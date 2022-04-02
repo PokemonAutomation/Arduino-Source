@@ -44,7 +44,7 @@ BeamReset::BeamReset(const BeamReset_Descriptor& descriptor)
     PA_ADD_OPTION(EXTRA_LINE);
 }
 
-void BeamReset::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void BeamReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_front_of_den_nowatts(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);

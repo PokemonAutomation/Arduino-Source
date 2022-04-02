@@ -31,15 +31,15 @@ public:
     CloneItemsMenuOverlap(const CloneItemsMenuOverlap_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     struct Stats;
 
-    bool trigger_encounter(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console);
-    void swap_party(const BotBaseContext& context, ConsoleHandle& console);
-    void mash_B_to_battle(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console);
-    void detach_items(const BotBaseContext& context, ConsoleHandle& console);
+    bool trigger_encounter(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console);
+    void swap_party(BotBaseContext& context, ConsoleHandle& console);
+    void mash_B_to_battle(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console);
+    void detach_items(BotBaseContext& context, ConsoleHandle& console);
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

@@ -96,7 +96,7 @@ struct AdventureRuntime{
 //  Return true if done.
 StateMachineAction run_state_iteration(
     AdventureRuntime& runtime, size_t console_index,
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     bool save_path,
     GlobalStateTracker& state_tracker,
     const EndBattleDecider& boss_action,

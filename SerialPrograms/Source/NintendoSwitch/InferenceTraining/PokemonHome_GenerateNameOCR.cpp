@@ -51,7 +51,7 @@ GenerateNameOCRData::GenerateNameOCRData(const GenerateNameOCRData_Descriptor& d
 }
 
 
-void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     QString resource_path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-National.json";
     QJsonArray array = read_json_file(resource_path).array();
 

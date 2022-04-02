@@ -94,7 +94,7 @@ std::unique_ptr<StatsTracker> CloneItemsMenuOverlap::make_stats() const{
 }
 
 
-bool CloneItemsMenuOverlap::trigger_encounter(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console){
+bool CloneItemsMenuOverlap::trigger_encounter(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console){
     console.log("Detected overworld. Triggering battle with menu overlap...");
 
     StartBattleMenuOverlapDetector detector(console);
@@ -125,7 +125,7 @@ bool CloneItemsMenuOverlap::trigger_encounter(ProgramEnvironment& env, const Bot
         return false;
     }
 }
-void CloneItemsMenuOverlap::swap_party(const BotBaseContext& context, ConsoleHandle& console){
+void CloneItemsMenuOverlap::swap_party(BotBaseContext& context, ConsoleHandle& console){
 //    const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY;
 //    const uint16_t BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY;
     const uint16_t BOX_SCROLL_DELAY = 20;
@@ -153,11 +153,11 @@ void CloneItemsMenuOverlap::swap_party(const BotBaseContext& context, ConsoleHan
     column_to_party(console, 1);
     pbf_press_button(console, BUTTON_ZL, 10, BOX_PICKUP_DROP_DELAY);
 }
-void CloneItemsMenuOverlap::mash_B_to_battle(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console){
+void CloneItemsMenuOverlap::mash_B_to_battle(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console){
     BattleMenuWatcher detector(BattleType::STANDARD);
     int ret = run_until(
         env, context, console,
-        [=](const BotBaseContext& context){
+        [=](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
         },
         { &detector }
@@ -169,7 +169,7 @@ void CloneItemsMenuOverlap::mash_B_to_battle(ProgramEnvironment& env, const BotB
     }
     pbf_mash_button(console, BUTTON_B, 2 * TICKS_PER_SECOND);
 }
-void CloneItemsMenuOverlap::detach_items(const BotBaseContext& context, ConsoleHandle& console){
+void CloneItemsMenuOverlap::detach_items(BotBaseContext& context, ConsoleHandle& console){
     const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
 
     for (size_t c = 0; c < 5; c++){
@@ -186,7 +186,7 @@ void CloneItemsMenuOverlap::detach_items(const BotBaseContext& context, ConsoleH
     }
 }
 
-void CloneItemsMenuOverlap::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void CloneItemsMenuOverlap::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.

@@ -28,10 +28,10 @@ public:
     EventBeamFinder(const EventBeamFinder_Descriptor& descriptor);
 
 
-    void goto_near_den(const BotBaseContext& context) const;
-    void goto_far_den(const BotBaseContext& context) const;
-    void drop_wishing_piece(const BotBaseContext& context) const;
-    virtual void program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) override;
+    void goto_near_den(BotBaseContext& context) const;
+    void goto_far_den(BotBaseContext& context) const;
+    void drop_wishing_piece(BotBaseContext& context) const;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;

@@ -114,7 +114,7 @@ std::unique_ptr<StatsTracker> MoneyFarmerRoute210::make_stats() const{
 }
 
 
-bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, const BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]){
+bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]){
     Stats& stats = env.stats<Stats>();
 
     env.log("Starting battle!");
@@ -123,7 +123,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, const BotB
         StartBattleDetector detector(env.console);
         int ret = run_until(
             env, context, env.console,
-            [=](const BotBaseContext& context){
+            [=](BotBaseContext& context){
                 pbf_press_button(context, BUTTON_ZL, 10, 10);
                 for (size_t c = 0; c < 17; c++){
                     pbf_press_dpad(context, DPAD_UP, 5, 10);
@@ -155,7 +155,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, const BotB
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         int ret = run_until(
             env, context, env.console,
-            [=](const BotBaseContext& context){
+            [=](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {
@@ -280,7 +280,7 @@ void MoneyFarmerRoute210::fly_to_center_heal_and_return(ConsoleHandle& console, 
 }
 
 bool MoneyFarmerRoute210::heal_after_battle_and_return(
-    SingleSwitchProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    SingleSwitchProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     uint8_t pp0[4], uint8_t pp1[4])
 {
     if (HEALING_METHOD == 0){
@@ -316,7 +316,7 @@ bool MoneyFarmerRoute210::has_pp(uint8_t pp0[4], uint8_t pp1[4]){
 
 
 
-void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     uint8_t pp0[4] = {
@@ -375,7 +375,7 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, const Bot
             VSSeekerReactionTracker tracker(env.console, {0.20, 0.20, 0.60, 0.60});
             run_until(
                 env, context, env.console,
-                [=](const BotBaseContext& context){
+                [=](BotBaseContext& context){
                     SHORTCUT.run(context, TICKS_PER_SECOND);
 
                 },

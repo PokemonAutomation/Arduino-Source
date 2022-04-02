@@ -24,7 +24,7 @@ namespace PokemonBDSP{
 
 
 
-void hatch_egg(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console){
+void hatch_egg(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console){
     //  Spin until egg starts hatching.
     do{
         ShortDialogWatcher dialog;
@@ -35,7 +35,7 @@ void hatch_egg(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHa
 
         int ret = run_until(
             env, context, console,
-            [](const BotBaseContext& context){
+            [](BotBaseContext& context){
                 egg_spin(context, 480 * TICKS_PER_SECOND);
             },
             {
@@ -102,13 +102,13 @@ void hatch_egg(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHa
         }
     }
 }
-void hatch_party(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console, size_t eggs){
+void hatch_party(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console, size_t eggs){
     for (size_t c = 0; c < eggs; c++){
         hatch_egg(env, context, console);
     }
 }
 
-void withdraw_1st_column_from_overworld(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console){
+void withdraw_1st_column_from_overworld(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console){
     const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
     const uint16_t BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY;
     overworld_to_box(env, context, console);
@@ -123,7 +123,7 @@ void withdraw_1st_column_from_overworld(ProgramEnvironment& env, const BotBaseCo
 
 
 
-void release(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console){
+void release(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console){
     pbf_press_button(console, BUTTON_ZL, 20, 50);
     pbf_move_right_joystick(console, 128, 0, 20, 10);
     pbf_move_right_joystick(console, 128, 0, 20, 10);

@@ -92,7 +92,7 @@ std::unique_ptr<StatsTracker> OutbreakFinder::make_stats() const{
 
 
 bool OutbreakFinder::read_outbreaks(
-    SingleSwitchProgramEnvironment& env, const BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
     MapRegion& current_region,
     const std::set<std::string>& desired
 ){
@@ -165,7 +165,7 @@ bool OutbreakFinder::read_outbreaks(
 
     return false;
 }
-void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env, const BotBaseContext& context, MapRegion region){
+void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env, BotBaseContext& context, MapRegion region){
     Stats& stats = env.stats<Stats>();
 
     mash_A_to_change_region(env, context, env.console);
@@ -202,7 +202,7 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
         );
         int ret = run_until(
             env, context, env.console,
-            [](const BotBaseContext& context){
+            [](BotBaseContext& context){
                 for (size_t c = 0; c < 10; c++){
                     pbf_press_button(context, BUTTON_A, 20, 125);
                 }
@@ -224,7 +224,7 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
 
 
 bool OutbreakFinder::run_iteration(
-    SingleSwitchProgramEnvironment& env, const BotBaseContext& context,
+    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
     const std::set<std::string>& desired
 ){
     Stats& stats = env.stats<Stats>();
@@ -235,7 +235,7 @@ bool OutbreakFinder::run_iteration(
     MapDetector detector;
     int ret = run_until(
         env, context, env.console,
-        [](const BotBaseContext& context){
+        [](BotBaseContext& context){
             for (size_t c = 0; c < 10; c++){
                 pbf_press_button(context, BUTTON_A, 20, 105);
             }
@@ -275,7 +275,7 @@ bool OutbreakFinder::run_iteration(
 
 
 
-void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     std::set<std::string> desired;

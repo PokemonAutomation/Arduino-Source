@@ -85,7 +85,7 @@ public:
 #if 0
 //  Return true if program should stop.
 bool run_on_shiny(
-    const BotBaseContext& context,
+    BotBaseContext& context,
     const ShinyDetectedActionOption& option
 );
 

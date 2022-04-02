@@ -86,7 +86,7 @@ std::unique_ptr<StatsTracker> UnownFinder::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-void ruins_entrance_route(const BotBaseContext& context){
+void ruins_entrance_route(BotBaseContext& context){
     pbf_wait(context, (uint16_t)(0.5 * TICKS_PER_SECOND));
     pbf_move_left_joystick(context, 139, 120, 10, 10);
     pbf_wait(context, (uint16_t)(1.3 * TICKS_PER_SECOND));
@@ -99,7 +99,7 @@ void ruins_entrance_route(const BotBaseContext& context){
     pbf_press_button(context, BUTTON_PLUS, 10, 10);
 }
 
-void enter_ruins(const BotBaseContext& context){
+void enter_ruins(BotBaseContext& context){
     pbf_press_button(context, BUTTON_B, (uint16_t)(4 * TICKS_PER_SECOND), 10);
     pbf_wait(context, (uint16_t)(1.5 * TICKS_PER_SECOND));
     pbf_move_left_joystick(context, 128, 255, 10, 0);
@@ -107,7 +107,7 @@ void enter_ruins(const BotBaseContext& context){
 }
 
 
-void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     stats.attempts++;
@@ -126,7 +126,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, const BotBa
         ShinySoundDetector shiny_detector_route(env.console, SHINY_DETECTED_ON_ROUTE.stop_on_shiny());
         run_until(
             env, context, env.console,
-            [](const BotBaseContext& context){
+            [](BotBaseContext& context){
                ruins_entrance_route(context);
             },
             { &shiny_detector_route }
@@ -141,7 +141,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, const BotBa
         ShinySoundDetector shiny_detector_ruins(env.console, SHINY_DETECTED.stop_on_shiny());
 
         run_until(env, context, env.console,
-            [](const BotBaseContext& context){
+            [](BotBaseContext& context){
                enter_ruins(context);
             },
             { &shiny_detector_ruins }
@@ -162,7 +162,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, const BotBa
 }
 
 
-void UnownFinder::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void UnownFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.

@@ -24,7 +24,7 @@ namespace MaxLairInternal{
 
 
 bool wait_for_a_player(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     const QImage& entrance,
     std::chrono::system_clock::time_point time_limit
 ){
@@ -60,7 +60,7 @@ bool wait_for_a_player(
 }
 
 bool wait_for_lobby_ready(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     const QImage& entrance,
     size_t min_players,
     size_t start_players,
@@ -93,7 +93,7 @@ bool wait_for_lobby_ready(
     return true;
 }
 bool start_adventure(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     size_t consoles,
     const QImage& entrance
 ){
@@ -107,7 +107,7 @@ bool start_adventure(
     LobbyDetector lobby_detector(true);
     int result = run_until(
         env, context, console,
-        [](const BotBaseContext& context){
+        [](BotBaseContext& context){
             for (size_t c = 0; c < 180; c++){
                 pbf_press_button(context, BUTTON_A, 10, 115);
                 context.wait_for_all_requests();
@@ -129,7 +129,7 @@ bool start_adventure(
 
 
 bool start_raid_self_solo(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     GlobalStateTracker& state_tracker,
     QImage& entrance, size_t boss_slot,
     ReadableQuantity999& ore
@@ -156,7 +156,7 @@ bool start_raid_self_solo(
 }
 
 bool start_raid_host_solo(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     GlobalStateTracker& state_tracker,
     QImage& entrance, size_t boss_slot,
     HostingSettings& settings,

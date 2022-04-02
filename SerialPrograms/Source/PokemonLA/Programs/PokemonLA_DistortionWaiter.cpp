@@ -80,7 +80,7 @@ std::unique_ptr<StatsTracker> DistortionWaiter::make_stats() const{
 }
 
 
-void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
 
@@ -98,7 +98,7 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, const BotBas
 
         int ret = run_until(
             env, context, env.console,
-            [&](const BotBaseContext& context){
+            [&](BotBaseContext& context){
                 for (size_t c = 0; c < 60; c++){
                     pbf_press_button(context, BUTTON_LCLICK, 20, 60 * TICKS_PER_SECOND - 20);
                     context.wait_for_all_requests();

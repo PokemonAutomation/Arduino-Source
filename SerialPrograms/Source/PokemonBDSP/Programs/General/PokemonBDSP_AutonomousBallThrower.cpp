@@ -103,7 +103,7 @@ std::unique_ptr<StatsTracker> AutonomousBallThrower::make_stats() const{
 
 
 
-void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
     env.update_stats();
 
@@ -118,7 +118,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, const B
             BattleMenuWatcher fight_detector(BattleType::STANDARD);
             int result = run_until(
                 env, context, env.console,
-                [=](const BotBaseContext& context){
+                [=](BotBaseContext& context){
                     while (true){
                         //TODO edit here for what to do
                         //pbf_wait(context, 1 * TICKS_PER_SECOND);

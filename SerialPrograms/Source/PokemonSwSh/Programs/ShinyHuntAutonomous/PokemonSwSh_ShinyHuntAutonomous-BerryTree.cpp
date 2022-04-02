@@ -78,7 +78,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousBerryTree::make_stats() const{
 
 
 
-void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
@@ -112,7 +112,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, 
 
             int result = run_until(
                 env, context, env.console,
-                [](const BotBaseContext& context){
+                [](BotBaseContext& context){
                     pbf_mash_button(context, BUTTON_A, 60 * TICKS_PER_SECOND);
                 },
                 {

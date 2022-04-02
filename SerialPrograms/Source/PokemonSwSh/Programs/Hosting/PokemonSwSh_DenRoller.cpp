@@ -100,14 +100,14 @@ std::unique_ptr<StatsTracker> DenRoller::make_stats() const{
 
 
 
-void DenRoller::ring_bell(const BotBaseContext& context, int count) const{
+void DenRoller::ring_bell(BotBaseContext& context, int count) const{
     for (int c = 0; c < count; c++){
         pbf_press_button(context, BUTTON_LCLICK, 5, 10);
     }
     pbf_wait(context, 200);
 }
 
-void DenRoller::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void DenRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     std::string desired_slug = FILTER.slug();

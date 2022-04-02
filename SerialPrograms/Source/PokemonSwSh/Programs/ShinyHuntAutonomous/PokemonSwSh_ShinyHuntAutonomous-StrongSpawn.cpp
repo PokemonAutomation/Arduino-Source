@@ -77,7 +77,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousStrongSpawn::make_stats() const
 
 
 
-void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
     }else{

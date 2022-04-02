@@ -73,14 +73,14 @@ std::unique_ptr<StatsTracker> ShinyHuntShaymin::make_stats() const{
 
 
 
-bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) const{
+bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env, BotBaseContext& context) const{
     env.console.botbase().wait_for_all_requests();
     {
         BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
         ShortDialogWatcher dialog_detector;
         int result = run_until(
             env, context, env.console,
-            [&](const BotBaseContext& context){
+            [&](BotBaseContext& context){
                 while (true){
                     for (size_t c = 0; c < 5; c++){
                         pbf_press_button(context, BUTTON_ZL, 20, 105);
@@ -107,7 +107,7 @@ bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env, cons
         StartBattleDetector start_battle_detector(env.console);
         int result = run_until(
             env, context, env.console,
-            [&](const BotBaseContext& context){
+            [&](BotBaseContext& context){
                 while (true){
                     for (size_t c = 0; c < 5; c++){
                         pbf_press_button(context, BUTTON_ZL, 20, 105);
@@ -132,7 +132,7 @@ bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env, cons
     return true;
 }
 
-void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     PokemonSwSh::ShinyHuntTracker& stats = env.stats<PokemonSwSh::ShinyHuntTracker>();
     env.update_stats();
 

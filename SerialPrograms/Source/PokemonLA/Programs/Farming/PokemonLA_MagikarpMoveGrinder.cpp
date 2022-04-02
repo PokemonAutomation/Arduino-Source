@@ -115,7 +115,7 @@ void MagikarpMoveGrinder::switch_pokemon(SingleSwitchProgramEnvironment& env, si
     }
 }
 
-bool MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+bool MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     // The location of the first move slot when choosing which move to use during battle.
@@ -228,7 +228,7 @@ bool MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, c
 
 
 
-void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     if (POKEMON_ACTIONS.num_pokemon() == 0){

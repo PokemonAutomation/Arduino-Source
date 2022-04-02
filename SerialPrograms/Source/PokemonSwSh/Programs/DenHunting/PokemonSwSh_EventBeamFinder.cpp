@@ -41,7 +41,7 @@ EventBeamFinder::EventBeamFinder(const EventBeamFinder_Descriptor& descriptor)
 }
 
 
-void EventBeamFinder::goto_near_den(const BotBaseContext& context) const{
+void EventBeamFinder::goto_near_den(BotBaseContext& context) const{
     ssf_hold_joystick1(context, true, STICK_CENTER, STICK_MIN, 375);
     pbf_wait(context, 50);
     ssf_press_button1(context, BUTTON_PLUS, 100);
@@ -50,7 +50,7 @@ void EventBeamFinder::goto_near_den(const BotBaseContext& context) const{
     ssf_press_button1(context, BUTTON_PLUS, 100);
     ssf_hold_joystick1(context, true, STICK_CENTER, STICK_MIN, 370);
 }
-void EventBeamFinder::goto_far_den(const BotBaseContext& context) const{
+void EventBeamFinder::goto_far_den(BotBaseContext& context) const{
     ssf_hold_joystick1(context, true, STICK_CENTER, STICK_MIN, 992);
     pbf_wait(context, 50);
     ssf_press_button1(context, BUTTON_PLUS, 100);
@@ -59,7 +59,7 @@ void EventBeamFinder::goto_far_den(const BotBaseContext& context) const{
     ssf_press_button1(context, BUTTON_PLUS, 100);
     ssf_hold_joystick1(context, true, STICK_CENTER, STICK_MIN, 300);
 }
-void EventBeamFinder::drop_wishing_piece(const BotBaseContext& context) const{
+void EventBeamFinder::drop_wishing_piece(BotBaseContext& context) const{
     ssf_press_button2(context, BUTTON_A, 200, 10);
     ssf_press_button2(context, BUTTON_A, 150, 10);
     ssf_press_button1(context, BUTTON_A, 5);
@@ -67,7 +67,7 @@ void EventBeamFinder::drop_wishing_piece(const BotBaseContext& context) const{
     ssf_press_button2(context, BUTTON_A, WAIT_TIME_IN_DEN + 100, 10);
     pbf_mash_button(context, BUTTON_B, 600);
 }
-void EventBeamFinder::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void EventBeamFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);

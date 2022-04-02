@@ -41,7 +41,7 @@ MountDetectionTest::MountDetectionTest(const MountDetectionTest_Descriptor& desc
 }
 
 
-void MountDetectionTest::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void MountDetectionTest::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 
     MountTracker tracker(env.console, (MountDetectorLogging)(size_t)FAILED_ACTION);
     VisualInferenceSession session(

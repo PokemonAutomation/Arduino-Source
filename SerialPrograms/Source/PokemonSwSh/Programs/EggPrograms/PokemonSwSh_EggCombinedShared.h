@@ -67,7 +67,7 @@ struct EggCombinedSession{
 
         return block;
     }
-    void withdraw_column_shiftR(const BotBaseContext& context, uint8_t column){
+    void withdraw_column_shiftR(BotBaseContext& context, uint8_t column){
         menu_to_box(context, false);
         party_to_column(context, column);
         pickup_column(context, false);
@@ -76,7 +76,7 @@ struct EggCombinedSession{
         ssf_press_button2(context, BUTTON_A, GameSettings::instance().BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
         box_to_menu(context);
     }
-    void deposit_column_shiftL(const BotBaseContext& context, uint8_t column){
+    void deposit_column_shiftL(BotBaseContext& context, uint8_t column){
         menu_to_box(context, true);
         pickup_column(context, true);
         party_to_column(context, column);
@@ -84,7 +84,7 @@ struct EggCombinedSession{
         ssf_press_button2(context, BUTTON_A, GameSettings::instance().BOX_PICKUP_DROP_DELAY, EGG_BUTTON_HOLD_DELAY);
         box_to_menu(context);
     }
-    uint8_t swap_party_shift(const BotBaseContext& context, uint8_t column){
+    uint8_t swap_party_shift(BotBaseContext& context, uint8_t column){
         menu_to_box(context, true);
         pickup_column(context, true);
 
@@ -126,7 +126,7 @@ struct EggCombinedSession{
 #define TRAVEL_BACK_TO_LADY_DURATION    (30 + 260 + (620) + 120 + 120 * 0)
 
     void eggcombined2_run_batch(
-        const BotBaseContext& context,
+        BotBaseContext& context,
         uint16_t INCUBATION_DELAY_LOWER,
         uint16_t remaining_travel_duration,
         uint8_t column,

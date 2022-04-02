@@ -65,7 +65,7 @@ static void enter_jobs(SingleSwitchProgramEnvironment &env, uint16_t index){
     pbf_press_button(env.console, BUTTON_A, 10, 5 * TICKS_PER_SECOND); // Wait for animation to complete
 }
 
-void PokeJobsFarmer::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void PokeJobsFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     uint8_t year = MAX_YEAR;
 
     // Play it safe in case some menu is open

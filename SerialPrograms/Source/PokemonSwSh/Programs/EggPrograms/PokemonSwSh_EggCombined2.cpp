@@ -66,7 +66,7 @@ EggCombined2::EggCombined2(const EggCombined2_Descriptor& descriptor)
     PA_ADD_OPTION(HATCH_DELAY);
 }
 
-void EggCombined2::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void EggCombined2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     EggCombinedSession session{
         .BOXES_TO_HATCH = BOXES_TO_HATCH,
         .STEPS_TO_HATCH = STEPS_TO_HATCH,

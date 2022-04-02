@@ -70,7 +70,7 @@ std::unique_ptr<StatsTracker> CloneItemsBoxCopy::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-void CloneItemsBoxCopy::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void CloneItemsBoxCopy::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;

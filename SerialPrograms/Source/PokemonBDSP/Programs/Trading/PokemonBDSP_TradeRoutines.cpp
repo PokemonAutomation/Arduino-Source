@@ -30,7 +30,7 @@ TradeStats::TradeStats()
 
 
 void trade_current_pokemon(
-    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     MultiConsoleErrorState& tracker,
     TradeStats& stats
 ){
@@ -97,7 +97,7 @@ void trade_current_pokemon(
         BlackScreenWatcher black_screen;
         int ret = run_until(
             env, context, console,
-            [](const BotBaseContext& context){
+            [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             { &black_screen }
@@ -143,8 +143,7 @@ void trade_current_box(
             );
 
             MultiConsoleErrorState error_state;
-            env.run_in_parallel([&](ConsoleHandle& console){
-                BotBaseContext context(env.scope(), console);
+            env.run_in_parallel([&](BotBaseContext& context, ConsoleHandle& console){
                 uint16_t box_scroll_delay = GameSettings::instance().BOX_SCROLL_DELAY_0;
                 for (size_t r = 0; r < row; r++){
                     pbf_move_right_joystick(console, 128, 255, 20, box_scroll_delay);

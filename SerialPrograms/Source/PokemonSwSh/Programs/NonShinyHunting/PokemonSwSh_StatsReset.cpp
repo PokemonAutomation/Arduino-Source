@@ -101,7 +101,7 @@ std::unique_ptr<StatsTracker> StatsReset::make_stats() const{
 
 
 
-void StatsReset::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
+void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
@@ -120,7 +120,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, const BotBaseConte
             BlackScreenOverWatcher detector;
             int result = run_until(
                 env, context, env.console,
-                [=](const BotBaseContext& context){
+                [=](BotBaseContext& context){
                     if (POKEMON == 2){
                         pbf_mash_button(context, BUTTON_A, 10 * TICKS_PER_SECOND);
                     }else{
