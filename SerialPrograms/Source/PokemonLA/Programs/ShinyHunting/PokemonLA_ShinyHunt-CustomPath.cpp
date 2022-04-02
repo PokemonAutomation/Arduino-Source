@@ -205,7 +205,7 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env){
 }
 
 
-void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env){
+void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.

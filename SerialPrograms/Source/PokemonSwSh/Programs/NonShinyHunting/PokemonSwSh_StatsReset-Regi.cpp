@@ -112,7 +112,7 @@ std::unique_ptr<StatsTracker> StatsResetRegi::make_stats() const{
 
 
 
-void StatsResetRegi::program(SingleSwitchProgramEnvironment& env){
+void StatsResetRegi::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);

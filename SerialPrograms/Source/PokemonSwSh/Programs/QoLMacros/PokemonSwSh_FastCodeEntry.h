@@ -27,7 +27,7 @@ class FastCodeEntry : public SingleSwitchProgramInstance{
 public:
     FastCodeEntry(const FastCodeEntry_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     FixedCodeOption RAID_CODE;

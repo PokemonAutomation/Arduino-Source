@@ -31,7 +31,7 @@ public:
 
     void collect_godegg(const BotBaseContext& context, uint8_t party_slot, bool map_to_pokemon, bool pokemon_to_map) const;
     void run_program(SingleSwitchProgramEnvironment& env, uint16_t attempts) const;
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;

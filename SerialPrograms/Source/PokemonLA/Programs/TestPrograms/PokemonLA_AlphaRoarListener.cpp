@@ -48,7 +48,7 @@ AlphaRoarListener::AlphaRoarListener(const AlphaRoarListener_Descriptor& descrip
 
 void searchAlphaRoarFromAudioDump();
 
-void AlphaRoarListener::program(SingleSwitchProgramEnvironment& env){
+void AlphaRoarListener::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     //  Connect the controller.
     // pbf_move_right_joystick(env.console, 0, 255, 10, 0);
 

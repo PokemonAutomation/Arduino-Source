@@ -87,7 +87,7 @@ std::unique_ptr<StatsTracker> ShinyHuntFishing::make_stats() const{
 
 
 
-void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
+void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     Stats& stats = env.stats<Stats>();
 
     StandardEncounterHandler handler(

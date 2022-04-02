@@ -90,10 +90,10 @@ void PABotBase::stop(){
     m_state.store(State::STOPPED, std::memory_order_release);
 }
 
-void PABotBase::wait_for_all_requests(const std::atomic<bool>* cancelled){
+void PABotBase::wait_for_all_requests(const Cancellable* cancelled){
     std::unique_lock<std::mutex> lg(m_sleep_lock);
     while (true){
-        if (cancelled != nullptr && cancelled->load(std::memory_order_acquire)){
+        if (cancelled != nullptr && cancelled->cancelled()){
             throw OperationCancelledException();
         }
         if (m_state.load(std::memory_order_acquire) != State::RUNNING){
@@ -413,7 +413,7 @@ void PABotBase::retransmit_thread(){
 
 
 uint64_t PABotBase::try_issue_request(
-    const std::atomic<bool>* cancelled,
+    const Cancellable* cancelled,
     const BotBaseRequest& request, bool silent_remove,
     size_t queue_limit
 ){
@@ -426,7 +426,7 @@ uint64_t PABotBase::try_issue_request(
     }
 
     SpinLockGuard lg(m_state_lock, "PABotBase::try_issue_request()");
-    if (cancelled != nullptr && cancelled->load(std::memory_order_acquire)){
+    if (cancelled != nullptr && cancelled->cancelled()){
         throw OperationCancelledException();
     }
 
@@ -466,7 +466,7 @@ uint64_t PABotBase::try_issue_request(
     return seqnum;
 }
 uint64_t PABotBase::try_issue_command(
-    const std::atomic<bool>* cancelled,
+    const Cancellable* cancelled,
     const BotBaseRequest& request, bool silent_remove,
     size_t queue_limit
 ){
@@ -479,7 +479,7 @@ uint64_t PABotBase::try_issue_command(
     }
 
     SpinLockGuard lg(m_state_lock, "PABotBase::try_issue_command()");
-    if (cancelled != nullptr && cancelled->load(std::memory_order_acquire)){
+    if (cancelled != nullptr && cancelled->cancelled()){
         throw OperationCancelledException();
     }
 
@@ -525,7 +525,7 @@ uint64_t PABotBase::try_issue_command(
     return seqnum;
 }
 uint64_t PABotBase::issue_request(
-    const std::atomic<bool>* cancelled,
+    const Cancellable* cancelled,
     const BotBaseRequest& request, bool silent_remove
 ){
     //  Issue a request or a command and return.
@@ -552,7 +552,7 @@ uint64_t PABotBase::issue_request(
             return seqnum;
         }
         std::unique_lock<std::mutex> lg(m_sleep_lock);
-        if (cancelled != nullptr && cancelled->load(std::memory_order_acquire)){
+        if (cancelled != nullptr && cancelled->cancelled()){
             throw OperationCancelledException();
         }
         if (m_state.load(std::memory_order_acquire) != State::RUNNING){
@@ -562,7 +562,7 @@ uint64_t PABotBase::issue_request(
     }
 }
 uint64_t PABotBase::issue_command(
-    const std::atomic<bool>* cancelled,
+    const Cancellable* cancelled,
     const BotBaseRequest& request, bool silent_remove
 ){
     //  Issue a request or a command and return.
@@ -589,7 +589,7 @@ uint64_t PABotBase::issue_command(
             return seqnum;
         }
         std::unique_lock<std::mutex> lg(m_sleep_lock);
-        if (cancelled != nullptr && cancelled->load(std::memory_order_acquire)){
+        if (cancelled != nullptr && cancelled->cancelled()){
             throw OperationCancelledException();
         }
         if (m_state.load(std::memory_order_acquire) != State::RUNNING){
@@ -601,7 +601,7 @@ uint64_t PABotBase::issue_command(
 
 bool PABotBase::try_issue_request(
     const BotBaseRequest& request,
-    const std::atomic<bool>* cancelled
+    const Cancellable* cancelled
 ){
     if (!request.is_command()){
         return try_issue_request(cancelled, request, true, MAX_PENDING_REQUESTS) != 0;
@@ -611,7 +611,7 @@ bool PABotBase::try_issue_request(
 }
 void PABotBase::issue_request(
     const BotBaseRequest& request,
-    const std::atomic<bool>* cancelled
+    const Cancellable* cancelled
 ){
     if (!request.is_command()){
         issue_request(cancelled, request, true);
@@ -622,7 +622,7 @@ void PABotBase::issue_request(
 
 BotBaseMessage PABotBase::issue_request_and_wait(
     const BotBaseRequest& request,
-    const std::atomic<bool>* cancelled
+    const Cancellable* cancelled
 ){
     if (request.is_command()){
         throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "This function only supports requests.");

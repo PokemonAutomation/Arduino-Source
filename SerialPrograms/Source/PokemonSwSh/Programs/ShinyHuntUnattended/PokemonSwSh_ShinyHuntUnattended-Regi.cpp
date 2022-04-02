@@ -63,7 +63,7 @@ ShinyHuntUnattendedRegi::ShinyHuntUnattendedRegi(const ShinyHuntUnattendedRegi_D
 
 
 
-void ShinyHuntUnattendedRegi::program(SingleSwitchProgramEnvironment& env){
+void ShinyHuntUnattendedRegi::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);

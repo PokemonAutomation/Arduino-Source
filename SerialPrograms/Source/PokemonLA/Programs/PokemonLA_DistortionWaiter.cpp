@@ -80,7 +80,7 @@ std::unique_ptr<StatsTracker> DistortionWaiter::make_stats() const{
 }
 
 
-void DistortionWaiter::program(SingleSwitchProgramEnvironment& env){
+void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     Stats& stats = env.stats<Stats>();
 
 

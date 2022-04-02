@@ -162,7 +162,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env){
 }
 
 
-void UnownFinder::program(SingleSwitchProgramEnvironment& env){
+void UnownFinder::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.

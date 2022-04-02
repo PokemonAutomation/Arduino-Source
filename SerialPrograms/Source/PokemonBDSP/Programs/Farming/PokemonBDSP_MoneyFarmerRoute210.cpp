@@ -317,7 +317,7 @@ bool MoneyFarmerRoute210::has_pp(uint8_t pp0[4], uint8_t pp1[4]){
 
 
 
-void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env){
+void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     Stats& stats = env.stats<Stats>();
 
     uint8_t pp0[4] = {

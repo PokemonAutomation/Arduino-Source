@@ -28,7 +28,7 @@ public:
     DistortionWaiter(const DistortionWaiter_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 
 private:

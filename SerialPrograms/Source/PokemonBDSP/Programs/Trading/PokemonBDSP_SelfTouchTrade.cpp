@@ -61,7 +61,7 @@ std::unique_ptr<StatsTracker> SelfTouchTrade::make_stats() const{
 
 
 
-void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env){
+void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     TradeStats& stats = env.stats<TradeStats>();
     env.update_stats();
 

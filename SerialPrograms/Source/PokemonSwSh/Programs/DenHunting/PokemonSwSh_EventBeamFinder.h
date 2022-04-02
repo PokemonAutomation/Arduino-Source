@@ -31,7 +31,7 @@ public:
     void goto_near_den(const BotBaseContext& context) const;
     void goto_far_den(const BotBaseContext& context) const;
     void drop_wishing_piece(const BotBaseContext& context) const;
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;

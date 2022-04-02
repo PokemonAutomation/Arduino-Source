@@ -150,7 +150,7 @@ void DexRecFinder::read_line(
     }
 }
 
-void DexRecFinder::program(SingleSwitchProgramEnvironment& env){
+void DexRecFinder::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
     }else{

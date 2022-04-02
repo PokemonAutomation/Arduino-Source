@@ -64,7 +64,7 @@ FriendCodeAdder::FriendCodeAdder(const FriendCodeAdder_Descriptor& descriptor)
     PA_ADD_OPTION(TOGGLE_BEST_STATUS_DELAY);
 }
 
-void FriendCodeAdder::program(SingleSwitchProgramEnvironment& env){
+void FriendCodeAdder::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     grip_menu_connect_go_home(env.console);
 
     bool first = true;

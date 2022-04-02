@@ -12,6 +12,7 @@
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "VisualInferenceCallback.h"
 
@@ -35,11 +36,7 @@ public:
     VisualInferenceCallback* run(std::chrono::milliseconds timeout = std::chrono::milliseconds(0));
     VisualInferenceCallback* run(std::chrono::system_clock::time_point stop);
 
-    //  Call this from a different thread to asynchronously stop the session.
-    void stop() noexcept;
-
-private:
-    virtual void cancel() noexcept override;
+    virtual bool cancel() noexcept override;
 
 private:
     struct Callback;
@@ -48,7 +45,6 @@ private:
     VideoFeed& m_feed;
     VideoOverlay& m_overlay;
     std::chrono::milliseconds m_period;
-    std::atomic<bool> m_stop;
 
     std::vector<Callback*> m_callback_list;
     std::map<VisualInferenceCallback*, Callback> m_callback_map;
@@ -64,12 +60,12 @@ private:
 class AsyncVisualInferenceSession : private VisualInferenceSession{
 public:
     AsyncVisualInferenceSession(
-        CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
+        ProgramEnvironment& env, CancellableScope& scope, Logger& logger,
         VideoFeed& feed, VideoOverlay& overlay,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)
     );
     AsyncVisualInferenceSession(
-        CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
+        ProgramEnvironment& env, CancellableScope& scope, Logger& logger,
         VideoFeed& feed, VideoOverlay& overlay,
         std::function<void()> on_finish_callback,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)

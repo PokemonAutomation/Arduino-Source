@@ -37,16 +37,15 @@ VisualInferenceSession::VisualInferenceSession(
     , m_feed(feed)
     , m_overlay(overlay)
     , m_period(period)
-    , m_stop(false)
 {}
 VisualInferenceSession::~VisualInferenceSession(){
-    stop();
+    VisualInferenceSession::cancel();
 }
-void VisualInferenceSession::stop() noexcept{
-    bool expected = false;
-    if (!m_stop.compare_exchange_strong(expected, true)){
-        return;
+bool VisualInferenceSession::cancel() noexcept{
+    if (Cancellable::cancel()){
+        return true;
     }
+    detach();
     {
         std::unique_lock<std::mutex> lg(m_lock);
         m_cv.notify_all();
@@ -54,16 +53,13 @@ void VisualInferenceSession::stop() noexcept{
 
     const double DIVIDER = std::chrono::milliseconds(1) / std::chrono::microseconds(1);
     const char* UNITS = " ms";
-
     try{
         m_stats_snapshot.log(m_logger, "Screenshot", UNITS, DIVIDER);
         for (Callback* callback : m_callback_list){
             callback->stats.log(m_logger, callback->callback->label(), UNITS, DIVIDER);
         }
     }catch (...){}
-}
-void VisualInferenceSession::cancel() noexcept{
-    stop();
+    return false;
 }
 
 void VisualInferenceSession::operator+=(VisualInferenceCallback& callback){
@@ -118,8 +114,8 @@ VisualInferenceCallback* VisualInferenceSession::run(std::chrono::system_clock::
     auto next_tick = now + m_period;
 
     while (true){
-        check_parent_cancelled();
-        if (m_stop.load(std::memory_order_acquire)){
+        throw_if_parent_cancelled();
+        if (cancelled()){
             return nullptr;
         }
 
@@ -150,9 +146,7 @@ VisualInferenceCallback* VisualInferenceSession::run(std::chrono::system_clock::
             WallClock stop_wait = std::min(next_tick, stop);
             m_cv.wait_until(
                 lg, stop_wait,
-                [=]{
-                    return m_stop.load(std::memory_order_acquire);
-                }
+                [=]{ return cancelled(); }
             );
             next_tick += m_period;
         }
@@ -162,16 +156,16 @@ VisualInferenceCallback* VisualInferenceSession::run(std::chrono::system_clock::
 
 
 AsyncVisualInferenceSession::AsyncVisualInferenceSession(
-    CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
+    ProgramEnvironment& env, CancellableScope& scope, Logger& logger,
     VideoFeed& feed, VideoOverlay& overlay,
     std::chrono::milliseconds period
 )
     : VisualInferenceSession(scope, logger, feed, overlay, period)
     , m_triggering_callback(nullptr)
-    , m_task(dispatcher.dispatch([this]{ thread_body(); }))
+    , m_task(env.inference_dispatcher().dispatch([this]{ thread_body(); }))
 {}
 AsyncVisualInferenceSession::AsyncVisualInferenceSession(
-    CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
+    ProgramEnvironment& env, CancellableScope& scope, Logger& logger,
     VideoFeed& feed, VideoOverlay& overlay,
     std::function<void()> on_finish_callback,
     std::chrono::milliseconds period
@@ -179,10 +173,10 @@ AsyncVisualInferenceSession::AsyncVisualInferenceSession(
     : VisualInferenceSession(scope, logger, feed, overlay, period)
     , m_on_finish_callback(std::move(on_finish_callback))
     , m_triggering_callback(nullptr)
-    , m_task(dispatcher.dispatch([this]{ thread_body(); }))
+    , m_task(env.inference_dispatcher().dispatch([this]{ thread_body(); }))
 {}
 AsyncVisualInferenceSession::~AsyncVisualInferenceSession(){
-    VisualInferenceSession::stop();
+    VisualInferenceSession::cancel();
 }
 void AsyncVisualInferenceSession::rethrow_exceptions(){
     if (m_task){
@@ -190,7 +184,7 @@ void AsyncVisualInferenceSession::rethrow_exceptions(){
     }
 }
 VisualInferenceCallback* AsyncVisualInferenceSession::stop_and_rethrow(){
-    VisualInferenceSession::stop();
+    VisualInferenceSession::cancel();
     if (m_task){
         m_task->wait_and_rethrow_exceptions();
     }

@@ -47,24 +47,18 @@ public:
 
 
 private:
-    void signal_to_stop() noexcept;
-    virtual void cancel() noexcept override;
+    virtual bool cancel() noexcept override;
     void thread_loop();
 
 
 private:
-    struct CommandSet{
-        CommandSet(BotBase& botbase, std::function<void(const BotBaseContext&)>&& lambda);
-        BotBaseContext context;
-        std::function<void(const BotBaseContext&)> commands;
-    };
+    struct CommandSet;
 
     Logger& m_logger;
     BotBase& m_botbase;
     std::unique_ptr<CommandSet> m_current;
 //    std::unique_ptr<CommandSet> m_pending;
 
-    std::atomic<bool> m_stopping_session;
     std::mutex m_lock;
     std::condition_variable m_cv;
 //    std::exception_ptr m_exception;

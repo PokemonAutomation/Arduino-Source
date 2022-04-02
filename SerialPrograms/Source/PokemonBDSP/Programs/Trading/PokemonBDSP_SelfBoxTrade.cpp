@@ -52,7 +52,7 @@ std::unique_ptr<StatsTracker> SelfBoxTrade::make_stats() const{
 
 
 
-void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env){
+void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     TradeStats& stats = env.stats<TradeStats>();
     env.update_stats();
 

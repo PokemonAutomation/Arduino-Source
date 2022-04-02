@@ -36,7 +36,7 @@ OverworldWatcher::OverworldWatcher(const OverworldWatcher_Descriptor& descriptor
 }
 
 
-void OverworldWatcher::program(SingleSwitchProgramEnvironment& env){
+void OverworldWatcher::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     BubbleDetector bubbles;
     ArcDetector arcs;
     QuestMarkDetector quest_marks;

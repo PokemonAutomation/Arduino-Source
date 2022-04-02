@@ -90,7 +90,7 @@ std::unique_ptr<StatsTracker> StarterReset::make_stats() const{
 
 
 
-void StarterReset::program(SingleSwitchProgramEnvironment& env){
+void StarterReset::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     Stats& stats = env.stats<Stats>();
 
     QImage briefcase(RESOURCE_PATH() + "PokemonBDSP/StarterBriefcase.png");

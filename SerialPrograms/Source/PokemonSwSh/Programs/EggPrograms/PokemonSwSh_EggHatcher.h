@@ -31,7 +31,7 @@ class EggHatcher : public SingleSwitchProgramInstance{
 public:
     EggHatcher(const EggHatcher_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 
 private:

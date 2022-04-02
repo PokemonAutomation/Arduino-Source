@@ -54,8 +54,7 @@ PokeJobsFarmer::PokeJobsFarmer(const PokeJobsFarmer_Descriptor &descriptor)
     PA_ADD_OPTION(MASH_B_DURATION);
 }
 
-static void enter_jobs(SingleSwitchProgramEnvironment &env, uint16_t index)
-{
+static void enter_jobs(SingleSwitchProgramEnvironment &env, uint16_t index){
     // Enter menu
     pbf_press_button(env.console, BUTTON_A, 10, 90);
     pbf_press_button(env.console, BUTTON_B, 10, 90);
@@ -67,8 +66,7 @@ static void enter_jobs(SingleSwitchProgramEnvironment &env, uint16_t index)
     pbf_press_button(env.console, BUTTON_A, 10, 5 * TICKS_PER_SECOND); // Wait for animation to complete
 }
 
-void PokeJobsFarmer::program(SingleSwitchProgramEnvironment &env)
-{
+void PokeJobsFarmer::program(SingleSwitchProgramEnvironment &env, CancellableScope& scope){
     uint8_t year = MAX_YEAR;
 
     // Play it safe in case some menu is open

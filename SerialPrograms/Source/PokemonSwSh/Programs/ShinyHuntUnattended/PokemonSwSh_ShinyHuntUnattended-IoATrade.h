@@ -29,7 +29,7 @@ class ShinyHuntUnattendedIoATrade : public SingleSwitchProgramInstance{
 public:
     ShinyHuntUnattendedIoATrade(const ShinyHuntUnattendedIoATrade_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;

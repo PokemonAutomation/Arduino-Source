@@ -101,13 +101,16 @@ void ProgramEnvironment::deregister_stop_program_signal(std::condition_variable&
 void ProgramEnvironment::signal_stop(){
     m_data->m_stopping.store(true, std::memory_order_release);
 
+    if (m_scope.cancel()){
+        return;
+    }
+
     std::lock_guard<std::mutex> lg(m_data->m_lock);
     m_data->m_cv.notify_all();
     for (auto& item : m_data->m_stop_signals){
         std::lock_guard<std::mutex> lg0(*item.second);
         item.first->notify_all();
     }
-    m_scope.cancel();
 }
 
 

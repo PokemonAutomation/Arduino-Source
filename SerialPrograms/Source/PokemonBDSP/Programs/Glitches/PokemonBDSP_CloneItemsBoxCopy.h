@@ -31,7 +31,7 @@ public:
     CloneItemsBoxCopy(const CloneItemsBoxCopy_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     struct Stats;

@@ -109,7 +109,7 @@ std::set<std::string> read_name(
 
 
 
-void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env){
+void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     PokemonSwSh::ShinyHuntTracker& stats = env.stats<PokemonSwSh::ShinyHuntTracker>();
 
 

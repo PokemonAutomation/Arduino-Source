@@ -102,7 +102,7 @@ std::unique_ptr<StatsTracker> AutoHostMultiGame::make_stats() const{
 
 
 
-void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env){
+void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     uint16_t start_raid_delay = HOST_ONLINE
         ? OPEN_ONLINE_DEN_LOBBY_DELAY
         : GameSettings::instance().OPEN_LOCAL_DEN_LOBBY_DELAY;

@@ -148,7 +148,7 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env){
 
 
 
-void DoublesLeveling::program(SingleSwitchProgramEnvironment& env){
+void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     Stats& stats = env.stats<Stats>();
     env.update_stats();
 

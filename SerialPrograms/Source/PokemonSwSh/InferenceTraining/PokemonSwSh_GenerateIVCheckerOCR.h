@@ -58,7 +58,7 @@ public:
 public:
     GenerateIVCheckerOCR(const GenerateIVCheckerOCR_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     OCR::LanguageOCR LANGUAGE;

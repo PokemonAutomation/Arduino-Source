@@ -33,7 +33,7 @@ BallThrower::BallThrower(const BallThrower_Descriptor& descriptor)
     PA_ADD_OPTION(START_IN_GRIP_MENU);
 }
 
-void BallThrower::program(SingleSwitchProgramEnvironment& env){
+void BallThrower::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().HOME_TO_GAME_DELAY);

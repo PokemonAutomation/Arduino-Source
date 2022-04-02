@@ -279,7 +279,7 @@ size_t MoneyFarmerRoute212::total_pp(uint8_t pp[4]){
 }
 
 
-void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env){
+void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     Stats& stats = env.stats<Stats>();
 
     uint8_t pp[4] = {

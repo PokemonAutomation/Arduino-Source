@@ -272,7 +272,7 @@ bool OutbreakFinder::run_iteration(SingleSwitchProgramEnvironment& env, const st
 
 
 
-void OutbreakFinder::program(SingleSwitchProgramEnvironment& env){
+void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     Stats& stats = env.stats<Stats>();
 
     std::set<std::string> desired;

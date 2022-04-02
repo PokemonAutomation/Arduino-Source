@@ -81,7 +81,7 @@ RaidItemFarmerOHKO::RaidItemFarmerOHKO(const RaidItemFarmerOHKO_Descriptor& desc
     PA_ADD_OPTION(TOUCH_DATE_INTERVAL);
 }
 
-void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env){
+void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     BotBase& host = env.consoles[0];
     size_t switches = env.consoles.size();
 

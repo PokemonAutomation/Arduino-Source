@@ -26,7 +26,7 @@ class FriendSearchDisconnect : public SingleSwitchProgramInstance{
 public:
     FriendSearchDisconnect(const FriendSearchDisconnect_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     SimpleIntegerOption<uint8_t> USER_SLOT;

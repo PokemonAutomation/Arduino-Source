@@ -28,7 +28,7 @@ class RaidItemFarmerOHKO : public MultiSwitchProgramInstance{
 public:
     RaidItemFarmerOHKO(const RaidItemFarmerOHKO_Descriptor& descriptor);
 
-    virtual void program(MultiSwitchProgramEnvironment& env) override;
+    virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     BooleanCheckBoxOption BACKUP_SAVE;

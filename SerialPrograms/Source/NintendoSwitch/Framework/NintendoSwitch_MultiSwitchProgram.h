@@ -85,7 +85,7 @@ public:
     size_t system_count() const{ return m_switches.count(); }
 
     virtual QWidget* make_widget(QWidget& parent, PanelListener& listener) override;
-    virtual void program(MultiSwitchProgramEnvironment& env) = 0;
+    virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) = 0;
 
 private:
     friend class MultiSwitchProgramWidget;

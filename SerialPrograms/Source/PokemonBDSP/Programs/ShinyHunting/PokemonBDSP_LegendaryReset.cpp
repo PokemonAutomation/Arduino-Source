@@ -63,7 +63,7 @@ std::unique_ptr<StatsTracker> LegendaryReset::make_stats() const{
 }
 
 
-void LegendaryReset::program(SingleSwitchProgramEnvironment& env){
+void LegendaryReset::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     PokemonSwSh::ShinyHuntTracker& stats = env.stats<PokemonSwSh::ShinyHuntTracker>();
 
     StandardEncounterHandler handler(

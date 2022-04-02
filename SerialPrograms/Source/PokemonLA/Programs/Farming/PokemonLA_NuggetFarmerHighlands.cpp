@@ -193,7 +193,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
 
 
 
-void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env){
+void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.

@@ -37,15 +37,13 @@ AudioInferenceSession::AudioInferenceSession(
     , m_logger(logger)
     , m_feed(feed)
     , m_period(period)
-    , m_stop(false)
 {}
 AudioInferenceSession::~AudioInferenceSession(){
-    stop();
+    AudioInferenceSession::cancel();
 }
-void AudioInferenceSession::stop() noexcept{
-    bool expected = false;
-    if (!m_stop.compare_exchange_strong(expected, true)){
-        return;
+bool AudioInferenceSession::cancel() noexcept{
+    if (Cancellable::cancel()){
+        return true;
     }
     detach();
     {
@@ -55,15 +53,12 @@ void AudioInferenceSession::stop() noexcept{
 
     const double DIVIDER = std::chrono::milliseconds(1) / std::chrono::microseconds(1);
     const char* UNITS = " ms";
-
     try{
         for (Callback* callback : m_callback_list){
             callback->stats.log(m_logger, callback->callback->label(), UNITS, DIVIDER);
         }
     }catch (...){}
-}
-void AudioInferenceSession::cancel() noexcept{
-    stop();
+    return false;
 }
 
 void AudioInferenceSession::operator+=(AudioInferenceCallback& callback){
@@ -118,8 +113,8 @@ AudioInferenceCallback* AudioInferenceSession::run(std::chrono::system_clock::ti
     std::vector<AudioSpectrum> spectrums;
 
     while (true){
-        check_parent_cancelled();
-        if (m_stop.load(std::memory_order_acquire)){
+        throw_if_parent_cancelled();
+        if (cancelled()){
             return nullptr;
         }
 
@@ -158,9 +153,7 @@ AudioInferenceCallback* AudioInferenceSession::run(std::chrono::system_clock::ti
             WallClock stop_wait = std::min(next_tick, stop);
             m_cv.wait_until(
                 lg, stop_wait,
-                [=]{
-                    return m_stop.load(std::memory_order_acquire);
-                }
+                [=]{ return cancelled(); }
             );
             next_tick += m_period;
         }
@@ -170,16 +163,16 @@ AudioInferenceCallback* AudioInferenceSession::run(std::chrono::system_clock::ti
 
 
 AsyncAudioInferenceSession::AsyncAudioInferenceSession(
-    CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
+    ProgramEnvironment& env, CancellableScope& scope, Logger& logger,
     AudioFeed& feed,
     std::chrono::milliseconds period
 )
     : AudioInferenceSession(scope, logger, feed, period)
     , m_triggering_callback(nullptr)
-    , m_task(dispatcher.dispatch([this]{ thread_body(); }))
+    , m_task(env.inference_dispatcher().dispatch([this]{ thread_body(); }))
 {}
 AsyncAudioInferenceSession::AsyncAudioInferenceSession(
-    CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
+    ProgramEnvironment& env, CancellableScope& scope, Logger& logger,
     AudioFeed& feed,
     std::function<void()> on_finish_callback,
     std::chrono::milliseconds period
@@ -187,10 +180,10 @@ AsyncAudioInferenceSession::AsyncAudioInferenceSession(
     : AudioInferenceSession(scope, logger, feed, period)
     , m_on_finish_callback(std::move(on_finish_callback))
     , m_triggering_callback(nullptr)
-    , m_task(dispatcher.dispatch([this]{ thread_body(); }))
+    , m_task(env.inference_dispatcher().dispatch([this]{ thread_body(); }))
 {}
 AsyncAudioInferenceSession::~AsyncAudioInferenceSession(){
-    AudioInferenceSession::stop();
+    AudioInferenceSession::cancel();
 }
 void AsyncAudioInferenceSession::rethrow_exceptions(){
     if (m_task){
@@ -198,7 +191,7 @@ void AsyncAudioInferenceSession::rethrow_exceptions(){
     }
 }
 AudioInferenceCallback* AsyncAudioInferenceSession::stop_and_rethrow(){
-    AudioInferenceSession::stop();
+    AudioInferenceSession::cancel();
     if (m_task){
         m_task->wait_and_rethrow_exceptions();
     }

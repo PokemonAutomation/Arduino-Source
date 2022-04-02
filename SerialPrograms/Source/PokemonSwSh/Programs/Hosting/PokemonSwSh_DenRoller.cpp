@@ -107,7 +107,7 @@ void DenRoller::ring_bell(const BotBaseContext& context, int count) const{
     pbf_wait(context, 200);
 }
 
-void DenRoller::program(SingleSwitchProgramEnvironment& env){
+void DenRoller::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     Stats& stats = env.stats<Stats>();
 
     std::string desired_slug = FILTER.slug();

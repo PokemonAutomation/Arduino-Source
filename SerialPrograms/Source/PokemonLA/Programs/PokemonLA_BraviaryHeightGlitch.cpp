@@ -29,7 +29,7 @@ BraviaryHeightGlitch::BraviaryHeightGlitch(const BraviaryHeightGlitch_Descriptor
 {}
 
 
-void BraviaryHeightGlitch::program(SingleSwitchProgramEnvironment& env){
+void BraviaryHeightGlitch::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     while (true){
         pbf_press_button(env.console, BUTTON_Y, 30, 0);
         pbf_press_button(env.console, BUTTON_PLUS, 30, 10);

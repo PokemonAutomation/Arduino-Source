@@ -31,7 +31,7 @@ class ShinyHuntUnattendedSwordsOfJustice : public SingleSwitchProgramInstance{
 public:
     ShinyHuntUnattendedSwordsOfJustice(const ShinyHuntUnattendedSwordsOfJustice_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;

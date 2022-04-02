@@ -67,7 +67,7 @@ void EventBeamFinder::drop_wishing_piece(const BotBaseContext& context) const{
     ssf_press_button2(context, BUTTON_A, WAIT_TIME_IN_DEN + 100, 10);
     pbf_mash_button(context, BUTTON_B, 600);
 }
-void EventBeamFinder::program(SingleSwitchProgramEnvironment& env){
+void EventBeamFinder::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);

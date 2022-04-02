@@ -45,7 +45,7 @@ StowOnSideFarmer::StowOnSideFarmer(const StowOnSideFarmer_Descriptor& descriptor
     PA_ADD_OPTION(SAVE_ITERATIONS);
 }
 
-void StowOnSideFarmer::program(SingleSwitchProgramEnvironment& env){
+void StowOnSideFarmer::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
     }else{

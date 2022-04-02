@@ -25,7 +25,7 @@ class ClothingBuyer : public SingleSwitchProgramInstance{
 public:
     ClothingBuyer(const ClothingBuyer_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
 

@@ -23,7 +23,7 @@ class PreventSleep : public SingleSwitchProgramInstance{
 public:
     PreventSleep(const PreventSleep_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 
 };

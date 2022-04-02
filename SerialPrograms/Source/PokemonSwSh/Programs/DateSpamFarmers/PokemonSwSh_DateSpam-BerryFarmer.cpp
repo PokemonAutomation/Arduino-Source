@@ -45,7 +45,7 @@ BerryFarmer::BerryFarmer(const BerryFarmer_Descriptor& descriptor)
     PA_ADD_OPTION(SAVE_ITERATIONS);
 }
 
-void BerryFarmer::program(SingleSwitchProgramEnvironment& env){
+void BerryFarmer::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
     }else{

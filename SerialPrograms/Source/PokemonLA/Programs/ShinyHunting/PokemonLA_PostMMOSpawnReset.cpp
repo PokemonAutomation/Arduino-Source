@@ -136,7 +136,7 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env){
 }
 
 
-void PostMMOSpawnReset::program(SingleSwitchProgramEnvironment& env){
+void PostMMOSpawnReset::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.

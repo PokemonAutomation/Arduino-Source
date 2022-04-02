@@ -67,7 +67,7 @@ std::unique_ptr<StatsTracker> DaySkipperEU::make_stats() const{
     return std::unique_ptr<StatsTracker>(new SkipperStats());
 }
 
-void DaySkipperEU::program(SingleSwitchProgramEnvironment& env){
+void DaySkipperEU::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     SkipperStats& stats = env.stats<SkipperStats>();
     stats.runs++;
 

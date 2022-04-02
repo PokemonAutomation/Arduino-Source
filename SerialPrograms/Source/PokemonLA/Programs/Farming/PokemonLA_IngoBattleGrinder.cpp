@@ -411,7 +411,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
 
 
 
-void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env){
+void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.

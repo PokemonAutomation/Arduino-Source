@@ -23,6 +23,7 @@
 #define PokemonAutomation_CancellableScope_H
 
 #include <chrono>
+#include <atomic>
 #include "Pimpl.h"
 
 namespace PokemonAutomation{
@@ -32,14 +33,28 @@ class CancellableScope;
 
 class Cancellable{
 public:
-    Cancellable() = default;
+    Cancellable()
+        : m_cancelled(false)
+    {}
     Cancellable(CancellableScope& scope);
     virtual ~Cancellable(){
         detach();
     }
-    virtual void cancel() noexcept = 0;
 
-    void check_parent_cancelled();
+    //  Returns true if it was already cancelled.
+    virtual bool cancel() noexcept{
+        if (cancelled()){
+            return true;
+        }
+        return m_cancelled.exchange(true);
+    }
+
+    CancellableScope* scope(){ return m_scope; }
+
+    bool cancelled() const{
+        return m_cancelled.load(std::memory_order_acquire);
+    }
+    void throw_if_parent_cancelled();
 
 protected:
     //  If you inherit from this class, you may need to manually call this in the
@@ -50,21 +65,20 @@ protected:
 
 private:
     CancellableScope* m_scope = nullptr;
+    std::atomic<bool> m_cancelled;
 };
 
 
-class CancellableScopeImpl;
+struct CancellableScopeData;
 class CancellableScope final : public Cancellable{
 public:
     CancellableScope();
     CancellableScope(CancellableScope& parent);
     virtual ~CancellableScope() override;
 
-    bool cancelled() const;
-    void check_cancelled();     //  Throws "OperationCanceledException" if this scope has been cancelled.
+    void throw_if_cancelled();  //  Throws "OperationCanceledException" if this scope has been cancelled.
 
-
-    virtual void cancel() noexcept override;
+    virtual bool cancel() noexcept override;
 
     void wait_for(std::chrono::milliseconds duration);
     void wait_until(std::chrono::system_clock::time_point stop);
@@ -75,19 +89,20 @@ private:
     void operator-=(Cancellable& cancellable);
 
 private:
-    Pimpl<CancellableScopeImpl> m_impl;
+    Pimpl<CancellableScopeData> m_impl;
 };
 
 
 
 inline Cancellable::Cancellable(CancellableScope& scope)
     : m_scope(&scope)
+    , m_cancelled(false)
 {
     scope += *this;
 }
-inline void Cancellable::check_parent_cancelled(){
+inline void Cancellable::throw_if_parent_cancelled(){
     if (m_scope){
-        m_scope->check_cancelled();
+        m_scope->throw_if_cancelled();
     }
 }
 inline void Cancellable::detach() noexcept{

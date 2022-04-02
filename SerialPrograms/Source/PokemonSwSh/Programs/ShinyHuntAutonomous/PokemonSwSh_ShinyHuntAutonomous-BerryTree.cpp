@@ -78,7 +78,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousBerryTree::make_stats() const{
 
 
 
-void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env){
+void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);

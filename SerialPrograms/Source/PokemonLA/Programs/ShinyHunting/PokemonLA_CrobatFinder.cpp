@@ -156,7 +156,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env){
 }
 
 
-void CrobatFinder::program(SingleSwitchProgramEnvironment& env){
+void CrobatFinder::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.

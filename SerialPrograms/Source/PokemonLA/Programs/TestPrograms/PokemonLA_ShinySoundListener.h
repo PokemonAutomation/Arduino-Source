@@ -26,7 +26,7 @@ class ShinySoundListener : public SingleSwitchProgramInstance{
 public:
     ShinySoundListener(const ShinySoundListener_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     BooleanCheckBoxOption STOP_ON_SHINY_SOUND;

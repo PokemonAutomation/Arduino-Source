@@ -165,7 +165,7 @@ private:
 
 
 
-void MaxLairBossFinder::program(MultiSwitchProgramEnvironment& env){
+void MaxLairBossFinder::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     if (CONSOLES.HOST >= env.consoles.size()){
         throw UserSetupError(env.logger(), "Invalid Host Switch");
     }

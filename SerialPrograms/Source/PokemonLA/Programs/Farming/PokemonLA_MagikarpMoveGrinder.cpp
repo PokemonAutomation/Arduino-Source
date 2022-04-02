@@ -228,7 +228,7 @@ bool MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env){
 
 
 
-void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env){
+void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     Stats& stats = env.stats<Stats>();
 
     if (POKEMON_ACTIONS.num_pokemon() == 0){

@@ -131,7 +131,7 @@ bool date_increment_day(const BotBaseContext& context, DateSmall* date, bool pre
     return false;
 }
 
-void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env){
+void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     SkipperStats& stats = env.stats<SkipperStats>();
     stats.runs++;
 

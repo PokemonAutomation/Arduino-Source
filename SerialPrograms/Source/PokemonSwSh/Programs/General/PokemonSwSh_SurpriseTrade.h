@@ -29,7 +29,7 @@ class SurpriseTrade : public SingleSwitchProgramInstance{
 public:
     SurpriseTrade(const SurpriseTrade_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     void trade_slot(const BotBaseContext& context, uint8_t slot, bool next_box) const;

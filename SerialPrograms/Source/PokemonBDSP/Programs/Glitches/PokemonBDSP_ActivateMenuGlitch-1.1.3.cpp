@@ -42,7 +42,7 @@ ActivateMenuGlitch113::ActivateMenuGlitch113(const ActivateMenuGlitch113_Descrip
 
 
 
-void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env){
+void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     ConsoleHandle& console = env.console;
 
     //  Enable Strength

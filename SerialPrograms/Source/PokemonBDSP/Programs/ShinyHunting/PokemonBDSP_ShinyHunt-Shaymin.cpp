@@ -132,7 +132,7 @@ bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env) cons
     return true;
 }
 
-void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env){
+void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     PokemonSwSh::ShinyHuntTracker& stats = env.stats<PokemonSwSh::ShinyHuntTracker>();
     env.update_stats();
 

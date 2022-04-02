@@ -11,6 +11,7 @@
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "Common/Cpp/CancellableScope.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/AudioFeed.h"
 #include "AudioInferenceCallback.h"
 
@@ -34,11 +35,7 @@ public:
     AudioInferenceCallback* run(std::chrono::milliseconds timeout = std::chrono::milliseconds(0));
     AudioInferenceCallback* run(std::chrono::system_clock::time_point stop);
 
-    //  Call this from a different thread to asynchronously stop the session.
-    void stop() noexcept;
-
-private:
-    virtual void cancel() noexcept override;
+    virtual bool cancel() noexcept override;
 
 private:
     struct Callback;
@@ -46,7 +43,6 @@ private:
     Logger& m_logger;
     AudioFeed& m_feed;
     std::chrono::milliseconds m_period;
-    std::atomic<bool> m_stop;
 
     std::vector<Callback*> m_callback_list;
     std::map<AudioInferenceCallback*, Callback> m_callback_map;
@@ -59,12 +55,12 @@ private:
 class AsyncAudioInferenceSession : private AudioInferenceSession{
 public:
     AsyncAudioInferenceSession(
-        CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
+        ProgramEnvironment& env, CancellableScope& scope, Logger& logger,
         AudioFeed& feed,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)
     );
     AsyncAudioInferenceSession(
-        CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
+        ProgramEnvironment& env, CancellableScope& scope, Logger& logger,
         AudioFeed& feed,
         std::function<void()> on_finish_callback,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)

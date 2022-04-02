@@ -87,7 +87,7 @@ std::unique_ptr<StatsTracker> ShinyHuntOverworld::make_stats() const{
 
 
 
-void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env){
+void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     Stats& stats = env.stats<Stats>();
     env.update_stats();
 

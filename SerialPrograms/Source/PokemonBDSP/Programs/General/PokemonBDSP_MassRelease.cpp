@@ -61,7 +61,7 @@ std::unique_ptr<StatsTracker> MassRelease::make_stats() const{
 
 
 
-void MassRelease::program(SingleSwitchProgramEnvironment& env){
+void MassRelease::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     Stats& stats = env.stats<Stats>();
     env.update_stats();
 

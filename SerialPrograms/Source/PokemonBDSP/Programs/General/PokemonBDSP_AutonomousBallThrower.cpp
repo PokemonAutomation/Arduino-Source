@@ -103,7 +103,7 @@ std::unique_ptr<StatsTracker> AutonomousBallThrower::make_stats() const{
 
 
 
-void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env){
+void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     Stats& stats = env.stats<Stats>();
     env.update_stats();
 

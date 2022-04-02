@@ -31,7 +31,7 @@ class ShinyHuntUnattendedRegi : public SingleSwitchProgramInstance{
 public:
     ShinyHuntUnattendedRegi(const ShinyHuntUnattendedRegi_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;

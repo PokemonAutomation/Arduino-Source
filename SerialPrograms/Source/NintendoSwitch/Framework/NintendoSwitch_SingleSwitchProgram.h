@@ -41,7 +41,7 @@ class SingleSwitchProgramInstance : public RunnableSwitchProgramInstance{
 public:
     SingleSwitchProgramInstance(const RunnableSwitchProgramDescriptor& descriptor);
     virtual QWidget* make_widget(QWidget& parent, PanelListener& listener) override;
-    virtual void program(SingleSwitchProgramEnvironment& env) = 0;
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) = 0;
 
 private:
     friend class SingleSwitchProgramWidget;

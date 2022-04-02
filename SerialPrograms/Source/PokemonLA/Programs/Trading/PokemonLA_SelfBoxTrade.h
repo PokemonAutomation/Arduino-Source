@@ -29,7 +29,7 @@ public:
     SelfBoxTrade(const SelfBoxTrade_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(MultiSwitchProgramEnvironment& env) override;
+    virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     bool move_to_next(MultiSwitchProgramEnvironment& env, uint8_t& row, uint8_t& col);

@@ -160,7 +160,7 @@ bool EggAutonomous::run_batch(
     return current_state.process_batch();
 }
 
-void EggAutonomous::program(SingleSwitchProgramEnvironment& env){
+void EggAutonomous::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     EggAutonomousStats& stats = env.stats<EggAutonomousStats>();
     env.update_stats();
 

@@ -145,7 +145,7 @@ bool SelfTouchTrade::move_to_next(ConsoleHandle& host, uint8_t& row, uint8_t& co
 }
 
 
-void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env){
+void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     TradeStats& stats = env.stats<TradeStats>();
 
     //  Build list of what's needed.

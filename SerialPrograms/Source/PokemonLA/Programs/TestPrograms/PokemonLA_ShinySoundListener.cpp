@@ -48,7 +48,7 @@ ShinySoundListener::ShinySoundListener(const ShinySoundListener_Descriptor& desc
 
 void searchShinySoundFromAudioDump();
 
-void ShinySoundListener::program(SingleSwitchProgramEnvironment& env){
+void ShinySoundListener::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     //  Connect the controller.
     // pbf_move_right_joystick(env.console, 0, 255, 10, 0);
 

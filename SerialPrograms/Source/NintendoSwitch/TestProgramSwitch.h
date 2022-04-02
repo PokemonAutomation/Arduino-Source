@@ -43,7 +43,7 @@ public:
 //    std::unique_ptr<StatsTracker> make_stats() const override{
 //        return std::unique_ptr<StatsTracker>(new StatsTracker());
 //    }
-    virtual void program(MultiSwitchProgramEnvironment& env) override;
+    virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     struct Stats : public StatsTracker{

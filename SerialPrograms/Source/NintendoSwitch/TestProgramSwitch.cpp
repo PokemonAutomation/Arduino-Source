@@ -244,7 +244,7 @@ using namespace PokemonLA;
 
 
 
-void TestProgram::program(MultiSwitchProgramEnvironment& env){
+void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
     using namespace OCR;

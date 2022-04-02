@@ -30,7 +30,7 @@ public:
     SelfTouchTrade(const SelfTouchTrade_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(MultiSwitchProgramEnvironment& env) override;
+    virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     bool trade_one(MultiSwitchProgramEnvironment& env, std::map<std::string, int>& trades_left);

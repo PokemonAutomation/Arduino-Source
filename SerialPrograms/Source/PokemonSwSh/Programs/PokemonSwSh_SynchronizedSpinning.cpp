@@ -29,7 +29,7 @@ SynchronizedSpinning::SynchronizedSpinning(const SynchronizedSpinning_Descriptor
     : MultiSwitchProgramInstance(description)
 {}
 
-void SynchronizedSpinning::program(MultiSwitchProgramEnvironment& env){
+void SynchronizedSpinning::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     env.run_in_parallel(
         [&](ConsoleHandle& console){
             pbf_move_left_joystick(console, 128, 255, 5, 20);

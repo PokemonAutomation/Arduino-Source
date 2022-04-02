@@ -354,7 +354,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
 
 
 
-void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env){
+void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     srand(time(nullptr));
 
     if (START_IN_GRIP_MENU){

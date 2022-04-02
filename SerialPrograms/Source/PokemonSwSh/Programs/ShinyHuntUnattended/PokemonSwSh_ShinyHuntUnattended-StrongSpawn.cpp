@@ -50,7 +50,7 @@ ShinyHuntUnattendedStrongSpawn::ShinyHuntUnattendedStrongSpawn(const ShinyHuntUn
 
 
 
-void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env){
+void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
     }else{

@@ -51,11 +51,19 @@ int wait_until(
 //  Exceptions throw in either the commands or the triggers will stop
 //  everything and be passed out of this function.
 int run_until(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, CancellableScope& scope, ConsoleHandle& console,
     std::function<void(const BotBaseContext& context)>&& command,
     std::vector<InferenceCallback*>&& callbacks,
     std::chrono::milliseconds period = std::chrono::milliseconds(50)
 );
+inline int run_until(
+    ProgramEnvironment& env, ConsoleHandle& console,
+    std::function<void(const BotBaseContext& context)>&& command,
+    std::vector<InferenceCallback*>&& callbacks,
+    std::chrono::milliseconds period = std::chrono::milliseconds(50)
+){
+    return run_until(env, env.scope(), console, std::move(command), std::move(callbacks), period);
+}
 
 
 

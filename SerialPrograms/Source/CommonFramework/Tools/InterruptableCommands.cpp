@@ -15,8 +15,24 @@ namespace PokemonAutomation{
 
 
 
-AsyncCommandSession::CommandSet::CommandSet(BotBase& botbase, std::function<void(const BotBaseContext&)>&& lambda)
-    : context(botbase)
+struct AsyncCommandSession::CommandSet{
+    CommandSet(
+        CancellableScope& parent, BotBase& botbase,
+        std::function<void(const BotBaseContext&)>&& lambda
+    );
+    CancellableScope scope;
+    BotBaseContext context;
+    std::function<void(const BotBaseContext&)> commands;
+};
+
+
+
+AsyncCommandSession::CommandSet::CommandSet(
+    CancellableScope& parent, BotBase& botbase,
+    std::function<void(const BotBaseContext&)>&& lambda
+)
+    : scope(parent)
+    , context(scope, botbase)
     , commands(std::move(lambda))
 {}
 
@@ -29,16 +45,15 @@ AsyncCommandSession::AsyncCommandSession(
     : Cancellable(scope)
     , m_logger(logger)
     , m_botbase(botbase)
-    , m_stopping_session(false)
     , m_task(dispatcher.dispatch([this]{ thread_loop(); }))
 {}
 AsyncCommandSession::~AsyncCommandSession(){
 //    cout << "~AsyncCommandSession()" << endl;
-    if (!m_stopping_session.load(std::memory_order_acquire) && std::uncaught_exceptions() == 0){
+    if (!cancelled() && std::uncaught_exceptions() == 0){
         m_logger.log("AsyncCommandSession::stop_session() not called before normal destruction.", COLOR_RED);
     }
     detach();
-    signal_to_stop();
+    cancel();
     //  Thread is automatically joined by m_task destructor.
 }
 
@@ -49,22 +64,21 @@ bool AsyncCommandSession::command_is_running(){
 
 void AsyncCommandSession::dispatch(std::function<void(const BotBaseContext&)>&& lambda){
     std::unique_lock<std::mutex> lg(m_lock);
-    if (m_stopping_session.load(std::memory_order_acquire)){
+    if (cancelled()){
         return;
     }
 
     if (m_current){
         m_current->context.cancel_lazy();
         m_cv.wait(lg, [=]{
-            return
-                m_stopping_session.load(std::memory_order_acquire) ||
-                m_current == nullptr;
+            return cancelled() || m_current == nullptr;
         });
     }
 
 //    cout << "dispatching" << endl;
 
     m_current.reset(new CommandSet(
+        *this->scope(),
         m_botbase, std::move(lambda)
     ));
 
@@ -72,8 +86,16 @@ void AsyncCommandSession::dispatch(std::function<void(const BotBaseContext&)>&& 
 }
 
 
-void AsyncCommandSession::cancel() noexcept{
-    signal_to_stop();
+bool AsyncCommandSession::cancel() noexcept{
+    if (Cancellable::cancel()){
+        return true;
+    }
+    std::lock_guard<std::mutex> lg(m_lock);
+    if (m_current != nullptr){
+        m_current->context.cancel_now();
+    }
+    m_cv.notify_all();
+    return false;
 }
 void AsyncCommandSession::thread_loop(){
     CommandSet* current = nullptr;
@@ -85,11 +107,9 @@ void AsyncCommandSession::thread_loop(){
                 m_cv.notify_all();
             }
             m_cv.wait(lg, [=]{
-                return
-                    m_stopping_session.load(std::memory_order_acquire) ||
-                    m_current != nullptr;
+                return cancelled() || m_current != nullptr;
             });
-            if (m_stopping_session.load(std::memory_order_acquire)){
+            if (cancelled()){
 //                cout << "thread_loop() - end" << endl;
                 m_current.reset();
                 return;
@@ -129,20 +149,10 @@ void AsyncCommandSession::wait(){
 //    cout << "wait() - done" << endl;
 }
 #endif
-void AsyncCommandSession::signal_to_stop() noexcept{
-    bool expected = false;
-    if (m_stopping_session.compare_exchange_strong(expected, true)){
-        std::lock_guard<std::mutex> lg(m_lock);
-        if (m_current != nullptr){
-            m_current->context.cancel_now();
-        }
-        m_cv.notify_all();
-    }
-}
 void AsyncCommandSession::stop_session_and_rethrow(){
-    signal_to_stop();
+    cancel();
     m_task->wait_and_rethrow_exceptions();
-    check_parent_cancelled();
+    throw_if_parent_cancelled();
 }
 
 

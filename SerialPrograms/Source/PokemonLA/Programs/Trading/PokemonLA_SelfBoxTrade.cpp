@@ -94,7 +94,7 @@ bool SelfBoxTrade::move_to_next(MultiSwitchProgramEnvironment& env, uint8_t& row
 }
 
 
-void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env){
+void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     TradeStats& stats = env.stats<TradeStats>();
 
 

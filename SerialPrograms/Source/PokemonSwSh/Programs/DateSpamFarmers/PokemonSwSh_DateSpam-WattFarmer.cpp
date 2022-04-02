@@ -49,7 +49,7 @@ WattFarmer::WattFarmer(const WattFarmer_Descriptor& descriptor)
     PA_ADD_OPTION(SAVE_ITERATIONS);
 }
 
-void WattFarmer::program(SingleSwitchProgramEnvironment& env){
+void WattFarmer::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         pbf_wait(env.console, GRIP_MENU_WAIT);

@@ -26,7 +26,7 @@ class MountDetectionTest : public SingleSwitchProgramInstance{
 public:
     MountDetectionTest(const MountDetectionTest_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     EnumDropdownOption FAILED_ACTION;

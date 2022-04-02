@@ -100,7 +100,7 @@ void trigger_map_overlap(ProgramEnvironment& env, ConsoleHandle& console){
 
 
 
-void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env){
+void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     ConsoleHandle& console = env.console;
 
     trigger_map_overlap(env, console);

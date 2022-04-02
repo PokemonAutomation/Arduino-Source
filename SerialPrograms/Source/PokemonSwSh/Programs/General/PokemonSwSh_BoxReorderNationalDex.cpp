@@ -132,7 +132,7 @@ BoxReorderNationalDex::BoxReorderNationalDex(const BoxReorderNationalDex_Descrip
     PA_ADD_OPTION(DODGE_SYSTEM_UPDATE_WINDOW);
 }
 
-void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env){
+void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_no_interact(env.console, DODGE_SYSTEM_UPDATE_WINDOW);

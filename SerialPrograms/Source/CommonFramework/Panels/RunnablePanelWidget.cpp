@@ -318,11 +318,13 @@ void RunnablePanelWidget::update_historical_stats(){
         m_logger.log("Stats successfully saved!", COLOR_BLUE);
     }else{
         m_logger.log("Unable to save stats.", COLOR_RED);
+#if 0
         QMetaObject::invokeMethod(
             this,
             "show_stats_warning",
             Qt::AutoConnection
         );
+#endif
 //        show_stats_warning();
     }
 //    settings.stat_sets.open_from_file(settings.stats_file);

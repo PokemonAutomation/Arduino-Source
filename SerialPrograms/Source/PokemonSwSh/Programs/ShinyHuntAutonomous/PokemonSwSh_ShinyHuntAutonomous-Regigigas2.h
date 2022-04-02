@@ -35,7 +35,7 @@ public:
     ShinyHuntAutonomousRegigigas2(const ShinyHuntAutonomousRegigigas2_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     bool kill_and_return(SingleSwitchProgramEnvironment& env) const;

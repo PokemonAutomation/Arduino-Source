@@ -75,7 +75,7 @@ void MultiSwitchProgramWidget::run_switch_program(const ProgramInfo& info){
 
     try{
         start_program_video_check(env.consoles, instance.descriptor().feedback());
-        instance.program(env);
+        instance.program(env, env.scope());
     }catch (...){
         env.update_stats();
         throw;
