@@ -75,7 +75,7 @@ std::unique_ptr<StatsTracker> AmitySquarePickUpFarmer::make_stats() const{
 }
 
 
-void AmitySquarePickUpFarmer::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void AmitySquarePickUpFarmer::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
     env.update_stats();
 

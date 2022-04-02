@@ -33,7 +33,7 @@ class EggCombined2 : public SingleSwitchProgramInstance{
 public:
     EggCombined2(const EggCombined2_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) override;
 
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;

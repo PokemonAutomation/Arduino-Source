@@ -27,7 +27,7 @@ class MultiGameFossil : public SingleSwitchProgramInstance{
 public:
     MultiGameFossil(const MultiGameFossil_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) override;
 
 private:
     StartInGripOrClosedOption START_IN_GRIP_MENU;

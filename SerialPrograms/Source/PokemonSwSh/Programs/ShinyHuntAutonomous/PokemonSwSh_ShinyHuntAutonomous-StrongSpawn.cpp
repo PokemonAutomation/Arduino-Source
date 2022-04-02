@@ -77,7 +77,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousStrongSpawn::make_stats() const
 
 
 
-void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
     }else{
@@ -92,7 +92,7 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
     env.update_stats();
 
     StandardEncounterHandler handler(
-        env, env.console,
+        env, context, env.console,
         LANGUAGE,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -105,7 +105,7 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
             last_touch += PERIOD;
         }
         reset_game_from_home_with_inference(
-            env, env.console,
+            env, context, env.console,
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
         );
         env.log("Starting Encounter: " + tostr_u_commas(stats.encounters() + 1));
@@ -113,7 +113,7 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
 
         //  Detect shiny.
         ShinyDetectionResult result = detect_shiny_battle(
-            env, env.console,
+            env, context, env.console,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );

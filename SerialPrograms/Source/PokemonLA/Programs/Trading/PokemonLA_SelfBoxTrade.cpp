@@ -143,7 +143,8 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope&
             //  Perform trade.
             MultiConsoleErrorState error_state;
             env.run_in_parallel([&](ConsoleHandle& console){
-                trade_current_pokemon(env, console, error_state, stats);
+                BotBaseContext context(env.scope(), console);
+                trade_current_pokemon(env, context, console, error_state, stats);
             });
             stats.m_trades++;
         }else{

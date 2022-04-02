@@ -91,10 +91,10 @@ std::unique_ptr<StatsTracker> MoneyFarmerHighlands::make_stats() const{
 
 
 
-void mash_A_until_end_of_battle(ProgramEnvironment& env, ConsoleHandle& console){
+void mash_A_until_end_of_battle(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console){
     OverworldDetector detector(console, console);
     int ret = run_until(
-        env, console,
+        env, context, console,
         [](const BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, 120 * TICKS_PER_SECOND);
         },
@@ -109,11 +109,11 @@ void mash_A_until_end_of_battle(ProgramEnvironment& env, ConsoleHandle& console)
 
 
 
-bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
+bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     //  Go to Coronet Highlands Mountain camp.
-    goto_camp_from_jubilife(env, env.console, TravelLocations::instance().Highlands_Mountain);
+    goto_camp_from_jubilife(env, context, env.console, TravelLocations::instance().Highlands_Mountain);
 
     stats.attempts++;
 
@@ -128,7 +128,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
         DialogSurpriseDetector dialog_detector(env.console, env.console, true);
         ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
         int ret = run_until(
-            env, env.console,
+            env, context, env.console,
             [](const BotBaseContext& context){
                 pbf_move_left_joystick(context, 0, 212, 50, 0);
                 pbf_press_button(context, BUTTON_B, 495, 80);
@@ -164,7 +164,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
         if (ret == 0){
             env.console.log("Found Charm!", COLOR_BLUE);
             stats.charm++;
-            mash_A_until_end_of_battle(env, env.console);
+            mash_A_until_end_of_battle(env, context, env.console);
             env.console.log("Battle succeeded!", COLOR_BLUE);
             success = true;
         }
@@ -180,12 +180,12 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
 
 
     env.console.log("Returning to Jubilife...");
-    goto_camp_from_overworld(env, env.console, SHINY_DETECTED, stats);
-    goto_professor(env.console, Camp::HIGHLANDS_HIGHLANDS);
-    from_professor_return_to_jubilife(env, env.console);
+    goto_camp_from_overworld(env, context, env.console, SHINY_DETECTED, stats);
+    goto_professor(env.console, context, Camp::HIGHLANDS_HIGHLANDS);
+    from_professor_return_to_jubilife(env, context, env.console);
 
     if (success){
-        save_game_from_overworld(env, env.console);
+        save_game_from_overworld(env, context, env.console);
     }
 
     return false;
@@ -193,14 +193,14 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env){
 
 
 
-void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.
     pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
 
     // Put a save here so that when the program reloads from error it won't break.
-    save_game_from_overworld(env, env.console);
+    save_game_from_overworld(env, context, env.console);
 
     while (true){
         env.update_stats();
@@ -211,13 +211,13 @@ void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env, Cancella
             stats.to_str()
         );
         try{
-            if (run_iteration(env)){
+            if (run_iteration(env, context)){
                 break;
             }
         }catch (OperationFailedException&){
             stats.errors++;
             pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
     }
 

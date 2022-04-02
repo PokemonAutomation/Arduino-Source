@@ -28,7 +28,7 @@ struct VisualInferenceSession::Callback{
 
 
 VisualInferenceSession::VisualInferenceSession(
-    CancellableScope& scope, Logger& logger,
+    Logger& logger, CancellableScope& scope,
     VideoFeed& feed, VideoOverlay& overlay,
     std::chrono::milliseconds period
 )
@@ -39,13 +39,13 @@ VisualInferenceSession::VisualInferenceSession(
     , m_period(period)
 {}
 VisualInferenceSession::~VisualInferenceSession(){
+    detach();
     VisualInferenceSession::cancel();
 }
 bool VisualInferenceSession::cancel() noexcept{
     if (Cancellable::cancel()){
         return true;
     }
-    detach();
     {
         std::unique_lock<std::mutex> lg(m_lock);
         m_cv.notify_all();
@@ -156,21 +156,21 @@ VisualInferenceCallback* VisualInferenceSession::run(std::chrono::system_clock::
 
 
 AsyncVisualInferenceSession::AsyncVisualInferenceSession(
-    ProgramEnvironment& env, CancellableScope& scope, Logger& logger,
+    ProgramEnvironment& env, Logger& logger, CancellableScope& scope,
     VideoFeed& feed, VideoOverlay& overlay,
     std::chrono::milliseconds period
 )
-    : VisualInferenceSession(scope, logger, feed, overlay, period)
+    : VisualInferenceSession(logger, scope, feed, overlay, period)
     , m_triggering_callback(nullptr)
     , m_task(env.inference_dispatcher().dispatch([this]{ thread_body(); }))
 {}
 AsyncVisualInferenceSession::AsyncVisualInferenceSession(
-    ProgramEnvironment& env, CancellableScope& scope, Logger& logger,
+    ProgramEnvironment& env, Logger& logger, CancellableScope& scope,
     VideoFeed& feed, VideoOverlay& overlay,
     std::function<void()> on_finish_callback,
     std::chrono::milliseconds period
 )
-    : VisualInferenceSession(scope, logger, feed, overlay, period)
+    : VisualInferenceSession(logger, scope, feed, overlay, period)
     , m_on_finish_callback(std::move(on_finish_callback))
     , m_triggering_callback(nullptr)
     , m_task(env.inference_dispatcher().dispatch([this]{ thread_body(); }))

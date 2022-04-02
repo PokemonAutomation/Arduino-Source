@@ -78,7 +78,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousBerryTree::make_stats() const{
 
 
 
-void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
@@ -90,7 +90,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, 
     env.update_stats();
 
     StandardEncounterHandler handler(
-        env, env.console,
+        env, context, env.console,
         LANGUAGE,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -111,7 +111,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, 
             StartBattleWatcher start_battle_detector;
 
             int result = run_until(
-                env, env.console,
+                env, context, env.console,
                 [](const BotBaseContext& context){
                     pbf_mash_button(context, BUTTON_A, 60 * TICKS_PER_SECOND);
                 },
@@ -127,7 +127,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, 
                 stats.add_error();
                 env.update_stats();
                 pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
-                run_away(env, env.console, EXIT_BATTLE_TIMEOUT);
+                run_away(env, context, env.console, EXIT_BATTLE_TIMEOUT);
                 continue;
             case 1:
                 env.log("Battle started!");
@@ -142,7 +142,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, 
 
         //  Detect shiny.
         ShinyDetectionResult result = detect_shiny_battle(
-            env, env.console,
+            env, context, env.console,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );

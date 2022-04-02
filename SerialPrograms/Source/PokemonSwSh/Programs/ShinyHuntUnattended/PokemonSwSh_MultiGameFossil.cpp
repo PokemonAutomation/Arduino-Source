@@ -118,7 +118,7 @@ void run_fossil_batch(
 }
 
 
-void MultiGameFossil::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void MultiGameFossil::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
     }else{

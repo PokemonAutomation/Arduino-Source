@@ -42,7 +42,7 @@ ActivateMenuGlitch113::ActivateMenuGlitch113(const ActivateMenuGlitch113_Descrip
 
 
 
-void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     ConsoleHandle& console = env.console;
 
     //  Enable Strength
@@ -56,7 +56,7 @@ void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, Cancell
     console.botbase().wait_for_all_requests();
     MapWatcher detector;
     int ret = wait_until(
-        env, console, std::chrono::seconds(2),
+        env, context, console, std::chrono::seconds(2),
         { &detector }
     );
     if (ret < 0){

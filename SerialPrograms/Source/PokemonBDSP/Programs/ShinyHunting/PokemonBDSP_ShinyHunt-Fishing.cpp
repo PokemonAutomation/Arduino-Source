@@ -87,11 +87,11 @@ std::unique_ptr<StatsTracker> ShinyHuntFishing::make_stats() const{
 
 
 
-void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     StandardEncounterHandler handler(
-        env, env.console,
+        env, context, env.console,
         LANGUAGE,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -113,7 +113,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, CancellableS
             StartBattleDetector battle(env.console);
             BattleMenuWatcher battle_menu(BattleType::STANDARD);
             int ret = run_until(
-                env, env.console,
+                env, context, env.console,
                 [=](const BotBaseContext& context){
                     SHORTCUT.run(context, 30 * TICKS_PER_SECOND);
                 },
@@ -145,7 +145,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, CancellableS
 
             //  Wait for dialog after hooking to appear.
             ret = wait_until(
-                env, env.console,
+                env, context, env.console,
                 std::chrono::milliseconds(5000),
                 {
                     &dialog_detector,
@@ -169,7 +169,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, CancellableS
 
             //  Wait for battle to start.
             ret = wait_until(
-                env, env.console,
+                env, context, env.console,
                 std::chrono::milliseconds(10000),
                 {
                     &battle,
@@ -196,7 +196,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, CancellableS
         DoublesShinyDetection result_wild;
         ShinyDetectionResult result_own;
         detect_shiny_battle(
-            env, env.console,
+            env, context, env.console,
             result_wild, result_own,
             WILD_POKEMON,
             std::chrono::seconds(30)

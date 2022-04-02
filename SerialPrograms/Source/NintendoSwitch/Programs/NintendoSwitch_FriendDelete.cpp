@@ -53,7 +53,7 @@ FriendDelete::FriendDelete(const FriendDelete_Descriptor& descriptor)
     PA_ADD_OPTION(DELETE_FRIEND_DELAY);
     PA_ADD_OPTION(FINISH_DELETE_DELAY);
 }
-void FriendDelete::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void FriendDelete::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     pbf_press_button(env.console, BUTTON_A, 5, 5);
 
     for (uint16_t c = 0; c < FRIENDS_TO_DELETE; c++){

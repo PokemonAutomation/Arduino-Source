@@ -22,7 +22,7 @@ namespace PokemonAutomation{
 class AudioInferenceSession : private Cancellable{
 public:
     AudioInferenceSession(
-        CancellableScope& scope, Logger& logger,
+        Logger& logger, CancellableScope& scope,
         AudioFeed& feed,
         std::chrono::milliseconds period = std::chrono::milliseconds(20)
     );
@@ -55,12 +55,12 @@ private:
 class AsyncAudioInferenceSession : private AudioInferenceSession{
 public:
     AsyncAudioInferenceSession(
-        ProgramEnvironment& env, CancellableScope& scope, Logger& logger,
+        ProgramEnvironment& env, Logger& logger, CancellableScope& scope,
         AudioFeed& feed,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)
     );
     AsyncAudioInferenceSession(
-        ProgramEnvironment& env, CancellableScope& scope, Logger& logger,
+        ProgramEnvironment& env, Logger& logger, CancellableScope& scope,
         AudioFeed& feed,
         std::function<void()> on_finish_callback,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)

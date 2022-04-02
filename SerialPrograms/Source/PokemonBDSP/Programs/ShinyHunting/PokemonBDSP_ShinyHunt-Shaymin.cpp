@@ -73,13 +73,13 @@ std::unique_ptr<StatsTracker> ShinyHuntShaymin::make_stats() const{
 
 
 
-bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env) const{
+bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) const{
     env.console.botbase().wait_for_all_requests();
     {
         BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
         ShortDialogWatcher dialog_detector;
         int result = run_until(
-            env, env.console,
+            env, context, env.console,
             [&](const BotBaseContext& context){
                 while (true){
                     for (size_t c = 0; c < 5; c++){
@@ -106,7 +106,7 @@ bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env) cons
         BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
         StartBattleDetector start_battle_detector(env.console);
         int result = run_until(
-            env, env.console,
+            env, context, env.console,
             [&](const BotBaseContext& context){
                 while (true){
                     for (size_t c = 0; c < 5; c++){
@@ -132,12 +132,12 @@ bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env) cons
     return true;
 }
 
-void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     PokemonSwSh::ShinyHuntTracker& stats = env.stats<PokemonSwSh::ShinyHuntTracker>();
     env.update_stats();
 
     StandardEncounterHandler handler(
-        env, env.console,
+        env, context, env.console,
         Language::None,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -150,7 +150,7 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, CancellableS
     //  Encounter Loop
     while (true){
         //  Find encounter.
-        bool battle = start_encounter(env);
+        bool battle = start_encounter(env, context);
         if (!battle){
             stats.add_error();
             handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
@@ -161,7 +161,7 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, CancellableS
         DoublesShinyDetection result_wild;
         ShinyDetectionResult result_own;
         detect_shiny_battle(
-            env, env.console,
+            env, context, env.console,
             result_wild, result_own,
             WILD_POKEMON,
             std::chrono::seconds(30)

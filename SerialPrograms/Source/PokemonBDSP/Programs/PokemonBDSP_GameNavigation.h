@@ -26,11 +26,11 @@ void box_to_overworld(const BotBaseContext& context);
 
 //  Feedback
 
-void overworld_to_menu(ProgramEnvironment& env, ConsoleHandle& console);
-void save_game(ProgramEnvironment& env, ConsoleHandle& console);
+void overworld_to_menu(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console);
+void save_game(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console);
 
-void overworld_to_box(ProgramEnvironment& env, ConsoleHandle& console);
-void box_to_overworld(ProgramEnvironment& env, ConsoleHandle& console);
+void overworld_to_box(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console);
+void box_to_overworld(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console);
 
 
 }

@@ -18,20 +18,7 @@ namespace PokemonAutomation{
 
 
 int wait_until(
-    ProgramEnvironment& env, ConsoleHandle& console,
-    std::chrono::milliseconds timeout,
-    std::vector<InferenceCallback*>&& callbacks,
-    std::chrono::milliseconds period
-){
-    return wait_until(
-        env, console,
-        std::chrono::system_clock::now() + timeout,
-        std::move(callbacks),
-        period
-    );
-}
-int wait_until(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     std::chrono::system_clock::time_point deadline,
     std::vector<InferenceCallback*>&& callbacks,
     std::chrono::milliseconds period
@@ -43,16 +30,8 @@ int wait_until(
         std::unique_ptr<AsyncVisualInferenceSession> visual_session;
         std::unique_ptr<AsyncAudioInferenceSession> audio_session;
 
-        std::mutex lock;
-        std::condition_variable cv;
-        ProgramStopNotificationScope stopper(env, lock, cv);
-        bool stopped = false;
-
-        std::function<void()> stop_callback = [&](){
-            std::lock_guard<std::mutex> lg(lock);
-            stopped = true;
-            cv.notify_all();
-        };
+        CancellableScope subscope(*context.scope());
+        BotBaseContext subcontext(subscope, console.botbase());
 
         //  Add all the callbacks. Lazy init the sessions only when needed.
         for (size_t c = 0; c < callbacks.size(); c++){
@@ -65,9 +44,10 @@ int wait_until(
             case InferenceType::VISUAL:
                 if (visual_session == nullptr){
                     visual_session.reset(new AsyncVisualInferenceSession(
-                        env, env.scope(), console,
+                        env, console, *context.scope(),
                         console, console,
-                        stop_callback, period
+                        [&](){ subcontext.cancel_now(); },
+                        period
                     ));
                 }
                 *visual_session += static_cast<VisualInferenceCallback&>(*callback);
@@ -75,9 +55,10 @@ int wait_until(
             case InferenceType::AUDIO:
                 if (audio_session == nullptr){
                     audio_session.reset(new AsyncAudioInferenceSession(
-                        env, env.scope(), console,
+                        env, console, *context.scope(),
                         console,
-                        stop_callback, period
+                        [&](){ subcontext.cancel_now(); },
+                        period
                     ));
                 }
                 *audio_session += static_cast<AudioInferenceCallback&>(*callback);
@@ -87,10 +68,11 @@ int wait_until(
 
 
         //  Wait
-        {
-            std::unique_lock<std::mutex> lg(lock);
-            cv.wait_until(lg, deadline, [&](){ return stopped || env.is_stopping(); });
-        }
+        try{
+            subcontext.wait_until(deadline + std::chrono::seconds(3600));
+        }catch (OperationCancelledException&){}
+
+        context.scope()->throw_if_cancelled();
 
         //  Stop the inference threads (and rethrow exceptions).
         if (visual_session){
@@ -121,7 +103,7 @@ int wait_until(
 
 
 int run_until(
-    ProgramEnvironment& env, CancellableScope& scope, ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     std::function<void(const BotBaseContext& context)>&& command,
     std::vector<InferenceCallback*>&& callbacks,
     std::chrono::milliseconds period
@@ -133,8 +115,8 @@ int run_until(
         std::unique_ptr<AsyncVisualInferenceSession> visual_session;
         std::unique_ptr<AsyncAudioInferenceSession> audio_session;
 
-        CancellableScope subscope(scope);
-        BotBaseContext context(subscope, console.botbase());
+        CancellableScope subscope(*context.scope());
+        BotBaseContext subcontext(subscope, console.botbase());
 
         //  Add all the callbacks. Lazy init the sessions only when needed.
         for (size_t c = 0; c < callbacks.size(); c++){
@@ -147,9 +129,9 @@ int run_until(
             case InferenceType::VISUAL:
                 if (visual_session == nullptr){
                     visual_session.reset(new AsyncVisualInferenceSession(
-                        env, scope, console,
+                        env, console, *context.scope(),
                         console, console,
-                        [&](){ context.cancel_now(); },
+                        [&](){ subcontext.cancel_now(); },
                         period
                     ));
                 }
@@ -158,9 +140,9 @@ int run_until(
             case InferenceType::AUDIO:
                 if (audio_session == nullptr){
                     audio_session.reset(new AsyncAudioInferenceSession(
-                        env, scope, console,
+                        env, console, *context.scope(),
                         console,
-                        [&](){ context.cancel_now(); },
+                        [&](){ subcontext.cancel_now(); },
                         period
                     ));
                 }
@@ -172,11 +154,11 @@ int run_until(
 
         //  Run commands.
         try{
-            command(context);
-            context.wait_for_all_requests();
+            command(subcontext);
+            subcontext.wait_for_all_requests();
         }catch (OperationCancelledException&){}
 
-        scope.throw_if_cancelled();
+        context.scope()->throw_if_cancelled();
 
         //  Stop the inference threads (and rethrow exceptions).
         if (visual_session){

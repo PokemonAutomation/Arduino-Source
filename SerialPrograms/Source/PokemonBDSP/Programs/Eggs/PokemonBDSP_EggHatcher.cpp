@@ -87,7 +87,7 @@ std::unique_ptr<StatsTracker> EggHatcher::make_stats() const{
 
 
 
-void EggHatcher::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void EggHatcher::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     uint16_t INCUBATION_TIME = (uint16_t)((1258.5 + 4.05 * STEPS_TO_HATCH) * 1.05);
@@ -121,7 +121,7 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, CancellableScope& 
             box_to_overworld(env.console);
             save_game(env.console);
             pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             withdraw_1st_column_from_overworld(env.console);
             column = 0;
         }

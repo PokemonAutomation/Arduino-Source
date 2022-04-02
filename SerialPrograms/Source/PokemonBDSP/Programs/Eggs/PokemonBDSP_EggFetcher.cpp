@@ -68,7 +68,7 @@ std::unique_ptr<StatsTracker> EggFetcher::make_stats() const{
 }
 
 
-void EggFetcher::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void EggFetcher::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
     env.update_stats();
 

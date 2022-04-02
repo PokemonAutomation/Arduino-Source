@@ -165,7 +165,7 @@ void ShinyHuntCustomPath::do_non_listen_action(SingleSwitchProgramEnvironment& e
 }
 
 
-void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env){
+void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     for(size_t action_index = 0; action_index < CUSTOM_PATH_TABLE.num_actions(); action_index++){
@@ -181,7 +181,7 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env){
             // but the code using the passed in `env` may still runs. This will delay the program stop
             // on shiny sound but should be genearally OK in this use case.
             run_until(
-                env, env.console,
+                env, context, env.console,
                 [&env, &action_index, this](const BotBaseContext& context){
                     for(; action_index < CUSTOM_PATH_TABLE.num_actions(); action_index++){
                         const auto& listened_row = CUSTOM_PATH_TABLE.get_action(action_index);
@@ -205,7 +205,7 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env){
 }
 
 
-void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.
@@ -214,7 +214,7 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, Cancellab
     if (TEST_PATH){
         // Run the test path immediately
         env.log("Testing path...");
-        run_path(env);
+        run_path(env, context);
         return;
     }
 
@@ -243,17 +243,17 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, Cancellab
         try{
 //            Stats& stats = env.stats<Stats>();
 
-            goto_camp_from_jubilife(env, env.console, TRAVEL_LOCATION);
-            run_path(env);
+            goto_camp_from_jubilife(env, context, env.console, TRAVEL_LOCATION);
+            run_path(env, context);
 
             stats.attempts++;
 
             pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }catch (OperationFailedException&){
             stats.errors++;
             pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
 
     }

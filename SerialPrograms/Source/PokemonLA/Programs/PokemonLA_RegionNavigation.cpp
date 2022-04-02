@@ -22,49 +22,51 @@ namespace PokemonLA{
 
 
 
-void goto_professor(ConsoleHandle& console, Camp camp){
+void goto_professor(Logger& logger, const BotBaseContext& context, Camp camp){
     switch (camp){
     case Camp::FIELDLANDS_FIELDLANDS:
-        pbf_move_left_joystick(console, 255, 0, 125, 0);
+        pbf_move_left_joystick(context, 255, 0, 125, 0);
         return;
     case Camp::FIELDLANDS_HEIGHTS:
-        pbf_move_left_joystick(console, 240, 0, 200, 0);
+        pbf_move_left_joystick(context, 240, 0, 200, 0);
         return;
     case Camp::MIRELANDS_MIRELANDS:
-        pbf_move_left_joystick(console, 255, 64, 160, 0);
+        pbf_move_left_joystick(context, 255, 64, 160, 0);
         return;
     case Camp::MIRELANDS_BOGBOUND:
-        pbf_move_left_joystick(console, 255, 64, 140, 0);
+        pbf_move_left_joystick(context, 255, 64, 140, 0);
         return;
     case Camp::COASTLANDS_BEACHSIDE:
-        pbf_move_left_joystick(console, 255, 96, 125, 0);
+        pbf_move_left_joystick(context, 255, 96, 125, 0);
         return;
     case Camp::COASTLANDS_COASTLANDS:
-        pbf_move_left_joystick(console, 255, 48, 105, 0);
+        pbf_move_left_joystick(context, 255, 48, 105, 0);
         return;
     case Camp::HIGHLANDS_HIGHLANDS:
-        pbf_move_left_joystick(console, 255, 48, 176, 0);
+        pbf_move_left_joystick(context, 255, 48, 176, 0);
         return;
     case Camp::HIGHLANDS_MOUNTAIN:
-        pbf_move_left_joystick(console, 255, 32, 125, 0);
+        pbf_move_left_joystick(context, 255, 32, 125, 0);
         return;
     case Camp::HIGHLANDS_SUMMIT:
-        pbf_move_left_joystick(console, 255, 0, 125, 0);
+        pbf_move_left_joystick(context, 255, 0, 125, 0);
         return;
     case Camp::ICELANDS_SNOWFIELDS:
-        pbf_move_left_joystick(console, 255, 56, 125, 0);
+        pbf_move_left_joystick(context, 255, 56, 125, 0);
         return;
     case Camp::ICELANDS_ICEPEAK:
-        pbf_move_left_joystick(console, 255, 48, 75, 0);
+        pbf_move_left_joystick(context, 255, 48, 75, 0);
         return;
     default:
         throw InternalProgramError(
-            &console.logger(), PA_CURRENT_FUNCTION,
+            &logger, PA_CURRENT_FUNCTION,
             "Unknown Camp: " + std::to_string((int)camp)
         );
     }
 }
-void from_professor_return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& console){
+void from_professor_return_to_jubilife(
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console
+){
     ButtonDetector button_detector0(
         console, console,
         ButtonType::ButtonA, ImageFloatBox(0.500, 0.578, 0.300, 0.043),
@@ -83,7 +85,7 @@ void from_professor_return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& c
     while (true){
         console.botbase().wait_for_all_requests();
         int ret = run_until(
-            env, console,
+            env, context, console,
             [](const BotBaseContext& context){
                 for (size_t c = 0; c < 20; c++){
                     pbf_press_button(context, BUTTON_A, 20, 125);
@@ -91,12 +93,12 @@ void from_professor_return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& c
             },
             { &button_detector0, &button_detector1, &bottom_B }
         );
-        env.wait_for(std::chrono::milliseconds(500));
+        context.wait_for(std::chrono::milliseconds(500));
         switch (ret){
         case 0:
             console.log("Detected return option...");
             pbf_press_dpad(console, DPAD_DOWN, 20, 105);
-            mash_A_to_change_region(env, console);
+            mash_A_to_change_region(env, context, console);
             return;
         case 1:
             console.log("Detected report research option...");
@@ -113,10 +115,12 @@ void from_professor_return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& c
 }
 
 
-void mash_A_to_enter_sub_area(ProgramEnvironment& env, ConsoleHandle& console){
+void mash_A_to_enter_sub_area(
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console
+){
     BlackScreenOverWatcher black_screen0(COLOR_RED, {0.2, 0.2, 0.6, 0.6}, 100, 10);
     int ret = run_until(
-        env, console,
+        env, context, console,
         [](const BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, 7 * TICKS_PER_SECOND);
         },
@@ -132,10 +136,12 @@ void mash_A_to_enter_sub_area(ProgramEnvironment& env, ConsoleHandle& console){
 }
 
 
-void mash_A_to_change_region(ProgramEnvironment& env, ConsoleHandle& console){
+void mash_A_to_change_region(
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console
+){
     BlackScreenOverWatcher black_screen0;
     int ret = run_until(
-        env, console,
+        env, context, console,
         [](const BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, GameSettings::instance().LOAD_REGION_TIMEOUT);
         },
@@ -144,34 +150,37 @@ void mash_A_to_change_region(ProgramEnvironment& env, ConsoleHandle& console){
     if (ret < 0){
         throw OperationFailedException(console, "Failed to load into region after timeout.");
     }
-    env.wait_for(std::chrono::milliseconds(100));
+    context.wait_for(std::chrono::milliseconds(100));
 
     BlackScreenOverWatcher black_screen1a(COLOR_RED, {0.20, 0.02, 0.60, 0.05}, 150);
     BlackScreenOverWatcher black_screen1b(COLOR_RED, {0.20, 0.93, 0.60, 0.05}, 150);
     ret = wait_until(
-        env, console,
+        env, context, console,
         std::chrono::milliseconds(1000 * GameSettings::instance().LOAD_REGION_TIMEOUT / TICKS_PER_SECOND),
         { &black_screen1a, &black_screen1b }
     );
     if (ret < 0){
-        dump_image(env.logger(), env.program_info(), "LoadRegion", console.video().snapshot());
+        dump_image(console.logger(), env.program_info(), "LoadRegion", console.video().snapshot());
         throw OperationFailedException(console, "Failed to load into region after timeout.");
     }
     console.log("Loaded into map...");
-    env.wait_for(std::chrono::milliseconds((uint64_t)(GameSettings::instance().POST_WARP_DELAY * 1000)));
+    context.wait_for(std::chrono::milliseconds((uint64_t)(GameSettings::instance().POST_WARP_DELAY * 1000)));
 }
 
 
 
 
-void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, const TravelLocation& location){
+void goto_camp_from_jubilife(
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    const TravelLocation& location
+){
     //  Open the map.
     console.botbase().wait_for_all_requests();
     pbf_move_left_joystick(console, 128, 255, 200, 0);
     {
         MapDetector detector;
         int ret = run_until(
-            env, console,
+            env, context, console,
             [](const BotBaseContext& context){
                 for (size_t c = 0; c < 10; c++){
                     pbf_press_button(context, BUTTON_A, 20, 105);
@@ -180,11 +189,11 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, co
             { &detector }
         );
         if (ret < 0){
-            dump_image(env.logger(), env.program_info(), "MapNotDetected", console.video().snapshot());
+            dump_image(console.logger(), env.program_info(), "MapNotDetected", console.video().snapshot());
             throw OperationFailedException(console, "Map not detected after 10 x A presses.");
         }
         console.log("Found map!");
-        env.wait_for(std::chrono::milliseconds(500));
+        context.wait_for(std::chrono::milliseconds(500));
     }
 
     DpadPosition direction = location.region < MapRegion::HIGHLANDS ? DPAD_RIGHT : DPAD_LEFT;
@@ -192,7 +201,7 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, co
     //  Move to region.
     MapRegion current_region = MapRegion::NONE;
     for (size_t c = 0; c < 10; c++){
-        current_region = detect_selected_region(env, console);
+        current_region = detect_selected_region(env, context, console);
         if (current_region == location.region){
             break;
         }
@@ -200,7 +209,7 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, co
         console.botbase().wait_for_all_requests();
     }
     if (current_region != location.region){
-        dump_image(env.logger(), env.program_info(), "FindRegion", console.video().snapshot());
+        dump_image(console.logger(), env.program_info(), "FindRegion", console.video().snapshot());
         throw OperationFailedException(console, std::string("Unable to find: ") + location.label);
     }
 
@@ -212,7 +221,7 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, co
     }
 
     //  Enter the region.
-    mash_A_to_change_region(env, console);
+    mash_A_to_change_region(env, context, console);
 
     if (location.warp_sub_slot == 0){
         return;
@@ -223,7 +232,7 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, co
     {
         MapDetector detector;
         int ret = wait_until(
-            env, console,
+            env, context, console,
             std::chrono::seconds(5),
             { &detector }
         );
@@ -232,7 +241,7 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, co
             throw OperationFailedException(console, "Map not detected after 5 seconds.");
         }
         console.log("Found map!");
-        env.wait_for(std::chrono::milliseconds(500));
+        context.wait_for(std::chrono::milliseconds(500));
     }
 
     //  Warp to sub-camp.
@@ -245,7 +254,7 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, co
             std::chrono::milliseconds(200), true
         );
         int ret = wait_until(
-            env, console,
+            env, context, console,
             std::chrono::seconds(2),
             { &detector }
         );
@@ -261,30 +270,30 @@ void goto_camp_from_jubilife(ProgramEnvironment& env, ConsoleHandle& console, co
 
     BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.6});
     int ret = wait_until(
-        env, console,
+        env, context, console,
         std::chrono::seconds(20),
         { &black_screen }
     );
     if (ret < 0){
-        dump_image(env.logger(), env.program_info(), "FlyToCamp", console.video().snapshot());
+        dump_image(console.logger(), env.program_info(), "FlyToCamp", console.video().snapshot());
         throw OperationFailedException(console, "Failed to fly to camp after 20 seconds.");
     }
     console.log("Arrived at sub-camp...");
-    env.wait_for(std::chrono::milliseconds((uint64_t)(GameSettings::instance().POST_WARP_DELAY * 1000)));
+    context.wait_for(std::chrono::milliseconds((uint64_t)(GameSettings::instance().POST_WARP_DELAY * 1000)));
 
     if (location.post_arrival_maneuver == nullptr){
         return;
     }
 
     location.post_arrival_maneuver(console);
-    console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
 }
 
 
 
 
 void goto_camp_from_overworld(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     ShinyDetectedActionOption& options,
     ShinyStatIncrementer& shiny_stat_incrementer
 ){
@@ -304,7 +313,7 @@ void goto_camp_from_overworld(
         }
 
         if (std::chrono::system_clock::now() - start > std::chrono::seconds(60)){
-            dump_image(env.logger(), env.program_info(), "EscapeFromAttack", console.video().snapshot());
+            dump_image(console.logger(), env.program_info(), "EscapeFromAttack", console.video().snapshot());
             throw OperationFailedException(console, "Unable to escape from being attacked.");
         }
 
@@ -313,19 +322,19 @@ void goto_camp_from_overworld(
         {
             MapDetector detector;
             int ret = wait_until(
-                env, console,
+                env, context, console,
                 std::chrono::seconds(5),
                 { &detector }
             );
             if (ret < 0){
-                dump_image(env.logger(), env.program_info(), "MapNotDetected", console.video().snapshot());
+                dump_image(console.logger(), env.program_info(), "MapNotDetected", console.video().snapshot());
                 console.log("Map not detected after 5 seconds.", COLOR_RED);
                 pbf_mash_button(console, BUTTON_B, TICKS_PER_SECOND);
                 console.botbase().wait_for_all_requests();
                 continue;
             }
             console.log("Found map!");
-            env.wait_for(std::chrono::milliseconds(500));
+            context.wait_for(std::chrono::milliseconds(500));
         }
 
         //  Try to fly back to camp.
@@ -339,7 +348,7 @@ void goto_camp_from_overworld(
                 std::chrono::milliseconds(200), true
             );
             int ret = wait_until(
-                env, console,
+                env, context, console,
                 std::chrono::seconds(2),
                 { &detector }
             );
@@ -357,16 +366,16 @@ void goto_camp_from_overworld(
 
     BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.6});
     int ret = wait_until(
-        env, console,
+        env, context, console,
         std::chrono::seconds(20),
         { &black_screen }
     );
     if (ret < 0){
-        dump_image(env.logger(), env.program_info(), "FlyToCamp", console.video().snapshot());
+        dump_image(console.logger(), env.program_info(), "FlyToCamp", console.video().snapshot());
         throw OperationFailedException(console, "Failed to fly to camp after 20 seconds.");
     }
     console.log("Arrived at camp...");
-    env.wait_for(std::chrono::milliseconds((uint64_t)(GameSettings::instance().POST_WARP_DELAY * 1000)));
+    context.wait_for(std::chrono::milliseconds((uint64_t)(GameSettings::instance().POST_WARP_DELAY * 1000)));
 }
 
 

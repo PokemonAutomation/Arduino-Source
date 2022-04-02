@@ -87,12 +87,12 @@ std::unique_ptr<StatsTracker> ShinyHuntOverworld::make_stats() const{
 
 
 
-void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
     env.update_stats();
 
     StandardEncounterHandler handler(
-        env, env.console,
+        env, context, env.console,
         LANGUAGE,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -105,7 +105,7 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, Cancellabl
     //  Encounter Loop
     while (true){
         //  Find encounter.
-        bool battle = TRIGGER_METHOD.find_encounter(env);
+        bool battle = TRIGGER_METHOD.find_encounter(env, context);
         if (!battle){
             stats.add_error();
             handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
@@ -116,7 +116,7 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, Cancellabl
         DoublesShinyDetection result_wild;
         ShinyDetectionResult result_own;
         detect_shiny_battle(
-            env, env.console,
+            env, context, env.console,
             result_wild, result_own,
             WILD_POKEMON,
             std::chrono::seconds(30)

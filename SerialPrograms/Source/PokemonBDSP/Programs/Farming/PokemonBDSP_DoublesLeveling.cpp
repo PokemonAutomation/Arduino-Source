@@ -95,7 +95,7 @@ std::unique_ptr<StatsTracker> DoublesLeveling::make_stats() const{
 
 
 
-bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env){
+bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     env.log("Starting battle!");
@@ -108,7 +108,7 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env){
         EndBattleWatcher end_battle;
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         int ret = run_until(
-            env, env.console,
+            env, context, env.console,
             [=](const BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
@@ -148,12 +148,12 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env){
 
 
 
-void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
     env.update_stats();
 
     StandardEncounterHandler handler(
-        env, env.console,
+        env, context, env.console,
         LANGUAGE,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -165,7 +165,7 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, CancellableSc
     //  Encounter Loop
     while (true){
         //  Find encounter.
-        bool battle = TRIGGER_METHOD.find_encounter(env);
+        bool battle = TRIGGER_METHOD.find_encounter(env, context);
         if (!battle){
             // Unexpected battle: detect battle menu but not battle starting animation.
             stats.add_error();
@@ -177,7 +177,7 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, CancellableSc
         DoublesShinyDetection result_wild;
         ShinyDetectionResult result_own;
         detect_shiny_battle(
-            env, env.console,
+            env, context, env.console,
             result_wild, result_own,
             WILD_POKEMON,
             std::chrono::seconds(30)
@@ -188,7 +188,7 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, CancellableSc
             break;
         }
 
-        if (this->battle(env)){
+        if (this->battle(env, context)){
             break;
         }
     }

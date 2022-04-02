@@ -96,7 +96,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousIoATrade::make_stats() const{
 
 
 
-void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);
@@ -172,7 +172,7 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, C
         pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
         TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.console);
         reset_game_from_home_with_inference(
-            env, env.console,
+            env, context, env.console,
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
         );
     }

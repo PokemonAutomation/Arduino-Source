@@ -106,7 +106,8 @@ bool SelfTouchTrade::trade_one(MultiSwitchProgramEnvironment& env, std::map<std:
 #if 1
     MultiConsoleErrorState error_state;
     env.run_in_parallel([&](ConsoleHandle& console){
-        trade_current_pokemon(env, console, error_state, stats);
+        BotBaseContext context(env.scope(), console);
+        trade_current_pokemon(env, context, console, error_state, stats);
     });
     stats.m_trades++;
     iter->second--;

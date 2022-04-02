@@ -109,7 +109,7 @@ std::set<std::string> read_name(
 
 
 
-void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     PokemonSwSh::ShinyHuntTracker& stats = env.stats<PokemonSwSh::ShinyHuntTracker>();
 
 
@@ -124,7 +124,7 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, Cancellable
 
         if (reset){
             pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-            if (!reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
+            if (!reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
                 stats.add_error();
                 continue;
             }
@@ -149,7 +149,7 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, Cancellable
                 {{arcs, true}}
             );
             int ret = run_until(
-                env, env.console,
+                env, context, env.console,
                 [=](const BotBaseContext& context){
                     pbf_mash_button(context, BUTTON_B, 60 * TICKS_PER_SECOND);
                 },
@@ -189,7 +189,7 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, Cancellable
             );
             ShinySymbolWaiter shiny_symbol(env.console, SHINY_SYMBOL_BOX_BOTTOM);
             int ret = run_until(
-                env, env.console,
+                env, context, env.console,
                 [=](const BotBaseContext& context){
                     pbf_press_button(context, BUTTON_ZL, 3 * TICKS_PER_SECOND, 0);
                 },

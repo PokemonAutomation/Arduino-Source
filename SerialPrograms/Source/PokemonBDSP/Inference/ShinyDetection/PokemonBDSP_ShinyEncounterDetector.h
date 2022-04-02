@@ -16,6 +16,7 @@
 #include "PokemonBDSP_ShinySparkleSet.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
     class ConsoleHandle;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
@@ -104,7 +105,7 @@ void determine_shiny_status(
 
 
 void detect_shiny_battle(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
     const DetectionType& type,

@@ -107,7 +107,7 @@ void DenRoller::ring_bell(const BotBaseContext& context, int count) const{
     pbf_wait(context, 200);
 }
 
-void DenRoller::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void DenRoller::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     std::string desired_slug = FILTER.slug();
@@ -175,7 +175,7 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, CancellableScope& s
         rollback_date_from_home(env.console, SKIPS);
 //        reset_game_from_home(TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
         reset_game_from_home_with_inference(
-            env, env.console,
+            env, context, env.console,
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
         );
     }

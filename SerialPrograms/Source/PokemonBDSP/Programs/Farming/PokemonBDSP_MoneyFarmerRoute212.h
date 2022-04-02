@@ -30,20 +30,20 @@ public:
     MoneyFarmerRoute212(const MoneyFarmerRoute212_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) override;
 
 private:
     struct Stats;
     // Run the battle loop. Return true if the program should stop.
-    bool battle(SingleSwitchProgramEnvironment& env, uint8_t pp[4], bool man);
+    bool battle(SingleSwitchProgramEnvironment& env, const BotBaseContext& context, uint8_t pp[4], bool man);
     // From the row above the old couple, heal Pokemon and return.
     // Return true if VS Seeker needs charging.
-    bool heal_after_battle_and_return(SingleSwitchProgramEnvironment& env, ConsoleHandle& console, uint8_t pp[4]);
+    bool heal_after_battle_and_return(SingleSwitchProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console, uint8_t pp[4]);
     // Starting in front of the Hearthome Pokecenter, heal and return
     // to the old couple.
-    void heal_at_center_and_return(ConsoleHandle& console, uint8_t pp[4]);
+    void heal_at_center_and_return(const BotBaseContext& context, ConsoleHandle& console, uint8_t pp[4]);
     // Fly from the old couple to Hearthome Pokecenter, heal and return.
-    void fly_to_center_heal_and_return(ConsoleHandle& console, uint8_t pp[4]);
+    void fly_to_center_heal_and_return(const BotBaseContext& context, ConsoleHandle& console, uint8_t pp[4]);
     // Move around to charge VS Seeker.
     void charge_vs_seeker(ConsoleHandle& console);
 

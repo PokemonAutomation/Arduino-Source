@@ -63,13 +63,13 @@ void box_to_overworld(const BotBaseContext& context){
 
 //  Feedback
 
-void overworld_to_menu(ProgramEnvironment& env, ConsoleHandle& console){
+void overworld_to_menu(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console){
     pbf_press_button(console, BUTTON_X, 20, 105);
     console.botbase().wait_for_all_requests();
     {
         MenuWatcher detector;
         int ret = wait_until(
-            env, console, std::chrono::seconds(10),
+            env, context, console, std::chrono::seconds(10),
             { &detector }
         );
         if (ret < 0){
@@ -80,15 +80,15 @@ void overworld_to_menu(ProgramEnvironment& env, ConsoleHandle& console){
     env.wait_for(std::chrono::milliseconds(100));
 }
 
-void save_game(ProgramEnvironment& env, ConsoleHandle& console){
-    overworld_to_menu(env, console);
+void save_game(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console){
+    overworld_to_menu(env, context, console);
     pbf_press_button(console, BUTTON_R, 10, 2 * TICKS_PER_SECOND);
     pbf_press_button(console, BUTTON_ZL, 10, 5 * TICKS_PER_SECOND);
 }
 
-void overworld_to_box(ProgramEnvironment& env, ConsoleHandle& console){
+void overworld_to_box(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console){
     //  Open menu.
-    overworld_to_menu(env, console);
+    overworld_to_menu(env, context, console);
 
     //  Enter Pokemon
     uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
@@ -107,7 +107,7 @@ void overworld_to_box(ProgramEnvironment& env, ConsoleHandle& console){
     {
         BoxWatcher detector;
         int ret = wait_until(
-            env, console, std::chrono::seconds(10),
+            env, context, console, std::chrono::seconds(10),
             { &detector }
         );
         if (ret < 0){
@@ -117,7 +117,7 @@ void overworld_to_box(ProgramEnvironment& env, ConsoleHandle& console){
     }
     env.wait_for(std::chrono::milliseconds(500));
 }
-void box_to_overworld(ProgramEnvironment& env, ConsoleHandle& console){
+void box_to_overworld(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console){
     //  There are two states here which need to be merged:
     //      1.  The depositing column was empty. The party has been swapped and
     //          it's sitting in the box with no held pokemon.
@@ -138,7 +138,7 @@ void box_to_overworld(ProgramEnvironment& env, ConsoleHandle& console){
     {
         MenuWatcher detector;
         int ret = wait_until(
-            env, console, std::chrono::seconds(10),
+            env, context, console, std::chrono::seconds(10),
             { &detector }
         );
         if (ret < 0){

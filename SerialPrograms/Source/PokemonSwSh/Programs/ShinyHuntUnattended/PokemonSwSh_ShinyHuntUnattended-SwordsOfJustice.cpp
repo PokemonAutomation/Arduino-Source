@@ -60,7 +60,7 @@ ShinyHuntUnattendedSwordsOfJustice::ShinyHuntUnattendedSwordsOfJustice(const Shi
 
 
 
-void ShinyHuntUnattendedSwordsOfJustice::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void ShinyHuntUnattendedSwordsOfJustice::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);

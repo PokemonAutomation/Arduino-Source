@@ -111,7 +111,7 @@ void GenerateNameOCRDataPokedex::dump_images(
 //    OCR::make_OCR_filter(image).apply(image);
 }
 
-void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
 
     QString dex_name;
     size_t dex_size = 0;

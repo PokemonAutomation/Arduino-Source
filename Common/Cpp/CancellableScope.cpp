@@ -17,15 +17,6 @@ namespace PokemonAutomation{
 
 
 struct CancellableScopeData{
-    void operator+=(Cancellable& cancellable){
-        std::lock_guard<std::mutex> lg(m_lock);
-        m_children.insert(&cancellable);
-    }
-    void operator-=(Cancellable& cancellable){
-        std::lock_guard<std::mutex> lg(m_lock);
-        m_children.erase(&cancellable);
-    }
-
     std::set<Cancellable*> m_children;
 
     std::mutex m_lock;
@@ -38,9 +29,7 @@ CancellableScope::CancellableScope(){}
 CancellableScope::CancellableScope(CancellableScope& parent)
     : Cancellable(parent)
 {}
-CancellableScope::~CancellableScope(){
-    detach();
-}
+CancellableScope::~CancellableScope(){}
 void CancellableScope::throw_if_cancelled(){
     if (cancelled()){
         throw OperationCancelledException();
@@ -50,15 +39,12 @@ bool CancellableScope::cancel() noexcept{
     if (Cancellable::cancel()){
         return true;
     }
-    std::set<Cancellable*> children;
-    {
-        std::lock_guard lg(m_impl->m_lock);
-        children = std::move(m_impl->m_children);
-        m_impl->m_cv.notify_all();
-    }
-    for (Cancellable* child : children){
+    std::lock_guard lg(m_impl->m_lock);
+    for (Cancellable* child : m_impl->m_children){
         child->cancel();
     }
+    m_impl->m_children.clear();
+    m_impl->m_cv.notify_all();
     return false;
 }
 void CancellableScope::wait_for(std::chrono::milliseconds duration){
@@ -78,10 +64,13 @@ void CancellableScope::wait_until(std::chrono::system_clock::time_point stop){
     throw_if_cancelled();
 }
 void CancellableScope::operator+=(Cancellable& cancellable){
-    (CancellableScopeData&)m_impl += cancellable;
+    std::lock_guard<std::mutex> lg(m_impl->m_lock);
+    throw_if_cancelled();
+    m_impl->m_children.insert(&cancellable);
 }
 void CancellableScope::operator-=(Cancellable& cancellable){
-    (CancellableScopeData&)m_impl -= cancellable;
+    std::lock_guard<std::mutex> lg(m_impl->m_lock);
+    m_impl->m_children.erase(&cancellable);
 }
 
 

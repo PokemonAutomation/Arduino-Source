@@ -115,7 +115,7 @@ void MagikarpMoveGrinder::switch_pokemon(SingleSwitchProgramEnvironment& env, si
     }
 }
 
-bool MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env){
+bool MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     // The location of the first move slot when choosing which move to use during battle.
@@ -134,7 +134,7 @@ bool MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env){
         BattlePokemonSwitchDetector pokemon_switch_detector(env.console, env.console, stop_on_detected);
         ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(200), stop_on_detected);
         int ret = wait_until(
-            env, env.console, std::chrono::minutes(2),
+            env, context, env.console, std::chrono::minutes(2),
             {
                 &battle_menu_detector,
                 &pokemon_switch_detector,
@@ -228,7 +228,7 @@ bool MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env){
 
 
 
-void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     if (POKEMON_ACTIONS.num_pokemon() == 0){
@@ -246,7 +246,7 @@ void MagikarpMoveGrinder::program(SingleSwitchProgramEnvironment& env, Cancellab
         stats.to_str()
     );
     try{
-        battle_magikarp(env);
+        battle_magikarp(env, context);
     }catch (OperationFailedException&){
         stats.errors++;
         throw;

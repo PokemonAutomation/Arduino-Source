@@ -129,7 +129,7 @@ std::unique_ptr<StatsTracker> PurpleBeamFinder::make_stats() const{
 
 
 
-void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_front_of_den_nowatts(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
@@ -195,7 +195,7 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, CancellableS
 
         pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
         reset_game_from_home_with_inference(
-            env, env.console,
+            env, context, env.console,
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
         );
     }

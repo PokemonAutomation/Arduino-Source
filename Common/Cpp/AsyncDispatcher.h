@@ -20,10 +20,6 @@
 #include <condition_variable>
 #include <thread>
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
-
 namespace PokemonAutomation{
 
 class AsyncTask{

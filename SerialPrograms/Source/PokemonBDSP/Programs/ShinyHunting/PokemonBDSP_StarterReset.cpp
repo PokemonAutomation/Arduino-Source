@@ -90,7 +90,7 @@ std::unique_ptr<StatsTracker> StarterReset::make_stats() const{
 
 
 
-void StarterReset::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void StarterReset::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     QImage briefcase(RESOURCE_PATH() + "PokemonBDSP/StarterBriefcase.png");
@@ -110,7 +110,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, CancellableScope
 
         if (reset){
             pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-            if (!reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
+            if (!reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
                 stats.add_error();
                 consecutive_failures++;
                 continue;
@@ -124,7 +124,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, CancellableScope
         //  Mash B until we see the briefcase.
         ImageMatchWatcher detector(briefcase, {0.5, 0.1, 0.5, 0.7}, 100, true);
         int ret = run_until(
-            env, env.console,
+            env, context, env.console,
             [](const BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
@@ -166,7 +166,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, CancellableScope
         {
             SelectionArrowFinder selection_arrow(env.console, {0.50, 0.60, 0.35, 0.20}, COLOR_RED);
             ret = wait_until(
-                env, env.console, std::chrono::seconds(3),
+                env, context, env.console, std::chrono::seconds(3),
                 { &selection_arrow }
             );
             if (ret == 0){
@@ -185,7 +185,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, CancellableScope
         DoublesShinyDetection result_wild;
         ShinyDetectionResult result_own;
         detect_shiny_battle(
-            env, env.console,
+            env, context, env.console,
             result_wild, result_own,
             YOUR_POKEMON,
             std::chrono::seconds(30)

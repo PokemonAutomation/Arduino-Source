@@ -71,17 +71,16 @@ public:
 class BotBaseContext : public Cancellable{
 public:
     BotBaseContext(BotBase& botbase)
-        : m_scope(nullptr)
-        , m_botbase(botbase)
+        : m_botbase(botbase)
     {}
     BotBaseContext(CancellableScope& scope, BotBase& botbase)
         : Cancellable(scope)
-        , m_scope(&scope)
         , m_botbase(botbase)
     {}
     virtual ~BotBaseContext(){
         detach();
     }
+
 
     void wait_for_all_requests() const{
         m_botbase.wait_for_all_requests(this);
@@ -89,10 +88,12 @@ public:
 
     //  Don't use this unless you really need to.
     BotBase& botbase() const{ return m_botbase; }
+//    CancellableScope* scope() const{ return m_scope; }
 
     //  Stop all commands in this context now.
     void cancel_now(){
         Cancellable::cancel();
+        scope()->cancel();
         m_botbase.stop_all_commands();
     }
 
@@ -104,6 +105,7 @@ public:
     //  sequence.
     void cancel_lazy(){
         Cancellable::cancel();
+        scope()->cancel();
         m_botbase.next_command_interrupt();
     }
 
@@ -112,10 +114,18 @@ public:
         if (Cancellable::cancel()){
             return true;
         }
+        scope()->cancel();
         try{
             m_botbase.stop_all_commands();
         }catch (...){}
         return false;
+    }
+
+    void wait_for(std::chrono::milliseconds duration) const{
+        scope()->wait_for(duration);
+    }
+    void wait_until(std::chrono::system_clock::time_point stop) const{
+        scope()->wait_until(stop);
     }
 
 
@@ -130,7 +140,6 @@ public:
 
 
 private:
-    CancellableScope* m_scope;
     BotBase& m_botbase;
 };
 

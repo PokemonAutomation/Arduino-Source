@@ -93,7 +93,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousFishing::make_stats() const{
 
 
 
-void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
@@ -108,7 +108,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Ca
     env.update_stats();
 
     StandardEncounterHandler handler(
-        env, env.console,
+        env, context, env.console,
         LANGUAGE,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -136,7 +136,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Ca
             FishingHookDetector hook_detector(env.console);
             StandardBattleMenuWatcher menu_detector(false);
             int result = wait_until(
-                env, env.console,
+                env, context, env.console,
                 std::chrono::seconds(12),
                 {
                     &miss_detector,
@@ -158,7 +158,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Ca
                 env.log("Unexpected battle menu.", COLOR_RED);
                 stats.add_error();
                 env.update_stats();
-                run_away(env, env.console, EXIT_BATTLE_TIMEOUT);
+                run_away(env, context, env.console, EXIT_BATTLE_TIMEOUT);
                 continue;
             default:
                 env.log("Timed out.", COLOR_RED);
@@ -178,7 +178,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Ca
 
         //  Detect shiny.
         ShinyDetectionResult result = detect_shiny_battle(
-            env, env.console,
+            env, context, env.console,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );

@@ -10,10 +10,6 @@
 #include "CommonFramework/ImageMatch/ImageCropper.h"
 #include "PokemonSwSh_PokemonSprites.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
-
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{

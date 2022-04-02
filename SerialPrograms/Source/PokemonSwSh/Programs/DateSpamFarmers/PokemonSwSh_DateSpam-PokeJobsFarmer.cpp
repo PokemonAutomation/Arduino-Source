@@ -11,12 +11,11 @@
 #include "PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.h"
 #include "PokemonSwSh_DateSpam-PokeJobsFarmer.h"
 
-namespace PokemonAutomation
-{
-namespace NintendoSwitch
-{
-namespace PokemonSwSh
-{
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSwSh{
+
+
 
 PokeJobsFarmer_Descriptor::PokeJobsFarmer_Descriptor()
     : RunnableSwitchProgramDescriptor(
@@ -66,7 +65,7 @@ static void enter_jobs(SingleSwitchProgramEnvironment &env, uint16_t index){
     pbf_press_button(env.console, BUTTON_A, 10, 5 * TICKS_PER_SECOND); // Wait for animation to complete
 }
 
-void PokeJobsFarmer::program(SingleSwitchProgramEnvironment &env, CancellableScope& scope){
+void PokeJobsFarmer::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     uint8_t year = MAX_YEAR;
 
     // Play it safe in case some menu is open
@@ -151,6 +150,9 @@ void PokeJobsFarmer::program(SingleSwitchProgramEnvironment &env, CancellableSco
         }
     }
 }
+
+
+
 }
 }
 }

@@ -37,8 +37,8 @@ namespace MaxLairInternal{
 
 StateMachineAction run_state_iteration(
     AdventureRuntime& runtime, size_t console_index,
-    ProgramEnvironment& env,
-    ConsoleHandle& console, bool save_path,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
+    bool save_path,
     GlobalStateTracker& global_state,
     const EndBattleDecider& decider,
     const QImage& entrance
@@ -65,7 +65,7 @@ StateMachineAction run_state_iteration(
     FrozenImageDetector frozen_screen(COLOR_CYAN, {0, 0, 1, 0.5}, std::chrono::seconds(30), 10);
 
     int result = wait_until(
-        env, console,
+        env, context, console,
         std::chrono::seconds(300),
         {
             starting
@@ -91,7 +91,7 @@ StateMachineAction run_state_iteration(
             return StateMachineAction::KEEP_GOING;
         }else{
             console.log("Current State: " + STRING_POKEMON + " Swap");
-            run_swap_pokemon(runtime, env, console, global_state, runtime.console_settings[console_index]);
+            run_swap_pokemon(runtime, env, context, console, global_state, runtime.console_settings[console_index]);
             return StateMachineAction::KEEP_GOING;
         }
     case 1:
@@ -100,16 +100,16 @@ StateMachineAction run_state_iteration(
         return StateMachineAction::KEEP_GOING;
     case 2:
         console.log("Current State: Item Select");
-        run_item_select(env, console, global_state);
+        run_item_select(env, context, console, global_state);
         return StateMachineAction::KEEP_GOING;
     case 3:
         console.log("Current State: Professor Swap");
-        run_professor_swap(runtime, env, console, global_state);
+        run_professor_swap(runtime, env, context, console, global_state);
         return StateMachineAction::KEEP_GOING;
     case 4:
         console.log("Current State: Move Select");
         return run_move_select(
-            env, console, global_state,
+            env, context, console, global_state,
             runtime.console_settings[console_index],
             battle_menu.dmaxed(),
             battle_menu.cheer()
@@ -118,7 +118,8 @@ StateMachineAction run_state_iteration(
         console.log("Current State: Catch Select");
         return throw_balls(
             runtime,
-            env, console, runtime.console_settings[console_index].language,
+            env, context, console,
+            runtime.console_settings[console_index].language,
             global_state,
             decider
         );
@@ -126,7 +127,7 @@ StateMachineAction run_state_iteration(
         console.log("Current State: Caught Menu");
         return run_caught_screen(
             runtime,
-            env, console,
+            env, context, console,
             global_state, decider,
             entrance
         );

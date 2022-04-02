@@ -36,7 +36,7 @@ OverworldWatcher::OverworldWatcher(const OverworldWatcher_Descriptor& descriptor
 }
 
 
-void OverworldWatcher::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void OverworldWatcher::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     BubbleDetector bubbles;
     ArcDetector arcs;
     QuestMarkDetector quest_marks;
@@ -57,7 +57,7 @@ void OverworldWatcher::program(SingleSwitchProgramEnvironment& env, CancellableS
     watcher.process_frame(env.console.video().snapshot(), std::chrono::system_clock::now());
 #else
     {
-        VisualInferenceSession session(env.scope(), env.console, env.console, env.console);
+        VisualInferenceSession session(env.console, env.scope(), env.console, env.console);
         session += watcher;
         session.run();
     }

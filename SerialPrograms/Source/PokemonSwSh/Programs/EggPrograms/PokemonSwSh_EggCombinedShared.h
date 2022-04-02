@@ -16,10 +16,6 @@
 #include "PokemonSwSh/Options/PokemonSwSh_DateToucher.h"
 #include "PokemonSwSh_EggHelpers.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
-
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{

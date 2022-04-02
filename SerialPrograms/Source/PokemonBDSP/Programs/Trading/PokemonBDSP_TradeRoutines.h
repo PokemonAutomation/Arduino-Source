@@ -29,7 +29,7 @@ struct TradeStats : public StatsTracker{
 
 
 void trade_current_pokemon(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     MultiConsoleErrorState& tracker,
     TradeStats& stats
 );

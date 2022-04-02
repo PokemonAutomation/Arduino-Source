@@ -35,10 +35,10 @@ public:
     ShinyHuntAutonomousRegigigas2(const ShinyHuntAutonomousRegigigas2_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) override;
 
 private:
-    bool kill_and_return(SingleSwitchProgramEnvironment& env) const;
+    bool kill_and_return(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) const;
 
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;

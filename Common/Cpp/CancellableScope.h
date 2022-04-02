@@ -41,20 +41,20 @@ public:
         detach();
     }
 
-    //  Returns true if it was already cancelled.
-    virtual bool cancel() noexcept{
-        if (cancelled()){
-            return true;
-        }
-        return m_cancelled.exchange(true);
-    }
-
-    CancellableScope* scope(){ return m_scope; }
+    CancellableScope* scope() const{ return m_scope; }
 
     bool cancelled() const{
         return m_cancelled.load(std::memory_order_acquire);
     }
     void throw_if_parent_cancelled();
+
+    //  Returns true if it was already cancelled.
+    virtual bool cancel() noexcept{
+        if (cancelled() || m_cancelled.exchange(true)){
+            return true;
+        }
+        return false;
+    }
 
 protected:
     //  If you inherit from this class, you may need to manually call this in the
@@ -76,9 +76,9 @@ public:
     CancellableScope(CancellableScope& parent);
     virtual ~CancellableScope() override;
 
-    void throw_if_cancelled();  //  Throws "OperationCanceledException" if this scope has been cancelled.
-
     virtual bool cancel() noexcept override;
+
+    void throw_if_cancelled();  //  Throws "OperationCanceledException" if this scope has been cancelled.
 
     void wait_for(std::chrono::milliseconds duration);
     void wait_until(std::chrono::system_clock::time_point stop);

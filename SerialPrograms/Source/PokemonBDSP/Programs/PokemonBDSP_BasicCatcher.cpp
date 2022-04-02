@@ -92,8 +92,7 @@ int16_t move_to_ball(
 
 
 CatchResults throw_balls(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     Language language,
     const std::string& ball_slug
 ){
@@ -135,7 +134,7 @@ CatchResults throw_balls(
         ExperienceGainWatcher experience_detector;
         SelectionArrowFinder own_fainted_detector(console, {0.18, 0.64, 0.46, 0.3}, COLOR_YELLOW);
         int result = wait_until(
-            env, console,
+            env, context, console,
             std::chrono::seconds(60),
             {
                 &menu_detector,
@@ -165,15 +164,14 @@ CatchResults throw_balls(
 
 
 CatchResults basic_catcher(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     Language language,
     const std::string& ball_slug
 ){
     console.botbase().wait_for_all_requests();
     env.log("Attempting to catch with: " + ball_slug);
 
-    CatchResults results = throw_balls(env, console, language, ball_slug);
+    CatchResults results = throw_balls(env, context, console, language, ball_slug);
     const QString s = (results.balls_used <= 1 ? "" : "s");
     const QString pokeball_str = QString::number(results.balls_used) + " " +
         QString(ball_slug.c_str()) + s;
@@ -216,7 +214,7 @@ CatchResults basic_catcher(
         //  Look for the pokemon caught screen.
         ReceivePokemonDetector caught_detector;
         int ret = run_until(
-            env, console,
+            env, context, console,
             [=](const BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },

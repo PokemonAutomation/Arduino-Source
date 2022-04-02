@@ -78,7 +78,7 @@ std::unique_ptr<StatsTracker> GalladeFinder::make_stats() const{
 }
 
 
-void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env){
+void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     // NOTE: there's no "stunned by alpha" detection in case the first spawn is an alpha!
     // NOTE: there is also no mitigation for if you get attacked by a Kirlia if it hates you
     Stats& stats = env.stats<Stats>();
@@ -88,7 +88,7 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env){
     // program should be started right in front of the entrance
     // so enter the sub region
     env.console.log("Entering Snowpoint Temple...");
-    mash_A_to_enter_sub_area(env, env.console);
+    mash_A_to_enter_sub_area(env, context, env.console);
 
     env.console.log("Beginning navigation to the Alpha Gallade...");
     // start the shiny detection, there's nothing initially
@@ -96,7 +96,7 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env){
     {
         ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
         run_until(
-            env, env.console,
+            env, context, env.console,
             [](const BotBaseContext& context){
                 // forward portion
                 pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, (uint16_t)(6.8 * TICKS_PER_SECOND)); // forward while running until stairs, mash y a few times down the stairs
@@ -141,11 +141,11 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env){
     env.console.log("No shiny detected, restarting the game!");
 
     pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-    reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+    reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 }
 
 
-void GalladeFinder::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void GalladeFinder::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.
@@ -160,11 +160,11 @@ void GalladeFinder::program(SingleSwitchProgramEnvironment& env, CancellableScop
             stats.to_str()
         );
         try{
-            run_iteration(env);
+            run_iteration(env, context);
         }catch (OperationFailedException&){
             stats.errors++;
             pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
     }
 

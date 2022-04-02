@@ -27,7 +27,7 @@ public:
     //  Return false if an unexpected battle happens where the battle menu is detected but
     //  not the starting animation.
     //  Throw exception if inference times out after Sweet Scent is used.
-    bool find_encounter(SingleSwitchProgramEnvironment& env) const;
+    bool find_encounter(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) const;
 
 private:
     //  Move character up and down or left and right once.

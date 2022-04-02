@@ -160,7 +160,7 @@ void GodEggItemDupe::run_program(SingleSwitchProgramEnvironment& env, uint16_t a
     }
 }
 
-void GodEggItemDupe::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void GodEggItemDupe::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);

@@ -105,7 +105,7 @@ EggHatcher::EggHatcher(const EggHatcher_Descriptor& descriptor)
     PA_ADD_OPTION(SAFETY_TIME);
     PA_ADD_OPTION(HATCH_DELAY);
 }
-void EggHatcher::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void EggHatcher::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     //  Calculate upper bounds for incubation time.
     uint16_t INCUBATION_DELAY_UPPER = (uint16_t)((uint32_t)STEPS_TO_HATCH * (uint32_t)103180 >> 16);
     uint16_t TOTAL_DELAY = INCUBATION_DELAY_UPPER + HATCH_DELAY + SAFETY_TIME - TRAVEL_RIGHT_DURATION;

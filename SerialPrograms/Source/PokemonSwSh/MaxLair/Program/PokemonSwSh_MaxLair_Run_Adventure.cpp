@@ -58,6 +58,7 @@ AdventureResult run_adventure(
     std::atomic<bool> error(false);
 
     env.run_in_parallel([&](ConsoleHandle& console){
+        BotBaseContext context(env.scope(), console);
         StateMachineAction action;
         while (true){
             //  Dump current state, but don't spam if nothing has changed.
@@ -73,7 +74,7 @@ AdventureResult run_adventure(
             size_t index = console.index();
             action = run_state_iteration(
                 runtime, index,
-                env, console, boss_slot != 0 && console.index() == runtime.host_index,
+                env, context, console, boss_slot != 0 && console.index() == runtime.host_index,
                 state_tracker, runtime.actions,
                 entrance[index]
             );
@@ -95,7 +96,7 @@ AdventureResult run_adventure(
                 runtime.session_stats.add_error();
                 error.store(true, std::memory_order_release);
                 pbf_press_button(console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-                reset_game_from_home_with_inference(env, console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+                reset_game_from_home_with_inference(env, context, console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
                 return;
             }
         }
@@ -175,10 +176,11 @@ void loop_adventures(
             }
             env.log("Failed to start adventure. Resetting all Switches...", COLOR_RED);
             env.run_in_parallel([&](ConsoleHandle& console){
+                BotBaseContext context(env.scope(), console);
 //                QImage screen = console.video().snapshot();
 //                dump_image(console, MODULE_NAME, "ResetRecovery", screen);
                 pbf_press_button(console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-                reset_game_from_home_with_inference(env, console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+                reset_game_from_home_with_inference(env, context, console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             });
             continue;
         }

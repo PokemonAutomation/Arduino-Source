@@ -5,17 +5,12 @@
  */
 
 #include <algorithm>
-#include <iostream>
 #include <emmintrin.h>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Microcontroller/MessageProtocol.h"
 #include "Common/Microcontroller/DeviceRoutines.h"
 #include "PABotBase.h"
-
-#include <iostream>
-using std::cout;
-using std::endl;
 
 namespace PokemonAutomation{
 

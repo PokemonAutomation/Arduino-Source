@@ -19,8 +19,7 @@ namespace MaxLairInternal{
 
 StateMachineAction run_caught_screen(
     AdventureRuntime& runtime,
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     GlobalStateTracker& state_tracker,
     const EndBattleDecider& decider,
     const QImage& entrance

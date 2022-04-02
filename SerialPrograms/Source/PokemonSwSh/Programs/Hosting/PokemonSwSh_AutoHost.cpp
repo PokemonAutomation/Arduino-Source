@@ -25,8 +25,7 @@ namespace PokemonSwSh{
 
 
 bool connect_to_internet(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     bool host_online,
     uint16_t connect_to_internet_delay
 ){
@@ -38,7 +37,7 @@ bool connect_to_internet(
         return true;
     }
     if (connect_to_internet_with_inference(
-        env, console,
+        env, context, console,
         std::chrono::seconds(5), connect_to_internet_delay
     )){
         return true;
@@ -131,7 +130,7 @@ void send_raid_notification(
 
 
 void run_autohost(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     Catchability catchability, uint8_t skips,
     const RandomCodeOption* raid_code, uint16_t lobby_wait_delay,
     bool host_online, uint8_t accept_FR_slot,
@@ -155,7 +154,7 @@ void run_autohost(
     console.botbase().wait_for_all_requests();
 
     if (!connect_to_internet(
-        env, console,
+        env, context, console,
         host_online,
         connect_to_internet_delay
     )){

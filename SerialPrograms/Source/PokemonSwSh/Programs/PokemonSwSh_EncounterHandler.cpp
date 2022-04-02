@@ -24,13 +24,12 @@ void take_video(const BotBaseContext& context){
 //    context->wait_for_all_requests();
 }
 void run_away(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     uint16_t exit_battle_time
 ){
     BlackScreenOverWatcher black_screen_detector;
     run_until(
-        env, console,
+        env, context, console,
         [=](const BotBaseContext& context){
             pbf_press_dpad(context, DPAD_UP, 10, 0);
             pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
@@ -46,13 +45,13 @@ void run_away(
 
 
 StandardEncounterHandler::StandardEncounterHandler(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     Language language,
     EncounterBotCommonOptions& settings,
     ShinyHuntTracker& session_stats
 )
     : m_env(env)
+    , m_context(context)
     , m_console(console)
     , m_language(language)
     , m_settings(settings)
@@ -98,7 +97,7 @@ void StandardEncounterHandler::run_away_and_update_stats(
 
     BlackScreenOverWatcher black_screen_detector;
     int ret = run_until(
-        m_env, m_console,
+        m_env, m_context, m_console,
         [=](const BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
             if (exit_battle_time > TICKS_PER_SECOND){
@@ -224,7 +223,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     case EncounterAction::RunAway:
         return false;
     case EncounterAction::ThrowBalls:{
-        CatchResults results = basic_catcher(m_env, m_console, m_language, action.second);
+        CatchResults results = basic_catcher(m_env, m_context, m_console, m_language, action.second);
         switch (results.result){
         case CatchResult::POKEMON_CAUGHT:
         case CatchResult::POKEMON_FAINTED:
@@ -263,7 +262,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         return false;
     }
     case EncounterAction::ThrowBallsAndSave:{
-        CatchResults results = basic_catcher(m_env, m_console, m_language, action.second);
+        CatchResults results = basic_catcher(m_env, m_context, m_console, m_language, action.second);
         switch (results.result){
         case CatchResult::POKEMON_CAUGHT:
             pbf_mash_button(m_console, BUTTON_B, 2 * TICKS_PER_SECOND);

@@ -96,7 +96,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousSwordsOfJustice::make_stats() c
 
 
 
-void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
@@ -111,7 +111,7 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
     env.update_stats();
 
     StandardEncounterHandler handler(
-        env, env.console,
+        env, context, env.console,
         LANGUAGE,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -145,7 +145,7 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
             StandardBattleMenuWatcher battle_menu_detector(false);
             StartBattleWatcher start_back_detector;
             wait_until(
-                env, env.console,
+                env, context, env.console,
                 std::chrono::seconds(30),
                 {
                     &battle_menu_detector,
@@ -156,7 +156,7 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
 
         //  Detect shiny.
         ShinyDetectionResult result = detect_shiny_battle(
-            env, env.console,
+            env, context, env.console,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );

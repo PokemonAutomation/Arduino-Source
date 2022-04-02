@@ -23,7 +23,7 @@ namespace PokemonAutomation{
 class VisualInferenceSession : private Cancellable{
 public:
     VisualInferenceSession(
-        CancellableScope& scope, Logger& logger,
+        Logger& logger, CancellableScope& scope,
         VideoFeed& feed, VideoOverlay& overlay,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)
     );
@@ -60,12 +60,12 @@ private:
 class AsyncVisualInferenceSession : private VisualInferenceSession{
 public:
     AsyncVisualInferenceSession(
-        ProgramEnvironment& env, CancellableScope& scope, Logger& logger,
+        ProgramEnvironment& env, Logger& logger, CancellableScope& scope,
         VideoFeed& feed, VideoOverlay& overlay,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)
     );
     AsyncVisualInferenceSession(
-        ProgramEnvironment& env, CancellableScope& scope, Logger& logger,
+        ProgramEnvironment& env, Logger& logger, CancellableScope& scope,
         VideoFeed& feed, VideoOverlay& overlay,
         std::function<void()> on_finish_callback,
         std::chrono::milliseconds period = std::chrono::milliseconds(50)

@@ -54,8 +54,7 @@ int move_to_ball(
 //  Returns the quantity of the ball.
 //  Returns -1 if unable to read.
 int16_t move_to_ball(
-    const BattleBallReader& reader,
-    ConsoleHandle& console,
+    const BattleBallReader& reader, const BotBaseContext& context, ConsoleHandle& console,
     const std::string& ball_slug
 ){
     //  Search forward at high speed.
@@ -87,8 +86,7 @@ int16_t move_to_ball(
 
 
 CatchResults throw_balls(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     Language language,
     const std::string& ball_slug
 ){
@@ -100,7 +98,7 @@ CatchResults throw_balls(
             pbf_mash_button(console, BUTTON_X, 125);
             console.botbase().wait_for_all_requests();
 
-            bool success = move_to_ball(reader, console, ball_slug);
+            bool success = move_to_ball(reader, context, console, ball_slug);
             if (!success){
                 return {CatchResult::OUT_OF_BALLS, balls_used};
             }
@@ -115,7 +113,7 @@ CatchResults throw_balls(
         StandardBattleMenuWatcher menu_detector(false);
         ExperienceGainWatcher experience_detector;
         int result = wait_until(
-            env, console,
+            env, context, console,
             std::chrono::seconds(60),
             {
                 &menu_detector,
@@ -142,15 +140,14 @@ CatchResults throw_balls(
 
 
 CatchResults basic_catcher(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     Language language,
     const std::string& ball_slug
 ){
     console.botbase().wait_for_all_requests();
     env.log("Attempting to catch with: " + ball_slug);
 
-    CatchResults results = throw_balls(env, console, language, ball_slug);
+    CatchResults results = throw_balls(env, context, console, language, ball_slug);
     if (results.result == CatchResult::OUT_OF_BALLS){
         return results;
     }
@@ -169,7 +166,7 @@ CatchResults basic_catcher(
     {
         BlackScreenOverWatcher black_screen_detector;
         run_until(
-            env, console,
+            env, context, console,
             [=](const BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
@@ -182,7 +179,7 @@ CatchResults basic_catcher(
         ReceivePokemonDetector caught_detector;
 
         int result = run_until(
-            env, console,
+            env, context, console,
             [=](const BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 4 * TICKS_PER_SECOND);
             },
@@ -204,7 +201,7 @@ CatchResults basic_catcher(
     {
         BlackScreenOverWatcher black_screen_detector;
         run_until(
-            env, console,
+            env, context, console,
             [=](const BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
             },

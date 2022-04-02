@@ -19,9 +19,6 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
 
 static RaidLobbyState raid_lobby_wait(
     ConsoleHandle& console,

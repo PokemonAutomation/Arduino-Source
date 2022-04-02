@@ -12,10 +12,6 @@
 #include "PokemonSwSh_PkmnLib_Types.h"
 #include "PokemonSwSh_PkmnLib_Moves.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
-
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{

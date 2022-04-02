@@ -22,7 +22,7 @@ namespace MaxLairInternal{
 
 void run_professor_swap(
     AdventureRuntime& runtime,
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     GlobalStateTracker& state_tracker
 ){
     size_t console_index = console.index();
@@ -57,7 +57,7 @@ void run_professor_swap(
     {
         BlackScreenWatcher detector;
         int result = run_until(
-            env, console,
+            env, context, console,
             [&](const BotBaseContext& context){
                 pbf_mash_button(context, swap ? BUTTON_A : BUTTON_B, 30 * TICKS_PER_SECOND);
             },
@@ -73,7 +73,7 @@ void run_professor_swap(
     {
         PathScreenDetector detector;
         int result = wait_until(
-            env, console,
+            env, context, console,
             std::chrono::seconds(30),
             { &detector },
             INFERENCE_RATE

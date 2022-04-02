@@ -74,7 +74,7 @@ CurryHunter::CurryHunter(const CurryHunter_Descriptor& descriptor)
 
 
 
-void CurryHunter::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void CurryHunter::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
@@ -153,7 +153,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, CancellableScope&
 //                env.console, env.console,
 //                ImageFloatBox(0.1, 0.01, 0.8, 0.77)
 //            );
-            AsyncVisualInferenceSession inference(env, env.scope(), env.console, env.console, env.console);
+            AsyncVisualInferenceSession inference(env, env.console, env.scope(), env.console, env.console);
             inference += receive_detector;
 //            inference += shiny_detector;
 

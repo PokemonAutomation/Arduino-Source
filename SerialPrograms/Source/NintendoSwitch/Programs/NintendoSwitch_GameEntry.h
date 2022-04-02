@@ -15,8 +15,7 @@ namespace NintendoSwitch{
 
 
 void open_game_from_home(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     bool tolerate_update_menu,
     uint8_t game_slot,
     uint8_t user_slot,
@@ -24,7 +23,7 @@ void open_game_from_home(
 );
 
 bool openedgame_to_gamemenu(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     uint16_t timeout
 );
 

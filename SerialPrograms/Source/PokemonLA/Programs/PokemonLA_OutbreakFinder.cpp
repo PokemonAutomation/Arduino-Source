@@ -92,7 +92,7 @@ std::unique_ptr<StatsTracker> OutbreakFinder::make_stats() const{
 
 
 bool OutbreakFinder::read_outbreaks(
-    SingleSwitchProgramEnvironment& env,
+    SingleSwitchProgramEnvironment& env, const BotBaseContext& context,
     MapRegion& current_region,
     const std::set<std::string>& desired
 ){
@@ -108,7 +108,7 @@ bool OutbreakFinder::read_outbreaks(
     current_region = MapRegion::NONE;
     size_t matches = 0;
     while (true){
-        current_region = detect_selected_region(env, env.console);
+        current_region = detect_selected_region(env, context, env.console);
         if (current_region == MapRegion::NONE){
             env.console.log("Unable to detect selected region.", COLOR_RED);
             return false;
@@ -150,7 +150,7 @@ bool OutbreakFinder::read_outbreaks(
     //  Scroll to next region without an outbreak.
     if (no_outbreak != MapRegion::NONE){
         while (true){
-            current_region = detect_selected_region(env, env.console);
+            current_region = detect_selected_region(env, context, env.console);
             if (current_region == MapRegion::NONE){
                 env.console.log("Unable to detect selected region.", COLOR_RED);
                 return false;
@@ -165,10 +165,10 @@ bool OutbreakFinder::read_outbreaks(
 
     return false;
 }
-void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env, MapRegion region){
+void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env, const BotBaseContext& context, MapRegion region){
     Stats& stats = env.stats<Stats>();
 
-    mash_A_to_change_region(env, env.console);
+    mash_A_to_change_region(env, context, env.console);
 
     Camp camp = Camp::FIELDLANDS_FIELDLANDS;
     switch (region){
@@ -190,7 +190,7 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
     default:
         throw InternalProgramError(&env.console.logger(), PA_CURRENT_FUNCTION, "Invalid region.");
     }
-    goto_professor(env.console, camp);
+    goto_professor(env.console, context, camp);
 
 
     while (true){
@@ -201,7 +201,7 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
             std::chrono::milliseconds(200), true
         );
         int ret = run_until(
-            env, env.console,
+            env, context, env.console,
             [](const BotBaseContext& context){
                 for (size_t c = 0; c < 10; c++){
                     pbf_press_button(context, BUTTON_A, 20, 125);
@@ -219,11 +219,14 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
         stats.errors++;
     }
 
-    mash_A_to_change_region(env, env.console);
+    mash_A_to_change_region(env, context, env.console);
 }
 
 
-bool OutbreakFinder::run_iteration(SingleSwitchProgramEnvironment& env, const std::set<std::string>& desired){
+bool OutbreakFinder::run_iteration(
+    SingleSwitchProgramEnvironment& env, const BotBaseContext& context,
+    const std::set<std::string>& desired
+){
     Stats& stats = env.stats<Stats>();
 
     //  Enter map.
@@ -231,7 +234,7 @@ bool OutbreakFinder::run_iteration(SingleSwitchProgramEnvironment& env, const st
 
     MapDetector detector;
     int ret = run_until(
-        env, env.console,
+        env, context, env.console,
         [](const BotBaseContext& context){
             for (size_t c = 0; c < 10; c++){
                 pbf_press_button(context, BUTTON_A, 20, 105);
@@ -248,7 +251,7 @@ bool OutbreakFinder::run_iteration(SingleSwitchProgramEnvironment& env, const st
 
 
     MapRegion current_region;
-    if (read_outbreaks(env, current_region, desired)){
+    if (read_outbreaks(env, context, current_region, desired)){
         return true;
     }
     if (current_region == MapRegion::NONE){
@@ -265,14 +268,14 @@ bool OutbreakFinder::run_iteration(SingleSwitchProgramEnvironment& env, const st
     );
 
     //  Go to region and return.
-    goto_region_and_return(env, current_region);
+    goto_region_and_return(env, context, current_region);
 
     return false;
 }
 
 
 
-void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     std::set<std::string> desired;
@@ -282,7 +285,7 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, CancellableSco
 
 
     while (true){
-        if (run_iteration(env, desired)){
+        if (run_iteration(env, context, desired)){
             break;
         }
     }

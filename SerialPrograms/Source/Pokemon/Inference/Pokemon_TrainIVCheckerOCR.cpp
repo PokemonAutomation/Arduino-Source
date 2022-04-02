@@ -15,10 +15,6 @@
 #include "CommonFramework/OCR/OCR_TrainingTools.h"
 #include "Pokemon_TrainIVCheckerOCR.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
-
 namespace PokemonAutomation{
 namespace Pokemon{
 

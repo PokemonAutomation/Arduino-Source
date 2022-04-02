@@ -45,11 +45,11 @@ ActivateMenuGlitch112::ActivateMenuGlitch112(const ActivateMenuGlitch112_Descrip
 
 
 
-void trigger_menu(ProgramEnvironment& env, ConsoleHandle& console){
+void trigger_menu(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console){
     console.botbase().wait_for_all_requests();
     MapWatcher detector;
     int ret = run_until(
-        env, console,
+        env, context, console,
         [](const BotBaseContext& context){
             for (size_t i = 0; i < 12; i++){
                 for (size_t c = 0; c < 42; c++){
@@ -76,15 +76,15 @@ void trigger_menu(ProgramEnvironment& env, ConsoleHandle& console){
         console.botbase().wait_for_all_requests();
     }
 }
-void trigger_map_overlap(ProgramEnvironment& env, ConsoleHandle& console){
+void trigger_map_overlap(ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console){
     for (size_t c = 0; c < 10; c++){
-        trigger_menu(env, console);
+        trigger_menu(env, context, console);
 
         pbf_press_dpad(console, DPAD_UP, 50, 0);
         console.botbase().wait_for_all_requests();
         BlackScreenWatcher detector;
         int ret = wait_until(
-            env, console, std::chrono::seconds(4),
+            env, context, console, std::chrono::seconds(4),
             { &detector }
         );
         if (ret >= 0){
@@ -100,10 +100,10 @@ void trigger_map_overlap(ProgramEnvironment& env, ConsoleHandle& console){
 
 
 
-void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     ConsoleHandle& console = env.console;
 
-    trigger_map_overlap(env, console);
+    trigger_map_overlap(env, context, console);
     pbf_wait(console, 3 * TICKS_PER_SECOND);
 
     //  Move to escalator.
@@ -122,7 +122,7 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, Cancell
         console.botbase().wait_for_all_requests();
         BlackScreenWatcher detector;
         int ret = run_until(
-            env, console,
+            env, context, console,
             [](const BotBaseContext& context){
                 for (size_t c = 0; c < 5; c++){
                     pbf_press_dpad(context, DPAD_LEFT, 20, 105);

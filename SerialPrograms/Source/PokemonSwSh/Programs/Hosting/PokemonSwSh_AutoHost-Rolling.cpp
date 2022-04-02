@@ -132,7 +132,7 @@ std::unique_ptr<StatsTracker> AutoHostRolling::make_stats() const{
 
 
 
-void AutoHostRolling::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void AutoHostRolling::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     uint16_t start_raid_delay = HOST_ONLINE
         ? OPEN_ONLINE_DEN_LOBBY_DELAY
         : GameSettings::instance().OPEN_LOCAL_DEN_LOBBY_DELAY;
@@ -158,7 +158,7 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env, CancellableSc
         env.update_stats();
 
         run_autohost(
-            env, env.console,
+            env, context, env.console,
             CATCHABILITY, SKIPS,
             &RAID_CODE, lobby_wait_delay,
             HOST_ONLINE, FRIEND_ACCEPT_USER_SLOT,
@@ -186,7 +186,7 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env, CancellableSc
         }
 
         start_game_from_home_with_inference(
-            env, env.console,
+            env, context, env.console,
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW,
             ALTERNATE_GAMES ? 2 : 0, 0,
             BACKUP_SAVE

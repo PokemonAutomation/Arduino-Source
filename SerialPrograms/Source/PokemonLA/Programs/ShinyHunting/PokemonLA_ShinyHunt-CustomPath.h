@@ -36,11 +36,11 @@ public:
     ShinyHuntCustomPath(const ShinyHuntCustomPath_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) override;
 
 private:
     // Run the custom path on overworld.
-    void run_path(SingleSwitchProgramEnvironment& env);
+    void run_path(SingleSwitchProgramEnvironment& env, const BotBaseContext& context);
 
     // Do one action (while ignoring listen-related actions)
     void do_non_listen_action(SingleSwitchProgramEnvironment& env, size_t action_index);

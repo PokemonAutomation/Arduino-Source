@@ -16,13 +16,12 @@ namespace PokemonBDSP{
 
 
 bool run_from_battle(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     uint16_t exit_battle_time
 ){
     BlackScreenOverWatcher black_screen_detector;
     int ret = run_until(
-        env, console,
+        env, context, console,
         [=](const BotBaseContext& context){
             pbf_mash_button(context, BUTTON_ZL, TICKS_PER_SECOND);
             if (exit_battle_time > TICKS_PER_SECOND){

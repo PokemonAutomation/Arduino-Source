@@ -56,13 +56,13 @@ public:
     IngoBattleGrinder(const IngoBattleGrinder_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) override;
 
 private:
-    bool run_iteration(SingleSwitchProgramEnvironment& env);
+    bool run_iteration(SingleSwitchProgramEnvironment& env, const BotBaseContext& context);
 
     //  Returns true if version 1.0.
-    bool start_dialog(SingleSwitchProgramEnvironment& env);
+    bool start_dialog(SingleSwitchProgramEnvironment& env, const BotBaseContext& context);
 
     // cur_pokemon: which pokemon is currently on the field, in terms of battle order
     // The first pokemon sent to the battle has cur_pokemon == 0

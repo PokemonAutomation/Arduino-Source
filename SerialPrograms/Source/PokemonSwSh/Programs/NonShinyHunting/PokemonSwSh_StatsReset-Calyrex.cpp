@@ -137,7 +137,7 @@ std::unique_ptr<StatsTracker> StatsResetCalyrex::make_stats() const{
 
 
 
-void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
@@ -157,7 +157,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, Cancellable
             {
                 StandardBattleMenuWatcher fight_detector(false);
                 int result = run_until(
-                    env, env.console,
+                    env, context, env.console,
                     [=](const BotBaseContext& context){
                     while (true){
                         pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
@@ -172,7 +172,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, Cancellable
             }
 
             pbf_mash_button(env.console, BUTTON_B, 1 * TICKS_PER_SECOND);
-            CatchResults result = basic_catcher(env, env.console, LANGUAGE, BALL_SELECT.slug());
+            CatchResults result = basic_catcher(env, context, env.console, LANGUAGE, BALL_SELECT.slug());
             switch (result.result){
             case CatchResult::POKEMON_CAUGHT:
                 calyrex_caught = true;
@@ -214,7 +214,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, Cancellable
             if (!calyrex_caught){
                 pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
                 reset_game_from_home_with_inference(
-                    env, env.console,
+                    env, context, env.console,
                     ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
                 );
             }
@@ -284,7 +284,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, Cancellable
         if (!match_found){
             pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
             reset_game_from_home_with_inference(
-                env, env.console,
+                env, context, env.console,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
             );
         }

@@ -34,7 +34,7 @@ public:
 public:
     GenerateNameOCRDataPokedex(const GenerateNameOCRDataPokedex_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) override;
 
 private:
     void read(

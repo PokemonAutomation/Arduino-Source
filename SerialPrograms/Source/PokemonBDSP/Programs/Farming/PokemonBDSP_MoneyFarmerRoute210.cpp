@@ -114,7 +114,7 @@ std::unique_ptr<StatsTracker> MoneyFarmerRoute210::make_stats() const{
 }
 
 
-bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, uint8_t pp0[4], uint8_t pp1[4]){
+bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, const BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]){
     Stats& stats = env.stats<Stats>();
 
     env.log("Starting battle!");
@@ -122,7 +122,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
     {
         StartBattleDetector detector(env.console);
         int ret = run_until(
-            env, env.console,
+            env, context, env.console,
             [=](const BotBaseContext& context){
                 pbf_press_button(context, BUTTON_ZL, 10, 10);
                 for (size_t c = 0; c < 17; c++){
@@ -154,7 +154,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
         EndBattleWatcher end_battle;
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         int ret = run_until(
-            env, env.console,
+            env, context, env.console,
             [=](const BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
@@ -280,8 +280,7 @@ void MoneyFarmerRoute210::fly_to_center_heal_and_return(ConsoleHandle& console, 
 }
 
 bool MoneyFarmerRoute210::heal_after_battle_and_return(
-    SingleSwitchProgramEnvironment& env,
-    ConsoleHandle& console,
+    SingleSwitchProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     uint8_t pp0[4], uint8_t pp1[4])
 {
     if (HEALING_METHOD == 0){
@@ -290,7 +289,7 @@ bool MoneyFarmerRoute210::heal_after_battle_and_return(
         return false;
     }else{
         // Use Global Room to heal the party.
-        heal_by_global_room(env, console);
+        heal_by_global_room(env, context, console);
 
         pp0[0] = MON0_MOVE1_PP;
         pp0[1] = MON0_MOVE2_PP;
@@ -317,7 +316,7 @@ bool MoneyFarmerRoute210::has_pp(uint8_t pp0[4], uint8_t pp1[4]){
 
 
 
-void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     uint8_t pp0[4] = {
@@ -342,7 +341,7 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, Cancellab
         need_to_charge = false;
     }else{
         if (HEALING_METHOD == 1){
-            heal_by_global_room(env, env.console);
+            heal_by_global_room(env, context, env.console);
         }
         pbf_move_left_joystick(env.console, 255, 128, 140, 0);
     }
@@ -375,7 +374,7 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, Cancellab
         {
             VSSeekerReactionTracker tracker(env.console, {0.20, 0.20, 0.60, 0.60});
             run_until(
-                env, env.console,
+                env, context, env.console,
                 [=](const BotBaseContext& context){
                     SHORTCUT.run(context, TICKS_PER_SECOND);
 
@@ -397,11 +396,11 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, Cancellab
             env.log("Reaction at: " + std::to_string(box.min_x), COLOR_BLUE);
         }
 
-        if (this->battle(env, pp0, pp1)){
+        if (this->battle(env, context, pp0, pp1)){
             return;
         }
         if (!has_pp(pp0, pp1)){
-            need_to_charge = heal_after_battle_and_return(env, env.console, pp0, pp1);
+            need_to_charge = heal_after_battle_and_return(env, context, env.console, pp0, pp1);
             continue;
         }
     }

@@ -10,10 +10,6 @@
 #include "PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h"
 #include "Pokemon_BallSelectWidget.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
-
 namespace PokemonAutomation{
 namespace Pokemon{
 

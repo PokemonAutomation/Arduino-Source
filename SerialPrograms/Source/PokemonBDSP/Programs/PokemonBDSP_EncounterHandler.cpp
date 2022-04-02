@@ -31,13 +31,13 @@ void take_video(const BotBaseContext& context){
 
 
 StandardEncounterHandler::StandardEncounterHandler(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     Language language,
     EncounterBotCommonOptions& settings,
     PokemonSwSh::ShinyHuntTracker& session_stats
 )
     : m_env(env)
+    , m_context(context)
     , m_console(console)
     , m_language(language)
     , m_settings(settings)
@@ -64,7 +64,7 @@ void StandardEncounterHandler::run_away_due_to_error(uint16_t exit_battle_time){
     pbf_press_dpad(m_console, DPAD_DOWN, 3 * TICKS_PER_SECOND, 0);
     m_console.botbase().wait_for_all_requests();
 
-    run_from_battle(m_env, m_console, exit_battle_time);
+    run_from_battle(m_env, m_context, m_console, exit_battle_time);
 }
 
 std::vector<EncounterResult> StandardEncounterHandler::results(StandardEncounterDetection& encounter){
@@ -218,19 +218,19 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         pbf_press_dpad(m_console, DPAD_UP, 20, 0);
         m_console.botbase().wait_for_all_requests();
 
-        run_from_battle(m_env, m_console, exit_battle_time);
+        run_from_battle(m_env, m_context, m_console, exit_battle_time);
         return false;
 
     case EncounterAction::ThrowBalls:
     case EncounterAction::ThrowBallsAndSave:{
-        CatchResults catch_result = basic_catcher(m_env, m_console, m_language, action.pokeball_slug);
+        CatchResults catch_result = basic_catcher(m_env, m_context, m_console, m_language, action.pokeball_slug);
         switch (catch_result.result){
         case CatchResult::POKEMON_CAUGHT:
             m_session_stats.add_caught();
             m_env.update_stats();
             if (action.action == EncounterAction::ThrowBallsAndSave){
                 //  Save the game
-                save_game(m_env, m_console);
+                save_game(m_env, m_context, m_console);
             }
             break;
         case CatchResult::POKEMON_FAINTED:

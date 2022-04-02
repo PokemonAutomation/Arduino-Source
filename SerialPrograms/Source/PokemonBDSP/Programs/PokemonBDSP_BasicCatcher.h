@@ -47,8 +47,7 @@ struct CatchResults{
 //
 // Don't handle the case that own pokemon evolving or black out to Pokecenter.
 CatchResults basic_catcher(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     Language language,
     const std::string& ball_slug
 );

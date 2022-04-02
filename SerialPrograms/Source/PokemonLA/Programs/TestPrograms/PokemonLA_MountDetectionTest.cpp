@@ -41,11 +41,11 @@ MountDetectionTest::MountDetectionTest(const MountDetectionTest_Descriptor& desc
 }
 
 
-void MountDetectionTest::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void MountDetectionTest::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
 
     MountTracker tracker(env.console, (MountDetectorLogging)(size_t)FAILED_ACTION);
     VisualInferenceSession session(
-        env.scope(), env.console,
+        env.console, env.scope(),
         env.console, env.console,
         std::chrono::seconds(1)
     );

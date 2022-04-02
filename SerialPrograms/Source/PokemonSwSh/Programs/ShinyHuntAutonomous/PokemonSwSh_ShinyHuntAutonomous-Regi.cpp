@@ -93,7 +93,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegi::make_stats() const{
 
 
 
-void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
@@ -105,7 +105,7 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env, Cance
     env.update_stats();
 
     StandardEncounterHandler handler(
-        env, env.console,
+        env, context, env.console,
         LANGUAGE,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -137,7 +137,7 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env, Cance
 
         //  Detect shiny.
         ShinyDetectionResult result = detect_shiny_battle(
-            env, env.console,
+            env, context, env.console,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );
@@ -145,7 +145,7 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env, Cance
         if (result.shiny_type == ShinyType::UNKNOWN){
             stats.add_error();
             pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
-            run_away(env, env.console, EXIT_BATTLE_TIMEOUT);
+            run_away(env, context, env.console, EXIT_BATTLE_TIMEOUT);
             error = true;
             continue;
         }

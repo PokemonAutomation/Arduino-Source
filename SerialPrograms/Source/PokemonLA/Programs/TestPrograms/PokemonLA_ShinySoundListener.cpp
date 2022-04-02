@@ -48,7 +48,7 @@ ShinySoundListener::ShinySoundListener(const ShinySoundListener_Descriptor& desc
 
 void searchShinySoundFromAudioDump();
 
-void ShinySoundListener::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void ShinySoundListener::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     //  Connect the controller.
     // pbf_move_right_joystick(env.console, 0, 255, 10, 0);
 
@@ -69,7 +69,7 @@ void ShinySoundListener::program(SingleSwitchProgramEnvironment& env, Cancellabl
     ShinySoundDetector detector(env.console, STOP_ON_SHINY_SOUND);
 
 #if 1
-    AudioInferenceSession session(env.scope(), env.console, env.console);
+    AudioInferenceSession session(env.console, env.scope(), env.console);
     session += detector;
 
     session.run();

@@ -29,7 +29,7 @@ struct AudioInferenceSession::Callback{
 
 
 AudioInferenceSession::AudioInferenceSession(
-    CancellableScope& scope, Logger& logger,
+    Logger& logger, CancellableScope& scope,
     AudioFeed& feed,
     std::chrono::milliseconds period
 )
@@ -39,13 +39,13 @@ AudioInferenceSession::AudioInferenceSession(
     , m_period(period)
 {}
 AudioInferenceSession::~AudioInferenceSession(){
+    detach();
     AudioInferenceSession::cancel();
 }
 bool AudioInferenceSession::cancel() noexcept{
     if (Cancellable::cancel()){
         return true;
     }
-    detach();
     {
         std::unique_lock<std::mutex> lg(m_lock);
         m_cv.notify_all();
@@ -163,21 +163,21 @@ AudioInferenceCallback* AudioInferenceSession::run(std::chrono::system_clock::ti
 
 
 AsyncAudioInferenceSession::AsyncAudioInferenceSession(
-    ProgramEnvironment& env, CancellableScope& scope, Logger& logger,
+    ProgramEnvironment& env, Logger& logger, CancellableScope& scope,
     AudioFeed& feed,
     std::chrono::milliseconds period
 )
-    : AudioInferenceSession(scope, logger, feed, period)
+    : AudioInferenceSession(logger, scope, feed, period)
     , m_triggering_callback(nullptr)
     , m_task(env.inference_dispatcher().dispatch([this]{ thread_body(); }))
 {}
 AsyncAudioInferenceSession::AsyncAudioInferenceSession(
-    ProgramEnvironment& env, CancellableScope& scope, Logger& logger,
+    ProgramEnvironment& env, Logger& logger, CancellableScope& scope,
     AudioFeed& feed,
     std::function<void()> on_finish_callback,
     std::chrono::milliseconds period
 )
-    : AudioInferenceSession(scope, logger, feed, period)
+    : AudioInferenceSession(logger, scope, feed, period)
     , m_on_finish_callback(std::move(on_finish_callback))
     , m_triggering_callback(nullptr)
     , m_task(env.inference_dispatcher().dispatch([this]{ thread_body(); }))

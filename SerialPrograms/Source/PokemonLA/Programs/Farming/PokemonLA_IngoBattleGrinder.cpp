@@ -137,12 +137,12 @@ std::unique_ptr<StatsTracker> IngoBattleGrinder::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-bool IngoBattleGrinder::start_dialog(SingleSwitchProgramEnvironment& env){
+bool IngoBattleGrinder::start_dialog(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     {
         ButtonDetector button0(env.console, env.console, ButtonType::ButtonA, {0.50, 0.450, 0.40, 0.042}, std::chrono::milliseconds(100), true);
         ButtonDetector button1(env.console, env.console, ButtonType::ButtonA, {0.50, 0.492, 0.40, 0.042}, std::chrono::milliseconds(100), true);
         int ret = run_until(
-            env, env.console,
+            env, context, env.console,
             [&](const BotBaseContext& context){
                 for (size_t c = 0; c < 10; c++){
                     pbf_press_button(context, BUTTON_A, 20, 150);
@@ -165,7 +165,7 @@ bool IngoBattleGrinder::start_dialog(SingleSwitchProgramEnvironment& env){
 
     ButtonDetector button2(env.console, env.console, ButtonType::ButtonA, {0.50, 0.350, 0.40, 0.400}, std::chrono::milliseconds(100), true);
     int ret = run_until(
-        env, env.console,
+        env, context, env.console,
         [&](const BotBaseContext& context){
             for (size_t c = 0; c < 5; c++){
                 pbf_press_button(context, BUTTON_A, 20, 150);
@@ -235,7 +235,7 @@ void IngoBattleGrinder::switch_pokemon(SingleSwitchProgramEnvironment& env, size
     }
 }
 
-bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
+bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     // The location of the move slots when choosing which move to use during battle.
@@ -252,7 +252,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
 
     // Talk to Ingo to start conversation and select regular battles:
     // The dialogues are different between version 10 (the vanilla version) and later versions.
-    bool version_10 = start_dialog(env);
+    bool version_10 = start_dialog(env, context);
 
     IngoOpponentMenuLocation menu_location = version_10
         ? INGO_OPPONENT_MENU_LOCATIONS_V10[OPPONENT]
@@ -299,7 +299,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
         NormalDialogDetector normal_dialogue_detector(env.console, env.console, stop_on_detected);
         ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(200), stop_on_detected);
         int ret = wait_until(
-            env, env.console, std::chrono::minutes(2),
+            env, context, env.console, std::chrono::minutes(2),
             {
                 &battle_menu_detector,
                 &dialogue_ellipse_detector,
@@ -411,7 +411,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env){
 
 
 
-void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.
@@ -440,7 +440,7 @@ void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env, Cancellable
             stats.to_str()
         );
         try{
-            if (run_iteration(env)){
+            if (run_iteration(env, context)){
                 break;
             }
         }catch (OperationFailedException&){

@@ -113,14 +113,14 @@ ShinyType determine_shiny_status(
 
 
 ShinyDetectionResult detect_shiny_battle(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     const ShinyDetectionBattle& battle_settings,
     std::chrono::seconds timeout,
     double detection_threshold
 ){
     ShinyEncounterTracker tracker(console, console, battle_settings);
     int result = wait_until(
-        env, console, timeout,
+        env, context, console, timeout,
         { &tracker }
     );
     if (result < 0){

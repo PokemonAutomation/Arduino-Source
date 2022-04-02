@@ -53,7 +53,7 @@ AsyncCommandSession::~AsyncCommandSession(){
         m_logger.log("AsyncCommandSession::stop_session() not called before normal destruction.", COLOR_RED);
     }
     detach();
-    cancel();
+    AsyncCommandSession::cancel();
     //  Thread is automatically joined by m_task destructor.
 }
 

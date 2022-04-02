@@ -43,7 +43,7 @@ FastCodeEntry::FastCodeEntry(const FastCodeEntry_Descriptor& descriptor)
     PA_ADD_OPTION(INITIAL_DELAY);
 }
 
-void FastCodeEntry::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void FastCodeEntry::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     uint8_t code[8];
     RAID_CODE.to_str(code);
 

@@ -31,7 +31,7 @@ namespace MaxLairInternal{
 
 bool read_battle_menu(
     ProgramEnvironment& env,
-    ConsoleHandle& console, size_t player_index,
+    const BotBaseContext& context, ConsoleHandle& console, size_t player_index,
     GlobalState& state,
     const ConsoleSpecificOptions& settings,
     bool currently_dmaxed, bool cheer_only
@@ -194,7 +194,7 @@ bool read_battle_menu(
 
 StateMachineAction run_move_select(
     ProgramEnvironment& env,
-    ConsoleHandle& console,
+    const BotBaseContext& context, ConsoleHandle& console,
     GlobalStateTracker& state_tracker,
     const ConsoleSpecificOptions& settings,
     bool currently_dmaxed, bool cheer_only
@@ -206,7 +206,7 @@ StateMachineAction run_move_select(
 
 
     if (!read_battle_menu(
-        env, console, player_index,
+        env, context, console, player_index,
         state, settings,
         currently_dmaxed, cheer_only
     )){
@@ -254,7 +254,7 @@ StateMachineAction run_move_select(
         //  Back out and look for battle menu. This indicates that the move wasn't selectable.
         BattleMenuDetector detector;
         int result = run_until(
-            env, console,
+            env, context, console,
             [](const BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 5 * TICKS_PER_SECOND);
             },
@@ -305,7 +305,7 @@ StateMachineAction run_move_select(
 
 StateMachineAction throw_balls(
     AdventureRuntime& runtime,
-    ProgramEnvironment& env,
+    ProgramEnvironment& env, const BotBaseContext& context,
     ConsoleHandle& console, Language language,
     GlobalStateTracker& state_tracker,
     const EndBattleDecider& decider
@@ -337,7 +337,7 @@ StateMachineAction throw_balls(
     pbf_press_button(console, BUTTON_A, 10, 125);
     console.botbase().wait_for_all_requests();
 
-    int16_t balls = move_to_ball(reader, console, ball);
+    int16_t balls = move_to_ball(reader, context, console, ball);
     if (balls != 0){
         pbf_press_button(console, BUTTON_A, 10, 125);
     }else{

@@ -7,6 +7,10 @@
 #include "CommonFramework/Tools/BlackBorderCheck.h"
 #include "NintendoSwitch_SingleSwitchProgramWidget.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
@@ -36,6 +40,7 @@ void SingleSwitchProgramWidget::run_switch_program(const ProgramInfo& info){
         system().overlay(),
         system().audio()
     );
+#if 0
     connect(
         this, &RunnableSwitchProgramWidget::signal_cancel,
         &env, [&]{
@@ -44,16 +49,27 @@ void SingleSwitchProgramWidget::run_switch_program(const ProgramInfo& info){
         },
         Qt::DirectConnection
     );
+#endif
     connect(
         &env, &ProgramEnvironment::set_status,
         this, &SingleSwitchProgramWidget::status_update
     );
 
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_env = &env;
+    }
     try{
         start_program_video_check(env.console, instance.descriptor().feedback());
-        instance.program(env, env.scope());
+        instance.program(env, BotBaseContext(env.scope(), env.console));
+        std::lock_guard<std::mutex> lg(m_lock);
+        cout << "clearing()" << endl;
+        m_env = nullptr;
     }catch (...){
         env.update_stats();
+        std::lock_guard<std::mutex> lg(m_lock);
+        cout << "clearing()" << endl;
+        m_env = nullptr;
         throw;
     }
 }

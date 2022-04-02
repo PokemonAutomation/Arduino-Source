@@ -140,7 +140,7 @@ void TradeBot::trade_slot(const BotBaseContext& context, const uint8_t code[8], 
     }
 }
 
-void TradeBot::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void TradeBot::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     uint8_t code[8];
     TRADE_CODE.to_str(code);
 

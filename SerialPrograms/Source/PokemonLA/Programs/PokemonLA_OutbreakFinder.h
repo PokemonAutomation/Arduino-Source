@@ -30,14 +30,20 @@ public:
     OutbreakFinder(const OutbreakFinder_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) override;
 
 
 private:
-    bool read_outbreaks(SingleSwitchProgramEnvironment& env, MapRegion& region, const std::set<std::string>& desired);
-    void goto_region_and_return(SingleSwitchProgramEnvironment& env, MapRegion region);
+    bool read_outbreaks(
+        SingleSwitchProgramEnvironment& env, const BotBaseContext& context,
+        MapRegion& region, const std::set<std::string>& desired
+    );
+    void goto_region_and_return(
+        SingleSwitchProgramEnvironment& env, const BotBaseContext& context,
+        MapRegion region
+    );
 
-    bool run_iteration(SingleSwitchProgramEnvironment& env, const std::set<std::string>& desired);
+    bool run_iteration(SingleSwitchProgramEnvironment& env, const BotBaseContext& context, const std::set<std::string>& desired);
 
 private:
     class Stats;

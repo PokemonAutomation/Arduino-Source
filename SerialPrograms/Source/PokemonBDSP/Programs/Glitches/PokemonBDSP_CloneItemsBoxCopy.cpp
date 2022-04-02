@@ -70,7 +70,7 @@ std::unique_ptr<StatsTracker> CloneItemsBoxCopy::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-void CloneItemsBoxCopy::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void CloneItemsBoxCopy::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
@@ -141,7 +141,7 @@ void CloneItemsBoxCopy::program(SingleSwitchProgramEnvironment& env, Cancellable
         pbf_press_button(env.console, BUTTON_ZL, 20, 250);
 
         //  Back all the way out to the overworld and clear glitch.
-        back_out_to_overworld(env, env.console, start);
+        back_out_to_overworld(env, context, env.console, start);
 
         //  Release the cloned box.
         overworld_to_box(env.console);
@@ -150,7 +150,7 @@ void CloneItemsBoxCopy::program(SingleSwitchProgramEnvironment& env, Cancellable
         pbf_press_button(env.console, BUTTON_L, 20, BOX_CHANGE_DELAY);
 
         //  Back all the way out to the overworld and clear glitch.
-        back_out_to_overworld(env, env.console, start);
+        back_out_to_overworld(env, context, env.console, start);
 
         stats.m_boxes++;
     }

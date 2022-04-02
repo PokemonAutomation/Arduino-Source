@@ -7,9 +7,11 @@
 #ifndef PokemonAutomation_NintendoSwitch_RunnableProgramWidget_H
 #define PokemonAutomation_NintendoSwitch_RunnableProgramWidget_H
 
+#include "Common/Cpp/SpinLock.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Panels/RunnablePanelWidget.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "NintendoSwitch_RunnableProgram.h"
 
 namespace PokemonAutomation{
@@ -54,6 +56,7 @@ protected:
     const std::string& m_program_name;
 
     SwitchSetupWidget* m_setup;
+    ProgramEnvironment* m_env = nullptr;
 };
 
 

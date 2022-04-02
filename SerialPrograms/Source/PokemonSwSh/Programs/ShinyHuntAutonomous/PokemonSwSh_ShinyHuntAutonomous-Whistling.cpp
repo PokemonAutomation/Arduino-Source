@@ -90,7 +90,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousWhistling::make_stats() const{
 
 
 
-void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
@@ -105,7 +105,7 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, 
     env.update_stats();
 
     StandardEncounterHandler handler(
-        env, env.console,
+        env, context, env.console,
         LANGUAGE,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -126,7 +126,7 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, 
             StartBattleWatcher start_battle_detector;
 
             int result = run_until(
-                env, env.console,
+                env, context, env.console,
                 [](const BotBaseContext& context){
                     while (true){
                         pbf_mash_button(context, BUTTON_LCLICK, TICKS_PER_SECOND);
@@ -145,7 +145,7 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, 
                 stats.m_unexpected_battles++;
                 env.update_stats();
                 pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
-                run_away(env, env.console, EXIT_BATTLE_TIMEOUT);
+                run_away(env, context, env.console, EXIT_BATTLE_TIMEOUT);
                 continue;
             case 1:
                 env.log("Battle started!");
@@ -155,7 +155,7 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, 
 
         //  Detect shiny.
         ShinyDetectionResult result = detect_shiny_battle(
-            env, env.console,
+            env, context, env.console,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );

@@ -91,11 +91,11 @@ std::unique_ptr<StatsTracker> ShinyHuntFlagPin::make_stats() const{
 }
 
 
-void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env){
+void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
     stats.attempts++;
 
-    goto_camp_from_jubilife(env, env.console, TRAVEL_LOCATION);
+    goto_camp_from_jubilife(env, context, env.console, TRAVEL_LOCATION);
 
     {
         FlagNavigationAir session(
@@ -114,11 +114,11 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env){
     }
 
     pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-    reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+    reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 }
 
 
-void ShinyHuntFlagPin::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void ShinyHuntFlagPin::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.
@@ -133,11 +133,11 @@ void ShinyHuntFlagPin::program(SingleSwitchProgramEnvironment& env, CancellableS
             stats.to_str()
         );
         try{
-            run_iteration(env);
+            run_iteration(env, context);
         }catch (OperationFailedException&){
             stats.errors++;
             pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
     }
 

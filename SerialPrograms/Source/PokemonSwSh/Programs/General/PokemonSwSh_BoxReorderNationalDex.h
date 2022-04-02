@@ -29,7 +29,7 @@ class BoxReorderNationalDex : public SingleSwitchProgramInstance{
 public:
     BoxReorderNationalDex(const BoxReorderNationalDex_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) override;
 
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;

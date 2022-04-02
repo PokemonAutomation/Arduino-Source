@@ -97,7 +97,7 @@ std::unique_ptr<StatsTracker> GiftBerryReset::make_stats() const{
 }
 
 
-void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
     env.update_stats();
 
@@ -156,7 +156,7 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, CancellableSco
 
         // Reset game:
         pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-        if (!reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
+        if (!reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
             throw OperationFailedException(env.console, "Error resetting game");
             break;
         }

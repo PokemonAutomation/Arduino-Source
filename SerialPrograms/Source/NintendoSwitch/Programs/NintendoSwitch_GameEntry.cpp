@@ -31,8 +31,7 @@ void move_to_user(const BotBaseContext& context, uint8_t user_slot){
 }
 
 void open_game_from_home(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     bool tolerate_update_menu,
     uint8_t game_slot,
     uint8_t user_slot,
@@ -112,14 +111,14 @@ private:
 
 
 bool openedgame_to_gamemenu(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     uint16_t timeout
 ){
     {
         console.log("Waiting to load game...");
         LoadingDetector detector(false);
         int ret = wait_until(
-            env, console,
+            env, context, console,
             std::chrono::milliseconds(timeout * (1000 / TICKS_PER_SECOND)),
             { &detector }
         );
@@ -132,7 +131,7 @@ bool openedgame_to_gamemenu(
         console.log("Waiting for game menu...");
         LoadingDetector detector(true);
         int ret = wait_until(
-            env, console,
+            env, context, console,
             std::chrono::milliseconds(timeout * (1000 / TICKS_PER_SECOND)),
             { &detector }
         );

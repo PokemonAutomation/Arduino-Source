@@ -31,7 +31,7 @@ public:
     DaySkipperJPN7p8k(const DaySkipperJPN7p8k_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(SingleSwitchProgramEnvironment& env, CancellableScope& scope) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context) override;
 
 private:
     SimpleIntegerOption<uint32_t> SKIPS;

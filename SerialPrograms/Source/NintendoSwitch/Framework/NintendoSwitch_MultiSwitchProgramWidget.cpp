@@ -58,6 +58,7 @@ void MultiSwitchProgramWidget::run_switch_program(const ProgramInfo& info){
         m_current_stats.get(), m_historical_stats.get(),
         std::move(switches)
     );
+#if 0
     connect(
         this, &RunnableSwitchProgramWidget::signal_cancel,
         &env, [&]{
@@ -66,6 +67,7 @@ void MultiSwitchProgramWidget::run_switch_program(const ProgramInfo& info){
         },
         Qt::DirectConnection
     );
+#endif
     connect(
         &env, &ProgramEnvironment::set_status,
         this, [=](QString status){
@@ -73,11 +75,19 @@ void MultiSwitchProgramWidget::run_switch_program(const ProgramInfo& info){
         }
     );
 
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_env = &env;
+    }
     try{
         start_program_video_check(env.consoles, instance.descriptor().feedback());
         instance.program(env, env.scope());
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_env = nullptr;
     }catch (...){
         env.update_stats();
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_env = nullptr;
         throw;
     }
 }

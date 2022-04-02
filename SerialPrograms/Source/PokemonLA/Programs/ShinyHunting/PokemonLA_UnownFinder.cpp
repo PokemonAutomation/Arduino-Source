@@ -107,12 +107,12 @@ void enter_ruins(const BotBaseContext& context){
 }
 
 
-void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env){
+void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     stats.attempts++;
 
-    goto_camp_from_jubilife(env, env.console, TravelLocations::instance().Mirelands_Mirelands);
+    goto_camp_from_jubilife(env, context, env.console, TravelLocations::instance().Mirelands_Mirelands);
 
     change_mount(env.console, MountState::BRAVIARY_ON);
 
@@ -125,7 +125,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env){
 
         ShinySoundDetector shiny_detector_route(env.console, SHINY_DETECTED_ON_ROUTE.stop_on_shiny());
         run_until(
-            env, env.console,
+            env, context, env.console,
             [](const BotBaseContext& context){
                ruins_entrance_route(context);
             },
@@ -140,7 +140,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env){
 
         ShinySoundDetector shiny_detector_ruins(env.console, SHINY_DETECTED.stop_on_shiny());
 
-        run_until(env, env.console,
+        run_until(env, context, env.console,
             [](const BotBaseContext& context){
                enter_ruins(context);
             },
@@ -155,14 +155,14 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env){
     };
 
     env.console.log("No shiny detected, returning to Jubilife!");
-    goto_camp_from_overworld(env, env.console, SHINY_DETECTED, stats);
+    goto_camp_from_overworld(env, context, env.console, SHINY_DETECTED, stats);
     pbf_press_dpad(env.console, DPAD_RIGHT, 10, 10);
-    goto_professor(env.console, Camp::MIRELANDS_MIRELANDS);
-    from_professor_return_to_jubilife(env, env.console);
+    goto_professor(env.console, context, Camp::MIRELANDS_MIRELANDS);
+    from_professor_return_to_jubilife(env, context, env.console);
 }
 
 
-void UnownFinder::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void UnownFinder::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.
@@ -177,11 +177,11 @@ void UnownFinder::program(SingleSwitchProgramEnvironment& env, CancellableScope&
             stats.to_str()
         );
         try{
-            run_iteration(env);
+            run_iteration(env, context);
         }catch (OperationFailedException&){
             stats.errors++;
             pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
     }
 

@@ -96,7 +96,7 @@ std::unique_ptr<StatsTracker> StatsResetMoltres::make_stats() const{
 
 
 
-void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
@@ -112,7 +112,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, Cancellable
         {
             StandardBattleMenuWatcher fight_detector(false);
             int result = run_until(
-                env, env.console,
+                env, context, env.console,
                 [=](const BotBaseContext& context){
                     while (true){
                         pbf_wait(context, 1 * TICKS_PER_SECOND);
@@ -127,7 +127,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, Cancellable
         }
 
         env.console.botbase().wait_for_all_requests();
-        CatchResults result = basic_catcher(env, env.console, LANGUAGE, "master-ball");
+        CatchResults result = basic_catcher(env, context, env.console, LANGUAGE, "master-ball");
         if (result.result != CatchResult::POKEMON_CAUGHT){
             throw OperationFailedException(env.console, "Unable to catch Moltres.");
         }
@@ -166,7 +166,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, Cancellable
             env.update_stats();
             pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
             reset_game_from_home_with_inference(
-                env, env.console,
+                env, context, env.console,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
             );
 
@@ -175,7 +175,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, Cancellable
             {
                 StandardBattleMenuWatcher fight_detector(false);
                 int ret = run_until(
-                    env, env.console,
+                    env, context, env.console,
                     [=](const BotBaseContext& context){
                         while (true){
                             pbf_wait(context, 1 * TICKS_PER_SECOND);

@@ -63,7 +63,7 @@ ShinyHuntUnattendedRegigigas2::ShinyHuntUnattendedRegigigas2(const ShinyHuntUnat
     PA_ADD_OPTION(CATCH_TO_OVERWORLD_DELAY);
 }
 
-void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     if (START_IN_GRIP_MENU){
         grip_menu_connect_go_home(env.console);
         resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);

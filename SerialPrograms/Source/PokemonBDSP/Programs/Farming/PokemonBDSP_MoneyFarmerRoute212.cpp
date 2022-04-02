@@ -112,7 +112,7 @@ std::unique_ptr<StatsTracker> MoneyFarmerRoute212::make_stats() const{
 }
 
 
-bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, uint8_t pp[4], bool man){
+bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, const BotBaseContext& context, uint8_t pp[4], bool man){
     Stats& stats = env.stats<Stats>();
 
     if (man){
@@ -134,7 +134,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
         EndBattleWatcher end_battle;
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         int ret = run_until(
-            env, env.console,
+            env, context, env.console,
             [=](const BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 30 * TICKS_PER_SECOND);
             },
@@ -197,31 +197,31 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, uint8_t pp
 }
 
 
-void MoneyFarmerRoute212::heal_at_center_and_return(ConsoleHandle& console, uint8_t pp[4]){
+void MoneyFarmerRoute212::heal_at_center_and_return(const BotBaseContext& context, ConsoleHandle& console, uint8_t pp[4]){
     console.log("Healing " + STRING_POKEMON + " at Hearthome City " + STRING_POKEMON + " Center.");
-    pbf_move_left_joystick(console, 125, 0, 6 * TICKS_PER_SECOND, 0);
-    pbf_mash_button(console, BUTTON_ZL, 3 * TICKS_PER_SECOND);
-    pbf_mash_button(console, BUTTON_B, 10 * TICKS_PER_SECOND);
+    pbf_move_left_joystick(context, 125, 0, 6 * TICKS_PER_SECOND, 0);
+    pbf_mash_button(context, BUTTON_ZL, 3 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
 
     console.log("Returning to rich couple location...");
-    pbf_move_left_joystick(console, 128, 255, 8 * TICKS_PER_SECOND, 0);
-    pbf_move_left_joystick(console, 255, 128, 380, 0);
-    pbf_move_left_joystick(console, 128, 255, 300, 0);
-    pbf_move_left_joystick(console,   0, 128, 600, 0);
-    pbf_move_left_joystick(console, 255, 128,  70, 0);
-    pbf_move_left_joystick(console, 128, 255, 1375, 0);
-    pbf_move_left_joystick(console, 255, 128, 125, 0);
-    pbf_move_left_joystick(console, 128, 255, 200, 0);
-    pbf_move_left_joystick(console,   0, 128, 200, 0);
-    pbf_move_left_joystick(console, 128, 255,  50, 0);
-    pbf_move_left_joystick(console,   0, 128, 125, 0);
-    pbf_move_left_joystick(console, 128, 255, 125, 0);
-    pbf_move_left_joystick(console, 255, 128, 250, 0);
-    pbf_move_left_joystick(console, 128, 255, 200, 0);
-    pbf_move_left_joystick(console,   0, 128,  90, 0);
-    pbf_move_left_joystick(console, 128, 255, 200, 0);
-    pbf_move_left_joystick(console, 255, 128, 125, 0);
-    pbf_move_left_joystick(console, 128, 255, 200, 0);
+    pbf_move_left_joystick(context, 128, 255, 8 * TICKS_PER_SECOND, 0);
+    pbf_move_left_joystick(context, 255, 128, 380, 0);
+    pbf_move_left_joystick(context, 128, 255, 300, 0);
+    pbf_move_left_joystick(context,   0, 128, 600, 0);
+    pbf_move_left_joystick(context, 255, 128,  70, 0);
+    pbf_move_left_joystick(context, 128, 255, 1375, 0);
+    pbf_move_left_joystick(context, 255, 128, 125, 0);
+    pbf_move_left_joystick(context, 128, 255, 200, 0);
+    pbf_move_left_joystick(context,   0, 128, 200, 0);
+    pbf_move_left_joystick(context, 128, 255,  50, 0);
+    pbf_move_left_joystick(context,   0, 128, 125, 0);
+    pbf_move_left_joystick(context, 128, 255, 125, 0);
+    pbf_move_left_joystick(context, 255, 128, 250, 0);
+    pbf_move_left_joystick(context, 128, 255, 200, 0);
+    pbf_move_left_joystick(context,   0, 128,  90, 0);
+    pbf_move_left_joystick(context, 128, 255, 200, 0);
+    pbf_move_left_joystick(context, 255, 128, 125, 0);
+    pbf_move_left_joystick(context, 128, 255, 200, 0);
 
     pp[0] = MOVE1_PP;
     pp[1] = MOVE2_PP;
@@ -230,28 +230,27 @@ void MoneyFarmerRoute212::heal_at_center_and_return(ConsoleHandle& console, uint
 }
 
 
-void MoneyFarmerRoute212::fly_to_center_heal_and_return(ConsoleHandle& console, uint8_t pp[4]){
+void MoneyFarmerRoute212::fly_to_center_heal_and_return(const BotBaseContext& context, ConsoleHandle& console, uint8_t pp[4]){
     console.log("Flying back to Hearthome City to heal.");
-    pbf_press_button(console, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
-    pbf_press_button(console, BUTTON_PLUS, 10, 240);
-    pbf_press_dpad(console, DPAD_UP, 10, 60);
-    pbf_press_dpad(console, DPAD_UP, 10, 60);
-    pbf_mash_button(console, BUTTON_ZL, 12 * TICKS_PER_SECOND);
-    heal_at_center_and_return(console, pp);
+    pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+    pbf_press_button(context, BUTTON_PLUS, 10, 240);
+    pbf_press_dpad(context, DPAD_UP, 10, 60);
+    pbf_press_dpad(context, DPAD_UP, 10, 60);
+    pbf_mash_button(context, BUTTON_ZL, 12 * TICKS_PER_SECOND);
+    heal_at_center_and_return(context, console, pp);
 }
 
 bool MoneyFarmerRoute212::heal_after_battle_and_return(
-    SingleSwitchProgramEnvironment& env,
-    ConsoleHandle& console,
+    SingleSwitchProgramEnvironment& env, const BotBaseContext& context, ConsoleHandle& console,
     uint8_t pp[4])
 {
     if (HEALING_METHOD == 0){
         // Go to Hearhome City Pokecenter to heal the party.
-        fly_to_center_heal_and_return(console, pp);
+        fly_to_center_heal_and_return(context, console, pp);
         return false;
     }else{
         // Use Global Room to heal the party.
-        heal_by_global_room(env, console);
+        heal_by_global_room(env, context, console);
 
         pp[0] = MOVE1_PP;
         pp[1] = MOVE2_PP;
@@ -279,7 +278,7 @@ size_t MoneyFarmerRoute212::total_pp(uint8_t pp[4]){
 }
 
 
-void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, CancellableScope& scope){
+void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, const BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     uint8_t pp[4] = {
@@ -294,11 +293,11 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, Cancellab
 
     bool need_to_charge = true;
     if (START_LOCATION == 0){
-        heal_at_center_and_return(env.console, pp);
+        heal_at_center_and_return(context, env.console, pp);
         need_to_charge = false;
     }else{
         if (HEALING_METHOD == 1){
-            heal_by_global_room(env, env.console);
+            heal_by_global_room(env, context, env.console);
         }
         pbf_move_left_joystick(env.console, 255, 128, 180, 0);
     }
@@ -328,7 +327,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, Cancellab
         {
             VSSeekerReactionTracker tracker(env.console, {0.23, 0.30, 0.35, 0.30});
             run_until(
-                env, env.console,
+                env, context, env.console,
                 [=](const BotBaseContext& context){
                     SHORTCUT.run(context, TICKS_PER_SECOND);
 
@@ -373,13 +372,13 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, Cancellab
             pbf_move_left_joystick(env.console, 128, 255, 10, 0);
 
             //  Battle woman.
-            if(battle(env, pp, false)){
+            if(battle(env, context, pp, false)){
                 return;
             }
 
             //  Check PP.
             if (total_pp(pp) == 0){
-                need_to_charge = heal_after_battle_and_return(env, env.console, pp);
+                need_to_charge = heal_after_battle_and_return(env, context, env.console, pp);
                 continue;
             }
         }
@@ -401,13 +400,13 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, Cancellab
 //            }
 
             //  Battle man.
-            if (battle(env, pp, true)){
+            if (battle(env, context, pp, true)){
                 return;
             }
 
             //  Check PP.
             if (total_pp(pp) == 0){
-                need_to_charge = heal_after_battle_and_return(env, env.console, pp);
+                need_to_charge = heal_after_battle_and_return(env, context, env.console, pp);
                 continue;
             }
         }
