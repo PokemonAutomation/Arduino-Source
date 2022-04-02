@@ -11,6 +11,7 @@
 #include <QMessageBox>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch_SwitchSetupWidget.h"
@@ -149,6 +150,8 @@ void RunnableSwitchProgramWidget::run_program(){
         return;
     }
 
+    GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_this_thread();
+
     RunnableSwitchProgramInstance& instance = static_cast<RunnableSwitchProgramInstance&>(m_instance);
     {
         std::lock_guard<std::mutex> lg(m_lock);
@@ -180,7 +183,7 @@ void RunnableSwitchProgramWidget::run_program(){
             m_logger, instance.NOTIFICATION_PROGRAM_FINISH,
             program_info,
             "",
-            stats
+            m_current_stats ? m_current_stats->to_str() : ""
         );
     }catch (InvalidConnectionStateException&){
     }catch (Exception& e){

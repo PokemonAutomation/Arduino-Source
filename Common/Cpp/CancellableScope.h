@@ -37,7 +37,7 @@ public:
     virtual ~Cancellable(){
         detach();
     }
-    virtual void cancel() = 0;
+    virtual void cancel() noexcept = 0;
 
     void check_parent_cancelled();
 
@@ -46,7 +46,7 @@ protected:
     //  destructor. "cancel()" can be called asynchronously at any time by the
     //  parent scope. To prevent it from being called in the middle of destruction
     //  you must detach it from the parent at the start of the destructor.
-    void detach();
+    void detach() noexcept;
 
 private:
     CancellableScope* m_scope = nullptr;
@@ -64,7 +64,7 @@ public:
     void check_cancelled();     //  Throws "OperationCanceledException" if this scope has been cancelled.
 
 
-    virtual void cancel() override;
+    virtual void cancel() noexcept override;
 
     void wait_for(std::chrono::milliseconds duration);
     void wait_until(std::chrono::system_clock::time_point stop);
@@ -90,7 +90,7 @@ inline void Cancellable::check_parent_cancelled(){
         m_scope->check_cancelled();
     }
 }
-inline void Cancellable::detach(){
+inline void Cancellable::detach() noexcept{
     if (m_scope){
         *m_scope -= *this;
     }

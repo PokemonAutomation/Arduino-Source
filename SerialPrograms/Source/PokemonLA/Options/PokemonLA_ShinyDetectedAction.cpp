@@ -171,6 +171,7 @@ void on_shiny_sound(
     }
 
     pbf_press_button(console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    console.botbase().wait_for_all_requests();
     throw ProgramFinishedException();
 }
 

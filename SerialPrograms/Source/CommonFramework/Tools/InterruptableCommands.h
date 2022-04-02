@@ -18,21 +18,20 @@
 namespace PokemonAutomation{
 
 
-class AsyncCommandSession : public Cancellable{
+class AsyncCommandSession final : public Cancellable{
 
 public:
     AsyncCommandSession(
         CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
         BotBase& botbase
     );
-    ~AsyncCommandSession();
+    virtual ~AsyncCommandSession();
 
     bool command_is_running();
 
     //  Stop the entire session. This will rethrow exceptions in the command thread.
-    //  This is not thread-safe with "run()" and "stop_commands()"
     //  You must call this prior to destruction unless it's during a stack-unwind.
-    void stop_session();
+    void stop_session_and_rethrow();
 
 
 public:
@@ -43,12 +42,13 @@ public:
 //    //  Stop the currently running command.
 //    void stop_commands();
 
-    //  Wait for currently running command to finish.
-    void wait();
+//    //  Wait for currently running command to finish.
+//    void wait();
 
 
 private:
-    virtual void cancel() override;
+    void signal_to_stop() noexcept;
+    virtual void cancel() noexcept override;
     void thread_loop();
 
 

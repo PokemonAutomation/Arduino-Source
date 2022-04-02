@@ -219,7 +219,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env){
 
             env.console.botbase().wait_for_all_requests();
             ShinyType shininess = ShinyType::NOT_SHINY;
-            if (inference.stop() != nullptr){
+            if (inference.stop_and_rethrow() != nullptr){
 //                shininess = shiny_detector.results();
 #if 1
                 stats.add_non_shiny();

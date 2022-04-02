@@ -42,7 +42,7 @@ VisualInferenceSession::VisualInferenceSession(
 VisualInferenceSession::~VisualInferenceSession(){
     stop();
 }
-void VisualInferenceSession::stop(){
+void VisualInferenceSession::stop() noexcept{
     bool expected = false;
     if (!m_stop.compare_exchange_strong(expected, true)){
         return;
@@ -55,12 +55,14 @@ void VisualInferenceSession::stop(){
     const double DIVIDER = std::chrono::milliseconds(1) / std::chrono::microseconds(1);
     const char* UNITS = " ms";
 
-    m_stats_snapshot.log(m_logger, "Screenshot", UNITS, DIVIDER);
-    for (Callback* callback : m_callback_list){
-        callback->stats.log(m_logger, callback->callback->label(), UNITS, DIVIDER);
-    }
+    try{
+        m_stats_snapshot.log(m_logger, "Screenshot", UNITS, DIVIDER);
+        for (Callback* callback : m_callback_list){
+            callback->stats.log(m_logger, callback->callback->label(), UNITS, DIVIDER);
+        }
+    }catch (...){}
 }
-void VisualInferenceSession::cancel(){
+void VisualInferenceSession::cancel() noexcept{
     stop();
 }
 
@@ -187,7 +189,7 @@ void AsyncVisualInferenceSession::rethrow_exceptions(){
         m_task->rethrow_exceptions();
     }
 }
-VisualInferenceCallback* AsyncVisualInferenceSession::stop(){
+VisualInferenceCallback* AsyncVisualInferenceSession::stop_and_rethrow(){
     VisualInferenceSession::stop();
     if (m_task){
         m_task->wait_and_rethrow_exceptions();

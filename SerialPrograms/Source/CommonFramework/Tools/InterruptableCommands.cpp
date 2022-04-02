@@ -30,32 +30,16 @@ AsyncCommandSession::AsyncCommandSession(
     , m_logger(logger)
     , m_botbase(botbase)
     , m_stopping_session(false)
-{
-    m_task = dispatcher.dispatch([this]{ thread_loop(); });
-}
+    , m_task(dispatcher.dispatch([this]{ thread_loop(); }))
+{}
 AsyncCommandSession::~AsyncCommandSession(){
 //    cout << "~AsyncCommandSession()" << endl;
     if (!m_stopping_session.load(std::memory_order_acquire) && std::uncaught_exceptions() == 0){
         m_logger.log("AsyncCommandSession::stop_session() not called before normal destruction.", COLOR_RED);
     }
     detach();
-    if (m_task){
-        m_stopping_session.store(true, std::memory_order_release);
-        {
-            std::lock_guard<std::mutex> lg(m_lock);
-            if (m_current){
-                try{
-                    m_current->context.cancel_now();
-                }catch (InvalidConnectionStateException&){
-                }catch (OperationCancelledException&){
-                }catch (...){
-                    m_logger.log("AsyncCommandSession::~AsyncCommandSession() - Uncaught Exception", COLOR_RED);
-                }
-            }
-            m_cv.notify_all();
-        }
-        m_task.reset();
-    }
+    signal_to_stop();
+    //  Thread is automatically joined by m_task destructor.
 }
 
 bool AsyncCommandSession::command_is_running(){
@@ -88,8 +72,8 @@ void AsyncCommandSession::dispatch(std::function<void(const BotBaseContext&)>&& 
 }
 
 
-void AsyncCommandSession::cancel(){
-
+void AsyncCommandSession::cancel() noexcept{
+    signal_to_stop();
 }
 void AsyncCommandSession::thread_loop(){
     CommandSet* current = nullptr;
@@ -135,6 +119,7 @@ void AsyncCommandSession::stop_commands(){
     }
 }
 #endif
+#if 0
 void AsyncCommandSession::wait(){
     std::unique_lock<std::mutex> lg(m_lock);
 //    cout << "wait() - start" << endl;
@@ -143,18 +128,20 @@ void AsyncCommandSession::wait(){
     });
 //    cout << "wait() - done" << endl;
 }
-void AsyncCommandSession::stop_session(){
+#endif
+void AsyncCommandSession::signal_to_stop() noexcept{
     bool expected = false;
-    if (!m_stopping_session.compare_exchange_strong(expected, true)){
-        {
-            std::lock_guard<std::mutex> lg(m_lock);
-            if (m_current != nullptr){
-                m_current->context.cancel_now();
-            }
-            m_cv.notify_all();
+    if (m_stopping_session.compare_exchange_strong(expected, true)){
+        std::lock_guard<std::mutex> lg(m_lock);
+        if (m_current != nullptr){
+            m_current->context.cancel_now();
         }
-        m_task->wait_and_rethrow_exceptions();
+        m_cv.notify_all();
     }
+}
+void AsyncCommandSession::stop_session_and_rethrow(){
+    signal_to_stop();
+    m_task->wait_and_rethrow_exceptions();
     check_parent_cancelled();
 }
 

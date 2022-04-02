@@ -131,16 +131,16 @@ void SuperControlSession::run_session(){
             next_tick += m_state_period;
         }
     }
-
+    m_env.check_stopping();
 
 //    cout << "SuperControlSession::run_session() - stop" << endl;
-    m_active_command->stop_session();
+    m_active_command->stop_session_and_rethrow();
 
     if (audio){
-        audio->stop();
+        audio->stop_and_rethrow();
     }
     if (visual){
-        visual->stop();
+        visual->stop_and_rethrow();
     }
 //    cout << "SuperControlSession::run_session() - end" << endl;
 }

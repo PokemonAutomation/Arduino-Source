@@ -32,7 +32,7 @@ public:
             throw OperationCancelledException();
         }
     }
-    void cancel(){
+    void cancel() noexcept{
 //        cout << "cancel(): " << this << endl;
         if (cancelled()){
             return;
@@ -105,7 +105,7 @@ bool CancellableScope::cancelled() const{
 void CancellableScope::check_cancelled(){
     m_impl->check_cancelled();
 }
-void CancellableScope::cancel(){
+void CancellableScope::cancel() noexcept{
     m_impl->cancel();
 }
 void CancellableScope::wait_for(std::chrono::milliseconds duration){

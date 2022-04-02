@@ -35,10 +35,10 @@ public:
     AudioInferenceCallback* run(std::chrono::system_clock::time_point stop);
 
     //  Call this from a different thread to asynchronously stop the session.
-    void stop();
+    void stop() noexcept;
 
 private:
-    virtual void cancel() override;
+    virtual void cancel() noexcept override;
 
 private:
     struct Callback;
@@ -81,7 +81,7 @@ public:
 
     //  This will rethrow any exceptions in the inference thread.
     //  You should call this at all natural destruction points.
-    AudioInferenceCallback* stop();
+    AudioInferenceCallback* stop_and_rethrow();
 
 private:
     void thread_body();

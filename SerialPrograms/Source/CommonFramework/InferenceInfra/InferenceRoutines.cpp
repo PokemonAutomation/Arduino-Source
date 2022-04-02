@@ -94,10 +94,10 @@ int wait_until(
 
         //  Stop the inference threads (and rethrow exceptions).
         if (visual_session){
-            visual_trigger = visual_session->stop();
+            visual_trigger = visual_session->stop_and_rethrow();
         }
         if (audio_session){
-            audio_trigger = audio_session->stop();
+            audio_trigger = audio_session->stop_and_rethrow();
         }
     }
 
@@ -178,10 +178,10 @@ int run_until(
 
         //  Stop the inference threads (and rethrow exceptions).
         if (visual_session){
-            visual_trigger = visual_session->stop();
+            visual_trigger = visual_session->stop_and_rethrow();
         }
         if (audio_session){
-            audio_trigger = audio_session->stop();
+            audio_trigger = audio_session->stop_and_rethrow();
         }
     }
 

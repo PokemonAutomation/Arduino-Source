@@ -42,7 +42,7 @@ AudioInferenceSession::AudioInferenceSession(
 AudioInferenceSession::~AudioInferenceSession(){
     stop();
 }
-void AudioInferenceSession::stop(){
+void AudioInferenceSession::stop() noexcept{
     bool expected = false;
     if (!m_stop.compare_exchange_strong(expected, true)){
         return;
@@ -56,11 +56,13 @@ void AudioInferenceSession::stop(){
     const double DIVIDER = std::chrono::milliseconds(1) / std::chrono::microseconds(1);
     const char* UNITS = " ms";
 
-    for (Callback* callback : m_callback_list){
-        callback->stats.log(m_logger, callback->callback->label(), UNITS, DIVIDER);
-    }
+    try{
+        for (Callback* callback : m_callback_list){
+            callback->stats.log(m_logger, callback->callback->label(), UNITS, DIVIDER);
+        }
+    }catch (...){}
 }
-void AudioInferenceSession::cancel(){
+void AudioInferenceSession::cancel() noexcept{
     stop();
 }
 
@@ -195,7 +197,7 @@ void AsyncAudioInferenceSession::rethrow_exceptions(){
         m_task->rethrow_exceptions();
     }
 }
-AudioInferenceCallback* AsyncAudioInferenceSession::stop(){
+AudioInferenceCallback* AsyncAudioInferenceSession::stop_and_rethrow(){
     AudioInferenceSession::stop();
     if (m_task){
         m_task->wait_and_rethrow_exceptions();

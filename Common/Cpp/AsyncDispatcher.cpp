@@ -30,15 +30,9 @@ void AsyncTask::rethrow_exceptions(){
 void AsyncTask::wait_and_rethrow_exceptions(){
     std::unique_lock<std::mutex> lg(m_lock);
     m_cv.wait(lg, [=]{ return m_finished; });
-#if 0
-    if (m_exception && std::uncaught_exceptions() == 0){
-        std::rethrow_exception(m_exception);
-    }
-#else
     if (m_exception){
         std::rethrow_exception(m_exception);
     }
-#endif
 }
 void AsyncTask::signal(){
     std::lock_guard<std::mutex> lg(m_lock);

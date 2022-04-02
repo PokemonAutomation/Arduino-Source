@@ -117,7 +117,7 @@ bool CloneItemsMenuOverlap::trigger_encounter(ProgramEnvironment& env, ConsoleHa
         console.botbase().wait_for_all_requests();
     }
 
-    if (session.stop()){
+    if (session.stop_and_rethrow()){
         console.log("Battle started!");
         return true;
     }else{
