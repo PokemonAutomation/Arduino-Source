@@ -29,7 +29,7 @@ public:
     )
         : m_index(index)
         , m_logger(logger)
-        , m_context(botbase)
+        , m_botbase(botbase)
         , m_video(video)
         , m_overlay(overlay)
         , m_audio(audio)
@@ -43,8 +43,8 @@ public:
     size_t index() const{ return m_index; }
 
     LoggerQt& logger(){ return m_logger; }
-    BotBase& botbase(){ return m_context.botbase(); }
-    BotBaseContext& context(){ return m_context; }
+    BotBase& botbase(){ return m_botbase; }
+//    BotBaseContext& context(){ return m_context; }
     VideoFeed& video(){ return m_video; }
     VideoOverlay& overlay(){ return m_overlay; }
     AudioFeed& audio(){ return m_audio; }
@@ -59,7 +59,7 @@ public:
 private:
     size_t m_index;
     LoggerQt& m_logger;
-    BotBaseContext m_context;
+    BotBase& m_botbase;
     VideoFeed& m_video;
     VideoOverlay& m_overlay;
     AudioFeed& m_audio;

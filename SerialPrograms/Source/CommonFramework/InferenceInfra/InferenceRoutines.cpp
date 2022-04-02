@@ -69,7 +69,7 @@ int wait_until(
 
         //  Wait
         try{
-            subcontext.wait_until(deadline + std::chrono::seconds(3600));
+            subcontext.wait_until(deadline);
         }catch (OperationCancelledException&){}
 
         context.scope()->throw_if_cancelled();

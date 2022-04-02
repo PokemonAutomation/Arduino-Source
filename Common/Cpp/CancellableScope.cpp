@@ -29,7 +29,9 @@ CancellableScope::CancellableScope(){}
 CancellableScope::CancellableScope(CancellableScope& parent)
     : Cancellable(parent)
 {}
-CancellableScope::~CancellableScope(){}
+CancellableScope::~CancellableScope(){
+    detach();
+}
 void CancellableScope::throw_if_cancelled(){
     if (cancelled()){
         throw OperationCancelledException();

@@ -45,7 +45,7 @@ AsyncCommandSession::AsyncCommandSession(
     : Cancellable(scope)
     , m_logger(logger)
     , m_botbase(botbase)
-    , m_task(dispatcher.dispatch([this]{ thread_loop(); }))
+    , m_thread(dispatcher.dispatch([this]{ thread_loop(); }))
 {}
 AsyncCommandSession::~AsyncCommandSession(){
 //    cout << "~AsyncCommandSession()" << endl;
@@ -68,6 +68,22 @@ void AsyncCommandSession::dispatch(std::function<void(BotBaseContext&)>&& lambda
         return;
     }
 
+    //  Set the new task.
+    m_pending.reset(new CommandSet(
+        *this->scope(),
+        m_botbase, std::move(lambda)
+    ));
+
+    if (m_current){
+        //  Already a task running. Cancel it.
+        m_current->context.cancel_lazy();
+    }else{
+        //  Otherwise, wake up the thread.
+        m_cv.notify_all();
+    }
+
+#if 0
+    //  Stop the current task.
     if (m_current){
         m_current->context.cancel_lazy();
         m_cv.wait(lg, [=]{
@@ -77,12 +93,14 @@ void AsyncCommandSession::dispatch(std::function<void(BotBaseContext&)>&& lambda
 
 //    cout << "dispatching" << endl;
 
+    //  Dispatch the new one.
     m_current.reset(new CommandSet(
         *this->scope(),
         m_botbase, std::move(lambda)
     ));
 
     m_cv.notify_all();
+#endif
 }
 
 
@@ -98,35 +116,43 @@ bool AsyncCommandSession::cancel() noexcept{
     return false;
 }
 void AsyncCommandSession::thread_loop(){
-    CommandSet* current = nullptr;
+//    CommandSet* current = nullptr;
     while (true){
+        CommandSet* current = nullptr;
         {
             std::unique_lock<std::mutex> lg(m_lock);
-            if (current != nullptr){
-                m_current = nullptr;
-                m_cv.notify_all();
-            }
             m_cv.wait(lg, [=]{
-                return cancelled() || m_current != nullptr;
+                return cancelled() || m_pending != nullptr;
             });
             if (cancelled()){
-//                cout << "thread_loop() - end" << endl;
-                m_current.reset();
-                return;
+                break;
             }
+            m_current = std::move(m_pending);
             current = m_current.get();
         }
+        try{
+//            cout << "start" << endl;
+            current->commands(current->context);
+            current->context.wait_for_all_requests();
+//            cout << "stop" << endl;
+        }catch (OperationCancelledException&){}
 
-        if (current != nullptr){
-            try{
-//                cout << "start" << endl;
-                current->commands(current->context);
-                current->context.wait_for_all_requests();
-//                cout << "stop" << endl;
-            }catch (OperationCancelledException&){
-            }
+        //  Transfer finished task to the finished queue under both locks.
+        {
+            std::unique_lock<std::mutex> lg(m_lock);
+            SpinLockGuard lg1(m_finished_lock);
+            m_finished_tasks.emplace_back(std::move(m_current));
+        }
+
+        //  Now it's safe to remove the finished task under just the finished lock.
+        {
+            SpinLockGuard lg(m_finished_lock);
+            m_finished_tasks.clear();
         }
     }
+
+    SpinLockGuard lg(m_finished_lock);
+    m_finished_tasks.clear();
 }
 
 
@@ -151,7 +177,7 @@ void AsyncCommandSession::wait(){
 #endif
 void AsyncCommandSession::stop_session_and_rethrow(){
     cancel();
-    m_task->wait_and_rethrow_exceptions();
+    m_thread->wait_and_rethrow_exceptions();
     throw_if_parent_cancelled();
 }
 

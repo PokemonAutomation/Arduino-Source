@@ -278,7 +278,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
     // Press the button to select the opponent
     pbf_press_button(context, BUTTON_A, 10, 115);
     pbf_wait(context, 1 * TICKS_PER_SECOND);
-    env.console.context().wait_for_all_requests();
+    context.wait_for_all_requests();
 
     // Which move (0, 1, 2 or 3) to use in next turn.
     size_t cur_move = 0;

@@ -64,12 +64,10 @@ void SingleSwitchProgramWidget::run_switch_program(const ProgramInfo& info){
         BotBaseContext context(env.scope(), env.console.botbase());
         instance.program(env, context);
         std::lock_guard<std::mutex> lg(m_lock);
-        cout << "clearing()" << endl;
         m_env = nullptr;
     }catch (...){
         env.update_stats();
         std::lock_guard<std::mutex> lg(m_lock);
-        cout << "clearing()" << endl;
         m_env = nullptr;
         throw;
     }

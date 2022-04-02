@@ -70,7 +70,7 @@ private:
 
 
 struct CancellableScopeData;
-class CancellableScope final : public Cancellable{
+class CancellableScope : public Cancellable{
 public:
     CancellableScope();
     CancellableScope(CancellableScope& parent);

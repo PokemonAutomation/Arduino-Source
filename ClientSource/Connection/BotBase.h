@@ -68,13 +68,13 @@ public:
 
 
 //  A wrapper for BotBase that allows for asynchronous cancelling.
-class BotBaseContext : public Cancellable{
+class BotBaseContext : public CancellableScope{
 public:
     BotBaseContext(BotBase& botbase)
         : m_botbase(botbase)
     {}
-    BotBaseContext(CancellableScope& scope, BotBase& botbase)
-        : Cancellable(scope)
+    BotBaseContext(CancellableScope& parent, BotBase& botbase)
+        : CancellableScope(parent)
         , m_botbase(botbase)
     {}
     virtual ~BotBaseContext(){
@@ -88,12 +88,10 @@ public:
 
     //  Don't use this unless you really need to.
     BotBase& botbase() const{ return m_botbase; }
-//    CancellableScope* scope() const{ return m_scope; }
 
     //  Stop all commands in this context now.
     void cancel_now(){
-        Cancellable::cancel();
-        scope()->cancel();
+        CancellableScope::cancel();
         m_botbase.stop_all_commands();
     }
 
@@ -104,28 +102,19 @@ public:
     //  This cancel is used when you need continuity from an ongoing
     //  sequence.
     void cancel_lazy(){
-        Cancellable::cancel();
-        scope()->cancel();
+        CancellableScope::cancel();
         m_botbase.next_command_interrupt();
     }
 
 
     virtual bool cancel() noexcept{
-        if (Cancellable::cancel()){
+        if (CancellableScope::cancel()){
             return true;
         }
-        scope()->cancel();
         try{
             m_botbase.stop_all_commands();
         }catch (...){}
         return false;
-    }
-
-    void wait_for(std::chrono::milliseconds duration) const{
-        scope()->wait_for(duration);
-    }
-    void wait_until(std::chrono::system_clock::time_point stop) const{
-        scope()->wait_until(stop);
     }
 
 
