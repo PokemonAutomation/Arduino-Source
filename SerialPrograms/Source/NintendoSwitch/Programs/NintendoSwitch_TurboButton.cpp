@@ -59,14 +59,14 @@ TurboButton::TurboButton(const TurboButton_Descriptor& descriptor)
 void TurboButton::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (TOTAL_PRESSES == 0){
         while (true){
-            pbf_press_button(env.console, (Button)1 << BUTTON, PRESS_DURATION, RELEASE_DURATION);
+            pbf_press_button(context, (Button)1 << BUTTON, PRESS_DURATION, RELEASE_DURATION);
         }
     }else{
         for (uint64_t c = 0; c < TOTAL_PRESSES; c++){
-            pbf_press_button(env.console, (Button)1 << BUTTON, PRESS_DURATION, RELEASE_DURATION);
+            pbf_press_button(context, (Button)1 << BUTTON, PRESS_DURATION, RELEASE_DURATION);
         }
     }
-    env.console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
 }
 
 

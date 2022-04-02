@@ -27,8 +27,8 @@ bool connect_to_internet_with_inference(
     {
         YCommMenuDetector detector(true);
         if (!detector.detect(console.video().snapshot())){
-            pbf_press_button(console, BUTTON_Y, 10, TICKS_PER_SECOND);
-            console.botbase().wait_for_all_requests();
+            pbf_press_button(context, BUTTON_Y, 10, TICKS_PER_SECOND);
+            context.wait_for_all_requests();
         }
         int result = wait_until(
             env, context, console,
@@ -46,10 +46,10 @@ bool connect_to_internet_with_inference(
 
     //  Connect to internet.
     env.wait_for(std::chrono::seconds(1));
-    pbf_press_dpad(console, DPAD_UP, 5, 0);
-    pbf_move_right_joystick(console, 128, 0, 5, 0);
-    pbf_mash_button(console, BUTTON_PLUS, TICKS_PER_SECOND);
-    console.botbase().wait_for_all_requests();
+    pbf_press_dpad(context, DPAD_UP, 5, 0);
+    pbf_move_right_joystick(context, 128, 0, 5, 0);
+    pbf_mash_button(context, BUTTON_PLUS, TICKS_PER_SECOND);
+    context.wait_for_all_requests();
 
 //    cout << "Waiting for Y-COMM to close..." << endl;
     //  Mash B until you leave Y-COMM.

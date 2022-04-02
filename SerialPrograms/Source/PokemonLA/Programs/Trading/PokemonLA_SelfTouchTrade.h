@@ -34,7 +34,7 @@ public:
 
 private:
     bool trade_one(MultiSwitchProgramEnvironment& env, std::map<std::string, int>& trades_left);
-    bool move_to_next(ConsoleHandle& host, uint8_t& row, uint8_t& col);
+    bool move_to_next(Logger& logger, BotBaseContext& host, uint8_t& row, uint8_t& col);
 
 private:
     class Stats;

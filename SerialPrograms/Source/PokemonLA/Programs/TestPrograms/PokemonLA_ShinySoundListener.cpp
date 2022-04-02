@@ -50,7 +50,7 @@ void searchShinySoundFromAudioDump();
 
 void ShinySoundListener::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     //  Connect the controller.
-    // pbf_move_right_joystick(env.console, 0, 255, 10, 0);
+    // pbf_move_right_joystick(context, 0, 255, 10, 0);
 
     // searchShinySoundFromAudioDump();
 

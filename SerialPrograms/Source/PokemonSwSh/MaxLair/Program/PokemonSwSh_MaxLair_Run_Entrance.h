@@ -20,8 +20,8 @@ namespace MaxLairInternal{
 
 void run_entrance(
     AdventureRuntime& runtime,
-    ProgramEnvironment& env,
-    ConsoleHandle& console, bool save_path,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    bool save_path,
     GlobalStateTracker& state_tracker
 );
 

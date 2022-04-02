@@ -68,12 +68,12 @@ void run_swap_pokemon(
     if (swap){
         console.log("Choosing to swap for: " + options[1], COLOR_PURPLE);
         std::lock_guard<std::mutex> lg(runtime.m_delay_lock);
-        pbf_mash_button(console, BUTTON_A, TICKS_PER_SECOND);
-        console.botbase().wait_for_all_requests();
+        pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
+        context.wait_for_all_requests();
     }else{
         console.log("Choosing not to swap.", COLOR_PURPLE);
-        pbf_mash_button(console, BUTTON_B, TICKS_PER_SECOND);
-        console.botbase().wait_for_all_requests();
+        pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
+        context.wait_for_all_requests();
     }
 
 #if 1

@@ -79,14 +79,14 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousStrongSpawn::make_stats() const
 
 void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
+        grip_menu_connect_go_home(context);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
     }
 
     const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
-    uint32_t last_touch = system_clock(env.console);
+    uint32_t last_touch = system_clock(context);
 
     ShinyHuntTracker& stats = env.stats<ShinyHuntTracker>();
     env.update_stats();
@@ -99,9 +99,9 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
     );
 
     while (true){
-        uint32_t now = system_clock(env.console);
+        uint32_t now = system_clock(context);
         if (TIME_ROLLBACK_HOURS > 0 && now - last_touch >= PERIOD){
-            rollback_hours_from_home(env.console, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+            rollback_hours_from_home(context, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
             last_touch += PERIOD;
         }
         reset_game_from_home_with_inference(
@@ -109,7 +109,7 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
         );
         env.log("Starting Encounter: " + tostr_u_commas(stats.encounters() + 1));
-        env.console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
 
         //  Detect shiny.
         ShinyDetectionResult result = detect_shiny_battle(
@@ -123,7 +123,7 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
             break;
         }
 
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
     }
 
     env.update_stats();
@@ -133,7 +133,7 @@ void ShinyHuntAutonomousStrongSpawn::program(SingleSwitchProgramEnvironment& env
         "",
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

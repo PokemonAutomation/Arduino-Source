@@ -29,8 +29,8 @@ void enter_loading_game(
     openedgame_to_gamemenu(env, context, console, GameSettings::instance().START_GAME_WAIT);
 
     env.log("enter_loading_game(): Game Loaded. Entering game...", COLOR_PURPLE);
-    enter_game(console, backup_save, GameSettings::instance().ENTER_GAME_MASH, 0);
-    console.botbase().wait_for_all_requests();
+    enter_game(context, backup_save, GameSettings::instance().ENTER_GAME_MASH, 0);
+    context.wait_for_all_requests();
 
     //  Wait to enter game.
     {
@@ -69,7 +69,7 @@ void enter_loading_game(
     env.log("start_game_with_inference(): Game started.", COLOR_PURPLE);
 
     if (post_wait_time != 0){
-        pbf_wait(console, post_wait_time);
+        pbf_wait(context, post_wait_time);
     }
 }
 
@@ -100,15 +100,15 @@ void reset_game_from_home_with_inference(
     uint16_t post_wait_time
 ){
     if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET || tolerate_update_menu){
-        close_game(console);
+        close_game(context);
         start_game_from_home_with_inference(
             env, context, console, tolerate_update_menu, 0, 0, backup_save, post_wait_time
         );
         return;
     }
 
-    fast_reset_game(console, GameSettings::instance().START_GAME_MASH, 0, 0, 0);
-    console.botbase().wait_for_all_requests();
+    fast_reset_game(context, GameSettings::instance().START_GAME_MASH, 0, 0, 0);
+    context.wait_for_all_requests();
 
     //  Wait for game to load.
     enter_loading_game(env, context, console, backup_save, post_wait_time);

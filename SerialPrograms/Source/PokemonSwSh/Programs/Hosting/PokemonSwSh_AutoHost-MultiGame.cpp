@@ -124,14 +124,14 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     }
 
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
+        grip_menu_connect_go_home(context);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
     }
 
     if (enable_touch){
-        TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.console);
+        TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(context);
     }
 
     uint32_t raids = 0;
@@ -149,7 +149,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             env.log("Raids Attempted: " + tostr_u_commas(raids++));
 
             //  Start game.
-            rollback_date_from_home(env.console, game.skips);
+            rollback_date_from_home(context, game.skips);
 
             //  Sanitize game slot.
             uint8_t game_slot = game.game_slot;
@@ -208,15 +208,15 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             );
 
             //  Exit game.
-            pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-            close_game(env.console);
+            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+            close_game(context);
 
             //  Post-raid delay.
-            pbf_wait(env.console, parse_ticks_i32(game.post_raid_delay));
+            pbf_wait(context, parse_ticks_i32(game.post_raid_delay));
 
             //  Touch the date.
             if (enable_touch){
-                TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.console);
+                TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(context);
             }
         }
     }

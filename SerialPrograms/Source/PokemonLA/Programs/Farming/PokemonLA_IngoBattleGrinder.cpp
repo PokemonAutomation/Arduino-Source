@@ -160,8 +160,8 @@ bool IngoBattleGrinder::start_dialog(SingleSwitchProgramEnvironment& env, BotBas
         }
     }
 
-    pbf_press_button(env.console, BUTTON_A, 20, 150);
-    env.console.botbase().wait_for_all_requests();
+    pbf_press_button(context, BUTTON_A, 20, 150);
+    context.wait_for_all_requests();
 
     ButtonDetector button2(env.console, env.console, ButtonType::ButtonA, {0.50, 0.350, 0.40, 0.400}, std::chrono::milliseconds(100), true);
     int ret = run_until(
@@ -202,24 +202,24 @@ void IngoBattleGrinder::use_move(BotBaseContext& context, size_t cur_pokemon, si
     context.wait_for_all_requests();
 }
 
-void IngoBattleGrinder::switch_pokemon(SingleSwitchProgramEnvironment& env, size_t& next_pokemon_in_party_order){
+void IngoBattleGrinder::switch_pokemon(BotBaseContext& context, ConsoleHandle& console, size_t& next_pokemon_in_party_order){
     // Move past leading fainted pokemon
     for(size_t i = 0; i < next_pokemon_in_party_order; i++){
-        pbf_press_dpad(env.console, DPAD_DOWN, 20, 80);
+        pbf_press_dpad(context, DPAD_DOWN, 20, 80);
     }
 
     while(true){
         // Choose the next pokemon to battle.
-        pbf_press_button(env.console, BUTTON_A, 20, 100);
-        pbf_press_button(env.console, BUTTON_A, 20, 150);
-        env.console.botbase().wait_for_all_requests();
+        pbf_press_button(context, BUTTON_A, 20, 100);
+        pbf_press_button(context, BUTTON_A, 20, 150);
+        context.wait_for_all_requests();
 
         next_pokemon_in_party_order++;
     
         // Check whether we can send this pokemon to battle:
         const bool stop_on_detected = true;
-        BattlePokemonSwitchDetector switch_detector(env.console, env.console, stop_on_detected);
-        QImage screen = env.console.video().snapshot();
+        BattlePokemonSwitchDetector switch_detector(console, console, stop_on_detected);
+        QImage screen = console.video().snapshot();
         if (switch_detector.process_frame(screen, std::chrono::system_clock::now()) == false){
             // No longer at the switching pokemon screen
             break;
@@ -229,9 +229,9 @@ void IngoBattleGrinder::switch_pokemon(SingleSwitchProgramEnvironment& env, size
         // and therefore cannot be used. Try the next pokemon:
 
         // Fist hit B to clear the "cannot send pokemon" dialogue
-        pbf_press_button(env.console, BUTTON_B, 20, 100);
+        pbf_press_button(context, BUTTON_B, 20, 100);
         // Move to the next pokemon
-        pbf_press_dpad(env.console, DPAD_DOWN, 20, 80);
+        pbf_press_dpad(context, DPAD_DOWN, 20, 80);
     }
 }
 
@@ -265,19 +265,19 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
 
     //  Move to page.
     for (int8_t c = 0; c < menu_location.page; c++){
-        pbf_press_dpad(env.console, DPAD_UP, 10, 60);
-        pbf_press_dpad(env.console, DPAD_UP, 10, 60);
-        pbf_press_button(env.console, BUTTON_A, 10, 100);
+        pbf_press_dpad(context, DPAD_UP, 10, 60);
+        pbf_press_dpad(context, DPAD_UP, 10, 60);
+        pbf_press_button(context, BUTTON_A, 10, 100);
     }
 
     //  Move to slot.
     for (int8_t c = 0; c < menu_location.index; c++){
-        pbf_press_dpad(env.console, DPAD_DOWN, 10, 60);
+        pbf_press_dpad(context, DPAD_DOWN, 10, 60);
     }
 
     // Press the button to select the opponent
-    pbf_press_button(env.console, BUTTON_A, 10, 115);
-    pbf_wait(env.console, 1 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_A, 10, 115);
+    pbf_wait(context, 1 * TICKS_PER_SECOND);
     env.console.context().wait_for_all_requests();
 
     // Which move (0, 1, 2 or 3) to use in next turn.
@@ -324,11 +324,11 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
                 env.console.log("Switch pokemon");
 
                 // Go to the switching pokemon screen:
-                pbf_press_dpad(env.console, DPAD_DOWN, 20, 100);
+                pbf_press_dpad(context, DPAD_DOWN, 20, 100);
 
                 cur_move = 0;
                 num_turns = 0;
-                switch_pokemon(env, next_pokemon_in_party_order);
+                switch_pokemon(context, env.console, next_pokemon_in_party_order);
                 cur_pokemon++;
             }
             else{
@@ -339,14 +339,14 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
                 }
 
                 // Press A to select moves
-                pbf_press_button(env.console, BUTTON_A, 10, 125);
-                env.console.botbase().wait_for_all_requests();
+                pbf_press_button(context, BUTTON_A, 10, 125);
+                context.wait_for_all_requests();
 
                 const auto& move_box = move_slot_boxes[cur_move];
                 QImage screen = env.console.video().snapshot();
                 ImageMatchDetector move_slot_detector(std::move(screen), move_box, 10.0);
                 
-                use_move(env.console, cur_pokemon, cur_move);
+                use_move(context, cur_pokemon, cur_move);
 
                 // Check if the move cannot be used due to no PP:
                 screen = env.console.video().snapshot();
@@ -359,11 +359,11 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
                     }
                     env.console.log("No PP. Use next move.", COLOR_RED);
                     // Go to the next move.
-                    pbf_press_dpad(env.console, DPAD_DOWN, 20, 100);
+                    pbf_press_dpad(context, DPAD_DOWN, 20, 100);
                     // env.console.context().wait_for_all_requests();
                     cur_move++;
 
-                    use_move(env.console, cur_pokemon, cur_move);
+                    use_move(context, cur_pokemon, cur_move);
 
 #ifdef DEBUG_INGO_BATTLE                    
                     std::cout << "Moved to next move " << cur_move << std::endl;
@@ -379,13 +379,13 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
         else if (ret == 1){
             env.console.log("Transparent dialogue box.");
             
-            pbf_press_button(env.console, BUTTON_B, 20, 100);
-            env.console.botbase().wait_for_all_requests();
+            pbf_press_button(context, BUTTON_B, 20, 100);
+            context.wait_for_all_requests();
         } else if(ret == 2){
             env.console.log("Normal dialogue box.");
 
-            pbf_press_button(env.console, BUTTON_B, 20, 100);
-            env.console.botbase().wait_for_all_requests();
+            pbf_press_button(context, BUTTON_B, 20, 100);
+            context.wait_for_all_requests();
         }
         else if (ret == 3){
             env.console.log("Pokemon fainted.", COLOR_RED);
@@ -394,7 +394,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
 
             cur_move = 0;
             num_turns = 0;
-            switch_pokemon(env, next_pokemon_in_party_order);
+            switch_pokemon(context, env.console, next_pokemon_in_party_order);
             cur_pokemon++;
         }
         else{ // ret is 4
@@ -415,7 +415,7 @@ void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
     // {
     //     // QImage image("./scripts/LA_switch_pokemon_Kuro.png");

@@ -66,25 +66,25 @@ void MassRelease::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
     env.update_stats();
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
     uint16_t box_scroll_delay = GameSettings::instance().BOX_SCROLL_DELAY_0;
     uint16_t box_change_delay = GameSettings::instance().BOX_CHANGE_DELAY_0;
 
     if (BOXES_TO_RELEASE > 0){
         env.update_stats();
-        release_box(env.console, box_scroll_delay);
+        release_box(context, box_scroll_delay);
         stats.m_boxes_released++;
         for (uint8_t box = 1; box < BOXES_TO_RELEASE; box++){
             env.update_stats();
-            pbf_press_dpad(env.console, DPAD_DOWN, 20, box_scroll_delay);
-            pbf_press_dpad(env.console, DPAD_DOWN, 20, box_scroll_delay);
-            pbf_press_dpad(env.console, DPAD_DOWN, 20, box_scroll_delay);
-            pbf_press_dpad(env.console, DPAD_RIGHT, 20, box_scroll_delay);
-            pbf_press_dpad(env.console, DPAD_RIGHT, 20, box_scroll_delay);
-            pbf_wait(env.console, 50);
-            pbf_press_button(env.console, BUTTON_R, 20, box_change_delay);
-            release_box(env.console, box_scroll_delay);
+            pbf_press_dpad(context, DPAD_DOWN, 20, box_scroll_delay);
+            pbf_press_dpad(context, DPAD_DOWN, 20, box_scroll_delay);
+            pbf_press_dpad(context, DPAD_DOWN, 20, box_scroll_delay);
+            pbf_press_dpad(context, DPAD_RIGHT, 20, box_scroll_delay);
+            pbf_press_dpad(context, DPAD_RIGHT, 20, box_scroll_delay);
+            pbf_wait(context, 50);
+            pbf_press_button(context, BUTTON_R, 20, box_change_delay);
+            release_box(context, box_scroll_delay);
             stats.m_boxes_released++;
         }
     }
@@ -96,7 +96,7 @@ void MassRelease::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
         "",
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

@@ -38,7 +38,7 @@ ClothingBuyer::ClothingBuyer(const ClothingBuyer_Descriptor& descriptor)
 
 void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
     while (true){
         // If this clothing is not bought:
@@ -53,17 +53,17 @@ void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         // Press B to be asked whether to leave menu
         // Press B to not leave
 
-        pbf_press_button(env.console, BUTTON_A, 10, 120);
-        pbf_press_button(env.console, BUTTON_A, 10, 130);
-        pbf_press_button(env.console, BUTTON_B, 10, 120);
-        pbf_press_button(env.console, BUTTON_B, 10, 60);
+        pbf_press_button(context, BUTTON_A, 10, 120);
+        pbf_press_button(context, BUTTON_A, 10, 130);
+        pbf_press_button(context, BUTTON_B, 10, 120);
+        pbf_press_button(context, BUTTON_B, 10, 60);
 
         // Move to the next clothing in the same category
-        pbf_press_dpad(env.console, DPAD_DOWN, 10, 40);
+        pbf_press_dpad(context, DPAD_DOWN, 10, 40);
 
         // Move to the next category
         if (CATEGORY_ROTATION){
-            pbf_press_button(env.console, BUTTON_R, 10, 40);
+            pbf_press_button(context, BUTTON_R, 10, 40);
         }
     }
 }

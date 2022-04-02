@@ -137,8 +137,8 @@ bool OutbreakFinder::read_outbreaks(
             }
         }
 
-        pbf_press_dpad(env.console, DPAD_RIGHT, 20, 40);
-        env.console.botbase().wait_for_all_requests();
+        pbf_press_dpad(context, DPAD_RIGHT, 20, 40);
+        context.wait_for_all_requests();
     }
 
     stats.matches += matches;
@@ -158,8 +158,8 @@ bool OutbreakFinder::read_outbreaks(
             if (current_region == no_outbreak){
                 break;
             }
-            pbf_press_dpad(env.console, DPAD_RIGHT, 20, 40);
-            env.console.botbase().wait_for_all_requests();
+            pbf_press_dpad(context, DPAD_RIGHT, 20, 40);
+            context.wait_for_all_requests();
         }
     }
 
@@ -194,7 +194,7 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
 
 
     while (true){
-        env.console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
         ButtonDetector button_detector(
             env.console, env.console,
             ButtonType::ButtonA, ImageFloatBox(0.50, 0.50, 0.30, 0.30),
@@ -211,11 +211,11 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
         );
         if (ret >= 0){
             env.wait_for(std::chrono::milliseconds(500));
-            pbf_press_dpad(env.console, DPAD_DOWN, 20, 105);
+            pbf_press_dpad(context, DPAD_DOWN, 20, 105);
             break;
         }
         env.console.log("Did not detect option to return to Jubilife.", COLOR_RED);
-        pbf_mash_button(env.console, BUTTON_B, 5 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_B, 5 * TICKS_PER_SECOND);
         stats.errors++;
     }
 
@@ -230,7 +230,7 @@ bool OutbreakFinder::run_iteration(
     Stats& stats = env.stats<Stats>();
 
     //  Enter map.
-    pbf_move_left_joystick(env.console, 128, 255, 200, 0);
+    pbf_move_left_joystick(context, 128, 255, 200, 0);
 
     MapDetector detector;
     int ret = run_until(
@@ -301,7 +301,7 @@ void OutbreakFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         env.console.video().snapshot()
     );
 
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

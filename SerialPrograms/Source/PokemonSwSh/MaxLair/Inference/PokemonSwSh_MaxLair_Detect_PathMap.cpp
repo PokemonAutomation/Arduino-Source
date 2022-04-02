@@ -82,12 +82,11 @@ QImage read_type_array_retry(
 
 
 bool read_path(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     PathMap& path,
     const ImageFloatBox& box
 ){
-    console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
 
     std::deque<InferenceBoxScope> hits;
 
@@ -98,8 +97,8 @@ bool read_path(
         return false;
     }
 
-    pbf_move_right_joystick(console, 128, 0, 70, 50);
-    console.botbase().wait_for_all_requests();
+    pbf_move_right_joystick(context, 128, 0, 70, 50);
+    context.wait_for_all_requests();
     ImagePixelBox boxes[4];
     error_image = read_type_array_retry(env, console, box, hits, 4, path.mon2, boxes);
     if (!error_image.isNull()){
@@ -108,15 +107,15 @@ bool read_path(
     }
 
     while (true){
-        pbf_move_right_joystick(console, 128, 0, 80, 50);
-        console.botbase().wait_for_all_requests();
+        pbf_move_right_joystick(context, 128, 0, 80, 50);
+        context.wait_for_all_requests();
 
         error_image = read_type_array_retry(env, console, box, hits, 4, path.mon3, nullptr);
         if (error_image.isNull()){
             break;
         }
-        pbf_move_right_joystick(console, 128, 0, 20, 50);
-        console.botbase().wait_for_all_requests();
+        pbf_move_right_joystick(context, 128, 0, 20, 50);
+        context.wait_for_all_requests();
         error_image = read_type_array_retry(env, console, box, hits, 4, path.mon3, nullptr);
         if (error_image.isNull()){
             break;
@@ -126,8 +125,8 @@ bool read_path(
         return false;
     }
 
-    pbf_move_right_joystick(console, 128, 0, 125, 50);
-    console.botbase().wait_for_all_requests();
+    pbf_move_right_joystick(context, 128, 0, 125, 50);
+    context.wait_for_all_requests();
 
     error_image = read_type_array_retry(env, console, box, hits, 1, &path.boss, nullptr);
     if (!error_image.isNull()){

@@ -30,7 +30,7 @@ public:
     GodEggDuplication(const GodEggDuplication_Descriptor& descriptor);
 
     void collect_godegg(BotBaseContext& context, uint8_t party_slot) const;
-    void run_program(SingleSwitchProgramEnvironment& env, uint16_t attempts) const;
+    void run_program(Logger& logger, BotBaseContext& context, uint16_t attempts) const;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

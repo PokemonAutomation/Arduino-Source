@@ -102,7 +102,7 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, BotBaseContext
 
     //  State Machine
     for (size_t c = 0; c < 5;){
-        env.console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
 
         BattleMenuWatcher battle_menu(BattleType::STANDARD);
         EndBattleWatcher end_battle;
@@ -121,18 +121,18 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, BotBaseContext
         switch (ret){
         case 0:
             env.log("Battle menu detected!", COLOR_BLUE);
-            pbf_mash_button(env.console, BUTTON_ZL, 5 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_ZL, 5 * TICKS_PER_SECOND);
             c++;
             break;
         case 1:
             env.log("Battle finished!", COLOR_BLUE);
-            pbf_mash_button(env.console, BUTTON_B, 250);
+            pbf_mash_button(context, BUTTON_B, 250);
             return false;
         case 2:
             env.log("Detected move learn!", COLOR_BLUE);
             if (ON_LEARN_MOVE == 0){
-                pbf_move_right_joystick(env.console, 128, 255, 20, 105);
-                pbf_press_button(env.console, BUTTON_ZL, 20, 105);
+                pbf_move_right_joystick(context, 128, 255, 20, 105);
+                pbf_press_button(context, BUTTON_ZL, 20, 105);
                 break;
             }
             return true;
@@ -160,7 +160,7 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, BotBaseContex
     );
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_B, 5, 5);
+    pbf_press_button(context, BUTTON_B, 5, 5);
 
     //  Encounter Loop
     while (true){
@@ -199,7 +199,7 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, BotBaseContex
         "",
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

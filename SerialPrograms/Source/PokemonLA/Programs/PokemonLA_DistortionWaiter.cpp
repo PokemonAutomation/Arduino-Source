@@ -85,7 +85,7 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, BotBaseConte
 
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
 
     NotificationDetector detector(env.console, LANGUAGE);
@@ -145,7 +145,7 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         {{"Session Stats", QString::fromStdString(stats.to_str())}},
         env.console.video().snapshot()
     );
-    pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
 }
 
 

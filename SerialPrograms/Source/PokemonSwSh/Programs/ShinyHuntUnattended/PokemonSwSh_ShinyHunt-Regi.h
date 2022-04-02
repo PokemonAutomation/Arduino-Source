@@ -16,12 +16,12 @@ namespace PokemonSwSh{
 
 
 void move_to_corner(
-    SingleSwitchProgramEnvironment& env,
+    Logger& logger, BotBaseContext& context,
     bool correction, uint16_t TRANSITION_DELAY
 );
 
 void run_regi_light_puzzle(
-    SingleSwitchProgramEnvironment& env,
+    Logger& logger, BotBaseContext& context,
     RegiGolem regi, uint64_t encounter
 );
 

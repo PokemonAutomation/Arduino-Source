@@ -148,9 +148,9 @@ bool start_raid_self_solo(
     state.boss = read_boss_sprite(console);
 
     //  Start raid.
-    pbf_press_dpad(console, DPAD_DOWN, 10, 50);
-    pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
-    console.botbase().wait_for_all_requests();
+    pbf_press_dpad(context, DPAD_DOWN, 10, 50);
+    pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+    context.wait_for_all_requests();
 
     return true;
 }
@@ -188,10 +188,10 @@ bool start_raid_host_solo(
     uint8_t code[8];
     bool has_code = settings.RAID_CODE.get_code(code);
     if (has_code){
-        pbf_press_button(console, BUTTON_PLUS, 10, TICKS_PER_SECOND);
-        enter_digits(console, 8, code);
-        pbf_wait(console, 2 * TICKS_PER_SECOND);
-        pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_PLUS, 10, TICKS_PER_SECOND);
+        enter_digits(context, 8, code);
+        pbf_wait(context, 2 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
     }
 
     send_raid_notification(
@@ -204,32 +204,32 @@ bool start_raid_host_solo(
     );
 
     //  Open lobby.
-    pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
-    console.botbase().wait_for_all_requests();
+    pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+    context.wait_for_all_requests();
 
     auto time_limit = std::chrono::system_clock::now() +
         std::chrono::milliseconds(settings.LOBBY_WAIT_DELAY * 1000 / TICKS_PER_SECOND);
 
     if (!wait_for_a_player(env, context, console, entrance, time_limit)){
-        pbf_mash_button(console, BUTTON_B, 10 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
         return start_raid_self_solo(env, context, console, state_tracker, entrance, boss_slot, ore);
     }
 
     //  Ready up.
     context.wait_for(std::chrono::seconds(1));
-    pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
-    console.botbase().wait_for_all_requests();
+    pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+    context.wait_for_all_requests();
 
     //  Wait
     if (!wait_for_lobby_ready(env, context, console, entrance, 1, 4, time_limit)){
-        pbf_mash_button(console, BUTTON_B, 10 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
         return false;
     }
 
     //  Start
-    console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
     if (!start_adventure(env, context, console, 1, entrance)){
-        pbf_mash_button(console, BUTTON_B, 10 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
         return false;
     }
 

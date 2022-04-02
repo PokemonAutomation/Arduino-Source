@@ -118,10 +118,10 @@ bool SelfTouchTrade::trade_one(MultiSwitchProgramEnvironment& env, std::map<std:
 
     return true;
 }
-bool SelfTouchTrade::move_to_next(ConsoleHandle& host, uint8_t& row, uint8_t& col){
+bool SelfTouchTrade::move_to_next(Logger& logger, BotBaseContext& host, uint8_t& row, uint8_t& col){
     //  Returns true if moved to next box.
 
-    host.log("Moving to next slot.");
+    logger.log("Moving to next slot.");
     if (col < 5){
         pbf_press_dpad(host, DPAD_RIGHT, 20, 140);
         col++;
@@ -162,6 +162,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
     uint8_t row = 0;
     uint8_t col = 0;
 
+    BotBaseContext host_context(env.scope(), (HOSTING_SWITCH == 0 ? env.consoles[0] : env.consoles[1]).botbase());
     ConsoleHandle& host = HOSTING_SWITCH == 0 ? env.consoles[0] : env.consoles[1];
     ConsoleHandle& recv = HOSTING_SWITCH == 0 ? env.consoles[1] : env.consoles[0];
 
@@ -202,10 +203,10 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
 
         //  Move to next slot.
         if (!traded){
-            if (move_to_next(host, row, col)){
+            if (move_to_next(host, host_context, row, col)){
                 boxes++;
             }
-            host.botbase().wait_for_all_requests();
+            host_context.wait_for_all_requests();
         }
     }
 

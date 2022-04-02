@@ -131,7 +131,7 @@ bool start_raid_local(
     ConsoleRuntime console_stats[4]
 ){
     if (env.consoles.size() == 1){
-        BotBaseContext context(env.scope(), host);
+        BotBaseContext context(env.scope(), host.botbase());
         return start_raid_self_solo(
             env, context, host,
             state_tracker, entrance[0], boss_slot, console_stats[0].ore
@@ -283,7 +283,7 @@ bool start_raid_host(
     ConsoleRuntime console_stats[4]
 ){
     if (env.consoles.size() == 1){
-        BotBaseContext context(env.scope(), host);
+        BotBaseContext context(env.scope(), host.botbase());
         return start_raid_host_solo(
             env, context, host,
             state_tracker,

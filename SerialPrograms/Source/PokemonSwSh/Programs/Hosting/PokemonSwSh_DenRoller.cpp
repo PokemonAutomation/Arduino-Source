@@ -113,24 +113,24 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
     std::string desired_slug = FILTER.slug();
 
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
+        grip_menu_connect_go_home(context);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
     }
 
-    rollback_date_from_home(env.console, SKIPS);
-    resume_game_front_of_den_nowatts(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+    rollback_date_from_home(context, SKIPS);
+    resume_game_front_of_den_nowatts(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
 
 
     QImage screen;
     while (true){
-        roll_den(env.console, 0, 0, SKIPS, CATCHABILITY);
+        roll_den(context, 0, 0, SKIPS, CATCHABILITY);
 
         if (FILTER == 0){
-            ring_bell(env.console, 20);
+            ring_bell(context, 20);
         }else{
-            env.console.botbase().wait_for_all_requests();
+            context.wait_for_all_requests();
         }
         stats.rolls++;
         stats.skips += SKIPS;
@@ -138,12 +138,12 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         {
             DenMonReader reader(env.console, env.console);
 
-            enter_den(env.console, 0, SKIPS != 0, false);
+            enter_den(context, 0, SKIPS != 0, false);
 
             if (FILTER != 0){
-                pbf_wait(env.console, READ_DELAY);
+                pbf_wait(context, READ_DELAY);
             }
-            env.console.botbase().wait_for_all_requests();
+            context.wait_for_all_requests();
 
             screen = env.console.video().snapshot();
             DenMonReadResults results = reader.read(screen);
@@ -151,12 +151,12 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
             //  Give user time to look at the mon.
             if (FILTER == 0){
                 //  No filter enabled. Keep going.
-                pbf_wait(env.console, VIEW_TIME);
+                pbf_wait(context, VIEW_TIME);
             }else if (results.slugs.results.empty()){
                 //  No detection. Keep going.
                 stats.errors++;
                 dump_image(env.console, env.program_info(), "ReadDenMon", screen);
-                pbf_wait(env.console, VIEW_TIME);
+                pbf_wait(context, VIEW_TIME);
             }else{
                 //  Check if we got what we wanted.
                 for (const auto& item : results.slugs.results){
@@ -170,9 +170,9 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         env.update_stats();
 
         //  Add a little extra wait time since correctness matters here.
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE - 10);
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE - 10);
 
-        rollback_date_from_home(env.console, SKIPS);
+        rollback_date_from_home(context, SKIPS);
 //        reset_game_from_home(TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
         reset_game_from_home_with_inference(
             env, context, env.console,

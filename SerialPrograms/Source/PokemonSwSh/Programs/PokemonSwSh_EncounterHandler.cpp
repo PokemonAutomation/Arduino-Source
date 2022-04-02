@@ -73,9 +73,9 @@ void StandardEncounterHandler::run_away_and_update_stats(
     const ShinyDetectionResult& result
 ){
     //  Initiate the run-away.
-    pbf_press_dpad(m_console, DPAD_UP, 10, 0);
-    pbf_mash_button(m_console, BUTTON_A, 60);
-    m_console.botbase().wait_for_all_requests();
+    pbf_press_dpad(m_context, DPAD_UP, 10, 0);
+    pbf_mash_button(m_context, BUTTON_A, 60);
+    m_context.wait_for_all_requests();
 
     update_frequencies(encounter);
 
@@ -128,7 +128,7 @@ bool StandardEncounterHandler::handle_standard_encounter(const ShinyDetectionRes
     m_env.update_stats();
 
     if (result.shiny_type == ShinyType::UNKNOWN){
-        pbf_mash_button(m_console, BUTTON_B, TICKS_PER_SECOND);
+        pbf_mash_button(m_context, BUTTON_B, TICKS_PER_SECOND);
         return false;
     }
 
@@ -158,7 +158,7 @@ bool StandardEncounterHandler::handle_standard_encounter(const ShinyDetectionRes
     );
 
     if (m_settings.VIDEO_ON_SHINY && encounter.is_shiny()){
-        take_video(m_console);
+        take_video(m_context);
     }
 
     return encounter.get_action().first == EncounterAction::StopProgram;
@@ -189,7 +189,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     );
 
     if (m_settings.VIDEO_ON_SHINY && encounter.is_shiny()){
-        take_video(m_console);
+        take_video(m_context);
     }
 
     std::pair<EncounterAction, std::string> action = encounter.get_action();
@@ -265,13 +265,13 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         CatchResults results = basic_catcher(m_env, m_context, m_console, m_language, action.second);
         switch (results.result){
         case CatchResult::POKEMON_CAUGHT:
-            pbf_mash_button(m_console, BUTTON_B, 2 * TICKS_PER_SECOND);
-            pbf_press_button(m_console, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY); //  Save game.
-            pbf_press_button(m_console, BUTTON_R, 20, 150);
-            pbf_press_button(m_console, BUTTON_A, 10, 500);
+            pbf_mash_button(m_context, BUTTON_B, 2 * TICKS_PER_SECOND);
+            pbf_press_button(m_context, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY); //  Save game.
+            pbf_press_button(m_context, BUTTON_R, 20, 150);
+            pbf_press_button(m_context, BUTTON_A, 10, 500);
             break;
         case CatchResult::POKEMON_FAINTED:
-            pbf_mash_button(m_console, BUTTON_B, 2 * TICKS_PER_SECOND);
+            pbf_mash_button(m_context, BUTTON_B, 2 * TICKS_PER_SECOND);
             break;
         case CatchResult::OWN_FAINTED:
             throw OperationFailedException(

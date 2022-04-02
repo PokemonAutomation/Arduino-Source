@@ -109,11 +109,11 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, BotBas
 
         if (session.detected_shiny()){
             stats.shinies++;
-            on_shiny_sound(env, env.console, SHINY_DETECTED, session.shiny_sound_results());
+            on_shiny_sound(env, context, env.console, SHINY_DETECTED, session.shiny_sound_results());
         }
     }
 
-    pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
     reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 }
 
@@ -122,7 +122,7 @@ void ShinyHuntFlagPin::program(SingleSwitchProgramEnvironment& env, BotBaseConte
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
     while (true){
         env.update_stats();
@@ -136,7 +136,7 @@ void ShinyHuntFlagPin::program(SingleSwitchProgramEnvironment& env, BotBaseConte
             run_iteration(env, context);
         }catch (OperationFailedException&){
             stats.errors++;
-            pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
     }

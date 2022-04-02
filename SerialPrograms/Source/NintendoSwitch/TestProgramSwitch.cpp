@@ -393,8 +393,8 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 #if 0
     change_mount(console, MountState::BRAVIARY_ON);
 
-    pbf_move_left_joystick(console, 160, 0, 160, 0);
-    pbf_mash_button(console, BUTTON_B, 375);
+    pbf_move_left_joystick(context, 160, 0, 160, 0);
+    pbf_mash_button(context, BUTTON_B, 375);
 #endif
 
 
@@ -518,10 +518,10 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 #if 0
-    pbf_move_left_joystick(console, 0, 0, 50, 0);
-    pbf_press_button(console, BUTTON_B, 20, 250);
-    pbf_mash_button(console, BUTTON_ZL, 250);
-    pbf_press_button(console, BUTTON_HOME, 20, 230);
+    pbf_move_left_joystick(context, 0, 0, 50, 0);
+    pbf_press_button(context, BUTTON_B, 20, 250);
+    pbf_mash_button(context, BUTTON_ZL, 250);
+    pbf_press_button(context, BUTTON_HOME, 20, 230);
 #endif
 
 #if 0
@@ -582,10 +582,10 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 #if 0
-    pbf_press_dpad(console, DPAD_UP, 20, 480);
-    pbf_press_button(console, BUTTON_A, 20, 480);
-    pbf_press_button(console, BUTTON_B, 20, 230);
-    pbf_press_button(console, BUTTON_B, 20, 230);
+    pbf_press_dpad(context, DPAD_UP, 20, 480);
+    pbf_press_button(context, BUTTON_A, 20, 480);
+    pbf_press_button(context, BUTTON_B, 20, 230);
+    pbf_press_button(context, BUTTON_B, 20, 230);
 #endif
 
 
@@ -687,17 +687,17 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 #if 0
-    pbf_move_right_joystick(console, 0, 128, 145, 0);
-    pbf_move_left_joystick(console, 128, 0, 50, 0);
-    pbf_press_button(console, BUTTON_B, 500, 125);
+    pbf_move_right_joystick(context, 0, 128, 145, 0);
+    pbf_move_left_joystick(context, 128, 0, 50, 0);
+    pbf_press_button(context, BUTTON_B, 500, 125);
 
-    pbf_move_right_joystick(console, 255, 128, 45, 0);
-    pbf_move_left_joystick(console, 128, 0, 50, 0);
-    pbf_press_button(console, BUTTON_B, 420, 125);
+    pbf_move_right_joystick(context, 255, 128, 45, 0);
+    pbf_move_left_joystick(context, 128, 0, 50, 0);
+    pbf_press_button(context, BUTTON_B, 420, 125);
 
-    pbf_move_right_joystick(console, 0, 128, 100, 0);
-    pbf_move_left_joystick(console, 128, 0, 50, 0);
-    pbf_press_button(console, BUTTON_B, 420, 125);
+    pbf_move_right_joystick(context, 0, 128, 100, 0);
+    pbf_move_left_joystick(context, 128, 0, 50, 0);
+    pbf_press_button(context, BUTTON_B, 420, 125);
 #endif
 
 
@@ -762,7 +762,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    cout << std::chrono::system_clock::time_point::min() - std::chrono::system_clock::now() << endl;
 
-//    pbf_move_right_joystick(console, 0, 128, 45, 0);
+//    pbf_move_right_joystick(context, 0, 128, 45, 0);
 
 
 

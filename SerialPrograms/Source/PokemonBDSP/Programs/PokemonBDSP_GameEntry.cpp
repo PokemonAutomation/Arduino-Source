@@ -29,8 +29,8 @@ bool gamemenu_to_ingame(
 ){
     console.log("Mashing A to enter game...");
     BlackScreenOverWatcher detector(COLOR_RED, {0.2, 0.2, 0.6, 0.6});
-    pbf_mash_button(console, BUTTON_ZL, mash_duration);
-    console.botbase().wait_for_all_requests();
+    pbf_mash_button(context, BUTTON_ZL, mash_duration);
+    context.wait_for_all_requests();
     console.log("Waiting to enter game...");
     int ret = wait_until(
         env, context, console,
@@ -58,8 +58,8 @@ bool openedgame_to_ingame(
         dump_image(console.logger(), env.program_info(), "StartGame", console.video().snapshot());
     }
     console.log("Entered game! Waiting out grace period.");
-    pbf_wait(console, post_wait_time);
-    console.botbase().wait_for_all_requests();
+    pbf_wait(context, post_wait_time);
+    context.wait_for_all_requests();
     return ok;
 }
 
@@ -72,7 +72,7 @@ bool reset_game_from_home(
     uint16_t post_wait_time
 ){
     if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET || tolerate_update_menu){
-        close_game(console);
+        close_game(context);
         open_game_from_home(
             env, context, console,
             tolerate_update_menu,
@@ -80,8 +80,8 @@ bool reset_game_from_home(
             GameSettings::instance().START_GAME_MASH
         );
     }else{
-        pbf_press_button(console, BUTTON_X, 50, 0);
-        pbf_mash_button(console, BUTTON_A, GameSettings::instance().START_GAME_MASH);
+        pbf_press_button(context, BUTTON_X, 50, 0);
+        pbf_mash_button(context, BUTTON_A, GameSettings::instance().START_GAME_MASH);
     }
     bool ret = openedgame_to_ingame(
         env, context, console,
@@ -90,7 +90,7 @@ bool reset_game_from_home(
         GameSettings::instance().ENTER_GAME_WAIT,
         post_wait_time
     );
-    console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
     return ret;
 }
 

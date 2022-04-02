@@ -80,10 +80,10 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousBerryTree::make_stats() const{
 
 void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
-        resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        grip_menu_connect_go_home(context);
+        resume_game_no_interact(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
     ShinyHuntTracker& stats = env.stats<ShinyHuntTracker>();
@@ -98,13 +98,13 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, 
 
     uint8_t year = MAX_YEAR;
     while (true){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
-        home_roll_date_enter_game_autorollback(env.console, &year);
-//        home_to_date_time(env.console, true, true);
-//        neutral_date_skip(env.console);
-//        settings_to_enter_game(env.console, true);
-        pbf_mash_button(env.console, BUTTON_B, 90);
-        env.console.botbase().wait_for_all_requests();
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
+        home_roll_date_enter_game_autorollback(context, &year);
+//        home_to_date_time(context, true, true);
+//        neutral_date_skip(context);
+//        settings_to_enter_game(context, true);
+        pbf_mash_button(context, BUTTON_B, 90);
+        context.wait_for_all_requests();
 
         {
             StandardBattleMenuWatcher battle_menu_detector(false);
@@ -126,7 +126,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, 
                 env.log("Unexpected battle menu.", COLOR_RED);
                 stats.add_error();
                 env.update_stats();
-                pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
                 run_away(env, context, env.console, EXIT_BATTLE_TIMEOUT);
                 continue;
             case 1:
@@ -151,18 +151,18 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, 
         if (stop){
             break;
         }
-//        pbf_mash_button(env.console, BUTTON_B, 10 * TICKS_PER_SECOND);
+//        pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
     }
 
-    pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
 
-    home_to_date_time(env.console, false, false);
-    pbf_press_button(env.console, BUTTON_A, 5, 5);
-    pbf_press_button(env.console, BUTTON_A, 5, 10);
-    pbf_press_button(env.console, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+    home_to_date_time(context, false, false);
+    pbf_press_button(context, BUTTON_A, 5, 5);
+    pbf_press_button(context, BUTTON_A, 5, 10);
+    pbf_press_button(context, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
 
     if (!GO_HOME_WHEN_DONE){
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().HOME_TO_GAME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().HOME_TO_GAME_DELAY);
     }
 
     send_program_finished_notification(

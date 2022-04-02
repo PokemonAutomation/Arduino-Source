@@ -50,10 +50,10 @@ void CaughtPokemonScreen::enter_summary(){
         return;
     }
 
-    pbf_press_button(m_console, BUTTON_A, 10, 100);
-    pbf_press_dpad(m_console, DPAD_DOWN, 10, 50);
-    pbf_press_button(m_console, BUTTON_A, 10, 0);
-    m_console.botbase().wait_for_all_requests();
+    pbf_press_button(m_context, BUTTON_A, 10, 100);
+    pbf_press_dpad(m_context, DPAD_DOWN, 10, 50);
+    pbf_press_button(m_context, BUTTON_A, 10, 0);
+    m_context.wait_for_all_requests();
 
     Detection detection = detector.wait_for_detection(m_env, m_console);
     m_in_summary = true;
@@ -68,7 +68,7 @@ void CaughtPokemonScreen::leave_summary(){
     SummaryShinySymbolDetector detector(m_console, m_console);
     process_detection(detector.wait_for_detection(m_env, m_console));
 
-    pbf_press_button(m_console, BUTTON_B, 10, TICKS_PER_SECOND);
+    pbf_press_button(m_context, BUTTON_B, 10, TICKS_PER_SECOND);
 
     PokemonCaughtMenuDetector caught_menu;
 
@@ -80,8 +80,8 @@ void CaughtPokemonScreen::leave_summary(){
 
     switch (result){
     case 0:
-        pbf_wait(m_console, 125);
-        m_console.botbase().wait_for_all_requests();
+        pbf_wait(m_context, 125);
+        m_context.wait_for_all_requests();
         break;
     default:
         dump_image(m_console, m_env.program_info(), "CaughtMenu", m_console.video().snapshot());
@@ -91,8 +91,8 @@ void CaughtPokemonScreen::leave_summary(){
     m_in_summary = false;
 }
 void CaughtPokemonScreen::scroll_down(){
-    pbf_press_dpad(m_console, DPAD_DOWN, 10, TICKS_PER_SECOND);
-    m_console.botbase().wait_for_all_requests();
+    pbf_press_dpad(m_context, DPAD_DOWN, 10, TICKS_PER_SECOND);
+    m_context.wait_for_all_requests();
     m_current_position++;
     if (m_current_position >= m_total){
         m_current_position = 0;

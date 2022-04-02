@@ -27,8 +27,7 @@ namespace MaxLairInternal{
 
 
 void run_path_select(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     GlobalStateTracker& state_tracker
 ){
     size_t console_index = console.index();
@@ -43,7 +42,7 @@ void run_path_select(
     reader.read_hp(console, state, screen);
 
     if (state.wins == 0){
-        reader.read_path(env, console, state);
+        reader.read_path(env, context, console, state);
     }else{
         reader.read_side(console, state, screen);
     }
@@ -66,10 +65,10 @@ void run_path_select(
     console.log("Choosing path " + std::to_string((int)slot) + ".", COLOR_PURPLE);
 
     for (uint8_t c = 0; c < slot; c++){
-        pbf_press_dpad(console, DPAD_RIGHT, 10, 50);
+        pbf_press_dpad(context, DPAD_RIGHT, 10, 50);
     }
-    pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
-    console.botbase().wait_for_all_requests();
+    pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+    context.wait_for_all_requests();
 }
 
 

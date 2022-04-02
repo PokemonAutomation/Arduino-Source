@@ -28,7 +28,7 @@ class EggFetcher2 : public SingleSwitchProgramInstance{
 public:
     EggFetcher2(const EggFetcher2_Descriptor& descriptor);
 
-    void run_eggfetcher(SingleSwitchProgramEnvironment& env, bool deposit_automatically, uint16_t attempts) const;
+    void run_eggfetcher(LoggerQt& logger, BotBaseContext& context, bool deposit_automatically, uint16_t attempts) const;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:

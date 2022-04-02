@@ -45,7 +45,7 @@ private:
     // Fly from the old couple to Hearthome Pokecenter, heal and return.
     void fly_to_center_heal_and_return(BotBaseContext& context, ConsoleHandle& console, uint8_t pp[4]);
     // Move around to charge VS Seeker.
-    void charge_vs_seeker(ConsoleHandle& console);
+    void charge_vs_seeker(BotBaseContext& context);
 
     static size_t total_pp(uint8_t pp[4]);
 

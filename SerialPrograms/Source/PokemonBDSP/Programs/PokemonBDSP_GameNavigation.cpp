@@ -64,8 +64,8 @@ void box_to_overworld(BotBaseContext& context){
 //  Feedback
 
 void overworld_to_menu(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console){
-    pbf_press_button(console, BUTTON_X, 20, 105);
-    console.botbase().wait_for_all_requests();
+    pbf_press_button(context, BUTTON_X, 20, 105);
+    context.wait_for_all_requests();
     {
         MenuWatcher detector;
         int ret = wait_until(
@@ -82,8 +82,8 @@ void overworld_to_menu(ProgramEnvironment& env, BotBaseContext& context, Console
 
 void save_game(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console){
     overworld_to_menu(env, context, console);
-    pbf_press_button(console, BUTTON_R, 10, 2 * TICKS_PER_SECOND);
-    pbf_press_button(console, BUTTON_ZL, 10, 5 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_R, 10, 2 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_ZL, 10, 5 * TICKS_PER_SECOND);
 }
 
 void overworld_to_box(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console){
@@ -93,17 +93,17 @@ void overworld_to_box(ProgramEnvironment& env, BotBaseContext& context, ConsoleH
     //  Enter Pokemon
     uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
 #if 0
-//    pbf_mash_button(console, BUTTON_ZL, 30);
+//    pbf_mash_button(context, BUTTON_ZL, 30);
     if (MENU_TO_POKEMON_DELAY > 30){
-        pbf_wait(console, MENU_TO_POKEMON_DELAY - 30);
+        pbf_wait(context, MENU_TO_POKEMON_DELAY - 30);
     }
 #else
-    pbf_press_button(console, BUTTON_ZL, 20, MENU_TO_POKEMON_DELAY);
+    pbf_press_button(context, BUTTON_ZL, 20, MENU_TO_POKEMON_DELAY);
 #endif
 
     //  Enter box system.
-    pbf_press_button(console, BUTTON_R, 20, 105);
-    console.botbase().wait_for_all_requests();
+    pbf_press_button(context, BUTTON_R, 20, 105);
+    context.wait_for_all_requests();
     {
         BoxWatcher detector;
         int ret = wait_until(
@@ -129,12 +129,12 @@ void box_to_overworld(ProgramEnvironment& env, BotBaseContext& context, ConsoleH
     //                  be swallowed by the animation.
     //  In state (2):   The 1st B will drop the party pokemon. The 2nd B will
     //                  back out of the box.
-    pbf_press_button(console, BUTTON_B, 20, 30);
-    pbf_press_button(console, BUTTON_B, 20, GameSettings::instance().BOX_TO_POKEMON_DELAY);
+    pbf_press_button(context, BUTTON_B, 20, 30);
+    pbf_press_button(context, BUTTON_B, 20, GameSettings::instance().BOX_TO_POKEMON_DELAY);
 
     //  To menu.
-    pbf_press_button(console, BUTTON_B, 20, 105);
-    console.botbase().wait_for_all_requests();
+    pbf_press_button(context, BUTTON_B, 20, 105);
+    context.wait_for_all_requests();
     {
         MenuWatcher detector;
         int ret = wait_until(
@@ -148,7 +148,7 @@ void box_to_overworld(ProgramEnvironment& env, BotBaseContext& context, ConsoleH
     }
 
     //  To overworld.
-    pbf_press_button(console, BUTTON_X, 20, GameSettings::instance().MENU_TO_OVERWORLD_DELAY);
+    pbf_press_button(context, BUTTON_X, 20, GameSettings::instance().MENU_TO_OVERWORLD_DELAY);
 }
 
 

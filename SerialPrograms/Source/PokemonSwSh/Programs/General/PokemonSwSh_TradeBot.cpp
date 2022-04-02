@@ -145,15 +145,15 @@ void TradeBot::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
     TRADE_CODE.to_str(code);
 
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
-        resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        grip_menu_connect_go_home(context);
+        resume_game_no_interact(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){
         for (uint8_t c = 0; c < 30; c++){
-            trade_slot(env.console, code, c);
+            trade_slot(context, code, c);
         }
 
         //  If the previous trade isn't done, either wait to finish or cancel it.
@@ -165,31 +165,31 @@ void TradeBot::program(SingleSwitchProgramEnvironment& env, BotBaseContext& cont
         //          because the trade is in progress. The 2nd iteration finishes it.
         //      4.  No partner was ever found. The 1st iteration will cancel the trade.
         for (uint8_t c = 0; c < 2; c++){
-            ssf_press_button1(env.console, BUTTON_Y, 250);
-            ssf_press_button1(env.console, BUTTON_A, 280);
-            ssf_press_button1(env.console, BUTTON_B, 280);
-            ssf_press_button1(env.console, BUTTON_B, 200);
-            ssf_press_button1(env.console, BUTTON_A, 100);
-            pbf_mash_button(env.console, BUTTON_B, TRADE_ANIMATION);
+            ssf_press_button1(context, BUTTON_Y, 250);
+            ssf_press_button1(context, BUTTON_A, 280);
+            ssf_press_button1(context, BUTTON_B, 280);
+            ssf_press_button1(context, BUTTON_B, 200);
+            ssf_press_button1(context, BUTTON_A, 100);
+            pbf_mash_button(context, BUTTON_B, TRADE_ANIMATION);
         }
 
         //  Wait out any new pokedex entries or trade evolutions.
-        pbf_mash_button(env.console, BUTTON_B, EVOLVE_DELAY);
+        pbf_mash_button(context, BUTTON_B, EVOLVE_DELAY);
 
         //  Change boxes.
-        ssf_press_button2(env.console, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
-        ssf_press_button2(env.console, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY, 10);
-        ssf_press_button2(env.console, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY, 10);
-        ssf_press_button2(env.console, BUTTON_R, GameSettings::instance().BOX_CHANGE_DELAY, 10);
+        ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
+        ssf_press_button2(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY, 10);
+        ssf_press_button2(context, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY, 10);
+        ssf_press_button2(context, BUTTON_R, GameSettings::instance().BOX_CHANGE_DELAY, 10);
         pbf_mash_button(
-            env.console, BUTTON_B,
+            context, BUTTON_B,
             GameSettings::instance().BOX_TO_POKEMON_DELAY +
             GameSettings::instance().POKEMON_TO_MENU_DELAY +
             GameSettings::instance().OVERWORLD_TO_MENU_DELAY
         );
     }
 
-    ssf_press_button2(env.console, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
+    ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
 }
 
 

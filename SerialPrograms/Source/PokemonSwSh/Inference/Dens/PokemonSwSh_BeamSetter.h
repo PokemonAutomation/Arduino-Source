@@ -30,7 +30,7 @@ public:
     };
 
 public:
-    BeamSetter(ProgramEnvironment& env, ConsoleHandle& console);
+    BeamSetter(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console);
 
     Detection run(
         bool save_screenshot,
@@ -44,6 +44,7 @@ public:
 
 private:
     ProgramEnvironment& m_env;
+    BotBaseContext& m_context;
     ConsoleHandle& m_console;
     InferenceBoxScope m_text_box;
     InferenceBoxScope m_box;

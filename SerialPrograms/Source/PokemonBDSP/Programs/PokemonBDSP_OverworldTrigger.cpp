@@ -115,7 +115,7 @@ bool OverworldTrigger::find_encounter(SingleSwitchProgramEnvironment& env, BotBa
 
         //  Go to pokemon page
         const uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
-        pbf_press_button(env.console, BUTTON_ZL, 20, MENU_TO_POKEMON_DELAY);
+        pbf_press_button(context, BUTTON_ZL, 20, MENU_TO_POKEMON_DELAY);
 
         //  Go to the pokemon that knows Sweet Scent
         const size_t location = SWEET_SCENT_POKEMON_LOCATION;
@@ -123,23 +123,23 @@ bool OverworldTrigger::find_encounter(SingleSwitchProgramEnvironment& env, BotBa
         if (location >= 1 && location <= 3){
             const size_t move_down_times = location;
             for(size_t i = 0; i < move_down_times; ++i){
-                pbf_press_dpad(env.console, DPAD_DOWN, 1, change_pokemon_delay);
+                pbf_press_dpad(context, DPAD_DOWN, 1, change_pokemon_delay);
             }
         }else if (location >= 1){ // for location 4 and 5
             const size_t move_down_times = 6 - location;
             for (size_t i = 0; i < move_down_times; ++i){
-                pbf_press_dpad(env.console, DPAD_UP, 1, change_pokemon_delay);
+                pbf_press_dpad(context, DPAD_UP, 1, change_pokemon_delay);
             }
         }
 
         //  Open the pokemon menu of the selected pokemon
         const uint16_t pokemon_to_pokemon_menu_delay = 30;
-        pbf_press_button(env.console, BUTTON_ZL, 20, pokemon_to_pokemon_menu_delay);
+        pbf_press_button(context, BUTTON_ZL, 20, pokemon_to_pokemon_menu_delay);
         //  Move down one menuitem to select "Sweet Scent"
         const uint16_t move_pokemon_menu_item_delay = 30;
-        pbf_press_dpad(env.console, DPAD_DOWN, 1, move_pokemon_menu_item_delay);
+        pbf_press_dpad(context, DPAD_DOWN, 1, move_pokemon_menu_item_delay);
         //  Use sweet scent
-        pbf_mash_button(env.console, BUTTON_ZL, 30);
+        pbf_mash_button(context, BUTTON_ZL, 30);
 
         result = wait_until(
             env, context, env.console, std::chrono::seconds(30),

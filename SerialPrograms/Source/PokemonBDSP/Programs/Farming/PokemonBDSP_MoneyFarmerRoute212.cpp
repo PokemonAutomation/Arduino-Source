@@ -121,14 +121,14 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
         env.log("Starting battle with woman (right).");
     }
 
-    pbf_mash_button(env.console, BUTTON_ZL, 5 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_ZL, 5 * TICKS_PER_SECOND);
 
     bool battle_menu_seen = false;
 
     //  State Machine
     //  We need lots of loops in case the party pokemon need to learn lots of moves.
     while (true){
-        env.console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
 
         BattleMenuWatcher battle_menu(BattleType::TRAINER);
         EndBattleWatcher end_battle;
@@ -149,7 +149,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
             env.log("Battle menu detected!", COLOR_BLUE);
             battle_menu_seen = true;
 
-            pbf_press_button(env.console, BUTTON_ZL, 10, 125);
+            pbf_press_button(context, BUTTON_ZL, 10, 125);
 
             uint8_t slot = 0;
             for (; slot < 4; slot++){
@@ -162,9 +162,9 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
             }
 
             for (uint8_t move_slot = 0; move_slot < slot; move_slot++){
-                pbf_press_dpad(env.console, DPAD_DOWN, 10, 50);
+                pbf_press_dpad(context, DPAD_DOWN, 10, 50);
             }
-            pbf_mash_button(env.console, BUTTON_ZL, 250);
+            pbf_mash_button(context, BUTTON_ZL, 250);
             pp[slot]--;
             env.log("Used move at slot " + std::to_string(slot+1) + ". " + std::to_string(pp[slot]) + " PP left.", COLOR_BLUE);
 
@@ -172,17 +172,17 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
         }
         case 1:
             env.log("Battle finished!", COLOR_BLUE);
-            pbf_mash_button(env.console, BUTTON_B, 250);
+            pbf_mash_button(context, BUTTON_B, 250);
             return false;
 //        case 1:
 //            env.log("Dialog detected! Battle finished?", COLOR_BLUE);
-//            pbf_mash_button(env.console, BUTTON_B, 250);
+//            pbf_mash_button(context, BUTTON_B, 250);
 //            return;
         case 2:
             env.log("Detected move learn!", COLOR_BLUE);
             if (ON_LEARN_MOVE == 0){
-                pbf_move_right_joystick(env.console, 128, 255, 20, 105);
-                pbf_press_button(env.console, BUTTON_ZL, 20, 105);
+                pbf_move_right_joystick(context, 128, 255, 20, 105);
+                pbf_press_button(context, BUTTON_ZL, 20, 105);
                 break;
             }
             return true;
@@ -260,10 +260,10 @@ bool MoneyFarmerRoute212::heal_after_battle_and_return(
     }
 }
 
-void MoneyFarmerRoute212::charge_vs_seeker(ConsoleHandle& console){
+void MoneyFarmerRoute212::charge_vs_seeker(BotBaseContext& context){
     for (size_t c = 0; c < 5; c++){
-        pbf_move_left_joystick(console, 0, 128, 180, 0);
-        pbf_move_left_joystick(console, 255, 128, 180, 0);
+        pbf_move_left_joystick(context, 0, 128, 180, 0);
+        pbf_move_left_joystick(context, 255, 128, 180, 0);
     }
 }
 
@@ -289,7 +289,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     };
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_B, 5, 5);
+    pbf_press_button(context, BUTTON_B, 5, 5);
 
     bool need_to_charge = true;
     if (START_LOCATION == 0){
@@ -299,7 +299,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         if (HEALING_METHOD == 1){
             heal_by_global_room(env, context, env.console);
         }
-        pbf_move_left_joystick(env.console, 255, 128, 180, 0);
+        pbf_move_left_joystick(context, 255, 128, 180, 0);
     }
 
     while (true){
@@ -313,13 +313,13 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         );
 
         if (need_to_charge){
-            charge_vs_seeker(env.console);
+            charge_vs_seeker(context);
         }
 
         //  Move to woman.
-        pbf_move_left_joystick(env.console, 0, 128, 52, 0);
+        pbf_move_left_joystick(context, 0, 128, 52, 0);
 
-        env.console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
         stats.m_searches++;
 
         QSize dimensions;
@@ -335,7 +335,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
                 { &tracker }
             );
             need_to_charge = true;
-            pbf_mash_button(env.console, BUTTON_B, 250);
+            pbf_mash_button(context, BUTTON_B, 250);
 
             dimensions = tracker.dimensions();
             bubbles = tracker.reactions();
@@ -368,8 +368,8 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         }
 
         if (woman){
-//            pbf_move_left_joystick(env.console, 0, 128, 52, 0);
-            pbf_move_left_joystick(env.console, 128, 255, 10, 0);
+//            pbf_move_left_joystick(context, 0, 128, 52, 0);
+            pbf_move_left_joystick(context, 128, 255, 10, 0);
 
             //  Battle woman.
             if(battle(env, context, pp, false)){
@@ -392,11 +392,11 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
 #endif
 
 //            if (woman){
-                pbf_move_left_joystick(env.console, 0, 128, 52, 0);
-                pbf_move_left_joystick(env.console, 128, 255, 10, 0);
+                pbf_move_left_joystick(context, 0, 128, 52, 0);
+                pbf_move_left_joystick(context, 128, 255, 10, 0);
 //            }else{
-//                pbf_move_left_joystick(env.console, 0, 128, 105, 0);
-//                pbf_move_left_joystick(env.console, 128, 255, 10, 0);
+//                pbf_move_left_joystick(context, 0, 128, 105, 0);
+//                pbf_move_left_joystick(context, 128, 255, 10, 0);
 //            }
 
             //  Battle man.
@@ -410,7 +410,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
                 continue;
             }
         }
-        pbf_move_left_joystick(env.console, 255, 128, 180, 0);
+        pbf_move_left_joystick(context, 255, 128, 180, 0);
 
     }
 }

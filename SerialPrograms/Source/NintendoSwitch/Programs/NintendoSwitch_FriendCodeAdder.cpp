@@ -65,7 +65,7 @@ FriendCodeAdder::FriendCodeAdder(const FriendCodeAdder_Descriptor& descriptor)
 }
 
 void FriendCodeAdder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-    grip_menu_connect_go_home(env.console);
+    grip_menu_connect_go_home(context);
 
     bool first = true;
     for (const QString& line : FRIEND_CODES.lines()){
@@ -74,16 +74,16 @@ void FriendCodeAdder::program(SingleSwitchProgramEnvironment& env, BotBaseContex
             continue;
         }
 
-        PokemonSwSh::home_to_add_friends(env.console, USER_SLOT - 1, 3, first);
+        PokemonSwSh::home_to_add_friends(context, USER_SLOT - 1, 3, first);
         first = false;
 
-        ssf_press_button1(env.console, BUTTON_A, OPEN_CODE_PAD_DELAY);
-        enter_digits(env.console, 12, &code[0]);
+        ssf_press_button1(context, BUTTON_A, OPEN_CODE_PAD_DELAY);
+        enter_digits(context, 12, &code[0]);
 
-        pbf_wait(env.console, SEARCH_TIME);
-        ssf_press_button1(env.console, BUTTON_A, TOGGLE_BEST_STATUS_DELAY);
-        ssf_press_button1(env.console, BUTTON_A, TOGGLE_BEST_STATUS_DELAY);
-        pbf_press_button(env.console, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+        pbf_wait(context, SEARCH_TIME);
+        ssf_press_button1(context, BUTTON_A, TOGGLE_BEST_STATUS_DELAY);
+        ssf_press_button1(context, BUTTON_A, TOGGLE_BEST_STATUS_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
     }
 }
 

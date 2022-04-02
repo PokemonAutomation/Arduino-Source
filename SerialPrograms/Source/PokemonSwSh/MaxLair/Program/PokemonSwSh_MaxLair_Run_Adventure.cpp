@@ -86,7 +86,7 @@ AdventureResult run_adventure(
             case StateMachineAction::STOP_PROGRAM:
                 env.log("End of adventure. Stop program requested...", COLOR_PURPLE);
                 if (runtime.go_home_when_done){
-                    pbf_press_button(console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+                    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
                 }
                 stop.store(true, std::memory_order_release);
                 return;
@@ -94,7 +94,7 @@ AdventureResult run_adventure(
                 env.log("Error detected. Attempting to correct by resetting...", COLOR_RED);
                 runtime.session_stats.add_error();
                 error.store(true, std::memory_order_release);
-                pbf_press_button(console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+                pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
                 reset_game_from_home_with_inference(env, context, console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
                 return;
             }

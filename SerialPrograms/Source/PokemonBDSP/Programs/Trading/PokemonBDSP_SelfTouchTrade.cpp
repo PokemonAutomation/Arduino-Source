@@ -65,17 +65,19 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
     TradeStats& stats = env.stats<TradeStats>();
     env.update_stats();
 
+    BotBaseContext host(env.scope(), env.consoles[HOSTING_SWITCH].botbase());
+
     //  Swap trade all the boxes.
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){
         if (box != 0){
-            pbf_press_button(env.consoles[HOSTING_SWITCH], BUTTON_R, 20, GameSettings::instance().BOX_CHANGE_DELAY_0);
+            pbf_press_button(host, BUTTON_R, 20, GameSettings::instance().BOX_CHANGE_DELAY_0);
         }
         trade_current_box(env, NOTIFICATION_STATUS_UPDATE, stats);
     }
 
     //  Trade back the last box.
     for (uint8_t box = 1; box < BOXES_TO_TRADE; box++){
-        pbf_press_button(env.consoles[HOSTING_SWITCH], BUTTON_L, 20, GameSettings::instance().BOX_CHANGE_DELAY_0);
+        pbf_press_button(host, BUTTON_L, 20, GameSettings::instance().BOX_CHANGE_DELAY_0);
     }
     trade_current_box(env, NOTIFICATION_STATUS_UPDATE, stats);
 

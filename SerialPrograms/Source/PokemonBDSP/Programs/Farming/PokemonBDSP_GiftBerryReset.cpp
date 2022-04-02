@@ -102,7 +102,7 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     env.update_stats();
 
     //  Connect the controller.
-    pbf_move_right_joystick(env.console, 0, 255, 10, 0);
+    pbf_move_right_joystick(context, 0, 255, 10, 0);
 
     const auto selected_berries = TARGET_BERRIES.selected_berries();
     for (const auto& berry_slug: selected_berries){
@@ -116,10 +116,10 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         env.console.log("Talking to berry npc.");
         // Press ZL three times to advance dialog with npc
         for (int i = 0; i < 3; i++){
-            pbf_mash_button(env.console, BUTTON_ZL, 30);
-            pbf_wait(env.console, 150);
+            pbf_mash_button(context, BUTTON_ZL, 30);
+            pbf_wait(context, 150);
         }
-        env.console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
 
         // Read dialog box to check which berry it is
         ShortDialogDetector dialog_detector;
@@ -155,7 +155,7 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         }
 
         // Reset game:
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
         if (!reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
             throw OperationFailedException(env.console, "Error resetting game");
             break;
@@ -169,7 +169,7 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         "",
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

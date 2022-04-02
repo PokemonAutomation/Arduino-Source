@@ -37,45 +37,45 @@ namespace{
         return { box, row, column };
     }
     
-    uint16_t move_to_location(SingleSwitchProgramEnvironment& env, uint16_t from, uint16_t to){
+    uint16_t move_to_location(Logger& logger, BotBaseContext& context, uint16_t from, uint16_t to){
         auto [from_box, from_row, from_column] = get_location(from);
         auto [to_box, to_row, to_column] = get_location(to);
 
         std::stringstream ss;
         ss << "Moving from location index " << from << "(" << from_box << "/" << from_row << "/" << from_column << ")";
         ss << " to location index " << to << "(" << to_box << "/" << to_row << "/" << to_column << ")";
-        env.log(ss.str());
+        logger.log(ss.str());
 
         int difference_box = to_box - from_box;
         int difference_row = to_row - from_row;
         int difference_column = to_column - from_column;
         for (int i = 0; i < difference_box; ++i){
-            pbf_press_button(env.console, BUTTON_R, 10, k_wait_after_move);
+            pbf_press_button(context, BUTTON_R, 10, k_wait_after_move);
         }
         for (int i = 0; i > difference_box; --i){
-            pbf_press_button(env.console, BUTTON_L, 10, k_wait_after_move);
+            pbf_press_button(context, BUTTON_L, 10, k_wait_after_move);
         }
 
         for (int i = 0; i < difference_row; ++i){
-            pbf_press_dpad(env.console, DPAD_DOWN, 10, k_wait_after_move);
+            pbf_press_dpad(context, DPAD_DOWN, 10, k_wait_after_move);
         }
         for (int i = 0; i > difference_row; --i){
-            pbf_press_dpad(env.console, DPAD_UP, 10, k_wait_after_move);
+            pbf_press_dpad(context, DPAD_UP, 10, k_wait_after_move);
         }
 
         for (int i = 0; i < difference_column; ++i){
-            pbf_press_dpad(env.console, DPAD_RIGHT, 10, k_wait_after_move);
+            pbf_press_dpad(context, DPAD_RIGHT, 10, k_wait_after_move);
         }
         for (int i = 0; i > difference_column; --i){
-            pbf_press_dpad(env.console, DPAD_LEFT, 10, k_wait_after_move);
+            pbf_press_dpad(context, DPAD_LEFT, 10, k_wait_after_move);
         }
         return to;
     }
 
-    std::string read_selected_pokemon(ProgramEnvironment& env, ConsoleHandle& console, Language language){
-        console.botbase().wait_for_all_requests();
+    std::string read_selected_pokemon(BotBaseContext& context, ConsoleHandle& console, Language language){
+        context.wait_for_all_requests();
         InferenceBoxScope box(console, ImageFloatBox(0.76, 0.08, 0.15, 0.064));
-        env.wait_for(k_wait_after_read);
+        context.wait_for(k_wait_after_read);
 
         QImage screen = console.video().snapshot();
         ConstImageRef frame = extract_box_reference(screen, box);
@@ -87,12 +87,12 @@ namespace{
         return result.results.begin()->second.token;
     }
 
-    std::vector<std::string> read_all_pokemon(SingleSwitchProgramEnvironment& env, uint16_t pokemon_count, Language language){
+    std::vector<std::string> read_all_pokemon(Logger& logger, BotBaseContext& context, ConsoleHandle& console, uint16_t pokemon_count, Language language){
         std::vector<std::string> pokemons;
         uint16_t current_location = 0;
         for (uint16_t i = 0; i < pokemon_count; ++i){
-            current_location = move_to_location(env, current_location, i);
-            pokemons.push_back(read_selected_pokemon(env, env.console, language));
+            current_location = move_to_location(logger, context, current_location, i);
+            pokemons.push_back(read_selected_pokemon(context, console, language));
         }
         return pokemons;
     }
@@ -134,13 +134,13 @@ BoxReorderNationalDex::BoxReorderNationalDex(const BoxReorderNationalDex_Descrip
 
 void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
-        resume_game_no_interact(env.console, DODGE_SYSTEM_UPDATE_WINDOW);
+        grip_menu_connect_go_home(context);
+        resume_game_no_interact(context, DODGE_SYSTEM_UPDATE_WINDOW);
     }else{
-        pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
+        pbf_press_button(context, BUTTON_LCLICK, 5, 5);
     }
 
-    std::vector<std::string> current_order = read_all_pokemon(env, POKEMON_COUNT, LANGUAGE);
+    std::vector<std::string> current_order = read_all_pokemon(env.console, context, env.console, POKEMON_COUNT, LANGUAGE);
 
     QString path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-National.json";
     QJsonArray array = read_json_file(path).array();
@@ -150,7 +150,7 @@ void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, BotBase
         QString slug = item.toString();
         if (slug.size() <= 0) {
             throw FileException(
-                &env.logger(), PA_CURRENT_FUNCTION,
+                &env.console.logger(), PA_CURRENT_FUNCTION,
                 "Expected non-empty string for Pokemon slug.",
                 path.toStdString()
             );
@@ -176,14 +176,14 @@ void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, BotBase
 
         std::stringstream ss;
         ss << "Swapping " << current_order[unsorted_location] << " at location index " << unsorted_location << " and " << current_order[sorted_location] << " at location index " << sorted_location;
-        env.log(ss.str());
-        current_location = move_to_location(env, current_location, unsorted_location);
-        pbf_press_button(env.console, BUTTON_A, 10, k_wait_after_move);
-        current_location = move_to_location(env, current_location, sorted_location);
-        pbf_press_button(env.console, BUTTON_A, 10, k_wait_after_move);
+        env.console.log(ss.str());
+        current_location = move_to_location(env.console, context, current_location, unsorted_location);
+        pbf_press_button(context, BUTTON_A, 10, k_wait_after_move);
+        current_location = move_to_location(env.console, context, current_location, sorted_location);
+        pbf_press_button(context, BUTTON_A, 10, k_wait_after_move);
         std::swap(current_order[unsorted_location], current_order[sorted_location]);
     }
-    pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().HOME_TO_GAME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().HOME_TO_GAME_DELAY);
 }
 
 

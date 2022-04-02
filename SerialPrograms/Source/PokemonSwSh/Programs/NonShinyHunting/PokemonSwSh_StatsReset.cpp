@@ -103,10 +103,10 @@ std::unique_ptr<StatsTracker> StatsReset::make_stats() const{
 
 void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
+        grip_menu_connect_go_home(context);
+        resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
     Stats& stats = env.stats<Stats>();
@@ -115,7 +115,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     while (true){
         env.update_stats();
 
-        env.console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
         {
             BlackScreenOverWatcher detector;
             int result = run_until(
@@ -138,13 +138,13 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         }
         stats.attempts++;
 
-        pbf_mash_button(env.console, BUTTON_B, 1 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
 
-        pbf_press_button(env.console, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
-        ssf_press_dpad2(env.console, DPAD_RIGHT, GameSettings::instance().BOX_SCROLL_DELAY, 10);
-        ssf_press_button2(env.console, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY, 10);
-        ssf_press_button2(env.console, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY, 10);
-        env.console.botbase().wait_for_all_requests();
+        pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+        ssf_press_dpad2(context, DPAD_RIGHT, GameSettings::instance().BOX_SCROLL_DELAY, 10);
+        ssf_press_button2(context, BUTTON_A, GameSettings::instance().MENU_TO_POKEMON_DELAY, 10);
+        ssf_press_button2(context, BUTTON_R, GameSettings::instance().POKEMON_TO_BOX_DELAY, 10);
+        context.wait_for_all_requests();
 
         {
             IVCheckerReaderScope reader(env.console, LANGUAGE);
@@ -163,7 +163,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         }
 
         //  Add a little extra wait time since correctness matters here.
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
 
         reset_game_from_home_with_inference(
             env, context, env.console,
@@ -175,8 +175,8 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
     env.update_stats();
     env.log("Result Found!", COLOR_BLUE);
 
-    pbf_wait(env.console, 5 * TICKS_PER_SECOND);
-    pbf_press_button(env.console, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+    pbf_wait(context, 5 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
 
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
@@ -185,7 +185,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         stats.to_str(),
         screen, false
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

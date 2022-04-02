@@ -44,13 +44,13 @@ void run_professor_swap(
     if (swap){
         console.log("Choosing to swap.", COLOR_PURPLE);
         std::lock_guard<std::mutex> lg(runtime.m_delay_lock);
-        pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
-        console.botbase().wait_for_all_requests();
+        pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+        context.wait_for_all_requests();
     }else{
         console.log("Choosing not to swap.", COLOR_PURPLE);
-        pbf_press_button(console, BUTTON_B, 10, TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_B, 10, TICKS_PER_SECOND);
     }
-    console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
 
 #if 1
     //  Wait until we exit the window.

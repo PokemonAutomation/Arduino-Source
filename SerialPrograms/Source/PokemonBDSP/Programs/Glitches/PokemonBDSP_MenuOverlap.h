@@ -18,12 +18,12 @@ namespace PokemonBDSP{
 //  Activate the menu overlap glitch from the overworld and back out.
 //  Returns the image of the overworld prior to entering the menus.
 //  Returns null image if the operation failed.
-QImage activate_menu_overlap_from_overworld(ConsoleHandle& console);
+QImage activate_menu_overlap_from_overworld(BotBaseContext& context, ConsoleHandle& console);
 
 
 //  Press B to back out all the way to the overworld with the menu on overlapped on top.
 bool back_out_to_overworld_with_overlap(
-    ConsoleHandle& console,
+    BotBaseContext& context, ConsoleHandle& console,
     const QImage& start,    //  Image of the overworld prior to enter the menus.
     uint16_t mash_B_start   //  Mash B for this long before using feedback.
 );

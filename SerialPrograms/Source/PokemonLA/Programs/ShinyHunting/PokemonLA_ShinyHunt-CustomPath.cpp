@@ -81,9 +81,9 @@ std::unique_ptr<StatsTracker> ShinyHuntCustomPath::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-void ShinyHuntCustomPath::do_non_listen_action(SingleSwitchProgramEnvironment& env, size_t action_index){
+void ShinyHuntCustomPath::do_non_listen_action(BotBaseContext& context, ConsoleHandle& console, size_t action_index){
     const auto& row = CUSTOM_PATH_TABLE.get_action(action_index);
-    env.log("Execute action " + PathAction_NAMES[(size_t)row.action]);
+    console.log("Execute action " + PathAction_NAMES[(size_t)row.action]);
     switch(row.action){
         case PathAction::CHANGE_MOUNT:
         {
@@ -109,18 +109,18 @@ void ShinyHuntCustomPath::do_non_listen_action(SingleSwitchProgramEnvironment& e
             }
 
             if (mountState == MountState::NOTHING){
-                dismount(env.console);
+                dismount(context, console);
             } else{
-                change_mount(env.console, mountState);
+                change_mount(context, console, mountState);
             }
             break;
         }
         case PathAction::ROTATE_CAMERA:
         {
             if (row.camera_turn_ticks > 0){
-                pbf_move_right_joystick(env.console, 255, 128, uint16_t(row.camera_turn_ticks), 0);
+                pbf_move_right_joystick(context, 255, 128, uint16_t(row.camera_turn_ticks), 0);
             } else if (row.camera_turn_ticks < 0){
-                pbf_move_right_joystick(env.console, 0, 128, uint16_t(-row.camera_turn_ticks), 0);
+                pbf_move_right_joystick(context, 0, 128, uint16_t(-row.camera_turn_ticks), 0);
             }
             break;
         }
@@ -128,40 +128,40 @@ void ShinyHuntCustomPath::do_non_listen_action(SingleSwitchProgramEnvironment& e
         {
             switch(row.move_speed){
             case PathSpeed::NORMAL_SPEED:
-                pbf_move_left_joystick(env.console, 128, 0, row.move_forward_ticks, 0);
+                pbf_move_left_joystick(context, 128, 0, row.move_forward_ticks, 0);
                 break;
             case PathSpeed::SLOW_SPEED:
-                pbf_move_left_joystick(env.console, 128, 64, row.move_forward_ticks, 0);
+                pbf_move_left_joystick(context, 128, 64, row.move_forward_ticks, 0);
                 break;
             case PathSpeed::RUN:
-                pbf_controller_state(env.console, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, row.move_forward_ticks);
+                pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, row.move_forward_ticks);
                 break;
             case PathSpeed::DASH:
-                pbf_press_button(env.console, BUTTON_B, row.move_forward_ticks, 0);
+                pbf_press_button(context, BUTTON_B, row.move_forward_ticks, 0);
                 break;
             case PathSpeed::DASH_B_SPAM:
-                pbf_mash_button(env.console, BUTTON_B, row.move_forward_ticks);
+                pbf_mash_button(context, BUTTON_B, row.move_forward_ticks);
                 break;
             case PathSpeed::DIVE:
-                pbf_press_button(env.console, BUTTON_Y, row.move_forward_ticks, 0);
+                pbf_press_button(context, BUTTON_Y, row.move_forward_ticks, 0);
                 break;
             }
             break;
         }
         case PathAction::JUMP:
         {
-            pbf_press_button(env.console, BUTTON_Y, 10, row.jump_wait_ticks);
+            pbf_press_button(context, BUTTON_Y, 10, row.jump_wait_ticks);
             break;
         }
         case PathAction::WAIT:
         {
-            pbf_wait(env.console, row.wait_ticks);
+            pbf_wait(context, row.wait_ticks);
             break;
         }
         default:   
             break;
     } // end switch action
-    env.console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
 }
 
 
@@ -171,7 +171,7 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseC
     for(size_t action_index = 0; action_index < CUSTOM_PATH_TABLE.num_actions(); action_index++){
         const auto& row = CUSTOM_PATH_TABLE.get_action(action_index);
         if (row.action != PathAction::START_LISTEN){
-            do_non_listen_action(env, action_index);
+            do_non_listen_action(context, env.console, action_index);
         } else{
             env.log("Start Listen, build sound detector");
             // Build shiny sound detector and start listens:
@@ -186,7 +186,7 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseC
                     for(; action_index < CUSTOM_PATH_TABLE.num_actions(); action_index++){
                         const auto& listened_row = CUSTOM_PATH_TABLE.get_action(action_index);
                         if (listened_row.action != PathAction::END_LISTEN){
-                            do_non_listen_action(env, action_index);
+                            do_non_listen_action(context, env.console, action_index);
                         } else{
                             env.log("End Listen, exit sound detector");
                             break;
@@ -197,7 +197,7 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseC
                 { &shiny_detector });
             if (shiny_detector.detected()){
                 stats.shinies++;
-                on_shiny_sound(env, env.console, SHINY_DETECTED, shiny_detector.results());
+                on_shiny_sound(env, context, env.console, SHINY_DETECTED, shiny_detector.results());
                 break;
             }
         }
@@ -209,7 +209,7 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
     if (TEST_PATH){
         // Run the test path immediately
@@ -248,11 +248,11 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, BotBaseCo
 
             stats.attempts++;
 
-            pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }catch (OperationFailedException&){
             stats.errors++;
-            pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
 

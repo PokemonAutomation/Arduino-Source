@@ -108,11 +108,11 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
     env.update_stats();
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
     bool pokemon_caught = false;
     while (!pokemon_caught){
-        env.console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
         env.log("Wait for a pokemon to attack you.", COLOR_PURPLE);
         {
             BattleMenuWatcher fight_detector(BattleType::STANDARD);
@@ -130,7 +130,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
             );
             if (result == 0){
                 env.log("New fight detected.", COLOR_PURPLE);
-                pbf_mash_button(env.console, BUTTON_B, 1 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
             }
         }
 
@@ -174,7 +174,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
         }
 
         if (!pokemon_caught){
-            pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, context, env.console, true);
         }
     }
@@ -187,7 +187,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
         "Caught the " + STRING_POKEMON,
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

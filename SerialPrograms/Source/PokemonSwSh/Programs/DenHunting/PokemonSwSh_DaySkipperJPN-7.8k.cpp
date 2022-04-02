@@ -139,7 +139,7 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     uint32_t remaining_skips = SKIPS;
 
     //  Connect
-    pbf_press_button(env.console, BUTTON_ZL, 5, 5);
+    pbf_press_button(context, BUTTON_ZL, 5, 5);
 
     //  Sanitize starting date.
     uint16_t year = (uint16_t)((QDate)START_DATE).year();
@@ -159,7 +159,7 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     }
 
     //  Setup starting state.
-    skipper_init_view(env.console);
+    skipper_init_view(context);
 
     uint16_t correct_count = 0;
     while (remaining_skips > 0){
@@ -170,7 +170,7 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             stats.to_str_current(remaining_skips)
         );
 
-        if (date_increment_day(env.console, &date, true)){
+        if (date_increment_day(context, &date, true)){
             correct_count++;
             remaining_skips--;
             stats.issued++;
@@ -180,13 +180,13 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         }
         if (CORRECTION_SKIPS != 0 && correct_count == CORRECTION_SKIPS){
             correct_count = 0;
-            skipper_auto_recovery(env.console);
+            skipper_auto_recovery(context);
         }
 
     }
 
     //  Prevent the Switch from sleeping and the time from advancing.
-    env.console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
         env.program_info(),
@@ -194,9 +194,9 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         stats.to_str_current(remaining_skips)
     );
 
-    pbf_wait(env.console, 15 * TICKS_PER_SECOND);
+    pbf_wait(context, 15 * TICKS_PER_SECOND);
     while (true){
-        ssf_press_button1(env.console, BUTTON_A, 15 * TICKS_PER_SECOND);
+        ssf_press_button1(context, BUTTON_A, 15 * TICKS_PER_SECOND);
     }
 }
 

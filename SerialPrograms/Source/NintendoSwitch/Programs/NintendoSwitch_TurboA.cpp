@@ -34,12 +34,12 @@ TurboA::TurboA(const TurboA_Descriptor& descriptor)
 
 void TurboA::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
-        PokemonSwSh::resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
+        grip_menu_connect_go_home(context);
+        PokemonSwSh::resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
     }
 
     while (true){
-        pbf_press_button(env.console, BUTTON_A, 5, 5);
+        pbf_press_button(context, BUTTON_A, 5, 5);
     }
 }
 

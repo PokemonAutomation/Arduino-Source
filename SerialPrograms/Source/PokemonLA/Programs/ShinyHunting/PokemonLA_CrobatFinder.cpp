@@ -99,17 +99,17 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCon
     for (size_t c = 0; c < 10; c++){
         MountState mount = mount_detector.detect(env.console.video().snapshot());
         if (mount == MountState::WYRDEER_OFF){
-            pbf_press_button(env.console, BUTTON_PLUS, 20, 105);
+            pbf_press_button(context, BUTTON_PLUS, 20, 105);
             error = false;
             break;
         }
         if (mount == MountState::WYRDEER_ON){
-            pbf_wait(env.console, 5 * TICKS_PER_SECOND);
+            pbf_wait(context, 5 * TICKS_PER_SECOND);
             error = false;
             break;
         }
-        pbf_press_dpad(env.console, DPAD_LEFT, 20, 50);
-        env.console.botbase().wait_for_all_requests();
+        pbf_press_dpad(context, DPAD_LEFT, 20, 50);
+        context.wait_for_all_requests();
     }
     if (error){
         throw OperationFailedException(env.console, "Unable to find Wyrdeer after 10 attempts.");
@@ -144,14 +144,14 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCon
         );
         if (shiny_detector.detected()){
            stats.shinies++;
-           on_shiny_sound(env, env.console, SHINY_DETECTED, shiny_detector.results());
+           on_shiny_sound(env, context, env.console, SHINY_DETECTED, shiny_detector.results());
         }
     };
 
     // then reset since no shiny was found
     env.console.log("No shiny detected, restarting the game!");
 
-    pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
     reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 }
 
@@ -160,7 +160,7 @@ void CrobatFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
     while (true){
         env.update_stats();
@@ -174,7 +174,7 @@ void CrobatFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             run_iteration(env, context);
         }catch (OperationFailedException&){
             stats.errors++;
-            pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
     }

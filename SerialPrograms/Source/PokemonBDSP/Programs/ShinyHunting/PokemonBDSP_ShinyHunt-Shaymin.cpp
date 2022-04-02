@@ -74,7 +74,7 @@ std::unique_ptr<StatsTracker> ShinyHuntShaymin::make_stats() const{
 
 
 bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env, BotBaseContext& context) const{
-    env.console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
     {
         BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
         ShortDialogWatcher dialog_detector;
@@ -145,7 +145,7 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, BotBaseConte
     LeadingShinyTracker lead_tracker(env.console);
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_B, 5, 5);
+    pbf_press_button(context, BUTTON_B, 5, 5);
 
     //  Encounter Loop
     while (true){
@@ -174,12 +174,12 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         lead_tracker.report_result(result_own.shiny_type);
 
         //  Clear dialogs.
-        pbf_mash_button(env.console, BUTTON_B, 75);
+        pbf_mash_button(context, BUTTON_B, 75);
 
         //  Hop on bike, ride down to seabreak path
 //        SHORTCUT.run(env.console, 0);
-        pbf_move_left_joystick(env.console, 128, 255, 360, 0);
-        pbf_move_left_joystick(env.console, 128, 0, 370, 0);
+        pbf_move_left_joystick(context, 128, 255, 360, 0);
+        pbf_move_left_joystick(context, 128, 0, 370, 0);
     }
 
     send_program_finished_notification(
@@ -188,7 +188,7 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         "",
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 }

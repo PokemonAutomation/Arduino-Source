@@ -97,7 +97,7 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
     Stats& stats = env.stats<Stats>();
 
     // From game to Switch Home
-    pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
     // Restart the game and go to game menu (where "Press A" is shown to enter the game)
     switch_home_to_gamemenu(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     {
@@ -127,7 +127,7 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
             { &shiny_detector });
         if (shiny_detector.detected()){
            stats.shinies++;
-           on_shiny_sound(env, env.console, SHINY_DETECTED, shiny_detector.results());
+           on_shiny_sound(env, context, env.console, SHINY_DETECTED, shiny_detector.results());
         }
     }
 
@@ -140,7 +140,7 @@ void PostMMOSpawnReset::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
     while (true){
         env.update_stats();

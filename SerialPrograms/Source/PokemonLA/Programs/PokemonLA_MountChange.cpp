@@ -52,20 +52,20 @@ bool get_mount_coordinates(size_t& index, MountState mount){
     }
 }
 
-void change_mount(ConsoleHandle& console, MountState mount){
+void change_mount(BotBaseContext& context, ConsoleHandle& console, MountState mount){
     size_t desired_index;
     bool desired_on = get_mount_coordinates(desired_index, mount);
 
     MountDetector mount_detector;
     for (size_t c = 0; c < 10; c++){
-        console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
 
         MountState current = mount_detector.detect(console.video().snapshot());
         if (mount == current){
             return;
         }
         if (current == MountState::NOTHING){
-            pbf_press_dpad(console, DPAD_RIGHT, 20, 50);
+            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
             continue;
         }
 
@@ -73,7 +73,7 @@ void change_mount(ConsoleHandle& console, MountState mount){
         bool current_on = get_mount_coordinates(current_index, current);
 
         if (!desired_on && current_on){
-            pbf_press_button(console, BUTTON_PLUS, 20, 105);
+            pbf_press_button(context, BUTTON_PLUS, 20, 105);
         }
 
         size_t index_diff = (4 + current_index - desired_index) % 4;
@@ -81,22 +81,22 @@ void change_mount(ConsoleHandle& console, MountState mount){
         case 0:
             break;
         case 1:
-            pbf_press_dpad(console, DPAD_RIGHT, 20, 50);
+            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
             break;
         case 2:
-            pbf_press_dpad(console, DPAD_RIGHT, 20, 50);
-            pbf_press_dpad(console, DPAD_RIGHT, 20, 50);
+            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
+            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
             break;
         case 3:
-            pbf_press_dpad(console, DPAD_LEFT, 20, 50);
+            pbf_press_dpad(context, DPAD_LEFT, 20, 50);
             break;
         }
 
         if (desired_on && !current_on){
             if (desired_index == 3){
-                pbf_press_button(console, BUTTON_PLUS, 20, 230);
+                pbf_press_button(context, BUTTON_PLUS, 20, 230);
             }else{
-                pbf_press_button(console, BUTTON_PLUS, 20, 105);
+                pbf_press_button(context, BUTTON_PLUS, 20, 105);
             }
         }
     }
@@ -107,10 +107,10 @@ void change_mount(ConsoleHandle& console, MountState mount){
     );
 }
 
-void dismount(ConsoleHandle& console){
+void dismount(BotBaseContext& context, ConsoleHandle& console){
     MountDetector mount_detector;
     for (size_t c = 0; c < 10; c++){
-        console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
 
         MountState current = mount_detector.detect(console.video().snapshot());
         switch (current){
@@ -126,12 +126,12 @@ void dismount(ConsoleHandle& console){
         }
 
         if (current == MountState::NOTHING){
-            pbf_press_dpad(console, DPAD_RIGHT, 20, 50);
+            pbf_press_dpad(context, DPAD_RIGHT, 20, 50);
             continue;
         }
 
         // We are mounted. Press + to unmount
-        pbf_press_button(console, BUTTON_PLUS, 20, 105);
+        pbf_press_button(context, BUTTON_PLUS, 20, 105);
     }
 
     throw OperationFailedException(console, "Unable to dismount after 10 attempts.");

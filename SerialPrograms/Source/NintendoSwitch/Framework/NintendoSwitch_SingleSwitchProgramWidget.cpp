@@ -61,7 +61,7 @@ void SingleSwitchProgramWidget::run_switch_program(const ProgramInfo& info){
     }
     try{
         start_program_video_check(env.console, instance.descriptor().feedback());
-        BotBaseContext context(env.scope(), env.console);
+        BotBaseContext context(env.scope(), env.console.botbase());
         instance.program(env, context);
         std::lock_guard<std::mutex> lg(m_lock);
         cout << "clearing()" << endl;

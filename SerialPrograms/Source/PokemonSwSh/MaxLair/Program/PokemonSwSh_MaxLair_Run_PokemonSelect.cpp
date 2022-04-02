@@ -19,8 +19,7 @@ namespace MaxLairInternal{
 
 
 void run_select_pokemon(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     GlobalStateTracker& state_tracker,
     const ConsoleSpecificOptions& settings
 ){
@@ -45,8 +44,8 @@ void run_select_pokemon(
     std::string options[3];
 
 //    //  Wait for bottom row to reload.
-//    pbf_wait(console, 50);
-//    console.botbase().wait_for_all_requests();
+//    pbf_wait(context, 50);
+//    context.wait_for_all_requests();
 
     //  Read the bottom two options first.
     QImage screen = console.video().snapshot();
@@ -62,8 +61,8 @@ void run_select_pokemon(
     }
 
     //  Scroll down one to move the arrow off the top row. Then we can read it.
-    pbf_press_dpad(console, DPAD_DOWN, 10, 80);
-    console.botbase().wait_for_all_requests();
+    pbf_press_dpad(context, DPAD_DOWN, 10, 80);
+    context.wait_for_all_requests();
     screen = console.video().snapshot();
     options[0] = reader.read_option(screen, 0);
 
@@ -82,16 +81,16 @@ void run_select_pokemon(
     console.log("Choosing option " + std::to_string((int)selection) + ".", COLOR_PURPLE);
     switch (selection){
     case 0:
-        pbf_press_dpad(console, DPAD_UP, 10, 50);
+        pbf_press_dpad(context, DPAD_UP, 10, 50);
         break;
     case 1:
         break;
     case 2:
-        pbf_press_dpad(console, DPAD_DOWN, 10, 50);
+        pbf_press_dpad(context, DPAD_DOWN, 10, 50);
         break;
     }
-    pbf_press_button(console, BUTTON_A, 10, 50);
-    console.botbase().wait_for_all_requests();
+    pbf_press_button(context, BUTTON_A, 10, 50);
+    context.wait_for_all_requests();
 
     //  Update state.
     if (player_index >= 0){

@@ -37,7 +37,7 @@ void MultiSwitchProgramEnvironment::run_in_parallel(
     realtime_dispatcher().run_in_parallel(
         s, e,
         [&](size_t index){
-            BotBaseContext context(this->scope(), consoles[index]);
+            BotBaseContext context(this->scope(), consoles[index].botbase());
             func(context, consoles[index]);
             consoles[index].botbase().wait_for_all_requests();
         }

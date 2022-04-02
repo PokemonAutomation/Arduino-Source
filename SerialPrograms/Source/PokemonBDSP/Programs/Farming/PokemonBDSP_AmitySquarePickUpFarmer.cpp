@@ -80,7 +80,7 @@ void AmitySquarePickUpFarmer::program(SingleSwitchProgramEnvironment& env, BotBa
     env.update_stats();
 
     //  Connect the controller.
-    pbf_move_right_joystick(env.console, 0, 255, 10, 0);
+    pbf_move_right_joystick(context, 0, 255, 10, 0);
 
     for (uint16_t c = 0; c < MAX_FETCH_ATTEMPTS; c++) {
         env.update_stats();
@@ -93,22 +93,22 @@ void AmitySquarePickUpFarmer::program(SingleSwitchProgramEnvironment& env, BotBa
 
         for (uint16_t i = 0; i < ROUNDS_PER_FETCH; i++) {
             //  Move right
-            pbf_move_left_joystick(env.console, 255, 128, ONE_WAY_MOVING_TIME, 0);
+            pbf_move_left_joystick(context, 255, 128, ONE_WAY_MOVING_TIME, 0);
             // Move left
-            pbf_move_left_joystick(env.console, 0, 128, ONE_WAY_MOVING_TIME, 0);
+            pbf_move_left_joystick(context, 0, 128, ONE_WAY_MOVING_TIME, 0);
         }
 
         // Wait for your pokemon to catch up to you
-        pbf_wait(env.console, WAIT_TIME_FOR_POKEMON);
+        pbf_wait(context, WAIT_TIME_FOR_POKEMON);
 
         // Face toward your pokemon.
-        pbf_press_dpad(env.console, DPAD_RIGHT, 1, 0);
+        pbf_press_dpad(context, DPAD_RIGHT, 1, 0);
 
         // Mash button to talk to pokemon
-        pbf_mash_button(env.console, BUTTON_ZL, 500);
+        pbf_mash_button(context, BUTTON_ZL, 500);
 
         // Mash button to end talking to pokemon
-        pbf_mash_button(env.console, BUTTON_B, 500);
+        pbf_mash_button(context, BUTTON_B, 500);
 
         stats.m_attempts++;
     }
@@ -120,7 +120,7 @@ void AmitySquarePickUpFarmer::program(SingleSwitchProgramEnvironment& env, BotBa
         "",
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

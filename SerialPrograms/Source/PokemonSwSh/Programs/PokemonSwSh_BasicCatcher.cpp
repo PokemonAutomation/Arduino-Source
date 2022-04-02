@@ -22,7 +22,7 @@ namespace PokemonSwSh{
 //  Returns the # of slots scrolled. Returns -1 if not found.
 int move_to_ball(
     const BattleBallReader& reader,
-    ConsoleHandle& console,
+    BotBaseContext& context, ConsoleHandle& console,
     const std::string& ball_slug,
     bool forward, int attempts, uint16_t delay
 ){
@@ -34,8 +34,8 @@ int move_to_ball(
 
     size_t repeat_counter = 0;
     for (int c = 1; c < attempts; c++){
-        pbf_press_dpad(console, forward ? DPAD_RIGHT : DPAD_LEFT, 10, delay);
-        console.botbase().wait_for_all_requests();
+        pbf_press_dpad(context, forward ? DPAD_RIGHT : DPAD_LEFT, 10, delay);
+        context.wait_for_all_requests();
         frame = console.video().snapshot();
         std::string current_ball = reader.read_ball(frame);
         if (current_ball == ball_slug){
@@ -58,7 +58,7 @@ int16_t move_to_ball(
     const std::string& ball_slug
 ){
     //  Search forward at high speed.
-    int ret = move_to_ball(reader, console, ball_slug, true, 50, 30);
+    int ret = move_to_ball(reader, context, console, ball_slug, true, 50, 30);
     if (ret < 0){
         return 0;
     }
@@ -68,12 +68,12 @@ int16_t move_to_ball(
     }
 
     //  Wait a second to let the video catch up.
-    pbf_wait(console, TICKS_PER_SECOND);
-    console.botbase().wait_for_all_requests();
+    pbf_wait(context, TICKS_PER_SECOND);
+    context.wait_for_all_requests();
 
     //  Now try again in reverse at a lower speed in case we overshot.
     //  This will return immediately if we got it right the first time.
-    ret = move_to_ball(reader, console, ball_slug, false, 5, TICKS_PER_SECOND);
+    ret = move_to_ball(reader, context, console, ball_slug, false, 5, TICKS_PER_SECOND);
     if (ret < 0){
         return 0;
     }
@@ -95,16 +95,16 @@ CatchResults throw_balls(
         {
             BattleBallReader reader(console, language);
 
-            pbf_mash_button(console, BUTTON_X, 125);
-            console.botbase().wait_for_all_requests();
+            pbf_mash_button(context, BUTTON_X, 125);
+            context.wait_for_all_requests();
 
             bool success = move_to_ball(reader, context, console, ball_slug);
             if (!success){
                 return {CatchResult::OUT_OF_BALLS, balls_used};
             }
 
-            pbf_mash_button(console, BUTTON_A, 125);
-            console.botbase().wait_for_all_requests();
+            pbf_mash_button(context, BUTTON_A, 125);
+            context.wait_for_all_requests();
         }
         balls_used++;
 
@@ -144,7 +144,7 @@ CatchResults basic_catcher(
     Language language,
     const std::string& ball_slug
 ){
-    console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
     env.log("Attempting to catch with: " + ball_slug);
 
     CatchResults results = throw_balls(env, context, console, language, ball_slug);
@@ -197,7 +197,7 @@ CatchResults basic_catcher(
         }
     }
 
-//    pbf_wait(console, 5 * TICKS_PER_SECOND);
+//    pbf_wait(context, 5 * TICKS_PER_SECOND);
     {
         BlackScreenOverWatcher black_screen_detector;
         run_until(

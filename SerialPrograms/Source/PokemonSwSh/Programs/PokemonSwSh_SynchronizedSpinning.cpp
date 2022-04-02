@@ -32,7 +32,7 @@ SynchronizedSpinning::SynchronizedSpinning(const SynchronizedSpinning_Descriptor
 void SynchronizedSpinning::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     env.run_in_parallel(
         [&](BotBaseContext& context, ConsoleHandle& console){
-            pbf_move_left_joystick(console, 128, 255, 5, 20);
+            pbf_move_left_joystick(context, 128, 255, 5, 20);
             while (true){
                 pbf_move_left_joystick(context, 128, 0, 5, 0);
                 pbf_move_left_joystick(context, 255, 0, 5, 0);

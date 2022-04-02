@@ -36,13 +36,13 @@ void trade_current_pokemon(
 ){
     tracker.check_unrecoverable_error(console);
 
-    console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
     QImage box_image = console.video().snapshot();
     ImageMatchWatcher box_detector(box_image, {0.02, 0.10, 0.15, 0.80}, 50);
 
     {
-        pbf_press_button(console, BUTTON_ZL, 20, 0);
-        console.botbase().wait_for_all_requests();
+        pbf_press_button(context, BUTTON_ZL, 20, 0);
+        context.wait_for_all_requests();
         SelectionArrowFinder detector(console, {0.50, 0.58, 0.40, 0.10}, COLOR_RED);
         int ret = wait_until(
             env, context, console, std::chrono::seconds(120),
@@ -57,8 +57,8 @@ void trade_current_pokemon(
         tracker.check_unrecoverable_error(console);
     }
     {
-        pbf_press_button(console, BUTTON_ZL, 20, 0);
-        console.botbase().wait_for_all_requests();
+        pbf_press_button(context, BUTTON_ZL, 20, 0);
+        context.wait_for_all_requests();
         SelectionArrowFinder detector(console, {0.50, 0.52, 0.40, 0.10}, COLOR_RED);
         int ret = wait_until(
             env, context, console, std::chrono::seconds(10),
@@ -74,7 +74,7 @@ void trade_current_pokemon(
     }
 
     //  Start trade.
-    pbf_press_button(console, BUTTON_ZL, 20, 0);
+    pbf_press_button(context, BUTTON_ZL, 20, 0);
 
     //  Wait for black screen.
     {
@@ -146,10 +146,10 @@ void trade_current_box(
             env.run_in_parallel([&](BotBaseContext& context, ConsoleHandle& console){
                 uint16_t box_scroll_delay = GameSettings::instance().BOX_SCROLL_DELAY_0;
                 for (size_t r = 0; r < row; r++){
-                    pbf_move_right_joystick(console, 128, 255, 20, box_scroll_delay);
+                    pbf_move_right_joystick(context, 128, 255, 20, box_scroll_delay);
                 }
                 for (size_t c = 0; c < col; c++){
-                    pbf_move_right_joystick(console, 255, 128, 20, box_scroll_delay);
+                    pbf_move_right_joystick(context, 255, 128, 20, box_scroll_delay);
                 }
                 trade_current_pokemon(env, context, console, error_state, stats);
             });

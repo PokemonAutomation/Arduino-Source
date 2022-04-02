@@ -39,13 +39,13 @@ void trade_current_pokemon(
 ){
     tracker.check_unrecoverable_error(console);
 
-    console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
     QImage box_image = console.video().snapshot();
     ImageMatchWatcher box_detector(box_image, {0.02, 0.15, 0.15, 0.80}, 50);
 
     {
-        pbf_press_button(console, BUTTON_A, 20, 0);
-        console.botbase().wait_for_all_requests();
+        pbf_press_button(context, BUTTON_A, 20, 0);
+        context.wait_for_all_requests();
         ButtonDetector detector(
             console, console,
             ButtonType::ButtonA, ImageFloatBox(0.25, 0.15, 0.50, 0.75),
@@ -64,8 +64,8 @@ void trade_current_pokemon(
         tracker.check_unrecoverable_error(console);
     }
     {
-        pbf_press_button(console, BUTTON_A, 20, 105);
-        console.botbase().wait_for_all_requests();
+        pbf_press_button(context, BUTTON_A, 20, 105);
+        context.wait_for_all_requests();
         ButtonDetector detector(
             console, console,
             ButtonType::ButtonA, ImageFloatBox(0.50, 0.52, 0.40, 0.10),
@@ -85,7 +85,7 @@ void trade_current_pokemon(
     }
 
     //  Start trade.
-    pbf_press_button(console, BUTTON_A, 20, 0);
+    pbf_press_button(context, BUTTON_A, 20, 0);
 
     //  Wait for black screen.
     {

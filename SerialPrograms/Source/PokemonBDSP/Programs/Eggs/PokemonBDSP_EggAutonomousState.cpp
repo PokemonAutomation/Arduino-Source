@@ -177,12 +177,12 @@ void EggAutonomousState::withdraw_egg_column(){
     const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
     const uint16_t BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY;
 
-    pbf_press_button(m_console, BUTTON_Y, 20, 50);
-    pbf_press_button(m_console, BUTTON_Y, 20, 50);
-    pickup_column(m_console);
-    pbf_move_right_joystick(m_console, 0, 128, 20, BOX_SCROLL_DELAY);
-    pbf_move_right_joystick(m_console, 128, 255, 20, BOX_SCROLL_DELAY);
-    pbf_press_button(m_console, BUTTON_ZL, 20, BOX_PICKUP_DROP_DELAY);
+    pbf_press_button(m_context, BUTTON_Y, 20, 50);
+    pbf_press_button(m_context, BUTTON_Y, 20, 50);
+    pickup_column(m_context);
+    pbf_move_right_joystick(m_context, 0, 128, 20, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(m_context, 128, 255, 20, BOX_SCROLL_DELAY);
+    pbf_press_button(m_context, BUTTON_ZL, 20, BOX_PICKUP_DROP_DELAY);
 
     m_eggs_in_column = 0;
     m_eggs_in_party = 5;
@@ -193,10 +193,10 @@ bool EggAutonomousState::process_party(){
     const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
 //    std::chrono::milliseconds SCROLL_TO_READ_DELAY((uint64_t)m_scroll_to_read_delay * 1000 / TICKS_PER_SECOND);
 
-    pbf_move_right_joystick(m_console, 0, 128, 20, BOX_SCROLL_DELAY);
-    pbf_move_right_joystick(m_console, 128, 255, 20, BOX_SCROLL_DELAY);
-    pbf_wait(m_console, m_scroll_to_read_delay);
-    m_console.botbase().wait_for_all_requests();
+    pbf_move_right_joystick(m_context, 0, 128, 20, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(m_context, 128, 255, 20, BOX_SCROLL_DELAY);
+    pbf_wait(m_context, m_scroll_to_read_delay);
+    m_context.wait_for_all_requests();
 //    m_env.wait_for(SCROLL_TO_READ_DELAY);
 
     BoxShinyDetector shiny_reader;
@@ -214,10 +214,10 @@ bool EggAutonomousState::process_party(){
     //  Run through the 5 hatchlings and release all the non-shinies.
     for (size_t c = 0; c < 5; c++){
         if (c != 0){
-            pbf_move_right_joystick(m_console, 128, 0, 20, BOX_SCROLL_DELAY);
-            pbf_move_right_joystick(m_console, 128, 255, 20, BOX_SCROLL_DELAY);
-            pbf_wait(m_console, m_scroll_to_read_delay);
-            m_console.botbase().wait_for_all_requests();
+            pbf_move_right_joystick(m_context, 128, 0, 20, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(m_context, 128, 255, 20, BOX_SCROLL_DELAY);
+            pbf_wait(m_context, m_scroll_to_read_delay);
+            m_context.wait_for_all_requests();
 //            m_env.wait_for(SCROLL_TO_READ_DELAY);
 
             screen = m_console.video().snapshot();
@@ -225,7 +225,7 @@ bool EggAutonomousState::process_party(){
                 process_error("StatsPanel", "Stats panel not detected.");
             }
         }
-//        m_console.botbase().wait_for_all_requests();
+//        m_context.wait_for_all_requests();
 
         bool shiny = shiny_reader.detect(screen);
         if (shiny){
@@ -265,23 +265,23 @@ bool EggAutonomousState::process_party(){
                     &m_stats
                 );
             }
-            pbf_press_button(m_console, BUTTON_ZL, 20, 105);
-            pbf_press_button(m_console, BUTTON_ZL, 20, 105);
-            pbf_move_right_joystick(m_console, 128, 0, 20, 105);
-            pbf_move_right_joystick(m_console, 128, 0, 20, 105);
-            pbf_move_right_joystick(m_console, 128, 0, 20, 105);
-            pbf_move_right_joystick(m_console, 255, 128, 20, 105);
-            pbf_press_button(m_console, BUTTON_ZL, 20, 230);
-            pbf_move_right_joystick(m_console, 0, 128, 20, 105);
-            pbf_move_right_joystick(m_console, 128, 0, 20, 105);
-            pbf_move_right_joystick(m_console, 128, 0, 20, 105);
-            pbf_press_button(m_console, BUTTON_ZL, 20, 105);
-            pbf_press_button(m_console, BUTTON_B, 20, 230);
-            pbf_press_button(m_console, BUTTON_R, 20, GameSettings::instance().BOX_CHANGE_DELAY_0);
-            pbf_move_right_joystick(m_console, 0, 128, 20, 105);
-            pbf_move_right_joystick(m_console, 128, 255, 20, 105);
-            pbf_move_right_joystick(m_console, 128, 255, 20, 105);
-            pbf_move_right_joystick(m_console, 128, 255, 20, 105);
+            pbf_press_button(m_context, BUTTON_ZL, 20, 105);
+            pbf_press_button(m_context, BUTTON_ZL, 20, 105);
+            pbf_move_right_joystick(m_context, 128, 0, 20, 105);
+            pbf_move_right_joystick(m_context, 128, 0, 20, 105);
+            pbf_move_right_joystick(m_context, 128, 0, 20, 105);
+            pbf_move_right_joystick(m_context, 255, 128, 20, 105);
+            pbf_press_button(m_context, BUTTON_ZL, 20, 230);
+            pbf_move_right_joystick(m_context, 0, 128, 20, 105);
+            pbf_move_right_joystick(m_context, 128, 0, 20, 105);
+            pbf_move_right_joystick(m_context, 128, 0, 20, 105);
+            pbf_press_button(m_context, BUTTON_ZL, 20, 105);
+            pbf_press_button(m_context, BUTTON_B, 20, 230);
+            pbf_press_button(m_context, BUTTON_R, 20, GameSettings::instance().BOX_CHANGE_DELAY_0);
+            pbf_move_right_joystick(m_context, 0, 128, 20, 105);
+            pbf_move_right_joystick(m_context, 128, 255, 20, 105);
+            pbf_move_right_joystick(m_context, 128, 255, 20, 105);
+            pbf_move_right_joystick(m_context, 128, 255, 20, 105);
             m_babies_saved++;
             if (m_babies_saved >= m_max_keepers){
                 m_console.log("Max keepers reached. Stopping program...");
@@ -294,8 +294,8 @@ bool EggAutonomousState::process_party(){
         }
     }
 
-    pbf_move_right_joystick(m_console, 128, 0, 20, BOX_SCROLL_DELAY);
-    pbf_move_right_joystick(m_console, 255, 128, 20, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(m_context, 128, 0, 20, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(m_context, 255, 128, 20, BOX_SCROLL_DELAY);
     return false;
 }
 bool EggAutonomousState::process_batch(){
@@ -317,7 +317,7 @@ void EggAutonomousState::fetch_egg(){
     }
 
     //  Move to corner.
-    m_console.botbase().wait_for_all_requests();
+    m_context.wait_for_all_requests();
     m_console.log("Attempting to fetch an egg.");
     {
         ShortDialogWatcher dialog;
@@ -336,8 +336,8 @@ void EggAutonomousState::fetch_egg(){
 
     m_console.log("Getting off bike.");
     if (m_on_bike){
-        m_shortcut.run(m_console, 100);
-        m_console.botbase().wait_for_all_requests();
+        m_shortcut.run(m_context, 100);
+        m_context.wait_for_all_requests();
         m_on_bike = false;
     }
 
@@ -398,9 +398,9 @@ void EggAutonomousState::fetch_egg(){
     }
 
     m_console.log("Getting back on bike.");
-    m_shortcut.run(m_console, 100);
+    m_shortcut.run(m_context, 100);
     m_on_bike = true;
-    pbf_move_left_joystick(m_console, 0, 255, 125, 0);
+    pbf_move_left_joystick(m_context, 0, 255, 125, 0);
 }
 void EggAutonomousState::hatch_egg(){
     if (m_eggs_in_party == 0){
@@ -411,8 +411,8 @@ void EggAutonomousState::hatch_egg(){
     QImage overworld = m_console.video().snapshot();
 //    overworld.save("test-0.png");
     {
-        pbf_mash_button(m_console, BUTTON_B, 10 * TICKS_PER_SECOND);
-        m_console.botbase().wait_for_all_requests();
+        pbf_mash_button(m_context, BUTTON_B, 10 * TICKS_PER_SECOND);
+        m_context.wait_for_all_requests();
 
         ShortDialogWatcher dialog;
         int ret = wait_until(
@@ -426,12 +426,12 @@ void EggAutonomousState::hatch_egg(){
         m_console.log("Egg finished hatching.");
         m_stats.m_hatched++;
         m_env.update_stats();
-        pbf_mash_button(m_console, BUTTON_B, 1 * TICKS_PER_SECOND);
+        pbf_mash_button(m_context, BUTTON_B, 1 * TICKS_PER_SECOND);
     }
 
     //  Return to overworld.
     while (true){
-        m_console.botbase().wait_for_all_requests();
+        m_context.wait_for_all_requests();
 
         //  Wait for steady state and read it again.
         m_env.wait_for(std::chrono::milliseconds(200));
@@ -455,7 +455,7 @@ void EggAutonomousState::hatch_egg(){
             throw UserSetupError(m_console, "Please turn off nicknaming.");
         default:
             m_console.log("Failed to detect overworld after 30 seconds. Did day/night change?", COLOR_RED);
-//            pbf_mash_button(console, BUTTON_ZL, 30 * TICKS_PER_SECOND);
+//            pbf_mash_button(context, BUTTON_ZL, 30 * TICKS_PER_SECOND);
             return;
         }
     }
@@ -481,7 +481,7 @@ void EggAutonomousState::hatch_rest_of_party(){
         switch (ret){
         case 0:
             m_console.log("Egg is hatching!");
-            m_console.botbase().wait_for_all_requests();
+            m_context.wait_for_all_requests();
             hatch_egg();
             break;
         case 1:
@@ -493,7 +493,7 @@ void EggAutonomousState::hatch_rest_of_party(){
     }
 }
 void EggAutonomousState::spin_until_fetch_or_hatch(){
-    m_console.botbase().wait_for_all_requests();
+    m_context.wait_for_all_requests();
     m_console.log("Looking for more eggs...");
     ShortDialogWatcher dialog;
     int ret = run_until(
@@ -515,7 +515,7 @@ void EggAutonomousState::spin_until_fetch_or_hatch(){
 
 bool EggAutonomousState::overworld_detect_and_run_state(){
     ShortDialogWatcher dialog;
-    m_console.botbase().wait_for_all_requests();
+    m_context.wait_for_all_requests();
     m_env.wait_for(std::chrono::milliseconds(200));
     dump();
 

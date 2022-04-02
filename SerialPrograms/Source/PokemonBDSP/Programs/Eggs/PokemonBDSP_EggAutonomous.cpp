@@ -165,10 +165,10 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     env.update_stats();
 
     //  Connect the controller.
-    pbf_move_right_joystick(env.console, 0, 255, 10, 0);
+    pbf_move_right_joystick(context, 0, 255, 10, 0);
 
     //  Move to corner.
-    pbf_move_left_joystick(env.console, 0, 255, 125, 0);
+    pbf_move_left_joystick(context, 0, 255, 125, 0);
 
     EggAutonomousState current_state(
         env, context, env.console,
@@ -213,7 +213,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
             if (consecutive_failures >= 3){
                 throw OperationFailedException(env.console, "Failed 3 batches in the row.");
             }
-            pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, context, env.console, true);
             current_state.set(saved_state);
         }
@@ -226,7 +226,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
         "",
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

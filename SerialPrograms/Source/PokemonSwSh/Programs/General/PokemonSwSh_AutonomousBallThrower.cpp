@@ -107,17 +107,17 @@ std::unique_ptr<StatsTracker> AutonomousBallThrower::make_stats() const{
 
 void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
+        grip_menu_connect_go_home(context);
+        resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
     Stats& stats = env.stats<Stats>();
 
     bool pokemon_caught = false;
     while (!pokemon_caught){
-        env.console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
         env.log("Wait for a pokemon to attack you.", COLOR_PURPLE);
         {
             StandardBattleMenuWatcher fight_detector(false);
@@ -133,7 +133,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
             );
             if (result == 0){
                 env.log("New fight detected.", COLOR_PURPLE);
-                pbf_mash_button(env.console, BUTTON_B, 1 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
             }
         }
 
@@ -177,7 +177,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
         }
 
         if (!pokemon_caught){
-            pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
             reset_game_from_home_with_inference(
                 env, context, env.console,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
@@ -193,7 +193,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
         "Caught the " + STRING_POKEMON,
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

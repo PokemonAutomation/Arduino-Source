@@ -20,8 +20,7 @@ namespace MaxLairInternal{
 
 
 void run_select_pokemon(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     GlobalStateTracker& state_tracker,
     const ConsoleSpecificOptions& settings
 );

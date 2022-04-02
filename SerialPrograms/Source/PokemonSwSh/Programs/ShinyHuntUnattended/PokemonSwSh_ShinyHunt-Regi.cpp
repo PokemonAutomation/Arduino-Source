@@ -14,22 +14,22 @@ namespace PokemonSwSh{
 
 
 void move_to_corner(
-    SingleSwitchProgramEnvironment& env,
+    Logger& logger, BotBaseContext& context,
     bool correction, uint16_t TRANSITION_DELAY
 ){
     if (correction){
-        env.log("Performing auto-correction.");
+        logger.log("Performing auto-correction.");
         //  Move down to building exit and exit.
-        pbf_move_left_joystick(env.console, 128, 255, 500, TRANSITION_DELAY);
-        pbf_move_left_joystick(env.console, 128, 255, 300, TRANSITION_DELAY);
+        pbf_move_left_joystick(context, 128, 255, 500, TRANSITION_DELAY);
+        pbf_move_left_joystick(context, 128, 255, 300, TRANSITION_DELAY);
 
         //  Navigate back into the corner.
-        pbf_move_left_joystick(env.console, 255, 64, 200, 0);
-        pbf_move_left_joystick(env.console, 120, 0, 250, 0);
-        pbf_move_left_joystick(env.console, 255, 100, 150, 10);
+        pbf_move_left_joystick(context, 255, 64, 200, 0);
+        pbf_move_left_joystick(context, 120, 0, 250, 0);
+        pbf_move_left_joystick(context, 255, 100, 150, 10);
     }else{
         //  Move to corner.
-        pbf_move_left_joystick(env.console, 255, 100, 300, 10);
+        pbf_move_left_joystick(context, 255, 100, 300, 10);
     }
 }
 
@@ -91,29 +91,29 @@ void regidrago(BotBaseContext& context){
 }
 
 void run_regi_light_puzzle(
-    SingleSwitchProgramEnvironment& env,
+    Logger& logger, BotBaseContext& context,
     RegiGolem regi, uint64_t encounter
 ){
     switch (regi){
     case RegiGolem::Regirock:
-        regirock(env.console);
-        env.log("Starting Regirock Encounter: " + tostr_u_commas(encounter + 1));
+        regirock(context);
+        logger.log("Starting Regirock Encounter: " + tostr_u_commas(encounter + 1));
         break;
     case RegiGolem::Regice:
-        regice(env.console);
-        env.log("Starting Regice Encounter: " + tostr_u_commas(encounter + 1));
+        regice(context);
+        logger.log("Starting Regice Encounter: " + tostr_u_commas(encounter + 1));
         break;
     case RegiGolem::Registeel:
-        registeel(env.console);
-        env.log("Starting Registeel Encounter: " + tostr_u_commas(encounter + 1));
+        registeel(context);
+        logger.log("Starting Registeel Encounter: " + tostr_u_commas(encounter + 1));
         break;
     case RegiGolem::Regieleki:
-        regieleki(env.console);
-        env.log("Starting Regieleki Encounter: " + tostr_u_commas(encounter + 1));
+        regieleki(context);
+        logger.log("Starting Regieleki Encounter: " + tostr_u_commas(encounter + 1));
         break;
     case RegiGolem::Regidrago:
-        regidrago(env.console);
-        env.log("Starting Regidrago Encounter: " + tostr_u_commas(encounter + 1));
+        regidrago(context);
+        logger.log("Starting Regidrago Encounter: " + tostr_u_commas(encounter + 1));
         break;
     }
 }

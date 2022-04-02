@@ -65,10 +65,10 @@ ShinyHuntUnattendedRegigigas2::ShinyHuntUnattendedRegigigas2(const ShinyHuntUnat
 
 void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);
+        grip_menu_connect_go_home(context);
+        resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
     uint32_t encounter = 0;
@@ -76,39 +76,39 @@ void ShinyHuntUnattendedRegigigas2::program(SingleSwitchProgramEnvironment& env,
         for (uint8_t pp = REVERSAL_PP; pp > 0; pp--){
             env.log("Starting Regigigas Encounter: " + tostr_u_commas(++encounter));
 
-            pbf_press_button(env.console, BUTTON_A, 10, 3 * TICKS_PER_SECOND);
-            pbf_press_button(env.console, BUTTON_A, 10, TICKS_PER_SECOND);
-            pbf_press_button(env.console, BUTTON_A, 10, START_TO_ATTACK_DELAY);
+            pbf_press_button(context, BUTTON_A, 10, 3 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_A, 10, START_TO_ATTACK_DELAY);
 
-            set_leds(env.console, true);
-            pbf_press_button(env.console, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
-            set_leds(env.console, false);
+            set_leds(context, true);
+            pbf_press_button(context, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
+            set_leds(context, false);
 
             //  Enter Pokemon menu if shiny.
-            pbf_press_dpad(env.console, DPAD_DOWN, 10, 0);
-            pbf_mash_button(env.console, BUTTON_A, 2 * TICKS_PER_SECOND);
+            pbf_press_dpad(context, DPAD_DOWN, 10, 0);
+            pbf_mash_button(context, BUTTON_A, 2 * TICKS_PER_SECOND);
 
-            pbf_press_dpad(env.console, DPAD_DOWN, 10, 0);
-            pbf_press_button(env.console, BUTTON_A, 10, TICKS_PER_SECOND);
-            pbf_press_dpad(env.console, DPAD_DOWN, 10, 0);
-            pbf_press_button(env.console, BUTTON_A, 10, TICKS_PER_SECOND);
+            pbf_press_dpad(context, DPAD_DOWN, 10, 0);
+            pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+            pbf_press_dpad(context, DPAD_DOWN, 10, 0);
+            pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
 
-            pbf_wait(env.console, ATTACK_TO_CATCH_DELAY);
-            pbf_press_dpad(env.console, DPAD_DOWN, 10, 0);
-            pbf_press_button(env.console, BUTTON_A, 10, CATCH_TO_OVERWORLD_DELAY);
+            pbf_wait(context, ATTACK_TO_CATCH_DELAY);
+            pbf_press_dpad(context, DPAD_DOWN, 10, 0);
+            pbf_press_button(context, BUTTON_A, 10, CATCH_TO_OVERWORLD_DELAY);
         }
 
         //  Conditional close game.
         close_game_if_overworld(
-            env.console,
+            context,
             TOUCH_DATE_INTERVAL.ok_to_touch_now(),
             0
         );
 
-        start_game_from_home(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 0, 0, false);
+        start_game_from_home(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 0, 0, false);
     }
 
-    pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
 }
 
 

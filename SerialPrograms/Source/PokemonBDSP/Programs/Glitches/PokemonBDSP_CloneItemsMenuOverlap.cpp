@@ -105,16 +105,16 @@ bool CloneItemsMenuOverlap::trigger_encounter(ProgramEnvironment& env, BotBaseCo
         if (detector.detected()){
             break;
         }
-        pbf_move_left_joystick(console, 255, 128, 55, 0);
-        pbf_move_right_joystick(console, 0, 128, 75, 0);
-        console.botbase().wait_for_all_requests();
+        pbf_move_left_joystick(context, 255, 128, 55, 0);
+        pbf_move_right_joystick(context, 0, 128, 75, 0);
+        context.wait_for_all_requests();
 
         if (detector.detected()){
             break;
         }
-        pbf_move_left_joystick(console, 0, 128, 45, 0);
-        pbf_move_right_joystick(console, 255, 128, 75, 0);
-        console.botbase().wait_for_all_requests();
+        pbf_move_left_joystick(context, 0, 128, 45, 0);
+        pbf_move_right_joystick(context, 255, 128, 75, 0);
+        context.wait_for_all_requests();
     }
 
     if (session.stop_and_rethrow()){
@@ -132,26 +132,26 @@ void CloneItemsMenuOverlap::swap_party(BotBaseContext& context, ConsoleHandle& c
     const uint16_t BOX_PICKUP_DROP_DELAY = 40;
 
     //  Enter Box
-    pbf_mash_button(console, BUTTON_ZL, 30);
-    pbf_wait(console, 130);
-    pbf_press_button(console, BUTTON_R, 20, 190);
+    pbf_mash_button(context, BUTTON_ZL, 30);
+    pbf_wait(context, 130);
+    pbf_press_button(context, BUTTON_R, 20, 190);
 
     //  Change to multi-select.
-    pbf_press_button(console, BUTTON_Y, 20, 50);
-    pbf_press_button(console, BUTTON_Y, 20, 50);
+    pbf_press_button(context, BUTTON_Y, 20, 50);
+    pbf_press_button(context, BUTTON_Y, 20, 50);
 
-    pbf_move_right_joystick(console, 0, 128, 10, BOX_SCROLL_DELAY);
-    pbf_move_right_joystick(console, 128, 255, 10, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(context, 0, 128, 10, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(context, 128, 255, 10, BOX_SCROLL_DELAY);
 
     //  Deposit current column.
-    pickup_column(console);
-    party_to_column(console, 0);
-    pbf_press_button(console, BUTTON_ZL, 10, BOX_PICKUP_DROP_DELAY);
+    pickup_column(context);
+    party_to_column(context, 0);
+    pbf_press_button(context, BUTTON_ZL, 10, BOX_PICKUP_DROP_DELAY);
 
-    pbf_move_right_joystick(console, 255, 128, 10, BOX_SCROLL_DELAY);
-    pickup_column(console);
-    column_to_party(console, 1);
-    pbf_press_button(console, BUTTON_ZL, 10, BOX_PICKUP_DROP_DELAY);
+    pbf_move_right_joystick(context, 255, 128, 10, BOX_SCROLL_DELAY);
+    pickup_column(context);
+    column_to_party(context, 1);
+    pbf_press_button(context, BUTTON_ZL, 10, BOX_PICKUP_DROP_DELAY);
 }
 void CloneItemsMenuOverlap::mash_B_to_battle(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console){
     BattleMenuWatcher detector(BattleType::STANDARD);
@@ -167,22 +167,22 @@ void CloneItemsMenuOverlap::mash_B_to_battle(ProgramEnvironment& env, BotBaseCon
     }else{
         console.log("Battle menu found!");
     }
-    pbf_mash_button(console, BUTTON_B, 2 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
 }
 void CloneItemsMenuOverlap::detach_items(BotBaseContext& context, ConsoleHandle& console){
     const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
 
     for (size_t c = 0; c < 5; c++){
         if (c == 0){
-            pbf_press_button(console, BUTTON_X, 10, 50);
+            pbf_press_button(context, BUTTON_X, 10, 50);
         }else{
-            pbf_move_right_joystick(console, 128, 255, 10, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(context, 128, 255, 10, BOX_SCROLL_DELAY);
         }
-        pbf_press_button(console, BUTTON_ZL, 10, 50);
-        pbf_move_right_joystick(console, 128, 255, 10, 50);
-        pbf_press_button(console, BUTTON_ZL, 10, 100);
-        pbf_press_button(console, BUTTON_ZL, 10, 100);
-        pbf_press_button(console, BUTTON_B, 10, 100);
+        pbf_press_button(context, BUTTON_ZL, 10, 50);
+        pbf_move_right_joystick(context, 128, 255, 10, 50);
+        pbf_press_button(context, BUTTON_ZL, 10, 100);
+        pbf_press_button(context, BUTTON_ZL, 10, 100);
+        pbf_press_button(context, BUTTON_B, 10, 100);
     }
 }
 
@@ -190,7 +190,7 @@ void CloneItemsMenuOverlap::program(SingleSwitchProgramEnvironment& env, BotBase
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.
-    pbf_mash_button(env.console, BUTTON_B, 50);
+    pbf_mash_button(context, BUTTON_B, 50);
 
     size_t consecutive_failures = 0;
     uint16_t save_counter = 0;
@@ -203,14 +203,14 @@ void CloneItemsMenuOverlap::program(SingleSwitchProgramEnvironment& env, BotBase
             stats.to_str()
         );
 
-        QImage start = activate_menu_overlap_from_overworld(env.console);
+        QImage start = activate_menu_overlap_from_overworld(context, env.console);
         if (start.isNull()){
             stats.m_errors++;
             consecutive_failures++;
             if (consecutive_failures >= 3){
                 throw OperationFailedException(env.console, "Failed to activate menu overlap glitch 3 times in the row.");
             }
-            pbf_mash_button(env.console, BUTTON_B, 10 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
             continue;
         }
         consecutive_failures = 0;
@@ -218,7 +218,7 @@ void CloneItemsMenuOverlap::program(SingleSwitchProgramEnvironment& env, BotBase
         //  Trigger an encounter.
         if (!trigger_encounter(env, context, env.console)){
             stats.m_errors++;
-            pbf_mash_button(env.console, BUTTON_B, 10 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
             continue;
         }
 
@@ -230,34 +230,34 @@ void CloneItemsMenuOverlap::program(SingleSwitchProgramEnvironment& env, BotBase
         mash_B_to_battle(env, context, env.console);
 
         //  Run away.
-        pbf_press_dpad(env.console, DPAD_UP, 10, 0);
+        pbf_press_dpad(context, DPAD_UP, 10, 0);
         if (!run_from_battle(env, context, env.console, EXIT_BATTLE_TIMEOUT)){
             env.log("Detected likely black screen freeze. Resetting game...", COLOR_RED);
             stats.m_resets++;
-            pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             continue;
         }
-        pbf_mash_button(env.console, BUTTON_B, GameSettings::instance().MENU_TO_OVERWORLD_DELAY);
+        pbf_mash_button(context, BUTTON_B, GameSettings::instance().MENU_TO_OVERWORLD_DELAY);
 
 
         //  Move column.
         start = env.console.video().snapshot();
-        overworld_to_box(env.console);
-        pbf_press_button(env.console, BUTTON_Y, 20, 40);
-        pbf_press_button(env.console, BUTTON_Y, 20, 40);
-        pickup_column(env.console);
-        pbf_move_right_joystick(env.console, 255, 128, 10, GameSettings::instance().BOX_SCROLL_DELAY_0);
-        pbf_press_button(env.console, BUTTON_ZL, 10, GameSettings::instance().BOX_PICKUP_DROP_DELAY);
+        overworld_to_box(context);
+        pbf_press_button(context, BUTTON_Y, 20, 40);
+        pbf_press_button(context, BUTTON_Y, 20, 40);
+        pickup_column(context);
+        pbf_move_right_joystick(context, 255, 128, 10, GameSettings::instance().BOX_SCROLL_DELAY_0);
+        pbf_press_button(context, BUTTON_ZL, 10, GameSettings::instance().BOX_PICKUP_DROP_DELAY);
 
         //  Detach items.
         detach_items(context, env.console);
-        pbf_mash_button(env.console, BUTTON_B, 2 * TICKS_PER_SECOND);
-        back_out_to_overworld_with_overlap(env.console, start, 0);
+        pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
+        back_out_to_overworld_with_overlap(context, env.console, start, 0);
 
         save_counter++;
         if (SAVE_INTERVAL != 0 && save_counter >= SAVE_INTERVAL){
-            save_game(env.console);
+            save_game(context);
         }
 
         stats.m_batches++;
@@ -270,7 +270,7 @@ void CloneItemsMenuOverlap::program(SingleSwitchProgramEnvironment& env, BotBase
         "",
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

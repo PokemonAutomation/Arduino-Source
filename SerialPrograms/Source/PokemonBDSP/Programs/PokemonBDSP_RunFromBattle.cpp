@@ -34,8 +34,8 @@ bool run_from_battle(
         console.log("Timed out waiting for end of battle. Are you stuck in the battle?", COLOR_RED);
         return false;
     }
-    pbf_wait(console, TICKS_PER_SECOND);
-    console.botbase().wait_for_all_requests();
+    pbf_wait(context, TICKS_PER_SECOND);
+    context.wait_for_all_requests();
     return true;
 }
 

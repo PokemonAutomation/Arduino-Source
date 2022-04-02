@@ -59,12 +59,12 @@ bool read_battle_menu(
             }
         }
         console.log("Attempting to read from summary.", COLOR_PURPLE);
-        pbf_press_button(console, BUTTON_Y, 10, TICKS_PER_SECOND);
-        pbf_press_dpad(console, DPAD_UP, 10, 50);
-        pbf_press_button(console, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
-        console.botbase().wait_for_all_requests();
+        pbf_press_button(context, BUTTON_Y, 10, TICKS_PER_SECOND);
+        pbf_press_dpad(context, DPAD_UP, 10, 50);
+        pbf_press_button(context, BUTTON_A, 10, 2 * TICKS_PER_SECOND);
+        context.wait_for_all_requests();
         mon = reader.read_opponent_in_summary(console, console.video().snapshot());
-        pbf_mash_button(console, BUTTON_B, 3 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_B, 3 * TICKS_PER_SECOND);
         state.opponent = std::move(mon);
 
         if (state.wins == 3 && !state.boss.empty()){
@@ -75,7 +75,7 @@ bool read_battle_menu(
             break;
         }
     }while (false);
-    console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
 
     const std::string& opponent = state.opponent.empty()
         ? ""
@@ -105,8 +105,8 @@ bool read_battle_menu(
         player.dmax_turns_left = 0;
         player.health = Health{0, 1};
         player.can_dmax = false;
-        pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
-        console.botbase().wait_for_all_requests();
+        pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+        context.wait_for_all_requests();
         return true;
     }
 
@@ -144,8 +144,8 @@ bool read_battle_menu(
 //    AsyncVisualInferenceSession inference(env, console, console);
 //    inference += arrow_finder;
 
-    pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
-    console.botbase().wait_for_all_requests();
+    pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+    context.wait_for_all_requests();
 
 
     //  Clear move blocked status.
@@ -172,9 +172,9 @@ bool read_battle_menu(
     if (move_slot < 0){
         console.log("Unable to detect move slot.", COLOR_RED);
         dump_image(console, MODULE_NAME, "MoveSlot", screen);
-        pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
-        pbf_press_dpad(console, DPAD_RIGHT, 2 * TICKS_PER_SECOND, 0);
-        pbf_press_dpad(console, DPAD_UP, 2 * TICKS_PER_SECOND, 0);
+        pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+        pbf_press_dpad(context, DPAD_RIGHT, 2 * TICKS_PER_SECOND, 0);
+        pbf_press_dpad(context, DPAD_UP, 2 * TICKS_PER_SECOND, 0);
         move_slot = 0;
     }else{
         console.log("Current Move Slot: " + std::to_string(move_slot), COLOR_BLUE);
@@ -222,8 +222,8 @@ StateMachineAction run_move_select(
 
         if (cheer_only){
             console.log("Choosing move Cheer. (you are dead)", COLOR_PURPLE);
-//            pbf_mash_button(console, BUTTON_A, 2 * TICKS_PER_SECOND);
-//            console.botbase().wait_for_all_requests();
+//            pbf_mash_button(context, BUTTON_A, 2 * TICKS_PER_SECOND);
+//            context.wait_for_all_requests();
             break;
         }
 
@@ -235,19 +235,19 @@ StateMachineAction run_move_select(
         console.log("Choosing move " + std::to_string((int)move.first) + (move.second ? " (dmax)." : "."), COLOR_PURPLE);
 
         if (player.can_dmax && move.second){
-            pbf_press_dpad(console, DPAD_LEFT, 10, 50);
-            pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
+            pbf_press_dpad(context, DPAD_LEFT, 10, 50);
+            pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
             player.dmax_turns_left = 3;
         }
         while (state.move_slot != move.first){
-            pbf_press_dpad(console, DPAD_DOWN, 10, 50);
+            pbf_press_dpad(context, DPAD_DOWN, 10, 50);
             state.move_slot++;
             state.move_slot %= 4;
         }
 
         //  Enter the move.
-        pbf_mash_button(console, BUTTON_A, 2 * TICKS_PER_SECOND);
-        console.botbase().wait_for_all_requests();
+        pbf_mash_button(context, BUTTON_A, 2 * TICKS_PER_SECOND);
+        context.wait_for_all_requests();
 
 //        inference.stop();
 
@@ -287,9 +287,9 @@ StateMachineAction run_move_select(
         state_tracker.push_update(console_index);
 
         //  Reset position.
-        pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
-        pbf_press_dpad(console, DPAD_RIGHT, 2 * TICKS_PER_SECOND, 0);
-        pbf_press_dpad(console, DPAD_UP, 2 * TICKS_PER_SECOND, 0);
+        pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+        pbf_press_dpad(context, DPAD_RIGHT, 2 * TICKS_PER_SECOND, 0);
+        pbf_press_dpad(context, DPAD_UP, 2 * TICKS_PER_SECOND, 0);
         state.move_slot = 0;
 
         inferred = state_tracker.infer_actual_state(console_index);
@@ -334,12 +334,12 @@ StateMachineAction throw_balls(
     }
 
     BattleBallReader reader(console, language);
-    pbf_press_button(console, BUTTON_A, 10, 125);
-    console.botbase().wait_for_all_requests();
+    pbf_press_button(context, BUTTON_A, 10, 125);
+    context.wait_for_all_requests();
 
     int16_t balls = move_to_ball(reader, context, console, ball);
     if (balls != 0){
-        pbf_press_button(console, BUTTON_A, 10, 125);
+        pbf_press_button(context, BUTTON_A, 10, 125);
     }else{
         throw OperationFailedException(console, "Unable to find appropriate ball. Did you run out?");
     }

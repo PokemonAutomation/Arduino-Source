@@ -42,7 +42,7 @@ EggFetcher2::EggFetcher2(const EggFetcher2_Descriptor& descriptor)
 
 
 void EggFetcher2::run_eggfetcher(
-    SingleSwitchProgramEnvironment& env,
+    LoggerQt& logger, BotBaseContext& context,
     bool deposit_automatically,
     uint16_t attempts
 ) const{
@@ -54,9 +54,9 @@ void EggFetcher2::run_eggfetcher(
 
     //  1st Fetch: Get into position.
     {
-        env.log("Fetch Attempts: " + tostr_u_commas(c));
-        fly_home_collect_egg(env.console, true);
-        collect_egg_mash_out(env.console, deposit_automatically);
+        logger.log("Fetch Attempts: " + tostr_u_commas(c));
+        fly_home_collect_egg(context, true);
+        collect_egg_mash_out(context, deposit_automatically);
 
         c++;
         if (c >= attempts){
@@ -66,24 +66,24 @@ void EggFetcher2::run_eggfetcher(
 
     //  Now we are in steady state.
     for (; c < attempts; c++){
-        env.log("Fetch Attempts: " + tostr_u_commas(c));
-        eggfetcher_loop(env.console);
-        collect_egg(env.console);
-        collect_egg_mash_out(env.console, deposit_automatically);
+        logger.log("Fetch Attempts: " + tostr_u_commas(c));
+        eggfetcher_loop(context);
+        collect_egg(context);
+        collect_egg_mash_out(context, deposit_automatically);
     }
 }
 
 void EggFetcher2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+        grip_menu_connect_go_home(context);
+        resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
-    run_eggfetcher(env, GameSettings::instance().AUTO_DEPOSIT, MAX_FETCH_ATTEMPTS);
+    run_eggfetcher(env.console, context, GameSettings::instance().AUTO_DEPOSIT, MAX_FETCH_ATTEMPTS);
 
-    pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
 }
 
 

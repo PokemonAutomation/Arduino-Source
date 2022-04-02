@@ -208,9 +208,9 @@ struct EggCombinedSession{
         ssf_press_button2(context, BUTTON_B, GameSettings::instance().MENU_TO_OVERWORLD_DELAY, 20);
     }
 
-    void eggcombined2_body(SingleSwitchProgramEnvironment& env){
+    void eggcombined2_body(Logger& logger, BotBaseContext& context){
         if (BOXES_TO_HATCH == 0){
-            ssf_press_button2(env.console, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
+            ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
             return;
         }
 
@@ -230,24 +230,24 @@ struct EggCombinedSession{
         float fetch_residual = 0;
 
         //  Withdraw party.
-        ssf_press_button2(env.console, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
-        withdraw_column_shiftR(env.console, 0);
-        fly_home_goto_lady(env.console, false);
+        ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
+        withdraw_column_shiftR(context, 0);
+        fly_home_goto_lady(context, false);
 
         for (uint8_t box = 0; box < BOXES_TO_HATCH; box++){
             for (uint8_t column = 0; column < 6; column++){
                 //  Touch the date.
                 if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
-                    env.log("Touching date to prevent rollover.");
-                    pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-                    touch_date_from_home(env.console, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-                    resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+                    logger.log("Touching date to prevent rollover.");
+                    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+                    touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+                    resume_game_no_interact(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
                 }
 
                 fetch_residual += fetches_per_batch;
                 uint8_t fetches = (uint8_t)fetch_residual;
                 eggcombined2_run_batch(
-                    env.console,
+                    context,
                     INCUBATION_DELAY_LOWER,
                     INCUBATION_DELAY_UPPER + FINISH_DELAY,
                     column,
@@ -259,7 +259,7 @@ struct EggCombinedSession{
         }
 
         //  Finish
-        ssf_press_button2(env.console, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
+        ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
     }
 
 };

@@ -83,7 +83,7 @@ void from_professor_return_to_jubilife(
         std::chrono::milliseconds(100), true
     );
     while (true){
-        console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
         int ret = run_until(
             env, context, console,
             [](BotBaseContext& context){
@@ -97,7 +97,7 @@ void from_professor_return_to_jubilife(
         switch (ret){
         case 0:
             console.log("Detected return option...");
-            pbf_press_dpad(console, DPAD_DOWN, 20, 105);
+            pbf_press_dpad(context, DPAD_DOWN, 20, 105);
             mash_A_to_change_region(env, context, console);
             return;
         case 1:
@@ -105,7 +105,7 @@ void from_professor_return_to_jubilife(
             break;
         case 2:
             console.log("Backing out of Pokedex...");
-            pbf_mash_button(console, BUTTON_B, 20);
+            pbf_mash_button(context, BUTTON_B, 20);
             break;
         default:
             dump_image(env.logger(), env.program_info(), "ReturnToJubilife", console.video().snapshot());
@@ -175,8 +175,8 @@ void goto_camp_from_jubilife(
     const TravelLocation& location
 ){
     //  Open the map.
-    console.botbase().wait_for_all_requests();
-    pbf_move_left_joystick(console, 128, 255, 200, 0);
+    context.wait_for_all_requests();
+    pbf_move_left_joystick(context, 128, 255, 200, 0);
     {
         MapDetector detector;
         int ret = run_until(
@@ -205,8 +205,8 @@ void goto_camp_from_jubilife(
         if (current_region == location.region){
             break;
         }
-        pbf_press_dpad(console, direction, 20, 40);
-        console.botbase().wait_for_all_requests();
+        pbf_press_dpad(context, direction, 20, 40);
+        context.wait_for_all_requests();
     }
     if (current_region != location.region){
         dump_image(console.logger(), env.program_info(), "FindRegion", console.video().snapshot());
@@ -214,9 +214,9 @@ void goto_camp_from_jubilife(
     }
 
     if (location.warp_slot != 0){
-        pbf_press_button(console, BUTTON_A, 20, 105);
+        pbf_press_button(context, BUTTON_A, 20, 105);
         for (size_t c = 0; c < location.warp_slot; c++){
-            pbf_press_dpad(console, DPAD_DOWN, 20, 30);
+            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
         }
     }
 
@@ -228,7 +228,7 @@ void goto_camp_from_jubilife(
     }
 
     //  Open the map.
-    pbf_press_button(console, BUTTON_MINUS, 20, 30);
+    pbf_press_button(context, BUTTON_MINUS, 20, 30);
     {
         MapDetector detector;
         int ret = wait_until(
@@ -245,7 +245,7 @@ void goto_camp_from_jubilife(
     }
 
     //  Warp to sub-camp.
-    pbf_press_button(console, BUTTON_X, 20, 30);
+    pbf_press_button(context, BUTTON_X, 20, 30);
     {
         ButtonDetector detector(
             console, console,
@@ -262,11 +262,11 @@ void goto_camp_from_jubilife(
             throw OperationFailedException(console, "Unable to fly. Are you under attack?");
         }
     }
-    pbf_wait(console, 50);
+    pbf_wait(context, 50);
     for (size_t c = 0; c < location.warp_sub_slot; c++){
-        pbf_press_dpad(console, DPAD_DOWN, 20, 30);
+        pbf_press_dpad(context, DPAD_DOWN, 20, 30);
     }
-    pbf_mash_button(console, BUTTON_A, 125);
+    pbf_mash_button(context, BUTTON_A, 125);
 
     BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.6});
     int ret = wait_until(
@@ -285,7 +285,7 @@ void goto_camp_from_jubilife(
         return;
     }
 
-    location.post_arrival_maneuver(console);
+    location.post_arrival_maneuver(context, console);
     context.wait_for_all_requests();
 }
 
@@ -309,7 +309,7 @@ void goto_camp_from_overworld(
 
         if (session.detected_shiny()){
             shiny_stat_incrementer.add_shiny();
-            on_shiny_sound(env, console, options, session.shiny_sound_results());
+            on_shiny_sound(env, context, console, options, session.shiny_sound_results());
         }
 
         if (std::chrono::system_clock::now() - start > std::chrono::seconds(60)){
@@ -318,7 +318,7 @@ void goto_camp_from_overworld(
         }
 
         //  Open the map.
-        pbf_press_button(console, BUTTON_MINUS, 20, 30);
+        pbf_press_button(context, BUTTON_MINUS, 20, 30);
         {
             MapDetector detector;
             int ret = wait_until(
@@ -329,8 +329,8 @@ void goto_camp_from_overworld(
             if (ret < 0){
                 dump_image(console.logger(), env.program_info(), "MapNotDetected", console.video().snapshot());
                 console.log("Map not detected after 5 seconds.", COLOR_RED);
-                pbf_mash_button(console, BUTTON_B, TICKS_PER_SECOND);
-                console.botbase().wait_for_all_requests();
+                pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
+                context.wait_for_all_requests();
                 continue;
             }
             console.log("Found map!");
@@ -338,7 +338,7 @@ void goto_camp_from_overworld(
         }
 
         //  Try to fly back to camp.
-        pbf_press_button(console, BUTTON_X, 20, 30);
+        pbf_press_button(context, BUTTON_X, 20, 30);
 
         {
             ButtonDetector detector(
@@ -354,13 +354,13 @@ void goto_camp_from_overworld(
             );
             if (ret >= 0){
                 console.log("Flying back to camp...");
-                pbf_mash_button(console, BUTTON_A, 125);
+                pbf_mash_button(context, BUTTON_A, 125);
                 break;
             }
             console.log("Unable to fly. Are you under attack?", COLOR_RED);
         }
 
-        pbf_mash_button(console, BUTTON_B, 125);
+        pbf_mash_button(context, BUTTON_B, 125);
         grace_period = std::chrono::seconds(5);
     }
 

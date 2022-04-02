@@ -99,13 +99,13 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, BotBaseConte
     LeadingShinyTracker lead_tracker(env.console);
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_B, 5, 5);
+    pbf_press_button(context, BUTTON_B, 5, 5);
 
     //  Encounter Loop
     while (true){
         env.update_stats();
-        pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
-        env.console.botbase().wait_for_all_requests();
+        pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
+        context.wait_for_all_requests();
 
         {
             ShortDialogWatcher dialog_detector;
@@ -130,7 +130,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, BotBaseConte
                 continue;
             case 1:
                 env.log("Hooked something!", COLOR_BLUE);
-                pbf_press_button(env.console, BUTTON_ZL, 10, TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_ZL, 10, TICKS_PER_SECOND);
                 break;
             case 2:
                 env.log("Unexpected battle menu.", COLOR_RED);
@@ -154,7 +154,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, BotBaseConte
             );
             switch (ret){
             case 0:
-                pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
                 break;
             case 1:
                 env.log("Unexpected battle menu.", COLOR_RED);
@@ -215,7 +215,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         "",
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

@@ -20,14 +20,14 @@ namespace PokemonBDSP{
 
 
 StandardEncounterDetection::StandardEncounterDetection(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
     Language language,
     const EncounterFilterOption& filter,
     const DoublesShinyDetection& shininess,
     std::chrono::milliseconds read_name_delay
 )
-    : m_console(console)
+    : m_context(context)
+    , m_console(console)
     , m_language(language)
     , m_filter(filter)
     , m_shininess(shininess)
@@ -38,7 +38,7 @@ StandardEncounterDetection::StandardEncounterDetection(
     InferenceBoxScope left_name(console, {0.467, 0.06, 0.16, 0.050});
     InferenceBoxScope right_name(console, {0.740, 0.06, 0.16, 0.050});
 
-    console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
     env.wait_for(std::chrono::milliseconds(100));
     QImage screen = console.video().snapshot();
 

@@ -46,31 +46,31 @@ BeamReset::BeamReset(const BeamReset_Descriptor& descriptor)
 
 void BeamReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
-        resume_game_front_of_den_nowatts(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+        grip_menu_connect_go_home(context);
+        resume_game_front_of_den_nowatts(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
     while (true){
         //  Talk to den.
-        pbf_press_button(env.console, BUTTON_A, 10, 450);
+        pbf_press_button(context, BUTTON_A, 10, 450);
         if (EXTRA_LINE){
-            pbf_press_button(env.console, BUTTON_A, 10, 300);
+            pbf_press_button(context, BUTTON_A, 10, 300);
         }
-        pbf_press_button(env.console, BUTTON_A, 10, 300);
+        pbf_press_button(context, BUTTON_A, 10, 300);
 
         //  Drop wishing piece.
-        pbf_press_button(env.console, BUTTON_A, 10, 70);
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(context, BUTTON_A, 10, 70);
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
 
         for (uint16_t c = 0; c < 4; c++){
-            pbf_press_button(env.console, BUTTON_HOME, 10, 10);
-            pbf_press_button(env.console, BUTTON_HOME, 10, 220);
+            pbf_press_button(context, BUTTON_HOME, 10, 10);
+            pbf_press_button(context, BUTTON_HOME, 10, 220);
         }
-        pbf_wait(env.console, DELAY_BEFORE_RESET);
+        pbf_wait(context, DELAY_BEFORE_RESET);
 
-        reset_game_from_home(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+        reset_game_from_home(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
     }
 }
 

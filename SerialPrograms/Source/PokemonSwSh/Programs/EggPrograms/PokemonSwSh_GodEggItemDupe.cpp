@@ -123,7 +123,7 @@ void GodEggItemDupe::collect_godegg(
         pbf_mash_button(context, BUTTON_B, 700);
     }
 }
-void GodEggItemDupe::run_program(SingleSwitchProgramEnvironment& env, uint16_t attempts) const{
+void GodEggItemDupe::run_program(Logger& logger, BotBaseContext& context, uint16_t attempts) const{
     if (attempts == 0){
         return;
     }
@@ -135,9 +135,9 @@ void GodEggItemDupe::run_program(SingleSwitchProgramEnvironment& env, uint16_t a
 
     //  1st Fetch: Get into position.
     {
-        env.log("Fetch Attempts: " + tostr_u_commas(c));
-        fly_home_collect_egg(env.console, true);
-        collect_godegg(env.console, party_slot++, true, false);
+        logger.log("Fetch Attempts: " + tostr_u_commas(c));
+        fly_home_collect_egg(context, true);
+        collect_godegg(context, party_slot++, true, false);
         if (party_slot >= items){
             party_slot = 0;
         }
@@ -150,10 +150,10 @@ void GodEggItemDupe::run_program(SingleSwitchProgramEnvironment& env, uint16_t a
 
     //  Now we are in steady state.
     for (; c < attempts; c++){
-        env.log("Fetch Attempts: " + tostr_u_commas(c));
-        eggfetcher_loop(env.console);
-        collect_egg(env.console);
-        collect_godegg(env.console, party_slot++, false, false);
+        logger.log("Fetch Attempts: " + tostr_u_commas(c));
+        eggfetcher_loop(context);
+        collect_egg(context);
+        collect_godegg(context, party_slot++, false, false);
         if (party_slot >= items){
             party_slot = 0;
         }
@@ -162,14 +162,14 @@ void GodEggItemDupe::run_program(SingleSwitchProgramEnvironment& env, uint16_t a
 
 void GodEggItemDupe::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+        grip_menu_connect_go_home(context);
+        resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
-    run_program(env, MAX_FETCH_ATTEMPTS);
-    ssf_press_button2(env.console, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
+    run_program(env.console, context, MAX_FETCH_ATTEMPTS);
+    ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
 }
 
 

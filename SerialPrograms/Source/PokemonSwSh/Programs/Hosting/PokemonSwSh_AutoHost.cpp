@@ -33,7 +33,7 @@ bool connect_to_internet(
         return true;
     }
     if (console.video().snapshot().isNull()){
-        connect_to_internet(console, GameSettings::instance().OPEN_YCOMM_DELAY, connect_to_internet_delay);
+        connect_to_internet(context, GameSettings::instance().OPEN_YCOMM_DELAY, connect_to_internet_delay);
         return true;
     }
     if (connect_to_internet_with_inference(
@@ -145,13 +145,13 @@ void run_autohost(
     AutoHostStats& stats = env.stats<AutoHostStats>();
 
     roll_den(
-        console,
+        context,
         enter_online_den_delay,
         open_online_den_lobby_delay,
         skips,
         catchability
     );
-    console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
 
     if (!connect_to_internet(
         env, context, console,
@@ -165,8 +165,8 @@ void run_autohost(
 
     {
         DenMonReader reader(console, console);
-        enter_den(console, enter_online_den_delay, skips != 0, host_online);
-        console.botbase().wait_for_all_requests();
+        enter_den(context, enter_online_den_delay, skips != 0, host_online);
+        context.wait_for_all_requests();
 
         //  Make sure we're actually in a den.
         QImage screen = console.video().snapshot();
@@ -191,12 +191,12 @@ void run_autohost(
                 str[c] = code[c] + '0';
             }
             env.log("Next Raid Code: " + std::string(str, sizeof(str)));
-            pbf_press_button(console, BUTTON_PLUS, 5, 145);
-            enter_digits(console, 8, code);
-            pbf_wait(console, 180);
-            pbf_press_button(console, BUTTON_A, 5, 95);
+            pbf_press_button(context, BUTTON_PLUS, 5, 145);
+            enter_digits(context, 8, code);
+            pbf_wait(context, 180);
+            pbf_press_button(context, BUTTON_A, 5, 95);
         }
-        console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
 
         screen = console.video().snapshot();
         send_raid_notification(
@@ -208,25 +208,25 @@ void run_autohost(
         );
     }
 
-    enter_lobby(console, open_online_den_lobby_delay, host_online, catchability);
+    enter_lobby(context, open_online_den_lobby_delay, host_online, catchability);
 
     //  Accept friend requests while we wait.
     RaidLobbyState raid_state = raid_lobby_wait(
-        console,
+        context, console,
         host_online,
         accept_FR_slot,
         lobby_wait_delay
     );
 
     //  Start Raid
-    pbf_press_dpad(console, DPAD_UP, 5, 45);
+    pbf_press_dpad(context, DPAD_UP, 5, 45);
 
     //  Mash A until it's time to close the game.
     {
-        console.botbase().wait_for_all_requests();
-        uint32_t start = system_clock(console);
-        pbf_mash_button(console, BUTTON_A, 3 * TICKS_PER_SECOND);
-        console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
+        uint32_t start = system_clock(context);
+        pbf_mash_button(context, BUTTON_A, 3 * TICKS_PER_SECOND);
+        context.wait_for_all_requests();
 
         BlackScreenOverWatcher black_screen;
         uint32_t now = start;
@@ -240,34 +240,34 @@ void run_autohost(
                 stats.add_timeout();
                 break;
             }
-            pbf_mash_button(console, BUTTON_A, TICKS_PER_SECOND);
-            console.botbase().wait_for_all_requests();
-            now = system_clock(console);
+            pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
+            context.wait_for_all_requests();
+            now = system_clock(context);
         }
     }
 
     //  Select a move.
     if (move_slot > 0){
-        pbf_wait(console, delay_to_select_move);
-        pbf_press_button(console, BUTTON_A, 20, 80);
+        pbf_wait(context, delay_to_select_move);
+        pbf_press_button(context, BUTTON_A, 20, 80);
         if (dynamax){
-            pbf_press_dpad(console, DPAD_LEFT, 20, 30);
-            pbf_press_button(console, BUTTON_A, 20, 60);
+            pbf_press_dpad(context, DPAD_LEFT, 20, 30);
+            pbf_press_button(context, BUTTON_A, 20, 60);
         }
         for (uint8_t c = 1; c < move_slot; c++){
-            pbf_press_dpad(console, DPAD_DOWN, 20, 30);
+            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
         }
-        pbf_press_button(console, BUTTON_A, 20, 80);
+        pbf_press_button(context, BUTTON_A, 20, 80);
 
         // Disable the troll hosting option if the dynamax is set to TRUE.
         if (!dynamax && troll_hosting > 0){
-            pbf_press_dpad(console, DPAD_DOWN, 20, 80);
+            pbf_press_dpad(context, DPAD_DOWN, 20, 80);
             for (uint8_t c = 0; c < troll_hosting; c++){
-                pbf_press_dpad(console, DPAD_RIGHT, 20, 80);
+                pbf_press_dpad(context, DPAD_RIGHT, 20, 80);
             }
         }
 
-        pbf_press_button(console, BUTTON_A, 20, 980);
+        pbf_press_button(context, BUTTON_A, 20, 980);
     }
 }
 

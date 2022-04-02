@@ -62,43 +62,43 @@ ShinyHuntUnattendedSwordsOfJustice::ShinyHuntUnattendedSwordsOfJustice(const Shi
 
 void ShinyHuntUnattendedSwordsOfJustice::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
-        resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        grip_menu_connect_go_home(context);
+        resume_game_no_interact(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
     const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
-    uint32_t last_touch = system_clock(env.console);
+    uint32_t last_touch = system_clock(context);
     for (uint32_t c = 0; ; c++){
         //  Touch the date.
-        if (TIME_ROLLBACK_HOURS > 0 && system_clock(env.console) - last_touch >= PERIOD){
-            pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-            rollback_hours_from_home(env.console, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-            resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        if (TIME_ROLLBACK_HOURS > 0 && system_clock(context) - last_touch >= PERIOD){
+            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+            rollback_hours_from_home(context, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+            resume_game_no_interact(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             last_touch += PERIOD;
         }
 
         //  Trigger encounter.
-        pbf_press_button(env.console, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
-        pbf_press_button(env.console, BUTTON_A, 10, ENTER_CAMP_DELAY);
+        pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+        pbf_press_button(context, BUTTON_A, 10, ENTER_CAMP_DELAY);
         if (AIRPLANE_MODE){
-            pbf_press_button(env.console, BUTTON_A, 10, 100);
-            pbf_press_button(env.console, BUTTON_A, 10, 100);
+            pbf_press_button(context, BUTTON_A, 10, 100);
+            pbf_press_button(context, BUTTON_A, 10, 100);
         }
-        pbf_press_button(env.console, BUTTON_X, 10, 50);
-        pbf_press_dpad(env.console, DPAD_LEFT, 10, 10);
+        pbf_press_button(context, BUTTON_X, 10, 50);
+        pbf_press_dpad(context, DPAD_LEFT, 10, 10);
         env.log("Starting Encounter: " + tostr_u_commas(c + 1));
-        pbf_press_button(env.console, BUTTON_A, 10, EXIT_CAMP_TO_RUN_DELAY);
+        pbf_press_button(context, BUTTON_A, 10, EXIT_CAMP_TO_RUN_DELAY);
 
         //  Run away if not shiny.
-        run_away_with_lights(env.console);
+        run_away_with_lights(context);
 
         //  Enter Pokemon menu if shiny.
-        enter_summary(env.console, false);
+        enter_summary(context, false);
     }
 
-    pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
 }
 
 

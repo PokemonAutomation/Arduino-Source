@@ -114,7 +114,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     goto_camp_from_jubilife(env, context, env.console, TravelLocations::instance().Mirelands_Mirelands);
 
-    change_mount(env.console, MountState::BRAVIARY_ON);
+    change_mount(context, env.console, MountState::BRAVIARY_ON);
 
     //Start path
     env.console.log("Beginning Shiny Detection...");
@@ -134,7 +134,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
         if (shiny_detector_route.detected()){
            stats.shinies++;
-           on_shiny_sound(env, env.console, SHINY_DETECTED_ON_ROUTE, shiny_detector_route.results());
+           on_shiny_sound(env, context, env.console, SHINY_DETECTED_ON_ROUTE, shiny_detector_route.results());
         }
 
 
@@ -150,13 +150,13 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
         if (shiny_detector_ruins.detected()){
            stats.shinies++;
-           on_shiny_sound(env, env.console, SHINY_DETECTED, shiny_detector_ruins.results());
+           on_shiny_sound(env, context, env.console, SHINY_DETECTED, shiny_detector_ruins.results());
         }
     };
 
     env.console.log("No shiny detected, returning to Jubilife!");
     goto_camp_from_overworld(env, context, env.console, SHINY_DETECTED, stats);
-    pbf_press_dpad(env.console, DPAD_RIGHT, 10, 10);
+    pbf_press_dpad(context, DPAD_RIGHT, 10, 10);
     goto_professor(env.console, context, Camp::MIRELANDS_MIRELANDS);
     from_professor_return_to_jubilife(env, context, env.console);
 }
@@ -166,7 +166,7 @@ void UnownFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
     while (true){
         env.update_stats();
@@ -180,7 +180,7 @@ void UnownFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
             run_iteration(env, context);
         }catch (OperationFailedException&){
             stats.errors++;
-            pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
     }

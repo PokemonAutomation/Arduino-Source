@@ -87,7 +87,7 @@ StateMachineAction run_state_iteration(
     case 0:
         if (starting){
             console.log("Current State: " + STRING_POKEMON + " Select");
-            run_select_pokemon(env, console, global_state, runtime.console_settings[console_index]);
+            run_select_pokemon(env, context, console, global_state, runtime.console_settings[console_index]);
             return StateMachineAction::KEEP_GOING;
         }else{
             console.log("Current State: " + STRING_POKEMON + " Swap");
@@ -96,7 +96,7 @@ StateMachineAction run_state_iteration(
         }
     case 1:
         console.log("Current State: Path Select");
-        run_path_select(env, console, global_state);
+        run_path_select(env, context, console, global_state);
         return StateMachineAction::KEEP_GOING;
     case 2:
         console.log("Current State: Item Select");
@@ -133,12 +133,12 @@ StateMachineAction run_state_iteration(
         );
     case 7:
         console.log("Current State: Entrance");
-        run_entrance(runtime, env, console, save_path, global_state);
+        run_entrance(runtime, env, context, console, save_path, global_state);
         return StateMachineAction::DONE_WITH_ADVENTURE;
     case 8:
         console.log("Current State: Frozen Screen", COLOR_RED);
-//        pbf_mash_button(console, BUTTON_B, TICKS_PER_SECOND);
-//        console.botbase().wait_for_all_requests();
+//        pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
+//        context.wait_for_all_requests();
 //        return StateMachineAction::KEEP_GOING;
         return StateMachineAction::RESET_RECOVER;
     default:

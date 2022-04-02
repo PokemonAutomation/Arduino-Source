@@ -38,28 +38,28 @@ void open_game_from_home(
     uint16_t start_game_mash
 ){
     if (game_slot != 0){
-        pbf_press_button(console, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY - 10);
+        pbf_press_button(context, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY - 10);
         for (uint8_t c = 1; c < game_slot; c++){
-            pbf_press_dpad(console, DPAD_RIGHT, 5, 5);
+            pbf_press_dpad(context, DPAD_RIGHT, 5, 5);
         }
     }
 
     if (tolerate_update_menu){
         //  If the update menu isn't there, these will get swallowed by the opening
         //  animation for the select user menu.
-        pbf_press_button(console, BUTTON_A, 5, 175);      //  Choose game
-        pbf_press_dpad(console, DPAD_UP, 5, 0);          //  Skip the update window.
-        move_to_user(console, user_slot);
+        pbf_press_button(context, BUTTON_A, 5, 175);      //  Choose game
+        pbf_press_dpad(context, DPAD_UP, 5, 0);          //  Skip the update window.
+        move_to_user(context, user_slot);
     }
 
 //    cout << "START_GAME_REQUIRES_INTERNET = " << START_GAME_REQUIRES_INTERNET << endl;
     if (!ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET && user_slot == 0){
         //  Mash your way into the game.
-        pbf_mash_button(console, BUTTON_A, start_game_mash);
+        pbf_mash_button(context, BUTTON_A, start_game_mash);
     }else{
-        pbf_press_button(console, BUTTON_A, 5, 175);     //  Enter select user menu.
-        move_to_user(console, user_slot);
-        pbf_press_button(console, BUTTON_A, 5, 5);       //  Enter game
+        pbf_press_button(context, BUTTON_A, 5, 175);     //  Enter select user menu.
+        move_to_user(context, user_slot);
+        pbf_press_button(context, BUTTON_A, 5, 5);       //  Enter game
 
         //  Switch to mashing ZL instead of A to get into the game.
         //  Mash your way into the game.
@@ -68,10 +68,10 @@ void open_game_from_home(
             //  Need to wait a bit longer for the internet check.
             duration += ConsoleSettings::instance().START_GAME_INTERNET_CHECK_DELAY;
         }
-//        pbf_mash_button(console, BUTTON_ZL, duration);
-        pbf_wait(console, duration);
+//        pbf_mash_button(context, BUTTON_ZL, duration);
+        pbf_wait(context, duration);
     }
-    console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
 }
 
 

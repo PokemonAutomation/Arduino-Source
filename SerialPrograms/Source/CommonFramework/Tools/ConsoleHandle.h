@@ -50,8 +50,8 @@ public:
     AudioFeed& audio(){ return m_audio; }
 
     operator LoggerQt&(){ return m_logger; }
-    operator BotBase&(){ return m_context.botbase(); }
-    operator BotBaseContext&(){ return m_context; }
+//    operator BotBase&(){ return m_context.botbase(); }
+//    operator BotBaseContext&(){ return m_context; }
     operator VideoFeed&(){ return m_video; }
     operator VideoOverlay&(){ return m_overlay; }
     operator AudioFeed&() { return m_audio; }

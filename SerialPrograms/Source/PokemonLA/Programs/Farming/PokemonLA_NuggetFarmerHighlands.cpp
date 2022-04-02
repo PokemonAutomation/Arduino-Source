@@ -117,7 +117,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, Bo
 
     stats.attempts++;
 
-    change_mount(env.console, MountState::WYRDEER_ON);
+    change_mount(context, env.console, MountState::WYRDEER_ON);
 
 
     bool success = false;
@@ -159,7 +159,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, Bo
         );
         if (shiny_detector.detected()){
             stats.shinies++;
-            on_shiny_sound(env, env.console, SHINY_DETECTED, shiny_detector.results());
+            on_shiny_sound(env, context, env.console, SHINY_DETECTED, shiny_detector.results());
         }
         if (ret == 0){
             env.console.log("Found Charm!", COLOR_BLUE);
@@ -197,7 +197,7 @@ void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env, BotBaseC
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
     // Put a save here so that when the program reloads from error it won't break.
     save_game_from_overworld(env, context, env.console);
@@ -216,7 +216,7 @@ void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env, BotBaseC
             }
         }catch (OperationFailedException&){
             stats.errors++;
-            pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
     }
