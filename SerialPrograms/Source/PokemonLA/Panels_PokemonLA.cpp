@@ -25,6 +25,7 @@
 #include "Programs/ShinyHunting/PokemonLA_GalladeFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_CrobatFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_UnownFinder.h"
+#include "Programs/ShinyHunting/PokemonLA_FroslassFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.h"
 #include "Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.h"
 #include "Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.h"
@@ -68,6 +69,7 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
 //    add_program<ShinyHuntLakeTrio_Descriptor, ShinyHuntLakeTrio>();
     add_program<CrobatFinder_Descriptor, CrobatFinder>();
     add_program<GalladeFinder_Descriptor, GalladeFinder>();
+    add_program<FroslassFinder_Descriptor, FroslassFinder>();
     add_program<UnownFinder_Descriptor, UnownFinder>();
     add_program<ShinyHuntFlagPin_Descriptor, ShinyHuntFlagPin>();
     add_program<PostMMOSpawnReset_Descriptor, PostMMOSpawnReset>();

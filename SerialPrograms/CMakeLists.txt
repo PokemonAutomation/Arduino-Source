@@ -902,6 +902,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_GalladeFinder.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_UnownFinder.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_UnownFinder.cpp
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_FroslassFinder.h
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_FroslassFinder.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.cpp
