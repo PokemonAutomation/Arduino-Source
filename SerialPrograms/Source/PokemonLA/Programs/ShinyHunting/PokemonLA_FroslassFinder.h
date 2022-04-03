@@ -38,7 +38,6 @@ private:
     BooleanCheckBoxOption SKIP_PATH_SHINY;
 
     EventNotificationOption NOTIFICATION_STATUS;
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 };
 
