@@ -214,7 +214,7 @@ StateMachineAction run_move_select(
     }
 
 
-    GlobalState inferred = state_tracker.synchronize(env, console, console_index);
+    GlobalState inferred = state_tracker.synchronize(console, console_index);
 
 
     while (true){
@@ -321,7 +321,7 @@ StateMachineAction throw_balls(
     state.players[3].health.value.dead = 0;
 
 
-    GlobalState inferred = state_tracker.synchronize(env, console, console_index);
+    GlobalState inferred = state_tracker.synchronize(console, console_index);
 
 
     std::string ball;

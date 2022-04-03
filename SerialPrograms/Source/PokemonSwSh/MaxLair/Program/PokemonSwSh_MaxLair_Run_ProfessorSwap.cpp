@@ -37,7 +37,7 @@ void run_professor_swap(
     }
 
 
-    GlobalState inferred = state_tracker.synchronize(env, console, console_index);
+    GlobalState inferred = state_tracker.synchronize(console, console_index);
 
 
     bool swap = should_swap_with_professor(console, inferred, player_index);

@@ -36,7 +36,7 @@ void run_item_select(
     }
 
 
-    GlobalState inferred = state_tracker.synchronize(env, console, console_index);
+    GlobalState inferred = state_tracker.synchronize(console, console_index);
 
 
     int8_t item_index = select_item(console, inferred, player_index);

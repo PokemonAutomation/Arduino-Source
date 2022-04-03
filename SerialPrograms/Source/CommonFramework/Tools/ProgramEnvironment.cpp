@@ -27,8 +27,6 @@ struct ProgramEnvironmentData{
     AsyncDispatcher m_realtime_dispatcher;
     AsyncDispatcher m_inference_dispatcher;
 
-    std::map<std::condition_variable*, std::mutex*> m_stop_signals;
-
     ProgramEnvironmentData(
         const ProgramInfo& program_info
     )
@@ -90,14 +88,6 @@ void ProgramEnvironment::check_stopping() const{
         throw ProgramCancelledException();
     }
 }
-void ProgramEnvironment::register_stop_program_signal(std::mutex& lock, std::condition_variable& cv){
-    std::unique_lock<std::mutex> lg(m_data->m_lock);
-    m_data->m_stop_signals[&cv] = &lock;
-}
-void ProgramEnvironment::deregister_stop_program_signal(std::condition_variable& cv){
-    std::unique_lock<std::mutex> lg(m_data->m_lock);
-    m_data->m_stop_signals.erase(&cv);
-}
 void ProgramEnvironment::signal_stop(){
     m_data->m_stopping.store(true, std::memory_order_release);
 
@@ -107,10 +97,6 @@ void ProgramEnvironment::signal_stop(){
 
     std::lock_guard<std::mutex> lg(m_data->m_lock);
     m_data->m_cv.notify_all();
-    for (auto& item : m_data->m_stop_signals){
-        std::lock_guard<std::mutex> lg0(*item.second);
-        item.first->notify_all();
-    }
 }
 
 
@@ -127,23 +113,6 @@ void ProgramEnvironment::wait_for(std::chrono::milliseconds duration){
     );
 
     check_stopping();
-}
-void ProgramEnvironment::wait_until(std::chrono::system_clock::time_point stop){
-    check_stopping();
-
-    std::unique_lock<std::mutex> lg(m_data->m_lock);
-    m_data->m_cv.wait_until(
-        lg, stop,
-        [=]{
-            return std::chrono::system_clock::now() >= stop || is_stopping();
-        }
-    );
-
-    check_stopping();
-}
-void ProgramEnvironment::notify_all(){
-    std::lock_guard<std::mutex> lg(m_data->m_lock);
-    m_data->m_cv.notify_all();
 }
 
 

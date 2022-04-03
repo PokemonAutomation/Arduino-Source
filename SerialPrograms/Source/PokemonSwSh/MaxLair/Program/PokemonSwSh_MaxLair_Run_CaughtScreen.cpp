@@ -60,7 +60,7 @@ void synchronize_caught_screen(
     GlobalStateTracker& state_tracker
 ){
     context.wait_for_all_requests();
-    state_tracker.synchronize(env, console, console.index(), std::chrono::seconds(60));
+    state_tracker.synchronize(console, console.index(), std::chrono::seconds(60));
 }
 
 

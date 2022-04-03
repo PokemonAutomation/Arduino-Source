@@ -35,7 +35,7 @@ AdventureResult run_adventure(
     send_status_notification(env, runtime);
 
     QImage entrance[4];
-    GlobalStateTracker state_tracker(env, env.consoles.size());
+    GlobalStateTracker state_tracker(scope, env.consoles.size());
 
     if (!start_adventure(
         env, scope,

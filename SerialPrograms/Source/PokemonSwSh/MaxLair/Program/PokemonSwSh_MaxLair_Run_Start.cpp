@@ -71,22 +71,19 @@ bool wait_for_all_join(
     }
 }
 
-class AllJoinedTracker{
+class AllJoinedTracker final : public Cancellable{
 public:
     AllJoinedTracker(
-        ProgramEnvironment& env, size_t consoles,
+        CancellableScope& scope, size_t consoles,
         std::chrono::system_clock::time_point time_limit
     )
-        : m_env(env)
-        , m_time_limit(time_limit)
+        : m_time_limit(time_limit)
         , m_consoles(consoles)
         , m_counter(0)
     {
-        env.register_stop_program_signal(m_lock, m_cv);
+        attach(scope);
     }
-    ~AllJoinedTracker(){
-        m_env.deregister_stop_program_signal(m_cv);
-    }
+    virtual ~AllJoinedTracker(){}
 
     bool report_joined(){
         std::unique_lock<std::mutex> lg(m_lock);
@@ -97,7 +94,7 @@ public:
         }
         while (true){
             m_cv.wait_until(lg, m_time_limit);
-            m_env.check_stopping();
+            throw_if_cancelled();
             if (m_counter >= m_consoles){
                 return true;
             }
@@ -107,8 +104,16 @@ public:
         }
     }
 
+    virtual bool cancel() noexcept override{
+        if (Cancellable::cancel()){
+            return true;
+        }
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_cv.notify_all();
+        return false;
+    }
+
 private:
-    ProgramEnvironment& m_env;
     std::mutex m_lock;
     std::condition_variable m_cv;
 
@@ -197,7 +202,7 @@ bool start_raid_local(
     auto time_limit = std::chrono::system_clock::now() +
         std::chrono::milliseconds(settings.LOBBY_WAIT_DELAY * 1000 / TICKS_PER_SECOND);
 
-    AllJoinedTracker joined_tracker(env, env.consoles.size(), time_limit);
+    AllJoinedTracker joined_tracker(scope, env.consoles.size(), time_limit);
 
     //  Wait for all Switches to join.
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
@@ -358,7 +363,7 @@ bool start_raid_host(
     auto time_limit = std::chrono::system_clock::now() +
         std::chrono::milliseconds(settings.LOBBY_WAIT_DELAY * 1000 / TICKS_PER_SECOND);
 
-    AllJoinedTracker joined_tracker(env, env.consoles.size(), time_limit);
+    AllJoinedTracker joined_tracker(scope, env.consoles.size(), time_limit);
 
     //  Wait for all Switches to join.
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){

@@ -78,18 +78,9 @@ public:
 
 
 public:
-    //  When the user issues a stop command, signal all the conditional variables
-    //  under their associated mutexes.
-    void register_stop_program_signal(std::mutex& lock, std::condition_variable& cv);
-    void deregister_stop_program_signal(std::condition_variable& cv);
-
-
-public:
     //  Use these since they will wake up on program stop.
 
     void wait_for(std::chrono::milliseconds duration);
-    void wait_until(std::chrono::system_clock::time_point stop);
-    void notify_all();
 
 
 public:
@@ -111,29 +102,6 @@ private:
     CancellableHolder<CancellableScope> m_scope;
 
     Pimpl<ProgramEnvironmentData> m_data;
-};
-
-
-
-class ProgramStopNotificationScope{
-public:
-    ProgramStopNotificationScope(
-        ProgramEnvironment& env,
-        std::mutex& lock,
-        std::condition_variable& cv
-    )
-        : m_env(env)
-        , m_cv(cv)
-    {
-        env.register_stop_program_signal(lock, cv);
-    }
-    ~ProgramStopNotificationScope(){
-        m_env.deregister_stop_program_signal(m_cv);
-    }
-
-private:
-    ProgramEnvironment& m_env;
-    std::condition_variable& m_cv;
 };
 
 

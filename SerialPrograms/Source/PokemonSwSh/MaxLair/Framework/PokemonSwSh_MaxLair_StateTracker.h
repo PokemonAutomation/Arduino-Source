@@ -18,11 +18,12 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-class GlobalStateTracker{
+class GlobalStateTracker final : public Cancellable{
     using time_point = std::chrono::system_clock::time_point;
 public:
-    GlobalStateTracker(ProgramEnvironment& env, size_t consoles);
-    ~GlobalStateTracker();
+    GlobalStateTracker(CancellableScope& scope, size_t consoles);
+    virtual ~GlobalStateTracker();
+    virtual bool cancel() noexcept override;
 
     //  Access the local copy for this console.
     //  This one is safe to directly access.
@@ -38,14 +39,14 @@ public:
 
     //  Attempt to synchronize with other consoles.
     GlobalState synchronize(
-        ProgramEnvironment& env, LoggerQt& logger,
-        size_t index,
+        LoggerQt& logger, size_t index,
         std::chrono::milliseconds window = std::chrono::seconds(5)
     );
 
     void mark_as_dead(size_t index);
 
     std::pair<uint64_t, std::string> dump();
+
 
 
 private:
@@ -82,7 +83,6 @@ private:
 
 
 private:
-    ProgramEnvironment& m_env;
     std::mutex m_lock;
     std::condition_variable m_cv;
 

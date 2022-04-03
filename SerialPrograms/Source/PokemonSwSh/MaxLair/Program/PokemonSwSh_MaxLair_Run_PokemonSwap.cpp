@@ -60,7 +60,7 @@ void run_swap_pokemon(
     state.add_seen(options[1]);
 
 
-    GlobalState inferred = state_tracker.synchronize(env, console, console_index);
+    GlobalState inferred = state_tracker.synchronize(console, console_index);
 
 
     //  Make your selection.

@@ -74,8 +74,7 @@ public:
         : m_botbase(botbase)
     {}
     BotBaseContext(CancellableScope& parent, BotBase& botbase)
-        : CancellableScope(parent)
-        , m_botbase(botbase)
+        : m_botbase(botbase)
     {
         attach(parent);
     }
