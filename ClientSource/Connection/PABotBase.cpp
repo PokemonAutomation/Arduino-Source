@@ -105,12 +105,17 @@ void PABotBase::wait_for_all_requests(const Cancellable* cancelled){
 }
 
 void PABotBase::stop_all_commands(){
+#if 0
     uint64_t seqnum = issue_request(nullptr, Microcontroller::DeviceRequest_request_stop(), false);
 
     pabb_MsgAckRequest response;
     wait_for_request(seqnum).convert<PABB_MSG_ACK_REQUEST>(m_logger, response);
 
     clear_all_active_commands(seqnum);
+#else
+    uint64_t seqnum = issue_request(nullptr, Microcontroller::DeviceRequest_request_stop(), true);
+    clear_all_active_commands(seqnum);
+#endif
 }
 void PABotBase::next_command_interrupt(){
     uint64_t seqnum = issue_request(nullptr, Microcontroller::DeviceRequest_next_command_interrupt(), true);

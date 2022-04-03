@@ -91,7 +91,7 @@ bool AsyncCommandSession::cancel() noexcept{
     }
     std::lock_guard<std::mutex> lg(m_lock);
     if (m_current != nullptr){
-        m_current->context.cancel_now();
+        m_current->context.cancel();
     }
     m_cv.notify_all();
     return false;
