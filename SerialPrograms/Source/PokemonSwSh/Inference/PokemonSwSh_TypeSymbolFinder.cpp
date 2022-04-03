@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "Common/Cpp/CancellableScope.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"

@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonBDSP_ShinyEncounterDetector_H
 #define PokemonAutomation_PokemonBDSP_ShinyEncounterDetector_H
 
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "Pokemon/Pokemon_DataTypes.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
@@ -17,6 +16,7 @@
 
 namespace PokemonAutomation{
     class BotBaseContext;
+    class ProgramEnvironment;
     class ConsoleHandle;
 namespace NintendoSwitch{
 namespace PokemonBDSP{

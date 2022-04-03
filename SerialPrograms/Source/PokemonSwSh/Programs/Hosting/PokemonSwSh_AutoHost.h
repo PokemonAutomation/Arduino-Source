@@ -8,13 +8,16 @@
 #define PokemonAutomation_PokemonSwSh_AutoHost_H
 
 #include "CommonFramework/Options/RandomCodeOption.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonSwSh/Options/PokemonSwSh_Catchability.h"
 #include "PokemonSwSh/Options/PokemonSwSh_AutoHostNotification.h"
 #include "PokemonSwSh/Inference/Dens/PokemonSwSh_DenMonReader.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
+    struct ProgramInfo;
+    class ProgramEnvironment;
+    class StatsTracker;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 

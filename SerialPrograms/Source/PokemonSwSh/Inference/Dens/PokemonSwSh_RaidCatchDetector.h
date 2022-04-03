@@ -8,7 +8,6 @@
 #define PokemonAutomation_PokemonSwSh_RaidCatchDetector_H
 
 #include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 

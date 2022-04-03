@@ -7,11 +7,12 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_CatchScreenTracker_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_CatchScreenTracker_H
 
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
+    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{

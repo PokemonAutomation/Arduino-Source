@@ -9,13 +9,14 @@
 
 #include <deque>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "Pokemon/Pokemon_Types.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
+    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{

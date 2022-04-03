@@ -7,11 +7,11 @@
 #ifndef PokemonAutomation_PokemonSwSh_DenTools_H
 #define PokemonAutomation_PokemonSwSh_DenTools_H
 
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 

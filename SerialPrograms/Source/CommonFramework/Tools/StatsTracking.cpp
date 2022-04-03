@@ -4,8 +4,8 @@
  *
  */
 
+#include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include "ProgramEnvironment.h"
 #include "StatsTracking.h"
 
 #include <iostream>

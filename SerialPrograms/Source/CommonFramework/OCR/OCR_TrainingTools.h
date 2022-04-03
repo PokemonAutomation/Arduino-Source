@@ -11,8 +11,9 @@
 #include <vector>
 #include <map>
 #include <QString>
+#include "Common/Cpp/CancellableScope.h"
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "CommonFramework/Logging/LoggerQt.h"
 
 namespace PokemonAutomation{
 namespace OCR{

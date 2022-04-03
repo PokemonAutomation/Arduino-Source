@@ -8,6 +8,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "VisualInferenceSession.h"
 
 namespace PokemonAutomation{

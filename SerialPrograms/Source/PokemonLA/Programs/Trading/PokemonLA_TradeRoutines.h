@@ -10,11 +10,12 @@
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/MultiConsoleErrors.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
+    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonLA{
 

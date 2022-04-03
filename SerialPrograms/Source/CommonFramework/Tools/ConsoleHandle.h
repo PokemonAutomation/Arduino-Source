@@ -7,11 +7,11 @@
 #ifndef PokemonAutomation_ConsoleHandle_H
 #define PokemonAutomation_ConsoleHandle_H
 
-#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 
 namespace PokemonAutomation{
 
+class BotBase;
 class VideoFeed;
 class VideoOverlay;
 class AudioFeed;
@@ -44,14 +44,11 @@ public:
 
     LoggerQt& logger(){ return m_logger; }
     BotBase& botbase(){ return m_botbase; }
-//    BotBaseContext& context(){ return m_context; }
     VideoFeed& video(){ return m_video; }
     VideoOverlay& overlay(){ return m_overlay; }
     AudioFeed& audio(){ return m_audio; }
 
     operator LoggerQt&(){ return m_logger; }
-//    operator BotBase&(){ return m_context.botbase(); }
-//    operator BotBaseContext&(){ return m_context; }
     operator VideoFeed&(){ return m_video; }
     operator VideoOverlay&(){ return m_overlay; }
     operator AudioFeed&() { return m_audio; }

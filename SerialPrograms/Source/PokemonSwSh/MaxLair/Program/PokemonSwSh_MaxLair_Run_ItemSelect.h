@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Run_ItemSelect_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Run_ItemSelect_H
 
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"

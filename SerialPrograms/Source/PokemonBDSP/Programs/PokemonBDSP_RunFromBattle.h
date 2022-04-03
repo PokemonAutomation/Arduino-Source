@@ -7,10 +7,11 @@
 #ifndef PokemonAutomation_PokemonBDSP_RunFromBattle_H
 #define PokemonAutomation_PokemonBDSP_RunFromBattle_H
 
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
+    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 

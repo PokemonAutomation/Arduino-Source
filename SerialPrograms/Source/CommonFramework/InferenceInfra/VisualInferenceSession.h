@@ -12,12 +12,12 @@
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
 
+class ProgramEnvironment;
 
 
 class VisualInferenceSession final : public Cancellable{

@@ -6,6 +6,7 @@
 
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"

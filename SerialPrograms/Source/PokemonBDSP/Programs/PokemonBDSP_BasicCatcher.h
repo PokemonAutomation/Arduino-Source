@@ -8,11 +8,12 @@
 #define PokemonAutomation_PokemonBDSP_BasicCatcher_H
 
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
+    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
     

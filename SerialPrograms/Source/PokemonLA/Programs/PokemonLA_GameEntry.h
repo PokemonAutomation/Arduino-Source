@@ -7,10 +7,11 @@
 #ifndef PokemonAutomation_PokemonLA_GameEntry_H
 #define PokemonAutomation_PokemonLA_GameEntry_H
 
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
+    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonLA{
 

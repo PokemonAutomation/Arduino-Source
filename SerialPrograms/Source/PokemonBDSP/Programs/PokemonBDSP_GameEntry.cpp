@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"

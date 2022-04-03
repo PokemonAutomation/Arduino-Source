@@ -7,6 +7,7 @@
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceSession.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"

@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Run_StartSolo_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Run_StartSolo_H
 
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_QuantityReader.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Hosting.h"
@@ -15,6 +14,8 @@
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateTracker.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
+    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{

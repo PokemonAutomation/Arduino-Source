@@ -9,12 +9,12 @@
 
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Logging/LoggerQt.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
 
 namespace PokemonAutomation{
+    class CancellableScope;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{

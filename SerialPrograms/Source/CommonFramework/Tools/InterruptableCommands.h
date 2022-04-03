@@ -12,10 +12,12 @@
 #include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 
 
 namespace PokemonAutomation{
+
+class ProgramEnvironment;
+
 
 
 class AsyncCommandSession final : public Cancellable{

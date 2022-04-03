@@ -11,12 +11,12 @@
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "Common/Cpp/CancellableScope.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/AudioFeed.h"
 #include "AudioInferenceCallback.h"
 
 namespace PokemonAutomation{
 
+class ProgramEnvironment;
 
 
 class AudioInferenceSession final : public Cancellable{

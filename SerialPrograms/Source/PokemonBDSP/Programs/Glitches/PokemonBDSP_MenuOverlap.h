@@ -7,10 +7,13 @@
 #ifndef PokemonAutomation_PokemonBDSP_MenuOverlap_H
 #define PokemonAutomation_PokemonBDSP_MenuOverlap_H
 
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 
+class QImage;
+
 namespace PokemonAutomation{
+    class BotBaseContext;
+    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 

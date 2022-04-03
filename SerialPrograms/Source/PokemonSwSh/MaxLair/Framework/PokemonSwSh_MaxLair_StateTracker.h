@@ -9,10 +9,11 @@
 
 #include <mutex>
 #include <condition_variable>
-#include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "Common/Cpp/CancellableScope.h"
 #include "PokemonSwSh_MaxLair_State.h"
 
 namespace PokemonAutomation{
+    class Logger;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{
@@ -39,7 +40,7 @@ public:
 
     //  Attempt to synchronize with other consoles.
     GlobalState synchronize(
-        LoggerQt& logger, size_t index,
+        Logger& logger, size_t index,
         std::chrono::milliseconds window = std::chrono::seconds(5)
     );
 

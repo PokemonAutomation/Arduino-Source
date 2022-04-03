@@ -15,6 +15,7 @@
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{

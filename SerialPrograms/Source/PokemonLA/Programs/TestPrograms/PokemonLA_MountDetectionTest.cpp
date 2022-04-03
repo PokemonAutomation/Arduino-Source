@@ -4,6 +4,7 @@
  *
  */
 
+#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceSession.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "PokemonLA_MountDetectionTest.h"

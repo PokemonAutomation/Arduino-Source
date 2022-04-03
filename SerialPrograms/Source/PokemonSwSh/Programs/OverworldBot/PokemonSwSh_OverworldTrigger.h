@@ -8,7 +8,6 @@
 #define PokemonAutomation_PokemonSwSh_OverworldTrigger_H
 
 #include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "PokemonSwSh_OverworldTargetTracker.h"
 
 namespace PokemonAutomation{

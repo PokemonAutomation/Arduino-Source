@@ -7,6 +7,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceSession.h"
 #include "CommonFramework/InferenceInfra/AudioInferenceSession.h"
+#include "ProgramEnvironment.h"
 #include "ConsoleHandle.h"
 #include "InterruptableCommands.h"
 #include "SuperControlSession.h"

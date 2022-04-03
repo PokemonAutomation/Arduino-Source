@@ -7,6 +7,7 @@
 #include <mutex>
 #include <condition_variable>
 #include "Common/Compiler.h"
+#include "Common/Cpp/AbstractLogger.h"
 #include "PokemonSwSh_MaxLair_StateTracker.h"
 
 namespace PokemonAutomation{
@@ -106,7 +107,7 @@ void GlobalStateTracker::mark_as_dead(size_t index){
 }
 
 GlobalState GlobalStateTracker::synchronize(
-    LoggerQt& logger, size_t index, std::chrono::milliseconds window
+    Logger& logger, size_t index, std::chrono::milliseconds window
 ){
     std::unique_lock<std::mutex> lg(m_lock);
     m_state_epoch++;

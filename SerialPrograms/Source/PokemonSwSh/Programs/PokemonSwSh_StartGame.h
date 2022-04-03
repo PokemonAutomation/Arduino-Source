@@ -13,6 +13,7 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 

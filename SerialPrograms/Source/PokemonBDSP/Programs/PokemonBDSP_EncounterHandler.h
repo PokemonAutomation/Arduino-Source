@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonBDSP_EncounterHandler_H
 #define PokemonAutomation_PokemonBDSP_EncounterHandler_H
 
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
@@ -17,6 +16,7 @@
 #include "PokemonBDSP/Programs/PokemonBDSP_EncounterDetection.h"
 
 namespace PokemonAutomation{
+    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 

@@ -7,6 +7,7 @@
 #include <cmath>
 #include "Common/Compiler.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/CancellableScope.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"

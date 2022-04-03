@@ -6,6 +6,7 @@
 
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "AudioInferenceSession.h"
 

@@ -7,6 +7,7 @@
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"

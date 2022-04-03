@@ -4,6 +4,7 @@
  *
  */
 
+#include "ClientSource/Connection/BotBase.h"
 //#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceSession.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.h"

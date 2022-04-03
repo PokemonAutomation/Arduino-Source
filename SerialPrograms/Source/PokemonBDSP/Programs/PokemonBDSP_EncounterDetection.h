@@ -9,7 +9,6 @@
 
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "Pokemon/Pokemon_EncounterStats.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOption.h"

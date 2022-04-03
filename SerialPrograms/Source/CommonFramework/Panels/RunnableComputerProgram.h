@@ -7,10 +7,12 @@
 #ifndef PokemonAutomation_RunnableComputerProgram_H
 #define PokemonAutomation_RunnableComputerProgram_H
 
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "RunnablePanel.h"
 
 namespace PokemonAutomation{
+
+class CancellableScope;
+class ProgramEnvironment;
 
 
 class RunnableComputerProgramDescriptor : public RunnablePanelDescriptor{

@@ -7,11 +7,13 @@
 #ifndef PokemonAutomation_PokemonSwSh_Internet_H
 #define PokemonAutomation_PokemonSwSh_Internet_H
 
+#include <chrono>
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
+    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 

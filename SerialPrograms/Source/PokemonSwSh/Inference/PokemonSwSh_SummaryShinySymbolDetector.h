@@ -10,11 +10,12 @@
 #ifndef PokemonAutomation_PokemonSwSh_SummaryShinySymbolDetector_H
 #define PokemonAutomation_PokemonSwSh_SummaryShinySymbolDetector_H
 
+#include <chrono>
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Logging/LoggerQt.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 
 namespace PokemonAutomation{
+    class CancellableScope;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 

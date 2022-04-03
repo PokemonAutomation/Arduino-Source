@@ -13,6 +13,7 @@
 #include "CommonFramework/OCR/OCR_Filtering.h"
 #include "CommonFramework/OCR/OCR_LargeDictionaryMatcher.h"
 #include "CommonFramework/OCR/OCR_TrainingTools.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "Pokemon_TrainPokemonOCR.h"
 
 namespace PokemonAutomation{

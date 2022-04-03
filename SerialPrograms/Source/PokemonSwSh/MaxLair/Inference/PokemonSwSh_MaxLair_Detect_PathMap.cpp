@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"

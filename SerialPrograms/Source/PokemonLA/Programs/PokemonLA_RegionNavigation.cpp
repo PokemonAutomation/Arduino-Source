@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"

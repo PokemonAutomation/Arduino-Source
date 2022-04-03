@@ -13,6 +13,7 @@
 #include "NintendoSwitch_RunnableProgram.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
 namespace NintendoSwitch{
 
 

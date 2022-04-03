@@ -8,7 +8,6 @@
 #define PokemonAutomation_PokemonBDSP_TradeRoutines_H
 
 #include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/MultiConsoleErrors.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h"

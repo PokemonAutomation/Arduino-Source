@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonSwSh_EncounterHandler_H
 #define PokemonAutomation_PokemonSwSh_EncounterHandler_H
 
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "Pokemon/Pokemon_Notification.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"

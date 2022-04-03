@@ -10,13 +10,14 @@
 #include <functional>
 #include <chrono>
 #include <vector>
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
 
+class BotBaseContext;
+class ProgramEnvironment;
 
 
 //  Wait until one of the "callbacks" are triggered or it times out.

@@ -11,12 +11,12 @@
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"
 #include "PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.h"
 
 namespace PokemonAutomation{
+    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 

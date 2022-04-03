@@ -11,7 +11,6 @@
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Notifications/ProgramInfo.h"
 #include "CommonFramework/Panels/RunnablePanelWidget.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "NintendoSwitch_RunnableProgram.h"
 
 namespace PokemonAutomation{

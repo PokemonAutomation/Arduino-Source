@@ -8,7 +8,7 @@
 #define PokemonAutomation_CommonFramework_InferenceThrottler_H
 
 #include <chrono>
-#include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "Common/Cpp/CancellableScope.h"
 
 namespace PokemonAutomation{
 

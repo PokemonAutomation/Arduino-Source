@@ -12,7 +12,7 @@
 
 namespace PokemonAutomation{
 
-class LoggerQt;
+class Logger;
 
 
 class StatAccumulatorI32{

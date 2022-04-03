@@ -8,6 +8,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "RunnableComputerProgramWidget.h"
 
 namespace PokemonAutomation{
