@@ -45,7 +45,7 @@ void MountDetectionTest::program(SingleSwitchProgramEnvironment& env, BotBaseCon
 
     MountTracker tracker(env.console, (MountDetectorLogging)(size_t)FAILED_ACTION);
     VisualInferenceSession session(
-        env.console, env.scope(),
+        env.console, context,
         env.console, env.console,
         std::chrono::seconds(1)
     );

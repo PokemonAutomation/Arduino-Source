@@ -130,7 +130,7 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, B
         SummaryShinySymbolDetector::Detection detection;
         {
             SummaryShinySymbolDetector detector(env.console, env.console);
-            detection = detector.wait_for_detection(env, env.console);
+            detection = detector.wait_for_detection(context, env.console);
 //            detection = SummaryShinySymbolDetector::SHINY;
         }
         switch (detection){

@@ -20,8 +20,8 @@ namespace MaxLairInternal{
 
 CaughtPokemonScreen::CaughtPokemonScreen(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context)
     : m_env(env)
-    , m_context(context)
     , m_console(console)
+    , m_context(context)
     , m_total(count_catches(console, console.video().snapshot()))
 {
     if (m_total == 0 || m_total > 4){
@@ -46,7 +46,7 @@ void CaughtPokemonScreen::enter_summary(){
     SummaryShinySymbolDetector detector(m_console, m_console);
     if (m_in_summary){
         //  Make sure we're actually in the summary screen.
-        process_detection(detector.wait_for_detection(m_env, m_console));
+        process_detection(detector.wait_for_detection(m_context, m_console));
         return;
     }
 
@@ -55,7 +55,7 @@ void CaughtPokemonScreen::enter_summary(){
     pbf_press_button(m_context, BUTTON_A, 10, 0);
     m_context.wait_for_all_requests();
 
-    Detection detection = detector.wait_for_detection(m_env, m_console);
+    Detection detection = detector.wait_for_detection(m_context, m_console);
     m_in_summary = true;
     process_detection(detection);
 }
@@ -66,7 +66,7 @@ void CaughtPokemonScreen::leave_summary(){
 
     //  Make sure we're actually in the summary screen.
     SummaryShinySymbolDetector detector(m_console, m_console);
-    process_detection(detector.wait_for_detection(m_env, m_console));
+    process_detection(detector.wait_for_detection(m_context, m_console));
 
     pbf_press_button(m_context, BUTTON_B, 10, TICKS_PER_SECOND);
 
@@ -99,7 +99,7 @@ void CaughtPokemonScreen::scroll_down(){
     }
     if (m_in_summary){
         SummaryShinySymbolDetector detector(m_console, m_console);
-        Detection detection = detector.wait_for_detection(m_env, m_console);
+        Detection detection = detector.wait_for_detection(m_context, m_console);
         process_detection(detection);
     }
 }

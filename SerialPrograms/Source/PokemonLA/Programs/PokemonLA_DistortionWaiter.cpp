@@ -131,7 +131,7 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, BotBaseConte
             stats.other++;
         }
 
-        env.wait_for(std::chrono::seconds(10));
+        context.wait_for(std::chrono::seconds(10));
     }
 
 

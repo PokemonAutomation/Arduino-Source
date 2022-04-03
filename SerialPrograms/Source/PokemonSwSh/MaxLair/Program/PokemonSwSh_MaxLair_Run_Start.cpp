@@ -136,7 +136,7 @@ bool start_raid_local(
     ConsoleRuntime console_stats[4]
 ){
     if (env.consoles.size() == 1){
-        BotBaseContext context(env.scope(), host.botbase());
+        BotBaseContext context(scope, host.botbase());
         return start_raid_self_solo(
             env, host, context,
             state_tracker, entrance[0], boss_slot, console_stats[0].ore
@@ -245,7 +245,7 @@ bool start_raid_local(
     //  Ready up and wait for lobby to be ready.
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
         //  Ready up.
-        env.wait_for(std::chrono::seconds(1));
+        context.wait_for(std::chrono::seconds(1));
         pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
         context.wait_for_all_requests();
 
@@ -288,7 +288,7 @@ bool start_raid_host(
     ConsoleRuntime console_stats[4]
 ){
     if (env.consoles.size() == 1){
-        BotBaseContext context(env.scope(), host.botbase());
+        BotBaseContext context(scope, host.botbase());
         return start_raid_host_solo(
             env, host, context,
             state_tracker,
@@ -349,7 +349,7 @@ bool start_raid_host(
     });
 
     //  Start delay.
-    env.wait_for(std::chrono::milliseconds(settings.START_DELAY * 1000 / TICKS_PER_SECOND));
+    scope.wait_for(std::chrono::milliseconds(settings.START_DELAY * 1000 / TICKS_PER_SECOND));
 
     //  Open lobby.
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
@@ -414,7 +414,7 @@ bool start_raid_host(
     //  Ready up and wait for lobby to be ready.
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
         //  Ready up.
-        env.wait_for(std::chrono::seconds(1));
+        context.wait_for(std::chrono::seconds(1));
         pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
         context.wait_for_all_requests();
 

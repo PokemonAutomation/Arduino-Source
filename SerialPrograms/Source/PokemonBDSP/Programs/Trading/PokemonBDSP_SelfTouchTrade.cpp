@@ -65,7 +65,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
     TradeStats& stats = env.stats<TradeStats>();
     env.update_stats();
 
-    BotBaseContext host(env.scope(), env.consoles[HOSTING_SWITCH].botbase());
+    BotBaseContext host(scope, env.consoles[HOSTING_SWITCH].botbase());
 
     //  Swap trade all the boxes.
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){

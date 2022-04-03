@@ -210,7 +210,7 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
             { &button_detector }
         );
         if (ret >= 0){
-            env.wait_for(std::chrono::milliseconds(500));
+            context.wait_for(std::chrono::milliseconds(500));
             pbf_press_dpad(context, DPAD_DOWN, 20, 105);
             break;
         }
@@ -247,7 +247,7 @@ bool OutbreakFinder::run_iteration(
         throw OperationFailedException(env.console, "Map not detected after 10 x A presses.");
     }
     env.console.log("Found map!");
-    env.wait_for(std::chrono::milliseconds(500));
+    context.wait_for(std::chrono::milliseconds(500));
 
 
     MapRegion current_region;

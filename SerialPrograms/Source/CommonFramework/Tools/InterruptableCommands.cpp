@@ -82,26 +82,6 @@ void AsyncCommandSession::dispatch(std::function<void(BotBaseContext&)>&& lambda
         //  Otherwise, wake up the thread.
         m_cv.notify_all();
     }
-
-#if 0
-    //  Stop the current task.
-    if (m_current){
-        m_current->context.cancel_lazy();
-        m_cv.wait(lg, [=]{
-            return cancelled() || m_current == nullptr;
-        });
-    }
-
-//    cout << "dispatching" << endl;
-
-    //  Dispatch the new one.
-    m_current.reset(new CommandSet(
-        *this->scope(),
-        m_botbase, std::move(lambda)
-    ));
-
-    m_cv.notify_all();
-#endif
 }
 
 

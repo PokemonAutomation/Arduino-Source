@@ -46,7 +46,7 @@ bool read_battle_menu(
 
     //  Read raid mon.
     do{
-        std::set<std::string> mon = reader.read_opponent(console, env, console);
+        std::set<std::string> mon = reader.read_opponent(console, context, console);
         if (mon.size() == 1){
             state.opponent = std::move(mon);
             break;

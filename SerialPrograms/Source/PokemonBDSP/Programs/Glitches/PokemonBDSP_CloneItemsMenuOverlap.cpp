@@ -98,7 +98,7 @@ bool CloneItemsMenuOverlap::trigger_encounter(ProgramEnvironment& env, ConsoleHa
     console.log("Detected overworld. Triggering battle with menu overlap...");
 
     StartBattleMenuOverlapDetector detector(console);
-    AsyncVisualInferenceSession session(env, console, env.scope(), console, console);
+    AsyncVisualInferenceSession session(env, console, context, console, console);
     session += detector;
 
     for (size_t c = 0; c < 60; c++){
@@ -223,7 +223,7 @@ void CloneItemsMenuOverlap::program(SingleSwitchProgramEnvironment& env, BotBase
         }
 
         //  Wait one second to avoid black screen.
-        env.wait_for(std::chrono::seconds(1));
+        context.wait_for(std::chrono::seconds(1));
 
         swap_party(env.console, context);
 

@@ -45,7 +45,7 @@ bool connect_to_internet_with_inference(
     }
 
     //  Connect to internet.
-    env.wait_for(std::chrono::seconds(1));
+    context.wait_for(std::chrono::seconds(1));
     pbf_press_dpad(context, DPAD_UP, 5, 0);
     pbf_move_right_joystick(context, 128, 0, 5, 0);
     pbf_mash_button(context, BUTTON_PLUS, TICKS_PER_SECOND);
@@ -71,7 +71,7 @@ bool connect_to_internet_with_inference(
     }
 
     //  Extra wait.
-    env.wait_for(post_wait_time);
+    context.wait_for(post_wait_time);
 
     return ok;
 }

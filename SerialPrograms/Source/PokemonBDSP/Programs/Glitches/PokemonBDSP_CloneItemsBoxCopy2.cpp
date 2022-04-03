@@ -173,7 +173,7 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, BotBaseCon
 #endif
 
         context.wait_for_all_requests();
-        env.wait_for(std::chrono::milliseconds(500));
+        context.wait_for(std::chrono::milliseconds(500));
         QImage current = env.console.video().snapshot();
         if (!matcher.detect(current)){
             stats.m_errors++;

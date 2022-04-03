@@ -117,7 +117,7 @@ bool SelfTouchTrade::trade_one(
     env.wait_for(std::chrono::milliseconds(5000));
     return false;
 #endif
-    env.wait_for(std::chrono::milliseconds(500));
+    scope.wait_for(std::chrono::milliseconds(500));
 
     return true;
 }
@@ -165,7 +165,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
     uint8_t row = 0;
     uint8_t col = 0;
 
-    BotBaseContext host_context(env.scope(), (HOSTING_SWITCH == 0 ? env.consoles[0] : env.consoles[1]).botbase());
+    BotBaseContext host_context(scope, (HOSTING_SWITCH == 0 ? env.consoles[0] : env.consoles[1]).botbase());
     ConsoleHandle& host = HOSTING_SWITCH == 0 ? env.consoles[0] : env.consoles[1];
     ConsoleHandle& recv = HOSTING_SWITCH == 0 ? env.consoles[1] : env.consoles[0];
 

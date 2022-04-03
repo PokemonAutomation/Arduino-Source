@@ -61,8 +61,7 @@ SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::detect(const Q
     return Detection::NO_DETECTION;
 }
 SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::wait_for_detection(
-    ProgramEnvironment& env,
-    VideoFeed& feed,
+    CancellableScope& scope, VideoFeed& feed,
     std::chrono::seconds timeout
 ){
     Detection last_detection = Detection::NO_DETECTION;
@@ -70,7 +69,7 @@ SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::wait_for_detec
 
     InferenceThrottler throttler(timeout);
     while (true){
-        env.check_stopping();
+        scope.throw_if_cancelled();
 
         Detection detection = detect(feed.snapshot());
         if (detection == last_detection){
@@ -83,7 +82,7 @@ SummaryShinySymbolDetector::Detection SummaryShinySymbolDetector::wait_for_detec
             break;
         }
 
-        if (throttler.end_iteration(env)){
+        if (throttler.end_iteration(scope)){
             last_detection = Detection::NO_DETECTION;
             break;
         }

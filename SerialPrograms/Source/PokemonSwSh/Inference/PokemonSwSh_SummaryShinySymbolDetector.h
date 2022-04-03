@@ -32,8 +32,7 @@ public:
 
     Detection detect(const QImage& screen);
     Detection wait_for_detection(
-        ProgramEnvironment& env,
-        VideoFeed& feed,
+        CancellableScope& scope, VideoFeed& feed,
         std::chrono::seconds timeout = std::chrono::seconds(10)
     );
 

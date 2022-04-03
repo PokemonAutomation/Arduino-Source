@@ -19,7 +19,7 @@ namespace MaxLairInternal{
 
 
 void run_select_pokemon(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     GlobalStateTracker& state_tracker,
     const ConsoleSpecificOptions& settings
 ){
@@ -31,7 +31,7 @@ void run_select_pokemon(
     console.log("Switch " + std::to_string(console.index()) + "'s turn to select.");
 
     //  Wait for the screen to finish loading.
-    env.wait_for(std::chrono::milliseconds(500));
+    context.wait_for(std::chrono::milliseconds(500));
 
 
     PokemonSelectMenuReader reader(

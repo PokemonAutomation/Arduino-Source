@@ -109,7 +109,7 @@ StateMachineAction run_caught_screen(
     if (!shinies.empty()){
         tracker.scroll_to(shinies.back());
         tracker.leave_summary();
-        env.wait_for(std::chrono::seconds(1));
+        context.wait_for(std::chrono::seconds(1));
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
         context.wait_for_all_requests();
     }

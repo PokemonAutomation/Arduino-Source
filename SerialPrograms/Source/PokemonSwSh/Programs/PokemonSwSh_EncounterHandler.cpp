@@ -133,7 +133,7 @@ bool StandardEncounterHandler::handle_standard_encounter(const ShinyDetectionRes
     }
 
     StandardEncounterDetection encounter(
-        m_env, m_console,
+        m_env, m_console, m_context,
         m_language,
         m_settings.FILTER,
         result.shiny_type
@@ -182,7 +182,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     m_env.update_stats();
 
     StandardEncounterDetection encounter(
-        m_env, m_console,
+        m_env, m_console, m_context,
         m_language,
         m_settings.FILTER,
         result.shiny_type

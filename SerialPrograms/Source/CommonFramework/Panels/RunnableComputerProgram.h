@@ -12,6 +12,7 @@
 
 namespace PokemonAutomation{
 
+
 class RunnableComputerProgramDescriptor : public RunnablePanelDescriptor{
 public:
     RunnableComputerProgramDescriptor(
@@ -33,7 +34,7 @@ public:
     }
 
     virtual QWidget* make_widget(QWidget& parent, PanelListener& listener) override;
-    virtual void program(ProgramEnvironment& env) = 0;
+    virtual void program(ProgramEnvironment& env, CancellableScope& scope) = 0;
 };
 
 

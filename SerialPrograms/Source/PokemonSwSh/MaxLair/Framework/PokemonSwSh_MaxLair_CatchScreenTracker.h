@@ -44,8 +44,8 @@ private:
 
 private:
     ProgramEnvironment& m_env;
-    BotBaseContext& m_context;
     ConsoleHandle& m_console;
+    BotBaseContext& m_context;
     size_t m_total;
     size_t m_current_position = 0;
     bool m_in_summary = false;

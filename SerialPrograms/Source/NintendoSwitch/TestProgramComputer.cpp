@@ -120,7 +120,7 @@ void print_8x64(__m512i m){
 
 
 
-void TestProgramComputer::program(ProgramEnvironment& env){
+void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace NintendoSwitch::PokemonLA;
     using namespace Pokemon;

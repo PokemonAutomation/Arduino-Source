@@ -40,35 +40,26 @@ void SingleSwitchProgramWidget::run_switch_program(const ProgramInfo& info){
         system().overlay(),
         system().audio()
     );
-#if 0
-    connect(
-        this, &RunnableSwitchProgramWidget::signal_cancel,
-        &env, [&]{
-            m_state.store(ProgramState::STOPPING, std::memory_order_release);
-            env.signal_stop();
-        },
-        Qt::DirectConnection
-    );
-#endif
     connect(
         &env, &ProgramEnvironment::set_status,
         this, &SingleSwitchProgramWidget::status_update
     );
 
+    CancellableHolder<CancellableScope> scope;
     {
         std::lock_guard<std::mutex> lg(m_lock);
-        m_env = &env;
+        m_scope = &scope;
     }
     try{
         start_program_video_check(env.console, instance.descriptor().feedback());
-        BotBaseContext context(env.scope(), env.console.botbase());
+        BotBaseContext context(scope, env.console.botbase());
         instance.program(env, context);
         std::lock_guard<std::mutex> lg(m_lock);
-        m_env = nullptr;
+        m_scope = nullptr;
     }catch (...){
         env.update_stats();
         std::lock_guard<std::mutex> lg(m_lock);
-        m_env = nullptr;
+        m_scope = nullptr;
         throw;
     }
 }

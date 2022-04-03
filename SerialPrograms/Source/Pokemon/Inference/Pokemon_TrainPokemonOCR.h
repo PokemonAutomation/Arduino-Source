@@ -27,7 +27,7 @@ class TrainPokemonOCR : public RunnableComputerProgramInstance{
 public:
     TrainPokemonOCR(const TrainPokemonOCR_Descriptor& descriptor);
 
-    virtual void program(ProgramEnvironment& env) override;
+    virtual void program(ProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     StringOption DIRECTORY;

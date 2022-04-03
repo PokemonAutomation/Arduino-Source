@@ -260,6 +260,10 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlay& overlay = env.consoles[0];
 
 
+    scope.wait_for(std::chrono::seconds(60));
+
+
+
 #if 0
     {
         std::unique_ptr<CancellableScope> scope0(new CancellableScope());
@@ -1055,7 +1059,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
-    env.wait_for(std::chrono::seconds(60));
+    scope.wait_for(std::chrono::seconds(60));
 
 
 }

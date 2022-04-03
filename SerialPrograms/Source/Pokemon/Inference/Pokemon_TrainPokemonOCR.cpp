@@ -57,10 +57,9 @@ TrainPokemonOCR::TrainPokemonOCR(const TrainPokemonOCR_Descriptor& descriptor)
 }
 
 
-void TrainPokemonOCR::program(ProgramEnvironment& env){
-    OCR::TrainingSession session(env, DIRECTORY);
+void TrainPokemonOCR::program(ProgramEnvironment& env, CancellableScope& scope){
+    OCR::TrainingSession session(env.logger(), scope, DIRECTORY);
     session.generate_large_dictionary(
-        env,
         "Pokemon/PokemonNameOCR/",
         "PokemonOCR-",
         MODE != 0,

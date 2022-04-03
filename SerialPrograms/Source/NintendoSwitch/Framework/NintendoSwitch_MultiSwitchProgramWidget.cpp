@@ -52,22 +52,13 @@ void MultiSwitchProgramWidget::run_switch_program(const ProgramInfo& info){
             system.audio()
         );
     }
+
     MultiSwitchProgramEnvironment env(
         info,
         m_logger,
         m_current_stats.get(), m_historical_stats.get(),
         std::move(switches)
     );
-#if 0
-    connect(
-        this, &RunnableSwitchProgramWidget::signal_cancel,
-        &env, [&]{
-            m_state.store(ProgramState::STOPPING, std::memory_order_release);
-            env.signal_stop();
-        },
-        Qt::DirectConnection
-    );
-#endif
     connect(
         &env, &ProgramEnvironment::set_status,
         this, [=](QString status){
@@ -75,19 +66,20 @@ void MultiSwitchProgramWidget::run_switch_program(const ProgramInfo& info){
         }
     );
 
+    CancellableHolder<CancellableScope> scope;
     {
         std::lock_guard<std::mutex> lg(m_lock);
-        m_env = &env;
+        m_scope = &scope;
     }
     try{
         start_program_video_check(env.consoles, instance.descriptor().feedback());
-        instance.program(env, env.scope());
+        instance.program(env, scope);
         std::lock_guard<std::mutex> lg(m_lock);
-        m_env = nullptr;
+        m_scope = nullptr;
     }catch (...){
         env.update_stats();
         std::lock_guard<std::mutex> lg(m_lock);
-        m_env = nullptr;
+        m_scope = nullptr;
         throw;
     }
 }

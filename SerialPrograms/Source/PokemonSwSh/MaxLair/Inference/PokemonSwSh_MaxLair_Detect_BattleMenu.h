@@ -61,8 +61,7 @@ public:
     BattleMenuReader(VideoOverlay& overlay, Language language);
 
     std::set<std::string> read_opponent(
-        LoggerQt& logger,
-        ProgramEnvironment& env,
+        LoggerQt& logger, CancellableScope& scope,
         VideoFeed& feed
     ) const;
     std::set<std::string> read_opponent_in_summary(LoggerQt& logger, const QImage& screen) const;

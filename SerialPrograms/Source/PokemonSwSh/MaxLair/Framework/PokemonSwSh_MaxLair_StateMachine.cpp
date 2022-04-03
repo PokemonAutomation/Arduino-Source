@@ -87,7 +87,7 @@ StateMachineAction run_state_iteration(
     case 0:
         if (starting){
             console.log("Current State: " + STRING_POKEMON + " Select");
-            run_select_pokemon(env, console, context, global_state, runtime.console_settings[console_index]);
+            run_select_pokemon(console, context, global_state, runtime.console_settings[console_index]);
             return StateMachineAction::KEEP_GOING;
         }else{
             console.log("Current State: " + STRING_POKEMON + " Swap");

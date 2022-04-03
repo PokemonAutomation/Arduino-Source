@@ -136,12 +136,6 @@ bool RunnableSwitchProgramWidget::request_program_stop(){
     if (!RunnablePanelWidget::request_program_stop()){
         return false;
     }
-    {
-        std::lock_guard<std::mutex> lg(m_lock);
-        if (m_env){
-            m_env->signal_stop();
-        }
-    }
 //    emit signal_cancel();
     ProgramState state = m_state.load(std::memory_order_acquire);
     if (m_setup){

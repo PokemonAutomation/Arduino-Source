@@ -53,7 +53,7 @@ void trade_current_pokemon(
             tracker.report_unrecoverable_error(console, "Failed to detect trade select prompt after 2 minutes.");
         }
         console.log("Detected trade prompt.");
-        env.wait_for(std::chrono::milliseconds(100));
+        context.wait_for(std::chrono::milliseconds(100));
         tracker.check_unrecoverable_error(console);
     }
     {
@@ -69,7 +69,7 @@ void trade_current_pokemon(
             tracker.report_unrecoverable_error(console, "Failed to detect trade confirm prompt after 10 seconds.");
         }
         console.log("Detected trade confirm prompt.");
-        env.wait_for(std::chrono::milliseconds(100));
+        context.wait_for(std::chrono::milliseconds(100));
         tracker.check_unrecoverable_error(console);
     }
 
@@ -88,7 +88,7 @@ void trade_current_pokemon(
             tracker.report_unrecoverable_error(console, "Failed to detect start of trade after 2 minutes.");
         }
         console.log("Detected start of trade.");
-        env.wait_for(std::chrono::milliseconds(100));
+        context.wait_for(std::chrono::milliseconds(100));
         tracker.check_unrecoverable_error(console);
     }
 
@@ -107,7 +107,7 @@ void trade_current_pokemon(
             tracker.report_unrecoverable_error(console, "Failed to detect end of trade after 2 minutes.");
         }
         console.log("Detected end of trade.");
-        env.wait_for(std::chrono::milliseconds(100));
+        context.wait_for(std::chrono::milliseconds(100));
         tracker.check_unrecoverable_error(console);
     }
 

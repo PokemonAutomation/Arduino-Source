@@ -79,7 +79,7 @@ void hatch_egg(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& 
         context.wait_for_all_requests();
 
         //  Wait for steady state and read it again.
-        env.wait_for(std::chrono::milliseconds(200));
+        context.wait_for(std::chrono::milliseconds(200));
         ImageMatchWatcher matcher(overworld, {0.10, 0.10, 0.80, 0.60}, 100);
         SelectionArrowFinder arrow(console, {0.50, 0.60, 0.30, 0.20}, COLOR_GREEN);
         int ret = wait_until(

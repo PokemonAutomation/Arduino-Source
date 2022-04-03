@@ -35,7 +35,7 @@ void run_path_select(
     size_t player_index = state.find_player_index(console_index);
 
     PathReader reader(console, player_index);
-    env.wait_for(std::chrono::milliseconds(500));
+    context.wait_for(std::chrono::milliseconds(500));
 
     QImage screen = console.video().snapshot();
     reader.read_sprites(console, state, screen);

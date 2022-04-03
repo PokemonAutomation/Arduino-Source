@@ -23,7 +23,7 @@ class TestProgramComputer : public RunnableComputerProgramInstance{
 public:
     TestProgramComputer(const TestProgramComputer_Descriptor& descriptor);
 
-    virtual void program(ProgramEnvironment& env) override;
+    virtual void program(ProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
 

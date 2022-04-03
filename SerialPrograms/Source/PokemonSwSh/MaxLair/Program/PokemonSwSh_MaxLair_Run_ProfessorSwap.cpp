@@ -85,7 +85,7 @@ void run_professor_swap(
         }
     }
 
-    env.wait_for(std::chrono::milliseconds(100));
+    context.wait_for(std::chrono::milliseconds(100));
 
     {
         QImage screen = console.video().snapshot();

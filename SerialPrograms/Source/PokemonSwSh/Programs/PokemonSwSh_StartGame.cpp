@@ -28,7 +28,7 @@ void enter_loading_game(
 ){
     openedgame_to_gamemenu(env, console, context, GameSettings::instance().START_GAME_WAIT);
 
-    env.log("enter_loading_game(): Game Loaded. Entering game...", COLOR_PURPLE);
+    console.log("enter_loading_game(): Game Loaded. Entering game...", COLOR_PURPLE);
     enter_game(context, backup_save, GameSettings::instance().ENTER_GAME_MASH, 0);
     context.wait_for_all_requests();
 
@@ -42,17 +42,17 @@ void enter_loading_game(
 
         InferenceThrottler throttler(timeout);
         while (true){
-            env.check_stopping();
+            context.throw_if_cancelled();
 
             QImage screen = console.video().snapshot();
             if (screen.isNull()){
-                env.log("enter_loading_game(): Screenshot failed.", COLOR_PURPLE);
+                console.log("enter_loading_game(): Screenshot failed.", COLOR_PURPLE);
                 throttler.set_period(std::chrono::milliseconds(1000));
             }else{
                 bool black = is_black(extract_box_reference(screen, box));
                 if (black){
                     if (!black_found){
-                        env.log("enter_loading_game(): Game entry started.", COLOR_PURPLE);
+                        console.log("enter_loading_game(): Game entry started.", COLOR_PURPLE);
                     }
                     black_found = true;
                 }else if (black_found){
@@ -60,13 +60,13 @@ void enter_loading_game(
                 }
             }
 
-            if (throttler.end_iteration(env)){
-                env.log("enter_loading_game(): Game entry timed out. Proceeding with default start delay.", COLOR_RED);
+            if (throttler.end_iteration(context)){
+                console.log("enter_loading_game(): Game entry timed out. Proceeding with default start delay.", COLOR_RED);
                 break;
             }
         }
     }
-    env.log("start_game_with_inference(): Game started.", COLOR_PURPLE);
+    console.log("start_game_with_inference(): Game started.", COLOR_PURPLE);
 
     if (post_wait_time != 0){
         pbf_wait(context, post_wait_time);

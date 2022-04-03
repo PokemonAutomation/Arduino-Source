@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QGroupBox>
 #include <QScrollArea>
+#include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -108,6 +109,12 @@ bool RunnablePanelWidget::request_program_stop(){
     }
     m_start_button->setText("Stopping Program...");
     m_listener.on_busy(m_instance);
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        if (m_scope){
+            m_scope->cancel();
+        }
+    }
     return true;
 }
 

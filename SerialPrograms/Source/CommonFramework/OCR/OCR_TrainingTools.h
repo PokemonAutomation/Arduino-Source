@@ -30,19 +30,17 @@ class TrainingSession{
 
 public:
     TrainingSession(
-        ProgramEnvironment& env,
+        LoggerQt& logger, CancellableScope& scope,
         const QString& training_data_directory
     );
 
     void generate_small_dictionary(
-        ProgramEnvironment& env,
         const QString& ocr_json_file,
         const QString& output_json_file,
         bool incremental,
         size_t threads
     );
     void generate_large_dictionary(
-        ProgramEnvironment& env,
         const QString& ocr_json_directory,
         const QString& output_prefix,
         bool incremental,
@@ -50,6 +48,8 @@ public:
     ) const;
 
 private:
+    LoggerQt& m_logger;
+    CancellableScope& m_scope;
     QString m_directory;
     size_t m_total_samples;
     std::map<Language, std::vector<TrainingSample>> m_samples;

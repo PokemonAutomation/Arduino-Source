@@ -65,7 +65,7 @@ void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, BotBase
         console.log("Detected map!", COLOR_BLUE);
     }
 
-    env.wait_for(std::chrono::seconds(1));
+    context.wait_for(std::chrono::seconds(1));
 
     //  Move bolder and cursor to Celestial town.
     pbf_press_dpad(context, DPAD_RIGHT, 30, 95);

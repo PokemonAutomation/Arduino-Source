@@ -70,7 +70,7 @@ void AlphaRoarListener::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     AlphaRoarDetector detector(env.console, STOP_ON_ALPHA_ROAR);
 
 #if 1
-    AudioInferenceSession session(env.console, env.scope(), env.console);
+    AudioInferenceSession session(env.console, context, env.console);
     session += detector;
 
     session.run();

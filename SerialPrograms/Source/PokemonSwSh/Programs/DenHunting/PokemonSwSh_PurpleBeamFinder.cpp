@@ -200,7 +200,7 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         );
     }
 
-    env.wait_for(std::chrono::seconds(2));
+    context.wait_for(std::chrono::seconds(2));
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PURPLE_BEAM,
         env.program_info(),

@@ -37,40 +37,38 @@ void RunnableComputerProgramWidget::run_program(){
     RunnableComputerProgramInstance& instance = static_cast<RunnableComputerProgramInstance&>(m_instance);
 
     const std::string& program_identifier = instance.descriptor().identifier();
-
-    ProgramEnvironment env(
-        ProgramInfo(
-            program_identifier,
-            instance.descriptor().category(),
-            instance.descriptor().display_name(),
-            timestamp()
-        ),
-        m_logger, nullptr, nullptr
+    ProgramInfo info(
+        program_identifier,
+        instance.descriptor().category(),
+        instance.descriptor().display_name(),
+        timestamp()
     );
-    connect(
-        this, &RunnableComputerProgramWidget::signal_cancel,
-        &env, [&]{
-            m_state.store(ProgramState::STOPPING, std::memory_order_release);
-            emit env.signal_stop();
-        },
-        Qt::DirectConnection
-    );
+    ProgramEnvironment env(info, m_logger, nullptr, nullptr);
     connect(
         &env, &ProgramEnvironment::set_status,
         this, &RunnableComputerProgramWidget::status_update
     );
 
+    CancellableHolder<CancellableScope> scope;
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_scope = &scope;
+    }
     try{
         m_logger.log("<b>Starting Program: " + program_identifier + "</b>");
-        instance.program(env);
+        instance.program(env, scope);
         m_logger.log("Ending Program...");
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_scope = nullptr;
+    }catch (OperationCancelledException&){
     }catch (ProgramCancelledException&){
     }catch (ProgramFinishedException&){
     }catch (InvalidConnectionStateException&){
-    }catch (UserSetupError& e){
-        emit signal_error(QString::fromStdString(e.message()));
     }catch (Exception& e){
         emit signal_error(QString::fromStdString(e.to_str()));
+    }catch (...){
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_scope = nullptr;
     }
 
     m_state.store(ProgramState::STOPPING, std::memory_order_release);

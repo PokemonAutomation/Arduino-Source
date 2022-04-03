@@ -110,7 +110,7 @@ bool StandardEncounterHandler::handle_standard_encounter(const DoublesShinyDetec
     m_consecutive_failures = 0;
 
     StandardEncounterDetection encounter(
-        m_env, m_console, m_context,
+        m_console, m_context,
         m_language,
         m_settings.FILTER,
         result
@@ -171,7 +171,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     m_consecutive_failures = 0;
 
     StandardEncounterDetection encounter(
-        m_env, m_console, m_context,
+        m_console, m_context,
         m_language,
         m_settings.FILTER,
         result

@@ -332,7 +332,7 @@ void EggAutonomousState::fetch_egg(){
             return;
         }
     }
-    m_env.wait_for(std::chrono::milliseconds(200));
+    m_context.wait_for(std::chrono::milliseconds(200));
 
     m_console.log("Getting off bike.");
     if (m_on_bike){
@@ -434,7 +434,7 @@ void EggAutonomousState::hatch_egg(){
         m_context.wait_for_all_requests();
 
         //  Wait for steady state and read it again.
-        m_env.wait_for(std::chrono::milliseconds(200));
+        m_context.wait_for(std::chrono::milliseconds(200));
         ImageMatchWatcher matcher(overworld, {0.10, 0.10, 0.80, 0.60}, 100);
         ShortDialogPromptDetector prompt(m_console, {0.50, 0.60, 0.30, 0.20}, COLOR_GREEN);
         int ret = wait_until(
@@ -503,7 +503,7 @@ void EggAutonomousState::spin_until_fetch_or_hatch(){
         },
         { &dialog }
     );
-    m_env.wait_for(std::chrono::milliseconds(200));
+    m_context.wait_for(std::chrono::milliseconds(200));
     if (ret < 0){
 //        m_console.log("Attempting to fetch an egg.");
         fetch_egg();
@@ -516,7 +516,7 @@ void EggAutonomousState::spin_until_fetch_or_hatch(){
 bool EggAutonomousState::overworld_detect_and_run_state(){
     ShortDialogWatcher dialog;
     m_context.wait_for_all_requests();
-    m_env.wait_for(std::chrono::milliseconds(200));
+    m_context.wait_for(std::chrono::milliseconds(200));
     dump();
 
     //  Egg is hatching. Handle that now.

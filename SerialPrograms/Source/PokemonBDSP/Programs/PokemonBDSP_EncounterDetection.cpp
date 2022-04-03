@@ -20,14 +20,13 @@ namespace PokemonBDSP{
 
 
 StandardEncounterDetection::StandardEncounterDetection(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     Language language,
     const EncounterFilterOption& filter,
     const DoublesShinyDetection& shininess,
     std::chrono::milliseconds read_name_delay
 )
-    : m_context(context)
-    , m_console(console)
+    : m_console(console)
     , m_language(language)
     , m_filter(filter)
     , m_shininess(shininess)
@@ -39,7 +38,7 @@ StandardEncounterDetection::StandardEncounterDetection(
     InferenceBoxScope right_name(console, {0.740, 0.06, 0.16, 0.050});
 
     context.wait_for_all_requests();
-    env.wait_for(std::chrono::milliseconds(100));
+    context.wait_for(std::chrono::milliseconds(100));
     QImage screen = console.video().snapshot();
 
     //  Check if it's a double battle.

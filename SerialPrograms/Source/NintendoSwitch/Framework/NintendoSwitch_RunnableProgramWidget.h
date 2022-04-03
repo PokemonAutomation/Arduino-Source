@@ -56,7 +56,6 @@ protected:
     const std::string& m_program_name;
 
     SwitchSetupWidget* m_setup;
-    ProgramEnvironment* m_env = nullptr;
 };
 
 

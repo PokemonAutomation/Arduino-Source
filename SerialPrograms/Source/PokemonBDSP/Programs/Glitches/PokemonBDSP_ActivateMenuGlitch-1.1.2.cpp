@@ -68,7 +68,7 @@ void trigger_menu(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContex
     }
     console.log("Detected map!", COLOR_BLUE);
 
-    env.wait_for(std::chrono::milliseconds(500));
+    context.wait_for(std::chrono::milliseconds(500));
     ShortDialogDetector dialog;
     while (dialog.detect(console.video().snapshot())){
         console.log("Overshot mashing. Backing out.", COLOR_ORANGE);

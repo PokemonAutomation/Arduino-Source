@@ -82,7 +82,7 @@ RaidItemFarmerOHKO::RaidItemFarmerOHKO(const RaidItemFarmerOHKO_Descriptor& desc
 }
 
 void RaidItemFarmerOHKO::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
-    BotBaseContext host(env.scope(), env.consoles[0].botbase());
+    BotBaseContext host(scope, env.consoles[0].botbase());
     size_t switches = env.consoles.size();
 
     env.run_in_parallel(

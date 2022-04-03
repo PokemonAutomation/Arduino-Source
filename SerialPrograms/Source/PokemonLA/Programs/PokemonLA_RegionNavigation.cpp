@@ -132,7 +132,7 @@ void mash_A_to_enter_sub_area(
     }
 
     console.log("Loaded into sub area...");
-    env.wait_for(std::chrono::milliseconds(200));
+    context.wait_for(std::chrono::milliseconds(200));
 }
 
 

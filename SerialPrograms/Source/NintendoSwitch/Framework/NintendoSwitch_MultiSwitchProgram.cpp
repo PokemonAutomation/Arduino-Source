@@ -15,13 +15,13 @@ namespace NintendoSwitch{
 MultiSwitchProgramEnvironment::~MultiSwitchProgramEnvironment(){}
 
 MultiSwitchProgramEnvironment::MultiSwitchProgramEnvironment(
-    ProgramInfo program_info,
+    const ProgramInfo& program_info,
     LoggerQt& logger,
     StatsTracker* current_stats,
     const StatsTracker* historical_stats,
     FixedLimitVector<ConsoleHandle> p_switches
 )
-    : ProgramEnvironment(std::move(program_info), logger, current_stats, historical_stats)
+    : ProgramEnvironment(program_info, logger, current_stats, historical_stats)
     , consoles(std::move(p_switches))
 {}
 

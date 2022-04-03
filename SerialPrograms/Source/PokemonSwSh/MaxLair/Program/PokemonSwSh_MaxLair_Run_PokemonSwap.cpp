@@ -32,7 +32,7 @@ void run_swap_pokemon(
 
 
     //  Wait for bottom row to reload.
-    env.wait_for(std::chrono::milliseconds(100));
+    context.wait_for(std::chrono::milliseconds(100));
 
 
     PokemonSwapMenuReader reader(
@@ -109,7 +109,7 @@ void run_swap_pokemon(
         }
     }
 
-    env.wait_for(std::chrono::milliseconds(100));
+    context.wait_for(std::chrono::milliseconds(100));
 
     PathReader path_reader(console, player_index);
     path_reader.read_sprites(console, state, console.video().snapshot());
