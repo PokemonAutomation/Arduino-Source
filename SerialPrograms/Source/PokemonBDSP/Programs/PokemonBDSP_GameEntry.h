@@ -16,17 +16,17 @@ namespace PokemonBDSP{
 
 
 bool gamemenu_to_ingame(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     uint16_t mash_duration, uint16_t enter_game_timeout
 );
 bool openedgame_to_ingame(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     uint16_t load_game_timeout,
     uint16_t mash_duration, uint16_t enter_game_timeout,
     uint16_t post_wait_time = 125
 );
 bool reset_game_from_home(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     bool tolerate_update_menu,
     uint16_t post_wait_time = 125
 );

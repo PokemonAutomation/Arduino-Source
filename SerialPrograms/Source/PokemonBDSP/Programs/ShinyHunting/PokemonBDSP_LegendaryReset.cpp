@@ -67,7 +67,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     PokemonSwSh::ShinyHuntTracker& stats = env.stats<PokemonSwSh::ShinyHuntTracker>();
 
     StandardEncounterHandler handler(
-        env, context, env.console,
+        env, env.console, context,
         LANGUAGE,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -83,7 +83,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
         if (reset){
             pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-            if (!reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
+            if (!reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
                 stats.add_error();
                 continue;
             }
@@ -94,7 +94,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         BattleMenuWatcher battle_menu(BattleType::STANDARD);
 
         int ret = run_until(
-            env, context, env.console,
+            env, env.console, context,
             [=](BotBaseContext& context){
                 size_t stop = WALK_UP ? 30 : 60;
                 for (size_t c = 0; c < stop; c++){
@@ -125,7 +125,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
         DoublesShinyDetection result_wild;
         ShinyDetectionResult result_own;
         detect_shiny_battle(
-            env, context, env.console,
+            env, env.console, context,
             result_wild, result_own,
             WILD_POKEMON,
             std::chrono::seconds(30)

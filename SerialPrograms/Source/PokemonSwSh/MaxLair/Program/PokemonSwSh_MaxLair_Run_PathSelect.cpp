@@ -27,7 +27,7 @@ namespace MaxLairInternal{
 
 
 void run_path_select(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     GlobalStateTracker& state_tracker
 ){
     size_t console_index = console.index();
@@ -42,7 +42,7 @@ void run_path_select(
     reader.read_hp(console, state, screen);
 
     if (state.wins == 0){
-        reader.read_path(env, context, console, state);
+        reader.read_path(env, console, context, state);
     }else{
         reader.read_side(console, state, screen);
     }

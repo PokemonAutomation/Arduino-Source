@@ -21,7 +21,7 @@ namespace MaxLairInternal{
 
 //  Returns true if adventure started. False if you errored and are back at the entrance.
 bool start_adventure(
-    MultiSwitchProgramEnvironment& env,
+    MultiSwitchProgramEnvironment& env, CancellableScope& scope,
     GlobalStateTracker& state_tracker,
     QImage entrance[4],
     ConsoleHandle& host, size_t boss_slot,

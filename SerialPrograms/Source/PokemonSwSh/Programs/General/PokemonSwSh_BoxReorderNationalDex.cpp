@@ -72,7 +72,7 @@ namespace{
         return to;
     }
 
-    std::string read_selected_pokemon(BotBaseContext& context, ConsoleHandle& console, Language language){
+    std::string read_selected_pokemon(ConsoleHandle& console, BotBaseContext& context, Language language){
         context.wait_for_all_requests();
         InferenceBoxScope box(console, ImageFloatBox(0.76, 0.08, 0.15, 0.064));
         context.wait_for(k_wait_after_read);
@@ -87,12 +87,12 @@ namespace{
         return result.results.begin()->second.token;
     }
 
-    std::vector<std::string> read_all_pokemon(Logger& logger, BotBaseContext& context, ConsoleHandle& console, uint16_t pokemon_count, Language language){
+    std::vector<std::string> read_all_pokemon(Logger& logger, ConsoleHandle& console, BotBaseContext& context, uint16_t pokemon_count, Language language){
         std::vector<std::string> pokemons;
         uint16_t current_location = 0;
         for (uint16_t i = 0; i < pokemon_count; ++i){
             current_location = move_to_location(logger, context, current_location, i);
-            pokemons.push_back(read_selected_pokemon(context, console, language));
+            pokemons.push_back(read_selected_pokemon(console, context, language));
         }
         return pokemons;
     }
@@ -140,7 +140,7 @@ void BoxReorderNationalDex::program(SingleSwitchProgramEnvironment& env, BotBase
         pbf_press_button(context, BUTTON_LCLICK, 5, 5);
     }
 
-    std::vector<std::string> current_order = read_all_pokemon(env.console, context, env.console, POKEMON_COUNT, LANGUAGE);
+    std::vector<std::string> current_order = read_all_pokemon(env.console, env.console, context, POKEMON_COUNT, LANGUAGE);
 
     QString path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-National.json";
     QJsonArray array = read_json_file(path).array();

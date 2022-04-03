@@ -30,7 +30,7 @@ struct PokemonDetection{
 class StandardEncounterDetection{
 public:
     StandardEncounterDetection(
-        ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+        ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
         Language language,
         const EncounterFilterOption& filter,
         const DoublesShinyDetection& shininess,

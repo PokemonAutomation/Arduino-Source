@@ -94,7 +94,7 @@ std::unique_ptr<StatsTracker> CloneItemsMenuOverlap::make_stats() const{
 }
 
 
-bool CloneItemsMenuOverlap::trigger_encounter(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console){
+bool CloneItemsMenuOverlap::trigger_encounter(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
     console.log("Detected overworld. Triggering battle with menu overlap...");
 
     StartBattleMenuOverlapDetector detector(console);
@@ -125,7 +125,7 @@ bool CloneItemsMenuOverlap::trigger_encounter(ProgramEnvironment& env, BotBaseCo
         return false;
     }
 }
-void CloneItemsMenuOverlap::swap_party(BotBaseContext& context, ConsoleHandle& console){
+void CloneItemsMenuOverlap::swap_party(ConsoleHandle& console, BotBaseContext& context){
 //    const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY;
 //    const uint16_t BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY;
     const uint16_t BOX_SCROLL_DELAY = 20;
@@ -153,10 +153,10 @@ void CloneItemsMenuOverlap::swap_party(BotBaseContext& context, ConsoleHandle& c
     column_to_party(context, 1);
     pbf_press_button(context, BUTTON_ZL, 10, BOX_PICKUP_DROP_DELAY);
 }
-void CloneItemsMenuOverlap::mash_B_to_battle(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console){
+void CloneItemsMenuOverlap::mash_B_to_battle(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
     BattleMenuWatcher detector(BattleType::STANDARD);
     int ret = run_until(
-        env, context, console,
+        env, console, context,
         [=](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
         },
@@ -169,7 +169,7 @@ void CloneItemsMenuOverlap::mash_B_to_battle(ProgramEnvironment& env, BotBaseCon
     }
     pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
 }
-void CloneItemsMenuOverlap::detach_items(BotBaseContext& context, ConsoleHandle& console){
+void CloneItemsMenuOverlap::detach_items(ConsoleHandle& console, BotBaseContext& context){
     const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
 
     for (size_t c = 0; c < 5; c++){
@@ -203,7 +203,7 @@ void CloneItemsMenuOverlap::program(SingleSwitchProgramEnvironment& env, BotBase
             stats.to_str()
         );
 
-        QImage start = activate_menu_overlap_from_overworld(context, env.console);
+        QImage start = activate_menu_overlap_from_overworld(env.console, context);
         if (start.isNull()){
             stats.m_errors++;
             consecutive_failures++;
@@ -216,7 +216,7 @@ void CloneItemsMenuOverlap::program(SingleSwitchProgramEnvironment& env, BotBase
         consecutive_failures = 0;
 
         //  Trigger an encounter.
-        if (!trigger_encounter(env, context, env.console)){
+        if (!trigger_encounter(env, env.console, context)){
             stats.m_errors++;
             pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
             continue;
@@ -225,17 +225,17 @@ void CloneItemsMenuOverlap::program(SingleSwitchProgramEnvironment& env, BotBase
         //  Wait one second to avoid black screen.
         env.wait_for(std::chrono::seconds(1));
 
-        swap_party(context, env.console);
+        swap_party(env.console, context);
 
-        mash_B_to_battle(env, context, env.console);
+        mash_B_to_battle(env, env.console, context);
 
         //  Run away.
         pbf_press_dpad(context, DPAD_UP, 10, 0);
-        if (!run_from_battle(env, context, env.console, EXIT_BATTLE_TIMEOUT)){
+        if (!run_from_battle(env, env.console, context, EXIT_BATTLE_TIMEOUT)){
             env.log("Detected likely black screen freeze. Resetting game...", COLOR_RED);
             stats.m_resets++;
             pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             continue;
         }
         pbf_mash_button(context, BUTTON_B, GameSettings::instance().MENU_TO_OVERWORLD_DELAY);
@@ -251,9 +251,9 @@ void CloneItemsMenuOverlap::program(SingleSwitchProgramEnvironment& env, BotBase
         pbf_press_button(context, BUTTON_ZL, 10, GameSettings::instance().BOX_PICKUP_DROP_DELAY);
 
         //  Detach items.
-        detach_items(context, env.console);
+        detach_items(env.console, context);
         pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
-        back_out_to_overworld_with_overlap(context, env.console, start, 0);
+        back_out_to_overworld_with_overlap(env.console, context, start, 0);
 
         save_counter++;
         if (SAVE_INTERVAL != 0 && save_counter >= SAVE_INTERVAL){

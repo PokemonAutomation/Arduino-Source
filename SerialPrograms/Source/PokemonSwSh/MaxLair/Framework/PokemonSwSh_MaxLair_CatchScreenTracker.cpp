@@ -18,7 +18,7 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-CaughtPokemonScreen::CaughtPokemonScreen(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console)
+CaughtPokemonScreen::CaughtPokemonScreen(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context)
     : m_env(env)
     , m_context(context)
     , m_console(console)
@@ -73,7 +73,7 @@ void CaughtPokemonScreen::leave_summary(){
     PokemonCaughtMenuDetector caught_menu;
 
     int result = wait_until(
-        m_env, m_context, m_console,
+        m_env, m_console, m_context,
         std::chrono::seconds(10),
         { &caught_menu }
     );

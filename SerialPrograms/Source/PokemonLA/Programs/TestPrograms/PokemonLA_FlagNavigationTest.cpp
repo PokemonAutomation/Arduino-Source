@@ -53,7 +53,7 @@ FlagNavigationTest::FlagNavigationTest(const FlagNavigationTest_Descriptor& desc
 void FlagNavigationTest::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 
     FlagNavigationAir session(
-        env, env.console,
+        env, env.console, context,
         SHINY_DETECTED.stop_on_shiny(),
         STOP_DISTANCE,
         FLAG_REACHED_DELAY,

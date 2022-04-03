@@ -25,7 +25,7 @@ namespace MaxLairInternal{
 
 
 AdventureResult run_adventure(
-    MultiSwitchProgramEnvironment& env,
+    MultiSwitchProgramEnvironment& env, CancellableScope& scope,
     size_t boss_slot,
     AdventureRuntime& runtime
 ){
@@ -38,7 +38,7 @@ AdventureResult run_adventure(
     GlobalStateTracker state_tracker(env, env.consoles.size());
 
     if (!start_adventure(
-        env,
+        env, scope,
         state_tracker,
         entrance,
         env.consoles[runtime.host_index], boss_slot,
@@ -57,7 +57,7 @@ AdventureResult run_adventure(
     std::atomic<bool> stop(false);
     std::atomic<bool> error(false);
 
-    env.run_in_parallel([&](BotBaseContext& context, ConsoleHandle& console){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
         StateMachineAction action;
         while (true){
             //  Dump current state, but don't spam if nothing has changed.
@@ -73,7 +73,7 @@ AdventureResult run_adventure(
             size_t index = console.index();
             action = run_state_iteration(
                 runtime, index,
-                env, context, console, boss_slot != 0 && console.index() == runtime.host_index,
+                env, console, context, boss_slot != 0 && console.index() == runtime.host_index,
                 state_tracker, runtime.actions,
                 entrance[index]
             );
@@ -95,7 +95,7 @@ AdventureResult run_adventure(
                 runtime.session_stats.add_error();
                 error.store(true, std::memory_order_release);
                 pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-                reset_game_from_home_with_inference(env, context, console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+                reset_game_from_home_with_inference(env, console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
                 return;
             }
         }
@@ -120,7 +120,7 @@ AdventureResult run_adventure(
 
 
 void loop_adventures(
-    MultiSwitchProgramEnvironment& env,
+    MultiSwitchProgramEnvironment& env, CancellableScope& scope,
     const Consoles& consoles,
     size_t host_index, size_t boss_slot,
     const EndBattleDecider& decider,
@@ -147,7 +147,7 @@ void loop_adventures(
     while (true){
         //  Touch the date.
         if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
-            env.run_in_parallel([&](BotBaseContext& context, ConsoleHandle& console){
+            env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
                 env.log("Touching date to prevent rollover.");
                 pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
                 touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
@@ -155,7 +155,7 @@ void loop_adventures(
             });
         }
 
-        AdventureResult result = run_adventure(env, boss_slot, runtime);
+        AdventureResult result = run_adventure(env, scope, boss_slot, runtime);
         switch (result){
         case AdventureResult::FINISHED:
             restart_count = 0;
@@ -174,11 +174,11 @@ void loop_adventures(
                 throw OperationFailedException(env.logger(), "Failed to start adventure 3 times in the row.");
             }
             env.log("Failed to start adventure. Resetting all Switches...", COLOR_RED);
-            env.run_in_parallel([&](BotBaseContext& context, ConsoleHandle& console){
+            env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
 //                QImage screen = console.video().snapshot();
 //                dump_image(console, MODULE_NAME, "ResetRecovery", screen);
                 pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-                reset_game_from_home_with_inference(env, context, console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+                reset_game_from_home_with_inference(env, console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             });
             continue;
         }

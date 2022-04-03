@@ -108,7 +108,7 @@ private:
     StatsTracker* m_current_stats;
     const StatsTracker* m_historical_stats;
 
-    CancellableScope m_scope;
+    CancellableHolder<CancellableScope> m_scope;
 
     Pimpl<ProgramEnvironmentData> m_data;
 };

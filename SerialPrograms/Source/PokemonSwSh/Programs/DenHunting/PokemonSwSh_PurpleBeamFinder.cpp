@@ -155,7 +155,7 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, BotBaseConte
 
         BeamSetter::Detection detection;
         {
-            BeamSetter setter(env, context, env.console);
+            BeamSetter setter(env, env.console, context);
             detection = setter.run(
                 SAVE_SCREENSHOT,
                 TIMEOUT_DELAY,
@@ -195,7 +195,7 @@ void PurpleBeamFinder::program(SingleSwitchProgramEnvironment& env, BotBaseConte
 
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
         reset_game_from_home_with_inference(
-            env, context, env.console,
+            env, env.console, context,
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
         );
     }

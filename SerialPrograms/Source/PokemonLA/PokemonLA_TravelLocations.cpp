@@ -21,7 +21,7 @@ TravelLocation::TravelLocation(
     const char* p_label,
     MapRegion p_region,
     uint8_t p_warp_slot, uint8_t p_warp_sub_slot,
-    std::function<void(BotBaseContext& context, ConsoleHandle& console)>&& p_post_arrival_maneuver
+    std::function<void(ConsoleHandle& console, BotBaseContext& context)>&& p_post_arrival_maneuver
 )
     : label(p_label)
     , region(p_region)
@@ -105,8 +105,8 @@ TravelLocations::TravelLocations()
     )
     , Coastlands_Arena_NW(
         "Cobalt Coastlands - Molten Arena (NW of Volcano)",
-        MapRegion::COASTLANDS, 0, 2, [](BotBaseContext& context, ConsoleHandle& console){
-            change_mount(context, console, MountState::BRAVIARY_ON);
+        MapRegion::COASTLANDS, 0, 2, [](ConsoleHandle& console, BotBaseContext& context){
+            change_mount(console, context, MountState::BRAVIARY_ON);
             pbf_move_left_joystick(context, 255, 0, 160, 0);
             pbf_mash_button(context, BUTTON_B, 4 * TICKS_PER_SECOND);
         }

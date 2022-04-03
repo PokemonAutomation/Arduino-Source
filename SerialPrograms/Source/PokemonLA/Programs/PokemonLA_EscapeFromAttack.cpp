@@ -16,13 +16,12 @@ namespace PokemonLA{
 
 
 EscapeFromAttack::EscapeFromAttack(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     std::chrono::seconds time_min,
     std::chrono::seconds time_limit,
     bool stop_on_shiny
 )
-    : SuperControlSession(env, console)
+    : SuperControlSession(env, console, context)
     , m_min_stop(std::chrono::system_clock::now() + time_min)
     , m_deadline(std::chrono::system_clock::now() + time_limit)
     , m_stop_on_shiny(stop_on_shiny)

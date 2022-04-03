@@ -90,7 +90,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCon
     // program should be started right in front of the entrance
     // so enter the sub region
     env.console.log("Entering Wayward Cave...");
-    mash_A_to_enter_sub_area(env, context, env.console);
+    mash_A_to_enter_sub_area(env, env.console, context);
 
     env.console.log("Beginning navigation to the Alpha Crobat...");
     //  Switch to Wrydeer.
@@ -120,7 +120,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCon
     {
         ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
         run_until(
-            env, context, env.console,
+            env, env.console, context,
             [](BotBaseContext& context){
 
                 // FORWARD PORTION OF CAVE UNTIL LEDGE
@@ -144,7 +144,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCon
         );
         if (shiny_detector.detected()){
            stats.shinies++;
-           on_shiny_sound(env, context, env.console, SHINY_DETECTED, shiny_detector.results());
+           on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_detector.results());
         }
     };
 
@@ -152,7 +152,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCon
     env.console.log("No shiny detected, restarting the game!");
 
     pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-    reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+    reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 }
 
 
@@ -175,7 +175,7 @@ void CrobatFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         }catch (OperationFailedException&){
             stats.errors++;
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
     }
 

@@ -22,7 +22,7 @@ namespace PokemonSwSh{
 class StandardEncounterHandler{
 public:
     StandardEncounterHandler(
-        ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+        ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
         Language language,
         EncounterBotCommonOptions& settings,
         ShinyHuntTracker& session_stats
@@ -59,7 +59,7 @@ private:
 
 void take_video(BotBaseContext& context);
 void run_away(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     uint16_t exit_battle_time
 );
 

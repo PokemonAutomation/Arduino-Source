@@ -20,7 +20,7 @@ struct AsyncCommandSession::CommandSet{
         CancellableScope& parent, BotBase& botbase,
         std::function<void(BotBaseContext&)>&& lambda
     );
-    CancellableScope scope;
+    CancellableHolder<CancellableScope> scope;
     BotBaseContext context;
     std::function<void(BotBaseContext&)> commands;
 };
@@ -42,11 +42,12 @@ AsyncCommandSession::AsyncCommandSession(
     CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
     BotBase& botbase
 )
-    : Cancellable(scope)
-    , m_logger(logger)
+    : m_logger(logger)
     , m_botbase(botbase)
     , m_thread(dispatcher.dispatch([this]{ thread_loop(); }))
-{}
+{
+    attach(scope);
+}
 AsyncCommandSession::~AsyncCommandSession(){
 //    cout << "~AsyncCommandSession()" << endl;
     if (!cancelled() && std::uncaught_exceptions() == 0){

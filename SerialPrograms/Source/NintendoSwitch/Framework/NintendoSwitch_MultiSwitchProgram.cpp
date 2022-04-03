@@ -26,20 +26,21 @@ MultiSwitchProgramEnvironment::MultiSwitchProgramEnvironment(
 {}
 
 void MultiSwitchProgramEnvironment::run_in_parallel(
-    const std::function<void(BotBaseContext& context, ConsoleHandle& console)>& func
+    CancellableScope& scope,
+    const std::function<void(ConsoleHandle& console, BotBaseContext& context)>& func
 ){
-    run_in_parallel(0, consoles.size(), func);
+    run_in_parallel(scope, 0, consoles.size(), func);
 }
 void MultiSwitchProgramEnvironment::run_in_parallel(
-    size_t s, size_t e,
-    const std::function<void(BotBaseContext& context, ConsoleHandle& console)>& func
+    CancellableScope& scope, size_t s, size_t e,
+    const std::function<void(ConsoleHandle& console, BotBaseContext& context)>& func
 ){
     realtime_dispatcher().run_in_parallel(
         s, e,
         [&](size_t index){
-            BotBaseContext context(this->scope(), consoles[index].botbase());
-            func(context, consoles[index]);
-            consoles[index].botbase().wait_for_all_requests();
+            BotBaseContext context(scope, consoles[index].botbase());
+            func(consoles[index], context);
+            context.wait_for_all_requests();
         }
     );
 }

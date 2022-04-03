@@ -152,7 +152,7 @@ bool EggAutonomous::run_batch(
     }
 
     if (save){
-        save_game(env, context, env.console);
+        save_game(env, env.console, context);
         saved_state.set(current_state);
     }
 
@@ -171,7 +171,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
     pbf_move_left_joystick(context, 0, 255, 125, 0);
 
     EggAutonomousState current_state(
-        env, context, env.console,
+        env, env.console, context,
         stats,
         NOTIFICATION_NONSHINY_KEEP,
         NOTIFICATION_SHINY,
@@ -191,7 +191,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 //    box_to_overworld(env, env.console);
 
     if (AUTO_SAVING == 1){
-        save_game(env, context, env.console);
+        save_game(env, env.console, context);
         saved_state.set(current_state);
     }
 
@@ -214,7 +214,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
                 throw OperationFailedException(env.console, "Failed 3 batches in the row.");
             }
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, context, env.console, true);
+            reset_game_from_home(env, env.console, context, true);
             current_state.set(saved_state);
         }
     }

@@ -91,10 +91,10 @@ std::unique_ptr<StatsTracker> MoneyFarmerHighlands::make_stats() const{
 
 
 
-void mash_A_until_end_of_battle(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console){
+void mash_A_until_end_of_battle(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
     OverworldDetector detector(console, console);
     int ret = run_until(
-        env, context, console,
+        env, console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, 120 * TICKS_PER_SECOND);
         },
@@ -113,11 +113,11 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, Bo
     Stats& stats = env.stats<Stats>();
 
     //  Go to Coronet Highlands Mountain camp.
-    goto_camp_from_jubilife(env, context, env.console, TravelLocations::instance().Highlands_Mountain);
+    goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Highlands_Mountain);
 
     stats.attempts++;
 
-    change_mount(context, env.console, MountState::WYRDEER_ON);
+    change_mount(env.console, context, MountState::WYRDEER_ON);
 
 
     bool success = false;
@@ -128,7 +128,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, Bo
         DialogSurpriseDetector dialog_detector(env.console, env.console, true);
         ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
         int ret = run_until(
-            env, context, env.console,
+            env, env.console, context,
             [](BotBaseContext& context){
                 pbf_move_left_joystick(context, 0, 212, 50, 0);
                 pbf_press_button(context, BUTTON_B, 495, 80);
@@ -159,12 +159,12 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, Bo
         );
         if (shiny_detector.detected()){
             stats.shinies++;
-            on_shiny_sound(env, context, env.console, SHINY_DETECTED, shiny_detector.results());
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_detector.results());
         }
         if (ret == 0){
             env.console.log("Found Charm!", COLOR_BLUE);
             stats.charm++;
-            mash_A_until_end_of_battle(env, context, env.console);
+            mash_A_until_end_of_battle(env, env.console, context);
             env.console.log("Battle succeeded!", COLOR_BLUE);
             success = true;
         }
@@ -180,12 +180,12 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, Bo
 
 
     env.console.log("Returning to Jubilife...");
-    goto_camp_from_overworld(env, context, env.console, SHINY_DETECTED, stats);
+    goto_camp_from_overworld(env, env.console, context, SHINY_DETECTED, stats);
     goto_professor(env.console, context, Camp::HIGHLANDS_HIGHLANDS);
-    from_professor_return_to_jubilife(env, context, env.console);
+    from_professor_return_to_jubilife(env, env.console, context);
 
     if (success){
-        save_game_from_overworld(env, context, env.console);
+        save_game_from_overworld(env, env.console, context);
     }
 
     return false;
@@ -200,7 +200,7 @@ void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env, BotBaseC
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
     // Put a save here so that when the program reloads from error it won't break.
-    save_game_from_overworld(env, context, env.console);
+    save_game_from_overworld(env, env.console, context);
 
     while (true){
         env.update_stats();
@@ -217,7 +217,7 @@ void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env, BotBaseC
         }catch (OperationFailedException&){
             stats.errors++;
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
     }
 

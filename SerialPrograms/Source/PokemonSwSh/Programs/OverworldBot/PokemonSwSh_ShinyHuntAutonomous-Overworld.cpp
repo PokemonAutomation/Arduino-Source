@@ -217,7 +217,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
             StartBattleWatcher start_battle_detector;
 
             int result = run_until(
-                env, context, env.console,
+                env, env.console, context,
                 [&](BotBaseContext& context){
                     trigger->run(context);
                 },
@@ -260,7 +260,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
             continue;
         }
 
-        if (charge_at_target(env, context, env.console, target)){
+        if (charge_at_target(env, env.console, context, target)){
             return true;
         }
     }
@@ -268,7 +268,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
 
 
 bool ShinyHuntAutonomousOverworld::charge_at_target(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     const std::pair<double, OverworldTarget>& target
 ) const{
     InferenceBoxScope target_box(console, target.second.box, COLOR_YELLOW);
@@ -309,7 +309,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
     );
 
     int result = run_until(
-        env, context, console,
+        env, console, context,
         [&](BotBaseContext& context){
             //  Move to target.
             pbf_move_left_joystick(
@@ -373,7 +373,7 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, 
     env.update_stats();
 
     StandardEncounterHandler handler(
-        env, context, env.console,
+        env, env.console, context,
         LANGUAGE,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -396,7 +396,7 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, 
         if (now - last > TIMEOUT){
             pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
             reset_game_from_home_with_inference(
-                env, context, env.console,
+                env, env.console, context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
             );
             stats.m_resets++;
@@ -413,7 +413,7 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, 
 
         //  Detect shiny.
         ShinyDetectionResult result = detect_shiny_battle(
-            env, context, env.console,
+            env, env.console, context,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );

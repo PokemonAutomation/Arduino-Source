@@ -24,7 +24,7 @@ namespace MaxLairInternal{
 
 
 bool wait_for_a_player(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     const QImage& entrance,
     std::chrono::system_clock::time_point time_limit
 ){
@@ -33,7 +33,7 @@ bool wait_for_a_player(
     PokemonSelectMenuDetector false_start_detector(false);
 
     int result = wait_until(
-        env, context, console,
+        env, console, context,
         time_limit,
         {
             &done_connecting_detector,
@@ -60,7 +60,7 @@ bool wait_for_a_player(
 }
 
 bool wait_for_lobby_ready(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     const QImage& entrance,
     size_t min_players,
     size_t start_players,
@@ -71,7 +71,7 @@ bool wait_for_lobby_ready(
     PokemonSelectMenuDetector false_start_detector(false);
 
     int result = wait_until(
-        env, context, console,
+        env, console, context,
         time_limit,
         {
             &ready_detector,
@@ -93,7 +93,7 @@ bool wait_for_lobby_ready(
     return true;
 }
 bool start_adventure(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     size_t consoles,
     const QImage& entrance
 ){
@@ -106,7 +106,7 @@ bool start_adventure(
     //  Press A until you're not in the lobby anymore.
     LobbyDetector lobby_detector(true);
     int result = run_until(
-        env, context, console,
+        env, console, context,
         [](BotBaseContext& context){
             for (size_t c = 0; c < 180; c++){
                 pbf_press_button(context, BUTTON_A, 10, 115);
@@ -129,7 +129,7 @@ bool start_adventure(
 
 
 bool start_raid_self_solo(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     GlobalStateTracker& state_tracker,
     QImage& entrance, size_t boss_slot,
     ReadableQuantity999& ore
@@ -139,7 +139,7 @@ bool start_raid_self_solo(
     GlobalState& state = state_tracker[0];
 
     //  Enter lobby.
-    entrance = enter_lobby(env, context, console, boss_slot, false, ore);
+    entrance = enter_lobby(env, console, context, boss_slot, false, ore);
     if (entrance.isNull()){
         return false;
     }
@@ -156,7 +156,7 @@ bool start_raid_self_solo(
 }
 
 bool start_raid_host_solo(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     GlobalStateTracker& state_tracker,
     QImage& entrance, size_t boss_slot,
     HostingSettings& settings,
@@ -173,7 +173,7 @@ bool start_raid_host_solo(
 
     //  Enter lobby.
     entrance = enter_lobby(
-        env, context, console, boss_slot,
+        env, console, context, boss_slot,
         (HostingMode)(size_t)settings.MODE == HostingMode::HOST_ONLINE,
         ore
     );
@@ -210,9 +210,9 @@ bool start_raid_host_solo(
     auto time_limit = std::chrono::system_clock::now() +
         std::chrono::milliseconds(settings.LOBBY_WAIT_DELAY * 1000 / TICKS_PER_SECOND);
 
-    if (!wait_for_a_player(env, context, console, entrance, time_limit)){
+    if (!wait_for_a_player(env, console, context, entrance, time_limit)){
         pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
-        return start_raid_self_solo(env, context, console, state_tracker, entrance, boss_slot, ore);
+        return start_raid_self_solo(env, console, context, state_tracker, entrance, boss_slot, ore);
     }
 
     //  Ready up.
@@ -221,14 +221,14 @@ bool start_raid_host_solo(
     context.wait_for_all_requests();
 
     //  Wait
-    if (!wait_for_lobby_ready(env, context, console, entrance, 1, 4, time_limit)){
+    if (!wait_for_lobby_ready(env, console, context, entrance, 1, 4, time_limit)){
         pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
         return false;
     }
 
     //  Start
     context.wait_for_all_requests();
-    if (!start_adventure(env, context, console, 1, entrance)){
+    if (!start_adventure(env, console, context, 1, entrance)){
         pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
         return false;
     }

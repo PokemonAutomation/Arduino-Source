@@ -65,7 +65,7 @@ void goto_professor(Logger& logger, BotBaseContext& context, Camp camp){
     }
 }
 void from_professor_return_to_jubilife(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context
 ){
     ButtonDetector button_detector0(
         console, console,
@@ -85,7 +85,7 @@ void from_professor_return_to_jubilife(
     while (true){
         context.wait_for_all_requests();
         int ret = run_until(
-            env, context, console,
+            env, console, context,
             [](BotBaseContext& context){
                 for (size_t c = 0; c < 20; c++){
                     pbf_press_button(context, BUTTON_A, 20, 125);
@@ -98,7 +98,7 @@ void from_professor_return_to_jubilife(
         case 0:
             console.log("Detected return option...");
             pbf_press_dpad(context, DPAD_DOWN, 20, 105);
-            mash_A_to_change_region(env, context, console);
+            mash_A_to_change_region(env, console, context);
             return;
         case 1:
             console.log("Detected report research option...");
@@ -116,11 +116,11 @@ void from_professor_return_to_jubilife(
 
 
 void mash_A_to_enter_sub_area(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context
 ){
     BlackScreenOverWatcher black_screen0(COLOR_RED, {0.2, 0.2, 0.6, 0.6}, 100, 10);
     int ret = run_until(
-        env, context, console,
+        env, console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, 7 * TICKS_PER_SECOND);
         },
@@ -137,11 +137,11 @@ void mash_A_to_enter_sub_area(
 
 
 void mash_A_to_change_region(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context
 ){
     BlackScreenOverWatcher black_screen0;
     int ret = run_until(
-        env, context, console,
+        env, console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, GameSettings::instance().LOAD_REGION_TIMEOUT);
         },
@@ -155,7 +155,7 @@ void mash_A_to_change_region(
     BlackScreenOverWatcher black_screen1a(COLOR_RED, {0.20, 0.02, 0.60, 0.05}, 150);
     BlackScreenOverWatcher black_screen1b(COLOR_RED, {0.20, 0.93, 0.60, 0.05}, 150);
     ret = wait_until(
-        env, context, console,
+        env, console, context,
         std::chrono::milliseconds(1000 * GameSettings::instance().LOAD_REGION_TIMEOUT / TICKS_PER_SECOND),
         { &black_screen1a, &black_screen1b }
     );
@@ -171,7 +171,7 @@ void mash_A_to_change_region(
 
 
 void goto_camp_from_jubilife(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     const TravelLocation& location
 ){
     //  Open the map.
@@ -180,7 +180,7 @@ void goto_camp_from_jubilife(
     {
         MapDetector detector;
         int ret = run_until(
-            env, context, console,
+            env, console, context,
             [](BotBaseContext& context){
                 for (size_t c = 0; c < 10; c++){
                     pbf_press_button(context, BUTTON_A, 20, 105);
@@ -201,7 +201,7 @@ void goto_camp_from_jubilife(
     //  Move to region.
     MapRegion current_region = MapRegion::NONE;
     for (size_t c = 0; c < 10; c++){
-        current_region = detect_selected_region(env, context, console);
+        current_region = detect_selected_region(env, console, context);
         if (current_region == location.region){
             break;
         }
@@ -221,7 +221,7 @@ void goto_camp_from_jubilife(
     }
 
     //  Enter the region.
-    mash_A_to_change_region(env, context, console);
+    mash_A_to_change_region(env, console, context);
 
     if (location.warp_sub_slot == 0){
         return;
@@ -232,7 +232,7 @@ void goto_camp_from_jubilife(
     {
         MapDetector detector;
         int ret = wait_until(
-            env, context, console,
+            env, console, context,
             std::chrono::seconds(5),
             { &detector }
         );
@@ -254,7 +254,7 @@ void goto_camp_from_jubilife(
             std::chrono::milliseconds(200), true
         );
         int ret = wait_until(
-            env, context, console,
+            env, console, context,
             std::chrono::seconds(2),
             { &detector }
         );
@@ -270,7 +270,7 @@ void goto_camp_from_jubilife(
 
     BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.6});
     int ret = wait_until(
-        env, context, console,
+        env, console, context,
         std::chrono::seconds(20),
         { &black_screen }
     );
@@ -285,7 +285,7 @@ void goto_camp_from_jubilife(
         return;
     }
 
-    location.post_arrival_maneuver(context, console);
+    location.post_arrival_maneuver(console, context);
     context.wait_for_all_requests();
 }
 
@@ -293,7 +293,7 @@ void goto_camp_from_jubilife(
 
 
 void goto_camp_from_overworld(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     ShinyDetectedActionOption& options,
     ShinyStatIncrementer& shiny_stat_incrementer
 ){
@@ -301,7 +301,7 @@ void goto_camp_from_overworld(
     std::chrono::seconds grace_period(0);
     while (true){
         EscapeFromAttack session(
-            env, console,
+            env, console, context,
             grace_period, std::chrono::seconds(10),
             options.stop_on_shiny()
         );
@@ -309,7 +309,7 @@ void goto_camp_from_overworld(
 
         if (session.detected_shiny()){
             shiny_stat_incrementer.add_shiny();
-            on_shiny_sound(env, context, console, options, session.shiny_sound_results());
+            on_shiny_sound(env, console, context, options, session.shiny_sound_results());
         }
 
         if (std::chrono::system_clock::now() - start > std::chrono::seconds(60)){
@@ -322,7 +322,7 @@ void goto_camp_from_overworld(
         {
             MapDetector detector;
             int ret = wait_until(
-                env, context, console,
+                env, console, context,
                 std::chrono::seconds(5),
                 { &detector }
             );
@@ -348,7 +348,7 @@ void goto_camp_from_overworld(
                 std::chrono::milliseconds(200), true
             );
             int ret = wait_until(
-                env, context, console,
+                env, console, context,
                 std::chrono::seconds(2),
                 { &detector }
             );
@@ -366,7 +366,7 @@ void goto_camp_from_overworld(
 
     BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.6});
     int ret = wait_until(
-        env, context, console,
+        env, console, context,
         std::chrono::seconds(20),
         { &black_screen }
     );

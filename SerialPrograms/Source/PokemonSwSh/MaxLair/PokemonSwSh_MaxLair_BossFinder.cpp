@@ -170,7 +170,7 @@ void MaxLairBossFinder::program(MultiSwitchProgramEnvironment& env, CancellableS
         throw UserSetupError(env.logger(), "Invalid Host Switch");
     }
 
-    env.run_in_parallel([&](BotBaseContext& context, ConsoleHandle& console){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
         if (START_IN_GRIP_MENU){
             grip_menu_connect_go_home(context);
             resume_game_no_interact(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
@@ -182,7 +182,7 @@ void MaxLairBossFinder::program(MultiSwitchProgramEnvironment& env, CancellableS
     EndBattleDecider_BossFinder decider(CONSOLES, BOSS_LIST);
 
     loop_adventures(
-        env, CONSOLES,
+        env, scope, CONSOLES,
         CONSOLES.HOST, 0,
         decider,
         GO_HOME_WHEN_DONE,

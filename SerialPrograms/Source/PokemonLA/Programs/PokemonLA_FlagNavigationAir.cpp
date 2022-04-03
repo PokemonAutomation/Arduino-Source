@@ -21,13 +21,13 @@ namespace PokemonLA{
 
 
 FlagNavigationAir::FlagNavigationAir(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     bool stop_on_shiny,
     uint16_t stop_radius,
     double flag_reached_delay,
     std::chrono::seconds navigate_timeout
 )
-    : SuperControlSession(env, console)
+    : SuperControlSession(env, console, context)
     , m_stop_on_shiny(stop_on_shiny)
     , m_stop_radius(stop_radius)
     , m_flag_reached_delay(std::chrono::milliseconds((uint64_t)(flag_reached_delay * 1000)))

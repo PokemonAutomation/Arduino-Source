@@ -58,11 +58,11 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope&
 
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){
         if (box != 0){
-            env.run_in_parallel([](BotBaseContext& context, ConsoleHandle& console){
+            env.run_in_parallel(scope, [](ConsoleHandle& console, BotBaseContext& context){
                 pbf_press_button(context, BUTTON_R, 20, GameSettings::instance().BOX_CHANGE_DELAY_0);
             });
         }
-        trade_current_box(env, NOTIFICATION_STATUS_UPDATE, stats);
+        trade_current_box(env, scope, NOTIFICATION_STATUS_UPDATE, stats);
     }
 
     env.update_stats();

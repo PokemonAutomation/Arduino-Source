@@ -110,7 +110,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
 
         if (reset){
             pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-            if (!reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
+            if (!reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
                 stats.add_error();
                 consecutive_failures++;
                 continue;
@@ -124,7 +124,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         //  Mash B until we see the briefcase.
         ImageMatchWatcher detector(briefcase, {0.5, 0.1, 0.5, 0.7}, 100, true);
         int ret = run_until(
-            env, context, env.console,
+            env, env.console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
@@ -166,7 +166,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         {
             SelectionArrowFinder selection_arrow(env.console, {0.50, 0.60, 0.35, 0.20}, COLOR_RED);
             ret = wait_until(
-                env, context, env.console, std::chrono::seconds(3),
+                env, env.console, context, std::chrono::seconds(3),
                 { &selection_arrow }
             );
             if (ret == 0){
@@ -185,7 +185,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         DoublesShinyDetection result_wild;
         ShinyDetectionResult result_own;
         detect_shiny_battle(
-            env, context, env.console,
+            env, env.console, context,
             result_wild, result_own,
             YOUR_POKEMON,
             std::chrono::seconds(30)

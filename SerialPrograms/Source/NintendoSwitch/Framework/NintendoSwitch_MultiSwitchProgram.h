@@ -26,13 +26,14 @@ public:
 
     //  Run the specified lambda for all switches in parallel.
     void run_in_parallel(
-        const std::function<void(BotBaseContext& context, ConsoleHandle& console)>& func
+        CancellableScope& scope,
+        const std::function<void(ConsoleHandle& console, BotBaseContext& context)>& func
     );
 
     //  Run the specified lambda for switch indices [s, e) in parallel.
     void run_in_parallel(
-        size_t s, size_t e,
-        const std::function<void(BotBaseContext& context, ConsoleHandle& console)>& func
+        CancellableScope& scope, size_t s, size_t e,
+        const std::function<void(ConsoleHandle& console, BotBaseContext& context)>& func
     );
 
 private:

@@ -18,7 +18,7 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-MapRegion detect_selected_region(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console);
+MapRegion detect_selected_region(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
 
 
 

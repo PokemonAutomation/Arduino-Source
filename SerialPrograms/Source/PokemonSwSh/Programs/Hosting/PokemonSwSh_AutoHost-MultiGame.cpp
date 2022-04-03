@@ -169,7 +169,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 break;
             }
             start_game_from_home_with_inference(
-                env, context, env.console,
+                env, env.console, context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW,
                 game_slot,
                 game.user_slot,
@@ -191,7 +191,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             //  Run auto-host.
             const MultiHostSlot& fr_game = GAME_LIST[FR_index];
             run_autohost(
-                env, context, env.console,
+                env, env.console, context,
                 game.always_catchable
                     ? Catchability::ALWAYS_CATCHABLE
                     : Catchability::MAYBE_UNCATCHABLE,

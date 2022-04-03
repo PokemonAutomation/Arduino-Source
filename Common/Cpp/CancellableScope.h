@@ -33,10 +33,6 @@ class CancellableScope;
 
 class Cancellable{
 public:
-    Cancellable()
-        : m_cancelled(false)
-    {}
-    Cancellable(CancellableScope& scope);
     virtual ~Cancellable(){
         detach();
     }
@@ -46,6 +42,8 @@ public:
     bool cancelled() const{
         return m_cancelled.load(std::memory_order_acquire);
     }
+
+    void throw_if_cancelled();
     void throw_if_parent_cancelled();
 
     //  Returns true if it was already cancelled.
@@ -56,12 +54,37 @@ public:
         return false;
     }
 
+
 protected:
-    //  If you inherit from this class, you may need to manually call this in the
-    //  destructor. "cancel()" can be called asynchronously at any time by the
-    //  parent scope. To prevent it from being called in the middle of destruction
-    //  you must detach it from the parent at the start of the destructor.
+    //  This class needs special handling for subclasses.
+    //
+    //  1.  The constructors of all sub-classes should be protected except for
+    //      the most-derived class.
+    //
+    //  2.  The most-derived class must be marked final.
+    //
+    //  3.  The most-derived class must call "attach()" at the end of its
+    //      constructor.
+    //
+    //  4.  The most-derived class must call "detach()" at the start of its
+    //      destructor.
+    //
+    //  The moment you attach to a scope, the scope may call "cancel()" on you
+    //  at any time - even before you are done constructing. Therefore you must
+    //  not attach until you are done constructing.
+    //
+    //  Because "cancel()" can be called on you at any time, you must detach
+    //  before you begin destructing.
+    Cancellable()
+        : m_cancelled(false)
+    {}
+
+    //  You must call last in the constructor of the most-derived subclass.
+    void attach(CancellableScope& scope);
+
+    //  You must call this first in the destructor of the most-derived subclass.
     void detach() noexcept;
+
 
 private:
     CancellableScope* m_scope = nullptr;
@@ -69,19 +92,19 @@ private:
 };
 
 
+
 struct CancellableScopeData;
 class CancellableScope : public Cancellable{
 public:
-    CancellableScope();
-    CancellableScope(CancellableScope& parent);
     virtual ~CancellableScope() override;
 
     virtual bool cancel() noexcept override;
 
-    void throw_if_cancelled();  //  Throws "OperationCanceledException" if this scope has been cancelled.
-
     void wait_for(std::chrono::milliseconds duration);
     void wait_until(std::chrono::system_clock::time_point stop);
+
+protected:
+    CancellableScope();
 
 private:
     friend class Cancellable;
@@ -94,23 +117,27 @@ private:
 
 
 
-inline Cancellable::Cancellable(CancellableScope& scope)
-    : m_scope(&scope)
-    , m_cancelled(false)
-{
-    scope += *this;
-}
-inline void Cancellable::throw_if_parent_cancelled(){
-    if (m_scope){
-        m_scope->throw_if_cancelled();
-    }
-}
-inline void Cancellable::detach() noexcept{
-    if (m_scope){
-        *m_scope -= *this;
-    }
-}
+template <typename CancellableType>
+class CancellableHolder final : public CancellableType{
+public:
+    //  Construct with no parent.
+    template <class... Args>
+    CancellableHolder(Args&&... args)
+        : CancellableType(std::forward<Args>(args)...)
+    {}
 
+    //  Construct with a parent.
+    template <class... Args>
+    CancellableHolder(CancellableScope& parent, Args&&... args)
+        : CancellableType(std::forward<Args>(args)...)
+    {
+        this->attach(parent);
+    }
+
+    virtual ~CancellableHolder(){
+        this->detach();
+    }
+};
 
 
 

@@ -51,7 +51,7 @@ private:
     ) const;
 
     bool charge_at_target(
-        ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+        ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
         const std::pair<double, OverworldTarget>& target
     ) const;
 

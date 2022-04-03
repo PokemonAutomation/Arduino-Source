@@ -81,7 +81,7 @@ std::unique_ptr<StatsTracker> ShinyHuntCustomPath::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-void ShinyHuntCustomPath::do_non_listen_action(BotBaseContext& context, ConsoleHandle& console, size_t action_index){
+void ShinyHuntCustomPath::do_non_listen_action(ConsoleHandle& console, BotBaseContext& context, size_t action_index){
     const auto& row = CUSTOM_PATH_TABLE.get_action(action_index);
     console.log("Execute action " + PathAction_NAMES[(size_t)row.action]);
     switch(row.action){
@@ -109,9 +109,9 @@ void ShinyHuntCustomPath::do_non_listen_action(BotBaseContext& context, ConsoleH
             }
 
             if (mountState == MountState::NOTHING){
-                dismount(context, console);
+                dismount(console, context);
             } else{
-                change_mount(context, console, mountState);
+                change_mount(console, context, mountState);
             }
             break;
         }
@@ -171,7 +171,7 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseC
     for(size_t action_index = 0; action_index < CUSTOM_PATH_TABLE.num_actions(); action_index++){
         const auto& row = CUSTOM_PATH_TABLE.get_action(action_index);
         if (row.action != PathAction::START_LISTEN){
-            do_non_listen_action(context, env.console, action_index);
+            do_non_listen_action(env.console, context, action_index);
         } else{
             env.log("Start Listen, build sound detector");
             // Build shiny sound detector and start listens:
@@ -181,12 +181,12 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseC
             // but the code using the passed in `env` may still runs. This will delay the program stop
             // on shiny sound but should be genearally OK in this use case.
             run_until(
-                env, context, env.console,
+                env, env.console, context,
                 [&env, &action_index, this](BotBaseContext& context){
                     for(; action_index < CUSTOM_PATH_TABLE.num_actions(); action_index++){
                         const auto& listened_row = CUSTOM_PATH_TABLE.get_action(action_index);
                         if (listened_row.action != PathAction::END_LISTEN){
-                            do_non_listen_action(context, env.console, action_index);
+                            do_non_listen_action(env.console, context, action_index);
                         } else{
                             env.log("End Listen, exit sound detector");
                             break;
@@ -197,7 +197,7 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseC
                 { &shiny_detector });
             if (shiny_detector.detected()){
                 stats.shinies++;
-                on_shiny_sound(env, context, env.console, SHINY_DETECTED, shiny_detector.results());
+                on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_detector.results());
                 break;
             }
         }
@@ -243,17 +243,17 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         try{
 //            Stats& stats = env.stats<Stats>();
 
-            goto_camp_from_jubilife(env, context, env.console, TRAVEL_LOCATION);
+            goto_camp_from_jubilife(env, env.console, context, TRAVEL_LOCATION);
             run_path(env, context);
 
             stats.attempts++;
 
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }catch (OperationFailedException&){
             stats.errors++;
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
 
     }

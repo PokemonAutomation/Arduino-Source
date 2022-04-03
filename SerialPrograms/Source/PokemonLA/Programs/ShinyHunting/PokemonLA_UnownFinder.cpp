@@ -112,9 +112,9 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     stats.attempts++;
 
-    goto_camp_from_jubilife(env, context, env.console, TravelLocations::instance().Mirelands_Mirelands);
+    goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Mirelands_Mirelands);
 
-    change_mount(context, env.console, MountState::BRAVIARY_ON);
+    change_mount(env.console, context, MountState::BRAVIARY_ON);
 
     //Start path
     env.console.log("Beginning Shiny Detection...");
@@ -125,7 +125,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
         ShinySoundDetector shiny_detector_route(env.console, SHINY_DETECTED_ON_ROUTE.stop_on_shiny());
         run_until(
-            env, context, env.console,
+            env, env.console, context,
             [](BotBaseContext& context){
                ruins_entrance_route(context);
             },
@@ -134,13 +134,13 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
         if (shiny_detector_route.detected()){
            stats.shinies++;
-           on_shiny_sound(env, context, env.console, SHINY_DETECTED_ON_ROUTE, shiny_detector_route.results());
+           on_shiny_sound(env, env.console, context, SHINY_DETECTED_ON_ROUTE, shiny_detector_route.results());
         }
 
 
         ShinySoundDetector shiny_detector_ruins(env.console, SHINY_DETECTED.stop_on_shiny());
 
-        run_until(env, context, env.console,
+        run_until(env, env.console, context,
             [](BotBaseContext& context){
                enter_ruins(context);
             },
@@ -150,15 +150,15 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
         if (shiny_detector_ruins.detected()){
            stats.shinies++;
-           on_shiny_sound(env, context, env.console, SHINY_DETECTED, shiny_detector_ruins.results());
+           on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_detector_ruins.results());
         }
     };
 
     env.console.log("No shiny detected, returning to Jubilife!");
-    goto_camp_from_overworld(env, context, env.console, SHINY_DETECTED, stats);
+    goto_camp_from_overworld(env, env.console, context, SHINY_DETECTED, stats);
     pbf_press_dpad(context, DPAD_RIGHT, 10, 10);
     goto_professor(env.console, context, Camp::MIRELANDS_MIRELANDS);
-    from_professor_return_to_jubilife(env, context, env.console);
+    from_professor_return_to_jubilife(env, env.console, context);
 }
 
 
@@ -181,7 +181,7 @@ void UnownFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
         }catch (OperationFailedException&){
             stats.errors++;
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
     }
 

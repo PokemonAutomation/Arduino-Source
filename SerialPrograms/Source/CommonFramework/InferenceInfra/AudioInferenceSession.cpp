@@ -33,11 +33,12 @@ AudioInferenceSession::AudioInferenceSession(
     AudioFeed& feed,
     std::chrono::milliseconds period
 )
-    : Cancellable(scope)
-    , m_logger(logger)
+    : m_logger(logger)
     , m_feed(feed)
     , m_period(period)
-{}
+{
+    attach(scope);
+}
 AudioInferenceSession::~AudioInferenceSession(){
     detach();
     AudioInferenceSession::cancel();
@@ -167,7 +168,7 @@ AsyncAudioInferenceSession::AsyncAudioInferenceSession(
     AudioFeed& feed,
     std::chrono::milliseconds period
 )
-    : AudioInferenceSession(logger, scope, feed, period)
+    : m_session(logger, scope, feed, period)
     , m_triggering_callback(nullptr)
     , m_task(env.inference_dispatcher().dispatch([this]{ thread_body(); }))
 {}
@@ -177,13 +178,19 @@ AsyncAudioInferenceSession::AsyncAudioInferenceSession(
     std::function<void()> on_finish_callback,
     std::chrono::milliseconds period
 )
-    : AudioInferenceSession(logger, scope, feed, period)
+    : m_session(logger, scope, feed, period)
     , m_on_finish_callback(std::move(on_finish_callback))
     , m_triggering_callback(nullptr)
     , m_task(env.inference_dispatcher().dispatch([this]{ thread_body(); }))
 {}
 AsyncAudioInferenceSession::~AsyncAudioInferenceSession(){
-    AudioInferenceSession::cancel();
+    m_session.cancel();
+}
+void AsyncAudioInferenceSession::operator+=(AudioInferenceCallback& callback){
+    m_session += callback;
+}
+void AsyncAudioInferenceSession::operator-=(AudioInferenceCallback& callback){
+    m_session -= callback;
 }
 void AsyncAudioInferenceSession::rethrow_exceptions(){
     if (m_task){
@@ -191,7 +198,7 @@ void AsyncAudioInferenceSession::rethrow_exceptions(){
     }
 }
 AudioInferenceCallback* AsyncAudioInferenceSession::stop_and_rethrow(){
-    AudioInferenceSession::cancel();
+    m_session.cancel();
     if (m_task){
         m_task->wait_and_rethrow_exceptions();
     }
@@ -199,7 +206,7 @@ AudioInferenceCallback* AsyncAudioInferenceSession::stop_and_rethrow(){
 }
 void AsyncAudioInferenceSession::thread_body(){
     try{
-        m_triggering_callback = run();
+        m_triggering_callback = m_session.run();
         if (m_on_finish_callback){
             m_on_finish_callback();
         }

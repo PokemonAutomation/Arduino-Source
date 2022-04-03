@@ -37,7 +37,7 @@ namespace MaxLairInternal{
 
 StateMachineAction run_state_iteration(
     AdventureRuntime& runtime, size_t console_index,
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     bool save_path,
     GlobalStateTracker& global_state,
     const EndBattleDecider& decider,
@@ -65,7 +65,7 @@ StateMachineAction run_state_iteration(
     FrozenImageDetector frozen_screen(COLOR_CYAN, {0, 0, 1, 0.5}, std::chrono::seconds(30), 10);
 
     int result = wait_until(
-        env, context, console,
+        env, console, context,
         std::chrono::seconds(300),
         {
             starting
@@ -87,29 +87,29 @@ StateMachineAction run_state_iteration(
     case 0:
         if (starting){
             console.log("Current State: " + STRING_POKEMON + " Select");
-            run_select_pokemon(env, context, console, global_state, runtime.console_settings[console_index]);
+            run_select_pokemon(env, console, context, global_state, runtime.console_settings[console_index]);
             return StateMachineAction::KEEP_GOING;
         }else{
             console.log("Current State: " + STRING_POKEMON + " Swap");
-            run_swap_pokemon(runtime, env, context, console, global_state, runtime.console_settings[console_index]);
+            run_swap_pokemon(runtime, env, console, context, global_state, runtime.console_settings[console_index]);
             return StateMachineAction::KEEP_GOING;
         }
     case 1:
         console.log("Current State: Path Select");
-        run_path_select(env, context, console, global_state);
+        run_path_select(env, console, context, global_state);
         return StateMachineAction::KEEP_GOING;
     case 2:
         console.log("Current State: Item Select");
-        run_item_select(env, context, console, global_state);
+        run_item_select(env, console, context, global_state);
         return StateMachineAction::KEEP_GOING;
     case 3:
         console.log("Current State: Professor Swap");
-        run_professor_swap(runtime, env, context, console, global_state);
+        run_professor_swap(runtime, env, console, context, global_state);
         return StateMachineAction::KEEP_GOING;
     case 4:
         console.log("Current State: Move Select");
         return run_move_select(
-            env, context, console, global_state,
+            env, console, context, global_state,
             runtime.console_settings[console_index],
             battle_menu.dmaxed(),
             battle_menu.cheer()
@@ -118,7 +118,7 @@ StateMachineAction run_state_iteration(
         console.log("Current State: Catch Select");
         return throw_balls(
             runtime,
-            env, context, console,
+            env, console, context,
             runtime.console_settings[console_index].language,
             global_state,
             decider
@@ -127,13 +127,13 @@ StateMachineAction run_state_iteration(
         console.log("Current State: Caught Menu");
         return run_caught_screen(
             runtime,
-            env, context, console,
+            env, console, context,
             global_state, decider,
             entrance
         );
     case 7:
         console.log("Current State: Entrance");
-        run_entrance(runtime, env, context, console, save_path, global_state);
+        run_entrance(runtime, env, console, context, save_path, global_state);
         return StateMachineAction::DONE_WITH_ADVENTURE;
     case 8:
         console.log("Current State: Frozen Screen", COLOR_RED);

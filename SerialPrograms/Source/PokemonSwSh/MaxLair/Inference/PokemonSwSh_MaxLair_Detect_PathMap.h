@@ -33,7 +33,7 @@ bool read_type_array(
 
 
 bool read_path(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     PathMap& path,
     const ImageFloatBox& box
 );

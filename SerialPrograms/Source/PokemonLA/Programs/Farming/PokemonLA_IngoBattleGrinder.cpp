@@ -142,7 +142,7 @@ bool IngoBattleGrinder::start_dialog(SingleSwitchProgramEnvironment& env, BotBas
         ButtonDetector button0(env.console, env.console, ButtonType::ButtonA, {0.50, 0.450, 0.40, 0.042}, std::chrono::milliseconds(100), true);
         ButtonDetector button1(env.console, env.console, ButtonType::ButtonA, {0.50, 0.492, 0.40, 0.042}, std::chrono::milliseconds(100), true);
         int ret = run_until(
-            env, context, env.console,
+            env, env.console, context,
             [&](BotBaseContext& context){
                 for (size_t c = 0; c < 10; c++){
                     pbf_press_button(context, BUTTON_A, 20, 150);
@@ -165,7 +165,7 @@ bool IngoBattleGrinder::start_dialog(SingleSwitchProgramEnvironment& env, BotBas
 
     ButtonDetector button2(env.console, env.console, ButtonType::ButtonA, {0.50, 0.350, 0.40, 0.400}, std::chrono::milliseconds(100), true);
     int ret = run_until(
-        env, context, env.console,
+        env, env.console, context,
         [&](BotBaseContext& context){
             for (size_t c = 0; c < 5; c++){
                 pbf_press_button(context, BUTTON_A, 20, 150);
@@ -202,7 +202,7 @@ void IngoBattleGrinder::use_move(BotBaseContext& context, size_t cur_pokemon, si
     context.wait_for_all_requests();
 }
 
-void IngoBattleGrinder::switch_pokemon(BotBaseContext& context, ConsoleHandle& console, size_t& next_pokemon_in_party_order){
+void IngoBattleGrinder::switch_pokemon(ConsoleHandle& console, BotBaseContext& context, size_t& next_pokemon_in_party_order){
     // Move past leading fainted pokemon
     for(size_t i = 0; i < next_pokemon_in_party_order; i++){
         pbf_press_dpad(context, DPAD_DOWN, 20, 80);
@@ -299,7 +299,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
         NormalDialogDetector normal_dialogue_detector(env.console, env.console, stop_on_detected);
         ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(200), stop_on_detected);
         int ret = wait_until(
-            env, context, env.console, std::chrono::minutes(2),
+            env, env.console, context, std::chrono::minutes(2),
             {
                 &battle_menu_detector,
                 &dialogue_ellipse_detector,
@@ -328,7 +328,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
 
                 cur_move = 0;
                 num_turns = 0;
-                switch_pokemon(context, env.console, next_pokemon_in_party_order);
+                switch_pokemon(env.console, context, next_pokemon_in_party_order);
                 cur_pokemon++;
             }
             else{
@@ -394,7 +394,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
 
             cur_move = 0;
             num_turns = 0;
-            switch_pokemon(context, env.console, next_pokemon_in_party_order);
+            switch_pokemon(env.console, context, next_pokemon_in_party_order);
             cur_pokemon++;
         }
         else{ // ret is 4

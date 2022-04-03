@@ -27,7 +27,7 @@ enum class AdventureResult{
 
 
 void loop_adventures(
-    MultiSwitchProgramEnvironment& env,
+    MultiSwitchProgramEnvironment& env, CancellableScope& scope,
     const Consoles& consoles,
     size_t host_index, size_t boss_slot,
     const EndBattleDecider& decider,

@@ -18,7 +18,7 @@ namespace PokemonAutomation{
 
 
 int wait_until(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     std::chrono::system_clock::time_point deadline,
     std::vector<InferenceCallback*>&& callbacks,
     std::chrono::milliseconds period
@@ -30,7 +30,7 @@ int wait_until(
         std::unique_ptr<AsyncVisualInferenceSession> visual_session;
         std::unique_ptr<AsyncAudioInferenceSession> audio_session;
 
-        CancellableScope subscope(*context.scope());
+        CancellableHolder<CancellableScope> subscope(*context.scope());
         BotBaseContext subcontext(subscope, console.botbase());
 
         //  Add all the callbacks. Lazy init the sessions only when needed.
@@ -103,7 +103,7 @@ int wait_until(
 
 
 int run_until(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     std::function<void(BotBaseContext& context)>&& command,
     std::vector<InferenceCallback*>&& callbacks,
     std::chrono::milliseconds period
@@ -115,7 +115,7 @@ int run_until(
         std::unique_ptr<AsyncVisualInferenceSession> visual_session;
         std::unique_ptr<AsyncAudioInferenceSession> audio_session;
 
-        CancellableScope subscope(*context.scope());
+        CancellableHolder<CancellableScope> subscope(*context.scope());
         BotBaseContext subcontext(subscope, console.botbase());
 
         //  Add all the callbacks. Lazy init the sessions only when needed.

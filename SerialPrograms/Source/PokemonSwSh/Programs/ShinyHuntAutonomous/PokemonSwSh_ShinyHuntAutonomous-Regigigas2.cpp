@@ -91,7 +91,7 @@ bool ShinyHuntAutonomousRegigigas2::kill_and_return(SingleSwitchProgramEnvironme
 
     RaidCatchDetector detector(env.console);
     int result = wait_until(
-        env, context, env.console,
+        env, env.console, context,
         std::chrono::seconds(30),
         { &detector }
     );
@@ -117,7 +117,7 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env,
     env.update_stats();
 
     StandardEncounterHandler handler(
-        env, context, env.console,
+        env, env.console, context,
         Language::None,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -133,7 +133,7 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env,
             {
                 StartBattleWatcher detector;
                 int result = wait_until(
-                    env, context, env.console,
+                    env, env.console, context,
                     std::chrono::seconds(30),
                     { &detector }
                 );
@@ -146,7 +146,7 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env,
             }
 
             ShinyDetectionResult result = detect_shiny_battle(
-                env, context, env.console,
+                env, env.console, context,
                 SHINY_BATTLE_RAID,
                 std::chrono::seconds(30)
             );
@@ -169,7 +169,7 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env,
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
         TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(context);
         reset_game_from_home_with_inference(
-            env, context, env.console,
+            env, env.console, context,
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
         );
     }

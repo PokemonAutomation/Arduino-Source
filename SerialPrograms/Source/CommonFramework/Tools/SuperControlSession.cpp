@@ -21,13 +21,14 @@ namespace PokemonAutomation{
 SuperControlSession::~SuperControlSession(){}
 
 SuperControlSession::SuperControlSession(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
         std::chrono::milliseconds state_period,
         std::chrono::milliseconds visual_period,
         std::chrono::milliseconds audio_period
 )
     : m_env(env)
     , m_console(console)
+    , m_context(context)
     , m_state_period(state_period)
     , m_visual_period(visual_period)
     , m_audio_period(audio_period)
@@ -116,18 +117,10 @@ void SuperControlSession::run_session(){
         }
 
         now = std::chrono::system_clock::now();
-        auto wait = next_tick - now;
-        if (wait <= std::chrono::milliseconds(0)){
+        if (now >= next_tick){
             next_tick = now + m_state_period;
         }else{
-            std::mutex lock;
-            std::condition_variable cv;
-            ProgramStopNotificationScope scope(m_env, lock, cv);
-            std::unique_lock<std::mutex> lg(lock);
-            cv.wait_until(
-                lg, next_tick,
-                [=]{ return m_env.is_stopping(); }
-            );
+            m_context.wait_until(next_tick);
             next_tick += m_state_period;
         }
     }

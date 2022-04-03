@@ -24,7 +24,7 @@ namespace PokemonBDSP{
 
 
 
-void hatch_egg(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console){
+void hatch_egg(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
     //  Spin until egg starts hatching.
     do{
         ShortDialogWatcher dialog;
@@ -34,7 +34,7 @@ void hatch_egg(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& 
         }
 
         int ret = run_until(
-            env, context, console,
+            env, console, context,
             [](BotBaseContext& context){
                 egg_spin(context, 480 * TICKS_PER_SECOND);
             },
@@ -64,7 +64,7 @@ void hatch_egg(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& 
 
         ShortDialogWatcher dialog;
         int ret = wait_until(
-            env, context, console, std::chrono::seconds(30),
+            env, console, context, std::chrono::seconds(30),
             { &dialog }
         );
         if (ret < 0){
@@ -83,7 +83,7 @@ void hatch_egg(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& 
         ImageMatchWatcher matcher(overworld, {0.10, 0.10, 0.80, 0.60}, 100);
         SelectionArrowFinder arrow(console, {0.50, 0.60, 0.30, 0.20}, COLOR_GREEN);
         int ret = wait_until(
-            env, context, console, std::chrono::seconds(30),
+            env, console, context, std::chrono::seconds(30),
             {
                 &matcher,
                 &arrow,
@@ -102,28 +102,28 @@ void hatch_egg(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& 
         }
     }
 }
-void hatch_party(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console, size_t eggs){
+void hatch_party(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, size_t eggs){
     for (size_t c = 0; c < eggs; c++){
-        hatch_egg(env, context, console);
+        hatch_egg(env, console, context);
     }
 }
 
-void withdraw_1st_column_from_overworld(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console){
+void withdraw_1st_column_from_overworld(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
     const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
     const uint16_t BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY;
-    overworld_to_box(env, context, console);
+    overworld_to_box(env, console, context);
     pbf_press_button(context, BUTTON_Y, 20, 50);
     pbf_press_button(context, BUTTON_Y, 20, 50);
     pickup_column(context);
     pbf_move_right_joystick(context, 0, 128, 20, BOX_SCROLL_DELAY);
     pbf_move_right_joystick(context, 128, 255, 20, BOX_SCROLL_DELAY);
     pbf_press_button(context, BUTTON_ZL, 20, BOX_PICKUP_DROP_DELAY);
-    box_to_overworld(env, context, console);
+    box_to_overworld(env, console, context);
 }
 
 
 
-void release(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console){
+void release(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
     pbf_press_button(context, BUTTON_ZL, 20, 50);
     pbf_move_right_joystick(context, 128, 0, 20, 10);
     pbf_move_right_joystick(context, 128, 0, 20, 10);

@@ -22,11 +22,11 @@ namespace PokemonSwSh{
 
 
 void enter_loading_game(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     bool backup_save,
     uint16_t post_wait_time
 ){
-    openedgame_to_gamemenu(env, context, console, GameSettings::instance().START_GAME_WAIT);
+    openedgame_to_gamemenu(env, console, context, GameSettings::instance().START_GAME_WAIT);
 
     env.log("enter_loading_game(): Game Loaded. Entering game...", COLOR_PURPLE);
     enter_game(context, backup_save, GameSettings::instance().ENTER_GAME_MASH, 0);
@@ -74,7 +74,7 @@ void enter_loading_game(
 }
 
 void start_game_from_home_with_inference(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     bool tolerate_update_menu,
     uint8_t game_slot,
     uint8_t user_slot,
@@ -82,7 +82,7 @@ void start_game_from_home_with_inference(
     uint16_t post_wait_time
 ){
     open_game_from_home(
-        env, context, console,
+        env, console, context,
         tolerate_update_menu,
         game_slot,
         user_slot,
@@ -90,11 +90,11 @@ void start_game_from_home_with_inference(
     );
 
     //  Wait for game to load.
-    enter_loading_game(env, context, console, backup_save, post_wait_time);
+    enter_loading_game(env, console, context, backup_save, post_wait_time);
 }
 
 void reset_game_from_home_with_inference(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     bool tolerate_update_menu,
     bool backup_save,
     uint16_t post_wait_time
@@ -102,7 +102,7 @@ void reset_game_from_home_with_inference(
     if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET || tolerate_update_menu){
         close_game(context);
         start_game_from_home_with_inference(
-            env, context, console, tolerate_update_menu, 0, 0, backup_save, post_wait_time
+            env, console, context, tolerate_update_menu, 0, 0, backup_save, post_wait_time
         );
         return;
     }
@@ -111,7 +111,7 @@ void reset_game_from_home_with_inference(
     context.wait_for_all_requests();
 
     //  Wait for game to load.
-    enter_loading_game(env, context, console, backup_save, post_wait_time);
+    enter_loading_game(env, console, context, backup_save, post_wait_time);
 }
 
 

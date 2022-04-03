@@ -90,7 +90,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, 
     env.update_stats();
 
     StandardEncounterHandler handler(
-        env, context, env.console,
+        env, env.console, context,
         LANGUAGE,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -111,7 +111,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, 
             StartBattleWatcher start_battle_detector;
 
             int result = run_until(
-                env, context, env.console,
+                env, env.console, context,
                 [](BotBaseContext& context){
                     pbf_mash_button(context, BUTTON_A, 60 * TICKS_PER_SECOND);
                 },
@@ -127,7 +127,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, 
                 stats.add_error();
                 env.update_stats();
                 pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
-                run_away(env, context, env.console, EXIT_BATTLE_TIMEOUT);
+                run_away(env, env.console, context, EXIT_BATTLE_TIMEOUT);
                 continue;
             case 1:
                 env.log("Battle started!");
@@ -142,7 +142,7 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, 
 
         //  Detect shiny.
         ShinyDetectionResult result = detect_shiny_battle(
-            env, context, env.console,
+            env, env.console, context,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );

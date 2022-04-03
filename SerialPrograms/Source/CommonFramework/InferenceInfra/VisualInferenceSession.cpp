@@ -32,12 +32,13 @@ VisualInferenceSession::VisualInferenceSession(
     VideoFeed& feed, VideoOverlay& overlay,
     std::chrono::milliseconds period
 )
-    : Cancellable(scope)
-    , m_logger(logger)
+    : m_logger(logger)
     , m_feed(feed)
     , m_overlay(overlay)
     , m_period(period)
-{}
+{
+    attach(scope);
+}
 VisualInferenceSession::~VisualInferenceSession(){
     detach();
     VisualInferenceSession::cancel();
@@ -160,7 +161,7 @@ AsyncVisualInferenceSession::AsyncVisualInferenceSession(
     VideoFeed& feed, VideoOverlay& overlay,
     std::chrono::milliseconds period
 )
-    : VisualInferenceSession(logger, scope, feed, overlay, period)
+    : m_session(logger, scope, feed, overlay, period)
     , m_triggering_callback(nullptr)
     , m_task(env.inference_dispatcher().dispatch([this]{ thread_body(); }))
 {}
@@ -170,13 +171,19 @@ AsyncVisualInferenceSession::AsyncVisualInferenceSession(
     std::function<void()> on_finish_callback,
     std::chrono::milliseconds period
 )
-    : VisualInferenceSession(logger, scope, feed, overlay, period)
+    : m_session(logger, scope, feed, overlay, period)
     , m_on_finish_callback(std::move(on_finish_callback))
     , m_triggering_callback(nullptr)
     , m_task(env.inference_dispatcher().dispatch([this]{ thread_body(); }))
 {}
 AsyncVisualInferenceSession::~AsyncVisualInferenceSession(){
-    VisualInferenceSession::cancel();
+    m_session.cancel();
+}
+void AsyncVisualInferenceSession::operator+=(VisualInferenceCallback& callback){
+    m_session += callback;
+}
+void AsyncVisualInferenceSession::operator-=(VisualInferenceCallback& callback){
+    m_session -= callback;
 }
 void AsyncVisualInferenceSession::rethrow_exceptions(){
     if (m_task){
@@ -184,7 +191,7 @@ void AsyncVisualInferenceSession::rethrow_exceptions(){
     }
 }
 VisualInferenceCallback* AsyncVisualInferenceSession::stop_and_rethrow(){
-    VisualInferenceSession::cancel();
+    m_session.cancel();
     if (m_task){
         m_task->wait_and_rethrow_exceptions();
     }
@@ -192,7 +199,7 @@ VisualInferenceCallback* AsyncVisualInferenceSession::stop_and_rethrow(){
 }
 void AsyncVisualInferenceSession::thread_body(){
     try{
-        m_triggering_callback = run();
+        m_triggering_callback = m_session.run();
         if (m_on_finish_callback){
             m_on_finish_callback();
         }

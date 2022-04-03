@@ -82,7 +82,7 @@ QImage read_type_array_retry(
 
 
 bool read_path(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     PathMap& path,
     const ImageFloatBox& box
 ){

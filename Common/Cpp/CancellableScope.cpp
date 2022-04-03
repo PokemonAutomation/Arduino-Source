@@ -16,6 +16,30 @@ namespace PokemonAutomation{
 
 
 
+void Cancellable::throw_if_cancelled(){
+    if (cancelled()){
+        throw OperationCancelledException();
+    }
+}
+void Cancellable::throw_if_parent_cancelled(){
+    if (m_scope){
+        m_scope->throw_if_cancelled();
+    }
+}
+void Cancellable::attach(CancellableScope& scope){
+    m_scope = &scope;
+    scope += *this;
+}
+void Cancellable::detach() noexcept{
+    if (m_scope){
+        *m_scope -= *this;
+    }
+}
+
+
+
+
+
 struct CancellableScopeData{
     std::set<Cancellable*> m_children;
 
@@ -26,16 +50,8 @@ struct CancellableScopeData{
 
 
 CancellableScope::CancellableScope(){}
-CancellableScope::CancellableScope(CancellableScope& parent)
-    : Cancellable(parent)
-{}
 CancellableScope::~CancellableScope(){
     detach();
-}
-void CancellableScope::throw_if_cancelled(){
-    if (cancelled()){
-        throw OperationCancelledException();
-    }
 }
 bool CancellableScope::cancel() noexcept{
     if (Cancellable::cancel()){

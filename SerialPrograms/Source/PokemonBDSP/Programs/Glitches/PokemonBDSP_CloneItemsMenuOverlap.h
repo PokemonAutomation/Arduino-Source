@@ -36,10 +36,10 @@ public:
 private:
     struct Stats;
 
-    bool trigger_encounter(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console);
-    void swap_party(BotBaseContext& context, ConsoleHandle& console);
-    void mash_B_to_battle(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console);
-    void detach_items(BotBaseContext& context, ConsoleHandle& console);
+    bool trigger_encounter(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+    void swap_party(ConsoleHandle& console, BotBaseContext& context);
+    void mash_B_to_battle(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+    void detach_items(ConsoleHandle& console, BotBaseContext& context);
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;

@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 
 
 
-class VisualInferenceSession : private Cancellable{
+class VisualInferenceSession final : public Cancellable{
 public:
     VisualInferenceSession(
         Logger& logger, CancellableScope& scope,
@@ -57,7 +57,7 @@ private:
 
 
 
-class AsyncVisualInferenceSession : private VisualInferenceSession{
+class AsyncVisualInferenceSession{
 public:
     AsyncVisualInferenceSession(
         ProgramEnvironment& env, Logger& logger, CancellableScope& scope,
@@ -74,8 +74,8 @@ public:
     //  This will not rethrow exceptions in the inference thread.
     ~AsyncVisualInferenceSession();
 
-    using VisualInferenceSession::operator+=;
-    using VisualInferenceSession::operator-=;
+    void operator+=(VisualInferenceCallback& callback);
+    void operator-=(VisualInferenceCallback& callback);
 
     //  Check if the thread died from an exception. If so, rethrow it.
     void rethrow_exceptions();
@@ -88,6 +88,7 @@ private:
     void thread_body();
 
 private:
+    VisualInferenceSession m_session;
     std::function<void()> m_on_finish_callback;
     VisualInferenceCallback* m_triggering_callback;
     std::unique_ptr<AsyncTask> m_task;

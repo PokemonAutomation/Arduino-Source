@@ -30,7 +30,7 @@ public:
     };
 
 public:
-    BeamSetter(ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console);
+    BeamSetter(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
 
     Detection run(
         bool save_screenshot,

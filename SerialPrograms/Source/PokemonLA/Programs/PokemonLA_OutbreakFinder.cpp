@@ -108,7 +108,7 @@ bool OutbreakFinder::read_outbreaks(
     current_region = MapRegion::NONE;
     size_t matches = 0;
     while (true){
-        current_region = detect_selected_region(env, context, env.console);
+        current_region = detect_selected_region(env, env.console, context);
         if (current_region == MapRegion::NONE){
             env.console.log("Unable to detect selected region.", COLOR_RED);
             return false;
@@ -150,7 +150,7 @@ bool OutbreakFinder::read_outbreaks(
     //  Scroll to next region without an outbreak.
     if (no_outbreak != MapRegion::NONE){
         while (true){
-            current_region = detect_selected_region(env, context, env.console);
+            current_region = detect_selected_region(env, env.console, context);
             if (current_region == MapRegion::NONE){
                 env.console.log("Unable to detect selected region.", COLOR_RED);
                 return false;
@@ -168,7 +168,7 @@ bool OutbreakFinder::read_outbreaks(
 void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env, BotBaseContext& context, MapRegion region){
     Stats& stats = env.stats<Stats>();
 
-    mash_A_to_change_region(env, context, env.console);
+    mash_A_to_change_region(env, env.console, context);
 
     Camp camp = Camp::FIELDLANDS_FIELDLANDS;
     switch (region){
@@ -201,7 +201,7 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
             std::chrono::milliseconds(200), true
         );
         int ret = run_until(
-            env, context, env.console,
+            env, env.console, context,
             [](BotBaseContext& context){
                 for (size_t c = 0; c < 10; c++){
                     pbf_press_button(context, BUTTON_A, 20, 125);
@@ -219,7 +219,7 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
         stats.errors++;
     }
 
-    mash_A_to_change_region(env, context, env.console);
+    mash_A_to_change_region(env, env.console, context);
 }
 
 
@@ -234,7 +234,7 @@ bool OutbreakFinder::run_iteration(
 
     MapDetector detector;
     int ret = run_until(
-        env, context, env.console,
+        env, env.console, context,
         [](BotBaseContext& context){
             for (size_t c = 0; c < 10; c++){
                 pbf_press_button(context, BUTTON_A, 20, 105);

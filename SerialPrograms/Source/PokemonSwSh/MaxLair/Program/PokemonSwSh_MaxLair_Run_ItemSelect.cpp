@@ -21,7 +21,7 @@ namespace MaxLairInternal{
 
 
 void run_item_select(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     GlobalStateTracker& state_tracker
 ){
     size_t console_index = console.index();
@@ -55,7 +55,7 @@ void run_item_select(
     //  Wait until we exit the window.
     ItemSelectDetector item_menu(true);
     wait_until(
-        env, context, console,
+        env, console, context,
         std::chrono::seconds(480),
         { &item_menu },
         INFERENCE_RATE

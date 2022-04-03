@@ -158,7 +158,7 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env, BotBaseContex
         env.update_stats();
 
         run_autohost(
-            env, context, env.console,
+            env, env.console, context,
             CATCHABILITY, SKIPS,
             &RAID_CODE, lobby_wait_delay,
             HOST_ONLINE, FRIEND_ACCEPT_USER_SLOT,
@@ -186,7 +186,7 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env, BotBaseContex
         }
 
         start_game_from_home_with_inference(
-            env, context, env.console,
+            env, env.console, context,
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW,
             ALTERNATE_GAMES ? 2 : 0, 0,
             BACKUP_SAVE

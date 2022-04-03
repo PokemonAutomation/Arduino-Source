@@ -24,7 +24,7 @@ namespace PokemonBDSP{
 class StandardEncounterHandler{
 public:
     StandardEncounterHandler(
-        ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+        ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
         Language language,
         EncounterBotCommonOptions& settings,
         PokemonSwSh::ShinyHuntTracker& session_stats

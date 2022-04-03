@@ -25,7 +25,7 @@ namespace PokemonBDSP{
 //  Returns the # of slots scrolled. Returns -1 if not found.
 int move_to_ball(
     const BattleBallReader& reader,
-    BotBaseContext& context, ConsoleHandle& console,
+    ConsoleHandle& console, BotBaseContext& context,
     const std::string& ball_slug,
     bool forward, int attempts, uint16_t delay
 ){
@@ -59,11 +59,11 @@ int move_to_ball(
 //  Returns -1 if unable to read.
 int16_t move_to_ball(
     const BattleBallReader& reader,
-    BotBaseContext& context, ConsoleHandle& console,
+    ConsoleHandle& console, BotBaseContext& context,
     const std::string& ball_slug
 ){
     //  Search forward at high speed.
-    int ret = move_to_ball(reader, context, console, ball_slug, true, 50, 30);
+    int ret = move_to_ball(reader, console, context, ball_slug, true, 50, 30);
     if (ret < 0){
         return 0;
     }
@@ -78,7 +78,7 @@ int16_t move_to_ball(
 
     //  Now try again in reverse at a lower speed in case we overshot.
     //  This will return immediately if we got it right the first time.
-    ret = move_to_ball(reader, context, console, ball_slug, false, 5, TICKS_PER_SECOND);
+    ret = move_to_ball(reader, console, context, ball_slug, false, 5, TICKS_PER_SECOND);
     if (ret < 0){
         return 0;
     }
@@ -92,7 +92,7 @@ int16_t move_to_ball(
 
 
 CatchResults throw_balls(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     Language language,
     const std::string& ball_slug
 ){
@@ -111,7 +111,7 @@ CatchResults throw_balls(
             pbf_press_button(context, BUTTON_X, 20, 105);
             context.wait_for_all_requests();
 
-            const int16_t num_balls = move_to_ball(reader, context, console, ball_slug);
+            const int16_t num_balls = move_to_ball(reader, console, context, ball_slug);
             if (num_balls < 0){
                 console.log("BasicCatcher: Unable to read quantity of ball " + ball_slug + ".");
             }
@@ -134,7 +134,7 @@ CatchResults throw_balls(
         ExperienceGainWatcher experience_detector;
         SelectionArrowFinder own_fainted_detector(console, {0.18, 0.64, 0.46, 0.3}, COLOR_YELLOW);
         int result = wait_until(
-            env, context, console,
+            env, console, context,
             std::chrono::seconds(60),
             {
                 &menu_detector,
@@ -164,14 +164,14 @@ CatchResults throw_balls(
 
 
 CatchResults basic_catcher(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     Language language,
     const std::string& ball_slug
 ){
     context.wait_for_all_requests();
     env.log("Attempting to catch with: " + ball_slug);
 
-    CatchResults results = throw_balls(env, context, console, language, ball_slug);
+    CatchResults results = throw_balls(env, console, context, language, ball_slug);
     const QString s = (results.balls_used <= 1 ? "" : "s");
     const QString pokeball_str = QString::number(results.balls_used) + " " +
         QString(ball_slug.c_str()) + s;
@@ -214,7 +214,7 @@ CatchResults basic_catcher(
         //  Look for the pokemon caught screen.
         ReceivePokemonDetector caught_detector;
         int ret = run_until(
-            env, context, console,
+            env, console, context,
             [=](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },

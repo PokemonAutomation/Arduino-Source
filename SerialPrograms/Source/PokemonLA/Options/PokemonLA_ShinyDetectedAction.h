@@ -99,7 +99,7 @@ bool run_on_shiny(
 
 
 void on_shiny_sound(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     ShinyDetectedActionOption& options,
     const ShinySoundResults& results
 );

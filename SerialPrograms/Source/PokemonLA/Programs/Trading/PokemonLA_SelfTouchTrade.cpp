@@ -75,7 +75,10 @@ std::unique_ptr<StatsTracker> SelfTouchTrade::make_stats() const{
 
 
 
-bool SelfTouchTrade::trade_one(MultiSwitchProgramEnvironment& env, std::map<std::string, int>& trades_left){
+bool SelfTouchTrade::trade_one(
+    MultiSwitchProgramEnvironment& env, CancellableScope& scope,
+    std::map<std::string, int>& trades_left
+){
     TradeStats& stats = env.stats<TradeStats>();
 
     ConsoleHandle& host = HOSTING_SWITCH == 0 ? env.consoles[0] : env.consoles[1];
@@ -105,8 +108,8 @@ bool SelfTouchTrade::trade_one(MultiSwitchProgramEnvironment& env, std::map<std:
     host.log("\"" + slug + "\" - Trades Remaining: " + std::to_string(iter->second));
 #if 1
     MultiConsoleErrorState error_state;
-    env.run_in_parallel([&](BotBaseContext& context, ConsoleHandle& console){
-        trade_current_pokemon(env, context, console, error_state, stats);
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+        trade_current_pokemon(env, console, context, error_state, stats);
     });
     stats.m_trades++;
     iter->second--;
@@ -155,7 +158,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
     }
 
     //  Connect both controllers.
-    env.run_in_parallel([&](BotBaseContext& context, ConsoleHandle& console){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
         pbf_press_button(context, BUTTON_LCLICK, 10, 0);
     });
 
@@ -179,7 +182,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
         bool host_ok, recv_ok;
         InferenceBoxScope box0(host, {0.925, 0.100, 0.014, 0.030});
         InferenceBoxScope box1(recv, {0.925, 0.100, 0.014, 0.030});
-        env.run_in_parallel([&](BotBaseContext& context, ConsoleHandle& console){
+        env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
             ImageStats stats = image_stats(extract_box_reference(console.video().snapshot(), box0));
             bool ok = is_white(stats);
             if (host.index() == console.index()){
@@ -196,7 +199,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScop
         //  Perform trade.
         bool traded = false;
         if (host_ok){
-            traded = trade_one(env, trades_left);
+            traded = trade_one(env, scope, trades_left);
         }else{
             recv.log("Skipping empty slot on host...", COLOR_PURPLE);
         }

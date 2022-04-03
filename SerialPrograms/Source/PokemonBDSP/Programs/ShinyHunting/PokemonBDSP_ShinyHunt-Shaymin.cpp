@@ -79,7 +79,7 @@ bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env, BotB
         BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
         ShortDialogWatcher dialog_detector;
         int result = run_until(
-            env, context, env.console,
+            env, env.console, context,
             [&](BotBaseContext& context){
                 while (true){
                     for (size_t c = 0; c < 5; c++){
@@ -106,7 +106,7 @@ bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env, BotB
         BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
         StartBattleDetector start_battle_detector(env.console);
         int result = run_until(
-            env, context, env.console,
+            env, env.console, context,
             [&](BotBaseContext& context){
                 while (true){
                     for (size_t c = 0; c < 5; c++){
@@ -137,7 +137,7 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, BotBaseConte
     env.update_stats();
 
     StandardEncounterHandler handler(
-        env, context, env.console,
+        env, env.console, context,
         Language::None,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -161,7 +161,7 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         DoublesShinyDetection result_wild;
         ShinyDetectionResult result_own;
         detect_shiny_battle(
-            env, context, env.console,
+            env, env.console, context,
             result_wild, result_own,
             WILD_POKEMON,
             std::chrono::seconds(30)

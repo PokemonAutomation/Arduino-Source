@@ -108,7 +108,7 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, BotBaseContext
         EndBattleWatcher end_battle;
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         int ret = run_until(
-            env, context, env.console,
+            env, env.console, context,
             [=](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
@@ -153,7 +153,7 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, BotBaseContex
     env.update_stats();
 
     StandardEncounterHandler handler(
-        env, context, env.console,
+        env, env.console, context,
         LANGUAGE,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -177,7 +177,7 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, BotBaseContex
         DoublesShinyDetection result_wild;
         ShinyDetectionResult result_own;
         detect_shiny_battle(
-            env, context, env.console,
+            env, env.console, context,
             result_wild, result_own,
             WILD_POKEMON,
             std::chrono::seconds(30)

@@ -21,8 +21,7 @@ namespace PokemonLA{
 class EscapeFromAttack : public SuperControlSession{
 public:
     EscapeFromAttack(
-        ProgramEnvironment& env,
-        ConsoleHandle& console,
+        ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
         std::chrono::seconds time_min,
         std::chrono::seconds time_limit,
         bool stop_on_shiny

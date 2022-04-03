@@ -75,9 +75,9 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
         add_program<ShinyHuntCustomPath_Descriptor, ShinyHuntCustomPath>();
     }
 
-    add_divider("---- Developer Tools ----");
-    add_program<MountDetectionTest_Descriptor, MountDetectionTest>();
     if (GlobalSettings::instance().DEVELOPER_MODE){
+        add_divider("---- Developer Tools ----");
+        add_program<MountDetectionTest_Descriptor, MountDetectionTest>();
         add_program<OverworldWatcher_Descriptor, OverworldWatcher>();
         add_program<ShinySoundListener_Descriptor, ShinySoundListener>();
         add_program<AlphaRoarListener_Descriptor, AlphaRoarListener>();

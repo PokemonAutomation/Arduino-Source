@@ -37,7 +37,7 @@ private:
     bool battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]);
     // From the bottom row of the Ace Trainer pair, heal Pokemon and return.
     // Return true if VS Seeker needs charging.
-    bool heal_after_battle_and_return(SingleSwitchProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console, uint8_t pp0[4], uint8_t pp1[4]);
+    bool heal_after_battle_and_return(SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]);
     // Starting in front of the Celestic Town Pokecenter, heal and return
     // to the Ace Trainer pair.
     void heal_at_center_and_return(LoggerQt& logger, BotBaseContext& context, uint8_t pp0[4], uint8_t pp1[4]);

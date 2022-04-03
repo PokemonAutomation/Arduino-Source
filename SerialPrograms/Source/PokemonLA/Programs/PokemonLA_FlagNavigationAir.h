@@ -22,7 +22,7 @@ namespace PokemonLA{
 class FlagNavigationAir : public SuperControlSession{
 public:
     FlagNavigationAir(
-        ProgramEnvironment& env, ConsoleHandle& console,
+        ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
         bool stop_on_shiny,
         uint16_t stop_radius,
         double flag_reached_delay,

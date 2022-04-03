@@ -105,7 +105,7 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env, BotBa
     env.update_stats();
 
     StandardEncounterHandler handler(
-        env, context, env.console,
+        env, env.console, context,
         LANGUAGE,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -137,7 +137,7 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env, BotBa
 
         //  Detect shiny.
         ShinyDetectionResult result = detect_shiny_battle(
-            env, context, env.console,
+            env, env.console, context,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );
@@ -145,7 +145,7 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env, BotBa
         if (result.shiny_type == ShinyType::UNKNOWN){
             stats.add_error();
             pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
-            run_away(env, context, env.console, EXIT_BATTLE_TIMEOUT);
+            run_away(env, env.console, context, EXIT_BATTLE_TIMEOUT);
             error = true;
             continue;
         }

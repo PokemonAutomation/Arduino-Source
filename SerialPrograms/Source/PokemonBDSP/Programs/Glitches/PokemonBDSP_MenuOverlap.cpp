@@ -17,7 +17,7 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-QImage activate_menu_overlap_from_overworld(BotBaseContext& context, ConsoleHandle& console){
+QImage activate_menu_overlap_from_overworld(ConsoleHandle& console, BotBaseContext& context){
     //  Capture screenshot.
     context.wait_for_all_requests();
     QImage start = console.video().snapshot();
@@ -33,7 +33,7 @@ QImage activate_menu_overlap_from_overworld(BotBaseContext& context, ConsoleHand
     pbf_press_button(context, BUTTON_ZR, 20, 250);
 
     //  Back out.
-    if (back_out_to_overworld_with_overlap(context, console, start, 4 * TICKS_PER_SECOND)){
+    if (back_out_to_overworld_with_overlap(console, context, start, 4 * TICKS_PER_SECOND)){
         return start;
     }
 
@@ -42,7 +42,7 @@ QImage activate_menu_overlap_from_overworld(BotBaseContext& context, ConsoleHand
 
 
 bool back_out_to_overworld_with_overlap(
-    BotBaseContext& context, ConsoleHandle& console,
+    ConsoleHandle& console, BotBaseContext& context,
     const QImage& start,
     uint16_t mash_B_start
 ){
@@ -90,7 +90,7 @@ bool back_out_to_overworld_with_overlap(
 }
 
 void back_out_to_overworld(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     const QImage& start
 ){
     console.log("Backing out to overworld...");
@@ -102,7 +102,7 @@ void back_out_to_overworld(
     background_all.make_overlays(boxes);
 
     int ret = run_until(
-        env, context, console,
+        env, console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 20 * TICKS_PER_SECOND);
         },

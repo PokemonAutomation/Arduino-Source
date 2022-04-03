@@ -24,7 +24,7 @@ namespace PokemonBDSP{
 
 
 bool gamemenu_to_ingame(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     uint16_t mash_duration, uint16_t enter_game_timeout
 ){
     console.log("Mashing A to enter game...");
@@ -33,7 +33,7 @@ bool gamemenu_to_ingame(
     context.wait_for_all_requests();
     console.log("Waiting to enter game...");
     int ret = wait_until(
-        env, context, console,
+        env, console, context,
         std::chrono::milliseconds(enter_game_timeout * (1000 / TICKS_PER_SECOND)),
         { &detector }
     );
@@ -46,14 +46,14 @@ bool gamemenu_to_ingame(
     }
 }
 bool openedgame_to_ingame(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     uint16_t load_game_timeout,
     uint16_t mash_duration, uint16_t enter_game_timeout,
     uint16_t post_wait_time
 ){
     bool ok = true;
-    ok &= openedgame_to_gamemenu(env, context, console, load_game_timeout);
-    ok &= gamemenu_to_ingame(env, context, console, mash_duration, enter_game_timeout);
+    ok &= openedgame_to_gamemenu(env, console, context, load_game_timeout);
+    ok &= gamemenu_to_ingame(env, console, context, mash_duration, enter_game_timeout);
     if (!ok){
         dump_image(console.logger(), env.program_info(), "StartGame", console.video().snapshot());
     }
@@ -67,14 +67,14 @@ bool openedgame_to_ingame(
 
 
 bool reset_game_from_home(
-    ProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     bool tolerate_update_menu,
     uint16_t post_wait_time
 ){
     if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET || tolerate_update_menu){
         close_game(context);
         open_game_from_home(
-            env, context, console,
+            env, console, context,
             tolerate_update_menu,
             0, 0,
             GameSettings::instance().START_GAME_MASH
@@ -84,7 +84,7 @@ bool reset_game_from_home(
         pbf_mash_button(context, BUTTON_A, GameSettings::instance().START_GAME_MASH);
     }
     bool ret = openedgame_to_ingame(
-        env, context, console,
+        env, console, context,
         GameSettings::instance().START_GAME_WAIT,
         GameSettings::instance().ENTER_GAME_MASH,
         GameSettings::instance().ENTER_GAME_WAIT,

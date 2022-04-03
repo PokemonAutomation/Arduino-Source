@@ -98,7 +98,7 @@ bool OverworldTrigger::find_encounter(SingleSwitchProgramEnvironment& env, BotBa
     if (TRIGGER_METHOD < 6){
         //  Move character back and forth to trigger encounter.
         result = run_until(
-            env, context, env.console,
+            env, env.console, context,
             [&](BotBaseContext& context){
                 while (true) {
                     run_trigger(context);
@@ -111,7 +111,7 @@ bool OverworldTrigger::find_encounter(SingleSwitchProgramEnvironment& env, BotBa
         );
     }else{
         //  Use Sweet Scent to trigger encounter.
-        overworld_to_menu(env, context, env.console);
+        overworld_to_menu(env, env.console, context);
 
         //  Go to pokemon page
         const uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
@@ -142,7 +142,7 @@ bool OverworldTrigger::find_encounter(SingleSwitchProgramEnvironment& env, BotBa
         pbf_mash_button(context, BUTTON_ZL, 30);
 
         result = wait_until(
-            env, context, env.console, std::chrono::seconds(30),
+            env, env.console, context, std::chrono::seconds(30),
             { &battle_menu_detector, &start_battle_detector }
         );
         if (result < 0){

@@ -121,7 +121,7 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
             box_to_overworld(context);
             save_game(context);
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             withdraw_1st_column_from_overworld(context);
             column = 0;
         }

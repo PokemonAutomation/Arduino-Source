@@ -32,7 +32,10 @@ public:
     virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
-    bool move_to_next(MultiSwitchProgramEnvironment& env, uint8_t& row, uint8_t& col);
+    bool move_to_next(
+        MultiSwitchProgramEnvironment& env, CancellableScope& scope,
+        uint8_t& row, uint8_t& col
+    );
 
 private:
     class Stats;

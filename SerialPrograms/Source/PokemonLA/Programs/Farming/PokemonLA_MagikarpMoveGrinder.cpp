@@ -80,7 +80,7 @@ std::unique_ptr<StatsTracker> MagikarpMoveGrinder::make_stats() const{
 
 
 
-void MagikarpMoveGrinder::switch_pokemon(BotBaseContext& context, ConsoleHandle& console, size_t& next_pokemon_in_party_order){
+void MagikarpMoveGrinder::switch_pokemon(ConsoleHandle& console, BotBaseContext& context, size_t& next_pokemon_in_party_order){
     // Move past leading fainted pokemon
     for(size_t i = 0; i < next_pokemon_in_party_order; i++){
         pbf_press_dpad(context, DPAD_DOWN, 20, 80);
@@ -134,7 +134,7 @@ bool MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, B
         BattlePokemonSwitchDetector pokemon_switch_detector(env.console, env.console, stop_on_detected);
         ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(200), stop_on_detected);
         int ret = wait_until(
-            env, context, env.console, std::chrono::minutes(2),
+            env, env.console, context, std::chrono::minutes(2),
             {
                 &battle_menu_detector,
                 &pokemon_switch_detector,
@@ -193,7 +193,7 @@ bool MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, B
                 // Go to the switching pokemon screen:
                 pbf_press_dpad(context, DPAD_DOWN, 20, 100);
                 
-                switch_pokemon(context, env.console, cur_pokemon);
+                switch_pokemon(env.console, context, cur_pokemon);
 
 #ifdef DEBUG_NO_PP
                 static int count = 0;
@@ -212,7 +212,7 @@ bool MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, B
                 env.console.log("All pokemon grinded. Stop program.");
                 break;
             }
-            switch_pokemon(context, env.console, cur_pokemon);
+            switch_pokemon(env.console, context, cur_pokemon);
         }
         else{ // ret is 2
             env.console.log("Battle finished.");

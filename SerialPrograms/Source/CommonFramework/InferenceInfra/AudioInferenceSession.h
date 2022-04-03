@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 
 
 
-class AudioInferenceSession : private Cancellable{
+class AudioInferenceSession final : public Cancellable{
 public:
     AudioInferenceSession(
         Logger& logger, CancellableScope& scope,
@@ -52,7 +52,7 @@ private:
 };
 
 
-class AsyncAudioInferenceSession : private AudioInferenceSession{
+class AsyncAudioInferenceSession{
 public:
     AsyncAudioInferenceSession(
         ProgramEnvironment& env, Logger& logger, CancellableScope& scope,
@@ -69,8 +69,8 @@ public:
     //  This will not rethrow exceptions in the inference thread.
     virtual ~AsyncAudioInferenceSession();
 
-    using AudioInferenceSession::operator+=;
-    using AudioInferenceSession::operator-=;
+    void operator+=(AudioInferenceCallback& callback);
+    void operator-=(AudioInferenceCallback& callback);
 
     //  Check if the thread died from an exception. If so, rethrow it.
     void rethrow_exceptions();
@@ -83,6 +83,7 @@ private:
     void thread_body();
 
 private:
+    AudioInferenceSession m_session;
     std::function<void()> m_on_finish_callback;
     AudioInferenceCallback* m_triggering_callback;
     std::unique_ptr<AsyncTask> m_task;

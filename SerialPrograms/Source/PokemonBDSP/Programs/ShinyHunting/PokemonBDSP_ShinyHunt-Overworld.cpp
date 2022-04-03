@@ -92,7 +92,7 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, BotBaseCon
     env.update_stats();
 
     StandardEncounterHandler handler(
-        env, context, env.console,
+        env, env.console, context,
         LANGUAGE,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -116,7 +116,7 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, BotBaseCon
         DoublesShinyDetection result_wild;
         ShinyDetectionResult result_own;
         detect_shiny_battle(
-            env, context, env.console,
+            env, env.console, context,
             result_wild, result_own,
             WILD_POKEMON,
             std::chrono::seconds(30)

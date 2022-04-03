@@ -134,7 +134,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
         EndBattleWatcher end_battle;
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         int ret = run_until(
-            env, context, env.console,
+            env, env.console, context,
             [=](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 30 * TICKS_PER_SECOND);
             },
@@ -197,7 +197,7 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
 }
 
 
-void MoneyFarmerRoute212::heal_at_center_and_return(BotBaseContext& context, ConsoleHandle& console, uint8_t pp[4]){
+void MoneyFarmerRoute212::heal_at_center_and_return(ConsoleHandle& console, BotBaseContext& context, uint8_t pp[4]){
     console.log("Healing " + STRING_POKEMON + " at Hearthome City " + STRING_POKEMON + " Center.");
     pbf_move_left_joystick(context, 125, 0, 6 * TICKS_PER_SECOND, 0);
     pbf_mash_button(context, BUTTON_ZL, 3 * TICKS_PER_SECOND);
@@ -230,27 +230,27 @@ void MoneyFarmerRoute212::heal_at_center_and_return(BotBaseContext& context, Con
 }
 
 
-void MoneyFarmerRoute212::fly_to_center_heal_and_return(BotBaseContext& context, ConsoleHandle& console, uint8_t pp[4]){
+void MoneyFarmerRoute212::fly_to_center_heal_and_return(ConsoleHandle& console, BotBaseContext& context, uint8_t pp[4]){
     console.log("Flying back to Hearthome City to heal.");
     pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
     pbf_press_button(context, BUTTON_PLUS, 10, 240);
     pbf_press_dpad(context, DPAD_UP, 10, 60);
     pbf_press_dpad(context, DPAD_UP, 10, 60);
     pbf_mash_button(context, BUTTON_ZL, 12 * TICKS_PER_SECOND);
-    heal_at_center_and_return(context, console, pp);
+    heal_at_center_and_return(console, context, pp);
 }
 
 bool MoneyFarmerRoute212::heal_after_battle_and_return(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context, ConsoleHandle& console,
+    SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     uint8_t pp[4])
 {
     if (HEALING_METHOD == 0){
         // Go to Hearhome City Pokecenter to heal the party.
-        fly_to_center_heal_and_return(context, console, pp);
+        fly_to_center_heal_and_return(console, context, pp);
         return false;
     }else{
         // Use Global Room to heal the party.
-        heal_by_global_room(env, context, console);
+        heal_by_global_room(env, console, context);
 
         pp[0] = MOVE1_PP;
         pp[1] = MOVE2_PP;
@@ -293,11 +293,11 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
 
     bool need_to_charge = true;
     if (START_LOCATION == 0){
-        heal_at_center_and_return(context, env.console, pp);
+        heal_at_center_and_return(env.console, context, pp);
         need_to_charge = false;
     }else{
         if (HEALING_METHOD == 1){
-            heal_by_global_room(env, context, env.console);
+            heal_by_global_room(env, env.console, context);
         }
         pbf_move_left_joystick(context, 255, 128, 180, 0);
     }
@@ -327,7 +327,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         {
             VSSeekerReactionTracker tracker(env.console, {0.23, 0.30, 0.35, 0.30});
             run_until(
-                env, context, env.console,
+                env, env.console, context,
                 [=](BotBaseContext& context){
                     SHORTCUT.run(context, TICKS_PER_SECOND);
 
@@ -378,7 +378,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
 
             //  Check PP.
             if (total_pp(pp) == 0){
-                need_to_charge = heal_after_battle_and_return(env, context, env.console, pp);
+                need_to_charge = heal_after_battle_and_return(env, env.console, context, pp);
                 continue;
             }
         }
@@ -406,7 +406,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
 
             //  Check PP.
             if (total_pp(pp) == 0){
-                need_to_charge = heal_after_battle_and_return(env, context, env.console, pp);
+                need_to_charge = heal_after_battle_and_return(env, env.console, context, pp);
                 continue;
             }
         }

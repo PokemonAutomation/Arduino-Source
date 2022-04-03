@@ -68,7 +68,7 @@ public:
 
 
 //  A wrapper for BotBase that allows for asynchronous cancelling.
-class BotBaseContext : public CancellableScope{
+class BotBaseContext final : public CancellableScope{
 public:
     BotBaseContext(BotBase& botbase)
         : m_botbase(botbase)
@@ -76,7 +76,9 @@ public:
     BotBaseContext(CancellableScope& parent, BotBase& botbase)
         : CancellableScope(parent)
         , m_botbase(botbase)
-    {}
+    {
+        attach(parent);
+    }
     virtual ~BotBaseContext(){
         detach();
     }

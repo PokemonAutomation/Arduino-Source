@@ -95,11 +95,11 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, BotBas
     Stats& stats = env.stats<Stats>();
     stats.attempts++;
 
-    goto_camp_from_jubilife(env, context, env.console, TRAVEL_LOCATION);
+    goto_camp_from_jubilife(env, env.console, context, TRAVEL_LOCATION);
 
     {
         FlagNavigationAir session(
-            env, env.console,
+            env, env.console, context,
             SHINY_DETECTED.stop_on_shiny(),
             STOP_DISTANCE,
             FLAG_REACHED_DELAY,
@@ -109,12 +109,12 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, BotBas
 
         if (session.detected_shiny()){
             stats.shinies++;
-            on_shiny_sound(env, context, env.console, SHINY_DETECTED, session.shiny_sound_results());
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED, session.shiny_sound_results());
         }
     }
 
     pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-    reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+    reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 }
 
 
@@ -137,7 +137,7 @@ void ShinyHuntFlagPin::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         }catch (OperationFailedException&){
             stats.errors++;
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, context, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
     }
 
