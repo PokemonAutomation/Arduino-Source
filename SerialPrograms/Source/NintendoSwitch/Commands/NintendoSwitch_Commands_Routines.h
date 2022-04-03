@@ -13,7 +13,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void close_game(const BotBaseContext& device);
+void close_game(BotBaseContext& device);
 
 
 

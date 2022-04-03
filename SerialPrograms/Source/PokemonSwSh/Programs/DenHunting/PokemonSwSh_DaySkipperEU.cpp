@@ -67,7 +67,7 @@ std::unique_ptr<StatsTracker> DaySkipperEU::make_stats() const{
     return std::unique_ptr<StatsTracker>(new SkipperStats());
 }
 
-void DaySkipperEU::program(SingleSwitchProgramEnvironment& env){
+void DaySkipperEU::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     SkipperStats& stats = env.stats<SkipperStats>();
     stats.runs++;
 
@@ -80,11 +80,11 @@ void DaySkipperEU::program(SingleSwitchProgramEnvironment& env){
     uint32_t remaining_skips = SKIPS;
 
     //  Connect
-    pbf_press_button(env.console, BUTTON_ZR, 5, 5);
+    pbf_press_button(context, BUTTON_ZR, 5, 5);
 
     //  Setup starting state.
-    skipper_init_view(env.console);
-    skipper_rollback_year_full(env.console, false);
+    skipper_init_view(context);
+    skipper_rollback_year_full(context, false);
     year = 0;
 
     uint16_t correct_count = 0;
@@ -96,7 +96,7 @@ void DaySkipperEU::program(SingleSwitchProgramEnvironment& env){
             stats.to_str_current(remaining_skips)
         );
 
-        skipper_increment_day(env.console, false);
+        skipper_increment_day(context, false);
 
         correct_count++;
         year++;
@@ -107,21 +107,21 @@ void DaySkipperEU::program(SingleSwitchProgramEnvironment& env){
 
         if (year >= 60){
             if (real_life_year <= 36){
-                skipper_rollback_year_sync(env.console);
+                skipper_rollback_year_sync(context);
                 year = real_life_year;
             }else{
-                skipper_rollback_year_full(env.console, false);
+                skipper_rollback_year_full(context, false);
                 year = 0;
             }
         }
         if (CORRECTION_SKIPS != 0 && correct_count == CORRECTION_SKIPS){
             correct_count = 0;
-            skipper_auto_recovery(env.console);
+            skipper_auto_recovery(context);
         }
     }
 
     //  Prevent the Switch from sleeping and the time from advancing.
-    env.console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
         env.program_info(),
@@ -129,9 +129,9 @@ void DaySkipperEU::program(SingleSwitchProgramEnvironment& env){
         stats.to_str_current(remaining_skips)
     );
 
-    pbf_wait(env.console, 15 * TICKS_PER_SECOND);
+    pbf_wait(context, 15 * TICKS_PER_SECOND);
     while (true){
-        ssf_press_button1(env.console, BUTTON_A, 15 * TICKS_PER_SECOND);
+        ssf_press_button1(context, BUTTON_A, 15 * TICKS_PER_SECOND);
     }
 }
 

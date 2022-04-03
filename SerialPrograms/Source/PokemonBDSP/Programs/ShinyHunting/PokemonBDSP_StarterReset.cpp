@@ -90,13 +90,13 @@ std::unique_ptr<StatsTracker> StarterReset::make_stats() const{
 
 
 
-void StarterReset::program(SingleSwitchProgramEnvironment& env){
+void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     QImage briefcase(RESOURCE_PATH() + "PokemonBDSP/StarterBriefcase.png");
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_B, 5, 5);
+    pbf_press_button(context, BUTTON_B, 5, 5);
 
     size_t consecutive_failures = 0;
 
@@ -109,8 +109,8 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
         }
 
         if (reset){
-            pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-            if (!reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
+            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+            if (!reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
                 stats.add_error();
                 consecutive_failures++;
                 continue;
@@ -119,13 +119,13 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
         reset = true;
 
         //  Enter the lake.
-        pbf_move_left_joystick(env.console, 128, 0, TICKS_PER_SECOND, 0);
+        pbf_move_left_joystick(context, 128, 0, TICKS_PER_SECOND, 0);
 
         //  Mash B until we see the briefcase.
         ImageMatchWatcher detector(briefcase, {0.5, 0.1, 0.5, 0.7}, 100, true);
         int ret = run_until(
-            env, env.console,
-            [](const BotBaseContext& context){
+            env, env.console, context,
+            [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             { &detector }
@@ -142,7 +142,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
 
         //  Wait for briefcase to fully open.
         env.log("Mashing B for briefcase to fully open.");
-        pbf_mash_button(env.console, BUTTON_B, 2 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
 
         //  Scroll to your starter.
         size_t scroll = 0;
@@ -156,17 +156,17 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
             scroll = 2;
         }
         for (size_t c = 0; c < scroll; c++){
-            pbf_press_dpad(env.console, DPAD_RIGHT, 20, 105);
+            pbf_press_dpad(context, DPAD_RIGHT, 20, 105);
         }
 
         //  Select starter.
-        pbf_press_button(env.console, BUTTON_ZL, 20, 30);
-        env.console.botbase().wait_for_all_requests();
+        pbf_press_button(context, BUTTON_ZL, 20, 30);
+        context.wait_for_all_requests();
 
         {
             SelectionArrowFinder selection_arrow(env.console, {0.50, 0.60, 0.35, 0.20}, COLOR_RED);
             ret = wait_until(
-                env, env.console, std::chrono::seconds(3),
+                env, env.console, context, std::chrono::seconds(3),
                 { &selection_arrow }
             );
             if (ret == 0){
@@ -175,17 +175,17 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
                 env.log("Timed out waiting for selection prompt.", COLOR_RED);
                 consecutive_failures++;
             }
-            pbf_wait(env.console, 50);
-            pbf_press_dpad(env.console, DPAD_UP, 10, 50);
-            pbf_press_button(env.console, BUTTON_ZL, 10, 5 * TICKS_PER_SECOND);
-            env.console.botbase().wait_for_all_requests();
+            pbf_wait(context, 50);
+            pbf_press_dpad(context, DPAD_UP, 10, 50);
+            pbf_press_button(context, BUTTON_ZL, 10, 5 * TICKS_PER_SECOND);
+            context.wait_for_all_requests();
         }
 
         //  Detect shiny.
         DoublesShinyDetection result_wild;
         ShinyDetectionResult result_own;
         detect_shiny_battle(
-            env, env.console,
+            env, env.console, context,
             result_wild, result_own,
             YOUR_POKEMON,
             std::chrono::seconds(30)
@@ -253,14 +253,14 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env){
         }
 
         if ((wild_shiny || your_shiny) && VIDEO_ON_SHINY){
-            pbf_wait(env.console, 5 * TICKS_PER_SECOND);
-            pbf_press_button(env.console, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+            pbf_wait(context, 5 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
         }
 
     }
 
     env.update_stats();
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

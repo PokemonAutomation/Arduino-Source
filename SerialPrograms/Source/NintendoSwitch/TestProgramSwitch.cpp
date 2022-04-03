@@ -165,6 +165,9 @@
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "PokemonLA/Programs/PokemonLA_MountChange.h"
+#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
+#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
+#include "Common/Cpp/CancellableScope.h"
 #include "TestProgramSwitch.h"
 
 #include <immintrin.h>
@@ -226,7 +229,7 @@ TestProgram::TestProgram(const TestProgram_Descriptor& descriptor)
 
 
 //using namespace Kernels;
-//using namespace Kernels::Waterfill;
+using namespace Kernels::Waterfill;
 
 using namespace PokemonLA;
 
@@ -234,7 +237,14 @@ using namespace PokemonLA;
 
 
 
-void TestProgram::program(MultiSwitchProgramEnvironment& env){
+
+
+
+
+
+
+
+void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace Kernels::Waterfill;
     using namespace OCR;
@@ -243,11 +253,80 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 //    using namespace PokemonBDSP;
 //    using namespace PokemonLA;
 
-     LoggerQt& logger = env.logger();
-     ConsoleHandle& console = env.consoles[0];
-//     BotBase& botbase = env.consoles[0];
-     VideoFeed& feed = env.consoles[0];
-     VideoOverlay& overlay = env.consoles[0];
+    LoggerQt& logger = env.logger();
+    ConsoleHandle& console = env.consoles[0];
+//    BotBase& botbase = env.consoles[0];
+    VideoFeed& feed = env.consoles[0];
+    VideoOverlay& overlay = env.consoles[0];
+
+
+    scope.wait_for(std::chrono::seconds(60));
+
+
+
+#if 0
+    {
+        std::unique_ptr<CancellableScope> scope0(new CancellableScope());
+//        std::unique_ptr<CancellableScope> scope1;
+//        std::unique_ptr<CancellableScope> scope2;
+        auto task = env.inference_dispatcher().dispatch([&]{
+            CancellableScope scope1(*scope0);
+            CancellableScope scope2(scope1);
+//            scope1 = std::make_unique<CancellableScope>(*scope0);
+//            scope2 = std::make_unique<CancellableScope>(*scope1);
+            scope2.wait_for(std::chrono::seconds(10));
+            scope1.wait_for(std::chrono::seconds(4));
+
+
+        });
+        cout << "waiting..." << endl;
+
+        scope0->wait_for(std::chrono::seconds(4));
+        cout << "stopping" << endl;
+//        scope0.cancel();
+        scope0.reset();
+
+//        scope0.wait_for(std::chrono::seconds(20));
+    }
+    cout << "stopped" << endl;
+#endif
+
+
+
+#if 0
+//    QImage image("screenshot-20220327-190703102304.png");
+    QImage image = feed.snapshot();
+    ArcPhoneDetector detector(console, console, std::chrono::milliseconds(0), true);
+    detector.process_frame(image, std::chrono::system_clock::now());
+#endif
+
+
+
+#if 0
+    InferenceBoxScope box(overlay, 0.010, 0.700, 0.050, 0.100);
+    QImage image = extract_box_copy(feed.snapshot(), box);
+
+
+    auto matrix = compress_rgb32_to_binary_range(image, 0xff808080, 0xffffffff);
+
+//    auto session = make_WaterfillSession(matrix);
+    std::vector<WaterfillObject> objects = find_objects_inplace(matrix, 20);
+    cout << "objects = " << objects.size() << endl;
+    int c = 0;
+    for (const WaterfillObject& object : objects){
+        extract_box_reference(image, object).save("test-" + QString::number(c++) + ".png");
+    }
+#endif
+
+
+
+#if 0
+    QImage image("ArcPhoneTriggered-2.png");
+
+    ArcPhoneDetector detector(console, console, std::chrono::milliseconds(0), true);
+    cout << detector.process_frame(image, std::chrono::system_clock::now()) << endl;
+#endif
+
 
 
 //    change_mount(console, MountState::WYRDEER_ON);
@@ -262,7 +341,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 #endif
 
 
-#if 1
+#if 0
     FlagTracker tracker(logger, overlay);
 
 
@@ -283,28 +362,28 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 #if 0
-    QImage image("MountOn-Braviary-Original.png");
+    QImage image("ButtonMinus-Original-test.png");
     image = image.convertToFormat(QImage::Format_ARGB32);
 
     int width = image.width();
     int height = image.height();
-    int plus_min_x = width - 29;
-    int plus_max_x = width - 10;
-    int plus_min_y = height - 23;
-    int plus_max_y = height - 4;
+    int plus_min_x = 3;
+    int plus_max_x = 24;
+    int plus_min_y = 9;
+    int plus_max_y = 18;
     for (int r = 0; r < height; r++){
         for (int c = 0; c < width; c++){
             if (plus_min_x < c && c < plus_max_x && plus_min_y < r && r < plus_max_y){
                 continue;
             }
             QRgb pixel = image.pixel(c, r);
-            if (qRed(pixel) < 128 || qGreen(pixel) < 128){
+            if (qRed(pixel) < 128 || qGreen(pixel) < 128 || qBlue(pixel) < 128){
                 image.setPixel(c, r, 0);
             }
         }
     }
 
-    image.save("MountOn-Braviary-Template.png");
+    image.save("ButtonMinus-Template.png");
 #endif
 
 
@@ -319,13 +398,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 #if 0
     change_mount(console, MountState::BRAVIARY_ON);
 
-    pbf_move_left_joystick(console, 160, 0, 160, 0);
-    pbf_mash_button(console, BUTTON_B, 375);
+    pbf_move_left_joystick(context, 160, 0, 160, 0);
+    pbf_mash_button(context, BUTTON_B, 375);
 #endif
 
 
 
-#if 1
+#if 0
     QImage image("screenshot-20220320-021110586101.png");
 //    QRgb pixel = image.pixel(1848, 761);
 //    cout << qRed(pixel) << ", " << qGreen(pixel) << ", " << qBlue(pixel) << endl;
@@ -444,10 +523,10 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 #if 0
-    pbf_move_left_joystick(console, 0, 0, 50, 0);
-    pbf_press_button(console, BUTTON_B, 20, 250);
-    pbf_mash_button(console, BUTTON_ZL, 250);
-    pbf_press_button(console, BUTTON_HOME, 20, 230);
+    pbf_move_left_joystick(context, 0, 0, 50, 0);
+    pbf_press_button(context, BUTTON_B, 20, 250);
+    pbf_mash_button(context, BUTTON_ZL, 250);
+    pbf_press_button(context, BUTTON_HOME, 20, 230);
 #endif
 
 #if 0
@@ -508,10 +587,10 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 #if 0
-    pbf_press_dpad(console, DPAD_UP, 20, 480);
-    pbf_press_button(console, BUTTON_A, 20, 480);
-    pbf_press_button(console, BUTTON_B, 20, 230);
-    pbf_press_button(console, BUTTON_B, 20, 230);
+    pbf_press_dpad(context, DPAD_UP, 20, 480);
+    pbf_press_button(context, BUTTON_A, 20, 480);
+    pbf_press_button(context, BUTTON_B, 20, 230);
+    pbf_press_button(context, BUTTON_B, 20, 230);
 #endif
 
 
@@ -613,17 +692,17 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 #if 0
-    pbf_move_right_joystick(console, 0, 128, 145, 0);
-    pbf_move_left_joystick(console, 128, 0, 50, 0);
-    pbf_press_button(console, BUTTON_B, 500, 125);
+    pbf_move_right_joystick(context, 0, 128, 145, 0);
+    pbf_move_left_joystick(context, 128, 0, 50, 0);
+    pbf_press_button(context, BUTTON_B, 500, 125);
 
-    pbf_move_right_joystick(console, 255, 128, 45, 0);
-    pbf_move_left_joystick(console, 128, 0, 50, 0);
-    pbf_press_button(console, BUTTON_B, 420, 125);
+    pbf_move_right_joystick(context, 255, 128, 45, 0);
+    pbf_move_left_joystick(context, 128, 0, 50, 0);
+    pbf_press_button(context, BUTTON_B, 420, 125);
 
-    pbf_move_right_joystick(console, 0, 128, 100, 0);
-    pbf_move_left_joystick(console, 128, 0, 50, 0);
-    pbf_press_button(console, BUTTON_B, 420, 125);
+    pbf_move_right_joystick(context, 0, 128, 100, 0);
+    pbf_move_left_joystick(context, 128, 0, 50, 0);
+    pbf_press_button(context, BUTTON_B, 420, 125);
 #endif
 
 
@@ -688,7 +767,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 //    cout << std::chrono::system_clock::time_point::min() - std::chrono::system_clock::now() << endl;
 
-//    pbf_move_right_joystick(console, 0, 128, 45, 0);
+//    pbf_move_right_joystick(context, 0, 128, 45, 0);
 
 
 
@@ -980,7 +1059,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env){
 
 
 
-    env.wait_for(std::chrono::seconds(60));
+    scope.wait_for(std::chrono::seconds(60));
 
 
 }

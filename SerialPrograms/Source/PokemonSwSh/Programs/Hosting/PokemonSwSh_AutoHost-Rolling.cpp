@@ -132,7 +132,7 @@ std::unique_ptr<StatsTracker> AutoHostRolling::make_stats() const{
 
 
 
-void AutoHostRolling::program(SingleSwitchProgramEnvironment& env){
+void AutoHostRolling::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     uint16_t start_raid_delay = HOST_ONLINE
         ? OPEN_ONLINE_DEN_LOBBY_DELAY
         : GameSettings::instance().OPEN_LOCAL_DEN_LOBBY_DELAY;
@@ -141,24 +141,24 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env){
         : LOBBY_WAIT_DELAY - start_raid_delay;
 
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
+        grip_menu_connect_go_home(context);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
     }
 
     if (SKIPS == 0){
-        TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.console);
+        TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(context);
     }
-    rollback_date_from_home(env.console, SKIPS);
-    resume_game_front_of_den_nowatts(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
+    rollback_date_from_home(context, SKIPS);
+    resume_game_front_of_den_nowatts(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
 
     for (uint32_t raids = 0;; raids++){
         env.log("Raids Attempted: " + tostr_u_commas(raids));
         env.update_stats();
 
         run_autohost(
-            env, env.console,
+            env, env.console, context,
             CATCHABILITY, SKIPS,
             &RAID_CODE, lobby_wait_delay,
             HOST_ONLINE, FRIEND_ACCEPT_USER_SLOT,
@@ -172,21 +172,21 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env){
         );
 
         //  Exit game.
-        ssf_press_button2(env.console, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
-        close_game(env.console);
+        ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
+        close_game(context);
 
         //  Post-raid delay.
-        pbf_wait(env.console, EXTRA_DELAY_BETWEEN_RAIDS);
+        pbf_wait(context, EXTRA_DELAY_BETWEEN_RAIDS);
 
         //  Touch the date.
         if (SKIPS == 0){
-            TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.console);
+            TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(context);
         }else{
-            rollback_date_from_home(env.console, SKIPS);
+            rollback_date_from_home(context, SKIPS);
         }
 
         start_game_from_home_with_inference(
-            env, env.console,
+            env, env.console, context,
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW,
             ALTERNATE_GAMES ? 2 : 0, 0,
             BACKUP_SAVE

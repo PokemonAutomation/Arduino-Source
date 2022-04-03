@@ -63,19 +63,19 @@ ShinyHuntUnattendedRegi::ShinyHuntUnattendedRegi(const ShinyHuntUnattendedRegi_D
 
 
 
-void ShinyHuntUnattendedRegi::program(SingleSwitchProgramEnvironment& env){
+void ShinyHuntUnattendedRegi::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
+        grip_menu_connect_go_home(context);
+        resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
     uint16_t correct_count = 0;
     for (uint32_t c = 0; ; c++){
         //  Auto-correction.
         bool correct = CORRECTION_INTERVAL > 0 && correct_count >= CORRECTION_INTERVAL;
-        move_to_corner(env, correct, TRANSITION_DELAY);
+        move_to_corner(env.console, context, correct, TRANSITION_DELAY);
         if (correct){
             correct_count = 0;
         }
@@ -83,35 +83,35 @@ void ShinyHuntUnattendedRegi::program(SingleSwitchProgramEnvironment& env){
         //  Touch the date.
         if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
             env.log("Touching date to prevent rollover.");
-            pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-            touch_date_from_home(env.console, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-            resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+            touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+            resume_game_no_interact(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
 
 
         //  Do the light puzzle.
-        run_regi_light_puzzle(env, REGI_NAME, c);
+        run_regi_light_puzzle(env.console, context, REGI_NAME, c);
 
-        pbf_press_button(env.console, BUTTON_A, 10, 100);
-        pbf_press_button(env.console, BUTTON_A, 10, 100);
+        pbf_press_button(context, BUTTON_A, 10, 100);
+        pbf_press_button(context, BUTTON_A, 10, 100);
         if (START_TO_RUN_DELAY >= 500){
             //  Extra A press to fix A parity if the lights were messed up.
-            pbf_press_button(env.console, BUTTON_A, 10, 500);
-            pbf_press_button(env.console, BUTTON_A, 10, START_TO_RUN_DELAY - 500);
+            pbf_press_button(context, BUTTON_A, 10, 500);
+            pbf_press_button(context, BUTTON_A, 10, START_TO_RUN_DELAY - 500);
         }else{
-            pbf_press_button(env.console, BUTTON_A, 10, START_TO_RUN_DELAY);
+            pbf_press_button(context, BUTTON_A, 10, START_TO_RUN_DELAY);
         }
 
         //  Run away if not shiny.
-        run_away_with_lights(env.console);
+        run_away_with_lights(context);
 
         //  Enter Pokemon menu if shiny.
-        enter_summary(env.console, true);
+        enter_summary(context, true);
 
         correct_count++;
     }
 
-//    pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+//    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
 //    end_program_callback(env.console);
 //    end_program_loop(env.console);
 }

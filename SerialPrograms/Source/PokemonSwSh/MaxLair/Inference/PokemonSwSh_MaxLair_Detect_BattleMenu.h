@@ -9,12 +9,12 @@
 
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Logging/LoggerQt.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
 
 namespace PokemonAutomation{
+    class CancellableScope;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{
@@ -61,8 +61,7 @@ public:
     BattleMenuReader(VideoOverlay& overlay, Language language);
 
     std::set<std::string> read_opponent(
-        LoggerQt& logger,
-        ProgramEnvironment& env,
+        LoggerQt& logger, CancellableScope& scope,
         VideoFeed& feed
     ) const;
     std::set<std::string> read_opponent_in_summary(LoggerQt& logger, const QImage& screen) const;

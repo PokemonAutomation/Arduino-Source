@@ -28,7 +28,7 @@ class BeamReset : public SingleSwitchProgramInstance{
 public:
     BeamReset(const BeamReset_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;

@@ -19,7 +19,7 @@ class ShortcutDirection : public EnumDropdownOption{
 public:
     ShortcutDirection(QString label, bool required = true);
 
-    void run(const BotBaseContext& context, uint16_t delay);
+    void run(BotBaseContext& context, uint16_t delay);
 
 private:
     bool m_required = true;

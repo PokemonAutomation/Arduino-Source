@@ -113,18 +113,18 @@ ShinyType determine_shiny_status(
 
 
 ShinyDetectionResult detect_shiny_battle(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     const ShinyDetectionBattle& battle_settings,
     std::chrono::seconds timeout,
     double detection_threshold
 ){
     ShinyEncounterTracker tracker(console, console, battle_settings);
     int result = wait_until(
-        env, console, timeout,
+        env, console, context, timeout,
         { &tracker }
     );
     if (result < 0){
-        env.log("ShinyDetector: Battle menu not found after timeout.", COLOR_RED);
+        console.log("ShinyDetector: Battle menu not found after timeout.", COLOR_RED);
         return ShinyDetectionResult{ShinyType::UNKNOWN, QImage()};
     }
     ShinyType shiny_type = determine_shiny_status(

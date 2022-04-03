@@ -78,6 +78,8 @@ bool ShinySoundDetector::process_spectrums(
     // newSpectrums are ordered from newest (largest timestamp) to oldest (smallest timestamp).
     // To feed the spectrum from old to new, we need to go through the vector in the reverse order:
     
+//    static int c = 0;
+//    c++;
     for(auto it = newSpectrums.rbegin(); it != newSpectrums.rend(); it++){
         std::vector<AudioSpectrum> singleSpectrum = {*it};
         float matcherScore = m_matcher->match(singleSpectrum);

@@ -13,6 +13,7 @@
 #include "NintendoSwitch_RunnableProgram.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
 namespace NintendoSwitch{
 
 
@@ -24,13 +25,13 @@ private:
     friend class SingleSwitchProgramWidget;
     template <class... Args>
     SingleSwitchProgramEnvironment(
-        ProgramInfo program_info,
+        const ProgramInfo& program_info,
         LoggerQt& logger,
         StatsTracker* current_stats,
         const StatsTracker* historical_stats,
         Args&&... args
     )
-        : ProgramEnvironment(std::move(program_info), logger, current_stats, historical_stats)
+        : ProgramEnvironment(program_info, logger, current_stats, historical_stats)
         , console(0, std::forward<Args>(args)...)
     {}
 };
@@ -41,7 +42,7 @@ class SingleSwitchProgramInstance : public RunnableSwitchProgramInstance{
 public:
     SingleSwitchProgramInstance(const RunnableSwitchProgramDescriptor& descriptor);
     virtual QWidget* make_widget(QWidget& parent, PanelListener& listener) override;
-    virtual void program(SingleSwitchProgramEnvironment& env) = 0;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) = 0;
 
 private:
     friend class SingleSwitchProgramWidget;

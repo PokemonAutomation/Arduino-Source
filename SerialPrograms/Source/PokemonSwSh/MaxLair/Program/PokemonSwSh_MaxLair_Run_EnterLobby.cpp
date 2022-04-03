@@ -86,14 +86,14 @@ private:
 
 
 QImage enter_lobby(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     size_t boss_slot, bool connect_to_internet,
     ReadableQuantity999& ore
 ){
-    pbf_mash_button(console, BUTTON_B, 2 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
 
     if (connect_to_internet){
-        connect_to_internet_with_inference(env, console);
+        connect_to_internet_with_inference(env, console, context);
     }
 
     VideoOverlaySet boxes(console);
@@ -110,8 +110,8 @@ QImage enter_lobby(
     size_t ore_dialog_count = 0;
     while (presses < 50){
         presses++;
-        pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
-        console.botbase().wait_for_all_requests();
+        pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+        context.wait_for_all_requests();
 
         QImage screen = console.video().snapshot();
         if (!arrow_detector.detect(screen)){
@@ -148,10 +148,10 @@ QImage enter_lobby(
         //  Detected save dialog.
         if (dialog_detector.detect(screen)){
             console.log("Detected save dialog.");
-            console.botbase().wait_for_all_requests();
+            context.wait_for_all_requests();
             QImage entrance = console.video().snapshot();
-            pbf_press_button(console, BUTTON_A, 10, 5 * TICKS_PER_SECOND);
-            console.botbase().wait_for_all_requests();
+            pbf_press_button(context, BUTTON_A, 10, 5 * TICKS_PER_SECOND);
+            context.wait_for_all_requests();
             return entrance;
         }
 
@@ -160,11 +160,11 @@ QImage enter_lobby(
             console.log("Detected boss selection.");
             if (boss_slot > 0){
                 for (size_t c = 1; c < boss_slot; c++){
-                    pbf_press_dpad(console, DPAD_DOWN, 10, 50);
+                    pbf_press_dpad(context, DPAD_DOWN, 10, 50);
                 }
-                pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
             }else{
-                pbf_press_button(console, BUTTON_B, 10, TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_B, 10, TICKS_PER_SECOND);
             }
         }
     }

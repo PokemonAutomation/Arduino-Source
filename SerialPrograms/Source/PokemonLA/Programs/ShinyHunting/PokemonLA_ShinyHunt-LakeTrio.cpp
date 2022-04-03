@@ -109,12 +109,12 @@ std::set<std::string> read_name(
 
 
 
-void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env){
+void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     PokemonSwSh::ShinyHuntTracker& stats = env.stats<PokemonSwSh::ShinyHuntTracker>();
 
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_B, 5, 5);
+    pbf_press_button(context, BUTTON_B, 5, 5);
 
     size_t consecutive_errors = 0;
 
@@ -123,8 +123,8 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env){
         env.update_stats();
 
         if (reset){
-            pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-            if (!reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
+            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+            if (!reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
                 stats.add_error();
                 continue;
             }
@@ -132,12 +132,12 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env){
         reset = true;
 
         env.console.log("Entering cave...");
-        pbf_move_left_joystick(env.console, 160, 0, 50, 0);
-        pbf_move_left_joystick(env.console, 96, 0, 50, 0);
-        pbf_move_left_joystick(env.console, 160, 0, 50, 0);
-        pbf_move_left_joystick(env.console, 96, 0, 50, 0);
-        pbf_mash_button(env.console, BUTTON_A, 125);
-        env.console.botbase().wait_for_all_requests();
+        pbf_move_left_joystick(context, 160, 0, 50, 0);
+        pbf_move_left_joystick(context, 96, 0, 50, 0);
+        pbf_move_left_joystick(context, 160, 0, 50, 0);
+        pbf_move_left_joystick(context, 96, 0, 50, 0);
+        pbf_mash_button(context, BUTTON_A, 125);
+        context.wait_for_all_requests();
 
 
         env.console.log("Waiting for a target to appear...");
@@ -149,8 +149,8 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env){
                 {{arcs, true}}
             );
             int ret = run_until(
-                env, env.console,
-                [=](const BotBaseContext& context){
+                env, env.console, context,
+                [=](BotBaseContext& context){
                     pbf_mash_button(context, BUTTON_B, 60 * TICKS_PER_SECOND);
                 },
                 { &watcher }
@@ -189,8 +189,8 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env){
             );
             ShinySymbolWaiter shiny_symbol(env.console, SHINY_SYMBOL_BOX_BOTTOM);
             int ret = run_until(
-                env, env.console,
-                [=](const BotBaseContext& context){
+                env, env.console, context,
+                [=](BotBaseContext& context){
                     pbf_press_button(context, BUTTON_ZL, 3 * TICKS_PER_SECOND, 0);
                 },
                 {
@@ -226,8 +226,8 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env){
                     &stats
                 );
                 if (VIDEO_ON_SHINY){
-//                    pbf_wait(env.console, 5 * TICKS_PER_SECOND);
-                    pbf_press_button(env.console, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+//                    pbf_wait(context, 5 * TICKS_PER_SECOND);
+                    pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
                 }
                 break;
             }
@@ -236,9 +236,9 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env){
     }
 
     env.update_stats();
-    pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
 
-//    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+//    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

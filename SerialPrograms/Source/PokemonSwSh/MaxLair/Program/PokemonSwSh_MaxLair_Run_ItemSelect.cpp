@@ -21,8 +21,7 @@ namespace MaxLairInternal{
 
 
 void run_item_select(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     GlobalStateTracker& state_tracker
 ){
     size_t console_index = console.index();
@@ -37,32 +36,32 @@ void run_item_select(
     }
 
 
-    GlobalState inferred = state_tracker.synchronize(env, console, console_index);
+    GlobalState inferred = state_tracker.synchronize(console, console_index);
 
 
     int8_t item_index = select_item(console, inferred, player_index);
     console.log("Choosing item " + std::to_string((int)item_index) + ".", COLOR_PURPLE);
 
     if (item_index < 0){
-        pbf_press_button(console, BUTTON_B, 10, 50);
+        pbf_press_button(context, BUTTON_B, 10, 50);
         return;
     }
     for (int8_t c = 0; c < item_index; c++){
-        pbf_press_dpad(console, DPAD_DOWN, 10, 50);
+        pbf_press_dpad(context, DPAD_DOWN, 10, 50);
     }
-    pbf_press_button(console, BUTTON_A, 10, 5 * TICKS_PER_SECOND);
-    console.botbase().wait_for_all_requests();
+    pbf_press_button(context, BUTTON_A, 10, 5 * TICKS_PER_SECOND);
+    context.wait_for_all_requests();
 
     //  Wait until we exit the window.
     ItemSelectDetector item_menu(true);
     wait_until(
-        env, console,
+        env, console, context,
         std::chrono::seconds(480),
         { &item_menu },
         INFERENCE_RATE
     );
 
-    pbf_wait(console, 1 * TICKS_PER_SECOND);
+    pbf_wait(context, 1 * TICKS_PER_SECOND);
 }
 
 

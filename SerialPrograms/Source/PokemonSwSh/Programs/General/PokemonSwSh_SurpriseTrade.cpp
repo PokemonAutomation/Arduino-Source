@@ -61,7 +61,7 @@ SurpriseTrade::SurpriseTrade(const SurpriseTrade_Descriptor& descriptor)
 }
 
 
-void SurpriseTrade::trade_slot(const BotBaseContext& context, uint8_t slot, bool next_box) const{
+void SurpriseTrade::trade_slot(BotBaseContext& context, uint8_t slot, bool next_box) const{
     ssf_press_button2(context, BUTTON_Y, GameSettings::instance().OPEN_YCOMM_DELAY, 50);
     ssf_press_dpad1(context, DPAD_DOWN, 10);
     ssf_press_button2(context, BUTTON_A, 280, 20);
@@ -95,22 +95,22 @@ void SurpriseTrade::trade_slot(const BotBaseContext& context, uint8_t slot, bool
     pbf_mash_button(context, BUTTON_B, TRADE_ANIMATION);
 }
 
-void SurpriseTrade::program(SingleSwitchProgramEnvironment& env){
+void SurpriseTrade::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
-        resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        grip_menu_connect_go_home(context);
+        resume_game_no_interact(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){
         //  At this point, we MUST be in the overworld with no pending trade.
         //  Otherwise the box transition will fail. Therefore we add a cleanup
         //  stage after each box to make sure we are in this state.
-        trade_slot(env.console, 0, box != 0);
+        trade_slot(context, 0, box != 0);
 
         for (uint8_t c = 1; c < 30; c++){
-            trade_slot(env.console, c, false);
+            trade_slot(context, c, false);
         }
 
         //  If the previous trade isn't done, either wait to finish or cancel it.
@@ -122,20 +122,20 @@ void SurpriseTrade::program(SingleSwitchProgramEnvironment& env){
         //          because the trade is in progress. The 2nd iteration finishes it.
         //      4.  No partner was ever found. The 1st iteration will cancel the trade.
         for (uint8_t c = 0; c < 2; c++){
-            ssf_press_button1(env.console, BUTTON_Y, 250);
-            ssf_press_dpad1(env.console, DPAD_DOWN, 20);
-            ssf_press_button1(env.console, BUTTON_A, 280);
-            ssf_press_button1(env.console, BUTTON_B, 280);
-            ssf_press_button1(env.console, BUTTON_B, 200);
-            ssf_press_button1(env.console, BUTTON_A, 100);
-            pbf_mash_button(env.console, BUTTON_B, TRADE_ANIMATION);
+            ssf_press_button1(context, BUTTON_Y, 250);
+            ssf_press_dpad1(context, DPAD_DOWN, 20);
+            ssf_press_button1(context, BUTTON_A, 280);
+            ssf_press_button1(context, BUTTON_B, 280);
+            ssf_press_button1(context, BUTTON_B, 200);
+            ssf_press_button1(context, BUTTON_A, 100);
+            pbf_mash_button(context, BUTTON_B, TRADE_ANIMATION);
         }
 
         //  Wait out any new pokedex entries or trade evolutions.
-        pbf_mash_button(env.console, BUTTON_B, EVOLVE_DELAY);
+        pbf_mash_button(context, BUTTON_B, EVOLVE_DELAY);
     }
 
-    ssf_press_button2(env.console, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
+    ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
 }
 
 

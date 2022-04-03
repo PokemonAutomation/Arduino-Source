@@ -39,7 +39,6 @@ ShinyHuntFishing::ShinyHuntFishing(const ShinyHuntFishing_Descriptor& descriptor
     , GO_HOME_WHEN_DONE(false)
     , SHORTCUT("<b>Fishing Shortcut:</b>")
     , ENCOUNTER_BOT_OPTIONS(true, true)
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
@@ -88,11 +87,11 @@ std::unique_ptr<StatsTracker> ShinyHuntFishing::make_stats() const{
 
 
 
-void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
+void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     StandardEncounterHandler handler(
-        env, env.console,
+        env, env.console, context,
         LANGUAGE,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -100,13 +99,13 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
     LeadingShinyTracker lead_tracker(env.console);
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_B, 5, 5);
+    pbf_press_button(context, BUTTON_B, 5, 5);
 
     //  Encounter Loop
     while (true){
         env.update_stats();
-        pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
-        env.console.botbase().wait_for_all_requests();
+        pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
+        context.wait_for_all_requests();
 
         {
             ShortDialogWatcher dialog_detector;
@@ -114,8 +113,8 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
             StartBattleDetector battle(env.console);
             BattleMenuWatcher battle_menu(BattleType::STANDARD);
             int ret = run_until(
-                env, env.console,
-                [=](const BotBaseContext& context){
+                env, env.console, context,
+                [=](BotBaseContext& context){
                     SHORTCUT.run(context, 30 * TICKS_PER_SECOND);
                 },
                 {
@@ -131,7 +130,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
                 continue;
             case 1:
                 env.log("Hooked something!", COLOR_BLUE);
-                pbf_press_button(env.console, BUTTON_ZL, 10, TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_ZL, 10, TICKS_PER_SECOND);
                 break;
             case 2:
                 env.log("Unexpected battle menu.", COLOR_RED);
@@ -146,7 +145,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
 
             //  Wait for dialog after hooking to appear.
             ret = wait_until(
-                env, env.console,
+                env, env.console, context,
                 std::chrono::milliseconds(5000),
                 {
                     &dialog_detector,
@@ -155,7 +154,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
             );
             switch (ret){
             case 0:
-                pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
                 break;
             case 1:
                 env.log("Unexpected battle menu.", COLOR_RED);
@@ -170,7 +169,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
 
             //  Wait for battle to start.
             ret = wait_until(
-                env, env.console,
+                env, env.console, context,
                 std::chrono::milliseconds(10000),
                 {
                     &battle,
@@ -197,7 +196,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
         DoublesShinyDetection result_wild;
         ShinyDetectionResult result_own;
         detect_shiny_battle(
-            env, env.console,
+            env, env.console, context,
             result_wild, result_own,
             WILD_POKEMON,
             std::chrono::seconds(30)
@@ -216,7 +215,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env){
         "",
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

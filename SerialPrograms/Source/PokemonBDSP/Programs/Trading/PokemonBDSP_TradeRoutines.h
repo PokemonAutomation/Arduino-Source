@@ -8,7 +8,6 @@
 #define PokemonAutomation_PokemonBDSP_TradeRoutines_H
 
 #include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/MultiConsoleErrors.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h"
@@ -29,12 +28,12 @@ struct TradeStats : public StatsTracker{
 
 
 void trade_current_pokemon(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     MultiConsoleErrorState& tracker,
     TradeStats& stats
 );
 void trade_current_box(
-    MultiSwitchProgramEnvironment& env,
+    MultiSwitchProgramEnvironment& env, CancellableScope& scope,
     EventNotificationOption& notifications,
     TradeStats& stats
 );

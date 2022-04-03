@@ -51,7 +51,7 @@ GenerateNameOCRData::GenerateNameOCRData(const GenerateNameOCRData_Descriptor& d
 }
 
 
-void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env){
+void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     QString resource_path = RESOURCE_PATH() + "Pokemon/Pokedex/Pokedex-National.json";
     QJsonArray array = read_json_file(resource_path).array();
 
@@ -73,7 +73,7 @@ void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env){
     QString language_code = QString::fromStdString(language_data(LANGUAGE).code);
 
     for (const std::string& slug : slugs){
-        env.console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
 
         QImage screen = env.console.video().snapshot();
         ImageRef image = extract_box_reference(screen, box);
@@ -93,7 +93,7 @@ void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env){
         path += ".png";
         image.save(path);
 
-        pbf_press_dpad(env.console, DPAD_RIGHT, 10, DELAY);
+        pbf_press_dpad(context, DPAD_RIGHT, 10, DELAY);
 
         OCR::make_OCR_filter(image).apply(image);
 

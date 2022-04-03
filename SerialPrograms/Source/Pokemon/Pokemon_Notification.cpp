@@ -12,10 +12,6 @@
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "Pokemon_Notification.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
-
 namespace PokemonAutomation{
 namespace Pokemon{
 

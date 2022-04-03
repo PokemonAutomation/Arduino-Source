@@ -15,6 +15,7 @@
 #include "NintendoSwitch_RunnableProgram.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
 namespace NintendoSwitch{
 
 
@@ -26,20 +27,21 @@ public:
 
     //  Run the specified lambda for all switches in parallel.
     void run_in_parallel(
-        const std::function<void(ConsoleHandle& console)>& func
+        CancellableScope& scope,
+        const std::function<void(ConsoleHandle& console, BotBaseContext& context)>& func
     );
 
     //  Run the specified lambda for switch indices [s, e) in parallel.
     void run_in_parallel(
-        size_t s, size_t e,
-        const std::function<void(ConsoleHandle& console)>& func
+        CancellableScope& scope, size_t s, size_t e,
+        const std::function<void(ConsoleHandle& console, BotBaseContext& context)>& func
     );
 
 private:
     friend class MultiSwitchProgramWidget;
     friend class MultiSwitchProgramUI;
     MultiSwitchProgramEnvironment(
-        ProgramInfo program_info,
+        const ProgramInfo& program_info,
         LoggerQt& logger,
         StatsTracker* current_stats,
         const StatsTracker* historical_stats,
@@ -85,7 +87,7 @@ public:
     size_t system_count() const{ return m_switches.count(); }
 
     virtual QWidget* make_widget(QWidget& parent, PanelListener& listener) override;
-    virtual void program(MultiSwitchProgramEnvironment& env) = 0;
+    virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) = 0;
 
 private:
     friend class MultiSwitchProgramWidget;

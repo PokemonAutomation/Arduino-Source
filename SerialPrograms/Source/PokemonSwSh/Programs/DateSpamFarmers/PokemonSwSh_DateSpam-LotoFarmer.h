@@ -28,7 +28,7 @@ class LotoFarmer : public SingleSwitchProgramInstance{
 public:
     LotoFarmer(const LotoFarmer_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;

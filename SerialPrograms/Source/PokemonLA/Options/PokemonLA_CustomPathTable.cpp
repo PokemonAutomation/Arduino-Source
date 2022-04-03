@@ -5,13 +5,19 @@
  */
 
 #include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <QLabel>
+#include <QPushButton>
+#include <QFileDialog>
+#include <QMessageBox>
 
 #include "Common/Compiler.h"
+#include "Common/Cpp/Exceptions.h"
+#include "Common/Qt/Options/EditableTable/EditableTableBaseWidget.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
-#include "Pokemon/Options/Pokemon_IVCheckerWidget.h"
 #include "CommonFramework/Options/EditableTableOption-EnumTableCell.h"
+#include "Pokemon/Options/Pokemon_IVCheckerWidget.h"
 #include "PokemonLA_CustomPathTable.h"
 
 #include <iostream>
@@ -30,6 +36,8 @@ const QString PathAction_NAMES[] = {
     "Move Forward",
     "Jump",
     "Wait",
+    "Start Listen",
+    "End Listen",
 };
 
 const std::map<QString, PathAction> PathAction_MAP{
@@ -39,6 +47,8 @@ const std::map<QString, PathAction> PathAction_MAP{
     {PathAction_NAMES[3], PathAction::MOVE_FORWARD},
     {PathAction_NAMES[4], PathAction::JUMP},
     {PathAction_NAMES[5], PathAction::WAIT},
+    {PathAction_NAMES[6], PathAction::START_LISTEN},
+    {PathAction_NAMES[7], PathAction::END_LISTEN},
 };
 
 
@@ -64,10 +74,10 @@ const std::map<QString, PathMount> PathMount_MAP{
 const QString PathSpeed_NAMES[] = {
     "Normal Speed",
     "Slow Speed",
-    "Run",
-    "Dash",
-    "Dash (Braviary B Spam)",
-    "Dive",
+    "Run on Foot",
+    "Dash on Ride",
+    "Dash on Braviary B Spam",
+    "Dive on Braviary",
 };
 
 const std::map<QString, PathSpeed> PathSpeed_MAP{
@@ -79,21 +89,6 @@ const std::map<QString, PathSpeed> PathSpeed_MAP{
     {PathSpeed_NAMES[5], PathSpeed::DIVE},
 };
 
-
-    // switch(action){
-    //     case PathAction::CHANGE_MOUNT:
-    //         break;
-    //     case PathAction::ROTATE_CAMERA:
-    //         break;
-    //     case PathAction::MOVE_FORWARD:
-    //         break;
-    //     case PathAction::JUMP:
-    //         break;
-    //     case PathAction::WAIT:
-    //         break;
-    //     default:
-    //         break;
-    // }
 
 
 CustomPathTableRow::CustomPathTableRow() {}
@@ -156,7 +151,7 @@ QJsonValue CustomPathTableRow::to_json() const{
         break;
     case PathAction::MOVE_FORWARD:
         obj.insert("MoveForwardTicks", move_forward_ticks);
-        obj.insert("Speed", PathMount_NAMES[(size_t)move_speed]);
+        obj.insert("Speed", PathSpeed_NAMES[(size_t)move_speed]);
         break;
     case PathAction::JUMP:
         obj.insert("JumpWaitTicks", jump_wait_ticks);
@@ -197,22 +192,27 @@ ActionParameterWidget::ActionParameterWidget(QWidget& parent, CustomPathTableRow
     m_layout->addWidget(make_enum_table_cell(*this, PathMount_MAP.size(), PathMount_NAMES, m_row.mount));
 
     // Widget 1, 2
-    m_layout->addWidget(new QLabel("Ticks to turn camera (right: +, left: -):"));
+    m_layout->addWidget(new QLabel("Ticks to turn camera (right: +, left: -):", this));
     m_layout->addWidget(make_number_table_cell(*this, m_row.camera_turn_ticks));
 
     // Widget 3, 4, 5, 6
-    m_layout->addWidget(new QLabel("Ticks to move forward:"));
+    m_layout->addWidget(new QLabel("Ticks to move forward:", this));
     m_layout->addWidget(make_number_table_cell(*this, m_row.move_forward_ticks));
-    m_layout->addWidget(new QLabel(" "));
+    m_layout->addWidget(new QLabel(" ", this));
     m_layout->addWidget(make_enum_table_cell(*this, PathSpeed_MAP.size(), PathSpeed_NAMES, m_row.move_speed));
 
     // Widget 7, 8
-    m_layout->addWidget(new QLabel("Ticks after jump:"));
+    m_layout->addWidget(new QLabel("Ticks after jump:", this));
     m_layout->addWidget(make_number_table_cell(*this, m_row.jump_wait_ticks));
 
     // Widget 9, 10
-    m_layout->addWidget(new QLabel("Ticks"));
+    m_layout->addWidget(new QLabel("Ticks", this));
     m_layout->addWidget(make_number_table_cell(*this, m_row.wait_ticks));
+
+    // Widget 11
+    m_layout->addWidget(new QLabel("Shiny sound", this));
+    // Widget 12
+    m_layout->addWidget(new QLabel("Shiny sound", this));
 
     setParameter();
 }
@@ -241,6 +241,12 @@ void ActionParameterWidget::setParameter(){
         case PathAction::WAIT:
             m_layout->itemAt(9)->widget()->show();
             m_layout->itemAt(10)->widget()->show();
+            break;
+        case PathAction::START_LISTEN:
+            m_layout->itemAt(11)->widget()->show();
+            break;
+        case PathAction::END_LISTEN:
+            m_layout->itemAt(12)->widget()->show();
             break;
         default:
             break;
@@ -290,13 +296,36 @@ std::unique_ptr<EditableTableRow> CustomPathTableTableFactory::make_row() const{
 
 
 
-std::vector<std::unique_ptr<EditableTableRow>> CustomPathTableTable::make_defaults() const{
+std::vector<std::unique_ptr<EditableTableRow>> CustomPathTable::make_defaults() const{
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(std::unique_ptr<CustomPathTableRow>(new CustomPathTableRow()));
+    auto row = std::make_unique<CustomPathTableRow>();
+    row->action = PathAction::START_LISTEN;
+    ret.emplace_back(std::move(row));
+
+    row = std::make_unique<CustomPathTableRow>();
+    row->action = PathAction::CHANGE_MOUNT;
+    row->mount = PathMount::WYRDEER;
+    ret.emplace_back(std::move(row));
+
+    row = std::make_unique<CustomPathTableRow>();
+    row->action = PathAction::ROTATE_CAMERA;
+    row->camera_turn_ticks = -100;
+    ret.emplace_back(std::move(row));
+
+    row = std::make_unique<CustomPathTableRow>();
+    row->action = PathAction::MOVE_FORWARD;
+    row->move_speed = PathSpeed::DASH;
+    row->move_forward_ticks = 400;
+    ret.emplace_back(std::move(row));
+
+    row = std::make_unique<CustomPathTableRow>();
+    row->action = PathAction::END_LISTEN;
+    ret.emplace_back(std::move(row));
+    
     return ret;
 }
 
-CustomPathTableTable::CustomPathTableTable()
+CustomPathTable::CustomPathTable()
     : m_table(
         "<b>Custom Path Table:</b><br>"
         "Set a sequence of actions to navigate the map. ",
@@ -304,20 +333,99 @@ CustomPathTableTable::CustomPathTableTable()
     )
 {}
 
-void CustomPathTableTable::load_json(const QJsonValue& json){
+void CustomPathTable::load_json(const QJsonValue& json){
     m_table.load_json(json);
 }
 
-QJsonValue CustomPathTableTable::to_json() const{
+QJsonValue CustomPathTable::to_json() const{
     return m_table.to_json();
 }
 
-void CustomPathTableTable::restore_defaults(){
+void CustomPathTable::restore_defaults(){
     m_table.restore_defaults();
 }
 
-ConfigWidget* CustomPathTableTable::make_ui(QWidget& parent){
-    return m_table.make_ui(parent);
+
+class CustomPathTableWidget : public QWidget, public ConfigWidget{
+public:
+    CustomPathTableWidget(QWidget& parent, EditableTableOption& value)
+        : QWidget(&parent)
+        , ConfigWidget(value, *this)
+    {
+        // m_table_widget is class EditableTableWidget : public EditableTableBaseWidget, public ConfigWidget
+        // EditableTableBaseWidget inherits QWidget.
+        // Since it's a QWidget, we don't need to care about its memory ownership after its parent is set (as `this`).
+
+        m_table_widget = value.make_ui(*this);
+        
+        QHBoxLayout* layout = new QHBoxLayout(this);
+        layout->setContentsMargins(0, 0, 0, 0);
+        layout->addWidget(&m_table_widget->widget());
+
+        QVBoxLayout* v_layout = new QVBoxLayout();
+        v_layout->setContentsMargins(0, 0, 0, 0);
+        layout->addLayout(v_layout);
+        auto load_button = new QPushButton("Load Option", this);
+        v_layout->addWidget(load_button);
+        auto save_button = new QPushButton("Save Option", this);
+        v_layout->addWidget(save_button);
+
+        connect(load_button,  &QPushButton::clicked, this, [&value, this](bool){
+            auto path = QFileDialog::getOpenFileName(this, tr("Open option file"), ".", "*.json");
+            std::cout << "Load CustomPathTable from " << path.toStdString() << std::endl;
+            if (path.size() > 0){
+                QJsonDocument doc = read_json_file(path);
+                if (!doc.isObject()){
+                    QMessageBox box;
+                    box.critical(nullptr, "Error", "Invalid option file: " + path + ", no Json object.");
+                    return;
+                }
+                QJsonObject root = doc.object();
+                auto it = root.find("CUSTOM_PATH_TABLE");
+                if (it == root.end()){
+                    QMessageBox box;
+                    box.critical(nullptr, "Error", "Invalid option file: " + path + ", no CUSTOM_PATH_TABLE.");
+                    return;
+                }
+                QJsonArray obj = json_get_array_throw(root,"CUSTOM_PATH_TABLE");
+                value.load_json(obj);
+                auto base_widget = dynamic_cast<EditableTableBaseWidget*>(this->m_table_widget);
+                if (base_widget == nullptr){
+                    QMessageBox box;
+                    box.critical(nullptr, "Error", "Internal code error, cannot convert to EditableTableBaseWidget.");
+                    return;
+                }
+                base_widget->redraw_table();
+            }
+        });
+
+        connect(save_button,  &QPushButton::clicked, this, [&value, this](bool){
+            auto path = QFileDialog::getSaveFileName(this, tr("Open option file"), ".", "*.json");
+            std::cout << "Save CustomPathTable from " << path.toStdString() << std::endl;
+            if (path.size() > 0){
+                try{
+                    QJsonObject root;
+                    root.insert("CUSTOM_PATH_TABLE", value.to_json());
+                    write_json_file(path, QJsonDocument(root));
+                }catch (FileException&){
+                    QMessageBox box;
+                    box.critical(nullptr, "Error", "Failed to save to file: " + path);
+                    return;
+                }
+            }
+        });
+    }
+
+    virtual void restore_defaults() override{
+        m_table_widget->restore_defaults();
+    }
+
+private:
+    ConfigWidget* m_table_widget = nullptr;
+};
+
+ConfigWidget* CustomPathTable::make_ui(QWidget& parent){
+    return new CustomPathTableWidget(parent, m_table);
 }
 
 

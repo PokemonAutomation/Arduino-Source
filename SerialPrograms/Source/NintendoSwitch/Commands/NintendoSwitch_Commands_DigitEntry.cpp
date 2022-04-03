@@ -27,7 +27,7 @@ namespace NintendoSwitch{
 
 
 
-void enter_digits_str(const BotBaseContext& context, uint8_t count, const char* digits){
+void enter_digits_str(BotBaseContext& context, uint8_t count, const char* digits){
     enter_digits(context, count, (const uint8_t*)digits);
 }
 uint8_t convert_digit(uint8_t digit){
@@ -39,7 +39,7 @@ uint8_t convert_digit(uint8_t digit){
     }
     return digit;
 }
-void enter_digits(const BotBaseContext& context, uint8_t count, const uint8_t* digits){
+void enter_digits(BotBaseContext& context, uint8_t count, const uint8_t* digits){
     context.issue_request(DeviceRequest_enter_digits(count, digits));
 }
 

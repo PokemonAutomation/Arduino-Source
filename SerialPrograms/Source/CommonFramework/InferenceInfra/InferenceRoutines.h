@@ -10,13 +10,14 @@
 #include <functional>
 #include <chrono>
 #include <vector>
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
 
+class BotBaseContext;
+class ProgramEnvironment;
 
 
 //  Wait until one of the "callbacks" are triggered or it times out.
@@ -28,17 +29,24 @@ namespace PokemonAutomation{
 //  Exceptions throw in either the commands or the triggers will stop
 //  everything and be passed out of this function.
 int wait_until(
-    ProgramEnvironment& env, ConsoleHandle& console,
-    std::chrono::milliseconds timeout,
-    std::vector<InferenceCallback*>&& callbacks,
-    std::chrono::milliseconds period = std::chrono::milliseconds(50)
-);
-int wait_until(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     std::chrono::system_clock::time_point deadline,
     std::vector<InferenceCallback*>&& callbacks,
     std::chrono::milliseconds period = std::chrono::milliseconds(50)
 );
+inline int wait_until(
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    std::chrono::milliseconds timeout,
+    std::vector<InferenceCallback*>&& callbacks,
+    std::chrono::milliseconds period = std::chrono::milliseconds(50)
+){
+    return wait_until(
+        env, console, context,
+        std::chrono::system_clock::now() + timeout,
+        std::move(callbacks),
+        period
+    );
+}
 
 
 //  Run the specified "command" until either it finishes or one of the
@@ -51,8 +59,8 @@ int wait_until(
 //  Exceptions throw in either the commands or the triggers will stop
 //  everything and be passed out of this function.
 int run_until(
-    ProgramEnvironment& env, ConsoleHandle& console,
-    std::function<void(const BotBaseContext& context)>&& command,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    std::function<void(BotBaseContext& context)>&& command,
     std::vector<InferenceCallback*>&& callbacks,
     std::chrono::milliseconds period = std::chrono::milliseconds(50)
 );

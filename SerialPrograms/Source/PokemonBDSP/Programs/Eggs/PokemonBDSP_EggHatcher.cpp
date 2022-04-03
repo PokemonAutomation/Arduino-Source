@@ -44,7 +44,6 @@ EggHatcher::EggHatcher(const EggHatcher_Descriptor& descriptor)
         true
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
@@ -88,14 +87,14 @@ std::unique_ptr<StatsTracker> EggHatcher::make_stats() const{
 
 
 
-void EggHatcher::program(SingleSwitchProgramEnvironment& env){
+void EggHatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     uint16_t INCUBATION_TIME = (uint16_t)((1258.5 + 4.05 * STEPS_TO_HATCH) * 1.05);
     uint16_t TOTAL_DELAY = INCUBATION_TIME + SAFETY_TIME0 + HATCH_DELAY;
 
     //  Connect the controller.
-    pbf_move_right_joystick(env.console, 0, 255, 10, 0);
+    pbf_move_right_joystick(context, 0, 255, 10, 0);
 
     uint8_t batches = BOXES_TO_HATCH * 6;
     uint8_t column = 0;
@@ -109,26 +108,26 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env){
         );
 
         if (c == 0){
-            withdraw_1st_column_from_overworld(env.console);
+            withdraw_1st_column_from_overworld(context);
         }else if (column < 5 || !SAVE_AND_RESET){
-            swap_party(env.console, column);
+            swap_party(context, column);
             column++;
             if (column == 6){
                 column = 0;
             }
         }else{
-            deposit_party_to_column(env.console, 5);
-            pbf_press_button(env.console, BUTTON_R, 20, GameSettings::instance().BOX_CHANGE_DELAY_0);
-            box_to_overworld(env.console);
-            save_game(env.console);
-            pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
-            withdraw_1st_column_from_overworld(env.console);
+            deposit_party_to_column(context, 5);
+            pbf_press_button(context, BUTTON_R, 20, GameSettings::instance().BOX_CHANGE_DELAY_0);
+            box_to_overworld(context);
+            save_game(context);
+            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            withdraw_1st_column_from_overworld(context);
             column = 0;
         }
 
-        pbf_move_left_joystick(env.console, 0, 255, 125, 0);
-        egg_spin_with_A(env.console, TOTAL_DELAY);
+        pbf_move_left_joystick(context, 0, 255, 125, 0);
+        egg_spin_with_A(context, TOTAL_DELAY);
 
         stats.m_batches++;
     }
@@ -140,7 +139,7 @@ void EggHatcher::program(SingleSwitchProgramEnvironment& env){
         "",
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

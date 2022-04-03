@@ -8,7 +8,7 @@
 #define PokemonAutomation_CommonFramework_InferenceThrottler_H
 
 #include <chrono>
-#include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "Common/Cpp/CancellableScope.h"
 
 namespace PokemonAutomation{
 
@@ -28,7 +28,7 @@ public:
     //  time since the previous iteration has reached the specified period.
     //
     //  Returns true if this loop has timed out.
-    bool end_iteration(ProgramEnvironment& env){
+    bool end_iteration(CancellableScope& scope){
         auto now = std::chrono::system_clock::now();
         if (m_timeout != std::chrono::milliseconds(0) && now - m_start >= m_timeout){
             return true;
@@ -39,7 +39,7 @@ public:
             m_wait_until = now + m_period;
         }else{
             m_wait_until += m_period;
-            env.wait_for(wait);
+            scope.wait_for(wait);
         }
         return false;
     }

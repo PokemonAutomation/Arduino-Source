@@ -27,7 +27,7 @@ class FriendCodeAdder : public SingleSwitchProgramInstance{
 public:
     FriendCodeAdder(const FriendCodeAdder_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     SimpleIntegerOption<uint8_t> USER_SLOT;

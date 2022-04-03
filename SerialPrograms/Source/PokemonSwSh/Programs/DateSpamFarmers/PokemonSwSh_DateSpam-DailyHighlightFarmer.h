@@ -27,7 +27,7 @@ class DailyHighlightFarmer : public SingleSwitchProgramInstance{
 public:
     DailyHighlightFarmer(const DailyHighlightFarmer_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;

@@ -21,14 +21,14 @@ namespace PokemonSwSh{
 
 
 //  Collect egg.
-static void collect_egg(const BotBaseContext& context){
+static void collect_egg(BotBaseContext& context){
     ssf_press_button1(context, BUTTON_A, 120);
     if (GameSettings::instance().EGG_FETCH_EXTRA_LINE){
         ssf_press_button1(context, BUTTON_A, 120);
     }
     ssf_press_button1(context, BUTTON_A, 10);
 }
-static void collect_egg_mash_out(const BotBaseContext& context, bool deposit_automatically){
+static void collect_egg_mash_out(BotBaseContext& context, bool deposit_automatically){
     uint16_t FETCH_EGG_MASH_DELAY = GameSettings::instance().FETCH_EGG_MASH_DELAY;
     pbf_mash_button(
         context,
@@ -41,7 +41,7 @@ static void collect_egg_mash_out(const BotBaseContext& context, bool deposit_aut
 
 
 //  Fly Home: Used by everything.
-static void fly_home(const BotBaseContext& context, char from_overworld){
+static void fly_home(BotBaseContext& context, char from_overworld){
     if (from_overworld){
         ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
     }
@@ -49,7 +49,7 @@ static void fly_home(const BotBaseContext& context, char from_overworld){
     ssf_press_dpad2(context, DPAD_UP_RIGHT, 25, 5);
     pbf_mash_button(context, BUTTON_A, 480);
 }
-static void fly_home_goto_lady(const BotBaseContext& context, char from_overworld){
+static void fly_home_goto_lady(BotBaseContext& context, char from_overworld){
     fly_home(context, from_overworld);
 
     //  Go to lady.
@@ -57,7 +57,7 @@ static void fly_home_goto_lady(const BotBaseContext& context, char from_overworl
     ssf_press_joystick2(context, true, STICK_MIN, STICK_CENTER, 16, 6);
     ssf_press_joystick2(context, true, STICK_CENTER, STICK_MIN, 90, 45);
 }
-static void fly_home_collect_egg(const BotBaseContext& context, char from_overworld){
+static void fly_home_collect_egg(BotBaseContext& context, char from_overworld){
     fly_home_goto_lady(context, from_overworld);
     collect_egg(context);
 }
@@ -68,7 +68,7 @@ static void fly_home_collect_egg(const BotBaseContext& context, char from_overwo
 
 #define EGG_BUTTON_HOLD_DELAY   10
 
-static void menu_to_box(const BotBaseContext& context, bool from_map){
+static void menu_to_box(BotBaseContext& context, bool from_map){
     uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY;
     if (from_map){
         ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
@@ -81,7 +81,7 @@ static void menu_to_box(const BotBaseContext& context, bool from_map){
     ssf_press_button2(context, BUTTON_Y, 30, EGG_BUTTON_HOLD_DELAY);
     ssf_press_button2(context, BUTTON_Y, 30, EGG_BUTTON_HOLD_DELAY);
 }
-static void box_to_menu(const BotBaseContext& context){
+static void box_to_menu(BotBaseContext& context){
     //  There are two states here which need to be merged:
     //      1.  The depositing column was empty. The party has been swapped and
     //          it's sitting in the box with no held pokemon.
@@ -106,7 +106,7 @@ static void box_to_menu(const BotBaseContext& context){
     ssf_press_dpad2(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
 }
 
-static void party_to_column(const BotBaseContext& context, uint8_t column){
+static void party_to_column(BotBaseContext& context, uint8_t column){
     uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY;
 
     ssf_press_dpad2(context, DPAD_UP, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
@@ -121,7 +121,7 @@ static void party_to_column(const BotBaseContext& context, uint8_t column){
         }
     }
 }
-static void column_to_party(const BotBaseContext& context, uint8_t column){
+static void column_to_party(BotBaseContext& context, uint8_t column){
     uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY;
 
     column++;
@@ -137,7 +137,7 @@ static void column_to_party(const BotBaseContext& context, uint8_t column){
     ssf_press_dpad2(context, DPAD_DOWN, BOX_SCROLL_DELAY, EGG_BUTTON_HOLD_DELAY);
 }
 
-static void pickup_column(const BotBaseContext& context, char party){
+static void pickup_column(BotBaseContext& context, char party){
     uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY;
 
     ssf_press_button2(context, BUTTON_A, 20, EGG_BUTTON_HOLD_DELAY);

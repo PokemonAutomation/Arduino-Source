@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonBDSP_ShinyEncounterDetector_H
 #define PokemonAutomation_PokemonBDSP_ShinyEncounterDetector_H
 
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "Pokemon/Pokemon_DataTypes.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
@@ -16,6 +15,8 @@
 #include "PokemonBDSP_ShinySparkleSet.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
+    class ProgramEnvironment;
     class ConsoleHandle;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
@@ -104,7 +105,7 @@ void determine_shiny_status(
 
 
 void detect_shiny_battle(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
     const DetectionType& type,

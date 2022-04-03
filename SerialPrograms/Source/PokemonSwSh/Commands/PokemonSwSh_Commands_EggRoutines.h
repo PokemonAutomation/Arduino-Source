@@ -15,11 +15,11 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void eggfetcher_loop        (const BotBaseContext& context);
-void move_while_mashing_B   (const BotBaseContext& context, uint16_t duration);
-void spin_and_mash_A        (const BotBaseContext& context, uint16_t duration);
-void travel_to_spin_location(const BotBaseContext& context);
-void travel_back_to_lady    (const BotBaseContext& context);
+void eggfetcher_loop        (BotBaseContext& context);
+void move_while_mashing_B   (BotBaseContext& context, uint16_t duration);
+void spin_and_mash_A        (BotBaseContext& context, uint16_t duration);
+void travel_to_spin_location(BotBaseContext& context);
+void travel_back_to_lady    (BotBaseContext& context);
 
 
 

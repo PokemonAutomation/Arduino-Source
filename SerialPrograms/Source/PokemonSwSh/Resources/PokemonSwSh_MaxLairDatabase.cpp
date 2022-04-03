@@ -13,10 +13,6 @@
 #include "Pokemon/Resources/Pokemon_PokemonNames.h"
 #include "PokemonSwSh_MaxLairDatabase.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
-
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{

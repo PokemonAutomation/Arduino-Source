@@ -8,9 +8,10 @@
 #define PokemonAutomation_PokemonLA_ShinyHuntCustomPath_H
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
-#include "CommonFramework/Options/SimpleIntegerOption.h"
-#include "CommonFramework/Options/FloatingPointOption.h"
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
+#include "CommonFramework/Options/FloatingPointOption.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/PokemonLA_Locations.h"
 #include "PokemonLA/PokemonLA_TravelLocations.h"
@@ -35,22 +36,27 @@ public:
     ShinyHuntCustomPath(const ShinyHuntCustomPath_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    void run_iteration(SingleSwitchProgramEnvironment& env);
+    // Run the custom path on overworld.
+    void run_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    // Do one action (while ignoring listen-related actions)
+    void do_non_listen_action(ConsoleHandle& console, BotBaseContext& context, size_t action_index);
 
 private:
     class Stats;
 
     TravelLocationOption TRAVEL_LOCATION;
 
-    CustomPathTableTable CUSTOM_PATH_TABLE;
+    CustomPathTable CUSTOM_PATH_TABLE;
+
+    BooleanCheckBoxOption TEST_PATH;
 
     ShinyDetectedActionOption SHINY_DETECTED;
 
     EventNotificationOption NOTIFICATION_STATUS;
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 };
 

@@ -17,20 +17,20 @@ namespace PokemonBDSP{
 
 
 
-bool heal_by_global_room(ProgramEnvironment& env, ConsoleHandle& console){
+bool heal_by_global_room(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
     // Go to union room menu.
     const uint16_t overworld_to_room_delay = 125;
-    pbf_press_button(console, BUTTON_Y, 10, overworld_to_room_delay);
+    pbf_press_button(context, BUTTON_Y, 10, overworld_to_room_delay);
 
     // Go to global room.
-    pbf_press_dpad(console, DPAD_RIGHT, 10, 100);
+    pbf_press_dpad(context, DPAD_RIGHT, 10, 100);
 
     // Press ZL until we are at:
     // - "Would you like to enter the Global Room?" To select: "Yes" and other options.
     SelectionArrowFinder arrow(console, {0.50, 0.45, 0.20, 0.20}, COLOR_GREEN);
     int ret = run_until(
-        env, console,
-        [=](const BotBaseContext& context){
+        env, console, context,
+        [=](BotBaseContext& context){
             for (int i = 0; i < 5; i++){
                 pbf_press_button(context, BUTTON_ZL, 10, 125);
             }
@@ -42,12 +42,12 @@ bool heal_by_global_room(ProgramEnvironment& env, ConsoleHandle& console){
     }
 
     // Select "Yes"
-    pbf_press_button(console, BUTTON_ZL, 10, 125);
+    pbf_press_button(context, BUTTON_ZL, 10, 125);
     
     // Then mash B to leave Union Room
-    pbf_mash_button(console, BUTTON_B, 400);
+    pbf_mash_button(context, BUTTON_B, 400);
 
-    console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
     return true;
 }
 

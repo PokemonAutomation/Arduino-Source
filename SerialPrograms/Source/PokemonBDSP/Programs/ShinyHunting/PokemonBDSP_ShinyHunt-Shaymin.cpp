@@ -38,7 +38,6 @@ ShinyHuntShaymin::ShinyHuntShaymin(const ShinyHuntShaymin_Descriptor& descriptor
     , GO_HOME_WHEN_DONE(false)
 //    , SHORTCUT("<b>Bike Shortcut:</b>")
     , ENCOUNTER_BOT_OPTIONS(false, false)
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
@@ -74,14 +73,14 @@ std::unique_ptr<StatsTracker> ShinyHuntShaymin::make_stats() const{
 
 
 
-bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env) const{
-    env.console.botbase().wait_for_all_requests();
+bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env, BotBaseContext& context) const{
+    context.wait_for_all_requests();
     {
         BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
         ShortDialogWatcher dialog_detector;
         int result = run_until(
-            env, env.console,
-            [&](const BotBaseContext& context){
+            env, env.console, context,
+            [&](BotBaseContext& context){
                 while (true){
                     for (size_t c = 0; c < 5; c++){
                         pbf_press_button(context, BUTTON_ZL, 20, 105);
@@ -107,8 +106,8 @@ bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env) cons
         BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
         StartBattleDetector start_battle_detector(env.console);
         int result = run_until(
-            env, env.console,
-            [&](const BotBaseContext& context){
+            env, env.console, context,
+            [&](BotBaseContext& context){
                 while (true){
                     for (size_t c = 0; c < 5; c++){
                         pbf_press_button(context, BUTTON_ZL, 20, 105);
@@ -133,12 +132,12 @@ bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env) cons
     return true;
 }
 
-void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env){
+void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     PokemonSwSh::ShinyHuntTracker& stats = env.stats<PokemonSwSh::ShinyHuntTracker>();
     env.update_stats();
 
     StandardEncounterHandler handler(
-        env, env.console,
+        env, env.console, context,
         Language::None,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -146,12 +145,12 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env){
     LeadingShinyTracker lead_tracker(env.console);
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_B, 5, 5);
+    pbf_press_button(context, BUTTON_B, 5, 5);
 
     //  Encounter Loop
     while (true){
         //  Find encounter.
-        bool battle = start_encounter(env);
+        bool battle = start_encounter(env, context);
         if (!battle){
             stats.add_error();
             handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
@@ -162,7 +161,7 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env){
         DoublesShinyDetection result_wild;
         ShinyDetectionResult result_own;
         detect_shiny_battle(
-            env, env.console,
+            env, env.console, context,
             result_wild, result_own,
             WILD_POKEMON,
             std::chrono::seconds(30)
@@ -175,12 +174,12 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env){
         lead_tracker.report_result(result_own.shiny_type);
 
         //  Clear dialogs.
-        pbf_mash_button(env.console, BUTTON_B, 75);
+        pbf_mash_button(context, BUTTON_B, 75);
 
         //  Hop on bike, ride down to seabreak path
 //        SHORTCUT.run(env.console, 0);
-        pbf_move_left_joystick(env.console, 128, 255, 360, 0);
-        pbf_move_left_joystick(env.console, 128, 0, 370, 0);
+        pbf_move_left_joystick(context, 128, 255, 360, 0);
+        pbf_move_left_joystick(context, 128, 0, 370, 0);
     }
 
     send_program_finished_notification(
@@ -189,7 +188,7 @@ void ShinyHuntShaymin::program(SingleSwitchProgramEnvironment& env){
         "",
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 }

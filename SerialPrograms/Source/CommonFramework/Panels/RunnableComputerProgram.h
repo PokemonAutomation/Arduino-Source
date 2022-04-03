@@ -7,10 +7,13 @@
 #ifndef PokemonAutomation_RunnableComputerProgram_H
 #define PokemonAutomation_RunnableComputerProgram_H
 
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "RunnablePanel.h"
 
 namespace PokemonAutomation{
+
+class CancellableScope;
+class ProgramEnvironment;
+
 
 class RunnableComputerProgramDescriptor : public RunnablePanelDescriptor{
 public:
@@ -33,7 +36,7 @@ public:
     }
 
     virtual QWidget* make_widget(QWidget& parent, PanelListener& listener) override;
-    virtual void program(ProgramEnvironment& env) = 0;
+    virtual void program(ProgramEnvironment& env, CancellableScope& scope) = 0;
 };
 
 

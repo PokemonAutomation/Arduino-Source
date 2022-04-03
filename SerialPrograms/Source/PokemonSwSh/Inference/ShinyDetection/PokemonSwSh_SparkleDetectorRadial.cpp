@@ -36,14 +36,16 @@ RadialSparkleDetector::RadialSparkleDetector(const WaterfillObject& object)
         return;
     }
     m_matrix = object.packed_matrix();
+    size_t width = m_matrix.width();
+    size_t height = m_matrix.height();
 //    cout << m_matrix.dump() << endl;
 
     //  Sort all pixels by distance from center.
     size_t center_x = object.center_x() - object.min_x;
     size_t center_y = object.center_y() - object.min_y;
     std::map<uint64_t, size_t> distances;
-    for (size_t r = 0; r < m_matrix.height(); r++){
-        for (size_t c = 0; c < m_matrix.width(); c++){
+    for (size_t r = 0; r < height; r++){
+        for (size_t c = 0; c < width; c++){
             if (m_matrix.get(c, r)){
                 size_t dist_x = c - center_x;
                 size_t dist_y = r - center_y;
@@ -65,8 +67,8 @@ RadialSparkleDetector::RadialSparkleDetector(const WaterfillObject& object)
         }
     }
     m_radius_sqr = distance;
-    for (size_t r = 0; r < m_matrix.height(); r++){
-        for (size_t c = 0; c < m_matrix.width(); c++){
+    for (size_t r = 0; r < height; r++){
+        for (size_t c = 0; c < width; c++){
             size_t dist_x = c - center_x;
             size_t dist_y = r - center_y;
             uint64_t distance_sqr = (uint64_t)dist_x*dist_x + (uint64_t)dist_y*dist_y;
@@ -136,8 +138,8 @@ bool RadialSparkleDetector::is_ball() const{
     }
 
     //  Verify that all live pixels are near the diagonals.
-    for (size_t r = 0; r < m_matrix.height(); r++){
-        for (size_t c = 0; c < m_matrix.width(); c++){
+    for (size_t r = 0; r < height; r++){
+        for (size_t c = 0; c < width; c++){
             if (!m_matrix.get(c, r)){
                 continue;
             }

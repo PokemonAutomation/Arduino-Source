@@ -26,7 +26,7 @@ public:
 class FriendDelete : public SingleSwitchProgramInstance{
 public:
     FriendDelete(const FriendDelete_Descriptor& descriptor);
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     SimpleIntegerOption<uint16_t> FRIENDS_TO_DELETE;

@@ -28,7 +28,7 @@ class GenerateNameOCRData : public SingleSwitchProgramInstance{
 public:
     GenerateNameOCRData(const GenerateNameOCRData_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     OCR::LanguageOCR LANGUAGE;

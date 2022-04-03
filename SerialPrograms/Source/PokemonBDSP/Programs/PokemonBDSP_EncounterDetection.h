@@ -9,7 +9,6 @@
 
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "Pokemon/Pokemon_EncounterStats.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOption.h"
@@ -30,8 +29,7 @@ struct PokemonDetection{
 class StandardEncounterDetection{
 public:
     StandardEncounterDetection(
-        ProgramEnvironment& env,
-        ConsoleHandle& console,
+        ConsoleHandle& console, BotBaseContext& context,
         Language language,
         const EncounterFilterOption& filter,
         const DoublesShinyDetection& shininess,

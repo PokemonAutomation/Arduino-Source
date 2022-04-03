@@ -13,11 +13,8 @@
 #include "CommonFramework/OCR/OCR_Filtering.h"
 #include "CommonFramework/OCR/OCR_LargeDictionaryMatcher.h"
 #include "CommonFramework/OCR/OCR_TrainingTools.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "Pokemon_TrainPokemonOCR.h"
-
-#include <iostream>
-using std::cout;
-using std::endl;
 
 namespace PokemonAutomation{
 namespace Pokemon{
@@ -61,10 +58,9 @@ TrainPokemonOCR::TrainPokemonOCR(const TrainPokemonOCR_Descriptor& descriptor)
 }
 
 
-void TrainPokemonOCR::program(ProgramEnvironment& env){
-    OCR::TrainingSession session(env, DIRECTORY);
+void TrainPokemonOCR::program(ProgramEnvironment& env, CancellableScope& scope){
+    OCR::TrainingSession session(env.logger(), scope, DIRECTORY);
     session.generate_large_dictionary(
-        env,
         "Pokemon/PokemonNameOCR/",
         "PokemonOCR-",
         MODE != 0,

@@ -58,7 +58,6 @@ AutonomousBallThrower::AutonomousBallThrower(const AutonomousBallThrower_Descrip
     )
     , NOTIFICATION_CATCH_SUCCESS("Catch Success", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_CATCH_FAILED("Catch Failed", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_CATCH_SUCCESS,
         &NOTIFICATION_CATCH_FAILED,
@@ -104,22 +103,22 @@ std::unique_ptr<StatsTracker> AutonomousBallThrower::make_stats() const{
 
 
 
-void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env){
+void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
     env.update_stats();
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
     bool pokemon_caught = false;
     while (!pokemon_caught){
-        env.console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
         env.log("Wait for a pokemon to attack you.", COLOR_PURPLE);
         {
             BattleMenuWatcher fight_detector(BattleType::STANDARD);
             int result = run_until(
-                env, env.console,
-                [=](const BotBaseContext& context){
+                env, env.console, context,
+                [=](BotBaseContext& context){
                     while (true){
                         //TODO edit here for what to do
                         //pbf_wait(context, 1 * TICKS_PER_SECOND);
@@ -131,11 +130,11 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env){
             );
             if (result == 0){
                 env.log("New fight detected.", COLOR_PURPLE);
-                pbf_mash_button(env.console, BUTTON_B, 1 * TICKS_PER_SECOND);
+                pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
             }
         }
 
-        CatchResults result = basic_catcher(env, env.console, LANGUAGE, BALL_SELECT.slug());
+        CatchResults result = basic_catcher(env, env.console, context, LANGUAGE, BALL_SELECT.slug());
         switch (result.result){
         case CatchResult::POKEMON_CAUGHT:
             pokemon_caught = true;
@@ -175,8 +174,8 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env){
         }
 
         if (!pokemon_caught){
-            pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, env.console, true);
+            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            reset_game_from_home(env, env.console, context, true);
         }
     }
 
@@ -188,7 +187,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env){
         "Caught the " + STRING_POKEMON,
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

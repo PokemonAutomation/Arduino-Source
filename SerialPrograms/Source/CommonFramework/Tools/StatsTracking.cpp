@@ -4,8 +4,8 @@
  *
  */
 
+#include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/PrettyPrint.h"
-#include "ProgramEnvironment.h"
 #include "StatsTracking.h"
 
 #include <iostream>
@@ -108,6 +108,71 @@ void StatsTracker::parse_and_append_line(const std::string& line){
         }
     }
 }
+
+
+
+std::string stats_to_bar(
+    Logger& logger,
+    const StatsTracker* historical,
+    const StatsTracker* current,
+    const std::string& override_current
+){
+    std::string current_str;
+    if (!override_current.empty()){
+        current_str = override_current;
+    }else if (current){
+        current_str = current->to_str();
+    }
+
+    std::string historical_str;
+    if (historical){
+        historical_str = historical->to_str();
+    }
+
+    if (current_str.empty() && historical_str.empty()){
+        return "";
+    }
+
+    if (!current_str.empty() && historical_str.empty()){
+        logger.log(current_str);
+        return current_str;
+    }
+    if (current_str.empty() && !historical_str.empty()){
+        return "<b>Past Runs</b> - " + historical_str;
+    }
+
+    logger.log(current_str);
+
+    std::string str;
+    str += "<b>Current Run</b> - " + current_str;
+    str += "<br>";
+    str += "<b>Past Totals</b> - " + historical_str;
+
+    return str;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 }

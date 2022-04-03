@@ -34,7 +34,7 @@ public:
     EggHatcher(const EggHatcher_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 
 private:
@@ -50,7 +50,6 @@ private:
     BooleanCheckBoxOption SAVE_AND_RESET;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;

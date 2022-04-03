@@ -11,12 +11,12 @@
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Notifications/EventNotificationOption.h"
 #include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h"
 #include "PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.h"
 
 namespace PokemonAutomation{
+    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
@@ -35,7 +35,7 @@ struct EggAutonomousStats : public StatsTracker{
 class EggAutonomousState{
 public:
     EggAutonomousState(
-        ProgramEnvironment& env, ConsoleHandle& console,
+        ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
         EggAutonomousStats& stats,
         EventNotificationOption& notification_nonshiny_keep,
         EventNotificationOption& notification_shiny,
@@ -80,6 +80,7 @@ private:
 private:
     ProgramEnvironment& m_env;
     ConsoleHandle& m_console;
+    BotBaseContext& m_context;
     EggAutonomousStats& m_stats;
     EventNotificationOption m_notification_noop;
     EventNotificationOption& m_notification_nonshiny_keep;

@@ -76,7 +76,7 @@ EggSuperCombined2::EggSuperCombined2(const EggSuperCombined2_Descriptor& descrip
     PA_ADD_OPTION(HATCH_DELAY);
 }
 
-void EggSuperCombined2::program(SingleSwitchProgramEnvironment& env){
+void EggSuperCombined2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     EggCombinedSession session{
         .BOXES_TO_HATCH = BOXES_TO_HATCH,
         .STEPS_TO_HATCH = STEPS_TO_HATCH,
@@ -88,25 +88,25 @@ void EggSuperCombined2::program(SingleSwitchProgramEnvironment& env){
     };
 
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+        grip_menu_connect_go_home(context);
+        resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
     //  Mass Release
-    ssf_press_button2(env.console, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
-    ssf_press_button1(env.console, BUTTON_A, 200);
-    ssf_press_button1(env.console, BUTTON_R, 250);
-    release_boxes(env.console, BOXES_TO_RELEASE, GameSettings::instance().BOX_SCROLL_DELAY, GameSettings::instance().BOX_CHANGE_DELAY);
+    ssf_press_button2(context, BUTTON_X, GameSettings::instance().OVERWORLD_TO_MENU_DELAY, 20);
+    ssf_press_button1(context, BUTTON_A, 200);
+    ssf_press_button1(context, BUTTON_R, 250);
+    release_boxes(context, BOXES_TO_RELEASE, GameSettings::instance().BOX_SCROLL_DELAY, GameSettings::instance().BOX_CHANGE_DELAY);
 
     //  Skip Boxes
     for (uint8_t c = 0; c <= BOXES_TO_SKIP; c++){
-        ssf_press_button1(env.console, BUTTON_R, 60);
+        ssf_press_button1(context, BUTTON_R, 60);
     }
-    pbf_mash_button(env.console, BUTTON_B, 600);
+    pbf_mash_button(context, BUTTON_B, 600);
 
-    session.eggcombined2_body(env);
+    session.eggcombined2_body(env.logger(), context);
 }
 
 

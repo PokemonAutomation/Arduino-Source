@@ -150,12 +150,12 @@ void DexRecFinder::read_line(
     }
 }
 
-void DexRecFinder::program(SingleSwitchProgramEnvironment& env){
+void DexRecFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
+        grip_menu_connect_go_home(context);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
     }
 
     std::set<std::string> desired;
@@ -169,20 +169,20 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env){
     Stats& stats = env.stats<Stats>();
 
     while (true){
-        home_to_date_time(env.console, true, true);
-        neutral_date_skip(env.console);
-        settings_to_enter_game(env.console, true);
-        pbf_mash_button(env.console, BUTTON_B, 90);
-        pbf_press_button(env.console, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY - 20);
+        home_to_date_time(context, true, true);
+        neutral_date_skip(context);
+        settings_to_enter_game(context, true);
+        pbf_mash_button(context, BUTTON_B, 90);
+        pbf_press_button(context, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY - 20);
 
         if (FILTERS.enabled()){
-            env.console.botbase().wait_for_all_requests();
+            context.wait_for_all_requests();
             InferenceBoxScope box0(env.console, ImageFloatBox(0.75, 0.531 + 0 * 0.1115, 0.18, 0.059));
             InferenceBoxScope box1(env.console, ImageFloatBox(0.75, 0.531 + 1 * 0.1115, 0.18, 0.059));
             InferenceBoxScope box2(env.console, ImageFloatBox(0.75, 0.531 + 2 * 0.1115, 0.18, 0.059));
             InferenceBoxScope box3(env.console, ImageFloatBox(0.75, 0.531 + 3 * 0.1115, 0.18, 0.059));
-            pbf_press_button(env.console, BUTTON_A, 10, ENTER_POKEDEX_TIME);
-            env.console.botbase().wait_for_all_requests();
+            pbf_press_button(context, BUTTON_A, 10, ENTER_POKEDEX_TIME);
+            context.wait_for_all_requests();
 
             QImage frame = env.console.video().snapshot();
             bool found = false;
@@ -211,18 +211,18 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env){
             if (bad_read){
                 env.log("Read Errors. Pausing for user to see.", COLOR_RED);
                 stats.errors++;
-                pbf_wait(env.console, VIEW_TIME);
+                pbf_wait(context, VIEW_TIME);
             }
         }else{
             stats.attempts++;
 //            stats.errors++;
-            pbf_press_button(env.console, BUTTON_A, 10, ENTER_POKEDEX_TIME);
-            pbf_wait(env.console, VIEW_TIME);
+            pbf_press_button(context, BUTTON_A, 10, ENTER_POKEDEX_TIME);
+            pbf_wait(context, VIEW_TIME);
         }
         env.update_stats();
 
-        pbf_mash_button(env.console, BUTTON_B, BACK_OUT_TIME);
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+        pbf_mash_button(context, BUTTON_B, BACK_OUT_TIME);
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
     }
 
     env.update_stats();
@@ -233,7 +233,7 @@ void DexRecFinder::program(SingleSwitchProgramEnvironment& env){
         stats.to_str(),
         env.console.video().snapshot(), false
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

@@ -12,10 +12,6 @@
 #include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
 #include "Pokemon_NameSelectOption.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
-
 namespace PokemonAutomation{
 namespace Pokemon{
 

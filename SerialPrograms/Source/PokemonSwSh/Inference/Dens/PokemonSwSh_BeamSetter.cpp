@@ -27,9 +27,10 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-BeamSetter::BeamSetter(ProgramEnvironment& env, ConsoleHandle& console)
+BeamSetter::BeamSetter(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context)
     : m_env(env)
     , m_console(console)
+    , m_context(context)
     , m_text_box(console, 0.400, 0.825, 0.05, 0.05, COLOR_RED)
     , m_box(console, 0.10, 0.005, 0.8, 0.470, COLOR_RED)
 {
@@ -64,8 +65,8 @@ BeamSetter::Detection BeamSetter::run(
     }
 
     //  Drop the wishing piece.
-    pbf_press_button(m_console, BUTTON_A, 10, 10);
-    m_console.botbase().wait_for_all_requests();
+    pbf_press_button(m_context, BUTTON_A, 10, 10);
+    m_context.wait_for_all_requests();
 
     bool low_stddev_flag = false;
 
@@ -181,7 +182,7 @@ BeamSetter::Detection BeamSetter::run(
         }
 
         last_screenshot = std::move(current_screenshot);
-    }while (!throttler.end_iteration(m_env));
+    }while (!throttler.end_iteration(m_context));
 
     return Detection::NO_DETECTION;
 }

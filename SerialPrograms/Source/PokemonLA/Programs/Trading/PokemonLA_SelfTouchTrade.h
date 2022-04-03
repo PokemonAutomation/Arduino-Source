@@ -30,11 +30,14 @@ public:
     SelfTouchTrade(const SelfTouchTrade_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(MultiSwitchProgramEnvironment& env) override;
+    virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
-    bool trade_one(MultiSwitchProgramEnvironment& env, std::map<std::string, int>& trades_left);
-    bool move_to_next(ConsoleHandle& host, uint8_t& row, uint8_t& col);
+    bool trade_one(
+        MultiSwitchProgramEnvironment& env, CancellableScope& scope,
+        std::map<std::string, int>& trades_left
+    );
+    bool move_to_next(Logger& logger, BotBaseContext& host, uint8_t& row, uint8_t& col);
 
 private:
     class Stats;
@@ -46,7 +49,6 @@ private:
     TradeCountTableOption TRADE_COUNTS;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 };
 

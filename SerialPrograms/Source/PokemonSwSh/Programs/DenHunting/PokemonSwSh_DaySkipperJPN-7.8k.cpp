@@ -41,7 +41,6 @@ DaySkipperJPN7p8k::DaySkipperJPN7p8k(const DaySkipperJPN7p8k_Descriptor& descrip
         QDate(2000, 1, 1)
     )
     , NOTIFICATION_PROGRESS_UPDATE("Progress Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRESS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
@@ -94,7 +93,7 @@ typedef struct{
 bool is_start(const DateSmall* date){
     return date->year != 0 || date->month != 1 || date->day != 1;
 }
-bool date_increment_day(const BotBaseContext& context, DateSmall* date, bool press){
+bool date_increment_day(BotBaseContext& context, DateSmall* date, bool press){
     uint8_t days = days_in_month(date->year, date->month);
     if (date->day != days){
         if (press){
@@ -132,7 +131,7 @@ bool date_increment_day(const BotBaseContext& context, DateSmall* date, bool pre
     return false;
 }
 
-void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env){
+void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     SkipperStats& stats = env.stats<SkipperStats>();
     stats.runs++;
 
@@ -140,7 +139,7 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env){
     uint32_t remaining_skips = SKIPS;
 
     //  Connect
-    pbf_press_button(env.console, BUTTON_ZL, 5, 5);
+    pbf_press_button(context, BUTTON_ZL, 5, 5);
 
     //  Sanitize starting date.
     uint16_t year = (uint16_t)((QDate)START_DATE).year();
@@ -160,7 +159,7 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env){
     }
 
     //  Setup starting state.
-    skipper_init_view(env.console);
+    skipper_init_view(context);
 
     uint16_t correct_count = 0;
     while (remaining_skips > 0){
@@ -171,7 +170,7 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env){
             stats.to_str_current(remaining_skips)
         );
 
-        if (date_increment_day(env.console, &date, true)){
+        if (date_increment_day(context, &date, true)){
             correct_count++;
             remaining_skips--;
             stats.issued++;
@@ -181,13 +180,13 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env){
         }
         if (CORRECTION_SKIPS != 0 && correct_count == CORRECTION_SKIPS){
             correct_count = 0;
-            skipper_auto_recovery(env.console);
+            skipper_auto_recovery(context);
         }
 
     }
 
     //  Prevent the Switch from sleeping and the time from advancing.
-    env.console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
         env.program_info(),
@@ -195,9 +194,9 @@ void DaySkipperJPN7p8k::program(SingleSwitchProgramEnvironment& env){
         stats.to_str_current(remaining_skips)
     );
 
-    pbf_wait(env.console, 15 * TICKS_PER_SECOND);
+    pbf_wait(context, 15 * TICKS_PER_SECOND);
     while (true){
-        ssf_press_button1(env.console, BUTTON_A, 15 * TICKS_PER_SECOND);
+        ssf_press_button1(context, BUTTON_A, 15 * TICKS_PER_SECOND);
     }
 }
 

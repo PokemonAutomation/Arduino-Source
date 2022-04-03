@@ -48,9 +48,9 @@ AlphaRoarListener::AlphaRoarListener(const AlphaRoarListener_Descriptor& descrip
 
 void searchAlphaRoarFromAudioDump();
 
-void AlphaRoarListener::program(SingleSwitchProgramEnvironment& env){
+void AlphaRoarListener::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     //  Connect the controller.
-    // pbf_move_right_joystick(env.console, 0, 255, 10, 0);
+    // pbf_move_right_joystick(context, 0, 255, 10, 0);
 
     // searchAlphaRoarFromAudioDump();
     // return;
@@ -70,7 +70,7 @@ void AlphaRoarListener::program(SingleSwitchProgramEnvironment& env){
     AlphaRoarDetector detector(env.console, STOP_ON_ALPHA_ROAR);
 
 #if 1
-    AudioInferenceSession session(env, env.console, env.console);
+    AudioInferenceSession session(env.console, context, env.console);
     session += detector;
 
     session.run();

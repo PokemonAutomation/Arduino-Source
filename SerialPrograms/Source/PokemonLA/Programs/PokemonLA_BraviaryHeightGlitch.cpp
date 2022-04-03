@@ -29,11 +29,11 @@ BraviaryHeightGlitch::BraviaryHeightGlitch(const BraviaryHeightGlitch_Descriptor
 {}
 
 
-void BraviaryHeightGlitch::program(SingleSwitchProgramEnvironment& env){
+void BraviaryHeightGlitch::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     while (true){
-        pbf_press_button(env.console, BUTTON_Y, 30, 0);
-        pbf_press_button(env.console, BUTTON_PLUS, 30, 10);
-        pbf_press_button(env.console, BUTTON_PLUS, 30, 30);
+        pbf_press_button(context, BUTTON_Y, 30, 0);
+        pbf_press_button(context, BUTTON_PLUS, 30, 10);
+        pbf_press_button(context, BUTTON_PLUS, 30, 30);
     }
 }
 

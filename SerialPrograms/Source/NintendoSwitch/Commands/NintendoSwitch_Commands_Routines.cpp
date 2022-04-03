@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-void close_game(const BotBaseContext& context){
+void close_game(BotBaseContext& context){
     context.issue_request(
         DeviceRequest_close_game()
     );

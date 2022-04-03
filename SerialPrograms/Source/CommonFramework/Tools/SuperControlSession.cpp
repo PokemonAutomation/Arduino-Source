@@ -7,6 +7,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceSession.h"
 #include "CommonFramework/InferenceInfra/AudioInferenceSession.h"
+#include "ProgramEnvironment.h"
 #include "ConsoleHandle.h"
 #include "InterruptableCommands.h"
 #include "SuperControlSession.h"
@@ -21,13 +22,14 @@ namespace PokemonAutomation{
 SuperControlSession::~SuperControlSession(){}
 
 SuperControlSession::SuperControlSession(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
         std::chrono::milliseconds state_period,
         std::chrono::milliseconds visual_period,
         std::chrono::milliseconds audio_period
 )
     : m_env(env)
     , m_console(console)
+    , m_context(context)
     , m_state_period(state_period)
     , m_visual_period(visual_period)
     , m_audio_period(audio_period)
@@ -75,7 +77,7 @@ void SuperControlSession::run_session(){
 
     std::unique_ptr<AsyncVisualInferenceSession> visual;
     if (!m_visual_callbacks.empty()){
-        visual.reset(new AsyncVisualInferenceSession(m_env, m_console, m_console, m_console, m_visual_period));
+        visual.reset(new AsyncVisualInferenceSession(m_env, m_console, m_context, m_console, m_console, m_visual_period));
         for (VisualInferenceCallback* callback : m_visual_callbacks){
             *visual += *callback;
         }
@@ -83,13 +85,18 @@ void SuperControlSession::run_session(){
 
     std::unique_ptr<AsyncAudioInferenceSession> audio;
     if (!m_audio_callbacks.empty()){
-        audio.reset(new AsyncAudioInferenceSession(m_env, m_console, m_console, m_audio_period));
+        audio.reset(new AsyncAudioInferenceSession(m_env, m_console, m_context, m_console, m_audio_period));
         for (AudioInferenceCallback* callback : m_audio_callbacks){
             *audio += *callback;
         }
     }
 
-    m_active_command.reset(new AsyncCommandSession(m_env, m_console.botbase()));
+    m_active_command.reset(
+        new AsyncCommandSession(
+            m_context, m_env.logger(), m_env.realtime_dispatcher(),
+            m_console.botbase()
+        )
+    );
 
     WallClock now = std::chrono::system_clock::now();
     WallClock next_tick = now + m_state_period;
@@ -98,7 +105,7 @@ void SuperControlSession::run_session(){
 
     while (true){
         //  Check stop conditions.
-        m_env.check_stopping();
+        m_context.throw_if_cancelled();
         if (visual){
             visual->rethrow_exceptions();
         }
@@ -111,31 +118,23 @@ void SuperControlSession::run_session(){
         }
 
         now = std::chrono::system_clock::now();
-        auto wait = next_tick - now;
-        if (wait <= std::chrono::milliseconds(0)){
+        if (now >= next_tick){
             next_tick = now + m_state_period;
         }else{
-            std::mutex lock;
-            std::condition_variable cv;
-            ProgramStopNotificationScope scope(m_env, lock, cv);
-            std::unique_lock<std::mutex> lg(lock);
-            cv.wait_until(
-                lg, next_tick,
-                [=]{ return m_env.is_stopping(); }
-            );
+            m_context.wait_until(next_tick);
             next_tick += m_state_period;
         }
     }
-
+    m_context.throw_if_cancelled();
 
 //    cout << "SuperControlSession::run_session() - stop" << endl;
-    m_active_command->stop_session();
+    m_active_command->stop_session_and_rethrow();
 
     if (audio){
-        audio->stop();
+        audio->stop_and_rethrow();
     }
     if (visual){
-        visual->stop();
+        visual->stop_and_rethrow();
     }
 //    cout << "SuperControlSession::run_session() - end" << endl;
 }

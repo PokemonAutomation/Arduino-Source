@@ -22,55 +22,15 @@ namespace PokemonSwSh{
 
 
 void enter_loading_game(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     bool backup_save,
     uint16_t post_wait_time
 ){
-#if 0
-    //  Wait for game to load.
-    {
-        std::chrono::milliseconds timeout(GameSettings::instance().START_GAME_WAIT * (1000 / TICKS_PER_SECOND));
+    openedgame_to_gamemenu(env, console, context, GameSettings::instance().START_GAME_WAIT);
 
-        InferenceBoxScope box0(console, 0.2, 0.2, 0.6, 0.1);
-        InferenceBoxScope box1(console, 0.2, 0.7, 0.6, 0.1);
-
-        bool black_found = false;
-
-        InferenceThrottler throttler(timeout);
-        while (true){
-            env.check_stopping();
-
-            QImage screen = console.video().snapshot();
-            if (screen.isNull()){
-                env.log("enter_loading_game(): Screenshot failed.", COLOR_PURPLE);
-                throttler.set_period(std::chrono::milliseconds(1000));
-            }else{
-                bool black0 = is_black(extract_box_reference(screen, box0));
-                bool black1 = is_black(extract_box_reference(screen, box1));
-                if (black0 && black1){
-                    if (!black_found){
-                        env.log("start_game_with_inference(): Game load started.", COLOR_PURPLE);
-                    }
-                    black_found = true;
-                }else if (black_found){
-                    break;
-                }
-            }
-
-            if (throttler.end_iteration(env)){
-                env.log("enter_loading_game(): Game load timed out. Proceeding with default start delay.", COLOR_RED);
-                break;
-            }
-        }
-    }
-#else
-    openedgame_to_gamemenu(env, console, GameSettings::instance().START_GAME_WAIT);
-#endif
-
-    env.log("enter_loading_game(): Game Loaded. Entering game...", COLOR_PURPLE);
-    enter_game(console, backup_save, GameSettings::instance().ENTER_GAME_MASH, 0);
-    console.botbase().wait_for_all_requests();
+    console.log("enter_loading_game(): Game Loaded. Entering game...", COLOR_PURPLE);
+    enter_game(context, backup_save, GameSettings::instance().ENTER_GAME_MASH, 0);
+    context.wait_for_all_requests();
 
     //  Wait to enter game.
     {
@@ -82,17 +42,17 @@ void enter_loading_game(
 
         InferenceThrottler throttler(timeout);
         while (true){
-            env.check_stopping();
+            context.throw_if_cancelled();
 
             QImage screen = console.video().snapshot();
             if (screen.isNull()){
-                env.log("enter_loading_game(): Screenshot failed.", COLOR_PURPLE);
+                console.log("enter_loading_game(): Screenshot failed.", COLOR_PURPLE);
                 throttler.set_period(std::chrono::milliseconds(1000));
             }else{
                 bool black = is_black(extract_box_reference(screen, box));
                 if (black){
                     if (!black_found){
-                        env.log("enter_loading_game(): Game entry started.", COLOR_PURPLE);
+                        console.log("enter_loading_game(): Game entry started.", COLOR_PURPLE);
                     }
                     black_found = true;
                 }else if (black_found){
@@ -100,109 +60,58 @@ void enter_loading_game(
                 }
             }
 
-            if (throttler.end_iteration(env)){
-                env.log("enter_loading_game(): Game entry timed out. Proceeding with default start delay.", COLOR_RED);
+            if (throttler.end_iteration(context)){
+                console.log("enter_loading_game(): Game entry timed out. Proceeding with default start delay.", COLOR_RED);
                 break;
             }
         }
     }
-    env.log("start_game_with_inference(): Game started.", COLOR_PURPLE);
+    console.log("start_game_with_inference(): Game started.", COLOR_PURPLE);
 
     if (post_wait_time != 0){
-        pbf_wait(console, post_wait_time);
+        pbf_wait(context, post_wait_time);
     }
 }
 
 void start_game_from_home_with_inference(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     bool tolerate_update_menu,
     uint8_t game_slot,
     uint8_t user_slot,
     bool backup_save,
     uint16_t post_wait_time
 ){
-//    cout << "tolerate_update_menu = " << tolerate_update_menu << endl;
-//    cout << "TOLERATE_SYSTEM_UPDATE_MENU_FAST = " << TOLERATE_SYSTEM_UPDATE_MENU_FAST << endl;
-//    cout << "TOLERATE_SYSTEM_UPDATE_MENU_FAST = " << &TOLERATE_SYSTEM_UPDATE_MENU_FAST << endl;
-
-#if 0
-    if (game_slot != 0){
-        pbf_press_button(console, BUTTON_HOME, 10, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY - 10);
-        for (uint8_t c = 1; c < game_slot; c++){
-            pbf_press_dpad(console, DPAD_RIGHT, 5, 5);
-        }
-    }
-
-    if (tolerate_update_menu){
-        //  If the update menu isn't there, these will get swallowed by the opening
-        //  animation for the select user menu.
-        pbf_press_button(console, BUTTON_A, 5, 35);      //  Choose game
-        pbf_press_dpad(console, DPAD_UP, 5, 0);          //  Skip the update window.
-    }
-
-//    cout << "START_GAME_REQUIRES_INTERNET = " << START_GAME_REQUIRES_INTERNET << endl;
-    if (!ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET && user_slot == 0){
-        //  Mash your way into the game.
-        pbf_mash_button(console, BUTTON_A, GameSettings::instance().START_GAME_MASH);
-    }else{
-        pbf_press_button(console, BUTTON_A, 5, 175);     //  Enter select user menu.
-        if (user_slot != 0){
-            //  Move to correct user.
-            for (uint8_t c = 0; c < 8; c++){
-                pbf_press_dpad(console, DPAD_LEFT, 7, 7);
-            }
-//            pbf_wait(50);
-            for (uint8_t c = 1; c < user_slot; c++){
-                pbf_press_dpad(console, DPAD_RIGHT, 7, 7);
-            }
-        }
-        pbf_press_button(console, BUTTON_A, 5, 5);       //  Enter game
-
-        //  Switch to mashing ZR instead of A to get into the game.
-        //  Mash your way into the game.
-        uint16_t duration = GameSettings::instance().START_GAME_MASH;
-        if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET){
-            //  Need to wait a bit longer for the internet check.
-            duration += ConsoleSettings::instance().START_GAME_INTERNET_CHECK_DELAY;
-        }
-        pbf_mash_button(console, BUTTON_ZR, duration);
-    }
-    console.botbase().wait_for_all_requests();
-#else
     open_game_from_home(
-        env, console,
+        env, console, context,
         tolerate_update_menu,
         game_slot,
         user_slot,
         GameSettings::instance().START_GAME_MASH
     );
-#endif
 
     //  Wait for game to load.
-    enter_loading_game(env, console, backup_save, post_wait_time);
+    enter_loading_game(env, console, context, backup_save, post_wait_time);
 }
 
 void reset_game_from_home_with_inference(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     bool tolerate_update_menu,
     bool backup_save,
     uint16_t post_wait_time
 ){
     if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET || tolerate_update_menu){
-        close_game(console);
+        close_game(context);
         start_game_from_home_with_inference(
-            env, console, tolerate_update_menu, 0, 0, backup_save, post_wait_time
+            env, console, context, tolerate_update_menu, 0, 0, backup_save, post_wait_time
         );
         return;
     }
 
-    fast_reset_game(console, GameSettings::instance().START_GAME_MASH, 0, 0, 0);
-    console.botbase().wait_for_all_requests();
+    fast_reset_game(context, GameSettings::instance().START_GAME_MASH, 0, 0, 0);
+    context.wait_for_all_requests();
 
     //  Wait for game to load.
-    enter_loading_game(env, console, backup_save, post_wait_time);
+    enter_loading_game(env, console, context, backup_save, post_wait_time);
 }
 
 

@@ -181,31 +181,33 @@ static PA_FORCE_INLINE uint64_t popcount_sumcoord(
 
 //  Run Waterfill algorithm on mask "m" with starting point "x".
 //  Save result back into "x".
-PA_FORCE_INLINE static void waterfill_expand(const BinaryTile_64x32_x64_AVX512& m, BinaryTile_64x32_x64_AVX512& x){
+PA_FORCE_INLINE static void waterfill_expand(BinaryTile_64x32_x64_AVX512& m, BinaryTile_64x32_x64_AVX512& x){
     __m512i x0 = x.vec[0];
     __m512i x1 = x.vec[1];
     __m512i x2 = x.vec[2];
     __m512i x3 = x.vec[3];
 
     Waterfill_64x32_x64_AVX512GF_ProcessedMask mask(m, x0, x1, x2, x3);
+    Intrinsics_x64_AVX512::expand_forward(mask, x0, x1, x2, x3);
 
-//    uint64_t c = 0;
-    __m512i changed;
+    __m512i m0, m1, m2, m3;
     do{
-        Intrinsics_x64_AVX512::expand_forward(mask, x0, x1, x2, x3);
         expand_vertical(mask, x0, x1, x2, x3);
         Intrinsics_x64_AVX512GF::expand_reverse(mask, x0, x1, x2, x3);
-        changed = _mm512_xor_si512(x0, x.vec[0]);
-        x.vec[0] = x0;
-        changed = _mm512_ternarylogic_epi64(changed, x1, x.vec[1], 0b11110110);
-        x.vec[1] = x1;
-        changed = _mm512_ternarylogic_epi64(changed, x2, x.vec[2], 0b11110110);
-        x.vec[2] = x2;
-        changed = _mm512_ternarylogic_epi64(changed, x3, x.vec[3], 0b11110110);
-        x.vec[3] = x3;
-//        cout << x.dump() << endl;
-//        c++;
-    }while (_mm512_test_epi64_mask(changed, changed));
+        Intrinsics_x64_AVX512::expand_forward(mask, x0, x1, x2, x3);
+    }while (Intrinsics_x64_AVX512::keep_going(
+        mask,
+        m0, m1, m2, m3,
+        x0, x1, x2, x3
+    ));
+    x.vec[0] = x0;
+    x.vec[1] = x1;
+    x.vec[2] = x2;
+    x.vec[3] = x3;
+    m.vec[0] = m0;
+    m.vec[1] = m1;
+    m.vec[2] = m2;
+    m.vec[3] = m3;
 }
 
 

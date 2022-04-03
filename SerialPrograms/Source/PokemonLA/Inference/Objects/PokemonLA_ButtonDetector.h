@@ -24,6 +24,7 @@ enum class ButtonType{
     ButtonA,
     ButtonB,
     ButtonPlus,
+    ButtonMinus,
     ArrowLeft,
     ArrowRight,
 };
@@ -31,13 +32,20 @@ enum class ButtonType{
 
 class ButtonMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
-    ButtonMatcher(ButtonType type, double max_rmsd);
+    ButtonMatcher(ButtonType type, size_t min_width, size_t max_width, double max_rmsd);
     static const ButtonMatcher& A();
     static const ButtonMatcher& B();
     static const ButtonMatcher& Plus();
+    static const ButtonMatcher& Minus();
     static const ButtonMatcher& ArrowLeft();
     static const ButtonMatcher& ArrowRight();
 
+    virtual bool check_image(const ConstImageRef& image) const override{
+        return image.width() >= m_min_width && image.height() >= m_min_height;
+    };
+
+    size_t m_min_width;
+    size_t m_min_height;
     double m_max_rmsd;
 };
 

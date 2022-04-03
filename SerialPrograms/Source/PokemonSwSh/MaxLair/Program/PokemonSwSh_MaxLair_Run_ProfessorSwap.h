@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Run_ProfessorSwap_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Run_ProfessorSwap_H
 
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateTracker.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.h"
@@ -20,7 +19,7 @@ namespace MaxLairInternal{
 
 void run_professor_swap(
     AdventureRuntime& runtime,
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     GlobalStateTracker& state_tracker
 );
 

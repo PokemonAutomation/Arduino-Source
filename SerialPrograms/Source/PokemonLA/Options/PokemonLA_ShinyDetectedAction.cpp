@@ -64,7 +64,7 @@ bool ShinyDetectedActionOption::stop_on_shiny() const{
 
 #if 0
 bool run_on_shiny(
-    const BotBaseContext& context,
+    BotBaseContext& context,
     const ShinyDetectedActionOption& option
 ){
     switch ((ShinyDetectedAction)(size_t)option.ACTION){
@@ -92,7 +92,7 @@ bool run_on_shiny(
 ){
     QImage screenshot = console.video().snapshot();
     if (!option.do_nothing()){
-        command_session.dispatch([&](const BotBaseContext& context){
+        command_session.dispatch([&](BotBaseContext& context){
             run_on_shiny(context, option);
         });
         command_session.wait();
@@ -120,7 +120,7 @@ bool run_on_shiny(
 
 
 void on_shiny_sound(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     ShinyDetectedActionOption& options,
     const ShinySoundResults& results
 ){
@@ -153,9 +153,9 @@ void on_shiny_sound(
         return;
     }
 
-//    pbf_press_button(console, BUTTON_ZL, 20, options.SCREENSHOT_DELAY);
-    pbf_mash_button(console, BUTTON_ZL, options.SCREENSHOT_DELAY);
-    console.botbase().wait_for_all_requests();
+//    pbf_press_button(context, BUTTON_ZL, 20, options.SCREENSHOT_DELAY);
+    pbf_mash_button(context, BUTTON_ZL, options.SCREENSHOT_DELAY);
+    context.wait_for_all_requests();
 
     QImage screen = console.video().snapshot();
     send_program_notification(
@@ -167,11 +167,12 @@ void on_shiny_sound(
     );
 
     if (action == ShinyDetectedAction::TAKE_VIDEO_STOP_PROGRAM){
-        pbf_press_button(console, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+        pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
     }
 
-    pbf_press_button(console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-    throw OperationCancelledException();
+    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    context.wait_for_all_requests();
+    throw ProgramFinishedException();
 }
 
 

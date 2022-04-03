@@ -18,8 +18,6 @@
 #include "Common/Cpp/PanicDump.h"
 #include "StreamInterface.h"
 
-//#include <iostream>
-
 namespace PokemonAutomation{
 
 class SerialConnection : public StreamConnection{

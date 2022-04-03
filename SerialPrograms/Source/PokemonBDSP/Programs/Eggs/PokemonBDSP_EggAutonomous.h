@@ -35,11 +35,11 @@ public:
     EggAutonomous(const EggAutonomous_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     bool run_batch(
-        SingleSwitchProgramEnvironment& env,
+        SingleSwitchProgramEnvironment& env, BotBaseContext& context,
         EggAutonomousState& saved_state,
         EggAutonomousState& current_state
     );
@@ -61,7 +61,6 @@ private:
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
     EventNotificationOption NOTIFICATION_NONSHINY_KEEP;
     EventNotificationOption NOTIFICATION_SHINY;
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;

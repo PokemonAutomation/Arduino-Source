@@ -53,7 +53,6 @@ SelfTouchTrade::SelfTouchTrade(const SelfTouchTrade_Descriptor& descriptor)
         2, 0, 32
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
@@ -76,7 +75,10 @@ std::unique_ptr<StatsTracker> SelfTouchTrade::make_stats() const{
 
 
 
-bool SelfTouchTrade::trade_one(MultiSwitchProgramEnvironment& env, std::map<std::string, int>& trades_left){
+bool SelfTouchTrade::trade_one(
+    MultiSwitchProgramEnvironment& env, CancellableScope& scope,
+    std::map<std::string, int>& trades_left
+){
     TradeStats& stats = env.stats<TradeStats>();
 
     ConsoleHandle& host = HOSTING_SWITCH == 0 ? env.consoles[0] : env.consoles[1];
@@ -106,8 +108,8 @@ bool SelfTouchTrade::trade_one(MultiSwitchProgramEnvironment& env, std::map<std:
     host.log("\"" + slug + "\" - Trades Remaining: " + std::to_string(iter->second));
 #if 1
     MultiConsoleErrorState error_state;
-    env.run_in_parallel([&](ConsoleHandle& console){
-        trade_current_pokemon(env, console, error_state, stats);
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+        trade_current_pokemon(env, console, context, error_state, stats);
     });
     stats.m_trades++;
     iter->second--;
@@ -115,14 +117,14 @@ bool SelfTouchTrade::trade_one(MultiSwitchProgramEnvironment& env, std::map<std:
     env.wait_for(std::chrono::milliseconds(5000));
     return false;
 #endif
-    env.wait_for(std::chrono::milliseconds(500));
+    scope.wait_for(std::chrono::milliseconds(500));
 
     return true;
 }
-bool SelfTouchTrade::move_to_next(ConsoleHandle& host, uint8_t& row, uint8_t& col){
+bool SelfTouchTrade::move_to_next(Logger& logger, BotBaseContext& host, uint8_t& row, uint8_t& col){
     //  Returns true if moved to next box.
 
-    host.log("Moving to next slot.");
+    logger.log("Moving to next slot.");
     if (col < 5){
         pbf_press_dpad(host, DPAD_RIGHT, 20, 140);
         col++;
@@ -146,7 +148,7 @@ bool SelfTouchTrade::move_to_next(ConsoleHandle& host, uint8_t& row, uint8_t& co
 }
 
 
-void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env){
+void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     TradeStats& stats = env.stats<TradeStats>();
 
     //  Build list of what's needed.
@@ -156,13 +158,14 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env){
     }
 
     //  Connect both controllers.
-    env.run_in_parallel([&](ConsoleHandle& console){
-        pbf_press_button(console, BUTTON_LCLICK, 10, 0);
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+        pbf_press_button(context, BUTTON_LCLICK, 10, 0);
     });
 
     uint8_t row = 0;
     uint8_t col = 0;
 
+    BotBaseContext host_context(scope, (HOSTING_SWITCH == 0 ? env.consoles[0] : env.consoles[1]).botbase());
     ConsoleHandle& host = HOSTING_SWITCH == 0 ? env.consoles[0] : env.consoles[1];
     ConsoleHandle& recv = HOSTING_SWITCH == 0 ? env.consoles[1] : env.consoles[0];
 
@@ -179,7 +182,7 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env){
         bool host_ok, recv_ok;
         InferenceBoxScope box0(host, {0.925, 0.100, 0.014, 0.030});
         InferenceBoxScope box1(recv, {0.925, 0.100, 0.014, 0.030});
-        env.run_in_parallel([&](ConsoleHandle& console){
+        env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
             ImageStats stats = image_stats(extract_box_reference(console.video().snapshot(), box0));
             bool ok = is_white(stats);
             if (host.index() == console.index()){
@@ -196,17 +199,17 @@ void SelfTouchTrade::program(MultiSwitchProgramEnvironment& env){
         //  Perform trade.
         bool traded = false;
         if (host_ok){
-            traded = trade_one(env, trades_left);
+            traded = trade_one(env, scope, trades_left);
         }else{
             recv.log("Skipping empty slot on host...", COLOR_PURPLE);
         }
 
         //  Move to next slot.
         if (!traded){
-            if (move_to_next(host, row, col)){
+            if (move_to_next(host, host_context, row, col)){
                 boxes++;
             }
-            host.botbase().wait_for_all_requests();
+            host_context.wait_for_all_requests();
         }
     }
 

@@ -9,7 +9,6 @@
 
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "Pokemon/Pokemon_EncounterStats.h"
 #include "PokemonSwSh/ShinyHuntTracker.h"
 #include "PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterOption.h"
@@ -23,8 +22,7 @@ namespace PokemonSwSh{
 class StandardEncounterDetection{
 public:
     StandardEncounterDetection(
-        ProgramEnvironment& env,
-        ConsoleHandle& console,
+        ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
         Language language,
         const EncounterFilterOption& filter,
         ShinyType shininess,
@@ -43,6 +41,7 @@ public:
 private:
     ProgramEnvironment& m_env;
     ConsoleHandle& m_console;
+    BotBaseContext& m_context;
 
     const Language m_language;
 

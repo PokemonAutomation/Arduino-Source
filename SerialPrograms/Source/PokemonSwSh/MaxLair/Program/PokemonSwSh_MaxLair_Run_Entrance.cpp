@@ -18,8 +18,8 @@ namespace MaxLairInternal{
 
 void run_entrance(
     AdventureRuntime& runtime,
-    ProgramEnvironment& env,
-    ConsoleHandle& console, bool save_path,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    bool save_path,
     GlobalStateTracker& state_tracker
 ){
     size_t console_index = console.index();
@@ -39,14 +39,14 @@ void run_entrance(
 
     InferenceBoxScope box(console, 0.782, 0.850, 0.030, 0.050);
 
-    pbf_wait(console, 2 * TICKS_PER_SECOND);
+    pbf_wait(context, 2 * TICKS_PER_SECOND);
     while (true){
         if (save_path){
-            pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
         }else{
-            pbf_press_button(console, BUTTON_B, 10, TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_B, 10, TICKS_PER_SECOND);
         }
-        console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
 
         QImage screen = console.video().snapshot();
         ImageStats stats = image_stats(extract_box_reference(screen, box));

@@ -19,10 +19,6 @@
 #include "ClientSource/Libraries/Logging.h"
 #include "StreamInterface.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
-
 namespace PokemonAutomation{
 
 class SerialConnection : public StreamConnection{

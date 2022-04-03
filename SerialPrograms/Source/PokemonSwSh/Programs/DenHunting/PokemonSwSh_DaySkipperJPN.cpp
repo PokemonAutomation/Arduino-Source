@@ -38,7 +38,6 @@ DaySkipperJPN::DaySkipperJPN(const DaySkipperJPN_Descriptor& descriptor)
         10
     )
     , NOTIFICATION_PROGRESS_UPDATE("Progress Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_PROGRESS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
@@ -62,7 +61,7 @@ std::unique_ptr<StatsTracker> DaySkipperJPN::make_stats() const{
     return std::unique_ptr<StatsTracker>(new SkipperStats());
 }
 
-void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env){
+void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     SkipperStats& stats = env.stats<SkipperStats>();
     stats.runs++;
 
@@ -70,10 +69,10 @@ void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env){
     uint32_t remaining_skips = SKIPS;
 
     //  Connect
-    pbf_press_button(env.console, BUTTON_ZR, 5, 5);
+    pbf_press_button(context, BUTTON_ZR, 5, 5);
 
     //  Setup starting state.
-    skipper_init_view(env.console);
+    skipper_init_view(context);
 
     uint8_t day = 1;
     uint16_t correct_count = 0;
@@ -85,7 +84,7 @@ void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env){
             stats.to_str_current(remaining_skips)
         );
 
-        skipper_increment_day(env.console, false);
+        skipper_increment_day(context, false);
 
         if (day == 31){
             day = 1;
@@ -99,13 +98,13 @@ void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env){
         }
         if (CORRECTION_SKIPS != 0 && correct_count == CORRECTION_SKIPS){
             correct_count = 0;
-            skipper_auto_recovery(env.console);
+            skipper_auto_recovery(context);
         }
 
     }
 
     //  Prevent the Switch from sleeping and the time from advancing.
-    env.console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
     send_program_finished_notification(
         env.logger(), NOTIFICATION_PROGRAM_FINISH,
         env.program_info(),
@@ -113,9 +112,9 @@ void DaySkipperJPN::program(SingleSwitchProgramEnvironment& env){
         stats.to_str_current(remaining_skips)
     );
 
-    pbf_wait(env.console, 15 * TICKS_PER_SECOND);
+    pbf_wait(context, 15 * TICKS_PER_SECOND);
     while (true){
-        ssf_press_button1(env.console, BUTTON_A, 15 * TICKS_PER_SECOND);
+        ssf_press_button1(context, BUTTON_A, 15 * TICKS_PER_SECOND);
     }
 }
 

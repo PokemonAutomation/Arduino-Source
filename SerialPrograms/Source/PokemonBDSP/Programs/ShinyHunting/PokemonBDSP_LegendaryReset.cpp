@@ -40,7 +40,6 @@ LegendaryReset::LegendaryReset(const LegendaryReset_Descriptor& descriptor)
     , GO_HOME_WHEN_DONE(false)
     , WALK_UP("<b>Walk Up:</b><br>Walk up while mashing A to trigger encounter.", false)
     , ENCOUNTER_BOT_OPTIONS(false, false)
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
@@ -64,11 +63,11 @@ std::unique_ptr<StatsTracker> LegendaryReset::make_stats() const{
 }
 
 
-void LegendaryReset::program(SingleSwitchProgramEnvironment& env){
+void LegendaryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     PokemonSwSh::ShinyHuntTracker& stats = env.stats<PokemonSwSh::ShinyHuntTracker>();
 
     StandardEncounterHandler handler(
-        env, env.console,
+        env, env.console, context,
         LANGUAGE,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -76,15 +75,15 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env){
     LeadingShinyTracker lead_tracker(env.console);
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_B, 5, 5);
+    pbf_press_button(context, BUTTON_B, 5, 5);
 
     bool reset = false;
     while (true){
         env.update_stats();
 
         if (reset){
-            pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
-            if (!reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
+            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);
+            if (!reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST)){
                 stats.add_error();
                 continue;
             }
@@ -95,8 +94,8 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env){
         BattleMenuWatcher battle_menu(BattleType::STANDARD);
 
         int ret = run_until(
-            env, env.console,
-            [=](const BotBaseContext& context){
+            env, env.console, context,
+            [=](BotBaseContext& context){
                 size_t stop = WALK_UP ? 30 : 60;
                 for (size_t c = 0; c < stop; c++){
                     if (WALK_UP){
@@ -126,7 +125,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env){
         DoublesShinyDetection result_wild;
         ShinyDetectionResult result_own;
         detect_shiny_battle(
-            env, env.console,
+            env, env.console, context,
             result_wild, result_own,
             WILD_POKEMON,
             std::chrono::seconds(30)
@@ -145,7 +144,7 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env){
         "",
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

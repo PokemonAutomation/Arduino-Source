@@ -11,11 +11,12 @@
 #define PokemonAutomation_PokemonSwSh_BeamSetter_H
 
 #include <vector>
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
+    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
@@ -30,7 +31,7 @@ public:
     };
 
 public:
-    BeamSetter(ProgramEnvironment& env, ConsoleHandle& console);
+    BeamSetter(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
 
     Detection run(
         bool save_screenshot,
@@ -45,6 +46,7 @@ public:
 private:
     ProgramEnvironment& m_env;
     ConsoleHandle& m_console;
+    BotBaseContext& m_context;
     InferenceBoxScope m_text_box;
     InferenceBoxScope m_box;
     std::vector<ImageFloatBox> m_boxes;

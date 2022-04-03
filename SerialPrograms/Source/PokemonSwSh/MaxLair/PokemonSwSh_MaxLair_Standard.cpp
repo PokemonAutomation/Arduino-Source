@@ -73,7 +73,6 @@ MaxLairStandard::MaxLairStandard(const MaxLairStandard_Descriptor& descriptor)
     , CONSOLES(MaxLairStandard_ConsoleFactory())
     , NOTIFICATION_STATUS("Status Update", true, false)
     , NOTIFICATION_SHINY("Shiny Catch", true, true, ImageAttachmentMode::JPG, {"Notifs", "Showcase"})
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &HOSTING.NOTIFICATIONS.NOTIFICATION,
         &NOTIFICATION_STATUS,
@@ -162,24 +161,24 @@ private:
 
 
 
-void MaxLairStandard::program(MultiSwitchProgramEnvironment& env){
+void MaxLairStandard::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     if (CONSOLES.HOST >= env.consoles.size()){
         throw UserSetupError(env.logger(), "Invalid Host Switch");
     }
 
-    env.run_in_parallel([&](ConsoleHandle& console){
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
         if (START_IN_GRIP_MENU){
-            grip_menu_connect_go_home(console);
-            resume_game_no_interact(console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            grip_menu_connect_go_home(context);
+            resume_game_no_interact(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }else{
-            pbf_press_button(console, BUTTON_B, 5, 5);
+            pbf_press_button(context, BUTTON_B, 5, 5);
         }
     });
 
     EndBattleDecider_Standard decider(CONSOLES);
 
     loop_adventures(
-        env, CONSOLES,
+        env, scope, CONSOLES,
         CONSOLES.HOST, BOSS_SLOT,
         decider,
         GO_HOME_WHEN_DONE,

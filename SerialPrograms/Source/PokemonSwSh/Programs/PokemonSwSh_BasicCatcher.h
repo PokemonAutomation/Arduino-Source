@@ -8,11 +8,12 @@
 #define PokemonAutomation_PokemonSwSh_BasicCatcher_H
 
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
+    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
@@ -20,8 +21,7 @@ namespace PokemonSwSh{
 //  Returns the quantity of the ball.
 //  Returns -1 if unable to read.
 int16_t move_to_ball(
-    const BattleBallReader& reader,
-    ConsoleHandle& console,
+    const BattleBallReader& reader, ConsoleHandle& console, BotBaseContext& context,
     const std::string& ball_slug
 );
 
@@ -44,8 +44,7 @@ struct CatchResults{
     uint16_t balls_used;
 };
 CatchResults basic_catcher(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     Language language,
     const std::string& ball_slug
 );

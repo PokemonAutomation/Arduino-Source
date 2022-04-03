@@ -38,14 +38,14 @@ FriendSearchDisconnect::FriendSearchDisconnect(const FriendSearchDisconnect_Desc
     PA_ADD_OPTION(USER_SLOT);
 }
 
-void FriendSearchDisconnect::program(SingleSwitchProgramEnvironment& env) {
-    ssf_press_button2(env.console, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
+void FriendSearchDisconnect::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) {
+    ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
 
-    home_to_add_friends(env.console, USER_SLOT - 1, 1, true);
+    home_to_add_friends(context, USER_SLOT - 1, 1, true);
 
     //  Enter friend search.
-    pbf_mash_button(env.console, BUTTON_A, 100);
-    settings_to_enter_game(env.console, true);
+    pbf_mash_button(context, BUTTON_A, 100);
+    settings_to_enter_game(context, true);
 }
 
 

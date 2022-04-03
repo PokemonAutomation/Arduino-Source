@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_LobbyWait_H
 #define PokemonAutomation_PokemonSwSh_LobbyWait_H
 
+#include <QImage>
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
@@ -19,11 +20,9 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
 
 static RaidLobbyState raid_lobby_wait(
+    BotBaseContext& context,
     ConsoleHandle& console,
     bool HOST_ONLINE,
     uint8_t accept_FR_slot,
@@ -34,21 +33,21 @@ static RaidLobbyState raid_lobby_wait(
     bool TOLERATE_SYSTEM_UPDATE_MENU_SLOW = ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW;
     uint16_t FULL_LOBBY_TIMER = GameSettings::instance().FULL_LOBBY_TIMER;
 
-    console.botbase().wait_for_all_requests();
-    uint32_t start = system_clock(console);
+    context.wait_for_all_requests();
+    uint32_t start = system_clock(context);
     RaidLobbyReader inference(console, console);
     RaidLobbyState state;
 
     if (HOST_ONLINE && accept_FR_slot > 0){
         accept_FRs(
-            console,
+            context,
             accept_FR_slot - 1, true,
             GAME_TO_HOME_DELAY_SAFE,
             AUTO_FR_DURATION,
             TOLERATE_SYSTEM_UPDATE_MENU_SLOW
         );
-        console.botbase().wait_for_all_requests();
-        uint32_t time_elapsed = system_clock(console) - start;
+        context.wait_for_all_requests();
+        uint32_t time_elapsed = system_clock(context) - start;
         uint32_t delay = time_elapsed;
 
         while (true){
@@ -56,18 +55,18 @@ static RaidLobbyState raid_lobby_wait(
             if (state.valid && state.raid_is_full() && state.raiders_are_ready()){
                 return state;
             }
-            time_elapsed = system_clock(console) - start;
+            time_elapsed = system_clock(context) - start;
             if (time_elapsed + delay >= lobby_wait_delay){
                 break;
             }
             accept_FRs(
-                console,
+                context,
                 accept_FR_slot - 1, false,
                 GAME_TO_HOME_DELAY_SAFE,
                 AUTO_FR_DURATION,
                 TOLERATE_SYSTEM_UPDATE_MENU_SLOW
             );
-            console.botbase().wait_for_all_requests();
+            context.wait_for_all_requests();
         }
     }
 
@@ -76,38 +75,38 @@ static RaidLobbyState raid_lobby_wait(
         if (state.valid && state.raid_is_full() && state.raiders_are_ready()){
             return state;
         }
-        uint32_t time_elapsed = system_clock(console) - start;
+        uint32_t time_elapsed = system_clock(context) - start;
         if (time_elapsed >= lobby_wait_delay){
             break;
         }
         pbf_wait(
-            console,
+            context,
             std::min(
                 lobby_wait_delay - time_elapsed,
                 (uint32_t)TICKS_PER_SECOND
             )
         );
-        console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
     }
 
-//    console.botbase().wait_for_all_requests();
+//    context.wait_for_all_requests();
 
     while (true){
         if (!state.valid || state.raiders_are_ready()){
             return state;
         }
-        uint32_t time_elapsed = system_clock(console) - start;
+        uint32_t time_elapsed = system_clock(context) - start;
         if (time_elapsed > FULL_LOBBY_TIMER){
             return state;
         }
         pbf_wait(
-            console,
+            context,
             std::min(
                 FULL_LOBBY_TIMER - time_elapsed,
                 (uint32_t)TICKS_PER_SECOND
             )
         );
-        console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
         state = inference.read(console.video().snapshot());
     }
 }

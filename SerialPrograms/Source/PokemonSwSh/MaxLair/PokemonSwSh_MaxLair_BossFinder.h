@@ -37,7 +37,7 @@ public:
     virtual void update_active_consoles() override;
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(MultiSwitchProgramEnvironment& env) override;
+    virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 
 private:
@@ -52,7 +52,6 @@ private:
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationOption NOTIFICATION_SHINY;
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 };
 

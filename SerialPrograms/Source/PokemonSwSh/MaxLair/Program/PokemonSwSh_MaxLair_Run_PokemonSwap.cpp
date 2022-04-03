@@ -21,7 +21,7 @@ namespace MaxLairInternal{
 
 void run_swap_pokemon(
     AdventureRuntime& runtime,
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     GlobalStateTracker& state_tracker,
     const ConsoleSpecificOptions& settings
 ){
@@ -32,7 +32,7 @@ void run_swap_pokemon(
 
 
     //  Wait for bottom row to reload.
-    env.wait_for(std::chrono::milliseconds(100));
+    context.wait_for(std::chrono::milliseconds(100));
 
 
     PokemonSwapMenuReader reader(
@@ -60,7 +60,7 @@ void run_swap_pokemon(
     state.add_seen(options[1]);
 
 
-    GlobalState inferred = state_tracker.synchronize(env, console, console_index);
+    GlobalState inferred = state_tracker.synchronize(console, console_index);
 
 
     //  Make your selection.
@@ -68,12 +68,12 @@ void run_swap_pokemon(
     if (swap){
         console.log("Choosing to swap for: " + options[1], COLOR_PURPLE);
         std::lock_guard<std::mutex> lg(runtime.m_delay_lock);
-        pbf_mash_button(console, BUTTON_A, TICKS_PER_SECOND);
-        console.botbase().wait_for_all_requests();
+        pbf_mash_button(context, BUTTON_A, TICKS_PER_SECOND);
+        context.wait_for_all_requests();
     }else{
         console.log("Choosing not to swap.", COLOR_PURPLE);
-        pbf_mash_button(console, BUTTON_B, TICKS_PER_SECOND);
-        console.botbase().wait_for_all_requests();
+        pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
+        context.wait_for_all_requests();
     }
 
 #if 1
@@ -81,8 +81,8 @@ void run_swap_pokemon(
     {
         BlackScreenWatcher detector;
         int result = run_until(
-            env, console,
-            [&](const BotBaseContext& context){
+            env, console, context,
+            [&](BotBaseContext& context){
                 pbf_mash_button(context, swap ? BUTTON_A : BUTTON_B, 30 * TICKS_PER_SECOND);
             },
             { &detector }
@@ -97,7 +97,7 @@ void run_swap_pokemon(
     {
         PathScreenDetector detector;
         int result = wait_until(
-            env, console,
+            env, console, context,
             std::chrono::seconds(30),
             { &detector },
             INFERENCE_RATE
@@ -109,7 +109,7 @@ void run_swap_pokemon(
         }
     }
 
-    env.wait_for(std::chrono::milliseconds(100));
+    context.wait_for(std::chrono::milliseconds(100));
 
     PathReader path_reader(console, player_index);
     path_reader.read_sprites(console, state, console.video().snapshot());

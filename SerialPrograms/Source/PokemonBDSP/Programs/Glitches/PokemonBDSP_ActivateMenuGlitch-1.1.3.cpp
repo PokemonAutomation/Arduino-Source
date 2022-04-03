@@ -42,21 +42,21 @@ ActivateMenuGlitch113::ActivateMenuGlitch113(const ActivateMenuGlitch113_Descrip
 
 
 
-void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env){
+void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     ConsoleHandle& console = env.console;
 
     //  Enable Strength
-    pbf_mash_button(console, BUTTON_ZL, 2 * TICKS_PER_SECOND);
-    pbf_mash_button(console, BUTTON_B, 5 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_ZL, 2 * TICKS_PER_SECOND);
+    pbf_mash_button(context, BUTTON_B, 5 * TICKS_PER_SECOND);
 
 
-    pbf_press_button(console, BUTTON_R, 5, 0);
-    pbf_press_dpad(console, DPAD_RIGHT, 10, 115);
-    pbf_press_button(console, BUTTON_ZL, 10, 0);
-    console.botbase().wait_for_all_requests();
+    pbf_press_button(context, BUTTON_R, 5, 0);
+    pbf_press_dpad(context, DPAD_RIGHT, 10, 115);
+    pbf_press_button(context, BUTTON_ZL, 10, 0);
+    context.wait_for_all_requests();
     MapWatcher detector;
     int ret = wait_until(
-        env, console, std::chrono::seconds(2),
+        env, console, context, std::chrono::seconds(2),
         { &detector }
     );
     if (ret < 0){
@@ -65,17 +65,17 @@ void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env){
         console.log("Detected map!", COLOR_BLUE);
     }
 
-    env.wait_for(std::chrono::seconds(1));
+    context.wait_for(std::chrono::seconds(1));
 
     //  Move bolder and cursor to Celestial town.
-    pbf_press_dpad(console, DPAD_RIGHT, 30, 95);
+    pbf_press_dpad(context, DPAD_RIGHT, 30, 95);
 
     //  Bring up menu
-    pbf_press_button(console, BUTTON_ZL, 20, FLY_A_TO_X_DELAY - 20);
-    pbf_press_button(console, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+    pbf_press_button(context, BUTTON_ZL, 20, FLY_A_TO_X_DELAY - 20);
+    pbf_press_button(context, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
 
     //  Fly
-    pbf_press_button(console, BUTTON_ZL, 20, 10 * TICKS_PER_SECOND);
+    pbf_press_button(context, BUTTON_ZL, 20, 10 * TICKS_PER_SECOND);
 }
 
 

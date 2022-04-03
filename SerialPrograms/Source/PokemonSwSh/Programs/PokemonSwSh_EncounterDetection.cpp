@@ -7,6 +7,7 @@
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceSession.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
@@ -18,8 +19,7 @@ namespace PokemonSwSh{
 
 
 StandardEncounterDetection::StandardEncounterDetection(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     Language language,
     const EncounterFilterOption& filter,
     ShinyType shininess,
@@ -27,6 +27,7 @@ StandardEncounterDetection::StandardEncounterDetection(
 )
     : m_env(env)
     , m_console(console)
+    , m_context(context)
     , m_language(language)
     , m_filter(filter)
     , m_shininess(shininess)
@@ -56,7 +57,7 @@ const std::set<std::string>* StandardEncounterDetection::candidates(){
     }
 
     InferenceBoxScope box(m_console, ImageFloatBox(0.76, 0.04, 0.15, 0.044));
-    m_env.wait_for(m_read_name_delay);
+    m_context.wait_for(m_read_name_delay);
 
     QImage screen = m_console.video().snapshot();
     ConstImageRef frame = extract_box_reference(screen, box);

@@ -50,7 +50,6 @@ ShinyHuntFlagPin::ShinyHuntFlagPin(const ShinyHuntFlagPin_Descriptor& descriptor
         180, 0
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
         &SHINY_DETECTED.NOTIFICATIONS,
@@ -92,15 +91,15 @@ std::unique_ptr<StatsTracker> ShinyHuntFlagPin::make_stats() const{
 }
 
 
-void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env){
+void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
     stats.attempts++;
 
-    goto_camp_from_jubilife(env, env.console, TRAVEL_LOCATION);
+    goto_camp_from_jubilife(env, env.console, context, TRAVEL_LOCATION);
 
     {
         FlagNavigationAir session(
-            env, env.console,
+            env, env.console, context,
             SHINY_DETECTED.stop_on_shiny(),
             STOP_DISTANCE,
             FLAG_REACHED_DELAY,
@@ -110,20 +109,20 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env){
 
         if (session.detected_shiny()){
             stats.shinies++;
-            on_shiny_sound(env, env.console, SHINY_DETECTED, session.shiny_sound_results());
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED, session.shiny_sound_results());
         }
     }
 
-    pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-    reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 }
 
 
-void ShinyHuntFlagPin::program(SingleSwitchProgramEnvironment& env){
+void ShinyHuntFlagPin::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
     while (true){
         env.update_stats();
@@ -134,13 +133,11 @@ void ShinyHuntFlagPin::program(SingleSwitchProgramEnvironment& env){
             stats.to_str()
         );
         try{
-            run_iteration(env);
+            run_iteration(env, context);
         }catch (OperationFailedException&){
             stats.errors++;
-            pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
-        }catch (OperationCancelledException&){
-            break;
+            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
     }
 

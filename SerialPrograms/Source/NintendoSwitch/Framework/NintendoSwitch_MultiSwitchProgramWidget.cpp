@@ -38,7 +38,7 @@ MultiSwitchProgramWidget* MultiSwitchProgramWidget::make(
     );
     return widget;
 }
-void MultiSwitchProgramWidget::run_switch_program(){
+void MultiSwitchProgramWidget::run_switch_program(const ProgramInfo& info){
     MultiSwitchProgramInstance& instance = static_cast<MultiSwitchProgramInstance&>(m_instance);
     FixedLimitVector<ConsoleHandle> switches(instance.system_count());
     for (size_t c = 0; c < instance.system_count(); c++){
@@ -52,24 +52,12 @@ void MultiSwitchProgramWidget::run_switch_program(){
             system.audio()
         );
     }
+
     MultiSwitchProgramEnvironment env(
-        ProgramInfo(
-            instance.descriptor().identifier(),
-            instance.descriptor().category(),
-            instance.descriptor().display_name(),
-            timestamp()
-        ),
+        info,
         m_logger,
         m_current_stats.get(), m_historical_stats.get(),
         std::move(switches)
-    );
-    connect(
-        this, &RunnableSwitchProgramWidget::signal_cancel,
-        &env, [&]{
-            m_state.store(ProgramState::STOPPING, std::memory_order_release);
-            env.signal_stop();
-        },
-        Qt::DirectConnection
     );
     connect(
         &env, &ProgramEnvironment::set_status,
@@ -78,11 +66,20 @@ void MultiSwitchProgramWidget::run_switch_program(){
         }
     );
 
+    CancellableHolder<CancellableScope> scope;
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_scope = &scope;
+    }
     try{
         start_program_video_check(env.consoles, instance.descriptor().feedback());
-        instance.program(env);
+        instance.program(env, scope);
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_scope = nullptr;
     }catch (...){
         env.update_stats();
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_scope = nullptr;
         throw;
     }
 }

@@ -42,7 +42,6 @@ SelfBoxTrade::SelfBoxTrade(const SelfBoxTrade_Descriptor& descriptor)
         2, 0, 32
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
@@ -62,19 +61,22 @@ std::unique_ptr<StatsTracker> SelfBoxTrade::make_stats() const{
 }
 
 
-bool SelfBoxTrade::move_to_next(MultiSwitchProgramEnvironment& env, uint8_t& row, uint8_t& col){
+bool SelfBoxTrade::move_to_next(
+    MultiSwitchProgramEnvironment& env, CancellableScope& scope,
+    uint8_t& row, uint8_t& col
+){
     //  Returns true if moved to next box.
 
     env.log("Moving to next slot.");
     if (col < 5){
-        env.run_in_parallel([](const BotBaseContext& context){
+        env.run_in_parallel(scope, [](ConsoleHandle& console, BotBaseContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, 140);
         });
         col++;
         return false;
     }
     if (row < 4){
-        env.run_in_parallel([](const BotBaseContext& context){
+        env.run_in_parallel(scope, [](ConsoleHandle& console, BotBaseContext& context){
             pbf_press_dpad(context, DPAD_RIGHT, 20, 105);
             pbf_press_dpad(context, DPAD_RIGHT, 20, 105);
             pbf_press_dpad(context, DPAD_DOWN, 20, 140);
@@ -83,7 +85,7 @@ bool SelfBoxTrade::move_to_next(MultiSwitchProgramEnvironment& env, uint8_t& row
         row++;
         return false;
     }
-    env.run_in_parallel([](const BotBaseContext& context){
+    env.run_in_parallel(scope, [](ConsoleHandle& console, BotBaseContext& context){
         pbf_press_button(context, BUTTON_R, 20, 230);
         pbf_press_dpad(context, DPAD_RIGHT, 20, 105);
         pbf_press_dpad(context, DPAD_RIGHT, 20, 105);
@@ -95,13 +97,13 @@ bool SelfBoxTrade::move_to_next(MultiSwitchProgramEnvironment& env, uint8_t& row
 }
 
 
-void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env){
+void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     TradeStats& stats = env.stats<TradeStats>();
 
 
     //  Connect both controllers.
-    env.run_in_parallel([&](ConsoleHandle& console){
-        pbf_press_button(console, BUTTON_LCLICK, 10, 0);
+    env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+        pbf_press_button(context, BUTTON_LCLICK, 10, 0);
     });
 
     uint8_t row = 0;
@@ -121,7 +123,7 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env){
         InferenceBoxScope box1(env.consoles[1], {0.920, 0.100, 0.020, 0.030});
         TradeNameReader name_reader0(env.consoles[0], env.consoles[0], LANGUAGE_LEFT);
         TradeNameReader name_reader1(env.consoles[1], env.consoles[1], LANGUAGE_RIGHT);
-        env.run_in_parallel([&](ConsoleHandle& console){
+        env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
             ConstImageRef image0 = extract_box_reference(console.video().snapshot(), box0);
             ImageStats stats = image_stats(image0);
             bool is_ok = is_white(stats);
@@ -143,8 +145,8 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env){
         if (ok.load(std::memory_order_acquire)){
             //  Perform trade.
             MultiConsoleErrorState error_state;
-            env.run_in_parallel([&](ConsoleHandle& console){
-                trade_current_pokemon(env, console, error_state, stats);
+            env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
+                trade_current_pokemon(env, console, context, error_state, stats);
             });
             stats.m_trades++;
         }else{
@@ -152,7 +154,7 @@ void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env){
         }
 
         //  Move to next slot.
-        if (move_to_next(env, row, col)){
+        if (move_to_next(env, scope, row, col)){
             boxes++;
         }
     }

@@ -20,6 +20,7 @@ class QPushButton;
 namespace PokemonAutomation{
 
 class BatchWidget;
+class CancellableScope;
 
 
 class RunnablePanelWidget : public PanelWidget{
@@ -64,6 +65,7 @@ protected:
     virtual QWidget* make_body(QWidget& parent);
     virtual BatchWidget* make_options(QWidget& parent);
     virtual QLabel* make_status_bar(QWidget& parent);
+    //  Make action widget, which is a UI area with button "Start Program!" and "Restore Defaults".
     virtual QWidget* make_actions(QWidget& parent);
 
 //    void redraw_options();
@@ -122,6 +124,7 @@ protected:
     std::mutex m_lock;
     std::unique_ptr<StatsTracker> m_historical_stats;
     std::unique_ptr<StatsTracker> m_current_stats;
+    CancellableScope* m_scope = nullptr;
 };
 
 

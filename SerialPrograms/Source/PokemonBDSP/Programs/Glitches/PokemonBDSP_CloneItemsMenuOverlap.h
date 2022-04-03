@@ -31,15 +31,15 @@ public:
     CloneItemsMenuOverlap(const CloneItemsMenuOverlap_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     struct Stats;
 
-    bool trigger_encounter(ProgramEnvironment& env, ConsoleHandle& console);
-    void swap_party(ConsoleHandle& console);
-    void mash_B_to_battle(ProgramEnvironment& env, ConsoleHandle& console);
-    void detach_items(ConsoleHandle& console);
+    bool trigger_encounter(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+    void swap_party(ConsoleHandle& console, BotBaseContext& context);
+    void mash_B_to_battle(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+    void detach_items(ConsoleHandle& console, BotBaseContext& context);
 
 private:
     GoHomeWhenDoneOption GO_HOME_WHEN_DONE;
@@ -48,7 +48,6 @@ private:
     SimpleIntegerOption<uint16_t> SAVE_INTERVAL;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;

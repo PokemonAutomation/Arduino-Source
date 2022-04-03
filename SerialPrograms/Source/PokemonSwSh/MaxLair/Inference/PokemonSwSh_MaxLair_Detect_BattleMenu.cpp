@@ -7,6 +7,7 @@
 #include <cmath>
 #include "Common/Compiler.h"
 #include "Common/Cpp/PrettyPrint.h"
+#include "Common/Cpp/CancellableScope.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
@@ -232,8 +233,7 @@ BattleMenuReader::BattleMenuReader(VideoOverlay& overlay, Language language)
 {}
 
 std::set<std::string> BattleMenuReader::read_opponent(
-    LoggerQt& logger,
-    ProgramEnvironment& env,
+    LoggerQt& logger, CancellableScope& scope,
     VideoFeed& feed
 ) const{
     std::set<std::string> result;
@@ -247,7 +247,7 @@ std::set<std::string> BattleMenuReader::read_opponent(
             return result;
         }
         logger.log("Failed to read opponent name. Retrying in 1 second...", COLOR_ORANGE);
-        env.wait_for(std::chrono::seconds(1));
+        scope.wait_for(std::chrono::seconds(1));
     }
     dump_image(logger, MODULE_NAME, "MaxLair-read_opponent", screen);
     return result;

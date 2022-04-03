@@ -39,7 +39,6 @@ GalladeFinder_Descriptor::GalladeFinder_Descriptor()
 GalladeFinder::GalladeFinder(const GalladeFinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
         &SHINY_DETECTED.NOTIFICATIONS,
@@ -79,7 +78,7 @@ std::unique_ptr<StatsTracker> GalladeFinder::make_stats() const{
 }
 
 
-void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env){
+void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     // NOTE: there's no "stunned by alpha" detection in case the first spawn is an alpha!
     // NOTE: there is also no mitigation for if you get attacked by a Kirlia if it hates you
     Stats& stats = env.stats<Stats>();
@@ -89,7 +88,7 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env){
     // program should be started right in front of the entrance
     // so enter the sub region
     env.console.log("Entering Snowpoint Temple...");
-    mash_A_to_enter_sub_area(env, env.console);
+    mash_A_to_enter_sub_area(env, env.console, context);
 
     env.console.log("Beginning navigation to the Alpha Gallade...");
     // start the shiny detection, there's nothing initially
@@ -97,8 +96,8 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env){
     {
         ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
         run_until(
-            env, env.console,
-            [](const BotBaseContext& context){
+            env, env.console, context,
+            [](BotBaseContext& context){
                 // forward portion
                 pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, (uint16_t)(6.8 * TICKS_PER_SECOND)); // forward while running until stairs, mash y a few times down the stairs
                 pbf_mash_button(context, BUTTON_Y,(uint16_t)(2.8 * TICKS_PER_SECOND)); // roll down the stairs, recover stamina
@@ -134,23 +133,23 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env){
         );
         if (shiny_detector.detected()){
            stats.shinies++;
-           on_shiny_sound(env, env.console, SHINY_DETECTED, shiny_detector.results());
+           on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_detector.results());
         }
     };
 
     // then reset
     env.console.log("No shiny detected, restarting the game!");
 
-    pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-    reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 }
 
 
-void GalladeFinder::program(SingleSwitchProgramEnvironment& env){
+void GalladeFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
     while (true){
         env.update_stats();
@@ -161,13 +160,11 @@ void GalladeFinder::program(SingleSwitchProgramEnvironment& env){
             stats.to_str()
         );
         try{
-            run_iteration(env);
+            run_iteration(env, context);
         }catch (OperationFailedException&){
             stats.errors++;
-            pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
-        }catch (OperationCancelledException&){
-            break;
+            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
     }
 

@@ -8,11 +8,12 @@
 #define PokemonAutomation_PokemonBDSP_BasicCatcher_H
 
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
+    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
     
@@ -47,8 +48,7 @@ struct CatchResults{
 //
 // Don't handle the case that own pokemon evolving or black out to Pokecenter.
 CatchResults basic_catcher(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     Language language,
     const std::string& ball_slug
 );

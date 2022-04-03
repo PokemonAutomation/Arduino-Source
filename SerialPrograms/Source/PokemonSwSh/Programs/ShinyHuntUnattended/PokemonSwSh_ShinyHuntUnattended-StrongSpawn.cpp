@@ -50,27 +50,27 @@ ShinyHuntUnattendedStrongSpawn::ShinyHuntUnattendedStrongSpawn(const ShinyHuntUn
 
 
 
-void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env){
+void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
+        grip_menu_connect_go_home(context);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
     }
 
     const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
-    uint32_t last_touch = system_clock(env.console);
+    uint32_t last_touch = system_clock(context);
     for (uint32_t c = 0; ; c++){
 
         //  If the update menu isn't there, these will get swallowed by the opening
         //  animation for the select user menu.
         if (ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST){
-            pbf_press_button(env.console, BUTTON_A, 5, 35); //  Choose game
-            pbf_press_dpad(env.console, DPAD_UP, 5, 0);     //  Skip the update window.
+            pbf_press_button(context, BUTTON_A, 5, 35); //  Choose game
+            pbf_press_dpad(context, DPAD_UP, 5, 0);     //  Skip the update window.
         }
 
-        pbf_press_button(env.console, BUTTON_A, 10, 180);   //  Enter select user menu.
-        pbf_press_button(env.console, BUTTON_A, 10, 10);    //  Enter game
+        pbf_press_button(context, BUTTON_A, 10, 180);   //  Enter select user menu.
+        pbf_press_button(context, BUTTON_A, 10, 10);    //  Enter game
 
         //  Switch to mashing ZR instead of A to get into the game.
         //  Mash your way into the game.
@@ -79,33 +79,33 @@ void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env
             //  Need to wait a bit longer for the internet check.
             duration += ConsoleSettings::instance().START_GAME_INTERNET_CHECK_DELAY;
         }
-        pbf_mash_button(env.console, BUTTON_ZR, duration);
+        pbf_mash_button(context, BUTTON_ZR, duration);
 
         //  Wait for game to start.
-        pbf_wait(env.console, START_GAME_WAIT_DELAY);
+        pbf_wait(context, START_GAME_WAIT_DELAY);
 
         //  Enter game.
         env.log("Starting Encounter: " + tostr_u_commas(c + 1));
-        pbf_press_button(env.console, BUTTON_A, 10, ENTER_GAME_TO_RUN_DELAY);
+        pbf_press_button(context, BUTTON_A, 10, ENTER_GAME_TO_RUN_DELAY);
 
         //  Run away.
-        run_away_with_lights(env.console);
+        run_away_with_lights(context);
 
         //  Enter Pokemon menu if shiny.
-        enter_summary(env.console, false);
+        enter_summary(context, false);
 
         //  Touch the date and conditional close game.
 //        if (true){
-        if (TIME_ROLLBACK_HOURS > 0 && system_clock(env.console) - last_touch >= PERIOD){
+        if (TIME_ROLLBACK_HOURS > 0 && system_clock(context) - last_touch >= PERIOD){
             last_touch += PERIOD;
-            close_game_if_overworld(env.console, false, TIME_ROLLBACK_HOURS);
+            close_game_if_overworld(context, false, TIME_ROLLBACK_HOURS);
         }else{
-            close_game_if_overworld(env.console, false, 0);
+            close_game_if_overworld(context, false, 0);
         }
 
     }
 
-    pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
 }
 
 

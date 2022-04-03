@@ -27,8 +27,7 @@ namespace MaxLairInternal{
 
 
 void run_path_select(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     GlobalStateTracker& state_tracker
 ){
     size_t console_index = console.index();
@@ -36,20 +35,20 @@ void run_path_select(
     size_t player_index = state.find_player_index(console_index);
 
     PathReader reader(console, player_index);
-    env.wait_for(std::chrono::milliseconds(500));
+    context.wait_for(std::chrono::milliseconds(500));
 
     QImage screen = console.video().snapshot();
     reader.read_sprites(console, state, screen);
     reader.read_hp(console, state, screen);
 
     if (state.wins == 0){
-        reader.read_path(env, console, state);
+        reader.read_path(env, console, context, state);
     }else{
         reader.read_side(console, state, screen);
     }
 
 
-    GlobalState inferred = state_tracker.synchronize(env, console, console_index);
+    GlobalState inferred = state_tracker.synchronize(console, console_index);
 
 
     //  Select the path.
@@ -66,10 +65,10 @@ void run_path_select(
     console.log("Choosing path " + std::to_string((int)slot) + ".", COLOR_PURPLE);
 
     for (uint8_t c = 0; c < slot; c++){
-        pbf_press_dpad(console, DPAD_RIGHT, 10, 50);
+        pbf_press_dpad(context, DPAD_RIGHT, 10, 50);
     }
-    pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
-    console.botbase().wait_for_all_requests();
+    pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+    context.wait_for_all_requests();
 }
 
 

@@ -16,6 +16,8 @@ class QJsonArray;
 
 namespace PokemonAutomation{
 
+class Logger;
+
 class StatsTracker{
     StatsTracker(const StatsTracker&) = delete;
 
@@ -40,6 +42,13 @@ protected:
     std::map<std::string, std::string> m_aliases;
 };
 
+
+std::string stats_to_bar(
+    Logger& logger,
+    const StatsTracker* historical,
+    const StatsTracker* current,
+    const std::string& override_current = ""
+);
 
 
 

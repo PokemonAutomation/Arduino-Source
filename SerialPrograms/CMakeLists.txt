@@ -64,6 +64,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/AlignedVector.h
     ../Common/Cpp/AsyncDispatcher.cpp
     ../Common/Cpp/AsyncDispatcher.h
+    ../Common/Cpp/CancellableScope.cpp
+    ../Common/Cpp/CancellableScope.h
     ../Common/Cpp/Color.h
     ../Common/Cpp/CpuId.cpp
     ../Common/Cpp/CpuId.h
@@ -542,6 +544,8 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.h
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.cpp
@@ -890,6 +894,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.h
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.cpp
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.h
+    Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.cpp
+    Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_GalladeFinder.cpp
@@ -1405,6 +1411,7 @@ SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x64_x64_AVX512.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x32_x64_AVX512.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x64_x64_AVX512.cpp
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.cpp
     PROPERTIES COMPILE_FLAGS ${ARCH_FLAGS_17_Skylake}
 )

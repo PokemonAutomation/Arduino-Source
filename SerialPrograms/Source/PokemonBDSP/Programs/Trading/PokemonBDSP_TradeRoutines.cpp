@@ -30,22 +30,22 @@ TradeStats::TradeStats()
 
 
 void trade_current_pokemon(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     MultiConsoleErrorState& tracker,
     TradeStats& stats
 ){
     tracker.check_unrecoverable_error(console);
 
-    console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
     QImage box_image = console.video().snapshot();
     ImageMatchWatcher box_detector(box_image, {0.02, 0.10, 0.15, 0.80}, 50);
 
     {
-        pbf_press_button(console, BUTTON_ZL, 20, 0);
-        console.botbase().wait_for_all_requests();
+        pbf_press_button(context, BUTTON_ZL, 20, 0);
+        context.wait_for_all_requests();
         SelectionArrowFinder detector(console, {0.50, 0.58, 0.40, 0.10}, COLOR_RED);
         int ret = wait_until(
-            env, console, std::chrono::seconds(120),
+            env, console, context, std::chrono::seconds(120),
             { &detector }
         );
         if (ret < 0){
@@ -53,15 +53,15 @@ void trade_current_pokemon(
             tracker.report_unrecoverable_error(console, "Failed to detect trade select prompt after 2 minutes.");
         }
         console.log("Detected trade prompt.");
-        env.wait_for(std::chrono::milliseconds(100));
+        context.wait_for(std::chrono::milliseconds(100));
         tracker.check_unrecoverable_error(console);
     }
     {
-        pbf_press_button(console, BUTTON_ZL, 20, 0);
-        console.botbase().wait_for_all_requests();
+        pbf_press_button(context, BUTTON_ZL, 20, 0);
+        context.wait_for_all_requests();
         SelectionArrowFinder detector(console, {0.50, 0.52, 0.40, 0.10}, COLOR_RED);
         int ret = wait_until(
-            env, console, std::chrono::seconds(10),
+            env, console, context, std::chrono::seconds(10),
             { &detector }
         );
         if (ret < 0){
@@ -69,18 +69,18 @@ void trade_current_pokemon(
             tracker.report_unrecoverable_error(console, "Failed to detect trade confirm prompt after 10 seconds.");
         }
         console.log("Detected trade confirm prompt.");
-        env.wait_for(std::chrono::milliseconds(100));
+        context.wait_for(std::chrono::milliseconds(100));
         tracker.check_unrecoverable_error(console);
     }
 
     //  Start trade.
-    pbf_press_button(console, BUTTON_ZL, 20, 0);
+    pbf_press_button(context, BUTTON_ZL, 20, 0);
 
     //  Wait for black screen.
     {
         BlackScreenOverWatcher black_screen;
         int ret = wait_until(
-            env, console, std::chrono::minutes(2),
+            env, console, context, std::chrono::minutes(2),
             { &black_screen }
         );
         if (ret < 0){
@@ -88,7 +88,7 @@ void trade_current_pokemon(
             tracker.report_unrecoverable_error(console, "Failed to detect start of trade after 2 minutes.");
         }
         console.log("Detected start of trade.");
-        env.wait_for(std::chrono::milliseconds(100));
+        context.wait_for(std::chrono::milliseconds(100));
         tracker.check_unrecoverable_error(console);
     }
 
@@ -96,8 +96,8 @@ void trade_current_pokemon(
     {
         BlackScreenWatcher black_screen;
         int ret = run_until(
-            env, console,
-            [](const BotBaseContext& context){
+            env, console, context,
+            [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             { &black_screen }
@@ -107,14 +107,14 @@ void trade_current_pokemon(
             tracker.report_unrecoverable_error(console, "Failed to detect end of trade after 2 minutes.");
         }
         console.log("Detected end of trade.");
-        env.wait_for(std::chrono::milliseconds(100));
+        context.wait_for(std::chrono::milliseconds(100));
         tracker.check_unrecoverable_error(console);
     }
 
     //  Wait to return to box.
     {
         int ret = wait_until(
-            env, console, std::chrono::minutes(2),
+            env, console, context, std::chrono::minutes(2),
             { &box_detector }
         );
         if (ret < 0){
@@ -128,7 +128,7 @@ void trade_current_pokemon(
 
 
 void trade_current_box(
-    MultiSwitchProgramEnvironment& env,
+    MultiSwitchProgramEnvironment& env, CancellableScope& scope,
     EventNotificationOption& notifications,
     TradeStats& stats
 ){
@@ -143,15 +143,15 @@ void trade_current_box(
             );
 
             MultiConsoleErrorState error_state;
-            env.run_in_parallel([&](ConsoleHandle& console){
+            env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
                 uint16_t box_scroll_delay = GameSettings::instance().BOX_SCROLL_DELAY_0;
                 for (size_t r = 0; r < row; r++){
-                    pbf_move_right_joystick(console, 128, 255, 20, box_scroll_delay);
+                    pbf_move_right_joystick(context, 128, 255, 20, box_scroll_delay);
                 }
                 for (size_t c = 0; c < col; c++){
-                    pbf_move_right_joystick(console, 255, 128, 20, box_scroll_delay);
+                    pbf_move_right_joystick(context, 255, 128, 20, box_scroll_delay);
                 }
-                trade_current_pokemon(env, console, error_state, stats);
+                trade_current_pokemon(env, console, context, error_state, stats);
             });
             stats.m_trades++;
         }

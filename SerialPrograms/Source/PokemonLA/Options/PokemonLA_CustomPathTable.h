@@ -23,7 +23,11 @@ enum class PathAction{
     MOVE_FORWARD,
     JUMP,
     WAIT,
+    START_LISTEN,
+    END_LISTEN,
 };
+
+extern const QString PathAction_NAMES[];
 
 enum class PathMount{
     NO_MOUNT,
@@ -74,9 +78,9 @@ public:
 };
 
 // A program option to build a custom path to navigate the map
-class CustomPathTableTable : public ConfigOption{
+class CustomPathTable : public ConfigOption{
 public:
-    CustomPathTableTable();
+    CustomPathTable();
 
     size_t num_actions() const { return m_table.size(); }
 

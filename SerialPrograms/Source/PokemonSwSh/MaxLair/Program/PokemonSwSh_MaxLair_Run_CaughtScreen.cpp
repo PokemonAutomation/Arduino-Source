@@ -31,15 +31,14 @@ namespace MaxLairInternal{
 
 StateMachineAction mash_A_to_entrance(
     AdventureRuntime& runtime,
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     const QImage& entrance
 ){
     EntranceDetector entrance_detector(entrance);
 
     int result = run_until(
-        env, console,
-        [&](const BotBaseContext& context){
+        env, console, context,
+        [&](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, 60 * TICKS_PER_SECOND);
         },
         { &entrance_detector },
@@ -57,19 +56,17 @@ StateMachineAction mash_A_to_entrance(
 
 
 void synchronize_caught_screen(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     GlobalStateTracker& state_tracker
 ){
-    console.botbase().wait_for_all_requests();
-    state_tracker.synchronize(env, console, console.index(), std::chrono::seconds(60));
+    context.wait_for_all_requests();
+    state_tracker.synchronize(console, console.index(), std::chrono::seconds(60));
 }
 
 
 StateMachineAction run_caught_screen(
     AdventureRuntime& runtime,
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     GlobalStateTracker& state_tracker,
     const EndBattleDecider& decider,
     const QImage& entrance
@@ -77,10 +74,10 @@ StateMachineAction run_caught_screen(
     size_t console_index = console.index();
     bool is_host = console_index == runtime.host_index;
 
-    pbf_wait(console, TICKS_PER_SECOND);
-    console.botbase().wait_for_all_requests();
+    pbf_wait(context, TICKS_PER_SECOND);
+    context.wait_for_all_requests();
 
-    CaughtPokemonScreen tracker(env, console);
+    CaughtPokemonScreen tracker(env, console, context);
     runtime.session_stats.add_run(tracker.total());
     if (is_host){
         runtime.path_stats.add_run(tracker.total() >= 4);
@@ -112,9 +109,9 @@ StateMachineAction run_caught_screen(
     if (!shinies.empty()){
         tracker.scroll_to(shinies.back());
         tracker.leave_summary();
-        env.wait_for(std::chrono::seconds(1));
-        pbf_press_button(console, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
-        console.botbase().wait_for_all_requests();
+        context.wait_for(std::chrono::seconds(1));
+        pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+        context.wait_for_all_requests();
     }
 
     //  Screencap all the shinies and send notifications.
@@ -147,7 +144,7 @@ StateMachineAction run_caught_screen(
     switch (action){
     case CaughtScreenAction::STOP_PROGRAM:
         console.log("Stopping program...", COLOR_PURPLE);
-        synchronize_caught_screen(env, console, state_tracker);
+        synchronize_caught_screen(env, console, context, state_tracker);
         return StateMachineAction::STOP_PROGRAM;
 
     case CaughtScreenAction::TAKE_NON_BOSS_SHINY_AND_CONTINUE:
@@ -157,24 +154,24 @@ StateMachineAction run_caught_screen(
         if (shinies.empty() || shinies[0] == 3){
             console.log("Quitting back to entrance.", COLOR_PURPLE);
             tracker.leave_summary();
-            synchronize_caught_screen(env, console, state_tracker);
-            pbf_press_dpad(console, DPAD_DOWN, 10, 50);
-            pbf_press_button(console, BUTTON_B, 10, TICKS_PER_SECOND);
-            return mash_A_to_entrance(runtime, env, console, entrance);
+            synchronize_caught_screen(env, console, context, state_tracker);
+            pbf_press_dpad(context, DPAD_DOWN, 10, 50);
+            pbf_press_button(context, BUTTON_B, 10, TICKS_PER_SECOND);
+            return mash_A_to_entrance(runtime, env, console, context, entrance);
         }else{
             console.log("Taking non-shiny boss and returning to entrance...", COLOR_BLUE);
             tracker.scroll_to(shinies[0]);
             tracker.enter_summary();    //  Enter summary to verify you're on the right mon.
             tracker.leave_summary();
-            synchronize_caught_screen(env, console, state_tracker);
-            return mash_A_to_entrance(runtime, env, console, entrance);
+            synchronize_caught_screen(env, console, context, state_tracker);
+            return mash_A_to_entrance(runtime, env, console, context, entrance);
         }
 
     case CaughtScreenAction::RESET:
         console.log("Resetting game...", COLOR_BLUE);
-        synchronize_caught_screen(env, console, state_tracker);
-        pbf_press_button(console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-        reset_game_from_home_with_inference(env, console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        synchronize_caught_screen(env, console, context, state_tracker);
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+        reset_game_from_home_with_inference(env, console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         return StateMachineAction::DONE_WITH_ADVENTURE;
     }
 

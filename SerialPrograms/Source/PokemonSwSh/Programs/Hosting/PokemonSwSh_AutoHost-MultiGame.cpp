@@ -102,7 +102,7 @@ std::unique_ptr<StatsTracker> AutoHostMultiGame::make_stats() const{
 
 
 
-void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env){
+void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     uint16_t start_raid_delay = HOST_ONLINE
         ? OPEN_ONLINE_DEN_LOBBY_DELAY
         : GameSettings::instance().OPEN_LOCAL_DEN_LOBBY_DELAY;
@@ -124,14 +124,14 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env){
     }
 
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
+        grip_menu_connect_go_home(context);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
     }
 
     if (enable_touch){
-        TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.console);
+        TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(context);
     }
 
     uint32_t raids = 0;
@@ -149,7 +149,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env){
             env.log("Raids Attempted: " + tostr_u_commas(raids++));
 
             //  Start game.
-            rollback_date_from_home(env.console, game.skips);
+            rollback_date_from_home(context, game.skips);
 
             //  Sanitize game slot.
             uint8_t game_slot = game.game_slot;
@@ -169,7 +169,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env){
                 break;
             }
             start_game_from_home_with_inference(
-                env, env.console,
+                env, env.console, context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW,
                 game_slot,
                 game.user_slot,
@@ -191,7 +191,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env){
             //  Run auto-host.
             const MultiHostSlot& fr_game = GAME_LIST[FR_index];
             run_autohost(
-                env, env.console,
+                env, env.console, context,
                 game.always_catchable
                     ? Catchability::ALWAYS_CATCHABLE
                     : Catchability::MAYBE_UNCATCHABLE,
@@ -208,15 +208,15 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env){
             );
 
             //  Exit game.
-            pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-            close_game(env.console);
+            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+            close_game(context);
 
             //  Post-raid delay.
-            pbf_wait(env.console, parse_ticks_i32(game.post_raid_delay));
+            pbf_wait(context, parse_ticks_i32(game.post_raid_delay));
 
             //  Touch the date.
             if (enable_touch){
-                TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.console);
+                TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(context);
             }
         }
     }

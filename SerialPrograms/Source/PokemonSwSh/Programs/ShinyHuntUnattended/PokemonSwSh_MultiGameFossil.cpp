@@ -39,7 +39,7 @@ MultiGameFossil::MultiGameFossil(const MultiGameFossil_Descriptor& descriptor)
 }
 
 void run_fossil_batch(
-    const BotBaseContext& context,
+    BotBaseContext& context,
     const FossilGame& batch,
     bool* game_slot_flipped,
     bool save_and_exit
@@ -118,12 +118,12 @@ void run_fossil_batch(
 }
 
 
-void MultiGameFossil::program(SingleSwitchProgramEnvironment& env){
+void MultiGameFossil::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
+        grip_menu_connect_go_home(context);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
+        pbf_press_button(context, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_FAST);
     }
 
     FossilGame batch;
@@ -133,10 +133,10 @@ void MultiGameFossil::program(SingleSwitchProgramEnvironment& env){
     bool game_slot_flipped = false;
     for (size_t c = 0; c < games; c++){
         batch = GAME_LIST[c];
-        run_fossil_batch(env.console, batch, &game_slot_flipped, c + 1 < games);
+        run_fossil_batch(context, batch, &game_slot_flipped, c + 1 < games);
     }
 
-    ssf_press_button2(env.console, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
+    ssf_press_button2(context, BUTTON_HOME, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE, 10);
 }
 
 

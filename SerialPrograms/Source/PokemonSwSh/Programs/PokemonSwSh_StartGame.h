@@ -13,6 +13,7 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
@@ -20,8 +21,7 @@ namespace PokemonSwSh{
 //  If "game_slot" is zero, it uses whatever the cursor is on.
 //  If "user_slot" is zero, it uses whatever the cursor is on.
 void start_game_from_home_with_inference(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     bool tolerate_update_menu,
     uint8_t game_slot = 0,
     uint8_t user_slot = 0,
@@ -30,8 +30,7 @@ void start_game_from_home_with_inference(
 );
 
 void reset_game_from_home_with_inference(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     bool tolerate_update_menu,
     bool backup_save = false,
     uint16_t post_wait_time = 1 * TICKS_PER_SECOND

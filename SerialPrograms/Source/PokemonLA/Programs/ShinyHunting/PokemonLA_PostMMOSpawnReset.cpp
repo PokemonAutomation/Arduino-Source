@@ -51,7 +51,6 @@ PostMMOSpawnReset::PostMMOSpawnReset(const PostMMOSpawnReset_Descriptor& descrip
         "3 * TICKS_PER_SECOND"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
         &SHINY_DETECTED.NOTIFICATIONS,
@@ -94,19 +93,22 @@ std::unique_ptr<StatsTracker> PostMMOSpawnReset::make_stats() const{
 }
 
 
-void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env){
+void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     // From game to Switch Home
-    pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
     // Restart the game and go to game menu (where "Press A" is shown to enter the game)
-    switch_home_to_gamemenu(env, env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+    switch_home_to_gamemenu(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     {
         ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
         run_until(
-            env, env.console,
-            [this, &env](const BotBaseContext& context){
-                gamemenu_to_ingame(env, env.console, GameSettings::instance().ENTER_GAME_MASH, GameSettings::instance().ENTER_GAME_WAIT);
+            env, env.console, context,
+            [this, &env](BotBaseContext& context){
+                // TODO: gamemenu_to_ingame has wait_until(). Nesting wait_until() into run_until() is not the intended usage of run_until().
+                // When outer run_until() wants to break out, the inner wait_until() may not be able to do that until itself is finished.
+                // But this is fine in the current use case, as we are OK with the shiny sound detector stopping the program a little late.
+                gamemenu_to_ingame(env, env.console, context, GameSettings::instance().ENTER_GAME_MASH, GameSettings::instance().ENTER_GAME_WAIT);
                 env.console.log("Entered game! Checking shiny sound...");
 
                 // forward portion
@@ -125,7 +127,7 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env){
             { &shiny_detector });
         if (shiny_detector.detected()){
            stats.shinies++;
-           on_shiny_sound(env, env.console, SHINY_DETECTED, shiny_detector.results());
+           on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_detector.results());
         }
     }
 
@@ -134,11 +136,11 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env){
 }
 
 
-void PostMMOSpawnReset::program(SingleSwitchProgramEnvironment& env){
+void PostMMOSpawnReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
     while (true){
         env.update_stats();
@@ -149,15 +151,13 @@ void PostMMOSpawnReset::program(SingleSwitchProgramEnvironment& env){
             stats.to_str()
         );
         try{
-            run_iteration(env);
+            run_iteration(env, context);
         }catch (OperationFailedException&){
             stats.errors++;
             // run_iteration() restarts the game first then listens to shiny sound.
             // If there is any error generated when the game is running and is caught here,
             // we just do nothing to handle the error as in the next iteration of run_iteration()
             // the game will be immediately restarted.
-        }catch (OperationCancelledException&){
-            break;
         }
     }
 

@@ -31,7 +31,7 @@ public:
     CloneItemsBoxCopy2(const CloneItemsBoxCopy2_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     struct Stats;
@@ -42,7 +42,6 @@ private:
     BooleanCheckBoxOption RELEASE;
 
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 };
 

@@ -96,12 +96,12 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousIoATrade::make_stats() const{
 
 
 
-void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env){
+void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);
+        grip_menu_connect_go_home(context);
+        resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
     ShinyHuntTracker& stats = env.stats<ShinyHuntTracker>();
@@ -109,28 +109,28 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env){
     while (true){
         env.update_stats();
 
-        pbf_press_button(env.console, BUTTON_A, 10, 100);
-        pbf_press_button(env.console, BUTTON_A, 10, 60);
-        pbf_press_button(env.console, BUTTON_A, 10, 100);
-        pbf_press_button(env.console, BUTTON_A, 10, 50);
-        pbf_press_button(env.console, BUTTON_A, 10, GameSettings::instance().POKEMON_TO_BOX_DELAY);
-        pbf_press_dpad(env.console, DPAD_LEFT, 10, 10);
-        pbf_mash_button(env.console, BUTTON_A, MASH_TO_TRADE_DELAY);
+        pbf_press_button(context, BUTTON_A, 10, 100);
+        pbf_press_button(context, BUTTON_A, 10, 60);
+        pbf_press_button(context, BUTTON_A, 10, 100);
+        pbf_press_button(context, BUTTON_A, 10, 50);
+        pbf_press_button(context, BUTTON_A, 10, GameSettings::instance().POKEMON_TO_BOX_DELAY);
+        pbf_press_dpad(context, DPAD_LEFT, 10, 10);
+        pbf_mash_button(context, BUTTON_A, MASH_TO_TRADE_DELAY);
 
         //  Enter box system.
-        pbf_press_button(env.console, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
-        pbf_press_dpad(env.console, DPAD_RIGHT, 10, 10);
-        pbf_press_button(env.console, BUTTON_A, 10, GameSettings::instance().MENU_TO_POKEMON_DELAY);
+        pbf_press_button(context, BUTTON_X, 10, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+        pbf_press_dpad(context, DPAD_RIGHT, 10, 10);
+        pbf_press_button(context, BUTTON_A, 10, GameSettings::instance().MENU_TO_POKEMON_DELAY);
 
         //  View summary.
-        pbf_press_button(env.console, BUTTON_A, 10, 100);
-        pbf_press_button(env.console, BUTTON_A, 10, 0);
-        env.console.botbase().wait_for_all_requests();
+        pbf_press_button(context, BUTTON_A, 10, 100);
+        pbf_press_button(context, BUTTON_A, 10, 0);
+        context.wait_for_all_requests();
 
         SummaryShinySymbolDetector::Detection detection;
         {
             SummaryShinySymbolDetector detector(env.console, env.console);
-            detection = detector.wait_for_detection(env, env.console);
+            detection = detector.wait_for_detection(context, env.console);
 //            detection = SummaryShinySymbolDetector::SHINY;
         }
         switch (detection){
@@ -161,25 +161,25 @@ void ShinyHuntAutonomousIoATrade::program(SingleSwitchProgramEnvironment& env){
                 &stats
             );
             if (VIDEO_ON_SHINY){
-                pbf_wait(env.console, 1 * TICKS_PER_SECOND);
-                pbf_press_button(env.console, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
+                pbf_wait(context, 1 * TICKS_PER_SECOND);
+                pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
             }
             if (!RUN_FROM_EVERYTHING){
                 goto StopProgram;
             }
         }
 
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-        TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.console);
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+        TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(context);
         reset_game_from_home_with_inference(
-            env, env.console,
+            env, env.console, context,
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
         );
     }
 
 StopProgram:
     env.update_stats();
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

@@ -34,7 +34,6 @@ SelfBoxTrade::SelfBoxTrade(const SelfBoxTrade_Descriptor& descriptor)
         2, 0, 40
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
@@ -53,17 +52,17 @@ std::unique_ptr<StatsTracker> SelfBoxTrade::make_stats() const{
 
 
 
-void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env){
+void SelfBoxTrade::program(MultiSwitchProgramEnvironment& env, CancellableScope& scope){
     TradeStats& stats = env.stats<TradeStats>();
     env.update_stats();
 
     for (uint8_t box = 0; box < BOXES_TO_TRADE; box++){
         if (box != 0){
-            env.run_in_parallel([](ConsoleHandle& console){
-                pbf_press_button(console, BUTTON_R, 20, GameSettings::instance().BOX_CHANGE_DELAY_0);
+            env.run_in_parallel(scope, [](ConsoleHandle& console, BotBaseContext& context){
+                pbf_press_button(context, BUTTON_R, 20, GameSettings::instance().BOX_CHANGE_DELAY_0);
             });
         }
-        trade_current_box(env, NOTIFICATION_STATUS_UPDATE, stats);
+        trade_current_box(env, scope, NOTIFICATION_STATUS_UPDATE, stats);
     }
 
     env.update_stats();

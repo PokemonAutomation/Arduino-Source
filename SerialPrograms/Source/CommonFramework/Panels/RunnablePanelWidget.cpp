@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QGroupBox>
 #include <QScrollArea>
+#include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -108,6 +109,12 @@ bool RunnablePanelWidget::request_program_stop(){
     }
     m_start_button->setText("Stopping Program...");
     m_listener.on_busy(m_instance);
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        if (m_scope){
+            m_scope->cancel();
+        }
+    }
     return true;
 }
 
@@ -318,11 +325,13 @@ void RunnablePanelWidget::update_historical_stats(){
         m_logger.log("Stats successfully saved!", COLOR_BLUE);
     }else{
         m_logger.log("Unable to save stats.", COLOR_RED);
+#if 0
         QMetaObject::invokeMethod(
             this,
             "show_stats_warning",
             Qt::AutoConnection
         );
+#endif
 //        show_stats_warning();
     }
 //    settings.stat_sets.open_from_file(settings.stats_file);

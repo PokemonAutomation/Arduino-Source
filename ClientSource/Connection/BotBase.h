@@ -9,6 +9,7 @@
 
 #include <atomic>
 #include "Common/Cpp/AbstractLogger.h"
+#include "Common/Cpp/CancellableScope.h"
 
 namespace PokemonAutomation{
 
@@ -33,7 +34,7 @@ public:
     virtual State state() const = 0;
 
     //  Waits for all pending requests to finish.
-    virtual void wait_for_all_requests(const std::atomic<bool>* cancelled = nullptr) = 0;
+    virtual void wait_for_all_requests(const Cancellable* cancelled = nullptr) = 0;
 
     //  Stop all pending commands. This wipes the command queue on both sides
     //  and stops any currently executing command.
@@ -51,15 +52,15 @@ public:
 public:
     virtual bool try_issue_request(
         const BotBaseRequest& request,
-        const std::atomic<bool>* cancelled = nullptr
+        const Cancellable* cancelled = nullptr
     ) = 0;
     virtual void issue_request(
         const BotBaseRequest& request,
-        const std::atomic<bool>* cancelled = nullptr
+        const Cancellable* cancelled = nullptr
     ) = 0;
     virtual BotBaseMessage issue_request_and_wait(
         const BotBaseRequest& request,
-        const std::atomic<bool>* cancelled = nullptr
+        const Cancellable* cancelled = nullptr
     ) = 0;
 
 };
@@ -67,15 +68,23 @@ public:
 
 
 //  A wrapper for BotBase that allows for asynchronous cancelling.
-class BotBaseContext{
+class BotBaseContext final : public CancellableScope{
 public:
     BotBaseContext(BotBase& botbase)
         : m_botbase(botbase)
-        , m_cancelled(false)
     {}
+    BotBaseContext(CancellableScope& parent, BotBase& botbase)
+        : m_botbase(botbase)
+    {
+        attach(parent);
+    }
+    virtual ~BotBaseContext(){
+        detach();
+    }
+
 
     void wait_for_all_requests() const{
-        m_botbase.wait_for_all_requests(&m_cancelled);
+        m_botbase.wait_for_all_requests(this);
     }
 
     //  Don't use this unless you really need to.
@@ -83,7 +92,7 @@ public:
 
     //  Stop all commands in this context now.
     void cancel_now(){
-        m_cancelled.store(true, std::memory_order_release);
+        CancellableScope::cancel();
         m_botbase.stop_all_commands();
     }
 
@@ -94,28 +103,34 @@ public:
     //  This cancel is used when you need continuity from an ongoing
     //  sequence.
     void cancel_lazy(){
-        m_cancelled.store(true, std::memory_order_release);
+        CancellableScope::cancel();
         m_botbase.next_command_interrupt();
     }
 
-    const std::atomic<bool>& cancelled_bool() const{
-        return m_cancelled;
+
+    virtual bool cancel() noexcept{
+        if (CancellableScope::cancel()){
+            return true;
+        }
+        try{
+            m_botbase.stop_all_commands();
+        }catch (...){}
+        return false;
     }
 
 
 public:
     bool try_issue_request(const BotBaseRequest& request) const{
-        return m_botbase.try_issue_request(request, &m_cancelled);
+        return m_botbase.try_issue_request(request, this);
     }
     void issue_request(const BotBaseRequest& request) const{
-        m_botbase.issue_request(request, &m_cancelled);
+        m_botbase.issue_request(request, this);
     }
     BotBaseMessage issue_request_and_wait(const BotBaseRequest& request) const;
 
 
 private:
     BotBase& m_botbase;
-    std::atomic<bool> m_cancelled;
 };
 
 

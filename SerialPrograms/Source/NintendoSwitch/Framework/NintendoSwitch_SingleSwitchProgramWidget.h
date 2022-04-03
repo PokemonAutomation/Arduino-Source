@@ -32,7 +32,7 @@ private:
     virtual ~SingleSwitchProgramWidget();
 
 private:
-    virtual void run_switch_program() override;
+    virtual void run_switch_program(const ProgramInfo& info) override;
 
 private:
     friend class SingleSwitchProgramInstance;

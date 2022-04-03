@@ -83,7 +83,6 @@ EggAutonomous::EggAutonomous(const EggAutonomous_Descriptor& descriptor)
         true, true, ImageAttachmentMode::JPG,
         {"Notifs", "Showcase"}
     )
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_NONSHINY_KEEP,
@@ -123,7 +122,7 @@ std::unique_ptr<StatsTracker> EggAutonomous::make_stats() const{
 
 
 bool EggAutonomous::run_batch(
-    SingleSwitchProgramEnvironment& env,
+    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
     EggAutonomousState& saved_state,
     EggAutonomousState& current_state
 ){
@@ -153,7 +152,7 @@ bool EggAutonomous::run_batch(
     }
 
     if (save){
-        save_game(env, env.console);
+        save_game(env, env.console, context);
         saved_state.set(current_state);
     }
 
@@ -161,18 +160,18 @@ bool EggAutonomous::run_batch(
     return current_state.process_batch();
 }
 
-void EggAutonomous::program(SingleSwitchProgramEnvironment& env){
+void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     EggAutonomousStats& stats = env.stats<EggAutonomousStats>();
     env.update_stats();
 
     //  Connect the controller.
-    pbf_move_right_joystick(env.console, 0, 255, 10, 0);
+    pbf_move_right_joystick(context, 0, 255, 10, 0);
 
     //  Move to corner.
-    pbf_move_left_joystick(env.console, 0, 255, 125, 0);
+    pbf_move_left_joystick(context, 0, 255, 125, 0);
 
     EggAutonomousState current_state(
-        env, env.console,
+        env, env.console, context,
         stats,
         NOTIFICATION_NONSHINY_KEEP,
         NOTIFICATION_SHINY,
@@ -192,20 +191,20 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env){
 //    box_to_overworld(env, env.console);
 
     if (AUTO_SAVING == 1){
-        save_game(env, env.console);
+        save_game(env, env.console, context);
         saved_state.set(current_state);
     }
 
     size_t consecutive_failures = 0;
     while (current_state.babies_saved() < MAX_KEEPERS){
         if (AUTO_SAVING == 0){
-            if (run_batch(env, saved_state, current_state)){
+            if (run_batch(env, context, saved_state, current_state)){
                 break;
             }
             continue;
         }
         try{
-            if (run_batch(env, saved_state, current_state)){
+            if (run_batch(env, context, saved_state, current_state)){
                 break;
             }
             consecutive_failures = 0;
@@ -214,8 +213,8 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env){
             if (consecutive_failures >= 3){
                 throw OperationFailedException(env.console, "Failed 3 batches in the row.");
             }
-            pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            reset_game_from_home(env, env.console, true);
+            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            reset_game_from_home(env, env.console, context, true);
             current_state.set(saved_state);
         }
     }
@@ -227,7 +226,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env){
         "",
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

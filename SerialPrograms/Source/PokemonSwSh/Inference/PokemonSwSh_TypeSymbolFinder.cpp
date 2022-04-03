@@ -5,6 +5,7 @@
  */
 
 #include "Common/Compiler.h"
+#include "Common/Cpp/CancellableScope.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
@@ -237,7 +238,7 @@ std::multimap<double, std::pair<PokemonType, ImagePixelBox>> find_symbols(
 
 
 void test_find_symbols(
-    ProgramEnvironment& env,
+    CancellableScope& scope,
     VideoOverlay& overlay,
     const ImageFloatBox& box,
     const QImage& screen, double max_area_ratio
@@ -255,7 +256,7 @@ void test_find_symbols(
         hits.emplace_back(overlay, translate_to_parent(screen, box, item.second.second), COLOR_GREEN);
     }
 
-    env.wait_for(std::chrono::seconds(10));
+    scope.wait_for(std::chrono::seconds(10));
 }
 
 

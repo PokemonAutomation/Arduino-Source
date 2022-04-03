@@ -72,6 +72,7 @@ SOURCES += \
     ../ClientSource/Libraries/MessageConverter.cpp \
     ../Common/CRC32.cpp \
     ../Common/Cpp/AsyncDispatcher.cpp \
+    ../Common/Cpp/CancellableScope.cpp \
     ../Common/Cpp/CpuId.cpp \
     ../Common/Cpp/Exceptions.cpp \
     ../Common/Cpp/FireForgetDispatcher.cpp \
@@ -275,6 +276,8 @@ SOURCES += \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.cpp \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.cpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.cpp \
@@ -436,6 +439,7 @@ SOURCES += \
     Source/PokemonLA/PokemonLA_Settings.cpp \
     Source/PokemonLA/PokemonLA_TravelLocations.cpp \
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.cpp \
+    Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.cpp \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.cpp \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.cpp \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp \
@@ -659,6 +663,7 @@ HEADERS += \
     ../Common/Cpp/AlignedVector.h \
     ../Common/Cpp/AlignedVector.tpp \
     ../Common/Cpp/AsyncDispatcher.h \
+    ../Common/Cpp/CancellableScope.h \
     ../Common/Cpp/Color.h \
     ../Common/Cpp/CpuId.h \
     ../Common/Cpp/Exceptions.h \
@@ -918,7 +923,7 @@ HEADERS += \
     Source/Kernels/Waterfill/Kernels_Waterfill.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h.autosave \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x4_Default.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.h \
@@ -1097,6 +1102,7 @@ HEADERS += \
     Source/PokemonLA/PokemonLA_Settings.h \
     Source/PokemonLA/PokemonLA_TravelLocations.h \
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.h \
+    Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.h \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.h \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.h \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.h \

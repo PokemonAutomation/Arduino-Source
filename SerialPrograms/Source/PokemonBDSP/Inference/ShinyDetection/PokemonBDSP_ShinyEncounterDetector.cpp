@@ -172,7 +172,7 @@ void determine_shiny_status(
 
 
 void detect_shiny_battle(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
     const DetectionType& type,
@@ -182,11 +182,11 @@ void detect_shiny_battle(
     BattleType battle_type = type.full_battle_menu ? BattleType::STANDARD : BattleType::STARTER;
     ShinyEncounterTracker tracker(console, console, battle_type);
     int result = wait_until(
-        env, console, timeout,
+        env, console, context, timeout,
         { &tracker }
     );
     if (result < 0){
-        env.log("ShinyDetector: Battle menu not found after timeout.", COLOR_RED);
+        console.log("ShinyDetector: Battle menu not found after timeout.", COLOR_RED);
         return;
     }
     determine_shiny_status(

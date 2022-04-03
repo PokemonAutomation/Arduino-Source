@@ -22,7 +22,8 @@ BinaryMatrixType get_BinaryMatrixType(){
     }
 #endif
     if (CPU_CAPABILITY_CURRENT.OK_17_Skylake){
-        return BinaryMatrixType::i64x64_AVX512;
+        return BinaryMatrixType::i64x32_AVX512;
+//        return BinaryMatrixType::i64x64_AVX512;
     }
     if (CPU_CAPABILITY_CURRENT.OK_13_Haswell){
         return BinaryMatrixType::i64x16_AVX2;

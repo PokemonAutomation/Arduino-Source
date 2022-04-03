@@ -7,6 +7,10 @@
 #include "CommonFramework/Tools/BlackBorderCheck.h"
 #include "NintendoSwitch_SingleSwitchProgramWidget.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
@@ -24,15 +28,10 @@ SingleSwitchProgramWidget* SingleSwitchProgramWidget::make(
     widget->construct();
     return widget;
 }
-void SingleSwitchProgramWidget::run_switch_program(){
+void SingleSwitchProgramWidget::run_switch_program(const ProgramInfo& info){
     SingleSwitchProgramInstance& instance = static_cast<SingleSwitchProgramInstance&>(m_instance);
     SingleSwitchProgramEnvironment env(
-        ProgramInfo(
-            instance.descriptor().identifier(),
-            instance.descriptor().category(),
-            instance.descriptor().display_name(),
-            timestamp()
-        ),
+        info,
         m_logger,
         m_current_stats.get(), m_historical_stats.get(),
         system().logger(),
@@ -42,23 +41,25 @@ void SingleSwitchProgramWidget::run_switch_program(){
         system().audio()
     );
     connect(
-        this, &RunnableSwitchProgramWidget::signal_cancel,
-        &env, [&]{
-            m_state.store(ProgramState::STOPPING, std::memory_order_release);
-            env.signal_stop();
-        },
-        Qt::DirectConnection
-    );
-    connect(
         &env, &ProgramEnvironment::set_status,
         this, &SingleSwitchProgramWidget::status_update
     );
 
+    CancellableHolder<CancellableScope> scope;
+    {
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_scope = &scope;
+    }
     try{
         start_program_video_check(env.console, instance.descriptor().feedback());
-        instance.program(env);
+        BotBaseContext context(scope, env.console.botbase());
+        instance.program(env, context);
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_scope = nullptr;
     }catch (...){
         env.update_stats();
+        std::lock_guard<std::mutex> lg(m_lock);
+        m_scope = nullptr;
         throw;
     }
 }

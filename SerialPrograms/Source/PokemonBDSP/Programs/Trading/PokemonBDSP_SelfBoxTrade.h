@@ -27,12 +27,11 @@ public:
     SelfBoxTrade(const SelfBoxTrade_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(MultiSwitchProgramEnvironment& env) override;
+    virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     SimpleIntegerOption<uint8_t> BOXES_TO_TRADE;
     EventNotificationOption NOTIFICATION_STATUS_UPDATE;
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 };
 

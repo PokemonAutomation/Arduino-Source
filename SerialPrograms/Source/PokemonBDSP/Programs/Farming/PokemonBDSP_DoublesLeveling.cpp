@@ -47,7 +47,6 @@ DoublesLeveling::DoublesLeveling(const DoublesLeveling_Descriptor& descriptor)
         0
     )
     , ENCOUNTER_BOT_OPTIONS(false, false)
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
@@ -96,21 +95,21 @@ std::unique_ptr<StatsTracker> DoublesLeveling::make_stats() const{
 
 
 
-bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env){
+bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     env.log("Starting battle!");
 
     //  State Machine
     for (size_t c = 0; c < 5;){
-        env.console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
 
         BattleMenuWatcher battle_menu(BattleType::STANDARD);
         EndBattleWatcher end_battle;
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         int ret = run_until(
-            env, env.console,
-            [=](const BotBaseContext& context){
+            env, env.console, context,
+            [=](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {
@@ -122,18 +121,18 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env){
         switch (ret){
         case 0:
             env.log("Battle menu detected!", COLOR_BLUE);
-            pbf_mash_button(env.console, BUTTON_ZL, 5 * TICKS_PER_SECOND);
+            pbf_mash_button(context, BUTTON_ZL, 5 * TICKS_PER_SECOND);
             c++;
             break;
         case 1:
             env.log("Battle finished!", COLOR_BLUE);
-            pbf_mash_button(env.console, BUTTON_B, 250);
+            pbf_mash_button(context, BUTTON_B, 250);
             return false;
         case 2:
             env.log("Detected move learn!", COLOR_BLUE);
             if (ON_LEARN_MOVE == 0){
-                pbf_move_right_joystick(env.console, 128, 255, 20, 105);
-                pbf_press_button(env.console, BUTTON_ZL, 20, 105);
+                pbf_move_right_joystick(context, 128, 255, 20, 105);
+                pbf_press_button(context, BUTTON_ZL, 20, 105);
                 break;
             }
             return true;
@@ -149,24 +148,24 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env){
 
 
 
-void DoublesLeveling::program(SingleSwitchProgramEnvironment& env){
+void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
     env.update_stats();
 
     StandardEncounterHandler handler(
-        env, env.console,
+        env, env.console, context,
         LANGUAGE,
         ENCOUNTER_BOT_OPTIONS,
         stats
     );
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_B, 5, 5);
+    pbf_press_button(context, BUTTON_B, 5, 5);
 
     //  Encounter Loop
     while (true){
         //  Find encounter.
-        bool battle = TRIGGER_METHOD.find_encounter(env);
+        bool battle = TRIGGER_METHOD.find_encounter(env, context);
         if (!battle){
             // Unexpected battle: detect battle menu but not battle starting animation.
             stats.add_error();
@@ -178,7 +177,7 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env){
         DoublesShinyDetection result_wild;
         ShinyDetectionResult result_own;
         detect_shiny_battle(
-            env, env.console,
+            env, env.console, context,
             result_wild, result_own,
             WILD_POKEMON,
             std::chrono::seconds(30)
@@ -189,7 +188,7 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env){
             break;
         }
 
-        if (this->battle(env)){
+        if (this->battle(env, context)){
             break;
         }
     }
@@ -200,7 +199,7 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env){
         "",
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

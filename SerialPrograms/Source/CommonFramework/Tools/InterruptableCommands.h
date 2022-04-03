@@ -12,60 +12,63 @@
 #include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 
 
 namespace PokemonAutomation{
 
+class ProgramEnvironment;
 
-class AsyncCommandSession{
+
+
+class AsyncCommandSession final : public Cancellable{
 
 public:
-    AsyncCommandSession(ProgramEnvironment& env, BotBase& botbase);
-    ~AsyncCommandSession();
+    AsyncCommandSession(
+        CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
+        BotBase& botbase
+    );
+    virtual ~AsyncCommandSession();
 
     bool command_is_running();
 
     //  Stop the entire session. This will rethrow exceptions in the command thread.
-    //  This is not thread-safe with "run()" and "stop_commands()"
     //  You must call this prior to destruction unless it's during a stack-unwind.
-    void stop_session();
+    void stop_session_and_rethrow();
 
 
 public:
     //  Dispath the following lambda. If something is already running, it will be
     //  stopped and replaced with this one.
-    void dispatch(std::function<void(const BotBaseContext&)>&& lambda);
+    void dispatch(std::function<void(BotBaseContext&)>&& lambda);
 
 //    //  Stop the currently running command.
 //    void stop_commands();
 
-    //  Wait for currently running command to finish.
-    void wait();
+//    //  Wait for currently running command to finish.
+//    void wait();
 
 
 private:
+    virtual bool cancel() noexcept override;
     void thread_loop();
 
 
 private:
-    struct CommandSet{
-        CommandSet(BotBase& botbase, std::function<void(const BotBaseContext&)>&& lambda);
-        BotBaseContext context;
-        std::function<void(const BotBaseContext&)> commands;
-    };
+    struct CommandSet;
 
-    ProgramEnvironment& m_env;
+    Logger& m_logger;
     BotBase& m_botbase;
+    std::unique_ptr<CommandSet> m_pending;
     std::unique_ptr<CommandSet> m_current;
-//    std::unique_ptr<CommandSet> m_pending;
 
-    std::atomic<bool> m_stopping_session;
     std::mutex m_lock;
     std::condition_variable m_cv;
-//    std::exception_ptr m_exception;
+    std::unique_ptr<AsyncTask> m_thread;
 
-    std::unique_ptr<AsyncTask> m_task;
+    //  Finished tasks need to be moved here first and then deleted outside
+    //  of "m_lock" due to a deadlock possibiliy.
+    SpinLock m_finished_lock;
+    std::vector<std::unique_ptr<CommandSet>> m_finished_tasks;
 };
 
 

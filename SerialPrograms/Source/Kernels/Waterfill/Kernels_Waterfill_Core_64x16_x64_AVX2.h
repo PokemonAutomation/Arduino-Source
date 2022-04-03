@@ -93,6 +93,49 @@ struct Waterfill_64x16_x64_AVX2_ProcessedMask{
 };
 
 
+
+PA_FORCE_INLINE bool keep_going(
+    const Waterfill_64x16_x64_AVX2_ProcessedMask& mask,
+    __m256i& m0, __m256i& m1, __m256i& m2, __m256i& m3,
+    __m256i& x0, __m256i& x1, __m256i& x2, __m256i& x3
+){
+    m0 = _mm256_andnot_si256(x0, mask.m0);
+    m1 = _mm256_andnot_si256(x1, mask.m1);
+    m2 = _mm256_andnot_si256(x2, mask.m2);
+    m3 = _mm256_andnot_si256(x3, mask.m3);
+
+    __m256i f0 = _mm256_permute4x64_epi64(m0, 57);
+    __m256i f1 = _mm256_permute4x64_epi64(m1, 57);
+    __m256i i0 = _mm256_permute4x64_epi64(m0, 147);
+    f0 = _mm256_or_si256(_mm256_blend_epi32(f0, f1, 0xc0), _mm256_blend_epi32(_mm256_setzero_si256(), i0, 0xfc));
+    f0 = _mm256_or_si256(f0, _mm256_slli_epi64(m0, 1));
+    __m256i changed = _mm256_and_si256(f0, x0);
+
+    __m256i f2 = _mm256_permute4x64_epi64(m2, 57);
+    __m256i i1 = _mm256_permute4x64_epi64(m1, 147);
+    f0 = _mm256_or_si256(_mm256_blend_epi32(f1, f2, 0xc0), _mm256_blend_epi32(i0, i1, 0xfc));
+    f0 = _mm256_or_si256(f0, _mm256_slli_epi64(m1, 1));
+    f0 = _mm256_and_si256(f0, x1);
+    changed = _mm256_or_si256(changed, f0);
+
+    __m256i f3 = _mm256_permute4x64_epi64(m3, 57);
+    __m256i i2 = _mm256_permute4x64_epi64(m2, 147);
+    f0 = _mm256_or_si256(_mm256_blend_epi32(f2, f3, 0xc0), _mm256_blend_epi32(i1, i2, 0xfc));
+    f0 = _mm256_or_si256(f0, _mm256_slli_epi64(m2, 1));
+    f0 = _mm256_and_si256(f0, x2);
+    changed = _mm256_or_si256(changed, f0);
+
+    __m256i i3 = _mm256_permute4x64_epi64(m3, 147);
+    f0 = _mm256_or_si256(_mm256_blend_epi32(f3, _mm256_setzero_si256(), 0xc0), _mm256_blend_epi32(i2, i3, 0xfc));
+    f0 = _mm256_or_si256(f0, _mm256_slli_epi64(m3, 1));
+    f0 = _mm256_and_si256(f0, x3);
+    changed = _mm256_or_si256(changed, f0);
+
+    return !_mm256_testz_si256(changed, changed);
+}
+
+
+
 PA_FORCE_INLINE void expand_forward(
     const Waterfill_64x16_x64_AVX2_ProcessedMask& mask,
     __m256i& x0, __m256i& x1, __m256i& x2, __m256i& x3
@@ -325,30 +368,34 @@ static PA_FORCE_INLINE uint64_t popcount_sumcoord(
 
 
 //  Run Waterfill algorithm on mask "m" with starting point "x".
-//  Save result back into "x".
-static PA_FORCE_INLINE void waterfill_expand(const BinaryTile_64x16_x64_AVX2& m, BinaryTile_64x16_x64_AVX2& x){
+//  Save result back into "x". Clear bits of object from "m".
+static PA_FORCE_INLINE void waterfill_expand(BinaryTile_64x16_x64_AVX2& m, BinaryTile_64x16_x64_AVX2& x){
     __m256i x0 = x.vec[0];
     __m256i x1 = x.vec[1];
     __m256i x2 = x.vec[2];
     __m256i x3 = x.vec[3];
 
     Waterfill_64x16_x64_AVX2_ProcessedMask mask(m, x0, x1, x2, x3);
+    expand_forward(mask, x0, x1, x2, x3);
 
-    __m256i changed;
+    __m256i m0, m1, m2, m3;
     do{
-        expand_forward(mask, x0, x1, x2, x3);
         expand_vertical(mask, x0, x1, x2, x3);
         expand_reverse(mask, x0, x1, x2, x3);
-        changed = _mm256_xor_si256(x0, x.vec[0]);
-        x.vec[0] = x0;
-        changed = _mm256_or_si256(changed, _mm256_xor_si256(x1, x.vec[1]));
-        x.vec[1] = x1;
-        changed = _mm256_or_si256(changed, _mm256_xor_si256(x2, x.vec[2]));
-        x.vec[2] = x2;
-        changed = _mm256_or_si256(changed, _mm256_xor_si256(x3, x.vec[3]));
-        x.vec[3] = x3;
-//        cout << x.dump() << endl;
-    }while (!_mm256_testz_si256(changed, changed));
+        expand_forward(mask, x0, x1, x2, x3);
+    }while (keep_going(
+        mask,
+        m0, m1, m2, m3,
+        x0, x1, x2, x3
+    ));
+    x.vec[0] = x0;
+    x.vec[1] = x1;
+    x.vec[2] = x2;
+    x.vec[3] = x3;
+    m.vec[0] = m0;
+    m.vec[1] = m1;
+    m.vec[2] = m2;
+    m.vec[3] = m3;
 }
 
 

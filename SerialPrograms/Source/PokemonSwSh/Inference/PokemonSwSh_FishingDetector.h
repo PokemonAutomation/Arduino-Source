@@ -10,7 +10,6 @@
 #include <chrono>
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Logging/LoggerQt.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
 

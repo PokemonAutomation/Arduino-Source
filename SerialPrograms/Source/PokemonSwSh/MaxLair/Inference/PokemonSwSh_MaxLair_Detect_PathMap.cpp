@@ -5,6 +5,7 @@
  */
 
 #include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
@@ -61,8 +62,7 @@ bool read_type_array(
 }
 
 QImage read_type_array_retry(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ConsoleHandle& console, CancellableScope& scope,
     const ImageFloatBox& box,
     std::deque<InferenceBoxScope>& hits,
     size_t count,
@@ -75,49 +75,48 @@ QImage read_type_array_retry(
         if (read_type_array(console, screen, box, hits, count, type, boxes)){
             return QImage();
         }
-        env.wait_for(std::chrono::milliseconds(200));
+        scope.wait_for(std::chrono::milliseconds(200));
     }
     return screen;
 }
 
 
 bool read_path(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     PathMap& path,
     const ImageFloatBox& box
 ){
-    console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
 
     std::deque<InferenceBoxScope> hits;
 
     QImage error_image;
-    error_image = read_type_array_retry(env, console, box, hits, 2, path.mon1, nullptr);
+    error_image = read_type_array_retry(console, context, box, hits, 2, path.mon1, nullptr);
     if (!error_image.isNull()){
         dump_image(console, env.program_info(), "ReadPath", error_image);
         return false;
     }
 
-    pbf_move_right_joystick(console, 128, 0, 70, 50);
-    console.botbase().wait_for_all_requests();
+    pbf_move_right_joystick(context, 128, 0, 70, 50);
+    context.wait_for_all_requests();
     ImagePixelBox boxes[4];
-    error_image = read_type_array_retry(env, console, box, hits, 4, path.mon2, boxes);
+    error_image = read_type_array_retry(console, context, box, hits, 4, path.mon2, boxes);
     if (!error_image.isNull()){
         dump_image(console, env.program_info(), "ReadPath", error_image);
         return false;
     }
 
     while (true){
-        pbf_move_right_joystick(console, 128, 0, 80, 50);
-        console.botbase().wait_for_all_requests();
+        pbf_move_right_joystick(context, 128, 0, 80, 50);
+        context.wait_for_all_requests();
 
-        error_image = read_type_array_retry(env, console, box, hits, 4, path.mon3, nullptr);
+        error_image = read_type_array_retry(console, context, box, hits, 4, path.mon3, nullptr);
         if (error_image.isNull()){
             break;
         }
-        pbf_move_right_joystick(console, 128, 0, 20, 50);
-        console.botbase().wait_for_all_requests();
-        error_image = read_type_array_retry(env, console, box, hits, 4, path.mon3, nullptr);
+        pbf_move_right_joystick(context, 128, 0, 20, 50);
+        context.wait_for_all_requests();
+        error_image = read_type_array_retry(console, context, box, hits, 4, path.mon3, nullptr);
         if (error_image.isNull()){
             break;
         }
@@ -126,10 +125,10 @@ bool read_path(
         return false;
     }
 
-    pbf_move_right_joystick(console, 128, 0, 125, 50);
-    console.botbase().wait_for_all_requests();
+    pbf_move_right_joystick(context, 128, 0, 125, 50);
+    context.wait_for_all_requests();
 
-    error_image = read_type_array_retry(env, console, box, hits, 1, &path.boss, nullptr);
+    error_image = read_type_array_retry(console, context, box, hits, 1, &path.boss, nullptr);
     if (!error_image.isNull()){
         dump_image(console, env.program_info(), "ReadPath", error_image);
         return false;

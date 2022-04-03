@@ -29,9 +29,9 @@ PreventSleep::PreventSleep(const PreventSleep_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
 {}
 
-void PreventSleep::program(SingleSwitchProgramEnvironment& env){
+void PreventSleep::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     while (true){
-        ssf_press_button2(env.console, BUTTON_B, 15 * TICKS_PER_SECOND, 10);
+        ssf_press_button2(context, BUTTON_B, 15 * TICKS_PER_SECOND, 10);
     }
 }
 

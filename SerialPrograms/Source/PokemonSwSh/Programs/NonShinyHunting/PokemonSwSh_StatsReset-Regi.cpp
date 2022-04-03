@@ -55,7 +55,6 @@ StatsResetRegi::StatsResetRegi(const StatsResetRegi_Descriptor& descriptor)
     , SPEED("<b>Speed:</b>")
     , NOTIFICATION_CATCH_SUCCESS("Catch Success", true, false, std::chrono::seconds(3600))
     , NOTIFICATION_CATCH_FAILED("Catch Failed", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_CATCH_SUCCESS,
         &NOTIFICATION_CATCH_FAILED,
@@ -113,12 +112,12 @@ std::unique_ptr<StatsTracker> StatsResetRegi::make_stats() const{
 
 
 
-void StatsResetRegi::program(SingleSwitchProgramEnvironment& env){
+void StatsResetRegi::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
+        grip_menu_connect_go_home(context);
+        resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
     Stats& stats = env.stats<Stats>();
@@ -129,12 +128,12 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env){
         bool regi_caught = false;
         while (!regi_caught){
             env.log("Talk to regi.", COLOR_PURPLE);
-            env.console.botbase().wait_for_all_requests();
+            context.wait_for_all_requests();
             {
                 StandardBattleMenuWatcher fight_detector(false);
                 int result = run_until(
-                    env, env.console,
-                    [=](const BotBaseContext& context){
+                    env, env.console, context,
+                    [=](BotBaseContext& context){
                         while (true){
                             pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
                         }
@@ -143,12 +142,12 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env){
                 );
                 if (result == 0){
                     env.log("New fight detected, let's begin to throw balls.", COLOR_PURPLE);
-                    pbf_mash_button(env.console, BUTTON_B, 1 * TICKS_PER_SECOND);
+                    pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
                 }
             }
 
             env.log("Catch regi.", COLOR_PURPLE);
-            CatchResults result = basic_catcher(env, env.console, LANGUAGE, BALL_SELECT.slug());
+            CatchResults result = basic_catcher(env, env.console, context, LANGUAGE, BALL_SELECT.slug());
             switch (result.result){
             case CatchResult::POKEMON_CAUGHT:
                 regi_caught = true;
@@ -188,9 +187,9 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env){
             }
 
             if (!regi_caught){
-                pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+                pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
                 reset_game_from_home_with_inference(
-                    env, env.console,
+                    env, env.console, context,
                     ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
                 );
             }
@@ -198,17 +197,17 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env){
 
         env.log("Check the stats.", COLOR_PURPLE);
         for (int i = 0; i < 20; i++){
-            pbf_press_button(env.console, BUTTON_B, 10, 1 * TICKS_PER_SECOND);
+            pbf_press_button(context, BUTTON_B, 10, 1 * TICKS_PER_SECOND);
         }
-        pbf_press_button(env.console, BUTTON_X  , 10, 2   * TICKS_PER_SECOND);
-        pbf_press_dpad  (env.console, DPAD_RIGHT, 10, 0.5 * TICKS_PER_SECOND);
-        pbf_press_button(env.console, BUTTON_A  , 10, 2   * TICKS_PER_SECOND);
-        pbf_press_button(env.console, BUTTON_R  , 10, 3   * TICKS_PER_SECOND);
-        pbf_press_dpad  (env.console, DPAD_LEFT , 10, 1   * TICKS_PER_SECOND);
-        pbf_press_dpad  (env.console, DPAD_UP   , 10, 1   * TICKS_PER_SECOND);
-        pbf_press_dpad  (env.console, DPAD_UP   , 10, 1   * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_X  , 10, 2   * TICKS_PER_SECOND);
+        pbf_press_dpad  (context, DPAD_RIGHT, 10, 0.5 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A  , 10, 2   * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_R  , 10, 3   * TICKS_PER_SECOND);
+        pbf_press_dpad  (context, DPAD_LEFT , 10, 1   * TICKS_PER_SECOND);
+        pbf_press_dpad  (context, DPAD_UP   , 10, 1   * TICKS_PER_SECOND);
+        pbf_press_dpad  (context, DPAD_UP   , 10, 1   * TICKS_PER_SECOND);
 
-        env.console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
         IVCheckerReaderScope reader(env.console, LANGUAGE);
         IVCheckerReader::Results results = reader.read(env.console, env.console.video().snapshot());
         bool ok = true;
@@ -222,9 +221,9 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env){
         match_found = ok;
 
         if (!match_found){
-            pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
             reset_game_from_home_with_inference(
-                env, env.console,
+                env, env.console, context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
             );
         }
@@ -240,7 +239,7 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env){
         "Found a perfect match!",
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

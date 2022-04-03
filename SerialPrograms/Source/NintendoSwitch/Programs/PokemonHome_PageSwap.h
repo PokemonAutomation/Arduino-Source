@@ -25,7 +25,7 @@ class PageSwap : public SingleSwitchProgramInstance{
 public:
     PageSwap(const PageSwap_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;

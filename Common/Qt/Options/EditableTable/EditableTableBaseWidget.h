@@ -21,8 +21,9 @@ public:
 
     void update_column_sizes();
 
-private:
     void redraw_table();
+
+private:
     void insert_row(int index, std::unique_ptr<EditableTableRow> row);
     void delete_row(int index);
     QWidget* make_insert_button(EditableTableRow& row);

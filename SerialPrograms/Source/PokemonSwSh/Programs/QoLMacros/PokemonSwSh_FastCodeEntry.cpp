@@ -43,17 +43,17 @@ FastCodeEntry::FastCodeEntry(const FastCodeEntry_Descriptor& descriptor)
     PA_ADD_OPTION(INITIAL_DELAY);
 }
 
-void FastCodeEntry::program(SingleSwitchProgramEnvironment& env){
+void FastCodeEntry::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     uint8_t code[8];
     RAID_CODE.to_str(code);
 
     if (INITIAL_DELAY != 0){
-        start_program_flash(env.console, INITIAL_DELAY);
+        start_program_flash(context, INITIAL_DELAY);
     }
 
-    pbf_press_button(env.console, BUTTON_PLUS, 5, 5);
-    pbf_press_button(env.console, BUTTON_PLUS, 5, 5);
-    enter_digits(env.console, 8, code);
+    pbf_press_button(context, BUTTON_PLUS, 5, 5);
+    pbf_press_button(context, BUTTON_PLUS, 5, 5);
+    enter_digits(context, 8, code);
 }
 
 

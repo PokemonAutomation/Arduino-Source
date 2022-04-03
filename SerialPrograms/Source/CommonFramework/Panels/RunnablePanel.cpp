@@ -14,6 +14,7 @@ namespace PokemonAutomation{
 
 RunnablePanelInstance::RunnablePanelInstance(const PanelDescriptor& descriptor)
     : PanelInstance(descriptor)
+    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATION_ERROR_RECOVERABLE(
         "Program Error (Recoverable)",
         true, false,

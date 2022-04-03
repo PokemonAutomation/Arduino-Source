@@ -14,14 +14,14 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 //  Detach items.
-void detach(const BotBaseContext& context);
-void detach_box(const BotBaseContext& context, uint16_t box_scroll_delay);
+void detach(BotBaseContext& context);
+void detach_box(BotBaseContext& context, uint16_t box_scroll_delay);
 
 //  Release Pokemon.
-void release(const BotBaseContext& context);
-void release_box(const BotBaseContext& context, uint16_t box_scroll_delay);
+void release(BotBaseContext& context);
+void release_box(BotBaseContext& context, uint16_t box_scroll_delay);
 void release_boxes(
-    const BotBaseContext& context,
+    BotBaseContext& context,
     uint8_t boxes,
     uint16_t box_scroll_delay,
     uint16_t box_change_delay

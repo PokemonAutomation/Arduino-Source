@@ -15,6 +15,7 @@
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{
@@ -83,7 +84,7 @@ public:
     ) const;
 
 
-    void read_path(ProgramEnvironment& env, ConsoleHandle& console, GlobalState& state);
+    void read_path(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, GlobalState& state);
 
 
     //  Determine which side you're on (left or right) in the path.

@@ -111,7 +111,7 @@ void GenerateNameOCRDataPokedex::dump_images(
 //    OCR::make_OCR_filter(image).apply(image);
 }
 
-void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env){
+void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 
     QString dex_name;
     size_t dex_size = 0;
@@ -152,7 +152,7 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env){
     }
 
     for (size_t c = 1; c <= dex_size; c += 7){
-        env.console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
 
         if (c + 6 > dex_size){
             c = dex_size - 6;
@@ -191,7 +191,7 @@ void GenerateNameOCRDataPokedex::program(SingleSwitchProgramEnvironment& env){
             break;
         }
 
-        pbf_press_dpad(env.console, DPAD_RIGHT, 10, TICKS_PER_SECOND);
+        pbf_press_dpad(context, DPAD_RIGHT, 10, TICKS_PER_SECOND);
     }
 
     if (MODE == Mode::READ_AND_SAVE){

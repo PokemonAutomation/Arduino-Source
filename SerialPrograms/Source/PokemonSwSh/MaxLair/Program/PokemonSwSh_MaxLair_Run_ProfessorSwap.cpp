@@ -22,7 +22,7 @@ namespace MaxLairInternal{
 
 void run_professor_swap(
     AdventureRuntime& runtime,
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     GlobalStateTracker& state_tracker
 ){
     size_t console_index = console.index();
@@ -37,28 +37,28 @@ void run_professor_swap(
     }
 
 
-    GlobalState inferred = state_tracker.synchronize(env, console, console_index);
+    GlobalState inferred = state_tracker.synchronize(console, console_index);
 
 
     bool swap = should_swap_with_professor(console, inferred, player_index);
     if (swap){
         console.log("Choosing to swap.", COLOR_PURPLE);
         std::lock_guard<std::mutex> lg(runtime.m_delay_lock);
-        pbf_press_button(console, BUTTON_A, 10, TICKS_PER_SECOND);
-        console.botbase().wait_for_all_requests();
+        pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
+        context.wait_for_all_requests();
     }else{
         console.log("Choosing not to swap.", COLOR_PURPLE);
-        pbf_press_button(console, BUTTON_B, 10, TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_B, 10, TICKS_PER_SECOND);
     }
-    console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
 
 #if 1
     //  Wait until we exit the window.
     {
         BlackScreenWatcher detector;
         int result = run_until(
-            env, console,
-            [&](const BotBaseContext& context){
+            env, console, context,
+            [&](BotBaseContext& context){
                 pbf_mash_button(context, swap ? BUTTON_A : BUTTON_B, 30 * TICKS_PER_SECOND);
             },
             { &detector }
@@ -73,7 +73,7 @@ void run_professor_swap(
     {
         PathScreenDetector detector;
         int result = wait_until(
-            env, console,
+            env, console, context,
             std::chrono::seconds(30),
             { &detector },
             INFERENCE_RATE
@@ -85,7 +85,7 @@ void run_professor_swap(
         }
     }
 
-    env.wait_for(std::chrono::milliseconds(100));
+    context.wait_for(std::chrono::milliseconds(100));
 
     {
         QImage screen = console.video().snapshot();

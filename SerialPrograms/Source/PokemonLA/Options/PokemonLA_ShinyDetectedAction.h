@@ -85,7 +85,7 @@ public:
 #if 0
 //  Return true if program should stop.
 bool run_on_shiny(
-    const BotBaseContext& context,
+    BotBaseContext& context,
     const ShinyDetectedActionOption& option
 );
 
@@ -99,7 +99,7 @@ bool run_on_shiny(
 
 
 void on_shiny_sound(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     ShinyDetectedActionOption& options,
     const ShinySoundResults& results
 );

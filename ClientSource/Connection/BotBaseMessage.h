@@ -67,7 +67,7 @@ private:
 
 
 inline BotBaseMessage BotBaseContext::issue_request_and_wait(const BotBaseRequest& request) const{
-    return m_botbase.issue_request_and_wait(request, &m_cancelled);
+    return m_botbase.issue_request_and_wait(request, this);
 }
 
 

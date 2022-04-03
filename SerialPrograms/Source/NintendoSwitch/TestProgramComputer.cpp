@@ -41,9 +41,11 @@
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 
-#include "Kernels/Kernels_x64_AVX512.h"
-//#include "Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512-GF.h"
+//#include "Kernels/Kernels_x64_AVX2.h"
+//#include "Kernels/Kernels_x64_AVX512.h"
+//#include "Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512.h"
 //#include "Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h"
 
 
@@ -116,13 +118,17 @@ void print_8x64(__m512i m){
 
 
 
-void TestProgramComputer::program(ProgramEnvironment& env){
+
+
+void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
-    using namespace NintendoSwitch::PokemonSwSh;
+    using namespace NintendoSwitch::PokemonLA;
     using namespace Pokemon;
 
 
-#if 1
+
+
+#if 0
     QImage image("20220328-043030682479.jpg");
     auto matrix = compress_rgb32_to_binary_range(image, 0xff808080, 0xffffffff);
     auto session = Waterfill::make_WaterfillSession(matrix);
@@ -137,6 +143,43 @@ void TestProgramComputer::program(ProgramEnvironment& env){
     for (const auto& item : map){
         cout << item.first << " : " << item.second.center_x() << ", " << item.second.center_y() << endl;
     }
+#endif
+
+
+
+#if 0
+    __m512i r0 = _mm512_setr_epi64(0, 1, 2, 3, 4, 5, 6, 7);
+    __m512i r1 = _mm512_setr_epi64(8, 9, 10, 11, 12, 13, 14, 15);
+    __m512i r2 = _mm512_setr_epi64(16, 17, 18, 19, 20, 21, 22, 23);
+    __m512i r3 = _mm512_setr_epi64(24, 25, 26, 27, 28, 29, 30, 31);
+
+    __m256i y0, y1, y2, y3, y4, y5, y6, y7;
+
+
+    transpose_64x8x4_forward(r0, r1, r2, r3, y0, y1, y2, y3, y4, y5, y6, y7);
+    transpose_64x8x4_inverse(r0, r1, r2, r3, y0, y1, y2, y3, y4, y5, y6, y7);
+
+    print_u64(r0);
+    print_u64(r1);
+    print_u64(r2);
+    print_u64(r3);
+#endif
+
+
+#if 0
+    __m256i m0 = _mm256_setr_epi64x(0, 1, 2, 3);
+    __m256i m1 = _mm256_setr_epi64x(4, 5, 6, 7);
+
+    __m256i f0 = _mm256_permute4x64_epi64(m0, 57);
+    __m256i f1 = _mm256_permute4x64_epi64(m1, 57);
+    __m256i i0 = _mm256_permute4x64_epi64(m0, 147);
+    __m256i i1 = _mm256_permute4x64_epi64(m1, 147);
+
+    print_u64(f0);
+    print_u64(f1);
+
+    print_u64(_mm256_blend_epi32(f0, f1, 0xc0));
+    print_u64(_mm256_blend_epi32(_mm256_setzero_si256(), i0, 0xfc));
 #endif
 
 
@@ -167,6 +210,127 @@ void TestProgramComputer::program(ProgramEnvironment& env){
 9605022433230136624, 5249211048379677373);
 
 
+//    r0 = _mm512_set1_epi8(-1);
+    print_8x64(r0);
+//    print_8x64(r1);
+//    print_8x64(r2);
+//    print_8x64(r3);
+    cout << "---------" << endl;
+
+
+
+
+//    print_8x64(_mm512_ternarylogic_epi64(_mm512_set1_epi8(0), _mm512_set1_epi8(-1), _mm512_set1_epi8(-1), 0b11111000));
+
+//    print_8x64(_mm512_alignr_epi64(r0, _mm512_setzero_si512(), 7));
+//    print_8x64(_mm512_alignr_epi64(r1, r0, 1));
+
+//    Intrinsics_x64_AVX512::transpose_1x64x32(r0, r1, r2, r3);
+//    r0 = Intrinsics_x64_AVX512::bit_reverse(r0);
+//    r1 = Intrinsics_x64_AVX512::bit_reverse(r1);
+//    r2 = Intrinsics_x64_AVX512::bit_reverse(r2);
+//    r3 = Intrinsics_x64_AVX512::bit_reverse(r3);
+//    Intrinsics_x64_AVX512::transpose_1x64x32_bitreverse_in(r0, r1, r2, r3);
+
+//    transpose_8x2x2x4(r0, r1);
+//    r0 = transpose_1x8x8x8(r0);
+//    r0 = bit_reverse(r0);
+//    r0 = transpose_1x8x8x8_bitreverse_in(r0);
+//    r1 = transpose_1x8x8x8(r1);
+
+//    print_8x64(r0);
+//    print_8x64(r1);
+
+//    transpose_16x2x2x2(r0, r1, r2, r3);
+
+//    print_8x64(r0);
+//    print_8x64(r1);
+//    print_8x64(r2);
+//    print_8x64(r3);
+
+
+//    r0 = transpose_1x8x8x8(r0);
+//    r1 = transpose_1x8x8x8(r1);
+//    transpose_8x2x2x4(r0, r1);
+
+
+#if 0
+    __m512i r = _mm512_shuffle_epi32(r0, 78);
+
+    __m512i L = _mm512_slli_epi64(r, 1);
+    __m512i H = _mm512_srli_epi64(r, 1);
+
+    r0 = _mm512_and_si512(r0, _mm512_setr_epi64(0x5555555555555555, 0xaaaaaaaaaaaaaaaa, 0x5555555555555555, 0xaaaaaaaaaaaaaaaa, 0x5555555555555555, 0xaaaaaaaaaaaaaaaa, 0x5555555555555555, 0xaaaaaaaaaaaaaaaa));
+    L = _mm512_and_si512(L, _mm512_setr_epi64(0xaaaaaaaaaaaaaaaa, 0x0000000000000000, 0xaaaaaaaaaaaaaaaa, 0x0000000000000000, 0xaaaaaaaaaaaaaaaa, 0x0000000000000000, 0xaaaaaaaaaaaaaaaa, 0x0000000000000000));
+    H = _mm512_and_si512(H, _mm512_setr_epi64(0x0000000000000000, 0x5555555555555555, 0x0000000000000000, 0x5555555555555555, 0x0000000000000000, 0x5555555555555555, 0x0000000000000000, 0x5555555555555555));
+    r0 = _mm512_or_si512(r0, L);
+    r0 = _mm512_or_si512(r0, H);
+
+//    print_8x64(r0);
+
+    r = _mm512_shuffle_i64x2(r0, r0, 177);
+//    print_8x64(r);
+
+    L = _mm512_slli_epi64(r, 2);
+    H = _mm512_srli_epi64(r, 2);
+
+    r0 = _mm512_and_si512(r0, _mm512_setr_epi64(0x3333333333333333, 0x3333333333333333, 0xcccccccccccccccc, 0xcccccccccccccccc, 0x3333333333333333, 0x3333333333333333, 0xcccccccccccccccc, 0xcccccccccccccccc));
+    L = _mm512_and_si512(L, _mm512_setr_epi64(0xcccccccccccccccc, 0xcccccccccccccccc, 0x0000000000000000, 0x0000000000000000, 0xcccccccccccccccc, 0xcccccccccccccccc, 0x0000000000000000, 0x0000000000000000));
+    H = _mm512_and_si512(H, _mm512_setr_epi64(0x0000000000000000, 0x0000000000000000, 0x3333333333333333, 0x3333333333333333, 0x0000000000000000, 0x0000000000000000, 0x3333333333333333, 0x3333333333333333));
+    r0 = _mm512_or_si512(r0, L);
+    r0 = _mm512_or_si512(r0, H);
+
+//    print_8x64(r0);
+
+    r = _mm512_shuffle_i64x2(r0, r0, 78);
+
+    L = _mm512_slli_epi64(r, 4);
+    H = _mm512_srli_epi64(r, 4);
+
+    r0 = _mm512_and_si512(r0, _mm512_setr_epi64(0x0f0f0f0f0f0f0f0f, 0x0f0f0f0f0f0f0f0f, 0x0f0f0f0f0f0f0f0f, 0x0f0f0f0f0f0f0f0f, 0xf0f0f0f0f0f0f0f0, 0xf0f0f0f0f0f0f0f0, 0xf0f0f0f0f0f0f0f0, 0xf0f0f0f0f0f0f0f0));
+    L = _mm512_and_si512(L, _mm512_setr_epi64(0xf0f0f0f0f0f0f0f0, 0xf0f0f0f0f0f0f0f0, 0xf0f0f0f0f0f0f0f0, 0xf0f0f0f0f0f0f0f0, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000));
+    H = _mm512_and_si512(H, _mm512_setr_epi64(0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0000000000000000, 0x0f0f0f0f0f0f0f0f, 0x0f0f0f0f0f0f0f0f, 0x0f0f0f0f0f0f0f0f, 0x0f0f0f0f0f0f0f0f));
+    r0 = _mm512_or_si512(r0, L);
+    r0 = _mm512_or_si512(r0, H);
+
+    print_8x64(r0);
+
+
+
+//    print_8x64(r0);
+
+
+#endif
+
+#if 0
+    r0 = _mm512_shuffle_epi32(r0, 216);
+//    print_8x64(r0);
+
+    __m512i L = _mm512_srli_epi64(r0, 31);
+    __m512i H = _mm512_slli_epi64(r0, 31);
+    r0 = _mm512_and_si512(r0, _mm512_set1_epi64(0xaaaaaaaa55555555));
+    L = _mm512_and_si512(L, _mm512_set1_epi64(0x00000000aaaaaaaa));
+    H = _mm512_and_si512(H, _mm512_set1_epi64(0x5555555500000000));
+    r0 = _mm512_or_si512(r0, L);
+    r0 = _mm512_or_si512(r0, H);
+
+    L = _mm512_srli_epi64(r0, 30);
+    H = _mm512_slli_epi64(r0, 30);
+    r0 = _mm512_and_si512(r0, _mm512_set1_epi64(0xcccccccc33333333));
+    L = _mm512_and_si512(L, _mm512_set1_epi64(0x00000000cccccccc));
+    H = _mm512_and_si512(H, _mm512_set1_epi64(0x3333333300000000));
+    r0 = _mm512_or_si512(r0, L);
+    r0 = _mm512_or_si512(r0, H);
+
+    r0 = _mm512_shuffle_epi32(r0, 216);
+    print_8x64(r0);
+#endif
+
+
+
+
+
+#if 0
     print_8x64(r0);
     print_8x64(r1);
     print_8x64(r2);
@@ -186,7 +350,7 @@ void TestProgramComputer::program(ProgramEnvironment& env){
     print_8x64(r1);
     print_8x64(r2);
     print_8x64(r3);
-
+#endif
 
 //    r0 = bit_reverse(r0);
 //    r1 = bit_reverse(r1);

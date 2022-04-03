@@ -15,30 +15,32 @@ namespace NintendoSwitch{
 MultiSwitchProgramEnvironment::~MultiSwitchProgramEnvironment(){}
 
 MultiSwitchProgramEnvironment::MultiSwitchProgramEnvironment(
-    ProgramInfo program_info,
+    const ProgramInfo& program_info,
     LoggerQt& logger,
     StatsTracker* current_stats,
     const StatsTracker* historical_stats,
     FixedLimitVector<ConsoleHandle> p_switches
 )
-    : ProgramEnvironment(std::move(program_info), logger, current_stats, historical_stats)
+    : ProgramEnvironment(program_info, logger, current_stats, historical_stats)
     , consoles(std::move(p_switches))
 {}
 
 void MultiSwitchProgramEnvironment::run_in_parallel(
-    const std::function<void(ConsoleHandle& console)>& func
+    CancellableScope& scope,
+    const std::function<void(ConsoleHandle& console, BotBaseContext& context)>& func
 ){
-    run_in_parallel(0, consoles.size(), func);
+    run_in_parallel(scope, 0, consoles.size(), func);
 }
 void MultiSwitchProgramEnvironment::run_in_parallel(
-    size_t s, size_t e,
-    const std::function<void(ConsoleHandle& console)>& func
+    CancellableScope& scope, size_t s, size_t e,
+    const std::function<void(ConsoleHandle& console, BotBaseContext& context)>& func
 ){
     realtime_dispatcher().run_in_parallel(
         s, e,
         [&](size_t index){
-            func(consoles[index]);
-            consoles[index].botbase().wait_for_all_requests();
+            BotBaseContext context(scope, consoles[index].botbase());
+            func(consoles[index], context);
+            context.wait_for_all_requests();
         }
     );
 }

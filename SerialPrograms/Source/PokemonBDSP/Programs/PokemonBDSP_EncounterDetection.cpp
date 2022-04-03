@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
@@ -20,8 +21,7 @@ namespace PokemonBDSP{
 
 
 StandardEncounterDetection::StandardEncounterDetection(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ConsoleHandle& console, BotBaseContext& context,
     Language language,
     const EncounterFilterOption& filter,
     const DoublesShinyDetection& shininess,
@@ -38,8 +38,8 @@ StandardEncounterDetection::StandardEncounterDetection(
     InferenceBoxScope left_name(console, {0.467, 0.06, 0.16, 0.050});
     InferenceBoxScope right_name(console, {0.740, 0.06, 0.16, 0.050});
 
-    console.botbase().wait_for_all_requests();
-    env.wait_for(std::chrono::milliseconds(100));
+    context.wait_for_all_requests();
+    context.wait_for(std::chrono::milliseconds(100));
     QImage screen = console.video().snapshot();
 
     //  Check if it's a double battle.

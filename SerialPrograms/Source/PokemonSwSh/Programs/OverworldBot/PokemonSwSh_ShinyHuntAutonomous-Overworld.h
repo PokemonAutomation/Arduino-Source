@@ -38,20 +38,20 @@ public:
     ShinyHuntAutonomousOverworld(const ShinyHuntAutonomousOverworld_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 
 private:
     struct Stats;
 
     bool find_encounter(
-        SingleSwitchProgramEnvironment& env,
+        SingleSwitchProgramEnvironment& env, BotBaseContext& context,
         Stats& stats,
         std::chrono::system_clock::time_point expiration
     ) const;
 
     bool charge_at_target(
-        ProgramEnvironment& env, ConsoleHandle& console,
+        ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
         const std::pair<double, OverworldTarget>& target
     ) const;
 
@@ -70,7 +70,6 @@ private:
 
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
 
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 
     SectionDividerOption m_advanced_options;

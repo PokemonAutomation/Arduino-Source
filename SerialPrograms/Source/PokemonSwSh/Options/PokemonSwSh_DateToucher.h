@@ -50,7 +50,7 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
     bool ok_to_touch_now();
-    void touch_now_from_home_if_needed(const BotBaseContext& context);
+    void touch_now_from_home_if_needed(BotBaseContext& context);
 
 private:
     SimpleIntegerOption<uint8_t> m_hours;

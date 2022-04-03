@@ -10,11 +10,12 @@
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/MultiConsoleErrors.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
+    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonLA{
 
@@ -27,7 +28,7 @@ struct TradeStats : public StatsTracker{
 
 
 void trade_current_pokemon(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     MultiConsoleErrorState& tracker,
     TradeStats& stats
 );

@@ -80,12 +80,12 @@ std::unique_ptr<StatsTracker> DistortionWaiter::make_stats() const{
 }
 
 
-void DistortionWaiter::program(SingleSwitchProgramEnvironment& env){
+void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
+    pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
 
     NotificationDetector detector(env.console, LANGUAGE);
@@ -97,8 +97,8 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env){
         env.update_stats();
 
         int ret = run_until(
-            env, env.console,
-            [&](const BotBaseContext& context){
+            env, env.console, context,
+            [&](BotBaseContext& context){
                 for (size_t c = 0; c < 60; c++){
                     pbf_press_button(context, BUTTON_LCLICK, 20, 60 * TICKS_PER_SECOND - 20);
                     context.wait_for_all_requests();
@@ -131,7 +131,7 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env){
             stats.other++;
         }
 
-        env.wait_for(std::chrono::seconds(10));
+        context.wait_for(std::chrono::seconds(10));
     }
 
 
@@ -145,7 +145,7 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env){
         {{"Session Stats", QString::fromStdString(stats.to_str())}},
         env.console.video().snapshot()
     );
-    pbf_press_button(env.console, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+    pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
 }
 
 

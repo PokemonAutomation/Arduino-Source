@@ -11,6 +11,7 @@
 #include <QMessageBox>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "NintendoSwitch_SwitchSetupWidget.h"
@@ -135,7 +136,7 @@ bool RunnableSwitchProgramWidget::request_program_stop(){
     if (!RunnablePanelWidget::request_program_stop()){
         return false;
     }
-    emit signal_cancel();
+//    emit signal_cancel();
     ProgramState state = m_state.load(std::memory_order_acquire);
     if (m_setup){
         m_setup->stop_serial();
@@ -149,6 +150,8 @@ void RunnableSwitchProgramWidget::run_program(){
         return;
     }
 
+    GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_this_thread();
+
     RunnableSwitchProgramInstance& instance = static_cast<RunnableSwitchProgramInstance&>(m_instance);
     {
         std::lock_guard<std::mutex> lg(m_lock);
@@ -159,16 +162,35 @@ void RunnableSwitchProgramWidget::run_program(){
 
     load_historical_stats();
 
+    ProgramInfo program_info(
+        instance.descriptor().identifier(),
+        instance.descriptor().category(),
+        instance.descriptor().display_name(),
+        timestamp()
+    );
+
     try{
         m_logger.log("<b>Starting Program: " + program_identifier + "</b>");
-        run_switch_program();
+        run_switch_program(program_info);
         m_setup->wait_for_all_requests();
         m_logger.log("Ending Program...");
+    }catch (OperationCancelledException&){
     }catch (ProgramCancelledException&){
     }catch (ProgramFinishedException&){
+        std::string stats = stats_to_bar(m_logger, m_historical_stats.get(), m_current_stats.get());
+        status_update(QString::fromStdString(stats));
+        send_program_finished_notification(
+            m_logger, instance.NOTIFICATION_PROGRAM_FINISH,
+            program_info,
+            "",
+            m_current_stats ? m_current_stats->to_str() : ""
+        );
     }catch (InvalidConnectionStateException&){
     }catch (Exception& e){
         QString message = QString::fromStdString(e.message());
+        if (message.isEmpty()){
+            message = e.name();
+        }
         emit signal_error(message);
         send_program_fatal_error_notification(
             m_logger, instance.NOTIFICATION_ERROR_FATAL,

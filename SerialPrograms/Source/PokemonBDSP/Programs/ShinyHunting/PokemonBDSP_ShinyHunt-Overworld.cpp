@@ -37,7 +37,6 @@ ShinyHuntOverworld::ShinyHuntOverworld(const ShinyHuntOverworld_Descriptor& desc
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
     , ENCOUNTER_BOT_OPTIONS(true, true)
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
@@ -88,12 +87,12 @@ std::unique_ptr<StatsTracker> ShinyHuntOverworld::make_stats() const{
 
 
 
-void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env){
+void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
     env.update_stats();
 
     StandardEncounterHandler handler(
-        env, env.console,
+        env, env.console, context,
         LANGUAGE,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -101,12 +100,12 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env){
     LeadingShinyTracker lead_tracker(env.console);
 
     //  Connect the controller.
-    pbf_press_button(env.console, BUTTON_B, 5, 5);
+    pbf_press_button(context, BUTTON_B, 5, 5);
 
     //  Encounter Loop
     while (true){
         //  Find encounter.
-        bool battle = TRIGGER_METHOD.find_encounter(env);
+        bool battle = TRIGGER_METHOD.find_encounter(env, context);
         if (!battle){
             stats.add_error();
             handler.run_away_due_to_error(EXIT_BATTLE_TIMEOUT);
@@ -117,7 +116,7 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env){
         DoublesShinyDetection result_wild;
         ShinyDetectionResult result_own;
         detect_shiny_battle(
-            env, env.console,
+            env, env.console, context,
             result_wild, result_own,
             WILD_POKEMON,
             std::chrono::seconds(30)
@@ -140,7 +139,7 @@ void ShinyHuntOverworld::program(SingleSwitchProgramEnvironment& env){
         "",
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

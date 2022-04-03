@@ -66,7 +66,7 @@ EggCombined2::EggCombined2(const EggCombined2_Descriptor& descriptor)
     PA_ADD_OPTION(HATCH_DELAY);
 }
 
-void EggCombined2::program(SingleSwitchProgramEnvironment& env){
+void EggCombined2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     EggCombinedSession session{
         .BOXES_TO_HATCH = BOXES_TO_HATCH,
         .STEPS_TO_HATCH = STEPS_TO_HATCH,
@@ -78,13 +78,13 @@ void EggCombined2::program(SingleSwitchProgramEnvironment& env){
     };
 
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
+        grip_menu_connect_go_home(context);
+        resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 400);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
-    session.eggcombined2_body(env);
+    session.eggcombined2_body(env.console, context);
 }
 
 

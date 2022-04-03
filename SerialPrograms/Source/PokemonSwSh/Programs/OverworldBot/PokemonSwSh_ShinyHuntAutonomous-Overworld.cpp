@@ -83,7 +83,6 @@ ShinyHuntAutonomousOverworld::ShinyHuntAutonomousOverworld(const ShinyHuntAutono
         70000, 0
     )
     , ENCOUNTER_BOT_OPTIONS(true, true)
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
@@ -151,7 +150,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousOverworld::make_stats() const{
 
 
 bool ShinyHuntAutonomousOverworld::find_encounter(
-    SingleSwitchProgramEnvironment& env,
+    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
     Stats& stats,
     std::chrono::system_clock::time_point expiration
 ) const{
@@ -218,8 +217,8 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
             StartBattleWatcher start_battle_detector;
 
             int result = run_until(
-                env, env.console,
-                [&](const BotBaseContext& context){
+                env, env.console, context,
+                [&](BotBaseContext& context){
                     trigger->run(context);
                 },
                 {
@@ -261,7 +260,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
             continue;
         }
 
-        if (charge_at_target(env, env.console, target)){
+        if (charge_at_target(env, env.console, context, target)){
             return true;
         }
     }
@@ -269,7 +268,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
 
 
 bool ShinyHuntAutonomousOverworld::charge_at_target(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     const std::pair<double, OverworldTarget>& target
 ) const{
     InferenceBoxScope target_box(console, target.second.box, COLOR_YELLOW);
@@ -310,8 +309,8 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
     );
 
     int result = run_until(
-        env, console,
-        [&](const BotBaseContext& context){
+        env, console, context,
+        [&](BotBaseContext& context){
             //  Move to target.
             pbf_move_left_joystick(
                 context,
@@ -355,26 +354,26 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
 
 
 
-void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env){
+void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     srand(time(nullptr));
 
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
+        grip_menu_connect_go_home(context);
+        resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 5, 5);
     }
-    pbf_move_right_joystick(env.console, 128, 255, TICKS_PER_SECOND, 0);
+    pbf_move_right_joystick(context, 128, 255, TICKS_PER_SECOND, 0);
 
     const std::chrono::milliseconds TIMEOUT((uint64_t)WATCHDOG_TIMER * 1000 / TICKS_PER_SECOND);
     const uint32_t PERIOD = (uint32_t)TIME_ROLLBACK_HOURS * 3600 * TICKS_PER_SECOND;
-    uint32_t last_touch = system_clock(env.console);
+    uint32_t last_touch = system_clock(context);
 
     Stats& stats = env.stats<Stats>();
     env.update_stats();
 
     StandardEncounterHandler handler(
-        env, env.console,
+        env, env.console, context,
         LANGUAGE,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -384,10 +383,10 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env){
     auto last = std::chrono::system_clock::now();
     while (true){
         //  Touch the date.
-        if (TIME_ROLLBACK_HOURS > 0 && system_clock(env.console) - last_touch >= PERIOD){
-            pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-            rollback_hours_from_home(env.console, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-            resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        if (TIME_ROLLBACK_HOURS > 0 && system_clock(context) - last_touch >= PERIOD){
+            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+            rollback_hours_from_home(context, TIME_ROLLBACK_HOURS, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+            resume_game_no_interact(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             last_touch += PERIOD;
         }
 
@@ -395,9 +394,9 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env){
 
         auto now = std::chrono::system_clock::now();
         if (now - last > TIMEOUT){
-            pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
             reset_game_from_home_with_inference(
-                env, env.console,
+                env, env.console, context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
             );
             stats.m_resets++;
@@ -405,16 +404,16 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env){
             continue;
         }
 
-        env.console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
 
-        bool battle = find_encounter(env, stats, last + TIMEOUT);
+        bool battle = find_encounter(env, context, stats, last + TIMEOUT);
         if (!battle){
             continue;
         }
 
         //  Detect shiny.
         ShinyDetectionResult result = detect_shiny_battle(
-            env, env.console,
+            env, env.console, context,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );
@@ -434,7 +433,7 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env){
         "",
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

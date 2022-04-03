@@ -31,12 +31,12 @@ public:
     MagikarpMoveGrinder(const MagikarpMoveGrinder_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    bool battle_magikarp(SingleSwitchProgramEnvironment& env);
+    bool battle_magikarp(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
-    void switch_pokemon(SingleSwitchProgramEnvironment& env, size_t& next_pokemon_in_party_order);
+    void switch_pokemon(ConsoleHandle& console, BotBaseContext& context, size_t& next_pokemon_in_party_order);
 
 private:
     class Stats;
@@ -44,7 +44,6 @@ private:
     OneMoveBattlePokemonActionTable POKEMON_ACTIONS;
 
     EventNotificationOption NOTIFICATION_STATUS;
-    EventNotificationOption NOTIFICATION_PROGRAM_FINISH;
     EventNotificationsOption NOTIFICATIONS;
 };
 

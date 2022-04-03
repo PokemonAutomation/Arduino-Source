@@ -8,7 +8,6 @@
 #define PokemonAutomation_PokemonSwSh_MaxLair_Detect_ItemSelectMenu_H
 
 #include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 

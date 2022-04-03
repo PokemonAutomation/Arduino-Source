@@ -28,8 +28,8 @@ class EggFetcherMultiple : public SingleSwitchProgramInstance{
 public:
     EggFetcherMultiple(const EggFetcherMultiple_Descriptor& descriptor);
 
-    void run_eggfetcher(SingleSwitchProgramEnvironment& env, bool deposit_automatically, uint16_t attempts) const;
-    virtual void program(SingleSwitchProgramEnvironment& env) override;
+    void run_eggfetcher(Logger& logger, BotBaseContext& context, bool deposit_automatically, uint16_t attempts) const;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;

@@ -27,7 +27,7 @@ class TrainIVCheckerOCR : public RunnableComputerProgramInstance{
 public:
     TrainIVCheckerOCR(const TrainIVCheckerOCR_Descriptor& descriptor);
 
-    virtual void program(ProgramEnvironment& env) override;
+    virtual void program(ProgramEnvironment& env, CancellableScope& scope) override;
 
 private:
     StringOption DIRECTORY;

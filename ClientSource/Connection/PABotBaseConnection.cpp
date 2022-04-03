@@ -4,7 +4,6 @@
  * 
  */
 
-#include <iostream>
 #include "Common/CRC32.h"
 #include "Common/Microcontroller/MessageProtocol.h"
 #include "ClientSource/Libraries/Logging.h"

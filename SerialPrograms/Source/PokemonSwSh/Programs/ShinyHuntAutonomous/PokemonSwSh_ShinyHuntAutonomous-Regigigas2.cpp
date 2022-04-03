@@ -46,7 +46,6 @@ ShinyHuntAutonomousRegigigas2::ShinyHuntAutonomousRegigigas2(const ShinyHuntAuto
         24
     )
     , ENCOUNTER_BOT_OPTIONS(false, false)
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
@@ -87,38 +86,38 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegigigas2::make_stats() const{
 
 
 
-bool ShinyHuntAutonomousRegigigas2::kill_and_return(SingleSwitchProgramEnvironment& env) const{
-    pbf_mash_button(env.console, BUTTON_A, 4 * TICKS_PER_SECOND);
+bool ShinyHuntAutonomousRegigigas2::kill_and_return(SingleSwitchProgramEnvironment& env, BotBaseContext& context) const{
+    pbf_mash_button(context, BUTTON_A, 4 * TICKS_PER_SECOND);
 
     RaidCatchDetector detector(env.console);
     int result = wait_until(
-        env, env.console,
+        env, env.console, context,
         std::chrono::seconds(30),
         { &detector }
     );
     switch (result){
     case 0:
-        pbf_press_dpad(env.console, DPAD_DOWN, 10, 0);
-        pbf_press_button(env.console, BUTTON_A, 10, CATCH_TO_OVERWORLD_DELAY);
+        pbf_press_dpad(context, DPAD_DOWN, 10, 0);
+        pbf_press_button(context, BUTTON_A, 10, CATCH_TO_OVERWORLD_DELAY);
         return true;
     default:
         env.log("Raid Catch Menu not found.", COLOR_RED);
         return false;
     }
 }
-void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env){
+void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);
+        grip_menu_connect_go_home(context);
+        resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 500);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
     ShinyHuntTracker& stats = env.stats<ShinyHuntTracker>();
     env.update_stats();
 
     StandardEncounterHandler handler(
-        env, env.console,
+        env, env.console, context,
         Language::None,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -128,13 +127,13 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env)
         for (uint8_t pp = REVERSAL_PP; pp > 0; pp--){
             env.log("Starting Regigigas Encounter: " + tostr_u_commas(stats.encounters() + 1));
 
-            pbf_mash_button(env.console, BUTTON_A, 18 * TICKS_PER_SECOND);
-            env.console.botbase().wait_for_all_requests();
+            pbf_mash_button(context, BUTTON_A, 18 * TICKS_PER_SECOND);
+            context.wait_for_all_requests();
 
             {
                 StartBattleWatcher detector;
                 int result = wait_until(
-                    env, env.console,
+                    env, env.console, context,
                     std::chrono::seconds(30),
                     { &detector }
                 );
@@ -147,7 +146,7 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env)
             }
 
             ShinyDetectionResult result = detect_shiny_battle(
-                env, env.console,
+                env, env.console, context,
                 SHINY_BATTLE_RAID,
                 std::chrono::seconds(30)
             );
@@ -164,13 +163,13 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env)
                 break;
             }
 
-            kill_and_return(env);
+            kill_and_return(env, context);
         }
 
-        pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-        TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(env.console);
+        pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+        TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(context);
         reset_game_from_home_with_inference(
-            env, env.console,
+            env, env.console, context,
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
         );
     }
@@ -184,7 +183,7 @@ StopProgram:
         "",
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

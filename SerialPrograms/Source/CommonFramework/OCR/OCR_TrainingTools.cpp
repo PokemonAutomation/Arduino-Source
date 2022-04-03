@@ -50,17 +50,19 @@ std::string extract_name(const QString& filename){
 
 
 TrainingSession::TrainingSession(
-    ProgramEnvironment& env,
+    LoggerQt& logger, CancellableScope& scope,
     const QString& training_data_directory
 )
-    : m_directory(TRAINING_PATH() + training_data_directory)
+    : m_logger(logger)
+    , m_scope(scope)
+    , m_directory(TRAINING_PATH() + training_data_directory)
     , m_total_samples(0)
 {
     if (!m_directory.isEmpty() && m_directory.back() != '/' && m_directory.back() != '\\'){
         m_directory += "/";
     }
 
-    env.log("Parsing training data in: " + m_directory);
+    logger.log("Parsing training data in: " + m_directory);
 
     QDirIterator iter(m_directory, QDir::AllDirs);
     while (iter.hasNext()){
@@ -82,13 +84,13 @@ TrainingSession::TrainingSession(
                 );
                 m_total_samples++;
 
-                env.check_stopping();
+                scope.throw_if_cancelled();
             }
         }
-        env.check_stopping();
+        scope.throw_if_cancelled();
     }
 
-    env.log(
+    logger.log(
         "Parsing Complete: Languages = " + tostr_u_commas(m_samples.size()) +
         ", Samples = " + tostr_u_commas(m_total_samples)
     );
@@ -96,13 +98,12 @@ TrainingSession::TrainingSession(
 
 
 void TrainingSession::generate_small_dictionary(
-    ProgramEnvironment& env,
     const QString& ocr_json_file,
     const QString& output_json_file,
     bool incremental,
     size_t threads
 ){
-    env.log("Generating OCR Data...");
+    m_logger.log("Generating OCR Data...");
 
     OCR::SmallDictionaryMatcher baseline(ocr_json_file, !incremental);
     OCR::SmallDictionaryMatcher trained(ocr_json_file, !incremental);
@@ -116,13 +117,13 @@ void TrainingSession::generate_small_dictionary(
     std::atomic<size_t> failed(0);
     for (const auto& language : m_samples){
         const LanguageData& language_info = language_data(language.first);
-        env.log("Starting Language: " + language_info.name);
+        m_logger.log("Starting Language: " + language_info.name);
 //        cout << (int)item.first << " : " << item.second.size() << endl;
         for (const TrainingSample& sample : language.second){
             task_runner.dispatch([&]{
                 QImage image(m_directory + sample.filepath);
                 if (image.isNull()){
-                    env.log("Skipping: " + sample.filepath);
+                    m_logger.log("Skipping: " + sample.filepath);
                     return;
                 }
                 OCR::make_OCR_filter(image).apply(image);
@@ -136,7 +137,7 @@ void TrainingSession::generate_small_dictionary(
 
                 if (result.results.empty()){
                     failed++;
-                    result0.log(env.logger(), MAX_LOG10P, sample.filepath);
+                    result0.log(m_logger, MAX_LOG10P, sample.filepath);
                     trained.add_candidate(language.first, sample.token, normalized);
                     return;
                 }
@@ -148,28 +149,27 @@ void TrainingSession::generate_small_dictionary(
                     }
                 }
             });
-            env.check_stopping();
+            m_scope.throw_if_cancelled();
         }
         task_runner.wait_for_everything();
-        env.check_stopping();
+        m_scope.throw_if_cancelled();
     }
 
-    env.log("Languages: " + tostr_u_commas(m_samples.size()));
-    env.log("Samples: " + tostr_u_commas(m_total_samples));
-    env.log("Matched: " + tostr_u_commas(matched));
-    env.log("Missed: " + tostr_u_commas(failed));
+    m_logger.log("Languages: " + tostr_u_commas(m_samples.size()));
+    m_logger.log("Samples: " + tostr_u_commas(m_total_samples));
+    m_logger.log("Matched: " + tostr_u_commas(matched));
+    m_logger.log("Missed: " + tostr_u_commas(failed));
 
     trained.save(output_json_file);
 }
 
 void TrainingSession::generate_large_dictionary(
-    ProgramEnvironment& env,
     const QString& ocr_json_directory,
     const QString& output_prefix,
     bool incremental,
     size_t threads
 ) const{
-    env.log("Generating OCR Data...");
+    m_logger.log("Generating OCR Data...");
 
     OCR::LargeDictionaryMatcher baseline(ocr_json_directory + output_prefix, nullptr, !incremental);
     OCR::LargeDictionaryMatcher trained(ocr_json_directory + output_prefix, nullptr, !incremental);
@@ -183,13 +183,13 @@ void TrainingSession::generate_large_dictionary(
     std::atomic<size_t> failed(0);
     for (const auto& language : m_samples){
         const LanguageData& language_info = language_data(language.first);
-        env.log("Starting Language: " + language_info.name);
+        m_logger.log("Starting Language: " + language_info.name);
 //        cout << (int)item.first << " : " << item.second.size() << endl;
         for (const TrainingSample& sample : language.second){
             task_runner.dispatch([&]{
                 QImage image(m_directory + sample.filepath);
                 if (image.isNull()){
-                    env.log("Skipping: " + sample.filepath);
+                    m_logger.log("Skipping: " + sample.filepath);
                     return;
                 }
                 OCR::make_OCR_filter(image).apply(image);
@@ -203,7 +203,7 @@ void TrainingSession::generate_large_dictionary(
 
                 if (result.results.empty()){
                     failed++;
-                    result0.log(env.logger(), MAX_LOG10P, sample.filepath);
+                    result0.log(m_logger, MAX_LOG10P, sample.filepath);
                     trained.add_candidate(language.first, sample.token, normalized);
                     return;
                 }
@@ -215,19 +215,19 @@ void TrainingSession::generate_large_dictionary(
                     }
                 }
             });
-            env.check_stopping();
+            m_scope.throw_if_cancelled();
         }
         task_runner.wait_for_everything();
 
         QString json = output_prefix + QString::fromStdString(language_info.code) + ".json";
         trained.save(language.first, json);
-        env.check_stopping();
+        m_scope.throw_if_cancelled();
     }
 
-    env.log("Languages: " + tostr_u_commas(m_samples.size()));
-    env.log("Samples: " + tostr_u_commas(m_total_samples));
-    env.log("Matched: " + tostr_u_commas(matched));
-    env.log("Missed: " + tostr_u_commas(failed));
+    m_logger.log("Languages: " + tostr_u_commas(m_samples.size()));
+    m_logger.log("Samples: " + tostr_u_commas(m_total_samples));
+    m_logger.log("Matched: " + tostr_u_commas(matched));
+    m_logger.log("Missed: " + tostr_u_commas(failed));
 }
 
 

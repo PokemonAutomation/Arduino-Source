@@ -24,7 +24,7 @@ namespace PokemonBDSP{
 
 
 
-void hatch_egg(ProgramEnvironment& env, ConsoleHandle& console){
+void hatch_egg(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
     //  Spin until egg starts hatching.
     do{
         ShortDialogWatcher dialog;
@@ -34,8 +34,8 @@ void hatch_egg(ProgramEnvironment& env, ConsoleHandle& console){
         }
 
         int ret = run_until(
-            env, console,
-            [](const BotBaseContext& context){
+            env, console, context,
+            [](BotBaseContext& context){
                 egg_spin(context, 480 * TICKS_PER_SECOND);
             },
             {
@@ -59,31 +59,31 @@ void hatch_egg(ProgramEnvironment& env, ConsoleHandle& console){
     QImage overworld = console.video().snapshot();
     overworld.save("test-0.png");
     {
-        pbf_mash_button(console, BUTTON_B, 10 * TICKS_PER_SECOND);
-        console.botbase().wait_for_all_requests();
+        pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
+        context.wait_for_all_requests();
 
         ShortDialogWatcher dialog;
         int ret = wait_until(
-            env, console, std::chrono::seconds(30),
+            env, console, context, std::chrono::seconds(30),
             { &dialog }
         );
         if (ret < 0){
             throw OperationFailedException(console, "End of hatch not detected after 30 seconds.");
         }
         console.log("Egg finished hatching.");
-        pbf_mash_button(console, BUTTON_B, 1 * TICKS_PER_SECOND);
+        pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
     }
 
     //  Return to overworld.
     while (true){
-        console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
 
         //  Wait for steady state and read it again.
-        env.wait_for(std::chrono::milliseconds(200));
+        context.wait_for(std::chrono::milliseconds(200));
         ImageMatchWatcher matcher(overworld, {0.10, 0.10, 0.80, 0.60}, 100);
         SelectionArrowFinder arrow(console, {0.50, 0.60, 0.30, 0.20}, COLOR_GREEN);
         int ret = wait_until(
-            env, console, std::chrono::seconds(30),
+            env, console, context, std::chrono::seconds(30),
             {
                 &matcher,
                 &arrow,
@@ -97,47 +97,47 @@ void hatch_egg(ProgramEnvironment& env, ConsoleHandle& console){
             throw UserSetupError(console, "Detected prompt. Please turn off nicknaming.");
         default:
             console.log("Failed to detect overworld after 30 seconds. Did day/night change?", COLOR_RED);
-//            pbf_mash_button(console, BUTTON_ZL, 30 * TICKS_PER_SECOND);
+//            pbf_mash_button(context, BUTTON_ZL, 30 * TICKS_PER_SECOND);
             return;
         }
     }
 }
-void hatch_party(ProgramEnvironment& env, ConsoleHandle& console, size_t eggs){
+void hatch_party(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, size_t eggs){
     for (size_t c = 0; c < eggs; c++){
-        hatch_egg(env, console);
+        hatch_egg(env, console, context);
     }
 }
 
-void withdraw_1st_column_from_overworld(ProgramEnvironment& env, ConsoleHandle& console){
+void withdraw_1st_column_from_overworld(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
     const uint16_t BOX_SCROLL_DELAY = GameSettings::instance().BOX_SCROLL_DELAY_0;
     const uint16_t BOX_PICKUP_DROP_DELAY = GameSettings::instance().BOX_PICKUP_DROP_DELAY;
-    overworld_to_box(env, console);
-    pbf_press_button(console, BUTTON_Y, 20, 50);
-    pbf_press_button(console, BUTTON_Y, 20, 50);
-    pickup_column(console);
-    pbf_move_right_joystick(console, 0, 128, 20, BOX_SCROLL_DELAY);
-    pbf_move_right_joystick(console, 128, 255, 20, BOX_SCROLL_DELAY);
-    pbf_press_button(console, BUTTON_ZL, 20, BOX_PICKUP_DROP_DELAY);
-    box_to_overworld(env, console);
+    overworld_to_box(env, console, context);
+    pbf_press_button(context, BUTTON_Y, 20, 50);
+    pbf_press_button(context, BUTTON_Y, 20, 50);
+    pickup_column(context);
+    pbf_move_right_joystick(context, 0, 128, 20, BOX_SCROLL_DELAY);
+    pbf_move_right_joystick(context, 128, 255, 20, BOX_SCROLL_DELAY);
+    pbf_press_button(context, BUTTON_ZL, 20, BOX_PICKUP_DROP_DELAY);
+    box_to_overworld(env, console, context);
 }
 
 
 
-void release(ProgramEnvironment& env, ConsoleHandle& console){
-    pbf_press_button(console, BUTTON_ZL, 20, 50);
-    pbf_move_right_joystick(console, 128, 0, 20, 10);
-    pbf_move_right_joystick(console, 128, 0, 20, 10);
-    pbf_press_button(console, BUTTON_ZL, 20, 105);
-    pbf_move_right_joystick(console, 128, 255, 20, 10);
+void release(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+    pbf_press_button(context, BUTTON_ZL, 20, 50);
+    pbf_move_right_joystick(context, 128, 0, 20, 10);
+    pbf_move_right_joystick(context, 128, 0, 20, 10);
+    pbf_press_button(context, BUTTON_ZL, 20, 105);
+    pbf_move_right_joystick(context, 128, 255, 20, 10);
 
     ShortDialogDetector detector;
     for (size_t c = 0; c < 3; c++){
-        console.botbase().wait_for_all_requests();
+        context.wait_for_all_requests();
         QImage screen = console.video().snapshot();
         if (!detector.detect(screen)){
             return;
         }
-        pbf_press_button(console, BUTTON_ZL, 20, 105);
+        pbf_press_button(context, BUTTON_ZL, 20, 105);
     }
     throw OperationFailedException(console, "Unexpected dialogs when releasing.");
 }

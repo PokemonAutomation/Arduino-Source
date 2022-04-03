@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonSwSh_ShinyEncounterDetector_H
 #define PokemonAutomation_PokemonSwSh_ShinyEncounterDetector_H
 
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "Pokemon/Pokemon_DataTypes.h"
 #include "Pokemon/Options/Pokemon_EncounterBotOptions.h"
@@ -17,6 +16,8 @@
 #include "PokemonSwSh_ShinySparkleSet.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
+    class ProgramEnvironment;
     class ConsoleHandle;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
@@ -82,7 +83,7 @@ ShinyType determine_shiny_status(
 
 
 ShinyDetectionResult detect_shiny_battle(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     const ShinyDetectionBattle& battle_settings,
     std::chrono::seconds timeout,
     double detection_threshold = 2.0

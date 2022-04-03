@@ -10,6 +10,7 @@
 #include <immintrin.h>
 #include "Common/Compiler.h"
 #include "Kernels/Kernels_x64_AVX512.h"
+#include "Kernels_Waterfill_Intrinsics_x64_AVX512.h"
 
 namespace PokemonAutomation{
 namespace Kernels{
@@ -153,6 +154,7 @@ PA_FORCE_INLINE void transpose_1x16x16x4(__m512i& r0, __m512i& r1){
     r1 = _mm512_permutexvar_epi8(INDEX, r1);
     s0 = _mm512_gf2p8affine_epi64_epi8(_mm512_set1_epi64(0x8040201008040201), r0, 0);
     s1 = _mm512_gf2p8affine_epi64_epi8(_mm512_set1_epi64(0x8040201008040201), r1, 0);
+#if 0
     const __m512i INDEX0 = _mm512_setr_epi8(
          0, 64, 16, 80, 32, 96, 48,112,
          1, 65, 17, 81, 33, 97, 49,113,
@@ -175,6 +177,38 @@ PA_FORCE_INLINE void transpose_1x16x16x4(__m512i& r0, __m512i& r1){
     );
     r0 = _mm512_permutex2var_epi8(s0, INDEX0, s1);
     r1 = _mm512_permutex2var_epi8(s0, INDEX1, s1);
+#else
+    const __m512i INDEX0 = _mm512_setr_epi8(
+         0,  8, 16, 24, 32, 40, 48, 56,
+         1,  9, 17, 25, 33, 41, 49, 57,
+         2, 10, 18, 26, 34, 42, 50, 58,
+         3, 11, 19, 27, 35, 43, 51, 59,
+         4, 12, 20, 28, 36, 44, 52, 60,
+         5, 13, 21, 29, 37, 45, 53, 61,
+         6, 14, 22, 30, 38, 46, 54, 62,
+         7, 15, 23, 31, 39, 47, 55, 63
+    );
+    const __m512i INDEX1 = _mm512_setr_epi8(
+         8,  0, 24, 16, 40, 32, 56, 48,
+         9,  1, 25, 17, 41, 33, 57, 49,
+        10,  2, 26, 18, 42, 34, 58, 50,
+        11,  3, 27, 19, 43, 35, 59, 51,
+        12,  4, 28, 20, 44, 36, 60, 52,
+        13,  5, 29, 21, 45, 37, 61, 53,
+        14,  6, 30, 22, 46, 38, 62, 54,
+        15,  7, 31, 23, 47, 39, 63, 55
+    );
+    s0 = _mm512_permutexvar_epi8(INDEX0, s0);
+    s1 = _mm512_permutexvar_epi8(INDEX1, s1);
+    r0 = _mm512_ternarylogic_epi64(s0, s1, _mm512_set1_epi16((uint16_t)0xff00), 0xd8);
+    r1 = _mm512_ternarylogic_epi64(s1, s0, _mm512_set1_epi16((uint16_t)0xff00), 0xd8);
+    r1 = _mm512_shuffle_epi8(r1, _mm512_setr_epi8(
+        1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14,
+        1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14,
+        1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14,
+        1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14
+    ));
+#endif
 }
 PA_FORCE_INLINE void transpose_1x16x16x4_bitreverse_in(__m512i& r0, __m512i& r1){
     const __m512i INDEX = _mm512_setr_epi8(
@@ -192,6 +226,7 @@ PA_FORCE_INLINE void transpose_1x16x16x4_bitreverse_in(__m512i& r0, __m512i& r1)
     r1 = _mm512_permutexvar_epi8(INDEX, r1);
     s0 = _mm512_gf2p8affine_epi64_epi8(_mm512_set1_epi64(0x8040201008040201), r0, 0);
     s1 = _mm512_gf2p8affine_epi64_epi8(_mm512_set1_epi64(0x8040201008040201), r1, 0);
+#if 0
     const __m512i INDEX0 = _mm512_setr_epi8(
          7, 71, 23, 87, 39,103, 55,119,
          6, 70, 22, 86, 38,102, 54,118,
@@ -214,52 +249,53 @@ PA_FORCE_INLINE void transpose_1x16x16x4_bitreverse_in(__m512i& r0, __m512i& r1)
     );
     r0 = _mm512_permutex2var_epi8(s0, INDEX0, s1);
     r1 = _mm512_permutex2var_epi8(s0, INDEX1, s1);
+#else
+    const __m512i INDEX0 = _mm512_setr_epi8(
+         7, 15, 23, 31, 39, 47, 55, 63,
+         6, 14, 22, 30, 38, 46, 54, 62,
+         5, 13, 21, 29, 37, 45, 53, 61,
+         4, 12, 20, 28, 36, 44, 52, 60,
+         3, 11, 19, 27, 35, 43, 51, 59,
+         2, 10, 18, 26, 34, 42, 50, 58,
+         1,  9, 17, 25, 33, 41, 49, 57,
+         0,  8, 16, 24, 32, 40, 48, 56
+    );
+    const __m512i INDEX1 = _mm512_setr_epi8(
+        15,  7, 31, 23, 47, 39, 63, 55,
+        14,  6, 30, 22, 46, 38, 62, 54,
+        13,  5, 29, 21, 45, 37, 61, 53,
+        12,  4, 28, 20, 44, 36, 60, 52,
+        11,  3, 27, 19, 43, 35, 59, 51,
+        10,  2, 26, 18, 42, 34, 58, 50,
+         9,  1, 25, 17, 41, 33, 57, 49,
+         8,  0, 24, 16, 40, 32, 56, 48
+    );
+    s0 = _mm512_permutexvar_epi8(INDEX0, s0);
+    s1 = _mm512_permutexvar_epi8(INDEX1, s1);
+    r0 = _mm512_ternarylogic_epi64(s0, s1, _mm512_set1_epi16((uint16_t)0xff00), 0xd8);
+    r1 = _mm512_ternarylogic_epi64(s1, s0, _mm512_set1_epi16((uint16_t)0xff00), 0xd8);
+    r1 = _mm512_shuffle_epi8(r1, _mm512_setr_epi8(
+        1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14,
+        1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14,
+        1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14,
+        1, 0, 3, 2, 5, 4, 7, 6, 9, 8, 11, 10, 13, 12, 15, 14
+    ));
+#endif
 }
 
-PA_FORCE_INLINE void transpose_16x2x2x2(__m512i& r0, __m512i& r1, __m512i& r2, __m512i& r3){
-    const __m512i INDEX0 = _mm512_setr_epi16(
-         0, 32,  2, 34,
-         4, 36,  6, 38,
-         8, 40, 10, 42,
-        12, 44, 14, 46,
-        16, 48, 18, 50,
-        20, 52, 22, 54,
-        24, 56, 26, 58,
-        28, 60, 30, 62
-    );
-    const __m512i INDEX1 = _mm512_setr_epi16(
-         1, 33,  3, 35,
-         5, 37,  7, 39,
-         9, 41, 11, 43,
-        13, 45, 15, 47,
-        17, 49, 19, 51,
-        21, 53, 23, 55,
-        25, 57, 27, 59,
-        29, 61, 31, 63
-    );
-    __m512i s0, s1, s2, s3;
-    s0 = r0;
-    s1 = r1;
-    s2 = r2;
-    s3 = r3;
-    r0 = _mm512_permutex2var_epi16(s0, INDEX0, s2);
-    r1 = _mm512_permutex2var_epi16(s1, INDEX0, s3);
-    r2 = _mm512_permutex2var_epi16(s0, INDEX1, s2);
-    r3 = _mm512_permutex2var_epi16(s1, INDEX1, s3);
-}
 PA_FORCE_INLINE void transpose_1x64x32(
     __m512i& r0, __m512i& r1, __m512i& r2, __m512i& r3
 ){
     transpose_1x16x16x4(r0, r1);
     transpose_1x16x16x4(r2, r3);
-    transpose_16x2x2x2(r0, r1, r2, r3);
+    Intrinsics_x64_AVX512::transpose_16x2x2x2(r0, r1, r2, r3);
 }
 PA_FORCE_INLINE void transpose_1x64x32_bitreverse_in(
     __m512i& r0, __m512i& r1, __m512i& r2, __m512i& r3
 ){
     transpose_1x16x16x4_bitreverse_in(r0, r1);
     transpose_1x16x16x4_bitreverse_in(r2, r3);
-    transpose_16x2x2x2(r0, r1, r2, r3);
+    Intrinsics_x64_AVX512::transpose_16x2x2x2(r0, r1, r2, r3);
 }
 
 PA_FORCE_INLINE void transpose_32x2x2(
@@ -313,8 +349,8 @@ PA_FORCE_INLINE void transpose_1x64x64(
     transpose_1x16x16x4(r2, r3);
     transpose_1x16x16x4(r4, r5);
     transpose_1x16x16x4(r6, r7);
-    transpose_16x2x2x2(r0, r1, r2, r3);
-    transpose_16x2x2x2(r4, r5, r6, r7);
+    Intrinsics_x64_AVX512::transpose_16x2x2x2(r0, r1, r2, r3);
+    Intrinsics_x64_AVX512::transpose_16x2x2x2(r4, r5, r6, r7);
     transpose_32x2x2(r0, r1, r2, r3, r4, r5, r6, r7);
 }
 PA_FORCE_INLINE void transpose_1x64x64_bitreverse_in(
@@ -325,8 +361,8 @@ PA_FORCE_INLINE void transpose_1x64x64_bitreverse_in(
     transpose_1x16x16x4_bitreverse_in(r2, r3);
     transpose_1x16x16x4_bitreverse_in(r4, r5);
     transpose_1x16x16x4_bitreverse_in(r6, r7);
-    transpose_16x2x2x2(r0, r1, r2, r3);
-    transpose_16x2x2x2(r4, r5, r6, r7);
+    Intrinsics_x64_AVX512::transpose_16x2x2x2(r0, r1, r2, r3);
+    Intrinsics_x64_AVX512::transpose_16x2x2x2(r4, r5, r6, r7);
     transpose_32x2x2(r0, r1, r2, r3, r4, r5, r6, r7);
 }
 

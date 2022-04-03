@@ -34,7 +34,7 @@ ShortcutDirection::ShortcutDirection(QString label, bool required)
     ), m_required(required)
 {}
 
-void ShortcutDirection::run(const BotBaseContext& context, uint16_t delay){
+void ShortcutDirection::run(BotBaseContext& context, uint16_t delay){
     uint8_t shortcut_x = 128;
     uint8_t shortcut_y = 128;
     size_t index = *this;

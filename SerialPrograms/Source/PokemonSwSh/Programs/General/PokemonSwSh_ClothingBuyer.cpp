@@ -38,22 +38,22 @@ ClothingBuyer::ClothingBuyer(const ClothingBuyer_Descriptor& descriptor)
     PA_ADD_OPTION(CATEGORY_ROTATION);
 }
 
-void ClothingBuyer::program(SingleSwitchProgramEnvironment& env){
+void ClothingBuyer::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
-        resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        grip_menu_connect_go_home(context);
+        resume_game_no_interact(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     }else{
-        pbf_press_button(env.console, BUTTON_LCLICK, 5, 5);
+        pbf_press_button(context, BUTTON_LCLICK, 5, 5);
     }
 
     while (true){
-        pbf_press_button(env.console, BUTTON_A, 10, 90);
+        pbf_press_button(context, BUTTON_A, 10, 90);
         if (CATEGORY_ROTATION){
-            pbf_press_dpad(env.console, DPAD_RIGHT, 10, 40);
+            pbf_press_dpad(context, DPAD_RIGHT, 10, 40);
         }
-        pbf_press_button(env.console, BUTTON_A, 10, 90);
-        pbf_press_button(env.console, BUTTON_A, 10, 90);
-        pbf_press_dpad(env.console, DPAD_DOWN, 10, 40);
+        pbf_press_button(context, BUTTON_A, 10, 90);
+        pbf_press_button(context, BUTTON_A, 10, 90);
+        pbf_press_dpad(context, DPAD_DOWN, 10, 40);
     }
 }
 

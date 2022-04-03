@@ -6,6 +6,7 @@
 
 #include <QtGlobal>
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Types.h"
 #include "PokemonBDSP_BasicCatcher.h"
@@ -23,7 +24,7 @@ namespace PokemonBDSP{
 
 
 
-void take_video(const BotBaseContext& context){
+void take_video(BotBaseContext& context){
     pbf_wait(context, 5 * TICKS_PER_SECOND);
     pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 5 * TICKS_PER_SECOND);
 //    context->wait_for_all_requests();
@@ -31,13 +32,13 @@ void take_video(const BotBaseContext& context){
 
 
 StandardEncounterHandler::StandardEncounterHandler(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     Language language,
     EncounterBotCommonOptions& settings,
     PokemonSwSh::ShinyHuntTracker& session_stats
 )
     : m_env(env)
+    , m_context(context)
     , m_console(console)
     , m_language(language)
     , m_settings(settings)
@@ -60,11 +61,11 @@ std::vector<PokemonDetection> get_mon_list(StandardEncounterDetection& encounter
 }
 
 void StandardEncounterHandler::run_away_due_to_error(uint16_t exit_battle_time){
-    pbf_mash_button(m_console, BUTTON_B, 3 * TICKS_PER_SECOND);
-    pbf_press_dpad(m_console, DPAD_DOWN, 3 * TICKS_PER_SECOND, 0);
-    m_console.botbase().wait_for_all_requests();
+    pbf_mash_button(m_context, BUTTON_B, 3 * TICKS_PER_SECOND);
+    pbf_press_dpad(m_context, DPAD_DOWN, 3 * TICKS_PER_SECOND, 0);
+    m_context.wait_for_all_requests();
 
-    run_from_battle(m_env, m_console, exit_battle_time);
+    run_from_battle(m_env, m_console, m_context, exit_battle_time);
 }
 
 std::vector<EncounterResult> StandardEncounterHandler::results(StandardEncounterDetection& encounter){
@@ -110,7 +111,7 @@ bool StandardEncounterHandler::handle_standard_encounter(const DoublesShinyDetec
     m_consecutive_failures = 0;
 
     StandardEncounterDetection encounter(
-        m_env, m_console,
+        m_console, m_context,
         m_language,
         m_settings.FILTER,
         result
@@ -129,7 +130,7 @@ bool StandardEncounterHandler::handle_standard_encounter(const DoublesShinyDetec
     m_env.update_stats();
 
     if (result.shiny_type == ShinyType::UNKNOWN){
-        pbf_mash_button(m_console, BUTTON_B, TICKS_PER_SECOND);
+        pbf_mash_button(m_context, BUTTON_B, TICKS_PER_SECOND);
         return false;
     }
 
@@ -150,7 +151,7 @@ bool StandardEncounterHandler::handle_standard_encounter(const DoublesShinyDetec
     );
 
     if (m_settings.VIDEO_ON_SHINY && encounter.has_shiny()){
-        take_video(m_console);
+        take_video(m_context);
     }
 
     return encounter.get_action().action == EncounterAction::StopProgram;
@@ -171,7 +172,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     m_consecutive_failures = 0;
 
     StandardEncounterDetection encounter(
-        m_env, m_console,
+        m_console, m_context,
         m_language,
         m_settings.FILTER,
         result
@@ -190,7 +191,7 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
     m_env.update_stats();
 
     if (m_settings.VIDEO_ON_SHINY && encounter.has_shiny()){
-        take_video(m_console);
+        take_video(m_context);
     }
 
     bool enable_names = m_language != Language::None;
@@ -215,26 +216,26 @@ bool StandardEncounterHandler::handle_standard_encounter_end_battle(
         return true;
     case EncounterAction::RunAway:
         //  Fast run-away sequence to save time.
-        pbf_press_dpad(m_console, DPAD_UP, 20, 0);
-        m_console.botbase().wait_for_all_requests();
+        pbf_press_dpad(m_context, DPAD_UP, 20, 0);
+        m_context.wait_for_all_requests();
 
-        run_from_battle(m_env, m_console, exit_battle_time);
+        run_from_battle(m_env, m_console, m_context, exit_battle_time);
         return false;
 
     case EncounterAction::ThrowBalls:
     case EncounterAction::ThrowBallsAndSave:{
-        CatchResults catch_result = basic_catcher(m_env, m_console, m_language, action.pokeball_slug);
+        CatchResults catch_result = basic_catcher(m_env, m_console, m_context, m_language, action.pokeball_slug);
         switch (catch_result.result){
         case CatchResult::POKEMON_CAUGHT:
             m_session_stats.add_caught();
             m_env.update_stats();
             if (action.action == EncounterAction::ThrowBallsAndSave){
                 //  Save the game
-                save_game(m_env, m_console);
+                save_game(m_env, m_console, m_context);
             }
             break;
         case CatchResult::POKEMON_FAINTED:
-            pbf_mash_button(m_console, BUTTON_B, 2 * TICKS_PER_SECOND);
+            pbf_mash_button(m_context, BUTTON_B, 2 * TICKS_PER_SECOND);
             break;
         case CatchResult::OWN_FAINTED:
             throw OperationFailedException(

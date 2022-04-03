@@ -20,6 +20,8 @@
 #include "Programs/Farming/PokemonLA_MagikarpMoveGrinder.h"
 #include "Programs/Farming/PokemonLA_NuggetFarmerHighlands.h"
 
+#include "Programs/General/PokemonLA_ClothingBuyer.h"
+
 #include "Programs/ShinyHunting/PokemonLA_GalladeFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_CrobatFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_UnownFinder.h"
@@ -50,6 +52,7 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<BraviaryHeightGlitch_Descriptor, BraviaryHeightGlitch>();
     add_program<DistortionWaiter_Descriptor, DistortionWaiter>();
     add_program<OutbreakFinder_Descriptor, OutbreakFinder>();
+    add_program<ClothingBuyer_Descriptor, ClothingBuyer>();
 
     add_divider("---- Trading ----");
     add_program<SelfBoxTrade_Descriptor, SelfBoxTrade>();
@@ -74,9 +77,9 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
         add_program<ShinyHuntCustomPath_Descriptor, ShinyHuntCustomPath>();
     }
 
-    add_divider("---- Developer Tools ----");
-    add_program<MountDetectionTest_Descriptor, MountDetectionTest>();
     if (GlobalSettings::instance().DEVELOPER_MODE){
+        add_divider("---- Developer Tools ----");
+        add_program<MountDetectionTest_Descriptor, MountDetectionTest>();
         add_program<OverworldWatcher_Descriptor, OverworldWatcher>();
         add_program<ShinySoundListener_Descriptor, ShinySoundListener>();
         add_program<AlphaRoarListener_Descriptor, AlphaRoarListener>();

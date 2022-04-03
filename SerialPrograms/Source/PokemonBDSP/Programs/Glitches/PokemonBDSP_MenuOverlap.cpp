@@ -17,23 +17,23 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-QImage activate_menu_overlap_from_overworld(ConsoleHandle& console){
+QImage activate_menu_overlap_from_overworld(ConsoleHandle& console, BotBaseContext& context){
     //  Capture screenshot.
-    console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
     QImage start = console.video().snapshot();
 
     //  Enter Summary
-    pbf_press_button(console, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
-    pbf_press_button(console, BUTTON_ZL, 20, GameSettings::instance().MENU_TO_POKEMON_DELAY);
-    pbf_press_button(console, BUTTON_ZL, 20, 50);
-    pbf_press_button(console, BUTTON_ZL, 20, 250);
+    pbf_press_button(context, BUTTON_X, 20, GameSettings::instance().OVERWORLD_TO_MENU_DELAY);
+    pbf_press_button(context, BUTTON_ZL, 20, GameSettings::instance().MENU_TO_POKEMON_DELAY);
+    pbf_press_button(context, BUTTON_ZL, 20, 50);
+    pbf_press_button(context, BUTTON_ZL, 20, 250);
 
     //  Activate overlap.
-    pbf_press_button(console, BUTTON_ZL, 10, 0);
-    pbf_press_button(console, BUTTON_ZR, 20, 250);
+    pbf_press_button(context, BUTTON_ZL, 10, 0);
+    pbf_press_button(context, BUTTON_ZR, 20, 250);
 
     //  Back out.
-    if (back_out_to_overworld_with_overlap(console, start, 4 * TICKS_PER_SECOND)){
+    if (back_out_to_overworld_with_overlap(console, context, start, 4 * TICKS_PER_SECOND)){
         return start;
     }
 
@@ -42,12 +42,12 @@ QImage activate_menu_overlap_from_overworld(ConsoleHandle& console){
 
 
 bool back_out_to_overworld_with_overlap(
-    ConsoleHandle& console,
+    ConsoleHandle& console, BotBaseContext& context,
     const QImage& start,
     uint16_t mash_B_start
 ){
     console.log("Backing out to overworld with overlap...");
-    pbf_mash_button(console, BUTTON_B, mash_B_start);
+    pbf_mash_button(context, BUTTON_B, mash_B_start);
 
     const double THRESHOLD = 50;
     const std::chrono::milliseconds HOLD_DURATION(200);
@@ -61,8 +61,8 @@ bool back_out_to_overworld_with_overlap(
     background_right.make_overlays(boxes);
     size_t backouts = 0;
     while (true){
-        pbf_press_button(console, BUTTON_B, 20, 205);
-        console.botbase().wait_for_all_requests();
+        pbf_press_button(context, BUTTON_B, 20, 205);
+        context.wait_for_all_requests();
         backouts++;
         if (backouts > 15){
             console.log("Overworld not detected after backing out 16 times.", COLOR_RED);
@@ -90,7 +90,7 @@ bool back_out_to_overworld_with_overlap(
 }
 
 void back_out_to_overworld(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     const QImage& start
 ){
     console.log("Backing out to overworld...");
@@ -102,8 +102,8 @@ void back_out_to_overworld(
     background_all.make_overlays(boxes);
 
     int ret = run_until(
-        env, console,
-        [](const BotBaseContext& context){
+        env, console, context,
+        [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 20 * TICKS_PER_SECOND);
         },
         { &background_all }
@@ -112,7 +112,7 @@ void back_out_to_overworld(
         throw OperationFailedException(console, "Failed to back out to overworld in 20 seconds. Something is wrong.");
     }
     console.log("Overworld detected.");
-    pbf_mash_button(console, BUTTON_B, 250);
+    pbf_mash_button(context, BUTTON_B, 250);
 }
 
 

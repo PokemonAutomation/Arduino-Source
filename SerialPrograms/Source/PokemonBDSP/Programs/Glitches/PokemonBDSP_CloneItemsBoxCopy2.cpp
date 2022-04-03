@@ -47,7 +47,6 @@ CloneItemsBoxCopy2::CloneItemsBoxCopy2(const CloneItemsBoxCopy2_Descriptor& desc
         true
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
@@ -79,7 +78,7 @@ std::unique_ptr<StatsTracker> CloneItemsBoxCopy2::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env){
+void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
 //    uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
@@ -93,12 +92,12 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env){
 //    uint16_t POKEMON_TO_MENU_DELAY = GameSettings::instance().POKEMON_TO_MENU_DELAY;
 
     //  Connect the controller.
-    pbf_mash_button(env.console, BUTTON_RCLICK, 50);
+    pbf_mash_button(context, BUTTON_RCLICK, 50);
 
     //  Enter box system.
-    menu_to_box(env.console);
+    menu_to_box(context);
 
-    env.console.botbase().wait_for_all_requests();
+    context.wait_for_all_requests();
     QImage expected = env.console.video().snapshot();
     ImageMatchWatcher matcher(expected, {0.02, 0.25, 0.96, 0.73}, 20);
 
@@ -112,69 +111,69 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env){
         );
 
         //  Select 1st mon.
-        pbf_press_button(env.console, BUTTON_ZL, 20, 50);
+        pbf_press_button(context, BUTTON_ZL, 20, 50);
 
         //  Enter box system again.
-        overworld_to_box(env.console);
+        overworld_to_box(context);
 
 #if 0
         //  Detach all items.
-        pbf_press_button(env.console, BUTTON_X, 20, 50);
-        detach_box(env.console, BOX_SCROLL_DELAY);
+        pbf_press_button(context, BUTTON_X, 20, 50);
+        detach_box(context, BOX_SCROLL_DELAY);
 
         //  Back to previous menu.
-        box_to_overworld(env.console);
+        box_to_overworld(context);
 
         //  View Summary
-        pbf_move_right_joystick(env.console, 128, 255, 20, 10);
-        pbf_press_button(env.console, BUTTON_ZL, 20, 250);
+        pbf_move_right_joystick(context, 128, 255, 20, 10);
+        pbf_press_button(context, BUTTON_ZL, 20, 250);
 
         //  Back out.
-        pbf_press_button(env.console, BUTTON_B, 20, 230);
+        pbf_press_button(context, BUTTON_B, 20, 230);
 
 #else
         //  Move entire box to a new box.
-        pbf_press_button(env.console, BUTTON_Y, 20, 50);
-        pbf_press_button(env.console, BUTTON_Y, 20, 50);
-        pbf_press_button(env.console, BUTTON_ZL, 20, BOX_PICKUP_DROP_DELAY);
+        pbf_press_button(context, BUTTON_Y, 20, 50);
+        pbf_press_button(context, BUTTON_Y, 20, 50);
+        pbf_press_button(context, BUTTON_ZL, 20, BOX_PICKUP_DROP_DELAY);
         for (size_t c = 0; c < 10; c++){
-            pbf_move_right_joystick(env.console, 255, 128, 5, 3);
-            pbf_move_right_joystick(env.console, 128, 255, 5, 3);
+            pbf_move_right_joystick(context, 255, 128, 5, 3);
+            pbf_move_right_joystick(context, 128, 255, 5, 3);
         }
-        pbf_press_button(env.console, BUTTON_ZL, 20, BOX_PICKUP_DROP_DELAY);
+        pbf_press_button(context, BUTTON_ZL, 20, BOX_PICKUP_DROP_DELAY);
         int box_offset = RELEASE ? 1 : 1 + box;
         for (int i = 0; i < box_offset; ++i){
-            pbf_press_button(env.console, BUTTON_R, 20, BOX_CHANGE_DELAY);
+            pbf_press_button(context, BUTTON_R, 20, BOX_CHANGE_DELAY);
         }
-        pbf_press_button(env.console, BUTTON_ZL, 20, BOX_PICKUP_DROP_DELAY);
+        pbf_press_button(context, BUTTON_ZL, 20, BOX_PICKUP_DROP_DELAY);
 
         //  Back to previous menu.
-        box_to_overworld(env.console);
+        box_to_overworld(context);
 
         //  View Summary
-        pbf_move_right_joystick(env.console, 128, 255, 20, 10);
-        pbf_press_button(env.console, BUTTON_ZL, 20, 250);
+        pbf_move_right_joystick(context, 128, 255, 20, 10);
+        pbf_press_button(context, BUTTON_ZL, 20, 250);
 
         //  Back out.
-        pbf_press_button(env.console, BUTTON_B, 20, 230);
+        pbf_press_button(context, BUTTON_B, 20, 230);
 
         if (RELEASE){
             //  Release the cloned box.
-            pbf_press_button(env.console, BUTTON_R, 20, BOX_CHANGE_DELAY);
-            release_box(env.console, BOX_SCROLL_DELAY);
-            pbf_press_button(env.console, BUTTON_L, 20, BOX_CHANGE_DELAY);
+            pbf_press_button(context, BUTTON_R, 20, BOX_CHANGE_DELAY);
+            release_box(context, BOX_SCROLL_DELAY);
+            pbf_press_button(context, BUTTON_L, 20, BOX_CHANGE_DELAY);
 
             //  Move cursor back to starting position.
-            pbf_move_right_joystick(env.console, 128, 255, 20, BOX_SCROLL_DELAY);
-            pbf_move_right_joystick(env.console, 128, 255, 20, BOX_SCROLL_DELAY);
-            pbf_move_right_joystick(env.console, 128, 255, 20, BOX_SCROLL_DELAY);
-            pbf_move_right_joystick(env.console, 255, 128, 20, BOX_SCROLL_DELAY);
-            pbf_move_right_joystick(env.console, 255, 128, 20, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(context, 128, 255, 20, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(context, 128, 255, 20, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(context, 128, 255, 20, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(context, 255, 128, 20, BOX_SCROLL_DELAY);
+            pbf_move_right_joystick(context, 255, 128, 20, BOX_SCROLL_DELAY);
         }
 #endif
 
-        env.console.botbase().wait_for_all_requests();
-        env.wait_for(std::chrono::milliseconds(500));
+        context.wait_for_all_requests();
+        context.wait_for(std::chrono::milliseconds(500));
         QImage current = env.console.video().snapshot();
         if (!matcher.detect(current)){
             stats.m_errors++;
@@ -191,7 +190,7 @@ void CloneItemsBoxCopy2::program(SingleSwitchProgramEnvironment& env){
         "",
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

@@ -25,7 +25,7 @@ class SynchronizedSpinning : public MultiSwitchProgramInstance{
 public:
     SynchronizedSpinning(const SynchronizedSpinning_Descriptor& description);
 
-    virtual void program(MultiSwitchProgramEnvironment& env) override;
+    virtual void program(MultiSwitchProgramEnvironment& env, CancellableScope& scope) override;
 };
 
 

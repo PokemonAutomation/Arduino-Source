@@ -7,10 +7,6 @@
 #include "PanicDump.h"
 #include "AsyncDispatcher.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
-
 namespace PokemonAutomation{
 
 
@@ -30,15 +26,9 @@ void AsyncTask::rethrow_exceptions(){
 void AsyncTask::wait_and_rethrow_exceptions(){
     std::unique_lock<std::mutex> lg(m_lock);
     m_cv.wait(lg, [=]{ return m_finished; });
-#if 0
-    if (m_exception && std::uncaught_exceptions() == 0){
-        std::rethrow_exception(m_exception);
-    }
-#else
     if (m_exception){
         std::rethrow_exception(m_exception);
     }
-#endif
 }
 void AsyncTask::signal(){
     std::lock_guard<std::mutex> lg(m_lock);
@@ -75,6 +65,7 @@ AsyncDispatcher::~AsyncDispatcher(){
     }
 }
 void AsyncDispatcher::dispatch_task(AsyncTask& task){
+//    cout << "dispatch_task() - enter" << endl;
     std::lock_guard<std::mutex> lg(m_lock);
 
     //  Enqueue task.
@@ -86,11 +77,13 @@ void AsyncDispatcher::dispatch_task(AsyncTask& task){
     }
 
     m_cv.notify_one();
+//    cout << "dispatch_task() - exit" << endl;
 }
 
 std::unique_ptr<AsyncTask> AsyncDispatcher::dispatch(std::function<void()>&& func){
     std::unique_ptr<AsyncTask> task(new AsyncTask(std::move(func)));
     dispatch_task(*task);
+//    cout << "dispatch_task - 1() - exit" << endl;
     return task;
 }
 void AsyncDispatcher::run_in_parallel(

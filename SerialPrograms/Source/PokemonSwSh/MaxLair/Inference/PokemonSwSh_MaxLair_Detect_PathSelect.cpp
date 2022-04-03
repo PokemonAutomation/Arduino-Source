@@ -245,9 +245,9 @@ void PathReader::read_hp(
 
 
 
-void PathReader::read_path(ProgramEnvironment& env, ConsoleHandle& console, GlobalState& state){
+void PathReader::read_path(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, GlobalState& state){
     PathMap path;
-    if (MaxLairInternal::read_path(env, console, path, m_path)){
+    if (MaxLairInternal::read_path(env, console, context, path, m_path)){
         console.log("Path Detection:\n" + path.dump(), COLOR_BLUE);
         state.path = path;
     }else{

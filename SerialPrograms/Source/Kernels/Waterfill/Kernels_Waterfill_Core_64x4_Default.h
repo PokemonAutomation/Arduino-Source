@@ -72,6 +72,29 @@ struct Waterfill_64x4_Default_ProcessedMask{
 };
 
 
+
+
+PA_FORCE_INLINE bool keep_going(
+    const Waterfill_64x4_Default_ProcessedMask& mask,
+    uint64_t& m0, uint64_t& m1, uint64_t& m2, uint64_t& m3,
+    uint64_t& x0, uint64_t& x1, uint64_t& x2, uint64_t& x3
+){
+    m0 = ~x0 & mask.m0;
+    m1 = ~x1 & mask.m1;
+    m2 = ~x2 & mask.m2;
+    m3 = ~x3 & mask.m3;
+
+    uint64_t changed = x0 & ((m0 << 1) | m1);
+
+    changed |= x1 & ((m1 << 1) | m0 | m2);
+    changed |= x2 & ((m2 << 1) | m1 | m3);
+    changed |= x3 & ((m3 << 1) | m2);
+
+    return changed;
+}
+
+
+
 PA_FORCE_INLINE void expand_forward(
     const Waterfill_64x4_Default_ProcessedMask& mask,
     uint64_t& x0, uint64_t& x1, uint64_t& x2, uint64_t& x3
@@ -278,30 +301,34 @@ static PA_FORCE_INLINE uint64_t popcount_sumcoord(
 
 
 //  Run Waterfill algorithm on mask "m" with starting point "x".
-//  Save result back into "x".
-static PA_FORCE_INLINE void waterfill_expand(const BinaryTile_64x4_Default& m, BinaryTile_64x4_Default& x){
+//  Save result back into "x". Clear bits of object from "m".
+static PA_FORCE_INLINE void waterfill_expand(BinaryTile_64x4_Default& m, BinaryTile_64x4_Default& x){
     uint64_t x0 = x.vec[0];
     uint64_t x1 = x.vec[1];
     uint64_t x2 = x.vec[2];
     uint64_t x3 = x.vec[3];
 
     Waterfill_64x4_Default_ProcessedMask mask(m, x0, x1, x2, x3);
+    expand_forward(mask, x0, x1, x2, x3);
 
-    uint64_t changed;
+    uint64_t m0, m1, m2, m3;
     do{
-        expand_forward(mask, x0, x1, x2, x3);
         expand_vertical(mask, x0, x1, x2, x3);
         expand_reverse(mask, x0, x1, x2, x3);
-        changed  = x0 ^ x.vec[0];
-        changed |= x1 ^ x.vec[1];
-        changed |= x2 ^ x.vec[2];
-        changed |= x3 ^ x.vec[3];
-        x.vec[0] = x0;
-        x.vec[1] = x1;
-        x.vec[2] = x2;
-        x.vec[3] = x3;
-//        cout << x.dump() << endl;
-    }while (changed);
+        expand_forward(mask, x0, x1, x2, x3);
+    }while (keep_going(
+        mask,
+        m0, m1, m2, m3,
+        x0, x1, x2, x3
+    ));
+    x.vec[0] = x0;
+    x.vec[1] = x1;
+    x.vec[2] = x2;
+    x.vec[3] = x3;
+    m.vec[0] = m0;
+    m.vec[1] = m1;
+    m.vec[2] = m2;
+    m.vec[3] = m3;
 }
 
 

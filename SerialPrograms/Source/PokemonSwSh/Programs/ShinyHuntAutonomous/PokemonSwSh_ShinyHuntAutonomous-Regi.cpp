@@ -40,7 +40,6 @@ ShinyHuntAutonomousRegi::ShinyHuntAutonomousRegi(const ShinyHuntAutonomousRegi_D
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
     , ENCOUNTER_BOT_OPTIONS(false, false)
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_SHINY,
@@ -94,19 +93,19 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegi::make_stats() const{
 
 
 
-void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env){
+void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     if (START_IN_GRIP_MENU){
-        grip_menu_connect_go_home(env.console);
-        resume_game_back_out(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
+        grip_menu_connect_go_home(context);
+        resume_game_back_out(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 200);
     }else{
-        pbf_press_button(env.console, BUTTON_B, 5, 5);
+        pbf_press_button(context, BUTTON_B, 5, 5);
     }
 
     ShinyHuntTracker& stats = env.stats<ShinyHuntTracker>();
     env.update_stats();
 
     StandardEncounterHandler handler(
-        env, env.console,
+        env, env.console, context,
         LANGUAGE,
         ENCOUNTER_BOT_OPTIONS,
         stats
@@ -114,8 +113,8 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env){
 
     bool error = false;
     while (true){
-        pbf_mash_button(env.console, BUTTON_B, POST_BATTLE_MASH_TIME);
-        move_to_corner(env, error, TRANSITION_DELAY);
+        pbf_mash_button(context, BUTTON_B, POST_BATTLE_MASH_TIME);
+        move_to_corner(env.console, context, error, TRANSITION_DELAY);
         if (error){
             env.update_stats();
             error = false;
@@ -124,29 +123,29 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env){
         //  Touch the date.
         if (TOUCH_DATE_INTERVAL.ok_to_touch_now()){
             env.log("Touching date to prevent rollover.");
-            pbf_press_button(env.console, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-            touch_date_from_home(env.console, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
-            resume_game_no_interact(env.console, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+            touch_date_from_home(context, ConsoleSettings::instance().SETTINGS_TO_HOME_DELAY);
+            resume_game_no_interact(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
 
         //  Do the light puzzle.
-        run_regi_light_puzzle(env, REGI_NAME, stats.encounters());
+        run_regi_light_puzzle(env.console, context, REGI_NAME, stats.encounters());
 
         //  Start the encounter.
-        pbf_mash_button(env.console, BUTTON_A, 5 * TICKS_PER_SECOND);
-        env.console.botbase().wait_for_all_requests();
+        pbf_mash_button(context, BUTTON_A, 5 * TICKS_PER_SECOND);
+        context.wait_for_all_requests();
 
         //  Detect shiny.
         ShinyDetectionResult result = detect_shiny_battle(
-            env, env.console,
+            env, env.console, context,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );
 //        shininess = ShinyDetection::SQUARE_SHINY;
         if (result.shiny_type == ShinyType::UNKNOWN){
             stats.add_error();
-            pbf_mash_button(env.console, BUTTON_B, TICKS_PER_SECOND);
-            run_away(env, env.console, EXIT_BATTLE_TIMEOUT);
+            pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
+            run_away(env, env.console, context, EXIT_BATTLE_TIMEOUT);
             error = true;
             continue;
         }
@@ -163,7 +162,7 @@ void ShinyHuntAutonomousRegi::program(SingleSwitchProgramEnvironment& env){
         "",
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 

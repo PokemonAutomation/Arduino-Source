@@ -7,20 +7,18 @@
 #ifndef PokemonAutomation_PokemonSwSh_PokeJobsFarmer_H
 #define PokemonAutomation_PokemonSwSh_PokeJobsFarmer_H
 
+#include "CommonFramework/Options/StaticTextOption.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "NintendoSwitch/Options/StartInGripMenuOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 
-namespace PokemonAutomation
-{
-namespace NintendoSwitch
-{
-namespace PokemonSwSh
-{
+namespace PokemonAutomation{
+namespace NintendoSwitch{
+namespace PokemonSwSh{
 
-class PokeJobsFarmer_Descriptor : public RunnableSwitchProgramDescriptor
-{
+
+class PokeJobsFarmer_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
     PokeJobsFarmer_Descriptor();
 };
@@ -28,9 +26,9 @@ public:
 class PokeJobsFarmer : public SingleSwitchProgramInstance
 {
 public:
-    PokeJobsFarmer(const PokeJobsFarmer_Descriptor &descriptor);
+    PokeJobsFarmer(const PokeJobsFarmer_Descriptor& descriptor);
 
-    virtual void program(SingleSwitchProgramEnvironment &env) override;
+    virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;
@@ -43,6 +41,8 @@ private:
 
     TimeExpressionOption<uint16_t> MASH_B_DURATION;
 };
+
+
 
 }
 }

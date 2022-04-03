@@ -10,18 +10,13 @@
 #include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
 #include "PokemonSwSh_Internet.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
-
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
 bool connect_to_internet_with_inference(
-    ProgramEnvironment& env,
-    ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     std::chrono::milliseconds post_wait_time,
     uint16_t timeout_ticks
 ){
@@ -32,11 +27,11 @@ bool connect_to_internet_with_inference(
     {
         YCommMenuDetector detector(true);
         if (!detector.detect(console.video().snapshot())){
-            pbf_press_button(console, BUTTON_Y, 10, TICKS_PER_SECOND);
-            console.botbase().wait_for_all_requests();
+            pbf_press_button(context, BUTTON_Y, 10, TICKS_PER_SECOND);
+            context.wait_for_all_requests();
         }
         int result = wait_until(
-            env, console,
+            env, console, context,
             std::chrono::seconds(10),
             { &detector }
         );
@@ -50,19 +45,19 @@ bool connect_to_internet_with_inference(
     }
 
     //  Connect to internet.
-    env.wait_for(std::chrono::seconds(1));
-    pbf_press_dpad(console, DPAD_UP, 5, 0);
-    pbf_move_right_joystick(console, 128, 0, 5, 0);
-    pbf_mash_button(console, BUTTON_PLUS, TICKS_PER_SECOND);
-    console.botbase().wait_for_all_requests();
+    context.wait_for(std::chrono::seconds(1));
+    pbf_press_dpad(context, DPAD_UP, 5, 0);
+    pbf_move_right_joystick(context, 128, 0, 5, 0);
+    pbf_mash_button(context, BUTTON_PLUS, TICKS_PER_SECOND);
+    context.wait_for_all_requests();
 
 //    cout << "Waiting for Y-COMM to close..." << endl;
     //  Mash B until you leave Y-COMM.
     {
         YCommMenuDetector detector(false);
         int result = run_until(
-            env, console,
-            [&](const BotBaseContext& context){
+            env, console, context,
+            [&](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, timeout_ticks);
             },
             { &detector }
@@ -76,7 +71,7 @@ bool connect_to_internet_with_inference(
     }
 
     //  Extra wait.
-    env.wait_for(post_wait_time);
+    context.wait_for(post_wait_time);
 
     return ok;
 }

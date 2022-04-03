@@ -7,6 +7,7 @@
 #include <mutex>
 #include <condition_variable>
 #include "Common/Compiler.h"
+#include "Common/Cpp/AbstractLogger.h"
 #include "PokemonSwSh_MaxLair_StateTracker.h"
 
 namespace PokemonAutomation{
@@ -15,19 +16,18 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-GlobalStateTracker::GlobalStateTracker(ProgramEnvironment& env, size_t consoles)
-    : m_env(env)
-    , m_count(consoles)
+GlobalStateTracker::GlobalStateTracker(CancellableScope& scope, size_t consoles)
+    : m_count(consoles)
 {
     auto timestamp = std::chrono::system_clock::now();
     for (size_t c = 0; c < 4; c++){
         m_master_consoles[c].timestamp = timestamp;
     }
     update_groups_unprotected();
-    env.register_stop_program_signal(m_lock, m_cv);
+    attach(scope);
 }
 GlobalStateTracker::~GlobalStateTracker(){
-    m_env.deregister_stop_program_signal(m_cv);
+    detach();
 }
 std::pair<uint64_t, std::string> GlobalStateTracker::dump(){
     std::lock_guard<std::mutex> lg(m_lock);
@@ -44,6 +44,14 @@ std::pair<uint64_t, std::string> GlobalStateTracker::dump(){
     }
 #endif
     return {m_state_epoch, str};
+}
+bool GlobalStateTracker::cancel() noexcept{
+    if (Cancellable::cancel()){
+        return true;
+    }
+    std::lock_guard<std::mutex> lg(m_lock);
+    m_cv.notify_all();
+    return false;
 }
 void GlobalStateTracker::push_update(size_t index){
     std::lock_guard<std::mutex> lg(m_lock);
@@ -99,9 +107,7 @@ void GlobalStateTracker::mark_as_dead(size_t index){
 }
 
 GlobalState GlobalStateTracker::synchronize(
-    ProgramEnvironment& env, LoggerQt& logger,
-    size_t index,
-    std::chrono::milliseconds window
+    Logger& logger, size_t index, std::chrono::milliseconds window
 ){
     std::unique_lock<std::mutex> lg(m_lock);
     m_state_epoch++;
@@ -125,7 +131,7 @@ GlobalState GlobalStateTracker::synchronize(
     while (true){
         m_cv.wait_until(lg, time_limit);
 
-        env.check_stopping();
+        throw_if_cancelled();
 
         time_point now = std::chrono::system_clock::now();
         if (now > time_limit){

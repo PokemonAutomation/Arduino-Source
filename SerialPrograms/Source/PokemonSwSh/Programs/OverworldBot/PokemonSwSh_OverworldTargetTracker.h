@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_OverworldTargetTracker_H
 #define PokemonAutomation_PokemonSwSh_OverworldTargetTracker_H
 
+#include <vector>
 #include <deque>
 #include <map>
 #include "Common/Cpp/SpinLock.h"

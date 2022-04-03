@@ -5,8 +5,10 @@
  */
 
 #include <QImage>
+#include "Common/Cpp/Exceptions.h"
 #include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "VisualInferenceSession.h"
 
 namespace PokemonAutomation{
@@ -27,27 +29,24 @@ struct VisualInferenceSession::Callback{
 
 
 VisualInferenceSession::VisualInferenceSession(
-    ProgramEnvironment& env, LoggerQt& logger,
+    Logger& logger, CancellableScope& scope,
     VideoFeed& feed, VideoOverlay& overlay,
     std::chrono::milliseconds period
 )
-    : m_env(env)
-    , m_logger(logger)
+    : m_logger(logger)
     , m_feed(feed)
     , m_overlay(overlay)
     , m_period(period)
-    , m_stop(false)
 {
-    env.register_stop_program_signal(m_lock, m_cv);
+    attach(scope);
 }
 VisualInferenceSession::~VisualInferenceSession(){
-    stop();
-    m_env.deregister_stop_program_signal(m_cv);
+    detach();
+    VisualInferenceSession::cancel();
 }
-void VisualInferenceSession::stop(){
-    bool expected = false;
-    if (!m_stop.compare_exchange_strong(expected, true)){
-        return;
+bool VisualInferenceSession::cancel() noexcept{
+    if (Cancellable::cancel()){
+        return true;
     }
     {
         std::unique_lock<std::mutex> lg(m_lock);
@@ -56,11 +55,13 @@ void VisualInferenceSession::stop(){
 
     const double DIVIDER = std::chrono::milliseconds(1) / std::chrono::microseconds(1);
     const char* UNITS = " ms";
-
-    m_stats_snapshot.log(m_logger, "Screenshot", UNITS, DIVIDER);
-    for (Callback* callback : m_callback_list){
-        callback->stats.log(m_logger, callback->callback->label(), UNITS, DIVIDER);
-    }
+    try{
+        m_stats_snapshot.log(m_logger, "Screenshot", UNITS, DIVIDER);
+        for (Callback* callback : m_callback_list){
+            callback->stats.log(m_logger, callback->callback->label(), UNITS, DIVIDER);
+        }
+    }catch (...){}
+    return false;
 }
 
 void VisualInferenceSession::operator+=(VisualInferenceCallback& callback){
@@ -115,8 +116,8 @@ VisualInferenceCallback* VisualInferenceSession::run(std::chrono::system_clock::
     auto next_tick = now + m_period;
 
     while (true){
-        m_env.check_stopping();
-        if (m_stop.load(std::memory_order_acquire)){
+        throw_if_parent_cancelled();
+        if (cancelled()){
             return nullptr;
         }
 
@@ -147,9 +148,7 @@ VisualInferenceCallback* VisualInferenceSession::run(std::chrono::system_clock::
             WallClock stop_wait = std::min(next_tick, stop);
             m_cv.wait_until(
                 lg, stop_wait,
-                [=]{
-                    return m_env.is_stopping() || m_stop.load(std::memory_order_acquire);
-                }
+                [=]{ return cancelled(); }
             );
             next_tick += m_period;
         }
@@ -159,35 +158,41 @@ VisualInferenceCallback* VisualInferenceSession::run(std::chrono::system_clock::
 
 
 AsyncVisualInferenceSession::AsyncVisualInferenceSession(
-    ProgramEnvironment& env, LoggerQt& logger,
+    ProgramEnvironment& env, Logger& logger, CancellableScope& scope,
     VideoFeed& feed, VideoOverlay& overlay,
     std::chrono::milliseconds period
 )
-    : VisualInferenceSession(env, logger, feed, overlay, period)
+    : m_session(logger, scope, feed, overlay, period)
     , m_triggering_callback(nullptr)
     , m_task(env.inference_dispatcher().dispatch([this]{ thread_body(); }))
 {}
 AsyncVisualInferenceSession::AsyncVisualInferenceSession(
-    ProgramEnvironment& env, LoggerQt& logger,
+    ProgramEnvironment& env, Logger& logger, CancellableScope& scope,
     VideoFeed& feed, VideoOverlay& overlay,
     std::function<void()> on_finish_callback,
     std::chrono::milliseconds period
 )
-    : VisualInferenceSession(env, logger, feed, overlay, period)
+    : m_session(logger, scope, feed, overlay, period)
     , m_on_finish_callback(std::move(on_finish_callback))
     , m_triggering_callback(nullptr)
     , m_task(env.inference_dispatcher().dispatch([this]{ thread_body(); }))
 {}
 AsyncVisualInferenceSession::~AsyncVisualInferenceSession(){
-    VisualInferenceSession::stop();
+    m_session.cancel();
+}
+void AsyncVisualInferenceSession::operator+=(VisualInferenceCallback& callback){
+    m_session += callback;
+}
+void AsyncVisualInferenceSession::operator-=(VisualInferenceCallback& callback){
+    m_session -= callback;
 }
 void AsyncVisualInferenceSession::rethrow_exceptions(){
     if (m_task){
         m_task->rethrow_exceptions();
     }
 }
-VisualInferenceCallback* AsyncVisualInferenceSession::stop(){
-    VisualInferenceSession::stop();
+VisualInferenceCallback* AsyncVisualInferenceSession::stop_and_rethrow(){
+    m_session.cancel();
     if (m_task){
         m_task->wait_and_rethrow_exceptions();
     }
@@ -195,7 +200,7 @@ VisualInferenceCallback* AsyncVisualInferenceSession::stop(){
 }
 void AsyncVisualInferenceSession::thread_body(){
     try{
-        m_triggering_callback = run();
+        m_triggering_callback = m_session.run();
         if (m_on_finish_callback){
             m_on_finish_callback();
         }

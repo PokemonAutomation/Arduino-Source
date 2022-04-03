@@ -36,10 +36,6 @@
 #include "BotBase.h"
 #include "BotBaseMessage.h"
 
-//#include <iostream>
-//using std::cout;
-//using std::endl;
-
 
 namespace PokemonAutomation{
 
@@ -76,7 +72,7 @@ public:
 public:
     //  Basic Requests
 
-    virtual void wait_for_all_requests(const std::atomic<bool>* cancelled = nullptr) override;
+    virtual void wait_for_all_requests(const Cancellable* cancelled = nullptr) override;
     virtual void stop_all_commands() override;
     virtual void next_command_interrupt() override;
 
@@ -130,37 +126,37 @@ private:
 private:
     //  Returns the seqnum of the request. If failed, returns zero.
     uint64_t try_issue_request(
-        const std::atomic<bool>* cancelled,
+        const Cancellable* cancelled,
         const BotBaseRequest& request, bool silent_remove,
         size_t queue_limit
     );
     uint64_t try_issue_command(
-        const std::atomic<bool>* cancelled,
+        const Cancellable* cancelled,
         const BotBaseRequest& request, bool silent_remove,
         size_t queue_limit
     );
 
     //  Returns the seqnum of the request.
     uint64_t issue_request(
-        const std::atomic<bool>* cancelled,
+        const Cancellable* cancelled,
         const BotBaseRequest& request, bool silent_remove
     );
     uint64_t issue_command(
-        const std::atomic<bool>* cancelled,
+        const Cancellable* cancelled,
         const BotBaseRequest& request, bool silent_remove
     );
 
     virtual bool try_issue_request(
         const BotBaseRequest& request,
-        const std::atomic<bool>* cancelled
+        const Cancellable* cancelled
     ) override;
     virtual void issue_request(
         const BotBaseRequest& request,
-        const std::atomic<bool>* cancelled
+        const Cancellable* cancelled
     ) override;
     virtual BotBaseMessage issue_request_and_wait(
         const BotBaseRequest& request,
-        const std::atomic<bool>* cancelled
+        const Cancellable* cancelled
     ) override;
 
     BotBaseMessage wait_for_request(uint64_t seqnum);

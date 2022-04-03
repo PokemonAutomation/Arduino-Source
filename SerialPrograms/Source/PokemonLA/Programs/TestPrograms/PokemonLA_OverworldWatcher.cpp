@@ -4,6 +4,7 @@
  *
  */
 
+#include "ClientSource/Connection/BotBase.h"
 //#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceSession.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.h"
@@ -36,7 +37,7 @@ OverworldWatcher::OverworldWatcher(const OverworldWatcher_Descriptor& descriptor
 }
 
 
-void OverworldWatcher::program(SingleSwitchProgramEnvironment& env){
+void OverworldWatcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     BubbleDetector bubbles;
     ArcDetector arcs;
     QuestMarkDetector quest_marks;
@@ -57,13 +58,13 @@ void OverworldWatcher::program(SingleSwitchProgramEnvironment& env){
     watcher.process_frame(env.console.video().snapshot(), std::chrono::system_clock::now());
 #else
     {
-        VisualInferenceSession session(env, env.console, env.console, env.console);
+        VisualInferenceSession session(env.console, context, env.console, env.console);
         session += watcher;
         session.run();
     }
 #endif
 
-    env.wait_for(std::chrono::seconds(60));
+    context.wait_for(std::chrono::seconds(60));
 }
 
 

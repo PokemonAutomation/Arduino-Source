@@ -15,44 +15,47 @@ namespace PokemonAutomation{
 
 
 
-AsyncCommandSession::CommandSet::CommandSet(BotBase& botbase, std::function<void(const BotBaseContext&)>&& lambda)
-    : context(botbase)
+struct AsyncCommandSession::CommandSet{
+    CommandSet(
+        CancellableScope& parent, BotBase& botbase,
+        std::function<void(BotBaseContext&)>&& lambda
+    );
+    CancellableHolder<CancellableScope> scope;
+    BotBaseContext context;
+    std::function<void(BotBaseContext&)> commands;
+};
+
+
+
+AsyncCommandSession::CommandSet::CommandSet(
+    CancellableScope& parent, BotBase& botbase,
+    std::function<void(BotBaseContext&)>&& lambda
+)
+    : scope(parent)
+    , context(scope, botbase)
     , commands(std::move(lambda))
 {}
 
 
 
-AsyncCommandSession::AsyncCommandSession(ProgramEnvironment& env, BotBase& botbase)
-    : m_env(env)
+AsyncCommandSession::AsyncCommandSession(
+    CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,
+    BotBase& botbase
+)
+    : m_logger(logger)
     , m_botbase(botbase)
-    , m_stopping_session(false)
+    , m_thread(dispatcher.dispatch([this]{ thread_loop(); }))
 {
-    env.register_stop_program_signal(m_lock, m_cv);
-    m_task = env.realtime_dispatcher().dispatch([this]{ thread_loop(); });
+    attach(scope);
 }
 AsyncCommandSession::~AsyncCommandSession(){
 //    cout << "~AsyncCommandSession()" << endl;
-    if (!m_stopping_session.load(std::memory_order_acquire) && std::uncaught_exceptions() == 0){
-        m_env.log("AsyncCommandSession::stop_session() not called before normal destruction.", COLOR_RED);
+    if (!cancelled() && std::uncaught_exceptions() == 0){
+        m_logger.log("AsyncCommandSession::stop_session() not called before normal destruction.", COLOR_RED);
     }
-    if (m_task){
-        m_stopping_session.store(true, std::memory_order_release);
-        {
-            std::lock_guard<std::mutex> lg(m_lock);
-            if (m_current){
-                try{
-                    m_current->context.cancel_now();
-                }catch (InvalidConnectionStateException&){
-                }catch (OperationCancelledException&){
-                }catch (...){
-                    m_env.log("AsyncCommandSession::~AsyncCommandSession() - Uncaught Exception", COLOR_RED);
-                }
-            }
-            m_cv.notify_all();
-        }
-        m_task.reset();
-    }
-    m_env.deregister_stop_program_signal(m_cv);
+    detach();
+    AsyncCommandSession::cancel();
+    //  Thread is automatically joined by m_task destructor.
 }
 
 bool AsyncCommandSession::command_is_running(){
@@ -60,68 +63,77 @@ bool AsyncCommandSession::command_is_running(){
     return m_current != nullptr;
 }
 
-void AsyncCommandSession::dispatch(std::function<void(const BotBaseContext&)>&& lambda){
+void AsyncCommandSession::dispatch(std::function<void(BotBaseContext&)>&& lambda){
     std::unique_lock<std::mutex> lg(m_lock);
-    m_env.check_stopping();
-    if (m_stopping_session.load(std::memory_order_acquire)){
+    if (cancelled()){
         return;
     }
 
-    if (m_current){
-        m_current->context.cancel_lazy();
-        m_cv.wait(lg, [=]{
-            return
-                m_env.is_stopping() ||
-                m_stopping_session.load(std::memory_order_acquire) ||
-                m_current == nullptr;
-        });
-    }
-
-//    cout << "dispatching" << endl;
-
-    m_current.reset(new CommandSet(
+    //  Set the new task.
+    m_pending.reset(new CommandSet(
+        *this->scope(),
         m_botbase, std::move(lambda)
     ));
 
-    m_cv.notify_all();
+    if (m_current){
+        //  Already a task running. Cancel it.
+        m_current->context.cancel_lazy();
+    }else{
+        //  Otherwise, wake up the thread.
+        m_cv.notify_all();
+    }
 }
 
 
+bool AsyncCommandSession::cancel() noexcept{
+    if (Cancellable::cancel()){
+        return true;
+    }
+    std::lock_guard<std::mutex> lg(m_lock);
+    if (m_current != nullptr){
+        m_current->context.cancel_now();
+    }
+    m_cv.notify_all();
+    return false;
+}
 void AsyncCommandSession::thread_loop(){
-    CommandSet* current = nullptr;
+//    CommandSet* current = nullptr;
     while (true){
+        CommandSet* current = nullptr;
         {
             std::unique_lock<std::mutex> lg(m_lock);
-            if (current != nullptr){
-                m_current = nullptr;
-                m_cv.notify_all();
-            }
             m_cv.wait(lg, [=]{
-                return
-                    m_env.is_stopping() ||
-                    m_stopping_session.load(std::memory_order_acquire) ||
-                    m_current != nullptr;
+                return cancelled() || m_pending != nullptr;
             });
-            if (m_env.is_stopping() || m_stopping_session.load(std::memory_order_acquire)){
-//                cout << "thread_loop() - end" << endl;
-                m_current.reset();
-                return;
+            if (cancelled()){
+                break;
             }
+            m_current = std::move(m_pending);
             current = m_current.get();
         }
+        try{
+//            cout << "start" << endl;
+            current->commands(current->context);
+            current->context.wait_for_all_requests();
+//            cout << "stop" << endl;
+        }catch (OperationCancelledException&){}
 
-        if (current != nullptr){
-            try{
-//                cout << "start" << endl;
-                current->commands(current->context);
-                current->context.wait_for_all_requests();
-//                cout << "stop" << endl;
-            }catch (ProgramCancelledException&){
-                throw;
-            }catch (OperationCancelledException&){
-            }
+        //  Transfer finished task to the finished queue under both locks.
+        {
+            std::unique_lock<std::mutex> lg(m_lock);
+            SpinLockGuard lg1(m_finished_lock);
+            m_finished_tasks.emplace_back(std::move(m_current));
+        }
+
+        //  Now it's safe to remove the finished task under just the finished lock.
+        {
+            SpinLockGuard lg(m_finished_lock);
+            m_finished_tasks.clear();
         }
     }
+
+    SpinLockGuard lg(m_finished_lock);
+    m_finished_tasks.clear();
 }
 
 
@@ -134,6 +146,7 @@ void AsyncCommandSession::stop_commands(){
     }
 }
 #endif
+#if 0
 void AsyncCommandSession::wait(){
     std::unique_lock<std::mutex> lg(m_lock);
 //    cout << "wait() - start" << endl;
@@ -142,17 +155,11 @@ void AsyncCommandSession::wait(){
     });
 //    cout << "wait() - done" << endl;
 }
-void AsyncCommandSession::stop_session(){
-    m_stopping_session.store(true, std::memory_order_release);
-    {
-        std::lock_guard<std::mutex> lg(m_lock);
-        if (m_current != nullptr){
-            m_current->context.cancel_now();
-        }
-        m_cv.notify_all();
-    }
-    m_task->wait_and_rethrow_exceptions();
-    m_env.check_stopping();
+#endif
+void AsyncCommandSession::stop_session_and_rethrow(){
+    cancel();
+    m_thread->wait_and_rethrow_exceptions();
+    throw_if_parent_cancelled();
 }
 
 

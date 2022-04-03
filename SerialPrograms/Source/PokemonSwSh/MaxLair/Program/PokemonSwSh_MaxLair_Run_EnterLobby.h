@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Run_EnterLobby_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Run_EnterLobby_H
 
-#include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.h"
 
@@ -18,7 +17,7 @@ namespace MaxLairInternal{
 
 
 QImage enter_lobby(
-    ProgramEnvironment& env, ConsoleHandle& console,
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     size_t boss_slot, bool connect_to_internet,
     ReadableQuantity999& ore
 );

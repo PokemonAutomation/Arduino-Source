@@ -41,7 +41,6 @@ EggFetcher::EggFetcher(const EggFetcher_Descriptor& descriptor)
         "15 * TICKS_PER_SECOND"
     )
     , NOTIFICATION_STATUS_UPDATE("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS_UPDATE,
         &NOTIFICATION_PROGRAM_FINISH,
@@ -69,15 +68,15 @@ std::unique_ptr<StatsTracker> EggFetcher::make_stats() const{
 }
 
 
-void EggFetcher::program(SingleSwitchProgramEnvironment& env){
+void EggFetcher::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
     env.update_stats();
 
     //  Connect the controller.
-    pbf_move_right_joystick(env.console, 0, 255, 10, 0);
+    pbf_move_right_joystick(context, 0, 255, 10, 0);
 
     //  Move to corner.
-    pbf_move_left_joystick(env.console, 0, 255, 125, 0);
+    pbf_move_left_joystick(context, 0, 255, 125, 0);
 
     for (uint16_t c = 0; c < MAX_FETCH_ATTEMPTS; c++){
         env.update_stats();
@@ -88,19 +87,19 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env){
             stats.to_str()
         );
 
-        egg_spin_with_A(env.console, TRAVEL_TIME_PER_FETCH);
-        SHORTCUT.run(env.console, 100);
+        egg_spin_with_A(context, TRAVEL_TIME_PER_FETCH);
+        SHORTCUT.run(context, 100);
 
         //  Move to man.
-        pbf_move_left_joystick(env.console, 0, 255, 30, 0);
-        pbf_move_left_joystick(env.console, 128, 0, 35, 0);
-        pbf_move_left_joystick(env.console, 255, 128, 60, 0);
+        pbf_move_left_joystick(context, 0, 255, 30, 0);
+        pbf_move_left_joystick(context, 128, 0, 35, 0);
+        pbf_move_left_joystick(context, 255, 128, 60, 0);
 
         //  Fetch egg.
-        pbf_mash_button(env.console, BUTTON_ZL, 500);
-        pbf_mash_button(env.console, BUTTON_B, 500);
-        pbf_move_left_joystick(env.console, 0, 255, 125, 0);
-        SHORTCUT.run(env.console, 100);
+        pbf_mash_button(context, BUTTON_ZL, 500);
+        pbf_mash_button(context, BUTTON_B, 500);
+        pbf_move_left_joystick(context, 0, 255, 125, 0);
+        SHORTCUT.run(context, 100);
 
         stats.m_attempts++;
     }
@@ -112,7 +111,7 @@ void EggFetcher::program(SingleSwitchProgramEnvironment& env){
         "",
         stats.to_str()
     );
-    GO_HOME_WHEN_DONE.run_end_of_program(env.console);
+    GO_HOME_WHEN_DONE.run_end_of_program(context);
 }
 
 
