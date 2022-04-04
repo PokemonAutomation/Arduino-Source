@@ -6,6 +6,7 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
@@ -22,7 +23,6 @@
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "PokemonLA/Programs/ShinyHunting/PokemonLA_FroslassFinder.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -44,7 +44,6 @@ FroslassFinder::FroslassFinder(const FroslassFinder_Descriptor& descriptor)
     , SHINY_DETECTED("0 * TICKS_PER_SECOND")
     , SKIP_PATH_SHINY("<b>Skip any Shines on the route to the cave.</b><br>Only care about shines inside the cave.", false)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
-    , NOTIFICATION_PROGRAM_FINISH("Program Finished", true, true)
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
         &SHINY_DETECTED.NOTIFICATIONS,
@@ -107,7 +106,7 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseC
         //Route to cave entrance
         ShinySoundDetector shiny_detector_route(env.console, SHINY_DETECTED_ON_ROUTE.stop_on_shiny());
         run_until(
-                env, env.console, context,
+            env, env.console, context,
                 [](BotBaseContext& context){
                 pbf_press_button(context, BUTTON_B, (uint16_t)(2 * TICKS_PER_SECOND), 10);  //Get some distance from the moutain
                 pbf_press_button(context, BUTTON_Y, (uint16_t)(4 * TICKS_PER_SECOND), 10);  //Descend
@@ -116,7 +115,7 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseC
                 pbf_press_button(context, BUTTON_PLUS, 10,10);
                 pbf_wait(context, (uint16_t)(1.1 * TICKS_PER_SECOND));
                 pbf_press_button(context, BUTTON_PLUS, 10,10);
-                pbf_press_button(context, BUTTON_B, (uint16_t)(2.8 * TICKS_PER_SECOND), 10); //Braviary Second Push
+                pbf_press_button(context, BUTTON_B, (uint16_t)(2.8 * TICKS_PER_SECOND), 10); // Braviary Second Push
             },
             { &shiny_detector_route }
         );
@@ -156,32 +155,33 @@ void FroslassFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
     while (true){
-            env.update_stats();
-            send_program_status_notification(
-                env.logger(), NOTIFICATION_STATUS,
-                env.program_info(),
-                "",
-                stats.to_str()
-            );
-            try{
-                run_iteration(env, context);
-            }catch (OperationFailedException&){
-                stats.errors++;
-                pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-                reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
-            }catch (OperationCancelledException&){
-                break;
-            }
-        }
-
         env.update_stats();
-        send_program_finished_notification(
-            env.logger(), NOTIFICATION_PROGRAM_FINISH,
+        send_program_status_notification(
+            env.logger(), NOTIFICATION_STATUS,
             env.program_info(),
             "",
             stats.to_str()
         );
+        try{
+            run_iteration(env, context);
+        }catch (OperationFailedException&){
+            stats.errors++;
+            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        }
+    }
+
+    env.update_stats();
+    send_program_finished_notification(
+        env.logger(), NOTIFICATION_PROGRAM_FINISH,
+        env.program_info(),
+        "",
+        stats.to_str()
+    );
 }
+
+
+
 
 }
 }

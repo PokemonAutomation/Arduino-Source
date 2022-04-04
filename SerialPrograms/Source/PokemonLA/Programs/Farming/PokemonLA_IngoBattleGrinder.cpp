@@ -352,7 +352,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
                 const auto& move_box = move_slot_boxes[cur_move];
                 QImage screen = env.console.video().snapshot();
                 ImageMatchDetector move_slot_detector(std::move(screen), move_box, 10.0);
-                
+
                 use_move(env.console, context, cur_pokemon, cur_move);
 
                 // Check if the move cannot be used due to no PP:

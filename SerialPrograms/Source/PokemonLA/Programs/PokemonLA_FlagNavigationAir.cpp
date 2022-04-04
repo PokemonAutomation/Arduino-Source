@@ -53,7 +53,7 @@ FlagNavigationAir::FlagNavigationAir(
     *this += m_mount;
     *this += m_centerA;
     *this += m_leftB;
-//    *this += m_dialog_detector;
+    *this += m_dialog_detector;
     *this += m_shiny_listener;
 
     auto find_flag = [=](BotBaseContext& context){
