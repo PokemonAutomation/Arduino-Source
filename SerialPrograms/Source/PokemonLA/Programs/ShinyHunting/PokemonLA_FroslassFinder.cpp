@@ -108,9 +108,9 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseC
         run_until(
             env, env.console, context,
                 [](BotBaseContext& context){
-                pbf_press_button(context, BUTTON_B, (uint16_t)(3 * TICKS_PER_SECOND), 10);  //  Get some distance from the moutain
-                pbf_press_button(context, BUTTON_Y, (uint16_t)(4 * TICKS_PER_SECOND), 10);  //  Descend
-                pbf_press_button(context, BUTTON_B, (uint16_t)(8 * TICKS_PER_SECOND), 10);  //  Reach to the cave entrance
+                pbf_press_button(context, BUTTON_B, (uint16_t)(2 * TICKS_PER_SECOND), 10);  //Get some distance from the moutain
+                pbf_press_button(context, BUTTON_Y, (uint16_t)(4 * TICKS_PER_SECOND), 10);  //Descend
+                pbf_press_button(context, BUTTON_B, (uint16_t)(7.89 * TICKS_PER_SECOND), 10); //Reach to the cave entrance
                 pbf_wait(context, (uint16_t)(0.5 * TICKS_PER_SECOND));
                 pbf_press_button(context, BUTTON_PLUS, 10,10);
                 pbf_wait(context, (uint16_t)(1.1 * TICKS_PER_SECOND));
