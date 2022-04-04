@@ -11,12 +11,12 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA/Inference/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA/Inference/PokemonLA_BattlePokemonSwitchDetector.h"
+#include "PokemonLA/Programs/PokemonLA_BattleRoutines.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA_MagikarpMoveGrinder.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
@@ -78,50 +78,8 @@ std::unique_ptr<StatsTracker> MagikarpMoveGrinder::make_stats() const{
 }
 
 
-
-
-void MagikarpMoveGrinder::switch_pokemon(ConsoleHandle& console, BotBaseContext& context, size_t& next_pokemon_in_party_order){
-    // Move past leading fainted pokemon
-    for(size_t i = 0; i < next_pokemon_in_party_order; i++){
-        pbf_press_dpad(context, DPAD_DOWN, 20, 80);
-    }
-
-    while(true){
-        // Choose the next pokemon to battle.
-        pbf_press_button(context, BUTTON_A, 20, 100);
-        pbf_press_button(context, BUTTON_A, 20, 150);
-        context.wait_for_all_requests();
-
-        // Check whether we can send this pokemon to battle:
-        const bool stop_on_detected = true;
-        BattlePokemonSwitchDetector switch_detector(console, console, stop_on_detected);
-        QImage screen = console.video().snapshot();
-        if (switch_detector.process_frame(screen, std::chrono::system_clock::now()) == false){
-            // No longer at the switching pokemon screen
-            break;
-        }
-
-        // We are still in the switching pokemon screen. So the current selected pokemon is fainted
-        // and therefore cannot be used. Try the next pokemon:
-        next_pokemon_in_party_order++;
-        if (next_pokemon_in_party_order >= POKEMON_ACTIONS.num_pokemon()){
-            throw OperationFailedException(console, "Cannot send any more Pokemon to battle.");
-        }
-
-        // Fist hit B to clear the "cannot send pokemon" dialogue
-        pbf_press_button(context, BUTTON_B, 20, 100);
-        // Move to the next pokemon
-        pbf_press_dpad(context, DPAD_DOWN, 20, 80);
-    }
-}
-
 bool MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
-
-    // The location of the first move slot when choosing which move to use during battle.
-    // This box will be used to check whether the content in those boxes are changed or not
-    // after selecting one move to use. In this way we can detect whether the move is out of PP.
-    const ImageFloatBox move_slot_box = {0.6600, 0.6220, 0.2500, 0.0320};
 
     env.console.log("Grinding on Magikarp...");
 
@@ -152,34 +110,12 @@ bool MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, B
             // Press A to select moves
             pbf_press_button(context, BUTTON_A, 10, 125);
             context.wait_for_all_requests();
-
-            QImage screen = env.console.video().snapshot();
-            ImageMatchDetector move_slot_detector(std::move(screen), move_slot_box, 10.0);
             
             const MoveStyle style = POKEMON_ACTIONS.get_style(cur_pokemon);
 
-            // Select move styles
-            if (style == MoveStyle::Agile){
-                // Agile style
-                pbf_press_button(context, BUTTON_L, 10, 125);
-            } else if (style == MoveStyle::Strong){
-                // Strong style
-                pbf_press_button(context, BUTTON_R, 10, 125);
-            }
-
-            env.log("Using pokemon " + QString::number(cur_pokemon) + "/" + QString::number(POKEMON_ACTIONS.num_pokemon()) + 
-                " style " + MoveStyle_NAMES[(int)style]);
-
-            // Choose the move
-            pbf_press_button(context, BUTTON_A, 10, 125);
-            pbf_wait(context, 1 * TICKS_PER_SECOND);
-            context.wait_for_all_requests();
-
-            // Check if the move cannot be used due to no PP:
-            screen = env.console.video().snapshot();
-            if (move_slot_detector.detect(screen)){
+            const bool check_move_success = true;
+            if (use_move(env.console, context, cur_pokemon, 0, style, check_move_success) == false){
                 // We are still on the move selection screen. No PP.
-
                 cur_pokemon++;
                 if (cur_pokemon >= POKEMON_ACTIONS.num_pokemon()){
                     env.console.log("All pokemon grinded. Stop program.");
@@ -193,12 +129,7 @@ bool MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, B
                 // Go to the switching pokemon screen:
                 pbf_press_dpad(context, DPAD_DOWN, 20, 100);
                 
-                switch_pokemon(env.console, context, cur_pokemon);
-
-#ifdef DEBUG_NO_PP
-                static int count = 0;
-                screen.save("./no_pp." + QString::number(count++) + ".png");
-#endif
+                cur_pokemon = switch_pokemon(env.console, context, cur_pokemon, POKEMON_ACTIONS.num_pokemon());
             }
             else{
                 stats.move_attempts++;
@@ -212,7 +143,7 @@ bool MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, B
                 env.console.log("All pokemon grinded. Stop program.");
                 break;
             }
-            switch_pokemon(env.console, context, cur_pokemon);
+            cur_pokemon = switch_pokemon(env.console, context, cur_pokemon, POKEMON_ACTIONS.num_pokemon());
         }
         else{ // ret is 2
             env.console.log("Battle finished.");

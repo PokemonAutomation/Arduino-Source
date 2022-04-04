@@ -36,8 +36,6 @@ public:
 private:
     bool battle_magikarp(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
-    void switch_pokemon(ConsoleHandle& console, BotBaseContext& context, size_t& next_pokemon_in_party_order);
-
 private:
     class Stats;
 

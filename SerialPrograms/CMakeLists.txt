@@ -866,6 +866,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/PokemonLA_Settings.h
     Source/PokemonLA/PokemonLA_TravelLocations.cpp
     Source/PokemonLA/PokemonLA_TravelLocations.h
+    Source/PokemonLA/Programs/PokemonLA_BattleRoutines.cpp
+    Source/PokemonLA/Programs/PokemonLA_BattleRoutines.h
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.cpp
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.h
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.cpp
@@ -890,6 +892,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/Trading/PokemonLA_TradeRoutines.h
     Source/PokemonLA/Programs/Farming/PokemonLA_NuggetFarmerHighlands.cpp
     Source/PokemonLA/Programs/Farming/PokemonLA_NuggetFarmerHighlands.h
+    Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.cpp
+    Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.h
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.cpp
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.h
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.cpp
