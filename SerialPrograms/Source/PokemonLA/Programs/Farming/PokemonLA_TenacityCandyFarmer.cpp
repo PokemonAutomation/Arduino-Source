@@ -228,12 +228,12 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
 
                 if (cur_move < target_move){
                     // Move move selection down
-                    for(int i = 0; i < target_move - cur_move; i++){
+                    for(size_t i = 0; i < target_move - cur_move; i++){
                         pbf_press_dpad(context, DPAD_DOWN, 20, 100);
                     }
                 } else if (cur_move > target_move){
                     // Move move selection up
-                    for(int i = 0; i < cur_move - target_move; i++){
+                    for(size_t i = 0; i < cur_move - target_move; i++){
                         pbf_press_dpad(context, DPAD_UP, 20, 100);
                     }
                 }
