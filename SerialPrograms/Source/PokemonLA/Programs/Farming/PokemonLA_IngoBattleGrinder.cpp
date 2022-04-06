@@ -11,12 +11,12 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA/Inference/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA/Inference/PokemonLA_BattlePokemonSwitchDetector.h"
+#include "PokemonLA/Programs/PokemonLA_BattleRoutines.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA_IngoBattleGrinder.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
@@ -115,20 +115,20 @@ public:
     Stats()
         : battles(m_stats["Battles"])
         , turns(m_stats["Turns"])
-        , move_attempts(m_stats["Move Attempts"])
+        , lead_move_attempts(m_stats["Lead Move Attempts"])
         , faint_switches(m_stats["Faint Switches"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Battles");
         m_display_order.emplace_back("Turns");
-        m_display_order.emplace_back("Move Attempts");
+        m_display_order.emplace_back("Lead Move Attempts");
         m_display_order.emplace_back("Faint Switches", true);
         m_display_order.emplace_back("Errors", true);
     }
 
     std::atomic<uint64_t>& battles;
     std::atomic<uint64_t>& turns;
-    std::atomic<uint64_t>& move_attempts;
+    std::atomic<uint64_t>& lead_move_attempts;
     std::atomic<uint64_t>& faint_switches;
     std::atomic<uint64_t>& errors;
 };
@@ -187,73 +187,9 @@ bool IngoBattleGrinder::start_dialog(SingleSwitchProgramEnvironment& env, BotBas
     }
 }
 
-void IngoBattleGrinder::use_move(Logger& logger, BotBaseContext& context, size_t cur_pokemon, size_t cur_move){
-    const MoveStyle style = POKEMON_ACTIONS.get_style(cur_pokemon, cur_move);
-
-    // Select move styles
-    if (style == MoveStyle::Agile){
-        // Agile style
-        pbf_press_button(context, BUTTON_L, 10, 125);
-    } else if (style == MoveStyle::Strong){
-        // Strong style
-        pbf_press_button(context, BUTTON_R, 10, 125);
-    }
-    
-    logger.log(
-        "Use pokemon " + std::to_string(cur_pokemon) + " move " + std::to_string(cur_move) + " style " + MoveStyle_NAMES[(int)style].toStdString()
-    );
-
-    // Choose the move
-    pbf_press_button(context, BUTTON_A, 10, 125);
-    pbf_wait(context, 1 * TICKS_PER_SECOND);
-    context.wait_for_all_requests();
-}
-
-void IngoBattleGrinder::switch_pokemon(ConsoleHandle& console, BotBaseContext& context, size_t& next_pokemon_in_party_order){
-    // Move past leading fainted pokemon
-    for(size_t i = 0; i < next_pokemon_in_party_order; i++){
-        pbf_press_dpad(context, DPAD_DOWN, 20, 80);
-    }
-
-    while(true){
-        // Choose the next pokemon to battle.
-        pbf_press_button(context, BUTTON_A, 20, 100);
-        pbf_press_button(context, BUTTON_A, 20, 150);
-        context.wait_for_all_requests();
-
-        next_pokemon_in_party_order++;
-    
-        // Check whether we can send this pokemon to battle:
-        const bool stop_on_detected = true;
-        BattlePokemonSwitchDetector switch_detector(console, console, stop_on_detected);
-        QImage screen = console.video().snapshot();
-        if (switch_detector.process_frame(screen, std::chrono::system_clock::now()) == false){
-            // No longer at the switching pokemon screen
-            break;
-        }
-
-        // We are still in the switching pokemon screen. So the current selected pokemon is fainted
-        // and therefore cannot be used. Try the next pokemon:
-
-        // Fist hit B to clear the "cannot send pokemon" dialogue
-        pbf_press_button(context, BUTTON_B, 20, 100);
-        // Move to the next pokemon
-        pbf_press_dpad(context, DPAD_DOWN, 20, 80);
-    }
-}
 
 bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
-
-    // The location of the move slots when choosing which move to use during battle.
-    // These boxes will be used to check whether the content in those boxes are changed or not
-    // after selecting one move to use. In this way we can detect whether the move is out of PP.
-    const ImageFloatBox move_slot_boxes[4] = {
-        {0.6600, 0.6220, 0.2500, 0.0320},
-        {0.6395, 0.6875, 0.2500, 0.0320},
-        {0.6190, 0.7530, 0.2500, 0.0320},
-        {0.5985, 0.8185, 0.2500, 0.0320},
-    };
 
     env.console.log("Starting battle...");
 
@@ -289,12 +225,30 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
 
     // Which move (0, 1, 2 or 3) to use in next turn.
     size_t cur_move = 0;
-    // Which pokemon in the party is not fainted
+    // The battle-order index of the current pokemon on the battle field.
+    // This index starts at 0. Whenever a new pokemon is sent to battle, the index adds by 1.
+    // It is equal to how many pokemon have left the battle.
+    // Note: battle order is different than party order, which is the order of the pokemon in the party.
+    // When the player selects a pokemon in the lower right corner of the screen in the overworld using "L"
+    // and "R" buttons, this pokemon will be sent to the battle first, with battle-order index of 0. But this
+    // pokemon can be in any place in the party list, therefore can have any party-order index.
     size_t cur_pokemon = 0;
-    // How many turns have passed in this battle:
+    // How many turns have passed for the current pokemon in this battle.
+    // This turn count is reset to zero when a new pokemon is sent to battle.
     size_t num_turns = 0;
     // Used to skip fainted pokemon in the party when switching a pokemon
-    size_t next_pokemon_in_party_order = 0;
+    // This is the party-order index of the pokemon to switch to.
+    // The index is the index in the pokemon party list.
+    size_t next_pokemon_to_switch_to = 0;
+
+    // Switch pokemon and update the battle states:
+    auto switch_cur_pokemon = [&](){
+        cur_move = 0;
+        num_turns = 0;
+        next_pokemon_to_switch_to++;
+        next_pokemon_to_switch_to = switch_pokemon(env.console, context, next_pokemon_to_switch_to);
+        cur_pokemon++;
+    };
 
     while(true){
         const bool stop_on_detected = true;
@@ -333,55 +287,50 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
                 // Go to the switching pokemon screen:
                 pbf_press_dpad(context, DPAD_DOWN, 20, 100);
 
-                cur_move = 0;
-                num_turns = 0;
-                switch_pokemon(env.console, context, next_pokemon_in_party_order);
-                cur_pokemon++;
+                switch_cur_pokemon();
             }
             else{
                 // Choose move to use!
                 if (cur_pokemon == 0){
                     // We collect the stat of move attempts of the first pokemon.
-                    stats.move_attempts++;
+                    stats.lead_move_attempts++;
                 }
 
                 // Press A to select moves
                 pbf_press_button(context, BUTTON_A, 10, 125);
                 context.wait_for_all_requests();
 
-                const auto& move_box = move_slot_boxes[cur_move];
-                QImage screen = env.console.video().snapshot();
-                ImageMatchDetector move_slot_detector(std::move(screen), move_box, 10.0);
-
-                use_move(env.console, context, cur_pokemon, cur_move);
-
-                // Check if the move cannot be used due to no PP:
-                screen = env.console.video().snapshot();
-                if (move_slot_detector.detect(screen)){
+                // Use move. 
+                // Use while loop to go to next move if the current move has no PP.
+                // No PP is detected by checking whether the pixels on the selected move menu item is still the same
+                // after about one second.
+                // Note: if the pokemon has no PP on any moves and results to Struggle, the fight animation should
+                // ensure we won't get the same pixels on the area that the move menu item would appear, so we won't
+                // get stuck in this while loop.
+                MoveStyle style = POKEMON_ACTIONS.get_style(cur_pokemon, cur_move);
+                const bool check_move_success = true;
+                while (use_move(env.console, context, cur_pokemon, cur_move, style, check_move_success) == false){
                     // We are still on the move selection screen. No PP.
                     if (cur_move == 3){
-                        // Pokemon has zero PP on all moves.
+                        // Pokemon has zero PP on all moves. This should not happen as it will just use
+                        // Struggle.
                         env.console.log("No PP on all moves. Abort program.", COLOR_RED);
                         throw OperationFailedException(env.console, "No PP on all moves.");
                     }
-                    env.console.log("No PP. Use next move.", COLOR_RED);
+                    
                     // Go to the next move.
                     pbf_press_dpad(context, DPAD_DOWN, 20, 100);
                     // env.console.context().wait_for_all_requests();
                     cur_move++;
-
-                    use_move(env.console, context, cur_pokemon, cur_move);
-
-#ifdef DEBUG_INGO_BATTLE                    
-                    std::cout << "Moved to next move " << cur_move << std::endl;
-                    static int count = 0;
-                    screen.save("./no_pp." + QString::number(count++) + ".png");
-#endif
+                    env.console.log("No PP. Use next move, " + QString::number(cur_move), COLOR_RED);
+                    
+                    style = POKEMON_ACTIONS.get_style(cur_pokemon, cur_move);
                 }
+
+                num_turns++;
             }
 
             env.update_stats();
-            num_turns++;
         }
         else if (ret == 1){
             env.console.log("Transparent dialogue box.");
@@ -399,10 +348,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
             stats.faint_switches++;
             env.update_stats();
 
-            cur_move = 0;
-            num_turns = 0;
-            switch_pokemon(env.console, context, next_pokemon_in_party_order);
-            cur_pokemon++;
+            switch_cur_pokemon();
         }
         else{ // ret is 4
             env.console.log("Battle finished.");
@@ -433,10 +379,6 @@ void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     //     std::cout << "detector " << detected << std::endl;
     //     return;
     // }
-
-    // Put a save here so that when the program reloads from error it won't break.
-    // save_game_from_overworld(env, env.console);
-    // env.console.context().wait_for_all_requests();
 
     while (true){
         env.update_stats();
