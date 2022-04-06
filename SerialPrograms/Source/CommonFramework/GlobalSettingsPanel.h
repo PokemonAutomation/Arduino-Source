@@ -24,6 +24,24 @@ namespace PokemonAutomation{
 
 
 
+
+class ResolutionOption : public GroupOption{
+public:
+    ResolutionOption(
+        QString label, QString description,
+        int default_width, int default_height
+    );
+
+    StaticTextOption DESCRIPTION;
+    SimpleIntegerOption<uint32_t> WIDTH;
+    SimpleIntegerOption<uint32_t> HEIGHT;
+};
+
+
+
+
+
+
 class GlobalSettings : public BatchOption{
     GlobalSettings();
 public:
@@ -36,9 +54,7 @@ public:
     BooleanCheckBoxOption SEND_ERROR_REPORTS;
 
     StringOption STATS_FILE;
-
-    SimpleIntegerOption<uint32_t> WINDOW_WIDTH;
-    SimpleIntegerOption<uint32_t> WINDOW_HEIGHT;
+    ResolutionOption WINDOW_SIZE;
 
     SectionDividerOption m_discord_settings;
     Integration::DiscordSettingsOption DISCORD;
@@ -48,6 +64,8 @@ public:
     BooleanCheckBoxOption LOG_EVERYTHING;
     BooleanCheckBoxOption SAVE_DEBUG_IMAGES;
     BooleanCheckBoxOption NAUGHTY_MODE;
+
+
 
     ProcessorLevelOption PROCESSOR_LEVEL0;
 

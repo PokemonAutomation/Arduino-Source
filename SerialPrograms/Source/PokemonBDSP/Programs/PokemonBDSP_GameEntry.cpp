@@ -75,7 +75,7 @@ bool reset_game_from_home(
     if (ConsoleSettings::instance().START_GAME_REQUIRES_INTERNET || tolerate_update_menu){
         close_game(context);
         open_game_from_home(
-            env, console, context,
+            context,
             tolerate_update_menu,
             0, 0,
             GameSettings::instance().START_GAME_MASH

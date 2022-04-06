@@ -19,6 +19,7 @@ using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
+namespace CameraQt6{
 
 
 std::vector<CameraInfo> qt6_get_all_cameras(){
@@ -49,6 +50,7 @@ Qt6VideoWidget::Qt6VideoWidget(
 )
     : VideoWidget(parent)
     , m_logger(logger)
+    , m_seqnum_frame(0)
 {
     if (!info){
         return;
@@ -82,8 +84,9 @@ Qt6VideoWidget::Qt6VideoWidget(
 
     connect(m_videoSink, &QVideoSink::videoFrameChanged, this, [&](const QVideoFrame& frame){
         {
-            std::unique_lock<std::mutex> lg(m_lock);
+            SpinLockGuard lg(m_frame_lock);
             m_videoFrame = frame;
+            m_seqnum_frame++;
         }
         this->update();
     });
@@ -156,26 +159,38 @@ void Qt6VideoWidget::set_resolution(const QSize& size){
 }
 
 QImage Qt6VideoWidget::snapshot(){
+    std::lock_guard<std::mutex> lg(m_lock);
+    if (m_camera == nullptr){
+        return QImage();
+    }
+
     QVideoFrame frame;
+    uint64_t seqnum = m_seqnum_frame;
     {
-        std::lock_guard<std::mutex> lg(m_lock);
-        if (m_camera == nullptr || !m_videoFrame.isValid()){
+        SpinLockGuard lg1(m_frame_lock);
+        //  Return cached image.
+        if (m_seqnum_image == seqnum && !m_last_image.isNull()){
+            return m_last_image;
+        }
+        if (!m_videoFrame.isValid()){
             return QImage();
         }
         frame = m_videoFrame; // Fast due to ref-count.
     }
 
     // auto time1 = std::chrono::system_clock::now();
-    QImage ret = frame.toImage();
+    //  Convert image and cache it.
+    m_last_image = frame.toImage();
     // auto time2 = std::chrono::system_clock::now();
     // std::chrono::duration<double> elapsed_seconds = time2 - time1;
     // std::cout << "snapshot image conversion time " << elapsed_seconds.count() << "s" << std::endl;
     // std::cout << "QVideoFrame pixel format " << int(frame.pixelFormat()) << std::endl;
-    QImage::Format format = ret.format();
+    QImage::Format format = m_last_image.format();
     if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
-        ret = ret.convertToFormat(QImage::Format_ARGB32);
+        m_last_image = m_last_image.convertToFormat(QImage::Format_ARGB32);
     }
-    return ret;
+    m_seqnum_image = seqnum;
+    return m_last_image;
 }
 
 
@@ -213,5 +228,6 @@ void Qt6VideoWidget::paintEvent(QPaintEvent* event){
 
 
 
+}
 }
 #endif

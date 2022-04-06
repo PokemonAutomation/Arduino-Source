@@ -8,18 +8,19 @@
 #define PokemonAutomation_VideoPipeline_Qt6VideoWidget_H
 
 #include <mutex>
-#include "CommonFramework/Logging/LoggerQt.h"
-#include "CameraInfo.h"
-#include "VideoWidget.h"
-
 #include <QCameraDevice>
 #include <QMediaCaptureSession>
 #include <QVideoFrame>
+#include "Common/Cpp/SpinLock.h"
+#include "CommonFramework/Logging/LoggerQt.h"
+#include "CameraInfo.h"
+#include "VideoWidget.h"
 
 class QCamera;
 class QVideoSink;
 
 namespace PokemonAutomation{
+namespace CameraQt6{
 
 
 std::vector<CameraInfo> qt6_get_all_cameras();
@@ -55,8 +56,13 @@ private:
     std::vector<QCameraFormat> m_formats;
 
     mutable std::mutex m_lock;
+    SpinLock m_frame_lock;
+    uint64_t m_seqnum_frame;
+    uint64_t m_seqnum_image = 0;
+    QImage m_last_image;
 };
 
 
+}
 }
 #endif

@@ -10,12 +10,13 @@
 #include "CommonFramework/Tools/ConsoleHandle.h"
 
 namespace PokemonAutomation{
+    class BotBaseContext;
     class ProgramEnvironment;
 namespace NintendoSwitch{
 
 
 void open_game_from_home(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    BotBaseContext& context,
     bool tolerate_update_menu,
     uint8_t game_slot,
     uint8_t user_slot,

@@ -31,7 +31,7 @@ void move_to_user(BotBaseContext& context, uint8_t user_slot){
 }
 
 void open_game_from_home(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    BotBaseContext& context,
     bool tolerate_update_menu,
     uint8_t game_slot,
     uint8_t user_slot,

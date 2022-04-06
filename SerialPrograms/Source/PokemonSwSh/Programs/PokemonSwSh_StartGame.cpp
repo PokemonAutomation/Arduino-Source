@@ -82,7 +82,7 @@ void start_game_from_home_with_inference(
     uint16_t post_wait_time
 ){
     open_game_from_home(
-        env, console, context,
+        context,
         tolerate_update_menu,
         game_slot,
         user_slot,

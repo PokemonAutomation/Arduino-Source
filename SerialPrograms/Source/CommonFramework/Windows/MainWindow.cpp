@@ -38,7 +38,7 @@ MainWindow::MainWindow(QWidget* parent)
         setObjectName(QString::fromUtf8("MainWindow"));
     }
 //    QSize window_size = PERSISTENT_SETTINGS().window_size;
-    resize(GlobalSettings::instance().WINDOW_WIDTH, GlobalSettings::instance().WINDOW_HEIGHT);
+    resize(GlobalSettings::instance().WINDOW_SIZE.WIDTH, GlobalSettings::instance().WINDOW_SIZE.HEIGHT);
     centralwidget = new QWidget(this);
     centralwidget->setObjectName(QString::fromUtf8("centralwidget"));
     setCentralWidget(centralwidget);
@@ -186,8 +186,8 @@ void MainWindow::closeEvent(QCloseEvent* event){
     QMainWindow::closeEvent(event);
 }
 void MainWindow::resizeEvent(QResizeEvent* event){
-    GlobalSettings::instance().WINDOW_WIDTH.set(width());
-    GlobalSettings::instance().WINDOW_HEIGHT.set(height());
+    GlobalSettings::instance().WINDOW_SIZE.WIDTH.set(width());
+    GlobalSettings::instance().WINDOW_SIZE.HEIGHT.set(height());
 }
 
 void MainWindow::close_panel(){

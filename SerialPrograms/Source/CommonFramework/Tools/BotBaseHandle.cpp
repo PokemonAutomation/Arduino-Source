@@ -261,6 +261,9 @@ void BotBaseHandle::thread_body(){
         }
     }
 
+    //  Stop pending commands.
+    m_botbase->stop_all_commands();
+
     std::thread watchdog([=]{
         while (true){
             if (m_state.load(std::memory_order_acquire) != State::READY){

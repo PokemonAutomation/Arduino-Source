@@ -69,9 +69,7 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
 //    add_program<ShinyHuntLakeTrio_Descriptor, ShinyHuntLakeTrio>();
     add_program<CrobatFinder_Descriptor, CrobatFinder>();
     add_program<GalladeFinder_Descriptor, GalladeFinder>();
-    if (GlobalSettings::instance().DEVELOPER_MODE){
-        add_program<FroslassFinder_Descriptor, FroslassFinder>();
-    }
+    add_program<FroslassFinder_Descriptor, FroslassFinder>();
     add_program<UnownFinder_Descriptor, UnownFinder>();
     add_program<ShinyHuntFlagPin_Descriptor, ShinyHuntFlagPin>();
     add_program<PostMMOSpawnReset_Descriptor, PostMMOSpawnReset>();

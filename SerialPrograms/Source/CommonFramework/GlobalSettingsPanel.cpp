@@ -26,6 +26,24 @@ const std::set<std::string> TOKENS{
 
 
 
+ResolutionOption::ResolutionOption(
+    QString label, QString description,
+    int default_width, int default_height
+)
+    : GroupOption(std::move(label))
+    , DESCRIPTION(std::move(description))
+    , WIDTH("<b>Width:</b>", scale_dpi_width(default_width))
+    , HEIGHT("<b>Height:</b>", scale_dpi_height(default_height))
+{
+    PA_ADD_STATIC(DESCRIPTION);
+    PA_ADD_OPTION(WIDTH);
+    PA_ADD_OPTION(HEIGHT);
+}
+
+
+
+
+
 GlobalSettings& GlobalSettings::instance(){
     static GlobalSettings settings;
     return settings;
@@ -42,19 +60,11 @@ GlobalSettings::GlobalSettings()
         "PA-Stats.txt",
         "PA-Stats.txt"
     )
-    , WINDOW_WIDTH(
-        "<b>Window Size (Width):</b><br>"
-        "Set the width of the window. Restart application to take effect.<br>"
-        "Use this to easily set the window to a specific resolution for streaming alignment.<br>"
-        "Note that the actual resolution will be subject to your monitor's DPI scaling.",
-        scale_dpi_width(1280)
-    )
-    , WINDOW_HEIGHT(
-        "<b>Window Size (Height):</b><br>"
-        "Set the height of the window. Restart application to take effect.<br>"
-        "Use this to easily set the window to a specific resolution for streaming alignment.<br>"
-        "Note that the actual resolution will be subject to your monitor's DPI scaling.",
-        scale_dpi_height(720)
+    , WINDOW_SIZE(
+        "Window Size:",
+        "Set the size of the window. Restart application to take effect.<br>"
+        "Use this to easily set the window to a specific resolution for streaming alignment.",
+        1280, 720
     )
     , m_discord_settings(
         "<font size=4><b>Discord Settings:</b> Integrate with Discord. "
@@ -99,8 +109,7 @@ GlobalSettings::GlobalSettings()
 {
     PA_ADD_OPTION(SEND_ERROR_REPORTS);
     PA_ADD_OPTION(STATS_FILE);
-    PA_ADD_OPTION(WINDOW_WIDTH);
-    PA_ADD_OPTION(WINDOW_HEIGHT);
+    PA_ADD_OPTION(WINDOW_SIZE);
 
     PA_ADD_STATIC(m_discord_settings);
     PA_ADD_OPTION(DISCORD);
