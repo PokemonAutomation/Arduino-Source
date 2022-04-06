@@ -25,9 +25,11 @@ public:
     virtual std::vector<QSize> resolutions() const = 0;
     virtual void set_resolution(const QSize& size) = 0;
 
-    //  This snapshot function will be called asynchronously from any thread
-    //  except the UI thread. It needs to be thread safe with itself and the
-    //  above functions.
+    //  This snapshot function will be called asynchronously from many threads
+    //  at a very high rate. So it needs to be thread-safe with both itself
+    //  and all the functions above and should cache the image if there has been
+    //  no new frames since the previous call.
+    //  This function will never be called on the UI thread.
     virtual QImage snapshot() = 0;
 };
 

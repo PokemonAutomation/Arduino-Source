@@ -39,6 +39,18 @@ PABotBase::~PABotBase(){
     }
 }
 
+size_t PABotBase::inflight_requests(){
+    //  Must be called under m_state_lock.
+
+    size_t ret = m_pending_requests.size();
+    for (const auto& item : m_pending_commands){
+        if (item.second.state == AckState::NOT_ACKED){
+            ret++;
+        }
+    }
+    return ret;
+}
+
 void PABotBase::connect(){
     pabb_MsgAckRequest response;
     issue_request_and_wait(
@@ -435,6 +447,12 @@ uint64_t PABotBase::try_issue_request(
         throw InvalidConnectionStateException();
     }
 
+    //  Too many unacked requests in flight.
+    if (inflight_requests() >= queue_limit){
+        m_logger.log("Message throttled due to too many inflight requests.");
+        return false;
+    }
+
     //  Don't get too far ahead of the oldest seqnum.
     uint64_t seqnum = m_send_seq;
     if (seqnum - oldest_live_seqnum() > MAX_SEQNUM_GAP){
@@ -491,6 +509,12 @@ uint64_t PABotBase::try_issue_command(
     //  Command queue is full.
     if (m_pending_commands.size() >= queue_limit){
 //        cout << "Command queue is full" << endl;
+        return false;
+    }
+
+    //  Too many unacked requests in flight.
+    if (inflight_requests() >= queue_limit){
+        m_logger.log("Message throttled due to too many inflight requests.");
         return false;
     }
 

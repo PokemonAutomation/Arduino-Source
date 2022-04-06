@@ -124,6 +124,8 @@ private:
     void retransmit_thread();
 
 private:
+    size_t inflight_requests();
+
     //  Returns the seqnum of the request. If failed, returns zero.
     uint64_t try_issue_request(
         const Cancellable* cancelled,

@@ -12,6 +12,7 @@
 #include "Programs/PokemonLA_BraviaryHeightGlitch.h"
 #include "Programs/PokemonLA_DistortionWaiter.h"
 #include "Programs/PokemonLA_OutbreakFinder.h"
+#include "Programs/General/PokemonLA_ClothingBuyer.h"
 
 #include "Programs/Trading/PokemonLA_SelfBoxTrade.h"
 #include "Programs/Trading/PokemonLA_SelfTouchTrade.h"
@@ -19,10 +20,9 @@
 #include "Programs/Farming/PokemonLA_IngoBattleGrinder.h"
 #include "Programs/Farming/PokemonLA_MagikarpMoveGrinder.h"
 #include "Programs/Farming/PokemonLA_NuggetFarmerHighlands.h"
-#include "PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.h"
+#include "Programs/Farming/PokemonLA_TenacityCandyFarmer.h"
 
-#include "Programs/General/PokemonLA_ClothingBuyer.h"
-
+//#include "Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h"
 #include "Programs/ShinyHunting/PokemonLA_GalladeFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_CrobatFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_UnownFinder.h"
@@ -30,7 +30,6 @@
 #include "Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.h"
 #include "Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.h"
 #include "Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.h"
-//#include "Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h"
 
 #include "Programs/TestPrograms/PokemonLA_MountDetectionTest.h"
 #include "Programs/TestPrograms/PokemonLA_OverworldWatcher.h"
