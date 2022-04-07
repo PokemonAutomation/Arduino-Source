@@ -12,25 +12,47 @@
 #include "Exceptions.h"
 #include "CancellableScope.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 
 
-
+CancellableScope* Cancellable::scope() const{
+    m_sanitizer.check_usage();
+    return m_scope;
+}
+bool Cancellable::cancelled() const{
+    m_sanitizer.check_usage();
+    return m_cancelled.load(std::memory_order_acquire);
+}
+bool Cancellable::cancel() noexcept{
+    m_sanitizer.check_usage();
+    if (cancelled() || m_cancelled.exchange(true)){
+        return true;
+    }
+    return false;
+}
 void Cancellable::throw_if_cancelled(){
+    m_sanitizer.check_usage();
     if (cancelled()){
         throw OperationCancelledException();
     }
 }
 void Cancellable::throw_if_parent_cancelled(){
+    m_sanitizer.check_usage();
     if (m_scope){
         m_scope->throw_if_cancelled();
     }
 }
 void Cancellable::attach(CancellableScope& scope){
+    m_sanitizer.check_usage();
     m_scope = &scope;
     scope += *this;
 }
 void Cancellable::detach() noexcept{
+    m_sanitizer.check_usage();
     if (m_scope){
         *m_scope -= *this;
     }
@@ -66,9 +88,11 @@ bool CancellableScope::cancel() noexcept{
     return false;
 }
 void CancellableScope::wait_for(std::chrono::milliseconds duration){
+    m_sanitizer.check_usage();
     wait_until(std::chrono::system_clock::now() + duration);
 }
 void CancellableScope::wait_until(std::chrono::system_clock::time_point stop){
+    m_sanitizer.check_usage();
     throw_if_cancelled();
     {
         std::unique_lock<std::mutex> lg(m_impl->m_lock);
@@ -82,11 +106,13 @@ void CancellableScope::wait_until(std::chrono::system_clock::time_point stop){
     throw_if_cancelled();
 }
 void CancellableScope::operator+=(Cancellable& cancellable){
+    m_sanitizer.check_usage();
     std::lock_guard<std::mutex> lg(m_impl->m_lock);
     throw_if_cancelled();
     m_impl->m_children.insert(&cancellable);
 }
 void CancellableScope::operator-=(Cancellable& cancellable){
+    m_sanitizer.check_usage();
     std::lock_guard<std::mutex> lg(m_impl->m_lock);
     m_impl->m_children.erase(&cancellable);
 }

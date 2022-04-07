@@ -76,6 +76,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/FireForgetDispatcher.h
     ../Common/Cpp/FixedLimitVector.h
     ../Common/Cpp/FixedLimitVector.tpp
+    ../Common/Cpp/LifetimeSanitizer.h
+    ../Common/Cpp/LifetimeSanitizer.cpp
     ../Common/Cpp/PanicDump.cpp
     ../Common/Cpp/PanicDump.h
     ../Common/Cpp/ParallelTaskRunner.cpp

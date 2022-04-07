@@ -25,6 +25,7 @@
 #include <chrono>
 #include <atomic>
 #include "Pimpl.h"
+#include "LifetimeSanitizer.h"
 
 namespace PokemonAutomation{
 
@@ -37,22 +38,15 @@ public:
         detach();
     }
 
-    CancellableScope* scope() const{ return m_scope; }
+    CancellableScope* scope() const;
 
-    bool cancelled() const{
-        return m_cancelled.load(std::memory_order_acquire);
-    }
+    bool cancelled() const;
 
     void throw_if_cancelled();
     void throw_if_parent_cancelled();
 
     //  Returns true if it was already cancelled.
-    virtual bool cancel() noexcept{
-        if (cancelled() || m_cancelled.exchange(true)){
-            return true;
-        }
-        return false;
-    }
+    virtual bool cancel() noexcept;
 
 
 protected:
@@ -89,6 +83,7 @@ protected:
 private:
     CancellableScope* m_scope = nullptr;
     std::atomic<bool> m_cancelled;
+    LifetimeSanitizer m_sanitizer;
 };
 
 
@@ -113,6 +108,7 @@ private:
 
 private:
     Pimpl<CancellableScopeData> m_impl;
+    LifetimeSanitizer m_sanitizer;
 };
 
 

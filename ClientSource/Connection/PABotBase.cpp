@@ -652,9 +652,7 @@ BotBaseMessage PABotBase::issue_request_and_wait(
         throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "This function only supports requests.");
     }
 
-    std::map<uint64_t, PendingRequest>::iterator iter;
     uint64_t seqnum = issue_request(cancelled, request, false);
-
     return wait_for_request(seqnum);
 }
 BotBaseMessage PABotBase::wait_for_request(uint64_t seqnum){

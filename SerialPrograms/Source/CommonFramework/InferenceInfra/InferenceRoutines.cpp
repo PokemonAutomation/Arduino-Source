@@ -27,11 +27,12 @@ int wait_until(
     InferenceCallback* visual_trigger = nullptr;
     InferenceCallback* audio_trigger = nullptr;
     {
-        std::unique_ptr<AsyncVisualInferenceSession> visual_session;
-        std::unique_ptr<AsyncAudioInferenceSession> audio_session;
-
+        //  The order here is important. BotBaseContext needs to outlive both inference sessions.
         CancellableHolder<CancellableScope> subscope(*context.scope());
         BotBaseContext subcontext(subscope, console.botbase());
+
+        std::unique_ptr<AsyncVisualInferenceSession> visual_session;
+        std::unique_ptr<AsyncAudioInferenceSession> audio_session;
 
         //  Add all the callbacks. Lazy init the sessions only when needed.
         for (size_t c = 0; c < callbacks.size(); c++){
@@ -112,11 +113,12 @@ int run_until(
     InferenceCallback* visual_trigger = nullptr;
     InferenceCallback* audio_trigger = nullptr;
     {
-        std::unique_ptr<AsyncVisualInferenceSession> visual_session;
-        std::unique_ptr<AsyncAudioInferenceSession> audio_session;
-
+        //  The order here is important. BotBaseContext needs to outlive both inference sessions.
         CancellableHolder<CancellableScope> subscope(*context.scope());
         BotBaseContext subcontext(subscope, console.botbase());
+
+        std::unique_ptr<AsyncVisualInferenceSession> visual_session;
+        std::unique_ptr<AsyncAudioInferenceSession> audio_session;
 
         //  Add all the callbacks. Lazy init the sessions only when needed.
         for (size_t c = 0; c < callbacks.size(); c++){

@@ -310,16 +310,15 @@ QImage Qt5VideoWidget::snapshot_image(){
         m_logger.log("Capture timed out.");
     }
 
-    QImage ret = std::move(capture.image);
+    m_last_image = std::move(capture.image);
     m_pending_captures.erase(iter.first);
-    QImage::Format format = ret.format();
+    QImage::Format format = m_last_image.format();
     if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
-        ret = ret.convertToFormat(QImage::Format_ARGB32);
+        m_last_image = m_last_image.convertToFormat(QImage::Format_ARGB32);
     }
-    m_last_image = ret;
     m_last_snapshot.store(timestamp, std::memory_order_release);
     m_seqnum_image = m_seqnum_frame.load(std::memory_order_acquire);
-    return ret;
+    return m_last_image;
 }
 QImage Qt5VideoWidget::snapshot(){
     return snapshot_image();
