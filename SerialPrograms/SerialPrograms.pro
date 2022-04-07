@@ -76,6 +76,7 @@ SOURCES += \
     ../Common/Cpp/CpuId.cpp \
     ../Common/Cpp/Exceptions.cpp \
     ../Common/Cpp/FireForgetDispatcher.cpp \
+    ../Common/Cpp/LifetimeSanitizer.cpp \
     ../Common/Cpp/PanicDump.cpp \
     ../Common/Cpp/ParallelTaskRunner.cpp \
     ../Common/Cpp/PrettyPrint.cpp \
@@ -673,6 +674,7 @@ HEADERS += \
     ../Common/Cpp/FireForgetDispatcher.h \
     ../Common/Cpp/FixedLimitVector.h \
     ../Common/Cpp/FixedLimitVector.tpp \
+    ../Common/Cpp/LifetimeSanitizer.h \
     ../Common/Cpp/PanicDump.h \
     ../Common/Cpp/ParallelTaskRunner.h \
     ../Common/Cpp/PrettyPrint.h \
