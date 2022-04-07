@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_LifetimeSanitizer_H
 #define PokemonAutomation_LifetimeSanitizer_H
 
-//#define PA_SANITIZER_ENABLE
+#define PA_SANITIZER_ENABLE
 
 namespace PokemonAutomation{
 

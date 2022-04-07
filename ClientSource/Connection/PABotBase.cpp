@@ -450,7 +450,7 @@ uint64_t PABotBase::try_issue_request(
     //  Too many unacked requests in flight.
     if (inflight_requests() >= queue_limit){
         m_logger.log("Message throttled due to too many inflight requests.");
-        return false;
+        return 0;
     }
 
     //  Don't get too far ahead of the oldest seqnum.
@@ -509,13 +509,13 @@ uint64_t PABotBase::try_issue_command(
     //  Command queue is full.
     if (m_pending_commands.size() >= queue_limit){
 //        cout << "Command queue is full" << endl;
-        return false;
+        return 0;
     }
 
     //  Too many unacked requests in flight.
     if (inflight_requests() >= queue_limit){
         m_logger.log("Message throttled due to too many inflight requests.");
-        return false;
+        return 0;
     }
 
     //  Don't get too far ahead of the oldest seqnum.

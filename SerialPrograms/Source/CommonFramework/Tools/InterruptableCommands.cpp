@@ -55,15 +55,19 @@ AsyncCommandSession::~AsyncCommandSession(){
     }
     detach();
     AsyncCommandSession::cancel();
-    //  Thread is automatically joined by m_task destructor.
+
+    //  Join the thread.
+    m_thread.reset();
 }
 
 bool AsyncCommandSession::command_is_running(){
+    m_sanitizer.check_usage();
     std::lock_guard<std::mutex> lg(m_lock);
     return m_current != nullptr;
 }
 
 void AsyncCommandSession::dispatch(std::function<void(BotBaseContext&)>&& lambda){
+    m_sanitizer.check_usage();
     std::unique_lock<std::mutex> lg(m_lock);
     if (cancelled()){
         return;
@@ -134,6 +138,8 @@ void AsyncCommandSession::thread_loop(){
 
     SpinLockGuard lg(m_finished_lock);
     m_finished_tasks.clear();
+
+    m_sanitizer.check_usage();
 }
 
 

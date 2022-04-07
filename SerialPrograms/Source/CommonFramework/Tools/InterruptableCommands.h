@@ -61,14 +61,16 @@ private:
     std::unique_ptr<CommandSet> m_pending;
     std::unique_ptr<CommandSet> m_current;
 
-    std::mutex m_lock;
-    std::condition_variable m_cv;
-    std::unique_ptr<AsyncTask> m_thread;
-
     //  Finished tasks need to be moved here first and then deleted outside
     //  of "m_lock" due to a deadlock possibiliy.
     SpinLock m_finished_lock;
     std::vector<std::unique_ptr<CommandSet>> m_finished_tasks;
+
+    std::mutex m_lock;
+    std::condition_variable m_cv;
+    std::unique_ptr<AsyncTask> m_thread;
+
+    LifetimeSanitizer m_sanitizer;
 };
 
 
