@@ -19,6 +19,8 @@ public:
     LifetimeSanitizer();
     ~LifetimeSanitizer();
     void check_usage() const;
+#else
+    void check_usage() const{}
 #endif
 };
 
