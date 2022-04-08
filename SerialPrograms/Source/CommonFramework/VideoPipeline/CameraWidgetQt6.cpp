@@ -86,7 +86,9 @@ Qt6VideoWidget::Qt6VideoWidget(
         {
             SpinLockGuard lg(m_frame_lock);
             m_videoFrame = frame;
-            m_seqnum_frame++;
+            uint64_t seqnum = m_seqnum_frame.load(std::memory_order_acquire);
+            m_seqnum_frame.store(seqnum + 1, std::memory_order_release);
+//            m_seqnum_frame++;
         }
         this->update();
     });
@@ -129,7 +131,6 @@ QSize Qt6VideoWidget::resolution() const{
     if (m_camera == nullptr){
         return QSize();
     }
-
     return m_camera->cameraFormat().resolution();
 }
 
@@ -159,23 +160,25 @@ void Qt6VideoWidget::set_resolution(const QSize& size){
 }
 
 QImage Qt6VideoWidget::snapshot(){
-    std::lock_guard<std::mutex> lg(m_lock);
-    if (m_camera == nullptr){
-        return QImage();
+    //  Prevent multiple concurrent screenshots from entering here.
+    std::lock_guard<std::mutex> lg(m_image_lock);
+
+    //  Image is already cached and not stale. Return it.
+    uint64_t seqnum = m_seqnum_frame.load(std::memory_order_acquire);
+    if (m_seqnum_image == seqnum && !m_last_image.isNull()){
+        return m_last_image;
     }
 
+    //  Need to update image. Grab the current frame.
     QVideoFrame frame;
-    uint64_t seqnum = m_seqnum_frame;
     {
         SpinLockGuard lg1(m_frame_lock);
-        //  Return cached image.
-        if (m_seqnum_image == seqnum && !m_last_image.isNull()){
-            return m_last_image;
-        }
-        if (!m_videoFrame.isValid()){
-            return QImage();
-        }
-        frame = m_videoFrame; // Fast due to ref-count.
+        frame = m_videoFrame;   // Fast due to ref-count.
+    }
+
+    //  Now make the image.
+    if (!frame.isValid()){
+        return QImage();
     }
 
     // auto time1 = std::chrono::system_clock::now();
@@ -216,7 +219,10 @@ void Qt6VideoWidget::resizeEvent(QResizeEvent* event){
 void Qt6VideoWidget::paintEvent(QPaintEvent* event){
     // std::cout << "paintEvent start" << std::endl;
     QWidget::paintEvent(event);
-    std::lock_guard<std::mutex> lg(m_lock);
+
+    //  Lock should not be needed since it's only updated on this UI thread.
+//    std::lock_guard<std::mutex> lg(m_lock);
+
     if (m_videoFrame.isValid()){
         QRect rect(0,0, this->width(), this->height());
         QVideoFrame::PaintOptions options;

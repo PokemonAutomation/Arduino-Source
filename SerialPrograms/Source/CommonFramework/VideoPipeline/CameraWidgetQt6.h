@@ -56,8 +56,10 @@ private:
     std::vector<QCameraFormat> m_formats;
 
     mutable std::mutex m_lock;
+    std::mutex m_image_lock;
     SpinLock m_frame_lock;
-    uint64_t m_seqnum_frame;
+    std::atomic<uint64_t> m_seqnum_frame;
+//    uint64_t m_seqnum_frame;
     uint64_t m_seqnum_image = 0;
     QImage m_last_image;
 };
