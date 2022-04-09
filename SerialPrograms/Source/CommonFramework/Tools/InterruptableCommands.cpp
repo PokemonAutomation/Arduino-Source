@@ -54,7 +54,7 @@ AsyncCommandSession::~AsyncCommandSession(){
         m_logger.log("AsyncCommandSession::stop_session() not called before normal destruction.", COLOR_RED);
     }
     detach();
-    AsyncCommandSession::cancel();
+    AsyncCommandSession::cancel(nullptr);
 
     //  Join the thread.
     m_thread.reset();
@@ -89,13 +89,13 @@ void AsyncCommandSession::dispatch(std::function<void(BotBaseContext&)>&& lambda
 }
 
 
-bool AsyncCommandSession::cancel() noexcept{
-    if (Cancellable::cancel()){
+bool AsyncCommandSession::cancel(std::exception_ptr exception) noexcept{
+    if (Cancellable::cancel(exception)){
         return true;
     }
     std::lock_guard<std::mutex> lg(m_lock);
     if (m_current != nullptr){
-        m_current->context.cancel();
+        m_current->context.cancel(std::move(exception));
     }
     m_cv.notify_all();
     return false;
@@ -163,9 +163,9 @@ void AsyncCommandSession::wait(){
 }
 #endif
 void AsyncCommandSession::stop_session_and_rethrow(){
-    cancel();
+    cancel(nullptr);
     m_thread->wait_and_rethrow_exceptions();
-    throw_if_parent_cancelled();
+    throw_if_cancelled_with_exception();
 }
 
 

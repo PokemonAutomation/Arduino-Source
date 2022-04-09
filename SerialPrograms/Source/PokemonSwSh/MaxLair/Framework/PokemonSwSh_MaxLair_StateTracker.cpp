@@ -45,8 +45,8 @@ std::pair<uint64_t, std::string> GlobalStateTracker::dump(){
 #endif
     return {m_state_epoch, str};
 }
-bool GlobalStateTracker::cancel() noexcept{
-    if (Cancellable::cancel()){
+bool GlobalStateTracker::cancel(std::exception_ptr exception) noexcept{
+    if (Cancellable::cancel(std::move(exception))){
         return true;
     }
     std::lock_guard<std::mutex> lg(m_lock);

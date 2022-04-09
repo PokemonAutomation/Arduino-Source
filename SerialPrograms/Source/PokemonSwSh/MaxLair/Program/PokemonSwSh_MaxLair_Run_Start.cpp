@@ -104,8 +104,8 @@ public:
         }
     }
 
-    virtual bool cancel() noexcept override{
-        if (Cancellable::cancel()){
+    virtual bool cancel(std::exception_ptr exception) noexcept override{
+        if (Cancellable::cancel(std::move(exception))){
             return true;
         }
         std::lock_guard<std::mutex> lg(m_lock);

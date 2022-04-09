@@ -24,7 +24,7 @@ class GlobalStateTracker final : public Cancellable{
 public:
     GlobalStateTracker(CancellableScope& scope, size_t consoles);
     virtual ~GlobalStateTracker();
-    virtual bool cancel() noexcept override;
+    virtual bool cancel(std::exception_ptr exception) noexcept override;
 
     //  Access the local copy for this console.
     //  This one is safe to directly access.

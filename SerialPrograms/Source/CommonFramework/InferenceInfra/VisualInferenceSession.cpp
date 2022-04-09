@@ -42,10 +42,10 @@ VisualInferenceSession::VisualInferenceSession(
 }
 VisualInferenceSession::~VisualInferenceSession(){
     detach();
-    VisualInferenceSession::cancel();
+    VisualInferenceSession::cancel(nullptr);
 }
-bool VisualInferenceSession::cancel() noexcept{
-    if (Cancellable::cancel()){
+bool VisualInferenceSession::cancel(std::exception_ptr exception) noexcept{
+    if (Cancellable::cancel(std::move(exception))){
         return true;
     }
     {
@@ -116,8 +116,7 @@ VisualInferenceCallback* VisualInferenceSession::run(std::chrono::system_clock::
     auto next_tick = now + m_period;
 
     while (true){
-        throw_if_parent_cancelled();
-        if (cancelled()){
+        if (throw_if_cancelled_with_exception()){
             return nullptr;
         }
 
@@ -178,7 +177,7 @@ AsyncVisualInferenceSession::AsyncVisualInferenceSession(
     , m_task(env.inference_dispatcher().dispatch([this]{ thread_body(); }))
 {}
 AsyncVisualInferenceSession::~AsyncVisualInferenceSession(){
-    m_session.cancel();
+    m_session.cancel(nullptr);
 }
 void AsyncVisualInferenceSession::operator+=(VisualInferenceCallback& callback){
     m_session += callback;
@@ -192,7 +191,7 @@ void AsyncVisualInferenceSession::rethrow_exceptions(){
     }
 }
 VisualInferenceCallback* AsyncVisualInferenceSession::stop_and_rethrow(){
-    m_session.cancel();
+    m_session.cancel(nullptr);
     if (m_task){
         m_task->wait_and_rethrow_exceptions();
     }
@@ -204,10 +203,12 @@ void AsyncVisualInferenceSession::thread_body(){
         if (m_on_finish_callback){
             m_on_finish_callback();
         }
+//        m_session.cancel(std::current_exception());
     }catch (...){
         if (m_on_finish_callback){
             m_on_finish_callback();
         }
+//        m_session.cancel(std::current_exception());
         throw;
     }
 }

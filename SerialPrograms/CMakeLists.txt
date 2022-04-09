@@ -82,6 +82,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/PanicDump.h
     ../Common/Cpp/ParallelTaskRunner.cpp
     ../Common/Cpp/ParallelTaskRunner.h
+    ../Common/Cpp/PeriodicScheduler.cpp
+    ../Common/Cpp/PeriodicScheduler.h
     ../Common/Cpp/Pimpl.h
     ../Common/Cpp/Pimpl.tpp
     ../Common/Cpp/PrettyPrint.cpp

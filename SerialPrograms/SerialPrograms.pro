@@ -79,6 +79,7 @@ SOURCES += \
     ../Common/Cpp/LifetimeSanitizer.cpp \
     ../Common/Cpp/PanicDump.cpp \
     ../Common/Cpp/ParallelTaskRunner.cpp \
+    ../Common/Cpp/PeriodicScheduler.cpp \
     ../Common/Cpp/PrettyPrint.cpp \
     ../Common/Cpp/SpinLock.cpp \
     ../Common/Cpp/Unicode.cpp \
@@ -677,6 +678,7 @@ HEADERS += \
     ../Common/Cpp/LifetimeSanitizer.h \
     ../Common/Cpp/PanicDump.h \
     ../Common/Cpp/ParallelTaskRunner.h \
+    ../Common/Cpp/PeriodicScheduler.h \
     ../Common/Cpp/PrettyPrint.h \
     ../Common/Cpp/SIMDDebuggers.h \
     ../Common/Cpp/SpinLock.h \

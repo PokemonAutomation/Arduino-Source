@@ -23,7 +23,8 @@
 #define PokemonAutomation_CancellableScope_H
 
 #include <chrono>
-#include <atomic>
+//#include <atomic>
+#include <exception>
 #include "Pimpl.h"
 #include "LifetimeSanitizer.h"
 
@@ -32,21 +33,29 @@ namespace PokemonAutomation{
 
 class CancellableScope;
 
+
+
+struct CancellableData;
 class Cancellable{
 public:
-    virtual ~Cancellable(){
-        detach();
-    }
+    virtual ~Cancellable();
 
     CancellableScope* scope() const;
 
-    bool cancelled() const;
+    bool cancelled() const noexcept;
 
-    void throw_if_cancelled();
-    void throw_if_parent_cancelled();
+    //  Throw an exception if this object has been cancelled.
+    //  If there is no exception, it throws OperationCancelledException.
+    //  Otherwise, it throws the stored exception.
+    void throw_if_cancelled() const;
+
+    //  If object has not been cancelled, return false.
+    //  If object has been cancelled with no exception, return true.
+    //  If object has been cancelled with exception, rethrow the exception.
+    bool throw_if_cancelled_with_exception() const;
 
     //  Returns true if it was already cancelled.
-    virtual bool cancel() noexcept;
+    virtual bool cancel(std::exception_ptr exception) noexcept;
 
 
 protected:
@@ -69,9 +78,7 @@ protected:
     //
     //  Because "cancel()" can be called on you at any time, you must detach
     //  before you begin destructing.
-    Cancellable()
-        : m_cancelled(false)
-    {}
+    Cancellable();
 
     //  You must call last in the constructor of the most-derived subclass.
     void attach(CancellableScope& scope);
@@ -82,7 +89,7 @@ protected:
 
 private:
     CancellableScope* m_scope = nullptr;
-    std::atomic<bool> m_cancelled;
+    Pimpl<CancellableData> m_impl;
     LifetimeSanitizer m_sanitizer;
 };
 
@@ -93,7 +100,7 @@ class CancellableScope : public Cancellable{
 public:
     virtual ~CancellableScope() override;
 
-    virtual bool cancel() noexcept override;
+    virtual bool cancel(std::exception_ptr exception) noexcept override;
 
     void wait_for(std::chrono::milliseconds duration);
     void wait_until(std::chrono::system_clock::time_point stop);

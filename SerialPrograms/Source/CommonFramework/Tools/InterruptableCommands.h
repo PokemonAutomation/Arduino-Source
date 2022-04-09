@@ -49,7 +49,7 @@ public:
 
 
 private:
-    virtual bool cancel() noexcept override;
+    virtual bool cancel(std::exception_ptr exception) noexcept override;
     void thread_loop();
 
 

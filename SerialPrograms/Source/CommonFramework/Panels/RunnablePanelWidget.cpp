@@ -10,6 +10,7 @@
 #include <QPushButton>
 #include <QGroupBox>
 #include <QScrollArea>
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/CancellableScope.h"
 #include "Common/Cpp/PanicDump.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
@@ -112,7 +113,7 @@ bool RunnablePanelWidget::request_program_stop(){
     {
         std::lock_guard<std::mutex> lg(m_lock);
         if (m_scope){
-            m_scope->cancel();
+            m_scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
         }
     }
     return true;

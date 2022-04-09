@@ -42,10 +42,10 @@ AudioInferenceSession::AudioInferenceSession(
 }
 AudioInferenceSession::~AudioInferenceSession(){
     detach();
-    AudioInferenceSession::cancel();
+    AudioInferenceSession::cancel(nullptr);
 }
-bool AudioInferenceSession::cancel() noexcept{
-    if (Cancellable::cancel()){
+bool AudioInferenceSession::cancel(std::exception_ptr exception) noexcept{
+    if (Cancellable::cancel(std::move(exception))){
         return true;
     }
     {
@@ -115,8 +115,7 @@ AudioInferenceCallback* AudioInferenceSession::run(std::chrono::system_clock::ti
     std::vector<AudioSpectrum> spectrums;
 
     while (true){
-        throw_if_parent_cancelled();
-        if (cancelled()){
+        if (throw_if_cancelled_with_exception()){
             return nullptr;
         }
 
@@ -185,7 +184,7 @@ AsyncAudioInferenceSession::AsyncAudioInferenceSession(
     , m_task(env.inference_dispatcher().dispatch([this]{ thread_body(); }))
 {}
 AsyncAudioInferenceSession::~AsyncAudioInferenceSession(){
-    m_session.cancel();
+    m_session.cancel(nullptr);
 }
 void AsyncAudioInferenceSession::operator+=(AudioInferenceCallback& callback){
     m_session += callback;
@@ -199,7 +198,7 @@ void AsyncAudioInferenceSession::rethrow_exceptions(){
     }
 }
 AudioInferenceCallback* AsyncAudioInferenceSession::stop_and_rethrow(){
-    m_session.cancel();
+    m_session.cancel(nullptr);
     if (m_task){
         m_task->wait_and_rethrow_exceptions();
     }
@@ -215,6 +214,7 @@ void AsyncAudioInferenceSession::thread_body(){
         if (m_on_finish_callback){
             m_on_finish_callback();
         }
+//        m_session.cancel(std::current_exception());
         throw;
     }
 }

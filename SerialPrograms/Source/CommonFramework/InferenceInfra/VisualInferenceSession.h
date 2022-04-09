@@ -36,7 +36,7 @@ public:
     VisualInferenceCallback* run(std::chrono::milliseconds timeout = std::chrono::milliseconds(0));
     VisualInferenceCallback* run(std::chrono::system_clock::time_point stop);
 
-    virtual bool cancel() noexcept override;
+    virtual bool cancel(std::exception_ptr exception) noexcept override;
 
 private:
     struct Callback;

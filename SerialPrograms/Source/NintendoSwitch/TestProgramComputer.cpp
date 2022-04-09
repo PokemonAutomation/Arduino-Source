@@ -5,16 +5,20 @@
  */
 
 #include <set>
+#include <mutex>
+#include <condition_variable>
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/AlignedVector.h"
 #include "Common/Cpp/CpuId.h"
+#include "Common/Cpp/AsyncDispatcher.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "TestProgramComputer.h"
+#include "ClientSource/Libraries/Logging.h"
 
 #include "Kernels/Kernels_Arch.h"
 #include "Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.h"
@@ -42,6 +46,7 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
+#include "Common/Cpp/PeriodicScheduler.h"
 
 //#include "Kernels/Kernels_x64_AVX2.h"
 //#include "Kernels/Kernels_x64_AVX512.h"
@@ -120,11 +125,58 @@ void print_8x64(__m512i m){
 
 
 
+class ScheduledPrinter : public PeriodicRunner{
+public:
+    virtual ~ScheduledPrinter(){
+        PeriodicRunner::cancel(nullptr);
+        stop_thread();
+    }
+    bool add_event(std::function<void()>& event, std::chrono::milliseconds period){
+        return PeriodicRunner::add_event(&event, period);
+    }
+    void remove_event(std::function<void()>& event){
+        PeriodicRunner::remove_event(&event);
+    }
+    virtual void run(void* event) override{
+        cout << current_time() << ": ";
+        (*(std::function<void()>*)event)();
+    }
+
+protected:
+    using PeriodicRunner::PeriodicRunner;
+};
+
+
+
+
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace NintendoSwitch::PokemonLA;
     using namespace Pokemon;
 
+
+    std::function<void()> callback0 = []{ cout << "asdf" << endl; };
+    std::function<void()> callback1 = []{ cout << "qwer" << endl; };
+
+    CancellableHolder<ScheduledPrinter> runner(scope, env.inference_dispatcher());
+    runner.add_event(callback0, std::chrono::seconds(2));
+    runner.add_event(callback1, std::chrono::seconds(3));
+
+    scope.wait_for(std::chrono::seconds(10));
+
+#if 0
+    PeriodicScheduler scheduler;
+    scheduler.add_event(&callback0, std::chrono::seconds(2));
+    scheduler.add_event(&callback1, std::chrono::seconds(3));
+    while (true){
+        scope.throw_if_cancelled();
+        void* ptr = scheduler.request_next_event();
+        if (ptr != nullptr){
+            cout << current_time() << ": ";
+            (*(std::function<void()>*)ptr)();
+        }
+    }
+#endif
 
 
 

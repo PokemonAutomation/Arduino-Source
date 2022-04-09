@@ -28,8 +28,7 @@ int wait_until(
     InferenceCallback* audio_trigger = nullptr;
     {
         //  The order here is important. BotBaseContext needs to outlive both inference sessions.
-        CancellableHolder<CancellableScope> subscope(*context.scope());
-        BotBaseContext subcontext(subscope, console.botbase());
+        BotBaseContext subcontext(context, console.botbase());
 
         std::unique_ptr<AsyncVisualInferenceSession> visual_session;
         std::unique_ptr<AsyncAudioInferenceSession> audio_session;
@@ -45,7 +44,7 @@ int wait_until(
             case InferenceType::VISUAL:
                 if (visual_session == nullptr){
                     visual_session.reset(new AsyncVisualInferenceSession(
-                        env, console, *context.scope(),
+                        env, console, subcontext,
                         console, console,
                         [&](){ subcontext.cancel_now(); },
                         period
@@ -56,7 +55,7 @@ int wait_until(
             case InferenceType::AUDIO:
                 if (audio_session == nullptr){
                     audio_session.reset(new AsyncAudioInferenceSession(
-                        env, console, *context.scope(),
+                        env, console, subcontext,
                         console,
                         [&](){ subcontext.cancel_now(); },
                         period
@@ -114,8 +113,7 @@ int run_until(
     InferenceCallback* audio_trigger = nullptr;
     {
         //  The order here is important. BotBaseContext needs to outlive both inference sessions.
-        CancellableHolder<CancellableScope> subscope(*context.scope());
-        BotBaseContext subcontext(subscope, console.botbase());
+        BotBaseContext subcontext(context, console.botbase());
 
         std::unique_ptr<AsyncVisualInferenceSession> visual_session;
         std::unique_ptr<AsyncAudioInferenceSession> audio_session;
@@ -131,7 +129,7 @@ int run_until(
             case InferenceType::VISUAL:
                 if (visual_session == nullptr){
                     visual_session.reset(new AsyncVisualInferenceSession(
-                        env, console, *context.scope(),
+                        env, console, subcontext,
                         console, console,
                         [&](){ subcontext.cancel_now(); },
                         period
@@ -142,7 +140,7 @@ int run_until(
             case InferenceType::AUDIO:
                 if (audio_session == nullptr){
                     audio_session.reset(new AsyncAudioInferenceSession(
-                        env, console, *context.scope(),
+                        env, console, subcontext,
                         console,
                         [&](){ subcontext.cancel_now(); },
                         period

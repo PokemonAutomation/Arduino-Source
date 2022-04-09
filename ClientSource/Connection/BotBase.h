@@ -92,7 +92,7 @@ public:
 
     //  Stop all commands in this context now.
     void cancel_now(){
-        CancellableScope::cancel();
+        CancellableScope::cancel(nullptr);
         m_botbase.stop_all_commands();
     }
 
@@ -103,13 +103,13 @@ public:
     //  This cancel is used when you need continuity from an ongoing
     //  sequence.
     void cancel_lazy(){
-        CancellableScope::cancel();
+        CancellableScope::cancel(nullptr);
         m_botbase.next_command_interrupt();
     }
 
 
-    virtual bool cancel() noexcept{
-        if (CancellableScope::cancel()){
+    virtual bool cancel(std::exception_ptr exception) noexcept{
+        if (CancellableScope::cancel(std::move(exception))){
             return true;
         }
         try{
