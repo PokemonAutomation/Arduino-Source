@@ -245,8 +245,8 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
     auto switch_cur_pokemon = [&](){
         cur_move = 0;
         num_turns = 0;
-        next_pokemon_to_switch_to++;
         next_pokemon_to_switch_to = switch_pokemon(env.console, context, next_pokemon_to_switch_to);
+        next_pokemon_to_switch_to++;
         cur_pokemon++;
     };
 
