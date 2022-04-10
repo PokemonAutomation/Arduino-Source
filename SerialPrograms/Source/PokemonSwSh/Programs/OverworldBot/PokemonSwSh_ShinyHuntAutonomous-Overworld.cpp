@@ -152,7 +152,7 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousOverworld::make_stats() const{
 bool ShinyHuntAutonomousOverworld::find_encounter(
     SingleSwitchProgramEnvironment& env, BotBaseContext& context,
     Stats& stats,
-    std::chrono::system_clock::time_point expiration
+    WallClock expiration
 ) const{
     InferenceBoxScope self(
         env.console,
@@ -205,7 +205,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
 
     while (true){
         //  Time expired.
-        if (std::chrono::system_clock::now() > expiration){
+        if (current_time() > expiration){
             return false;
         }
 
@@ -380,7 +380,7 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, 
     );
 
     //  Encounter Loop
-    auto last = std::chrono::system_clock::now();
+    auto last = current_time();
     while (true){
         //  Touch the date.
         if (TIME_ROLLBACK_HOURS > 0 && system_clock(context) - last_touch >= PERIOD){
@@ -392,7 +392,7 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, 
 
 //        cout << "TOLERATE_SYSTEM_UPDATE_MENU_FAST = " << TOLERATE_SYSTEM_UPDATE_MENU_FAST << endl;
 
-        auto now = std::chrono::system_clock::now();
+        auto now = current_time();
         if (now - last > TIMEOUT){
             pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
             reset_game_from_home_with_inference(
@@ -400,7 +400,7 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, 
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
             );
             stats.m_resets++;
-            last = std::chrono::system_clock::now();
+            last = current_time();
             continue;
         }
 
@@ -424,7 +424,7 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, 
             break;
         }
 
-        last = std::chrono::system_clock::now();
+        last = current_time();
     }
 
     send_program_finished_notification(

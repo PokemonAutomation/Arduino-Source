@@ -298,7 +298,7 @@ void goto_camp_from_overworld(
     ShinyDetectedActionOption& options,
     ShinyStatIncrementer& shiny_stat_incrementer
 ){
-    auto start = std::chrono::system_clock::now();
+    auto start = current_time();
     std::chrono::seconds grace_period(0);
     while (true){
         EscapeFromAttack session(
@@ -313,7 +313,7 @@ void goto_camp_from_overworld(
             on_shiny_sound(env, console, context, options, session.shiny_sound_results());
         }
 
-        if (std::chrono::system_clock::now() - start > std::chrono::seconds(60)){
+        if (current_time() - start > std::chrono::seconds(60)){
             dump_image(console.logger(), env.program_info(), "EscapeFromAttack", console.video().snapshot());
             throw OperationFailedException(console, "Unable to escape from being attacked.");
         }

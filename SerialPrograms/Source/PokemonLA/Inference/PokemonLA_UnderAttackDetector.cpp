@@ -35,16 +35,13 @@ UnderAttackWatcher::UnderAttackWatcher(LoggerQt& logger)
 void UnderAttackWatcher::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_CYAN, m_box);
 }
-bool UnderAttackWatcher::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool UnderAttackWatcher::process_frame(const QImage& frame, WallClock timestamp){
     UnderAttackState state = detect(frame);
 
 //    SpinLockGuard lg(m_lock);
 
     //  Clear out old history.
-    std::chrono::system_clock::time_point threshold = timestamp - std::chrono::seconds(1);
+    WallClock threshold = timestamp - std::chrono::seconds(1);
     while (!m_history.empty()){
         Sample& sample = m_history.front();
         if (m_history.front().timestamp >= threshold){

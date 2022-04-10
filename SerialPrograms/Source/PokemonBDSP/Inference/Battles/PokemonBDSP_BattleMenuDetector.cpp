@@ -193,10 +193,7 @@ BattleMenuWatcher::BattleMenuWatcher(BattleType battle_type, Color color)
 void BattleMenuWatcher::make_overlays(VideoOverlaySet& items) const{
     BattleMenuDetector::make_overlays(items);
 }
-bool BattleMenuWatcher::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool BattleMenuWatcher::process_frame(const QImage& frame, WallClock timestamp){
     //  Need 5 consecutive successful detections.
     if (!detect(frame)){
         m_trigger_count = 0;

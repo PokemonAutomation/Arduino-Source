@@ -8,6 +8,7 @@
 #define PokemonAutomation_CommonFramework_AudioInferenceSession_H
 
 #include <map>
+#include "Common/Cpp/Time.h"
 #include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "Common/Cpp/CancellableScope.h"
@@ -33,7 +34,7 @@ public:
 
     //  Run the session. This will not return until the session is stopped.
     AudioInferenceCallback* run(std::chrono::milliseconds timeout = std::chrono::milliseconds(0));
-    AudioInferenceCallback* run(std::chrono::system_clock::time_point stop);
+    AudioInferenceCallback* run(WallClock stop);
 
     virtual bool cancel(std::exception_ptr exception) noexcept override;
 

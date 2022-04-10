@@ -102,17 +102,15 @@ void VisualInferenceSession::operator-=(VisualInferenceCallback& callback){
 }
 
 VisualInferenceCallback* VisualInferenceSession::run(std::chrono::milliseconds timeout){
-    auto now = std::chrono::system_clock::now();
+    auto now = current_time();
     auto wait_until = now + m_period;
     auto stop_time = timeout == std::chrono::milliseconds(0)
-        ? std::chrono::system_clock::time_point::max()
+        ? WallClock::max()
         : wait_until + timeout;
     return run(stop_time);
 }
-VisualInferenceCallback* VisualInferenceSession::run(std::chrono::system_clock::time_point stop){
-    using WallClock = std::chrono::system_clock::time_point;
-
-    WallClock now = std::chrono::system_clock::now();
+VisualInferenceCallback* VisualInferenceSession::run(WallClock stop){
+    WallClock now = current_time();
     auto next_tick = now + m_period;
 
     while (true){
@@ -120,23 +118,24 @@ VisualInferenceCallback* VisualInferenceSession::run(std::chrono::system_clock::
             return nullptr;
         }
 
-        WallClock time0_snapshot = std::chrono::system_clock::now();
-        QImage screen = m_feed.snapshot();
-        WallClock time1_snapshot = std::chrono::system_clock::now();
+        WallClock time0_snapshot = current_time();
+        WallClock timestamp;
+        QImage screen = m_feed.snapshot(&timestamp);
+        WallClock time1_snapshot = current_time();
         m_stats_snapshot += std::chrono::duration_cast<std::chrono::microseconds>(time1_snapshot - time0_snapshot).count();
 
         std::unique_lock<std::mutex> lg(m_lock);
         for (Callback* callback : m_callback_list){
-            WallClock time0 = std::chrono::system_clock::now();
-            bool done = callback->callback->process_frame(screen, time1_snapshot);
-            WallClock time1 = std::chrono::system_clock::now();
+            WallClock time0 = current_time();
+            bool done = callback->callback->process_frame(screen, timestamp);
+            WallClock time1 = current_time();
             callback->stats += std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count();
             if (done){
                 return callback->callback;
             }
         }
 
-        now = std::chrono::system_clock::now();
+        now = current_time();
         if (now >= stop){
             return nullptr;
         }

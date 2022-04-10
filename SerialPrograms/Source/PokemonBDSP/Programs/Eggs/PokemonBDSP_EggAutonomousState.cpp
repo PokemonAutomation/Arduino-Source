@@ -67,10 +67,7 @@ public:
         items.add(m_color, m_box0);
         items.add(m_color, m_box1);
     }
-    virtual bool process_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-    ) override{
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) override{
         ImageStats stats0 = image_stats(extract_box_reference(frame, m_box0));
         ImageStats stats1 = image_stats(extract_box_reference(frame, m_box1));
         if (!is_solid(stats0, {0.22951, 0.340853, 0.429638}, 0.15, 20)){

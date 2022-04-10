@@ -40,10 +40,7 @@ void ShinyEncounterTracker::make_overlays(VideoOverlaySet& items) const{
     m_dialog_tracker.make_overlays(items);
     m_sparkle_tracker.make_overlays(items);
 }
-bool ShinyEncounterTracker::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool ShinyEncounterTracker::process_frame(const QImage& frame, WallClock timestamp){
     bool battle_menu = m_battle_menu.process_frame(frame, timestamp);
     if (battle_menu){
         m_dialog_tracker.push_end(timestamp);

@@ -99,7 +99,14 @@ VisualInferencePivot::~VisualInferencePivot(){
     detach();
 }
 void VisualInferencePivot::run(void* event){
+#if 0
+    PeriodicCallback& callback = *(PeriodicCallback*)event;
+    try{
+        callback.callback.process_frame();
+    }catch (...){
 
+    }
+#endif
 }
 
 
@@ -121,7 +128,6 @@ private:
     void thread_loop();
 
 private:
-    using WallClock = std::chrono::system_clock::time_point;
 
     VideoFeed& m_video;
     AsyncDispatcher& m_dispatcher;
@@ -160,7 +166,7 @@ void VisualInferencePivot::thread_loop(){
         }
 
         std::unique_lock<std::mutex> lg(m_lock);
-        WallClock now = std::chrono::system_clock::now();
+        WallClock now = current_time();
         void* ptr = m_scheduler.request_next_event(now);
         if (ptr == nullptr){
             WallClock next = m_scheduler.next_event();
@@ -172,7 +178,7 @@ void VisualInferencePivot::thread_loop(){
             continue;
         }
 
-        now = std::chrono::system_clock::now();
+        now = current_time();
         QImage frame = m_video.snapshot();
         ((VisualInferenceCallback*)ptr)->process_frame(frame, now);
 
@@ -252,7 +258,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    QImage image("screenshot-20220327-190703102304.png");
     QImage image = feed.snapshot();
     ArcPhoneDetector detector(console, console, std::chrono::milliseconds(0), true);
-    detector.process_frame(image, std::chrono::system_clock::now());
+    detector.process_frame(image, current_time());
 #endif
 
 
@@ -279,7 +285,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     QImage image("ArcPhoneTriggered-2.png");
 
     ArcPhoneDetector detector(console, console, std::chrono::milliseconds(0), true);
-    cout << detector.process_frame(image, std::chrono::system_clock::now()) << endl;
+    cout << detector.process_frame(image, current_time()) << endl;
 #endif
 
 
@@ -292,7 +298,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     AsyncVisualInferenceSession visual(env, console, console, console);
     visual += tracker;
-//    tracker.process_frame(feed.snapshot(), std::chrono::system_clock::now());
+//    tracker.process_frame(feed.snapshot(), current_time());
 #endif
 
 
@@ -302,15 +308,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    QImage src("20220315-054734853907.jpg");
     QImage src("20220315-055335301551.jpg");
-    auto start = std::chrono::system_clock::now();
+    auto start = current_time();
     uint64_t c = 0;
-    while (std::chrono::system_clock::now() - start < std::chrono::seconds(10)){
-        tracker.process_frame(src, std::chrono::system_clock::now());
+    while (current_time() - start < std::chrono::seconds(10)){
+        tracker.process_frame(src, current_time());
         env.check_stopping();
         c++;
 //        break;
     }
-    auto elapsed = std::chrono::system_clock::now() - start;
+    auto elapsed = current_time() - start;
     auto micros = std::chrono::duration_cast<std::chrono::microseconds>(elapsed);
     cout << "iterations/sec = " << (double)c / micros.count() * 1000000 << endl;
 #endif
@@ -346,7 +352,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     QImage image("ArcPhoneTriggered-31.png");
 //    QImage image("screenshot-20220308-225539293411.png");
     ArcPhoneDetector detector(console, console, std::chrono::milliseconds(0), true);
-    detector.process_frame(image, std::chrono::system_clock::now());
+    detector.process_frame(image, current_time());
 #endif
 
 
@@ -428,7 +434,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     QImage frame = feed.snapshot();
 
     FlagTracker tracker(console, console);
-    tracker.process_frame(frame, std::chrono::system_clock::now());
+    tracker.process_frame(frame, current_time());
 
     double distance, flag_x, flag_y;
     tracker.get(distance, flag_x, flag_y);
@@ -490,7 +496,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //        QImage image("screenshot-20220306-172029164014.png");
 
         DialogSurpriseDetector detector(logger, overlay, true);
-        detector.process_frame(image, std::chrono::system_clock::now());
+        detector.process_frame(image, current_time());
     }
 #endif
 #if 0
@@ -498,13 +504,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         QImage image("screenshot-20220302-094034596712.png");
 
         DialogDetector detector(logger, overlay, true);
-        detector.process_frame(image, std::chrono::system_clock::now());
+        detector.process_frame(image, current_time());
     }
     {
         QImage image("screenshot-Gin");
 
         DialogDetector detector(logger, overlay, true);
-        detector.process_frame(image, std::chrono::system_clock::now());
+        detector.process_frame(image, current_time());
     }
 #endif
 
@@ -570,7 +576,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet set(overlay);
     DialogDetector detector(console, console);
     detector.make_overlays(set);
-    detector.process_frame(feed.snapshot(), std::chrono::system_clock::now());
+    detector.process_frame(feed.snapshot(), current_time());
 #endif
 
 
@@ -581,7 +587,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     QImage image = extract_box(feed.snapshot(), box0);
 
     ArcPhoneDetector detector(console, console, std::chrono::milliseconds(200), true);
-    detector.process_frame(image, std::chrono::system_clock::now());
+    detector.process_frame(image, current_time());
     wait_until(
         env, console, std::chrono::seconds(10),
         { &detector }
@@ -619,7 +625,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
     detector.make_overlays(overlays);
 
-    detector.process_frame(feed.snapshot(), std::chrono::system_clock::now());
+    detector.process_frame(feed.snapshot(), current_time());
 #endif
 
 
@@ -705,7 +711,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    CenterAButtonTracker tracker;
 //    WhiteObjectWatcher detector(console, {0.40, 0.50, 0.40, 0.50}, {{tracker, false}});
 
-//    detector.process_frame(image, std::chrono::system_clock::now());
+//    detector.process_frame(image, current_time());
 
     ButtonDetector detector(console, console, ButtonType::ButtonA, {0.40, 0.50, 0.40, 0.50});
 
@@ -720,7 +726,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    InferenceBoxScope box(overlay, 0.40, 0.50, 0.40, 0.50);
 
 
-//    cout << std::chrono::system_clock::time_point::min() - std::chrono::system_clock::now() << endl;
+//    cout << WallClock::min() - current_time() << endl;
 
 //    pbf_move_right_joystick(context, 0, 128, 45, 0);
 
@@ -782,7 +788,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         overlay,
         {{bubbles, false}, {arcs, false}, {quest_marks, false}}
     );
-//    watcher.process_frame(feed.snapshot(), std::chrono::system_clock::now());
+//    watcher.process_frame(feed.snapshot(), current_time());
 #if 1
     {
         VisualInferenceSession session(env, logger, feed, overlay);
@@ -825,7 +831,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 //    ShinySymbolWatcher watcher(overlay, SHINY_SYMBOL_BOX_BOTTOM);
-//    watcher.process_frame(feed.snapshot(), std::chrono::system_clock::now());
+//    watcher.process_frame(feed.snapshot(), current_time());
 
 
 //    ArcDetector detector;

@@ -306,7 +306,7 @@ void TenacityCandyFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     //     QImage image("./PLA_test_data/ingoBattle/broken_dialogue_detector.png");
     //     const bool stop_on_detected = true;
     //     NormalDialogDetector detector(env.console, env.console, stop_on_detected);
-    //     bool detected = detector.process_frame(image, std::chrono::system_clock::now());
+    //     bool detected = detector.process_frame(image, current_time());
     //     std::cout << "detector " << detected << std::endl;
     //     return;
     // }

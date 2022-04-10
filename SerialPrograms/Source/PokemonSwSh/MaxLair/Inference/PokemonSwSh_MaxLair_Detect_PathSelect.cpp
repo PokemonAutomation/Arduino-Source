@@ -82,10 +82,7 @@ bool PathScreenDetector::detect(const QImage& screen) const{
     }
     return true;
 }
-bool PathScreenDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool PathScreenDetector::process_frame(const QImage& frame, WallClock timestamp){
     bool ret = detect(frame);
 //    global_logger().log(std::to_string(ret));
     return ret;
@@ -152,10 +149,7 @@ bool PathSelectDetector::detect(const QImage& screen) const{
 //    }
     return true;
 }
-bool PathSelectDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool PathSelectDetector::process_frame(const QImage& frame, WallClock timestamp){
     bool ret = detect(frame);
 //    global_logger().log(std::to_string(ret));
     return ret;

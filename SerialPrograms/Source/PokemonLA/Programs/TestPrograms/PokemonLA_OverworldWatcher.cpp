@@ -55,7 +55,7 @@ void OverworldWatcher::program(SingleSwitchProgramEnvironment& env, BotBaseConte
     );
 
 #if 0
-    watcher.process_frame(env.console.video().snapshot(), std::chrono::system_clock::now());
+    watcher.process_frame(env.console.video().snapshot(), current_time());
 #else
     {
         VisualInferenceSession session(env.console, context, env.console, env.console);

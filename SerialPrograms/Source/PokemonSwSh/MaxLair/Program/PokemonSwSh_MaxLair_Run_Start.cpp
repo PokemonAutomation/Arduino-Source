@@ -75,7 +75,7 @@ class AllJoinedTracker final : public Cancellable{
 public:
     AllJoinedTracker(
         CancellableScope& scope, size_t consoles,
-        std::chrono::system_clock::time_point time_limit
+        WallClock time_limit
     )
         : m_time_limit(time_limit)
         , m_consoles(consoles)
@@ -98,7 +98,7 @@ public:
             if (m_counter >= m_consoles){
                 return true;
             }
-            if (std::chrono::system_clock::now() > m_time_limit){
+            if (current_time() > m_time_limit){
                 return false;
             }
         }
@@ -117,7 +117,7 @@ private:
     std::mutex m_lock;
     std::condition_variable m_cv;
 
-    std::chrono::system_clock::time_point m_time_limit;
+    WallClock m_time_limit;
     size_t m_consoles;
     size_t m_counter;
 };
@@ -199,7 +199,7 @@ bool start_raid_local(
         pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
     });
 
-    auto time_limit = std::chrono::system_clock::now() +
+    auto time_limit = current_time() +
         std::chrono::milliseconds(settings.LOBBY_WAIT_DELAY * 1000 / TICKS_PER_SECOND);
 
     AllJoinedTracker joined_tracker(scope, env.consoles.size(), time_limit);
@@ -360,7 +360,7 @@ bool start_raid_host(
         pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
     });
 
-    auto time_limit = std::chrono::system_clock::now() +
+    auto time_limit = current_time() +
         std::chrono::milliseconds(settings.LOBBY_WAIT_DELAY * 1000 / TICKS_PER_SECOND);
 
     AllJoinedTracker joined_tracker(scope, env.consoles.size(), time_limit);

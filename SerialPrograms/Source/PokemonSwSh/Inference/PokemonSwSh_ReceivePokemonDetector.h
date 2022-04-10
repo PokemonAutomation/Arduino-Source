@@ -27,10 +27,7 @@ public:
     bool receive_is_over(const QImage& frame);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-   ) override;
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
 
 private:
     ImageFloatBox m_box_top;

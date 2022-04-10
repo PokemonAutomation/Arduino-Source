@@ -79,14 +79,14 @@ public:
             m_idle.pop_back();
         }while (false);
 
-//        auto start = std::chrono::system_clock::now();
+//        auto start = current_time();
         TesseractString str = instance->read32(
             (const unsigned char*)image.data(),
             image.width(),
             image.height(),
             image.bytes_per_row()
         );
-//        auto end = std::chrono::system_clock::now();
+//        auto end = current_time();
 //        cout << std::chrono::duration_cast<std::chrono::milliseconds>(end - start).count() << endl;
 
         {

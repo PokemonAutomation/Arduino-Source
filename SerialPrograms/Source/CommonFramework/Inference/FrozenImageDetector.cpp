@@ -35,10 +35,7 @@ FrozenImageDetector::FrozenImageDetector(
 void FrozenImageDetector::make_overlays(VideoOverlaySet& set) const{
     set.add(m_color, m_box);
 }
-bool FrozenImageDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool FrozenImageDetector::process_frame(const QImage& frame, WallClock timestamp){
     QImage image = extract_box_copy(frame, m_box);
     if (m_last_delta.size() != image.size()){
         m_timestamp = timestamp;

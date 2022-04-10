@@ -22,8 +22,8 @@ EscapeFromAttack::EscapeFromAttack(
     bool stop_on_shiny
 )
     : SuperControlSession(env, console, context)
-    , m_min_stop(std::chrono::system_clock::now() + time_min)
-    , m_deadline(std::chrono::system_clock::now() + time_limit)
+    , m_min_stop(current_time() + time_min)
+    , m_deadline(current_time() + time_limit)
     , m_stop_on_shiny(stop_on_shiny)
     , m_attacked(console)
     , m_mount(console)
@@ -104,7 +104,7 @@ EscapeFromAttack::EscapeFromAttack(
     });
     register_state_command(State::DASH_FORWARD, [=](){
         bool delay_dash =
-            std::chrono::system_clock::now() < m_get_on_sneasler_time + GET_ON_BRAVIARY_TIME_MILLIS;
+            current_time() < m_get_on_sneasler_time + GET_ON_BRAVIARY_TIME_MILLIS;
         if (delay_dash){
             m_console.log("Dashing forward... (delayed due to being on Sneasler)");
         }else{
@@ -123,7 +123,7 @@ EscapeFromAttack::EscapeFromAttack(
         m_active_command->dispatch([=](BotBaseContext& context){
             pbf_press_button(context, BUTTON_A, 20, 230);
         });
-        m_get_on_sneasler_time = std::chrono::system_clock::now();
+        m_get_on_sneasler_time = current_time();
         return false;
     });
     register_state_command(State::CLIMBING, [=](){

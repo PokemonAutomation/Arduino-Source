@@ -38,10 +38,7 @@ void BattleMoveSelectionDetector::make_overlays(VideoOverlaySet& items) const{
 
 
 
-bool BattleMoveSelectionDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool BattleMoveSelectionDetector::process_frame(const QImage& frame, WallClock timestamp){
     size_t highlighted = 0;
 
     const ImageStats move_1 = image_stats(extract_box_reference(frame, m_move_1_highlight));

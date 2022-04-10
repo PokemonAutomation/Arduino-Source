@@ -13,6 +13,7 @@
 #include <map>
 #include <mutex>
 #include <condition_variable>
+#include "Time.h"
 #include "AsyncDispatcher.h"
 #include "CancellableScope.h"
 
@@ -24,10 +25,9 @@ namespace PokemonAutomation{
 //  and determines what event should be fired next and when.
 //
 class PeriodicScheduler{
-    using WallClock = std::chrono::system_clock::time_point;
 public:
     //  Returns true if event was successfully added.
-    bool add_event(void* event, std::chrono::milliseconds period, WallClock start = std::chrono::system_clock::now());
+    bool add_event(void* event, std::chrono::milliseconds period, WallClock start = current_time());
     void remove_event(void* event);
 
     //  Returns the next scheduled event. If no events are scheduled, returns WallClock::max().
@@ -35,7 +35,7 @@ public:
 
     //  If an event is before the current timestamp, return it and reschedule for next period.
     //  If nothing is before the current timestamp, return nullptr.
-    void* request_next_event(WallClock timestamp = std::chrono::system_clock::now());
+    void* request_next_event(WallClock timestamp = current_time());
 
 private:
     //  "id" is needed to solve ABA problem if the same pointer is removed/re-added.
@@ -63,13 +63,12 @@ private:
 //  Adding and removing callbacks is thread-safe.
 //
 class PeriodicRunner : public Cancellable{
-    using WallClock = std::chrono::system_clock::time_point;
 public:
     virtual bool cancel(std::exception_ptr exception) noexcept override;
 
 protected:
     PeriodicRunner(AsyncDispatcher& dispatcher);
-    bool add_event(void* event, std::chrono::milliseconds period, WallClock start = std::chrono::system_clock::now());
+    bool add_event(void* event, std::chrono::milliseconds period, WallClock start = current_time());
     void remove_event(void* event);
     virtual void run(void* event) = 0;
 

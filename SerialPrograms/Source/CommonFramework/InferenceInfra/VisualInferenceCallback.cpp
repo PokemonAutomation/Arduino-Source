@@ -22,7 +22,7 @@ void VisualInferenceCallbackWithCommandStop::register_command_stop(Interruptable
 
 bool VisualInferenceCallbackWithCommandStop::process_frame(
     const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
+    WallClock timestamp
 ){
     if (!on_frame(frame, timestamp)){
         return false;

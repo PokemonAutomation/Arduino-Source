@@ -39,7 +39,7 @@ size_t switch_pokemon(ConsoleHandle& console, BotBaseContext& context, size_t po
         const bool stop_on_detected = true;
         BattlePokemonSwitchDetector switch_detector(console, console, stop_on_detected);
         QImage screen = console.video().snapshot();
-        if (switch_detector.process_frame(screen, std::chrono::system_clock::now()) == false){
+        if (switch_detector.process_frame(screen, current_time()) == false){
             // No longer at the switching pokemon screen
             break;
         }

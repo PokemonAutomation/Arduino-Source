@@ -44,10 +44,7 @@ bool ProfessorSwapDetector::detect(const QImage& screen){
     }
     return SelectionArrowFinder::detect(screen);
 }
-bool ProfessorSwapDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool ProfessorSwapDetector::process_frame(const QImage& frame, WallClock timestamp){
     return detect(frame);
 }
 

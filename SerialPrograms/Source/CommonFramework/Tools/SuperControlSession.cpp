@@ -34,7 +34,7 @@ SuperControlSession::SuperControlSession(
     , m_visual_period(visual_period)
     , m_audio_period(audio_period)
     , m_last_state(0)
-    , m_last_state_change(std::chrono::system_clock::now())
+    , m_last_state_change(current_time())
 {}
 
 void SuperControlSession::operator+=(VisualInferenceCallback& callback){
@@ -68,12 +68,12 @@ bool SuperControlSession::run_state_action(size_t state){
 
     //  Run the state.
     m_last_state = state;
-    m_last_state_change = std::chrono::system_clock::now();
+    m_last_state_change = current_time();
     return iter->second();
 }
 
 void SuperControlSession::run_session(){
-    m_start_time = std::chrono::system_clock::now();
+    m_start_time = current_time();
 
     std::unique_ptr<AsyncVisualInferenceSession> visual;
     if (!m_visual_callbacks.empty()){
@@ -98,7 +98,7 @@ void SuperControlSession::run_session(){
         )
     );
 
-    WallClock now = std::chrono::system_clock::now();
+    WallClock now = current_time();
     WallClock next_tick = now + m_state_period;
 
     m_last_state = 0;
@@ -113,11 +113,11 @@ void SuperControlSession::run_session(){
             audio->rethrow_exceptions();
         }
 
-        if (run_state(*m_active_command, std::chrono::system_clock::now())){
+        if (run_state(*m_active_command, current_time())){
             break;
         }
 
-        now = std::chrono::system_clock::now();
+        now = current_time();
         if (now >= next_tick){
             next_tick = now + m_state_period;
         }else{

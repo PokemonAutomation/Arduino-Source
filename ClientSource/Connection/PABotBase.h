@@ -96,14 +96,14 @@ private:
         bool silent_remove;
         BotBaseMessage request;
         BotBaseMessage ack;
-        std::chrono::system_clock::time_point first_sent;
+        WallClock first_sent;
     };
     struct PendingCommand{
         AckState state = AckState::NOT_ACKED;
         bool silent_remove;
         BotBaseMessage request;
         BotBaseMessage ack;
-        std::chrono::system_clock::time_point first_sent;
+        WallClock first_sent;
     };
 
     template <typename Map>

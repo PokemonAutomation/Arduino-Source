@@ -41,7 +41,7 @@ public:
     std::vector<QSize> resolutions() const;
     void set_resolution(const QSize& resolution);
 
-    QImage snapshot();
+    QImage snapshot(WallClock* timestamp = nullptr);
 
 private:
     virtual void add_box(const ImageFloatBox& box, Color color) override;

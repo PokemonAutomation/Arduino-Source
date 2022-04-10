@@ -39,7 +39,7 @@ public:
     virtual void set_resolution(const QSize& size) override;
 
     //  Cannot call from UI thread or it will deadlock.
-    virtual QImage snapshot() override;
+    virtual QImage snapshot(WallClock* timestamp) override;
 
     virtual void resizeEvent(QResizeEvent* event) override;
 private:
@@ -53,6 +53,7 @@ private:
     QMediaCaptureSession m_captureSession;
     QVideoSink* m_videoSink = nullptr;
     QVideoFrame m_videoFrame;
+    WallClock m_videoTimestamp;
     std::vector<QCameraFormat> m_formats;
 
     mutable std::mutex m_lock;
@@ -61,7 +62,8 @@ private:
     std::atomic<uint64_t> m_seqnum_frame;
 //    uint64_t m_seqnum_frame;
     uint64_t m_seqnum_image = 0;
-    QImage m_last_image;
+    QImage m_cached_frame;
+    WallClock m_cached_timestamp;
 };
 
 

@@ -24,7 +24,7 @@ EncounterDialogTracker::EncounterDialogTracker(
     : VisualInferenceCallback("EncounterDialogTracker")
     , m_logger(logger)
     , m_dialog_detector(dialog_detector)
-    , m_end_dialog(std::chrono::system_clock::now())
+    , m_end_dialog(current_time())
     , m_dialog_on(false)
     , m_state(EncounterState::BEFORE_ANYTHING)
     , m_wild_animation_duration(0)
@@ -34,7 +34,7 @@ EncounterDialogTracker::EncounterDialogTracker(
 void EncounterDialogTracker::make_overlays(VideoOverlaySet& items) const{
     m_dialog_detector.make_overlays(items);
 }
-bool EncounterDialogTracker::process_frame(const QImage& screen, std::chrono::system_clock::time_point timestamp){
+bool EncounterDialogTracker::process_frame(const QImage& screen, WallClock timestamp){
     bool dialog_on = m_dialog_detector.detect(screen);
 //    cout << dialog_on << endl;
     if (dialog_on == m_dialog_on){
@@ -76,7 +76,7 @@ bool EncounterDialogTracker::process_frame(const QImage& screen, std::chrono::sy
     }
     return false;
 }
-void EncounterDialogTracker::push_end(std::chrono::system_clock::time_point timestamp){
+void EncounterDialogTracker::push_end(WallClock timestamp){
     std::chrono::milliseconds gap_duration = std::chrono::duration_cast<std::chrono::milliseconds>(timestamp - m_end_dialog);
     m_logger.log(
         "DialogTracker: End " +

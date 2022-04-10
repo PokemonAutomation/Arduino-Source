@@ -9,6 +9,7 @@
 
 #include <vector>
 #include <QWidget>
+#include "Common/Cpp/Time.h"
 
 class QImage;
 
@@ -30,7 +31,10 @@ public:
     //  and all the functions above and should cache the image if there has been
     //  no new frames since the previous call.
     //  This function will never be called on the UI thread.
-    virtual QImage snapshot() = 0;
+    //
+    //  If "timestamp" is not null, it will be set to the best known timestamp
+    //  of the screenshot that is returned.
+    virtual QImage snapshot(WallClock* timestamp = nullptr) = 0;
 };
 
 

@@ -84,8 +84,10 @@ Qt6VideoWidget::Qt6VideoWidget(
 
     connect(m_videoSink, &QVideoSink::videoFrameChanged, this, [&](const QVideoFrame& frame){
         {
+            auto timestamp = current_time();
             SpinLockGuard lg(m_frame_lock);
             m_videoFrame = frame;
+            m_videoTimestamp = timestamp;
             uint64_t seqnum = m_seqnum_frame.load(std::memory_order_acquire);
             m_seqnum_frame.store(seqnum + 1, std::memory_order_release);
 //            m_seqnum_frame++;
@@ -159,41 +161,53 @@ void Qt6VideoWidget::set_resolution(const QSize& size){
     }
 }
 
-QImage Qt6VideoWidget::snapshot(){
+QImage Qt6VideoWidget::snapshot(WallClock* timestamp){
     //  Prevent multiple concurrent screenshots from entering here.
     std::lock_guard<std::mutex> lg(m_image_lock);
 
     //  Image is already cached and not stale. Return it.
     uint64_t seqnum = m_seqnum_frame.load(std::memory_order_acquire);
-    if (m_seqnum_image == seqnum && !m_last_image.isNull()){
-        return m_last_image;
+    if (m_seqnum_image == seqnum && !m_cached_frame.isNull()){
+        if (timestamp){
+            timestamp[0] = m_cached_timestamp;
+        }
+        return m_cached_frame;
     }
 
     //  Need to update image. Grab the current frame.
     QVideoFrame frame;
+    WallClock tick;
     {
         SpinLockGuard lg1(m_frame_lock);
         frame = m_videoFrame;   // Fast due to ref-count.
+        tick = m_videoTimestamp;
     }
 
     //  Now make the image.
     if (!frame.isValid()){
+        if (timestamp){
+            timestamp[0] = current_time();
+        }
         return QImage();
     }
 
-    // auto time1 = std::chrono::system_clock::now();
+    // auto time1 = current_time();
     //  Convert image and cache it.
-    m_last_image = frame.toImage();
-    // auto time2 = std::chrono::system_clock::now();
+    QImage image = frame.toImage();
+    // auto time2 = current_time();
     // std::chrono::duration<double> elapsed_seconds = time2 - time1;
     // std::cout << "snapshot image conversion time " << elapsed_seconds.count() << "s" << std::endl;
     // std::cout << "QVideoFrame pixel format " << int(frame.pixelFormat()) << std::endl;
-    QImage::Format format = m_last_image.format();
+    QImage::Format format = image.format();
     if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
-        m_last_image = m_last_image.convertToFormat(QImage::Format_ARGB32);
+        image = image.convertToFormat(QImage::Format_ARGB32);
     }
     m_seqnum_image = seqnum;
-    return m_last_image;
+    m_cached_frame = std::move(frame);
+    if (timestamp){
+        timestamp[0] = m_cached_timestamp;
+    }
+    return m_cached_frame;
 }
 
 

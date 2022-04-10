@@ -33,7 +33,7 @@ AlphaRoarDetector::AlphaRoarDetector(ConsoleHandle& console, bool stop_on_detect
     , m_console(console)
     , m_stop_on_detected(stop_on_detected)
     , m_detected(false)
-    , m_time_detected(std::chrono::system_clock::time_point::min())
+    , m_time_detected(WallClock::min())
     , m_error_coefficient(1.0)
 {}
 void AlphaRoarDetector::log_results(){
@@ -62,7 +62,7 @@ bool AlphaRoarDetector::process_spectrums(
         return false;
     }
 
-    std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+    WallClock now = current_time();
 
     size_t sampleRate = newSpectrums[0].sample_rate;
     if (m_matcher == nullptr || m_matcher->sampleRate() != sampleRate){

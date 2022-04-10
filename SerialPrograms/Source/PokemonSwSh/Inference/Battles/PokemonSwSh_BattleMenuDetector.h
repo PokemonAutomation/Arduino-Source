@@ -48,10 +48,7 @@ public:
     StandardBattleMenuWatcher(bool den, Color color = COLOR_RED);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-    ) override final;
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) override final;
 
 private:
     size_t m_trigger_count = 0;

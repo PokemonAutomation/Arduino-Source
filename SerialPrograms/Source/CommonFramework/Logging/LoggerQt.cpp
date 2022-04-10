@@ -27,7 +27,7 @@ void TaggedLogger::log(const char* msg, Color color){
 }
 void TaggedLogger::log(const std::string& msg, Color color){
     std::string str =
-        current_time() +
+        current_time_to_str() +
         " - [" + m_tag + "]: " +
         msg;
     m_logger.log(str, color);

@@ -47,10 +47,7 @@ bool YCommMenuDetector::detect(const QImage& screen){
     return true;
 }
 
-bool YCommMenuDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool YCommMenuDetector::process_frame(const QImage& frame, WallClock timestamp){
     return m_is_on ? detect(frame) : !detect(frame);
 }
 

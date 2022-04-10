@@ -39,16 +39,13 @@ public:
     std::chrono::milliseconds your_animation_duration() const{ return m_your_animation_duration; }
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(
-        const QImage& screen,
-        std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now()
-    ) override;
-    void push_end(std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now());
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
+    void push_end(WallClock timestamp = current_time());
 
 private:
     LoggerQt& m_logger;
     StaticScreenDetector& m_dialog_detector;
-    std::chrono::system_clock::time_point m_end_dialog;
+    WallClock m_end_dialog;
     bool m_dialog_on;
 
     EncounterState m_state;

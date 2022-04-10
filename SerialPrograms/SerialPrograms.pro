@@ -82,6 +82,7 @@ SOURCES += \
     ../Common/Cpp/PeriodicScheduler.cpp \
     ../Common/Cpp/PrettyPrint.cpp \
     ../Common/Cpp/SpinLock.cpp \
+    ../Common/Cpp/Time.cpp \
     ../Common/Cpp/Unicode.cpp \
     ../Common/Microcontroller/DeviceRoutines.cpp \
     ../Common/NintendoSwitch/NintendoSwitch_Tools.cpp \
@@ -682,6 +683,7 @@ HEADERS += \
     ../Common/Cpp/PrettyPrint.h \
     ../Common/Cpp/SIMDDebuggers.h \
     ../Common/Cpp/SpinLock.h \
+    ../Common/Cpp/Time.h \
     ../Common/Cpp/Unicode.h \
     ../Common/Microcontroller/DeviceRoutines.h \
     ../Common/Microcontroller/MessageProtocol.h \

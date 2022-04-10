@@ -48,7 +48,7 @@ void TouchDateIntervalOption::restore_defaults(){
     m_hours.restore_defaults();
 };
 void TouchDateIntervalOption::reset_state(){
-    m_last_touch = std::chrono::system_clock::time_point::min();
+    m_last_touch = WallClock::min();
 }
 ConfigWidget* TouchDateIntervalOption::make_ui(QWidget& parent){
     return m_hours.make_ui(parent);
@@ -60,7 +60,7 @@ bool TouchDateIntervalOption::ok_to_touch_now(){
     if (hours == 0){
         return false;
     }
-    auto now = std::chrono::system_clock::now();
+    auto now = current_time();
     if (now < m_last_touch + std::chrono::hours(hours)){
         return false;
     }

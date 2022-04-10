@@ -96,17 +96,15 @@ void AudioInferenceSession::operator-=(AudioInferenceCallback& callback){
 }
 
 AudioInferenceCallback* AudioInferenceSession::run(std::chrono::milliseconds timeout){
-    auto now = std::chrono::system_clock::now();
+    auto now = current_time();
     auto wait_until = now + m_period;
     auto stop_time = timeout == std::chrono::milliseconds(0)
-        ? std::chrono::system_clock::time_point::max()
+        ? WallClock::max()
         : wait_until + timeout;
     return run(stop_time);
 }
-AudioInferenceCallback* AudioInferenceSession::run(std::chrono::system_clock::time_point stop){
-    using WallClock = std::chrono::system_clock::time_point;
-
-    auto now = std::chrono::system_clock::now();
+AudioInferenceCallback* AudioInferenceSession::run(WallClock stop){
+    auto now = current_time();
     auto next_tick = now + m_period;
 
     uint64_t lastTimestamp = ~(uint64_t)0;
@@ -134,16 +132,16 @@ AudioInferenceCallback* AudioInferenceSession::run(std::chrono::system_clock::ti
         std::unique_lock<std::mutex> lg(m_lock);
         for (Callback* callback : m_callback_list){
 //            std::cout << "Run callback on spectrums " << spectrums.size() << std::endl;
-            WallClock time0 = std::chrono::system_clock::now();
+            WallClock time0 = current_time();
             bool done = callback->callback->process_spectrums(spectrums, m_feed);
-            WallClock time1 = std::chrono::system_clock::now();
+            WallClock time1 = current_time();
             callback->stats += std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count();
             if (done){
                 return callback->callback;
             }
         }
 
-        now = std::chrono::system_clock::now();
+        now = current_time();
         if (now >= stop){
             return nullptr;
         }

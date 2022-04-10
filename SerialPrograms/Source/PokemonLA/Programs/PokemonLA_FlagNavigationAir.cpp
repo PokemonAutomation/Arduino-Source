@@ -161,7 +161,7 @@ FlagNavigationAir::FlagNavigationAir(
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
                 context.wait_for_all_requests();
-                m_looking_straight_ahead_timestamp.store(std::chrono::system_clock::now());
+                m_looking_straight_ahead_timestamp.store(current_time());
                 m_looking_straight_ahead.store(true, std::memory_order_release);
 //                cout << "State::DASH_FORWARD: m_looking_straight_ahead = true" << endl;
             }
@@ -176,7 +176,7 @@ FlagNavigationAir::FlagNavigationAir(
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
                 context.wait_for_all_requests();
-                m_looking_straight_ahead_timestamp.store(std::chrono::system_clock::now());
+                m_looking_straight_ahead_timestamp.store(current_time());
                 m_looking_straight_ahead.store(true, std::memory_order_release);
 //                cout << "State::DASH_FORWARD: m_looking_straight_ahead = true" << endl;
             }
@@ -192,7 +192,7 @@ FlagNavigationAir::FlagNavigationAir(
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
                 context.wait_for_all_requests();
-                m_looking_straight_ahead_timestamp.store(std::chrono::system_clock::now());
+                m_looking_straight_ahead_timestamp.store(current_time());
                 m_looking_straight_ahead.store(true, std::memory_order_release);
 //                cout << "State::DASH_LEFT: m_looking_straight_ahead = true" << endl;
             }
@@ -218,7 +218,7 @@ FlagNavigationAir::FlagNavigationAir(
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
                 context.wait_for_all_requests();
-                m_looking_straight_ahead_timestamp.store(std::chrono::system_clock::now());
+                m_looking_straight_ahead_timestamp.store(current_time());
                 m_looking_straight_ahead.store(true, std::memory_order_release);
 //                cout << "State::DASH_FORWARD: m_looking_straight_ahead = true" << endl;
             }
@@ -234,7 +234,7 @@ FlagNavigationAir::FlagNavigationAir(
             if (!m_looking_straight_ahead.load(std::memory_order_acquire)){
                 pbf_move_left_joystick(context, 128, 0, 160, 0);
                 context.wait_for_all_requests();
-                m_looking_straight_ahead_timestamp.store(std::chrono::system_clock::now());
+                m_looking_straight_ahead_timestamp.store(current_time());
                 m_looking_straight_ahead.store(true, std::memory_order_release);
 //                cout << "State::DASH_LEFT: m_looking_straight_ahead = true" << endl;
             }
@@ -288,10 +288,7 @@ FlagNavigationAir::FlagNavigationAir(
     });
 }
 
-bool FlagNavigationAir::run_state(
-    AsyncCommandSession& commands,
-    std::chrono::system_clock::time_point timestamp
-){
+bool FlagNavigationAir::run_state(AsyncCommandSession& commands,WallClock timestamp){
     if (m_stop_on_shiny && m_shiny_listener.detected()){
         return true;
     }

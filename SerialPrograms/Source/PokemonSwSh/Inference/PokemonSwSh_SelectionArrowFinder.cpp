@@ -84,10 +84,7 @@ bool SelectionArrowFinder::detect(const QImage& screen){
     }
     return !m_arrow_boxes.empty();
 }
-bool SelectionArrowFinder::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool SelectionArrowFinder::process_frame(const QImage& frame, WallClock timestamp){
     detect(frame);
 //    cout << m_arrow_boxes.size() << endl;
     return !m_arrow_boxes.empty();
@@ -117,10 +114,7 @@ int8_t BattleMoveArrowFinder::detect(const QImage& screen){
     m_arrow_slot.store(slot, std::memory_order_release);
     return slot;
 }
-bool BattleMoveArrowFinder::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool BattleMoveArrowFinder::process_frame(const QImage& frame, WallClock timestamp){
     detect(frame);
     return false;
 }

@@ -29,7 +29,7 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(
         const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
+        WallClock timestamp
     ) override;
 
 protected:
@@ -44,7 +44,7 @@ public:
 
     virtual bool process_frame(
         const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
+        WallClock timestamp
     ) override;
 };
 

@@ -8,6 +8,7 @@
 #define PokemonAutomation_VideoFeedInterface_H
 
 #include <deque>
+#include "Common/Cpp/Time.h"
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 
@@ -24,7 +25,7 @@ public:
 
     //  Do not call this on the main thread or it will deadlock.
     //  Format must be "Format_ARGB32" or "Format_RGB32".
-    virtual QImage snapshot() = 0;
+    virtual QImage snapshot(WallClock* timestamp = nullptr) = 0;
 };
 
 

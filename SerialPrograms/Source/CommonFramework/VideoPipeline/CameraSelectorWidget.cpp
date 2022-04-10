@@ -206,17 +206,23 @@ void CameraSelectorWidget::set_overlay_enabled(bool enabled){
     m_display.overlay().setHidden(!enabled);
 }
 
-QImage CameraSelectorWidget::snapshot(){
+QImage CameraSelectorWidget::snapshot(WallClock* timestamp){
     if (!m_snapshots_allowed.load(std::memory_order_acquire)){
+        if (timestamp){
+            timestamp[0] = current_time();
+        }
         return QImage();
     }
 
     std::unique_lock<std::mutex> lg(m_camera_lock);
     if (!m_display){
+        if (timestamp){
+            timestamp[0] = current_time();
+        }
         return QImage();
     }
 
-    return m_display.snapshot();
+    return m_display.snapshot(timestamp);
 }
 
 

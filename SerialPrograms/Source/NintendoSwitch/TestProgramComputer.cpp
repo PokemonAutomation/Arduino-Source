@@ -78,7 +78,7 @@ TestProgramComputer::TestProgramComputer(const TestProgramComputer_Descriptor& d
 {
 }
 
-std::chrono::system_clock::time_point REFERENCE = std::chrono::system_clock::now();
+WallClock REFERENCE = current_time();
 
 
 void print(const float* ptr, size_t len){
@@ -138,7 +138,7 @@ public:
         PeriodicRunner::remove_event(&event);
     }
     virtual void run(void* event) override{
-        cout << current_time() << ": ";
+        cout << current_time_to_str() << ": ";
         (*(std::function<void()>*)event)();
     }
 
@@ -172,7 +172,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
         scope.throw_if_cancelled();
         void* ptr = scheduler.request_next_event();
         if (ptr != nullptr){
-            cout << current_time() << ": ";
+            cout << current_time_to_str() << ": ";
             (*(std::function<void()>*)ptr)();
         }
     }
@@ -628,7 +628,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    cout << dst.width() << " x " << dst.height() << endl;
 
     {
-        auto start = std::chrono::system_clock::now();
+        auto start = current_time();
         for (size_t c = 0; c < 1000000; c++){
             QImage dst(src.width(), height, QImage::Format_ARGB32);
             scale_vertical_shrink_Default(
@@ -637,19 +637,19 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
                 (uint32_t*)dst.bits(), dst.bytesPerLine(), dst.height()
             );
         }
-        auto end = std::chrono::system_clock::now();
+        auto end = current_time();
         cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start) << endl;
     }
     {
-        auto start = std::chrono::system_clock::now();
+        auto start = current_time();
         for (size_t c = 0; c < 1000000; c++){
             QImage dst = src.scaled(src.width(), height);
         }
-        auto end = std::chrono::system_clock::now();
+        auto end = current_time();
         cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start) << endl;
     }
     {
-        auto start = std::chrono::system_clock::now();
+        auto start = current_time();
         for (size_t c = 0; c < 1000000; c++){
             QImage dst(src.width(), height, QImage::Format_ARGB32);
             scale_vertical_shrink<Uint8Scaler_x16_SSE41>(
@@ -658,11 +658,11 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
                 (uint32_t*)dst.bits(), dst.bytesPerLine(), dst.height()
             );
         }
-        auto end = std::chrono::system_clock::now();
+        auto end = current_time();
         cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start) << endl;
     }
     {
-        auto start = std::chrono::system_clock::now();
+        auto start = current_time();
         for (size_t c = 0; c < 1000000; c++){
             QImage dst(src.width(), height, QImage::Format_ARGB32);
             scale_vertical_shrink<Uint8Scaler_x32_AVX2>(
@@ -671,7 +671,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
                 (uint32_t*)dst.bits(), dst.bytesPerLine(), dst.height()
             );
         }
-        auto end = std::chrono::system_clock::now();
+        auto end = current_time();
         cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start) << endl;
     }
 
@@ -748,7 +748,6 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 #endif
 
 
-//    using WallClock = std::chrono::system_clock::time_point;
 
 //    cout << (WallClock::min() < WallClock::max()) << endl;
 
@@ -761,7 +760,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 #if 0
     BlackScreenOverWatcher black_screen1(COLOR_RED, {0.20, 0.95, 0.60, 0.03}, 20);
 
-    black_screen1.process_frame(QImage("screenshot-20220221-232325966395.png"), std::chrono::system_clock::now());
+    black_screen1.process_frame(QImage("screenshot-20220221-232325966395.png"), current_time());
 #endif
 
 #if 0
@@ -771,7 +770,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     }
     print(data, 25);
 
-//    auto start = std::chrono::system_clock::now();
+//    auto start = current_time();
 
     TimeSampleBuffer<float> buffer(10, std::chrono::seconds(10));
 

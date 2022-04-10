@@ -67,14 +67,11 @@ public:
 
     MountState state() const;
 
-    virtual bool process_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-    ) override;
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
 
 private:
     struct Sample{
-        std::chrono::system_clock::time_point timestamp;
+        WallClock timestamp;
         MountState state;
     };
 

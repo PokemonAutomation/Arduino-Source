@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 
 int wait_until(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
-    std::chrono::system_clock::time_point deadline,
+    WallClock deadline,
     std::vector<InferenceCallback*>&& callbacks,
     std::chrono::milliseconds period
 ){

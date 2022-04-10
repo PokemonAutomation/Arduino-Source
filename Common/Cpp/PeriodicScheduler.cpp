@@ -32,7 +32,7 @@ void PeriodicScheduler::remove_event(void* event){
     //  No need to remove from scheduler since it will be skipped over automatically.
     m_events.erase(event);
 }
-PeriodicScheduler::WallClock PeriodicScheduler::next_event() const{
+WallClock PeriodicScheduler::next_event() const{
     auto iter = m_schedule.begin();
     if (iter == m_schedule.end()){
         return WallClock::max();
@@ -120,7 +120,7 @@ void PeriodicRunner::thread_loop(){
         //  released if the CPU is too slow to keep up with all the callbacks.
         std::unique_lock<std::mutex> lg(m_lock);
 
-        WallClock now = std::chrono::system_clock::now();
+        WallClock now = current_time();
         void* event = m_scheduler.request_next_event(now);
 
         //  Event is available now. Run it.

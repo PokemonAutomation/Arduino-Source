@@ -270,7 +270,7 @@ void BotBaseHandle::thread_body(){
                 break;
             }
 
-            auto last = std::chrono::system_clock::now() - m_botbase->last_ack();
+            auto last = current_time() - m_botbase->last_ack();
             std::chrono::duration<double> seconds = last;
             if (last > 2 * SERIAL_REFRESH_RATE){
                 emit uptime_status(

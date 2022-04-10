@@ -12,6 +12,7 @@
 #include <map>
 #include <chrono>
 #include <functional>
+#include "Common/Cpp/Time.h"
 
 namespace PokemonAutomation{
 
@@ -40,8 +41,6 @@ class VisualInferenceCallback;
 
 class SuperControlSession{
 public:
-    using WallClock = std::chrono::system_clock::time_point;
-
     ~SuperControlSession();
     void run_session();
 

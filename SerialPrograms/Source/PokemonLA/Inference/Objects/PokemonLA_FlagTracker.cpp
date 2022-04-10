@@ -31,7 +31,7 @@ void FlagTracker::make_overlays(VideoOverlaySet& items) const{
 
 bool FlagTracker::get(
     double& distance, double& x, double& y,
-    std::chrono::system_clock::time_point timestamp
+    WallClock timestamp
 ){
     SpinLockGuard lg(m_lock);
 
@@ -47,7 +47,7 @@ bool FlagTracker::get(
     }
 
     //  Distance reading is unreliable. So look at the last 2 seconds of history to infer it.
-    std::multimap<int, std::chrono::system_clock::time_point> distances;
+    std::multimap<int, WallClock> distances;
     for (const Sample& sample : m_history){
         if (0 <= sample.distance && sample.distance <= 999){
             distances.emplace(sample.distance, sample.timestamp);
@@ -84,10 +84,7 @@ bool FlagTracker::get(
     return true;
 }
 
-bool FlagTracker::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool FlagTracker::process_frame(const QImage& frame, WallClock timestamp){
     m_watcher.process_frame(frame, timestamp);
 
     Sample sample;
@@ -106,7 +103,7 @@ bool FlagTracker::process_frame(
     SpinLockGuard lg(m_lock);
 
     //  Clear out old history.
-    std::chrono::system_clock::time_point threshold = timestamp - std::chrono::seconds(2);
+    WallClock threshold = timestamp - std::chrono::seconds(2);
     while (!m_history.empty() && m_history.front().timestamp < threshold){
         m_history.pop_front();
     }

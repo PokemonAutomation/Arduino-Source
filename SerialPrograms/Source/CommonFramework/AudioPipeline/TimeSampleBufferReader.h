@@ -14,21 +14,20 @@ namespace PokemonAutomation{
 
 template <typename Type>
 class TimeSampleBufferReader{
-    using TimePoint = std::chrono::system_clock::time_point;
     using Duration = std::chrono::system_clock::duration;
 
 public:
     TimeSampleBufferReader(TimeSampleBuffer<Type>& buffer);
 
-    void set_to_timestamp(TimePoint timestamp = std::chrono::system_clock::now());
+    void set_to_timestamp(WallClock timestamp = current_time());
 
     void read_samples(
         Type* samples, size_t count,
-        TimePoint timestamp = std::chrono::system_clock::now()
+        WallClock timestamp = current_time()
     );
 
 private:
-    void set_to_timestamp_unprotected(TimePoint timestamp = std::chrono::system_clock::now());
+    void set_to_timestamp_unprotected(WallClock timestamp = current_time());
 
 public:
     TimeSampleBuffer<Type>& m_buffer;
@@ -36,7 +35,7 @@ public:
 //    TimePoint m_last_timestamp;
 
     //  Last read sample.
-    TimePoint m_current_block;
+    WallClock m_current_block;
     size_t m_current_index;
 };
 

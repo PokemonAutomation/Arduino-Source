@@ -96,7 +96,7 @@ BeamSetter::Detection BeamSetter::run(
         }
 
         QImage baseline_diff = image_diff_greyscale(baseline_image, current_screenshot);
-        auto now = std::chrono::system_clock::now();
+        auto now = current_time();
 
         bool purple = false;
         size_t best_index = 0;

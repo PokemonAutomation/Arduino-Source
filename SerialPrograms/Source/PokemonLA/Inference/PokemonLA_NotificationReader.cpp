@@ -139,19 +139,16 @@ NotificationDetector::NotificationDetector(LoggerQt& logger, Language language)
     : VisualInferenceCallback("NotificationDetector")
     , m_reader(logger, language)
     , m_last(Notification::NOTHING)
-    , m_last_check(std::chrono::system_clock::time_point::min())
+    , m_last_check(WallClock::min())
 {}
 
 void NotificationDetector::make_overlays(VideoOverlaySet& items) const{
     m_reader.make_overlays(items);
 }
 
-bool NotificationDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool NotificationDetector::process_frame(const QImage& frame, WallClock timestamp){
     //  Throttle this to 1/sec.
-    auto now = std::chrono::system_clock::now();
+    auto now = current_time();
     if (m_last_check + std::chrono::milliseconds(1000) > now){
         return false;
     }

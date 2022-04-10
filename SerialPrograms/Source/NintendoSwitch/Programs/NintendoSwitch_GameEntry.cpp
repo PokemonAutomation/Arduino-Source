@@ -90,10 +90,7 @@ public:
         items.add(COLOR_RED, m_box1);
     }
 
-    virtual bool process_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-    ) override{
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) override{
         if (!is_black(extract_box_reference(frame, m_box0))){
             return m_invert;
         }

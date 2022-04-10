@@ -62,15 +62,12 @@ public:
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
 
-    virtual bool process_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-    ) override;
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
 
 private:
     NotificationReader m_reader;
     std::atomic<Notification> m_last;
-    std::chrono::system_clock::time_point m_last_check;
+    WallClock m_last_check;
 };
 
 

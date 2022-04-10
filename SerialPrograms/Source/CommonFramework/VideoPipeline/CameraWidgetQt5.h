@@ -37,13 +37,13 @@ public:
     virtual void set_resolution(const QSize& size) override;
 
     //  Cannot call from UI thread or it will deadlock.
-    virtual QImage snapshot() override;
+    virtual QImage snapshot(WallClock* timestamp) override;
 
     virtual void resizeEvent(QResizeEvent* event) override;
 
 private:
-    QImage snapshot_probe();
-    QImage snapshot_image();
+    QImage snapshot_probe(WallClock* timestamp);
+    QImage snapshot_image(WallClock* timestamp);
 
 private:
     enum class CaptureStatus{
@@ -72,7 +72,7 @@ private:
     std::map<int, PendingCapture> m_pending_captures;
 
     SpinLock m_frame_lock;
-    std::atomic<std::chrono::system_clock::time_point> m_last_snapshot;
+    std::atomic<WallClock> m_last_snapshot;
 
 //    SpinLock m_capture_lock;
     QVideoProbe* m_probe = nullptr;

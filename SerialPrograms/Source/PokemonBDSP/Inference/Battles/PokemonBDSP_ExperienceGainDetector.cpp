@@ -70,10 +70,7 @@ ExperienceGainWatcher::ExperienceGainWatcher(Color color)
 void ExperienceGainWatcher::make_overlays(VideoOverlaySet& items) const{
     ExperienceGainDetector::make_overlays(items);
 }
-bool ExperienceGainWatcher::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool ExperienceGainWatcher::process_frame(const QImage& frame, WallClock timestamp){
     return detect(frame);
 }
 

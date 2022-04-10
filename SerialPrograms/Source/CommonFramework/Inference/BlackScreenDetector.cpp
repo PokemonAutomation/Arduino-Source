@@ -52,10 +52,7 @@ BlackScreenWatcher::BlackScreenWatcher(
 void BlackScreenWatcher::make_overlays(VideoOverlaySet& items) const{
     BlackScreenDetector::make_overlays(items);
 }
-bool BlackScreenWatcher::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool BlackScreenWatcher::process_frame(const QImage& frame, WallClock timestamp){
     return detect(frame);
 }
 
@@ -74,10 +71,7 @@ void BlackScreenOverWatcher::make_overlays(VideoOverlaySet& items) const{
     m_detector.make_overlays(items);
 }
 
-bool BlackScreenOverWatcher::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool BlackScreenOverWatcher::process_frame(const QImage& frame, WallClock timestamp){
     return black_is_over(frame);
 }
 bool BlackScreenOverWatcher::black_is_over(const QImage& frame){

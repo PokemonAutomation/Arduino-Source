@@ -30,7 +30,7 @@ class ProgramEnvironment;
 //  everything and be passed out of this function.
 int wait_until(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
-    std::chrono::system_clock::time_point deadline,
+    WallClock deadline,
     std::vector<InferenceCallback*>&& callbacks,
     std::chrono::milliseconds period = std::chrono::milliseconds(50)
 );
@@ -42,7 +42,7 @@ inline int wait_until(
 ){
     return wait_until(
         env, console, context,
-        std::chrono::system_clock::now() + timeout,
+        current_time() + timeout,
         std::move(callbacks),
         period
     );

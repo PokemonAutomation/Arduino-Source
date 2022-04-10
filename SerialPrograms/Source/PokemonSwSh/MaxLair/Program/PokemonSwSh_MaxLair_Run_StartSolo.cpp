@@ -26,7 +26,7 @@ namespace MaxLairInternal{
 bool wait_for_a_player(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     const QImage& entrance,
-    std::chrono::system_clock::time_point time_limit
+    WallClock time_limit
 ){
     LobbyDoneConnecting done_connecting_detector;
     EntranceDetector entrance_detector(entrance);
@@ -64,7 +64,7 @@ bool wait_for_lobby_ready(
     const QImage& entrance,
     size_t min_players,
     size_t start_players,
-    std::chrono::system_clock::time_point time_limit
+    WallClock time_limit
 ){
     LobbyAllReadyDetector ready_detector(start_players);
     EntranceDetector entrance_detector(entrance);
@@ -207,7 +207,7 @@ bool start_raid_host_solo(
     pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
     context.wait_for_all_requests();
 
-    auto time_limit = std::chrono::system_clock::now() +
+    auto time_limit = current_time() +
         std::chrono::milliseconds(settings.LOBBY_WAIT_DELAY * 1000 / TICKS_PER_SECOND);
 
     if (!wait_for_a_player(env, console, context, entrance, time_limit)){

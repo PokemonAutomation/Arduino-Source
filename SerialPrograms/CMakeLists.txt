@@ -91,6 +91,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/SIMDDebuggers.h
     ../Common/Cpp/SpinLock.cpp
     ../Common/Cpp/SpinLock.h
+    ../Common/Cpp/Time.cpp
+    ../Common/Cpp/Time.h
     ../Common/Cpp/Unicode.cpp
     ../Common/Cpp/Unicode.h
     ../Common/Microcontroller/DeviceRoutines.h

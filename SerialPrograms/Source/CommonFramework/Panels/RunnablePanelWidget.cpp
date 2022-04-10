@@ -47,7 +47,7 @@ std::string RunnablePanelWidget::stats(){
     }
     return "";
 }
-std::chrono::system_clock::time_point RunnablePanelWidget::timestamp() const{
+WallClock RunnablePanelWidget::timestamp() const{
     return m_timestamp.load(std::memory_order_acquire);
 }
 
@@ -71,7 +71,7 @@ bool RunnablePanelWidget::start(){
             m_thread.join();
         }
 
-        m_timestamp.store(std::chrono::system_clock::now(), std::memory_order_release);
+        m_timestamp.store(current_time(), std::memory_order_release);
         m_state.store(ProgramState::RUNNING, std::memory_order_release);
         m_thread = std::thread(
             run_with_catch,
@@ -130,7 +130,7 @@ RunnablePanelWidget::RunnablePanelWidget(
     , m_logger(listener.raw_logger(), "Program")
     , m_status_bar(nullptr)
     , m_start_button(nullptr)
-    , m_timestamp(std::chrono::system_clock::now())
+    , m_timestamp(current_time())
     , m_state(ProgramState::NOT_READY)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);

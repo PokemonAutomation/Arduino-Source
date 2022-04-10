@@ -12,6 +12,7 @@
 #include <thread>
 #include <QImage>
 #include <QNetworkReply>
+#include "Common/Cpp/Time.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Notifications/MessageAttachment.h"
@@ -67,7 +68,7 @@ private:
     std::mutex m_lock;
     std::condition_variable m_cv;
     std::deque<DiscordWebhookRequest> m_queue;
-    std::deque<std::chrono::system_clock::time_point> m_sent;
+    std::deque<WallClock> m_sent;
     std::thread m_thread;
 };
 

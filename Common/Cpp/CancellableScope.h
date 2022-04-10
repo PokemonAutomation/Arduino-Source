@@ -22,10 +22,9 @@
 #ifndef PokemonAutomation_CancellableScope_H
 #define PokemonAutomation_CancellableScope_H
 
-#include <chrono>
-//#include <atomic>
 #include <exception>
 #include "Pimpl.h"
+#include "Time.h"
 #include "LifetimeSanitizer.h"
 
 namespace PokemonAutomation{
@@ -103,7 +102,7 @@ public:
     virtual bool cancel(std::exception_ptr exception) noexcept override;
 
     void wait_for(std::chrono::milliseconds duration);
-    void wait_until(std::chrono::system_clock::time_point stop);
+    void wait_until(WallClock stop);
 
 protected:
     CancellableScope();

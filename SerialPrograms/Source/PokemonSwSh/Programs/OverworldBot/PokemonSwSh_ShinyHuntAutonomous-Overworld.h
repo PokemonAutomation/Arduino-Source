@@ -47,7 +47,7 @@ private:
     bool find_encounter(
         SingleSwitchProgramEnvironment& env, BotBaseContext& context,
         Stats& stats,
-        std::chrono::system_clock::time_point expiration
+        WallClock expiration
     ) const;
 
     bool charge_at_target(

@@ -74,10 +74,7 @@ MarkTracker::MarkTracker(VideoOverlay& overlay, const ImageFloatBox& box)
 void MarkTracker::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box);
 }
-bool MarkTracker::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point
-){
+bool MarkTracker::process_frame(const QImage& frame, WallClock){
     std::vector<ImagePixelBox> exclamation_marks = find_exclamation_marks(extract_box_reference(frame, m_box));
 //        cout << exclamation_marks.size() << endl;
 
@@ -88,10 +85,7 @@ bool MarkTracker::process_frame(
     return false;
 }
 
-bool MarkDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool MarkDetector::process_frame(const QImage& frame, WallClock timestamp){
     MarkTracker::process_frame(frame, timestamp);
     return !m_marks.empty();
 }

@@ -16,7 +16,7 @@ namespace PokemonAutomation{
 void log(const std::stringstream& ss);
 void log(const std::string& msg);
 
-std::string current_time();
+std::string current_time_to_str();
 
 
 

@@ -129,7 +129,7 @@ CatchResults throw_balls(
         }
         balls_used++;
 
-        auto start = std::chrono::system_clock::now();
+        auto start = current_time();
 
         BattleMenuWatcher menu_detector(BattleType::STANDARD);
         ExperienceGainWatcher experience_detector;
@@ -145,7 +145,7 @@ CatchResults throw_balls(
         );
         switch (result){
         case 0:
-            if (std::chrono::system_clock::now() < start + std::chrono::seconds(5)){
+            if (current_time() < start + std::chrono::seconds(5)){
                 return {CatchResult::CANNOT_THROW_BALL, balls_used};
             }
             env.log("BasicCatcher: Failed to catch.", COLOR_ORANGE);

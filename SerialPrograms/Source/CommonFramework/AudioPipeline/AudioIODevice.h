@@ -12,6 +12,7 @@
 #include <QAudioFormat>
 #include <QIODevice>
 #include "Common/Compiler.h"
+#include "Common/Cpp/Time.h"
 #include "Common/Cpp/AlignedVector.h"
 #include "AudioInfo.h"
 
@@ -95,9 +96,8 @@ private:
 
     QIODevice* m_audioSinkDevice = nullptr;
 
-    using TimePoint = std::chrono::system_clock::time_point;
     // Used to measure the frequency of the audio loop for debugging.
-    TimePoint m_lastWriteTimepoint;
+    WallClock m_lastWriteTimepoint;
 
 #ifdef USE_FFTREAL
     FFTRealWrapper m_fft;

@@ -124,9 +124,9 @@ bool CancellableScope::cancel(std::exception_ptr exception) noexcept{
 }
 void CancellableScope::wait_for(std::chrono::milliseconds duration){
     m_sanitizer.check_usage();
-    wait_until(std::chrono::system_clock::now() + duration);
+    wait_until(current_time() + duration);
 }
-void CancellableScope::wait_until(std::chrono::system_clock::time_point stop){
+void CancellableScope::wait_until(WallClock stop){
     m_sanitizer.check_usage();
     throw_if_cancelled();
     CancellableScopeData& data(m_impl);
@@ -135,7 +135,7 @@ void CancellableScope::wait_until(std::chrono::system_clock::time_point stop){
         data.cv.wait_until(
             lg, stop,
             [=]{
-                return std::chrono::system_clock::now() >= stop || cancelled();
+                return current_time() >= stop || cancelled();
             }
         );
     }

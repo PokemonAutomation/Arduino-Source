@@ -9,8 +9,8 @@
 
 #include <string>
 #include <vector>
-#include <chrono>
 #include <set>
+#include "Common/Cpp/Time.h"
 #include "Pokemon/Pokemon_Types.h"
 
 namespace PokemonAutomation{
@@ -32,19 +32,19 @@ struct TimestampedValue{
     }
 
     TimestampedValue()
-        : timestamp(std::chrono::system_clock::time_point::min())
+        : timestamp(WallClock::min())
         , value()
     {}
     TimestampedValue(Type p_value)
-        : timestamp(std::chrono::system_clock::now())
+        : timestamp(current_time())
         , value(std::move(p_value))
     {}
-    TimestampedValue(Type p_value, std::chrono::system_clock::time_point timestamp)
+    TimestampedValue(Type p_value, WallClock timestamp)
         : timestamp(timestamp)
         , value(std::move(p_value))
     {}
     void operator=(Type x){
-        timestamp = std::chrono::system_clock::now();
+        timestamp = current_time();
         value = std::move(x);
     }
 
@@ -52,7 +52,7 @@ struct TimestampedValue{
         return value;
     }
 
-    std::chrono::system_clock::time_point timestamp;
+    WallClock timestamp;
     Type value;
 };
 
@@ -139,10 +139,8 @@ std::string dump_path(const std::vector<PathNode>& path);
 
 
 struct GlobalState{
-    using time_point = std::chrono::system_clock::time_point;
-
     //  Timestamp when this state was issued.
-    time_point timestamp = time_point::min();
+    WallClock timestamp = WallClock::min();
 
     bool adventure_started = false;
 

@@ -13,7 +13,7 @@
 
 namespace PokemonAutomation{
 
-std::string current_time(){
+std::string current_time_to_str(){
     //  Based off of: https://stackoverflow.com/questions/15957805/extract-year-month-day-etc-from-stdchronotime-point-in-c
 
     using namespace std;
@@ -56,7 +56,7 @@ void log(const std::stringstream& ss){
 }
 void log(const std::string& msg){
     std::lock_guard<std::mutex> lg(logging_lock);
-    std::cout << current_time() << " - " << msg << std::endl;
+    std::cout << current_time_to_str() << " - " << msg << std::endl;
 }
 
 

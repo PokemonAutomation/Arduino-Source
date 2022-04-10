@@ -196,7 +196,7 @@ double evaluate_hypothetical_team(
         }
 //        cout << "npcs.size() = " << npcs.size() << endl;
 
-//        auto time0 = std::chrono::system_clock::now();
+//        auto time0 = current_time();
         double rental_score = evaluate_average_matchup(
             *attacker,
             rental_candidates_on_path,
@@ -207,7 +207,7 @@ double evaluate_hypothetical_team(
             boss_candidates_on_path,
             npcs, lives
         );
-//        auto time1 = std::chrono::system_clock::now();
+//        auto time1 = current_time();
 //        cout << std::chrono::duration_cast<std::chrono::milliseconds>(time1 - time0).count() << endl;
 
         double weighted_score = get_weighted_score(

@@ -26,10 +26,7 @@ LobbyReadyButtonDetector::LobbyReadyButtonDetector(VideoOverlay& overlay)
     : m_box0(overlay, 0.630, 0.695, 0.034, 0.04)
     , m_box1(overlay, 0.910, 0.695, 0.034, 0.04)
 {}
-bool LobbyReadyButtonDetector::on_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool LobbyReadyButtonDetector::on_frame(const QImage& frame, WallClock timestamp){
     return detect(frame);
 }
 bool LobbyReadyButtonDetector::detect(const QImage& screen){
@@ -51,10 +48,7 @@ void LobbyDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_pink);
     items.add(COLOR_RED, m_white);
 }
-bool LobbyDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool LobbyDetector::process_frame(const QImage& frame, WallClock timestamp){
     return detect(frame);
 }
 bool LobbyDetector::detect(const QImage& screen){
@@ -82,10 +76,7 @@ void LobbyDoneConnecting::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box);
     items.add(COLOR_RED, m_player0);
 }
-bool LobbyDoneConnecting::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool LobbyDoneConnecting::process_frame(const QImage& frame, WallClock timestamp){
     return detect(frame);
 }
 bool LobbyDoneConnecting::detect(const QImage& screen){
@@ -129,10 +120,7 @@ void LobbyJoinedDetector::make_overlays(VideoOverlaySet& items) const{
     m_player3.make_overlays(items);
 }
 
-size_t LobbyJoinedDetector::joined(
-    const QImage& screen,
-    std::chrono::system_clock::time_point timestamp
-){
+size_t LobbyJoinedDetector::joined(const QImage& screen, WallClock timestamp){
     size_t count = 0;
     if (m_player0.process_frame(extract_box_copy(screen, m_box0), timestamp)) count++;
     if (m_player1.process_frame(extract_box_copy(screen, m_box1), timestamp)) count++;
@@ -141,10 +129,7 @@ size_t LobbyJoinedDetector::joined(
     return count;
 }
 
-bool LobbyJoinedDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool LobbyJoinedDetector::process_frame(const QImage& frame, WallClock timestamp){
     return m_invert
         ? joined(frame, timestamp) < m_consoles
         : joined(frame, timestamp) >= m_consoles;
@@ -178,10 +163,7 @@ size_t LobbyReadyDetector::ready_players(const QImage& screen){
     if (stats3.stddev.sum() > 50) ready++;
     return ready;
 }
-bool LobbyReadyDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool LobbyReadyDetector::process_frame(const QImage& frame, WallClock timestamp){
     return detect(frame);
 }
 

@@ -20,7 +20,7 @@ namespace MaxLairInternal{
 
 
 class GlobalStateTracker final : public Cancellable{
-    using time_point = std::chrono::system_clock::time_point;
+    using time_point = WallClock;
 public:
     GlobalStateTracker(CancellableScope& scope, size_t consoles);
     virtual ~GlobalStateTracker();

@@ -54,7 +54,7 @@ public:
 
 private:
     SimpleIntegerOption<uint8_t> m_hours;
-    std::chrono::system_clock::time_point m_last_touch;
+    WallClock m_last_touch;
 };
 
 

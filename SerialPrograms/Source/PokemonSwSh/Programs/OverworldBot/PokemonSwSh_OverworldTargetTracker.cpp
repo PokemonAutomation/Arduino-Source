@@ -149,10 +149,7 @@ bool OverworldTargetTracker::save_target(std::multimap<double, OverworldTarget>:
 //    return target->first <= m_max_alpha;
 }
 
-bool OverworldTargetTracker::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool OverworldTargetTracker::process_frame(const QImage& frame, WallClock timestamp){
     ConstImageRef image = extract_box_reference(frame, m_search_area);
 
     std::vector<ImagePixelBox> exclamation_marks = find_exclamation_marks(image);

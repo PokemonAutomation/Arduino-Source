@@ -69,7 +69,7 @@ Qt5VideoWidget::Qt5VideoWidget(
 )
     : VideoWidget(parent)
     , m_logger(logger)
-    , m_last_snapshot(std::chrono::system_clock::time_point::min())
+    , m_last_snapshot(WallClock::min())
     , m_seqnum_frame(0)
 {
     if (!info){
@@ -252,7 +252,7 @@ QImage Qt5VideoWidget::snapshot_probe(){
     return m_last_image;
 }
 #endif
-QImage Qt5VideoWidget::snapshot_image(){
+QImage Qt5VideoWidget::snapshot_image(WallClock* timestamp){
 //    cout << "snapshot_image()" << endl;
     std::unique_lock<std::mutex> lg(m_lock);
     if (m_camera == nullptr){
@@ -260,23 +260,32 @@ QImage Qt5VideoWidget::snapshot_image(){
     }
 
     //  Frame is already cached and is not stale.
-    auto timestamp = std::chrono::system_clock::now();
+    auto now = current_time();
+    if (timestamp){
+        timestamp[0] = now;
+    }
 #if 1
     {
         SpinLockGuard lg1(m_frame_lock);
         if (!m_last_image.isNull()){
             if (m_probe){
                 //  If we have the probe enabled, we know if a new frame has been pushed.
-//                cout << timestamp - m_last_snapshot.load(std::memory_order_acquire) << endl;
+//                cout << now - m_last_snapshot.load(std::memory_order_acquire) << endl;
                 if (m_seqnum_image == m_seqnum_frame.load(std::memory_order_acquire)){
 //                    cout << "cached 0" << endl;
+                    if (timestamp){
+                        timestamp[0] = m_last_snapshot.load(std::memory_order_acquire);
+                    }
                     return m_last_image;
                 }
             }else{
                 //  Otherwise, we have to use time.
-//                cout << timestamp - m_last_snapshot.load(std::memory_order_acquire) << endl;
-                if (m_last_snapshot.load(std::memory_order_acquire) + m_frame_period > timestamp){
+//                cout << now - m_last_snapshot.load(std::memory_order_acquire) << endl;
+                if (m_last_snapshot.load(std::memory_order_acquire) + m_frame_period > now){
 //                    cout << "cached 1" << endl;
+                    if (timestamp){
+                        timestamp[0] = m_last_snapshot.load(std::memory_order_acquire);
+                    }
                     return m_last_image;
                 }
             }
@@ -316,12 +325,12 @@ QImage Qt5VideoWidget::snapshot_image(){
     if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
         m_last_image = m_last_image.convertToFormat(QImage::Format_ARGB32);
     }
-    m_last_snapshot.store(timestamp, std::memory_order_release);
+    m_last_snapshot.store(now, std::memory_order_release);
     m_seqnum_image = m_seqnum_frame.load(std::memory_order_acquire);
     return m_last_image;
 }
-QImage Qt5VideoWidget::snapshot(){
-    return snapshot_image();
+QImage Qt5VideoWidget::snapshot(WallClock* timestamp){
+    return snapshot_image(timestamp);
 }
 
 void Qt5VideoWidget::resizeEvent(QResizeEvent* event){
