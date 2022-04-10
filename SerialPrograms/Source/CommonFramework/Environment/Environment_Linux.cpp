@@ -6,7 +6,6 @@
 
 #if defined(__linux) || defined(__APPLE__)
 
-#include <chrono>
 #include <set>
 #include <map>
 #include <thread>
@@ -17,6 +16,7 @@
 #include <unistd.h>
 #include <sched.h>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Time.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "Environment.h"
 

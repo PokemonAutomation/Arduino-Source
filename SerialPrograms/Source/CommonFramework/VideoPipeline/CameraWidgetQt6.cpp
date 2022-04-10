@@ -203,7 +203,7 @@ QImage Qt6VideoWidget::snapshot(WallClock* timestamp){
         image = image.convertToFormat(QImage::Format_ARGB32);
     }
     m_seqnum_image = seqnum;
-    m_cached_frame = std::move(frame);
+    m_cached_frame = std::move(image);
     if (timestamp){
         timestamp[0] = m_cached_timestamp;
     }
