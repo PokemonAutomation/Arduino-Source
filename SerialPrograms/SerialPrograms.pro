@@ -161,9 +161,11 @@ SOURCES += \
     Source/CommonFramework/Inference/ImageTools.cpp \
     Source/CommonFramework/Inference/SpectrogramMatcher.cpp \
     Source/CommonFramework/Inference/StatAccumulator.cpp \
+    Source/CommonFramework/InferenceInfra/AudioInferencePivot.cpp \
     Source/CommonFramework/InferenceInfra/AudioInferenceSession.cpp \
     Source/CommonFramework/InferenceInfra/InferenceRoutines.cpp \
     Source/CommonFramework/InferenceInfra/VisualInferenceCallback.cpp \
+    Source/CommonFramework/InferenceInfra/VisualInferencePivot.cpp \
     Source/CommonFramework/InferenceInfra/VisualInferenceSession.cpp \
     Source/CommonFramework/Language.cpp \
     Source/CommonFramework/Logging/FileWindowLogger.cpp \
@@ -218,6 +220,7 @@ SOURCES += \
     Source/CommonFramework/PersistentSettings.cpp \
     Source/CommonFramework/Tools/BlackBorderCheck.cpp \
     Source/CommonFramework/Tools/BotBaseHandle.cpp \
+    Source/CommonFramework/Tools/ConsoleHandle.cpp \
     Source/CommonFramework/Tools/ErrorDumper.cpp \
     Source/CommonFramework/Tools/InterruptableCommands.cpp \
     Source/CommonFramework/Tools/MultiConsoleErrors.cpp \
@@ -784,10 +787,12 @@ HEADERS += \
     Source/CommonFramework/Inference/TimeWindowStatTracker.h \
     Source/CommonFramework/Inference/VisualDetector.h \
     Source/CommonFramework/InferenceInfra/AudioInferenceCallback.h \
+    Source/CommonFramework/InferenceInfra/AudioInferencePivot.h \
     Source/CommonFramework/InferenceInfra/AudioInferenceSession.h \
     Source/CommonFramework/InferenceInfra/InferenceCallback.h \
     Source/CommonFramework/InferenceInfra/InferenceRoutines.h \
     Source/CommonFramework/InferenceInfra/VisualInferenceCallback.h \
+    Source/CommonFramework/InferenceInfra/VisualInferencePivot.h \
     Source/CommonFramework/InferenceInfra/VisualInferenceSession.h \
     Source/CommonFramework/Language.h \
     Source/CommonFramework/Logging/FileWindowLogger.h \
