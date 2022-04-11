@@ -40,6 +40,7 @@ MultiSwitchProgramWidget* MultiSwitchProgramWidget::make(
 }
 void MultiSwitchProgramWidget::run_switch_program(const ProgramInfo& info){
     MultiSwitchProgramInstance& instance = static_cast<MultiSwitchProgramInstance&>(m_instance);
+
     FixedLimitVector<ConsoleHandle> switches(instance.system_count());
     for (size_t c = 0; c < instance.system_count(); c++){
         SwitchSystemWidget& system = this->system(c);
@@ -53,8 +54,10 @@ void MultiSwitchProgramWidget::run_switch_program(const ProgramInfo& info){
         );
     }
 
+    CancellableHolder<CancellableScope> scope;
     MultiSwitchProgramEnvironment env(
         info,
+        scope,
         m_logger,
         m_current_stats.get(), m_historical_stats.get(),
         std::move(switches)
@@ -66,7 +69,6 @@ void MultiSwitchProgramWidget::run_switch_program(const ProgramInfo& info){
         }
     );
 
-    CancellableHolder<CancellableScope> scope;
     {
         std::lock_guard<std::mutex> lg(m_lock);
         m_scope = &scope;

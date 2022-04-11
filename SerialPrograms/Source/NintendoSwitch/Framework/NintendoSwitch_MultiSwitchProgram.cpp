@@ -16,6 +16,7 @@ MultiSwitchProgramEnvironment::~MultiSwitchProgramEnvironment(){}
 
 MultiSwitchProgramEnvironment::MultiSwitchProgramEnvironment(
     const ProgramInfo& program_info,
+    CancellableScope& scope,
     LoggerQt& logger,
     StatsTracker* current_stats,
     const StatsTracker* historical_stats,
@@ -23,7 +24,11 @@ MultiSwitchProgramEnvironment::MultiSwitchProgramEnvironment(
 )
     : ProgramEnvironment(program_info, logger, current_stats, historical_stats)
     , consoles(std::move(p_switches))
-{}
+{
+    for (ConsoleHandle& console : consoles){
+        console.initialize_inference_threads(scope, inference_dispatcher());
+    }
+}
 
 void MultiSwitchProgramEnvironment::run_in_parallel(
     CancellableScope& scope,

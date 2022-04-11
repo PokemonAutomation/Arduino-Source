@@ -7,9 +7,12 @@
 #include "TestProgramSwitch.h"
 
 #include <immintrin.h>
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/AsyncDispatcher.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceSession.h"
 #include "Common/Cpp/PeriodicScheduler.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceSession.h"
+#include "PokemonLA/Inference/PokemonLA_MountDetector.h"
+#include "CommonFramework/InferenceInfra/VisualInferencePivot.h"
 
 //#include <Windows.h>
 #include <iostream>
@@ -66,125 +69,11 @@ using namespace Kernels::Waterfill;
 
 
 
-struct PeriodicCallback{
-    VisualInferenceCallback& callback;
-    std::chrono::milliseconds period;
-    std::exception_ptr exception;
-};
-
-
-
-
-class VisualInferencePivot final : public PeriodicRunner{
-public:
-    VisualInferencePivot(CancellableScope& scope, AsyncDispatcher& dispatcher);
-    virtual ~VisualInferencePivot();
-
-    void add_callback();
-
-private:
-    virtual void run(void* event) override;
-
-private:
-    std::map<VisualInferenceCallback*, PeriodicCallback> m_callbacks;
-};
-
-
-VisualInferencePivot::VisualInferencePivot(CancellableScope& scope, AsyncDispatcher& dispatcher)
-    : PeriodicRunner(dispatcher)
-{
-    attach(scope);
-}
-VisualInferencePivot::~VisualInferencePivot(){
-    detach();
-}
-void VisualInferencePivot::run(void* event){
-#if 0
-    PeriodicCallback& callback = *(PeriodicCallback*)event;
-    try{
-        callback.callback.process_frame();
-    }catch (...){
-
-    }
-#endif
-}
 
 
 
 
 
-
-
-
-#if 0
-class VisualInferencePivot : public Cancellable{
-public:
-    VisualInferencePivot(VideoFeed& video, AsyncDispatcher& dispatcher);
-
-    void add_callback(VisualInferenceCallback& callback, std::chrono::milliseconds period);
-    void remove_callback(InferenceCallback& callback);
-
-private:
-    void thread_loop();
-
-private:
-
-    VideoFeed& m_video;
-    AsyncDispatcher& m_dispatcher;
-
-    std::mutex m_lock;
-    std::condition_variable m_cv;
-
-    PeriodicScheduler m_scheduler;
-
-    std::unique_ptr<AsyncTask> m_task;
-};
-
-
-VisualInferencePivot::VisualInferencePivot(VideoFeed& video, AsyncDispatcher& dispatcher)
-    : m_video(video)
-    , m_dispatcher(dispatcher)
-{}
-void VisualInferencePivot::add_callback(VisualInferenceCallback& callback, std::chrono::milliseconds period){
-    std::lock_guard<std::mutex> lg(m_lock);
-
-    //  Thread not started yet. Do this first for strong exception safety.
-    if (!m_task){
-        m_dispatcher.dispatch([=]{ thread_loop(); });
-    }
-
-    m_scheduler.add_event(&callback, period);
-}
-void VisualInferencePivot::remove_callback(InferenceCallback& callback){
-    std::lock_guard<std::mutex> lg(m_lock);
-    m_scheduler.remove_event(&callback);
-}
-void VisualInferencePivot::thread_loop(){
-    while (true){
-        if (cancelled()){
-            return;
-        }
-
-        std::unique_lock<std::mutex> lg(m_lock);
-        WallClock now = current_time();
-        void* ptr = m_scheduler.request_next_event(now);
-        if (ptr == nullptr){
-            WallClock next = m_scheduler.next_event();
-            if (next < WallClock::max()){
-                m_cv.wait_until(lg, next);
-            }else{
-                m_cv.wait(lg);
-            }
-            continue;
-        }
-
-        now = current_time();
-        QImage frame = m_video.snapshot();
-        ((VisualInferenceCallback*)ptr)->process_frame(frame, now);
-
-    }
-}
-#endif
 
 
 
@@ -195,9 +84,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace Kernels::Waterfill;
     using namespace OCR;
     using namespace Pokemon;
-    using namespace PokemonSwSh;
+//    using namespace PokemonSwSh;
 //    using namespace PokemonBDSP;
-//    using namespace PokemonLA;
+    using namespace PokemonLA;
 
     LoggerQt& logger = env.logger();
     ConsoleHandle& console = env.consoles[0];
@@ -206,12 +95,20 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlay& overlay = env.consoles[0];
 
 
+
+    VisualInferencePivot pivot(scope, feed, env.inference_dispatcher());
+
+    MountTracker tracker(logger, MountDetectorLogging::LOG_ONLY);
+
+    pivot.add_callback(scope, tracker, std::chrono::milliseconds(500));
+
+
 //    scope.wait_for(std::chrono::seconds(60));
 
+#if 0
     std::function<void()> callback0 = []{ cout << "asdf" << endl; };
     std::function<void()> callback1 = []{ cout << "qwer" << endl; };
 
-#if 0
     PeriodicScheduler scheduler;
     scheduler.add_event(&callback0, std::chrono::seconds(2));
     scheduler.add_event(&callback1, std::chrono::seconds(3));

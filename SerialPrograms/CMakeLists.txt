@@ -264,6 +264,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Inference/TimeWindowStatTracker.h
     Source/CommonFramework/Inference/VisualDetector.h
     Source/CommonFramework/InferenceInfra/AudioInferenceCallback.h
+    Source/CommonFramework/InferenceInfra/AudioInferencePivot.cpp
+    Source/CommonFramework/InferenceInfra/AudioInferencePivot.h
     Source/CommonFramework/InferenceInfra/AudioInferenceSession.cpp
     Source/CommonFramework/InferenceInfra/AudioInferenceSession.h
     Source/CommonFramework/InferenceInfra/InferenceCallback.h
@@ -271,6 +273,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/InferenceInfra/InferenceRoutines.h
     Source/CommonFramework/InferenceInfra/VisualInferenceCallback.cpp
     Source/CommonFramework/InferenceInfra/VisualInferenceCallback.h
+    Source/CommonFramework/InferenceInfra/VisualInferencePivot.cpp
+    Source/CommonFramework/InferenceInfra/VisualInferencePivot.h
     Source/CommonFramework/InferenceInfra/VisualInferenceSession.cpp
     Source/CommonFramework/InferenceInfra/VisualInferenceSession.h
     Source/CommonFramework/Environment/Environment_Linux.cpp
@@ -392,6 +396,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Tools/BotBaseHandle.h
     Source/CommonFramework/Tools/BlackBorderCheck.cpp
     Source/CommonFramework/Tools/BlackBorderCheck.h
+    Source/CommonFramework/Tools/ConsoleHandle.cpp
     Source/CommonFramework/Tools/ConsoleHandle.h
     Source/CommonFramework/Tools/ErrorDumper.cpp
     Source/CommonFramework/Tools/ErrorDumper.h

@@ -124,7 +124,7 @@ void print_8x64(__m512i m){
 
 
 
-
+#if 0
 class ScheduledPrinter : public PeriodicRunner{
 public:
     virtual ~ScheduledPrinter(){
@@ -145,6 +145,7 @@ public:
 protected:
     using PeriodicRunner::PeriodicRunner;
 };
+#endif
 
 
 
@@ -155,6 +156,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 
 
+#if 0
     std::function<void()> callback0 = []{ cout << "asdf" << endl; };
     std::function<void()> callback1 = []{ cout << "qwer" << endl; };
 
@@ -163,6 +165,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     runner.add_event(callback1, std::chrono::seconds(3));
 
     scope.wait_for(std::chrono::seconds(10));
+#endif
 
 #if 0
     PeriodicScheduler scheduler;

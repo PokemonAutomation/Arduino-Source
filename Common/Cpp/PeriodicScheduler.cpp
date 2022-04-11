@@ -82,28 +82,32 @@ PeriodicRunner::PeriodicRunner(AsyncDispatcher& dispatcher)
 bool PeriodicRunner::add_event(void* event, std::chrono::milliseconds period, WallClock start){
     throw_if_cancelled();
 
-    std::lock_guard<std::mutex> lg(m_lock);
+    bool ret;
+    {
+        std::lock_guard<std::mutex> lg(m_state_lock);
 
-    //  Thread not started yet. Do this first for strong exception safety.
-    if (!m_task){
-        m_task = m_dispatcher.dispatch([=]{ thread_loop(); });
+        //  Thread not started yet. Do this first for strong exception safety.
+        if (!m_task){
+            m_task = m_dispatcher.dispatch([=]{ thread_loop(); });
+        }
+
+        ret = m_scheduler.add_event(event, period, start);
     }
-
-    bool ret = m_scheduler.add_event(event, period, start);
     if (ret){
+        std::lock_guard<std::mutex> lg(m_sleep_lock);
         m_cv.notify_all();
     }
     return ret;
 }
 void PeriodicRunner::remove_event(void* event){
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<std::mutex> lg(m_state_lock);
     m_scheduler.remove_event(event);
 }
 bool PeriodicRunner::cancel(std::exception_ptr exception) noexcept{
     if (Cancellable::cancel(std::move(exception))){
         return true;
     }
-    std::lock_guard<std::mutex> lg(m_lock);
+    std::lock_guard<std::mutex> lg(m_sleep_lock);
     m_cv.notify_all();
     return false;
 }
@@ -118,19 +122,27 @@ void PeriodicRunner::thread_loop(){
         //
         //  If we move this lock outside the loop, then it will never be
         //  released if the CPU is too slow to keep up with all the callbacks.
-        std::unique_lock<std::mutex> lg(m_lock);
+        WallClock next;
+        {
+            std::unique_lock<std::mutex> lg(m_state_lock);
 
-        WallClock now = current_time();
-        void* event = m_scheduler.request_next_event(now);
+            WallClock now = current_time();
+            void* event = m_scheduler.request_next_event(now);
 
-        //  Event is available now. Run it.
-        if (event != nullptr){
-            run(event);
-            continue;
+            //  Event is available now. Run it.
+            if (event != nullptr){
+                run(event);
+                continue;
+            }
+
+            //  Wait for next scheduled event.
+            next = m_scheduler.next_event();
         }
 
-        //  Wait for next scheduled event.
-        WallClock next = m_scheduler.next_event();
+        std::unique_lock<std::mutex> lg(m_sleep_lock);
+        if (cancelled()){
+            return;
+        }
         if (next < WallClock::max()){
             m_cv.wait_until(lg, next);
         }else{
@@ -139,6 +151,7 @@ void PeriodicRunner::thread_loop(){
     }
 }
 void PeriodicRunner::stop_thread(){
+    PeriodicRunner::cancel(nullptr);
     m_task.reset();
 }
 

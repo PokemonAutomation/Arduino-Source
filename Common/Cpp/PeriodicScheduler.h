@@ -70,7 +70,7 @@ protected:
     PeriodicRunner(AsyncDispatcher& dispatcher);
     bool add_event(void* event, std::chrono::milliseconds period, WallClock start = current_time());
     void remove_event(void* event);
-    virtual void run(void* event) = 0;
+    virtual void run(void* event) noexcept = 0;
 
 private:
     void thread_loop();
@@ -80,10 +80,12 @@ protected:
 private:
     AsyncDispatcher& m_dispatcher;
 
-    std::mutex m_lock;
+    std::mutex m_state_lock;
+    PeriodicScheduler m_scheduler;
+
+    std::mutex m_sleep_lock;
     std::condition_variable m_cv;
 
-    PeriodicScheduler m_scheduler;
     std::unique_ptr<AsyncTask> m_task;
 };
 

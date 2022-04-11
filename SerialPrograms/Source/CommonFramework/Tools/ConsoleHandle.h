@@ -7,17 +7,29 @@
 #ifndef PokemonAutomation_ConsoleHandle_H
 #define PokemonAutomation_ConsoleHandle_H
 
+#include <memory>
 #include "CommonFramework/Logging/LoggerQt.h"
 
 namespace PokemonAutomation{
 
+class CancellableScope;
+class AsyncDispatcher;
 class BotBase;
 class VideoFeed;
 class VideoOverlay;
 class AudioFeed;
+class VisualInferencePivot;
+class AudioInferencePivot;
 
 
 class ConsoleHandle{
+public:
+    ConsoleHandle(ConsoleHandle&& x);
+    void operator=(ConsoleHandle&& x) = delete;
+    ConsoleHandle(const ConsoleHandle& x) = delete;
+    void operator=(const ConsoleHandle& x) = delete;
+    ~ConsoleHandle();
+
 public:
     ConsoleHandle(
         size_t index,
@@ -26,14 +38,7 @@ public:
         VideoFeed& video,
         VideoOverlay& overlay,
         AudioFeed& audio
-    )
-        : m_index(index)
-        , m_logger(logger)
-        , m_botbase(botbase)
-        , m_video(video)
-        , m_overlay(overlay)
-        , m_audio(audio)
-    {}
+    );
 
     template <class... Args>
     void log(Args&&... args){
@@ -53,6 +58,13 @@ public:
     operator VideoOverlay&(){ return m_overlay; }
     operator AudioFeed&() { return m_audio; }
 
+    VisualInferencePivot& video_inference_pivot(){ return *m_video_pivot; }
+    AudioInferencePivot& audio_inference_pivot(){ return *m_audio_pivot; }
+
+
+public:
+    void initialize_inference_threads(CancellableScope& scope, AsyncDispatcher& dispatcher);
+
 private:
     size_t m_index;
     LoggerQt& m_logger;
@@ -60,6 +72,8 @@ private:
     VideoFeed& m_video;
     VideoOverlay& m_overlay;
     AudioFeed& m_audio;
+    std::unique_ptr<VisualInferencePivot> m_video_pivot;
+    std::unique_ptr<AudioInferencePivot> m_audio_pivot;
 };
 
 
