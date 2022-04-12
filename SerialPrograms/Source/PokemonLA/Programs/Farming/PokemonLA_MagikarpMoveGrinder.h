@@ -10,11 +10,7 @@
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
-#include "CommonFramework/Options/EnumDropdownOption.h"
-#include "CommonFramework/Options/SimpleIntegerOption.h"
-#include "CommonFramework/Options/BatchOption/GroupOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -34,12 +30,16 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    bool battle_magikarp(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    void battle_magikarp(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+
+    void grind_mimic(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
     class Stats;
 
     OneMoveBattlePokemonActionTable POKEMON_ACTIONS;
+
+    BooleanCheckBoxOption SPECIAL_CASE_MIMIC;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;
