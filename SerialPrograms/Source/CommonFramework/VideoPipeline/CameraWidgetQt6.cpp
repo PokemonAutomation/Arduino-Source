@@ -51,6 +51,7 @@ Qt6VideoWidget::Qt6VideoWidget(
     : VideoWidget(parent)
     , m_logger(logger)
     , m_seqnum_frame(0)
+    , m_cached_timestamp(WallClock::min())
 {
     if (!info){
         return;
@@ -204,6 +205,7 @@ QImage Qt6VideoWidget::snapshot(WallClock* timestamp){
     }
     m_seqnum_image = seqnum;
     m_cached_frame = std::move(image);
+    m_cached_timestamp = tick;
     if (timestamp){
         timestamp[0] = m_cached_timestamp;
     }
