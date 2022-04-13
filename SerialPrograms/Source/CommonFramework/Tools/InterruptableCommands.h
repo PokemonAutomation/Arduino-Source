@@ -21,7 +21,6 @@ class ProgramEnvironment;
 
 
 class AsyncCommandSession final : public Cancellable{
-
 public:
     AsyncCommandSession(
         CancellableScope& scope, Logger& logger, AsyncDispatcher& dispatcher,

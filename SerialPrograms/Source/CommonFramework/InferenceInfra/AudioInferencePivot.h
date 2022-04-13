@@ -9,18 +9,12 @@
 
 #include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/PeriodicScheduler.h"
+#include "CommonFramework/Inference/StatAccumulator.h"
 #include "AudioInferenceCallback.h"
 
 namespace PokemonAutomation{
 
 class AudioFeed;
-
-
-struct PeriodicAudioCallback{
-    AudioInferenceCallback& callback;
-    std::chrono::milliseconds period;
-    Cancellable& scope;
-};
 
 
 
@@ -31,15 +25,19 @@ public:
 
     //  Returns true if event was successfully added.
     void add_callback(Cancellable& scope, AudioInferenceCallback& callback, std::chrono::milliseconds period);
-    void remove_callback(AudioInferenceCallback& callback);
+
+    //  Returns the latency stats for the callback. Units are milliseconds.
+    StatAccumulatorI32 remove_callback(AudioInferenceCallback& callback);
 
 private:
     virtual void run(void* event) noexcept override;
 
 private:
+    struct PeriodicCallback;
+
     AudioFeed& m_feed;
     SpinLock m_lock;
-    std::map<AudioInferenceCallback*, PeriodicAudioCallback> m_map;
+    std::map<AudioInferenceCallback*, PeriodicCallback> m_map;
 
     uint64_t m_last_timestamp = ~(uint64_t)0;
 };

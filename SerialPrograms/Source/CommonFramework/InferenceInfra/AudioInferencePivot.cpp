@@ -13,6 +13,24 @@ namespace PokemonAutomation{
 
 
 
+struct AudioInferencePivot::PeriodicCallback{
+    Cancellable& scope;
+    AudioInferenceCallback& callback;
+    std::chrono::milliseconds period;
+    StatAccumulatorI32 stats;
+
+    PeriodicCallback(
+        Cancellable& p_scope,
+        AudioInferenceCallback& p_callback,
+        std::chrono::milliseconds p_period
+    )
+        : scope(p_scope)
+        , callback(p_callback)
+        , period(p_period)
+    {}
+};
+
+
 AudioInferencePivot::AudioInferencePivot(CancellableScope& scope, AudioFeed& feed, AsyncDispatcher& dispatcher)
     : PeriodicRunner(dispatcher)
     , m_feed(feed)
@@ -29,7 +47,11 @@ void AudioInferencePivot::add_callback(Cancellable& scope, AudioInferenceCallbac
     if (iter != m_map.end()){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Attempted to add the same callback twice.");
     }
-    iter = m_map.emplace(&callback, PeriodicAudioCallback{callback, period, scope}).first;
+    iter = m_map.emplace(
+        std::piecewise_construct,
+        std::forward_as_tuple(&callback),
+        std::forward_as_tuple(scope, callback, period)
+    ).first;
     try{
         PeriodicRunner::add_event(&iter->second, period);
     }catch (...){
@@ -37,17 +59,19 @@ void AudioInferencePivot::add_callback(Cancellable& scope, AudioInferenceCallbac
         throw;
     }
 }
-void AudioInferencePivot::remove_callback(AudioInferenceCallback& callback){
+StatAccumulatorI32 AudioInferencePivot::remove_callback(AudioInferenceCallback& callback){
     SpinLockGuard lg(m_lock);
     auto iter = m_map.find(&callback);
     if (iter == m_map.end()){
-        return;
+        return StatAccumulatorI32();
     }
+    StatAccumulatorI32 stats = iter->second.stats;
     PeriodicRunner::remove_event(&iter->second);
     m_map.erase(iter);
+    return stats;
 }
 void AudioInferencePivot::run(void* event) noexcept{
-    PeriodicAudioCallback& callback = *(PeriodicAudioCallback*)event;
+    PeriodicCallback& callback = *(PeriodicCallback*)event;
     try{
         std::vector<AudioSpectrum> spectrums;
 
@@ -63,7 +87,11 @@ void AudioInferencePivot::run(void* event) noexcept{
             m_last_timestamp = spectrums[0].stamp;
         }
 
-        if (callback.callback.process_spectrums(spectrums, m_feed)){
+        WallClock time0 = current_time();
+        bool stop = callback.callback.process_spectrums(spectrums, m_feed);
+        WallClock time1 = current_time();
+        callback.stats += std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count();
+        if (stop){
             callback.scope.cancel(nullptr);
         }
     }catch (...){

@@ -9,18 +9,12 @@
 
 #include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/PeriodicScheduler.h"
+#include "CommonFramework/Inference/StatAccumulator.h"
 #include "VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
 
 class VideoFeed;
-
-
-struct PeriodicVisualCallback{
-    VisualInferenceCallback& callback;
-    std::chrono::milliseconds period;
-    Cancellable& scope;
-};
 
 
 
@@ -31,15 +25,19 @@ public:
 
     //  Returns true if event was successfully added.
     void add_callback(Cancellable& scope, VisualInferenceCallback& callback, std::chrono::milliseconds period);
-    void remove_callback(VisualInferenceCallback& callback);
+
+    //  Returns the latency stats for the callback. Units are milliseconds.
+    StatAccumulatorI32 remove_callback(VisualInferenceCallback& callback);
 
 private:
     virtual void run(void* event) noexcept override;
 
 private:
+    struct PeriodicCallback;
+
     VideoFeed& m_feed;
     SpinLock m_lock;
-    std::map<VisualInferenceCallback*, PeriodicVisualCallback> m_map;
+    std::map<VisualInferenceCallback*, PeriodicCallback> m_map;
 };
 
 
