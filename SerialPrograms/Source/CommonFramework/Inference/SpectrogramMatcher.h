@@ -25,21 +25,26 @@ class AudioSpectrum;
 class SpectrogramMatcher{
 public:
     enum class Mode{
-        // Don't do any convolution on each window of spectrum, matching raw spectrums.
-        NO_CONV,
+        // Don't do any processing on each window of spectrum, matching raw spectrums.
+        RAW,
         // Do convolution on each window of spectrum with a peak detection kernel, before matching spectrums.
         SPIKE_CONV,
         // Do convolution on each window of spectrum with a Gaussian smooth kernel, before matching spectrums.
         // GAUSSIAN_CONV,
+        // Average every 5 frequencies to reduce computation.
+        AVERAGE_5,
     };
 
+    // audioTemplate: the audio template for the audio stream to match against.
+    //  Use AudioTemplate::loadAudioTemplate() to load a template from disk, or
+    //  use AudioTemplateCache::instance().get_throw(audioResourceRelativePath, sampleRate) to get one from cache.
+    // mode: which type of spectrogram filtering to use before the actual match.
+    // sampleRate: audio sample rate.
+    // lowFrequencyFilter: only match the frequencies above this threshold.
+    // templateSubdivision: divide the template into how many sub-templates to match. <= 1 means no subdivision.
     SpectrogramMatcher(
         AudioTemplate audioTemplate, Mode mode, size_t sampleRate,
-        double lowFrequencyFilter
-    );
-    SpectrogramMatcher(
-        const QString& templateFilename, Mode mode, size_t sampleRate,
-        double lowFrequencyFilter
+        double lowFrequencyFilter, size_t templateSubdivision = 0
     );
 
     size_t sampleRate() const{ return m_sampleRate; }
@@ -73,7 +78,12 @@ public:
 
 private:
     void conv(const float* src, size_t num, float* dst);
-    float templateNorm() const;
+    
+    // The function to build `m_templateNorm`
+    std::vector<float> buildTemplateNorm() const;
+
+    // For a given sub-template, return its match score and scaling factor
+    std::pair<float, float> matchSubTemplate(size_t subIndex) const;
 
     // Update internal data for the next new spectrum. Called by `updateToNewSpectrums()`.
     // Return true if there is no error.
@@ -82,6 +92,8 @@ private:
     // Update internal data for the new specttrums.
     // Return true if there is no error.
     bool updateToNewSpectrums(const std::vector<AudioSpectrum>& newSpectrums);
+
+
 
 private:
     AudioTemplate m_template;
@@ -92,16 +104,24 @@ private:
     size_t m_originalFreqStart = 0;
     size_t m_originalFreqEnd = 0;
 
-    float m_templateNorm = 0.0f;
     size_t m_freqStart = 0;
     size_t m_freqEnd = 0;
+    // Temporal ranges of the template to match with. Used when matching a subdivided template.
+    // If there is no subdivision, it will store only one pair: <0, m_template.numWindows()>
+    std::vector<std::pair<size_t, size_t>> m_templateRange;
+    // For each subdivided template, store its sepctrogram matrix norm
+    std::vector<float> m_templateNorm;
 
-    Mode m_mode = Mode::NO_CONV;
+    Mode m_mode = Mode::RAW;
 
     std::vector<float> m_convKernel;
 
+    // Spectrums from audio feed. They will be matched against the template.
     std::list<AudioSpectrum> m_spectrums;
+    // Norm squares of each spectrum in `m_spectrums`.
     std::list<float> m_spectrumNormSqrs;
+    // How many spectrums needed to store.
+    size_t m_numSpectrumsNeeded = 0;
 
     size_t m_lastStampTested = SIZE_MAX;
     float m_lastScale = 0.0f;

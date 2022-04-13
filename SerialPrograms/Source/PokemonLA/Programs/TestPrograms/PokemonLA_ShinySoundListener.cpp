@@ -15,6 +15,7 @@
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
 #include "CommonFramework/InferenceInfra/InferenceSession.h"
+#include "CommonFramework/Inference/AudioTemplateCache.h"
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -75,9 +76,9 @@ void searchShinySoundFromAudioDump(){
 
     const size_t SAMPLE_RATE = 48000;
 
-    QString shinyFilename = "./heracrossShinyTemplateCompact.wav";
     SpectrogramMatcher matcher(
-        shinyFilename, SpectrogramMatcher::Mode::SPIKE_CONV, SAMPLE_RATE,
+        AudioTemplateCache::instance().get_throw("PokemonLA/ShinySound", SAMPLE_RATE),
+        SpectrogramMatcher::Mode::SPIKE_CONV, SAMPLE_RATE,
         GameSettings::instance().SHINY_SHOUND_LOW_FREQUENCY
     );
     

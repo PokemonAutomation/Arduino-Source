@@ -70,7 +70,7 @@ bool AlphaRoarDetector::process_spectrums(
         const double lowFrequencyFilter = 100.0; // we don't match frequencies under 100.0 Hz
         m_matcher = std::make_unique<SpectrogramMatcher>(
             AudioTemplateCache::instance().get_throw("PokemonLA/AlphaRoar", sampleRate),
-            SpectrogramMatcher::Mode::NO_CONV, sampleRate,
+            SpectrogramMatcher::Mode::RAW, sampleRate,
             lowFrequencyFilter
         );
     }

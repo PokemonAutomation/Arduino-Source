@@ -43,7 +43,7 @@ std::vector<float> buildSpikeKernel(size_t numFrequencies, size_t halfSampleRate
 
 SpectrogramMatcher::SpectrogramMatcher(
     AudioTemplate audioTemplate, Mode mode, size_t sampleRate,
-    double lowFrequencyFilter
+    double lowFrequencyFilter, size_t templateSubdivision
 )
     : m_template(std::move(audioTemplate))
     , m_sampleRate(sampleRate)
@@ -74,7 +74,9 @@ SpectrogramMatcher::SpectrogramMatcher(
     // Initialize the spike convolution kernel:
     m_convKernel = buildSpikeKernel(m_numOriginalFrequencies, halfSampleRate);
 
-    if (m_mode == Mode::SPIKE_CONV){
+    switch(m_mode){
+    case Mode::SPIKE_CONV:
+    {
         // Do convolution on audio template
         const size_t numConvedFrequencies = (m_originalFreqEnd - m_originalFreqStart) - m_convKernel.size() + 1;
         std::vector<float> temporaryBuffer(numConvedFrequencies * numTemplateWindows);
@@ -86,19 +88,49 @@ SpectrogramMatcher::SpectrogramMatcher(
         m_template = AudioTemplate(std::move(temporaryBuffer), numTemplateWindows);
         m_freqStart = 0;
         m_freqEnd = numConvedFrequencies;
-    } else{
+        break;
+    }
+    case Mode::AVERAGE_5:
+    {
+        // Avereage every 5 frequencies
+        const size_t numNewFreq = (m_originalFreqEnd - m_originalFreqStart) / 5;
+        std::vector<float> temporaryBuffer(numNewFreq * numTemplateWindows);
+        for(size_t i = 0; i < numTemplateWindows; i++){
+            for(size_t j = 0; j < numNewFreq; j++){
+                const float * rawFreqMag = m_template.getWindow(i) + m_originalFreqStart + j*5;
+                const float newMag = (rawFreqMag[0] + rawFreqMag[1] + rawFreqMag[2] + rawFreqMag[3] + rawFreqMag[4]) / 5.0f;
+                temporaryBuffer[i*numNewFreq + j] = newMag;
+            }
+        }
+        m_template = AudioTemplate(std::move(temporaryBuffer), numTemplateWindows);
+        m_freqStart = 0;
+        m_freqEnd = numNewFreq;
+        break;
+    }
+    case Mode::RAW:
         m_freqStart = m_originalFreqStart;
         m_freqEnd = m_originalFreqEnd;
+        break;
     }
 
-    m_templateNorm = templateNorm();
+    if (templateSubdivision <= 1){
+        m_templateRange.emplace_back(0, numTemplateWindows);
+        m_numSpectrumsNeeded = numTemplateWindows;
+    } else{
+        // Number of subdivision cannot exceed number of windows in the template.
+        templateSubdivision = std::min(templateSubdivision, numTemplateWindows);
+        // num windows of each subdivided template
+        const size_t num_subWindows = numTemplateWindows / templateSubdivision;
+        m_numSpectrumsNeeded = num_subWindows;
+        for(size_t i = 0; i < templateSubdivision; i++){
+            const size_t windowStart = i * num_subWindows;
+            const size_t windowEnd = (i+1) * num_subWindows;
+            m_templateRange.emplace_back(windowStart, windowEnd);
+        }
+    }
+    
+    m_templateNorm = buildTemplateNorm();
 }
-SpectrogramMatcher::SpectrogramMatcher(
-    const QString& templateFilename, Mode mode, size_t sampleRate,
-    double lowFrequencyFilter
-)
-    : SpectrogramMatcher(loadAudioTemplate(templateFilename, sampleRate), mode, sampleRate, lowFrequencyFilter)
-{}
 
 size_t SpectrogramMatcher::latestTimestamp() const{
     if (m_spectrums.size() == 0){
@@ -119,14 +151,21 @@ void SpectrogramMatcher::conv(const float* src, size_t num, float* dst){
     }
 }
 
-float SpectrogramMatcher::templateNorm() const{
-    float sumSqr = 0.0f;
-    for(size_t i = 0; i < m_template.numWindows(); i++)
-        for(size_t j = m_freqStart; j < m_freqEnd; j++){
-            const float v = m_template.getWindow(i)[j];
-            sumSqr += v * v;
+std::vector<float> SpectrogramMatcher::buildTemplateNorm() const {
+    std::vector<float> ret(m_templateRange.size());
+
+    for(size_t subIndex = 0; subIndex < m_templateRange.size(); subIndex++){
+        float sumSqr = 0.0f;
+        for(size_t i = m_templateRange[subIndex].first; i < m_templateRange[subIndex].second; i++){
+            for(size_t j = m_freqStart; j < m_freqEnd; j++){
+                const float v = m_template.getWindow(i)[j];
+                sumSqr += v * v;
+            }
         }
-    return std::sqrt(sumSqr);
+        ret[subIndex] = std::sqrt(sumSqr);
+    }
+    
+    return ret;
 }
 
 bool SpectrogramMatcher::updateToNewSpectrum(AudioSpectrum spectrum){
@@ -136,13 +175,30 @@ bool SpectrogramMatcher::updateToNewSpectrum(AudioSpectrum spectrum){
         return false;
     }
 
-    if (m_mode == Mode::SPIKE_CONV){
+    switch(m_mode){
+    case Mode::SPIKE_CONV:
+    {
         // Do the conv on new spectrum too.
         AlignedVector<float> convedSpectrum(m_template.numFrequencies());
         conv(spectrum.magnitudes->data() + m_originalFreqStart,
             m_originalFreqEnd - m_originalFreqStart, convedSpectrum.data());
         
         spectrum.magnitudes = std::make_unique<AlignedVector<float>>(std::move(convedSpectrum));
+        break;
+    }
+    case Mode::AVERAGE_5:
+    {
+        AlignedVector<float> avgedSpectrum(m_template.numFrequencies());
+        for(size_t j = 0; j < m_template.numFrequencies(); j++){
+            const float * rawFreqMag = spectrum.magnitudes->data() + m_originalFreqStart + j*5;
+            const float newMag = (rawFreqMag[0] + rawFreqMag[1] + rawFreqMag[2] + rawFreqMag[3] + rawFreqMag[4]) / 5.0f;
+            avgedSpectrum[j] = newMag;
+        }
+        spectrum.magnitudes = std::make_unique<AlignedVector<float>>(std::move(avgedSpectrum));
+        break;
+    }
+    case Mode::RAW:
+        break;
     }
 
     // Compute the norm square (= sum squares) of the spectrum, used for matching:
@@ -166,13 +222,50 @@ bool SpectrogramMatcher::updateToNewSpectrums(const std::vector<AudioSpectrum>& 
             return false;
         }
     }
-  
-    while(m_spectrums.size() > m_template.numWindows()){
+    
+    // pop out too old spectrums
+    while(m_spectrums.size() > m_numSpectrumsNeeded){
         m_spectrums.pop_back();
         m_spectrumNormSqrs.pop_back();
     }
 
     return true;
+}
+
+std::pair<float, float> SpectrogramMatcher::matchSubTemplate(size_t subIndex) const {
+    auto iter = m_spectrums.begin();
+    auto iter2 = m_spectrumNormSqrs.begin();
+    float streamSumSqr = 0.0f;
+    float sumMulti = 0.0f;
+
+    const size_t templateStart = m_templateRange[subIndex].first;
+    const size_t templateEnd = m_templateRange[subIndex].second;
+    for(size_t i = templateStart; i < templateEnd; i++, iter++, iter2++){
+        // match in order from latest window to oldest
+        const float* templateData = m_template.getWindow(templateEnd-1-i);
+        const float* streamData = iter->magnitudes->data();
+        streamSumSqr += *iter2;
+        for(size_t j = m_freqStart; j < m_freqEnd; j++){
+            sumMulti += templateData[j] * streamData[j];
+        }
+    }
+    const float scale = (streamSumSqr < 1e-6f ? 1.0f : sumMulti / streamSumSqr);
+
+    iter = m_spectrums.begin();
+    iter2 = m_spectrumNormSqrs.begin();
+    float sum = 0.0f;
+    for(size_t i = templateStart; i < templateEnd; i++, iter++, iter2++){
+        // match in order from latest window to oldest
+        const float* templateData = m_template.getWindow(templateEnd-1-i);
+        const float* streamData = iter->magnitudes->data();
+        for(size_t j = m_freqStart; j < m_freqEnd; j++){
+            float d = templateData[j] - scale * streamData[j];
+            sum += d * d;
+        }
+    }
+    const float score = sqrt(sum) / m_templateNorm[0];
+
+    return std::make_pair(score, scale);
 }
 
 float SpectrogramMatcher::match(const std::vector<AudioSpectrum>& newSpectrums){
@@ -206,40 +299,24 @@ float SpectrogramMatcher::match(const std::vector<AudioSpectrum>& newSpectrums){
     m_lastStampTested = curStamp;
     
     // Do the match:
-    auto iter = m_spectrums.begin();
-    auto iter2 = m_spectrumNormSqrs.begin();
-    float streamSumSqr = 0.0f;
-    float sumMulti = 0.0f;
-    for(size_t i = 0; i < m_template.numWindows(); i++, iter++, iter2++){
-        // match in order from latest window to oldest
-        const float* templateData = m_template.getWindow(m_template.numWindows()-1-i);
-        const float* streamData = iter->magnitudes->data();
-        streamSumSqr += *iter2;
-        for(size_t j = m_freqStart; j < m_freqEnd; j++){
-            sumMulti += templateData[j] * streamData[j];
+    float score = FLT_MAX; // the lower the score, the better the match
+    if (m_templateRange.size() == 1){
+        // Match the full template
+        std::tie(score, m_lastScale) = matchSubTemplate(0);
+    }
+    else{
+        // Match each indivdual sub-template
+        for(size_t subTemp = 0; subTemp < m_templateRange.size(); subTemp++){
+            float subTemplateScore = FLT_MAX, subTemplateScale = 1.0f;
+            std::tie(subTemplateScore, subTemplateScale) = matchSubTemplate(subTemp);
+            if (subTemplateScore < score){
+                score = subTemplateScore;
+                m_lastScale = subTemplateScale;
+            }
         }
     }
-    float scale = (streamSumSqr < 1e-6f ? 1.0f : sumMulti / streamSumSqr);
-    m_lastScale = scale;  // record the scale to be given to the caller on request.
-    // std::cout << curStamp << " Matcher " << scale << " " << sumMulti << "/" << streamSumSqr << std::endl;
 
-    iter = m_spectrums.begin();
-    iter2 = m_spectrumNormSqrs.begin();
-    float sum = 0.0f;
-    for(size_t i = 0; i < m_template.numWindows(); i++, iter++, iter2++){
-        // match in order from latest window to oldest
-        const float* templateData = m_template.getWindow(m_template.numWindows()-1-i);
-        const float* streamData = iter->magnitudes->data();
-        for(size_t j = m_freqStart; j < m_freqEnd; j++){
-            float d = templateData[j] - scale * streamData[j];
-            sum += d * d;
-        }
-    }
-    float distance = sqrt(sum) / m_templateNorm;
-
-    // std::cout << "(" << curStamp+1-m_template.numWindows() << ", " <<  curStamp+1 << "): " << distance << std::endl;
-
-    return distance;
+    return score;
 }
 
 bool SpectrogramMatcher::skip(const std::vector<AudioSpectrum>& newSpectrums){
