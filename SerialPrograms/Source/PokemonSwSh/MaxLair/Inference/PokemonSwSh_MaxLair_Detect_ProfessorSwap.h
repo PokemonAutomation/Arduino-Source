@@ -17,7 +17,7 @@ namespace MaxLairInternal{
 
 class ProfessorSwapDetector : public SelectionArrowFinder{
 public:
-    ProfessorSwapDetector(VideoOverlay& overlay);
+    ProfessorSwapDetector(VideoOverlay& overlay, bool enable);
 
     bool detect(const QImage& screen);
 
@@ -26,6 +26,7 @@ public:
 
 
 private:
+    bool m_enabled;
 //    ImageFloatBox m_dialog0;
 //    ImageFloatBox m_dialog1;
     ImageFloatBox m_bottom_main;

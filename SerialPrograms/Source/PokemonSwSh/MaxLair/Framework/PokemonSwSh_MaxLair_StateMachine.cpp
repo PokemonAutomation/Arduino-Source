@@ -57,7 +57,7 @@ StateMachineAction run_state_iteration(
     PokemonSwapMenuDetector pokemon_swap(false);
     PathSelectDetector path_select;
     ItemSelectDetector item_menu(false);
-    ProfessorSwapDetector professor_swap(console);
+    ProfessorSwapDetector professor_swap(console, !starting);
     BattleMenuDetector battle_menu;
     RaidCatchDetector catch_select(console);
     PokemonCaughtMenuDetector caught_menu;
@@ -73,7 +73,7 @@ StateMachineAction run_state_iteration(
                 : (VisualInferenceCallback*)&pokemon_swap,
             &path_select,
             &item_menu,
-            starting ? nullptr : &professor_swap,
+            &professor_swap,
             &battle_menu,
             &catch_select,
             &caught_menu,

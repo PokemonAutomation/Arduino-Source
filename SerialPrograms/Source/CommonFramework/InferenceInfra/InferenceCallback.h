@@ -55,7 +55,21 @@ struct PeriodicInferenceCallback{
     )
         : callback(&p_callback)
         , period(p_period)
-    {}
+    {
+#if 0
+        if (period > std::chrono::milliseconds(0)){
+            return;
+        }
+        switch (callback->type()){
+        case InferenceType::VISUAL:
+            period = std::chrono::milliseconds(50);
+            break;
+        case InferenceType::AUDIO:
+            period = std::chrono::milliseconds(20);
+            break;
+        }
+#endif
+    }
 };
 
 

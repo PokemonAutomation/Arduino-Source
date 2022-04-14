@@ -31,6 +31,9 @@ InferenceSession::InferenceSession(
     try{
         for (size_t c = 0; c < callbacks.size(); c++){
             InferenceCallback* callback = callbacks[c];
+            if (callback == nullptr){
+                continue;
+            }
             if (!m_map.emplace(callback, c).second){
                 throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION, "Attempted to add the same callback twice.");
             }
