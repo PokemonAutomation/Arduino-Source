@@ -37,26 +37,26 @@ int wait_until(
 int wait_until(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     WallClock deadline,
-    std::vector<PeriodicInferenceCallback>& callbacks,
+    const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_period = std::chrono::milliseconds(50)
 );
 inline int wait_until(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     std::chrono::milliseconds timeout,
-    std::vector<InferenceCallback*>&& callbacks,
+    const std::vector<InferenceCallback*>& callbacks,
     std::chrono::milliseconds period = std::chrono::milliseconds(50)
 ){
     return wait_until(
         env, console, context,
         current_time() + timeout,
-        std::move(callbacks),
+        callbacks,
         period
     );
 }
 inline int wait_until(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     std::chrono::milliseconds timeout,
-    std::vector<PeriodicInferenceCallback>& callbacks,
+    const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_period = std::chrono::milliseconds(50)
 ){
     return wait_until(
@@ -86,7 +86,7 @@ int run_until(
 int run_until(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     std::function<void(BotBaseContext& context)>&& command,
-    std::vector<PeriodicInferenceCallback>& callbacks,
+    const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_period = std::chrono::milliseconds(50)
 );
 

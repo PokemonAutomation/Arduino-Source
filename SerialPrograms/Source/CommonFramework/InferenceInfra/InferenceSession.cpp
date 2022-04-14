@@ -21,7 +21,8 @@ namespace PokemonAutomation{
 InferenceSession::InferenceSession(
     Cancellable& scope, ConsoleHandle& console,
     const std::vector<InferenceCallback*>& callbacks,
-    std::chrono::milliseconds default_period
+    std::chrono::milliseconds default_video_period,
+    std::chrono::milliseconds default_audio_period
 )
     : m_console(console)
     , m_overlays(console.overlay())
@@ -39,7 +40,7 @@ InferenceSession::InferenceSession(
                 console.video_inference_pivot().add_callback(
                     scope, &m_triggered,
                     visual_callback,
-                    default_period
+                    default_video_period
                 );
                 visual_callback.make_overlays(m_overlays);
                 break;
@@ -48,7 +49,7 @@ InferenceSession::InferenceSession(
                 console.audio_inference_pivot().add_callback(
                     scope, &m_triggered,
                     static_cast<AudioInferenceCallback&>(*callback),
-                    default_period
+                    default_audio_period
                 );
                 break;
             }
@@ -60,8 +61,9 @@ InferenceSession::InferenceSession(
 }
 InferenceSession::InferenceSession(
     Cancellable& scope, ConsoleHandle& console,
-    std::vector<PeriodicInferenceCallback>& callbacks,
-    std::chrono::milliseconds default_period
+    const std::vector<PeriodicInferenceCallback>& callbacks,
+    std::chrono::milliseconds default_video_period,
+    std::chrono::milliseconds default_audio_period
 )
     : m_console(console)
     , m_overlays(console.overlay())
@@ -69,17 +71,17 @@ InferenceSession::InferenceSession(
 {
     try{
         for (size_t c = 0; c < callbacks.size(); c++){
-            PeriodicInferenceCallback& callback = callbacks[c];
-            if (!m_map.emplace(&callback.callback, c).second){
+            const PeriodicInferenceCallback& callback = callbacks[c];
+            if (!m_map.emplace(callback.callback, c).second){
                 throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION, "Attempted to add the same callback twice.");
             }
-            switch (callback.callback.type()){
+            switch (callback.callback->type()){
             case InferenceType::VISUAL:{
-                VisualInferenceCallback& visual_callback = static_cast<VisualInferenceCallback&>(callback.callback);
+                VisualInferenceCallback& visual_callback = static_cast<VisualInferenceCallback&>(*callback.callback);
                 console.video_inference_pivot().add_callback(
                     scope, &m_triggered,
                     visual_callback,
-                    default_period
+                    default_video_period
                 );
                 visual_callback.make_overlays(m_overlays);
                 break;
@@ -87,8 +89,8 @@ InferenceSession::InferenceSession(
             case InferenceType::AUDIO:
                 console.audio_inference_pivot().add_callback(
                     scope, &m_triggered,
-                    static_cast<AudioInferenceCallback&>(callback.callback),
-                    default_period
+                    static_cast<AudioInferenceCallback&>(*callback.callback),
+                    default_audio_period
                 );
                 break;
             }
@@ -116,7 +118,7 @@ int InferenceSession::triggered_index() const{
 
 
 void InferenceSession::clear() noexcept{
-    const double DIVIDER = std::chrono::milliseconds(1) / std::chrono::microseconds(1);
+    const double DIVIDER = (double)(std::chrono::milliseconds(1) / std::chrono::microseconds(1));
     const char* UNITS = " ms";
     for (auto& item : m_map){
         switch (item.first->type()){

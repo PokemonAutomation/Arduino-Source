@@ -14,7 +14,7 @@
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
-#include "CommonFramework/InferenceInfra/AudioInferenceSession.h"
+#include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -56,24 +56,14 @@ void ShinySoundListener::program(SingleSwitchProgramEnvironment& env, BotBaseCon
 
     std::cout << "Running audio test program." << std::endl;
 
-#if 0
-    auto& audioFeed = env.console.audio();
-    const int sampleRate = audioFeed.sample_rate();
-
-    if (sampleRate == 0){
-        std::cout << "Error: sample rate 0, audio stream not initialized" << std::endl;
-        return;
-    }
-#endif
     
     ShinySoundDetector detector(env.console, STOP_ON_SHINY_SOUND);
 
-#if 1
-    AudioInferenceSession session(env.console, context, env.console);
-    session += detector;
-
-    session.run();
-#endif
+    InferenceSession session(
+        context, env.console,
+        {{detector, std::chrono::milliseconds(20)}}
+    );
+    context.wait_until_cancel();
 
 
     std::cout << "Audio test program finished." << std::endl;

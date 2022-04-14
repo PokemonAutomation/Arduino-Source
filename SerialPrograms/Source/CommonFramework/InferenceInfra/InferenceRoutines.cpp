@@ -122,7 +122,7 @@ int wait_until(
 int wait_until(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     WallClock deadline,
-    std::vector<PeriodicInferenceCallback>& callbacks,
+    const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_period
 ){
     BotBaseContext subcontext(context, console.botbase());
@@ -246,7 +246,7 @@ int run_until(
 int run_until(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     std::function<void(BotBaseContext& context)>&& command,
-    std::vector<PeriodicInferenceCallback>& callbacks,
+    const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_period
 ){
     BotBaseContext subcontext(context, console.botbase());

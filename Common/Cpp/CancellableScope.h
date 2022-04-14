@@ -103,6 +103,7 @@ public:
 
     void wait_for(std::chrono::milliseconds duration);
     void wait_until(WallClock stop);
+    void wait_until_cancel();
 
 protected:
     CancellableScope();

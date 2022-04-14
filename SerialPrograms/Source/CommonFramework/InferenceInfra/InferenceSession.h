@@ -43,12 +43,14 @@ public:
     InferenceSession(
         Cancellable& scope, ConsoleHandle& console,
         const std::vector<InferenceCallback*>& callbacks,
-        std::chrono::milliseconds default_period
+        std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
+        std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
     );
     InferenceSession(
         Cancellable& scope, ConsoleHandle& console,
-        std::vector<PeriodicInferenceCallback>& callbacks,
-        std::chrono::milliseconds default_period
+        const std::vector<PeriodicInferenceCallback>& callbacks,
+        std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
+        std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
     );
     ~InferenceSession();
 

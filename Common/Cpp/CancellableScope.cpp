@@ -141,6 +141,21 @@ void CancellableScope::wait_until(WallClock stop){
     }
     throw_if_cancelled();
 }
+void CancellableScope::wait_until_cancel(){
+    m_sanitizer.check_usage();
+    throw_if_cancelled();
+    CancellableScopeData& data(m_impl);
+    {
+        std::unique_lock<std::mutex> lg(data.lock);
+        data.cv.wait(
+            lg,
+            [=]{
+                return cancelled();
+            }
+        );
+    }
+    throw_if_cancelled();
+}
 void CancellableScope::operator+=(Cancellable& cancellable){
     m_sanitizer.check_usage();
     CancellableScopeData& data(m_impl);

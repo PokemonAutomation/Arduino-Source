@@ -46,8 +46,16 @@ private:
 
 
 struct PeriodicInferenceCallback{
-    InferenceCallback& callback;
+    InferenceCallback* callback;
     std::chrono::milliseconds period = std::chrono::milliseconds(0);    //  0 means user default
+
+    PeriodicInferenceCallback(
+        InferenceCallback& p_callback,
+        std::chrono::milliseconds p_period = std::chrono::milliseconds(0)
+    )
+        : callback(&p_callback)
+        , period(p_period)
+    {}
 };
 
 

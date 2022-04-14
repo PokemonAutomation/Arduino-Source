@@ -158,7 +158,10 @@ void mash_A_to_change_region(
     ret = wait_until(
         env, console, context,
         std::chrono::milliseconds(1000 * GameSettings::instance().LOAD_REGION_TIMEOUT / TICKS_PER_SECOND),
-        { &black_screen1a, &black_screen1b }
+        {
+            {black_screen1a},
+            {black_screen1b},
+        }
     );
     if (ret < 0){
         dump_image(console.logger(), env.program_info(), "LoadRegion", console.video().snapshot());
