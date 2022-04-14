@@ -24,27 +24,11 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-
-ShinySoundDetector::~ShinySoundDetector(){
-    log_results();
-}
 ShinySoundDetector::ShinySoundDetector(ConsoleHandle& console, bool stop_on_detected)
-    : AudioInferenceCallback("ShinySoundDetector")
-    , m_console(console)
-    , m_stop_on_detected(stop_on_detected)
-    , m_detected(false)
-    , m_time_detected(WallClock::min())
-    , m_error_coefficient(1.0)
+    // Use a green as the detection color because the shiny symbol in LA is green.
+    : AudioPerSpectrumDetectorBase("ShinySoundDetector", "Shiny sound", COLOR_GREEN, console, stop_on_detected)
 {}
-void ShinySoundDetector::log_results(){
-    std::stringstream ss;
-    ss << m_error_coefficient;
-    if (detected()){
-        m_console.log("Shiny detected! Error Coefficient = " + ss.str(), COLOR_BLUE);
-    }else{
-        m_console.log("No shiny detected. Error Coefficient = " + ss.str(), COLOR_PURPLE);
-    }
-}
+
 ShinySoundResults ShinySoundDetector::results(){
     ShinySoundResults results;
     SpinLockGuard lg(m_lock);
@@ -54,90 +38,16 @@ ShinySoundResults ShinySoundDetector::results(){
 }
 
 
-bool ShinySoundDetector::process_spectrums(
-    const std::vector<AudioSpectrum>& newSpectrums,
-    AudioFeed& audioFeed
-){
-    if (newSpectrums.empty()){
-        return false;
-    }
-
-    WallClock now = current_time();
-
-    size_t sampleRate = newSpectrums[0].sample_rate;
-    if (m_matcher == nullptr || m_matcher->sampleRate() != sampleRate){
-        m_console.log("Loading spectrogram...");
-        m_matcher = std::make_unique<SpectrogramMatcher>(
-            AudioTemplateCache::instance().get_throw("PokemonLA/ShinySound", sampleRate),
-            SpectrogramMatcher::Mode::SPIKE_CONV, sampleRate,
-            GameSettings::instance().SHINY_SHOUND_LOW_FREQUENCY
-        );
-    }
-
-    // Feed spectrum one by one to the matcher:
-    // newSpectrums are ordered from newest (largest timestamp) to oldest (smallest timestamp).
-    // To feed the spectrum from old to new, we need to go through the vector in the reverse order:
-
-//    static int c = 0;
-//    c++;
-    for(auto it = newSpectrums.rbegin(); it != newSpectrums.rend(); it++){
-        std::vector<AudioSpectrum> singleSpectrum = {*it};
-        float matcherScore = m_matcher->match(singleSpectrum);
-
-        if (matcherScore == FLT_MAX){
-            continue; // error or not enough spectrum history
-        }
-
-        const float threshold = (float)GameSettings::instance().SHINY_SHOUND_THRESHOLD2;
-        bool found = matcherScore <= threshold;
-//        cout << matcherScore << endl;
-
-        m_error_coefficient = std::min(m_error_coefficient, matcherScore);
-
-        size_t curStamp = m_matcher->latestTimestamp();
-        // std::cout << "(" << curStamp+1-m_matcher->numTemplateWindows() << ", " <<  curStamp+1 << "): " << matcherScore <<
-        //     (found ? " FOUND!" : "") << std::endl;
-
-        if (found){
-            {
-                SpinLockGuard lg(m_lock);
-                m_screenshot = m_console.video().snapshot();
-            }
-            std::ostringstream os;
-            os << "Shiny sound find, score " << matcherScore << "/" << threshold << ", scale: " << m_matcher->lastMatchedScale();
-            m_console.log(os.str(), COLOR_BLUE);
-            // Add a green box to the matched sound. Use color green because the shiny symbol in LA is green.
-            audioFeed.add_overlay(curStamp+1-m_matcher->numTemplateWindows(), curStamp+1, COLOR_GREEN);
-            // Tell m_matcher to skip the remaining spectrums so that if `process_spectrums()` gets
-            // called again on a newer batch of spectrums, m_matcher is happy.
-            m_matcher->skip(std::vector<AudioSpectrum>(
-                newSpectrums.begin(),
-                newSpectrums.begin() + std::distance(it + 1, newSpectrums.rend())
-            ));
-
-            if (!m_detected.load(std::memory_order_acquire)){
-                m_time_detected = now;
-                m_detected.store(true, std::memory_order_release);
-            }
-
-            break;
-        }
-    }
-
-    if (!m_stop_on_detected){
-        return false;
-    }
-    if (!m_detected.load(std::memory_order_acquire)){
-        return false;
-    }
-
-    //  Don't return true for another 200ms so we can get a measurement of how strong this detection is.
-    return m_time_detected + std::chrono::milliseconds(200) <= now;
+float ShinySoundDetector::get_score_threshold() const{
+    return (float)GameSettings::instance().SHINY_SHOUND_THRESHOLD2;
 }
 
-
-void ShinySoundDetector::clear(){
-    m_matcher->clear();
+std::unique_ptr<SpectrogramMatcher> ShinySoundDetector::build_spectrogram_matcher(size_t sampleRate){
+    return std::make_unique<SpectrogramMatcher>(
+        AudioTemplateCache::instance().get_throw("PokemonLA/ShinySound", sampleRate),
+        SpectrogramMatcher::Mode::SPIKE_CONV, sampleRate,
+        GameSettings::instance().SHINY_SHOUND_LOW_FREQUENCY
+    );
 }
 
 

@@ -11,7 +11,7 @@
 #include <QImage>
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Logging/LoggerQt.h"
-#include "CommonFramework/InferenceInfra/AudioInferenceCallback.h"
+#include "CommonFramework/Inference/AudioPerSpectrumDetectorBase.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 
 #include <memory>
@@ -25,38 +25,18 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class ShinySoundDetector : public AudioInferenceCallback{
+class ShinySoundDetector : public AudioPerSpectrumDetectorBase{
 public:
-    virtual ~ShinySoundDetector();
     ShinySoundDetector(ConsoleHandle& console, bool stop_on_detected);
 
-    void log_results();
-
-    bool detected() const{
-        return m_detected.load(std::memory_order_acquire);
-    }
     ShinySoundResults results();
 
-    virtual bool process_spectrums(
-        const std::vector<AudioSpectrum>& newSpectrums,
-        AudioFeed& audioFeed
-    ) override;
+    // Implement AudioPerSpectrumDetectorBase::get_score_threshold()
+    virtual float get_score_threshold() const override;
 
-    // Clear internal data to be used on another audio stream.
-    void clear();
-
-private:
-    ConsoleHandle& m_console;
-    bool m_stop_on_detected;
-
-    SpinLock m_lock;
-    std::atomic<bool> m_detected;
-    WallClock m_time_detected;
-
-    float m_error_coefficient;
-    QImage m_screenshot;
-
-    std::unique_ptr<SpectrogramMatcher> m_matcher;
+protected:
+    // Implement AudioPerSpectrumDetectorBase::build_spectrogram_matcher()
+    virtual std::unique_ptr<SpectrogramMatcher> build_spectrogram_matcher(size_t sampleRate) override;
 };
 
 

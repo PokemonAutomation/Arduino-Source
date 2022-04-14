@@ -40,6 +40,8 @@ public:
         AudioFeed& audio
     );
 
+    // log(string-like msg, Color color = Color())
+    // string-like can be const char*, std::string or QString
     template <class... Args>
     void log(Args&&... args){
         m_logger.log(std::forward<Args>(args)...);
