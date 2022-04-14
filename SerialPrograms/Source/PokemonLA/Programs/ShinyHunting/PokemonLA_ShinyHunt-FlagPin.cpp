@@ -6,9 +6,11 @@
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA/PokemonLA_Settings.h"
+#include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "PokemonLA/Programs/PokemonLA_FlagNavigationAir.h"
@@ -98,18 +100,23 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, BotBas
     goto_camp_from_jubilife(env, env.console, context, TRAVEL_LOCATION);
 
     {
-        FlagNavigationAir session(
-            env, env.console, context,
-            SHINY_DETECTED.stop_on_shiny(),
-            STOP_DISTANCE,
-            FLAG_REACHED_DELAY,
-            std::chrono::seconds(NAVIGATION_TIMEOUT)
+        ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
+        run_until(
+            env.console, context,
+            [&](BotBaseContext& context){
+                FlagNavigationAir session(
+                    env, env.console, context,
+                    STOP_DISTANCE,
+                    FLAG_REACHED_DELAY,
+                    std::chrono::seconds(NAVIGATION_TIMEOUT)
+                );
+                session.run_session();
+            },
+            {{shiny_detector}}
         );
-        session.run_session();
-
-        if (session.detected_shiny()){
+        if (shiny_detector.detected()){
             stats.shinies++;
-            on_shiny_sound(env, env.console, context, SHINY_DETECTED, session.shiny_sound_results());
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_detector.results());
         }
     }
 

@@ -5,6 +5,7 @@
  */
 
 #include <sstream>
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Tools/InterruptableCommands.h"
@@ -22,13 +23,11 @@ namespace PokemonLA{
 
 FlagNavigationAir::FlagNavigationAir(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
-    bool stop_on_shiny,
     uint16_t stop_radius,
     double flag_reached_delay,
     std::chrono::seconds navigate_timeout
 )
     : SuperControlSession(env, console, context)
-    , m_stop_on_shiny(stop_on_shiny)
     , m_stop_radius(stop_radius)
     , m_flag_reached_delay(std::chrono::milliseconds((uint64_t)(flag_reached_delay * 1000)))
     , m_navigate_timeout(navigate_timeout)
@@ -37,7 +36,6 @@ FlagNavigationAir::FlagNavigationAir(
     , m_centerA(console, console, ButtonType::ButtonA, {0.40, 0.50, 0.40, 0.50}, std::chrono::milliseconds(200), false)
     , m_leftB(console, console, ButtonType::ButtonB, {0.02, 0.40, 0.05, 0.20}, std::chrono::milliseconds(200), false)
     , m_dialog_detector(console, console, false)
-    , m_shiny_listener(console, false)
     , m_looking_straight_ahead(false)
     , m_looking_straight_ahead_timestamp(WallClock::min())
 //    , m_last_good_state(WallClock::min())
@@ -48,22 +46,19 @@ FlagNavigationAir::FlagNavigationAir(
     , m_flag_distance(-1)
     , m_flag_x(0.5)
     , m_flag_y(0.0)
+    , m_last_flag_print(WallClock::min())
 {
     *this += m_flag;
     *this += m_mount;
     *this += m_centerA;
     *this += m_leftB;
     *this += m_dialog_detector;
-    *this += m_shiny_listener;
 
     auto find_flag = [=](BotBaseContext& context){
         uint8_t turn = m_flag_x <= 0.5 ? 0 : 255;
         for (size_t c = 0; c < 2; c++){
             pbf_mash_button(context, BUTTON_ZL, 2 * TICKS_PER_SECOND);
             pbf_move_right_joystick(context, turn, 128, 400, 0);
-//            pbf_move_right_joystick(context, 128, 255, 200, 0);
-//            pbf_move_right_joystick(context, 128, 0, 200, 0);
-//            pbf_move_right_joystick(context, 128, 255, 80, 0);
             pbf_move_right_joystick(context, 128, 255, 120, 0);
             pbf_move_right_joystick(context, turn, 128, 400, 0);
             pbf_move_right_joystick(context, 128, 0, 200, 0);
@@ -72,7 +67,6 @@ FlagNavigationAir::FlagNavigationAir(
         context.wait_for_all_requests();
         m_find_flag_failed.store(true, std::memory_order_release);
     };
-
 
     register_state_command(State::UNKNOWN, [=](){
         m_console.log("Unknown state. Moving camera around...");
@@ -287,12 +281,11 @@ FlagNavigationAir::FlagNavigationAir(
         return false;
     });
 }
+void FlagNavigationAir::set_flag_callback(std::function<void(double distance, double x, double y)> flag_callback){
+    m_flag_callback = std::move(flag_callback);
+}
 
-bool FlagNavigationAir::run_state(AsyncCommandSession& commands,WallClock timestamp){
-    if (m_stop_on_shiny && m_shiny_listener.detected()){
-        return true;
-    }
-
+bool FlagNavigationAir::run_state(AsyncCommandSession& commands, WallClock timestamp){
     if (last_state_change() + std::chrono::seconds(60) < timestamp){
         throw OperationFailedException(m_console, "No state change detected after 60 seconds.");
     }
@@ -310,15 +303,19 @@ bool FlagNavigationAir::run_state(AsyncCommandSession& commands,WallClock timest
     m_flag_detected = m_flag.get(m_flag_distance, m_flag_x, m_flag_y, timestamp);
     if (m_flag_detected){
         m_last_flag_detection = timestamp;
+        if (m_flag_callback){
+            m_flag_callback(m_flag_distance, m_flag_x, m_flag_y);
+        }
     }else{
 //        m_console.log("Flag not detected.", COLOR_ORANGE);
     }
 #if 1
-    if (m_flag_detected && m_flag_distance >= 0 && m_flag_distance < 50){
+    if (m_flag_detected && m_flag_distance >= 0 && m_last_flag_print + std::chrono::seconds(1) <= timestamp){
         std::stringstream ss;
-        ss << "distance = " << (m_flag_distance < 0 ? "?" : std::to_string(m_flag_distance))
+        ss << "Flag: Distance = " << (m_flag_distance < 0 ? "?" : std::to_string(m_flag_distance))
            << ", x = " << m_flag_x << ", y = " << m_flag_y << std::endl;
-        m_console.log(ss.str());
+        m_console.log(ss.str(), COLOR_PURPLE);
+        m_last_flag_print = timestamp;
     }
 #endif
 

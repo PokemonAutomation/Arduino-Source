@@ -46,7 +46,7 @@ FlagNavigationTest::FlagNavigationTest(const FlagNavigationTest_Descriptor& desc
     PA_ADD_OPTION(STOP_DISTANCE);
     PA_ADD_OPTION(FLAG_REACHED_DELAY);
     PA_ADD_OPTION(NAVIGATION_TIMEOUT);
-    PA_ADD_OPTION(SHINY_DETECTED);
+//    PA_ADD_OPTION(SHINY_DETECTED);
 }
 
 
@@ -54,7 +54,7 @@ void FlagNavigationTest::program(SingleSwitchProgramEnvironment& env, BotBaseCon
 
     FlagNavigationAir session(
         env, env.console, context,
-        SHINY_DETECTED.stop_on_shiny(),
+//        SHINY_DETECTED.stop_on_shiny(),
         STOP_DISTANCE,
         FLAG_REACHED_DELAY,
         std::chrono::seconds(NAVIGATION_TIMEOUT)

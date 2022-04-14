@@ -34,7 +34,7 @@ public:
         std::chrono::milliseconds period
     );
 
-    //  Returns the latency stats for the callback. Units are milliseconds.
+    //  Returns the latency stats for the callback. Units are microseconds.
     StatAccumulatorI32 remove_callback(VisualInferenceCallback& callback);
 
 private:

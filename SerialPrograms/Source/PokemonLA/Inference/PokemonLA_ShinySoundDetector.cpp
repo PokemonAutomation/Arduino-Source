@@ -77,7 +77,7 @@ bool ShinySoundDetector::process_spectrums(
     // Feed spectrum one by one to the matcher:
     // newSpectrums are ordered from newest (largest timestamp) to oldest (smallest timestamp).
     // To feed the spectrum from old to new, we need to go through the vector in the reverse order:
-    
+
 //    static int c = 0;
 //    c++;
     for(auto it = newSpectrums.rbegin(); it != newSpectrums.rend(); it++){
@@ -95,7 +95,7 @@ bool ShinySoundDetector::process_spectrums(
         m_error_coefficient = std::min(m_error_coefficient, matcherScore);
 
         size_t curStamp = m_matcher->latestTimestamp();
-        // std::cout << "(" << curStamp+1-m_matcher->numTemplateWindows() << ", " <<  curStamp+1 << "): " << matcherScore << 
+        // std::cout << "(" << curStamp+1-m_matcher->numTemplateWindows() << ", " <<  curStamp+1 << "): " << matcherScore <<
         //     (found ? " FOUND!" : "") << std::endl;
 
         if (found){
@@ -134,9 +134,140 @@ bool ShinySoundDetector::process_spectrums(
     return m_time_detected + std::chrono::milliseconds(200) <= now;
 }
 
+
 void ShinySoundDetector::clear(){
     m_matcher->clear();
 }
+
+
+
+
+
+
+
+
+ShinySoundDetector2::~ShinySoundDetector2(){
+    try{
+        log_results();
+    }catch (...){}
+}
+ShinySoundDetector2::ShinySoundDetector2(ConsoleHandle& console, std::function<bool(float error_coefficient)> on_shiny_callback)
+    : AudioInferenceCallback("ShinySoundDetector")
+    , m_console(console)
+    , m_on_shiny_callback(std::move(on_shiny_callback))
+    , m_lowest_error(1.0)
+    , m_last_timestamp(WallClock::min())
+    , m_last_error(1.0)
+    , m_last_reported(false)
+{}
+void ShinySoundDetector2::log_results(){
+    std::stringstream ss;
+    ss << m_lowest_error;
+    if (m_last_timestamp != WallClock::min()){
+        m_console.log("Shiny detected! Error Coefficient = " + ss.str(), COLOR_BLUE);
+    }else{
+        m_console.log("No shiny detected. Error Coefficient = " + ss.str(), COLOR_PURPLE);
+    }
+}
+
+
+bool ShinySoundDetector2::process_spectrums(
+    const std::vector<AudioSpectrum>& newSpectrums,
+    AudioFeed& audioFeed
+){
+    if (newSpectrums.empty()){
+        return false;
+    }
+
+    WallClock now = current_time();
+
+    //  Clear last detection.
+    if (m_last_timestamp + std::chrono::milliseconds(1000) <= now){
+        m_last_error = 1.0;
+        m_last_reported = false;
+    }
+
+    size_t sampleRate = newSpectrums[0].sample_rate;
+    if (m_matcher == nullptr || m_matcher->sampleRate() != sampleRate){
+        m_console.log("Loading spectrogram...");
+        m_matcher = std::make_unique<SpectrogramMatcher>(
+            AudioTemplateCache::instance().get_throw("PokemonLA/ShinySound", sampleRate),
+            SpectrogramMatcher::Mode::SPIKE_CONV, sampleRate,
+            GameSettings::instance().SHINY_SHOUND_LOW_FREQUENCY
+        );
+    }
+
+    // Feed spectrum one by one to the matcher:
+    // newSpectrums are ordered from newest (largest timestamp) to oldest (smallest timestamp).
+    // To feed the spectrum from old to new, we need to go through the vector in the reverse order:
+
+//    static int c = 0;
+//    c++;
+    bool found = false;
+    for (auto it = newSpectrums.rbegin(); it != newSpectrums.rend(); it++){
+        std::vector<AudioSpectrum> singleSpectrum = {*it};
+        float matcherScore = m_matcher->match(singleSpectrum);
+
+        if (matcherScore == FLT_MAX){
+            continue; // error or not enough spectrum history
+        }
+
+        const float threshold = (float)GameSettings::instance().SHINY_SHOUND_THRESHOLD2;
+        found = matcherScore <= threshold;
+//        cout << matcherScore << endl;
+
+        m_lowest_error = std::min(m_lowest_error, matcherScore);
+
+        size_t curStamp = m_matcher->latestTimestamp();
+        // std::cout << "(" << curStamp+1-m_matcher->numTemplateWindows() << ", " <<  curStamp+1 << "): " << matcherScore <<
+        //     (found ? " FOUND!" : "") << std::endl;
+
+        if (found){
+            if (m_last_error >= 1.0){
+                m_last_timestamp = now;
+            }
+            m_last_error = std::min(m_last_error, matcherScore);
+
+            std::ostringstream os;
+            os << "Shiny sound find, score " << matcherScore << "/" << threshold << ", scale: " << m_matcher->lastMatchedScale();
+            m_console.log(os.str(), COLOR_BLUE);
+            audioFeed.add_overlay(curStamp+1-m_matcher->numTemplateWindows(), curStamp+1, COLOR_RED);
+            // Tell m_matcher to skip the remaining spectrums so that if `process_spectrums()` gets
+            // called again on a newer batch of spectrums, m_matcher is happy.
+            m_matcher->skip(std::vector<AudioSpectrum>(
+                newSpectrums.begin(),
+                newSpectrums.begin() + std::distance(it + 1, newSpectrums.rend())
+            ));
+
+            break;
+        }
+    }
+
+    //  No shiny detected.
+    if (!found){
+        return false;
+    }
+
+    //  Shiny detected, but haven't waited long enough to measure its magnitude.
+    if (m_last_timestamp + std::chrono::milliseconds(200) > now){
+        return false;
+    }
+
+    //  Already reported this shiny. Don't report again.
+    if (m_last_reported){
+        return false;
+    }
+
+    //  No callback. Can't report.
+    if (m_on_shiny_callback == nullptr){
+        return false;
+    }
+
+    bool ret = m_on_shiny_callback(m_last_error);
+    m_last_reported = true;
+    return ret;
+}
+
 
 
 
