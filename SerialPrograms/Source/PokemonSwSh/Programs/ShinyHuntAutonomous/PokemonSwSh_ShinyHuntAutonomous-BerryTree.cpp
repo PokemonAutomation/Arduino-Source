@@ -116,8 +116,8 @@ void ShinyHuntAutonomousBerryTree::program(SingleSwitchProgramEnvironment& env, 
                     pbf_mash_button(context, BUTTON_A, 60 * TICKS_PER_SECOND);
                 },
                 {
-                    &battle_menu_detector,
-                    &start_battle_detector,
+                    {battle_menu_detector},
+                    {start_battle_detector},
                 }
             );
 

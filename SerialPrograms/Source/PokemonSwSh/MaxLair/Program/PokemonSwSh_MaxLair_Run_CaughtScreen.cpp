@@ -41,7 +41,7 @@ StateMachineAction mash_A_to_entrance(
         [&](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, 60 * TICKS_PER_SECOND);
         },
-        { &entrance_detector },
+        {{entrance_detector}},
         INFERENCE_RATE
     );
 

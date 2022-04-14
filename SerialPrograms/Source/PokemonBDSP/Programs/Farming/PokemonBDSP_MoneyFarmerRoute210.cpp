@@ -132,7 +132,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
                     pbf_press_button(context, BUTTON_ZL, 10, 10);
                 }
             },
-            { &detector, }
+            {{detector}}
         );
         if (ret < 0){
             stats.m_errors++;
@@ -159,9 +159,9 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {
-                &battle_menu,
-                battle_menu_seen ? &end_battle : nullptr,
-                &learn_move
+                {battle_menu},
+                battle_menu_seen ? PeriodicInferenceCallback{end_battle} : PeriodicInferenceCallback{},
+                {learn_move},
             }
         );
         switch (ret){
@@ -377,9 +377,8 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, BotBaseCo
                 env.console, context,
                 [=](BotBaseContext& context){
                     SHORTCUT.run(context, TICKS_PER_SECOND);
-
                 },
-                { &tracker }
+                {{tracker}}
             );
             need_to_charge = true;
             pbf_mash_button(context, BUTTON_B, 250);

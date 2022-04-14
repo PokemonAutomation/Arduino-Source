@@ -138,7 +138,7 @@ void StatsResetRegi::program(SingleSwitchProgramEnvironment& env, BotBaseContext
                             pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
                         }
                     },
-                    { &fight_detector }
+                    {{fight_detector}}
                 );
                 if (result == 0){
                     env.log("New fight detected, let's begin to throw balls.", COLOR_PURPLE);

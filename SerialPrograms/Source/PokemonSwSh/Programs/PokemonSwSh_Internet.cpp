@@ -33,7 +33,7 @@ bool connect_to_internet_with_inference(
         int result = wait_until(
             console, context,
             std::chrono::seconds(10),
-            { &detector }
+            {{detector}}
         );
         if (result == 0){
             console.log("Y-COMM detected.");
@@ -60,7 +60,7 @@ bool connect_to_internet_with_inference(
             [&](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, timeout_ticks);
             },
-            { &detector }
+            {{detector}}
         );
         if (result == 0){
             console.log("Y-COMM no longer detected. Assume done connected to internet.");

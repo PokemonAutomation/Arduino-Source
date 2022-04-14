@@ -129,7 +129,7 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCo
                 pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, (uint16_t)(3.5 * TICKS_PER_SECOND)); // forward while sprinting until stairs, mash y a few times down the stairs
                 // we should easily be in range of gallade at this point, so if there's no shiny we're done
             },
-            { &shiny_detector }
+            {{shiny_detector}}
         );
         if (shiny_detector.detected()){
            stats.shinies++;

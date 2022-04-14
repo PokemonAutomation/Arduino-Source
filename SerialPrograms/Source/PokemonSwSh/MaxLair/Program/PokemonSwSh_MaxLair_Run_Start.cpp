@@ -51,8 +51,8 @@ bool wait_for_all_join(
         console, context,
         std::chrono::seconds(10),
         {
-            &joined_detector,
-            &entrance_detector,
+            {joined_detector},
+            {entrance_detector},
         },
         INFERENCE_RATE
     );

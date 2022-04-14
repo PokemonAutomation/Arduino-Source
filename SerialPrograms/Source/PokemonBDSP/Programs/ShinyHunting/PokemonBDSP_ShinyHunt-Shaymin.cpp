@@ -89,8 +89,8 @@ bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env, BotB
                 }
             },
             {
-                &battle_menu_detector,
-                &dialog_detector,
+                {battle_menu_detector},
+                {dialog_detector},
             }
         );
         switch (result){
@@ -116,8 +116,8 @@ bool ShinyHuntShaymin::start_encounter(SingleSwitchProgramEnvironment& env, BotB
                 }
             },
             {
-                &battle_menu_detector,
-                &start_battle_detector,
+                {battle_menu_detector},
+                {start_battle_detector},
             }
         );
         switch (result){

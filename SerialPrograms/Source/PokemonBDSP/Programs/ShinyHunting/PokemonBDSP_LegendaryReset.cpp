@@ -105,8 +105,8 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
                 }
             },
             {
-                &start_battle,
-                &battle_menu,
+                {start_battle},
+                {battle_menu},
             }
         );
         switch (ret){

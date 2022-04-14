@@ -118,7 +118,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                         pbf_wait(context, 1 * TICKS_PER_SECOND);
                     }
                 },
-                { &fight_detector }
+                {{fight_detector}}
             );
             if (result == 0){
                 env.log("New fight detected.", COLOR_PURPLE);
@@ -181,7 +181,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                             pbf_wait(context, 1 * TICKS_PER_SECOND);
                         }
                     },
-                    { &fight_detector }
+                    {{fight_detector}}
                 );
                 if (ret == 0){
                     env.log("New fight detected.", COLOR_PURPLE);

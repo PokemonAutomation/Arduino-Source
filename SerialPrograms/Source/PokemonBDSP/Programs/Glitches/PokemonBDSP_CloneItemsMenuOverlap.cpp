@@ -162,7 +162,7 @@ void CloneItemsMenuOverlap::mash_B_to_battle(ConsoleHandle& console, BotBaseCont
         [=](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
         },
-        { &detector }
+        {{detector}}
     );
     if (ret < 0){
         throw OperationFailedException(console, "Battle menu not detected after 10 seconds.");

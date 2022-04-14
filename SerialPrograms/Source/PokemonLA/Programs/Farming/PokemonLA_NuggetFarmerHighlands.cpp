@@ -98,7 +98,7 @@ void mash_A_until_end_of_battle(ConsoleHandle& console, BotBaseContext& context)
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, 120 * TICKS_PER_SECOND);
         },
-        { &detector }
+        {{detector}}
     );
     if (ret < 0){
         throw OperationFailedException(console, "Failed to return to overworld after 2 minutes.");
@@ -155,7 +155,10 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, Bo
 //                pbf_move_right_joystick(context, 0, 128, 200, 125);
 
             },
-            { &dialog_detector, &shiny_detector }
+            {
+                {dialog_detector},
+                {shiny_detector},
+            }
         );
         if (shiny_detector.detected()){
             stats.shinies++;

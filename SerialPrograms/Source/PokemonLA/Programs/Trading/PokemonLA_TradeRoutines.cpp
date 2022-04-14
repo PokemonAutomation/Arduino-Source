@@ -53,7 +53,7 @@ void trade_current_pokemon(
         );
         int ret = wait_until(
             console, context, std::chrono::seconds(120),
-            { &detector }
+            {{detector}}
         );
         if (ret < 0){
             stats.m_errors++;
@@ -73,7 +73,7 @@ void trade_current_pokemon(
         );
         int ret = wait_until(
             console, context, std::chrono::seconds(10),
-            { &detector }
+            {{detector}}
         );
         if (ret < 0){
             stats.m_errors++;
@@ -92,7 +92,7 @@ void trade_current_pokemon(
         BlackScreenOverWatcher black_screen;
         int ret = wait_until(
             console, context, std::chrono::minutes(2),
-            { &black_screen }
+            {{black_screen}}
         );
         if (ret < 0){
             stats.m_errors++;
@@ -111,7 +111,7 @@ void trade_current_pokemon(
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
-            { &black_screen }
+            {{black_screen}}
         );
         if (ret < 0){
             stats.m_errors++;
@@ -126,7 +126,7 @@ void trade_current_pokemon(
     {
         int ret = wait_until(
             console, context, std::chrono::minutes(2),
-            { &box_detector }
+            {{box_detector}}
         );
         if (ret < 0){
             stats.m_errors++;

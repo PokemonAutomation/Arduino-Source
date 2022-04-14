@@ -255,7 +255,7 @@ StateMachineAction run_move_select(
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 5 * TICKS_PER_SECOND);
             },
-            { &detector },
+            {{detector}},
             INFERENCE_RATE
         );
 

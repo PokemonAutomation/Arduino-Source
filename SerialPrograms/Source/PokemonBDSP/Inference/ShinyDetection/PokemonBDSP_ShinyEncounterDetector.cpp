@@ -180,7 +180,7 @@ void detect_shiny_battle(
     ShinyEncounterTracker tracker(console, console, battle_type);
     int result = wait_until(
         console, context, timeout,
-        { &tracker }
+        {{tracker}}
     );
     if (result < 0){
         console.log("ShinyDetector: Battle menu not found after timeout.", COLOR_RED);

@@ -117,8 +117,8 @@ CatchResults throw_balls(
             console, context,
             std::chrono::seconds(60),
             {
-                &menu_detector,
-                &experience_detector,
+                {menu_detector},
+                {experience_detector},
             }
         );
         switch (result){
@@ -171,7 +171,7 @@ CatchResults basic_catcher(
             [=](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
-            { &black_screen_detector }
+            {{black_screen_detector}}
         );
     }
 
@@ -184,7 +184,7 @@ CatchResults basic_catcher(
             [=](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 4 * TICKS_PER_SECOND);
             },
-            { &caught_detector }
+            {{caught_detector}}
         );
 
         switch (result){
@@ -206,7 +206,7 @@ CatchResults basic_catcher(
             [=](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
             },
-            { &black_screen_detector }
+            {{black_screen_detector}}
         );
     }
 

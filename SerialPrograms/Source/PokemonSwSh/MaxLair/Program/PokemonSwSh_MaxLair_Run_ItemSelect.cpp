@@ -57,7 +57,7 @@ void run_item_select(
     wait_until(
         console, context,
         std::chrono::seconds(480),
-        { &item_menu },
+        {{item_menu}},
         INFERENCE_RATE
     );
 

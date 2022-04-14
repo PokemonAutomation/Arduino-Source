@@ -159,11 +159,11 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 int result = run_until(
                     env.console, context,
                     [=](BotBaseContext& context){
-                    while (true){
-                        pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
-                    }
-                },
-                { &fight_detector }
+                        while (true){
+                            pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
+                        }
+                    },
+                    {{fight_detector}}
                 );
                 if (result == 0) {
                     env.log("New fight detected, let's begin to throw balls.", COLOR_PURPLE);

@@ -118,7 +118,7 @@ bool openedgame_to_gamemenu(
         int ret = wait_until(
             console, context,
             std::chrono::milliseconds(timeout * (1000 / TICKS_PER_SECOND)),
-            { &detector }
+            {{detector}}
         );
         if (ret < 0){
             console.log("Timed out waiting to enter game.", COLOR_RED);
@@ -131,7 +131,7 @@ bool openedgame_to_gamemenu(
         int ret = wait_until(
             console, context,
             std::chrono::milliseconds(timeout * (1000 / TICKS_PER_SECOND)),
-            { &detector }
+            {{detector}}
         );
         if (ret < 0){
             console.log("Timed out waiting for game menu.", COLOR_RED);

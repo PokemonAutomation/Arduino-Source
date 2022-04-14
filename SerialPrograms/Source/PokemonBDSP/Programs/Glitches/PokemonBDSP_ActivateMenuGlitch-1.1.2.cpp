@@ -61,7 +61,7 @@ void trigger_menu(ConsoleHandle& console, BotBaseContext& context){
                 pbf_press_button(context, BUTTON_R, 20, 105);
             }
         },
-        { &detector }
+        {{detector}}
     );
     if (ret < 0){
         throw OperationFailedException(console, "Map not detected after 60 seconds.");
@@ -85,7 +85,7 @@ void trigger_map_overlap(ConsoleHandle& console, BotBaseContext& context){
         BlackScreenWatcher detector;
         int ret = wait_until(
             console, context, std::chrono::seconds(4),
-            { &detector }
+            {{detector}}
         );
         if (ret >= 0){
             console.log("Overlap detected! Entered " + STRING_POKEMON + " center.", COLOR_BLUE);
@@ -129,7 +129,7 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, BotBase
                     pbf_press_dpad(context, DPAD_DOWN, 20, 105);
                 }
             },
-            { &detector }
+            {{detector}}
         );
         if (ret < 0){
             throw OperationFailedException(console, "Unable to leave " + STRING_POKEMON.toStdString() + " center.");

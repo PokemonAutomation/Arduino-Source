@@ -149,7 +149,11 @@ bool IngoBattleGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& con
                     pbf_press_button(context, BUTTON_A, 20, 150);
                 }
             },
-            { &button0, &button1, &button2 }
+            {
+                {button0},
+                {button1},
+                {button2},
+            }
         );
         switch (ret){
         case 0:
@@ -177,7 +181,7 @@ bool IngoBattleGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& con
                 pbf_press_button(context, BUTTON_A, 20, 150);
             }
         },
-        { &button2 }
+        {{button2}}
     );
     switch (ret){
     case 0:
@@ -262,11 +266,11 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
         int ret = wait_until(
             env.console, context, std::chrono::minutes(2),
             {
-                &battle_menu_detector,
-                &dialogue_ellipse_detector,
-                &normal_dialogue_detector,
-                &pokemon_switch_detector,
-                &arc_phone_detector
+                {battle_menu_detector},
+                {dialogue_ellipse_detector},
+                {normal_dialogue_detector},
+                {pokemon_switch_detector},
+                {arc_phone_detector},
             }
         );
         if (ret < 0){

@@ -140,7 +140,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCon
                 pbf_move_left_joystick(context, 128, 0, (uint16_t)(3.8 * TICKS_PER_SECOND), 0); // forward to crobat check
 
             },
-            { &shiny_detector }
+            {{shiny_detector}}
         );
         if (shiny_detector.detected()){
            stats.shinies++;

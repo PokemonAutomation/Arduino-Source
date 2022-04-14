@@ -68,17 +68,18 @@ StateMachineAction run_state_iteration(
         console, context,
         std::chrono::seconds(300),
         {
-            starting
-                ? (VisualInferenceCallback*)&pokemon_select
-                : (VisualInferenceCallback*)&pokemon_swap,
-            &path_select,
-            &item_menu,
-            &professor_swap,
-            &battle_menu,
-            &catch_select,
-            &caught_menu,
-            &entrance_detector,
-            &frozen_screen,
+            {starting
+                ? (VisualInferenceCallback&)pokemon_select
+                : (VisualInferenceCallback&)pokemon_swap
+            },
+            {path_select},
+            {item_menu},
+            {professor_swap},
+            {battle_menu},
+            {catch_select},
+            {caught_menu},
+            {entrance_detector},
+            {frozen_screen},
         },
         std::chrono::milliseconds(200)
     );

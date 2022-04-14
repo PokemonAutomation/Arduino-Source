@@ -31,28 +31,9 @@ class ProgramEnvironment;
 int wait_until(
     ConsoleHandle& console, BotBaseContext& context,
     WallClock deadline,
-    const std::vector<InferenceCallback*>& callbacks,
-    std::chrono::milliseconds period = std::chrono::milliseconds(50)
-);
-int wait_until(
-    ConsoleHandle& console, BotBaseContext& context,
-    WallClock deadline,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_period = std::chrono::milliseconds(50)
 );
-inline int wait_until(
-    ConsoleHandle& console, BotBaseContext& context,
-    std::chrono::milliseconds timeout,
-    const std::vector<InferenceCallback*>& callbacks,
-    std::chrono::milliseconds period = std::chrono::milliseconds(50)
-){
-    return wait_until(
-        console, context,
-        current_time() + timeout,
-        callbacks,
-        period
-    );
-}
 inline int wait_until(
     ConsoleHandle& console, BotBaseContext& context,
     std::chrono::milliseconds timeout,
@@ -77,12 +58,6 @@ inline int wait_until(
 //
 //  Exceptions thrown in either the commands or the triggers will stop
 //  everything and will be propagated out of this function.
-int run_until(
-    ConsoleHandle& console, BotBaseContext& context,
-    std::function<void(BotBaseContext& context)>&& command,
-    const std::vector<InferenceCallback*>& callbacks,
-    std::chrono::milliseconds period = std::chrono::milliseconds(50)
-);
 int run_until(
     ConsoleHandle& console, BotBaseContext& context,
     std::function<void(BotBaseContext& context)>&& command,

@@ -222,9 +222,9 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
                     trigger->run(context);
                 },
                 {
-                    &battle_menu_detector,
-                    &start_battle_detector,
-                    &target_tracker,
+                    {battle_menu_detector},
+                    {start_battle_detector},
+                    {target_tracker},
                 }
             );
 
@@ -331,9 +331,9 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
             }
         },
         {
-            &battle_menu_detector,
-            &start_battle_detector,
-            &target_tracker,
+            {battle_menu_detector},
+            {start_battle_detector},
+            {target_tracker},
         }
     );
 

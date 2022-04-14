@@ -38,7 +38,7 @@ void run_away(
                 pbf_mash_button(context, BUTTON_B, exit_battle_time - TICKS_PER_SECOND);
             }
         },
-        { &black_screen_detector }
+        {{black_screen_detector}}
     );
 }
 
@@ -105,7 +105,7 @@ void StandardEncounterHandler::run_away_and_update_stats(
                 pbf_mash_button(context, BUTTON_B, exit_battle_time - TICKS_PER_SECOND);
             }
         },
-        { &black_screen_detector }
+        {{black_screen_detector}}
     );
     if (ret < 0){
         m_console.log("Timed out waiting for end of battle. Are you stuck in the battle?", COLOR_RED);

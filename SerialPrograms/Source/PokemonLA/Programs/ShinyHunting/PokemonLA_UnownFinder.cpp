@@ -129,7 +129,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             [](BotBaseContext& context){
                ruins_entrance_route(context);
             },
-            { &shiny_detector_route }
+            {{shiny_detector_route}}
         );
 
         if (shiny_detector_route.detected()){
@@ -144,7 +144,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             [](BotBaseContext& context){
                enter_ruins(context);
             },
-            { &shiny_detector_ruins }
+            {{shiny_detector_ruins}}
         );
 
 

@@ -138,9 +138,9 @@ CatchResults throw_balls(
             console, context,
             std::chrono::seconds(60),
             {
-                &menu_detector,
-                &experience_detector,
-                &own_fainted_detector,
+                {menu_detector},
+                {experience_detector},
+                {own_fainted_detector},
             }
         );
         switch (result){
@@ -220,9 +220,9 @@ CatchResults basic_catcher(
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {
-                &end_battle,
-                &caught_detector,
-                &learn_move,
+                {end_battle},
+                {caught_detector},
+                {learn_move},
             }
         );
         switch (ret){

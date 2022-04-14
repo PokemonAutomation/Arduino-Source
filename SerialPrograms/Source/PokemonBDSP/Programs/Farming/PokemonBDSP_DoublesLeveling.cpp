@@ -113,9 +113,9 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, BotBaseContext
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {
-                &battle_menu,
-                &end_battle,
-                &learn_move,
+                {battle_menu},
+                {end_battle},
+                {learn_move},
             }
         );
         switch (ret){

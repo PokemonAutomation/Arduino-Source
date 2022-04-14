@@ -124,7 +124,8 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
 
                 context.wait_for_all_requests();
             },
-            { &shiny_detector });
+            {{shiny_detector}}
+        );
         if (shiny_detector.detected()){
            stats.shinies++;
            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_detector.results());

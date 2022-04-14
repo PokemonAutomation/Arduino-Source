@@ -324,7 +324,7 @@ void EggAutonomousState::fetch_egg(){
             [=](BotBaseContext& context){
                 pbf_move_left_joystick(context, 0, 255, 125, 0);
             },
-            { &dialog }
+            {{dialog}}
         );
         if (ret >= 0){
             return;
@@ -349,7 +349,7 @@ void EggAutonomousState::fetch_egg(){
                 pbf_move_left_joystick(context, 128, 0, 35, 0);
                 pbf_move_left_joystick(context, 255, 128, 60, 125);
             },
-            { &dialog }
+            {{dialog}}
         );
         if (ret >= 0){
             return;
@@ -364,7 +364,7 @@ void EggAutonomousState::fetch_egg(){
             [=](BotBaseContext& context){
                 pbf_press_button(context, BUTTON_ZL, 20, 230);
             },
-            { &dialog }
+            {{dialog}}
         );
         if (ret < 0){
             process_error("DaycareMan", "Unable to find daycare man.");
@@ -382,7 +382,7 @@ void EggAutonomousState::fetch_egg(){
                 pbf_mash_button(context, BUTTON_ZL, 500);
                 pbf_mash_button(context, BUTTON_B, 500);
             },
-            { &received }
+            {{received}}
         );
         m_stats.m_fetch_attempts++;
         if (received.fetched()){
@@ -415,7 +415,7 @@ void EggAutonomousState::hatch_egg(){
         ShortDialogWatcher dialog;
         int ret = wait_until(
             m_console, m_context, std::chrono::seconds(30),
-            { &dialog }
+            {{dialog}}
         );
         if (ret < 0){
             throw OperationFailedException(m_console, "End of hatch not detected after 30 seconds.");
@@ -438,8 +438,8 @@ void EggAutonomousState::hatch_egg(){
         int ret = wait_until(
             m_console, m_context, std::chrono::seconds(30),
             {
-                &matcher,
-                &prompt,
+                {matcher},
+                {prompt},
             }
         );
         switch (ret){
@@ -472,8 +472,8 @@ void EggAutonomousState::hatch_rest_of_party(){
 //                egg_spin(context, 5 * TICKS_PER_SECOND);
             },
             {
-                &dialog,
-                &frozen,
+                {dialog},
+                {frozen},
             }
         );
         switch (ret){
@@ -499,7 +499,7 @@ void EggAutonomousState::spin_until_fetch_or_hatch(){
         [&](BotBaseContext& context){
             egg_spin(context, m_travel_time_per_fetch);
         },
-        { &dialog }
+        {{dialog}}
     );
     m_context.wait_for(std::chrono::milliseconds(200));
     if (ret < 0){

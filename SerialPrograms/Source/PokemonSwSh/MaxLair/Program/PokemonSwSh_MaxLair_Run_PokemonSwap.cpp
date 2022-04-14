@@ -85,7 +85,7 @@ void run_swap_pokemon(
             [&](BotBaseContext& context){
                 pbf_mash_button(context, swap ? BUTTON_A : BUTTON_B, 30 * TICKS_PER_SECOND);
             },
-            { &detector }
+            {{detector}}
         );
         if (result < 0){
             console.log("Timed out waiting for black screen.", COLOR_RED);
@@ -99,7 +99,7 @@ void run_swap_pokemon(
         int result = wait_until(
             console, context,
             std::chrono::seconds(30),
-            { &detector },
+            {{detector}},
             INFERENCE_RATE
         );
         if (result < 0){

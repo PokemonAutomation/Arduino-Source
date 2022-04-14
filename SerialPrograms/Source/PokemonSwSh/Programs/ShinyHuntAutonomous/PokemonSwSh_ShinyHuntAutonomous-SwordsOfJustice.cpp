@@ -148,8 +148,8 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
                 env.console, context,
                 std::chrono::seconds(30),
                 {
-                    &battle_menu_detector,
-                    &start_back_detector,
+                    {battle_menu_detector},
+                    {start_back_detector},
                 }
             );
         }

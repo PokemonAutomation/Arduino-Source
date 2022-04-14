@@ -207,7 +207,7 @@ void OutbreakFinder::goto_region_and_return(SingleSwitchProgramEnvironment& env,
                     pbf_press_button(context, BUTTON_A, 20, 125);
                 }
             },
-            { &button_detector }
+            {{button_detector}}
         );
         if (ret >= 0){
             context.wait_for(std::chrono::milliseconds(500));
@@ -240,7 +240,7 @@ bool OutbreakFinder::run_iteration(
                 pbf_press_button(context, BUTTON_A, 20, 105);
             }
         },
-        { &detector }
+        {{detector}}
     );
     if (ret < 0){
         stats.errors++;

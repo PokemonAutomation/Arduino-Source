@@ -39,8 +39,8 @@ void hatch_egg(ConsoleHandle& console, BotBaseContext& context){
                 egg_spin(context, 480 * TICKS_PER_SECOND);
             },
             {
-                &dialog,
-                &frozen,
+                {dialog},
+                {frozen},
             }
         );
         switch (ret){
@@ -65,7 +65,7 @@ void hatch_egg(ConsoleHandle& console, BotBaseContext& context){
         ShortDialogWatcher dialog;
         int ret = wait_until(
             console, context, std::chrono::seconds(30),
-            { &dialog }
+            {{dialog}}
         );
         if (ret < 0){
             throw OperationFailedException(console, "End of hatch not detected after 30 seconds.");
@@ -85,8 +85,8 @@ void hatch_egg(ConsoleHandle& console, BotBaseContext& context){
         int ret = wait_until(
             console, context, std::chrono::seconds(30),
             {
-                &matcher,
-                &arrow,
+                {matcher},
+                {arrow},
             }
         );
         switch (ret){

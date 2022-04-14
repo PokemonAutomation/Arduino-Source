@@ -93,7 +93,7 @@ bool ShinyHuntAutonomousRegigigas2::kill_and_return(ConsoleHandle& console, BotB
     int result = wait_until(
         console, context,
         std::chrono::seconds(30),
-        { &detector }
+        {{detector}}
     );
     switch (result){
     case 0:
@@ -135,7 +135,7 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env,
                 int result = wait_until(
                     env.console, context,
                     std::chrono::seconds(30),
-                    { &detector }
+                    {{detector}}
                 );
                 if (result < 0){
                     stats.add_error();

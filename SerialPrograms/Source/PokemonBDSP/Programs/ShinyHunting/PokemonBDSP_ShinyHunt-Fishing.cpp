@@ -118,9 +118,9 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, BotBaseConte
                     SHORTCUT.run(context, 30 * TICKS_PER_SECOND);
                 },
                 {
-                    &dialog_detector,
-                    &mark_detector,
-                    &battle_menu,
+                    {dialog_detector},
+                    {mark_detector},
+                    {battle_menu},
                 }
             );
             switch (ret){
@@ -148,8 +148,8 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, BotBaseConte
                 env.console, context,
                 std::chrono::milliseconds(5000),
                 {
-                    &dialog_detector,
-                    &battle_menu,
+                    {dialog_detector},
+                    {battle_menu},
                 }
             );
             switch (ret){
@@ -172,8 +172,8 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, BotBaseConte
                 env.console, context,
                 std::chrono::milliseconds(10000),
                 {
-                    &battle,
-                    &battle_menu,
+                    {battle},
+                    {battle_menu},
                 }
             );
             switch (ret){

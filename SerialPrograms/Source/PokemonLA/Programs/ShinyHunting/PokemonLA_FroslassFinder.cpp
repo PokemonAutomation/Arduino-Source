@@ -117,7 +117,7 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseC
                 pbf_press_button(context, BUTTON_PLUS, 10,10);
                 pbf_press_button(context, BUTTON_B, (uint16_t)(2.8 * TICKS_PER_SECOND), 10); // Braviary Second Push
             },
-            { &shiny_detector_route }
+            {{shiny_detector_route}}
         );
 
         if (shiny_detector_route.detected()){
@@ -133,7 +133,7 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseC
                 pbf_press_dpad(context, DPAD_LEFT, 20, 20);
                 pbf_press_button(context, BUTTON_B, (uint16_t)(4.5 * TICKS_PER_SECOND), 10);
             },
-            { &shiny_detector_ruins }
+            {{shiny_detector_ruins}}
         );
 
         if (shiny_detector_ruins.detected()){

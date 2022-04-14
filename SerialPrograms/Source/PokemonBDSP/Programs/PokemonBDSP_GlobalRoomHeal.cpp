@@ -35,7 +35,7 @@ bool heal_by_global_room(ConsoleHandle& console, BotBaseContext& context){
                 pbf_press_button(context, BUTTON_ZL, 10, 125);
             }
         },
-        { &arrow }
+        {{arrow}}
     );
     if (ret < 0){
         throw OperationFailedException(console, "No selection arrow detected when using Global Room.");

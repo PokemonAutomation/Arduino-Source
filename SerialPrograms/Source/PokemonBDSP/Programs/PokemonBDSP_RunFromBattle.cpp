@@ -28,7 +28,7 @@ bool run_from_battle(
                 pbf_mash_button(context, BUTTON_B, exit_battle_time - TICKS_PER_SECOND);
             }
         },
-        { &black_screen_detector }
+        {{black_screen_detector}}
     );
     if (ret < 0){
         console.log("Timed out waiting for end of battle. Are you stuck in the battle?", COLOR_RED);

@@ -139,9 +139,9 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Bo
                 env.console, context,
                 std::chrono::seconds(12),
                 {
-                    &miss_detector,
-                    &hook_detector,
-                    &menu_detector,
+                    {miss_detector},
+                    {hook_detector},
+                    {menu_detector},
                 }
             );
             switch (result){

@@ -36,7 +36,7 @@ bool gamemenu_to_ingame(
     int ret = wait_until(
         console, context,
         std::chrono::milliseconds(enter_game_timeout * (1000 / TICKS_PER_SECOND)),
-        { &detector }
+        {{detector}}
     );
     if (ret == 0){
         console.log("Entered game!");

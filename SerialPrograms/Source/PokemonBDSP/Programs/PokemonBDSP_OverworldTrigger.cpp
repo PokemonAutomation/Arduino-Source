@@ -105,8 +105,8 @@ bool OverworldTrigger::find_encounter(ConsoleHandle& console, BotBaseContext& co
                 }
             },
             {
-                &battle_menu_detector,
-                &start_battle_detector,
+                {battle_menu_detector},
+                {start_battle_detector},
             }
         );
     }else{
@@ -143,7 +143,10 @@ bool OverworldTrigger::find_encounter(ConsoleHandle& console, BotBaseContext& co
 
         result = wait_until(
             console, context, std::chrono::seconds(30),
-            { &battle_menu_detector, &start_battle_detector }
+            {
+                {battle_menu_detector},
+                {start_battle_detector},
+            }
         );
         if (result < 0){
             throw OperationFailedException(console, "Battle not detected after Sweet Scent for 30 seconds.");

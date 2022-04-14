@@ -134,8 +134,8 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, 
                     }
                 },
                 {
-                    &battle_menu_detector,
-                    &start_battle_detector,
+                    {battle_menu_detector},
+                    {start_battle_detector},
                 }
             );
 

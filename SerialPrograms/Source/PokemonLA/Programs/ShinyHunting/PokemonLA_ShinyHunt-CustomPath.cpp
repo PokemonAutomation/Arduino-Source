@@ -168,11 +168,11 @@ void ShinyHuntCustomPath::do_non_listen_action(ConsoleHandle& console, BotBaseCo
 void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
-    for(size_t action_index = 0; action_index < CUSTOM_PATH_TABLE.num_actions(); action_index++){
+    for (size_t action_index = 0; action_index < CUSTOM_PATH_TABLE.num_actions(); action_index++){
         const auto& row = CUSTOM_PATH_TABLE.get_action(action_index);
         if (row.action != PathAction::START_LISTEN){
             do_non_listen_action(env.console, context, action_index);
-        } else{
+        }else{
             env.log("Start Listen, build sound detector");
             // Build shiny sound detector and start listens:
             ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
@@ -194,7 +194,8 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseC
                     }
                     context.wait_for_all_requests();
                 },
-                { &shiny_detector });
+                {{shiny_detector}}
+            );
             if (shiny_detector.detected()){
                 stats.shinies++;
                 on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_detector.results());

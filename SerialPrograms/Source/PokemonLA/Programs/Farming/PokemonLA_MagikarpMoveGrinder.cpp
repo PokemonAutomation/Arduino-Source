@@ -102,9 +102,9 @@ void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, BotBa
         int ret = wait_until(
             env.console, context, std::chrono::minutes(2),
             {
-                &battle_menu_detector,
-                &pokemon_switch_detector,
-                &arc_phone_detector
+                {battle_menu_detector},
+                {pokemon_switch_detector},
+                {arc_phone_detector},
             }
         );
         if (ret < 0){
@@ -171,9 +171,9 @@ void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, B
         int ret = wait_until(
             env.console, context, std::chrono::minutes(2),
             {
-                &battle_menu_detector,
-                &pokemon_switch_detector,
-                &arc_phone_detector
+                {battle_menu_detector},
+                {pokemon_switch_detector},
+                {arc_phone_detector},
             }
         );
         if (ret < 0){

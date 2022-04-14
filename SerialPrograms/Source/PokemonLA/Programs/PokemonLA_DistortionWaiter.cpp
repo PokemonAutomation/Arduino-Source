@@ -108,7 +108,7 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, BotBaseConte
                     }
                 }
             },
-            { &detector }
+            {{detector}}
         );
         if (ret < 0){
             stats.errors++;

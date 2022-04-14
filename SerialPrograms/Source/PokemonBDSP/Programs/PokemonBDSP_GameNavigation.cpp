@@ -70,7 +70,7 @@ void overworld_to_menu(ConsoleHandle& console, BotBaseContext& context){
         MenuWatcher detector;
         int ret = wait_until(
             console, context, std::chrono::seconds(10),
-            { &detector }
+            {{detector}}
         );
         if (ret < 0){
             throw OperationFailedException(console, "Menu not detected after 10 seconds.");
@@ -108,7 +108,7 @@ void overworld_to_box(ConsoleHandle& console, BotBaseContext& context){
         BoxWatcher detector;
         int ret = wait_until(
             console, context, std::chrono::seconds(10),
-            { &detector }
+            {{detector}}
         );
         if (ret < 0){
             throw OperationFailedException(console, "Box system not detected after 10 seconds.");
@@ -139,7 +139,7 @@ void box_to_overworld(ConsoleHandle& console, BotBaseContext& context){
         MenuWatcher detector;
         int ret = wait_until(
             console, context, std::chrono::seconds(10),
-            { &detector }
+            {{detector}}
         );
         if (ret < 0){
             throw OperationFailedException(console, "Menu not detected after 10 seconds.");

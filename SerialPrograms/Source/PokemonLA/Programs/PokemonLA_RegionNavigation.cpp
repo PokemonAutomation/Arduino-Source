@@ -92,7 +92,11 @@ void from_professor_return_to_jubilife(
                     pbf_press_button(context, BUTTON_A, 20, 125);
                 }
             },
-            { &button_detector0, &button_detector1, &bottom_B }
+            {
+                {button_detector0},
+                {button_detector1},
+                {bottom_B}
+            }
         );
         context.wait_for(std::chrono::milliseconds(500));
         switch (ret){
@@ -125,7 +129,7 @@ void mash_A_to_enter_sub_area(
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, 7 * TICKS_PER_SECOND);
         },
-        { &black_screen0 }
+        {{black_screen0}}
     );
     if (ret < 0){
         dump_image(env.logger(), env.program_info(), "LoadSubArea", console.video().snapshot());
@@ -146,7 +150,7 @@ void mash_A_to_change_region(
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, GameSettings::instance().LOAD_REGION_TIMEOUT);
         },
-        { &black_screen0 }
+        {{black_screen0}}
     );
     if (ret < 0){
         throw OperationFailedException(console, "Failed to load into region after timeout.");
@@ -190,7 +194,7 @@ void goto_camp_from_jubilife(
                     pbf_press_button(context, BUTTON_A, 20, 105);
                 }
             },
-            { &detector }
+            {{detector}}
         );
         if (ret < 0){
             dump_image(console.logger(), env.program_info(), "MapNotDetected", console.video().snapshot());
@@ -238,7 +242,7 @@ void goto_camp_from_jubilife(
         int ret = wait_until(
             console, context,
             std::chrono::seconds(5),
-            { &detector }
+            {{detector}}
         );
         if (ret < 0){
             dump_image(env.logger(), env.program_info(), "MapNotFound", console.video().snapshot());
@@ -260,7 +264,7 @@ void goto_camp_from_jubilife(
         int ret = wait_until(
             console, context,
             std::chrono::seconds(2),
-            { &detector }
+            {{detector}}
         );
         if (ret < 0){
             throw OperationFailedException(console, "Unable to fly. Are you under attack?");
@@ -276,7 +280,7 @@ void goto_camp_from_jubilife(
     int ret = wait_until(
         console, context,
         std::chrono::seconds(20),
-        { &black_screen }
+        {{black_screen}}
     );
     if (ret < 0){
         dump_image(console.logger(), env.program_info(), "FlyToCamp", console.video().snapshot());
@@ -328,7 +332,7 @@ void goto_camp_from_overworld(
             int ret = wait_until(
                 console, context,
                 std::chrono::seconds(5),
-                { &detector }
+                {{detector}}
             );
             if (ret < 0){
                 dump_image(console.logger(), env.program_info(), "MapNotDetected", console.video().snapshot());
@@ -354,7 +358,7 @@ void goto_camp_from_overworld(
             int ret = wait_until(
                 console, context,
                 std::chrono::seconds(2),
-                { &detector }
+                {{detector}}
             );
             if (ret >= 0){
                 console.log("Flying back to camp...");
@@ -372,7 +376,7 @@ void goto_camp_from_overworld(
     int ret = wait_until(
         console, context,
         std::chrono::seconds(20),
-        { &black_screen }
+        {{black_screen}}
     );
     if (ret < 0){
         dump_image(console.logger(), env.program_info(), "FlyToCamp", console.video().snapshot());

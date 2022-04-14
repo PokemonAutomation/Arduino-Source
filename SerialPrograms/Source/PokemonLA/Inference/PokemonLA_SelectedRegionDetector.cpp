@@ -85,7 +85,7 @@ MapRegion detect_selected_region(ConsoleHandle& console, BotBaseContext& context
     int ret = wait_until(
         console, context,
         std::chrono::seconds(2),
-        { &detector }
+        {{detector}}
     );
     MapRegion region = detector.current_region();
     if (ret < 0){

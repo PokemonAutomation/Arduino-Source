@@ -169,7 +169,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
                 env.console, context, [](BotBaseContext& context){
                     pbf_mash_button(context, BUTTON_B, 20 * TICKS_PER_SECOND);
                 },
-                {&arc_phone_detector}
+                {{arc_phone_detector}}
             );
             if (ret < 0){
                 throw OperationFailedException(env.console, "Failed to find Arc phone after 20 seconds when the last battle ends.");
@@ -194,12 +194,12 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
         int ret = wait_until(
             env.console, context, std::chrono::minutes(2),
             {
-                &battle_menu_detector,
-                &dialogue_ellipse_detector,
-                &normal_dialogue_detector,
-                &surprise_dialogue_detector,
-                &pokemon_switch_detector,
-                &arc_phone_detector
+                {battle_menu_detector},
+                {dialogue_ellipse_detector},
+                {normal_dialogue_detector},
+                {surprise_dialogue_detector},
+                {pokemon_switch_detector},
+                {arc_phone_detector},
             }
         );
         if (ret < 0){

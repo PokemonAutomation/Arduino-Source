@@ -75,6 +75,9 @@ InferenceSession::InferenceSession(
     try{
         for (size_t c = 0; c < callbacks.size(); c++){
             const PeriodicInferenceCallback& callback = callbacks[c];
+            if (callback.callback == nullptr){
+                continue;
+            }
             if (!m_map.emplace(callback.callback, c).second){
                 throw InternalProgramError(&console.logger(), PA_CURRENT_FUNCTION, "Attempted to add the same callback twice.");
             }

@@ -128,7 +128,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
-            { &detector }
+            {{detector}}
         );
         if (ret == 0){
             env.log("Detected briefcase!");
@@ -167,7 +167,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
             SelectionArrowFinder selection_arrow(env.console, {0.50, 0.60, 0.35, 0.20}, COLOR_RED);
             ret = wait_until(
                 env.console, context, std::chrono::seconds(3),
-                { &selection_arrow }
+                {{selection_arrow}}
             );
             if (ret == 0){
                 env.log("Detected selection prompt!");

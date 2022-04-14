@@ -36,9 +36,9 @@ bool wait_for_a_player(
         console, context,
         time_limit,
         {
-            &done_connecting_detector,
-            &entrance_detector,
-            &false_start_detector,
+            {done_connecting_detector},
+            {entrance_detector},
+            {false_start_detector},
         },
         INFERENCE_RATE
     );
@@ -74,8 +74,8 @@ bool wait_for_lobby_ready(
         console, context,
         time_limit,
         {
-            &ready_detector,
-            &entrance_detector,
+            {ready_detector},
+            {entrance_detector},
         },
         INFERENCE_RATE
     );
@@ -113,7 +113,7 @@ bool start_adventure(
                 context.wait_for_all_requests();
             }
         },
-        { &lobby_detector },
+        {{lobby_detector}},
         INFERENCE_RATE
     );
     switch (result){

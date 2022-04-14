@@ -128,7 +128,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                     }
                     pbf_mash_button(context, BUTTON_B, 20 * TICKS_PER_SECOND);
                 },
-                { &detector }
+                {{detector}}
             );
             if (result == 0){
                 env.log(STRING_POKEMON + " receive menu detected.", COLOR_PURPLE);
