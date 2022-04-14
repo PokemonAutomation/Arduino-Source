@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceSession.h"
+#include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -153,9 +153,13 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
 //                env.console, env.console,
 //                ImageFloatBox(0.1, 0.01, 0.8, 0.77)
 //            );
-            AsyncVisualInferenceSession inference(env, env.console, context, env.console, env.console);
-            inference += receive_detector;
-//            inference += shiny_detector;
+            InferenceSession inference(
+                context, env.console,
+                {
+                    {receive_detector},
+//                    {shiny_detector},
+                }
+            );
 
             //  Different implementation of the "attract curry Pokemon" routine. DEFAULT
             pbf_move_left_joystick(context, 0x80, 0x00, 40, 5);     //  Move up a bit to avoid talking to your pokemon.
@@ -219,7 +223,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
 
             context.wait_for_all_requests();
             ShinyType shininess = ShinyType::NOT_SHINY;
-            if (inference.stop_and_rethrow() != nullptr){
+            if (inference.triggered_ptr() != nullptr){
 //                shininess = shiny_detector.results();
 #if 1
                 stats.add_non_shiny();

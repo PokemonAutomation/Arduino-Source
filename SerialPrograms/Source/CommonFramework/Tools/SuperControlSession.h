@@ -50,7 +50,7 @@ protected:
         ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
         std::chrono::milliseconds state_period = std::chrono::milliseconds(100),
         std::chrono::milliseconds visual_period = std::chrono::milliseconds(50),
-        std::chrono::milliseconds audio_period = std::chrono::milliseconds(50)
+        std::chrono::milliseconds audio_period = std::chrono::milliseconds(20)
     );
 
     void operator+=(VisualInferenceCallback& callback);

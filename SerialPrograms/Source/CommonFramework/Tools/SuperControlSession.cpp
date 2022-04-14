@@ -7,8 +7,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/InferenceInfra/AudioInferenceCallback.h"
-//#include "CommonFramework/InferenceInfra/VisualInferenceSession.h"
-//#include "CommonFramework/InferenceInfra/AudioInferenceSession.h"
 #include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "ProgramEnvironment.h"
 #include "ConsoleHandle.h"
@@ -85,7 +83,6 @@ void SuperControlSession::run_session(){
         )
     );
 
-#if 1
     std::vector<PeriodicInferenceCallback> callbacks;
     for (VisualInferenceCallback* callback : m_visual_callbacks){
         callbacks.emplace_back(PeriodicInferenceCallback{*callback, m_visual_period});
@@ -123,64 +120,6 @@ void SuperControlSession::run_session(){
     m_context.throw_if_cancelled();
 
     m_active_command->stop_session_and_rethrow();
-
-#else
-    std::unique_ptr<AsyncVisualInferenceSession> visual;
-    if (!m_visual_callbacks.empty()){
-        visual.reset(new AsyncVisualInferenceSession(m_env, m_console, m_context, m_console, m_console, m_visual_period));
-        for (VisualInferenceCallback* callback : m_visual_callbacks){
-            *visual += *callback;
-        }
-    }
-
-    std::unique_ptr<AsyncAudioInferenceSession> audio;
-    if (!m_audio_callbacks.empty()){
-        audio.reset(new AsyncAudioInferenceSession(m_env, m_console, m_context, m_console, m_audio_period));
-        for (AudioInferenceCallback* callback : m_audio_callbacks){
-            *audio += *callback;
-        }
-    }
-
-    WallClock now = current_time();
-    WallClock next_tick = now + m_state_period;
-
-    m_last_state = 0;
-
-    while (true){
-        //  Check stop conditions.
-        m_context.throw_if_cancelled();
-        if (visual){
-            visual->rethrow_exceptions();
-        }
-        if (audio){
-            audio->rethrow_exceptions();
-        }
-
-        if (run_state(*m_active_command, current_time())){
-            break;
-        }
-
-        now = current_time();
-        if (now >= next_tick){
-            next_tick = now + m_state_period;
-        }else{
-            m_context.wait_until(next_tick);
-            next_tick += m_state_period;
-        }
-    }
-    m_context.throw_if_cancelled();
-
-//    cout << "SuperControlSession::run_session() - stop" << endl;
-    m_active_command->stop_session_and_rethrow();
-
-    if (audio){
-        audio->stop_and_rethrow();
-    }
-    if (visual){
-        visual->stop_and_rethrow();
-    }
-//    cout << "SuperControlSession::run_session() - end" << endl;
-#endif
 }
 
 

@@ -6,7 +6,7 @@
 
 #include "ClientSource/Connection/BotBase.h"
 //#include "CommonFramework/InferenceInfra/VisualInferenceRoutines.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceSession.h"
+#include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.h"
@@ -54,17 +54,11 @@ void OverworldWatcher::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         }
     );
 
-#if 0
-    watcher.process_frame(env.console.video().snapshot(), current_time());
-#else
-    {
-        VisualInferenceSession session(env.console, context, env.console, env.console);
-        session += watcher;
-        session.run();
-    }
-#endif
-
-    context.wait_for(std::chrono::seconds(60));
+    InferenceSession session(
+        context, env.console,
+        {{watcher}}
+    );
+    context.wait_until_cancel();
 }
 
 

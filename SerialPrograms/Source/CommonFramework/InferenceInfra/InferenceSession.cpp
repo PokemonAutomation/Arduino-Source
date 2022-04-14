@@ -81,7 +81,7 @@ InferenceSession::InferenceSession(
                 console.video_inference_pivot().add_callback(
                     scope, &m_triggered,
                     visual_callback,
-                    default_video_period
+                    callback.period > std::chrono::milliseconds(0) ? callback.period : default_video_period
                 );
                 visual_callback.make_overlays(m_overlays);
                 break;
@@ -90,7 +90,7 @@ InferenceSession::InferenceSession(
                 console.audio_inference_pivot().add_callback(
                     scope, &m_triggered,
                     static_cast<AudioInferenceCallback&>(*callback.callback),
-                    default_audio_period
+                    callback.period > std::chrono::milliseconds(0) ? callback.period : default_audio_period
                 );
                 break;
             }

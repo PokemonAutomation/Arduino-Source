@@ -89,8 +89,6 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, BotBaseConte
 
 
     NotificationDetector detector(env.console, LANGUAGE);
-//    AsyncVisualInferenceSession visual(env, console, console, console);
-//    visual += detector;
 
     WallClock start = current_time();
     while (true){

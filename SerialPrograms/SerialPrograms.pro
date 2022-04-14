@@ -162,12 +162,10 @@ SOURCES += \
     Source/CommonFramework/Inference/SpectrogramMatcher.cpp \
     Source/CommonFramework/Inference/StatAccumulator.cpp \
     Source/CommonFramework/InferenceInfra/AudioInferencePivot.cpp \
-    Source/CommonFramework/InferenceInfra/AudioInferenceSession.cpp \
     Source/CommonFramework/InferenceInfra/InferenceRoutines.cpp \
     Source/CommonFramework/InferenceInfra/InferenceSession.cpp \
     Source/CommonFramework/InferenceInfra/VisualInferenceCallback.cpp \
     Source/CommonFramework/InferenceInfra/VisualInferencePivot.cpp \
-    Source/CommonFramework/InferenceInfra/VisualInferenceSession.cpp \
     Source/CommonFramework/Language.cpp \
     Source/CommonFramework/Logging/FileWindowLogger.cpp \
     Source/CommonFramework/Logging/LoggerQt.cpp \
@@ -789,13 +787,11 @@ HEADERS += \
     Source/CommonFramework/Inference/VisualDetector.h \
     Source/CommonFramework/InferenceInfra/AudioInferenceCallback.h \
     Source/CommonFramework/InferenceInfra/AudioInferencePivot.h \
-    Source/CommonFramework/InferenceInfra/AudioInferenceSession.h \
     Source/CommonFramework/InferenceInfra/InferenceCallback.h \
     Source/CommonFramework/InferenceInfra/InferenceRoutines.h \
     Source/CommonFramework/InferenceInfra/InferenceSession.h \
     Source/CommonFramework/InferenceInfra/VisualInferenceCallback.h \
     Source/CommonFramework/InferenceInfra/VisualInferencePivot.h \
-    Source/CommonFramework/InferenceInfra/VisualInferenceSession.h \
     Source/CommonFramework/Language.h \
     Source/CommonFramework/Logging/FileWindowLogger.h \
     Source/CommonFramework/Logging/LoggerQt.h \

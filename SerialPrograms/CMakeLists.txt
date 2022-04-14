@@ -267,8 +267,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/InferenceInfra/AudioInferenceCallback.h
     Source/CommonFramework/InferenceInfra/AudioInferencePivot.cpp
     Source/CommonFramework/InferenceInfra/AudioInferencePivot.h
-    Source/CommonFramework/InferenceInfra/AudioInferenceSession.cpp
-    Source/CommonFramework/InferenceInfra/AudioInferenceSession.h
     Source/CommonFramework/InferenceInfra/InferenceCallback.h
     Source/CommonFramework/InferenceInfra/InferenceRoutines.cpp
     Source/CommonFramework/InferenceInfra/InferenceRoutines.h
@@ -278,8 +276,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/InferenceInfra/VisualInferenceCallback.h
     Source/CommonFramework/InferenceInfra/VisualInferencePivot.cpp
     Source/CommonFramework/InferenceInfra/VisualInferencePivot.h
-    Source/CommonFramework/InferenceInfra/VisualInferenceSession.cpp
-    Source/CommonFramework/InferenceInfra/VisualInferenceSession.h
     Source/CommonFramework/Environment/Environment_Linux.cpp
     Source/CommonFramework/Environment/Environment_Windows.cpp
     Source/CommonFramework/Environment/Environment.cpp

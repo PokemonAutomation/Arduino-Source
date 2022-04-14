@@ -10,7 +10,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "Common/Cpp/PeriodicScheduler.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceSession.h"
+#include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "CommonFramework/InferenceInfra/VisualInferencePivot.h"
 

@@ -7,7 +7,7 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceSession.h"
+#include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -98,8 +98,10 @@ bool CloneItemsMenuOverlap::trigger_encounter(ProgramEnvironment& env, ConsoleHa
     console.log("Detected overworld. Triggering battle with menu overlap...");
 
     StartBattleMenuOverlapDetector detector(console);
-    AsyncVisualInferenceSession session(env, console, context, console, console);
-    session += detector;
+    InferenceSession session(
+        context, console,
+        {{detector}}
+    );
 
     for (size_t c = 0; c < 60; c++){
         if (detector.detected()){
@@ -117,7 +119,7 @@ bool CloneItemsMenuOverlap::trigger_encounter(ProgramEnvironment& env, ConsoleHa
         context.wait_for_all_requests();
     }
 
-    if (session.stop_and_rethrow()){
+    if (session.triggered_ptr()){
         console.log("Battle started!");
         return true;
     }else{

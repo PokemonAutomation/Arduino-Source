@@ -141,9 +141,6 @@ bool read_battle_menu(
 
 
     //  Enter move selection to read PP.
-//    AsyncVisualInferenceSession inference(env, console, console);
-//    inference += arrow_finder;
-
     pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
     context.wait_for_all_requests();
 
