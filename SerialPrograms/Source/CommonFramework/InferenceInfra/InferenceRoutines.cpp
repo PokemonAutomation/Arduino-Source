@@ -5,9 +5,12 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Tools/InterruptableCommands.h"
-#include "VisualInferenceSession.h"
-#include "AudioInferenceSession.h"
+#include "ClientSource/Connection/BotBase.h"
+//#include "CommonFramework/Tools/InterruptableCommands.h"
+#include "CommonFramework/Tools/VideoOverlaySet.h"
+//#include "VisualInferenceSession.h"
+//#include "AudioInferenceSession.h"
+#include "InferenceSession.h"
 #include "InferenceRoutines.h"
 
 #include <iostream>
@@ -17,12 +20,29 @@ using std::endl;
 namespace PokemonAutomation{
 
 
+
 int wait_until(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     WallClock deadline,
-    std::vector<InferenceCallback*>&& callbacks,
+    const std::vector<InferenceCallback*>& callbacks,
     std::chrono::milliseconds period
 ){
+#if 1
+    BotBaseContext subcontext(context, console.botbase());
+    InferenceSession session(subcontext, console, callbacks, period);
+
+//    cout << "wait_until()" << endl;
+
+    //  Wait
+    try{
+        subcontext.wait_until(deadline);
+    }catch (OperationCancelledException&){}
+
+    context.scope()->throw_if_cancelled();
+
+    return session.triggered_index();
+
+#else
     std::map<InferenceCallback*, size_t> map;
     InferenceCallback* visual_trigger = nullptr;
     InferenceCallback* audio_trigger = nullptr;
@@ -97,6 +117,27 @@ int wait_until(
         }
     }
     return -1;
+#endif
+}
+int wait_until(
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    WallClock deadline,
+    std::vector<PeriodicInferenceCallback>& callbacks,
+    std::chrono::milliseconds default_period
+){
+    BotBaseContext subcontext(context, console.botbase());
+    InferenceSession session(subcontext, console, callbacks, default_period);
+
+//    cout << "wait_until()" << endl;
+
+    //  Wait
+    try{
+        subcontext.wait_until(deadline);
+    }catch (OperationCancelledException&){}
+
+    context.scope()->throw_if_cancelled();
+
+    return session.triggered_index();
 }
 
 
@@ -105,9 +146,26 @@ int wait_until(
 int run_until(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     std::function<void(BotBaseContext& context)>&& command,
-    std::vector<InferenceCallback*>&& callbacks,
+    const std::vector<InferenceCallback*>& callbacks,
     std::chrono::milliseconds period
 ){
+#if 1
+    BotBaseContext subcontext(context, console.botbase());
+    InferenceSession session(subcontext, console, callbacks, period);
+
+//    cout << "run_until()" << endl;
+
+    //  Run commands.
+    try{
+        command(subcontext);
+        subcontext.wait_for_all_requests();
+    }catch (OperationCancelledException&){}
+
+    context.scope()->throw_if_cancelled();
+
+    return session.triggered_index();
+
+#else
     std::map<InferenceCallback*, size_t> map;
     InferenceCallback* visual_trigger = nullptr;
     InferenceCallback* audio_trigger = nullptr;
@@ -183,6 +241,28 @@ int run_until(
         }
     }
     return -1;
+#endif
+}
+int run_until(
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    std::function<void(BotBaseContext& context)>&& command,
+    std::vector<PeriodicInferenceCallback>& callbacks,
+    std::chrono::milliseconds default_period
+){
+    BotBaseContext subcontext(context, console.botbase());
+    InferenceSession session(subcontext, console, callbacks, default_period);
+
+//    cout << "run_until()" << endl;
+
+    //  Run commands.
+    try{
+        command(subcontext);
+        subcontext.wait_for_all_requests();
+    }catch (OperationCancelledException&){}
+
+    context.scope()->throw_if_cancelled();
+
+    return session.triggered_index();
 }
 
 

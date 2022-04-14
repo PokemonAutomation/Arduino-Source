@@ -96,11 +96,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
+#if 0
     VisualInferencePivot pivot(scope, feed, env.inference_dispatcher());
 
     MountTracker tracker(logger, MountDetectorLogging::LOG_ONLY);
 
     pivot.add_callback(scope, tracker, std::chrono::milliseconds(500));
+#endif
 
 
 //    scope.wait_for(std::chrono::seconds(60));

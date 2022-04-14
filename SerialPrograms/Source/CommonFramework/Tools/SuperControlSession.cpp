@@ -5,8 +5,11 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceSession.h"
-#include "CommonFramework/InferenceInfra/AudioInferenceSession.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonFramework/InferenceInfra/AudioInferenceCallback.h"
+//#include "CommonFramework/InferenceInfra/VisualInferenceSession.h"
+//#include "CommonFramework/InferenceInfra/AudioInferenceSession.h"
+#include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "ProgramEnvironment.h"
 #include "ConsoleHandle.h"
 #include "InterruptableCommands.h"
@@ -75,6 +78,53 @@ bool SuperControlSession::run_state_action(size_t state){
 void SuperControlSession::run_session(){
     m_start_time = current_time();
 
+    m_active_command.reset(
+        new AsyncCommandSession(
+            m_context, m_env.logger(), m_env.realtime_dispatcher(),
+            m_console.botbase()
+        )
+    );
+
+#if 1
+    std::vector<PeriodicInferenceCallback> callbacks;
+    for (VisualInferenceCallback* callback : m_visual_callbacks){
+        callbacks.emplace_back(PeriodicInferenceCallback{*callback, m_visual_period});
+    }
+    for (AudioInferenceCallback* callback : m_audio_callbacks){
+        callbacks.emplace_back(PeriodicInferenceCallback{*callback, m_audio_period});
+    }
+    InferenceSession session(
+        m_context, m_console,
+        callbacks,
+        m_visual_period
+    );
+
+    WallClock now = current_time();
+    WallClock next_tick = now + m_state_period;
+
+    m_last_state = 0;
+
+    while (true){
+        //  Check stop conditions.
+        m_context.throw_if_cancelled();
+
+        if (run_state(*m_active_command, current_time())){
+            break;
+        }
+
+        now = current_time();
+        if (now >= next_tick){
+            next_tick = now + m_state_period;
+        }else{
+            m_context.wait_until(next_tick);
+            next_tick += m_state_period;
+        }
+    }
+    m_context.throw_if_cancelled();
+
+    m_active_command->stop_session_and_rethrow();
+
+#else
     std::unique_ptr<AsyncVisualInferenceSession> visual;
     if (!m_visual_callbacks.empty()){
         visual.reset(new AsyncVisualInferenceSession(m_env, m_console, m_context, m_console, m_console, m_visual_period));
@@ -90,13 +140,6 @@ void SuperControlSession::run_session(){
             *audio += *callback;
         }
     }
-
-    m_active_command.reset(
-        new AsyncCommandSession(
-            m_context, m_env.logger(), m_env.realtime_dispatcher(),
-            m_console.botbase()
-        )
-    );
 
     WallClock now = current_time();
     WallClock next_tick = now + m_state_period;
@@ -137,6 +180,7 @@ void SuperControlSession::run_session(){
         visual->stop_and_rethrow();
     }
 //    cout << "SuperControlSession::run_session() - end" << endl;
+#endif
 }
 
 

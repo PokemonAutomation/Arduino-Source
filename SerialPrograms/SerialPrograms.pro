@@ -164,6 +164,7 @@ SOURCES += \
     Source/CommonFramework/InferenceInfra/AudioInferencePivot.cpp \
     Source/CommonFramework/InferenceInfra/AudioInferenceSession.cpp \
     Source/CommonFramework/InferenceInfra/InferenceRoutines.cpp \
+    Source/CommonFramework/InferenceInfra/InferenceSession.cpp \
     Source/CommonFramework/InferenceInfra/VisualInferenceCallback.cpp \
     Source/CommonFramework/InferenceInfra/VisualInferencePivot.cpp \
     Source/CommonFramework/InferenceInfra/VisualInferenceSession.cpp \
@@ -791,6 +792,7 @@ HEADERS += \
     Source/CommonFramework/InferenceInfra/AudioInferenceSession.h \
     Source/CommonFramework/InferenceInfra/InferenceCallback.h \
     Source/CommonFramework/InferenceInfra/InferenceRoutines.h \
+    Source/CommonFramework/InferenceInfra/InferenceSession.h \
     Source/CommonFramework/InferenceInfra/VisualInferenceCallback.h \
     Source/CommonFramework/InferenceInfra/VisualInferencePivot.h \
     Source/CommonFramework/InferenceInfra/VisualInferenceSession.h \

@@ -8,6 +8,7 @@
 #define PokemonAutomation_CommonFramework_InferenceCallback_H
 
 #include <string>
+#include <chrono>
 
 namespace PokemonAutomation{
 
@@ -18,6 +19,10 @@ enum class InferenceType{
 
 
 class InferenceCallback{
+    //  Disable these to prevent accidental copying/slicing.
+    InferenceCallback(const InferenceCallback&) = delete;
+    void operator=(const InferenceCallback&) = delete;
+
 public:
     virtual ~InferenceCallback() = default;
 
@@ -35,6 +40,14 @@ protected:
 private:
     InferenceType m_type;
     std::string m_label;
+};
+
+
+
+
+struct PeriodicInferenceCallback{
+    InferenceCallback& callback;
+    std::chrono::milliseconds period = std::chrono::milliseconds(0);    //  0 means user default
 };
 
 

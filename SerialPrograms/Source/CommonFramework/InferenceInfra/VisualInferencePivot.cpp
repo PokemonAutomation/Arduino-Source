@@ -15,16 +15,19 @@ namespace PokemonAutomation{
 
 struct VisualInferencePivot::PeriodicCallback{
     Cancellable& scope;
+    std::atomic<InferenceCallback*>* set_when_triggered;
     VisualInferenceCallback& callback;
     std::chrono::milliseconds period;
     StatAccumulatorI32 stats;
 
     PeriodicCallback(
         Cancellable& p_scope,
+        std::atomic<InferenceCallback*>* p_set_when_triggered,
         VisualInferenceCallback& p_callback,
         std::chrono::milliseconds p_period
     )
         : scope(p_scope)
+        , set_when_triggered(p_set_when_triggered)
         , callback(p_callback)
         , period(p_period)
     {}
@@ -42,7 +45,12 @@ VisualInferencePivot::~VisualInferencePivot(){
     detach();
     stop_thread();
 }
-void VisualInferencePivot::add_callback(Cancellable& scope, VisualInferenceCallback& callback, std::chrono::milliseconds period){
+void VisualInferencePivot::add_callback(
+    Cancellable& scope,
+    std::atomic<InferenceCallback*>* set_when_triggered,
+    VisualInferenceCallback& callback,
+    std::chrono::milliseconds period
+){
     SpinLockGuard lg(m_lock);
     auto iter = m_map.find(&callback);
     if (iter != m_map.end()){
@@ -51,7 +59,7 @@ void VisualInferencePivot::add_callback(Cancellable& scope, VisualInferenceCallb
     iter = m_map.emplace(
         std::piecewise_construct,
         std::forward_as_tuple(&callback),
-        std::forward_as_tuple(scope, callback, period)
+        std::forward_as_tuple(scope, set_when_triggered, callback, period)
     ).first;
     try{
         PeriodicRunner::add_event(&iter->second, period);
@@ -79,8 +87,12 @@ void VisualInferencePivot::run(void* event) noexcept{
         WallClock time0 = current_time();
         bool stop = callback.callback.process_frame(frame, timestamp);
         WallClock time1 = current_time();
-        callback.stats += std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count();
+        callback.stats += (uint32_t)std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count();
         if (stop){
+            if (callback.set_when_triggered){
+                InferenceCallback* expected = nullptr;
+                callback.set_when_triggered->compare_exchange_strong(expected, &callback.callback);
+            }
             callback.scope.cancel(nullptr);
         }
     }catch (...){
