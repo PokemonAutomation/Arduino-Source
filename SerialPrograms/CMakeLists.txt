@@ -244,6 +244,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ImageTools/SolidColorTest.h
     Source/CommonFramework/Inference/AnomalyDetector.cpp
     Source/CommonFramework/Inference/AnomalyDetector.h
+    Source/CommonFramework/Inference/AudioPerSpectrumDetectorBase.cpp
+    Source/CommonFramework/Inference/AudioPerSpectrumDetectorBase.h
     Source/CommonFramework/Inference/AudioTemplateCache.cpp
     Source/CommonFramework/Inference/AudioTemplateCache.h
     Source/CommonFramework/Inference/BlackBorderDetector.cpp
