@@ -186,7 +186,7 @@ void AutoHostRolling::program(SingleSwitchProgramEnvironment& env, BotBaseContex
         }
 
         start_game_from_home_with_inference(
-            env, env.console, context,
+            env.console, context,
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW,
             ALTERNATE_GAMES ? 2 : 0, 0,
             BACKUP_SAVE

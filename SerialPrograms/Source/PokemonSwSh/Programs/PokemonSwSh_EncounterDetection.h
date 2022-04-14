@@ -15,6 +15,7 @@
 #include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
 
 namespace PokemonAutomation{
+    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 

@@ -26,7 +26,7 @@ namespace PokemonSwSh{
 
 
 bool connect_to_internet(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     bool host_online,
     uint16_t connect_to_internet_delay
 ){
@@ -38,7 +38,7 @@ bool connect_to_internet(
         return true;
     }
     if (connect_to_internet_with_inference(
-        env, console, context,
+        console, context,
         std::chrono::seconds(5), connect_to_internet_delay
     )){
         return true;
@@ -155,7 +155,7 @@ void run_autohost(
     context.wait_for_all_requests();
 
     if (!connect_to_internet(
-        env, console, context,
+        console, context,
         host_online,
         connect_to_internet_delay
     )){

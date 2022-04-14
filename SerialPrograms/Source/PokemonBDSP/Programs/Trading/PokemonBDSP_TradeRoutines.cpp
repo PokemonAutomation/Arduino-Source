@@ -30,7 +30,7 @@ TradeStats::TradeStats()
 
 
 void trade_current_pokemon(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     MultiConsoleErrorState& tracker,
     TradeStats& stats
 ){
@@ -45,7 +45,7 @@ void trade_current_pokemon(
         context.wait_for_all_requests();
         SelectionArrowFinder detector(console, {0.50, 0.58, 0.40, 0.10}, COLOR_RED);
         int ret = wait_until(
-            env, console, context, std::chrono::seconds(120),
+            console, context, std::chrono::seconds(120),
             { &detector }
         );
         if (ret < 0){
@@ -61,7 +61,7 @@ void trade_current_pokemon(
         context.wait_for_all_requests();
         SelectionArrowFinder detector(console, {0.50, 0.52, 0.40, 0.10}, COLOR_RED);
         int ret = wait_until(
-            env, console, context, std::chrono::seconds(10),
+            console, context, std::chrono::seconds(10),
             { &detector }
         );
         if (ret < 0){
@@ -80,7 +80,7 @@ void trade_current_pokemon(
     {
         BlackScreenOverWatcher black_screen;
         int ret = wait_until(
-            env, console, context, std::chrono::minutes(2),
+            console, context, std::chrono::minutes(2),
             { &black_screen }
         );
         if (ret < 0){
@@ -96,7 +96,7 @@ void trade_current_pokemon(
     {
         BlackScreenWatcher black_screen;
         int ret = run_until(
-            env, console, context,
+            console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
@@ -114,7 +114,7 @@ void trade_current_pokemon(
     //  Wait to return to box.
     {
         int ret = wait_until(
-            env, console, context, std::chrono::minutes(2),
+            console, context, std::chrono::minutes(2),
             { &box_detector }
         );
         if (ret < 0){
@@ -151,7 +151,7 @@ void trade_current_box(
                 for (size_t c = 0; c < col; c++){
                     pbf_move_right_joystick(context, 255, 128, 20, box_scroll_delay);
                 }
-                trade_current_pokemon(env, console, context, error_state, stats);
+                trade_current_pokemon(console, context, error_state, stats);
             });
             stats.m_trades++;
         }

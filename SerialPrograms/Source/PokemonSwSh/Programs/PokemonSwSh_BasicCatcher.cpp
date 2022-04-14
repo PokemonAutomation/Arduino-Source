@@ -87,7 +87,7 @@ int16_t move_to_ball(
 
 
 CatchResults throw_balls(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     Language language,
     const std::string& ball_slug
 ){
@@ -114,7 +114,7 @@ CatchResults throw_balls(
         StandardBattleMenuWatcher menu_detector(false);
         ExperienceGainWatcher experience_detector;
         int result = wait_until(
-            env, console, context,
+            console, context,
             std::chrono::seconds(60),
             {
                 &menu_detector,
@@ -124,16 +124,16 @@ CatchResults throw_balls(
         switch (result){
         case 0:
             if (current_time() < start + std::chrono::seconds(5)){
-                env.log("BasicCatcher: Unable to throw ball.", COLOR_RED);
+                console.log("BasicCatcher: Unable to throw ball.", COLOR_RED);
                 return {CatchResult::CANNOT_THROW_BALL, balls_used};
             }
-            env.log("BasicCatcher: Failed to catch.", COLOR_ORANGE);
+            console.log("BasicCatcher: Failed to catch.", COLOR_ORANGE);
             continue;
         case 1:
-            env.log("BasicCatcher: End of battle detected.", COLOR_PURPLE);
+            console.log("BasicCatcher: End of battle detected.", COLOR_PURPLE);
             return {CatchResult::POKEMON_FAINTED, balls_used};
          default:
-            env.log("BasicCatcher: Timed out.", COLOR_RED);
+            console.log("BasicCatcher: Timed out.", COLOR_RED);
             return {CatchResult::TIMEOUT, balls_used};
         }
     }
@@ -141,14 +141,14 @@ CatchResults throw_balls(
 
 
 CatchResults basic_catcher(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     Language language,
     const std::string& ball_slug
 ){
     context.wait_for_all_requests();
-    env.log("Attempting to catch with: " + ball_slug);
+    console.log("Attempting to catch with: " + ball_slug);
 
-    CatchResults results = throw_balls(env, console, context, language, ball_slug);
+    CatchResults results = throw_balls(console, context, language, ball_slug);
     if (results.result == CatchResult::OUT_OF_BALLS){
         return results;
     }
@@ -167,7 +167,7 @@ CatchResults basic_catcher(
     {
         BlackScreenOverWatcher black_screen_detector;
         run_until(
-            env, console, context,
+            console, context,
             [=](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
@@ -180,7 +180,7 @@ CatchResults basic_catcher(
         ReceivePokemonDetector caught_detector;
 
         int result = run_until(
-            env, console, context,
+            console, context,
             [=](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 4 * TICKS_PER_SECOND);
             },
@@ -189,10 +189,10 @@ CatchResults basic_catcher(
 
         switch (result){
         case 0:
-            env.log("BasicCatcher: The wild " + STRING_POKEMON + " was caught!", COLOR_BLUE);
+            console.log("BasicCatcher: The wild " + STRING_POKEMON + " was caught!", COLOR_BLUE);
             break;
         default:
-            env.log("BasicCatcher: The wild " + STRING_POKEMON + " fainted.", COLOR_RED);
+            console.log("BasicCatcher: The wild " + STRING_POKEMON + " fainted.", COLOR_RED);
             results.result = CatchResult::POKEMON_FAINTED;
             return results;
         }
@@ -202,7 +202,7 @@ CatchResults basic_catcher(
     {
         BlackScreenOverWatcher black_screen_detector;
         run_until(
-            env, console, context,
+            console, context,
             [=](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
             },

@@ -150,19 +150,19 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousOverworld::make_stats() const{
 
 
 bool ShinyHuntAutonomousOverworld::find_encounter(
-    SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     Stats& stats,
     WallClock expiration
 ) const{
     InferenceBoxScope self(
-        env.console,
+        console,
         OverworldTargetTracker::OVERWORLD_CENTER_X - 0.02,
         OverworldTargetTracker::OVERWORLD_CENTER_Y - 0.05,
         0.04, 0.1, COLOR_CYAN
     );
 
     OverworldTargetTracker target_tracker(
-        env.console, env.console,
+        console, console,
         std::chrono::milliseconds(1000),
         MARK_OFFSET,
         (MarkPriority)(size_t)MARK_PRIORITY,
@@ -217,7 +217,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
             StartBattleWatcher start_battle_detector;
 
             int result = run_until(
-                env, env.console, context,
+                console, context,
                 [&](BotBaseContext& context){
                     trigger->run(context);
                 },
@@ -230,10 +230,10 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
 
             switch (result){
             case 0:
-                env.console.log("Unexpected Battle.", COLOR_RED);
+                console.log("Unexpected Battle.", COLOR_RED);
                 return false;
             case 1:
-                env.console.log("Battle started!");
+                console.log("Battle started!");
                 return true;
             }
         }
@@ -244,11 +244,11 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
 //        env.log("target: " + std::to_string(target.first));
 
         if (target.first < 0){
-            env.log("No targets found.", COLOR_ORANGE);
+            console.log("No targets found.", COLOR_ORANGE);
             continue;
         }
         if (target.first > MAX_TARGET_ALPHA){
-            env.log(
+            console.log(
                 QString("Target too Weak: ") +
                 (target.second.mark == OverworldMark::EXCLAMATION_MARK ? "Exclamation" : "Question") +
                 " at [" +
@@ -260,7 +260,7 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
             continue;
         }
 
-        if (charge_at_target(env, env.console, context, target)){
+        if (charge_at_target(console, context, target)){
             return true;
         }
     }
@@ -268,11 +268,11 @@ bool ShinyHuntAutonomousOverworld::find_encounter(
 
 
 bool ShinyHuntAutonomousOverworld::charge_at_target(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     const std::pair<double, OverworldTarget>& target
 ) const{
     InferenceBoxScope target_box(console, target.second.box, COLOR_YELLOW);
-    env.log(
+    console.log(
         QString("Best Target: ") +
         (target.second.mark == OverworldMark::EXCLAMATION_MARK ? "Exclamation" : "Question") +
         " at [" +
@@ -287,7 +287,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
         (double)trajectory.joystick_y - 128,
         (double)trajectory.joystick_x - 128
     ) * 57.295779513082320877;
-    env.log(
+    console.log(
         "Trajectory: Distance = " + QString::number(trajectory.distance_in_ticks) +
         ", Direction = " + QString::number(-angle) + " degrees"
     );
@@ -309,7 +309,7 @@ bool ShinyHuntAutonomousOverworld::charge_at_target(
     );
 
     int result = run_until(
-        env, console, context,
+        console, context,
         [&](BotBaseContext& context){
             //  Move to target.
             pbf_move_left_joystick(
@@ -396,7 +396,7 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, 
         if (now - last > TIMEOUT){
             pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
             reset_game_from_home_with_inference(
-                env, env.console, context,
+                env.console, context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
             );
             stats.m_resets++;
@@ -406,14 +406,14 @@ void ShinyHuntAutonomousOverworld::program(SingleSwitchProgramEnvironment& env, 
 
         context.wait_for_all_requests();
 
-        bool battle = find_encounter(env, context, stats, last + TIMEOUT);
+        bool battle = find_encounter(env.console, context, stats, last + TIMEOUT);
         if (!battle){
             continue;
         }
 
         //  Detect shiny.
         ShinyDetectionResult result = detect_shiny_battle(
-            env, env.console, context,
+            env.console, context,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );

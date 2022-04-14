@@ -58,7 +58,7 @@ private:
 
 void take_video(BotBaseContext& context);
 void run_away(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     uint16_t exit_battle_time
 );
 

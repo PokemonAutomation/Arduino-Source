@@ -91,10 +91,10 @@ std::unique_ptr<StatsTracker> MoneyFarmerHighlands::make_stats() const{
 
 
 
-void mash_A_until_end_of_battle(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+void mash_A_until_end_of_battle(ConsoleHandle& console, BotBaseContext& context){
     OverworldDetector detector(console, console);
     int ret = run_until(
-        env, console, context,
+        console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, 120 * TICKS_PER_SECOND);
         },
@@ -128,7 +128,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, Bo
         DialogSurpriseDetector dialog_detector(env.console, env.console, true);
         ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
         int ret = run_until(
-            env, env.console, context,
+            env.console, context,
             [](BotBaseContext& context){
                 pbf_move_left_joystick(context, 0, 212, 50, 0);
                 pbf_press_button(context, BUTTON_B, 495, 80);
@@ -164,7 +164,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, Bo
         if (ret == 0){
             env.console.log("Found Charm!", COLOR_BLUE);
             stats.charm++;
-            mash_A_until_end_of_battle(env, env.console, context);
+            mash_A_until_end_of_battle(env.console, context);
             env.console.log("Battle succeeded!", COLOR_BLUE);
             success = true;
         }

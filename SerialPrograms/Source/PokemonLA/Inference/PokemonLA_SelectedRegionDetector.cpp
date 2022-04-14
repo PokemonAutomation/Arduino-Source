@@ -80,10 +80,10 @@ private:
 };
 
 
-MapRegion detect_selected_region(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+MapRegion detect_selected_region(ConsoleHandle& console, BotBaseContext& context){
     MapLocationDetector detector(console.video().snapshot());
     int ret = wait_until(
-        env, console, context,
+        console, context,
         std::chrono::seconds(2),
         { &detector }
     );

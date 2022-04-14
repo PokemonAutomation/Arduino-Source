@@ -181,7 +181,7 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseC
             // but the code using the passed in `env` may still runs. This will delay the program stop
             // on shiny sound but should be genearally OK in this use case.
             run_until(
-                env, env.console, context,
+                env.console, context,
                 [&env, &action_index, this](BotBaseContext& context){
                     for(; action_index < CUSTOM_PATH_TABLE.num_actions(); action_index++){
                         const auto& listened_row = CUSTOM_PATH_TABLE.get_action(action_index);

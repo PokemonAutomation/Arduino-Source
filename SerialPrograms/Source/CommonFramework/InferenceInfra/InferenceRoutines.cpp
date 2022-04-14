@@ -20,7 +20,7 @@ namespace PokemonAutomation{
 
 
 int wait_until(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     WallClock deadline,
     const std::vector<InferenceCallback*>& callbacks,
     std::chrono::milliseconds period
@@ -37,7 +37,7 @@ int wait_until(
     return session.triggered_index();
 }
 int wait_until(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     WallClock deadline,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_period
@@ -58,7 +58,7 @@ int wait_until(
 
 
 int run_until(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     std::function<void(BotBaseContext& context)>&& command,
     const std::vector<InferenceCallback*>& callbacks,
     std::chrono::milliseconds period
@@ -77,7 +77,7 @@ int run_until(
     return session.triggered_index();
 }
 int run_until(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     std::function<void(BotBaseContext& context)>&& command,
     const std::vector<PeriodicInferenceCallback>& callbacks,
     std::chrono::milliseconds default_period

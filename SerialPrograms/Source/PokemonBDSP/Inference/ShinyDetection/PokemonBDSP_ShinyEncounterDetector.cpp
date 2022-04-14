@@ -169,7 +169,7 @@ void determine_shiny_status(
 
 
 void detect_shiny_battle(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
     const DetectionType& type,
@@ -179,7 +179,7 @@ void detect_shiny_battle(
     BattleType battle_type = type.full_battle_menu ? BattleType::STANDARD : BattleType::STARTER;
     ShinyEncounterTracker tracker(console, console, battle_type);
     int result = wait_until(
-        env, console, context, timeout,
+        console, context, timeout,
         { &tracker }
     );
     if (result < 0){

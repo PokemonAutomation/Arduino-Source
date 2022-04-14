@@ -288,7 +288,7 @@ bool EggAutonomousState::process_party(){
             break;
         case EggHatchAction::Release:
             m_console.log("Releasing Pokemon...", COLOR_PURPLE);
-            release(m_env, m_console, m_context);
+            release(m_console, m_context);
         }
     }
 
@@ -297,12 +297,12 @@ bool EggAutonomousState::process_party(){
     return false;
 }
 bool EggAutonomousState::process_batch(){
-    overworld_to_box(m_env, m_console, m_context);
+    overworld_to_box(m_console, m_context);
     if (process_party()){
         return true;
     }
     withdraw_egg_column();
-    box_to_overworld(m_env, m_console, m_context);
+    box_to_overworld(m_console, m_context);
     return false;
 }
 
@@ -320,7 +320,7 @@ void EggAutonomousState::fetch_egg(){
     {
         ShortDialogWatcher dialog;
         int ret = run_until(
-            m_env, m_console, m_context,
+            m_console, m_context,
             [=](BotBaseContext& context){
                 pbf_move_left_joystick(context, 0, 255, 125, 0);
             },
@@ -343,7 +343,7 @@ void EggAutonomousState::fetch_egg(){
     {
         ShortDialogWatcher dialog;
         int ret = run_until(
-            m_env, m_console, m_context,
+            m_console, m_context,
             [=](BotBaseContext& context){
                 pbf_move_left_joystick(context, 0, 255, 30, 0);
                 pbf_move_left_joystick(context, 128, 0, 35, 0);
@@ -360,7 +360,7 @@ void EggAutonomousState::fetch_egg(){
     {
         ShortDialogWatcher dialog;
         int ret = run_until(
-            m_env, m_console, m_context,
+            m_console, m_context,
             [=](BotBaseContext& context){
                 pbf_press_button(context, BUTTON_ZL, 20, 230);
             },
@@ -377,7 +377,7 @@ void EggAutonomousState::fetch_egg(){
     {
         EggReceivedDetector received;
         run_until(
-            m_env, m_console, m_context,
+            m_console, m_context,
             [=](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_ZL, 500);
                 pbf_mash_button(context, BUTTON_B, 500);
@@ -414,7 +414,7 @@ void EggAutonomousState::hatch_egg(){
 
         ShortDialogWatcher dialog;
         int ret = wait_until(
-            m_env, m_console, m_context, std::chrono::seconds(30),
+            m_console, m_context, std::chrono::seconds(30),
             { &dialog }
         );
         if (ret < 0){
@@ -436,7 +436,7 @@ void EggAutonomousState::hatch_egg(){
         ImageMatchWatcher matcher(overworld, {0.10, 0.10, 0.80, 0.60}, 100);
         ShortDialogPromptDetector prompt(m_console, {0.50, 0.60, 0.30, 0.20}, COLOR_GREEN);
         int ret = wait_until(
-            m_env, m_console, m_context, std::chrono::seconds(30),
+            m_console, m_context, std::chrono::seconds(30),
             {
                 &matcher,
                 &prompt,
@@ -466,7 +466,7 @@ void EggAutonomousState::hatch_rest_of_party(){
         ShortDialogWatcher dialog;
         FrozenImageDetector frozen(COLOR_CYAN, {0, 0, 1, 0.5}, std::chrono::seconds(60), 20);
         int ret = run_until(
-            m_env, m_console, m_context,
+            m_console, m_context,
             [&](BotBaseContext& context){
                 egg_spin(context, 480 * TICKS_PER_SECOND);
 //                egg_spin(context, 5 * TICKS_PER_SECOND);
@@ -495,7 +495,7 @@ void EggAutonomousState::spin_until_fetch_or_hatch(){
     m_console.log("Looking for more eggs...");
     ShortDialogWatcher dialog;
     int ret = run_until(
-        m_env, m_console, m_context,
+        m_console, m_context,
         [&](BotBaseContext& context){
             egg_spin(context, m_travel_time_per_fetch);
         },

@@ -95,7 +95,7 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         env.update_stats();
 
         int ret = run_until(
-            env, env.console, context,
+            env.console, context,
             [&](BotBaseContext& context){
                 for (size_t c = 0; c < 60; c++){
                     pbf_press_button(context, BUTTON_LCLICK, 20, 60 * TICKS_PER_SECOND - 20);

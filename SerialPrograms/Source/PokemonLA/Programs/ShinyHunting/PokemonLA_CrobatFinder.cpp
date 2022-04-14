@@ -120,7 +120,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCon
     {
         ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
         run_until(
-            env, env.console, context,
+            env.console, context,
             [](BotBaseContext& context){
 
                 // FORWARD PORTION OF CAVE UNTIL LEDGE

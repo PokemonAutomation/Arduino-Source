@@ -95,7 +95,7 @@ AdventureResult run_adventure(
                 runtime.session_stats.add_error();
                 error.store(true, std::memory_order_release);
                 pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-                reset_game_from_home_with_inference(env, console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+                reset_game_from_home_with_inference(console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
                 return;
             }
         }
@@ -178,7 +178,7 @@ void loop_adventures(
 //                QImage screen = console.video().snapshot();
 //                dump_image(console, MODULE_NAME, "ResetRecovery", screen);
                 pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-                reset_game_from_home_with_inference(env, console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+                reset_game_from_home_with_inference(console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
             });
             continue;
         }

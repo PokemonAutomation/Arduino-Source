@@ -122,7 +122,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
     {
         StartBattleDetector detector(env.console);
         int ret = run_until(
-            env, env.console, context,
+            env.console, context,
             [=](BotBaseContext& context){
                 pbf_press_button(context, BUTTON_ZL, 10, 10);
                 for (size_t c = 0; c < 17; c++){
@@ -154,7 +154,7 @@ bool MoneyFarmerRoute210::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
         EndBattleWatcher end_battle;
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         int ret = run_until(
-            env, env.console, context,
+            env.console, context,
             [=](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
@@ -289,7 +289,7 @@ bool MoneyFarmerRoute210::heal_after_battle_and_return(
         return false;
     }else{
         // Use Global Room to heal the party.
-        heal_by_global_room(env, console, context);
+        heal_by_global_room(console, context);
 
         pp0[0] = MON0_MOVE1_PP;
         pp0[1] = MON0_MOVE2_PP;
@@ -341,7 +341,7 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         need_to_charge = false;
     }else{
         if (HEALING_METHOD == 1){
-            heal_by_global_room(env, env.console, context);
+            heal_by_global_room(env.console, context);
         }
         pbf_move_left_joystick(context, 255, 128, 140, 0);
     }
@@ -374,7 +374,7 @@ void MoneyFarmerRoute210::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         {
             VSSeekerReactionTracker tracker(env.console, {0.20, 0.20, 0.60, 0.60});
             run_until(
-                env, env.console, context,
+                env.console, context,
                 [=](BotBaseContext& context){
                     SHORTCUT.run(context, TICKS_PER_SECOND);
 

@@ -25,7 +25,7 @@ namespace PokemonBDSP{
 
 
 bool gamemenu_to_ingame(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     uint16_t mash_duration, uint16_t enter_game_timeout
 ){
     console.log("Mashing A to enter game...");
@@ -34,7 +34,7 @@ bool gamemenu_to_ingame(
     context.wait_for_all_requests();
     console.log("Waiting to enter game...");
     int ret = wait_until(
-        env, console, context,
+        console, context,
         std::chrono::milliseconds(enter_game_timeout * (1000 / TICKS_PER_SECOND)),
         { &detector }
     );
@@ -53,8 +53,8 @@ bool openedgame_to_ingame(
     uint16_t post_wait_time
 ){
     bool ok = true;
-    ok &= openedgame_to_gamemenu(env, console, context, load_game_timeout);
-    ok &= gamemenu_to_ingame(env, console, context, mash_duration, enter_game_timeout);
+    ok &= openedgame_to_gamemenu(console, context, load_game_timeout);
+    ok &= gamemenu_to_ingame(console, context, mash_duration, enter_game_timeout);
     if (!ok){
         dump_image(console.logger(), env.program_info(), "StartGame", console.video().snapshot());
     }

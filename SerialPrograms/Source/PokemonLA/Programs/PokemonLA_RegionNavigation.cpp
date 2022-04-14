@@ -86,7 +86,7 @@ void from_professor_return_to_jubilife(
     while (true){
         context.wait_for_all_requests();
         int ret = run_until(
-            env, console, context,
+            console, context,
             [](BotBaseContext& context){
                 for (size_t c = 0; c < 20; c++){
                     pbf_press_button(context, BUTTON_A, 20, 125);
@@ -121,7 +121,7 @@ void mash_A_to_enter_sub_area(
 ){
     BlackScreenOverWatcher black_screen0(COLOR_RED, {0.2, 0.2, 0.6, 0.6}, 100, 10);
     int ret = run_until(
-        env, console, context,
+        console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, 7 * TICKS_PER_SECOND);
         },
@@ -142,7 +142,7 @@ void mash_A_to_change_region(
 ){
     BlackScreenOverWatcher black_screen0;
     int ret = run_until(
-        env, console, context,
+        console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, GameSettings::instance().LOAD_REGION_TIMEOUT);
         },
@@ -156,7 +156,7 @@ void mash_A_to_change_region(
     BlackScreenOverWatcher black_screen1a(COLOR_RED, {0.20, 0.02, 0.60, 0.05}, 150);
     BlackScreenOverWatcher black_screen1b(COLOR_RED, {0.20, 0.93, 0.60, 0.05}, 150);
     ret = wait_until(
-        env, console, context,
+        console, context,
         std::chrono::milliseconds(1000 * GameSettings::instance().LOAD_REGION_TIMEOUT / TICKS_PER_SECOND),
         {
             {black_screen1a},
@@ -184,7 +184,7 @@ void goto_camp_from_jubilife(
     {
         MapDetector detector;
         int ret = run_until(
-            env, console, context,
+            console, context,
             [](BotBaseContext& context){
                 for (size_t c = 0; c < 10; c++){
                     pbf_press_button(context, BUTTON_A, 20, 105);
@@ -205,7 +205,7 @@ void goto_camp_from_jubilife(
     //  Move to region.
     MapRegion current_region = MapRegion::NONE;
     for (size_t c = 0; c < 10; c++){
-        current_region = detect_selected_region(env, console, context);
+        current_region = detect_selected_region(console, context);
         if (current_region == location.region){
             break;
         }
@@ -236,7 +236,7 @@ void goto_camp_from_jubilife(
     {
         MapDetector detector;
         int ret = wait_until(
-            env, console, context,
+            console, context,
             std::chrono::seconds(5),
             { &detector }
         );
@@ -258,7 +258,7 @@ void goto_camp_from_jubilife(
             std::chrono::milliseconds(200), true
         );
         int ret = wait_until(
-            env, console, context,
+            console, context,
             std::chrono::seconds(2),
             { &detector }
         );
@@ -274,7 +274,7 @@ void goto_camp_from_jubilife(
 
     BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.6});
     int ret = wait_until(
-        env, console, context,
+        console, context,
         std::chrono::seconds(20),
         { &black_screen }
     );
@@ -326,7 +326,7 @@ void goto_camp_from_overworld(
         {
             MapDetector detector;
             int ret = wait_until(
-                env, console, context,
+                console, context,
                 std::chrono::seconds(5),
                 { &detector }
             );
@@ -352,7 +352,7 @@ void goto_camp_from_overworld(
                 std::chrono::milliseconds(200), true
             );
             int ret = wait_until(
-                env, console, context,
+                console, context,
                 std::chrono::seconds(2),
                 { &detector }
             );
@@ -370,7 +370,7 @@ void goto_camp_from_overworld(
 
     BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.6});
     int ret = wait_until(
-        env, console, context,
+        console, context,
         std::chrono::seconds(20),
         { &black_screen }
     );

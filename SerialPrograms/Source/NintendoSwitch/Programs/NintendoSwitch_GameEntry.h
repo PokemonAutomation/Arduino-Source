@@ -11,7 +11,6 @@
 
 namespace PokemonAutomation{
     class BotBaseContext;
-    class ProgramEnvironment;
 namespace NintendoSwitch{
 
 
@@ -24,7 +23,7 @@ void open_game_from_home(
 );
 
 bool openedgame_to_gamemenu(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     uint16_t timeout
 );
 

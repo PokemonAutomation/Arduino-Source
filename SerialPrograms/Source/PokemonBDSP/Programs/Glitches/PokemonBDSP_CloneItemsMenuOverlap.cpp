@@ -155,10 +155,10 @@ void CloneItemsMenuOverlap::swap_party(ConsoleHandle& console, BotBaseContext& c
     column_to_party(context, 1);
     pbf_press_button(context, BUTTON_ZL, 10, BOX_PICKUP_DROP_DELAY);
 }
-void CloneItemsMenuOverlap::mash_B_to_battle(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+void CloneItemsMenuOverlap::mash_B_to_battle(ConsoleHandle& console, BotBaseContext& context){
     BattleMenuWatcher detector(BattleType::STANDARD);
     int ret = run_until(
-        env, console, context,
+        console, context,
         [=](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
         },
@@ -229,11 +229,11 @@ void CloneItemsMenuOverlap::program(SingleSwitchProgramEnvironment& env, BotBase
 
         swap_party(env.console, context);
 
-        mash_B_to_battle(env, env.console, context);
+        mash_B_to_battle(env.console, context);
 
         //  Run away.
         pbf_press_dpad(context, DPAD_UP, 10, 0);
-        if (!run_from_battle(env, env.console, context, EXIT_BATTLE_TIMEOUT)){
+        if (!run_from_battle(env.console, context, EXIT_BATTLE_TIMEOUT)){
             env.log("Detected likely black screen freeze. Resetting game...", COLOR_RED);
             stats.m_resets++;
             pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY);

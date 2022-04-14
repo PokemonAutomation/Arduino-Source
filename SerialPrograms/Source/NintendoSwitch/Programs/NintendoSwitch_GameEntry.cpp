@@ -109,14 +109,14 @@ private:
 
 
 bool openedgame_to_gamemenu(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     uint16_t timeout
 ){
     {
         console.log("Waiting to load game...");
         LoadingDetector detector(false);
         int ret = wait_until(
-            env, console, context,
+            console, context,
             std::chrono::milliseconds(timeout * (1000 / TICKS_PER_SECOND)),
             { &detector }
         );
@@ -129,7 +129,7 @@ bool openedgame_to_gamemenu(
         console.log("Waiting for game menu...");
         LoadingDetector detector(true);
         int ret = wait_until(
-            env, console, context,
+            console, context,
             std::chrono::milliseconds(timeout * (1000 / TICKS_PER_SECOND)),
             { &detector }
         );

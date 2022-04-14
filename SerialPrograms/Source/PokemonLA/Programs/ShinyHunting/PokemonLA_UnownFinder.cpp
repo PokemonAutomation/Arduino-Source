@@ -125,7 +125,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
         ShinySoundDetector shiny_detector_route(env.console, SHINY_DETECTED_ON_ROUTE.stop_on_shiny());
         run_until(
-            env, env.console, context,
+            env.console, context,
             [](BotBaseContext& context){
                ruins_entrance_route(context);
             },
@@ -140,7 +140,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
         ShinySoundDetector shiny_detector_ruins(env.console, SHINY_DETECTED.stop_on_shiny());
 
-        run_until(env, env.console, context,
+        run_until(env.console, context,
             [](BotBaseContext& context){
                enter_ruins(context);
             },

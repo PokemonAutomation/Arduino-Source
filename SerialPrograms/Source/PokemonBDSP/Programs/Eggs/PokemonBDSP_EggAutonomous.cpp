@@ -152,7 +152,7 @@ bool EggAutonomous::run_batch(
     }
 
     if (save){
-        save_game(env, env.console, context);
+        save_game(env.console, context);
         saved_state.set(current_state);
     }
 
@@ -191,7 +191,7 @@ void EggAutonomous::program(SingleSwitchProgramEnvironment& env, BotBaseContext&
 //    box_to_overworld(env, env.console);
 
     if (AUTO_SAVING == 1){
-        save_game(env, env.console, context);
+        save_game(env.console, context);
         saved_state.set(current_state);
     }
 

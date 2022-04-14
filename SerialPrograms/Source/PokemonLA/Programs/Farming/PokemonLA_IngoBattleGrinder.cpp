@@ -137,13 +137,13 @@ std::unique_ptr<StatsTracker> IngoBattleGrinder::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-bool IngoBattleGrinder::start_dialog(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool IngoBattleGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& context){
     {
-        ButtonDetector button0(env.console, env.console, ButtonType::ButtonA, {0.50, 0.408, 0.40, 0.042}, std::chrono::milliseconds(100), true);
-        ButtonDetector button1(env.console, env.console, ButtonType::ButtonA, {0.50, 0.450, 0.40, 0.042}, std::chrono::milliseconds(100), true);
-        ButtonDetector button2(env.console, env.console, ButtonType::ButtonA, {0.50, 0.492, 0.40, 0.042}, std::chrono::milliseconds(100), true);
+        ButtonDetector button0(console, console, ButtonType::ButtonA, {0.50, 0.408, 0.40, 0.042}, std::chrono::milliseconds(100), true);
+        ButtonDetector button1(console, console, ButtonType::ButtonA, {0.50, 0.450, 0.40, 0.042}, std::chrono::milliseconds(100), true);
+        ButtonDetector button2(console, console, ButtonType::ButtonA, {0.50, 0.492, 0.40, 0.042}, std::chrono::milliseconds(100), true);
         int ret = run_until(
-            env, env.console, context,
+            console, context,
             [&](BotBaseContext& context){
                 for (size_t c = 0; c < 10; c++){
                     pbf_press_button(context, BUTTON_A, 20, 150);
@@ -162,16 +162,16 @@ bool IngoBattleGrinder::start_dialog(SingleSwitchProgramEnvironment& env, BotBas
             //  Version 1.1 with new options unlocked.
             break;
         default:
-            throw OperationFailedException(env.console, "Unable to detect options after 10 A presses.");
+            throw OperationFailedException(console, "Unable to detect options after 10 A presses.");
         }
     }
 
     pbf_press_button(context, BUTTON_A, 20, 150);
     context.wait_for_all_requests();
 
-    ButtonDetector button2(env.console, env.console, ButtonType::ButtonA, {0.50, 0.350, 0.40, 0.400}, std::chrono::milliseconds(100), true);
+    ButtonDetector button2(console, console, ButtonType::ButtonA, {0.50, 0.350, 0.40, 0.400}, std::chrono::milliseconds(100), true);
     int ret = run_until(
-        env, env.console, context,
+        console, context,
         [&](BotBaseContext& context){
             for (size_t c = 0; c < 5; c++){
                 pbf_press_button(context, BUTTON_A, 20, 150);
@@ -183,7 +183,7 @@ bool IngoBattleGrinder::start_dialog(SingleSwitchProgramEnvironment& env, BotBas
     case 0:
         return false;
     default:
-        throw OperationFailedException(env.console, "Unable to find opponent list options after 5 A presses.");
+        throw OperationFailedException(console, "Unable to find opponent list options after 5 A presses.");
     }
 }
 
@@ -195,7 +195,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
 
     // Talk to Ingo to start conversation and select regular battles:
     // The dialogues are different between version 10 (the vanilla version) and later versions.
-    bool version_10 = start_dialog(env, context);
+    bool version_10 = start_dialog(env.console, context);
 
     IngoOpponentMenuLocation menu_location = version_10
         ? INGO_OPPONENT_MENU_LOCATIONS_V10[OPPONENT]
@@ -260,7 +260,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
         NormalDialogDetector normal_dialogue_detector(env.console, env.console, stop_on_detected);
         ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(200), stop_on_detected);
         int ret = wait_until(
-            env, env.console, context, std::chrono::minutes(2),
+            env.console, context, std::chrono::minutes(2),
             {
                 &battle_menu_detector,
                 &dialogue_ellipse_detector,

@@ -11,7 +11,6 @@
 
 namespace PokemonAutomation{
     class BotBaseContext;
-    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
@@ -27,11 +26,11 @@ void box_to_overworld(BotBaseContext& context);
 
 //  Feedback
 
-void overworld_to_menu(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
-void save_game(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+void overworld_to_menu(ConsoleHandle& console, BotBaseContext& context);
+void save_game(ConsoleHandle& console, BotBaseContext& context);
 
-void overworld_to_box(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
-void box_to_overworld(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+void overworld_to_box(ConsoleHandle& console, BotBaseContext& context);
+void box_to_overworld(ConsoleHandle& console, BotBaseContext& context);
 
 
 }

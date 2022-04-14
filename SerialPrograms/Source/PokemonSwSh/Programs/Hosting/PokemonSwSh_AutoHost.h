@@ -23,7 +23,7 @@ namespace PokemonSwSh{
 
 
 bool connect_to_internet(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     bool host_online,
     uint16_t connect_to_internet_delay
 );

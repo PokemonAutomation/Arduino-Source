@@ -62,7 +62,7 @@ private:
     bool run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     //  Returns true if version 1.0.
-    bool start_dialog(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    bool start_dialog(ConsoleHandle& console, BotBaseContext& context);
 
 private:
     class Stats;

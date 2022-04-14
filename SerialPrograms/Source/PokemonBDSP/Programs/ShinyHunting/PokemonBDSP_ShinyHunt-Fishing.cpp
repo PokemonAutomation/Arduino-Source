@@ -113,7 +113,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, BotBaseConte
             StartBattleDetector battle(env.console);
             BattleMenuWatcher battle_menu(BattleType::STANDARD);
             int ret = run_until(
-                env, env.console, context,
+                env.console, context,
                 [=](BotBaseContext& context){
                     SHORTCUT.run(context, 30 * TICKS_PER_SECOND);
                 },
@@ -145,7 +145,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, BotBaseConte
 
             //  Wait for dialog after hooking to appear.
             ret = wait_until(
-                env, env.console, context,
+                env.console, context,
                 std::chrono::milliseconds(5000),
                 {
                     &dialog_detector,
@@ -169,7 +169,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, BotBaseConte
 
             //  Wait for battle to start.
             ret = wait_until(
-                env, env.console, context,
+                env.console, context,
                 std::chrono::milliseconds(10000),
                 {
                     &battle,
@@ -196,7 +196,7 @@ void ShinyHuntFishing::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         DoublesShinyDetection result_wild;
         ShinyDetectionResult result_own;
         detect_shiny_battle(
-            env, env.console, context,
+            env.console, context,
             result_wild, result_own,
             WILD_POKEMON,
             std::chrono::seconds(30)

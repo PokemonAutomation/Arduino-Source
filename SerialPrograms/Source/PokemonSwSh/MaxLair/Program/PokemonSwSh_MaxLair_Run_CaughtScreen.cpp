@@ -31,13 +31,13 @@ namespace MaxLairInternal{
 
 StateMachineAction mash_A_to_entrance(
     AdventureRuntime& runtime,
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     const QImage& entrance
 ){
     EntranceDetector entrance_detector(entrance);
 
     int result = run_until(
-        env, console, context,
+        console, context,
         [&](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, 60 * TICKS_PER_SECOND);
         },
@@ -56,7 +56,7 @@ StateMachineAction mash_A_to_entrance(
 
 
 void synchronize_caught_screen(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     GlobalStateTracker& state_tracker
 ){
     context.wait_for_all_requests();
@@ -144,7 +144,7 @@ StateMachineAction run_caught_screen(
     switch (action){
     case CaughtScreenAction::STOP_PROGRAM:
         console.log("Stopping program...", COLOR_PURPLE);
-        synchronize_caught_screen(env, console, context, state_tracker);
+        synchronize_caught_screen(console, context, state_tracker);
         return StateMachineAction::STOP_PROGRAM;
 
     case CaughtScreenAction::TAKE_NON_BOSS_SHINY_AND_CONTINUE:
@@ -154,24 +154,24 @@ StateMachineAction run_caught_screen(
         if (shinies.empty() || shinies[0] == 3){
             console.log("Quitting back to entrance.", COLOR_PURPLE);
             tracker.leave_summary();
-            synchronize_caught_screen(env, console, context, state_tracker);
+            synchronize_caught_screen(console, context, state_tracker);
             pbf_press_dpad(context, DPAD_DOWN, 10, 50);
             pbf_press_button(context, BUTTON_B, 10, TICKS_PER_SECOND);
-            return mash_A_to_entrance(runtime, env, console, context, entrance);
+            return mash_A_to_entrance(runtime, console, context, entrance);
         }else{
             console.log("Taking non-shiny boss and returning to entrance...", COLOR_BLUE);
             tracker.scroll_to(shinies[0]);
             tracker.enter_summary();    //  Enter summary to verify you're on the right mon.
             tracker.leave_summary();
-            synchronize_caught_screen(env, console, context, state_tracker);
-            return mash_A_to_entrance(runtime, env, console, context, entrance);
+            synchronize_caught_screen(console, context, state_tracker);
+            return mash_A_to_entrance(runtime, console, context, entrance);
         }
 
     case CaughtScreenAction::RESET:
         console.log("Resetting game...", COLOR_BLUE);
-        synchronize_caught_screen(env, console, context, state_tracker);
+        synchronize_caught_screen(console, context, state_tracker);
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
-        reset_game_from_home_with_inference(env, console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+        reset_game_from_home_with_inference(console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         return StateMachineAction::DONE_WITH_ADVENTURE;
     }
 

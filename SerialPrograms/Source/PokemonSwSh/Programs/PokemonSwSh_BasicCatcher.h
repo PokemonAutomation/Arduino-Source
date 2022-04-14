@@ -13,7 +13,6 @@
 
 namespace PokemonAutomation{
     class BotBaseContext;
-    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 
@@ -44,7 +43,7 @@ struct CatchResults{
     uint16_t balls_used;
 };
 CatchResults basic_catcher(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     Language language,
     const std::string& ball_slug
 );

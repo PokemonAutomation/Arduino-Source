@@ -141,7 +141,7 @@ void CloneItemsBoxCopy::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         pbf_press_button(context, BUTTON_ZL, 20, 250);
 
         //  Back all the way out to the overworld and clear glitch.
-        back_out_to_overworld(env, env.console, context, start);
+        back_out_to_overworld(env.console, context, start);
 
         //  Release the cloned box.
         overworld_to_box(context);
@@ -150,7 +150,7 @@ void CloneItemsBoxCopy::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         pbf_press_button(context, BUTTON_L, 20, BOX_CHANGE_DELAY);
 
         //  Back all the way out to the overworld and clear glitch.
-        back_out_to_overworld(env, env.console, context, start);
+        back_out_to_overworld(env.console, context, start);
 
         stats.m_boxes++;
     }

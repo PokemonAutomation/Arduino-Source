@@ -122,7 +122,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
         {
             StandardBattleMenuWatcher fight_detector(false);
             int result = run_until(
-                env, env.console, context,
+                env.console, context,
                 [=](BotBaseContext& context){
                     while (true){
                         //TODO edit here for what to do
@@ -137,7 +137,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
             }
         }
 
-        CatchResults result = basic_catcher(env, env.console, context, LANGUAGE, BALL_SELECT.slug());
+        CatchResults result = basic_catcher(env.console, context, LANGUAGE, BALL_SELECT.slug());
         switch (result.result){
         case CatchResult::POKEMON_CAUGHT:
             pokemon_caught = true;
@@ -179,7 +179,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
         if (!pokemon_caught){
             pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
             reset_game_from_home_with_inference(
-                env, env.console, context,
+                env.console, context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
             );
         }

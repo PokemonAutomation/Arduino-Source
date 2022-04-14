@@ -100,7 +100,7 @@ void MagikarpMoveGrinder::grind_mimic(SingleSwitchProgramEnvironment& env, BotBa
         BattlePokemonSwitchDetector pokemon_switch_detector(env.console, env.console, stop_on_detected);
         ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(200), stop_on_detected);
         int ret = wait_until(
-            env, env.console, context, std::chrono::minutes(2),
+            env.console, context, std::chrono::minutes(2),
             {
                 &battle_menu_detector,
                 &pokemon_switch_detector,
@@ -169,7 +169,7 @@ void MagikarpMoveGrinder::battle_magikarp(SingleSwitchProgramEnvironment& env, B
         BattlePokemonSwitchDetector pokemon_switch_detector(env.console, env.console, stop_on_detected);
         ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(200), stop_on_detected);
         int ret = wait_until(
-            env, env.console, context, std::chrono::minutes(2),
+            env.console, context, std::chrono::minutes(2),
             {
                 &battle_menu_detector,
                 &pokemon_switch_detector,

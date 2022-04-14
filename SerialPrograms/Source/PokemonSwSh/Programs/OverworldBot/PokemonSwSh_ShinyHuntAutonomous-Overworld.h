@@ -45,13 +45,13 @@ private:
     struct Stats;
 
     bool find_encounter(
-        SingleSwitchProgramEnvironment& env, BotBaseContext& context,
+        ConsoleHandle& console, BotBaseContext& context,
         Stats& stats,
         WallClock expiration
     ) const;
 
     bool charge_at_target(
-        ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+        ConsoleHandle& console, BotBaseContext& context,
         const std::pair<double, OverworldTarget>& target
     ) const;
 

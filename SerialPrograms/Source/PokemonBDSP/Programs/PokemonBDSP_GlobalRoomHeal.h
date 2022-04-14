@@ -11,14 +11,13 @@
 
 namespace PokemonAutomation{
     class BotBaseContext;
-    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
 // Use Global Room to heal the party.
 // Must start at overworld and have Y-shotcut to Global Room unlocked.
-bool heal_by_global_room(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+bool heal_by_global_room(ConsoleHandle& console, BotBaseContext& context);
 
 
 }

@@ -166,7 +166,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             const bool stop_on_detected = true;
             ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(200), stop_on_detected);
             int ret = run_until(
-                env, env.console, context, [](BotBaseContext& context){
+                env.console, context, [](BotBaseContext& context){
                     pbf_mash_button(context, BUTTON_B, 20 * TICKS_PER_SECOND);
                 },
                 {&arc_phone_detector}
@@ -192,7 +192,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
         DialogSurpriseDetector surprise_dialogue_detector(env.console, env.console, stop_on_detected);
         ArcPhoneDetector arc_phone_detector(env.console, env.console, std::chrono::milliseconds(200), stop_on_detected);
         int ret = wait_until(
-            env, env.console, context, std::chrono::minutes(2),
+            env.console, context, std::chrono::minutes(2),
             {
                 &battle_menu_detector,
                 &dialogue_ellipse_detector,

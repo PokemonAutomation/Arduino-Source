@@ -83,14 +83,14 @@ private:
 
 
 QImage enter_lobby(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     size_t boss_slot, bool connect_to_internet,
     ReadableQuantity999& ore
 ){
     pbf_mash_button(context, BUTTON_B, 2 * TICKS_PER_SECOND);
 
     if (connect_to_internet){
-        connect_to_internet_with_inference(env, console, context);
+        connect_to_internet_with_inference(console, context);
     }
 
     VideoOverlaySet boxes(console);

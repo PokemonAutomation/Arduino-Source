@@ -18,14 +18,14 @@ namespace PokemonLA{
 // From the game menu screen (where "Press A" is displayed to enter the game),
 // mash A to enter the game and wait until the black screen is gone.
 bool gamemenu_to_ingame(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     uint16_t mash_duration, uint16_t enter_game_timeout
 );
 
 // From Switch Home menu, start game and wait until the game menu screen (where 
 // "Press A" is displayed to enter the game) is shown.
 bool switch_home_to_gamemenu(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     bool tolerate_update_menu
 );
 

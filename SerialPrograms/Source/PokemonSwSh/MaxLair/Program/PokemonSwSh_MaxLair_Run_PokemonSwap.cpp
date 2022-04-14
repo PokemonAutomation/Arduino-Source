@@ -21,7 +21,7 @@ namespace MaxLairInternal{
 
 void run_swap_pokemon(
     AdventureRuntime& runtime,
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     GlobalStateTracker& state_tracker,
     const ConsoleSpecificOptions& settings
 ){
@@ -81,7 +81,7 @@ void run_swap_pokemon(
     {
         BlackScreenWatcher detector;
         int result = run_until(
-            env, console, context,
+            console, context,
             [&](BotBaseContext& context){
                 pbf_mash_button(context, swap ? BUTTON_A : BUTTON_B, 30 * TICKS_PER_SECOND);
             },
@@ -97,7 +97,7 @@ void run_swap_pokemon(
     {
         PathScreenDetector detector;
         int result = wait_until(
-            env, console, context,
+            console, context,
             std::chrono::seconds(30),
             { &detector },
             INFERENCE_RATE
