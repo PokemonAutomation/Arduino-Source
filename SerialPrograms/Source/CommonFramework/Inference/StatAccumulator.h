@@ -9,6 +9,7 @@
 
 #include <stdint.h>
 #include <string>
+#include "Common/Cpp/Time.h"
 
 namespace PokemonAutomation{
 
@@ -17,9 +18,10 @@ class Logger;
 
 class StatAccumulatorI32{
 public:
-    using StatObject = double;
+    using StatObject = uint32_t;
 
 public:
+    void clear();
     void operator+=(uint32_t x);
 
     uint64_t count() const{ return m_count; };
@@ -37,6 +39,23 @@ private:
     uint64_t m_sqr = 0;
     uint32_t m_min = (uint32_t)-1;
     uint32_t m_max = 0;
+};
+
+class PeriodicStatsReporterI32 : public StatAccumulatorI32{
+public:
+    PeriodicStatsReporterI32(
+        const char* label,
+        const char* units, double divider,
+        std::chrono::milliseconds period
+    );
+    void report_data(Logger& logger, uint32_t x);
+
+private:
+    const char* m_label;
+    const char* m_units;
+    double m_divider;
+    std::chrono::milliseconds m_period;
+    WallClock m_last_report;
 };
 
 

@@ -13,6 +13,7 @@
 #include <QVideoProbe>
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Inference/StatAccumulator.h"
 #include "CameraInfo.h"
 #include "VideoWidget.h"
 
@@ -42,11 +43,12 @@ public:
     virtual void resizeEvent(QResizeEvent* event) override;
 
 private:
-    QImage direct_snapshot_image();
+    //  All of these must be called under the lock.
+    QImage direct_snapshot_image(std::unique_lock<std::mutex>& lock);
     QImage direct_snapshot_probe(bool flip_vertical);
 
+    QImage snapshot_image(std::unique_lock<std::mutex>& lock, WallClock* timestamp);
     QImage snapshot_probe(WallClock* timestamp);
-    QImage snapshot_image(WallClock* timestamp);
 
 private:
     enum class CaptureStatus{
@@ -76,6 +78,7 @@ private:
 
 //    SpinLock m_capture_lock;
     QVideoProbe* m_probe = nullptr;
+    bool m_use_probe_frames = false;
     bool m_flip_vertical = false;
 
     SpinLock m_frame_lock;
@@ -90,6 +93,7 @@ private:
     QImage m_last_image;
     WallClock m_last_image_timestamp;
     uint64_t m_last_image_seqnum = 0;
+    PeriodicStatsReporterI32 m_stats_conversion;
 };
 
 

@@ -14,7 +14,7 @@ namespace PokemonAutomation{
 
 
 QImage frame_to_image(Logger& logger, QVideoFrame frame, bool flip_vertical){
-    if (frame.isValid()){
+    if (!frame.isValid()){
         return QImage();
     }
     if (!frame.map(QAbstractVideoBuffer::ReadOnly)){

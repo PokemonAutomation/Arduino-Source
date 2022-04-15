@@ -36,32 +36,6 @@ QString qt5_get_camera_name(const CameraInfo& info){
 }
 
 
-#if 0
-QImage QVideoFrame_to_QImage(QVideoFrame& frame){
-    //  "frame" must already be mapped.
-
-    QImage ret;
-
-    QImage::Format format = QVideoFrame::imageFormatFromPixelFormat(frame.pixelFormat());
-    do{
-        if (format != QImage::Format_Invalid){
-            ret = QImage(frame.bits(), frame.width(), frame.height(), frame.bytesPerLine(), format).copy();
-            break;
-        }
-        if (frame.pixelFormat() == QVideoFrame::Format_Jpeg){
-            ret.loadFromData(frame.bits(), frame.mappedBytes(), "JPG");
-            break;
-        }
-    }while (false);
-    if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
-        ret = ret.convertToFormat(QImage::Format_ARGB32);
-    }
-    return ret;
-}
-#endif
-
-
-
 
 Qt5VideoWidget::Qt5VideoWidget(
     QWidget* parent,
@@ -70,8 +44,11 @@ Qt5VideoWidget::Qt5VideoWidget(
 )
     : VideoWidget(parent)
     , m_logger(logger)
-    , m_last_image_timestamp(WallClock::min())
+    , m_use_probe_frames(false)
+    , m_flip_vertical(true)
     , m_last_frame_seqnum(0)
+    , m_last_image_timestamp(WallClock::min())
+    , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
 {
     if (!info){
         return;
@@ -137,8 +114,16 @@ Qt5VideoWidget::Qt5VideoWidget(
             m_probe, &QVideoProbe::videoFrameProbed,
             this, [=](const QVideoFrame& frame){
                 WallClock now = current_time();
+//                WallClock time0 = current_time();
                 SpinLockGuard lg(m_frame_lock);
-                m_last_frame = frame;
+//                WallClock time1 = current_time();
+//                cout << "Lock (signal): " << std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count() << endl;
+                if (m_use_probe_frames){
+//                    WallClock time0 = current_time();
+                    m_last_frame = frame;
+//                    WallClock time1 = current_time();
+//                    cout << "Copy Frame (signal): " << std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count() << endl;
+                }
                 m_last_frame_timestamp = now;
                 m_last_frame_seqnum++;
 //                cout << "asdf" << endl;
@@ -212,8 +197,8 @@ void Qt5VideoWidget::set_resolution(const QSize& size){
     m_camera->setViewfinderSettings(settings);
     m_resolution = size;
 }
-QImage Qt5VideoWidget::direct_snapshot_image(){
-    std::unique_lock<std::mutex> lg(m_lock);
+QImage Qt5VideoWidget::direct_snapshot_image(std::unique_lock<std::mutex>& lock){
+//    std::unique_lock<std::mutex> lg(m_lock);
     if (m_camera == nullptr){
         return QImage();
     }
@@ -235,7 +220,7 @@ QImage Qt5VideoWidget::direct_snapshot_image(){
     PendingCapture& capture = iter.first->second;
 
     capture.cv.wait_for(
-        lg,
+        lock,
         std::chrono::milliseconds(1000),
         [&]{ return capture.status != CaptureStatus::PENDING; }
     );
@@ -253,7 +238,7 @@ QImage Qt5VideoWidget::direct_snapshot_image(){
     return image;
 }
 QImage Qt5VideoWidget::direct_snapshot_probe(bool flip_vertical){
-    std::lock_guard<std::mutex> lg(m_lock);
+//    std::lock_guard<std::mutex> lg(m_lock);
     if (m_camera == nullptr){
         return QImage();
     }
@@ -266,9 +251,9 @@ QImage Qt5VideoWidget::direct_snapshot_probe(bool flip_vertical){
 
     return frame_to_image(m_logger, frame, flip_vertical);
 }
-QImage Qt5VideoWidget::snapshot_image(WallClock* timestamp){
+QImage Qt5VideoWidget::snapshot_image(std::unique_lock<std::mutex>& lock, WallClock* timestamp){
 //    cout << "snapshot_image()" << endl;
-    std::unique_lock<std::mutex> lg(m_lock);
+//    std::unique_lock<std::mutex> lg(m_lock);
 
     auto now = current_time();
     if (timestamp){
@@ -309,6 +294,8 @@ QImage Qt5VideoWidget::snapshot_image(WallClock* timestamp){
         }
     }
 
+    WallClock time0 = current_time();
+
     m_camera->searchAndLock();
     int id = m_capture->capture();
     m_camera->unlock();
@@ -327,7 +314,7 @@ QImage Qt5VideoWidget::snapshot_image(WallClock* timestamp){
 
 //    cout << "snapshot: " << id << endl;
     capture.cv.wait_for(
-        lg,
+        lock,
         std::chrono::milliseconds(1000),
         [&]{ return capture.status != CaptureStatus::PENDING; }
     );
@@ -344,10 +331,12 @@ QImage Qt5VideoWidget::snapshot_image(WallClock* timestamp){
     }
     m_last_image_timestamp = now;
     m_last_image_seqnum = frame_seqnum;
+    WallClock time1 = current_time();
+    m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count());
     return m_last_image;
 }
 QImage Qt5VideoWidget::snapshot_probe(WallClock* timestamp){
-    std::lock_guard<std::mutex> lg(m_lock);
+//    std::lock_guard<std::mutex> lg(m_lock);
 
     if (m_camera == nullptr){
         if (timestamp){
@@ -361,7 +350,10 @@ QImage Qt5VideoWidget::snapshot_probe(WallClock* timestamp){
     WallClock frame_timestamp;
     uint64_t frame_seqnum;
     {
-        SpinLockGuard lg1(m_frame_lock);
+//        WallClock time0 = current_time();
+        SpinLockGuard lg0(m_frame_lock);
+//        WallClock time1 = current_time();
+//        cout << "Lock (snapshot): " << std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count() << endl;
         frame_seqnum = m_last_frame_seqnum;
         if (!m_last_image.isNull() && m_last_image_seqnum == frame_seqnum){
 //            cout << "cached 0" << endl;
@@ -370,21 +362,33 @@ QImage Qt5VideoWidget::snapshot_probe(WallClock* timestamp){
             }
             return m_last_image;
         }
+//        WallClock time0 = current_time();
         frame = m_last_frame;
+//        WallClock time1 = current_time();
+//        cout << "Copy Frame (snapshot): " << std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count() << endl;
         frame_timestamp = m_last_frame_timestamp;
     }
 
+    WallClock time0 = current_time();
     m_last_image = frame_to_image(m_logger, frame, m_flip_vertical);
+//    cout << "Convert Frame: " << std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count() << endl;
     m_last_image_timestamp = frame_timestamp;
     m_last_image_seqnum = frame_seqnum;
     if (timestamp){
         timestamp[0] = frame_timestamp;
     }
+    WallClock time1 = current_time();
+    m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count());
     return m_last_image;
 }
 
 QImage Qt5VideoWidget::snapshot(WallClock* timestamp){
-    return snapshot_image(timestamp);
+    std::unique_lock<std::mutex> lg(m_lock);
+    if (m_use_probe_frames){
+        return snapshot_probe(timestamp);
+    }else{
+        return snapshot_image(lg, timestamp);
+    }
 }
 
 void Qt5VideoWidget::resizeEvent(QResizeEvent* event){

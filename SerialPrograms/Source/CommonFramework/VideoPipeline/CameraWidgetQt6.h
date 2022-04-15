@@ -13,6 +13,7 @@
 #include <QVideoFrame>
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/Inference/StatAccumulator.h"
 #include "CameraInfo.h"
 #include "VideoWidget.h"
 
@@ -52,18 +53,22 @@ private:
     QCamera* m_camera = nullptr;
     QMediaCaptureSession m_captureSession;
     QVideoSink* m_videoSink = nullptr;
-    QVideoFrame m_videoFrame;
-    WallClock m_videoTimestamp;
     std::vector<QCameraFormat> m_formats;
 
     mutable std::mutex m_lock;
     std::mutex m_image_lock;
     SpinLock m_frame_lock;
-    std::atomic<uint64_t> m_seqnum_frame;
-//    uint64_t m_seqnum_frame;
-    uint64_t m_seqnum_image = 0;
-    QImage m_cached_frame;
-    WallClock m_cached_timestamp;
+
+    //  Last Frame
+    QVideoFrame m_last_frame;
+    WallClock m_last_frame_timestamp;
+    std::atomic<uint64_t> m_last_frame_seqnum;
+
+    //  Last Cached Image
+    QImage m_last_image;
+    WallClock m_last_image_timestamp;
+    uint64_t m_last_image_seqnum = 0;
+    PeriodicStatsReporterI32 m_stats_conversion;
 };
 
 

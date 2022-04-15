@@ -50,8 +50,9 @@ Qt6VideoWidget::Qt6VideoWidget(
 )
     : VideoWidget(parent)
     , m_logger(logger)
-    , m_seqnum_frame(0)
-    , m_cached_timestamp(WallClock::min())
+    , m_last_frame_seqnum(0)
+    , m_last_image_timestamp(WallClock::min())
+    , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
 {
     if (!info){
         return;
@@ -87,11 +88,11 @@ Qt6VideoWidget::Qt6VideoWidget(
         {
             auto timestamp = current_time();
             SpinLockGuard lg(m_frame_lock);
-            m_videoFrame = frame;
-            m_videoTimestamp = timestamp;
-            uint64_t seqnum = m_seqnum_frame.load(std::memory_order_acquire);
-            m_seqnum_frame.store(seqnum + 1, std::memory_order_release);
-//            m_seqnum_frame++;
+            m_last_frame = frame;
+            m_last_frame_timestamp = timestamp;
+            uint64_t seqnum = m_last_frame_seqnum.load(std::memory_order_acquire);
+            m_last_frame_seqnum.store(seqnum + 1, std::memory_order_release);
+//            m_last_frame_seqnum++;
         }
         this->update();
     });
@@ -167,21 +168,23 @@ QImage Qt6VideoWidget::snapshot(WallClock* timestamp){
     std::lock_guard<std::mutex> lg(m_image_lock);
 
     //  Image is already cached and not stale. Return it.
-    uint64_t seqnum = m_seqnum_frame.load(std::memory_order_acquire);
-    if (m_seqnum_image == seqnum && !m_cached_frame.isNull()){
+    uint64_t seqnum = m_last_frame_seqnum.load(std::memory_order_acquire);
+    if (m_last_image_seqnum == seqnum && !m_last_image.isNull()){
         if (timestamp){
-            timestamp[0] = m_cached_timestamp;
+            timestamp[0] = m_last_image_timestamp;
         }
-        return m_cached_frame;
+        return m_last_image;
     }
+
+    WallClock time0 = current_time();
 
     //  Need to update image. Grab the current frame.
     QVideoFrame frame;
     WallClock tick;
     {
         SpinLockGuard lg1(m_frame_lock);
-        frame = m_videoFrame;   // Fast due to ref-count.
-        tick = m_videoTimestamp;
+        frame = m_last_frame;   // Fast due to ref-count.
+        tick = m_last_frame_timestamp;
     }
 
     //  Now make the image.
@@ -203,13 +206,15 @@ QImage Qt6VideoWidget::snapshot(WallClock* timestamp){
     if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
         image = image.convertToFormat(QImage::Format_ARGB32);
     }
-    m_seqnum_image = seqnum;
-    m_cached_frame = std::move(image);
-    m_cached_timestamp = tick;
+    m_last_image_seqnum = seqnum;
+    m_last_image = std::move(image);
+    m_last_image_timestamp = tick;
     if (timestamp){
-        timestamp[0] = m_cached_timestamp;
+        timestamp[0] = m_last_image_timestamp;
     }
-    return m_cached_frame;
+    WallClock time1 = current_time();
+    m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count());
+    return m_last_image;
 }
 
 
@@ -239,11 +244,11 @@ void Qt6VideoWidget::paintEvent(QPaintEvent* event){
     //  Lock should not be needed since it's only updated on this UI thread.
 //    std::lock_guard<std::mutex> lg(m_lock);
 
-    if (m_videoFrame.isValid()){
+    if (m_last_frame.isValid()){
         QRect rect(0,0, this->width(), this->height());
         QVideoFrame::PaintOptions options;
         QPainter painter(this);
-        m_videoFrame.paint(&painter, rect, options);
+        m_last_frame.paint(&painter, rect, options);
     }
     // std::cout << "paintEvent end" << std::endl;
 }

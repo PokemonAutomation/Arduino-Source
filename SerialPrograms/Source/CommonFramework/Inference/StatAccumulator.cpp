@@ -11,10 +11,17 @@
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "StatAccumulator.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 
 
 
+void StatAccumulatorI32::clear(){
+    *this = StatAccumulatorI32();
+}
 void StatAccumulatorI32::operator+=(uint32_t x){
     m_count++;
     m_sum += x;
@@ -45,6 +52,33 @@ std::string StatAccumulatorI32::dump(const char* units, double divider) const{
 void StatAccumulatorI32::log(Logger& logger, const std::string& label, const char* units, double divider) const{
     logger.log(label + ": " + dump(units, divider), COLOR_MAGENTA);
 }
+
+
+
+PeriodicStatsReporterI32::PeriodicStatsReporterI32(
+    const char* label,
+    const char* units, double divider,
+    std::chrono::milliseconds period
+)
+    : m_label(label)
+    , m_units(units)
+    , m_divider(divider)
+    , m_period(period)
+    , m_last_report(current_time())
+{}
+void PeriodicStatsReporterI32::report_data(Logger& logger, uint32_t x){
+    StatAccumulatorI32::operator+=(x);
+    WallClock now = current_time();
+    if (m_last_report + m_period <= now){
+        log(logger, m_label, m_units, m_divider);
+        clear();
+        m_last_report = now;
+    }
+
+}
+
+
+
 
 
 
