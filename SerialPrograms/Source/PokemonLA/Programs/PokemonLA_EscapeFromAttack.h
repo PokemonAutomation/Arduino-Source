@@ -23,18 +23,11 @@ public:
     EscapeFromAttack(
         ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
         std::chrono::seconds time_min,
-        std::chrono::seconds time_limit,
-        bool stop_on_shiny
+        std::chrono::seconds time_limit
     );
 
     UnderAttackState state() const{
         return m_attacked.state();
-    }
-    bool detected_shiny() const{
-        return m_shiny_listener.detected();
-    }
-    ShinySoundResults shiny_sound_results(){
-        return m_shiny_listener.results();
     }
 
 
@@ -71,13 +64,11 @@ private:
 
     const WallClock m_min_stop;
     const WallClock m_deadline;
-    const bool m_stop_on_shiny;
 
     UnderAttackWatcher m_attacked;
     MountTracker m_mount;
     ButtonDetector m_centerA;
     ButtonDetector m_leftB;
-    ShinySoundDetector m_shiny_listener;
 
     WallClock m_get_on_sneasler_time;
 };

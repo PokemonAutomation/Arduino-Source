@@ -175,11 +175,16 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseC
         }else{
             env.log("Start Listen, build sound detector");
             // Build shiny sound detector and start listens:
-            ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
-            // TODO: run_until() is not designed to pass `env` inside. run_until() relies on the usage
-            // of the passed in BotBaseContext& context to stop the code inside the lambda function,
-            // but the code using the passed in `env` may still runs. This will delay the program stop
-            // on shiny sound but should be genearally OK in this use case.
+            bool shiny_detected = false;
+            ShinySoundResults shiny_results;
+            ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+                // This lambda function will be called when a shiny is detected.
+                // Its return will determine whether to stop the program:
+                shiny_detected = true;
+                shiny_results.screenshot = env.console.video().snapshot();
+                shiny_results.error_coefficient = error_coefficient;
+                return SHINY_DETECTED.stop_on_shiny();
+            });
             run_until(
                 env.console, context,
                 [&env, &action_index, this](BotBaseContext& context){
@@ -196,10 +201,9 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseC
                 },
                 {{shiny_detector}}
             );
-            if (shiny_detector.detected()){
+            if (shiny_detected){
                 stats.shinies++;
-                on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_detector.results());
-                break;
+                on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_results);
             }
         }
     } // end for loop on each action

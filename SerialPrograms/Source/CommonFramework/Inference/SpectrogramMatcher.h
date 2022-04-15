@@ -65,7 +65,8 @@ public:
     // Clear internal data to be used on another audio stream.
     void clear();
 
-    size_t numTemplateWindows() const { return m_template.numWindows(); }
+    // How many windows are used for matching.
+    size_t numMatchedWindows() const { return m_numSpectrumsNeeded; }
 
     // Return latest timestamp from the stored audio spectrum stream.
     // Return SIZE_MAX if there is no stored spectrum yet.

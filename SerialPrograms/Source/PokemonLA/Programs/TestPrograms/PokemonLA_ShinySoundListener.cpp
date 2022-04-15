@@ -58,7 +58,11 @@ void ShinySoundListener::program(SingleSwitchProgramEnvironment& env, BotBaseCon
     std::cout << "Running audio test program." << std::endl;
 
     
-    ShinySoundDetector detector(env.console, STOP_ON_SHINY_SOUND);
+    ShinySoundDetector detector(env.console, [&](float error_coefficient) -> bool{
+        // This lambda function will be called when a shiny is detected.
+        // Its return will determine whether to stop the program:
+        return STOP_ON_SHINY_SOUND;
+    });
 
     InferenceSession session(
         context, env.console,
@@ -121,7 +125,7 @@ void searchShinySoundFromAudioDump(){
         // match!
         float minScore = FLT_MAX;
         std::vector<AudioSpectrum> newSpectrums;
-        size_t numStreamWindows = std::max(matcher.numTemplateWindows(), audio.numWindows());
+        size_t numStreamWindows = std::max(matcher.numMatchedWindows(), audio.numWindows());
         for(size_t audioIdx = 0; audioIdx < numStreamWindows; audioIdx++){
             newSpectrums.clear();
             AlignedVector<float> freqVector(audio.numFrequencies());

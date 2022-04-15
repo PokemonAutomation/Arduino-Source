@@ -25,20 +25,11 @@ namespace PokemonLA{
 
 
 
-AlphaRoarDetector::AlphaRoarDetector(ConsoleHandle& console, bool stop_on_detected)
+AlphaRoarDetector::AlphaRoarDetector(ConsoleHandle& console, OnShinyCallback on_shiny_callback)
     // Use a purple as the detection color because the alpha symbol is red. To differentiate with the
     // detection color of alpha music, the roar (which is loud -> heavy -> darker color) uses purple.
-    : AudioPerSpectrumDetectorBase("AlphaRoarDetector", "Alpha roar", COLOR_PURPLE, console, stop_on_detected)
+    : AudioPerSpectrumDetectorBase("AlphaRoarDetector", "Alpha roar", COLOR_PURPLE, console, on_shiny_callback)
 {}
-
-ShinySoundResults AlphaRoarDetector::results(){
-    ShinySoundResults results;
-    SpinLockGuard lg(m_lock);
-    results.screenshot = m_screenshot;
-    results.error_coefficient = m_error_coefficient;
-    return results;
-}
-
 
 float AlphaRoarDetector::get_score_threshold() const{
     return (float)GameSettings::instance().ALPHA_ROAR_THRESHOLD;

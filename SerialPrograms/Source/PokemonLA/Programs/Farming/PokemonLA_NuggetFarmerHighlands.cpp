@@ -126,7 +126,18 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, Bo
     env.console.log("Traveling to Charm's location...");
     {
         DialogSurpriseDetector dialog_detector(env.console, env.console, true);
-        ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
+        
+        bool shiny_detected = false;
+        ShinySoundResults shiny_results;
+        ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+            // This lambda function will be called when a shiny is detected.
+            // Its return will determine whether to stop the program:
+            shiny_detected = true;
+            shiny_results.screenshot = env.console.video().snapshot();
+            shiny_results.error_coefficient = error_coefficient;
+            return SHINY_DETECTED.stop_on_shiny();
+        });
+
         int ret = run_until(
             env.console, context,
             [](BotBaseContext& context){
@@ -160,9 +171,9 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, Bo
                 {shiny_detector},
             }
         );
-        if (shiny_detector.detected()){
+        if (shiny_detected){
             stats.shinies++;
-            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_detector.results());
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_results);
         }
         if (ret == 0){
             env.console.log("Found Charm!", COLOR_BLUE);
@@ -183,8 +194,35 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, Bo
 
 
     env.console.log("Returning to Jubilife...");
-    goto_camp_from_overworld(env, env.console, context, SHINY_DETECTED, stats);
-    goto_professor(env.console, context, Camp::HIGHLANDS_HIGHLANDS);
+
+
+    {
+        bool shiny_detected = false;
+        ShinySoundResults shiny_results;
+        ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+            // This lambda function will be called when a shiny is detected.
+            // Its return will determine whether to stop the program:
+            shiny_detected = true;
+            shiny_results.screenshot = env.console.video().snapshot();
+            shiny_results.error_coefficient = error_coefficient;
+            return SHINY_DETECTED.stop_on_shiny();
+        });
+
+        run_until(env.console, context,
+            [&env](BotBaseContext& context){
+                goto_camp_from_overworld(env, env.console, context);
+                goto_professor(env.console, context, Camp::HIGHLANDS_HIGHLANDS);
+            },
+            {{shiny_detector}}
+        );
+
+        if (shiny_detected){
+            stats.shinies++;
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_results);
+        }
+    }
+
+
     from_professor_return_to_jubilife(env, env.console, context);
 
     if (success){

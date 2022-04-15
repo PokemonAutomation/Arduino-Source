@@ -99,7 +99,17 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
     // From game to Switch Home
     pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
     {
-        ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
+        bool shiny_detected = false;
+        ShinySoundResults shiny_results;
+        ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+            // This lambda function will be called when a shiny is detected.
+            // Its return will determine whether to stop the program:
+            shiny_detected = true;
+            shiny_results.screenshot = env.console.video().snapshot();
+            shiny_results.error_coefficient = error_coefficient;
+            return SHINY_DETECTED.stop_on_shiny();
+        });
+
         run_until(
             env.console, context,
             [this, &env](BotBaseContext& context){
@@ -121,9 +131,9 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
             },
             {{shiny_detector}}
         );
-        if (shiny_detector.detected()){
-           stats.shinies++;
-           on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_detector.results());
+        if (shiny_detected){
+            stats.shinies++;
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_results);
         }
     }
 

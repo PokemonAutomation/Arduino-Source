@@ -91,20 +91,31 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseC
 
     //Start path
     env.console.log("Beginning Shiny Detection...");
-    {
-        //Setup
-        pbf_move_left_joystick(context, 108, 255, 20, 20);
-        pbf_press_button(context, BUTTON_ZL, 10,10);
-        pbf_wait(context, (uint16_t)(0.5 * TICKS_PER_SECOND));
-        change_mount(env.console, context, MountState::BRAVIARY_ON);
-        pbf_wait(context, (uint16_t)(0.5 * TICKS_PER_SECOND));
 
+    //Setup
+    pbf_move_left_joystick(context, 108, 255, 20, 20);
+    pbf_press_button(context, BUTTON_ZL, 10,10);
+    pbf_wait(context, (uint16_t)(0.5 * TICKS_PER_SECOND));
+    change_mount(env.console, context, MountState::BRAVIARY_ON);
+    pbf_wait(context, (uint16_t)(0.5 * TICKS_PER_SECOND));
+
+    //Route to cave entrance
+    {
         ShinyDetectedActionOption SHINY_DETECTED_ON_ROUTE(QString::number(SHINY_DETECTED.SCREENSHOT_DELAY));
         SHINY_DETECTED_ON_ROUTE.NOTIFICATIONS = SHINY_DETECTED.NOTIFICATIONS;
         SHINY_DETECTED_ON_ROUTE.ACTION.set(!SKIP_PATH_SHINY);
 
-        //Route to cave entrance
-        ShinySoundDetector shiny_detector_route(env.console, SHINY_DETECTED_ON_ROUTE.stop_on_shiny());
+        bool shiny_detected = false;
+        ShinySoundResults shiny_results;
+        ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+            // This lambda function will be called when a shiny is detected.
+            // Its return will determine whether to stop the program:
+            shiny_detected = true;
+            shiny_results.screenshot = env.console.video().snapshot();
+            shiny_results.error_coefficient = error_coefficient;
+            return !SKIP_PATH_SHINY;
+        });
+
         run_until(
             env.console, context,
                 [](BotBaseContext& context){
@@ -117,30 +128,42 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseC
                 pbf_press_button(context, BUTTON_PLUS, 10,10);
                 pbf_press_button(context, BUTTON_B, (uint16_t)(2.8 * TICKS_PER_SECOND), 10); // Braviary Second Push
             },
-            {{shiny_detector_route}}
+            {{shiny_detector}}
         );
 
-        if (shiny_detector_route.detected()){
-           stats.shinies++;
-           on_shiny_sound(env, env.console, context, SHINY_DETECTED_ON_ROUTE, shiny_detector_route.results());
+        if (shiny_detected){
+            stats.shinies++;
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED_ON_ROUTE, shiny_results);
         }
+    }
 
-        //Move to Froslass
-        ShinySoundDetector shiny_detector_ruins(env.console, SHINY_DETECTED.stop_on_shiny());
+    //Move to Froslass
+    {
+        bool shiny_detected = false;
+        ShinySoundResults shiny_results;
+        ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+            // This lambda function will be called when a shiny is detected.
+            // Its return will determine whether to stop the program:
+            shiny_detected = true;
+            shiny_results.screenshot = env.console.video().snapshot();
+            shiny_results.error_coefficient = error_coefficient;
+            return SHINY_DETECTED.stop_on_shiny();
+        });
+
         run_until(
                 env.console, context,
                 [](BotBaseContext& context){
                 pbf_press_dpad(context, DPAD_LEFT, 20, 20);
                 pbf_press_button(context, BUTTON_B, (uint16_t)(4.5 * TICKS_PER_SECOND), 10);
             },
-            {{shiny_detector_ruins}}
+            {{shiny_detector}}
         );
 
-        if (shiny_detector_ruins.detected()){
-           stats.shinies++;
-           on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_detector_ruins.results());
+        if (shiny_detected){
+            stats.shinies++;
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_results);
         }
-    };
+    }
 
     env.console.log("No shiny detected, returning to Jubilife!");
     pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);

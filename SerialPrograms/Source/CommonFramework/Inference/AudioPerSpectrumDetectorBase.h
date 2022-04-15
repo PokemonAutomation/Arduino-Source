@@ -2,17 +2,27 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *  A base class for any audio detector that tries to match an audio template starting at each 
- *  incoming spectrum in the audio stream (hence the "PerSpectrum").
- *  This means that, if called with three newest unseen spectrums from the audio feed, the detector
- *  will check whether the audio template matches audio starting at the first of the three spectrums,
- *  then check the second, and finally the third.
- *  Basically, it will try to match the audio template to any possible past location in the audio
- *  stream. So it will not miss any match if the audio template is short in duration and the matching
+ *  A base class for audio detectors.
+ * 
+ *  It implements AudioInferenceCallback so that it can hook to an inference session
+ *  and stop the session when a target audio is detected.
+ *  The inference session calls process_spectrums(...) periodically and stops when
+ *  the function returns true.
+ *  This base class implements this function.
+ *  
+ *  This base class is called "PerSpectrum" because it tries to match the audio template starting at
+ *  each incoming spectrum in the audio stream.
+ *  For example, if called with three newest unseen spectrums from the audio feed, (i.e `newSpectrums`
+ *  contains three spectrums when passed to AudioPerSpectrumDetectorBase::process_spectrums(...))
+ *  the detector will check whether the audio template matches the part of audio starting at the first
+ *  of the three spectrums, then check starting at the second, and finally the third.
+ *  Basically, it will try to match the audio template to any possible location in the current audio
+ *  stream. So it will not miss any match even if the audio template is short in duration and the matching
  *  algorithm needs to be very precise.
+ * 
  *  This is opposite to the other design choice that only matches the audio starting at the newest
- *  spectrum when called. That design choice is better suited to non-time-critical audio matching and
- *  the matching algorithm can tolerate a few spectrums off on time axis.
+ *  spectrum in `newSpectrums` when called. That design choice is better suited to non-time-critical
+ *  audio matching and the matching algorithm can tolerate a few spectrums off on time axis.
  */
 
 #ifndef PokemonAutomation_CommonFramework_AudioPerSpectrumDetectorBase_H
@@ -21,6 +31,7 @@
 #include <QImage>
 
 #include <string>
+#include <functional>
 
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/SpinLock.h"
@@ -32,15 +43,23 @@ namespace PokemonAutomation{
 class ConsoleHandle;
 class SpectrogramMatcher;
 
-// A base class for audio detectors to match an audio template starting at each incoming spectrum in 
-// the audio stream.
+// A virtual base class for audio detectors to match an audio template starting at each incoming
+// spectrum in the audio stream.
+// The derived classes need to implement two functions:
+// - float get_score_threshold() const
+// - std::unique_ptr<SpectrogramMatcher> build_spectrogram_matcher(size_t sampleRate)
 class AudioPerSpectrumDetectorBase : public AudioInferenceCallback{
 public:
+    using OnShinyCallback = std::function<bool(float error_coefficient)>;
     // label: a name for this detector. Used for logging and profiling.
     // audio_name: the name of the audio to be detected (shiny sound etc). Capitalize first letter.
     // detection_color: the color to visualize the detection on audio spectrogram UI.
+    // on_shiny_callback(float error_coefficient) -> bool: 
+    // when the detector finds a match, it calls this callback function to decide whether to stop
+    // the inference session. The error coefficient of the found audio is passed to the callback
+    // function. If it returns true, the inference session will stop.
     AudioPerSpectrumDetectorBase(std::string label, std::string audio_name, Color detection_color,
-        ConsoleHandle& console, bool stop_on_detected);
+        ConsoleHandle& console, OnShinyCallback on_shiny_callback);
 
     virtual ~AudioPerSpectrumDetectorBase();
 
@@ -57,12 +76,9 @@ public:
     // Clear internal data to be used on another audio stream.
     void clear();
 
-    // Log whether the target audio is detected or not
+    // Log whether the target audio is detected or not during the runtime of this detector.
+    // This function will always be called when the detector is destructed.
     void log_results();
-
-    bool detected() const{
-        return m_detected.load(std::memory_order_acquire);
-    }
 
 protected:
     // To be implemented by derived classes:
@@ -71,18 +87,26 @@ protected:
 
     // Name of the target audio to be detected. Used for logging.
     std::string m_audio_name;
+    // Color of the box to visualize the detection in the audio spectrogram UI.
     Color m_detection_color;
     
     ConsoleHandle& m_console;
-    bool m_stop_on_detected = false;
+    // Callback function to determine whether to stop the inference session when the target audio
+    // is detected.
+    OnShinyCallback m_on_shiny_callback;
 
-    SpinLock m_lock;
-    std::atomic<bool> m_detected;
-    WallClock m_time_detected;
-
-    float m_error_coefficient = 1.0f;
-    QImage m_screenshot;
-
+    // Record lowest error coefficient (i.e best match) during the runtime of this detector.
+    float m_lowest_error = 1.0f;
+    // Record the last timestamp when the target audio is detected.
+    // If no detection throughout the runtime, this will remain WallClock::min().
+    WallClock m_last_timestamp = WallClock::min();
+    // Record the last match error coefficient when the target audio is detected.
+    // It will be reset to 1.0f when one second has passed since the last detection.
+    float m_last_error = 1.0f;
+    // This is set to true when a match is found. It will remain true for one second
+    // so that the detector will not count the same detected audio multiple times.
+    bool m_last_reported = false;
+    
     std::unique_ptr<SpectrogramMatcher> m_matcher;
 };
 

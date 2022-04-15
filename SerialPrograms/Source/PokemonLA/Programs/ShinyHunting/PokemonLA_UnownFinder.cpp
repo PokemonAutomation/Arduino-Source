@@ -116,46 +116,66 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     change_mount(env.console, context, MountState::BRAVIARY_ON);
 
-    //Start path
+    // Start path
     env.console.log("Beginning Shiny Detection...");
     {
         ShinyDetectedActionOption SHINY_DETECTED_ON_ROUTE(QString::number(SHINY_DETECTED.SCREENSHOT_DELAY));
         SHINY_DETECTED_ON_ROUTE.NOTIFICATIONS = SHINY_DETECTED.NOTIFICATIONS;
         SHINY_DETECTED_ON_ROUTE.ACTION.set(!SKIP_PATH_SHINY);
 
-        ShinySoundDetector shiny_detector_route(env.console, SHINY_DETECTED_ON_ROUTE.stop_on_shiny());
+        bool shiny_detected = false;
+        ShinySoundResults shiny_results;
+        ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+            // This lambda function will be called when a shiny is detected.
+            // Its return will determine whether to stop the program:
+            shiny_detected = true;
+            shiny_results.screenshot = env.console.video().snapshot();
+            shiny_results.error_coefficient = error_coefficient;
+            return !SKIP_PATH_SHINY;
+        });
+
         run_until(
             env.console, context,
             [](BotBaseContext& context){
                ruins_entrance_route(context);
             },
-            {{shiny_detector_route}}
+            {{shiny_detector}}
         );
 
-        if (shiny_detector_route.detected()){
-           stats.shinies++;
-           on_shiny_sound(env, env.console, context, SHINY_DETECTED_ON_ROUTE, shiny_detector_route.results());
+        if (shiny_detected){
+            stats.shinies++;
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED_ON_ROUTE, shiny_results);
         }
+    }
 
-
-        ShinySoundDetector shiny_detector_ruins(env.console, SHINY_DETECTED.stop_on_shiny());
+    // Enter ruins
+    {
+        bool shiny_detected = false;
+        ShinySoundResults shiny_results;
+        ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+            // This lambda function will be called when a shiny is detected.
+            // Its return will determine whether to stop the program:
+            shiny_detected = true;
+            shiny_results.screenshot = env.console.video().snapshot();
+            shiny_results.error_coefficient = error_coefficient;
+            return SHINY_DETECTED.stop_on_shiny();
+        });
 
         run_until(env.console, context,
             [](BotBaseContext& context){
                enter_ruins(context);
             },
-            {{shiny_detector_ruins}}
+            {{shiny_detector}}
         );
 
-
-        if (shiny_detector_ruins.detected()){
-           stats.shinies++;
-           on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_detector_ruins.results());
+        if (shiny_detected){
+            stats.shinies++;
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_results);
         }
-    };
+    }
 
     env.console.log("No shiny detected, returning to Jubilife!");
-    goto_camp_from_overworld(env, env.console, context, SHINY_DETECTED, stats);
+    goto_camp_from_overworld(env, env.console, context);
     pbf_press_dpad(context, DPAD_RIGHT, 10, 10);
     goto_professor(env.console, context, Camp::MIRELANDS_MIRELANDS);
     from_professor_return_to_jubilife(env, env.console, context);

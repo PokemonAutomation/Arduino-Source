@@ -58,7 +58,11 @@ void AlphaRoarListener::program(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     std::cout << "Running audio test program." << std::endl;
     
-    AlphaRoarDetector detector(env.console, STOP_ON_ALPHA_ROAR);
+    AlphaRoarDetector detector(env.console, [&](float error_coefficient) -> bool{
+        // This lambda function will be called when an alpha roar is detected.
+        // Its return will determine whether to stop the program:
+        return STOP_ON_ALPHA_ROAR;
+    });
 
     InferenceSession session(
         context, env.console,
@@ -70,7 +74,7 @@ void AlphaRoarListener::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     std::cout << "Audio test program finished." << std::endl;
 }
 
-// A function used to search for the shiny sound on LA audio dump.
+// A function used to search for the alpha roar on LA audio dump.
 // But we didn't find the shound sound :P
 void searchAlphaRoarFromAudioDump(){
 
@@ -121,7 +125,7 @@ void searchAlphaRoarFromAudioDump(){
         // match!
         float minScore = FLT_MAX;
         std::vector<AudioSpectrum> newSpectrums;
-        size_t numStreamWindows = std::max(matcher.numTemplateWindows(), audio.numWindows());
+        size_t numStreamWindows = std::max(matcher.numMatchedWindows(), audio.numWindows());
         for(size_t audioIdx = 0; audioIdx < numStreamWindows; audioIdx++){
             newSpectrums.clear();
             AlignedVector<float> freqVector(audio.numFrequencies());
