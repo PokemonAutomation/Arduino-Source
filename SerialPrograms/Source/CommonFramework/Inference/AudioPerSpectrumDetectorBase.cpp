@@ -17,7 +17,9 @@
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "AudioPerSpectrumDetectorBase.h"
 
-// #include <iostream>
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -73,6 +75,15 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
     // Feed spectrum one by one to the matcher:
     // newSpectrums are ordered from newest (largest timestamp) to oldest (smallest timestamp).
     // To feed the spectrum from old to new, we need to go through the vector in the reverse order:
+
+
+//#define PA_DEBUG_FORCE_PLA_SOUND
+
+#ifdef PA_DEBUG_FORCE_PLA_SOUND
+    static int debug_count = 0;
+    debug_count++;
+    cout << "debug_count = " << debug_count << endl;
+#endif
     
     bool found = false;
     const float threshold = get_score_threshold();
@@ -91,6 +102,12 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
         found = matcherScore <= threshold;
 
         size_t curStamp = m_matcher->latestTimestamp();
+
+#ifdef PA_DEBUG_FORCE_PLA_SOUND
+        if (debug_count % 300 == 0){
+            found = true;
+        }
+#endif
 
         if (found){
             // Record the time of this match
@@ -122,7 +139,7 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
     }
 
     //  No shiny detected.
-    if (!found){
+    if (m_last_error >= 1.0){
         return false;
     }
 
