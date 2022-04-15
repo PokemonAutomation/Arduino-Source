@@ -42,6 +42,7 @@ public:
     FloatingPointOption SHINY_SHOUND_THRESHOLD2;
     FloatingPointOption SHINY_SHOUND_LOW_FREQUENCY;
     FloatingPointOption ALPHA_ROAR_THRESHOLD;
+    FloatingPointOption ALPHA_MUSIC_THRESHOLD;
 };
 
 

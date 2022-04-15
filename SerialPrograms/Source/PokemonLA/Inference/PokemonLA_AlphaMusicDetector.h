@@ -1,11 +1,11 @@
-/*  Alpha Roar Detector
+/*  Alpha Music Detector
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_PokemonLA_AlphaRoarDetector_H
-#define PokemonAutomation_PokemonLA_AlphaRoarDetector_H
+#ifndef PokemonAutomation_PokemonLA_AlphaMusicDetector_H
+#define PokemonAutomation_PokemonLA_AlphaMusicDetector_H
 
 #include <QImage>
 #include "Common/Cpp/SpinLock.h"
@@ -24,9 +24,9 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class AlphaRoarDetector : public AudioPerSpectrumDetectorBase{
+class AlphaMusicDetector : public AudioPerSpectrumDetectorBase{
 public:
-    AlphaRoarDetector(ConsoleHandle& console, OnShinyCallback on_shiny_callback);
+    AlphaMusicDetector(ConsoleHandle& console, OnShinyCallback on_shiny_callback);
 
     // Implement AudioPerSpectrumDetectorBase::get_score_threshold()
     virtual float get_score_threshold() const override;

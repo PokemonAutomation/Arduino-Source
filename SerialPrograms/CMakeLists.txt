@@ -244,6 +244,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ImageTools/SolidColorTest.h
     Source/CommonFramework/Inference/AnomalyDetector.cpp
     Source/CommonFramework/Inference/AnomalyDetector.h
+    Source/CommonFramework/Inference/AudioPerSpectrumDetectorBase.cpp
+    Source/CommonFramework/Inference/AudioPerSpectrumDetectorBase.h
     Source/CommonFramework/Inference/AudioTemplateCache.cpp
     Source/CommonFramework/Inference/AudioTemplateCache.h
     Source/CommonFramework/Inference/BlackBorderDetector.cpp
@@ -847,6 +849,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.cpp
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h
+    Source/PokemonLA/Inference/PokemonLA_AlphaMusicDetector.cpp
+    Source/PokemonLA/Inference/PokemonLA_AlphaMusicDetector.h
     Source/PokemonLA/Inference/PokemonLA_AlphaRoarDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_AlphaRoarDetector.h
     Source/PokemonLA/Inference/PokemonLA_BattleMenuDetector.cpp
@@ -932,6 +936,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaMusicListener.cpp
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaMusicListener.h
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.cpp
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.h
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_FlagNavigationTest.cpp

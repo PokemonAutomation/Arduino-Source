@@ -301,23 +301,17 @@ void goto_camp_from_jubilife(
 
 
 void goto_camp_from_overworld(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
-    ShinyDetectedActionOption& options,
-    ShinyStatIncrementer& shiny_stat_incrementer
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context
 ){
     auto start = current_time();
     std::chrono::seconds grace_period(0);
     while (true){
-        EscapeFromAttack session(
-            env, console, context,
-            grace_period, std::chrono::seconds(10),
-            options.stop_on_shiny()
-        );
-        session.run_session();
-
-        if (session.detected_shiny()){
-            shiny_stat_incrementer.add_shiny();
-            on_shiny_sound(env, console, context, options, session.shiny_sound_results());
+        {
+            EscapeFromAttack session(
+                env, console, context,
+                grace_period, std::chrono::seconds(10)
+            );
+            session.run_session();
         }
 
         if (current_time() - start > std::chrono::seconds(60)){
