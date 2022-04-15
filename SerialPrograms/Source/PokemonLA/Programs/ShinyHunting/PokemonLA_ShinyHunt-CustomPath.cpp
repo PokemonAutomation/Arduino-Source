@@ -5,18 +5,18 @@
  */
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA/PokemonLA_Settings.h"
+#include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "PokemonLA/Programs/PokemonLA_MountChange.h"
 #include "PokemonLA_ShinyHunt-CustomPath.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
 
-#include <iostream>
+//#include <iostream>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

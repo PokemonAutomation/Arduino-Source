@@ -26,7 +26,7 @@ namespace PokemonLA{
 
 ShinySoundDetector::ShinySoundDetector(ConsoleHandle& console, OnShinyCallback on_shiny_callback)
     // Use a green as the detection color because the shiny symbol in LA is green.
-    : AudioPerSpectrumDetectorBase("ShinySoundDetector", "Shiny sound", COLOR_GREEN, console, on_shiny_callback)
+    : AudioPerSpectrumDetectorBase("ShinySoundDetector", "Shiny sound", COLOR_YELLOW, console, on_shiny_callback)
 {}
 
 

@@ -153,6 +153,7 @@ SOURCES += \
     Source/CommonFramework/ImageTypes/BinaryImage.cpp \
     Source/CommonFramework/ImageTypes/ImageReference.cpp \
     Source/CommonFramework/Inference/AnomalyDetector.cpp \
+    Source/CommonFramework/Inference/AudioPerSpectrumDetectorBase.cpp \
     Source/CommonFramework/Inference/AudioTemplateCache.cpp \
     Source/CommonFramework/Inference/BlackBorderDetector.cpp \
     Source/CommonFramework/Inference/BlackScreenDetector.cpp \
@@ -412,6 +413,9 @@ SOURCES += \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfBoxTrade.cpp \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfTouchTrade.cpp \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.cpp \
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.cpp \
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.cpp \
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.cpp \
@@ -422,10 +426,6 @@ SOURCES += \
     Source/PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.cpp \
-    Source/PokemonLA/Inference/PokemonLA_AlphaRoarDetector.cpp \
-    Source/PokemonLA/Inference/PokemonLA_BattleMenuDetector.cpp \
-    Source/PokemonLA/Inference/PokemonLA_BattleMoveSelectionDetector.cpp \
-    Source/PokemonLA/Inference/PokemonLA_BattlePokemonSwitchDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.cpp \
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_MapDetector.cpp \
@@ -433,8 +433,10 @@ SOURCES += \
     Source/PokemonLA/Inference/PokemonLA_NotificationReader.cpp \
     Source/PokemonLA/Inference/PokemonLA_OutbreakReader.cpp \
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.cpp \
-    Source/PokemonLA/Inference/PokemonLA_ShinySoundDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.cpp \
+    Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.cpp \
+    Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaRoarDetector.cpp \
+    Source/PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.cpp \
     Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.cpp \
     Source/PokemonLA/Options/PokemonLA_CustomPathTable.cpp \
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.cpp \
@@ -458,6 +460,7 @@ SOURCES += \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.cpp \
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaMusicListener.cpp \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.cpp \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_MountDetectionTest.cpp \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.cpp \
@@ -774,6 +777,7 @@ HEADERS += \
     Source/CommonFramework/ImageTypes/BinaryImage.h \
     Source/CommonFramework/ImageTypes/ImageReference.h \
     Source/CommonFramework/Inference/AnomalyDetector.h \
+    Source/CommonFramework/Inference/AudioPerSpectrumDetectorBase.h \
     Source/CommonFramework/Inference/AudioTemplateCache.h \
     Source/CommonFramework/Inference/BlackBorderDetector.h \
     Source/CommonFramework/Inference/BlackScreenDetector.h \
@@ -1082,6 +1086,9 @@ HEADERS += \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfBoxTrade.h \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfTouchTrade.h \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.h \
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h \
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.h \
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.h \
@@ -1092,10 +1099,6 @@ HEADERS += \
     Source/PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h \
-    Source/PokemonLA/Inference/PokemonLA_AlphaRoarDetector.h \
-    Source/PokemonLA/Inference/PokemonLA_BattleMenuDetector.h \
-    Source/PokemonLA/Inference/PokemonLA_BattleMoveSelectionDetector.h \
-    Source/PokemonLA/Inference/PokemonLA_BattlePokemonSwitchDetector.h \
     Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.h \
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.h \
     Source/PokemonLA/Inference/PokemonLA_MapDetector.h \
@@ -1104,8 +1107,10 @@ HEADERS += \
     Source/PokemonLA/Inference/PokemonLA_OutbreakReader.h \
     Source/PokemonLA/Inference/PokemonLA_OverworldDetector.h \
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h \
-    Source/PokemonLA/Inference/PokemonLA_ShinySoundDetector.h \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.h \
+    Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.h \
+    Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaRoarDetector.h \
+    Source/PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h \
     Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h \
     Source/PokemonLA/Options/PokemonLA_CustomPathTable.h \
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.h \
@@ -1129,6 +1134,7 @@ HEADERS += \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.h \
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaMusicListener.h \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.h \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_MountDetectionTest.h \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.h \

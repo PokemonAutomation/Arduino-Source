@@ -829,6 +829,12 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Panels_PokemonBDSP.h
     Source/PokemonBDSP/PokemonBDSP_Settings.cpp
     Source/PokemonBDSP/PokemonBDSP_Settings.h
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.cpp
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.cpp
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.h
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.cpp
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcDetector.cpp
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcDetector.h
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.cpp
@@ -849,16 +855,6 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.cpp
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h
-    Source/PokemonLA/Inference/PokemonLA_AlphaMusicDetector.cpp
-    Source/PokemonLA/Inference/PokemonLA_AlphaMusicDetector.h
-    Source/PokemonLA/Inference/PokemonLA_AlphaRoarDetector.cpp
-    Source/PokemonLA/Inference/PokemonLA_AlphaRoarDetector.h
-    Source/PokemonLA/Inference/PokemonLA_BattleMenuDetector.cpp
-    Source/PokemonLA/Inference/PokemonLA_BattleMenuDetector.h
-    Source/PokemonLA/Inference/PokemonLA_BattleMoveSelectionDetector.cpp
-    Source/PokemonLA/Inference/PokemonLA_BattleMoveSelectionDetector.h
-    Source/PokemonLA/Inference/PokemonLA_BattlePokemonSwitchDetector.cpp
-    Source/PokemonLA/Inference/PokemonLA_BattlePokemonSwitchDetector.h
     Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.cpp
     Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.h
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.cpp
@@ -876,8 +872,12 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.h
-    Source/PokemonLA/Inference/PokemonLA_ShinySoundDetector.cpp
-    Source/PokemonLA/Inference/PokemonLA_ShinySoundDetector.h
+    Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.cpp
+    Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.h
+    Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaRoarDetector.cpp
+    Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaRoarDetector.h
+    Source/PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.cpp
+    Source/PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h
     Source/PokemonLA/Panels_PokemonLA.cpp
     Source/PokemonLA/Panels_PokemonLA.h
     Source/PokemonLA/PokemonLA_Locations.cpp

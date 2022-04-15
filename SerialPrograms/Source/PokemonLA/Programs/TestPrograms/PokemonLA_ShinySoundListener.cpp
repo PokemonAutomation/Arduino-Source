@@ -20,8 +20,8 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonLA/PokemonLA_Settings.h"
+#include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA_ShinySoundListener.h"
-#include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

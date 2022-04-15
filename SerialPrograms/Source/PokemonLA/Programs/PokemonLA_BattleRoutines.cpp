@@ -9,7 +9,7 @@
 #include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "PokemonLA/Inference/PokemonLA_BattlePokemonSwitchDetector.h"
+#include "PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
 #include "PokemonLA_BattleRoutines.h"
 
 #include <iostream>
