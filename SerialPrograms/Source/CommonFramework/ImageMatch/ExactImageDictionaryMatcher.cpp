@@ -45,7 +45,7 @@ std::vector<QImage> make_image_set(
             ret.emplace_back(
                 extract_box_reference(screen, box, x * scale, y * scale).scaled_to_qimage(dimensions.width(), dimensions.height())
             );
-//            cout << "make_image_set(): image = " << ret.back().width() << " x " << ret.back().height() << endl;  //  REMOVE
+//            cout << "make_image_set(): image = " << ret.back().width() << " x " << ret.back().height() << endl;
 //            if (x == 0 && y == 0){
 //                ret.back().save("image.png");
 //            }

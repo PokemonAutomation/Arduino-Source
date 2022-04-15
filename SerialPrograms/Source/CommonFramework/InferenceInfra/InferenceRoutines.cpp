@@ -37,7 +37,7 @@ int wait_until(
         subcontext.wait_until(deadline);
     }catch (OperationCancelledException&){}
 
-    context.scope()->throw_if_cancelled();
+    context.throw_if_cancelled();
 
     return session.triggered_index();
 }
@@ -64,7 +64,7 @@ int run_until(
         subcontext.wait_for_all_requests();
     }catch (OperationCancelledException&){}
 
-    context.scope()->throw_if_cancelled();
+    context.throw_if_cancelled();
 
     return session.triggered_index();
 }

@@ -34,7 +34,7 @@ private:
 private:
     class Stats;
     class RunRoute;
-    ShinyDetectedActionOption SHINY_DETECTED;
+    ShinyDetectedActionOption SHINY_DETECTED0;
     BooleanCheckBoxOption SKIP_PATH_SHINY;
 
     EventNotificationOption NOTIFICATION_STATUS;
