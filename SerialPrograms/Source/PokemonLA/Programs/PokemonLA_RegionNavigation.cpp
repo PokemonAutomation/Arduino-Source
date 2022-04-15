@@ -155,7 +155,7 @@ void mash_A_to_change_region(
     if (ret < 0){
         throw OperationFailedException(console, "Failed to load into region after timeout.");
     }
-    context.wait_for(std::chrono::milliseconds(100));
+    context.wait_for(std::chrono::milliseconds(1000));
 
     BlackScreenOverWatcher black_screen1a(COLOR_RED, {0.20, 0.02, 0.60, 0.05}, 150);
     BlackScreenOverWatcher black_screen1b(COLOR_RED, {0.20, 0.93, 0.60, 0.05}, 150);

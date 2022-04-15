@@ -108,13 +108,13 @@ bool determine_frame_orientation(
     ss << "    Orientation: ";
     bool ok = false;
     do{
-        if (identity < 0.01 && flipped_vertical > 0.1){
+        if (identity < 0.05 && identity * 10 < flipped_vertical){
             flip_vertical = false;
             ok = true;
             ss << "Identity";
             break;
         }
-        if (flipped_vertical < 0.01 && identity > 0.1){
+        if (flipped_vertical < 0.05 && flipped_vertical * 10 < identity){
             flip_vertical = true;
             ok = true;
             ss << "Flipped Vertical";
