@@ -10,6 +10,7 @@
 #include <QCameraInfo>
 #include <QVBoxLayout>
 #include "Common/Compiler.h"
+#include "VideoToolsQt5.h"
 #include "CameraWidgetQt5.h"
 
 #include <iostream>
@@ -69,8 +70,8 @@ Qt5VideoWidget::Qt5VideoWidget(
 )
     : VideoWidget(parent)
     , m_logger(logger)
-    , m_last_snapshot(WallClock::min())
-    , m_seqnum_frame(0)
+    , m_last_image_timestamp(WallClock::min())
+    , m_last_frame_seqnum(0)
 {
     if (!info){
         return;
@@ -135,9 +136,11 @@ Qt5VideoWidget::Qt5VideoWidget(
         connect(
             m_probe, &QVideoProbe::videoFrameProbed,
             this, [=](const QVideoFrame& frame){
-//                SpinLockGuard lg(m_frame_lock);
-//                m_last_frame = frame;
-                m_seqnum_frame++;
+                WallClock now = current_time();
+                SpinLockGuard lg(m_frame_lock);
+                m_last_frame = frame;
+                m_last_frame_timestamp = now;
+                m_last_frame_seqnum++;
 //                cout << "asdf" << endl;
             }
         );
@@ -209,89 +212,11 @@ void Qt5VideoWidget::set_resolution(const QSize& size){
     m_camera->setViewfinderSettings(settings);
     m_resolution = size;
 }
-#if 0
-QImage Qt5VideoWidget::snapshot_probe(){
-//    cout << "snapshot_probe()" << endl;
-    std::lock_guard<std::mutex> lg(m_lock);
-    if (m_camera == nullptr){
-        return QImage();
-    }
-
-    QVideoFrame frame;
-//    SpinLockGuard lg0(m_capture_lock);
-    {
-        SpinLockGuard lg1(m_frame_lock);
-        if (m_seqnum_image == m_seqnum_frame){
-            return m_last_image;
-        }
-        frame = std::move(m_last_frame);
-        m_seqnum_image = m_seqnum_frame;
-    }
-    if (!frame.isValid()){
-        return QImage();
-    }
-    if (!frame.map(QAbstractVideoBuffer::ReadOnly)){
-        m_logger.log("Unable to map QVideoFrame.", COLOR_RED);
-    }
-    QImage::Format format = QVideoFrame::imageFormatFromPixelFormat(frame.pixelFormat());
-//    cout << "field = " << (int)frame.fieldType() << endl;
-//    cout << "format = " << (int)format << endl;
-    QImage image(
-        frame.bits(),
-        frame.width(),
-        frame.height(),
-        frame.bytesPerLine(),
-        format
-    );
-//    image.save("test.png");
-#ifdef _WIN32
-    m_last_image = image.convertToFormat(QImage::Format_RGB32).mirrored(false, true);
-#else
-    m_last_image = image.convertToFormat(QImage::Format_RGB32).copy();
-#endif
-    return m_last_image;
-}
-#endif
-QImage Qt5VideoWidget::snapshot_image(WallClock* timestamp){
-//    cout << "snapshot_image()" << endl;
+QImage Qt5VideoWidget::direct_snapshot_image(){
     std::unique_lock<std::mutex> lg(m_lock);
     if (m_camera == nullptr){
         return QImage();
     }
-
-    //  Frame is already cached and is not stale.
-    auto now = current_time();
-    if (timestamp){
-        timestamp[0] = now;
-    }
-#if 1
-    {
-        SpinLockGuard lg1(m_frame_lock);
-        if (!m_last_image.isNull()){
-            if (m_probe){
-                //  If we have the probe enabled, we know if a new frame has been pushed.
-//                cout << now - m_last_snapshot.load(std::memory_order_acquire) << endl;
-                if (m_seqnum_image == m_seqnum_frame.load(std::memory_order_acquire)){
-//                    cout << "cached 0" << endl;
-                    if (timestamp){
-                        timestamp[0] = m_last_snapshot.load(std::memory_order_acquire);
-                    }
-                    return m_last_image;
-                }
-            }else{
-                //  Otherwise, we have to use time.
-//                cout << now - m_last_snapshot.load(std::memory_order_acquire) << endl;
-                if (m_last_snapshot.load(std::memory_order_acquire) + m_frame_period > now){
-//                    cout << "cached 1" << endl;
-                    if (timestamp){
-                        timestamp[0] = m_last_snapshot.load(std::memory_order_acquire);
-                    }
-                    return m_last_image;
-                }
-            }
-        }
-    }
-#endif
 
     m_camera->searchAndLock();
     int id = m_capture->capture();
@@ -319,16 +244,145 @@ QImage Qt5VideoWidget::snapshot_image(WallClock* timestamp){
         m_logger.log("Capture timed out.");
     }
 
+    QImage image = std::move(capture.image);
+    m_pending_captures.erase(iter.first);
+    QImage::Format format = m_last_image.format();
+    if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
+        image = image.convertToFormat(QImage::Format_ARGB32);
+    }
+    return image;
+}
+QImage Qt5VideoWidget::direct_snapshot_probe(bool flip_vertical){
+    std::lock_guard<std::mutex> lg(m_lock);
+    if (m_camera == nullptr){
+        return QImage();
+    }
+
+    QVideoFrame frame;
+    {
+        SpinLockGuard lg1(m_frame_lock);
+        frame = m_last_frame;
+    }
+
+    return frame_to_image(m_logger, frame, flip_vertical);
+}
+QImage Qt5VideoWidget::snapshot_image(WallClock* timestamp){
+//    cout << "snapshot_image()" << endl;
+    std::unique_lock<std::mutex> lg(m_lock);
+
+    auto now = current_time();
+    if (timestamp){
+        timestamp[0] = now;
+    }
+
+    if (m_camera == nullptr){
+        return QImage();
+    }
+
+    //  Frame is already cached and is not stale.
+    uint64_t frame_seqnum;
+    {
+        SpinLockGuard lg1(m_frame_lock);
+        frame_seqnum = m_last_frame_seqnum;
+        if (!m_last_image.isNull()){
+            if (m_probe){
+                //  If we have the probe enabled, we know if a new frame has been pushed.
+//                cout << now - m_last_snapshot.load(std::memory_order_acquire) << endl;
+                if (m_last_image_seqnum == frame_seqnum){
+//                    cout << "cached 0" << endl;
+                    if (timestamp){
+                        timestamp[0] = m_last_image_timestamp;
+                    }
+                    return m_last_image;
+                }
+            }else{
+                //  Otherwise, we have to use time.
+//                cout << now - m_last_snapshot.load(std::memory_order_acquire) << endl;
+                if (m_last_image_timestamp + m_frame_period > now){
+//                    cout << "cached 1" << endl;
+                    if (timestamp){
+                        timestamp[0] = m_last_image_timestamp;
+                    }
+                    return m_last_image;
+                }
+            }
+        }
+    }
+
+    m_camera->searchAndLock();
+    int id = m_capture->capture();
+    m_camera->unlock();
+
+//    cout << "start = " << id << endl;
+
+    auto iter = m_pending_captures.emplace(
+        std::piecewise_construct,
+        std::forward_as_tuple(id),
+        std::forward_as_tuple()
+    );
+    if (!iter.second){
+        return QImage();
+    }
+    PendingCapture& capture = iter.first->second;
+
+//    cout << "snapshot: " << id << endl;
+    capture.cv.wait_for(
+        lg,
+        std::chrono::milliseconds(1000),
+        [&]{ return capture.status != CaptureStatus::PENDING; }
+    );
+
+    if (capture.status != CaptureStatus::COMPLETED){
+        m_logger.log("Capture timed out.");
+    }
+
     m_last_image = std::move(capture.image);
     m_pending_captures.erase(iter.first);
     QImage::Format format = m_last_image.format();
     if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
         m_last_image = m_last_image.convertToFormat(QImage::Format_ARGB32);
     }
-    m_last_snapshot.store(now, std::memory_order_release);
-    m_seqnum_image = m_seqnum_frame.load(std::memory_order_acquire);
+    m_last_image_timestamp = now;
+    m_last_image_seqnum = frame_seqnum;
     return m_last_image;
 }
+QImage Qt5VideoWidget::snapshot_probe(WallClock* timestamp){
+    std::lock_guard<std::mutex> lg(m_lock);
+
+    if (m_camera == nullptr){
+        if (timestamp){
+            timestamp[0] = current_time();
+        }
+        return QImage();
+    }
+
+    //  Frame is already cached and is not stale.
+    QVideoFrame frame;
+    WallClock frame_timestamp;
+    uint64_t frame_seqnum;
+    {
+        SpinLockGuard lg1(m_frame_lock);
+        frame_seqnum = m_last_frame_seqnum;
+        if (!m_last_image.isNull() && m_last_image_seqnum == frame_seqnum){
+//            cout << "cached 0" << endl;
+            if (timestamp){
+                timestamp[0] = m_last_image_timestamp;
+            }
+            return m_last_image;
+        }
+        frame = m_last_frame;
+        frame_timestamp = m_last_frame_timestamp;
+    }
+
+    m_last_image = frame_to_image(m_logger, frame, m_flip_vertical);
+    m_last_image_timestamp = frame_timestamp;
+    m_last_image_seqnum = frame_seqnum;
+    if (timestamp){
+        timestamp[0] = frame_timestamp;
+    }
+    return m_last_image;
+}
+
 QImage Qt5VideoWidget::snapshot(WallClock* timestamp){
     return snapshot_image(timestamp);
 }

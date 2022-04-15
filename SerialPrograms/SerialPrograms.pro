@@ -234,6 +234,7 @@ SOURCES += \
     Source/CommonFramework/VideoPipeline/CameraWidgetQt6.cpp \
     Source/CommonFramework/VideoPipeline/VideoDisplayWidget.cpp \
     Source/CommonFramework/VideoPipeline/VideoOverlayWidget.cpp \
+    Source/CommonFramework/VideoPipeline/VideoToolsQt5.cpp \
     Source/CommonFramework/Windows/ButtonDiagram.cpp \
     Source/CommonFramework/Windows/MainWindow.cpp \
     Source/Integrations/DiscordIntegrationSettings.cpp \
@@ -867,6 +868,7 @@ HEADERS += \
     Source/CommonFramework/VideoPipeline/CameraWidgetQt6.h \
     Source/CommonFramework/VideoPipeline/VideoDisplayWidget.h \
     Source/CommonFramework/VideoPipeline/VideoOverlayWidget.h \
+    Source/CommonFramework/VideoPipeline/VideoToolsQt5.h \
     Source/CommonFramework/VideoPipeline/VideoWidget.h \
     Source/CommonFramework/Windows/ButtonDiagram.h \
     Source/CommonFramework/Windows/DpiScaler.h \

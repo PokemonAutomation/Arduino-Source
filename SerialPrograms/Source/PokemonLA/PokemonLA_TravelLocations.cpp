@@ -107,7 +107,7 @@ TravelLocations::TravelLocations()
         "Cobalt Coastlands - Molten Arena (NW of Volcano)",
         MapRegion::COASTLANDS, 0, 2, [](ConsoleHandle& console, BotBaseContext& context){
             change_mount(console, context, MountState::BRAVIARY_ON);
-            pbf_move_left_joystick(context, 255, 0, 160, 0);
+            pbf_move_left_joystick(context, 160, 0, 160, 0);
             pbf_mash_button(context, BUTTON_B, 4 * TICKS_PER_SECOND);
         }
     )

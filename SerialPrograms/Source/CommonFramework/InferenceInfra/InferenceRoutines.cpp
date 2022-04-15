@@ -23,10 +23,15 @@ int wait_until(
     ConsoleHandle& console, BotBaseContext& context,
     WallClock deadline,
     const std::vector<PeriodicInferenceCallback>& callbacks,
-    std::chrono::milliseconds default_period
+    std::chrono::milliseconds default_video_period,
+    std::chrono::milliseconds default_audio_period
 ){
     BotBaseContext subcontext(context, console.botbase());
-    InferenceSession session(subcontext, console, callbacks, default_period);
+    InferenceSession session(
+        subcontext, console,
+        callbacks,
+        default_video_period, default_audio_period
+    );
 
     try{
         subcontext.wait_until(deadline);
@@ -44,10 +49,15 @@ int run_until(
     ConsoleHandle& console, BotBaseContext& context,
     std::function<void(BotBaseContext& context)>&& command,
     const std::vector<PeriodicInferenceCallback>& callbacks,
-    std::chrono::milliseconds default_period
+    std::chrono::milliseconds default_video_period,
+    std::chrono::milliseconds default_audio_period
 ){
     BotBaseContext subcontext(context, console.botbase());
-    InferenceSession session(subcontext, console, callbacks, default_period);
+    InferenceSession session(
+        subcontext, console,
+        callbacks,
+        default_video_period, default_audio_period
+    );
 
     try{
         command(subcontext);

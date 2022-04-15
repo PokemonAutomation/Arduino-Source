@@ -429,6 +429,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/VideoDisplayWidget.h
     Source/CommonFramework/VideoPipeline/VideoOverlayWidget.cpp
     Source/CommonFramework/VideoPipeline/VideoOverlayWidget.h
+    Source/CommonFramework/VideoPipeline/VideoToolsQt5.cpp
+    Source/CommonFramework/VideoPipeline/VideoToolsQt5.h
     Source/CommonFramework/Windows/ButtonDiagram.cpp
     Source/CommonFramework/Windows/ButtonDiagram.h
     Source/CommonFramework/Windows/DpiScaler.h

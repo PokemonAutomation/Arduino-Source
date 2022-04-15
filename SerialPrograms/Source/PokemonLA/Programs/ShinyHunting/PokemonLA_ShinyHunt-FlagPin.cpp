@@ -97,13 +97,14 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, BotBas
     Stats& stats = env.stats<Stats>();
     stats.attempts++;
 
-    goto_camp_from_jubilife(env, env.console, context, TRAVEL_LOCATION);
-
     {
+        //  Outer scope with shiny detection wrapping everything.
         ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
         run_until(
             env.console, context,
             [&](BotBaseContext& context){
+                //  Inner scope.
+                goto_camp_from_jubilife(env, env.console, context, TRAVEL_LOCATION);
                 FlagNavigationAir session(
                     env, env.console, context,
                     STOP_DISTANCE,

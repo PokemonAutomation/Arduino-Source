@@ -38,7 +38,7 @@ public:
     void* request_next_event(WallClock timestamp = current_time());
 
 private:
-    //  "id" is needed to solve ABA problem if the same pointer is removed/re-added.
+    //  "id" is needed to solve the ABA problem if the same pointer is removed/re-added.
     struct PeriodicEvent{
         uint64_t id;
         std::chrono::milliseconds period;
@@ -80,11 +80,11 @@ protected:
 private:
     AsyncDispatcher& m_dispatcher;
 
-    std::mutex m_state_lock;
-    PeriodicScheduler m_scheduler;
-
-    std::mutex m_sleep_lock;
+    std::atomic<size_t> m_pending_waits;
+    std::mutex m_lock;
     std::condition_variable m_cv;
+
+    PeriodicScheduler m_scheduler;
 
     std::unique_ptr<AsyncTask> m_task;
 };

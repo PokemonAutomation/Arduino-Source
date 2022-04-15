@@ -14,6 +14,8 @@
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "CommonFramework/InferenceInfra/VisualInferencePivot.h"
 
+#include <QVideoFrame>
+
 //#include <Windows.h>
 #include <iostream>
 using std::cout;
@@ -65,8 +67,6 @@ TestProgram::TestProgram(const TestProgram_Descriptor& descriptor)
 using namespace Kernels::Waterfill;
 
 //using namespace PokemonLA;
-
-
 
 
 

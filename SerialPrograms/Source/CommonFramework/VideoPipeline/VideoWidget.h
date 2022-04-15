@@ -15,7 +15,8 @@ class QImage;
 
 namespace PokemonAutomation{
 
-// Base class for the widget that loads the video content.
+
+//  Base class for the widget that loads the video content.
 class VideoWidget : public QWidget{
 public:
     using QWidget::QWidget;

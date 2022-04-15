@@ -18,6 +18,7 @@ namespace PokemonAutomation{
 
 
 
+#if 0
 InferenceSession::InferenceSession(
     Cancellable& scope, ConsoleHandle& console,
     const std::vector<InferenceCallback*>& callbacks,
@@ -62,6 +63,7 @@ InferenceSession::InferenceSession(
         throw;
     }
 }
+#endif
 InferenceSession::InferenceSession(
     Cancellable& scope, ConsoleHandle& console,
     const std::vector<PeriodicInferenceCallback>& callbacks,

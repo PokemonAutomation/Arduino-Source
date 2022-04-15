@@ -40,12 +40,14 @@ class ConsoleHandle;
 //
 class InferenceSession{
 public:
+#if 0
     InferenceSession(
         Cancellable& scope, ConsoleHandle& console,
         const std::vector<InferenceCallback*>& callbacks,
         std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
         std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
     );
+#endif
     InferenceSession(
         Cancellable& scope, ConsoleHandle& console,
         const std::vector<PeriodicInferenceCallback>& callbacks,

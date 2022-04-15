@@ -6,6 +6,10 @@
 
 #include "PeriodicScheduler.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -76,70 +80,87 @@ void* PeriodicScheduler::request_next_event(WallClock timestamp){
 
 
 
+
+#if 0
+class ScopedCounter{
+public:
+    ScopedCounter(std::atomic<size_t>& counter)
+        : m_counter(counter)
+    {
+        counter++;
+    }
+    ~ScopedCounter(){
+        m_counter--;
+    }
+
+private:
+    std::atomic<size_t>& m_counter;
+};
+#endif
+
+
+
+
+
 PeriodicRunner::PeriodicRunner(AsyncDispatcher& dispatcher)
     : m_dispatcher(dispatcher)
+    , m_pending_waits(0)
 {}
 bool PeriodicRunner::add_event(void* event, std::chrono::milliseconds period, WallClock start){
     throw_if_cancelled();
 
-    bool ret;
-    {
-        std::lock_guard<std::mutex> lg(m_state_lock);
+    m_pending_waits++;
+    std::lock_guard<std::mutex> lg(m_lock);
+    m_pending_waits--;
 
-        //  Thread not started yet. Do this first for strong exception safety.
-        if (!m_task){
-            m_task = m_dispatcher.dispatch([=]{ thread_loop(); });
-        }
+    //  Thread not started yet. Do this first for strong exception safety.
+    if (!m_task){
+        m_task = m_dispatcher.dispatch([=]{ thread_loop(); });
+    }
 
-        ret = m_scheduler.add_event(event, period, start);
-    }
-    if (ret){
-        std::lock_guard<std::mutex> lg(m_sleep_lock);
-        m_cv.notify_all();
-    }
+    bool ret = m_scheduler.add_event(event, period, start);
+    m_cv.notify_all();
     return ret;
 }
 void PeriodicRunner::remove_event(void* event){
-    std::lock_guard<std::mutex> lg(m_state_lock);
+    m_pending_waits++;
+    std::lock_guard<std::mutex> lg(m_lock);
+    m_pending_waits--;
     m_scheduler.remove_event(event);
+    m_cv.notify_all();
 }
 bool PeriodicRunner::cancel(std::exception_ptr exception) noexcept{
     if (Cancellable::cancel(std::move(exception))){
         return true;
     }
-    std::lock_guard<std::mutex> lg(m_sleep_lock);
+    std::lock_guard<std::mutex> lg(m_lock);
     m_cv.notify_all();
     return false;
 }
 void PeriodicRunner::thread_loop(){
+    std::unique_lock<std::mutex> lg(m_lock);
     while (true){
         if (cancelled()){
             return;
         }
 
-        //  We intentionally acquire+release this lock every iteration so that
-        //  we don't starve any other functions that may be waiting on this lock.
-        //
-        //  If we move this lock outside the loop, then it will never be
-        //  released if the CPU is too slow to keep up with all the callbacks.
-        WallClock next;
-        {
-            std::unique_lock<std::mutex> lg(m_state_lock);
-
-            WallClock now = current_time();
-            void* event = m_scheduler.request_next_event(now);
-
-            //  Event is available now. Run it.
-            if (event != nullptr){
-                run(event);
-                continue;
-            }
-
-            //  Wait for next scheduled event.
-            next = m_scheduler.next_event();
+        //  If anyone is trying to get the lock, yield now.
+        if (m_pending_waits.load(std::memory_order_acquire) != 0){
+            m_cv.wait(lg, [=]{ return m_pending_waits.load(std::memory_order_acquire) == 0; });
         }
 
-        std::unique_lock<std::mutex> lg(m_sleep_lock);
+        WallClock now = current_time();
+        void* event = m_scheduler.request_next_event(now);
+
+        //  Event is available now. Run it.
+        if (event != nullptr){
+            run(event);
+            continue;
+        }
+
+        //  Wait for next scheduled event.
+        WallClock next = m_scheduler.next_event();
+
         if (cancelled()){
             return;
         }

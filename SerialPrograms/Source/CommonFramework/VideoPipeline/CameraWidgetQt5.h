@@ -42,6 +42,9 @@ public:
     virtual void resizeEvent(QResizeEvent* event) override;
 
 private:
+    QImage direct_snapshot_image();
+    QImage direct_snapshot_probe(bool flip_vertical);
+
     QImage snapshot_probe(WallClock* timestamp);
     QImage snapshot_image(WallClock* timestamp);
 
@@ -71,16 +74,22 @@ private:
     QCameraImageCapture* m_capture = nullptr;
     std::map<int, PendingCapture> m_pending_captures;
 
-    SpinLock m_frame_lock;
-    std::atomic<WallClock> m_last_snapshot;
-
 //    SpinLock m_capture_lock;
     QVideoProbe* m_probe = nullptr;
-    std::atomic<uint64_t> m_seqnum_frame;
-//    uint64_t m_seqnum_frame = 0;
-//    QVideoFrame m_last_frame;
-    uint64_t m_seqnum_image = 0;
+    bool m_flip_vertical = false;
+
+    SpinLock m_frame_lock;
+
+    //  Last Frame
+    QVideoFrame m_last_frame;
+    WallClock m_last_frame_timestamp;
+//    std::atomic<uint64_t> m_last_frame_seqnum;
+    uint64_t m_last_frame_seqnum = 0;
+
+    //  Last Cached Image
     QImage m_last_image;
+    WallClock m_last_image_timestamp;
+    uint64_t m_last_image_seqnum = 0;
 };
 
 
