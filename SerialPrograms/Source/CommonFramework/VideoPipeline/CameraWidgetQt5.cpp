@@ -10,6 +10,7 @@
 #include <QCameraInfo>
 #include <QVBoxLayout>
 #include "Common/Compiler.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "VideoToolsQt5.h"
 #include "CameraWidgetQt5.h"
 
@@ -44,8 +45,9 @@ Qt5VideoWidget::Qt5VideoWidget(
 )
     : VideoWidget(parent)
     , m_logger(logger)
-    , m_use_probe_frames(false)
-    , m_flip_vertical(true)
+    , m_last_orientation_attempt(WallClock::min())
+//    , m_use_probe_frames(true)
+//    , m_flip_vertical(true)
     , m_last_frame_seqnum(0)
     , m_last_image_timestamp(WallClock::min())
     , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
@@ -63,6 +65,7 @@ Qt5VideoWidget::Qt5VideoWidget(
 #if 1
     m_probe = new QVideoProbe(this);
     if (!m_probe->setSource(m_camera)){
+//        m_use_probe_frames = false;
         logger.log("Unable to initialize QVideoProbe() capture.", COLOR_RED);
         delete m_probe;
         m_probe = nullptr;
@@ -114,15 +117,9 @@ Qt5VideoWidget::Qt5VideoWidget(
             m_probe, &QVideoProbe::videoFrameProbed,
             this, [=](const QVideoFrame& frame){
                 WallClock now = current_time();
-//                WallClock time0 = current_time();
                 SpinLockGuard lg(m_frame_lock);
-//                WallClock time1 = current_time();
-//                cout << "Lock (signal): " << std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count() << endl;
-                if (m_use_probe_frames){
-//                    WallClock time0 = current_time();
+                if (GlobalSettings::instance().ENABLE_FRAME_SCREENSHOTS){
                     m_last_frame = frame;
-//                    WallClock time1 = current_time();
-//                    cout << "Copy Frame (signal): " << std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count() << endl;
                 }
                 m_last_frame_timestamp = now;
                 m_last_frame_seqnum++;
@@ -384,7 +381,28 @@ QImage Qt5VideoWidget::snapshot_probe(WallClock* timestamp){
 
 QImage Qt5VideoWidget::snapshot(WallClock* timestamp){
     std::unique_lock<std::mutex> lg(m_lock);
-    if (m_use_probe_frames){
+
+    //  Frame screenshots are disabled.
+    if (!GlobalSettings::instance().ENABLE_FRAME_SCREENSHOTS){
+        return snapshot_image(lg, timestamp);
+    }
+
+    //  QVideoFrame is enabled and ready!
+    if (m_probe && m_orientation_known){
+        return snapshot_probe(timestamp);
+    }
+
+    //  If probing is enabled and we don't know the frame orientation, try to
+    //  figure it out. But don't try too often if we fail.
+    if (m_probe && !m_orientation_known){
+        WallClock now = current_time();
+        if (m_last_orientation_attempt + std::chrono::seconds(10) < now){
+            m_orientation_known = determine_frame_orientation(lg);
+            m_last_orientation_attempt = now;
+        }
+    }
+
+    if (m_orientation_known){
         return snapshot_probe(timestamp);
     }else{
         return snapshot_image(lg, timestamp);
@@ -409,6 +427,49 @@ void Qt5VideoWidget::resizeEvent(QResizeEvent* event){
 
     m_camera_view->setFixedSize(this->size());
 }
+
+
+
+
+
+bool Qt5VideoWidget::determine_frame_orientation(std::unique_lock<std::mutex>& lock){
+    //  Qt 5.12 is really shitty in that there's no way to figure out the
+    //  orientation of a QVideoFrame. So here we'll try to figure it out
+    //  the poor man's way. Snapshot using both QCameraImageCapture and
+    //  QVideoProbe and compare them.
+
+    //  This function cannot be called on the UI thread.
+    //  This function must be called under the lock.
+
+    QImage reference = direct_snapshot_image(lock);
+    QImage frame = direct_snapshot_probe(false);
+    m_orientation_known = PokemonAutomation::determine_frame_orientation(m_logger, reference, frame, m_flip_vertical);
+    return m_orientation_known;
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

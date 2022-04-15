@@ -65,6 +65,7 @@ public:
     BooleanCheckBoxOption SAVE_DEBUG_IMAGES;
     BooleanCheckBoxOption NAUGHTY_MODE;
 
+    BooleanCheckBoxOption ENABLE_FRAME_SCREENSHOTS;
 
 
     ProcessorLevelOption PROCESSOR_LEVEL0;

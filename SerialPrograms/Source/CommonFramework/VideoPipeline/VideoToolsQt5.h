@@ -16,6 +16,11 @@ namespace PokemonAutomation{
 
 QImage frame_to_image(Logger& logger, QVideoFrame frame, bool flip_vertical);
 
+bool determine_frame_orientation(
+    Logger& logger, const QImage& reference, const QImage& image,
+    bool& flip_vertical
+);
+
 
 
 }

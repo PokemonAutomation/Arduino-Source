@@ -50,6 +50,8 @@ private:
     QImage snapshot_image(std::unique_lock<std::mutex>& lock, WallClock* timestamp);
     QImage snapshot_probe(WallClock* timestamp);
 
+    bool determine_frame_orientation(std::unique_lock<std::mutex>& lock);
+
 private:
     enum class CaptureStatus{
         PENDING,
@@ -78,7 +80,9 @@ private:
 
 //    SpinLock m_capture_lock;
     QVideoProbe* m_probe = nullptr;
-    bool m_use_probe_frames = false;
+    WallClock m_last_orientation_attempt;
+    bool m_orientation_known = false;
+//    bool m_use_probe_frames = false;
     bool m_flip_vertical = false;
 
     SpinLock m_frame_lock;

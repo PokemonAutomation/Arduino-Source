@@ -85,6 +85,11 @@ GlobalSettings::GlobalSettings()
         true
     )
     , NAUGHTY_MODE("<b>Naughty Mode:</b>", false)
+    , ENABLE_FRAME_SCREENSHOTS(
+        "<b>Enable Frame Screenshots:</b><br>"
+        "Attempt to use QVideoProbe and QVideoFrame for screenshots.",
+        true
+    )
     , REALTIME_THREAD_PRIORITY0(
         "<b>Realtime Thread Priority:</b><br>"
         "Thread priority of real-time threads. (UI thread, audio threads)<br>"
@@ -118,6 +123,9 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(LOG_EVERYTHING);
     PA_ADD_OPTION(SAVE_DEBUG_IMAGES);
 //    PA_ADD_OPTION(NAUGHTY_MODE);
+#if QT_VERSION_MAJOR == 5
+    PA_ADD_OPTION(ENABLE_FRAME_SCREENSHOTS);
+#endif
     PA_ADD_OPTION(REALTIME_THREAD_PRIORITY0);
     PA_ADD_OPTION(INFERENCE_PRIORITY0);
     PA_ADD_OPTION(COMPUTE_PRIORITY0);
