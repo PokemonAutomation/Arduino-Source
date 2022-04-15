@@ -70,7 +70,6 @@ private:
         return SuperControlSession::run_state_action((size_t)state);
     }
 
-    bool m_stop_on_shiny;
     uint16_t m_stop_radius;
     std::chrono::milliseconds m_flag_reached_delay;
     std::chrono::seconds m_navigate_timeout;

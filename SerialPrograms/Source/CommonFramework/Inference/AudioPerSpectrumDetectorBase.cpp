@@ -17,6 +17,8 @@
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "AudioPerSpectrumDetectorBase.h"
 
+// #include <iostream>
+
 namespace PokemonAutomation{
 
 
@@ -77,6 +79,7 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
     for(auto it = newSpectrums.rbegin(); it != newSpectrums.rend(); it++){
         std::vector<AudioSpectrum> singleSpectrum = {*it};
         const float matcherScore = m_matcher->match(singleSpectrum);
+        // std::cout << "error: " << matcherScore << std::endl;
 
         if (matcherScore == FLT_MAX){
             continue; // error or not enough spectrum history

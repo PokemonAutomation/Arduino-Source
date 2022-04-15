@@ -273,7 +273,7 @@ float SpectrogramMatcher::match(const std::vector<AudioSpectrum>& newSpectrums){
         return FLT_MAX;
     }
 
-    if (m_spectrums.size() < m_template.numWindows()){
+    if (m_spectrums.size() < m_numSpectrumsNeeded){
         return FLT_MAX;
     }
 
