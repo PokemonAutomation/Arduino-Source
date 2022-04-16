@@ -38,7 +38,7 @@ GalladeFinder_Descriptor::GalladeFinder_Descriptor()
 
 GalladeFinder::GalladeFinder(const GalladeFinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
-    , SHINY_DETECTED("Shiny Detected Action", "0 * TICKS_PER_SECOND")
+    , SHINY_DETECTED("Shiny Detected Action", "", "0 * TICKS_PER_SECOND")
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -48,6 +48,7 @@ GalladeFinder::GalladeFinder(const GalladeFinder_Descriptor& descriptor)
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }

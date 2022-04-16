@@ -50,7 +50,7 @@ PostMMOSpawnReset::PostMMOSpawnReset(const PostMMOSpawnReset_Descriptor& descrip
         "<b>Wait Time:</b><br> Wait time after movement.",
         "3 * TICKS_PER_SECOND"
     )
-    , SHINY_DETECTED("Shiny Detected Action", "0 * TICKS_PER_SECOND")
+    , SHINY_DETECTED("Shiny Detected Action", "", "0 * TICKS_PER_SECOND")
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -60,6 +60,7 @@ PostMMOSpawnReset::PostMMOSpawnReset(const PostMMOSpawnReset_Descriptor& descrip
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(TURN_DURATION);
     PA_ADD_OPTION(FORWARD_DURATION);
     PA_ADD_OPTION(WAIT_DURATION);

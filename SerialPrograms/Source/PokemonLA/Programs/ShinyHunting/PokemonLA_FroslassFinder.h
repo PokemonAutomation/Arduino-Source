@@ -34,6 +34,9 @@ private:
 private:
     class Stats;
     class RunRoute;
+
+    ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
+
     ShinyDetectedActionOption SHINY_DETECTED;
     BooleanCheckBoxOption SKIP_PATH_SHINY;
 

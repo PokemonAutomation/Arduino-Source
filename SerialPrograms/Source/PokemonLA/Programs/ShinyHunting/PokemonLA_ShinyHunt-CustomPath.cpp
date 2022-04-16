@@ -41,7 +41,7 @@ ShinyHuntCustomPath::ShinyHuntCustomPath(const ShinyHuntCustomPath_Descriptor& d
         "<b>Test Path:</b><br>Run the path immediately on the map to test it.",
         false
     )
-    , SHINY_DETECTED("Shiny Detected Action", "0 * TICKS_PER_SECOND")
+    , SHINY_DETECTED("Shiny Detected Action", "", "0 * TICKS_PER_SECOND")
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -51,6 +51,7 @@ ShinyHuntCustomPath::ShinyHuntCustomPath(const ShinyHuntCustomPath_Descriptor& d
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(TRAVEL_LOCATION);
     PA_ADD_OPTION(CUSTOM_PATH_TABLE);
     PA_ADD_OPTION(TEST_PATH);

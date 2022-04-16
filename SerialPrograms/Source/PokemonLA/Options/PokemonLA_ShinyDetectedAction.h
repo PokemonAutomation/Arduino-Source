@@ -26,6 +26,14 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
+
+class ShinyRequiresAudioText : public StaticTextOption{
+public:
+    ShinyRequiresAudioText();
+};
+
+
+
 class ShinySoundDetector;
 
 
@@ -51,7 +59,7 @@ enum class ShinyDetectedAction{
 class ShinyDetectedActionOption : public GroupOption{
 public:
     ShinyDetectedActionOption(
-        QString label,
+        QString label, QString description,
         QString default_delay_ticks
     );
 

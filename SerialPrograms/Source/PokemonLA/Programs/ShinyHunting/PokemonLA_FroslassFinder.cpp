@@ -41,7 +41,7 @@ FroslassFinder_Descriptor::FroslassFinder_Descriptor()
 
 FroslassFinder::FroslassFinder(const FroslassFinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
-    , SHINY_DETECTED("Shiny Detected Action", "0 * TICKS_PER_SECOND")
+    , SHINY_DETECTED("Shiny Detected Action", "", "0 * TICKS_PER_SECOND")
     , SKIP_PATH_SHINY("<b>Skip any Shines on the route to the cave.</b><br>Only care about shines inside the cave.", false)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -52,6 +52,7 @@ FroslassFinder::FroslassFinder(const FroslassFinder_Descriptor& descriptor)
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(SKIP_PATH_SHINY);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -101,7 +102,7 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseC
 
     //Route to cave entrance
     {
-        ShinyDetectedActionOption SHINY_DETECTED_ON_ROUTE("Shiny Detected Action", QString::number(SHINY_DETECTED.SCREENSHOT_DELAY));
+        ShinyDetectedActionOption SHINY_DETECTED_ON_ROUTE("Shiny Detected Action", "", QString::number(SHINY_DETECTED.SCREENSHOT_DELAY));
         SHINY_DETECTED_ON_ROUTE.NOTIFICATIONS = SHINY_DETECTED.NOTIFICATIONS;
         SHINY_DETECTED_ON_ROUTE.ACTION.set(!SKIP_PATH_SHINY);
 

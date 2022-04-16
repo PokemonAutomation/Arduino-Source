@@ -281,7 +281,7 @@ FlagNavigationAir::FlagNavigationAir(
         return false;
     });
 }
-void FlagNavigationAir::set_flag_callback(std::function<void(double distance, double x, double y)> flag_callback){
+void FlagNavigationAir::set_distance_callback(std::function<void(double distance)> flag_callback){
     m_flag_callback = std::move(flag_callback);
 }
 
@@ -304,7 +304,7 @@ bool FlagNavigationAir::run_state(AsyncCommandSession& commands, WallClock times
     if (m_flag_detected){
         m_last_flag_detection = timestamp;
         if (m_flag_callback){
-            m_flag_callback(m_flag_distance, m_flag_x, m_flag_y);
+            m_flag_callback(m_flag_distance);
         }
     }else{
 //        m_console.log("Flag not detected.", COLOR_ORANGE);

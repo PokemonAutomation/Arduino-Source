@@ -41,16 +41,22 @@ private:
 private:
     class Stats;
 
+    ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
+
     TravelLocationOption TRAVEL_LOCATION;
 
-    SimpleIntegerOption<uint16_t> STOP_DISTANCE;
-    FloatingPointOption FLAG_REACHED_DELAY;
-    SimpleIntegerOption<uint64_t> NAVIGATION_TIMEOUT;
+    SimpleIntegerOption<uint16_t> ENROUTE_DISTANCE;
 
-    ShinyDetectedActionOption SHINY_DETECTED;
+    ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;
+    ShinyDetectedActionOption SHINY_DETECTED_DESTINATION;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;
+
+    SectionDividerOption m_advanced_options;
+    SimpleIntegerOption<uint16_t> STOP_DISTANCE;
+    FloatingPointOption FLAG_REACHED_DELAY;
+    SimpleIntegerOption<uint64_t> NAVIGATION_TIMEOUT;
 };
 
 

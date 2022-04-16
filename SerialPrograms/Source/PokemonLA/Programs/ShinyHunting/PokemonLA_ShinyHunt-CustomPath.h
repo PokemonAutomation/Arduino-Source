@@ -48,6 +48,8 @@ private:
 private:
     class Stats;
 
+    ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
+
     TravelLocationOption TRAVEL_LOCATION;
 
     CustomPathTable CUSTOM_PATH_TABLE;

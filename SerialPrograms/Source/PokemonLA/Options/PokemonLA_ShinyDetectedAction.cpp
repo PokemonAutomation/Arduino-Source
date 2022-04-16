@@ -23,12 +23,24 @@ namespace PokemonLA{
 
 
 
+ShinyRequiresAudioText::ShinyRequiresAudioText()
+    : StaticTextOption(
+        "<font size=4 color=\"blue\"><b>Shiny detection uses sound. Make sure you have the correct audio input set.</b></font>"
+    )
+{}
+
+
+
 ShinyDetectedActionOption::ShinyDetectedActionOption(
-    QString label,
+    QString label, QString description,
     QString default_delay_ticks
 )
     : GroupOption(std::move(label))
-    , DESCRIPTION("<font color=\"blue\">Shiny detection uses sound. Make sure you have the correct audio input set.</font>")
+    , DESCRIPTION(std::move(description))
+//    , DESCRIPTION(
+//        (description.isEmpty() ? "" : description + "<br><br>") +
+//        "<font color=\"blue\">Shiny detection uses sound. Make sure you have the correct audio input set.</font>"
+//    )
     , ACTION(
         "<b>Shiny Detected Action:</b>",
         {
@@ -41,15 +53,16 @@ ShinyDetectedActionOption::ShinyDetectedActionOption(
 //    , STOP_PROGRAM("<b>Stop Program:</b><br>Stop program and go Home if it hears a shiny.", true)
 //    , TAKE_VIDEO("<b>Take Video:</b><br>Take a video if a shiny is heard.", true)
     , SCREENSHOT_DELAY(
-        "<b>Screenshot Delay:</b><br><br>"
+        "<b>Screenshot Delay:</b><br>"
         "Align the camera, then wait this long before taking a screenshot + video of the shiny.<br>"
-        "If set to zero or a small value, it will not be able to fully align the camera.<br>"
-        "(Don't wait too long or the shiny may run away!)",
+        "Set to zero to skip this. Don't set this too large or the shiny may run away!",
         std::move(default_delay_ticks)
     )
     , NOTIFICATIONS("Shiny Detected", true, true, ImageAttachmentMode::JPG, {"Notifs", "Showcase"})
 {
-    PA_ADD_OPTION(DESCRIPTION);
+    if (!DESCRIPTION.label().isEmpty()){
+        PA_ADD_OPTION(DESCRIPTION);
+    }
     PA_ADD_OPTION(ACTION);
 //    PA_ADD_OPTION(STOP_PROGRAM);
 //    PA_ADD_OPTION(TAKE_VIDEO);
@@ -79,6 +92,8 @@ bool on_shiny_callback(
     if (action != ShinyDetectedAction::IGNORE){
         return true;
     }
+
+    console.log("Ignoring shiny per user settings...", COLOR_RED);
 
     ss << "Error Coefficient: ";
     ss << error_coefficient;

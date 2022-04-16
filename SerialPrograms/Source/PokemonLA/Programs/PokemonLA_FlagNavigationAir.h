@@ -27,7 +27,7 @@ public:
         std::chrono::seconds navigate_timeout
     );
 
-    void set_flag_callback(std::function<void(double distance, double x, double y)> flag_callback);
+    void set_distance_callback(std::function<void(double distance)> flag_callback);
 
 
 private:
@@ -74,7 +74,7 @@ private:
     std::chrono::milliseconds m_flag_reached_delay;
     std::chrono::seconds m_navigate_timeout;
 
-    std::function<void(double distance, double x, double y)> m_flag_callback;
+    std::function<void(double distance)> m_flag_callback;
 
     FlagTracker m_flag;
     MountTracker m_mount;

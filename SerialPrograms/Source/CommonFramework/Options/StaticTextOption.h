@@ -17,6 +17,9 @@ namespace PokemonAutomation{
 class StaticTextOption : public ConfigOption{
 public:
     StaticTextOption(QString label);
+
+    const QString& label() const{ return m_label; }
+
     virtual void load_json(const QJsonValue& json) override;
     virtual QJsonValue to_json() const override;
 

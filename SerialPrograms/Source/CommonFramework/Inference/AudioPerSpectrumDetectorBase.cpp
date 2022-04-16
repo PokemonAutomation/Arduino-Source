@@ -104,7 +104,7 @@ bool AudioPerSpectrumDetectorBase::process_spectrums(
         size_t curStamp = m_matcher->latestTimestamp();
 
 #ifdef PA_DEBUG_FORCE_PLA_SOUND
-        if (debug_count % 300 == 0){
+        if (debug_count % 1200 > 1195){
             found = true;
         }
 #endif
