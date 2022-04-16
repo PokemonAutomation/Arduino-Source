@@ -213,6 +213,7 @@ StateMachineAction run_move_select(
 
     GlobalState inferred = state_tracker.synchronize(console, console_index);
 
+    bool all_moves_blocked = false;
 
     while (true){
         console.log("Selecting move...");
@@ -243,6 +244,13 @@ StateMachineAction run_move_select(
         }
 
         //  Enter the move.
+        if (all_moves_blocked){
+            //  If we had trouble selecting a move, then we're probably stuck in a self-target loop.
+            //  Force target the opponent.
+            console.log("Force targeting opponent due to inability to select a move after multiple attempts...", COLOR_RED);
+            pbf_press_button(context, BUTTON_A, 20, 2 * TICKS_PER_SECOND);
+            pbf_press_dpad(context, DPAD_UP, 2 * TICKS_PER_SECOND, 0);
+        }
         pbf_mash_button(context, BUTTON_A, 2 * TICKS_PER_SECOND);
         context.wait_for_all_requests();
 
@@ -279,6 +287,7 @@ StateMachineAction run_move_select(
             for (size_t c = 0; c < 4; c++){
                 player.move_blocked[c] = false;
             }
+            all_moves_blocked = true;
         }
 
         state_tracker.push_update(console_index);
