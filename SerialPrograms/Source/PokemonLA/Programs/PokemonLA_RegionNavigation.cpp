@@ -379,6 +379,79 @@ void goto_camp_from_overworld(
     context.wait_for(std::chrono::milliseconds((uint64_t)(GameSettings::instance().POST_WARP_DELAY * 1000)));
 }
 
+void goto_any_camp_from_overworld(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+                                  const TravelLocation& location){
+    //  Open the map.
+    pbf_press_button(context, BUTTON_MINUS, 20, 30);
+    {
+        MapDetector detector;
+        int ret = wait_until(
+            env, console, context,
+            std::chrono::seconds(5),
+            { &detector }
+        );
+        if (ret < 0){
+            dump_image(env.logger(), env.program_info(), "MapNotFound", console.video().snapshot());
+            throw OperationFailedException(console, "Map not detected after 5 seconds.");
+        }
+        console.log("Found map!");
+        context.wait_for(std::chrono::milliseconds(500));
+    }
+
+    //  Warp to sub-camp.
+    pbf_press_button(context, BUTTON_X, 20, 30);
+    {
+        ButtonDetector detector(
+            console, console,
+            ButtonType::ButtonA,
+            {0.55, 0.40, 0.20, 0.40},
+            std::chrono::milliseconds(200), true
+        );
+        int ret = wait_until(
+            env, console, context,
+            std::chrono::seconds(2),
+            { &detector }
+        );
+        if (ret < 0){
+            throw OperationFailedException(console, "Unable to fly. Are you under attack?");
+        }
+    }
+
+    pbf_wait(context, 50);
+
+    if (location.warp_slot != 0){
+        for (size_t c = 0; c < location.warp_slot; c++){
+            pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+        }
+    }
+
+    for (size_t c = 0; c < location.warp_sub_slot; c++){
+        pbf_press_dpad(context, DPAD_DOWN, 20, 30);
+    }
+
+    pbf_mash_button(context, BUTTON_A, 125);
+
+    BlackScreenOverWatcher black_screen(COLOR_RED, {0.1, 0.1, 0.8, 0.6});
+    int ret = wait_until(
+        env, console, context,
+        std::chrono::seconds(20),
+        { &black_screen }
+    );
+    if (ret < 0){
+        dump_image(env.logger(), env.program_info(), "FlyToCamp", console.video().snapshot());
+        throw OperationFailedException(console, "Failed to fly to camp after 20 seconds.");
+    }
+    console.log("Arrived at sub-camp...");
+    context.wait_for(std::chrono::milliseconds((uint64_t)(GameSettings::instance().POST_WARP_DELAY * 1000)));
+
+    if (location.post_arrival_maneuver == nullptr){
+        return;
+    }
+
+    location.post_arrival_maneuver(console, context);
+    console.botbase().wait_for_all_requests();
+}
+
 
 
 

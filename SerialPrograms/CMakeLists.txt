@@ -854,6 +854,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/PokemonLA_OverworldDetector.h
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h
+    Source/PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h
+    Source/PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.h
     Source/PokemonLA/Inference/PokemonLA_ShinySoundDetector.cpp
@@ -904,6 +906,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_UnownFinder.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_FroslassFinder.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_FroslassFinder.cpp
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_TreeShinyHunting.h
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_TreeShinyHunting.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.cpp
