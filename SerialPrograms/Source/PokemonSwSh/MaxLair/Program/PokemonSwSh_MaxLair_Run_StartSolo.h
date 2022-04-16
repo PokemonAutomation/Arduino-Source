@@ -22,26 +22,26 @@ namespace MaxLairInternal{
 
 
 bool wait_for_a_player(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     const QImage& entrance,
-    std::chrono::system_clock::time_point time_limit
+    WallClock time_limit
 );
 bool wait_for_lobby_ready(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     const QImage& entrance,
     size_t min_players,
     size_t start_players,
-    std::chrono::system_clock::time_point time_limit
+    WallClock time_limit
 );
 bool start_adventure(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     size_t consoles,
     const QImage& entrance
 );
 
 
 bool start_raid_self_solo(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     GlobalStateTracker& state_tracker,
     QImage& entrance, size_t boss_slot,
     ReadableQuantity999& ore

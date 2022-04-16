@@ -20,11 +20,11 @@ namespace MaxLairInternal{
 
 
 class GlobalStateTracker final : public Cancellable{
-    using time_point = std::chrono::system_clock::time_point;
+    using time_point = WallClock;
 public:
     GlobalStateTracker(CancellableScope& scope, size_t consoles);
     virtual ~GlobalStateTracker();
-    virtual bool cancel() noexcept override;
+    virtual bool cancel(std::exception_ptr exception) noexcept override;
 
     //  Access the local copy for this console.
     //  This one is safe to directly access.

@@ -10,7 +10,7 @@
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/FloatingPointOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
-#include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
+//#include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -35,7 +35,7 @@ private:
     FloatingPointOption FLAG_REACHED_DELAY;
 
     SimpleIntegerOption<uint64_t> NAVIGATION_TIMEOUT;
-    ShinyDetectedActionOption SHINY_DETECTED;
+//    ShinyDetectedActionOption SHINY_DETECTED;
 };
 
 

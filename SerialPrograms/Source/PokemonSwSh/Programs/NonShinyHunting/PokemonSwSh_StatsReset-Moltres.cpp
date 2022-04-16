@@ -112,13 +112,13 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         {
             StandardBattleMenuWatcher fight_detector(false);
             int result = run_until(
-                env, env.console, context,
+                env.console, context,
                 [=](BotBaseContext& context){
                     while (true){
                         pbf_wait(context, 1 * TICKS_PER_SECOND);
                     }
                 },
-                { &fight_detector }
+                {{fight_detector}}
             );
             if (result == 0){
                 env.log("New fight detected.", COLOR_PURPLE);
@@ -127,7 +127,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         }
 
         context.wait_for_all_requests();
-        CatchResults result = basic_catcher(env, env.console, context, LANGUAGE, "master-ball");
+        CatchResults result = basic_catcher(env.console, context, LANGUAGE, "master-ball");
         if (result.result != CatchResult::POKEMON_CAUGHT){
             throw OperationFailedException(env.console, "Unable to catch Moltres.");
         }
@@ -166,7 +166,7 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             env.update_stats();
             pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
             reset_game_from_home_with_inference(
-                env, env.console, context,
+                env.console, context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
             );
 
@@ -175,13 +175,13 @@ void StatsResetMoltres::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             {
                 StandardBattleMenuWatcher fight_detector(false);
                 int ret = run_until(
-                    env, env.console, context,
+                    env.console, context,
                     [=](BotBaseContext& context){
                         while (true){
                             pbf_wait(context, 1 * TICKS_PER_SECOND);
                         }
                     },
-                    { &fight_detector }
+                    {{fight_detector}}
                 );
                 if (ret == 0){
                     env.log("New fight detected.", COLOR_PURPLE);

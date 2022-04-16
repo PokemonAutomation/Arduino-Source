@@ -17,7 +17,7 @@ void QueuedLogger::log(const char* msg, Color color){
 void QueuedLogger::log(const std::string& msg, Color color){
     std::lock_guard<std::mutex> lg(m_lock);
     m_queue.emplace_back(new Entry{
-        std::chrono::system_clock::now(),
+        current_time(),
         color,
         msg
     });

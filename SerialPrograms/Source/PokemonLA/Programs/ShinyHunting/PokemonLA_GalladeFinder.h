@@ -35,6 +35,8 @@ private:
 private:
     class Stats;
 
+    ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
+
     ShinyDetectedActionOption SHINY_DETECTED;
 
     EventNotificationOption NOTIFICATION_STATUS;

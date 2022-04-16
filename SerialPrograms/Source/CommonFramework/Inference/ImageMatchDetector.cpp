@@ -83,21 +83,18 @@ ImageMatchWatcher::ImageMatchWatcher(
     , VisualInferenceCallback("ImageMatchWatcher")
     , m_hold_duration(hold_duration)
     , m_last_match(false)
-    , m_start_of_match(std::chrono::system_clock::time_point::min())
+    , m_start_of_match(WallClock::min())
 {}
 
 void ImageMatchWatcher::make_overlays(VideoOverlaySet& items) const{
     ImageMatchDetector::make_overlays(items);
 }
-bool ImageMatchWatcher::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point
-){
+bool ImageMatchWatcher::process_frame(const QImage& frame, WallClock){
     if (!detect(frame)){
         m_last_match = false;
         return false;
     }
-    auto now = std::chrono::system_clock::now();
+    auto now = current_time();
     if (!m_last_match){
         m_last_match = true;
         m_start_of_match = now;

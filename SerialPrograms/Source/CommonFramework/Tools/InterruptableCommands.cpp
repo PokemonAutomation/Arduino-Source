@@ -54,16 +54,20 @@ AsyncCommandSession::~AsyncCommandSession(){
         m_logger.log("AsyncCommandSession::stop_session() not called before normal destruction.", COLOR_RED);
     }
     detach();
-    AsyncCommandSession::cancel();
-    //  Thread is automatically joined by m_task destructor.
+    AsyncCommandSession::cancel(nullptr);
+
+    //  Join the thread.
+    m_thread.reset();
 }
 
 bool AsyncCommandSession::command_is_running(){
+    m_sanitizer.check_usage();
     std::lock_guard<std::mutex> lg(m_lock);
     return m_current != nullptr;
 }
 
 void AsyncCommandSession::dispatch(std::function<void(BotBaseContext&)>&& lambda){
+    m_sanitizer.check_usage();
     std::unique_lock<std::mutex> lg(m_lock);
     if (cancelled()){
         return;
@@ -85,13 +89,13 @@ void AsyncCommandSession::dispatch(std::function<void(BotBaseContext&)>&& lambda
 }
 
 
-bool AsyncCommandSession::cancel() noexcept{
-    if (Cancellable::cancel()){
+bool AsyncCommandSession::cancel(std::exception_ptr exception) noexcept{
+    if (Cancellable::cancel(exception)){
         return true;
     }
     std::lock_guard<std::mutex> lg(m_lock);
     if (m_current != nullptr){
-        m_current->context.cancel();
+        m_current->context.cancel(std::move(exception));
     }
     m_cv.notify_all();
     return false;
@@ -134,6 +138,8 @@ void AsyncCommandSession::thread_loop(){
 
     SpinLockGuard lg(m_finished_lock);
     m_finished_tasks.clear();
+
+    m_sanitizer.check_usage();
 }
 
 
@@ -157,9 +163,9 @@ void AsyncCommandSession::wait(){
 }
 #endif
 void AsyncCommandSession::stop_session_and_rethrow(){
-    cancel();
+    cancel(nullptr);
     m_thread->wait_and_rethrow_exceptions();
-    throw_if_parent_cancelled();
+    throw_if_cancelled_with_exception();
 }
 
 

@@ -72,6 +72,10 @@ GameSettings::GameSettings()
         "<b>Alpha Roar Threshold:</b><br>Maximum error coefficient to trigger an alpha roar detection.",
         0.65, 0, 1.0
     )
+    , ALPHA_MUSIC_THRESHOLD(
+        "<b>Alpha Music Threshold:</b><br>Maximum error coefficient to trigger an alpha music detection.",
+        0.61, 0, 1.0
+    )
 {
     PA_ADD_STATIC(m_general);
     PA_ADD_OPTION(POST_WARP_DELAY);

@@ -76,10 +76,14 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/FireForgetDispatcher.h
     ../Common/Cpp/FixedLimitVector.h
     ../Common/Cpp/FixedLimitVector.tpp
+    ../Common/Cpp/LifetimeSanitizer.h
+    ../Common/Cpp/LifetimeSanitizer.cpp
     ../Common/Cpp/PanicDump.cpp
     ../Common/Cpp/PanicDump.h
     ../Common/Cpp/ParallelTaskRunner.cpp
     ../Common/Cpp/ParallelTaskRunner.h
+    ../Common/Cpp/PeriodicScheduler.cpp
+    ../Common/Cpp/PeriodicScheduler.h
     ../Common/Cpp/Pimpl.h
     ../Common/Cpp/Pimpl.tpp
     ../Common/Cpp/PrettyPrint.cpp
@@ -87,6 +91,8 @@ file(GLOB MAIN_SOURCES
     ../Common/Cpp/SIMDDebuggers.h
     ../Common/Cpp/SpinLock.cpp
     ../Common/Cpp/SpinLock.h
+    ../Common/Cpp/Time.cpp
+    ../Common/Cpp/Time.h
     ../Common/Cpp/Unicode.cpp
     ../Common/Cpp/Unicode.h
     ../Common/Microcontroller/DeviceRoutines.h
@@ -151,6 +157,7 @@ file(GLOB MAIN_SOURCES
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h
     ../Common/Qt/QtJsonTools.cpp
     ../Common/Qt/QtJsonTools.h
+    Source/CommonFramework/AudioPipeline/AudioConstants.h
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.cpp
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.h
     Source/CommonFramework/AudioPipeline/AudioFileLoader.cpp
@@ -237,6 +244,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/ImageTools/SolidColorTest.h
     Source/CommonFramework/Inference/AnomalyDetector.cpp
     Source/CommonFramework/Inference/AnomalyDetector.h
+    Source/CommonFramework/Inference/AudioPerSpectrumDetectorBase.cpp
+    Source/CommonFramework/Inference/AudioPerSpectrumDetectorBase.h
     Source/CommonFramework/Inference/AudioTemplateCache.cpp
     Source/CommonFramework/Inference/AudioTemplateCache.h
     Source/CommonFramework/Inference/BlackBorderDetector.cpp
@@ -258,15 +267,17 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Inference/TimeWindowStatTracker.h
     Source/CommonFramework/Inference/VisualDetector.h
     Source/CommonFramework/InferenceInfra/AudioInferenceCallback.h
-    Source/CommonFramework/InferenceInfra/AudioInferenceSession.cpp
-    Source/CommonFramework/InferenceInfra/AudioInferenceSession.h
+    Source/CommonFramework/InferenceInfra/AudioInferencePivot.cpp
+    Source/CommonFramework/InferenceInfra/AudioInferencePivot.h
     Source/CommonFramework/InferenceInfra/InferenceCallback.h
     Source/CommonFramework/InferenceInfra/InferenceRoutines.cpp
     Source/CommonFramework/InferenceInfra/InferenceRoutines.h
+    Source/CommonFramework/InferenceInfra/InferenceSession.cpp
+    Source/CommonFramework/InferenceInfra/InferenceSession.h
     Source/CommonFramework/InferenceInfra/VisualInferenceCallback.cpp
     Source/CommonFramework/InferenceInfra/VisualInferenceCallback.h
-    Source/CommonFramework/InferenceInfra/VisualInferenceSession.cpp
-    Source/CommonFramework/InferenceInfra/VisualInferenceSession.h
+    Source/CommonFramework/InferenceInfra/VisualInferencePivot.cpp
+    Source/CommonFramework/InferenceInfra/VisualInferencePivot.h
     Source/CommonFramework/Environment/Environment_Linux.cpp
     Source/CommonFramework/Environment/Environment_Windows.cpp
     Source/CommonFramework/Environment/Environment.cpp
@@ -386,6 +397,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Tools/BotBaseHandle.h
     Source/CommonFramework/Tools/BlackBorderCheck.cpp
     Source/CommonFramework/Tools/BlackBorderCheck.h
+    Source/CommonFramework/Tools/ConsoleHandle.cpp
     Source/CommonFramework/Tools/ConsoleHandle.h
     Source/CommonFramework/Tools/ErrorDumper.cpp
     Source/CommonFramework/Tools/ErrorDumper.h
@@ -419,6 +431,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/VideoDisplayWidget.h
     Source/CommonFramework/VideoPipeline/VideoOverlayWidget.cpp
     Source/CommonFramework/VideoPipeline/VideoOverlayWidget.h
+    Source/CommonFramework/VideoPipeline/VideoToolsQt5.cpp
+    Source/CommonFramework/VideoPipeline/VideoToolsQt5.h
     Source/CommonFramework/Windows/ButtonDiagram.cpp
     Source/CommonFramework/Windows/ButtonDiagram.h
     Source/CommonFramework/Windows/DpiScaler.h
@@ -468,6 +482,10 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x4_Default.h
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x8_x64_SSE42.h
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x16_x64_AVX2.h
+    Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_64x64_x64_AVX512.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x4_Default.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x8_x64_SSE42.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x16_x64_AVX2.cpp
@@ -480,9 +498,9 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp
-    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_t.h
+    Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x4_Default.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x8_x64_SSE42.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Arch_64x16_x64_AVX2.h
@@ -811,6 +829,12 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Panels_PokemonBDSP.h
     Source/PokemonBDSP/PokemonBDSP_Settings.cpp
     Source/PokemonBDSP/PokemonBDSP_Settings.h
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.cpp
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.cpp
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.h
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.cpp
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcDetector.cpp
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcDetector.h
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.cpp
@@ -831,18 +855,12 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.cpp
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h
-    Source/PokemonLA/Inference/PokemonLA_AlphaRoarDetector.cpp
-    Source/PokemonLA/Inference/PokemonLA_AlphaRoarDetector.h
-    Source/PokemonLA/Inference/PokemonLA_BattleMenuDetector.cpp
-    Source/PokemonLA/Inference/PokemonLA_BattleMenuDetector.h
-    Source/PokemonLA/Inference/PokemonLA_BattleMoveSelectionDetector.cpp
-    Source/PokemonLA/Inference/PokemonLA_BattleMoveSelectionDetector.h
-    Source/PokemonLA/Inference/PokemonLA_BattlePokemonSwitchDetector.cpp
-    Source/PokemonLA/Inference/PokemonLA_BattlePokemonSwitchDetector.h
     Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.cpp
     Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.h
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.h
+    Source/PokemonLA/Inference/PokemonLA_ItemCompatibilityDetector.cpp
+    Source/PokemonLA/Inference/PokemonLA_ItemCompatibilityDetector.h
     Source/PokemonLA/Inference/PokemonLA_MapDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_MapDetector.h
     Source/PokemonLA/Inference/PokemonLA_MountDetector.cpp
@@ -858,8 +876,12 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.h
-    Source/PokemonLA/Inference/PokemonLA_ShinySoundDetector.cpp
-    Source/PokemonLA/Inference/PokemonLA_ShinySoundDetector.h
+    Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.cpp
+    Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.h
+    Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaRoarDetector.cpp
+    Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaRoarDetector.h
+    Source/PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.cpp
+    Source/PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h
     Source/PokemonLA/Panels_PokemonLA.cpp
     Source/PokemonLA/Panels_PokemonLA.h
     Source/PokemonLA/PokemonLA_Locations.cpp
@@ -868,6 +890,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/PokemonLA_Settings.h
     Source/PokemonLA/PokemonLA_TravelLocations.cpp
     Source/PokemonLA/PokemonLA_TravelLocations.h
+    Source/PokemonLA/Programs/PokemonLA_BattleRoutines.cpp
+    Source/PokemonLA/Programs/PokemonLA_BattleRoutines.h
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.cpp
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.h
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.cpp
@@ -892,12 +916,16 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/Trading/PokemonLA_TradeRoutines.h
     Source/PokemonLA/Programs/Farming/PokemonLA_NuggetFarmerHighlands.cpp
     Source/PokemonLA/Programs/Farming/PokemonLA_NuggetFarmerHighlands.h
+    Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.cpp
+    Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.h
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.cpp
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.h
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.cpp
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.h
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.cpp
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.h
+    Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.cpp
+    Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_GalladeFinder.cpp
@@ -916,6 +944,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaMusicListener.cpp
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaMusicListener.h
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.cpp
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.h
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_FlagNavigationTest.cpp

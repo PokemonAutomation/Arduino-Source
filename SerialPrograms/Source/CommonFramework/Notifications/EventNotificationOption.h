@@ -8,7 +8,7 @@
 #define PokemonAutomation_EventNotificationOption_H
 
 #include <vector>
-#include <chrono>
+#include "Common/Cpp/Time.h"
 #include "CommonFramework/Options/ConfigOption.h"
 #include "CommonFramework/Options/ScreenshotFormatOption.h"
 #include "CommonFramework/Logging/LoggerQt.h"
@@ -77,7 +77,7 @@ private:
     bool screenshot_supported;
     EventNotificationSettings m_default;
     EventNotificationSettings m_current;
-    std::chrono::system_clock::time_point m_last_sent;
+    WallClock m_last_sent;
 
     //  Set by the table.
     bool m_enabled = true;

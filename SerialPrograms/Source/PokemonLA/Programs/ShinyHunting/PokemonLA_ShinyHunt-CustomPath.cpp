@@ -5,18 +5,18 @@
  */
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA/PokemonLA_Settings.h"
+#include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "PokemonLA/Programs/PokemonLA_MountChange.h"
 #include "PokemonLA_ShinyHunt-CustomPath.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
 
-#include <iostream>
+//#include <iostream>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -41,6 +41,7 @@ ShinyHuntCustomPath::ShinyHuntCustomPath(const ShinyHuntCustomPath_Descriptor& d
         "<b>Test Path:</b><br>Run the path immediately on the map to test it.",
         false
     )
+    , SHINY_DETECTED("Shiny Detected Action", "", "0 * TICKS_PER_SECOND")
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -50,6 +51,7 @@ ShinyHuntCustomPath::ShinyHuntCustomPath(const ShinyHuntCustomPath_Descriptor& d
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(TRAVEL_LOCATION);
     PA_ADD_OPTION(CUSTOM_PATH_TABLE);
     PA_ADD_OPTION(TEST_PATH);
@@ -168,20 +170,22 @@ void ShinyHuntCustomPath::do_non_listen_action(ConsoleHandle& console, BotBaseCo
 void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
-    for(size_t action_index = 0; action_index < CUSTOM_PATH_TABLE.num_actions(); action_index++){
+    for (size_t action_index = 0; action_index < CUSTOM_PATH_TABLE.num_actions(); action_index++){
         const auto& row = CUSTOM_PATH_TABLE.get_action(action_index);
         if (row.action != PathAction::START_LISTEN){
             do_non_listen_action(env.console, context, action_index);
-        } else{
+        }else{
             env.log("Start Listen, build sound detector");
             // Build shiny sound detector and start listens:
-            ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
-            // TODO: run_until() is not designed to pass `env` inside. run_until() relies on the usage
-            // of the passed in BotBaseContext& context to stop the code inside the lambda function,
-            // but the code using the passed in `env` may still runs. This will delay the program stop
-            // on shiny sound but should be genearally OK in this use case.
-            run_until(
-                env, env.console, context,
+            float shiny_coefficient = 1.0;
+            ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+                //  Warning: This callback will be run from a different thread than this function.
+                stats.shinies++;
+                shiny_coefficient = error_coefficient;
+                return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
+            });
+            int ret = run_until(
+                env.console, context,
                 [&env, &action_index, this](BotBaseContext& context){
                     for(; action_index < CUSTOM_PATH_TABLE.num_actions(); action_index++){
                         const auto& listened_row = CUSTOM_PATH_TABLE.get_action(action_index);
@@ -194,11 +198,10 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseC
                     }
                     context.wait_for_all_requests();
                 },
-                { &shiny_detector });
-            if (shiny_detector.detected()){
-                stats.shinies++;
-                on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_detector.results());
-                break;
+                {{shiny_detector}}
+            );
+            if (ret == 0){
+                on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_coefficient);
             }
         }
     } // end for loop on each action

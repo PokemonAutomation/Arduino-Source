@@ -81,10 +81,7 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
 
     //  Return true if the inference session should stop.
-    virtual bool process_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-    ) override;
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
 
 
 private:

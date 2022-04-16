@@ -111,10 +111,7 @@ ArcPhoneDetector::ArcPhoneDetector(
 void ArcPhoneDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box);
 }
-bool ArcPhoneDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool ArcPhoneDetector::process_frame(const QImage& frame, WallClock timestamp){
     m_watcher.process_frame(frame, timestamp);
     bool detected0 = m_debouncer_phone.push_value(!m_tracker_phone.detections().empty(), timestamp);
     bool detected1 = m_debouncer_button.push_value(!m_tracker_phone.detections().empty(), timestamp);

@@ -35,7 +35,7 @@ public:
 struct ProgramTrackingState{
     std::string program_name;
     std::vector<uint64_t> console_ids;
-    std::chrono::system_clock::time_point start_time;
+    WallClock start_time;
     ProgramState state;
     std::string stats;
 };

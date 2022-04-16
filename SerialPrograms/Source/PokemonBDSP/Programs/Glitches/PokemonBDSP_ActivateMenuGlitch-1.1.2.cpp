@@ -45,11 +45,11 @@ ActivateMenuGlitch112::ActivateMenuGlitch112(const ActivateMenuGlitch112_Descrip
 
 
 
-void trigger_menu(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+void trigger_menu(ConsoleHandle& console, BotBaseContext& context){
     context.wait_for_all_requests();
     MapWatcher detector;
     int ret = run_until(
-        env, console, context,
+        console, context,
         [](BotBaseContext& context){
             for (size_t i = 0; i < 12; i++){
                 for (size_t c = 0; c < 42; c++){
@@ -61,7 +61,7 @@ void trigger_menu(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContex
                 pbf_press_button(context, BUTTON_R, 20, 105);
             }
         },
-        { &detector }
+        {{detector}}
     );
     if (ret < 0){
         throw OperationFailedException(console, "Map not detected after 60 seconds.");
@@ -76,16 +76,16 @@ void trigger_menu(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContex
         context.wait_for_all_requests();
     }
 }
-void trigger_map_overlap(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+void trigger_map_overlap(ConsoleHandle& console, BotBaseContext& context){
     for (size_t c = 0; c < 10; c++){
-        trigger_menu(env, console, context);
+        trigger_menu(console, context);
 
         pbf_press_dpad(context, DPAD_UP, 50, 0);
         context.wait_for_all_requests();
         BlackScreenWatcher detector;
         int ret = wait_until(
-            env, console, context, std::chrono::seconds(4),
-            { &detector }
+            console, context, std::chrono::seconds(4),
+            {{detector}}
         );
         if (ret >= 0){
             console.log("Overlap detected! Entered " + STRING_POKEMON + " center.", COLOR_BLUE);
@@ -103,7 +103,7 @@ void trigger_map_overlap(ProgramEnvironment& env, ConsoleHandle& console, BotBas
 void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     ConsoleHandle& console = env.console;
 
-    trigger_map_overlap(env, console, context);
+    trigger_map_overlap(console, context);
     pbf_wait(context, 3 * TICKS_PER_SECOND);
 
     //  Move to escalator.
@@ -122,14 +122,14 @@ void ActivateMenuGlitch112::program(SingleSwitchProgramEnvironment& env, BotBase
         context.wait_for_all_requests();
         BlackScreenWatcher detector;
         int ret = run_until(
-            env, console, context,
+            console, context,
             [](BotBaseContext& context){
                 for (size_t c = 0; c < 5; c++){
                     pbf_press_dpad(context, DPAD_LEFT, 20, 105);
                     pbf_press_dpad(context, DPAD_DOWN, 20, 105);
                 }
             },
-            { &detector }
+            {{detector}}
         );
         if (ret < 0){
             throw OperationFailedException(console, "Unable to leave " + STRING_POKEMON.toStdString() + " center.");

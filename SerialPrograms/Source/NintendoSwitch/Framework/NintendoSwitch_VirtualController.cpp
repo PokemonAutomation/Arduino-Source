@@ -30,7 +30,7 @@ VirtualController::VirtualController(
     : m_logger(logger)
     , m_botbase(botbase)
     , m_allow_commands_while_running(allow_commands_while_running)
-    , m_last(std::chrono::system_clock::now())
+    , m_last(current_time())
     , m_last_known_state(ProgramState::STOPPED)
     , m_stop(false)
     , m_granularity(1)
@@ -66,7 +66,7 @@ void VirtualController::on_key_press(Qt::Key key){
         button->press(m_controller_state);
 
         m_pressed_buttons.insert(key);
-        m_last = std::chrono::system_clock::now();
+        m_last = current_time();
     }
 //    print();
     std::lock_guard<std::mutex> lg(m_sleep_lock);
@@ -89,7 +89,7 @@ void VirtualController::on_key_release(Qt::Key key){
         button->release(m_controller_state);
 
         m_pressed_buttons.erase(key);
-        m_last = std::chrono::system_clock::now();
+        m_last = current_time();
     }
 //    print();
 
@@ -242,7 +242,7 @@ void VirtualController::thread_loop(){
         const uint16_t TICK_MILLIS = 1000 / TICKS_PER_SECOND;
         std::chrono::milliseconds granularity = std::chrono::milliseconds(TICK_MILLIS * m_granularity);
 
-        auto start = std::chrono::system_clock::now();
+        auto start = current_time();
         {
             std::unique_lock<std::mutex> lg(m_sleep_lock);
             if (m_stop.load(std::memory_order_acquire)){
@@ -250,7 +250,7 @@ void VirtualController::thread_loop(){
             }
             m_cv.wait_for(lg, granularity / 2);
         }
-        auto stop = std::chrono::system_clock::now();
+        auto stop = current_time();
         std::chrono::milliseconds delay = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
 
         if (delays.size() > 20){

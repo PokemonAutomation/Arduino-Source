@@ -25,10 +25,7 @@ public:
     bool detect(const QImage& screen) const;
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-    ) override final;
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) override final;
 
 private:
     bool m_stop_on_no_detect;

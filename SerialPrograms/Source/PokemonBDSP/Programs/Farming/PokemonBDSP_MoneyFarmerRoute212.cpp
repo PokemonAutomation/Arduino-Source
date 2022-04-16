@@ -134,14 +134,14 @@ bool MoneyFarmerRoute212::battle(SingleSwitchProgramEnvironment& env, BotBaseCon
         EndBattleWatcher end_battle;
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         int ret = run_until(
-            env, env.console, context,
+            env.console, context,
             [=](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 30 * TICKS_PER_SECOND);
             },
             {
-                &battle_menu,
-                battle_menu_seen ? &end_battle : nullptr,
-                &learn_move
+                {battle_menu},
+                battle_menu_seen ? PeriodicInferenceCallback{end_battle} : PeriodicInferenceCallback{},
+                {learn_move},
             }
         );
         switch (ret){
@@ -241,7 +241,7 @@ void MoneyFarmerRoute212::fly_to_center_heal_and_return(ConsoleHandle& console, 
 }
 
 bool MoneyFarmerRoute212::heal_after_battle_and_return(
-    SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     uint8_t pp[4])
 {
     if (HEALING_METHOD == 0){
@@ -250,7 +250,7 @@ bool MoneyFarmerRoute212::heal_after_battle_and_return(
         return false;
     }else{
         // Use Global Room to heal the party.
-        heal_by_global_room(env, console, context);
+        heal_by_global_room(console, context);
 
         pp[0] = MOVE1_PP;
         pp[1] = MOVE2_PP;
@@ -297,7 +297,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         need_to_charge = false;
     }else{
         if (HEALING_METHOD == 1){
-            heal_by_global_room(env, env.console, context);
+            heal_by_global_room(env.console, context);
         }
         pbf_move_left_joystick(context, 255, 128, 180, 0);
     }
@@ -327,12 +327,12 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
         {
             VSSeekerReactionTracker tracker(env.console, {0.23, 0.30, 0.35, 0.30});
             run_until(
-                env, env.console, context,
+                env.console, context,
                 [=](BotBaseContext& context){
                     SHORTCUT.run(context, TICKS_PER_SECOND);
 
                 },
-                { &tracker }
+                {{tracker}}
             );
             need_to_charge = true;
             pbf_mash_button(context, BUTTON_B, 250);
@@ -378,7 +378,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
 
             //  Check PP.
             if (total_pp(pp) == 0){
-                need_to_charge = heal_after_battle_and_return(env, env.console, context, pp);
+                need_to_charge = heal_after_battle_and_return(env.console, context, pp);
                 continue;
             }
         }
@@ -406,7 +406,7 @@ void MoneyFarmerRoute212::program(SingleSwitchProgramEnvironment& env, BotBaseCo
 
             //  Check PP.
             if (total_pp(pp) == 0){
-                need_to_charge = heal_after_battle_and_return(env, env.console, context, pp);
+                need_to_charge = heal_after_battle_and_return(env.console, context, pp);
                 continue;
             }
         }

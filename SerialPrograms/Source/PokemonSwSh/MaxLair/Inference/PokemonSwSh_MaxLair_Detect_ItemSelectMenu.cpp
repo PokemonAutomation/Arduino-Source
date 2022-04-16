@@ -46,10 +46,7 @@ bool ItemSelectDetector::detect(const QImage& screen) const{
     }
     return true;
 }
-bool ItemSelectDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool ItemSelectDetector::process_frame(const QImage& frame, WallClock timestamp){
     return m_stop_on_no_detect
         ? !detect(frame)
         : detect(frame);

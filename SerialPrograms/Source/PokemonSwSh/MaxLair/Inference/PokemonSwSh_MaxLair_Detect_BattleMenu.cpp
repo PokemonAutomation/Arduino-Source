@@ -55,10 +55,7 @@ void BattleMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_YELLOW, m_status0);
     items.add(COLOR_YELLOW, m_status1);
 }
-bool BattleMenuDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool BattleMenuDetector::process_frame(const QImage& frame, WallClock timestamp){
     //  Need 5 consecutive successful detections.
     if (!detect(frame)){
         m_trigger_count = 0;

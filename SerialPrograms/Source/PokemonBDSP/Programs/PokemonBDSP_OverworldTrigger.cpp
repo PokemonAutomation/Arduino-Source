@@ -90,28 +90,28 @@ void OverworldTrigger::run_trigger(BotBaseContext& context) const{
     }
 }
 
-bool OverworldTrigger::find_encounter(SingleSwitchProgramEnvironment& env, BotBaseContext& context) const{
+bool OverworldTrigger::find_encounter(ConsoleHandle& console, BotBaseContext& context) const{
     BattleMenuWatcher battle_menu_detector(BattleType::STANDARD);
-    StartBattleDetector start_battle_detector(env.console);
+    StartBattleDetector start_battle_detector(console);
 
     int result = 0;
     if (TRIGGER_METHOD < 6){
         //  Move character back and forth to trigger encounter.
         result = run_until(
-            env, env.console, context,
+            console, context,
             [&](BotBaseContext& context){
                 while (true) {
                     run_trigger(context);
                 }
             },
             {
-                &battle_menu_detector,
-                &start_battle_detector,
+                {battle_menu_detector},
+                {start_battle_detector},
             }
         );
     }else{
         //  Use Sweet Scent to trigger encounter.
-        overworld_to_menu(env, env.console, context);
+        overworld_to_menu(console, context);
 
         //  Go to pokemon page
         const uint16_t MENU_TO_POKEMON_DELAY = GameSettings::instance().MENU_TO_POKEMON_DELAY;
@@ -142,20 +142,23 @@ bool OverworldTrigger::find_encounter(SingleSwitchProgramEnvironment& env, BotBa
         pbf_mash_button(context, BUTTON_ZL, 30);
 
         result = wait_until(
-            env, env.console, context, std::chrono::seconds(30),
-            { &battle_menu_detector, &start_battle_detector }
+            console, context, std::chrono::seconds(30),
+            {
+                {battle_menu_detector},
+                {start_battle_detector},
+            }
         );
         if (result < 0){
-            throw OperationFailedException(env.console, "Battle not detected after Sweet Scent for 30 seconds.");
+            throw OperationFailedException(console, "Battle not detected after Sweet Scent for 30 seconds.");
         }
     }
 
     switch (result){
     case 0:
-        env.console.log("Unexpected Battle.", COLOR_RED);
+        console.log("Unexpected Battle.", COLOR_RED);
         return false;
     case 1:
-        env.console.log("Battle started!");
+        console.log("Battle started!");
         return true;
     }
     return false;

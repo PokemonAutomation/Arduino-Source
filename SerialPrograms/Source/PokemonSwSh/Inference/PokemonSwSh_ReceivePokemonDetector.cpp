@@ -33,10 +33,7 @@ void ReceivePokemonDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box_bot_left);
 }
 
-bool ReceivePokemonDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool ReceivePokemonDetector::process_frame(const QImage& frame, WallClock timestamp){
     return receive_is_over(frame);
 }
 bool ReceivePokemonDetector::receive_is_over(const QImage& frame){

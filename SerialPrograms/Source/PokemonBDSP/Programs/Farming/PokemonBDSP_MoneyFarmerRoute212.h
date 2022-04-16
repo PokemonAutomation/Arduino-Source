@@ -38,7 +38,7 @@ private:
     bool battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context, uint8_t pp[4], bool man);
     // From the row above the old couple, heal Pokemon and return.
     // Return true if VS Seeker needs charging.
-    bool heal_after_battle_and_return(SingleSwitchProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, uint8_t pp[4]);
+    bool heal_after_battle_and_return(ConsoleHandle& console, BotBaseContext& context, uint8_t pp[4]);
     // Starting in front of the Hearthome Pokecenter, heal and return
     // to the old couple.
     void heal_at_center_and_return(ConsoleHandle& console, BotBaseContext& context, uint8_t pp[4]);

@@ -38,9 +38,7 @@ void goto_camp_from_jubilife(
 
 
 void goto_camp_from_overworld(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
-    ShinyDetectedActionOption& options,
-    ShinyStatIncrementer& shiny_stat_incrementer
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context
 );
 
 void goto_any_camp_from_overworld(

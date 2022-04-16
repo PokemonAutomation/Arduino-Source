@@ -79,10 +79,7 @@ bool RaidCatchDetector::detect(const QImage& screen){
 
     return true;
 }
-bool RaidCatchDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool RaidCatchDetector::process_frame(const QImage& frame, WallClock timestamp){
     //  Need 5 consecutive successful detections.
     if (!detect(frame)){
         m_trigger_count = 0;

@@ -261,13 +261,16 @@ void BotBaseHandle::thread_body(){
         }
     }
 
+    //  Stop pending commands.
+    m_botbase->stop_all_commands();
+
     std::thread watchdog([=]{
         while (true){
             if (m_state.load(std::memory_order_acquire) != State::READY){
                 break;
             }
 
-            auto last = std::chrono::system_clock::now() - m_botbase->last_ack();
+            auto last = current_time() - m_botbase->last_ack();
             std::chrono::duration<double> seconds = last;
             if (last > 2 * SERIAL_REFRESH_RATE){
                 emit uptime_status(

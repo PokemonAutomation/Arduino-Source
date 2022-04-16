@@ -19,7 +19,7 @@ namespace MaxLairInternal{
 
 void run_professor_swap(
     AdventureRuntime& runtime,
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     GlobalStateTracker& state_tracker
 );
 

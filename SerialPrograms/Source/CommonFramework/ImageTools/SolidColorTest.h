@@ -32,6 +32,8 @@ bool is_grey(
     double min_rgb_sum, double max_rgb_sum,
     double max_stddev_sum = 10
 );
+
+// expected_color_ratio: ratio of color channels to match, e.g. if a color is (127, 127, 254), it's color ratio is (0.25, 0.25, 0.5)
 bool is_solid(
     const ImageStats& stats,
     const FloatPixel& expected_color_ratio,
@@ -63,6 +65,8 @@ inline bool is_grey(
 ){
     return is_grey(image_stats(image), min_rgb_sum, max_rgb_sum, max_stddev_sum);
 }
+
+// expected_color_ratio: ratio of color channels to match, e.g. if a color is (127, 127, 254), it's color ratio is (0.25, 0.25, 0.5)
 inline bool is_solid(
     const ConstImageRef& image,
     const FloatPixel& expected_color_ratio,

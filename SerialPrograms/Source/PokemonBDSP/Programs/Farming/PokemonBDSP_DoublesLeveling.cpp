@@ -108,14 +108,14 @@ bool DoublesLeveling::battle(SingleSwitchProgramEnvironment& env, BotBaseContext
         EndBattleWatcher end_battle;
         SelectionArrowFinder learn_move(env.console, {0.50, 0.62, 0.40, 0.18}, COLOR_YELLOW);
         int ret = run_until(
-            env, env.console, context,
+            env.console, context,
             [=](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {
-                &battle_menu,
-                &end_battle,
-                &learn_move,
+                {battle_menu},
+                {end_battle},
+                {learn_move},
             }
         );
         switch (ret){
@@ -165,7 +165,7 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, BotBaseContex
     //  Encounter Loop
     while (true){
         //  Find encounter.
-        bool battle = TRIGGER_METHOD.find_encounter(env, context);
+        bool battle = TRIGGER_METHOD.find_encounter(env.console, context);
         if (!battle){
             // Unexpected battle: detect battle menu but not battle starting animation.
             stats.add_error();
@@ -177,7 +177,7 @@ void DoublesLeveling::program(SingleSwitchProgramEnvironment& env, BotBaseContex
         DoublesShinyDetection result_wild;
         ShinyDetectionResult result_own;
         detect_shiny_battle(
-            env, env.console, context,
+            env.console, context,
             result_wild, result_own,
             WILD_POKEMON,
             std::chrono::seconds(30)

@@ -26,7 +26,7 @@ PABotBase::PABotBase(
     , m_logger(logger)
     , m_send_seq(1)
     , m_retransmit_delay(retransmit_delay)
-    , m_last_ack(std::chrono::system_clock::now())
+    , m_last_ack(current_time())
     , m_state(State::RUNNING)
     , m_retransmit_thread(run_with_catch, "PABotBase::retransmit_thread()", [=]{ retransmit_thread(); })
 {
@@ -37,6 +37,18 @@ PABotBase::~PABotBase(){
     while (m_state.load(std::memory_order_acquire) != State::STOPPED){
         _mm_pause();
     }
+}
+
+size_t PABotBase::inflight_requests(){
+    //  Must be called under m_state_lock.
+
+    size_t ret = m_pending_requests.size();
+    for (const auto& item : m_pending_commands){
+        if (item.second.state == AckState::NOT_ACKED){
+            ret++;
+        }
+    }
+    return ret;
 }
 
 void PABotBase::connect(){
@@ -224,7 +236,7 @@ void PABotBase::process_ack_request(BotBaseMessage message){
         }
     }
 
-    m_last_ack.store(std::chrono::system_clock::now(), std::memory_order_release);
+    m_last_ack.store(current_time(), std::memory_order_release);
 
     switch (state){
     case AckState::NOT_ACKED:
@@ -264,7 +276,7 @@ void PABotBase::process_ack_command(BotBaseMessage message){
         return;
     }
 
-    m_last_ack.store(std::chrono::system_clock::now(), std::memory_order_release);
+    m_last_ack.store(current_time(), std::memory_order_release);
 
     switch (iter->second.state){
     case AckState::NOT_ACKED:
@@ -361,9 +373,9 @@ void PABotBase::on_recv_message(BotBaseMessage message){
 
 void PABotBase::retransmit_thread(){
 //    cout << "retransmit_thread()" << endl;
-    auto last_sent = std::chrono::system_clock::now();
+    auto last_sent = current_time();
     while (m_state.load(std::memory_order_acquire) == State::RUNNING){
-        auto now = std::chrono::system_clock::now();
+        auto now = current_time();
 
         if (now - last_sent < m_retransmit_delay){
             std::unique_lock<std::mutex> lg(m_sleep_lock);
@@ -391,7 +403,7 @@ void PABotBase::retransmit_thread(){
         for (auto& item : pending_requests){
             if (
                 item.second.state == AckState::NOT_ACKED &&
-                std::chrono::system_clock::now() - item.second.first_sent >= m_retransmit_delay
+                current_time() - item.second.first_sent >= m_retransmit_delay
             ){
                 send_message(item.second.request, true);
             }
@@ -399,12 +411,12 @@ void PABotBase::retransmit_thread(){
         for (auto& item : pending_commands){
             if (
                 item.second.state == AckState::NOT_ACKED &&
-                std::chrono::system_clock::now() - item.second.first_sent >= m_retransmit_delay
+                current_time() - item.second.first_sent >= m_retransmit_delay
             ){
                 send_message(item.second.request, true);
             }
         }
-        last_sent = std::chrono::system_clock::now();
+        last_sent = current_time();
     }
 //    cout << "retransmit_thread() - exit" << endl;
 }
@@ -435,6 +447,12 @@ uint64_t PABotBase::try_issue_request(
         throw InvalidConnectionStateException();
     }
 
+    //  Too many unacked requests in flight.
+    if (inflight_requests() >= queue_limit){
+        m_logger.log("Message throttled due to too many inflight requests.");
+        return 0;
+    }
+
     //  Don't get too far ahead of the oldest seqnum.
     uint64_t seqnum = m_send_seq;
     if (seqnum - oldest_live_seqnum() > MAX_SEQNUM_GAP){
@@ -459,7 +477,7 @@ uint64_t PABotBase::try_issue_request(
 
     handle->silent_remove = silent_remove;
     handle->request = std::move(message);
-    handle->first_sent = std::chrono::system_clock::now();
+    handle->first_sent = current_time();
 
     send_message(handle->request, false);
 
@@ -491,7 +509,13 @@ uint64_t PABotBase::try_issue_command(
     //  Command queue is full.
     if (m_pending_commands.size() >= queue_limit){
 //        cout << "Command queue is full" << endl;
-        return false;
+        return 0;
+    }
+
+    //  Too many unacked requests in flight.
+    if (inflight_requests() >= queue_limit){
+        m_logger.log("Message throttled due to too many inflight requests.");
+        return 0;
     }
 
     //  Don't get too far ahead of the oldest seqnum.
@@ -518,7 +542,7 @@ uint64_t PABotBase::try_issue_command(
 
     handle->silent_remove = silent_remove;
     handle->request = std::move(message);
-    handle->first_sent = std::chrono::system_clock::now();
+    handle->first_sent = current_time();
 
     send_message(handle->request, false);
 
@@ -628,9 +652,7 @@ BotBaseMessage PABotBase::issue_request_and_wait(
         throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "This function only supports requests.");
     }
 
-    std::map<uint64_t, PendingRequest>::iterator iter;
     uint64_t seqnum = issue_request(cancelled, request, false);
-
     return wait_for_request(seqnum);
 }
 BotBaseMessage PABotBase::wait_for_request(uint64_t seqnum){

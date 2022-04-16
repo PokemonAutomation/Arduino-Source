@@ -26,6 +26,7 @@ private:
     template <class... Args>
     SingleSwitchProgramEnvironment(
         const ProgramInfo& program_info,
+        CancellableScope& scope,
         LoggerQt& logger,
         StatsTracker* current_stats,
         const StatsTracker* historical_stats,
@@ -33,7 +34,9 @@ private:
     )
         : ProgramEnvironment(program_info, logger, current_stats, historical_stats)
         , console(0, std::forward<Args>(args)...)
-    {}
+    {
+        console.initialize_inference_threads(scope, inference_dispatcher());
+    }
 };
 
 

@@ -74,9 +74,9 @@ void CaughtPokemonScreen::leave_summary(){
     PokemonCaughtMenuDetector caught_menu;
 
     int result = wait_until(
-        m_env, m_console, m_context,
+        m_console, m_context,
         std::chrono::seconds(10),
-        { &caught_menu }
+        {{caught_menu}}
     );
 
     switch (result){

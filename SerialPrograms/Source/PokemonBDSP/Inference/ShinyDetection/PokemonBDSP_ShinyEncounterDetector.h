@@ -16,7 +16,6 @@
 
 namespace PokemonAutomation{
     class BotBaseContext;
-    class ProgramEnvironment;
     class ConsoleHandle;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
@@ -58,10 +57,7 @@ public:
     const ShinySparkleAggregator& sparkles_own() const{ return m_best_own; }
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-    ) override;
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
 
     ShinyType get_results() const;
 
@@ -105,7 +101,7 @@ void determine_shiny_status(
 
 
 void detect_shiny_battle(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
     const DetectionType& type,

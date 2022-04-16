@@ -88,10 +88,7 @@ DialogueEllipseDetector::DialogueEllipseDetector(
 void DialogueEllipseDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box);
 }
-bool DialogueEllipseDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool DialogueEllipseDetector::process_frame(const QImage& frame, WallClock timestamp){
     m_watcher.process_frame(frame, timestamp);
     bool detected = m_debouncer.push_value(!m_tracker.detections().empty(), timestamp);
     return detected && m_stop_on_detected;

@@ -157,13 +157,13 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             {
                 StandardBattleMenuWatcher fight_detector(false);
                 int result = run_until(
-                    env, env.console, context,
+                    env.console, context,
                     [=](BotBaseContext& context){
-                    while (true){
-                        pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
-                    }
-                },
-                { &fight_detector }
+                        while (true){
+                            pbf_press_button(context, BUTTON_A, 10, 1 * TICKS_PER_SECOND);
+                        }
+                    },
+                    {{fight_detector}}
                 );
                 if (result == 0) {
                     env.log("New fight detected, let's begin to throw balls.", COLOR_PURPLE);
@@ -172,7 +172,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             }
 
             pbf_mash_button(context, BUTTON_B, 1 * TICKS_PER_SECOND);
-            CatchResults result = basic_catcher(env, env.console, context, LANGUAGE, BALL_SELECT.slug());
+            CatchResults result = basic_catcher(env.console, context, LANGUAGE, BALL_SELECT.slug());
             switch (result.result){
             case CatchResult::POKEMON_CAUGHT:
                 calyrex_caught = true;
@@ -214,7 +214,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             if (!calyrex_caught){
                 pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
                 reset_game_from_home_with_inference(
-                    env, env.console, context,
+                    env.console, context,
                     ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
                 );
             }
@@ -284,7 +284,7 @@ void StatsResetCalyrex::program(SingleSwitchProgramEnvironment& env, BotBaseCont
         if (!match_found){
             pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
             reset_game_from_home_with_inference(
-                env, env.console, context,
+                env.console, context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
             );
         }

@@ -117,7 +117,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
         {
             BattleMenuWatcher fight_detector(BattleType::STANDARD);
             int result = run_until(
-                env, env.console, context,
+                env.console, context,
                 [=](BotBaseContext& context){
                     while (true){
                         //TODO edit here for what to do
@@ -126,7 +126,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
                         pbf_press_dpad(context, DPAD_UP, 5, TICKS_PER_SECOND);
                     }
                 },
-                { &fight_detector }
+                {{fight_detector}}
             );
             if (result == 0){
                 env.log("New fight detected.", COLOR_PURPLE);
@@ -134,7 +134,7 @@ void AutonomousBallThrower::program(SingleSwitchProgramEnvironment& env, BotBase
             }
         }
 
-        CatchResults result = basic_catcher(env, env.console, context, LANGUAGE, BALL_SELECT.slug());
+        CatchResults result = basic_catcher(env.console, context, LANGUAGE, BALL_SELECT.slug());
         switch (result.result){
         case CatchResult::POKEMON_CAUGHT:
             pokemon_caught = true;

@@ -90,7 +90,7 @@ bool back_out_to_overworld_with_overlap(
 }
 
 void back_out_to_overworld(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     const QImage& start
 ){
     console.log("Backing out to overworld...");
@@ -102,11 +102,11 @@ void back_out_to_overworld(
     background_all.make_overlays(boxes);
 
     int ret = run_until(
-        env, console, context,
+        console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_B, 20 * TICKS_PER_SECOND);
         },
-        { &background_all }
+        {{background_all}}
     );
     if (ret < 0){
         throw OperationFailedException(console, "Failed to back out to overworld in 20 seconds. Something is wrong.");

@@ -12,7 +12,6 @@
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
-#include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -23,18 +22,12 @@ class FlagNavigationAir : public SuperControlSession{
 public:
     FlagNavigationAir(
         ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
-        bool stop_on_shiny,
         uint16_t stop_radius,
         double flag_reached_delay,
         std::chrono::seconds navigate_timeout
     );
 
-    bool detected_shiny() const{
-        return m_shiny_listener.detected();
-    }
-    ShinySoundResults shiny_sound_results(){
-        return m_shiny_listener.results();
-    }
+    void set_distance_callback(std::function<void(double distance)> flag_callback);
 
 
 private:
@@ -77,20 +70,20 @@ private:
         return SuperControlSession::run_state_action((size_t)state);
     }
 
-    bool m_stop_on_shiny;
     uint16_t m_stop_radius;
     std::chrono::milliseconds m_flag_reached_delay;
     std::chrono::seconds m_navigate_timeout;
+
+    std::function<void(double distance)> m_flag_callback;
 
     FlagTracker m_flag;
     MountTracker m_mount;
     ButtonDetector m_centerA;
     ButtonDetector m_leftB;
     DialogSurpriseDetector m_dialog_detector;
-    ShinySoundDetector m_shiny_listener;
 
     std::atomic<bool> m_looking_straight_ahead;
-    std::atomic<std::chrono::system_clock::time_point> m_looking_straight_ahead_timestamp;
+    std::atomic<WallClock> m_looking_straight_ahead_timestamp;
 //    WallClock m_last_good_state;
     MountState m_last_known_mount;
 
@@ -104,6 +97,8 @@ private:
     double m_flag_distance;
     double m_flag_x;
     double m_flag_y;
+
+    WallClock m_last_flag_print;
 };
 
 

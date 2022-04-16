@@ -39,10 +39,7 @@ void PokemonCaughtMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_MAGENTA, m_bottom_black);
     items.add(COLOR_MAGENTA, m_bottom_options);
 }
-bool PokemonCaughtMenuDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool PokemonCaughtMenuDetector::process_frame(const QImage& frame, WallClock timestamp){
     return detect(frame);
 }
 

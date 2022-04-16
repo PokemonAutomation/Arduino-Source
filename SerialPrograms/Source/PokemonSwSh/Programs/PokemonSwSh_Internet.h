@@ -19,7 +19,7 @@ namespace PokemonSwSh{
 
 
 bool connect_to_internet_with_inference(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     std::chrono::milliseconds post_wait_time = std::chrono::seconds(3),
     uint16_t timeout_ticks = 120 * TICKS_PER_SECOND
 );

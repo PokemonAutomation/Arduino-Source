@@ -19,7 +19,7 @@ namespace MaxLairInternal{
 GlobalStateTracker::GlobalStateTracker(CancellableScope& scope, size_t consoles)
     : m_count(consoles)
 {
-    auto timestamp = std::chrono::system_clock::now();
+    auto timestamp = current_time();
     for (size_t c = 0; c < 4; c++){
         m_master_consoles[c].timestamp = timestamp;
     }
@@ -45,8 +45,8 @@ std::pair<uint64_t, std::string> GlobalStateTracker::dump(){
 #endif
     return {m_state_epoch, str};
 }
-bool GlobalStateTracker::cancel() noexcept{
-    if (Cancellable::cancel()){
+bool GlobalStateTracker::cancel(std::exception_ptr exception) noexcept{
+    if (Cancellable::cancel(std::move(exception))){
         return true;
     }
     std::lock_guard<std::mutex> lg(m_lock);
@@ -57,7 +57,7 @@ void GlobalStateTracker::push_update(size_t index){
     std::lock_guard<std::mutex> lg(m_lock);
     m_state_epoch++;
     m_master_consoles[index] = m_consoles[index];
-    m_master_consoles[index].timestamp = std::chrono::system_clock::now();
+    m_master_consoles[index].timestamp = current_time();
     m_cv.notify_all();
 }
 
@@ -112,7 +112,7 @@ GlobalState GlobalStateTracker::synchronize(
     std::unique_lock<std::mutex> lg(m_lock);
     m_state_epoch++;
 
-    time_point timestamp = std::chrono::system_clock::now();
+    time_point timestamp = current_time();
     logger.log("Synchronizing...", COLOR_MAGENTA);
 
     m_master_consoles[index] = m_consoles[index];
@@ -133,7 +133,7 @@ GlobalState GlobalStateTracker::synchronize(
 
         throw_if_cancelled();
 
-        time_point now = std::chrono::system_clock::now();
+        time_point now = current_time();
         if (now > time_limit){
             m_state_epoch++;
             logger.log("GlobalStateTracker::synchronize() timed out.", COLOR_RED);
@@ -224,7 +224,7 @@ Type merge_majority_vote(
     const uint8_t groups[4],
     size_t count, uint8_t group, Type null_value,
     GlobalState states[4],
-    std::chrono::system_clock::time_point min_valid_time,
+    WallClock min_valid_time,
     Lambda&& lambda
 ){
     std::map<Type, size_t> map;
@@ -269,7 +269,7 @@ TimestampedValue<double> merge_hp(
     }
     return num == 0 ? -1 : sum / num;
 #endif
-    TimestampedValue<double> latest(-1, std::chrono::system_clock::time_point::min());
+    TimestampedValue<double> latest(-1, WallClock::min());
     for (size_t c = 0; c < count; c++){
         if (group != groups[c]){
             continue;
@@ -335,7 +335,7 @@ void GlobalStateTracker::merge_boss_type(uint8_t group, GlobalState& state){
 }
 #endif
 void GlobalStateTracker::merge_path(uint8_t group, GlobalState& state){
-//    std::chrono::system_clock::time_point latest =  std::chrono::system_clock::time_point::min();
+//    WallClock latest =  WallClock::min();
     for (size_t c = 0; c < m_count; c++){
         if (group != m_groups[c]){
             continue;
@@ -442,7 +442,7 @@ void GlobalStateTracker::merge_player_hp(uint8_t group, PlayerState& player, siz
 }
 #endif
 void GlobalStateTracker::merge_player_health(uint8_t group, PlayerState& player, size_t player_index){
-    TimestampedValue<Health> latest(Health(), std::chrono::system_clock::time_point::min());
+    TimestampedValue<Health> latest(Health(), WallClock::min());
     for (size_t c = 0; c < m_count; c++){
         if (group != m_groups[c]){
             continue;

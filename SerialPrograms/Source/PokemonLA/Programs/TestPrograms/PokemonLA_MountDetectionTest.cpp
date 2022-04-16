@@ -5,7 +5,7 @@
  */
 
 #include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceSession.h"
+#include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "PokemonLA_MountDetectionTest.h"
 
@@ -43,18 +43,12 @@ MountDetectionTest::MountDetectionTest(const MountDetectionTest_Descriptor& desc
 
 
 void MountDetectionTest::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-
     MountTracker tracker(env.console, (MountDetectorLogging)(size_t)FAILED_ACTION);
-    VisualInferenceSession session(
-        env.console, context,
-        env.console, env.console,
-        std::chrono::seconds(1)
+    InferenceSession session(
+        context, env.console,
+        {{tracker, std::chrono::seconds(1)}}
     );
-    session += tracker;
-
-    session.run();
-
-
+    context.wait_until_cancel();
 }
 
 

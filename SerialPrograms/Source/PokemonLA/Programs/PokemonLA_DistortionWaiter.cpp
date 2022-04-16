@@ -89,20 +89,18 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, BotBaseConte
 
 
     NotificationDetector detector(env.console, LANGUAGE);
-//    AsyncVisualInferenceSession visual(env, console, console, console);
-//    visual += detector;
 
-    std::chrono::system_clock::time_point start = std::chrono::system_clock::now();
+    WallClock start = current_time();
     while (true){
         env.update_stats();
 
         int ret = run_until(
-            env, env.console, context,
+            env.console, context,
             [&](BotBaseContext& context){
                 for (size_t c = 0; c < 60; c++){
                     pbf_press_button(context, BUTTON_LCLICK, 20, 60 * TICKS_PER_SECOND - 20);
                     context.wait_for_all_requests();
-                    auto elapsed = std::chrono::system_clock::now() - start;
+                    auto elapsed = current_time() - start;
                     uint64_t minutes = std::chrono::duration_cast<std::chrono::minutes>(elapsed).count();
                     if (minutes != stats.minutes_waited.load(std::memory_order_relaxed)){
                         stats.minutes_waited.store(minutes, std::memory_order_relaxed);
@@ -110,14 +108,14 @@ void DistortionWaiter::program(SingleSwitchProgramEnvironment& env, BotBaseConte
                     }
                 }
             },
-            { &detector }
+            {{detector}}
         );
         if (ret < 0){
             stats.errors++;
             throw OperationFailedException(env.console, "No distortion found after one hour.");
         }
 
-        auto elapsed = std::chrono::system_clock::now() - start;
+        auto elapsed = current_time() - start;
         uint64_t minutes = std::chrono::duration_cast<std::chrono::minutes>(elapsed).count();
         stats.minutes_waited.store(minutes, std::memory_order_relaxed);
 

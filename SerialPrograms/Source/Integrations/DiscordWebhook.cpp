@@ -96,7 +96,7 @@ void DiscordWebhookSender::thread_loop(){
 
             //  Throttle the messages.
             auto duration = THROTTLE_DURATION;
-            auto now = std::chrono::system_clock::now();
+            auto now = current_time();
             while (!m_sent.empty() && m_sent[0] + duration < now){
                 m_sent.pop_front();
             }

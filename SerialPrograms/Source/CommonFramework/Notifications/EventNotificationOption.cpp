@@ -158,7 +158,7 @@ void EventNotificationOption::restore_defaults(){
     m_current = m_default;
 }
 void EventNotificationOption::reset_rate_limit(){
-    m_last_sent = std::chrono::system_clock::time_point::min();
+    m_last_sent = WallClock::min();
 }
 bool EventNotificationOption::ok_to_send_now(LoggerQt& logger){
     if (!m_enabled){
@@ -172,7 +172,7 @@ bool EventNotificationOption::ok_to_send_now(LoggerQt& logger){
 //    if (m_current.rate_limit == std::chrono::seconds(0)){
 //        return true;
 //    }
-    auto now = std::chrono::system_clock::now();
+    auto now = current_time();
     if (now < m_last_sent + m_current.rate_limit){
         logger.log("EventNotification(" + m_label + "): Notification dropped due to rate limit.", COLOR_PURPLE);
         return false;

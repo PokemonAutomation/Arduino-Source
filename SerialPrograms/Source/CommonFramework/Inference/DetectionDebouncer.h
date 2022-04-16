@@ -8,8 +8,8 @@
 #define PokemonAutomation_CommonFramework_DetectionDebouncer_H
 
 #include <functional>
-#include <chrono>
 #include <atomic>
+#include "Common/Cpp/Time.h"
 
 namespace PokemonAutomation{
 
@@ -25,7 +25,7 @@ public:
         : m_min_streak(min_streak)
         , m_state_reporter(std::move(state_reporter))
         , m_current_reported(initial_state)
-        , m_last_match(std::chrono::system_clock::now())
+        , m_last_match(current_time())
     {}
 
     //  This is fully thread-safe.
@@ -34,7 +34,7 @@ public:
     }
 
     //  Only one thread at a time is allowed to call this.
-    Type push_value(Type value, std::chrono::system_clock::time_point timestamp){
+    Type push_value(Type value, WallClock timestamp){
         Type current_reported = get();
 
         //  No change.
@@ -60,7 +60,7 @@ private:
     std::function<void(Type)> m_state_reporter;
 
     std::atomic<Type> m_current_reported;
-    std::chrono::system_clock::time_point m_last_match;
+    WallClock m_last_match;
 };
 
 

@@ -36,6 +36,8 @@ private:
 private:
     class Stats;
 
+    ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
+
     TimeExpressionOption<int16_t> TURN_DURATION;
     TimeExpressionOption<uint16_t> FORWARD_DURATION;
     TimeExpressionOption<uint16_t> WAIT_DURATION;

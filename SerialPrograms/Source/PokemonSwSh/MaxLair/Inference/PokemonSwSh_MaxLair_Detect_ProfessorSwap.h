@@ -17,18 +17,16 @@ namespace MaxLairInternal{
 
 class ProfessorSwapDetector : public SelectionArrowFinder{
 public:
-    ProfessorSwapDetector(VideoOverlay& overlay);
+    ProfessorSwapDetector(VideoOverlay& overlay, bool enable);
 
     bool detect(const QImage& screen);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-    ) override final;
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) override final;
 
 
 private:
+    bool m_enabled;
 //    ImageFloatBox m_dialog0;
 //    ImageFloatBox m_dialog1;
     ImageFloatBox m_bottom_main;

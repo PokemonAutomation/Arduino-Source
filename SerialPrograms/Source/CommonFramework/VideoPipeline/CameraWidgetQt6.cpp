@@ -19,6 +19,7 @@ using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
+namespace CameraQt6{
 
 
 std::vector<CameraInfo> qt6_get_all_cameras(){
@@ -49,6 +50,9 @@ Qt6VideoWidget::Qt6VideoWidget(
 )
     : VideoWidget(parent)
     , m_logger(logger)
+    , m_last_frame_seqnum(0)
+    , m_last_image_timestamp(WallClock::min())
+    , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
 {
     if (!info){
         return;
@@ -82,8 +86,13 @@ Qt6VideoWidget::Qt6VideoWidget(
 
     connect(m_videoSink, &QVideoSink::videoFrameChanged, this, [&](const QVideoFrame& frame){
         {
-            std::unique_lock<std::mutex> lg(m_lock);
-            m_videoFrame = frame;
+            auto timestamp = current_time();
+            SpinLockGuard lg(m_frame_lock);
+            m_last_frame = frame;
+            m_last_frame_timestamp = timestamp;
+            uint64_t seqnum = m_last_frame_seqnum.load(std::memory_order_acquire);
+            m_last_frame_seqnum.store(seqnum + 1, std::memory_order_release);
+//            m_last_frame_seqnum++;
         }
         this->update();
     });
@@ -126,7 +135,6 @@ QSize Qt6VideoWidget::resolution() const{
     if (m_camera == nullptr){
         return QSize();
     }
-
     return m_camera->cameraFormat().resolution();
 }
 
@@ -155,27 +163,58 @@ void Qt6VideoWidget::set_resolution(const QSize& size){
     }
 }
 
-QImage Qt6VideoWidget::snapshot(){
-    QVideoFrame frame;
-    {
-        std::lock_guard<std::mutex> lg(m_lock);
-        if (m_camera == nullptr || !m_videoFrame.isValid()){
-            return QImage();
+QImage Qt6VideoWidget::snapshot(WallClock* timestamp){
+    //  Prevent multiple concurrent screenshots from entering here.
+    std::lock_guard<std::mutex> lg(m_image_lock);
+
+    //  Image is already cached and not stale. Return it.
+    uint64_t seqnum = m_last_frame_seqnum.load(std::memory_order_acquire);
+    if (m_last_image_seqnum == seqnum && !m_last_image.isNull()){
+        if (timestamp){
+            timestamp[0] = m_last_image_timestamp;
         }
-        frame = m_videoFrame; // Fast due to ref-count.
+        return m_last_image;
     }
 
-    // auto time1 = std::chrono::system_clock::now();
-    QImage ret = frame.toImage();
-    // auto time2 = std::chrono::system_clock::now();
+    WallClock time0 = current_time();
+
+    //  Need to update image. Grab the current frame.
+    QVideoFrame frame;
+    WallClock tick;
+    {
+        SpinLockGuard lg1(m_frame_lock);
+        frame = m_last_frame;   // Fast due to ref-count.
+        tick = m_last_frame_timestamp;
+    }
+
+    //  Now make the image.
+    if (!frame.isValid()){
+        if (timestamp){
+            timestamp[0] = current_time();
+        }
+        return QImage();
+    }
+
+    // auto time1 = current_time();
+    //  Convert image and cache it.
+    QImage image = frame.toImage();
+    // auto time2 = current_time();
     // std::chrono::duration<double> elapsed_seconds = time2 - time1;
     // std::cout << "snapshot image conversion time " << elapsed_seconds.count() << "s" << std::endl;
     // std::cout << "QVideoFrame pixel format " << int(frame.pixelFormat()) << std::endl;
-    QImage::Format format = ret.format();
+    QImage::Format format = image.format();
     if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
-        ret = ret.convertToFormat(QImage::Format_ARGB32);
+        image = image.convertToFormat(QImage::Format_ARGB32);
     }
-    return ret;
+    m_last_image_seqnum = seqnum;
+    m_last_image = std::move(image);
+    m_last_image_timestamp = tick;
+    if (timestamp){
+        timestamp[0] = m_last_image_timestamp;
+    }
+    WallClock time1 = current_time();
+    m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count());
+    return m_last_image;
 }
 
 
@@ -201,17 +240,21 @@ void Qt6VideoWidget::resizeEvent(QResizeEvent* event){
 void Qt6VideoWidget::paintEvent(QPaintEvent* event){
     // std::cout << "paintEvent start" << std::endl;
     QWidget::paintEvent(event);
-    std::lock_guard<std::mutex> lg(m_lock);
-    if (m_videoFrame.isValid()){
+
+    //  Lock should not be needed since it's only updated on this UI thread.
+//    std::lock_guard<std::mutex> lg(m_lock);
+
+    if (m_last_frame.isValid()){
         QRect rect(0,0, this->width(), this->height());
         QVideoFrame::PaintOptions options;
         QPainter painter(this);
-        m_videoFrame.paint(&painter, rect, options);
+        m_last_frame.paint(&painter, rect, options);
     }
     // std::cout << "paintEvent end" << std::endl;
 }
 
 
 
+}
 }
 #endif

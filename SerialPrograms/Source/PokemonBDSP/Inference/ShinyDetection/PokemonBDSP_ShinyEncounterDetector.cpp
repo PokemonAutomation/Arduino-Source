@@ -52,10 +52,7 @@ void ShinyEncounterTracker::make_overlays(VideoOverlaySet& items) const{
     m_sparkle_tracker_wild.make_overlays(items);
     m_sparkle_tracker_own.make_overlays(items);
 }
-bool ShinyEncounterTracker::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool ShinyEncounterTracker::process_frame(const QImage& frame, WallClock timestamp){
     using PokemonSwSh::EncounterState;
 
     if (frame.isNull()){
@@ -172,7 +169,7 @@ void determine_shiny_status(
 
 
 void detect_shiny_battle(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
     const DetectionType& type,
@@ -182,8 +179,8 @@ void detect_shiny_battle(
     BattleType battle_type = type.full_battle_menu ? BattleType::STANDARD : BattleType::STARTER;
     ShinyEncounterTracker tracker(console, console, battle_type);
     int result = wait_until(
-        env, console, context, timeout,
-        { &tracker }
+        console, context, timeout,
+        {{tracker}}
     );
     if (result < 0){
         console.log("ShinyDetector: Battle menu not found after timeout.", COLOR_RED);

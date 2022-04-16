@@ -54,7 +54,7 @@ public:
 
     //  Override VideoFeed::snapshot().
     //  Cannot be called from UI thread.
-    virtual QImage snapshot() override;
+    virtual QImage snapshot(WallClock* timestamp) override;
 
 signals:
     // Need to define this version of async_reset_video()

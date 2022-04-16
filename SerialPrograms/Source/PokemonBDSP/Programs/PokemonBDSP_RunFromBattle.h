@@ -11,7 +11,6 @@
 
 namespace PokemonAutomation{
     class BotBaseContext;
-    class ProgramEnvironment;
 namespace NintendoSwitch{
 namespace PokemonBDSP{
 
@@ -21,7 +20,7 @@ namespace PokemonBDSP{
 // Return true if a black screen is detected, false if not detected after
 // `exit_battle_time` of ticks have passed. 
 bool run_from_battle(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     uint16_t exit_battle_time
 );
 

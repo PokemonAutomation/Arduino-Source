@@ -5,16 +5,20 @@
  */
 
 #include <set>
+#include <mutex>
+#include <condition_variable>
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/AlignedVector.h"
 #include "Common/Cpp/CpuId.h"
+#include "Common/Cpp/AsyncDispatcher.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
 #include "TestProgramComputer.h"
+#include "ClientSource/Libraries/Logging.h"
 
 #include "Kernels/Kernels_Arch.h"
 #include "Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.h"
@@ -42,6 +46,7 @@
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
+#include "Common/Cpp/PeriodicScheduler.h"
 
 //#include "Kernels/Kernels_x64_AVX2.h"
 //#include "Kernels/Kernels_x64_AVX512.h"
@@ -73,7 +78,7 @@ TestProgramComputer::TestProgramComputer(const TestProgramComputer_Descriptor& d
 {
 }
 
-std::chrono::system_clock::time_point REFERENCE = std::chrono::system_clock::now();
+WallClock REFERENCE = current_time();
 
 
 void print(const float* ptr, size_t len){
@@ -119,12 +124,62 @@ void print_8x64(__m512i m){
 
 
 
+#if 0
+class ScheduledPrinter : public PeriodicRunner{
+public:
+    virtual ~ScheduledPrinter(){
+        PeriodicRunner::cancel(nullptr);
+        stop_thread();
+    }
+    bool add_event(std::function<void()>& event, std::chrono::milliseconds period){
+        return PeriodicRunner::add_event(&event, period);
+    }
+    void remove_event(std::function<void()>& event){
+        PeriodicRunner::remove_event(&event);
+    }
+    virtual void run(void* event) override{
+        cout << current_time_to_str() << ": ";
+        (*(std::function<void()>*)event)();
+    }
+
+protected:
+    using PeriodicRunner::PeriodicRunner;
+};
+#endif
+
+
+
 
 void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& scope){
     using namespace Kernels;
     using namespace NintendoSwitch::PokemonLA;
     using namespace Pokemon;
 
+
+#if 0
+    std::function<void()> callback0 = []{ cout << "asdf" << endl; };
+    std::function<void()> callback1 = []{ cout << "qwer" << endl; };
+
+    CancellableHolder<ScheduledPrinter> runner(scope, env.inference_dispatcher());
+    runner.add_event(callback0, std::chrono::seconds(2));
+    runner.add_event(callback1, std::chrono::seconds(3));
+
+    scope.wait_for(std::chrono::seconds(10));
+#endif
+
+#if 0
+    PeriodicScheduler scheduler;
+    scheduler.add_event(&callback0, std::chrono::seconds(2));
+    scheduler.add_event(&callback1, std::chrono::seconds(3));
+    while (true){
+        scope.throw_if_cancelled();
+        void* ptr = scheduler.request_next_event();
+        if (ptr != nullptr){
+            cout << current_time_to_str() << ": ";
+            (*(std::function<void()>*)ptr)();
+        }
+    }
+#endif
 
 
 
@@ -576,7 +631,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    cout << dst.width() << " x " << dst.height() << endl;
 
     {
-        auto start = std::chrono::system_clock::now();
+        auto start = current_time();
         for (size_t c = 0; c < 1000000; c++){
             QImage dst(src.width(), height, QImage::Format_ARGB32);
             scale_vertical_shrink_Default(
@@ -585,19 +640,19 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
                 (uint32_t*)dst.bits(), dst.bytesPerLine(), dst.height()
             );
         }
-        auto end = std::chrono::system_clock::now();
+        auto end = current_time();
         cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start) << endl;
     }
     {
-        auto start = std::chrono::system_clock::now();
+        auto start = current_time();
         for (size_t c = 0; c < 1000000; c++){
             QImage dst = src.scaled(src.width(), height);
         }
-        auto end = std::chrono::system_clock::now();
+        auto end = current_time();
         cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start) << endl;
     }
     {
-        auto start = std::chrono::system_clock::now();
+        auto start = current_time();
         for (size_t c = 0; c < 1000000; c++){
             QImage dst(src.width(), height, QImage::Format_ARGB32);
             scale_vertical_shrink<Uint8Scaler_x16_SSE41>(
@@ -606,11 +661,11 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
                 (uint32_t*)dst.bits(), dst.bytesPerLine(), dst.height()
             );
         }
-        auto end = std::chrono::system_clock::now();
+        auto end = current_time();
         cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start) << endl;
     }
     {
-        auto start = std::chrono::system_clock::now();
+        auto start = current_time();
         for (size_t c = 0; c < 1000000; c++){
             QImage dst(src.width(), height, QImage::Format_ARGB32);
             scale_vertical_shrink<Uint8Scaler_x32_AVX2>(
@@ -619,7 +674,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
                 (uint32_t*)dst.bits(), dst.bytesPerLine(), dst.height()
             );
         }
-        auto end = std::chrono::system_clock::now();
+        auto end = current_time();
         cout << std::chrono::duration_cast<std::chrono::microseconds>(end - start) << endl;
     }
 
@@ -696,7 +751,6 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 #endif
 
 
-//    using WallClock = std::chrono::system_clock::time_point;
 
 //    cout << (WallClock::min() < WallClock::max()) << endl;
 
@@ -709,7 +763,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 #if 0
     BlackScreenOverWatcher black_screen1(COLOR_RED, {0.20, 0.95, 0.60, 0.03}, 20);
 
-    black_screen1.process_frame(QImage("screenshot-20220221-232325966395.png"), std::chrono::system_clock::now());
+    black_screen1.process_frame(QImage("screenshot-20220221-232325966395.png"), current_time());
 #endif
 
 #if 0
@@ -719,7 +773,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     }
     print(data, 25);
 
-//    auto start = std::chrono::system_clock::now();
+//    auto start = current_time();
 
     TimeSampleBuffer<float> buffer(10, std::chrono::seconds(10));
 

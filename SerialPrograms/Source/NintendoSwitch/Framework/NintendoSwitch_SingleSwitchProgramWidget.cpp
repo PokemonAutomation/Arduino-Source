@@ -30,8 +30,11 @@ SingleSwitchProgramWidget* SingleSwitchProgramWidget::make(
 }
 void SingleSwitchProgramWidget::run_switch_program(const ProgramInfo& info){
     SingleSwitchProgramInstance& instance = static_cast<SingleSwitchProgramInstance&>(m_instance);
+
+    CancellableHolder<CancellableScope> scope;
     SingleSwitchProgramEnvironment env(
         info,
+        scope,
         m_logger,
         m_current_stats.get(), m_historical_stats.get(),
         system().logger(),
@@ -45,7 +48,6 @@ void SingleSwitchProgramWidget::run_switch_program(const ProgramInfo& info){
         this, &SingleSwitchProgramWidget::status_update
     );
 
-    CancellableHolder<CancellableScope> scope;
     {
         std::lock_guard<std::mutex> lg(m_lock);
         m_scope = &scope;

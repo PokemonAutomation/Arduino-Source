@@ -145,18 +145,18 @@ void ShinyHuntAutonomousSwordsOfJustice::program(SingleSwitchProgramEnvironment&
             StandardBattleMenuWatcher battle_menu_detector(false);
             StartBattleWatcher start_back_detector;
             wait_until(
-                env, env.console, context,
+                env.console, context,
                 std::chrono::seconds(30),
                 {
-                    &battle_menu_detector,
-                    &start_back_detector,
+                    {battle_menu_detector},
+                    {start_back_detector},
                 }
             );
         }
 
         //  Detect shiny.
         ShinyDetectionResult result = detect_shiny_battle(
-            env, env.console, context,
+            env.console, context,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );

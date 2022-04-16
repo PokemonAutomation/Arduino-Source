@@ -76,10 +76,7 @@ VSSeekerReactionTracker::VSSeekerReactionTracker(VideoOverlay& overlay, const Im
 void VSSeekerReactionTracker::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box);
 }
-bool VSSeekerReactionTracker::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point
-){
+bool VSSeekerReactionTracker::process_frame(const QImage& frame, WallClock){
     ConstImageRef cropped = extract_box_reference(frame, m_box);
     m_dimensions = QSize((int)cropped.width(), (int)cropped.height());
     m_bubbles = find_seeker_bubbles(cropped);

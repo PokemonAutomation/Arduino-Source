@@ -19,7 +19,7 @@ namespace PokemonAutomation{
 class QueuedLogger : public Logger{
 public:
     struct Entry{
-        std::chrono::system_clock::time_point timestamp;
+        WallClock timestamp;
         Color color;
         std::string line;
     };

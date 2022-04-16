@@ -33,7 +33,7 @@ TradeStats::TradeStats()
 
 
 void trade_current_pokemon(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     MultiConsoleErrorState& tracker,
     TradeStats& stats
 ){
@@ -52,8 +52,8 @@ void trade_current_pokemon(
             std::chrono::milliseconds(0), true
         );
         int ret = wait_until(
-            env, console, context, std::chrono::seconds(120),
-            { &detector }
+            console, context, std::chrono::seconds(120),
+            {{detector}}
         );
         if (ret < 0){
             stats.m_errors++;
@@ -72,8 +72,8 @@ void trade_current_pokemon(
             std::chrono::milliseconds(0), true
         );
         int ret = wait_until(
-            env, console, context, std::chrono::seconds(10),
-            { &detector }
+            console, context, std::chrono::seconds(10),
+            {{detector}}
         );
         if (ret < 0){
             stats.m_errors++;
@@ -91,8 +91,8 @@ void trade_current_pokemon(
     {
         BlackScreenOverWatcher black_screen;
         int ret = wait_until(
-            env, console, context, std::chrono::minutes(2),
-            { &black_screen }
+            console, context, std::chrono::minutes(2),
+            {{black_screen}}
         );
         if (ret < 0){
             stats.m_errors++;
@@ -107,11 +107,11 @@ void trade_current_pokemon(
     {
         BlackScreenWatcher black_screen;
         int ret = run_until(
-            env, console, context,
+            console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
-            { &black_screen }
+            {{black_screen}}
         );
         if (ret < 0){
             stats.m_errors++;
@@ -125,8 +125,8 @@ void trade_current_pokemon(
     //  Wait to return to box.
     {
         int ret = wait_until(
-            env, console, context, std::chrono::minutes(2),
-            { &box_detector }
+            console, context, std::chrono::minutes(2),
+            {{box_detector}}
         );
         if (ret < 0){
             stats.m_errors++;

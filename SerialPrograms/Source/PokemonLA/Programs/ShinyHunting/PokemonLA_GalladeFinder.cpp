@@ -14,7 +14,7 @@
 #include "PokemonLA/Inference/PokemonLA_MapDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 #include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
-#include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
+#include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "PokemonLA_GalladeFinder.h"
@@ -38,6 +38,7 @@ GalladeFinder_Descriptor::GalladeFinder_Descriptor()
 
 GalladeFinder::GalladeFinder(const GalladeFinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
+    , SHINY_DETECTED("Shiny Detected Action", "", "0 * TICKS_PER_SECOND")
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -47,6 +48,7 @@ GalladeFinder::GalladeFinder(const GalladeFinder_Descriptor& descriptor)
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -94,9 +96,16 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCo
     // start the shiny detection, there's nothing initially
     env.console.log("Enabling Shiny Detection...");
     {
-        ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
-        run_until(
-            env, env.console, context,
+        float shiny_coefficient = 1.0;
+        ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+            //  Warning: This callback will be run from a different thread than this function.
+            stats.shinies++;
+            shiny_coefficient = error_coefficient;
+            return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
+        });
+
+        int ret = run_until(
+            env.console, context,
             [](BotBaseContext& context){
                 // forward portion
                 pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, (uint16_t)(6.8 * TICKS_PER_SECOND)); // forward while running until stairs, mash y a few times down the stairs
@@ -129,11 +138,10 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCo
                 pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, (uint16_t)(3.5 * TICKS_PER_SECOND)); // forward while sprinting until stairs, mash y a few times down the stairs
                 // we should easily be in range of gallade at this point, so if there's no shiny we're done
             },
-            { &shiny_detector }
+            {{shiny_detector}}
         );
-        if (shiny_detector.detected()){
-           stats.shinies++;
-           on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_detector.results());
+        if (ret == 0){
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_coefficient);
         }
     };
 

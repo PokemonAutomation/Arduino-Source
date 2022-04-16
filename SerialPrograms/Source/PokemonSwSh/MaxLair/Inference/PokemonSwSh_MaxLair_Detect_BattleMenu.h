@@ -27,10 +27,7 @@ public:
     bool detect(const QImage& screen);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-    ) override final;
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) override final;
 
     bool dmaxed() const{ return m_dmaxed; }
     bool cheer() const{ return m_cheer; }

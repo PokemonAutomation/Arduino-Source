@@ -136,12 +136,12 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Bo
             FishingHookDetector hook_detector(env.console);
             StandardBattleMenuWatcher menu_detector(false);
             int result = wait_until(
-                env, env.console, context,
+                env.console, context,
                 std::chrono::seconds(12),
                 {
-                    &miss_detector,
-                    &hook_detector,
-                    &menu_detector,
+                    {miss_detector},
+                    {hook_detector},
+                    {menu_detector},
                 }
             );
             switch (result){
@@ -158,7 +158,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Bo
                 env.log("Unexpected battle menu.", COLOR_RED);
                 stats.add_error();
                 env.update_stats();
-                run_away(env, env.console, context, EXIT_BATTLE_TIMEOUT);
+                run_away(env.console, context, EXIT_BATTLE_TIMEOUT);
                 continue;
             default:
                 env.log("Timed out.", COLOR_RED);
@@ -178,7 +178,7 @@ void ShinyHuntAutonomousFishing::program(SingleSwitchProgramEnvironment& env, Bo
 
         //  Detect shiny.
         ShinyDetectionResult result = detect_shiny_battle(
-            env, env.console, context,
+            env.console, context,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );

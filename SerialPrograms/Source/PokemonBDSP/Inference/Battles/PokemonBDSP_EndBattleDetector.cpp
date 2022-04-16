@@ -32,10 +32,7 @@ EndBattleWatcher::EndBattleWatcher(const ImageFloatBox& box, Color color)
 void EndBattleWatcher::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
-bool EndBattleWatcher::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool EndBattleWatcher::process_frame(const QImage& frame, WallClock timestamp){
     return battle_is_over(frame);
 }
 bool EndBattleWatcher::battle_is_over(const QImage& frame){

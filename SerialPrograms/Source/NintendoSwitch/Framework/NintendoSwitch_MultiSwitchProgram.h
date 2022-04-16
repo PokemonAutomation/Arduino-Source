@@ -42,6 +42,7 @@ private:
     friend class MultiSwitchProgramUI;
     MultiSwitchProgramEnvironment(
         const ProgramInfo& program_info,
+        CancellableScope& scope,
         LoggerQt& logger,
         StatsTracker* current_stats,
         const StatsTracker* historical_stats,

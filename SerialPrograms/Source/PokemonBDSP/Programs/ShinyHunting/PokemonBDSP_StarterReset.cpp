@@ -124,11 +124,11 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         //  Mash B until we see the briefcase.
         ImageMatchWatcher detector(briefcase, {0.5, 0.1, 0.5, 0.7}, 100, true);
         int ret = run_until(
-            env, env.console, context,
+            env.console, context,
             [](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
-            { &detector }
+            {{detector}}
         );
         if (ret == 0){
             env.log("Detected briefcase!");
@@ -166,8 +166,8 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         {
             SelectionArrowFinder selection_arrow(env.console, {0.50, 0.60, 0.35, 0.20}, COLOR_RED);
             ret = wait_until(
-                env, env.console, context, std::chrono::seconds(3),
-                { &selection_arrow }
+                env.console, context, std::chrono::seconds(3),
+                {{selection_arrow}}
             );
             if (ret == 0){
                 env.log("Detected selection prompt!");
@@ -185,7 +185,7 @@ void StarterReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         DoublesShinyDetection result_wild;
         ShinyDetectionResult result_own;
         detect_shiny_battle(
-            env, env.console, context,
+            env.console, context,
             result_wild, result_own,
             YOUR_POKEMON,
             std::chrono::seconds(30)

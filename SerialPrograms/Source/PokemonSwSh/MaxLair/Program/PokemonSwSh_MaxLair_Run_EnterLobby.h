@@ -17,7 +17,7 @@ namespace MaxLairInternal{
 
 
 QImage enter_lobby(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     size_t boss_slot, bool connect_to_internet,
     ReadableQuantity999& ore
 );

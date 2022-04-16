@@ -67,10 +67,7 @@ ShortDialogWatcher::ShortDialogWatcher(Color color)
 void ShortDialogWatcher::make_overlays(VideoOverlaySet& items) const{
     ShortDialogDetector::make_overlays(items);
 }
-bool ShortDialogWatcher::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point
-){
+bool ShortDialogWatcher::process_frame(const QImage& frame, WallClock){
     return detect(frame);
 }
 
@@ -128,10 +125,7 @@ void ShortDialogPromptDetector::make_overlays(VideoOverlaySet& items) const{
     m_dialog.make_overlays(items);
     m_arrow.make_overlays(items);
 }
-bool ShortDialogPromptDetector::process_frame(
-    const QImage& screen,
-    std::chrono::system_clock::time_point timestamp
-){
+bool ShortDialogPromptDetector::process_frame(const QImage& screen, WallClock timestamp){
     return m_dialog.detect(screen) && m_arrow.process_frame(screen, timestamp);
 }
 

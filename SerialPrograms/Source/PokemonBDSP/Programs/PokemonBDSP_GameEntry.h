@@ -17,7 +17,7 @@ namespace PokemonBDSP{
 
 
 bool gamemenu_to_ingame(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     uint16_t mash_duration, uint16_t enter_game_timeout
 );
 bool openedgame_to_ingame(

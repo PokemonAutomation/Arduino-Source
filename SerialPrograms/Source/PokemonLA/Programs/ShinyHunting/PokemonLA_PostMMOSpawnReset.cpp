@@ -14,7 +14,7 @@
 #include "PokemonLA/Inference/PokemonLA_MapDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 #include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
-#include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
+#include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "PokemonLA_PostMMOSpawnReset.h"
@@ -50,6 +50,7 @@ PostMMOSpawnReset::PostMMOSpawnReset(const PostMMOSpawnReset_Descriptor& descrip
         "<b>Wait Time:</b><br> Wait time after movement.",
         "3 * TICKS_PER_SECOND"
     )
+    , SHINY_DETECTED("Shiny Detected Action", "", "0 * TICKS_PER_SECOND")
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -59,6 +60,7 @@ PostMMOSpawnReset::PostMMOSpawnReset(const PostMMOSpawnReset_Descriptor& descrip
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(TURN_DURATION);
     PA_ADD_OPTION(FORWARD_DURATION);
     PA_ADD_OPTION(WAIT_DURATION);
@@ -98,17 +100,19 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
 
     // From game to Switch Home
     pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-    // Restart the game and go to game menu (where "Press A" is shown to enter the game)
-    switch_home_to_gamemenu(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
     {
-        ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
-        run_until(
-            env, env.console, context,
+        float shiny_coefficient = 1.0;
+        ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+            //  Warning: This callback will be run from a different thread than this function.
+            stats.shinies++;
+            shiny_coefficient = error_coefficient;
+            return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
+        });
+
+        int ret = run_until(
+            env.console, context,
             [this, &env](BotBaseContext& context){
-                // TODO: gamemenu_to_ingame has wait_until(). Nesting wait_until() into run_until() is not the intended usage of run_until().
-                // When outer run_until() wants to break out, the inner wait_until() may not be able to do that until itself is finished.
-                // But this is fine in the current use case, as we are OK with the shiny sound detector stopping the program a little late.
-                gamemenu_to_ingame(env, env.console, context, GameSettings::instance().ENTER_GAME_MASH, GameSettings::instance().ENTER_GAME_WAIT);
+                reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
                 env.console.log("Entered game! Checking shiny sound...");
 
                 // forward portion
@@ -124,10 +128,10 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
 
                 context.wait_for_all_requests();
             },
-            { &shiny_detector });
-        if (shiny_detector.detected()){
-           stats.shinies++;
-           on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_detector.results());
+            {{shiny_detector}}
+        );
+        if (ret == 0){
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_coefficient);
         }
     }
 

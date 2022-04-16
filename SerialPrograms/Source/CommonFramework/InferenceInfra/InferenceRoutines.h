@@ -12,7 +12,7 @@
 #include <vector>
 #include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "VisualInferenceCallback.h"
+#include "InferenceCallback.h"
 
 namespace PokemonAutomation{
 
@@ -24,27 +24,29 @@ class ProgramEnvironment;
 //
 //  Returns:
 //      -   The index of the trigger if that's what stopped it.
-//      -   -1 nothing triggered before timeout.
+//      -   -1 if nothing triggered before timeout.
 //
-//  Exceptions throw in either the commands or the triggers will stop
-//  everything and be passed out of this function.
+//  Exceptions thrown in either the commands or the callbacks will stop
+//  everything and will be propagated out of this function.
 int wait_until(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
-    std::chrono::system_clock::time_point deadline,
-    std::vector<InferenceCallback*>&& callbacks,
-    std::chrono::milliseconds period = std::chrono::milliseconds(50)
+    ConsoleHandle& console, BotBaseContext& context,
+    WallClock deadline,
+    const std::vector<PeriodicInferenceCallback>& callbacks,
+    std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
+    std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
 );
 inline int wait_until(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     std::chrono::milliseconds timeout,
-    std::vector<InferenceCallback*>&& callbacks,
-    std::chrono::milliseconds period = std::chrono::milliseconds(50)
+    const std::vector<PeriodicInferenceCallback>& callbacks,
+    std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
+    std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
 ){
     return wait_until(
-        env, console, context,
-        std::chrono::system_clock::now() + timeout,
-        std::move(callbacks),
-        period
+        console, context,
+        current_time() + timeout,
+        callbacks,
+        default_video_period, default_audio_period
     );
 }
 
@@ -54,15 +56,16 @@ inline int wait_until(
 //
 //  Returns:
 //      -   The index of the trigger if that's what stopped it.
-//      -   -1 nothing triggered before command fimished.
+//      -   -1 if nothing triggered before command fimished.
 //
-//  Exceptions throw in either the commands or the triggers will stop
-//  everything and be passed out of this function.
+//  Exceptions thrown in either the commands or the callbacks will stop
+//  everything and will be propagated out of this function.
 int run_until(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     std::function<void(BotBaseContext& context)>&& command,
-    std::vector<InferenceCallback*>&& callbacks,
-    std::chrono::milliseconds period = std::chrono::milliseconds(50)
+    const std::vector<PeriodicInferenceCallback>& callbacks,
+    std::chrono::milliseconds default_video_period = std::chrono::milliseconds(50),
+    std::chrono::milliseconds default_audio_period = std::chrono::milliseconds(20)
 );
 
 

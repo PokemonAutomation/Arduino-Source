@@ -175,7 +175,7 @@ void DenRoller::program(SingleSwitchProgramEnvironment& env, BotBaseContext& con
         rollback_date_from_home(context, SKIPS);
 //        reset_game_from_home(TOLERATE_SYSTEM_UPDATE_MENU_SLOW);
         reset_game_from_home_with_inference(
-            env, env.console, context,
+            env.console, context,
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
         );
     }

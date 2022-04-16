@@ -33,7 +33,7 @@ bool back_out_to_overworld_with_overlap(
 
 //  Mash B to back out all the overworld completely. (disabling glitch)
 void back_out_to_overworld(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     const QImage& start
 );
 

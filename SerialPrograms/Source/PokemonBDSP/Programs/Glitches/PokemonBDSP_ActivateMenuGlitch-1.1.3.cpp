@@ -56,8 +56,8 @@ void ActivateMenuGlitch113::program(SingleSwitchProgramEnvironment& env, BotBase
     context.wait_for_all_requests();
     MapWatcher detector;
     int ret = wait_until(
-        env, console, context, std::chrono::seconds(2),
-        { &detector }
+        console, context, std::chrono::seconds(2),
+        {{detector}}
     );
     if (ret < 0){
         throw OperationFailedException(console, "Map not detected after 2 seconds.");

@@ -18,25 +18,21 @@ namespace PokemonLA{
 EscapeFromAttack::EscapeFromAttack(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     std::chrono::seconds time_min,
-    std::chrono::seconds time_limit,
-    bool stop_on_shiny
+    std::chrono::seconds time_limit
 )
     : SuperControlSession(env, console, context)
-    , m_min_stop(std::chrono::system_clock::now() + time_min)
-    , m_deadline(std::chrono::system_clock::now() + time_limit)
-    , m_stop_on_shiny(stop_on_shiny)
+    , m_min_stop(current_time() + time_min)
+    , m_deadline(current_time() + time_limit)
     , m_attacked(console)
     , m_mount(console)
     , m_centerA(console, console, ButtonType::ButtonA, {0.40, 0.50, 0.40, 0.50}, std::chrono::milliseconds(200), false)
     , m_leftB(console, console, ButtonType::ButtonB, {0.02, 0.40, 0.05, 0.20}, std::chrono::milliseconds(200), false)
-    , m_shiny_listener(console, false)
     , m_get_on_sneasler_time(WallClock::min())
 {
     *this += m_attacked;
     *this += m_mount;
     *this += m_centerA;
     *this += m_leftB;
-    *this += m_shiny_listener;
 
     const std::chrono::milliseconds GET_ON_BRAVIARY_TIME_MILLIS(GET_ON_BRAVIARY_TIME * 1000 / TICKS_PER_SECOND);
 
@@ -104,7 +100,7 @@ EscapeFromAttack::EscapeFromAttack(
     });
     register_state_command(State::DASH_FORWARD, [=](){
         bool delay_dash =
-            std::chrono::system_clock::now() < m_get_on_sneasler_time + GET_ON_BRAVIARY_TIME_MILLIS;
+            current_time() < m_get_on_sneasler_time + GET_ON_BRAVIARY_TIME_MILLIS;
         if (delay_dash){
             m_console.log("Dashing forward... (delayed due to being on Sneasler)");
         }else{
@@ -123,7 +119,7 @@ EscapeFromAttack::EscapeFromAttack(
         m_active_command->dispatch([=](BotBaseContext& context){
             pbf_press_button(context, BUTTON_A, 20, 230);
         });
-        m_get_on_sneasler_time = std::chrono::system_clock::now();
+        m_get_on_sneasler_time = current_time();
         return false;
     });
     register_state_command(State::CLIMBING, [=](){
@@ -139,10 +135,6 @@ bool EscapeFromAttack::run_state(AsyncCommandSession& commands, WallClock timest
         return true;
     }
     if (m_attacked.state() == UnderAttackState::SAFE && timestamp >= m_min_stop){
-        return true;
-    }
-    if (m_stop_on_shiny && m_shiny_listener.detected()){
-//        cout << "EscapeFromAttack::run_state(): shiny out" << endl;
         return true;
     }
 

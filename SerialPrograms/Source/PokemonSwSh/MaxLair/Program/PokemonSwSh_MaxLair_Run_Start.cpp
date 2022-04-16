@@ -41,18 +41,18 @@ bool abort_if_error(MultiSwitchProgramEnvironment& env, CancellableScope& scope,
 }
 
 bool wait_for_all_join(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     const QImage& entrance,
     size_t start_players
 ){
     LobbyJoinedDetector joined_detector(start_players, false);
     EntranceDetector entrance_detector(entrance);
     int result = wait_until(
-        env, console, context,
+        console, context,
         std::chrono::seconds(10),
         {
-            &joined_detector,
-            &entrance_detector,
+            {joined_detector},
+            {entrance_detector},
         },
         INFERENCE_RATE
     );
@@ -75,7 +75,7 @@ class AllJoinedTracker final : public Cancellable{
 public:
     AllJoinedTracker(
         CancellableScope& scope, size_t consoles,
-        std::chrono::system_clock::time_point time_limit
+        WallClock time_limit
     )
         : m_time_limit(time_limit)
         , m_consoles(consoles)
@@ -98,14 +98,14 @@ public:
             if (m_counter >= m_consoles){
                 return true;
             }
-            if (std::chrono::system_clock::now() > m_time_limit){
+            if (current_time() > m_time_limit){
                 return false;
             }
         }
     }
 
-    virtual bool cancel() noexcept override{
-        if (Cancellable::cancel()){
+    virtual bool cancel(std::exception_ptr exception) noexcept override{
+        if (Cancellable::cancel(std::move(exception))){
             return true;
         }
         std::lock_guard<std::mutex> lg(m_lock);
@@ -117,7 +117,7 @@ private:
     std::mutex m_lock;
     std::condition_variable m_cv;
 
-    std::chrono::system_clock::time_point m_time_limit;
+    WallClock m_time_limit;
     size_t m_consoles;
     size_t m_counter;
 };
@@ -138,7 +138,7 @@ bool start_raid_local(
     if (env.consoles.size() == 1){
         BotBaseContext context(scope, host.botbase());
         return start_raid_self_solo(
-            env, host, context,
+            host, context,
             state_tracker, entrance[0], boss_slot, console_stats[0].ore
         );
     }
@@ -154,7 +154,7 @@ bool start_raid_local(
         bool is_host = index == host.index();
 
         entrance[index] = enter_lobby(
-            env, console, context,
+            console, context,
             is_host ? boss_slot : 0,
             (HostingMode)(size_t)settings.MODE == HostingMode::HOST_ONLINE,
             console_stats[index].ore
@@ -199,7 +199,7 @@ bool start_raid_local(
         pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
     });
 
-    auto time_limit = std::chrono::system_clock::now() +
+    auto time_limit = current_time() +
         std::chrono::milliseconds(settings.LOBBY_WAIT_DELAY * 1000 / TICKS_PER_SECOND);
 
     AllJoinedTracker joined_tracker(scope, env.consoles.size(), time_limit);
@@ -209,7 +209,7 @@ bool start_raid_local(
         size_t index = console.index();
 
         //  Wait for a player to show up. This lets you ready up.
-        if (!wait_for_a_player(env, console, context, entrance[index], time_limit)){
+        if (!wait_for_a_player(console, context, entrance[index], time_limit)){
             errors.fetch_add(1);
             return;
         }
@@ -232,7 +232,7 @@ bool start_raid_local(
 
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
         size_t index = console.index();
-        if (!wait_for_all_join(env, console, context, entrance[index], env.consoles.size())){
+        if (!wait_for_all_join(console, context, entrance[index], env.consoles.size())){
             console.log("Switches joined into different raids.", COLOR_RED);
             errors.fetch_add(1);
             return;
@@ -251,7 +251,7 @@ bool start_raid_local(
 
         //  Wait
         size_t index = console.index();
-        if (!wait_for_lobby_ready(env, console, context, entrance[index], env.consoles.size(), env.consoles.size(), time_limit)){
+        if (!wait_for_lobby_ready(console, context, entrance[index], env.consoles.size(), env.consoles.size(), time_limit)){
             errors.fetch_add(1);
             pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
             return;
@@ -264,7 +264,7 @@ bool start_raid_local(
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
         //  Start
         size_t index = console.index();
-        if (!start_adventure(env, console, context, env.consoles.size(), entrance[index])){
+        if (!start_adventure(console, context, env.consoles.size(), entrance[index])){
             errors.fetch_add(1);
             pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
             return;
@@ -311,7 +311,7 @@ bool start_raid_host(
         bool is_host = index == host.index();
 
         entrance[index] = enter_lobby(
-            env, console, context,
+            console, context,
             is_host ? boss_slot : 0,
             (HostingMode)(size_t)settings.MODE == HostingMode::HOST_ONLINE,
             console_stats[index].ore
@@ -360,7 +360,7 @@ bool start_raid_host(
         pbf_press_button(context, BUTTON_A, 10, TICKS_PER_SECOND);
     });
 
-    auto time_limit = std::chrono::system_clock::now() +
+    auto time_limit = current_time() +
         std::chrono::milliseconds(settings.LOBBY_WAIT_DELAY * 1000 / TICKS_PER_SECOND);
 
     AllJoinedTracker joined_tracker(scope, env.consoles.size(), time_limit);
@@ -369,7 +369,7 @@ bool start_raid_host(
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
         //  Wait for a player to show up. This lets you ready up.
         size_t index = console.index();
-        if (!wait_for_a_player(env, console, context, entrance[index], time_limit)){
+        if (!wait_for_a_player(console, context, entrance[index], time_limit)){
             errors.fetch_add(1);
             return;
         }
@@ -392,7 +392,7 @@ bool start_raid_host(
 
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
         size_t index = console.index();
-        if (!wait_for_all_join(env, console, context, entrance[index], env.consoles.size())){
+        if (!wait_for_all_join(console, context, entrance[index], env.consoles.size())){
             console.log("Switches joined into different raids.", COLOR_RED);
             errors.fetch_add(1);
             return;
@@ -420,7 +420,7 @@ bool start_raid_host(
 
         //  Wait
         size_t index = console.index();
-        if (!wait_for_lobby_ready(env, console, context, entrance[index], env.consoles.size(), 4, time_limit)){
+        if (!wait_for_lobby_ready(console, context, entrance[index], env.consoles.size(), 4, time_limit)){
             errors.fetch_add(1);
             pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
             return;
@@ -433,7 +433,7 @@ bool start_raid_host(
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
         //  Start
         size_t index = console.index();
-        if (!start_adventure(env, console, context, env.consoles.size(), entrance[index])){
+        if (!start_adventure(console, context, env.consoles.size(), entrance[index])){
             errors.fetch_add(1);
             pbf_mash_button(context, BUTTON_B, 10 * TICKS_PER_SECOND);
             return;

@@ -17,7 +17,7 @@
 #include "PokemonLA/Inference/PokemonLA_MapDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 #include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
-#include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
+#include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "PokemonLA_CrobatFinder.h"
@@ -41,7 +41,7 @@ CrobatFinder_Descriptor::CrobatFinder_Descriptor()
 
 CrobatFinder::CrobatFinder(const CrobatFinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
-    , SHINY_DETECTED("2 * TICKS_PER_SECOND")
+    , SHINY_DETECTED("Shiny Detected Action", "", "2 * TICKS_PER_SECOND")
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -51,6 +51,7 @@ CrobatFinder::CrobatFinder(const CrobatFinder_Descriptor& descriptor)
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -118,9 +119,15 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCon
     env.console.log("Beginning Shiny Detection...");
     // start the shiny detection, there's nothing initially
     {
-        ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
-        run_until(
-            env, env.console, context,
+        float shiny_coefficient = 1.0;
+        ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+            //  Warning: This callback will be run from a different thread than this function.
+            stats.shinies++;
+            shiny_coefficient = error_coefficient;
+            return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
+        });
+        int ret = run_until(
+            env.console, context,
             [](BotBaseContext& context){
 
                 // FORWARD PORTION OF CAVE UNTIL LEDGE
@@ -140,11 +147,10 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCon
                 pbf_move_left_joystick(context, 128, 0, (uint16_t)(3.8 * TICKS_PER_SECOND), 0); // forward to crobat check
 
             },
-            { &shiny_detector }
+            {{shiny_detector}}
         );
-        if (shiny_detector.detected()){
-           stats.shinies++;
-           on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_detector.results());
+        if (ret == 0){
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_coefficient);
         }
     };
 

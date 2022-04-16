@@ -11,14 +11,13 @@
 #include "PokemonLA/PokemonLA_Locations.h"
 
 namespace PokemonAutomation{
-    class ProgramEnvironment;
     class BotBaseContext;
     class ConsoleHandle;
 namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-MapRegion detect_selected_region(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+MapRegion detect_selected_region(ConsoleHandle& console, BotBaseContext& context);
 
 
 

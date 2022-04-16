@@ -18,8 +18,8 @@
 #include "PokemonLA/Inference/PokemonLA_MapDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 #include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
-#include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Inference/PokemonLA_UnderAttackDetector.h"
+#include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Programs/PokemonLA_MountChange.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
@@ -45,7 +45,7 @@ UnownFinder_Descriptor::UnownFinder_Descriptor()
 
 UnownFinder::UnownFinder(const UnownFinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
-    , SHINY_DETECTED("0 * TICKS_PER_SECOND")
+    , SHINY_DETECTED("Shiny Detected Action", "", "0 * TICKS_PER_SECOND")
     , SKIP_PATH_SHINY("<b>Skip any Shines on the Path:</b><br>Only care about shines inside the ruins.", false)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -56,6 +56,7 @@ UnownFinder::UnownFinder(const UnownFinder_Descriptor& descriptor)
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(SKIP_PATH_SHINY);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -116,46 +117,56 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     change_mount(env.console, context, MountState::BRAVIARY_ON);
 
-    //Start path
+    // Start path
     env.console.log("Beginning Shiny Detection...");
     {
-        ShinyDetectedActionOption SHINY_DETECTED_ON_ROUTE(QString::number(SHINY_DETECTED.SCREENSHOT_DELAY));
+        ShinyDetectedActionOption SHINY_DETECTED_ON_ROUTE("Shiny Detected Action", "", QString::number(SHINY_DETECTED.SCREENSHOT_DELAY));
         SHINY_DETECTED_ON_ROUTE.NOTIFICATIONS = SHINY_DETECTED.NOTIFICATIONS;
         SHINY_DETECTED_ON_ROUTE.ACTION.set(!SKIP_PATH_SHINY);
 
-        ShinySoundDetector shiny_detector_route(env.console, SHINY_DETECTED_ON_ROUTE.stop_on_shiny());
-        run_until(
-            env, env.console, context,
+        float shiny_coefficient = 1.0;
+        ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+            //  Warning: This callback will be run from a different thread than this function.
+            stats.shinies++;
+            shiny_coefficient = error_coefficient;
+            return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
+        });
+
+        int ret = run_until(
+            env.console, context,
             [](BotBaseContext& context){
                ruins_entrance_route(context);
             },
-            { &shiny_detector_route }
+            {{shiny_detector}}
         );
-
-        if (shiny_detector_route.detected()){
-           stats.shinies++;
-           on_shiny_sound(env, env.console, context, SHINY_DETECTED_ON_ROUTE, shiny_detector_route.results());
+        if (ret == 0){
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_coefficient);
         }
+    }
 
+    // Enter ruins
+    {
+        float shiny_coefficient = 1.0;
+        ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+            //  Warning: This callback will be run from a different thread than this function.
+            stats.shinies++;
+            shiny_coefficient = error_coefficient;
+            return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
+        });
 
-        ShinySoundDetector shiny_detector_ruins(env.console, SHINY_DETECTED.stop_on_shiny());
-
-        run_until(env, env.console, context,
+        int ret = run_until(env.console, context,
             [](BotBaseContext& context){
                enter_ruins(context);
             },
-            { &shiny_detector_ruins }
+            {{shiny_detector}}
         );
-
-
-        if (shiny_detector_ruins.detected()){
-           stats.shinies++;
-           on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_detector_ruins.results());
+        if (ret == 0){
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_coefficient);
         }
-    };
+    }
 
     env.console.log("No shiny detected, returning to Jubilife!");
-    goto_camp_from_overworld(env, env.console, context, SHINY_DETECTED, stats);
+    goto_camp_from_overworld(env, env.console, context);
     pbf_press_dpad(context, DPAD_RIGHT, 10, 10);
     goto_professor(env.console, context, Camp::MIRELANDS_MIRELANDS);
     from_professor_return_to_jubilife(env, env.console, context);

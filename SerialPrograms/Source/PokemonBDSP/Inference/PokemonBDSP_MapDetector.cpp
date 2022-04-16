@@ -60,10 +60,7 @@ MapWatcher::MapWatcher(Color color)
 void MapWatcher::make_overlays(VideoOverlaySet& items) const{
     MapDetector::make_overlays(items);
 }
-bool MapWatcher::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool MapWatcher::process_frame(const QImage& frame, WallClock timestamp){
     return detect(frame);
 }
 

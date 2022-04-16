@@ -31,10 +31,7 @@ void StartBattleDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_screen_box);
     m_dialog.make_overlays(items);
 }
-bool StartBattleDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool StartBattleDetector::process_frame(const QImage& frame, WallClock timestamp){
     return detect(frame);
 }
 
@@ -62,10 +59,7 @@ void StartBattleMenuOverlapDetector::make_overlays(VideoOverlaySet& items) const
     items.add(COLOR_RED, m_left);
     items.add(COLOR_RED, m_right);
 }
-bool StartBattleMenuOverlapDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool StartBattleMenuOverlapDetector::process_frame(const QImage& frame, WallClock timestamp){
     if (detect(frame)){
         m_battle_detected.store(true, std::memory_order_release);
         return true;

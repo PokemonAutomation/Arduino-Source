@@ -16,7 +16,7 @@ namespace PokemonSwSh{
 
 
 bool connect_to_internet_with_inference(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     std::chrono::milliseconds post_wait_time,
     uint16_t timeout_ticks
 ){
@@ -31,9 +31,9 @@ bool connect_to_internet_with_inference(
             context.wait_for_all_requests();
         }
         int result = wait_until(
-            env, console, context,
+            console, context,
             std::chrono::seconds(10),
-            { &detector }
+            {{detector}}
         );
         if (result == 0){
             console.log("Y-COMM detected.");
@@ -56,11 +56,11 @@ bool connect_to_internet_with_inference(
     {
         YCommMenuDetector detector(false);
         int result = run_until(
-            env, console, context,
+            console, context,
             [&](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, timeout_ticks);
             },
-            { &detector }
+            {{detector}}
         );
         if (result == 0){
             console.log("Y-COMM no longer detected. Assume done connected to internet.");

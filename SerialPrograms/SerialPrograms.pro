@@ -76,10 +76,13 @@ SOURCES += \
     ../Common/Cpp/CpuId.cpp \
     ../Common/Cpp/Exceptions.cpp \
     ../Common/Cpp/FireForgetDispatcher.cpp \
+    ../Common/Cpp/LifetimeSanitizer.cpp \
     ../Common/Cpp/PanicDump.cpp \
     ../Common/Cpp/ParallelTaskRunner.cpp \
+    ../Common/Cpp/PeriodicScheduler.cpp \
     ../Common/Cpp/PrettyPrint.cpp \
     ../Common/Cpp/SpinLock.cpp \
+    ../Common/Cpp/Time.cpp \
     ../Common/Cpp/Unicode.cpp \
     ../Common/Microcontroller/DeviceRoutines.cpp \
     ../Common/NintendoSwitch/NintendoSwitch_Tools.cpp \
@@ -150,6 +153,7 @@ SOURCES += \
     Source/CommonFramework/ImageTypes/BinaryImage.cpp \
     Source/CommonFramework/ImageTypes/ImageReference.cpp \
     Source/CommonFramework/Inference/AnomalyDetector.cpp \
+    Source/CommonFramework/Inference/AudioPerSpectrumDetectorBase.cpp \
     Source/CommonFramework/Inference/AudioTemplateCache.cpp \
     Source/CommonFramework/Inference/BlackBorderDetector.cpp \
     Source/CommonFramework/Inference/BlackScreenDetector.cpp \
@@ -158,10 +162,11 @@ SOURCES += \
     Source/CommonFramework/Inference/ImageTools.cpp \
     Source/CommonFramework/Inference/SpectrogramMatcher.cpp \
     Source/CommonFramework/Inference/StatAccumulator.cpp \
-    Source/CommonFramework/InferenceInfra/AudioInferenceSession.cpp \
+    Source/CommonFramework/InferenceInfra/AudioInferencePivot.cpp \
     Source/CommonFramework/InferenceInfra/InferenceRoutines.cpp \
+    Source/CommonFramework/InferenceInfra/InferenceSession.cpp \
     Source/CommonFramework/InferenceInfra/VisualInferenceCallback.cpp \
-    Source/CommonFramework/InferenceInfra/VisualInferenceSession.cpp \
+    Source/CommonFramework/InferenceInfra/VisualInferencePivot.cpp \
     Source/CommonFramework/Language.cpp \
     Source/CommonFramework/Logging/FileWindowLogger.cpp \
     Source/CommonFramework/Logging/LoggerQt.cpp \
@@ -215,6 +220,7 @@ SOURCES += \
     Source/CommonFramework/PersistentSettings.cpp \
     Source/CommonFramework/Tools/BlackBorderCheck.cpp \
     Source/CommonFramework/Tools/BotBaseHandle.cpp \
+    Source/CommonFramework/Tools/ConsoleHandle.cpp \
     Source/CommonFramework/Tools/ErrorDumper.cpp \
     Source/CommonFramework/Tools/InterruptableCommands.cpp \
     Source/CommonFramework/Tools/MultiConsoleErrors.cpp \
@@ -229,6 +235,7 @@ SOURCES += \
     Source/CommonFramework/VideoPipeline/CameraWidgetQt6.cpp \
     Source/CommonFramework/VideoPipeline/VideoDisplayWidget.cpp \
     Source/CommonFramework/VideoPipeline/VideoOverlayWidget.cpp \
+    Source/CommonFramework/VideoPipeline/VideoToolsQt5.cpp \
     Source/CommonFramework/Windows/ButtonDiagram.cpp \
     Source/CommonFramework/Windows/MainWindow.cpp \
     Source/Integrations/DiscordIntegrationSettings.cpp \
@@ -406,6 +413,9 @@ SOURCES += \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfBoxTrade.cpp \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfTouchTrade.cpp \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.cpp \
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.cpp \
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.cpp \
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.cpp \
@@ -416,19 +426,18 @@ SOURCES += \
     Source/PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.cpp \
-    Source/PokemonLA/Inference/PokemonLA_AlphaRoarDetector.cpp \
-    Source/PokemonLA/Inference/PokemonLA_BattleMenuDetector.cpp \
-    Source/PokemonLA/Inference/PokemonLA_BattleMoveSelectionDetector.cpp \
-    Source/PokemonLA/Inference/PokemonLA_BattlePokemonSwitchDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.cpp \
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_ItemCompatibilityDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_MapDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_MountDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_NotificationReader.cpp \
     Source/PokemonLA/Inference/PokemonLA_OutbreakReader.cpp \
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.cpp \
-    Source/PokemonLA/Inference/PokemonLA_ShinySoundDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.cpp \
+    Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.cpp \
+    Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaRoarDetector.cpp \
+    Source/PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.cpp \
     Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.cpp \
     Source/PokemonLA/Options/PokemonLA_CustomPathTable.cpp \
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.cpp \
@@ -439,7 +448,10 @@ SOURCES += \
     Source/PokemonLA/PokemonLA_Settings.cpp \
     Source/PokemonLA/PokemonLA_TravelLocations.cpp \
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.cpp \
+    Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.cpp \
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.cpp \
+    Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.cpp \
+    Source/PokemonLA/Programs/PokemonLA_BattleRoutines.cpp \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.cpp \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.cpp \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp \
@@ -450,6 +462,7 @@ SOURCES += \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.cpp \
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaMusicListener.cpp \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.cpp \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_MountDetectionTest.cpp \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.cpp \
@@ -671,11 +684,14 @@ HEADERS += \
     ../Common/Cpp/FireForgetDispatcher.h \
     ../Common/Cpp/FixedLimitVector.h \
     ../Common/Cpp/FixedLimitVector.tpp \
+    ../Common/Cpp/LifetimeSanitizer.h \
     ../Common/Cpp/PanicDump.h \
     ../Common/Cpp/ParallelTaskRunner.h \
+    ../Common/Cpp/PeriodicScheduler.h \
     ../Common/Cpp/PrettyPrint.h \
     ../Common/Cpp/SIMDDebuggers.h \
     ../Common/Cpp/SpinLock.h \
+    ../Common/Cpp/Time.h \
     ../Common/Cpp/Unicode.h \
     ../Common/Microcontroller/DeviceRoutines.h \
     ../Common/Microcontroller/MessageProtocol.h \
@@ -763,6 +779,7 @@ HEADERS += \
     Source/CommonFramework/ImageTypes/BinaryImage.h \
     Source/CommonFramework/ImageTypes/ImageReference.h \
     Source/CommonFramework/Inference/AnomalyDetector.h \
+    Source/CommonFramework/Inference/AudioPerSpectrumDetectorBase.h \
     Source/CommonFramework/Inference/AudioTemplateCache.h \
     Source/CommonFramework/Inference/BlackBorderDetector.h \
     Source/CommonFramework/Inference/BlackScreenDetector.h \
@@ -776,11 +793,12 @@ HEADERS += \
     Source/CommonFramework/Inference/TimeWindowStatTracker.h \
     Source/CommonFramework/Inference/VisualDetector.h \
     Source/CommonFramework/InferenceInfra/AudioInferenceCallback.h \
-    Source/CommonFramework/InferenceInfra/AudioInferenceSession.h \
+    Source/CommonFramework/InferenceInfra/AudioInferencePivot.h \
     Source/CommonFramework/InferenceInfra/InferenceCallback.h \
     Source/CommonFramework/InferenceInfra/InferenceRoutines.h \
+    Source/CommonFramework/InferenceInfra/InferenceSession.h \
     Source/CommonFramework/InferenceInfra/VisualInferenceCallback.h \
-    Source/CommonFramework/InferenceInfra/VisualInferenceSession.h \
+    Source/CommonFramework/InferenceInfra/VisualInferencePivot.h \
     Source/CommonFramework/Language.h \
     Source/CommonFramework/Logging/FileWindowLogger.h \
     Source/CommonFramework/Logging/LoggerQt.h \
@@ -856,6 +874,7 @@ HEADERS += \
     Source/CommonFramework/VideoPipeline/CameraWidgetQt6.h \
     Source/CommonFramework/VideoPipeline/VideoDisplayWidget.h \
     Source/CommonFramework/VideoPipeline/VideoOverlayWidget.h \
+    Source/CommonFramework/VideoPipeline/VideoToolsQt5.h \
     Source/CommonFramework/VideoPipeline/VideoWidget.h \
     Source/CommonFramework/Windows/ButtonDiagram.h \
     Source/CommonFramework/Windows/DpiScaler.h \
@@ -1069,6 +1088,9 @@ HEADERS += \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfBoxTrade.h \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfTouchTrade.h \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.h \
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h \
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.h \
+    Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.h \
@@ -1079,20 +1101,19 @@ HEADERS += \
     Source/PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h \
-    Source/PokemonLA/Inference/PokemonLA_AlphaRoarDetector.h \
-    Source/PokemonLA/Inference/PokemonLA_BattleMenuDetector.h \
-    Source/PokemonLA/Inference/PokemonLA_BattleMoveSelectionDetector.h \
-    Source/PokemonLA/Inference/PokemonLA_BattlePokemonSwitchDetector.h \
     Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.h \
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_ItemCompatibilityDetector.h \
     Source/PokemonLA/Inference/PokemonLA_MapDetector.h \
     Source/PokemonLA/Inference/PokemonLA_MountDetector.h \
     Source/PokemonLA/Inference/PokemonLA_NotificationReader.h \
     Source/PokemonLA/Inference/PokemonLA_OutbreakReader.h \
     Source/PokemonLA/Inference/PokemonLA_OverworldDetector.h \
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h \
-    Source/PokemonLA/Inference/PokemonLA_ShinySoundDetector.h \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.h \
+    Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.h \
+    Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaRoarDetector.h \
+    Source/PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h \
     Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h \
     Source/PokemonLA/Options/PokemonLA_CustomPathTable.h \
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.h \
@@ -1103,7 +1124,10 @@ HEADERS += \
     Source/PokemonLA/PokemonLA_Settings.h \
     Source/PokemonLA/PokemonLA_TravelLocations.h \
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.h \
+    Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.h \
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.h \
+    Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.h \
+    Source/PokemonLA/Programs/PokemonLA_BattleRoutines.h \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.h \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.h \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.h \
@@ -1114,6 +1138,7 @@ HEADERS += \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.h \
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaMusicListener.h \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.h \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_MountDetectionTest.h \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.h \

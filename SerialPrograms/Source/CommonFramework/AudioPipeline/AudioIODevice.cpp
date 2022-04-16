@@ -206,7 +206,7 @@ qint64 AudioIODevice::writeData(const char* data, qint64 len)
     for(int j = 0; j < numChannels; j++){
         meanChannelVol[j] /= float(numSamples);
     }
-    auto currentTimepoint = std::chrono::system_clock::now();
+    WallClock currentTimepoint = current_time();
     const auto dur = std::chrono::duration_cast<std::chrono::microseconds>(currentTimepoint-m_lastWriteTimepoint);
     m_lastWriteTimepoint = currentTimepoint;
     std::cout << "T" << QThread::currentThread() << " Wrote " << numSamples << " audio frames after " <<

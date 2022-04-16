@@ -119,7 +119,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         {
             BlackScreenOverWatcher detector;
             int result = run_until(
-                env, env.console, context,
+                env.console, context,
                 [=](BotBaseContext& context){
                     if (POKEMON == 2){
                         pbf_mash_button(context, BUTTON_A, 10 * TICKS_PER_SECOND);
@@ -128,7 +128,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
                     }
                     pbf_mash_button(context, BUTTON_B, 20 * TICKS_PER_SECOND);
                 },
-                { &detector }
+                {{detector}}
             );
             if (result == 0){
                 env.log(STRING_POKEMON + " receive menu detected.", COLOR_PURPLE);
@@ -166,7 +166,7 @@ void StatsReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext& co
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
 
         reset_game_from_home_with_inference(
-            env, env.console, context,
+            env.console, context,
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
         );
     }

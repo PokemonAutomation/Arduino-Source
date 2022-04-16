@@ -62,14 +62,7 @@ private:
     bool run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
     //  Returns true if version 1.0.
-    bool start_dialog(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-
-    // cur_pokemon: which pokemon is currently on the field, in terms of battle order
-    // The first pokemon sent to the battle has cur_pokemon == 0
-    // cur_move: which move to use, can be: 0, 1, 2, 3
-    void use_move(Logger& logger, BotBaseContext& context, size_t cur_pokemon, size_t cur_move);
-
-    void switch_pokemon(ConsoleHandle& console, BotBaseContext& context, size_t& next_pokemon_in_party_order);
+    bool start_dialog(ConsoleHandle& console, BotBaseContext& context);
 
 private:
     class Stats;

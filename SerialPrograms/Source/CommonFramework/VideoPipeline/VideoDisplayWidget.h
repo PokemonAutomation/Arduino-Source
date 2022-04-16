@@ -15,12 +15,12 @@
 
 namespace PokemonAutomation{
 
-// The widget that owns the video window.
-// It is made by a VideoWidget that loads the video content from Switch
-// and a VideoOverlayWidget that renders inference boxes on top of the video
-// content to visualize inferences when running programs.
-// The VideoWidget is assigned by calling VideoDisplayWidget::set_video().
-// This function is called by CameraSelectorWidget.
+//  The widget that owns the video window.
+//  It is made by a VideoWidget that loads the video content from Switch
+//  and a VideoOverlayWidget that renders inference boxes on top of the video
+//  content to visualize inferences when running programs.
+//  The VideoWidget is assigned by calling VideoDisplayWidget::set_video().
+//  This function is called by CameraSelectorWidget.
 class VideoDisplayWidget : public QWidget, public VideoOverlay{
 public:
     VideoDisplayWidget(QWidget& parent);
@@ -41,7 +41,7 @@ public:
     std::vector<QSize> resolutions() const;
     void set_resolution(const QSize& resolution);
 
-    QImage snapshot();
+    QImage snapshot(WallClock* timestamp = nullptr);
 
 private:
     virtual void add_box(const ImageFloatBox& box, Color color) override;

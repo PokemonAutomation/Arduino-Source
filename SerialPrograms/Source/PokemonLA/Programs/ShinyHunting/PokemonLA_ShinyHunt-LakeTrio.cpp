@@ -149,11 +149,11 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 {{arcs, true}}
             );
             int ret = run_until(
-                env, env.console, context,
+                env.console, context,
                 [=](BotBaseContext& context){
                     pbf_mash_button(context, BUTTON_B, 60 * TICKS_PER_SECOND);
                 },
-                { &watcher }
+                {{watcher}}
             );
             if (ret < 0){
                 QImage screen = env.console.video().snapshot();
@@ -189,13 +189,13 @@ void ShinyHuntLakeTrio::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             );
             ShinySymbolWaiter shiny_symbol(env.console, SHINY_SYMBOL_BOX_BOTTOM);
             int ret = run_until(
-                env, env.console, context,
+                env.console, context,
                 [=](BotBaseContext& context){
                     pbf_press_button(context, BUTTON_ZL, 3 * TICKS_PER_SECOND, 0);
                 },
                 {
-                    &watcher,
-                    &shiny_symbol,
+                    {watcher},
+                    {shiny_symbol},
                 }
             );
             QImage screen = env.console.video().snapshot();

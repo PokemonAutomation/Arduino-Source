@@ -100,10 +100,7 @@ void SelectionArrowFinder::detect(const QImage& screen){
 void SelectionArrowFinder::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_box);
 }
-bool SelectionArrowFinder::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool SelectionArrowFinder::process_frame(const QImage& frame, WallClock timestamp){
     detect(frame);
 //    cout << m_arrow_boxes.size() << endl;
 //    if (!m_arrow_boxes.empty()){

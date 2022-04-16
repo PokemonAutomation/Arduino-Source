@@ -23,10 +23,7 @@ public:
 
     bool detect(const QImage& screen);
 
-    virtual bool on_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-    ) override final;
+    virtual bool on_frame(const QImage& frame, WallClock timestamp) override final;
 
 
 private:
@@ -44,10 +41,7 @@ public:
     bool detect(const QImage& screen);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-    ) override final;
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) override final;
 
 
 private:
@@ -65,10 +59,7 @@ public:
     bool detect(const QImage& screen);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-    ) override final;
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) override final;
 
 
 private:
@@ -81,16 +72,10 @@ class LobbyJoinedDetector : public VisualInferenceCallback{
 public:
     LobbyJoinedDetector(size_t consoles, bool invert);
 
-    size_t joined(
-        const QImage& screen,
-        std::chrono::system_clock::time_point timestamp
-    );
+    size_t joined(const QImage& screen, WallClock timestamp);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
-    virtual bool process_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-    ) override final;
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) override final;
 
 private:
     size_t m_consoles;
@@ -118,7 +103,7 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(
         const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
+        WallClock timestamp
     ) override final;
     virtual bool detect(const QImage& screen) = 0;
 

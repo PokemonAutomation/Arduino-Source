@@ -21,7 +21,7 @@ namespace MaxLairInternal{
 
 void run_swap_pokemon(
     AdventureRuntime& runtime,
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     GlobalStateTracker& state_tracker,
     const ConsoleSpecificOptions& settings
 ){
@@ -81,11 +81,11 @@ void run_swap_pokemon(
     {
         BlackScreenWatcher detector;
         int result = run_until(
-            env, console, context,
+            console, context,
             [&](BotBaseContext& context){
                 pbf_mash_button(context, swap ? BUTTON_A : BUTTON_B, 30 * TICKS_PER_SECOND);
             },
-            { &detector }
+            {{detector}}
         );
         if (result < 0){
             console.log("Timed out waiting for black screen.", COLOR_RED);
@@ -97,9 +97,9 @@ void run_swap_pokemon(
     {
         PathScreenDetector detector;
         int result = wait_until(
-            env, console, context,
+            console, context,
             std::chrono::seconds(30),
-            { &detector },
+            {{detector}},
             INFERENCE_RATE
         );
         if (result < 0){

@@ -7,8 +7,8 @@
 #ifndef PokemonAutomation_CommonFramework_DifferentialAnomalyDetector_H
 #define PokemonAutomation_CommonFramework_DifferentialAnomalyDetector_H
 
-#include <chrono>
 #include <deque>
+#include "Common/Cpp/Time.h"
 
 namespace PokemonAutomation{
 
@@ -37,10 +37,7 @@ private:
 class TimeNormalizedDeltaAnomalyDetector{
 public:
     TimeNormalizedDeltaAnomalyDetector(size_t window_size, double max_value);
-    double push(
-        double x,
-        std::chrono::time_point<std::chrono::system_clock> timestamp = std::chrono::system_clock::now()
-    );
+    double push(double x, WallClock timestamp = current_time());
 
     double mean() const;
     double stddev() const;
@@ -48,7 +45,7 @@ public:
 
 private:
     struct Frame{
-        std::chrono::time_point<std::chrono::system_clock> timestamp;
+        WallClock timestamp;
         uint32_t fixed_point_value;
     };
 

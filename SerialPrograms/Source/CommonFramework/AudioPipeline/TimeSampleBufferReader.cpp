@@ -15,19 +15,19 @@ template <typename Type>
 TimeSampleBufferReader<Type>::TimeSampleBufferReader(TimeSampleBuffer<Type>& buffer)
     : m_buffer(buffer)
 //    , m_last_timestamp(TimePoint::min())
-    , m_current_block(TimePoint::min())
+    , m_current_block(WallClock::min())
     , m_current_index(0)
 {}
 
 template <typename Type>
-void TimeSampleBufferReader<Type>::set_to_timestamp(TimePoint timestamp){
+void TimeSampleBufferReader<Type>::set_to_timestamp(WallClock timestamp){
     SpinLockGuard lg(m_buffer.m_lock);
     set_to_timestamp_unprotected(timestamp);
 }
 
 template <typename Type>
-void TimeSampleBufferReader<Type>::set_to_timestamp_unprotected(TimePoint timestamp){
-    m_current_block = TimePoint::min();
+void TimeSampleBufferReader<Type>::set_to_timestamp_unprotected(WallClock timestamp){
+    m_current_block = WallClock::min();
     m_current_index = 0;
 
     const typename TimeSampleBuffer<Type>::MapType& buffer = m_buffer.m_samples;
@@ -41,8 +41,8 @@ void TimeSampleBufferReader<Type>::set_to_timestamp_unprotected(TimePoint timest
         --current_block;
     }
 
-    TimePoint end = current_block->first;
-    TimePoint start = end - current_block->second.size() * m_buffer.m_sample_period;
+    WallClock end = current_block->first;
+    WallClock start = end - current_block->second.size() * m_buffer.m_sample_period;
 
 //    cout << start - REFERENCE << " - " << end - REFERENCE << endl;
 
@@ -84,7 +84,7 @@ void TimeSampleBufferReader<Type>::set_to_timestamp_unprotected(TimePoint timest
 template <typename Type>
 void TimeSampleBufferReader<Type>::read_samples(
     Type* samples, size_t count,
-    TimePoint timestamp
+    WallClock timestamp
 ){
     const typename TimeSampleBuffer<Type>::MapType& buffer = m_buffer.m_samples;
 
@@ -96,7 +96,7 @@ void TimeSampleBufferReader<Type>::read_samples(
     }
 
     //  Setup output state.
-    TimePoint requested_time = timestamp - count * m_buffer.m_sample_period;
+    WallClock requested_time = timestamp - count * m_buffer.m_sample_period;
     TimeSampleWriterForward output_buffer(samples, count);
 
     auto current_block = buffer.lower_bound(m_current_block);
@@ -117,7 +117,7 @@ void TimeSampleBufferReader<Type>::read_samples(
     }
 
     //  Setup input state.
-    TimePoint current_time = current_block->first - current_block->second.size() * m_buffer.m_sample_period;
+    WallClock current_time = current_block->first - current_block->second.size() * m_buffer.m_sample_period;
 
     while (output_buffer.samples_left() > 0){
         //  Current block is empty. Move to next block.

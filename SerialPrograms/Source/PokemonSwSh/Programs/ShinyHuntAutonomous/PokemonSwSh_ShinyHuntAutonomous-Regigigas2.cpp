@@ -86,14 +86,14 @@ std::unique_ptr<StatsTracker> ShinyHuntAutonomousRegigigas2::make_stats() const{
 
 
 
-bool ShinyHuntAutonomousRegigigas2::kill_and_return(SingleSwitchProgramEnvironment& env, BotBaseContext& context) const{
+bool ShinyHuntAutonomousRegigigas2::kill_and_return(ConsoleHandle& console, BotBaseContext& context) const{
     pbf_mash_button(context, BUTTON_A, 4 * TICKS_PER_SECOND);
 
-    RaidCatchDetector detector(env.console);
+    RaidCatchDetector detector(console);
     int result = wait_until(
-        env, env.console, context,
+        console, context,
         std::chrono::seconds(30),
-        { &detector }
+        {{detector}}
     );
     switch (result){
     case 0:
@@ -101,7 +101,7 @@ bool ShinyHuntAutonomousRegigigas2::kill_and_return(SingleSwitchProgramEnvironme
         pbf_press_button(context, BUTTON_A, 10, CATCH_TO_OVERWORLD_DELAY);
         return true;
     default:
-        env.log("Raid Catch Menu not found.", COLOR_RED);
+        console.log("Raid Catch Menu not found.", COLOR_RED);
         return false;
     }
 }
@@ -133,9 +133,9 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env,
             {
                 StartBattleWatcher detector;
                 int result = wait_until(
-                    env, env.console, context,
+                    env.console, context,
                     std::chrono::seconds(30),
-                    { &detector }
+                    {{detector}}
                 );
                 if (result < 0){
                     stats.add_error();
@@ -146,7 +146,7 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env,
             }
 
             ShinyDetectionResult result = detect_shiny_battle(
-                env, env.console, context,
+                env.console, context,
                 SHINY_BATTLE_RAID,
                 std::chrono::seconds(30)
             );
@@ -163,13 +163,13 @@ void ShinyHuntAutonomousRegigigas2::program(SingleSwitchProgramEnvironment& env,
                 break;
             }
 
-            kill_and_return(env, context);
+            kill_and_return(env.console, context);
         }
 
         pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
         TOUCH_DATE_INTERVAL.touch_now_from_home_if_needed(context);
         reset_game_from_home_with_inference(
-            env, env.console, context,
+            env.console, context,
             ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST
         );
     }

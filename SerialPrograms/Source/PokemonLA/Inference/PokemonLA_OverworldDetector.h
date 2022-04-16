@@ -26,10 +26,7 @@ public:
         m_arc_phone.make_overlays(items);
         m_mount.make_overlays(items);
     }
-    virtual bool process_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-    ) override{
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) override{
         m_arc_phone.process_frame(frame, timestamp);
         if (!m_arc_phone.detected()){
             return false;

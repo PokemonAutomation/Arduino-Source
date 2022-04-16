@@ -27,10 +27,7 @@ void MapDetector::make_overlays(VideoOverlaySet& items) const{
 }
 
 //  Return true if the inference session should stop.
-bool MapDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool MapDetector::process_frame(const QImage& frame, WallClock timestamp){
     ImageStats bottom0 = image_stats(extract_box_reference(frame, m_bottom0));
 //    cout << bottom0.average << bottom0.stddev << endl;
     if (!is_solid(bottom0, {0.330212, 0.334083, 0.335705})){

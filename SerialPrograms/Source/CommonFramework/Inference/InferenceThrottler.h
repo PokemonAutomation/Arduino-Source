@@ -20,7 +20,7 @@ public:
     )
         : m_timeout(timeout)
         , m_period(period)
-        , m_start(std::chrono::system_clock::now())
+        , m_start(current_time())
         , m_wait_until(m_start + period)
     {}
 
@@ -29,7 +29,7 @@ public:
     //
     //  Returns true if this loop has timed out.
     bool end_iteration(CancellableScope& scope){
-        auto now = std::chrono::system_clock::now();
+        auto now = current_time();
         if (m_timeout != std::chrono::milliseconds(0) && now - m_start >= m_timeout){
             return true;
         }
@@ -51,8 +51,8 @@ public:
 private:
     std::chrono::milliseconds m_timeout;
     std::chrono::milliseconds m_period;
-    std::chrono::system_clock::time_point m_start;
-    std::chrono::system_clock::time_point m_wait_until;
+    WallClock m_start;
+    WallClock m_wait_until;
 };
 
 

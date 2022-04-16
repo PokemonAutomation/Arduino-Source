@@ -6,7 +6,6 @@
 
 #if defined(__linux) || defined(__APPLE__)
 
-#include <chrono>
 #include <set>
 #include <map>
 #include <thread>
@@ -17,6 +16,7 @@
 #include <unistd.h>
 #include <sched.h>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Time.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "Environment.h"
 
@@ -125,10 +125,10 @@ uint64_t x86_rdtsc(){
 
 uint64_t x86_measure_rdtsc_ticks_per_sec(){
 //    Time::WallClock w_start = Time::WallClock::Now();
-    auto w_start = std::chrono::system_clock::now();
+    auto w_start = current_time();
     uint64_t r_start = x86_rdtsc();
-    while (std::chrono::system_clock::now() - w_start < std::chrono::microseconds(62500));
-    auto w_end = std::chrono::system_clock::now();
+    while (current_time() - w_start < std::chrono::microseconds(62500));
+    auto w_end = current_time();
 //    while (w_start.SecondsElapsed() < 0.0625);
 //    Time::WallClock w_end = Time::WallClock::Now();
     uint64_t r_end = x86_rdtsc();

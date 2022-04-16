@@ -38,7 +38,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    bool kill_and_return(SingleSwitchProgramEnvironment& env, BotBaseContext& context) const;
+    bool kill_and_return(ConsoleHandle& console, BotBaseContext& context) const;
 
 private:
     StartInGripOrGameOption START_IN_GRIP_MENU;

@@ -169,7 +169,7 @@ void AutoHostMultiGame::program(SingleSwitchProgramEnvironment& env, BotBaseCont
                 break;
             }
             start_game_from_home_with_inference(
-                env, env.console, context,
+                env.console, context,
                 ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_SLOW,
                 game_slot,
                 game.user_slot,

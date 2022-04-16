@@ -31,9 +31,9 @@
 #ifndef PokemonAutomation_CommonFramework_AudioPipeline_TimeSampleBuffer_H
 #define PokemonAutomation_CommonFramework_AudioPipeline_TimeSampleBuffer_H
 
-#include <chrono>
 #include <vector>
 #include <map>
+#include "Common/Cpp/Time.h"
 #include "Common/Cpp/SpinLock.h"
 
 namespace PokemonAutomation{
@@ -45,7 +45,6 @@ class TimeSampleBufferReader;
 
 template <typename Type>
 class TimeSampleBuffer{
-    using TimePoint = std::chrono::system_clock::time_point;
     using Duration = std::chrono::system_clock::duration;
 
 public:
@@ -58,20 +57,20 @@ public:
     //  Write "count" samples ending on "timestamp".
     void push_samples(
         const Type* samples, size_t count,
-        TimePoint timestamp = std::chrono::system_clock::now()
+        WallClock timestamp = current_time()
     );
 
     //  Read "count" samples ending on "timestamp".
     void read_samples(
         Type* samples, size_t count,
-        TimePoint timestamp = std::chrono::system_clock::now()
+        WallClock timestamp = current_time()
     );
 
     std::string dump() const;
 
 private:
     friend class TimeSampleBufferReader<Type>;
-    using MapType = std::map<TimePoint, std::vector<Type>>;
+    using MapType = std::map<WallClock, std::vector<Type>>;
 
     const size_t m_samples_per_second;
     const Duration m_sample_period;     //  Time between adjacent samples.

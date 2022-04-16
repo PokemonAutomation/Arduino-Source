@@ -126,7 +126,7 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, 
             StartBattleWatcher start_battle_detector;
 
             int result = run_until(
-                env, env.console, context,
+                env.console, context,
                 [](BotBaseContext& context){
                     while (true){
                         pbf_mash_button(context, BUTTON_LCLICK, TICKS_PER_SECOND);
@@ -134,8 +134,8 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, 
                     }
                 },
                 {
-                    &battle_menu_detector,
-                    &start_battle_detector,
+                    {battle_menu_detector},
+                    {start_battle_detector},
                 }
             );
 
@@ -145,7 +145,7 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, 
                 stats.m_unexpected_battles++;
                 env.update_stats();
                 pbf_mash_button(context, BUTTON_B, TICKS_PER_SECOND);
-                run_away(env, env.console, context, EXIT_BATTLE_TIMEOUT);
+                run_away(env.console, context, EXIT_BATTLE_TIMEOUT);
                 continue;
             case 1:
                 env.log("Battle started!");
@@ -155,7 +155,7 @@ void ShinyHuntAutonomousWhistling::program(SingleSwitchProgramEnvironment& env, 
 
         //  Detect shiny.
         ShinyDetectionResult result = detect_shiny_battle(
-            env, env.console, context,
+            env.console, context,
             SHINY_BATTLE_REGULAR,
             std::chrono::seconds(30)
         );

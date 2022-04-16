@@ -16,19 +16,19 @@ namespace PokemonBDSP{
 
 
 bool run_from_battle(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     uint16_t exit_battle_time
 ){
     BlackScreenOverWatcher black_screen_detector;
     int ret = run_until(
-        env, console, context,
+        console, context,
         [=](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_ZL, TICKS_PER_SECOND);
             if (exit_battle_time > TICKS_PER_SECOND){
                 pbf_mash_button(context, BUTTON_B, exit_battle_time - TICKS_PER_SECOND);
             }
         },
-        { &black_screen_detector }
+        {{black_screen_detector}}
     );
     if (ret < 0){
         console.log("Timed out waiting for end of battle. Are you stuck in the battle?", COLOR_RED);

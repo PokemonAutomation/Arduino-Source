@@ -7,8 +7,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
-//#include "CommonFramework/Tools/InterruptableCommands.h"
-//#include "CommonFramework/Tools/SuperControlSession.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -17,11 +15,15 @@
 #include "PokemonLA/Inference/PokemonLA_MapDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 #include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
-#include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
+#include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/PokemonLA_MountChange.h"
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
 #include "PokemonLA_NuggetFarmerHighlands.h"
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -42,7 +44,7 @@ NuggetFarmerHighlands_Descriptor::NuggetFarmerHighlands_Descriptor()
 
 MoneyFarmerHighlands::MoneyFarmerHighlands(const NuggetFarmerHighlands_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
-    , SHINY_DETECTED("2 * TICKS_PER_SECOND")
+    , SHINY_DETECTED("Shiny Detected Action", "", "2 * TICKS_PER_SECOND")
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -52,6 +54,7 @@ MoneyFarmerHighlands::MoneyFarmerHighlands(const NuggetFarmerHighlands_Descripto
         &NOTIFICATION_ERROR_FATAL,
     })
 {
+    PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
     PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -91,14 +94,14 @@ std::unique_ptr<StatsTracker> MoneyFarmerHighlands::make_stats() const{
 
 
 
-void mash_A_until_end_of_battle(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+void mash_A_until_end_of_battle(ConsoleHandle& console, BotBaseContext& context){
     OverworldDetector detector(console, console);
     int ret = run_until(
-        env, console, context,
+        console, context,
         [](BotBaseContext& context){
             pbf_mash_button(context, BUTTON_A, 120 * TICKS_PER_SECOND);
         },
-        { &detector }
+        {{detector}}
     );
     if (ret < 0){
         throw OperationFailedException(console, "Failed to return to overworld after 2 minutes.");
@@ -126,9 +129,17 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, Bo
     env.console.log("Traveling to Charm's location...");
     {
         DialogSurpriseDetector dialog_detector(env.console, env.console, true);
-        ShinySoundDetector shiny_detector(env.console, SHINY_DETECTED.stop_on_shiny());
+
+        float shiny_coefficient = 1.0;
+        ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+            //  Warning: This callback will be run from a different thread than this function.
+            stats.shinies++;
+            shiny_coefficient = error_coefficient;
+            return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
+        });
+
         int ret = run_until(
-            env, env.console, context,
+            env.console, context,
             [](BotBaseContext& context){
                 pbf_move_left_joystick(context, 0, 212, 50, 0);
                 pbf_press_button(context, BUTTON_B, 495, 80);
@@ -155,18 +166,22 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, Bo
 //                pbf_move_right_joystick(context, 0, 128, 200, 125);
 
             },
-            { &dialog_detector, &shiny_detector }
+            {
+                {dialog_detector},
+                {shiny_detector},
+            }
         );
-        if (shiny_detector.detected()){
-            stats.shinies++;
-            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_detector.results());
-        }
-        if (ret == 0){
+        switch (ret){
+        case 0:
             env.console.log("Found Charm!", COLOR_BLUE);
             stats.charm++;
-            mash_A_until_end_of_battle(env, env.console, context);
+            mash_A_until_end_of_battle(env.console, context);
             env.console.log("Battle succeeded!", COLOR_BLUE);
             success = true;
+            break;
+        case 1:
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_coefficient);
+            break;
         }
     }
 
@@ -180,8 +195,30 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, Bo
 
 
     env.console.log("Returning to Jubilife...");
-    goto_camp_from_overworld(env, env.console, context, SHINY_DETECTED, stats);
-    goto_professor(env.console, context, Camp::HIGHLANDS_HIGHLANDS);
+
+
+    {
+        float shiny_coefficient = 1.0;
+        ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+            //  Warning: This callback will be run from a different thread than this function.
+            stats.shinies++;
+            shiny_coefficient = error_coefficient;
+            return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
+        });
+
+        int ret = run_until(env.console, context,
+            [&env](BotBaseContext& context){
+                goto_camp_from_overworld(env, env.console, context);
+                goto_professor(env.console, context, Camp::HIGHLANDS_HIGHLANDS);
+            },
+            {{shiny_detector}}
+        );
+        if (ret == 0){
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_coefficient);
+        }
+    }
+
+
     from_professor_return_to_jubilife(env, env.console, context);
 
     if (success){

@@ -665,17 +665,14 @@ MountState MountTracker::state() const{
     return m_state.load(std::memory_order_acquire);
 }
 
-bool MountTracker::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool MountTracker::process_frame(const QImage& frame, WallClock timestamp){
     MountState state = m_detector.detect(frame);
 //    cout << "state = " << (int)state << endl;
 
 //    SpinLockGuard lg(m_lock);
 
     //  Clear out old history.
-    std::chrono::system_clock::time_point threshold = timestamp - std::chrono::seconds(1);
+    WallClock threshold = timestamp - std::chrono::seconds(1);
     while (!m_history.empty()){
         Sample& sample = m_history.front();
         if (m_history.front().timestamp >= threshold){

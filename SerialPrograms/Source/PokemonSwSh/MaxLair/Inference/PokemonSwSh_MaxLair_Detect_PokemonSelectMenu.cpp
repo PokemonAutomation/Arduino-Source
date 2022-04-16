@@ -80,10 +80,7 @@ bool PokemonSelectMenuDetector::detect(const QImage& screen) const{
 //    if (select2 < 200) return true;
     return false;
 }
-bool PokemonSelectMenuDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool PokemonSelectMenuDetector::process_frame(const QImage& frame, WallClock timestamp){
     return m_stop_on_no_detect
         ? !detect(frame)
         : detect(frame);

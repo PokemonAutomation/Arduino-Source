@@ -44,7 +44,7 @@ public:
 
 
 private:
-    ProgramEnvironment& m_env;
+    // ProgramEnvironment& m_env;
     ConsoleHandle& m_console;
     BotBaseContext& m_context;
     InferenceBoxScope m_text_box;

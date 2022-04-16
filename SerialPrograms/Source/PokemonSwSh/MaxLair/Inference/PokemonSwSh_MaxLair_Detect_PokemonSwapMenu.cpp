@@ -50,10 +50,7 @@ void PokemonSwapMenuDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_bottom_main);
     items.add(COLOR_RED, m_bottom_right);
 }
-bool PokemonSwapMenuDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool PokemonSwapMenuDetector::process_frame(const QImage& frame, WallClock timestamp){
     return m_stop_on_no_detect
         ? !detect(frame)
         : detect(frame);

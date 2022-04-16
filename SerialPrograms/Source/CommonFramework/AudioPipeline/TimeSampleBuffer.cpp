@@ -35,7 +35,7 @@ TimeSampleBuffer<Type>::TimeSampleBuffer(
 template <typename Type>
 void TimeSampleBuffer<Type>::push_samples(
     const Type* samples, size_t count,
-    std::chrono::system_clock::time_point timestamp
+    WallClock timestamp
 ){
     std::vector<Type> block(count);
     memcpy(block.data(), samples, count * sizeof(Type));
@@ -74,7 +74,7 @@ std::string TimeSampleBuffer<Type>::dump() const{
         return str;
     }
     auto iter = m_samples.rbegin();
-    TimePoint latest = iter->first;
+    WallClock latest = iter->first;
     for (; iter != m_samples.rend(); ++iter){
         Duration last = iter->first - latest;
         Duration first = last - m_sample_period * iter->second.size();
@@ -92,7 +92,7 @@ std::string TimeSampleBuffer<Type>::dump() const{
 template <typename Type>
 void TimeSampleBuffer<Type>::read_samples(
     Type* samples, size_t count,
-    TimePoint timestamp
+    WallClock timestamp
 ){
     SpinLockGuard lg(m_lock);
 
@@ -102,7 +102,7 @@ void TimeSampleBuffer<Type>::read_samples(
     }
 
     //  Setup output state.
-    TimePoint requested_time = timestamp;
+    WallClock requested_time = timestamp;
     TimeSampleWriterReverse output_buffer(samples, count);
 
     //  Jump to the latest block that's relevant to this request.
@@ -115,7 +115,7 @@ void TimeSampleBuffer<Type>::read_samples(
     }
 
     //  Setup input state.
-    TimePoint current_time = current_block->first;
+    WallClock current_time = current_block->first;
     size_t current_index = current_block->second.size();
 
     //  State machine loop. Look at the current input and output states to

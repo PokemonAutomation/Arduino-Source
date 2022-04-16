@@ -136,7 +136,7 @@ private:
 #endif
 
 //        std::cout << "start write" << std::endl;
-//        auto start = std::chrono::system_clock::now();
+//        auto start = current_time();
         DWORD written;
         if (WriteFile(m_handle, data, (DWORD)bytes, &written, nullptr) == 0 || bytes != written){
             DWORD error = GetLastError();
@@ -147,7 +147,7 @@ private:
             );
             clear_error();
         }
-//        auto stop = std::chrono::system_clock::now();
+//        auto stop = current_time();
 //        cout << "WriteFile() : " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count() << endl;
 
 //        std::cout << "end send()" << std::endl;
@@ -156,9 +156,9 @@ private:
     void recv_loop(){
 //        std::lock_guard<std::mutex> lg(m_send_lock);
         char buffer[32];
-        auto last_recv = std::chrono::system_clock::now();
+        auto last_recv = current_time();
         while (!m_exit.load(std::memory_order_acquire)){
-//            auto start = std::chrono::system_clock::now();
+//            auto start = current_time();
 //            std::cout << "start read" << std::endl;
             DWORD read;
             if (ReadFile(m_handle, buffer, 32, &read, nullptr) == 0){
@@ -166,7 +166,7 @@ private:
                 log("ReadFile() failed. Error = " + std::to_string(error));
                 clear_error();
             }
-//            auto stop = std::chrono::system_clock::now();
+//            auto stop = current_time();
 //            cout << "ReadFile() : " << std::chrono::duration_cast<std::chrono::milliseconds>(stop - start).count() << endl;
 //            std::cout << "read = " << read << std::endl;
 //            set_timouts();
@@ -177,17 +177,17 @@ private:
 #endif
             if (read != 0){
                 on_recv(buffer, read);
-                last_recv = std::chrono::system_clock::now();
+                last_recv = current_time();
                 continue;
             }
 
 
 #if 1
-//            auto start = std::chrono::system_clock::now();
+//            auto start = current_time();
             Sleep(1);
-//            auto stop = std::chrono::system_clock::now();
+//            auto stop = current_time();
 #else
-            auto now = std::chrono::system_clock::now();
+            auto now = current_time();
             uint64_t millis_since_last_recv = std::chrono::duration_cast<std::chrono::milliseconds>(now - last_recv).count();
             if (millis_since_last_recv > 100){
                 Sleep(1);

@@ -8,8 +8,8 @@
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "PokemonLA/Inference/PokemonLA_CommonColorCheck.h"
 #include "PokemonLA_BattlePokemonSwitchDetector.h"
-#include "PokemonLA_CommonColorCheck.h"
 
 #include <iostream>
 using std::cout;
@@ -43,10 +43,7 @@ void BattlePokemonSwitchDetector::make_overlays(VideoOverlaySet& items) const{
 }
 
 
-bool BattlePokemonSwitchDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool BattlePokemonSwitchDetector::process_frame(const QImage& frame, WallClock timestamp){
     const ImageStats white_1 = image_stats(extract_box_reference(frame, m_white_bg_1));
     if(is_white(white_1, 500, 10) == false){
         // std::cout << "no white_1" << std::endl;

@@ -4,182 +4,17 @@
  *
  */
 
-#include <cmath>
-//#include <QSystemTrayIcon>
-#include <QProcess>
-#include "Common/Cpp/Exceptions.h"
-#include "Common/Cpp/PrettyPrint.h"
-#include "Common/Cpp/AlignedVector.h"
-#include "Common/Cpp/SIMDDebuggers.h"
-#include "Common/Qt/QtJsonTools.h"
-#include "ClientSource/Libraries/Logging.h"
-#include "CommonFramework/PersistentSettings.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/StatsDatabase.h"
-#include "CommonFramework/Tools/InterruptableCommands.h"
-#include "CommonFramework/Inference/InferenceThrottler.h"
-#include "CommonFramework/Inference/AnomalyDetector.h"
-#include "CommonFramework/Inference/StatAccumulator.h"
-#include "CommonFramework/Inference/TimeWindowStatTracker.h"
-#include "CommonFramework/InferenceInfra/VisualInferenceSession.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Inference/FrozenImageDetector.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
-#include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/ImageMatch/FilterToAlpha.h"
-#include "CommonFramework/ImageMatch/ImageDiff.h"
-#include "CommonFramework/ImageMatch/ImageCropper.h"
-#include "CommonFramework/ImageMatch/ImageDiff.h"
-#include "CommonFramework/OCR/OCR_RawOCR.h"
-#include "CommonFramework/OCR/OCR_Filtering.h"
-#include "CommonFramework/OCR/OCR_StringNormalization.h"
-#include "CommonFramework/OCR/OCR_TextMatcher.h"
-#include "CommonFramework/OCR/OCR_LargeDictionaryMatcher.h"
-#include "CommonFramework/ImageMatch/ExactImageDictionaryMatcher.h"
-#include "CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h"
-#include "CommonFramework/Inference/ImageMatchDetector.h"
-#include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
-#include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
-#include "Pokemon/Resources/Pokemon_PokemonNames.h"
-#include "PokemonSwSh/ShinyHuntTracker.h"
-#include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
-#include "PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h"
-#include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinyEncounterDetector.h"
-#include "PokemonSwSh/Inference/Dens/PokemonSwSh_RaidLobbyReader.h"
-#include "PokemonSwSh/Inference/Battles/PokemonSwSh_StartBattleDetector.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_SummaryShinySymbolDetector.h"
-#include "PokemonSwSh/Inference/Dens/PokemonSwSh_RaidCatchDetector.h"
-#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleMenuDetector.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_FishingDetector.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_ReceivePokemonDetector.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_PokemonSpriteReader.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h"
-#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleBallReader.h"
-#include "PokemonSwSh/Inference/Dens/PokemonSwSh_DenMonReader.h"
-#include "PokemonSwSh/Inference/Battles/PokemonSwSh_ExperienceGainDetector.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_YCommDetector.h"
-#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Entrance.h"
-#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.h"
-#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
-#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_ItemSelectMenu.h"
-#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
-#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_EndBattle.h"
-#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Lobby.h"
-#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h"
-#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.h"
-#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_ProfessorSwap.h"
-#include "PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_CaughtScreen.h"
-#include "PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Entrance.h"
-#include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.h"
-#include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_PathMatchup.h"
-#include "PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_RentalBossMatchup.h"
-#include "PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Moves.h"
-#include "PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Pokemon.h"
-#include "PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Matchup.h"
-#include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
-#include "PokemonSwSh/Programs/PokemonSwSh_BasicCatcher.h"
-#include "PokemonSwSh/Programs/PokemonSwSh_Internet.h"
-#include "PokemonSwSh/Resources/PokemonSwSh_TypeSprites.h"
-#include "Kernels/Kernels_x64_SSE41.h"
-#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
-//#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
-#include "Kernels/ImageStats/Kernels_ImagePixelSumSqr.h"
-#include "Kernels/ImageStats/Kernels_ImagePixelSumSqrDev.h"
-#include "Kernels/Kernels_Alignment.h"
-//#include "Kernels/Waterfill/Kernels_Waterfill_Intrinsics_SSE4.h"
-//#include "Kernels/Waterfill/Kernels_Waterfill_FillQueue.h"
-//#include "Kernels/BinaryImage/Kernels_BinaryImage_Default.h"
-//#include "Kernels/BinaryImage/Kernels_BinaryImage_x64_SSE42.h"
-//#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.h"
-//#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h"
-//#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h"
-//#include "Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h"
-#include "Kernels/Waterfill/Kernels_Waterfill.h"
-#include "Integrations/DiscordWebhook.h"
-#include "Pokemon/Pokemon_Notification.h"
-#include "PokemonSwSh/Programs/PokemonSwSh_StartGame.h"
-#include "PokemonSwSh/Inference/Battles/PokemonSwSh_BattleDialogTracker.h"
-#include "PokemonBDSP/PokemonBDSP_Settings.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
-#include "CommonFramework/ImageTools/ColorClustering.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
-#include "PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_MarkFinder.h"
-#include "PokemonBDSP/Programs/PokemonBDSP_GameEntry.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_MapDetector.h"
-#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_SelectionArrow.h"
-#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleMenuDetector.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_VSSeekerReaction.h"
-#include "PokemonBDSP/Inference/Battles/PokemonBDSP_StartBattleDetector.h"
-#include "PokemonBDSP/Inference/PokemonBDSP_MenuDetector.h"
-#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxDetector.h"
-#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_BoxShinyDetector.h"
-#include "PokemonBDSP/Programs/Eggs/PokemonBDSP_EggRoutines.h"
-#include "PokemonBDSP/Programs/Eggs/PokemonBDSP_EggFeedback.h"
-#include "PokemonBDSP/Programs/PokemonBDSP_RunFromBattle.h"
-#include "PokemonBDSP/Programs/PokemonBDSP_BoxRelease.h"
-#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h"
-//#include "CommonFramework/BinaryImage/BinaryImage.h"
-#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
-#include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSide.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_TypeSymbolFinder.h"
-#include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorRadial.h"
-#include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_SparkleDetectorSquare.h"
-#include "PokemonSwSh/Inference/ShinyDetection/PokemonSwSh_ShinySparkleSet.h"
-#include "PokemonBDSP/Inference/Battles/PokemonBDSP_ExperienceGainDetector.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_ArcDetector.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h"
-#include "CommonFramework/ImageMatch/SubObjectTemplateMatcher.h"
-#include "CommonFramework/Inference/BlackBorderDetector.h"
-#include "PokemonLA/Programs/PokemonLA_GameEntry.h"
-#include "PokemonLA/PokemonLA_Settings.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
-#include "PokemonLA/Inference/PokemonLA_MountDetector.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_FlagDetector.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h"
-#include "CommonFramework/Tools/InterruptableCommands.h"
-#include "CommonFramework/Tools/SuperControlSession.h"
-#include "PokemonLA/Programs/PokemonLA_FlagNavigationAir.h"
-#include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
-#include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
-#include "PokemonLA/Inference/PokemonLA_NotificationReader.h"
-#include "PokemonLA/Inference/PokemonLA_OutbreakReader.h"
-#include "PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h"
-#include "PokemonLA/Inference/PokemonLA_MapDetector.h"
-#include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
-#include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
-#include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
-#include "CommonFramework/Tools/MultiConsoleErrors.h"
-#include "PokemonLA/Inference/PokemonLA_UnderAttackDetector.h"
-#include "PokemonLA/Programs/PokemonLA_EscapeFromAttack.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
-#include "CommonFramework/Inference/SpectrogramMatcher.h"
-#include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
-#include "PokemonLA/Programs/PokemonLA_MountChange.h"
-#include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
-#include "Common/Cpp/CancellableScope.h"
 #include "TestProgramSwitch.h"
 
 #include <immintrin.h>
-#include <fstream>
-#include <QHttpMultiPart>
-#include <QFile>
-#include <QEventLoop>
-#include <QJsonArray>
-#include <QJsonDocument>
-#include <QJsonObject>
-#include <QNetworkAccessManager>
-#include <QNetworkReply>
+#include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/AsyncDispatcher.h"
+#include "Common/Cpp/PeriodicScheduler.h"
+#include "CommonFramework/InferenceInfra/InferenceSession.h"
+#include "PokemonLA/Inference/PokemonLA_MountDetector.h"
+#include "CommonFramework/InferenceInfra/VisualInferencePivot.h"
+
+#include <QVideoFrame>
 
 //#include <Windows.h>
 #include <iostream>
@@ -231,7 +66,7 @@ TestProgram::TestProgram(const TestProgram_Descriptor& descriptor)
 //using namespace Kernels;
 using namespace Kernels::Waterfill;
 
-using namespace PokemonLA;
+//using namespace PokemonLA;
 
 
 
@@ -249,9 +84,9 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     using namespace Kernels::Waterfill;
     using namespace OCR;
     using namespace Pokemon;
-    using namespace PokemonSwSh;
+//    using namespace PokemonSwSh;
 //    using namespace PokemonBDSP;
-//    using namespace PokemonLA;
+    using namespace PokemonLA;
 
     LoggerQt& logger = env.logger();
     ConsoleHandle& console = env.consoles[0];
@@ -260,7 +95,32 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlay& overlay = env.consoles[0];
 
 
-    scope.wait_for(std::chrono::seconds(60));
+
+#if 0
+    VisualInferencePivot pivot(scope, feed, env.inference_dispatcher());
+
+    MountTracker tracker(logger, MountDetectorLogging::LOG_ONLY);
+
+    pivot.add_callback(scope, tracker, std::chrono::milliseconds(500));
+#endif
+
+
+//    scope.wait_for(std::chrono::seconds(60));
+
+#if 0
+    std::function<void()> callback0 = []{ cout << "asdf" << endl; };
+    std::function<void()> callback1 = []{ cout << "qwer" << endl; };
+
+    PeriodicScheduler scheduler;
+    scheduler.add_event(&callback0, std::chrono::seconds(2));
+    scheduler.add_event(&callback1, std::chrono::seconds(3));
+    while (true){
+        void* ptr = scheduler.next_event();
+        if (ptr != nullptr){
+            (*(std::function<void()>*)ptr)();
+        }
+    }
+#endif
 
 
 
@@ -297,7 +157,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    QImage image("screenshot-20220327-190703102304.png");
     QImage image = feed.snapshot();
     ArcPhoneDetector detector(console, console, std::chrono::milliseconds(0), true);
-    detector.process_frame(image, std::chrono::system_clock::now());
+    detector.process_frame(image, current_time());
 #endif
 
 
@@ -324,7 +184,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     QImage image("ArcPhoneTriggered-2.png");
 
     ArcPhoneDetector detector(console, console, std::chrono::milliseconds(0), true);
-    cout << detector.process_frame(image, std::chrono::system_clock::now()) << endl;
+    cout << detector.process_frame(image, current_time()) << endl;
 #endif
 
 
@@ -337,7 +197,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
     AsyncVisualInferenceSession visual(env, console, console, console);
     visual += tracker;
-//    tracker.process_frame(feed.snapshot(), std::chrono::system_clock::now());
+//    tracker.process_frame(feed.snapshot(), current_time());
 #endif
 
 
@@ -347,15 +207,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 //    QImage src("20220315-054734853907.jpg");
     QImage src("20220315-055335301551.jpg");
-    auto start = std::chrono::system_clock::now();
+    auto start = current_time();
     uint64_t c = 0;
-    while (std::chrono::system_clock::now() - start < std::chrono::seconds(10)){
-        tracker.process_frame(src, std::chrono::system_clock::now());
+    while (current_time() - start < std::chrono::seconds(10)){
+        tracker.process_frame(src, current_time());
         env.check_stopping();
         c++;
 //        break;
     }
-    auto elapsed = std::chrono::system_clock::now() - start;
+    auto elapsed = current_time() - start;
     auto micros = std::chrono::duration_cast<std::chrono::microseconds>(elapsed);
     cout << "iterations/sec = " << (double)c / micros.count() * 1000000 << endl;
 #endif
@@ -391,7 +251,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     QImage image("ArcPhoneTriggered-31.png");
 //    QImage image("screenshot-20220308-225539293411.png");
     ArcPhoneDetector detector(console, console, std::chrono::milliseconds(0), true);
-    detector.process_frame(image, std::chrono::system_clock::now());
+    detector.process_frame(image, current_time());
 #endif
 
 
@@ -473,7 +333,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     QImage frame = feed.snapshot();
 
     FlagTracker tracker(console, console);
-    tracker.process_frame(frame, std::chrono::system_clock::now());
+    tracker.process_frame(frame, current_time());
 
     double distance, flag_x, flag_y;
     tracker.get(distance, flag_x, flag_y);
@@ -535,7 +395,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //        QImage image("screenshot-20220306-172029164014.png");
 
         DialogSurpriseDetector detector(logger, overlay, true);
-        detector.process_frame(image, std::chrono::system_clock::now());
+        detector.process_frame(image, current_time());
     }
 #endif
 #if 0
@@ -543,13 +403,13 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         QImage image("screenshot-20220302-094034596712.png");
 
         DialogDetector detector(logger, overlay, true);
-        detector.process_frame(image, std::chrono::system_clock::now());
+        detector.process_frame(image, current_time());
     }
     {
         QImage image("screenshot-Gin");
 
         DialogDetector detector(logger, overlay, true);
-        detector.process_frame(image, std::chrono::system_clock::now());
+        detector.process_frame(image, current_time());
     }
 #endif
 
@@ -615,7 +475,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet set(overlay);
     DialogDetector detector(console, console);
     detector.make_overlays(set);
-    detector.process_frame(feed.snapshot(), std::chrono::system_clock::now());
+    detector.process_frame(feed.snapshot(), current_time());
 #endif
 
 
@@ -626,7 +486,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     QImage image = extract_box(feed.snapshot(), box0);
 
     ArcPhoneDetector detector(console, console, std::chrono::milliseconds(200), true);
-    detector.process_frame(image, std::chrono::system_clock::now());
+    detector.process_frame(image, current_time());
     wait_until(
         env, console, std::chrono::seconds(10),
         { &detector }
@@ -664,7 +524,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoOverlaySet overlays(overlay);
     detector.make_overlays(overlays);
 
-    detector.process_frame(feed.snapshot(), std::chrono::system_clock::now());
+    detector.process_frame(feed.snapshot(), current_time());
 #endif
 
 
@@ -750,7 +610,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    CenterAButtonTracker tracker;
 //    WhiteObjectWatcher detector(console, {0.40, 0.50, 0.40, 0.50}, {{tracker, false}});
 
-//    detector.process_frame(image, std::chrono::system_clock::now());
+//    detector.process_frame(image, current_time());
 
     ButtonDetector detector(console, console, ButtonType::ButtonA, {0.40, 0.50, 0.40, 0.50});
 
@@ -765,7 +625,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 //    InferenceBoxScope box(overlay, 0.40, 0.50, 0.40, 0.50);
 
 
-//    cout << std::chrono::system_clock::time_point::min() - std::chrono::system_clock::now() << endl;
+//    cout << WallClock::min() - current_time() << endl;
 
 //    pbf_move_right_joystick(context, 0, 128, 45, 0);
 
@@ -827,7 +687,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
         overlay,
         {{bubbles, false}, {arcs, false}, {quest_marks, false}}
     );
-//    watcher.process_frame(feed.snapshot(), std::chrono::system_clock::now());
+//    watcher.process_frame(feed.snapshot(), current_time());
 #if 1
     {
         VisualInferenceSession session(env, logger, feed, overlay);
@@ -870,7 +730,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 //    ShinySymbolWatcher watcher(overlay, SHINY_SYMBOL_BOX_BOTTOM);
-//    watcher.process_frame(feed.snapshot(), std::chrono::system_clock::now());
+//    watcher.process_frame(feed.snapshot(), current_time());
 
 
 //    ArcDetector detector;

@@ -28,10 +28,7 @@ EntranceDetector::EntranceDetector(const QImage& entrance_screen)
 void EntranceDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_DARKGREEN, m_box0);
 }
-bool EntranceDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool EntranceDetector::process_frame(const QImage& frame, WallClock timestamp){
     return detect(frame);
 }
 

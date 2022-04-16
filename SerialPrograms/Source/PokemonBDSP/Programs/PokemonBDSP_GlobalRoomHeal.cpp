@@ -17,7 +17,7 @@ namespace PokemonBDSP{
 
 
 
-bool heal_by_global_room(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
+bool heal_by_global_room(ConsoleHandle& console, BotBaseContext& context){
     // Go to union room menu.
     const uint16_t overworld_to_room_delay = 125;
     pbf_press_button(context, BUTTON_Y, 10, overworld_to_room_delay);
@@ -29,13 +29,13 @@ bool heal_by_global_room(ProgramEnvironment& env, ConsoleHandle& console, BotBas
     // - "Would you like to enter the Global Room?" To select: "Yes" and other options.
     SelectionArrowFinder arrow(console, {0.50, 0.45, 0.20, 0.20}, COLOR_GREEN);
     int ret = run_until(
-        env, console, context,
+        console, context,
         [=](BotBaseContext& context){
             for (int i = 0; i < 5; i++){
                 pbf_press_button(context, BUTTON_ZL, 10, 125);
             }
         },
-        { &arrow }
+        {{arrow}}
     );
     if (ret < 0){
         throw OperationFailedException(console, "No selection arrow detected when using Global Room.");

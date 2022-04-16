@@ -57,7 +57,7 @@ StateMachineAction run_state_iteration(
     PokemonSwapMenuDetector pokemon_swap(false);
     PathSelectDetector path_select;
     ItemSelectDetector item_menu(false);
-    ProfessorSwapDetector professor_swap(console);
+    ProfessorSwapDetector professor_swap(console, !starting);
     BattleMenuDetector battle_menu;
     RaidCatchDetector catch_select(console);
     PokemonCaughtMenuDetector caught_menu;
@@ -65,20 +65,21 @@ StateMachineAction run_state_iteration(
     FrozenImageDetector frozen_screen(COLOR_CYAN, {0, 0, 1, 0.5}, std::chrono::seconds(30), 10);
 
     int result = wait_until(
-        env, console, context,
+        console, context,
         std::chrono::seconds(300),
         {
-            starting
-                ? (VisualInferenceCallback*)&pokemon_select
-                : (VisualInferenceCallback*)&pokemon_swap,
-            &path_select,
-            &item_menu,
-            starting ? nullptr : &professor_swap,
-            &battle_menu,
-            &catch_select,
-            &caught_menu,
-            &entrance_detector,
-            &frozen_screen,
+            {starting
+                ? (VisualInferenceCallback&)pokemon_select
+                : (VisualInferenceCallback&)pokemon_swap
+            },
+            {path_select},
+            {item_menu},
+            {professor_swap},
+            {battle_menu},
+            {catch_select},
+            {caught_menu},
+            {entrance_detector},
+            {frozen_screen},
         },
         std::chrono::milliseconds(200)
     );
@@ -91,7 +92,7 @@ StateMachineAction run_state_iteration(
             return StateMachineAction::KEEP_GOING;
         }else{
             console.log("Current State: " + STRING_POKEMON + " Swap");
-            run_swap_pokemon(runtime, env, console, context, global_state, runtime.console_settings[console_index]);
+            run_swap_pokemon(runtime, console, context, global_state, runtime.console_settings[console_index]);
             return StateMachineAction::KEEP_GOING;
         }
     case 1:
@@ -100,11 +101,11 @@ StateMachineAction run_state_iteration(
         return StateMachineAction::KEEP_GOING;
     case 2:
         console.log("Current State: Item Select");
-        run_item_select(env, console, context, global_state);
+        run_item_select(console, context, global_state);
         return StateMachineAction::KEEP_GOING;
     case 3:
         console.log("Current State: Professor Swap");
-        run_professor_swap(runtime, env, console, context, global_state);
+        run_professor_swap(runtime, console, context, global_state);
         return StateMachineAction::KEEP_GOING;
     case 4:
         console.log("Current State: Move Select");

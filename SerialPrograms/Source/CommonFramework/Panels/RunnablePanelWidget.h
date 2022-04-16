@@ -31,7 +31,7 @@ public:
 
     ProgramState state() const{ return m_state.load(std::memory_order_acquire); }
     std::string stats();
-    std::chrono::system_clock::time_point timestamp() const;
+    WallClock timestamp() const;
 
 //    //  Reset serial if possible.
 //    bool reset_serial();    //  Must call on main thread.
@@ -115,7 +115,7 @@ protected:
     QPushButton* m_start_button;
     QPushButton* m_default_button;
 
-    std::atomic<std::chrono::system_clock::time_point> m_timestamp;
+    std::atomic<WallClock> m_timestamp;
     std::atomic<ProgramState> m_state;
     std::thread m_thread;
 

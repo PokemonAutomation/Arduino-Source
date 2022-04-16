@@ -16,8 +16,9 @@ namespace PokemonSwSh{
 namespace MaxLairInternal{
 
 
-ProfessorSwapDetector::ProfessorSwapDetector(VideoOverlay& overlay)
+ProfessorSwapDetector::ProfessorSwapDetector(VideoOverlay& overlay, bool enable)
     : SelectionArrowFinder(overlay, ImageFloatBox(0.600, 0.600, 0.200, 0.200))
+    , m_enabled(enable)
 //    , m_dialog0(0.257, 0.807, 0.015, 0.030)
 //    , m_dialog1(0.710, 0.880, 0.030, 0.050)
     , m_bottom_main(0.100, 0.970, 0.600, 0.020)
@@ -44,10 +45,10 @@ bool ProfessorSwapDetector::detect(const QImage& screen){
     }
     return SelectionArrowFinder::detect(screen);
 }
-bool ProfessorSwapDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool ProfessorSwapDetector::process_frame(const QImage& frame, WallClock timestamp){
+    if (!m_enabled){
+        return false;
+    }
     return detect(frame);
 }
 

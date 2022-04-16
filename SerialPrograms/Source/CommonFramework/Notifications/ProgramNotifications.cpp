@@ -61,12 +61,12 @@ void send_program_notification(
                 ? STRING_POKEMON + " Automation (" + PROGRAM_VERSION + "-dev)"
                 : STRING_POKEMON + " Automation (" + PROGRAM_VERSION + ")";
             QString text = info.program_name;
-            if (info.start_time != std::chrono::system_clock::time_point::min()){
+            if (info.start_time != WallClock::min()){
                 text += "\nUp Time: ";
                 text += QString::fromStdString(
                     duration_to_string(
                         std::chrono::duration_cast<std::chrono::milliseconds>(
-                            std::chrono::system_clock::now() - info.start_time
+                            current_time() - info.start_time
                         )
                     )
                 );

@@ -26,17 +26,14 @@ public:
 
     bool get(
         double& distance, double& x, double& y,
-        std::chrono::system_clock::time_point timestamp = std::chrono::system_clock::now()
+        WallClock timestamp = current_time()
     );
 
-    virtual bool process_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-    ) override;
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
 
 private:
     struct Sample{
-        std::chrono::system_clock::time_point timestamp;
+        WallClock timestamp;
         int distance;
         double x;
         double y;

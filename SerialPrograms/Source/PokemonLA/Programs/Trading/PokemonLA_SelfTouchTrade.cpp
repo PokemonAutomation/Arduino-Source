@@ -109,7 +109,7 @@ bool SelfTouchTrade::trade_one(
 #if 1
     MultiConsoleErrorState error_state;
     env.run_in_parallel(scope, [&](ConsoleHandle& console, BotBaseContext& context){
-        trade_current_pokemon(env, console, context, error_state, stats);
+        trade_current_pokemon(console, context, error_state, stats);
     });
     stats.m_trades++;
     iter->second--;

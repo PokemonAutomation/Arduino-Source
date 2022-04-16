@@ -39,7 +39,7 @@ const std::map<std::string, std::string> STATS_DATABASE_ALIASES{
 
 
 StatLine::StatLine(StatsTracker& tracker)
-    : m_time(current_time())
+    : m_time(current_time_to_str())
     , m_stats(tracker.to_str())
 {}
 StatLine::StatLine(const std::string& line){

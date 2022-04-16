@@ -72,10 +72,7 @@ MenuWatcher::MenuWatcher(Color color)
 void MenuWatcher::make_overlays(VideoOverlaySet& items) const{
     MenuDetector::make_overlays(items);
 }
-bool MenuWatcher::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool MenuWatcher::process_frame(const QImage& frame, WallClock timestamp){
     return detect(frame);
 }
 

@@ -36,7 +36,7 @@ void pai_status(DllSafeString& description){
         str += "__**Program " + std::to_string(item.first) + "**__\n";
         str += "* **Name:** " + item.second.program_name + "\n";
         str += "* **State:** ";
-        std::chrono::system_clock::time_point now = std::chrono::system_clock::now();
+        WallClock now = current_time();
         switch (item.second.state){
         case ProgramState::NOT_READY:
             str += "Not Ready";

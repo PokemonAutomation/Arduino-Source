@@ -93,7 +93,7 @@ int16_t move_to_ball(
 
 
 CatchResults throw_balls(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     Language language,
     const std::string& ball_slug
 ){
@@ -129,29 +129,29 @@ CatchResults throw_balls(
         }
         balls_used++;
 
-        auto start = std::chrono::system_clock::now();
+        auto start = current_time();
 
         BattleMenuWatcher menu_detector(BattleType::STANDARD);
         ExperienceGainWatcher experience_detector;
         SelectionArrowFinder own_fainted_detector(console, {0.18, 0.64, 0.46, 0.3}, COLOR_YELLOW);
         int result = wait_until(
-            env, console, context,
+            console, context,
             std::chrono::seconds(60),
             {
-                &menu_detector,
-                &experience_detector,
-                &own_fainted_detector,
+                {menu_detector},
+                {experience_detector},
+                {own_fainted_detector},
             }
         );
         switch (result){
         case 0:
-            if (std::chrono::system_clock::now() < start + std::chrono::seconds(5)){
+            if (current_time() < start + std::chrono::seconds(5)){
                 return {CatchResult::CANNOT_THROW_BALL, balls_used};
             }
-            env.log("BasicCatcher: Failed to catch.", COLOR_ORANGE);
+            console.log("BasicCatcher: Failed to catch.", COLOR_ORANGE);
             continue;
         case 1:
-            env.log("BasicCatcher: End of battle detected.", COLOR_PURPLE);
+            console.log("BasicCatcher: End of battle detected.", COLOR_PURPLE);
             // It's actually fainted or caught. The logic to find out which one
             // is in basic_catcher().
             return {CatchResult::POKEMON_FAINTED, balls_used};
@@ -165,30 +165,30 @@ CatchResults throw_balls(
 
 
 CatchResults basic_catcher(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     Language language,
     const std::string& ball_slug
 ){
     context.wait_for_all_requests();
-    env.log("Attempting to catch with: " + ball_slug);
+    console.log("Attempting to catch with: " + ball_slug);
 
-    CatchResults results = throw_balls(env, console, context, language, ball_slug);
+    CatchResults results = throw_balls(console, context, language, ball_slug);
     const QString s = (results.balls_used <= 1 ? "" : "s");
     const QString pokeball_str = QString::number(results.balls_used) + " " +
         QString(ball_slug.c_str()) + s;
 
     switch (results.result){
     case CatchResult::OUT_OF_BALLS:
-        env.log("BasicCatcher: Out of balls after throwing " + pokeball_str, COLOR_RED);
+        console.log("BasicCatcher: Out of balls after throwing " + pokeball_str, COLOR_RED);
         return results;
     case CatchResult::CANNOT_THROW_BALL:
-        env.log("BasicCatcher: cannot throw ball for some reason.", COLOR_RED);
+        console.log("BasicCatcher: cannot throw ball for some reason.", COLOR_RED);
         return results;
     case CatchResult::OWN_FAINTED:
-        env.log("BasicCatcher: own pokemon fainted after throwing " + pokeball_str, COLOR_RED);
+        console.log("BasicCatcher: own pokemon fainted after throwing " + pokeball_str, COLOR_RED);
         return results;
     case CatchResult::TIMEOUT:
-        env.log("BasicCatcher: time out.", COLOR_RED);
+        console.log("BasicCatcher: time out.", COLOR_RED);
         return results;
     default:;
     }
@@ -215,23 +215,23 @@ CatchResults basic_catcher(
         //  Look for the pokemon caught screen.
         ReceivePokemonDetector caught_detector;
         int ret = run_until(
-            env, console, context,
+            console, context,
             [=](BotBaseContext& context){
                 pbf_mash_button(context, BUTTON_B, 120 * TICKS_PER_SECOND);
             },
             {
-                &end_battle,
-                &caught_detector,
-                &learn_move,
+                {end_battle},
+                {caught_detector},
+                {learn_move},
             }
         );
         switch (ret){
         case 0:
             if (results.result == CatchResult::POKEMON_FAINTED){
-                env.log("BasicCatcher: The wild " + STRING_POKEMON + " fainted after " +
+                console.log("BasicCatcher: The wild " + STRING_POKEMON + " fainted after " +
                     pokeball_str, COLOR_RED);
             }
-            env.log("BasicCatcher: Battle finished!", COLOR_BLUE);
+            console.log("BasicCatcher: Battle finished!", COLOR_BLUE);
             pbf_wait(context, TICKS_PER_SECOND);
             context.wait_for_all_requests();
             return results;
@@ -239,12 +239,12 @@ CatchResults basic_catcher(
             if (results.result == CatchResult::POKEMON_CAUGHT){
                 throw OperationFailedException(console, "BasicCatcher: Found receive pokemon screen two times.");
             }
-            env.log("BasicCatcher: The wild " + STRING_POKEMON + " was caught by " + pokeball_str, COLOR_BLUE);
+            console.log("BasicCatcher: The wild " + STRING_POKEMON + " was caught by " + pokeball_str, COLOR_BLUE);
             pbf_wait(context, 50);
             results.result = CatchResult::POKEMON_CAUGHT;
             break; //  Continue the loop.
         case 2:
-            env.log("BasicCatcher: Detected move learn! Don't learn the new move.", COLOR_BLUE);
+            console.log("BasicCatcher: Detected move learn! Don't learn the new move.", COLOR_BLUE);
             num_learned_moves++;
             if (num_learned_moves == 100){
                 throw OperationFailedException(console, "BasicCatcher: Learn new move attempts reach 100.");
@@ -254,7 +254,7 @@ CatchResults basic_catcher(
             break; //  Continue the loop.
 
         default:
-            env.log("BasicCatcher: Timed out.", COLOR_RED);
+            console.log("BasicCatcher: Timed out.", COLOR_RED);
             results.result = CatchResult::TIMEOUT;
             return results;
         }

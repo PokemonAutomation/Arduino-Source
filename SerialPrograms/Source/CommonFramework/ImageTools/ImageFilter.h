@@ -15,7 +15,8 @@ namespace PokemonAutomation{
 
 class ConstImageRef;
 
-
+// If `invert` is false, replace the color outside of the range (`mins` and `maxs`) with the color `replace_with`.
+// If `invert` is true, replace the color range (between `mins` and `maxs`) with `replace_with`.
 void filter_rgb32_range(QImage& image, uint32_t mins, uint32_t maxs, Color replace_with, bool invert);
 
 void filter1_rgb32_range(

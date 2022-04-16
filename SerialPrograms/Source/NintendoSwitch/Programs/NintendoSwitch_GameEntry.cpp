@@ -9,6 +9,7 @@
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -31,7 +32,7 @@ void move_to_user(BotBaseContext& context, uint8_t user_slot){
 }
 
 void open_game_from_home(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    BotBaseContext& context,
     bool tolerate_update_menu,
     uint8_t game_slot,
     uint8_t user_slot,
@@ -90,10 +91,7 @@ public:
         items.add(COLOR_RED, m_box1);
     }
 
-    virtual bool process_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-    ) override{
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) override{
         if (!is_black(extract_box_reference(frame, m_box0))){
             return m_invert;
         }
@@ -111,16 +109,16 @@ private:
 
 
 bool openedgame_to_gamemenu(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ConsoleHandle& console, BotBaseContext& context,
     uint16_t timeout
 ){
     {
         console.log("Waiting to load game...");
         LoadingDetector detector(false);
         int ret = wait_until(
-            env, console, context,
+            console, context,
             std::chrono::milliseconds(timeout * (1000 / TICKS_PER_SECOND)),
-            { &detector }
+            {{detector}}
         );
         if (ret < 0){
             console.log("Timed out waiting to enter game.", COLOR_RED);
@@ -131,9 +129,9 @@ bool openedgame_to_gamemenu(
         console.log("Waiting for game menu...");
         LoadingDetector detector(true);
         int ret = wait_until(
-            env, console, context,
+            console, context,
             std::chrono::milliseconds(timeout * (1000 / TICKS_PER_SECOND)),
-            { &detector }
+            {{detector}}
         );
         if (ret < 0){
             console.log("Timed out waiting for game menu.", COLOR_RED);

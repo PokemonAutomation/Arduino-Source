@@ -39,10 +39,7 @@ void DialogSurpriseDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_cursor);
     m_arc_phone.make_overlays(items);
 }
-bool DialogSurpriseDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool DialogSurpriseDetector::process_frame(const QImage& frame, WallClock timestamp){
     size_t hits = 0;
 
     ImageStats title_top = image_stats(extract_box_reference(frame, m_title_top));
@@ -124,10 +121,7 @@ void NormalDialogDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_right_white);
     // m_arc_phone.make_overlays(items);
 }
-bool NormalDialogDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool NormalDialogDetector::process_frame(const QImage& frame, WallClock timestamp){
     size_t hits = 0;
 
     const ImageStats title_top = image_stats(extract_box_reference(frame, m_title_top));

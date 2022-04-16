@@ -30,10 +30,7 @@ public:
     virtual void make_overlays(VideoOverlaySet& items) const override;
 
     // Return true only when a receiving event happened and ended.
-    virtual bool process_frame(
-        const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
-    ) override;
+    virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
 
 private:
     bool m_received = false;

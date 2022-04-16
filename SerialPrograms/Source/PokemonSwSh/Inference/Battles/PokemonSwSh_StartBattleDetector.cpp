@@ -28,10 +28,7 @@ StartBattleWatcher::StartBattleWatcher(Color color)
 void StartBattleWatcher::make_overlays(VideoOverlaySet& items) const{
     items.add(m_color, m_screen_box);
 }
-bool StartBattleWatcher::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool StartBattleWatcher::process_frame(const QImage& frame, WallClock timestamp){
     ConstImageRef image = extract_box_reference(frame, m_screen_box);
     ImageStats stats = image_stats(image);
 

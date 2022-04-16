@@ -38,7 +38,7 @@ private:
 
     bool trigger_encounter(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
     void swap_party(ConsoleHandle& console, BotBaseContext& context);
-    void mash_B_to_battle(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
+    void mash_B_to_battle(ConsoleHandle& console, BotBaseContext& context);
     void detach_items(ConsoleHandle& console, BotBaseContext& context);
 
 private:

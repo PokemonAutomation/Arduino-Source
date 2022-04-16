@@ -41,10 +41,7 @@ bool FishingMissDetector::detect(const QImage& frame){
 
     return true;
 }
-bool FishingMissDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool FishingMissDetector::process_frame(const QImage& frame, WallClock timestamp){
     return detect(frame);
 }
 
@@ -56,10 +53,7 @@ FishingHookDetector::FishingHookDetector(VideoOverlay& overlay)
 void FishingHookDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_hook_box);
 }
-bool FishingHookDetector::process_frame(
-    const QImage& frame,
-    std::chrono::system_clock::time_point timestamp
-){
+bool FishingHookDetector::process_frame(const QImage& frame, WallClock timestamp){
     ConstImageRef hook_image = extract_box_reference(frame, m_hook_box);
 
     std::vector<ImagePixelBox> exclamation_marks = find_exclamation_marks(hook_image);
