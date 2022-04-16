@@ -44,7 +44,7 @@ NuggetFarmerHighlands_Descriptor::NuggetFarmerHighlands_Descriptor()
 
 MoneyFarmerHighlands::MoneyFarmerHighlands(const NuggetFarmerHighlands_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
-    , SHINY_DETECTED("2 * TICKS_PER_SECOND")
+    , SHINY_DETECTED("Shiny Detected Action", "2 * TICKS_PER_SECOND")
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,

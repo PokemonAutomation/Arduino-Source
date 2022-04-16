@@ -50,7 +50,7 @@ PostMMOSpawnReset::PostMMOSpawnReset(const PostMMOSpawnReset_Descriptor& descrip
         "<b>Wait Time:</b><br> Wait time after movement.",
         "3 * TICKS_PER_SECOND"
     )
-    , SHINY_DETECTED("0 * TICKS_PER_SECOND")
+    , SHINY_DETECTED("Shiny Detected Action", "0 * TICKS_PER_SECOND")
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,

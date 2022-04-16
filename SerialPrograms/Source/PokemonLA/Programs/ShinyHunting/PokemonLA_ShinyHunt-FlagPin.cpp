@@ -51,7 +51,7 @@ ShinyHuntFlagPin::ShinyHuntFlagPin(const ShinyHuntFlagPin_Descriptor& descriptor
         "<b>Navigation Timeout:</b><br>Give up and reset if flag is not reached after this many seconds.",
         180, 0
     )
-    , SHINY_DETECTED("0 * TICKS_PER_SECOND")
+    , SHINY_DETECTED("Shiny Detected Action", "0 * TICKS_PER_SECOND")
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,

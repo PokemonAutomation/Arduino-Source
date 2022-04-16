@@ -45,7 +45,7 @@ UnownFinder_Descriptor::UnownFinder_Descriptor()
 
 UnownFinder::UnownFinder(const UnownFinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
-    , SHINY_DETECTED("0 * TICKS_PER_SECOND")
+    , SHINY_DETECTED("Shiny Detected Action", "0 * TICKS_PER_SECOND")
     , SKIP_PATH_SHINY("<b>Skip any Shines on the Path:</b><br>Only care about shines inside the ruins.", false)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -119,7 +119,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     // Start path
     env.console.log("Beginning Shiny Detection...");
     {
-        ShinyDetectedActionOption SHINY_DETECTED_ON_ROUTE(QString::number(SHINY_DETECTED.SCREENSHOT_DELAY));
+        ShinyDetectedActionOption SHINY_DETECTED_ON_ROUTE("Shiny Detected Action", QString::number(SHINY_DETECTED.SCREENSHOT_DELAY));
         SHINY_DETECTED_ON_ROUTE.NOTIFICATIONS = SHINY_DETECTED.NOTIFICATIONS;
         SHINY_DETECTED_ON_ROUTE.ACTION.set(!SKIP_PATH_SHINY);
 

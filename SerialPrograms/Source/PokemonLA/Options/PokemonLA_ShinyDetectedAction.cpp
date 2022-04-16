@@ -23,8 +23,11 @@ namespace PokemonLA{
 
 
 
-ShinyDetectedActionOption::ShinyDetectedActionOption(QString default_delay_ticks)
-    : GroupOption("Shiny Detected Actions")
+ShinyDetectedActionOption::ShinyDetectedActionOption(
+    QString label,
+    QString default_delay_ticks
+)
+    : GroupOption(std::move(label))
     , DESCRIPTION("<font color=\"blue\">Shiny detection uses sound. Make sure you have the correct audio input set.</font>")
     , ACTION(
         "<b>Shiny Detected Action:</b>",

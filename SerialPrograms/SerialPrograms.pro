@@ -428,6 +428,7 @@ SOURCES += \
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.cpp \
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_ItemCompatibilityDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_MapDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_MountDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_NotificationReader.cpp \
@@ -449,6 +450,7 @@ SOURCES += \
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.cpp \
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.cpp \
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.cpp \
+    Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.cpp \
     Source/PokemonLA/Programs/PokemonLA_BattleRoutines.cpp \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.cpp \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.cpp \
@@ -1101,6 +1103,7 @@ HEADERS += \
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h \
     Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.h \
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_ItemCompatibilityDetector.h \
     Source/PokemonLA/Inference/PokemonLA_MapDetector.h \
     Source/PokemonLA/Inference/PokemonLA_MountDetector.h \
     Source/PokemonLA/Inference/PokemonLA_NotificationReader.h \
@@ -1123,6 +1126,7 @@ HEADERS += \
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.h \
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.h \
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.h \
+    Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.h \
     Source/PokemonLA/Programs/PokemonLA_BattleRoutines.h \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.h \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.h \

@@ -50,7 +50,10 @@ enum class ShinyDetectedAction{
 
 class ShinyDetectedActionOption : public GroupOption{
 public:
-    ShinyDetectedActionOption(QString default_delay_ticks);
+    ShinyDetectedActionOption(
+        QString label,
+        QString default_delay_ticks
+    );
 
     bool stop_on_shiny() const;
 
