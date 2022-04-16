@@ -859,6 +859,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.h
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.h
+    Source/PokemonLA/Inference/PokemonLA_ItemCompatibilityDetector.cpp
+    Source/PokemonLA/Inference/PokemonLA_ItemCompatibilityDetector.h
     Source/PokemonLA/Inference/PokemonLA_MapDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_MapDetector.h
     Source/PokemonLA/Inference/PokemonLA_MountDetector.cpp
@@ -920,6 +922,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.h
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.cpp
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.h
+    Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.cpp
+    Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_GalladeFinder.cpp
