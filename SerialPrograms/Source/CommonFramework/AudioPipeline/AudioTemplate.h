@@ -35,6 +35,8 @@ private:
     std::vector<float> m_spectrogram;
 };
 
+// Load AudioTemplate from disk. Accept .wav format on any OS.
+// Loading .mp3 format however is dependent on Qt's platform-dependent backend.
 AudioTemplate loadAudioTemplate(const QString& filename, size_t sampleRate = 48000);
 
 
