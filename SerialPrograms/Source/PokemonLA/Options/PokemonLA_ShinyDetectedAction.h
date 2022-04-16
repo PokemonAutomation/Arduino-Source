@@ -41,25 +41,6 @@ struct ShinySoundResults{
 
 
 
-
-#if 0
-//  Throw when you want to force the program to stop.
-class ShinyDetectedException : public OperationCancelledException{
-public:
-    ShinyDetectedException(QImage image)
-        : m_screenshot(std::move(image))
-    {}
-    virtual const char* name() const override{ return "ShinyDetectedException"; }
-    QImage consume_screenshot(){
-        return m_screenshot;
-    }
-
-private:
-    QImage m_screenshot;
-};
-#endif
-
-
 enum class ShinyDetectedAction{
     IGNORE,
     STOP_PROGRAM,
@@ -69,7 +50,7 @@ enum class ShinyDetectedAction{
 
 class ShinyDetectedActionOption : public GroupOption{
 public:
-    ShinyDetectedActionOption(QString default_delay_ticks = "0 * TICKS_PER_SECOND");
+    ShinyDetectedActionOption(QString default_delay_ticks);
 
     bool stop_on_shiny() const;
 
@@ -82,27 +63,27 @@ public:
 };
 
 
-#if 0
-//  Return true if program should stop.
-bool run_on_shiny(
-    BotBaseContext& context,
-    const ShinyDetectedActionOption& option
-);
 
-bool run_on_shiny(
-    ProgramEnvironment& env, ConsoleHandle& console,
-    AsyncCommandSession& command_session,
-    ShinyDetectedActionOption& option,
-    const StatsTracker* session_stats
-);
-#endif
-
-
-void on_shiny_sound(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+//  Call this inside the ShinySoundDetector callback.
+//  Returns true if session should stop.
+bool on_shiny_callback(
+    const ProgramEnvironment& env, ConsoleHandle& console,
     ShinyDetectedActionOption& options,
-    const ShinySoundResults& results
+    float error_coefficient
 );
+
+//  Call this after the session ends. Only if the session stopped on the shiny.
+void on_shiny_sound(
+    const ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ShinyDetectedActionOption& options,
+    float error_coefficient
+);
+
+
+
+
+
+
 
 
 

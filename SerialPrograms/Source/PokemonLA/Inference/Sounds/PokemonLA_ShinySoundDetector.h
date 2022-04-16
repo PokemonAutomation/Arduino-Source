@@ -27,6 +27,7 @@ namespace PokemonLA{
 
 class ShinySoundDetector : public AudioPerSpectrumDetectorBase{
 public:
+    //  Warning: The callback will be called from the audio inference thread.
     ShinySoundDetector(ConsoleHandle& console, OnShinyCallback on_shiny_callback);
 
     // Implement AudioPerSpectrumDetectorBase::get_score_threshold()

@@ -51,6 +51,7 @@ ShinyHuntFlagPin::ShinyHuntFlagPin(const ShinyHuntFlagPin_Descriptor& descriptor
         "<b>Navigation Timeout:</b><br>Give up and reset if flag is not reached after this many seconds.",
         180, 0
     )
+    , SHINY_DETECTED("0 * TICKS_PER_SECOND")
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -99,18 +100,14 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, BotBas
 
     {
         //  Outer scope with shiny detection wrapping everything.
-        bool shiny_detected = false;
-        ShinySoundResults shiny_results;
+        float shiny_coefficient = 1.0;
         ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
-            // This lambda function will be called when a shiny is detected.
-            // Its return will determine whether to stop the program:
-            shiny_detected = true;
-            
-            shiny_results.screenshot = env.console.video().snapshot();
-            shiny_results.error_coefficient = error_coefficient;
-            return SHINY_DETECTED.stop_on_shiny();
+            //  Warning: This callback will be run from a different thread than this function.
+            stats.shinies++;
+            shiny_coefficient = error_coefficient;
+            return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
         });
-        run_until(
+        int ret = run_until(
             env.console, context,
             [&](BotBaseContext& context){
                 //  Inner scope.
@@ -125,9 +122,8 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, BotBas
             },
             {{shiny_detector}}
         );
-        if (shiny_detected){
-            stats.shinies++;
-            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_results);
+        if (ret == 0){
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_coefficient);
         }
     }
 

@@ -45,18 +45,18 @@ UnownFinder_Descriptor::UnownFinder_Descriptor()
 
 UnownFinder::UnownFinder(const UnownFinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
-    , SHINY_DETECTED0("2 * TICKS_PER_SECOND")
+    , SHINY_DETECTED("0 * TICKS_PER_SECOND")
     , SKIP_PATH_SHINY("<b>Skip any Shines on the Path:</b><br>Only care about shines inside the ruins.", false)
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
-        &SHINY_DETECTED0.NOTIFICATIONS,
+        &SHINY_DETECTED.NOTIFICATIONS,
         &NOTIFICATION_PROGRAM_FINISH,
 //        &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
 {
-    PA_ADD_OPTION(SHINY_DETECTED0);
+    PA_ADD_OPTION(SHINY_DETECTED);
     PA_ADD_OPTION(SKIP_PATH_SHINY);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
@@ -119,58 +119,48 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     // Start path
     env.console.log("Beginning Shiny Detection...");
     {
-        ShinyDetectedActionOption SHINY_DETECTED_ON_ROUTE(QString::number(SHINY_DETECTED0.SCREENSHOT_DELAY));
-        SHINY_DETECTED_ON_ROUTE.NOTIFICATIONS = SHINY_DETECTED0.NOTIFICATIONS;
+        ShinyDetectedActionOption SHINY_DETECTED_ON_ROUTE(QString::number(SHINY_DETECTED.SCREENSHOT_DELAY));
+        SHINY_DETECTED_ON_ROUTE.NOTIFICATIONS = SHINY_DETECTED.NOTIFICATIONS;
         SHINY_DETECTED_ON_ROUTE.ACTION.set(!SKIP_PATH_SHINY);
 
-        bool shiny_detected = false;
-        ShinySoundResults shiny_results;
+        float shiny_coefficient = 1.0;
         ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
-            // This lambda function will be called when a shiny is detected.
-            // Its return will determine whether to stop the program:
-            shiny_detected = true;
-            shiny_results.screenshot = env.console.video().snapshot();
-            shiny_results.error_coefficient = error_coefficient;
-            return !SKIP_PATH_SHINY;
+            //  Warning: This callback will be run from a different thread than this function.
+            stats.shinies++;
+            shiny_coefficient = error_coefficient;
+            return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
         });
 
-        run_until(
+        int ret = run_until(
             env.console, context,
             [](BotBaseContext& context){
                ruins_entrance_route(context);
             },
             {{shiny_detector}}
         );
-
-        if (shiny_detected){
-            stats.shinies++;
-            on_shiny_sound(env, env.console, context, SHINY_DETECTED_ON_ROUTE, shiny_results);
+        if (ret == 0){
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_coefficient);
         }
     }
 
     // Enter ruins
     {
-        bool shiny_detected = false;
-        ShinySoundResults shiny_results;
+        float shiny_coefficient = 1.0;
         ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
-            // This lambda function will be called when a shiny is detected.
-            // Its return will determine whether to stop the program:
-            shiny_detected = true;
-            shiny_results.screenshot = env.console.video().snapshot();
-            shiny_results.error_coefficient = error_coefficient;
-            return SHINY_DETECTED0.stop_on_shiny();
+            //  Warning: This callback will be run from a different thread than this function.
+            stats.shinies++;
+            shiny_coefficient = error_coefficient;
+            return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
         });
 
-        run_until(env.console, context,
+        int ret = run_until(env.console, context,
             [](BotBaseContext& context){
                enter_ruins(context);
             },
             {{shiny_detector}}
         );
-
-        if (shiny_detected){
-            stats.shinies++;
-            on_shiny_sound(env, env.console, context, SHINY_DETECTED0, shiny_results);
+        if (ret == 0){
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_coefficient);
         }
     }
 

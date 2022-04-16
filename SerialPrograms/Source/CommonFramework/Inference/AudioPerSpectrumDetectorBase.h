@@ -80,6 +80,8 @@ public:
     // This function will always be called when the detector is destructed.
     void log_results();
 
+    float lowest_error(){ return m_lowest_error; }
+
 protected:
     // To be implemented by derived classes:
     // build the actual spectrogram matcher for the target audio.

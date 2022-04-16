@@ -105,18 +105,15 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseC
         SHINY_DETECTED_ON_ROUTE.NOTIFICATIONS = SHINY_DETECTED.NOTIFICATIONS;
         SHINY_DETECTED_ON_ROUTE.ACTION.set(!SKIP_PATH_SHINY);
 
-        bool shiny_detected = false;
-        ShinySoundResults shiny_results;
+        float shiny_coefficient = 1.0;
         ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
-            // This lambda function will be called when a shiny is detected.
-            // Its return will determine whether to stop the program:
-            shiny_detected = true;
-            shiny_results.screenshot = env.console.video().snapshot();
-            shiny_results.error_coefficient = error_coefficient;
-            return !SKIP_PATH_SHINY;
+            //  Warning: This callback will be run from a different thread than this function.
+            stats.shinies++;
+            shiny_coefficient = error_coefficient;
+            return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
         });
 
-        run_until(
+        int ret = run_until(
             env.console, context,
                 [](BotBaseContext& context){
                 pbf_press_button(context, BUTTON_B, (uint16_t)(2 * TICKS_PER_SECOND), 10);  //Get some distance from the moutain
@@ -130,27 +127,22 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseC
             },
             {{shiny_detector}}
         );
-
-        if (shiny_detected){
-            stats.shinies++;
-            on_shiny_sound(env, env.console, context, SHINY_DETECTED_ON_ROUTE, shiny_results);
+        if (ret == 0){
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_coefficient);
         }
     }
 
     //Move to Froslass
     {
-        bool shiny_detected = false;
-        ShinySoundResults shiny_results;
+        float shiny_coefficient = 1.0;
         ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
-            // This lambda function will be called when a shiny is detected.
-            // Its return will determine whether to stop the program:
-            shiny_detected = true;
-            shiny_results.screenshot = env.console.video().snapshot();
-            shiny_results.error_coefficient = error_coefficient;
-            return SHINY_DETECTED.stop_on_shiny();
+            //  Warning: This callback will be run from a different thread than this function.
+            stats.shinies++;
+            shiny_coefficient = error_coefficient;
+            return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
         });
 
-        run_until(
+        int ret = run_until(
                 env.console, context,
                 [](BotBaseContext& context){
                 pbf_press_dpad(context, DPAD_LEFT, 20, 20);
@@ -158,10 +150,8 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseC
             },
             {{shiny_detector}}
         );
-
-        if (shiny_detected){
-            stats.shinies++;
-            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_results);
+        if (ret == 0){
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_coefficient);
         }
     }
 

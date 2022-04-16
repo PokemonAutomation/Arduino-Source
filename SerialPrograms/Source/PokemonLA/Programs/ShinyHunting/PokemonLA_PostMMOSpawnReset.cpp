@@ -50,6 +50,7 @@ PostMMOSpawnReset::PostMMOSpawnReset(const PostMMOSpawnReset_Descriptor& descrip
         "<b>Wait Time:</b><br> Wait time after movement.",
         "3 * TICKS_PER_SECOND"
     )
+    , SHINY_DETECTED("0 * TICKS_PER_SECOND")
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -99,18 +100,15 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
     // From game to Switch Home
     pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
     {
-        bool shiny_detected = false;
-        ShinySoundResults shiny_results;
+        float shiny_coefficient = 1.0;
         ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
-            // This lambda function will be called when a shiny is detected.
-            // Its return will determine whether to stop the program:
-            shiny_detected = true;
-            shiny_results.screenshot = env.console.video().snapshot();
-            shiny_results.error_coefficient = error_coefficient;
-            return SHINY_DETECTED.stop_on_shiny();
+            //  Warning: This callback will be run from a different thread than this function.
+            stats.shinies++;
+            shiny_coefficient = error_coefficient;
+            return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
         });
 
-        run_until(
+        int ret = run_until(
             env.console, context,
             [this, &env](BotBaseContext& context){
                 reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
@@ -131,9 +129,8 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
             },
             {{shiny_detector}}
         );
-        if (shiny_detected){
-            stats.shinies++;
-            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_results);
+        if (ret == 0){
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_coefficient);
         }
     }
 

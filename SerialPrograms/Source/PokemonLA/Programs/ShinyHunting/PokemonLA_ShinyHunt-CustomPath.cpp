@@ -41,6 +41,7 @@ ShinyHuntCustomPath::ShinyHuntCustomPath(const ShinyHuntCustomPath_Descriptor& d
         "<b>Test Path:</b><br>Run the path immediately on the map to test it.",
         false
     )
+    , SHINY_DETECTED("0 * TICKS_PER_SECOND")
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -175,17 +176,14 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseC
         }else{
             env.log("Start Listen, build sound detector");
             // Build shiny sound detector and start listens:
-            bool shiny_detected = false;
-            ShinySoundResults shiny_results;
+            float shiny_coefficient = 1.0;
             ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
-                // This lambda function will be called when a shiny is detected.
-                // Its return will determine whether to stop the program:
-                shiny_detected = true;
-                shiny_results.screenshot = env.console.video().snapshot();
-                shiny_results.error_coefficient = error_coefficient;
-                return SHINY_DETECTED.stop_on_shiny();
+                //  Warning: This callback will be run from a different thread than this function.
+                stats.shinies++;
+                shiny_coefficient = error_coefficient;
+                return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
             });
-            run_until(
+            int ret = run_until(
                 env.console, context,
                 [&env, &action_index, this](BotBaseContext& context){
                     for(; action_index < CUSTOM_PATH_TABLE.num_actions(); action_index++){
@@ -201,9 +199,8 @@ void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseC
                 },
                 {{shiny_detector}}
             );
-            if (shiny_detected){
-                stats.shinies++;
-                on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_results);
+            if (ret == 0){
+                on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_coefficient);
             }
         }
     } // end for loop on each action

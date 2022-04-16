@@ -27,12 +27,7 @@ ShinyDetectedActionOption::ShinyDetectedActionOption(QString default_delay_ticks
     : GroupOption("Shiny Detected Actions")
     , DESCRIPTION("<font color=\"blue\">Shiny detection uses sound. Make sure you have the correct audio input set.</font>")
     , ACTION(
-        "<b>Shiny Detected Action:</b><br><br>"
-        "If set to ignore the shiny, the notification may be delayed depending on the program. "
-        "Furthermore, the screenshot will be from the moment the shiny sound was detected. "
-        "No attempt will be made to align the camera or wait for the shiny to come into view.<br><br>"
-        "This limitation is because most programs cannot be interrupted without completely stopping the program. "
-        "So you must either completely ignore the shiny or completely stop the program.",
+        "<b>Shiny Detected Action:</b>",
         {
             "Ignore the shiny. Do not stop the program.",
             "Stop program. Align camera for a screenshot. Then go Home.",
@@ -62,67 +57,51 @@ bool ShinyDetectedActionOption::stop_on_shiny() const{
 }
 
 
-#if 0
-bool run_on_shiny(
-    BotBaseContext& context,
-    const ShinyDetectedActionOption& option
-){
-    switch ((ShinyDetectedAction)(size_t)option.ACTION){
-    case ShinyDetectedAction::IGNORE:
-        return false;
-    case ShinyDetectedAction::STOP_PROGRAM:
-        pbf_wait(context, option.VIDEO_DELAY);
-        pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-        return true;
-    case ShinyDetectedAction::TAKE_VIDEO_STOP_PROGRAM:
-        pbf_wait(context, option.VIDEO_DELAY);
-        pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
-        pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-        return true;
-    }
-    return false;
-}
 
 
-bool run_on_shiny(
-    ProgramEnvironment& env, ConsoleHandle& console,
-    AsyncCommandSession& command_session,
-    ShinyDetectedActionOption& option,
-    const StatsTracker* session_stats
+
+
+bool on_shiny_callback(
+    const ProgramEnvironment& env, ConsoleHandle& console,
+    ShinyDetectedActionOption& options,
+    float error_coefficient
 ){
-    QImage screenshot = console.video().snapshot();
-    if (!option.do_nothing()){
-        command_session.dispatch([&](BotBaseContext& context){
-            run_on_shiny(context, option);
-        });
-        command_session.wait();
+    std::stringstream ss;
+    ss << "Detected Shiny Sound! (error coefficient = " << error_coefficient << ")";
+    console.log(ss.str(), COLOR_BLUE);
+
+    //  If we're not ignoring the shiny, return now. Actions will be deferred
+    //  until after the session ends.
+    ShinyDetectedAction action = (ShinyDetectedAction)(size_t)options.ACTION;
+    if (action != ShinyDetectedAction::IGNORE){
+        return true;
     }
+
+    ss << "Error Coefficient: ";
+    ss << error_coefficient;
+    ss << "\n(Shiny may not be visible on the screen.)";
 
     std::vector<std::pair<QString, QString>> embeds;
-    if (session_stats){
-        std::string str = session_stats->to_str();
+    const StatsTracker* stats = env.stats();
+    if (stats){
+        std::string str = stats->to_str();
         if (!str.empty()){
             embeds.emplace_back("Session Stats", QString::fromStdString(str));
         }
     }
-
     send_program_notification(
-        console, option.NOTIFICATIONS, Color(COLOR_STAR_SHINY),
+        console, options.NOTIFICATIONS, Pokemon::COLOR_STAR_SHINY,
         env.program_info(),
         "Detected Shiny Sound",
         embeds,
-        screenshot, true
+        console.video().snapshot(), true
     );
-
-    return (ShinyDetectedAction)(size_t)option.ACTION != ShinyDetectedAction::IGNORE;
+    return false;
 }
-#endif
-
-
 void on_shiny_sound(
-    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    const ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     ShinyDetectedActionOption& options,
-    const ShinySoundResults& results
+    float error_coefficient
 ){
     std::vector<std::pair<QString, QString>> embeds;
     const StatsTracker* stats = env.stats();
@@ -135,23 +114,10 @@ void on_shiny_sound(
 
     std::stringstream ss;
     ss << "Error Coefficient: ";
-    ss << results.error_coefficient;
+    ss << error_coefficient;
     ss << "\n(Shiny may not be visible on the screen.)";
 
     embeds.emplace_back("Detection Results", QString::fromStdString(ss.str()));
-
-    ShinyDetectedAction action = (ShinyDetectedAction)(size_t)options.ACTION;
-
-    if (action == ShinyDetectedAction::IGNORE){
-        send_program_notification(
-            console, options.NOTIFICATIONS, Pokemon::COLOR_STAR_SHINY,
-            env.program_info(),
-            "Detected Shiny Sound",
-            embeds,
-            results.screenshot, true
-        );
-        return;
-    }
 
 //    pbf_press_button(context, BUTTON_ZL, 20, options.SCREENSHOT_DELAY);
     pbf_mash_button(context, BUTTON_ZL, options.SCREENSHOT_DELAY);
@@ -166,6 +132,7 @@ void on_shiny_sound(
         screen, true
     );
 
+    ShinyDetectedAction action = (ShinyDetectedAction)(size_t)options.ACTION;
     if (action == ShinyDetectedAction::TAKE_VIDEO_STOP_PROGRAM){
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
     }
@@ -174,6 +141,13 @@ void on_shiny_sound(
     context.wait_for_all_requests();
     throw ProgramFinishedException();
 }
+
+
+
+
+
+
+
 
 
 
