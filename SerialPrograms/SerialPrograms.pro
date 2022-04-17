@@ -9,6 +9,7 @@ greaterThan(QT_MAJOR_VERSION, 4): QT += widgets
 INCLUDEPATH += ../
 INCLUDEPATH += ../../Internal/
 INCLUDEPATH += Source/
+RESOURCES += ../Common/Qt/qdarkstyle/dark/style.qrc
 
 CONFIG += force_debug_info
 

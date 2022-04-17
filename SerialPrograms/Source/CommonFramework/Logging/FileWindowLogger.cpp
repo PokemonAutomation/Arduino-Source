@@ -105,8 +105,12 @@ QString FileWindowLogger::to_window_str(const std::string& msg, Color color){
     //      <br>    for the output window.
     //      \r\n    for the log file.
 
-    QColor qcolor = color ? QColor((uint32_t)color) : Qt::black;
-    std::string str = "<font color=\"" + qcolor.name().toStdString() + "\">";
+    std::string str;
+    if (color){
+        str += "<font color=\"" + QColor((uint32_t)color).name().toStdString() + "\">";
+    }else{
+        str += "<font>";
+    }
     for (char ch : msg){
         if (ch == ' '){
             str += "&nbsp;";
@@ -118,7 +122,9 @@ QString FileWindowLogger::to_window_str(const std::string& msg, Color color){
         }
         str += ch;
     }
-    str += "</font>";
+//    if (color){
+        str += "</font>";
+//    }
 
     return QString::fromStdString(str);
 }

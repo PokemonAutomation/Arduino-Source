@@ -156,6 +156,13 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 
 
+
+
+    cout << "asdfasdf" << endl;
+
+
+
+
 #if 0
     std::function<void()> callback0 = []{ cout << "asdf" << endl; };
     std::function<void()> callback1 = []{ cout << "qwer" << endl; };
