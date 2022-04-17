@@ -35,8 +35,6 @@ void KeyboardDebouncer::add_event(bool press, VirtualControllerState state){
     }
     m_history.emplace_back(Entry{now, press, state});
 }
-
-//  Returns when the consumer thread should wake up again.
 WallClock KeyboardDebouncer::get_current_state(VirtualControllerState& state){
     WallClock now = current_time();
 
@@ -52,8 +50,8 @@ WallClock KeyboardDebouncer::get_current_state(VirtualControllerState& state){
     auto iter = m_history.end();
 
     //  Iterate the history backwards until we find an event that can be used.
-    //  Basically we use everything can be used except for button releases
-    //  that are too new in order to debounce them.
+    //  Everything can be used except for key releases that are too new in
+    //  order to debounce them.
     while (true){
         if (iter == m_history.begin()){
             break;
@@ -62,21 +60,14 @@ WallClock KeyboardDebouncer::get_current_state(VirtualControllerState& state){
 
         const Entry& entry = *iter;
 
-        //  Last event is a press. Return it.
-        if (entry.press){
-            m_last = entry.state;
-            ++iter;
-            break;
+        //  Key release that isn't old enough.
+        if (!entry.press && entry.timestamp + RELEASE_DELAY > now){
+            continue;
         }
 
-        //  Last event is a release that is old enough.
-        if (entry.timestamp + RELEASE_DELAY < now){
-            m_last = entry.state;
-            ++iter;
-            break;
-        }
-
-        //  Otherwise, skip this release event.
+        m_last = entry.state;
+        ++iter;
+        break;
     }
 
     //  Clear the history that we don't need anymore.
@@ -131,7 +122,6 @@ void VirtualController::on_key_press(Qt::Key key){
     button->press(m_controller_state);
 
     m_pressed_buttons.insert(key);
-
     m_history.add_event(true, m_controller_state);
 
     std::lock_guard<std::mutex> lg(m_sleep_lock);
@@ -151,7 +141,6 @@ void VirtualController::on_key_release(Qt::Key key){
     button->release(m_controller_state);
 
     m_pressed_buttons.erase(key);
-
     m_history.add_event(false, m_controller_state);
 
     std::lock_guard<std::mutex> lg(m_sleep_lock);
@@ -209,7 +198,7 @@ void VirtualController::thread_loop(){
                     break;
                 }
 
-                //  If the new state is different, then set next interrupt so the new
+                //  If the new state is different, set next interrupt so the new
                 //  new command can replace the current one without gaps.
                 if (!last_neutral && current != last && m_botbase.try_next_interrupt() != nullptr){
                     break;
