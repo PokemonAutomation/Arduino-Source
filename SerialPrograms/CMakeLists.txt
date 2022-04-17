@@ -611,6 +611,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemWidget.h
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualController.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualController.h
+    Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerState.cpp
+    Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerState.h
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerMapping.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerMapping.h
     Source/NintendoSwitch/NintendoSwitch_Settings.cpp

@@ -307,6 +307,7 @@ SOURCES += \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemWidget.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualController.cpp \
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerMapping.cpp \
+    Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerState.cpp \
     Source/NintendoSwitch/InferenceTraining/PokemonHome_GenerateNameOCR.cpp \
     Source/NintendoSwitch/NintendoSwitch_Panels.cpp \
     Source/NintendoSwitch/NintendoSwitch_Settings.cpp \
@@ -978,6 +979,7 @@ HEADERS += \
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemWidget.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualController.h \
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerMapping.h \
+    Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerState.h \
     Source/NintendoSwitch/InferenceTraining/PokemonHome_GenerateNameOCR.h \
     Source/NintendoSwitch/NintendoSwitch_Panels.h \
     Source/NintendoSwitch/NintendoSwitch_Settings.h \

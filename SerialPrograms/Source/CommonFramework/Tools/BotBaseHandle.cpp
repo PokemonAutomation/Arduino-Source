@@ -96,6 +96,40 @@ const char* BotBaseHandle::try_send_request(const BotBaseRequest& request){
     }
     return nullptr;
 }
+const char* BotBaseHandle::try_stop_commands(){
+    std::unique_lock<std::mutex> lg(m_lock, std::defer_lock);
+    if (!lg.try_lock()){
+        return "Console is busy.";
+    }
+    if (state() != State::READY){
+        return "Console is not accepting commands right now.";
+    }
+    if (m_current_pabotbase.load(std::memory_order_acquire) <= PABotBaseLevel::NOT_PABOTBASE){
+        return "Device is not running PABotBase.";
+    }
+    if (!m_allow_user_commands.load(std::memory_order_acquire)){
+        return "Handle is not accepting commands right now.";
+    }
+    botbase()->stop_all_commands();
+    return nullptr;
+}
+const char* BotBaseHandle::try_next_interrupt(){
+    std::unique_lock<std::mutex> lg(m_lock, std::defer_lock);
+    if (!lg.try_lock()){
+        return "Console is busy.";
+    }
+    if (state() != State::READY){
+        return "Console is not accepting commands right now.";
+    }
+    if (m_current_pabotbase.load(std::memory_order_acquire) <= PABotBaseLevel::NOT_PABOTBASE){
+        return "Device is not running PABotBase.";
+    }
+    if (!m_allow_user_commands.load(std::memory_order_acquire)){
+        return "Handle is not accepting commands right now.";
+    }
+    botbase()->next_command_interrupt();
+    return nullptr;
+}
 
 void BotBaseHandle::stop_unprotected(){
     {

@@ -275,7 +275,7 @@ StateMachineAction run_move_select(
 
         //  Battle menu detected. It means the move wasn't selectable.
 
-        console.log("Move not selectable.", COLOR_MAGENTA);
+        console.log("Move not selectable.", COLOR_RED);
         player.move_blocked[state.move_slot] = true;
 
         bool no_moves = true;
