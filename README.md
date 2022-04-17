@@ -12,8 +12,8 @@ This is the source code for all the main Arduino programs.
 
 # Dependencies:
 - Qt5 and Qt6 (LGPLv3)
-- [LUFA (MIT)](https://github.com/abcminiuser/lufa)
+- [LUFA (MIT License)](https://github.com/abcminiuser/lufa)
 - [Tesseract (Apache 2.0 License)](https://github.com/tesseract-ocr/tesseract)
 - [Tesseract for Windows (Apache 2.0 License)](https://github.com/peirick/Tesseract-OCR_for_Windows)
 - [Sleep Discord (MIT License)](https://github.com/yourWaifu/sleepy-discord)
-- [Qt Wav Reader (BSD)](https://code.qt.io/cgit/qt/qtmultimedia.git/tree/examples/multimedia/spectrum/app/wavfile.cpp?h=5.15)
+- [Qt Wav Reader (BSD License)](https://code.qt.io/cgit/qt/qtmultimedia.git/tree/examples/multimedia/spectrum/app/wavfile.cpp?h=5.15)
