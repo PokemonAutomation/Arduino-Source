@@ -108,6 +108,7 @@ TextEditWidget::TextEditWidget(QWidget& parent, TextEditOption& value)
     , m_value(value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(new QLabel(value.label(), this));
     m_box = new Box(*this);
     m_box->setText(value);

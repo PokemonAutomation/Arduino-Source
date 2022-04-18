@@ -83,11 +83,11 @@ std::unique_ptr<EditableTableRow> PokemonNameListFactory::make_row() const{
 
 PokemonNameList::PokemonNameList(QString label, const std::map<std::string, QIcon>& icons)
     : PokemonNameListFactory(icons)
-    , EditableTableOption(std::move(label), *this, true)
+    , EditableTableOption(std::move(label), *this)
 {}
 PokemonNameList::PokemonNameList(QString label, const std::map<std::string, QIcon>& icons, std::vector<std::string> slug_list)
     : PokemonNameListFactory(icons, std::move(slug_list))
-    , EditableTableOption(std::move(label), *this, true)
+    , EditableTableOption(std::move(label), *this)
 {}
 
 const std::string& PokemonNameList::operator[](size_t index) const{

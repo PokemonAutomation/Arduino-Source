@@ -329,7 +329,7 @@ CustomPathTable::CustomPathTable()
     : m_table(
         "<b>Custom Path Table:</b><br>"
         "Set a sequence of actions to navigate the map. ",
-        m_factory, true, make_defaults()
+        m_factory, make_defaults()
     )
 {}
 

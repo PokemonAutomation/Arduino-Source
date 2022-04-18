@@ -233,7 +233,7 @@ void VirtualController::thread_loop(){
         if (m_stop.load(std::memory_order_acquire)){
             return;
         }
-        if (next_wake == WallClock::max()){
+        if (next_wake != WallClock::max()){
             m_cv.wait_until(lg, next_wake);
         }
     }

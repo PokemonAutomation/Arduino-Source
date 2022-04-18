@@ -156,7 +156,7 @@ DiscordWebhookSettingsOption::DiscordWebhookSettingsOption()
     : GroupOption("Discord Webhook Settings", true, false)
     , urls(
         "<b>Discord Webhook URLs:</b> Notifications are sent to all enabled URLs that share a tag with the event.",
-        m_factory, true
+        m_factory
     )
 {
     PA_ADD_OPTION(urls);

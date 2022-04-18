@@ -168,7 +168,7 @@ std::unique_ptr<EditableTableRow> DiscordIntegrationTableFactory::make_row() con
 DiscordIntegrationTable::DiscordIntegrationTable()
     : EditableTableOption(
         "<b>Discord Channels:</b> Configure which channels to send notifications and accept commands in.",
-        *this, true
+        *this
     )
 {}
 void DiscordIntegrationTable::load_json(const QJsonValue& json){

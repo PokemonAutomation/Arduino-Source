@@ -105,7 +105,7 @@ BattlePokemonActionTable::BattlePokemonActionTable()
         "Set what move styles to use and whether to switch the " + STRING_POKEMON + " after some turns. "
         "Each row is the action for one " + STRING_POKEMON + ". "
         "The table follows the order that " + STRING_POKEMON + " are sent to battle.",
-        m_factory, true, make_defaults()
+        m_factory, make_defaults()
     )
 {}
 
@@ -206,7 +206,7 @@ OneMoveBattlePokemonActionTable::OneMoveBattlePokemonActionTable()
         "Set what move style to use for each " + STRING_POKEMON + " to grind against a Magikarp. "
         "Each row is the action for one " + STRING_POKEMON + ". "
         "The table follows the order that " + STRING_POKEMON + " are sent to battle.",
-        m_factory, true, make_defaults()
+        m_factory, make_defaults()
     )
 {}
 

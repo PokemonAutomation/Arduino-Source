@@ -111,6 +111,7 @@ FixedCodeWidget::FixedCodeWidget(QWidget& parent, FixedCodeOption& value)
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
     QLabel* text = new QLabel(value.m_label, this);
     layout->addWidget(text, 1);
     text->setWordWrap(true);

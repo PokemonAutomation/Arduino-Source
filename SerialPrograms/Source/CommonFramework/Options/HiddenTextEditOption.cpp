@@ -124,6 +124,7 @@ HiddenTextEditWidget::HiddenTextEditWidget(QWidget& parent, HiddenTextEditOption
     , m_value(value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->setAlignment(Qt::AlignTop);
     layout->addWidget(new QLabel(value.label(), this));
 

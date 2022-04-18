@@ -111,6 +111,7 @@ BossActionOptionUI::BossActionOptionUI(QWidget& parent, BossActionOption& value)
     , m_table(nullptr)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
     layout->addWidget(new QLabel(m_value.m_label));
     redraw_table();
 }
