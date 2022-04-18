@@ -36,7 +36,7 @@ TreeShinyHunting_Descriptor::TreeShinyHunting_Descriptor()
         "PokemonLA:Tree Shiny Hunter",
         STRING_POKEMON + " LA", "Tree Shiny Hunter",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/TreeShinyHunter.md",
-        "Constantly reset to find a Shiny Unown or any Shiny in the path.",
+        "Check nearby trees for a possible Shiny, Alpha or Alpha Shiny Burmy",
         FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )

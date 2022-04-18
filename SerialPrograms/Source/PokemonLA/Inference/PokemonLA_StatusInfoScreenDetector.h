@@ -1,8 +1,8 @@
-/*  Battle Pokemon Switch Detector
+/*  Status Info Screen Detector
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *  Detect the screen of switching to another pokemon during battle.
+ *  Detect shiny and alpha on the Status Info Screen.
  */
 
 #ifndef PokemonAutomation_PokemonLA_StatusInfoScreenDetector_H
@@ -37,7 +37,6 @@ private:
 
     ImageFloatBox m_shiny_box;
     ImageFloatBox m_alpha_box;
-    //ImageFloatBox m_other_box;
 };
 
 
