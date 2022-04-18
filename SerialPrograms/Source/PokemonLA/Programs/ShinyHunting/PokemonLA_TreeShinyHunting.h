@@ -31,12 +31,14 @@ public:
 
 private:
     void run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    bool check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int16_t match);
+    void exit_battle(BotBaseContext& context);
 
 private:
     class Stats;
     class RunRoute;
-    ShinyDetectedActionOption SHINY_DETECTED;
-
+    ShinyDetectedActionOption MATCH_DETECTED_OPTIONS;
+    EnumDropdownOption STOP_ON;
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;
 };

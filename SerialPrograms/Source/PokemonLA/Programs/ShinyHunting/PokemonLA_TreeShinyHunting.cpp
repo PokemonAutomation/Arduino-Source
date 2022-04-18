@@ -13,12 +13,11 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA/PokemonLA_Settings.h"
-#include "PokemonLA/Inference/PokemonLA_BattleMenuDetector.h"
-#include "PokemonLA/Inference/PokemonLA_BattlePokemonSwitchDetector.h"
+#include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 #include "PokemonLA/Inference/PokemonLA_MapDetector.h"
-#include "PokemonLA/Inference/PokemonLA_ShinySoundDetector.h"
+#include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Inference/PokemonLA_UnderAttackDetector.h"
 #include "PokemonLA/Programs/PokemonLA_MountChange.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
@@ -46,16 +45,30 @@ TreeShinyHunting_Descriptor::TreeShinyHunting_Descriptor()
 
 TreeShinyHunting::TreeShinyHunting(const TreeShinyHunting_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
-    , SHINY_DETECTED("0 * TICKS_PER_SECOND")
+    , MATCH_DETECTED_OPTIONS(
+      "Match Action",
+      "What to do when the pokemon matches the expectations",
+      "0 * TICKS_PER_SECOND")
+    , STOP_ON(
+        "<b>Stop On:</b>",
+        {
+        "Shiny",
+        "Alpha",
+        "Shiny & Alpha",
+        "Stop on any non regular"
+        },
+        0
+    )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
-        &SHINY_DETECTED.NOTIFICATIONS,
+        &MATCH_DETECTED_OPTIONS.NOTIFICATIONS,
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,
     })
 {
-    PA_ADD_OPTION(SHINY_DETECTED);
+    PA_ADD_OPTION(MATCH_DETECTED_OPTIONS);
+    PA_ADD_OPTION(STOP_ON);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -80,10 +93,6 @@ public:
         shinies++;
     }
 
-    virtual void add_alpha() {
-        alphas++;
-    }
-
     std::atomic<uint64_t>& attempts;
     std::atomic<uint64_t>& errors;
     std::atomic<uint64_t>& found;
@@ -96,7 +105,10 @@ std::unique_ptr<StatsTracker> TreeShinyHunting::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-int16_t check_for_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+
+bool TreeShinyHunting::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int16_t expected){
+
+    Stats& stats = env.stats<Stats>();
 
     pbf_press_button(context, BUTTON_ZR, (0.5 * TICKS_PER_SECOND), 20); //throw pokemon
     pbf_wait(context, (4 * TICKS_PER_SECOND));
@@ -107,154 +119,132 @@ int16_t check_for_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& co
 
     if (mount != MountState::NOTHING){
        env.console.log("Battle not found. Tree might be empty.");
-       dump_image(env.console, env.program_info(), "Nothing On Tree", env.console.video().snapshot());
-    }
-    else{
-       env.console.log("Found battle");
-       dump_image(env.console, env.program_info(), "Battle Found", env.console.video().snapshot());
-
-       BattleMenuDetector battle_menu_detector(env.console, env.console, true);
-       wait_until(
-           env, env.console, context, std::chrono::seconds(5),
-           {
-               &battle_menu_detector,
-           }
-       );
-
-       pbf_wait(context, (1 * TICKS_PER_SECOND));
-       pbf_press_button(context, BUTTON_PLUS, 20, 20);
-       pbf_wait(context, (1 * TICKS_PER_SECOND));
-       pbf_press_button(context, BUTTON_R, 20, 20);
-       pbf_wait(context, (1 * TICKS_PER_SECOND));
-
-       context.wait_for_all_requests();
-
-       QImage infoScreen = env.console.video().snapshot();
-       StatusInfoScreenDetector detector;
-
-       dump_image(env.console, env.program_info(), "Details", infoScreen);
-       detector.process_frame(infoScreen, std::chrono::system_clock::now());
-
-       int16_t ret = detector.detected();
-
-       env.console.log("DETECTOR RETURNED: " + std::to_string(ret));
-       context.wait_for_all_requests();
-       return ret;
+       return false;
     }
 
-    return -1;
+    env.console.log("Battle found!");
+
+    BattleMenuDetector battle_menu_detector(env.console, env.console, true);
+    wait_until(
+       env.console, context, std::chrono::seconds(10),
+       {
+           {battle_menu_detector}
+       }
+    );
+
+    pbf_wait(context, (1 * TICKS_PER_SECOND));
+    pbf_press_button(context, BUTTON_PLUS, 20, 20);
+    pbf_wait(context, (1 * TICKS_PER_SECOND));
+    pbf_press_button(context, BUTTON_R, 20, 20);
+    pbf_wait(context, (1 * TICKS_PER_SECOND));
+
+    context.wait_for_all_requests();
+
+    QImage infoScreen = env.console.video().snapshot();
+    StatusInfoScreenDetector detector;
+
+    detector.process_frame(infoScreen, std::chrono::system_clock::now());
+
+    int16_t ret = detector.detected();
+
+    env.console.log("RETURN: " + std::to_string(ret));
+    env.console.log("EXPECT: " + std::to_string(expected));
+
+    context.wait_for_all_requests();
+
+    if(ret == 0){
+       env.console.log("Normie in the tree -_-");
+       stats.found++;
+       exit_battle(context);
+       return false;
+    }
+
+    switch (ret) {
+        case 1:
+            env.console.log("Found SHINY");
+            stats.shinies++;
+            break;
+
+        case 2:
+            env.console.log("FOUND ALPHA");
+            stats.alphas++;
+            break;
+
+        case 3:
+             env.console.log("FOUND SHINY ALPHA");
+             stats.shinies++;
+             stats.alphas++;
+            break;
+    }
+
+    on_match_found(env, env.console, context, MATCH_DETECTED_OPTIONS, (ret == expected || expected == 4));
+
+    exit_battle(context);
+    return true;
+}
+
+void TreeShinyHunting::exit_battle(BotBaseContext& context){
+    pbf_press_button(context, BUTTON_B, 20, 100);
+    pbf_wait(context, (1 * TICKS_PER_SECOND));
+    pbf_press_button(context, BUTTON_B, 20, 100);
+    pbf_wait(context, (1 * TICKS_PER_SECOND));
+    pbf_press_button(context, BUTTON_A, 20, 100);
+    pbf_wait(context, (3 * TICKS_PER_SECOND));
+    context.wait_for_all_requests();
 }
 
 void TreeShinyHunting::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+
     Stats& stats = env.stats<Stats>();
     stats.attempts++;
 
-    env.console.log("Beginning Shiny Detection...");
+    int16_t match = static_cast<int>(STOP_ON) + 1;
+
+    env.console.log("Starting...");
     {
+        //Tree 1
         goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
-
-        //First Tree
-        pbf_move_left_joystick(context, 200, 255, 30, 30);
+        pbf_move_left_joystick(context, 170, 255, 30, 30);
         change_mount(env.console, context, MountState::BRAVIARY_ON);
-        pbf_press_button(context, BUTTON_B, (3 * TICKS_PER_SECOND), 20);//turn right
-        change_mount(env.console, context, MountState::BRAVIARY_OFF);
-
-        pbf_move_right_joystick(context, 0, 127, (0.5 * TICKS_PER_SECOND), 30);
-        pbf_move_left_joystick(context, 0, 127, 30, 30);
-        pbf_press_button(context, BUTTON_ZL, 30, 30);
-
+        pbf_press_button(context, BUTTON_B, (6.35 * TICKS_PER_SECOND), 20);
+        pbf_press_button(context, BUTTON_PLUS, 20, 20);
+        pbf_wait(context, (1 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_PLUS, 20, 20);
+        pbf_wait(context, (0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_PLUS, 20, 20);
+        pbf_wait(context, (1 * TICKS_PER_SECOND));
+        pbf_move_left_joystick(context, 255, 127, 30, 30);
+        pbf_wait(context, (0.5 * TICKS_PER_SECOND));
+        pbf_press_button(context, BUTTON_ZL, 20, 20);
+        pbf_wait(context, (0.5 * TICKS_PER_SECOND));
+        pbf_move_right_joystick(context, 127, 255, (0.10 * TICKS_PER_SECOND), 20);
+        pbf_wait(context, (0.5 * TICKS_PER_SECOND));
         context.wait_for_all_requests();
+        check_tree(env, context, match);
 
-        int16_t ret = check_for_battle(env, context);
-
-        switch (ret) {
-            case 0:
-                env.console.log("Normie in the tree -_-");
-                pbf_press_button(context, BUTTON_B, 20, 100);
-                pbf_wait(context, (1 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_B, 20, 100);
-                pbf_wait(context, (1 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_A, 20, 100);
-                pbf_wait(context, (3 * TICKS_PER_SECOND));
-                stats.found++;
-                context.wait_for_all_requests();
-                break;
-            case 1:
-                env.console.log("Found SHINY");
-                stats.shinies++;
-                throw OperationFailedException(env.console, "SHINY");
-
-            case 2:
-                env.console.log("FOUND ALPHA");
-                stats.alphas++;
-                throw OperationFailedException(env.console, "ALPHA");
-
-            case 3:
-                env.console.log("FOUND SHINY ALPHA");
-                stats.shinies++;
-                stats.alphas++;
-                throw OperationFailedException(env.console, "SHINY ALPHA");
-        }
-
-        //Second Tree
+        //Tree 2
         goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
-
-        pbf_move_left_joystick(context, 137, 255, 30, 30);//turn back
+        pbf_move_left_joystick(context, 152, 255, 30, 30);
         change_mount(env.console, context, MountState::BRAVIARY_ON);
-        pbf_press_button(context, BUTTON_B, (6.25 * TICKS_PER_SECOND), 20); //Ride forward
-
-        pbf_press_button(context, BUTTON_PLUS, 20, 20); //Braviary off
+        pbf_press_button(context, BUTTON_B, (11.8 * TICKS_PER_SECOND), 20);
+        pbf_press_button(context, BUTTON_PLUS, 20, 20);
         pbf_wait(context, (1 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_PLUS, 20, 20); //Braviary on
+        pbf_press_button(context, BUTTON_PLUS, 20, 20);
         pbf_wait(context, (0.5 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_PLUS, 20, 20); //Braviary off
+        pbf_press_button(context, BUTTON_PLUS, 20, 20);
         pbf_wait(context, (1 * TICKS_PER_SECOND));
-
-        pbf_move_left_joystick(context, 0, 127, 30, 30);//look to tree
+        pbf_move_left_joystick(context, 255, 127, 30, 30);
         pbf_wait(context, (0.5 * TICKS_PER_SECOND));
-        pbf_press_button(context, BUTTON_ZL, 30, 30);   //focus
+        pbf_press_button(context, BUTTON_ZL, 20, 20);
         pbf_wait(context, (0.5 * TICKS_PER_SECOND));
-        pbf_move_right_joystick(context, 127, 255, (0.15 * TICKS_PER_SECOND), 20);
+        pbf_move_right_joystick(context, 127, 255, (0.10 * TICKS_PER_SECOND), 20);
         pbf_wait(context, (0.5 * TICKS_PER_SECOND));
-
         context.wait_for_all_requests();
-
-        ret = check_for_battle(env, context);
-
-        switch (ret) {
-            case 0:
-                env.console.log("Normie in the tree -_-");
-                pbf_press_button(context, BUTTON_B, 20, 100);
-                pbf_wait(context, (1 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_B, 20, 100);
-                pbf_wait(context, (1 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_A, 20, 100);
-                pbf_wait(context, (3 * TICKS_PER_SECOND));
-                stats.found++;
-                context.wait_for_all_requests();
-                break;
-            case 1:
-                env.console.log("Found SHINY");
-                stats.shinies++;
-                throw OperationFailedException(env.console, "SHINY");
-
-            case 2:
-                env.console.log("FOUND ALPHA");
-                stats.alphas++;
-                throw OperationFailedException(env.console, "ALPHA");
-
-            case 3:
-                env.console.log("FOUND SHINY ALPHA");
-                stats.shinies++;
-                stats.alphas++;
-                throw OperationFailedException(env.console, "SHINY ALPHA");
-        }
-
-
+        check_tree(env, context, match);
 
         //End
-        env.console.log("Noothing found, returning to Jubilife!");
-        goto_camp_from_overworld(env, env.console, context, SHINY_DETECTED, stats);
+        env.console.log("Nothing found, returning to Jubilife!");
+        goto_camp_from_overworld(env, env.console, context);
         goto_professor(env.console, context, Camp::FIELDLANDS_FIELDLANDS);
         from_professor_return_to_jubilife(env, env.console, context);
     }
@@ -277,12 +267,9 @@ void TreeShinyHunting::program(SingleSwitchProgramEnvironment& env, BotBaseConte
         try{
             run_iteration(env, context);
         }catch (OperationFailedException&){
-            //break;
-            pbf_press_button(context, BUTTON_HOME, 20, 20);
-            break;
-            //stats.errors++;
-            //pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
-            //reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
+            stats.errors++;
+            pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+            reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
         }
     }
 
