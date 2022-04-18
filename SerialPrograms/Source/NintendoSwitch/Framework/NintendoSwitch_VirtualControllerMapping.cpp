@@ -18,29 +18,6 @@ using std::endl;
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
-void VirtualControllerState::print() const{
-    cout << "dpad = (" << dpad_x << "," << dpad_y
-         << "), left = (" << left_joystick_x << "," << left_joystick_y
-         << "), right = (" << right_joystick_x << "," << right_joystick_y
-         << "), buttons =";
-    if (buttons & BUTTON_Y) cout << " Y";
-    if (buttons & BUTTON_B) cout << " B";
-    if (buttons & BUTTON_A) cout << " A";
-    if (buttons & BUTTON_X) cout << " X";
-    if (buttons & BUTTON_L) cout << " L";
-    if (buttons & BUTTON_R) cout << " R";
-    if (buttons & BUTTON_ZL) cout << " ZL";
-    if (buttons & BUTTON_ZR) cout << " ZR";
-    if (buttons & BUTTON_PLUS) cout << " +";
-    if (buttons & BUTTON_MINUS) cout << " -";
-    if (buttons & BUTTON_LCLICK) cout << " LC";
-    if (buttons & BUTTON_RCLICK) cout << " RC";
-    if (buttons & BUTTON_HOME) cout << " Home";
-    if (buttons & BUTTON_CAPTURE) cout << " Screen";
-    cout << ")" << endl;
-}
-
-
 
 struct ControllerButton_Dpad : public ControllerButton{
     int delta_x;

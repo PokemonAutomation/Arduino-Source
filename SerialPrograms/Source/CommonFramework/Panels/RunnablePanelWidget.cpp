@@ -209,9 +209,11 @@ QLabel* RunnablePanelWidget::make_status_bar(QWidget& parent){
 }
 QWidget* RunnablePanelWidget::make_actions(QWidget& parent){
     QGroupBox* actions_widget = new QGroupBox("Actions", &parent);
+//    actions_widget->setContentsMargins(50, 50, 50, 50);
+//    actions_widget->
 
     QHBoxLayout* action_layout = new QHBoxLayout(actions_widget);
-    action_layout->setContentsMargins(0, 0, 0, 0);
+//    action_layout->setContentsMargins(0, 0, 0, 0);
 
     {
         m_start_button = new QPushButton("Start Program!", &parent);
@@ -262,7 +264,15 @@ QWidget* RunnablePanelWidget::make_actions(QWidget& parent){
     connect(
         m_default_button, &QPushButton::clicked,
         this, [=](bool){
-            restore_defaults();
+            QMessageBox::StandardButton button = QMessageBox::question(
+                nullptr,
+                "Restore Defaults",
+                "Are you sure you wish to restore settings back to defaults? This will wipe the current settings.",
+                QMessageBox::Ok | QMessageBox::Cancel
+            );
+            if (button == QMessageBox::Ok){
+                restore_defaults();
+            }
         }
     );
 

@@ -116,13 +116,14 @@ LanguageOCRWidget::LanguageOCRWidget(QWidget& parent, LanguageOCR& value)
     , ConfigWidget(value, *this)
     , m_value(value)
 {
-    QHBoxLayout* hbox = new QHBoxLayout(this);
+    QHBoxLayout* layout = new QHBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
     QLabel* text = new QLabel(m_value.m_label, this);
-    hbox->addWidget(text, 1);
+    layout->addWidget(text, 1);
     text->setWordWrap(true);
 
     QVBoxLayout* vbox = new QVBoxLayout();
-    hbox->addLayout(vbox, 1);
+    layout->addLayout(vbox, 1);
     m_box = new NoWheelComboBox(&parent);
 
     for (const auto& item : m_value.m_case_list){

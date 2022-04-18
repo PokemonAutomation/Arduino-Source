@@ -74,7 +74,7 @@ std::vector<std::unique_ptr<EditableTableRow>> BerrySelectorOption::make_default
 
 BerrySelectorOption::BerrySelectorOption(QString label)
     : m_table(
-        std::move(label), m_factory, true, make_defaults()
+        std::move(label), m_factory, make_defaults()
     )
 {}
 

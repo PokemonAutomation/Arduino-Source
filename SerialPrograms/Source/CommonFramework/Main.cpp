@@ -8,9 +8,10 @@
 #include "Logging/OutputRedirector.h"
 #include "Tools/StatsDatabase.h"
 #include "Integrations/SleepyDiscordRunner.h"
+#include "GlobalSettingsPanel.h"
 #include "Windows/MainWindow.h"
 
-#include "GlobalSettingsPanel.h"
+#include <QTextStream>
 
 #include <iostream>
 using std::cout;
@@ -56,6 +57,12 @@ int main(int argc, char *argv[]){
         global_logger_tagged().log(error.message(), COLOR_RED);
     }
 
+    if (GlobalSettings::instance().THEME == 1){
+        QFile f(":qdarkstyle/dark/style.qss");
+        f.open(QFile::ReadOnly | QFile::Text);
+        QTextStream ts(&f);
+        application.setStyleSheet(ts.readAll());
+    }
 
     int ret;
     {

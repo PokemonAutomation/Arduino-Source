@@ -55,6 +55,7 @@ public:
 
     StringOption STATS_FILE;
     ResolutionOption WINDOW_SIZE;
+    EnumDropdownOption THEME;
 
     SectionDividerOption m_discord_settings;
     Integration::DiscordSettingsOption DISCORD;

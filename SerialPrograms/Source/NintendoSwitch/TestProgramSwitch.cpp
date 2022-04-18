@@ -96,6 +96,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
 
 
 
+
 #if 0
     VisualInferencePivot pivot(scope, feed, env.inference_dispatcher());
 

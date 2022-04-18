@@ -63,8 +63,7 @@ EncounterFilterOption::EncounterFilterOption(bool rare_stars, bool enable_overri
                 "<b>Overrides:</b><br>"
                 "The game language must be properly set to read " + STRING_POKEMON + " names.<br>"
                 "If more than one override applies, the last one will be chosen.",
-        rare_stars ? ENCOUNTER_FILTER_RARE : ENCOUNTER_FILTER_NORMAL,
-        false
+        rare_stars ? ENCOUNTER_FILTER_RARE : ENCOUNTER_FILTER_NORMAL
     )
 {}
 std::vector<EncounterFilterOverride> EncounterFilterOption::overrides() const{

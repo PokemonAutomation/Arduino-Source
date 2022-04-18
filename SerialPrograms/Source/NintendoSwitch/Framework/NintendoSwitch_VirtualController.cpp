@@ -22,6 +22,67 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
+
+void KeyboardDebouncer::add_event(bool press, VirtualControllerState state){
+    WallClock now = current_time();
+    SpinLockGuard lg(m_lock);
+    while (!m_history.empty()){
+        if (m_history.front().timestamp + std::chrono::seconds(1) < now){
+            m_history.pop_front();
+        }else{
+            break;
+        }
+    }
+    m_history.emplace_back(Entry{now, press, state});
+}
+WallClock KeyboardDebouncer::get_current_state(VirtualControllerState& state){
+    WallClock now = current_time();
+
+    const std::chrono::milliseconds RELEASE_DELAY(20);
+
+    SpinLockGuard lg(m_lock);
+
+    if (m_history.empty()){
+        state = m_last;
+        return WallClock::max();
+    }
+
+    auto iter = m_history.end();
+
+    //  Iterate the history backwards until we find an event that can be used.
+    //  Everything can be used except for key releases that are too new in
+    //  order to debounce them.
+    while (true){
+        if (iter == m_history.begin()){
+            break;
+        }
+        --iter;
+
+        const Entry& entry = *iter;
+
+        //  Key release that isn't old enough.
+        if (!entry.press && entry.timestamp + RELEASE_DELAY > now){
+            continue;
+        }
+
+        m_last = entry.state;
+        ++iter;
+        break;
+    }
+
+    //  Clear the history that we don't need anymore.
+    m_history.erase(m_history.begin(), iter);
+
+    state = m_last;
+    return m_history.empty()
+        ? WallClock::max()
+        : m_history.begin()->timestamp + RELEASE_DELAY;
+}
+
+
+
+
+
 VirtualController::VirtualController(
     LoggerQt& logger,
     BotBaseHandle& botbase,
@@ -30,10 +91,8 @@ VirtualController::VirtualController(
     : m_logger(logger)
     , m_botbase(botbase)
     , m_allow_commands_while_running(allow_commands_while_running)
-    , m_last(current_time())
     , m_last_known_state(ProgramState::STOPPED)
     , m_stop(false)
-    , m_granularity(1)
     , m_thread(run_with_catch, "VirtualController::thread_loop()", [=]{ thread_loop(); })
 {}
 VirtualController::~VirtualController(){
@@ -50,48 +109,39 @@ void VirtualController::clear_state(){
 }
 
 void VirtualController::on_key_press(Qt::Key key){
-    {
-        SpinLockGuard lg(m_state_lock, "VirtualController::on_key_press()");
-
-        //  Suppress if key is already pressed.
-        auto iter = m_pressed_buttons.find(key);
-        if (iter != m_pressed_buttons.end()){
-            return;
-        }
-
-        const ControllerButton* button = button_lookup(key);
-        if (button == nullptr){
-            return;
-        }
-        button->press(m_controller_state);
-
-        m_pressed_buttons.insert(key);
-        m_last = current_time();
+    //  Suppress if key is already pressed.
+    auto iter = m_pressed_buttons.find(key);
+    if (iter != m_pressed_buttons.end()){
+        return;
     }
-//    print();
+
+    const ControllerButton* button = button_lookup(key);
+    if (button == nullptr){
+        return;
+    }
+    button->press(m_controller_state);
+
+    m_pressed_buttons.insert(key);
+    m_history.add_event(true, m_controller_state);
+
     std::lock_guard<std::mutex> lg(m_sleep_lock);
     m_cv.notify_all();
 }
 void VirtualController::on_key_release(Qt::Key key){
-    {
-        SpinLockGuard lg(m_state_lock, "VirtualController::on_key_release()");
-
-        //  Suppress if key is not pressed.
-        auto iter = m_pressed_buttons.find(key);
-        if (iter == m_pressed_buttons.end()){
-            return;
-        }
-
-        const ControllerButton* button = button_lookup(key);
-        if (button == nullptr){
-            return;
-        }
-        button->release(m_controller_state);
-
-        m_pressed_buttons.erase(key);
-        m_last = current_time();
+    //  Suppress if key is not pressed.
+    auto iter = m_pressed_buttons.find(key);
+    if (iter == m_pressed_buttons.end()){
+        return;
     }
-//    print();
+
+    const ControllerButton* button = button_lookup(key);
+    if (button == nullptr){
+        return;
+    }
+    button->release(m_controller_state);
+
+    m_pressed_buttons.erase(key);
+    m_history.add_event(false, m_controller_state);
 
     std::lock_guard<std::mutex> lg(m_sleep_lock);
     m_cv.notify_all();
@@ -100,87 +150,19 @@ void VirtualController::on_key_release(Qt::Key key){
 
 
 void VirtualController::thread_loop(){
-
-#if 1
-    std::deque<std::chrono::milliseconds> delays;
-    std::chrono::milliseconds sum(0);
-//    bool spin_mode = false;
-#endif
-
+    VirtualControllerState last;
+    bool last_neutral = true;
+    WallClock last_press = current_time();
     while (true){
         if (m_stop.load(std::memory_order_acquire)){
             break;
         }
 
-        Button buttons;
-        DpadPosition dpad;
-        uint8_t left_x;
-        uint8_t left_y;
-        uint8_t right_x;
-        uint8_t right_y;
-        bool neutral;
-        {
-            SpinLockGuard lg(m_state_lock, "VirtualController::thread_loop()");
-
-            buttons = m_controller_state.buttons;
-            neutral = m_controller_state.buttons == 0;
-
-            dpad = DPAD_NONE;
-            if (m_controller_state.dpad_x != 0 || m_controller_state.dpad_y != 0){
-                neutral = false;
-                do{
-                    if (m_controller_state.dpad_x == 0){
-                        dpad = m_controller_state.dpad_y > 0 ? DPAD_DOWN : DPAD_UP;
-                        break;
-                    }
-                    if (m_controller_state.dpad_y == 0){
-                        dpad = m_controller_state.dpad_x > 0 ? DPAD_RIGHT : DPAD_LEFT;
-                        break;
-                    }
-                    if (m_controller_state.dpad_x < 0 && m_controller_state.dpad_y < 0){
-                        dpad = DPAD_UP_LEFT;
-                        break;
-                    }
-                    if (m_controller_state.dpad_x < 0 && m_controller_state.dpad_y > 0){
-                        dpad = DPAD_DOWN_LEFT;
-                        break;
-                    }
-                    if (m_controller_state.dpad_x > 0 && m_controller_state.dpad_y > 0){
-                        dpad = DPAD_DOWN_RIGHT;
-                        break;
-                    }
-                    if (m_controller_state.dpad_x > 0 && m_controller_state.dpad_y < 0){
-                        dpad = DPAD_UP_RIGHT;
-                        break;
-                    }
-                }while (false);
-            }
-
-            left_x = 128;
-            left_y = 128;
-            if (m_controller_state.left_joystick_x != 0 || m_controller_state.left_joystick_y != 0){
-                neutral = false;
-                int mag = std::abs(m_controller_state.left_joystick_x) > std::abs(m_controller_state.left_joystick_y)
-                    ? std::abs(m_controller_state.left_joystick_x)
-                    : std::abs(m_controller_state.left_joystick_y);
-                left_x = std::min(128 * m_controller_state.left_joystick_x / mag + 128, 255);
-                left_y = std::min(128 * m_controller_state.left_joystick_y / mag + 128, 255);
-            }
-
-            right_x = 128;
-            right_y = 128;
-            if (m_controller_state.right_joystick_x != 0 || m_controller_state.right_joystick_y != 0){
-                neutral = false;
-                int mag = std::abs(m_controller_state.right_joystick_x) > std::abs(m_controller_state.right_joystick_y)
-                    ? std::abs(m_controller_state.right_joystick_x)
-                    : std::abs(m_controller_state.right_joystick_y);
-                right_x = std::min(128 * m_controller_state.right_joystick_x / mag + 128, 255);
-                right_y = std::min(128 * m_controller_state.right_joystick_y / mag + 128, 255);
-            }
-
-        }
-
-        if (neutral){
+        //  Not accepting commands.
+        if (!m_allow_commands_while_running &&
+            m_last_known_state.load(std::memory_order_acquire) != ProgramState::STOPPED
+        ){
+            last = VirtualControllerState();
             std::unique_lock<std::mutex> lg(m_sleep_lock);
             if (m_stop.load(std::memory_order_acquire)){
                 return;
@@ -189,21 +171,56 @@ void VirtualController::thread_loop(){
             continue;
         }
 
+        VirtualControllerState current;
+        WallClock next_wake = m_history.get_current_state(current);
+//        current.print();
+
+        //  Send the command.
         do{
-//            cout << (int)m_last_known_state.load(std::memory_order_acquire) << endl;
-            if (!m_allow_commands_while_running &&
-                m_last_known_state.load(std::memory_order_acquire) != ProgramState::STOPPED
-            ){
-                break;
-            }
+            WallClock now = current_time();
             try{
+//                current.print();
+                if (current == last && last_press + std::chrono::milliseconds(1000) > now){
+//                    cout << "No state change." << endl;
+                    break;
+                }
+
+                //  Convert the state.
+                ControllerState state;
+                bool neutral = current.to_state(state);
+
+                //  If state is neutral, just issue a stop.
+                if (neutral){
+                    m_botbase.try_stop_commands();
+                    last = VirtualControllerState();
+                    last_neutral = true;
+                    last_press = now;
+                    break;
+                }
+
+                //  If the new state is different, set next interrupt so the new
+                //  new command can replace the current one without gaps.
+                if (!last_neutral && current != last && m_botbase.try_next_interrupt() != nullptr){
+                    break;
+                }
+
+                //  Send the command.
                 DeviceRequest_controller_state request(
-                    buttons, dpad,
-                    left_x, left_y,
-                    right_x, right_y,
-                    m_granularity
+                    state.buttons,
+                    state.dpad,
+                    state.left_x,
+                    state.left_y,
+                    state.right_x,
+                    state.right_y,
+                    255
                 );
-                m_botbase.try_send_request(request);
+                if (m_botbase.try_send_request(request) != nullptr){
+                    break;
+                }
+
+                last = current;
+                last_neutral = false;
+                last_press = now;
             }catch (ProgramCancelledException&){
             }catch (ProgramFinishedException&){
             }catch (InvalidConnectionStateException&){
@@ -211,79 +228,14 @@ void VirtualController::thread_loop(){
         }while (false);
 
 
-
-
-#if 0
+        //  Wait for next event.
         std::unique_lock<std::mutex> lg(m_sleep_lock);
         if (m_stop.load(std::memory_order_acquire)){
-            break;
+            return;
         }
-        m_cv.wait_for(lg, std::chrono::milliseconds(4));
-#else
-//        if (spin_mode){
-//            _mm_pause();
-//            continue;
-//        }
-
-        //
-        //  Adaptive Granularity:
-        //
-        //      On some computers, the sleep/yield latency is very high.
-        //  For example, Sleep(1) or cv.wait_for(..., 1ms) doesn't return in 1ms,
-        //  but maybe as high as 16 or 32ms. This is so large that it causes us
-        //  to drop frames.
-        //
-        //  To make this actually work, we measure the sleep latency and adjust
-        //  the granularity accordingly. Longer latencies will require larger
-        //  granularity to avoid dropping frames. But larger granularity also
-        //  decreases keyboard->Switch responsiveness.
-        //
-
-        const uint16_t TICK_MILLIS = 1000 / TICKS_PER_SECOND;
-        std::chrono::milliseconds granularity = std::chrono::milliseconds(TICK_MILLIS * m_granularity);
-
-        auto start = current_time();
-        {
-            std::unique_lock<std::mutex> lg(m_sleep_lock);
-            if (m_stop.load(std::memory_order_acquire)){
-                break;
-            }
-            m_cv.wait_for(lg, granularity / 2);
+        if (next_wake != WallClock::max()){
+            m_cv.wait_until(lg, next_wake);
         }
-        auto stop = current_time();
-        std::chrono::milliseconds delay = std::chrono::duration_cast<std::chrono::milliseconds>(stop - start);
-
-        if (delays.size() > 20){
-            sum -= delays[0];
-            delays.pop_front();
-
-        }
-
-        delays.push_back(delay);
-        sum += delay;
-
-        auto average = sum / delays.size();
-        if (delays.size() > 10 && average > granularity){
-//            spin_mode = true;
-            if (m_granularity < 4){
-                m_granularity++;
-                m_logger.log(
-                    "System sleep latency (" + QString::number(average.count()) + " ms). "
-                    "Increasing granularity to " + QString::number(m_granularity) + " ticks.",
-                    COLOR_RED
-                );
-            }
-        }else if (delays.size() > 10 && average < granularity / 2){
-            if (m_granularity > 1){
-                m_granularity--;
-                m_logger.log(
-                    "System sleep latency (" + QString::number(average.count()) + " ms). "
-                    "Decreasing granularity to " + QString::number(m_granularity) + " ticks.",
-                    COLOR_BLUE
-                );
-            }
-        }
-#endif
     }
 }
 

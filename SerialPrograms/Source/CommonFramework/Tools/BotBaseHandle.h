@@ -64,6 +64,8 @@ public:
     //  Thread-safe with stop()/reset(). These may drop.
     const char* try_reset();
     const char* try_send_request(const BotBaseRequest& request);
+    const char* try_stop_commands();
+    const char* try_next_interrupt();
 
 signals:
     void on_not_connected(QString error);

@@ -9,22 +9,10 @@
 
 #include <QJsonArray>
 #include "Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h"
+#include "NintendoSwitch_VirtualControllerState.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-
-
-struct VirtualControllerState{
-    Button buttons = 0;
-    int dpad_x = 0;
-    int dpad_y = 0;
-    int left_joystick_x = 0;
-    int left_joystick_y = 0;
-    int right_joystick_x = 0;
-    int right_joystick_y = 0;
-
-    void print() const;
-};
 
 
 struct ControllerButton{
@@ -39,6 +27,7 @@ const ControllerButton* button_lookup(Qt::Key key);
 
 QJsonArray read_keyboard_mapping();
 void set_keyboard_mapping(const QJsonArray& json);
+
 
 
 }

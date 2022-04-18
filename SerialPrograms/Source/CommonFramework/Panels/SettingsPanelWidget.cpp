@@ -8,6 +8,7 @@
 #include <QPushButton>
 #include <QScrollArea>
 #include <QGroupBox>
+#include <QMessageBox>
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Options/BatchOption/BatchWidget.h"
 #include "SettingsPanelWidget.h"
@@ -74,7 +75,15 @@ QWidget* SettingsPanelWidget::make_actions(QWidget& parent){
     connect(
         m_default_button, &QPushButton::clicked,
         this, [=](bool){
-            restore_defaults();
+            QMessageBox::StandardButton button = QMessageBox::question(
+                nullptr,
+                "Restore Defaults",
+                "Are you sure you wish to restore settings back to defaults? This will wipe the current settings.",
+                QMessageBox::Ok | QMessageBox::Cancel
+            );
+            if (button == QMessageBox::Ok){
+                restore_defaults();
+            }
         }
     );
 

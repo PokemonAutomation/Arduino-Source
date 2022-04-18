@@ -23,6 +23,7 @@ EncounterFilterWidget::EncounterFilterWidget(QWidget& parent, EncounterFilterOpt
     , m_value(value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
 //    QLabel* text = new QLabel(value.label(), this);
 //    layout->addWidget(text);
 

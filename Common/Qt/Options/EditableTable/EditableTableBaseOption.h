@@ -45,7 +45,7 @@ public:
 class EditableTableBaseOption{
 public:
     EditableTableBaseOption(
-        QString label, const EditableTableFactory& factory, bool margin,
+        QString label, const EditableTableFactory& factory,
         std::vector<std::unique_ptr<EditableTableRow>> default_value = {}
     );
 
@@ -72,7 +72,6 @@ private:
     friend class EditableTableBaseWidget;
     QString m_label;
     const EditableTableFactory& m_factory;
-    bool m_margin;
     std::vector<std::unique_ptr<EditableTableRow>> m_default;
     std::vector<std::unique_ptr<EditableTableRow>> m_current;
 };

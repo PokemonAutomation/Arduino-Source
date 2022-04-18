@@ -53,7 +53,7 @@ AudioDisplayWidget::AudioDisplayWidget(QWidget& parent)
 //    const float LOG_SCALE_MAX = std::log(11.0f);
     
     m_freqVisBlockBoundaries[0] = 1;
-    for(size_t i = 1; i < m_numFreqVisBlocks; i++){
+    for (size_t i = 1; i < m_numFreqVisBlocks; i++){
 //        const float logValue = i / (float)m_numFreqVisBlocks;
 //        float linearValue = (std::exp(logValue * LOG_SCALE_MAX) - 1.f) / 10.f;
 //        linearValue = std::max(std::min(linearValue, 1.0f), 0.0f);
@@ -272,6 +272,7 @@ void AudioDisplayWidget::paintEvent(QPaintEvent* event){
         const size_t paddingWidth = widgetWidth - m_numFreqVisBlocks * (barWidth + gapWidth);
         const size_t leftPaddingWidth = (paddingWidth + gapWidth) / 2;
         const size_t barHeight = widgetHeight - 2 * gapWidth;
+//        cout << "barHeight = " << barHeight << endl;
 
         for (size_t i = 0; i < m_numFreqVisBlocks; i++){
             size_t curWindow = (m_nextFFTWindowIndex + m_numFreqWindows - 1) % m_numFreqWindows;
@@ -289,10 +290,11 @@ void AudioDisplayWidget::paintEvent(QPaintEvent* event){
     }
     case AudioDisplayType::SPECTROGRAM:
     {
-        const size_t barHeight = widgetHeight / m_numFreqVisBlocks;
+        const double barHeight = (double)widgetHeight / m_numFreqVisBlocks;
         const size_t barWidth = widgetWidth;
+//        cout << "barHeight = " << barHeight << endl;
         for (size_t i = 0; i < m_numFreqVisBlocks; i++){
-            QLinearGradient colorGradient(0,barHeight/2,widgetWidth, barHeight/2);
+            QLinearGradient colorGradient(0, barHeight/2, widgetWidth, barHeight/2);
             colorGradient.setSpread(QGradient::PadSpread);
             for(size_t j = 0; j < m_numFreqWindows; j++){
                 // Start with the oldest window in time:
@@ -382,6 +384,7 @@ void AudioDisplayWidget::setAudioDisplayType(AudioDisplayType type){
 
 void AudioDisplayWidget::update_size(){
     int height = m_audioDisplayType == AudioDisplayType::NO_DISPLAY ? 0 : this->width() / 6;
+//    cout << "height = " << height << endl;
     this->setFixedHeight(height);
 }
 

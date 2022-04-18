@@ -66,6 +66,14 @@ GlobalSettings::GlobalSettings()
         "Use this to easily set the window to a specific resolution for streaming alignment.",
         1280, 720
     )
+    , THEME(
+        "<b>Theme:</b><br>Restart program to take effect.",
+        {
+            "Default",
+            "Dark Mode",
+        },
+        0
+    )
     , m_discord_settings(
         "<font size=4><b>Discord Settings:</b> Integrate with Discord. "
 //        "You can also control the program from Discord. "
@@ -115,6 +123,7 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(SEND_ERROR_REPORTS);
     PA_ADD_OPTION(STATS_FILE);
     PA_ADD_OPTION(WINDOW_SIZE);
+    PA_ADD_OPTION(THEME);
 
     PA_ADD_STATIC(m_discord_settings);
     PA_ADD_OPTION(DISCORD);
