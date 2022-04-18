@@ -61,7 +61,7 @@ GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
 //    layout->setAlignment(Qt::AlignTop);
-//    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(0, 0, 0, 0);
     m_group_box = new QGroupBox(value.m_label, this);
     m_group_box->setCheckable(value.m_toggleable);
     m_group_box->setChecked(value.enabled());
@@ -81,7 +81,7 @@ GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
 
     QVBoxLayout* group_layout = new QVBoxLayout(m_group_box);
     group_layout->setAlignment(Qt::AlignTop);
-    group_layout->setContentsMargins(0, 0, 0, 0);
+    group_layout->setContentsMargins(0, 10, 0, 0);
 
     m_expand_text = new QWidget(m_group_box);
     m_expand_text->setLayout(new QVBoxLayout());
@@ -97,6 +97,7 @@ GroupWidget::GroupWidget(QWidget& parent, GroupOption& value)
 
     for (auto& item : m_value.m_options){
         m_options.emplace_back(item.first->make_ui(parent));
+        m_options.back()->widget().setContentsMargins(5, 5, 5, 5);
         m_options_layout->addWidget(&m_options.back()->widget());
     }
 

@@ -71,6 +71,7 @@ BatchWidget::BatchWidget(QWidget& parent, BatchOption& value)
 
     for (auto& item : m_value.m_options){
         m_options.emplace_back(item.first->make_ui(parent));
+        m_options.back()->widget().setContentsMargins(0, 5, 0, 5);
         options_layout->addWidget(&m_options.back()->widget(), 0);
     }
 }

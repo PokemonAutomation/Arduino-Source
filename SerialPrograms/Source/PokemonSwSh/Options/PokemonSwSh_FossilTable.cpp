@@ -30,7 +30,7 @@ public:
 
 
 FossilTableOption::FossilTableOption()
-    : m_table("<b>Game List:</b>", m_factory, true)
+    : m_table("<b>Game List:</b>", m_factory)
 {}
 void FossilTableOption::load_json(const QJsonValue& json){
     m_table.load_current(json);

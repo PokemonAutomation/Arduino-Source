@@ -16,12 +16,11 @@ namespace PokemonAutomation{
 
 
 EditableTableBaseOption::EditableTableBaseOption(
-    QString label, const EditableTableFactory& factory, bool margin,
+    QString label, const EditableTableFactory& factory,
     std::vector<std::unique_ptr<EditableTableRow>> default_value
 )
     : m_label(std::move(label))
     , m_factory(factory)
-    , m_margin(margin)
     , m_default(std::move(default_value))
 {
     restore_defaults();

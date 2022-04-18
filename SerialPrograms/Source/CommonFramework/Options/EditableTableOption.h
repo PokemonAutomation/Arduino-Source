@@ -18,7 +18,7 @@ namespace PokemonAutomation{
 class EditableTableOption : public ConfigOption, public EditableTableBaseOption{
 public:
     EditableTableOption(
-        QString label, const EditableTableFactory& factory, bool margin,
+        QString label, const EditableTableFactory& factory,
         std::vector<std::unique_ptr<EditableTableRow>> default_value = {}
     );
 

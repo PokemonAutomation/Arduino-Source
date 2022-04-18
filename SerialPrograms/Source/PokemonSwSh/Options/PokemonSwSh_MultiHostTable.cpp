@@ -29,7 +29,7 @@ public:
 
 MultiHostTableOption::MultiHostTableOption()
     : m_factory(true)
-    , m_table("<b>Game List:</b>", m_factory, true)
+    , m_table("<b>Game List:</b>", m_factory)
 {}
 void MultiHostTableOption::load_json(const QJsonValue& json){
     m_table.load_current(json);

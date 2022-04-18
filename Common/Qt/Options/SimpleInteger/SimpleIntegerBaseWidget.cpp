@@ -18,6 +18,7 @@ SimpleIntegerBaseWidget<Type>::SimpleIntegerBaseWidget(QWidget& parent, SimpleIn
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
     QLabel* text = new QLabel(m_value.label(), this);
     layout->addWidget(text, 1);
     text->setWordWrap(true);

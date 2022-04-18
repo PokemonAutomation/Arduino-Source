@@ -66,6 +66,7 @@ StaticTextWidget::StaticTextWidget(QWidget& parent, StaticTextOption& value)
     , ConfigWidget(value, *this)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
 
     QLabel* text = new QLabel(value.m_label, this);
     layout->addWidget(text);
@@ -81,6 +82,7 @@ SectionDividerWidget::SectionDividerWidget(QWidget& parent, SectionDividerOption
     , ConfigWidget(value, *this)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
+    layout->setContentsMargins(0, 10, 0, 0);
 
     QFrame* frame = new QFrame(this);
     layout->addWidget(frame);

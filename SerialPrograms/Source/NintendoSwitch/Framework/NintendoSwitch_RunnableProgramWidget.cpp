@@ -8,7 +8,6 @@
 #include <QLabel>
 #include <QGroupBox>
 #include <QScrollArea>
-#include <QMessageBox>
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/GlobalSettingsPanel.h"

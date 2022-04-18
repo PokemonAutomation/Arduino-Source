@@ -87,7 +87,7 @@ EventNotificationsTableUI::EventNotificationsTableUI(QWidget& parent, EventNotif
     , m_value(value)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
-//    layout->setContentsMargins(0, 0, 0, 0);
+    layout->setContentsMargins(0, 0, 0, 0);
     m_table = new AutoHeightTableWidget(this);
     layout->addWidget(m_table, 0, Qt::AlignTop);
 

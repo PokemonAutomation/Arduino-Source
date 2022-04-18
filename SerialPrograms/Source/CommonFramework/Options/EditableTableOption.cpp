@@ -30,10 +30,10 @@ public:
 
 
 EditableTableOption::EditableTableOption(
-    QString label, const EditableTableFactory& factory, bool margin,
+    QString label, const EditableTableFactory& factory,
     std::vector<std::unique_ptr<EditableTableRow>> default_value
 )
-    : EditableTableBaseOption(std::move(label), factory, margin, std::move(default_value))
+    : EditableTableBaseOption(std::move(label), factory, std::move(default_value))
 {}
 
 void EditableTableOption::load_json(const QJsonValue& json){

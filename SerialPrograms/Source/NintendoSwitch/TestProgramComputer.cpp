@@ -53,6 +53,8 @@
 //#include "Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512.h"
 //#include "Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h"
 
+#include <QMessageBox>
+
 
 #include <iostream>
 using std::cout;
@@ -154,6 +156,14 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Kernels;
     using namespace NintendoSwitch::PokemonLA;
     using namespace Pokemon;
+
+
+//    throw InternalProgramError(nullptr, "asdf", "qwer");
+
+//    cout << "asdfasdf" << endl;
+
+
+
 
 
 #if 0

@@ -170,7 +170,7 @@ EggHatchFilterOption::EggHatchFilterOption()
         "Otherwise, it will be released. "
         "If multiple entries apply and have conflicting actions, the program will stop.<br>"
         "IV checking requires that your right panel be set to the IV Judge.",
-        m_factory, true, make_defaults()
+        m_factory, make_defaults()
     )
 {}
 

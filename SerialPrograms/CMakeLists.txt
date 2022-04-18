@@ -39,6 +39,7 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
 link_directories(${CMAKE_CURRENT_LIST_DIR})
 
 file(GLOB MAIN_SOURCES
+    ../Common/Qt/qdarkstyle/dark/style.qrc
     ../ClientSource/Connection/BotBase.h
     ../ClientSource/Connection/BotBaseMessage.h
     ../ClientSource/Connection/MessageLogger.cpp
@@ -611,6 +612,8 @@ file(GLOB MAIN_SOURCES
     Source/NintendoSwitch/Framework/NintendoSwitch_SwitchSystemWidget.h
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualController.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualController.h
+    Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerState.cpp
+    Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerState.h
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerMapping.cpp
     Source/NintendoSwitch/Framework/NintendoSwitch_VirtualControllerMapping.h
     Source/NintendoSwitch/NintendoSwitch_Settings.cpp

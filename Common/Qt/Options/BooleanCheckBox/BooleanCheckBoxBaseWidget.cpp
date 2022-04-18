@@ -20,6 +20,7 @@ BooleanCheckBoxBaseWidget::BooleanCheckBoxBaseWidget(QWidget& parent, BooleanChe
     , m_value(value)
 {
     QHBoxLayout* layout = new QHBoxLayout(this);
+    layout->setContentsMargins(0, 0, 0, 0);
     QLabel* text = new QLabel(m_value.label(), this);
     layout->addWidget(text, 3);
     text->setWordWrap(true);

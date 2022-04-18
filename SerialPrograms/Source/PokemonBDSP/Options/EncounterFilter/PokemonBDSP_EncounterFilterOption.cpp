@@ -32,7 +32,7 @@ EncounterFilterOption::EncounterFilterOption(bool enable_overrides, bool allow_a
             ? "<br>Auto-catching only applies in single battles. The program will stop if asked to auto-catch in a double-battle."
             : ""
         ),
-        m_factory, false
+        m_factory
     )
 {}
 std::vector<EncounterFilterOverride> EncounterFilterOption::overrides() const{
