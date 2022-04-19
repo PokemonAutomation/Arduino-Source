@@ -59,7 +59,7 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    bool run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    bool run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, std::map<size_t, size_t>& pokemon_move_attempts);
 
     //  Returns true if version 1.0.
     bool start_dialog(ConsoleHandle& console, BotBaseContext& context);
