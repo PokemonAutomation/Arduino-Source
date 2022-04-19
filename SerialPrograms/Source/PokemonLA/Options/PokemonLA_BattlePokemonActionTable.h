@@ -36,9 +36,16 @@ public:
     virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
 
 public:
+    // Move style (agile/strong) of each move
     MoveStyle style[4] = {MoveStyle::NoStyle, MoveStyle::NoStyle, MoveStyle::NoStyle, MoveStyle::NoStyle};
+    // Whether to switch pokemon after a number of turns
     bool switch_pokemon = false;
+    // The number of turns to switch
     uint16_t num_turns_to_switch = 1;
+    // Whether to stop battling after a number of move attempts from a pokemon
+    bool stop_after_num_moves = false;
+    // The target number of move attempts after which to stop
+    uint16_t num_moves_to_stop = 25;
 };
 
 class BattlePokemonActionTableFactory : public EditableTableFactory{
@@ -59,12 +66,17 @@ public:
     // Get which style to use according to the info in the table.
     // pokemon: pokemon index, usually at range [0, 5]
     // move: move index, range [0, 3]
-    MoveStyle get_style(size_t pokemon, size_t move);
+    MoveStyle get_style(size_t pokemon, size_t move) const;
 
     // Whether to switch the pokemon at current turns.
     // pokemon: pokemon index, usually at range [0, 5]
     // num_turns: num turns passed so far since the pokemon is sent to the battle.
-    bool switch_pokemon(size_t pokemon, size_t num_turns);
+    bool switch_pokemon(size_t pokemon, size_t num_turns) const;
+    // Whether to stop battling after a certain number of move attempts are made on
+    // a pokemon.
+    // pokemon: pokemon index, usually at range [0, 5]
+    // num_move_attempts: number of move attempts made from this pokemon so far.
+    bool stop_battle(size_t pokemon, size_t num_move_attempts) const;
 
     virtual void load_json(const QJsonValue& json) override;
     virtual QJsonValue to_json() const override;

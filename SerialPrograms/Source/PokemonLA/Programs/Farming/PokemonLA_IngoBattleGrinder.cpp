@@ -192,7 +192,7 @@ bool IngoBattleGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& con
 }
 
 
-bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, std::map<size_t, size_t>& pokemon_move_attempts){
     Stats& stats = env.stats<Stats>();
 
     env.console.log("Starting battle...");
@@ -244,6 +244,9 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
     // This is the party-order index of the pokemon to switch to.
     // The index is the index in the pokemon party list.
     size_t next_pokemon_to_switch_to = 0;
+
+    // Whether this is the last battle. After the last battle ends, stops the program.
+    bool last_battle = false;
 
     // Switch pokemon and update the battle states:
     auto switch_cur_pokemon = [&](){
@@ -332,6 +335,15 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
                 }
 
                 num_turns++;
+                pokemon_move_attempts[cur_pokemon]++;
+                // Check whether to stop battle
+                if (last_battle == false){
+                    last_battle = POKEMON_ACTIONS.stop_battle(cur_pokemon, pokemon_move_attempts[cur_pokemon]);
+                    if (last_battle){
+                        env.log("Target move attempts reached: " + QString::number(pokemon_move_attempts[cur_pokemon]) + 
+                            ". Stop program after this battle finishes.");
+                    }
+                }
             }
 
             env.update_stats();
@@ -363,7 +375,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
     stats.battles++;
     env.update_stats();
 
-    return false;
+    return last_battle;
 }
 
 
@@ -384,6 +396,9 @@ void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     //     return;
     // }
 
+    // pokemon index -> number of move attemps made so far
+    std::map<size_t, size_t> pokemon_move_attempts;
+
     while (true){
         env.update_stats();
         send_program_status_notification(
@@ -393,7 +408,7 @@ void IngoBattleGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseCont
             stats.to_str()
         );
         try{
-            if (run_iteration(env, context)){
+            if (run_iteration(env, context, pokemon_move_attempts)){
                 break;
             }
         }catch (OperationFailedException&){
