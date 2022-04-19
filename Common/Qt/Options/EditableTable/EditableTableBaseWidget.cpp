@@ -116,7 +116,13 @@ void EditableTableBaseWidget::delete_row(int index){
     }
 }
 QWidget* EditableTableBaseWidget::make_insert_button(EditableTableRow& row){
+//    QWidget* widget = new QWidget(m_table);
+//    QHBoxLayout* layout = new QHBoxLayout(widget);
+//    layout->setContentsMargins(2, 2, 2, 2);
+
     QPushButton* button = new QPushButton(m_table);
+//    layout->addWidget(button);
+
     QFont font;
     font.setBold(true);
     button->setFont(font);
@@ -133,7 +139,13 @@ QWidget* EditableTableBaseWidget::make_insert_button(EditableTableRow& row){
     return button;
 }
 QWidget* EditableTableBaseWidget::make_delete_button(EditableTableRow& row){
+//    QWidget* widget = new QWidget(m_table);
+//    QHBoxLayout* layout = new QHBoxLayout(widget);
+//    layout->setContentsMargins(2, 2, 2, 2);
+
     QPushButton* button = new QPushButton(m_table);
+//    layout->addWidget(button);
+
     QFont font;
     font.setBold(true);
     button->setFont(font);

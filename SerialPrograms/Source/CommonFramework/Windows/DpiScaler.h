@@ -13,22 +13,12 @@
 namespace PokemonAutomation{
 
 
-inline int scale_dpi_width(int width){
-    int dpi = 96;
-    QScreen* primaryScreen = QGuiApplication::primaryScreen();
-    if (primaryScreen != nullptr){
-        dpi = primaryScreen->logicalDotsPerInchX();
-    }
-    return width * dpi / 96;
-}
-inline int scale_dpi_height(int height){
-    int dpi = 96;
-    QScreen* primaryScreen = QGuiApplication::primaryScreen();
-    if (primaryScreen != nullptr){
-        dpi = primaryScreen->logicalDotsPerInchY();
-    }
-    return height * dpi / 96;
-}
+int scale_dpi_width(int width);
+int scale_dpi_height(int height);
+
+
+QString scale_dpi_stylesheet(const QString& style_str);
+
 
 
 }

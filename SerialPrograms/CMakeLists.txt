@@ -355,10 +355,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/FloatingPointOption.h
     Source/CommonFramework/Options/HiddenTextEditOption.cpp
     Source/CommonFramework/Options/HiddenTextEditOption.h
-    Source/CommonFramework/Options/ProcessorLevelOption.cpp
-    Source/CommonFramework/Options/ProcessorLevelOption.h
-    Source/CommonFramework/Options/ProcessPriorityOption.cpp
-    Source/CommonFramework/Options/ProcessPriorityOption.h
     Source/CommonFramework/Options/RandomCodeOption.cpp
     Source/CommonFramework/Options/RandomCodeOption.h
     Source/CommonFramework/Options/ScreenshotFormatOption.cpp
@@ -373,6 +369,12 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/StringSelectOption.h
     Source/CommonFramework/Options/TextEditOption.cpp
     Source/CommonFramework/Options/TextEditOption.h
+    Source/CommonFramework/Options/Environment/ProcessorLevelOption.cpp
+    Source/CommonFramework/Options/Environment/ProcessorLevelOption.h
+    Source/CommonFramework/Options/Environment/ProcessPriorityOption.cpp
+    Source/CommonFramework/Options/Environment/ProcessPriorityOption.h
+    Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp
+    Source/CommonFramework/Options/Environment/ThemeSelectorOption.h
     Source/CommonFramework/Panels/Panel.cpp
     Source/CommonFramework/Panels/Panel.h
     Source/CommonFramework/Panels/PanelList.cpp
@@ -436,6 +438,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/VideoToolsQt5.h
     Source/CommonFramework/Windows/ButtonDiagram.cpp
     Source/CommonFramework/Windows/ButtonDiagram.h
+    Source/CommonFramework/Windows/DpiScaler.cpp
     Source/CommonFramework/Windows/DpiScaler.h
     Source/CommonFramework/Windows/MainWindow.cpp
     Source/CommonFramework/Windows/MainWindow.h

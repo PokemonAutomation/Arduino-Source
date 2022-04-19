@@ -51,6 +51,8 @@ void BattlePokemonActionRow::load_json(const QJsonValue& json){
 
     json_get_bool(switch_pokemon, obj, "Switch");
     json_get_int(num_turns_to_switch, obj, "Turns", 0);
+    json_get_bool(stop_after_num_moves, obj, "StopAfterNumMoves");
+    json_get_int(num_moves_to_stop, obj, "NumMovesToStop", 0);
 }
 
 QJsonValue BattlePokemonActionRow::to_json() const{
@@ -61,6 +63,8 @@ QJsonValue BattlePokemonActionRow::to_json() const{
     
     obj.insert("Switch", switch_pokemon);
     obj.insert("Turns", num_turns_to_switch);
+    obj.insert("StopAfterNumMoves", stop_after_num_moves);
+    obj.insert("NumMovesToStop", num_moves_to_stop);
     return obj;
 }
 
@@ -75,6 +79,8 @@ std::vector<QWidget*> BattlePokemonActionRow::make_widgets(QWidget& parent){
     }
     widgets.emplace_back(make_boolean_table_cell(parent, this->switch_pokemon));
     widgets.emplace_back(make_number_table_cell(parent, this->num_turns_to_switch));
+    widgets.emplace_back(make_boolean_table_cell(parent, this->stop_after_num_moves));
+    widgets.emplace_back(make_number_table_cell(parent, this->num_moves_to_stop));
     return widgets;
 }
 
@@ -82,7 +88,9 @@ std::vector<QWidget*> BattlePokemonActionRow::make_widgets(QWidget& parent){
 
 QStringList BattlePokemonActionTableFactory::make_header() const{
     QStringList list;
-    list << "Move 1 Style" << "Move 2 Style" << "Move 3 Style" << "Move 4 Style" << "Switch " + STRING_POKEMON << "Num Turns to Switch";
+    list << "Move 1 Style" << "Move 2 Style" << "Move 3 Style" << "Move 4 Style" << 
+        "Switch " + STRING_POKEMON << "Num Turns to Switch" << 
+        "Limit Move Attempts" << "Max Move Attempts";
     return list;
 }
 
@@ -104,7 +112,11 @@ BattlePokemonActionTable::BattlePokemonActionTable()
         "<b>" + STRING_POKEMON + " Action Table:</b><br>"
         "Set what move styles to use and whether to switch the " + STRING_POKEMON + " after some turns. "
         "Each row is the action for one " + STRING_POKEMON + ". "
-        "The table follows the order that " + STRING_POKEMON + " are sent to battle.",
+        "The table follows the order that " + STRING_POKEMON + " are sent to battle.<br>"
+        "You can also set a target number of move attempts. After it is reached the program will finish the battle and stop.<br>"
+        "Note: if your second last " + STRING_POKEMON + " faints, the game will send your last " + STRING_POKEMON + " automatically for you. "
+        "The program cannot detect this switch as there is no switch selection screen. "
+        "Therefore the program will treat it as the same " + STRING_POKEMON + ".",
         m_factory, make_defaults()
     )
 {}
@@ -125,7 +137,7 @@ ConfigWidget* BattlePokemonActionTable::make_ui(QWidget& parent){
     return m_table.make_ui(parent);
 }
 
-MoveStyle BattlePokemonActionTable::get_style(size_t pokemon, size_t move){
+MoveStyle BattlePokemonActionTable::get_style(size_t pokemon, size_t move) const{
     if (pokemon >= m_table.size()){
         return MoveStyle::NoStyle;
     }
@@ -134,7 +146,7 @@ MoveStyle BattlePokemonActionTable::get_style(size_t pokemon, size_t move){
     return action.style[move];
 }
 
-bool BattlePokemonActionTable::switch_pokemon(size_t pokemon, size_t num_turns){
+bool BattlePokemonActionTable::switch_pokemon(size_t pokemon, size_t num_turns) const{
     if (pokemon >= m_table.size()){
         return false;
     }
@@ -143,8 +155,14 @@ bool BattlePokemonActionTable::switch_pokemon(size_t pokemon, size_t num_turns){
     return action.switch_pokemon && num_turns >= (size_t)action.num_turns_to_switch;
 }
 
+bool BattlePokemonActionTable::stop_battle(size_t pokemon, size_t num_move_attempts) const{
+    if (pokemon >= m_table.size()){
+        return false;
+    }
 
-
+    const BattlePokemonActionRow& action = static_cast<const BattlePokemonActionRow&>(m_table[pokemon]);
+    return action.stop_after_num_moves && num_move_attempts >= (size_t)action.num_moves_to_stop;
+}
 
 
 

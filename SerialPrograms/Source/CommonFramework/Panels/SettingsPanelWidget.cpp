@@ -63,7 +63,7 @@ QWidget* SettingsPanelWidget::make_actions(QWidget& parent){
     QGroupBox* actions_widget = new QGroupBox("Actions", &parent);
 
     QHBoxLayout* action_layout = new QHBoxLayout(actions_widget);
-    action_layout->setContentsMargins(0, 0, 0, 0);
+//    action_layout->setContentsMargins(0, 0, 0, 0);
     {
         m_default_button = new QPushButton("Restore Defaults", actions_widget);
         action_layout->addWidget(m_default_button, 1);
