@@ -444,10 +444,6 @@ void goto_any_camp_from_overworld(ProgramEnvironment& env, ConsoleHandle& consol
                 pbf_mash_button(context, BUTTON_A, 125);
                 break;
             }
-
-            if (ret < 0){
-                throw OperationFailedException(console, "Unable to fly. Are you under attack?");
-            }
         }
 
         pbf_mash_button(context, BUTTON_B, 125);
