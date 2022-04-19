@@ -9,9 +9,10 @@
 #include "Tools/StatsDatabase.h"
 #include "Integrations/SleepyDiscordRunner.h"
 #include "GlobalSettingsPanel.h"
+#include "Windows/DpiScaler.h"
 #include "Windows/MainWindow.h"
 
-#include <QTextStream>
+//#include <QTextStream>
 
 #include <iostream>
 using std::cout;
@@ -23,7 +24,6 @@ using namespace PokemonAutomation;
 Q_DECLARE_METATYPE(std::string)
 
 
-
 int main(int argc, char *argv[]){
     setup_crash_handler();
 
@@ -33,14 +33,9 @@ int main(int argc, char *argv[]){
 
     QApplication application(argc, argv);
 
-//    int dpiX = application.desktop()->logicalDpiX();
-//    cout << dpiX << endl;
-//    cout << application.devicePixelRatio() << endl;
-
     qRegisterMetaType<size_t>("size_t");
     qRegisterMetaType<uint8_t>("uint8_t");
     qRegisterMetaType<std::string>("std::string");
-//    qRegisterMetaType<QVector<float>>("QVector<float>");
 
     OutputRedirector redirect_stdout(std::cout, "stdout", Color());
     OutputRedirector redirect_stderr(std::cerr, "stderr", COLOR_RED);
@@ -57,12 +52,14 @@ int main(int argc, char *argv[]){
         global_logger_tagged().log(error.message(), COLOR_RED);
     }
 
-    if (GlobalSettings::instance().THEME == 1){
-        QFile f(":qdarkstyle/dark/style.qss");
-        f.open(QFile::ReadOnly | QFile::Text);
-        QTextStream ts(&f);
-        application.setStyleSheet(ts.readAll());
-    }
+#if 0
+    application.connect(
+        &application, &QGuiApplication::primaryScreenChanged,
+        &application, [&](QScreen* screen){
+            cout << "asdf" << endl;
+        }
+    );
+#endif
 
     int ret;
     {

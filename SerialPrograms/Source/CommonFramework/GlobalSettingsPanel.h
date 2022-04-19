@@ -11,8 +11,9 @@
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/StringOption.h"
-#include "CommonFramework/Options/ProcessPriorityOption.h"
-#include "CommonFramework/Options/ProcessorLevelOption.h"
+#include "CommonFramework/Options/Environment/ProcessPriorityOption.h"
+#include "CommonFramework/Options/Environment/ProcessorLevelOption.h"
+#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "Integrations/DiscordSettingsOption.h"
 
@@ -55,7 +56,7 @@ public:
 
     StringOption STATS_FILE;
     ResolutionOption WINDOW_SIZE;
-    EnumDropdownOption THEME;
+    ThemeSelectorOption THEME;
 
     SectionDividerOption m_discord_settings;
     Integration::DiscordSettingsOption DISCORD;

@@ -25,7 +25,6 @@ RunnableComputerProgramDescriptor::RunnableComputerProgramDescriptor(
     )
 {}
 
-
 QWidget* RunnableComputerProgramInstance::make_widget(QWidget& parent, PanelListener& listener){
     return RunnableComputerProgramWidget::make(parent, *this, listener);
 }
