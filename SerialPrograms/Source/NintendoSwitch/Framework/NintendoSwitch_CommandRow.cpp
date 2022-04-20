@@ -5,6 +5,7 @@
  */
 
 #include <QHBoxLayout>
+#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "NintendoSwitch_CommandRow.h"
 
 namespace PokemonAutomation{
@@ -76,16 +77,16 @@ CommandRow::CommandRow(
         m_inference_box, &QCheckBox::stateChanged,
         this, [=](int){
 //            m_overlay_box->setEnabled(m_inference_box->isChecked());
-            set_feedback_enabled(m_inference_box->isChecked());
+            emit set_feedback_enabled(m_inference_box->isChecked());
         }
     );
     connect(
         m_overlay_box, &QCheckBox::stateChanged,
-        this, [=](int){ set_inference_boxes(m_overlay_box->isChecked()); }
+        this, [=](int){ emit set_inference_boxes(m_overlay_box->isChecked()); }
     );
     connect(
         m_screenshot_button, &QPushButton::clicked,
-        this, [=](bool){ screenshot_requested(); }
+        this, [=](bool){ emit screenshot_requested(); }
     );
 }
 
@@ -117,7 +118,7 @@ void CommandRow::update_ui(){
 //        m_reset_button->setEnabled(stopped);
         if (!stopped){
             m_status->setText(
-                "<font color=\"purple\">Not Active. Keyboard commands are disabled while a program is running.</font>"
+                html_color_text("Not Active. Keyboard commands are disabled while a program is running.", COLOR_PURPLE)
             );
             return;
         }
@@ -127,20 +128,20 @@ void CommandRow::update_ui(){
     if (state == BotBaseHandle::State::READY){
         if (!m_botbase.accepting_commands()){
             m_status->setText(
-                "<font color=\"red\">Not Active. The program on the device doesn't accept commands.</font>"
+                html_color_text("Not Active. The program on the device doesn't accept commands.", COLOR_RED)
             );
         }else if (!m_last_known_focus){
             m_status->setText(
-                "<font color=\"purple\">Not Active. Click on the video to activate keyboard commands.</font>"
+                html_color_text("Not Active. Click on the video to activate keyboard commands.", COLOR_PURPLE)
             );
         }else{
             m_status->setText(
-                "<font color=\"green\">Keyboard Control Active! Use the keyboard to enter commands.</font>"
+                html_color_text("Keyboard Control Active! Use the keyboard to enter commands.", COLOR_DARKGREEN)
             );
         }
     }else{
         m_status->setText(
-            "<font color=\"red\">Not Active. The connection is not ready.</font>"
+            html_color_text("Not Active. The connection is not ready.", COLOR_RED)
         );
     }
 }

@@ -40,14 +40,16 @@ constexpr Color COLOR_GRAY(0xff808080);
 
 constexpr Color COLOR_RED(0xffff0000);
 constexpr Color COLOR_GREEN(0xff00ff00);
-constexpr Color COLOR_BLUE(0xff0000ff);
+constexpr Color COLOR_BLUE(0xff0080ff);
+constexpr Color COLOR_DARK_BLUE(0xff0000ff);    //  Hard to see on dark theme.
 
 constexpr Color COLOR_MAGENTA(0xffff00ff);
 constexpr Color COLOR_YELLOW(0xffffff00);
 constexpr Color COLOR_CYAN(0xff00ffff);
 
 constexpr Color COLOR_ORANGE(0xffffa500);
-constexpr Color COLOR_PURPLE(0xff800080);
+//constexpr Color COLOR_PURPLE(0xff800080);       //  Hard to see on dark theme.
+constexpr Color COLOR_PURPLE(0xff8a2be2);
 
 constexpr Color COLOR_DARKGREEN(0xff008000);
 constexpr Color COLOR_DARKCYAN(0xff008080);

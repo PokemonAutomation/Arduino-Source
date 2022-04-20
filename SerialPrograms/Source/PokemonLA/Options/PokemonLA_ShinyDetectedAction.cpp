@@ -5,6 +5,7 @@
  */
 
 #include <sstream>
+#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/Tools/VideoFeed.h"
@@ -25,7 +26,10 @@ namespace PokemonLA{
 
 ShinyRequiresAudioText::ShinyRequiresAudioText()
     : StaticTextOption(
-        "<font size=4 color=\"blue\"><b>Shiny detection uses sound. Make sure you have the correct audio input set.</b></font>"
+        html_color_text(
+            "<font size=4><b>Shiny detection uses sound. Make sure you have the correct audio input set.</b></font>",
+            COLOR_BLUE
+        )
     )
 {}
 
@@ -37,10 +41,6 @@ ShinyDetectedActionOption::ShinyDetectedActionOption(
 )
     : GroupOption(std::move(label))
     , DESCRIPTION(std::move(description))
-//    , DESCRIPTION(
-//        (description.isEmpty() ? "" : description + "<br><br>") +
-//        "<font color=\"blue\">Shiny detection uses sound. Make sure you have the correct audio input set.</font>"
-//    )
     , ACTION(
         "<b>Shiny Detected Action:</b>",
         {
