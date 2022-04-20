@@ -452,6 +452,7 @@ SOURCES += \
     Source/PokemonLA/PokemonLA_TravelLocations.cpp \
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.cpp \
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.cpp \
+    Source/PokemonLA/Programs/Farming/PokemonLA_TreeLeapGrinder.cpp \
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.cpp \
     Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.cpp \
     Source/PokemonLA/Programs/PokemonLA_BattleRoutines.cpp \
@@ -1130,6 +1131,7 @@ HEADERS += \
     Source/PokemonLA/PokemonLA_TravelLocations.h \
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.h \
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.h \
+    Source/PokemonLA/Programs/Farming/PokemonLA_TreeLeapGrinder.h \
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.h \
     Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.h \
     Source/PokemonLA/Programs/PokemonLA_BattleRoutines.h \

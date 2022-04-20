@@ -924,6 +924,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/Farming/PokemonLA_NuggetFarmerHighlands.h
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.cpp
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.h
+    Source/PokemonLA/Programs/Farming/PokemonLA_TreeLeapGrinder.cpp
+    Source/PokemonLA/Programs/Farming/PokemonLA_TreeLeapGrinder.h
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.cpp
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.h
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.cpp
