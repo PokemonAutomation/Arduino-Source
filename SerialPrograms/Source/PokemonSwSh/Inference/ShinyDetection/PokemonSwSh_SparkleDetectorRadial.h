@@ -12,15 +12,6 @@
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 
-namespace PokemonAutomation{
-namespace Kernels{
-namespace Waterfill{
-
-class WaterfillObject;
-
-}
-}
-}
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -86,12 +86,12 @@ WallClock KeyboardDebouncer::get_current_state(VirtualControllerState& state){
 
 
 VirtualController::VirtualController(
-    LoggerQt& logger,
+    LoggerQt& /*logger*/,
     BotBaseHandle& botbase,
     bool allow_commands_while_running
 )
-    : m_logger(logger)
-    , m_botbase(botbase)
+    // : m_logger(logger)
+    : m_botbase(botbase)
     , m_allow_commands_while_running(allow_commands_while_running)
     , m_last_known_state(ProgramState::STOPPED)
     , m_stop(false)

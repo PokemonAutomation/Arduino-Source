@@ -55,7 +55,7 @@ private:
 class VirtualController{
 public:
     VirtualController(
-        LoggerQt& logger,
+        LoggerQt& /*logger*/,
         BotBaseHandle& botbase,
         bool allow_commands_while_running
     );
@@ -73,7 +73,7 @@ private:
     void thread_loop();
 
 private:
-    LoggerQt& m_logger;
+    // LoggerQt& m_logger;
     BotBaseHandle& m_botbase;
     const bool m_allow_commands_while_running;
 
