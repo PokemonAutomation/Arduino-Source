@@ -94,11 +94,12 @@ public slots:
 
 private:
     void update_size();
-
     void clear();
 
-private:
+    void render_bars();
+    void render_spectrograph();
 
+private:
     AudioThreadController* m_audioThreadController = nullptr;
 
     // Num frequencies to store for the output of one fft computation.

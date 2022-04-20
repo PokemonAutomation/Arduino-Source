@@ -155,7 +155,7 @@ void VirtualController::thread_loop(){
     WallClock last_press = current_time();
     while (true){
         if (m_stop.load(std::memory_order_acquire)){
-            break;
+            return;
         }
 
         //  Not accepting commands.
@@ -176,8 +176,9 @@ void VirtualController::thread_loop(){
 //        current.print();
 
         //  Send the command.
+        WallClock now;
         do{
-            WallClock now = current_time();
+            now = current_time();
             try{
 //                current.print();
                 if (current == last && last_press + std::chrono::milliseconds(1000) > now){
@@ -233,7 +234,9 @@ void VirtualController::thread_loop(){
         if (m_stop.load(std::memory_order_acquire)){
             return;
         }
-        if (next_wake != WallClock::max()){
+        if (next_wake == WallClock::max()){
+            m_cv.wait(lg);
+        }else if (now <= next_wake){
             m_cv.wait_until(lg, next_wake);
         }
     }

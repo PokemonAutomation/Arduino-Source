@@ -9,6 +9,7 @@
 #include <QLabel>
 #include "Common/Qt/CollapsibleGroupBox.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "PanelWidget.h"
 
 namespace PokemonAutomation{
@@ -34,7 +35,7 @@ CollapsibleGroupBox* PanelWidget::make_header(QWidget& parent){
     QString name_text = "<b>Name:</b> " + m_instance.descriptor().display_name();
     if (m_instance.descriptor().doc_link().size() > 0){
         QString path = ONLINE_DOC_URL + m_instance.descriptor().doc_link();
-        name_text += " (<a href=\"" + path + "\">online documentation</a>)</font>";
+        name_text += " (" + make_text_url(path, "online documentation") + ")";
     }
     QLabel* name = new QLabel(name_text, description_box);
     name->setTextFormat(Qt::RichText);

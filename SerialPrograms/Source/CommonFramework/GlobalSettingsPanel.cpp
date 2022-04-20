@@ -67,10 +67,11 @@ GlobalSettings::GlobalSettings()
         1280, 720
     )
     , m_discord_settings(
-        "<font size=4><b>Discord Settings:</b> Integrate with Discord. "
-//        "You can also control the program from Discord. "
-        "(<a href=\"" + ONLINE_DOC_URL + "ComputerControl/blob/master/Wiki/Software/DiscordIntegration.md" +
-        "\">online documentation</a>)</font></font>"
+        "<font size=4><b>Discord Settings:</b> Integrate with Discord. (" +
+        make_text_url(
+            ONLINE_DOC_URL + "ComputerControl/blob/master/Wiki/Software/DiscordIntegration.md",
+            "online documentation"
+        ) + ")</font>"
     )
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
@@ -153,6 +154,15 @@ void GlobalSettings::load_json(const QJsonValue& json){
 //    }
 
     BatchOption::load_json(json);
+
+    //  Remake this to update the color.
+    m_discord_settings = SectionDividerOption(
+        "<font size=4><b>Discord Settings:</b> Integrate with Discord. (" +
+        make_text_url(
+            ONLINE_DOC_URL + "ComputerControl/blob/master/Wiki/Software/DiscordIntegration.md",
+            "online documentation"
+        ) + ")</font>"
+    );
 }
 QJsonValue GlobalSettings::to_json() const{
     QJsonObject obj = BatchOption::to_json().toObject();
