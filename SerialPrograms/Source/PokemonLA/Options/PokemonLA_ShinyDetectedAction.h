@@ -90,6 +90,11 @@ void on_shiny_sound(
     float error_coefficient
 );
 
+// Alternative for matches (shiny/alphas) not found by sound.
+void on_match_found(
+    const ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ShinyDetectedActionOption& options, bool is_match
+);
 
 
 

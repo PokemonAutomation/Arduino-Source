@@ -476,6 +476,7 @@ SOURCES += \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_GalladeFinder.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_FroslassFinder.cpp \
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_TreeShinyHunting.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_UnownFinder.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.cpp \
@@ -1153,6 +1154,7 @@ HEADERS += \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_GalladeFinder.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_FroslassFinder.h \
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_TreeShinyHunting.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_UnownFinder.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h \

@@ -41,6 +41,11 @@ void goto_camp_from_overworld(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context
 );
 
+void goto_any_camp_from_overworld(
+    ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    const TravelLocation& location
+);
+
 
 
 }
