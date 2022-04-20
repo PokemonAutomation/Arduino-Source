@@ -43,3 +43,7 @@ build*/
 *.exe
 *.out
 *.app
+
+.vs
+Resources/*
+SerialPrograms/CMakeLists.txt.user
