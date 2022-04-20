@@ -16,6 +16,7 @@
 #include "ClientSource/Connection/SerialConnection.h"
 #include "ClientSource/Connection/PABotBase.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "BotBaseHandle.h"
 
@@ -180,7 +181,7 @@ void BotBaseHandle::reset_unprotected(const QSerialPortInfo& port){
             "Prolific controllers do not work for Arduino and similar microntrollers.<br>"
             "You were warned of this in the setup instructions. Please buy a CP210x controller instead."
         );
-        emit on_not_connected("<font color=\"red\">Cannot connect to Prolific controller.</font>");
+        emit on_not_connected(html_color_text("Cannot connect to Prolific controller.", COLOR_RED));
         m_logger.log("Unable to connect due to Prolific controller.");
         return;
     }
@@ -198,7 +199,7 @@ void BotBaseHandle::reset_unprotected(const QSerialPortInfo& port){
         m_state.store(State::CONNECTING, std::memory_order_release);
         emit on_connecting();
     }else{
-        emit on_not_connected("<font color=\"red\">Unable to open port.</font>");
+        emit on_not_connected(html_color_text("Unable to open port.", COLOR_RED));
 //        m_logger.log(error, Color());
         return;
     }
@@ -261,7 +262,7 @@ void BotBaseHandle::thread_body(){
         }
         if (!error.isEmpty()){
             m_botbase->stop();
-            emit on_stopped("<font color=\"red\">" + error + "</font>");
+            emit on_stopped(html_color_text(error, COLOR_RED));
             return;
         }
     }
@@ -282,14 +283,13 @@ void BotBaseHandle::thread_body(){
         }
         if (error.isEmpty()){
             m_state.store(State::READY, std::memory_order_release);
-            emit on_ready(QString::fromStdString(
-                "<font color=\"blue\">Program: " +
-                program_name(program_id) +
-                " (" + std::to_string(version) + ")</font>"
-            ));
+            std::string text = "Program: " + program_name(program_id) + " (" + std::to_string(version) + ")";
+            emit on_ready(
+                html_color_text(QString::fromStdString(text), theme_friendly_darkblue())
+            );
         }else{
             m_state.store(State::STOPPED, std::memory_order_release);
-            emit on_stopped("<font color=\"red\">" + error + "</font>");
+            emit on_stopped(html_color_text(error, COLOR_RED));
             m_botbase->stop();
             return;
         }
@@ -307,9 +307,9 @@ void BotBaseHandle::thread_body(){
             auto last = current_time() - m_botbase->last_ack();
             std::chrono::duration<double> seconds = last;
             if (last > 2 * SERIAL_REFRESH_RATE){
+                std::string text = "Last Ack: " + tostr_fixed(seconds.count(), 3) + " seconds ago";
                 emit uptime_status(
-                    QString("<font color=\"red\">Last Ack: ") +
-                    QString::fromStdString(tostr_fixed(seconds.count(), 3)) + " seconds ago</font>"
+                    html_color_text(QString::fromStdString(text), COLOR_RED)
                 );
 //                m_logger.log("Connection issue detected. Turning on all logging...");
 //                settings.log_everything.store(true, std::memory_order_release);
@@ -342,9 +342,11 @@ void BotBaseHandle::thread_body(){
             error = QString::fromStdString(e.message());
         }
         if (error.isEmpty()){
-            emit uptime_status("<font color=\"blue\">Up Time: " + QString::fromStdString(str) + "</font>");
+            QString text = "Up Time: " + QString::fromStdString(str);
+            emit uptime_status(html_color_text(text, theme_friendly_darkblue()));
         }else{
-            emit uptime_status("<font color=\"red\">Up Time: " + error + "</font>");
+            QString text = "Up Time: " + error;
+            emit uptime_status(html_color_text(text, COLOR_RED));
             error.clear();
         }
 

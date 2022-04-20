@@ -40,7 +40,7 @@ namespace PokemonAutomation{
 AudioDisplayWidget::AudioDisplayWidget(QWidget& parent)
      : QWidget(&parent)
      , m_numFreqs(NUM_FFT_SAMPLES/2)
-     , m_numFreqWindows(500)
+     , m_numFreqWindows(1000)
      , m_numFreqVisBlocks(96)
      , m_freqVisBlockBoundaries(m_numFreqVisBlocks+1)
      , m_freqVisBlocks(m_numFreqVisBlocks * m_numFreqWindows)
@@ -226,147 +226,144 @@ void AudioDisplayWidget::loadFFTOutput(size_t sampleRate, std::shared_ptr<const 
 }
 
 // TODO: move this to a common lib folder:
-QColor jetColorMap(float v){
+PA_FORCE_INLINE QRgb jetColorMap(float v){
     if (v <= 0.f){
-        return QColor(0,0,0);
+        return qRgb(0,0,0);
     }
     else if (v < 0.125f){
-        return QColor(0, 0, int((0.5f + 4.f * v) * 255.f));
+        return qRgb(0, 0, int((0.5f + 4.f * v) * 255.f));
     }
     else if (v < 0.375f){
-        return QColor(0, int((v - 0.125f)*1020.f), 255);
+        return qRgb(0, int((v - 0.125f)*1020.f), 255);
     }
     else if (v < 0.625f){
         int c = int((v - 0.375f) * 1020.f);
-        return QColor(c, 255, 255-c);
+        return qRgb(c, 255, 255-c);
     }
     else if (v < 0.875f){
-        return QColor(255, 255 - int((v-0.625f) * 1020.f), 0);
+        return qRgb(255, 255 - int((v-0.625f) * 1020.f), 0);
     }
     else if (v <= 1.0){
-        return QColor(255 - int((v-0.875)*1020.f), 0, 0);
+        return qRgb(255 - int((v-0.875)*1020.f), 0, 0);
     }
     else {
-        return QColor(255, 255, 255);
+        return qRgb(255, 255, 255);
     }
 }
 
-void AudioDisplayWidget::paintEvent(QPaintEvent* event){
-    QWidget::paintEvent(event);
-
+void AudioDisplayWidget::render_bars(){
     QPainter painter(this);
     painter.fillRect(rect(), Qt::black);
 
     const int widgetWidth = this->width();
     const int widgetHeight = this->height();
-//    // num frequency bars
-//    // -1 here because we don't show the freq-0 bar
-//    const size_t numBars = m_numFreqVisBlocks-1;
+
+    const size_t barPlusGapWidth = widgetWidth / m_numFreqVisBlocks;
+    const size_t barWidth = 0.8 * barPlusGapWidth;
+    const size_t gapWidth = barPlusGapWidth - barWidth;
+    const size_t paddingWidth = widgetWidth - m_numFreqVisBlocks * (barWidth + gapWidth);
+    const size_t leftPaddingWidth = (paddingWidth + gapWidth) / 2;
+    const size_t barHeight = widgetHeight - 2 * gapWidth;
+//        cout << "barHeight = " << barHeight << endl;
+
+    for (size_t i = 0; i < m_numFreqVisBlocks; i++){
+        size_t curWindow = (m_nextFFTWindowIndex + m_numFreqWindows - 1) % m_numFreqWindows;
+//            // +1 here to skip the freq-0 value
+        float value = m_freqVisBlocks[curWindow * m_numFreqVisBlocks + i];
+        QRect bar = rect();
+        bar.setLeft((int)(rect().left() + leftPaddingWidth + (i * (gapWidth + barWidth))));
+        bar.setWidth((int)barWidth);
+        bar.setTop((int)(rect().top() + gapWidth + (1.0 - value) * barHeight));
+        bar.setBottom((int)(rect().bottom() - gapWidth));
+
+        painter.fillRect(bar, jetColorMap(value));
+    }
+}
+void AudioDisplayWidget::render_spectrograph(){
+    QPainter painter(this);
+    painter.fillRect(rect(), Qt::black);
+
+    const int widgetWidth = this->width();
+    const int widgetHeight = this->height();
+
+    int width = (int)m_numFreqWindows;
+    int height = (int)m_numFreqVisBlocks;
+    QImage graph(width, height, QImage::Format_RGB32);
+    uint32_t* pixels = (uint32_t*)graph.bits();
+    size_t bytes_per_line = graph.bytesPerLine();
+    for (int c = 0; c < width; c++){
+        size_t curWindow = (m_nextFFTWindowIndex + m_numFreqWindows + c) % m_numFreqWindows;
+        const float* in = m_freqVisBlocks.data() + curWindow * m_numFreqVisBlocks;
+        uint32_t* out = pixels;
+        for (int r = 0; r < height; r++){
+            float value = in[r];
+            out[0] = jetColorMap(value);
+            out = (uint32_t*)((char*)out + bytes_per_line);
+        }
+        pixels++;
+    }
+    graph = graph.scaled(widgetWidth, widgetHeight);
+    painter.fillRect(rect(), graph);
+
+    // Now render overlays:
+
+    // The oldest window on the spectrogram view has the oldest timestamp,
+    // and its position is left most on the spectrogram, assigning a window ID of 0.
+    size_t oldestStamp = m_freqVisStamps[m_nextFFTWindowIndex];
+    size_t oldestWindowID = 0;
+    // When the audio stream starts coming in, the history of the spectrogram
+    // is not fully filled. So the oldest stamp may not be the leftmost one on the display.
+    // Here we use the validity of the time stamp to find the real oldest one.
+    for (; oldestWindowID < m_numFreqWindows; oldestWindowID++){
+        if (oldestStamp != SIZE_MAX){
+            // it's a window with valid stamp
+            break;
+        }
+        oldestStamp = m_freqVisStamps[(m_nextFFTWindowIndex+oldestWindowID) % m_numFreqWindows];
+    }
+    if (oldestStamp == SIZE_MAX){
+        // we have no valid windows in the spectrogram, so no overlays to render:
+        return;
+    }
+    size_t newestStamp = m_freqVisStamps[(m_nextFFTWindowIndex + m_numFreqWindows - 1) % m_numFreqWindows];
+    // size_t newestWindowID = m_numFreqWindows - 1;
+
+    // Each window has width: widgetWidth / (m_numFreqWindows-1) on the spectrogram
+    const float FFTWindowWidth = widgetWidth / float(m_numFreqWindows-1);
+
+    std::lock_guard<std::mutex> lock_gd(m_overlay_lock);
+    for (const auto& box: m_overlay){
+        const size_t startingStamp = std::get<0>(box);
+        const size_t endStamp = std::get<1>(box);
+        const Color& color = std::get<2>(box);
+        if (startingStamp >= endStamp){
+            continue;
+        }
+
+        // std::cout << "Render overlay at (" << startingStamp << ", " << endStamp
+        //     << ") oldestStamp " << oldestStamp << " wID " << oldestWindowID << " newest stamp " << newestStamp << std::endl;
+
+        if (endStamp <= oldestStamp || startingStamp > newestStamp){
+            continue;
+        }
+
+        int xmin = int((startingStamp - oldestStamp + oldestWindowID - 0.5) * FFTWindowWidth + 0.5);
+        int ymin = rect().top() - 1;
+        int rangeWidth = int(FFTWindowWidth * (endStamp - startingStamp) + 0.5);
+        painter.setPen(QColor((uint32_t)color));
+        painter.drawRect(xmin, ymin, rangeWidth, widgetHeight);
+    }
+}
+void AudioDisplayWidget::paintEvent(QPaintEvent* event){
+    QWidget::paintEvent(event);
 
     switch (m_audioDisplayType){
     case AudioDisplayType::FREQ_BARS:
-    {
-        const size_t barPlusGapWidth = widgetWidth / m_numFreqVisBlocks;
-        const size_t barWidth = 0.8 * barPlusGapWidth;
-        const size_t gapWidth = barPlusGapWidth - barWidth;
-        const size_t paddingWidth = widgetWidth - m_numFreqVisBlocks * (barWidth + gapWidth);
-        const size_t leftPaddingWidth = (paddingWidth + gapWidth) / 2;
-        const size_t barHeight = widgetHeight - 2 * gapWidth;
-//        cout << "barHeight = " << barHeight << endl;
-
-        for (size_t i = 0; i < m_numFreqVisBlocks; i++){
-            size_t curWindow = (m_nextFFTWindowIndex + m_numFreqWindows - 1) % m_numFreqWindows;
-//            // +1 here to skip the freq-0 value
-            float value = m_freqVisBlocks[curWindow * m_numFreqVisBlocks + i];
-            QRect bar = rect();
-            bar.setLeft((int)(rect().left() + leftPaddingWidth + (i * (gapWidth + barWidth))));
-            bar.setWidth((int)barWidth);
-            bar.setTop((int)(rect().top() + gapWidth + (1.0 - value) * barHeight));
-            bar.setBottom((int)(rect().bottom() - gapWidth));
-
-            painter.fillRect(bar, jetColorMap(value));
-        }
+        render_bars();
         break;
-    }
     case AudioDisplayType::SPECTROGRAM:
-    {
-        const double barHeight = (double)widgetHeight / m_numFreqVisBlocks;
-        const size_t barWidth = widgetWidth;
-//        cout << "barHeight = " << barHeight << endl;
-        for (size_t i = 0; i < m_numFreqVisBlocks; i++){
-            QLinearGradient colorGradient(0, barHeight/2, widgetWidth, barHeight/2);
-            colorGradient.setSpread(QGradient::PadSpread);
-            for(size_t j = 0; j < m_numFreqWindows; j++){
-                // Start with the oldest window in time:
-                size_t curWindow = (m_nextFFTWindowIndex + m_numFreqWindows + j) % m_numFreqWindows;
-//                // +1 here to skip the freq-0 value
-                float value = m_freqVisBlocks[curWindow * m_numFreqVisBlocks + i];
-
-                float pos = (float)j/(m_numFreqWindows - 1);
-                colorGradient.setColorAt(pos, jetColorMap(value));
-            }
-
-            QRect bar = rect();
-            bar.setLeft(rect().left());
-            bar.setWidth((int)barWidth);
-            bar.setTop((int)(rect().top() + i * barHeight));
-            bar.setBottom((int)(rect().top() + (i+1) * barHeight));
-
-            painter.fillRect(bar, QBrush(colorGradient));
-        }
-        
-        // Now render overlays:
-        
-        // The oldest window on the spectrogram view has the oldest timestamp,
-        // and its position is left most on the spectrogram, assigning a window ID of 0.
-        size_t oldestStamp = m_freqVisStamps[m_nextFFTWindowIndex];
-        size_t oldestWindowID = 0;
-        // When the audio stream starts coming in, the history of the spectrogram
-        // is not fully filled. So the oldest stamp may not be the leftmost one on the display.
-        // Here we use the validity of the time stamp to find the real oldest one.
-        for(; oldestWindowID < m_numFreqWindows; oldestWindowID++){
-            if (oldestStamp != SIZE_MAX){
-                // it's a window with valid stamp
-                break;
-            }
-            oldestStamp = m_freqVisStamps[(m_nextFFTWindowIndex+oldestWindowID) % m_numFreqWindows];
-        }
-        if (oldestStamp == SIZE_MAX){
-            // we have no valid windows in the spectrogram, so no overlays to render:
-            break;
-        }
-        size_t newestStamp = m_freqVisStamps[(m_nextFFTWindowIndex+m_numFreqWindows-1) % m_numFreqWindows];
-        // size_t newestWindowID = m_numFreqWindows - 1;
-
-        // Each window has width: widgetWidth / (m_numFreqWindows-1) on the spectrogram
-        const float FFTWindowWidth = widgetWidth / float(m_numFreqWindows-1);
-
-        {
-            std::lock_guard<std::mutex> lock_gd(m_overlay_lock);
-            for(const auto& box: m_overlay){
-                const size_t startingStamp = std::get<0>(box);
-                const size_t endStamp = std::get<1>(box);
-                const Color& color = std::get<2>(box);
-                if (startingStamp >= endStamp){
-                    continue;
-                }
-
-                // std::cout << "Render overlay at (" << startingStamp << ", " << endStamp
-                //     << ") oldestStamp " << oldestStamp << " wID " << oldestWindowID << " newest stamp " << newestStamp << std::endl;
-
-                if (endStamp <= oldestStamp || startingStamp > newestStamp){
-                    continue;            
-                }
-
-                int xmin = int((startingStamp - oldestStamp + oldestWindowID - 0.5) * FFTWindowWidth + 0.5);
-                int ymin = rect().top();
-                int rangeWidth = int(FFTWindowWidth * (endStamp - startingStamp) + 0.5);
-                painter.setPen(QColor((uint32_t)color));
-                painter.drawRect(xmin, ymin, rangeWidth, widgetHeight);
-            }
-        }
+        render_spectrograph();
         break;
-    }
     default:
         break;
     }

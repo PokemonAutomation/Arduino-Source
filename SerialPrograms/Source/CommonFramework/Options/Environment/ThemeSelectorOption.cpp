@@ -7,6 +7,7 @@
 #include <QFile>
 #include <QTextStream>
 #include <QApplication>
+#include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "CommonFramework/Options/EnumDropdownWidget.h"
 #include "CommonFramework/Windows/DpiScaler.h"
@@ -84,6 +85,42 @@ public:
 ConfigWidget* ThemeSelectorOption::make_ui(QWidget& parent){
     return new ThemeSelectorWidget(parent, *this);
 }
+
+
+#if 1
+Color theme_friendly_darkblue(){
+    if (current_theme == 1){
+        return Color(0xff0080ff);
+    }
+    return COLOR_DARK_BLUE;
+}
+#endif
+QString html_color_text(const QString& text, Color color){
+    const char HEX[] = "0123456789abcdef";
+    uint32_t rgb = (uint32_t)color;
+    QString str;
+    str += HEX[(rgb >> 20) & 15];
+    str += HEX[(rgb >> 16) & 15];
+    str += HEX[(rgb >> 12) & 15];
+    str += HEX[(rgb >>  8) & 15];
+    str += HEX[(rgb >>  4) & 15];
+    str += HEX[(rgb >>  0) & 15];
+    return "<font color=#" + str + ">" + text + "</font>";
+}
+QString make_text_url(const QString& url, const QString& text){
+#if 0
+    switch (current_theme){
+    case 0:
+        return "<a href=\"" + url + "\">" + text + "</a>";
+    case 1:
+        return "<a href=\"" + url + "\" style=\"color: #0080ff\">" + text + "</a>";
+    }
+    throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid theme #.");
+#endif
+    return "<a href=\"" + url + "\" style=\"color: #0080ff\">" + text + "</a>";
+}
+
+
 
 
 
