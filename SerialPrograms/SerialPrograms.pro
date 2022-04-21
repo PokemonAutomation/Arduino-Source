@@ -459,6 +459,7 @@ SOURCES += \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.cpp \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.cpp \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp \
+	Source/PokemonLA/Programs/PokemonLA_TreeActions.cpp \
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.cpp \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.cpp \
     Source/PokemonLA/Programs/PokemonLA_MountChange.cpp \
@@ -1138,6 +1139,7 @@ HEADERS += \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.h \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.h \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.h \
+	Source/PokemonLA/Programs/PokemonLA_TreeActions.h \
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.h \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.h \
     Source/PokemonLA/Programs/PokemonLA_MountChange.h \
