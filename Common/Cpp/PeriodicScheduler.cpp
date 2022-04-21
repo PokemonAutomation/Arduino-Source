@@ -138,6 +138,7 @@ bool PeriodicRunner::cancel(std::exception_ptr exception) noexcept{
     return false;
 }
 void PeriodicRunner::thread_loop(){
+    bool is_back_to_back = false;
     std::unique_lock<std::mutex> lg(m_lock);
     while (true){
         if (cancelled()){
@@ -154,9 +155,11 @@ void PeriodicRunner::thread_loop(){
 
         //  Event is available now. Run it.
         if (event != nullptr){
-            run(event);
+            run(event, is_back_to_back);
+            is_back_to_back = true;
             continue;
         }
+        is_back_to_back = false;
 
         //  Wait for next scheduled event.
         WallClock next = m_scheduler.next_event();

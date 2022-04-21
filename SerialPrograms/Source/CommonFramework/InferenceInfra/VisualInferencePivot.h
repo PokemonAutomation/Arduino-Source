@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_CommonFramework_VisualInferencePivot_H
 #define PokemonAutomation_CommonFramework_VisualInferencePivot_H
 
+#include <QImage>
 #include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/PeriodicScheduler.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
@@ -38,7 +39,7 @@ public:
     StatAccumulatorI32 remove_callback(VisualInferenceCallback& callback);
 
 private:
-    virtual void run(void* event) noexcept override;
+    virtual void run(void* event, bool is_back_to_back) noexcept override;
 
 private:
     struct PeriodicCallback;
@@ -46,6 +47,8 @@ private:
     VideoFeed& m_feed;
     SpinLock m_lock;
     std::map<VisualInferenceCallback*, PeriodicCallback> m_map;
+    QImage m_last;
+    uint64_t m_seqnum = 0;
 };
 
 
