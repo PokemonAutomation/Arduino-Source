@@ -160,6 +160,46 @@ void on_shiny_sound(
     throw ProgramFinishedException();
 }
 
+void on_match_found(
+    const ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
+    ShinyDetectedActionOption& options, bool stop_program
+){
+    std::vector<std::pair<QString, QString>> embeds;
+    const StatsTracker* stats = env.stats();
+    if (stats){
+        std::string str = stats->to_str();
+        if (!str.empty()){
+            embeds.emplace_back("Session Stats", QString::fromStdString(str));
+        }
+    }
+
+    pbf_mash_button(context, BUTTON_ZL, options.SCREENSHOT_DELAY);
+    context.wait_for_all_requests();
+
+    QImage screen = console.video().snapshot();
+    send_program_notification(
+        console, options.NOTIFICATIONS, Pokemon::COLOR_STAR_SHINY,
+        env.program_info(),
+        "Match Found!",
+        embeds,
+        screen, true
+    );
+
+    ShinyDetectedAction action = (ShinyDetectedAction)(size_t)options.ACTION;
+    if (action == ShinyDetectedAction::TAKE_VIDEO_STOP_PROGRAM){
+        pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+    }
+
+    if(stop_program){
+        console.log("STOPPING...");
+        pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
+        context.wait_for_all_requests();
+        throw ProgramFinishedException();
+    }
+
+    console.log("CONTINUING...");
+}
+
 
 
 
