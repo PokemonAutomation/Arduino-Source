@@ -6,8 +6,9 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/OCR/OCR_Filtering.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"

@@ -9,7 +9,7 @@
 #include "Common/Cpp/FixedLimitVector.tpp"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/VideoPipeline/VideoOverlaySet.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonBDSP_ExperienceGainDetector.h"
 
 #include <iostream>

@@ -6,7 +6,7 @@
 
 #include <QImage>
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/VideoPipeline/VideoOverlaySet.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonLA_MapDetector.h"
 
 namespace PokemonAutomation{

@@ -8,7 +8,7 @@
 #define PokemonAutomation_PokemonBDSP_SelectionArrow_H
 
 #include <deque>
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{

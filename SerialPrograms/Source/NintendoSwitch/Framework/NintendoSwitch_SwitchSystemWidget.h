@@ -15,6 +15,7 @@ namespace PokemonAutomation{
     class CollapsibleGroupBox;
     class AudioFeed;
     class AudioDisplayWidget;
+    class VideoOverlay;
 
 namespace NintendoSwitch{
 

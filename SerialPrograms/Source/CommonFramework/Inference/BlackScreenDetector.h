@@ -12,7 +12,7 @@
 #define PokemonAutomation_CommonFramework_BlackScreenDetector_H
 
 #include "CommonFramework/Logging/LoggerQt.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 

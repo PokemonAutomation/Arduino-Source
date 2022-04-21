@@ -428,7 +428,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/CameraWidgetQt6.cpp
     Source/CommonFramework/VideoPipeline/CameraWidgetQt6.h
     Source/CommonFramework/VideoPipeline/VideoFeed.h
-    Source/CommonFramework/VideoPipeline/VideoOverlaySet.h
+    Source/CommonFramework/VideoPipeline/VideoOverlay.h
     Source/CommonFramework/VideoPipeline/VideoWidget.h
     Source/CommonFramework/VideoPipeline/VideoDisplayWidget.cpp
     Source/CommonFramework/VideoPipeline/VideoDisplayWidget.h

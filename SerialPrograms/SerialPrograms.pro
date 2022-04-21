@@ -879,7 +879,7 @@ HEADERS += \
     Source/CommonFramework/VideoPipeline/CameraWidgetQt6.h \
     Source/CommonFramework/VideoPipeline/VideoDisplayWidget.h \
     Source/CommonFramework/VideoPipeline/VideoFeed.h \
-    Source/CommonFramework/VideoPipeline/VideoOverlaySet.h \
+    Source/CommonFramework/VideoPipeline/VideoOverlay.h \
     Source/CommonFramework/VideoPipeline/VideoOverlayWidget.h \
     Source/CommonFramework/VideoPipeline/VideoToolsQt5.h \
     Source/CommonFramework/VideoPipeline/VideoWidget.h \

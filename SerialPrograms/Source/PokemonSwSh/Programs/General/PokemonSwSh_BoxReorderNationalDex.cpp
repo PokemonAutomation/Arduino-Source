@@ -10,6 +10,7 @@
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/OCR/OCR_TextMatcher.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"

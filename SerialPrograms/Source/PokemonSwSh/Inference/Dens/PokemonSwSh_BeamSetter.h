@@ -11,7 +11,7 @@
 #define PokemonAutomation_PokemonSwSh_BeamSetter_H
 
 #include <vector>
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 
 namespace PokemonAutomation{

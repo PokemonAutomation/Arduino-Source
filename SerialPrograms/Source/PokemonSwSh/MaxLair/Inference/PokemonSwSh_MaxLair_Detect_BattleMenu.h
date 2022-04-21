@@ -9,12 +9,13 @@
 
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Logging/LoggerQt.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h"
 
 namespace PokemonAutomation{
     class CancellableScope;
+    class VideoFeed;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{

@@ -6,9 +6,10 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "ClientSource/Connection/BotBase.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "PokemonBDSP_EncounterDetection.h"
 
 #include <iostream>

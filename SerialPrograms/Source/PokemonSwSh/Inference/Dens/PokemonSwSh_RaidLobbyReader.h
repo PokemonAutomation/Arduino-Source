@@ -11,7 +11,7 @@
 #define PokemonAutomation_PokemonSwSh_RaidLobbyReader_H
 
 #include "CommonFramework/Logging/LoggerQt.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

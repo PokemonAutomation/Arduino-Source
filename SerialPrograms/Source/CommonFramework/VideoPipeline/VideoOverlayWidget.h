@@ -10,7 +10,8 @@
 #include <map>
 #include <QWidget>
 #include "Common/Cpp/SpinLock.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "Common/Cpp/Color.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 
 namespace PokemonAutomation{
 

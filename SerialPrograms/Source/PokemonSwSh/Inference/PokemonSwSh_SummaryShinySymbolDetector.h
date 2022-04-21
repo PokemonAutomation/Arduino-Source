@@ -12,10 +12,11 @@
 
 #include <chrono>
 #include "CommonFramework/Logging/LoggerQt.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 
 namespace PokemonAutomation{
     class CancellableScope;
+    class VideoFeed;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 

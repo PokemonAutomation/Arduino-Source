@@ -7,6 +7,8 @@
 #ifndef PokemonAutomation_PokemonBDSP_MapDetector_H
 #define PokemonAutomation_PokemonBDSP_MapDetector_H
 
+#include "Common/Cpp/Color.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 

@@ -9,7 +9,7 @@
 
 #include <string>
 #include "CommonFramework/Options/StringSelectOption.h"
-#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/ImageMatch/SilhouetteDictionaryMatcher.h"
 
 namespace PokemonAutomation{
