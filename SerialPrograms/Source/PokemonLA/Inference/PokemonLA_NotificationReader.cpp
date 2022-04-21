@@ -13,7 +13,7 @@
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
-#include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "CommonFramework/VideoPipeline/VideoOverlaySet.h"
 #include "PokemonLA_NotificationReader.h"
 
 #include <iostream>

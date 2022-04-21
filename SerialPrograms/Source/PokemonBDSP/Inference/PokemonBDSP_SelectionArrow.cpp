@@ -8,10 +8,10 @@
 #include "Common/Qt/ImageOpener.h"
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
+#include "CommonFramework/VideoPipeline/VideoOverlaySet.h"
 #include "PokemonBDSP_SelectionArrow.h"
 
 #include <iostream>

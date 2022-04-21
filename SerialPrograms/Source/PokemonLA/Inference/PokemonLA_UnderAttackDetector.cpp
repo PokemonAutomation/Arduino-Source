@@ -6,7 +6,7 @@
 
 #include <QImage>
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "CommonFramework/VideoPipeline/VideoOverlaySet.h"
 #include "PokemonLA_UnderAttackDetector.h"
 
 #include <iostream>

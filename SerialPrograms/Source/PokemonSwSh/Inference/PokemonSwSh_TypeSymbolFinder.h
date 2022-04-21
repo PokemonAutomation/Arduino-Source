@@ -9,7 +9,7 @@
 
 #include <map>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_TypeSprites.h"
 
 namespace PokemonAutomation{

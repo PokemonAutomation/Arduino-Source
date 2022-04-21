@@ -6,8 +6,8 @@
 
 #include <QImage>
 #include "Common/Compiler.h"
-#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
+#include "CommonFramework/VideoPipeline/VideoOverlaySet.h"
 #include "PokemonBDSP_MapDetector.h"
 
 #include <iostream>

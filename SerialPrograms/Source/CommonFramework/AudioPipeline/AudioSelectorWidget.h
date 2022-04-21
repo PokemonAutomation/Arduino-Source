@@ -13,7 +13,7 @@
 #include <QWidget>
 #include <QSlider>
 #include <QString>
-#include "CommonFramework/Tools/AudioFeed.h"
+#include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "AudioSelector.h"
 
 class QComboBox;

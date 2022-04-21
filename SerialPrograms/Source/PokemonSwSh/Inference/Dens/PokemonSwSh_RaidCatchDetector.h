@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_RaidCatchDetector_H
 #define PokemonAutomation_PokemonSwSh_RaidCatchDetector_H
 
-#include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 

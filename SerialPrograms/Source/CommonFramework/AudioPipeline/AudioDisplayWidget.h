@@ -16,7 +16,7 @@
 #include <QThread>
 #include <QAudioFormat>
 #include "Common/Cpp/AlignedVector.h"
-#include "CommonFramework/Tools/AudioFeed.h"
+#include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "AudioSelector.h"
 
 class QString;

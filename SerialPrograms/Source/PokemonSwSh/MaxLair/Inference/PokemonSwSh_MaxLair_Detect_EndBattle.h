@@ -7,10 +7,11 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Detect_EndBattle_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Detect_EndBattle_H
 
-#include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
+    class VideoOverlay;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 namespace MaxLairInternal{

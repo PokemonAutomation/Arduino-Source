@@ -10,7 +10,7 @@
 #include <functional>
 #include <chrono>
 #include <vector>
-#include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "InferenceCallback.h"
 

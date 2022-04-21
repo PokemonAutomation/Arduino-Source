@@ -10,8 +10,8 @@
 #ifndef PokemonAutomation_PokemonSwSh_RaidLobbyReader_H
 #define PokemonAutomation_PokemonSwSh_RaidLobbyReader_H
 
-#include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Logging/LoggerQt.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

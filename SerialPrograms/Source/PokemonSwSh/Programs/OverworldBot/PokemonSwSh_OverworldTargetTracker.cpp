@@ -5,7 +5,7 @@
  */
 
 #include <QImage>
-#include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "CommonFramework/VideoPipeline/VideoOverlaySet.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_MarkFinder.h"
 #include "PokemonSwSh_OverworldTargetTracker.h"
 

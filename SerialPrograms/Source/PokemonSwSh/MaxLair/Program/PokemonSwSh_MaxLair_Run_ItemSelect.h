@@ -7,9 +7,9 @@
 #ifndef PokemonAutomation_PokemonSwSh_MaxLair_Run_ItemSelect_H
 #define PokemonAutomation_PokemonSwSh_MaxLair_Run_ItemSelect_H
 
-#include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/Tools/ConsoleHandle.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonFramework/Tools/ConsoleHandle.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h"
 #include "PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateTracker.h"
 

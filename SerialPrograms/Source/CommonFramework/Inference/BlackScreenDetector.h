@@ -11,10 +11,10 @@
 #ifndef PokemonAutomation_CommonFramework_BlackScreenDetector_H
 #define PokemonAutomation_CommonFramework_BlackScreenDetector_H
 
-#include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/Logging/LoggerQt.h"
-#include "CommonFramework/Inference/VisualDetector.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonFramework/Inference/VisualDetector.h"
 
 namespace PokemonAutomation{
 

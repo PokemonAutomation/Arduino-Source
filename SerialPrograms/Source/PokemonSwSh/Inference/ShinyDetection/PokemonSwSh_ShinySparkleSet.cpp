@@ -9,7 +9,6 @@
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Session.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "PokemonSwSh_SparkleDetectorRadial.h"
 #include "PokemonSwSh_SparkleDetectorSquare.h"
 #include "PokemonSwSh_ShinySparkleSet.h"

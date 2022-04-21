@@ -8,9 +8,9 @@
 #define PokemonAutomation_PokemonBDSP_BattleMenuDetector_H
 
 #include <memory>
-#include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/Inference/VisualDetector.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonFramework/Inference/VisualDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

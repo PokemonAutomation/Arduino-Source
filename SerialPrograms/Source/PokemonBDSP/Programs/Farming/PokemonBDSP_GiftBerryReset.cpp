@@ -6,9 +6,8 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Language.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/Tools/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"

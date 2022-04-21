@@ -6,9 +6,9 @@
 
 #include <cmath>
 #include "Common/Compiler.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
+#include "CommonFramework/VideoPipeline/VideoOverlaySet.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_HPPP.h"

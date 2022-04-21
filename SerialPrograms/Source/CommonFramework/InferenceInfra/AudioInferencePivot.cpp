@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Tools/AudioFeed.h"
+#include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "AudioInferencePivot.h"
 
 namespace PokemonAutomation{

@@ -16,7 +16,6 @@
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{
-    class VideoOverlaySet;
 namespace NintendoSwitch{
 namespace PokemonLA{
 

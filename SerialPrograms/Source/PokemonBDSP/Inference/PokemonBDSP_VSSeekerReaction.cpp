@@ -7,8 +7,8 @@
 #include "Kernels/Waterfill/Kernels_Waterfill.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
-#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
+#include "CommonFramework/VideoPipeline/VideoOverlaySet.h"
 #include "PokemonBDSP_VSSeekerReaction.h"
 
 #include <iostream>

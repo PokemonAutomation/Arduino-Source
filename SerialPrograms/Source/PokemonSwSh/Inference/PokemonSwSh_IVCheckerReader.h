@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonSwSh_IVCheckerReader_H
 #define PokemonAutomation_PokemonSwSh_IVCheckerReader_H
 
-#include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
 
 namespace PokemonAutomation{

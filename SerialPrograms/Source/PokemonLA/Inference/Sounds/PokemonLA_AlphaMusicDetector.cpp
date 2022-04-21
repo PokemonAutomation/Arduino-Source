@@ -7,8 +7,6 @@
 #include <QString>
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
 #include "CommonFramework/Inference/AudioTemplateCache.h"
-#include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/Tools/AudioFeed.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA_AlphaMusicDetector.h"

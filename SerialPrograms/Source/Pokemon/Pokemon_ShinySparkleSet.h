@@ -8,7 +8,7 @@
 #define PokemonAutomation_Pokemon_ShinySparkleSet_H
 
 #include <string>
-#include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "CommonFramework/VideoPipeline/VideoOverlaySet.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{

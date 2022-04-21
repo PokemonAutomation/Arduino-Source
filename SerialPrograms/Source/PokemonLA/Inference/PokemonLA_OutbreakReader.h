@@ -10,7 +10,7 @@
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/OCR/OCR_StringMatchResult.h"
 
 namespace PokemonAutomation{

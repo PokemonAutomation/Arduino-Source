@@ -9,8 +9,10 @@
 
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Logging/LoggerQt.h"
-#include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
+
+class QImage;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

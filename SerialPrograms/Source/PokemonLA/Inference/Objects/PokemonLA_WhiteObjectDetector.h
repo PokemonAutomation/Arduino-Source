@@ -11,7 +11,7 @@
 #include <list>
 #include <set>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "CommonFramework/VideoPipeline/VideoOverlaySet.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{

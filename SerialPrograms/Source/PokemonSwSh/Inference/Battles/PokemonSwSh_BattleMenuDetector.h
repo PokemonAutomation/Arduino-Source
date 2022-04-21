@@ -7,9 +7,10 @@
 #ifndef PokemonAutomation_PokemonSwSh_BattleMenuDetector_H
 #define PokemonAutomation_PokemonSwSh_BattleMenuDetector_H
 
-#include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/Inference/VisualDetector.h"
+#include "Common/Cpp/Color.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonFramework/Inference/VisualDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{

@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_PokemonSwSh_PromptDetector_H
 #define PokemonAutomation_PokemonSwSh_PromptDetector_H
 
-#include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{

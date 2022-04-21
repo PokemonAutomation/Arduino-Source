@@ -11,8 +11,8 @@
 #define PokemonAutomation_PokemonSwSh_BeamSetter_H
 
 #include <vector>
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "CommonFramework/Tools/VideoFeed.h"
 
 namespace PokemonAutomation{
     class BotBaseContext;

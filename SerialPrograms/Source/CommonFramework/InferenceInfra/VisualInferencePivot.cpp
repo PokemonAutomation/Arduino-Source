@@ -6,7 +6,7 @@
 
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "VisualInferencePivot.h"
 
 #include <iostream>
