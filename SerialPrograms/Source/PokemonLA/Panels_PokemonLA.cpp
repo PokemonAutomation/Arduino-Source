@@ -22,7 +22,7 @@
 #include "Programs/Farming/PokemonLA_MagikarpMoveGrinder.h"
 #include "Programs/Farming/PokemonLA_NuggetFarmerHighlands.h"
 #include "Programs/Farming/PokemonLA_TenacityCandyFarmer.h"
-#include "Programs/Farming/PokemonLA_TreeLeapGrinder.h"
+//#include "Programs/Farming/PokemonLA_TreeLeapGrinder.h"
 
 //#include "Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h"
 #include "Programs/ShinyHunting/PokemonLA_GalladeFinder.h"
