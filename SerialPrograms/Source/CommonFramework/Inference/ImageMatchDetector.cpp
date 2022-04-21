@@ -5,10 +5,10 @@
  */
 
 #include <cmath>
-#include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "ImageMatchDetector.h"
 
 #include <iostream>

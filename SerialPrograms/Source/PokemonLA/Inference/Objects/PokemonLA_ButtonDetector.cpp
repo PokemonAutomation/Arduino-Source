@@ -4,7 +4,6 @@
  *
  */
 
-#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "PokemonLA_ButtonDetector.h"
 
 namespace PokemonAutomation{

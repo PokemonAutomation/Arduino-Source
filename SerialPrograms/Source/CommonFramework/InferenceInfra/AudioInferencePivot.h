@@ -38,7 +38,7 @@ public:
     StatAccumulatorI32 remove_callback(AudioInferenceCallback& callback);
 
 private:
-    virtual void run(void* event) noexcept override;
+    virtual void run(void* event, bool is_back_to_back) noexcept override;
 
 private:
     struct PeriodicCallback;

@@ -9,11 +9,11 @@
 
 #include <map>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Tools/VideoFeed.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_TypeSprites.h"
 
 namespace PokemonAutomation{
     class ProgramEnvironment;
+    class VideoOverlay;
 namespace NintendoSwitch{
 namespace PokemonSwSh{
 

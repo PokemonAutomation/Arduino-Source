@@ -7,7 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_IVCheckerReader_H
 #define PokemonAutomation_PokemonBDSP_IVCheckerReader_H
 
-#include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
 
 namespace PokemonAutomation{

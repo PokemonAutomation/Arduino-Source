@@ -1,32 +1,18 @@
-/*  Video Feed Interface
+/*  Video Overlay Set
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_VideoFeedInterface_H
-#define PokemonAutomation_VideoFeedInterface_H
+#ifndef PokemonAutomation_VideoOverlaySet_H
+#define PokemonAutomation_VideoOverlaySet_H
 
 #include <deque>
-#include "Common/Cpp/Time.h"
 #include "Common/Cpp/Color.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 
-class QImage;
-
 namespace PokemonAutomation{
 
-//  Define basic interface of a video feed to be used
-//  by programs.
-class VideoFeed{
-public:
-    //  Can call from anywhere.
-    virtual void async_reset_video() = 0;
-
-    //  Do not call this on the main thread or it will deadlock.
-    //  Format must be "Format_ARGB32" or "Format_RGB32".
-    virtual QImage snapshot(WallClock* timestamp = nullptr) = 0;
-};
 
 
 class VideoOverlay{
@@ -77,8 +63,24 @@ private:
 };
 
 
-class VideoOverlaySet;
 
+class VideoOverlaySet{
+public:
+    VideoOverlaySet(VideoOverlay& overlay)
+        : m_overlay(overlay)
+    {}
+
+    void clear(){
+        m_boxes.clear();
+    }
+    void add(Color color, const ImageFloatBox& box){
+        m_boxes.emplace_back(m_overlay, box, color);
+    }
+
+private:
+    VideoOverlay& m_overlay;
+    std::deque<InferenceBoxScope> m_boxes;
+};
 
 
 

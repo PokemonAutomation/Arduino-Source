@@ -10,6 +10,7 @@
 #include <functional>
 #include <deque>
 #include <set>
+#include "VideoOverlay.h"
 #include "VideoWidget.h"
 #include "VideoOverlayWidget.h"
 

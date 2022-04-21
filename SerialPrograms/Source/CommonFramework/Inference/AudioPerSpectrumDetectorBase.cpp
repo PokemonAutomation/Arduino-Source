@@ -10,10 +10,9 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Globals.h"
+#include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
-#include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/Tools/AudioFeed.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "AudioPerSpectrumDetectorBase.h"
 

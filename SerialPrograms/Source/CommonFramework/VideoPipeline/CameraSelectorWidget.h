@@ -11,7 +11,7 @@
 #include <atomic>
 #include <mutex>
 #include <QWidget>
-#include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CameraSelector.h"
 
 class QComboBox;

@@ -8,9 +8,9 @@
 #define PokemonAutomation_PokemonBDSP_BattleWonDetector_H
 
 #include "Common/Cpp/FixedLimitVector.h"
-#include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/Inference/VisualDetector.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
+#include "CommonFramework/Inference/VisualDetector.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 
 namespace PokemonAutomation{

@@ -12,7 +12,7 @@
 #define PokemonAutomation_PokemonBDSP_ReceivePokemonDetector_H
 
 #include "CommonFramework/Logging/LoggerQt.h"
-#include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{

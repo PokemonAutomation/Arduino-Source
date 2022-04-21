@@ -5,9 +5,9 @@
  */
 
 #include <QImage>
-#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonSwSh_BattleDialogDetector.h"
 
 namespace PokemonAutomation{

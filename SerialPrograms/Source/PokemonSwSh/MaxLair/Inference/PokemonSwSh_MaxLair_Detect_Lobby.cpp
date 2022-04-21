@@ -5,10 +5,10 @@
  */
 
 #include "Common/Compiler.h"
-#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonSwSh_MaxLair_Detect_Lobby.h"
 
 #include <iostream>

@@ -9,8 +9,8 @@
 
 #include <string>
 #include "CommonFramework/Options/StringSelectOption.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "CommonFramework/Tools/VideoFeed.h"
 #include "CommonFramework/ImageMatch/CroppedImageDictionaryMatcher.h"
 #include "Pokemon/Inference/Pokemon_PokeballNameReader.h"
 

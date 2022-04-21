@@ -9,10 +9,10 @@
 
 #include <cstddef>
 #include <vector>
-
 #include <QString>
 
 namespace PokemonAutomation{
+
 
 // Hold the sepctrogram of an audio, used as a template to
 // match sounds from an audio stream.

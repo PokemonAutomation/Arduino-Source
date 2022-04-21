@@ -161,6 +161,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/AudioPipeline/AudioConstants.h
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.cpp
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.h
+    Source/CommonFramework/AudioPipeline/AudioFeed.h
     Source/CommonFramework/AudioPipeline/AudioFileLoader.cpp
     Source/CommonFramework/AudioPipeline/AudioFileLoader.h
     Source/CommonFramework/AudioPipeline/AudioFormatUtils.cpp
@@ -395,7 +396,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Panels/SettingsPanelWidget.h
     Source/CommonFramework/PersistentSettings.cpp
     Source/CommonFramework/PersistentSettings.h
-    Source/CommonFramework/Tools/AudioFeed.h
     Source/CommonFramework/Tools/BotBaseHandle.cpp
     Source/CommonFramework/Tools/BotBaseHandle.h
     Source/CommonFramework/Tools/BlackBorderCheck.cpp
@@ -416,8 +416,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Tools/StatsTracking.h
     Source/CommonFramework/Tools/SuperControlSession.cpp
     Source/CommonFramework/Tools/SuperControlSession.h
-    Source/CommonFramework/Tools/VideoFeed.h
-    Source/CommonFramework/Tools/VideoOverlaySet.h
     Source/CommonFramework/VideoPipeline/CameraImplementations.cpp
     Source/CommonFramework/VideoPipeline/CameraImplementations.h
     Source/CommonFramework/VideoPipeline/CameraInfo.h
@@ -429,6 +427,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/CameraWidgetQt5.h
     Source/CommonFramework/VideoPipeline/CameraWidgetQt6.cpp
     Source/CommonFramework/VideoPipeline/CameraWidgetQt6.h
+    Source/CommonFramework/VideoPipeline/VideoFeed.h
+    Source/CommonFramework/VideoPipeline/VideoOverlay.h
     Source/CommonFramework/VideoPipeline/VideoWidget.h
     Source/CommonFramework/VideoPipeline/VideoDisplayWidget.cpp
     Source/CommonFramework/VideoPipeline/VideoDisplayWidget.h

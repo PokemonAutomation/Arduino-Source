@@ -10,7 +10,7 @@
 #include <functional>
 #include <chrono>
 #include <thread>
-#include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "PokemonBDSP/Inference/PokemonBDSP_DialogDetector.h"
 

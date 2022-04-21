@@ -199,6 +199,7 @@ SOURCES += \
     Source/CommonFramework/Options/EnumDropdownOption.cpp \
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.cpp \
     Source/CommonFramework/Options/Environment/ProcessorLevelOption.cpp \
+    Source/CommonFramework/Options/Environment/ThemeSelectorOption.cpp \
     Source/CommonFramework/Options/FixedCodeOption.cpp \
     Source/CommonFramework/Options/FloatingPointOption.cpp \
     Source/CommonFramework/Options/HiddenTextEditOption.cpp \
@@ -437,6 +438,7 @@ SOURCES += \
     Source/PokemonLA/Inference/PokemonLA_NotificationReader.cpp \
     Source/PokemonLA/Inference/PokemonLA_OutbreakReader.cpp \
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.cpp \
     Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.cpp \
     Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaRoarDetector.cpp \
@@ -740,6 +742,7 @@ HEADERS += \
     ../Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h \
     Source/CommonFramework/AudioPipeline/AudioConstants.h \
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.h \
+    Source/CommonFramework/AudioPipeline/AudioFeed.h \
     Source/CommonFramework/AudioPipeline/AudioFileLoader.h \
     Source/CommonFramework/AudioPipeline/AudioFormatUtils.h \
     Source/CommonFramework/AudioPipeline/AudioIODevice.h \
@@ -869,9 +872,7 @@ HEADERS += \
     Source/CommonFramework/Tools/StatsDatabase.h \
     Source/CommonFramework/Tools/StatsTracking.h \
     Source/CommonFramework/Tools/SuperControlSession.h \
-    Source/CommonFramework/Tools/VideoFeed.h \
     Source/CommonFramework/Tools/BotBaseHandle.h \
-    Source/CommonFramework/Tools/VideoOverlaySet.h \
     Source/CommonFramework/VideoPipeline/CameraImplementations.h \
     Source/CommonFramework/VideoPipeline/CameraInfo.h \
     Source/CommonFramework/VideoPipeline/CameraSelector.h \
@@ -879,6 +880,8 @@ HEADERS += \
     Source/CommonFramework/VideoPipeline/CameraWidgetQt5.h \
     Source/CommonFramework/VideoPipeline/CameraWidgetQt6.h \
     Source/CommonFramework/VideoPipeline/VideoDisplayWidget.h \
+    Source/CommonFramework/VideoPipeline/VideoFeed.h \
+    Source/CommonFramework/VideoPipeline/VideoOverlay.h \
     Source/CommonFramework/VideoPipeline/VideoOverlayWidget.h \
     Source/CommonFramework/VideoPipeline/VideoToolsQt5.h \
     Source/CommonFramework/VideoPipeline/VideoWidget.h \
@@ -1117,6 +1120,7 @@ HEADERS += \
     Source/PokemonLA/Inference/PokemonLA_OutbreakReader.h \
     Source/PokemonLA/Inference/PokemonLA_OverworldDetector.h \
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.h \
     Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.h \
     Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaRoarDetector.h \

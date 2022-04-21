@@ -7,7 +7,6 @@
 #include <QImage>
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "PokemonLA/Inference/PokemonLA_CommonColorCheck.h"
 #include "PokemonLA_BattlePokemonSwitchDetector.h"
 

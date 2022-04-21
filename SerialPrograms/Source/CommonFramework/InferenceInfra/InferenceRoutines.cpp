@@ -6,8 +6,6 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "ClientSource/Connection/BotBase.h"
-//#include "CommonFramework/Tools/InterruptableCommands.h"
-#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "InferenceSession.h"
 #include "InferenceRoutines.h"
 

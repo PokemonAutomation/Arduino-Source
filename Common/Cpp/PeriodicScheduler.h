@@ -70,7 +70,13 @@ protected:
     PeriodicRunner(AsyncDispatcher& dispatcher);
     bool add_event(void* event, std::chrono::milliseconds period, WallClock start = current_time());
     void remove_event(void* event);
-    virtual void run(void* event) noexcept = 0;
+
+    //  Run the event. "is_back_to_back" is true if there was no wait between
+    //  this event and the previous one.
+    //  This can be used is a performance hint to the child class to reuse
+    //  state for two close-in-time events or to determine if the inference
+    //  is too slow to keep up.
+    virtual void run(void* event, bool is_back_to_back) noexcept = 0;
 
 private:
     void thread_loop();

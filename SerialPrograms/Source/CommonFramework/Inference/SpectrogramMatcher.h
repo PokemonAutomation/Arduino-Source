@@ -12,6 +12,7 @@
 #include <memory>
 #include <vector>
 #include <list>
+#include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
 
 class QString;

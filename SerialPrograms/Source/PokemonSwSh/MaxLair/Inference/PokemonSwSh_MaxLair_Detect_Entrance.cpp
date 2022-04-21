@@ -5,9 +5,9 @@
  */
 
 #include "Common/Compiler.h"
-#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonSwSh_MaxLair_Detect_Entrance.h"
 
 #include <iostream>

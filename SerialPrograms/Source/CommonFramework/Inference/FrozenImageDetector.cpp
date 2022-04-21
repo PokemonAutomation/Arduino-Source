@@ -4,8 +4,8 @@
  *
  */
 
-#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "FrozenImageDetector.h"
 
 #include <iostream>

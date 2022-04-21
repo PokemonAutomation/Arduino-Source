@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_PokemonBDSP_MenuDetector_H
 #define PokemonAutomation_PokemonBDSP_MenuDetector_H
 
+#include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 

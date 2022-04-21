@@ -7,7 +7,7 @@
 #include <QImage>
 #include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "PokemonBDSP_StartBattleDetector.h"
 

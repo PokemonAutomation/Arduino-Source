@@ -6,7 +6,8 @@
 
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "CommonFramework/Inference/BlackBorderDetector.h"
 #include "BlackBorderCheck.h"

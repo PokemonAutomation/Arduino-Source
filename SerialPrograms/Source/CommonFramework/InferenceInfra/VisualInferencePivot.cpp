@@ -6,8 +6,12 @@
 
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "VisualInferencePivot.h"
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -19,6 +23,7 @@ struct VisualInferencePivot::PeriodicCallback{
     VisualInferenceCallback& callback;
     std::chrono::milliseconds period;
     StatAccumulatorI32 stats;
+    uint64_t last_seqnum;
 
     PeriodicCallback(
         Cancellable& p_scope,
@@ -30,6 +35,7 @@ struct VisualInferencePivot::PeriodicCallback{
         , set_when_triggered(p_set_when_triggered)
         , callback(p_callback)
         , period(p_period)
+        , last_seqnum(0)
     {}
 };
 
@@ -79,15 +85,24 @@ StatAccumulatorI32 VisualInferencePivot::remove_callback(VisualInferenceCallback
     m_map.erase(iter);
     return stats;
 }
-void VisualInferencePivot::run(void* event) noexcept{
+void VisualInferencePivot::run(void* event, bool is_back_to_back) noexcept{
     PeriodicCallback& callback = *(PeriodicCallback*)event;
     try{
         WallClock timestamp;
-        QImage frame = m_feed.snapshot(&timestamp);
+
+        //  Reuse the cached screenshot.
+        if (!is_back_to_back || callback.last_seqnum == m_seqnum){
+//            cout << "back-to-back" << endl;
+            m_last = m_feed.snapshot(&timestamp);
+            m_seqnum++;
+        }
+        QImage frame = m_last;
+
         WallClock time0 = current_time();
         bool stop = callback.callback.process_frame(frame, timestamp);
         WallClock time1 = current_time();
         callback.stats += (uint32_t)std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count();
+        callback.last_seqnum = m_seqnum;
         if (stop){
             if (callback.set_when_triggered){
                 InferenceCallback* expected = nullptr;

@@ -10,7 +10,7 @@
 #include <vector>
 #include <deque>
 #include "CommonFramework/ImageTools/ImageBoxes.h"
-#include "CommonFramework/Tools/VideoFeed.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
 namespace PokemonAutomation{

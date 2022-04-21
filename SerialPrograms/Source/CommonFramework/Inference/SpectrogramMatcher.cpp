@@ -6,8 +6,8 @@
 #include <fstream>
 #include <QString>
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
-#include "CommonFramework/Tools/AudioFeed.h"
 #include "SpectrogramMatcher.h"
 
 

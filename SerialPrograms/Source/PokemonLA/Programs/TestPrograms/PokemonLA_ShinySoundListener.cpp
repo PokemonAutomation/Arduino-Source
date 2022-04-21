@@ -10,13 +10,12 @@
 #include <iostream>
 #include <fstream>
 #include <sstream>
-#include "CommonFramework/Tools/AudioFeed.h"
-#include "CommonFramework/Tools/StatsTracking.h"
-#include "CommonFramework/Tools/VideoOverlaySet.h"
+#include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
 #include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "CommonFramework/Inference/AudioTemplateCache.h"
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
+#include "CommonFramework/Tools/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonLA/PokemonLA_Settings.h"

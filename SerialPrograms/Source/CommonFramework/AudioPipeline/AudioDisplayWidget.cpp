@@ -281,7 +281,6 @@ void AudioDisplayWidget::render_bars(){
 }
 void AudioDisplayWidget::render_spectrograph(){
     QPainter painter(this);
-    painter.fillRect(rect(), Qt::black);
 
     const int widgetWidth = this->width();
     const int widgetHeight = this->height();
@@ -348,10 +347,10 @@ void AudioDisplayWidget::render_spectrograph(){
         }
 
         int xmin = int((startingStamp - oldestStamp + oldestWindowID - 0.5) * FFTWindowWidth + 0.5);
-        int ymin = rect().top() - 1;
+        int ymin = rect().top();
         int rangeWidth = int(FFTWindowWidth * (endStamp - startingStamp) + 0.5);
         painter.setPen(QColor((uint32_t)color));
-        painter.drawRect(xmin, ymin, rangeWidth, widgetHeight);
+        painter.drawRect(xmin, ymin + 1, rangeWidth, widgetHeight - 2);
     }
 }
 void AudioDisplayWidget::paintEvent(QPaintEvent* event){

@@ -5,7 +5,7 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Tools/AudioFeed.h"
+#include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "AudioInferencePivot.h"
 
 namespace PokemonAutomation{
@@ -77,7 +77,7 @@ StatAccumulatorI32 AudioInferencePivot::remove_callback(AudioInferenceCallback& 
     m_map.erase(iter);
     return stats;
 }
-void AudioInferencePivot::run(void* event) noexcept{
+void AudioInferencePivot::run(void* event, bool is_back_to_back) noexcept{
     PeriodicCallback& callback = *(PeriodicCallback*)event;
     try{
         std::vector<AudioSpectrum> spectrums;

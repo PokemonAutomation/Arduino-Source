@@ -9,8 +9,6 @@
 
 #include <chrono>
 #include "CommonFramework/Logging/LoggerQt.h"
-#include "CommonFramework/Tools/VideoFeed.h"
-#include "CommonFramework/Tools/VideoOverlaySet.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 
