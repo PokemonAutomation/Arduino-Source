@@ -7,7 +7,6 @@
 #ifndef PokemonAutomation_VideoFeedInterface_H
 #define PokemonAutomation_VideoFeedInterface_H
 
-#include <deque>
 #include "Common/Cpp/Time.h"
 
 class QImage;

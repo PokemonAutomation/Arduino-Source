@@ -6,9 +6,10 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/Tools/StatsTracking.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
+#include "CommonFramework/Tools/StatsTracking.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"

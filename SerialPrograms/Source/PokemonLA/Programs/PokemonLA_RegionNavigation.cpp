@@ -5,11 +5,12 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA/Inference/PokemonLA_MapDetector.h"

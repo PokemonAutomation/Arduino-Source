@@ -6,6 +6,7 @@
 
 #include <QImage>
 #include "CommonFramework/ImageMatch/ImageDiff.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
