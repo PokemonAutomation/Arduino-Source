@@ -35,6 +35,8 @@ public:
         const CameraInfo& info,
         const QSize& desired_resolution
     ) const = 0;
+
+    virtual ~CameraBackend() {}
 };
 
 

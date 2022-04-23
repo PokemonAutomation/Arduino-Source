@@ -50,6 +50,8 @@ void PersistentSettings::write() const{
     }catch (FileException&){
     }
 }
+
+
 void PersistentSettings::read(){
     QString path = QCoreApplication::applicationFilePath() + "-Settings.json";
     QJsonDocument doc = read_json_file(path);

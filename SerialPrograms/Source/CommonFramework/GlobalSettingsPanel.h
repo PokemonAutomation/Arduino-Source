@@ -80,7 +80,15 @@ public:
 
     StringOption DEVELOPER_TOKEN;
 
-    bool DEVELOPER_MODE;
+    // Developer mode shows some additional test programs used
+    // for developing purposes.
+    bool DEVELOPER_MODE = false;
+
+    // The mode that does not run Qt GUI, but instead runs some tests for
+    // debugging, unit testing and developing purposes.
+    bool COMMAND_LINE_TEST_MODE = false;
+    // Which tests to run if in the command line test mode.
+    std::vector<std::string> COMMAND_LINE_TEST_LIST;
 };
 
 
