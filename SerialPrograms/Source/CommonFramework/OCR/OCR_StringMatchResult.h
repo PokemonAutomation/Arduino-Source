@@ -31,12 +31,12 @@ struct StringMatchData{
 struct StringMatchResult{
     bool exact_match = false;
     std::multimap<double, StringMatchData> results;
-    std::string expected_token;
+//    std::string expected_token;
 
     void clear(){
         exact_match = false;
         results.clear();
-        expected_token.clear();
+//        expected_token.clear();
     }
     void log(LoggerQt& logger, double max_log10p, const QString& extra = QString()) const;
 

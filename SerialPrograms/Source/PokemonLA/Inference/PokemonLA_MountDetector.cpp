@@ -418,27 +418,29 @@ std::vector<MountDetectorFilteredImage> run_filters(const ConstImageRef& image, 
         ret[c].matrix = std::move(matrices[c]);
     }
 
+
+    size_t count;
     size_t c = 0;
     for (; c + 3 < range.size(); c += 4){
         filter4_rgb32_range(
             image,
-            ret[c + 0].image, range[c + 0].first, range[c + 0].second, COLOR_BLACK, false,
-            ret[c + 1].image, range[c + 1].first, range[c + 1].second, COLOR_BLACK, false,
-            ret[c + 2].image, range[c + 2].first, range[c + 2].second, COLOR_BLACK, false,
-            ret[c + 3].image, range[c + 3].first, range[c + 3].second, COLOR_BLACK, false
+            count, ret[c + 0].image, range[c + 0].first, range[c + 0].second, COLOR_BLACK, false,
+            count, ret[c + 1].image, range[c + 1].first, range[c + 1].second, COLOR_BLACK, false,
+            count, ret[c + 2].image, range[c + 2].first, range[c + 2].second, COLOR_BLACK, false,
+            count, ret[c + 3].image, range[c + 3].first, range[c + 3].second, COLOR_BLACK, false
         );
     }
     for (; c + 1 < range.size(); c += 2){
         filter2_rgb32_range(
             image,
-            ret[c + 0].image, range[c + 0].first, range[c + 0].second, COLOR_BLACK, false,
-            ret[c + 1].image, range[c + 1].first, range[c + 1].second, COLOR_BLACK, false
+            count, ret[c + 0].image, range[c + 0].first, range[c + 0].second, COLOR_BLACK, false,
+            count, ret[c + 1].image, range[c + 1].first, range[c + 1].second, COLOR_BLACK, false
         );
     }
     if (c < range.size()){
         filter1_rgb32_range(
             image,
-            ret[c].image, range[c].first, range[c].second, COLOR_BLACK, false
+            count, ret[c].image, range[c].first, range[c].second, COLOR_BLACK, false
         );
     }
     return ret;

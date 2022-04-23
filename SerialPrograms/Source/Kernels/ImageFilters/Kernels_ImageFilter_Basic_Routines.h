@@ -18,7 +18,7 @@ namespace Kernels{
 template <typename Filter>
 PA_FORCE_INLINE void filter_rbg32(
     const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
-    uint32_t* out0, size_t bytes_per_row0, const Filter& filter0
+    Filter& filter0, uint32_t* out0, size_t bytes_per_row0
 ){
     if (width == 0 || height == 0){
         return;
@@ -44,8 +44,8 @@ PA_FORCE_INLINE void filter_rbg32(
 template <typename Filter>
 PA_FORCE_INLINE void filter2_rbg32(
     const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
-    uint32_t* out0, size_t bytes_per_row0, const Filter& filter0,
-    uint32_t* out1, size_t bytes_per_row1, const Filter& filter1
+    Filter& filter0, uint32_t* out0, size_t bytes_per_row0,
+    Filter& filter1, uint32_t* out1, size_t bytes_per_row1
 ){
     if (width == 0 || height == 0){
         return;
@@ -76,10 +76,10 @@ PA_FORCE_INLINE void filter2_rbg32(
 template <typename Filter>
 PA_FORCE_INLINE void filter4_rbg32(
     const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
-    uint32_t* out0, size_t bytes_per_row0, const Filter& filter0,
-    uint32_t* out1, size_t bytes_per_row1, const Filter& filter1,
-    uint32_t* out2, size_t bytes_per_row2, const Filter& filter2,
-    uint32_t* out3, size_t bytes_per_row3, const Filter& filter3
+    Filter& filter0, uint32_t* out0, size_t bytes_per_row0,
+    Filter& filter1, uint32_t* out1, size_t bytes_per_row1,
+    Filter& filter2, uint32_t* out2, size_t bytes_per_row2,
+    Filter& filter3, uint32_t* out3, size_t bytes_per_row3
 ){
     if (width == 0 || height == 0){
         return;

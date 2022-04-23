@@ -30,11 +30,13 @@ QString StringMatchData::to_qstr() const{
 void StringMatchResult::log(LoggerQt& logger, double max_log10p, const QString& extra) const{
     QString str = "String Match Result: ";
 
+#if 0
     if (!expected_token.empty()){
         str += "Expected (";
         str += QString::fromStdString(expected_token);
         str += "): ";
     }
+#endif
 
     if (results.empty()){
         str += "no matches";
