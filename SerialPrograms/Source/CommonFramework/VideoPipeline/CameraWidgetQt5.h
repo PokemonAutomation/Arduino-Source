@@ -38,7 +38,7 @@ public:
     virtual void set_resolution(const QSize& size) override;
 
     //  Cannot call from UI thread or it will deadlock.
-    virtual QImage snapshot(WallClock* timestamp) override;
+    virtual VideoSnapshot snapshot() override;
 
     virtual void resizeEvent(QResizeEvent* event) override;
 
@@ -47,8 +47,8 @@ private:
     QImage direct_snapshot_image(std::unique_lock<std::mutex>& lock);
     QImage direct_snapshot_probe(bool flip_vertical);
 
-    QImage snapshot_image(std::unique_lock<std::mutex>& lock, WallClock* timestamp);
-    QImage snapshot_probe(WallClock* timestamp);
+    VideoSnapshot snapshot_image(std::unique_lock<std::mutex>& lock);
+    VideoSnapshot snapshot_probe();
 
     bool determine_frame_orientation(std::unique_lock<std::mutex>& lock);
 

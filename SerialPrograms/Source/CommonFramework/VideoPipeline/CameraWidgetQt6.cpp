@@ -163,17 +163,14 @@ void Qt6VideoWidget::set_resolution(const QSize& size){
     }
 }
 
-QImage Qt6VideoWidget::snapshot(WallClock* timestamp){
+VideoSnapshot Qt6VideoWidget::snapshot(){
     //  Prevent multiple concurrent screenshots from entering here.
     std::lock_guard<std::mutex> lg(m_image_lock);
 
     //  Image is already cached and not stale. Return it.
     uint64_t seqnum = m_last_frame_seqnum.load(std::memory_order_acquire);
     if (m_last_image_seqnum == seqnum && !m_last_image.isNull()){
-        if (timestamp){
-            timestamp[0] = m_last_image_timestamp;
-        }
-        return m_last_image;
+        return VideoSnapshot{m_last_image, m_last_image_timestamp};
     }
 
     WallClock time0 = current_time();
@@ -189,10 +186,7 @@ QImage Qt6VideoWidget::snapshot(WallClock* timestamp){
 
     //  Now make the image.
     if (!frame.isValid()){
-        if (timestamp){
-            timestamp[0] = current_time();
-        }
-        return QImage();
+        return VideoSnapshot{QImage(), current_time()};
     }
 
     // auto time1 = current_time();
@@ -209,12 +203,9 @@ QImage Qt6VideoWidget::snapshot(WallClock* timestamp){
     m_last_image_seqnum = seqnum;
     m_last_image = std::move(image);
     m_last_image_timestamp = tick;
-    if (timestamp){
-        timestamp[0] = m_last_image_timestamp;
-    }
     WallClock time1 = current_time();
     m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count());
-    return m_last_image;
+    return VideoSnapshot{m_last_image, m_last_image_timestamp};
 }
 
 

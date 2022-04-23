@@ -248,17 +248,14 @@ QImage Qt5VideoWidget::direct_snapshot_probe(bool flip_vertical){
 
     return frame_to_image(m_logger, frame, flip_vertical);
 }
-QImage Qt5VideoWidget::snapshot_image(std::unique_lock<std::mutex>& lock, WallClock* timestamp){
+VideoSnapshot Qt5VideoWidget::snapshot_image(std::unique_lock<std::mutex>& lock){
 //    cout << "snapshot_image()" << endl;
 //    std::unique_lock<std::mutex> lg(m_lock);
 
     auto now = current_time();
-    if (timestamp){
-        timestamp[0] = now;
-    }
 
     if (m_camera == nullptr){
-        return QImage();
+        return VideoSnapshot{QImage(), now};
     }
 
     //  Frame is already cached and is not stale.
@@ -272,20 +269,14 @@ QImage Qt5VideoWidget::snapshot_image(std::unique_lock<std::mutex>& lock, WallCl
 //                cout << now - m_last_snapshot.load(std::memory_order_acquire) << endl;
                 if (m_last_image_seqnum == frame_seqnum){
 //                    cout << "cached 0" << endl;
-                    if (timestamp){
-                        timestamp[0] = m_last_image_timestamp;
-                    }
-                    return m_last_image;
+                    return VideoSnapshot{m_last_image, m_last_image_timestamp};
                 }
             }else{
                 //  Otherwise, we have to use time.
 //                cout << now - m_last_snapshot.load(std::memory_order_acquire) << endl;
                 if (m_last_image_timestamp + m_frame_period > now){
 //                    cout << "cached 1" << endl;
-                    if (timestamp){
-                        timestamp[0] = m_last_image_timestamp;
-                    }
-                    return m_last_image;
+                    return VideoSnapshot{m_last_image, m_last_image_timestamp};
                 }
             }
         }
@@ -305,7 +296,7 @@ QImage Qt5VideoWidget::snapshot_image(std::unique_lock<std::mutex>& lock, WallCl
         std::forward_as_tuple()
     );
     if (!iter.second){
-        return QImage();
+        return VideoSnapshot{QImage(), now};
     }
     PendingCapture& capture = iter.first->second;
 
@@ -330,16 +321,13 @@ QImage Qt5VideoWidget::snapshot_image(std::unique_lock<std::mutex>& lock, WallCl
     m_last_image_seqnum = frame_seqnum;
     WallClock time1 = current_time();
     m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count());
-    return m_last_image;
+    return VideoSnapshot{m_last_image, m_last_image_timestamp};
 }
-QImage Qt5VideoWidget::snapshot_probe(WallClock* timestamp){
+VideoSnapshot Qt5VideoWidget::snapshot_probe(){
 //    std::lock_guard<std::mutex> lg(m_lock);
 
     if (m_camera == nullptr){
-        if (timestamp){
-            timestamp[0] = current_time();
-        }
-        return QImage();
+        return VideoSnapshot{QImage(), current_time()};
     }
 
     //  Frame is already cached and is not stale.
@@ -354,10 +342,7 @@ QImage Qt5VideoWidget::snapshot_probe(WallClock* timestamp){
         frame_seqnum = m_last_frame_seqnum;
         if (!m_last_image.isNull() && m_last_image_seqnum == frame_seqnum){
 //            cout << "cached 0" << endl;
-            if (timestamp){
-                timestamp[0] = m_last_image_timestamp;
-            }
-            return m_last_image;
+            return VideoSnapshot{m_last_image, m_last_image_timestamp};
         }
 //        WallClock time0 = current_time();
         frame = m_last_frame;
@@ -371,25 +356,22 @@ QImage Qt5VideoWidget::snapshot_probe(WallClock* timestamp){
 //    cout << "Convert Frame: " << std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count() << endl;
     m_last_image_timestamp = frame_timestamp;
     m_last_image_seqnum = frame_seqnum;
-    if (timestamp){
-        timestamp[0] = frame_timestamp;
-    }
     WallClock time1 = current_time();
     m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count());
-    return m_last_image;
+    return VideoSnapshot{m_last_image, frame_timestamp};
 }
 
-QImage Qt5VideoWidget::snapshot(WallClock* timestamp){
+VideoSnapshot Qt5VideoWidget::snapshot(){
     std::unique_lock<std::mutex> lg(m_lock);
 
     //  Frame screenshots are disabled.
     if (!GlobalSettings::instance().ENABLE_FRAME_SCREENSHOTS){
-        return snapshot_image(lg, timestamp);
+        return snapshot_image(lg);
     }
 
     //  QVideoFrame is enabled and ready!
     if (m_probe && m_orientation_known){
-        return snapshot_probe(timestamp);
+        return snapshot_probe();
     }
 
     //  If probing is enabled and we don't know the frame orientation, try to
@@ -403,9 +385,9 @@ QImage Qt5VideoWidget::snapshot(WallClock* timestamp){
     }
 
     if (m_orientation_known){
-        return snapshot_probe(timestamp);
+        return snapshot_probe();
     }else{
-        return snapshot_image(lg, timestamp);
+        return snapshot_image(lg);
     }
 }
 

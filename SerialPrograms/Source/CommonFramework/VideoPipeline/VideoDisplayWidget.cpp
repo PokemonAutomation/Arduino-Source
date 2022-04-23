@@ -71,14 +71,11 @@ void VideoDisplayWidget::set_resolution(const QSize& resolution){
     m_video->set_resolution(resolution);
     update_size();
 }
-QImage VideoDisplayWidget::snapshot(WallClock* timestamp){
+VideoSnapshot VideoDisplayWidget::snapshot(){
     if (m_video == nullptr){
-        if (timestamp){
-            timestamp[0] = current_time();
-        }
-        return QImage();
+        return VideoSnapshot{QImage(), current_time()};
     }
-    return m_video->snapshot(timestamp);
+    return m_video->snapshot();
 }
 
 

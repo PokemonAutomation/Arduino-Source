@@ -10,8 +10,7 @@
 #include <vector>
 #include <QWidget>
 #include "Common/Cpp/Time.h"
-
-class QImage;
+#include "VideoFeed.h"
 
 namespace PokemonAutomation{
 
@@ -35,7 +34,7 @@ public:
     //
     //  If "timestamp" is not null, it will be set to the best known timestamp
     //  of the screenshot that is returned.
-    virtual QImage snapshot(WallClock* timestamp = nullptr) = 0;
+    virtual VideoSnapshot snapshot() = 0;
 };
 
 

@@ -40,7 +40,7 @@ public:
     virtual void set_resolution(const QSize& size) override;
 
     //  Cannot call from UI thread or it will deadlock.
-    virtual QImage snapshot(WallClock* timestamp) override;
+    virtual VideoSnapshot snapshot() override;
 
     virtual void resizeEvent(QResizeEvent* event) override;
 private:
