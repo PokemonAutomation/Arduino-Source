@@ -23,6 +23,8 @@ size_t filter_rgb32_range(QImage& image, uint32_t mins, uint32_t maxs, Color rep
 
 
 
+//  Run multiple filters at once. This is more memory efficient than making
+//  multiple calls to one filter at a time.
 struct FilterRgb32Range{
     uint32_t mins;
     uint32_t maxs;
@@ -36,10 +38,26 @@ std::vector<std::pair<QImage, size_t>> filter_rgb32_range(
 
 
 
-//void bucketize1_rgb32_range(
-//    const ConstImageRef& image,
-//    size_t& count0, QImage& image0, uint32_t mins0, uint32_t maxs0, Color replace_in, Color replace_out
-//);
+
+
+//  Convert the image to black and white.
+//  Inside [mins, maxs] is white, otherwise it's black.
+//  Set "in_range_black" to true to invert the colors.
+size_t to_blackwhite_rgb32_range(QImage& image, uint32_t mins, uint32_t maxs, bool in_range_black);
+
+
+
+//  Run multiple filters at once. This is more memory efficient than making
+//  multiple calls to one filter at a time.
+struct BlackWhiteRgb32Range{
+    uint32_t mins;
+    uint32_t maxs;
+    bool in_range_black;
+};
+std::vector<std::pair<QImage, size_t>> filter_rgb32_range(
+    const ConstImageRef& image,
+    const std::vector<BlackWhiteRgb32Range>& filters
+);
 
 
 
