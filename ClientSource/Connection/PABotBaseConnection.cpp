@@ -28,8 +28,10 @@ PABotBaseConnection::~PABotBaseConnection(){
     }
 }
 void PABotBaseConnection::safely_stop(){
-    m_connection->stop();
-    m_connection.reset();
+    if (m_connection){
+        m_connection->stop();
+        m_connection.reset();
+    }
 }
 
 
@@ -42,6 +44,10 @@ void PABotBaseConnection::set_sniffer(MessageSniffer* sniffer){
 
 
 void PABotBaseConnection::send_zeros(uint8_t bytes){
+    if (!m_connection){
+        return;
+    }
+
     char ch = 0;
     for (uint8_t c = 0; c < bytes; c++){
         m_connection->send(&ch, 1);
@@ -49,6 +55,10 @@ void PABotBaseConnection::send_zeros(uint8_t bytes){
     }
 }
 void PABotBaseConnection::send_message(const BotBaseMessage& message, bool is_retransmit){
+    if (!m_connection){
+        return;
+    }
+
 //    log("Sending: " + message_to_string(type, msg));
     m_sniffer->on_send(message, is_retransmit);
 
