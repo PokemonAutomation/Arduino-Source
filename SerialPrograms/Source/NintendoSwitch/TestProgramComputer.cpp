@@ -277,6 +277,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 
 
+#if 0
     QImage image("20220301-205136873076.jpg");
     QImage image0, image1, image2, image3;
 
@@ -288,14 +289,29 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
         count2, image2, 0xffa0a0a0, 0xffffffff, Color(0xff000000), false,
         count3, image3, 0xffb0b0b0, 0xffffffff, Color(0xff000000), false
     );
-
-
     cout << count0 << endl;
     cout << count1 << endl;
     cout << count2 << endl;
     cout << count3 << endl;
 
+    auto ret = filter_rgb32_range(
+        image,
+        {
+            {0xff808080, 0xffffffff, Color(0xff000000), false},
+            {0xff909090, 0xffffffff, Color(0xff000000), false},
+            {0xffa0a0a0, 0xffffffff, Color(0xff000000), false},
+            {0xffb0b0b0, 0xffffffff, Color(0xff000000), false},
+        }
+    );
+    cout << ret[0].second << endl;
+    cout << ret[1].second << endl;
+    cout << ret[2].second << endl;
+    cout << ret[3].second << endl;
+
+
+
     image.save("test.png");
+#endif
 
 
 //    throw InternalProgramError(nullptr, "asdf", "qwer");

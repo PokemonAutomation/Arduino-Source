@@ -74,44 +74,35 @@ void filter_rgb32_range_x64_AVX512(
     filter_rbg32(image, bytes_per_row, width, height, filter0, out0, bytes_per_row0);
     count0 = filter0.count();
 }
-void filter2_rgb32_range_x64_AVX512(
+
+
+
+void filter_rgb32_range_x64_AVX512(
     const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
-    size_t& count0, uint32_t* out0, size_t bytes_per_row0, uint32_t mins0, uint32_t maxs0, uint32_t replacement0, bool invert0,
-    size_t& count1, uint32_t* out1, size_t bytes_per_row1, uint32_t mins1, uint32_t maxs1, uint32_t replacement1, bool invert1
+    FilterRgb32RangeFilter* filter, size_t filter_count
 ){
-    ImageFilter_RgbRange_x64_AVX512 filter0(mins0, maxs0, replacement0, invert0);
-    ImageFilter_RgbRange_x64_AVX512 filter1(mins1, maxs1, replacement1, invert1);
-    filter2_rbg32(
-        image, bytes_per_row, width, height,
-        filter0, out0, bytes_per_row0,
-        filter1, out1, bytes_per_row1
+    filter_rbg32<ImageFilter_RgbRange_x64_AVX512>(
+        image, bytes_per_row, width, height, filter, filter_count
     );
-    count0 = filter0.count();
-    count1 = filter1.count();
 }
-void filter4_rgb32_range_x64_AVX512(
-    const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
-    size_t& count0, uint32_t* out0, size_t bytes_per_row0, uint32_t mins0, uint32_t maxs0, uint32_t replacement0, bool invert0,
-    size_t& count1, uint32_t* out1, size_t bytes_per_row1, uint32_t mins1, uint32_t maxs1, uint32_t replacement1, bool invert1,
-    size_t& count2, uint32_t* out2, size_t bytes_per_row2, uint32_t mins2, uint32_t maxs2, uint32_t replacement2, bool invert2,
-    size_t& count3, uint32_t* out3, size_t bytes_per_row3, uint32_t mins3, uint32_t maxs3, uint32_t replacement3, bool invert3
-){
-    ImageFilter_RgbRange_x64_AVX512 filter0(mins0, maxs0, replacement0, invert0);
-    ImageFilter_RgbRange_x64_AVX512 filter1(mins1, maxs1, replacement1, invert1);
-    ImageFilter_RgbRange_x64_AVX512 filter2(mins2, maxs2, replacement2, invert2);
-    ImageFilter_RgbRange_x64_AVX512 filter3(mins3, maxs3, replacement3, invert3);
-    filter4_rbg32(
-        image, bytes_per_row, width, height,
-        filter0, out0, bytes_per_row0,
-        filter1, out1, bytes_per_row1,
-        filter2, out2, bytes_per_row2,
-        filter3, out3, bytes_per_row3
-    );
-    count0 = filter0.count();
-    count1 = filter1.count();
-    count2 = filter2.count();
-    count3 = filter3.count();
-}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 

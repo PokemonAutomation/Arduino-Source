@@ -20,18 +20,40 @@ void filter_rgb32_range(
     const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
     size_t& count0, uint32_t* out0, size_t bytes_per_row0, uint32_t mins0, uint32_t maxs0, uint32_t replacement0, bool invert0
 );
-void filter2_rgb32_range(
+
+
+
+//  Same as above, but multiple filters.
+//  The purpose is to reduce passes over the entire image.
+//  All matricies must have the same dimensions.
+struct FilterRgb32RangeFilter{
+    uint32_t* data;     //  Pointer will be overwritten.
+    const size_t bytes_per_row;
+    const uint32_t mins;
+    const uint32_t maxs;
+    const uint32_t replacement;
+    const bool invert;
+
+    size_t pixels_in_range;
+
+    FilterRgb32RangeFilter(
+        uint32_t* p_data, size_t p_bytes_per_row,
+        uint32_t p_mins, uint32_t p_maxs, uint32_t p_replacement, bool p_invert
+    )
+        : data(p_data)
+        , bytes_per_row(p_bytes_per_row)
+        , mins(p_mins)
+        , maxs(p_maxs)
+        , replacement(p_replacement)
+        , invert(p_invert)
+    {}
+};
+void filter_rgb32_range(
     const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
-    size_t& count0, uint32_t* out0, size_t bytes_per_row0, uint32_t mins0, uint32_t maxs0, uint32_t replacement0, bool invert0,
-    size_t& count1, uint32_t* out1, size_t bytes_per_row1, uint32_t mins1, uint32_t maxs1, uint32_t replacement1, bool invert1
+    FilterRgb32RangeFilter* filter, size_t filter_count
 );
-void filter4_rgb32_range(
-    const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
-    size_t& count0, uint32_t* out0, size_t bytes_per_row0, uint32_t mins0, uint32_t maxs0, uint32_t replacement0, bool invert0,
-    size_t& count1, uint32_t* out1, size_t bytes_per_row1, uint32_t mins1, uint32_t maxs1, uint32_t replacement1, bool invert1,
-    size_t& count2, uint32_t* out2, size_t bytes_per_row2, uint32_t mins2, uint32_t maxs2, uint32_t replacement2, bool invert2,
-    size_t& count3, uint32_t* out3, size_t bytes_per_row3, uint32_t mins3, uint32_t maxs3, uint32_t replacement3, bool invert3
-);
+
+
 
 
 

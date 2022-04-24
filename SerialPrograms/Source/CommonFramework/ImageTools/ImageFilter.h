@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_CommonFramework_ImageFilter_H
 #define PokemonAutomation_CommonFramework_ImageFilter_H
 
+#include <vector>
 #include "Common/Cpp/Color.h"
 
 class QImage;
@@ -20,22 +21,26 @@ class ConstImageRef;
 //  Returns the # of pixels inside the range [mins, maxs].
 size_t filter_rgb32_range(QImage& image, uint32_t mins, uint32_t maxs, Color replace_with, bool invert);
 
-void filter1_rgb32_range(
+
+
+struct FilterRgb32Range{
+    uint32_t mins;
+    uint32_t maxs;
+    Color replace_with;
+    bool invert;
+};
+std::vector<std::pair<QImage, size_t>> filter_rgb32_range(
     const ConstImageRef& image,
-    size_t& count0, QImage& image0, uint32_t mins0, uint32_t maxs0, Color replace_with0, bool invert0
+    const std::vector<FilterRgb32Range>& filters
 );
-void filter2_rgb32_range(
-    const ConstImageRef& image,
-    size_t& count0, QImage& image0, uint32_t mins0, uint32_t maxs0, Color replace_with0, bool invert0,
-    size_t& count1, QImage& image1, uint32_t mins1, uint32_t maxs1, Color replace_with1, bool invert1
-);
-void filter4_rgb32_range(
-    const ConstImageRef& image,
-    size_t& count0, QImage& image0, uint32_t mins0, uint32_t maxs0, Color replace_with0, bool invert0,
-    size_t& count1, QImage& image1, uint32_t mins1, uint32_t maxs1, Color replace_with1, bool invert1,
-    size_t& count2, QImage& image2, uint32_t mins2, uint32_t maxs2, Color replace_with2, bool invert2,
-    size_t& count3, QImage& image3, uint32_t mins3, uint32_t maxs3, Color replace_with3, bool invert3
-);
+
+
+
+//void bucketize1_rgb32_range(
+//    const ConstImageRef& image,
+//    size_t& count0, QImage& image0, uint32_t mins0, uint32_t maxs0, Color replace_in, Color replace_out
+//);
+
 
 
 
