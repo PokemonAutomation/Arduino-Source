@@ -186,6 +186,7 @@ SOURCES += \
     Source/CommonFramework/OCR/OCR_LargeDictionaryMatcher.cpp \
     Source/CommonFramework/OCR/OCR_NumberReader.cpp \
     Source/CommonFramework/OCR/OCR_RawOCR.cpp \
+    Source/CommonFramework/OCR/OCR_Routines.cpp \
     Source/CommonFramework/OCR/OCR_SmallDictionaryMatcher.cpp \
     Source/CommonFramework/OCR/OCR_StringMatchResult.cpp \
     Source/CommonFramework/OCR/OCR_StringNormalization.cpp \
@@ -824,6 +825,7 @@ HEADERS += \
     Source/CommonFramework/OCR/OCR_LargeDictionaryMatcher.h \
     Source/CommonFramework/OCR/OCR_NumberReader.h \
     Source/CommonFramework/OCR/OCR_RawOCR.h \
+    Source/CommonFramework/OCR/OCR_Routines.h \
     Source/CommonFramework/OCR/OCR_SmallDictionaryMatcher.h \
     Source/CommonFramework/OCR/OCR_StringMatchResult.h \
     Source/CommonFramework/OCR/OCR_StringNormalization.h \

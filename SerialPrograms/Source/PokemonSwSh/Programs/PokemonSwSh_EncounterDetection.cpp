@@ -62,7 +62,12 @@ const std::set<std::string>* StandardEncounterDetection::candidates(){
     QImage screen = m_console.video().snapshot();
     ConstImageRef frame = extract_box_reference(screen, box);
 
-    OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(m_console, m_language, frame);
+    OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
+        m_console, m_language, frame,
+        {
+            {0xff000000, 0xff404040},
+        }
+    );
     if (result.results.empty()){
         dump_image(
             m_console, m_env.program_info(),

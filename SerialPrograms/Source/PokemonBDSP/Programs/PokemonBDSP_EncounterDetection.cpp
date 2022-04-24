@@ -120,7 +120,12 @@ std::set<std::string> StandardEncounterDetection::read_name(const QImage& screen
 
     std::set<std::string> ret;
 
-    OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(m_console, m_language, image);
+    OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
+        m_console, m_language, image,
+        {
+            {0xff000000, 0xff404040},
+        }
+    );
     if (result.results.empty()){
         dump_image(
             m_console, ProgramInfo(),

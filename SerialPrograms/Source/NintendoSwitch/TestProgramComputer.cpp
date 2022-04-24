@@ -15,6 +15,8 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
 #include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonFramework/OCR/OCR_RawOCR.h"
+#include "CommonFramework/OCR/OCR_Routines.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
@@ -124,148 +126,15 @@ void print_8x64(__m512i m){
 }
 
 
+namespace OCR{
 
 
 
-#if 0
-class ScheduledPrinter : public PeriodicRunner{
-public:
-    virtual ~ScheduledPrinter(){
-        PeriodicRunner::cancel(nullptr);
-        stop_thread();
-    }
-    bool add_event(std::function<void()>& event, std::chrono::milliseconds period){
-        return PeriodicRunner::add_event(&event, period);
-    }
-    void remove_event(std::function<void()>& event){
-        PeriodicRunner::remove_event(&event);
-    }
-    virtual void run(void* event) override{
-        cout << current_time_to_str() << ": ";
-        (*(std::function<void()>*)event)();
-    }
 
-protected:
-    using PeriodicRunner::PeriodicRunner;
-};
-#endif
-
-
-
-#if 0
-template <typename Counter>
-PA_FORCE_INLINE void count_rbg32(
-    const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
-    Counter& counter0
-){
-    if (width == 0 || height == 0){
-        return;
-    }
-    const size_t VECTOR_SIZE = Counter::VECTOR_SIZE;
-    do{
-        const uint32_t* in = image;
-        size_t lc = width / VECTOR_SIZE;
-        do{
-            counter0.process_full(in);
-            in += VECTOR_SIZE;
-        }while (--lc);
-        size_t left = width % VECTOR_SIZE;
-        if (left != 0){
-            counter0.process_partial(in, left);
-        }
-        image = (const uint32_t*)((const char*)image + bytes_per_row);
-    }while (--height);
-}
-
-
-class PixelCounter_RgbRange_Default{
-public:
-    static const size_t VECTOR_SIZE = 1;
-
-public:
-    PixelCounter_RgbRange_Default(uint32_t mins, uint32_t maxs)
-        : m_minB(mins & 0x000000ff)
-        , m_maxB(maxs & 0x000000ff)
-        , m_minG(mins & 0x0000ff00)
-        , m_maxG(maxs & 0x0000ff00)
-        , m_minR(mins & 0x00ff0000)
-        , m_maxR(maxs & 0x00ff0000)
-        , m_minA(mins & 0xff000000)
-        , m_maxA(maxs & 0xff000000)
-        , m_count(0)
-    {}
-
-    size_t count() const{
-        return m_count;
-    }
-
-    PA_FORCE_INLINE void process_full(const uint32_t* ptr){
-        uint32_t pixel = ptr[0];
-        uint64_t ret = 1;
-        {
-            uint32_t p = pixel & 0xff000000;
-            ret &= p >= m_minA;
-            ret &= p <= m_maxA;
-        }
-        {
-            uint32_t p = pixel & 0x00ff0000;
-            ret &= p >= m_minR;
-            ret &= p <= m_maxR;
-        }
-        {
-            uint32_t p = pixel & 0x0000ff00;
-            ret &= p >= m_minG;
-            ret &= p <= m_maxG;
-        }
-        {
-            uint32_t p = pixel & 0x000000ff;
-            ret &= p >= m_minB;
-            ret &= p <= m_maxB;
-        }
-        m_count += ret;
-    }
-    PA_FORCE_INLINE void process_partial(const uint32_t* ptr, size_t left){
-        process_full(ptr);
-    }
-
-
-private:
-    uint32_t m_minB;
-    uint32_t m_maxB;
-    uint32_t m_minG;
-    uint32_t m_maxG;
-    uint32_t m_minR;
-    uint32_t m_maxR;
-    uint32_t m_minA;
-    uint32_t m_maxA;
-    size_t m_count;
-};
-#endif
-
-
-#if 0
-size_t count_pixels_rgb_range_Default(
-    const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
-    uint32_t mins0, uint32_t maxs0
-){
-
-}
-
-
-
-size_t count_pixels_rgb_range(
-    const uint32_t* image, size_t bytes_per_row, size_t width, size_t height,
-    uint32_t mins0, uint32_t maxs0
-){
-
-}
 
 
 
-size_t count_pixels_rgb_range(const ConstImageRef& image, uint32_t mins, uint32_t maxs){
-    return count_pixels_rgb_range(image.data(), image.bytes_per_row(), image.width(), image.height(), mins, maxs);
 }
-#endif
 
 
 
@@ -277,7 +146,23 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 
 
-#if 1
+    QImage image("20220301-205136873076.jpg");
+
+    ImageFloatBox box(0.050, 0.177, 0.200, 0.038);
+
+    OCR::StringMatchResult result = OCR::multifiltered_OCR(
+        Language::English, Pokemon::PokemonNameReader::instance(), extract_box_reference(image, box),
+        {
+            {0xff808080, 0xffffffff},
+            {0xff909090, 0xffffffff},
+        },
+        1.0
+    );
+    result.log(env.logger(), -5);
+
+
+
+#if 0
     QImage image("20220301-205136873076.jpg");
 
     auto ret = filter_rgb32_range(

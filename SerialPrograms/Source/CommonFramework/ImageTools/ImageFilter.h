@@ -54,7 +54,7 @@ struct BlackWhiteRgb32Range{
     uint32_t maxs;
     bool in_range_black;
 };
-std::vector<std::pair<QImage, size_t>> filter_rgb32_range(
+std::vector<std::pair<QImage, size_t>> to_blackwhite_rgb32_range(
     const ConstImageRef& image,
     const std::vector<BlackWhiteRgb32Range>& filters
 );
