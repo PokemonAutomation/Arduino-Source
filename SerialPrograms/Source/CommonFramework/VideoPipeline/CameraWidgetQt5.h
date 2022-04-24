@@ -90,7 +90,6 @@ private:
     //  Last Frame
     QVideoFrame m_last_frame;
     WallClock m_last_frame_timestamp;
-//    std::atomic<uint64_t> m_last_frame_seqnum;
     uint64_t m_last_frame_seqnum = 0;
 
     //  Last Cached Image

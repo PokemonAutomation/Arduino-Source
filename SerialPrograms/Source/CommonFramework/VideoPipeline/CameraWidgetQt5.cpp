@@ -62,7 +62,8 @@ Qt5VideoWidget::Qt5VideoWidget(
 
     m_camera = new QCamera(QCameraInfo(info.device_name().c_str()), this);
 
-#if 1
+
+    //  Setup the screenshot capture.
     m_probe = new QVideoProbe(this);
     if (!m_probe->setSource(m_camera)){
 //        m_use_probe_frames = false;
@@ -70,12 +71,12 @@ Qt5VideoWidget::Qt5VideoWidget(
         delete m_probe;
         m_probe = nullptr;
     }
-#endif
     m_capture = new QCameraImageCapture(m_camera, this);
     m_capture->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
     m_camera->setCaptureMode(QCamera::CaptureStillImage);
 
 
+    //  Setup the video display.
     m_camera_view = new QCameraViewfinder(this);
     layout->addWidget(m_camera_view);
     m_camera_view->setMinimumSize(80, 45);
@@ -123,8 +124,8 @@ Qt5VideoWidget::Qt5VideoWidget(
                 }
                 m_last_frame_timestamp = now;
                 m_last_frame_seqnum++;
-//                cout << "asdf" << endl;
-            }
+            },
+            Qt::DirectConnection
         );
     }
     {
@@ -335,29 +336,24 @@ VideoSnapshot Qt5VideoWidget::snapshot_probe(){
     WallClock frame_timestamp;
     uint64_t frame_seqnum;
     {
-//        WallClock time0 = current_time();
         SpinLockGuard lg0(m_frame_lock);
-//        WallClock time1 = current_time();
-//        cout << "Lock (snapshot): " << std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count() << endl;
         frame_seqnum = m_last_frame_seqnum;
         if (!m_last_image.isNull() && m_last_image_seqnum == frame_seqnum){
-//            cout << "cached 0" << endl;
             return VideoSnapshot{m_last_image, m_last_image_timestamp};
         }
-//        WallClock time0 = current_time();
         frame = m_last_frame;
-//        WallClock time1 = current_time();
-//        cout << "Copy Frame (snapshot): " << std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count() << endl;
         frame_timestamp = m_last_frame_timestamp;
     }
 
     WallClock time0 = current_time();
+
     m_last_image = frame_to_image(m_logger, frame, m_flip_vertical);
-//    cout << "Convert Frame: " << std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count() << endl;
     m_last_image_timestamp = frame_timestamp;
     m_last_image_seqnum = frame_seqnum;
+
     WallClock time1 = current_time();
     m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count());
+
     return VideoSnapshot{m_last_image, frame_timestamp};
 }
 

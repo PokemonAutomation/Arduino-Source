@@ -84,18 +84,19 @@ Qt6VideoWidget::Qt6VideoWidget(
     m_videoSink = new QVideoSink(this);
     m_captureSession.setVideoOutput(m_videoSink);
 
-    connect(m_videoSink, &QVideoSink::videoFrameChanged, this, [&](const QVideoFrame& frame){
-        {
-            auto timestamp = current_time();
-            SpinLockGuard lg(m_frame_lock);
-            m_last_frame = frame;
-            m_last_frame_timestamp = timestamp;
-            uint64_t seqnum = m_last_frame_seqnum.load(std::memory_order_acquire);
-            m_last_frame_seqnum.store(seqnum + 1, std::memory_order_release);
-//            m_last_frame_seqnum++;
+    connect(
+        m_videoSink, &QVideoSink::videoFrameChanged,
+        this, [&](const QVideoFrame& frame){
+            {
+                WallClock now = current_time();
+                SpinLockGuard lg(m_frame_lock);
+                m_last_frame = frame;
+                m_last_frame_timestamp = now;
+                m_last_frame_seqnum++;
+            }
+            this->update();
         }
-        this->update();
-    });
+    );
 
     const QList<QCameraFormat> formats = m_info.videoFormats();
     // Filter out additional formats that have the same resolutions:
@@ -165,46 +166,41 @@ void Qt6VideoWidget::set_resolution(const QSize& size){
 
 VideoSnapshot Qt6VideoWidget::snapshot(){
     //  Prevent multiple concurrent screenshots from entering here.
-    std::lock_guard<std::mutex> lg(m_image_lock);
+    std::lock_guard<std::mutex> lg(m_lock);
 
-    //  Image is already cached and not stale. Return it.
-    uint64_t seqnum = m_last_frame_seqnum.load(std::memory_order_acquire);
-    if (m_last_image_seqnum == seqnum && !m_last_image.isNull()){
-        return VideoSnapshot{m_last_image, m_last_image_timestamp};
+    if (m_camera == nullptr){
+        return VideoSnapshot{QImage(), current_time()};
+    }
+
+    //  Frame is already cached and is not stale.
+    QVideoFrame frame;
+    WallClock frame_timestamp;
+    uint64_t frame_seqnum;
+    {
+        SpinLockGuard lg0(m_frame_lock);
+        frame_seqnum = m_last_frame_seqnum;
+        if (!m_last_image.isNull() && m_last_image_seqnum == frame_seqnum){
+            return VideoSnapshot{m_last_image, m_last_image_timestamp};
+        }
+        frame = m_last_frame;
+        frame_timestamp = m_last_frame_timestamp;
     }
 
     WallClock time0 = current_time();
 
-    //  Need to update image. Grab the current frame.
-    QVideoFrame frame;
-    WallClock tick;
-    {
-        SpinLockGuard lg1(m_frame_lock);
-        frame = m_last_frame;   // Fast due to ref-count.
-        tick = m_last_frame_timestamp;
-    }
-
-    //  Now make the image.
-    if (!frame.isValid()){
-        return VideoSnapshot{QImage(), current_time()};
-    }
-
-    // auto time1 = current_time();
-    //  Convert image and cache it.
     QImage image = frame.toImage();
-    // auto time2 = current_time();
-    // std::chrono::duration<double> elapsed_seconds = time2 - time1;
-    // std::cout << "snapshot image conversion time " << elapsed_seconds.count() << "s" << std::endl;
-    // std::cout << "QVideoFrame pixel format " << int(frame.pixelFormat()) << std::endl;
     QImage::Format format = image.format();
     if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
         image = image.convertToFormat(QImage::Format_ARGB32);
     }
-    m_last_image_seqnum = seqnum;
+
     m_last_image = std::move(image);
-    m_last_image_timestamp = tick;
+    m_last_image_timestamp = frame_timestamp;
+    m_last_image_seqnum = frame_seqnum;
+
     WallClock time1 = current_time();
     m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count());
+
     return VideoSnapshot{m_last_image, m_last_image_timestamp};
 }
 

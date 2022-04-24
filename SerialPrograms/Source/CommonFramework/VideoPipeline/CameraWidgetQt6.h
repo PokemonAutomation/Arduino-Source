@@ -56,13 +56,12 @@ private:
     std::vector<QCameraFormat> m_formats;
 
     mutable std::mutex m_lock;
-    std::mutex m_image_lock;
     SpinLock m_frame_lock;
 
     //  Last Frame
     QVideoFrame m_last_frame;
     WallClock m_last_frame_timestamp;
-    std::atomic<uint64_t> m_last_frame_seqnum;
+    uint64_t m_last_frame_seqnum = 0;
 
     //  Last Cached Image
     QImage m_last_image;
