@@ -9,6 +9,7 @@
 
 #include <new>
 #include <utility>
+#include <immintrin.h>
 #include "FixedLimitVector.h"
 
 namespace PokemonAutomation{
@@ -21,7 +22,7 @@ FixedLimitVector<Object>::~FixedLimitVector(){
     while (m_size > 0){
         pop_back();
     }
-    delete[] reinterpret_cast<char*>(m_data);
+    _mm_free(m_data);
 }
 
 
@@ -33,7 +34,10 @@ FixedLimitVector<Object>::FixedLimitVector(size_t capacity)
     : m_size(0)
     , m_capacity(capacity)
 {
-    m_data = reinterpret_cast<Object*>(new char[capacity * sizeof(Object)]);
+    m_data = (Object*)_mm_malloc(capacity * sizeof(Object), alignof(Object));
+    if (m_data == nullptr){
+        throw std::bad_alloc();
+    }
 }
 
 template <typename Object>
@@ -41,17 +45,20 @@ void FixedLimitVector<Object>::reset(){
     while (m_size > 0){
         pop_back();
     }
-    delete[] reinterpret_cast<char*>(m_data);
+    _mm_free(m_data);
     m_data = nullptr;
     m_capacity = 0;
 }
 template <typename Object>
 void FixedLimitVector<Object>::reset(size_t capacity){
-    Object* data = reinterpret_cast<Object*>(new char[capacity * sizeof(Object)]);
+    Object* data = (Object*)_mm_malloc(capacity * sizeof(Object), alignof(Object));
+    if (data == nullptr){
+        throw std::bad_alloc();
+    }
     while (m_size > 0){
         pop_back();
     }
-    delete[] reinterpret_cast<char*>(m_data);
+    _mm_free(m_data);
     m_data = data;
     m_capacity = capacity;
 }
