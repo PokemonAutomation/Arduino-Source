@@ -4,6 +4,9 @@
  *
  */
 
+#include <QtGlobal>
+#if QT_VERSION_MAJOR == 5
+
 #include <QVBoxLayout>
 #include <QCameraInfo>
 #include <QCamera>
@@ -426,3 +429,4 @@ void Qt5VideoWidget2::resizeEvent(QResizeEvent* event){
 
 }
 }
+#endif
