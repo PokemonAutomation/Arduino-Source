@@ -7,6 +7,9 @@
 #ifndef PokemonAutomation_VideoPipeline_VideoWidgetQt5v2_H
 #define PokemonAutomation_VideoPipeline_VideoWidgetQt5v2_H
 
+#include <QtGlobal>
+#if QT_VERSION_MAJOR == 5
+
 #include <mutex>
 #include <condition_variable>
 #include <QVideoFrame>
@@ -143,4 +146,5 @@ private:
 
 }
 }
+#endif
 #endif

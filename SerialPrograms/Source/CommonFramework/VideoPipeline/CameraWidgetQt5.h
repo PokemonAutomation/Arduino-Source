@@ -7,6 +7,9 @@
 #ifndef PokemonAutomation_VideoPipeline_Qt5VideoWidget_H
 #define PokemonAutomation_VideoPipeline_Qt5VideoWidget_H
 
+#include <QtGlobal>
+#if QT_VERSION_MAJOR == 5
+
 #include <condition_variable>
 #include <QThread>
 #include <QCameraViewfinder>
@@ -137,4 +140,5 @@ private:
 
 }
 }
+#endif
 #endif

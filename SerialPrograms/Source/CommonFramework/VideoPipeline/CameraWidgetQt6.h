@@ -7,6 +7,9 @@
 #ifndef PokemonAutomation_VideoPipeline_Qt6VideoWidget_H
 #define PokemonAutomation_VideoPipeline_Qt6VideoWidget_H
 
+#include <QtGlobal>
+#if QT_VERSION_MAJOR == 6
+
 #include <mutex>
 #include <QCameraDevice>
 #include <QMediaCaptureSession>
@@ -73,4 +76,5 @@ private:
 
 }
 }
+#endif
 #endif
