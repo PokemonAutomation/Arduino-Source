@@ -35,8 +35,8 @@ public:
         const CameraInfo& info, const QSize& desired_resolution
     );
     virtual ~Qt6VideoWidget();
-    virtual QSize resolution() const override;
-    virtual std::vector<QSize> resolutions() const override;
+    virtual QSize current_resolution() const override;
+    virtual std::vector<QSize> supported_resolutions() const override;
     virtual void set_resolution(const QSize& size) override;
 
     //  Cannot call from UI thread or it will deadlock.

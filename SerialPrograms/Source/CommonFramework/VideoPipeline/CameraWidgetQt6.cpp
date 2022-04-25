@@ -131,7 +131,7 @@ Qt6VideoWidget::Qt6VideoWidget(
 }
 Qt6VideoWidget::~Qt6VideoWidget(){}
 
-QSize Qt6VideoWidget::resolution() const{
+QSize Qt6VideoWidget::current_resolution() const{
     std::lock_guard<std::mutex> lg(m_lock);
     if (m_camera == nullptr){
         return QSize();
@@ -139,7 +139,7 @@ QSize Qt6VideoWidget::resolution() const{
     return m_camera->cameraFormat().resolution();
 }
 
-std::vector<QSize> Qt6VideoWidget::resolutions() const{
+std::vector<QSize> Qt6VideoWidget::supported_resolutions() const{
     return m_resolutions;
 }
 

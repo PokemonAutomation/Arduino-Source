@@ -9,6 +9,7 @@
 
 #if QT_VERSION_MAJOR == 5
 #include "CameraWidgetQt5.h"
+#include "CameraWidgetQt5v2.h"
 #elif QT_VERSION_MAJOR == 6
 #include "CameraWidgetQt6.h"
 #endif
@@ -37,7 +38,7 @@ std::function<VideoWidget*(QWidget& parent)> make_video_factory(
 ){
     return [&](QWidget& parent){
 #if QT_VERSION_MAJOR == 5
-        return new CameraQt5::Qt5VideoWidget(&parent, logger, info, desired_resolution);
+        return new CameraQt5::Qt5VideoWidget2(&parent, logger, info, desired_resolution);
 #elif QT_VERSION_MAJOR == 6
         return new CameraQt6::Qt6VideoWidget(&parent, logger, info, desired_resolution);
 #endif
