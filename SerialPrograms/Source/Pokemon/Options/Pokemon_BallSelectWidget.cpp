@@ -24,7 +24,29 @@ BallSelectWidget::BallSelectWidget(
     this->setInsertPolicy(QComboBox::NoInsert);
     this->completer()->setCompletionMode(QCompleter::PopupCompletion);
     this->completer()->setFilterMode(Qt::MatchContains);
+    this->setIconSize(QSize(25, 25));
 
+#if 1
+    //  A more optimized version.
+    QStringList list;
+    for (const std::string& slug : slugs){
+        list.append(get_pokeball_name(slug).display_name());
+    }
+    this->addItems(list);
+
+    for (size_t index = 0; index < slugs.size(); index++){
+        using namespace NintendoSwitch::PokemonSwSh;
+
+        const std::string& slug = slugs[index];
+
+        const PokeballSprite* sprites = get_pokeball_sprite_nothrow(slug);
+        this->setItemIcon((int)index, sprites->icon());
+
+        if (slug == current_slug){
+            this->setCurrentIndex((int)index);
+        }
+    }
+#else
     for (size_t index = 0; index < slugs.size(); index++){
         using namespace NintendoSwitch::PokemonSwSh;
 
@@ -45,10 +67,14 @@ BallSelectWidget::BallSelectWidget(
             this->setCurrentIndex((int)index);
         }
     }
+#endif
+
+    update_size_cache();
 }
 std::string BallSelectWidget::slug() const{
     return parse_pokeball_name_nothrow(currentText());
 }
+
 
 
 

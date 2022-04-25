@@ -11,6 +11,11 @@
 #include <QPushButton>
 #include "EditableTableBaseWidget.h"
 
+//#include "Common/Cpp/Time.h"
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -41,6 +46,8 @@ EditableTableBaseWidget::EditableTableBaseWidget(QWidget& parent, EditableTableB
     redraw_table();
 }
 void EditableTableBaseWidget::redraw_table(){
+//    cout << "redraw_table() - enter" << endl;
+//    WallClock time0 = current_time();
     m_table->setRowCount(0);
 
     for (const std::unique_ptr<EditableTableRow>& item : m_value.m_current){
@@ -80,6 +87,10 @@ void EditableTableBaseWidget::redraw_table(){
     }
 
     m_table->resizeColumnsToContents();
+//    cout << "redraw_table() - end" << endl;
+
+//    WallClock time1 = current_time();
+//    cout << std::chrono::duration_cast<std::chrono::milliseconds>(time1 - time0).count() / 1000. << endl;
 }
 void EditableTableBaseWidget::insert_row(int index, std::unique_ptr<EditableTableRow> row){
     //  Insert the row.
