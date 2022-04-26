@@ -18,6 +18,7 @@
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CameraInfo.h"
+#include "CameraImplementations.h"
 #include "VideoWidget.h"
 
 class QCamera;
