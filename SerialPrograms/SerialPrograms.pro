@@ -664,7 +664,10 @@ SOURCES += \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.cpp \
-    Source/PokemonSwSh/ShinyHuntTracker.cpp
+    Source/PokemonSwSh/ShinyHuntTracker.cpp \
+    Source/Tests/CommandLineTests.cpp \
+    Source/Tests/PokemonLA_Tests.cpp \
+    Source/Tests/TestMap.cpp
 
 HEADERS += \
     ../ClientSource/Connection/BotBase.h \
@@ -1353,7 +1356,11 @@ HEADERS += \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.h \
-    Source/PokemonSwSh/ShinyHuntTracker.h
+    Source/PokemonSwSh/ShinyHuntTracker.h \
+    Source/Tests/CommandLineTests.h \
+    Source/Tests/PokemonLA_Tests.h \
+    Source/Tests/TestMap.h \
+    Source/Tests/TestUtils.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
