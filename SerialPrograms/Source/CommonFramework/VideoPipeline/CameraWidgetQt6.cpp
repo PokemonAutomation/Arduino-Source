@@ -47,7 +47,7 @@ PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(
     const CameraInfo& info,
     const QSize& desired_resolution
 ) const{
-    return new CameraQt6::VideoWidget(&parent, logger, info, desired_resolution);
+    return new VideoWidget(&parent, logger, info, desired_resolution);
 }
 
 
