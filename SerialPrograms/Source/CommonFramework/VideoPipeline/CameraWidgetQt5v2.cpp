@@ -20,11 +20,30 @@
 #include "CameraWidgetQt5v2.h"
 
 namespace PokemonAutomation{
-namespace CameraQt5{
+namespace CameraQt5QCameraViewfinderSeparateThread{
+
+
+
+std::vector<CameraInfo> CameraBackend::get_all_cameras() const{
+    return qt5_get_all_cameras();
+}
+QString CameraBackend::get_camera_name(const CameraInfo& info) const{
+    return qt5_get_camera_name(info);
+}
+PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(
+    QWidget& parent,
+    LoggerQt& logger,
+    const CameraInfo& info,
+    const QSize& desired_resolution
+) const{
+    return new VideoWidget(&parent, logger, info, desired_resolution);
+}
+
+
 
 
 CameraHolder::CameraHolder(
-    LoggerQt& logger, Qt5VideoWidget2& widget,
+    LoggerQt& logger, VideoWidget& widget,
     const CameraInfo& info, const QSize& desired_resolution
 )
     : m_logger(logger)
@@ -88,6 +107,7 @@ CameraHolder::CameraHolder(
                 }
                 m_last_frame_timestamp = now;
                 m_last_frame_seqnum++;
+//                frame_to_image(m_logger, frame, true);
             },
             Qt::DirectConnection
         );
@@ -354,14 +374,15 @@ VideoSnapshot CameraHolder::snapshot(){
 
 
 
-Qt5VideoWidget2::Qt5VideoWidget2(
+VideoWidget::VideoWidget(
     QWidget* parent,
     LoggerQt& logger,
     const CameraInfo& info, const QSize& desired_resolution
 )
-    : VideoWidget(parent)
+    : PokemonAutomation::VideoWidget(parent)
     , m_logger(logger)
 {
+    logger.log("Constructing VideoWidget: Backend = CameraQt5QCameraViewfinderSeparateThread");
     if (!info){
         return;
     }
@@ -379,43 +400,44 @@ Qt5VideoWidget2::Qt5VideoWidget2(
     layout->addWidget(m_camera_view);
     m_camera_view->setMinimumSize(80, 45);
     m_holder->m_camera->setViewfinder(m_camera_view);
+//    m_holder->m_camera->setViewfinder((QVideoWidget*)nullptr);
 
     m_holder->moveToThread(&m_thread);
     m_thread.start();
     GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_qthread(m_thread);
 
     connect(
-        this, &Qt5VideoWidget2::internal_set_resolution,
+        this, &VideoWidget::internal_set_resolution,
         m_holder.get(), &CameraHolder::set_resolution
     );
 }
-Qt5VideoWidget2::~Qt5VideoWidget2(){
+VideoWidget::~VideoWidget(){
     m_holder.reset();
     m_thread.quit();
     m_thread.wait();
 }
-QSize Qt5VideoWidget2::current_resolution() const{
+QSize VideoWidget::current_resolution() const{
     if (!m_holder){
         return QSize();
     }
     return m_holder->current_resolution();
 }
-std::vector<QSize> Qt5VideoWidget2::supported_resolutions() const{
+std::vector<QSize> VideoWidget::supported_resolutions() const{
     if (!m_holder){
         return std::vector<QSize>();
     }
     return m_holder->supported_resolutions();
 }
-void Qt5VideoWidget2::set_resolution(const QSize& size){
+void VideoWidget::set_resolution(const QSize& size){
     emit internal_set_resolution(size);
 }
-VideoSnapshot Qt5VideoWidget2::snapshot(){
+VideoSnapshot VideoWidget::snapshot(){
     if (!m_holder){
         return VideoSnapshot{QImage(), current_time()};
     }
     return m_holder->snapshot();
 }
-void Qt5VideoWidget2::resizeEvent(QResizeEvent* event){
+void VideoWidget::resizeEvent(QResizeEvent* event){
     QWidget::resizeEvent(event);
     if (m_holder == nullptr){
         return;

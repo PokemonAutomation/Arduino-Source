@@ -19,43 +19,23 @@ using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
-namespace CameraQt5{
+namespace CameraQt5QCameraViewfinder{
 
 
-std::vector<CameraInfo> qt5_get_all_cameras(){
-    QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
-    std::vector<CameraInfo> ret;
-    for (const QCameraInfo& info : cameras){
-        ret.emplace_back(info.deviceName().toStdString());
-    }
-    return ret;
+
+std::vector<CameraInfo> CameraBackend::get_all_cameras() const{
+    return qt5_get_all_cameras();
 }
-
-QString qt5_get_camera_name(const CameraInfo& info){
-    QCameraInfo qinfo(info.device_name().c_str());
-    return qinfo.description();
+QString CameraBackend::get_camera_name(const CameraInfo& info) const{
+    return qt5_get_camera_name(info);
 }
-
-
-
-
-FrameReader::FrameReader(Qt5VideoWidget& widget)
-    : m_widget(widget)
-{
-    connect(
-        m_widget.m_probe, &QVideoProbe::videoFrameProbed,
-        this, [=](const QVideoFrame& frame){
-//            cout << "asdf" << endl;
-//            std::terminate();
-            WallClock now = current_time();
-            SpinLockGuard lg(m_widget.m_frame_lock);
-            if (GlobalSettings::instance().ENABLE_FRAME_SCREENSHOTS){
-                m_widget.m_last_frame = frame;
-            }
-            m_widget.m_last_frame_timestamp = now;
-            m_widget.m_last_frame_seqnum++;
-        }
-    );
+PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(
+    QWidget& parent,
+    LoggerQt& logger,
+    const CameraInfo& info,
+    const QSize& desired_resolution
+) const{
+    return new VideoWidget(&parent, logger, info, desired_resolution);
 }
 
 
@@ -63,12 +43,13 @@ FrameReader::FrameReader(Qt5VideoWidget& widget)
 
 
 
-Qt5VideoWidget::Qt5VideoWidget(
+
+VideoWidget::VideoWidget(
     QWidget* parent,
     LoggerQt& logger,
     const CameraInfo& info, const QSize& desired_resolution
 )
-    : VideoWidget(parent)
+    : PokemonAutomation::VideoWidget(parent)
     , m_logger(logger)
     , m_last_orientation_attempt(WallClock::min())
 //    , m_use_probe_frames(true)
@@ -77,6 +58,7 @@ Qt5VideoWidget::Qt5VideoWidget(
     , m_last_image_timestamp(WallClock::min())
     , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
 {
+    logger.log("Constructing VideoWidget: Backend = CameraQt5QCameraViewfinder");
     if (!info){
         return;
     }
@@ -139,12 +121,6 @@ Qt5VideoWidget::Qt5VideoWidget(
     }
 
     if (m_probe){
-#ifdef PA_VIDEOFRAME_ON_SEPARATE_THREAD
-        m_frame_reader = new FrameReader(*this);
-        m_frame_reader->moveToThread(&m_frame_thread);
-        connect(&m_frame_thread, &QThread::finished, m_frame_reader, &QObject::deleteLater);
-        m_frame_thread.start();
-#else
         connect(
             m_probe, &QVideoProbe::videoFrameProbed,
             this, [=](const QVideoFrame& frame){
@@ -158,7 +134,6 @@ Qt5VideoWidget::Qt5VideoWidget(
             },
             Qt::DirectConnection
         );
-#endif
     }
     {
         connect(
@@ -200,17 +175,13 @@ Qt5VideoWidget::Qt5VideoWidget(
         );
     }
 }
-Qt5VideoWidget::~Qt5VideoWidget(){
+VideoWidget::~VideoWidget(){
     for (auto& item : m_pending_captures){
         item.second.status = CaptureStatus::COMPLETED;
         item.second.cv.notify_all();
     }
-#ifdef PA_VIDEOFRAME_ON_SEPARATE_THREAD
-    m_frame_thread.quit();
-    m_frame_thread.wait();
-#endif
 }
-QSize Qt5VideoWidget::current_resolution() const{
+QSize VideoWidget::current_resolution() const{
     std::lock_guard<std::mutex> lg(m_lock);
     if (m_camera == nullptr){
         return QSize();
@@ -218,10 +189,10 @@ QSize Qt5VideoWidget::current_resolution() const{
     QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
     return settings.resolution();
 }
-std::vector<QSize> Qt5VideoWidget::supported_resolutions() const{
+std::vector<QSize> VideoWidget::supported_resolutions() const{
     return m_resolutions;
 }
-void Qt5VideoWidget::set_resolution(const QSize& size){
+void VideoWidget::set_resolution(const QSize& size){
     std::lock_guard<std::mutex> lg(m_lock);
     QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
     if (settings.resolution() == size){
@@ -231,7 +202,7 @@ void Qt5VideoWidget::set_resolution(const QSize& size){
     m_camera->setViewfinderSettings(settings);
     m_resolution = size;
 }
-QImage Qt5VideoWidget::direct_snapshot_image(std::unique_lock<std::mutex>& lock){
+QImage VideoWidget::direct_snapshot_image(std::unique_lock<std::mutex>& lock){
 //    std::unique_lock<std::mutex> lg(m_lock);
     if (m_camera == nullptr){
         return QImage();
@@ -271,7 +242,7 @@ QImage Qt5VideoWidget::direct_snapshot_image(std::unique_lock<std::mutex>& lock)
     }
     return image;
 }
-QImage Qt5VideoWidget::direct_snapshot_probe(bool flip_vertical){
+QImage VideoWidget::direct_snapshot_probe(bool flip_vertical){
 //    std::lock_guard<std::mutex> lg(m_lock);
     if (m_camera == nullptr){
         return QImage();
@@ -285,7 +256,7 @@ QImage Qt5VideoWidget::direct_snapshot_probe(bool flip_vertical){
 
     return frame_to_image(m_logger, frame, flip_vertical);
 }
-VideoSnapshot Qt5VideoWidget::snapshot_image(std::unique_lock<std::mutex>& lock){
+VideoSnapshot VideoWidget::snapshot_image(std::unique_lock<std::mutex>& lock){
 //    cout << "snapshot_image()" << endl;
 //    std::unique_lock<std::mutex> lg(m_lock);
 
@@ -360,7 +331,7 @@ VideoSnapshot Qt5VideoWidget::snapshot_image(std::unique_lock<std::mutex>& lock)
     m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count());
     return VideoSnapshot{m_last_image, m_last_image_timestamp};
 }
-VideoSnapshot Qt5VideoWidget::snapshot_probe(){
+VideoSnapshot VideoWidget::snapshot_probe(){
 //    std::lock_guard<std::mutex> lg(m_lock);
 
     if (m_camera == nullptr){
@@ -393,7 +364,7 @@ VideoSnapshot Qt5VideoWidget::snapshot_probe(){
     return VideoSnapshot{m_last_image, frame_timestamp};
 }
 
-VideoSnapshot Qt5VideoWidget::snapshot(){
+VideoSnapshot VideoWidget::snapshot(){
     std::unique_lock<std::mutex> lg(m_lock);
 
     //  Frame screenshots are disabled.
@@ -423,7 +394,7 @@ VideoSnapshot Qt5VideoWidget::snapshot(){
     }
 }
 
-void Qt5VideoWidget::resizeEvent(QResizeEvent* event){
+void VideoWidget::resizeEvent(QResizeEvent* event){
     QWidget::resizeEvent(event);
     if (m_camera == nullptr){
         return;
@@ -446,7 +417,7 @@ void Qt5VideoWidget::resizeEvent(QResizeEvent* event){
 
 
 
-bool Qt5VideoWidget::determine_frame_orientation(std::unique_lock<std::mutex>& lock){
+bool VideoWidget::determine_frame_orientation(std::unique_lock<std::mutex>& lock){
     //  Qt 5.12 is really shitty in that there's no way to figure out the
     //  orientation of a QVideoFrame. So here we'll try to figure it out
     //  the poor man's way. Snapshot using both QCameraImageCapture and

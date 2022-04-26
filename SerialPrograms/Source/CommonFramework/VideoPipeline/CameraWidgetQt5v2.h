@@ -18,6 +18,7 @@
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "VideoWidget.h"
 //#include "CameraInfo.h"
+#include "CameraImplementations.h"
 
 class QCamera;
 class QCameraImageCapture;
@@ -27,17 +28,30 @@ class QVideoProbe;
 namespace PokemonAutomation{
     class LoggerQt;
     class CameraInfo;
-namespace CameraQt5{
+namespace CameraQt5QCameraViewfinderSeparateThread{
 
 
-class Qt5VideoWidget2;
+class CameraBackend : public PokemonAutomation::CameraBackend{
+public:
+    virtual std::vector<CameraInfo> get_all_cameras() const override;
+    virtual QString get_camera_name(const CameraInfo& info) const override;
+    virtual VideoWidget* make_video_widget(
+        QWidget& parent,
+        LoggerQt& logger,
+        const CameraInfo& info,
+        const QSize& desired_resolution
+    ) const override;
+};
+
+
+class VideoWidget;
 
 
 class CameraHolder : public QObject{
     Q_OBJECT
 public:
     CameraHolder(
-        LoggerQt& logger, Qt5VideoWidget2& widget,
+        LoggerQt& logger, VideoWidget& widget,
         const CameraInfo& info, const QSize& desired_resolution
     );
     virtual ~CameraHolder();
@@ -61,7 +75,7 @@ private:
     bool determine_frame_orientation(std::unique_lock<std::mutex>& lock);
 
 private:
-    friend class Qt5VideoWidget2;
+    friend class VideoWidget;
     enum class CaptureStatus{
         PENDING,
         COMPLETED,
@@ -74,7 +88,7 @@ private:
     };
 
     LoggerQt& m_logger;
-    Qt5VideoWidget2& m_widget;
+    VideoWidget& m_widget;
     QCamera* m_camera = nullptr;
 
     std::mutex m_state_lock;
@@ -108,15 +122,15 @@ private:
 
 
 
-class Qt5VideoWidget2 : public VideoWidget{
+class VideoWidget : public PokemonAutomation::VideoWidget{
     Q_OBJECT
 public:
-    Qt5VideoWidget2(
+    VideoWidget(
         QWidget* parent,
         LoggerQt& logger,
         const CameraInfo& info, const QSize& desired_resolution
     );
-    virtual ~Qt5VideoWidget2();
+    virtual ~VideoWidget();
     virtual QSize current_resolution() const override;
     virtual std::vector<QSize> supported_resolutions() const override;
     virtual void set_resolution(const QSize& size) override;

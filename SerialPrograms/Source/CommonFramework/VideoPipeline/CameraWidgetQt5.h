@@ -19,42 +19,36 @@
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CameraInfo.h"
+#include "CameraImplementations.h"
 #include "VideoWidget.h"
 
-//#define PA_VIDEOFRAME_ON_SEPARATE_THREAD
-
 namespace PokemonAutomation{
-namespace CameraQt5{
+namespace CameraQt5QCameraViewfinder{
 
 
-std::vector<CameraInfo> qt5_get_all_cameras();
-QString qt5_get_camera_name(const CameraInfo& info);
-
-
-class Qt5VideoWidget;
-
-
-class FrameReader : public QObject{
-    Q_OBJECT
-
+class CameraBackend : public PokemonAutomation::CameraBackend{
 public:
-    FrameReader(Qt5VideoWidget& widget);
-
-private:
-    Qt5VideoWidget& m_widget;
+    virtual std::vector<CameraInfo> get_all_cameras() const override;
+    virtual QString get_camera_name(const CameraInfo& info) const override;
+    virtual VideoWidget* make_video_widget(
+        QWidget& parent,
+        LoggerQt& logger,
+        const CameraInfo& info,
+        const QSize& desired_resolution
+    ) const override;
 };
 
 
 
 
-class Qt5VideoWidget : public VideoWidget{
+class VideoWidget : public PokemonAutomation::VideoWidget{
 public:
-    Qt5VideoWidget(
+    VideoWidget(
         QWidget* parent,
         LoggerQt& logger,
         const CameraInfo& info, const QSize& desired_resolution
     );
-    virtual ~Qt5VideoWidget();
+    virtual ~VideoWidget();
     virtual QSize current_resolution() const override;
     virtual std::vector<QSize> supported_resolutions() const override;
     virtual void set_resolution(const QSize& size) override;
@@ -108,10 +102,6 @@ private:
     bool m_orientation_known = false;
 //    bool m_use_probe_frames = false;
     bool m_flip_vertical = false;
-#ifdef PA_VIDEOFRAME_ON_SEPARATE_THREAD
-    FrameReader* m_frame_reader;
-    QThread m_frame_thread;
-#endif
 
     SpinLock m_frame_lock;
 

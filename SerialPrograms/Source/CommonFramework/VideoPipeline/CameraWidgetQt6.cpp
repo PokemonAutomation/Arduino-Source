@@ -19,10 +19,11 @@ using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
-namespace CameraQt6{
+namespace CameraQt6QVideoSink{
 
 
-std::vector<CameraInfo> qt6_get_all_cameras(){
+
+std::vector<CameraInfo> CameraBackend::get_all_cameras() const{
     std::vector<CameraInfo> ret;
     const auto cameras = QMediaDevices::videoInputs();
     for (const auto& info : cameras){
@@ -30,8 +31,7 @@ std::vector<CameraInfo> qt6_get_all_cameras(){
     }
     return ret;
 }
-
-QString qt6_get_camera_name(const CameraInfo& info){
+QString CameraBackend::get_camera_name(const CameraInfo& info) const{
     const auto cameras = QMediaDevices::videoInputs();
     for (const auto& camera : cameras){
         if (camera.id().toStdString() == info.device_name()){
@@ -41,19 +41,30 @@ QString qt6_get_camera_name(const CameraInfo& info){
     std::cout << "Error: no such camera for CameraInfo: " << info.device_name() << std::endl;
     return "";
 }
+PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(
+    QWidget& parent,
+    LoggerQt& logger,
+    const CameraInfo& info,
+    const QSize& desired_resolution
+) const{
+    return new CameraQt6::VideoWidget(&parent, logger, info, desired_resolution);
+}
 
 
-Qt6VideoWidget::Qt6VideoWidget(
+
+
+VideoWidget::VideoWidget(
     QWidget* parent,
     Logger& logger,
     const CameraInfo& info, const QSize& desired_resolution
 )
-    : VideoWidget(parent)
+    : PokemonAutomation::VideoWidget(parent)
     , m_logger(logger)
     , m_last_frame_seqnum(0)
     , m_last_image_timestamp(WallClock::min())
     , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
 {
+    logger.log("Constructing VideoWidget: Backend = CameraQt6QVideoSink");
     if (!info){
         return;
     }
@@ -68,7 +79,7 @@ Qt6VideoWidget::Qt6VideoWidget(
         }
     }
     if (foundInfo == false){
-        std::cout << "Cannot build Qt6VideoWidget: wrong camera device name: " << info.device_name() << std::endl;
+        std::cout << "Cannot build VideoWidget: wrong camera device name: " << info.device_name() << std::endl;
         return;
     }
 
@@ -129,9 +140,9 @@ Qt6VideoWidget::Qt6VideoWidget(
 
     m_camera->start();
 }
-Qt6VideoWidget::~Qt6VideoWidget(){}
+VideoWidget::~VideoWidget(){}
 
-QSize Qt6VideoWidget::current_resolution() const{
+QSize VideoWidget::current_resolution() const{
     std::lock_guard<std::mutex> lg(m_lock);
     if (m_camera == nullptr){
         return QSize();
@@ -139,11 +150,11 @@ QSize Qt6VideoWidget::current_resolution() const{
     return m_camera->cameraFormat().resolution();
 }
 
-std::vector<QSize> Qt6VideoWidget::supported_resolutions() const{
+std::vector<QSize> VideoWidget::supported_resolutions() const{
     return m_resolutions;
 }
 
-void Qt6VideoWidget::set_resolution(const QSize& size){
+void VideoWidget::set_resolution(const QSize& size){
     std::lock_guard<std::mutex> lg(m_lock);
     {
         const auto format = m_camera->cameraFormat();
@@ -164,7 +175,7 @@ void Qt6VideoWidget::set_resolution(const QSize& size){
     }
 }
 
-VideoSnapshot Qt6VideoWidget::snapshot(){
+VideoSnapshot VideoWidget::snapshot(){
     //  Prevent multiple concurrent screenshots from entering here.
     std::lock_guard<std::mutex> lg(m_lock);
 
@@ -205,7 +216,7 @@ VideoSnapshot Qt6VideoWidget::snapshot(){
 }
 
 
-void Qt6VideoWidget::resizeEvent(QResizeEvent* event){
+void VideoWidget::resizeEvent(QResizeEvent* event){
     QWidget::resizeEvent(event);
     if (m_camera == nullptr){
         return;
@@ -224,7 +235,7 @@ void Qt6VideoWidget::resizeEvent(QResizeEvent* event){
     this->setFixedSize(this->size());
 }
 
-void Qt6VideoWidget::paintEvent(QPaintEvent* event){
+void VideoWidget::paintEvent(QPaintEvent* event){
     // std::cout << "paintEvent start" << std::endl;
     QWidget::paintEvent(event);
 

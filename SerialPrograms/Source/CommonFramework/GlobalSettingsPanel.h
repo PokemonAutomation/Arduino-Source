@@ -14,6 +14,7 @@
 #include "CommonFramework/Options/Environment/ProcessPriorityOption.h"
 #include "CommonFramework/Options/Environment/ProcessorLevelOption.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "CommonFramework/VideoPipeline/CameraImplementations.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "Integrations/DiscordSettingsOption.h"
 
@@ -67,15 +68,15 @@ public:
     BooleanCheckBoxOption SAVE_DEBUG_IMAGES;
     BooleanCheckBoxOption NAUGHTY_MODE;
 
-    BooleanCheckBoxOption ENABLE_FRAME_SCREENSHOTS;
-
-
-    ProcessorLevelOption PROCESSOR_LEVEL0;
-
 //    ProcessPriorityOption PROCESS_PRIORITY0;
     ThreadPriorityOption REALTIME_THREAD_PRIORITY0;
     ThreadPriorityOption INFERENCE_PRIORITY0;
     ThreadPriorityOption COMPUTE_PRIORITY0;
+
+    VideoBackendOption VIDEO_BACKEND;
+    BooleanCheckBoxOption ENABLE_FRAME_SCREENSHOTS;
+
+    ProcessorLevelOption PROCESSOR_LEVEL0;
 
     StringOption DEVELOPER_TOKEN;
 
