@@ -7,7 +7,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
-#include "CommonFramework/OCR/OCR_Filtering.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h"
@@ -107,15 +106,23 @@ std::string read_boss_sprite(ConsoleHandle& console){
 
 
 std::set<std::string> read_pokemon_name(
-    LoggerQt& logger,
-    const ConstImageRef& screen, const ConstImageRef& image,
-    Language language
+    LoggerQt& logger, Language language,
+    const ConstImageRef& image
 ){
     const SpeciesReadDatabase& database = SpeciesReadDatabase::instance();
 
 //    OCR::MatchResult result = PokemonNameReader::instance().read_substring(language, image);
 //    image.save("test.png");
-    OCR::StringMatchResult result = database.name_reader->read_substring(logger, language, image);
+    OCR::StringMatchResult result = database.name_reader->read_substring(
+        logger, language, image,
+        {
+            {0xff000000, 0xff404040},
+            {0xff000000, 0xff808080},
+            {0xff808080, 0xffffffff},
+            {0xffa0a0a0, 0xffffffff},
+            {0xffc0c0c0, 0xffffffff},
+        }
+    );
 //    result.log(logger);
     if (result.results.empty()){
         return {};
@@ -290,9 +297,8 @@ std::string read_pokemon_name_sprite(
 //    QImage name = extract_box(screen, name_box);
 
     QImage image = extract_box_copy(screen, name_box);
-    OCR::filter_smart(image);
 
-    std::set<std::string> ocr_slugs = read_pokemon_name(logger, screen, image, language);
+    std::set<std::string> ocr_slugs = read_pokemon_name(logger, language, image);
     bool ocr_hit = !ocr_slugs.empty();
     bool ocr_unique = ocr_hit && ocr_slugs.size() == 1;
     if (!ocr_hit){

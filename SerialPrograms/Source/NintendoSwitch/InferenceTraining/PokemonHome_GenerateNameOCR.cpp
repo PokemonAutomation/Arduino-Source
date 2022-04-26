@@ -11,7 +11,6 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "CommonFramework/OCR/OCR_Filtering.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonHome_GenerateNameOCR.h"
@@ -96,9 +95,13 @@ void GenerateNameOCRData::program(SingleSwitchProgramEnvironment& env, BotBaseCo
 
         pbf_press_dpad(context, DPAD_RIGHT, 10, DELAY);
 
-        OCR::make_OCR_filter(image).apply(image);
-
-        OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(env.console, LANGUAGE, image);
+        OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
+            env.console, LANGUAGE, image,
+            {
+                {0xff000000, 0xff404040},
+                {0xff000000, 0xff808080},
+            }
+        );
     }
 
 

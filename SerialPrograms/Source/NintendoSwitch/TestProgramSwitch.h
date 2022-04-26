@@ -18,7 +18,6 @@
 #include "NintendoSwitch/Framework/NintendoSwitch_MultiSwitchProgram.h"
 #include "Pokemon/Options/Pokemon_BallSelectOption.h"
 #include "PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterOption.h"
-#include "PokemonSwSh/Inference/PokemonSwSh_IVCheckerReader.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 
 namespace PokemonAutomation{

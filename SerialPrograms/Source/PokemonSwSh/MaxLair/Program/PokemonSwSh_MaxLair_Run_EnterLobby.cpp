@@ -8,8 +8,8 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
+#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
-#include "CommonFramework/OCR/OCR_Filtering.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
@@ -63,24 +63,6 @@ private:
 };
 
 
-class OreReader{
-public:
-    OreReader(LoggerQt& logger, VideoOverlay& overlay)
-        : m_logger(logger)
-        , m_box(overlay, 0.945, 0.010, 0.0525, 0.050)
-    {}
-
-    int read(const QImage& screen){
-        QImage image = extract_box_copy(screen, m_box);
-        OCR::TextImageFilter{false, 600}.apply(image);
-        return OCR::read_number(m_logger, image);
-    }
-
-private:
-    LoggerQt& m_logger;
-    InferenceBoxScope m_box;
-};
-
 
 
 QImage enter_lobby(
@@ -128,7 +110,7 @@ QImage enter_lobby(
 
             arrow_count = 0;
             QImage image = extract_box_copy(screen, ore_quantity);
-            OCR::TextImageFilter{false, 600}.apply(image);
+            to_blackwhite_rgb32_range(image, 0xff808080, 0xffffffff, true);
             ore.update_with_ocr(console.logger(), image);
 
             if (ore.quantity < 20){

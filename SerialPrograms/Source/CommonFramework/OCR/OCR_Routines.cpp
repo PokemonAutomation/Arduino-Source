@@ -52,6 +52,8 @@ StringMatchResult multifiltered_OCR(
         ret.results.insert(current.results.begin(), current.results.end());
     }
 
+//    ret.log(global_logger_tagged(), -1.5);
+
     //  Prune duplicates.
     std::set<std::string> tokens;
     for (auto iter = ret.results.begin(); iter != ret.results.end();){

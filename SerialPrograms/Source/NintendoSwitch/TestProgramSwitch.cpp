@@ -13,6 +13,7 @@
 #include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "CommonFramework/InferenceInfra/VisualInferencePivot.h"
+#include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h"
 
 #include <QVideoFrame>
 
@@ -94,6 +95,10 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoFeed& feed = env.consoles[0];
     VideoOverlay& overlay = env.consoles[0];
 
+
+
+    PokemonBDSP::IVCheckerReaderScope reader(overlay, Language::English);
+    reader.read(logger, feed.snapshot());
 
 
 

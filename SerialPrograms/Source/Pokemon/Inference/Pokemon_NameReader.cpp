@@ -24,6 +24,7 @@ PokemonNameReader::PokemonNameReader(const std::set<std::string>& subset)
     : LargeDictionaryMatcher("Pokemon/PokemonNameOCR/PokemonOCR-", &subset, false)
 {}
 
+#if 0
 OCR::StringMatchResult PokemonNameReader::read_substring(
     LoggerQt& logger,
     Language language,
@@ -35,6 +36,7 @@ OCR::StringMatchResult PokemonNameReader::read_substring(
     ret.clear_beyond_log10p(MAX_LOG10P);
     return ret;
 }
+#endif
 OCR::StringMatchResult PokemonNameReader::read_substring(
     LoggerQt& logger,
     Language language,

@@ -7,7 +7,7 @@
 #include <QImage>
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
+//#include "CommonFramework/Tools/ErrorDumper.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonLA_OutbreakReader.h"
 
@@ -39,12 +39,13 @@ OCR::StringMatchResult OutbreakReader::read(const QImage& screen) const{
         m_logger, m_language, image,
         {
             {0xff808080, 0xffffffff},
+            {0xffa0a0a0, 0xffffffff},
         }
     );
     result.clear_beyond_log10p(Pokemon::PokemonNameReader::MAX_LOG10P);
-    if (result.results.empty()){
-        dump_image(m_logger, ProgramInfo(), "OutbreakReader", screen);
-    }
+//    if (result.results.empty()){
+//        dump_image(m_logger, ProgramInfo(), "OutbreakReader", screen);
+//    }
 
     return result;
 }

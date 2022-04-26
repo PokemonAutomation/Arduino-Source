@@ -6,7 +6,6 @@
 
 #include "Common/Compiler.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/OCR/OCR_Filtering.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"

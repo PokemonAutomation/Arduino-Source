@@ -59,6 +59,7 @@
 #include <QMessageBox>
 
 
+
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -146,6 +147,8 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 
 
+
+#if 0
     QImage image("20220301-205136873076.jpg");
 
     ImageFloatBox box(0.050, 0.177, 0.200, 0.038);
@@ -159,7 +162,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
         1.0
     );
     result.log(env.logger(), -5);
-
+#endif
 
 
 #if 0
@@ -892,34 +895,6 @@ void print(const uint64_t* ptr, size_t len){
 
 
 
-std::set<std::string> read_name(
-    LoggerQt& logger,
-    Language language,
-    const QImage& screen, const ImageFloatBox& box
-){
-    if (language == Language::None){
-        return {};
-    }
-
-    QImage image = extract_box_copy(screen, box);
-    OCR::filter_smart(image);
-
-    std::set<std::string> ret;
-
-    OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(logger, language, image);
-    if (result.results.empty()){
-//        dump_image(
-//            logger, ProgramInfo(),
-//            QString::fromStdString("NameOCR-" + language_data(language).code),
-//            screen
-//        );
-    }else{
-        for (const auto& item : result.results){
-            ret.insert(item.second.token);
-        }
-    }
-    return ret;
-}
 
 
 

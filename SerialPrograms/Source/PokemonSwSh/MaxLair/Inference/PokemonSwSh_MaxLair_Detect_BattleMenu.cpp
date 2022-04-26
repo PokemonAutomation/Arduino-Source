@@ -10,7 +10,6 @@
 #include "Common/Cpp/CancellableScope.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "CommonFramework/ImageTools/ColorClustering.h"
-#include "CommonFramework/OCR/OCR_Filtering.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/ErrorDumper.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h"
@@ -238,8 +237,7 @@ std::set<std::string> BattleMenuReader::read_opponent(
     for (size_t c = 0; c < 3; c++){
         screen = feed.snapshot();
         QImage image = extract_box_copy(screen, m_opponent_name);
-        OCR::TextImageFilter{false, 600}.apply(image);
-        result = read_pokemon_name(logger, screen, image, m_language);
+        result = read_pokemon_name(logger, m_language, image);
         if (!result.empty()){
             return result;
         }
@@ -251,7 +249,7 @@ std::set<std::string> BattleMenuReader::read_opponent(
 }
 std::set<std::string> BattleMenuReader::read_opponent_in_summary(LoggerQt& logger, const QImage& screen) const{
     ConstImageRef name = extract_box_reference(screen, m_summary_opponent_name);
-    std::set<std::string> slugs = read_pokemon_name(logger, screen, name, m_language);
+    std::set<std::string> slugs = read_pokemon_name(logger, m_language, name);
 
     ConstImageRef types = extract_box_reference(screen, m_summary_opponent_types);
     std::multimap<double, std::pair<PokemonType, ImagePixelBox>> candidates = find_symbols(types, 0.2);

@@ -8,8 +8,6 @@
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "CommonFramework/OCR/OCR_RawOCR.h"
-#include "CommonFramework/OCR/OCR_Filtering.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
@@ -135,9 +133,13 @@ void DexRecFinder::read_line(
     const std::set<std::string>& exclusions
 ){
     QImage image = extract_box_copy(frame, box);
-    OCR::make_OCR_filter(image).apply(image);
-
-    OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(logger, language, image);
+    OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
+        logger, language, image,
+        {
+            {0xff000000, 0xff404040},
+            {0xff000000, 0xff808080},
+        }
+    );
     if (result.results.empty()){
         bad_read = true;
         return;

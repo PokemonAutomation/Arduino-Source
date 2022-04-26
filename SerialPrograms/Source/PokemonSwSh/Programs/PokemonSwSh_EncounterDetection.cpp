@@ -66,6 +66,7 @@ const std::set<std::string>* StandardEncounterDetection::candidates(){
         m_console, m_language, frame,
         {
             {0xff000000, 0xff404040},
+            {0xff000000, 0xff808080},
         }
     );
     if (result.results.empty()){
