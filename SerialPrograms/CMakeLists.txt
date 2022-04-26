@@ -1339,6 +1339,13 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.h
     Source/PokemonSwSh/ShinyHuntTracker.cpp
     Source/PokemonSwSh/ShinyHuntTracker.h
+    Source/Tests/CommandLineTests.cpp
+    Source/Tests/CommandLineTests.h
+    Source/Tests/PokemonLA_tests.cpp
+    Source/Tests/PokemonLA_tests.h
+    Source/Tests/TestMap.cpp
+    Source/Tests/TestMap.h
+    Source/Tests/TestUtils.h
 )
 add_executable(SerialPrograms WIN32 ${MAIN_SOURCES})
 set_target_properties(SerialPrograms PROPERTIES LINKER_LANGUAGE CXX)
