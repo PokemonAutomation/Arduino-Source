@@ -38,37 +38,37 @@ void StringMatchResult::log(LoggerQt& logger, double max_log10p, const QString& 
     }
 #endif
 
+    Color color;
     if (results.empty()){
         str += "no matches";
-        logger.log(str, COLOR_RED);
-        return;
-    }
-
-    double best = results.begin()->first;
-    Color color = exact_match || best <= max_log10p
-        ? COLOR_BLUE
-        : COLOR_RED;
-
-    if (results.size() == 1){
-        auto iter = results.begin();
-        str += iter->second.to_qstr();
-        str += " (log10p = ";
-        str += QString::number(iter->first);
-        str += ")";
+        color = COLOR_RED;
     }else{
-        str += "Multiple Candidates =>\n";
-        size_t printed = 0;
-        for (const auto& item : results){
-            if (printed == 10){
-                str += "    (" + QString::number(results.size() - 10) + " more...)\n";
-                break;
+        double best = results.begin()->first;
+        color = exact_match || best <= max_log10p
+            ? COLOR_BLUE
+            : COLOR_RED;
+
+        if (results.size() == 1){
+            auto iter = results.begin();
+            str += iter->second.to_qstr();
+            str += " (log10p = ";
+            str += QString::number(iter->first);
+            str += ")";
+        }else{
+            str += "Multiple Candidates =>\n";
+            size_t printed = 0;
+            for (const auto& item : results){
+                if (printed == 10){
+                    str += "    (" + QString::number(results.size() - 10) + " more...)\n";
+                    break;
+                }
+                str += "    ";
+                str += QString::number(item.first);
+                str += " : ";
+                str += item.second.to_qstr();
+                str += "\n";
+                printed++;
             }
-            str += "    ";
-            str += QString::number(item.first);
-            str += " : ";
-            str += item.second.to_qstr();
-            str += "\n";
-            printed++;
         }
     }
 
@@ -97,7 +97,7 @@ void StringMatchResult::clear_beyond_log10p(double max_log10p){
         auto iter = results.end();
         --iter;
         if (iter->first <= max_log10p){
-            break;;
+            break;
         }
         results.erase(iter);
     }

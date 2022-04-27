@@ -28,8 +28,9 @@ OCR::StringMatchResult IVCheckerReader::read_substring(
     double min_text_ratio, double max_text_ratio
 ) const{
     return match_substring_from_image_multifiltered(
-        logger, language, image, text_color_ranges,
-        MAX_LOG10P, 0.5, min_text_ratio, max_text_ratio
+        &logger, language, image, text_color_ranges,
+        MAX_LOG10P, MAX_LOG10P_SPREAD,
+        min_text_ratio, max_text_ratio
     );
 }
 

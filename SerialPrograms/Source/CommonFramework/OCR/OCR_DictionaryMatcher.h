@@ -31,7 +31,7 @@ public:
     ) const;
 
     OCR::StringMatchResult match_substring_from_image_multifiltered(
-        LoggerQt& logger,
+        LoggerQt* logger,
         Language language,
         const ConstImageRef& image,
         const std::vector<OCR::TextColorRange>& text_color_ranges,

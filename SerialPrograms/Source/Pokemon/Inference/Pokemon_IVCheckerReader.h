@@ -18,6 +18,7 @@ namespace Pokemon{
 class IVCheckerReader : public OCR::SmallDictionaryMatcher{
 public:
     static constexpr double MAX_LOG10P = -1.40;
+    static constexpr double MAX_LOG10P_SPREAD = 0.50;
 
 public:
     struct Results{

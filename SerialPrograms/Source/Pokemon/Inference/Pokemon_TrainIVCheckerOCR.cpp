@@ -4,16 +4,11 @@
  *
  */
 
-#include <QDirIterator>
-#include "Common/Cpp/PrettyPrint.h"
 #include "Common/Cpp/ParallelTaskRunner.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Language.h"
-#include "CommonFramework/OCR/OCR_RawOCR.h"
-#include "CommonFramework/OCR/OCR_Filtering.h"
-#include "CommonFramework/OCR/OCR_TextMatcher.h"
 #include "CommonFramework/OCR/OCR_TrainingTools.h"
 #include "CommonFramework/Tools/ProgramEnvironment.h"
+#include "Pokemon_IVCheckerReader.h"
 #include "Pokemon_TrainIVCheckerOCR.h"
 
 namespace PokemonAutomation{
@@ -62,10 +57,15 @@ TrainIVCheckerOCR::TrainIVCheckerOCR(const TrainIVCheckerOCR_Descriptor& descrip
 void TrainIVCheckerOCR::program(ProgramEnvironment& env, CancellableScope& scope){
     OCR::TrainingSession session(env.logger(), scope, DIRECTORY);
     session.generate_small_dictionary(
-        "PokemonSwSh/IVCheckerOCR.json",
+        "Pokemon/IVCheckerOCR.json",
         "IVCheckerOCR.json",
-        MODE != 0,
-        THREADS
+        MODE != 0, THREADS,
+        {
+            {0xff000000, 0xff404040},
+            {0xff000000, 0xff606060},
+            {0xff000000, 0xff808080},
+        },
+        IVCheckerReader::MAX_LOG10P, IVCheckerReader::MAX_LOG10P_SPREAD
     );
 }
 

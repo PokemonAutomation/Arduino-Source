@@ -37,7 +37,7 @@ StringMatchResult DictionaryMatcher::match_substring(
 }
 
 OCR::StringMatchResult DictionaryMatcher::match_substring_from_image_multifiltered(
-    LoggerQt& logger,
+    LoggerQt* logger,
     Language language,
     const ConstImageRef& image,
     const std::vector<OCR::TextColorRange>& text_color_ranges,
@@ -49,7 +49,9 @@ OCR::StringMatchResult DictionaryMatcher::match_substring_from_image_multifilter
         text_color_ranges,
         log10p_spread, min_text_ratio, max_text_ratio
     );
-    ret.log(logger, max_log10p);
+    if (logger){
+        ret.log(*logger, max_log10p);
+    }
     ret.clear_beyond_log10p(max_log10p);
     return ret;
 }

@@ -160,6 +160,7 @@ std::string TradeNameReader::read(const QImage& screen) const{
         m_logger, m_language, image,
         {
             {0xff000000, 0xff404040},
+            {0xff000000, 0xff606060},
             {0xff000000, 0xff808080},
         }
     );

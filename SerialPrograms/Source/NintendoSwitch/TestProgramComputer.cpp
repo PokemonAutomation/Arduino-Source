@@ -50,6 +50,7 @@
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "Common/Cpp/PeriodicScheduler.h"
+#include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
 
 //#include "Kernels/Kernels_x64_AVX2.h"
 //#include "Kernels/Kernels_x64_AVX512.h"
@@ -145,6 +146,22 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Kernels;
     using namespace NintendoSwitch::PokemonLA;
     using namespace Pokemon;
+
+
+    PokemonNameReader::instance().match_substring_from_image_multifiltered(
+        &env.logger(),
+        Language::English,
+        QImage("C:\\Users\\Ayase\\Desktop\\PA-Repository\\TrainingData\\PokemonNameOCR\\PokemonNameOCR (Kim-SwShPokedex-0)\\jpn\\cleffa-20210618-200715.png"),
+        {
+            {0xff000000, 0xff404040},
+            {0xff000000, 0xff606060},
+            {0xff000000, 0xff808080},
+            {0xff000000, 0xffa0a0a0},
+        },
+        PokemonNameReader::MAX_LOG10P, PokemonNameReader::MAX_LOG10P_SPREAD
+    );
+
+
 
 
 
