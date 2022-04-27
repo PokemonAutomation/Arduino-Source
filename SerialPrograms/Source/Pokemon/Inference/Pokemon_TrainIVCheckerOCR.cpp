@@ -65,7 +65,8 @@ void TrainIVCheckerOCR::program(ProgramEnvironment& env, CancellableScope& scope
             {0xff000000, 0xff606060},
             {0xff000000, 0xff808080},
         },
-        IVCheckerReader::MAX_LOG10P, IVCheckerReader::MAX_LOG10P_SPREAD
+        IVCheckerReader::MAX_LOG10P,
+        IVCheckerReader::MAX_LOG10P_SPREAD
     );
 }
 

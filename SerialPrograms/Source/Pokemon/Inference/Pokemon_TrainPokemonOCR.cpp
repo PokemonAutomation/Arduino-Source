@@ -67,7 +67,8 @@ void TrainPokemonOCR::program(ProgramEnvironment& env, CancellableScope& scope){
             {0xff808080, 0xffffffff},
             {0xffa0a0a0, 0xffffffff},
         },
-        PokemonNameReader::MAX_LOG10P, PokemonNameReader::MAX_LOG10P_SPREAD
+        PokemonNameReader::MAX_LOG10P + 1.0,
+        PokemonNameReader::MAX_LOG10P_SPREAD
     );
 }
 

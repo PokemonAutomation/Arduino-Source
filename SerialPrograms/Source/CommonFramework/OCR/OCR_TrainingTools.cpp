@@ -158,6 +158,12 @@ void TrainingSession::generate_small_dictionary(
                         return;
                     }
                 }
+
+                result.log(m_logger, -99999, sample.filepath);
+                trained.add_candidate(
+                    language.first, sample.token,
+                    result0.results.begin()->second.normalized_text
+                );
             });
             m_scope.throw_if_cancelled();
         }
@@ -234,6 +240,12 @@ void TrainingSession::generate_large_dictionary(
                         return;
                     }
                 }
+
+                result.log(m_logger, -99999, sample.filepath);
+                trained.add_candidate(
+                    language.first, sample.token,
+                    result0.results.begin()->second.normalized_text
+                );
             });
             m_scope.throw_if_cancelled();
         }
