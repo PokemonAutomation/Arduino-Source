@@ -37,7 +37,6 @@
 #include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
-#include "CommonFramework/OCR/OCR_Filtering.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "Common/Cpp/AlignedVector.tpp"
 #include "CommonFramework/AudioPipeline/TimeSampleWriter.h"

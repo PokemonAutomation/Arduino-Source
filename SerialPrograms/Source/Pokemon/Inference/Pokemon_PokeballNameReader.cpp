@@ -21,6 +21,7 @@ PokeballNameReader::PokeballNameReader()
     : SmallDictionaryMatcher("Pokemon/PokeballNameOCR.json")
 {}
 
+#if 0
 OCR::StringMatchResult PokeballNameReader::read_substring(
     LoggerQt& logger,
     Language language,
@@ -32,6 +33,7 @@ OCR::StringMatchResult PokeballNameReader::read_substring(
     ret.clear_beyond_log10p(MAX_LOG10P);
     return ret;
 }
+#endif
 OCR::StringMatchResult PokeballNameReader::read_substring(
     LoggerQt& logger,
     Language language,

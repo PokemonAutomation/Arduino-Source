@@ -181,7 +181,6 @@ SOURCES += \
     Source/CommonFramework/Notifications/SenderNotificationTable.cpp \
     Source/CommonFramework/OCR/OCR_DictionaryMatcher.cpp \
     Source/CommonFramework/OCR/OCR_DictionaryOCR.cpp \
-    Source/CommonFramework/OCR/OCR_Filtering.cpp \
     Source/CommonFramework/OCR/OCR_LanguageOptionOCR.cpp \
     Source/CommonFramework/OCR/OCR_LargeDictionaryMatcher.cpp \
     Source/CommonFramework/OCR/OCR_NumberReader.cpp \
@@ -824,7 +823,6 @@ HEADERS += \
     Source/CommonFramework/Notifications/SenderNotificationTable.h \
     Source/CommonFramework/OCR/OCR_DictionaryMatcher.h \
     Source/CommonFramework/OCR/OCR_DictionaryOCR.h \
-    Source/CommonFramework/OCR/OCR_Filtering.h \
     Source/CommonFramework/OCR/OCR_LanguageOptionOCR.h \
     Source/CommonFramework/OCR/OCR_LargeDictionaryMatcher.h \
     Source/CommonFramework/OCR/OCR_NumberReader.h \

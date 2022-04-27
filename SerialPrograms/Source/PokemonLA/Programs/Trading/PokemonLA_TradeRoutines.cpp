@@ -159,9 +159,8 @@ std::string TradeNameReader::read(const QImage& screen) const{
     OCR::StringMatchResult result = Pokemon::PokemonNameReader::instance().read_substring(
         m_logger, m_language, image,
         {
-            {0xff000000, 0xff404040},
-            {0xff000000, 0xff606060},
-            {0xff000000, 0xff808080},
+            {0xff808080, 0xffffffff},
+            {0xffa0a0a0, 0xffffffff},
         }
     );
     result.clear_beyond_log10p(Pokemon::PokemonNameReader::MAX_LOG10P);

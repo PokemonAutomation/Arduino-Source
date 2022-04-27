@@ -23,11 +23,13 @@ public:
 
     static PokeballNameReader& instance();
 
+#if 0
     OCR::StringMatchResult read_substring(
         LoggerQt& logger,
         Language language,
         const QImage& image
     ) const;
+#endif
 
     OCR::StringMatchResult read_substring(
         LoggerQt& logger,
