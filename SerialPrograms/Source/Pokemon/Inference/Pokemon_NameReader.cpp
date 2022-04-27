@@ -44,14 +44,10 @@ OCR::StringMatchResult PokemonNameReader::read_substring(
     const std::vector<OCR::TextColorRange>& text_color_ranges,
     double min_text_ratio, double max_text_ratio
 ) const{
-    OCR::StringMatchResult ret = OCR::multifiltered_OCR(
-        language, *this, image,
-        text_color_ranges,
-        0.5, min_text_ratio, max_text_ratio
+    return match_substring_from_image_multifiltered(
+        logger, language, image, text_color_ranges,
+        MAX_LOG10P, 0.5, min_text_ratio, max_text_ratio
     );
-    ret.log(logger, MAX_LOG10P);
-    ret.clear_beyond_log10p(MAX_LOG10P);
-    return ret;
 }
 
 

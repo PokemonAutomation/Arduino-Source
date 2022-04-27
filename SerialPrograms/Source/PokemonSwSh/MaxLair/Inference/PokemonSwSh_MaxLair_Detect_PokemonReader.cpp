@@ -296,7 +296,7 @@ std::string read_pokemon_name_sprite(
 //    QImage sprite = extract_box(screen, sprite_box);
 //    QImage name = extract_box(screen, name_box);
 
-    QImage image = extract_box_copy(screen, name_box);
+    ConstImageRef image = extract_box_reference(screen, name_box);
 
     std::set<std::string> ocr_slugs = read_pokemon_name(logger, language, image);
     bool ocr_hit = !ocr_slugs.empty();

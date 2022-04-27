@@ -7,10 +7,7 @@
 #ifndef PokemonAutomation_Pokemon_PokemonNameReader_H
 #define PokemonAutomation_Pokemon_PokemonNameReader_H
 
-#include "CommonFramework/Logging/LoggerQt.h"
-#include "CommonFramework/ImageTypes/ImageReference.h"
 #include "CommonFramework/OCR/OCR_LargeDictionaryMatcher.h"
-#include "CommonFramework/OCR/OCR_Routines.h"
 
 namespace PokemonAutomation{
 namespace Pokemon{

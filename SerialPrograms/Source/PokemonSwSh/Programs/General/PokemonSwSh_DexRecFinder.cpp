@@ -132,7 +132,7 @@ void DexRecFinder::read_line(
     const std::set<std::string>& desired,
     const std::set<std::string>& exclusions
 ){
-    QImage image = extract_box_copy(frame, box);
+    ConstImageRef image = extract_box_reference(frame, box);
     OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
         logger, language, image,
         {

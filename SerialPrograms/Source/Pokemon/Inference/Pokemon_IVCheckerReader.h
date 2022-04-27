@@ -7,10 +7,7 @@
 #ifndef PokemonAutomation_Pokemon_IVCheckerReader_H
 #define PokemonAutomation_Pokemon_IVCheckerReader_H
 
-#include <vector>
-#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/OCR/OCR_SmallDictionaryMatcher.h"
-#include "CommonFramework/OCR/OCR_Routines.h"
 #include "Pokemon/Pokemon_IVChecker.h"
 
 namespace PokemonAutomation{

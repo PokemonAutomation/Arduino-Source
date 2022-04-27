@@ -14,6 +14,7 @@
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "CommonFramework/InferenceInfra/VisualInferencePivot.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h"
+#include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.h"
 
 #include <QVideoFrame>
 
@@ -95,10 +96,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoFeed& feed = env.consoles[0];
     VideoOverlay& overlay = env.consoles[0];
 
+    PokemonBDSP::BattleBallReader reader(console, Language::English);
+    reader.read_ball(feed.snapshot());
+    reader.read_quantity(feed.snapshot());
 
 
-    PokemonBDSP::IVCheckerReaderScope reader(overlay, Language::English);
-    reader.read(logger, feed.snapshot());
+
+
+//    PokemonBDSP::IVCheckerReaderScope reader(overlay, Language::English);
+//    reader.read(logger, feed.snapshot());
 
 
 

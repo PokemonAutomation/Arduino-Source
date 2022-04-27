@@ -55,7 +55,6 @@ private:
 class VirtualController{
 public:
     VirtualController(
-        LoggerQt& /*logger*/,
         BotBaseHandle& botbase,
         bool allow_commands_while_running
     );

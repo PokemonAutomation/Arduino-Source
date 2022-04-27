@@ -4,10 +4,10 @@
  *
  */
 
-#include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/OCR/OCR_NumberReader.h"
 #include "CommonFramework/OCR/OCR_StringNormalization.h"
-#include "CommonFramework/OCR/OCR_Filtering.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h"
 #include "PokemonSwSh_BattleBallReader.h"
 
@@ -62,9 +62,15 @@ std::string BattleBallReader::read_ball(const QImage& screen) const{
     }
     OCR::StringMatchResult name_result;
     {
-        QImage cropped = extract_box_copy(screen, m_box_name);
-        OCR::make_OCR_filter(cropped).apply(cropped);
-        name_result = m_name_reader.read_substring(m_console, m_language, cropped);
+        ConstImageRef cropped = extract_box_reference(screen, m_box_name);
+        name_result = m_name_reader.read_substring(
+            m_console, m_language, cropped,
+            {
+                {0xff808080, 0xffffffff},
+                {0xffa0a0a0, 0xffffffff},
+                {0xffc0c0c0, 0xffffffff},
+            }
+        );
     }
 
     if (sprite_result.results.empty()){
@@ -99,8 +105,7 @@ std::string BattleBallReader::read_ball(const QImage& screen) const{
 }
 uint16_t BattleBallReader::read_quantity(const QImage& screen) const{
     QImage image = extract_box_copy(screen, m_box_quantity);
-    auto filter = OCR::make_OCR_filter(image);
-    filter.apply(image);
+    to_blackwhite_rgb32_range(image, 0xff808080, 0xffffffff, true);
     return OCR::read_number(m_console, image);
 }
 

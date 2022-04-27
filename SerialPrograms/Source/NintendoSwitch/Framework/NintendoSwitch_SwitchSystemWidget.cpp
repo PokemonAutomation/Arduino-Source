@@ -64,7 +64,6 @@ SwitchSystemWidget::SwitchSystemWidget(
         m_command = new CommandRow(
             *widget,
             m_serial->botbase(),
-            m_logger,
             factory.m_feedback, factory.m_allow_commands_while_running
         );
         group_layout->addWidget(m_command);

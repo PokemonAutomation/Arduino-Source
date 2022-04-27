@@ -236,7 +236,7 @@ std::set<std::string> BattleMenuReader::read_opponent(
     QImage screen;
     for (size_t c = 0; c < 3; c++){
         screen = feed.snapshot();
-        QImage image = extract_box_copy(screen, m_opponent_name);
+        ConstImageRef image = extract_box_reference(screen, m_opponent_name);
         result = read_pokemon_name(logger, m_language, image);
         if (!result.empty()){
             return result;
