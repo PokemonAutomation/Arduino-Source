@@ -64,11 +64,11 @@ public:
 public slots:
     void set_resolution(const QSize& size);
 
-signals:
-    void async_shutdown();
+//signals:
+//    void stop();
 
 private:
-    void internal_shutdown();
+//    void internal_shutdown();
 
     //  All of these must be called under the state lock.
     QImage direct_snapshot_image(std::unique_lock<std::mutex>& lock);

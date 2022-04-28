@@ -150,27 +150,44 @@ CameraHolder::CameraHolder(
             iter->second.cv.notify_all();
         }
     );
+#if 0
     connect(
-        this, &CameraHolder::async_shutdown,
+        this, &CameraHolder::stop,
         this, &CameraHolder::internal_shutdown
     );
+#endif
 }
 CameraHolder::~CameraHolder(){
     //  Redispatch to the thread that owns the class.
-    emit async_shutdown();
+    m_camera->stop();
+    delete m_capture;
+#if 0
+//    internal_shutdown();
+    emit stop();
     std::unique_lock<std::mutex> lg(m_state_lock);
+    if (m_camera == nullptr){
+        return;
+    }
     m_cv.wait(lg, [=]{ return m_camera == nullptr; });
+    delete m_capture;
+#endif
 }
+#if 0
 void CameraHolder::internal_shutdown(){
     std::lock_guard<std::mutex> lg(m_state_lock);
-//    m_camera->stop();
+    if (m_camera == nullptr){
+        return;
+    }
+    m_camera->stop();
+//    delete m_probe;
 //    delete m_capture;
-    delete m_camera;
-    m_probe = nullptr;
-    m_capture = nullptr;
+//    delete m_camera;
+//    m_probe = nullptr;
+//    m_capture = nullptr;
     m_camera = nullptr;
     m_cv.notify_all();
 }
+#endif
 void CameraHolder::set_resolution(const QSize& size){
     QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
     if (settings.resolution() == size){
@@ -408,9 +425,6 @@ VideoWidget::VideoWidget(
     layout->setContentsMargins(0, 0, 0, 0);
 
     m_holder = std::make_unique<CameraHolder>(logger, *this, info, desired_resolution);
-//    m_holder->moveToThread(&m_thread);
-//    connect(&m_thread, &QThread::finished, m_holder.get(), &QObject::deleteLater);
-//    m_thread.start();
 
     m_camera_view = new QCameraViewfinder(this);
     layout->addWidget(m_camera_view);
@@ -419,6 +433,7 @@ VideoWidget::VideoWidget(
 //    m_holder->m_camera->setViewfinder((QVideoWidget*)nullptr);
 
     m_holder->moveToThread(&m_thread);
+//    connect(&m_thread, &QThread::finished, m_holder.get(), &QObject::deleteLater);
     m_thread.start();
     GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_qthread(m_thread);
 
