@@ -4,6 +4,7 @@
  *
  */
 
+#include <set>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Language.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
@@ -16,8 +17,6 @@
 #include "PokemonBDSP/Programs/PokemonBDSP_GameEntry.h"
 #include "PokemonBDSP_GiftBerryReset.h"
 #include "Pokemon/Inference/Pokemon_BerryNameReader.h"
-
-#include <set>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -132,7 +131,14 @@ void GiftBerryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
 
         ImageFloatBox dialog_box(0.218, 0.835, 0.657, 0.12);
         ConstImageRef dialog_image = extract_box_reference(screen, dialog_box);
-        const auto result = Pokemon::BerryNameReader::instance().read_substring(env.console, LANGUAGE, dialog_image);
+        const auto result = Pokemon::BerryNameReader::instance().read_substring(
+            env.console, LANGUAGE, dialog_image,
+            {
+                {0xff000000, 0xff404040},
+                {0xff000000, 0xff606060},
+                {0xff000000, 0xff808080},
+            }
+        );
         if (result.results.empty()){
             throw OperationFailedException(env.console, "No berry name found in dialog box");
         }

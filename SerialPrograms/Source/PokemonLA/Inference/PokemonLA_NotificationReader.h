@@ -30,7 +30,19 @@ enum class Notification{
 
 class NotificationOCR : public OCR::SmallDictionaryMatcher{
 public:
+    static constexpr double MAX_LOG10P = -2.0;
+    static constexpr double MAX_LOG10P_SPREAD = 4.0;
+
+public:
     static const NotificationOCR& instance();
+
+    OCR::StringMatchResult read_substring(
+        LoggerQt& logger,
+        Language language,
+        const ConstImageRef& image,
+        const std::vector<OCR::TextColorRange>& text_color_ranges,
+        double min_text_ratio = 0.01, double max_text_ratio = 0.50
+    ) const;
 
 private:
     NotificationOCR();
