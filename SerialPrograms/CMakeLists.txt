@@ -926,8 +926,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/Farming/PokemonLA_NuggetFarmerHighlands.h
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.cpp
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.h
-    Source/PokemonLA/Programs/Farming/PokemonLA_TreeLeapGrinder.cpp
-    Source/PokemonLA/Programs/Farming/PokemonLA_TreeLeapGrinder.h
+    Source/PokemonLA/Programs/Farming/PokemonLA_LeapGrinder.cpp
+    Source/PokemonLA/Programs/Farming/PokemonLA_LeapGrinder.h
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.cpp
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.h
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.cpp
@@ -980,6 +980,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.h
     Source/PokemonLA/Resources/PokemonLA_PokemonIcons.cpp
     Source/PokemonLA/Resources/PokemonLA_PokemonIcons.h
+    Source/PokemonLA/Resources/PokemonLA_PokemonInfo.cpp
+    Source/PokemonLA/Resources/PokemonLA_PokemonInfo.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp

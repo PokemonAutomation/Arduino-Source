@@ -4,8 +4,8 @@
  *
  */
 
-#ifndef PokemonAutomation_PokemonLA_TreeLeapGrinder_H
-#define PokemonAutomation_PokemonLA_TreeLeapGrinder_H
+#ifndef PokemonAutomation_PokemonLA_LeapGrinder_H
+#define PokemonAutomation_PokemonLA_LeapGrinder_H
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
@@ -13,37 +13,39 @@
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "PokemonLA/Inference/PokemonLA_UnderAttackDetector.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
+#include "PokemonLA/Programs/PokemonLA_TreeActions.h"
+#include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-class TreeLeapGrinder_Descriptor : public RunnableSwitchProgramDescriptor{
+class LeapGrinder_Descriptor : public RunnableSwitchProgramDescriptor{
 public:
-    TreeLeapGrinder_Descriptor();
+    LeapGrinder_Descriptor();
 };
 
-class TreeLeapGrinder : public SingleSwitchProgramInstance{
+class LeapGrinder : public SingleSwitchProgramInstance{
 public:
-    TreeLeapGrinder(const TreeLeapGrinder_Descriptor& descriptor);
+    LeapGrinder(const LeapGrinder_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
     void run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    bool check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int16_t match);
-    void exit_battle(BotBaseContext& context);
 
 private:
     class Stats;
     class RunRoute;
 
-    ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;
-    ShinyDetectedActionOption MATCH_DETECTED_OPTIONS;
-    SimpleIntegerOption<uint8_t> SHAKES;
-    EnumDropdownOption STOP_ON;
+    OCR::LanguageOCR LANGUAGE;
     EnumDropdownOption POKEMON;
+    SimpleIntegerOption<uint8_t> LEAPS;
+    EnumDropdownOption STOP_ON;
+    ShinyDetectedActionOption MATCH_DETECTED_OPTIONS;
+    ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;
+
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;
 };

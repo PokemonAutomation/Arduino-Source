@@ -22,7 +22,7 @@
 #include "Programs/Farming/PokemonLA_MagikarpMoveGrinder.h"
 #include "Programs/Farming/PokemonLA_NuggetFarmerHighlands.h"
 #include "Programs/Farming/PokemonLA_TenacityCandyFarmer.h"
-#include "Programs/Farming/PokemonLA_TreeLeapGrinder.h"
+#include "Programs/Farming/PokemonLA_LeapGrinder.h"
 
 //#include "Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h"
 #include "Programs/ShinyHunting/PokemonLA_GalladeFinder.h"
@@ -68,7 +68,7 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<IngoBattleGrinder_Descriptor, IngoBattleGrinder>();
     add_program<MagikarpMoveGrinder_Descriptor, MagikarpMoveGrinder>();
     add_program<TenacityCandyFarmer_Descriptor, TenacityCandyFarmer>();
-    //add_program<TreeLeapGrinder_Descriptor, TreeLeapGrinder>();
+    add_program<LeapGrinder_Descriptor, LeapGrinder>();
 
     add_divider("---- Shiny Hunting ----");
 //    add_program<ShinyHuntLakeTrio_Descriptor, ShinyHuntLakeTrio>();
