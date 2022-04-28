@@ -82,8 +82,8 @@ void PABotBase::stop(){
         uint64_t seqnum = m_send_seq;
         seqnum_t seqnum_s = (seqnum_t)seqnum;
         memcpy(&params, &seqnum_s, sizeof(seqnum_t));
-    //    try_issue_request<PABB_MSG_REQUEST_STOP>(params);
-    //    m_state.store(State::STOPPING, std::memory_order_release);
+//        try_issue_request<PABB_MSG_REQUEST_STOP>(params);
+//        m_state.store(State::STOPPING, std::memory_order_release);
         BotBaseMessage stop_request(PABB_MSG_REQUEST_STOP, std::string((char*)&params, sizeof(params)));
         send_message(stop_request, false);
     }
@@ -306,10 +306,11 @@ void PABotBase::process_command_finished(BotBaseMessage message){
     pabb_MsgAckRequest ack;
     ack.seqnum = seqnum;
 //    m_send_queue.emplace_back((uint8_t)PABB_MSG_ACK, std::string((char*)&ack, sizeof(ack)));
-    send_message(BotBaseMessage(PABB_MSG_ACK_REQUEST, std::string((char*)&ack, sizeof(ack))), false);
 
     std::lock_guard<std::mutex> lg0(m_sleep_lock);
     SpinLockGuard lg1(m_state_lock, "PABotBase::process_command_finished() - 0");
+
+    send_message(BotBaseMessage(PABB_MSG_ACK_REQUEST, std::string((char*)&ack, sizeof(ack))), false);
 
     if (m_pending_commands.empty()){
         m_sniffer->log(
@@ -387,20 +388,14 @@ void PABotBase::retransmit_thread(){
         }
 
         //  Process retransmits.
-        std::map<uint64_t, PendingRequest> pending_requests;
-        std::map<uint64_t, PendingCommand> pending_commands;
-        {
-            SpinLockGuard lg(m_state_lock, "PABotBase::retransmit_thread()");
-            pending_requests = m_pending_requests;
-            pending_commands = m_pending_commands;
-        }
+        SpinLockGuard lg(m_state_lock, "PABotBase::retransmit_thread()");
 //        std::cout << "retransmit_thread - m_pending_messages.size(): " << m_pending_messages.size() << std::endl;
 //        cout << "m_pending_messages.size()" << endl;
 
         //  Retransmit
         //      Iterate through all pending requests and retransmit them in
         //  chronological order. Skip the ones that are new.
-        for (auto& item : pending_requests){
+        for (auto& item : m_pending_requests){
             if (
                 item.second.state == AckState::NOT_ACKED &&
                 current_time() - item.second.first_sent >= m_retransmit_delay
@@ -408,7 +403,7 @@ void PABotBase::retransmit_thread(){
                 send_message(item.second.request, true);
             }
         }
-        for (auto& item : pending_commands){
+        for (auto& item : m_pending_commands){
             if (
                 item.second.state == AckState::NOT_ACKED &&
                 current_time() - item.second.first_sent >= m_retransmit_delay

@@ -6,9 +6,9 @@
 
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
-#include "CommonFramework/OCR/OCR_Filtering.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Notification.h"
@@ -87,12 +87,18 @@ std::set<std::string> read_name(
         return {};
     }
 
-    QImage image = extract_box_copy(screen, box);
-    OCR::filter_smart(image);
+
+    ConstImageRef image = extract_box_reference(screen, box);
+    OCR::StringMatchResult result = Pokemon::PokemonNameReader::instance().read_substring(
+        logger, language, image,
+        {
+            {0xff808080, 0xffffffff},
+            {0xffa0a0a0, 0xffffffff},
+        }
+    );
+    result.clear_beyond_log10p(Pokemon::PokemonNameReader::MAX_LOG10P);
 
     std::set<std::string> ret;
-
-    OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(logger, language, image);
     if (result.results.empty()){
         dump_image(
             logger, ProgramInfo(),

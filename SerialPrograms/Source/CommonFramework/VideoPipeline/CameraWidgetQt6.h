@@ -7,6 +7,9 @@
 #ifndef PokemonAutomation_VideoPipeline_Qt6VideoWidget_H
 #define PokemonAutomation_VideoPipeline_Qt6VideoWidget_H
 
+#include <QtGlobal>
+#if QT_VERSION_MAJOR == 6
+
 #include <mutex>
 #include <QCameraDevice>
 #include <QMediaCaptureSession>
@@ -15,32 +18,44 @@
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CameraInfo.h"
+#include "CameraImplementations.h"
 #include "VideoWidget.h"
 
 class QCamera;
 class QVideoSink;
 
 namespace PokemonAutomation{
-namespace CameraQt6{
+namespace CameraQt6QVideoSink{
 
 
-std::vector<CameraInfo> qt6_get_all_cameras();
-QString qt6_get_camera_name(const CameraInfo& info);
-
-class Qt6VideoWidget : public VideoWidget{
+class CameraBackend : public PokemonAutomation::CameraBackend{
 public:
-    Qt6VideoWidget(
+    virtual std::vector<CameraInfo> get_all_cameras() const override;
+    virtual QString get_camera_name(const CameraInfo& info) const override;
+    virtual VideoWidget* make_video_widget(
+        QWidget& parent,
+        LoggerQt& logger,
+        const CameraInfo& info,
+        const QSize& desired_resolution
+    ) const override;
+};
+
+
+
+class VideoWidget : public PokemonAutomation::VideoWidget{
+public:
+    VideoWidget(
         QWidget* parent,
         Logger& logger,
         const CameraInfo& info, const QSize& desired_resolution
     );
-    virtual ~Qt6VideoWidget();
-    virtual QSize resolution() const override;
-    virtual std::vector<QSize> resolutions() const override;
+    virtual ~VideoWidget();
+    virtual QSize current_resolution() const override;
+    virtual std::vector<QSize> supported_resolutions() const override;
     virtual void set_resolution(const QSize& size) override;
 
     //  Cannot call from UI thread or it will deadlock.
-    virtual QImage snapshot(WallClock* timestamp) override;
+    virtual VideoSnapshot snapshot() override;
 
     virtual void resizeEvent(QResizeEvent* event) override;
 private:
@@ -56,13 +71,12 @@ private:
     std::vector<QCameraFormat> m_formats;
 
     mutable std::mutex m_lock;
-    std::mutex m_image_lock;
     SpinLock m_frame_lock;
 
     //  Last Frame
     QVideoFrame m_last_frame;
     WallClock m_last_frame_timestamp;
-    std::atomic<uint64_t> m_last_frame_seqnum;
+    uint64_t m_last_frame_seqnum = 0;
 
     //  Last Cached Image
     QImage m_last_image;
@@ -74,4 +88,5 @@ private:
 
 }
 }
+#endif
 #endif

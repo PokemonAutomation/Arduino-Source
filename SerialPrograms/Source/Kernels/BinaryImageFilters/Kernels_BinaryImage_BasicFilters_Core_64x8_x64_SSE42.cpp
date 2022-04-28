@@ -27,10 +27,10 @@ void compress_rgb32_to_binary_range_64x8_x64_SSE42(
 }
 void compress_rgb32_to_binary_range_64x8_x64_SSE42(
     const uint32_t* image, size_t bytes_per_row,
-    CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
+    CompressRgb32ToBinaryRangeFilter* filters, size_t filter_count
 ){
     compress_rgb32_to_binary<PackedBinaryMatrix_64x8_x64_SSE42, Compressor_RgbRange_x64_SSE41>(
-        image, bytes_per_row, filter, filter_count
+        image, bytes_per_row, filters, filter_count
     );
 }
 

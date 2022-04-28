@@ -4,15 +4,9 @@
  *
  */
 
+#include <QImage>
 #include "Common/Qt/QtJsonTools.h"
-#include "CommonFramework/OCR/OCR_RawOCR.h"
-#include "CommonFramework/OCR/OCR_Filtering.h"
 #include "PokemonSwSh_IVCheckerReader.h"
-
-#include <iostream>
-using std::cout;
-using std::endl;
-
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -32,17 +26,16 @@ IVCheckerReaderScope::IVCheckerReaderScope(VideoOverlay& overlay, Language langu
 
 
 IVCheckerValue IVCheckerReaderScope::read(LoggerQt& logger, const QImage& frame, const InferenceBoxScope& box){
-    QImage image = extract_box_copy(frame, box);
-    OCR::make_OCR_filter(image).apply(image);
-//    image.save("test.png");
-
-    QString text = OCR::ocr_read(m_language, image);
-
-    static constexpr double MAX_LOG10P = -1.40;
-
-    OCR::StringMatchResult result = IVCheckerReader::instance().match_substring(m_language, text);
-    result.log(logger, MAX_LOG10P);
-    result.clear_beyond_log10p(MAX_LOG10P);
+    ConstImageRef image = extract_box_reference(frame, box);
+    OCR::StringMatchResult result = IVCheckerReader::instance().read_substring(
+        logger, m_language, image,
+        {
+            {0xff000000, 0xff404040},
+            {0xff000000, 0xff606060},
+            {0xff000000, 0xff808080},
+        }
+    );
+    result.clear_beyond_log10p(IVCheckerReader::MAX_LOG10P);
     if (result.results.size() != 1){
         return IVCheckerValue::UnableToDetect;
     }

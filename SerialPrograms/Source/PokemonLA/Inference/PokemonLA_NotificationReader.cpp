@@ -38,6 +38,24 @@ NotificationOCR::NotificationOCR()
 {}
 
 
+OCR::StringMatchResult NotificationOCR::read_substring(
+    LoggerQt& logger,
+    Language language,
+    const ConstImageRef& image,
+    const std::vector<OCR::TextColorRange>& text_color_ranges,
+    double min_text_ratio, double max_text_ratio
+) const{
+    return match_substring_from_image_multifiltered(
+        &logger, language, image, text_color_ranges,
+        MAX_LOG10P, MAX_LOG10P_SPREAD,
+        min_text_ratio, max_text_ratio
+    );
+}
+
+
+
+
+
 
 NotificationReader::NotificationReader(LoggerQt& logger, Language language)
     : m_logger(logger)
@@ -70,11 +88,26 @@ Notification NotificationReader::detect(const QImage& screen) const{
     }
 
 
-//    image = image.convertToFormat(QImage::Format::Format_ARGB32);
-    QImage image_ocr((int)image.width(), (int)image.height(), QImage::Format_ARGB32);
-
 
     m_logger.log("NotificationReader: Possible text found (" + std::to_string(objects) + " objects). Attempting to read it...", COLOR_PURPLE);
+
+    OCR::StringMatchResult results = NotificationOCR::instance().read_substring(
+        m_logger, m_language, image,
+        {
+            {0xff808080, 0xffffffff},
+            {0xffa0a0a0, 0xffffffff},
+        }
+    );
+
+    if (results.results.empty()){
+        return Notification::NOTHING;
+    }
+
+
+#if 0
+
+//    image = image.convertToFormat(QImage::Format::Format_ARGB32);
+    QImage image_ocr((int)image.width(), (int)image.height(), QImage::Format_ARGB32);
 
     OCR::StringMatchResult results;
     bool good = false;
@@ -116,6 +149,7 @@ Notification NotificationReader::detect(const QImage& screen) const{
     if (!good){
         return Notification::NOTHING;
     }
+#endif
 
 //    cout << results.results.begin()->second.token << endl;
 

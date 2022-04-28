@@ -5,6 +5,7 @@
  */
 
 #include <QImage>
+#include "Common/Cpp/FixedLimitVector.tpp"
 #include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
 #include "CommonFramework/ImageTypes/ImageReference.h"
 #include "ImageFilter.h"
@@ -13,61 +14,77 @@ namespace PokemonAutomation{
 
 
 
-void filter_rgb32_range(QImage& image, uint32_t mins, uint32_t maxs, Color replace_with, bool invert){
+size_t filter_rgb32_range(QImage& image, uint32_t mins, uint32_t maxs, Color replace_with, bool invert){
     if (!(image.format() == QImage::Format_RGB32 || image.format() == QImage::Format_ARGB32)){
         image = image.convertToFormat(QImage::Format_RGB32);
     }
-    Kernels::filter_rgb32_range(
+    return Kernels::filter_rgb32_range(
         (uint32_t*)image.bits(), image.bytesPerLine(), image.width(), image.height(),
         (uint32_t*)image.bits(), image.bytesPerLine(), mins, maxs, (uint32_t)replace_with, invert
     );
 }
-
-void filter1_rgb32_range(
+std::vector<std::pair<QImage, size_t>> filter_rgb32_range(
     const ConstImageRef& image,
-    QImage& image0, uint32_t mins0, uint32_t maxs0, Color replace_with0, bool invert0
+    const std::vector<FilterRgb32Range>& filters
 ){
-    image0 = QImage((int)image.width(), (int)image.height(), QImage::Format_ARGB32);
-
+    std::vector<std::pair<QImage, size_t>> ret(filters.size());
+    FixedLimitVector<Kernels::FilterRgb32RangeFilter> subfilters(filters.size());
+    for (size_t c = 0; c < filters.size(); c++){
+        QImage& out = ret[c].first;
+        out = QImage((int)image.width(), (int)image.height(), QImage::Format_ARGB32);
+        subfilters.emplace_back(
+            (uint32_t*)out.bits(), out.bytesPerLine(),
+            filters[c].mins, filters[c].maxs, (uint32_t)filters[c].replace_with, filters[c].invert
+        );
+    }
     Kernels::filter_rgb32_range(
         image.data(), image.bytes_per_row(), image.width(), image.height(),
-        (uint32_t*)image0.bits(), image0.bytesPerLine(), mins0, maxs0, (uint32_t)replace_with0, invert0
+        subfilters.data(), subfilters.size()
     );
+    for (size_t c = 0; c < filters.size(); c++){
+        ret[c].second = subfilters[c].pixels_in_range;
+    }
+    return ret;
 }
-void filter2_rgb32_range(
-    const ConstImageRef& image,
-    QImage& image0, uint32_t mins0, uint32_t maxs0, Color replace_with0, bool invert0,
-    QImage& image1, uint32_t mins1, uint32_t maxs1, Color replace_with1, bool invert1
-){
-    image0 = QImage((int)image.width(), (int)image.height(), QImage::Format_ARGB32);
-    image1 = QImage((int)image.width(), (int)image.height(), QImage::Format_ARGB32);
 
-    Kernels::filter2_rgb32_range(
-        image.data(), image.bytes_per_row(), image.width(), image.height(),
-        (uint32_t*)image0.bits(), image0.bytesPerLine(), mins0, maxs0, (uint32_t)replace_with0, invert0,
-        (uint32_t*)image1.bits(), image1.bytesPerLine(), mins1, maxs1, (uint32_t)replace_with1, invert1
-    );
-}
-void filter4_rgb32_range(
-    const ConstImageRef& image,
-    QImage& image0, uint32_t mins0, uint32_t maxs0, Color replace_with0, bool invert0,
-    QImage& image1, uint32_t mins1, uint32_t maxs1, Color replace_with1, bool invert1,
-    QImage& image2, uint32_t mins2, uint32_t maxs2, Color replace_with2, bool invert2,
-    QImage& image3, uint32_t mins3, uint32_t maxs3, Color replace_with3, bool invert3
-){
-    image0 = QImage((int)image.width(), (int)image.height(), QImage::Format_ARGB32);
-    image1 = QImage((int)image.width(), (int)image.height(), QImage::Format_ARGB32);
-    image2 = QImage((int)image.width(), (int)image.height(), QImage::Format_ARGB32);
-    image3 = QImage((int)image.width(), (int)image.height(), QImage::Format_ARGB32);
 
-    Kernels::filter4_rgb32_range(
-        image.data(), image.bytes_per_row(), image.width(), image.height(),
-        (uint32_t*)image0.bits(), image0.bytesPerLine(), mins0, maxs0, (uint32_t)replace_with0, invert0,
-        (uint32_t*)image1.bits(), image1.bytesPerLine(), mins1, maxs1, (uint32_t)replace_with1, invert1,
-        (uint32_t*)image2.bits(), image2.bytesPerLine(), mins2, maxs2, (uint32_t)replace_with2, invert2,
-        (uint32_t*)image3.bits(), image3.bytesPerLine(), mins3, maxs3, (uint32_t)replace_with3, invert3
+
+
+
+
+size_t to_blackwhite_rgb32_range(QImage& image, uint32_t mins, uint32_t maxs, bool in_range_black){
+    if (!(image.format() == QImage::Format_RGB32 || image.format() == QImage::Format_ARGB32)){
+        image = image.convertToFormat(QImage::Format_RGB32);
+    }
+    return Kernels::to_blackwhite_rgb32_range(
+        (uint32_t*)image.bits(), image.bytesPerLine(), image.width(), image.height(),
+        (uint32_t*)image.bits(), image.bytesPerLine(), mins, maxs, in_range_black
     );
 }
+std::vector<std::pair<QImage, size_t>> to_blackwhite_rgb32_range(
+    const ConstImageRef& image,
+    const std::vector<BlackWhiteRgb32Range>& filters
+){
+    std::vector<std::pair<QImage, size_t>> ret(filters.size());
+    FixedLimitVector<Kernels::ToBlackWhiteRgb32RangeFilter> subfilters(filters.size());
+    for (size_t c = 0; c < filters.size(); c++){
+        QImage& out = ret[c].first;
+        out = QImage((int)image.width(), (int)image.height(), QImage::Format_ARGB32);
+        subfilters.emplace_back(
+            (uint32_t*)out.bits(), out.bytesPerLine(),
+            filters[c].mins, filters[c].maxs, (uint32_t)filters[c].in_range_black
+        );
+    }
+    Kernels::to_blackwhite_rgb32_range(
+        image.data(), image.bytes_per_row(), image.width(), image.height(),
+        subfilters.data(), subfilters.size()
+    );
+    for (size_t c = 0; c < filters.size(); c++){
+        ret[c].second = subfilters[c].pixels_in_range;
+    }
+    return ret;
+}
+
 
 
 

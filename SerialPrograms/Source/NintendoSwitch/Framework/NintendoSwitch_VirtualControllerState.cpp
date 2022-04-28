@@ -109,8 +109,8 @@ bool VirtualControllerState::to_state(ControllerState& state) const{
         int mag = std::abs(left_joystick_x) > std::abs(left_joystick_y)
             ? std::abs(left_joystick_x)
             : std::abs(left_joystick_y);
-        state.left_x = std::min(128 * left_joystick_x / mag + 128, 255);
-        state.left_y = std::min(128 * left_joystick_y / mag + 128, 255);
+        state.left_x = (uint8_t)std::min(128 * left_joystick_x / mag + 128, 255);
+        state.left_y = (uint8_t)std::min(128 * left_joystick_y / mag + 128, 255);
     }
 
     state.right_x = 128;
@@ -120,8 +120,8 @@ bool VirtualControllerState::to_state(ControllerState& state) const{
         int mag = std::abs(right_joystick_x) > std::abs(right_joystick_y)
             ? std::abs(right_joystick_x)
             : std::abs(right_joystick_y);
-        state.right_x = std::min(128 * right_joystick_x / mag + 128, 255);
-        state.right_y = std::min(128 * right_joystick_y / mag + 128, 255);
+        state.right_x = (uint8_t)std::min(128 * right_joystick_x / mag + 128, 255);
+        state.right_y = (uint8_t)std::min(128 * right_joystick_y / mag + 128, 255);
     }
 
     return neutral;

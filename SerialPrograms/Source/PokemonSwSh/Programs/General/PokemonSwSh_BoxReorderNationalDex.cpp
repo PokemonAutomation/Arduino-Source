@@ -81,10 +81,19 @@ namespace{
         QImage screen = console.video().snapshot();
         ConstImageRef frame = extract_box_reference(screen, box);
 
-        OCR::StringMatchResult result = Pokemon::PokemonNameReader::instance().read_substring(console, language, frame);
-        static constexpr double MAX_LOG10P = -1.40;
-        result.log(console, MAX_LOG10P);
-        assert(result.results.size() == 1);
+        OCR::StringMatchResult result = Pokemon::PokemonNameReader::instance().read_substring(
+            console, language, frame,
+            {
+                {0xff000000, 0xff404040},
+                {0xff000000, 0xff606060},
+                {0xff000000, 0xff808080},
+            }
+        );
+        result.log(console, Pokemon::PokemonNameReader::MAX_LOG10P);
+//        assert(result.results.size() == 1);
+        if (result.results.size() != 1){
+            return "";
+        }
         return result.results.begin()->second.token;
     }
 

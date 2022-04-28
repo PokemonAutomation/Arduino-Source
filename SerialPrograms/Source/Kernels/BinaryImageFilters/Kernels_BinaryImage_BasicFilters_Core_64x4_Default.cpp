@@ -25,10 +25,10 @@ void compress_rgb32_to_binary_range_64x4_Default(
 }
 void compress_rgb32_to_binary_range_64x4_Default(
     const uint32_t* image, size_t bytes_per_row,
-    CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
+    CompressRgb32ToBinaryRangeFilter* filters, size_t filter_count
 ){
     compress_rgb32_to_binary<PackedBinaryMatrix_64x4_Default, Compressor_RgbRange_Default>(
-        image, bytes_per_row, filter, filter_count
+        image, bytes_per_row, filters, filter_count
     );
 }
 

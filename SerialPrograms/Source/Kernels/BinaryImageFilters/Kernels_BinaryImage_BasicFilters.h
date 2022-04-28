@@ -22,7 +22,6 @@
 #ifndef PokemonAutomation_Kernels_BinaryImage_BasicFilters_H
 #define PokemonAutomation_Kernels_BinaryImage_BasicFilters_H
 
-//#include "Kernels/BinaryImage/Kernels_BinaryImage.h"
 #include "Kernels/BinaryMatrix/Kernels_BinaryMatrix.h"
 
 namespace PokemonAutomation{
@@ -36,6 +35,7 @@ void compress_rgb32_to_binary_range(
     const uint32_t* image, size_t bytes_per_row,
     PackedBinaryMatrix_IB& matrix0, uint32_t mins0, uint32_t maxs0
 );
+
 
 //  Same as above, but multiple filters.
 //  The purpose is to reduce passes over the entire image.
@@ -53,7 +53,7 @@ struct CompressRgb32ToBinaryRangeFilter{
 };
 void compress_rgb32_to_binary_range(
     const uint32_t* image, size_t bytes_per_row,
-    CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
+    CompressRgb32ToBinaryRangeFilter* filters, size_t filter_count
 );
 
 

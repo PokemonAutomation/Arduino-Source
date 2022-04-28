@@ -1,0 +1,44 @@
+/*  OCR Routines
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#ifndef PokemonAutomation_OCR_Routines_H
+#define PokemonAutomation_OCR_Routines_H
+
+#include <vector>
+#include "CommonFramework/Language.h"
+#include "CommonFramework/ImageTypes/ImageReference.h"
+
+namespace PokemonAutomation{
+namespace OCR{
+
+struct StringMatchResult;
+class DictionaryMatcher;
+
+
+
+struct TextColorRange{
+    uint32_t mins;
+    uint32_t maxs;
+
+    TextColorRange(uint32_t p_mins, uint32_t p_maxs)
+        : mins(p_mins)
+        , maxs(p_maxs)
+    {}
+};
+
+
+StringMatchResult multifiltered_OCR(
+    Language language, const DictionaryMatcher& dictionary, const ConstImageRef& image,
+    const std::vector<TextColorRange>& text_color_ranges,
+    double log10p_spread,
+    double min_text_ratio = 0.01, double max_text_ratio = 0.50
+);
+
+
+
+}
+}
+#endif

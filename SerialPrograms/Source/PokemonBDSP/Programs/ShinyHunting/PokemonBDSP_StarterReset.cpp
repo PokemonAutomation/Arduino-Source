@@ -5,10 +5,11 @@
  */
 
 #include "Common/Cpp/Exceptions.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/ImageMatchDetector.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Pokemon_Notification.h"

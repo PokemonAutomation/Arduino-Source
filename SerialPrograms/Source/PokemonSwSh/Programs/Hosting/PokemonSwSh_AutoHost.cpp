@@ -33,7 +33,7 @@ bool connect_to_internet(
     if (!host_online){
         return true;
     }
-    if (console.video().snapshot().isNull()){
+    if (console.video().snapshot().frame.isNull()){
         connect_to_internet(context, GameSettings::instance().OPEN_YCOMM_DELAY, connect_to_internet_delay);
         return true;
     }

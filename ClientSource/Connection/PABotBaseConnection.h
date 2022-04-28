@@ -26,6 +26,8 @@
 namespace PokemonAutomation{
 
 
+//  None the functions in this class are thread-safe. It is up to
+//  the child class to wrap and make them thread-safe.
 class PABotBaseConnection : public StreamListener{
 public:
     PABotBaseConnection(Logger& logger, std::unique_ptr<StreamConnection> connection);

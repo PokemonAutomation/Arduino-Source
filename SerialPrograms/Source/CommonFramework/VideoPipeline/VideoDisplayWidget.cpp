@@ -56,13 +56,13 @@ QSize VideoDisplayWidget::resolution() const{
     if (m_video == nullptr){
         return QSize();
     }
-    return m_video->resolution();
+    return m_video->current_resolution();
 }
 std::vector<QSize> VideoDisplayWidget::resolutions() const{
     if (m_video == nullptr){
         return {};
     }
-    return m_video->resolutions();
+    return m_video->supported_resolutions();
 }
 void VideoDisplayWidget::set_resolution(const QSize& resolution){
     if (m_video == nullptr){
@@ -71,14 +71,11 @@ void VideoDisplayWidget::set_resolution(const QSize& resolution){
     m_video->set_resolution(resolution);
     update_size();
 }
-QImage VideoDisplayWidget::snapshot(WallClock* timestamp){
+VideoSnapshot VideoDisplayWidget::snapshot(){
     if (m_video == nullptr){
-        if (timestamp){
-            timestamp[0] = current_time();
-        }
-        return QImage();
+        return VideoSnapshot{QImage(), current_time()};
     }
-    return m_video->snapshot(timestamp);
+    return m_video->snapshot();
 }
 
 
@@ -98,7 +95,7 @@ void VideoDisplayWidget::update_size(){
         return;
     }
     int width = this->width();
-    QSize resolution = m_video->resolution();
+    QSize resolution = m_video->current_resolution();
     int height = (int)(width * (double)resolution.height() / resolution.width());
     this->setFixedHeight(height);
     m_video->setFixedSize(this->size());

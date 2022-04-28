@@ -15,11 +15,10 @@ namespace NintendoSwitch{
 CommandRow::CommandRow(
     QWidget& parent,
     BotBaseHandle& botbase,
-    LoggerQt& logger,
     FeedbackType feedback, bool allow_commands_while_running
 )
     : QWidget(&parent)
-    , VirtualController(logger, botbase, allow_commands_while_running)
+    , VirtualController(botbase, allow_commands_while_running)
     , m_botbase(botbase)
     , m_allow_commands_while_running(allow_commands_while_running)
     , m_last_known_focus(false)

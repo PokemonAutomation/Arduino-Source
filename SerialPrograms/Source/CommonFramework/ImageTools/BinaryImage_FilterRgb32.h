@@ -50,6 +50,11 @@ PackedBinaryMatrix2 compress_rgb32_to_binary_range(
     const ConstImageRef& image,
     uint32_t mins, uint32_t maxs
 );
+
+
+
+//  Run multiple filters at once. This is more memory efficient than making
+//  multiple calls to one filter at a time.
 std::vector<PackedBinaryMatrix2> compress_rgb32_to_binary_range(
     const ConstImageRef& image,
     const std::vector<std::pair<uint32_t, uint32_t>>& filters

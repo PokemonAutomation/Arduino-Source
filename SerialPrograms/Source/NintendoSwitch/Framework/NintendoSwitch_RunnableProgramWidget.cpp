@@ -135,6 +135,7 @@ bool RunnableSwitchProgramWidget::request_program_stop(){
 //    if (!RunnablePanelWidget::request_program_stop()){
 //        return false;
 //    }
+//    while (true);
     ProgramState state = m_state.load(std::memory_order_acquire);
     if (m_setup){
         m_logger.log("Stopping serial connection...");

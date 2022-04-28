@@ -28,7 +28,7 @@ public:
 
 private:
     StringSelectOption& m_value;
-    QComboBox* m_box;
+    NoWheelComboBox* m_box;
 //    bool m_updating = false;
 };
 
@@ -135,6 +135,8 @@ StringSelectWidget::StringSelectWidget(QWidget& parent, StringSelectOption& valu
         m_box->addItem(item.second, item.first);
     }
     m_box->setCurrentIndex((int)m_value);
+    m_box->update_size_cache();
+
     layout->addWidget(m_box, 1);
 
     connect(

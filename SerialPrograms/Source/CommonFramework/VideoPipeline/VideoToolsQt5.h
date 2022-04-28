@@ -7,11 +7,19 @@
 #ifndef PokemonAutomation_VideoPipeline_VideoToolsQt5_H
 #define PokemonAutomation_VideoPipeline_VideoToolsQt5_H
 
+#include <vector>
 #include <QImage>
 #include <QVideoFrame>
 #include "Common/Cpp/AbstractLogger.h"
+#include "CameraInfo.h"
 
 namespace PokemonAutomation{
+
+
+std::vector<CameraInfo> qt5_get_all_cameras();
+QString qt5_get_camera_name(const CameraInfo& info);
+
+
 
 
 QImage frame_to_image(Logger& logger, QVideoFrame frame, bool flip_vertical);

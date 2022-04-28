@@ -14,6 +14,7 @@
 #include "CommonFramework/Options/Environment/ProcessPriorityOption.h"
 #include "CommonFramework/Options/Environment/ProcessorLevelOption.h"
 #include "CommonFramework/Options/Environment/ThemeSelectorOption.h"
+#include "CommonFramework/VideoPipeline/CameraImplementations.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "Integrations/DiscordSettingsOption.h"
 
@@ -67,19 +68,27 @@ public:
     BooleanCheckBoxOption SAVE_DEBUG_IMAGES;
     BooleanCheckBoxOption NAUGHTY_MODE;
 
-    BooleanCheckBoxOption ENABLE_FRAME_SCREENSHOTS;
-
-
-    ProcessorLevelOption PROCESSOR_LEVEL0;
-
 //    ProcessPriorityOption PROCESS_PRIORITY0;
     ThreadPriorityOption REALTIME_THREAD_PRIORITY0;
     ThreadPriorityOption INFERENCE_PRIORITY0;
     ThreadPriorityOption COMPUTE_PRIORITY0;
 
+    VideoBackendOption VIDEO_BACKEND;
+    BooleanCheckBoxOption ENABLE_FRAME_SCREENSHOTS;
+
+    ProcessorLevelOption PROCESSOR_LEVEL0;
+
     StringOption DEVELOPER_TOKEN;
 
-    bool DEVELOPER_MODE;
+    // Developer mode shows some additional test programs used
+    // for developing purposes.
+    bool DEVELOPER_MODE = false;
+
+    // The mode that does not run Qt GUI, but instead runs some tests for
+    // debugging, unit testing and developing purposes.
+    bool COMMAND_LINE_TEST_MODE = false;
+    // Which tests to run if in the command line test mode.
+    std::vector<std::string> COMMAND_LINE_TEST_LIST;
 };
 
 

@@ -10,6 +10,7 @@
 #include <map>
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Language.h"
+#include "OCR_Routines.h"
 #include "OCR_DictionaryOCR.h"
 
 namespace PokemonAutomation{
@@ -27,6 +28,15 @@ public:
     StringMatchResult match_substring(
         Language language,
         const QString& text, double log10p_spread = 0.50
+    ) const;
+
+    OCR::StringMatchResult match_substring_from_image_multifiltered(
+        LoggerQt* logger,
+        Language language,
+        const ConstImageRef& image,
+        const std::vector<OCR::TextColorRange>& text_color_ranges,
+        double max_log10p, double log10p_spread = 0.5,
+        double min_text_ratio = 0.01, double max_text_ratio = 0.50
     ) const;
 
 

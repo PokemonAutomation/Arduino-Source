@@ -6,7 +6,7 @@
 
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
-#include "CommonFramework/OCR/OCR_Filtering.h"
+#include "CommonFramework/ImageTools/ImageFilter.h"
 #include "CommonFramework/OCR/OCR_StringNormalization.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "PokemonSwSh_MaxLair_Detect_HPPP.h"
@@ -220,9 +220,18 @@ int8_t parse_pp(const std::string& str){
 }
 
 int8_t read_pp_text(LoggerQt& logger, const ConstImageRef& image){
+    if (image.width() == 0 || image.height() == 0){
+        return -1;
+    }
     QImage processed = image.to_qimage();
 
-    OCR::binary_filter_solid_background(processed);
+//    OCR::binary_filter_solid_background(processed);
+    size_t text_pixels = to_blackwhite_rgb32_range(processed, 0xff000000, 0xff404040, false);
+    double text_ratio = 1.0 - (double)text_pixels / (image.width() * image.height());
+    if (text_ratio < 0.05 || text_ratio > 0.50){
+        logger.log("OCR Result: Invalid text ratio.", COLOR_RED);
+        return -1;
+    }
 
     QString ocr_text = OCR::ocr_read(Language::English, processed);
 

@@ -181,11 +181,11 @@ SOURCES += \
     Source/CommonFramework/Notifications/SenderNotificationTable.cpp \
     Source/CommonFramework/OCR/OCR_DictionaryMatcher.cpp \
     Source/CommonFramework/OCR/OCR_DictionaryOCR.cpp \
-    Source/CommonFramework/OCR/OCR_Filtering.cpp \
     Source/CommonFramework/OCR/OCR_LanguageOptionOCR.cpp \
     Source/CommonFramework/OCR/OCR_LargeDictionaryMatcher.cpp \
     Source/CommonFramework/OCR/OCR_NumberReader.cpp \
     Source/CommonFramework/OCR/OCR_RawOCR.cpp \
+    Source/CommonFramework/OCR/OCR_Routines.cpp \
     Source/CommonFramework/OCR/OCR_SmallDictionaryMatcher.cpp \
     Source/CommonFramework/OCR/OCR_StringMatchResult.cpp \
     Source/CommonFramework/OCR/OCR_StringNormalization.cpp \
@@ -234,6 +234,7 @@ SOURCES += \
     Source/CommonFramework/VideoPipeline/CameraSelector.cpp \
     Source/CommonFramework/VideoPipeline/CameraSelectorWidget.cpp \
     Source/CommonFramework/VideoPipeline/CameraWidgetQt5.cpp \
+    Source/CommonFramework/VideoPipeline/CameraWidgetQt5v2.cpp \
     Source/CommonFramework/VideoPipeline/CameraWidgetQt6.cpp \
     Source/CommonFramework/VideoPipeline/VideoDisplayWidget.cpp \
     Source/CommonFramework/VideoPipeline/VideoOverlayWidget.cpp \
@@ -664,7 +665,10 @@ SOURCES += \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.cpp \
-    Source/PokemonSwSh/ShinyHuntTracker.cpp
+    Source/PokemonSwSh/ShinyHuntTracker.cpp \
+    Source/Tests/CommandLineTests.cpp \
+    Source/Tests/PokemonLA_Tests.cpp \
+    Source/Tests/TestMap.cpp
 
 HEADERS += \
     ../ClientSource/Connection/BotBase.h \
@@ -821,11 +825,11 @@ HEADERS += \
     Source/CommonFramework/Notifications/SenderNotificationTable.h \
     Source/CommonFramework/OCR/OCR_DictionaryMatcher.h \
     Source/CommonFramework/OCR/OCR_DictionaryOCR.h \
-    Source/CommonFramework/OCR/OCR_Filtering.h \
     Source/CommonFramework/OCR/OCR_LanguageOptionOCR.h \
     Source/CommonFramework/OCR/OCR_LargeDictionaryMatcher.h \
     Source/CommonFramework/OCR/OCR_NumberReader.h \
     Source/CommonFramework/OCR/OCR_RawOCR.h \
+    Source/CommonFramework/OCR/OCR_Routines.h \
     Source/CommonFramework/OCR/OCR_SmallDictionaryMatcher.h \
     Source/CommonFramework/OCR/OCR_StringMatchResult.h \
     Source/CommonFramework/OCR/OCR_StringNormalization.h \
@@ -878,6 +882,7 @@ HEADERS += \
     Source/CommonFramework/VideoPipeline/CameraSelector.h \
     Source/CommonFramework/VideoPipeline/CameraSelectorWidget.h \
     Source/CommonFramework/VideoPipeline/CameraWidgetQt5.h \
+    Source/CommonFramework/VideoPipeline/CameraWidgetQt5v2.h \
     Source/CommonFramework/VideoPipeline/CameraWidgetQt6.h \
     Source/CommonFramework/VideoPipeline/VideoDisplayWidget.h \
     Source/CommonFramework/VideoPipeline/VideoFeed.h \
@@ -1353,7 +1358,11 @@ HEADERS += \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokemonSprites.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeMatchup.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.h \
-    Source/PokemonSwSh/ShinyHuntTracker.h
+    Source/PokemonSwSh/ShinyHuntTracker.h \
+    Source/Tests/CommandLineTests.h \
+    Source/Tests/PokemonLA_Tests.h \
+    Source/Tests/TestMap.h \
+    Source/Tests/TestUtils.h
 
 # Default rules for deployment.
 qnx: target.path = /tmp/$${TARGET}/bin
