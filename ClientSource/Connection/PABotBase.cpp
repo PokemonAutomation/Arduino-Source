@@ -73,18 +73,20 @@ void PABotBase::stop(){
     }
     m_retransmit_thread.join();
 
-    SpinLockGuard lg(m_state_lock, "PABotBase::stop()");
+    {
+        SpinLockGuard lg(m_state_lock, "PABotBase::stop()");
 
-    //  Send a stop request, but don't wait for a response that we may never
-    //  receive.
-    pabb_MsgRequestStop params;
-    uint64_t seqnum = m_send_seq;
-    seqnum_t seqnum_s = (seqnum_t)seqnum;
-    memcpy(&params, &seqnum_s, sizeof(seqnum_t));
-//    try_issue_request<PABB_MSG_REQUEST_STOP>(params);
-//    m_state.store(State::STOPPING, std::memory_order_release);
-    BotBaseMessage stop_request(PABB_MSG_REQUEST_STOP, std::string((char*)&params, sizeof(params)));
-    send_message(stop_request, false);
+        //  Send a stop request, but don't wait for a response that we may never
+        //  receive.
+        pabb_MsgRequestStop params;
+        uint64_t seqnum = m_send_seq;
+        seqnum_t seqnum_s = (seqnum_t)seqnum;
+        memcpy(&params, &seqnum_s, sizeof(seqnum_t));
+//        try_issue_request<PABB_MSG_REQUEST_STOP>(params);
+//        m_state.store(State::STOPPING, std::memory_order_release);
+        BotBaseMessage stop_request(PABB_MSG_REQUEST_STOP, std::string((char*)&params, sizeof(params)));
+        send_message(stop_request, false);
+    }
 
     //  Must call this to stop the receiver thread from making any more async
     //  calls into this class which touch its fields.
