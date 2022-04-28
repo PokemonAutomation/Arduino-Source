@@ -14,6 +14,9 @@
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/ImageTools/ImageBoxes.h"
+#include "CommonFramework/ImageTools/ImageFilter.h"
+#include "CommonFramework/OCR/OCR_RawOCR.h"
+#include "CommonFramework/OCR/OCR_Routines.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h"
 #include "PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h"
 #include "CommonFramework/ImageMatch/ExactImageMatcher.h"
@@ -34,7 +37,6 @@
 #include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
-#include "CommonFramework/OCR/OCR_Filtering.h"
 #include "PokemonSwSh/Inference/PokemonSwSh_SelectionArrowFinder.h"
 #include "Common/Cpp/AlignedVector.tpp"
 #include "CommonFramework/AudioPipeline/TimeSampleWriter.h"
@@ -47,6 +49,7 @@
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "Common/Cpp/PeriodicScheduler.h"
+#include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
 
 //#include "Kernels/Kernels_x64_AVX2.h"
 //#include "Kernels/Kernels_x64_AVX512.h"
@@ -54,6 +57,7 @@
 //#include "Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h"
 
 #include <QMessageBox>
+
 
 
 #include <iostream>
@@ -123,31 +127,16 @@ void print_8x64(__m512i m){
 }
 
 
+namespace OCR{
 
 
 
-#if 0
-class ScheduledPrinter : public PeriodicRunner{
-public:
-    virtual ~ScheduledPrinter(){
-        PeriodicRunner::cancel(nullptr);
-        stop_thread();
-    }
-    bool add_event(std::function<void()>& event, std::chrono::milliseconds period){
-        return PeriodicRunner::add_event(&event, period);
-    }
-    void remove_event(std::function<void()>& event){
-        PeriodicRunner::remove_event(&event);
-    }
-    virtual void run(void* event) override{
-        cout << current_time_to_str() << ": ";
-        (*(std::function<void()>*)event)();
-    }
 
-protected:
-    using PeriodicRunner::PeriodicRunner;
-};
-#endif
+
+
+
+}
+
 
 
 
@@ -156,6 +145,86 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Kernels;
     using namespace NintendoSwitch::PokemonLA;
     using namespace Pokemon;
+
+
+    PokemonNameReader::instance().match_substring_from_image_multifiltered(
+        &env.logger(),
+        Language::English,
+        QImage("C:\\Users\\Ayase\\Desktop\\PA-Repository\\TrainingData\\PokemonNameOCR\\PokemonNameOCR (Kim-SwShPokedex-0)\\jpn\\cleffa-20210618-200715.png"),
+        {
+            {0xff000000, 0xff404040},
+            {0xff000000, 0xff606060},
+            {0xff000000, 0xff808080},
+            {0xff000000, 0xffa0a0a0},
+        },
+        PokemonNameReader::MAX_LOG10P, PokemonNameReader::MAX_LOG10P_SPREAD
+    );
+
+
+
+
+
+#if 0
+    QImage image("20220301-205136873076.jpg");
+
+    ImageFloatBox box(0.050, 0.177, 0.200, 0.038);
+
+    OCR::StringMatchResult result = OCR::multifiltered_OCR(
+        Language::English, Pokemon::PokemonNameReader::instance(), extract_box_reference(image, box),
+        {
+            {0xff808080, 0xffffffff},
+            {0xff909090, 0xffffffff},
+        },
+        1.0
+    );
+    result.log(env.logger(), -5);
+#endif
+
+
+#if 0
+    QImage image("20220301-205136873076.jpg");
+
+    auto ret = filter_rgb32_range(
+        image,
+        {
+            {0xff808080, 0xffffffff, Color(0xff000000), false},
+            {0xff909090, 0xffffffff, Color(0xff000000), false},
+            {0xffa0a0a0, 0xffffffff, Color(0xff000000), false},
+            {0xffb0b0b0, 0xffffffff, Color(0xff000000), false},
+        }
+    );
+    cout << ret[0].second << endl;
+    cout << ret[1].second << endl;
+    cout << ret[2].second << endl;
+    cout << ret[3].second << endl;
+
+//    ret[0].first.save("test0.png");
+//    ret[1].first.save("test1.png");
+//    ret[2].first.save("test2.png");
+//    ret[3].first.save("test3.png");
+
+//    cout << to_blackwhite_rgb32_range(image, 0xff808080, 0xffffffff, false) << endl;
+//    image.save("test0.png");
+
+    auto ret1 = filter_rgb32_range(
+        image,
+        {
+            {0xff808080, 0xffffffff, false},
+            {0xff909090, 0xffffffff, false},
+            {0xffa0a0a0, 0xffffffff, false},
+            {0xffb0b0b0, 0xffffffff, false},
+        }
+    );
+    cout << ret1[0].second << endl;
+    cout << ret1[1].second << endl;
+    cout << ret1[2].second << endl;
+    cout << ret1[3].second << endl;
+    ret1[0].first.save("test0.png");
+    ret1[1].first.save("test1.png");
+    ret1[2].first.save("test2.png");
+    ret1[3].first.save("test3.png");
+
+#endif
 
 
 //    throw InternalProgramError(nullptr, "asdf", "qwer");
@@ -842,34 +911,6 @@ void print(const uint64_t* ptr, size_t len){
 
 
 
-std::set<std::string> read_name(
-    LoggerQt& logger,
-    Language language,
-    const QImage& screen, const ImageFloatBox& box
-){
-    if (language == Language::None){
-        return {};
-    }
-
-    QImage image = extract_box_copy(screen, box);
-    OCR::filter_smart(image);
-
-    std::set<std::string> ret;
-
-    OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(logger, language, image);
-    if (result.results.empty()){
-//        dump_image(
-//            logger, ProgramInfo(),
-//            QString::fromStdString("NameOCR-" + language_data(language).code),
-//            screen
-//        );
-    }else{
-        for (const auto& item : result.results){
-            ret.insert(item.second.token);
-        }
-    }
-    return ret;
-}
 
 
 

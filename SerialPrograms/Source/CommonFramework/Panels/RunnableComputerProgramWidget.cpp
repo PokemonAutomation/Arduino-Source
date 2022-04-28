@@ -11,11 +11,18 @@
 #include "CommonFramework/Tools/ProgramEnvironment.h"
 #include "RunnableComputerProgramWidget.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 
 
 
 RunnableComputerProgramWidget::~RunnableComputerProgramWidget(){
+    if (m_scope){
+        m_scope->cancel(std::make_exception_ptr(ProgramCancelledException()));
+    }
     join_program_thread();
 }
 

@@ -8,6 +8,8 @@
 #include "ClientSource/Libraries/Logging.h"
 #include "LoggerQt.h"
 
+#include <iostream>
+
 namespace PokemonAutomation{
 
 
@@ -59,6 +61,35 @@ QString combine_string(const char* a, const QString& b){
 }
 
 
+
+class CommandLineLogger : public LoggerQt{
+public:
+    CommandLineLogger(LoggerQt& logger)
+    : m_logger(logger) {}
+
+    virtual void log(const char* msg, Color color = Color()) override{
+        m_logger.log(msg, color);
+        std::cout << msg << std::endl;
+    }
+
+    virtual void log(const std::string& msg, Color color = Color()) override{
+        log(msg.c_str(), color);
+    }
+
+    virtual void log(const QString& msg, Color color = Color()) override{
+        log(msg.toStdString(), color);
+    }
+
+private:
+    LoggerQt& m_logger;
+    std::string m_tag;
+};
+
+
+LoggerQt& global_logger_command_line(){
+    static CommandLineLogger logger(global_logger_raw());
+    return logger;
+}
 
 
 }

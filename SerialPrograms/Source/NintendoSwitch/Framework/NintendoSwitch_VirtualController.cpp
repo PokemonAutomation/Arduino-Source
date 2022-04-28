@@ -34,6 +34,7 @@ void KeyboardDebouncer::add_event(bool press, VirtualControllerState state){
         }
     }
     m_history.emplace_back(Entry{now, press, state});
+//    cout << "add event" << endl;
 }
 WallClock KeyboardDebouncer::get_current_state(VirtualControllerState& state){
     WallClock now = current_time();
@@ -72,6 +73,7 @@ WallClock KeyboardDebouncer::get_current_state(VirtualControllerState& state){
 
     //  Clear the history that we don't need anymore.
     m_history.erase(m_history.begin(), iter);
+//    cout << "remove event: " << m_history.size() << endl;
 
     state = m_last;
     return m_history.empty()
@@ -84,12 +86,11 @@ WallClock KeyboardDebouncer::get_current_state(VirtualControllerState& state){
 
 
 VirtualController::VirtualController(
-    LoggerQt& logger,
     BotBaseHandle& botbase,
     bool allow_commands_while_running
 )
-    : m_logger(logger)
-    , m_botbase(botbase)
+    // : m_logger(logger)
+    : m_botbase(botbase)
     , m_allow_commands_while_running(allow_commands_while_running)
     , m_last_known_state(ProgramState::STOPPED)
     , m_stop(false)
@@ -189,6 +190,7 @@ void VirtualController::thread_loop(){
                 //  Convert the state.
                 ControllerState state;
                 bool neutral = current.to_state(state);
+//                cout << "neutral = " << neutral << endl;
 
                 //  If state is neutral, just issue a stop.
                 if (neutral){
@@ -234,10 +236,14 @@ void VirtualController::thread_loop(){
         if (m_stop.load(std::memory_order_acquire)){
             return;
         }
-        if (next_wake == WallClock::max()){
+
+        //  Nothing held down.
+        if (last_neutral && next_wake == WallClock::max()){
+//            cout << "wait - long" << endl;
             m_cv.wait(lg);
-        }else if (now <= next_wake){
-            m_cv.wait_until(lg, next_wake);
+        }else{
+//            cout << "wait - short" << endl;
+            m_cv.wait_until(lg, std::min(next_wake, now + std::chrono::milliseconds(1000)));
         }
     }
 }

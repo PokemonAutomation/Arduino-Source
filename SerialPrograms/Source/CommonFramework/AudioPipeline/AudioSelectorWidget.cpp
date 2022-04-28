@@ -53,29 +53,29 @@ AudioSelectorWidget::AudioSelectorWidget(
         row0->setContentsMargins(0, 0, 0, 0);
         vbox->addLayout(row0);
 
-        row0->addWidget(new QLabel("<b>Audio Input:</b>", this), 1);
+        row0->addWidget(new QLabel("<b>Audio Input:</b>", this), 2);
         row0->addSpacing(5);
 
         QHBoxLayout* input_layout = new QHBoxLayout();
-        row0->addLayout(input_layout, 5);
+        row0->addLayout(input_layout, 10);
 
         if (GlobalSettings::instance().DEVELOPER_MODE){
             m_audio_input_box = new NoWheelComboBox(this);
-            input_layout->addWidget(m_audio_input_box, 3);
+            input_layout->addWidget(m_audio_input_box, 7);
             m_load_file_button = new QPushButton("Load File", this);
-            input_layout->addWidget(m_load_file_button, 2);
+            input_layout->addWidget(m_load_file_button, 3);
         }else{
             m_audio_input_box = new NoWheelComboBox(this);
-            input_layout->addWidget(m_audio_input_box, 5);
+            input_layout->addWidget(m_audio_input_box, 10);
         }
         row0->addSpacing(5);
 
         m_audio_format_box = new NoWheelComboBox(this);
-        row0->addWidget(m_audio_format_box, 3);
+        row0->addWidget(m_audio_format_box, 6);
         row0->addSpacing(5);
 
         m_reset_button = new QPushButton("Reset Audio", this);
-        row0->addWidget(m_reset_button, 1);
+        row0->addWidget(m_reset_button, 2);
     }
 
     {
@@ -83,19 +83,19 @@ AudioSelectorWidget::AudioSelectorWidget(
         row1->setContentsMargins(0, 0, 0, 0);
         vbox->addLayout(row1);
 
-        row1->addWidget(new QLabel("<b>Audio Output:</b>", this), 1);
+        row1->addWidget(new QLabel("<b>Audio Output:</b>", this), 2);
         row1->addSpacing(5);
 
         QHBoxLayout* output_layout = new QHBoxLayout();
-        row1->addLayout(output_layout, 5);
+        row1->addLayout(output_layout, 10);
         if (GlobalSettings::instance().DEVELOPER_MODE){
             m_audio_output_box = new NoWheelComboBox(this);
-            output_layout->addWidget(m_audio_output_box, 3);
+            output_layout->addWidget(m_audio_output_box, 7);
             m_record_button = new QPushButton("Record Frequencies", this);
-            output_layout->addWidget(m_record_button, 2);
+            output_layout->addWidget(m_record_button, 3);
         }else{
             m_audio_output_box = new NoWheelComboBox(this);
-            output_layout->addWidget(m_audio_output_box, 5);
+            output_layout->addWidget(m_audio_output_box, 10);
         }
         row1->addSpacing(5);
 
@@ -104,14 +104,14 @@ AudioSelectorWidget::AudioSelectorWidget(
         m_volume_slider->setTickInterval(10);
         m_volume_slider->setMinimumWidth(40);
         m_volume_slider->setTickPosition(QSlider::TicksBothSides);
-        row1->addWidget(m_volume_slider, 2);
+        row1->addWidget(m_volume_slider, 4);
         row1->addSpacing(5);
 
         m_audio_vis_box = new NoWheelComboBox(this);
         m_audio_vis_box->addItem("No Display");
         m_audio_vis_box->addItem("Spectrum");
         m_audio_vis_box->addItem("Spectrogram");
-        row1->addWidget(m_audio_vis_box, 2);
+        row1->addWidget(m_audio_vis_box, 4);
     }
 
     refresh();

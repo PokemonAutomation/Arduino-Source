@@ -8,11 +8,29 @@
 #if QT_VERSION_MAJOR == 5
 
 #include <sstream>
+#include <QCameraInfo>
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "VideoToolsQt5.h"
 
 namespace PokemonAutomation{
+
+
+
+std::vector<CameraInfo> qt5_get_all_cameras(){
+    QList<QCameraInfo> cameras = QCameraInfo::availableCameras();
+    std::vector<CameraInfo> ret;
+    for (const QCameraInfo& info : cameras){
+        ret.emplace_back(info.deviceName().toStdString());
+    }
+    return ret;
+}
+
+QString qt5_get_camera_name(const CameraInfo& info){
+    QCameraInfo qinfo(info.device_name().c_str());
+    return qinfo.description();
+}
+
 
 
 

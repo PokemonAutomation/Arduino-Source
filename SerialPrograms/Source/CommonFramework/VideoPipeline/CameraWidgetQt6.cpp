@@ -19,10 +19,11 @@ using std::cout;
 using std::endl;
 
 namespace PokemonAutomation{
-namespace CameraQt6{
+namespace CameraQt6QVideoSink{
 
 
-std::vector<CameraInfo> qt6_get_all_cameras(){
+
+std::vector<CameraInfo> CameraBackend::get_all_cameras() const{
     std::vector<CameraInfo> ret;
     const auto cameras = QMediaDevices::videoInputs();
     for (const auto& info : cameras){
@@ -30,8 +31,7 @@ std::vector<CameraInfo> qt6_get_all_cameras(){
     }
     return ret;
 }
-
-QString qt6_get_camera_name(const CameraInfo& info){
+QString CameraBackend::get_camera_name(const CameraInfo& info) const{
     const auto cameras = QMediaDevices::videoInputs();
     for (const auto& camera : cameras){
         if (camera.id().toStdString() == info.device_name()){
@@ -41,19 +41,30 @@ QString qt6_get_camera_name(const CameraInfo& info){
     std::cout << "Error: no such camera for CameraInfo: " << info.device_name() << std::endl;
     return "";
 }
+PokemonAutomation::VideoWidget* CameraBackend::make_video_widget(
+    QWidget& parent,
+    LoggerQt& logger,
+    const CameraInfo& info,
+    const QSize& desired_resolution
+) const{
+    return new VideoWidget(&parent, logger, info, desired_resolution);
+}
 
 
-Qt6VideoWidget::Qt6VideoWidget(
+
+
+VideoWidget::VideoWidget(
     QWidget* parent,
     Logger& logger,
     const CameraInfo& info, const QSize& desired_resolution
 )
-    : VideoWidget(parent)
+    : PokemonAutomation::VideoWidget(parent)
     , m_logger(logger)
     , m_last_frame_seqnum(0)
     , m_last_image_timestamp(WallClock::min())
     , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
 {
+    logger.log("Constructing VideoWidget: Backend = CameraQt6QVideoSink");
     if (!info){
         return;
     }
@@ -68,7 +79,7 @@ Qt6VideoWidget::Qt6VideoWidget(
         }
     }
     if (foundInfo == false){
-        std::cout << "Cannot build Qt6VideoWidget: wrong camera device name: " << info.device_name() << std::endl;
+        std::cout << "Cannot build VideoWidget: wrong camera device name: " << info.device_name() << std::endl;
         return;
     }
 
@@ -84,18 +95,19 @@ Qt6VideoWidget::Qt6VideoWidget(
     m_videoSink = new QVideoSink(this);
     m_captureSession.setVideoOutput(m_videoSink);
 
-    connect(m_videoSink, &QVideoSink::videoFrameChanged, this, [&](const QVideoFrame& frame){
-        {
-            auto timestamp = current_time();
-            SpinLockGuard lg(m_frame_lock);
-            m_last_frame = frame;
-            m_last_frame_timestamp = timestamp;
-            uint64_t seqnum = m_last_frame_seqnum.load(std::memory_order_acquire);
-            m_last_frame_seqnum.store(seqnum + 1, std::memory_order_release);
-//            m_last_frame_seqnum++;
+    connect(
+        m_videoSink, &QVideoSink::videoFrameChanged,
+        this, [&](const QVideoFrame& frame){
+            {
+                WallClock now = current_time();
+                SpinLockGuard lg(m_frame_lock);
+                m_last_frame = frame;
+                m_last_frame_timestamp = now;
+                m_last_frame_seqnum++;
+            }
+            this->update();
         }
-        this->update();
-    });
+    );
 
     const QList<QCameraFormat> formats = m_info.videoFormats();
     // Filter out additional formats that have the same resolutions:
@@ -128,9 +140,9 @@ Qt6VideoWidget::Qt6VideoWidget(
 
     m_camera->start();
 }
-Qt6VideoWidget::~Qt6VideoWidget(){}
+VideoWidget::~VideoWidget(){}
 
-QSize Qt6VideoWidget::resolution() const{
+QSize VideoWidget::current_resolution() const{
     std::lock_guard<std::mutex> lg(m_lock);
     if (m_camera == nullptr){
         return QSize();
@@ -138,11 +150,11 @@ QSize Qt6VideoWidget::resolution() const{
     return m_camera->cameraFormat().resolution();
 }
 
-std::vector<QSize> Qt6VideoWidget::resolutions() const{
+std::vector<QSize> VideoWidget::supported_resolutions() const{
     return m_resolutions;
 }
 
-void Qt6VideoWidget::set_resolution(const QSize& size){
+void VideoWidget::set_resolution(const QSize& size){
     std::lock_guard<std::mutex> lg(m_lock);
     {
         const auto format = m_camera->cameraFormat();
@@ -163,62 +175,48 @@ void Qt6VideoWidget::set_resolution(const QSize& size){
     }
 }
 
-QImage Qt6VideoWidget::snapshot(WallClock* timestamp){
+VideoSnapshot VideoWidget::snapshot(){
     //  Prevent multiple concurrent screenshots from entering here.
-    std::lock_guard<std::mutex> lg(m_image_lock);
+    std::lock_guard<std::mutex> lg(m_lock);
 
-    //  Image is already cached and not stale. Return it.
-    uint64_t seqnum = m_last_frame_seqnum.load(std::memory_order_acquire);
-    if (m_last_image_seqnum == seqnum && !m_last_image.isNull()){
-        if (timestamp){
-            timestamp[0] = m_last_image_timestamp;
+    if (m_camera == nullptr){
+        return VideoSnapshot{QImage(), current_time()};
+    }
+
+    //  Frame is already cached and is not stale.
+    QVideoFrame frame;
+    WallClock frame_timestamp;
+    uint64_t frame_seqnum;
+    {
+        SpinLockGuard lg0(m_frame_lock);
+        frame_seqnum = m_last_frame_seqnum;
+        if (!m_last_image.isNull() && m_last_image_seqnum == frame_seqnum){
+            return VideoSnapshot{m_last_image, m_last_image_timestamp};
         }
-        return m_last_image;
+        frame = m_last_frame;
+        frame_timestamp = m_last_frame_timestamp;
     }
 
     WallClock time0 = current_time();
 
-    //  Need to update image. Grab the current frame.
-    QVideoFrame frame;
-    WallClock tick;
-    {
-        SpinLockGuard lg1(m_frame_lock);
-        frame = m_last_frame;   // Fast due to ref-count.
-        tick = m_last_frame_timestamp;
-    }
-
-    //  Now make the image.
-    if (!frame.isValid()){
-        if (timestamp){
-            timestamp[0] = current_time();
-        }
-        return QImage();
-    }
-
-    // auto time1 = current_time();
-    //  Convert image and cache it.
     QImage image = frame.toImage();
-    // auto time2 = current_time();
-    // std::chrono::duration<double> elapsed_seconds = time2 - time1;
-    // std::cout << "snapshot image conversion time " << elapsed_seconds.count() << "s" << std::endl;
-    // std::cout << "QVideoFrame pixel format " << int(frame.pixelFormat()) << std::endl;
     QImage::Format format = image.format();
     if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
         image = image.convertToFormat(QImage::Format_ARGB32);
     }
-    m_last_image_seqnum = seqnum;
+
     m_last_image = std::move(image);
-    m_last_image_timestamp = tick;
-    if (timestamp){
-        timestamp[0] = m_last_image_timestamp;
-    }
+    m_last_image_timestamp = frame_timestamp;
+    m_last_image_seqnum = frame_seqnum;
+
     WallClock time1 = current_time();
     m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count());
-    return m_last_image;
+
+    return VideoSnapshot{m_last_image, m_last_image_timestamp};
 }
 
 
-void Qt6VideoWidget::resizeEvent(QResizeEvent* event){
+void VideoWidget::resizeEvent(QResizeEvent* event){
     QWidget::resizeEvent(event);
     if (m_camera == nullptr){
         return;
@@ -237,7 +235,7 @@ void Qt6VideoWidget::resizeEvent(QResizeEvent* event){
     this->setFixedSize(this->size());
 }
 
-void Qt6VideoWidget::paintEvent(QPaintEvent* event){
+void VideoWidget::paintEvent(QPaintEvent* event){
     // std::cout << "paintEvent start" << std::endl;
     QWidget::paintEvent(event);
 

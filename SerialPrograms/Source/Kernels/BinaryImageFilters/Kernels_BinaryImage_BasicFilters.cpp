@@ -22,7 +22,7 @@ void compress_rgb32_to_binary_range_64x4_Default(
 );
 void compress_rgb32_to_binary_range_64x4_Default(
     const uint32_t* image, size_t bytes_per_row,
-    CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
+    CompressRgb32ToBinaryRangeFilter* filters, size_t filter_count
 );
 
 void compress_rgb32_to_binary_range_64x8_x64_SSE42(
@@ -31,7 +31,7 @@ void compress_rgb32_to_binary_range_64x8_x64_SSE42(
 );
 void compress_rgb32_to_binary_range_64x8_x64_SSE42(
     const uint32_t* image, size_t bytes_per_row,
-    CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
+    CompressRgb32ToBinaryRangeFilter* filters, size_t filter_count
 );
 
 void compress_rgb32_to_binary_range_64x16_x64_AVX2(
@@ -40,7 +40,7 @@ void compress_rgb32_to_binary_range_64x16_x64_AVX2(
 );
 void compress_rgb32_to_binary_range_64x16_x64_AVX2(
     const uint32_t* image, size_t bytes_per_row,
-    CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
+    CompressRgb32ToBinaryRangeFilter* filters, size_t filter_count
 );
 
 void compress_rgb32_to_binary_range_64x32_x64_AVX512(
@@ -49,7 +49,7 @@ void compress_rgb32_to_binary_range_64x32_x64_AVX512(
 );
 void compress_rgb32_to_binary_range_64x32_x64_AVX512(
     const uint32_t* image, size_t bytes_per_row,
-    CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
+    CompressRgb32ToBinaryRangeFilter* filters, size_t filter_count
 );
 
 void compress_rgb32_to_binary_range_64x64_x64_AVX512(
@@ -58,7 +58,7 @@ void compress_rgb32_to_binary_range_64x64_x64_AVX512(
 );
 void compress_rgb32_to_binary_range_64x64_x64_AVX512(
     const uint32_t* image, size_t bytes_per_row,
-    CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
+    CompressRgb32ToBinaryRangeFilter* filters, size_t filter_count
 );
 
 void compress_rgb32_to_binary_range(
@@ -93,38 +93,38 @@ void compress_rgb32_to_binary_range(
 }
 void compress_rgb32_to_binary_range(
     const uint32_t* image, size_t bytes_per_row,
-    CompressRgb32ToBinaryRangeFilter* filter, size_t filter_count
+    CompressRgb32ToBinaryRangeFilter* filters, size_t filter_count
 ){
     if (filter_count == 0){
         return;
     }
-    BinaryMatrixType type = filter[0].matrix.type();
+    BinaryMatrixType type = filters[0].matrix.type();
     for (size_t c = 1; c < filter_count; c++){
-        if (type != filter[c].matrix.type()){
+        if (type != filters[c].matrix.type()){
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching matrix formats.");
         }
     }
     switch (type){
 #ifdef PA_AutoDispatch_17_Skylake
     case BinaryMatrixType::i64x64_AVX512:
-        compress_rgb32_to_binary_range_64x64_x64_AVX512(image, bytes_per_row, filter, filter_count);
+        compress_rgb32_to_binary_range_64x64_x64_AVX512(image, bytes_per_row, filters, filter_count);
         return;
     case BinaryMatrixType::i64x32_AVX512:
-        compress_rgb32_to_binary_range_64x32_x64_AVX512(image, bytes_per_row, filter, filter_count);
+        compress_rgb32_to_binary_range_64x32_x64_AVX512(image, bytes_per_row, filters, filter_count);
         return;
 #endif
 #ifdef PA_AutoDispatch_13_Haswell
     case BinaryMatrixType::i64x16_AVX2:
-        compress_rgb32_to_binary_range_64x16_x64_AVX2(image, bytes_per_row, filter, filter_count);
+        compress_rgb32_to_binary_range_64x16_x64_AVX2(image, bytes_per_row, filters, filter_count);
         return;
 #endif
 #ifdef PA_AutoDispatch_08_Nehalem
     case BinaryMatrixType::i64x8_SSE42:
-        compress_rgb32_to_binary_range_64x8_x64_SSE42(image, bytes_per_row, filter, filter_count);
+        compress_rgb32_to_binary_range_64x8_x64_SSE42(image, bytes_per_row, filters, filter_count);
         return;
 #endif
     case BinaryMatrixType::i64x4_Default:
-        compress_rgb32_to_binary_range_64x4_Default(image, bytes_per_row, filter, filter_count);
+        compress_rgb32_to_binary_range_64x4_Default(image, bytes_per_row, filters, filter_count);
         return;
     default:
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Unsupported matrix format.");

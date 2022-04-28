@@ -10,7 +10,6 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
 #include "CommonFramework/OCR/OCR_RawOCR.h"
-#include "CommonFramework/OCR/OCR_Filtering.h"
 #include "CommonFramework/OCR/OCR_StringNormalization.h"
 #include "OCR_SmallDictionaryMatcher.h"
 #include "OCR_LargeDictionaryMatcher.h"
@@ -101,7 +100,10 @@ void TrainingSession::generate_small_dictionary(
     const QString& ocr_json_file,
     const QString& output_json_file,
     bool incremental,
-    size_t threads
+    size_t threads,
+    const std::vector<OCR::TextColorRange>& text_color_ranges,
+    double max_log10p, double log10p_spread,
+    double min_text_ratio, double max_text_ratio
 ){
     m_logger.log("Generating OCR Data...");
 
@@ -126,19 +128,26 @@ void TrainingSession::generate_small_dictionary(
                     m_logger.log("Skipping: " + sample.filepath);
                     return;
                 }
-                OCR::make_OCR_filter(image).apply(image);
-                QString text = OCR::ocr_read(language.first, image);
-                QString normalized = OCR::normalize(text);
 
-                OCR::StringMatchResult result = baseline.match_substring(language.first, text, LOG10P_SPREAD);
+                OCR::StringMatchResult result = baseline.match_substring_from_image_multifiltered(
+                    nullptr, language.first, image,
+                    text_color_ranges,
+                    0, log10p_spread,
+                    min_text_ratio, max_text_ratio
+                );
 
                 OCR::StringMatchResult result0 = result;
-                result.clear_beyond_log10p(MAX_LOG10P);
+                result.clear_beyond_log10p(max_log10p);
 
                 if (result.results.empty()){
                     failed++;
-                    result0.log(m_logger, MAX_LOG10P, sample.filepath);
-                    trained.add_candidate(language.first, sample.token, normalized);
+                    result0.log(m_logger, max_log10p, sample.filepath);
+                    if (!result0.results.empty()){
+                        trained.add_candidate(
+                            language.first, sample.token,
+                            result0.results.begin()->second.normalized_text
+                        );
+                    }
                     return;
                 }
 
@@ -148,6 +157,12 @@ void TrainingSession::generate_small_dictionary(
                         return;
                     }
                 }
+
+                result.log(m_logger, -99999, sample.filepath);
+                trained.add_candidate(
+                    language.first, sample.token,
+                    result0.results.begin()->second.normalized_text
+                );
             });
             m_scope.throw_if_cancelled();
         }
@@ -167,7 +182,10 @@ void TrainingSession::generate_large_dictionary(
     const QString& ocr_json_directory,
     const QString& output_prefix,
     bool incremental,
-    size_t threads
+    size_t threads,
+    const std::vector<OCR::TextColorRange>& text_color_ranges,
+    double max_log10p, double log10p_spread,
+    double min_text_ratio, double max_text_ratio
 ) const{
     m_logger.log("Generating OCR Data...");
 
@@ -192,19 +210,26 @@ void TrainingSession::generate_large_dictionary(
                     m_logger.log("Skipping: " + sample.filepath);
                     return;
                 }
-                OCR::make_OCR_filter(image).apply(image);
-                QString text = OCR::ocr_read(language.first, image);
-                QString normalized = OCR::normalize(text);
 
-                OCR::StringMatchResult result = baseline.match_substring(language.first, text, LOG10P_SPREAD);
+                OCR::StringMatchResult result = baseline.match_substring_from_image_multifiltered(
+                    nullptr, language.first, image,
+                    text_color_ranges,
+                    0, log10p_spread,
+                    min_text_ratio, max_text_ratio
+                );
 
                 OCR::StringMatchResult result0 = result;
-                result.clear_beyond_log10p(MAX_LOG10P);
+                result.clear_beyond_log10p(max_log10p);
 
                 if (result.results.empty()){
                     failed++;
-                    result0.log(m_logger, MAX_LOG10P, sample.filepath);
-                    trained.add_candidate(language.first, sample.token, normalized);
+                    result0.log(m_logger, max_log10p, sample.filepath);
+                    if (!result0.results.empty()){
+                        trained.add_candidate(
+                            language.first, sample.token,
+                            result0.results.begin()->second.normalized_text
+                        );
+                    }
                     return;
                 }
 
@@ -214,6 +239,12 @@ void TrainingSession::generate_large_dictionary(
                         return;
                     }
                 }
+
+                result.log(m_logger, -99999, sample.filepath);
+                trained.add_candidate(
+                    language.first, sample.token,
+                    result0.results.begin()->second.normalized_text
+                );
             });
             m_scope.throw_if_cancelled();
         }

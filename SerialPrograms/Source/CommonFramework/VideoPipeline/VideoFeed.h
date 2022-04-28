@@ -7,12 +7,24 @@
 #ifndef PokemonAutomation_VideoFeedInterface_H
 #define PokemonAutomation_VideoFeedInterface_H
 
-#include <deque>
+#include <QImage>
 #include "Common/Cpp/Time.h"
 
-class QImage;
-
 namespace PokemonAutomation{
+
+
+struct VideoSnapshot{
+    //  The frame itself. Null means no snapshot was available.
+    QImage frame;
+
+    //  The timestamp of when the frame was taken.
+    //  This will be as close as possible to when the frame was taken.
+    WallClock timestamp;
+
+    operator QImage&(){ return frame; }
+};
+
+
 
 
 //  Define basic interface of a video feed to be used
@@ -24,7 +36,7 @@ public:
 
     //  Do not call this on the main thread or it will deadlock.
     //  Format must be "Format_ARGB32" or "Format_RGB32".
-    virtual QImage snapshot(WallClock* timestamp = nullptr) = 0;
+    virtual VideoSnapshot snapshot() = 0;
 };
 
 

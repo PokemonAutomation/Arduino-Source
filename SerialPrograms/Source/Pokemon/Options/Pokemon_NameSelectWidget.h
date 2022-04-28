@@ -23,8 +23,6 @@ public:
     );
 
     std::string slug() const;
-
-private:
 };
 
 

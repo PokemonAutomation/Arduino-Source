@@ -35,6 +35,27 @@ StringMatchResult DictionaryMatcher::match_substring(
 ) const{
     return dictionary(language).match_substring(text, log10p_spread);
 }
+
+OCR::StringMatchResult DictionaryMatcher::match_substring_from_image_multifiltered(
+    LoggerQt* logger,
+    Language language,
+    const ConstImageRef& image,
+    const std::vector<OCR::TextColorRange>& text_color_ranges,
+    double max_log10p, double log10p_spread,
+    double min_text_ratio, double max_text_ratio
+) const{
+    OCR::StringMatchResult ret = OCR::multifiltered_OCR(
+        language, *this, image,
+        text_color_ranges,
+        log10p_spread, min_text_ratio, max_text_ratio
+    );
+    if (logger){
+        ret.log(*logger, max_log10p);
+    }
+    ret.clear_beyond_log10p(max_log10p);
+    return ret;
+}
+
 void DictionaryMatcher::add_candidate(Language language, std::string token, const QString& candidate){
     dictionary(language).add_candidate(std::move(token), candidate);
 }

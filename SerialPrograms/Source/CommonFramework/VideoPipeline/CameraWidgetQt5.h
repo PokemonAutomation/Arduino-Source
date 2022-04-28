@@ -7,7 +7,11 @@
 #ifndef PokemonAutomation_VideoPipeline_Qt5VideoWidget_H
 #define PokemonAutomation_VideoPipeline_Qt5VideoWidget_H
 
+#include <QtGlobal>
+#if QT_VERSION_MAJOR == 5
+
 #include <condition_variable>
+#include <QThread>
 #include <QCameraViewfinder>
 #include <QCameraImageCapture>
 #include <QVideoProbe>
@@ -15,30 +19,42 @@
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CameraInfo.h"
+#include "CameraImplementations.h"
 #include "VideoWidget.h"
 
 namespace PokemonAutomation{
-namespace CameraQt5{
+namespace CameraQt5QCameraViewfinder{
 
 
-std::vector<CameraInfo> qt5_get_all_cameras();
-QString qt5_get_camera_name(const CameraInfo& info);
-
-
-class Qt5VideoWidget : public VideoWidget{
+class CameraBackend : public PokemonAutomation::CameraBackend{
 public:
-    Qt5VideoWidget(
+    virtual std::vector<CameraInfo> get_all_cameras() const override;
+    virtual QString get_camera_name(const CameraInfo& info) const override;
+    virtual VideoWidget* make_video_widget(
+        QWidget& parent,
+        LoggerQt& logger,
+        const CameraInfo& info,
+        const QSize& desired_resolution
+    ) const override;
+};
+
+
+
+
+class VideoWidget : public PokemonAutomation::VideoWidget{
+public:
+    VideoWidget(
         QWidget* parent,
         LoggerQt& logger,
         const CameraInfo& info, const QSize& desired_resolution
     );
-    virtual ~Qt5VideoWidget();
-    virtual QSize resolution() const override;
-    virtual std::vector<QSize> resolutions() const override;
+    virtual ~VideoWidget();
+    virtual QSize current_resolution() const override;
+    virtual std::vector<QSize> supported_resolutions() const override;
     virtual void set_resolution(const QSize& size) override;
 
     //  Cannot call from UI thread or it will deadlock.
-    virtual QImage snapshot(WallClock* timestamp) override;
+    virtual VideoSnapshot snapshot() override;
 
     virtual void resizeEvent(QResizeEvent* event) override;
 
@@ -47,12 +63,14 @@ private:
     QImage direct_snapshot_image(std::unique_lock<std::mutex>& lock);
     QImage direct_snapshot_probe(bool flip_vertical);
 
-    QImage snapshot_image(std::unique_lock<std::mutex>& lock, WallClock* timestamp);
-    QImage snapshot_probe(WallClock* timestamp);
+    VideoSnapshot snapshot_image(std::unique_lock<std::mutex>& lock);
+    VideoSnapshot snapshot_probe();
 
     bool determine_frame_orientation(std::unique_lock<std::mutex>& lock);
 
 private:
+    friend class FrameReader;
+
     enum class CaptureStatus{
         PENDING,
         COMPLETED,
@@ -90,7 +108,6 @@ private:
     //  Last Frame
     QVideoFrame m_last_frame;
     WallClock m_last_frame_timestamp;
-//    std::atomic<uint64_t> m_last_frame_seqnum;
     uint64_t m_last_frame_seqnum = 0;
 
     //  Last Cached Image
@@ -102,6 +119,16 @@ private:
 
 
 
+
+
+
+
+
+
+
+
+
 }
 }
+#endif
 #endif

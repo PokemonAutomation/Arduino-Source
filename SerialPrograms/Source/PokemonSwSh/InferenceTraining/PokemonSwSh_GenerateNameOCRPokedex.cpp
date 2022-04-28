@@ -11,8 +11,6 @@
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
-#include "CommonFramework/OCR/OCR_RawOCR.h"
-#include "CommonFramework/OCR/OCR_Filtering.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonSwSh_GenerateNameOCRPokedex.h"
@@ -74,10 +72,16 @@ void GenerateNameOCRDataPokedex::read(
     LoggerQt& logger,
     QImage image
 ) const{
-    OCR::make_OCR_filter(image).apply(image);
-//    image.save("test.png");
-
-    OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(logger, LANGUAGE, image);
+    OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
+        logger, LANGUAGE, image,
+        {
+            {0xff000000, 0xff404040},
+            {0xff000000, 0xff606060},
+            {0xff000000, 0xff808080},
+            {0xff808080, 0xffffffff},
+            {0xffa0a0a0, 0xffffffff},
+        }
+    );
     if (result.results.empty()){
         output.append("");
     }else{

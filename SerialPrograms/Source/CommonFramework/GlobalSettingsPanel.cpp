@@ -4,6 +4,7 @@
  *
  */
 
+#include <iostream>
 #include <set>
 #include <QCryptographicHash>
 #include "Common/Qt/QtJsonTools.h"
@@ -86,11 +87,6 @@ GlobalSettings::GlobalSettings()
         true
     )
     , NAUGHTY_MODE("<b>Naughty Mode:</b>", false)
-    , ENABLE_FRAME_SCREENSHOTS(
-        "<b>Enable Frame Screenshots:</b><br>"
-        "Attempt to use QVideoProbe and QVideoFrame for screenshots.",
-        true
-    )
     , REALTIME_THREAD_PRIORITY0(
         "<b>Realtime Thread Priority:</b><br>"
         "Thread priority of real-time threads. (UI thread, audio threads)<br>"
@@ -106,6 +102,11 @@ GlobalSettings::GlobalSettings()
         "<b>Compute Priority:</b><br>"
         "Thread priority of computation threads.",
         -1
+    )
+    , ENABLE_FRAME_SCREENSHOTS(
+        "<b>Enable Frame Screenshots:</b><br>"
+        "Attempt to use QVideoProbe and QVideoFrame for screenshots.",
+        true
     )
     , DEVELOPER_TOKEN(
         true,
@@ -125,18 +126,23 @@ GlobalSettings::GlobalSettings()
     PA_ADD_OPTION(LOG_EVERYTHING);
     PA_ADD_OPTION(SAVE_DEBUG_IMAGES);
 //    PA_ADD_OPTION(NAUGHTY_MODE);
-#if QT_VERSION_MAJOR == 5
-    PA_ADD_OPTION(ENABLE_FRAME_SCREENSHOTS);
-#endif
+
     PA_ADD_OPTION(REALTIME_THREAD_PRIORITY0);
     PA_ADD_OPTION(INFERENCE_PRIORITY0);
     PA_ADD_OPTION(COMPUTE_PRIORITY0);
+
+    PA_ADD_OPTION(VIDEO_BACKEND);
+#if QT_VERSION_MAJOR == 5
+    PA_ADD_OPTION(ENABLE_FRAME_SCREENSHOTS);
+#endif
+
     PA_ADD_OPTION(PROCESSOR_LEVEL0);
+
     PA_ADD_OPTION(DEVELOPER_TOKEN);
 }
 
 void GlobalSettings::load_json(const QJsonValue& json){
-    QJsonObject obj = json.toObject();
+    const QJsonObject obj = json.toObject();
 
     //  Naughty mode.
     NAUGHTY_MODE.load_json(json_get_value_nothrow(obj, "NAUGHTY_MODE"));
@@ -163,10 +169,46 @@ void GlobalSettings::load_json(const QJsonValue& json){
             "online documentation"
         ) + ")</font>"
     );
+
+    COMMAND_LINE_TEST_LIST.clear();
+    const QJsonObject command_line_tests_setting = json_get_object_nothrow(obj, "COMMAND_LINE_TESTS");
+    if (!command_line_tests_setting.isEmpty()){
+        json_get_bool(COMMAND_LINE_TEST_MODE, command_line_tests_setting, "RUN");
+
+        const QJsonArray test_list = json_get_array_nothrow(command_line_tests_setting, "TEST_LIST");
+        for(const auto& value: test_list){
+            const std::string test_name = value.toString().toStdString();
+            if (test_name.size() > 0){
+                COMMAND_LINE_TEST_LIST.emplace_back(std::move(test_name));
+            }
+        }
+
+        if (COMMAND_LINE_TEST_MODE){
+            std::cout << "Enter command line test mode:" << std::endl;
+            if (COMMAND_LINE_TEST_LIST.size() > 0){
+                std::cout << "Run following tests: " << std::endl;
+                for(const auto& name : COMMAND_LINE_TEST_LIST){
+                    std::cout << "- " << name << std::endl;
+                }
+            }
+        }
+    }
 }
+
+
 QJsonValue GlobalSettings::to_json() const{
     QJsonObject obj = BatchOption::to_json().toObject();
     obj.insert("NAUGHTY_MODE", NAUGHTY_MODE.to_json());
+
+    QJsonObject command_line_test_obj;
+    command_line_test_obj.insert("RUN", QJsonValue(COMMAND_LINE_TEST_MODE));
+    QJsonArray test_list;
+    for(const auto& name : COMMAND_LINE_TEST_LIST){
+        test_list.append(QJsonValue(name.c_str()));
+    }
+    command_line_test_obj.insert("TEST_LIST", test_list);
+    obj.insert("COMMAND_LINE_TESTS", command_line_test_obj);
+    
     return obj;
 }
 

@@ -10,6 +10,7 @@
 #include <functional>
 #include <deque>
 #include <set>
+#include "VideoFeed.h"
 #include "VideoOverlay.h"
 #include "VideoWidget.h"
 #include "VideoOverlayWidget.h"
@@ -42,7 +43,7 @@ public:
     std::vector<QSize> resolutions() const;
     void set_resolution(const QSize& resolution);
 
-    QImage snapshot(WallClock* timestamp = nullptr);
+    VideoSnapshot snapshot();
 
 private:
     virtual void add_box(const ImageFloatBox& box, Color color) override;

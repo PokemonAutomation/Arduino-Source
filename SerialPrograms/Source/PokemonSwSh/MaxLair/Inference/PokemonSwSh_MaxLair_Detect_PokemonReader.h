@@ -25,20 +25,9 @@ std::string read_boss_sprite(ConsoleHandle& console);
 
 //  OCR the Pokemon name and return all possible candidates.
 std::set<std::string> read_pokemon_name(
-    LoggerQt& logger,
-    const ConstImageRef& screen, const ConstImageRef& image,
-    Language language
+    LoggerQt& logger, Language language,
+    const ConstImageRef& image
 );
-
-
-#if 0
-//  Read a Pokemon sprite. This will attempt to auto-sizing first.
-//  If that fails, it will attempt exact match.
-std::string read_pokemon_sprite(
-    Logger& logger,
-    const QImage& screen, const ImageFloatBox& box
-);
-#endif
 
 
 //  Read a Pokemon sprite. The sprite may be partially obstructed

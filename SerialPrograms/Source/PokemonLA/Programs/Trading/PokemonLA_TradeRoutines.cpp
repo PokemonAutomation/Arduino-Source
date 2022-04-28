@@ -5,12 +5,12 @@
  */
 
 #include "Common/Qt/QtJsonTools.h"
-#include "Kernels/ImageFilters/Kernels_ImageFilter_Basic.h"
 #include "CommonFramework/Globals.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "CommonFramework/Inference/ImageMatchDetector.h"
+#include "CommonFramework/Tools/ErrorDumper.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
@@ -155,19 +155,14 @@ TradeNameReader::TradeNameReader(LoggerQt& logger, VideoOverlay& overlay, Langua
 }
 
 std::string TradeNameReader::read(const QImage& screen) const{
-    QImage image = extract_box_copy(screen, m_box);
-
-    //  TODO: Clean this shit up.
-    Kernels::filter_rgb32_range(
-        (const uint32_t*)image.constBits(), image.bytesPerLine(), image.width(), image.height(),
-        (uint32_t*)image.bits(), image.bytesPerLine(), 0xff808080, 0xffffffff, 0xffffffff, false
+    ConstImageRef image = extract_box_reference(screen, m_box);
+    OCR::StringMatchResult result = Pokemon::PokemonNameReader::instance().read_substring(
+        m_logger, m_language, image,
+        {
+            {0xff808080, 0xffffffff},
+            {0xffa0a0a0, 0xffffffff},
+        }
     );
-    Kernels::filter_rgb32_range(
-        (const uint32_t*)image.constBits(), image.bytesPerLine(), image.width(), image.height(),
-        (uint32_t*)image.bits(), image.bytesPerLine(), 0xffffffff, 0xffffffff, 0xff000000, false
-    );
-
-    OCR::StringMatchResult result = Pokemon::PokemonNameReader::instance().read_substring(m_logger, m_language, image);
     result.clear_beyond_log10p(Pokemon::PokemonNameReader::MAX_LOG10P);
 
     for (auto iter = result.results.begin(); iter != result.results.end();){

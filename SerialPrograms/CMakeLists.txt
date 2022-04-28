@@ -312,8 +312,6 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/OCR/OCR_DictionaryMatcher.h
     Source/CommonFramework/OCR/OCR_DictionaryOCR.cpp
     Source/CommonFramework/OCR/OCR_DictionaryOCR.h
-    Source/CommonFramework/OCR/OCR_Filtering.cpp
-    Source/CommonFramework/OCR/OCR_Filtering.h
     Source/CommonFramework/OCR/OCR_LanguageOptionOCR.cpp
     Source/CommonFramework/OCR/OCR_LanguageOptionOCR.h
     Source/CommonFramework/OCR/OCR_LargeDictionaryMatcher.cpp
@@ -322,6 +320,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/OCR/OCR_NumberReader.h
     Source/CommonFramework/OCR/OCR_RawOCR.cpp
     Source/CommonFramework/OCR/OCR_RawOCR.h
+    Source/CommonFramework/OCR/OCR_Routines.cpp
+    Source/CommonFramework/OCR/OCR_Routines.h
     Source/CommonFramework/OCR/OCR_SmallDictionaryMatcher.cpp
     Source/CommonFramework/OCR/OCR_SmallDictionaryMatcher.h
     Source/CommonFramework/OCR/OCR_StringNormalization.cpp
@@ -425,6 +425,8 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/VideoPipeline/CameraSelectorWidget.h
     Source/CommonFramework/VideoPipeline/CameraWidgetQt5.cpp
     Source/CommonFramework/VideoPipeline/CameraWidgetQt5.h
+    Source/CommonFramework/VideoPipeline/CameraWidgetQt5v2.cpp
+    Source/CommonFramework/VideoPipeline/CameraWidgetQt5v2.h
     Source/CommonFramework/VideoPipeline/CameraWidgetQt6.cpp
     Source/CommonFramework/VideoPipeline/CameraWidgetQt6.h
     Source/CommonFramework/VideoPipeline/VideoFeed.h
@@ -1341,6 +1343,13 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Resources/PokemonSwSh_TypeSprites.h
     Source/PokemonSwSh/ShinyHuntTracker.cpp
     Source/PokemonSwSh/ShinyHuntTracker.h
+    Source/Tests/CommandLineTests.cpp
+    Source/Tests/CommandLineTests.h
+    Source/Tests/PokemonLA_tests.cpp
+    Source/Tests/PokemonLA_tests.h
+    Source/Tests/TestMap.cpp
+    Source/Tests/TestMap.h
+    Source/Tests/TestUtils.h
 )
 add_executable(SerialPrograms WIN32 ${MAIN_SOURCES})
 set_target_properties(SerialPrograms PROPERTIES LINKER_LANGUAGE CXX)

@@ -129,7 +129,7 @@ void EventNotificationsTableUI::redraw_table(){
 QWidget* EventNotificationsTableUI::make_enabled_box(EventNotificationOption& entry){
     QWidget* widget = new QWidget(this);
     QHBoxLayout* layout = new QHBoxLayout(widget);
-    layout->setAlignment(Qt::AlignHCenter);
+    layout->setAlignment(Qt::AlignCenter);
     layout->setContentsMargins(0, 0, 0, 0);
     QCheckBox* box = new QCheckBox(this);
     layout->addWidget(box);
@@ -145,7 +145,7 @@ QWidget* EventNotificationsTableUI::make_enabled_box(EventNotificationOption& en
 QWidget* EventNotificationsTableUI::make_ping_box(EventNotificationOption& entry){
     QWidget* widget = new QWidget(this);
     QHBoxLayout* layout = new QHBoxLayout(widget);
-    layout->setAlignment(Qt::AlignHCenter);
+    layout->setAlignment(Qt::AlignCenter);
     layout->setContentsMargins(0, 0, 0, 0);
     QCheckBox* box = new QCheckBox(this);
     layout->addWidget(box);
@@ -175,14 +175,14 @@ QWidget* EventNotificationsTableUI::make_screenshot_box(EventNotificationOption&
         return box;
     }else{
         QLabel* box = new QLabel("---", this);
-        box->setAlignment(Qt::AlignHCenter);
+        box->setAlignment(Qt::AlignCenter);
         return box;
     }
 }
 QWidget* EventNotificationsTableUI::make_tags_box(EventNotificationOption& entry){
     QLineEdit* box = new QLineEdit(this);
     box->setText(EventNotificationSettings::tags_to_str(entry.m_current.tags));
-//    box->setAlignment(Qt::AlignHCenter);
+//    box->setAlignment(Qt::AlignCenter);
     box->connect(
         box, &QLineEdit::textChanged,
         box, [&](const QString& text){
@@ -194,7 +194,7 @@ QWidget* EventNotificationsTableUI::make_tags_box(EventNotificationOption& entry
 QWidget* EventNotificationsTableUI::make_rate_limit_box(EventNotificationOption& entry){
     QLineEdit* box = new QLineEdit(this);
     box->setText(QString::number(entry.m_current.rate_limit.count()));
-    box->setAlignment(Qt::AlignHCenter);
+    box->setAlignment(Qt::AlignCenter);
     QIntValidator* validator = new QIntValidator(0, std::numeric_limits<int>::max(), box);
     box->setValidator(validator);
     box->connect(

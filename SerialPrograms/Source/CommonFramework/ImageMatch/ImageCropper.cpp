@@ -4,19 +4,21 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
+#include "CommonFramework/ImageTypes/ImageReference.h"
 #include "ImageCropper.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
+//#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace ImageMatch{
 
 
 
-bool scan_row(const QImage& image, int row, const std::function<bool(QRgb)>& filter){
-    for (int c = 0; c < image.width(); c++){
+bool scan_row(const ConstImageRef& image, size_t row, const std::function<bool(QRgb)>& filter){
+    for (size_t c = 0; c < image.width(); c++){
         QRgb pixel = image.pixel(c, row);
         if (filter(pixel)){
 //            cout << "{" << c << "," << row << "}" << endl;
@@ -25,8 +27,8 @@ bool scan_row(const QImage& image, int row, const std::function<bool(QRgb)>& fil
     }
     return true;
 }
-bool scan_col(const QImage& image, int col, const std::function<bool(QRgb)>& filter){
-    for (int r = 0; r < image.height(); r++){
+bool scan_col(const ConstImageRef& image, size_t col, const std::function<bool(QRgb)>& filter){
+    for (size_t r = 0; r < image.height(); r++){
         QRgb pixel = image.pixel(col, r);
         if (filter(pixel)){
 //            cout << "{" << col << "," << r << "}" << endl;
@@ -37,6 +39,10 @@ bool scan_col(const QImage& image, int col, const std::function<bool(QRgb)>& fil
 }
 
 QImage trim_image_alpha(const QImage& image){
+    if (image.format() != QImage::Format_RGB32 && image.format() != QImage::Format_ARGB32){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid image format.");
+    }
+
     int rs = 0;
     int re = image.height();
     int cs = 0;
@@ -51,6 +57,10 @@ QImage trim_image_alpha(const QImage& image){
     return image.copy(cs, rs, ce - cs, re - rs);
 }
 QImage trim_image_pixel_filter(const QImage& image, const std::function<bool(QRgb)>& filter){
+    if (image.format() != QImage::Format_RGB32 && image.format() != QImage::Format_ARGB32){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid image format.");
+    }
+
     int rs = 0;
     int re = image.height();
     int cs = 0;
@@ -62,6 +72,10 @@ QImage trim_image_pixel_filter(const QImage& image, const std::function<bool(QRg
     return image.copy(cs, rs, ce - cs, re - rs);
 }
 QRect enclosing_rectangle_with_pixel_filter(const QImage& image, const std::function<bool(QRgb)>& filter){
+    if (image.format() != QImage::Format_RGB32 && image.format() != QImage::Format_ARGB32){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid image format.");
+    }
+
     int rs = 0;
     int re = image.height();
     int cs = 0;

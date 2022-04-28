@@ -10,8 +10,7 @@
 #include <vector>
 #include <QWidget>
 #include "Common/Cpp/Time.h"
-
-class QImage;
+#include "VideoFeed.h"
 
 namespace PokemonAutomation{
 
@@ -23,8 +22,8 @@ public:
     virtual ~VideoWidget() = default;
 
     //  These will be called from the UI thread.
-    virtual QSize resolution() const = 0;
-    virtual std::vector<QSize> resolutions() const = 0;
+    virtual QSize current_resolution() const = 0;
+    virtual std::vector<QSize> supported_resolutions() const = 0;
     virtual void set_resolution(const QSize& size) = 0;
 
     //  This snapshot function will be called asynchronously from many threads
@@ -35,7 +34,7 @@ public:
     //
     //  If "timestamp" is not null, it will be set to the best known timestamp
     //  of the screenshot that is returned.
-    virtual QImage snapshot(WallClock* timestamp = nullptr) = 0;
+    virtual VideoSnapshot snapshot() = 0;
 };
 
 

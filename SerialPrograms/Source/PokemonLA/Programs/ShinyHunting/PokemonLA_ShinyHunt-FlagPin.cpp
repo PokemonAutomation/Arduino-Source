@@ -42,7 +42,7 @@ ShinyHuntFlagPin::ShinyHuntFlagPin(const ShinyHuntFlagPin_Descriptor& descriptor
         "<font color=\"red\">If you wish to ignore enroute shinies, scroll down to "
         "\"Enroute Shiny Action\" and set it to ignore shinies. "
         "Keep in mind that the shiny sound radius is 30 and you will need some headroom.</font>",
-        100
+        60
     )
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
