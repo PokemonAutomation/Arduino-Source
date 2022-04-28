@@ -64,7 +64,12 @@ public:
 public slots:
     void set_resolution(const QSize& size);
 
+signals:
+    void async_shutdown();
+
 private:
+    void internal_shutdown();
+
     //  All of these must be called under the state lock.
     QImage direct_snapshot_image(std::unique_lock<std::mutex>& lock);
     QImage direct_snapshot_probe(bool flip_vertical);
@@ -92,6 +97,8 @@ private:
     QCamera* m_camera = nullptr;
 
     std::mutex m_state_lock;
+    std::condition_variable m_cv;
+
     size_t m_max_frame_rate;
     std::chrono::milliseconds m_frame_period;
     std::vector<QSize> m_supported_resolutions;

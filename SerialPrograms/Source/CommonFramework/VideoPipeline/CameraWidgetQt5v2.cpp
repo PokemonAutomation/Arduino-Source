@@ -86,7 +86,7 @@ CameraHolder::CameraHolder(
         m_current_resolution = new_resolution;
     }
 
-    m_probe = new QVideoProbe(this);
+    m_probe = new QVideoProbe(m_camera);
     if (!m_probe->setSource(m_camera)){
         logger.log("Unable to initialize QVideoProbe() capture.", COLOR_RED);
         delete m_probe;
@@ -150,10 +150,26 @@ CameraHolder::CameraHolder(
             iter->second.cv.notify_all();
         }
     );
+    connect(
+        this, &CameraHolder::async_shutdown,
+        this, &CameraHolder::internal_shutdown
+    );
 }
 CameraHolder::~CameraHolder(){
-    m_camera->stop();
-    delete m_capture;
+    //  Redispatch to the thread that owns the class.
+    emit async_shutdown();
+    std::unique_lock<std::mutex> lg(m_state_lock);
+    m_cv.wait(lg, [=]{ return m_camera == nullptr; });
+}
+void CameraHolder::internal_shutdown(){
+    std::lock_guard<std::mutex> lg(m_state_lock);
+//    m_camera->stop();
+//    delete m_capture;
+    delete m_camera;
+    m_probe = nullptr;
+    m_capture = nullptr;
+    m_camera = nullptr;
+    m_cv.notify_all();
 }
 void CameraHolder::set_resolution(const QSize& size){
     QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
