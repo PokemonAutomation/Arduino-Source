@@ -90,6 +90,9 @@ private:
 
 
 
+EventNotificationOption EggAutonomousState::m_notification_noop;
+
+
 EggAutonomousState::EggAutonomousState(
     ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context,
     EggAutonomousStats& stats,

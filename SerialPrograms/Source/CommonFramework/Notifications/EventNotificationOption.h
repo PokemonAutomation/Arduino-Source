@@ -77,7 +77,7 @@ private:
     bool screenshot_supported;
     EventNotificationSettings m_default;
     EventNotificationSettings m_current;
-    WallClock m_last_sent;
+    std::atomic<WallClock> m_last_sent;
 
     //  Set by the table.
     bool m_enabled = true;

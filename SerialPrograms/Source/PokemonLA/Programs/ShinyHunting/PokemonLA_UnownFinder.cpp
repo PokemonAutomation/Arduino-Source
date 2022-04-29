@@ -45,20 +45,29 @@ UnownFinder_Descriptor::UnownFinder_Descriptor()
 
 UnownFinder::UnownFinder(const UnownFinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
-    , SHINY_DETECTED("Shiny Detected Action", "", "0 * TICKS_PER_SECOND")
-    , SKIP_PATH_SHINY("<b>Skip any Shines on the Path:</b><br>Only care about shines inside the ruins.", false)
+    , SHINY_DETECTED_ENROUTE(
+        "Enroute Shiny Action",
+        "This applies if you are still traveling to the ruins.",
+        "0 * TICKS_PER_SECOND"
+    )
+    , SHINY_DETECTED_DESTINATION(
+        "Destination Shiny Action",
+        "This applies if you are near the ruins.",
+        "0 * TICKS_PER_SECOND"
+    )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
-        &SHINY_DETECTED.NOTIFICATIONS,
+        &SHINY_DETECTED_ENROUTE.NOTIFICATIONS,
+        &SHINY_DETECTED_DESTINATION.NOTIFICATIONS,
         &NOTIFICATION_PROGRAM_FINISH,
 //        &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
-    PA_ADD_OPTION(SHINY_DETECTED);
-    PA_ADD_OPTION(SKIP_PATH_SHINY);
+    PA_ADD_OPTION(SHINY_DETECTED_ENROUTE);
+    PA_ADD_OPTION(SHINY_DETECTED_DESTINATION);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -120,16 +129,12 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     // Start path
     env.console.log("Beginning Shiny Detection...");
     {
-        ShinyDetectedActionOption SHINY_DETECTED_ON_ROUTE("Shiny Detected Action", "", QString::number(SHINY_DETECTED.SCREENSHOT_DELAY));
-        SHINY_DETECTED_ON_ROUTE.NOTIFICATIONS = SHINY_DETECTED.NOTIFICATIONS;
-        SHINY_DETECTED_ON_ROUTE.ACTION.set(!SKIP_PATH_SHINY);
-
         float shiny_coefficient = 1.0;
         ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
             stats.shinies++;
             shiny_coefficient = error_coefficient;
-            return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
+            return on_shiny_callback(env, env.console, SHINY_DETECTED_ENROUTE, error_coefficient);
         });
 
         int ret = run_until(
@@ -140,7 +145,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             {{shiny_detector}}
         );
         if (ret == 0){
-            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_coefficient);
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED_ENROUTE, shiny_coefficient);
         }
     }
 
@@ -151,7 +156,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             //  Warning: This callback will be run from a different thread than this function.
             stats.shinies++;
             shiny_coefficient = error_coefficient;
-            return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
+            return on_shiny_callback(env, env.console, SHINY_DETECTED_DESTINATION, error_coefficient);
         });
 
         int ret = run_until(env.console, context,
@@ -161,7 +166,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             {{shiny_detector}}
         );
         if (ret == 0){
-            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_coefficient);
+            on_shiny_sound(env, env.console, context, SHINY_DETECTED_DESTINATION, shiny_coefficient);
         }
     }
 
