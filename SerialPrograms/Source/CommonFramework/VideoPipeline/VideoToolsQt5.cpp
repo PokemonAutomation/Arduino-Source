@@ -9,9 +9,14 @@
 
 #include <sstream>
 #include <QCameraInfo>
+#include <QCoreApplication>
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageMatch/ImageDiff.h"
 #include "VideoToolsQt5.h"
+
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -46,8 +51,12 @@ QImage frame_to_image(Logger& logger, QVideoFrame frame, bool flip_vertical){
     try{
         if (frame.pixelFormat() == QVideoFrame::Format_Jpeg){
             QImage image;
-            image.loadFromData(frame.bits(0), frame.mappedBytes(), "JPG");
+            bool ok = image.loadFromData(frame.bits(0), frame.mappedBytes(), "JPG");
             frame.unmap();
+            if (!ok){
+//                cout << frame.mappedBytes() << " " << frame.width() << endl;
+                return QImage();
+            }
             if (flip_vertical){
                 image = image.mirrored(false, flip_vertical);
             }
@@ -98,7 +107,6 @@ bool determine_frame_orientation(
     ImageStats ref_stats = image_stats(reference);
     double ref_stddev = ref_stats.stddev.sum();
     if (ref_stddev < 10){
-        std::stringstream ss;
         ss << "Image has too little detail. (rmsd = " << ref_stddev << ")";
         logger.log(ss.str(), COLOR_RED);
         return false;
@@ -106,7 +114,6 @@ bool determine_frame_orientation(
     ImageStats img_stats = image_stats(image);
     double img_stddev = img_stats.stddev.sum();
     if (img_stddev < 10){
-        std::stringstream ss;
         ss << "Frame has too little detail. (rmsd = " << img_stddev << ")";
         logger.log(ss.str(), COLOR_RED);
         return false;
@@ -145,6 +152,90 @@ bool determine_frame_orientation(
 
     return ok;
 }
+
+
+
+
+
+
+CameraScreenshotter::CameraScreenshotter(LoggerQt& logger, QCamera& camera)
+    : m_logger(logger)
+    , m_camera(camera)
+    , m_stats_conversion("Snapshot", "ms", 1000, std::chrono::seconds(10))
+{
+    m_capture = new QCameraImageCapture(&m_camera, &m_camera);
+    m_capture->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
+    m_camera.setCaptureMode(QCamera::CaptureStillImage);
+
+    connect(
+        m_capture, &QCameraImageCapture::imageCaptured,
+        this, [&](int id, const QImage& preview){
+            std::lock_guard<std::mutex> lg(m_lock);
+            m_screenshot = preview;
+            m_pending_screenshot = false;
+            m_cv.notify_all();
+        },
+        Qt::ConnectionType::QueuedConnection
+    );
+    connect(
+        m_capture, static_cast<void(QCameraImageCapture::*)(int, QCameraImageCapture::Error, const QString&)>(&QCameraImageCapture::error),
+        this, [&](int id, QCameraImageCapture::Error error, const QString& errorString){
+            std::lock_guard<std::mutex> lg(m_lock);
+            m_logger.log(
+                "QCameraImageCapture::error(): Capture ID: " + errorString,
+                COLOR_RED
+            );
+            m_screenshot = QImage();
+            m_pending_screenshot = false;
+            m_cv.notify_all();
+        },
+        Qt::ConnectionType::QueuedConnection
+    );
+}
+CameraScreenshotter::~CameraScreenshotter(){
+    delete m_capture;
+}
+VideoSnapshot CameraScreenshotter::snapshot(){
+    //  Only allow one snapshot at a time.
+    WallClock timestamp = current_time();
+
+    m_pending_screenshot = true;
+    m_camera.searchAndLock();
+    m_capture->capture();
+    m_camera.unlock();
+
+    QImage image;
+    WallClock start = current_time();
+    do{
+        if (current_time() - start >= std::chrono::seconds(1)){
+            m_logger.log("Capture timed out.");
+            m_pending_screenshot = false;
+            return VideoSnapshot{QImage(), timestamp};
+        }
+        QCoreApplication::instance()->processEvents(QEventLoop::AllEvents, 1);
+        std::unique_lock<std::mutex> lg(m_lock);
+        m_cv.wait_for(
+            lg,
+            std::chrono::milliseconds(1),
+            [&]{ return !m_pending_screenshot; }
+        );
+        image = std::move(m_screenshot);
+    }while (m_pending_screenshot);
+
+    QImage::Format format = image.format();
+    if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
+        image = image.convertToFormat(QImage::Format_ARGB32);
+    }
+
+    WallClock time1 = current_time();
+    m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - timestamp).count());
+    return VideoSnapshot{image, timestamp};
+}
+
+
+
+
+
 
 
 

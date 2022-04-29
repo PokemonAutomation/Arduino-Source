@@ -223,15 +223,26 @@ int8_t read_pp_text(LoggerQt& logger, const ConstImageRef& image){
     if (image.width() == 0 || image.height() == 0){
         return -1;
     }
-    QImage processed = image.to_qimage();
+    QImage reference = image.to_qimage();
 
-//    OCR::binary_filter_solid_background(processed);
-    size_t text_pixels = to_blackwhite_rgb32_range(processed, 0xff000000, 0xff404040, false);
-    double text_ratio = 1.0 - (double)text_pixels / (image.width() * image.height());
-    if (text_ratio < 0.05 || text_ratio > 0.50){
+    std::vector<std::pair<uint32_t, uint32_t>> filters{
+        {0xff000000, 0xff404040},
+        {0xff808080, 0xffffffff},
+    };
+    QImage processed;
+    for (const auto& item : filters){
+        processed = reference;
+        size_t text_pixels = to_blackwhite_rgb32_range(processed, item.first, item.second, true);
+        double text_ratio = (double)text_pixels / (image.width() * image.height());
+        if (0.05 <= text_ratio && text_ratio <= 0.50){
+            break;
+        }
+    }
+    if (processed.isNull()){
         logger.log("OCR Result: Invalid text ratio.", COLOR_RED);
         return -1;
     }
+
 
     QString ocr_text = OCR::ocr_read(Language::English, processed);
 

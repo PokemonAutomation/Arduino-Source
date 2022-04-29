@@ -48,15 +48,14 @@ CameraHolder::CameraHolder(
 )
     : m_logger(logger)
     , m_widget(widget)
+    , m_camera(new QCamera(QCameraInfo(info.device_name().c_str()), this))
+    , m_screenshotter(logger, *m_camera)
     , m_last_orientation_attempt(WallClock::min())
-    , m_last_image_timestamp(WallClock::min())
     , m_stats_conversion("ConvertFrame", "ms", 1000, std::chrono::seconds(10))
 {
-    m_camera = new QCamera(QCameraInfo(info.device_name().c_str()), this);
-
-    m_capture = new QCameraImageCapture(m_camera, this);
-    m_capture->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
-    m_camera->setCaptureMode(QCamera::CaptureStillImage);
+//    m_capture = new QCameraImageCapture(m_camera, this);
+//    m_capture->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
+//    m_camera->setCaptureMode(QCamera::CaptureStillImage);
     m_camera->start();
 
     for (const auto& size : m_camera->supportedViewfinderResolutions()){
@@ -112,83 +111,14 @@ CameraHolder::CameraHolder(
             Qt::DirectConnection
         );
     }
-
-    connect(
-        m_capture, &QCameraImageCapture::imageCaptured,
-        this, [&](int id, const QImage& preview){
-            std::lock_guard<std::mutex> lg(m_state_lock);
-//            cout << "finish = " << id << endl;
-            auto iter = m_pending_captures.find(id);
-            if (iter == m_pending_captures.end()){
-                m_logger.log(
-                    "QCameraImageCapture::imageCaptured(): Unable to find capture ID: " + std::to_string(id),
-                    COLOR_RED
-                );
-//                cout << "QCameraImageCapture::imageCaptured(): Unable to find capture ID: " << id << endl;
-                return;
-            }
-            iter->second.status = CaptureStatus::COMPLETED;
-            iter->second.image = preview;
-            iter->second.cv.notify_all();
-        }
-    );
-    connect(
-        m_capture, static_cast<void(QCameraImageCapture::*)(int, QCameraImageCapture::Error, const QString&)>(&QCameraImageCapture::error),
-        this, [&](int id, QCameraImageCapture::Error error, const QString& errorString){
-            std::lock_guard<std::mutex> lg(m_state_lock);
-//            cout << "error = " << id << endl;
-            m_logger.log(
-                "QCameraImageCapture::error(): Capture ID: " + errorString,
-                COLOR_RED
-            );
-//            cout << "QCameraImageCapture::error(): " << errorString.toUtf8().data() << endl;
-            auto iter = m_pending_captures.find(id);
-            if (iter == m_pending_captures.end()){
-                return;
-            }
-            iter->second.status = CaptureStatus::COMPLETED;
-            iter->second.cv.notify_all();
-        }
-    );
-#if 0
-    connect(
-        this, &CameraHolder::stop,
-        this, &CameraHolder::internal_shutdown
-    );
-#endif
 }
 CameraHolder::~CameraHolder(){
     //  Redispatch to the thread that owns the class.
     m_camera->stop();
-    delete m_capture;
-#if 0
-//    internal_shutdown();
-    emit stop();
-    std::unique_lock<std::mutex> lg(m_state_lock);
-    if (m_camera == nullptr){
-        return;
-    }
-    m_cv.wait(lg, [=]{ return m_camera == nullptr; });
-    delete m_capture;
-#endif
-}
-#if 0
-void CameraHolder::internal_shutdown(){
-    std::lock_guard<std::mutex> lg(m_state_lock);
-    if (m_camera == nullptr){
-        return;
-    }
-    m_camera->stop();
-//    delete m_probe;
 //    delete m_capture;
-//    delete m_camera;
-//    m_probe = nullptr;
-//    m_capture = nullptr;
-    m_camera = nullptr;
-    m_cv.notify_all();
 }
-#endif
 void CameraHolder::set_resolution(const QSize& size){
+    std::unique_lock<std::mutex> lg(m_state_lock);
     QCameraViewfinderSettings settings = m_camera->viewfinderSettings();
     if (settings.resolution() == size){
         return;
@@ -196,44 +126,6 @@ void CameraHolder::set_resolution(const QSize& size){
     settings.setResolution(size);
     m_camera->setViewfinderSettings(settings);
     m_current_resolution = size;
-}
-QImage CameraHolder::direct_snapshot_image(std::unique_lock<std::mutex>& lock){
-//    std::unique_lock<std::mutex> lg(m_lock);
-    if (m_camera == nullptr){
-        return QImage();
-    }
-
-    m_camera->searchAndLock();
-    int id = m_capture->capture();
-    m_camera->unlock();
-
-    auto iter = m_pending_captures.emplace(
-        std::piecewise_construct,
-        std::forward_as_tuple(id),
-        std::forward_as_tuple()
-    );
-    if (!iter.second){
-        return QImage();
-    }
-    PendingCapture& capture = iter.first->second;
-
-    capture.cv.wait_for(
-        lock,
-        std::chrono::milliseconds(1000),
-        [&]{ return capture.status != CaptureStatus::PENDING; }
-    );
-
-    if (capture.status != CaptureStatus::COMPLETED){
-        m_logger.log("Capture timed out.");
-    }
-
-    QImage image = std::move(capture.image);
-    m_pending_captures.erase(iter.first);
-    QImage::Format format = image.format();
-    if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
-        image = image.convertToFormat(QImage::Format_ARGB32);
-    }
-    return image;
 }
 QImage CameraHolder::direct_snapshot_probe(bool flip_vertical){
 //    std::lock_guard<std::mutex> lg(m_lock);
@@ -258,7 +150,7 @@ bool CameraHolder::determine_frame_orientation(std::unique_lock<std::mutex>& loc
     //  This function cannot be called on the UI thread.
     //  This function must be called under the lock.
 
-    QImage reference = direct_snapshot_image(lock);
+    QImage reference = m_screenshotter.snapshot().frame;
     QImage frame = direct_snapshot_probe(false);
     m_orientation_known = PokemonAutomation::determine_frame_orientation(m_logger, reference, frame, m_flip_vertical);
     return m_orientation_known;
@@ -269,74 +161,34 @@ VideoSnapshot CameraHolder::snapshot_image(std::unique_lock<std::mutex>& lock){
 
     auto now = current_time();
 
-    if (m_camera == nullptr){
-        return VideoSnapshot{QImage(), now};
-    }
-
     //  Frame is already cached and is not stale.
     uint64_t frame_seqnum;
     {
         SpinLockGuard lg1(m_frame_lock);
         frame_seqnum = m_last_frame_seqnum;
-        if (!m_last_image.isNull()){
+        if (!m_last_image.frame.isNull()){
             if (m_probe){
                 //  If we have the probe enabled, we know if a new frame has been pushed.
 //                cout << now - m_last_snapshot.load(std::memory_order_acquire) << endl;
                 if (m_last_image_seqnum == frame_seqnum){
 //                    cout << "cached 0" << endl;
-                    return VideoSnapshot{m_last_image, m_last_image_timestamp};
+                    return m_last_image;
                 }
             }else{
                 //  Otherwise, we have to use time.
 //                cout << now - m_last_snapshot.load(std::memory_order_acquire) << endl;
-                if (m_last_image_timestamp + m_frame_period > now){
+                if (m_last_image.timestamp + m_frame_period > now){
 //                    cout << "cached 1" << endl;
-                    return VideoSnapshot{m_last_image, m_last_image_timestamp};
+                    return m_last_image;
                 }
             }
         }
     }
 
-    WallClock time0 = current_time();
-
-    m_camera->searchAndLock();
-    int id = m_capture->capture();
-    m_camera->unlock();
-
-//    cout << "start = " << id << endl;
-
-    auto iter = m_pending_captures.emplace(
-        std::piecewise_construct,
-        std::forward_as_tuple(id),
-        std::forward_as_tuple()
-    );
-    if (!iter.second){
-        return VideoSnapshot{QImage(), now};
-    }
-    PendingCapture& capture = iter.first->second;
-
-//    cout << "snapshot: " << id << endl;
-    capture.cv.wait_for(
-        lock,
-        std::chrono::milliseconds(1000),
-        [&]{ return capture.status != CaptureStatus::PENDING; }
-    );
-
-    if (capture.status != CaptureStatus::COMPLETED){
-        m_logger.log("Capture timed out.");
-    }
-
-    m_last_image = std::move(capture.image);
-    m_pending_captures.erase(iter.first);
-    QImage::Format format = m_last_image.format();
-    if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
-        m_last_image = m_last_image.convertToFormat(QImage::Format_ARGB32);
-    }
-    m_last_image_timestamp = now;
+    m_last_image = m_screenshotter.snapshot();
     m_last_image_seqnum = frame_seqnum;
-    WallClock time1 = current_time();
-    m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count());
-    return VideoSnapshot{m_last_image, m_last_image_timestamp};
+
+    return m_last_image;
 }
 VideoSnapshot CameraHolder::snapshot_probe(){
 //    std::lock_guard<std::mutex> lg(m_lock);
@@ -352,8 +204,8 @@ VideoSnapshot CameraHolder::snapshot_probe(){
     {
         SpinLockGuard lg0(m_frame_lock);
         frame_seqnum = m_last_frame_seqnum;
-        if (!m_last_image.isNull() && m_last_image_seqnum == frame_seqnum){
-            return VideoSnapshot{m_last_image, m_last_image_timestamp};
+        if (!m_last_image.frame.isNull() && m_last_image_seqnum == frame_seqnum){
+            return m_last_image;
         }
         frame = m_last_frame;
         frame_timestamp = m_last_frame_timestamp;
@@ -361,14 +213,14 @@ VideoSnapshot CameraHolder::snapshot_probe(){
 
     WallClock time0 = current_time();
 
-    m_last_image = frame_to_image(m_logger, frame, m_flip_vertical);
-    m_last_image_timestamp = frame_timestamp;
+    m_last_image.frame = frame_to_image(m_logger, frame, m_flip_vertical);
+    m_last_image.timestamp = frame_timestamp;
     m_last_image_seqnum = frame_seqnum;
 
     WallClock time1 = current_time();
     m_stats_conversion.report_data(m_logger, std::chrono::duration_cast<std::chrono::microseconds>(time1 - time0).count());
 
-    return VideoSnapshot{m_last_image, frame_timestamp};
+    return m_last_image;
 }
 VideoSnapshot CameraHolder::snapshot(){
     std::unique_lock<std::mutex> lg(m_state_lock);

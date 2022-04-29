@@ -19,7 +19,7 @@ struct VideoSnapshot{
 
     //  The timestamp of when the frame was taken.
     //  This will be as close as possible to when the frame was taken.
-    WallClock timestamp;
+    WallClock timestamp = WallClock::min();
 
     operator QImage&(){ return frame; }
 };

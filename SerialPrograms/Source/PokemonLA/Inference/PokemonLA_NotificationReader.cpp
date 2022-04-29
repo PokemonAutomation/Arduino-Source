@@ -12,7 +12,6 @@
 #include "CommonFramework/ImageTypes/BinaryImage.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
 #include "CommonFramework/ImageTools/ImageStats.h"
-#include "CommonFramework/OCR/OCR_RawOCR.h"
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonLA_NotificationReader.h"
 
@@ -67,8 +66,6 @@ void NotificationReader::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_ocr_box);
 }
 Notification NotificationReader::detect(const QImage& screen) const{
-    const double max_log10p = -8.0;
-
     ConstImageRef image = extract_box_reference(screen, m_ocr_box);
 
 
@@ -105,6 +102,8 @@ Notification NotificationReader::detect(const QImage& screen) const{
 
 
 #if 0
+    const double max_log10p = -8.0;
+
 
 //    image = image.convertToFormat(QImage::Format::Format_ARGB32);
     QImage image_ocr((int)image.width(), (int)image.height(), QImage::Format_ARGB32);

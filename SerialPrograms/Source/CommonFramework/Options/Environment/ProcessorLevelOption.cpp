@@ -59,7 +59,8 @@ std::vector<QString> make_processor_labels(){
 
 ProcessorLevelOption::ProcessorLevelOption()
     : EnumDropdownOption(
-        "<b>Processor Specific Optimization:</b>",
+        "<b>Processor Specific Optimization:</b><br>"
+        "Note that this only applies to this binary. External dependencies may ignore this and use higher instructions anyway.",
         make_processor_labels(),
         AVAILABLE_CAPABILITIES().size() - 1
     )
