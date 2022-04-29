@@ -40,18 +40,29 @@ CrobatFinder_Descriptor::CrobatFinder_Descriptor()
 
 CrobatFinder::CrobatFinder(const CrobatFinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
-    , SHINY_DETECTED("Shiny Detected Action", "", "2 * TICKS_PER_SECOND")
+    , SHINY_DETECTED_ENROUTE(
+        "Enroute Shiny Action",
+        "This applies if you are still traveling to the Crobat.",
+        "2 * TICKS_PER_SECOND"
+    )
+    , SHINY_DETECTED_DESTINATION(
+        "Destination Shiny Action",
+        "This applies if you are near the Crobat.",
+        "2 * TICKS_PER_SECOND"
+    )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
-        &SHINY_DETECTED.NOTIFICATIONS,
+        &SHINY_DETECTED_ENROUTE.NOTIFICATIONS,
+        &SHINY_DETECTED_DESTINATION.NOTIFICATIONS,
         &NOTIFICATION_PROGRAM_FINISH,
 //        &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
-    PA_ADD_OPTION(SHINY_DETECTED);
+    PA_ADD_OPTION(SHINY_DETECTED_ENROUTE);
+    PA_ADD_OPTION(SHINY_DETECTED_DESTINATION);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -119,15 +130,19 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCon
     // start the shiny detection, there's nothing initially
     {
         float shiny_coefficient = 1.0;
+        std::atomic<ShinyDetectedActionOption*> shiny_action = &SHINY_DETECTED_ENROUTE;
+
         ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
             stats.shinies++;
             shiny_coefficient = error_coefficient;
-            return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
+            ShinyDetectedActionOption* action = shiny_action.load(std::memory_order_acquire);
+            return on_shiny_callback(env, env.console, *action, error_coefficient);
         });
+
         int ret = run_until(
             env.console, context,
-            [](BotBaseContext& context){
+            [&](BotBaseContext& context){
 
                 // FORWARD PORTION OF CAVE UNTIL LEDGE
                 pbf_press_button(context, BUTTON_B, (uint16_t)(2.2 * TICKS_PER_SECOND), 80); // wyrdeer sprint
@@ -143,13 +158,18 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCon
                 pbf_press_button(context, BUTTON_B, (uint16_t)(1.05 * TICKS_PER_SECOND), 80); // sprint forward for a split second
                 pbf_move_left_joystick(context, 255, 150, 10, 20); // rotate slightly right
                 pbf_press_button(context, BUTTON_ZL, 20, 70); // align camera
+
+                context.wait_for_all_requests();
+                shiny_action.store(&SHINY_DETECTED_DESTINATION, std::memory_order_release);
+
                 pbf_move_left_joystick(context, 128, 0, (uint16_t)(3.8 * TICKS_PER_SECOND), 0); // forward to crobat check
 
             },
             {{shiny_detector}}
         );
         if (ret == 0){
-            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_coefficient);
+            ShinyDetectedActionOption* action = shiny_action.load(std::memory_order_acquire);
+            on_shiny_sound(env, env.console, context, *action, shiny_coefficient);
         }
     };
 

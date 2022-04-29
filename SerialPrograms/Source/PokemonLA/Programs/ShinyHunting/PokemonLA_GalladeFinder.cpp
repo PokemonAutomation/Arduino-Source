@@ -38,18 +38,29 @@ GalladeFinder_Descriptor::GalladeFinder_Descriptor()
 
 GalladeFinder::GalladeFinder(const GalladeFinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
-    , SHINY_DETECTED("Shiny Detected Action", "", "0 * TICKS_PER_SECOND")
+    , SHINY_DETECTED_ENROUTE(
+        "Enroute Shiny Action",
+        "This applies if you are still traveling to the Gallade.",
+        "0 * TICKS_PER_SECOND"
+    )
+    , SHINY_DETECTED_DESTINATION(
+        "Destination Shiny Action",
+        "This applies if you are near the Gallade.",
+        "0 * TICKS_PER_SECOND"
+    )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
-        &SHINY_DETECTED.NOTIFICATIONS,
+        &SHINY_DETECTED_ENROUTE.NOTIFICATIONS,
+        &SHINY_DETECTED_DESTINATION.NOTIFICATIONS,
         &NOTIFICATION_PROGRAM_FINISH,
 //        &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
 {
     PA_ADD_STATIC(SHINY_REQUIRES_AUDIO);
-    PA_ADD_OPTION(SHINY_DETECTED);
+    PA_ADD_OPTION(SHINY_DETECTED_ENROUTE);
+    PA_ADD_OPTION(SHINY_DETECTED_DESTINATION);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -97,16 +108,19 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCo
     env.console.log("Enabling Shiny Detection...");
     {
         float shiny_coefficient = 1.0;
+        std::atomic<ShinyDetectedActionOption*> shiny_action = &SHINY_DETECTED_ENROUTE;
+
         ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
             stats.shinies++;
             shiny_coefficient = error_coefficient;
-            return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
+            ShinyDetectedActionOption* action = shiny_action.load(std::memory_order_acquire);
+            return on_shiny_callback(env, env.console, *action, error_coefficient);
         });
 
         int ret = run_until(
             env.console, context,
-            [](BotBaseContext& context){
+            [&](BotBaseContext& context){
                 // forward portion
                 pbf_controller_state(context, BUTTON_LCLICK, DPAD_NONE, 128, 0, 128, 128, (uint16_t)(6.8 * TICKS_PER_SECOND)); // forward while running until stairs, mash y a few times down the stairs
                 pbf_mash_button(context, BUTTON_Y,(uint16_t)(2.8 * TICKS_PER_SECOND)); // roll down the stairs, recover stamina
@@ -129,6 +143,9 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCo
                 pbf_press_button(context, BUTTON_ZL, 20, 0); // camera align
                 pbf_wait(context, 70);
 
+                context.wait_for_all_requests();
+                shiny_action.store(&SHINY_DETECTED_DESTINATION, std::memory_order_release);
+
                 pbf_move_left_joystick(context, 0, 128, 2.0 * TICKS_PER_SECOND, 0); // left
 
                 // then forward left
@@ -141,7 +158,8 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCo
             {{shiny_detector}}
         );
         if (ret == 0){
-            on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_coefficient);
+            ShinyDetectedActionOption* action = shiny_action.load(std::memory_order_acquire);
+            on_shiny_sound(env, env.console, context, *action, shiny_coefficient);
         }
     };
 

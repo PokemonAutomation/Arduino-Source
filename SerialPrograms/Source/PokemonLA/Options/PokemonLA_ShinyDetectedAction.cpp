@@ -58,7 +58,7 @@ ShinyDetectedActionOption::ShinyDetectedActionOption(
         "Set to zero to skip this. Don't set this too large or the shiny may run away!",
         std::move(default_delay_ticks)
     )
-    , NOTIFICATIONS("Shiny Detected", true, true, ImageAttachmentMode::JPG, {"Notifs", "Showcase"})
+    , NOTIFICATIONS(this->label(), true, true, ImageAttachmentMode::JPG, {"Notifs", "Showcase"})
 {
     if (!DESCRIPTION.label().isEmpty()){
         PA_ADD_OPTION(DESCRIPTION);
