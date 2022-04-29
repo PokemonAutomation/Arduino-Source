@@ -22,6 +22,7 @@
 #include <QVideoProbe>
 #include <QCameraImageCapture>
 #include <QCameraViewfinder>
+#include "Common/Compiler.h"
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Inference/StatAccumulator.h"
 #include "CameraImplementations.h"

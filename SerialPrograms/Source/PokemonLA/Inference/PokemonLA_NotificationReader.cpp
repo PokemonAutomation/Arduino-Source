@@ -90,10 +90,7 @@ Notification NotificationReader::detect(const QImage& screen) const{
 
     OCR::StringMatchResult results = NotificationOCR::instance().read_substring(
         m_logger, m_language, image,
-        {
-            {0xff808080, 0xffffffff},
-            {0xffa0a0a0, 0xffffffff},
-        }
+        OCR::WHITE_TEXT_FILTERS()
     );
 
     if (results.results.empty()){

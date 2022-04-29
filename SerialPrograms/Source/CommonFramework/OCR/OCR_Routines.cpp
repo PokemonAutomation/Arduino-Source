@@ -71,6 +71,38 @@ StringMatchResult multifiltered_OCR(
 
 
 
+const std::vector<TextColorRange>& BLACK_TEXT_FILTERS(){
+    static std::vector<TextColorRange> filters{
+        {0xff000000, 0xff404040},
+        {0xff000000, 0xff606060},
+        {0xff000000, 0xff808080},
+    };
+    return filters;
+}
+const std::vector<TextColorRange>& WHITE_TEXT_FILTERS(){
+    static std::vector<TextColorRange> filters{
+        {0xff808080, 0xffffffff},
+        {0xffa0a0a0, 0xffffffff},
+        {0xffc0c0c0, 0xffffffff},
+    };
+    return filters;
+}
+const std::vector<TextColorRange>& BLACK_OR_WHITE_TEXT_FILTERS(){
+    static std::vector<TextColorRange> filters{
+        {0xff000000, 0xff404040},
+        {0xff000000, 0xff606060},
+        {0xff000000, 0xff808080},
+        {0xff808080, 0xffffffff},
+        {0xffa0a0a0, 0xffffffff},
+    };
+    return filters;
+}
+
+
+
+
+
+
 
 
 }
