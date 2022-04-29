@@ -65,11 +65,7 @@ std::string BattleBallReader::read_ball(const QImage& screen) const{
         ConstImageRef cropped = extract_box_reference(screen, m_box_name);
         name_result = m_name_reader.read_substring(
             m_console, m_language, cropped,
-            {
-                {0xff808080, 0xffffffff},
-                {0xffa0a0a0, 0xffffffff},
-                {0xffc0c0c0, 0xffffffff},
-            }
+            OCR::WHITE_TEXT_FILTERS()
         );
     }
 

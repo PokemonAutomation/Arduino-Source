@@ -60,11 +60,7 @@ void TrainIVCheckerOCR::program(ProgramEnvironment& env, CancellableScope& scope
         "Pokemon/IVCheckerOCR.json",
         "IVCheckerOCR.json",
         MODE != 0, THREADS,
-        {
-            {0xff000000, 0xff404040},
-            {0xff000000, 0xff606060},
-            {0xff000000, 0xff808080},
-        },
+        OCR::BLACK_TEXT_FILTERS(),
         IVCheckerReader::MAX_LOG10P,
         IVCheckerReader::MAX_LOG10P_SPREAD
     );

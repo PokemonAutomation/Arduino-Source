@@ -115,13 +115,7 @@ std::set<std::string> read_pokemon_name(
 //    image.save("test.png");
     OCR::StringMatchResult result = database.name_reader->read_substring(
         logger, language, image,
-        {
-            {0xff000000, 0xff404040},
-            {0xff000000, 0xff808080},
-            {0xff808080, 0xffffffff},
-            {0xffa0a0a0, 0xffffffff},
-            {0xffc0c0c0, 0xffffffff},
-        }
+        OCR::BLACK_OR_WHITE_TEXT_FILTERS()
     );
 //    result.log(logger);
     if (result.results.empty()){

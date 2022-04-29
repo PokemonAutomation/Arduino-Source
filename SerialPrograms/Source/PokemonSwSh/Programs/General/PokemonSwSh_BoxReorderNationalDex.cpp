@@ -83,11 +83,7 @@ namespace{
 
         OCR::StringMatchResult result = Pokemon::PokemonNameReader::instance().read_substring(
             console, language, frame,
-            {
-                {0xff000000, 0xff404040},
-                {0xff000000, 0xff606060},
-                {0xff000000, 0xff808080},
-            }
+            OCR::BLACK_TEXT_FILTERS()
         );
         result.log(console, Pokemon::PokemonNameReader::MAX_LOG10P);
 //        assert(result.results.size() == 1);

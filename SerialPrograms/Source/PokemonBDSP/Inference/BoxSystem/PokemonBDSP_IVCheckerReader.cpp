@@ -28,11 +28,7 @@ IVCheckerValue IVCheckerReaderScope::read(LoggerQt& logger, const QImage& frame,
     ConstImageRef image = extract_box_reference(frame, box);
     OCR::StringMatchResult result = IVCheckerReader::instance().read_substring(
         logger, m_language, image,
-        {
-            {0xff000000, 0xff404040},
-            {0xff000000, 0xff606060},
-            {0xff000000, 0xff808080},
-        }
+        OCR::BLACK_TEXT_FILTERS()
     );
     result.clear_beyond_log10p(IVCheckerReader::MAX_LOG10P);
     if (result.results.size() != 1){

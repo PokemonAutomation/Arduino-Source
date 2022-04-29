@@ -64,11 +64,7 @@ const std::set<std::string>* StandardEncounterDetection::candidates(){
 
     OCR::StringMatchResult result = PokemonNameReader::instance().read_substring(
         m_console, m_language, frame,
-        {
-            {0xff000000, 0xff404040},
-            {0xff000000, 0xff606060},
-            {0xff000000, 0xff808080},
-        }
+        OCR::BLACK_TEXT_FILTERS()
     );
     if (result.results.empty()){
         dump_image(

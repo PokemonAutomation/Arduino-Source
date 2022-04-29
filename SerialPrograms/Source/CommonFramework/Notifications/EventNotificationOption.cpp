@@ -104,6 +104,7 @@ EventNotificationOption::EventNotificationOption()
     : screenshot_supported(false)
     , m_default({false, false, ImageAttachmentMode::NO_SCREENSHOT, {}, std::chrono::seconds(0)})
     , m_current(m_default)
+    , m_last_sent(WallClock::min())
 {
     reset_rate_limit();
 }
@@ -116,6 +117,7 @@ EventNotificationOption::EventNotificationOption(
     , screenshot_supported(false)
     , m_default({enabled, ping, ImageAttachmentMode::NO_SCREENSHOT, {"Notifs"}, rate_limit})
     , m_current(m_default)
+    , m_last_sent(WallClock::min())
 {
     reset_rate_limit();
 }
@@ -129,6 +131,7 @@ EventNotificationOption::EventNotificationOption(
     , screenshot_supported(false)
     , m_default({enabled, ping, ImageAttachmentMode::NO_SCREENSHOT, std::move(tags), rate_limit})
     , m_current(m_default)
+    , m_last_sent(WallClock::min())
 {
     reset_rate_limit();
 }
@@ -143,6 +146,7 @@ EventNotificationOption::EventNotificationOption(
     , screenshot_supported(true)
     , m_default({enabled, ping, screenshot, std::move(tags), rate_limit})
     , m_current(m_default)
+    , m_last_sent(WallClock::min())
 {
     reset_rate_limit();
 }
@@ -158,7 +162,7 @@ void EventNotificationOption::restore_defaults(){
     m_current = m_default;
 }
 void EventNotificationOption::reset_rate_limit(){
-    m_last_sent = WallClock::min();
+    m_last_sent.store(WallClock::min(), std::memory_order_release);
 }
 bool EventNotificationOption::ok_to_send_now(LoggerQt& logger){
     if (!m_enabled){
@@ -172,12 +176,20 @@ bool EventNotificationOption::ok_to_send_now(LoggerQt& logger){
 //    if (m_current.rate_limit == std::chrono::seconds(0)){
 //        return true;
 //    }
-    auto now = current_time();
-    if (now < m_last_sent + m_current.rate_limit){
-        logger.log("EventNotification(" + m_label + "): Notification dropped due to rate limit.", COLOR_PURPLE);
-        return false;
-    }
-    m_last_sent = now;
+
+    WallClock now;
+    WallClock last;
+    do{
+        now = current_time();
+        WallClock last = m_last_sent.load(std::memory_order_acquire);
+
+        if (now < last + m_current.rate_limit){
+            logger.log("EventNotification(" + m_label + "): Notification dropped due to rate limit.", COLOR_PURPLE);
+            return false;
+        }
+
+    }while (!m_last_sent.compare_exchange_weak(last, now));
+
     logger.log("EventNotification(" + m_label + "): Sending notification.", COLOR_BLUE);
     return true;
 }

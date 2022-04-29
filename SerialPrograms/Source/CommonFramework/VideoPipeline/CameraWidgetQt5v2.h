@@ -19,6 +19,7 @@
 #include "VideoWidget.h"
 //#include "CameraInfo.h"
 #include "CameraImplementations.h"
+#include "VideoToolsQt5.h"
 
 class QCamera;
 class QCameraImageCapture;
@@ -71,7 +72,6 @@ private:
 //    void internal_shutdown();
 
     //  All of these must be called under the state lock.
-    QImage direct_snapshot_image(std::unique_lock<std::mutex>& lock);
     QImage direct_snapshot_probe(bool flip_vertical);
 
     VideoSnapshot snapshot_image(std::unique_lock<std::mutex>& lock);
@@ -95,20 +95,15 @@ private:
     LoggerQt& m_logger;
     VideoWidget& m_widget;
     QCamera* m_camera = nullptr;
+    CameraScreenshotter m_screenshotter;
 
     std::mutex m_state_lock;
-    std::condition_variable m_cv;
 
     size_t m_max_frame_rate;
     std::chrono::milliseconds m_frame_period;
     std::vector<QSize> m_supported_resolutions;
     QSize m_current_resolution;
 
-    //  QCameraImageCapture capture method.
-    QCameraImageCapture* m_capture = nullptr;
-    std::map<int, PendingCapture> m_pending_captures;
-
-    //  QVideoProbe capture method.
     QVideoProbe* m_probe = nullptr;
 
     WallClock m_last_orientation_attempt;
@@ -121,8 +116,7 @@ private:
     uint64_t m_last_frame_seqnum = 0;
 
     //  Last Cached Image
-    QImage m_last_image;
-    WallClock m_last_image_timestamp;
+    VideoSnapshot m_last_image;
     uint64_t m_last_image_seqnum = 0;
     PeriodicStatsReporterI32 m_stats_conversion;
 };
