@@ -22,6 +22,7 @@ public:
         bool enabled = true
     );
 
+    const QString label() const{ return m_label; }
     bool enabled() const;
 
     virtual void load_json(const QJsonValue& json) override;

@@ -26,7 +26,7 @@ ItemCompatibility detect_item_compatibility(const QImage& screen){
 
     QImage region = extract_box_copy(screen, box);
 
-    // Replacing white background with zero-alpah color so that they won't be counted in
+    // Replacing white background with zero-alpha color so that they won't be counted in
     // the following image_stats()
     filter_rgb32_range(region, 0xffa0a0a0, 0xffffffff, Color(0), true);
 

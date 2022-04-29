@@ -60,13 +60,7 @@ void TrainPokemonOCR::program(ProgramEnvironment& env, CancellableScope& scope){
         "PokemonOCR-",
         MODE != 0,
         THREADS,
-        {
-            {0xff000000, 0xff404040},
-            {0xff000000, 0xff606060},
-            {0xff000000, 0xff808080},
-            {0xff808080, 0xffffffff},
-            {0xffa0a0a0, 0xffffffff},
-        },
+        OCR::BLACK_OR_WHITE_TEXT_FILTERS(),
         PokemonNameReader::MAX_LOG10P + 1.0,
         PokemonNameReader::MAX_LOG10P_SPREAD
     );

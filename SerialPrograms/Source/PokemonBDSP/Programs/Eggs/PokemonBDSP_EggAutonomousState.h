@@ -82,7 +82,7 @@ private:
     ConsoleHandle& m_console;
     BotBaseContext& m_context;
     EggAutonomousStats& m_stats;
-    EventNotificationOption m_notification_noop;
+    static EventNotificationOption m_notification_noop;
     EventNotificationOption& m_notification_nonshiny_keep;
     EventNotificationOption& m_notification_shiny;
     EventNotificationOption& m_notification_error;
