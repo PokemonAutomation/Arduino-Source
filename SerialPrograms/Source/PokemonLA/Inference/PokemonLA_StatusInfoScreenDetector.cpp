@@ -80,13 +80,17 @@ void StatusInfoScreenDetector::get_pokemon_name(ConsoleHandle& console, QImage f
 
     QImage image = extract_box_copy(frame, m_name_box);
 
-    OCR::StringMatchResult result = Pokemon::PokemonNameReader::instance().read_substring(console, language, image);
-
+    OCR::StringMatchResult result = Pokemon::PokemonNameReader::instance().read_substring(
+        console, language, image,
+        {
+            {0xff000000, 0xff404040},
+            {0xff000000, 0xff606060},
+            {0xff000000, 0xff808080},
+        }
+    );
     m_pokemon.name = "UNIDENTIFIED";
 
     for (const auto& item : result.results){
-//        console.log("ORIGINAL: " + item.second.original_text);
-//        console.log("NORMALIZED: " + item.second.normalized_text);
         m_pokemon.name = item.second.original_text.trimmed();
     }
 }

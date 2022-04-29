@@ -127,41 +127,60 @@ std::unique_ptr<StatsTracker> LeapGrinder::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-void LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
 
     Stats& stats = env.stats<Stats>();
     stats.attempts++;
 
-    uint8_t stop_case = static_cast<int>(STOP_ON) + 1;
-    uint8_t remaining_leaps = LEAPS;
+    uint8_t stop_case = STOP_ON + 1;
 
-    env.console.log("Starting...");
+    env.console.log("Starting route and shiny detection...");
 
-    switch (POKEMON)
-    {
-        case 1:
-            setup(env, env.console, context);
-            break;
+    float shiny_coefficient = 1.0;
+    ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+        //  Warning: This callback will be run from a different thread than this function.
+        stats.shinies++;
+        shiny_coefficient = error_coefficient;
+        return on_shiny_callback(env, env.console, SHINY_DETECTED_ENROUTE, error_coefficient);
+    });
+
+    int ret = run_until(
+        env.console, context,
+        [&](BotBaseContext& context){
+            switch (POKEMON)
+            {
+                case 1:
+                    setup(env, env.console, context);
+                    break;
+            }
+        },
+        {{shiny_detector}}
+    );
+    if (ret == 0){
+        on_shiny_sound(env, env.console, context, SHINY_DETECTED_ENROUTE, shiny_coefficient);
     }
+
+    env.console.log("End of route and shiny detection...");
 
     bool battle_found = check_tree_for_battle(env.console, context);
 
     context.wait_for_all_requests();
 
     if (battle_found){
+        env.console.log("Pokemon leaped!");
+
         PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
 
-        env.console.log("LOOKING FOR:" + POKEMON.case_name(POKEMON));
-        env.console.log("FOUND:" + pokemon.name);
-        env.console.log("IS SHINY: " + std::to_string(pokemon.is_shiny));
-        env.console.log("IS ALPHA: " + std::to_string(pokemon.is_alpha));
+        env.console.log("Looking for: " + POKEMON.case_name(POKEMON));
+        env.console.log("Found: " + pokemon.name);
+        env.console.log("Alpha: " + std::to_string(pokemon.is_alpha));
+        env.console.log("Shiny: " + std::to_string(pokemon.is_shiny));
 
         if (pokemon.name == POKEMON.case_name(POKEMON).trimmed()){
-            env.console.log("Pokemon leaped!");
-            remaining_leaps--;
+            env.console.log("Expected Pokemon leaped!");
             stats.leaps++;
         }else{
-            env.console.log("Not the expected pokemon. Continuing.");
+            env.console.log("Not the expected pokemon.");
         }
 
         //Match validation
@@ -175,15 +194,17 @@ void LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
         exit_battle(context);
     }
 
-    if (remaining_leaps == 0){
-        throw ProgramFinishedException();
-    }
-
-    env.console.log("Reamining Leaps:" + std::to_string(remaining_leaps));
+    env.console.log("Remaining Leaps:" + std::to_string(LEAPS - stats.leaps));
 
     goto_camp_from_overworld(env, env.console, context);
     goto_professor(env.console, context, Camp::FIELDLANDS_FIELDLANDS);
     from_professor_return_to_jubilife(env, env.console, context);
+
+    if (stats.leaps == LEAPS){
+        return true;
+    }
+
+    return false;
 }
 
 void LeapGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
@@ -201,7 +222,8 @@ void LeapGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
             stats.to_str()
         );
         try{
-            run_iteration(env, context);
+            if(run_iteration(env, context))
+                break;
         }catch (OperationFailedException&){
             stats.errors++;
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);

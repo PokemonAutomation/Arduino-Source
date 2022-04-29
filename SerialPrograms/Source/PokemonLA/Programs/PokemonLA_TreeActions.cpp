@@ -4,6 +4,7 @@
  *
  */
 
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "PokemonLA/Programs/PokemonLA_MountChange.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
@@ -41,7 +42,8 @@ void setup(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& cont
 bool check_tree_for_battle(ConsoleHandle& console, BotBaseContext& context){
 
     pbf_press_button(context, BUTTON_ZR, (0.5 * TICKS_PER_SECOND), 20); //throw pokemon
-    pbf_wait(context, (4 * TICKS_PER_SECOND));
+    pbf_wait(context, (4.5 * TICKS_PER_SECOND));
+
     context.wait_for_all_requests();
 
     MountDetector mount_detector;
