@@ -4,29 +4,15 @@
  *
  */
 
-#include "Common/Cpp/Exceptions.h"
+
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "CommonFramework/Tools/ErrorDumper.h"
-#include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
-#include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "PokemonLA/PokemonLA_Settings.h"
-#include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
-#include "PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
-#include "PokemonLA/Inference/PokemonLA_MapDetector.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
-#include "PokemonLA/Inference/PokemonLA_UnderAttackDetector.h"
-#include "PokemonLA/Programs/PokemonLA_MountChange.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
-#include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.h"
 #include "PokemonLA/Programs/Farming/PokemonLA_LeapGrinder.h"
-#include "PokemonLA/Programs/PokemonLA_TreeActions.h"
-#include "PokemonLA/Resources/PokemonLA_PokemonInfo.h"
-
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -132,7 +118,7 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     Stats& stats = env.stats<Stats>();
     stats.attempts++;
 
-    uint8_t stop_case = STOP_ON + 1;
+    size_t stop_case = STOP_ON + 1;
 
     env.console.log("Starting route and shiny detection...");
 
@@ -184,10 +170,10 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
         }
 
         //Match validation
-        int8_t ret = (pokemon.is_alpha + pokemon.is_shiny);
+        size_t match_ret = (pokemon.is_alpha + pokemon.is_shiny);
         if((pokemon.is_alpha + pokemon.is_shiny) > 0){
-            if(pokemon.is_alpha) ret++;
-            bool is_match = (ret == stop_case || stop_case == 4);
+            if(pokemon.is_alpha) match_ret++;
+            bool is_match = (match_ret == stop_case || stop_case == 4);
             on_match_found(env, env.console, context, MATCH_DETECTED_OPTIONS, is_match);
         }
 

@@ -948,8 +948,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_UnownFinder.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_FroslassFinder.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_FroslassFinder.cpp
-    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_TreeShinyHunting.h
-    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_TreeShinyHunting.cpp
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_BurmyFinder.h
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_BurmyFinder.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.cpp
