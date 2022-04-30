@@ -274,12 +274,10 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, BotBaseCo
             stats.to_str()
         );
         try{
-//            Stats& stats = env.stats<Stats>();
+            stats.attempts++;
 
             goto_camp_from_jubilife(env, env.console, context, TRAVEL_LOCATION);
             run_path(env, context);
-
-            stats.attempts++;
 
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
