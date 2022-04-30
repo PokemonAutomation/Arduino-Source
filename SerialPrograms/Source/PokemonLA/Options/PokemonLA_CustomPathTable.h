@@ -19,8 +19,10 @@ namespace PokemonLA{
 enum class PathAction{
     NO_ACTION,
     CHANGE_MOUNT,
-    ROTATE_CAMERA,
+//    ROTATE_CAMERA,
     MOVE_FORWARD,
+    MOVE_IN_DIRECTION,
+    CENTER_CAMERA,
     JUMP,
     WAIT,
     START_LISTEN,
@@ -64,9 +66,14 @@ private:
 public:
     PathAction action = PathAction::NO_ACTION;
     PathMount mount = PathMount::NO_MOUNT;
+
     int16_t camera_turn_ticks = 0;
-    uint16_t move_forward_ticks = 0;
+
     PathSpeed move_speed = PathSpeed::NORMAL_SPEED;
+    uint16_t move_forward_ticks = 0;
+    double left_x = 0;
+    double left_y = 0;
+
     uint16_t jump_wait_ticks = 0;
     uint16_t wait_ticks = 0;
 };

@@ -37,7 +37,8 @@ ShinyRequiresAudioText::ShinyRequiresAudioText()
 
 ShinyDetectedActionOption::ShinyDetectedActionOption(
     QString label, QString description,
-    QString default_delay_ticks
+    QString default_delay_ticks,
+    ShinyDetectedAction default_action
 )
     : GroupOption(std::move(label))
     , DESCRIPTION(std::move(description))
@@ -48,7 +49,7 @@ ShinyDetectedActionOption::ShinyDetectedActionOption(
             "Stop program. Align camera for a screenshot. Then go Home.",
             "Stop program. Align camera for a screenshot + video. Then go Home.",
         },
-        2
+        (size_t)default_action
     )
 //    , STOP_PROGRAM("<b>Stop Program:</b><br>Stop program and go Home if it hears a shiny.", true)
 //    , TAKE_VIDEO("<b>Take Video:</b><br>Take a video if a shiny is heard.", true)

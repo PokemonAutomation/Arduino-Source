@@ -32,8 +32,10 @@ namespace PokemonLA{
 const QString PathAction_NAMES[] = {
     "NO Action",
     "Change Mount",
-    "Rotate Camera",
+//    "Rotate Camera",
     "Move Forward",
+    "Move in Direction",
+    "Center Camera",
     "Jump",
     "Wait",
     "Start Listen",
@@ -43,12 +45,14 @@ const QString PathAction_NAMES[] = {
 const std::map<QString, PathAction> PathAction_MAP{
     {PathAction_NAMES[0], PathAction::NO_ACTION},
     {PathAction_NAMES[1], PathAction::CHANGE_MOUNT},
-    {PathAction_NAMES[2], PathAction::ROTATE_CAMERA},
-    {PathAction_NAMES[3], PathAction::MOVE_FORWARD},
-    {PathAction_NAMES[4], PathAction::JUMP},
-    {PathAction_NAMES[5], PathAction::WAIT},
-    {PathAction_NAMES[6], PathAction::START_LISTEN},
-    {PathAction_NAMES[7], PathAction::END_LISTEN},
+//    {PathAction_NAMES[2], PathAction::ROTATE_CAMERA},
+    {PathAction_NAMES[2], PathAction::MOVE_FORWARD},
+    {PathAction_NAMES[3], PathAction::MOVE_IN_DIRECTION},
+    {PathAction_NAMES[4], PathAction::CENTER_CAMERA},
+    {PathAction_NAMES[5], PathAction::JUMP},
+    {PathAction_NAMES[6], PathAction::WAIT},
+    {PathAction_NAMES[7], PathAction::START_LISTEN},
+    {PathAction_NAMES[8], PathAction::END_LISTEN},
 };
 
 
@@ -112,9 +116,11 @@ void CustomPathTableRow::load_json(const QJsonValue& json){
                 }
             }
             break;
+#if 0
         case PathAction::ROTATE_CAMERA:
             json_get_int(camera_turn_ticks, obj, "CameraTurnTicks");
             break;
+#endif
         case PathAction::MOVE_FORWARD:
             json_get_int(move_forward_ticks, obj, "MoveForwardTicks");
             if (json_get_string(value, obj, "Speed")){
@@ -123,6 +129,17 @@ void CustomPathTableRow::load_json(const QJsonValue& json){
                     move_speed = iter->second;
                 }
             }
+            break;
+        case PathAction::MOVE_IN_DIRECTION:
+            json_get_int(move_forward_ticks, obj, "MoveForwardTicks");
+            if (json_get_string(value, obj, "Speed")){
+                const auto iter = PathSpeed_MAP.find(value);
+                if (iter != PathSpeed_MAP.end()){
+                    move_speed = iter->second;
+                }
+            }
+            json_get_double(left_x, obj, "MoveDirectionX");
+            json_get_double(left_y, obj, "MoveDirectionY");
             break;
         case PathAction::JUMP:
             json_get_int(jump_wait_ticks, obj, "JumpWaitTicks");
@@ -146,12 +163,20 @@ QJsonValue CustomPathTableRow::to_json() const{
     case PathAction::CHANGE_MOUNT:
         obj.insert("Mount", PathMount_NAMES[(size_t)mount]);
         break;
+#if 0
     case PathAction::ROTATE_CAMERA:
         obj.insert("CameraTurnTicks", camera_turn_ticks);
         break;
+#endif
     case PathAction::MOVE_FORWARD:
         obj.insert("MoveForwardTicks", move_forward_ticks);
         obj.insert("Speed", PathSpeed_NAMES[(size_t)move_speed]);
+        break;
+    case PathAction::MOVE_IN_DIRECTION:
+        obj.insert("MoveForwardTicks", move_forward_ticks);
+        obj.insert("Speed", PathSpeed_NAMES[(size_t)move_speed]);
+        obj.insert("MoveDirectionX", left_x);
+        obj.insert("MoveDirectionY", left_y);
         break;
     case PathAction::JUMP:
         obj.insert("JumpWaitTicks", jump_wait_ticks);
@@ -182,39 +207,105 @@ private:
     CustomPathTableRow& m_row;
 
     QHBoxLayout* m_layout = nullptr;
+
+    QWidget* m_mounts_dropdown;
+
+    QWidget* m_camera_label;
+    QWidget* m_camera_duration;
+
+    QWidget* m_move_label;
+    QWidget* m_move_duration;
+    QWidget* m_move_space;
+    QWidget* m_move_speed;
+
+    QWidget* m_move_x_label;
+    QWidget* m_move_x_coord;
+    QWidget* m_move_y_label;
+    QWidget* m_move_y_coord;
+
+    QWidget* m_center_label;
+
+    QWidget* m_jump_label;
+    QWidget* m_jump_duration;
+
+    QWidget* m_wait_label;
+    QWidget* m_wait_duration;
+
+    QWidget* m_listen_start;
+    QWidget* m_listen_stop;
 };
 
-ActionParameterWidget::ActionParameterWidget(QWidget& parent, CustomPathTableRow& row): QWidget(&parent), m_row(row)
+ActionParameterWidget::ActionParameterWidget(QWidget& parent, CustomPathTableRow& row)
+    : QWidget(&parent), m_row(row)
 {
+    //  TODO: Figure out why nesting a widget creates a vertical margin even
+    //  when the margins are set to zero.
+
+    this->setContentsMargins(0, 0, 0, 0);
     m_layout = new QHBoxLayout(this);
+
+#if 0
     m_layout->setContentsMargins(0, 0, 0, 0);
-    // Widget 0
-    m_layout->addWidget(make_enum_table_cell(*this, PathMount_MAP.size(), PathMount_NAMES, m_row.mount));
+    QWidget* widget(this);
+    widget->setContentsMargins(0, 0, 0, 0);
+    new QHBoxLayout(widget);
+     widget->layout()->setContentsMargins(0, 0, 0, 0);
+    widget->layout()->addWidget(new QPushButton("test", this));
+//    m_layout->addWidget(new QPushButton("test", this));
+    m_layout->addWidget(widget);
+#endif
 
-    // Widget 1, 2
-    m_layout->addWidget(new QLabel("Ticks to turn camera (right: +, left: -):", this));
-    m_layout->addWidget(make_number_table_cell(*this, m_row.camera_turn_ticks));
+#if 1
+    m_layout->setContentsMargins(5, 0, 5, 0);
 
-    // Widget 3, 4, 5, 6
-    m_layout->addWidget(new QLabel("Ticks to move forward:", this));
-    m_layout->addWidget(make_number_table_cell(*this, m_row.move_forward_ticks));
-    m_layout->addWidget(new QLabel(" ", this));
-    m_layout->addWidget(make_enum_table_cell(*this, PathSpeed_MAP.size(), PathSpeed_NAMES, m_row.move_speed));
+    m_mounts_dropdown = make_enum_table_cell(*this, PathMount_MAP.size(), PathMount_NAMES, m_row.mount);
+    m_layout->addWidget(m_mounts_dropdown);
 
-    // Widget 7, 8
-    m_layout->addWidget(new QLabel("Ticks after jump:", this));
-    m_layout->addWidget(make_number_table_cell(*this, m_row.jump_wait_ticks));
+    m_camera_label = new QLabel("Ticks to turn camera (right: +, left: -):", this);
+    m_camera_duration = make_integer_table_cell(*this, m_row.camera_turn_ticks);
+    m_layout->addWidget(m_camera_label);
+    m_layout->addWidget(m_camera_duration);
 
-    // Widget 9, 10
-    m_layout->addWidget(new QLabel("Ticks", this));
-    m_layout->addWidget(make_number_table_cell(*this, m_row.wait_ticks));
+    m_move_label = new QLabel("Ticks to move:", this);
+    m_move_duration = make_integer_table_cell(*this, m_row.move_forward_ticks);
+    m_move_space = new QLabel(" ", this);
+    m_move_speed = make_enum_table_cell(*this, PathSpeed_MAP.size(), PathSpeed_NAMES, m_row.move_speed);
+    m_layout->addWidget(m_move_label);
+    m_layout->addWidget(m_move_duration);
+    m_layout->addWidget(m_move_space);
+    m_layout->addWidget(m_move_speed);
 
-    // Widget 11
-    m_layout->addWidget(new QLabel("Shiny sound", this));
-    // Widget 12
-    m_layout->addWidget(new QLabel("Shiny sound", this));
+    m_move_x_label = new QLabel("x: [left: -1.0, right: 1.0]", this);
+    m_move_x_coord = make_double_table_cell(*this, m_row.left_x, -1.0, 1.0);
+    m_move_x_coord->setMaximumWidth(80);
+    m_move_y_label = new QLabel("y: [forward: 1.0, backward: -1.0]", this);
+    m_move_y_coord = make_double_table_cell(*this, m_row.left_y, -1.0, 1.0);
+    m_move_y_coord->setMaximumWidth(80);
+    m_layout->addWidget(m_move_x_label);
+    m_layout->addWidget(m_move_x_coord);
+    m_layout->addWidget(m_move_y_label);
+    m_layout->addWidget(m_move_y_coord);
+
+    m_center_label = new QLabel("Center the camera so that you can move straight forward.", this);
+    m_layout->addWidget(m_center_label);
+
+    m_jump_label = new QLabel("Ticks after jump:", this);
+    m_jump_duration = make_integer_table_cell(*this, m_row.jump_wait_ticks);
+    m_layout->addWidget(m_jump_label);
+    m_layout->addWidget(m_jump_duration);
+
+    m_wait_label = new QLabel("Ticks", this);
+    m_wait_duration = make_integer_table_cell(*this, m_row.wait_ticks);
+    m_layout->addWidget(m_wait_label);
+    m_layout->addWidget(m_wait_duration);
+
+    m_listen_start = new QLabel("If shiny detected, use \"Shiny Action (Listening)\".", this);
+    m_layout->addWidget(m_listen_start);
+    m_listen_stop = new QLabel("If shiny detected, use \"Shiny Action (Ignoring)\".", this);
+    m_layout->addWidget(m_listen_stop);
 
     setParameter();
+#endif
 }
 
 void ActionParameterWidget::setParameter(){
@@ -223,30 +314,44 @@ void ActionParameterWidget::setParameter(){
     }
     switch(m_row.action){
         case PathAction::CHANGE_MOUNT:
-            m_layout->itemAt(0)->widget()->show();
+            m_mounts_dropdown->show();
             break;
+#if 0
         case PathAction::ROTATE_CAMERA:
-            m_layout->itemAt(1)->widget()->show();
-            m_layout->itemAt(2)->widget()->show();
+            m_camera_label->show();
+            m_camera_duration->show();
             break;
+#endif
         case PathAction::MOVE_FORWARD:
-            for(int i = 3; i < 7; i++){
-                m_layout->itemAt(i)->widget()->show();
-            }
+            m_move_label->show();
+            m_move_duration->show();
+            m_move_space->show();
+            m_move_speed->show();
+            break;
+        case PathAction::MOVE_IN_DIRECTION:
+            m_move_label->show();
+            m_move_duration->show();
+            m_move_x_label->show();
+            m_move_x_coord->show();
+            m_move_y_label->show();
+            m_move_y_coord->show();
+            break;
+        case PathAction::CENTER_CAMERA:
+            m_center_label->show();
             break;
         case PathAction::JUMP:
-            m_layout->itemAt(7)->widget()->show();
-            m_layout->itemAt(8)->widget()->show();
+            m_jump_label->show();
+            m_jump_duration->show();
             break;
         case PathAction::WAIT:
-            m_layout->itemAt(9)->widget()->show();
-            m_layout->itemAt(10)->widget()->show();
+            m_wait_label->show();
+            m_wait_duration->show();
             break;
         case PathAction::START_LISTEN:
-            m_layout->itemAt(11)->widget()->show();
+            m_listen_start->show();
             break;
         case PathAction::END_LISTEN:
-            m_layout->itemAt(12)->widget()->show();
+            m_listen_stop->show();
             break;
         default:
             break;
@@ -307,9 +412,22 @@ std::vector<std::unique_ptr<EditableTableRow>> CustomPathTable::make_defaults() 
     row->mount = PathMount::WYRDEER;
     ret.emplace_back(std::move(row));
 
+#if 0
     row = std::make_unique<CustomPathTableRow>();
     row->action = PathAction::ROTATE_CAMERA;
     row->camera_turn_ticks = -100;
+    ret.emplace_back(std::move(row));
+#endif
+
+    row = std::make_unique<CustomPathTableRow>();
+    row->action = PathAction::MOVE_IN_DIRECTION;
+    row->move_forward_ticks = 400;
+    row->left_x = -1.0;
+    row->left_y = 1.0;
+    ret.emplace_back(std::move(row));
+
+    row = std::make_unique<CustomPathTableRow>();
+    row->action = PathAction::CENTER_CAMERA;
     ret.emplace_back(std::move(row));
 
     row = std::make_unique<CustomPathTableRow>();
@@ -318,9 +436,9 @@ std::vector<std::unique_ptr<EditableTableRow>> CustomPathTable::make_defaults() 
     row->move_forward_ticks = 400;
     ret.emplace_back(std::move(row));
 
-    row = std::make_unique<CustomPathTableRow>();
-    row->action = PathAction::END_LISTEN;
-    ret.emplace_back(std::move(row));
+//    row = std::make_unique<CustomPathTableRow>();
+//    row->action = PathAction::END_LISTEN;
+//    ret.emplace_back(std::move(row));
     
     return ret;
 }

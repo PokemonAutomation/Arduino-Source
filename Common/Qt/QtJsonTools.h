@@ -42,7 +42,7 @@ bool json_get_bool(Destination& destination, const QJsonObject& obj, const QStri
     if (iter == obj.end() || !iter->isBool()){
         return false;
     }
-    destination = iter->toBool();
+    destination = (Destination)iter->toBool();
     return true;
 }
 template <typename Destination>
@@ -62,7 +62,27 @@ bool json_get_int(
     if (x > max_value){
         x = max_value;
     }
-    destination = x;
+    destination = (Destination)x;
+    return true;
+}
+template <typename Destination>
+bool json_get_double(
+    Destination& destination, const QJsonObject& obj, const QString& key,
+    int min_value = std::numeric_limits<int>::min(),
+    int max_value = std::numeric_limits<int>::max()
+){
+    auto iter = obj.find(key);
+    if (iter == obj.end() || !iter->isDouble()){
+        return false;
+    }
+    double x = iter->toDouble();
+    if (x < min_value){
+        x = min_value;
+    }
+    if (x > max_value){
+        x = max_value;
+    }
+    destination = (Destination)x;
     return true;
 }
 template <typename Destination>
