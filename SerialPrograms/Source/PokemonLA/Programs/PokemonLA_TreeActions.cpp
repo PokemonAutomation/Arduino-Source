@@ -24,18 +24,12 @@ void setup(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& cont
     pbf_move_left_joystick(context, 170, 255, 30, 30);
     change_mount(console, context, MountState::BRAVIARY_ON);
     pbf_press_button(context, BUTTON_B, (6.35 * TICKS_PER_SECOND), 20);
-    pbf_press_button(context, BUTTON_PLUS, 20, 20);
-    pbf_wait(context, (1 * TICKS_PER_SECOND));
-    pbf_press_button(context, BUTTON_PLUS, 20, 20);
-    pbf_wait(context, (0.5 * TICKS_PER_SECOND));
-    pbf_press_button(context, BUTTON_PLUS, 20, 20);
-    pbf_wait(context, (1 * TICKS_PER_SECOND));
-    pbf_move_left_joystick(context, 255, 127, 30, 30);
-    pbf_wait(context, (0.5 * TICKS_PER_SECOND));
-    pbf_press_button(context, BUTTON_ZL, 20, 20);
-    pbf_wait(context, (0.5 * TICKS_PER_SECOND));
-    pbf_move_right_joystick(context, 127, 255, (0.10 * TICKS_PER_SECOND), 20);
-    pbf_wait(context, (0.5 * TICKS_PER_SECOND));
+    pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+    pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
+    pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
+    pbf_move_left_joystick(context, 255, 127, 30, (0.5 * TICKS_PER_SECOND));
+    pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+    pbf_move_right_joystick(context, 127, 255, (0.10 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
     context.wait_for_all_requests();
 }
 
