@@ -159,6 +159,7 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
         env.console.log("Looking for: " + POKEMON.case_name(POKEMON));
         env.console.log("Found: " + pokemon.name);
+        env.console.log("Gender: " + pokemon.gender);
         env.console.log("Alpha: " + std::to_string(pokemon.is_alpha));
         env.console.log("Shiny: " + std::to_string(pokemon.is_shiny));
 
