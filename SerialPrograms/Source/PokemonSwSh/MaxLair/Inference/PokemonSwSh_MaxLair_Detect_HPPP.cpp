@@ -232,8 +232,8 @@ int8_t read_pp_text(LoggerQt& logger, const ConstImageRef& image){
     QImage processed;
     for (const auto& item : filters){
         processed = reference;
-        size_t text_pixels = to_blackwhite_rgb32_range(processed, item.first, item.second, true);
-        double text_ratio = (double)text_pixels / (image.width() * image.height());
+        size_t text_pixels = to_blackwhite_rgb32_range(processed, item.first, item.second, false);
+        double text_ratio = 1.0 - (double)text_pixels / (image.width() * image.height());
         if (0.05 <= text_ratio && text_ratio <= 0.50){
             break;
         }
