@@ -22,13 +22,14 @@
 #include "Programs/Farming/PokemonLA_MagikarpMoveGrinder.h"
 #include "Programs/Farming/PokemonLA_NuggetFarmerHighlands.h"
 #include "Programs/Farming/PokemonLA_TenacityCandyFarmer.h"
+#include "Programs/Farming/PokemonLA_LeapGrinder.h"
 
 //#include "Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h"
 #include "Programs/ShinyHunting/PokemonLA_GalladeFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_CrobatFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_FroslassFinder.h"
+#include "Programs/ShinyHunting/PokemonLA_BurmyFinder.h"
 #include "Programs/ShinyHunting/PokemonLA_UnownFinder.h"
-#include "Programs/ShinyHunting/PokemonLA_TreeShinyHunting.h"
 #include "Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.h"
 #include "Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.h"
 #include "Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.h"
@@ -67,14 +68,15 @@ Panels::Panels(QTabWidget& parent, PanelListener& listener)
     add_program<IngoBattleGrinder_Descriptor, IngoBattleGrinder>();
     add_program<MagikarpMoveGrinder_Descriptor, MagikarpMoveGrinder>();
     add_program<TenacityCandyFarmer_Descriptor, TenacityCandyFarmer>();
+    add_program<LeapGrinder_Descriptor, LeapGrinder>();
 
     add_divider("---- Shiny Hunting ----");
 //    add_program<ShinyHuntLakeTrio_Descriptor, ShinyHuntLakeTrio>();
     add_program<CrobatFinder_Descriptor, CrobatFinder>();
     add_program<GalladeFinder_Descriptor, GalladeFinder>();
     add_program<FroslassFinder_Descriptor, FroslassFinder>();
+    add_program<BurmyFinder_Descriptor, BurmyFinder>();
     add_program<UnownFinder_Descriptor, UnownFinder>();
-    add_program<TreeShinyHunting_Descriptor, TreeShinyHunting>();
     add_program<ShinyHuntFlagPin_Descriptor, ShinyHuntFlagPin>();
     add_program<PostMMOSpawnReset_Descriptor, PostMMOSpawnReset>();
     if (GlobalSettings::instance().DEVELOPER_MODE){

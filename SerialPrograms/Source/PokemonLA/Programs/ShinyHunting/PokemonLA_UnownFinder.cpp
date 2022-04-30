@@ -7,8 +7,6 @@
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
-//#include "CommonFramework/Tools/InterruptableCommands.h"
-//#include "CommonFramework/Tools/SuperControlSession.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/BlackScreenDetector.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
@@ -47,12 +45,12 @@ UnownFinder::UnownFinder(const UnownFinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
-        "This applies if you are still traveling to the ruins.",
+        "This applies if a shiny is detected while enroute to the ruins.",
         "0 * TICKS_PER_SECOND"
     )
     , SHINY_DETECTED_DESTINATION(
         "Destination Shiny Action",
-        "This applies if you are near the ruins.",
+        "This applies if a shiny is detected inside the ruins.",
         "0 * TICKS_PER_SECOND"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
@@ -61,7 +59,6 @@ UnownFinder::UnownFinder(const UnownFinder_Descriptor& descriptor)
         &SHINY_DETECTED_ENROUTE.NOTIFICATIONS,
         &SHINY_DETECTED_DESTINATION.NOTIFICATIONS,
         &NOTIFICATION_PROGRAM_FINISH,
-//        &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
     })
 {
@@ -128,6 +125,8 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     // Start path
     env.console.log("Beginning Shiny Detection...");
+
+    //Head to ruins
     {
         float shiny_coefficient = 1.0;
         ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{

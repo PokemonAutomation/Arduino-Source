@@ -918,6 +918,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.h
+    Source/PokemonLA/Programs/PokemonLA_TreeActions.cpp
+    Source/PokemonLA/Programs/PokemonLA_TreeActions.h
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.cpp
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.h
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfTouchTrade.cpp
@@ -928,6 +930,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/Farming/PokemonLA_NuggetFarmerHighlands.h
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.cpp
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.h
+    Source/PokemonLA/Programs/Farming/PokemonLA_LeapGrinder.cpp
+    Source/PokemonLA/Programs/Farming/PokemonLA_LeapGrinder.h
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.cpp
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.h
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.cpp
@@ -944,8 +948,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_UnownFinder.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_FroslassFinder.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_FroslassFinder.cpp
-    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_TreeShinyHunting.h
-    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_TreeShinyHunting.cpp
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_BurmyFinder.h
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_BurmyFinder.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.cpp
@@ -980,6 +984,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.h
     Source/PokemonLA/Resources/PokemonLA_PokemonIcons.cpp
     Source/PokemonLA/Resources/PokemonLA_PokemonIcons.h
+    Source/PokemonLA/Resources/PokemonLA_PokemonInfo.cpp
+    Source/PokemonLA/Resources/PokemonLA_PokemonInfo.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_DateSpam.cpp

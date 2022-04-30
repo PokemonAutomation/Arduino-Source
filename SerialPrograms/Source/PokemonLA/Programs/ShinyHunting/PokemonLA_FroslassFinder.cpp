@@ -43,12 +43,12 @@ FroslassFinder::FroslassFinder(const FroslassFinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
-        "This applies if you are still traveling to the Froslass.",
+        "This applies if a shiny is detected while enroute to the cave. (Does not ignore Misdreavus and Glalie)",
         "0 * TICKS_PER_SECOND"
     )
     , SHINY_DETECTED_DESTINATION(
         "Destination Shiny Action",
-        "This applies if you are near the Froslass.",
+        "This applies if a shiny is detected at or near Froslass.",
         "0 * TICKS_PER_SECOND"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))

@@ -456,12 +456,14 @@ SOURCES += \
     Source/PokemonLA/PokemonLA_TravelLocations.cpp \
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.cpp \
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.cpp \
+    Source/PokemonLA/Programs/Farming/PokemonLA_LeapGrinder.cpp \
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.cpp \
     Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.cpp \
     Source/PokemonLA/Programs/PokemonLA_BattleRoutines.cpp \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.cpp \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.cpp \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp \
+	Source/PokemonLA/Programs/PokemonLA_TreeActions.cpp \
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.cpp \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.cpp \
     Source/PokemonLA/Programs/PokemonLA_MountChange.cpp \
@@ -480,7 +482,7 @@ SOURCES += \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_GalladeFinder.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_FroslassFinder.cpp \
-    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_TreeShinyHunting.cpp \
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_BurmyFinder.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_UnownFinder.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.cpp \
@@ -1141,12 +1143,14 @@ HEADERS += \
     Source/PokemonLA/PokemonLA_TravelLocations.h \
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.h \
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.h \
+    Source/PokemonLA/Programs/Farming/PokemonLA_LeapGrinder.h \
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.h \
     Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.h \
     Source/PokemonLA/Programs/PokemonLA_BattleRoutines.h \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.h \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.h \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.h \
+	Source/PokemonLA/Programs/PokemonLA_TreeActions.h \
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.h \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.h \
     Source/PokemonLA/Programs/PokemonLA_MountChange.h \
@@ -1165,7 +1169,7 @@ HEADERS += \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_GalladeFinder.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_FroslassFinder.h \
-    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_TreeShinyHunting.h \
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_BurmyFinder.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_UnownFinder.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h \
