@@ -1,4 +1,4 @@
-/*  Tree Leap Grinder
+/*  Leap Grinder
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
