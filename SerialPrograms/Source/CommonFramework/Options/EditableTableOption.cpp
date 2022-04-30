@@ -58,8 +58,25 @@ ConfigWidget* EditableTableOption::make_ui(QWidget& parent){
 
 
 
-template<typename T> QWidget* make_number_table_cell(QWidget& parent, T& value)
-{
+QWidget* make_boolean_table_cell(QWidget& parent, bool& value){
+    QWidget* widget = new QWidget(&parent);
+    QHBoxLayout* layout = new QHBoxLayout(widget);
+    layout->setAlignment(Qt::AlignHCenter);
+    layout->setContentsMargins(0, 0, 0, 0);
+    QCheckBox* box = new QCheckBox(&parent);
+    layout->addWidget(box);
+    box->setChecked(value);
+    box->connect(
+        box, &QCheckBox::stateChanged,
+        box, [&value, box](int){
+            value = box->isChecked();
+        }
+    );
+    return widget;
+}
+
+
+template<typename T> QWidget* make_integer_table_cell(QWidget& parent, T& value){
     QLineEdit* box = new QLineEdit(QString::number(value), &parent);
     box->setAlignment(Qt::AlignHCenter);
     box->connect(
@@ -86,26 +103,35 @@ template<typename T> QWidget* make_number_table_cell(QWidget& parent, T& value)
     return box;
 }
 
-
-QWidget* make_boolean_table_cell(QWidget& parent, bool& value){
-    QWidget* widget = new QWidget(&parent);
-    QHBoxLayout* layout = new QHBoxLayout(widget);
-    layout->setAlignment(Qt::AlignHCenter);
-    layout->setContentsMargins(0, 0, 0, 0);
-    QCheckBox* box = new QCheckBox(&parent);
-    layout->addWidget(box);
-    box->setChecked(value);
+QWidget* make_double_table_cell(QWidget& parent, double& value, double min, double max){
+    QLineEdit* box = new QLineEdit(QString::number(value), &parent);
+    box->setAlignment(Qt::AlignHCenter);
     box->connect(
-        box, &QCheckBox::stateChanged,
-        box, [&value, box](int){
-            value = box->isChecked();
+        box, &QLineEdit::textChanged,
+        box, [&value, box, min, max](const QString& text){
+            bool ok = false;
+            double current = text.toDouble(&ok);
+            QPalette palette;
+            if (ok && current >= min && current <= max){
+                value = current;
+                palette.setColor(QPalette::Text, Qt::black);
+            }else{
+                palette.setColor(QPalette::Text, Qt::red);
+            }
+            box->setPalette(palette);
         }
     );
-    return widget;
+    box->connect(
+        box, &QLineEdit::editingFinished,
+        box, [&value, box](){
+            box->setText(QString::number(value));
+        }
+    );
+    return box;
 }
 
 
-template QWidget* make_number_table_cell(QWidget& parent, uint16_t& value);
-template QWidget* make_number_table_cell(QWidget& parent, int16_t& value);
+template QWidget* make_integer_table_cell(QWidget& parent, uint16_t& value);
+template QWidget* make_integer_table_cell(QWidget& parent, int16_t& value);
 
 }

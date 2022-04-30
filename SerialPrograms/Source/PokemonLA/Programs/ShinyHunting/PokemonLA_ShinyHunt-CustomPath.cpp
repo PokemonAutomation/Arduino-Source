@@ -17,6 +17,8 @@
 #include "PokemonLA_ShinyHunt-CustomPath.h"
 
 //#include <iostream>
+//using std::cout;
+//using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -41,11 +43,21 @@ ShinyHuntCustomPath::ShinyHuntCustomPath(const ShinyHuntCustomPath_Descriptor& d
         "<b>Test Path:</b><br>Run the path immediately on the map to test it.",
         false
     )
-    , SHINY_DETECTED("Shiny Detected Action", "", "0 * TICKS_PER_SECOND")
+    , SHINY_DETECTED_IGNORING(
+        "Shiny Action (Ignoring)",
+        "This applies if a shiny is detected while you are ignoring shinies.",
+        "0 * TICKS_PER_SECOND",
+        ShinyDetectedAction::IGNORE
+    )
+    , SHINY_DETECTED_LISTENING(
+        "Shiny Action (Listening)",
+        "This applies if a shiny is detected while you are listening for shinies.",
+        "0 * TICKS_PER_SECOND"
+    )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
-        &SHINY_DETECTED.NOTIFICATIONS,
+        &SHINY_DETECTED_LISTENING.NOTIFICATIONS,
         &NOTIFICATION_PROGRAM_FINISH,
 //        &NOTIFICATION_ERROR_RECOVERABLE,
         &NOTIFICATION_ERROR_FATAL,
@@ -55,7 +67,8 @@ ShinyHuntCustomPath::ShinyHuntCustomPath(const ShinyHuntCustomPath_Descriptor& d
     PA_ADD_OPTION(TRAVEL_LOCATION);
     PA_ADD_OPTION(CUSTOM_PATH_TABLE);
     PA_ADD_OPTION(TEST_PATH);
-    PA_ADD_OPTION(SHINY_DETECTED);
+    PA_ADD_OPTION(SHINY_DETECTED_IGNORING);
+    PA_ADD_OPTION(SHINY_DETECTED_LISTENING);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -117,6 +130,7 @@ void ShinyHuntCustomPath::do_non_listen_action(ConsoleHandle& console, BotBaseCo
             }
             break;
         }
+#if 0
         case PathAction::ROTATE_CAMERA:
         {
             if (row.camera_turn_ticks > 0){
@@ -126,6 +140,7 @@ void ShinyHuntCustomPath::do_non_listen_action(ConsoleHandle& console, BotBaseCo
             }
             break;
         }
+#endif
         case PathAction::MOVE_FORWARD:
         {
             switch(row.move_speed){
@@ -150,6 +165,18 @@ void ShinyHuntCustomPath::do_non_listen_action(ConsoleHandle& console, BotBaseCo
             }
             break;
         }
+        case PathAction::MOVE_IN_DIRECTION:
+        {
+            uint8_t x = (uint8_t)((row.left_x + 1.0) * 127.5 + 0.5);
+            uint8_t y = (uint8_t)((-row.left_y + 1.0) * 127.5 + 0.5);
+            pbf_move_left_joystick(context, x, y, row.move_forward_ticks, 0);
+            break;
+        }
+        case PathAction::CENTER_CAMERA:
+        {
+            pbf_mash_button(context, BUTTON_ZL, 200);
+            break;
+        }
         case PathAction::JUMP:
         {
             pbf_press_button(context, BUTTON_Y, 10, row.jump_wait_ticks);
@@ -170,41 +197,44 @@ void ShinyHuntCustomPath::do_non_listen_action(ConsoleHandle& console, BotBaseCo
 void ShinyHuntCustomPath::run_path(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
-    for (size_t action_index = 0; action_index < CUSTOM_PATH_TABLE.num_actions(); action_index++){
-        const auto& row = CUSTOM_PATH_TABLE.get_action(action_index);
-        if (row.action != PathAction::START_LISTEN){
-            do_non_listen_action(env.console, context, action_index);
+    std::atomic<bool> listen_for_shiny(false);
+    float shiny_coefficient = 1.0;
+    ShinyDetectedActionOption* shiny_action = nullptr;
+    ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+        //  Warning: This callback will be run from a different thread than this function.
+        stats.shinies++;
+        shiny_coefficient = error_coefficient;
+        if (listen_for_shiny.load(std::memory_order_acquire)){
+            shiny_action = &SHINY_DETECTED_LISTENING;
         }else{
-            env.log("Start Listen, build sound detector");
-            // Build shiny sound detector and start listens:
-            float shiny_coefficient = 1.0;
-            ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
-                //  Warning: This callback will be run from a different thread than this function.
-                stats.shinies++;
-                shiny_coefficient = error_coefficient;
-                return on_shiny_callback(env, env.console, SHINY_DETECTED, error_coefficient);
-            });
-            int ret = run_until(
-                env.console, context,
-                [&env, &action_index, this](BotBaseContext& context){
-                    for(; action_index < CUSTOM_PATH_TABLE.num_actions(); action_index++){
-                        const auto& listened_row = CUSTOM_PATH_TABLE.get_action(action_index);
-                        if (listened_row.action != PathAction::END_LISTEN){
-                            do_non_listen_action(env.console, context, action_index);
-                        } else{
-                            env.log("End Listen, exit sound detector");
-                            break;
-                        }
-                    }
-                    context.wait_for_all_requests();
-                },
-                {{shiny_detector}}
-            );
-            if (ret == 0){
-                on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_coefficient);
-            }
+            shiny_action = &SHINY_DETECTED_IGNORING;
         }
-    } // end for loop on each action
+        return on_shiny_callback(env, env.console, *shiny_action, error_coefficient);
+    });
+
+    int ret = run_until(
+        env.console, context,
+        [&](BotBaseContext& context){
+            for (size_t action_index = 0; action_index < CUSTOM_PATH_TABLE.num_actions(); action_index++){
+                const auto& row = CUSTOM_PATH_TABLE.get_action(action_index);
+                if (row.action == PathAction::START_LISTEN){
+                    listen_for_shiny.store(true, std::memory_order_release);
+                    continue;
+                }else if (row.action == PathAction::END_LISTEN){
+                    listen_for_shiny.store(false, std::memory_order_release);
+                    continue;
+                }
+
+                do_non_listen_action(env.console, context, action_index);
+                context.wait_for_all_requests();
+            }
+        },
+        {{shiny_detector}}
+    );
+
+    if (ret == 0){
+        on_shiny_sound(env, env.console, context, *shiny_action, shiny_coefficient);
+    }
 }
 
 
@@ -244,12 +274,10 @@ void ShinyHuntCustomPath::program(SingleSwitchProgramEnvironment& env, BotBaseCo
             stats.to_str()
         );
         try{
-//            Stats& stats = env.stats<Stats>();
+            stats.attempts++;
 
             goto_camp_from_jubilife(env, env.console, context, TRAVEL_LOCATION);
             run_path(env, context);
-
-            stats.attempts++;
 
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);

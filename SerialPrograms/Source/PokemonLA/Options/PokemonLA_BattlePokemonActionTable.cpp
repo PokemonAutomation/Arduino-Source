@@ -78,9 +78,9 @@ std::vector<QWidget*> BattlePokemonActionRow::make_widgets(QWidget& parent){
         widgets.emplace_back(make_enum_table_cell(parent, MoveStyle_MAP.size(), MoveStyle_NAMES, style[i]));
     }
     widgets.emplace_back(make_boolean_table_cell(parent, this->switch_pokemon));
-    widgets.emplace_back(make_number_table_cell(parent, this->num_turns_to_switch));
+    widgets.emplace_back(make_integer_table_cell(parent, this->num_turns_to_switch));
     widgets.emplace_back(make_boolean_table_cell(parent, this->stop_after_num_moves));
-    widgets.emplace_back(make_number_table_cell(parent, this->num_moves_to_stop));
+    widgets.emplace_back(make_integer_table_cell(parent, this->num_moves_to_stop));
     return widgets;
 }
 

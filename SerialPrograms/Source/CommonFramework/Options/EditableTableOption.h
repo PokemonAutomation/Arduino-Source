@@ -31,16 +31,18 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 };
 
-// Generate a text edit field for user to enter a number. This number is bind to the input `value`.
-// Pass the member var of EditableTableRow as `value` so that user editing this UI widget in a table
-// row changes the value of the EditableTableRow automatically.
-// T can be uint16_t or int16_t. Add more template instantiations in the cpp file for more numerical types.
-template<typename T> QWidget* make_number_table_cell(QWidget& parent, T& value);
-
 // Generate a checker box for user to enter a boolean value. This boolean is bind to the input `value`.
 // Pass the member var of EditableTableRow as `value` so that user editing this UI widget in a table
 // row changes the value of the EditableTableRow automatically.
 QWidget* make_boolean_table_cell(QWidget& parent, bool& value);
+
+// Generate a text edit field for user to enter a number. This number is bind to the input `value`.
+// Pass the member var of EditableTableRow as `value` so that user editing this UI widget in a table
+// row changes the value of the EditableTableRow automatically.
+// T can be uint16_t or int16_t. Add more template instantiations in the cpp file for more numerical types.
+template<typename T> QWidget* make_integer_table_cell(QWidget& parent, T& value);
+
+QWidget* make_double_table_cell(QWidget& parent, double& value, double min, double max);
 
 // See EditableTableOption-EnumTableCell.h for template<typename T> QWidget* make_enum_table_cell(QWidget& parent, T& value);
 

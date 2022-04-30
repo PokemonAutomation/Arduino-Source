@@ -60,7 +60,8 @@ class ShinyDetectedActionOption : public GroupOption{
 public:
     ShinyDetectedActionOption(
         QString label, QString description,
-        QString default_delay_ticks
+        QString default_delay_ticks,
+        ShinyDetectedAction default_action = ShinyDetectedAction::TAKE_VIDEO_STOP_PROGRAM
     );
 
     bool stop_on_shiny() const;

@@ -56,7 +56,8 @@ private:
 
     BooleanCheckBoxOption TEST_PATH;
 
-    ShinyDetectedActionOption SHINY_DETECTED;
+    ShinyDetectedActionOption SHINY_DETECTED_IGNORING;
+    ShinyDetectedActionOption SHINY_DETECTED_LISTENING;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;
