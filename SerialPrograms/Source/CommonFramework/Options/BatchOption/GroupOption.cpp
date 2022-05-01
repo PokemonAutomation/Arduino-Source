@@ -125,6 +125,13 @@ void GroupWidget::restore_defaults(){
         item->restore_defaults();
     }
 }
+void GroupWidget::update_ui(){
+    bool on = m_value.m_enabled.load(std::memory_order_acquire);
+    m_group_box->setChecked(on);
+    for (ConfigWidget* item : m_options){
+        item->update_ui();
+    }
+}
 void GroupWidget::update_visibility(){
     ConfigWidget::update_visibility();
     for (ConfigWidget* item : m_options){

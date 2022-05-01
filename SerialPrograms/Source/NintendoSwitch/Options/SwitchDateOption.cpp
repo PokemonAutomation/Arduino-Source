@@ -21,6 +21,9 @@ public:
     virtual void restore_defaults() override{
         SwitchDateBaseWidget::restore_defaults();
     }
+    virtual void update_ui() override{
+        SwitchDateBaseWidget::update_ui();
+    }
 };
 
 

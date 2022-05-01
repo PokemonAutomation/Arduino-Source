@@ -39,7 +39,7 @@ EncounterFilterWidget::EncounterFilterWidget(QWidget& parent, EncounterFilterOpt
         for (const QString& item : ShinyFilter_NAMES){
             m_shininess->addItem(item);
         }
-        ShinyFilter current = m_value.m_shiny_filter_current;
+        ShinyFilter current = m_value.m_shiny_filter_current.load(std::memory_order_acquire);
         for (int c = 0; c < m_shininess->count(); c++){
             if (m_shininess->itemText(c) == ShinyFilter_NAMES[(int)current]){
                 m_shininess->setCurrentIndex(c);
@@ -58,7 +58,7 @@ EncounterFilterWidget::EncounterFilterWidget(QWidget& parent, EncounterFilterOpt
                 if (iter == ShinyFilter_MAP.end()){
                     throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Invalid option: " + text.toStdString());
                 }
-                m_value.m_shiny_filter_current = iter->second;
+                m_value.m_shiny_filter_current.store(iter->second, std::memory_order_release);
             }
         );
     }
@@ -71,7 +71,10 @@ EncounterFilterWidget::EncounterFilterWidget(QWidget& parent, EncounterFilterOpt
 }
 void EncounterFilterWidget::restore_defaults(){
     m_value.restore_defaults();
-    ShinyFilter current = m_value.m_shiny_filter_current;
+    update_ui();
+}
+void EncounterFilterWidget::update_ui(){
+    ShinyFilter current = m_value.m_shiny_filter_current.load(std::memory_order_acquire);
     for (int c = 0; c < m_shininess->count(); c++){
         if (m_shininess->itemText(c) == ShinyFilter_NAMES[(int)current]){
             m_shininess->setCurrentIndex(c);
@@ -79,7 +82,7 @@ void EncounterFilterWidget::restore_defaults(){
         }
     }
     if (m_table){
-        m_table->restore_defaults();
+        m_table->update_ui();
     }
 }
 

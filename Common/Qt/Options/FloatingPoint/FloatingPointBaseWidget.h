@@ -19,7 +19,9 @@ namespace PokemonAutomation{
 class FloatingPointBaseWidget : public QWidget{
 public:
     FloatingPointBaseWidget(QWidget& parent, FloatingPointBaseOption& value);
+
     void restore_defaults();
+    void update_ui();
 
 private:
     FloatingPointBaseOption& m_value;

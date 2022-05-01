@@ -98,13 +98,13 @@ void BossActionOption::restore_defaults(){
 }
 
 ConfigWidget* BossActionOption::make_ui(QWidget& parent){
-    return new BossActionOptionUI(parent, *this);
+    return new BossActionWidget(parent, *this);
 }
 
 
 
 
-BossActionOptionUI::BossActionOptionUI(QWidget& parent, BossActionOption& value)
+BossActionWidget::BossActionWidget(QWidget& parent, BossActionOption& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)
@@ -115,7 +115,14 @@ BossActionOptionUI::BossActionOptionUI(QWidget& parent, BossActionOption& value)
     layout->addWidget(new QLabel(m_value.m_label));
     redraw_table();
 }
-void BossActionOptionUI::redraw_table(){
+void BossActionWidget::restore_defaults(){
+    m_value.restore_defaults();
+    update_ui();
+}
+void BossActionWidget::update_ui(){
+    redraw_table();
+}
+void BossActionWidget::redraw_table(){
     delete m_table;
     m_table = new AutoHeightTableWidget(this);
     layout()->addWidget(m_table);
@@ -151,13 +158,9 @@ void BossActionOptionUI::redraw_table(){
 
     m_table->resizeColumnsToContents();
 }
-void BossActionOptionUI::restore_defaults(){
-    m_value.restore_defaults();
-    redraw_table();
-}
 
 
-QComboBox* BossActionOptionUI::make_action_box(QWidget& parent, int row, BallSelectWidget& ball_select, BossAction action){
+QComboBox* BossActionWidget::make_action_box(QWidget& parent, int row, BallSelectWidget& ball_select, BossAction action){
     QComboBox* box = new NoWheelComboBox(&parent);
     for (const QString& name : BossAction_NAMES){
         box->addItem(name);
@@ -181,7 +184,7 @@ QComboBox* BossActionOptionUI::make_action_box(QWidget& parent, int row, BallSel
     );
     return box;
 }
-BallSelectWidget* BossActionOptionUI::make_ball_select(QWidget& parent, int row, const std::string& slug){
+BallSelectWidget* BossActionWidget::make_ball_select(QWidget& parent, int row, const std::string& slug){
     using namespace Pokemon;
     BallSelectWidget* box = new BallSelectWidget(parent, POKEBALL_SLUGS(), slug);
     connect(

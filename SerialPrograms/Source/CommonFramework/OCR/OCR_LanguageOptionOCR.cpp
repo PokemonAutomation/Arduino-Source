@@ -28,7 +28,9 @@ namespace OCR{
 class LanguageOCRWidget : public QWidget, public ConfigWidget{
 public:
     LanguageOCRWidget(QWidget& parent, LanguageOCR& value);
+
     virtual void restore_defaults() override;
+    virtual void update_ui() override;
 
 private:
     void update_status();
@@ -190,6 +192,9 @@ void LanguageOCRWidget::update_status(){
 
 void LanguageOCRWidget::restore_defaults(){
     m_value.restore_defaults();
+    update_ui();
+}
+void LanguageOCRWidget::update_ui(){
     m_box->setCurrentIndex((int)m_value.m_current);
 }
 

@@ -80,6 +80,9 @@ EncounterFilterWidget::EncounterFilterWidget(QWidget& parent, EncounterFilterOpt
 }
 void EncounterFilterWidget::restore_defaults(){
     m_value.restore_defaults();
+    update_ui();
+}
+void EncounterFilterWidget::update_ui(){
     ShinyFilter current = m_value.m_shiny_filter_current;
     for (int c = 0; c < m_shininess->count(); c++){
         if (m_shininess->itemText(c) == ShinyFilter_NAMES[(int)current]){
@@ -88,7 +91,7 @@ void EncounterFilterWidget::restore_defaults(){
         }
     }
     if (m_table){
-        m_table->restore_defaults();
+        m_table->update_ui();
     }
 }
 

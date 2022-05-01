@@ -21,6 +21,9 @@ public:
     virtual void restore_defaults() override{
         BooleanCheckBoxBaseWidget::restore_defaults();
     }
+    virtual void update_ui() override{
+        BooleanCheckBoxBaseWidget::update_ui();
+    }
 };
 
 

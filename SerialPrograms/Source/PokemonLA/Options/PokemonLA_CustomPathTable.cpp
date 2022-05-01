@@ -508,7 +508,7 @@ public:
                     return;
                 }
                 m_travel_location->update_ui();
-                m_table_widget->redraw_table();
+                m_table_widget->update_ui();
             }
         });
 
@@ -532,6 +532,10 @@ public:
     virtual void restore_defaults() override{
         m_travel_location->restore_defaults();
         m_table_widget->restore_defaults();
+    }
+    virtual void update_ui() override{
+        m_travel_location->update_ui();
+        m_table_widget->update_ui();
     }
 
 private:

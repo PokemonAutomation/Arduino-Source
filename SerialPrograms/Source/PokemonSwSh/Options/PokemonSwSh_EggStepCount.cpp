@@ -33,7 +33,10 @@ const std::vector<uint16_t> STEP_COUNTS{
 class EggStepCountWidget : public QWidget, public ConfigWidget{
 public:
     EggStepCountWidget(QWidget& parent, EggStepCountOption& value);
+
     virtual void restore_defaults() override;
+    virtual void update_ui() override;
+
 
 private:
     EggStepCountOption& m_value;
@@ -92,6 +95,9 @@ EggStepCountWidget::EggStepCountWidget(QWidget& parent, EggStepCountOption& valu
 }
 void EggStepCountWidget::restore_defaults(){
     m_value.restore_defaults();
+    update_ui();
+}
+void EggStepCountWidget::update_ui(){
     m_box->setCurrentIndex((int)m_value.m_current);
 }
 

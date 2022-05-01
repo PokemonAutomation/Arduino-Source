@@ -22,6 +22,9 @@ public:
     virtual void restore_defaults() override{
         EditableTableBaseWidget::restore_defaults();
     }
+    virtual void update_ui() override{
+        EditableTableBaseWidget::update_ui();
+    }
 };
 
 

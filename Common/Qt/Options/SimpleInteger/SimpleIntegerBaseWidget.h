@@ -19,7 +19,9 @@ template <typename Type>
 class SimpleIntegerBaseWidget : public QWidget{
 public:
     SimpleIntegerBaseWidget(QWidget& parent, SimpleIntegerBaseOption<Type>& value);
+
     void restore_defaults();
+    void update_ui();
 
 private:
     SimpleIntegerBaseOption<Type>& m_value;

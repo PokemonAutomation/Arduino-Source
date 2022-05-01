@@ -31,16 +31,17 @@ public:
     void set_enabled(bool enabled);
 
 private:
-    friend class EventNotificationsTableUI;
+    friend class EventNotificationsTableWidget;
     std::vector<EventNotificationOption*> m_options;
     std::map<QString, EventNotificationOption*> m_name_map;
 };
 
-class EventNotificationsTableUI : public QWidget, public ConfigWidget{
+class EventNotificationsTableWidget : public QWidget, public ConfigWidget{
 public:
-    EventNotificationsTableUI(QWidget& parent, EventNotificationsTable& value);
+    EventNotificationsTableWidget(QWidget& parent, EventNotificationsTable& value);
 
     virtual void restore_defaults();
+    virtual void update_ui();
 
 private:
     void redraw_table();

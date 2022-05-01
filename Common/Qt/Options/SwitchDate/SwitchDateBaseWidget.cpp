@@ -37,6 +37,9 @@ SwitchDateBaseWidget::SwitchDateBaseWidget(QWidget& parent, SwitchDateBaseOption
 }
 void SwitchDateBaseWidget::restore_defaults(){
     m_value.restore_defaults();
+    update_ui();
+}
+void SwitchDateBaseWidget::update_ui(){
     m_date_edit->setDate(m_value.get());
 }
 

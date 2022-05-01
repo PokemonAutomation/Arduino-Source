@@ -11,19 +11,17 @@
 #include "Common/Qt/QtJsonTools.h"
 #include "NintendoSwitch_FriendCodeListOption.h"
 
-#include <iostream>
-using std::cout;
-using std::endl;
-
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
 
-class FriendCodeListOptionUI : public QWidget, public ConfigWidget{
+class FriendCodeListWidget : public QWidget, public ConfigWidget{
 public:
-    FriendCodeListOptionUI(QWidget& parent, FriendCodeListOption& value);
+    FriendCodeListWidget(QWidget& parent, FriendCodeListOption& value);
+
     virtual void restore_defaults() override;
+    virtual void update_ui() override;
 
 private:
     class Box;
@@ -62,7 +60,7 @@ void FriendCodeListOption::restore_defaults(){
     m_lines = m_default;
 }
 ConfigWidget* FriendCodeListOption::make_ui(QWidget& parent){
-    return new FriendCodeListOptionUI(parent, *this);
+    return new FriendCodeListWidget(parent, *this);
 }
 
 
@@ -97,9 +95,9 @@ std::vector<std::string> FriendCodeListOption::list() const{
 
 
 
-class FriendCodeListOptionUI::Box : public QTextEdit{
+class FriendCodeListWidget::Box : public QTextEdit{
 public:
-    Box(FriendCodeListOptionUI& parent)
+    Box(FriendCodeListWidget& parent)
         : QTextEdit(&parent)
         , m_parent(parent)
     {
@@ -142,10 +140,10 @@ public:
     }
 
 private:
-    FriendCodeListOptionUI& m_parent;
+    FriendCodeListWidget& m_parent;
 };
 
-FriendCodeListOptionUI::FriendCodeListOptionUI(QWidget& parent, FriendCodeListOption& value)
+FriendCodeListWidget::FriendCodeListWidget(QWidget& parent, FriendCodeListOption& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)
@@ -158,8 +156,11 @@ FriendCodeListOptionUI::FriendCodeListOptionUI(QWidget& parent, FriendCodeListOp
     m_box->redraw();
 }
 
-void FriendCodeListOptionUI::restore_defaults(){
+void FriendCodeListWidget::restore_defaults(){
     m_value.restore_defaults();
+    update_ui();
+}
+void FriendCodeListWidget::update_ui(){
     m_box->redraw();
 }
 

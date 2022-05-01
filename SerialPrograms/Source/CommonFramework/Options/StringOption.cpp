@@ -50,6 +50,9 @@ public:
     virtual void restore_defaults() override{
         StringBaseWidget::restore_defaults();
     }
+    virtual void update_ui() override{
+        StringBaseWidget::update_ui();
+    }
 };
 
 

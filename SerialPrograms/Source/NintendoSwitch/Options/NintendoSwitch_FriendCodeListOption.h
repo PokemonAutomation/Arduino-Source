@@ -31,7 +31,7 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class FriendCodeListOptionUI;
+    friend class FriendCodeListWidget;
     QString m_label;
     std::vector<QString> m_default;
     std::vector<QString> m_lines;

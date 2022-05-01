@@ -20,6 +20,7 @@ class FixedCodeWidget : public QWidget, public ConfigWidget{
 public:
     FixedCodeWidget(QWidget& parent, FixedCodeOption& value);
     virtual void restore_defaults() override;
+    virtual void update_ui() override;
 
 private:
     QString sanitized_code(const QString& text) const;
@@ -144,6 +145,9 @@ FixedCodeWidget::FixedCodeWidget(QWidget& parent, FixedCodeOption& value)
 }
 void FixedCodeWidget::restore_defaults(){
     m_value.restore_defaults();
+    update_ui();
+}
+void FixedCodeWidget::update_ui(){
     m_box->setText(m_value);
 }
 

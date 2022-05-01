@@ -99,12 +99,12 @@ EnumDropdownWidget::EnumDropdownWidget(QWidget& parent, EnumDropdownOption& valu
 }
 
 
-void EnumDropdownWidget::update_ui(){
-    m_box->setCurrentIndex((int)m_value);
-}
 void EnumDropdownWidget::restore_defaults(){
     m_value.restore_defaults();
     update_ui();
+}
+void EnumDropdownWidget::update_ui(){
+    m_box->setCurrentIndex((int)m_value);
 }
 
 

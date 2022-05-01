@@ -51,6 +51,10 @@ SimpleIntegerBaseWidget<Type>::SimpleIntegerBaseWidget(QWidget& parent, SimpleIn
 template <typename Type>
 void SimpleIntegerBaseWidget<Type>::restore_defaults(){
     m_value.restore_defaults();
+    update_ui();
+}
+template <typename Type>
+void SimpleIntegerBaseWidget<Type>::update_ui(){
     m_box->setText(QString::number(m_value));
 }
 

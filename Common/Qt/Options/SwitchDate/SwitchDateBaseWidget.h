@@ -20,7 +20,9 @@ namespace NintendoSwitch{
 class SwitchDateBaseWidget : public QWidget{
 public:
     SwitchDateBaseWidget(QWidget& parent, SwitchDateBaseOption& value);
+
     void restore_defaults();
+    void update_ui();
 
 private:
     SwitchDateBaseOption& m_value;

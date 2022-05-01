@@ -20,7 +20,9 @@ namespace PokemonAutomation{
 class BooleanCheckBoxBaseWidget : public QWidget{
 public:
     BooleanCheckBoxBaseWidget(QWidget& parent, BooleanCheckBoxBaseOption& value);
+
     void restore_defaults();
+    void update_ui();
 
 private:
     BooleanCheckBoxBaseOption& m_value;

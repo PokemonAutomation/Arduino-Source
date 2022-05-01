@@ -18,6 +18,8 @@ namespace PokemonAutomation{
 class TextEditWidget : public QWidget, public ConfigWidget{
 public:
     TextEditWidget(QWidget& parent, TextEditOption& value);
+
+    virtual void update_ui() override;
     virtual void restore_defaults() override;
 
 private:
@@ -114,8 +116,12 @@ TextEditWidget::TextEditWidget(QWidget& parent, TextEditOption& value)
     m_box->setText(value);
     layout->addWidget(m_box);
 }
+void TextEditWidget::update_ui(){
+    m_box->setText(m_value);
+}
 void TextEditWidget::restore_defaults(){
     m_value.restore_defaults();
+    update_ui();
 }
 
 
