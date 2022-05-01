@@ -16,8 +16,8 @@ namespace PokemonAutomation{
 namespace Kernels{
 namespace Waterfill{
     class WaterfillObject;
-}
-}
+} // end namespace Waterfill
+} // end namespace Kernels
 
 
 using pxint_t = int;
@@ -40,8 +40,31 @@ struct ImagePixelBox{
     pxint_t height() const{ return max_y - min_y; }
     size_t area() const{ return (size_t)width() * (size_t)height(); }
 
+    pxint_t center_x() const{ return (min_x + max_x)/2; }
+    pxint_t center_y() const{ return (min_y + max_y)/2; }
+
+    // Create a box covering both `this` box and the parameter `box` passed in.
+    // If the parameter `box` has 0 area, do no change.
+    // If `this` box has 0 area, `this` becomes the parameter `box`.
     void merge_with(const ImagePixelBox& box);
+
+    // Return whether two boxes overlap. Boxes touching each other does not count as overlap.
+    bool overlap(const ImagePixelBox& box) const;
+
+    // Return the overlapping area of `this` box and the parameter `box` passed in.
     size_t overlap_with(const ImagePixelBox& box) const;
+
+    // Whether a point (x, y) is inside the box. Points on the border of the box does not
+    // count as inside.
+    bool inside(size_t x, size_t y) const;
+
+    // clip the box to be within the image size.
+    void clip(size_t image_width, size_t image_height);
+    
+    // The distance to another box on x axis. If two boxes overlap, the distance is 0.
+    size_t distance_x(const ImagePixelBox& box) const;
+    // The distance to another box on y axis. If two boxes overlap, the distance is 0.
+    size_t distance_y(const ImagePixelBox& box) const;
 };
 
 
@@ -124,6 +147,11 @@ QImage extract_object_from_inner_feature(
     const ImageFloatBox& inner_relative_to_object
 );
 
+// Draw a box on the image. Used for debugging purposes:
+// save inference results to an image on the disk.
+// color: the color of the pixel. See Common/Cpp/Color.h:Color on the color format.
+// thickness: thickness (in unit of pixels) of the box border.
+void draw_box(QImage& image, const ImagePixelBox& pixel_box, uint32_t color, size_t thickness = 1);
 
 
 

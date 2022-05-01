@@ -27,6 +27,8 @@ public:
 
     //  Get the object at the specific bit position.
     //  The object will be removed from the input matrix.
+    //  Return true if there is an object at the bit (x, y); false otherwise.
+    //  If keep_object is true, object.object is constructed.
     virtual bool find_object_on_bit(
         WaterfillObject& object, bool keep_object,
         size_t x, size_t y

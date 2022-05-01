@@ -7,6 +7,7 @@
 #include <algorithm>
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/Color.h"
 #include "Kernels/Waterfill/Kernels_Waterfill_Types.h"
 #include "ImageBoxes.h"
 
@@ -51,6 +52,11 @@ void ImagePixelBox::merge_with(const ImagePixelBox& box){
     max_x = std::max(max_x, box.max_x);
     max_y = std::max(max_y, box.max_y);
 }
+
+bool ImagePixelBox::overlap(const ImagePixelBox& box) const{
+    return !(box.min_x >= max_x || box.max_x <= min_x || box.min_y >= max_y || box.max_y <= min_y);
+}
+
 size_t ImagePixelBox::overlap_with(const ImagePixelBox& box) const{
     pxint_t min_x = std::max(this->min_x, box.min_x);
     pxint_t max_x = std::min(this->max_x, box.max_x);
@@ -65,6 +71,34 @@ size_t ImagePixelBox::overlap_with(const ImagePixelBox& box) const{
     return (size_t)(max_x - min_x) * (size_t)(max_y - min_y);
 }
 
+bool ImagePixelBox::inside(size_t x, size_t y) const{
+    return x > min_x && x < max_x && y > min_y && y < max_y;
+}
+
+void ImagePixelBox::clip(size_t image_width, size_t image_height){
+    min_x = std::max(0, min_x);
+    min_y = std::max(0, min_y);
+    max_x = std::min(max_x, image_width > 0 ? (int)image_width-1 : 0);
+    max_y = std::min(max_y, image_height > 0 ? (int)image_height-1 : 0);
+}
+
+size_t ImagePixelBox::distance_x(const ImagePixelBox& box) const{
+    pxint_t min_x = std::max(this->min_x, box.min_x);
+    pxint_t max_x = std::min(this->max_x, box.max_x);
+    if (min_x >= max_x){
+        return min_x - max_x;
+    }
+    return 0;
+}
+
+size_t ImagePixelBox::distance_y(const ImagePixelBox& box) const{
+    pxint_t min_y = std::max(this->min_y, box.min_y);
+    pxint_t max_y = std::min(this->max_y, box.max_y);
+    if (min_y >= max_y){
+        return min_y - max_y;
+    }
+    return 0;
+}
 
 
 
@@ -216,6 +250,50 @@ QImage extract_object_from_inner_feature(
 }
 
 
+void draw_box(QImage& image, const ImagePixelBox& pixel_box, uint32_t color, size_t thickness){
+    if (thickness == 0 || image.width() <= 0 || image.height() <= 0){
+        return;
+    }
+
+    Color c(color);
+    auto clamp_x = [&](pxint_t x){
+        return std::min(std::max(x, 0), image.width()-1);
+    };
+    auto clamp_y = [&](pxint_t y){
+        return std::min(std::max(y, 0), image.height()-1);
+    };
+
+    auto draw_solid_rect = [&](pxint_t start_x, pxint_t start_y, pxint_t end_x, pxint_t end_y){
+        start_x = clamp_x(start_x);
+        end_x = clamp_x(end_x);
+        start_y = clamp_y(start_y);
+        end_y = clamp_y(end_y);
+        if (start_x > end_x){
+            std::swap(start_x, end_x);
+        }
+        if (start_y > end_y){
+            std::swap(start_y, end_y);
+        }
+        QColor qColor(c.r(), c.g(), c.b(), c.a());
+        for(pxint_t y = start_y; y <= end_y; ++y){
+            for(pxint_t x = start_x; x <= end_x; ++x){
+                image.setPixelColor(x, y, qColor);
+            }
+        }
+    };
+
+    pxint_t lo = (thickness-1) / 2; // lower offset
+    pxint_t uo = thickness - lo - 1; // upper offset
+    
+    // draw the upper horizontal line
+    draw_solid_rect(pixel_box.min_x-lo, pixel_box.min_y-lo, pixel_box.max_x+uo, pixel_box.min_y+uo);
+    // draw the lower horizontal line
+    draw_solid_rect(pixel_box.min_x-lo, pixel_box.max_y-lo, pixel_box.max_x+uo, pixel_box.max_y+uo);
+    // draw the left vertical line
+    draw_solid_rect(pixel_box.min_x-lo, pixel_box.min_y-lo, pixel_box.min_x+uo, pixel_box.max_y+uo);
+    // draw the right vertical line
+    draw_solid_rect(pixel_box.max_x-lo, pixel_box.min_y-lo, pixel_box.max_x+uo, pixel_box.max_y+uo);
+}
 
 
 }

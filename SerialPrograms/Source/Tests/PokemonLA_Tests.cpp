@@ -10,6 +10,7 @@
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.h"
+#include "PokemonLA/Inference/PokemonLA_BerryTreeDetector.h"
 
 #include <QImage>
 
@@ -45,6 +46,13 @@ int test_pokemonLA_DialogueEllipseDetector(const QImage& image, bool target){
     bool result = detector.process_frame(image, current_time());
     TEST_DETECTOR(result, target);
 }
+
+void test_pokemonLA_BerryTreeDetector(const QImage& image){
+    NintendoSwitch::PokemonLA::BerryTreeDetector detector;
+
+    detector.process_frame(image, current_time());
+}
+
 
 
 }

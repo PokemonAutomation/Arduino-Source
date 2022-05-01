@@ -255,6 +255,7 @@ SOURCES += \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_Default.cpp \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_AVX2.cpp \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Core_x86_SSE41.cpp \
+    Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x16_x64_AVX2.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x4_Default.cpp \
@@ -432,6 +433,7 @@ SOURCES += \
     Source/PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_BerryTreeDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.cpp \
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_ItemCompatibilityDetector.cpp \
@@ -921,6 +923,7 @@ HEADERS += \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Reductions.h \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.h \
     Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.tpp \
+    Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Default.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Routines.h \
@@ -1119,6 +1122,7 @@ HEADERS += \
     Source/PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_BerryTreeDetector.h \
     Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.h \
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.h \
     Source/PokemonLA/Inference/PokemonLA_ItemCompatibilityDetector.h \
