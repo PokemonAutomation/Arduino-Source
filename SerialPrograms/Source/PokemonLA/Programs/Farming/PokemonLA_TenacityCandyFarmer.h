@@ -10,6 +10,7 @@
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 
 namespace PokemonAutomation{
@@ -35,7 +36,7 @@ private:
 private:
     class Stats;
 
-    BooleanCheckBoxOption FOURTH_MOVE_ON_MAMOSWINE;
+    EnumDropdownOption FOURTH_MOVE_ON;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;

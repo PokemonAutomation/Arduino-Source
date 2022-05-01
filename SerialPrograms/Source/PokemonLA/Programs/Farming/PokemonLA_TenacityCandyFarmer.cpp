@@ -28,6 +28,12 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
+namespace {
+    // Indices of FOURTH_MOVE_ON.
+    // These const ints are used to make code more readable.
+    const int OPPONENT_MAMOSWINE = 1;
+    const int OPPONENT_AVALUGG = 2;
+}
 
 TenacityCandyFarmer_Descriptor::TenacityCandyFarmer_Descriptor()
     : RunnableSwitchProgramDescriptor(
@@ -43,9 +49,14 @@ TenacityCandyFarmer_Descriptor::TenacityCandyFarmer_Descriptor()
 
 TenacityCandyFarmer::TenacityCandyFarmer(const TenacityCandyFarmer_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
-    , FOURTH_MOVE_ON_MAMOSWINE(
-        "<b>Fourth Move on Mamoswine:</b><br>Use fourth move (Flamethrower) on Mamoswine to grind its research task.",
-        false
+    , FOURTH_MOVE_ON(
+        "<b>Opponent:</b>",
+        {
+            "None",
+            "Mamoswine (fourth move set to Flamethrower)",
+            "Avalugg (fourth move set to Rock Smash)"
+        },
+        0
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -54,7 +65,7 @@ TenacityCandyFarmer::TenacityCandyFarmer(const TenacityCandyFarmer_Descriptor& d
         &NOTIFICATION_ERROR_FATAL,
     })
 {
-    PA_ADD_OPTION(FOURTH_MOVE_ON_MAMOSWINE);
+    PA_ADD_OPTION(FOURTH_MOVE_ON);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -232,6 +243,13 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             env.console.log("Our turn!", COLOR_BLUE);
             clearing_dialogues = false;
 
+            if (cur_battle == 1 && num_turns == 1){
+                // Change opponent to Froslass as Froslass is fast and Avalugg is slow.
+                // So better to finish Forslass first so that we may move immediately to finsih Avalugg
+                // without taking damage.
+                pbf_press_button(context, BUTTON_ZL, 10, 100);
+            }
+
             // Press A to select moves
             pbf_press_button(context, BUTTON_A, 10, 125);
             context.wait_for_all_requests();
@@ -240,8 +258,15 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             if (cur_pokemon == 0){ // Arceus is still alive
                 size_t target_move = target_battle_moves[cur_battle][std::min(num_turns, 2)];
 
-                if (FOURTH_MOVE_ON_MAMOSWINE && cur_battle == 0 && num_turns == 1){
+                if (FOURTH_MOVE_ON == OPPONENT_MAMOSWINE && cur_battle == 0 && num_turns == 1){
                     target_move = 3;
+                    stats.fourth_moves++;
+                    env.update_stats();
+                }
+
+                if (FOURTH_MOVE_ON == OPPONENT_AVALUGG && cur_battle == 1 && num_turns >= 1){
+                    // Use Flash Cannon to finish Froslass first, then use fourth move, Rock Smash to grind Avalugg.
+                    target_move = (num_turns == 1 ? 2 : 3);
                     stats.fourth_moves++;
                     env.update_stats();
                 }
