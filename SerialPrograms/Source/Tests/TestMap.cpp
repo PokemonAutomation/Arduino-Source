@@ -77,7 +77,7 @@ const std::map<std::string, TestFunction> TEST_MAP = {
 TestFunction find_test_function(const std::string& test_space, const std::string& test_name){
     const auto it = TEST_MAP.find(test_space + "_" + test_name);
     if (it == TEST_MAP.end()){
-        cerr << "Error: no test object named " << test_space << "_" << test_name << " found in the code." << endl;
+        cerr << "Warning: no test object named " << test_space << "_" << test_name << " found in the code." << endl;
         return nullptr;
     }
     return it->second;
