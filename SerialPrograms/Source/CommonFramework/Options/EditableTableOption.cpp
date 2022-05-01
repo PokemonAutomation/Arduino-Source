@@ -9,23 +9,10 @@
 #include <QLineEdit>
 #include <QCheckBox>
 #include <QHBoxLayout>
-#include "Common/Qt/Options/EditableTable/EditableTableBaseWidget.h"
 #include "EditableTableOption.h"
+#include "EditableTableWidget.h"
 
 namespace PokemonAutomation{
-
-
-
-class EditableTableWidget : public EditableTableBaseWidget, public ConfigWidget{
-public:
-    EditableTableWidget(QWidget& parent, EditableTableOption& value)
-        : EditableTableBaseWidget(parent, value)
-        , ConfigWidget(value, *this)
-    {}
-    virtual void restore_defaults() override{
-        EditableTableBaseWidget::restore_defaults();
-    }
-};
 
 
 

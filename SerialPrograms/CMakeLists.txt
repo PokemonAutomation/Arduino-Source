@@ -347,6 +347,7 @@ file(GLOB MAIN_SOURCES
     Source/CommonFramework/Options/EditableTableOption-EnumTableCell.h
     Source/CommonFramework/Options/EditableTableOption.cpp
     Source/CommonFramework/Options/EditableTableOption.h
+    Source/CommonFramework/Options/EditableTableWidget.h
     Source/CommonFramework/Options/EnumDropdownOption.cpp
     Source/CommonFramework/Options/EnumDropdownOption.h
     Source/CommonFramework/Options/EnumDropdownWidget.h
