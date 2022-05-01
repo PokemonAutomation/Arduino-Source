@@ -17,9 +17,9 @@
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
 #include "PokemonLA/Programs/PokemonLA_BattleRoutines.h"
-#include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA_TenacityCandyFarmer.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 
@@ -98,8 +98,28 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
     pbf_press_dpad(context, DPAD_DOWN, 10, 50);
     // Press A to select Path of Tenacity
     pbf_press_button(context, BUTTON_A, 20, 200);
-    // Press A to show the opponenet team selection menu box
-    pbf_press_button(context, BUTTON_A, 20, 50);
+
+    // Press A repeatedly to show the opponenet team selection menu box.
+    // Note: in different languages, there are different number of dialogue boxes to clear to show the team selection menu.
+    // So we have to use a ButtonDetector to visually check when the team selection menu appears.
+    {
+        context.wait_for_all_requests();
+        ButtonDetector button(env.console, env.console, ButtonType::ButtonA, {0.56, 0.46, 0.33, 0.27}, std::chrono::milliseconds(100), true);
+        int ret = run_until(
+            env.console, context,
+            [&](BotBaseContext& context){
+                for (size_t c = 0; c < 10; c++){
+                    pbf_press_button(context, BUTTON_A, 20, 150);
+                }
+            },
+            {
+                {button}
+            }
+        );
+        if (ret != 0){
+            throw OperationFailedException(env.console, "Unable to detect Tenacity path menu after 10 A presses.");
+        }
+    }
     // Move down the menu box to select Pearl Clan
     pbf_press_dpad(context, DPAD_DOWN, 10, 50);
     pbf_press_dpad(context, DPAD_DOWN, 10, 50);
