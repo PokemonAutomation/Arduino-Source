@@ -50,7 +50,7 @@ TenacityCandyFarmer_Descriptor::TenacityCandyFarmer_Descriptor()
 TenacityCandyFarmer::TenacityCandyFarmer(const TenacityCandyFarmer_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , FOURTH_MOVE_ON(
-        "<b>Opponent:</b>",
+        "<b>Fourth Move On:</b>",
         {
             "None",
             "Mamoswine (fourth move set to Flamethrower)",
