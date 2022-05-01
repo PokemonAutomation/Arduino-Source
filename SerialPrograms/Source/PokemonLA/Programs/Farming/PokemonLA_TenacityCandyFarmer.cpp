@@ -240,7 +240,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
         }
 
         if (ret == 0){
-            env.console.log("Our turn!", COLOR_BLUE);
+            env.console.log("Our turn! Battle " + std::to_string(cur_battle) + " turn " + std::to_string(num_turns), COLOR_BLUE);
             clearing_dialogues = false;
 
             if (cur_battle == 1 && num_turns == 1){
@@ -259,16 +259,19 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
                 size_t target_move = target_battle_moves[cur_battle][std::min(num_turns, 2)];
 
                 if (FOURTH_MOVE_ON == OPPONENT_MAMOSWINE && cur_battle == 0 && num_turns == 1){
+                    env.console.log("Target fourth move on Mamonswine");
                     target_move = 3;
                     stats.fourth_moves++;
                     env.update_stats();
                 }
-
-                if (FOURTH_MOVE_ON == OPPONENT_AVALUGG && cur_battle == 1 && num_turns >= 1){
+                else if (FOURTH_MOVE_ON == OPPONENT_AVALUGG && cur_battle == 1 && num_turns >= 1){
                     // Use Flash Cannon to finish Froslass first, then use fourth move, Rock Smash to grind Avalugg.
                     target_move = (num_turns == 1 ? 2 : 3);
-                    stats.fourth_moves++;
-                    env.update_stats();
+                    if (num_turns == 2){
+                        env.console.log("Target fourth move on Avalugg");
+                        stats.fourth_moves++;
+                        env.update_stats();
+                    }
                 }
 
                 if (cur_move < target_move){
