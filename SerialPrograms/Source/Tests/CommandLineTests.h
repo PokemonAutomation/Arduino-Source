@@ -14,9 +14,11 @@
  * 
  *  Enable the command line test mode by changing the SerialPrograms-Settings.json field:
  *  "20-GlobalSettings": "COMMAND_LINE_TESTS": "RUN" to true.
- *  In this mode, the program does not launch GUI. Instead it looks for a local folder ./CommandLineTests/ to run tests.
+ *  In this mode, the program does not launch GUI. Instead it looks for a local folder which path is specified by the json field:
+ *  "20-GlobalSettings": "COMMAND_LINE_TESTS": "FOLDER"
+ *  and run tests inside it.
  *  The folder is structured as:
- *  CommandLineTests/                          <- root test folder
+ *  ../CommandLineTests/                         <- root test folder
  *    - PokemonLA/                               <- test space, sub-folder to organize tests, e.g. by which games the inferences are used in
  *        - BattleMenuDetector/                    <- test object, name of the class/function/file to test
  *            - IngoBattleDayTime-True.png           <- test file for BattleMenuDetector
