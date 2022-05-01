@@ -50,11 +50,11 @@ TenacityCandyFarmer_Descriptor::TenacityCandyFarmer_Descriptor()
 TenacityCandyFarmer::TenacityCandyFarmer(const TenacityCandyFarmer_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , FOURTH_MOVE_ON(
-        "<b>Fourth Move On:</b>",
+        "<b>Fourth Move On:</b><br>Use Arceus' fourth move to grind research tasks",
         {
             "None",
-            "Mamoswine (fourth move set to Flamethrower)",
-            "Avalugg (fourth move set to Rock Smash)"
+            "Mamoswine (fourth move needs to be set to Flamethrower)",
+            "Avalugg (fourth move needs to be set to Rock Smash)"
         },
         0
     )
