@@ -69,6 +69,7 @@ int screen_detector_helper(ScreenDetectorFunction test_func, const std::string& 
 
 const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonLA_BattleMenuDetector", std::bind(screen_detector_helper, test_pokemonLA_BattleMenuDetector, _1)},
+    {"PokemonLA_BattlePokemonSwitchDetector", std::bind(screen_detector_helper, test_pokemonLA_BattlePokemonSwitchDetector, _1)},
     {"PokemonLA_DialogueEllipseDetector", std::bind(screen_detector_helper, test_pokemonLA_DialogueEllipseDetector, _1)}
 };
 

@@ -27,8 +27,8 @@ BattlePokemonSwitchDetector::BattlePokemonSwitchDetector(LoggerQt& logger, Video
     , m_white_bg_2(0.641, 0.248, 0.05, 0.023)
     , m_white_bg_3(0.517, 0.195, 0.011, 0.061)
     , m_white_bg_4(0.924, 0.185, 0.019, 0.076)
-    , m_ready_to_battle_bg_1(0.54, 0.216, 0.016, 0.018)
-    , m_ready_to_battle_bg_2(0.676, 0.216, 0.016, 0.018)
+    , m_ready_to_battle_bg_1(0.538, 0.216, 0.008, 0.018)
+    , m_ready_to_battle_bg_2(0.686, 0.216, 0.008, 0.018)
     , m_button_plus_detector(logger, overlay, ButtonType::ButtonPlus, ImageFloatBox{0.044, 0.091, 0.043, 0.077}, std::chrono::milliseconds(0), false)
 {}
 
