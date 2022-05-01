@@ -20,7 +20,7 @@
 #include "PokemonLA_TenacityCandyFarmer.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.h"
+// #include "PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 
 
@@ -215,8 +215,6 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
     while(true){
         const bool stop_on_detected = true;
         BattleMenuDetector battle_menu_detector(env.console, env.console, stop_on_detected);
-        // dialogue ellipse appears on a semi-transparent dialog box if you win the fight.
-        DialogueEllipseDetector dialogue_ellipse_detector(env.console, env.console, std::chrono::milliseconds(200), stop_on_detected);
         BattlePokemonSwitchDetector pokemon_switch_detector(env.console, env.console, stop_on_detected);
         // normal dialogue appears if you lose the fight.
         NormalDialogDetector normal_dialogue_detector(env.console, env.console, stop_on_detected);
@@ -226,7 +224,6 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             env.console, context, std::chrono::minutes(2),
             {
                 {battle_menu_detector},
-                {dialogue_ellipse_detector},
                 {normal_dialogue_detector},
                 {surprise_dialogue_detector},
                 {pokemon_switch_detector},
@@ -300,24 +297,18 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             }
 
             num_turns++;
-        }
-        else if (ret == 1){
-            env.console.log("Transparent dialogue box.");
-            if (clear_dialogue_box()){
-                break;
-            }
-        } else if(ret == 2){
+        } else if(ret == 1){
             env.console.log("Normal dialogue box.");
             if (clear_dialogue_box()){
                 break;
             }
-        } else if(ret == 3){
+        } else if(ret == 2){
             env.console.log("Surprise dialogue box.");
             if (clear_dialogue_box()){
                 break;
             }
         }
-        else if (ret == 4){
+        else if (ret == 3){
             env.console.log("Pokemon fainted.", COLOR_RED);
 
             clearing_dialogues = false;
@@ -329,7 +320,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             next_pokemon_to_switch_to = switch_pokemon(env.console, context, next_pokemon_to_switch_to);
             cur_pokemon++;
         }
-        else{ // ret is 5
+        else{ // ret is 4
             env.console.log("Battle finished.");
             break;
         }
