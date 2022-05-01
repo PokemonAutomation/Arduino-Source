@@ -38,11 +38,11 @@ public:
     // to filter out candidate objects on an image. The thresholds specified here are the
     // min color thresholds. The max color thresholds for all filters are always 0xffffffff.
     WhiteObjectDetector(Color inference_box_color, std::set<Color> thresholds)
-        : m_color(inference_box_color)
+        : m_box_color(inference_box_color)
         , m_thresholds(std::move(thresholds))
     {}
 
-    Color color() const{ return m_color; }
+    Color color() const{ return m_box_color; }
     const std::set<Color>& thresholds() const{ return m_thresholds; }
 
     const std::vector<ImagePixelBox>& detections() const{ return m_detections; }
@@ -55,7 +55,7 @@ protected:
     void merge_heavily_overlapping(double tolerance = 0.2);
 
 protected:
-    Color m_color;
+    Color m_box_color;
     std::set<Color> m_thresholds;
     std::vector<ImagePixelBox> m_detections;
 };
