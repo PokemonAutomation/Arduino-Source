@@ -16,6 +16,8 @@ namespace PokemonAutomation{
 
 int test_pokemonLA_BattleMenuDetector(const QImage& image, bool target);
 
+int test_pokemonLA_BattlePokemonSwitchDetector(const QImage& image, bool target);
+
 int test_pokemonLA_DialogueEllipseDetector(const QImage& image, bool target);
 
 
