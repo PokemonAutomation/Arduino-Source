@@ -15,7 +15,7 @@ namespace NintendoSwitch{
 
 class Panels : public PanelList{
 public:
-    Panels(QTabWidget& parent, PanelListener& listener);
+    Panels(QTabWidget& parent, PanelHolder& holder);
 };
 
 

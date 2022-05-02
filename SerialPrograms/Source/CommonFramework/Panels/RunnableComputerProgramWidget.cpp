@@ -29,9 +29,9 @@ RunnableComputerProgramWidget::~RunnableComputerProgramWidget(){
 RunnableComputerProgramWidget* RunnableComputerProgramWidget::make(
     QWidget& parent,
     RunnableComputerProgramInstance& instance,
-    PanelListener& listener
+    PanelHolder& holder
 ){
-    RunnableComputerProgramWidget* widget = new RunnableComputerProgramWidget(parent, instance, listener);
+    RunnableComputerProgramWidget* widget = new RunnableComputerProgramWidget(parent, instance, holder);
     widget->construct();
     widget->m_state.store(ProgramState::STOPPED, std::memory_order_release);
     widget->update_ui_after_program_state_change();

@@ -87,8 +87,8 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-Panels::Panels(QTabWidget& parent, PanelListener& listener)
-    : PanelList(parent, "Sword/Shield", listener)
+Panels::Panels(QTabWidget& parent, PanelHolder& holder)
+    : PanelList(parent, "Sword/Shield", holder)
 {
     add_divider("---- Settings ----");
     add_settings<GameSettings_Descriptor, GameSettingsPanel>();

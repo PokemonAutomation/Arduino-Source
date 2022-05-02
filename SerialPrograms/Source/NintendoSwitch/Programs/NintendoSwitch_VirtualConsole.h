@@ -28,11 +28,11 @@ public:
 class VirtualConsole : public PanelInstance{
 public:
     VirtualConsole(const VirtualConsole_Descriptor& descriptor);
-    virtual QWidget* make_widget(QWidget& parent, PanelListener& listener) override;
+    virtual QWidget* make_widget(QWidget& parent, PanelHolder& holder) override;
 
 public:
     //  Serialization
-    VirtualConsole(PanelListener& listener, const QJsonValue& json);
+    VirtualConsole(PanelHolder& holder, const QJsonValue& json);
     virtual void from_json(const QJsonValue& json) override;
     virtual QJsonValue to_json() const override;
 
@@ -49,14 +49,14 @@ public:
     static VirtualConsole_Widget* make(
         QWidget& parent,
         VirtualConsole& instance,
-        PanelListener& listener
+        PanelHolder& holder
     );
 
 private:
     VirtualConsole_Widget(
         QWidget& parent,
         VirtualConsole& instance,
-        PanelListener& listener
+        PanelHolder& holder
     );
     void construct();
 

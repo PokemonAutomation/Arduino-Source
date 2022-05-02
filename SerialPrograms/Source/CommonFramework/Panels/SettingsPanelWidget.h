@@ -22,7 +22,7 @@ public:
     static SettingsPanelWidget* make(
         QWidget& parent,
         SettingsPanelInstance& instance,
-        PanelListener& listener
+        PanelHolder& holder
     );
 
     void restore_defaults();
@@ -31,7 +31,7 @@ private:
     SettingsPanelWidget(
         QWidget& parent,
         SettingsPanelInstance& instance,
-        PanelListener& listener
+        PanelHolder& holder
     );
     void construct();
     QWidget* make_options(QWidget& parent);

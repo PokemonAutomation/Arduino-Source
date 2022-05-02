@@ -22,9 +22,9 @@ SingleSwitchProgramWidget::~SingleSwitchProgramWidget(){
 SingleSwitchProgramWidget* SingleSwitchProgramWidget::make(
     QWidget& parent,
     SingleSwitchProgramInstance& instance,
-    PanelListener& listener
+    PanelHolder& holder
 ){
-    SingleSwitchProgramWidget* widget = new SingleSwitchProgramWidget(parent, instance, listener);
+    SingleSwitchProgramWidget* widget = new SingleSwitchProgramWidget(parent, instance, holder);
     widget->construct();
     return widget;
 }

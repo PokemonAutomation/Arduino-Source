@@ -30,9 +30,9 @@ RunnableSwitchProgramWidget::~RunnableSwitchProgramWidget(){
 RunnableSwitchProgramWidget::RunnableSwitchProgramWidget(
     QWidget& parent,
     RunnableSwitchProgramInstance& instance,
-    PanelListener& listener
+    PanelHolder& holder
 )
-    : RunnablePanelWidget(parent, instance, listener)
+    : RunnablePanelWidget(parent, instance, holder)
     , m_program_name(instance.descriptor().identifier())
     , m_setup(nullptr)
 {}
@@ -99,7 +99,7 @@ CollapsibleGroupBox* RunnableSwitchProgramWidget::make_header(QWidget& parent){
 }
 QWidget* RunnableSwitchProgramWidget::make_body(QWidget& parent){
     RunnableSwitchProgramInstance& instance = static_cast<RunnableSwitchProgramInstance&>(m_instance);
-    m_setup = instance.m_setup->make_ui(parent, m_listener.raw_logger(), m_instance_id);
+    m_setup = instance.m_setup->make_ui(parent, m_holder.raw_logger(), m_instance_id);
     return m_setup;
 }
 QWidget* RunnableSwitchProgramWidget::make_actions(QWidget& parent){
@@ -132,9 +132,9 @@ void RunnableSwitchProgramWidget::update_ui_after_program_state_change(){
 }
 
 bool RunnableSwitchProgramWidget::request_program_stop(){
-//    if (!RunnablePanelWidget::request_program_stop()){
-//        return false;
-//    }
+    if (!RunnablePanelWidget::request_program_stop()){
+        return false;
+    }
 //    while (true);
     ProgramState state = m_state.load(std::memory_order_acquire);
     if (m_setup){
@@ -142,8 +142,8 @@ bool RunnableSwitchProgramWidget::request_program_stop(){
         m_setup->stop_serial();
         m_setup->update_ui(state);
     }
-    return RunnablePanelWidget::request_program_stop();
-//   return true;
+//    return RunnablePanelWidget::request_program_stop();
+   return true;
 }
 
 void RunnableSwitchProgramWidget::run_program(){

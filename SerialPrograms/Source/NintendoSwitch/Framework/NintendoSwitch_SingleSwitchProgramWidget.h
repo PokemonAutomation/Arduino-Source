@@ -20,7 +20,7 @@ public:
     static SingleSwitchProgramWidget* make(
         QWidget& parent,
         SingleSwitchProgramInstance& instance,
-        PanelListener& listener
+        PanelHolder& holder
     );
 
     SwitchSystemWidget& system(){

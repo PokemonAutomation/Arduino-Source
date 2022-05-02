@@ -18,11 +18,11 @@ namespace PokemonAutomation{
 PanelWidget::PanelWidget(
     QWidget& parent,
     PanelInstance& instance,
-    PanelListener& listener
+    PanelHolder& holder
 )
     : QWidget(&parent)
     , m_instance(instance)
-    , m_listener(listener)
+    , m_holder(holder)
 {}
 
 CollapsibleGroupBox* PanelWidget::make_header(QWidget& parent){

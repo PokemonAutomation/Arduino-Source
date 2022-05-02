@@ -35,7 +35,7 @@ public:
         return static_cast<const RunnableComputerProgramDescriptor&>(m_descriptor);
     }
 
-    virtual QWidget* make_widget(QWidget& parent, PanelListener& listener) override;
+    virtual QWidget* make_widget(QWidget& parent, PanelHolder& holder) override;
     virtual void program(ProgramEnvironment& env, CancellableScope& scope) = 0;
 };
 

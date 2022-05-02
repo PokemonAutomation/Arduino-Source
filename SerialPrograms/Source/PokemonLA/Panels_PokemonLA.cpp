@@ -46,8 +46,8 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-Panels::Panels(QTabWidget& parent, PanelListener& listener)
-    : PanelList(parent, "LA", listener)
+Panels::Panels(QTabWidget& parent, PanelHolder& holder)
+    : PanelList(parent, "LA", holder)
 {
     add_divider("---- Settings ----");
     add_settings<GameSettings_Descriptor, GameSettingsPanel>();

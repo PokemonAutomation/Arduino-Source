@@ -21,7 +21,7 @@ public:
     static MultiSwitchProgramWidget* make(
         QWidget& parent,
         MultiSwitchProgramInstance& instance,
-        PanelListener& listener
+        PanelHolder& holder
     );
 
     size_t system_count() const{

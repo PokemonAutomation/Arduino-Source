@@ -19,7 +19,7 @@ public:
     static RunnableComputerProgramWidget* make(
         QWidget& parent,
         RunnableComputerProgramInstance& instance,
-        PanelListener& listener
+        PanelHolder& holder
     );
 
 private:

@@ -33,8 +33,8 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 
 
-Panels::Panels(QTabWidget& parent, PanelListener& listener)
-    : PanelList(parent, "Switch", listener)
+Panels::Panels(QTabWidget& parent, PanelHolder& holder)
+    : PanelList(parent, "Switch", holder)
 {
     add_divider("---- Settings ----");
     add_settings<ConsoleSettings_Descriptor, ConsoleSettingsPanel>();
