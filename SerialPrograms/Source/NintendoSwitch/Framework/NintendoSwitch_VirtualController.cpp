@@ -10,6 +10,7 @@
 #include "Common/Cpp/PanicDump.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "ClientSource/Connection/BotBase.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h"
 #include "NintendoSwitch_VirtualController.h"
@@ -153,6 +154,8 @@ void VirtualController::on_key_release(Qt::Key key){
 
 
 void VirtualController::thread_loop(){
+    GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_this_thread();
+
     VirtualControllerState last;
     bool last_neutral = true;
     WallClock last_press = current_time();
