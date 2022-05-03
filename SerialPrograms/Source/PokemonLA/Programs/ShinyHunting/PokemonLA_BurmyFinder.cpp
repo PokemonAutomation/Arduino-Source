@@ -38,10 +38,10 @@ BurmyFinder::BurmyFinder(const BurmyFinder_Descriptor& descriptor)
     , STOP_ON(
         "<b>Stop On:</b>",
         {
-        "Shiny",
-        "Alpha",
-        "Shiny & Alpha",
-        "Stop on any non regular"
+            "Shiny",
+            "Alpha",
+            "Shiny & Alpha",
+            "Stop on any non regular"
         },
         0
     )
@@ -104,7 +104,7 @@ std::unique_ptr<StatsTracker> BurmyFinder::make_stats() const{
 }
 
 
-void BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext& context, int16_t expected){
+void BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     bool battle_found = check_tree_for_battle(env.console, context);
@@ -115,32 +115,40 @@ void BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext
         PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
 
         //Match validation
-        int8_t ret = (pokemon.is_alpha + pokemon.is_shiny);
-        if(ret > 0){
-            if(pokemon.is_alpha) ret++;
-            switch (ret) {
-                case 1:
-                    env.console.log("Found Shiny!");
-                    stats.shinies++;
-                    break;
 
-                case 2:
-                    env.console.log("Found Alpha!");
-                    stats.alphas++;
-                    break;
-
-                case 3:
-                     env.console.log("Found Shiny Alpha!");
-                     stats.shinies++;
-                     stats.alphas++;
-                    break;
-            }
-            bool is_match = (ret == expected || expected == 4);
-            on_match_found(env, env.console, context, MATCH_DETECTED_OPTIONS, is_match);
-        }
-        else{
+        if (pokemon.is_alpha && pokemon.is_shiny){
+            env.console.log("Found Shiny Alpha!");
+            stats.shinies++;
+            stats.alphas++;
+        }else if (pokemon.is_alpha){
+            env.console.log("Found Alpha!");
+            stats.alphas++;
+        }else if (pokemon.is_shiny){
+            env.console.log("Found Shiny!");
+            stats.shinies++;
+        }else{
             env.console.log("Normie in the tree -_-");
             stats.found++;
+        }
+
+        bool is_match = false;
+        switch (STOP_ON){
+        case 0: //  Shiny
+            is_match = pokemon.is_shiny;
+            break;
+        case 1: //  Alpha
+            is_match = pokemon.is_alpha;
+            break;
+        case 2: //  Shiny and Alpha
+            is_match = pokemon.is_alpha && pokemon.is_shiny;
+            break;
+        case 3: //  Shiny or Alpha
+            is_match = pokemon.is_alpha || pokemon.is_shiny;
+            break;
+        }
+
+        if (pokemon.is_alpha || pokemon.is_shiny){
+            on_match_found(env, env.console, context, MATCH_DETECTED_OPTIONS, is_match);
         }
 
         exit_battle(context);
@@ -151,9 +159,6 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     Stats& stats = env.stats<Stats>();
     stats.attempts++;
-
-    int16_t stop_case = STOP_ON + 1;
-
     env.console.log("Starting route and shiny detection...");
 
     float shiny_coefficient = 1.0;
@@ -180,7 +185,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
             pbf_move_right_joystick(context, 127, 255, (0.10 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
             context.wait_for_all_requests();
-            check_tree(env, context, stop_case);
+            check_tree(env, context);
 
             //Tree 2
             goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
@@ -194,7 +199,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
             pbf_move_right_joystick(context, 127, 255, (0.10 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
             context.wait_for_all_requests();
-            check_tree(env, context, stop_case);
+            check_tree(env, context);
 
         },
         {{shiny_detector}}

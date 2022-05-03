@@ -191,7 +191,7 @@ void on_match_found(
         pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
     }
 
-    if(stop_program){
+    if (stop_program){
         console.log("STOPPING...");
         pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
         context.wait_for_all_requests();
