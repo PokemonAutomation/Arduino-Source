@@ -23,20 +23,33 @@ using std::endl;
 namespace PokemonAutomation{
 
 
+AudioPerSpectrumDetectorBase::AudioPerSpectrumDetectorBase(
+    Logger& logger,
+    std::string label, std::string audio_name, Color detection_color,
+    ConsoleHandle& console, OnShinyCallback on_shiny_callback
+)
+    : AudioInferenceCallback(std::move(label))
+    , m_logger(logger)
+    , m_audio_name(std::move(audio_name))
+    , m_detection_color(detection_color)
+    , m_console(console)
+    , m_on_shiny_callback(std::move(on_shiny_callback))
+    , m_start_timestamp(current_time())
+{}
 AudioPerSpectrumDetectorBase::~AudioPerSpectrumDetectorBase(){
     try{
         log_results();
     }catch (...){}
 }
-AudioPerSpectrumDetectorBase::AudioPerSpectrumDetectorBase(
-    std::string label, std::string audio_name, Color detection_color, ConsoleHandle& console, 
-    std::function<bool(float error_coefficient)> on_shiny_callback)
-    : AudioInferenceCallback(std::move(label))
-    , m_audio_name(std::move(audio_name))
-    , m_detection_color(detection_color)
-    , m_console(console)
-    , m_on_shiny_callback(std::move(on_shiny_callback))
-{}
+void AudioPerSpectrumDetectorBase::throw_if_no_sound(std::chrono::milliseconds min_duration){
+    if (m_start_timestamp + min_duration > current_time()){
+        return;
+    }
+    if (m_lowest_error < 1.0){
+        return;
+    }
+    throw UserSetupError(m_logger, "No sound detected.");
+}
 
 void AudioPerSpectrumDetectorBase::log_results(){
     std::stringstream ss;

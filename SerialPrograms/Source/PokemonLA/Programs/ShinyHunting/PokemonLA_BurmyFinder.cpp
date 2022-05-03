@@ -162,7 +162,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     env.console.log("Starting route and shiny detection...");
 
     float shiny_coefficient = 1.0;
-    ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+    ShinySoundDetector shiny_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
         //  Warning: This callback will be run from a different thread than this function.
         stats.shinies++;
         shiny_coefficient = error_coefficient;
@@ -204,6 +204,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
         },
         {{shiny_detector}}
     );
+    shiny_detector.throw_if_no_sound();
     if (ret == 0){
         on_shiny_sound(env, env.console, context, SHINY_DETECTED_ENROUTE, shiny_coefficient);
     }

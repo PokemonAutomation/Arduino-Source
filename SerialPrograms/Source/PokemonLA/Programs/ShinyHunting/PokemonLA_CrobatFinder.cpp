@@ -132,7 +132,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCon
         float shiny_coefficient = 1.0;
         std::atomic<ShinyDetectedActionOption*> shiny_action = &SHINY_DETECTED_ENROUTE;
 
-        ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+        ShinySoundDetector shiny_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
             stats.shinies++;
             shiny_coefficient = error_coefficient;
@@ -167,6 +167,7 @@ void CrobatFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCon
             },
             {{shiny_detector}}
         );
+        shiny_detector.throw_if_no_sound();
         if (ret == 0){
             ShinyDetectedActionOption* action = shiny_action.load(std::memory_order_acquire);
             on_shiny_sound(env, env.console, context, *action, shiny_coefficient);

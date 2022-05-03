@@ -57,7 +57,7 @@ void ShinySoundListener::program(SingleSwitchProgramEnvironment& env, BotBaseCon
     std::cout << "Running audio test program." << std::endl;
 
     
-    ShinySoundDetector detector(env.console, [&](float error_coefficient) -> bool{
+    ShinySoundDetector detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
         // This lambda function will be called when a shiny is detected.
         // Its return will determine whether to stop the program:
         return STOP_ON_SHINY_SOUND;

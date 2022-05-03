@@ -57,7 +57,7 @@ void AlphaMusicListener::program(SingleSwitchProgramEnvironment& env, BotBaseCon
 
     std::cout << "Running audio test program." << std::endl;
     
-    AlphaMusicDetector detector(env.console, [&](float error_coefficient) -> bool{
+    AlphaMusicDetector detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
         // This lambda function will be called when an alpha roar is detected.
         // Its return will determine whether to stop the program:
         return STOP_ON_ALPHA_MUSIC;

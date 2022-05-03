@@ -26,7 +26,7 @@ namespace PokemonLA{
 
 class AlphaMusicDetector : public AudioPerSpectrumDetectorBase{
 public:
-    AlphaMusicDetector(ConsoleHandle& console, OnShinyCallback on_shiny_callback);
+    AlphaMusicDetector(Logger& logger, ConsoleHandle& console, OnShinyCallback on_shiny_callback);
 
     // Implement AudioPerSpectrumDetectorBase::get_score_threshold()
     virtual float get_score_threshold() const override;

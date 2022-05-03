@@ -129,7 +129,7 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, BotBas
         float shiny_coefficient = 1.0;
         ShinyDetectedActionOption* shiny_action = nullptr;
 
-        ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+        ShinySoundDetector shiny_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
             stats.shinies++;
             shiny_coefficient = error_coefficient;
@@ -158,6 +158,7 @@ void ShinyHuntFlagPin::run_iteration(SingleSwitchProgramEnvironment& env, BotBas
             },
             {{shiny_detector}}
         );
+        shiny_detector.throw_if_no_sound();
         if (ret == 0){
             on_shiny_sound(env, env.console, context, *shiny_action, shiny_coefficient);
         }
