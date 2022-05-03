@@ -12,6 +12,7 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include "Kernels/Kernels_Arch.h"
+#include "Common/Compiler.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/GlobalSettingsPanel.h"

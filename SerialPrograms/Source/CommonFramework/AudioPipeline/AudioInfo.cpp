@@ -138,10 +138,10 @@ std::vector<AudioFormat> supported_input_formats(int& preferred_index, const Nat
         if (info.isFormatSupported(format)){
             if (format.channelCount() == preferred_channels && format.sampleRate() == preferred_rate){
                 preferred_index = (int)ret.size();
-                if (display_name.contains("ShadowCast")){
-                    preferred_index += 1;
-                }else{
+                if (display_name.contains("MiraBox")){
                     preferred_index += 2;
+                }else{
+                    preferred_index += 1;
                 }
             }
             ret.emplace_back(AudioFormat::MONO_96000);
