@@ -42,7 +42,7 @@ NuggetFarmerHighlands_Descriptor::NuggetFarmerHighlands_Descriptor()
 {}
 
 
-MoneyFarmerHighlands::MoneyFarmerHighlands(const NuggetFarmerHighlands_Descriptor& descriptor)
+NuggetFarmerHighlands::NuggetFarmerHighlands(const NuggetFarmerHighlands_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , SHINY_DETECTED("Shiny Detected Action", "", "2 * TICKS_PER_SECOND")
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
@@ -61,7 +61,7 @@ MoneyFarmerHighlands::MoneyFarmerHighlands(const NuggetFarmerHighlands_Descripto
 
 
 
-class MoneyFarmerHighlands::Stats : public StatsTracker, public ShinyStatIncrementer{
+class NuggetFarmerHighlands::Stats : public StatsTracker, public ShinyStatIncrementer{
 public:
     Stats()
         : attempts(m_stats["Attempts"])
@@ -87,7 +87,7 @@ public:
     std::atomic<uint64_t>& shinies;
 };
 
-std::unique_ptr<StatsTracker> MoneyFarmerHighlands::make_stats() const{
+std::unique_ptr<StatsTracker> NuggetFarmerHighlands::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
@@ -112,7 +112,7 @@ void mash_A_until_end_of_battle(ConsoleHandle& console, BotBaseContext& context)
 
 
 
-bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+bool NuggetFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     //  Go to Coronet Highlands Mountain camp.
@@ -231,7 +231,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, Bo
 
 
 
-void MoneyFarmerHighlands::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void NuggetFarmerHighlands::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
     //  Connect the controller.

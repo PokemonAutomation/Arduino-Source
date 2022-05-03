@@ -22,9 +22,9 @@ public:
 };
 
 
-class MoneyFarmerHighlands : public SingleSwitchProgramInstance{
+class NuggetFarmerHighlands : public SingleSwitchProgramInstance{
 public:
-    MoneyFarmerHighlands(const NuggetFarmerHighlands_Descriptor& descriptor);
+    NuggetFarmerHighlands(const NuggetFarmerHighlands_Descriptor& descriptor);
 
     virtual std::unique_ptr<StatsTracker> make_stats() const override;
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
