@@ -18,21 +18,6 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-
-//void setup(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context){
-//    goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Fieldlands_Heights);
-//    pbf_move_left_joystick(context, 170, 255, 30, 30);
-//    change_mount(console, context, MountState::BRAVIARY_ON);
-//    pbf_press_button(context, BUTTON_B, (6.35 * TICKS_PER_SECOND), 20);
-//    pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-//    pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
-//    pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
-//    pbf_move_left_joystick(context, 255, 127, 30, (0.5 * TICKS_PER_SECOND));
-//    pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-//    pbf_move_right_joystick(context, 127, 255, (0.10 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-//    context.wait_for_all_requests();
-//}
-
 void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, size_t pokemon){
     switch (pokemon) {
     case 0: //Aipom
@@ -170,45 +155,25 @@ void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& cont
 void return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, size_t pokemon){
     goto_camp_from_overworld(env, console, context);
     switch (pokemon) {
-    case 0:
-        goto_professor(console, context, Camp::COASTLANDS_BEACHSIDE);
-        break;
-    case 1:
+    case 0: //Aipom
+    case 1: //Burmy
+    case 3: //Cherubi
+    case 4: //Combee
+    case 8: //Wormadam
+    case 9: //Geodude
         goto_professor(console, context, Camp::FIELDLANDS_FIELDLANDS);
         break;
     case 2: //Cherrim
-        goto_professor(console, context, Camp::HIGHLANDS_HIGHLANDS);
-        break;
-    case 3: //Cherubi
-        goto_professor(console, context, Camp::FIELDLANDS_FIELDLANDS);
-        break;
-    case 4: //Combee
-        goto_professor(console, context, Camp::FIELDLANDS_FIELDLANDS);
-        break;
-    case 5:
+    case 5: //Heracross
+    case 10: //Graveler
+    case 12: //Bronzor
+    case 13: //Nosepass
         goto_professor(console, context, Camp::HIGHLANDS_HIGHLANDS);
         break;
     case 6: //Pachirisu
     case 7: //Vespiquen
-        goto_professor(console, context, Camp::MIRELANDS_MIRELANDS);
-        break;
-    case 8: //Wormadam
-        goto_professor(console, context, Camp::FIELDLANDS_FIELDLANDS);
-        break;
-    case 9: //Geodude
-        goto_professor(console, context, Camp::FIELDLANDS_FIELDLANDS);
-        break;
-    case 10: //Graveler
-        goto_professor(console, context, Camp::HIGHLANDS_HIGHLANDS);
-        break;
     case 11: //Bonsly
         goto_professor(console, context, Camp::MIRELANDS_MIRELANDS);
-        break;
-    case 12: //Bronzor
-        goto_professor(console, context, Camp::HIGHLANDS_HIGHLANDS);
-        break;
-    case 13: //Nosepass
-        goto_professor(console, context, Camp::HIGHLANDS_HIGHLANDS);
         break;
     case 14: //Bergimite
         goto_professor(console, context, Camp::ICELANDS_SNOWFIELDS);

@@ -28,7 +28,7 @@ LeapGrinder_Descriptor::LeapGrinder_Descriptor()
         "PokemonLA:Leap Grinder",
         STRING_POKEMON + " LA", "Leap Grinder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/LeapGrinder.md",
-        "Shake trees to grind dex tasks",
+        "Shake trees and ores to grind tasks",
         FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
@@ -63,7 +63,8 @@ LeapGrinder::LeapGrinder(const LeapGrinder_Descriptor& descriptor)
     , STOP_ON(
         "<b>Stop On:</b>",
         {
-        "Shiny", "Alpha",
+        "Shiny",
+        "Alpha",
         "Shiny & Alpha",
         "Stop on any non regular"
         }, 0
