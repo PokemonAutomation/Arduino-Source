@@ -138,6 +138,9 @@ std::unique_ptr<StatsTracker> IngoBattleGrinder::make_stats() const{
 }
 
 bool IngoBattleGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& context){
+    // First press A to start talking with Ingo.^M
+    pbf_press_button(context, BUTTON_A, 20, 150);^M
+    context.wait_for_all_requests();^M
     {
         ButtonDetector button0(console, console, ButtonType::ButtonA, {0.50, 0.408, 0.40, 0.042}, std::chrono::milliseconds(100), true);
         ButtonDetector button1(console, console, ButtonType::ButtonA, {0.50, 0.450, 0.40, 0.042}, std::chrono::milliseconds(100), true);
