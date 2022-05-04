@@ -12,6 +12,7 @@
 #include <QPushButton>
 #include <QMessageBox>
 #include "Kernels/Kernels_Arch.h"
+#include "Common/Compiler.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/PersistentSettings.h"
 #include "CommonFramework/GlobalSettingsPanel.h"
@@ -159,7 +160,9 @@ MainWindow::MainWindow(QWidget* parent)
     connect(
         settings, &QPushButton::clicked,
         this, [=](bool){
-            on_panel_construct(GlobalSettings_Descriptor::INSTANCE.make_panel());
+            if (report_new_panel_intent(GlobalSettings_Descriptor::INSTANCE)){
+                load_panel(GlobalSettings_Descriptor::INSTANCE.make_panel());
+            }
         }
     );
 
@@ -214,7 +217,21 @@ void MainWindow::close_panel(){
     m_current_panel.reset();
 }
 
-void MainWindow::on_panel_construct(std::unique_ptr<PanelInstance> panel){
+bool MainWindow::report_new_panel_intent(const PanelDescriptor& descriptor){
+    //  No active panel. Proceed with panel change.
+    if (m_current_panel == nullptr){
+        return true;
+    }
+
+    //  Panel is already active. Don't change.
+    if (&m_current_panel->descriptor() == &descriptor){
+        m_current_panel->save_settings();
+        return false;
+    }
+
+    return true;
+}
+void MainWindow::load_panel(std::unique_ptr<PanelInstance> panel){
     close_panel();
 
     //  Make new widget.

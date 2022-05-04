@@ -42,8 +42,8 @@ namespace NintendoSwitch{
 namespace PokemonBDSP{
 
 
-Panels::Panels(QTabWidget& parent, PanelListener& listener)
-    : PanelList(parent, "BD/SP", listener)
+Panels::Panels(QTabWidget& parent, PanelHolder& holder)
+    : PanelList(parent, "BD/SP", holder)
 {
     add_divider("---- Settings ----");
     add_settings<GameSettings_Descriptor, GameSettingsPanel>();

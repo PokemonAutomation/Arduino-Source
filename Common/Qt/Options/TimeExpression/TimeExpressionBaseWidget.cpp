@@ -61,6 +61,10 @@ TimeExpressionBaseWidget<Type>::TimeExpressionBaseWidget(QWidget& parent, TimeEx
 template <typename Type>
 void TimeExpressionBaseWidget<Type>::restore_defaults(){
     m_value.restore_defaults();
+    update_ui();
+}
+template <typename Type>
+void TimeExpressionBaseWidget<Type>::update_ui(){
     m_box->setText(m_value.text());
 }
 

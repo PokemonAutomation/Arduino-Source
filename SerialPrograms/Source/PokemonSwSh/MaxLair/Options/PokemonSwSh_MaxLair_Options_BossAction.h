@@ -49,16 +49,18 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class BossActionOptionUI;
+    friend class BossActionWidget;
 
     QString m_label;
     std::vector<BossFilter> m_list;
 };
 
-class BossActionOptionUI : public QWidget, public ConfigWidget{
+class BossActionWidget : public QWidget, public ConfigWidget{
 public:
-    BossActionOptionUI(QWidget& parent, BossActionOption& value);
+    BossActionWidget(QWidget& parent, BossActionOption& value);
+
     virtual void restore_defaults() override;
+    virtual void update_ui() override;
 
 private:
     void redraw_table();

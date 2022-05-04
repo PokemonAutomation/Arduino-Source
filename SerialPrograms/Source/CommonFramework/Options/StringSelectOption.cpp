@@ -24,7 +24,9 @@ namespace PokemonAutomation{
 class StringSelectWidget : public QWidget, public ConfigWidget{
 public:
     StringSelectWidget(QWidget& parent, StringSelectOption& value);
+
     virtual void restore_defaults() override;
+    virtual void update_ui() override;
 
 private:
     StringSelectOption& m_value;
@@ -155,6 +157,9 @@ StringSelectWidget::StringSelectWidget(QWidget& parent, StringSelectOption& valu
 
 void StringSelectWidget::restore_defaults(){
     m_value.restore_defaults();
+    update_ui();
+}
+void StringSelectWidget::update_ui(){
     m_box->setCurrentIndex((int)m_value);
 }
 

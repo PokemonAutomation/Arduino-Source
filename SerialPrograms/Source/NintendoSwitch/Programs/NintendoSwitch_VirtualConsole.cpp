@@ -33,8 +33,8 @@ void VirtualConsole::from_json(const QJsonValue& json){
 QJsonValue VirtualConsole::to_json() const{
     return m_switch.to_json();
 }
-QWidget* VirtualConsole::make_widget(QWidget& parent, PanelListener& listener){
-    return VirtualConsole_Widget::make(parent, *this, listener);
+QWidget* VirtualConsole::make_widget(QWidget& parent, PanelHolder& holder){
+    return VirtualConsole_Widget::make(parent, *this, holder);
 }
 
 
@@ -42,18 +42,18 @@ QWidget* VirtualConsole::make_widget(QWidget& parent, PanelListener& listener){
 VirtualConsole_Widget* VirtualConsole_Widget::make(
     QWidget& parent,
     VirtualConsole& instance,
-    PanelListener& listener
+    PanelHolder& holder
 ){
-    VirtualConsole_Widget* widget = new VirtualConsole_Widget(parent, instance, listener);
+    VirtualConsole_Widget* widget = new VirtualConsole_Widget(parent, instance, holder);
     widget->construct();
     return widget;
 }
 VirtualConsole_Widget::VirtualConsole_Widget(
     QWidget& parent,
     VirtualConsole& instance,
-    PanelListener& listener
+    PanelHolder& holder
 )
-    : PanelWidget(parent, instance, listener)
+    : PanelWidget(parent, instance, holder)
 {}
 void VirtualConsole_Widget::construct(){
     QVBoxLayout* layout = new QVBoxLayout(this);
@@ -61,7 +61,7 @@ void VirtualConsole_Widget::construct(){
     layout->addWidget(make_header(*this));
 
     VirtualConsole& instance = static_cast<VirtualConsole&>(m_instance);
-    m_switch = (SwitchSystemWidget*)instance.m_switch.make_ui(*this, m_listener.raw_logger(), 0);
+    m_switch = (SwitchSystemWidget*)instance.m_switch.make_ui(*this, m_holder.raw_logger(), 0);
     layout->addWidget(m_switch);
 }
 

@@ -844,6 +844,7 @@ HEADERS += \
     Source/CommonFramework/Options/BooleanCheckBoxOption.h \
     Source/CommonFramework/Options/ConfigOption.h \
     Source/CommonFramework/Options/EditableTableOption.h \
+    Source/CommonFramework/Options/EditableTableWidget.h \
     Source/CommonFramework/Options/EnumDropdownOption.h \
     Source/CommonFramework/Options/EnumDropdownWidget.h \
     Source/CommonFramework/Options/Environment/ProcessPriorityOption.h \

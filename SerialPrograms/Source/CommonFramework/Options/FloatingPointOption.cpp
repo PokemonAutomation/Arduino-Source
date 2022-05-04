@@ -38,20 +38,23 @@ void FloatingPointOption::restore_defaults(){
 
 
 
-class FloatingPointOptionUI : private FloatingPointBaseWidget, public ConfigWidget{
+class FloatingPointWidget : private FloatingPointBaseWidget, public ConfigWidget{
 public:
-    FloatingPointOptionUI(QWidget& parent, FloatingPointOption& value)
+    FloatingPointWidget(QWidget& parent, FloatingPointOption& value)
         : FloatingPointBaseWidget(parent, value)
         , ConfigWidget(value, *this)
     {}
     virtual void restore_defaults() override{
         FloatingPointBaseWidget::restore_defaults();
     }
+    virtual void update_ui() override{
+        FloatingPointBaseWidget::update_ui();
+    }
 };
 
 
 ConfigWidget* FloatingPointOption::make_ui(QWidget& parent){
-    return new FloatingPointOptionUI(parent, *this);
+    return new FloatingPointWidget(parent, *this);
 }
 
 

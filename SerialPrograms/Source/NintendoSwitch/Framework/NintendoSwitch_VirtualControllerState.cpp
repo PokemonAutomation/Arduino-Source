@@ -18,7 +18,7 @@ void VirtualControllerState::print() const{
     cout << "dpad = (" << dpad_x << "," << dpad_y
          << "), left = (" << left_joystick_x << "," << left_joystick_y
          << "), right = (" << right_joystick_x << "," << right_joystick_y
-         << "), buttons =";
+         << "), buttons = (";
     if (buttons & BUTTON_Y) cout << " Y";
     if (buttons & BUTTON_B) cout << " B";
     if (buttons & BUTTON_A) cout << " A";

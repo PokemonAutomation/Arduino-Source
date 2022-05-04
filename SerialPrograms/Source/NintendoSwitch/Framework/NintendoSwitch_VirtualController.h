@@ -77,7 +77,7 @@ private:
     const bool m_allow_commands_while_running;
 
     //  Keyboard State
-    std::set<Qt::Key> m_pressed_buttons;
+    std::set<const ControllerButton*> m_pressed_buttons;
 
     //  Controller State
     VirtualControllerState m_controller_state;

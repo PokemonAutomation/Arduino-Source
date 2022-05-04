@@ -91,8 +91,8 @@ MultiSwitchProgramInstance::MultiSwitchProgramInstance(const MultiSwitchProgramD
 {
     m_setup = &m_switches;
 }
-QWidget* MultiSwitchProgramInstance::make_widget(QWidget& parent, PanelListener& listener){
-    return MultiSwitchProgramWidget::make(parent, *this, listener);
+QWidget* MultiSwitchProgramInstance::make_widget(QWidget& parent, PanelHolder& holder){
+    return MultiSwitchProgramWidget::make(parent, *this, holder);
 }
 
 

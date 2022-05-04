@@ -20,7 +20,9 @@ namespace PokemonSwSh{
 class RegiSelectorWidget : public QWidget, public ConfigWidget{
 public:
     RegiSelectorWidget(QWidget& parent, RegiSelectorOption& value);
+
     virtual void restore_defaults() override;
+    virtual void update_ui() override;
 
 private:
     RegiSelectorOption& m_value;
@@ -83,6 +85,9 @@ RegiSelectorWidget::RegiSelectorWidget(QWidget& parent, RegiSelectorOption& valu
 }
 void RegiSelectorWidget::restore_defaults(){
     m_value.restore_defaults();
+    update_ui();
+}
+void RegiSelectorWidget::update_ui(){
     m_box->setCurrentIndex((int)(RegiGolem)m_value);
 }
 

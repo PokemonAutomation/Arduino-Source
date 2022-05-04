@@ -18,6 +18,7 @@ namespace PokemonAutomation{
 class StaticTextWidget : public QWidget, public ConfigWidget{
 public:
     StaticTextWidget(QWidget& parent, StaticTextOption& value);
+    virtual void update_ui() override{}
     virtual void restore_defaults() override{}
 };
 
@@ -25,6 +26,7 @@ public:
 class SectionDividerWidget : public QWidget, public ConfigWidget{
 public:
     SectionDividerWidget(QWidget& parent, SectionDividerOption& value);
+    virtual void update_ui() override{}
     virtual void restore_defaults() override{}
 };
 

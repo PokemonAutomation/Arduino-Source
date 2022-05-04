@@ -20,6 +20,7 @@ class StringBaseWidget : public QWidget{
 public:
     StringBaseWidget(QWidget& parent, StringBaseOption& value);
     void restore_defaults();
+    void update_ui();
 
 private:
     StringBaseOption& m_value;

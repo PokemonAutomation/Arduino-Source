@@ -33,8 +33,6 @@ namespace PokemonAutomation{
 
 namespace{
 
-const char* TEST_FOLDER_NAME = "CommandLineTests/";
-
 #define RETURN_IF_NOT_ZERO(statement) \
     do { \
         int _ret = (statement); \
@@ -81,12 +79,13 @@ int run_test_obj(const std::string& test_space, const QFileInfo& obj_info, size_
         return 0;
     }
 
+    cout << "===========================================" << endl;
     const TestFunction test_func = find_test_function(test_space, test_name);
     if (test_func == nullptr){
-        return 2;
+        // No corresponding test code, skip the folder.
+        return 0;
     }
 
-    cout << "===========================================" << endl;
     cout << "Testing " << test_name << ":" << endl;
 
     // Recursively get test filenames, like:
@@ -128,13 +127,15 @@ int run_test_space(const QFileInfo& space_info, size_t& num_passed){
 
 
 int run_command_line_tests(){
-    QDir test_root_dir(TEST_FOLDER_NAME);
+    const auto& root_folder_name = GlobalSettings::instance().COMMAND_LINE_TEST_FOLDER;
+
+    QDir test_root_dir(root_folder_name.c_str());
     if (!test_root_dir.exists()){
-        cerr << "Error: command line test folder ./" << TEST_FOLDER_NAME << " does not exist." << endl;
+        cerr << "Error: command line test folder " << root_folder_name << " does not exist." << endl;
         return 1;
     }
 
-    QFileInfo test_root_info(TEST_FOLDER_NAME);
+    QFileInfo test_root_info(root_folder_name.c_str());
 
     size_t num_passed = 0;
 
@@ -153,7 +154,7 @@ int run_command_line_tests(){
     } else{
         // Only run on selected tests
         for(const std::string& test_path : selected_test_list){
-            const std::string full_path = TEST_FOLDER_NAME + test_path;
+            const std::string full_path = root_folder_name + "/" + test_path;
             const QString full_path_cleaned = QDir::cleanPath(QString::fromStdString(full_path));
 
             if (full_path_cleaned.size() == 0){
@@ -190,7 +191,7 @@ int run_command_line_tests(){
                 return 1;
             }
 
-            QDir cur_dir(TEST_FOLDER_NAME);
+            QDir cur_dir(root_folder_name.c_str());
 
             auto it = path_components.begin();
             std::string test_space = it->toStdString();

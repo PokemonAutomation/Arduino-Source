@@ -129,7 +129,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     //Head to ruins
     {
         float shiny_coefficient = 1.0;
-        ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+        ShinySoundDetector shiny_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
             stats.shinies++;
             shiny_coefficient = error_coefficient;
@@ -143,6 +143,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             },
             {{shiny_detector}}
         );
+        shiny_detector.throw_if_no_sound();
         if (ret == 0){
             on_shiny_sound(env, env.console, context, SHINY_DETECTED_ENROUTE, shiny_coefficient);
         }
@@ -151,7 +152,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     // Enter ruins
     {
         float shiny_coefficient = 1.0;
-        ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+        ShinySoundDetector shiny_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
             stats.shinies++;
             shiny_coefficient = error_coefficient;
@@ -164,6 +165,7 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             },
             {{shiny_detector}}
         );
+        shiny_detector.throw_if_no_sound();
         if (ret == 0){
             on_shiny_sound(env, env.console, context, SHINY_DETECTED_DESTINATION, shiny_coefficient);
         }

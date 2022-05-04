@@ -80,6 +80,11 @@ void BatchWidget::restore_defaults(){
         item->restore_defaults();
     }
 }
+void BatchWidget::update_ui(){
+    for (ConfigWidget* item : m_options){
+        item->update_ui();
+    }
+}
 void BatchWidget::update_visibility(){
     ConfigWidget::update_visibility();
     for (ConfigWidget* item : m_options){

@@ -20,6 +20,7 @@ public:
     EncounterFilterWidget(QWidget& parent, EncounterFilterOption& value);
 
     virtual void restore_defaults() override;
+    virtual void update_ui() override;
 
 private:
     EncounterFilterOption& m_value;

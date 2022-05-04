@@ -19,7 +19,9 @@ class EnumDropdownWidget : public QWidget, public ConfigWidget{
 
 public:
     EnumDropdownWidget(QWidget& parent, EnumDropdownOption& value);
+
     virtual void restore_defaults() override;
+    virtual void update_ui() override;
 
 signals:
     void on_changed();

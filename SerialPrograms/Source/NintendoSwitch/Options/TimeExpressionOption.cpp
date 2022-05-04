@@ -15,14 +15,17 @@ namespace NintendoSwitch{
 
 
 template <typename Type>
-class TimeExpressionOptionUI : private TimeExpressionBaseWidget<Type>, public ConfigWidget{
+class TimeExpressionWidget : private TimeExpressionBaseWidget<Type>, public ConfigWidget{
 public:
-    TimeExpressionOptionUI(QWidget& parent, TimeExpressionOption<Type>& value)
+    TimeExpressionWidget(QWidget& parent, TimeExpressionOption<Type>& value)
         : TimeExpressionBaseWidget<Type>(parent, value)
         , ConfigWidget(value, *this)
     {}
     virtual void restore_defaults() override{
         return TimeExpressionBaseWidget<Type>::restore_defaults();
+    }
+    virtual void update_ui() override{
+        return TimeExpressionBaseWidget<Type>::update_ui();
     }
 };
 
@@ -59,7 +62,7 @@ void TimeExpressionOption<Type>::restore_defaults(){
 
 template <typename Type>
 ConfigWidget* TimeExpressionOption<Type>::make_ui(QWidget& parent){
-    return new TimeExpressionOptionUI<Type>(parent, *this);
+    return new TimeExpressionWidget<Type>(parent, *this);
 }
 
 

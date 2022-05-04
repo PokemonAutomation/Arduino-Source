@@ -39,7 +39,7 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class FloatingPointOptionUI;
+    friend class FloatingPointWidget;
 };
 
 

@@ -95,14 +95,14 @@ void TradeCountTableOption::restore_defaults(){
     }
 }
 ConfigWidget* TradeCountTableOption::make_ui(QWidget& parent){
-    return new TradeCountTableOptionUI(parent, *this);
+    return new TradeCountTableWidget(parent, *this);
 }
 
 
 
 
 
-TradeCountTableOptionUI::TradeCountTableOptionUI(QWidget& parent, TradeCountTableOption& value)
+TradeCountTableWidget::TradeCountTableWidget(QWidget& parent, TradeCountTableOption& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)
@@ -148,13 +148,16 @@ TradeCountTableOptionUI::TradeCountTableOptionUI(QWidget& parent, TradeCountTabl
     m_table->resizeColumnsToContents();
 
 }
-void TradeCountTableOptionUI::restore_defaults(){
+void TradeCountTableWidget::restore_defaults(){
     m_value.restore_defaults();
+    update_ui();
+}
+void TradeCountTableWidget::update_ui(){
     for (size_t c = 0; c < m_value.m_list.size(); c++){
         m_entries[c]->setText(QString::number(m_value.m_list[0].second));
     }
 }
-QLineEdit* TradeCountTableOptionUI::make_count_box(QWidget& parent, int row, int count){
+QLineEdit* TradeCountTableWidget::make_count_box(QWidget& parent, int row, int count){
     QLineEdit* box = new QLineEdit(&parent);
     QIntValidator* validator = new QIntValidator(0, 25, box);
     box->setValidator(validator);

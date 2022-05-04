@@ -14,14 +14,17 @@ namespace PokemonSwSh{
 
 
 
-class MultiHostTableOptionUI : public EditableTableBaseWidget, public ConfigWidget{
+class MultiHostTableWidget : public EditableTableBaseWidget, public ConfigWidget{
 public:
-    MultiHostTableOptionUI(QWidget& parent, MultiHostTableOption& value)
+    MultiHostTableWidget(QWidget& parent, MultiHostTableOption& value)
         : EditableTableBaseWidget(parent, value.m_table)
         , ConfigWidget(value, *this)
     {}
     virtual void restore_defaults() override{
         EditableTableBaseWidget::restore_defaults();
+    }
+    virtual void update_ui() override{
+        EditableTableBaseWidget::update_ui();
     }
 
 };
@@ -54,7 +57,7 @@ void MultiHostTableOption::restore_defaults(){
 
 
 ConfigWidget* MultiHostTableOption::make_ui(QWidget& parent){
-    return new MultiHostTableOptionUI(parent, *this);
+    return new MultiHostTableWidget(parent, *this);
 }
 
 

@@ -23,7 +23,9 @@ namespace PokemonAutomation{
 class RandomCodeWidget : public QWidget, public ConfigWidget{
 public:
     RandomCodeWidget(QWidget& parent, RandomCodeOption& value);
+
     virtual void restore_defaults() override;
+    virtual void update_ui() override;
 
 private:
     QString sanitized_code(const QString& text) const;
@@ -235,6 +237,9 @@ void RandomCodeWidget::update_labels(){
 }
 void RandomCodeWidget::restore_defaults(){
     m_value.restore_defaults();
+    update_ui();
+}
+void RandomCodeWidget::update_ui(){
     m_box_random->setText(QString::number(m_value.m_current.random_digits()));
     m_box_code->setText(m_value.m_current.code_string());
 }

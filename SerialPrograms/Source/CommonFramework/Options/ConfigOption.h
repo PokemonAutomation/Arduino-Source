@@ -60,8 +60,9 @@ public:
     ConfigOption& option(){ return m_value; }
 
     QWidget& widget(){ return m_widget; }
-    virtual void restore_defaults() = 0;
 
+    virtual void restore_defaults() = 0;
+    virtual void update_ui() = 0;
     virtual void update_visibility();
 
 private:

@@ -16,7 +16,7 @@
 namespace PokemonAutomation{
 
 
-class MainWindow : public QMainWindow, public PanelListener{
+class MainWindow : public QMainWindow, public PanelHolder{
 public:
     MainWindow(QWidget* parent = nullptr);
     ~MainWindow();
@@ -31,7 +31,8 @@ private:
 
     void close_panel();
 
-    virtual void on_panel_construct(std::unique_ptr<PanelInstance> panel) override;
+    virtual bool report_new_panel_intent(const PanelDescriptor& descriptor) override;
+    virtual void load_panel(std::unique_ptr<PanelInstance> panel) override;
 public: //  Make private.
     virtual LoggerQt& raw_logger() override{ return global_logger_raw(); }
 private:

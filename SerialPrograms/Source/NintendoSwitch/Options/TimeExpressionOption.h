@@ -18,7 +18,7 @@ namespace NintendoSwitch{
 
 
 template <typename Type>
-class TimeExpressionOptionUI;
+class TimeExpressionWidget;
 
 
 template <typename Type>
@@ -45,7 +45,7 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class TimeExpressionOptionUI<Type>;
+    friend class TimeExpressionWidget<Type>;
 };
 
 

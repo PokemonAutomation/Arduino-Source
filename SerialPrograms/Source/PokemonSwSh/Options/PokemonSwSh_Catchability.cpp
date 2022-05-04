@@ -23,7 +23,9 @@ namespace PokemonSwSh{
 class CatchabilitySelectorWidget : public QWidget, public ConfigWidget{
 public:
     CatchabilitySelectorWidget(QWidget& parent, CatchabilitySelectorOption& value);
+
     virtual void restore_defaults() override;
+    virtual void update_ui() override;
 
 private:
     CatchabilitySelectorOption& m_value;
@@ -85,6 +87,9 @@ CatchabilitySelectorWidget::CatchabilitySelectorWidget(QWidget& parent, Catchabi
 }
 void CatchabilitySelectorWidget::restore_defaults(){
     m_value.restore_defaults();
+    update_ui();
+}
+void CatchabilitySelectorWidget::update_ui(){
     m_box->setCurrentIndex((int)(Catchability)m_value);
 }
 

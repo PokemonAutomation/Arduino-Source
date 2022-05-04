@@ -8,7 +8,9 @@
 #define PokemonAutomation_PokemonLA_CustomPathTableTable_H
 
 #include "CommonFramework/Options/ConfigOption.h"
+#include "CommonFramework/Options/BatchOption/BatchOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"
+#include "PokemonLA_TravelLocation.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -85,30 +87,16 @@ public:
 };
 
 // A program option to build a custom path to navigate the map
-class CustomPathTable : public ConfigOption{
+class CustomPathTable : public BatchOption{
 public:
     CustomPathTable();
 
-    size_t num_actions() const { return m_table.size(); }
+    const TravelLocationOption& travel_location() const{ return TRAVEL_LOCATION; }
 
+    size_t num_actions() const { return PATH.size(); }
     const CustomPathTableRow& get_action(size_t action_index) const {
-        return static_cast<const CustomPathTableRow&>(m_table[action_index]);
+        return static_cast<const CustomPathTableRow&>(PATH[action_index]);
     }
-
-    // // Get which style to use according to the info in the table.
-    // // pokemon: pokemon index, usually at range [0, 5]
-    // // move: move index, range [0, 3]
-    // MoveStyle get_style(size_t pokemon, size_t move);
-
-    // // Whether to switch the pokemon at current turns.
-    // // pokemon: pokemon index, usually at range [0, 5]
-    // // num_turns: num turns passed so far since the pokemon is sent to the battle.
-    // bool switch_pokemon(size_t pokemon, size_t num_turns);
-
-    virtual void load_json(const QJsonValue& json) override;
-    virtual QJsonValue to_json() const override;
-
-    virtual void restore_defaults() override;
 
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
@@ -116,8 +104,11 @@ private:
     std::vector<std::unique_ptr<EditableTableRow>> make_defaults() const;
 
 private:
+    friend class CustomPathTableWidget;
+
+    TravelLocationOption TRAVEL_LOCATION;
     CustomPathTableTableFactory m_factory;
-    EditableTableOption m_table;
+    EditableTableOption PATH;
 };
 
 

@@ -17,10 +17,10 @@
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
 #include "PokemonLA/Programs/PokemonLA_BattleRoutines.h"
-#include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA_TenacityCandyFarmer.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.h"
+#include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
+// #include "PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 
 
@@ -28,6 +28,12 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
+namespace {
+    // Indices of FOURTH_MOVE_ON.
+    // These const ints are used to make code more readable.
+    const int OPPONENT_MAMOSWINE = 1;
+    const int OPPONENT_AVALUGG = 2;
+}
 
 TenacityCandyFarmer_Descriptor::TenacityCandyFarmer_Descriptor()
     : RunnableSwitchProgramDescriptor(
@@ -43,9 +49,14 @@ TenacityCandyFarmer_Descriptor::TenacityCandyFarmer_Descriptor()
 
 TenacityCandyFarmer::TenacityCandyFarmer(const TenacityCandyFarmer_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
-    , FOURTH_MOVE_ON_MAMOSWINE(
-        "<b>Fourth Move on Mamoswine:</b><br>Use fourth move (Flamethrower) on Mamoswine to grind its research task.",
-        false
+    , FOURTH_MOVE_ON(
+        "<b>Fourth Move On:</b><br>Use Arceus' fourth move to grind research tasks",
+        {
+            "None",
+            "Mamoswine (fourth move needs to be set to Flamethrower)",
+            "Avalugg (fourth move needs to be set to Rock Smash)"
+        },
+        0
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -54,7 +65,7 @@ TenacityCandyFarmer::TenacityCandyFarmer(const TenacityCandyFarmer_Descriptor& d
         &NOTIFICATION_ERROR_FATAL,
     })
 {
-    PA_ADD_OPTION(FOURTH_MOVE_ON_MAMOSWINE);
+    PA_ADD_OPTION(FOURTH_MOVE_ON);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -98,8 +109,28 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
     pbf_press_dpad(context, DPAD_DOWN, 10, 50);
     // Press A to select Path of Tenacity
     pbf_press_button(context, BUTTON_A, 20, 200);
-    // Press A to show the opponenet team selection menu box
-    pbf_press_button(context, BUTTON_A, 20, 50);
+
+    // Press A repeatedly to show the opponenet team selection menu box.
+    // Note: in different languages, there are different number of dialogue boxes to clear to show the team selection menu.
+    // So we have to use a ButtonDetector to visually check when the team selection menu appears.
+    {
+        context.wait_for_all_requests();
+        ButtonDetector button(env.console, env.console, ButtonType::ButtonA, {0.56, 0.46, 0.33, 0.27}, std::chrono::milliseconds(100), true);
+        int ret = run_until(
+            env.console, context,
+            [&](BotBaseContext& context){
+                for (size_t c = 0; c < 10; c++){
+                    pbf_press_button(context, BUTTON_A, 20, 150);
+                }
+            },
+            {
+                {button}
+            }
+        );
+        if (ret != 0){
+            throw OperationFailedException(env.console, "Unable to detect Tenacity path menu after 10 A presses.");
+        }
+    }
     // Move down the menu box to select Pearl Clan
     pbf_press_dpad(context, DPAD_DOWN, 10, 50);
     pbf_press_dpad(context, DPAD_DOWN, 10, 50);
@@ -184,8 +215,6 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
     while(true){
         const bool stop_on_detected = true;
         BattleMenuDetector battle_menu_detector(env.console, env.console, stop_on_detected);
-        // dialogue ellipse appears on a semi-transparent dialog box if you win the fight.
-        DialogueEllipseDetector dialogue_ellipse_detector(env.console, env.console, std::chrono::milliseconds(200), stop_on_detected);
         BattlePokemonSwitchDetector pokemon_switch_detector(env.console, env.console, stop_on_detected);
         // normal dialogue appears if you lose the fight.
         NormalDialogDetector normal_dialogue_detector(env.console, env.console, stop_on_detected);
@@ -195,7 +224,6 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             env.console, context, std::chrono::minutes(2),
             {
                 {battle_menu_detector},
-                {dialogue_ellipse_detector},
                 {normal_dialogue_detector},
                 {surprise_dialogue_detector},
                 {pokemon_switch_detector},
@@ -209,8 +237,15 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
         }
 
         if (ret == 0){
-            env.console.log("Our turn!", COLOR_BLUE);
+            env.console.log("Our turn! Battle " + std::to_string(cur_battle) + " turn " + std::to_string(num_turns), COLOR_BLUE);
             clearing_dialogues = false;
+
+            if (cur_battle == 1 && num_turns == 1){
+                // Change opponent to Froslass as Froslass is fast and Avalugg is slow.
+                // So better to finish Forslass first so that we may move immediately to finsih Avalugg
+                // without taking damage.
+                pbf_press_button(context, BUTTON_ZL, 10, 100);
+            }
 
             // Press A to select moves
             pbf_press_button(context, BUTTON_A, 10, 125);
@@ -220,10 +255,20 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             if (cur_pokemon == 0){ // Arceus is still alive
                 size_t target_move = target_battle_moves[cur_battle][std::min(num_turns, 2)];
 
-                if (FOURTH_MOVE_ON_MAMOSWINE && cur_battle == 0 && num_turns == 1){
+                if (FOURTH_MOVE_ON == OPPONENT_MAMOSWINE && cur_battle == 0 && num_turns == 1){
+                    env.console.log("Target fourth move on Mamonswine");
                     target_move = 3;
                     stats.fourth_moves++;
                     env.update_stats();
+                }
+                else if (FOURTH_MOVE_ON == OPPONENT_AVALUGG && cur_battle == 1 && num_turns >= 1){
+                    // Use Flash Cannon to finish Froslass first, then use fourth move, Rock Smash to grind Avalugg.
+                    target_move = (num_turns == 1 ? 2 : 3);
+                    if (num_turns == 2){
+                        env.console.log("Target fourth move on Avalugg");
+                        stats.fourth_moves++;
+                        env.update_stats();
+                    }
                 }
 
                 if (cur_move < target_move){
@@ -252,24 +297,18 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             }
 
             num_turns++;
-        }
-        else if (ret == 1){
-            env.console.log("Transparent dialogue box.");
-            if (clear_dialogue_box()){
-                break;
-            }
-        } else if(ret == 2){
+        } else if(ret == 1){
             env.console.log("Normal dialogue box.");
             if (clear_dialogue_box()){
                 break;
             }
-        } else if(ret == 3){
+        } else if(ret == 2){
             env.console.log("Surprise dialogue box.");
             if (clear_dialogue_box()){
                 break;
             }
         }
-        else if (ret == 4){
+        else if (ret == 3){
             env.console.log("Pokemon fainted.", COLOR_RED);
 
             clearing_dialogues = false;
@@ -281,7 +320,7 @@ bool TenacityCandyFarmer::run_iteration(SingleSwitchProgramEnvironment& env, Bot
             next_pokemon_to_switch_to = switch_pokemon(env.console, context, next_pokemon_to_switch_to);
             cur_pokemon++;
         }
-        else{ // ret is 5
+        else{ // ret is 4
             env.console.log("Battle finished.");
             break;
         }

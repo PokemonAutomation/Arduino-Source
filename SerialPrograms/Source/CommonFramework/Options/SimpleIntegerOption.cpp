@@ -53,6 +53,9 @@ public:
     virtual void restore_defaults() override{
         SimpleIntegerBaseWidget<Type>::restore_defaults();
     }
+    virtual void update_ui() override{
+        SimpleIntegerBaseWidget<Type>::update_ui();
+    }
 };
 
 

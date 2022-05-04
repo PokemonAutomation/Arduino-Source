@@ -10,6 +10,7 @@
 #include "Common/Cpp/PanicDump.h"
 #include "Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h"
 #include "ClientSource/Connection/BotBase.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Messages_PushButtons.h"
 #include "NintendoSwitch_VirtualController.h"
@@ -39,7 +40,7 @@ void KeyboardDebouncer::add_event(bool press, VirtualControllerState state){
 WallClock KeyboardDebouncer::get_current_state(VirtualControllerState& state){
     WallClock now = current_time();
 
-    const std::chrono::milliseconds RELEASE_DELAY(20);
+    const std::chrono::milliseconds RELEASE_DELAY(10);
 
     SpinLockGuard lg(m_lock);
 
@@ -62,13 +63,11 @@ WallClock KeyboardDebouncer::get_current_state(VirtualControllerState& state){
         const Entry& entry = *iter;
 
         //  Key release that isn't old enough.
-        if (!entry.press && entry.timestamp + RELEASE_DELAY > now){
-            continue;
+        if (entry.press || entry.timestamp + RELEASE_DELAY <= now){
+            m_last = entry.state;
+            ++iter;
+            break;
         }
-
-        m_last = entry.state;
-        ++iter;
-        break;
     }
 
     //  Clear the history that we don't need anymore.
@@ -110,38 +109,42 @@ void VirtualController::clear_state(){
 }
 
 void VirtualController::on_key_press(Qt::Key key){
-    //  Suppress if key is already pressed.
-    auto iter = m_pressed_buttons.find(key);
-    if (iter != m_pressed_buttons.end()){
-        return;
-    }
+//    cout << "press" << endl;
 
     const ControllerButton* button = button_lookup(key);
     if (button == nullptr){
         return;
     }
+
+    //  Suppress if key is already pressed.
+    auto iter = m_pressed_buttons.find(button);
+    if (iter != m_pressed_buttons.end()){
+        return;
+    }
     button->press(m_controller_state);
 
-    m_pressed_buttons.insert(key);
+    m_pressed_buttons.insert(button);
     m_history.add_event(true, m_controller_state);
 
     std::lock_guard<std::mutex> lg(m_sleep_lock);
     m_cv.notify_all();
 }
 void VirtualController::on_key_release(Qt::Key key){
-    //  Suppress if key is not pressed.
-    auto iter = m_pressed_buttons.find(key);
-    if (iter == m_pressed_buttons.end()){
-        return;
-    }
+//    cout << "release" << endl;
 
     const ControllerButton* button = button_lookup(key);
     if (button == nullptr){
         return;
     }
+
+    //  Suppress if key is not pressed.
+    auto iter = m_pressed_buttons.find(button);
+    if (iter == m_pressed_buttons.end()){
+        return;
+    }
     button->release(m_controller_state);
 
-    m_pressed_buttons.erase(key);
+    m_pressed_buttons.erase(button);
     m_history.add_event(false, m_controller_state);
 
     std::lock_guard<std::mutex> lg(m_sleep_lock);
@@ -151,6 +154,8 @@ void VirtualController::on_key_release(Qt::Key key){
 
 
 void VirtualController::thread_loop(){
+    GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_this_thread();
+
     VirtualControllerState last;
     bool last_neutral = true;
     WallClock last_press = current_time();

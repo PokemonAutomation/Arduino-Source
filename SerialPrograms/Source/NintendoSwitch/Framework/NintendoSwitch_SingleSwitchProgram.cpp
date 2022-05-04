@@ -23,8 +23,8 @@ SingleSwitchProgramInstance::SingleSwitchProgramInstance(const RunnableSwitchPro
 {
     m_setup = &m_switch;
 }
-QWidget* SingleSwitchProgramInstance::make_widget(QWidget& parent, PanelListener& listener){
-    return SingleSwitchProgramWidget::make(parent, *this, listener);
+QWidget* SingleSwitchProgramInstance::make_widget(QWidget& parent, PanelHolder& holder){
+    return SingleSwitchProgramWidget::make(parent, *this, holder);
 }
 
 

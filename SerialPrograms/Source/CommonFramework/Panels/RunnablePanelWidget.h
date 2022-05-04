@@ -55,7 +55,7 @@ protected:
     RunnablePanelWidget(
         QWidget& parent,
         RunnablePanelInstance& instance,
-        PanelListener& listener
+        PanelHolder& holder
     );
 
     //  Call immediately after construction.

@@ -51,6 +51,9 @@ FloatingPointBaseWidget::FloatingPointBaseWidget(QWidget& parent, FloatingPointB
 }
 void FloatingPointBaseWidget::restore_defaults(){
     m_value.restore_defaults();
+    update_ui();
+}
+void FloatingPointBaseWidget::update_ui(){
     m_box->setText(QString::number(m_value, 'f', 2));
 }
 

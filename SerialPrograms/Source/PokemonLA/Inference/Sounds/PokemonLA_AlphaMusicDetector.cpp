@@ -23,9 +23,9 @@ namespace PokemonLA{
 
 
 
-AlphaMusicDetector::AlphaMusicDetector(ConsoleHandle& console, OnShinyCallback on_shiny_callback)
+AlphaMusicDetector::AlphaMusicDetector(Logger& logger, ConsoleHandle& console, OnShinyCallback on_shiny_callback)
     // Use a red as the detection color because the alpha symbol is red.
-    : AudioPerSpectrumDetectorBase("AlphaMusicDetector", "Alpha music", COLOR_RED, console, on_shiny_callback)
+    : AudioPerSpectrumDetectorBase(logger, "AlphaMusicDetector", "Alpha music", COLOR_RED, console, on_shiny_callback)
 {}
 
 float AlphaMusicDetector::get_score_threshold() const{

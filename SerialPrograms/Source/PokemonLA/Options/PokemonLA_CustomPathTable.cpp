@@ -13,7 +13,8 @@
 
 #include "Common/Compiler.h"
 #include "Common/Cpp/Exceptions.h"
-#include "Common/Qt/Options/EditableTable/EditableTableBaseWidget.h"
+#include "CommonFramework/Options/EditableTableOption.h"
+#include "CommonFramework/Options/EditableTableWidget.h"
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/EditableTableOption-EnumTableCell.h"
@@ -299,9 +300,9 @@ ActionParameterWidget::ActionParameterWidget(QWidget& parent, CustomPathTableRow
     m_layout->addWidget(m_wait_label);
     m_layout->addWidget(m_wait_duration);
 
-    m_listen_start = new QLabel("If shiny detected, use \"Shiny Action (Listening)\".", this);
+    m_listen_start = new QLabel("If shiny detected, use \"Destination Shiny Action\".", this);
     m_layout->addWidget(m_listen_start);
-    m_listen_stop = new QLabel("If shiny detected, use \"Shiny Action (Ignoring)\".", this);
+    m_listen_stop = new QLabel("If shiny detected, use \"Enroute Shiny Action\".", this);
     m_layout->addWidget(m_listen_stop);
 
     setParameter();
@@ -444,29 +445,21 @@ std::vector<std::unique_ptr<EditableTableRow>> CustomPathTable::make_defaults() 
 }
 
 CustomPathTable::CustomPathTable()
-    : m_table(
+    : PATH(
         "<b>Custom Path Table:</b><br>"
-        "Set a sequence of actions to navigate the map. ",
+        "Set a sequence of actions to navigate the map. By default, the shiny detected behavior is \"Enroute Shiny Action\".<br>"
+        "<font color=\"red\">If you wish to ignore enroute shinies, make sure you set \"Enroute Shiny Action\" to ignore shinies.</font>",
         m_factory, make_defaults()
     )
-{}
-
-void CustomPathTable::load_json(const QJsonValue& json){
-    m_table.load_json(json);
-}
-
-QJsonValue CustomPathTable::to_json() const{
-    return m_table.to_json();
-}
-
-void CustomPathTable::restore_defaults(){
-    m_table.restore_defaults();
+{
+    PA_ADD_OPTION(TRAVEL_LOCATION);
+    PA_ADD_OPTION(PATH);
 }
 
 
 class CustomPathTableWidget : public QWidget, public ConfigWidget{
 public:
-    CustomPathTableWidget(QWidget& parent, EditableTableOption& value)
+    CustomPathTableWidget(QWidget& parent, CustomPathTable& value)
         : QWidget(&parent)
         , ConfigWidget(value, *this)
     {
@@ -474,22 +467,24 @@ public:
         // EditableTableBaseWidget inherits QWidget.
         // Since it's a QWidget, we don't need to care about its memory ownership after its parent is set (as `this`).
 
-        m_table_widget = value.make_ui(*this);
-        
-        QHBoxLayout* layout = new QHBoxLayout(this);
+        m_travel_location = value.TRAVEL_LOCATION.make_ui(*this);
+        m_table_widget = static_cast<EditableTableWidget*>(value.PATH.make_ui(*this));
+
+        QVBoxLayout* layout = new QVBoxLayout(this);
         layout->setContentsMargins(0, 0, 0, 0);
+        layout->addWidget(&m_travel_location->widget());
         layout->addWidget(&m_table_widget->widget());
 
-        QVBoxLayout* v_layout = new QVBoxLayout();
-        v_layout->setContentsMargins(0, 0, 0, 0);
-        layout->addLayout(v_layout);
-        auto load_button = new QPushButton("Load Option", this);
-        v_layout->addWidget(load_button);
-        auto save_button = new QPushButton("Save Option", this);
-        v_layout->addWidget(save_button);
+        QHBoxLayout* button_layout = new QHBoxLayout();
+        button_layout->setContentsMargins(0, 0, 0, 0);
+        layout->addLayout(button_layout);
+        auto load_button = new QPushButton("Load Options", this);
+        button_layout->addWidget(load_button);
+        auto save_button = new QPushButton("Save Options", this);
+        button_layout->addWidget(save_button);
 
         connect(load_button,  &QPushButton::clicked, this, [&value, this](bool){
-            auto path = QFileDialog::getOpenFileName(this, tr("Open option file"), ".", "*.json");
+            QString path = QFileDialog::getOpenFileName(this, tr("Open option file"), ".", "*.json");
             std::cout << "Load CustomPathTable from " << path.toStdString() << std::endl;
             if (path.size() > 0){
                 QJsonDocument doc = read_json_file(path);
@@ -505,15 +500,15 @@ public:
                     box.critical(nullptr, "Error", "Invalid option file: " + path + ", no CUSTOM_PATH_TABLE.");
                     return;
                 }
-                QJsonArray obj = json_get_array_throw(root,"CUSTOM_PATH_TABLE");
+                QJsonValue obj = json_get_value_nothrow(root, "CUSTOM_PATH_TABLE");
                 value.load_json(obj);
-                auto base_widget = dynamic_cast<EditableTableBaseWidget*>(this->m_table_widget);
-                if (base_widget == nullptr){
+                if (m_table_widget == nullptr){
                     QMessageBox box;
                     box.critical(nullptr, "Error", "Internal code error, cannot convert to EditableTableBaseWidget.");
                     return;
                 }
-                base_widget->redraw_table();
+                m_travel_location->update_ui();
+                m_table_widget->update_ui();
             }
         });
 
@@ -535,15 +530,21 @@ public:
     }
 
     virtual void restore_defaults() override{
+        m_travel_location->restore_defaults();
         m_table_widget->restore_defaults();
+    }
+    virtual void update_ui() override{
+        m_travel_location->update_ui();
+        m_table_widget->update_ui();
     }
 
 private:
-    ConfigWidget* m_table_widget = nullptr;
+    ConfigWidget* m_travel_location = nullptr;
+    EditableTableWidget* m_table_widget = nullptr;
 };
 
 ConfigWidget* CustomPathTable::make_ui(QWidget& parent){
-    return new CustomPathTableWidget(parent, m_table);
+    return new CustomPathTableWidget(parent, *this);
 }
 
 

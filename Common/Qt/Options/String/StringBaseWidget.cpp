@@ -39,6 +39,9 @@ StringBaseWidget::StringBaseWidget(QWidget& parent, StringBaseOption& value)
 }
 void StringBaseWidget::restore_defaults(){
     m_value.restore_defaults();
+    update_ui();
+}
+void StringBaseWidget::update_ui(){
     m_line_edit->setText(m_value.get());
 }
 

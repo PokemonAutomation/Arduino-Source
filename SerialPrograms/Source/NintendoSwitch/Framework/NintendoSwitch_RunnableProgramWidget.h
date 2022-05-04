@@ -29,7 +29,7 @@ protected:
     RunnableSwitchProgramWidget(
         QWidget& parent,
         RunnableSwitchProgramInstance& instance,
-        PanelListener& listener
+        PanelHolder& holder
     );
     void construct();
     virtual CollapsibleGroupBox* make_header(QWidget& parent) override;

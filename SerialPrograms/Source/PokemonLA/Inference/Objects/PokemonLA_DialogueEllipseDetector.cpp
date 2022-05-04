@@ -91,6 +91,12 @@ void DialogueEllipseDetector::make_overlays(VideoOverlaySet& items) const{
 bool DialogueEllipseDetector::process_frame(const QImage& frame, WallClock timestamp){
     m_watcher.process_frame(frame, timestamp);
     bool detected = m_debouncer.push_value(!m_tracker.detections().empty(), timestamp);
+
+    // static int count = 0;
+    // if (detected){
+    //     frame.save("./debug_transparentEllipse" + QString::number(count) + ".png");
+    //     count++;
+    // }
     return detected && m_stop_on_detected;
 }
 

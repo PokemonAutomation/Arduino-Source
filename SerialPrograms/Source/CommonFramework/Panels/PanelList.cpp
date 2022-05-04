@@ -19,10 +19,10 @@ namespace PokemonAutomation{
 
 const QString PanelList::JSON_PROGRAM_PANEL = "ProgramPanel";
 
-PanelList::PanelList(QTabWidget& parent, QString label, PanelListener& listener)
+PanelList::PanelList(QTabWidget& parent, QString label, PanelHolder& holder)
     : QListWidget(&parent)
     , m_label(label)
-    , m_listener(listener)
+    , m_panel_holder(holder)
 {}
 void PanelList::add_divider(QString label){
     m_panels.emplace_back(std::move(label), nullptr);
@@ -71,11 +71,14 @@ void PanelList::handle_panel_clicked(const QString text){
         return;
     }
     const PanelDescriptor* descriptor = iter->second;
+    if (!m_panel_holder.report_new_panel_intent(*descriptor)){
+        return;
+    }
     try{
         std::unique_ptr<PanelInstance> panel = descriptor->make_panel();
         const QString identifier = QString::fromStdString(descriptor->identifier());
         panel->from_json(PERSISTENT_SETTINGS().panels[identifier]);
-        m_listener.on_panel_construct(std::move(panel));
+        m_panel_holder.load_panel(std::move(panel));
 
         PERSISTENT_SETTINGS().panels.insert(JSON_PROGRAM_PANEL, iter->first);
     }catch (const Exception& error){

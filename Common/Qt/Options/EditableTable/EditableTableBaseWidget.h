@@ -17,11 +17,11 @@ namespace PokemonAutomation{
 class EditableTableBaseWidget : public QWidget{
 public:
     EditableTableBaseWidget(QWidget& parent, EditableTableBaseOption& value);
+
     void restore_defaults();
+    void update_ui();
 
     void update_column_sizes();
-
-    void redraw_table();
 
 private:
     void insert_row(int index, std::unique_ptr<EditableTableRow> row);

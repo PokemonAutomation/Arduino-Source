@@ -19,8 +19,8 @@ void SettingsPanelInstance::from_json(const QJsonValue& json){
 QJsonValue SettingsPanelInstance::to_json() const{
     return m_options.to_json();
 }
-QWidget* SettingsPanelInstance::make_widget(QWidget& parent, PanelListener& listener){
-    return SettingsPanelWidget::make(parent, *this, listener);
+QWidget* SettingsPanelInstance::make_widget(QWidget& parent, PanelHolder& holder){
+    return SettingsPanelWidget::make(parent, *this, holder);
 }
 
 

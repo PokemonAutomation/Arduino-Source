@@ -31,7 +31,7 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class MultiHostTableOptionUI;
+    friend class MultiHostTableWidget;
     MultiHostSlotOptionFactory m_factory;
     EditableTableBaseOption m_table;
 };

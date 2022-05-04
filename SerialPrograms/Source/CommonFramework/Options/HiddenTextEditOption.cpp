@@ -18,7 +18,9 @@ namespace PokemonAutomation{
 class HiddenTextEditWidget : public QWidget, public ConfigWidget{
 public:
     HiddenTextEditWidget(QWidget& parent, HiddenTextEditOption& value);
+
     virtual void restore_defaults() override;
+    virtual void update_ui() override;
 
 private:
     class Box;
@@ -149,6 +151,10 @@ HiddenTextEditWidget::HiddenTextEditWidget(QWidget& parent, HiddenTextEditOption
 }
 void HiddenTextEditWidget::restore_defaults(){
     m_value.restore_defaults();
+    update_ui();
+}
+void HiddenTextEditWidget::update_ui(){
+    m_box->setText(m_value);
 }
 
 

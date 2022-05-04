@@ -32,7 +32,7 @@
 
 #include <string>
 #include <functional>
-
+#include "Common/Cpp/AbstractLogger.h"
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/Time.h"
@@ -58,10 +58,15 @@ public:
     // when the detector finds a match, it calls this callback function to decide whether to stop
     // the inference session. The error coefficient of the found audio is passed to the callback
     // function. If it returns true, the inference session will stop.
-    AudioPerSpectrumDetectorBase(std::string label, std::string audio_name, Color detection_color,
-        ConsoleHandle& console, OnShinyCallback on_shiny_callback);
+    AudioPerSpectrumDetectorBase(
+        Logger& logger,
+        std::string label, std::string audio_name, Color detection_color,
+        ConsoleHandle& console, OnShinyCallback on_shiny_callback
+    );
 
     virtual ~AudioPerSpectrumDetectorBase();
+
+    void throw_if_no_sound(std::chrono::milliseconds min_duration = std::chrono::milliseconds(5000));
 
     // To be implemented by derived classes:
     // The match threshold for the target audio.
@@ -87,6 +92,8 @@ protected:
     // build the actual spectrogram matcher for the target audio.
     virtual std::unique_ptr<SpectrogramMatcher> build_spectrogram_matcher(size_t sampleRate) = 0;
 
+    Logger& m_logger;
+
     // Name of the target audio to be detected. Used for logging.
     std::string m_audio_name;
     // Color of the box to visualize the detection in the audio spectrogram UI.
@@ -96,6 +103,8 @@ protected:
     // Callback function to determine whether to stop the inference session when the target audio
     // is detected.
     OnShinyCallback m_on_shiny_callback;
+
+    WallClock m_start_timestamp;
 
     // Record lowest error coefficient (i.e best match) during the runtime of this detector.
     float m_lowest_error = 1.0f;
@@ -110,6 +119,7 @@ protected:
     bool m_last_reported = false;
     
     std::unique_ptr<SpectrogramMatcher> m_matcher;
+
 };
 
 

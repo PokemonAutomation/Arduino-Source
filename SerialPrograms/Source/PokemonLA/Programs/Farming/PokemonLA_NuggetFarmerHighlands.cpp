@@ -131,7 +131,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, Bo
         DialogSurpriseDetector dialog_detector(env.console, env.console, true);
 
         float shiny_coefficient = 1.0;
-        ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+        ShinySoundDetector shiny_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
             stats.shinies++;
             shiny_coefficient = error_coefficient;
@@ -199,7 +199,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, Bo
 
     {
         float shiny_coefficient = 1.0;
-        ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+        ShinySoundDetector shiny_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
             stats.shinies++;
             shiny_coefficient = error_coefficient;
@@ -213,6 +213,7 @@ bool MoneyFarmerHighlands::run_iteration(SingleSwitchProgramEnvironment& env, Bo
             },
             {{shiny_detector}}
         );
+        shiny_detector.throw_if_no_sound();
         if (ret == 0){
             on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_coefficient);
         }

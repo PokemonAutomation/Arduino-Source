@@ -43,9 +43,9 @@ EditableTableBaseWidget::EditableTableBaseWidget(QWidget& parent, EditableTableB
 //    m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::ResizeToContents);
     m_table->horizontalHeader()->setSectionResizeMode(QHeaderView::Interactive);
 
-    redraw_table();
+    update_ui();
 }
-void EditableTableBaseWidget::redraw_table(){
+void EditableTableBaseWidget::update_ui(){
 //    cout << "redraw_table() - enter" << endl;
 //    WallClock time0 = current_time();
     m_table->setRowCount(0);
@@ -174,7 +174,7 @@ QWidget* EditableTableBaseWidget::make_delete_button(EditableTableRow& row){
 }
 void EditableTableBaseWidget::restore_defaults(){
     m_value.restore_defaults();
-    redraw_table();
+    update_ui();
 }
 void EditableTableBaseWidget::update_column_sizes(){
     m_table->resizeColumnsToContents();

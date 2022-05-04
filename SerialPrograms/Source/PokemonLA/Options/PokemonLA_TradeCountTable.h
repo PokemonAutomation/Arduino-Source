@@ -34,17 +34,19 @@ public:
     virtual ConfigWidget* make_ui(QWidget& parent) override;
 
 private:
-    friend class TradeCountTableOptionUI;
+    friend class TradeCountTableWidget;
 
     QString m_label;
     std::vector<std::pair<std::string, int>> m_list;
 };
 
 
-class TradeCountTableOptionUI : public QWidget, public ConfigWidget{
+class TradeCountTableWidget : public QWidget, public ConfigWidget{
 public:
-    TradeCountTableOptionUI(QWidget& parent, TradeCountTableOption& value);
+    TradeCountTableWidget(QWidget& parent, TradeCountTableOption& value);
+
     virtual void restore_defaults() override;
+    virtual void update_ui() override;
 
 private:
     QLineEdit* make_count_box(QWidget& parent, int row, int count);

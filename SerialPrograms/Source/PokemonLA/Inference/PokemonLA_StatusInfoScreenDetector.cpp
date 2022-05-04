@@ -74,11 +74,7 @@ void StatusInfoScreenDetector::get_pokemon_name(ConsoleHandle& console, QImage f
 
     OCR::StringMatchResult result = Pokemon::PokemonNameReader::instance().read_substring(
         console, language, image,
-        {
-            {0xff000000, 0xff404040},
-            {0xff000000, 0xff606060},
-            {0xff000000, 0xff808080},
-        }
+        OCR::BLACK_TEXT_FILTERS()
     );
     m_pokemon.name = "UNIDENTIFIED";
 

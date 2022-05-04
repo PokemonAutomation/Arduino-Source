@@ -23,10 +23,10 @@ MultiSwitchProgramWidget::~MultiSwitchProgramWidget(){
 MultiSwitchProgramWidget* MultiSwitchProgramWidget::make(
     QWidget& parent,
     MultiSwitchProgramInstance& instance,
-    PanelListener& listener
+    PanelHolder& holder
 ){
     instance.update_active_consoles();
-    MultiSwitchProgramWidget* widget = new MultiSwitchProgramWidget(parent, instance, listener);
+    MultiSwitchProgramWidget* widget = new MultiSwitchProgramWidget(parent, instance, holder);
     widget->construct();
     connect(
         widget->m_setup, &SwitchSetupWidget::on_setup_changed,

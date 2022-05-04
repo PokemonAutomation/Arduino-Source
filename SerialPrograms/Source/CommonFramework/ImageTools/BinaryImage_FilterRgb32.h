@@ -55,6 +55,8 @@ PackedBinaryMatrix2 compress_rgb32_to_binary_range(
 
 //  Run multiple filters at once. This is more memory efficient than making
 //  multiple calls to one filter at a time.
+//  Pixels Within filter color ranges are marked as 1 in the corresponding binary matrices,
+//  while those output of range are 0.
 std::vector<PackedBinaryMatrix2> compress_rgb32_to_binary_range(
     const ConstImageRef& image,
     const std::vector<std::pair<uint32_t, uint32_t>>& filters

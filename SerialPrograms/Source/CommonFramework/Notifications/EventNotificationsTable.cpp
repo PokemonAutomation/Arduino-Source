@@ -70,7 +70,7 @@ void EventNotificationsTable::reset_state(){
     }
 }
 ConfigWidget* EventNotificationsTable::make_ui(QWidget& parent){
-    return new EventNotificationsTableUI(parent, *this);
+    return new EventNotificationsTableWidget(parent, *this);
 }
 void EventNotificationsTable::set_enabled(bool enabled){
     for (EventNotificationOption* option : m_options){
@@ -81,7 +81,7 @@ void EventNotificationsTable::set_enabled(bool enabled){
 
 
 
-EventNotificationsTableUI::EventNotificationsTableUI(QWidget& parent, EventNotificationsTable& value)
+EventNotificationsTableWidget::EventNotificationsTableWidget(QWidget& parent, EventNotificationsTable& value)
     : QWidget(&parent)
     , ConfigWidget(value, *this)
     , m_value(value)
@@ -105,12 +105,15 @@ EventNotificationsTableUI::EventNotificationsTableUI(QWidget& parent, EventNotif
 
     redraw_table();
 }
-void EventNotificationsTableUI::restore_defaults(){
+void EventNotificationsTableWidget::restore_defaults(){
     m_value.restore_defaults();
+    update_ui();
+}
+void EventNotificationsTableWidget::update_ui(){
     redraw_table();
 }
 
-void EventNotificationsTableUI::redraw_table(){
+void EventNotificationsTableWidget::redraw_table(){
     m_table->setRowCount(0);
     m_table->setRowCount((int)m_value.m_options.size());
     int stop = (int)m_value.m_options.size();
@@ -126,7 +129,7 @@ void EventNotificationsTableUI::redraw_table(){
     }
     m_table->resizeColumnsToContents();
 }
-QWidget* EventNotificationsTableUI::make_enabled_box(EventNotificationOption& entry){
+QWidget* EventNotificationsTableWidget::make_enabled_box(EventNotificationOption& entry){
     QWidget* widget = new QWidget(this);
     QHBoxLayout* layout = new QHBoxLayout(widget);
     layout->setAlignment(Qt::AlignCenter);
@@ -142,7 +145,7 @@ QWidget* EventNotificationsTableUI::make_enabled_box(EventNotificationOption& en
     );
     return widget;
 }
-QWidget* EventNotificationsTableUI::make_ping_box(EventNotificationOption& entry){
+QWidget* EventNotificationsTableWidget::make_ping_box(EventNotificationOption& entry){
     QWidget* widget = new QWidget(this);
     QHBoxLayout* layout = new QHBoxLayout(widget);
     layout->setAlignment(Qt::AlignCenter);
@@ -158,7 +161,7 @@ QWidget* EventNotificationsTableUI::make_ping_box(EventNotificationOption& entry
     );
     return widget;
 }
-QWidget* EventNotificationsTableUI::make_screenshot_box(EventNotificationOption& entry){
+QWidget* EventNotificationsTableWidget::make_screenshot_box(EventNotificationOption& entry){
     if (entry.screenshot_supported){
         QComboBox* box = new NoWheelComboBox(this);
         ScreenshotOption screenshot_option("");
@@ -179,7 +182,7 @@ QWidget* EventNotificationsTableUI::make_screenshot_box(EventNotificationOption&
         return box;
     }
 }
-QWidget* EventNotificationsTableUI::make_tags_box(EventNotificationOption& entry){
+QWidget* EventNotificationsTableWidget::make_tags_box(EventNotificationOption& entry){
     QLineEdit* box = new QLineEdit(this);
     box->setText(EventNotificationSettings::tags_to_str(entry.m_current.tags));
 //    box->setAlignment(Qt::AlignCenter);
@@ -191,7 +194,7 @@ QWidget* EventNotificationsTableUI::make_tags_box(EventNotificationOption& entry
     );
     return box;
 }
-QWidget* EventNotificationsTableUI::make_rate_limit_box(EventNotificationOption& entry){
+QWidget* EventNotificationsTableWidget::make_rate_limit_box(EventNotificationOption& entry){
     QLineEdit* box = new QLineEdit(this);
     box->setText(QString::number(entry.m_current.rate_limit.count()));
     box->setAlignment(Qt::AlignCenter);
@@ -205,7 +208,7 @@ QWidget* EventNotificationsTableUI::make_rate_limit_box(EventNotificationOption&
     );
     return box;
 }
-QWidget* EventNotificationsTableUI::make_test_box(EventNotificationOption& entry){
+QWidget* EventNotificationsTableWidget::make_test_box(EventNotificationOption& entry){
     QPushButton* button = new QPushButton(this);
     QFont font;
     font.setBold(true);

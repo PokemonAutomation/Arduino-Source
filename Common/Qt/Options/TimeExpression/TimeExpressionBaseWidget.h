@@ -21,7 +21,9 @@ template <typename Type>
 class TimeExpressionBaseWidget : public QWidget{
 public:
     TimeExpressionBaseWidget(QWidget& parent, TimeExpressionBaseOption<Type>& value);
+
     void restore_defaults();
+    void update_ui();
 
 private:
     TimeExpressionBaseOption<Type>& m_value;

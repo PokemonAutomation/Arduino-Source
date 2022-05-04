@@ -51,7 +51,7 @@ void EncounterFilterOption::load_json(const QJsonValue& json){
     if (json_get_string(shiny_filter, obj, "ShinyFilter")){
         auto iter = ShinyFilter_MAP.find(shiny_filter);
         if (iter != ShinyFilter_MAP.end()){
-            m_shiny_filter_current = iter->second;
+            m_shiny_filter_current.store(iter->second, std::memory_order_release);
         }
     }
 
@@ -61,7 +61,7 @@ void EncounterFilterOption::load_json(const QJsonValue& json){
 }
 QJsonValue EncounterFilterOption::to_json() const{
     QJsonObject obj;
-    obj.insert("ShinyFilter", ShinyFilter_NAMES[(size_t)m_shiny_filter_current]);
+    obj.insert("ShinyFilter", ShinyFilter_NAMES[(size_t)m_shiny_filter_current.load(std::memory_order_acquire)]);
 
     if (m_enable_overrides){
         obj.insert("Overrides", m_table.to_json());
@@ -70,7 +70,7 @@ QJsonValue EncounterFilterOption::to_json() const{
     return obj;
 }
 void EncounterFilterOption::restore_defaults(){
-    m_shiny_filter_current = m_shiny_filter_default;
+    m_shiny_filter_current.store(m_shiny_filter_default, std::memory_order_acquire);
     m_table.restore_defaults();
 }
 ConfigWidget* EncounterFilterOption::make_ui(QWidget& parent){

@@ -50,14 +50,14 @@ private:
 
     ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
 
-    TravelLocationOption TRAVEL_LOCATION;
+//    TravelLocationOption TRAVEL_LOCATION;
 
-    CustomPathTable CUSTOM_PATH_TABLE;
+    CustomPathTable PATH;
 
     BooleanCheckBoxOption TEST_PATH;
 
-    ShinyDetectedActionOption SHINY_DETECTED_IGNORING;
-    ShinyDetectedActionOption SHINY_DETECTED_LISTENING;
+    ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;
+    ShinyDetectedActionOption SHINY_DETECTED_DESTINATION;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;

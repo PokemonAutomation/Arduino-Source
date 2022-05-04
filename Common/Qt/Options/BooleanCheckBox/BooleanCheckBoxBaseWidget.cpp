@@ -38,6 +38,9 @@ BooleanCheckBoxBaseWidget::BooleanCheckBoxBaseWidget(QWidget& parent, BooleanChe
 }
 void BooleanCheckBoxBaseWidget::restore_defaults(){
     m_value.restore_defaults();
+    update_ui();
+}
+void BooleanCheckBoxBaseWidget::update_ui(){
     m_box->setChecked(m_value);
 }
 

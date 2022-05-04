@@ -71,7 +71,7 @@ public:
 
 private:
     friend class EventNotificationsTable;
-    friend class EventNotificationsTableUI;
+    friend class EventNotificationsTableWidget;
 
     QString m_label;
     bool screenshot_supported;

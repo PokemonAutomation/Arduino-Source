@@ -109,7 +109,7 @@ bool RunnablePanelWidget::request_program_stop(){
         return true;
     }
     m_start_button->setText("Stopping Program...");
-    m_listener.on_busy(m_instance);
+    m_holder.on_busy(m_instance);
     {
         std::lock_guard<std::mutex> lg(m_lock);
         if (m_scope){
@@ -124,10 +124,10 @@ bool RunnablePanelWidget::request_program_stop(){
 RunnablePanelWidget::RunnablePanelWidget(
     QWidget& parent,
     RunnablePanelInstance& instance,
-    PanelListener& listener
+    PanelHolder& holder
 )
-    : PanelWidget(parent, instance, listener)
-    , m_logger(listener.raw_logger(), "Program")
+    : PanelWidget(parent, instance, holder)
+    , m_logger(holder.raw_logger(), "Program")
     , m_status_bar(nullptr)
     , m_start_button(nullptr)
     , m_timestamp(current_time())
@@ -357,16 +357,16 @@ void RunnablePanelWidget::update_ui_after_program_state_change(){
     switch (state){
     case ProgramState::NOT_READY:
         m_start_button->setText("Loading...");
-        m_listener.on_busy(m_instance);
+        m_holder.on_busy(m_instance);
         break;
     case ProgramState::STOPPED:
         m_start_button->setText("Start Program...");
 //        m_start_button->setEnabled(settings_valid());
-        m_listener.on_idle(m_instance);
+        m_holder.on_idle(m_instance);
         break;
     case ProgramState::RUNNING:
         m_start_button->setText("Stop Program...");
-        m_listener.on_busy(m_instance);
+        m_holder.on_busy(m_instance);
         break;
 //    case ProgramState::FINISHED:
 //        m_start_button->setText("Program Finished! Click to stop.");
@@ -374,7 +374,7 @@ void RunnablePanelWidget::update_ui_after_program_state_change(){
 //        break;
     case ProgramState::STOPPING:
         m_start_button->setText("Stopping Program...");
-        m_listener.on_busy(m_instance);
+        m_holder.on_busy(m_instance);
         break;
     }
 

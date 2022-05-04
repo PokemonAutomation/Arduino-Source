@@ -16,36 +16,37 @@ namespace PokemonBDSP{
 
 void egg_spin(BotBaseContext& context, uint16_t duration){
     for (uint16_t c = 0; c < duration; c += 41){
+#if 1
+        pbf_move_left_joystick(context, 0, 0, 5, 0);
+        pbf_move_left_joystick(context, 128, 0, 5, 0);
+        pbf_move_left_joystick(context, 255, 0, 5, 0);
+        pbf_move_left_joystick(context, 255, 128, 4, 0);
+        pbf_move_left_joystick(context, 255, 255, 5, 0);
+        pbf_move_left_joystick(context, 128, 255, 5, 0);
+        pbf_move_left_joystick(context, 0, 255, 6, 0);
+        pbf_move_left_joystick(context, 0, 128, 6, 0);
+#else
+        pbf_controller_state(context, 0, DPAD_NONE, 0, 0, 128, 128, 5);
         pbf_controller_state(context, 0, DPAD_NONE, 128, 0, 128, 128, 5);
         pbf_controller_state(context, 0, DPAD_NONE, 255, 0, 128, 128, 5);
-        pbf_controller_state(context, 0, DPAD_NONE, 255, 128, 128, 128, 5);
+        pbf_controller_state(context, 0, DPAD_NONE, 255, 128, 128, 128, 4);
         pbf_controller_state(context, 0, DPAD_NONE, 255, 255, 128, 128, 5);
         pbf_controller_state(context, 0, DPAD_NONE, 128, 255, 128, 128, 5);
-        pbf_controller_state(context, 0, DPAD_NONE, 0, 255, 128, 128, 5);
+        pbf_controller_state(context, 0, DPAD_NONE, 0, 255, 128, 128, 6);
         pbf_controller_state(context, 0, DPAD_NONE, 0, 128, 128, 128, 6);
-        pbf_controller_state(context, 0, DPAD_NONE, 0, 0, 128, 128, 5);
+#endif
     }
 }
 void egg_spin_with_A(BotBaseContext& context, uint16_t duration){
     for (uint16_t c = 0; c < duration; c += 41){
-#if 0
-        pbf_move_left_joystick(context, 128, 0, 5, 0);
-        pbf_move_left_joystick(context, 255, 0, 5, 0);
-        pbf_move_left_joystick(context, 255, 128, 5, 0);
-        pbf_move_left_joystick(context, 255, 255, 5, 0);
-        pbf_move_left_joystick(context, 128, 255, 5, 0);
-        pbf_move_left_joystick(context, 0, 255, 5, 0);
-        pbf_move_left_joystick(context, 0, 128, 6, 0);
-        pbf_move_left_joystick(context, 0, 0, 5, 0);
-#endif
-        pbf_controller_state(context, BUTTON_ZL, DPAD_NONE, 128, 0, 128, 128, 5);
+        pbf_controller_state(context, BUTTON_ZL, DPAD_NONE, 0, 0, 128, 128, 5);
+        pbf_controller_state(context, 0, DPAD_NONE, 128, 0, 128, 128, 5);
         pbf_controller_state(context, 0, DPAD_NONE, 255, 0, 128, 128, 5);
-        pbf_controller_state(context, 0, DPAD_NONE, 255, 128, 128, 128, 5);
+        pbf_controller_state(context, 0, DPAD_NONE, 255, 128, 128, 128, 4);
         pbf_controller_state(context, 0, DPAD_NONE, 255, 255, 128, 128, 5);
         pbf_controller_state(context, 0, DPAD_NONE, 128, 255, 128, 128, 5);
-        pbf_controller_state(context, 0, DPAD_NONE, 0, 255, 128, 128, 5);
+        pbf_controller_state(context, 0, DPAD_NONE, 0, 255, 128, 128, 6);
         pbf_controller_state(context, 0, DPAD_NONE, 0, 128, 128, 128, 6);
-        pbf_controller_state(context, 0, DPAD_NONE, 0, 0, 128, 128, 5);
     }
 }
 

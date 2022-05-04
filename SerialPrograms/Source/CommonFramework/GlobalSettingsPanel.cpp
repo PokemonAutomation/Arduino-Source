@@ -175,6 +175,13 @@ void GlobalSettings::load_json(const QJsonValue& json){
     if (!command_line_tests_setting.isEmpty()){
         json_get_bool(COMMAND_LINE_TEST_MODE, command_line_tests_setting, "RUN");
 
+        QString folder;
+        if (json_get_string(folder, command_line_tests_setting, "FOLDER")){
+            COMMAND_LINE_TEST_FOLDER = folder.toStdString();
+        } else{
+            COMMAND_LINE_TEST_FOLDER = "CommandLineTests";
+        }
+
         const QJsonArray test_list = json_get_array_nothrow(command_line_tests_setting, "TEST_LIST");
         for(const auto& value: test_list){
             const std::string test_name = value.toString().toStdString();
@@ -202,6 +209,7 @@ QJsonValue GlobalSettings::to_json() const{
 
     QJsonObject command_line_test_obj;
     command_line_test_obj.insert("RUN", QJsonValue(COMMAND_LINE_TEST_MODE));
+    command_line_test_obj.insert("FOLDER", QJsonValue(QString::fromStdString(COMMAND_LINE_TEST_FOLDER)));
     QJsonArray test_list;
     for(const auto& name : COMMAND_LINE_TEST_LIST){
         test_list.append(QJsonValue(name.c_str()));

@@ -17,11 +17,16 @@ class QWidget;
 
 namespace PokemonAutomation{
 
+
 class PanelInstance;
+class PanelDescriptor;
 
 
-struct PanelListener{
-    virtual void on_panel_construct(std::unique_ptr<PanelInstance> panel) = 0;
+struct PanelHolder{
+    //  Returns true if ready for new panel.
+    virtual bool report_new_panel_intent(const PanelDescriptor& descriptor) = 0;
+
+    virtual void load_panel(std::unique_ptr<PanelInstance> panel) = 0;
     virtual LoggerQt& raw_logger() = 0;
     virtual void on_busy(PanelInstance& panel) = 0;
     virtual void on_idle(PanelInstance& panel) = 0;
@@ -71,13 +76,13 @@ public:
 
 class PanelInstance{
 public:
-    PanelInstance(const PanelDescriptor& descriptor);
+    explicit PanelInstance(const PanelDescriptor& descriptor);
     virtual ~PanelInstance() = default;
 
     const PanelDescriptor& descriptor() const{ return m_descriptor; }
 
     void save_settings() const;
-    virtual QWidget* make_widget(QWidget& parent, PanelListener& listener);
+    virtual QWidget* make_widget(QWidget& parent, PanelHolder& holder);
 
 public:
     //  Serialization

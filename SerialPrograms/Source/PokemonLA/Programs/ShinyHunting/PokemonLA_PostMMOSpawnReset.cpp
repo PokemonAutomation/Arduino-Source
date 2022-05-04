@@ -102,7 +102,7 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
     pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
     {
         float shiny_coefficient = 1.0;
-        ShinySoundDetector shiny_detector(env.console, [&](float error_coefficient) -> bool{
+        ShinySoundDetector shiny_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
             stats.shinies++;
             shiny_coefficient = error_coefficient;
@@ -130,6 +130,7 @@ void PostMMOSpawnReset::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
             },
             {{shiny_detector}}
         );
+        shiny_detector.throw_if_no_sound();
         if (ret == 0){
             on_shiny_sound(env, env.console, context, SHINY_DETECTED, shiny_coefficient);
         }

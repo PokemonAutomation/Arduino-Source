@@ -19,18 +19,18 @@ namespace PokemonAutomation{
 SettingsPanelWidget* SettingsPanelWidget::make(
     QWidget& parent,
     SettingsPanelInstance& instance,
-    PanelListener& listener
+    PanelHolder& holder
 ){
-    SettingsPanelWidget* widget = new SettingsPanelWidget(parent, instance, listener);
+    SettingsPanelWidget* widget = new SettingsPanelWidget(parent, instance, holder);
     widget->construct();
     return widget;
 }
 SettingsPanelWidget::SettingsPanelWidget(
     QWidget& parent,
     SettingsPanelInstance& instance,
-    PanelListener& listener
+    PanelHolder& holder
 )
-    : PanelWidget(parent, instance, listener)
+    : PanelWidget(parent, instance, holder)
 {}
 void SettingsPanelWidget::construct(){
     QVBoxLayout* layout = new QVBoxLayout(this);

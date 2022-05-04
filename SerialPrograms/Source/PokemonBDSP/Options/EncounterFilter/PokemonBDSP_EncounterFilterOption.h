@@ -18,7 +18,7 @@ class EncounterFilterOption : public ConfigOption{
 public:
     EncounterFilterOption(bool enable_overrides, bool allow_autocatch);
 
-    ShinyFilter shiny_filter() const{ return m_shiny_filter_current; }
+    ShinyFilter shiny_filter() const{ return m_shiny_filter_current.load(std::memory_order_acquire); }
     std::vector<EncounterFilterOverride> overrides() const;
 
     virtual void load_json(const QJsonValue& json) override;
@@ -37,7 +37,7 @@ private:
     const bool m_allow_autocatch;
 
     const ShinyFilter m_shiny_filter_default;
-    ShinyFilter m_shiny_filter_current;
+    std::atomic<ShinyFilter> m_shiny_filter_current;
 
     EncounterFilterOptionFactory m_factory;
     EditableTableOption m_table;

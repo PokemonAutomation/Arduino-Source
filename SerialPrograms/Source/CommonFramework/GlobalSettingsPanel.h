@@ -87,6 +87,8 @@ public:
     // The mode that does not run Qt GUI, but instead runs some tests for
     // debugging, unit testing and developing purposes.
     bool COMMAND_LINE_TEST_MODE = false;
+    // The path to the command line test folder.
+    std::string COMMAND_LINE_TEST_FOLDER;
     // Which tests to run if in the command line test mode.
     std::vector<std::string> COMMAND_LINE_TEST_LIST;
 };

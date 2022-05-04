@@ -19,7 +19,7 @@ public:
     static const QString JSON_PROGRAM_PANEL;
 
 public:
-    PanelList(QTabWidget& parent, QString label, PanelListener& listener);
+    PanelList(QTabWidget& parent, QString label, PanelHolder& holder);
 
     const QString& label() const{ return m_label; }
     size_t items() const{ return m_panels.size(); }
@@ -50,7 +50,7 @@ protected:
 
 protected:
     QString m_label;
-    PanelListener& m_listener;
+    PanelHolder& m_panel_holder;
     std::vector<std::pair<QString, std::unique_ptr<PanelDescriptor>>> m_panels;
 private:
     std::map<QString, const PanelDescriptor*> m_panel_map;

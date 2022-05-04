@@ -48,10 +48,11 @@ void PanelInstance::save_settings() const{
     if (!identifier.empty()){
         PERSISTENT_SETTINGS().panels[QString::fromStdString(identifier)] = to_json();
     }
+    global_logger_tagged().log("Saving panel settings...");
     PERSISTENT_SETTINGS().write();
 }
-QWidget* PanelInstance::make_widget(QWidget& parent, PanelListener& listener){
-    return new PanelWidget(parent, *this, listener);
+QWidget* PanelInstance::make_widget(QWidget& parent, PanelHolder& holder){
+    return new PanelWidget(parent, *this, holder);
 }
 
 

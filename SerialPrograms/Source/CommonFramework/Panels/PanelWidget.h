@@ -19,7 +19,7 @@ public:
     PanelWidget(
         QWidget& parent,
         PanelInstance& instance,
-        PanelListener& listener
+        PanelHolder& holder
     );
     virtual ~PanelWidget() = default;
 
@@ -30,7 +30,7 @@ protected:
 
 protected:
     PanelInstance& m_instance;
-    PanelListener& m_listener;
+    PanelHolder& m_holder;
 };
 
 

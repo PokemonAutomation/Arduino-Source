@@ -15,7 +15,7 @@ namespace PokemonAutomation{
 
 class ProgramTabs : public QTabWidget{
 public:
-    ProgramTabs(QWidget& parent, PanelListener& listener);
+    ProgramTabs(QWidget& parent, PanelHolder& holder);
 
     // Load the panel specified in the persistent setting.
     void load_persistent_panel();
