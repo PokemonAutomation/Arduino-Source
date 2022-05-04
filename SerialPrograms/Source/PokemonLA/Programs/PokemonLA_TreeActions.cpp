@@ -98,7 +98,7 @@ void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& cont
         pbf_move_left_joystick(context, 0, 170, 30, 30);
         pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
         change_mount(console, context, MountState::BRAVIARY_ON);
-        pbf_press_button(context, BUTTON_B, (10 * TICKS_PER_SECOND), 20);
+        pbf_press_button(context, BUTTON_B, (10.2 * TICKS_PER_SECOND), 20);
         pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
         break;
     case 8: //Wormadam

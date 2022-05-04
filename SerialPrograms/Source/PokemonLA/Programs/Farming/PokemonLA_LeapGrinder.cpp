@@ -132,8 +132,6 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     Stats& stats = env.stats<Stats>();
     stats.attempts++;
 
-    size_t stop_case = STOP_ON + 1;
-
     env.console.log("Starting route and shiny detection...");
 
     float shiny_coefficient = 1.0;
@@ -173,7 +171,6 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
         env.console.log("Alpha: " + std::to_string(pokemon.is_alpha));
         env.console.log("Shiny: " + std::to_string(pokemon.is_shiny));
 
-        //if (pokemon.name.compare(POKEMON.case_name(POKEMON).trimmed(),Qt::CaseInsensitive) == 0){
         if (pokemon.name == QString::fromStdString(POKEMON.slug())){
             env.console.log("Expected Pokemon leaped!");
             stats.leaps++;
@@ -182,10 +179,23 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
         }
 
         //Match validation
-        size_t match_ret = (pokemon.is_alpha + pokemon.is_shiny);
-        if((pokemon.is_alpha + pokemon.is_shiny) > 0){
-            if(pokemon.is_alpha) match_ret++;
-            bool is_match = (match_ret == stop_case || stop_case == 4);
+        bool is_match = false;
+        switch (STOP_ON){
+        case 0: //  Shiny
+            is_match = pokemon.is_shiny;
+            break;
+        case 1: //  Alpha
+            is_match = pokemon.is_alpha;
+            break;
+        case 2: //  Shiny and Alpha
+            is_match = pokemon.is_alpha && pokemon.is_shiny;
+            break;
+        case 3: //  Shiny or Alpha
+            is_match = pokemon.is_alpha || pokemon.is_shiny;
+            break;
+        }
+
+        if (pokemon.is_alpha || pokemon.is_shiny){
             on_match_found(env, env.console, context, MATCH_DETECTED_OPTIONS, is_match);
         }
 
@@ -203,26 +213,6 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     return false;
 }
 
-bool LeapGrinder::quick_check(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-
-    PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
-
-    env.console.log("Looking for: " + POKEMON.slug());
-    env.console.log("Found: " + pokemon.name);
-    env.console.log("Gender: " + pokemon.gender);
-    env.console.log("Alpha: " + std::to_string(pokemon.is_alpha));
-    env.console.log("Shiny: " + std::to_string(pokemon.is_shiny));
-    if (pokemon.name == QString::fromStdString(POKEMON.slug())){
-        env.console.log("Expected Pokemon leaped!");
-
-    }else{
-        env.console.log("Not the expected pokemon.");
-    }
-
-    return true;
-}
-
-
 void LeapGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
@@ -239,7 +229,6 @@ void LeapGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
         );
         try{
             if(run_iteration(env, context))
-            //if(quick_check(env, context))
                 break;
         }catch (OperationFailedException&){
             stats.errors++;
