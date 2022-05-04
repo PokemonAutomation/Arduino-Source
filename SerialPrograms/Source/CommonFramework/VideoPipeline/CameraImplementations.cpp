@@ -38,12 +38,12 @@ struct CameraBackends{
 #endif
 
         for (const auto& item : m_backends){
-            m_labels.emplace_back(item.first);
+            m_cases.emplace_back(item.first);
         }
     }
 
     std::vector<std::pair<QString, std::unique_ptr<CameraBackend>>> m_backends;
-    std::vector<QString> m_labels;
+    std::vector<EnumDropdownOption::Option> m_cases;
 };
 
 
@@ -51,7 +51,7 @@ struct CameraBackends{
 VideoBackendOption::VideoBackendOption()
     : EnumDropdownOption(
         "<b>Video Pipeline Backend:</b>",
-        CameraBackends::instance().m_labels,
+        CameraBackends::instance().m_cases,
 #if QT_VERSION_MAJOR == 5
         1
 #elif QT_VERSION_MAJOR == 6

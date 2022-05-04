@@ -181,7 +181,7 @@ bool EventNotificationOption::ok_to_send_now(LoggerQt& logger){
     WallClock last;
     do{
         now = current_time();
-        WallClock last = m_last_sent.load(std::memory_order_acquire);
+        last = m_last_sent.load(std::memory_order_acquire);
 
         if (now < last + m_current.rate_limit){
             logger.log("EventNotification(" + m_label + "): Notification dropped due to rate limit.", COLOR_PURPLE);

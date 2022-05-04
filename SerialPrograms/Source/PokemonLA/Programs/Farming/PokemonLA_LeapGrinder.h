@@ -45,8 +45,8 @@ private:
     Pokemon::PokemonNameSelect POKEMON;
     SimpleIntegerOption<uint8_t> LEAPS;
     EnumDropdownOption STOP_ON;
-    ShinyDetectedActionOption MATCH_DETECTED_OPTIONS;
     ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;
+    ShinyDetectedActionOption MATCH_DETECTED_OPTIONS;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;
