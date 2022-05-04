@@ -14,6 +14,10 @@
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/Farming/PokemonLA_LeapGrinder.h"
 
+
+#include "PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
+#include "PokemonLA/Resources/PokemonLA_PokemonIcons.h"
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
@@ -35,13 +39,23 @@ LeapGrinder::LeapGrinder(const LeapGrinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , LANGUAGE("<b>Game Language</b>", Pokemon::PokemonNameReader::instance().languages(), true)
     , POKEMON(
-       "<b>Pokemon Species</b>",
-       {
-          "Aipom", "Burmy", "Cherrim",
-          "Cherubi", "Combee", "Heracross",
-          "Pachirisu", "Vespiquen", "Wormadam"
-       }, 0
-       )
+        "<b>Pokemon Species</b>",
+        {"aipom",
+          "burmy",
+          "cherrim",
+          "cherubi",
+          "combee",
+          "heracross",
+          "pachirisu",
+          "vespiquen",
+          "wormadam",
+          "geodude",
+          "graveler",
+          "bonsly",
+          "bronzor",
+          "nosepass",
+          "bergmite"}
+        )
     , LEAPS(
       "<b>Leaps</b> <br>How many leaps before stopping the program</br>",
       1, 1, 100
@@ -133,12 +147,7 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     int ret = run_until(
         env.console, context,
         [&](BotBaseContext& context){
-            switch (POKEMON)
-            {
-                case 1:
-                    setup(env, env.console, context);
-                    break;
-            }
+            route(env, env.console, context, POKEMON);
         },
         {{shiny_detector}}
     );
@@ -157,13 +166,14 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
         PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
 
-        env.console.log("Looking for: " + POKEMON.case_name(POKEMON));
+        env.console.log("Looking for: " + POKEMON.slug());
         env.console.log("Found: " + pokemon.name);
         env.console.log("Gender: " + pokemon.gender);
         env.console.log("Alpha: " + std::to_string(pokemon.is_alpha));
         env.console.log("Shiny: " + std::to_string(pokemon.is_shiny));
 
-        if (pokemon.name == POKEMON.case_name(POKEMON).trimmed()){
+        //if (pokemon.name.compare(POKEMON.case_name(POKEMON).trimmed(),Qt::CaseInsensitive) == 0){
+        if (pokemon.name == QString::fromStdString(POKEMON.slug())){
             env.console.log("Expected Pokemon leaped!");
             stats.leaps++;
         }else{
@@ -183,9 +193,7 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     env.console.log("Remaining Leaps:" + std::to_string(LEAPS - stats.leaps));
 
-    goto_camp_from_overworld(env, env.console, context);
-    goto_professor(env.console, context, Camp::FIELDLANDS_FIELDLANDS);
-    from_professor_return_to_jubilife(env, env.console, context);
+    return_to_jubilife(env, env.console, context, POKEMON);
 
     if (stats.leaps == LEAPS){
         return true;
@@ -193,6 +201,26 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     return false;
 }
+
+bool LeapGrinder::quick_check(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+
+    PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
+
+    env.console.log("Looking for: " + POKEMON.slug());
+    env.console.log("Found: " + pokemon.name);
+    env.console.log("Gender: " + pokemon.gender);
+    env.console.log("Alpha: " + std::to_string(pokemon.is_alpha));
+    env.console.log("Shiny: " + std::to_string(pokemon.is_shiny));
+    if (pokemon.name == QString::fromStdString(POKEMON.slug())){
+        env.console.log("Expected Pokemon leaped!");
+
+    }else{
+        env.console.log("Not the expected pokemon.");
+    }
+
+    return true;
+}
+
 
 void LeapGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
@@ -210,6 +238,7 @@ void LeapGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
         );
         try{
             if(run_iteration(env, context))
+            //if(quick_check(env, context))
                 break;
         }catch (OperationFailedException&){
             stats.errors++;

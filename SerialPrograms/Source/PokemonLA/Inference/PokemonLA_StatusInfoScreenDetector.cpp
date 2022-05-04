@@ -5,6 +5,7 @@
  */
 
 #include <QImage>
+#include <QString>
 #include "CommonFramework/ImageTools/ImageStats.h"
 #include "CommonFramework/ImageTools/SolidColorTest.h"
 #include "PokemonLA_StatusInfoScreenDetector.h"
@@ -82,7 +83,7 @@ void StatusInfoScreenDetector::get_pokemon_name(ConsoleHandle& console, QImage f
     m_pokemon.name = "UNIDENTIFIED";
 
     for (const auto& item : result.results){
-        m_pokemon.name = item.second.original_text.trimmed();
+        m_pokemon.name = QString::fromStdString(item.second.token);
     }
 }
 
