@@ -134,6 +134,8 @@ private:
     // Since the spectrums will be probided to the automation programs in
     // other threads, we need to have a lock here.
     std::mutex m_spectrums_lock;
+    // The initial timestamp for the incoming spectrums.
+    size_t m_spectrum_stamp_start = 0;
 
     // The inference boxes <box starting stamp, box end stamp, box color>
     // to highlight FFT windows on spectrogram. Used to tell user which part

@@ -113,6 +113,11 @@ void AudioDisplayWidget::clear(){
     m_freqVisStamps.assign(m_freqVisStamps.size(), SIZE_MAX);
     {
         std::lock_guard<std::mutex> lock_gd(m_spectrums_lock);
+        // update m_spectrum_stamp_start in case the audio widget is used
+        // again to store new spectrums.
+        if (m_spectrums.size() > 0){
+            m_spectrum_stamp_start = m_spectrums.front().stamp + 1;
+        }
         m_spectrums.clear();
     }
     {
@@ -159,7 +164,7 @@ void AudioDisplayWidget::loadFFTOutput(size_t sampleRate, std::shared_ptr<const 
 //    std::vector<float> spectrumVector(output.begin(), output.end());
     {
         std::lock_guard<std::mutex> lock_gd(m_spectrums_lock);
-        const size_t stamp = (m_spectrums.size() > 0) ? m_spectrums.front().stamp + 1 : 0;
+        const size_t stamp = (m_spectrums.size() > 0) ? m_spectrums.front().stamp + 1 : m_spectrum_stamp_start;
         m_spectrums.emplace_front(stamp, sampleRate, fftOutput);
         if (m_spectrums.size() > m_spectrum_history_length){
             m_spectrums.pop_back();
