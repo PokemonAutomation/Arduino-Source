@@ -115,7 +115,6 @@ void AudioDisplayWidget::clear(){
         std::lock_guard<std::mutex> lock_gd(m_spectrums_lock);
         // update m_spectrum_stamp_start in case the audio widget is used
         // again to store new spectrums.
-        m_spectrum_stamp_start = 0;
         if (m_spectrums.size() > 0){
             m_spectrum_stamp_start = m_spectrums.front().stamp + 1;
         }
@@ -418,6 +417,7 @@ void AudioDisplayWidget::resizeEvent(QResizeEvent* event){
 std::vector<AudioSpectrum> AudioDisplayWidget::spectrums_since(size_t startingStamp){
     std::vector<AudioSpectrum> spectrums;
     std::lock_guard<std::mutex> lock_gd(m_spectrums_lock);
+
     for(const auto& ptr : m_spectrums){
         if (ptr.stamp >= startingStamp){
             spectrums.emplace_back(ptr);

@@ -199,6 +199,7 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
     // Talk to Ingo to start conversation and select regular battles:
     // The dialogues are different between version 10 (the vanilla version) and later versions.
     bool version_10 = start_dialog(env.console, context);
+    env.log(std::string("Detected current version: ") + (version_10 ? "1.0" : "1.2"));
 
     IngoOpponentMenuLocation menu_location = version_10
         ? INGO_OPPONENT_MENU_LOCATIONS_V10[OPPONENT]
@@ -225,6 +226,8 @@ bool IngoBattleGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBa
     pbf_press_button(context, BUTTON_A, 10, 115);
     pbf_wait(context, 1 * TICKS_PER_SECOND);
     context.wait_for_all_requests();
+
+    env.log("Finish selecting the opponent. Battle should start now.");
 
     // Which move (0, 1, 2 or 3) to use in next turn.
     size_t cur_move = 0;
