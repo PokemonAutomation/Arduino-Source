@@ -49,7 +49,7 @@ ShinyHuntCustomPath::ShinyHuntCustomPath(const ShinyHuntCustomPath_Descriptor& d
         "0 * TICKS_PER_SECOND"
     )
     , SHINY_DETECTED_DESTINATION(
-        "Detination Shiny Action",
+        "Destination Shiny Action",
         "This applies if a shiny is detected while you are listening for shinies.",
         "0 * TICKS_PER_SECOND"
     )
