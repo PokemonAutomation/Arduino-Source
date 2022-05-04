@@ -23,7 +23,7 @@ TravelLocationOption::TravelLocationOption()
 
 TravelLocationOption::operator TravelLocation() const{
     size_t index = (size_t)*this;
-    const QString& label = this->case_list()[index];
+    const QString& label = this->case_name(index);
     std::string str = label.toStdString();
     const TravelLocation* location = TravelLocations::instance().get_from_name(str);
     if (location == nullptr){

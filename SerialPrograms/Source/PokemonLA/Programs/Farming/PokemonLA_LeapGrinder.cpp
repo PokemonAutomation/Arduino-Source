@@ -54,15 +54,15 @@ LeapGrinder::LeapGrinder(const LeapGrinder_Descriptor& descriptor)
         "Stop on any non regular"
         }, 0
     )
-    , MATCH_DETECTED_OPTIONS(
-      "Match Action",
-      "What to do when the leaping Pokemon matches the *Stop On*",
-      "0 * TICKS_PER_SECOND"
-    )
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
-        "This applies if a shiny is detected while enroute to destination",
+        "This applies if a shiny is detected while enroute to destination.",
         "0 * TICKS_PER_SECOND"
+    )
+    , MATCH_DETECTED_OPTIONS(
+      "Match Action",
+      "What to do when the leaping Pokemon matches the *Stop On*.",
+      "0 * TICKS_PER_SECOND"
     )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
@@ -76,8 +76,8 @@ LeapGrinder::LeapGrinder(const LeapGrinder_Descriptor& descriptor)
     PA_ADD_OPTION(POKEMON);
     PA_ADD_OPTION(LEAPS);
     PA_ADD_OPTION(STOP_ON);
-    PA_ADD_OPTION(MATCH_DETECTED_OPTIONS);
     PA_ADD_OPTION(SHINY_DETECTED_ENROUTE);
+    PA_ADD_OPTION(MATCH_DETECTED_OPTIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 

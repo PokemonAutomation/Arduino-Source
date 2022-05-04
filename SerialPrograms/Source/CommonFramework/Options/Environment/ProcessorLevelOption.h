@@ -18,6 +18,7 @@ public:
     ProcessorLevelOption();
 
     virtual void load_json(const QJsonValue& json) override;
+    virtual QJsonValue to_json() const override;
 
     void set_global();
     void set_global(int index);

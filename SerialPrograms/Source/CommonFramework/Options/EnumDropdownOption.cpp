@@ -5,6 +5,7 @@
  */
 
 #include <QJsonValue>
+#include <QStandardItemModel>
 #include <QHBoxLayout>
 #include <QLabel>
 #include "Common/Qt/NoWheelComboBox.h"
@@ -16,24 +17,24 @@ namespace PokemonAutomation{
 
 EnumDropdownOption::EnumDropdownOption(
     QString label,
-    std::vector<QString> cases,
+    std::initializer_list<Option> cases,
     size_t default_index
 )
     : m_label(std::move(label))
-    , m_case_list(std::move(cases))
     , m_default(default_index)
     , m_current(default_index)
 {
-    if (default_index >= m_case_list.size()){
+    if (default_index >= cases.size()){
         throw "Index is too large.";
     }
-
-    for (size_t index = 0; index < m_case_list.size(); index++){
-        const QString& item = m_case_list[index];
+    size_t index = 0;
+    for (auto iter = cases.begin(); iter != cases.end(); ++iter){
+        m_case_list.emplace_back(*iter);
+        const QString& item = m_case_list.back().name;
         auto ret = m_case_map.emplace(
             std::piecewise_construct,
             std::forward_as_tuple(item),
-            std::forward_as_tuple(index)
+            std::forward_as_tuple(index++)
         );
         if (!ret.second){
             throw "Duplicate enum label.";
@@ -48,12 +49,12 @@ void EnumDropdownOption::load_json(const QJsonValue& json){
     }
     QString str = json.toString();
     auto iter = m_case_map.find(str);
-    if (iter != m_case_map.end()){
+    if (iter != m_case_map.end() && m_case_list[iter->second].enabled){
         m_current.store(iter->second, std::memory_order_relaxed);
     }
 }
 QJsonValue EnumDropdownOption::to_json() const{
-    return QJsonValue(m_case_list[m_current]);
+    return QJsonValue(m_case_list[m_current].name);
 }
 
 void EnumDropdownOption::restore_defaults(){
@@ -79,8 +80,19 @@ EnumDropdownWidget::EnumDropdownWidget(QWidget& parent, EnumDropdownOption& valu
     m_box = new NoWheelComboBox(&parent);
     layout->addWidget(m_box);
 
-    for (const QString& item : m_value.case_list()){
-        m_box->addItem(item);
+    for (const auto& item : m_value.m_case_list){
+        m_box->addItem(item.name);
+        if (item.enabled){
+            continue;
+        }
+        auto* model = qobject_cast<QStandardItemModel*>(m_box->model());
+        if (model == nullptr){
+            continue;
+        }
+        QStandardItem* line_handle = model->item(m_box->count() - 1);
+        if (line_handle != nullptr){
+            line_handle->setEnabled(false);
+        }
     }
     m_box->setCurrentIndex((int)m_value);
     layout->addWidget(m_box, 1);

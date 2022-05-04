@@ -68,20 +68,22 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_program<IngoBattleGrinder_Descriptor, IngoBattleGrinder>();
     add_program<MagikarpMoveGrinder_Descriptor, MagikarpMoveGrinder>();
     add_program<TenacityCandyFarmer_Descriptor, TenacityCandyFarmer>();
-    add_program<LeapGrinder_Descriptor, LeapGrinder>();
+    if (GlobalSettings::instance().DEVELOPER_MODE){
+        add_program<LeapGrinder_Descriptor, LeapGrinder>();
+    }
 
     add_divider("---- Shiny Hunting ----");
 //    add_program<ShinyHuntLakeTrio_Descriptor, ShinyHuntLakeTrio>();
     add_program<CrobatFinder_Descriptor, CrobatFinder>();
     add_program<GalladeFinder_Descriptor, GalladeFinder>();
     add_program<FroslassFinder_Descriptor, FroslassFinder>();
-    add_program<BurmyFinder_Descriptor, BurmyFinder>();
+    if (GlobalSettings::instance().DEVELOPER_MODE){
+        add_program<BurmyFinder_Descriptor, BurmyFinder>();
+    }
     add_program<UnownFinder_Descriptor, UnownFinder>();
     add_program<ShinyHuntFlagPin_Descriptor, ShinyHuntFlagPin>();
     add_program<PostMMOSpawnReset_Descriptor, PostMMOSpawnReset>();
-    if (GlobalSettings::instance().DEVELOPER_MODE){
-        add_program<ShinyHuntCustomPath_Descriptor, ShinyHuntCustomPath>();
-    }
+    add_program<ShinyHuntCustomPath_Descriptor, ShinyHuntCustomPath>();
 
     if (GlobalSettings::instance().DEVELOPER_MODE){
         add_divider("---- Developer Tools ----");
