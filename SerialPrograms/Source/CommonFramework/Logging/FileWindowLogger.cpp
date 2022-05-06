@@ -47,7 +47,7 @@ void FileWindowLogger::log(const std::string& msg, Color color){
         if (!m_windows.empty()){
             QString str = to_window_str(line, color);
             for (FileWindowLoggerWindow* window : m_windows){
-                *window += str;
+                window->log(str);
             }
         }
     }
@@ -159,15 +159,15 @@ FileWindowLoggerWindow::FileWindowLoggerWindow(FileWindowLogger& logger, QWidget
     );
 
     m_logger += *this;
-    *this += "================================================================================";
-    *this += "<b>Window Startup...</b>";
+    log("================================================================================");
+    log("<b>Window Startup...</b>");
 }
 FileWindowLoggerWindow::~FileWindowLoggerWindow(){
     m_logger -= *this;
 }
 
-void FileWindowLoggerWindow::operator+=(const QString& msg){
-    signal_log(msg);
+void FileWindowLoggerWindow::log(const QString& msg){
+    emit signal_log(msg);
 }
 
 

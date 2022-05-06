@@ -203,6 +203,7 @@ std::vector<std::pair<Qt::Key, const ControllerButton&>> keyboard_mapping{
     {Qt::Key::Key_E,            CONTROLLER_BUTTON_R},
     {Qt::Key::Key_R,            CONTROLLER_BUTTON_ZL},
     {Qt::Key::Key_Backslash,    CONTROLLER_BUTTON_ZR},
+    {Qt::Key::Key_Bar,          CONTROLLER_BUTTON_ZR},
 
     {Qt::Key::Key_Minus,        CONTROLLER_BUTTON_MINUS},
     {Qt::Key::Key_Underscore,   CONTROLLER_BUTTON_MINUS},

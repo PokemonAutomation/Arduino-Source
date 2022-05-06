@@ -48,9 +48,9 @@ class FileWindowLoggerWindow : public QMainWindow{
 
 public:
     FileWindowLoggerWindow(FileWindowLogger& logger, QWidget* parent = nullptr);
-    ~FileWindowLoggerWindow();
+    virtual ~FileWindowLoggerWindow();
 
-    void operator+=(const QString& msg);
+    void log(const QString& msg);
 
 signals:
     void signal_log(const QString& msg);

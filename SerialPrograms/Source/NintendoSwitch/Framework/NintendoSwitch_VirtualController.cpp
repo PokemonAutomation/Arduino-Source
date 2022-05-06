@@ -109,7 +109,7 @@ void VirtualController::clear_state(){
 }
 
 void VirtualController::on_key_press(Qt::Key key){
-//    cout << "press" << endl;
+//    cout << "press: " << key << endl;
 
     const ControllerButton* button = button_lookup(key);
     if (button == nullptr){
