@@ -15,6 +15,7 @@
 #include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "PokemonLA/Programs/PokemonLA_TreeActions.h"
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
+#include "Pokemon/Options/Pokemon_NameSelectOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -34,13 +35,14 @@ public:
 
 private:
     bool run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    bool quick_check(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
     class Stats;
     class RunRoute;
 
     OCR::LanguageOCR LANGUAGE;
-    EnumDropdownOption POKEMON;
+    Pokemon::PokemonNameSelect POKEMON;
     SimpleIntegerOption<uint8_t> LEAPS;
     EnumDropdownOption STOP_ON;
     ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;

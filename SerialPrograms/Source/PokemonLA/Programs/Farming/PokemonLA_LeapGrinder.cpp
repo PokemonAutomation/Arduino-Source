@@ -14,6 +14,10 @@
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/Farming/PokemonLA_LeapGrinder.h"
 
+
+#include "PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
+#include "PokemonLA/Resources/PokemonLA_PokemonIcons.h"
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
@@ -24,7 +28,7 @@ LeapGrinder_Descriptor::LeapGrinder_Descriptor()
         "PokemonLA:Leap Grinder",
         STRING_POKEMON + " LA", "Leap Grinder",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/LeapGrinder.md",
-        "Shake trees to grind dex tasks",
+        "Shake trees and ores to grind tasks",
         FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )
@@ -35,13 +39,23 @@ LeapGrinder::LeapGrinder(const LeapGrinder_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , LANGUAGE("<b>Game Language</b>", Pokemon::PokemonNameReader::instance().languages(), true)
     , POKEMON(
-       "<b>Pokemon Species</b>",
-       {
-          "Aipom", "Burmy", "Cherrim",
-          "Cherubi", "Combee", "Heracross",
-          "Pachirisu", "Vespiquen", "Wormadam"
-       }, 0
-       )
+        "<b>Pokemon Species</b>",
+        {"aipom",
+          "burmy",
+          "cherrim",
+          "cherubi",
+          "combee",
+          "heracross",
+          "pachirisu",
+          "vespiquen",
+          "wormadam",
+          "geodude",
+          "graveler",
+          "bonsly",
+          "bronzor",
+          "nosepass",
+          "bergmite"}
+        )
     , LEAPS(
       "<b>Leaps</b> <br>How many leaps before stopping the program</br>",
       1, 1, 100
@@ -49,7 +63,8 @@ LeapGrinder::LeapGrinder(const LeapGrinder_Descriptor& descriptor)
     , STOP_ON(
         "<b>Stop On:</b>",
         {
-        "Shiny", "Alpha",
+        "Shiny",
+        "Alpha",
         "Shiny & Alpha",
         "Stop on any non regular"
         }, 0
@@ -118,8 +133,6 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     Stats& stats = env.stats<Stats>();
     stats.attempts++;
 
-    size_t stop_case = STOP_ON + 1;
-
     env.console.log("Starting route and shiny detection...");
 
     float shiny_coefficient = 1.0;
@@ -133,12 +146,7 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     int ret = run_until(
         env.console, context,
         [&](BotBaseContext& context){
-            switch (POKEMON)
-            {
-                case 1:
-                    setup(env, env.console, context);
-                    break;
-            }
+            route(env, env.console, context, POKEMON);
         },
         {{shiny_detector}}
     );
@@ -158,13 +166,13 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
         PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
 
-        env.console.log("Looking for: " + POKEMON.case_name(POKEMON));
+        env.console.log("Looking for: " + POKEMON.slug());
         env.console.log("Found: " + pokemon.name);
         env.console.log("Gender: " + pokemon.gender);
         env.console.log("Alpha: " + std::to_string(pokemon.is_alpha));
         env.console.log("Shiny: " + std::to_string(pokemon.is_shiny));
 
-        if (pokemon.name == POKEMON.case_name(POKEMON).trimmed()){
+        if (pokemon.name == QString::fromStdString(POKEMON.slug())){
             env.console.log("Expected Pokemon leaped!");
             stats.leaps++;
         }else{
@@ -172,10 +180,23 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
         }
 
         //Match validation
-        size_t match_ret = (pokemon.is_alpha + pokemon.is_shiny);
-        if((pokemon.is_alpha + pokemon.is_shiny) > 0){
-            if(pokemon.is_alpha) match_ret++;
-            bool is_match = (match_ret == stop_case || stop_case == 4);
+        bool is_match = false;
+        switch (STOP_ON){
+        case 0: //  Shiny
+            is_match = pokemon.is_shiny;
+            break;
+        case 1: //  Alpha
+            is_match = pokemon.is_alpha;
+            break;
+        case 2: //  Shiny and Alpha
+            is_match = pokemon.is_alpha && pokemon.is_shiny;
+            break;
+        case 3: //  Shiny or Alpha
+            is_match = pokemon.is_alpha || pokemon.is_shiny;
+            break;
+        }
+
+        if (pokemon.is_alpha || pokemon.is_shiny){
             on_match_found(env, env.console, context, MATCH_DETECTED_OPTIONS, is_match);
         }
 
@@ -184,9 +205,7 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     env.console.log("Remaining Leaps:" + std::to_string(LEAPS - stats.leaps));
 
-    goto_camp_from_overworld(env, env.console, context);
-    goto_professor(env.console, context, Camp::FIELDLANDS_FIELDLANDS);
-    from_professor_return_to_jubilife(env, env.console, context);
+    return_to_jubilife(env, env.console, context, POKEMON);
 
     if (stats.leaps == LEAPS){
         return true;
