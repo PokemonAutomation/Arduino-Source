@@ -156,6 +156,8 @@ void return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& console, BotBase
     goto_camp_from_overworld(env, console, context);
     switch (pokemon) {
     case 0: //Aipom
+        goto_professor(console, context, Camp::COASTLANDS_BEACHSIDE);
+        break;
     case 1: //Burmy
     case 3: //Cherubi
     case 4: //Combee

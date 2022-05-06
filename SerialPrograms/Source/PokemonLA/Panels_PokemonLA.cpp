@@ -64,7 +64,7 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_program<SelfTouchTrade_Descriptor, SelfTouchTrade>();
 
     add_divider("---- Farming ----");
-    add_program<NuggetFarmerHighlands_Descriptor, MoneyFarmerHighlands>();
+    add_program<NuggetFarmerHighlands_Descriptor, NuggetFarmerHighlands>();
     add_program<IngoBattleGrinder_Descriptor, IngoBattleGrinder>();
     add_program<MagikarpMoveGrinder_Descriptor, MagikarpMoveGrinder>();
     add_program<TenacityCandyFarmer_Descriptor, TenacityCandyFarmer>();
