@@ -177,7 +177,7 @@ CatchResults basic_catcher(
 
     //  Look for the orange caught screen.
     {
-        ReceivePokemonDetector caught_detector;
+        ReceivePokemonDetector caught_detector(true);
 
         int result = run_until(
             console, context,

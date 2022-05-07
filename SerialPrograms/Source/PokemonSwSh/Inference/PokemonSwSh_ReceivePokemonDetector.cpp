@@ -20,12 +20,14 @@ namespace NintendoSwitch{
 namespace PokemonSwSh{
 
 
-ReceivePokemonDetector::ReceivePokemonDetector()
+ReceivePokemonDetector::ReceivePokemonDetector(bool stop_on_detected)
     : VisualInferenceCallback("ReceivePokemonDetector")
+    , m_stop_on_detected(stop_on_detected)
     , m_box_top(0.2, 0.02, 0.78, 0.02)
     , m_box_top_right(0.93, 0.02, 0.05, 0.1)
     , m_box_bot_left(0.02, 0.85, 0.1, 0.1)
     , m_has_been_orange(false)
+    , m_triggered(false)
 {}
 void ReceivePokemonDetector::make_overlays(VideoOverlaySet& items) const{
     items.add(COLOR_RED, m_box_top);
@@ -34,7 +36,10 @@ void ReceivePokemonDetector::make_overlays(VideoOverlaySet& items) const{
 }
 
 bool ReceivePokemonDetector::process_frame(const QImage& frame, WallClock timestamp){
-    return receive_is_over(frame);
+    bool ret = receive_is_over(frame);
+    bool triggered = m_triggered.load(std::memory_order_acquire);
+    m_triggered.store(triggered | ret, std::memory_order_release);
+    return ret && m_stop_on_detected;
 }
 bool ReceivePokemonDetector::receive_is_over(const QImage& frame){
     ImageStats stats0 = image_stats(extract_box_reference(frame, m_box_top));
