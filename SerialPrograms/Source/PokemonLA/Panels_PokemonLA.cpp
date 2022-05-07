@@ -59,7 +59,9 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_program<OutbreakFinder_Descriptor, OutbreakFinder>();
     add_program<ClothingBuyer_Descriptor, ClothingBuyer>();
     add_program<SkipToFullMoon_Descriptor, SkipToFullMoon>();
-    add_program<PokedexTasksReader_Descriptor, PokedexTasksReader>();
+    if (GlobalSettings::instance().DEVELOPER_MODE){
+        add_program<PokedexTasksReader_Descriptor, PokedexTasksReader>();
+    }
 
     add_divider("---- Trading ----");
     add_program<SelfBoxTrade_Descriptor, SelfBoxTrade>();

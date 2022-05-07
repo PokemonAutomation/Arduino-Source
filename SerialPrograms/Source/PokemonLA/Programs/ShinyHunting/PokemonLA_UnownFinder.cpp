@@ -125,51 +125,36 @@ void UnownFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     // Start path
     env.console.log("Beginning Shiny Detection...");
-
-    //Head to ruins
     {
         float shiny_coefficient = 1.0;
+        std::atomic<ShinyDetectedActionOption*> shiny_action(&SHINY_DETECTED_ENROUTE);
+
         ShinySoundDetector shiny_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
             stats.shinies++;
             shiny_coefficient = error_coefficient;
-            return on_shiny_callback(env, env.console, SHINY_DETECTED_ENROUTE, error_coefficient);
+            ShinyDetectedActionOption* action = shiny_action.load(std::memory_order_acquire);
+            return on_shiny_callback(env, env.console, *action, error_coefficient);
         });
 
         int ret = run_until(
             env.console, context,
-            [](BotBaseContext& context){
-               ruins_entrance_route(context);
+            [&](BotBaseContext& context){
+                ruins_entrance_route(context);
+
+                context.wait_for_all_requests();
+                shiny_action.store(&SHINY_DETECTED_DESTINATION, std::memory_order_release);
+
+                enter_ruins(context);
             },
             {{shiny_detector}}
         );
         shiny_detector.throw_if_no_sound();
         if (ret == 0){
-            on_shiny_sound(env, env.console, context, SHINY_DETECTED_ENROUTE, shiny_coefficient);
+            ShinyDetectedActionOption* action = shiny_action.load(std::memory_order_acquire);
+            on_shiny_sound(env, env.console, context, *action, shiny_coefficient);
         }
-    }
-
-    // Enter ruins
-    {
-        float shiny_coefficient = 1.0;
-        ShinySoundDetector shiny_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
-            //  Warning: This callback will be run from a different thread than this function.
-            stats.shinies++;
-            shiny_coefficient = error_coefficient;
-            return on_shiny_callback(env, env.console, SHINY_DETECTED_DESTINATION, error_coefficient);
-        });
-
-        int ret = run_until(env.console, context,
-            [](BotBaseContext& context){
-               enter_ruins(context);
-            },
-            {{shiny_detector}}
-        );
-        shiny_detector.throw_if_no_sound();
-        if (ret == 0){
-            on_shiny_sound(env, env.console, context, SHINY_DETECTED_DESTINATION, shiny_coefficient);
-        }
-    }
+    };
 
     env.console.log("No shiny detected, returning to Jubilife!");
     goto_camp_from_overworld(env, env.console, context);

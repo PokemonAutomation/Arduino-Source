@@ -109,19 +109,22 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseC
     change_mount(env.console, context, MountState::BRAVIARY_ON);
     pbf_wait(context, (uint16_t)(0.5 * TICKS_PER_SECOND));
 
-    //Route to cave entrance
     {
         float shiny_coefficient = 1.0;
+        std::atomic<ShinyDetectedActionOption*> shiny_action(&SHINY_DETECTED_ENROUTE);
+
         ShinySoundDetector shiny_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
             stats.shinies++;
             shiny_coefficient = error_coefficient;
-            return on_shiny_callback(env, env.console, SHINY_DETECTED_ENROUTE, error_coefficient);
+            ShinyDetectedActionOption* action = shiny_action.load(std::memory_order_acquire);
+            return on_shiny_callback(env, env.console, *action, error_coefficient);
         });
 
         int ret = run_until(
             env.console, context,
-                [](BotBaseContext& context){
+            [&](BotBaseContext& context){
+                //  Route to cave entrance
                 pbf_press_button(context, BUTTON_B, (uint16_t)(2 * TICKS_PER_SECOND), 10);  //Get some distance from the moutain
                 pbf_press_button(context, BUTTON_Y, (uint16_t)(4 * TICKS_PER_SECOND), 10);  //Descend
                 pbf_press_button(context, BUTTON_B, (uint16_t)(7.89 * TICKS_PER_SECOND), 10); //Reach to the cave entrance
@@ -130,28 +133,11 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseC
                 pbf_wait(context, (uint16_t)(1.1 * TICKS_PER_SECOND));
                 pbf_press_button(context, BUTTON_PLUS, 10,10);
                 pbf_press_button(context, BUTTON_B, (uint16_t)(2.8 * TICKS_PER_SECOND), 10); // Braviary Second Push
-            },
-            {{shiny_detector}}
-        );
-        shiny_detector.throw_if_no_sound();
-        if (ret == 0){
-            on_shiny_sound(env, env.console, context, SHINY_DETECTED_ENROUTE, shiny_coefficient);
-        }
-    }
 
-    //Move to Froslass
-    {
-        float shiny_coefficient = 1.0;
-        ShinySoundDetector shiny_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
-            //  Warning: This callback will be run from a different thread than this function.
-            stats.shinies++;
-            shiny_coefficient = error_coefficient;
-            return on_shiny_callback(env, env.console, SHINY_DETECTED_DESTINATION, error_coefficient);
-        });
+                context.wait_for_all_requests();
+                shiny_action.store(&SHINY_DETECTED_DESTINATION, std::memory_order_release);
 
-        int ret = run_until(
-                env.console, context,
-                [](BotBaseContext& context){
+                //  Move to Froslass
                 pbf_press_dpad(context, DPAD_LEFT, 20, 20);
                 pbf_press_button(context, BUTTON_B, (uint16_t)(4.5 * TICKS_PER_SECOND), 10);
             },
@@ -159,7 +145,8 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseC
         );
         shiny_detector.throw_if_no_sound();
         if (ret == 0){
-            on_shiny_sound(env, env.console, context, SHINY_DETECTED_DESTINATION, shiny_coefficient);
+            ShinyDetectedActionOption* action = shiny_action.load(std::memory_order_acquire);
+            on_shiny_sound(env, env.console, context, *action, shiny_coefficient);
         }
     }
 

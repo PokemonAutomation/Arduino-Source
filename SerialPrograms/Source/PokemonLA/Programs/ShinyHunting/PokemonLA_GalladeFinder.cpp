@@ -108,7 +108,7 @@ void GalladeFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCo
     env.console.log("Enabling Shiny Detection...");
     {
         float shiny_coefficient = 1.0;
-        std::atomic<ShinyDetectedActionOption*> shiny_action = &SHINY_DETECTED_ENROUTE;
+        std::atomic<ShinyDetectedActionOption*> shiny_action(&SHINY_DETECTED_ENROUTE);
 
         ShinySoundDetector shiny_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
