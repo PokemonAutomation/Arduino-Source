@@ -95,6 +95,16 @@ void SparseBinaryMatrixCore<Tile>::set_data(std::map<TileIndex, Tile> data){
 }
 
 template <typename Tile>
+void SparseBinaryMatrixCore<Tile>::operator^=(const SparseBinaryMatrixCore& x){
+    m_logical_width = std::max(m_logical_width, x.m_logical_width);
+    m_logical_height = std::max(m_logical_height, x.m_logical_height);
+    m_tile_width = std::max(m_tile_width, x.m_tile_width);
+    m_tile_height = std::max(m_tile_height, x.m_tile_height);
+    for (const auto& tile : x.m_data){
+        this->tile(tile.first) ^= tile.second;
+    }
+}
+template <typename Tile>
 void SparseBinaryMatrixCore<Tile>::operator|=(const SparseBinaryMatrixCore& x){
     m_logical_width = std::max(m_logical_width, x.m_logical_width);
     m_logical_height = std::max(m_logical_height, x.m_logical_height);
@@ -102,6 +112,16 @@ void SparseBinaryMatrixCore<Tile>::operator|=(const SparseBinaryMatrixCore& x){
     m_tile_height = std::max(m_tile_height, x.m_tile_height);
     for (const auto& tile : x.m_data){
         this->tile(tile.first) |= tile.second;
+    }
+}
+template <typename Tile>
+void SparseBinaryMatrixCore<Tile>::operator&=(const SparseBinaryMatrixCore& x){
+    m_logical_width = std::max(m_logical_width, x.m_logical_width);
+    m_logical_height = std::max(m_logical_height, x.m_logical_height);
+    m_tile_width = std::max(m_tile_width, x.m_tile_width);
+    m_tile_height = std::max(m_tile_height, x.m_tile_height);
+    for (const auto& tile : x.m_data){
+        this->tile(tile.first) &= tile.second;
     }
 }
 

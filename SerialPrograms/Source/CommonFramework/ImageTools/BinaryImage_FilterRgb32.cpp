@@ -104,6 +104,26 @@ std::vector<PackedBinaryMatrix2> compress_rgb32_to_binary_range(
 
 
 
+PackedBinaryMatrix2 compress_rgb32_to_binary_multirange(
+    const ConstImageRef& image,
+    const std::vector<std::pair<uint32_t, uint32_t>>& filters
+){
+    if (filters.empty()){
+        PackedBinaryMatrix2 ret(image.width(), image.height());
+        ret.set_zero();
+        return ret;
+    }
+    PackedBinaryMatrix2 ret = compress_rgb32_to_binary_range(image, filters[0].first, filters[0].second);
+    for (size_t c = 1; c < filters.size(); c++){
+        ret |= compress_rgb32_to_binary_range(image, filters[c].first, filters[c].second);
+    }
+    return ret;
+}
+
+
+
+
+
 void filter_rgb32(
     const PackedBinaryMatrix2& matrix,
     const ImageRef& image,

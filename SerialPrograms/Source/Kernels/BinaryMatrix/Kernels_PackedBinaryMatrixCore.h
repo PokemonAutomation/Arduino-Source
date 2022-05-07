@@ -69,6 +69,11 @@ public:
     void set_ones();        //  Set entire matrix to ones.
     void invert();          //  Invert all bits.
 
+    //  Matrix must have same dimensions.
+    void operator^=(const PackedBinaryMatrixCore& x);
+    void operator|=(const PackedBinaryMatrixCore& x);
+    void operator&=(const PackedBinaryMatrixCore& x);
+
 public:
     size_t width() const{ return m_logical_width; }
     size_t height() const{ return m_logical_height; }

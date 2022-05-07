@@ -63,6 +63,15 @@ std::vector<PackedBinaryMatrix2> compress_rgb32_to_binary_range(
 );
 
 
+
+//  Run multiple filters and OR them all together. (experimental)
+PackedBinaryMatrix2 compress_rgb32_to_binary_multirange(
+    const ConstImageRef& image,
+    const std::vector<std::pair<uint32_t, uint32_t>>& filters
+);
+
+
+
 void filter_rgb32(
     const PackedBinaryMatrix2& matrix,
     const ImageRef& image,

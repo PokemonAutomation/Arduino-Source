@@ -36,7 +36,9 @@ public:
     void clear();
     void set_data(std::map<TileIndex, TileType> data);
 
+    void operator^=(const SparseBinaryMatrixCore& x);
     void operator|=(const SparseBinaryMatrixCore& x);
+    void operator&=(const SparseBinaryMatrixCore& x);
 
 public:
     size_t width() const{ return m_logical_width; }

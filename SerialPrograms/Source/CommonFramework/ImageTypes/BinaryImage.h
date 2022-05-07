@@ -41,6 +41,11 @@ public:
     //  Invert all bits.
     void invert(){ return m_matrix->invert(); }
 
+    //  Bitwise with another matrix. Dimensions must be the same!
+    void operator^=(const PackedBinaryMatrix2& x){ *m_matrix ^= *x.m_matrix; }
+    void operator|=(const PackedBinaryMatrix2& x){ *m_matrix |= *x.m_matrix; }
+    void operator&=(const PackedBinaryMatrix2& x){ *m_matrix &= *x.m_matrix; }
+
     std::string dump() const{ return m_matrix->dump(); }
     std::string dump(size_t min_x, size_t min_y, size_t max_x, size_t max_y) const{ return m_matrix->dump(min_x, min_y, max_x, max_y); }
 

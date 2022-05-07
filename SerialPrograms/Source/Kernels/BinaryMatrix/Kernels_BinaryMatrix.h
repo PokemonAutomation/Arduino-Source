@@ -49,6 +49,11 @@ public:
     virtual void set_ones() = 0;    //  Set entire matrix to ones.
     virtual void invert() = 0;      //  Invert all bits.
 
+    //  Matrix must have same dimensions.
+    virtual void operator^=(const PackedBinaryMatrix_IB& x) = 0;
+    virtual void operator|=(const PackedBinaryMatrix_IB& x) = 0;
+    virtual void operator&=(const PackedBinaryMatrix_IB& x) = 0;
+
     virtual std::string dump() const = 0;
     virtual std::string dump(size_t min_x, size_t min_y, size_t max_x, size_t max_y) const = 0;
     virtual std::string dump_tiles() const = 0;
@@ -78,7 +83,9 @@ public:
 
     virtual void clear() = 0;
 
+    virtual void operator^=(const SparseBinaryMatrix_IB& x) = 0;
     virtual void operator|=(const SparseBinaryMatrix_IB& x) = 0;
+    virtual void operator&=(const SparseBinaryMatrix_IB& x) = 0;
 
 public:
     virtual size_t width() const = 0;

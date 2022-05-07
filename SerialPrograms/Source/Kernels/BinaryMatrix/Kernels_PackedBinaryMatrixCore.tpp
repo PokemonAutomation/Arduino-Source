@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Kernels_PackedBinaryMatrixCore_TPP
 #define PokemonAutomation_Kernels_PackedBinaryMatrixCore_TPP
 
+#include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/AlignedVector.tpp"
 #include "Kernels_PackedBinaryMatrixCore.h"
 
@@ -105,7 +106,7 @@ void PackedBinaryMatrixCore<Tile>::set_zero(){
 }
 template <typename Tile>
 void PackedBinaryMatrixCore<Tile>::set_ones(){
-    //  This one is more complicated because because we need need to leave the
+    //  This one is more complicated because because we need to leave the
     //  padding its zero.
     size_t r = 0;
     size_t r_left = m_logical_height;
@@ -139,7 +140,7 @@ void PackedBinaryMatrixCore<Tile>::set_ones(){
 }
 template <typename Tile>
 void PackedBinaryMatrixCore<Tile>::invert(){
-    //  This one is more complicated because because we need need to leave the
+    //  This one is more complicated because because we need to leave the
     //  padding its zero.
     size_t r = 0;
     size_t r_left = m_logical_height;
@@ -175,6 +176,36 @@ void PackedBinaryMatrixCore<Tile>::invert(){
             tile.clear_padding(c_left, r_left);
         }
 
+    }
+}
+template <typename Tile>
+void PackedBinaryMatrixCore<Tile>::operator^=(const PackedBinaryMatrixCore& x){
+    if (m_logical_width != x.m_logical_width || m_logical_height != x.m_logical_height){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching dimensions.");
+    }
+    size_t stop = m_tile_width * m_tile_height;
+    for (size_t c = 0; c < stop; c++){
+        m_data[c] ^= x.m_data[c];
+    }
+}
+template <typename Tile>
+void PackedBinaryMatrixCore<Tile>::operator|=(const PackedBinaryMatrixCore& x){
+    if (m_logical_width != x.m_logical_width || m_logical_height != x.m_logical_height){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching dimensions.");
+    }
+    size_t stop = m_tile_width * m_tile_height;
+    for (size_t c = 0; c < stop; c++){
+        m_data[c] |= x.m_data[c];
+    }
+}
+template <typename Tile>
+void PackedBinaryMatrixCore<Tile>::operator&=(const PackedBinaryMatrixCore& x){
+    if (m_logical_width != x.m_logical_width || m_logical_height != x.m_logical_height){
+        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching dimensions.");
+    }
+    size_t stop = m_tile_width * m_tile_height;
+    for (size_t c = 0; c < stop; c++){
+        m_data[c] &= x.m_data[c];
     }
 }
 

@@ -41,6 +41,25 @@ public:
     virtual void set_ones() override{ m_matrix.set_ones(); }
     virtual void invert() override{ m_matrix.invert(); }
 
+    virtual void operator^=(const PackedBinaryMatrix_IB& x) override{
+        if (this->type() != x.type()){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching matrix types.");
+        }
+        m_matrix ^= static_cast<const PackedBinaryMatrix_t<Tile>&>(x).m_matrix;
+    }
+    virtual void operator|=(const PackedBinaryMatrix_IB& x) override{
+        if (this->type() != x.type()){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching matrix types.");
+        }
+        m_matrix |= static_cast<const PackedBinaryMatrix_t<Tile>&>(x).m_matrix;
+    }
+    virtual void operator&=(const PackedBinaryMatrix_IB& x) override{
+        if (this->type() != x.type()){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching matrix types.");
+        }
+        m_matrix &= static_cast<const PackedBinaryMatrix_t<Tile>&>(x).m_matrix;
+    }
+
     virtual std::string dump() const override{ return m_matrix.dump(); }
     virtual std::string dump(size_t min_x, size_t min_y, size_t max_x, size_t max_y) const override{ return m_matrix.dump(min_x, min_y, max_x, max_y); }
     virtual std::string dump_tiles() const override{ return m_matrix.dump_tiles(); }
@@ -84,11 +103,23 @@ public:
 
     virtual void clear() override{ m_matrix.clear(); }
 
+    virtual void operator^=(const SparseBinaryMatrix_IB& x) override{
+        if (this->type() != x.type()){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching matrix types.");
+        }
+        m_matrix ^= static_cast<const SparseBinaryMatrix_t&>(x).m_matrix;
+    }
     virtual void operator|=(const SparseBinaryMatrix_IB& x) override{
-        if (type() != x.type()){
+        if (this->type() != x.type()){
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching matrix types.");
         }
         m_matrix |= static_cast<const SparseBinaryMatrix_t&>(x).m_matrix;
+    }
+    virtual void operator&=(const SparseBinaryMatrix_IB& x) override{
+        if (this->type() != x.type()){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "Mismatching matrix types.");
+        }
+        m_matrix &= static_cast<const SparseBinaryMatrix_t&>(x).m_matrix;
     }
 
     virtual std::string dump() const override{ return m_matrix.dump(); }
