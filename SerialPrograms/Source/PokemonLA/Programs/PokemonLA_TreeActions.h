@@ -19,6 +19,24 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
+enum class TreePokemon
+{
+    Aipom,
+    Burmy,
+    Cherrim,
+    Cherubi,
+    Combee,
+    Heracross,
+    Pachirisu,
+    Vespiquen,
+    Wormadam,
+    Geodude,
+    Graveler,
+    Bonsly,
+    Bronzor,
+    Nosepass,
+    Bergimite
+};
 
 void setup(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
 void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, size_t pokemon);

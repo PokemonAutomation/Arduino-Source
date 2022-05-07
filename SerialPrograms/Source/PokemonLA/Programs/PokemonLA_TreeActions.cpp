@@ -19,8 +19,8 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, size_t pokemon){
-    switch (pokemon) {
-    case 0: //Aipom
+    switch (static_cast<TreePokemon>(pokemon)) {
+    case TreePokemon::Aipom:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Coastlands_Beachside);
         pbf_move_left_joystick(context, 240, 255, 30, 30);
         pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
@@ -30,7 +30,7 @@ void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& cont
         pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
         pbf_move_left_joystick(context, 127, 0, (3 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
         break;
-    case 1: //Burmy
+    case TreePokemon::Burmy:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Fieldlands_Heights);
         pbf_move_left_joystick(context, 170, 255, 30, 30);
         change_mount(console, context, MountState::BRAVIARY_ON);
@@ -42,7 +42,7 @@ void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& cont
         pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
         pbf_move_right_joystick(context, 127, 255, (0.10 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
         break;
-    case 2: //Cherrim
+    case TreePokemon::Cherrim:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Highlands_Mountain);
         pbf_move_left_joystick(context, 255, 35, 30, 30);
         pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
@@ -55,14 +55,14 @@ void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& cont
         pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
         pbf_move_right_joystick(context, 127, 255, (0.20 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
         break;
-    case 3: //Cherubi
+    case TreePokemon::Cherubi:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Fieldlands_Arena);
         pbf_move_left_joystick(context, 255, 152, 30, 30);
         change_mount(console, context, MountState::BRAVIARY_ON);
         pbf_press_button(context, BUTTON_B, (25.5 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
         pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
         break;
-    case 4: //Combee
+    case TreePokemon::Combee:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Fieldlands_Arena);
         pbf_move_left_joystick(context, 57, 255, 20, (0.5 * TICKS_PER_SECOND));
         pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
@@ -70,15 +70,15 @@ void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& cont
         pbf_press_button(context, BUTTON_B, (2.75 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
         pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
         break;
-    case 5: //Heracross
+    case TreePokemon::Heracross:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Highlands_Mountain);
         pbf_move_left_joystick(context, 0, 220, 30, 30);
         pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
         pbf_move_left_joystick(context, 127, 0, (4 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
         pbf_move_right_joystick(context, 127, 255, (0.17 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
         break;
-    case 6: //Pachirisu
-    case 7: //Vespiquen
+    case TreePokemon::Pachirisu:
+    case TreePokemon::Vespiquen:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Mirelands_Bogbound);
         pbf_move_left_joystick(context, 0, 170, 30, 30);
         pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
@@ -86,7 +86,7 @@ void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& cont
         pbf_press_button(context, BUTTON_B, (10.2 * TICKS_PER_SECOND), 20);
         pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
         break;
-    case 8: //Wormadam
+    case TreePokemon::Wormadam:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Fieldlands_Fieldlands);
         pbf_move_left_joystick(context, 110, 255, 30, 30);
         change_mount(console, context, MountState::BRAVIARY_ON);
@@ -96,7 +96,7 @@ void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& cont
         pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
         pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
         break;
-    case 9: //Geodude
+    case TreePokemon::Geodude:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Fieldlands_Heights);
         pbf_move_left_joystick(context, 200, 255, 20, 20);
         pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
@@ -108,20 +108,20 @@ void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& cont
         pbf_move_left_joystick(context, 127, 255, 20, 20);
         pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
         break;
-    case 10: //Graveler
+    case TreePokemon::Graveler:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Highlands_Highlands);
         pbf_move_left_joystick(context, 255, 145, 20, 20);
         pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
         pbf_move_left_joystick(context, 127, 0, (5 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
         break;
-    case 11: //Bonsly
+    case TreePokemon::Bonsly:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Mirelands_DiamondSettlement);
         pbf_move_left_joystick(context, 0, 150, 20, (0.5 * TICKS_PER_SECOND));
         pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
         change_mount(console, context, MountState::BRAVIARY_ON);
         pbf_move_left_joystick(context, 127, 0, (10 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
         break;
-    case 12: //Bronzor
+    case TreePokemon::Bronzor:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Highlands_Mountain);
         pbf_move_left_joystick(context, 55, 255, 20, (0.5 * TICKS_PER_SECOND));
         pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
@@ -130,7 +130,7 @@ void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& cont
         pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
         pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
         break;
-    case 13: //Nosepass
+    case TreePokemon::Nosepass:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Highlands_Summit);
         pbf_move_left_joystick(context, 255, 175, 20, (0.5 * TICKS_PER_SECOND));
         pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
@@ -139,7 +139,7 @@ void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& cont
         pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
         pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
         break;
-    case 14: //Bergimite
+    case TreePokemon::Bergimite:
         goto_camp_from_jubilife(env, console, context, TravelLocations::instance().Icelands_Snowfields);
         pbf_move_left_joystick(context, 115, 255, 20, (0.5 * TICKS_PER_SECOND));
         pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
@@ -154,30 +154,30 @@ void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& cont
 
 void return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, size_t pokemon){
     goto_camp_from_overworld(env, console, context);
-    switch (pokemon) {
-    case 0: //Aipom
+    switch (static_cast<TreePokemon>(pokemon)) {
+    case TreePokemon::Aipom:
         goto_professor(console, context, Camp::COASTLANDS_BEACHSIDE);
         break;
-    case 1: //Burmy
-    case 3: //Cherubi
-    case 4: //Combee
-    case 8: //Wormadam
-    case 9: //Geodude
+    case TreePokemon::Burmy:
+    case TreePokemon::Cherubi:
+    case TreePokemon::Combee:
+    case TreePokemon::Wormadam:
+    case TreePokemon::Geodude:
         goto_professor(console, context, Camp::FIELDLANDS_FIELDLANDS);
         break;
-    case 2: //Cherrim
-    case 5: //Heracross
-    case 10: //Graveler
-    case 12: //Bronzor
-    case 13: //Nosepass
+    case TreePokemon::Cherrim:
+    case TreePokemon::Heracross:
+    case TreePokemon::Graveler:
+    case TreePokemon::Bronzor:
+    case TreePokemon::Nosepass:
         goto_professor(console, context, Camp::HIGHLANDS_HIGHLANDS);
         break;
-    case 6: //Pachirisu
-    case 7: //Vespiquen
-    case 11: //Bonsly
+    case TreePokemon::Pachirisu:
+    case TreePokemon::Vespiquen:
+    case TreePokemon::Bonsly:
         goto_professor(console, context, Camp::MIRELANDS_MIRELANDS);
         break;
-    case 14: //Bergimite
+    case TreePokemon::Bergimite:
         goto_professor(console, context, Camp::ICELANDS_SNOWFIELDS);
         break;
     }
