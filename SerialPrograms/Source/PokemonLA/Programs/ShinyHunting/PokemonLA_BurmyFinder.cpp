@@ -47,12 +47,12 @@ BurmyFinder::BurmyFinder(const BurmyFinder_Descriptor& descriptor)
     )
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
-        "This applies if a shiny is detected while enroute to destination",
+        "This applies if a shiny is detected while traveling in the overworld.",
         "0 * TICKS_PER_SECOND"
     )
     , MATCH_DETECTED_OPTIONS(
       "Match Action",
-      "What to do when the pokemon matches the expectations",
+      "What to do when a Burmy is found that matches the \"Stop On\" parameter.",
       "0 * TICKS_PER_SECOND")
 
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
@@ -114,7 +114,9 @@ void BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext
     if (battle_found){
         PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
 
-        //Match validation
+        stats.found++;
+
+        //  Match validation
 
         if (pokemon.is_alpha && pokemon.is_shiny){
             env.console.log("Found Shiny Alpha!");
@@ -128,8 +130,8 @@ void BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext
             stats.shinies++;
         }else{
             env.console.log("Normie in the tree -_-");
-            stats.found++;
         }
+        env.update_stats();
 
         bool is_match = false;
         switch (STOP_ON){

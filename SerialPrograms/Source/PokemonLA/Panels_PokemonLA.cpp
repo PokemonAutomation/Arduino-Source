@@ -59,9 +59,7 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_program<OutbreakFinder_Descriptor, OutbreakFinder>();
     add_program<ClothingBuyer_Descriptor, ClothingBuyer>();
     add_program<SkipToFullMoon_Descriptor, SkipToFullMoon>();
-    if (GlobalSettings::instance().DEVELOPER_MODE){
-        add_program<PokedexTasksReader_Descriptor, PokedexTasksReader>();
-    }
+    add_program<PokedexTasksReader_Descriptor, PokedexTasksReader>();
 
     add_divider("---- Trading ----");
     add_program<SelfBoxTrade_Descriptor, SelfBoxTrade>();
@@ -81,9 +79,7 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_program<CrobatFinder_Descriptor, CrobatFinder>();
     add_program<GalladeFinder_Descriptor, GalladeFinder>();
     add_program<FroslassFinder_Descriptor, FroslassFinder>();
-    if (GlobalSettings::instance().DEVELOPER_MODE){
-        add_program<BurmyFinder_Descriptor, BurmyFinder>();
-    }
+    add_program<BurmyFinder_Descriptor, BurmyFinder>();
     add_program<UnownFinder_Descriptor, UnownFinder>();
     add_program<ShinyHuntFlagPin_Descriptor, ShinyHuntFlagPin>();
     add_program<PostMMOSpawnReset_Descriptor, PostMMOSpawnReset>();
