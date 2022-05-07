@@ -941,6 +941,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.h
     Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.cpp
     Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.h
+    Source/PokemonLA/Programs/General/PokemonLA_PokedexTasksReader.cpp
+    Source/PokemonLA/Programs/General/PokemonLA_PokedexTasksReader.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_GalladeFinder.cpp
