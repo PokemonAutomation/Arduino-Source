@@ -148,7 +148,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
         {
             context.wait_for_all_requests();
 
-            ReceivePokemonDetector receive_detector;
+            ReceivePokemonDetector receive_detector(false);
 //            ShinySparkleDetector shiny_detector(
 //                env.console, env.console,
 //                ImageFloatBox(0.1, 0.01, 0.8, 0.77)
@@ -223,7 +223,7 @@ void CurryHunter::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
 
             context.wait_for_all_requests();
             ShinyType shininess = ShinyType::NOT_SHINY;
-            if (inference.triggered_ptr() != nullptr){
+            if (receive_detector.triggered()){
 //                shininess = shiny_detector.results();
 #if 1
                 stats.add_non_shiny();

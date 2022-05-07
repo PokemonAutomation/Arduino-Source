@@ -22,18 +22,22 @@ namespace PokemonSwSh{
 
 class ReceivePokemonDetector : public VisualInferenceCallback{
 public:
-    ReceivePokemonDetector();
+    ReceivePokemonDetector(bool stop_on_detected);
 
+    bool triggered() const{ return m_triggered.load(std::memory_order_acquire); }
     bool receive_is_over(const QImage& frame);
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
     virtual bool process_frame(const QImage& frame, WallClock timestamp) override;
 
 private:
+    bool m_stop_on_detected;
     ImageFloatBox m_box_top;
     ImageFloatBox m_box_top_right;
     ImageFloatBox m_box_bot_left;
     bool m_has_been_orange;
+
+    std::atomic<bool> m_triggered;
 };
 
 
