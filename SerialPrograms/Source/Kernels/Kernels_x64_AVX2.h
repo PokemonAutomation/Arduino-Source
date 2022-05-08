@@ -71,6 +71,13 @@ inline static void print_u64(const __m256i& x){
 
 
 
+PA_FORCE_INLINE float reduce32_x64_AVX(__m256 x){
+    __m128 v = _mm_add_ps(
+        _mm256_castps256_ps128(x),
+        _mm256_extractf128_ps(x, 1)
+    );
+    return reduce32_x64_SSE(v);
+}
 PA_FORCE_INLINE uint64_t reduce_add32_x64_AVX2(__m256i ymm){
     __m128i xmm = _mm_add_epi32(
         _mm256_castsi256_si128(ymm),

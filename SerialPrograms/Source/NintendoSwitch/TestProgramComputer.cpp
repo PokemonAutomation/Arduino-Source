@@ -50,13 +50,12 @@
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "Common/Cpp/PeriodicScheduler.h"
 #include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
-
-//#include "Kernels/Kernels_x64_AVX2.h"
+//#include "Kernels/Kernels_x64_SSE41.h"
 //#include "Kernels/Kernels_x64_AVX512.h"
 //#include "Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512.h"
 //#include "Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h"
+#include "Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h"
 
-#include <QMessageBox>
 
 
 
@@ -127,15 +126,26 @@ void print_8x64(__m512i m){
 }
 
 
-namespace OCR{
 
 
 
+
+
+
+
+
+
+namespace Kernels{
+namespace ScaleInvariantMatrixMatch{
 
 
 
 
 }
+}
+
+
+
 
 
 
@@ -147,18 +157,47 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 
 
-    PokemonNameReader::instance().match_substring_from_image_multifiltered(
-        &env.logger(),
-        Language::English,
-        QImage("C:\\Users\\Ayase\\Desktop\\PA-Repository\\TrainingData\\PokemonNameOCR\\PokemonNameOCR (Kim-SwShPokedex-0)\\jpn\\cleffa-20210618-200715.png"),
-        {
-            {0xff000000, 0xff404040},
-            {0xff000000, 0xff606060},
-            {0xff000000, 0xff808080},
-            {0xff000000, 0xffa0a0a0},
-        },
-        PokemonNameReader::MAX_LOG10P, PokemonNameReader::MAX_LOG10P_SPREAD
-    );
+#if 0
+    __m128 v0 = _mm_setr_ps(10, 11, 12, 13);
+    __m128 v1 = _mm_setr_ps(20, 21, 22, 23);
+
+    print(v0);
+    print(v1);
+//    print(_mm_unpacklo_ps(v0, v0));
+//    print(_mm_unpackhi_ps(v0, v0));
+    print(_mm_shuffle_ps(v0, v0, 78));
+    print(_mm_shuffle_ps(v0, v0, 177));
+
+    v0 = _mm_add_ps(v0, _mm_shuffle_ps(v0, v0, 78));
+    print(v0);
+    v0 = _mm_add_ps(v0, _mm_shuffle_ps(v0, v0, 177));
+    print(v0);
+
+
+
+    size_t length = 2048;
+
+    AlignedVector<float> A(length);
+    AlignedVector<float> T(length);
+    AlignedVector<float> W(length);
+    for (size_t c = 0; c < length; c++){
+        A[c] = (float)rand() / RAND_MAX;
+        T[c] = (float)rand() / RAND_MAX;
+        W[c] = (float)rand() / RAND_MAX;
+    }
+
+    {
+        const float* ptrA = A.data();
+        const float* ptrT = T.data();
+        cout << Kernels::ScaleInvariantMatrixMatch::compute_scale(length, 1, &ptrA, &ptrT) << endl;
+    }
+    {
+        const float* ptrA = A.data();
+        const float* ptrT = T.data();
+        const float* ptrW = W.data();
+        cout << Kernels::ScaleInvariantMatrixMatch::compute_scale(length, 1, &ptrA, &ptrT, &ptrW) << endl;
+    }
+#endif
 
 
 

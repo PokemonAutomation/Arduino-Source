@@ -222,7 +222,7 @@ bool SpectrogramMatcher::updateToNewSpectrums(const std::vector<AudioSpectrum>& 
             return false;
         }
     }
-    
+
     // pop out too old spectrums
     while(m_spectrums.size() > m_numSpectrumsNeeded){
         m_spectrums.pop_back();

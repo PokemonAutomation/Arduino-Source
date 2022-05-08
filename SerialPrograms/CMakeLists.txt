@@ -463,6 +463,15 @@ file(GLOB MAIN_SOURCES
     Source/Integrations/ProgramTracker.h
     Source/Integrations/SleepyDiscordRunner.cpp
     Source/Integrations/SleepyDiscordRunner.h
+    Source/Kernels/Kernels_Arch.h
+    Source/Kernels/Kernels_Alignment.h
+    Source/Kernels/Kernels_BitScan.h
+    Source/Kernels/Kernels_BitSet.h
+    Source/Kernels/Kernels_x64_SSE41.h
+    Source/Kernels/Kernels_x64_AVX2.h
+    Source/Kernels/Kernels_x64_AVX512.h
+    Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h
+    Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT.cpp
     Source/Kernels/AbsFFT/Kernels_AbsFFT.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Arch.h
@@ -484,6 +493,13 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Reductions.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.tpp
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.cpp
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.h
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Default.cpp
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.cpp
+    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters.h
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Routines.h
@@ -500,13 +516,31 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x16_x64_AVX2.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x32_x64_AVX512.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x64_x64_AVX512.cpp
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.cpp
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.h
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Default.cpp
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_SSE42.cpp
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX2.cpp
-    Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_x64_AVX512.cpp
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.cpp
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Default.cpp
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_SSE41.cpp
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.cpp
+    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX512.cpp
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr.cpp
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr.h
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_Default.cpp
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX2.cpp
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.cpp
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev.cpp
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev.h
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_Default.cpp
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_SSE41.cpp
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX2.cpp
+    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.cpp
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.cpp
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Routines.h
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Core_Default.cpp
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Core_x86_SSE.cpp
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Core_x86_AVX2.cpp
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Core_x86_AVX512.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_t.h
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.cpp
@@ -531,33 +565,6 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/BinaryMatrix/Kernels_PackedBinaryMatrixCore.tpp
     Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixCore.h
     Source/Kernels/BinaryMatrix/Kernels_SparseBinaryMatrixCore.tpp
-    Source/Kernels/Kernels_Alignment.h
-    Source/Kernels/Kernels_Arch.h
-    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.cpp
-    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness.h
-    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_Default.cpp
-    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_SSE41.cpp
-    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.cpp
-    Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX512.cpp
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr.cpp
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr.h
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_Default.cpp
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX2.cpp
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.cpp
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev.cpp
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev.h
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_Default.cpp
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_SSE41.cpp
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX2.cpp
-    Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.cpp
-    Source/Kernels/Kernels_BitScan.h
-    Source/Kernels/Kernels_BitSet.h
-    Source/Kernels/Kernels_x64_SSE41.h
-    Source/Kernels/Kernels_x64_AVX2.h
-    Source/Kernels/Kernels_x64_AVX512.h
-    Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h
-    Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h
     Source/Kernels/Waterfill/Kernels_Waterfill.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill.h
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h
@@ -1442,6 +1449,7 @@ SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_SSE41.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_SSE41.cpp
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Core_x86_SSE.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x8_x64_SSE42.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x8_x64_SSE42.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.cpp
@@ -1455,6 +1463,7 @@ SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX2.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX2.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX2.cpp
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Core_x86_AVX2.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x16_x64_AVX2.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x16_x64_AVX2.cpp
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x16_x64_AVX2.cpp
@@ -1467,6 +1476,7 @@ SET_SOURCE_FILES_PROPERTIES(
     Source/Kernels/ImageScaleBrightness/Kernels_ImageScaleBrightness_x64_AVX512.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.cpp
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqrDev_x64_AVX512.cpp
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Core_x86_AVX512.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x32_x64_AVX512.cpp
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x64_x64_AVX512.cpp
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x32_x64_AVX512.cpp

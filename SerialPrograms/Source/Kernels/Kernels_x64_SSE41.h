@@ -70,6 +70,12 @@ inline static void print_u64(const __m128i& x){
 
 
 
+
+PA_FORCE_INLINE float reduce32_x64_SSE(__m128 x){
+    x = _mm_add_ps(x, _mm_shuffle_ps(x, x, 78));
+    x = _mm_add_ps(x, _mm_shuffle_ps(x, x, 177));
+    return _mm_cvtss_f32(x);
+}
 PA_FORCE_INLINE uint64_t reduce32_x64_SSE41(__m128i x){
     uint64_t ret = _mm_cvtsi128_si32(x);
     ret += _mm_extract_epi32(x, 1);
