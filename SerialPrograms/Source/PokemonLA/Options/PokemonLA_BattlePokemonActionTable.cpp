@@ -9,9 +9,11 @@
 #include "Common/Qt/QtJsonTools.h"
 #include "CommonFramework/Globals.h"
 #include "CommonFramework/Options/EditableTableOption-EnumTableCell.h"
+#include "CommonFramework/Options/EnumDropdownWidget.h"
 #include "Pokemon/Options/Pokemon_IVCheckerWidget.h"
 #include "PokemonLA_BattlePokemonActionTable.h"
 
+#include <QLabel>
 #include <iostream>
 using std::cout;
 using std::endl;
@@ -103,7 +105,7 @@ std::unique_ptr<EditableTableRow> BattlePokemonActionTableFactory::make_row() co
 
 std::vector<std::unique_ptr<EditableTableRow>> BattlePokemonActionTable::make_defaults() const{
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(std::unique_ptr<BattlePokemonActionRow>(new BattlePokemonActionRow()));
+    ret.emplace_back(std::make_unique<BattlePokemonActionRow>());
     return ret;
 }
 
@@ -214,7 +216,7 @@ std::unique_ptr<EditableTableRow> OneMoveBattlePokemonActionTableFactory::make_r
 
 std::vector<std::unique_ptr<EditableTableRow>> OneMoveBattlePokemonActionTable::make_defaults() const{
     std::vector<std::unique_ptr<EditableTableRow>> ret;
-    ret.emplace_back(std::unique_ptr<OneMoveBattlePokemonActionRow>(new OneMoveBattlePokemonActionRow()));
+    ret.emplace_back(std::make_unique<OneMoveBattlePokemonActionRow>());
     return ret;
 }
 
@@ -250,6 +252,114 @@ MoveStyle OneMoveBattlePokemonActionTable::get_style(size_t pokemon){
 }
 
 
+
+const QString PokemonIndex_NAMES[] = {
+    "First " + STRING_POKEMON,
+    "Second " + STRING_POKEMON,
+    "Third " + STRING_POKEMON,
+    "Fourth " + STRING_POKEMON,
+};
+
+const QString MoveIndex_NAMES[] = {
+    "First move",
+    "Second move",
+    "Third move",
+    "Fourth move",
+};
+
+void MoveGrinderActionRow::load_json(const QJsonValue& json)
+{
+    QJsonObject obj = json.toObject();
+    json_get_int(pokemon_index, obj, "PokemonIndex", 0);
+    json_get_int(move_index, obj, "MoveIndex", 0);
+    {
+        QString value;
+        if (json_get_string(value, obj, "Style")) {
+            const auto iter = MoveStyle_MAP.find(value);
+            if (iter != MoveStyle_MAP.end()) {
+                style = iter->second;
+            }
+        }
+    }
+    json_get_int(attemps, obj, "Attempts", 0);
+}
+
+QJsonValue MoveGrinderActionRow::to_json() const
+{
+    QJsonObject obj;
+    obj.insert("PokemonIndex", static_cast<uint16_t>(pokemon_index));
+    obj.insert("MoveIndex", static_cast<uint16_t>(move_index));
+    obj.insert("Style", MoveStyle_NAMES[(size_t)style]);
+    obj.insert("Attempts", attemps);
+    return obj;
+}
+
+std::unique_ptr<EditableTableRow> MoveGrinderActionRow::clone() const
+{
+    return std::unique_ptr<EditableTableRow>(new MoveGrinderActionRow(*this));
+}
+
+std::vector<QWidget*> MoveGrinderActionRow::make_widgets(QWidget& parent)
+{
+    std::vector<QWidget*> widgets;
+    widgets.emplace_back(make_enum_table_cell(parent, 4, PokemonIndex_NAMES, pokemon_index));
+    widgets.emplace_back(make_enum_table_cell(parent, 4, MoveIndex_NAMES, move_index));
+    widgets.emplace_back(make_enum_table_cell(parent, MoveStyle_MAP.size(), MoveStyle_NAMES, style));
+    widgets.emplace_back(make_integer_table_cell(parent, attemps));
+    return widgets;
+}
+
+QStringList MoveGrinderActionTableFactory::make_header() const
+{
+    QStringList list;
+    list << "Pokemon index" << "Move index" << "Move Style" << "Move Attempts";
+    return list;
+}
+
+std::unique_ptr<EditableTableRow> MoveGrinderActionTableFactory::make_row() const
+{
+    return std::unique_ptr<EditableTableRow>(new MoveGrinderActionRow());
+}
+
+MoveGrinderActionTable::MoveGrinderActionTable()
+    : m_table("For every move you want to perform, input the style and the number of attemps you want to achieve.", m_factory)
+{}
+
+Move MoveGrinderActionTable::get_move(size_t pokemon, size_t move) const
+{
+    // Pokemon index 4 is gonna be Arceus with powerful moves, just use them with normal style and hope you'll win the battle
+    if (pokemon == 4)
+    {
+        return {MoveStyle::NoStyle, std::numeric_limits<decltype(Move::attemps)>::max()};
+
+    }
+    for (size_t i = 0; i < m_table.size(); ++i)
+    {
+        const MoveGrinderActionRow& action = static_cast<const MoveGrinderActionRow&>(m_table[i]);
+        if (action.pokemon_index != pokemon)
+        {
+            continue;
+        }
+        if (action.move_index != move)
+        {
+            continue;
+        }
+        return {action.style , action.attemps};
+    }
+    return {MoveStyle::NoStyle, 0};
+}
+
+void MoveGrinderActionTable::load_json(const QJsonValue& json) {
+    m_table.load_json(json);
+}
+
+QJsonValue MoveGrinderActionTable::to_json() const {
+    return m_table.to_json();
+}
+
+ConfigWidget* MoveGrinderActionTable::make_ui(QWidget& parent) {
+    return m_table.make_ui(parent);
+}
 
 }
 }

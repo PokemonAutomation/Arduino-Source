@@ -946,6 +946,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/Farming/PokemonLA_LeapGrinder.h
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.cpp
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.h
+    Source/PokemonLA/Programs/Farming/PokemonLA_IngoMoveGrinder.cpp
+    Source/PokemonLA/Programs/Farming/PokemonLA_IngoMoveGrinder.h
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.cpp
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.h
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.cpp

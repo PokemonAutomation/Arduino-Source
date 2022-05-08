@@ -20,6 +20,7 @@
 #include "Programs/Trading/PokemonLA_SelfTouchTrade.h"
 
 #include "Programs/Farming/PokemonLA_IngoBattleGrinder.h"
+#include "Programs/Farming/PokemonLA_IngoMoveGrinder.h"
 #include "Programs/Farming/PokemonLA_MagikarpMoveGrinder.h"
 #include "Programs/Farming/PokemonLA_NuggetFarmerHighlands.h"
 #include "Programs/Farming/PokemonLA_TenacityCandyFarmer.h"
@@ -68,6 +69,9 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_divider("---- Farming ----");
     add_program<NuggetFarmerHighlands_Descriptor, NuggetFarmerHighlands>();
     add_program<IngoBattleGrinder_Descriptor, IngoBattleGrinder>();
+    if (GlobalSettings::instance().DEVELOPER_MODE){
+        add_program<IngoMoveGrinder_Descriptor, IngoMoveGrinder>();
+    }
     add_program<MagikarpMoveGrinder_Descriptor, MagikarpMoveGrinder>();
     add_program<TenacityCandyFarmer_Descriptor, TenacityCandyFarmer>();
     if (GlobalSettings::instance().DEVELOPER_MODE){
