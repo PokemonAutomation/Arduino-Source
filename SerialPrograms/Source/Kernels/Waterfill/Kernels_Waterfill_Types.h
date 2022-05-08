@@ -20,7 +20,8 @@ namespace Waterfill{
 
 class WaterfillIterator;
 
-
+// An object in the waterfill session.
+// Objects are represented as non-zero bits on the size of an image.
 class WaterfillObject{
 public:
     WaterfillObject(WaterfillObject&& x) = default;
@@ -55,6 +56,7 @@ public:
     double aspect_ratio() const{ return (double)width() / height(); }
     double area_ratio() const{ return (double)area / (width() * height()); }
 
+    // Note: `object` must be constructed before callling this function.
     std::unique_ptr<PackedBinaryMatrix_IB> packed_matrix() const{
         return object->submatrix(min_x, min_y, max_x - min_x, max_y - min_y);
     }

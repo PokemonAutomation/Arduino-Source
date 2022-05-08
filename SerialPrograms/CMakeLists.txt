@@ -493,6 +493,8 @@ file(GLOB MAIN_SOURCES
     Source/Kernels/AbsFFT/Kernels_AbsFFT_Reductions.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.h
     Source/Kernels/AbsFFT/Kernels_AbsFFT_TwiddleTable.tpp
+    Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.cpp
+    Source/Kernels/Algorithm/Kernels_Algorithm_DisjointSet.h
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.cpp
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic.h
     Source/Kernels/ImageFilters/Kernels_ImageFilter_Basic_Routines.h
@@ -873,6 +875,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.cpp
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h
+    Source/PokemonLA/Inference/PokemonLA_BerryTreeDetector.cpp
+    Source/PokemonLA/Inference/PokemonLA_BerryTreeDetector.h
     Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.cpp
     Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.h
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.cpp

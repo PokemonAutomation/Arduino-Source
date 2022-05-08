@@ -26,14 +26,16 @@ namespace PokemonAutomation{
 // files, read data from test file names or gold files and possibly more.
 // To reuse the code, we design the following helper functions.
 
-using ScreenDetectorFunction = std::function<int(const QImage& image, bool target)>;
+using ScreenBoolDetectorFunction = std::function<int(const QImage& image, bool target)>;
+
+using ScreenVoidDetectorFunction = std::function<void(const QImage& image)>;
 
 
-// Helper for testing screen detectors, which return true or false based on
+// Helper for testing screen bool detectors, which return true or false based on
 // screen content.
 // The target test result (whether this test file should be detected as true or false)
 // is stored as part of the filename. For example, IngoBattleDayTime-True.png.
-int screen_detector_helper(ScreenDetectorFunction test_func, const std::string& test_path){
+int screen_bool_detector_helper(ScreenBoolDetectorFunction test_func, const std::string& test_path){
     const QString file_path = QString::fromStdString(test_path);
     QImageReader reader(file_path);
     if (reader.canRead() == false){
@@ -67,10 +69,35 @@ int screen_detector_helper(ScreenDetectorFunction test_func, const std::string& 
     return test_func(image, target_bool);
 }
 
+
+// Helper for testing screen null detectors, which does not return anything based on
+// screen content.
+// This is used for developing visual inference code where the developer writes custom
+// debugging output. So no need to get target values from the test framework.
+int screen_void_detector_helper(ScreenVoidDetectorFunction test_func, const std::string& test_path){
+const QString file_path = QString::fromStdString(test_path);
+    QImageReader reader(file_path);
+    if (reader.canRead() == false){
+        cout << "Skip " << test_path << " as it cannot be read as image" << endl;
+        return -1;
+    }
+
+    cout << "Test file: " << test_path << endl;
+    const QImage image = reader.read();
+    test_func(image);
+
+    return 0;
+}
+
+
+
+
+
 const std::map<std::string, TestFunction> TEST_MAP = {
-    {"PokemonLA_BattleMenuDetector", std::bind(screen_detector_helper, test_pokemonLA_BattleMenuDetector, _1)},
-    {"PokemonLA_BattlePokemonSwitchDetector", std::bind(screen_detector_helper, test_pokemonLA_BattlePokemonSwitchDetector, _1)},
-    {"PokemonLA_DialogueEllipseDetector", std::bind(screen_detector_helper, test_pokemonLA_DialogueEllipseDetector, _1)}
+    {"PokemonLA_BattleMenuDetector", std::bind(screen_bool_detector_helper, test_pokemonLA_BattleMenuDetector, _1)},
+    {"PokemonLA_BattlePokemonSwitchDetector", std::bind(screen_bool_detector_helper, test_pokemonLA_BattlePokemonSwitchDetector, _1)},
+    {"PokemonLA_DialogueEllipseDetector", std::bind(screen_bool_detector_helper, test_pokemonLA_DialogueEllipseDetector, _1)},
+    {"PokemonLA_BerryTreeDetector", std::bind(screen_void_detector_helper, test_pokemonLA_BerryTreeDetector, _1)}
 };
 
 
