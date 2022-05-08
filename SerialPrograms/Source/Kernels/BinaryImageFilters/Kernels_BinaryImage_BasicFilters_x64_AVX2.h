@@ -47,7 +47,7 @@ public:
         count %= 8;
         if (count){
             PartialWordAccess32_x64_AVX2 loader(count);
-            __m256i pixel = loader.load(pixels);
+            __m256i pixel = loader.load_i32(pixels);
             uint64_t mask = ((uint64_t)1 << count) - 1;
             bits |= (convert8(pixel) & mask) << c;
         }
@@ -90,7 +90,7 @@ public:
         count %= 8;
         if (count){
             PartialWordAccess32_x64_AVX2 loader(count);
-            __m256i pixel = loader.load(pixels);
+            __m256i pixel = loader.load_i32(pixels);
             pixel = filter8(bits & 255, pixel);
             loader.store(pixels, pixel);
         }

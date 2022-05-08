@@ -14,7 +14,7 @@ namespace ScaleInvariantMatrixMatch{
 
 
 
-struct SumATA2_u2_Default{
+struct SumATA2_Default{
     using vtype = float;
 
     float sum_AT = 0;
@@ -29,14 +29,25 @@ struct SumATA2_u2_Default{
         float sum_at1 = 0;
         float sum_as0 = 0;
         float sum_as1 = 0;
-        for (size_t c = 0; c < length; c += 2){
-            float a0 = A[c + 0];
-            float a1 = A[c + 1];
-            sum_at0 += a0 * T[c + 0];
-            sum_at1 += a1 * T[c + 1];
+
+        size_t lc = length / 2;
+        while (lc--){
+            float a0 = A[0];
+            float a1 = A[1];
+            sum_at0 += a0 * T[0];
+            sum_at1 += a1 * T[1];
             sum_as0 += a0 * a0;
             sum_as1 += a1 * a1;
+            A += 2;
+            T += 2;
         }
+
+        if (length % 2){
+            float a0 = A[0];
+            sum_at0 += a0 * T[0];
+            sum_as0 += a0 * a0;
+        }
+
         sum_AT += sum_at0 + sum_at1;
         sum_A2 += sum_as0 + sum_as1;
     }
@@ -45,34 +56,46 @@ struct SumATA2_u2_Default{
         float sum_at1 = 0;
         float sum_as0 = 0;
         float sum_as1 = 0;
-        for (size_t c = 0; c < length; c += 2){
-            float a0 = A[c + 0];
-            float a1 = A[c + 1];
-            sum_at0 += a0 * TW2[c + 0];
-            sum_at1 += a1 * TW2[c + 1];
-            sum_as0 += a0 * a0 * W2[c + 0];
-            sum_as1 += a1 * a1 * W2[c + 1];
+
+        size_t lc = length / 2;
+        while (lc--){
+            float a0 = A[0];
+            float a1 = A[1];
+            sum_at0 += a0 * TW2[0];
+            sum_at1 += a1 * TW2[1];
+            sum_as0 += a0 * a0 * W2[0];
+            sum_as1 += a1 * a1 * W2[1];
+            A += 2;
+            TW2 += 2;
+            W2 += 2;
         }
+
+        if (length % 2){
+            float a0 = A[0];
+            sum_at0 += a0 * TW2[0];
+            sum_as0 += a0 * a0 * W2[0];
+        }
+
         sum_AT += sum_at0 + sum_at1;
         sum_A2 += sum_as0 + sum_as1;
     }
 };
 
 
-float compute_scale_u2_Default(
+float compute_scale_Default(
     size_t width, size_t height,
     float const* const* A,
     float const* const* T
 ){
-    return compute_scale<SumATA2_u2_Default>(width, height, A, T);
+    return compute_scale<SumATA2_Default>(width, height, A, T);
 }
-float compute_scale_u2_Default(
+float compute_scale_Default(
     size_t width, size_t height,
     float const* const* A,
     float const* const* TW2,
     float const* const* W2
 ){
-    return compute_scale<SumATA2_u2_Default>(width, height, A, TW2, W2);
+    return compute_scale<SumATA2_Default>(width, height, A, TW2, W2);
 }
 
 

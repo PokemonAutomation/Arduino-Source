@@ -41,7 +41,7 @@ public:
     }
     PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, size_t left){
         PartialWordAccess32_x64_AVX2 loader(left);
-        __m256i pixel = loader.load(in);
+        __m256i pixel = loader.load_i32(in);
         pixel = process_word(pixel);
         loader.store(out, pixel);
     }
@@ -113,7 +113,7 @@ public:
     }
     PA_FORCE_INLINE void process_partial(uint32_t* out, const uint32_t* in, size_t left){
         PartialWordAccess32_x64_AVX2 loader(left);
-        __m256i pixel = loader.load(in);
+        __m256i pixel = loader.load_i32(in);
         pixel = process_word(pixel);
         loader.store(out, pixel);
     }

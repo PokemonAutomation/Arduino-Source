@@ -87,8 +87,8 @@ PA_FORCE_INLINE void pixel_sum_sqr_x64_AVX2(
     if (width % 8){
         PartialWordAccess32_x64_AVX2 loader(width % 8);
 
-        __m256i p = loader.load(ptrI);
-        __m256i m = loader.load(ptrA);
+        __m256i p = loader.load_i32(ptrI);
+        __m256i m = loader.load_i32(ptrA);
 
         m = _mm256_srai_epi32(m, 31);
         p = _mm256_and_si256(p, m);

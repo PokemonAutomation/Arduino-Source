@@ -175,7 +175,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 
 
 
-    size_t length = 2048;
+    size_t length = 128;
 
     AlignedVector<float> A(length);
     AlignedVector<float> T(length);
@@ -186,16 +186,18 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
         W[c] = (float)rand() / RAND_MAX;
     }
 
+#if 1
     {
-        const float* ptrA = A.data();
-        const float* ptrT = T.data();
-        cout << Kernels::ScaleInvariantMatrixMatch::compute_scale(length, 1, &ptrA, &ptrT) << endl;
+        const float* ptrA = A.data() + 15;
+        const float* ptrT = T.data() + 15;
+        cout << Kernels::ScaleInvariantMatrixMatch::compute_scale(length - 15, 1, &ptrA, &ptrT) << endl;
     }
+#endif
     {
-        const float* ptrA = A.data();
-        const float* ptrT = T.data();
-        const float* ptrW = W.data();
-        cout << Kernels::ScaleInvariantMatrixMatch::compute_scale(length, 1, &ptrA, &ptrT, &ptrW) << endl;
+        const float* ptrA = A.data() + 3;
+        const float* ptrT = T.data() + 3;
+        const float* ptrW = W.data() + 3;
+        cout << Kernels::ScaleInvariantMatrixMatch::compute_scale(length - 3, 1, &ptrA, &ptrT, &ptrW) << endl;
     }
 #endif
 

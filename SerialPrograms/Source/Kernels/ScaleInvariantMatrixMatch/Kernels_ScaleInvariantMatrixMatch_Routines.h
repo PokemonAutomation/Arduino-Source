@@ -28,14 +28,8 @@ PA_FORCE_INLINE float compute_scale(
     for (size_t r = 0; r < height; r++){
         const float* ptrA = A[r];
         const float* ptrT = T[r];
-        size_t ptr_check = (size_t)ptrA | (size_t)ptrT;
-        if (ptr_check % ALIGNMENT){
-            if ((size_t)ptrA % ALIGNMENT){
-                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "A is misaligned.");
-            }
-            if ((size_t)ptrT % ALIGNMENT){
-                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "T is misaligned.");
-            }
+        if ((size_t)ptrA % ALIGNMENT != (size_t)ptrT % ALIGNMENT){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "A and T must have the same alignment.");
         }
         sum.accumulate(width, ptrA, ptrT);
     }
@@ -54,17 +48,8 @@ PA_FORCE_INLINE float compute_scale(
         const float* ptrA = A[r];
         const float* ptrT = TW2[r];
         const float* ptrW = W2[r];
-        size_t ptr_check = (size_t)ptrA | (size_t)ptrT | (size_t)ptrW;
-        if (ptr_check % ALIGNMENT){
-            if ((size_t)ptrA % ALIGNMENT){
-                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "A is misaligned.");
-            }
-            if ((size_t)ptrT % ALIGNMENT){
-                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "TW2 is misaligned.");
-            }
-            if ((size_t)ptrW % ALIGNMENT){
-                throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "W2 is misaligned.");
-            }
+        if ((size_t)ptrA % ALIGNMENT != (size_t)ptrT % ALIGNMENT || (size_t)ptrA % ALIGNMENT != (size_t)ptrW % ALIGNMENT){
+            throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "A, TW2, and W2 must have the same alignment.");
         }
         sum.accumulate(width, ptrA, ptrT, ptrW);
     }

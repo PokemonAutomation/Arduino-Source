@@ -7,6 +7,7 @@
 #ifndef PokemonAutomation_Kernels_PartialWordAccess_x64_AVX2_H
 #define PokemonAutomation_Kernels_PartialWordAccess_x64_AVX2_H
 
+#include <stdint.h>
 #include <cstddef>
 #include <immintrin.h>
 #include "Common/Compiler.h"
@@ -24,8 +25,11 @@ public:
         );
     }
 
-    PA_FORCE_INLINE __m256i load(const void* ptr){
+    PA_FORCE_INLINE __m256i load_i32(const void* ptr){
         return _mm256_maskload_epi32((const int*)ptr, m_mask);
+    }
+    PA_FORCE_INLINE __m256 load_f32(const void* ptr){
+        return _mm256_maskload_ps((const float*)ptr, m_mask);
     }
     PA_FORCE_INLINE void store(const void* ptr, __m256i x){
         _mm256_maskstore_epi32((int*)ptr, m_mask, x);

@@ -38,21 +38,29 @@ public:
         );
     }
 
-    PA_FORCE_INLINE __m128i load_no_read_past_end(const void* ptr) const{
+    PA_FORCE_INLINE __m128i load_i32_no_read_past_end(const void* ptr) const{
         __m128i x = _mm_loadu_si128((const __m128i*)((const char*)ptr - m_shift));
         return _mm_shuffle_epi8(x, m_shift_front);
     }
-    PA_FORCE_INLINE __m128i load_no_read_before_ptr(const void* ptr) const{
-        __m128i x = _mm_loadu_si128((const __m128i*)((const char*)ptr));
+    PA_FORCE_INLINE __m128i load_i32_no_read_before_ptr(const void* ptr) const{
+        __m128i x = _mm_loadu_si128((const __m128i*)ptr);
         return _mm_and_si128(x, m_front_mask);
+    }
+    PA_FORCE_INLINE __m128 load_f32_no_read_past_end(const void* ptr) const{
+        __m128i x = _mm_loadu_si128((const __m128i*)((const char*)ptr - m_shift));
+        return _mm_castsi128_ps(_mm_shuffle_epi8(x, m_shift_front));
+    }
+    PA_FORCE_INLINE __m128 load_f32_no_read_before_ptr(const void* ptr) const{
+        __m128i x = _mm_loadu_si128((const __m128i*)ptr);
+        return _mm_castsi128_ps(_mm_and_si128(x, m_front_mask));
     }
 
     PA_FORCE_INLINE __m128i load(const void* ptr) const{
         const void* end = (const char*)ptr + 16;
         if (((size_t)end & 4095) < 16){
-            return load_no_read_past_end(ptr);
+            return load_i32_no_read_past_end(ptr);
         }else{
-            return load_no_read_before_ptr(ptr);
+            return load_i32_no_read_before_ptr(ptr);
         }
     }
 
