@@ -56,7 +56,7 @@ public:
     double aspect_ratio() const{ return (double)width() / height(); }
     double area_ratio() const{ return (double)area / (width() * height()); }
 
-    // Note: `object` must be constructed before callling this function.
+    // Note: `object` must be constructed before calling this function.
     std::unique_ptr<PackedBinaryMatrix_IB> packed_matrix() const{
         return object->submatrix(min_x, min_y, max_x - min_x, max_y - min_y);
     }

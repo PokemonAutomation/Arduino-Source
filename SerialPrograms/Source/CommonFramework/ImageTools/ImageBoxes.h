@@ -56,7 +56,7 @@ struct ImagePixelBox{
 
     // Whether a point (x, y) is inside the box. Points on the border of the box does not
     // count as inside.
-    bool inside(size_t x, size_t y) const;
+    bool inside(pxint_t x, pxint_t y) const;
 
     // clip the box to be within the image size.
     void clip(size_t image_width, size_t image_height);

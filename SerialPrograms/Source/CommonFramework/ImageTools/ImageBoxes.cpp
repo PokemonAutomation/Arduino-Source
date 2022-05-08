@@ -71,7 +71,7 @@ size_t ImagePixelBox::overlap_with(const ImagePixelBox& box) const{
     return (size_t)(max_x - min_x) * (size_t)(max_y - min_y);
 }
 
-bool ImagePixelBox::inside(size_t x, size_t y) const{
+bool ImagePixelBox::inside(pxint_t x, pxint_t y) const{
     return x > min_x && x < max_x && y > min_y && y < max_y;
 }
 
@@ -275,15 +275,15 @@ void draw_box(QImage& image, const ImagePixelBox& pixel_box, uint32_t color, siz
             std::swap(start_y, end_y);
         }
         QColor qColor(c.r(), c.g(), c.b(), c.a());
-        for(pxint_t y = start_y; y <= end_y; ++y){
-            for(pxint_t x = start_x; x <= end_x; ++x){
+        for (pxint_t y = start_y; y <= end_y; ++y){
+            for (pxint_t x = start_x; x <= end_x; ++x){
                 image.setPixelColor(x, y, qColor);
             }
         }
     };
 
-    pxint_t lo = (thickness-1) / 2; // lower offset
-    pxint_t uo = thickness - lo - 1; // upper offset
+    pxint_t lo = ((pxint_t)thickness - 1) / 2; // lower offset
+    pxint_t uo = (pxint_t)thickness - lo - 1; // upper offset
     
     // draw the upper horizontal line
     draw_solid_rect(pixel_box.min_x-lo, pixel_box.min_y-lo, pixel_box.max_x+uo, pixel_box.min_y+uo);

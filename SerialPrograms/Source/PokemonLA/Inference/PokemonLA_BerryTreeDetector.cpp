@@ -5,6 +5,7 @@
  */
 
 #include <QImage>
+#include "Common/Compiler.h"
 #include "Common/Cpp/Color.h"
 #include "Common/Cpp/Time.h"
 #include "CommonFramework/ImageTools/BinaryImage_FilterRgb32.h"
@@ -34,10 +35,14 @@ namespace PokemonLA{
 
 
 void set_color_to_image(const WaterfillObject& obj, const QColor& color, QImage& image, size_t offset_x, size_t offset_y){
-    for(int x = 0; x < obj.width(); x++){
-        for(int y = 0; y < obj.height(); y++){
+    for (size_t x = 0; x < obj.width(); x++){
+        for (size_t y = 0; y < obj.height(); y++){
             if (obj.object->get(obj.min_x + x, obj.min_y + y)){
-                image.setPixelColor(offset_x + obj.min_x + x, offset_y + obj.min_y + y, color);
+                image.setPixelColor(
+                    (pxint_t)(offset_x + obj.min_x + x),
+                    (pxint_t)(offset_y + obj.min_y + y),
+                    color
+                );
                 // cout << "Set color at " << offset_x + object.min_x + obj.min_x + x << ", " << offset_y + object.min_y + obj.min_y + y << endl;
             }
         }
@@ -45,10 +50,14 @@ void set_color_to_image(const WaterfillObject& obj, const QColor& color, QImage&
 }
 
 void set_color_to_image(const PackedBinaryMatrix2& matrix, const QColor& color, QImage& image, size_t offset_x, size_t offset_y){
-    for(int x = 0; x < matrix.width(); x++){
-        for(int y = 0; y < matrix.height(); y++){
+    for (size_t x = 0; x < matrix.width(); x++){
+        for (size_t y = 0; y < matrix.height(); y++){
             if (matrix.get(x, y)){
-                image.setPixelColor(offset_x + x, offset_y + y, color);
+                image.setPixelColor(
+                    (pxint_t)(offset_x + x),
+                    (pxint_t)(offset_y + y),
+                    color
+                );
             }
         }
     }
@@ -173,10 +182,14 @@ bool detect_sphere(const Kernels::Waterfill::WaterfillObject& object, QImage* im
                 color = QColor(128, 128, 255);
             }
             // cout << "cut area " << obj.area << endl;
-            for(int x = 0; x < obj.width(); x++){
-                for(int y = 0; y < obj.height(); y++){
+            for (size_t x = 0; x < obj.width(); x++){
+                for (size_t y = 0; y < obj.height(); y++){
                     if (obj.object->get(obj.min_x + x, obj.min_y + y)){
-                        image->setPixelColor(object.min_x + offset_x + obj.min_x + x, offset_y + object.min_y + obj.min_y + y, color);
+                        image->setPixelColor(
+                            (pxint_t)(object.min_x + offset_x + obj.min_x + x),
+                            (pxint_t)(offset_y + object.min_y + obj.min_y + y),
+                            color
+                        );
                         // cout << "Set color at " << offset_x + object.min_x + obj.min_x + x << ", " << offset_y + object.min_y + obj.min_y + y << endl;
                     }
                 }
@@ -281,9 +294,12 @@ bool BerryTreeDetector::process_frame(const QImage& frame, WallClock timestamp){
 
     // item area is the lower left of the screen with the current selected item/pokemon.
     // We won't do any berry detection on that area as it's covered with item/pokemon sprites.
-    const int item_area_x = int(frame.width() * 0.78);
-    const int item_area_y = int(frame.height() * 0.752);
-    const ImagePixelBox character_area(int(frame.width() * 0.39), int(frame.height() * 0.77), int(frame.width() * 0.61), frame.height());
+    const size_t item_area_x = size_t(frame.width() * 0.78);
+    const size_t item_area_y = size_t(frame.height() * 0.752);
+    const ImagePixelBox character_area(
+        (pxint_t)(frame.width() * 0.39), (pxint_t)(frame.height() * 0.77),
+        (pxint_t)(frame.width() * 0.61), (pxint_t)frame.height()
+    );
 
     std::vector<ImagePixelBox> berry_candidate_areas;
     //  Iterate the objects for this matrix.
@@ -298,7 +314,7 @@ bool BerryTreeDetector::process_frame(const QImage& frame, WallClock timestamp){
             continue;
         }
         // Skip if it overlaps with the main character.
-        if (character_area.inside(object.center_x(), object.center_y())){
+        if (character_area.inside((pxint_t)object.center_x(), (pxint_t)object.center_y())){
             continue;
         }
         
@@ -306,13 +322,13 @@ bool BerryTreeDetector::process_frame(const QImage& frame, WallClock timestamp){
         size_t size = std::max(object.width(), object.height());
 
         // Increase the size to cover the full berry and surrounding area:
-        size_t radius = size;
+        pxint_t radius = (pxint_t)size;
 
         ImagePixelBox box;
-        box.min_x = object.center_x() - radius;
-        box.max_x = object.center_x() + radius;
-        box.min_y = object.center_y() - radius;
-        box.max_y = object.center_y() + radius;
+        box.min_x = (pxint_t)object.center_x() - radius;
+        box.max_x = (pxint_t)object.center_x() + radius;
+        box.min_y = (pxint_t)object.center_y() - radius;
+        box.max_y = (pxint_t)object.center_y() + radius;
         box.clip(debug_image.width(), debug_image.height());
 
         // std::cout << "core berry color " << to_str(box) << std::endl;
@@ -360,10 +376,10 @@ bool BerryTreeDetector::process_frame(const QImage& frame, WallClock timestamp){
         }
 
         ImagePixelBox box;
-        box.min_x = candidate_box.min_x + object.center_x() - object.width()/2;
-        box.max_x = candidate_box.min_x + object.center_x() + object.width()/2;
-        box.min_y = candidate_box.min_y + object.center_y() - object.height()/2;
-        box.max_y = candidate_box.min_y + object.center_y() + object.height()/2;
+        box.min_x = candidate_box.min_x + (pxint_t)(object.center_x() - object.width()/2);
+        box.max_x = candidate_box.min_x + (pxint_t)(object.center_x() + object.width()/2);
+        box.min_y = candidate_box.min_y + (pxint_t)(object.center_y() - object.height()/2);
+        box.max_y = candidate_box.min_y + (pxint_t)(object.center_y() + object.height()/2);
 
         std::cout << "full-color region #pixels: " << object.area << " at " << box.center_x() << " " << box.center_y() << std::endl;
 
@@ -378,10 +394,10 @@ bool BerryTreeDetector::process_frame(const QImage& frame, WallClock timestamp){
         size_t enlarged_width = berry_box.width() + berry_box.width() / 2;
         size_t enlarged_height = berry_box.height() + berry_box.height() / 2;
         size_t enlarged_box_size = enlarged_width * enlarged_height;
-        enlarged_box.min_x = berry_box.center_x() - enlarged_width/2;
-        enlarged_box.max_x = berry_box.center_x() + enlarged_width/2;
-        enlarged_box.min_y = berry_box.center_y() - enlarged_height/2;
-        enlarged_box.max_y = berry_box.center_y() + enlarged_height/2;
+        enlarged_box.min_x = berry_box.center_x() - (pxint_t)enlarged_width/2;
+        enlarged_box.max_x = berry_box.center_x() + (pxint_t)enlarged_width/2;
+        enlarged_box.min_y = berry_box.center_y() - (pxint_t)enlarged_height/2;
+        enlarged_box.max_y = berry_box.center_y() + (pxint_t)enlarged_height/2;
 
         size_t potential_leaf_area = enlarged_box_size - berry_box.width() * berry_box.height();
 

@@ -41,9 +41,9 @@ public:
     }
 
     uint8_t a() const { return (uint8_t)(m_argb >> 24); }
-    uint8_t r() const { return (m_argb & 0x00ff0000) >> 16; }
-    uint8_t g() const { return (m_argb & 0x0000ff00) >> 8; }
-    uint8_t b() const { return (m_argb & 0x000000ff); }
+    uint8_t r() const { return (uint8_t)(m_argb >> 16); }
+    uint8_t g() const { return (uint8_t)(m_argb >>  8); }
+    uint8_t b() const { return (uint8_t)(m_argb >>  0); }
 
 private:
     uint32_t m_argb;
