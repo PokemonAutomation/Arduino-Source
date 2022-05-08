@@ -13,7 +13,7 @@
 #include "PokemonLA/Programs/PokemonLA_MountChange.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/ShinyHunting/PokemonLA_BurmyFinder.h"
-#include "PokemonLA/Programs/PokemonLA_TreeActions.h"
+#include "PokemonLA/Programs/PokemonLA_LeapPokemonActions.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -107,7 +107,7 @@ std::unique_ptr<StatsTracker> BurmyFinder::make_stats() const{
 void BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
-    bool battle_found = check_tree_for_battle(env.console, context);
+    bool battle_found = check_tree_or_ore_for_battle(env.console, context);
 
     context.wait_for_all_requests();
 

@@ -157,7 +157,7 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     env.console.log("End of route and shiny detection...");
 
-    bool battle_found = check_tree_for_battle(env.console, context);
+    bool battle_found = check_tree_or_ore_for_battle(env.console, context);
 
     context.wait_for_all_requests();
 
