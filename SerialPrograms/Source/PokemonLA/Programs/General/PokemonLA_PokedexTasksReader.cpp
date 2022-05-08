@@ -41,7 +41,7 @@ public:
     std::array<int, 9> read_tasks(const QImage& screen) const
     {
         std::array<int, 9> tasks{};
-        for (int i = 0; i < m_tasksBox.size(); ++i)
+        for (size_t i = 0; i < m_tasksBox.size(); ++i)
         {
             QImage image = extract_box_copy(screen, m_tasksBox[i]);
             to_blackwhite_rgb32_range(image, 0xff808080, 0xffffffff, false);
@@ -58,9 +58,9 @@ private:
 PokedexTasksReader_Descriptor::PokedexTasksReader_Descriptor()
     : RunnableSwitchProgramDescriptor(
         "PokemonLA:PokedexTasksReader",
-        STRING_POKEMON + " LA", "Pokedex Tasks Reader",
+        STRING_POKEMON + " LA", STRING_POKEDEX + " Tasks Reader",
         "ComputerControl/blob/master/Wiki/Programs/PokemonLA/PokedexTasksReader.md",
-        "Read all the tasks in your pokedex and output a json with the tasks you did.",
+        "Read all the tasks in your " + STRING_POKEDEX + " and output a json with the tasks you did.",
         FeedbackType::REQUIRED, false,
         PABotBaseLevel::PABOTBASE_12KB
     )

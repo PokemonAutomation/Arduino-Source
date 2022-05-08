@@ -6,6 +6,7 @@
 #include <fstream>
 #include <QString>
 #include "Common/Cpp/Exceptions.h"
+#include "Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
 #include "SpectrogramMatcher.h"
@@ -233,6 +234,7 @@ bool SpectrogramMatcher::updateToNewSpectrums(const std::vector<AudioSpectrum>& 
 }
 
 std::pair<float, float> SpectrogramMatcher::matchSubTemplate(size_t subIndex) const {
+#if 1
     auto iter = m_spectrums.begin();
     auto iter2 = m_spectrumNormSqrs.begin();
     float streamSumSqr = 0.0f;
@@ -250,11 +252,31 @@ std::pair<float, float> SpectrogramMatcher::matchSubTemplate(size_t subIndex) co
         }
     }
     const float scale = (streamSumSqr < 1e-6f ? 1.0f : sumMulti / streamSumSqr);
+#else
+    //  Not ready yet.
+    auto iter = m_spectrums.begin();
+    const size_t templateStart = m_templateRange[subIndex].first;
+    const size_t templateEnd = m_templateRange[subIndex].second;
+    size_t windows = templateEnd - templateStart;
+    size_t freqs = m_freqEnd - m_freqStart;
+    std::vector<const float*> matrixA(windows);
+    std::vector<const float*> matrixT(windows);
+    for (size_t i = templateStart; i < templateEnd; i++, iter++){
+        matrixA[i] = m_freqStart + m_template.getWindow(templateEnd - 1 - i);
+        matrixT[i] = m_freqStart + iter->magnitudes->data();
+    }
+    const float scale = Kernels::ScaleInvariantMatrixMatch::compute_scale(
+        freqs, windows,
+        matrixA.data(), matrixT.data()
+    );
+
+#endif
+
+
 
     iter = m_spectrums.begin();
-    iter2 = m_spectrumNormSqrs.begin();
     float sum = 0.0f;
-    for(size_t i = templateStart; i < templateEnd; i++, iter++, iter2++){
+    for(size_t i = templateStart; i < templateEnd; i++, iter++){
         // match in order from latest window to oldest
         const float* templateData = m_template.getWindow(templateEnd-1-i);
         const float* streamData = iter->magnitudes->data();
