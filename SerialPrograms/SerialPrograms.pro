@@ -260,6 +260,11 @@ SOURCES += \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x4_Default.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x64_x64_AVX512.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x8_x64_SSE42.cpp \
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.cpp \
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Core_Default.cpp \
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Core_x86_SSE.cpp \
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Core_x86_AVX2.cpp \
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Core_x86_AVX512.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x16_x64_AVX2.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x32_x64_AVX512.cpp \
@@ -458,12 +463,13 @@ SOURCES += \
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.cpp \
     Source/PokemonLA/Programs/Farming/PokemonLA_LeapGrinder.cpp \
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.cpp \
+    Source/PokemonLA/Programs/General/PokemonLA_PokedexTasksReader.cpp \
     Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.cpp \
     Source/PokemonLA/Programs/PokemonLA_BattleRoutines.cpp \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.cpp \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.cpp \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp \
-	Source/PokemonLA/Programs/PokemonLA_TreeActions.cpp \
+    Source/PokemonLA/Programs/PokemonLA_TreeActions.cpp \
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.cpp \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.cpp \
     Source/PokemonLA/Programs/PokemonLA_MountChange.cpp \
@@ -927,6 +933,8 @@ HEADERS += \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h \
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h \
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Routines.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x16_x64_AVX2.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x32_x64_AVX512.h \
@@ -1146,12 +1154,13 @@ HEADERS += \
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.h \
     Source/PokemonLA/Programs/Farming/PokemonLA_LeapGrinder.h \
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.h \
+    Source/PokemonLA/Programs/General/PokemonLA_PokedexTasksReader.h \
     Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.h \
     Source/PokemonLA/Programs/PokemonLA_BattleRoutines.h \
     Source/PokemonLA/Programs/PokemonLA_BraviaryHeightGlitch.h \
     Source/PokemonLA/Programs/PokemonLA_DistortionWaiter.h \
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.h \
-	Source/PokemonLA/Programs/PokemonLA_TreeActions.h \
+    Source/PokemonLA/Programs/PokemonLA_TreeActions.h \
     Source/PokemonLA/Programs/PokemonLA_FlagNavigationAir.h \
     Source/PokemonLA/Programs/PokemonLA_GameEntry.h \
     Source/PokemonLA/Programs/PokemonLA_MountChange.h \
