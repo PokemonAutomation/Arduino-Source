@@ -13,7 +13,7 @@
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "PokemonLA/Inference/PokemonLA_UnderAttackDetector.h"
 #include "CommonFramework/Options/SimpleIntegerOption.h"
-#include "PokemonLA/Programs/PokemonLA_TreeActions.h"
+#include "PokemonLA/Programs/PokemonLA_LeapPokemonActions.h"
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 #include "Pokemon/Options/Pokemon_NameSelectOption.h"
 

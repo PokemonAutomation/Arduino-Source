@@ -926,8 +926,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.cpp
     Source/PokemonLA/Programs/PokemonLA_EscapeFromAttack.h
-    Source/PokemonLA/Programs/PokemonLA_TreeActions.cpp
-    Source/PokemonLA/Programs/PokemonLA_TreeActions.h
+    Source/PokemonLA/Programs/PokemonLA_LeapPokemonActions.cpp
+    Source/PokemonLA/Programs/PokemonLA_LeapPokemonActions.h
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.cpp
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.h
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfTouchTrade.cpp
