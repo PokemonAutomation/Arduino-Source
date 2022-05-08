@@ -28,10 +28,10 @@ struct SumATA2_u8_x86_SSE{
     }
 
     PA_FORCE_INLINE void accumulate(size_t length, const float* A, const float* T){
-        __m128 sum_at0 = _mm_setzero_ps();
-        __m128 sum_at1 = _mm_setzero_ps();
         __m128 sum_as0 = _mm_setzero_ps();
         __m128 sum_as1 = _mm_setzero_ps();
+        __m128 sum_at0 = _mm_setzero_ps();
+        __m128 sum_at1 = _mm_setzero_ps();
 
         size_t align = (size_t)T % 16;
         if (align){
@@ -41,8 +41,8 @@ struct SumATA2_u8_x86_SSE{
 
             __m128 a0 = access.load_f32_no_read_before_ptr(A);
             __m128 t0 = access.load_f32_no_read_before_ptr(T);
-            sum_at0 = _mm_add_ps(sum_at0, _mm_mul_ps(a0, t0));
             sum_as0 = _mm_add_ps(sum_as0, _mm_mul_ps(a0, a0));
+            sum_at0 = _mm_add_ps(sum_at0, _mm_mul_ps(a0, t0));
 
             A += 4 - align;
             T += 4 - align;
@@ -56,10 +56,10 @@ struct SumATA2_u8_x86_SSE{
         do{
             __m128 a0 = ptrA[0];
             __m128 a1 = ptrA[1];
-            sum_at0 = _mm_add_ps(sum_at0, _mm_mul_ps(a0, ptrT[0]));
-            sum_at1 = _mm_add_ps(sum_at1, _mm_mul_ps(a1, ptrT[1]));
             sum_as0 = _mm_add_ps(sum_as0, _mm_mul_ps(a0, a0));
             sum_as1 = _mm_add_ps(sum_as1, _mm_mul_ps(a1, a1));
+            sum_at0 = _mm_add_ps(sum_at0, _mm_mul_ps(a0, ptrT[0]));
+            sum_at1 = _mm_add_ps(sum_at1, _mm_mul_ps(a1, ptrT[1]));
             ptrA += 2;
             ptrT += 2;
         }while (--lc);
@@ -67,8 +67,8 @@ struct SumATA2_u8_x86_SSE{
         length %= 8;
         if (length >= 4){
             __m128 a0 = ptrA[0];
-            sum_at0 = _mm_add_ps(sum_at0, _mm_mul_ps(a0, ptrT[0]));
             sum_as0 = _mm_add_ps(sum_as0, _mm_mul_ps(a0, a0));
+            sum_at0 = _mm_add_ps(sum_at0, _mm_mul_ps(a0, ptrT[0]));
             ptrA += 1;
             ptrT += 1;
             length -= 4;
@@ -77,54 +77,54 @@ struct SumATA2_u8_x86_SSE{
             PartialWordAccess_x64_SSE41 access(length * 4);
             __m128 a0 = access.load_f32_no_read_past_end(ptrA);
             __m128 t0 = access.load_f32_no_read_past_end(ptrT);
-            sum_at0 = _mm_add_ps(sum_at0, _mm_mul_ps(a0, t0));
             sum_as0 = _mm_add_ps(sum_as0, _mm_mul_ps(a0, a0));
+            sum_at0 = _mm_add_ps(sum_at0, _mm_mul_ps(a0, t0));
         }
 
-        sum_at0 = _mm_add_ps(sum_at0, sum_at1);
         sum_as0 = _mm_add_ps(sum_as0, sum_as1);
-        sum_AT = _mm_add_ps(sum_AT, sum_at0);
+        sum_at0 = _mm_add_ps(sum_at0, sum_at1);
         sum_A2 = _mm_add_ps(sum_A2, sum_as0);
+        sum_AT = _mm_add_ps(sum_AT, sum_at0);
     }
-    PA_FORCE_INLINE void accumulate(size_t length, const float* A, const float* TW2, const float* W2){
-        __m128 sum_at0 = _mm_setzero_ps();
-        __m128 sum_at1 = _mm_setzero_ps();
+    PA_FORCE_INLINE void accumulate(size_t length, const float* A, const float* TW, const float* W){
         __m128 sum_as0 = _mm_setzero_ps();
         __m128 sum_as1 = _mm_setzero_ps();
+        __m128 sum_at0 = _mm_setzero_ps();
+        __m128 sum_at1 = _mm_setzero_ps();
 
-        size_t align = (size_t)TW2 % 16;
+        size_t align = (size_t)TW % 16;
         if (align){
             align /= sizeof(float);
 
             PartialWordAccess_x64_SSE41 access(16 - align * 4);
 
             __m128 a0 = access.load_f32_no_read_before_ptr(A);
-            __m128 t0 = access.load_f32_no_read_before_ptr(TW2);
-            __m128 w0 = access.load_f32_no_read_before_ptr(W2);
+            __m128 t0 = access.load_f32_no_read_before_ptr(TW);
+            __m128 w0 = access.load_f32_no_read_before_ptr(W);
+            a0 = _mm_mul_ps(a0, w0);
+            sum_as0 = _mm_add_ps(sum_as0, _mm_mul_ps(a0, a0));
             sum_at0 = _mm_add_ps(sum_at0, _mm_mul_ps(a0, t0));
-            a0 = _mm_mul_ps(a0, a0);
-            sum_as0 = _mm_add_ps(sum_as0, _mm_mul_ps(a0, w0));
 
             A += 4 - align;
-            TW2 += 4 - align;
-            W2 += 4 - align;
+            TW += 4 - align;
+            W += 4 - align;
             length -= 4 - align;
         }
 
         const __m128* ptrA = (const __m128*)A;
-        const __m128* ptrT = (const __m128*)TW2;
-        const __m128* ptrW = (const __m128*)W2;
+        const __m128* ptrT = (const __m128*)TW;
+        const __m128* ptrW = (const __m128*)W;
 
         size_t lc = length / 8;
         do{
             __m128 a0 = ptrA[0];
             __m128 a1 = ptrA[1];
+            a0 = _mm_mul_ps(a0, ptrW[0]);
+            a1 = _mm_mul_ps(a1, ptrW[1]);
+            sum_as0 = _mm_add_ps(sum_as0, _mm_mul_ps(a0, a0));
+            sum_as1 = _mm_add_ps(sum_as1, _mm_mul_ps(a1, a1));
             sum_at0 = _mm_add_ps(sum_at0, _mm_mul_ps(a0, ptrT[0]));
             sum_at1 = _mm_add_ps(sum_at1, _mm_mul_ps(a1, ptrT[1]));
-            a0 = _mm_mul_ps(a0, a0);
-            a1 = _mm_mul_ps(a1, a1);
-            sum_as0 = _mm_add_ps(sum_as0, _mm_mul_ps(a0, ptrW[0]));
-            sum_as1 = _mm_add_ps(sum_as1, _mm_mul_ps(a1, ptrW[1]));
             ptrA += 2;
             ptrT += 2;
             ptrW += 2;
@@ -133,9 +133,9 @@ struct SumATA2_u8_x86_SSE{
         length %= 8;
         if (length >= 4){
             __m128 a0 = ptrA[0];
+            a0 = _mm_mul_ps(a0, ptrW[0]);
+            sum_as0 = _mm_add_ps(sum_as0, _mm_mul_ps(a0, a0));
             sum_at0 = _mm_add_ps(sum_at0, _mm_mul_ps(a0, ptrT[0]));
-            a0 = _mm_mul_ps(a0, a0);
-            sum_as0 = _mm_add_ps(sum_as0, _mm_mul_ps(a0, ptrW[0]));
             ptrA += 1;
             ptrT += 1;
             ptrW += 1;
@@ -146,15 +146,15 @@ struct SumATA2_u8_x86_SSE{
             __m128 a0 = access.load_f32_no_read_past_end(ptrA);
             __m128 t0 = access.load_f32_no_read_past_end(ptrT);
             __m128 w0 = access.load_f32_no_read_past_end(ptrW);
+            a0 = _mm_mul_ps(a0, w0);
+            sum_as0 = _mm_add_ps(sum_as0, _mm_mul_ps(a0, a0));
             sum_at0 = _mm_add_ps(sum_at0, _mm_mul_ps(a0, t0));
-            a0 = _mm_mul_ps(a0, a0);
-            sum_as0 = _mm_add_ps(sum_as0, _mm_mul_ps(a0, w0));
         }
 
-        sum_at0 = _mm_add_ps(sum_at0, sum_at1);
         sum_as0 = _mm_add_ps(sum_as0, sum_as1);
-        sum_AT = _mm_add_ps(sum_AT, sum_at0);
+        sum_at0 = _mm_add_ps(sum_at0, sum_at1);
         sum_A2 = _mm_add_ps(sum_A2, sum_as0);
+        sum_AT = _mm_add_ps(sum_AT, sum_at0);
     }
 };
 

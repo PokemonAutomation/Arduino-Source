@@ -157,7 +157,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace Pokemon;
 
 
-#if 0
+#if 1
     __m128 v0 = _mm_setr_ps(10, 11, 12, 13);
     __m128 v1 = _mm_setr_ps(20, 21, 22, 23);
 

@@ -26,8 +26,8 @@ float compute_scale(
 float compute_scale(
     size_t width, size_t height,
     float const* const* A,
-    float const* const* TW2,    //  Precomputed T * W^2
-    float const* const* W2      //  Precomputed W^2
+    float const* const* TW, //  Precomputed T * W
+    float const* const* W
 );
 
 

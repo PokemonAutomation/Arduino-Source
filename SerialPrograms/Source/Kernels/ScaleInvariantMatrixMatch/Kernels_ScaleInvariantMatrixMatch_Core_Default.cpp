@@ -25,33 +25,33 @@ struct SumATA2_Default{
     }
 
     PA_FORCE_INLINE void accumulate(size_t length, const float* A, const float* T){
-        float sum_at0 = 0;
-        float sum_at1 = 0;
         float sum_as0 = 0;
         float sum_as1 = 0;
+        float sum_at0 = 0;
+        float sum_at1 = 0;
 
         size_t lc = length / 2;
         while (lc--){
             float a0 = A[0];
             float a1 = A[1];
-            sum_at0 += a0 * T[0];
-            sum_at1 += a1 * T[1];
             sum_as0 += a0 * a0;
             sum_as1 += a1 * a1;
+            sum_at0 += a0 * T[0];
+            sum_at1 += a1 * T[1];
             A += 2;
             T += 2;
         }
 
         if (length % 2){
             float a0 = A[0];
-            sum_at0 += a0 * T[0];
             sum_as0 += a0 * a0;
+            sum_at0 += a0 * T[0];
         }
 
-        sum_AT += sum_at0 + sum_at1;
         sum_A2 += sum_as0 + sum_as1;
+        sum_AT += sum_at0 + sum_at1;
     }
-    PA_FORCE_INLINE void accumulate(size_t length, const float* A, const float* TW2, const float* W2){
+    PA_FORCE_INLINE void accumulate(size_t length, const float* A, const float* TW, const float* W){
         float sum_at0 = 0;
         float sum_at1 = 0;
         float sum_as0 = 0;
@@ -59,25 +59,25 @@ struct SumATA2_Default{
 
         size_t lc = length / 2;
         while (lc--){
-            float a0 = A[0];
-            float a1 = A[1];
-            sum_at0 += a0 * TW2[0];
-            sum_at1 += a1 * TW2[1];
-            sum_as0 += a0 * a0 * W2[0];
-            sum_as1 += a1 * a1 * W2[1];
+            float a0 = A[0] * W[0];
+            float a1 = A[1] * W[1];
+            sum_as0 += a0 * a0;
+            sum_as1 += a1 * a1;
+            sum_at0 += a0 * TW[0];
+            sum_at1 += a1 * TW[1];
             A += 2;
-            TW2 += 2;
-            W2 += 2;
+            TW += 2;
+            W += 2;
         }
 
         if (length % 2){
-            float a0 = A[0];
-            sum_at0 += a0 * TW2[0];
-            sum_as0 += a0 * a0 * W2[0];
+            float a0 = A[0] * W[0];
+            sum_as0 += a0 * a0;
+            sum_at0 += a0 * TW[0];
         }
 
-        sum_AT += sum_at0 + sum_at1;
         sum_A2 += sum_as0 + sum_as1;
+        sum_AT += sum_at0 + sum_at1;
     }
 };
 
