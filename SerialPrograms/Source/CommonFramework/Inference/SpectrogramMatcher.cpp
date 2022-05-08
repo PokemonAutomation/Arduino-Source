@@ -11,6 +11,9 @@
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
 #include "SpectrogramMatcher.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
 
 namespace PokemonAutomation{
 
@@ -80,7 +83,7 @@ SpectrogramMatcher::SpectrogramMatcher(
     {
         // Do convolution on audio template
         const size_t numConvedFrequencies = (m_originalFreqEnd - m_originalFreqStart) - m_convKernel.size() + 1;
-        std::vector<float> temporaryBuffer(numConvedFrequencies * numTemplateWindows);
+        AlignedVector<float> temporaryBuffer(numConvedFrequencies * numTemplateWindows);
         for(size_t i = 0; i < numTemplateWindows; i++){
             conv(m_template.getWindow(i) + m_originalFreqStart, m_originalFreqEnd - m_originalFreqStart,
                 temporaryBuffer.data() + i * numConvedFrequencies);
@@ -95,7 +98,7 @@ SpectrogramMatcher::SpectrogramMatcher(
     {
         // Avereage every 5 frequencies
         const size_t numNewFreq = (m_originalFreqEnd - m_originalFreqStart) / 5;
-        std::vector<float> temporaryBuffer(numNewFreq * numTemplateWindows);
+        AlignedVector<float> temporaryBuffer(numNewFreq * numTemplateWindows);
         for(size_t i = 0; i < numTemplateWindows; i++){
             for(size_t j = 0; j < numNewFreq; j++){
                 const float * rawFreqMag = m_template.getWindow(i) + m_originalFreqStart + j*5;
@@ -234,7 +237,7 @@ bool SpectrogramMatcher::updateToNewSpectrums(const std::vector<AudioSpectrum>& 
 }
 
 std::pair<float, float> SpectrogramMatcher::matchSubTemplate(size_t subIndex) const {
-#if 1
+#if 0
     auto iter = m_spectrums.begin();
     auto iter2 = m_spectrumNormSqrs.begin();
     float streamSumSqr = 0.0f;
@@ -262,6 +265,8 @@ std::pair<float, float> SpectrogramMatcher::matchSubTemplate(size_t subIndex) co
     std::vector<const float*> matrixA(windows);
     std::vector<const float*> matrixT(windows);
     for (size_t i = templateStart; i < templateEnd; i++, iter++){
+        cout << "Template: " << ((size_t)m_template.getWindow(templateEnd - 1 - i) % 64) << endl;
+        cout << "Samples:  " << ((size_t)iter->magnitudes->data() % 64) << endl;
         matrixA[i] = m_freqStart + m_template.getWindow(templateEnd - 1 - i);
         matrixT[i] = m_freqStart + iter->magnitudes->data();
     }

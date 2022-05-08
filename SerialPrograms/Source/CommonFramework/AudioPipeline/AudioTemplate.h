@@ -10,6 +10,7 @@
 #include <cstddef>
 #include <vector>
 #include <QString>
+#include "Common/Cpp/AlignedVector.h"
 
 namespace PokemonAutomation{
 
@@ -18,12 +19,13 @@ namespace PokemonAutomation{
 // match sounds from an audio stream.
 class AudioTemplate{
 public:
-    AudioTemplate() {}
-    AudioTemplate(std::vector<float>&& spectrogram, size_t numWindows);
+    ~AudioTemplate();
+    AudioTemplate();
+    AudioTemplate(AlignedVector<float>&& spectrogram, size_t numWindows);
     
     size_t numWindows() const { return m_numWindows; }
     size_t numFrequencies() const { return m_numFrequencies; }
-    const std::vector<float>& spectrogram() const { return m_spectrogram; }
+    const AlignedVector<float>& spectrogram() const { return m_spectrogram; }
 
     const float* getWindow(size_t windowIndex) const { return m_spectrogram.data() + windowIndex * m_numFrequencies; }
 
@@ -32,7 +34,7 @@ public:
 private:
     size_t m_numWindows = 0;
     size_t m_numFrequencies = 0;
-    std::vector<float> m_spectrogram;
+    AlignedVector<float> m_spectrogram;
 };
 
 // Load AudioTemplate from disk. Accept .wav format on any OS.
