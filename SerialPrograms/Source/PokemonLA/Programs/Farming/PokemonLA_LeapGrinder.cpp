@@ -97,31 +97,35 @@ LeapGrinder::LeapGrinder(const LeapGrinder_Descriptor& descriptor)
 }
 
 
-class LeapGrinder::Stats : public StatsTracker, public ShinyStatIncrementer{
+class LeapGrinder::Stats : public StatsTracker{
 public:
     Stats()
         : attempts(m_stats["Attempts"])
         , errors(m_stats["Errors"])
         , leaps(m_stats["Leaps"])
-        , shinies(m_stats["Shinies"])
-        , alphas(m_stats["Alphas"])
+        , found(m_stats["Found"])
+        , enroute_shinies(m_stats["Enroute Shinies"])
+        , leap_alphas(m_stats["Leap Alphas"])
+        , leap_shinies(m_stats["Leap Shinies"])
     {
         m_display_order.emplace_back("Attempts");
         m_display_order.emplace_back("Errors", true);
-        m_display_order.emplace_back("Leaps", true);
-        m_display_order.emplace_back("Shinies", true);
-        m_display_order.emplace_back("Alphas", true);
-    }
-
-    virtual void add_shiny() override{
-        shinies++;
+        m_display_order.emplace_back("Leaps");
+        m_display_order.emplace_back("Found");
+        m_display_order.emplace_back("Enroute Shinies");
+        m_display_order.emplace_back("Leap Alphas");
+        m_display_order.emplace_back("Leap Shinies");
+        m_aliases["Shinies"] = "Enroute Shinies";
+        m_aliases["Alphas"] = "Leap Alphas";
     }
 
     std::atomic<uint64_t>& attempts;
     std::atomic<uint64_t>& errors;
     std::atomic<uint64_t>& leaps;
-    std::atomic<uint64_t>& shinies;
-    std::atomic<uint64_t>& alphas;
+    std::atomic<uint64_t>& found;
+    std::atomic<uint64_t>& enroute_shinies;
+    std::atomic<uint64_t>& leap_alphas;
+    std::atomic<uint64_t>& leap_shinies;
 };
 
 std::unique_ptr<StatsTracker> LeapGrinder::make_stats() const{
@@ -138,7 +142,7 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     float shiny_coefficient = 1.0;
     ShinySoundDetector shiny_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
         //  Warning: This callback will be run from a different thread than this function.
-        stats.shinies++;
+        stats.enroute_shinies++;
         shiny_coefficient = error_coefficient;
         return on_shiny_callback(env, env.console, SHINY_DETECTED_ENROUTE, error_coefficient);
     });
@@ -163,6 +167,7 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
     if (battle_found){
         env.console.log("Pokemon leaped!");
+        stats.leaps++;
 
         PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
 
@@ -174,12 +179,28 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
         if (pokemon.name == QString::fromStdString(POKEMON.slug())){
             env.console.log("Expected Pokemon leaped!");
-            stats.leaps++;
+            stats.found++;
         }else{
             env.console.log("Not the expected pokemon.");
         }
 
-        //Match validation
+        //  Match validation
+
+        if (pokemon.is_alpha && pokemon.is_shiny){
+            env.console.log("Found Shiny Alpha!");
+            stats.leap_shinies++;
+            stats.leap_alphas++;
+        }else if (pokemon.is_alpha){
+            env.console.log("Found Alpha!");
+            stats.leap_alphas++;
+        }else if (pokemon.is_shiny){
+            env.console.log("Found Shiny!");
+            stats.leap_shinies++;
+        }else{
+            env.console.log("Normie in the tree -_-");
+        }
+        env.update_stats();
+
         bool is_match = false;
         switch (STOP_ON){
         case 0: //  Shiny
