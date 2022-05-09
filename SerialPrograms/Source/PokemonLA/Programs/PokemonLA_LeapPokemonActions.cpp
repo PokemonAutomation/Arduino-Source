@@ -240,7 +240,7 @@ PokemonDetails get_pokemon_details(ConsoleHandle& console, BotBaseContext& conte
     detector.process_frame(infoScreen, std::chrono::system_clock::now());
     detector.get_pokemon_name(console, infoScreen, language);
 
-    return detector.details();;
+    return detector.details();
 }
 
 

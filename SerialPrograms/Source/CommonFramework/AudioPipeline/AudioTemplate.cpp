@@ -21,14 +21,16 @@ namespace PokemonAutomation{
 
 AudioTemplate::~AudioTemplate(){}
 AudioTemplate::AudioTemplate(){}
+AudioTemplate::AudioTemplate(size_t frequencies, size_t windows)
+    : m_numWindows(windows)
+    , m_numFrequencies(frequencies)
+    , m_spectrogram(windows * frequencies)
+{}
 AudioTemplate::AudioTemplate(AlignedVector<float>&& spectrogram, size_t numWindows)
     : m_numWindows(numWindows)
     , m_numFrequencies(spectrogram.size()/numWindows)
     , m_spectrogram(std::move(spectrogram))
-{
-    cout << "numWindows = " << numWindows << endl;
-    cout << "m_numFrequencies = " << m_numFrequencies << endl;  //  REMOVE
-}
+{}
 
 
 AudioTemplate loadAudioTemplate(const QString& filename, size_t sampleRate){
@@ -54,37 +56,35 @@ AudioTemplate loadAudioTemplate(const QString& filename, size_t sampleRate){
     AlignedVector<float> output_buffer(numFrequencies);
 
     size_t numWindows = 0;
-    AlignedVector<float> spectrogram;
-
-    cout << "numSamples = " << numSamples << endl;  //  REMOVE
+    AudioTemplate audio_template;
 
     // If sample count < FFT input requirement, we pad zeros in the end to do one FFT.
     // Otherwise, we don't pad zeros and compute FFT as much as possible using fixed
     // window step.
     if (numSamples < NUM_FFT_SAMPLES){
         numWindows = 1;
-        spectrogram = AlignedVector<float>(numFrequencies);
+        audio_template = AudioTemplate(numFrequencies, 1);
 
         memset(input_buffer.data(), 0, sizeof(float) * NUM_FFT_SAMPLES);
         memcpy(input_buffer.data(), data, sizeof(float) * numSamples);
         Kernels::AbsFFT::fft_abs(FFT_LENGTH_POWER_OF_TWO, output_buffer.data(), input_buffer.data());
-        memcpy(spectrogram.data(), output_buffer.data(), sizeof(float) * numFrequencies);
+        memcpy(audio_template.getWindow(0), output_buffer.data(), sizeof(float) * numFrequencies);
     }else{
         numWindows = (numSamples - NUM_FFT_SAMPLES) / FFT_SLIDING_WINDOW_STEP + 1;
-        spectrogram = AlignedVector<float>(numWindows * numFrequencies);
+        audio_template = AudioTemplate(numFrequencies, numWindows);
 
         for (size_t i = 0, start = 0; start+NUM_FFT_SAMPLES <= numSamples; i++, start += FFT_SLIDING_WINDOW_STEP){
             assert(i < numWindows);
             memcpy(input_buffer.data(), data + start, sizeof(float) * NUM_FFT_SAMPLES);
             Kernels::AbsFFT::fft_abs(FFT_LENGTH_POWER_OF_TWO, output_buffer.data(), input_buffer.data());
-            memcpy(spectrogram.data() + i*numFrequencies, output_buffer.data(), sizeof(float) * numFrequencies);
+            memcpy(audio_template.getWindow(i), output_buffer.data(), sizeof(float) * numFrequencies);
         }
     }
 
     std::cout << "Built audio template with sample rate " << sampleRate << ", " << numWindows << " windows and " << numFrequencies << 
         " frequenices from " << filename.toStdString() << std::endl;
 
-    return AudioTemplate(std::move(spectrogram), numWindows);
+    return audio_template;
 }
 
 

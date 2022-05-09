@@ -24,9 +24,9 @@ class StatusInfoScreenDetector : public VisualInferenceCallback{
 public:
     StatusInfoScreenDetector();
 
-    int16_t detected() const{
-        return m_detected;
-    }
+//    int16_t detected() const{
+//        return m_detected;
+//    }
 
     PokemonDetails details()const{
         return m_pokemon;
@@ -41,7 +41,7 @@ public:
     void get_pokemon_name(ConsoleHandle& console, QImage infoScreen, Language language);
 
 private:
-    int16_t m_detected;
+//    int16_t m_detected;
     PokemonDetails m_pokemon;
     ImageFloatBox m_shiny_box;
     ImageFloatBox m_alpha_box;

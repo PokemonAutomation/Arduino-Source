@@ -39,15 +39,15 @@ template <typename SumATA2>
 PA_FORCE_INLINE float compute_scale(
     size_t width, size_t height,
     float const* const* A,
-    float const* const* TW2,
-    float const* const* W2
+    float const* const* TW,
+    float const* const* W
 ){
     constexpr size_t ALIGNMENT = alignof(typename SumATA2::vtype);
     SumATA2 sum;
     for (size_t r = 0; r < height; r++){
         const float* ptrA = A[r];
-        const float* ptrT = TW2[r];
-        const float* ptrW = W2[r];
+        const float* ptrT = TW[r];
+        const float* ptrW = W[r];
         if ((size_t)ptrA % ALIGNMENT != (size_t)ptrT % ALIGNMENT || (size_t)ptrA % ALIGNMENT != (size_t)ptrW % ALIGNMENT){
             throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "A, TW2, and W2 must have the same alignment.");
         }

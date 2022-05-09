@@ -20,7 +20,7 @@ namespace PokemonLA{
 
 StatusInfoScreenDetector::StatusInfoScreenDetector()
     : VisualInferenceCallback("StatusInfoScreenDetector")
-    , m_detected(0)
+//    , m_detected(0)
     , m_shiny_box(0.726, 0.133, 0.015, 0.023)
     , m_alpha_box(0.756, 0.137, 0.005, 0.005)
     , m_gender_box(0.777, 0.138, 0.001, 0.015)
@@ -37,17 +37,17 @@ void StatusInfoScreenDetector::make_overlays(VideoOverlaySet& items) const{
 
 bool StatusInfoScreenDetector::process_frame(
     const QImage& frame,
-        std::chrono::system_clock::time_point timestamp
+    std::chrono::system_clock::time_point timestamp
 ){
     const ImageStats shiny_box = image_stats(extract_box_reference(frame, m_shiny_box));
     if(!is_solid(shiny_box, {0.333333, 0.333333, 0.333333}, 0.2, 20)){
-       m_detected = m_detected + 1;
+//       m_detected = m_detected + 1;
        m_pokemon.is_shiny = true;
     }
 
     const ImageStats alpha_box = image_stats(extract_box_reference(frame, m_alpha_box));
     if(is_solid(alpha_box, {0.501968, 0.157480, 0.137795}, 0.2, 20)){
-       m_detected = m_detected + 2;
+//       m_detected = m_detected + 2;
        m_pokemon.is_alpha = true;
     }
 
@@ -56,10 +56,10 @@ bool StatusInfoScreenDetector::process_frame(
         m_pokemon.gender = "genderless";
     }
     else if(is_solid(gender_box, { 0.233,0.265,0.502}, 0.3, 30)){
-       m_pokemon.gender = "male";
+        m_pokemon.gender = "male";
     }
     else if(is_solid(gender_box, { 0.617,0.102,0.281}, 0.3, 30)){
-       m_pokemon.gender = "female";
+        m_pokemon.gender = "female";
     }
     else{
         m_pokemon.gender = "UKNOWN";

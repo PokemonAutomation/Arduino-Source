@@ -83,13 +83,16 @@ SpectrogramMatcher::SpectrogramMatcher(
     {
         // Do convolution on audio template
         const size_t numConvedFrequencies = (m_originalFreqEnd - m_originalFreqStart) - m_convKernel.size() + 1;
-        AlignedVector<float> temporaryBuffer(numConvedFrequencies * numTemplateWindows);
-        for(size_t i = 0; i < numTemplateWindows; i++){
-            conv(m_template.getWindow(i) + m_originalFreqStart, m_originalFreqEnd - m_originalFreqStart,
-                temporaryBuffer.data() + i * numConvedFrequencies);
+
+        AudioTemplate audio_template(numConvedFrequencies, numTemplateWindows);
+        for (size_t i = 0; i < numTemplateWindows; i++){
+            conv(
+                m_template.getWindow(i) + m_originalFreqStart, m_originalFreqEnd - m_originalFreqStart,
+                audio_template.getWindow(i)
+            );
         }
 
-        m_template = AudioTemplate(std::move(temporaryBuffer), numTemplateWindows);
+        m_template = std::move(audio_template);
         m_freqStart = 0;
         m_freqEnd = numConvedFrequencies;
         break;
@@ -98,15 +101,17 @@ SpectrogramMatcher::SpectrogramMatcher(
     {
         // Avereage every 5 frequencies
         const size_t numNewFreq = (m_originalFreqEnd - m_originalFreqStart) / 5;
-        AlignedVector<float> temporaryBuffer(numNewFreq * numTemplateWindows);
-        for(size_t i = 0; i < numTemplateWindows; i++){
-            for(size_t j = 0; j < numNewFreq; j++){
+
+        AudioTemplate audio_template(numNewFreq, numTemplateWindows);
+        for (size_t i = 0; i < numTemplateWindows; i++){
+            for (size_t j = 0; j < numNewFreq; j++){
                 const float * rawFreqMag = m_template.getWindow(i) + m_originalFreqStart + j*5;
                 const float newMag = (rawFreqMag[0] + rawFreqMag[1] + rawFreqMag[2] + rawFreqMag[3] + rawFreqMag[4]) / 5.0f;
-                temporaryBuffer[i*numNewFreq + j] = newMag;
+                audio_template.getWindow(i)[j] = newMag;
             }
         }
-        m_template = AudioTemplate(std::move(temporaryBuffer), numTemplateWindows);
+
+        m_template = std::move(audio_template);
         m_freqStart = 0;
         m_freqEnd = numNewFreq;
         break;
@@ -237,7 +242,7 @@ bool SpectrogramMatcher::updateToNewSpectrums(const std::vector<AudioSpectrum>& 
 }
 
 std::pair<float, float> SpectrogramMatcher::matchSubTemplate(size_t subIndex) const {
-#if 0
+#if 1
     auto iter = m_spectrums.begin();
     auto iter2 = m_spectrumNormSqrs.begin();
     float streamSumSqr = 0.0f;
