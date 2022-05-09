@@ -71,31 +71,32 @@ BurmyFinder::BurmyFinder(const BurmyFinder_Descriptor& descriptor)
 }
 
 
-class BurmyFinder::Stats : public StatsTracker, public ShinyStatIncrementer{
+class BurmyFinder::Stats : public StatsTracker{
 public:
     Stats()
         : attempts(m_stats["Attempts"])
         , errors(m_stats["Errors"])
         , found(m_stats["Found"])
-        , shinies(m_stats["Shinies"])
-        , alphas(m_stats["Alphas"])
+        , enroute_shinies(m_stats["Enroute Shinies"])
+        , tree_alphas(m_stats["Tree Alphas"])
+        , tree_shinies(m_stats["Tree Shinies"])
     {
         m_display_order.emplace_back("Attempts");
         m_display_order.emplace_back("Errors", true);
-        m_display_order.emplace_back("Found", true);
-        m_display_order.emplace_back("Shinies", true);
-        m_display_order.emplace_back("Alphas", true);
-    }
-
-    virtual void add_shiny() override{
-        shinies++;
+        m_display_order.emplace_back("Found");
+        m_display_order.emplace_back("Enroute Shinies");
+        m_display_order.emplace_back("Tree Alphas");
+        m_display_order.emplace_back("Tree Shinies");
+        m_aliases["Shinies"] = "Enroute Shinies";
+        m_aliases["Alphas"] = "Tree Alphas";
     }
 
     std::atomic<uint64_t>& attempts;
     std::atomic<uint64_t>& errors;
     std::atomic<uint64_t>& found;
-    std::atomic<uint64_t>& shinies;
-    std::atomic<uint64_t>& alphas;
+    std::atomic<uint64_t>& enroute_shinies;
+    std::atomic<uint64_t>& tree_alphas;
+    std::atomic<uint64_t>& tree_shinies;
 
 };
 
@@ -112,22 +113,22 @@ void BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext
     context.wait_for_all_requests();
 
     if (battle_found){
-        PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
-
         stats.found++;
+
+        PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
 
         //  Match validation
 
         if (pokemon.is_alpha && pokemon.is_shiny){
             env.console.log("Found Shiny Alpha!");
-            stats.shinies++;
-            stats.alphas++;
+            stats.tree_shinies++;
+            stats.tree_alphas++;
         }else if (pokemon.is_alpha){
             env.console.log("Found Alpha!");
-            stats.alphas++;
+            stats.tree_alphas++;
         }else if (pokemon.is_shiny){
             env.console.log("Found Shiny!");
-            stats.shinies++;
+            stats.tree_shinies++;
         }else{
             env.console.log("Normie in the tree -_-");
         }
@@ -166,7 +167,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     float shiny_coefficient = 1.0;
     ShinySoundDetector shiny_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
         //  Warning: This callback will be run from a different thread than this function.
-        stats.shinies++;
+        stats.enroute_shinies++;
         shiny_coefficient = error_coefficient;
         return on_shiny_callback(env, env.console, SHINY_DETECTED_ENROUTE, error_coefficient);
     });
