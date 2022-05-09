@@ -192,12 +192,23 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
         const float* ptrT = T.data() + 15;
         cout << Kernels::ScaleInvariantMatrixMatch::compute_scale(length - 15, 1, &ptrA, &ptrT) << endl;
     }
-#endif
     {
         const float* ptrA = A.data() + 3;
         const float* ptrT = T.data() + 3;
         const float* ptrW = W.data() + 3;
         cout << Kernels::ScaleInvariantMatrixMatch::compute_scale(length - 3, 1, &ptrA, &ptrT, &ptrW) << endl;
+    }
+#endif
+    {
+        const float* ptrA = A.data() + 15;
+        const float* ptrT = T.data() + 15;
+        cout << Kernels::ScaleInvariantMatrixMatch::compute_error(length - 15 , 1, 0.5, &ptrA, &ptrT) << endl;
+    }
+    {
+        const float* ptrA = A.data() + 3;
+        const float* ptrT = T.data() + 3;
+        const float* ptrW = W.data() + 3;
+        cout << Kernels::ScaleInvariantMatrixMatch::compute_error(length - 3, 1, 0.5, &ptrA, &ptrT, &ptrW) << endl;
     }
 #endif
 

@@ -261,7 +261,20 @@ std::pair<float, float> SpectrogramMatcher::matchSubTemplate(size_t subIndex) co
     }
 //    cout << "sumMulti = " << sumMulti << ", streamSumSqr = " << streamSumSqr << endl;
     const float scale = (streamSumSqr < 1e-6f ? 1.0f : sumMulti / streamSumSqr);
+
+    iter = m_spectrums.begin();
+    float sum = 0.0f;
+    for(size_t i = templateStart; i < templateEnd; i++, iter++){
+        // match in order from latest window to oldest
+        const float* templateData = m_template.getWindow(templateEnd-1-i);
+        const float* streamData = iter->magnitudes->data();
+        for(size_t j = m_freqStart; j < m_freqEnd; j++){
+            float d = templateData[j] - scale * streamData[j];
+            sum += d * d;
+        }
+    }
 #else
+    //  Build matrix.
     auto iter = m_spectrums.begin();
     const size_t templateStart = m_templateRange[subIndex].first;
     const size_t templateEnd = m_templateRange[subIndex].second;
@@ -275,28 +288,25 @@ std::pair<float, float> SpectrogramMatcher::matchSubTemplate(size_t subIndex) co
         matrixT[i] = m_freqStart + m_template.getWindow(templateEnd - 1 - i);
         matrixA[i] = m_freqStart + iter->magnitudes->data();
     }
+
+    //  Compute scale.
     float scale = Kernels::ScaleInvariantMatrixMatch::compute_scale(
         freqs, windows,
         matrixA.data(), matrixT.data()
     );
     scale = std::min<float>(scale, 1000000);
 
+    //  Compute error.
+    float sum = Kernels::ScaleInvariantMatrixMatch::compute_error(
+        freqs, windows,
+        scale,
+        matrixA.data(), matrixT.data()
+    );
 #endif
 
 
-
-    iter = m_spectrums.begin();
-    float sum = 0.0f;
-    for(size_t i = templateStart; i < templateEnd; i++, iter++){
-        // match in order from latest window to oldest
-        const float* templateData = m_template.getWindow(templateEnd-1-i);
-        const float* streamData = iter->magnitudes->data();
-        for(size_t j = m_freqStart; j < m_freqEnd; j++){
-            float d = templateData[j] - scale * streamData[j];
-            sum += d * d;
-        }
-    }
-    const float score = sqrt(sum) / m_templateNorm[0];
+    float score = sqrt(sum) / m_templateNorm[0];
+    score = std::min<float>(score, 1.0);
 
     return std::make_pair(score, scale);
 }

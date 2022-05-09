@@ -32,6 +32,28 @@ float compute_scale(
 
 
 
+//  Compute: |s A - T|^2
+float compute_error(
+    size_t width, size_t height,
+    float scale,
+    float const* const* A,
+    float const* const* T
+);
+
+
+//  Compute: |s A w - T|^2
+float compute_error(
+    size_t width, size_t height,
+    float scale,
+    float const* const* A,
+    float const* const* TW, //  Precomputed T * W
+    float const* const* W
+);
+
+
+
+
+
 }
 }
 }

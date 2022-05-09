@@ -80,6 +80,38 @@ struct SumATA2_Default{
         sum_AT += sum_at0 + sum_at1;
     }
 };
+struct SumError_Default{
+    using vtype = float;
+
+    float scale;
+    float sum = 0;
+
+    PA_FORCE_INLINE SumError_Default(float p_scale)
+        : scale(p_scale)
+    {}
+
+    PA_FORCE_INLINE float sum_sqr() const{
+        return sum;
+    }
+
+    PA_FORCE_INLINE void accumulate(size_t length, const float* A, const float* T){
+        float sum0 = 0;
+        for (size_t c = 0; c < length; c++){
+            float a0 = scale * A[c] - T[c];
+            sum0 += a0 * a0;
+        }
+        sum += sum0;
+    }
+    PA_FORCE_INLINE void accumulate(size_t length, const float* A, const float* TW, const float* W){
+        float sum0 = 0;
+        for (size_t c = 0; c < length; c++){
+            float a0 = scale * A[c] * W[c] - TW[c];
+            sum0 += a0 * a0;
+        }
+        sum += sum0;
+    }
+};
+
 
 
 float compute_scale_Default(
@@ -92,11 +124,31 @@ float compute_scale_Default(
 float compute_scale_Default(
     size_t width, size_t height,
     float const* const* A,
-    float const* const* TW2,
-    float const* const* W2
+    float const* const* TW,
+    float const* const* W
 ){
-    return compute_scale<SumATA2_Default>(width, height, A, TW2, W2);
+    return compute_scale<SumATA2_Default>(width, height, A, TW, W);
 }
+float compute_error_Default(
+    size_t width, size_t height,
+    float scale,
+    float const* const* A,
+    float const* const* T
+){
+    return compute_error<SumError_Default>(width, height, scale, A, T);
+}
+float compute_error_Default(
+    size_t width, size_t height,
+    float scale,
+    float const* const* A,
+    float const* const* TW,
+    float const* const* W
+){
+    return compute_error<SumError_Default>(width, height, scale, A, TW, W);
+}
+
+
+
 
 
 
