@@ -17,7 +17,7 @@ namespace ScaleInvariantMatrixMatch{
 
 
 
-struct SumATA2_u16_x86_FMA3{
+struct SumATA2_min8_x86_FMA3{
     using vtype = __m256;
 
     __m256 sum_AT = _mm256_setzero_ps();
@@ -30,8 +30,12 @@ struct SumATA2_u16_x86_FMA3{
     PA_FORCE_INLINE void accumulate(size_t length, const float* A, const float* T){
         __m256 sum_as0 = _mm256_setzero_ps();
         __m256 sum_as1 = _mm256_setzero_ps();
+        __m256 sum_as2 = _mm256_setzero_ps();
+        __m256 sum_as3 = _mm256_setzero_ps();
         __m256 sum_at0 = _mm256_setzero_ps();
         __m256 sum_at1 = _mm256_setzero_ps();
+        __m256 sum_at2 = _mm256_setzero_ps();
+        __m256 sum_at3 = _mm256_setzero_ps();
 
         size_t align = (size_t)T % 32;
         if (align){
@@ -57,20 +61,34 @@ struct SumATA2_u16_x86_FMA3{
         const __m256* ptrA = (const __m256*)A;
         const __m256* ptrT = (const __m256*)T;
 
-        size_t lc = length / 16;
-        do{
-            __m256 a0 = ptrA[0];
-            __m256 a1 = ptrA[1];
-            sum_as0 = _mm256_fmadd_ps(a0, a0, sum_as0);
-            sum_as1 = _mm256_fmadd_ps(a1, a1, sum_as1);
-            sum_at0 = _mm256_fmadd_ps(a0, ptrT[0], sum_at0);
-            sum_at1 = _mm256_fmadd_ps(a1, ptrT[1], sum_at1);
-            ptrA += 2;
-            ptrT += 2;
-        }while (--lc);
+        size_t lc = length / 32;
+        if (lc){
+            do{
+                __m256 a0 = ptrA[0];
+                __m256 a1 = ptrA[1];
+                __m256 a2 = ptrA[2];
+                __m256 a3 = ptrA[3];
+                sum_as0 = _mm256_fmadd_ps(a0, a0, sum_as0);
+                sum_as1 = _mm256_fmadd_ps(a1, a1, sum_as1);
+                sum_as2 = _mm256_fmadd_ps(a2, a2, sum_as2);
+                sum_as3 = _mm256_fmadd_ps(a3, a3, sum_as3);
+                sum_at0 = _mm256_fmadd_ps(a0, ptrT[0], sum_at0);
+                sum_at1 = _mm256_fmadd_ps(a1, ptrT[1], sum_at1);
+                sum_at2 = _mm256_fmadd_ps(a2, ptrT[2], sum_at2);
+                sum_at3 = _mm256_fmadd_ps(a3, ptrT[3], sum_at3);
+                ptrA += 4;
+                ptrT += 4;
+            }while (--lc);
+            sum_as1 = _mm256_add_ps(sum_as1, sum_as2);
+            sum_at1 = _mm256_add_ps(sum_at1, sum_at2);
+            sum_as1 = _mm256_add_ps(sum_as1, sum_as3);
+            sum_at1 = _mm256_add_ps(sum_at1, sum_at3);
+            sum_as0 = _mm256_add_ps(sum_as0, sum_as1);
+            sum_at0 = _mm256_add_ps(sum_at0, sum_at1);
+        }
 
-        length %= 16;
-        if (length >= 8){
+        length %= 32;
+        while (length >= 8){
             __m256 a0 = ptrA[0];
             sum_as0 = _mm256_fmadd_ps(a0, a0, sum_as0);
             sum_at0 = _mm256_fmadd_ps(a0, ptrT[0], sum_at0);
@@ -86,16 +104,18 @@ struct SumATA2_u16_x86_FMA3{
             sum_at0 = _mm256_fmadd_ps(a0, t0, sum_at0);
         }
 
-        sum_as0 = _mm256_add_ps(sum_as0, sum_as1);
-        sum_at0 = _mm256_add_ps(sum_at0, sum_at1);
         sum_A2 = _mm256_add_ps(sum_A2, sum_as0);
         sum_AT = _mm256_add_ps(sum_AT, sum_at0);
     }
     PA_FORCE_INLINE void accumulate(size_t length, const float* A, const float* TW, const float* W){
         __m256 sum_as0 = _mm256_setzero_ps();
         __m256 sum_as1 = _mm256_setzero_ps();
+        __m256 sum_as2 = _mm256_setzero_ps();
+        __m256 sum_as3 = _mm256_setzero_ps();
         __m256 sum_at0 = _mm256_setzero_ps();
         __m256 sum_at1 = _mm256_setzero_ps();
+        __m256 sum_at2 = _mm256_setzero_ps();
+        __m256 sum_at3 = _mm256_setzero_ps();
 
         size_t align = (size_t)TW % 32;
         if (align){
@@ -126,23 +146,39 @@ struct SumATA2_u16_x86_FMA3{
         const __m256* ptrT = (const __m256*)TW;
         const __m256* ptrW = (const __m256*)W;
 
-        size_t lc = length / 16;
-        do{
-            __m256 a0 = ptrA[0];
-            __m256 a1 = ptrA[1];
-            a0 = _mm256_mul_ps(a0, ptrW[0]);
-            a1 = _mm256_mul_ps(a1, ptrW[1]);
-            sum_as0 = _mm256_fmadd_ps(a0, a0, sum_as0);
-            sum_as1 = _mm256_fmadd_ps(a1, a1, sum_as1);
-            sum_at0 = _mm256_fmadd_ps(a0, ptrT[0], sum_at0);
-            sum_at1 = _mm256_fmadd_ps(a1, ptrT[1], sum_at1);
-            ptrA += 2;
-            ptrT += 2;
-            ptrW += 2;
-        }while (--lc);
+        size_t lc = length / 32;
+        if (lc){
+            do{
+                __m256 a0 = ptrA[0];
+                __m256 a1 = ptrA[1];
+                __m256 a2 = ptrA[2];
+                __m256 a3 = ptrA[3];
+                a0 = _mm256_mul_ps(a0, ptrW[0]);
+                a1 = _mm256_mul_ps(a1, ptrW[1]);
+                a2 = _mm256_mul_ps(a2, ptrW[2]);
+                a3 = _mm256_mul_ps(a3, ptrW[3]);
+                sum_as0 = _mm256_fmadd_ps(a0, a0, sum_as0);
+                sum_as1 = _mm256_fmadd_ps(a1, a1, sum_as1);
+                sum_as2 = _mm256_fmadd_ps(a2, a2, sum_as2);
+                sum_as3 = _mm256_fmadd_ps(a3, a3, sum_as3);
+                sum_at0 = _mm256_fmadd_ps(a0, ptrT[0], sum_at0);
+                sum_at1 = _mm256_fmadd_ps(a1, ptrT[1], sum_at1);
+                sum_at2 = _mm256_fmadd_ps(a2, ptrT[2], sum_at2);
+                sum_at3 = _mm256_fmadd_ps(a3, ptrT[3], sum_at3);
+                ptrA += 4;
+                ptrT += 4;
+                ptrW += 4;
+            }while (--lc);
+            sum_as1 = _mm256_add_ps(sum_as1, sum_as2);
+            sum_at1 = _mm256_add_ps(sum_at1, sum_at2);
+            sum_as1 = _mm256_add_ps(sum_as1, sum_as3);
+            sum_at1 = _mm256_add_ps(sum_at1, sum_at3);
+            sum_as0 = _mm256_add_ps(sum_as0, sum_as1);
+            sum_at0 = _mm256_add_ps(sum_at0, sum_at1);
+        }
 
-        length %= 16;
-        if (length >= 8){
+        length %= 32;
+        while (length >= 8){
             __m256 a0 = ptrA[0];
             a0 = _mm256_mul_ps(a0, ptrW[0]);
             sum_as0 = _mm256_fmadd_ps(a0, a0, sum_as0);
@@ -162,28 +198,26 @@ struct SumATA2_u16_x86_FMA3{
             sum_at0 = _mm256_fmadd_ps(a0, t0, sum_at0);
         }
 
-        sum_as0 = _mm256_add_ps(sum_as0, sum_as1);
-        sum_at0 = _mm256_add_ps(sum_at0, sum_at1);
         sum_A2 = _mm256_add_ps(sum_A2, sum_as0);
         sum_AT = _mm256_add_ps(sum_AT, sum_at0);
     }
 };
 
 
-float compute_scale_min32_x86_FMA3(
+float compute_scale_min8_x86_FMA3(
     size_t width, size_t height,
     float const* const* A,
     float const* const* T
 ){
-    return compute_scale<SumATA2_u16_x86_FMA3>(width, height, A, T);
+    return compute_scale<SumATA2_min8_x86_FMA3>(width, height, A, T);
 }
-float compute_scale_min32_x86_FMA3(
+float compute_scale_min8_x86_FMA3(
     size_t width, size_t height,
     float const* const* A,
     float const* const* TW2,
     float const* const* W2
 ){
-    return compute_scale<SumATA2_u16_x86_FMA3>(width, height, A, TW2, W2);
+    return compute_scale<SumATA2_min8_x86_FMA3>(width, height, A, TW2, W2);
 }
 
 
