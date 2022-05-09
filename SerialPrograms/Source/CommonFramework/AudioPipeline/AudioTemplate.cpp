@@ -5,6 +5,7 @@
  */
 
 #include "Common/Cpp/AlignedVector.tpp"
+#include "Kernels/Kernels_Alignment.h"
 #include "Kernels/AbsFFT/Kernels_AbsFFT.h"
 #include "AudioConstants.h"
 #include "AudioTemplate.h"
@@ -24,12 +25,8 @@ AudioTemplate::AudioTemplate(){}
 AudioTemplate::AudioTemplate(size_t frequencies, size_t windows)
     : m_numWindows(windows)
     , m_numFrequencies(frequencies)
-    , m_spectrogram(windows * frequencies)
-{}
-AudioTemplate::AudioTemplate(AlignedVector<float>&& spectrogram, size_t numWindows)
-    : m_numWindows(numWindows)
-    , m_numFrequencies(spectrogram.size()/numWindows)
-    , m_spectrogram(std::move(spectrogram))
+    , m_bytes_per_spectrum(Kernels::align_int_up<64>(frequencies * sizeof(float)))
+    , m_spectrogram(windows * (m_bytes_per_spectrum / sizeof(float)))
 {}
 
 

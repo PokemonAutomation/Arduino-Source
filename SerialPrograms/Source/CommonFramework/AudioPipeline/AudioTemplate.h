@@ -26,17 +26,19 @@ public:
     size_t numWindows() const{ return m_numWindows; }
     size_t numFrequencies() const{ return m_numFrequencies; }
 
-    const float* getWindow(size_t windowIndex) const{ return m_spectrogram.data() + windowIndex * m_numFrequencies; }
-          float* getWindow(size_t windowIndex)      { return m_spectrogram.data() + windowIndex * m_numFrequencies; }
+    const float* getWindow(size_t windowIndex) const{
+        return (const float*)((const char*)m_spectrogram.data() + windowIndex * m_bytes_per_spectrum);
+    }
+    float* getWindow(size_t windowIndex){
+        return (float*)((char*)m_spectrogram.data() + windowIndex * m_bytes_per_spectrum);
+    }
 
-    void scale(float s) { for(auto& v: m_spectrogram) v *= s; }
-
-private:
-    AudioTemplate(AlignedVector<float>&& spectrogram, size_t numWindows);
+//    void scale(float s) { for(auto& v: m_spectrogram) v *= s; }
 
 private:
     size_t m_numWindows = 0;
     size_t m_numFrequencies = 0;
+    size_t m_bytes_per_spectrum;
     AlignedVector<float> m_spectrogram;
 };
 

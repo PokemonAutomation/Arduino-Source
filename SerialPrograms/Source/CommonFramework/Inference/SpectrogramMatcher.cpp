@@ -242,7 +242,7 @@ bool SpectrogramMatcher::updateToNewSpectrums(const std::vector<AudioSpectrum>& 
 }
 
 std::pair<float, float> SpectrogramMatcher::matchSubTemplate(size_t subIndex) const {
-#if 1
+#if 0
     auto iter = m_spectrums.begin();
     auto iter2 = m_spectrumNormSqrs.begin();
     float streamSumSqr = 0.0f;
@@ -259,9 +259,9 @@ std::pair<float, float> SpectrogramMatcher::matchSubTemplate(size_t subIndex) co
             sumMulti += templateData[j] * streamData[j];
         }
     }
+//    cout << "sumMulti = " << sumMulti << ", streamSumSqr = " << streamSumSqr << endl;
     const float scale = (streamSumSqr < 1e-6f ? 1.0f : sumMulti / streamSumSqr);
 #else
-    //  Not ready yet.
     auto iter = m_spectrums.begin();
     const size_t templateStart = m_templateRange[subIndex].first;
     const size_t templateEnd = m_templateRange[subIndex].second;
@@ -270,15 +270,16 @@ std::pair<float, float> SpectrogramMatcher::matchSubTemplate(size_t subIndex) co
     std::vector<const float*> matrixA(windows);
     std::vector<const float*> matrixT(windows);
     for (size_t i = templateStart; i < templateEnd; i++, iter++){
-        cout << "Template: " << ((size_t)m_template.getWindow(templateEnd - 1 - i) % 64) << endl;
-        cout << "Samples:  " << ((size_t)iter->magnitudes->data() % 64) << endl;
-        matrixA[i] = m_freqStart + m_template.getWindow(templateEnd - 1 - i);
-        matrixT[i] = m_freqStart + iter->magnitudes->data();
+//        cout << "Template: " << ((size_t)m_template.getWindow(templateEnd - 1 - i) % 64) << endl;
+//        cout << "Samples:  " << ((size_t)iter->magnitudes->data() % 64) << endl;
+        matrixT[i] = m_freqStart + m_template.getWindow(templateEnd - 1 - i);
+        matrixA[i] = m_freqStart + iter->magnitudes->data();
     }
-    const float scale = Kernels::ScaleInvariantMatrixMatch::compute_scale(
+    float scale = Kernels::ScaleInvariantMatrixMatch::compute_scale(
         freqs, windows,
         matrixA.data(), matrixT.data()
     );
+    scale = std::min<float>(scale, 1000000);
 
 #endif
 
