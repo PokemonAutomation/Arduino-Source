@@ -64,17 +64,20 @@ public:
         : battles(m_stats["Battles"])
         , turns(m_stats["Turns"])
         , move_attempts(m_stats["Move Attempts"])
+        , faint_switches(m_stats["Faint Switches"])
         , errors(m_stats["Errors"])
     {
         m_display_order.emplace_back("Battles");
         m_display_order.emplace_back("Turns");
         m_display_order.emplace_back("Move Attempts");
+        m_display_order.emplace_back("Faint Switches", true);
         m_display_order.emplace_back("Errors", true);
     }
 
     std::atomic<uint64_t>& battles;
     std::atomic<uint64_t>& turns;
     std::atomic<uint64_t>& move_attempts;
+    std::atomic<uint64_t>& faint_switches;
     std::atomic<uint64_t>& errors;
 };
 
@@ -143,9 +146,10 @@ bool IngoMoveGrinder::start_dialog(ConsoleHandle& console, BotBaseContext& conte
 bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
+    env.console.log("Starting battle...");
+
     cur_pokemon = 0;
     cur_move = 0;
-    next_pokemon_to_switch_to = 1;
 
     // Talk to Ingo to start conversation and select regular battles:
     // The dialogues are different between version 10 (the vanilla version) and later versions.
@@ -229,7 +233,7 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBase
                 {
                     pbf_press_button(context, BUTTON_B, 20, 2 * TICKS_PER_SECOND);
                     env.console.log("No PP left for pokemon " + QString::number(cur_pokemon) + " and move " + QString::number(cur_move));
-                    if (cur_move == 3)
+                    if (get_next_move_to_switch_to() == 4)
                     {
                         // Press down to select pokemons
                         pbf_press_dpad(context, DPAD_DOWN, 20, 100);
@@ -245,7 +249,7 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBase
             else
             {
                 env.console.log("Done grinding for pokemon " + QString::number(cur_pokemon) + " and move " + QString::number(cur_move));
-                if (cur_move == 3)
+                if (get_next_move_to_switch_to() == 4)
                 {
                     // Press down to select pokemons
                     pbf_press_dpad(context, DPAD_DOWN, 20, 100);
@@ -273,6 +277,7 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBase
         }
         else if (ret == 3){
             env.console.log("Pokemon fainted.", COLOR_RED);
+            stats.faint_switches++;
             env.update_stats();
 
             go_to_next_pokemon(env, context);
@@ -291,12 +296,12 @@ bool IngoMoveGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBase
         {
             if (move_issued[i][j] < POKEMON_ACTIONS.get_move(i, j).attemps)
             {
-                env.console.log("Grinding will continue.");
+                env.console.log("Grinding will continue." + debug_move_attempts_info());
                 return false;
             }
         }
     }
-    env.console.log("Grinding will stop.");
+    env.console.log("Grinding will stop." + debug_move_attempts_info());
     return true;
 }
 
@@ -346,9 +351,13 @@ void IngoMoveGrinder::go_to_next_move(SingleSwitchProgramEnvironment& env, BotBa
 {
     env.console.log("Switch to next move " + debug_current_info() + debug_move_attempts_info());
     pbf_press_button(context, BUTTON_A, 10, 125);
-    pbf_press_dpad(context, DPAD_DOWN, 20, 100);
+    size_t next_move = get_next_move_to_switch_to();
+    for (size_t i = 0; i < next_move - cur_move; ++i)
+    {
+        pbf_press_dpad(context, DPAD_DOWN, 20, 100);
+    }
     pbf_press_button(context, BUTTON_B, 10, 125);
-    cur_move++;
+    cur_move = next_move;
     env.console.log("Switched to next move " + debug_current_info() + debug_move_attempts_info());
     context.wait_for_all_requests();
 }
@@ -361,12 +370,24 @@ void IngoMoveGrinder::go_to_next_pokemon(SingleSwitchProgramEnvironment& env, Bo
         throw OperationFailedException(env.console, "Abort program. Your 4 first pokemons are done grinding moves, dead or without PP. Your fifth pokemon (Arceus) died so no other choice than stopping the program.");
     }
     env.console.log("Switch to next pokemon " + debug_current_info() + debug_move_attempts_info());
-    switch_pokemon(env.console, context, next_pokemon_to_switch_to);
+    cur_pokemon = get_next_pokemon_to_switch_to();
     cur_move = 0;
-    cur_pokemon = next_pokemon_to_switch_to;
-    next_pokemon_to_switch_to = get_next_pokemon_to_switch_to();
+    switch_pokemon(env.console, context, cur_pokemon);
     env.console.log("Switched to next pokemon " + debug_current_info() + debug_move_attempts_info());
     context.wait_for_all_requests();
+}
+
+size_t IngoMoveGrinder::get_next_move_to_switch_to() const
+{
+    for (size_t i = cur_move + 1; i < 4; ++i)
+    {
+        if (move_issued[cur_pokemon][i] < POKEMON_ACTIONS.get_move(cur_pokemon, i).attemps)
+        {
+            return i;
+        }
+    }
+    // Means switch to next pokemon
+    return 4;
 }
 
 size_t IngoMoveGrinder::get_next_pokemon_to_switch_to() const
@@ -377,17 +398,17 @@ size_t IngoMoveGrinder::get_next_pokemon_to_switch_to() const
         {
             if (move_issued[i][j] < POKEMON_ACTIONS.get_move(i, j).attemps)
             {
-                // the pokemon still have a move to grind
                 return i;
             }
         }
     }
+    // Means switch to arceus and spam moves to end the battle
     return 4;
 }
 
 QString IngoMoveGrinder::debug_current_info() const
 {
-    return "(cur_pokemon : " + QString::number(cur_pokemon) + ", cur_move : " + QString::number(cur_move) + ", next_pokemon_to_switch_to : " + QString::number(next_pokemon_to_switch_to) + ")";
+    return "(cur_pokemon : " + QString::number(cur_pokemon) + ", cur_move : " + QString::number(cur_move) + ")";
 }
 
 QString IngoMoveGrinder::debug_move_attempts_info() const

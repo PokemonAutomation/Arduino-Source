@@ -40,6 +40,7 @@ private:
 private:
     void go_to_next_move(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
     void go_to_next_pokemon(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    size_t get_next_move_to_switch_to() const;
     size_t get_next_pokemon_to_switch_to() const;
     QString debug_current_info() const;
     QString debug_move_attempts_info() const;
@@ -53,7 +54,6 @@ private:
 
     size_t cur_pokemon = 0;
     size_t cur_move = 0;
-    size_t next_pokemon_to_switch_to = 1;
     std::array<std::array<uint16_t, 4>, 5> move_issued{};
 };
 
