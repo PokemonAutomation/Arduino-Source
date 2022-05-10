@@ -28,15 +28,33 @@ public:
 };
 
 
-#define TEST_DETECTOR(result, target) \
+#define TEST_RESULT_EQUAL(result, target) \
     do { \
         if ((result) != (target)) {\
-            std::cerr << "Error: " << __func__ << " result is " << (result) << " but should be " << (target) << std::endl; \
+            std::cerr << "Error: " << __func__ << " result is " << (result) << " but should be " << (target) << "." << std::endl; \
             return 1; \
         } \
         return 0; \
     } while (0)
 
+
+#define TEST_RESULT_COMPONENT_EQUAL(result, target, component_name) \
+    do { \
+        if ((result) != (target)) {\
+            std::cerr << "Error: " << __func__ << " " << component_name << " result is " << (result) << " but should be " << (target) << "." << std::endl; \
+            return 1; \
+        } \
+        return 0; \
+    } while (0)
+
+#define TEST_RESULT_COMPONENT_EQUAL_WITH_PRINT_FUNC(result, target, component_name, print_func) \
+    do { \
+        if ((result) != (target)) {\
+            std::cerr << "Error: " << __func__ << " " << component_name << " result is " << print_func(result) << " but should be " << print_func(target) << "." << std::endl; \
+            return 1; \
+        } \
+        return 0; \
+    } while (0)
 
 }
 

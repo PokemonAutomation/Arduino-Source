@@ -93,7 +93,7 @@ int image_bool_detector_helper(ImageBoolDetectorFunction test_func, const std::s
 // Helper for testing detector code that reads an image and returns some custom data that can be described
 // by keywords included in the test filename.
 // The helper will split the filename by "-" into keywords and send it in the same order to the test function.
-int image_keyword_detector_helper(ImageKeywordsDetectorFunction test_func, const std::string& test_path){
+int image_keywords_detector_helper(ImageKeywordsDetectorFunction test_func, const std::string& test_path){
     auto parse_filename_and_run_test = [&](const QImage& image, const std::string& filename_base){
         const auto name_base = QString::fromStdString(filename_base);
 
@@ -132,7 +132,8 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonLA_BattleMenuDetector", std::bind(image_bool_detector_helper, test_pokemonLA_BattleMenuDetector, _1)},
     {"PokemonLA_BattlePokemonSwitchDetector", std::bind(image_bool_detector_helper, test_pokemonLA_BattlePokemonSwitchDetector, _1)},
     {"PokemonLA_DialogueEllipseDetector", std::bind(image_bool_detector_helper, test_pokemonLA_DialogueEllipseDetector, _1)},
-    {"PokemonLA_BerryTreeDetector", std::bind(image_void_detector_helper, test_pokemonLA_BerryTreeDetector, _1)}
+    {"PokemonLA_BerryTreeDetector", std::bind(image_void_detector_helper, test_pokemonLA_BerryTreeDetector, _1)},
+    {"PokemonLA_StatusInfoScreenDetector", std::bind(image_keywords_detector_helper, test_pokemonLA_StatusInfoScreenDetector, _1)}
 };
 
 
