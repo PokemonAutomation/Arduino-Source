@@ -176,17 +176,21 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     env.console.log("Starting route and shiny detection...");
 
     float shiny_coefficient = 1.0;
+    std::atomic<bool> enable_shiny_sound(true);
     ShinySoundDetector shiny_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
         //  Warning: This callback will be run from a different thread than this function.
+        if (!enable_shiny_sound.load()){
+            return false;
+        }
         stats.enroute_shinies++;
         shiny_coefficient = error_coefficient;
         return on_shiny_callback(env, env.console, SHINY_DETECTED_ENROUTE, error_coefficient);
     });
 
-    //  Tree 1
     int ret = run_until(
         env.console, context,
         [&](BotBaseContext& context){
+            //  Tree 1
             goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
             pbf_move_left_joystick(context, 170, 255, 30, 30);
             change_mount(env.console, context, MountState::BRAVIARY_ON);
@@ -198,18 +202,12 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
             pbf_move_right_joystick(context, 127, 255, (0.10 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
 
-        },
-        {{shiny_detector}}
-    );
-    if (ret == 0){
-        on_shiny_sound(env, env.console, context, SHINY_DETECTED_ENROUTE, shiny_coefficient);
-    }
-    check_tree(env, context);
+            context.wait_for_all_requests();
+            enable_shiny_sound.store(false, std::memory_order_release);
+            check_tree(env, context);
+            enable_shiny_sound.store(true, std::memory_order_release);
 
-    //  Tree 2
-    ret = run_until(
-        env.console, context,
-        [&](BotBaseContext& context){
+            //  Tree 2
             goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
             pbf_move_left_joystick(context, 152, 255, 30, 30);
             change_mount(env.console, context, MountState::BRAVIARY_ON);
@@ -220,28 +218,22 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             pbf_move_left_joystick(context, 255, 127, 30, (0.5 * TICKS_PER_SECOND));
             pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
             pbf_move_right_joystick(context, 127, 255, (0.10 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-        },
-        {{shiny_detector}}
-    );
-    if (ret == 0){
-        on_shiny_sound(env, env.console, context, SHINY_DETECTED_ENROUTE, shiny_coefficient);
-    }
-    check_tree(env, context);
 
-    //  End
-    env.console.log("Nothing found, returning to Jubilife!");
-    ret = run_until(
-        env.console, context,
-        [&](BotBaseContext& context){
+            context.wait_for_all_requests();
+            enable_shiny_sound.store(false, std::memory_order_release);
+            check_tree(env, context);
+            enable_shiny_sound.store(true, std::memory_order_release);
+
+            //  End
             goto_camp_from_overworld(env, env.console, context);
             goto_professor(env.console, context, Camp::FIELDLANDS_FIELDLANDS);
         },
         {{shiny_detector}}
     );
+    shiny_detector.throw_if_no_sound();
     if (ret == 0){
         on_shiny_sound(env, env.console, context, SHINY_DETECTED_ENROUTE, shiny_coefficient);
     }
-    shiny_detector.throw_if_no_sound();
 
     from_professor_return_to_jubilife(env, env.console, context);
 }
