@@ -41,6 +41,10 @@
  *  - "PokemonBDSP/DialogDetector/Win_Mirabox/FetchEggDayTime-True.png"
  *  This gives the flexibility to test the code for a game, a detector, a detector on a capture card or a detector on a particular image/audio/video.
  * 
+ *  If you have put some test files for experimental code in a folder and later decide to not run that code for a while, you can use
+ *  "20-GlobalSettings": "COMMAND_LINE_TESTS": "IGNORE_LIST" as a list of strings to skip the paths to those tests.
+ *  Each string in the list serves as a prefix to the test path that the test framework uses to filter out paths.
+ * 
  * 
  *  How to add new test code:
  * 

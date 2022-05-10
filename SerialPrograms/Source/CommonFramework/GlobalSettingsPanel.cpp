@@ -171,6 +171,7 @@ void GlobalSettings::load_json(const QJsonValue& json){
     );
 
     COMMAND_LINE_TEST_LIST.clear();
+    COMMAND_LINE_IGNORE_LIST.clear();
     const QJsonObject command_line_tests_setting = json_get_object_nothrow(obj, "COMMAND_LINE_TESTS");
     if (!command_line_tests_setting.isEmpty()){
         json_get_bool(COMMAND_LINE_TEST_MODE, command_line_tests_setting, "RUN");
@@ -189,12 +190,25 @@ void GlobalSettings::load_json(const QJsonValue& json){
                 COMMAND_LINE_TEST_LIST.emplace_back(std::move(test_name));
             }
         }
+        const QJsonArray ignore_list = json_get_array_nothrow(command_line_tests_setting, "IGNORE_LIST");
+        for(const auto& value: ignore_list){
+            const std::string test_name = value.toString().toStdString();
+            if (test_name.size() > 0){
+                COMMAND_LINE_IGNORE_LIST.emplace_back(std::move(test_name));
+            }
+        }
 
         if (COMMAND_LINE_TEST_MODE){
             std::cout << "Enter command line test mode:" << std::endl;
             if (COMMAND_LINE_TEST_LIST.size() > 0){
                 std::cout << "Run following tests: " << std::endl;
                 for(const auto& name : COMMAND_LINE_TEST_LIST){
+                    std::cout << "- " << name << std::endl;
+                }
+            }
+            if (COMMAND_LINE_IGNORE_LIST.size() > 0){
+                std::cout << "Ignore following paths: " << std::endl;
+                for(const auto& name : COMMAND_LINE_IGNORE_LIST){
                     std::cout << "- " << name << std::endl;
                 }
             }
@@ -210,11 +224,23 @@ QJsonValue GlobalSettings::to_json() const{
     QJsonObject command_line_test_obj;
     command_line_test_obj.insert("RUN", QJsonValue(COMMAND_LINE_TEST_MODE));
     command_line_test_obj.insert("FOLDER", QJsonValue(QString::fromStdString(COMMAND_LINE_TEST_FOLDER)));
-    QJsonArray test_list;
-    for(const auto& name : COMMAND_LINE_TEST_LIST){
-        test_list.append(QJsonValue(name.c_str()));
+
+    {
+        QJsonArray test_list;
+        for(const auto& name : COMMAND_LINE_TEST_LIST){
+            test_list.append(QJsonValue(name.c_str()));
+        }
+        command_line_test_obj.insert("TEST_LIST", test_list);
     }
-    command_line_test_obj.insert("TEST_LIST", test_list);
+
+    {
+        QJsonArray ignore_list;
+        for(const auto& name : COMMAND_LINE_IGNORE_LIST){
+            ignore_list.append(QJsonValue(name.c_str()));
+        }
+        command_line_test_obj.insert("IGNORE_LIST", ignore_list);
+    }
+
     obj.insert("COMMAND_LINE_TESTS", command_line_test_obj);
     
     return obj;

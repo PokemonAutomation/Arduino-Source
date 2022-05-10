@@ -33,6 +33,10 @@ namespace PokemonAutomation{
 
 namespace{
 
+void print_equals(){
+    cout << "===========================================" << endl;
+}
+
 #define RETURN_IF_NOT_ZERO(statement) \
     do { \
         int _ret = (statement); \
@@ -45,7 +49,7 @@ namespace{
     do { \
         int _ret = test_func(file_path); \
         if (_ret > 0) {\
-            cout << "===========================================" << endl; \
+            print_equals(); \
             cout << "Test: " << (file_path) << " failed." << endl; \
             return _ret; \
         } else if (_ret == 0){ \
@@ -53,17 +57,33 @@ namespace{
         } \
     } while (0)
 
+bool skip_ignored_path(const QString& file_path, const std::vector<QString>& ignore_list){
+    for(const auto& path_prefix : ignore_list){
+        if (file_path.startsWith(path_prefix)){
+            cout << "* Skip ignored path " << file_path.toStdString() << endl;
+            return true;
+        }
+    }
+    return false;
+}
 
-int run_test_obj_dir(TestFunction test_func, const QString& directory_path, size_t& num_passed){
+int run_test_obj_dir(TestFunction test_func, const QString& directory_path, size_t& num_passed, const std::vector<QString>& ignore_list){
     QDirIterator file_iter(directory_path, QDir::Filter::Files, QDirIterator::IteratorFlag::Subdirectories);
 
     bool first_test_file = true;
     while (file_iter.hasNext()){
-        const std::string file_path = file_iter.next().toStdString();
         if (first_test_file == false){
             cout << "-------------------------------------------" << endl;
         }
         first_test_file = false;
+
+        const QString next_file = file_iter.next();
+        const std::string file_path = next_file.toStdString();
+
+        // Check ignore list to determine whether to skip the test
+        if (skip_ignored_path(next_file, ignore_list)){
+            continue;
+        }
 
         // Call the function to do the actual test:
         RETURN_IF_TEST_FAILED(test_func, file_path, num_passed);
@@ -72,17 +92,22 @@ int run_test_obj_dir(TestFunction test_func, const QString& directory_path, size
     return 0;
 }
 
-int run_test_obj(const std::string& test_space, const QFileInfo& obj_info, size_t& num_passed){
-    // test_name e.g.: "BattleMenuDetector"
+// Run the tests inside a folder representing a "test object".
+// It is usually defined as one detector, e.g. CommandLineTests/PokemonLA/BattleMenuDetector/
+int run_test_obj(const std::string& test_space, const QFileInfo& obj_info, size_t& num_passed, const std::vector<QString>& ignore_list){
     const std::string test_name = obj_info.fileName().toStdString();
     if (test_name == "." || test_name == ".."){
         return 0;
     }
 
-    cout << "===========================================" << endl;
+    print_equals();
     const TestFunction test_func = find_test_function(test_space, test_name);
     if (test_func == nullptr){
         // No corresponding test code, skip the folder.
+        return 0;
+    }
+
+    if (skip_ignored_path(obj_info.filePath(), ignore_list)){
         return 0;
     }
 
@@ -90,16 +115,20 @@ int run_test_obj(const std::string& test_space, const QFileInfo& obj_info, size_
 
     // Recursively get test filenames, like:
     // ./CommandLineTests/PokemonLA/BattleMenuDetector/IngoBattleMenuDayTime-True.png
-    return run_test_obj_dir(test_func, obj_info.filePath(), num_passed);
+    return run_test_obj_dir(test_func, obj_info.filePath(), num_passed, ignore_list);
 }
 
-
-int run_test_space(const QFileInfo& space_info, size_t& num_passed){
-    // sub_dir e.g.: ./CommandLineTests/PokemonLA/
+// Run the tests inside a folder representing a "test space".
+// It is usually defined as one pokemon game, e.g. CommandLineTests/PokemonLA/
+int run_test_space(const QFileInfo& space_info, size_t& num_passed, const std::vector<QString>& ignore_list){
     QDir sub_dir(space_info.filePath());
     if (!sub_dir.exists()){
         cerr << "Error: cannot access " << space_info.filePath().toStdString() << endl;
         return 1;
+    }
+
+    if (skip_ignored_path(space_info.fileName(), ignore_list)){
+        return 0;
     }
 
     sub_dir.setFilter(QDir::Filter::Dirs);
@@ -113,7 +142,7 @@ int run_test_space(const QFileInfo& space_info, size_t& num_passed){
     // ./CommandLineTests/PokemonLA/BattleMenuDetector/
     const QFileInfoList obj_list = sub_dir.entryInfoList();
     for(const QFileInfo& obj_info : obj_list){
-        RETURN_IF_NOT_ZERO(run_test_obj(test_space, obj_info, num_passed));
+        RETURN_IF_NOT_ZERO(run_test_obj(test_space, obj_info, num_passed, ignore_list));
     }
 
     return 0;
@@ -141,6 +170,19 @@ int run_command_line_tests(){
 
     const auto& selected_test_list = GlobalSettings::instance().COMMAND_LINE_TEST_LIST;
 
+    // The ignore list will be used to skip path.
+    // The ignore list functions as path prefixes when determining which path to skip.
+    std::vector<QString> ignore_list;
+    for(const std::string& ignore_path : GlobalSettings::instance().COMMAND_LINE_IGNORE_LIST){
+        QString path_cleaned = QDir::cleanPath(QString::fromStdString(root_folder_name + "/" + ignore_path));
+        // Remove the trailing '/' or '\\' to make sure it can match the input path
+        // without the trailing '/' or '\\'.
+        if (path_cleaned.endsWith('/') || path_cleaned.endsWith('\\')){
+            path_cleaned.chop(1);
+        }
+        ignore_list.emplace_back(std::move(path_cleaned));
+    }
+
     // Run all tests
     if (selected_test_list.size() == 0){
         // Look for sub-folders, e.g.
@@ -149,7 +191,7 @@ int run_command_line_tests(){
         test_root_dir.setFilter(QDir::Filter::Dirs);
         const QFileInfoList sub_dir_list = test_root_dir.entryInfoList();
         for(const QFileInfo& sub_dir_info : sub_dir_list){
-            RETURN_IF_NOT_ZERO(run_test_space(sub_dir_info, num_passed));
+            RETURN_IF_NOT_ZERO(run_test_space(sub_dir_info, num_passed, ignore_list));
         }
     } else{
         // Only run on selected tests
@@ -160,6 +202,10 @@ int run_command_line_tests(){
             if (full_path_cleaned.size() == 0){
                 cerr << "Error: empty path found in TEST_LIST" << endl;
                 return 1;
+            }
+
+            if (skip_ignored_path(full_path_cleaned, ignore_list)){
+                continue;
             }
 
             QFileInfo selected_path_info(full_path_cleaned);
@@ -180,7 +226,7 @@ int run_command_line_tests(){
                     cur_info = QFileInfo(path);
                 }
             }
-            // If full_path is "PokemonLA/DialogueEllipseDetector/macOS_bright/WendyNight-True.png", then
+            // If full_path is "CommandLineTest/PokemonLA/DialogueEllipseDetector/macOS_bright/WendyNight-True.png", then
             // path_components contains:
             // - PokemonLA
             // - DialogueEllipseDetector
@@ -198,7 +244,7 @@ int run_command_line_tests(){
             QFileInfo test_space_info(cur_dir.filePath(*it));
             cur_dir = QDir(test_space_info.filePath());
             if (path_components.size() == 1){
-                RETURN_IF_NOT_ZERO(run_test_space(test_space_info, num_passed));
+                RETURN_IF_NOT_ZERO(run_test_space(test_space_info, num_passed, ignore_list));
                 continue;
             }
 
@@ -206,7 +252,7 @@ int run_command_line_tests(){
             std::string test_name = it->toStdString();
             QFileInfo test_obj_info(cur_dir.filePath(*it));
             if (path_components.size() == 2){
-                RETURN_IF_NOT_ZERO(run_test_obj(test_space, test_obj_info, num_passed));
+                RETURN_IF_NOT_ZERO(run_test_obj(test_space, test_obj_info, num_passed, ignore_list));
                 continue;
             }
 
@@ -215,18 +261,18 @@ int run_command_line_tests(){
                 return 2;
             }
 
-            cout << "===========================================" << endl;
+            print_equals();
             if (selected_path_info.isFile()){
                 // Call the function to do the actual test:
                 RETURN_IF_TEST_FAILED(test_func, full_path_cleaned.toStdString(), num_passed);
             } else{
                 // selected_path_info is a directory, go through each file recursively in the directory
-                RETURN_IF_NOT_ZERO(run_test_obj_dir(test_func, full_path_cleaned, num_passed));
+                RETURN_IF_NOT_ZERO(run_test_obj_dir(test_func, full_path_cleaned, num_passed, ignore_list));
             }
         } // end selected_test_list
     }
 
-    cout << "===========================================" << endl;
+    print_equals();
     cout << num_passed << " test" << (num_passed > 1 ? "s" : "") << " passed" << std::endl;
     return 0;
 }

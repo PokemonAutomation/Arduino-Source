@@ -91,6 +91,9 @@ public:
     std::string COMMAND_LINE_TEST_FOLDER;
     // Which tests to run if in the command line test mode.
     std::vector<std::string> COMMAND_LINE_TEST_LIST;
+    // Which tests to ignore running under the command line test mode.
+    // If a test path appears in both COMMAND_LINE_TEST_LIST and COMMAND_LINE_IGNORE_LIST, it's still ignored.
+    std::vector<std::string> COMMAND_LINE_IGNORE_LIST;
 };
 
 
