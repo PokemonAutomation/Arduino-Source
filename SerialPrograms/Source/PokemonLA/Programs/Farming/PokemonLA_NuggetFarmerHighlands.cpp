@@ -14,8 +14,8 @@
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA/Inference/PokemonLA_MapDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
-#include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
+#include "PokemonLA/Programs/PokemonLA_BattleRoutines.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/PokemonLA_MountChange.h"
 #include "PokemonLA/Programs/PokemonLA_RegionNavigation.h"
@@ -91,23 +91,6 @@ std::unique_ptr<StatsTracker> NuggetFarmerHighlands::make_stats() const{
     return std::unique_ptr<StatsTracker>(new Stats());
 }
 
-
-
-
-void mash_A_until_end_of_battle(ConsoleHandle& console, BotBaseContext& context){
-    OverworldDetector detector(console, console);
-    int ret = run_until(
-        console, context,
-        [](BotBaseContext& context){
-            pbf_mash_button(context, BUTTON_A, 120 * TICKS_PER_SECOND);
-        },
-        {{detector}}
-    );
-    if (ret < 0){
-        throw OperationFailedException(console, "Failed to return to overworld after 2 minutes.");
-    }
-    console.log("Returned to overworld.");
-}
 
 
 

@@ -7,8 +7,10 @@
 #include <QImage>
 #include "Common/Cpp/Exceptions.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "CommonFramework/Inference/ImageMatchDetector.h"
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
+#include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
 #include "PokemonLA_BattleRoutines.h"
 
@@ -19,6 +21,25 @@ using std::endl;
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
+
+
+
+void mash_A_until_end_of_battle(ConsoleHandle& console, BotBaseContext& context){
+    OverworldDetector detector(console, console);
+    int ret = run_until(
+        console, context,
+        [](BotBaseContext& context){
+            pbf_mash_button(context, BUTTON_A, 120 * TICKS_PER_SECOND);
+        },
+        {{detector}}
+    );
+    if (ret < 0){
+        throw OperationFailedException(console, "Failed to return to overworld after 2 minutes.");
+    }
+    console.log("Returned to overworld.");
+}
+
+
 
 size_t switch_pokemon(ConsoleHandle& console, BotBaseContext& context, size_t pokemon_to_switch_to, size_t max_num_pokemon){
     if (pokemon_to_switch_to >= max_num_pokemon){

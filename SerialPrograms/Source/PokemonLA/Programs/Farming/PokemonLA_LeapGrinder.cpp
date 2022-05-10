@@ -4,7 +4,7 @@
  *
  */
 
-
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
@@ -40,22 +40,24 @@ LeapGrinder::LeapGrinder(const LeapGrinder_Descriptor& descriptor)
     , LANGUAGE("<b>Game Language</b>", Pokemon::PokemonNameReader::instance().languages(), true)
     , POKEMON(
         "<b>Pokemon Species</b>",
-        {"aipom",
-          "burmy",
-          "cherrim",
-          "cherubi",
-          "combee",
-          "heracross",
-          "pachirisu",
-          "vespiquen",
-          "wormadam",
-          "geodude",
-          "graveler",
-          "bonsly",
-          "bronzor",
-          "nosepass",
-          "bergmite"}
-        )
+        {
+            "aipom",
+            "burmy",
+            "cherrim",
+            "cherubi",
+            "combee",
+            "heracross",
+            "pachirisu",
+            "vespiquen",
+            "wormadam",
+            "geodude",
+            "graveler",
+            "bonsly",
+            "bronzor",
+            "nosepass",
+            "bergmite"
+          }
+    )
     , LEAPS(
       "<b>Leaps</b> <br>How many leaps before stopping the program</br>",
       1, 1, 100
@@ -170,14 +172,16 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
         stats.leaps++;
 
         PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
+        pbf_press_button(context, BUTTON_B, 20, 225);
+        context.wait_for_all_requests();
 
         env.console.log("Looking for: " + POKEMON.slug());
-        env.console.log("Found: " + pokemon.name);
-        env.console.log("Gender: " + pokemon.gender);
-        env.console.log("Alpha: " + std::to_string(pokemon.is_alpha));
-        env.console.log("Shiny: " + std::to_string(pokemon.is_shiny));
+        env.console.log("Found: " + set_to_str(pokemon.name_candidates));
+        env.console.log("Gender: " + std::string(get_gender_str(pokemon.gender)));
+        env.console.log("Alpha: " + std::string(pokemon.is_alpha ? "Yes" : "No"));
+        env.console.log("Shiny: " + std::string(pokemon.is_shiny ? "Yes" : "No"));
 
-        if (pokemon.name == QString::fromStdString(POKEMON.slug())){
+        if (pokemon.name_candidates.find(POKEMON.slug()) != pokemon.name_candidates.end()){
             env.console.log("Expected Pokemon leaped!");
             stats.found++;
         }else{
@@ -221,7 +225,7 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             on_match_found(env, env.console, context, MATCH_DETECTED_OPTIONS, is_match);
         }
 
-        exit_battle(context);
+        exit_battle(env.console, context);
     }
 
     env.console.log("Remaining Leaps:" + std::to_string(LEAPS - stats.leaps));
@@ -250,8 +254,9 @@ void LeapGrinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
             stats.to_str()
         );
         try{
-            if(run_iteration(env, context))
+            if(run_iteration(env, context)){
                 break;
+            }
         }catch (OperationFailedException&){
             stats.errors++;
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);

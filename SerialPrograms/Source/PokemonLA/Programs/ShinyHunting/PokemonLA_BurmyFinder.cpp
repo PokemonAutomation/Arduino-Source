@@ -41,7 +41,15 @@ BurmyFinder::BurmyFinder(const BurmyFinder_Descriptor& descriptor)
             "Shiny",
             "Alpha",
             "Shiny & Alpha",
-            "Stop on any non regular"
+            "Stop on any non regular",
+        },
+        0
+    )
+    , EXIT_METHOD(
+        "<b>Exit Battle Method:</b>",
+        {
+            "Run Away",
+            "Mash A to Kill",
         },
         0
     )
@@ -65,6 +73,7 @@ BurmyFinder::BurmyFinder(const BurmyFinder_Descriptor& descriptor)
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(STOP_ON);
+    PA_ADD_OPTION(EXIT_METHOD);
     PA_ADD_OPTION(SHINY_DETECTED_ENROUTE);
     PA_ADD_OPTION(MATCH_DETECTED_OPTIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -116,6 +125,8 @@ void BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext
         stats.found++;
 
         PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
+        pbf_press_button(context, BUTTON_B, 20, 225);
+        context.wait_for_all_requests();
 
         //  Match validation
 
@@ -154,7 +165,7 @@ void BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext
             on_match_found(env, env.console, context, MATCH_DETECTED_OPTIONS, is_match);
         }
 
-        exit_battle(context);
+        exit_battle(env.console, context, EXIT_METHOD == 1);
     }
 }
 
@@ -172,11 +183,10 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
         return on_shiny_callback(env, env.console, SHINY_DETECTED_ENROUTE, error_coefficient);
     });
 
+    //  Tree 1
     int ret = run_until(
         env.console, context,
         [&](BotBaseContext& context){
-
-            //Tree 1
             goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
             pbf_move_left_joystick(context, 170, 255, 30, 30);
             change_mount(env.console, context, MountState::BRAVIARY_ON);
@@ -187,10 +197,19 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             pbf_move_left_joystick(context, 255, 127, 30, (0.5 * TICKS_PER_SECOND));
             pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
             pbf_move_right_joystick(context, 127, 255, (0.10 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            context.wait_for_all_requests();
-            check_tree(env, context);
 
-            //Tree 2
+        },
+        {{shiny_detector}}
+    );
+    if (ret == 0){
+        on_shiny_sound(env, env.console, context, SHINY_DETECTED_ENROUTE, shiny_coefficient);
+    }
+    check_tree(env, context);
+
+    //  Tree 2
+    ret = run_until(
+        env.console, context,
+        [&](BotBaseContext& context){
             goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
             pbf_move_left_joystick(context, 152, 255, 30, 30);
             change_mount(env.console, context, MountState::BRAVIARY_ON);
@@ -201,23 +220,30 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             pbf_move_left_joystick(context, 255, 127, 30, (0.5 * TICKS_PER_SECOND));
             pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
             pbf_move_right_joystick(context, 127, 255, (0.10 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            context.wait_for_all_requests();
-            check_tree(env, context);
-
         },
         {{shiny_detector}}
     );
-    shiny_detector.throw_if_no_sound();
     if (ret == 0){
         on_shiny_sound(env, env.console, context, SHINY_DETECTED_ENROUTE, shiny_coefficient);
     }
+    check_tree(env, context);
 
-    //End
+    //  End
     env.console.log("Nothing found, returning to Jubilife!");
-    goto_camp_from_overworld(env, env.console, context);
-    goto_professor(env.console, context, Camp::FIELDLANDS_FIELDLANDS);
-    from_professor_return_to_jubilife(env, env.console, context);
+    ret = run_until(
+        env.console, context,
+        [&](BotBaseContext& context){
+            goto_camp_from_overworld(env, env.console, context);
+            goto_professor(env.console, context, Camp::FIELDLANDS_FIELDLANDS);
+        },
+        {{shiny_detector}}
+    );
+    if (ret == 0){
+        on_shiny_sound(env, env.console, context, SHINY_DETECTED_ENROUTE, shiny_coefficient);
+    }
+    shiny_detector.throw_if_no_sound();
 
+    from_professor_return_to_jubilife(env, env.console, context);
 }
 
 void BurmyFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){

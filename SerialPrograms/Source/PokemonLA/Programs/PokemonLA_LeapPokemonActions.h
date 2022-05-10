@@ -41,7 +41,7 @@ enum class LeapPokemon
 void setup(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context);
 void route(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, size_t pokemon);
 bool check_tree_or_ore_for_battle(ConsoleHandle& console, BotBaseContext& context);
-void exit_battle(BotBaseContext& context);
+void exit_battle(ConsoleHandle& console, BotBaseContext& context, bool mash_A_to_kill = false);
 void return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& console, BotBaseContext& context, size_t pokemon);
 PokemonDetails get_pokemon_details(ConsoleHandle& console, BotBaseContext& context, Language language);
 

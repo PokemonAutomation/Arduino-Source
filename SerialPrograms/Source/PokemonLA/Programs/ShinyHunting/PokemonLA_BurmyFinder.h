@@ -39,6 +39,7 @@ private:
 
     OCR::LanguageOCR LANGUAGE;
     EnumDropdownOption STOP_ON;
+    EnumDropdownOption EXIT_METHOD;
     ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;
     ShinyDetectedActionOption MATCH_DETECTED_OPTIONS;
     EventNotificationOption NOTIFICATION_STATUS;

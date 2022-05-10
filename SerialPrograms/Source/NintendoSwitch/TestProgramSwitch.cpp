@@ -10,11 +10,14 @@
 #include "Common/Cpp/Exceptions.h"
 #include "Common/Cpp/AsyncDispatcher.h"
 #include "Common/Cpp/PeriodicScheduler.h"
+#include "Common/Cpp/PrettyPrint.h"
+#include "ClientSource/Connection/BotBase.h"
 #include "CommonFramework/InferenceInfra/InferenceSession.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "CommonFramework/InferenceInfra/VisualInferencePivot.h"
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.h"
+#include "PokemonLA/Programs/PokemonLA_LeapPokemonActions.h"
 
 #include <QVideoFrame>
 
@@ -96,10 +99,23 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoFeed& feed = env.consoles[0];
     VideoOverlay& overlay = env.consoles[0];
 
+    BotBaseContext context(scope, console.botbase());
+
+
+    PokemonDetails pokemon = get_pokemon_details(console, context, LANGUAGE);
+    cout << set_to_str(pokemon.name_candidates) << endl;
+    cout << get_gender_str(pokemon.gender) << endl;
+    cout << "is_alpha = " << pokemon.is_alpha << endl;
+    cout << "is_shiny = " << pokemon.is_shiny << endl;
+
+
+
+
+#if 0
     PokemonBDSP::BattleBallReader reader(console, Language::English);
     reader.read_ball(feed.snapshot());
     reader.read_quantity(feed.snapshot());
-
+#endif
 
 
 

@@ -14,10 +14,12 @@
 #include <stdint.h>
 
 namespace PokemonAutomation{
+    class BotBaseContext;
 namespace NintendoSwitch{
 namespace PokemonLA{
 
 
+void mash_A_until_end_of_battle(ConsoleHandle& console, BotBaseContext& context);
 
 // Assuming the game is in the switching pokemon screen, select a pokemon to send to battle.
 // pokemon_to_switch_to: the index of the pokemon in the party to switch to.

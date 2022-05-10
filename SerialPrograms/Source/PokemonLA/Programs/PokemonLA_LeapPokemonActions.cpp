@@ -6,13 +6,15 @@
 
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
-#include "PokemonLA/Programs/PokemonLA_MountChange.h"
-#include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
-#include "PokemonLA_RegionNavigation.h"
-#include "PokemonLA_LeapPokemonActions.h"
-#include "PokemonLA/Resources/PokemonLA_PokemonInfo.h"
-#include "PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"
 #include "Pokemon/Inference/Pokemon_NameReader.h"
+#include "PokemonLA/Resources/PokemonLA_PokemonInfo.h"
+#include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
+#include "PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"
+#include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
+#include "PokemonLA_MountChange.h"
+#include "PokemonLA_RegionNavigation.h"
+#include "PokemonLA_BattleRoutines.h"
+#include "PokemonLA_LeapPokemonActions.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -186,10 +188,8 @@ void return_to_jubilife(ProgramEnvironment& env, ConsoleHandle& console, BotBase
 }
 
 bool check_tree_or_ore_for_battle(ConsoleHandle& console, BotBaseContext& context){
-
     pbf_press_button(context, BUTTON_ZR, (0.5 * TICKS_PER_SECOND), 20); //throw pokemon
     pbf_wait(context, (4.5 * TICKS_PER_SECOND));
-
     context.wait_for_all_requests();
 
     MountDetector mount_detector;
@@ -205,26 +205,30 @@ bool check_tree_or_ore_for_battle(ConsoleHandle& console, BotBaseContext& contex
     BattleMenuDetector battle_menu_detector(console, console, true);
     wait_until(
        console, context, std::chrono::seconds(10),
-       {
-           {battle_menu_detector}
-       }
+       {{battle_menu_detector}}
     );
 
     return true;
 }
 
-void exit_battle(BotBaseContext& context){
-    pbf_press_button(context, BUTTON_B, 20, 100);
-    pbf_wait(context, (1 * TICKS_PER_SECOND));
-    pbf_press_button(context, BUTTON_B, 20, 100);
-    pbf_wait(context, (1 * TICKS_PER_SECOND));
-    pbf_press_button(context, BUTTON_A, 20, 100);
-    pbf_wait(context, (3 * TICKS_PER_SECOND));
+void exit_battle(ConsoleHandle& console, BotBaseContext& context, bool mash_A_to_kill){
+//    pbf_press_button(context, BUTTON_B, 20, 225);
+
+    if (!mash_A_to_kill){
+        console.log("Running from battle...");
+        pbf_press_button(context, BUTTON_B, 20, 225);
+        pbf_press_button(context, BUTTON_A, 20, 100 + 3 * TICKS_PER_SECOND);
+        context.wait_for_all_requests();
+        return;
+    }
+
     context.wait_for_all_requests();
+    console.log("Mashing A to battle!");
+    mash_A_until_end_of_battle(console, context);
 }
 
 PokemonDetails get_pokemon_details(ConsoleHandle& console, BotBaseContext& context, Language language){
-    //Open Info Screen
+    //  Open Info Screen
     pbf_wait(context, (1 * TICKS_PER_SECOND));
     pbf_press_button(context, BUTTON_PLUS, 20, 20);
     pbf_wait(context, (1 * TICKS_PER_SECOND));
@@ -232,15 +236,9 @@ PokemonDetails get_pokemon_details(ConsoleHandle& console, BotBaseContext& conte
     pbf_wait(context, (1 * TICKS_PER_SECOND));
 
     context.wait_for_all_requests();
+    QImage screen = console.video().snapshot();
 
-    QImage infoScreen = console.video().snapshot();
-
-    StatusInfoScreenDetector detector;
-
-    detector.process_frame(infoScreen, std::chrono::system_clock::now());
-    detector.get_pokemon_name(console, infoScreen, language);
-
-    return detector.details();
+    return read_status_info(console, console, screen, language);
 }
 
 
