@@ -9,10 +9,12 @@
 #include "TestMap.h"
 #include "TestUtils.h"
 
+#include <QFileInfo>
 #include <QImage>
 #include <QImageReader>
 
 #include <iostream>
+#include <sstream>
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -26,16 +28,20 @@ namespace PokemonAutomation{
 // files, read data from test file names or gold files and possibly more.
 // To reuse the code, we design the following helper functions.
 
-using ScreenBoolDetectorFunction = std::function<int(const QImage& image, bool target)>;
+using ImageFilenameFunction = std::function<int(const QImage& image, const std::string& filename_base)>;
 
-using ScreenVoidDetectorFunction = std::function<void(const QImage& image)>;
+using ImageBoolDetectorFunction = std::function<int(const QImage& image, bool target)>;
 
+using ImageKeywordsDetectorFunction = std::function<int(const QImage& image, const std::vector<std::string>& keywords)>;
 
-// Helper for testing screen bool detectors, which return true or false based on
-// screen content.
-// The target test result (whether this test file should be detected as true or false)
-// is stored as part of the filename. For example, IngoBattleDayTime-True.png.
-int screen_bool_detector_helper(ScreenBoolDetectorFunction test_func, const std::string& test_path){
+using ImageVoidDetectorFunction = std::function<void(const QImage& image)>;
+
+// Basic check on whether an image can be loaded.
+// Also strip the image format suffix (.png and so on)
+
+// Helper for testing code that reads an image and uses filename to get the target outcome for the code.
+// test_func: reads an image and the image filename base and returns an int code.
+int image_filename_detector_helper(const std::string& test_path, ImageFilenameFunction test_func){
     const QString file_path = QString::fromStdString(test_path);
     QImageReader reader(file_path);
     if (reader.canRead() == false){
@@ -43,50 +49,79 @@ int screen_bool_detector_helper(ScreenBoolDetectorFunction test_func, const std:
         return -1;
     }
 
+    QFileInfo file_info(file_path);
+    std::string filename = file_info.fileName().toStdString();
+
     // Search for the target test result from test filename.
-    // const QFileInfo file_info(QString::fromStdString(test_path));
-    // const std::string filename = file_info.fileName().toStdString();
-    const size_t target_pos = test_path.rfind('.');
+    const size_t target_pos = filename.rfind('.');
     if (target_pos == std::string::npos){
         cerr << "Error: image test file " << test_path << " has no \".\" in the filename." << endl;
         return 1;
     }
 
-    const auto test_path_base = QString::fromStdString(test_path.substr(0, target_pos));
-    bool target_bool = false;
-    if (test_path_base.endsWith("-True")){
-        target_bool = true;
-    } else if (test_path_base.endsWith("-False")){
-        target_bool = false;
-    } else{
-        cerr << "Error: image test file " << test_path << " has incorrect target detection result (-True/-False) set in the filename." << endl;
-        return 1;
-    }
+    // cout << "Test file: " << test_path << endl;
 
-    cout << "Test file: " << test_path << endl;
+    const auto filename_base = filename.substr(0, target_pos);
+
     const QImage image = reader.read();
-
-    return test_func(image, target_bool);
+    return test_func(image, filename_base);
 }
 
 
-// Helper for testing screen null detectors, which does not return anything based on
-// screen content.
+// Helper for testing detector code that reads an image and returns true or false.
+// The target test result (whether this test file should be detected as true or false)
+// is stored as part of the filename. For example, IngoBattleDayTime-True.png.
+int image_bool_detector_helper(ImageBoolDetectorFunction test_func, const std::string& test_path){
+    auto parse_filename_and_run_test = [&](const QImage& image, const std::string& filename_base){
+        const auto name_base = QString::fromStdString(filename_base);
+        bool target_bool = false;
+        if (name_base.endsWith("-True")){
+            target_bool = true;
+        } else if (name_base.endsWith("-False")){
+            target_bool = false;
+        } else{
+            cerr << "Error: image test file " << test_path << " has incorrect target detection result (-True/-False) set in the filename." << endl;
+            return 1;
+        }
+
+        return test_func(image, target_bool);
+    };
+
+    return image_filename_detector_helper(test_path, parse_filename_and_run_test);
+}
+
+// Helper for testing detector code that reads an image and returns some custom data that can be described
+// by keywords included in the test filename.
+// The helper will split the filename by "-" into keywords and send it in the same order to the test function.
+int image_keyword_detector_helper(ImageKeywordsDetectorFunction test_func, const std::string& test_path){
+    auto parse_filename_and_run_test = [&](const QImage& image, const std::string& filename_base){
+        const auto name_base = QString::fromStdString(filename_base);
+
+        std::vector<std::string> keywords;
+        std::istringstream is(filename_base);
+        std::string keyword;
+        while (getline(is, keyword, '-')){
+            keywords.push_back(keyword);
+        }
+
+        return test_func(image, keywords);
+    };
+
+    return image_filename_detector_helper(test_path, parse_filename_and_run_test);
+}
+
+
+// Helper for testing sdetector code that reads an image and returns nothing.
 // This is used for developing visual inference code where the developer writes custom
 // debugging output. So no need to get target values from the test framework.
-int screen_void_detector_helper(ScreenVoidDetectorFunction test_func, const std::string& test_path){
+int image_void_detector_helper(ImageVoidDetectorFunction test_func, const std::string& test_path){
 const QString file_path = QString::fromStdString(test_path);
-    QImageReader reader(file_path);
-    if (reader.canRead() == false){
-        cout << "Skip " << test_path << " as it cannot be read as image" << endl;
-        return -1;
-    }
+    auto run_test = [&](const QImage& image, const std::string&) -> int{
+        test_func(image);
+        return 0;
+    };
 
-    cout << "Test file: " << test_path << endl;
-    const QImage image = reader.read();
-    test_func(image);
-
-    return 0;
+    return image_filename_detector_helper(test_path, run_test);
 }
 
 
@@ -94,10 +129,10 @@ const QString file_path = QString::fromStdString(test_path);
 
 
 const std::map<std::string, TestFunction> TEST_MAP = {
-    {"PokemonLA_BattleMenuDetector", std::bind(screen_bool_detector_helper, test_pokemonLA_BattleMenuDetector, _1)},
-    {"PokemonLA_BattlePokemonSwitchDetector", std::bind(screen_bool_detector_helper, test_pokemonLA_BattlePokemonSwitchDetector, _1)},
-    {"PokemonLA_DialogueEllipseDetector", std::bind(screen_bool_detector_helper, test_pokemonLA_DialogueEllipseDetector, _1)},
-    {"PokemonLA_BerryTreeDetector", std::bind(screen_void_detector_helper, test_pokemonLA_BerryTreeDetector, _1)}
+    {"PokemonLA_BattleMenuDetector", std::bind(image_bool_detector_helper, test_pokemonLA_BattleMenuDetector, _1)},
+    {"PokemonLA_BattlePokemonSwitchDetector", std::bind(image_bool_detector_helper, test_pokemonLA_BattlePokemonSwitchDetector, _1)},
+    {"PokemonLA_DialogueEllipseDetector", std::bind(image_bool_detector_helper, test_pokemonLA_DialogueEllipseDetector, _1)},
+    {"PokemonLA_BerryTreeDetector", std::bind(image_void_detector_helper, test_pokemonLA_BerryTreeDetector, _1)}
 };
 
 

@@ -22,7 +22,6 @@ int test_pokemonLA_DialogueEllipseDetector(const QImage& image, bool target);
 
 void test_pokemonLA_BerryTreeDetector(const QImage& image);
 
-
 }
 
 #endif
