@@ -12,6 +12,10 @@
 #include "Common/Microcontroller/DeviceRoutines.h"
 #include "PABotBase.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 
 
@@ -40,6 +44,8 @@ PABotBase::~PABotBase(){
 }
 
 size_t PABotBase::inflight_requests(){
+    m_sanitizer.check_usage();
+
     //  Must be called under m_state_lock.
 
     size_t ret = m_pending_requests.size();
@@ -52,13 +58,15 @@ size_t PABotBase::inflight_requests(){
 }
 
 void PABotBase::connect(){
+    m_sanitizer.check_usage();
+
     pabb_MsgAckRequest response;
     issue_request_and_wait(
         Microcontroller::DeviceRequest_seqnum_reset(), nullptr
     ).convert<PABB_MSG_ACK_REQUEST>(logger(), response);
 }
 void PABotBase::stop(){
-//    cout << "stop" << endl;
+    m_sanitizer.check_usage();
 
     //  Make sure only one thread can get in here.
     State expected = State::RUNNING;
@@ -98,6 +106,8 @@ void PABotBase::stop(){
 }
 
 void PABotBase::wait_for_all_requests(const Cancellable* cancelled){
+    m_sanitizer.check_usage();
+
     std::unique_lock<std::mutex> lg(m_sleep_lock);
     while (true){
         if (cancelled != nullptr && cancelled->cancelled()){
@@ -117,53 +127,42 @@ void PABotBase::wait_for_all_requests(const Cancellable* cancelled){
 }
 
 void PABotBase::stop_all_commands(){
-#if 0
-    uint64_t seqnum = issue_request(nullptr, Microcontroller::DeviceRequest_request_stop(), false);
+    m_sanitizer.check_usage();
 
-    pabb_MsgAckRequest response;
-    wait_for_request(seqnum).convert<PABB_MSG_ACK_REQUEST>(m_logger, response);
-
-    clear_all_active_commands(seqnum);
-#else
     uint64_t seqnum = issue_request(nullptr, Microcontroller::DeviceRequest_request_stop(), true);
     clear_all_active_commands(seqnum);
-#endif
 }
 void PABotBase::next_command_interrupt(){
+    m_sanitizer.check_usage();
+
     uint64_t seqnum = issue_request(nullptr, Microcontroller::DeviceRequest_next_command_interrupt(), true);
     clear_all_active_commands(seqnum);
 }
 void PABotBase::clear_all_active_commands(uint64_t seqnum){
-    //  Remove all commands at or before the specified seqnum.
+    m_sanitizer.check_usage();
 
+    //  Remove all commands at or before the specified seqnum.
     std::lock_guard<std::mutex> lg0(m_sleep_lock);
     SpinLockGuard lg1(m_state_lock, "PABotBase::next_command_interrupt()");
 
     if (!m_pending_commands.empty()){
         //  Remove all active commands up to the seqnum.
         while (true){
-            auto iter1 = m_pending_commands.begin();
-            if (iter1 == m_pending_commands.end() || iter1->first > seqnum){
+            auto iter = m_pending_commands.begin();
+            if (iter == m_pending_commands.end() || iter->first > seqnum){
                 break;
             }
-            m_pending_commands.erase(iter1);
+            iter->second.sanitizer.check_usage();
+            m_pending_commands.erase(iter);
         }
     }
 
     m_cv.notify_all();
 }
-void PABotBase::remove_request(std::map<uint64_t, PendingRequest>::iterator iter){
-    //  Must be called under both sleep and state locks.
-    m_pending_requests.erase(iter);
-    m_cv.notify_all();
-}
-void PABotBase::remove_command(std::map<uint64_t, PendingCommand>::iterator iter){
-    //  Must be called under both sleep and state locks.
-    m_pending_commands.erase(iter);
-    m_cv.notify_all();
-}
 template <typename Map>
 uint64_t PABotBase::infer_full_seqnum(const Map& map, seqnum_t seqnum) const{
+    m_sanitizer.check_usage();
+
     //  The protocol uses a 32-bit seqnum that wraps around. For our purposes of
     //  retransmits, we use a full 64-bit seqnum to maintain sorting order
     //  across the wrap-arounds.
@@ -189,6 +188,8 @@ uint64_t PABotBase::infer_full_seqnum(const Map& map, seqnum_t seqnum) const{
 }
 
 uint64_t PABotBase::oldest_live_seqnum() const{
+    m_sanitizer.check_usage();
+
     //  Must call under state lock.
     uint64_t oldest = m_send_seq;
     if (!m_pending_requests.empty()){
@@ -202,6 +203,8 @@ uint64_t PABotBase::oldest_live_seqnum() const{
 
 template <typename Params>
 void PABotBase::process_ack_request(BotBaseMessage message){
+    m_sanitizer.check_usage();
+
     if (message.body.size() != sizeof(Params)){
         m_sniffer->log("Ignoring message with invalid size.");
         return;
@@ -224,6 +227,7 @@ void PABotBase::process_ack_request(BotBaseMessage message){
             m_sniffer->log("Unexpected request ack message: seqnum = " + std::to_string(seqnum));
             return;
         }
+        iter->second.sanitizer.check_usage();
 
         state = iter->second.state;
         if (state == AckState::NOT_ACKED){
@@ -255,6 +259,8 @@ void PABotBase::process_ack_request(BotBaseMessage message){
 }
 template <typename Params>
 void PABotBase::process_ack_command(BotBaseMessage message){
+    m_sanitizer.check_usage();
+
     if (message.body.size() != sizeof(Params)){
         m_sniffer->log("Ignoring message with invalid size.");
         return;
@@ -275,6 +281,7 @@ void PABotBase::process_ack_command(BotBaseMessage message){
         m_sniffer->log("Unexpected command ack message: seqnum = " + std::to_string(seqnum));
         return;
     }
+    iter->second.sanitizer.check_usage();
 
     m_last_ack.store(current_time(), std::memory_order_release);
 
@@ -294,6 +301,8 @@ void PABotBase::process_ack_command(BotBaseMessage message){
 }
 template <typename Params>
 void PABotBase::process_command_finished(BotBaseMessage message){
+    m_sanitizer.check_usage();
+
     if (message.body.size() != sizeof(Params)){
         m_sniffer->log("Ignoring message with invalid size.");
         return;
@@ -329,6 +338,7 @@ void PABotBase::process_command_finished(BotBaseMessage message){
         );
         return;
     }
+    iter->second.sanitizer.check_usage();
 
     switch (iter->second.state){
     case AckState::NOT_ACKED:
@@ -346,6 +356,8 @@ void PABotBase::process_command_finished(BotBaseMessage message){
     }
 }
 void PABotBase::on_recv_message(BotBaseMessage message){
+    m_sanitizer.check_usage();
+
     switch (message.type){
     case PABB_MSG_ACK_COMMAND:
         process_ack_command<pabb_MsgAckCommand>(std::move(message));
@@ -373,6 +385,8 @@ void PABotBase::on_recv_message(BotBaseMessage message){
 }
 
 void PABotBase::retransmit_thread(){
+    m_sanitizer.check_usage();
+
 //    cout << "retransmit_thread()" << endl;
     auto last_sent = current_time();
     while (m_state.load(std::memory_order_acquire) == State::RUNNING){
@@ -396,6 +410,7 @@ void PABotBase::retransmit_thread(){
         //      Iterate through all pending requests and retransmit them in
         //  chronological order. Skip the ones that are new.
         for (auto& item : m_pending_requests){
+            item.second.sanitizer.check_usage();
             if (
                 item.second.state == AckState::NOT_ACKED &&
                 current_time() - item.second.first_sent >= m_retransmit_delay
@@ -404,6 +419,7 @@ void PABotBase::retransmit_thread(){
             }
         }
         for (auto& item : m_pending_commands){
+            item.second.sanitizer.check_usage();
             if (
                 item.second.state == AckState::NOT_ACKED &&
                 current_time() - item.second.first_sent >= m_retransmit_delay
@@ -424,6 +440,8 @@ uint64_t PABotBase::try_issue_request(
     const BotBaseRequest& request, bool silent_remove,
     size_t queue_limit
 ){
+    m_sanitizer.check_usage();
+
     BotBaseMessage message = request.message();
     if (message.body.size() < sizeof(uint32_t)){
         throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Message is too short.");
@@ -468,13 +486,13 @@ uint64_t PABotBase::try_issue_request(
 
     m_send_seq = seqnum + 1;
 
-    PendingRequest* handle = &ret.first->second;
+    PendingRequest& handle = ret.first->second;
 
-    handle->silent_remove = silent_remove;
-    handle->request = std::move(message);
-    handle->first_sent = current_time();
+    handle.silent_remove = silent_remove;
+    handle.request = std::move(message);
+    handle.first_sent = current_time();
 
-    send_message(handle->request, false);
+    send_message(handle.request, false);
 
     return seqnum;
 }
@@ -483,6 +501,8 @@ uint64_t PABotBase::try_issue_command(
     const BotBaseRequest& request, bool silent_remove,
     size_t queue_limit
 ){
+    m_sanitizer.check_usage();
+
     BotBaseMessage message = request.message();
     if (message.body.size() < sizeof(uint32_t)){
         throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "Message is too short.");
@@ -533,13 +553,13 @@ uint64_t PABotBase::try_issue_command(
 
     m_send_seq = seqnum + 1;
 
-    PendingCommand* handle = &ret.first->second;
+    PendingCommand& handle = ret.first->second;
 
-    handle->silent_remove = silent_remove;
-    handle->request = std::move(message);
-    handle->first_sent = current_time();
+    handle.silent_remove = silent_remove;
+    handle.request = std::move(message);
+    handle.first_sent = current_time();
 
-    send_message(handle->request, false);
+    send_message(handle.request, false);
 
     return seqnum;
 }
@@ -547,6 +567,8 @@ uint64_t PABotBase::issue_request(
     const Cancellable* cancelled,
     const BotBaseRequest& request, bool silent_remove
 ){
+    m_sanitizer.check_usage();
+
     //  Issue a request or a command and return.
     //
     //  If it cannot be issued (because we're over the limits), this function
@@ -584,6 +606,8 @@ uint64_t PABotBase::issue_command(
     const Cancellable* cancelled,
     const BotBaseRequest& request, bool silent_remove
 ){
+    m_sanitizer.check_usage();
+
     //  Issue a request or a command and return.
     //
     //  If it cannot be issued (because we're over the limits), this function
@@ -622,6 +646,8 @@ bool PABotBase::try_issue_request(
     const BotBaseRequest& request,
     const Cancellable* cancelled
 ){
+    m_sanitizer.check_usage();
+
     if (!request.is_command()){
         return try_issue_request(cancelled, request, true, MAX_PENDING_REQUESTS) != 0;
     }else{
@@ -632,6 +658,8 @@ void PABotBase::issue_request(
     const BotBaseRequest& request,
     const Cancellable* cancelled
 ){
+    m_sanitizer.check_usage();
+
     if (!request.is_command()){
         issue_request(cancelled, request, true);
     }else{
@@ -643,6 +671,8 @@ BotBaseMessage PABotBase::issue_request_and_wait(
     const BotBaseRequest& request,
     const Cancellable* cancelled
 ){
+    m_sanitizer.check_usage();
+
     if (request.is_command()){
         throw InternalProgramError(&m_logger, PA_CURRENT_FUNCTION, "This function only supports requests.");
     }
@@ -651,6 +681,8 @@ BotBaseMessage PABotBase::issue_request_and_wait(
     return wait_for_request(seqnum);
 }
 BotBaseMessage PABotBase::wait_for_request(uint64_t seqnum){
+    m_sanitizer.check_usage();
+
     std::unique_lock<std::mutex> lg(m_sleep_lock);
     while (true){
         {
@@ -659,14 +691,18 @@ BotBaseMessage PABotBase::wait_for_request(uint64_t seqnum){
             if (iter == m_pending_requests.end()){
                 throw OperationCancelledException();
             }
+            iter->second.sanitizer.check_usage();
+
             State state = m_state.load(std::memory_order_acquire);
             if (state != State::RUNNING){
-                remove_request(iter);
+                m_pending_requests.erase(iter);
+                m_cv.notify_all();
                 throw InvalidConnectionStateException();
             }
             if (iter->second.state == AckState::ACKED){
                 BotBaseMessage ret = std::move(iter->second.ack);
-                remove_request(iter);
+                m_pending_requests.erase(iter);
+                m_cv.notify_all();
                 return ret;
             }
         }

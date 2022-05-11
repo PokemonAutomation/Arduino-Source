@@ -11,6 +11,10 @@
 #include "BotBaseMessage.h"
 #include "PABotBaseConnection.h"
 
+#include <iostream>
+using std::cout;
+using std::endl;
+
 namespace PokemonAutomation{
 
 MessageSniffer null_sniffer;

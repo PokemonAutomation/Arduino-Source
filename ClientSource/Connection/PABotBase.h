@@ -97,6 +97,7 @@ private:
         BotBaseMessage request;
         BotBaseMessage ack;
         WallClock first_sent;
+        LifetimeSanitizer sanitizer;
     };
     struct PendingCommand{
         AckState state = AckState::NOT_ACKED;
@@ -104,6 +105,7 @@ private:
         BotBaseMessage request;
         BotBaseMessage ack;
         WallClock first_sent;
+        LifetimeSanitizer sanitizer;
     };
 
     template <typename Map>
@@ -118,8 +120,6 @@ private:
     virtual void on_recv_message(BotBaseMessage message) override;
 
     void clear_all_active_commands(uint64_t seqnum);
-    void remove_request(std::map<uint64_t, PendingRequest>::iterator iter);
-    void remove_command(std::map<uint64_t, PendingCommand>::iterator iter);
 
     void retransmit_thread();
 
@@ -180,6 +180,8 @@ private:
     std::condition_variable m_cv;
     std::atomic<State> m_state;
     std::thread m_retransmit_thread;
+
+    LifetimeSanitizer m_sanitizer;
 };
 
 

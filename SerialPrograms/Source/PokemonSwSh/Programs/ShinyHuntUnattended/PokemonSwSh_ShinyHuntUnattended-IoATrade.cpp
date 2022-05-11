@@ -137,7 +137,7 @@ void ShinyHuntUnattendedIoATrade::program(SingleSwitchProgramEnvironment& env, B
         start_game_from_home(context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST, 0, 0, false);
     }
 
-    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+//    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
 }
 
 

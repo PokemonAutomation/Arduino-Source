@@ -105,7 +105,7 @@ void ShinyHuntUnattendedStrongSpawn::program(SingleSwitchProgramEnvironment& env
 
     }
 
-    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
+//    pbf_press_button(context, BUTTON_HOME, 10, GameSettings::instance().GAME_TO_HOME_DELAY_SAFE);
 }
 
 

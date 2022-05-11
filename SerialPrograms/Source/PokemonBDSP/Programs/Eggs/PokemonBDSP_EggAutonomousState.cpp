@@ -422,8 +422,8 @@ void EggAutonomousState::hatch_egg(){
             {{dialog}}
         );
         if (ret < 0){
-            throw OperationFailedException(m_console, "End of hatch not detected after 30 seconds.");
             process_error("NoHatchEnd", "End of hatch not detected after 30 seconds.");
+            throw OperationFailedException(m_console, "End of hatch not detected after 30 seconds.");
         }
         m_console.log("Egg finished hatching.");
         m_stats.m_hatched++;

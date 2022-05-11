@@ -11,6 +11,7 @@
 #include <cstring>
 #include <string>
 #include "Common/Cpp/Exceptions.h"
+#include "Common/Cpp/LifetimeSanitizer.h"
 #include "BotBase.h"
 
 namespace PokemonAutomation{
@@ -19,6 +20,8 @@ namespace PokemonAutomation{
 struct BotBaseMessage{
     uint8_t type;
     std::string body;
+
+    LifetimeSanitizer sanitizer;
 
     BotBaseMessage() = default;
     BotBaseMessage(uint8_t p_type, std::string p_body)
@@ -34,6 +37,7 @@ struct BotBaseMessage{
 
     template <uint8_t MessageType, typename MessageBody>
     void convert(Logger& logger, MessageBody& params) const{
+        sanitizer.check_usage();
         if (type != MessageType){
             throw SerialProtocolException(
                 logger, PA_CURRENT_FUNCTION,
@@ -47,6 +51,7 @@ struct BotBaseMessage{
             );
         }
         memcpy(&params, body.c_str(), body.size());
+        sanitizer.check_usage();
     }
 
 };

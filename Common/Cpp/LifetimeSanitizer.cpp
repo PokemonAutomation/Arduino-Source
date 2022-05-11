@@ -43,9 +43,54 @@ LifetimeSanitizer::~LifetimeSanitizer(){
         sanitizer_map.erase(this);
         return;
     }
-    std::cerr << "LifetimeSanitizer -Free non-existant: " << this << std::endl;
+    std::cerr << "LifetimeSanitizer - Free non-existant: " << this << std::endl;
     std::terminate();
 }
+
+
+
+LifetimeSanitizer::LifetimeSanitizer(LifetimeSanitizer&& x){
+    x.check_usage();
+    SpinLockGuard lg(sanitizer_lock);
+#ifdef PA_SANITIZER_PRINT_ALL
+    std::cout << "LifetimeSanitizer - Allocating (move-construct): " << this << std::endl;
+#endif
+    auto iter = sanitizer_map.find(this);
+    if (iter == sanitizer_map.end()){
+        sanitizer_map.insert(this);
+        return;
+    }
+    std::cerr << "LifetimeSanitizer - Double allocation: " << this << std::endl;
+    std::terminate();
+}
+void LifetimeSanitizer::operator=(LifetimeSanitizer&& x){
+    check_usage();
+    x.check_usage();
+}
+
+
+
+LifetimeSanitizer::LifetimeSanitizer(const LifetimeSanitizer& x){
+    x.check_usage();
+    SpinLockGuard lg(sanitizer_lock);
+#ifdef PA_SANITIZER_PRINT_ALL
+    std::cout << "LifetimeSanitizer - Allocating (copy-construct): " << this << std::endl;
+#endif
+    auto iter = sanitizer_map.find(this);
+    if (iter == sanitizer_map.end()){
+        sanitizer_map.insert(this);
+        return;
+    }
+    std::cerr << "LifetimeSanitizer - Double allocation: " << this << std::endl;
+    std::terminate();
+}
+void LifetimeSanitizer::operator=(const LifetimeSanitizer& x){
+    check_usage();
+    x.check_usage();
+}
+
+
+
 void LifetimeSanitizer::check_usage() const{
     SpinLockGuard lg(sanitizer_lock);
 #ifdef PA_SANITIZER_PRINT_ALL
