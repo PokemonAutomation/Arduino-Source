@@ -13,12 +13,12 @@ namespace ScaleInvariantMatrixMatch{
 
 
 float compute_scale_Default         (size_t width, size_t height, float const* const* A, float const* const* T);
-float compute_scale_min16_x86_SSE   (size_t width, size_t height, float const* const* A, float const* const* T);
+float compute_scale_min4_x86_SSE    (size_t width, size_t height, float const* const* A, float const* const* T);
 float compute_scale_min8_x86_AVX2   (size_t width, size_t height, float const* const* A, float const* const* T);
 float compute_scale_min16_x86_AVX512(size_t width, size_t height, float const* const* A, float const* const* T);
 
 float compute_scale_Default         (size_t width, size_t height, float const* const* A, float const* const* TW, float const* const* W);
-float compute_scale_min16_x86_SSE   (size_t width, size_t height, float const* const* A, float const* const* TW, float const* const* W);
+float compute_scale_min4_x86_SSE    (size_t width, size_t height, float const* const* A, float const* const* TW, float const* const* W);
 float compute_scale_min8_x86_AVX2   (size_t width, size_t height, float const* const* A, float const* const* TW, float const* const* W);
 float compute_scale_min16_x86_AVX512(size_t width, size_t height, float const* const* A, float const* const* TW, float const* const* W);
 
@@ -39,8 +39,8 @@ float compute_scale(
     }
 #endif
 #ifdef PA_AutoDispatch_08_Nehalem
-    if (width >= 16 && CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
-        return compute_scale_min16_x86_SSE(width, height, A, T);
+    if (width >= 4 && CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
+        return compute_scale_min4_x86_SSE(width, height, A, T);
     }
 #endif
     return compute_scale_Default(width, height, A, T);
@@ -62,8 +62,8 @@ float compute_scale(
     }
 #endif
 #ifdef PA_AutoDispatch_08_Nehalem
-    if (width >= 16 && CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
-        return compute_scale_min16_x86_SSE(width, height, A, TW, W);
+    if (width >= 4 && CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
+        return compute_scale_min4_x86_SSE(width, height, A, TW, W);
     }
 #endif
     return compute_scale_Default(width, height, A, TW, W);
@@ -72,12 +72,12 @@ float compute_scale(
 
 
 float compute_error_Default         (size_t width, size_t height, float scale, float const* const* A, float const* const* T);
-float compute_error_min16_x86_SSE   (size_t width, size_t height, float scale, float const* const* A, float const* const* T);
+float compute_error_min4_x86_SSE    (size_t width, size_t height, float scale, float const* const* A, float const* const* T);
 float compute_error_min8_x86_AVX2   (size_t width, size_t height, float scale, float const* const* A, float const* const* T);
 float compute_error_min16_x86_AVX512(size_t width, size_t height, float scale, float const* const* A, float const* const* T);
 
 float compute_error_Default         (size_t width, size_t height, float scale, float const* const* A, float const* const* TW, float const* const* W);
-float compute_error_min16_x86_SSE   (size_t width, size_t height, float scale, float const* const* A, float const* const* TW, float const* const* W);
+float compute_error_min4_x86_SSE    (size_t width, size_t height, float scale, float const* const* A, float const* const* TW, float const* const* W);
 float compute_error_min8_x86_AVX2   (size_t width, size_t height, float scale, float const* const* A, float const* const* TW, float const* const* W);
 float compute_error_min16_x86_AVX512(size_t width, size_t height, float scale, float const* const* A, float const* const* TW, float const* const* W);
 
@@ -98,8 +98,8 @@ float compute_error(
     }
 #endif
 #ifdef PA_AutoDispatch_08_Nehalem
-    if (width >= 16 && CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
-        return compute_error_min16_x86_SSE(width, height, scale, A, T);
+    if (width >= 4 && CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
+        return compute_error_min4_x86_SSE(width, height, scale, A, T);
     }
 #endif
     return compute_error_Default(width, height, scale, A, T);
@@ -122,8 +122,8 @@ float compute_error(
     }
 #endif
 #ifdef PA_AutoDispatch_08_Nehalem
-    if (width >= 16 && CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
-        return compute_error_min16_x86_SSE(width, height, scale, A, TW, W);
+    if (width >= 4 && CPU_CAPABILITY_CURRENT.OK_08_Nehalem){
+        return compute_error_min4_x86_SSE(width, height, scale, A, TW, W);
     }
 #endif
     return compute_error_Default(width, height, scale, A, TW, W);

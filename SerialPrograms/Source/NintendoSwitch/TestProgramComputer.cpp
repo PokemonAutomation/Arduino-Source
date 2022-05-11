@@ -54,8 +54,8 @@
 //#include "Kernels/Kernels_x64_SSE41.h"
 //#include "Kernels/Kernels_x64_AVX2.h"
 //#include "Kernels/Kernels_x64_AVX512.h"
-#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
-#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
+//#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
+//#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
 //#include "Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512.h"
 //#include "Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h"
 #include "Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h"
@@ -157,6 +157,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
 //    __m256 k3 = _mm256_set1_ps(-1.);
 
 
+#if 0
     alignas(PA_ALIGNMENT) float out[32];
     alignas(PA_ALIGNMENT) float in[32] = {3, 3, 3, 8, 9, 6, 9, 5, 7, 6, 3, 1, 4, 0, 4, 7, 9, 5, 1, 3, 1, 3, 8, \
 5, 2, 6, 1, 3, 3, 5, 3, 0};
@@ -170,7 +171,7 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     SpikeConvolution::compute_spike_kernel(out, in, 32, kernel, 5);
 
     print(out, 32);
-
+#endif
 
 
 

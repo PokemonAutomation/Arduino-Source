@@ -9,7 +9,6 @@
 
 #include <vector>
 #include <QWidget>
-#include "Common/Cpp/Time.h"
 #include "VideoFeed.h"
 
 namespace PokemonAutomation{
