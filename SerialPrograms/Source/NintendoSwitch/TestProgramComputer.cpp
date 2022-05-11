@@ -50,11 +50,16 @@
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "Common/Cpp/PeriodicScheduler.h"
 #include "Pokemon/Inference/Pokemon_IVCheckerReader.h"
+#include "Kernels/Kernels_Alignment.h"
 //#include "Kernels/Kernels_x64_SSE41.h"
+//#include "Kernels/Kernels_x64_AVX2.h"
 //#include "Kernels/Kernels_x64_AVX512.h"
+#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h"
+#include "Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h"
 //#include "Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512.h"
 //#include "Kernels/Waterfill/Kernels_Waterfill_Core_64x32_x64_AVX512-GF.h"
 #include "Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h"
+#include "Kernels/SpikeConvolution/Kernels_SpikeConvolution.h"
 
 
 
@@ -129,20 +134,10 @@ void print_8x64(__m512i m){
 
 
 
+using namespace Kernels;
 
 
 
-
-
-
-namespace Kernels{
-namespace ScaleInvariantMatrixMatch{
-
-
-
-
-}
-}
 
 
 
@@ -156,8 +151,32 @@ void TestProgramComputer::program(ProgramEnvironment& env, CancellableScope& sco
     using namespace NintendoSwitch::PokemonLA;
     using namespace Pokemon;
 
+//    __m256 k0 = _mm256_set1_ps(-4.);
+//    __m256 k1 = _mm256_set1_ps(-3.);
+//    __m256 k2 = _mm256_set1_ps(-2.);
+//    __m256 k3 = _mm256_set1_ps(-1.);
 
-#if 1
+
+    alignas(PA_ALIGNMENT) float out[32];
+    alignas(PA_ALIGNMENT) float in[32] = {3, 3, 3, 8, 9, 6, 9, 5, 7, 6, 3, 1, 4, 0, 4, 7, 9, 5, 1, 3, 1, 3, 8, \
+5, 2, 6, 1, 3, 3, 5, 3, 0};
+
+    float kernel[] = {1, 2, 3, 2, 1};
+
+    for (size_t c = 0; c < 32; c++){
+        out[c] = 9999;
+    }
+
+    SpikeConvolution::compute_spike_kernel(out, in, 32, kernel, 5);
+
+    print(out, 32);
+
+
+
+
+
+
+#if 0
     __m128 v0 = _mm_setr_ps(10, 11, 12, 13);
     __m128 v1 = _mm_setr_ps(20, 21, 22, 23);
 

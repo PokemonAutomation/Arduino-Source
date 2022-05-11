@@ -1,0 +1,33 @@
+/*  Spike Convolution
+ *
+ *  From: https://github.com/PokemonAutomation/Arduino-Source
+ *
+ */
+
+#ifndef PokemonAutomation_Kernels_SpikeConvolution_H
+#define PokemonAutomation_Kernels_SpikeConvolution_H
+
+#include <stddef.h>
+
+namespace PokemonAutomation{
+namespace Kernels{
+namespace SpikeConvolution{
+
+
+//  Compute the Spike Kernel
+//      "out" and "in" are both aligned to "PA_ALIGNMENT" bytes.
+//      lengthI % PA_ALIGNMENT == 0
+//      lengthI >= lengthK
+//      "in"  is valid for lengthI
+//      "out" is valid for (lengthI - lengthK + 1) rounded up to PA_ALIGNMENT/sizeof(float)
+void compute_spike_kernel(
+    float* out, const float* in, size_t lengthI,
+    const float* kernel, size_t lengthK
+);
+
+
+
+}
+}
+}
+#endif

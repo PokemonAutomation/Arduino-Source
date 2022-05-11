@@ -12,6 +12,8 @@
 namespace PokemonAutomation{
 
 
+#define PA_ALIGNMENT    64
+
 
 #if 0
 #elif _MSC_VER

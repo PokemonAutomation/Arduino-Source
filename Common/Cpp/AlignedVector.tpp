@@ -88,7 +88,7 @@ void AlignedVector<Object>::operator=(const AlignedVector& x){
 
 template <typename Object>
 AlignedVector<Object>::AlignedVector(size_t items){
-    m_ptr = (Object*)_mm_malloc(items * sizeof(Object), 64);
+    m_ptr = (Object*)_mm_malloc(items * sizeof(Object), PA_ALIGNMENT);
     if (m_ptr == nullptr){
         throw std::bad_alloc();
     }
@@ -135,7 +135,7 @@ void AlignedVector<Object>::clear(){
 template <typename Object>
 PA_NO_INLINE void AlignedVector<Object>::expand(){
     size_t size = m_capacity == 0 ? 1 : m_capacity * 2;
-    Object* ptr = (Object*)_mm_malloc(size * sizeof(Object), 64);
+    Object* ptr = (Object*)_mm_malloc(size * sizeof(Object), PA_ALIGNMENT);
     if (ptr == nullptr){
         throw std::bad_alloc();
     }

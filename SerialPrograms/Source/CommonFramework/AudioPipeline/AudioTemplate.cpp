@@ -25,7 +25,7 @@ AudioTemplate::AudioTemplate(){}
 AudioTemplate::AudioTemplate(size_t frequencies, size_t windows)
     : m_numWindows(windows)
     , m_numFrequencies(frequencies)
-    , m_bytes_per_spectrum(Kernels::align_int_up<64>(frequencies * sizeof(float)))
+    , m_bytes_per_spectrum(Kernels::align_int_up<PA_ALIGNMENT>(frequencies * sizeof(float)))
     , m_spectrogram(windows * (m_bytes_per_spectrum / sizeof(float)))
 {}
 

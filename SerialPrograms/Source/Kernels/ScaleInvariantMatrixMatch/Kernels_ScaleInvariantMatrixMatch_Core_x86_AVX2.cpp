@@ -17,7 +17,7 @@ namespace ScaleInvariantMatrixMatch{
 
 
 
-struct SumATA2_min8_x86_FMA3{
+struct SumATA2_min8_x86_AVX2{
     using vtype = __m256;
 
     __m256 sum_AT = _mm256_setzero_ps();
@@ -367,22 +367,22 @@ struct SumError_min8_x86_FMA3{
 };
 
 
-float compute_scale_min8_x86_FMA3(
+float compute_scale_min8_x86_AVX2(
     size_t width, size_t height,
     float const* const* A,
     float const* const* T
 ){
-    return compute_scale<SumATA2_min8_x86_FMA3>(width, height, A, T);
+    return compute_scale<SumATA2_min8_x86_AVX2>(width, height, A, T);
 }
-float compute_scale_min8_x86_FMA3(
+float compute_scale_min8_x86_AVX2(
     size_t width, size_t height,
     float const* const* A,
     float const* const* TW,
     float const* const* W
 ){
-    return compute_scale<SumATA2_min8_x86_FMA3>(width, height, A, TW, W);
+    return compute_scale<SumATA2_min8_x86_AVX2>(width, height, A, TW, W);
 }
-float compute_error_min8_x86_FMA3(
+float compute_error_min8_x86_AVX2(
     size_t width, size_t height,
     float scale,
     float const* const* A,
@@ -390,7 +390,7 @@ float compute_error_min8_x86_FMA3(
 ){
     return compute_error<SumError_min8_x86_FMA3>(width, height, scale, A, T);
 }
-float compute_error_min8_x86_FMA3(
+float compute_error_min8_x86_AVX2(
     size_t width, size_t height,
     float scale,
     float const* const* A,

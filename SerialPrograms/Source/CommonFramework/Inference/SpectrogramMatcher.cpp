@@ -137,7 +137,7 @@ SpectrogramMatcher::SpectrogramMatcher(
             m_templateRange.emplace_back(windowStart, windowEnd);
         }
     }
-    
+
     m_templateNorm = buildTemplateNorm();
 }
 
@@ -163,9 +163,9 @@ void SpectrogramMatcher::conv(const float* src, size_t num, float* dst){
 std::vector<float> SpectrogramMatcher::buildTemplateNorm() const {
     std::vector<float> ret(m_templateRange.size());
 
-    for(size_t subIndex = 0; subIndex < m_templateRange.size(); subIndex++){
+    for (size_t subIndex = 0; subIndex < m_templateRange.size(); subIndex++){
         float sumSqr = 0.0f;
-        for(size_t i = m_templateRange[subIndex].first; i < m_templateRange[subIndex].second; i++){
+        for (size_t i = m_templateRange[subIndex].first; i < m_templateRange[subIndex].second; i++){
             for(size_t j = m_freqStart; j < m_freqEnd; j++){
                 const float v = m_template.getWindow(i)[j];
                 sumSqr += v * v;
@@ -173,7 +173,7 @@ std::vector<float> SpectrogramMatcher::buildTemplateNorm() const {
         }
         ret[subIndex] = std::sqrt(sumSqr);
     }
-    
+
     return ret;
 }
 

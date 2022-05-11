@@ -14,12 +14,12 @@ namespace ScaleInvariantMatrixMatch{
 
 float compute_scale_Default         (size_t width, size_t height, float const* const* A, float const* const* T);
 float compute_scale_min16_x86_SSE   (size_t width, size_t height, float const* const* A, float const* const* T);
-float compute_scale_min8_x86_FMA3   (size_t width, size_t height, float const* const* A, float const* const* T);
+float compute_scale_min8_x86_AVX2   (size_t width, size_t height, float const* const* A, float const* const* T);
 float compute_scale_min16_x86_AVX512(size_t width, size_t height, float const* const* A, float const* const* T);
 
 float compute_scale_Default         (size_t width, size_t height, float const* const* A, float const* const* TW, float const* const* W);
 float compute_scale_min16_x86_SSE   (size_t width, size_t height, float const* const* A, float const* const* TW, float const* const* W);
-float compute_scale_min8_x86_FMA3   (size_t width, size_t height, float const* const* A, float const* const* TW, float const* const* W);
+float compute_scale_min8_x86_AVX2   (size_t width, size_t height, float const* const* A, float const* const* TW, float const* const* W);
 float compute_scale_min16_x86_AVX512(size_t width, size_t height, float const* const* A, float const* const* TW, float const* const* W);
 
 
@@ -35,7 +35,7 @@ float compute_scale(
 #endif
 #ifdef PA_AutoDispatch_13_Haswell
     if (width >= 8 && CPU_CAPABILITY_CURRENT.OK_13_Haswell){
-        return compute_scale_min8_x86_FMA3(width, height, A, T);
+        return compute_scale_min8_x86_AVX2(width, height, A, T);
     }
 #endif
 #ifdef PA_AutoDispatch_08_Nehalem
@@ -58,7 +58,7 @@ float compute_scale(
 #endif
 #ifdef PA_AutoDispatch_13_Haswell
     if (width >= 8 && CPU_CAPABILITY_CURRENT.OK_13_Haswell){
-        return compute_scale_min8_x86_FMA3(width, height, A, TW, W);
+        return compute_scale_min8_x86_AVX2(width, height, A, TW, W);
     }
 #endif
 #ifdef PA_AutoDispatch_08_Nehalem
@@ -73,12 +73,12 @@ float compute_scale(
 
 float compute_error_Default         (size_t width, size_t height, float scale, float const* const* A, float const* const* T);
 float compute_error_min16_x86_SSE   (size_t width, size_t height, float scale, float const* const* A, float const* const* T);
-float compute_error_min8_x86_FMA3   (size_t width, size_t height, float scale, float const* const* A, float const* const* T);
+float compute_error_min8_x86_AVX2   (size_t width, size_t height, float scale, float const* const* A, float const* const* T);
 float compute_error_min16_x86_AVX512(size_t width, size_t height, float scale, float const* const* A, float const* const* T);
 
 float compute_error_Default         (size_t width, size_t height, float scale, float const* const* A, float const* const* TW, float const* const* W);
 float compute_error_min16_x86_SSE   (size_t width, size_t height, float scale, float const* const* A, float const* const* TW, float const* const* W);
-float compute_error_min8_x86_FMA3   (size_t width, size_t height, float scale, float const* const* A, float const* const* TW, float const* const* W);
+float compute_error_min8_x86_AVX2   (size_t width, size_t height, float scale, float const* const* A, float const* const* TW, float const* const* W);
 float compute_error_min16_x86_AVX512(size_t width, size_t height, float scale, float const* const* A, float const* const* TW, float const* const* W);
 
 float compute_error(
@@ -94,7 +94,7 @@ float compute_error(
 #endif
 #ifdef PA_AutoDispatch_13_Haswell
     if (width >= 8 && CPU_CAPABILITY_CURRENT.OK_13_Haswell){
-        return compute_error_min8_x86_FMA3(width, height, scale, A, T);
+        return compute_error_min8_x86_AVX2(width, height, scale, A, T);
     }
 #endif
 #ifdef PA_AutoDispatch_08_Nehalem
@@ -118,7 +118,7 @@ float compute_error(
 #endif
 #ifdef PA_AutoDispatch_13_Haswell
     if (width >= 8 && CPU_CAPABILITY_CURRENT.OK_13_Haswell){
-        return compute_error_min8_x86_FMA3(width, height, scale, A, TW, W);
+        return compute_error_min8_x86_AVX2(width, height, scale, A, TW, W);
     }
 #endif
 #ifdef PA_AutoDispatch_08_Nehalem
