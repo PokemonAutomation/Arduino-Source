@@ -2,7 +2,7 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *  Tables to set moves and switching durign battle.
+ *  Tables to set moves and switching during battle.
  *
  */
 
@@ -11,6 +11,7 @@
 
 #include "CommonFramework/Options/ConfigOption.h"
 #include "CommonFramework/Options/EditableTableOption.h"
+#include "CommonFramework/Options/EnumDropdownOption.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -148,6 +149,46 @@ private:
 };
 
 
+
+class MoveGrinderActionRow : public EditableTableRow {
+public:
+    virtual void load_json(const QJsonValue& json) override;
+    virtual QJsonValue to_json() const override;
+    virtual std::unique_ptr<EditableTableRow> clone() const override;
+    virtual std::vector<QWidget*> make_widgets(QWidget& parent) override;
+
+    size_t pokemon_index;
+    size_t move_index;
+    MoveStyle style = MoveStyle::NoStyle;
+    uint16_t attemps = 0;
+};
+
+class MoveGrinderActionTableFactory : public EditableTableFactory {
+public:
+    virtual QStringList make_header() const override;
+    virtual std::unique_ptr<EditableTableRow> make_row() const override;
+};
+
+struct Move{
+    MoveStyle style;
+    uint16_t attemps;
+};
+
+class MoveGrinderActionTable : public ConfigOption {
+public:
+    MoveGrinderActionTable();
+
+    Move get_move(size_t pokemon, size_t move) const;
+
+    virtual void load_json(const QJsonValue& json) override;
+    virtual QJsonValue to_json() const override;
+
+    virtual ConfigWidget* make_ui(QWidget& parent) override;
+
+private:
+    MoveGrinderActionTableFactory m_factory;
+    EditableTableOption m_table;
+};
 
 
 }
