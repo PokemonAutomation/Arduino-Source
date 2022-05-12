@@ -17,6 +17,7 @@ namespace PokemonAutomation{
 namespace ImageMatch{
 
 
+// Used to match an image or a waterfill object against a template object.
 class WaterfillTemplateMatcher{
 protected:
     using WaterfillObject = Kernels::Waterfill::WaterfillObject;

@@ -433,11 +433,13 @@ SOURCES += \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.cpp \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.cpp \
+    Source/PokemonLA/Inference/Battles/PokemonLA_TransparentDialogueDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.cpp \
+    Source/PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagTracker.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.cpp \
@@ -1129,11 +1131,13 @@ HEADERS += \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMoveSelectionDetector.h \
     Source/PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h \
+    Source/PokemonLA/Inference/Battles/PokemonLA_TransparentDialogueDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_BubbleDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.h \
+    Source/PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_FlagTracker.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_QuestMarkDetector.h \

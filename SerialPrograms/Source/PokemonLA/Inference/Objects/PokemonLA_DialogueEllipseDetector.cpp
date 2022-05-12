@@ -42,20 +42,12 @@ DialogueEllipseTracker::DialogueEllipseTracker()
 {}
 
 void DialogueEllipseTracker::process_object(const ConstImageRef& image, const WaterfillObject& object){
-//    cout << "asdf" << endl;
-//    static int c = 0;
-//    cout << "c = " << c << endl;
-//    extract_box(image, object).save("test-" + QString::number(c++) + ".png");
-//    image.save("test-" + QString::number(c++) + "-A.png");
-//    extract_box(image, object).save("test-" + QString::number(c++) + "-B.png");
-
     double rmsd = DialogueEllipseMatcher::instance().rmsd_original(image, object);
-//    cout << "rmsd = " << rmsd << endl;
     if (rmsd < 80){
-//        cout << "rmsd = " << rmsd << endl;
         m_detections.emplace_back(object);
     }
 }
+
 void DialogueEllipseTracker::finish(){
     merge_heavily_overlapping();
 }
@@ -67,7 +59,7 @@ DialogueEllipseDetector::DialogueEllipseDetector(
     std::chrono::milliseconds min_streak,
     bool stop_on_detected
 )
-    : VisualInferenceCallback("CenterAButtonDetector")
+    : VisualInferenceCallback("DialogueEllipseButtonDetector")
     , m_logger(logger)
     , m_box(0.741, 0.811, 0.028, 0.023)
     , m_stop_on_detected(stop_on_detected)

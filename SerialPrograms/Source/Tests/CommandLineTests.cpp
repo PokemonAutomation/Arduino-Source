@@ -86,6 +86,7 @@ int run_test_obj_dir(TestFunction test_func, const QString& directory_path, size
         }
 
         // Call the function to do the actual test:
+        cout << file_path << endl;
         RETURN_IF_TEST_FAILED(test_func, file_path, num_passed);
     }
 

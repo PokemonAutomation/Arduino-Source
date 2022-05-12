@@ -20,7 +20,7 @@ int test_pokemonLA_BattleMenuDetector(const QImage& image, bool target);
 
 int test_pokemonLA_BattlePokemonSwitchDetector(const QImage& image, bool target);
 
-int test_pokemonLA_DialogueEllipseDetector(const QImage& image, bool target);
+int test_pokemonLA_TransparentDialogueDetector(const QImage& image, bool target);
 
 int test_pokemonLA_StatusInfoScreenDetector(const QImage& image, const std::vector<std::string>& keywords);
 

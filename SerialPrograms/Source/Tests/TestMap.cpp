@@ -131,7 +131,7 @@ const QString file_path = QString::fromStdString(test_path);
 const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonLA_BattleMenuDetector", std::bind(image_bool_detector_helper, test_pokemonLA_BattleMenuDetector, _1)},
     {"PokemonLA_BattlePokemonSwitchDetector", std::bind(image_bool_detector_helper, test_pokemonLA_BattlePokemonSwitchDetector, _1)},
-    {"PokemonLA_DialogueEllipseDetector", std::bind(image_bool_detector_helper, test_pokemonLA_DialogueEllipseDetector, _1)},
+    {"PokemonLA_TransparentDialogueDetector", std::bind(image_bool_detector_helper, test_pokemonLA_TransparentDialogueDetector, _1)},
     {"PokemonLA_BerryTreeDetector", std::bind(image_void_detector_helper, test_pokemonLA_BerryTreeDetector, _1)},
     {"PokemonLA_StatusInfoScreenDetector", std::bind(image_keywords_detector_helper, test_pokemonLA_StatusInfoScreenDetector, _1)}
 };

@@ -1,12 +1,15 @@
-/*  Dialogue Ellipse Detector
+/*  Dialogue Yellow Arrow Detector
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *  Detect the white wide ellipse at the end of the transparent dialogue box.
+ *  The yellow marker pointing to the button to advance dialogue box.
+ *  For different types of dialogue boxes, there are different types of yellow arrows.
+ *  Currently we only need to detect the yellow arrows for transparent dialogue boxes happened
+ *  during Ingo's battles.
  */
 
-#ifndef PokemonAutomation_PokemonLA_DialogueEllipseDetector_H
-#define PokemonAutomation_PokemonLA_DialogueEllipseDetector_H
+#ifndef PokemonAutomation_PokemonLA_DialogueYellowArrowDetector_H
+#define PokemonAutomation_PokemonLA_DialogueYellowArrowDetector_H
 
 #include "Common/Cpp/SpinLock.h"
 #include "Common/Cpp/Color.h"
@@ -14,41 +17,37 @@
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/Inference/DetectionDebouncer.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h"
+#include "PokemonLA_WhiteObjectDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-class DialogueEllipseMatcher : public ImageMatch::WaterfillTemplateMatcher{
+class DialogueYellowArrowMatcher : public ImageMatch::WaterfillTemplateMatcher{
 public:
-    DialogueEllipseMatcher();
-    static const DialogueEllipseMatcher& instance();
+    DialogueYellowArrowMatcher();
+    static const DialogueYellowArrowMatcher& instance();
 };
 
-
-
-class DialogueEllipseTracker : public WhiteObjectDetector{
+class DialogueYellowArrowTracker : public WhiteObjectDetector{
 public:
-    DialogueEllipseTracker();
+    DialogueYellowArrowTracker();
 
     virtual void process_object(const ConstImageRef& image, const WaterfillObject& object) override;
     virtual void finish() override;
 };
 
 
-
-class DialogueEllipseDetector : public VisualInferenceCallback{
+class DialogueYellowArrowDetector : public VisualInferenceCallback{
 public:
-    DialogueEllipseDetector(
+    DialogueYellowArrowDetector(
         LoggerQt& logger, VideoOverlay& overlay,
-        std::chrono::milliseconds min_streak,
         bool stop_on_detected
     );
 
     bool detected() const{
-        return m_debouncer.get();
+        return m_detected.load(std::memory_order_acquire);
     }
 
     virtual void make_overlays(VideoOverlaySet& items) const override;
@@ -60,10 +59,10 @@ private:
     ImageFloatBox m_box;
     bool m_stop_on_detected;
 
-    DialogueEllipseTracker m_tracker;
+    DialogueYellowArrowTracker m_tracker;
     WhiteObjectWatcher m_watcher;
 
-    DetectionDebouncer<bool> m_debouncer;
+    std::atomic<bool> m_detected;
 };
 
 

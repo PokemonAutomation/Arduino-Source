@@ -10,7 +10,7 @@
 #include "CommonFramework/Language.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
-#include "PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.h"
+#include "PokemonLA/Inference/Battles/PokemonLA_TransparentDialogueDetector.h"
 #include "PokemonLA/Inference/PokemonLA_BerryTreeDetector.h"
 #include "PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"
 
@@ -41,11 +41,11 @@ int test_pokemonLA_BattlePokemonSwitchDetector(const QImage& image, bool target)
     TEST_RESULT_EQUAL(result, target);
 }
 
-int test_pokemonLA_DialogueEllipseDetector(const QImage& image, bool target){
+int test_pokemonLA_TransparentDialogueDetector(const QImage& image, bool target){
     auto& logger = global_logger_command_line();
     auto overlay = DummyVideoOverlay();
     const bool stop_on_detected = true;
-    DialogueEllipseDetector detector(logger, overlay, std::chrono::milliseconds(0), stop_on_detected);
+    TransparentDialogueDetector detector(logger, overlay, stop_on_detected);
 
     bool result = detector.process_frame(image, current_time());
     TEST_RESULT_EQUAL(result, target);
