@@ -898,6 +898,7 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/PokemonLA_NotificationReader.h
     Source/PokemonLA/Inference/PokemonLA_OutbreakReader.cpp
     Source/PokemonLA/Inference/PokemonLA_OutbreakReader.h
+    Source/PokemonLA/Inference/PokemonLA_OverworldDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_OverworldDetector.h
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.h

@@ -18,6 +18,7 @@
 #include "PokemonBDSP/Inference/BoxSystem/PokemonBDSP_IVCheckerReader.h"
 #include "PokemonBDSP/Inference/Battles/PokemonBDSP_BattleBallReader.h"
 #include "PokemonLA/Programs/PokemonLA_LeapPokemonActions.h"
+#include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
 
 #include <QVideoFrame>
 
@@ -99,6 +100,15 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     VideoFeed& feed = env.consoles[0];
     VideoOverlay& overlay = env.consoles[0];
 
+
+
+//    InferenceBoxScope box(overlay, 0.843, 0.96, 0.075, 0.005);
+
+    is_pokemon_selection(overlay, feed.snapshot().frame);
+
+
+
+#if 0
     BotBaseContext context(scope, console.botbase());
 
 
@@ -107,7 +117,7 @@ void TestProgram::program(MultiSwitchProgramEnvironment& env, CancellableScope& 
     cout << get_gender_str(pokemon.gender) << endl;
     cout << "is_alpha = " << pokemon.is_alpha << endl;
     cout << "is_shiny = " << pokemon.is_shiny << endl;
-
+#endif
 
 
 

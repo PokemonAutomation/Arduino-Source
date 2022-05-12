@@ -5,9 +5,11 @@
  */
 
 #include "CommonFramework/Notifications/ProgramNotifications.h"
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/StatsTracking.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonLA/PokemonLA_Settings.h"
+#include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
 #include "PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Programs/PokemonLA_MountChange.h"
@@ -170,10 +172,21 @@ void BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext
 }
 
 void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
-
     Stats& stats = env.stats<Stats>();
     stats.attempts++;
     env.console.log("Starting route and shiny detection...");
+
+    for (size_t c = 0; true; c++){
+        context.wait_for_all_requests();
+        if (is_pokemon_selection(env.console, env.console.video().snapshot().frame)){
+            break;
+        }
+        if (c >= 5){
+            throw OperationFailedException(env.console, "Failed to switch to Pokemon selection after 5 attempts.");
+        }
+        env.console.log("Not on Pokemon selection. Attempting to switch to it...", COLOR_ORANGE);
+        pbf_press_button(context, BUTTON_X, 20, 230);
+    }
 
     float shiny_coefficient = 1.0;
     std::atomic<bool> enable_shiny_sound(true);
@@ -258,7 +271,6 @@ void BurmyFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
             stats.errors++;
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
             reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
-            pbf_press_button(context, BUTTON_X, 20, 105);
         }
     }
 

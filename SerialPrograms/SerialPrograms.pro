@@ -451,6 +451,7 @@ SOURCES += \
     Source/PokemonLA/Inference/PokemonLA_MountDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_NotificationReader.cpp \
     Source/PokemonLA/Inference/PokemonLA_OutbreakReader.cpp \
+    Source/PokemonLA/Inference/PokemonLA_OverworldDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_SelectedRegionDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.cpp \
