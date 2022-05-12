@@ -30,6 +30,7 @@ public:
         NOT_CONNECTED,  //  Connection doesn't exist.
         CONNECTING,     //  Connection exists, but not ready.
         READY,          //  Connection exists and ready to use.
+        ERRORED,
         STOPPED,        //  Connection exists, but has been stopped.
         SHUTDOWN,       //  Connection is in the process of being destroyed.
     };
@@ -76,6 +77,8 @@ signals:
     void uptime_status(QString status);
 
 private:
+    const char* check_accepting_commands();
+
     void stop_unprotected();
     void reset_unprotected(const QSerialPortInfo& port);
 
@@ -96,7 +99,7 @@ private:
     std::thread m_status_thread;
     std::unique_ptr<PABotBase> m_botbase;
     std::mutex m_lock;
-    std::mutex m_cv_lock;
+    std::mutex m_sleep_lock;
     std::condition_variable m_cv;
 };
 

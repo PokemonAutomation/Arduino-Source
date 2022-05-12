@@ -32,6 +32,7 @@ PABotBase::PABotBase(
     , m_retransmit_delay(retransmit_delay)
     , m_last_ack(current_time())
     , m_state(State::RUNNING)
+    , m_error(false)
     , m_retransmit_thread(run_with_catch, "PABotBase::retransmit_thread()", [=]{ retransmit_thread(); })
 {
     set_sniffer(message_logger);
@@ -126,11 +127,33 @@ void PABotBase::wait_for_all_requests(const Cancellable* cancelled){
     }
 }
 
+bool PABotBase::try_stop_all_commands(){
+    m_sanitizer.check_usage();
+
+    uint64_t seqnum = try_issue_request(nullptr, Microcontroller::DeviceRequest_request_stop(), true, MAX_PENDING_REQUESTS);
+    if (seqnum != 0){
+        clear_all_active_commands(seqnum);
+        return true;
+    }else{
+        return false;
+    }
+}
 void PABotBase::stop_all_commands(){
     m_sanitizer.check_usage();
 
     uint64_t seqnum = issue_request(nullptr, Microcontroller::DeviceRequest_request_stop(), true);
     clear_all_active_commands(seqnum);
+}
+bool PABotBase::try_next_command_interrupt(){
+    m_sanitizer.check_usage();
+
+    uint64_t seqnum = try_issue_request(nullptr, Microcontroller::DeviceRequest_next_command_interrupt(), true, MAX_PENDING_REQUESTS);
+    if (seqnum != 0){
+        clear_all_active_commands(seqnum);
+        return true;
+    }else{
+        return false;
+    }
 }
 void PABotBase::next_command_interrupt(){
     m_sanitizer.check_usage();
@@ -374,9 +397,20 @@ void PABotBase::on_recv_message(BotBaseMessage message){
     case PABB_MSG_ACK_REQUEST_I32:
         process_ack_request<pabb_MsgAckRequestI32>(std::move(message));
         return;
-//    case PABB_MSG_INFO_COMMAND_DROPPED:
-//        return;
-
+    case PABB_MSG_ERROR_MISSED_REQUEST:{
+        if (message.body.size() != sizeof(pabb_MsgInfoMissedRequest)){
+            m_sniffer->log("Ignoring message with invalid size.");
+            return;
+        }
+        const pabb_MsgInfoMissedRequest* params = (const pabb_MsgInfoMissedRequest*)message.body.c_str();
+        if (params->seqnum == 1){
+            m_logger.log("Serial connection has been interrupted.", COLOR_RED);
+            m_error.store(true, std::memory_order_release);
+            std::lock_guard<std::mutex> lg0(m_sleep_lock);
+            m_cv.notify_all();
+        }
+        return;
+    }
     case PABB_MSG_REQUEST_COMMAND_FINISHED:{
         process_command_finished<pabb_MsgRequestCommandFinished>(std::move(message));
         return;
@@ -395,6 +429,9 @@ void PABotBase::retransmit_thread(){
         if (now - last_sent < m_retransmit_delay){
             std::unique_lock<std::mutex> lg(m_sleep_lock);
             if (m_state.load(std::memory_order_acquire) != State::RUNNING){
+                break;
+            }
+            if (m_error.load(std::memory_order_acquire)){
                 break;
             }
             m_cv.wait_for(lg, m_retransmit_delay);
@@ -459,6 +496,9 @@ uint64_t PABotBase::try_issue_request(
     if (state != State::RUNNING){
         throw InvalidConnectionStateException();
     }
+    if (m_error.load(std::memory_order_acquire)){
+        throw ConnectionException(&m_logger, "Serial connection was interrupted.");
+    }
 
     //  Too many unacked requests in flight.
     if (inflight_requests() >= queue_limit){
@@ -519,6 +559,9 @@ uint64_t PABotBase::try_issue_command(
     State state = m_state.load(std::memory_order_acquire);
     if (state != State::RUNNING){
         throw InvalidConnectionStateException();
+    }
+    if (m_error.load(std::memory_order_acquire)){
+        throw ConnectionException(&m_logger, "Serial connection was interrupted.");
     }
 
     //  Command queue is full.
@@ -599,6 +642,9 @@ uint64_t PABotBase::issue_request(
         if (m_state.load(std::memory_order_acquire) != State::RUNNING){
             throw InvalidConnectionStateException();
         }
+        if (m_error.load(std::memory_order_acquire)){
+            throw ConnectionException(&m_logger, "Serial connection was interrupted.");
+        }
         m_cv.wait(lg);
     }
 }
@@ -637,6 +683,9 @@ uint64_t PABotBase::issue_command(
         }
         if (m_state.load(std::memory_order_acquire) != State::RUNNING){
             throw InvalidConnectionStateException();
+        }
+        if (m_error.load(std::memory_order_acquire)){
+            throw ConnectionException(&m_logger, "Serial connection was interrupted.");
         }
         m_cv.wait(lg);
     }
@@ -698,6 +747,11 @@ BotBaseMessage PABotBase::wait_for_request(uint64_t seqnum){
                 m_pending_requests.erase(iter);
                 m_cv.notify_all();
                 throw InvalidConnectionStateException();
+            }
+            if (m_error.load(std::memory_order_acquire)){
+                m_pending_requests.erase(iter);
+                m_cv.notify_all();
+                throw ConnectionException(&m_logger, "Serial connection was interrupted.");
             }
             if (iter->second.state == AckState::ACKED){
                 BotBaseMessage ret = std::move(iter->second.ack);

@@ -466,6 +466,7 @@ SOURCES += \
     Source/PokemonLA/PokemonLA_Locations.cpp \
     Source/PokemonLA/PokemonLA_Settings.cpp \
     Source/PokemonLA/PokemonLA_TravelLocations.cpp \
+    Source/PokemonLA/Programs/Farming/PokemonLA_IngoMoveGrinder.cpp \
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.cpp \
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.cpp \
     Source/PokemonLA/Programs/Farming/PokemonLA_LeapGrinder.cpp \
@@ -1161,6 +1162,7 @@ HEADERS += \
     Source/PokemonLA/PokemonLA_Locations.h \
     Source/PokemonLA/PokemonLA_Settings.h \
     Source/PokemonLA/PokemonLA_TravelLocations.h \
+    Source/PokemonLA/Programs/Farming/PokemonLA_IngoMoveGrinder.h \
     Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.h \
     Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.h \
     Source/PokemonLA/Programs/Farming/PokemonLA_LeapGrinder.h \

@@ -73,7 +73,11 @@ public:
     //  Basic Requests
 
     virtual void wait_for_all_requests(const Cancellable* cancelled = nullptr) override;
+
+    virtual bool try_stop_all_commands() override;
     virtual void stop_all_commands() override;
+
+    virtual bool try_next_command_interrupt() override;
     virtual void next_command_interrupt() override;
 
 
@@ -179,6 +183,7 @@ private:
 
     std::condition_variable m_cv;
     std::atomic<State> m_state;
+    std::atomic<bool> m_error;
     std::thread m_retransmit_thread;
 
     LifetimeSanitizer m_sanitizer;

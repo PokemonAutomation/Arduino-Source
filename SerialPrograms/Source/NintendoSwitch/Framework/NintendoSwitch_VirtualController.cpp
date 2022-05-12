@@ -199,16 +199,20 @@ void VirtualController::thread_loop(){
 
                 //  If state is neutral, just issue a stop.
                 if (neutral){
-                    m_botbase.try_stop_commands();
-                    last = VirtualControllerState();
-                    last_neutral = true;
-                    last_press = now;
+                    if (m_botbase.try_stop_commands() == nullptr){
+                        last = VirtualControllerState();
+                        last_neutral = true;
+                        last_press = now;
+                    }else{
+                        next_wake = now + std::chrono::milliseconds(PABB_RETRANSMIT_DELAY_MILLIS);
+                    }
                     break;
                 }
 
                 //  If the new state is different, set next interrupt so the new
                 //  new command can replace the current one without gaps.
                 if (!last_neutral && current != last && m_botbase.try_next_interrupt() != nullptr){
+                    next_wake = now + std::chrono::milliseconds(PABB_RETRANSMIT_DELAY_MILLIS);
                     break;
                 }
 
@@ -223,6 +227,7 @@ void VirtualController::thread_loop(){
                     255
                 );
                 if (m_botbase.try_send_request(request) != nullptr){
+                    next_wake = now + std::chrono::milliseconds(PABB_RETRANSMIT_DELAY_MILLIS);
                     break;
                 }
 

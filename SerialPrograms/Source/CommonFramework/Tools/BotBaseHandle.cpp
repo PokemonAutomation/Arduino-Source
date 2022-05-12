@@ -64,6 +64,19 @@ void BotBaseHandle::set_allow_user_commands(bool allow){
     m_allow_user_commands.store(allow, std::memory_order_release);
 }
 
+const char* BotBaseHandle::check_accepting_commands(){
+    //  Must call under the lock.
+    if (state() != State::READY){
+        return "Console is not accepting commands right now.";
+    }
+    if (m_current_pabotbase.load(std::memory_order_acquire) <= PABotBaseLevel::NOT_PABOTBASE){
+        return "Device is not running PABotBase.";
+    }
+    if (!m_allow_user_commands.load(std::memory_order_acquire)){
+        return "Handle is not accepting commands right now.";
+    }
+    return nullptr;
+}
 const char* BotBaseHandle::try_reset(){
     std::unique_lock<std::mutex> lg(m_lock, std::defer_lock);
     if (!lg.try_lock()){
@@ -83,14 +96,9 @@ const char* BotBaseHandle::try_send_request(const BotBaseRequest& request){
     if (!lg.try_lock()){
         return "Console is busy.";
     }
-    if (state() != State::READY){
-        return "Console is not accepting commands right now.";
-    }
-    if (m_current_pabotbase.load(std::memory_order_acquire) <= PABotBaseLevel::NOT_PABOTBASE){
-        return "Device is not running PABotBase.";
-    }
-    if (!m_allow_user_commands.load(std::memory_order_acquire)){
-        return "Handle is not accepting commands right now.";
+    const char* error = check_accepting_commands();
+    if (error){
+        return error;
     }
     if (!botbase()->try_issue_request(request)){
         return "Command dropped.";
@@ -102,16 +110,13 @@ const char* BotBaseHandle::try_stop_commands(){
     if (!lg.try_lock()){
         return "Console is busy.";
     }
-    if (state() != State::READY){
-        return "Console is not accepting commands right now.";
+    const char* error = check_accepting_commands();
+    if (error){
+        return error;
     }
-    if (m_current_pabotbase.load(std::memory_order_acquire) <= PABotBaseLevel::NOT_PABOTBASE){
-        return "Device is not running PABotBase.";
+    if (!botbase()->try_stop_all_commands()){
+        return "Command dropped.";
     }
-    if (!m_allow_user_commands.load(std::memory_order_acquire)){
-        return "Handle is not accepting commands right now.";
-    }
-    botbase()->stop_all_commands();
     return nullptr;
 }
 const char* BotBaseHandle::try_next_interrupt(){
@@ -119,16 +124,13 @@ const char* BotBaseHandle::try_next_interrupt(){
     if (!lg.try_lock()){
         return "Console is busy.";
     }
-    if (state() != State::READY){
-        return "Console is not accepting commands right now.";
+    const char* error = check_accepting_commands();
+    if (error){
+        return error;
     }
-    if (m_current_pabotbase.load(std::memory_order_acquire) <= PABotBaseLevel::NOT_PABOTBASE){
-        return "Device is not running PABotBase.";
+    if (!botbase()->try_next_command_interrupt()){
+        return "Command dropped.";
     }
-    if (!m_allow_user_commands.load(std::memory_order_acquire)){
-        return "Handle is not accepting commands right now.";
-    }
-    botbase()->next_command_interrupt();
     return nullptr;
 }
 
@@ -149,7 +151,7 @@ void BotBaseHandle::stop_unprotected(){
         emit on_stopped("");
         m_botbase->stop();
 
-        std::lock_guard<std::mutex> lg(m_cv_lock);
+        std::lock_guard<std::mutex> lg(m_sleep_lock);
         m_cv.notify_all();
     }
 
@@ -315,7 +317,7 @@ void BotBaseHandle::thread_body(){
 //                settings.log_everything.store(true, std::memory_order_release);
             }
 
-            std::unique_lock<std::mutex> lg(m_cv_lock);
+            std::unique_lock<std::mutex> lg(m_sleep_lock);
             if (m_state.load(std::memory_order_acquire) != State::READY){
                 break;
             }
@@ -340,18 +342,25 @@ void BotBaseHandle::thread_body(){
             break;
         }catch (SerialProtocolException& e){
             error = QString::fromStdString(e.message());
+        }catch (ConnectionException& e){
+            error = QString::fromStdString(e.message());
         }
         if (error.isEmpty()){
             QString text = "Up Time: " + QString::fromStdString(str);
             emit uptime_status(html_color_text(text, theme_friendly_darkblue()));
         }else{
-            QString text = "Up Time: " + error;
-            emit uptime_status(html_color_text(text, COLOR_RED));
+            emit uptime_status(html_color_text(error, COLOR_RED));
             error.clear();
+            std::lock_guard<std::mutex> lg(m_lock);
+            State state = m_state.load(std::memory_order_acquire);
+            if (state == State::READY){
+                m_state.store(State::ERRORED, std::memory_order_release);
+            }
+            break;
         }
 
 //        cout << "lock()" << endl;
-        std::unique_lock<std::mutex> lg(m_cv_lock);
+        std::unique_lock<std::mutex> lg(m_sleep_lock);
 //        cout << "lock() - done" << endl;
         if (m_state.load(std::memory_order_acquire) != State::READY){
             break;
@@ -360,7 +369,7 @@ void BotBaseHandle::thread_body(){
     }
 
     {
-        std::unique_lock<std::mutex> lg(m_cv_lock);
+        std::unique_lock<std::mutex> lg(m_sleep_lock);
         m_cv.notify_all();
     }
     watchdog.join();
