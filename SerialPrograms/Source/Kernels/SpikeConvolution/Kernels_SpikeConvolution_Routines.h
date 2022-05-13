@@ -297,7 +297,7 @@ PA_FORCE_INLINE void accumulate_k4(
 
 
 //  Compute the Spike Kernel
-//      "out" and "in" are both aligned to "PA_ALIGNMENT" bytes.
+//      "out" is aligned to "PA_ALIGNMENT" bytes.
 //      lengthI % PA_ALIGNMENT == 0
 //      lengthI >= lengthK
 //      "in"  is valid for lengthI
@@ -313,9 +313,6 @@ PA_FORCE_INLINE void compute_spike_kernel(
 
     if ((size_t)out % PA_ALIGNMENT){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "\"out\" is misaligned.");
-    }
-    if ((size_t)in % PA_ALIGNMENT){
-        throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "\"in\" is misaligned.");
     }
     if (lengthI % FLOAT_ALIGNMENT){
         throw InternalProgramError(nullptr, PA_CURRENT_FUNCTION, "lengthI is misaligned.");

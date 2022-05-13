@@ -33,6 +33,7 @@ float compute_scale(
 
 
 //  Compute: |s A - T|^2
+//      All pointers must have the same alignment.
 float compute_error(
     size_t width, size_t height,
     float scale,
@@ -42,6 +43,7 @@ float compute_error(
 
 
 //  Compute: |s A w - T|^2
+//      All pointers must have the same alignment.
 float compute_error(
     size_t width, size_t height,
     float scale,

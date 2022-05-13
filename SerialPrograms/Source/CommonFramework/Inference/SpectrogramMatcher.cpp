@@ -7,6 +7,7 @@
 #include <QString>
 #include "Common/Cpp/Exceptions.h"
 #include "Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h"
+#include "Kernels/SpikeConvolution/Kernels_SpikeConvolution.h"
 #include "CommonFramework/AudioPipeline/AudioFeed.h"
 #include "CommonFramework/AudioPipeline/AudioTemplate.h"
 #include "SpectrogramMatcher.h"
@@ -149,15 +150,26 @@ size_t SpectrogramMatcher::latestTimestamp() const{
 }
 
 void SpectrogramMatcher::conv(const float* src, size_t num, float* dst){
+//    cout << (size_t)dst % 64 << endl;
+
+    const size_t numConvedFrequencies = num - m_convKernel.size() + 1;
     if (num < m_convKernel.size()){
+        memset(dst, 0, numConvedFrequencies * sizeof(float));
         return;
     }
-    for(size_t i = 0; i < num-m_convKernel.size()+1; i++){
+
+#if 0
+    for (size_t i = 0; i < num-m_convKernel.size()+1; i++){
         dst[i] = 0.0f;
-        for(size_t j = 0; j < m_convKernel.size(); j++){
+        for (size_t j = 0; j < m_convKernel.size(); j++){
             dst[i] += src[i+j] * m_convKernel[j];
         }
     }
+#else
+    Kernels::SpikeConvolution::compute_spike_kernel(
+        dst, src, num, m_convKernel.data(), m_convKernel.size()
+    );
+#endif
 }
 
 std::vector<float> SpectrogramMatcher::buildTemplateNorm() const {
@@ -279,6 +291,7 @@ std::pair<float, float> SpectrogramMatcher::matchSubTemplate(size_t subIndex) co
     const size_t templateStart = m_templateRange[subIndex].first;
     const size_t templateEnd = m_templateRange[subIndex].second;
     size_t windows = templateEnd - templateStart;
+//    cout << windows << endl;
     size_t freqs = m_freqEnd - m_freqStart;
     std::vector<const float*> matrixA(windows);
     std::vector<const float*> matrixT(windows);

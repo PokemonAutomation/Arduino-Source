@@ -35,7 +35,7 @@ WaterfillTemplateMatcher::WaterfillTemplateMatcher(
     if (objects.empty()){
         throw FileException(
             nullptr, PA_CURRENT_FUNCTION,
-            "Failed to find exactly any objects in resource.",
+            "Failed to find any objects in resource.",
             qpath.toStdString()
         );
     }
