@@ -2,7 +2,7 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *  Detect the transparent dialogue box from you opponent shown when you win a pokemon battle, like
+ *  Detect the transparent dialogue box from your opponent shown before and/or after the battle, like
  *  Ingo's battles or Fortune Sisters'.
  */
 

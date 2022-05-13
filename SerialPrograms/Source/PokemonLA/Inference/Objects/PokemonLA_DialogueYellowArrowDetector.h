@@ -2,10 +2,9 @@
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
- *  The yellow marker pointing to the button to advance dialogue box.
- *  For different types of dialogue boxes, there are different types of yellow arrows.
- *  Currently we only need to detect the yellow arrows for transparent dialogue boxes happened
- *  during Ingo's battles.
+ *  The yellow marker pointing to the button to advance dialogue boxes.
+ *  For different types of dialogue boxes, the locations of the yellow arrow is different.
+ *  This detector covers all possible locations of the yellow arrow.
  */
 
 #ifndef PokemonAutomation_PokemonLA_DialogueYellowArrowDetector_H
@@ -17,7 +16,6 @@
 #include "CommonFramework/ImageMatch/WaterfillTemplateMatcher.h"
 #include "CommonFramework/Inference/DetectionDebouncer.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
-#include "PokemonLA_WhiteObjectDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -30,13 +28,6 @@ public:
     static const DialogueYellowArrowMatcher& instance();
 };
 
-class DialogueYellowArrowTracker : public WhiteObjectDetector{
-public:
-    DialogueYellowArrowTracker();
-
-    virtual void process_object(const ConstImageRef& image, const WaterfillObject& object) override;
-    virtual void finish() override;
-};
 
 
 class DialogueYellowArrowDetector : public VisualInferenceCallback{
@@ -58,9 +49,6 @@ private:
     LoggerQt& m_logger;
     ImageFloatBox m_box;
     bool m_stop_on_detected;
-
-    DialogueYellowArrowTracker m_tracker;
-    WhiteObjectWatcher m_watcher;
 
     std::atomic<bool> m_detected;
 };
