@@ -10,6 +10,7 @@
 
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Options/SimpleIntegerOption.h"
 #include "CommonFramework/Options/EnumDropdownOption.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 
@@ -37,6 +38,8 @@ private:
     class Stats;
 
     EnumDropdownOption FOURTH_MOVE_ON;
+
+    SimpleIntegerOption<uint32_t> SAVE_EVERY_FEW_BATTLES;
 
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;

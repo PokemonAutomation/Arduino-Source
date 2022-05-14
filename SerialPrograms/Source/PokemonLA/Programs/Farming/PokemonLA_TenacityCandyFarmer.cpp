@@ -17,10 +17,10 @@
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattlePokemonSwitchDetector.h"
 #include "PokemonLA/Programs/PokemonLA_BattleRoutines.h"
+#include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA_TenacityCandyFarmer.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ArcPhoneDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_ButtonDetector.h"
-// #include "PokemonLA/Inference/Objects/PokemonLA_DialogueEllipseDetector.h"
 #include "PokemonLA/Inference/PokemonLA_DialogDetector.h"
 
 
@@ -58,6 +58,10 @@ TenacityCandyFarmer::TenacityCandyFarmer(const TenacityCandyFarmer_Descriptor& d
         },
         0
     )
+    , SAVE_EVERY_FEW_BATTLES(
+        "<b>Save every few battles:</b><br>After every this number of battles, save the game. Enter zero to never save the game.",
+        0
+    )
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -66,6 +70,7 @@ TenacityCandyFarmer::TenacityCandyFarmer(const TenacityCandyFarmer_Descriptor& d
     })
 {
     PA_ADD_OPTION(FOURTH_MOVE_ON);
+    PA_ADD_OPTION(SAVE_EVERY_FEW_BATTLES);
     PA_ADD_OPTION(NOTIFICATIONS);
 }
 
@@ -350,6 +355,7 @@ void TenacityCandyFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseCo
     //     return;
     // }
 
+    size_t num_battles = 0;
     while (true){
         env.update_stats();
         send_program_status_notification(
@@ -362,6 +368,11 @@ void TenacityCandyFarmer::program(SingleSwitchProgramEnvironment& env, BotBaseCo
             if (run_iteration(env, context)){
                 break;
             }
+            num_battles++;
+            if (SAVE_EVERY_FEW_BATTLES > 0 && num_battles % SAVE_EVERY_FEW_BATTLES == 0){
+                save_game_from_overworld(env, env.console, context);
+            }
+
         }catch (OperationFailedException&){
             stats.errors++;
             throw;
