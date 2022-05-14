@@ -60,13 +60,13 @@ public:
 
 private:
     //  All of these must be called under the lock.
-    QImage direct_snapshot_image(std::unique_lock<std::mutex>& lock);
+    QImage direct_snapshot_image();
     QImage direct_snapshot_probe(bool flip_vertical);
 
-    VideoSnapshot snapshot_image(std::unique_lock<std::mutex>& lock);
+    VideoSnapshot snapshot_image();
     VideoSnapshot snapshot_probe();
 
-    bool determine_frame_orientation(std::unique_lock<std::mutex>& lock);
+    bool determine_frame_orientation();
 
 private:
     friend class FrameReader;
@@ -84,6 +84,7 @@ private:
 
     LoggerQt& m_logger;
     QCamera* m_camera = nullptr;
+    CameraScreenshotter m_screenshotter;
     QCameraViewfinder* m_camera_view = nullptr;
 
     size_t m_max_frame_rate;
@@ -92,9 +93,6 @@ private:
 
     mutable std::mutex m_lock;
     QSize m_resolution;
-
-    QCameraImageCapture* m_capture = nullptr;
-    std::map<int, PendingCapture> m_pending_captures;
 
 //    SpinLock m_capture_lock;
     QVideoProbe* m_probe = nullptr;

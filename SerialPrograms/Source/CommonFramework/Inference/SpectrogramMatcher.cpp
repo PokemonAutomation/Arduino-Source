@@ -292,14 +292,16 @@ std::pair<float, float> SpectrogramMatcher::matchSubTemplate(size_t subIndex) co
     const size_t templateEnd = m_templateRange[subIndex].second;
     size_t windows = templateEnd - templateStart;
 //    cout << windows << endl;
+//    cout << m_spectrums.size() << " / " << windows << endl;
     size_t freqs = m_freqEnd - m_freqStart;
     std::vector<const float*> matrixA(windows);
     std::vector<const float*> matrixT(windows);
-    for (size_t i = templateStart; i < templateEnd; i++, iter++){
+    for (size_t i = 0; i < windows; i++, iter++){
 //        cout << "Template: " << ((size_t)m_template.getWindow(templateEnd - 1 - i) % 64) << endl;
 //        cout << "Samples:  " << ((size_t)iter->magnitudes->data() % 64) << endl;
-        matrixT[i] = m_freqStart + m_template.getWindow(templateEnd - 1 - i);
+        matrixT[i] = m_freqStart + m_template.getWindow(windows - 1 - i);
         matrixA[i] = m_freqStart + iter->magnitudes->data();
+//        cout << matrixT[i] << " : " << matrixA[i] << endl;
     }
 
     //  Compute scale.

@@ -65,8 +65,8 @@ public:
 public slots:
     void set_resolution(const QSize& size);
 
-//signals:
-//    void stop();
+signals:
+    void stop();
 
 private:
 //    void internal_shutdown();
@@ -74,23 +74,13 @@ private:
     //  All of these must be called under the state lock.
     QImage direct_snapshot_probe(bool flip_vertical);
 
-    VideoSnapshot snapshot_image(std::unique_lock<std::mutex>& lock);
+    VideoSnapshot snapshot_image();
     VideoSnapshot snapshot_probe();
 
-    bool determine_frame_orientation(std::unique_lock<std::mutex>& lock);
+    bool determine_frame_orientation();
 
 private:
     friend class VideoWidget;
-    enum class CaptureStatus{
-        PENDING,
-        COMPLETED,
-        CANCELED,
-    };
-    struct PendingCapture{
-        CaptureStatus status = CaptureStatus::PENDING;
-        QImage image;
-        std::condition_variable cv;
-    };
 
     LoggerQt& m_logger;
     VideoWidget& m_widget;
@@ -98,6 +88,8 @@ private:
     CameraScreenshotter m_screenshotter;
 
     std::mutex m_state_lock;
+    std::condition_variable m_cv;
+    bool m_stopped = false;
 
     size_t m_max_frame_rate;
     std::chrono::milliseconds m_frame_period;

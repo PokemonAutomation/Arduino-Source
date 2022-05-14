@@ -51,6 +51,8 @@ VideoWidget::VideoWidget(
 )
     : PokemonAutomation::VideoWidget(parent)
     , m_logger(logger)
+    , m_camera(new QCamera(QCameraInfo(info.device_name().c_str()), this))
+    , m_screenshotter(logger, *m_camera)
     , m_last_orientation_attempt(WallClock::min())
 //    , m_use_probe_frames(true)
 //    , m_flip_vertical(true)
@@ -67,8 +69,6 @@ VideoWidget::VideoWidget(
     layout->setAlignment(Qt::AlignTop);
     layout->setContentsMargins(0, 0, 0, 0);
 
-    m_camera = new QCamera(QCameraInfo(info.device_name().c_str()), this);
-
 
     //  Setup the screenshot capture.
     m_probe = new QVideoProbe(this);
@@ -78,9 +78,6 @@ VideoWidget::VideoWidget(
         delete m_probe;
         m_probe = nullptr;
     }
-    m_capture = new QCameraImageCapture(m_camera, this);
-    m_capture->setCaptureDestination(QCameraImageCapture::CaptureToBuffer);
-    m_camera->setCaptureMode(QCamera::CaptureStillImage);
 
 
     //  Setup the video display.
@@ -135,52 +132,8 @@ VideoWidget::VideoWidget(
             Qt::DirectConnection
         );
     }
-    {
-        connect(
-            m_capture, &QCameraImageCapture::imageCaptured,
-            this, [&](int id, const QImage& preview){
-                std::lock_guard<std::mutex> lg(m_lock);
-//                cout << "finish = " << id << endl;
-                auto iter = m_pending_captures.find(id);
-                if (iter == m_pending_captures.end()){
-                    m_logger.log(
-                        "QCameraImageCapture::imageCaptured(): Unable to find capture ID: " + std::to_string(id),
-                        COLOR_RED
-                    );
-//                    cout << "QCameraImageCapture::imageCaptured(): Unable to find capture ID: " << id << endl;
-                    return;
-                }
-                iter->second.status = CaptureStatus::COMPLETED;
-                iter->second.image = preview;
-                iter->second.cv.notify_all();
-            }
-        );
-        connect(
-            m_capture, static_cast<void(QCameraImageCapture::*)(int, QCameraImageCapture::Error, const QString&)>(&QCameraImageCapture::error),
-            this, [&](int id, QCameraImageCapture::Error error, const QString& errorString){
-                std::lock_guard<std::mutex> lg(m_lock);
-//                cout << "error = " << id << endl;
-                m_logger.log(
-                    "QCameraImageCapture::error(): Capture ID: " + errorString,
-                    COLOR_RED
-                );
-//                cout << "QCameraImageCapture::error(): " << errorString.toUtf8().data() << endl;
-                auto iter = m_pending_captures.find(id);
-                if (iter == m_pending_captures.end()){
-                    return;
-                }
-                iter->second.status = CaptureStatus::COMPLETED;
-                iter->second.cv.notify_all();
-            }
-        );
-    }
 }
-VideoWidget::~VideoWidget(){
-    for (auto& item : m_pending_captures){
-        item.second.status = CaptureStatus::COMPLETED;
-        item.second.cv.notify_all();
-    }
-}
+VideoWidget::~VideoWidget(){}
 QSize VideoWidget::current_resolution() const{
     std::lock_guard<std::mutex> lg(m_lock);
     if (m_camera == nullptr){
@@ -202,45 +155,12 @@ void VideoWidget::set_resolution(const QSize& size){
     m_camera->setViewfinderSettings(settings);
     m_resolution = size;
 }
-QImage VideoWidget::direct_snapshot_image(std::unique_lock<std::mutex>& lock){
+QImage VideoWidget::direct_snapshot_image(){
 //    std::unique_lock<std::mutex> lg(m_lock);
     if (m_camera == nullptr){
         return QImage();
     }
-
-    m_camera->searchAndLock();
-    int id = m_capture->capture();
-    m_camera->unlock();
-
-//    cout << "start = " << id << endl;
-
-    auto iter = m_pending_captures.emplace(
-        std::piecewise_construct,
-        std::forward_as_tuple(id),
-        std::forward_as_tuple()
-    );
-    if (!iter.second){
-        return QImage();
-    }
-    PendingCapture& capture = iter.first->second;
-
-    capture.cv.wait_for(
-        lock,
-        std::chrono::milliseconds(1000),
-        [&]{ return capture.status != CaptureStatus::PENDING; }
-    );
-
-    if (capture.status != CaptureStatus::COMPLETED){
-        m_logger.log("Capture timed out.");
-    }
-
-    QImage image = std::move(capture.image);
-    m_pending_captures.erase(iter.first);
-    QImage::Format format = image.format();
-    if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
-        image = image.convertToFormat(QImage::Format_ARGB32);
-    }
-    return image;
+    return m_screenshotter.snapshot();
 }
 QImage VideoWidget::direct_snapshot_probe(bool flip_vertical){
 //    std::lock_guard<std::mutex> lg(m_lock);
@@ -256,7 +176,7 @@ QImage VideoWidget::direct_snapshot_probe(bool flip_vertical){
 
     return frame_to_image(m_logger, frame, flip_vertical);
 }
-VideoSnapshot VideoWidget::snapshot_image(std::unique_lock<std::mutex>& lock){
+VideoSnapshot VideoWidget::snapshot_image(){
 //    cout << "snapshot_image()" << endl;
 //    std::unique_lock<std::mutex> lg(m_lock);
 
@@ -292,39 +212,7 @@ VideoSnapshot VideoWidget::snapshot_image(std::unique_lock<std::mutex>& lock){
 
     WallClock time0 = current_time();
 
-    m_camera->searchAndLock();
-    int id = m_capture->capture();
-    m_camera->unlock();
-
-//    cout << "start = " << id << endl;
-
-    auto iter = m_pending_captures.emplace(
-        std::piecewise_construct,
-        std::forward_as_tuple(id),
-        std::forward_as_tuple()
-    );
-    if (!iter.second){
-        return VideoSnapshot{QImage(), now};
-    }
-    PendingCapture& capture = iter.first->second;
-
-//    cout << "snapshot: " << id << endl;
-    capture.cv.wait_for(
-        lock,
-        std::chrono::milliseconds(1000),
-        [&]{ return capture.status != CaptureStatus::PENDING; }
-    );
-
-    if (capture.status != CaptureStatus::COMPLETED){
-        m_logger.log("Capture timed out.");
-    }
-
-    m_last_image = std::move(capture.image);
-    m_pending_captures.erase(iter.first);
-    QImage::Format format = m_last_image.format();
-    if (format != QImage::Format_ARGB32 && format != QImage::Format_RGB32){
-        m_last_image = m_last_image.convertToFormat(QImage::Format_ARGB32);
-    }
+    m_last_image = m_screenshotter.snapshot();
     m_last_image_timestamp = now;
     m_last_image_seqnum = frame_seqnum;
     WallClock time1 = current_time();
@@ -369,7 +257,7 @@ VideoSnapshot VideoWidget::snapshot(){
 
     //  Frame screenshots are disabled.
     if (!GlobalSettings::instance().ENABLE_FRAME_SCREENSHOTS){
-        return snapshot_image(lg);
+        return snapshot_image();
     }
 
     //  QVideoFrame is enabled and ready!
@@ -382,7 +270,7 @@ VideoSnapshot VideoWidget::snapshot(){
     if (m_probe && !m_orientation_known){
         WallClock now = current_time();
         if (m_last_orientation_attempt + std::chrono::seconds(10) < now){
-            m_orientation_known = determine_frame_orientation(lg);
+            m_orientation_known = determine_frame_orientation();
             m_last_orientation_attempt = now;
         }
     }
@@ -390,7 +278,7 @@ VideoSnapshot VideoWidget::snapshot(){
     if (m_orientation_known){
         return snapshot_probe();
     }else{
-        return snapshot_image(lg);
+        return snapshot_image();
     }
 }
 
@@ -417,7 +305,7 @@ void VideoWidget::resizeEvent(QResizeEvent* event){
 
 
 
-bool VideoWidget::determine_frame_orientation(std::unique_lock<std::mutex>& lock){
+bool VideoWidget::determine_frame_orientation(){
     //  Qt 5.12 is really shitty in that there's no way to figure out the
     //  orientation of a QVideoFrame. So here we'll try to figure it out
     //  the poor man's way. Snapshot using both QCameraImageCapture and
@@ -426,7 +314,7 @@ bool VideoWidget::determine_frame_orientation(std::unique_lock<std::mutex>& lock
     //  This function cannot be called on the UI thread.
     //  This function must be called under the lock.
 
-    QImage reference = direct_snapshot_image(lock);
+    QImage reference = direct_snapshot_image();
     QImage frame = direct_snapshot_probe(false);
     m_orientation_known = PokemonAutomation::determine_frame_orientation(m_logger, reference, frame, m_flip_vertical);
     return m_orientation_known;

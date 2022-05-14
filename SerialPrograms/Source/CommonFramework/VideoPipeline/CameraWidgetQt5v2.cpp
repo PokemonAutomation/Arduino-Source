@@ -7,6 +7,7 @@
 #include <QtGlobal>
 #if QT_VERSION_MAJOR == 5
 
+#include <QApplication>
 #include <QVBoxLayout>
 #include <QCameraInfo>
 #include <QCamera>
@@ -111,11 +112,26 @@ CameraHolder::CameraHolder(
             Qt::DirectConnection
         );
     }
+    connect(
+        this, &CameraHolder::stop,
+        this, [=]{
+            this->moveToThread(QApplication::instance()->thread());
+            m_camera->stop();
+
+            std::lock_guard<std::mutex> lg(m_state_lock);
+            m_stopped = true;
+            m_cv.notify_all();
+        }
+    );
 }
 CameraHolder::~CameraHolder(){
     //  Redispatch to the thread that owns the class.
-    m_camera->stop();
+//    m_camera->stop();
 //    delete m_capture;
+
+    emit this->stop();
+    std::unique_lock<std::mutex> lg(m_state_lock);
+    m_cv.wait(lg, [=]{ return m_stopped; });
 }
 void CameraHolder::set_resolution(const QSize& size){
     std::unique_lock<std::mutex> lg(m_state_lock);
@@ -141,7 +157,7 @@ QImage CameraHolder::direct_snapshot_probe(bool flip_vertical){
 
     return frame_to_image(m_logger, frame, flip_vertical);
 }
-bool CameraHolder::determine_frame_orientation(std::unique_lock<std::mutex>& lock){
+bool CameraHolder::determine_frame_orientation(){
     //  Qt 5.12 is really shitty in that there's no way to figure out the
     //  orientation of a QVideoFrame. So here we'll try to figure it out
     //  the poor man's way. Snapshot using both QCameraImageCapture and
@@ -155,7 +171,7 @@ bool CameraHolder::determine_frame_orientation(std::unique_lock<std::mutex>& loc
     m_orientation_known = PokemonAutomation::determine_frame_orientation(m_logger, reference, frame, m_flip_vertical);
     return m_orientation_known;
 }
-VideoSnapshot CameraHolder::snapshot_image(std::unique_lock<std::mutex>& lock){
+VideoSnapshot CameraHolder::snapshot_image(){
 //    cout << "snapshot_image()" << endl;
 //    std::unique_lock<std::mutex> lg(m_lock);
 
@@ -227,7 +243,7 @@ VideoSnapshot CameraHolder::snapshot(){
 
     //  Frame screenshots are disabled.
     if (!GlobalSettings::instance().ENABLE_FRAME_SCREENSHOTS){
-        return snapshot_image(lg);
+        return snapshot_image();
     }
 
     //  QVideoFrame is enabled and ready!
@@ -240,7 +256,7 @@ VideoSnapshot CameraHolder::snapshot(){
     if (m_probe && !m_orientation_known){
         WallClock now = current_time();
         if (m_last_orientation_attempt + std::chrono::seconds(10) < now){
-            m_orientation_known = determine_frame_orientation(lg);
+            m_orientation_known = determine_frame_orientation();
             m_last_orientation_attempt = now;
         }
     }
@@ -248,7 +264,7 @@ VideoSnapshot CameraHolder::snapshot(){
     if (m_orientation_known){
         return snapshot_probe();
     }else{
-        return snapshot_image(lg);
+        return snapshot_image();
     }
 }
 
