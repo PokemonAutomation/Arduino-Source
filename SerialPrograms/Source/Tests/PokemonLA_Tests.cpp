@@ -14,6 +14,7 @@
 #include "PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h"
 #include "PokemonLA/Inference/PokemonLA_BerryTreeDetector.h"
 #include "PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"
+#include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 
 #include <QImage>
 #include <iostream>
@@ -30,6 +31,7 @@ int test_pokemonLA_BattleMenuDetector(const QImage& image, bool target){
 
     bool result = detector.process_frame(image, current_time());
     TEST_RESULT_EQUAL(result, target);
+    return 0;
 }
 
 int test_pokemonLA_BattlePokemonSwitchDetector(const QImage& image, bool target) {
@@ -40,6 +42,7 @@ int test_pokemonLA_BattlePokemonSwitchDetector(const QImage& image, bool target)
 
     bool result = detector.process_frame(image, current_time());
     TEST_RESULT_EQUAL(result, target);
+    return 0;
 }
 
 int test_pokemonLA_TransparentDialogueDetector(const QImage& image, bool target){
@@ -50,6 +53,7 @@ int test_pokemonLA_TransparentDialogueDetector(const QImage& image, bool target)
 
     bool result = detector.process_frame(image, current_time());
     TEST_RESULT_EQUAL(result, target);
+    return 0;
 }
 
 int test_pokemonLA_DialogueYellowArrowDetector(const QImage& image, bool target){
@@ -60,6 +64,7 @@ int test_pokemonLA_DialogueYellowArrowDetector(const QImage& image, bool target)
 
     bool result = detector.process_frame(image, current_time());
     TEST_RESULT_EQUAL(result, target);
+    return 0;
 }
 
 int test_pokemonLA_StatusInfoScreenDetector(const QImage& image, const std::vector<std::string>& keywords){
@@ -135,6 +140,7 @@ int test_pokemonLA_StatusInfoScreenDetector(const QImage& image, const std::vect
             std::cout << slg << ", ";
         }
         std::cout << "but should be " << pokemon_slug << "." << std::endl;
+        return 1;
     }
 
     return 0;
@@ -146,6 +152,23 @@ void test_pokemonLA_BerryTreeDetector(const QImage& image){
     detector.process_frame(image, current_time());
 }
 
+
+int test_pokemonLA_shinySoundDetector(const std::vector<AudioSpectrum>& spectrums, bool target){
+    auto& logger = global_logger_command_line();
+    DummyBotBase botbase(logger);
+    DummyVideoFeed video_feed;
+    DummyVideoOverlay video_overlay;
+    DummyAudioFeed audio_feed;
+
+    ConsoleHandle console(0, logger, botbase, video_feed, video_overlay, audio_feed);
+    ShinySoundDetector detector(logger, console, [&](float error_coefficient) -> bool{
+        return true;
+    });
+
+    bool result = detector.process_spectrums(spectrums, audio_feed);
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
 
 
 

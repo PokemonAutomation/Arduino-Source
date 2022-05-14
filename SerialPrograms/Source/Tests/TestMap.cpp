@@ -8,6 +8,7 @@
 #include "PokemonLA_Tests.h"
 #include "TestMap.h"
 #include "TestUtils.h"
+#include "CommonFramework/AudioPipeline/AudioTemplate.h"
 
 #include <QFileInfo>
 #include <QImage>
@@ -15,6 +16,7 @@
 
 #include <iostream>
 #include <sstream>
+#include <algorithm>
 using std::cout;
 using std::cerr;
 using std::endl;
@@ -35,6 +37,8 @@ using ImageBoolDetectorFunction = std::function<int(const QImage& image, bool ta
 using ImageKeywordsDetectorFunction = std::function<int(const QImage& image, const std::vector<std::string>& keywords)>;
 
 using ImageVoidDetectorFunction = std::function<void(const QImage& image)>;
+
+using SoundBoolDetectorFunction = std::function<int(const std::vector<AudioSpectrum>& spectrums, bool target)>;
 
 // Basic check on whether an image can be loaded.
 // Also strip the image format suffix (.png and so on)
@@ -125,6 +129,55 @@ const QString file_path = QString::fromStdString(test_path);
 }
 
 
+// Basic check on whether an image can be loaded.
+// Also strip the image format suffix (.png and so on)
+
+int sound_bool_detector_helper(SoundBoolDetectorFunction test_func, const std::string& test_path){
+    QFileInfo file_info(QString::fromStdString(test_path));
+    std::string filename = file_info.fileName().toStdString();
+
+    // Search for the target test result from test filename.
+    const size_t target_pos = filename.rfind('.');
+    if (target_pos == std::string::npos){
+        cerr << "Error: image test file " << test_path << " has no \".\" in the filename." << endl;
+        return 1;
+    }
+
+    // cout << "Test file: " << test_path << endl;
+    const auto filename_base = filename.substr(0, target_pos);
+
+    const auto name_base = QString::fromStdString(filename_base);
+    bool target_bool = false;
+    if (name_base.endsWith("-True")){
+        target_bool = true;
+    } else if (name_base.endsWith("-False")){
+        target_bool = false;
+    } else{
+        cerr << "Error: audio test file " << test_path << " has incorrect target detection result (-True/-False) set in the filename." << endl;
+        return 1;
+    }
+
+
+
+    // XXX for now we assume the audio in the command line test is always 48000.
+    //     in future we can read sample rate from filename
+    size_t sample_rate = 48000;
+    AudioTemplate audio_stream = loadAudioTemplate(QString::fromStdString(test_path), sample_rate);
+    std::vector<AudioSpectrum> spectrums;
+    for(size_t i = 0; i < audio_stream.numWindows(); i++){
+        // AudioSpectrum(size_t s, size_t rate, std::shared_ptr<const AlignedVector<float>> m);
+        AlignedVector<float> freq_mag(audio_stream.numFrequencies());
+        memcpy(freq_mag.data(), audio_stream.getWindow(i), sizeof(float) * audio_stream.numFrequencies());
+        spectrums.emplace_back(0, sample_rate, std::make_shared<const AlignedVector<float>>(std::move(freq_mag)));
+    }
+
+    // Need to reverse spectrums, because audio detector interface accepts sepctrum vector in the order of
+    // from newest (largest timestamp) to oldest (smallest timestamp) in the vector.
+    std::reverse(spectrums.begin(), spectrums.end());
+
+    return test_func(spectrums, target_bool);
+}
+
 
 
 
@@ -134,7 +187,8 @@ const std::map<std::string, TestFunction> TEST_MAP = {
     {"PokemonLA_TransparentDialogueDetector", std::bind(image_bool_detector_helper, test_pokemonLA_TransparentDialogueDetector, _1)},
     {"PokemonLA_DialogueYellowArrowDetector", std::bind(image_bool_detector_helper, test_pokemonLA_DialogueYellowArrowDetector, _1)},
     {"PokemonLA_BerryTreeDetector", std::bind(image_void_detector_helper, test_pokemonLA_BerryTreeDetector, _1)},
-    {"PokemonLA_StatusInfoScreenDetector", std::bind(image_keywords_detector_helper, test_pokemonLA_StatusInfoScreenDetector, _1)}
+    {"PokemonLA_StatusInfoScreenDetector", std::bind(image_keywords_detector_helper, test_pokemonLA_StatusInfoScreenDetector, _1)},
+    {"PokemonLA_ShinySoundDetector", std::bind(sound_bool_detector_helper, test_pokemonLA_shinySoundDetector, _1)}
 };
 
 
