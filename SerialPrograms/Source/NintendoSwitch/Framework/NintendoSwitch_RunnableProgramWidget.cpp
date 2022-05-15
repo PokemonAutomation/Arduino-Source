@@ -132,9 +132,12 @@ void RunnableSwitchProgramWidget::update_ui_after_program_state_change(){
 }
 
 bool RunnableSwitchProgramWidget::request_program_stop(){
-    if (!RunnablePanelWidget::request_program_stop()){
+    if (state() != ProgramState::RUNNING){
         return false;
     }
+//    if (!RunnablePanelWidget::request_program_stop()){
+//        return false;
+//    }
 //    while (true);
     ProgramState state = m_state.load(std::memory_order_acquire);
     if (m_setup){
@@ -142,7 +145,7 @@ bool RunnableSwitchProgramWidget::request_program_stop(){
         m_setup->stop_serial();
         m_setup->update_ui(state);
     }
-//    return RunnablePanelWidget::request_program_stop();
+    return RunnablePanelWidget::request_program_stop();
    return true;
 }
 
