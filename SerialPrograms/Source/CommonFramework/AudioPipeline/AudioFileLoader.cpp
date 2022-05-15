@@ -282,6 +282,8 @@ void AudioDecoderWorker::start(){
             std::cout << "QAudioDecoder::bufferAvailableChanged(): " << available << std::endl;
         }
     );
+
+#if QT_VERSION_MAJOR == 5
     connect(
         m_audioDecoder, &QAudioDecoder::stateChanged,
         this, [=](QAudioDecoder::State state){
@@ -289,6 +291,7 @@ void AudioDecoderWorker::start(){
             emit this->finished();
         }
     );
+#endif
 
     // Whenever a new buffer of audo frames decoded, save them by calling readAudioDecoderBuffer().
     connect(m_audioDecoder, &QAudioDecoder::bufferReady, this, &AudioDecoderWorker::readAudioDecoderBuffer);
