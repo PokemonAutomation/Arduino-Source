@@ -162,7 +162,7 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_program<EggCombined2_Descriptor, EggCombined2>();
     add_program<EggSuperCombined2_Descriptor, EggSuperCombined2>();
     add_program<GodEggItemDupe_Descriptor, GodEggItemDupe>();
-    if (GlobalSettings::instance().NAUGHTY_MODE){
+    if (PreloadSettings::instance().NAUGHTY_MODE){
         add_program<GodEggDuplication_Descriptor, GodEggDuplication>();
     }
 
@@ -175,7 +175,7 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_program<MaxLairStrongBoss_Descriptor, MaxLairStrongBoss>();
     add_program<MaxLairBossFinder_Descriptor, MaxLairBossFinder>();
 
-    if (GlobalSettings::instance().DEVELOPER_MODE){
+    if (PreloadSettings::instance().DEVELOPER_MODE){
         add_divider("---- Developer Tools ----");
         add_program<GenerateIVCheckerOCR_Descriptor, GenerateIVCheckerOCR>();
         add_program<GenerateNameOCRDataPokedex_Descriptor, GenerateNameOCRDataPokedex>();

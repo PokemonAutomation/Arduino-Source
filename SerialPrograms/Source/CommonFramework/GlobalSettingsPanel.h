@@ -42,6 +42,17 @@ public:
 
 
 
+class PreloadSettings{
+    PreloadSettings();
+public:
+    static PreloadSettings& instance();
+
+    void load(const QJsonValue& json);
+
+    bool NAUGHTY_MODE = false;
+    bool DEVELOPER_MODE = false;
+};
+
 
 
 class GlobalSettings : public BatchOption{
@@ -66,7 +77,7 @@ public:
 
     BooleanCheckBoxOption LOG_EVERYTHING;
     BooleanCheckBoxOption SAVE_DEBUG_IMAGES;
-    BooleanCheckBoxOption NAUGHTY_MODE;
+    BooleanCheckBoxOption NAUGHTY_MODE_OPTION;
 
 //    ProcessPriorityOption PROCESS_PRIORITY0;
     ThreadPriorityOption REALTIME_THREAD_PRIORITY0;
@@ -79,10 +90,6 @@ public:
     ProcessorLevelOption PROCESSOR_LEVEL0;
 
     StringOption DEVELOPER_TOKEN;
-
-    // Developer mode shows some additional test programs used
-    // for developing purposes.
-    bool DEVELOPER_MODE = false;
 
     // The mode that does not run Qt GUI, but instead runs some tests for
     // debugging, unit testing and developing purposes.

@@ -44,6 +44,30 @@ ResolutionOption::ResolutionOption(
 
 
 
+PreloadSettings::PreloadSettings(){}
+PreloadSettings& PreloadSettings::instance(){
+    static PreloadSettings settings;
+    return settings;
+}
+void PreloadSettings::load(const QJsonValue& json){
+    const QJsonObject obj = json.toObject();
+
+    //  Naughty mode.
+    json_get_bool(NAUGHTY_MODE, obj, "NAUGHTY_MODE");
+
+    //  Developer mode stuff.
+    QString dev_token;
+    json_get_string(dev_token, obj, "DEVELOPER_TOKEN");
+    {
+        std::string token = dev_token.toStdString();
+        QCryptographicHash hash(QCryptographicHash::Algorithm::Sha256);
+        hash.addData(token.c_str(), (int)token.size());
+        DEVELOPER_MODE = TOKENS.find(hash.result().toHex().toStdString()) != TOKENS.end();
+    }
+}
+
+
+
 
 GlobalSettings& GlobalSettings::instance(){
     static GlobalSettings settings;
@@ -86,7 +110,7 @@ GlobalSettings::GlobalSettings()
         "If the program fails to read something when it should succeed, save the image for debugging purposes.",
         true
     )
-    , NAUGHTY_MODE("<b>Naughty Mode:</b>", false)
+    , NAUGHTY_MODE_OPTION("<b>Naughty Mode:</b>", false)
     , REALTIME_THREAD_PRIORITY0(
         "<b>Realtime Thread Priority:</b><br>"
         "Thread priority of real-time threads. (UI thread, audio threads)<br>"
@@ -144,20 +168,7 @@ GlobalSettings::GlobalSettings()
 void GlobalSettings::load_json(const QJsonValue& json){
     const QJsonObject obj = json.toObject();
 
-    //  Naughty mode.
-    NAUGHTY_MODE.load_json(json_get_value_nothrow(obj, "NAUGHTY_MODE"));
-
-    //  Developer mode stuff.
-    DEVELOPER_TOKEN.load_json(json_get_value_nothrow(obj, "DEVELOPER_TOKEN"));
-    {
-        std::string token = DEVELOPER_TOKEN.get().toStdString();
-        QCryptographicHash hash(QCryptographicHash::Algorithm::Sha256);
-        hash.addData(token.c_str(), (int)token.size());
-        DEVELOPER_MODE = TOKENS.find(hash.result().toHex().toStdString()) != TOKENS.end();
-    }
-//    if (DEVELOPER_MODE){
-//        DISCORD.enable_integration();
-//    }
+    PreloadSettings::instance().load(json);
 
     BatchOption::load_json(json);
 
@@ -219,7 +230,7 @@ void GlobalSettings::load_json(const QJsonValue& json){
 
 QJsonValue GlobalSettings::to_json() const{
     QJsonObject obj = BatchOption::to_json().toObject();
-    obj.insert("NAUGHTY_MODE", NAUGHTY_MODE.to_json());
+    obj.insert("NAUGHTY_MODE", NAUGHTY_MODE_OPTION.to_json());
 
     QJsonObject command_line_test_obj;
     command_line_test_obj.insert("RUN", QJsonValue(COMMAND_LINE_TEST_MODE));
@@ -242,10 +253,9 @@ QJsonValue GlobalSettings::to_json() const{
     }
 
     obj.insert("COMMAND_LINE_TESTS", command_line_test_obj);
-    
+
     return obj;
 }
-
 
 
 

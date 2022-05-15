@@ -454,7 +454,7 @@ void sleepy_connect(){
     std::lock_guard<std::mutex> lg(m_connect_lock);
     {
 //        std::lock_guard<std::mutex> lg(m_client_lock);
-//        if (!GlobalSettings::instance().DEVELOPER_MODE){
+//        if (!PreloadSettings::instance().DEVELOPER_MODE){
 //            return;
 //        }
         if (m_sleepy_client != nullptr){

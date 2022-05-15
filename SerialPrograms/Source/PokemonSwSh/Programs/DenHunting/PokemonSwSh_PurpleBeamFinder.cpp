@@ -85,7 +85,7 @@ PurpleBeamFinder::PurpleBeamFinder(const PurpleBeamFinder_Descriptor& descriptor
     PA_ADD_OPTION(START_IN_GRIP_MENU);
     PA_ADD_OPTION(EXTRA_LINE);
     PA_ADD_OPTION(NOTIFICATIONS);
-    if (GlobalSettings::instance().DEVELOPER_MODE){
+    if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_STATIC(m_advanced_options);
         PA_ADD_OPTION(TIMEOUT_DELAY);
         PA_ADD_OPTION(MIN_BRIGHTNESS);

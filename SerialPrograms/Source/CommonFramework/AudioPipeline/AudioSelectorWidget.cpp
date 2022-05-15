@@ -59,7 +59,7 @@ AudioSelectorWidget::AudioSelectorWidget(
         QHBoxLayout* input_layout = new QHBoxLayout();
         row0->addLayout(input_layout, 10);
 
-        if (GlobalSettings::instance().DEVELOPER_MODE){
+        if (PreloadSettings::instance().DEVELOPER_MODE){
             m_audio_input_box = new NoWheelComboBox(this);
             input_layout->addWidget(m_audio_input_box, 7);
             m_load_file_button = new QPushButton("Load File", this);
@@ -88,7 +88,7 @@ AudioSelectorWidget::AudioSelectorWidget(
 
         QHBoxLayout* output_layout = new QHBoxLayout();
         row1->addLayout(output_layout, 10);
-        if (GlobalSettings::instance().DEVELOPER_MODE){
+        if (PreloadSettings::instance().DEVELOPER_MODE){
             m_audio_output_box = new NoWheelComboBox(this);
             output_layout->addWidget(m_audio_output_box, 7);
             m_record_button = new QPushButton("Record Frequencies", this);
@@ -212,7 +212,7 @@ AudioSelectorWidget::AudioSelectorWidget(
 
     // only in developer mode:
     // record audio
-    if (GlobalSettings::instance().DEVELOPER_MODE){
+    if (PreloadSettings::instance().DEVELOPER_MODE){
         connect(m_record_button, &QPushButton::clicked, this, [=](bool){
             m_record_is_on = !m_record_is_on;
             m_display.saveAudioFrequenciesToDisk(m_record_is_on);

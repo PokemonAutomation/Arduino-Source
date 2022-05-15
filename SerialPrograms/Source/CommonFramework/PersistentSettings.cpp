@@ -60,7 +60,12 @@ void PersistentSettings::read(){
     }
     QJsonObject root = doc.object();
 
-    GlobalSettings::instance().load_json(json_get_object_nothrow(root,"20-GlobalSettings"));
+    //  Need to load this subset of settings first because they will affect how
+    //  "GlobalSettings" is constructed.
+    QJsonObject settings = json_get_object_nothrow(root, "20-GlobalSettings");
+    PreloadSettings::instance().load(settings);
+
+    GlobalSettings::instance().load_json(settings);
 //    GlobalSettings::instance().PROCESS_PRIORITY0.update_priority_to_option();
     GlobalSettings::instance().REALTIME_THREAD_PRIORITY0.set_on_this_thread();
 

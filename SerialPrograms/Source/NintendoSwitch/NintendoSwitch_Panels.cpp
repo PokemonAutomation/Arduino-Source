@@ -53,7 +53,7 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
 //    add_divider("---- " + STRING_POKEMON + " Home ----");
     add_program<PokemonHome::PageSwap_Descriptor, PokemonHome::PageSwap>();
 
-    if (GlobalSettings::instance().DEVELOPER_MODE){
+    if (PreloadSettings::instance().DEVELOPER_MODE){
         add_divider("---- Developer Tools ----");
         add_program<TestProgramComputer_Descriptor, TestProgramComputer>();
         add_program<TestProgram_Descriptor, TestProgram>();

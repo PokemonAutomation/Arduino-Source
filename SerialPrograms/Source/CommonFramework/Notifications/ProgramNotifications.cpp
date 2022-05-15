@@ -57,7 +57,7 @@ void send_program_notification(
         QJsonArray fields;
         {
             QJsonObject field;
-            field["name"] = GlobalSettings::instance().DEVELOPER_MODE
+            field["name"] = PreloadSettings::instance().DEVELOPER_MODE
                 ? STRING_POKEMON + " Automation (" + PROGRAM_VERSION + "-dev)"
                 : STRING_POKEMON + " Automation (" + PROGRAM_VERSION + ")";
             QString text = info.program_name;
@@ -150,7 +150,7 @@ void send_program_telemetry(
         QJsonArray fields;
         {
             QJsonObject field;
-            field["name"] = GlobalSettings::instance().DEVELOPER_MODE
+            field["name"] = PreloadSettings::instance().DEVELOPER_MODE
                 ? STRING_POKEMON + " Automation (" + PROGRAM_VERSION + "-dev)"
                 : STRING_POKEMON + " Automation (" + PROGRAM_VERSION + ")";
             field["value"] = info.program_name.isEmpty() ? "(unknown)" : info.program_name;

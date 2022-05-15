@@ -86,7 +86,7 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_program<CloneItemsBoxCopy_Descriptor, CloneItemsBoxCopy>();
     add_program<CloneItemsMenuOverlap_Descriptor, CloneItemsMenuOverlap>();
 
-//    if (GlobalSettings::instance().DEVELOPER_MODE){
+//    if (PreloadSettings::instance().DEVELOPER_MODE){
 //    }
 
 

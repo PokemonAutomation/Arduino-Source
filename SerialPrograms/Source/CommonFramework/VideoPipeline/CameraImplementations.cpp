@@ -31,7 +31,9 @@ struct CameraBackends{
 #if QT_VERSION_MAJOR == 5
         m_backends.emplace_back("Qt5: QCameraViewfinder",                   new CameraQt5QCameraViewfinder::CameraBackend());
         m_backends.emplace_back("Qt5: QCameraViewfinder (separate thread)", new CameraQt5QCameraViewfinderSeparateThread::CameraBackend());
-//        m_backends.emplace_back("Qt5: Custom Frame",                        new CameraQt5CustomFrame::CameraBackend());
+        if (PreloadSettings::instance().DEVELOPER_MODE){
+            m_backends.emplace_back("Qt5: Custom Frame", new CameraQt5CustomFrame::CameraBackend());
+        }
 #endif
 #if QT_VERSION_MAJOR == 6
         m_backends.emplace_back("Qt6: QVideoSink",                          new CameraQt6QVideoSink::CameraBackend());

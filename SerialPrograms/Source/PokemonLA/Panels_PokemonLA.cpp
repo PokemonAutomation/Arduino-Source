@@ -69,12 +69,12 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_divider("---- Farming ----");
     add_program<NuggetFarmerHighlands_Descriptor, NuggetFarmerHighlands>();
     add_program<IngoBattleGrinder_Descriptor, IngoBattleGrinder>();
-    if (GlobalSettings::instance().DEVELOPER_MODE){
+    if (PreloadSettings::instance().DEVELOPER_MODE){
         add_program<IngoMoveGrinder_Descriptor, IngoMoveGrinder>();
     }
     add_program<MagikarpMoveGrinder_Descriptor, MagikarpMoveGrinder>();
     add_program<TenacityCandyFarmer_Descriptor, TenacityCandyFarmer>();
-    if (GlobalSettings::instance().DEVELOPER_MODE){
+    if (PreloadSettings::instance().DEVELOPER_MODE){
         add_program<LeapGrinder_Descriptor, LeapGrinder>();
     }
 
@@ -89,7 +89,7 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_program<PostMMOSpawnReset_Descriptor, PostMMOSpawnReset>();
     add_program<ShinyHuntCustomPath_Descriptor, ShinyHuntCustomPath>();
 
-    if (GlobalSettings::instance().DEVELOPER_MODE){
+    if (PreloadSettings::instance().DEVELOPER_MODE){
         add_divider("---- Developer Tools ----");
         add_program<MountDetectionTest_Descriptor, MountDetectionTest>();
         add_program<OverworldWatcher_Descriptor, OverworldWatcher>();

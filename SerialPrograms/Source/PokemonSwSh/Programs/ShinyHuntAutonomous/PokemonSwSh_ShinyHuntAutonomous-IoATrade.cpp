@@ -83,7 +83,7 @@ ShinyHuntAutonomousIoATrade::ShinyHuntAutonomousIoATrade(const ShinyHuntAutonomo
 
     PA_ADD_STATIC(m_advanced_options);
     PA_ADD_OPTION(MASH_TO_TRADE_DELAY);
-    if (GlobalSettings::instance().DEVELOPER_MODE){
+    if (PreloadSettings::instance().DEVELOPER_MODE){
         PA_ADD_OPTION(RUN_FROM_EVERYTHING);
     }
 }
