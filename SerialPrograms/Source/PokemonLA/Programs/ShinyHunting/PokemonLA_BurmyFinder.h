@@ -31,7 +31,7 @@ public:
 
 private:
     void run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
-    void check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    bool check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
     class Stats;
