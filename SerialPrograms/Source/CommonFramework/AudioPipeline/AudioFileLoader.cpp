@@ -275,7 +275,21 @@ AudioDecoderWorker::AudioDecoderWorker(
 
 void AudioDecoderWorker::start(){
     m_audioDecoder = new QAudioDecoder(this);
-    
+
+    connect(
+        m_audioDecoder, &QAudioDecoder::bufferAvailableChanged,
+        this, [](bool available){
+            std::cout << "QAudioDecoder::bufferAvailableChanged(): " << available << std::endl;
+        }
+    );
+    connect(
+        m_audioDecoder, &QAudioDecoder::stateChanged,
+        this, [=](QAudioDecoder::State state){
+            std::cout << "QAudioDecoder::stateChanged(): " << (int)state << std::endl;
+            emit this->finished();
+        }
+    );
+
     // Whenever a new buffer of audo frames decoded, save them by calling readAudioDecoderBuffer().
     connect(m_audioDecoder, &QAudioDecoder::bufferReady, this, &AudioDecoderWorker::readAudioDecoderBuffer);
 
