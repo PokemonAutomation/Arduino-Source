@@ -13,8 +13,8 @@
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/Farming/PokemonLA_LeapGrinder.h"
-
-
+#include "CommonFramework/VideoPipeline/VideoFeed.h"
+#include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
 #include "PokemonLA/Resources/PokemonLA_AvailablePokemon.h"
 #include "PokemonLA/Resources/PokemonLA_PokemonIcons.h"
 
@@ -71,6 +71,14 @@ LeapGrinder::LeapGrinder(const LeapGrinder_Descriptor& descriptor)
         "Stop on any non regular"
         }, 0
     )
+    , EXIT_METHOD(
+        "<b>Exit Battle Method:</b>",
+        {
+            "Run Away",
+            "Mash A to Kill",
+        },
+        0
+    )
     , SHINY_DETECTED_ENROUTE(
         "Enroute Shiny Action",
         "This applies if a shiny is detected while enroute to destination.",
@@ -93,6 +101,7 @@ LeapGrinder::LeapGrinder(const LeapGrinder_Descriptor& descriptor)
     PA_ADD_OPTION(POKEMON);
     PA_ADD_OPTION(LEAPS);
     PA_ADD_OPTION(STOP_ON);
+    PA_ADD_OPTION(EXIT_METHOD);
     PA_ADD_OPTION(SHINY_DETECTED_ENROUTE);
     PA_ADD_OPTION(MATCH_DETECTED_OPTIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -140,6 +149,18 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     stats.attempts++;
 
     env.console.log("Starting route and shiny detection...");
+
+    for (size_t c = 0; true; c++){
+        context.wait_for_all_requests();
+        if (is_pokemon_selection(env.console, env.console.video().snapshot().frame)){
+            break;
+        }
+        if (c >= 5){
+            throw OperationFailedException(env.console, "Failed to switch to Pokemon selection after 5 attempts.");
+        }
+        env.console.log("Not on Pokemon selection. Attempting to switch to it...", COLOR_ORANGE);
+        pbf_press_button(context, BUTTON_X, 20, 230);
+    }
 
     float shiny_coefficient = 1.0;
     ShinySoundDetector shiny_detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
@@ -225,7 +246,7 @@ bool LeapGrinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             on_match_found(env, env.console, context, MATCH_DETECTED_OPTIONS, is_match);
         }
 
-        exit_battle(env.console, context);
+        exit_battle(env.console, context, EXIT_METHOD == 1);
     }
 
     env.console.log("Remaining Leaps:" + std::to_string(LEAPS - stats.leaps));
