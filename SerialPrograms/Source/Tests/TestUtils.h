@@ -106,7 +106,8 @@ public:
 #define TEST_RESULT_COMPONENT_EQUAL(result, target, component_name) \
     do { \
         if ((result) != (target)) {\
-            std::cerr << "Error: " << __func__ << " " << component_name << " result is " << (result) << " but should be " << (target) << "." << std::endl; \
+            std::cerr << "Error: " << __func__ << " " << component_name << " result is " << (result) << " but should be " << \
+                (target) << "." << std::endl; \
             return 1; \
         } \
     } while (0)
@@ -114,10 +115,22 @@ public:
 #define TEST_RESULT_COMPONENT_EQUAL_WITH_PRINT_FUNC(result, target, component_name, print_func) \
     do { \
         if ((result) != (target)) {\
-            std::cerr << "Error: " << __func__ << " " << component_name << " result is " << print_func(result) << " but should be " << print_func(target) << "." << std::endl; \
+            std::cerr << "Error: " << __func__ << " " << component_name << " result is " << print_func(result) << " but should be " << \
+                print_func(target) << "." << std::endl; \
             return 1; \
         } \
     } while (0)
+
+#define TEST_RESULT_APPROXIMATE(result, target, threshold) \
+    do { \
+        if (std::fabs((result) - (target)) > (threshold)) {\
+            std::cerr << "Error: " << __func__ << " result is " << (result) << " but should be close to " << (target) << \
+                " with threshold: " << (threshold) << "." << std::endl; \
+            return 1; \
+        } \
+    } while (0)
+
+
 
 }
 

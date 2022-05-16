@@ -16,7 +16,9 @@ namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-
+// On the map that you see when you leave village, detect which region the cursor is currently
+// floats on.
+// The function detects the region by checking which red region name sign is moving up and down.
 MapRegion detect_selected_region(ConsoleHandle& console, BotBaseContext& context);
 
 

@@ -15,10 +15,12 @@
 #include "PokemonLA/Inference/PokemonLA_BerryTreeDetector.h"
 #include "PokemonLA/Inference/PokemonLA_BlackOutDetector.h"
 #include "PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"
+#include "PokemonLA/Inference/PokemonLA_MapMarkerLocator.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 
 #include <QImage>
 #include <iostream>
+#include <cmath>
 
 namespace PokemonAutomation{
 
@@ -154,6 +156,12 @@ int test_pokemonLA_StatusInfoScreenDetector(const QImage& image, const std::vect
         return 1;
     }
 
+    return 0;
+}
+
+int test_pokemonLA_MapMarkerLocator(const QImage& image, float target_angle, float threshold){
+    float angle = get_orientation_on_map(image);
+    TEST_RESULT_APPROXIMATE(angle, target_angle, threshold);
     return 0;
 }
 

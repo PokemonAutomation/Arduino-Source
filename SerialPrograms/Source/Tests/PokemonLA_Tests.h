@@ -30,6 +30,8 @@ int test_pokemonLA_BlackOutDetector(const QImage& image, bool target);
 
 int test_pokemonLA_StatusInfoScreenDetector(const QImage& image, const std::vector<std::string>& keywords);
 
+int test_pokemonLA_MapMarkerLocator(const QImage& image, float target_angle, float threshold);
+
 void test_pokemonLA_BerryTreeDetector(const QImage& image);
 
 int test_pokemonLA_shinySoundDetector(const std::vector<AudioSpectrum>& spectrums, bool target);

@@ -66,7 +66,7 @@ bool DialogueYellowArrowDetector::process_frame(const QImage& frame, WallClock t
     // int count = 0;
     // for(const auto& matrix : matrices){
     //     QImage output = cropped_frame.to_qimage();
-    //     set_color_to_image(matrix, QColor(255, 0, 0), output, 0, 0);
+    //     Kernels::Waterfill::draw_matrix_on_image(matrix, combine_rgb(255, 0, 0), output, 0, 0);
     //     output.save(QString::fromStdString("test_yellow_arrow_" + std::to_string(count) + ".png"));
     //     count++;
     // }
