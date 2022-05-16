@@ -207,7 +207,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     int ret = run_until(
         env.console, context,
         [&](BotBaseContext& context){
-            bool battle_found = false;
+            bool battle_found = true;
 
             //Tree 1
             goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
@@ -219,69 +219,108 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
             context.wait_for_all_requests();
             enable_shiny_sound.store(false, std::memory_order_release);
-            battle_found = check_tree(env, context);
+            check_tree(env, context);
             enable_shiny_sound.store(true, std::memory_order_release);
 
             //Tree 2
-            pbf_move_left_joystick(context, 235, 255, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-            change_mount(env.console, context, MountState::BRAVIARY_ON);
-            pbf_press_button(context, BUTTON_B, (2.7 * TICKS_PER_SECOND), (1.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
-
+            if(battle_found){
+                env.console.log("Battle with no match found. Restarting from camp.");
+                goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
+                pbf_move_left_joystick(context, 255, 230, 20, (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+                change_mount(env.console, context, MountState::BRAVIARY_ON);
+                pbf_press_button(context, BUTTON_B, (1.8 * TICKS_PER_SECOND), (1.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+                pbf_move_left_joystick(context, 255, 102, 10, (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+            }else{
+                pbf_move_left_joystick(context, 235, 255, 20, (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+                change_mount(env.console, context, MountState::BRAVIARY_ON);
+                pbf_press_button(context, BUTTON_B, (2.7 * TICKS_PER_SECOND), (1.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
+            }
             context.wait_for_all_requests();
             enable_shiny_sound.store(false, std::memory_order_release);
-            battle_found = check_tree(env, context);
+            check_tree(env, context);
             enable_shiny_sound.store(true, std::memory_order_release);
 
             //Tree 3
-            pbf_move_left_joystick(context, 255, 102, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-            change_mount(env.console, context, MountState::BRAVIARY_ON);
-            pbf_press_button(context, BUTTON_B, (3.3 * TICKS_PER_SECOND), (1.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
-            pbf_move_right_joystick(context, 127, 255, (0.10 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+            if(battle_found){
+                env.console.log("Battle with no match found. Restarting from camp.");
+                goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
+                pbf_move_left_joystick(context, 0, 207, 20, (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+                change_mount(env.console, context, MountState::BRAVIARY_ON);
+                pbf_press_button(context, BUTTON_B, (2.2 * TICKS_PER_SECOND), (1.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
+            }else{
+                pbf_move_left_joystick(context, 255, 102, 20, (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+                change_mount(env.console, context, MountState::BRAVIARY_ON);
+                pbf_press_button(context, BUTTON_B, (3.3 * TICKS_PER_SECOND), (1.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
+                pbf_move_right_joystick(context, 127, 255, (0.10 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+            }
 
             context.wait_for_all_requests();
             enable_shiny_sound.store(false, std::memory_order_release);
-            battle_found = check_tree(env, context);
+            check_tree(env, context);
             enable_shiny_sound.store(true, std::memory_order_release);
 
             //  Tree 4
-            env.console.log("Battle with no match found. Restarting from camp.", COLOR_ORANGE);
-            goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
-            pbf_move_left_joystick(context, 160, 255, 30, 30);
-            change_mount(env.console, context, MountState::BRAVIARY_ON);
-            pbf_press_button(context, BUTTON_B, (6.35 * TICKS_PER_SECOND), 20);
-            pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
-            pbf_move_left_joystick(context, 255, 127, 30, (0.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+            if(battle_found){
+                env.console.log("Battle with no match found. Restarting from camp.");
+                goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
+                pbf_move_left_joystick(context, 160, 255, 30, 30);
+                change_mount(env.console, context, MountState::BRAVIARY_ON);
+                pbf_press_button(context, BUTTON_B, (6.35 * TICKS_PER_SECOND), 20);
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
+                pbf_move_left_joystick(context, 255, 127, 30, (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+                pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+            }else{
 
+            }
             context.wait_for_all_requests();
             enable_shiny_sound.store(false, std::memory_order_release);
-            battle_found = check_tree(env, context);
+            check_tree(env, context);
             enable_shiny_sound.store(true, std::memory_order_release);
 
             //  Tree 5
-            pbf_move_left_joystick(context, 0, 105, 30, 30);
-            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-            change_mount(env.console, context, MountState::BRAVIARY_ON);
-            pbf_press_button(context, BUTTON_B, (5.5 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-            pbf_move_left_joystick(context, 255, 127, 30, (0.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_move_right_joystick(context, 127, 255, (0.15 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-
+            if (battle_found){
+                env.console.log("Battle with no match found. Restarting from camp.");
+                goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
+                pbf_move_left_joystick(context, 149, 255, 30, 30);
+                change_mount(env.console, context, MountState::BRAVIARY_ON);
+                pbf_press_button(context, BUTTON_B, (11.8 * TICKS_PER_SECOND), 20);
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
+                pbf_move_left_joystick(context, 255, 127, 30, (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+                pbf_move_right_joystick(context, 127, 255, (0.10 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+            }else{
+                pbf_move_left_joystick(context, 0, 105, 30, 30);
+                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+                change_mount(env.console, context, MountState::BRAVIARY_ON);
+                pbf_press_button(context, BUTTON_B, (5.5 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+                pbf_move_left_joystick(context, 255, 127, 30, (0.5 * TICKS_PER_SECOND));
+                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+                pbf_move_right_joystick(context, 127, 255, (0.15 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+            }
             context.wait_for_all_requests();
             enable_shiny_sound.store(false, std::memory_order_release);
-            battle_found = check_tree(env, context);
+            check_tree(env, context);
             enable_shiny_sound.store(true, std::memory_order_release);
 
             //  End
