@@ -123,6 +123,7 @@ struct BurmyFinder::TreeCounter{
     uint64_t tree2 = 0;
     uint64_t tree3 = 0;
     uint64_t tree4 = 0;
+    uint64_t tree5 = 0;
 
     void log(Logger& logger) const{
         std::string str;
@@ -131,6 +132,7 @@ struct BurmyFinder::TreeCounter{
         str += " - Tree2: " + tostr_u_commas(tree2);
         str += " - Tree3: " + tostr_u_commas(tree3);
         str += " - Tree4: " + tostr_u_commas(tree4);
+        str += " - Tree5: " + tostr_u_commas(tree5);
         logger.log(str);
     }
 };
@@ -227,143 +229,122 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     int ret = run_until(
         env.console, context,
         [&](BotBaseContext& context){
-            bool battle_found = false;
 
-            //Tree 1
+            //  Tree 0
+            env.console.log("Heading to Tree 0");
             goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
-            pbf_move_left_joystick(context, 255, 20, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+            pbf_move_left_joystick(context, 148, 255, 20, 20);
             change_mount(env.console, context, MountState::BRAVIARY_ON);
-            pbf_press_button(context, BUTTON_B, (2.5 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_B, (11.8 * TICKS_PER_SECOND), 20);
             pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
+            pbf_move_left_joystick(context, 255, 127, 30, (0.5 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+            pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
 
             context.wait_for_all_requests();
             enable_shiny_sound.store(false, std::memory_order_release);
             if (check_tree(env, context)){
                 tree_counter.tree0++;
-                battle_found = true;
             }
             enable_shiny_sound.store(true, std::memory_order_release);
 
-            //Tree 2
-            if(battle_found){
-                env.console.log("Battle with no match found. Restarting from camp.");
-                goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
-                pbf_move_left_joystick(context, 255, 230, 20, (0.5 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-                change_mount(env.console, context, MountState::BRAVIARY_ON);
-                pbf_press_button(context, BUTTON_B, (1.8 * TICKS_PER_SECOND), (1.5 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-                pbf_move_left_joystick(context, 255, 102, 10, (0.5 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-                pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            }else{
-                pbf_move_left_joystick(context, 235, 255, 20, (0.5 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-                change_mount(env.console, context, MountState::BRAVIARY_ON);
-                pbf_press_button(context, BUTTON_B, (2.8 * TICKS_PER_SECOND), (1.5 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
-                pbf_move_right_joystick(context, 127, 255, (0.15 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            }
+            //Tree 1
+            env.console.log("Heading to Tree 1");
+            goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
+            pbf_move_left_joystick(context, 104, 255, 30, 30);
+            change_mount(env.console, context, MountState::BRAVIARY_ON);
+            pbf_press_button(context, BUTTON_B, (11 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_PLUS, 20, (1.3 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
+            pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+
             context.wait_for_all_requests();
             enable_shiny_sound.store(false, std::memory_order_release);
             if (check_tree(env, context)){
                 tree_counter.tree1++;
-                battle_found = true;
             }
             enable_shiny_sound.store(true, std::memory_order_release);
 
-            //Tree 3
-            if(battle_found){
-                env.console.log("Battle with no match found. Restarting from camp.");
-                goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
-                pbf_move_left_joystick(context, 0, 207, 20, (0.5 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-                change_mount(env.console, context, MountState::BRAVIARY_ON);
-                pbf_press_button(context, BUTTON_B, (2.2 * TICKS_PER_SECOND), (1.5 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
-            }else{
-                pbf_move_left_joystick(context, 255, 102, 20, (0.5 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-                change_mount(env.console, context, MountState::BRAVIARY_ON);
-                pbf_press_button(context, BUTTON_B, (3.4 * TICKS_PER_SECOND), (1.5 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
-                pbf_move_right_joystick(context, 127, 255, (0.15 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            }
 
+            //Tree 2
+            env.console.log("Heading to Tree 2");
+            goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
+            pbf_move_left_joystick(context, 108, 255, 20, 20);
+            change_mount(env.console, context, MountState::BRAVIARY_ON);
+            pbf_press_button(context, BUTTON_B, (8.7 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+            pbf_move_left_joystick(context, 140, 255, 20, 20);
+            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+            pbf_move_right_joystick(context, 140, 255, (0.3 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
             context.wait_for_all_requests();
             enable_shiny_sound.store(false, std::memory_order_release);
             if (check_tree(env, context)){
                 tree_counter.tree2++;
-                battle_found = true;
             }
             enable_shiny_sound.store(true, std::memory_order_release);
-            //  Tree 4
-            if(battle_found){
-                env.console.log("Battle with no match found. Restarting from camp.");
-                goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
-                pbf_move_left_joystick(context, 160, 255, 30, 30);
-                change_mount(env.console, context, MountState::BRAVIARY_ON);
-                pbf_press_button(context, BUTTON_B, (6.35 * TICKS_PER_SECOND), 20);
-                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
-                pbf_move_left_joystick(context, 255, 127, 30, (0.5 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-                pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            }else{
-                pbf_move_left_joystick(context, 0, 230, 30, 30);
-                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-                change_mount(env.console, context, MountState::BRAVIARY_ON);
-                pbf_press_button(context, BUTTON_B, (5.2 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_PLUS, 20, (1.8 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-                pbf_move_left_joystick(context, 255, 127, 20, 20);
-                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-                pbf_move_right_joystick(context, 127, 255, (0.15 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            }
+
+
+            //Tree 3
+            env.console.log("Heading to Tree 3");
+            goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
+            pbf_move_left_joystick(context, 160, 255, 30, 30);
+            change_mount(env.console, context, MountState::BRAVIARY_ON);
+            pbf_press_button(context, BUTTON_B, (6.35 * TICKS_PER_SECOND), 20);
+            pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
+            pbf_move_left_joystick(context, 255, 135, 30, (0.5 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+            pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
             context.wait_for_all_requests();
             enable_shiny_sound.store(false, std::memory_order_release);
             if (check_tree(env, context)){
                 tree_counter.tree3++;
-                battle_found = true;
             }
             enable_shiny_sound.store(true, std::memory_order_release);
 
-            //  Tree 5
-            if (battle_found){
-                env.console.log("Battle with no match found. Restarting from camp.");
-                goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
-                pbf_move_left_joystick(context, 149, 255, 30, 30);
-                change_mount(env.console, context, MountState::BRAVIARY_ON);
-                pbf_press_button(context, BUTTON_B, (11.8 * TICKS_PER_SECOND), 20);
-                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
-                pbf_move_left_joystick(context, 255, 127, 30, (0.5 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-                pbf_move_right_joystick(context, 127, 255, (0.10 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            }else{
-                pbf_move_left_joystick(context, 0, 37, 30, 30);
-                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-                change_mount(env.console, context, MountState::BRAVIARY_ON);
-                pbf_press_button(context, BUTTON_B, (5.4 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
-                pbf_move_left_joystick(context, 255, 127, 30, (0.5 * TICKS_PER_SECOND));
-                pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-                pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
-            }
+            //Tree 4
+            env.console.log("Heading to Tree 4");
+            goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
+            pbf_move_left_joystick(context, 240, 240, 20, (0.5 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+            change_mount(env.console, context, MountState::BRAVIARY_ON);
+            pbf_press_button(context, BUTTON_B, (5.95 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_PLUS, 20, (1.2 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
+            pbf_move_left_joystick(context, 0, 0, 20, (0.5 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+            pbf_move_right_joystick(context, 127, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
             context.wait_for_all_requests();
             enable_shiny_sound.store(false, std::memory_order_release);
             if (check_tree(env, context)){
                 tree_counter.tree4++;
+            }
+            enable_shiny_sound.store(true, std::memory_order_release);
+
+            //Tree 5
+            env.console.log("Heading to Tree 5");
+            goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
+            //pbf_move_left_joystick(context, 255, 165, 20, (0.5 * TICKS_PER_SECOND));
+            pbf_move_left_joystick(context, 255, 158, 20, (0.5 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+            change_mount(env.console, context, MountState::BRAVIARY_ON);
+            pbf_press_button(context, BUTTON_B, (6.4 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_PLUS, 20, (0.5 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_PLUS, 20, (1.5 * TICKS_PER_SECOND));
+
+            pbf_move_left_joystick(context, 255, 130, 20, (0.5 * TICKS_PER_SECOND));
+            pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
+            pbf_move_right_joystick(context, 127, 255, (0.15 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+            context.wait_for_all_requests();
+            enable_shiny_sound.store(false, std::memory_order_release);
+            if (check_tree(env, context)){
+                tree_counter.tree5++;
             }
             enable_shiny_sound.store(true, std::memory_order_release);
 
