@@ -116,6 +116,8 @@ CameraHolder::CameraHolder(
         this, &CameraHolder::stop,
         this, [=]{
             this->moveToThread(QApplication::instance()->thread());
+
+            m_camera->setViewfinder((QVideoWidget*)nullptr);
             m_camera->stop();
 
             std::lock_guard<std::mutex> lg(m_state_lock);

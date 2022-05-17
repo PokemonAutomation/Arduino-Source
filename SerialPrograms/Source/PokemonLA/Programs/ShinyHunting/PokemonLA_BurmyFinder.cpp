@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
 #include "CommonFramework/Tools/StatsTracking.h"
@@ -116,6 +117,25 @@ std::unique_ptr<StatsTracker> BurmyFinder::make_stats() const{
 }
 
 
+struct BurmyFinder::TreeCounter{
+    uint64_t tree0 = 0;
+    uint64_t tree1 = 0;
+    uint64_t tree2 = 0;
+    uint64_t tree3 = 0;
+    uint64_t tree4 = 0;
+
+    void log(Logger& logger) const{
+        std::string str;
+        str += "Tree0: " + tostr_u_commas(tree0);
+        str += " - Tree1: " + tostr_u_commas(tree1);
+        str += " - Tree2: " + tostr_u_commas(tree2);
+        str += " - Tree3: " + tostr_u_commas(tree3);
+        str += " - Tree4: " + tostr_u_commas(tree4);
+        logger.log(str);
+    }
+};
+
+
 bool BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     Stats& stats = env.stats<Stats>();
 
@@ -175,7 +195,7 @@ bool BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext
     return false;
 }
 
-void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, TreeCounter& tree_counter){
     Stats& stats = env.stats<Stats>();
     stats.attempts++;
     env.console.log("Starting route and shiny detection...");
@@ -219,7 +239,9 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
             context.wait_for_all_requests();
             enable_shiny_sound.store(false, std::memory_order_release);
-            check_tree(env, context);
+            if (check_tree(env, context)){
+                tree_counter.tree0++;
+            }
             enable_shiny_sound.store(true, std::memory_order_release);
 
             //Tree 2
@@ -246,7 +268,9 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             }
             context.wait_for_all_requests();
             enable_shiny_sound.store(false, std::memory_order_release);
-            check_tree(env, context);
+            if (check_tree(env, context)){
+                tree_counter.tree1++;
+            }
             enable_shiny_sound.store(true, std::memory_order_release);
 
             //Tree 3
@@ -269,7 +293,9 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
             context.wait_for_all_requests();
             enable_shiny_sound.store(false, std::memory_order_release);
-            check_tree(env, context);
+            if (check_tree(env, context)){
+                tree_counter.tree2++;
+            }
             enable_shiny_sound.store(true, std::memory_order_release);
 
             //  Tree 4
@@ -290,7 +316,9 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             }
             context.wait_for_all_requests();
             enable_shiny_sound.store(false, std::memory_order_release);
-            check_tree(env, context);
+            if (check_tree(env, context)){
+                tree_counter.tree3++;
+            }
             enable_shiny_sound.store(true, std::memory_order_release);
 
             //  Tree 5
@@ -320,7 +348,9 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             }
             context.wait_for_all_requests();
             enable_shiny_sound.store(false, std::memory_order_release);
-            check_tree(env, context);
+            if (check_tree(env, context)){
+                tree_counter.tree4++;
+            }
             enable_shiny_sound.store(true, std::memory_order_release);
 
             //  End
@@ -343,8 +373,11 @@ void BurmyFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
     //  Connect the controller.
     pbf_press_button(context, BUTTON_LCLICK, 5, 5);
 
+    TreeCounter counters;
+
     while (true){
         env.update_stats();
+        counters.log(env.logger());
         send_program_status_notification(
             env.logger(), NOTIFICATION_STATUS,
             env.program_info(),
@@ -352,7 +385,7 @@ void BurmyFinder::program(SingleSwitchProgramEnvironment& env, BotBaseContext& c
             stats.to_str()
         );
         try{
-            run_iteration(env, context);
+            run_iteration(env, context, counters);
         }catch (OperationFailedException&){
             stats.errors++;
             pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
