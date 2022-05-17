@@ -30,7 +30,9 @@ public:
     virtual void program(SingleSwitchProgramEnvironment& env, BotBaseContext& context) override;
 
 private:
-    void run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
+    struct TreeCounter;
+
+    void run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, TreeCounter& tree_counter);
     bool check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
