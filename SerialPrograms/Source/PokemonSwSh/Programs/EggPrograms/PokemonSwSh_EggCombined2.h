@@ -43,7 +43,7 @@ private:
     EggStepCountOption STEPS_TO_HATCH;
     FloatingPointOption FETCHES_PER_BATCH;
     SectionDividerOption m_advanced_options;
-    TimeExpressionOption<uint16_t> SAFETY_TIME;
+    TimeExpressionOption<uint16_t> SAFETY_TIME0;
     TimeExpressionOption<uint16_t> EARLY_HATCH_SAFETY;
     TimeExpressionOption<uint16_t> HATCH_DELAY;
 };

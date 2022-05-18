@@ -66,7 +66,7 @@ const uint32_t TOUCH_DATE_INTERVAL  =   (uint32_t)4 * 3600 * TICKS_PER_SECOND;  
 //  If you see that the program is going into Y-COMM or there is less than 5
 //  seconds of extra spinning after the last egg in the batch, please report
 //  this as a bug. As a temporary work-around, you can increase this number.
-const uint16_t SAFETY_TIME          =   8 * TICKS_PER_SECOND;
+const uint16_t SAFETY_TIME          =   12 * TICKS_PER_SECOND;
 
 //  Eggs will not hatch early by more than this period.
 const uint16_t EARLY_HATCH_SAFETY   =   5 * TICKS_PER_SECOND;

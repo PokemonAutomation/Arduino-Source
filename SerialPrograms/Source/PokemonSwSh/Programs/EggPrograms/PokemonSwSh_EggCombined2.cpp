@@ -41,9 +41,9 @@ EggCombined2::EggCombined2(const EggCombined2_Descriptor& descriptor)
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , SAFETY_TIME(
+    , SAFETY_TIME0(
         "<b>Safety Time:</b><br>Additional time added to the spinning.",
-        "8 * TICKS_PER_SECOND"
+        "12 * TICKS_PER_SECOND"
     )
     , EARLY_HATCH_SAFETY(
         "<b>Early Hatch Safety:</b><br>Eggs will not hatch early by more than this period.",
@@ -61,7 +61,7 @@ EggCombined2::EggCombined2(const EggCombined2_Descriptor& descriptor)
     PA_ADD_OPTION(STEPS_TO_HATCH);
     PA_ADD_OPTION(FETCHES_PER_BATCH);
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(SAFETY_TIME);
+    PA_ADD_OPTION(SAFETY_TIME0);
     PA_ADD_OPTION(EARLY_HATCH_SAFETY);
     PA_ADD_OPTION(HATCH_DELAY);
 }
@@ -71,7 +71,7 @@ void EggCombined2::program(SingleSwitchProgramEnvironment& env, BotBaseContext& 
         .BOXES_TO_HATCH = BOXES_TO_HATCH,
         .STEPS_TO_HATCH = STEPS_TO_HATCH,
         .FETCHES_PER_BATCH = (float)FETCHES_PER_BATCH,
-        .SAFETY_TIME = SAFETY_TIME,
+        .SAFETY_TIME = SAFETY_TIME0,
         .EARLY_HATCH_SAFETY = EARLY_HATCH_SAFETY,
         .HATCH_DELAY = HATCH_DELAY,
         .TOUCH_DATE_INTERVAL = TOUCH_DATE_INTERVAL,
