@@ -153,7 +153,7 @@ bool BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext
 
         context.wait_for_all_requests();
 
-        if (pokemon.name_candidates.find("burmy") != pokemon.name_candidates.end()){
+        if (pokemon.name_candidates.find("Burmy") != pokemon.name_candidates.end()){
             env.console.log("Not a burmy. Leaving battle.");
             exit_battle(env.console, context, EXIT_METHOD == 1);
             return false;
