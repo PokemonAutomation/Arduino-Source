@@ -205,7 +205,7 @@ bool check_tree_or_ore_for_battle(ConsoleHandle& console, BotBaseContext& contex
            return false;
         }
         else{
-            pbf_wait(context, 0.5 * TICKS_PER_SECOND);
+            pbf_wait(context, 1 * TICKS_PER_SECOND);
             snapshot = console.video().snapshot();
         }
     }
