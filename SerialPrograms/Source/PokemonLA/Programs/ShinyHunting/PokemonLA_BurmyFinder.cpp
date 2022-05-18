@@ -146,12 +146,20 @@ bool BurmyFinder::check_tree(SingleSwitchProgramEnvironment& env, BotBaseContext
     context.wait_for_all_requests();
 
     if (battle_found){
-        stats.found++;
 
         PokemonDetails pokemon = get_pokemon_details(env.console, context, LANGUAGE);
+
         pbf_press_button(context, BUTTON_B, 20, 225);
+
         context.wait_for_all_requests();
 
+        if (pokemon.name_candidates.find("burmy") != pokemon.name_candidates.end()){
+            env.console.log("Not a burmy. Leaving battle.");
+            exit_battle(env.console, context, EXIT_METHOD == 1);
+            return false;
+        }
+
+        stats.found++;
         //  Match validation
 
         if (pokemon.is_alpha && pokemon.is_shiny){

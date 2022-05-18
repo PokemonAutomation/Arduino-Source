@@ -193,14 +193,24 @@ bool check_tree_or_ore_for_battle(ConsoleHandle& console, BotBaseContext& contex
     context.wait_for_all_requests();
 
     MountDetector mount_detector;
-    MountState mount = mount_detector.detect(console.video().snapshot());
 
-    if (mount != MountState::NOTHING){
-       console.log("Battle not found. Tree or ore might be empty.");
-       return false;
+    QImage snapshot = console.video().snapshot();
+
+
+    for (int i = 0; i < 2; i++) {
+        MountState mount = mount_detector.detect(snapshot);
+
+        if (mount != MountState::NOTHING){
+           console.log("Battle not found. Tree or ore might be empty.");
+           return false;
+        }
+        else{
+            pbf_wait(context, 0.5 * TICKS_PER_SECOND);
+            snapshot = console.video().snapshot();
+        }
     }
 
-    console.log("Battle found!");
+    console.log("Mount icon seems to be gone, waiting for battle menu...");
 
     BattleMenuDetector battle_menu_detector(console, console, true);
     wait_until(
@@ -208,7 +218,13 @@ bool check_tree_or_ore_for_battle(ConsoleHandle& console, BotBaseContext& contex
        {{battle_menu_detector}}
     );
 
-    return true;
+    if(battle_menu_detector.detected()){
+        console.log("Battle found!");
+        return true;
+    }
+
+    console.log("Battle menu not found. Tree or ore might be empty.");
+    return false;
 }
 
 void exit_battle(ConsoleHandle& console, BotBaseContext& context, bool mash_A_to_kill){
@@ -217,7 +233,7 @@ void exit_battle(ConsoleHandle& console, BotBaseContext& context, bool mash_A_to
     if (!mash_A_to_kill){
         console.log("Running from battle...");
         pbf_press_button(context, BUTTON_B, 20, 225);
-        pbf_press_button(context, BUTTON_A, 20, 100 + 3 * TICKS_PER_SECOND);
+        pbf_press_button(context, BUTTON_A, 20, 100 + 3.5 * TICKS_PER_SECOND);
         context.wait_for_all_requests();
         return;
     }
