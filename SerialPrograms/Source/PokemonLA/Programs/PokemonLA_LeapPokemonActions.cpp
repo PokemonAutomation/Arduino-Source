@@ -15,7 +15,6 @@
 #include "PokemonLA_RegionNavigation.h"
 #include "PokemonLA_BattleRoutines.h"
 #include "PokemonLA_LeapPokemonActions.h"
-#include "Common/Cpp/PrettyPrint.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -199,8 +198,6 @@ bool check_tree_or_ore_for_battle(ConsoleHandle& console, BotBaseContext& contex
     MountState mount = mount_detector.detect(snapshot);
     bool found = false;
     for (int i = 0; i < 4; i++) {
-        mount = mount_detector.detect(snapshot);
-
         if (mount == MountState::NOTHING){
             found = true;
             break;
@@ -210,6 +207,7 @@ bool check_tree_or_ore_for_battle(ConsoleHandle& console, BotBaseContext& contex
             pbf_wait(context, 0.5 * TICKS_PER_SECOND);
             snapshot = console.video().snapshot();
         }
+        mount = mount_detector.detect(snapshot);
     }
 
     if (!found){

@@ -310,7 +310,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
             pbf_move_right_joystick(context, 140, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
             context.wait_for_all_requests();
-            enable_shiny_sound.store(false, std::memory_order_release);
+
             if (check_tree(env, context)){
                 tree_counter.tree[2]++;
             }
