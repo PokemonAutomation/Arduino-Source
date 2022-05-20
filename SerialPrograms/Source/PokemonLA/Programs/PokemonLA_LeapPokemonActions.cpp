@@ -15,6 +15,7 @@
 #include "PokemonLA_RegionNavigation.h"
 #include "PokemonLA_BattleRoutines.h"
 #include "PokemonLA_LeapPokemonActions.h"
+#include "Common/Cpp/PrettyPrint.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -195,19 +196,25 @@ bool check_tree_or_ore_for_battle(ConsoleHandle& console, BotBaseContext& contex
     MountDetector mount_detector;
 
     QImage snapshot = console.video().snapshot();
+    MountState mount = mount_detector.detect(snapshot);
+    bool found = false;
+    for (int i = 0; i < 4; i++) {
+        mount = mount_detector.detect(snapshot);
 
-
-    for (int i = 0; i < 2; i++) {
-        MountState mount = mount_detector.detect(snapshot);
-
-        if (mount != MountState::NOTHING){
-           console.log("Battle not found. Tree or ore might be empty.");
-           return false;
+        if (mount == MountState::NOTHING){
+            found = true;
+            break;
         }
         else{
-            pbf_wait(context, 1 * TICKS_PER_SECOND);
+            console.log("Attempt " + std::to_string(i) + "Found: " + MOUNT_STATE_STRINGS[(int)mount]);
+            pbf_wait(context, 0.5 * TICKS_PER_SECOND);
             snapshot = console.video().snapshot();
         }
+    }
+
+    if (!found){
+        console.log("Battle not found. Tree or ore might be empty.");
+        return false;
     }
 
     console.log("Mount icon seems to be gone, waiting for battle menu...");
