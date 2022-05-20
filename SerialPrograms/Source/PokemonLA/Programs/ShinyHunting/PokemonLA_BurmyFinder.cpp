@@ -4,6 +4,8 @@
  *
  */
 
+#include <array>
+#include <sstream>
 #include "Common/Cpp/PrettyPrint.h"
 #include "CommonFramework/Notifications/ProgramNotifications.h"
 #include "CommonFramework/VideoPipeline/VideoFeed.h"
@@ -18,8 +20,6 @@
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/ShinyHunting/PokemonLA_BurmyFinder.h"
 #include "PokemonLA/Programs/PokemonLA_LeapPokemonActions.h"
-
-#include <sstream>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
