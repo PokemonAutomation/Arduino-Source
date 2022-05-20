@@ -42,7 +42,7 @@ bool is_pokemon_selection(VideoOverlay& overlay, const ConstImageRef& frame){
     ImageStats stats = image_stats(extract_box_reference(frame, box));
 //    cout << stats.average << stats.stddev << endl;
 //    extract_box_reference(frame, box).save("test.png");
-    if (is_solid(stats, {0.0652401, 0.606812, 0.327948}, 0.15, 50)){
+    if (is_solid(stats, {0.0652401, 0.606812, 0.327948}, 0.15, 70)){
         return true;
     }
     return false;
