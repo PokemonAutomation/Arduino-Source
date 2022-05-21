@@ -26,6 +26,8 @@ int test_pokemonLA_TransparentDialogueDetector(const QImage& image, bool target)
 
 int test_pokemonLA_DialogueYellowArrowDetector(const QImage& image, bool target);
 
+int test_pokemonLA_BlackOutDetector(const QImage& image, bool target);
+
 int test_pokemonLA_StatusInfoScreenDetector(const QImage& image, const std::vector<std::string>& keywords);
 
 void test_pokemonLA_BerryTreeDetector(const QImage& image);

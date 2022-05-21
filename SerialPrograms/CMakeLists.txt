@@ -888,6 +888,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h
     Source/PokemonLA/Inference/PokemonLA_BerryTreeDetector.cpp
     Source/PokemonLA/Inference/PokemonLA_BerryTreeDetector.h
+    Source/PokemonLA/Inference/PokemonLA_BlackOutDetector.cpp
+    Source/PokemonLA/Inference/PokemonLA_BlackOutDetector.h
     Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.cpp
     Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.h
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.cpp

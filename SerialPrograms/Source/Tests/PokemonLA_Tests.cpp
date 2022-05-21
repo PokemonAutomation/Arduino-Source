@@ -13,6 +13,7 @@
 #include "PokemonLA/Inference/Battles/PokemonLA_TransparentDialogueDetector.h"
 #include "PokemonLA/Inference/Objects/PokemonLA_DialogueYellowArrowDetector.h"
 #include "PokemonLA/Inference/PokemonLA_BerryTreeDetector.h"
+#include "PokemonLA/Inference/PokemonLA_BlackOutDetector.h"
 #include "PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
 
@@ -62,6 +63,16 @@ int test_pokemonLA_DialogueYellowArrowDetector(const QImage& image, bool target)
     const bool stop_on_detected = true;
     DialogueYellowArrowDetector detector(logger, overlay, stop_on_detected);
 
+    bool result = detector.process_frame(image, current_time());
+    TEST_RESULT_EQUAL(result, target);
+    return 0;
+}
+
+int test_pokemonLA_BlackOutDetector(const QImage& image, bool target){
+    auto& logger = global_logger_command_line();
+    auto overlay = DummyVideoOverlay();
+
+    BlackOutDetector detector(logger, overlay);
     bool result = detector.process_frame(image, current_time());
     TEST_RESULT_EQUAL(result, target);
     return 0;

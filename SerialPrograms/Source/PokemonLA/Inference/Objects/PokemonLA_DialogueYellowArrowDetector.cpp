@@ -60,7 +60,16 @@ bool DialogueYellowArrowDetector::process_frame(const QImage& frame, WallClock t
     auto matrices = compress_rgb32_to_binary_range(cropped_frame,{
         {combine_rgb(160, 160, 0), combine_rgb(255, 255, 255)},
         {combine_rgb(200, 200, 0), combine_rgb(255, 255, 255)},
+        {combine_rgb(200, 200, 0), combine_rgb(255, 255, 180)},
     });
+
+    // int count = 0;
+    // for(const auto& matrix : matrices){
+    //     QImage output = cropped_frame.to_qimage();
+    //     set_color_to_image(matrix, QColor(255, 0, 0), output, 0, 0);
+    //     output.save(QString::fromStdString("test_yellow_arrow_" + std::to_string(count) + ".png"));
+    //     count++;
+    // }
 
     std::unique_ptr<Kernels::Waterfill::WaterfillSession> session = Kernels::Waterfill::make_WaterfillSession();
     Kernels::Waterfill::WaterfillObject object;
@@ -73,6 +82,7 @@ bool DialogueYellowArrowDetector::process_frame(const QImage& frame, WallClock t
         const bool keep_object_matrix = false;
         while (finder->find_next(object, keep_object_matrix)){
             double rmsd = DialogueYellowArrowMatcher::instance().rmsd_original(cropped_frame, object);
+            // cout << "rmsd " << rmsd << " area " << object.area << endl;
             if (rmsd < 80){
                 detected = true;
                 break;
