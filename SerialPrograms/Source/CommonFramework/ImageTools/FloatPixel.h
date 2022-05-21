@@ -8,6 +8,7 @@
 #define PokemonAutomation_CommonFramework_FloatPixel_H
 
 #include <ostream>
+#include <string>
 #include <QColor>
 
 namespace PokemonAutomation{

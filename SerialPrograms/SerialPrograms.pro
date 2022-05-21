@@ -446,6 +446,7 @@ SOURCES += \
     Source/PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.cpp \
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_BerryTreeDetector.cpp \
+    Source/PokemonLA/Inference/PokemonLA_BlackOutDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.cpp \
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.cpp \
     Source/PokemonLA/Inference/PokemonLA_ItemCompatibilityDetector.cpp \
@@ -1144,6 +1145,7 @@ HEADERS += \
     Source/PokemonLA/Inference/Objects/PokemonLA_ShinySymbolDetector.h \
     Source/PokemonLA/Inference/Objects/PokemonLA_WhiteObjectDetector.h \
     Source/PokemonLA/Inference/PokemonLA_BerryTreeDetector.h \
+    Source/PokemonLA/Inference/PokemonLA_BlackOutDetector.h \
     Source/PokemonLA/Inference/PokemonLA_CommonColorCheck.h \
     Source/PokemonLA/Inference/PokemonLA_DialogDetector.h \
     Source/PokemonLA/Inference/PokemonLA_ItemCompatibilityDetector.h \

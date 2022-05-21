@@ -9,10 +9,13 @@
 
 #include "CommonFramework/ImageTypes/ImageReference.h"
 #include "ImageStats.h"
+#include "ImageBoxes.h"
 
 //#include <iostream>
 //using std::cout;
 //using std::endl;
+
+class QImage;
 
 namespace PokemonAutomation{
 
@@ -75,6 +78,31 @@ inline bool is_solid(
 ){
     return is_solid(image_stats(image), expected_color_ratio, max_euclidean_distance, max_stddev_sum);
 }
+
+// A convenience struct to do solid checks on images.
+struct ImageSolidCheck{
+    ImageFloatBox box;
+    FloatPixel expected_color_ratio;
+    double max_euclidean_distance = 0.15;
+    double max_stddev_sum = 10;
+
+    ImageSolidCheck(
+        double x, double y, double width, double height,
+        double r, double g, double b,
+        double max_distance = 0.15, double max_stddev_sum = 10)
+        : box(x, y, width, height)
+        , expected_color_ratio(r, g, b)
+        , max_euclidean_distance(max_distance)
+        , max_stddev_sum(max_stddev_sum) {}
+    
+    // Check if the area on the image is a solid color.
+    bool check(const QImage& image) const;
+
+    // Return a debug string on the checks performed on the image.
+    std::string debug_string(const QImage& image) const;
+};
+
+
 
 
 }
