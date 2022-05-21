@@ -10,6 +10,7 @@
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
+#include "CommonFramework/Options/BooleanCheckBoxOption.h"
 #include "CommonFramework/OCR/OCR_LanguageOptionOCR.h"
 
 namespace PokemonAutomation{
@@ -51,13 +52,31 @@ private:
     // Return true if a burmy is in the battle. False otherwise.
     bool handle_battle(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
+    // Set `m_enable_shiny_sound` to false to disable sound detection.
+    // Also call `context.wait_for_all_requests()` to make sure controller commands are all executed.
+    // See `m_enable_shiny_sound` for more context.
     void disable_shiny_sound(BotBaseContext& context);
+    // Re-enable shiny sound detection.
+    // Also call `context.wait_for_all_requests()` to make sure controller commands are all executed.
+    // See `m_enable_shiny_sound` for more context.
     void enable_shiny_sound(BotBaseContext& context);
+
+    // From any place on the fieldlands, return to Height Camp.
+    // It will try to ride on Braviary to escape from attacking pokemon if it can not transport via map.
+    // For robustness, the function will detect pokemon battles if for some reason the player character
+    // is entering a pokemon battle when this function is called.
+    // In the case of an active battle, it calls `handle_battle()` to check potential Burmy and then finish
+    // battle. After that, try to go back to Height Camp again.
+    void go_to_height_camp(SingleSwitchProgramEnvironment& env, BotBaseContext& context);
 
 private:
     class Stats;
     class RunRoute;
 
+    // Atomic bool to control whether to skip shiny sound for shiny sound detector.
+    // Shiny pokemon will play the shiny sound when it jumps out of a tree. To prevent this shiny sound from being
+    // treated as enroute shiny (shiny tree pokemon should be regarded as tree shiny), we disable shiny sound
+    // detection when throwing pokemon to shake a tree.
     std::atomic<bool> m_enable_shiny_sound{true};
 
     OCR::LanguageOCR LANGUAGE;
@@ -65,8 +84,11 @@ private:
     EnumDropdownOption EXIT_METHOD;
     ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;
     ShinyDetectedActionOption MATCH_DETECTED_OPTIONS;
+
     EventNotificationOption NOTIFICATION_STATUS;
     EventNotificationsOption NOTIFICATIONS;
+
+    BooleanCheckBoxOption SAVE_DEBUG_VIDEO;
 };
 
 

@@ -21,6 +21,7 @@
 #include "PokemonLA/Programs/PokemonLA_GameEntry.h"
 #include "PokemonLA/Programs/ShinyHunting/PokemonLA_BurmyFinder.h"
 #include "PokemonLA/Programs/PokemonLA_LeapPokemonActions.h"
+#include "CommonFramework/GlobalSettingsPanel.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -69,7 +70,6 @@ BurmyFinder::BurmyFinder(const BurmyFinder_Descriptor& descriptor)
       "Match Action",
       "What to do when a Burmy is found that matches the \"Stop On\" parameter.",
       "0 * TICKS_PER_SECOND")
-
     , NOTIFICATION_STATUS("Status Update", true, false, std::chrono::seconds(3600))
     , NOTIFICATIONS({
         &NOTIFICATION_STATUS,
@@ -77,6 +77,9 @@ BurmyFinder::BurmyFinder(const BurmyFinder_Descriptor& descriptor)
         &NOTIFICATION_PROGRAM_FINISH,
         &NOTIFICATION_ERROR_FATAL,
     })
+    , SAVE_DEBUG_VIDEO(
+        "<b>Save debug videos to Switch:</b>", false
+    )
 {
     PA_ADD_OPTION(LANGUAGE);
     PA_ADD_OPTION(STOP_ON);
@@ -84,6 +87,9 @@ BurmyFinder::BurmyFinder(const BurmyFinder_Descriptor& descriptor)
     PA_ADD_OPTION(SHINY_DETECTED_ENROUTE);
     PA_ADD_OPTION(MATCH_DETECTED_OPTIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        PA_ADD_OPTION(SAVE_DEBUG_VIDEO);
+    }
 }
 
 
@@ -235,6 +241,33 @@ void BurmyFinder::enable_shiny_sound(BotBaseContext& context){
     m_enable_shiny_sound.store(true, std::memory_order_release);
 }
 
+void BurmyFinder::go_to_height_camp(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+    const bool stop_on_detected = true;
+    BattleMenuDetector battle_menu_detector(env.console, env.console, stop_on_detected);
+    int ret = run_until(
+        env.console, context,
+        [&](BotBaseContext& context){
+            goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
+        },
+        {
+            {battle_menu_detector},
+        }
+    );
+    if (ret == 0){
+        env.log("Warning: found inside a battle when trying to return to camp.");
+        // Unexpected battle during movement to camp
+        if (SAVE_DEBUG_VIDEO){
+            // Take a video to know why it enters battle during return trip
+            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+            context.wait_for_all_requests();
+        }
+        // Finish battle
+        handle_battle(env, context);
+        // Go back to camp
+        goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
+    }
+}
+
 void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseContext& context, TreeCounter& tree_counter){
     Stats& stats = env.stats<Stats>();
     stats.attempts++;
@@ -291,7 +324,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
             //Tree 1
             env.console.log("Heading to Tree 1");
-            goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
+            go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 104, 255, 30, 30);
             change_mount(env.console, context, MountState::BRAVIARY_ON);
             pbf_press_button(context, BUTTON_B, (11 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
@@ -307,7 +340,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
             //Tree 2
             env.console.log("Heading to Tree 2");
-            goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
+            go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 108, 255, 20, 20);
             change_mount(env.console, context, MountState::BRAVIARY_ON);
             pbf_press_button(context, BUTTON_B, (8.7 * TICKS_PER_SECOND), (1 * TICKS_PER_SECOND));
@@ -324,7 +357,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
             //Tree 3
             env.console.log("Heading to Tree 3");
-            goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
+            go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 160, 255, 30, 30);
             change_mount(env.console, context, MountState::BRAVIARY_ON);
             pbf_press_button(context, BUTTON_B, (6.35 * TICKS_PER_SECOND), 20);
@@ -341,7 +374,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
             //Tree 4
             env.console.log("Heading to Tree 4");
-            goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
+            go_to_height_camp(env, context);
             pbf_move_left_joystick(context, 240, 240, 20, (0.5 * TICKS_PER_SECOND));
             pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
             change_mount(env.console, context, MountState::BRAVIARY_ON);
@@ -359,7 +392,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
             //Tree 5
             env.console.log("Heading to Tree 5");
-            goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
+            go_to_height_camp(env, context);
             //pbf_move_left_joystick(context, 255, 165, 20, (0.5 * TICKS_PER_SECOND));
             pbf_move_left_joystick(context, 255, 158, 20, (0.5 * TICKS_PER_SECOND));
             pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
@@ -379,7 +412,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
             // Tree 6-9
             env.console.log("Heading to Tree 6-9");
-            goto_any_camp_from_overworld(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
+            go_to_height_camp(env, context);
             const bool stop_on_detected = true;
             BattleMenuDetector battle_menu_detector(env.console, env.console, stop_on_detected);
             int ret = run_until(
@@ -487,9 +520,15 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
     if (ret == 0){
         on_shiny_sound(env, env.console, context, SHINY_DETECTED_ENROUTE, shiny_coefficient);
     } else if (ret == 1){
+        env.log("Character blacks out");
         // black out.
         stats.blackouts++;
         env.update_stats();
+        if (SAVE_DEBUG_VIDEO){
+            // Take a video to know why it blacks out
+            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+            context.wait_for_all_requests();
+        }
         throw OperationFailedException(env.console, "Black out.");
     }
 

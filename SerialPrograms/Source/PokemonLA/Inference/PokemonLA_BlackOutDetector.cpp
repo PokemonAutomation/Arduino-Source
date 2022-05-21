@@ -59,10 +59,18 @@ void BlackOutDetector::make_overlays(VideoOverlaySet& items) const{
 
 //  Return true if the inference session should stop.
 bool BlackOutDetector::process_frame(const QImage& frame, WallClock timestamp){
+
+    auto save_image = [&](){
+        static int count = 0;
+        frame.save(QString("BlackOut-") + QString::number(count) + QString(".png"));
+        count++;
+    };
+
     // First, check whether it is the black out screen:
     const bool is_screen_black = is_black(extract_box_reference(frame, m_black_screen), 100, 10);
     if (is_screen_black && m_yellow_arrow_detector.process_frame(frame, timestamp)) {
         // We have both a mostly black screen and a yellow arrow:
+        save_image();
         return true;
     }
 
@@ -74,6 +82,7 @@ bool BlackOutDetector::process_frame(const QImage& frame, WallClock timestamp){
         }
     }
 
+    save_image();
     return true;
 }
 
