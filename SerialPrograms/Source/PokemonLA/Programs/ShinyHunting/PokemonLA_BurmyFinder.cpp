@@ -13,6 +13,7 @@
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonLA/PokemonLA_Settings.h"
 #include "PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.h"
+#include "PokemonLA/Inference/PokemonLA_BlackOutDetector.h"
 #include "PokemonLA/Inference/PokemonLA_OverworldDetector.h"
 #include "PokemonLA/Inference/PokemonLA_StatusInfoScreenDetector.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
@@ -92,6 +93,7 @@ public:
         : attempts(m_stats["Attempts"])
         , trees(m_stats["Trees"])
         , errors(m_stats["Errors"])
+        , blackouts(m_stats["Blackouts"])
         , found(m_stats["Found"])
         , enroute_shinies(m_stats["Enroute Shinies"])
         , tree_alphas(m_stats["Tree Alphas"])
@@ -100,6 +102,7 @@ public:
         m_display_order.emplace_back("Attempts");
         m_display_order.emplace_back("Trees");
         m_display_order.emplace_back("Errors", true);
+        m_display_order.emplace_back("Blackouts", true);
         m_display_order.emplace_back("Found");
         m_display_order.emplace_back("Enroute Shinies");
         m_display_order.emplace_back("Tree Alphas");
@@ -111,6 +114,7 @@ public:
     std::atomic<uint64_t>& attempts;
     std::atomic<uint64_t>& trees;
     std::atomic<uint64_t>& errors;
+    std::atomic<uint64_t>& blackouts;
     std::atomic<uint64_t>& found;
     std::atomic<uint64_t>& enroute_shinies;
     std::atomic<uint64_t>& tree_alphas;
@@ -260,6 +264,8 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
         shiny_coefficient = error_coefficient;
         return on_shiny_callback(env, env.console, SHINY_DETECTED_ENROUTE, error_coefficient);
     });
+
+    BlackOutDetector black_out_detector(env.console, env.console);
 
     goto_camp_from_jubilife(env, env.console, context, TravelLocations::instance().Fieldlands_Heights);
 
@@ -475,11 +481,16 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             goto_camp_from_overworld(env, env.console, context);
             goto_professor(env.console, context, Camp::FIELDLANDS_FIELDLANDS);
         },
-        {{shiny_detector}}
+        {{shiny_detector, black_out_detector}}
     );
     shiny_detector.throw_if_no_sound();
     if (ret == 0){
         on_shiny_sound(env, env.console, context, SHINY_DETECTED_ENROUTE, shiny_coefficient);
+    } else if (ret == 1){
+        // black out.
+        stats.blackouts++;
+        env.update_stats();
+        throw OperationFailedException(env.console, "Black out.");
     }
 
     from_professor_return_to_jubilife(env, env.console, context);
