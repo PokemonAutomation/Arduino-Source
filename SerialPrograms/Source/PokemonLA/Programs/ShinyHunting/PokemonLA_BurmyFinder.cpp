@@ -308,7 +308,8 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
             pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
             pbf_move_left_joystick(context, 140, 255, 20, 20);
             pbf_press_button(context, BUTTON_ZL, 20, (0.5 * TICKS_PER_SECOND));
-            pbf_move_right_joystick(context, 140, 255, (0.3 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+            pbf_move_right_joystick(context, 140, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+            context.wait_for_all_requests();
 
             if (check_tree(env, context)){
                 tree_counter.tree[2]++;
