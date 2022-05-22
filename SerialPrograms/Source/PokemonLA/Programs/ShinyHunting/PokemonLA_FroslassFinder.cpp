@@ -156,7 +156,7 @@ void FroslassFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseC
         }
     }
 
-    env.console.log("No shiny detected, returning to Jubilife!");
+    env.console.log("No shiny detected, Reset game!");
     pbf_press_button(context, BUTTON_HOME, 20, GameSettings::instance().GAME_TO_HOME_DELAY);
     reset_game_from_home(env, env.console, context, ConsoleSettings::instance().TOLERATE_SYSTEM_UPDATE_MENU_FAST);
 }
