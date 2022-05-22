@@ -193,7 +193,9 @@ void detect_shiny_battle(
         tracker.sparkles_wild_overall(),
         tracker.sparkles_wild_left(),
         tracker.sparkles_wild_right(),
-        tracker.sparkles_own()
+        tracker.sparkles_own(),
+        overall_threshold,
+        doubles_threshold
     );
     wild_result.best_screenshot = tracker.sparkles_wild_overall().best_image();
     your_result.best_screenshot = tracker.sparkles_own().best_image();
