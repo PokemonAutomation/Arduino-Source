@@ -39,10 +39,12 @@ public:
     TimeExpressionOption<uint16_t> ENTER_GAME_WAIT;
 
     SectionDividerOption m_advanced_options;
-    FloatingPointOption SHINY_SHOUND_THRESHOLD2;
-    FloatingPointOption SHINY_SHOUND_LOW_FREQUENCY;
+    FloatingPointOption SHINY_SOUND_THRESHOLD;
+    FloatingPointOption SHINY_SOUND_LOW_FREQUENCY;
     FloatingPointOption ALPHA_ROAR_THRESHOLD;
     FloatingPointOption ALPHA_MUSIC_THRESHOLD;
+    FloatingPointOption ITEM_DROP_SOUND_THRESHOLD;
+    FloatingPointOption ITEM_DROP_SOUND_LOW_FREQUENCY;
 };
 
 

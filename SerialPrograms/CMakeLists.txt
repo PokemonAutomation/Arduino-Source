@@ -916,6 +916,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.h
     Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaRoarDetector.cpp
     Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaRoarDetector.h
+    Source/PokemonLA/Inference/Sounds/PokemonLA_ItemDropSoundDetector.cpp
+    Source/PokemonLA/Inference/Sounds/PokemonLA_ItemDropSoundDetector.h
     Source/PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.cpp
     Source/PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h
     Source/PokemonLA/Panels_PokemonLA.cpp
@@ -988,18 +990,14 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.h
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.cpp
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h
-    Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaMusicListener.cpp
-    Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaMusicListener.h
-    Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.cpp
-    Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.h
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_SoundListener.cpp
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_SoundListener.h
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_FlagNavigationTest.cpp
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_FlagNavigationTest.h
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_MountDetectionTest.cpp
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_MountDetectionTest.h
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_OverworldWatcher.cpp
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_OverworldWatcher.h
-    Source/PokemonLA/Programs/TestPrograms/PokemonLA_ShinySoundListener.cpp
-    Source/PokemonLA/Programs/TestPrograms/PokemonLA_ShinySoundListener.h
     Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.cpp
     Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h
     Source/PokemonLA/Options/PokemonLA_CustomPathTable.cpp

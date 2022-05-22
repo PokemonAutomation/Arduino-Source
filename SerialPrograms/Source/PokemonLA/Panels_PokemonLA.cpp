@@ -38,10 +38,8 @@
 
 #include "Programs/TestPrograms/PokemonLA_MountDetectionTest.h"
 #include "Programs/TestPrograms/PokemonLA_OverworldWatcher.h"
-#include "Programs/TestPrograms/PokemonLA_ShinySoundListener.h"
 #include "Programs/TestPrograms/PokemonLA_FlagNavigationTest.h"
-#include "Programs/TestPrograms/PokemonLA_AlphaRoarListener.h"
-#include "Programs/TestPrograms/PokemonLA_AlphaMusicListener.h"
+#include "Programs/TestPrograms/PokemonLA_SoundListener.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -93,9 +91,7 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
         add_divider("---- Developer Tools ----");
         add_program<MountDetectionTest_Descriptor, MountDetectionTest>();
         add_program<OverworldWatcher_Descriptor, OverworldWatcher>();
-        add_program<ShinySoundListener_Descriptor, ShinySoundListener>();
-        add_program<AlphaRoarListener_Descriptor, AlphaRoarListener>();
-        add_program<AlphaMusicListener_Descriptor, AlphaMusicListener>();
+        add_program<SoundListener_Descriptor, SoundListener>();
         add_program<FlagNavigationTest_Descriptor, FlagNavigationTest>();
     }
 

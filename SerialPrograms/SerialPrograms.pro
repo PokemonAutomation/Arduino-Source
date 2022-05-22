@@ -460,6 +460,7 @@ SOURCES += \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.cpp \
     Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.cpp \
     Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaRoarDetector.cpp \
+    Source/PokemonLA/Inference/Sounds/PokemonLA_ItemDropSoundDetector.cpp \
     Source/PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.cpp \
     Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.cpp \
     Source/PokemonLA/Options/PokemonLA_CustomPathTable.cpp \
@@ -489,12 +490,6 @@ SOURCES += \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.cpp \
-    Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaMusicListener.cpp \
-    Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.cpp \
-    Source/PokemonLA/Programs/TestPrograms/PokemonLA_MountDetectionTest.cpp \
-    Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.cpp \
-    Source/PokemonLA/Programs/Trading/PokemonLA_SelfTouchTrade.cpp \
-    Source/PokemonLA/Programs/Trading/PokemonLA_TradeRoutines.cpp \
     Source/PokemonLA/Programs/Farming/PokemonLA_NuggetFarmerHighlands.cpp \
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.cpp \
@@ -505,8 +500,12 @@ SOURCES += \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.cpp \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_OverworldWatcher.cpp \
-    Source/PokemonLA/Programs/TestPrograms/PokemonLA_ShinySoundListener.cpp \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_FlagNavigationTest.cpp \
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_SoundListener.cpp \
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_MountDetectionTest.cpp \
+    Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.cpp \
+    Source/PokemonLA/Programs/Trading/PokemonLA_SelfTouchTrade.cpp \
+    Source/PokemonLA/Programs/Trading/PokemonLA_TradeRoutines.cpp \
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.cpp \
     Source/PokemonLA/Resources/PokemonLA_PokemonIcons.cpp \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.cpp \
@@ -1159,6 +1158,7 @@ HEADERS += \
     Source/PokemonLA/Inference/PokemonLA_UnderAttackDetector.h \
     Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.h \
     Source/PokemonLA/Inference/Sounds/PokemonLA_AlphaRoarDetector.h \
+    Source/PokemonLA/Inference/Sounds/PokemonLA_ItemDropSoundDetector.h \
     Source/PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h \
     Source/PokemonLA/Options/PokemonLA_BattlePokemonActionTable.h \
     Source/PokemonLA/Options/PokemonLA_CustomPathTable.h \
@@ -1188,12 +1188,6 @@ HEADERS += \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.h \
-    Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaMusicListener.h \
-    Source/PokemonLA/Programs/TestPrograms/PokemonLA_AlphaRoarListener.h \
-    Source/PokemonLA/Programs/TestPrograms/PokemonLA_MountDetectionTest.h \
-    Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.h \
-    Source/PokemonLA/Programs/Trading/PokemonLA_SelfTouchTrade.h \
-    Source/PokemonLA/Programs/Trading/PokemonLA_TradeRoutines.h \
     Source/PokemonLA/Programs/Farming/PokemonLA_NuggetFarmerHighlands.h \
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.h \
@@ -1205,7 +1199,11 @@ HEADERS += \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_FlagNavigationTest.h \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_OverworldWatcher.h \
-    Source/PokemonLA/Programs/TestPrograms/PokemonLA_ShinySoundListener.h \
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_SoundListener.h \
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_MountDetectionTest.h \
+    Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.h \
+    Source/PokemonLA/Programs/Trading/PokemonLA_SelfTouchTrade.h \
+    Source/PokemonLA/Programs/Trading/PokemonLA_TradeRoutines.h \
     Source/PokemonLA/Resources/PokemonLA_AvailablePokemon.h \
     Source/PokemonLA/Resources/PokemonLA_PokemonIcons.h \
     Source/PokemonSwSh/Commands/PokemonSwSh_Commands_AutoHosts.h \

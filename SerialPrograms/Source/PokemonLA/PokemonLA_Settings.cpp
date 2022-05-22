@@ -60,11 +60,11 @@ GameSettings::GameSettings()
     , m_advanced_options(
         "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
     )
-    , SHINY_SHOUND_THRESHOLD2(
+    , SHINY_SOUND_THRESHOLD(
         "<b>Shiny Sound Threshold:</b><br>Maximum error coefficient to trigger a shiny detection.",
         0.87, 0, 1.0
     )
-    , SHINY_SHOUND_LOW_FREQUENCY(
+    , SHINY_SOUND_LOW_FREQUENCY(
         "<b>Shiny Sound Low Frequency (Hz):</b><br>High pass filter frequency for shiny sound.",
         5000, 0, 48000
     )
@@ -75,6 +75,14 @@ GameSettings::GameSettings()
     , ALPHA_MUSIC_THRESHOLD(
         "<b>Alpha Music Threshold:</b><br>Maximum error coefficient to trigger an alpha music detection.",
         0.61, 0, 1.0
+    )
+    , ITEM_DROP_SOUND_THRESHOLD(
+        "<b>Item Drop Sound Threshold:</b><br>Maximum error coefficient to trigger an item drop sound detection.",
+        0.9, 0, 1.0
+    )
+    , ITEM_DROP_SOUND_LOW_FREQUENCY(
+        "<b>Item Drop Sound Low Frequency (Hz):</b><br>High pass filter frequency for item drop sound.",
+        5000, 0, 48000
     )
 {
     PA_ADD_STATIC(m_general);
@@ -93,9 +101,11 @@ GameSettings::GameSettings()
     PA_ADD_OPTION(ENTER_GAME_WAIT);
 
     PA_ADD_STATIC(m_advanced_options);
-    PA_ADD_OPTION(SHINY_SHOUND_THRESHOLD2);
-    PA_ADD_OPTION(SHINY_SHOUND_LOW_FREQUENCY);
+    PA_ADD_OPTION(SHINY_SOUND_THRESHOLD);
+    PA_ADD_OPTION(SHINY_SOUND_LOW_FREQUENCY);
     PA_ADD_OPTION(ALPHA_ROAR_THRESHOLD);
+    PA_ADD_OPTION(ITEM_DROP_SOUND_THRESHOLD);
+    PA_ADD_OPTION(ITEM_DROP_SOUND_LOW_FREQUENCY);
 }
 
 

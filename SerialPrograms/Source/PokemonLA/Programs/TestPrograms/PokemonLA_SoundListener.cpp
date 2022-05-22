@@ -1,4 +1,4 @@
-/*  Alpha Roar Listener
+/*  Sound Listener
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -19,36 +19,50 @@
 #include "NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h"
 #include "NintendoSwitch/NintendoSwitch_Settings.h"
 #include "PokemonLA/PokemonLA_Settings.h"
+#include "PokemonLA/Inference/Sounds/PokemonLA_AlphaMusicDetector.h"
 #include "PokemonLA/Inference/Sounds/PokemonLA_AlphaRoarDetector.h"
-#include "PokemonLA_AlphaRoarListener.h"
+#include "PokemonLA/Inference/Sounds/PokemonLA_ItemDropSoundDetector.h"
+#include "PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h"
+#include "PokemonLA_SoundListener.h"
+
+#include <QMessageBox>
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonLA{
 
-AlphaRoarListener_Descriptor::AlphaRoarListener_Descriptor()
+SoundListener_Descriptor::SoundListener_Descriptor()
     : RunnableSwitchProgramDescriptor(
-        "PokemonLA:AlphaRoarListener",
-        STRING_POKEMON + " LA", "Alpha Roar Listener",
+        "PokemonLA:SoundListener",
+        STRING_POKEMON + " LA", "Sound Listener",
         "",
-        "Detect alpha roar from audio stream.",
+        "Test sound detectors listening to audio stream.",
         FeedbackType::REQUIRED, true,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
 
 
-AlphaRoarListener::AlphaRoarListener(const AlphaRoarListener_Descriptor& descriptor)
+SoundListener::SoundListener(const SoundListener_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
-    , STOP_ON_ALPHA_ROAR("<b>Stop on Alpha Roar</b><br>Stop program when an alpha roar is heard.", false)
+    , SOUND_TYPE("<b>Which Sound to Detect</b>",
+    {
+        "Shiny Sound",
+        "Alpha Roar",
+        "Alpha Music",
+        "Item Drop Sound",
+    }, 0
+    )
+    , STOP_ON_DETECTED_SOUND("<b>Stop on the detected sound</b><br>Stop program when the sound is detected.", false)
 {
-    PA_ADD_OPTION(STOP_ON_ALPHA_ROAR);
+    PA_ADD_OPTION(SOUND_TYPE);
+    PA_ADD_OPTION(STOP_ON_DETECTED_SOUND);
 }
 
 
-void searchAlphaRoarFromAudioDump();
+// void searchAlphaRoarFromAudioDump();
 
-void AlphaRoarListener::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
+void SoundListener::program(SingleSwitchProgramEnvironment& env, BotBaseContext& context){
     //  Connect the controller.
     // pbf_move_right_joystick(context, 0, 255, 10, 0);
 
@@ -56,22 +70,36 @@ void AlphaRoarListener::program(SingleSwitchProgramEnvironment& env, BotBaseCont
     // return;
 
     std::cout << "Running audio test program." << std::endl;
-    
-    AlphaRoarDetector detector(env.console.logger(), env.console, [&](float error_coefficient) -> bool{
-        // This lambda function will be called when an alpha roar is detected.
+
+    std::shared_ptr<AudioInferenceCallback> detector;
+    auto action = [&](float error_coefficient) -> bool{
+        // This lambda function will be called when the sound is detected.
         // Its return will determine whether to stop the program:
-        return STOP_ON_ALPHA_ROAR;
-    });
+        return STOP_ON_DETECTED_SOUND;
+    };
+
+    if (SOUND_TYPE == 0){
+        detector = std::make_shared<ShinySoundDetector>(env.console.logger(), env.console, action);
+    } else if (SOUND_TYPE == 1){
+        detector = std::make_shared<AlphaRoarDetector>(env.console.logger(), env.console, action);
+    } else if (SOUND_TYPE == 2){
+        detector = std::make_shared<AlphaMusicDetector>(env.console.logger(), env.console, action);
+    } else if (SOUND_TYPE == 3){
+        detector = std::make_shared<ItemDropSoundDetector>(env.console.logger(), env.console, action);
+    } else {
+        QMessageBox::critical(nullptr, "Error","Not such sound detector as sound type " + QString::number(SOUND_TYPE));
+        return;
+    }
 
     InferenceSession session(
         context, env.console,
-        {{detector, std::chrono::milliseconds(20)}}
+        {{*detector, std::chrono::milliseconds(20)}}
     );
     context.wait_until_cancel();
 
-
-    std::cout << "Audio test program finished." << std::endl;
+    std::cout << "Audio test program Sound listener finished." << std::endl;
 }
+
 
 // A function used to search for the alpha roar on LA audio dump.
 // But we didn't find the shound sound :P
@@ -162,6 +190,9 @@ void searchAlphaRoarFromAudioDump(){
     fout.close();
     return;
 }
+
+
+
 
 
 }

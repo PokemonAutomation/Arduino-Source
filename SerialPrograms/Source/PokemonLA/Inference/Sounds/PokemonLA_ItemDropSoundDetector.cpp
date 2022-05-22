@@ -1,4 +1,4 @@
-/*  Shiny Sound Detector
+/*  Item Drop Sound Detector
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
@@ -9,7 +9,7 @@
 #include "CommonFramework/Inference/AudioTemplateCache.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
 #include "PokemonLA/PokemonLA_Settings.h"
-#include "PokemonLA_ShinySoundDetector.h"
+#include "PokemonLA_ItemDropSoundDetector.h"
 
 #include <sstream>
 #include <cfloat>
@@ -22,21 +22,21 @@ namespace NintendoSwitch{
 namespace PokemonLA{
 
 
-ShinySoundDetector::ShinySoundDetector(Logger& logger, ConsoleHandle& console, OnShinyCallback on_shiny_callback)
+ItemDropSoundDetector::ItemDropSoundDetector(Logger& logger, ConsoleHandle& console, OnShinyCallback on_shiny_callback)
     // Use a green as the detection color because the shiny symbol in LA is green.
-    : AudioPerSpectrumDetectorBase(logger, "ShinySoundDetector", "Shiny sound", COLOR_YELLOW, console, on_shiny_callback)
+    : AudioPerSpectrumDetectorBase(logger, "ItemDropSoundDetector", "Item drop sound", COLOR_DARKGREEN, console, on_shiny_callback)
 {}
 
 
-float ShinySoundDetector::get_score_threshold() const{
-    return (float)GameSettings::instance().SHINY_SOUND_THRESHOLD;
+float ItemDropSoundDetector::get_score_threshold() const{
+    return (float)GameSettings::instance().ITEM_DROP_SOUND_THRESHOLD;
 }
 
-std::unique_ptr<SpectrogramMatcher> ShinySoundDetector::build_spectrogram_matcher(size_t sampleRate){
+std::unique_ptr<SpectrogramMatcher> ItemDropSoundDetector::build_spectrogram_matcher(size_t sampleRate){
     return std::make_unique<SpectrogramMatcher>(
-        AudioTemplateCache::instance().get_throw("PokemonLA/ShinySound", sampleRate),
+        AudioTemplateCache::instance().get_throw("PokemonLA/ItemDropSound", sampleRate),
         SpectrogramMatcher::Mode::SPIKE_CONV, sampleRate,
-        GameSettings::instance().SHINY_SOUND_LOW_FREQUENCY
+        GameSettings::instance().ITEM_DROP_SOUND_LOW_FREQUENCY
     );
 }
 

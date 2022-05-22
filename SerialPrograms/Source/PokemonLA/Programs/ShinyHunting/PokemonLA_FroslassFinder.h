@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonLA_FroslassFinder_H
 #include "CommonFramework/Notifications/EventNotificationsTable.h"
 #include "NintendoSwitch/Framework/NintendoSwitch_SingleSwitchProgram.h"
+#include "NintendoSwitch/Options/TimeExpressionOption.h"
 #include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 #include "PokemonLA/Inference/PokemonLA_MountDetector.h"
 #include "PokemonLA/Inference/PokemonLA_UnderAttackDetector.h"
@@ -36,6 +37,8 @@ private:
     class RunRoute;
 
     ShinyRequiresAudioText SHINY_REQUIRES_AUDIO;
+
+    TimeExpressionOption<uint16_t> DASH_DURATION;
 
     ShinyDetectedActionOption SHINY_DETECTED_ENROUTE;
     ShinyDetectedActionOption SHINY_DETECTED_DESTINATION;
