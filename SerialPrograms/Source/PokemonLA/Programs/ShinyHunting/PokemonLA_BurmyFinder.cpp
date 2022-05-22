@@ -303,9 +303,10 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotBaseCon
 
                 // Now we should be on ground
                 disable_shiny_sound(context);
+                last_checked_tree = 0;
                 check_tree_no_stop(env, context);
                 context.wait_for_all_requests();
-                last_checked_tree = 0;
+
 
                 // === Fly to the second tree on trip ===
                 // Mount on Braviary
@@ -324,9 +325,10 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotBaseCon
 
                 // Now we should be on ground
                 disable_shiny_sound(context);
+                last_checked_tree = 1;
                 check_tree_no_stop(env, context);
                 context.wait_for_all_requests();
-                last_checked_tree = 1;
+
 
                 // === Fly to the third tree on trip ===
                 env.console.log("Checking tree: 2");
@@ -345,9 +347,10 @@ size_t BurmyFinder::grouped_path(SingleSwitchProgramEnvironment& env, BotBaseCon
 
                 // Now we should be on ground
                 disable_shiny_sound(context);
+                last_checked_tree = 2;
                 check_tree_no_stop(env, context);
                 context.wait_for_all_requests();
-                last_checked_tree = 2;
+
 
                 // === Fly to the fourth tree ===
                 env.console.log("Checking tree: 3");
