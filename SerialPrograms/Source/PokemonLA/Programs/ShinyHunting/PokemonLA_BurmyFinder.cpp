@@ -258,7 +258,7 @@ void BurmyFinder::go_to_height_camp(SingleSwitchProgramEnvironment& env, BotBase
         // Unexpected battle during movement to camp
         if (SAVE_DEBUG_VIDEO){
             // Take a video to know why it enters battle during return trip
-            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
             context.wait_for_all_requests();
         }
         // Finish battle
@@ -433,7 +433,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
                     // Change camera to face what player character faces
                     pbf_press_button(context, BUTTON_ZL, 20, (0.4 * TICKS_PER_SECOND));
                     // Move camera down
-                    pbf_move_right_joystick(context, 128, 255, (0.2 * TICKS_PER_SECOND), (0.5 * TICKS_PER_SECOND));
+                    pbf_move_right_joystick(context, 128, 255, (0.3 * TICKS_PER_SECOND), (0.2 * TICKS_PER_SECOND));
                     
                     // Now we should be on ground
                     disable_shiny_sound(context);
@@ -446,8 +446,8 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
 
                     // Now face towards the next tree
                     pbf_move_left_joystick(context, 255, 200, 1 * TICKS_PER_SECOND, 0);
-                    pbf_press_button(context, BUTTON_B, 60, 0);
-                    pbf_press_button(context, BUTTON_Y, (2.3 * TICKS_PER_SECOND), 0);
+                    pbf_mash_button(context, BUTTON_B, 100);
+                    pbf_press_button(context, BUTTON_Y, (2.1 * TICKS_PER_SECOND), 0);
                     // Get off Braviary
                     pbf_press_button(context, BUTTON_PLUS, 20, (1 * TICKS_PER_SECOND));
                     // Move camera down
@@ -526,7 +526,7 @@ void BurmyFinder::run_iteration(SingleSwitchProgramEnvironment& env, BotBaseCont
         env.update_stats();
         if (SAVE_DEBUG_VIDEO){
             // Take a video to know why it blacks out
-            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 0);
+            pbf_press_button(context, BUTTON_CAPTURE, 2 * TICKS_PER_SECOND, 2 * TICKS_PER_SECOND);
             context.wait_for_all_requests();
         }
         throw OperationFailedException(env.console, "Black out.");
