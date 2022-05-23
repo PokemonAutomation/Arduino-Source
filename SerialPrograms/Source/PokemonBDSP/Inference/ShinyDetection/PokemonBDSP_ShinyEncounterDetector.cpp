@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 //#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "PokemonBDSP_ShinyEncounterDetector.h"
