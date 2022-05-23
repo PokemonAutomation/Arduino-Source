@@ -29,7 +29,7 @@ void BattleDialogDetector::make_overlays(VideoOverlaySet& items) const{
 }
 bool BattleDialogDetector::detect(const QImage& screen) const{
     ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
-    if (!is_grey(bottom, 0, 200, 5)){
+    if (!is_grey(bottom, 0, 200, 10)){
         return false;
     }
     ImageStats left = image_stats(extract_box_reference(screen, m_left));
