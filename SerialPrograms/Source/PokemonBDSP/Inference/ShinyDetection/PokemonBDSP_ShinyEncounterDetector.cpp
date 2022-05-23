@@ -8,6 +8,7 @@
 //#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "PokemonBDSP_ShinyEncounterDetector.h"
+#include "PokemonBDSP/Inference/Sounds/PokemonBDSP_ShinySoundDetector.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -120,6 +121,7 @@ void determine_shiny_status(
     const ShinySparkleAggregator& sparkles_wild_left,
     const ShinySparkleAggregator& sparkles_wild_right,
     const ShinySparkleAggregator& sparkles_own,
+    bool wild_shiny_sound_found,
     double overall_threshold,
     double doubles_threshold
 ){
@@ -136,6 +138,10 @@ void determine_shiny_status(
             alpha_wild_overall += 3.5;
         }
     }
+    if (wild_shiny_sound_found){
+        alpha_wild_overall += 5.0;
+    }
+
     {
         std::chrono::milliseconds dialog_duration = dialog_tracker.your_animation_duration();
         std::chrono::milliseconds min_delay = SHINY_ANIMATION_DELAY - std::chrono::milliseconds(300);
@@ -146,6 +152,7 @@ void determine_shiny_status(
     }
     logger.log(
         "ShinyDetector: Wild Alpha = " + QString::number(alpha_wild_overall) +
+        (wild_shiny_sound_found ? "(shiny sound detected)" : "") +
         ", Left Alpha = " + QString::number(alpha_wild_left) +
         ", Right Alpha = " + QString::number(alpha_wild_right) +
         ", Your Alpha = " + QString::number(alpha_own),
@@ -182,13 +189,33 @@ void detect_shiny_battle(
     ShinyDetectionResult& your_result,
     const DetectionType& type,
     std::chrono::seconds timeout,
-    double overall_threshold, double doubles_threshold
+    double overall_threshold, double doubles_threshold,
+    bool use_shiny_sound
 ){
     BattleType battle_type = type.full_battle_menu ? BattleType::STANDARD : BattleType::STARTER;
     ShinyEncounterTracker tracker(console, console, battle_type);
+
+    bool shiny_sound_detected = false;
+    std::shared_ptr<ShinySoundDetector> shiny_sound_detector;
+    
+    if (use_shiny_sound){
+        shiny_sound_detector = std::make_shared<ShinySoundDetector>(console.logger(), console, [&shiny_sound_detected](float error_coefficient) -> bool{
+            //  Warning: This callback will be run from a different thread than this function.
+            //  When this lambda function is called, a shiny sound is detected. Mark this by `shiny_sound_detected`.
+            //  This lambda function always returns false. It tells the shiny sound detector to always return false
+            //  in ShinySoundDetector::process_spectrums() when a shiny sound is found, so that it won't stop
+            //  ShinyEncounterTracker tracker from finish running.
+            shiny_sound_detected = true;
+            return false;
+        });
+    }
+
+    std::vector<PeriodicInferenceCallback> callbacks = {{tracker}};
+    if (use_shiny_sound){
+        callbacks.emplace_back(*shiny_sound_detector);
+    }
     int result = wait_until(
-        console, context, timeout,
-        {{tracker}}
+        console, context, timeout, callbacks
     );
     if (result < 0){
         console.log("ShinyDetector: Battle menu not found after timeout.", COLOR_RED);
@@ -202,6 +229,7 @@ void detect_shiny_battle(
         tracker.sparkles_wild_left(),
         tracker.sparkles_wild_right(),
         tracker.sparkles_own(),
+        shiny_sound_detected,
         overall_threshold,
         doubles_threshold
     );

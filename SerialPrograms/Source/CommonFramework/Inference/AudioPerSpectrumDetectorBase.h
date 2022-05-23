@@ -57,7 +57,8 @@ public:
     // on_shiny_callback(float error_coefficient) -> bool: 
     // when the detector finds a match, it calls this callback function to decide whether to stop
     // the inference session. The error coefficient of the found audio is passed to the callback
-    // function. If it returns true, the inference session will stop.
+    // function. If it returns true, the inference session will stop (by returning true from 
+    // AudioPerSpectrumDetectorBase::process_spectrums()).
     AudioPerSpectrumDetectorBase(
         Logger& logger,
         std::string label, std::string audio_name, Color detection_color,

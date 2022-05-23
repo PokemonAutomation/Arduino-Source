@@ -85,21 +85,31 @@ private:
     ShinySparkleAggregator m_best_own;
 };
 
-void determine_shiny_status(
-    LoggerQt& logger,
-    DoublesShinyDetection& wild_result,
-    ShinyDetectionResult& your_result,
-    const PokemonSwSh::EncounterDialogTracker& dialog_tracker,
-    const ShinySparkleAggregator& sparkles_wild_overall,
-    const ShinySparkleAggregator& sparkles_wild_left,
-    const ShinySparkleAggregator& sparkles_wild_right,
-    const ShinySparkleAggregator& sparkles_own,
-    double overall_threshold = 5.0,
-    double doubles_threshold = 3.0
-);
 
-
-
+// Called when battle starts to detect whether any pokemon in the battle is shiny.
+// Store shiny results in `wild_result` and `your_result`.
+// wild_result.shiny_type and your_result.shiny_type can be ShinyType::NOT_SHINY or 
+// ShinyType::UNKNOWN_SHINY.
+// `overall_threshold` is the threshold for determining wild shiny and your shiny.
+// If there is wild shiny, `doubles_threshold` is the threshold to determine the shiniess
+// of the left and right wild pokemon slot.
+//
+// Internally, we use the symbol alpha to denote how much shininess detected.
+// The higher the alpha, the more likely the pokemon is shiny.
+// `overall_threshold` and `doubles_threshold` are thresholds on alpha.
+// Each detected shiny animation sparkles counts as 1.0 alpha.
+// The function uses `ShinyEncounterTracker` to track the frame with the most detected
+// sparkles, aka highest alpha.
+// If the dialog timing is implies a shiny animation played, add 3.5 to the highest alpha.
+// If the final value reaches `overall_threshold`, it is counted as a shiny detected.
+// If the highest alpha detected on the cropped view of the left pokemon slot reaches 
+// `doubles_threshold`, it is considered a shiny on left. Same to the right slot.
+//
+// When `use_shiny_sound` is true, the function also use a shiny sound detector to improve
+// its detection on wild pokemon.
+// When a shiny sound is detected, it adds 5.0 to the heighest overall alpha value.
+// Note: shiny sound will trigger a detection when your own shiny pokemon leads the battle.
+// Don't send shiny pokemon if you want to use shiny sound detection.
 void detect_shiny_battle(
     ConsoleHandle& console, BotBaseContext& context,
     DoublesShinyDetection& wild_result,
@@ -107,7 +117,8 @@ void detect_shiny_battle(
     const DetectionType& type,
     std::chrono::seconds timeout,
     double overall_threshold = 5.0,
-    double doubles_threshold = 3.0
+    double doubles_threshold = 3.0,
+    bool use_shiny_sound = false
 );
 
 

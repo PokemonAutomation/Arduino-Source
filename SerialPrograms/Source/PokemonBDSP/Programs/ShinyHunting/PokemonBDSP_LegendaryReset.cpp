@@ -39,6 +39,9 @@ LegendaryReset::LegendaryReset(const LegendaryReset_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
     , WALK_UP("<b>Walk Up:</b><br>Walk up while mashing A to trigger encounter.", false)
+    , USE_SOUND_DETECTION("<b>Use sound detection:</b><br>Use shiny sound detection. "
+    "<b>Make sure you have correct audio input set.</b><br>"
+    "Don't use your own shiny " + STRING_POKEMON + " as battle lead, which will trigger shiny sound detection.", false)
     , ENCOUNTER_BOT_OPTIONS(false, false)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
@@ -52,6 +55,7 @@ LegendaryReset::LegendaryReset(const LegendaryReset_Descriptor& descriptor)
     PA_ADD_OPTION(LANGUAGE);
 
     PA_ADD_OPTION(WALK_UP);
+    PA_ADD_OPTION(USE_SOUND_DETECTION);
 
     PA_ADD_OPTION(ENCOUNTER_BOT_OPTIONS);
     PA_ADD_OPTION(NOTIFICATIONS);
@@ -128,7 +132,10 @@ void LegendaryReset::program(SingleSwitchProgramEnvironment& env, BotBaseContext
             env.console, context,
             result_wild, result_own,
             WILD_POKEMON,
-            std::chrono::seconds(30)
+            std::chrono::seconds(30),
+            5.0,
+            3.0,
+            USE_SOUND_DETECTION
         );
 
         bool stop = handler.handle_standard_encounter(result_wild);

@@ -40,6 +40,8 @@ private:
 
     BooleanCheckBoxOption WALK_UP;
 
+    BooleanCheckBoxOption USE_SOUND_DETECTION;
+
     EncounterBotCommonOptions ENCOUNTER_BOT_OPTIONS;
 
     EventNotificationsOption NOTIFICATIONS;
