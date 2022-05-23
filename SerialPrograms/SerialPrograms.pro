@@ -392,7 +392,7 @@ SOURCES += \
     Source/PokemonBDSP/Options/PokemonBDSP_BerrySelector.cpp \
     Source/PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.cpp \
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.cpp \
-    Source/PokemonBDSP/Panels_PokemonBDSP.cpp \
+    Source/PokemonBDSP/PokemonBDSP_Panels.cpp \
     Source/PokemonBDSP/PokemonBDSP_Settings.cpp \
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggAutonomous.cpp \
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggAutonomousState.cpp \
@@ -427,6 +427,7 @@ SOURCES += \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Overworld.cpp \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Shaymin.cpp \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_StarterReset.cpp \
+    Source/PokemonBDSP/Programs/TestPrograms/PokemonBDSP_ShinyEncounterTester.cpp \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfBoxTrade.cpp \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfTouchTrade.cpp \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.cpp \
@@ -467,8 +468,8 @@ SOURCES += \
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.cpp \
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.cpp \
     Source/PokemonLA/Options/PokemonLA_TravelLocation.cpp \
-    Source/PokemonLA/Panels_PokemonLA.cpp \
     Source/PokemonLA/PokemonLA_Locations.cpp \
+    Source/PokemonLA/PokemonLA_Panels.cpp \
     Source/PokemonLA/PokemonLA_Settings.cpp \
     Source/PokemonLA/PokemonLA_TravelLocations.cpp \
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoMoveGrinder.cpp \
@@ -677,6 +678,7 @@ SOURCES += \
     Source/PokemonSwSh/Programs/PokemonSwSh_SynchronizedSpinning.cpp \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FastCodeEntry.cpp \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.cpp \
+    Source/PokemonSwSh/Programs/TestPrograms/PokemonSwSh_ShinyEncounterTester.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokemonIcons.cpp \
@@ -1090,7 +1092,7 @@ HEADERS += \
     Source/PokemonBDSP/Options/PokemonBDSP_EggHatchFilter.h \
     Source/PokemonBDSP/Options/PokemonBDSP_EncounterBotCommon.h \
     Source/PokemonBDSP/Options/PokemonBDSP_ShortcutDirection.h \
-    Source/PokemonBDSP/Panels_PokemonBDSP.h \
+    Source/PokemonBDSP/PokemonBDSP_Panels.h \
     Source/PokemonBDSP/PokemonBDSP_Settings.h \
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggAutonomous.h \
     Source/PokemonBDSP/Programs/Eggs/PokemonBDSP_EggAutonomousState.h \
@@ -1125,6 +1127,7 @@ HEADERS += \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Overworld.h \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Shaymin.h \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_StarterReset.h \
+    Source/PokemonBDSP/Programs/TestPrograms/PokemonBDSP_ShinyEncounterTester.h \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfBoxTrade.h \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfTouchTrade.h \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.h \
@@ -1165,8 +1168,8 @@ HEADERS += \
     Source/PokemonLA/Options/PokemonLA_ShinyDetectedAction.h \
     Source/PokemonLA/Options/PokemonLA_TradeCountTable.h \
     Source/PokemonLA/Options/PokemonLA_TravelLocation.h \
-    Source/PokemonLA/Panels_PokemonLA.h \
     Source/PokemonLA/PokemonLA_Locations.h \
+    Source/PokemonLA/PokemonLA_Panels.h \
     Source/PokemonLA/PokemonLA_Settings.h \
     Source/PokemonLA/PokemonLA_TravelLocations.h \
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoMoveGrinder.h \
@@ -1382,6 +1385,7 @@ HEADERS += \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FastCodeEntry.h \
     Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.h \
     Source/PokemonSwSh/Programs/ReleaseHelpers.h \
+    Source/PokemonSwSh/Programs/TestPrograms/PokemonSwSh_ShinyEncounterTester.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokemonIcons.h \

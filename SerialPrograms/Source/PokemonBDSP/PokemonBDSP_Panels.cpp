@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "Panels_PokemonBDSP.h"
+#include "PokemonBDSP_Panels.h"
 
 #include "PokemonBDSP_Settings.h"
 
@@ -36,6 +36,8 @@
 #include "Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy2.h"
 #include "Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy.h"
 #include "Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.h"
+
+#include "Programs/TestPrograms/PokemonBDSP_ShinyEncounterTester.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -86,8 +88,10 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     add_program<CloneItemsBoxCopy_Descriptor, CloneItemsBoxCopy>();
     add_program<CloneItemsMenuOverlap_Descriptor, CloneItemsMenuOverlap>();
 
-//    if (PreloadSettings::instance().DEVELOPER_MODE){
-//    }
+    if (PreloadSettings::instance().DEVELOPER_MODE){
+        add_divider("---- Developer Tools ----");
+        add_program<ShinyEncounterTester_Descriptor, ShinyEncounterTester>();
+    }
 
 
     finish_panel_setup();

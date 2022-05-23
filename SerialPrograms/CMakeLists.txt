@@ -822,6 +822,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.h
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_MenuOverlap.cpp
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_MenuOverlap.h
+    Source/PokemonBDSP/Programs/TestPrograms/PokemonBDSP_ShinyEncounterTester.cpp
+    Source/PokemonBDSP/Programs/TestPrograms/PokemonBDSP_ShinyEncounterTester.h
     Source/PokemonBDSP/Programs/PokemonBDSP_EncounterDetection.cpp
     Source/PokemonBDSP/Programs/PokemonBDSP_EncounterDetection.h
     Source/PokemonBDSP/Programs/PokemonBDSP_EncounterHandler.cpp
@@ -852,8 +854,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfTouchTrade.h
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.cpp
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.h
-    Source/PokemonBDSP/Panels_PokemonBDSP.cpp
-    Source/PokemonBDSP/Panels_PokemonBDSP.h
+    Source/PokemonBDSP/PokemonBDSP_Panels.cpp
+    Source/PokemonBDSP/PokemonBDSP_Panels.h
     Source/PokemonBDSP/PokemonBDSP_Settings.cpp
     Source/PokemonBDSP/PokemonBDSP_Settings.h
     Source/PokemonLA/Inference/Battles/PokemonLA_BattleMenuDetector.cpp
@@ -920,8 +922,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonLA/Inference/Sounds/PokemonLA_ItemDropSoundDetector.h
     Source/PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.cpp
     Source/PokemonLA/Inference/Sounds/PokemonLA_ShinySoundDetector.h
-    Source/PokemonLA/Panels_PokemonLA.cpp
-    Source/PokemonLA/Panels_PokemonLA.h
+    Source/PokemonLA/PokemonLA_Panels.cpp
+    Source/PokemonLA/PokemonLA_Panels.h
     Source/PokemonLA/PokemonLA_Locations.cpp
     Source/PokemonLA/PokemonLA_Locations.h
     Source/PokemonLA/PokemonLA_Settings.cpp
@@ -1359,6 +1361,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-StrongSpawn.h
     Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.cpp
     Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.h
+    Source/PokemonSwSh/Programs/TestPrograms/PokemonSwSh_ShinyEncounterTester.cpp
+    Source/PokemonSwSh/Programs/TestPrograms/PokemonSwSh_ShinyEncounterTester.h
     Source/PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.cpp
     Source/PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h
     Source/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.cpp

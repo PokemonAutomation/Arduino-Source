@@ -78,6 +78,7 @@
 #include "MaxLair/PokemonSwSh_MaxLair_StrongBoss.h"
 #include "MaxLair/PokemonSwSh_MaxLair_BossFinder.h"
 
+#include "Programs/TestPrograms/PokemonSwSh_ShinyEncounterTester.h"
 #include "InferenceTraining/PokemonSwSh_GenerateIVCheckerOCR.h"
 #include "InferenceTraining/PokemonSwSh_GenerateNameOCRPokedex.h"
 
@@ -177,6 +178,7 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
 
     if (PreloadSettings::instance().DEVELOPER_MODE){
         add_divider("---- Developer Tools ----");
+        add_program<ShinyEncounterTester_Descriptor, ShinyEncounterTester>();
         add_program<GenerateIVCheckerOCR_Descriptor, GenerateIVCheckerOCR>();
         add_program<GenerateNameOCRDataPokedex_Descriptor, GenerateNameOCRDataPokedex>();
     }
