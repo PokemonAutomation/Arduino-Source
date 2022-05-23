@@ -18,7 +18,7 @@ ShinyEncounterTester_Descriptor::ShinyEncounterTester_Descriptor()
         STRING_POKEMON + " SwSh", "Shiny Encounter Tester",
         "",
         "Test the shiny encounter detector. Start this program just before an encounter.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED, true,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
@@ -31,7 +31,7 @@ ShinyEncounterTester::ShinyEncounterTester(const ShinyEncounterTester_Descriptor
         "<b>Encounter Type:</b>",
         {
             "Wild Encounter",
-            " Raid Den",
+            "Raid Den",
         },
         0
     )

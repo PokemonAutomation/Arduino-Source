@@ -10,6 +10,10 @@
 #include "CommonFramework/VideoPipeline/VideoOverlay.h"
 #include "PokemonSwSh_BattleDialogDetector.h"
 
+//#include <iostream>
+//using std::cout;
+//using std::endl;
+
 namespace PokemonAutomation{
 namespace NintendoSwitch{
 namespace PokemonSwSh{
@@ -29,14 +33,17 @@ void BattleDialogDetector::make_overlays(VideoOverlaySet& items) const{
 }
 bool BattleDialogDetector::detect(const QImage& screen) const{
     ImageStats bottom = image_stats(extract_box_reference(screen, m_bottom));
-    if (!is_grey(bottom, 0, 200, 5)){
+//    cout << "bottom: " << bottom.stddev << endl;
+    if (!is_grey(bottom, 0, 200, 10)){
         return false;
     }
     ImageStats left = image_stats(extract_box_reference(screen, m_left));
+//    cout << "left:   " << left.stddev << endl;
     if (!is_grey(left, 0, 200, 5)){
         return false;
     }
     ImageStats right = image_stats(extract_box_reference(screen, m_right));
+//    cout << "right:  " << right.stddev << endl;
     if (!is_grey(right, 0, 200, 5)){
         return false;
     }

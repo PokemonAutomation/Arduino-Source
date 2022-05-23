@@ -18,7 +18,7 @@ ShinyEncounterTester_Descriptor::ShinyEncounterTester_Descriptor()
         STRING_POKEMON + " BDSP", "Shiny Encounter Tester",
         "",
         "Test the shiny encounter detector. Start this program just before an encounter.",
-        FeedbackType::REQUIRED, false,
+        FeedbackType::REQUIRED, true,
         PABotBaseLevel::PABOTBASE_12KB
     )
 {}
