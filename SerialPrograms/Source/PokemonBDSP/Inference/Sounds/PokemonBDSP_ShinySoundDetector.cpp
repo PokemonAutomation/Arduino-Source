@@ -8,8 +8,8 @@
 #include "CommonFramework/Inference/SpectrogramMatcher.h"
 #include "CommonFramework/Inference/AudioTemplateCache.h"
 #include "CommonFramework/Tools/ConsoleHandle.h"
-#include "PokemonLA/PokemonLA_Settings.h"
-#include "PokemonLA_ShinySoundDetector.h"
+#include "PokemonBDSP/PokemonBDSP_Settings.h"
+#include "PokemonBDSP_ShinySoundDetector.h"
 
 #include <sstream>
 #include <cfloat>
@@ -19,7 +19,7 @@ using std::endl;
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
-namespace PokemonLA{
+namespace PokemonBDSP{
 
 
 ShinySoundDetector::ShinySoundDetector(Logger& logger, ConsoleHandle& console, OnShinyCallback on_shiny_callback)
@@ -34,7 +34,7 @@ float ShinySoundDetector::get_score_threshold() const{
 
 std::unique_ptr<SpectrogramMatcher> ShinySoundDetector::build_spectrogram_matcher(size_t sampleRate){
     return std::make_unique<SpectrogramMatcher>(
-        AudioTemplateCache::instance().get_throw("PokemonLA/ShinySound", sampleRate),
+        AudioTemplateCache::instance().get_throw("PokemonBDSP/ShinySound", sampleRate),
         SpectrogramMatcher::Mode::SPIKE_CONV, sampleRate,
         GameSettings::instance().SHINY_SOUND_LOW_FREQUENCY
     );

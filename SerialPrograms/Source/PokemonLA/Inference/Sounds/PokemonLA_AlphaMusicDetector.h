@@ -11,7 +11,6 @@
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Inference/AudioPerSpectrumDetectorBase.h"
-#include "PokemonLA/Options/PokemonLA_ShinyDetectedAction.h"
 
 #include <memory>
 

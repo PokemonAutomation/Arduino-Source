@@ -38,6 +38,7 @@
 #include "Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.h"
 
 #include "Programs/TestPrograms/PokemonBDSP_ShinyEncounterTester.h"
+#include "Programs/TestPrograms/PokemonBDSP_SoundListener.h"
 
 namespace PokemonAutomation{
 namespace NintendoSwitch{
@@ -91,6 +92,7 @@ Panels::Panels(QTabWidget& parent, PanelHolder& holder)
     if (PreloadSettings::instance().DEVELOPER_MODE){
         add_divider("---- Developer Tools ----");
         add_program<ShinyEncounterTester_Descriptor, ShinyEncounterTester>();
+        add_program<SoundListener_Descriptor, SoundListener>();
     }
 
 

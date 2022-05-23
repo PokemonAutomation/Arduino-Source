@@ -7,8 +7,9 @@
 #ifndef PokemonAutomation_PokemonBDSP_Settings_H
 #define PokemonAutomation_PokemonBDSP_Settings_H
 
-#include "CommonFramework/Options/StaticTextOption.h"
 #include "CommonFramework/Options/BooleanCheckBoxOption.h"
+#include "CommonFramework/Options/FloatingPointOption.h"
+#include "CommonFramework/Options/StaticTextOption.h"
 #include "CommonFramework/Panels/SettingsPanel.h"
 #include "NintendoSwitch/Options/TimeExpressionOption.h"
 
@@ -41,6 +42,10 @@ public:
     TimeExpressionOption<uint16_t> POKEMON_TO_BOX_DELAY0;
     TimeExpressionOption<uint16_t> BOX_TO_POKEMON_DELAY;
     TimeExpressionOption<uint16_t> POKEMON_TO_MENU_DELAY;
+
+    SectionDividerOption m_advanced_options;
+    FloatingPointOption SHINY_SOUND_THRESHOLD;
+    FloatingPointOption SHINY_SOUND_LOW_FREQUENCY;
 
 //    SectionDividerOption m_experimental;
 //    BooleanCheckBoxOption USE_NEW_SHINY_DETECTOR;

@@ -1,12 +1,13 @@
-/*  Alpha Roar Detector
+/*  Shiny Sound Detector
  *
  *  From: https://github.com/PokemonAutomation/Arduino-Source
  *
  */
 
-#ifndef PokemonAutomation_PokemonLA_AlphaRoarDetector_H
-#define PokemonAutomation_PokemonLA_AlphaRoarDetector_H
+#ifndef PokemonAutomation_PokemonBDSP_ShinySoundDetector_H
+#define PokemonAutomation_PokemonBDSP_ShinySoundDetector_H
 
+#include <functional>
 #include <QImage>
 #include "Common/Cpp/SpinLock.h"
 #include "CommonFramework/Logging/LoggerQt.h"
@@ -20,12 +21,13 @@ class ConsoleHandle;
 class SpectrogramMatcher;
 
 namespace NintendoSwitch{
-namespace PokemonLA{
+namespace PokemonBDSP{
 
 
-class AlphaRoarDetector : public AudioPerSpectrumDetectorBase{
+class ShinySoundDetector : public AudioPerSpectrumDetectorBase{
 public:
-    AlphaRoarDetector(Logger& logger, ConsoleHandle& console, OnShinyCallback on_shiny_callback);
+    //  Warning: The callback will be called from the audio inference thread.
+    ShinySoundDetector(Logger& logger, ConsoleHandle& console, OnShinyCallback on_shiny_callback);
 
     // Implement AudioPerSpectrumDetectorBase::get_score_threshold()
     virtual float get_score_threshold() const override;
@@ -34,6 +36,7 @@ protected:
     // Implement AudioPerSpectrumDetectorBase::build_spectrogram_matcher()
     virtual std::unique_ptr<SpectrogramMatcher> build_spectrogram_matcher(size_t sampleRate) override;
 };
+
 
 
 

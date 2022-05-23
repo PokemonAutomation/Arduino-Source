@@ -39,7 +39,6 @@ add_compile_definitions(QT_DISABLE_DEPRECATED_BEFORE=0x050F00)
 link_directories(${CMAKE_CURRENT_LIST_DIR})
 
 file(GLOB MAIN_SOURCES
-    
     ../ClientSource/Connection/BotBase.h
     ../ClientSource/Connection/BotBaseMessage.h
     ../ClientSource/Connection/MessageLogger.cpp
@@ -765,6 +764,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinySparkleSet.cpp
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinySparkleSet.h
+    Source/PokemonBDSP/Inference/Sounds/PokemonBDSP_ShinySoundDetector.cpp
+    Source/PokemonBDSP/Inference/Sounds/PokemonBDSP_ShinySoundDetector.h
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterEnums.cpp
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterEnums.h
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOption.cpp
@@ -854,6 +855,8 @@ file(GLOB MAIN_SOURCES
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_StarterReset.h
     Source/PokemonBDSP/Programs/TestPrograms/PokemonBDSP_ShinyEncounterTester.cpp
     Source/PokemonBDSP/Programs/TestPrograms/PokemonBDSP_ShinyEncounterTester.h
+    Source/PokemonBDSP/Programs/TestPrograms/PokemonBDSP_SoundListener.cpp
+    Source/PokemonBDSP/Programs/TestPrograms/PokemonBDSP_SoundListener.h
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfBoxTrade.cpp
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfBoxTrade.h
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfTouchTrade.cpp

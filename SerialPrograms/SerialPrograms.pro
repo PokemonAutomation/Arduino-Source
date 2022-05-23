@@ -384,6 +384,7 @@ SOURCES += \
     Source/PokemonBDSP/Inference/PokemonBDSP_VSSeekerReaction.cpp \
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.cpp \
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinySparkleSet.cpp \
+    Source/PokemonBDSP/Inference/Sounds/PokemonBDSP_ShinySoundDetector.cpp \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterEnums.cpp \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOption.cpp \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOverride.cpp \
@@ -427,6 +428,7 @@ SOURCES += \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Shaymin.cpp \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_StarterReset.cpp \
     Source/PokemonBDSP/Programs/TestPrograms/PokemonBDSP_ShinyEncounterTester.cpp \
+    Source/PokemonBDSP/Programs/TestPrograms/PokemonBDSP_SoundListener.cpp \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfBoxTrade.cpp \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfTouchTrade.cpp \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.cpp \
@@ -1082,6 +1084,7 @@ HEADERS += \
     Source/PokemonBDSP/Inference/PokemonBDSP_VSSeekerReaction.h \
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinyEncounterDetector.h \
     Source/PokemonBDSP/Inference/ShinyDetection/PokemonBDSP_ShinySparkleSet.h \
+    Source/PokemonBDSP/Inference/Sounds/PokemonBDSP_ShinySoundDetector.h \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterEnums.h \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOption.h \
     Source/PokemonBDSP/Options/EncounterFilter/PokemonBDSP_EncounterFilterOverride.h \
@@ -1126,6 +1129,7 @@ HEADERS += \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_ShinyHunt-Shaymin.h \
     Source/PokemonBDSP/Programs/ShinyHunting/PokemonBDSP_StarterReset.h \
     Source/PokemonBDSP/Programs/TestPrograms/PokemonBDSP_ShinyEncounterTester.h \
+    Source/PokemonBDSP/Programs/TestPrograms/PokemonBDSP_SoundListener.h \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfBoxTrade.h \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_SelfTouchTrade.h \
     Source/PokemonBDSP/Programs/Trading/PokemonBDSP_TradeRoutines.h \
