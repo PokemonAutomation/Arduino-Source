@@ -1,4 +1,3 @@
-
 QT += core gui
 QT += serialport
 QT += multimedia
@@ -261,11 +260,6 @@ SOURCES += \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x4_Default.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x64_x64_AVX512.cpp \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_Core_64x8_x64_SSE42.cpp \
-    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.cpp \
-    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Core_Default.cpp \
-    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Core_x86_SSE.cpp \
-    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Core_x86_AVX2.cpp \
-    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Core_x86_AVX512.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x16_x64_AVX2.cpp \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix_Core_64x32_x64_AVX512.cpp \
@@ -292,6 +286,11 @@ SOURCES += \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX2.cpp \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_AVX512.cpp \
     Source/Kernels/ImageStats/Kernels_ImagePixelSumSqr_x64_SSE41.cpp \
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.cpp \
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Core_Default.cpp \
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Core_x86_AVX2.cpp \
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Core_x86_AVX512.cpp \
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Core_x86_SSE.cpp \
     Source/Kernels/SpikeConvolution/Kernels_SpikeConvolution.cpp \
     Source/Kernels/SpikeConvolution/Kernels_SpikeConvolution_Core_Default.cpp \
     Source/Kernels/SpikeConvolution/Kernels_SpikeConvolution_Core_x86_AVX2.cpp \
@@ -407,8 +406,8 @@ SOURCES += \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.cpp \
     Source/PokemonBDSP/Programs/General/PokemonBDSP_AutonomousBallThrower.cpp \
     Source/PokemonBDSP/Programs/General/PokemonBDSP_MassRelease.cpp \
-    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.3.cpp \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.2.cpp \
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.3.cpp \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy.cpp \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy2.cpp \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.cpp \
@@ -472,10 +471,12 @@ SOURCES += \
     Source/PokemonLA/PokemonLA_Panels.cpp \
     Source/PokemonLA/PokemonLA_Settings.cpp \
     Source/PokemonLA/PokemonLA_TravelLocations.cpp \
+    Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.cpp \
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoMoveGrinder.cpp \
-    Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.cpp \
-    Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.cpp \
     Source/PokemonLA/Programs/Farming/PokemonLA_LeapGrinder.cpp \
+    Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.cpp \
+    Source/PokemonLA/Programs/Farming/PokemonLA_NuggetFarmerHighlands.cpp \
+    Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.cpp \
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.cpp \
     Source/PokemonLA/Programs/General/PokemonLA_PokedexTasksReader.cpp \
     Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.cpp \
@@ -489,21 +490,19 @@ SOURCES += \
     Source/PokemonLA/Programs/PokemonLA_MountChange.cpp \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.cpp \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.cpp \
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_BurmyFinder.cpp \
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.cpp \
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_FroslassFinder.cpp \
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_GalladeFinder.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.cpp \
-    Source/PokemonLA/Programs/Farming/PokemonLA_NuggetFarmerHighlands.cpp \
-    Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.cpp \
-    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.cpp \
-    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_GalladeFinder.cpp \
-    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_FroslassFinder.cpp \
-    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_BurmyFinder.cpp \
-    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_UnownFinder.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.cpp \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.cpp \
-    Source/PokemonLA/Programs/TestPrograms/PokemonLA_OverworldWatcher.cpp \
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_UnownFinder.cpp \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_FlagNavigationTest.cpp \
-    Source/PokemonLA/Programs/TestPrograms/PokemonLA_SoundListener.cpp \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_MountDetectionTest.cpp \
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_OverworldWatcher.cpp \
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_SoundListener.cpp \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.cpp \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfTouchTrade.cpp \
     Source/PokemonLA/Programs/Trading/PokemonLA_TradeRoutines.cpp \
@@ -545,20 +544,49 @@ SOURCES += \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI.cpp \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_PathMatchup.cpp \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_RentalBossMatchup.cpp \
+    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SelectItem.cpp \
+    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SelectMove.cpp \
+    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SelectPath.cpp \
+    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SelectStarter.cpp \
+    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SwapCatch.cpp \
+    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SwapProfessor.cpp \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_Tools.cpp \
     Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_CatchScreenTracker.cpp \
+    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Notifications.cpp \
+    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.cpp \
+    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.cpp \
+    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateTracker.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_EndBattle.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Entrance.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_HPPP.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_ItemSelectMenu.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Lobby.cpp \
     Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathMap.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.cpp \
     Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSide.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.cpp \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.cpp \
     Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_ProfessorSwap.cpp \
     Source/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.cpp \
     Source/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_BossAction.cpp \
     Source/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Consoles.cpp \
     Source/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Hosting.cpp \
     Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_BossFinder.cpp \
+    Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_Standard.cpp \
     Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_StrongBoss.cpp \
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Adventure.cpp \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Battle.cpp \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_CaughtScreen.cpp \
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_EnterLobby.cpp \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Entrance.cpp \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_ItemSelect.cpp \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_PathSelect.cpp \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_PokemonSelect.cpp \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_PokemonSwap.cpp \
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_ProfessorSwap.cpp \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Start.cpp \
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_StartSolo.cpp \
     Source/PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterEnums.cpp \
     Source/PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterOption.cpp \
@@ -580,8 +608,26 @@ SOURCES += \
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Types.cpp \
     Source/PokemonSwSh/PokemonSwSh_Panels.cpp \
     Source/PokemonSwSh/PokemonSwSh_Settings.cpp \
+    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-BerryFarmer.cpp \
+    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-DailyHighlightFarmer.cpp \
+    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-LotoFarmer.cpp \
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-PokeJobsFarmer.cpp \
+    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-StowOnSideFarmer.cpp \
+    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-WattFarmer.cpp \
+    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_BeamReset.cpp \
+    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperEU.cpp \
+    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperJPN-7.8k.cpp \
+    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperJPN.cpp \
+    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperUS.cpp \
+    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_EventBeamFinder.cpp \
+    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_PurpleBeamFinder.cpp \
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggCombined2.cpp \
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggFetcher2.cpp \
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggFetcherMultiple.cpp \
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggHatcher.cpp \
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggSuperCombined2.cpp \
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_GodEggDuplication.cpp \
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_GodEggItemDupe.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_AutonomousBallThrower.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_BallThrower.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_BoxReorderNationalDex.cpp \
@@ -590,37 +636,11 @@ SOURCES += \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_MassRelease.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_SurpriseTrade.cpp \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_TradeBot.cpp \
+    Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_AutoHost-MultiGame.cpp \
+    Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_AutoHost-Rolling.cpp \
     Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_AutoHost.cpp \
     Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_AutoHostStats.cpp \
-    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SelectItem.cpp \
-    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SelectMove.cpp \
-    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SelectPath.cpp \
-    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SelectStarter.cpp \
-    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SwapCatch.cpp \
-    Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_SwapProfessor.cpp \
-    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Notifications.cpp \
-    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.cpp \
-    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.cpp \
-    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateTracker.cpp \
-    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.cpp \
-    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_EndBattle.cpp \
-    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Entrance.cpp \
-    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_HPPP.cpp \
-    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_ItemSelectMenu.cpp \
-    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Lobby.cpp \
-    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.cpp \
-    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.cpp \
-    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.cpp \
-    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.cpp \
-    Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_Standard.cpp \
-    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Battle.cpp \
-    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_CaughtScreen.cpp \
-    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Entrance.cpp \
-    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_ItemSelect.cpp \
-    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_PathSelect.cpp \
-    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_PokemonSelect.cpp \
-    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_PokemonSwap.cpp \
-    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Start.cpp \
+    Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_DenRoller.cpp \
     Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_DenTools.cpp \
     Source/PokemonSwSh/Programs/NonShinyHunting/PokemonSwSh_StatsReset-Calyrex.cpp \
     Source/PokemonSwSh/Programs/NonShinyHunting/PokemonSwSh_StatsReset-Moltres.cpp \
@@ -635,7 +655,11 @@ SOURCES += \
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterDetection.cpp \
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterHandler.cpp \
     Source/PokemonSwSh/Programs/PokemonSwSh_Internet.cpp \
+    Source/PokemonSwSh/Programs/PokemonSwSh_RaidItemFarmerOKHO.cpp \
     Source/PokemonSwSh/Programs/PokemonSwSh_StartGame.cpp \
+    Source/PokemonSwSh/Programs/PokemonSwSh_SynchronizedSpinning.cpp \
+    Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FastCodeEntry.cpp \
+    Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.cpp \
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-BerryTree.cpp \
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Fishing.cpp \
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-IoATrade.cpp \
@@ -653,31 +677,6 @@ SOURCES += \
     Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-Regigigas2.cpp \
     Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-StrongSpawn.cpp \
     Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.cpp \
-    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-BerryFarmer.cpp \
-    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-DailyHighlightFarmer.cpp \
-    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-LotoFarmer.cpp \
-    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-StowOnSideFarmer.cpp \
-    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-WattFarmer.cpp \
-    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_BeamReset.cpp \
-    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperEU.cpp \
-    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperJPN-7.8k.cpp \
-    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperJPN.cpp \
-    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperUS.cpp \
-    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_EventBeamFinder.cpp \
-    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_PurpleBeamFinder.cpp \
-    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggCombined2.cpp \
-    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggFetcher2.cpp \
-    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggHatcher.cpp \
-    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggSuperCombined2.cpp \
-    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_GodEggDuplication.cpp \
-    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_GodEggItemDupe.cpp \
-    Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_AutoHost-MultiGame.cpp \
-    Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_AutoHost-Rolling.cpp \
-    Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_DenRoller.cpp \
-    Source/PokemonSwSh/Programs/PokemonSwSh_RaidItemFarmerOKHO.cpp \
-    Source/PokemonSwSh/Programs/PokemonSwSh_SynchronizedSpinning.cpp \
-    Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FastCodeEntry.cpp \
-    Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.cpp \
     Source/PokemonSwSh/Programs/TestPrograms/PokemonSwSh_ShinyEncounterTester.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.cpp \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.cpp \
@@ -727,8 +726,8 @@ HEADERS += \
     ../Common/Cpp/Unicode.h \
     ../Common/Microcontroller/DeviceRoutines.h \
     ../Common/Microcontroller/MessageProtocol.h \
+    ../Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_DigitEntry.h \
-    ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_PushButtons.h \
     ../Common/NintendoSwitch/NintendoSwitch_Protocol_Routines.h \
     ../Common/NintendoSwitch/NintendoSwitch_Tools.h \
@@ -763,7 +762,6 @@ HEADERS += \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseOption.h \
     ../Common/Qt/Options/TimeExpression/TimeExpressionBaseWidget.h \
     ../Common/Qt/QtJsonTools.h \
-    ../Common/NintendoSwitch/NintendoSwitch_ControllerDefs.h \
     Source/CommonFramework/AudioPipeline/AudioConstants.h \
     Source/CommonFramework/AudioPipeline/AudioDisplayWidget.h \
     Source/CommonFramework/AudioPipeline/AudioFeed.h \
@@ -889,6 +887,7 @@ HEADERS += \
     Source/CommonFramework/Panels/SettingsPanelWidget.h \
     Source/CommonFramework/PersistentSettings.h \
     Source/CommonFramework/Tools/BlackBorderCheck.h \
+    Source/CommonFramework/Tools/BotBaseHandle.h \
     Source/CommonFramework/Tools/ConsoleHandle.h \
     Source/CommonFramework/Tools/ErrorDumper.h \
     Source/CommonFramework/Tools/InterruptableCommands.h \
@@ -897,7 +896,6 @@ HEADERS += \
     Source/CommonFramework/Tools/StatsDatabase.h \
     Source/CommonFramework/Tools/StatsTracking.h \
     Source/CommonFramework/Tools/SuperControlSession.h \
-    Source/CommonFramework/Tools/BotBaseHandle.h \
     Source/CommonFramework/VideoPipeline/CameraImplementations.h \
     Source/CommonFramework/VideoPipeline/CameraInfo.h \
     Source/CommonFramework/VideoPipeline/CameraSelector.h \
@@ -947,8 +945,6 @@ HEADERS += \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX2.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_AVX512.h \
     Source/Kernels/BinaryImageFilters/Kernels_BinaryImage_BasicFilters_x64_SSE42.h \
-    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h \
-    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Routines.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrix.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x16_x64_AVX2.h \
     Source/Kernels/BinaryMatrix/Kernels_BinaryMatrixTile_64x32_x64_AVX512.h \
@@ -979,6 +975,8 @@ HEADERS += \
     Source/Kernels/Kernels_x64_SSE41.h \
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_AVX2.h \
     Source/Kernels/PartialWordAccess/Kernels_PartialWordAccess_x64_SSE41.h \
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch.h \
+    Source/Kernels/ScaleInvariantMatrixMatch/Kernels_ScaleInvariantMatrixMatch_Routines.h \
     Source/Kernels/SpikeConvolution/Kernels_SpikeConvolution.h \
     Source/Kernels/SpikeConvolution/Kernels_SpikeConvolution_Routines.h \
     Source/Kernels/Waterfill/Kernels_Waterfill.h \
@@ -989,12 +987,12 @@ HEADERS += \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512-GF.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x64_x64_AVX512.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Core_64x8_x64_SSE42.h \
+    Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512-GF.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Routines.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.h \
     Source/Kernels/Waterfill/Kernels_Waterfill_Session.tpp \
     Source/Kernels/Waterfill/Kernels_Waterfill_Types.h \
-    Source/Kernels/Waterfill/Kernels_Waterfill_Intrinsics_x64_AVX512-GF.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_Device.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_DigitEntry.h \
     Source/NintendoSwitch/Commands/NintendoSwitch_Commands_PushButtons.h \
@@ -1107,8 +1105,8 @@ HEADERS += \
     Source/PokemonBDSP/Programs/Farming/PokemonBDSP_MoneyFarmerRoute212.h \
     Source/PokemonBDSP/Programs/General/PokemonBDSP_AutonomousBallThrower.h \
     Source/PokemonBDSP/Programs/General/PokemonBDSP_MassRelease.h \
-    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.3.h \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.2.h \
+    Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_ActivateMenuGlitch-1.1.3.h \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy.h \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsBoxCopy2.h \
     Source/PokemonBDSP/Programs/Glitches/PokemonBDSP_CloneItemsMenuOverlap.h \
@@ -1172,10 +1170,12 @@ HEADERS += \
     Source/PokemonLA/PokemonLA_Panels.h \
     Source/PokemonLA/PokemonLA_Settings.h \
     Source/PokemonLA/PokemonLA_TravelLocations.h \
+    Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.h \
     Source/PokemonLA/Programs/Farming/PokemonLA_IngoMoveGrinder.h \
-    Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.h \
-    Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.h \
     Source/PokemonLA/Programs/Farming/PokemonLA_LeapGrinder.h \
+    Source/PokemonLA/Programs/Farming/PokemonLA_MagikarpMoveGrinder.h \
+    Source/PokemonLA/Programs/Farming/PokemonLA_NuggetFarmerHighlands.h \
+    Source/PokemonLA/Programs/Farming/PokemonLA_TenacityCandyFarmer.h \
     Source/PokemonLA/Programs/General/PokemonLA_ClothingBuyer.h \
     Source/PokemonLA/Programs/General/PokemonLA_PokedexTasksReader.h \
     Source/PokemonLA/Programs/General/PokemonLA_SkipToFullMoon.h \
@@ -1189,21 +1189,19 @@ HEADERS += \
     Source/PokemonLA/Programs/PokemonLA_MountChange.h \
     Source/PokemonLA/Programs/PokemonLA_OutbreakFinder.h \
     Source/PokemonLA/Programs/PokemonLA_RegionNavigation.h \
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_BurmyFinder.h \
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.h \
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_FroslassFinder.h \
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_GalladeFinder.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_PostMMOSpawnReset.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-CustomPath.h \
-    Source/PokemonLA/Programs/Farming/PokemonLA_NuggetFarmerHighlands.h \
-    Source/PokemonLA/Programs/Farming/PokemonLA_IngoBattleGrinder.h \
-    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_CrobatFinder.h \
-    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_GalladeFinder.h \
-    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_FroslassFinder.h \
-    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_BurmyFinder.h \
-    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_UnownFinder.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-FlagPin.h \
     Source/PokemonLA/Programs/ShinyHunting/PokemonLA_ShinyHunt-LakeTrio.h \
+    Source/PokemonLA/Programs/ShinyHunting/PokemonLA_UnownFinder.h \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_FlagNavigationTest.h \
+    Source/PokemonLA/Programs/TestPrograms/PokemonLA_MountDetectionTest.h \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_OverworldWatcher.h \
     Source/PokemonLA/Programs/TestPrograms/PokemonLA_SoundListener.h \
-    Source/PokemonLA/Programs/TestPrograms/PokemonLA_MountDetectionTest.h \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfBoxTrade.h \
     Source/PokemonLA/Programs/Trading/PokemonLA_SelfTouchTrade.h \
     Source/PokemonLA/Programs/Trading/PokemonLA_TradeRoutines.h \
@@ -1253,18 +1251,42 @@ HEADERS += \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_RentalBossMatchup.h \
     Source/PokemonSwSh/MaxLair/AI/PokemonSwSh_MaxLair_AI_Tools.h \
     Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_CatchScreenTracker.h \
+    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Notifications.h \
+    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h \
+    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.h \
+    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateTracker.h \
+    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Stats.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_EndBattle.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Entrance.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_HPPP.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_ItemSelectMenu.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Lobby.h \
     Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathMap.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h \
     Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSide.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.h \
+    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h \
     Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_ProfessorSwap.h \
     Source/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options.h \
     Source/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_BossAction.h \
     Source/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Consoles.h \
     Source/PokemonSwSh/MaxLair/Options/PokemonSwSh_MaxLair_Options_Hosting.h \
     Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_BossFinder.h \
+    Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_Standard.h \
     Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_StrongBoss.h \
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Adventure.h \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Battle.h \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_CaughtScreen.h \
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_EnterLobby.h \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Entrance.h \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_ItemSelect.h \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_PathSelect.h \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_PokemonSelect.h \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_PokemonSwap.h \
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_ProfessorSwap.h \
+    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Start.h \
     Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_StartSolo.h \
     Source/PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterEnums.h \
     Source/PokemonSwSh/Options/EncounterFilter/PokemonSwSh_EncounterFilterOption.h \
@@ -1287,9 +1309,29 @@ HEADERS += \
     Source/PokemonSwSh/PkmnLib/PokemonSwSh_PkmnLib_Types.h \
     Source/PokemonSwSh/PokemonSwSh_Panels.h \
     Source/PokemonSwSh/PokemonSwSh_Settings.h \
+    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-BerryFarmer.h \
+    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-DailyHighlightFarmer.h \
+    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-LotoFarmer.h \
     Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-PokeJobsFarmer.h \
+    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-StowOnSideFarmer.h \
+    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-WattFarmer.h \
+    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_BeamReset.h \
+    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperEU.h \
+    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperJPN-7.8k.h \
+    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperJPN.h \
     Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperStats.h \
+    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperUS.h \
+    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_EventBeamFinder.h \
+    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_PurpleBeamFinder.h \
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggCombined2.h \
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggCombinedShared.h \
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggFetcher2.h \
     Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggFetcherMultiple.h \
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggHatcher.h \
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggHelpers.h \
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggSuperCombined2.h \
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_GodEggDuplication.h \
+    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_GodEggItemDupe.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_AutonomousBallThrower.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_BallThrower.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_BoxReorderNationalDex.h \
@@ -1298,32 +1340,13 @@ HEADERS += \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_MassRelease.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_SurpriseTrade.h \
     Source/PokemonSwSh/Programs/General/PokemonSwSh_TradeBot.h \
+    Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_AutoHost-MultiGame.h \
+    Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_AutoHost-Rolling.h \
     Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_AutoHost.h \
     Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_AutoHostStats.h \
-    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Notifications.h \
-    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_State.h \
-    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateMachine.h \
-    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_StateTracker.h \
-    Source/PokemonSwSh/MaxLair/Framework/PokemonSwSh_MaxLair_Stats.h \
-    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_BattleMenu.h \
-    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_EndBattle.h \
-    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Entrance.h \
-    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_HPPP.h \
-    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_ItemSelectMenu.h \
-    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_Lobby.h \
-    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PathSelect.h \
-    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonReader.h \
-    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSelectMenu.h \
-    Source/PokemonSwSh/MaxLair/Inference/PokemonSwSh_MaxLair_Detect_PokemonSwapMenu.h \
-    Source/PokemonSwSh/MaxLair/PokemonSwSh_MaxLair_Standard.h \
-    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Battle.h \
-    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_CaughtScreen.h \
-    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Entrance.h \
-    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_ItemSelect.h \
-    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_PathSelect.h \
-    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_PokemonSelect.h \
-    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_PokemonSwap.h \
-    Source/PokemonSwSh/MaxLair/Program/PokemonSwSh_MaxLair_Run_Start.h \
+    Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_DenRoller.h \
+    Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_DenTools.h \
+    Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_LobbyWait.h \
     Source/PokemonSwSh/Programs/NonShinyHunting/PokemonSwSh_StatsReset-Calyrex.h \
     Source/PokemonSwSh/Programs/NonShinyHunting/PokemonSwSh_StatsReset-Moltres.h \
     Source/PokemonSwSh/Programs/NonShinyHunting/PokemonSwSh_StatsReset-Regi.h \
@@ -1337,7 +1360,12 @@ HEADERS += \
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterDetection.h \
     Source/PokemonSwSh/Programs/PokemonSwSh_EncounterHandler.h \
     Source/PokemonSwSh/Programs/PokemonSwSh_Internet.h \
+    Source/PokemonSwSh/Programs/PokemonSwSh_RaidItemFarmerOKHO.h \
     Source/PokemonSwSh/Programs/PokemonSwSh_StartGame.h \
+    Source/PokemonSwSh/Programs/PokemonSwSh_SynchronizedSpinning.h \
+    Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FastCodeEntry.h \
+    Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.h \
+    Source/PokemonSwSh/Programs/ReleaseHelpers.h \
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-BerryTree.h \
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-Fishing.h \
     Source/PokemonSwSh/Programs/ShinyHuntAutonomous/PokemonSwSh_ShinyHuntAutonomous-IoATrade.h \
@@ -1355,36 +1383,6 @@ HEADERS += \
     Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-Regigigas2.h \
     Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-StrongSpawn.h \
     Source/PokemonSwSh/Programs/ShinyHuntUnattended/PokemonSwSh_ShinyHuntUnattended-SwordsOfJustice.h \
-    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-BerryFarmer.h \
-    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-DailyHighlightFarmer.h \
-    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-LotoFarmer.h \
-    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-StowOnSideFarmer.h \
-    Source/PokemonSwSh/Programs/DateSpamFarmers/PokemonSwSh_DateSpam-WattFarmer.h \
-    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_BeamReset.h \
-    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperEU.h \
-    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperJPN-7.8k.h \
-    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperJPN.h \
-    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_DaySkipperUS.h \
-    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_EventBeamFinder.h \
-    Source/PokemonSwSh/Programs/DenHunting/PokemonSwSh_PurpleBeamFinder.h \
-    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggCombined2.h \
-    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggCombinedShared.h \
-    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggFetcher2.h \
-    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggHatcher.h \
-    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggHelpers.h \
-    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_EggSuperCombined2.h \
-    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_GodEggDuplication.h \
-    Source/PokemonSwSh/Programs/EggPrograms/PokemonSwSh_GodEggItemDupe.h \
-    Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_AutoHost-MultiGame.h \
-    Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_AutoHost-Rolling.h \
-    Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_DenRoller.h \
-    Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_DenTools.h \
-    Source/PokemonSwSh/Programs/Hosting/PokemonSwSh_LobbyWait.h \
-    Source/PokemonSwSh/Programs/PokemonSwSh_RaidItemFarmerOKHO.h \
-    Source/PokemonSwSh/Programs/PokemonSwSh_SynchronizedSpinning.h \
-    Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FastCodeEntry.h \
-    Source/PokemonSwSh/Programs/QoLMacros/PokemonSwSh_FriendSearchDisconnect.h \
-    Source/PokemonSwSh/Programs/ReleaseHelpers.h \
     Source/PokemonSwSh/Programs/TestPrograms/PokemonSwSh_ShinyEncounterTester.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_MaxLairDatabase.h \
     Source/PokemonSwSh/Resources/PokemonSwSh_PokeballSprites.h \
