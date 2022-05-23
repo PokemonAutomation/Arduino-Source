@@ -77,6 +77,17 @@ GameSettings::GameSettings()
         "<b>" + STRING_POKEMON + " to Menu Delay:</b><br>Delay to return to menu.",
         "250"
     )
+    , m_advanced_options(
+        "<font size=4><b>Advanced Options:</b> You should not need to touch anything below here.</font>"
+    )
+    , SHINY_SOUND_THRESHOLD(
+        "<b>Shiny Sound Threshold:</b><br>Maximum error coefficient to trigger a shiny detection.",
+        0.87, 0, 1.0
+    )
+    , SHINY_SOUND_LOW_FREQUENCY(
+        "<b>Shiny Sound Low Frequency (Hz):</b><br>High pass filter frequency for shiny sound.",
+        5000, 0, 48000
+    )
 //    , m_experimental("<font size=4><b>Experimental/Beta Features:</b></font>")
 //    , USE_NEW_SHINY_DETECTOR(
 //        "<b>Use New Shiny Detector:</b><br>Use the new version of the shiny detection algorithm.",
@@ -102,6 +113,10 @@ GameSettings::GameSettings()
     PA_ADD_OPTION(POKEMON_TO_BOX_DELAY0);
     PA_ADD_OPTION(BOX_TO_POKEMON_DELAY);
     PA_ADD_OPTION(POKEMON_TO_MENU_DELAY);
+
+    PA_ADD_STATIC(m_advanced_options);
+    PA_ADD_OPTION(SHINY_SOUND_THRESHOLD);
+    PA_ADD_OPTION(SHINY_SOUND_LOW_FREQUENCY);
 
 //    PA_ADD_STATIC(m_experimental);
 //    PA_ADD_OPTION(USE_NEW_SHINY_DETECTOR);

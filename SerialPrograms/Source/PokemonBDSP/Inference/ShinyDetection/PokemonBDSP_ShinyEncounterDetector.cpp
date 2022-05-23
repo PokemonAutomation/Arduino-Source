@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 //#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "PokemonBDSP_ShinyEncounterDetector.h"
@@ -57,6 +58,13 @@ bool ShinyEncounterTracker::process_frame(const QImage& frame, WallClock timesta
 
     if (frame.isNull()){
         return false;
+    }
+    if (frame.height() < 1080){
+        throw UserSetupError(m_logger, "Video resolution must be at least 1080p.");
+    }
+    double aspect_ratio = (double)frame.width() / frame.height();
+    if (aspect_ratio < 1.77 || aspect_ratio > 1.78){
+        throw UserSetupError(m_logger, "Video aspect ratio must be 16:9.");
     }
 
     bool battle_menu = m_battle_menu.process_frame(frame, timestamp);
@@ -193,7 +201,9 @@ void detect_shiny_battle(
         tracker.sparkles_wild_overall(),
         tracker.sparkles_wild_left(),
         tracker.sparkles_wild_right(),
-        tracker.sparkles_own()
+        tracker.sparkles_own(),
+        overall_threshold,
+        doubles_threshold
     );
     wild_result.best_screenshot = tracker.sparkles_wild_overall().best_image();
     your_result.best_screenshot = tracker.sparkles_own().best_image();

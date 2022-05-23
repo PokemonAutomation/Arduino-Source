@@ -12,8 +12,8 @@
 #include "CommonFramework/Windows/DpiScaler.h"
 #include "NintendoSwitch/NintendoSwitch_Panels.h"
 #include "PokemonSwSh/PokemonSwSh_Panels.h"
-#include "PokemonBDSP/Panels_PokemonBDSP.h"
-#include "PokemonLA/Panels_PokemonLA.h"
+#include "PokemonBDSP/PokemonBDSP_Panels.h"
+#include "PokemonLA/PokemonLA_Panels.h"
 #include "PanelLists.h"
 
 #include <iostream>

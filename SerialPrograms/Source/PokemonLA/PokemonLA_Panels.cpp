@@ -5,7 +5,7 @@
  */
 
 #include "CommonFramework/GlobalSettingsPanel.h"
-#include "Panels_PokemonLA.h"
+#include "PokemonLA_Panels.h"
 
 #include "PokemonLA_Settings.h"
 

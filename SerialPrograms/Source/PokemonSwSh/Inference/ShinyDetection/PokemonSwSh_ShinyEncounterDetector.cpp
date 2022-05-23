@@ -4,6 +4,7 @@
  *
  */
 
+#include "Common/Cpp/Exceptions.h"
 //#include "CommonFramework/Tools/ErrorDumper.h"
 #include "CommonFramework/InferenceInfra/InferenceRoutines.h"
 #include "PokemonSwSh/PokemonSwSh_Settings.h"
@@ -41,6 +42,17 @@ void ShinyEncounterTracker::make_overlays(VideoOverlaySet& items) const{
     m_sparkle_tracker.make_overlays(items);
 }
 bool ShinyEncounterTracker::process_frame(const QImage& frame, WallClock timestamp){
+    if (frame.isNull()){
+        return false;
+    }
+    if (frame.height() < 720){
+        throw UserSetupError(m_logger, "Video resolution must be at least 720p.");
+    }
+    double aspect_ratio = (double)frame.width() / frame.height();
+    if (aspect_ratio < 1.77 || aspect_ratio > 1.78){
+        throw UserSetupError(m_logger, "Video aspect ratio must be 16:9.");
+    }
+
     bool battle_menu = m_battle_menu.process_frame(frame, timestamp);
     if (battle_menu){
         m_dialog_tracker.push_end(timestamp);
@@ -128,7 +140,8 @@ ShinyDetectionResult detect_shiny_battle(
         console,
         battle_settings,
         tracker.dialog_tracker(),
-        tracker.sparkles_wild()
+        tracker.sparkles_wild(),
+        detection_threshold
     );
     return ShinyDetectionResult{shiny_type, tracker.sparkles_wild().best_image()};
 }
