@@ -8,6 +8,7 @@
 #define PokemonAutomation_PokemonSwSh_EncounterDialogTracker_H
 
 #include <chrono>
+#include <atomic>
 #include "CommonFramework/Logging/LoggerQt.h"
 #include "CommonFramework/Inference/VisualDetector.h"
 #include "CommonFramework/InferenceInfra/VisualInferenceCallback.h"
@@ -31,8 +32,11 @@ public:
         StaticScreenDetector& dialog_detector
     );
 
-    bool dialog_on() const{ return m_dialog_on; }
-    EncounterState encounter_state() const{ return m_state; }
+    //  Thread-safe
+    bool dialog_on() const{ return m_dialog_on.load(std::memory_order_acquire); }
+    EncounterState encounter_state() const{ return m_state.load(std::memory_order_acquire); }
+
+    //  Not thread-safe
     std::chrono::milliseconds wild_animation_duration() const{ return m_wild_animation_duration; }
     std::chrono::milliseconds your_animation_duration() const{ return m_your_animation_duration; }
 
@@ -44,9 +48,10 @@ private:
     LoggerQt& m_logger;
     StaticScreenDetector& m_dialog_detector;
     WallClock m_end_dialog;
-    bool m_dialog_on;
 
-    EncounterState m_state;
+    std::atomic<bool> m_dialog_on;
+    std::atomic<EncounterState> m_state;
+
     std::chrono::milliseconds m_wild_animation_duration;
     std::chrono::milliseconds m_your_animation_duration;
 };
