@@ -68,18 +68,24 @@ bool ShinyEncounterTracker::process_frame(const QImage& frame, WallClock timesta
         throw UserSetupError(m_logger, "Video aspect ratio must be 16:9.");
     }
 
+    // End shiny detection when we reach the battle menu
     bool battle_menu = m_battle_menu.process_frame(frame, timestamp);
     if (battle_menu){
         m_dialog_tracker.push_end(timestamp);
         return true;
     }
 
+    // Use m_dialog_tracker to track dialog timings. Dialogs partitions the opening of a battle into:
+    // before anything -> wild pokemon animation -> player pokemon animation -> battle menu detected
     m_dialog_tracker.process_frame(frame, timestamp);
 
     switch (m_dialog_tracker.encounter_state()){
     case EncounterState::BEFORE_ANYTHING:
         break;
     case EncounterState::WILD_ANIMATION:{
+        // Update the timestamp that records the end of wild animation
+        m_wild_animation_end_timestamp = timestamp;
+
         m_sparkle_tracker_wild.process_frame(frame, timestamp);
         m_sparkle_tracker_own.clear_boxes();
         m_best_wild_overall.add_frame(frame, m_sparkles_wild);
@@ -101,6 +107,9 @@ bool ShinyEncounterTracker::process_frame(const QImage& frame, WallClock timesta
         break;
     }
     case EncounterState::YOUR_ANIMATION:
+        // Update the timestamp that records the end of player pokemon animation
+        m_your_animation_end_timestamp = timestamp;
+
         m_sparkle_tracker_wild.clear_boxes();
         m_sparkle_tracker_own.process_frame(frame, timestamp);
         m_best_own.add_frame(frame, m_sparkles_own);
@@ -116,15 +125,17 @@ void determine_shiny_status(
     LoggerQt& logger,
     DoublesShinyDetection& wild_result,
     ShinyDetectionResult& your_result,
-    const PokemonSwSh::EncounterDialogTracker& dialog_tracker,
-    const ShinySparkleAggregator& sparkles_wild_overall,
-    const ShinySparkleAggregator& sparkles_wild_left,
-    const ShinySparkleAggregator& sparkles_wild_right,
-    const ShinySparkleAggregator& sparkles_own,
-    bool wild_shiny_sound_found,
+    const ShinyEncounterTracker& tracker,
+    const std::vector<WallClock>& shiny_sound_timestamps,
     double overall_threshold,
     double doubles_threshold
 ){
+    const PokemonSwSh::EncounterDialogTracker& dialog_tracker = tracker.dialog_tracker();
+    const ShinySparkleAggregator& sparkles_wild_overall = tracker.sparkles_wild_overall();
+    const ShinySparkleAggregator& sparkles_wild_left = tracker.sparkles_wild_left();
+    const ShinySparkleAggregator& sparkles_wild_right = tracker.sparkles_wild_right();
+    const ShinySparkleAggregator& sparkles_own = tracker.sparkles_own();
+
     double alpha_wild_overall = sparkles_wild_overall.best_overall();
     double alpha_wild_left = sparkles_wild_left.best_overall();
     double alpha_wild_right = sparkles_wild_right.best_overall();
@@ -138,9 +149,34 @@ void determine_shiny_status(
             alpha_wild_overall += 3.5;
         }
     }
-    if (wild_shiny_sound_found){
-        alpha_wild_overall += 5.0;
+    
+    bool wild_shiny_sound_detected = false;
+    bool own_shiny_sound_detected = false;
+    for(const WallClock& timestamp: shiny_sound_timestamps){
+        const WallClock& wild_end = tracker.wild_animtion_end_timestmap();
+        const WallClock& own_end = tracker.your_animation_end_timestamp();
+
+        auto get_timestamp_distance = [](const WallClock& t0, const WallClock& t1) -> std::chrono::milliseconds{
+            if (t0 > t1){
+                return std::chrono::duration_cast<std::chrono::milliseconds>(t0 - t1);
+            }
+            else{
+                return std::chrono::duration_cast<std::chrono::milliseconds>(t1 - t0);
+            }
+        };
+
+        const auto dist_to_wild = get_timestamp_distance(timestamp, wild_end);
+        const auto dist_to_own = get_timestamp_distance(timestamp, own_end);
+        if (dist_to_wild < dist_to_own){
+            wild_shiny_sound_detected = true;
+        } else if (dist_to_own < dist_to_wild){
+            own_shiny_sound_detected = true;
+        } else{
+            throw OperationFailedException(logger, "Wrong shiny sound timing found.");
+        }
     }
+    alpha_wild_overall += wild_shiny_sound_detected ? 5.0 : 0.0;
+    alpha_own += own_shiny_sound_detected ? 5.0 : 0.0;
 
     {
         std::chrono::milliseconds dialog_duration = dialog_tracker.your_animation_duration();
@@ -152,10 +188,11 @@ void determine_shiny_status(
     }
     logger.log(
         "ShinyDetector: Wild Alpha = " + QString::number(alpha_wild_overall) +
-        (wild_shiny_sound_found ? "(shiny sound detected)" : "") +
+        (wild_shiny_sound_detected ? "(shiny sound detected)" : "") +
         ", Left Alpha = " + QString::number(alpha_wild_left) +
         ", Right Alpha = " + QString::number(alpha_wild_right) +
-        ", Your Alpha = " + QString::number(alpha_own),
+        ", Your Alpha = " + QString::number(alpha_own) + 
+        (own_shiny_sound_detected ? "(shiny sound detected)" : ""),
         COLOR_PURPLE
     );
 
@@ -195,17 +232,19 @@ void detect_shiny_battle(
     BattleType battle_type = type.full_battle_menu ? BattleType::STANDARD : BattleType::STARTER;
     ShinyEncounterTracker tracker(console, console, battle_type);
 
-    bool shiny_sound_detected = false;
     std::shared_ptr<ShinySoundDetector> shiny_sound_detector;
+    std::vector<WallClock> shiny_sound_timestamps; // the times where shiny sound is detected
     
     if (use_shiny_sound){
-        shiny_sound_detector = std::make_shared<ShinySoundDetector>(console.logger(), console, [&shiny_sound_detected](float error_coefficient) -> bool{
+        shiny_sound_detector = std::make_shared<ShinySoundDetector>(console.logger(), console, [&shiny_sound_timestamps](float error_coefficient) -> bool{
             //  Warning: This callback will be run from a different thread than this function.
-            //  When this lambda function is called, a shiny sound is detected. Mark this by `shiny_sound_detected`.
+            //  When this lambda function is called, a shiny sound is detected.
+            //  Mark this by `shiny_sound_timestamps`.
+            shiny_sound_timestamps.emplace_back(current_time());
             //  This lambda function always returns false. It tells the shiny sound detector to always return false
             //  in ShinySoundDetector::process_spectrums() when a shiny sound is found, so that it won't stop
             //  ShinyEncounterTracker tracker from finish running.
-            shiny_sound_detected = true;
+            
             return false;
         });
     }
@@ -224,12 +263,8 @@ void detect_shiny_battle(
     determine_shiny_status(
         console,
         wild_result, your_result,
-        tracker.dialog_tracker(),
-        tracker.sparkles_wild_overall(),
-        tracker.sparkles_wild_left(),
-        tracker.sparkles_wild_right(),
-        tracker.sparkles_own(),
-        shiny_sound_detected,
+        tracker,
+        shiny_sound_timestamps,
         overall_threshold,
         doubles_threshold
     );

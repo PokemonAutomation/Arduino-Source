@@ -39,9 +39,8 @@ LegendaryReset::LegendaryReset(const LegendaryReset_Descriptor& descriptor)
     : SingleSwitchProgramInstance(descriptor)
     , GO_HOME_WHEN_DONE(false)
     , WALK_UP("<b>Walk Up:</b><br>Walk up while mashing A to trigger encounter.", false)
-    , USE_SOUND_DETECTION("<b>Use sound detection:</b><br>Use shiny sound detection. "
-    "<b>Make sure you have correct audio input set.</b><br>"
-    "Don't use your own shiny " + STRING_POKEMON + " as battle lead, which will trigger shiny sound detection.", false)
+    , USE_SOUND_DETECTION("<b>Use sound detection:</b><br>Use sound to improve shiny detection. "
+    "<b>Make sure you have correct audio input set.</b>", false)
     , ENCOUNTER_BOT_OPTIONS(false, false)
     , NOTIFICATIONS({
         &ENCOUNTER_BOT_OPTIONS.NOTIFICATION_NONSHINY,
